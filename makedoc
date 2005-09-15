@@ -1,17 +1,8 @@
 CMLOGSRC = $(shell pwd)
 
-DIRS=   WidgetsACM \
-	WidgetsFermilab \
-	Utils \
-	Image \
-	XmA \
-	deviceIO \
-	deviceRPC \
+DIRS=   deviceRPC \
 	Transprofs \
-	logRPC_NEW \
-	logRPC_VMS \
 	AccStat \
-	ACSfortran \
 	Analog \
 	Analyze \
 	cdevService \
@@ -22,10 +13,6 @@ DIRS=   WidgetsACM \
 	Intlock \
 	IQreset \
 	JavaJNI \
-	logRPC_NEW \
-	logRPC_NEW \
-	logRPC_VMS \
-	logRPC_VMS \
 	Malus \
 	MEDM/xc \
 	MEDM/acs \
@@ -35,11 +22,11 @@ DIRS=   WidgetsACM \
 	Oraprogs \
 	pc104/HPcalc \
 	pc104/UpDown \
+	pc104/LCD \
 	pc104 \
 	Pfeil \
 	pidControl \
 	pidStrom \
-	Profil \
 	Scan \
 	scl \
 	sga \
