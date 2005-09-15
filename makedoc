@@ -1,0 +1,70 @@
+CMLOGSRC = $(shell pwd)
+
+DIRS=   WidgetsACM \
+	WidgetsFermilab \
+	Utils \
+	Image \
+	XmA \
+	deviceIO \
+	deviceRPC \
+	Transprofs \
+	logRPC_NEW \
+	logRPC_VMS \
+	AccStat \
+	ACSfortran \
+	Analog \
+	Analyze \
+	cdevService \
+	Disco \
+	Geiss \
+	GraEdit \
+	HFdisp \
+	Intlock \
+	IQreset \
+	JavaJNI \
+	logRPC_NEW \
+	logRPC_NEW \
+	logRPC_VMS \
+	logRPC_VMS \
+	Malus \
+	MEDM/xc \
+	MEDM/acs \
+	MEDM/cdev \
+	MEDM/medm \
+	myServer \
+	Oraprogs \
+	pc104/HPcalc \
+	pc104/UpDown \
+	pc104 \
+	Pfeil \
+	pidControl \
+	pidStrom \
+	Profil \
+	Scan \
+	scl \
+	sga \
+	StripTool \
+	Szent \
+	Tendis \
+	Touchp \
+	Verdis
+
+
+
+all:
+	@for dir in $(DIRS); \
+	do \
+		cd $$dir; \
+		echo " "; \
+		echo "---------------------------------------------------------"; \
+		echo "-----------------" $$dir ; \
+		echo "---------------------------------------------------------"; \
+		echo " "; \
+		perl /home/mezger/workarea/cvs2html.pl  -a -o  /home/mezger/workarea/docs/$$dirs.html; \
+		cd $(CMLOGSRC); \
+	done
+
+
+
+
+
