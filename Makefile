@@ -19,7 +19,7 @@
 # -------------------------------------------------------------------------
 # 2005-08-04  PSI/ACS	MGa	Initial version CVS directory layout
 #
-# @(#)$Id: Makefile,v 1.1 2005/09/15 11:46:50 gasche Exp $
+# @(#)$Id: Makefile,v 1.2 2005/09/15 13:27:55 gasche Exp $
 #**************************************************************************
 
 ifndef ACS_BUILD_INCLUDE
@@ -60,7 +60,7 @@ MODULES = DeviceRPC \
 	  Scan \
 	  scl \
 	  Spread \
-	  StripTool \
+	  StripTool/src \
 	  Szent \
 	  Tcl \
 	  Tendis \
