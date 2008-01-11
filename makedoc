@@ -1,18 +1,22 @@
 CMLOGSRC = $(shell pwd)
 
-DIRS=   deviceRPC \
-	Transprofs \
+DIRS=	Transprofs \
 	AccStat \
+	ACSfortran \
 	Analog \
-	Analyze \
+	Analyze_NEW \
+	BELIZE \
+	BPM \
 	cdevService \
 	Disco \
 	Geiss \
 	GraEdit \
 	HFdisp \
 	Intlock \
+	IntlockEpics \
 	IQreset \
-	JavaJNI \
+	logRPC_NEW \
+	LogWWW \
 	Malus \
 	MEDM/xc \
 	MEDM/acs \
@@ -30,10 +34,13 @@ DIRS=   deviceRPC \
 	Scan \
 	scl \
 	sga \
-	StripTool \
+	Spread \
+	Survey \
 	Szent \
+	Tcl    \
 	Tendis \
 	Touchp \
+	Transprofs \
 	Verdis
 
 
@@ -47,7 +54,7 @@ all:
 		echo "-----------------" $$dir ; \
 		echo "---------------------------------------------------------"; \
 		echo " "; \
-		perl /home/mezger/workarea/cvs2html.pl  -a -o  /home/mezger/workarea/docs/$$dirs.html; \
+		perl /home/mezger/workarea/acs/mezger/cvs2html.pl  -a -o  /home/mezger/workarea/acs/mezger/docs/$$dirs.html; \
 		cd $(CMLOGSRC); \
 	done
 
