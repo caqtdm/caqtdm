@@ -1,19 +1,23 @@
 CMLOGSRC = $(shell pwd)
 
-DIRS=	Transprofs \
-	AccStat \
+DIRS=	AccStat \
 	ACSfortran \
 	Analog \
 	Analyze_NEW \
 	BELIZE \
 	BPM \
 	cdevService \
+        DeviceIO \
+        DeviceRPC \
 	Disco \
+        epicsLib \
+        epicsTests \
 	Geiss \
 	GraEdit \
 	HFdisp \
 	Intlock \
 	IntlockEpics \
+        IntlockNew \
 	IQreset \
 	logRPC_NEW \
 	LogWWW \
@@ -31,6 +35,7 @@ DIRS=	Transprofs \
 	Pfeil \
 	pidControl \
 	pidStrom \
+        procUCN \
 	Scan \
 	scl \
 	sga \
