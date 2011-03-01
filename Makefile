@@ -1,4 +1,4 @@
-SUBDIRS = AccStat Analog Analyze_NEW Disco epicsLib Geiss HFdisp IntlockNew IQreset Malus Oraprogs pc104New pidControl pidStrom pioGateway procUCN Scan scl Survey SzentNew MEDM Tendis Touchp Transprofs Verdis
+SUBDIRS = AccStat Analog Analyze_NEW Disco epicsLib Geiss HFdisp IntlockNew IQreset Malus Oraprogs pc104New pidControl pidStrom pioGateway procUCN Scan scl Survey SzentNew Tendis Touchp Transprofs Verdis
 
 .PHONY: subdirs $(SUBDIRS)
 subdirs: $(SUBDIRS)
