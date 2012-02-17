@@ -1,11 +1,44 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 #include "QtProperties.h"
 
 #define DEFAULT_FORMAT "% 6.2f"
 #define DEFAULT_FORMAT_WIDTH 6
 #define DEFAULT_FORMAT_PRECISION 2
+
+zOrder zorder[1000];
+int zindex=0;
+
+static int sortFunction(zOrder *a, zOrder *b)
+{
+    //printf("%d %d\n", a->vis, b->vis);
+    return (b->vis > a->vis);
+}
+
+static void uppercase(char *str)
+{
+    int i;
+    for( i = 0; str[ i ]; i++)
+      str[i] = toupper( str[ i ] );
+    return;
+}
+
+static void replace_char (char *s, char find, char replace) {
+    while (*s != 0) {
+        if (*s == find) *s = replace;
+        s++;
+    }
+}
+
+void niceChannel(char *value)
+{
+
+  replace_char (value, ' ', '\0');
+  replace_char (value, ';', ':');
+  uppercase(value);
+}
 
 /* Checks format validity and calls compute_format_size */
 static void wheelSwitchFormat(char *format, int *width, int *precision)
@@ -73,8 +106,51 @@ static void wheelSwitchFormat(char *format, int *width, int *precision)
 void Qt_handleString(char *prop, char *tag, char *value)
 {
     C_writeOpenProperty(myParserPtr, prop);
+
+    // in case of a channel, we have to replace blancs, dots and ; used by AC
+
+    if(!strcmp(prop, "channel")) {
+        niceChannel(value);
+    }
+
     C_writeTaggedString(myParserPtr, tag, value);
     C_writeCloseProperty(myParserPtr);
+}
+
+void Qt_taggedString(char *tag, char *value)
+{
+     C_writeTaggedString(myParserPtr, tag, value);
+}
+
+void Qt_writeOpenTag(char *tag, char *typ, char *value)
+{
+    C_writeOpenTag(myParserPtr, tag, typ, value);
+}
+
+void Qt_writeCloseTag(char *tag, char *value, int visibilityStatic)
+{
+    if(!strcmp(tag, "widget") && strstr(value, "ca")) {
+        strcpy(zorder[zindex].z, value);
+        zorder[zindex].vis = visibilityStatic;
+        zorder[zindex].indx = zindex;
+        zindex++;
+    }
+    C_writeCloseTag(myParserPtr, tag);
+}
+
+void Qt_writeOpenProperty(char *property)
+{
+    C_writeOpenProperty(myParserPtr, property);
+}
+
+void Qt_writeCloseProperty()
+{
+    C_writeCloseProperty(myParserPtr);
+}
+
+void Qt_writeStyleSheet()
+{
+C_writeStyleSheet(myParserPtr);
 }
 
 void Qt_setWheelSwitchForm(char *widget, char *token)
@@ -111,7 +187,6 @@ void Qt_setMaximumLimit(char *widget, int pen, char *token) {
 }
 
 void Qt_setPrecision(char *widget, int pen, char *token) {
-    printf("set precision widget=%s\n", widget);
     if(strstr(widget, "caNumeric") != (char*) 0) {
         int prec;
         char asc[10];
@@ -160,34 +235,36 @@ void Qt_setYaxisLimitSource(char *widget, char *token)
 
 void Qt_setMinimumLimitSource(char *widget, int pen, char *token)
 {
-
+    char strng[30];
+    if(strstr(token, "default") != (char*) 0) {
+        sprintf(strng, "%s::User", widget);
+    } else if(strstr(token, "channel") != (char*) 0) {
+        sprintf(strng, "%s::Channel", widget);
+    }
     if(!strcmp(widget, "caStripPlot") || !strcmp(widget, "caCartesianPlot")) {
-       char asc[30], strng[30];
-       sprintf(asc, "YaxisScalingMin_%d", pen+1);
-       if(strstr(token, "default") != (char*) 0) {
-           sprintf(strng, "%s::User", widget);
-       } else if(strstr(token, "channel") != (char*) 0) {
-           sprintf(strng, "%s::Channel", widget);
-       }
-       Qt_handleString(asc, "enum", strng);
-   } else {
+        char asc[30];
+        sprintf(asc, "YaxisScalingMin_%d", pen+1);
+        Qt_handleString(asc, "enum", strng);
+    } else {
+        Qt_handleString("limitsMode", "enum", strng);
+    }
 
-   }
 }
 
 void Qt_setMaximumLimitSource(char *widget, int pen, char *token)
 {
+    char strng[30];
+    if(strstr(token, "default") != (char*) 0) {
+        sprintf(strng, "%s::User", widget);
+    } else if(strstr(token, "channel") != (char*) 0) {
+        sprintf(strng, "%s::Channel", widget);
+    }
      if(!strcmp(widget, "caStripPlot") || !strcmp(widget, "caCartesianPlot")) {
-        char asc[30], strng[30];
+        char asc[30];
         sprintf(asc, "YaxisScalingMax_%d", pen+1);
-        if(strstr(token, "default") != (char*) 0) {
-            sprintf(strng, "%s::User", widget);
-        } else if(strstr(token, "channel") != (char*) 0) {
-            sprintf(strng, "%s::Channel", widget);
-        }
         Qt_handleString(asc, "enum", strng);
     } else {
-
+        Qt_handleString("limitsMode", "enum", strng);
     }
 }
 
@@ -224,22 +301,28 @@ void Qt_setColorMode(char *widget, char *token)
     }
 }
 
-void Qt_setVisibilityMode(char *widget, char *token)
+int Qt_setVisibilityMode(char *widget, char *token)
 {
+    // returns 0 if visibility is static, 1 otherwise
     char asc[80];
     if(!strcmp(token,"static")) {
         sprintf(asc, "%s::StaticV", widget);
         Qt_handleString("visibility", "enum", asc);
+        return 0;
     } else if(!strcmp(token,"if not zero")) {
         sprintf(asc, "%s::IfNotZero", widget);
         Qt_handleString("visibility", "enum", asc);
+        return 1;
     } else if(!strcmp(token,"if zero")) {
         sprintf(asc, "%s::IfZero", widget);
         Qt_handleString("visibility", "enum", asc);
+        return 1;
     } else if(!strcmp(token,"calc")) {
         sprintf(asc, "%s::Calc", widget);
         Qt_handleString("visibility", "enum", asc);
+        return 1;
     }
+    return 0;
 }
 
 static void Qt_setColor(char *property, int r, int g, int b, int alpha)

@@ -9,3 +9,6 @@ SOURCES += myParser.cpp XmlWriter.cpp parser.c \
     QtProperties.c
 
 TARGET = myParser
+
+OTHER_FILES += \
+    stylesheet.qss

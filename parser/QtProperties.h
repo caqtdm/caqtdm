@@ -3,6 +3,16 @@
 
 typedef struct myParser myParser;
 
+typedef char string40[40];
+typedef struct _zOrder {
+    int indx;
+    int vis;
+    string40 z;
+} zOrder;
+
+#define True 1==1
+#define False !True
+
 extern myParser* myParserPtr;
 extern myParser* C_Parser(myParser* p, char *strng);
 extern myParser* C_writeOpenTag(myParser* p, char *type, char *cls, char *name );
@@ -14,9 +24,15 @@ extern myParser* C_writeCloseProperty(myParser* p);
 extern myParser* C_writeStyleSheet(myParser* p);
 
 void Qt_handleString(char *property, char *tag, char *value);
+void Qt_taggedString(char *tag, char *value);
+void Qt_writeOpenTag(char *tag, char *typ, char *value);
+void Qt_writeCloseTag(char *tag, char *value, int visibilityStatic);
+void Qt_writeOpenProperty(char *property);
+void Qt_writeCloseProperty();
+void Qt_writeStyleSheet();
 void Qt_setWheelSwitchForm(char *widget, char *token);
 void Qt_setColorMode(char *widget, char *token);
-void Qt_setVisibilityMode(char *widget, char *token);
+int Qt_setVisibilityMode(char *widget, char *token);
 
 void Qt_setColorBackground(char *widget, int r, int g, int b, int alpha);
 void Qt_setColorForeground(char *widget, int r, int g, int b, int alpha);
@@ -35,5 +51,7 @@ void Qt_setMaximumLimitSource(char *widget, int pen, char *token);
 void Qt_setPrecisionSource(char *widget, int pen, char *token);
 
 void Qt_setColormain(char *widget, int r, int g, int b, int alpha);
+
+void niceChannel(char *value);
 
 #endif
