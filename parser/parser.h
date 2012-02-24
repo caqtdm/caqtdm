@@ -38,23 +38,6 @@ extern "C" {
 #error Need to make changes (CALC_A_RC, etc.) if MAX_CALC_RECORDS != 4
 #endif
 
-
-#define NUM_TEXT_FORMATS        11
-typedef enum {
-    MEDM_DECIMAL  = 23,
-    EXPONENTIAL   = 24,
-    ENGR_NOTATION = 25,
-    COMPACT       = 26,
-    TRUNCATED     = 27,
-    HEXADECIMAL   = 28,
-    OCTAL         = 29,
-    STRING        = 30,
-    SEXAGESIMAL   = 31,
-    SEXAGESIMAL_HMS= 32,
-    SEXAGESIMAL_DMS= 33
-} TextFormat;
-const TextFormat FIRST_TEXT_FORMAT = MEDM_DECIMAL;
-
 typedef struct {
     int x, y;
     unsigned int width, height;
@@ -69,11 +52,6 @@ typedef struct {
     int r, g, b;
     int inten;
 } DlColormapEntry;
-
-typedef struct {
-    char name[MAX_TOKEN_LENGTH];
-    int versionNumber;
-} DlFile;
 
 typedef struct {
     DlObject object;
@@ -98,7 +76,7 @@ typedef struct {
 
 typedef struct _DisplayInfo {
     FILE *filePtr;
-    DlFile *dlFile;
+    //DlFile *dlFile;
     int versionNumber;
     int drawingAreaBackgroundColor;
     int drawingAreaForegroundColor;

@@ -51,11 +51,11 @@ public:
     void writeOpenTag(const QString& type, const QString& cls = "", const QString& name = "");
     void writeCloseTag(const QString& type);
     XmlWriter *xw;
-    myParser *parser;
+    myParser *adlParser;
     QFile *file;
     QString StyleSheet;
     void test();
-    void Init(myParser* parser);
+    void Init(myParser* adlParser);
     void writeMessage(char *mess);
 
 private:
@@ -162,9 +162,9 @@ void myParser::writeCloseTag(const QString& type)
     xw->writeCloseTag(type);
 }
 
-void myParser::Init(myParser* parser)
+void myParser::Init(myParser* adlParser)
 {
-    myParserPtr = parser;
+    myParserPtr = adlParser;
 }
 
 void myParser::writeMessage(char *mess) {
@@ -207,7 +207,7 @@ extern "C" myParser* C_writeCloseProperty(myParser* p)
     return p;
 }
 
-extern "C" myParser* C_Parser(myParser* p, char* strng)
+extern "C" myParser* C_adlParser(myParser* p, char* strng)
 {
     p->writeMessage(strng);
     p->writeProperty( "name", "cstring", strng );
@@ -238,29 +238,30 @@ int main(int argc, char *argv[])
     for (numargs = argc, in = 1; in < numargs; in++) {
         if ( strcmp (argv[in], "-flat" ) == 0 ) {
             in++;
-            printf("parser -- a flat file will be generated\n");
             generateFlatFile = True;
         }
         if ( strcmp (argv[in], "-deviceonmenu" ) == 0 ) {
             in++;
-            printf("parser -- device name will be put on menus\n");
             generateDeviceOnMenus = True;
         }
         if (strncmp (argv[in], "-" , 1) == 0) {
             /* unknown application argument */
-            printf("parser -- Argument %d = [%s] is unknown! ",in,argv[in]);
+            printf("adlParser: Argument %d = [%s] is unknown! ",in,argv[in]);
             printf("possible are: '-flat and '-deviceonmenu'\n");
             exit(-1);
         } else {
-            printf("parser -- file = <%s>\n", argv[in]);
+            printf("adlParser: file = <%s>\n", argv[in]);
             strcpy(inFile, argv[in]);
         }
     }
 
+    if(generateFlatFile) printf("adlParser: a flat file will be generated\n");
+    if(generateDeviceOnMenus)printf("adlParser: device name will be put on menus\n");
+
     // input and out files
     QString inputFile = inFile;
     if(inputFile.size() < 1) {
-        qDebug() << "parser -- sorry: no input file";
+        qDebug() << "adlParser -- sorry: no input file";
         exit(-1);
     }
 
@@ -272,7 +273,7 @@ int main(int argc, char *argv[])
     // when file exists open it
     QFileInfo fi(inputFile);
     if(!fi.exists()) {
-        qDebug() << "parser -- sorry: file" << inFile << "does not exist";
+        qDebug() << "adlParser: sorry, file" << inFile << "does not exist";
         exit(-1);
     }
 
@@ -280,13 +281,13 @@ int main(int argc, char *argv[])
     //qDebug() << fi.absolutePath();
     strcpy(filePrefix, fi.absolutePath().toAscii().data());
 
-    // init parser
-    myParser *parser = new myParser;
-    parser->Init(parser);
+    // init adlParser
+    myParser *adlParser = new myParser;
+    adlParser->Init(adlParser);
 
     //get rid of path, we want to generate where we are
     outputFile = outputFile.section('/',-1);
-    parser->openFile(outputFile.toAscii().data());
+    adlParser->openFile(outputFile.toAscii().data());
 
     // open input file
     FILE *filePtr = fopen(inputFile.toAscii().data(), "r");
@@ -332,7 +333,7 @@ int main(int argc, char *argv[])
     }
 
     // close output file
-    parser->closeFile();
+    adlParser->closeFile();
 
     return 0;
 }

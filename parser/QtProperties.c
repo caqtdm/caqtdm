@@ -8,7 +8,7 @@
 #define DEFAULT_FORMAT_WIDTH 6
 #define DEFAULT_FORMAT_PRECISION 2
 
-zOrder zorder[1000];
+zOrder zorder[10000];
 int zindex=0;
 
 static int sortFunction(zOrder *a, zOrder *b)
