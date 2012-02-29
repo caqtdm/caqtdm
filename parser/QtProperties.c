@@ -162,8 +162,6 @@ void Qt_setWheelSwitchForm(char *widget, char *token)
     Qt_handleString("integerDigits", "number", asc);
     sprintf(asc, "%d", precision);
     Qt_handleString("decimalDigits", "number", asc);
-    Qt_handleString("digitsFontScaleEnabled", "bool", "true");
-    Qt_handleString("autoFillBackground", "bool", "true");
 }
 
 void Qt_setMinimumLimit(char *widget, int pen, char *token) {
@@ -190,6 +188,10 @@ void Qt_setPrecision(char *widget, int pen, char *token) {
     if(strstr(widget, "caNumeric") != (char*) 0) {
         int prec;
         char asc[10];
+
+        printf("setprecision <%s>\n", token);
+
+
         sscanf(token, "%d", &prec);
         Qt_handleString("decimalDigits", "number", token);
         sprintf(asc, "%d", prec+1);
@@ -271,33 +273,36 @@ void Qt_setMaximumLimitSource(char *widget, int pen, char *token)
 void Qt_setPrecisionSource(char *widget, int pen, char *token)
 {
     char asc[80], aux[80];
-    if(!strcmp(widget, "caLineEdit")) {
       strcpy(aux, token);
       if(aux[0] >= 'a' && aux[0] <='z') aux[0] = aux[0] - 32;
       if(!strcmp(aux, "Default")) strcpy(aux, "User");
       sprintf(asc, "%s::%s", widget, aux);
       Qt_handleString("precisionMode", "enum", asc);
-    }
 }
 
 void Qt_setColorFill(char *widget) {
-    C_writeOpenProperty(myParserPtr, "fill");
+
+    C_writeOpenProperty(myParserPtr, "fillstyle");
     C_writeTaggedString(myParserPtr, "enum", "Filled");
     C_writeCloseProperty(myParserPtr);
 }
 
-void Qt_setColorMode(char *widget, char *token)
+int Qt_setColorMode(char *widget, char *token)
 {
+    // returns 0 if alarm is static, 1 otherwise
     char asc[80];
     if(!strcmp(token,"static")) {
         sprintf(asc, "%s::Static", widget);
         Qt_handleString("colorMode", "enum", asc);
+        return 0;
     } else if(!strcmp(token,"alarm")) {
         sprintf(asc, "%s::Alarm_Static", widget);
         Qt_handleString("colorMode", "enum", asc);
+        return 1;
     } else if(!strcmp(token,"discrete")) {
-        sprintf(asc, "%s::Discrete", widget);
+        sprintf(asc, "%s::Static", widget);
         Qt_handleString("colorMode", "enum", asc);
+        return 0;
     }
 }
 

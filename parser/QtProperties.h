@@ -31,7 +31,7 @@ void Qt_writeOpenProperty(char *property);
 void Qt_writeCloseProperty();
 void Qt_writeStyleSheet();
 void Qt_setWheelSwitchForm(char *widget, char *token);
-void Qt_setColorMode(char *widget, char *token);
+int Qt_setColorMode(char *widget, char *token);
 int Qt_setVisibilityMode(char *widget, char *token);
 
 void Qt_setColorBackground(char *widget, int r, int g, int b, int alpha);

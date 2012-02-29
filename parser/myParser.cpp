@@ -116,7 +116,7 @@ void myParser::closeFile()
     // sort according to the static elements
     qStableSort(myvector.begin(), myvector.end(), compareFunc);
     for (it=myvector.begin(); it!=myvector.end(); ++it) {
-        //qDebug() << "sorted" << it->indx << it->vis << it->z;
+        qDebug() << "sorted" << it->indx << it->vis << it->z;
         xw->writeTaggedString("zorder", it->z);
     }
 

@@ -430,7 +430,6 @@ void parseAttr(DisplayInfo *displayInfo, char *widget)
                                       displayInfo->dlColormap->dl_color[clr].b,
                                       255);
 
-
 	    } else if(!strcmp(token,"style")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
@@ -605,13 +604,13 @@ void parseBasicAttribute(DisplayInfo *displayInfo, char *widget)
                         displayInfo->dlColormap->dl_color[clr].b,
                         255);
 
-    } else if((!strcmp(widget,"caPolyLine")) || (!strcmp(widget,"caGraphics"))) {
+    } else if( (!strcmp(widget,"caPolyLine")) || (!strcmp(widget,"caGraphics")) || (!strcmp(widget,"caPolygon")) ) {
         if(!strcmp(fillstyle,"solid")) {
             Qt_setColorForeground("", displayInfo->dlColormap->dl_color[clr].r,
                                   displayInfo->dlColormap->dl_color[clr].g,
                                   displayInfo->dlColormap->dl_color[clr].b,
                                   255);
-            if(strcmp(widget,"caPolyLine"))Qt_setColorFill("");
+            Qt_setColorFill(widget);
             Qt_setColorLine("",  displayInfo->dlColormap->dl_color[clr].r,
                             displayInfo->dlColormap->dl_color[clr].g,
                             displayInfo->dlColormap->dl_color[clr].b,
@@ -631,13 +630,15 @@ void parseBasicAttribute(DisplayInfo *displayInfo, char *widget)
                             255);
         }
 
+
         if(!strcmp(linestyle,"solid")) {
-            Qt_handleString("style", "enum", "Solid");
+              Qt_handleString("linestyle", "enum", "Solid");
         } else if(!strcmp(linestyle,"dash")) {
-            Qt_handleString("style", "enum", "Dash");
+              Qt_handleString("linestyle", "enum", "Dash");
         } else if(!strcmp(linestyle,"bigdash")) {
-            Qt_handleString("style", "enum", "BigDash");
+              Qt_handleString("linestyle", "enum", "BigDash");
         }
+
     }
 
 }
@@ -717,11 +718,11 @@ void parseDynamicAttribute(DisplayInfo *displayInfo, char *widget, int *visibili
 	    if(!strcmp(token,"clr")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
-                Qt_setColorMode(widget, token);
+                *visibilityStatic = Qt_setColorMode(widget, token);
 	    } else if(!strcmp(token,"vis")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
-                *visibilityStatic = Qt_setVisibilityMode(widget, token);
+                Qt_setVisibilityMode(widget, token);
 	    } else if(!strcmp(token,"calc")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
@@ -883,6 +884,10 @@ void parsePen(DisplayInfo *displayInfo, int pen, char *channels, char *widget)
 
 void parseObject(DisplayInfo *displayInfo, DlObject *object, FrameOffset * offset, char *widget)
 {
+
+    // in case of labels, the width has not alwas been set properly by the user
+    // do nothing now, and set the object properties later
+
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
     int nestingLevel = 0;
@@ -923,6 +928,7 @@ void parseObject(DisplayInfo *displayInfo, DlObject *object, FrameOffset * offse
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
                 object->width = atoi(token);
+
                 // add two pixels for frames
                 if(!strcmp(widget,"caFrame")) {
                     char asc[10];
@@ -1837,11 +1843,6 @@ void *parseTextUpdate(DisplayInfo *displayInfo, FrameOffset * offset)
                               format = 5;
                           }
                       }
-
-
-
-
-
 	    } else if(!strcmp(token,"align")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
@@ -2366,7 +2367,7 @@ static void compositeFileParse(DisplayInfo *displayInfo, char *filename, FrameOf
 
         Qt_handleString("filename", "string", filename);
         Qt_handleString("macro", "string", macroString);
-        Qt_writeCloseTag("widget", "", 1);
+        Qt_writeCloseTag("widget", widgetName, 0);
         return;
     }
 
@@ -2512,7 +2513,7 @@ void *parseComposite(DisplayInfo *displayInfo, FrameOffset * offset)
     char compositeName[MAX_TOKEN_LENGTH];
     char compositeFile[MAX_TOKEN_LENGTH];
     char asc[MAX_TOKEN_LENGTH];
-    int visibilityStatic = 2;
+    int visibilityStatic = 0;
 
     static int number = 0;
     char widgetName[40];
@@ -2575,30 +2576,31 @@ void *parseComposite(DisplayInfo *displayInfo, FrameOffset * offset)
 }
 
 #define INITIAL_NUM_POINTS 16
-void parsePolygonPoints(DisplayInfo *displayInfo, char *widget)
+void parsePolygonPoints(DisplayInfo *displayInfo, char *widget, int offsetX, int offsetY)
 {
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
     int nestingLevel;
+    int x, y;
+    char points[1024];
 
+    points[0] = '\0';
     nestingLevel = 0;
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
-	    if(!strcmp(token,"(")) {
-                //if(dlPolygon->nPoints >= pointsArraySize) {
-                /* reallocate the points array: enlarge by 4X, etc */
-                //pointsArraySize *= 4;
-                //dlPolygon->points = (XPoint *)realloc(dlPolygon->points,(pointsArraySize+1)*sizeof(XPoint));
-                //}
-		getToken(displayInfo,token);
-		//dlPolygon->points[dlPolygon->nPoints].x = atoi(token);
-		getToken(displayInfo,token);	/* separator	*/
-		getToken(displayInfo,token);
-		//dlPolygon->points[dlPolygon->nPoints].y = atoi(token);
-		getToken(displayInfo,token);	/*   ")"	*/
-                //dlPolygon->nPoints++;
-	    }
+
+            if(!strcmp(token,"(")) {
+
+                getToken(displayInfo,token);
+                x = atoi(token);
+                getToken(displayInfo,token);	// separator
+                getToken(displayInfo,token);
+                y = atoi(token);
+                getToken(displayInfo,token);	//   ")"
+                sprintf(points, "%s%d,%d;", points,  x-offsetX, y-offsetY);
+            }
+
 	    break;
 	case T_EQUAL:
 	    break;
@@ -2614,19 +2616,8 @@ void parsePolygonPoints(DisplayInfo *displayInfo, char *widget)
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
-    /* ensure closure of the polygon... */
-    /*
-    if(dlPolygon->points[0].x != dlPolygon->points[dlPolygon->nPoints-1].x &&
-      dlPolygon->points[0].y != dlPolygon->points[dlPolygon->nPoints-1].y) {
- if(dlPolygon->nPoints >= pointsArraySize) {
-     dlPolygon->points = (XPoint *)realloc(dlPolygon->points,
-       (dlPolygon->nPoints+2)*sizeof(XPoint));
- }
- dlPolygon->points[dlPolygon->nPoints].x = dlPolygon->points[0].x;
- dlPolygon->points[dlPolygon->nPoints].y = dlPolygon->points[0].y;
- dlPolygon->nPoints++;
-    }
- */ 
+        if(strlen(points) > 0) Qt_handleString("xyPairs", "string", points);
+
 }
 
 void *parseWheelSwitch(DisplayInfo *displayInfo, FrameOffset * offset)
@@ -2636,8 +2627,8 @@ void *parseWheelSwitch(DisplayInfo *displayInfo, FrameOffset * offset)
     TOKEN tokenType;
     int nestingLevel = 0;
     DlObject object;
-    int i = 0;
     int visibilityStatic = 2; // top layer
+    int formatFound=False;
 
     static int number = 0;
     char widgetName[40];
@@ -2661,7 +2652,9 @@ void *parseWheelSwitch(DisplayInfo *displayInfo, FrameOffset * offset)
 	    } else if(!strcmp(token,"format")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
+                formatFound = True;
                 Qt_setWheelSwitchForm("", token);
+                Qt_setPrecisionSource("caNumeric", 0, "Default");
 	    }
 	    break;
 	case T_EQUAL:
@@ -2678,7 +2671,8 @@ void *parseWheelSwitch(DisplayInfo *displayInfo, FrameOffset * offset)
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
-    //Qt_setColorMode("caNumeric", COLORMODE);
+    //Qt_handleString("digitsFontScaleEnabled", "bool", "true");
+    Qt_handleString("autoFillBackground", "bool", "true");
 
     Qt_writeCloseTag("widget", widgetName, visibilityStatic);
 
@@ -2693,19 +2687,22 @@ void *parsePolygon(DisplayInfo *displayInfo, FrameOffset * offset)
     int nestingLevel = 0;
     DlObject object;
     int visibilityStatic = 0;
+    int offsetX=0, offsetY=0;
 
     static int number = 0;
     char widgetName[40];
     sprintf(widgetName, "caPolygon_%d", number++);
-    Qt_writeOpenTag("widget", "caPolygon", widgetName);
+    Qt_writeOpenTag("widget", "caPolyLine", widgetName);
 
-    printf("==> parsePolygon not yet implemented\n");
+    //printf("==> parsePolygon not yet implemented\n");
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
-	    if(!strcmp(token,"object"))
+            if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object, offset, "caPolygon");
-	    else
+                offsetX = object.x;
+                offsetY = object.y;
+            } else {
                 if(!strcmp(token,"basic attribute"))
                     parseBasicAttribute(displayInfo, "caPolygon");
                 else
@@ -2713,7 +2710,8 @@ void *parsePolygon(DisplayInfo *displayInfo, FrameOffset * offset)
                         parseDynamicAttribute(displayInfo, "caPolygon", &visibilityStatic);
                     else
                         if(!strcmp(token,"points"))
-                            parsePolygonPoints(displayInfo, "caPolygon");
+                            parsePolygonPoints(displayInfo, "caPolygon", offsetX, offsetY);
+            }
 	    break;
 	case T_EQUAL:
 	    break;
@@ -2728,6 +2726,8 @@ void *parsePolygon(DisplayInfo *displayInfo, FrameOffset * offset)
 	}
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
+
+    Qt_handleString("polystyle", "enum", "caPolyLine::Polygon");
 
     Qt_writeCloseTag("widget", widgetName, visibilityStatic);
 
@@ -2918,7 +2918,7 @@ void *parseText(DisplayInfo *displayInfo, FrameOffset * offset)
                 Qt_handleString("text", "string",  token);
                 Qt_handleString("fontScaleMode", "enum",  "ESimpleLabel::Height");
 	    } else if(!strcmp(token,"align")) {
-		int found=0;
+                int found=0;
 
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
