@@ -21,7 +21,7 @@ static void uppercase(char *str)
 {
     int i;
     for( i = 0; str[ i ]; i++)
-      str[i] = toupper( str[ i ] );
+        str[i] = toupper( str[ i ] );
     return;
 }
 
@@ -35,9 +35,9 @@ static void replace_char (char *s, char find, char replace) {
 void niceChannel(char *value)
 {
 
-  replace_char (value, ' ', '\0');
-  replace_char (value, ';', ':');
-  uppercase(value);
+    replace_char (value, ' ', '\0');
+    replace_char (value, ';', ':');
+    uppercase(value);
 }
 
 /* Checks format validity and calls compute_format_size */
@@ -119,7 +119,7 @@ void Qt_handleString(char *prop, char *tag, char *value)
 
 void Qt_taggedString(char *tag, char *value)
 {
-     C_writeTaggedString(myParserPtr, tag, value);
+    C_writeTaggedString(myParserPtr, tag, value);
 }
 
 void Qt_writeOpenTag(char *tag, char *typ, char *value)
@@ -150,7 +150,7 @@ void Qt_writeCloseProperty()
 
 void Qt_writeStyleSheet()
 {
-C_writeStyleSheet(myParserPtr);
+    C_writeStyleSheet(myParserPtr);
 }
 
 void Qt_setWheelSwitchForm(char *widget, char *token)
@@ -166,7 +166,7 @@ void Qt_setWheelSwitchForm(char *widget, char *token)
 
 void Qt_setMinimumLimit(char *widget, int pen, char *token) {
     if(strstr(widget, "caStripPlot") == (char*) 0) {
-       Qt_handleString("minValue", "double", token);
+        Qt_handleString("minValue", "double", token);
     } else {
         char asc[30];
         sprintf(asc, "YaxisLimitsMin_%d", pen+1);
@@ -176,7 +176,7 @@ void Qt_setMinimumLimit(char *widget, int pen, char *token) {
 
 void Qt_setMaximumLimit(char *widget, int pen, char *token) {
     if(strstr(widget, "caStripPlot") == (char*) 0) {
-      Qt_handleString("maxValue", "double", token);
+        Qt_handleString("maxValue", "double", token);
     } else {
         char asc[30];
         sprintf(asc, "YaxisLimitsMax_%d", pen+1);
@@ -188,20 +188,16 @@ void Qt_setPrecision(char *widget, int pen, char *token) {
     if(strstr(widget, "caNumeric") != (char*) 0) {
         int prec;
         char asc[10];
-
-        printf("setprecision <%s>\n", token);
-
-
         sscanf(token, "%d", &prec);
         Qt_handleString("decimalDigits", "number", token);
         sprintf(asc, "%d", prec+1);
         Qt_handleString("integerDigits", "number", asc);
     } else {
-      int prec;
-      char asc[10];
-      sscanf(token, "%d", &prec);
-      sprintf(asc, "%d", prec);
-       Qt_handleString("precision", "number", asc);
+        int prec;
+        char asc[10];
+        sscanf(token, "%d", &prec);
+        sprintf(asc, "%d", prec);
+        Qt_handleString("precision", "number", asc);
     }
 }
 
@@ -223,6 +219,7 @@ void Qt_setXaxisLimitSource(char *widget, char *token)
 void Qt_setYaxisLimitSource(char *widget, char *token)
 {
     char asc[80];
+
     if(strstr(token, "auto") != (char*) 0) {
         sprintf(asc, "%s::Auto", widget);
     }else if(strstr(token, "default") != (char*) 0) {
@@ -261,7 +258,7 @@ void Qt_setMaximumLimitSource(char *widget, int pen, char *token)
     } else if(strstr(token, "channel") != (char*) 0) {
         sprintf(strng, "%s::Channel", widget);
     }
-     if(!strcmp(widget, "caStripPlot") || !strcmp(widget, "caCartesianPlot")) {
+    if(!strcmp(widget, "caStripPlot") || !strcmp(widget, "caCartesianPlot")) {
         char asc[30];
         sprintf(asc, "YaxisScalingMax_%d", pen+1);
         Qt_handleString(asc, "enum", strng);
@@ -273,11 +270,12 @@ void Qt_setMaximumLimitSource(char *widget, int pen, char *token)
 void Qt_setPrecisionSource(char *widget, int pen, char *token)
 {
     char asc[80], aux[80];
-      strcpy(aux, token);
-      if(aux[0] >= 'a' && aux[0] <='z') aux[0] = aux[0] - 32;
-      if(!strcmp(aux, "Default")) strcpy(aux, "User");
-      sprintf(asc, "%s::%s", widget, aux);
-      Qt_handleString("precisionMode", "enum", asc);
+    if(!strcmp(widget, "caStripPlot")) return;
+    strcpy(aux, token);
+    if(aux[0] >= 'a' && aux[0] <='z') aux[0] = aux[0] - 32;
+    if(!strcmp(aux, "Default")) strcpy(aux, "User");
+    sprintf(asc, "%s::%s", widget, aux);
+    Qt_handleString("precisionMode", "enum", asc);
 }
 
 void Qt_setColorFill(char *widget) {

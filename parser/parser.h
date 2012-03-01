@@ -45,7 +45,7 @@ typedef struct {
 
 typedef struct {
    int frameX, frameY;
-   int frameXprv, frameYprv; 
+   int frameWidth, frameHeight;
 } FrameOffset;
 
 typedef struct {

@@ -23,6 +23,7 @@ extern "C" void Qt_writeZorder();
 extern "C" int parsingCompositeFile;
 extern "C" int generateFlatFile;
 extern "C" int generateDeviceOnMenus;
+extern "C" int framesRequested;
 
 typedef char string40[40];
 typedef struct _zOrder {
@@ -116,7 +117,7 @@ void myParser::closeFile()
     // sort according to the static elements
     qStableSort(myvector.begin(), myvector.end(), compareFunc);
     for (it=myvector.begin(); it!=myvector.end(); ++it) {
-        qDebug() << "sorted" << it->indx << it->vis << it->z;
+        //qDebug() << "sorted" << it->indx << it->vis << it->z;
         xw->writeTaggedString("zorder", it->z);
     }
 
@@ -232,6 +233,8 @@ int main(int argc, char *argv[])
     generateFlatFile = false;
     parsingCompositeFile = false;
     generateDeviceOnMenus = false;
+    framesRequested = true;  // this has always to stay true. was just used for testing with false
+
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
 
@@ -294,8 +297,8 @@ int main(int argc, char *argv[])
     FrameOffset offset;
 
     DisplayInfo *cdi = (DisplayInfo *) malloc(sizeof (DisplayInfo));
-    offset.frameX = offset.frameXprv = 0;
-    offset.frameY = offset.frameYprv = 0;
+    offset.frameX = 0;
+    offset.frameY = 0;
     cdi->filePtr = filePtr;
 
     // start parsing

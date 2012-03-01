@@ -6,6 +6,8 @@
 int parsingCompositeFile;
 int generateFlatFile;
 int generateDeviceOnMenus;
+int framesRequested;
+
 char filePrefix[128] = "";
 static  string40 formatTable[] = { "decimal", "exponential", "engr. notation", "compact", "truncated",
                             "hexadecimal", "octal", "string",
@@ -1097,6 +1099,7 @@ void parsePlotAxisDefinition(DisplayInfo *displayInfo, int axis)
     int nestingLevel = 0;
     char minRange[MAX_TOKEN_LENGTH];
     char maxRange[MAX_TOKEN_LENGTH];
+    int rangeStyleFound = False;
 
     minRange[0] = '\0';
     maxRange[0] = '\0';
@@ -1115,6 +1118,7 @@ void parsePlotAxisDefinition(DisplayInfo *displayInfo, int axis)
                     printf("adlParser -- no time axis is supported by now\n");
                 }
             } else if (!strcmp(token,"rangeStyle")) {
+                rangeStyleFound = True;
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 if(axis == X_AXIS_ELEMENT) {
@@ -1131,7 +1135,6 @@ void parsePlotAxisDefinition(DisplayInfo *displayInfo, int axis)
                 getToken(displayInfo,token);
                 strcpy(maxRange, token);
             } else if (!strcmp(token,"timeFormat")) {
-                int i;
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 printf("adlParser -- no time format is supported by now\n");
@@ -1165,6 +1168,14 @@ void parsePlotAxisDefinition(DisplayInfo *displayInfo, int axis)
         else Qt_handleString("YaxisLimits", "string", "0;1");
     }
 
+    if(!rangeStyleFound) {
+        if(axis == X_AXIS_ELEMENT) {
+            Qt_setXaxisLimitSource("caCartesianPlot", "channel");
+        } else {
+            Qt_setYaxisLimitSource("caCartesianPlot", "channel");
+        }
+    }
+
 }
 
 void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
@@ -1174,6 +1185,10 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
     int nestingLevel = 0;
     DlObject object;
     int traceNumber;
+    int styleFound = False;
+    int XrangeFound = False;
+    int Y1rangeFound = False;
+    int Y2rangeFound = False;
     int visibilityStatic = 2; // top layer
 
     //printf("==> parseCartesianPlot\n");
@@ -1197,6 +1212,7 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
             } else if(!strcmp(token,"style")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
+                styleFound = True;
                 if(!strcmp(token,"point plot")) {
                     Qt_handleString("Style_1", "enum", "caCartesianPlot::Dots");
                     Qt_handleString("Style_2", "enum", "caCartesianPlot::Dots");
@@ -1278,10 +1294,13 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
                 traceNumber = MIN(token[6] - '0', MAX_TRACES - 1);
                 parseTrace(displayInfo,traceNumber);
             } else if(!strcmp(token,"x_axis")) {
+                XrangeFound = True;
                 parsePlotAxisDefinition(displayInfo, X_AXIS_ELEMENT);
             } else if(!strcmp(token,"y1_axis")) {
+                Y1rangeFound = True;
                 parsePlotAxisDefinition(displayInfo, Y1_AXIS_ELEMENT);
             } else if(!strcmp(token,"y2_axis")) {
+                Y2rangeFound = True;
                 parsePlotAxisDefinition(displayInfo, Y2_AXIS_ELEMENT);
             } else if(!strcmp(token,"trigger")) {
                 getToken(displayInfo,token);
@@ -1318,6 +1337,18 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
         }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
+
+    if(!styleFound) {
+      Qt_handleString("Style_1", "enum", "caCartesianPlot::Dots");
+      Qt_handleString("Style_2", "enum", "caCartesianPlot::Dots");
+      Qt_handleString("Style_3", "enum", "caCartesianPlot::Dots");
+      Qt_handleString("symbol_1", "enum", "caCartesianPlot::NoSymbol");
+      Qt_handleString("symbol_2", "enum", "caCartesianPlot::Rect");
+      Qt_handleString("symbol_3", "enum", "caCartesianPlot::Triangle");
+    }
+
+    if(!XrangeFound) Qt_setXaxisLimitSource("caCartesianPlot", "channel");
+    if(!Y1rangeFound && !Y2rangeFound) Qt_setYaxisLimitSource("caCartesianPlot", "channel");
 
     Qt_writeCloseTag("widget", widgetName, visibilityStatic);
 
@@ -2059,7 +2090,7 @@ void *parseTextEntry(DisplayInfo *displayInfo, FrameOffset * offset)
     TOKEN tokenType;
     int nestingLevel = 0;
     DlObject object;
-    int i = 0;
+    int i= 0, format=0;
     int visibilityStatic = 2; // top layer
 
     static int number = 0;
@@ -2067,31 +2098,30 @@ void *parseTextEntry(DisplayInfo *displayInfo, FrameOffset * offset)
     sprintf(widgetName, "caTextEntry_%d", number++);
     Qt_writeOpenTag("widget", "caTextEntry", widgetName);
 
-    printf("==> parseTextEntry not yet supported\n");
+    //printf("==> parseTextEntry\n");
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
-	    if(!strcmp(token,"object"))
-                parseObject(displayInfo, &object, offset, "caTextEntry");
-	    else if(!strcmp(token,"control"))
+            if(!strcmp(token,"object")) {
+                parseObject(displayInfo, &object, offset, "caLineEdit");
+                Qt_handleString("fontScaleMode", "enum", "caLineEdit::Height");
+            } else if(!strcmp(token,"control")) {
                 parseControl(displayInfo);
-	    else if(!strcmp(token,"clrmod")) {
+            } else if(!strcmp(token,"clrmod")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
                 strcpy(COLORMODE, token);
 	    } else if(!strcmp(token,"format")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
-                /*
-                for(i=(int)FIRST_TEXT_FORMAT;i<(int)(FIRST_TEXT_FORMAT+NUM_TEXT_FORMATS); i++) {
-      if(!strcmp(token,stringValueTable[i])) {
-                        dlTextEntry->format = (TextFormat) i;
-   break;
-      }
-  }
-                */
+                for(i=0;i<nbFormats; i++) {
+                    if(!strcmp(token, formatTable[i])) {
+                        format = i;
+                        break;
+                    }
+                }
 	    } else if(!strcmp(token,"limits")) {
-                parseLimits(displayInfo, "caTextEntry", 0);
+                parseLimits(displayInfo, "caLineEdit", 0);
 	    }
 	    break;
 	case T_EQUAL:
@@ -2108,8 +2138,8 @@ void *parseTextEntry(DisplayInfo *displayInfo, FrameOffset * offset)
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
-    Qt_setColorMode("caTextEntry", COLORMODE);
-
+    Qt_setColorMode("caLineEdit", COLORMODE);
+    Qt_handleString("formatType", "enum", formatTable[format]);
     Qt_writeCloseTag("widget", widgetName, visibilityStatic);
 
     return (void*) 0;
@@ -2318,7 +2348,7 @@ void *parseImage(DisplayInfo *displayInfo, FrameOffset * offset)
     return (void*) 0;
 }
 
-static void compositeFileParse(DisplayInfo *displayInfo, char *filename, FrameOffset *newoffset, int width, int height)
+static void compositeFileParse(DisplayInfo *displayInfo, char *filename, FrameOffset *newoffset)
 {
     FILE *filePtr, *savedFilePtr;
     int savedVersionNumber;
@@ -2358,10 +2388,19 @@ static void compositeFileParse(DisplayInfo *displayInfo, char *filename, FrameOf
 
         Qt_writeOpenProperty("geometry");
         Qt_writeOpenTag("rect", "", "");
-        sprintf(asc, "%d", width + 2);
+
+
+        sprintf(asc, "%d", newoffset->frameX);
+        Qt_taggedString("x", asc);
+        sprintf(asc, "%d", newoffset->frameY);
+        Qt_taggedString("y", asc);
+
+        sprintf(asc, "%d", newoffset->frameWidth + 2);
         Qt_taggedString("width", asc);
-        sprintf(asc, "%d", height + 2);
+        sprintf(asc, "%d", newoffset->frameHeight + 2);
         Qt_taggedString("height", asc);
+
+
         Qt_writeCloseTag("rect", "", False);
         Qt_writeCloseProperty();
 
@@ -2517,9 +2556,11 @@ void *parseComposite(DisplayInfo *displayInfo, FrameOffset * offset)
 
     static int number = 0;
     char widgetName[40];
-    sprintf(widgetName, "caFrame_%d", number++);
-    Qt_writeOpenTag("widget", "caFrame", widgetName);
 
+    if(framesRequested) {
+      sprintf(widgetName, "caFrame_%d", number++);
+      Qt_writeOpenTag("widget", "caFrame", widgetName);
+    }
     object = (DlObject *)malloc(sizeof(DlObject));
 
     FrameOffset *actoffset = (FrameOffset *)malloc(sizeof(FrameOffset));
@@ -2528,9 +2569,14 @@ void *parseComposite(DisplayInfo *displayInfo, FrameOffset * offset)
         switch(tokenType=getToken(displayInfo,token)) {
 	case T_WORD:
 	    if(!strcmp(token,"object")) {
-                parseObject(displayInfo, (object), offset, "caFrame");
-                actoffset->frameX = object->x;
-                actoffset->frameY = object->y;
+                parseObject(displayInfo, object, offset, "caFrame");
+                if(framesRequested) {
+                  actoffset->frameX = object->x;
+                  actoffset->frameY = object->y;
+                } else {
+                  actoffset->frameX = 0;
+                  actoffset->frameY = 0;
+                }
                 //printf("new frame xy= %d %d\n",actoffset->frameX, actoffset->frameY);
                 offset=actoffset;
 	    } else if(!strcmp(token,"dynamic attribute")) {
@@ -2540,13 +2586,20 @@ void *parseComposite(DisplayInfo *displayInfo, FrameOffset * offset)
 		getToken(displayInfo,token);
 		strcpy(compositeName,token);
 	    } else if(!strcmp(token,"composite file")) {
+                FrameOffset *newoffset = (FrameOffset *)malloc(sizeof(FrameOffset));
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
 		strcpy(compositeFile,token);
-                FrameOffset *newoffset = (FrameOffset *)malloc(sizeof(FrameOffset));
-                newoffset->frameX = 0; //actoffset->frameX;
-                newoffset->frameY = 0; //actoffset->frameY;
-                compositeFileParse(displayInfo, compositeFile, newoffset, object->width, object->height);
+                if(framesRequested) {
+                  newoffset->frameX = 0;
+                  newoffset->frameY = 0;
+                } else {
+                  newoffset->frameX = object->x;
+                  newoffset->frameY = object->y;
+                }
+                newoffset->frameWidth = object->width;
+                newoffset->frameHeight = object->height;
+                compositeFileParse(displayInfo, compositeFile, newoffset);
                 /* Handle composite file here */
 	    } else if(!strcmp(token,"children")) {
                 FrameOffset *newoffset = (FrameOffset *)malloc(sizeof(FrameOffset));
@@ -2570,8 +2623,9 @@ void *parseComposite(DisplayInfo *displayInfo, FrameOffset * offset)
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
-    Qt_writeCloseTag("widget", widgetName, visibilityStatic);
-
+    if(framesRequested) {
+      Qt_writeCloseTag("widget", widgetName, visibilityStatic);
+    }
     return (void*) 0;
 }
 
