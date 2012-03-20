@@ -25,6 +25,8 @@ extern "C" {
 #define STRDUP(a) (strcpy( (char *)malloc(strlen(a)+1),a))
 #endif
 
+#define LONGSTRING            1024
+#define MAX_ASCII               80      /* max size of many asci strings */
 #define MAX_TOKEN_LENGTH        256     /* max size of strings in adl    */
 #define MAX_PENS                8       /* max # of pens on strip chart  */
 #define MAX_TRACES              8       /* max # of traces on cart. plot */

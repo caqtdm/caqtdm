@@ -23,7 +23,6 @@ extern "C" void Qt_writeZorder();
 extern "C" int parsingCompositeFile;
 extern "C" int generateFlatFile;
 extern "C" int generateDeviceOnMenus;
-extern "C" int framesRequested;
 
 typedef char string40[40];
 typedef struct _zOrder {
@@ -233,7 +232,6 @@ int main(int argc, char *argv[])
     generateFlatFile = false;
     parsingCompositeFile = false;
     generateDeviceOnMenus = false;
-    framesRequested = true;  // this has always to stay true. was just used for testing with false
 
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;

@@ -11,12 +11,6 @@
 zOrder zorder[10000];
 int zindex=0;
 
-static int sortFunction(zOrder *a, zOrder *b)
-{
-    //printf("%d %d\n", a->vis, b->vis);
-    return (b->vis > a->vis);
-}
-
 static void uppercase(char *str)
 {
     int i;
@@ -158,7 +152,11 @@ void Qt_setWheelSwitchForm(char *widget, char *token)
     int width, precision;
     char asc[10];
     wheelSwitchFormat(token, &width, &precision);
-    sprintf(asc, "%d", width-precision-1);
+    if(precision != 0) {
+      sprintf(asc, "%d", width-precision-2);
+    } else {
+      sprintf(asc, "%d", width-precision-1);
+    }
     Qt_handleString("integerDigits", "number", asc);
     sprintf(asc, "%d", precision);
     Qt_handleString("decimalDigits", "number", asc);
@@ -272,6 +270,7 @@ void Qt_setPrecisionSource(char *widget, int pen, char *token)
     char asc[80], aux[80];
     if(!strcmp(widget, "caStripPlot")) return;
     strcpy(aux, token);
+
     if(aux[0] >= 'a' && aux[0] <='z') aux[0] = aux[0] - 32;
     if(!strcmp(aux, "Default")) strcpy(aux, "User");
     sprintf(asc, "%s::%s", widget, aux);

@@ -6,13 +6,12 @@
 int parsingCompositeFile;
 int generateFlatFile;
 int generateDeviceOnMenus;
-int framesRequested;
 
 char filePrefix[128] = "";
 static  string40 formatTable[] = { "decimal", "exponential", "engr. notation", "compact", "truncated",
-                            "hexadecimal", "octal", "string",
-                            "sexagesimal", "sexagesimal-hms", "sexagesimal-dms"};
- static int nbFormats = 11;
+                                   "hexadecimal", "octal", "string",
+                                   "sexagesimal", "sexagesimal-hms", "sexagesimal-dms"};
+static int nbFormats = 11;
 
 TOKEN parseAndAppendDisplayList(DisplayInfo *displayInfo, FrameOffset *offset, char *firstToken, TOKEN firstTokenType);
 
@@ -88,7 +87,7 @@ DlColormap defaultDlColormap = {
     }};
 
 void parseDlColor(DisplayInfo *displayInfo, FILE *filePtr, DlColormapEntry *dlColor);
-void parseObject(DisplayInfo *displayInfo, DlObject *object, FrameOffset * offset, char *widget);
+void parseObject(DisplayInfo *displayInfo, DlObject *object);
 void parseGrid(DisplayInfo *displayInfo, char *widget);
 
 DlColormap *parseAndExtractExternalColormap(DisplayInfo *displayInfo, char *filename);
@@ -111,7 +110,7 @@ void *parseValuator(DisplayInfo *, FrameOffset *);
 void *parseWheelSwitch(DisplayInfo *, FrameOffset *);
 void *parseTextEntry(DisplayInfo *, FrameOffset *);
 void *parseMenu(DisplayInfo *, FrameOffset *);
-void parseControl(DisplayInfo *);
+void parseControl(DisplayInfo *, char *widget);
 void *parseImage(DisplayInfo *, FrameOffset *);
 void *parseComposite(DisplayInfo *, FrameOffset *);
 void *parsePolyline(DisplayInfo *, FrameOffset *);
@@ -123,6 +122,8 @@ void *parseIndicator(DisplayInfo *, FrameOffset *);
 void *parseTextUpdate(DisplayInfo *, FrameOffset *);
 void *parseStripChart(DisplayInfo *, FrameOffset *);
 void *parseCartesianPlot(DisplayInfo *, FrameOffset *);
+void *getNextElement(DisplayInfo *pDI, char *token, FrameOffset *offset);
+
 
 typedef void *(*medmParseFunc)(DisplayInfo *, FrameOffset *);
 typedef struct {
@@ -161,6 +162,63 @@ ParseFuncEntry parseFuncTable[] = {
 
 static int parseFuncTableSize = sizeof(parseFuncTable)/sizeof(ParseFuncEntry);
 
+void correctOffset( DlObject *object, FrameOffset *offset, int *x, int *y, int *w, int *h)
+{
+    *w = object->width;
+    *h = object->height;
+
+    if(offset->frameX == 0) {
+        *x = object->x;
+    } else {
+        *x = object->x - offset->frameX;
+    }
+
+    if(offset->frameY == 0) {
+        *y = object->y;
+    } else {
+        *y = object->y - offset->frameY;
+    }
+}
+
+void writeRectangleDimensions(DlObject *object, FrameOffset *offset, char *widget, int correct)
+{
+    char asc[MAX_ASCII];
+
+    int x = offset->frameX;
+    int y = offset->frameY;
+    int w = offset->frameWidth;
+    int h = offset->frameHeight;
+
+    Qt_writeOpenProperty("geometry");
+    Qt_writeOpenTag("rect", "", "");
+
+    if(correct) correctOffset(object, offset, &x, &y, &w, &h);
+
+    sprintf(asc, "%d", x);
+    Qt_taggedString("x", asc);
+
+    sprintf(asc, "%d", y);
+    Qt_taggedString("y", asc);
+
+    // add two pixels for frames
+    if(!strcmp(widget,"caFrame")) {
+        sprintf(asc, "%d", w + 2);
+        Qt_taggedString("width", asc);
+    } else {
+        sprintf(asc, "%d", w);
+        Qt_taggedString("width", asc);
+    }
+    if(!strcmp(widget,"caFrame")) {
+        sprintf(asc, "%d", h + 2);
+        Qt_taggedString("height", asc);
+    } else {
+        sprintf(asc, "%d", h);
+        Qt_taggedString("height", asc);
+    }
+
+    Qt_writeCloseTag("rect", "", False);
+    Qt_writeCloseProperty();
+}
 
 // decompose string
 int parseDelimited(char *s, string40 items[], int nbItems, char token)
@@ -170,7 +228,7 @@ int parseDelimited(char *s, string40 items[], int nbItems, char token)
     char ctoken[2];
     memcpy(ctoken, &token, 1);
     ctoken[1] ='\0';
-    for (i=0; i<strlen(s); i++) if(s[i] < ' ') s[i] = '\0';
+    for (i=0; i< (int) strlen(s); i++) if(s[i] < ' ') s[i] = '\0';
     cnt = 0;
     pch = strtok (s, ctoken);
     while (pch != NULL)
@@ -551,8 +609,8 @@ void parseBasicAttribute(DisplayInfo *displayInfo, char *widget)
     TOKEN tokenType;
     int nestingLevel = 0;
     int clr=0;
-    char fillstyle[80];
-    char linestyle[80];
+    char fillstyle[MAX_TOKEN_LENGTH];
+    char linestyle[MAX_TOKEN_LENGTH];
 
     strcpy(fillstyle, "solid");
     strcpy(linestyle, "solid");
@@ -634,18 +692,18 @@ void parseBasicAttribute(DisplayInfo *displayInfo, char *widget)
 
 
         if(!strcmp(linestyle,"solid")) {
-              Qt_handleString("linestyle", "enum", "Solid");
+            Qt_handleString("linestyle", "enum", "Solid");
         } else if(!strcmp(linestyle,"dash")) {
-              Qt_handleString("linestyle", "enum", "Dash");
+            Qt_handleString("linestyle", "enum", "Dash");
         } else if(!strcmp(linestyle,"bigdash")) {
-              Qt_handleString("linestyle", "enum", "BigDash");
+            Qt_handleString("linestyle", "enum", "BigDash");
         }
 
     }
 
 }
 
-void parseLimits(DisplayInfo *displayInfo, char *widget, int pen)
+void parseLimits(DisplayInfo *displayInfo, char *widget, int pen, int DoNotWritePrec)
 {
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
@@ -654,6 +712,8 @@ void parseLimits(DisplayInfo *displayInfo, char *widget, int pen)
     int loprSrc = False;
     int precSrc = False;
     int precDefault = False;
+    int hoprDefault = False;
+    int loprDefault = False;
 
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
@@ -667,6 +727,7 @@ void parseLimits(DisplayInfo *displayInfo, char *widget, int pen)
 		getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 Qt_setMinimumLimit(widget, pen, token);
+                loprDefault= True;
 	    } else if(!strcmp(token,"hoprSrc")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
@@ -676,15 +737,16 @@ void parseLimits(DisplayInfo *displayInfo, char *widget, int pen)
 		getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 Qt_setMaximumLimit(widget, pen, token);
+                hoprDefault= True;
 	    } else if(!strcmp(token,"precSrc")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
                 precSrc = True;
-                Qt_setPrecisionSource(widget, pen, token);
+                if(!DoNotWritePrec)Qt_setPrecisionSource(widget, pen, token);
 	    } else if(!strcmp(token,"precDefault")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
-                Qt_setPrecision(widget, pen, token);
+                if(!DoNotWritePrec) Qt_setPrecision(widget, pen, token);
                 precDefault = True;
 	    }
 	    break;
@@ -702,7 +764,20 @@ void parseLimits(DisplayInfo *displayInfo, char *widget, int pen)
 
     if(!loprSrc) Qt_setMinimumLimitSource(widget, pen, "channel");
     if(!hoprSrc) Qt_setMaximumLimitSource(widget, pen, "channel");
-    if(!precSrc) Qt_setPrecisionSource(widget, pen, "channel");
+    if(!DoNotWritePrec) {
+        if(!precSrc) Qt_setPrecisionSource(widget, pen, "channel");
+    }
+    if(!loprDefault && !hoprDefault) {
+        char asc[MAX_ASCII];
+        strcpy(asc, "0.0");
+        Qt_setMinimumLimit(widget, pen, asc);
+        strcpy(asc, "1.0");
+        Qt_setMaximumLimit(widget, pen, asc);
+    } else if(!loprDefault && hoprDefault) {
+        char asc[MAX_ASCII];
+        strcpy(asc, "0.0");
+        Qt_setMinimumLimit(widget, pen, asc);
+    }
 }
 
 void parseDynamicAttribute(DisplayInfo *displayInfo, char *widget, int *visibilityStatic) {
@@ -867,7 +942,7 @@ void parsePen(DisplayInfo *displayInfo, int pen, char *channels, char *widget)
                                  displayInfo->dlColormap->dl_color[clr].b,
                                  255, pen+1);
             } else if (!strcmp(token,"limits")) {
-                parseLimits(displayInfo, widget, pen);
+                parseLimits(displayInfo, widget, pen, False);
             }
             break;
         case T_LEFT_BRACE:
@@ -884,7 +959,7 @@ void parsePen(DisplayInfo *displayInfo, int pen, char *channels, char *widget)
 
 }
 
-void parseObject(DisplayInfo *displayInfo, DlObject *object, FrameOffset * offset, char *widget)
+void parseObject(DisplayInfo *displayInfo, DlObject *object)
 {
 
     // in case of labels, the width has not alwas been set properly by the user
@@ -894,8 +969,8 @@ void parseObject(DisplayInfo *displayInfo, DlObject *object, FrameOffset * offse
     TOKEN tokenType;
     int nestingLevel = 0;
 
-    Qt_writeOpenProperty("geometry");
-    Qt_writeOpenTag("rect", "", "");
+    //Qt_writeOpenProperty("geometry");
+    //Qt_writeOpenTag("rect", "", "");
 
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
@@ -905,52 +980,19 @@ void parseObject(DisplayInfo *displayInfo, DlObject *object, FrameOffset * offse
 		getToken(displayInfo,token);
                 object->x = atoi(token);
                 //printf("correct position with x=%d\n", offset->frameX);
-                if(offset->frameX == 0) {
-                    Qt_taggedString("x", token);
-                } else {
-                    char asc[20];
-                    int xx = atoi(token) - offset->frameX;
-                    sprintf(asc, "%d", xx);
-                    Qt_taggedString("x", asc);
-                }
 	    } else if(!strcmp(token,"y")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
                 object->y = atoi(token);
                 //printf("correct position with y=%d\n", offset->frameY);
-                if(offset->frameY == 0) {
-                    Qt_taggedString("y", token);
-                } else {
-                    char asc[20];
-                    int yy = atoi(token) - offset->frameY;
-                    sprintf(asc, "%d", yy);
-                    Qt_taggedString("y", asc);
-                }
 	    } else if(!strcmp(token,"width")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
                 object->width = atoi(token);
-
-                // add two pixels for frames
-                if(!strcmp(widget,"caFrame")) {
-                    char asc[10];
-                    sprintf(asc, "%d", object->width + 2);
-                    Qt_taggedString("width", asc);
-                } else {
-                    Qt_taggedString("width", token);
-                }
 	    } else if(!strcmp(token,"height")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
                 object->height = atoi(token);
-                // add two pixels for frames
-                if(!strcmp(widget,"caFrame")) {
-                    char asc[10];
-                    sprintf(asc, "%d", object->height + 2);
-                    Qt_taggedString("height", asc);
-                } else {
-                    Qt_taggedString("height", token);
-                }
 	    }
 	    break;
 	case T_LEFT_BRACE:
@@ -965,8 +1007,8 @@ void parseObject(DisplayInfo *displayInfo, DlObject *object, FrameOffset * offse
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
-    Qt_writeCloseTag("rect", "", False);
-    Qt_writeCloseProperty();
+    //Qt_writeCloseTag("rect", "", False);
+    //Qt_writeCloseProperty();
 }
 
 void parsePlotcom(DisplayInfo *displayInfo, char *widget)
@@ -988,7 +1030,7 @@ void parsePlotcom(DisplayInfo *displayInfo, char *widget)
                 Qt_handleString("TitleX", "string", token);
 
                 if(strstr(token, "[") != (char*) 0 && strstr(widget, "caStripPlot") != (char*) 0) {
-                    char asc[80];
+                    char asc[MAX_ASCII];
                     sprintf(asc, "%s::FillUnder", widget);
                     Qt_handleString("Style_1", "enum", asc);
                 }
@@ -1045,10 +1087,10 @@ void parseTrace(DisplayInfo *displayInfo, int traceNr)
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
     int nestingLevel = 0;
-    char pvX[40];
-    char pvY[40];
-    char mon[80];
-    char channel[40];
+    char pvX[MAX_TOKEN_LENGTH];
+    char pvY[MAX_TOKEN_LENGTH];
+    char mon[2*MAX_TOKEN_LENGTH+1];
+    char channel[MAX_TOKEN_LENGTH];
 
     pvX[0] = '\0';
     pvY[0] = '\0';
@@ -1153,7 +1195,7 @@ void parsePlotAxisDefinition(DisplayInfo *displayInfo, int axis)
               && (tokenType != T_EOF) );
 
     if(minRange[0] != '\0' || maxRange[0] != '\0') {
-        char range[80];
+        char range[MAX_TOKEN_LENGTH];
         if(minRange[0] == '\0') strcpy(minRange, "0");
         if(maxRange[0] == '\0') strcpy(maxRange, "0");
         if(axis == X_AXIS_ELEMENT) {
@@ -1194,7 +1236,7 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
     //printf("==> parseCartesianPlot\n");
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caCartesianPlot_%d", number++);
     Qt_writeOpenTag("widget", "caCartesianPlot", widgetName);
 
@@ -1202,13 +1244,14 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
         switch( (tokenType=getToken(displayInfo,token)) ) {
         case T_WORD:
             if(!strcmp(token,"object")) {
-                parseObject(displayInfo, &object, offset, "caCartesianPlot");
+                parseObject(displayInfo, &object);
+                writeRectangleDimensions(&object, offset, "caCartesianPlot", True);
             } else if(!strcmp(token,"plotcom")) {
                 parsePlotcom(displayInfo, "caCartesianPlot");
             } else if(!strcmp(token,"count")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                printf("adlParser -- count for cartesian plot not yet supported\n");
+                if(strlen(token) > 0) printf("adlParser -- count for cartesian plot not yet supported\n");
             } else if(!strcmp(token,"style")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
@@ -1231,14 +1274,14 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
                     Qt_handleString("Style_1", "enum", "caCartesianPlot::Lines");
                     Qt_handleString("Style_2", "enum", "caCartesianPlot::Lines");
                     Qt_handleString("Style_3", "enum", "caCartesianPlot::Lines");
-                    Qt_handleString("symbol_1", "enum", "caCartesianPlot::Ellipse");
+                    Qt_handleString("symbol_1", "enum", "caCartesianPlot::NoSymbol");
                     Qt_handleString("symbol_2", "enum", "caCartesianPlot::Rect");
                     Qt_handleString("symbol_3", "enum", "caCartesianPlot::Triangle");
                 } else if(!strcmp(token,"line")) {
                     Qt_handleString("Style_1", "enum", "caCartesianPlot::Lines");
                     Qt_handleString("Style_2", "enum", "caCartesianPlot::Lines");
                     Qt_handleString("Style_3", "enum", "caCartesianPlot::Lines");
-                    Qt_handleString("symbol_1", "enum", "caCartesianPlot::Ellipse");
+                    Qt_handleString("symbol_1", "enum", "caCartesianPlot::NoSymbol");
                     Qt_handleString("symbol_2", "enum", "caCartesianPlot::Rect");
                     Qt_handleString("symbol_3", "enum", "caCartesianPlot::Triangle");
                     /* Modified by A.Mezger 6-8-10: added option lines without marks and thick lines */
@@ -1260,7 +1303,7 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
                     Qt_handleString("Style_1", "enum", "caCartesianPlot::Lines");
                     Qt_handleString("Style_2", "enum", "caCartesianPlot::Lines");
                     Qt_handleString("Style_3", "enum", "caCartesianPlot::Lines");
-                    Qt_handleString("symbol_1", "enum", "caCartesianPlot::Ellipse");
+                    Qt_handleString("symbol_1", "enum", "caCartesianPlot::NoSymbol");
                     Qt_handleString("symbol_2", "enum", "caCartesianPlot::Rect");
                     Qt_handleString("symbol_3", "enum", "caCartesianPlot::Triangle");
                 } else if(!strcmp(token,"fill under")) {
@@ -1339,12 +1382,12 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
              && (tokenType != T_EOF) );
 
     if(!styleFound) {
-      Qt_handleString("Style_1", "enum", "caCartesianPlot::Dots");
-      Qt_handleString("Style_2", "enum", "caCartesianPlot::Dots");
-      Qt_handleString("Style_3", "enum", "caCartesianPlot::Dots");
-      Qt_handleString("symbol_1", "enum", "caCartesianPlot::NoSymbol");
-      Qt_handleString("symbol_2", "enum", "caCartesianPlot::Rect");
-      Qt_handleString("symbol_3", "enum", "caCartesianPlot::Triangle");
+        Qt_handleString("Style_1", "enum", "caCartesianPlot::Dots");
+        Qt_handleString("Style_2", "enum", "caCartesianPlot::Dots");
+        Qt_handleString("Style_3", "enum", "caCartesianPlot::Dots");
+        Qt_handleString("symbol_1", "enum", "caCartesianPlot::NoSymbol");
+        Qt_handleString("symbol_2", "enum", "caCartesianPlot::Rect");
+        Qt_handleString("symbol_3", "enum", "caCartesianPlot::Triangle");
     }
 
     if(!XrangeFound) Qt_setXaxisLimitSource("caCartesianPlot", "channel");
@@ -1369,12 +1412,12 @@ void *parseRelatedDisplay(DisplayInfo *displayInfo, FrameOffset * offset)
     int rc;
     DlObject object;
     char visual[MAX_TOKEN_LENGTH] = "Menu";
-    char labels[1000] = "\0";
-    char names[1000] = "\0";
-    char argus[1000]  = "\0";
+    char labels[LONGSTRING] = "\0";
+    char names[LONGSTRING] = "\0";
+    char argus[LONGSTRING]  = "\0";
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caRelatedDisplay_%d", number++);
     Qt_writeOpenTag("widget", "caRelatedDisplay", widgetName);
 
@@ -1383,7 +1426,8 @@ void *parseRelatedDisplay(DisplayInfo *displayInfo, FrameOffset * offset)
         switch(tokenType=getToken(displayInfo,token)) {
         case T_WORD:
             if(!strcmp(token,"object")) {
-                parseObject(displayInfo, &object, offset, "caRelatedDisplay");
+                parseObject(displayInfo, &object);
+                writeRectangleDimensions(&object, offset, "caRelatedDisplay", True);
             } else if(!strncmp(token,"display",7)) {
                 /* Get the display number */
                 displayNumber=MAX_RELATED_DISPLAYS-1;
@@ -1513,14 +1557,14 @@ void *parseShellCommand(DisplayInfo *displayInfo, FrameOffset * offset)
     int rc;
     DlObject object;
 
-    char labels[1000] = "\0";
-    char names[1000] = "\0";
-    char argus[1000]  = "\0";
+    char labels[LONGSTRING] = "\0";
+    char names[LONGSTRING] = "\0";
+    char argus[LONGSTRING]  = "\0";
 
     int visibilityStatic = 2; // top layer
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caShellCommand_%d", number++);
     Qt_writeOpenTag("widget", "caShellCommand", widgetName);
 
@@ -1528,7 +1572,8 @@ void *parseShellCommand(DisplayInfo *displayInfo, FrameOffset * offset)
         switch( (tokenType=getToken(displayInfo,token)) ) {
         case T_WORD:
             if(!strcmp(token,"object")) {
-                parseObject(displayInfo, &object, offset, "caParseShellCommand");
+                parseObject(displayInfo, &object);
+                writeRectangleDimensions(&object, offset, "caParseShellCommand", True);
             } else if(!strncmp(token,"command",7)) {
                 /* Get the command number */
                 cmdNumber=MAX_SHELL_COMMANDS-1;
@@ -1607,7 +1652,7 @@ void *parseMeter(DisplayInfo *displayInfo, FrameOffset * offset)
     DlObject object;
     int visibilityStatic = 2; // top layer
 
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caCircularGauge_%d", number++);
     Qt_writeOpenTag("widget", "caCircularGauge", widgetName);
 
@@ -1615,11 +1660,12 @@ void *parseMeter(DisplayInfo *displayInfo, FrameOffset * offset)
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
-	    if(!strcmp(token,"object"))
-                parseObject(displayInfo, &object, offset, "caCircularGauge");
-	    else if(!strcmp(token,"monitor"))
+            if(!strcmp(token,"object")) {
+                parseObject(displayInfo, &object);
+                writeRectangleDimensions(&object, offset, "caCircularGauge", True);
+            } else if(!strcmp(token,"monitor")) {
                 parseMonitor(displayInfo, "caCircularGauge");
-	    else if(!strcmp(token,"label")) {
+            } else if(!strcmp(token,"label")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
 
@@ -1631,7 +1677,7 @@ void *parseMeter(DisplayInfo *displayInfo, FrameOffset * offset)
 		getToken(displayInfo,token);
                 strcpy(COLORMODE, token);
 	    } else if(!strcmp(token,"limits")) {
-                parseLimits(displayInfo, "caCircularGauge", 0);
+                parseLimits(displayInfo, "caCircularGauge", 0, False);
 	    }
 	    break;
 	case T_EQUAL:
@@ -1667,7 +1713,7 @@ void *parseByte( DisplayInfo *displayInfo, FrameOffset * offset) {
     int ebitFound = False;
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caByte_%d", number++);
     Qt_writeOpenTag("widget", "caByte", widgetName);
 
@@ -1676,7 +1722,8 @@ void *parseByte( DisplayInfo *displayInfo, FrameOffset * offset) {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
 	    if(!strcmp(token,"object")) {
-                parseObject(displayInfo, &object, offset, "caByte");
+                parseObject(displayInfo, &object);
+                writeRectangleDimensions(&object, offset, "caByte", True);
 	    } else if(!strcmp(token,"monitor")) {
                 parseMonitor(displayInfo, "caByte");
 	    } else if(!strcmp(token,"clrmod")) {
@@ -1738,7 +1785,7 @@ void *parseStripChart(DisplayInfo *displayInfo, FrameOffset * offset)
     char token[MAX_TOKEN_LENGTH];
     char periodValue[MAX_TOKEN_LENGTH] = "";
     char periodUnits[MAX_TOKEN_LENGTH] = "second";
-    char channels[200] = "";
+    char channels[LONGSTRING] = "";
     TOKEN tokenType;
     int nestingLevel = 0;
     DlObject object;
@@ -1746,7 +1793,7 @@ void *parseStripChart(DisplayInfo *displayInfo, FrameOffset * offset)
     int visibilityStatic = 2; // top layer
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caStripPlot_%d", number++);
     Qt_writeOpenTag("widget", "caStripPlot", widgetName);
 
@@ -1755,7 +1802,8 @@ void *parseStripChart(DisplayInfo *displayInfo, FrameOffset * offset)
 	switch( (tokenType=getToken(displayInfo, token)) ) {
 	case T_WORD:
 	    if(!strcmp(token, "object")) {
-                parseObject(displayInfo,  &object, offset, "caStripPlot");
+                parseObject(displayInfo,  &object);
+                writeRectangleDimensions(&object, offset, "caStripPlot", True);
             } else if(!strcmp(token, "plotcom")) {
                 parsePlotcom(displayInfo, "caStripPlot");
             } else if(!strcmp(token, "period")) {
@@ -1828,7 +1876,7 @@ void *parseTextUpdate(DisplayInfo *displayInfo, FrameOffset * offset)
     int visibilityStatic = 2; // top layer
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caLineEdit_%d", number++);
     Qt_writeOpenTag("widget", "caLineEdit", widgetName);
 
@@ -1837,7 +1885,8 @@ void *parseTextUpdate(DisplayInfo *displayInfo, FrameOffset * offset)
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
 	    if(!strcmp(token,"object")) {
-                parseObject(displayInfo, &object, offset, "caLineEdit");
+                parseObject(displayInfo, &object);
+                writeRectangleDimensions(&object, offset, "caLineEdit", True);
                 Qt_handleString("fontScaleMode", "enum", "caLineEdit::Height");
 	    } else if(!strcmp(token,"monitor")) {
                 parseMonitor(displayInfo, "caLineEdit");
@@ -1850,30 +1899,30 @@ void *parseTextUpdate(DisplayInfo *displayInfo, FrameOffset * offset)
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
                 for(i=0;i<nbFormats; i++) {
-                          if(!strcmp(token, formatTable[i])) {
-                              format = i;
-                              found = 1;
-                              break;
-                          }
-                      }
-                      // Backward compatibility
-                      if(!found) {
-                          if(!strcmp(token,"decimal")) {
-                              format = 0;
-                          } else if(!strcmp(token,"decimal- exponential notation")) {
-                              format = 1;
-                          } else if(!strcmp(token,"engr. notation")) {
-                              format = 2;
-                          } else if(!strcmp(token,"decimal- compact")) {
-                              format = 3;
-                          } else if(!strcmp(token,"decimal- truncated")) {
-                              format = 4;
-                          } else if(!strcmp(token,"decimal- truncated ")) {
-                              format = 4;
-                          } else if(!strcmp(token,"hexidecimal")) {
-                              format = 5;
-                          }
-                      }
+                    if(!strcmp(token, formatTable[i])) {
+                        format = i;
+                        found = 1;
+                        break;
+                    }
+                }
+                // Backward compatibility
+                if(!found) {
+                    if(!strcmp(token,"decimal")) {
+                        format = 0;
+                    } else if(!strcmp(token,"decimal- exponential notation")) {
+                        format = 1;
+                    } else if(!strcmp(token,"engr. notation")) {
+                        format = 2;
+                    } else if(!strcmp(token,"decimal- compact")) {
+                        format = 3;
+                    } else if(!strcmp(token,"decimal- truncated")) {
+                        format = 4;
+                    } else if(!strcmp(token,"decimal- truncated ")) {
+                        format = 4;
+                    } else if(!strcmp(token,"hexidecimal")) {
+                        format = 5;
+                    }
+                }
 	    } else if(!strcmp(token,"align")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
@@ -1889,7 +1938,7 @@ void *parseTextUpdate(DisplayInfo *displayInfo, FrameOffset * offset)
                 }
 
 	    } else if(!strcmp(token,"limits")) {
-                parseLimits(displayInfo, "caLineEdit", 0);
+                parseLimits(displayInfo, "caLineEdit", 0, False);
 	    }
 	    break;
 	case T_EQUAL:
@@ -1926,7 +1975,7 @@ void *parseChoiceButton(DisplayInfo *displayInfo, FrameOffset * offset)
     int visibilityStatic = 2; // top layer
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caChoice_%d", number++);
     Qt_writeOpenTag("widget", "caChoice", widgetName);
 
@@ -1934,11 +1983,12 @@ void *parseChoiceButton(DisplayInfo *displayInfo, FrameOffset * offset)
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
-	    if(!strcmp(token,"object"))
-                parseObject(displayInfo, &object, offset, "caChoice");
-	    else if(!strcmp(token,"control"))
-                parseControl(displayInfo);
-	    else if(!strcmp(token,"clrmod")) {
+            if(!strcmp(token,"object")) {
+                parseObject(displayInfo, &object);
+                writeRectangleDimensions(&object, offset, "caChoice", True);
+            } else if(!strcmp(token,"control")) {
+                parseControl(displayInfo, "caChoice");
+            } else if(!strcmp(token,"clrmod")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
                 printf("adlParser -- color mode for caChoice not supported\n");
@@ -1983,19 +2033,19 @@ void *parseMessageButton(DisplayInfo *displayInfo, FrameOffset * offset)
     int visibilityStatic = 2; // top layer
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caMessageButton_%d", number++);
     Qt_writeOpenTag("widget", "caMessageButton", widgetName);
 
-    printf("==> parseMessageButton not yet supported\n");
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
-	    if(!strcmp(token,"object"))
-                parseObject(displayInfo, &object, offset, "caMessageButton");
-	    else if(!strcmp(token,"control"))
-                parseControl(displayInfo);
-	    else if(!strcmp(token,"press_msg")) {
+            if(!strcmp(token,"object")) {
+                parseObject(displayInfo, &object);
+                writeRectangleDimensions(&object, offset, "caMessageButton", True);
+            } else if(!strcmp(token,"control")) {
+                parseControl(displayInfo, "caMessageButton");
+            } else if(!strcmp(token,"press_msg")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
                 Qt_handleString("pressMessage", "string", token);
@@ -2043,7 +2093,7 @@ void *parseMenu(DisplayInfo *displayInfo, FrameOffset * offset)
     int visibilityStatic = 2; // top layer
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caMenu_%d", number++);
     Qt_writeOpenTag("widget", "caMenu", widgetName);
 
@@ -2051,11 +2101,12 @@ void *parseMenu(DisplayInfo *displayInfo, FrameOffset * offset)
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
-	    if(!strcmp(token,"object"))
-                parseObject(displayInfo, &object, offset, "caMenu");
-	    else if(!strcmp(token,"control"))
-                parseControl(displayInfo);
-	    else if(!strcmp(token,"clrmod")) {
+            if(!strcmp(token,"object")) {
+                parseObject(displayInfo, &object);
+                writeRectangleDimensions(&object, offset, "caMenu", True);
+            } else if(!strcmp(token,"control")) {
+                parseControl(displayInfo, "caMenu");
+            } else if(!strcmp(token,"clrmod")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
                 printf("adlParser -- color mode for caMenu not supported\n");
@@ -2094,7 +2145,7 @@ void *parseTextEntry(DisplayInfo *displayInfo, FrameOffset * offset)
     int visibilityStatic = 2; // top layer
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caTextEntry_%d", number++);
     Qt_writeOpenTag("widget", "caTextEntry", widgetName);
 
@@ -2103,10 +2154,11 @@ void *parseTextEntry(DisplayInfo *displayInfo, FrameOffset * offset)
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
             if(!strcmp(token,"object")) {
-                parseObject(displayInfo, &object, offset, "caLineEdit");
+                parseObject(displayInfo, &object);
+                writeRectangleDimensions(&object, offset, "caLineEdit", True);
                 Qt_handleString("fontScaleMode", "enum", "caLineEdit::Height");
             } else if(!strcmp(token,"control")) {
-                parseControl(displayInfo);
+                parseControl(displayInfo, "caTextEntry");
             } else if(!strcmp(token,"clrmod")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
@@ -2121,7 +2173,7 @@ void *parseTextEntry(DisplayInfo *displayInfo, FrameOffset * offset)
                     }
                 }
 	    } else if(!strcmp(token,"limits")) {
-                parseLimits(displayInfo, "caLineEdit", 0);
+                parseLimits(displayInfo, "caLineEdit", 0, False);
 	    }
 	    break;
 	case T_EQUAL:
@@ -2150,7 +2202,7 @@ void *parseValuator(DisplayInfo *displayInfo, FrameOffset * offset)
 {
     char token[MAX_TOKEN_LENGTH];
     char COLORMODE[MAX_TOKEN_LENGTH] = "static";
-    char direction[MAX_TOKEN_LENGTH] = "Up";
+    char direction[MAX_TOKEN_LENGTH] = "Right";
     char look[MAX_TOKEN_LENGTH] = "noDeco";
     TOKEN tokenType;
     int nestingLevel = 0;
@@ -2158,7 +2210,7 @@ void *parseValuator(DisplayInfo *displayInfo, FrameOffset * offset)
     int visibilityStatic = 2; // top layer
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caSlider_%d", number++);
     Qt_writeOpenTag("widget", "caSlider", widgetName);
 
@@ -2166,11 +2218,12 @@ void *parseValuator(DisplayInfo *displayInfo, FrameOffset * offset)
     do {
 	switch((tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
-	    if(!strcmp(token,"object"))
-                parseObject(displayInfo, &object, offset, "caSlider");
-	    else if(!strcmp(token,"control"))
-                parseControl(displayInfo);
-	    else if(!strcmp(token,"label")) {
+            if(!strcmp(token,"object")) {
+                parseObject(displayInfo, &object);
+                writeRectangleDimensions(&object, offset, "caSlider", True);
+            } else if(!strcmp(token,"control")) {
+                parseControl(displayInfo, "caSlider");
+            } else if(!strcmp(token,"label")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
                 if(!strcmp(token,"none")) {
@@ -2210,7 +2263,7 @@ void *parseValuator(DisplayInfo *displayInfo, FrameOffset * offset)
 		getToken(displayInfo,token);
                 //dlValuator->dPrecision = atof(token);
 	    } else if(!strcmp(token,"limits")) {
-                parseLimits(displayInfo,  "caSlider", 0);
+                parseLimits(displayInfo,  "caSlider", 0, False);
 	    }
 	    break;
 	case T_EQUAL:
@@ -2228,7 +2281,7 @@ void *parseValuator(DisplayInfo *displayInfo, FrameOffset * offset)
             && (tokenType != T_EOF) );
 
     Qt_handleString("direction", "enum", direction);
-    Qt_handleString("look", "enum", look);
+
     if(!strcmp(look,"noLabel") || !strcmp(look,"noDeco")) {
         Qt_handleString("scalePosition", "enum", "NoScale");
     } else if(!strcmp(direction, "Up") || !strcmp(direction, "Down")) {
@@ -2244,7 +2297,7 @@ void *parseValuator(DisplayInfo *displayInfo, FrameOffset * offset)
     return (void*)0;
 }
 
-void parseControl(DisplayInfo *displayInfo)
+void parseControl(DisplayInfo *displayInfo, char *widget)
 {
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
@@ -2275,11 +2328,27 @@ void parseControl(DisplayInfo *displayInfo)
 	    } else if (!strcmp(token,"clr")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
-                //printf("adlParser -- color  for control not supported\n");
+                if(!strcmp(widget, "caTextEntry")) {
+                    int clr = atoi(token) % DL_MAX_COLORS;
+                    Qt_setColorForeground("",displayInfo->dlColormap->dl_color[clr].r,
+                                          displayInfo->dlColormap->dl_color[clr].g,
+                                          displayInfo->dlColormap->dl_color[clr].b,
+                                          255);
+                } else {
+                    //printf("adlParser -- color  for control %s not supported (use stylesheet)\n", widget);
+                }
 	    } else if (!strcmp(token,"bclr")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
-                //printf("adlParser -- back color  for control not supported\n");
+                if(!strcmp(widget, "caTextEntry")) {
+                    int bclr = atoi(token) % DL_MAX_COLORS;
+                    Qt_setColorBackground("",displayInfo->dlColormap->dl_color[bclr].r,
+                                          displayInfo->dlColormap->dl_color[bclr].g,
+                                          displayInfo->dlColormap->dl_color[bclr].b,
+                                          255);
+                } else {
+                    //printf("adlParser -- color  for control %s not supported (use stylesheet)\n", widget);
+                }
 	    }
 	    break;
 	case T_LEFT_BRACE:
@@ -2304,7 +2373,7 @@ void *parseImage(DisplayInfo *displayInfo, FrameOffset * offset)
     int visibilityStatic = 0;
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caImage_%d", number++);
     Qt_writeOpenTag("widget", "caImage", widgetName);
 
@@ -2313,7 +2382,8 @@ void *parseImage(DisplayInfo *displayInfo, FrameOffset * offset)
         switch( (tokenType = getToken(displayInfo,token)) ) {
 	case T_WORD:
 	    if(!strcmp(token,"object")) {
-                parseObject(displayInfo, &object, offset, "caImage");
+                parseObject(displayInfo, &object);
+                writeRectangleDimensions(&object, offset, "caImage", True);
 	    } else if(!strcmp(token,"dynamic attribute")) {
                 parseDynamicAttribute(displayInfo,"caImage", &visibilityStatic);
 	    } else if(!strcmp(token,"type")) {
@@ -2348,17 +2418,79 @@ void *parseImage(DisplayInfo *displayInfo, FrameOffset * offset)
     return (void*) 0;
 }
 
-static void compositeFileParse(DisplayInfo *displayInfo, char *filename, FrameOffset *newoffset)
+static int getWidthFromIncludeFile(DisplayInfo *displayInfo, char *filename,
+                                   int *compositeFileWidth,  int *compositeFileHeight)
+{
+    char token[MAX_TOKEN_LENGTH];
+    TOKEN tokenType;
+    int savedVersionNumber;
+    FILE *savedFilePtr;
+
+    FILE *filePtr = fopen(filename, "r");
+    if(!filePtr) {
+        printf("\ncompositeFileParse: Cannot open file: %s\n", filename);
+        return False;
+    }
+
+    savedFilePtr = displayInfo->filePtr;
+    savedVersionNumber = displayInfo->versionNumber;
+
+    displayInfo->filePtr = filePtr;
+    parsingCompositeFile = True;
+
+    // Read the display block
+    tokenType=getToken(displayInfo,token);
+    if(tokenType == T_WORD && !strcmp(token,"display")) {
+        parseAndSkip(displayInfo);
+        tokenType=getToken(displayInfo,token);
+    }
+
+    // Read the colormap
+    if(tokenType == T_WORD && (!strcmp(token,"color map") ||
+                               !strcmp(token,"<<color map>>"))) {
+        parseAndSkip(displayInfo);
+        tokenType=getToken(displayInfo,token);
+    }
+
+    while( (tokenType=getToken(displayInfo,token)) != T_EOF) {
+
+        if(tokenType == T_WORD && !strcmp(token,"width")) {
+            getToken(displayInfo,token);
+            getToken(displayInfo,token);
+            *compositeFileWidth = atoi(token);
+            //printf("found width =%d instead off %d\n", atoi(token), newoffset->frameWidth);
+        }
+        if(tokenType == T_WORD && !strcmp(token,"height")) {
+            getToken(displayInfo,token);
+            getToken(displayInfo,token);
+            *compositeFileHeight = atoi(token);
+            //printf("found height =%d instead off %d\n", atoi(token), newoffset->frameHeight);
+            break;
+        }
+    }
+    // Restore displayInfo file parameters
+    displayInfo->filePtr = savedFilePtr;
+    displayInfo->versionNumber = savedVersionNumber;
+
+    fclose(filePtr);
+    return True;
+}
+
+static void compositeFileParse(DisplayInfo *displayInfo, char *filename, DlObject *object,
+                               FrameOffset *frameoffset,
+                               FrameOffset *newoffset)
 {
     FILE *filePtr, *savedFilePtr;
     int savedVersionNumber;
     NameValueTable *savedNameValueTable = NULL;
     int savedNumNameValues = 0;
-    char asc[MAX_TOKEN_LENGTH];
     char macroString[MAX_TOKEN_LENGTH];
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
-    char newFileName[200];
+    char newFileName[LONGSTRING];
+
+    int compositeFileWidth = newoffset->frameWidth + 2;
+    int compositeFileHeight = newoffset->frameHeight + 2;
 
     if(!displayInfo) return;
 
@@ -2378,37 +2510,55 @@ static void compositeFileParse(DisplayInfo *displayInfo, char *filename, FrameOf
         }
     }
 
+    // filename
+    strcpy(newFileName, filePrefix);
+    strcat(newFileName, "/");
+    strcat(newFileName, filename);
+
     // include file instead of flat parsing
 
     if(!generateFlatFile) {
-        static int number = 0;
-        char widgetName[40];
-        sprintf(widgetName, "caInclude_%d", number++);
-        Qt_writeOpenTag("widget", "caInclude", widgetName);
 
-        Qt_writeOpenProperty("geometry");
-        Qt_writeOpenTag("rect", "", "");
+        // we would like to correct the composite width and height, so open the file to find it
 
+        if(!getWidthFromIncludeFile(displayInfo, newFileName, &compositeFileWidth, &compositeFileHeight)) {
+            printf("\ncompositeFileParse: Cannot open file: %s\n", newFileName);
+        }
 
-        sprintf(asc, "%d", newoffset->frameX);
-        Qt_taggedString("x", asc);
-        sprintf(asc, "%d", newoffset->frameY);
-        Qt_taggedString("y", asc);
+        object->height = compositeFileHeight;
+        object->width = compositeFileWidth;
+        writeRectangleDimensions(object, frameoffset, "caFrame", True);  // delayed write
 
-        sprintf(asc, "%d", newoffset->frameWidth + 2);
-        Qt_taggedString("width", asc);
-        sprintf(asc, "%d", newoffset->frameHeight + 2);
-        Qt_taggedString("height", asc);
+        newoffset->frameX = newoffset->frameX - frameoffset->frameX;
+        newoffset->frameY = newoffset->frameY - frameoffset->frameY;
+        newoffset->frameHeight = compositeFileHeight;
+        newoffset->frameWidth = compositeFileWidth;
 
-
-        Qt_writeCloseTag("rect", "", False);
-        Qt_writeCloseProperty();
+        writeRectangleDimensions(object, newoffset, "caInclude", False);
 
         Qt_handleString("filename", "string", filename);
         Qt_handleString("macro", "string", macroString);
-        Qt_writeCloseTag("widget", widgetName, 0);
+
         return;
     }
+
+    // generate flat file, not always so good
+
+    // we would like to correct the composite width and height, so open the file to find it
+
+    if(!getWidthFromIncludeFile(displayInfo, newFileName, &compositeFileWidth, &compositeFileHeight)) {
+        printf("\ncompositeFileParse: Cannot open file: %s\n", newFileName);
+        object->height = compositeFileHeight;
+        object->width = compositeFileWidth;
+        writeRectangleDimensions(object, frameoffset, "caFrame", True);  // delayed write
+        return;
+    }
+
+    object->height = compositeFileHeight;
+    object->width = compositeFileWidth;
+    writeRectangleDimensions(object, frameoffset, "caFrame", True);  // delayed write
+
+    // now use the original parsing
 
     //printf("compositeFileParse file=%s macro=%s\n", filename, macroString);
 
@@ -2416,9 +2566,6 @@ static void compositeFileParse(DisplayInfo *displayInfo, char *filename, FrameOf
     savedVersionNumber = displayInfo->versionNumber;
 
     // Open the file
-    strcpy(newFileName, filePrefix);
-    strcat(newFileName, "/");
-    strcat(newFileName, filename);
     filePtr = fopen(newFileName, "r");
     if(!filePtr) {
         printf("\ncompositeFileParse: Cannot open file: %s\n", newFileName);
@@ -2470,65 +2617,6 @@ static void compositeFileParse(DisplayInfo *displayInfo, char *filename, FrameOf
         tokenType=getToken(displayInfo,token);
     }
 
-    /*
-  // Rearrange the composite to fit its contents
-    minX = INT_MAX; minY = INT_MAX;
-    maxX = INT_MIN; maxY = INT_MIN;
-    pE = FirstDlElement(dlComposite->dlElementList);
-    while(pE) {
-        pO = &(pE->structure.composite->object);
-
-        minX = MIN(minX,pO->x);
-        maxX = MAX(maxX,(int)(pO->x+pO->width));
-        minY = MIN(minY,pO->y);
-        maxY = MAX(maxY,(int)(pO->y+pO->height));
-#if DEBUG_FILE
-        print("  %-20s %3d %3d %3d %3d %3d %3d\n",
-          elementType(pE->type),
-          pO->x,pO->y,pO->width,pO->height,
-          (int)(pO->x+pO->width),(int)(pO->x+pO->height));
-#endif
-        pE = pE->next;
-    }
-    oldX = dlComposite->object.x;
-    oldY = dlComposite->object.y;
-    dlComposite->object.x = minX;
-    dlComposite->object.y = minY;
-    dlComposite->object.width = maxX - minX;
-    dlComposite->object.height = maxY - minY;
-
-  // Move the rearranged composite to its original x and y coordinates
-    compositeMove(dlElement, oldX - minX, oldY - minY);
-
-  // Check composite is in bounds
-    displayW = displayH = 0;
-    pD = FirstDlElement(displayInfo->dlElementList);
-    pO = &(dlComposite->object);
-    if(pD && pO) {
-        displayW = pD->structure.display->object.width;
-        displayH = pD->structure.display->object.height;
-        if((pO->x) > displayW ||
-          (pO->x + (int)pO->width) < 0 ||
-          (pO->y) > displayH ||
-          (pO->y + (int)pO->height) < 0) {
-            medmPrintf(1,"\ncompositeFileParse:"
-              " Composite from file extends beyond display:\n"
-              "  File: %s\n", filename);
-        } else if((pO->x) < 0 ||
-          (pO->x + (int)pO->width) > displayW ||
-          (pO->y) < 0 ||
-          (pO->y + (int)pO->height) > displayH) {
-            medmPrintf(1,"\ncompositeFileParse:"
-              " Composite from file extends beyond display:\n"
-              "  File: %s\n", filename);
-        }
-    }
-#if DEBUG_FILE
-    print("  displayW=%d displayH=%d width=%d height=%d\n",
-      displayW,displayH,(int)dlComposite->object.width,
-      (int)dlComposite->object.height);
-#endif
-*/
 RETURN:
 
     // Restore displayInfo file parameters
@@ -2543,7 +2631,7 @@ RETURN:
     fclose(filePtr);
 }
 
-void *parseComposite(DisplayInfo *displayInfo, FrameOffset * offset)
+void *parseComposite(DisplayInfo *displayInfo, FrameOffset *offset)
 {
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
@@ -2551,61 +2639,95 @@ void *parseComposite(DisplayInfo *displayInfo, FrameOffset * offset)
     DlObject *object;
     char compositeName[MAX_TOKEN_LENGTH];
     char compositeFile[MAX_TOKEN_LENGTH];
-    char asc[MAX_TOKEN_LENGTH];
     int visibilityStatic = 0;
+    int includeSet = False;
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
 
-    if(framesRequested) {
-      sprintf(widgetName, "caFrame_%d", number++);
-      Qt_writeOpenTag("widget", "caFrame", widgetName);
-    }
     object = (DlObject *)malloc(sizeof(DlObject));
 
+    FrameOffset *frameoffset = (FrameOffset *)malloc(sizeof(FrameOffset));
     FrameOffset *actoffset = (FrameOffset *)malloc(sizeof(FrameOffset));
 
     do {
         switch(tokenType=getToken(displayInfo,token)) {
 	case T_WORD:
+
 	    if(!strcmp(token,"object")) {
-                parseObject(displayInfo, object, offset, "caFrame");
-                if(framesRequested) {
-                  actoffset->frameX = object->x;
-                  actoffset->frameY = object->y;
-                } else {
-                  actoffset->frameX = 0;
-                  actoffset->frameY = 0;
-                }
-                //printf("new frame xy= %d %d\n",actoffset->frameX, actoffset->frameY);
+
+                parseObject(displayInfo, object);
+                // do not write yet any dimensions, have to be delayed for composite file to add width and height
+                frameoffset = offset;
+                actoffset->frameX = object->x;
+                actoffset->frameY = object->y;
                 offset=actoffset;
+/*
+                printf("parseobject object=%d %d actoffset=%d %d\n", object->x, object->y,
+                                                                     actoffset->frameX, actoffset->frameY);
+*/
 	    } else if(!strcmp(token,"dynamic attribute")) {
-                parseDynamicAttribute(displayInfo, "caFrame", &visibilityStatic);
+                // dynamic attribute is normally after composite file
+                if(!includeSet) {
+                  parseDynamicAttribute(displayInfo, "caFrame", &visibilityStatic);
+                } else {
+                  parseDynamicAttribute(displayInfo, "caInclude", &visibilityStatic);
+                }
+
 	    } else if(!strcmp(token,"composite name")) {
+
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
 		strcpy(compositeName,token);
+
 	    } else if(!strcmp(token,"composite file")) {
+
                 FrameOffset *newoffset = (FrameOffset *)malloc(sizeof(FrameOffset));
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
 		strcpy(compositeFile,token);
-                if(framesRequested) {
-                  newoffset->frameX = 0;
-                  newoffset->frameY = 0;
+                // will be an caInclude
+                if(!generateFlatFile) {
+                    includeSet = True;
+
+                    sprintf(widgetName, "caInclude_%d", number++);
+                    Qt_writeOpenTag("widget", "caInclude", widgetName);
+
+                    newoffset->frameX = object->x;
+                    newoffset->frameY = object->y;
+                    newoffset->frameWidth = object->width;
+                    newoffset->frameHeight = object->height;
+                // will be a caFrame
                 } else {
-                  newoffset->frameX = object->x;
-                  newoffset->frameY = object->y;
+
+                    sprintf(widgetName, "caFrame_%d", number++);
+                    Qt_writeOpenTag("widget", "caFrame", widgetName);
+
+                    newoffset->frameX = 0;
+                    newoffset->frameY = 0;
+                    newoffset->frameWidth = object->width;
+                    newoffset->frameHeight = object->height;
                 }
-                newoffset->frameWidth = object->width;
-                newoffset->frameHeight = object->height;
-                compositeFileParse(displayInfo, compositeFile, newoffset);
-                /* Handle composite file here */
+/*
+                printf("parsefile object=%d %d frameoffset=%d %d newoffset = %d %d\n", object->x, object->y,
+                                                                                      frameoffset->frameX, frameoffset->frameY,
+                                                                                       newoffset->frameX, newoffset->frameY);
+*/
+                compositeFileParse(displayInfo, compositeFile, object, frameoffset, newoffset);
+
 	    } else if(!strcmp(token,"children")) {
+
+                sprintf(widgetName, "caFrame_%d", number++);
+                Qt_writeOpenTag("widget", "caFrame", widgetName);
+
                 FrameOffset *newoffset = (FrameOffset *)malloc(sizeof(FrameOffset));
-                newoffset->frameX = actoffset->frameX;
-                newoffset->frameY = actoffset->frameY;
+                newoffset->frameX = offset->frameX;
+                newoffset->frameY = offset->frameY;
+/*
+                printf("children object=%d %d newoffset = %d %d\n", object->x, object->y, newoffset->frameX, newoffset->frameY);
+*/
 		tokenType=getToken(displayInfo,token);
+                writeRectangleDimensions(object, frameoffset, "caFrame", True);  // delayed write
                 parseAndAppendDisplayList(displayInfo, newoffset, token, tokenType);
 	    }
 	    break;
@@ -2623,9 +2745,8 @@ void *parseComposite(DisplayInfo *displayInfo, FrameOffset * offset)
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
-    if(framesRequested) {
-      Qt_writeCloseTag("widget", widgetName, visibilityStatic);
-    }
+    Qt_writeCloseTag("widget", widgetName, visibilityStatic);
+
     return (void*) 0;
 }
 
@@ -2636,7 +2757,7 @@ void parsePolygonPoints(DisplayInfo *displayInfo, char *widget, int offsetX, int
     TOKEN tokenType;
     int nestingLevel;
     int x, y;
-    char points[1024];
+    char points[LONGSTRING];
 
     points[0] = '\0';
     nestingLevel = 0;
@@ -2670,7 +2791,7 @@ void parsePolygonPoints(DisplayInfo *displayInfo, char *widget, int offsetX, int
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
-        if(strlen(points) > 0) Qt_handleString("xyPairs", "string", points);
+    if(strlen(points) > 0) Qt_handleString("xyPairs", "string", points);
 
 }
 
@@ -2685,7 +2806,7 @@ void *parseWheelSwitch(DisplayInfo *displayInfo, FrameOffset * offset)
     int formatFound=False;
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caNumeric_%d", number++);
     Qt_writeOpenTag("widget", "caNumeric", widgetName);
 
@@ -2694,21 +2815,23 @@ void *parseWheelSwitch(DisplayInfo *displayInfo, FrameOffset * offset)
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
 	    if(!strcmp(token,"object")) {
-                parseObject(displayInfo, &object, offset, "caNumeric");
+                parseObject(displayInfo, &object);
+                writeRectangleDimensions(&object, offset, "caNumeric", True);
 	    } else if(!strcmp(token,"control")) {
-                parseControl(displayInfo);
+                parseControl(displayInfo, "caNumeric");
 	    } else if(!strcmp(token,"clrmod")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
                 strcpy(COLORMODE, token);
 	    } else if(!strcmp(token,"limits")) {
-                parseLimits(displayInfo, "caNumeric", 0);
+                parseLimits(displayInfo, "caNumeric", 0, formatFound);
 	    } else if(!strcmp(token,"format")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
                 formatFound = True;
                 Qt_setWheelSwitchForm("", token);
                 Qt_setPrecisionSource("caNumeric", 0, "Default");
+                Qt_handleString("fixedFormat", "bool", "true");
 	    }
 	    break;
 	case T_EQUAL:
@@ -2725,8 +2848,8 @@ void *parseWheelSwitch(DisplayInfo *displayInfo, FrameOffset * offset)
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
-    //Qt_handleString("digitsFontScaleEnabled", "bool", "true");
     Qt_handleString("autoFillBackground", "bool", "true");
+    if(!formatFound) Qt_handleString("fixedFormat", "bool", "false");
 
     Qt_writeCloseTag("widget", widgetName, visibilityStatic);
 
@@ -2744,16 +2867,16 @@ void *parsePolygon(DisplayInfo *displayInfo, FrameOffset * offset)
     int offsetX=0, offsetY=0;
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caPolygon_%d", number++);
     Qt_writeOpenTag("widget", "caPolyLine", widgetName);
 
-    //printf("==> parsePolygon not yet implemented\n");
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
             if(!strcmp(token,"object")) {
-                parseObject(displayInfo, &object, offset, "caPolygon");
+                parseObject(displayInfo, &object);
+                writeRectangleDimensions(&object, offset, "caPolygon", True);
                 offsetX = object.x;
                 offsetY = object.y;
             } else {
@@ -2797,7 +2920,7 @@ void *parseRectangle(DisplayInfo *displayInfo, FrameOffset * offset)
     int visibilityStatic = 0;
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caRectangle_%d", number++);
     Qt_writeOpenTag("widget", "caGraphics", widgetName);
 
@@ -2807,9 +2930,10 @@ void *parseRectangle(DisplayInfo *displayInfo, FrameOffset * offset)
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
-	    if(!strcmp(token,"object"))
-                parseObject(displayInfo, &object, offset, "caGraphics");
-	    else if(!strcmp(token,"basic attribute")) {
+            if(!strcmp(token,"object")) {
+                parseObject(displayInfo, &object);
+                writeRectangleDimensions(&object, offset, "caGraphics", True);
+            } else if(!strcmp(token,"basic attribute")) {
                 parseBasicAttribute(displayInfo, "caGraphics");
             } else if(!strcmp(token,"dynamic attribute")) {
                 parseDynamicAttribute(displayInfo, "caGraphics", &visibilityStatic);
@@ -2843,7 +2967,7 @@ void *parseOval(DisplayInfo *displayInfo, FrameOffset * offset)
     int visibilityStatic = 0;
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caGraphics_%d", number++);
     Qt_writeOpenTag("widget", "caGraphics", widgetName);
 
@@ -2853,9 +2977,10 @@ void *parseOval(DisplayInfo *displayInfo, FrameOffset * offset)
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
-	    if(!strcmp(token,"object"))
-                parseObject(displayInfo, &object, offset, "caGraphics");
-	    else if(!strcmp(token,"basic attribute")) {
+            if(!strcmp(token,"object")) {
+                parseObject(displayInfo, &object);
+                writeRectangleDimensions(&object, offset, "caGraphics", True);
+            } else if(!strcmp(token,"basic attribute")) {
                 parseBasicAttribute(displayInfo, "caGraphics");
             } else if(!strcmp(token,"dynamic attribute")) {
                 parseDynamicAttribute(displayInfo, "caGraphics", &visibilityStatic);
@@ -2883,35 +3008,47 @@ void *parseOval(DisplayInfo *displayInfo, FrameOffset * offset)
 void *parseArc(DisplayInfo *displayInfo, FrameOffset * offset)
 {
     char token[MAX_TOKEN_LENGTH];
+    char asc[MAX_ASCII];
     TOKEN tokenType;
     int nestingLevel = 0;
     DlObject object;
     int visibilityStatic = 0;
+    int startAngle = 0;
+    int spanAngle = 0;
 
     static int number = 0;
-    char widgetName[40];
-    sprintf(widgetName, "caArc_%d", number++);
-    Qt_writeOpenTag("widget", "caArc", widgetName);
+    char widgetName[MAX_ASCII];
 
-    printf("==> parseArc not yet supported\n");
+    sprintf(widgetName, "caArc_%d", number++);
+    Qt_writeOpenTag("widget", "caGraphics", widgetName);
+
+    Qt_handleString("form", "enum", "caGraphics::Arc");
+
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
 	    if (!strcmp(token,"object"))
-                parseObject(displayInfo, &object, offset, "caArc");
+                parseObject(displayInfo, &object);
+            writeRectangleDimensions(&object, offset, "caGraphics", True);
 	    if (!strcmp(token,"basic attribute")) {
-                parseBasicAttribute(displayInfo, "caArc");
+                parseBasicAttribute(displayInfo, "caGraphics");
             } else {
                 if (!strcmp(token,"dynamic attribute")) {
-                    parseDynamicAttribute(displayInfo, "caArc", &visibilityStatic);
+                    parseDynamicAttribute(displayInfo, "caGraphics", &visibilityStatic);
                 } else {
                     if (!strcmp(token,"begin")) {
                         getToken(displayInfo,token);
                         getToken(displayInfo,token);
+                        startAngle = atoi(token);
+                        sprintf(asc, "%d", startAngle / 64);
+                        Qt_handleString("startAngle", "number", asc);
                     } else
                         if (!strcmp(token,"path")) {
                             getToken(displayInfo,token);
                             getToken(displayInfo,token);
+                            spanAngle = atoi(token);
+                            sprintf(asc, "%d", spanAngle / 64);
+                            Qt_handleString("spanAngle", "number", asc);
                         }
                 }
             }
@@ -2939,20 +3076,21 @@ void *parseArc(DisplayInfo *displayInfo, FrameOffset * offset)
 void *parseText(DisplayInfo *displayInfo, FrameOffset * offset)
 {
     char token[MAX_TOKEN_LENGTH];
+    char textix[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
     int nestingLevel = 0;
     DlObject object;
-    //TextAlign align;
     int alignFound=False;
     int visibilityStatic = 0;
-    int i = 0;
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caLabel_%d", number++);
     Qt_writeOpenTag("widget", "caLabel", widgetName);
 
     Qt_handleString("frameShape", "enum", "QFrame::NoFrame");
+
+    textix[0] = '\0';
 
     //printf("==> parseText\n");
 
@@ -2960,7 +3098,8 @@ void *parseText(DisplayInfo *displayInfo, FrameOffset * offset)
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
 	    if(!strcmp(token,"object")) {
-                parseObject(displayInfo, &object, offset, "caLabel");
+                parseObject(displayInfo, &object);
+                //writeRectangleDimensions(&object, offset, "caLabel", True);
 	    } else if(!strcmp(token,"basic attribute")) {
                 parseBasicAttribute(displayInfo, "caLabel");
             } else if(!strcmp(token,"dynamic attribute")) {
@@ -2969,10 +3108,10 @@ void *parseText(DisplayInfo *displayInfo, FrameOffset * offset)
 	    else if(!strcmp(token,"textix")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
+                strcpy(textix, token);
                 Qt_handleString("text", "string",  token);
                 Qt_handleString("fontScaleMode", "enum",  "ESimpleLabel::Height");
 	    } else if(!strcmp(token,"align")) {
-                int found=0;
 
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
@@ -3003,6 +3142,12 @@ void *parseText(DisplayInfo *displayInfo, FrameOffset * offset)
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
+    if(strlen(textix) > 0) {
+        int newWidth = .6 * object.height * strlen(textix);
+        if(newWidth > object.width) object.width = newWidth;
+    }
+    writeRectangleDimensions(&object, offset, "caLabel", True);
+
     if(!alignFound) Qt_handleString("alignment", "set", "Qt::AlignAbsolute|Qt::AlignLeft|Qt::AlignVCenter");
 
     Qt_writeCloseTag("widget", widgetName, visibilityStatic);
@@ -3016,7 +3161,7 @@ void parsePolylinePoints(DisplayInfo *displayInfo, char *widget, int offsetX, in
     TOKEN tokenType;
     int nestingLevel;
     int x, y;
-    char points[1024];
+    char points[LONGSTRING];
 
     points[0] = '\0';
     nestingLevel = 0;
@@ -3063,7 +3208,7 @@ void *parsePolyline(DisplayInfo *displayInfo, FrameOffset * offset)
     int visibilityStatic = 0;
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caPolyLine_%d", number++);
     Qt_writeOpenTag("widget", "caPolyLine", widgetName);
     
@@ -3072,7 +3217,8 @@ void *parsePolyline(DisplayInfo *displayInfo, FrameOffset * offset)
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
             if(!strcmp(token,"object")) {
-                parseObject(displayInfo, &object, offset, "caPolyLine");
+                parseObject(displayInfo, &object);
+                writeRectangleDimensions(&object, offset, "caPolyLine", True);
                 offsetX = object.x;
                 offsetY = object.y;
             } else if(!strcmp(token,"basic attribute")) {
@@ -3114,7 +3260,7 @@ void *parseBar(DisplayInfo *displayInfo, FrameOffset * offset)
     int visibilityStatic = 2; // top layer
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caThermo_%d", number++);
     Qt_writeOpenTag("widget", "caThermo", widgetName);
 
@@ -3123,7 +3269,8 @@ void *parseBar(DisplayInfo *displayInfo, FrameOffset * offset)
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
 	    if(!strcmp(token,"object")) {
-                parseObject(displayInfo, &object, offset, "caThermo");
+                parseObject(displayInfo, &object);
+                writeRectangleDimensions(&object, offset, "caThermo", True);
 	    } else if(!strcmp(token,"monitor")) {
                 parseMonitor(displayInfo, "caThermo");
 	    } else if(!strcmp(token,"label")) {
@@ -3168,7 +3315,7 @@ void *parseBar(DisplayInfo *displayInfo, FrameOffset * offset)
                     //dlBar->fillmod = FROM_CENTER;
                 }
 	    } else if(!strcmp(token,"limits")) {
-                parseLimits(displayInfo, "caThermo", 0);
+                parseLimits(displayInfo, "caThermo", 0, False);
 	    }
 	    break;
 	case T_EQUAL:
@@ -3186,7 +3333,7 @@ void *parseBar(DisplayInfo *displayInfo, FrameOffset * offset)
              && (tokenType != T_EOF) );
 
     Qt_handleString("direction", "enum", direction);
-    Qt_handleString("look", "enum", look);
+
     if(!strcmp(look,"noLabel") || !strcmp(look,"noDeco")) {
         Qt_handleString("scalePosition", "enum", "NoScale");
     } else if(!strcmp(direction, "Up") || !strcmp(direction, "Down")) {
@@ -3214,7 +3361,7 @@ void *parseIndicator(DisplayInfo *displayInfo, FrameOffset * offset)
     int visibilityStatic = 2; // top layer
 
     static int number = 0;
-    char widgetName[40];
+    char widgetName[MAX_ASCII];
     sprintf(widgetName, "caThermoM_%d", number++);
     Qt_writeOpenTag("widget", "caThermo", widgetName);
 
@@ -3223,7 +3370,8 @@ void *parseIndicator(DisplayInfo *displayInfo, FrameOffset * offset)
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
 	    if(!strcmp(token,"object")) {
-                parseObject(displayInfo, &object, offset, "caThermo");
+                parseObject(displayInfo, &object);
+                writeRectangleDimensions(&object, offset, "caThermo", True);
 	    } else if(!strcmp(token,"monitor")) {
                 parseMonitor(displayInfo, "caThermo");
 	    } else if(!strcmp(token,"label")) {
@@ -3259,7 +3407,7 @@ void *parseIndicator(DisplayInfo *displayInfo, FrameOffset * offset)
                     strcpy(direction, "Left");
                 }
 	    } else if(!strcmp(token,"limits")) {
-                parseLimits(displayInfo, "caThermo", 0);
+                parseLimits(displayInfo, "caThermo", 0, False);
 	    }
 	    break;
 	case T_EQUAL:
@@ -3277,7 +3425,7 @@ void *parseIndicator(DisplayInfo *displayInfo, FrameOffset * offset)
              && (tokenType != T_EOF) );
 
     Qt_handleString("direction", "enum", direction);
-    Qt_handleString("look", "enum", look);
+
     if(!strcmp(look,"noLabel") || !strcmp(look,"noDeco")) {
         Qt_handleString("scalePosition", "enum", "NoScale");
     } else if(!strcmp(direction, "Up") || !strcmp(direction, "Down")) {
@@ -3484,7 +3632,8 @@ void *parseDisplay(DisplayInfo *displayInfo)
         switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
 	    if(!strcmp(token,"object")) {
-                parseObject(displayInfo, &object, &offset, "");
+                parseObject(displayInfo, &object);
+                writeRectangleDimensions(&object, &offset, "", True);
 	    } else if(!strcmp(token,"grid")) {
                 parseGrid(displayInfo, "");
 	    } else if(!strcmp(token,"cmap")) {
