@@ -288,12 +288,17 @@ int Qt_setColorMode(char *widget, char *token)
 {
     // returns 0 if alarm is static, 1 otherwise
     char asc[80];
+    char aux[80];
     if(!strcmp(token,"static")) {
         sprintf(asc, "%s::Static", widget);
         Qt_handleString("colorMode", "enum", asc);
         return 0;
     } else if(!strcmp(token,"alarm")) {
-        sprintf(asc, "%s::Alarm_Static", widget);
+        strcpy(aux, "Alarm");
+        if(!strcmp(widget, "caTextEntry")) strcpy(aux, "Alarm_Static");
+        if(!strcmp(widget, "caLineEdit")) strcpy(aux, "Alarm_Static");
+        if(!strcmp(widget, "caThermo")) strcpy(aux, "Alarm_Static");
+        sprintf(asc, "%s::%s", widget, aux);
         Qt_handleString("colorMode", "enum", asc);
         return 1;
     } else if(!strcmp(token,"discrete")) {

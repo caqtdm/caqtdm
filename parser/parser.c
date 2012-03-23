@@ -989,10 +989,12 @@ void parseObject(DisplayInfo *displayInfo, DlObject *object)
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
                 object->width = atoi(token);
+                if(object->width < 1) object->width=1;   // oh; line without thickness
 	    } else if(!strcmp(token,"height")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
                 object->height = atoi(token);
+                if(object->height < 1) object->height=1;   // oh; line without thickness
 	    }
 	    break;
 	case T_LEFT_BRACE:
@@ -1704,6 +1706,7 @@ void *parseMeter(DisplayInfo *displayInfo, FrameOffset * offset)
 void *parseByte( DisplayInfo *displayInfo, FrameOffset * offset) {
     char token[MAX_TOKEN_LENGTH];
     char direction[MAX_TOKEN_LENGTH] = "Down";
+    char COLORMODE[MAX_TOKEN_LENGTH] = "static";
     TOKEN tokenType;
     int nestingLevel = 0;
     DlObject object;
@@ -1729,7 +1732,7 @@ void *parseByte( DisplayInfo *displayInfo, FrameOffset * offset) {
 	    } else if(!strcmp(token,"clrmod")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
-                printf("adlParser -- color mode for caByte not supported\n");
+                strcpy(COLORMODE, token);
 	    } else if(!strcmp(token,"direction")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
@@ -1767,6 +1770,8 @@ void *parseByte( DisplayInfo *displayInfo, FrameOffset * offset) {
 	}
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
+
+    Qt_setColorMode("caByte", COLORMODE);
 
     if(!sbitFound || !ebitFound) {
         Qt_handleString("startBit", "enum", "0");
@@ -1969,6 +1974,7 @@ void *parseTextUpdate(DisplayInfo *displayInfo, FrameOffset * offset)
 void *parseChoiceButton(DisplayInfo *displayInfo, FrameOffset * offset)
 {
     char token[MAX_TOKEN_LENGTH];
+    char COLORMODE[MAX_TOKEN_LENGTH] = "static";
     TOKEN tokenType;
     int nestingLevel = 0;
     DlObject object;
@@ -1991,7 +1997,7 @@ void *parseChoiceButton(DisplayInfo *displayInfo, FrameOffset * offset)
             } else if(!strcmp(token,"clrmod")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
-                printf("adlParser -- color mode for caChoice not supported\n");
+                strcpy(COLORMODE, token);
 	    } else if(!strcmp(token,"stacking")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
@@ -2018,6 +2024,7 @@ void *parseChoiceButton(DisplayInfo *displayInfo, FrameOffset * offset)
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
+    Qt_setColorMode("caChoice", COLORMODE);
     Qt_writeCloseTag("widget", widgetName, visibilityStatic);
 
     return (void*) 0;
@@ -2087,6 +2094,7 @@ void *parseMessageButton(DisplayInfo *displayInfo, FrameOffset * offset)
 void *parseMenu(DisplayInfo *displayInfo, FrameOffset * offset)
 {
     char token[MAX_TOKEN_LENGTH];
+    char COLORMODE[MAX_TOKEN_LENGTH] = "static";
     TOKEN tokenType;
     int nestingLevel = 0;
     DlObject object;
@@ -2109,7 +2117,7 @@ void *parseMenu(DisplayInfo *displayInfo, FrameOffset * offset)
             } else if(!strcmp(token,"clrmod")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
-                printf("adlParser -- color mode for caMenu not supported\n");
+                strcpy(COLORMODE, token);
 	    }
 	    break;
 	case T_EQUAL:
@@ -2126,6 +2134,8 @@ void *parseMenu(DisplayInfo *displayInfo, FrameOffset * offset)
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
+
+     Qt_setColorMode("caMenu", COLORMODE);
     // case for proscan
     if(generateDeviceOnMenus) Qt_handleString("labelDisplay", "bool", "true");
 
