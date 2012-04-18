@@ -2886,18 +2886,18 @@ void *parsePolygon(DisplayInfo *displayInfo, FrameOffset * offset)
 	case T_WORD:
             if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
-                writeRectangleDimensions(&object, offset, "caPolygon", True);
+                writeRectangleDimensions(&object, offset, "caPolyLine", True);
                 offsetX = object.x;
                 offsetY = object.y;
             } else {
                 if(!strcmp(token,"basic attribute"))
-                    parseBasicAttribute(displayInfo, "caPolygon");
+                    parseBasicAttribute(displayInfo, "caPolyLine");
                 else
                     if(!strcmp(token,"dynamic attribute"))
-                        parseDynamicAttribute(displayInfo, "caPolygon", &visibilityStatic);
+                        parseDynamicAttribute(displayInfo, "caPolyLine", &visibilityStatic);
                     else
                         if(!strcmp(token,"points"))
-                            parsePolygonPoints(displayInfo, "caPolygon", offsetX, offsetY);
+                            parsePolygonPoints(displayInfo, "caPolyLine", offsetX, offsetY);
             }
 	    break;
 	case T_EQUAL:
