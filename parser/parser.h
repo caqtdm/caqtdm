@@ -1,7 +1,6 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -78,7 +77,6 @@ typedef struct {
 
 typedef struct _DisplayInfo {
     FILE *filePtr;
-    //DlFile *dlFile;
     int versionNumber;
     int drawingAreaBackgroundColor;
     int drawingAreaForegroundColor;

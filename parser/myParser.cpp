@@ -46,7 +46,7 @@ public:
     void writeOpenProperty(const QString& name);
     void writeTaggedString(const QString& type, const QString& value );
     void writeCloseProperty();
-    void writeStyleSheet();
+    void writeStyleSheet(int r, int g, int b);
 
     void writeOpenTag(const QString& type, const QString& cls = "", const QString& name = "");
     void writeCloseTag(const QString& type);
@@ -91,10 +91,17 @@ void myParser::openFile(char *outFile)
     xw->writeOpenTag("widget", AttrMap("class", "QMainWindow"), AttrMap("name", "MainWindow"));
 }
 
-void myParser::writeStyleSheet()
+void myParser::writeStyleSheet(int r, int g, int b)
 {
     xw->writeOpenTag( "property", AttrMap("name", "styleSheet") );
-    xw->writeTaggedString( "string",  StyleSheet);
+
+    QString color = "\n\nQWidget#centralWidget {background: rgb(%1, %2, %3);}\n\n";
+    color = color.arg(r).arg(g).arg(b);
+
+    QString styles = color;
+    styles.append(StyleSheet);
+
+    xw->writeTaggedString( "string",  styles);
     xw->writeCloseTag( "property");
 }
 
@@ -214,9 +221,9 @@ extern "C" myParser* C_adlParser(myParser* p, char* strng)
     return p;
 }
 
-extern "C" myParser* C_writeStyleSheet(myParser* p)
+extern "C" myParser* C_writeStyleSheet(myParser* p, int r, int g, int b)
 {
-    p->writeStyleSheet();
+    p->writeStyleSheet(r, g, b);
     return p;
 }
 

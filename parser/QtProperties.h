@@ -21,7 +21,7 @@ extern myParser* C_writeProperty(myParser* p, char *name, char *type, char *valu
 extern myParser* C_writeOpenProperty(myParser* p, char *name);
 extern myParser* C_writeTaggedString(myParser* p, char *type, char *value );
 extern myParser* C_writeCloseProperty(myParser* p);
-extern myParser* C_writeStyleSheet(myParser* p);
+extern myParser* C_writeStyleSheet(myParser* p, int r, int g, int b);
 
 void Qt_handleString(char *property, char *tag, char *value);
 void Qt_taggedString(char *tag, char *value);

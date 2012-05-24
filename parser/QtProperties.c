@@ -28,7 +28,6 @@ static void replace_char (char *s, char find, char replace) {
 
 void niceChannel(char *value)
 {
-
     replace_char (value, ' ', '\0');
     replace_char (value, ';', ':');
     uppercase(value);
@@ -142,9 +141,9 @@ void Qt_writeCloseProperty()
     C_writeCloseProperty(myParserPtr);
 }
 
-void Qt_writeStyleSheet()
+void Qt_writeStyleSheet(int r, int g, int b)
 {
-    C_writeStyleSheet(myParserPtr);
+    C_writeStyleSheet(myParserPtr, r, g, b);
 }
 
 void Qt_setWheelSwitchForm(char *widget, char *token)
@@ -183,6 +182,9 @@ void Qt_setMaximumLimit(char *widget, int pen, char *token) {
 }
 
 void Qt_setPrecision(char *widget, int pen, char *token) {
+    if(!strcmp(widget, "caStripPlot")) return;
+    if(!strcmp(widget, "caThermo")) return;
+    if(!strcmp(widget, "caSlider")) return;
     if(strstr(widget, "caNumeric") != (char*) 0) {
         int prec;
         char asc[10];
@@ -233,6 +235,9 @@ void Qt_setYaxisLimitSource(char *widget, char *token)
 void Qt_setMinimumLimitSource(char *widget, int pen, char *token)
 {
     char strng[30];
+
+    if(strstr(widget, "Gauge") != (char*) 0) return;
+
     if(strstr(token, "default") != (char*) 0) {
         sprintf(strng, "%s::User", widget);
     } else if(strstr(token, "channel") != (char*) 0) {
@@ -250,6 +255,8 @@ void Qt_setMinimumLimitSource(char *widget, int pen, char *token)
 
 void Qt_setMaximumLimitSource(char *widget, int pen, char *token)
 {
+    if(strstr(widget, "Gauge") != (char*) 0) return;
+
     char strng[30];
     if(strstr(token, "default") != (char*) 0) {
         sprintf(strng, "%s::User", widget);
@@ -269,6 +276,9 @@ void Qt_setPrecisionSource(char *widget, int pen, char *token)
 {
     char asc[80], aux[80];
     if(!strcmp(widget, "caStripPlot")) return;
+    if(!strcmp(widget, "caThermo")) return;
+    if(!strcmp(widget, "caSlider")) return;
+    if(strstr(widget, "Gauge") != (char*) 0) return;
     strcpy(aux, token);
 
     if(aux[0] >= 'a' && aux[0] <='z') aux[0] = aux[0] - 32;
@@ -289,6 +299,9 @@ int Qt_setColorMode(char *widget, char *token)
     // returns 0 if alarm is static, 1 otherwise
     char asc[80];
     char aux[80];
+
+    if(strstr(widget, "Gauge") != (char*) 0) return;
+
     if(!strcmp(token,"static")) {
         sprintf(asc, "%s::Static", widget);
         Qt_handleString("colorMode", "enum", asc);
@@ -297,7 +310,6 @@ int Qt_setColorMode(char *widget, char *token)
         strcpy(aux, "Alarm");
         if(!strcmp(widget, "caTextEntry")) strcpy(aux, "Alarm_Static");
         if(!strcmp(widget, "caLineEdit")) strcpy(aux, "Alarm_Static");
-        if(!strcmp(widget, "caThermo")) strcpy(aux, "Alarm_Static");
         sprintf(asc, "%s::%s", widget, aux);
         Qt_handleString("colorMode", "enum", asc);
         return 1;
@@ -361,6 +373,7 @@ void Qt_setColorScale(char *widget, int r, int g, int b, int alpha) {
 }
 
 void Qt_setColorLine(char *widget, int r, int g, int b, int alpha) {
+    if(!strcmp(widget, "caLabel")) return;  // no linecolor for label
     Qt_setColor("lineColor", r, g, b, alpha);
 }
 

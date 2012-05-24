@@ -615,7 +615,6 @@ void parseBasicAttribute(DisplayInfo *displayInfo, char *widget)
     strcpy(fillstyle, "solid");
     strcpy(linestyle, "solid");
 
-    //printf("parseBasicAttribute\n");
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
@@ -788,7 +787,6 @@ void parseDynamicAttribute(DisplayInfo *displayInfo, char *widget, int *visibili
 
     *visibilityStatic = 0;  // default is first layer
 
-    //printf("parseDynamicAttribute\n");
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
@@ -979,12 +977,10 @@ void parseObject(DisplayInfo *displayInfo, DlObject *object)
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
                 object->x = atoi(token);
-                //printf("correct position with x=%d\n", offset->frameX);
 	    } else if(!strcmp(token,"y")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
                 object->y = atoi(token);
-                //printf("correct position with y=%d\n", offset->frameY);
 	    } else if(!strcmp(token,"width")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
@@ -1235,8 +1231,6 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
     int Y2rangeFound = False;
     int visibilityStatic = 2; // top layer
 
-    //printf("==> parseCartesianPlot\n");
-
     static int number = 0;
     char widgetName[MAX_ASCII];
     sprintf(widgetName, "caCartesianPlot_%d", number++);
@@ -1423,7 +1417,6 @@ void *parseRelatedDisplay(DisplayInfo *displayInfo, FrameOffset * offset)
     sprintf(widgetName, "caRelatedDisplay_%d", number++);
     Qt_writeOpenTag("widget", "caRelatedDisplay", widgetName);
 
-    //printf("parseRelatedDisplay\n");
     do {
         switch(tokenType=getToken(displayInfo,token)) {
         case T_WORD:
@@ -1658,7 +1651,6 @@ void *parseMeter(DisplayInfo *displayInfo, FrameOffset * offset)
     sprintf(widgetName, "caCircularGauge_%d", number++);
     Qt_writeOpenTag("widget", "caCircularGauge", widgetName);
 
-    //printf("==> parseMeter\n");
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
@@ -1672,7 +1664,7 @@ void *parseMeter(DisplayInfo *displayInfo, FrameOffset * offset)
 		getToken(displayInfo,token);
 
                 // labeltype none, no decorations, outline, limits, channel
-                Qt_handleString("labelType", "enum", token);
+                // Qt_handleString("labelType", "enum", token);
 
 	    } else if(!strcmp(token,"clrmod")) {
 		getToken(displayInfo,token);
@@ -1720,7 +1712,6 @@ void *parseByte( DisplayInfo *displayInfo, FrameOffset * offset) {
     sprintf(widgetName, "caByte_%d", number++);
     Qt_writeOpenTag("widget", "caByte", widgetName);
 
-    //printf("==> parseByte\n");
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
@@ -1802,7 +1793,6 @@ void *parseStripChart(DisplayInfo *displayInfo, FrameOffset * offset)
     sprintf(widgetName, "caStripPlot_%d", number++);
     Qt_writeOpenTag("widget", "caStripPlot", widgetName);
 
-    //printf("==> parseStripPlot\n");
     do {
 	switch( (tokenType=getToken(displayInfo, token)) ) {
 	case T_WORD:
@@ -1885,7 +1875,6 @@ void *parseTextUpdate(DisplayInfo *displayInfo, FrameOffset * offset)
     sprintf(widgetName, "caLineEdit_%d", number++);
     Qt_writeOpenTag("widget", "caLineEdit", widgetName);
 
-    //printf("==> parseTextUpdate\n");
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
@@ -1985,7 +1974,6 @@ void *parseChoiceButton(DisplayInfo *displayInfo, FrameOffset * offset)
     sprintf(widgetName, "caChoice_%d", number++);
     Qt_writeOpenTag("widget", "caChoice", widgetName);
 
-    //printf("==> parseChoice\n");
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
@@ -2105,7 +2093,6 @@ void *parseMenu(DisplayInfo *displayInfo, FrameOffset * offset)
     sprintf(widgetName, "caMenu_%d", number++);
     Qt_writeOpenTag("widget", "caMenu", widgetName);
 
-    //printf("==> parseMenu\n");
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
@@ -2159,7 +2146,6 @@ void *parseTextEntry(DisplayInfo *displayInfo, FrameOffset * offset)
     sprintf(widgetName, "caTextEntry_%d", number++);
     Qt_writeOpenTag("widget", "caTextEntry", widgetName);
 
-    //printf("==> parseTextEntry\n");
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
@@ -2224,7 +2210,6 @@ void *parseValuator(DisplayInfo *displayInfo, FrameOffset * offset)
     sprintf(widgetName, "caSlider_%d", number++);
     Qt_writeOpenTag("widget", "caSlider", widgetName);
 
-    //printf("==> parseValuator\n");
     do {
 	switch((tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
@@ -2387,7 +2372,6 @@ void *parseImage(DisplayInfo *displayInfo, FrameOffset * offset)
     sprintf(widgetName, "caImage_%d", number++);
     Qt_writeOpenTag("widget", "caImage", widgetName);
 
-    //printf("==> parseImage\n");
     do {
         switch( (tokenType = getToken(displayInfo,token)) ) {
 	case T_WORD:
@@ -2820,7 +2804,6 @@ void *parseWheelSwitch(DisplayInfo *displayInfo, FrameOffset * offset)
     sprintf(widgetName, "caNumeric_%d", number++);
     Qt_writeOpenTag("widget", "caNumeric", widgetName);
 
-    //printf("==> parseWheelSwitch\n");
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
@@ -2936,7 +2919,6 @@ void *parseRectangle(DisplayInfo *displayInfo, FrameOffset * offset)
 
     Qt_handleString("form", "enum", "caGraphics::Rectangle");
 
-    //printf("==> parseRectangle\n");
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
@@ -2983,7 +2965,6 @@ void *parseOval(DisplayInfo *displayInfo, FrameOffset * offset)
 
     Qt_handleString("form", "enum", "caGraphics::Circle");
 
-    //printf("==> parseOval\n");
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
@@ -3102,8 +3083,6 @@ void *parseText(DisplayInfo *displayInfo, FrameOffset * offset)
 
     textix[0] = '\0';
 
-    //printf("==> parseText\n");
-
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
@@ -3221,8 +3200,7 @@ void *parsePolyline(DisplayInfo *displayInfo, FrameOffset * offset)
     char widgetName[MAX_ASCII];
     sprintf(widgetName, "caPolyLine_%d", number++);
     Qt_writeOpenTag("widget", "caPolyLine", widgetName);
-    
-    //printf("==> parsePolyline\n");
+
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
@@ -3274,7 +3252,6 @@ void *parseBar(DisplayInfo *displayInfo, FrameOffset * offset)
     sprintf(widgetName, "caThermo_%d", number++);
     Qt_writeOpenTag("widget", "caThermo", widgetName);
 
-    //printf("==> parseBar\n");
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
@@ -3375,7 +3352,6 @@ void *parseIndicator(DisplayInfo *displayInfo, FrameOffset * offset)
     sprintf(widgetName, "caThermoM_%d", number++);
     Qt_writeOpenTag("widget", "caThermo", widgetName);
 
-    //printf("==> parseIndicator\n");
     do {
 	switch( (tokenType=getToken(displayInfo,token)) ) {
 	case T_WORD:
@@ -3583,13 +3559,15 @@ TOKEN parseAndAppendDisplayList(DisplayInfo *displayInfo, FrameOffset *offset, c
     if(veryFirst) {
         veryFirst = False;
         int bclr = displayInfo->drawingAreaBackgroundColor;
-
+/*
         Qt_setColormain("", displayInfo->dlColormap->dl_color[bclr].r,
                         displayInfo->dlColormap->dl_color[bclr].g,
                         displayInfo->dlColormap->dl_color[bclr].b,
                         255);
-
-        Qt_writeStyleSheet();
+*/
+        Qt_writeStyleSheet(displayInfo->dlColormap->dl_color[bclr].r,
+                           displayInfo->dlColormap->dl_color[bclr].g,
+                           displayInfo->dlColormap->dl_color[bclr].b);
 
         Qt_writeOpenTag("widget", "QWidget", "centralWidget");
     }
@@ -3634,7 +3612,6 @@ void *parseDisplay(DisplayInfo *displayInfo)
     int clr, bclr;
     char cmap[MAX_TOKEN_LENGTH];
 
-    //printf("parseDisplay\n");
     FrameOffset offset;
     offset.frameX = offset.frameY =0; 
 
@@ -3737,8 +3714,6 @@ void parseDlColor(DisplayInfo *displayInfo, FILE *filePtr,
 
     FILE *savedFilePtr;
 
-    //printf("parseDlColor\n");
-
     /* (MDA) have to be sneaky for these colormap parsing routines: *
   * since possibly external colormap, save and restore * external file
   * ptr in displayInfo so that getToken() * works with displayInfo and
@@ -3783,7 +3758,7 @@ void parseOldDlColor(DisplayInfo *displayInfo, FILE *filePtr,
     TOKEN tokenType;
     int nestingLevel = 0;
     FILE *savedFilePtr;
-    //printf("parseOldDlColor\n");
+
     /*
    * (MDA) have to be sneaky for these colormap parsing routines:
    *      since possibly external colormap, save and restore
@@ -3849,8 +3824,6 @@ DlColormap *parseColormap(DisplayInfo *displayInfo, FILE *filePtr)
     DlColormapEntry dl_color[DL_MAX_COLORS];
     int counter;
     FILE *savedFilePtr;
-
-    //printf("parseColormap\n");
 
     dlColormap = createDlColormap(displayInfo);
     if(!dlColormap) return NULL;
