@@ -30,7 +30,7 @@ void niceChannel(char *value)
 {
     replace_char (value, ' ', '\0');
     replace_char (value, ';', ':');
-    uppercase(value);
+    //uppercase(value);
 }
 
 /* Checks format validity and calls compute_format_size */

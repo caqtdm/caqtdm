@@ -273,10 +273,20 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
-    QStringList openFile = inputFile.split(".", QString::SkipEmptyParts);
-    inputFile = openFile[0].append(".adl");
-    openFile = inputFile.split(".", QString::SkipEmptyParts);
-    QString outputFile = openFile[0].append(".ui");
+    QString openFile1, openFile2;
+    QString outputFile;
+
+    int found = inputFile.lastIndexOf(".adl");
+    if (found != -1) {
+        openFile1 = inputFile.mid(0, found);
+    } else {
+        openFile1 = inputFile;
+    }
+
+    openFile2 = openFile1;
+
+    outputFile = openFile1.append(".ui");
+    inputFile = openFile2.append(".adl");
 
     // when file exists open it
     QFileInfo fi(inputFile);

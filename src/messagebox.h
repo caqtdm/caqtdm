@@ -12,6 +12,7 @@
 #ifndef MESSAGEBOX_H
 #define MESSAGEBOX_H
 
+#include <QCoreApplication>
 #include <QMessageBox>
 
 class MessageBox : public QMessageBox {
@@ -26,7 +27,7 @@ MessageBox ( Icon icon,
              Qt::WindowFlags f = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint,
              bool autoClose = false);
 
-~MessageBox() {}
+~MessageBox();
 
 protected:
 

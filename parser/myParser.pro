@@ -12,7 +12,7 @@ HEADERS += XmlWriter.h parser.h \
 SOURCES += myParser.cpp XmlWriter.cpp parser.c \
     QtProperties.c
 
-TARGET = myParser
+TARGET = adl2ui
 
 OTHER_FILES += \
     stylesheet.qss

@@ -31,6 +31,10 @@ MessageBox::MessageBox (Icon icon,
     }
 }
 
+MessageBox::~MessageBox() {
+
+}
+
 void MessageBox::timerEvent(QTimerEvent *event)
 {
     currentTime++;

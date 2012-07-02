@@ -25,7 +25,7 @@
 #include <sys/time.h>
 
 #ifdef linux
-  #include <sys/resource.h>
+#include <sys/resource.h>
 #endif
 
 /**
@@ -37,6 +37,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     lastWindow = (QMainWindow*) 0;
     lastMacro ="";
     lastFile = "";
+    userClose = false;
 
     // set window title without the whole path
     QString title("caQtDM ");
@@ -90,6 +91,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         if (!sharedMemory.create(100)) {
             qDebug("Unable to create single instance.");
         } else {
+            qDebug() << "created share memory";
             sharedMemory.lock();
             char *to = (char*)sharedMemory.data();
             const char *from = byteArray.data();
@@ -120,6 +122,33 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
     sprintf(asc, "memory usage: %d kB", usage.ru_maxrss);
     statusBar()->showMessage( asc);
 #endif
+
+    // any open windows ?
+    QList<QWidget *> all = this->findChildren<QWidget *>();
+
+    //qDebug() << all.count() << all;
+
+    // we want to ask with timeout if the application has to be closed
+    if(all.count() <= 8 && userClose) { // 8 is the number of basic objects
+        QString message = QString("no more open windows, do you want to exit?");
+        MessageBox *m = new MessageBox(QMessageBox::Warning, "Exit", message, QMessageBox::Yes | QMessageBox::No, this, Qt::Dialog, true);
+        m->show();
+        int selected = m->exec();
+        if(selected == QMessageBox::Yes) {
+            if (sharedMemory.isAttached()) sharedMemory.detach();
+            exit(0);
+        } else if(selected == QMessageBox::No){
+            m->deleteLater();
+            userClose = false;
+        } else {  // on timeout, the user does not seem to be interested
+            if (sharedMemory.isAttached()) sharedMemory.detach();
+            exit(0);
+        }
+
+    } else if(all.count() > 9){
+        userClose = true;
+    }
+
 }
 
 
@@ -132,7 +161,7 @@ void FileOpenWindow::Callback_OpenButton()
     QString path = (QString)  getenv("CAQTDM_DISPLAY_PATH");
     if(path.size() == 0) path.append(".");
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open ui file"), path, tr("ui Files (*.ui)"));
-    std::cout << "Got filename: " << fileName.toStdString() << std::endl;
+    //std::cout << "Got filename: " << fileName.toStdString() << std::endl;
 
     if(!fileName.isNull()) {
         char asc[255];
@@ -157,21 +186,37 @@ void FileOpenWindow::Callback_OpenButton()
 /**
  * slot for opening file by signal
  */
-void FileOpenWindow::Callback_OpenNewFile(const QString& File, const QString& macroString)
+void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QString& macroString)
 {
     //qDebug() << "*************************************************************************";
-    //qDebug() << "callback open new file" << File << "with macro string" << macroString;
-    QStringList openFile = File.split(".", QString::SkipEmptyParts);
+    //qDebug() << "callback open new file" << inputFile << "with macro string" << macroString;
 
-    QString FileName = openFile[0].append(".ui");
+    int found1 = inputFile.lastIndexOf(".ui");
+    int found2 = inputFile.lastIndexOf(".adl");
+    QString openFile = inputFile;
+    if (found1 != -1) {
+        openFile = inputFile.mid(0, found1);
+    }
+    if(found2 != -1) {
+        openFile = inputFile.mid(0, found2);
+    }
+
+    QString FileName = openFile.append(".ui");
 
     // go through the children of this main window and find out if new or already present
     QList<QWidget *> all = this->findChildren<QWidget *>();
     foreach(QWidget* widget, all) {
         if(QMainWindow* w = qobject_cast<QMainWindow *>(widget)) {
             // if already exists then yust pop it up
-            //qDebug() << "popup";
-            if(w->windowTitle().contains(FileName) && w->windowTitle().contains(macroString)) {
+            QFile *file = new QFile;
+            file->setFileName(FileName);
+            QString title(file->fileName().section('/',-1));
+            title.append("&");
+            title.append(macroString);
+            delete file;
+            //qDebug() << w->windowTitle() << title;
+            if(QString::compare(w->windowTitle(), title) == 0) {
+                //qDebug() << "popup";
                 w->raise();
                 return;
             }
@@ -186,10 +231,10 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& File, const QString& ma
         message.append(" does not exist");
         MessageBox *m = new MessageBox(QMessageBox::Warning, "file open error", message, QMessageBox::Close, this, Qt::Dialog, true);
         m->show();
-        qDebug() << "sorry -- file" << FileName << "does not exist";
+        //qDebug() << "sorry -- file" << FileName << "does not exist";
     } else {
         char asc[255];
-        //qDebug() << "file" << s->findFile() << "will be loaded";
+        //qDebug() << "file" << s->findFile() << "will be loaded" << "macro=" << macroString;
         QMainWindow *mainWindow = new CaQtDM_Lib(this, s->findFile(), macroString, mutexKnobData, messageWindow);
         mainWindow->show();
         mainWindow->raise();
@@ -227,7 +272,7 @@ void FileOpenWindow::Callback_ActionExit()
     m->show();
     int selected = m->exec();
     if(selected == QMessageBox::Yes) {
-        sharedMemory.detach();
+        if (sharedMemory.isAttached()) sharedMemory.detach();
         delete mutexKnobData;
         exit(0);
     }

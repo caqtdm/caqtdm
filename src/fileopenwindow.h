@@ -55,6 +55,7 @@ signals:
      bool _isRunning;
      MessageWindow* messageWindow;
      MutexKnobData *mutexKnobData;
+     bool userClose;
  };
  
  #endif
