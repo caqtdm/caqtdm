@@ -167,7 +167,7 @@ extern "C" MutexKnobData* C_SetMutexKnobDataReceived(MutexKnobData* p, knobData 
 //*********************************************************************************************************************
 
 /**
-  * timer is running with 250 ms speed
+  * timer is running with 100 ms speed
   */
 void MutexKnobData::timerEvent(QTimerEvent *)
 {
@@ -200,8 +200,10 @@ void MutexKnobData::timerEvent(QTimerEvent *)
             y.clear();
 
             if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kPtr->edata.dataB != (void*) 0) {
-                memcpy(dataString, (char*) kPtr->edata.dataB, kPtr->edata.dataSize);
-                dataString[kPtr->edata.dataSize] = '\0';
+                if(kPtr->edata.dataSize < 1024) {
+                    memcpy(dataString, (char*) kPtr->edata.dataB, kPtr->edata.dataSize);
+                    dataString[kPtr->edata.dataSize] = '\0';
+                }
 
             } else if(kPtr->edata.dataB != (void*) 0) {
                 if(valueCount > 0) {

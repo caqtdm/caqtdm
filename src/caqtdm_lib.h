@@ -55,6 +55,7 @@ public:
     void HandleWidget(QWidget *w, QString macro);
     void closeEvent(QCloseEvent* ce);
     bool CalcVisibility(QWidget *w);
+    int ComputeAlarm(QWidget *w);
     int setObjectVisibility(QWidget *w, double value);
     bool reaffectText(QMap<QString, QString> map, QString *text);
     void InitVisibility(QWidget* widget, knobData *kData, QMap<QString, QString> map,  int *specData);

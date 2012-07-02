@@ -311,6 +311,8 @@ static int AddCell(char *name, pioDevices Cells[], int indx, char *aux)
     memset(attS, '\0', 5);
     aux[0] = '\0';
 
+    if(strlen(name) > 39) return (int)(- 1);
+
     UnpackDevice(name, devS, attS, &convS, aux, &bit, &Err);
     devS[8] = '\0';
     attS[4] = '\0';
