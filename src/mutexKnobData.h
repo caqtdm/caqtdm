@@ -46,13 +46,12 @@ public:
 
     void SetMutexKnobDataConnected(int indx, int connected);
 
-    void UpdateWidget(int indx, QWidget* w,  char* units, char* fec,
-                      char* statusString, knobData knb, QVector<double> y);
+    void UpdateWidget(int indx, QWidget* w,  char* units, char* fec, char* statusString, knobData knb);
     void UpdateTextLine(char *message, char *name);
 
 signals:
 
-    void Signal_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData, const QVector<double> &);
+    void Signal_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, const knobData&);
     void Signal_QLineEdit(const QString&, const QString&);
 
 private:

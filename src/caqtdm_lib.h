@@ -59,7 +59,7 @@ public:
     int setObjectVisibility(QWidget *w, double value);
     bool reaffectText(QMap<QString, QString> map, QString *text);
     void InitVisibility(QWidget* widget, knobData *kData, QMap<QString, QString> map,  int *specData);
-    void ComputeNumericMaxMinPrec(QWidget* widget, knobData* data);
+    void ComputeNumericMaxMinPrec(QWidget* widget, const knobData& data);
     void postMessage(QtMsgType type, char *msg);
 
 protected:
@@ -93,8 +93,8 @@ private slots:
     void Callback_Slider(double value);
     void Callback_MessageButton(int type);
 
-    void Callback_UpdateWidget(int, QWidget *w, const QString& units,const QString& fec, const QString& statusString,
-                               knobData data,const QVector<double>& y);
+    void Callback_UpdateWidget(int, QWidget *w, const QString& units,const QString& fec,
+                               const QString& statusString, const knobData& data);
     void Callback_UpdateLine(const QString&, const QString&);
     void Callback_MenuClicked(const QString&);
     void Callback_ChoiceClicked(const QString&);

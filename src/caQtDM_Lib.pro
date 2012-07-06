@@ -66,7 +66,7 @@ unix {
     DEPENDPATH +=/usr/local/Trolltech/qwt-6.0.0/src
 }
 
-#CONFIG += acs  will build besides epics also acs
+CONFIG += acs  will build besides epics also acs
 acs: {
 SOURCES += acsSubs.c \
            medmblock.c

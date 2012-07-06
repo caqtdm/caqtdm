@@ -174,13 +174,11 @@ void MutexKnobData::timerEvent(QTimerEvent *)
     char units[40];
     char fec[40];
     char dataString[1024];
-    QVector<double> y;
     struct timeb now;
     ftime(&now);
 
     for(int i=0; i < GetMutexKnobDataSize(); i++) {
         knobData *kPtr = (knobData*) &KnobData[i];
-
 
         if( ((kPtr->index != -1) && (kPtr->edata.monitorCount > kPtr->edata.displayCount))){
 /*
@@ -195,54 +193,19 @@ void MutexKnobData::timerEvent(QTimerEvent *)
             dataString[0] = '\0';
             strcpy(units, kPtr->edata.units);
             strcpy(fec, kPtr->edata.fec);
-            int valueCount= kPtr->edata.valueCount;
             int caFieldType= kPtr->edata.fieldtype;
-            y.clear();
 
             if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kPtr->edata.dataB != (void*) 0) {
                 if(kPtr->edata.dataSize < 1024) {
                     memcpy(dataString, (char*) kPtr->edata.dataB, kPtr->edata.dataSize);
                     dataString[kPtr->edata.dataSize] = '\0';
                 }
-
-            } else if(kPtr->edata.dataB != (void*) 0) {
-                if(valueCount > 0) {
-                    y.reserve(valueCount);
-                    switch(caFieldType) {
-                    case DBF_FLOAT: {
-                        float* P = (float*) kPtr->edata.dataB;
-                        for(int i=0; i< valueCount; i++) y.append(P[i]);
-                    }
-                    break;
-
-                    case DBF_DOUBLE:
-                    {
-                        double* P = (double*) kPtr->edata.dataB;
-                        for(int i=0; i< valueCount; i++) y.append(P[i]);
-                    }
-                    break;
-
-                    case DBF_LONG:
-                    {
-                        long* P = (long*) kPtr->edata.dataB;
-                        for(int i=0; i< valueCount; i++) y.append(P[i]);
-                    }
-                    break;
-
-                    case DBF_INT:
-                    {
-                        int* P = (int*) kPtr->edata.dataB;
-                        for(int i=0; i< valueCount; i++) y.append(P[i]);
-                    }
-                    break;
-                    }
-                }
             }
 
             kPtr->edata.displayCount = kPtr->edata.monitorCount;
             locker.unlock();
 
-            UpdateWidget(index, dispW, units, fec, dataString, KnobData[index], y);
+            UpdateWidget(index, dispW, units, fec, dataString, KnobData[index]);
             kPtr->edata.initialize = false;
 
         } else if (kPtr->index != -1) {
@@ -252,13 +215,11 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 dataString[0] = '\0';
                 //qDebug() << kPtr->pv << "not connected" << (QWidget*) kPtr->dispW;
                 int index = kPtr->index;
-                y.clear();
                 kPtr->edata.displayCount = kPtr->edata.monitorCount;
-                UpdateWidget(index, (QWidget*) kPtr->dispW, units, fec, dataString, KnobData[index], y);
+                UpdateWidget(index, (QWidget*) kPtr->dispW, units, fec, dataString, KnobData[index]);
             }
         }
     }
-
 }
 
 //*********************************************************************************************************************
@@ -274,7 +235,7 @@ void MutexKnobData::SetMutexKnobDataConnected(int index, int connected)
     KnobData[index].edata.connected = connected;
 
     if(!connected) {
-        UpdateWidget(index, (QWidget*)KnobData[index].dispW, (char*) " ", (char*) " ",  (char*) " ", KnobData[index], y);
+        UpdateWidget(index, (QWidget*)KnobData[index].dispW, (char*) " ", (char*) " ",  (char*) " ", KnobData[index]);
     }
 
 }
@@ -289,12 +250,11 @@ extern "C" MutexKnobData* C_SetMutexKnobDataConnected(MutexKnobData* p, int inde
  * update display data
  */
 
-void MutexKnobData::UpdateWidget(int index, QWidget* w,char *units, char *fec,
-                                 char *dataString, knobData knb, QVector<double> y)
+void MutexKnobData::UpdateWidget(int index, QWidget* w,char *units, char *fec, char *dataString, knobData knb)
 {
     //QString StringUnits = QString::fromLatin1(units);
     //StringUnits.remove(QRegExp("[\\n\\t\\r]"));
-    emit Signal_UpdateWidget(index, w, units, fec, dataString, knb, y);
+    emit Signal_UpdateWidget(index, w, units, fec, dataString, knb);
 }
 //*********************************************************************************************************************
 
