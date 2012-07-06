@@ -28,6 +28,18 @@
 #include <sys/resource.h>
 #endif
 
+#ifdef Q_WS_X11
+        #include <QX11Info>
+        #include <X11/Xutil.h>
+        #include <X11/Xlib.h>
+        #include <X11/Xatom.h>
+
+        #define MESSAGE_SOURCE_OLD            0
+        #define MESSAGE_SOURCE_APPLICATION    1
+        #define MESSAGE_SOURCE_PAGER          2
+#endif //Q_WS_X11
+
+
 /**
  * our main window (form) constructor
  */
@@ -124,12 +136,10 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 #endif
 
     // any open windows ?
-    QList<QWidget *> all = this->findChildren<QWidget *>();
-
-    //qDebug() << all.count() << all;
+    //qDebug() << this->findChildren<CaQtDM_Lib *>().count();
 
     // we want to ask with timeout if the application has to be closed
-    if(all.count() <= 8 && userClose) { // 8 is the number of basic objects
+    if(this->findChildren<CaQtDM_Lib *>().count() <= 0 && userClose) {
         QString message = QString("no more open windows, do you want to exit?");
         MessageBox *m = new MessageBox(QMessageBox::Warning, "Exit", message, QMessageBox::Yes | QMessageBox::No, this, Qt::Dialog, true);
         m->show();
@@ -145,12 +155,10 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
             exit(0);
         }
 
-    } else if(all.count() > 9){
+    } else if(this->findChildren<CaQtDM_Lib *>().count() > 0){
         userClose = true;
     }
-
 }
-
 
 /**
  * slot for opening file by button
@@ -214,10 +222,31 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
             title.append("&");
             title.append(macroString);
             delete file;
-            //qDebug() << w->windowTitle() << title;
             if(QString::compare(w->windowTitle(), title) == 0) {
-                //qDebug() << "popup";
+                w->activateWindow();
                 w->raise();
+                w->showNormal();
+                w->setFocus();
+// all these past commands will only give you a notification in the taskbar
+// in case of x windows, we will poup the window really up
+#ifdef Q_WS_X11
+                static Atom  NET_ACTIVE_WINDOW = 0;
+                XClientMessageEvent xev;
+                if (NET_ACTIVE_WINDOW == 0) {
+                    Display *dpy      = QX11Info::display();
+                    NET_ACTIVE_WINDOW = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", False);
+                }
+                xev.type         = ClientMessage;
+                xev.window       = w->winId();
+                xev.message_type = NET_ACTIVE_WINDOW;
+                xev.format       = 32;
+                xev.data.l[0]    = MESSAGE_SOURCE_PAGER;
+                xev.data.l[1]    = QX11Info::appUserTime();
+                xev.data.l[2]    = xev.data.l[3] = xev.data.l[4] = 0;
+
+                XSendEvent(QX11Info::display(), QX11Info::appRootWindow(), False, SubstructureNotifyMask | SubstructureRedirectMask, (XEvent*)&xev);
+#endif //Q_WS_X11
+
                 return;
             }
         }

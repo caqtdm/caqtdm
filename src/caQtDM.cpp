@@ -38,6 +38,7 @@ int main(int argc, char *argv[])
     bool attach;
     attach = false;
     for (numargs = argc, in = 1; in < numargs; in++) {
+        //qDebug() << argv[in];
         if ( strcmp (argv[in], "-display" ) == 0 ) {
             in++;
             printf("caQtDM -- display <%s>\n", strdup(argv[in]));
