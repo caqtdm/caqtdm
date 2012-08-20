@@ -61,6 +61,8 @@ public:
     void InitVisibility(QWidget* widget, knobData *kData, QMap<QString, QString> map,  int *specData);
     void ComputeNumericMaxMinPrec(QWidget* widget, const knobData& data);
     void postMessage(QtMsgType type, char *msg);
+    int Execute(char *command);
+    void TreatRequestedValue(QString text, caTextEntry::FormatType fType, QWidget *w);
 
 protected:
 
@@ -82,8 +84,12 @@ private:
     QVector<double> xx, yy;
     int level;
     QString savedMacro[50];
+    QString savedFile[50];
     QProcess *proc;
     QMap<QString, QString> createMap(const QString&);
+
+    QByteArray byteArray;
+    bool initTry;
 
 private slots:
 
