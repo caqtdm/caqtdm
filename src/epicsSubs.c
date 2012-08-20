@@ -46,16 +46,6 @@ typedef struct _connectInfo {
     chid ch;         // read channel
 } connectInfo;
 
-typedef union {
-    struct dbr_sts_string  *s;
-    struct dbr_ctrl_enum   *e;
-    struct dbr_ctrl_char   *c;
-    struct dbr_ctrl_short  *i;
-    struct dbr_ctrl_long   *l;
-    struct dbr_ctrl_float  *f;
-    struct dbr_ctrl_double *d;
-} dataBuf;
-
 #define AssignEpicsData \
     strcpy(kData.edata.units, stsF->units); \
     kData.edata.lower_disp_limit = stsF->lower_disp_limit; \
@@ -174,6 +164,7 @@ static void dataCallback(struct event_handler_args args)
             C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
         }
         break;
+
         case DBF_STRING:
         {
             int dataSize;
@@ -378,7 +369,7 @@ void connectCallback(struct connection_handler_args args)
         info->connected = false;
         break;
     case cs_conn:
-        PRINT(printf("%s has just connected with channel id=%d count=%d\n", ca_name(args.chid), (int) args.chid, ca_element_count(args.chid)));
+        PRINT(printf("%s has just connected with channel id=%d count=%d native type=%s\n", ca_name(args.chid), (int) args.chid, ca_element_count(args.chid), dbf_type_to_text(ca_field_type(args.chid))));
         info->connected = true;
         if (info->event == 0) {
             info->event++;
@@ -556,7 +547,7 @@ int EpicsSetValue(char *pv, float rdata, long idata, char *sdata, char *object, 
 #endif
 
     // set epics value
-    PRINT(printf(" we have to set a value to an epics device <%s> %f %ld <%s>\n", pv, rdata, idata, sdata));
+    //printf(" we have to set a value to an epics device <%s> %f %ld <%s>\n", pv, rdata, idata, sdata);
     int status = ca_create_channel(pv, NULL, 0, CA_PRIORITY, &ch);
     if (ch == (chid) 0) {
         return !ECA_NORMAL;
@@ -582,10 +573,17 @@ int EpicsSetValue(char *pv, float rdata, long idata, char *sdata, char *object, 
         break;
 
     case DBF_INT:
-    case DBF_LONG:
-
-        //printf("Epicsput int/long for <%s> with data=%d\n", pv, (int) idata);
+        //printf("Epicsput int for <%s> with data=%d\n", pv, (int) idata);
         status = ca_put(DBR_INT, ch, &idata);
+        if (status != ECA_NORMAL) {
+            C_postMsgEvent(messageWindow, 1, vaPrintf("put pv <%s> %s)\n", pv, ca_message (status)));
+            return status;
+        }
+        break;
+
+    case DBF_LONG:
+        //printf("Epicsput long for <%s> with data=%d\n", pv, (int) idata);
+        status = ca_put(DBR_LONG, ch, &idata);
         if (status != ECA_NORMAL) {
             C_postMsgEvent(messageWindow, 1, vaPrintf("put pv <%s> %s)\n", pv, ca_message (status)));
             return status;
