@@ -1229,6 +1229,7 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
     int XrangeFound = False;
     int Y1rangeFound = False;
     int Y2rangeFound = False;
+    int countDone = False;
     int visibilityStatic = 2; // top layer
 
     static int number = 0;
@@ -1247,7 +1248,11 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
             } else if(!strcmp(token,"count")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                if(strlen(token) > 0) printf("adlParser -- count for cartesian plot not yet supported\n");
+                if((strlen(token) > 0) && (!countDone)){
+                    countDone = True;
+                    printf("adlParser -- count for cartesian plot is now supported\n");
+                    Qt_handleString("countNumOrChannel", "string", token);
+                }
             } else if(!strcmp(token,"style")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
@@ -1321,13 +1326,16 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 if(!strcmp(token,"on")) {
-                    printf("adlParser -- erase oldest on for cartesian plot not yet supported\n");
+                    Qt_handleString("plotMode", "enum", "caCartesianPlot::PlotLastNPoints");
+                    printf("adlParser -- erase oldest on for cartesian plot is now supported\n");
                 } else if(!strcmp(token,"off")) {
-                    printf("adlParser -- erase oldest off for cartesian plot not yet supported\n");
+                    Qt_handleString("plotMode", "enum", "caCartesianPlot::PlotNPointsAndStop");
+                    printf("adlParser -- erase oldest off for cartesian plot is now supported\n");
                 } else if(!strcmp(token,"plot last n pts")) {
-                    printf("adlParser -- plot last n pts for cartesian plot is default\n");
+                    Qt_handleString("plotMode", "enum", "caCartesianPlot::PlotLastNPoints");
                 } else if(!strcmp(token,"plot n pts & stop")) {
-                    printf("adlParser -- plot last n pts & stop for cartesian plot is not yet supported\n");
+                    Qt_handleString("plotMode", "enum", "caCartesianPlot::PlotNPointsAndStop");
+                    printf("adlParser -- plot last n pts & stop for cartesian plot is now supported\n");
                 }
             } else if(!strncmp(token,"trace",5)) {
                 traceNumber = MIN(token[6] - '0', MAX_TRACES - 1);
@@ -1344,22 +1352,30 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
             } else if(!strcmp(token,"trigger")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                printf("adlParser -- trigger for cartesian plot is not yet supported\n");
+                Qt_handleString("triggerChannel", "string", token);
+                printf("adlParser -- trigger for cartesian plot is now supported\n");
             } else if(!strcmp(token,"erase")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                printf("adlParser -- erase for cartesian plot is not yet supported\n");
+                Qt_handleString("eraseChannel", "string", token);
+                printf("adlParser -- erase for cartesian plot is now supported\n");
             } else if(!strcmp(token,"countPvName")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                printf("adlParser -- countPvname for cartesian plot is not yet supported\n");
+                if(!countDone) {
+                    countDone = True;
+                    Qt_handleString("countNumOrChannel", "string", token);
+                    printf("adlParser -- countPvname for cartesian plot is now supported\n");
+                }
             } else if(!strcmp(token,"eraseMode")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 if(!strcmp(token,"if not zero")) {
-                    printf("adlParser -- erase if not zero for cartesian plot is not yet supported\n");
+                    Qt_handleString("eraseMode", "enum", "caCartesianPlot::ifnotzero");
+                    printf("adlParser -- erase if not zero for cartesian plot is now supported\n");
                 } else if(!strcmp(token,"if zero")) {
-                    printf("adlParser -- erase if zero for cartesian plot is not yet supported\n");
+                    Qt_handleString("eraseMode", "enum", "caCartesianPlot::ifzero");
+                    printf("adlParser -- erase if zero for cartesian plot is now supported\n");
                 }
             }
             break;
@@ -2323,7 +2339,7 @@ void parseControl(DisplayInfo *displayInfo, char *widget)
 	    } else if (!strcmp(token,"clr")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
-                if(!strcmp(widget, "caTextEntry")) {
+                if((!strcmp(widget, "caTextEntry")) || (!strcmp(widget, "caMessageButton"))) {
                     int clr = atoi(token) % DL_MAX_COLORS;
                     Qt_setColorForeground("",displayInfo->dlColormap->dl_color[clr].r,
                                           displayInfo->dlColormap->dl_color[clr].g,
@@ -2335,7 +2351,7 @@ void parseControl(DisplayInfo *displayInfo, char *widget)
 	    } else if (!strcmp(token,"bclr")) {
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
-                if(!strcmp(widget, "caTextEntry")) {
+                if((!strcmp(widget, "caTextEntry")) || (!strcmp(widget, "caMessageButton"))) {
                     int bclr = atoi(token) % DL_MAX_COLORS;
                     Qt_setColorBackground("",displayInfo->dlColormap->dl_color[bclr].r,
                                           displayInfo->dlColormap->dl_color[bclr].g,
@@ -3297,9 +3313,8 @@ void *parseBar(DisplayInfo *displayInfo, FrameOffset * offset)
 		getToken(displayInfo,token);
 		getToken(displayInfo,token);
                 if(!strcmp(token,"from edge")) {
-                    //dlBar->fillmod = FROM_EDGE;
                 } else if(!strcmp(token,"from center")) {
-                    //dlBar->fillmod = FROM_CENTER;
+                    Qt_handleString("type", "enum", "QwtThermoMarker::PipeFromCenter");
                 }
 	    } else if(!strcmp(token,"limits")) {
                 parseLimits(displayInfo, "caThermo", 0, False);
