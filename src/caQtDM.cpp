@@ -24,10 +24,11 @@ int main(int argc, char *argv[])
     QString macroString = "";
 
     dmsearchFile *s = new dmsearchFile("stylesheet.qss");
-    if(s->findFile().isNull()) {
+    QString fileNameFound = s->findFile();
+    if(fileNameFound.isNull()) {
         printf("caQtDM --file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toAscii().constData());
     } else {
-        QFile file(s->findFile());
+        QFile file(fileNameFound);
         file.open(QFile::ReadOnly);
         QString StyleSheet = QLatin1String(file.readAll());
         app.setStyleSheet(StyleSheet);
@@ -35,8 +36,9 @@ int main(int argc, char *argv[])
     }
 
     int	in, numargs;
-    bool attach;
-    attach = false;
+    bool attach = false;
+    bool minimize= false;
+
     for (numargs = argc, in = 1; in < numargs; in++) {
         //qDebug() << argv[in];
         if ( strcmp (argv[in], "-display" ) == 0 ) {
@@ -49,9 +51,14 @@ int main(int argc, char *argv[])
         } else if ( strcmp (argv[in], "-attach" ) == 0 ) {
             printf("caQtDM -- will attach to another caQtDM if running\n");
             attach = true;
+        } else if ( strcmp (argv[in], "-noMsg" ) == 0 ) {
+            printf("caQtDM -- will minimize its main windows\n");
+            minimize = true;
+        } else if ( strcmp (argv[in], "-x" ) == 0 ) {
+
         } else if (strncmp (argv[in], "-" , 1) == 0) {
             /* unknown application argument */
-            printf("caQtDM -- Argument %d = [%s] is unknown!\n",in,argv[in]);
+            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg\n",in,argv[in]);
         } else {
             printf("caQtDM -- file = <%s>\n", argv[in]);
             fileName = QString(argv[in]);
@@ -59,7 +66,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    FileOpenWindow window (0, fileName, macroString, attach);
+    FileOpenWindow window (0, fileName, macroString, attach, minimize);
     window.show();
 
 

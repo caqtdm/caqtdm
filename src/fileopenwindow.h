@@ -14,6 +14,7 @@
  
 #include <QMainWindow>
 #include <QSharedMemory>
+#include <QTableWidget>
 #include "MessageWindow.h"
 #include "dbrString.h"
 #include "knobDefines.h"
@@ -26,18 +27,20 @@
      Q_OBJECT
  
  public:
-     FileOpenWindow(QMainWindow *parent = 0,  QString filename = "", QString macroString = "", bool attach = false);
+     FileOpenWindow(QMainWindow *parent = 0,  QString filename = "", QString macroString = "", bool attach = false, bool minimize = false);
      bool isRunning();
      bool sendMessage(const QString &message);
+     void fillPVtable(int &countPV, int &countnotConnected);
 
  private slots:
      void Callback_OpenButton();
      void Callback_ActionAbout();
      void Callback_ActionExit();
      void Callback_ActionReload();
+     void Callback_ActionUnconnected();
      void Callback_OpenNewFile(const QString&, const QString&);
      void checkForMessage();
-
+     void Callback_PVwindowExit();
 
  protected:
 
@@ -56,6 +59,10 @@ signals:
      MessageWindow* messageWindow;
      MutexKnobData *mutexKnobData;
      bool userClose;
+
+     QMainWindow *pvWindow;
+     QTableWidget* pvTable;
+     QTimer *timer;
  };
  
  #endif

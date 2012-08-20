@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'main.ui'
 **
-** Created: Fri Jul 6 14:18:47 2012
+** Created: Thu Aug 16 16:20:07 2012
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -30,11 +30,13 @@ public:
     QAction *aboutAction;
     QAction *exitAction;
     QAction *reloadAction;
+    QAction *unconnectedAction;
     QWidget *centralwidget;
     QPushButton *btnOpen;
     QStatusBar *statusbar;
     QMenuBar *menuBar;
     QMenu *menuMenu;
+    QMenu *menuPV;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -48,6 +50,8 @@ public:
         exitAction->setObjectName(QString::fromUtf8("exitAction"));
         reloadAction = new QAction(MainWindow);
         reloadAction->setObjectName(QString::fromUtf8("reloadAction"));
+        unconnectedAction = new QAction(MainWindow);
+        unconnectedAction->setObjectName(QString::fromUtf8("unconnectedAction"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         btnOpen = new QPushButton(centralwidget);
@@ -59,17 +63,21 @@ public:
         MainWindow->setStatusBar(statusbar);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 297, 25));
+        menuBar->setGeometry(QRect(0, 0, 297, 27));
         menuMenu = new QMenu(menuBar);
         menuMenu->setObjectName(QString::fromUtf8("menuMenu"));
+        menuPV = new QMenu(menuBar);
+        menuPV->setObjectName(QString::fromUtf8("menuPV"));
         MainWindow->setMenuBar(menuBar);
 
         menuBar->addAction(menuMenu->menuAction());
+        menuBar->addAction(menuPV->menuAction());
         menuMenu->addAction(aboutAction);
         menuMenu->addSeparator();
         menuMenu->addSeparator();
         menuMenu->addAction(exitAction);
         menuMenu->addAction(reloadAction);
+        menuPV->addAction(unconnectedAction);
 
         retranslateUi(MainWindow);
 
@@ -82,8 +90,10 @@ public:
         aboutAction->setText(QApplication::translate("MainWindow", "&About", 0, QApplication::UnicodeUTF8));
         exitAction->setText(QApplication::translate("MainWindow", "&Exit", 0, QApplication::UnicodeUTF8));
         reloadAction->setText(QApplication::translate("MainWindow", "&Reload", 0, QApplication::UnicodeUTF8));
+        unconnectedAction->setText(QApplication::translate("MainWindow", "&Unconnected", 0, QApplication::UnicodeUTF8));
         btnOpen->setText(QApplication::translate("MainWindow", "Open ui File", 0, QApplication::UnicodeUTF8));
         menuMenu->setTitle(QApplication::translate("MainWindow", "Menu", 0, QApplication::UnicodeUTF8));
+        menuPV->setTitle(QApplication::translate("MainWindow", "PV", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

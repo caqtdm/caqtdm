@@ -43,13 +43,15 @@
 /**
  * our main window (form) constructor
  */
-FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString macroString, bool attach): QMainWindow(parent)
+FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString macroString, bool attach, bool minimize): QMainWindow(parent)
 {
     // definitions for last opened file
     lastWindow = (QMainWindow*) 0;
     lastMacro ="";
     lastFile = "";
     userClose = false;
+
+    if(minimize) showMinimized ();
 
     // set window title without the whole path
     QString title("caQtDM ");
@@ -73,11 +75,13 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     connect( this->ui.aboutAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionAbout()) );
     connect( this->ui.exitAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionExit()) );
     connect( this->ui.reloadAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionReload()) );
+    connect( this->ui.unconnectedAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionUnconnected()) );
 
     setWindowTitle(title);
 
     // message window used by library and here
     messageWindow = new MessageWindow();
+    if(minimize) messageWindow->showMinimized();
     messageWindow->setGeometry(305,0, 500, 150);
 
     sharedMemory.setKey ("caQtDM shared memory");
@@ -110,7 +114,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
             memcpy(to, from, qMin(sharedMemory.size(), byteArray.size()));
             sharedMemory.unlock();
             // start checking for messages of other instances.
-            QTimer *timer = new QTimer(this);
+            timer = new QTimer(this);
             connect(timer, SIGNAL(timeout()), this, SLOT(checkForMessage()));
             timer->start(1000);
         }
@@ -122,17 +126,24 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowMinMaxButtonsHint);
 
     // start a timer
-    startTimer(1000);
+    startTimer(2000);
+
+    pvWindow = (QMainWindow*) 0;
+    pvTable = (QTableWidget*) 0;
 }
 
 void FileOpenWindow::timerEvent(QTimerEvent *event)
 {
-#ifdef linux
     char asc[255];
+    int countPV=0;
+    int countNotConnected=0;
+
+    asc[0] = '\0';
+
+#ifdef linux
     struct rusage usage;
     int ret = getrusage(RUSAGE_SELF, &usage);
-    sprintf(asc, "memory usage: %d kB", usage.ru_maxrss);
-    statusBar()->showMessage( asc);
+    sprintf(asc, "memory: %d kB", usage.ru_maxrss);
 #endif
 
     // any open windows ?
@@ -158,6 +169,13 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
     } else if(this->findChildren<CaQtDM_Lib *>().count() > 0){
         userClose = true;
     }
+
+    // any non connected pv's ?
+
+    fillPVtable(countPV, countNotConnected);
+
+    sprintf(asc, "%s - PV=%d (%d NC)", asc, countPV, countNotConnected);
+    statusBar()->showMessage(asc);
 }
 
 /**
@@ -228,7 +246,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
                 w->showNormal();
                 w->setFocus();
 // all these past commands will only give you a notification in the taskbar
-// in case of x windows, we will poup the window really up
+// in case of x windows, we will pop the window really up
 #ifdef Q_WS_X11
                 static Atom  NET_ACTIVE_WINDOW = 0;
                 XClientMessageEvent xev;
@@ -254,8 +272,8 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
 
     // open file
     dmsearchFile *s = new dmsearchFile(FileName);
-
-    if(s->findFile().isNull()) {
+    QString fileNameFound = s->findFile();
+    if(fileNameFound.isNull()) {
         QString message = QString(FileName);
         message.append(" does not exist");
         MessageBox *m = new MessageBox(QMessageBox::Warning, "file open error", message, QMessageBox::Close, this, Qt::Dialog, true);
@@ -263,14 +281,14 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         //qDebug() << "sorry -- file" << FileName << "does not exist";
     } else {
         char asc[255];
-        //qDebug() << "file" << s->findFile() << "will be loaded" << "macro=" << macroString;
-        QMainWindow *mainWindow = new CaQtDM_Lib(this, s->findFile(), macroString, mutexKnobData, messageWindow);
+        //qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString;
+        QMainWindow *mainWindow = new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, messageWindow);
         mainWindow->show();
         mainWindow->raise();
 
         lastWindow = mainWindow;
         lastMacro = macroString;
-        lastFile = s->findFile();
+        lastFile = fileNameFound;
         sprintf(asc, "last file: %s", lastFile.toAscii().constData());
         messageWindow->postMsgEvent(QtDebugMsg, asc);
     }
@@ -375,5 +393,93 @@ bool FileOpenWindow::sendMessage(const QString &message)
     memcpy(to, from, qMin(sharedMemory.size(), byteArray.size()));
     sharedMemory.unlock();
     return true;
+}
+
+/**
+ * slot for unconnected channels button
+ */
+void FileOpenWindow::Callback_ActionUnconnected()
+{
+    int countPV=0;
+    int countNotConnected=0;
+
+    if(pvWindow != (QMainWindow*) 0) {
+        pvWindow->show();
+        return;
+    }
+    pvWindow = new QMainWindow();
+    pvWindow->setWindowTitle(QString::fromUtf8("unconnected PV's"));
+    pvWindow->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowMinMaxButtonsHint);
+
+    QVBoxLayout *l = new QVBoxLayout();
+
+    pvWindow->resize(400, 250);
+
+    pvTable = new QTableWidget();
+
+    QPushButton *pushbutton = new QPushButton("close");
+    connect(pushbutton, SIGNAL(clicked()), this, SLOT(Callback_PVwindowExit()));
+
+    l->addWidget(pvTable);
+    l->addWidget(pushbutton);
+
+    QWidget* widg = new QWidget();
+    widg->setLayout(l);
+
+    fillPVtable(countPV, countNotConnected);
+
+    pvWindow->setCentralWidget(widg);
+    pvWindow->show();
+
+    // set width of window
+    int w = 0;
+    int count = pvTable->columnCount();
+    for (int i = 0; i < count; i++) w += pvTable->columnWidth(i);
+    int maxW = (w + count + pvTable->verticalHeader()->width() + pvTable->verticalScrollBar()->width());
+    pvWindow->setMinimumWidth(maxW+25);
+}
+
+void FileOpenWindow::Callback_PVwindowExit()
+{
+    pvWindow->hide();
+}
+
+void FileOpenWindow::fillPVtable(int &countPV, int &countNotConnected)
+{
+
+    if(pvTable != (QTableWidget*) 0) {
+        pvTable->clear();
+        pvTable->setColumnCount(3);
+        pvTable->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+        pvTable->setHorizontalHeaderLabels(QString("unconnected PV;object;filename").split(";"));
+        pvTable->setAlternatingRowColors(true);
+    }
+
+    for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
+        knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
+        if(kPtr->index != -1) {
+            if(!kPtr->edata.connected) {
+                countNotConnected++;
+            }
+            countPV++;
+        }
+    }
+
+    if(pvTable != (QTableWidget*) 0) {
+        pvTable->setRowCount(countNotConnected);
+        countNotConnected = 0;
+        for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
+            knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
+            if(kPtr->index != -1) {
+                if(!kPtr->edata.connected) {
+                    pvTable->setItem(countNotConnected,0, new QTableWidgetItem(kPtr->pv));
+                    pvTable->setItem(countNotConnected,1, new QTableWidgetItem(kPtr->dispName));
+                    pvTable->setItem(countNotConnected,2, new QTableWidgetItem(kPtr->fileName));
+                    countNotConnected++;
+                }
+            }
+        }
+        pvTable->resizeColumnsToContents();
+    }
 }
 
