@@ -12,7 +12,7 @@
 #ifndef __KNOBDEFINES_INC__
 #define __KNOBDEFINES_INC__
 
-#define MAX_CALC_INPUTS 4
+#define MAX_CALC_INPUTS 12
 
 #define PRINT(x)
 
@@ -20,6 +20,11 @@
 #define true 1==1
 #define false !true
 
-typedef char pv_string[80];  // temporary definition, I should allocate what we need
+#define MAXFILELEN 60
+#define MAXPVLEN 80
+#define MAXDISPLEN 20
+#define NBSPECS 5
+
+typedef char pv_string[MAXPVLEN];  // temporary definition, I should allocate what we need
 
 #endif

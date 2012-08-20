@@ -26,10 +26,9 @@ MutexKnobData::MutexKnobData()
     for(int i=0; i < KnobDataArraySize; i++){
         KnobData[i].index  = -1;
     }
-#ifdef USETIMER
-    // start a timer with 5Hz
+
+    // start a timer with 5Hz in order to avoid very fast updates one does not see anyhow
     timerId = startTimer(200);
-#endif
 }
 
 
@@ -52,7 +51,6 @@ void MutexKnobData::ReAllocate(int oldsize, int newsize, void **ptr)
     }
     *ptr = tmp;
 }
-
 
 /**
  * get a copy for a knob

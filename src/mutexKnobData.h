@@ -20,8 +20,6 @@
 #include <QWaitCondition>
 #include "knobData.h"
 
-#define USETIMER
-
 class MutexKnobData: public QObject {
     Q_OBJECT
 
@@ -40,9 +38,7 @@ public:
     void SetMutexKnobDataReceived(knobData *kData);
     knobData *getMutexKnobDataPV(QString pv);
 
-#ifdef USETIMER
     void timerEvent(QTimerEvent *);
-#endif
 
     void SetMutexKnobDataConnected(int indx, int connected);
 

@@ -20,20 +20,37 @@ dmsearchFile::dmsearchFile(QString filename)
 
 QString dmsearchFile::findFile()
 {
+    if(_FileName.isNull()) return NULL;
+
     QString path = (QString)  getenv("CAQTDM_DISPLAY_PATH");
+    QStringList paths = path.split(":");
+
+    // first search in current directory
     QString FileName = _FileName;
     bool fileFound = false;
     QFileInfo fi(FileName);
+
+    // file was not found, go through path list
     if(!fi.exists()) {
-       FileName = path + "/" + _FileName;
-       QFileInfo fi(FileName);
-       if(fi.exists()) {
-         fileFound = true;
-       }
+       for(int i=0; i< paths.count(); i++) {
+           FileName = paths[i] + "/" + _FileName;
+           QFileInfo fi(FileName);
+           if(fi.exists()) {
+             fileFound = true;
+             break;
+           }
+        }
+
+    // file was found in current directory
     } else {
         fileFound = true;
     }
-    if(fileFound) return FileName;
+
+    // return filename or null
+    if(fileFound) {
+        //printf("dmsearchFile %s\n", FileName.toAscii().constData());
+        return FileName;
+    }
     else return NULL;
 }
 

@@ -60,9 +60,10 @@ typedef struct _knobData {
     pv_string pv;                       /* device process variable name */
     void *dispW;                        /* widget identifier */
     epicsData edata;                    /* epics data */
-    int specData[5];                    /* some special data, will be replaced by properties later */
+    int specData[NBSPECS];              /* some special data, will be replaced by properties later */
     int valPix;                         /* pixel value of caThermo */
-    char dispName[20];                  /* name of widget type */
+    char dispName[MAXDISPLEN];          /* name of widget type */
+    char fileName[MAXFILELEN];
 } knobData;
 
 #ifdef __cplusplus
