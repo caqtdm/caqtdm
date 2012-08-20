@@ -20,7 +20,9 @@
 #include <QObject>
 #include <QtDesigner/QFormBuilder>
 #include <iostream>
-#include <sys/wait.h>
+#ifdef linux
+#  include <sys/wait.h>
+#endif
 
 #include "alarmdefs.h"
 
@@ -2006,13 +2008,13 @@ void CaQtDM_Lib::Callback_MessageButton(int type)
 
 void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
 {
-    /*
+#ifndef linux
     proc = new QProcess( this);
     proc->setWorkingDirectory(".");
     proc->setProcessChannelMode(QProcess::MergedChannels);
     QObject::connect( proc, SIGNAL(error(QProcess::ProcessError)),
                       this, SLOT(processError(QProcess::ProcessError)));
-    */
+#endif
     caShellCommand *choice = qobject_cast<caShellCommand *>(sender());
     QStringList commands = choice->getFiles().split(";");
     QStringList args = choice->getArgs().split(";");
@@ -2027,25 +2029,29 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
         command.replace("medm ", "caQtDM ");
         //command.replace("&", " ");  // special character not supported
         postMessage(QtDebugMsg, (char*) qPrintable(command.trimmed()));
-        //proc->start(command.trimmed(), QIODevice::ReadWrite);
-
+#ifndef linux
+        proc->start(command.trimmed(), QIODevice::ReadWrite);
+#else
         // I had too many problems with QProcess start, use standard execl
         int status = Execute((char*)command.toAscii().constData());
         if(status != 0) {
             QMessageBox::information(0,"FailedToStart", command);
         }
+#endif
     } else if(indx < commands.count()) {
         QString command;
         command.append(commands[indx].trimmed());
         //command.replace("&", " "); // special character not supported
         postMessage(QtDebugMsg, (char*) qPrintable(command.trimmed()));
-        //proc->start(command.trimmed(),QIODevice::ReadWrite);
-
+#ifndef linux
+        proc->start(command.trimmed(),QIODevice::ReadWrite);
+#else
         // I had too many problems with QProcess start, use standard execl
         int status = Execute((char*)command.toAscii().constData());
         if(status != 0) {
             QMessageBox::information(0,"FailedToStart", command);
         }
+#endif
     }
 
     // read output, but blocks application until child exits
@@ -2673,7 +2679,7 @@ void CaQtDM_Lib::postMessage(QtMsgType type, char *msg)
 /*******************/
 /* execute program */
 /*******************/
-
+#ifdef linux
 int CaQtDM_Lib::Execute(char *command)
 {
     int status;
@@ -2692,7 +2698,7 @@ int CaQtDM_Lib::Execute(char *command)
 
     return status;
 }
-
+#endif
 void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType, QWidget *w)
 {
     char errmess[255];
