@@ -1,6 +1,10 @@
 CMLOGSRC = $(shell pwd)
 
-DIRS=	AccStat \
+DIRS=	caQtDM \
+        caQtDM/parser \
+        caQtDM_Lib \
+        QtControls/qtcontrols/src \
+        AccStat \
 	ACSfortran \
 	Analog \
 	Analyze_NEW \
@@ -59,7 +63,7 @@ all:
 		echo "-----------------" $$dir ; \
 		echo "---------------------------------------------------------"; \
 		echo " "; \
-		perl /home/mezger/workarea/acs/mezger/cvs2html.pl  -a -o  /home/mezger/workarea/acs/mezger/docs/$$dirs.html; \
+		perl /afs/psi.ch/user/m/mezger/workarea/ACS/mezger/cvs2html.pl  -a -o  /afs/psi.ch/user/m/mezger/workarea/ACS/mezger/docs/$$dirs.html; \
 		cd $(CMLOGSRC); \
 	done
 
