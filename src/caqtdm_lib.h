@@ -52,21 +52,23 @@ public:
     bool bitState(int value, int bitNr);
     QString treatMacro(QMap<QString, QString> map, const QString& pv, bool *doNothing);
     int addMonitor(QWidget *thisW, knobData *data, QString pv, QWidget *w, int *specData, QMap<QString, QString> map, QString *pvRep);
-    void HandleWidget(QWidget *w, QString macro);
+    void HandleWidget(QWidget *w, QString macro, bool firstPass);
     void closeEvent(QCloseEvent* ce);
-    bool CalcVisibility(QWidget *w);
+    bool CalcVisibility(QWidget *w, double &result, bool &valid);
     int ComputeAlarm(QWidget *w);
     int setObjectVisibility(QWidget *w, double value);
     bool reaffectText(QMap<QString, QString> map, QString *text);
-    void InitVisibility(QWidget* widget, knobData *kData, QMap<QString, QString> map,  int *specData);
+    void InitVisibility(QWidget* widget, knobData *kData, QMap<QString, QString> map,  int *specData, QString info);
     void ComputeNumericMaxMinPrec(QWidget* widget, const knobData& data);
     void postMessage(QtMsgType type, char *msg);
     int Execute(char *command);
     void TreatRequestedValue(QString text, caTextEntry::FormatType fType, QWidget *w);
+    bool getSoftChannel(QString pv, knobData &data);
 
 protected:
 
     virtual void mouseReleaseEvent(QMouseEvent *event);
+    virtual void timerEvent(QTimerEvent *e);
 
 signals:
     void clicked(QString);

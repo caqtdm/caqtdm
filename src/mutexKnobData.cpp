@@ -18,6 +18,7 @@
 #include <QLineEdit>
 #include <QWidget>
 #include <QDebug>
+#include "QtControls"
 
 MutexKnobData::MutexKnobData()
 {
@@ -25,6 +26,7 @@ MutexKnobData::MutexKnobData()
     KnobData = (knobData*) malloc(KnobDataArraySize * sizeof(knobData));
     for(int i=0; i < KnobDataArraySize; i++){
         KnobData[i].index  = -1;
+        KnobData[i].thisW = (void*) 0;
     }
 
     // start a timer with 5Hz in order to avoid very fast updates one does not see anyhow
@@ -34,7 +36,7 @@ MutexKnobData::MutexKnobData()
 
 MutexKnobData:: ~MutexKnobData()
 {
-        free (KnobData);
+
 }
 
 /**
@@ -53,12 +55,72 @@ void MutexKnobData::ReAllocate(int oldsize, int newsize, void **ptr)
 }
 
 /**
+ * insert the softpv into the list
+ */
+void MutexKnobData::InsertSoftPV(QString pv, int num, QWidget *w)
+{
+    char asc[MAXPVLEN+20];
+    sprintf(asc, "%s_%p", pv.toAscii().constData(),  w);
+    variableList.insert(asc, num);
+}
+
+/**
+ * remove the softpv into the list
+ */
+void MutexKnobData::RemoveSoftPV(QString pv, QWidget *w)
+{
+    char asc[MAXPVLEN+20];
+    sprintf(asc, "%s_%p", pv.toAscii().constData(),  w);
+    variableList.remove(asc);
+}
+
+/**
+ * update the data for the caCalc softpv
+ */
+void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w)
+{
+    char asc[MAXPVLEN+20];
+    sprintf(asc, "%s_%p", pv.toAscii().constData(),  w);
+    QMap<QString, int>::const_iterator name = variableList.find(asc);
+    if(name != variableList.end()) {
+        //qDebug() << "update softpv with value" << pv << value;
+        knobData *ptr = GetMutexKnobDataPtr(name.value());
+        ptr->edata.rvalue = value;
+        ptr->edata.fieldtype = caDOUBLE;
+        ptr->edata.precision = 3;
+        ptr->edata.connected = true;
+        ptr->edata.upper_disp_limit=0.0;
+        ptr->edata.lower_disp_limit=0.0;
+    }
+}
+
+/**
+ * get the index to the data for the softpv
+ */
+bool MutexKnobData::getSoftPV(QString pv, int *indx, QWidget *w)
+{
+    char asc[MAXPVLEN+20];
+    sprintf(asc, "%s_%p", pv.toAscii().constData(),  w);
+    QMap<QString, int>::const_iterator name = variableList.find(asc);
+    if(name != variableList.end()) {
+        *indx = name.value();
+        return true;
+    }
+    //qDebug() << "did not find (yet) softpv";
+    return false;
+}
+
+/**
  * get a copy for a knob
  */
-knobData MutexKnobData::GetMutexKnobData(int indx)
+knobData MutexKnobData::GetMutexKnobData(int index)
 {
+    knobData kData;
     QMutexLocker locker(&mutex);
-    return KnobData[indx];
+
+    memcpy(&kData, &KnobData[index], sizeof(knobData));
+    memcpy(&kData.edata, &KnobData[index].edata, sizeof(epicsData));
+    return kData;
 }
 
 extern "C" MutexKnobData* C_GetMutexKnobData(MutexKnobData* p, int indx, knobData *data)
@@ -106,7 +168,6 @@ void MutexKnobData::SetMutexKnobData(int index, knobData data)
 {
     QMutexLocker locker(&mutex);
     memcpy(&KnobData[index], &data, sizeof(knobData));
-    KnobData[index].index = index;
 }
 
 extern "C" MutexKnobData* C_SetMutexKnobData(MutexKnobData* p, int index, knobData data)
@@ -122,7 +183,7 @@ extern "C" MutexKnobData* C_SetMutexKnobData(MutexKnobData* p, int index, knobDa
 
 knobData* MutexKnobData::getMutexKnobDataPV(QString pv)
 {
-     QMutexLocker locker(&mutex);
+    QMutexLocker locker(&mutex);
     for(int i=0; i < GetMutexKnobDataSize(); i++) {
         knobData *kPtr = (knobData*) &KnobData[i];
         if(kPtr->index != -1) {
@@ -147,7 +208,7 @@ knobData* MutexKnobData::GetMutexKnobDataPtr(int index)
 //*********************************************************************************************************************
 
 /**
- * update received data
+ * update array with the received data
  */
 void MutexKnobData::SetMutexKnobDataReceived(knobData *kData){
     QVector<double> y;
@@ -165,7 +226,7 @@ extern "C" MutexKnobData* C_SetMutexKnobDataReceived(MutexKnobData* p, knobData 
 //*********************************************************************************************************************
 
 /**
-  * timer is running with 100 ms speed
+  * timer is running with 200 ms speed
   */
 void MutexKnobData::timerEvent(QTimerEvent *)
 {
@@ -178,12 +239,31 @@ void MutexKnobData::timerEvent(QTimerEvent *)
     for(int i=0; i < GetMutexKnobDataSize(); i++) {
         knobData *kPtr = (knobData*) &KnobData[i];
 
+        if(kPtr->index != -1 && kPtr->soft) {
+            int indx;
+            //qDebug() << "I am a soft channel" << kPtr->pv << kPtr->dispName << kPtr->edata.rvalue << kPtr->index;
+            // get for this soft pv the index of the corresponding caCalc into the knobData array where the data were updated
+            if(getSoftPV(kPtr->pv, &indx, (QWidget*) kPtr->thisW)) {
+                // get value from (updated) QMap variable list
+                knobData *ptr = (knobData*) &KnobData[indx];
+                kPtr->edata.rvalue = ptr->edata.rvalue;
+                kPtr->edata.fieldtype = caDOUBLE;
+                kPtr->edata.connected = true;
+                kPtr->edata.accessW = true;
+                //update also the count
+                kPtr->edata.monitorCount++;
+                QWidget *ww = (QWidget *)kPtr->dispW;
+                if (caTextEntry *widget = qobject_cast<caTextEntry *>(ww)) {
+                    widget->setAccessW(kPtr->edata.accessW);
+                }
+            }
+        }
+
         if( ((kPtr->index != -1) && (kPtr->edata.monitorCount > kPtr->edata.displayCount))){
 /*
             printf("<%s> index=%d mcount=%d dcount=%d value=%f datasize=%d valuecount=%d\n", kPtr->pv, kPtr->index, kPtr->edata.monitorCount,
                                                                       kPtr->edata.displayCount, kPtr->edata.rvalue,
                                                                       kPtr->edata.dataSize, kPtr->edata.valueCount);
-
 */
             QMutexLocker locker(&mutex);
             int index = kPtr->index;
@@ -211,7 +291,6 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 units[0] = '\0';
                 fec[0] = '\0';
                 dataString[0] = '\0';
-                //qDebug() << kPtr->pv << "not connected" << (QWidget*) kPtr->dispW;
                 int index = kPtr->index;
                 kPtr->edata.displayCount = kPtr->edata.monitorCount;
                 UpdateWidget(index, (QWidget*) kPtr->dispW, units, fec, dataString, KnobData[index]);

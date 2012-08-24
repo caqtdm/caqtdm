@@ -17,6 +17,7 @@
 #include <QMutex>
 #include <QObject>
 #include <QVector>
+#include <QMap>
 #include <QWaitCondition>
 #include "knobData.h"
 
@@ -45,15 +46,22 @@ public:
     void UpdateWidget(int indx, QWidget* w,  char* units, char* fec, char* statusString, knobData knb);
     void UpdateTextLine(char *message, char *name);
 
+    void InsertSoftPV(QString pv, int num, QWidget* w);
+    void RemoveSoftPV(QString pv, QWidget *w);
+    void UpdateSoftPV(QString pv, double value, QWidget *w);
+    bool getSoftPV(QString pv, int *indx, QWidget *w);
+
 signals:
 
     void Signal_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, const knobData&);
     void Signal_QLineEdit(const QString&, const QString&);
 
 private:
+
     QMutex mutex;
     knobData *KnobData;
     int KnobDataArraySize;
     int timerId;
+    QMap<QString, int> variableList;
 };
 #endif // MUTEXKNOBDATA_H

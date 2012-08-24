@@ -14,8 +14,8 @@
 
 #include <pthread.h>
 
-pthread_mutex_t MEDMserializeAccess;
-pthread_mutex_t MEDMprotectVector;
+pthread_mutex_t serializeAccess;
+pthread_mutex_t protectAccess;
 
 #define MONITOR_CREATE(x)  {  \
                             pthread_mutexattr_t attr; \

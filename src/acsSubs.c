@@ -112,11 +112,11 @@ static void *Thread()
 {
     while (True) {
         //printf("execute thread with %d cells\n", NumCells);
-        MONITOR_ENTER(MEDMserializeAccess, "thread");
+        MONITOR_ENTER(serializeAccess, "thread");
         if (NumCells > 0) {
             ExecuteValueCells();
         }
-        MONITOR_EXIT(MEDMserializeAccess, "thread");
+        MONITOR_EXIT(serializeAccess, "thread");
 
         usleep(333000);
     }
@@ -151,8 +151,7 @@ void StartPIOserver()
     fecNamesD.str = (char *) fecNames;
     opncom(&lun, &evt, &bopp, &my_protocol, etherReceive, &error);
     pthread_attr_init(&attr);
-    MONITOR_CREATE(&MEDMserializeAccess);
-    MONITOR_CREATE(&MEDMprotectVector);
+    MONITOR_CREATE(&serializeAccess);
     status = pthread_create(&th, &attr, Thread, (void *)0);
     if (status != 0)
         printf("MEDM -- create thread status= %d\n", status);
@@ -283,17 +282,17 @@ static int ExecuteValueCells()
 
 int AddValueCell(char *name, int indx, char *aux)
 {
-    MONITOR_ENTER(MEDMserializeAccess, "thread");
+    MONITOR_ENTER(serializeAccess, "thread");
     int status = AddCell(name, ValueCells, indx, aux);
-    MONITOR_EXIT(MEDMserializeAccess, "thread");
+    MONITOR_EXIT(serializeAccess, "thread");
     return status;
 }
 
 int RemoveValueCell(int indx)
 {
-    MONITOR_ENTER(MEDMserializeAccess, "thread");
+    MONITOR_ENTER(serializeAccess, "thread");
     int status = RemoveCell(ValueCells, indx);
-    MONITOR_EXIT(MEDMserializeAccess, "thread");
+    MONITOR_EXIT(serializeAccess, "thread");
     return status;
 }
 
@@ -551,7 +550,7 @@ int SetDeviceFloatValue(char *name, float *value)
     char            mess[ERRMSGLEN + 1];
     FORSTR messD = {ERRMSGLEN, 0, 0, mess};
 
-    MONITOR_ENTER(MEDMserializeAccess, "thread");
+    MONITOR_ENTER(serializeAccess, "thread");
 
     int iofunc = 1;
 
@@ -569,11 +568,11 @@ int SetDeviceFloatValue(char *name, float *value)
             mess[ERRMSGLEN] = '\0';
             C_postMsgEvent(messageWindow, 1, vaPrintf("device <%s> has io-error %d %s\n", name, ecode, mess));
         }
-        MONITOR_EXIT(MEDMserializeAccess, "thread");
+        MONITOR_EXIT(serializeAccess, "thread");
         return error;
     } else {
         C_postMsgEvent(messageWindow, 1, vaPrintf("device <%s> fec not found\n", name));
-        MONITOR_EXIT(MEDMserializeAccess, "thread");
+        MONITOR_EXIT(serializeAccess, "thread");
         return 0;
     }
 }
@@ -627,13 +626,13 @@ int SetDeviceStringValue(char *name, char *data)
                     mess[ERRMSGLEN] = '\0';
                     C_postMsgEvent(messageWindow, 1, vaPrintf("device <%s> has io-error %d %s\n", name, ecode, mess));
                 }
-                MONITOR_EXIT(MEDMserializeAccess, "thread");
+                MONITOR_EXIT(serializeAccess, "thread");
                 return error;
             }
         }
     } else {
         C_postMsgEvent(messageWindow, 1, vaPrintf("device <%s> fec not found\n", name));
-        MONITOR_EXIT(MEDMserializeAccess, "thread");
+        MONITOR_EXIT(serializeAccess, "thread");
         return 0;
     }
     return 0;
