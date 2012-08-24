@@ -319,6 +319,17 @@ void FileOpenWindow::Callback_ActionExit()
     m->show();
     int selected = m->exec();
     if(selected == QMessageBox::Yes) {
+
+// we are first going to close all open windows
+        // go through the children of the main window and find out if that window still exists
+        QList<QWidget *> all = this->findChildren<QWidget *>();
+        foreach(QWidget* widget, all) {
+            if(QMainWindow* w = qobject_cast<QMainWindow *>(widget)) {
+                w->close();
+            }
+        }
+
+// detach shared memory, delete pv container
         if (sharedMemory.isAttached()) sharedMemory.detach();
         delete mutexKnobData;
         exit(0);
