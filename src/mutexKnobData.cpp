@@ -59,9 +59,10 @@ void MutexKnobData::ReAllocate(int oldsize, int newsize, void **ptr)
  */
 void MutexKnobData::InsertSoftPV(QString pv, int num, QWidget *w)
 {
+    int indx;
     char asc[MAXPVLEN+20];
     sprintf(asc, "%s_%p", pv.toAscii().constData(),  w);
-    variableList.insert(asc, num);
+    if(!getSoftPV(pv, &indx, (QWidget*) w)) variableList.insert(asc, num);
 }
 
 /**
@@ -83,8 +84,8 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w)
     sprintf(asc, "%s_%p", pv.toAscii().constData(),  w);
     QMap<QString, int>::const_iterator name = variableList.find(asc);
     if(name != variableList.end()) {
-        //qDebug() << "update softpv with value" << pv << value;
         knobData *ptr = GetMutexKnobDataPtr(name.value());
+        //qDebug() << "update softpv with value" << pv << value << "at index=" << ptr->index;
         ptr->edata.rvalue = value;
         ptr->edata.fieldtype = caDOUBLE;
         ptr->edata.precision = 3;
@@ -106,7 +107,7 @@ bool MutexKnobData::getSoftPV(QString pv, int *indx, QWidget *w)
         *indx = name.value();
         return true;
     }
-    //qDebug() << "did not find (yet) softpv";
+    //qDebug() << "did not find (yet) softpv" << pv;
     return false;
 }
 
@@ -241,17 +242,23 @@ void MutexKnobData::timerEvent(QTimerEvent *)
 
         if(kPtr->index != -1 && kPtr->soft) {
             int indx;
-            //qDebug() << "I am a soft channel" << kPtr->pv << kPtr->dispName << kPtr->edata.rvalue << kPtr->index;
+            // qDebug() << "I am a soft channel" << kPtr->pv << kPtr->dispName << kPtr->edata.rvalue << kPtr->index;
             // get for this soft pv the index of the corresponding caCalc into the knobData array where the data were updated
             if(getSoftPV(kPtr->pv, &indx, (QWidget*) kPtr->thisW)) {
                 // get value from (updated) QMap variable list
                 knobData *ptr = (knobData*) &KnobData[indx];
+                //qDebug() << "will be updated with value=" << ptr->edata.rvalue << "from" << ptr->pv << "index=" << ptr->index;
                 kPtr->edata.rvalue = ptr->edata.rvalue;
                 kPtr->edata.fieldtype = caDOUBLE;
                 kPtr->edata.connected = true;
                 kPtr->edata.accessW = true;
-                //update also the count
-                kPtr->edata.monitorCount++;
+                kPtr->edata.accessR = true;
+                //update also the count when value changed
+                if(kPtr->edata.oldsoftvalue != ptr->edata.rvalue) {
+                    //qDebug() << kPtr->pv << "will be updated with value=" << ptr->edata.rvalue << "from" << ptr->pv << "index=" << ptr->index << "oldvalue=" << kPtr->edata.oldsoftvalue;
+                    kPtr->edata.monitorCount++;
+                }
+                kPtr->edata.oldsoftvalue = ptr->edata.rvalue;
                 QWidget *ww = (QWidget *)kPtr->dispW;
                 if (caTextEntry *widget = qobject_cast<caTextEntry *>(ww)) {
                     widget->setAccessW(kPtr->edata.accessW);

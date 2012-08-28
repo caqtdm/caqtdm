@@ -24,6 +24,8 @@
 #  include <sys/wait.h>
 #endif
 
+#include "myMessageBox.h"
+
 #include "alarmdefs.h"
 
 // not nice, we should not need this partial declaration here
@@ -285,6 +287,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     memset(&kData, 0, sizeof (knobData));
     bool doNothing;
     QString pv;
+    // an object has normally at least one pv, in case of visibility monitors
+    // the exact number of monitors is computed, when zero monitors
+    // then no info will be shown
+    int nbMonitors = 1;
 
     kData.soft = false;
 
@@ -308,13 +314,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     w1->setProperty("BColor", bg);
     w1->setProperty("FColor", fg);
 
-    // make a context menu
-    if(className.contains("ca") && !className.contains("caRel")) {
-        w1->setContextMenuPolicy(Qt::CustomContextMenu);
-        connect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
-        w1->setProperty("Connect", false);
-    }
-
     // when first pass specified, treat only caCalc
     //==================================================================================================================
     if(firstPass) {
@@ -322,11 +321,25 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
             // soft channel
             kData.soft = true;
+
+            // add soft channel
             addMonitor(myWidget, &kData, widget->getVariable().toAscii().constData(), w1, specData, map, &pv);
 
-            // other channels
+            // other channels if any
             kData.soft = false;
-            InitVisibility(w1, &kData, map, specData, widget->getVariable().toAscii().constData());
+            nbMonitors = InitVisibility(w1, &kData, map, specData, widget->getVariable().toAscii().constData());
+
+            // when no monitors then inititalize value
+            if(nbMonitors == 0) {
+                //qDebug() << "update " << widget->getVariable().toAscii().constData()<< "initial value" << widget->getInitialValue();
+                widget->setValue(widget->getInitialValue());
+                mutexKnobData->UpdateSoftPV(widget->getVariable().toAscii().constData(), widget->getInitialValue(), myWidget);
+            }
+
+            w1->setContextMenuPolicy(Qt::CustomContextMenu);
+            connect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
+            w1->setProperty("Connect", false);
+
             widget->setProperty("Taken", true);
         }
         return;
@@ -338,7 +351,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //qDebug() << "create caImage";
 
-        InitVisibility(w1, &kData, map, specData, "");
+         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
 
         // empty calc string, set animation
         if(widget->getImageCalc().size() == 0) {
@@ -508,7 +521,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //qDebug() << "create caLabel";
 
-        InitVisibility(w1, &kData, map, specData, "");
+         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
 
         QString text =  treatMacro(map, widget->text(), &doNothing);
         text.replace(QString::fromWCharArray(L"\u00A6"), " ");    // replace ¦ with a blanc (was used in macros for creating blancs)
@@ -562,7 +575,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //qDebug() << "create caGraphics";
 
-        InitVisibility(w1, &kData, map, specData, "");
+         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
 
         widget->setProperty("Taken", true);
 
@@ -571,7 +584,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //qDebug() << "create caPolyLine";
 
-        InitVisibility(w1, &kData, map, specData, "");
+         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
 
         widget->setProperty("Taken", true);
 
@@ -725,7 +738,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //qDebug() << "treat caInclude" << w1 << "level=" << level;
 
-        InitVisibility(w1, &kData, map, specData, "");
+         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
 
         widget->setProperty("Taken", true);
 
@@ -798,6 +811,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
             }
 
         } else {
+            postMessage(QtDebugMsg, (char*) tr("sorry, could not load include file %1").arg(fileName).toAscii().constData());
             qDebug() << "sorry, file" << fileName << " does not exist";
         }
 
@@ -812,7 +826,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //qDebug() << "treat caFrame" << w1;
 
-        InitVisibility(w1, &kData, map, specData, "");
+         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
 
         widget->setProperty("Taken", true);
 
@@ -1096,6 +1110,14 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         widget->setColumnSizes(widget->getColumnSizes());
         widget->setProperty("Taken", true);
     }
+
+    // make a context menu for object having a monitor
+    if(className.contains("ca") && !className.contains("caRel") && nbMonitors > 0) {
+        w1->setContextMenuPolicy(Qt::CustomContextMenu);
+        connect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
+        w1->setProperty("Connect", false);
+    }
+
 }
 /**
   * this routine uses macro table to replace inside the pv the macro part
@@ -1179,7 +1201,7 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     // insert into the softpv list when we create a soft channel
     if(kData->soft) mutexKnobData->InsertSoftPV(kData->pv, num, thisW);
 
-    // did we use a soft channel here, then set it
+    // did we use a new soft channel here, then set it
     if(mutexKnobData->getSoftPV(kData->pv, &indx, thisW)) kData->soft= true;
 
     // update our data
@@ -1810,7 +1832,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             // trigger channel
             } else if(XorY == caCartesianPlot::CH_Trigger) {
                QVector<double> y;
-               for(int i=0; i < 4; i++)widget->setData(y, i, curvType, XorY);
+               for(int i=0; i < 4; i++) widget->setData(y, i, curvType, XorY);
 
             // count channel
             } else if(XorY == caCartesianPlot::CH_Count) {
@@ -2459,6 +2481,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     myMenu.addAction("Print");
 
     QAction* selectedItem = myMenu.exec(pos);
+
     if (selectedItem) {
         //qDebug() << "item selected=" << selectedItem << selectedItem->text();
         if(selectedItem->text().contains("Get Info")) {
@@ -2603,27 +2626,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             }
             info.append(InfoPostfix);
 
-            //QMessageBox::information(this,"pv info",info);
-
-            QMessageBox box(QMessageBox::Information, "pv info", info, QMessageBox::Close);
-            const QObjectList children = box.children();
-            QGridLayout *layout = qobject_cast<QGridLayout *>(children.at(0));
-            QLayoutItem *item = layout->itemAtPosition(0, 1);
-            if (item) {
-                QWidget *widget = item->widget();
-                if (widget) {
-                    qobject_cast<QLabel *>(widget)->setWordWrap(true);
-                    layout->removeWidget(widget);
-                    QScrollArea *area = new QScrollArea();
-                    area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-                    area->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-                    area->setMinimumHeight(500);
-                    area->setMinimumWidth(300);
-                    area->setWidget(widget);
-                    layout->addWidget(area, 0, 1);
-                }
-            }
-
+            myMessageBox box;
+            box.setText("<html>" + info + "</html>");
             box.exec();
 
         } else if(selectedItem->text().contains("Print")) {
@@ -2639,6 +2643,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
   */
 void CaQtDM_Lib::ShowContextMenu(const QPoint& position) // this is a slot
 {
+    //qDebug() << "ShowContextMenu" << position;
     DisplayContextMenu(qobject_cast<QWidget *>(sender()));
 }
 
@@ -2650,7 +2655,7 @@ void CaQtDM_Lib::mouseReleaseEvent(QMouseEvent *event)
 /**
   * get channels and create the monitors for calculating the visibility of the objects
   */
-void CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, QString> map,  int *specData, QString info)
+int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, QString> map,  int *specData, QString info)
 {
     QString tooltip;
     QString pv;
@@ -2711,7 +2716,7 @@ void CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, 
         visibilityCalc = w->getVisibilityCalc();
     } else {
         qDebug() << "widget has not been defined for visibility";
-        return;
+        return 0;
     }
 
     /* add monitors for this image if any */
@@ -2796,6 +2801,7 @@ void CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, 
         w->setVisibilityCalc(text);
         w->setProperty("MonitorList", integerList);
     }
+    return nbMon;
 }
 
 /**
@@ -3022,6 +3028,9 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
             if(kPtr->soft) {
                 char asc[100];
                 kPtr->edata.rvalue = value;
+                // set value also into widget, will be overwritten when driven from other channels
+                caCalc * ww = (caCalc*) kPtr->dispW;
+                ww->setValue(value);
                 sprintf(asc, "SoftPV: %s  set to value: \"%s\"\n", kPtr->pv, textValue);
                 postMessage(QtDebugMsg, asc);
             } else {

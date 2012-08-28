@@ -58,7 +58,7 @@ public:
     int ComputeAlarm(QWidget *w);
     int setObjectVisibility(QWidget *w, double value);
     bool reaffectText(QMap<QString, QString> map, QString *text);
-    void InitVisibility(QWidget* widget, knobData *kData, QMap<QString, QString> map,  int *specData, QString info);
+    int InitVisibility(QWidget* widget, knobData *kData, QMap<QString, QString> map,  int *specData, QString info);
     void ComputeNumericMaxMinPrec(QWidget* widget, const knobData& data);
     void postMessage(QtMsgType type, char *msg);
     int Execute(char *command);

@@ -44,6 +44,7 @@ typedef struct _epicsData {
     double	 upper_ctrl_limit;	/* upper control limit */
     double	 lower_ctrl_limit;	/* lower control limit */
     double	 rvalue;		/* real value */
+    double       oldsoftvalue;          /* for softpv in order to increment monitorcount only when necessary */
     long	 ivalue;		/* integer value */
     int          accessW;               /* epics access control */
     int          accessR;
