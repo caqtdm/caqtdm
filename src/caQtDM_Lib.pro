@@ -25,7 +25,8 @@ SOURCES += caqtdm_lib.cpp \
     epicsSubs.c \
     dmsearchfile.cpp \
     MessageWindow.cpp \
-    vaPrintf.c
+    vaPrintf.c \
+    myMessageBox.cpp
 
 HEADERS += caqtdm_lib.h\
         caQtDM_Lib_global.h \
@@ -39,7 +40,8 @@ HEADERS += caqtdm_lib.h\
     dmsearchfile.h \
     MessageWindow.h \
     messageWindowWrapper.h \
-    vaPrintf.h
+    vaPrintf.h \
+    myMessageBox.h
 
 INCLUDEPATH += .
 win32 {
@@ -67,7 +69,7 @@ unix {
 }
 
 #will build besides epics also acs if enabled
-CONFIG += acs
+#CONFIG += acs
 acs: {
 SOURCES += acsSubs.c \
            medmblock.c
