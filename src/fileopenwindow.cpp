@@ -339,6 +339,8 @@ void FileOpenWindow::Callback_ActionExit()
 void FileOpenWindow::Callback_ActionReload()
 {
     char asc[255];
+    QPoint position;
+
     if(lastWindow == (QMainWindow*) 0) return;
     if(lastFile.size() <= 0) return;
     // go through the children of the main window and find out if that window still exists
@@ -346,6 +348,7 @@ void FileOpenWindow::Callback_ActionReload()
     foreach(QWidget* widget, all) {
         if(QMainWindow* w = qobject_cast<QMainWindow *>(widget)) {
             if(lastWindow == w) {
+                position=lastWindow->pos();
                 lastWindow->close();
                 break;
             }
@@ -354,6 +357,7 @@ void FileOpenWindow::Callback_ActionReload()
 
     QMainWindow *mainWindow = new CaQtDM_Lib(this, lastFile, lastMacro, mutexKnobData, messageWindow);
     mainWindow->show();
+    mainWindow->move(position);
     mainWindow->raise();
 
     lastWindow = mainWindow;
