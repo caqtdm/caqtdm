@@ -63,7 +63,7 @@ win32 {
 DEFINES += BUILDTIME=\\\"\\\"
 DEFINES += BUILDDATE=\\\"\\\"
 }
-DEFINES += BUILDVERSION=\\\"V1.9\\\"
+DEFINES += BUILDVERSION=\\\"V2.0\\\"
 
 UI_DIR += ./
 
