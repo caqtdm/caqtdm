@@ -56,6 +56,8 @@ int main(int argc, char *argv[])
             minimize = true;
         } else if ( strcmp (argv[in], "-x" ) == 0 ) {
 
+        } else if ( strcmp (argv[in], "-displayFont" ) == 0 ) {
+             in++;
         } else if (strncmp (argv[in], "-" , 1) == 0) {
             /* unknown application argument */
             printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg\n",in,argv[in]);
