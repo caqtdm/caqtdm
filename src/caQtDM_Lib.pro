@@ -69,7 +69,7 @@ unix {
 }
 
 #will build besides epics also acs if enabled
-#CONFIG += acs
+CONFIG += acs
 acs: {
 SOURCES += acsSubs.c \
            medmblock.c
