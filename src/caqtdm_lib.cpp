@@ -2279,7 +2279,11 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
         }
     }
 
+#ifdef linux
     usleep(200000);
+#else
+    Sleep::msleep(200);
+#endif
 
     // get rid of memory, that was allocated before for this window.
     // it has not been done previously, while otherwise in the datacallback
@@ -2543,7 +2547,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                     }
                     case caINT:
                     case caLONG:
-                        sprintf(asc,"%ld %s", kPtr->edata.ivalue, kPtr->edata.units);
+                        sprintf(asc,"%ld (0x%lx) %s", kPtr->edata.ivalue, kPtr->edata.ivalue, kPtr->edata.units);
                         info.append(asc);
                         break;
                     case caFLOAT:
