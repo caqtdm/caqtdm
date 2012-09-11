@@ -30,7 +30,6 @@ struct ca_client_context *dbCaClientContext;
 #include "mutexKnobDataWrapper.h"
 #include "messageWindowWrapper.h"
 #include "vaPrintf.h"
-#include "medmpio.h"
 
 #ifdef ACS
 #include "acsSubs.h"
@@ -89,7 +88,6 @@ void Exceptionhandler(struct exception_handler_args args)
  */
 void PrepareDeviceIO()
 {
-    MONITOR_CREATE(&protectAccess);
     PRINT(printf("create epics context\n"));
     int status = ca_context_create(ca_enable_preemptive_callback);
     if (status != ECA_NORMAL) {
@@ -104,14 +102,13 @@ void PrepareDeviceIO()
 static void access_rights_handler(struct access_rights_handler_args args)
 {
     knobData kData;
-    MONITOR_ENTER(protectAccess, "thread");
 
     connectInfo *info = (connectInfo *) ca_puser(args.chid);
     C_GetMutexKnobData(KnobDataPtr, info->index, &kData);
     kData.edata.accessW = ca_write_access(args.chid);
     kData.edata.accessR = ca_read_access(args.chid);
     C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
-    MONITOR_EXIT(protectAccess, "thread");
+
     return;
 }
 
