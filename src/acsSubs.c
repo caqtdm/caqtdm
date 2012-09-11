@@ -1047,9 +1047,8 @@ static void etherReceive(pioStatusB *iosb, pio_ethbuf *irbb)
                             char level2Data[21];
                             level2Data[0] = '\0';
 
-                            kData.edata.fieldtype = caINT;  // default type
-
                             int value = ReceiveCells[i].ub.int4val;
+                            kData.edata.fieldtype = caINT;  // default type
 
                             // new value ?
                             if(kData.edata.ivalue == value && kData.edata.monitorCount > 1) {
@@ -1064,7 +1063,6 @@ static void etherReceive(pioStatusB *iosb, pio_ethbuf *irbb)
                             image2D.strPtr = (char *) image2;
 
                             // in case of ca_choice and cabitnames get also bitnames
-
                             if((strstr(kData.dispName, "choice") != (char *) 0) ||
                                     (strstr(kData.dispName, "bitnames") != (char *) 0)) {
                                 if(kData.edata.dataSize > 0) {
@@ -1086,19 +1084,18 @@ static void etherReceive(pioStatusB *iosb, pio_ethbuf *irbb)
 
                             } else if((strstr(kData.dispName, "lineedit") != (char *) 0) ||
                                       (strstr(kData.dispName, "image") != (char *) 0)) {
-
                                 // get digital level 2
                                 int j;
                                 num = getDigLvl2ext(&devD, &attD, &ReceiveCells[i].ub.int4val, &dim,  &level2D, &image2D, offset);
-
                                 dataSize = 21 * sizeof(char) * num + (num) * sizeof(char);
                                 for(j = 0; j < num; j++) {
                                     level2[j][20] = '\0';
                                     // if we have an image, compute the correct frame and keep also the string
                                     if(strlen(kData.edata.aux) > 0) {
-                                        char levData[21];
+                                        char levData[21], aux[21];
                                         strcpy(levData, level2[j]);
-                                        if(IsInside(strUpr(levData), kData.edata.aux)) {
+                                        strcpy(aux, kData.edata.aux); strcat(aux, "_");
+                                        if(IsInside(strUpr(levData), aux)) {
                                             kData.edata.rvalue = offset[j];
                                             strcpy(level2Data, level2[j]);
                                             dataSize = 21 * sizeof(char);
@@ -1126,6 +1123,7 @@ static void etherReceive(pioStatusB *iosb, pio_ethbuf *irbb)
                                     ptr[0] = '\0';
                                     strcpy(ptr, level2Data);
                                     kData.edata.valueCount = 1;
+                                    kData.edata.enumCount=0;
 
                                 } else {
                                     int j;
@@ -1140,6 +1138,7 @@ static void etherReceive(pioStatusB *iosb, pio_ethbuf *irbb)
                                         sprintf(ptr, "%s;%s", ptr, levData);
                                     }
                                     kData.edata.valueCount=num;
+                                    kData.edata.enumCount=num;
                                 }
                             }
 
