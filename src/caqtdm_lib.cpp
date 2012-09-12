@@ -1109,10 +1109,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         }
         widget->setColumnSizes(widget->getColumnSizes());
         widget->setProperty("Taken", true);
+        widget->setToolTip("with Ctrl+C you can copy selected items to the clipboard");
     }
 
     // make a context menu for object having a monitor
-    if(className.contains("ca") && !className.contains("caRel") && nbMonitors > 0) {
+    if(className.contains("ca") && !className.contains("caRel") && !className.contains("caTable") && nbMonitors > 0) {
         w1->setContextMenuPolicy(Qt::CustomContextMenu);
         connect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
         w1->setProperty("Connect", false);
@@ -2476,7 +2477,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         nbPV = 5;
 
     } else  {
-        qDebug() << w << "not treated";
+        //qDebug() << w << "not treated";
         return;
     }
 
