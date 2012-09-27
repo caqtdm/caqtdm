@@ -1035,9 +1035,9 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         title = widget->getTitlePlot();
         if(reaffectText(map, &title)) widget->setTitlePlot(title);
         title = widget->getTitleX();
-        if(reaffectText(map, &title)) widget->setTitlePlot(title);
+        if(reaffectText(map, &title)) widget->setTitleX(title);
         title = widget->getTitleY();
-        if(reaffectText(map, &title)) widget->setTitlePlot(title);
+        if(reaffectText(map, &title)) widget->setTitleY(title);
 
         widget->setWhiteColors();
 
