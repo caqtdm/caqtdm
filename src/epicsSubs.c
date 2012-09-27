@@ -455,7 +455,7 @@ int CreateAndConnect(int index, knobData *kData)
         StartPIOserver();
         first = false;
     }
-
+    kData->edata.severity = -4;
     if(AddValueCell(kData->pv, index, aux) != -1) {
         strcpy(kData->edata.aux, aux);
 

@@ -1025,6 +1025,8 @@ static void etherReceive(pioStatusB *iosb, pio_ethbuf *irbb)
 
                     if (ReceiveCells[i].error_code == 1) {
 
+                        kData.edata.severity = 0;
+
                         // floats
 
                         if (ReceiveCells[i].unit_code > 3) {
@@ -1148,8 +1150,9 @@ static void etherReceive(pioStatusB *iosb, pio_ethbuf *irbb)
                         unit[real_len(unit)] = '\0';
                         strcpy(kData.edata.units, unit);
                     } else {
+                        kData.edata.severity = ReceiveCells[i].error_code;
                         if (ReceiveCells[i].unit_code > 3) {
-                            kData.edata.rvalue = (float) ReceiveCells[i].error_code;
+                            kData.edata.rvalue = 0.0;
                             kData.edata.fieldtype = caFLOAT;
                             kData.edata.precision = 3;
                         }
