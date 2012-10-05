@@ -196,6 +196,9 @@ void FileOpenWindow::Callback_OpenButton()
             QMainWindow *mainWindow = new CaQtDM_Lib(this, fileName, "", mutexKnobData, messageWindow);
             mainWindow->show();
             mainWindow->raise();
+            mainWindow->setMinimumSize(0, 0);
+            mainWindow->setMaximumSize(16777215, 16777215);
+            mainWindow->setWindowFlags( mainWindow->windowFlags() );
 
             lastWindow = mainWindow;
             lastMacro = "";
@@ -285,6 +288,9 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         QMainWindow *mainWindow = new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, messageWindow);
         mainWindow->show();
         mainWindow->raise();
+        mainWindow->setMinimumSize(0, 0);
+        mainWindow->setMaximumSize(16777215, 16777215);
+        mainWindow->setWindowFlags( mainWindow->windowFlags() );
 
         lastWindow = mainWindow;
         lastMacro = macroString;
@@ -359,6 +365,10 @@ void FileOpenWindow::Callback_ActionReload()
     mainWindow->show();
     mainWindow->move(position);
     mainWindow->raise();
+
+    mainWindow->setMinimumSize(0, 0);
+    mainWindow->setMaximumSize(16777215, 16777215);
+    mainWindow->setWindowFlags( mainWindow->windowFlags() );
 
     lastWindow = mainWindow;
     sprintf(asc, "last file: %s", lastFile.toAscii().constData());
