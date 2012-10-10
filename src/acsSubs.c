@@ -981,7 +981,7 @@ static void etherReceive(pioStatusB *iosb, pio_ethbuf *irbb)
                 }
 
                 // in case of commands we do not have to consider an error code
-                if(strncmp(attS, "COM", 3) == 0) {
+                if(strncmp(attS, "C", 1) == 0) {
                     if(kData.edata.dataSize > 0) {
                         kData.edata.monitorCount--;
                         goto skip1;  // cmdnames should not change
