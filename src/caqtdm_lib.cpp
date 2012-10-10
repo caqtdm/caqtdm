@@ -292,8 +292,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     // then no info will be shown
     int nbMonitors = 1;
 
-    kData.soft = false;
-
     QVariant test=w1->property("Taken");
     if(!test.isNull()) {
         if(test.toBool()) return;
@@ -826,7 +824,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //qDebug() << "treat caFrame" << w1;
 
-         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
+        nbMonitors = InitVisibility(w1, &kData, map, specData, "");
 
         widget->setProperty("Taken", true);
 
@@ -866,7 +864,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         //==================================================================================================================
     } else if(caCartesianPlot* widget = qobject_cast<caCartesianPlot *>(w1)) {
 
-        //qDebug() << "create cartesian plot";
         QString triggerChannel, countChannel, eraseChannel, title;
 
         // addmonitor normally will add a tooltip to show the pv; however here we have more than one pv
@@ -1213,6 +1210,8 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
 
     w->setProperty("MonitorIndex", num);
     w->setProperty("Connect", false);
+
+    memset(kData, 0, sizeof (knobData));
 
     return num;
 }
