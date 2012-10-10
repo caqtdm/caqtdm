@@ -85,7 +85,6 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w)
     QMap<QString, int>::const_iterator name = variableList.find(asc);
     if(name != variableList.end()) {
         knobData *ptr = GetMutexKnobDataPtr(name.value());
-        //qDebug() << "update softpv with value" << pv << value << "at index=" << ptr->index;
         ptr->edata.rvalue = value;
         ptr->edata.fieldtype = caDOUBLE;
         ptr->edata.precision = 3;
@@ -100,10 +99,20 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w)
  */
 bool MutexKnobData::getSoftPV(QString pv, int *indx, QWidget *w)
 {
+    QMapIterator<QString, int> i(variableList);
+/*
+    qDebug() << "list start";
+    while (i.hasNext()) {
+        i.next();
+        qDebug() <<  "list item=" << i.key();
+    }
+    qDebug() << "list end";
+*/
     char asc[MAXPVLEN+20];
     sprintf(asc, "%s_%p", pv.toAscii().constData(),  w);
     QMap<QString, int>::const_iterator name = variableList.find(asc);
     if(name != variableList.end()) {
+        //qDebug() << "found softpv" << pv << "list item=" << name.key();
         *indx = name.value();
         return true;
     }
@@ -242,7 +251,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
 
         if(kPtr->index != -1 && kPtr->soft) {
             int indx;
-            // qDebug() << "I am a soft channel" << kPtr->pv << kPtr->dispName << kPtr->edata.rvalue << kPtr->index;
+             //qDebug() << "I am a soft channel" << kPtr->pv << kPtr->dispName << kPtr->edata.rvalue << kPtr->index;
             // get for this soft pv the index of the corresponding caCalc into the knobData array where the data were updated
             if(getSoftPV(kPtr->pv, &indx, (QWidget*) kPtr->thisW)) {
                 // get value from (updated) QMap variable list
