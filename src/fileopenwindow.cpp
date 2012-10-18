@@ -290,6 +290,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         mainWindow->raise();
         mainWindow->setMinimumSize(0, 0);
         mainWindow->setMaximumSize(16777215, 16777215);
+        mainWindow->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         mainWindow->setWindowFlags( mainWindow->windowFlags() );
 
         lastWindow = mainWindow;
