@@ -1236,6 +1236,11 @@ int CaQtDM_Lib::setObjectVisibility(QWidget *w, double value)
     if(caFrame *widget = qobject_cast<caFrame *>(w)) {
         // treat visibility if defined
         ComputeVisibility(caFrame)
+        if(widget->getVisibilityMode() == caFrame::Background) {
+            if(visible) widget->setAutoFillBackground(true);
+            else widget->setAutoFillBackground(false);
+            return visible;
+        }
     } else if (caInclude *widget = qobject_cast<caInclude *>(w)) {
         // treat visibility if defined
         ComputeVisibility(caInclude)
@@ -2200,7 +2205,7 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
         // I had too many problems with QProcess start, use standard execl
         int status = Execute((char*)command.toAscii().constData());
         if(status != 0) {
-            QMessageBox::information(0,"FailedToStart", command);
+            QMessageBox::information(0,"FailedToStart or Error", command);
         }
 #endif
     } else if(indx < commands.count()) {
@@ -2214,7 +2219,7 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
         // I had too many problems with QProcess start, use standard execl
         int status = Execute((char*)command.toAscii().constData());
         if(status != 0) {
-            QMessageBox::information(0,"FailedToStart", command);
+            QMessageBox::information(0,"FailedToStart or error", command);
         }
 #endif
     }
