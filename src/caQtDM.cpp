@@ -23,14 +23,15 @@ int main(int argc, char *argv[])
     QString fileName = "";
     QString macroString = "";
 
-    dmsearchFile *s = new dmsearchFile("stylesheet.qss");
+    dmsearchFile *s = new dmsearchFile("caQtDM_stylesheet.qss");
     QString fileNameFound = s->findFile();
     if(fileNameFound.isNull()) {
-        printf("caQtDM --file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toAscii().constData());
+        printf("caQtDM -- file <caQtDM_stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toAscii().constData());
     } else {
         QFile file(fileNameFound);
         file.open(QFile::ReadOnly);
         QString StyleSheet = QLatin1String(file.readAll());
+        printf("caQtDM -- file <caQtDM_stylesheet.qss> loaded as the default application stylesheet\n");
         app.setStyleSheet(StyleSheet);
         file.close();
     }
@@ -38,6 +39,7 @@ int main(int argc, char *argv[])
     int	in, numargs;
     bool attach = false;
     bool minimize= false;
+    bool nostyles = false;
 
     for (numargs = argc, in = 1; in < numargs; in++) {
         //qDebug() << argv[in];
@@ -54,17 +56,35 @@ int main(int argc, char *argv[])
         } else if ( strcmp (argv[in], "-noMsg" ) == 0 ) {
             printf("caQtDM -- will minimize its main windows\n");
             minimize = true;
+        } else if ( strcmp (argv[in], "-noStyles" ) == 0 ) {
+            printf("caQtDM -- will not replace the default application stylesheet caQtDM_stylesheet.qss\n");
+            nostyles = true;
         } else if ( strcmp (argv[in], "-x" ) == 0 ) {
 
         } else if ( strcmp (argv[in], "-displayFont" ) == 0 ) {
              in++;
         } else if (strncmp (argv[in], "-" , 1) == 0) {
             /* unknown application argument */
-            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg\n",in,argv[in]);
+            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -noStyles\n",in,argv[in]);
         } else {
             printf("caQtDM -- file = <%s>\n", argv[in]);
             fileName = QString(argv[in]);
             break;
+        }
+    }
+
+    if(!nostyles) {
+        s = new dmsearchFile("stylesheet.qss");
+        fileNameFound = s->findFile();
+        if(fileNameFound.isNull()) {
+            printf("caQtDM -- file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toAscii().constData());
+        } else {
+            QFile file(fileNameFound);
+            file.open(QFile::ReadOnly);
+            QString StyleSheet = QLatin1String(file.readAll());
+            printf("caQtDM -- file <stylesheet.qss> replaced the default stylesheet\n");
+            app.setStyleSheet(StyleSheet);
+            file.close();
         }
     }
 
