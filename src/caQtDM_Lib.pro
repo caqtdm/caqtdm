@@ -6,7 +6,7 @@
 
 QT       += core gui
 
-CONFIG      += qt warn_on thread uitools
+CONFIG      += qt warn_on thread uitools designer plugin
 
 TARGET = caQtDM_Lib
 TEMPLATE = lib
