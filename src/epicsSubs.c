@@ -525,6 +525,10 @@ int EpicsSetValue(char *pv, float rdata, long idata, char *sdata, char *object, 
     struct dbr_ctrl_float ctrlR;
     struct dbr_sts_string ctrlS;
 
+    if(strlen(pv) < 1)  {
+            C_postMsgEvent(messageWindow, 1, vaPrintf("pv with length=0 (not translated for macro?)\n"));
+            return !ECA_NORMAL;
+    }
 
 #ifdef ACS
     if(SetActivCell(pv) != -1) {
@@ -547,7 +551,7 @@ int EpicsSetValue(char *pv, float rdata, long idata, char *sdata, char *object, 
 #endif
 
     // set epics value
-    //printf(" we have to set a value to an epics device <%s> %f %ld <%s>\n", pv, rdata, idata, sdata);
+    PRINT(printf(" we have to set a value to an epics device <%s> %f %ld <%s>\n", pv, rdata, idata, sdata));
     int status = ca_create_channel(pv, NULL, 0, CA_PRIORITY, &ch);
     if (ch == (chid) 0) {
         return !ECA_NORMAL;
