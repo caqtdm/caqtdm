@@ -18,7 +18,7 @@
 #include <sys/timeb.h>
 #include <postfix.h>
 #include <QObject>
-#include <QtDesigner/QFormBuilder>
+//#include <QtDesigner/QFormBuilder>
 #include <iostream>
 #ifdef linux
 #  include <sys/wait.h>
@@ -616,7 +616,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if (caMessageButton* widget = qobject_cast<caMessageButton *>(w1)) {
 
         QString text;
-        //qDebug() << "create caMessageButton";
+        //qDebug() << "create caMessageButton" <<  widget->getPV();
         if(widget->getPV().size() > 0) {
             addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
             widget->setPV(pv);
@@ -1106,7 +1106,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         }
         widget->setColumnSizes(widget->getColumnSizes());
         widget->setProperty("Taken", true);
-        widget->setToolTip("with Ctrl+C you can copy selected items to the clipboard");
+        widget->setToolTip("with Ctrl+C you can copy selected items to the clipboard\ninside X11 you can then do shft+ins");
     }
 
     // make a context menu for object having a monitor
@@ -1157,7 +1157,6 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     QString trimmedPV = pv.trimmed();
 
     QString newpv = treatMacro(map, trimmedPV, &doNothing);
-    if(doNothing) return -1;
     *pvRep = newpv;
 
     // set pvname as tooltip
@@ -1206,7 +1205,7 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     mutexKnobData->SetMutexKnobData(num, *kData);
 
     // create data acquisition
-    CreateAndConnect(num, kData);
+    if(!doNothing) CreateAndConnect(num, kData);
 
     w->setProperty("MonitorIndex", num);
     w->setProperty("Connect", false);
@@ -1684,7 +1683,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         // Graphics ==================================================================================================================
     } else if (caGraphics *widget = qobject_cast<caGraphics *>(w)) {
-        //qDebug() << "caGraphics" << widget->objectName() << widget->getColorMode();
+        //qDebug() << "caGraphics" << widget->objectName() << widget->getColorMode() << data.pv;
 
         if(data.edata.connected) {
             int colorMode = widget->getColorMode();
@@ -2163,7 +2162,6 @@ void CaQtDM_Lib::Callback_MessageButton(int type)
 {
     QWidget *w1 = qobject_cast<QWidget *>(sender());
     caMessageButton *w = qobject_cast<caMessageButton *>(sender());
-    //qDebug() << "messagebutton pressed" << w << type;
     if(type == 0) {         // pressed
         if(w->getPressMessage().size() > 0)
             TreatRequestedValue(w->getPressMessage(), caTextEntry::decimal, w1);
@@ -2955,7 +2953,6 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
     if(mutexKnobData->getSoftPV(kPtr->pv, &indx, (QWidget*) kPtr->thisW)) {
         kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
     }
-
 
     switch (kPtr->edata.fieldtype) {
     case caSTRING:
