@@ -167,7 +167,7 @@ static int ExecuteValueCells()
     int             devIOF;
     int             listNo;
     int             NumberOfLists;
-    int             repeat;
+    int             repeat = 0;
     int             tffunc;
     pioDevices      ProCells[MAX_DEVS];
     pioDevices      PioCells[MAX_DEVS];
@@ -777,6 +777,7 @@ static void medmAcquisition(short *own_prot, int *devIOFunc, pioDevices *Cells, 
         indFec = 0;
         total[0] = 0;
     }
+
 }
 
 /*****************************************************************************/
@@ -1053,7 +1054,7 @@ static void etherReceive(pioStatusB *iosb, pio_ethbuf *irbb)
                             kData.edata.fieldtype = caINT;  // default type
 
                             // new value ?
-                            if(kData.edata.ivalue == value && kData.edata.monitorCount > 1) {
+                            if(kData.edata.ivalue == value && kData.edata.monitorCount > 1 && kData.edata.displayCount != 0) {
                                 kData.edata.monitorCount--;
                                 goto skip1;
                             }
@@ -1068,7 +1069,7 @@ static void etherReceive(pioStatusB *iosb, pio_ethbuf *irbb)
                             if((strstr(kData.dispName, "choice") != (char *) 0) ||
                                     (strstr(kData.dispName, "bitnames") != (char *) 0)) {
                                 if(kData.edata.dataSize > 0) {
-                                    goto skip1;  // bitnames should not change, but value yes
+                                     if(kData.edata.displayCount > 0)  goto skip1;  // bitnames should not change, but value yes
                                 }
                                 status = getBitNames(&devD, &attD, result);
                                 if(status == 1) {
