@@ -39,6 +39,18 @@
         #define MESSAGE_SOURCE_PAGER          2
 #endif //Q_WS_X11
 
+class Sleep
+{
+public:
+    static void msleep(unsigned long msecs)
+    {
+        QMutex mutex;
+        mutex.lock();
+        QWaitCondition waitCondition;
+        waitCondition.wait(&mutex, msecs);
+        mutex.unlock();
+    }
+};
 
 /**
  * our main window (form) constructor
@@ -89,7 +101,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     if (sharedMemory.attach()) {
         _isRunning = true;
         if(attach) {
-            qDebug() << "another instance of caQtDM detected ==> attach to it";
+            qDebug() << "caQtDM -- another instance of caQtDM detected ==> attach to it";
             QString message(filename);
             message.append(";");
             message.append(macroString);
@@ -98,16 +110,16 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
             sharedMemory.detach();
             exit(0);
         } else {
-            qDebug() << "another instance of caQtDM detected, but no attach specified ==> standalone";
+            qDebug() << "caQtDM -- another instance of caQtDM detected, but no attach specified ==> standalone";
         }
     } else {
         QByteArray byteArray("0");
         _isRunning = false;
         // create shared memory with a default value to note that no message is available.
         if (!sharedMemory.create(100)) {
-            qDebug("Unable to create single instance.");
+            qDebug("caQtDM -- Unable to create single instance.");
         } else {
-            qDebug() << "created share memory";
+            qDebug() << "caQtDM -- created shared memory";
             sharedMemory.lock();
             char *to = (char*)sharedMemory.data();
             const char *from = byteArray.data();
@@ -121,12 +133,20 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     }
 
     // when file was specified, open it
-    if(filename.size() > 0) Callback_OpenNewFile(filename, macroString);
+    // when called from here on Windows, the actual size of the window
+    // is not found => defer opening
+    mustOpenFile = false;
+    if(filename.size() > 0) {
+        lastMacro = macroString;
+        lastFile = filename;
+        mustOpenFile = true;
+        //Callback_OpenNewFile(filename, macroString);
+    }
 
     setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowMinMaxButtonsHint);
 
     // start a timer
-    startTimer(2000);
+    startTimer(1000);
 
     pvWindow = (QMainWindow*) 0;
     pvTable = (QTableWidget*) 0;
@@ -137,6 +157,11 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
     char asc[255];
     int countPV=0;
     int countNotConnected=0;
+
+    if(mustOpenFile) {
+        mustOpenFile = false;
+        Callback_OpenNewFile(lastFile, lastMacro);
+    }
 
     asc[0] = '\0';
 
@@ -307,8 +332,8 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
  */
 void FileOpenWindow::Callback_ActionAbout()
 {
-    QString message = QString("Qt-based Epics Display Manager Version %1 developed at Paul Scherrer Institut, by Anton Mezger\n");
-    message = message.arg(BUILDVERSION);
+    QString message = QString("Qt-based Epics Display Manager Version %1 using %2 developed at Paul Scherrer Institut, by Anton Mezger\n");
+    message = message.arg(BUILDVERSION, BUILDARCH);
 #ifdef ACS
     message.append("ACS enabled\n");
 #endif

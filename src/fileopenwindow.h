@@ -11,7 +11,7 @@
 
 #ifndef CALCULATORFORM_H
 #define CALCULATORFORM_H
- 
+
 #include <QMainWindow>
 #include <QSharedMemory>
 #include <QTableWidget>
@@ -21,11 +21,11 @@
 #include "knobData.h"
 #include "mutexKnobData.h"
 #include "ui_main.h"
- 
+
  class FileOpenWindow : public QMainWindow
  {
      Q_OBJECT
- 
+
  public:
      FileOpenWindow(QMainWindow *parent = 0,  QString filename = "", QString macroString = "", bool attach = false, bool minimize = false);
      bool isRunning();
@@ -49,7 +49,7 @@
 signals:
 
    void messageAvailable(QString message);
- 
+
  private:
      QMainWindow *lastWindow;
      QString lastMacro, lastFile;
@@ -63,6 +63,8 @@ signals:
      QMainWindow *pvWindow;
      QTableWidget* pvTable;
      QTimer *timer;
+
+     bool mustOpenFile;
  };
- 
+
  #endif
