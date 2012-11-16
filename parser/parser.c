@@ -1040,7 +1040,7 @@ void parsePlotcom(DisplayInfo *displayInfo, char *widget)
             } else if (!strcmp(token,"package")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                printf("adlParser -- package not supported\n");
+                printf("adl2ui -- package not supported\n");
             } else if (!strcmp(token,"clr")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
@@ -1151,11 +1151,11 @@ void parsePlotAxisDefinition(DisplayInfo *displayInfo, int axis)
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 if (!strcmp(token,"linear")) {
-                    printf("adlParser -- only linear axis is supported by now\n");
+                    printf("adl2ui -- only linear axis is supported by now\n");
                 } else if (!strcmp(token,"log10")) {
-                    printf("adlParser -- no logarithmic is supported by now\n");
+                    printf("adl2ui -- no logarithmic is supported by now\n");
                 } else  if (!strcmp(token,"time")) {
-                    printf("adlParser -- no time axis is supported by now\n");
+                    printf("adl2ui -- no time axis is supported by now\n");
                 }
             } else if (!strcmp(token,"rangeStyle")) {
                 rangeStyleFound = True;
@@ -1177,7 +1177,7 @@ void parsePlotAxisDefinition(DisplayInfo *displayInfo, int axis)
             } else if (!strcmp(token,"timeFormat")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                printf("adlParser -- no time format is supported by now\n");
+                printf("adl2ui -- no time format is supported by now\n");
             }
             break;
         case T_LEFT_BRACE:
@@ -1250,7 +1250,6 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
                 getToken(displayInfo,token);
                 if((strlen(token) > 0) && (!countDone)){
                     countDone = True;
-                    printf("adlParser -- count for cartesian plot is now supported\n");
                     Qt_handleString("countNumOrChannel", "string", token);
                 }
             } else if(!strcmp(token,"style")) {
@@ -1327,15 +1326,12 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
                 getToken(displayInfo,token);
                 if(!strcmp(token,"on")) {
                     Qt_handleString("plotMode", "enum", "caCartesianPlot::PlotLastNPoints");
-                    printf("adlParser -- erase oldest on for cartesian plot is now supported\n");
                 } else if(!strcmp(token,"off")) {
                     Qt_handleString("plotMode", "enum", "caCartesianPlot::PlotNPointsAndStop");
-                    printf("adlParser -- erase oldest off for cartesian plot is now supported\n");
                 } else if(!strcmp(token,"plot last n pts")) {
                     Qt_handleString("plotMode", "enum", "caCartesianPlot::PlotLastNPoints");
                 } else if(!strcmp(token,"plot n pts & stop")) {
                     Qt_handleString("plotMode", "enum", "caCartesianPlot::PlotNPointsAndStop");
-                    printf("adlParser -- plot last n pts & stop for cartesian plot is now supported\n");
                 }
             } else if(!strncmp(token,"trace",5)) {
                 traceNumber = MIN(token[6] - '0', MAX_TRACES - 1);
@@ -1353,29 +1349,24 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 Qt_handleString("triggerChannel", "string", token);
-                printf("adlParser -- trigger for cartesian plot is now supported\n");
             } else if(!strcmp(token,"erase")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 Qt_handleString("eraseChannel", "string", token);
-                printf("adlParser -- erase for cartesian plot is now supported\n");
             } else if(!strcmp(token,"countPvName")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 if(!countDone) {
                     countDone = True;
                     Qt_handleString("countNumOrChannel", "string", token);
-                    printf("adlParser -- countPvname for cartesian plot is now supported\n");
                 }
             } else if(!strcmp(token,"eraseMode")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 if(!strcmp(token,"if not zero")) {
                     Qt_handleString("eraseMode", "enum", "caCartesianPlot::ifnotzero");
-                    printf("adlParser -- erase if not zero for cartesian plot is now supported\n");
                 } else if(!strcmp(token,"if zero")) {
                     Qt_handleString("eraseMode", "enum", "caCartesianPlot::ifzero");
-                    printf("adlParser -- erase if zero for cartesian plot is now supported\n");
                 }
             }
             break;
@@ -2346,7 +2337,7 @@ void parseControl(DisplayInfo *displayInfo, char *widget)
                                           displayInfo->dlColormap->dl_color[clr].b,
                                           255);
                 } else {
-                    //printf("adlParser -- color  for control %s not supported (use stylesheet)\n", widget);
+                    //printf("adl2ui -- color  for control %s not supported (use stylesheet)\n", widget);
                 }
 	    } else if (!strcmp(token,"bclr")) {
 		getToken(displayInfo,token);
@@ -2358,7 +2349,7 @@ void parseControl(DisplayInfo *displayInfo, char *widget)
                                           displayInfo->dlColormap->dl_color[bclr].b,
                                           255);
                 } else {
-                    //printf("adlParser -- color  for control %s not supported (use stylesheet)\n", widget);
+                    //printf("adl2ui -- color  for control %s not supported (use stylesheet)\n", widget);
                 }
 	    }
 	    break;

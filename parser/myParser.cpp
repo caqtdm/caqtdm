@@ -1,9 +1,13 @@
-/* 
- * File:   myParser.cpp
- * Author: mezger
- *
- * Created on January 4, 2012, 4:58 PM
- */
+//******************************************************************************
+// Copyright (c) 2012 Paul Scherrer Institut PSI), Villigen, Switzerland
+// Disclaimer: neither  PSI, nor any of their employees makes any warranty
+// or assumes any legal liability or responsibility for the use of this software
+//******************************************************************************
+//******************************************************************************
+//
+//     Author : Anton Chr. Mezger
+//
+//******************************************************************************
 
 #include <cstdlib>
 #include "parser.h"
@@ -11,6 +15,7 @@
 #include <qfile.h>
 #include "XmlWriter.h"
 #include <QFileDialog>
+#include "dmsearchfile.h"
 #include <QDebug>
 
 
@@ -72,11 +77,19 @@ myParser::myParser () {
 
 void myParser::openFile(char *outFile)
 {
-    // open stylesheet
-    QFile stylefile("stylesheet.qss");
-    stylefile.open(QFile::ReadOnly);
-    StyleSheet = QLatin1String(stylefile.readAll());
-    stylefile.close();
+    dmsearchFile *s = new dmsearchFile("stylesheet.qss");
+    QString fileNameFound = s->findFile();
+    if(fileNameFound.isNull()) {
+        printf("adl2ui -- file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toAscii().constData());
+        printf("adl2ui -- could be a problem!\n");
+    } else {
+        QFile file(fileNameFound);
+        file.open(QFile::ReadOnly);
+        StyleSheet = QLatin1String(file.readAll());
+        printf("adl2ui -- file <stylesheet.qss> found and will be integrated in the resulting ui file\n");
+        printf("adl2ui -- if you do not want any styles, redefine CAQTDM_DISPLAY_PATH\n");
+        file.close();
+    }
 
     file = new QFile(outFile);
     if (!file->open(QIODevice::WriteOnly | QIODevice::Text)) exit(0);
@@ -254,22 +267,22 @@ int main(int argc, char *argv[])
         }
         if (strncmp (argv[in], "-" , 1) == 0) {
             /* unknown application argument */
-            printf("adlParser: Argument %d = [%s] is unknown! ",in,argv[in]);
+            printf("adl2ui -- Argument %d = [%s] is unknown! ",in,argv[in]);
             printf("possible are: '-flat and '-deviceonmenu'\n");
             exit(-1);
         } else {
-            printf("adlParser: file = <%s>\n", argv[in]);
+            printf("adl2ui -- file = <%s>\n", argv[in]);
             strcpy(inFile, argv[in]);
         }
     }
 
-    if(generateFlatFile) printf("adlParser: a flat file will be generated\n");
-    if(generateDeviceOnMenus)printf("adlParser: device name will be put on menus\n");
+    if(generateFlatFile) printf("adl2ui -- a flat file will be generated\n");
+    if(generateDeviceOnMenus)printf("adl2ui -- device name will be put on menus\n");
 
     // input and out files
     QString inputFile = inFile;
     if(inputFile.size() < 1) {
-        qDebug() << "adlParser -- sorry: no input file";
+        qDebug() << "adl2ui -- sorry: no input file";
         exit(-1);
     }
 
@@ -291,7 +304,7 @@ int main(int argc, char *argv[])
     // when file exists open it
     QFileInfo fi(inputFile);
     if(!fi.exists()) {
-        qDebug() << "adlParser: sorry, file" << inFile << "does not exist";
+        qDebug() << "adl2ui -- sorry, file" << inFile << "does not exist";
         exit(-1);
     }
 
