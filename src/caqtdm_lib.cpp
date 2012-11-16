@@ -260,14 +260,25 @@ bool CaQtDM_Lib::reaffectText(QMap<QString, QString> map, QString *text) {
  */
 QMap<QString, QString> CaQtDM_Lib::createMap(const QString& macro)
 {
+    //qDebug() << "treat macro" << macro;
     QMap<QString, QString> map;
     // macro of type A=MMAC3,B=STR,C=RMJ:POSA:2 to be used for replacements of pv in child widgets
     if(macro != NULL) {
         QStringList vars = macro.split(",", QString::SkipEmptyParts);
         for(int i=0; i< vars.count(); i++) {
+/* this would be ok if medm did not allow also an equal sign after the equal sign
             QStringList keyvalue = vars.at(i).split("=", QString::SkipEmptyParts);
             if(keyvalue.count() == 2) {
                 map.insert(keyvalue.at(0).trimmed(), keyvalue.at(1));
+            }
+*/
+            int pos = vars.at(i).indexOf("=");
+            if(pos != -1) {
+                QString key = vars.at(i).mid(0, pos);
+                QString value = vars.at(i).mid(pos+1);
+                map.insert(key.trimmed(), value);
+            } else {
+                qDebug() << macro << "could not parse" << vars.at(i);
             }
         }
     }
@@ -1157,6 +1168,13 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     QString trimmedPV = pv.trimmed();
 
     QString newpv = treatMacro(map, trimmedPV, &doNothing);
+
+    if(doNothing) {
+        char asc[100];
+        sprintf(asc, "malformed pv '%s' (due to macro?)", (char*) newpv.toAscii().constData());
+        postMessage(QtDebugMsg, asc);
+    }
+
     *pvRep = newpv;
 
     // set pvname as tooltip
@@ -1205,7 +1223,7 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     mutexKnobData->SetMutexKnobData(num, *kData);
 
     // create data acquisition
-    if(!doNothing) CreateAndConnect(num, kData);
+    CreateAndConnect(num, kData);
 
     w->setProperty("MonitorIndex", num);
     w->setProperty("Connect", false);
@@ -1335,7 +1353,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
             char asc[100];
             sprintf(asc, "invalid calc %s for %s", calcString, qPrintable(w->objectName()));
             postMessage(QtDebugMsg, asc);
-            printf("%s\n", asc);
+            //printf("%s\n", asc);
             valid = false;
             return true;
         }
@@ -1840,6 +1858,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
             // count channel
             } else if(XorY == caCartesianPlot::CH_Count) {
+                //qDebug() << "count channel" << data.edata.rvalue << (int) (data.edata.rvalue + 0.5);
                 widget->setCountNumber((int) (data.edata.rvalue + 0.5));
 
             // erase channel
@@ -1983,7 +2002,6 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         // bitnames table with text and coloring according the value=========================================================
     } else if (caBitnames *widget = qobject_cast<caBitnames *>(w)) {
-
         if(data.edata.connected) {
             // set enum strings
             if(data.edata.fieldtype == caENUM) {
@@ -2456,6 +2474,10 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         }
         QString TriggerPV = widget->getTriggerPV();
         if(TriggerPV.trimmed().length() > 0) pv[nbPV++] = TriggerPV.trimmed();
+        QString CountPV = widget->getCountPV();
+        if(CountPV.trimmed().length() > 0) pv[nbPV++] = CountPV.trimmed();
+        QString ErasePV = widget->getErasePV();
+        if(ErasePV.trimmed().length() > 0) pv[nbPV++] = ErasePV.trimmed();
     } else if(caCamera* widget = qobject_cast<caCamera *>(w)) {
         nbPV=0;
         for(int i=0; i< 5; i++) {
