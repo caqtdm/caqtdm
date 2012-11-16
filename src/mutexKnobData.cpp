@@ -248,7 +248,6 @@ void MutexKnobData::timerEvent(QTimerEvent *)
 
     for(int i=0; i < GetMutexKnobDataSize(); i++) {
         knobData *kPtr = (knobData*) &KnobData[i];
-
         if(kPtr->index != -1 && kPtr->soft) {
             int indx;
              //qDebug() << "I am a soft channel" << kPtr->pv << kPtr->dispName << kPtr->edata.rvalue << kPtr->index;

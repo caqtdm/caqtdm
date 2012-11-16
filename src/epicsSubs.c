@@ -119,8 +119,6 @@ static void dataCallback(struct event_handler_args args)
 {
     knobData kData;
 
-    //int status = ca_attach_context(dbCaClientContext);
-
     connectInfo *info = (connectInfo *) ca_puser(args.chid);
     if(info == (connectInfo *) 0) return;
 
@@ -142,11 +140,11 @@ static void dataCallback(struct event_handler_args args)
             int i;
             struct dbr_ctrl_char *stsF = (struct dbr_ctrl_char *) args.dbr;
             dbr_char_t *val_ptr = dbr_value_ptr(args.dbr, DBR_CTRL_CHAR);
-/*
-            printf("dataCallback char %s %d %d <%s> status=%d count=%d nBytes=%d\n", ca_name(args.chid), (int) args.chid,
+
+            PRINT(printf("dataCallback char %s %d %d <%s> status=%d count=%d nBytes=%d\n", ca_name(args.chid), (int) args.chid,
                          info->index, ca_host_name(args.chid),
-                         stsF->status, (int) args.count, dbr_size_n(args.type, args.count));
-*/
+                         stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
+
             AssignEpicsValue((double) 0.0, (long) 0, args.count);
             kData.edata.precision = 0;
             kData.edata.units[0] = '\0';
@@ -208,14 +206,15 @@ static void dataCallback(struct event_handler_args args)
             int dataSize;
             int i;
             struct dbr_ctrl_enum *stsF = (struct dbr_ctrl_enum *) args.dbr;
-
-            PRINT(printf("dataCallback enum  %s %d <%d> %d <%s> status=%d count=%d\n", ca_name(args.chid), (int) args.chid,
+            PRINT(printf("dataCallback:\n""  get: %s\n", ca_message_text[CA_EXTRACT_MSG_NO(args.status)]));
+            PRINT(printf("dataCallback enum  %s %d <%d> %d <%s> status=%d count=%d enum no_str=%d size=%d\n", ca_name(args.chid), (int) args.chid,
                          stsF->value, info->index, ca_host_name(args.chid),
-                         stsF->status, (int) args.count));
+                         stsF->status, (int) args.count, stsF->no_str, dbr_size_n(args.type, args.count)));
 
             AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
             kData.edata.precision = 0;
             kData.edata.units[0] = '\0';
+
             kData.edata.enumCount = stsF->no_str;
 
             if(stsF->no_str>0) {
@@ -233,7 +232,6 @@ static void dataCallback(struct event_handler_args args)
                 for (i = 1; i < stsF->no_str; i++) {
                     sprintf(ptr, "%s;%s", ptr, stsF->strs[i]);
                 }
-
                 C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
             }
         }
@@ -459,7 +457,7 @@ int CreateAndConnect(int index, knobData *kData)
     if(AddValueCell(kData->pv, index, aux) != -1) {
         strcpy(kData->edata.aux, aux);
 
-       //printf("we added an acs device <%s> %d aux=<%s>\n", kData->pv,  index, aux);
+        //printf("we added an acs device <%s> %d aux=<%s>\n", kData->pv,  index, aux);
         tmp->cs = 1;                 // acs controlsystem
         // update knobdata
         C_SetMutexKnobData(KnobDataPtr, index, *kData);
