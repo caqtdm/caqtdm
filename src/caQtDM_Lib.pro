@@ -54,23 +54,29 @@ win32 {
      LIBS += C:/work/QtControls/qtcontrols/release/libqtcontrols4.a
      LIBS += C:\epics\base-3.14.12\lib\win32-x86-mingw/ca.lib
      LIBS += C:\epics\base-3.14.12\lib\win32-x86-mingw/COM.lib
-
 }
 
 unix {
-    LIBS += -L/usr/local/Trolltech/qwt-6.0.0/lib -lqwt
-    LIBS += -L$(EPICSLIB) -lca
-    LIBS += -L$(HOME)/workarea/ACS/mezger/QtControls/qtcontrols -lqtcontrols
-    INCLUDEPATH += /usr/local/Trolltech/qwt-6.0.0/src
+
+    QWTLIB = $(QWTHOME)/lib
+    QTCONTROLS = $(QTBASE)/binQt
+    EPICSLIB = $(EPICSLIB)
+
+    LIBS += -L$${QWTLIB} -Wl,-rpath,$${QWTLIB} -lqwt
+    LIBS += -L$${EPICSLIB} -Wl,-rpath,$${EPICSLIB} -lca
+    LIBS += -L$${QTCONTROLS} -Wl,-rpath,$${QTCONTROLS} -lqtcontrols
+
+    INCLUDEPATH += $(QWTHOME)/src
     INCLUDEPATH += $(EPICSINCLUDE)
     INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
     INCLUDEPATH += $(HOME)/workarea/ACS/mezger/QtControls/qtcontrols/src
-    DEPENDPATH +=/usr/local/Trolltech/qwt-6.0.0/src
+    DEPENDPATH += $(QWTHOME)/src
 }
 
 #will build besides epics also acs if enabled
-CONFIG += acs
+#CONFIG += acs
 acs: {
+TARGET = caQtDM_Lib_Hipa
 SOURCES += acsSubs.c \
            medmblock.c
 
@@ -79,8 +85,6 @@ LIBS += -L$(ACS_BUILD_LIBRARY) -lDEV -lCDB -lInclude -lProfAcc
 INCLUDEPATH += $(ACS_BUILD_INCLUDE)
 DEFINES += ACS
 }
-
-DEPENDPATH +=/usr/local/Trolltech/qwt-6.0.0/src
 
 UI_DIR += ./
 
