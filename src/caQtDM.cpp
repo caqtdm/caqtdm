@@ -13,8 +13,21 @@
 
 #include "QDebug"
 #include <QFileDialog>
-
+#include <signal.h>
 #include "fileopenwindow.h"
+
+
+static void unixSignalHandler(int signum) {
+    qDebug("DBG: main.cpp::unixSignalHandler(). signal = %s\n", strsignal(signum));
+
+    /*
+     * Make sure your Qt application gracefully quits.
+     * NOTE - purpose for calling qApp->exit(0):
+     *      1. Forces the Qt framework's "main event loop `qApp->exec()`" to quit looping.
+     *      2. Also emits the QCoreApplication::aboutToQuit() signal. This signal is used for cleanup code.
+     */
+    QCoreApplication::exit(0);
+}
 
 int main(int argc, char *argv[])
 {
@@ -91,6 +104,14 @@ int main(int argc, char *argv[])
     FileOpenWindow window (0, fileName, macroString, attach, minimize);
     window.show();
 
+    if (signal(SIGINT, unixSignalHandler) == SIG_ERR) {
+        qFatal("ERR - %s(%d): An error occurred while setting a signal handler.\n", __FILE__,__LINE__);
+    }
+    if (signal(SIGTERM, unixSignalHandler) == SIG_ERR) {
+        qFatal("ERR - %s(%d): An error occurred while setting a signal handler.\n", __FILE__,__LINE__);
+    }
+
+    QObject::connect(&app, SIGNAL(aboutToQuit()), &window, SLOT(doSomething()));
 
     return app.exec();
 }
