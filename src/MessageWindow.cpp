@@ -118,7 +118,7 @@ extern "C" MessageWindow* C_postMsgEvent(MessageWindow* p, int type, char* msg)
 
 void MessageWindow::closeEvent(QCloseEvent* ce)
 {
-    //qDebug() << "message window close event";
+    Q_UNUSED(ce);
 }
 
 MessageEvent::MessageEvent(QString & msg):
