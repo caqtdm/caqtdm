@@ -154,6 +154,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 
 void FileOpenWindow::timerEvent(QTimerEvent *event)
 {
+    Q_UNUSED(event);
     char asc[255];
     int countPV=0;
     int countNotConnected=0;
@@ -167,8 +168,8 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 
 #ifdef linux
     struct rusage usage;
-    int ret = getrusage(RUSAGE_SELF, &usage);
-    sprintf(asc, "memory: %d kB", usage.ru_maxrss);
+    getrusage(RUSAGE_SELF, &usage);
+    sprintf(asc, "memory: %ld kB", usage.ru_maxrss);
 #endif
 
     // any open windows ?
@@ -332,11 +333,8 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
  */
 void FileOpenWindow::Callback_ActionAbout()
 {
-    QString message = QString("Qt-based Epics Display Manager Version %1 using %2 developed at Paul Scherrer Institut, by Anton Mezger\n");
-    message = message.arg(BUILDVERSION, BUILDARCH);
-#ifdef ACS
-    message.append("ACS enabled\n");
-#endif
+    QString message = QString("Qt-based Epics Display Manager Version %1 using %2 with data from %3 developed at Paul Scherrer Institut, by Anton Mezger\n");
+    message = message.arg(BUILDVERSION, BUILDARCH, SUPPORT);
     MessageBox *m = new MessageBox(QMessageBox::Information, "About", message, QMessageBox::Close, this, Qt::Dialog, true);
     m->show();
 }

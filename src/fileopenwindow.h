@@ -21,6 +21,7 @@
 #include "knobData.h"
 #include "mutexKnobData.h"
 #include "ui_main.h"
+#include <stdio.h>
 
  class FileOpenWindow : public QMainWindow
  {
@@ -41,6 +42,10 @@
      void Callback_OpenNewFile(const QString&, const QString&);
      void checkForMessage();
      void Callback_PVwindowExit();
+
+ public slots:
+     void doSomething() { printf("About to quit!\n"); sharedMemory.detach();}
+
 
  protected:
 
