@@ -45,7 +45,7 @@ MutexKnobData:: ~MutexKnobData()
 void MutexKnobData::ReAllocate(int oldsize, int newsize, void **ptr)
 {
     void *tmp;
-
+    //printf("reallocate for %d size\n", newsize);
     tmp = (void *) malloc(newsize);
     if(oldsize > 0) {
         memcpy(tmp, *ptr, oldsize);
@@ -154,7 +154,9 @@ int MutexKnobData::GetMutexKnobDataIndex()
     oldsize=KnobDataArraySize;
     KnobDataArraySize+=200;
     newsize = KnobDataArraySize;
-    ReAllocate(oldsize * sizeof(knobData), newsize * sizeof(knobData), (void**) &(KnobData));
+    void *p = &KnobData;
+    //ReAllocate(oldsize * sizeof(knobData), newsize * sizeof(knobData), (void**) &KnobData);
+    ReAllocate(oldsize * sizeof(knobData), newsize * sizeof(knobData), (void**) p);
     for(int i=oldsize; i < newsize; i++){
         KnobData[i].index  = -1;
     }
@@ -307,8 +309,13 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 fec[0] = '\0';
                 dataString[0] = '\0';
                 int index = kPtr->index;
-                kPtr->edata.displayCount = kPtr->edata.monitorCount;
-                UpdateWidget(index, (QWidget*) kPtr->dispW, units, fec, dataString, KnobData[index]);
+                // brake unconnected displays
+                if(kPtr->edata.unconnectCount == 0) {
+                  kPtr->edata.displayCount = kPtr->edata.monitorCount;
+                  UpdateWidget(index, (QWidget*) kPtr->dispW, units, fec, dataString, KnobData[index]);
+                }
+                kPtr->edata.unconnectCount++;
+                if(kPtr->edata.unconnectCount == 10) kPtr->edata.unconnectCount=0;
             }
         }
     }
