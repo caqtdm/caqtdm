@@ -88,6 +88,22 @@ typedef struct _connectInfo {
     break; \
     }
 
+#define QStringsToChars(x,y,z) \
+  char param1[MAXPVLEN], param2[255], param3[80]; \
+  int size1, size2, size3; \
+  QByteArray Parameter_1 = x.toAscii().constData(); \
+  QByteArray Parameter_2 = y.toAscii().constData(); \
+  QByteArray Parameter_3 = z.toAscii().constData(); \
+  size1 = qMin(Parameter_1.size(), MAXPVLEN); \
+  size2 = qMin(Parameter_2.size(), 255); \
+  size3 = qMin(Parameter_3.size(), 80); \
+  strncpy(param1, Parameter_1.constData(), size1); \
+  strncpy(param2, Parameter_2.constData(), size2); \
+  strncpy(param3, Parameter_3.constData(), size3); \
+  param1[size1] = '\0'; \
+  param2[size2] = '\0'; \
+  param3[size3] = '\0';
+
 //===============================================================================================
 
 Q_DECLARE_METATYPE(QList<int>)
@@ -239,6 +255,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
  */
 void CaQtDM_Lib::timerEvent(QTimerEvent *event)
 {
+    Q_UNUSED(event);
 }
 
 /**
@@ -1414,6 +1431,8 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                                        const QString& String,
                                        const knobData& data)
 {
+    Q_UNUSED(indx);
+    Q_UNUSED(fec);
     /*
     knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer for getting all necessary information
 */
@@ -1452,14 +1471,32 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         // menu ==================================================================================================================
     } else if (caMenu *widget = qobject_cast<caMenu *>(w)) {
-        //qDebug() << "we have a menu" << String << value;
+        //qDebug() << "we have a menu";
 
-        QStringList stringlist = String.split( ";");
-        // set enum strings
-        if(data.edata.fieldtype == caENUM) {
-            widget->populateCells(stringlist);
-            if(widget->getLabelDisplay()) widget->setCurrentIndex(0);
-            else widget->setCurrentIndex((int) data.edata.ivalue);
+        if(data.edata.connected) {
+          QStringList stringlist = String.split( ";");
+          // set enum strings
+          if(data.edata.fieldtype == caENUM) {
+              widget->populateCells(stringlist);
+              if(widget->getLabelDisplay()) widget->setCurrentIndex(0);
+              else widget->setCurrentIndex((int) data.edata.ivalue);
+
+              if (widget->getColorMode() == caMenu::Alarm) {
+                      widget->setAlarmColors(data.edata.severity);
+                  // case of static mode
+              } else {
+                  // done at initialisation, we have to set it back after no connect
+                  if(!widget->property("Connect").value<bool>()) {
+                      widget->setNormalColors();
+                      widget->setProperty("Connect", true);
+                  }
+              }
+          }
+
+          // set no connection color
+        } else {
+          widget->setAlarmColors(NOTCONNECTED);
+          widget->setProperty("Connect", false);
         }
         widget->setAccessW(data.edata.accessW);
 
@@ -1467,10 +1504,26 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
     } else if (caChoice *widget = qobject_cast<caChoice *>(w)) {
         //qDebug() << "we have a choiceButton" << String << value;
 
-        QStringList stringlist = String.split( ";");
-        // set enum strings
-        if(data.edata.fieldtype == caENUM) {
-            widget->populateCells(stringlist, (int) data.edata.ivalue);
+        if(data.edata.connected) {
+          QStringList stringlist = String.split( ";");
+          // set enum strings
+          if(data.edata.fieldtype == caENUM) {
+              widget->populateCells(stringlist, (int) data.edata.ivalue);
+              if (widget->getColorMode() == caChoice::Alarm) {
+                      widget->setAlarmColors(data.edata.severity);
+                  // case of static mode
+              } else {
+                  // done at initialisation, we have to set it back after no connect
+                  if(!widget->property("Connect").value<bool>()) {
+                      widget->setNormalColors();
+                      widget->setProperty("Connect", true);
+                  }
+              }
+          }
+        // set no connection color
+        } else {
+          widget->setAlarmColors(NOTCONNECTED);
+          widget->setProperty("Connect", false);
         }
         widget->setAccessW(data.edata.accessW);
 
@@ -1509,9 +1562,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             } else {
                 // done at initialisation, we have to set it back after no connect
                 if(!widget->property("Connect").value<bool>()) {
-                    QColor fg = widget->getForeground();
-                    QColor bg = widget->getBackground();
-                    widget->setColors(bg, fg);
+                    widget->setNormalColors();
                     widget->setProperty("Connect", true);
                 }
             }
@@ -1559,9 +1610,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             } else {
                 // done at initialisation, we have to set it back after no connect
                 if(!widget->property("Connect").value<bool>()) {
-                    QColor fg = widget->getForeground();
-                    QColor bg = widget->getBackground();
-                    widget->setColors(bg, fg);
+                    widget->setNormalColors();
                     widget->setProperty("Connect", true);
                 }
             }
@@ -2050,8 +2099,23 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
     } else if (caMessageButton *widget = qobject_cast<caMessageButton *>(w)) {
 
         if(data.edata.connected) {
-            widget->setAccessW(data.edata.accessW);
+              if (widget->getColorMode() == caMessageButton::Alarm) {
+                      widget->setAlarmColors(data.edata.severity);
+                  // case of static mode
+              } else {
+                  // done at initialisation, we have to set it back after no connect
+                  if(!widget->property("Connect").value<bool>()) {
+                      widget->setNormalColors();
+                      widget->setProperty("Connect", true);
+                  }
+              }
+
+          // set no connection color
+        } else {
+          widget->setAlarmColors(NOTCONNECTED);
+          widget->setProperty("Connect", false);
         }
+        widget->setAccessW(data.edata.accessW);
 
         // something else (user defined monitors with non ca widgets ?) ==============================================
     } else {
@@ -2068,8 +2132,9 @@ void CaQtDM_Lib::Callback_EApplyNumeric(double value)
     caApplyNumeric *numeric = qobject_cast<caApplyNumeric *>(sender());
     if(numeric->getPV().length() > 0) {
         //qDebug() << numeric->objectName() << numeric->getPV() << value;
-        EpicsSetValue((char*) numeric->getPV().toAscii().constData(), value, 0, "",
-                      (char*) numeric->objectName().toLower().toAscii().constData(), errmess);
+        QString text("");
+        QStringsToChars(numeric->getPV(), text, numeric->objectName().toLower());
+        EpicsSetValue(param1, value, 0, param2, param3, errmess);
     }
 }
 /**
@@ -2082,8 +2147,9 @@ void CaQtDM_Lib::Callback_ENumeric(double value)
 
     if(numeric->getPV().length() > 0) {
         //qDebug() << numeric->objectName() << numeric->getPV() << value;
-        EpicsSetValue((char*) numeric->getPV().toAscii().constData(), value, 0, "",
-                      (char*) numeric->objectName().toLower().toAscii().constData(), errmess);
+        QString text(" ");
+        QStringsToChars(numeric->getPV(), text, numeric->objectName().toLower());
+        EpicsSetValue(param1, value, 0, param2, param3, errmess);
     }
 }
 
@@ -2097,8 +2163,9 @@ void CaQtDM_Lib::Callback_Slider(double value)
 
     if(numeric->getPV().length() > 0) {
         //qDebug() << numeric->objectName() << numeric->getPV() << value;
-        EpicsSetValue((char*) numeric->getPV().toAscii().constData(), value, 0, "",
-                      (char*) numeric->objectName().toLower().toAscii().constData(), errmess);
+        QString text(" ");
+        QStringsToChars(numeric->getPV(), text, numeric->objectName().toLower());
+        EpicsSetValue(param1, value, 0, param2, param3, errmess);
     }
 }
 
@@ -2120,9 +2187,11 @@ void CaQtDM_Lib::Callback_ChoiceClicked(const QString& text)
     char errmess[255];
     caChoice *choice = qobject_cast<caChoice *>(sender());
     QString pv = choice->getPV();
-    //qDebug() << "choicecallback" << text << choice << choice->getPV();
-    EpicsSetValue((char*) pv.toAscii().constData(), 0.0, 0, (char*) text.toAscii().constData(),
-                  (char*) choice->objectName().toLower().toAscii().constData(), errmess);
+    if(choice->getPV().length() > 0) {
+        //qDebug() << "choice_clicked" << text << choice->getPV();
+        QStringsToChars(choice->getPV(), text,  choice->objectName().toLower());
+        EpicsSetValue(param1, 0.0, 0, param2, param3, errmess);
+    }
 }
 
 /**
@@ -2132,10 +2201,12 @@ void CaQtDM_Lib::Callback_MenuClicked(const QString& text)
 {
     char errmess[255];
     caMenu *menu = qobject_cast<caMenu *>(sender());
-    QString pv = menu->getPV();
-    //qDebug() << "menu_clicked" << text << pv;
-    EpicsSetValue((char*) pv.toAscii().constData(), 0.0, 0, (char*) text.toAscii().constData(),
-                  (char*) menu->objectName().toLower().toAscii().constData(), errmess);
+
+    if(menu->getPV().length() > 0) {
+      //qDebug() << "menu_clicked" << text << menu->getPV();
+      QStringsToChars(menu->getPV(), text,  menu->objectName().toLower());
+      EpicsSetValue(param1, 0.0, 0, param2, param3, errmess);
+    }
     // display label again when configured with it
     if(menu->getLabelDisplay()) {
         menu->setCurrentIndex(0);
@@ -2283,6 +2354,7 @@ void CaQtDM_Lib::processError(QProcess::ProcessError err)
   */
 void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
 {
+    Q_UNUSED(ce);
     for(int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
 
         knobData kData =  mutexKnobData->GetMutexKnobData(i);
@@ -2339,7 +2411,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     int precMode = false;
     int limitsMode = false;
     int Precision = 0;
-    char *caTypeStr[] = {"DBF_STRING", "DBF_INT", "DBF_FLOAT", "DBF_ENUM", "DBF_CHAR", "DBF_LONG", "DBF_DOUBLE"};
+    const char *caTypeStr[] = {"DBF_STRING", "DBF_INT", "DBF_FLOAT", "DBF_ENUM", "DBF_CHAR", "DBF_LONG", "DBF_DOUBLE"};
     char colMode[20] = {""};
     double limitsMax=0.0, limitsMin=0.0;
 
@@ -2672,7 +2744,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
   */
 void CaQtDM_Lib::ShowContextMenu(const QPoint& position) // this is a slot
 {
-    //qDebug() << "ShowContextMenu" << position;
+    Q_UNUSED(position);
     DisplayContextMenu(qobject_cast<QWidget *>(sender()));
 }
 
