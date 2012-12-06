@@ -717,7 +717,8 @@ static void medmAcquisition(short *own_prot, int *devIOFunc, pioDevices *Cells, 
 
     /* qsort the cells according to the ioc */
 
-    qsort(SortCells, *Nbcells, sizeof(pioDevices), PIOcmpF);
+    qsort(SortCells, *Nbcells, sizeof(pioDevices), (int (*)(const void *, const void *))PIOcmpF);
+
     strcpy(prvFec, " ");
     prvFec[6] = '\0';
     actFec[6] = '\0';
@@ -797,12 +798,12 @@ static void etherReceive(pioStatusB *iosb, pio_ethbuf *irbb)
     DSC trtnodD  = { 6, 0, 0, trtnod};
     pioDevices      ReceiveCells[MAX_DEVS];
     int             aLen, dLen;
-    char           auxAtt[5], auxDev[9];
+    char            auxAtt[5], auxDev[9];
 
     maxDevices = MAX_DEVS;
     error = 1;
     pioreq_analyze_extended(&iosb->trans, &irbb->head.bytecount, &maxDevices, &listNumber,
-                            &devIOF, &repTick, &numDevs, &ReceiveCells, &error, &ident,
+                            &devIOF, &repTick, &numDevs, ReceiveCells, &error, &ident,
                             &totaldev, &totalfec, &tffunc);
     if (error != 1) {
         GET_ETHER_ADDPROT(&AddPro);
