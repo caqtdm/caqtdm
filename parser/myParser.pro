@@ -8,9 +8,11 @@ DESTDIR = .
 # Input
 HEADERS += XmlWriter.h parser.h \
     myParser.h \
-    QtProperties.h
+    QtProperties.h \
+    dmsearchfile.h
 SOURCES += myParser.cpp XmlWriter.cpp parser.c \
-    QtProperties.c
+    QtProperties.c \
+    dmsearchfile.cpp
 
 TARGET = adl2ui
 

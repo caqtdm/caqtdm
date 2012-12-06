@@ -396,33 +396,33 @@ void parseDynAttrMod(DisplayInfo *displayInfo, char *widget)
     int nestingLevel = 0;
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    if(!strcmp(token,"clr")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
-		if(!strcmp(token,"discrete")){
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
+            if(!strcmp(token,"clr")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                if(!strcmp(token,"discrete")){
                     Qt_handleString("ColorMode", "value", "Discrete");
                 } else if(!strcmp(token,"static")) {
                     Qt_handleString("ColorMode", "value", "Static");
                 } else if(!strcmp(token,"alarm")) {
                     Qt_handleString("ColorMode", "value", "ALarm_Default");
                 }
-	    } else if(!strcmp(token,"vis")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"vis")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 Qt_setVisibilityMode(widget, token);
-	    }
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            }
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 }
@@ -436,38 +436,38 @@ void parseDynAttrParam(DisplayInfo *displayInfo, char *widget)
     char chanName[6];
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    for(i=0; i < MAX_CALC_RECORDS; i++) {
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
+            for(i=0; i < MAX_CALC_RECORDS; i++) {
                 /* Names are chan, chanB, chanC, etc. */
-		sprintf(chanName,"chan%c",i?'A'+i:'\0');
-		if(!strcmp(token,chanName)) {
-		    getToken(displayInfo,token);
-		    getToken(displayInfo,token);
-		    if(token[0]) {
+                sprintf(chanName,"chan%c",i?'A'+i:'\0');
+                if(!strcmp(token,chanName)) {
+                    getToken(displayInfo,token);
+                    getToken(displayInfo,token);
+                    if(token[0]) {
                         Qt_handleString(chanName, "string", token);
-			break;
-		    }
-		}
-		if(!strcmp(token,"calc")) {
-		    getToken(displayInfo,token);
-		    getToken(displayInfo,token);
-		    if(token[0]) {
+                        break;
+                    }
+                }
+                if(!strcmp(token,"calc")) {
+                    getToken(displayInfo,token);
+                    getToken(displayInfo,token);
+                    if(token[0]) {
                         Qt_handleString(chanName, "calc", token);
-			break;
-		    }
-		}
-	    }
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+                        break;
+                    }
+                }
+            }
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 }
@@ -479,48 +479,48 @@ void parseAttr(DisplayInfo *displayInfo, char *widget)
     int nestingLevel = 0;
     ;
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    if(!strcmp(token,"clr")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
+            if(!strcmp(token,"clr")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 int clr = atoi(token) % DL_MAX_COLORS;
                 Qt_setColorForeground("",displayInfo->dlColormap->dl_color[clr].r,
                                       displayInfo->dlColormap->dl_color[clr].g,
                                       displayInfo->dlColormap->dl_color[clr].b,
                                       255);
 
-	    } else if(!strcmp(token,"style")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
-		if(!strcmp(token,"solid")) {
+            } else if(!strcmp(token,"style")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                if(!strcmp(token,"solid")) {
                     Qt_handleString("linestyle", "string", "Solid");
-		} else if(!strcmp(token,"dash")) {
+                } else if(!strcmp(token,"dash")) {
                     Qt_handleString("linestyle", "string", "Dash");
-		}
-	    } else if(!strcmp(token,"fill")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
-		if(!strcmp(token,"solid")) {
+                }
+            } else if(!strcmp(token,"fill")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                if(!strcmp(token,"solid")) {
                     Qt_handleString("fillstyle", "string", "Filled");
-		} else if(!strcmp(token,"outline")) {
+                } else if(!strcmp(token,"outline")) {
                     Qt_handleString("fillstyle", "string", "Outline");
-		}
-	    } else if(!strcmp(token,"width")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+                }
+            } else if(!strcmp(token,"width")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 Qt_handleString("width", "string", token);
-	    }
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            }
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) ) ;     /* Do nothing */
 }
@@ -532,23 +532,23 @@ void parseDynamicAttr(DisplayInfo *displayInfo, char *widget)
     int nestingLevel = 0;
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    if(!strcmp(token,"mod")) {
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
+            if(!strcmp(token,"mod")) {
                 parseDynAttrMod(displayInfo, widget);
-	    } else if(!strcmp(token,"param")) {
+            } else if(!strcmp(token,"param")) {
                 parseDynAttrParam(displayInfo, widget);
-	    }
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            }
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 }
@@ -560,17 +560,17 @@ void parseMonitor(DisplayInfo *displayInfo, char *widget)
     int nestingLevel = 0;
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    if (!strcmp(token,"rdbk") ||
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
+            if (!strcmp(token,"rdbk") ||
                     !strcmp(token,"chan")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 Qt_handleString("channel", "string", token);
 
-	    } else if (!strcmp(token,"clr")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if (!strcmp(token,"clr")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 int clr = atoi(token) % DL_MAX_COLORS;
 
                 Qt_setColorForeground("", displayInfo->dlColormap->dl_color[clr].r,
@@ -578,9 +578,9 @@ void parseMonitor(DisplayInfo *displayInfo, char *widget)
                                       displayInfo->dlColormap->dl_color[clr].b,
                                       255);
 
-	    } else if (!strcmp(token,"bclr")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if (!strcmp(token,"bclr")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 int bclr = atoi(token) % DL_MAX_COLORS;
 
                 Qt_setColorBackground("", displayInfo->dlColormap->dl_color[bclr].r,
@@ -588,17 +588,17 @@ void parseMonitor(DisplayInfo *displayInfo, char *widget)
                                       displayInfo->dlColormap->dl_color[bclr].b,
                                       255);
 
-	    }
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            }
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while ( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
               && (tokenType != T_EOF) );
 }
@@ -616,35 +616,35 @@ void parseBasicAttribute(DisplayInfo *displayInfo, char *widget)
     strcpy(linestyle, "solid");
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    if(!strcmp(token,"clr")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
+            if(!strcmp(token,"clr")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 clr= atoi(token) % DL_MAX_COLORS;
-	    } else if(!strcmp(token,"style")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"style")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 strcpy(linestyle, token);
-	    } else if(!strcmp(token,"fill")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"fill")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 strcpy(fillstyle, token);
-	    } else if(!strcmp(token,"width")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"width")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 Qt_handleString("lineSize", "number", token);
-	    }
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            }
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -715,49 +715,49 @@ void parseLimits(DisplayInfo *displayInfo, char *widget, int pen, int DoNotWrite
     int loprDefault = False;
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    if(!strcmp(token,"loprSrc")) {
-		getToken(displayInfo,token);
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
+            if(!strcmp(token,"loprSrc")) {
+                getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 loprSrc = True;
                 Qt_setMinimumLimitSource(widget, pen, token);
-	    } else if(!strcmp(token,"loprDefault")) {
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"loprDefault")) {
+                getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 Qt_setMinimumLimit(widget, pen, token);
                 loprDefault= True;
-	    } else if(!strcmp(token,"hoprSrc")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"hoprSrc")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 hoprSrc = True;
                 Qt_setMaximumLimitSource(widget, pen, token);
-	    } else if(!strcmp(token,"hoprDefault")) {
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"hoprDefault")) {
+                getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 Qt_setMaximumLimit(widget, pen, token);
                 hoprDefault= True;
-	    } else if(!strcmp(token,"precSrc")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"precSrc")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 precSrc = True;
                 if(!DoNotWritePrec)Qt_setPrecisionSource(widget, pen, token);
-	    } else if(!strcmp(token,"precDefault")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"precDefault")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 if(!DoNotWritePrec) Qt_setPrecision(widget, pen, token);
                 precDefault = True;
-	    }
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            }
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -788,50 +788,50 @@ void parseDynamicAttribute(DisplayInfo *displayInfo, char *widget, int *visibili
     *visibilityStatic = 0;  // default is first layer
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    if(!strcmp(token,"clr")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
+            if(!strcmp(token,"clr")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 *visibilityStatic = Qt_setColorMode(widget, token);
-	    } else if(!strcmp(token,"vis")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"vis")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 Qt_setVisibilityMode(widget, token);
-	    } else if(!strcmp(token,"calc")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
-		if((strlen(token) > (size_t)0)) {
+            } else if(!strcmp(token,"calc")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                if((strlen(token) > (size_t)0)) {
                     Qt_handleString("visibilityCalc", "string", token);
-		}
-	    } else {
+                }
+            } else {
                 /* Channel names */
-		int i;
+                int i;
                 char chanName[10];
 
-		for(i=0; i < MAX_CALC_RECORDS; i++) {
+                for(i=0; i < MAX_CALC_RECORDS; i++) {
                     /* Names are chan, chanB, chanC, etc. */
-		    sprintf(chanName,"chan%c",i?'A'+i:'\0');
-		    if(!strcmp(token,chanName)) {
-			getToken(displayInfo,token);
-			getToken(displayInfo,token);
-			if((strlen(token) > (size_t)0)) {
+                    sprintf(chanName,"chan%c",i?'A'+i:'\0');
+                    if(!strcmp(token,chanName)) {
+                        getToken(displayInfo,token);
+                        getToken(displayInfo,token);
+                        if((strlen(token) > (size_t)0)) {
                             sprintf(chanName,"channel%c",i?'A'+i:'\0');
                             Qt_handleString(chanName, "string", token);
-			}
-		    }
-		}
-	    }
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+                        }
+                    }
+                }
+            }
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 }
@@ -886,31 +886,31 @@ void parseGrid(DisplayInfo *displayInfo, char *widget)
     int nestingLevel = 0;
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    if(!strcmp(token,"gridSpacing")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
+            if(!strcmp(token,"gridSpacing")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 //grid->gridSpacing = atoi(token);
-	    } else if(!strcmp(token,"gridOn")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
-		//grid->gridOn = atoi(token);
-	    } else if(!strcmp(token,"snapToGrid")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
-		//grid->snapToGrid = atoi(token);
-	    }
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            } else if(!strcmp(token,"gridOn")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                //grid->gridOn = atoi(token);
+            } else if(!strcmp(token,"snapToGrid")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                //grid->snapToGrid = atoi(token);
+            }
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 }
@@ -971,37 +971,37 @@ void parseObject(DisplayInfo *displayInfo, DlObject *object)
     //Qt_writeOpenTag("rect", "", "");
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    if(!strcmp(token,"x")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
+            if(!strcmp(token,"x")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 object->x = atoi(token);
-	    } else if(!strcmp(token,"y")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"y")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 object->y = atoi(token);
-	    } else if(!strcmp(token,"width")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"width")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 object->width = atoi(token);
                 if(object->width < 1) object->width=1;   // oh; line without thickness
-	    } else if(!strcmp(token,"height")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"height")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 object->height = atoi(token);
                 if(object->height < 1) object->height=1;   // oh; line without thickness
-	    }
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            }
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -1659,39 +1659,39 @@ void *parseMeter(DisplayInfo *displayInfo, FrameOffset * offset)
     Qt_writeOpenTag("widget", "caCircularGauge", widgetName);
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
             if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, offset, "caCircularGauge", True);
             } else if(!strcmp(token,"monitor")) {
                 parseMonitor(displayInfo, "caCircularGauge");
             } else if(!strcmp(token,"label")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
 
                 // labeltype none, no decorations, outline, limits, channel
                 // Qt_handleString("labelType", "enum", token);
 
-	    } else if(!strcmp(token,"clrmod")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"clrmod")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 strcpy(COLORMODE, token);
-	    } else if(!strcmp(token,"limits")) {
+            } else if(!strcmp(token,"limits")) {
                 parseLimits(displayInfo, "caCircularGauge", 0, False);
-	    }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            }
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -1720,20 +1720,20 @@ void *parseByte( DisplayInfo *displayInfo, FrameOffset * offset) {
     Qt_writeOpenTag("widget", "caByte", widgetName);
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    if(!strcmp(token,"object")) {
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
+            if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, offset, "caByte", True);
-	    } else if(!strcmp(token,"monitor")) {
+            } else if(!strcmp(token,"monitor")) {
                 parseMonitor(displayInfo, "caByte");
-	    } else if(!strcmp(token,"clrmod")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"clrmod")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 strcpy(COLORMODE, token);
-	    } else if(!strcmp(token,"direction")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"direction")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 if(!strcmp(token,"up")) {
                     strcpy(direction, "Up");
                 } else if(!strcmp(token,"right")) {
@@ -1743,29 +1743,29 @@ void *parseByte( DisplayInfo *displayInfo, FrameOffset * offset) {
                 } else if(!strcmp(token,"left")) {
                     strcpy(direction, "Left");
                 }
-	    } else if(!strcmp(token,"sbit")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"sbit")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 sbitFound = True;
                 Qt_handleString("startBit", "number", token);
-	    } else if(!strcmp(token,"ebit")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"ebit")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 ebitFound = True;
                 Qt_handleString("endBit", "number", token);
-	    }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
+            }
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
         default:
-	    break;
-	}
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -1801,41 +1801,41 @@ void *parseStripChart(DisplayInfo *displayInfo, FrameOffset * offset)
     Qt_writeOpenTag("widget", "caStripPlot", widgetName);
 
     do {
-	switch( (tokenType=getToken(displayInfo, token)) ) {
-	case T_WORD:
-	    if(!strcmp(token, "object")) {
+        switch( (tokenType=getToken(displayInfo, token)) ) {
+        case T_WORD:
+            if(!strcmp(token, "object")) {
                 parseObject(displayInfo,  &object);
                 writeRectangleDimensions(&object, offset, "caStripPlot", True);
             } else if(!strcmp(token, "plotcom")) {
                 parsePlotcom(displayInfo, "caStripPlot");
             } else if(!strcmp(token, "period")) {
-		getToken(displayInfo, token);
-		getToken(displayInfo, token);
+                getToken(displayInfo, token);
+                getToken(displayInfo, token);
                 strcpy(periodValue, token);
-	    } else if(!strcmp(token, "delay")) {
-		getToken(displayInfo, token);
-		getToken(displayInfo, token);
+            } else if(!strcmp(token, "delay")) {
+                getToken(displayInfo, token);
+                getToken(displayInfo, token);
                 Qt_handleString("delay", "enum", token);
             } else if(!strcmp(token, "units")) {
-		getToken(displayInfo, token);
-		getToken(displayInfo, token);
+                getToken(displayInfo, token);
+                getToken(displayInfo, token);
                 strcpy(periodUnits, token);
-	    } else if(!strncmp(token, "pen", 3)) {
-		penNumber = MIN(token[4] - '0', MAX_PENS-1);
+            } else if(!strncmp(token, "pen", 3)) {
+                penNumber = MIN(token[4] - '0', MAX_PENS-1);
                 parsePen(displayInfo, penNumber, channels, "caStripPlot");
-	    }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            }
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -1883,22 +1883,22 @@ void *parseTextUpdate(DisplayInfo *displayInfo, FrameOffset * offset)
     Qt_writeOpenTag("widget", "caLineEdit", widgetName);
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    if(!strcmp(token,"object")) {
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
+            if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, offset, "caLineEdit", True);
                 Qt_handleString("fontScaleMode", "enum", "caLineEdit::Height");
-	    } else if(!strcmp(token,"monitor")) {
+            } else if(!strcmp(token,"monitor")) {
                 parseMonitor(displayInfo, "caLineEdit");
-	    } else if(!strcmp(token,"clrmod")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"clrmod")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 strcpy(COLORMODE, token);
-	    } else if(!strcmp(token,"format")) {
+            } else if(!strcmp(token,"format")) {
                 int found=0;
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 for(i=0;i<nbFormats; i++) {
                     if(!strcmp(token, formatTable[i])) {
                         format = i;
@@ -1924,9 +1924,9 @@ void *parseTextUpdate(DisplayInfo *displayInfo, FrameOffset * offset)
                         format = 5;
                     }
                 }
-	    } else if(!strcmp(token,"align")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"align")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 if(strstr(token, "left") != (char*) 0) {
                     alignFound = True;
                     Qt_handleString("alignment", "set", "Qt::AlignAbsolute|Qt::AlignLeft|Qt::AlignVCenter");
@@ -1938,21 +1938,21 @@ void *parseTextUpdate(DisplayInfo *displayInfo, FrameOffset * offset)
                     Qt_handleString("alignment", "set", "Qt::AlignAbsolute|Qt::AlignRight|Qt::AlignVCenter");
                 }
 
-	    } else if(!strcmp(token,"limits")) {
+            } else if(!strcmp(token,"limits")) {
                 parseLimits(displayInfo, "caLineEdit", 0, False);
-	    }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            }
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -1982,20 +1982,20 @@ void *parseChoiceButton(DisplayInfo *displayInfo, FrameOffset * offset)
     Qt_writeOpenTag("widget", "caChoice", widgetName);
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
             if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, offset, "caChoice", True);
             } else if(!strcmp(token,"control")) {
                 parseControl(displayInfo, "caChoice");
             } else if(!strcmp(token,"clrmod")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 strcpy(COLORMODE, token);
-	    } else if(!strcmp(token,"stacking")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"stacking")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 if(!strcmp(token,"row")) {
                     Qt_handleString("stackingMode", "enum", "Row");
                 } else if(!strcmp(token,"column")) {
@@ -2003,19 +2003,19 @@ void *parseChoiceButton(DisplayInfo *displayInfo, FrameOffset * offset)
                 } else if(!strcmp(token,"row column")) {
                     Qt_handleString("stackingMode", "enum", "RowColumn");
                 }
-	    }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            }
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -2040,42 +2040,42 @@ void *parseMessageButton(DisplayInfo *displayInfo, FrameOffset * offset)
     Qt_writeOpenTag("widget", "caMessageButton", widgetName);
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
             if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, offset, "caMessageButton", True);
             } else if(!strcmp(token,"control")) {
                 parseControl(displayInfo, "caMessageButton");
             } else if(!strcmp(token,"press_msg")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 Qt_handleString("pressMessage", "string", token);
-	    } else if(!strcmp(token,"release_msg")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"release_msg")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 Qt_handleString("releaseMessage", "string", token);
-	    } else if(!strcmp(token,"label")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"label")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 Qt_handleString("label", "string", token);
-	    } else if(!strcmp(token,"clrmod")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"clrmod")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 strcpy(COLORMODE, token);
-	    }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            }
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -2101,35 +2101,35 @@ void *parseMenu(DisplayInfo *displayInfo, FrameOffset * offset)
     Qt_writeOpenTag("widget", "caMenu", widgetName);
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
             if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, offset, "caMenu", True);
             } else if(!strcmp(token,"control")) {
                 parseControl(displayInfo, "caMenu");
             } else if(!strcmp(token,"clrmod")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 strcpy(COLORMODE, token);
-	    }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            }
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
 
-     Qt_setColorMode("caMenu", COLORMODE);
+    Qt_setColorMode("caMenu", COLORMODE);
     // case for proscan
     if(generateDeviceOnMenus) Qt_handleString("labelDisplay", "bool", "true");
 
@@ -2154,8 +2154,8 @@ void *parseTextEntry(DisplayInfo *displayInfo, FrameOffset * offset)
     Qt_writeOpenTag("widget", "caTextEntry", widgetName);
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
             if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, offset, "caLineEdit", True);
@@ -2163,33 +2163,33 @@ void *parseTextEntry(DisplayInfo *displayInfo, FrameOffset * offset)
             } else if(!strcmp(token,"control")) {
                 parseControl(displayInfo, "caTextEntry");
             } else if(!strcmp(token,"clrmod")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 strcpy(COLORMODE, token);
-	    } else if(!strcmp(token,"format")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"format")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 for(i=0;i<nbFormats; i++) {
                     if(!strcmp(token, formatTable[i])) {
                         format = i;
                         break;
                     }
                 }
-	    } else if(!strcmp(token,"limits")) {
+            } else if(!strcmp(token,"limits")) {
                 parseLimits(displayInfo, "caLineEdit", 0, False);
-	    }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            }
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -2218,16 +2218,16 @@ void *parseValuator(DisplayInfo *displayInfo, FrameOffset * offset)
     Qt_writeOpenTag("widget", "caSlider", widgetName);
 
     do {
-	switch((tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
+        switch((tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
             if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, offset, "caSlider", True);
             } else if(!strcmp(token,"control")) {
                 parseControl(displayInfo, "caSlider");
             } else if(!strcmp(token,"label")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 if(!strcmp(token,"none")) {
                     strcpy(look, "noLabel");
                 } else if(!strcmp(token,"no decorations")) {
@@ -2241,13 +2241,13 @@ void *parseValuator(DisplayInfo *displayInfo, FrameOffset * offset)
                         strcpy(look, "channelV");
                     }
                 }
-	    } else if(!strcmp(token,"clrmod")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"clrmod")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 strcpy(COLORMODE, token);
-	    } else  if(!strcmp(token,"direction")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else  if(!strcmp(token,"direction")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
 
                 if(!strcmp(token,"up")) {
                     strcpy(direction, "Up");
@@ -2260,25 +2260,25 @@ void *parseValuator(DisplayInfo *displayInfo, FrameOffset * offset)
                 }
 
 
-	    } else if(!strcmp(token,"dPrecision")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"dPrecision")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 //dlValuator->dPrecision = atof(token);
-	    } else if(!strcmp(token,"limits")) {
+            } else if(!strcmp(token,"limits")) {
                 parseLimits(displayInfo,  "caSlider", 0, False);
-	    }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            }
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while((tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
             && (tokenType != T_EOF) );
 
@@ -2309,10 +2309,10 @@ void parseControl(DisplayInfo *displayInfo, char *widget)
 
     do {
         switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
+        case T_WORD:
             if (!strcmp(token,"ctrl") || !strcmp(token,"chan")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 //printf("==================== token = <%s>\n", token);
                 // specialty for proscan, we added bitstart and bitend to the channel sperated by a blanc
                 // and separated with a comma
@@ -2327,40 +2327,42 @@ void parseControl(DisplayInfo *displayInfo, char *widget)
                         Qt_handleString("endBit", "number", items[1]);
                     }
                 }
-	    } else if (!strcmp(token,"clr")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
-                if((!strcmp(widget, "caTextEntry")) || (!strcmp(widget, "caMessageButton"))) {
+            } else if (!strcmp(token,"clr")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                if((!strcmp(widget, "caTextEntry")) || (!strcmp(widget, "caMessageButton")) || (!strcmp(widget, "caChoice")) ||
+                   (!strcmp(widget, "caMenu")) || (!strcmp(widget, "caNumeric"))) {
                     int clr = atoi(token) % DL_MAX_COLORS;
                     Qt_setColorForeground("",displayInfo->dlColormap->dl_color[clr].r,
                                           displayInfo->dlColormap->dl_color[clr].g,
                                           displayInfo->dlColormap->dl_color[clr].b,
                                           255);
                 } else {
-                    //printf("adl2ui -- color  for control %s not supported (use stylesheet)\n", widget);
+                    printf("adl2ui -- forecolor  for control %s not supported (use stylesheet)\n", widget);
                 }
-	    } else if (!strcmp(token,"bclr")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
-                if((!strcmp(widget, "caTextEntry")) || (!strcmp(widget, "caMessageButton"))) {
+            } else if (!strcmp(token,"bclr")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                if((!strcmp(widget, "caTextEntry")) || (!strcmp(widget, "caMessageButton"))|| (!strcmp(widget, "caChoice")) ||
+                   (!strcmp(widget, "caMenu")) || (!strcmp(widget, "caNumeric"))) {
                     int bclr = atoi(token) % DL_MAX_COLORS;
                     Qt_setColorBackground("",displayInfo->dlColormap->dl_color[bclr].r,
                                           displayInfo->dlColormap->dl_color[bclr].g,
                                           displayInfo->dlColormap->dl_color[bclr].b,
                                           255);
                 } else {
-                    //printf("adl2ui -- color  for control %s not supported (use stylesheet)\n", widget);
+                    //printf("adl2ui -- backcolor  for control %s not supported (use stylesheet)\n", widget);
                 }
-	    }
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
+            }
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
         }
     } while ( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
               && (tokenType != T_EOF) );
@@ -2381,35 +2383,35 @@ void *parseImage(DisplayInfo *displayInfo, FrameOffset * offset)
 
     do {
         switch( (tokenType = getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    if(!strcmp(token,"object")) {
+        case T_WORD:
+            if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, offset, "caImage", True);
-	    } else if(!strcmp(token,"dynamic attribute")) {
+            } else if(!strcmp(token,"dynamic attribute")) {
                 parseDynamicAttribute(displayInfo,"caImage", &visibilityStatic);
-	    } else if(!strcmp(token,"type")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
-	    } else if(!strcmp(token,"image name")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"type")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
+            } else if(!strcmp(token,"image name")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 Qt_handleString("filename", "string", token);
-	    } else if(!strcmp(token,"calc")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"calc")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 Qt_handleString("imageCalc", "string", token);
-	    }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
+            }
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
         }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
@@ -2653,9 +2655,9 @@ void *parseComposite(DisplayInfo *displayInfo, FrameOffset *offset)
 
     do {
         switch(tokenType=getToken(displayInfo,token)) {
-	case T_WORD:
+        case T_WORD:
 
-	    if(!strcmp(token,"object")) {
+            if(!strcmp(token,"object")) {
 
                 parseObject(displayInfo, object);
                 // do not write yet any dimensions, have to be delayed for composite file to add width and height
@@ -2663,30 +2665,30 @@ void *parseComposite(DisplayInfo *displayInfo, FrameOffset *offset)
                 actoffset->frameX = object->x;
                 actoffset->frameY = object->y;
                 offset=actoffset;
-/*
+                /*
                 printf("parseobject object=%d %d actoffset=%d %d\n", object->x, object->y,
                                                                      actoffset->frameX, actoffset->frameY);
 */
-	    } else if(!strcmp(token,"dynamic attribute")) {
+            } else if(!strcmp(token,"dynamic attribute")) {
                 // dynamic attribute is normally after composite file
                 if(!includeSet) {
-                  parseDynamicAttribute(displayInfo, "caFrame", &visibilityStatic);
+                    parseDynamicAttribute(displayInfo, "caFrame", &visibilityStatic);
                 } else {
-                  parseDynamicAttribute(displayInfo, "caInclude", &visibilityStatic);
+                    parseDynamicAttribute(displayInfo, "caInclude", &visibilityStatic);
                 }
 
-	    } else if(!strcmp(token,"composite name")) {
+            } else if(!strcmp(token,"composite name")) {
 
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
-		strcpy(compositeName,token);
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                strcpy(compositeName,token);
 
-	    } else if(!strcmp(token,"composite file")) {
+            } else if(!strcmp(token,"composite file")) {
 
                 FrameOffset *newoffset = (FrameOffset *)malloc(sizeof(FrameOffset));
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
-		strcpy(compositeFile,token);
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                strcpy(compositeFile,token);
                 // will be an caInclude
                 if(!generateFlatFile) {
                     includeSet = True;
@@ -2698,7 +2700,7 @@ void *parseComposite(DisplayInfo *displayInfo, FrameOffset *offset)
                     newoffset->frameY = object->y;
                     newoffset->frameWidth = object->width;
                     newoffset->frameHeight = object->height;
-                // will be a caFrame
+                    // will be a caFrame
                 } else {
 
                     sprintf(widgetName, "caFrame_%d", number++);
@@ -2709,14 +2711,14 @@ void *parseComposite(DisplayInfo *displayInfo, FrameOffset *offset)
                     newoffset->frameWidth = object->width;
                     newoffset->frameHeight = object->height;
                 }
-/*
+                /*
                 printf("parsefile object=%d %d frameoffset=%d %d newoffset = %d %d\n", object->x, object->y,
                                                                                       frameoffset->frameX, frameoffset->frameY,
                                                                                        newoffset->frameX, newoffset->frameY);
 */
                 compositeFileParse(displayInfo, compositeFile, object, frameoffset, newoffset);
 
-	    } else if(!strcmp(token,"children")) {
+            } else if(!strcmp(token,"children")) {
 
                 sprintf(widgetName, "caFrame_%d", number++);
                 Qt_writeOpenTag("widget", "caFrame", widgetName);
@@ -2724,24 +2726,24 @@ void *parseComposite(DisplayInfo *displayInfo, FrameOffset *offset)
                 FrameOffset *newoffset = (FrameOffset *)malloc(sizeof(FrameOffset));
                 newoffset->frameX = offset->frameX;
                 newoffset->frameY = offset->frameY;
-/*
+                /*
                 printf("children object=%d %d newoffset = %d %d\n", object->x, object->y, newoffset->frameX, newoffset->frameY);
 */
-		tokenType=getToken(displayInfo,token);
+                tokenType=getToken(displayInfo,token);
                 writeRectangleDimensions(object, frameoffset, "caFrame", True);  // delayed write
                 parseAndAppendDisplayList(displayInfo, newoffset, token, tokenType);
-	    }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
+            }
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
         default:
-	    break;
+            break;
         }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
@@ -2763,8 +2765,8 @@ void parsePolygonPoints(DisplayInfo *displayInfo, char *widget, int offsetX, int
     points[0] = '\0';
     nestingLevel = 0;
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
 
             if(!strcmp(token,"(")) {
 
@@ -2777,18 +2779,18 @@ void parsePolygonPoints(DisplayInfo *displayInfo, char *widget, int offsetX, int
                 sprintf(points, "%s%d,%d;", points,  x-offsetX, y-offsetY);
             }
 
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -2812,43 +2814,44 @@ void *parseWheelSwitch(DisplayInfo *displayInfo, FrameOffset * offset)
     Qt_writeOpenTag("widget", "caNumeric", widgetName);
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    if(!strcmp(token,"object")) {
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
+            if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, offset, "caNumeric", True);
-	    } else if(!strcmp(token,"control")) {
+            } else if(!strcmp(token,"control")) {
                 parseControl(displayInfo, "caNumeric");
-	    } else if(!strcmp(token,"clrmod")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"clrmod")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 strcpy(COLORMODE, token);
-	    } else if(!strcmp(token,"limits")) {
+            } else if(!strcmp(token,"limits")) {
                 parseLimits(displayInfo, "caNumeric", 0, formatFound);
-	    } else if(!strcmp(token,"format")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"format")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 formatFound = True;
                 Qt_setWheelSwitchForm("", token);
                 Qt_setPrecisionSource("caNumeric", 0, "Default");
                 Qt_handleString("fixedFormat", "bool", "true");
-	    }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            }
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
     Qt_handleString("autoFillBackground", "bool", "true");
+    Qt_handleString("digitsFontScaleEnabled", "bool", "true");
     if(!formatFound) Qt_handleString("fixedFormat", "bool", "false");
 
     Qt_writeCloseTag("widget", widgetName, visibilityStatic);
@@ -2872,8 +2875,8 @@ void *parsePolygon(DisplayInfo *displayInfo, FrameOffset * offset)
     Qt_writeOpenTag("widget", "caPolyLine", widgetName);
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
             if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, offset, "caPolyLine", True);
@@ -2889,18 +2892,18 @@ void *parsePolygon(DisplayInfo *displayInfo, FrameOffset * offset)
                         if(!strcmp(token,"points"))
                             parsePolygonPoints(displayInfo, "caPolyLine", offsetX, offsetY);
             }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -2927,8 +2930,8 @@ void *parseRectangle(DisplayInfo *displayInfo, FrameOffset * offset)
     Qt_handleString("form", "enum", "caGraphics::Rectangle");
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
             if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, offset, "caGraphics", True);
@@ -2937,18 +2940,18 @@ void *parseRectangle(DisplayInfo *displayInfo, FrameOffset * offset)
             } else if(!strcmp(token,"dynamic attribute")) {
                 parseDynamicAttribute(displayInfo, "caGraphics", &visibilityStatic);
             }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -2973,8 +2976,8 @@ void *parseOval(DisplayInfo *displayInfo, FrameOffset * offset)
     Qt_handleString("form", "enum", "caGraphics::Circle");
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
             if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, offset, "caGraphics", True);
@@ -2983,18 +2986,18 @@ void *parseOval(DisplayInfo *displayInfo, FrameOffset * offset)
             } else if(!strcmp(token,"dynamic attribute")) {
                 parseDynamicAttribute(displayInfo, "caGraphics", &visibilityStatic);
             }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -3023,12 +3026,12 @@ void *parseArc(DisplayInfo *displayInfo, FrameOffset * offset)
     Qt_handleString("form", "enum", "caGraphics::Arc");
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    if (!strcmp(token,"object"))
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
+            if (!strcmp(token,"object"))
                 parseObject(displayInfo, &object);
             writeRectangleDimensions(&object, offset, "caGraphics", True);
-	    if (!strcmp(token,"basic attribute")) {
+            if (!strcmp(token,"basic attribute")) {
                 parseBasicAttribute(displayInfo, "caGraphics");
             } else {
                 if (!strcmp(token,"dynamic attribute")) {
@@ -3050,18 +3053,18 @@ void *parseArc(DisplayInfo *displayInfo, FrameOffset * offset)
                         }
                 }
             }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
         default:
-	    break;
-	}
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -3091,26 +3094,26 @@ void *parseText(DisplayInfo *displayInfo, FrameOffset * offset)
     textix[0] = '\0';
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    if(!strcmp(token,"object")) {
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
+            if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 //writeRectangleDimensions(&object, offset, "caLabel", True);
-	    } else if(!strcmp(token,"basic attribute")) {
+            } else if(!strcmp(token,"basic attribute")) {
                 parseBasicAttribute(displayInfo, "caLabel");
             } else if(!strcmp(token,"dynamic attribute")) {
                 parseDynamicAttribute(displayInfo, "caLabel", &visibilityStatic);
             }
-	    else if(!strcmp(token,"textix")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            else if(!strcmp(token,"textix")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 strcpy(textix, token);
                 Qt_handleString("text", "string",  token);
                 Qt_handleString("fontScaleMode", "enum",  "ESimpleLabel::Height");
-	    } else if(!strcmp(token,"align")) {
+            } else if(!strcmp(token,"align")) {
 
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
 
                 if(strstr(token, "left") != (char*) 0) {
                     alignFound = True;
@@ -3122,19 +3125,19 @@ void *parseText(DisplayInfo *displayInfo, FrameOffset * offset)
                     alignFound = True;
                     Qt_handleString("alignment", "set", "Qt::AlignAbsolute|Qt::AlignRight|Qt::AlignVCenter");
                 }
-	    }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            }
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -3209,8 +3212,8 @@ void *parsePolyline(DisplayInfo *displayInfo, FrameOffset * offset)
     Qt_writeOpenTag("widget", "caPolyLine", widgetName);
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
             if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, offset, "caPolyLine", True);
@@ -3223,18 +3226,18 @@ void *parsePolyline(DisplayInfo *displayInfo, FrameOffset * offset)
             } else if(!strcmp(token,"points")) {
                 parsePolylinePoints(displayInfo, "caPolyLine", offsetX, offsetY);
             }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -3260,16 +3263,16 @@ void *parseBar(DisplayInfo *displayInfo, FrameOffset * offset)
     Qt_writeOpenTag("widget", "caThermo", widgetName);
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    if(!strcmp(token,"object")) {
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
+            if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, offset, "caThermo", True);
-	    } else if(!strcmp(token,"monitor")) {
+            } else if(!strcmp(token,"monitor")) {
                 parseMonitor(displayInfo, "caThermo");
-	    } else if(!strcmp(token,"label")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"label")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 if(!strcmp(token,"none")) {
                     strcpy(look, "noLabel");
                 } else if(!strcmp(token,"no decorations")) {
@@ -3283,13 +3286,13 @@ void *parseBar(DisplayInfo *displayInfo, FrameOffset * offset)
                         strcpy(look, "channelV");
                     }
                 }
-	    } else if(!strcmp(token,"clrmod")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"clrmod")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 strcpy(COLORMODE, token);
-	    } else if(!strcmp(token,"direction")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"direction")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 if(!strcmp(token,"up")) {
                     strcpy(direction, "Up");
                 } else if(!strcmp(token,"right")) {
@@ -3300,28 +3303,28 @@ void *parseBar(DisplayInfo *displayInfo, FrameOffset * offset)
                     strcpy(direction, "Left");
                 }
 
-	    } else if(!strcmp(token,"fillmod")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"fillmod")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 if(!strcmp(token,"from edge")) {
                 } else if(!strcmp(token,"from center")) {
                     Qt_handleString("type", "enum", "QwtThermoMarker::PipeFromCenter");
                 }
-	    } else if(!strcmp(token,"limits")) {
+            } else if(!strcmp(token,"limits")) {
                 parseLimits(displayInfo, "caThermo", 0, False);
-	    }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            }
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -3359,16 +3362,16 @@ void *parseIndicator(DisplayInfo *displayInfo, FrameOffset * offset)
     Qt_writeOpenTag("widget", "caThermo", widgetName);
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    if(!strcmp(token,"object")) {
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
+            if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, offset, "caThermo", True);
-	    } else if(!strcmp(token,"monitor")) {
+            } else if(!strcmp(token,"monitor")) {
                 parseMonitor(displayInfo, "caThermo");
-	    } else if(!strcmp(token,"label")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"label")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 if(!strcmp(token,"none")) {
                     strcpy(look, "noLabel");
                 } else if(!strcmp(token,"no decorations")) {
@@ -3382,11 +3385,11 @@ void *parseIndicator(DisplayInfo *displayInfo, FrameOffset * offset)
                         strcpy(look, "channelV");
                     }
                 }
-	    } else if(!strcmp(token,"clrmod")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
+            } else if(!strcmp(token,"clrmod")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
                 strcpy(COLORMODE, token);
-	    } else if(!strcmp(token,"direction")) {
+            } else if(!strcmp(token,"direction")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 if(!strcmp(token,"up")) {
@@ -3398,21 +3401,21 @@ void *parseIndicator(DisplayInfo *displayInfo, FrameOffset * offset)
                 } else if(!strcmp(token,"left")) {
                     strcpy(direction, "Left");
                 }
-	    } else if(!strcmp(token,"limits")) {
+            } else if(!strcmp(token,"limits")) {
                 parseLimits(displayInfo, "caThermo", 0, False);
-	    }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+            }
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -3452,14 +3455,14 @@ TOKEN getToken(DisplayInfo *displayInfo, char *word)
 
     while( (c=getc(filePtr)) != EOF) {
         
-	switch (state) {
-	case NEUTRAL:
-	    switch(c) {
-	    case '=' : return(T_EQUAL);
-	    case '{' : return(T_LEFT_BRACE);
-	    case '}' : return(T_RIGHT_BRACE);
-	    case '"' : state = INQUOTE;
-		break;
+        switch (state) {
+        case NEUTRAL:
+            switch(c) {
+            case '=' : return(T_EQUAL);
+            case '{' : return(T_LEFT_BRACE);
+            case '}' : return(T_RIGHT_BRACE);
+            case '"' : state = INQUOTE;
+                break;
                 /*
      case '$' : c=getc(filePtr);
                 // only do macro substitution if in execute mode or parsing a composite file
@@ -3471,71 +3474,71 @@ TOKEN getToken(DisplayInfo *displayInfo, char *word)
       *w++ = c;
   }
 */
-		break;
-	    case ' ' :
-	    case '\t':
+                break;
+            case ' ' :
+            case '\t':
             case '\r':
-	    case '\n': break;
+            case '\n': break;
 
                 /* for constructs of the form (a,b) */
-	    case '(' :
-	    case ',' :
-	    case ')' : *w++ = c; *w = '\0'; return(T_WORD);
+            case '(' :
+            case ',' :
+            case ')' : *w++ = c; *w = '\0'; return(T_WORD);
 
-	    default  : state = INWORD;
-		*w++ = c;
-		break;
-	    }
-	    break;
-	case INQUOTE:
-	    switch(c) {
-	    case '"' : *w = '\0'; return(T_WORD);
-		break;
-	    default  : *w++ = c;
-		break;
-	    }
-	    break;
-	case INMACRO:
-	    switch(c) {
-	    case ')' : *m = '\0';
-		value = lookupNameValue(displayInfo->nameValueTable,
+            default  : state = INWORD;
+                *w++ = c;
+                break;
+            }
+            break;
+        case INQUOTE:
+            switch(c) {
+            case '"' : *w = '\0'; return(T_WORD);
+                break;
+            default  : *w++ = c;
+                break;
+            }
+            break;
+        case INMACRO:
+            switch(c) {
+            case ')' : *m = '\0';
+                value = lookupNameValue(displayInfo->nameValueTable,
                                         displayInfo->numNameValues,macro);
-		if(value != NULL) {
-		    for(j = 0; j < (int) strlen(value); j++) {
-			*w++ = value[j];
-		    }
-		} else {
-		    *w++ = '$';
-		    *w++ = '(';
-		    for(j = 0; j < (int) strlen(macro); j++) {
-			*w++ = macro[j];
-		    }
-		    *w++ = ')';
-		}
-		state = savedState;
-		m = macro;
-		break;
+                if(value != NULL) {
+                    for(j = 0; j < (int) strlen(value); j++) {
+                        *w++ = value[j];
+                    }
+                } else {
+                    *w++ = '$';
+                    *w++ = '(';
+                    for(j = 0; j < (int) strlen(macro); j++) {
+                        *w++ = macro[j];
+                    }
+                    *w++ = ')';
+                }
+                state = savedState;
+                m = macro;
+                break;
 
-	    default  : *m++ = c;
-		break;
-	    }
-	    break;
-	case INWORD:
-	    switch(c) {
-	    case ' ' :
+            default  : *m++ = c;
+                break;
+            }
+            break;
+        case INWORD:
+            switch(c) {
+            case ' ' :
             case '\r':
-	    case '\n':
-	    case '\t':
-	    case '=' :
-	    case '(' :
-	    case ',' :
-	    case ')' :
-	    case '"' : ungetc(c,filePtr); *w = '\0'; return(T_WORD);
-	    default  : *w++ = c;
-		break;
-	    }
-	    break;
-	}
+            case '\n':
+            case '\t':
+            case '=' :
+            case '(' :
+            case ',' :
+            case ')' :
+            case '"' : ungetc(c,filePtr); *w = '\0'; return(T_WORD);
+            default  : *w++ = c;
+                break;
+            }
+            break;
+        }
     }
 
     return(T_EOF);
@@ -3546,9 +3549,9 @@ TOKEN getToken(DisplayInfo *displayInfo, char *word)
 void *getNextElement(DisplayInfo *pDI, char *token, FrameOffset *offset) {
     int i;
     for(i=0; i < parseFuncTableSize; i++) {
-	if(!strcmp(token,parseFuncTable[i].name)) {
+        if(!strcmp(token,parseFuncTable[i].name)) {
             return (void *) parseFuncTable[i].func(pDI, offset);
-	}
+        }
     }
     return 0;
 }
@@ -3565,7 +3568,7 @@ TOKEN parseAndAppendDisplayList(DisplayInfo *displayInfo, FrameOffset *offset, c
     if(veryFirst) {
         veryFirst = False;
         int bclr = displayInfo->drawingAreaBackgroundColor;
-/*
+        /*
         Qt_setColormain("", displayInfo->dlColormap->dl_color[bclr].r,
                         displayInfo->dlColormap->dl_color[bclr].g,
                         displayInfo->dlColormap->dl_color[bclr].b,
@@ -3580,27 +3583,27 @@ TOKEN parseAndAppendDisplayList(DisplayInfo *displayInfo, FrameOffset *offset, c
 
     /* Loop over tokens until T_EOF */
     do {
-	if(first) {
-	    tokenType=firstTokenType;
-	    strcpy(token,firstToken);
-	    first = 0;
-	} else {
-	    tokenType=getToken(displayInfo,token);
-	}
-	switch(tokenType) {
-	case T_WORD : {
+        if(first) {
+            tokenType=firstTokenType;
+            strcpy(token,firstToken);
+            first = 0;
+        } else {
+            tokenType=getToken(displayInfo,token);
+        }
+        switch(tokenType) {
+        case T_WORD : {
             getNextElement(displayInfo, token, offset);
-	    break;
-	}
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++; break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--; break;
-	default :
-	    break;
-	}
+            break;
+        }
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++; break;
+        case T_RIGHT_BRACE:
+            nestingLevel--; break;
+        default :
+            break;
+        }
     } while((tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
             && (tokenType != T_EOF));
 
@@ -3619,54 +3622,54 @@ void *parseDisplay(DisplayInfo *displayInfo)
     char cmap[MAX_TOKEN_LENGTH];
 
     FrameOffset offset;
-    offset.frameX = offset.frameY =0; 
+    offset.frameX = offset.frameY =0;
 
     do {
         switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    if(!strcmp(token,"object")) {
+        case T_WORD:
+            if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, &offset, "", True);
-	    } else if(!strcmp(token,"grid")) {
+            } else if(!strcmp(token,"grid")) {
                 parseGrid(displayInfo, "");
-	    } else if(!strcmp(token,"cmap")) {
+            } else if(!strcmp(token,"cmap")) {
                 /* Parse separate display list to get and use that colormap */
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
-		if(strlen(token) > (size_t) 0) {
-		    strcpy(cmap,token);
-		}
-	    } else if(!strcmp(token,"bclr")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
-		bclr = atoi(token) % DL_MAX_COLORS;
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                if(strlen(token) > (size_t) 0) {
+                    strcpy(cmap,token);
+                }
+            } else if(!strcmp(token,"bclr")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                bclr = atoi(token) % DL_MAX_COLORS;
                 displayInfo->drawingAreaBackgroundColor = bclr;
-	    } else if(!strcmp(token,"clr")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
-		clr = atoi(token) % DL_MAX_COLORS;
-		displayInfo->drawingAreaForegroundColor = clr;
-	    } else if(!strcmp(token,"gridSpacing")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
-	    } else if(!strcmp(token,"gridOn")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
-	    } else if(!strcmp(token,"snapToGrid")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
-	    }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
+            } else if(!strcmp(token,"clr")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                clr = atoi(token) % DL_MAX_COLORS;
+                displayInfo->drawingAreaForegroundColor = clr;
+            } else if(!strcmp(token,"gridSpacing")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
+            } else if(!strcmp(token,"gridOn")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
+            } else if(!strcmp(token,"snapToGrid")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
+            }
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
         }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
@@ -3682,28 +3685,28 @@ void parseFile(DisplayInfo *displayInfo)
     int nestingLevel = 0;
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    if(!strcmp(token,"name")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
-	    }
-	    if(!strcmp(token,"version")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
-	    }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
+            if(!strcmp(token,"name")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
+            }
+            if(!strcmp(token,"version")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
+            }
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -3728,28 +3731,28 @@ void parseDlColor(DisplayInfo *displayInfo, FILE *filePtr,
     displayInfo->filePtr = filePtr;
 
     do {
-	switch( (tokenType=getToken(displayInfo, token)) ) {
-	case T_WORD: {
-	    char *end;
-	    unsigned long color = strtoul(token,&end,16);
-	    if(counter < DL_MAX_COLORS) {
-		dlColor[counter].r = (color & 0x00ff0000) >> 16;
-		dlColor[counter].g = (color & 0x0000ff00) >> 8;
-		dlColor[counter].b = color & 0x000000ff;
-		counter++;
-	    }
-	    getToken(displayInfo,token);
-	    break;
-	}
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+        switch( (tokenType=getToken(displayInfo, token)) ) {
+        case T_WORD: {
+            char *end;
+            unsigned long color = strtoul(token,&end,16);
+            if(counter < DL_MAX_COLORS) {
+                dlColor[counter].r = (color & 0x00ff0000) >> 16;
+                dlColor[counter].g = (color & 0x0000ff00) >> 8;
+                dlColor[counter].b = color & 0x000000ff;
+                counter++;
+            }
+            getToken(displayInfo,token);
+            break;
+        }
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -3775,31 +3778,31 @@ void parseOldDlColor(DisplayInfo *displayInfo, FILE *filePtr,
     displayInfo->filePtr = filePtr;
 
     do {
-	switch( (tokenType=getToken(displayInfo,token)) ) {
-	case T_WORD:
-	    if(!strcmp(token,"r")) {
-		getToken(displayInfo,token);getToken(displayInfo,token);
-		dlColor->r = atoi(token);
-	    } else if(!strcmp(token,"g")) {
-		getToken(displayInfo,token);getToken(displayInfo,token);
-		dlColor->g = atoi(token);
-	    } else if(!strcmp(token,"b")) {
-		getToken(displayInfo,token);getToken(displayInfo,token);
-		dlColor->b = atoi(token);
-	    } else if(!strcmp(token,"inten")) {
-		getToken(displayInfo,token);getToken(displayInfo,token);
-		dlColor->inten = atoi(token);
-	    }
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+        switch( (tokenType=getToken(displayInfo,token)) ) {
+        case T_WORD:
+            if(!strcmp(token,"r")) {
+                getToken(displayInfo,token);getToken(displayInfo,token);
+                dlColor->r = atoi(token);
+            } else if(!strcmp(token,"g")) {
+                getToken(displayInfo,token);getToken(displayInfo,token);
+                dlColor->g = atoi(token);
+            } else if(!strcmp(token,"b")) {
+                getToken(displayInfo,token);getToken(displayInfo,token);
+                dlColor->b = atoi(token);
+            } else if(!strcmp(token,"inten")) {
+                getToken(displayInfo,token);getToken(displayInfo,token);
+                dlColor->inten = atoi(token);
+            }
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
@@ -3845,42 +3848,42 @@ DlColormap *parseColormap(DisplayInfo *displayInfo, FILE *filePtr)
     counter = 0;
 
     do {
-	switch( (tokenType=getToken(displayInfo, token)) ) {
-	case T_WORD:
-	    if(!strcmp(token,"ncolors")) {
-		getToken(displayInfo,token);
-		getToken(displayInfo,token);
-		dlColormap->ncolors = atoi(token);
-		if(dlColormap->ncolors > DL_MAX_COLORS) {
-		    printf("\nMaximum # of colors in colormap exceeded\n"
+        switch( (tokenType=getToken(displayInfo, token)) ) {
+        case T_WORD:
+            if(!strcmp(token,"ncolors")) {
+                getToken(displayInfo,token);
+                getToken(displayInfo,token);
+                dlColormap->ncolors = atoi(token);
+                if(dlColormap->ncolors > DL_MAX_COLORS) {
+                    printf("\nMaximum # of colors in colormap exceeded\n"
                            "  Will continue with truncated color space\n"
                            "(You may want to change the colors of some objects)\n");
-		    //dmSetAndPopupWarningDialog(displayInfo, msg,"OK",NULL,NULL);
+                    //dmSetAndPopupWarningDialog(displayInfo, msg,"OK",NULL,NULL);
                 }
-	    } else if(!strcmp(token,"dl_color")) {
+            } else if(!strcmp(token,"dl_color")) {
                 /* continue parsing but throw away "excess" colormap entries */
-		if(counter < DL_MAX_COLORS) {
-		    parseOldDlColor(displayInfo,filePtr,&(dl_color[counter]));
-		    counter++;
-		} else {
-		    parseOldDlColor(displayInfo,filePtr,&dummyColormapEntry);
-		    counter++;
-		}
-	    } else if(!strcmp(token,"colors")) {
-		parseDlColor(displayInfo,filePtr, dl_color);
-	    }
-	    break;
-	case T_EQUAL:
-	    break;
-	case T_LEFT_BRACE:
-	    nestingLevel++;
-	    break;
-	case T_RIGHT_BRACE:
-	    nestingLevel--;
-	    break;
-	default:
-	    break;
-	}
+                if(counter < DL_MAX_COLORS) {
+                    parseOldDlColor(displayInfo,filePtr,&(dl_color[counter]));
+                    counter++;
+                } else {
+                    parseOldDlColor(displayInfo,filePtr,&dummyColormapEntry);
+                    counter++;
+                }
+            } else if(!strcmp(token,"colors")) {
+                parseDlColor(displayInfo,filePtr, dl_color);
+            }
+            break;
+        case T_EQUAL:
+            break;
+        case T_LEFT_BRACE:
+            nestingLevel++;
+            break;
+        case T_RIGHT_BRACE:
+            nestingLevel--;
+            break;
+        default:
+            break;
+        }
     } while((tokenType != T_RIGHT_BRACE) && (nestingLevel > 0) &&
             (tokenType != T_EOF));
 
