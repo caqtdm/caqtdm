@@ -37,6 +37,7 @@ MessageBox::~MessageBox() {
 
 void MessageBox::timerEvent(QTimerEvent *event)
 {
+    Q_UNUSED(event);
     currentTime++;
     if (currentTime >= timeout) {
         this->deleteLater();
