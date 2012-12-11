@@ -18,7 +18,7 @@
 
 
 static void unixSignalHandler(int signum) {
-    qDebug("DBG: main.cpp::unixSignalHandler(). signal = %s\n", strsignal(signum));
+    //qDebug("DBG: main.cpp::unixSignalHandler(). signal = %s\n", strsignal(signum));
 
     /*
      * Make sure your Qt application gracefully quits.
