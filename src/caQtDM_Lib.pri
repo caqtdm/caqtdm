@@ -41,6 +41,15 @@ HEADERS += caqtdm_lib.h\
     vaPrintf.h \
     myMessageBox.h
 
+HEADERS += \
+    ../JSONValue.h \
+    ../JSON.h
+
+SOURCES += \
+    ../JSONValue.cpp \
+    ../JSON.cpp
+
+
 INCLUDEPATH += .
 
 LIBS += -L$${EPICSLIB} -Wl,-rpath,$${EPICSLIB} -lca

@@ -108,7 +108,7 @@ typedef struct _connectInfo {
 
 Q_DECLARE_METATYPE(QList<int>)
 
-extern "C" int CreateAndConnect(int index, knobData *data);
+extern "C" int CreateAndConnect(int index, knobData *data, int rate);
 extern "C" void ClearMonitor(knobData *kData);
 extern "C" void PrepareDeviceIO();
 extern "C" int EpicsSetValue(char *pv, float rdata, long idata, char *sdata, char *object, char *errmess);
@@ -1180,14 +1180,33 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     int cpylen;
     int indx;
 
+    int rate = 5;  // default will be 5Hz
+
     if(pv.size() == 0) return -1;
 
     QString trimmedPV = pv.trimmed();
 
+    // is there a json string ?
+    int pos = trimmedPV.indexOf("{");
+    if(pos != -1) {
+        int status;
+        char asc[255];
+        QString JSONString = trimmedPV.mid(pos);
+        trimmedPV = trimmedPV.mid(0, pos);
+        status = parseForDisplayRate(JSONString, rate);
+        if(!status) {
+            sprintf(asc, "JSON parsing error on %s ,should be like {\"monitor\":{\"maxdisplayrate\":10}}",
+                          (char*) pv.trimmed().toAscii().constData());
+        } else {
+          sprintf(asc, "pv %s display rate set to maximum %dHz", trimmedPV.toAscii().constData(), rate);
+        }
+         postMessage(QtDebugMsg, asc);
+    }
+
     QString newpv = treatMacro(map, trimmedPV, &doNothing);
 
     if(doNothing) {
-        char asc[100];
+        char asc[255];
         sprintf(asc, "malformed pv '%s' (due to macro?)", (char*) newpv.toAscii().constData());
         postMessage(QtDebugMsg, asc);
     }
@@ -1240,7 +1259,7 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     mutexKnobData->SetMutexKnobData(num, *kData);
 
     // create data acquisition
-    CreateAndConnect(num, kData);
+    CreateAndConnect(num, kData, rate);
 
     w->setProperty("MonitorIndex", num);
     w->setProperty("Connect", false);
@@ -3147,3 +3166,54 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
         break;
     }
 }
+int CaQtDM_Lib::parseForDisplayRate(QString inputc, int &rate)
+{
+    // Parse data
+    char input[MAXPVLEN];
+    int cpylen = qMin(inputc.length(), MAXPVLEN-1);
+    strncpy(input, (char*) inputc.toAscii().constData(), cpylen);
+    input[cpylen] = '\0';
+    JSONValue *value = JSON::Parse(input);
+
+    // Did it go wrong?
+    if (value == NULL) {
+        //printf("failed to parse <%s>\n", input);
+        return false;
+    } else {
+        // Retrieve the main object
+        JSONObject root;
+        if (value->IsObject() == false) {
+            //printf("The root element is not an object");
+            return false;
+        } else {
+
+            root = value->AsObject();
+            // check for monitor
+            if (root.find(L"monitor") != root.end() && root[L"monitor"]->IsObject()) {
+
+                //printf("monitor detected\n");
+                // Retrieve nested object
+                JSONValue *value = JSON::Parse(root[L"monitor"]->Stringify().c_str());
+                // Did it go wrong?
+                if ((value != NULL) && (value->IsObject() != false)) {
+                    JSONObject root;
+                    root = value->AsObject();
+                    if (root.find(L"maxdisplayrate") != root.end() && root[L"maxdisplayrate"]->IsNumber()) {
+                        int status;
+                        //printf("maxdisplayrate detected\n");
+                        status = swscanf(root[L"maxdisplayrate"]->Stringify().c_str(), L"%d", &rate);
+                        if(status != 1) return false;
+                        //printf("%d decode value=%d\n", status, rate);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
+    return false;
+}
+

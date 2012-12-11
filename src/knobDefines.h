@@ -21,7 +21,7 @@
 #define false !true
 
 #define MAXFILELEN 60
-#define MAXPVLEN 80
+#define MAXPVLEN 120
 #define MAXDISPLEN 20
 #define NBSPECS 5
 

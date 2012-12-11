@@ -29,8 +29,8 @@ MutexKnobData::MutexKnobData()
         KnobData[i].thisW = (void*) 0;
     }
 
-    // start a timer with 5Hz in order to avoid very fast updates one does not see anyhow
-    timerId = startTimer(200);
+    // start a timer with 50Hz
+    timerId = startTimer(20);
 }
 
 
@@ -238,19 +238,27 @@ extern "C" MutexKnobData* C_SetMutexKnobDataReceived(MutexKnobData* p, knobData 
 //*********************************************************************************************************************
 
 /**
-  * timer is running with 200 ms speed
+  * timer is running with 50 ms speed
   */
 void MutexKnobData::timerEvent(QTimerEvent *)
 {
+    double diff, repRate;
     char units[40];
     char fec[40];
     char dataString[1024];
     struct timeb now;
     ftime(&now);
 
+    static int displayCount;
+    static struct timeb last;
+
     for(int i=0; i < GetMutexKnobDataSize(); i++) {
         knobData *kPtr = (knobData*) &KnobData[i];
-        if(kPtr->index != -1 && kPtr->soft) {
+
+        diff = ((double) now.time + (double) now.millitm / (double)1000) -
+               ((double) kPtr->edata.lastTime.time + (double) kPtr->edata.lastTime.millitm / (double)1000);
+
+        if(kPtr->index != -1 && kPtr->soft && diff >= 0.1) {
             int indx;
              //qDebug() << "I am a soft channel" << kPtr->pv << kPtr->dispName << kPtr->edata.rvalue << kPtr->index;
             // get for this soft pv the index of the corresponding caCalc into the knobData array where the data were updated
@@ -276,7 +284,11 @@ void MutexKnobData::timerEvent(QTimerEvent *)
             }
         }
 
-        if( ((kPtr->index != -1) && (kPtr->edata.monitorCount > kPtr->edata.displayCount))){
+        if(kPtr->edata.repRate < 1) repRate = 1;
+        else repRate = kPtr->edata.repRate;
+
+        // use specified repetition rate (normally 5Hz)
+        if( ((kPtr->index != -1) && (kPtr->edata.monitorCount > kPtr->edata.displayCount) && (diff >= (1.0/(double)repRate)))){
 /*
             printf("<%s> index=%d mcount=%d dcount=%d value=%f datasize=%d valuecount=%d\n", kPtr->pv, kPtr->index, kPtr->edata.monitorCount,
                                                                       kPtr->edata.displayCount, kPtr->edata.rvalue,
@@ -299,9 +311,10 @@ void MutexKnobData::timerEvent(QTimerEvent *)
 
             kPtr->edata.displayCount = kPtr->edata.monitorCount;
             locker.unlock();
-
             UpdateWidget(index, dispW, units, fec, dataString, KnobData[index]);
+            kPtr->edata.lastTime = now;
             kPtr->edata.initialize = false;
+            displayCount++;
 
         } else if (kPtr->index != -1) {
             if( (!kPtr->edata.connected)) {
@@ -312,12 +325,23 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 // brake unconnected displays
                 if(kPtr->edata.unconnectCount == 0) {
                   kPtr->edata.displayCount = kPtr->edata.monitorCount;
+                  kPtr->edata.lastTime = now;
                   UpdateWidget(index, (QWidget*) kPtr->dispW, units, fec, dataString, KnobData[index]);
                 }
                 kPtr->edata.unconnectCount++;
                 if(kPtr->edata.unconnectCount == 10) kPtr->edata.unconnectCount=0;
             }
         }
+    }
+
+    ftime(&now);
+    diff = ((double) now.time + (double) now.millitm / (double)1000) -
+           ((double) last.time + (double) last.millitm / (double)1000);
+
+    if(diff >= 10.0) {
+        ftime(&last);
+        //printf("displayed=%.1f/s %f\n", (displayCount/diff), diff);
+        displayCount = 0;
     }
 }
 

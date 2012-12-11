@@ -34,6 +34,7 @@
 #include "mutexKnobData.h"
 #include "mutexKnobDataWrapper.h"
 #include "MessageWindow.h"
+#include "JSON.h"
 
 #include <QtControls>
 
@@ -64,6 +65,7 @@ public:
     int Execute(char *command);
     void TreatRequestedValue(QString text, caTextEntry::FormatType fType, QWidget *w);
     bool getSoftChannel(QString pv, knobData &data);
+    int parseForDisplayRate(QString input, int &rate);
 
 protected:
 

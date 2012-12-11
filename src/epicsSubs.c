@@ -137,7 +137,6 @@ static void dataCallback(struct event_handler_args args)
         case DBF_CHAR:
         {
             int dataSize;
-            int i;
             struct dbr_ctrl_char *stsF = (struct dbr_ctrl_char *) args.dbr;
             dbr_char_t *val_ptr = dbr_value_ptr(args.dbr, DBR_CTRL_CHAR);
 
@@ -149,7 +148,6 @@ static void dataCallback(struct event_handler_args args)
             kData.edata.precision = 0;
             kData.edata.units[0] = '\0';
 
-            // concatenate
             dataSize = dbr_size_n(args.type, args.count) + sizeof(char);
             if(dataSize != kData.edata.dataSize) {
                 free(kData.edata.dataB);
@@ -158,9 +156,7 @@ static void dataCallback(struct event_handler_args args)
             }
 
             char *ptr = (char*) kData.edata.dataB;
-            for (i = 0; i < args.count; i++) {
-                ptr[i] = val_ptr[i];
-            }
+            memcpy(ptr, val_ptr, args.count *sizeof(char));
             ptr[args.count] = '\0';
 
             C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
@@ -407,7 +403,7 @@ void connectCallback(struct connection_handler_args args)
 /**
  * define device io and hook info to gui
  */
-int CreateAndConnect(int index, knobData *kData)
+int CreateAndConnect(int index, knobData *kData, int rate)
 {
     int status;
 #ifdef ACS
@@ -431,6 +427,8 @@ int CreateAndConnect(int index, knobData *kData)
     kData->edata.dataB =(void*) 0;
     kData->edata.dataSize = 0;
     kData->edata.initialize = true;
+
+    kData->edata.repRate = rate;   // default 5 Hz, will anyhow not be higher due to scan loop
 
     tmp = (connectInfo *) kData->edata.info;
     strcpy(tmp->pv, kData->pv);

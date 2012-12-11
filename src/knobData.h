@@ -32,21 +32,21 @@ typedef struct _epicsData {
     int          valueCount;            /* number of values */
     int          enumCount;             /* number of values */
     short        fieldtype;             /* fieldtype */
-    short	 status;	        /* status of value */
-    short	 severity;		/* severity of alarm */
-    short	 precision;		/* number of decimal places */
+    short	     status;	            /* status of value */
+    short	     severity;		        /* severity of alarm */
+    short	     precision;		        /* number of decimal places */
     dbr_string_t units;	                /* units of value */
-    double	 upper_disp_limit;	/* upper limit of graph */
-    double	 lower_disp_limit;	/* lower limit of graph */
-    double	 upper_alarm_limit;
-    double	 upper_warning_limit;
-    double	 lower_warning_limit;
-    double	 lower_alarm_limit;
-    double	 upper_ctrl_limit;	/* upper control limit */
-    double	 lower_ctrl_limit;	/* lower control limit */
-    double	 rvalue;		/* real value */
+    double	     upper_disp_limit;	    /* upper limit of graph */
+    double	     lower_disp_limit;	    /* lower limit of graph */
+    double	     upper_alarm_limit;
+    double	     upper_warning_limit;
+    double	     lower_warning_limit;
+    double	     lower_alarm_limit;
+    double	     upper_ctrl_limit;	    /* upper control limit */
+    double	     lower_ctrl_limit;	    /* lower control limit */
+    double	     rvalue;		        /* real value */
     double       oldsoftvalue;          /* for softpv in order to increment monitorcount only when necessary */
-    long	 ivalue;		/* integer value */
+    long	     ivalue;		        /* integer value */
     int          accessW;               /* epics access control */
     int          accessR;
     void         *info;                 /* pointer to  epics connection info */
@@ -54,6 +54,8 @@ typedef struct _epicsData {
     void         *dataB;                /* vector data */
     int          initialize;            /* first initialisation */
     char         aux[10];               /* used for acs controlsystem images */
+    struct timeb lastTime;              /* last displayed time */
+    int          repRate;               /* repetition rate for this channel, default will be 5Hz */
 } epicsData;
 
 typedef struct _knobData {
