@@ -658,11 +658,12 @@ void parseBasicAttribute(DisplayInfo *displayInfo, char *widget)
                               displayInfo->dlColormap->dl_color[clr].g,
                               displayInfo->dlColormap->dl_color[clr].b,
                               0);
+        /*
         Qt_setColorLine("",  displayInfo->dlColormap->dl_color[clr].r,
                         displayInfo->dlColormap->dl_color[clr].g,
                         displayInfo->dlColormap->dl_color[clr].b,
                         255);
-
+       */
     } else if( (!strcmp(widget,"caPolyLine")) || (!strcmp(widget,"caGraphics")) || (!strcmp(widget,"caPolygon")) ) {
         if(!strcmp(fillstyle,"solid")) {
             Qt_setColorForeground("", displayInfo->dlColormap->dl_color[clr].r,

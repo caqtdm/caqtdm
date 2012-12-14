@@ -373,7 +373,6 @@ void Qt_setColorScale(char *widget, int r, int g, int b, int alpha) {
 }
 
 void Qt_setColorLine(char *widget, int r, int g, int b, int alpha) {
-    if(!strcmp(widget, "caLabel")) return;  // no linecolor for label
     Qt_setColor("lineColor", r, g, b, alpha);
 }
 
