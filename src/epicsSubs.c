@@ -406,6 +406,8 @@ void connectCallback(struct connection_handler_args args)
 int CreateAndConnect(int index, knobData *kData, int rate)
 {
     int status;
+    struct timeb now;
+    ftime(&now);
 #ifdef ACS
     char aux[10];
     static int first = true;
@@ -427,7 +429,7 @@ int CreateAndConnect(int index, knobData *kData, int rate)
     kData->edata.dataB =(void*) 0;
     kData->edata.dataSize = 0;
     kData->edata.initialize = true;
-
+    kData->edata.lastTime = now;
     kData->edata.repRate = rate;   // default 5 Hz, will anyhow not be higher due to scan loop
 
     tmp = (connectInfo *) kData->edata.info;

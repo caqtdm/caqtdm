@@ -255,9 +255,12 @@ void MutexKnobData::timerEvent(QTimerEvent *)
     for(int i=0; i < GetMutexKnobDataSize(); i++) {
         knobData *kPtr = (knobData*) &KnobData[i];
 
-        diff = ((double) now.time + (double) now.millitm / (double)1000) -
-               ((double) kPtr->edata.lastTime.time + (double) kPtr->edata.lastTime.millitm / (double)1000);
-
+        if(kPtr->index != -1) {
+           diff = ((double) now.time + (double) now.millitm / (double)1000) -
+                  ((double) kPtr->edata.lastTime.time + (double) kPtr->edata.lastTime.millitm / (double)1000);
+           if(kPtr->edata.repRate < 1) repRate = 1;
+           else repRate = kPtr->edata.repRate;
+        }
         if(kPtr->index != -1 && kPtr->soft && diff >= 0.1) {
             int indx;
              //qDebug() << "I am a soft channel" << kPtr->pv << kPtr->dispName << kPtr->edata.rvalue << kPtr->index;
@@ -283,9 +286,6 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 }
             }
         }
-
-        if(kPtr->edata.repRate < 1) repRate = 1;
-        else repRate = kPtr->edata.repRate;
 
         // use specified repetition rate (normally 5Hz)
         if( ((kPtr->index != -1) && (kPtr->edata.monitorCount > kPtr->edata.displayCount) && (diff >= (1.0/(double)repRate)))){
@@ -316,8 +316,10 @@ void MutexKnobData::timerEvent(QTimerEvent *)
             kPtr->edata.initialize = false;
             displayCount++;
 
-        } else if (kPtr->index != -1) {
+        } else if ((kPtr->index != -1)  && (diff >= (1.0/(double)repRate))){
             if( (!kPtr->edata.connected)) {
+                QMutexLocker locker(&mutex);
+                bool displayIt = false;
                 units[0] = '\0';
                 fec[0] = '\0';
                 dataString[0] = '\0';
@@ -326,10 +328,13 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 if(kPtr->edata.unconnectCount == 0) {
                   kPtr->edata.displayCount = kPtr->edata.monitorCount;
                   kPtr->edata.lastTime = now;
-                  UpdateWidget(index, (QWidget*) kPtr->dispW, units, fec, dataString, KnobData[index]);
+                  displayIt = true;
                 }
                 kPtr->edata.unconnectCount++;
                 if(kPtr->edata.unconnectCount == 10) kPtr->edata.unconnectCount=0;
+                locker.unlock();
+                if(displayIt) UpdateWidget(index, (QWidget*) kPtr->dispW, units, fec, dataString, KnobData[index]);
+
             }
         }
     }
