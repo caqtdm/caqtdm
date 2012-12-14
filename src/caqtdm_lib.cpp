@@ -610,8 +610,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //qDebug() << "create caPolyLine";
 
-         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
-
+        nbMonitors = InitVisibility(w1, &kData, map, specData, "");
+        widget->setEnabled(false);  // disable editing possibility
         widget->setProperty("Taken", true);
 
         //==================================================================================================================
@@ -1471,8 +1471,29 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
     } else if(caLabel *widget = qobject_cast<caLabel *>(w)) {
         //qDebug() << "we have a label";
 
-        // treat visibility if defined
-        setObjectVisibility(widget, data.edata.rvalue);
+        if(data.edata.connected) {
+            int colorMode = widget->getColorMode();
+            if(colorMode == caLabel::Static) {
+                // done at initialisation, we have to set it back after no connect
+                if(!widget->property("Connect").value<bool>()) {
+                    QColor fg = widget->property("FColor").value<QColor>();
+                    QColor bg = widget->property("BColor").value<QColor>();
+                    widget->setForeground(fg);
+                    widget->setBackground(bg);
+                    widget->setProperty("Connect", true);
+                }
+            } else if(colorMode == caLabel::Alarm) {
+                int status = ComputeAlarm(w);
+                widget->setAlarmColors(status);
+            }
+
+            // treat visibility if defined
+            setObjectVisibility(widget, data.edata.rvalue);
+
+        } else {
+            widget->setAlarmColors(NOTCONNECTED);
+            widget->setProperty("Connect", false);
+        }
 
         // frame ==================================================================================================================
     } else if(caInclude *widget = qobject_cast<caInclude *>(w)) {
@@ -2614,7 +2635,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             for(int i=0; i< nbPV; i++) {
                 knobData *kPtr = mutexKnobData->getMutexKnobDataPV(pv[i]);  // use pointer for getting all necessary information
                 if((kPtr != (knobData*) 0) && (pv[i].length() > 0)) {
-                    char asc[80];
+                    char asc[255];
                     info.append("<br>");
                     info.append(kPtr->pv);
 
@@ -3173,6 +3194,7 @@ int CaQtDM_Lib::parseForDisplayRate(QString inputc, int &rate)
     int cpylen = qMin(inputc.length(), MAXPVLEN-1);
     strncpy(input, (char*) inputc.toAscii().constData(), cpylen);
     input[cpylen] = '\0';
+
     JSONValue *value = JSON::Parse(input);
 
     // Did it go wrong?
@@ -3184,6 +3206,7 @@ int CaQtDM_Lib::parseForDisplayRate(QString inputc, int &rate)
         JSONObject root;
         if (value->IsObject() == false) {
             //printf("The root element is not an object");
+            delete(value);
             return false;
         } else {
 
@@ -3193,22 +3216,27 @@ int CaQtDM_Lib::parseForDisplayRate(QString inputc, int &rate)
 
                 //printf("monitor detected\n");
                 // Retrieve nested object
-                JSONValue *value = JSON::Parse(root[L"monitor"]->Stringify().c_str());
+                JSONValue *value1 = JSON::Parse(root[L"monitor"]->Stringify().c_str());
                 // Did it go wrong?
-                if ((value != NULL) && (value->IsObject() != false)) {
+                if ((value1 != NULL) && (value1->IsObject() != false)) {
                     JSONObject root;
-                    root = value->AsObject();
+                    root = value1->AsObject();
                     if (root.find(L"maxdisplayrate") != root.end() && root[L"maxdisplayrate"]->IsNumber()) {
                         int status;
                         //printf("maxdisplayrate detected\n");
                         status = swscanf(root[L"maxdisplayrate"]->Stringify().c_str(), L"%d", &rate);
                         if(status != 1) return false;
                         //printf("%d decode value=%d\n", status, rate);
+                        delete(value1);
+                        delete(value);
                         return true;
                     } else {
+                        delete(value1);
+                        delete(value);
                         return false;
                     }
                 } else {
+                    delete(value);
                     return false;
                 }
             }
