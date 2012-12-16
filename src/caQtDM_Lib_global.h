@@ -14,10 +14,22 @@
 
 #include <QtCore/qglobal.h>
 
-#if defined(CAQTDM_LIB_LIBRARY)
-#  define CAQTDM_LIBSHARED_EXPORT Q_DECL_EXPORT
+#if defined(_MSC_VER)
+
+   #if defined(CAQTDM_LIB_LIBRARY)
+      #define CAQTDM_LIBSHARED_EXPORT __declspec(dllexport)
+   #else
+      #define CAQTDM_LIBSHARED_EXPORT __declspec(dllimport)
+   #endif
+
 #else
-#  define CAQTDM_LIBSHARED_EXPORT Q_DECL_IMPORT
+
+   #if defined(CAQTDM_LIB_LIBRARY)
+     #define CAQTDM_LIBSHARED_EXPORT Q_DECL_EXPORT
+   #else
+     #define CAQTDM_LIBSHARED_EXPORT Q_DECL_IMPORT
+   #endif
+
 #endif
 
 #endif // CAQTDM_LIB_GLOBAL_H

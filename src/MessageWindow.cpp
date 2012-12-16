@@ -37,7 +37,7 @@ QString MessageWindow::QtMsgToQString(QtMsgType type, const char *msg)
     time_t          time_val;
     struct tm       *timess;
     struct timeb    timeA;
-    char            prTime[20];
+    char            prTime[200];
 
     ftime(&timeA);
     time_val = timeA.time;
@@ -74,7 +74,11 @@ void MessageWindow::customEvent(QEvent* event)
 #ifdef __MINGW32__
                 msgTextEdit.append(dynamic_cast<typename MessageEvent::MessageEvent* >(event)->msg);
 #else
+        #ifdef _WIN32
+                msgTextEdit.append(dynamic_cast<::MessageEvent* >(event)->msg);
+        #else
                 msgTextEdit.append(dynamic_cast<MessageEvent::MessageEvent* >(event)->msg);
+        #endif
 #endif
         }
 }
@@ -102,7 +106,11 @@ void MessageWindow::postMsgEvent(QtMsgType type, char* msg)
 #ifdef __MINGW32__
         QCoreApplication::postEvent(this, new typename MessageEvent::MessageEvent(qmsg));
 #else
-        QCoreApplication::postEvent(this, new MessageEvent::MessageEvent(qmsg));
+        #ifdef _WIN32
+            QCoreApplication::postEvent(this, new ::MessageEvent(qmsg));
+        #else
+            QCoreApplication::postEvent(this, new MessageEvent::MessageEvent(qmsg));
+        #endif
 #endif
 }
 

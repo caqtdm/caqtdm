@@ -12,6 +12,8 @@
 #ifndef MUTEXKNOBDATA_H
 #define MUTEXKNOBDATA_H
 
+#include <caQtDM_Lib_global.h>
+
 #include "dbrString.h"
 #include "knobDefines.h"
 #include <QMutex>
@@ -21,7 +23,7 @@
 #include <QWaitCondition>
 #include "knobData.h"
 
-class MutexKnobData: public QObject {
+class CAQTDM_LIBSHARED_EXPORT MutexKnobData: public QObject {
     Q_OBJECT
 
 public:

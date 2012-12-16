@@ -16,11 +16,12 @@
 #include <QDockWidget>
 #include <QTextEdit>
 #include <QEvent>
+#include <caQtDM_Lib_global.h>
 
 /**
  * Message Window. Handling errors and other messages.
  */
-class MessageWindow: public QDockWidget
+class CAQTDM_LIBSHARED_EXPORT MessageWindow: public QDockWidget
 {
     Q_OBJECT
 
@@ -43,7 +44,7 @@ public:
     void postMsgEvent(QtMsgType type, char *msg);
 };
 
-class MessageEvent: public QEvent
+class CAQTDM_LIBSHARED_EXPORT MessageEvent: public QEvent
 {
 public:
     QString msg;    // Message string.

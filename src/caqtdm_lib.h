@@ -42,7 +42,7 @@ namespace Ui {
     class CaQtDM_Lib;
 }
 
-class CaQtDM_Lib : public QMainWindow
+class CAQTDM_LIBSHARED_EXPORT CaQtDM_Lib : public QMainWindow
 {
     Q_OBJECT
 

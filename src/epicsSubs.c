@@ -9,22 +9,29 @@
 //
 //******************************************************************************
 
+#ifdef _MSC_VER
+    #include <windows.h>
+#else
+    #include <unistd.h>
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
-#include <unistd.h>
 
 #define epicsAlarmGLOBAL
+#include <cadef.h>
+struct ca_client_context *dbCaClientContext;
 #include <alarm.h>
+#include <epicsExport.h>
+
 #undef epicsAlarmGLOBAL
 
 #define CA_PRIORITY 50          /* CA priority */
 #define CA_TIMEOUT   2          /* CA timeout 2.0 seconds */
 
 #include "knobDefines.h"
-#include <cadef.h>
-struct ca_client_context *dbCaClientContext;
 
 #include "knobData.h"
 #include "mutexKnobDataWrapper.h"
@@ -86,9 +93,9 @@ void Exceptionhandler(struct exception_handler_args args)
 /**
  * define what we need for network IO
  */
-void PrepareDeviceIO()
+void PrepareDeviceIO(void)
 {
-    PRINT(printf("create epics context\n"));
+    //PRINT(printf("create epics context\n"));
     int status = ca_context_create(ca_enable_preemptive_callback);
     if (status != ECA_NORMAL) {
         printf("ca_context_create:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]);
@@ -137,6 +144,7 @@ static void dataCallback(struct event_handler_args args)
         case DBF_CHAR:
         {
             int dataSize;
+            char* ptr;
             struct dbr_ctrl_char *stsF = (struct dbr_ctrl_char *) args.dbr;
             dbr_char_t *val_ptr = dbr_value_ptr(args.dbr, DBR_CTRL_CHAR);
 
@@ -155,7 +163,7 @@ static void dataCallback(struct event_handler_args args)
                 kData.edata.dataSize = dataSize;
             }
 
-            char *ptr = (char*) kData.edata.dataB;
+            ptr = (char*) kData.edata.dataB;
             memcpy(ptr, val_ptr, args.count *sizeof(char));
             ptr[args.count] = '\0';
 
@@ -167,6 +175,7 @@ static void dataCallback(struct event_handler_args args)
         {
             int dataSize;
             int i;
+            char *ptr;
             struct dbr_sts_string *stsF = (struct dbr_sts_string *) args.dbr;
             dbr_string_t *val_ptr = dbr_value_ptr(args.dbr, DBR_STS_STRING);
 
@@ -186,7 +195,7 @@ static void dataCallback(struct event_handler_args args)
                 kData.edata.dataSize = dataSize;
             }
 
-            char *ptr = (char*) kData.edata.dataB;
+            ptr = (char*) kData.edata.dataB;
             ptr[0] = '\0';
             strcpy(ptr, val_ptr[0]);
             for (i = 1; i < args.count; i++) {
@@ -201,6 +210,7 @@ static void dataCallback(struct event_handler_args args)
         {
             int dataSize;
             int i;
+            char *ptr;
             struct dbr_ctrl_enum *stsF = (struct dbr_ctrl_enum *) args.dbr;
             PRINT(printf("dataCallback:\n""  get: %s\n", ca_message_text[CA_EXTRACT_MSG_NO(args.status)]));
             PRINT(printf("dataCallback enum  %s %d <%d> %d <%s> status=%d count=%d enum no_str=%d size=%d\n", ca_name(args.chid), (int) args.chid,
@@ -222,7 +232,7 @@ static void dataCallback(struct event_handler_args args)
                     kData.edata.dataSize = dataSize;
                 }
 
-                char *ptr = (char*) kData.edata.dataB;
+                ptr = (char*) kData.edata.dataB;
                 ptr[0] = '\0';
                 strcpy(ptr, stsF->strs[0]);
                 for (i = 1; i < stsF->no_str; i++) {
@@ -406,6 +416,7 @@ void connectCallback(struct connection_handler_args args)
 int CreateAndConnect(int index, knobData *kData, int rate)
 {
     int status;
+    connectInfo *tmp;
     struct timeb now;
     ftime(&now);
 #ifdef ACS
@@ -417,7 +428,7 @@ int CreateAndConnect(int index, knobData *kData, int rate)
 
     kData->index = index;
 
-    connectInfo *tmp = (connectInfo *) 0;
+    tmp = (connectInfo *) 0;
 
     //printf("create channel for button=%d <%s>\n", index, kData->pv);
 
@@ -488,6 +499,7 @@ int CreateAndConnect(int index, knobData *kData, int rate)
 void ClearMonitor(knobData *kData)
 {
     int status;
+    connectInfo *tmp;
 
     status = ca_attach_context(dbCaClientContext);
 
@@ -496,7 +508,7 @@ void ClearMonitor(knobData *kData)
     kData->index = -1;
     kData->pv[0] = '\0';
 
-    connectInfo *tmp = (connectInfo *) kData->edata.info;
+    tmp = (connectInfo *) kData->edata.info;
     if (tmp != (connectInfo *) 0) {
         if(tmp->cs == 0) { // epics
             if(tmp->ch != (chid) 0) {
@@ -520,6 +532,7 @@ int EpicsSetValue(char *pv, float rdata, long idata, char *sdata, char *object, 
 {
     chid     ch;
     chtype   chType;
+    int status;
     struct dbr_ctrl_float ctrlR;
     struct dbr_sts_string ctrlS;
 
@@ -550,7 +563,7 @@ int EpicsSetValue(char *pv, float rdata, long idata, char *sdata, char *object, 
 
     // set epics value
     PRINT(printf(" we have to set a value to an epics device <%s> %f %ld <%s>\n", pv, rdata, idata, sdata));
-    int status = ca_create_channel(pv, NULL, 0, CA_PRIORITY, &ch);
+    status = ca_create_channel(pv, NULL, 0, CA_PRIORITY, &ch);
     if (ch == (chid) 0) {
         return !ECA_NORMAL;
     }

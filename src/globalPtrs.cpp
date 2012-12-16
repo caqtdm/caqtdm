@@ -15,11 +15,19 @@
 #include "knobData.h"
 #include "mutexKnobData.h"
 #include "mutexKnobDataWrapper.h"
+#include <caQtDM_Lib_global.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 MutexKnobData* KnobDataPtr;
 
-void MutexKnobDataWrapperInit(MutexKnobData* KnobData)
+#ifdef __cplusplus
+}
+#endif
+
+CAQTDM_LIBSHARED_EXPORT void MutexKnobDataWrapperInit(MutexKnobData* KnobData)
 {
     KnobDataPtr = KnobData;
 }
