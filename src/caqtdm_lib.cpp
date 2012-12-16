@@ -1619,7 +1619,6 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         if(widget->getLimitsMode() == caSlider::Channel) channelLimitsEnabled= true;
 
         if(data.edata.connected) {
-            bool channelLimitsEnabled = false;
             if(widget->getLimitsMode() == caSlider::Channel) channelLimitsEnabled= true;
             // take limits from channel, in case of user limits these should already been set
             if((channelLimitsEnabled) && (data.edata.initialize) ) {
@@ -1798,7 +1797,6 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 // done at initialisation, we have to set it back after no connect
                 if(!widget->property("Connect").value<bool>()) {
                     QColor fg = widget->property("FColor").value<QColor>();
-                    QColor bg = widget->property("FColor").value<QColor>();
                     widget->setForeground(fg);
                     widget->setLineColor(fg);
                     widget->setProperty("Connect", true);
