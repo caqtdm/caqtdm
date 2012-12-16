@@ -1,3 +1,7 @@
+#if defined (_MSC_VER)
+   #define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include <stdlib.h>
 #include <ctype.h>
 #include "parser.h"
@@ -279,6 +283,7 @@ NameValueTable *generateNameValueTable(char *argsString, int *numNameValues)
     NameValueTable *nameTable;
     Boolean first;
 
+    tableIndex = 0;
     nameTable = NULL;
     copyOfArgsString = NULL;
 
@@ -477,14 +482,14 @@ void parseAttr(DisplayInfo *displayInfo, char *widget)
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
     int nestingLevel = 0;
-    ;
+    int clr = 0;
     do {
         switch( (tokenType=getToken(displayInfo,token)) ) {
         case T_WORD:
             if(!strcmp(token,"clr")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                int clr = atoi(token) % DL_MAX_COLORS;
+                clr = atoi(token) % DL_MAX_COLORS;
                 Qt_setColorForeground("",displayInfo->dlColormap->dl_color[clr].r,
                                       displayInfo->dlColormap->dl_color[clr].g,
                                       displayInfo->dlColormap->dl_color[clr].b,
@@ -558,6 +563,8 @@ void parseMonitor(DisplayInfo *displayInfo, char *widget)
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
     int nestingLevel = 0;
+    int clr = 0;
+    int bclr = 0;
 
     do {
         switch( (tokenType=getToken(displayInfo,token)) ) {
@@ -571,7 +578,7 @@ void parseMonitor(DisplayInfo *displayInfo, char *widget)
             } else if (!strcmp(token,"clr")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                int clr = atoi(token) % DL_MAX_COLORS;
+                clr = atoi(token) % DL_MAX_COLORS;
 
                 Qt_setColorForeground("", displayInfo->dlColormap->dl_color[clr].r,
                                       displayInfo->dlColormap->dl_color[clr].g,
@@ -581,7 +588,7 @@ void parseMonitor(DisplayInfo *displayInfo, char *widget)
             } else if (!strcmp(token,"bclr")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                int bclr = atoi(token) % DL_MAX_COLORS;
+                bclr = atoi(token) % DL_MAX_COLORS;
 
                 Qt_setColorBackground("", displayInfo->dlColormap->dl_color[bclr].r,
                                       displayInfo->dlColormap->dl_color[bclr].g,
@@ -921,6 +928,7 @@ void parsePen(DisplayInfo *displayInfo, int pen, char *channels, char *widget)
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
     int nestingLevel = 0;
+    int clr = 0;
 
     do {
         switch( (tokenType=getToken(displayInfo,token)) ) {
@@ -935,7 +943,7 @@ void parsePen(DisplayInfo *displayInfo, int pen, char *channels, char *widget)
             } else if (!strcmp(token,"clr")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                int clr = atoi(token) % DL_MAX_COLORS;
+                clr = atoi(token) % DL_MAX_COLORS;
                 Qt_setColorTrace("", displayInfo->dlColormap->dl_color[clr].r,
                                  displayInfo->dlColormap->dl_color[clr].g,
                                  displayInfo->dlColormap->dl_color[clr].b,
@@ -1006,8 +1014,6 @@ void parseObject(DisplayInfo *displayInfo, DlObject *object)
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
-    //Qt_writeCloseTag("rect", "", False);
-    //Qt_writeCloseProperty();
 }
 
 void parsePlotcom(DisplayInfo *displayInfo, char *widget)
@@ -1015,6 +1021,8 @@ void parsePlotcom(DisplayInfo *displayInfo, char *widget)
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
     int nestingLevel = 0;
+    int clr = 0;
+    int bclr = 0;
 
     do {
         switch( (tokenType=getToken(displayInfo,token)) ) {
@@ -1045,7 +1053,7 @@ void parsePlotcom(DisplayInfo *displayInfo, char *widget)
             } else if (!strcmp(token,"clr")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                int clr = atoi(token) % DL_MAX_COLORS;
+                clr = atoi(token) % DL_MAX_COLORS;
 
                 Qt_setColorScale("", displayInfo->dlColormap->dl_color[clr].r,
                                  displayInfo->dlColormap->dl_color[clr].g,
@@ -1055,7 +1063,7 @@ void parsePlotcom(DisplayInfo *displayInfo, char *widget)
             } else if (!strcmp(token,"bclr")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                int bclr = atoi(token) % DL_MAX_COLORS;
+                bclr = atoi(token) % DL_MAX_COLORS;
 
                 Qt_setColorForeground("", displayInfo->dlColormap->dl_color[bclr].r,
                                       displayInfo->dlColormap->dl_color[bclr].g,
@@ -1090,6 +1098,7 @@ void parseTrace(DisplayInfo *displayInfo, int traceNr)
     char pvY[MAX_TOKEN_LENGTH];
     char mon[2*MAX_TOKEN_LENGTH+1];
     char channel[MAX_TOKEN_LENGTH];
+    int clr = 0;
 
     pvX[0] = '\0';
     pvY[0] = '\0';
@@ -1108,7 +1117,7 @@ void parseTrace(DisplayInfo *displayInfo, int traceNr)
             } else if (!strcmp(token,"data_clr")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                int clr = atoi(token) % DL_MAX_COLORS;
+                clr = atoi(token) % DL_MAX_COLORS;
 
                 Qt_setColorTrace("", displayInfo->dlColormap->dl_color[clr].r,
                                  displayInfo->dlColormap->dl_color[clr].g,
@@ -1421,6 +1430,7 @@ void *parseRelatedDisplay(DisplayInfo *displayInfo, FrameOffset * offset)
     char argus[LONGSTRING]  = "\0";
 
     static int number = 0;
+    int clr = 0;
     char widgetName[MAX_ASCII];
     sprintf(widgetName, "caRelatedDisplay_%d", number++);
     Qt_writeOpenTag("widget", "caRelatedDisplay", widgetName);
@@ -1448,7 +1458,7 @@ void *parseRelatedDisplay(DisplayInfo *displayInfo, FrameOffset * offset)
             } else if(!strcmp(token,"clr")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                int clr = atoi(token) % DL_MAX_COLORS;
+                clr = atoi(token) % DL_MAX_COLORS;
                 Qt_setColorForeground("",displayInfo->dlColormap->dl_color[clr].r,
                                       displayInfo->dlColormap->dl_color[clr].g,
                                       displayInfo->dlColormap->dl_color[clr].b,
@@ -1456,7 +1466,7 @@ void *parseRelatedDisplay(DisplayInfo *displayInfo, FrameOffset * offset)
             } else if(!strcmp(token,"bclr")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                int clr = atoi(token) % DL_MAX_COLORS;
+                clr = atoi(token) % DL_MAX_COLORS;
                 Qt_setColorBackground("",displayInfo->dlColormap->dl_color[clr].r,
                                       displayInfo->dlColormap->dl_color[clr].g,
                                       displayInfo->dlColormap->dl_color[clr].b,
@@ -1559,6 +1569,8 @@ void *parseShellCommand(DisplayInfo *displayInfo, FrameOffset * offset)
     int cmdNumber;
     int rc;
     DlObject object;
+    int clr = 0;
+    int bclr = 0;
 
     char labels[LONGSTRING] = "\0";
     char names[LONGSTRING] = "\0";
@@ -1592,7 +1604,7 @@ void *parseShellCommand(DisplayInfo *displayInfo, FrameOffset * offset)
             } else if(!strcmp(token,"clr")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                int clr = atoi(token) % DL_MAX_COLORS;
+                clr = atoi(token) % DL_MAX_COLORS;
 
                 Qt_setColorForeground("", displayInfo->dlColormap->dl_color[clr].r,
                                       displayInfo->dlColormap->dl_color[clr].g,
@@ -1601,7 +1613,7 @@ void *parseShellCommand(DisplayInfo *displayInfo, FrameOffset * offset)
             } else if(!strcmp(token,"bclr")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                int bclr = atoi(token) % DL_MAX_COLORS;
+                bclr = atoi(token) % DL_MAX_COLORS;
 
                 Qt_setColorBackground("", displayInfo->dlColormap->dl_color[bclr].r,
                                       displayInfo->dlColormap->dl_color[bclr].g,
@@ -2648,11 +2660,14 @@ void *parseComposite(DisplayInfo *displayInfo, FrameOffset *offset)
 
     static int number = 0;
     char widgetName[MAX_ASCII];
+    FrameOffset *frameoffset;
+    FrameOffset *actoffset;
+    FrameOffset *newoffset;
 
     object = (DlObject *)malloc(sizeof(DlObject));
 
-    FrameOffset *frameoffset = (FrameOffset *)malloc(sizeof(FrameOffset));
-    FrameOffset *actoffset = (FrameOffset *)malloc(sizeof(FrameOffset));
+    frameoffset = (FrameOffset *)malloc(sizeof(FrameOffset));
+    actoffset = (FrameOffset *)malloc(sizeof(FrameOffset));
 
     do {
         switch(tokenType=getToken(displayInfo,token)) {
@@ -2686,7 +2701,7 @@ void *parseComposite(DisplayInfo *displayInfo, FrameOffset *offset)
 
             } else if(!strcmp(token,"composite file")) {
 
-                FrameOffset *newoffset = (FrameOffset *)malloc(sizeof(FrameOffset));
+                newoffset = (FrameOffset *)malloc(sizeof(FrameOffset));
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 strcpy(compositeFile,token);
@@ -3565,16 +3580,12 @@ TOKEN parseAndAppendDisplayList(DisplayInfo *displayInfo, FrameOffset *offset, c
     static Boolean init = True;
     int first = 1;
     static int veryFirst = True;
+    int bclr = 0;
 
     if(veryFirst) {
         veryFirst = False;
-        int bclr = displayInfo->drawingAreaBackgroundColor;
-        /*
-        Qt_setColormain("", displayInfo->dlColormap->dl_color[bclr].r,
-                        displayInfo->dlColormap->dl_color[bclr].g,
-                        displayInfo->dlColormap->dl_color[bclr].b,
-                        255);
-*/
+        bclr = displayInfo->drawingAreaBackgroundColor;
+
         Qt_writeStyleSheet(displayInfo->dlColormap->dl_color[bclr].r,
                            displayInfo->dlColormap->dl_color[bclr].g,
                            displayInfo->dlColormap->dl_color[bclr].b);

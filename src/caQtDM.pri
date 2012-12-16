@@ -1,3 +1,5 @@
+include(qtdefs.pri)
+
 QT       += core gui svg
 CONFIG      += qt warn_on thread uitools
 
@@ -28,7 +30,7 @@ INCLUDEPATH += $(HOME)/workarea/ACS/mezger/caQtDM_Lib
 
 DEFINES += BUILDTIME=\\\"$$system(date '+%H:%M')\\\"
 DEFINES += BUILDDATE=\\\"$$system(date '+%d-%m-%Y')\\\"
-DEFINES += BUILDVERSION=\\\"V2.4\\\"
+DEFINES += BUILDVERSION=\\\"$${CAQTDM_VERSION}\\\"
 DEFINES += BUILDARCH=\\\"$$(QMAKESPEC)\\\"
 
 

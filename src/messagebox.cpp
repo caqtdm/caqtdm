@@ -12,7 +12,7 @@
 #include "messagebox.h"
 
 
-MessageBox::MessageBox (Icon icon,
+QTDMMessageBox::QTDMMessageBox (Icon icon,
                         const QString & title,
                         const QString & text,
                         StandardButtons buttons,
@@ -31,11 +31,11 @@ MessageBox::MessageBox (Icon icon,
     }
 }
 
-MessageBox::~MessageBox() {
+QTDMMessageBox::~QTDMMessageBox() {
 
 }
 
-void MessageBox::timerEvent(QTimerEvent *event)
+void QTDMMessageBox::timerEvent(QTimerEvent *event)
 {
     Q_UNUSED(event);
     currentTime++;

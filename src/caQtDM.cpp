@@ -11,11 +11,16 @@
 //
 //******************************************************************************
 
+#if defined(_MSC_VER)
+   #include <windows.h>
+#endif
+
+#include "dmsearchfile.h"
+#include <QtGui/QApplication>
+#include "fileopenwindow.h"
 #include "QDebug"
 #include <QFileDialog>
 #include <signal.h>
-#include "fileopenwindow.h"
-
 
 static void unixSignalHandler(int signum) {
     //qDebug("DBG: main.cpp::unixSignalHandler(). signal = %s\n", strsignal(signum));

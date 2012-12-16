@@ -9,11 +9,16 @@
 //
 //******************************************************************************
 
+#if defined(_MSC_VER)
+   #include <windows.h>
+#endif
+
+#include "dmsearchfile.h"
+
 #include <QtGui>
 
 #include "fileopenwindow.h"
 #include "caqtdm_lib.h"
-#include "dmsearchfile.h"
 
 #include <iostream>
 #include <string>
@@ -22,10 +27,9 @@
 #include <QString>
 #include "messagebox.h"
 
-#include <sys/time.h>
-
 #ifdef linux
 #include <sys/resource.h>
+#include <sys/time.h>
 #endif
 
 #ifdef Q_WS_X11
@@ -140,7 +144,6 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         lastMacro = macroString;
         lastFile = filename;
         mustOpenFile = true;
-        //Callback_OpenNewFile(filename, macroString);
     }
 
     setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowMinMaxButtonsHint);
@@ -178,7 +181,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
     // we want to ask with timeout if the application has to be closed
     if(this->findChildren<CaQtDM_Lib *>().count() <= 0 && userClose) {
         QString message = QString("no more open windows, do you want to exit?");
-        MessageBox *m = new MessageBox(QMessageBox::Warning, "Exit", message, QMessageBox::Yes | QMessageBox::No, this, Qt::Dialog, true);
+        QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "Exit", message, QMessageBox::Yes | QMessageBox::No, this, Qt::Dialog, true);
         m->show();
         int selected = m->exec();
         if(selected == QMessageBox::Yes) {
@@ -216,7 +219,7 @@ void FileOpenWindow::Callback_OpenButton()
     //std::cout << "Got filename: " << fileName.toStdString() << std::endl;
 
     if(!fileName.isNull()) {
-        char asc[255];
+        char asc[1000];
         QFileInfo fi(fileName);
         if(fi.exists()) {
             QMainWindow *mainWindow = new CaQtDM_Lib(this, fileName, "", mutexKnobData, messageWindow);
@@ -233,7 +236,7 @@ void FileOpenWindow::Callback_OpenButton()
             messageWindow->postMsgEvent(QtDebugMsg, asc);
 
         } else {
-            MessageBox(QMessageBox::Warning, "file open error", "does not exist", QMessageBox::Close, this, Qt::Popup, true);
+            QTDMMessageBox(QMessageBox::Warning, "file open error", "does not exist", QMessageBox::Close, this, Qt::Popup, true);
         }
     }
 }
@@ -305,7 +308,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     if(fileNameFound.isNull()) {
         QString message = QString(FileName);
         message.append(" does not exist");
-        MessageBox *m = new MessageBox(QMessageBox::Warning, "file open error", message, QMessageBox::Close, this, Qt::Dialog, true);
+        QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "file open error", message, QMessageBox::Close, this, Qt::Dialog, true);
         m->show();
         //qDebug() << "sorry -- file" << FileName << "does not exist";
     } else {
@@ -335,7 +338,7 @@ void FileOpenWindow::Callback_ActionAbout()
 {
     QString message = QString("Qt-based Epics Display Manager Version %1 using %2 with data from %3 developed at Paul Scherrer Institut, by Anton Mezger\n");
     message = message.arg(BUILDVERSION, BUILDARCH, SUPPORT);
-    MessageBox *m = new MessageBox(QMessageBox::Information, "About", message, QMessageBox::Close, this, Qt::Dialog, true);
+    QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Information, "About", message, QMessageBox::Close, this, Qt::Dialog, true);
     m->show();
 }
 
@@ -345,7 +348,7 @@ void FileOpenWindow::Callback_ActionAbout()
 void FileOpenWindow::Callback_ActionExit()
 {
     QString message = QString("Are you sure to want to exit?");
-    MessageBox *m = new MessageBox(QMessageBox::Warning, "Exit", message, QMessageBox::Yes | QMessageBox::No, this, Qt::Dialog, false);
+    QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "Exit", message, QMessageBox::Yes | QMessageBox::No, this, Qt::Dialog, false);
     m->show();
     int selected = m->exec();
     if(selected == QMessageBox::Yes) {

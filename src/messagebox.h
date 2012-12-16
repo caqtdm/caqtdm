@@ -15,11 +15,11 @@
 #include <QCoreApplication>
 #include <QMessageBox>
 
-class MessageBox : public QMessageBox {
+class QTDMMessageBox : public QMessageBox {
 
 public:
 
-MessageBox ( Icon icon,
+QTDMMessageBox ( Icon icon,
              const QString & title,
              const QString & text,
              StandardButtons buttons = NoButton,
@@ -27,7 +27,7 @@ MessageBox ( Icon icon,
              Qt::WindowFlags f = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint,
              bool autoClose = false);
 
-~MessageBox();
+~QTDMMessageBox();
 
 protected:
 

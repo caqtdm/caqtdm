@@ -1,3 +1,7 @@
+#if defined(_MSC_VER)
+   #define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -11,6 +15,7 @@
 zOrder zorder[10000];
 int zindex=0;
 
+/*
 static void uppercase(char *str)
 {
     int i;
@@ -18,6 +23,7 @@ static void uppercase(char *str)
         str[i] = toupper( str[ i ] );
     return;
 }
+*/
 
 static void replace_char (char *s, char find, char replace) {
     while (*s != 0) {
@@ -39,9 +45,9 @@ static void wheelSwitchFormat(char *format, int *width, int *precision)
     char *percent = NULL,*fpart = NULL,*ad;
     char format_used[255];
     char flag_char[2] = " ";
+    int nparsed = 0;
     *width = DEFAULT_FORMAT_WIDTH;
     *precision = DEFAULT_FORMAT_PRECISION;
-    int nparsed = 0;
 
     /* Check for a % with an f following somewhere after */
     percent = strchr(format, '%');
@@ -255,9 +261,10 @@ void Qt_setMinimumLimitSource(char *widget, int pen, char *token)
 
 void Qt_setMaximumLimitSource(char *widget, int pen, char *token)
 {
+    char strng[30];
+
     if(strstr(widget, "Gauge") != (char*) 0) return;
 
-    char strng[30];
     if(strstr(token, "default") != (char*) 0) {
         sprintf(strng, "%s::User", widget);
     } else if(strstr(token, "channel") != (char*) 0) {
@@ -300,7 +307,7 @@ int Qt_setColorMode(char *widget, char *token)
     char asc[80];
     char aux[80];
 
-    if(strstr(widget, "Gauge") != (char*) 0) return;
+    if(strstr(widget, "Gauge") != (char*) 0) return 0;
 
     if(!strcmp(token,"static")) {
         sprintf(asc, "%s::Static", widget);
@@ -318,6 +325,7 @@ int Qt_setColorMode(char *widget, char *token)
         Qt_handleString("colorMode", "enum", asc);
         return 0;
     }
+    return 0;
 }
 
 int Qt_setVisibilityMode(char *widget, char *token)
