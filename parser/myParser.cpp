@@ -108,7 +108,7 @@ void myParser::writeStyleSheet(int r, int g, int b)
 {
     xw->writeOpenTag( "property", AttrMap("name", "styleSheet") );
 
-    QString color = "\n\nQWidget#centralWidget {background: rgb(%1, %2, %3);}\n\n";
+    QString color = "\n\nQWidget#centralWidget {background: rgba(%1, %2, %3, 255);}\n\n";
     color = color.arg(r).arg(g).arg(b);
 
     QString styles = color;
