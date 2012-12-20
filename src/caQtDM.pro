@@ -30,6 +30,20 @@ HEADERS  +=  \
  MOC_DIR = moc
  OBJECTS_DIR = obj
  DESTDIR = .
+
+win32-g++ {
+  EPICS_LIBS=$${EPICS_BASE}/lib/win32-x86-mingw
+}
+win32-msvc* {
+        DebugBuild {
+                EPICS_LIBS=$${EPICS_BASE}/lib/win32-x86
+                OBJECTS_DIR = debug/obj
+        }
+        ReleaseBuild {
+                EPICS_LIBS=$${EPICS_BASE}/lib/win32-x86-debug
+                OBJECTS_DIR = release/obj
+        }
+}
  
  INCLUDEPATH += .
  INCLUDEPATH += $${QWTHOME}/src
@@ -49,5 +63,34 @@ HEADERS  +=  \
  DEFINES += BUILDARCH=\\\"$$(QMAKESPEC)\\\"
  DEFINES += SUPPORT=\\\"EPICS\\\"
  UI_DIR += ./
- RESOURCES +=
+
+   win32-g++ {
+
+        QTCONTROLS_LIBS=$${QTCONTROLS}/release
+        LIBS += $${CAQTDM_LIBS}/release/libcaQtDm_Lib.a
+        LIBS += $${QWTHOME}/lib/libqwt.a
+        LIBS += $${QTCONTROLS_LIBS}/libqtcontrols.a
+        LIBS += $${EPICS_BASE}/lib/win32-x86-mingw/ca.lib
+        LIBS += $${EPICS_BASE}/lib/win32-x86-mingw/COM.lib
+    }
+     win32-msvc* {
+        DebugBuild {
+                LIBS += $${CAQTDM_LIB}/debug/caQtDM_Lib.lib
+                LIBS += $${QWTHOME}/lib/qwtd.lib
+                LIBS += $${EPICS_BASE}/lib/win32-x86-debug/ca.lib
+                LIBS += $${EPICS_BASE}/lib/win32-x86-debug/COM.lib
+                LIBS += $${QTCONTROLS}/debug/qtcontrols.lib
+
+        }
+
+        ReleaseBuild {
+                LIBS += $${CAQTDM_LIB}/release/caQtDM_Lib.lib
+                LIBS += $${QWTHOME}/lib/qwt.lib
+                LIBS += $${EPICS_BASE}/lib/win32-x86/ca.lib
+                LIBS += $${EPICS_BASE}/lib/win32-x86/COM.lib
+                LIBS += $${QTCONTROLS}/release/qtcontrols.lib
+                QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\caQtDM.exe $${BINARY_LOCATION}
+        }
+     }
+
 }
