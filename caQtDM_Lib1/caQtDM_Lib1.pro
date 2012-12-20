@@ -4,4 +4,8 @@ TARGET = caQtDM_Lib
 OBJECTS_DIR = ../obj1
 TEMPLATE = lib
 
+HEADERS +=
+
+SOURCES +=
+
 
