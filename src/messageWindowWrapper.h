@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 typedef struct MessageWindow MessageWindow;
-extern MessageWindow* messageWindow;
+/*extern*/ MessageWindow* messageWindow;
 MessageWindow* C_postMsgEvent(MessageWindow* p, int type, char* msg);
 
 #ifdef __cplusplus

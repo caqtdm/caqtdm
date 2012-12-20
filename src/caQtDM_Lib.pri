@@ -6,8 +6,8 @@ TARGET = caQtDM_Lib
 TEMPLATE = lib
 
 MOC_DIR = ../moc
-VPATH += ../
-INCLUDEPATH += ../
+VPATH += ../src
+INCLUDEPATH += ../src
 DESTDIR = ../
 UI_DIR += ../
 
@@ -24,7 +24,8 @@ SOURCES += caqtdm_lib.cpp \
     dmsearchfile.cpp \
     MessageWindow.cpp \
     vaPrintf.c \
-    myMessageBox.cpp
+    myMessageBox.cpp \
+    limitsStripplotDialog.cpp
 
 HEADERS += caqtdm_lib.h\
         caQtDM_Lib_global.h \
@@ -39,15 +40,16 @@ HEADERS += caqtdm_lib.h\
     MessageWindow.h \
     messageWindowWrapper.h \
     vaPrintf.h \
-    myMessageBox.h
+    myMessageBox.h \
+    limitsStripplotDialog.h
 
 HEADERS += \
-    ../JSONValue.h \
-    ../JSON.h
+    JSONValue.h \
+    JSON.h
 
 SOURCES += \
-    ../JSONValue.cpp \
-    ../JSON.cpp
+    JSONValue.cpp \
+    JSON.cpp
 
 
 INCLUDEPATH += .

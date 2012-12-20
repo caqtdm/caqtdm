@@ -1074,6 +1074,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         //qDebug() << "create caStripPlot";
 
         QString text;
+        QList<QVariant> integerList;
+        int nbMon = 0;
 
         // addmonitor normally will add a tooltip to show the pv; however here we have more than one pv
         QString tooltip;
@@ -1081,6 +1083,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         text = widget->getPVS();
         reaffectText(map, &text);
+        widget->setPVS(text);
         QStringList vars = text.split(";", QString::SkipEmptyParts);
 
         int NumberOfCurves = min(vars.count(), 5);
@@ -1089,18 +1092,21 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         widget->defineCurves(vars, widget->getUnits(), widget->getPeriod(),  widget->width(),  NumberOfCurves);
         for(int i=0; i< NumberOfCurves; i++) {
+            int num;
             QString pv = vars.at(i).trimmed();
             if(pv.size() > 0) {
-                if(i==0) {
-                    widget->setYscale( widget->getYaxisLimitsMin(i), widget->getYaxisLimitsMax(i));
+                if(i==0) {  // user defaults, will be redefined when limits from channel
+                    widget->setYscale(widget->getYaxisLimitsMin(i), widget->getYaxisLimitsMax(i));
                 }
                 specData[1] = i;            // curve number
                 specData[0] = vars.count(); // number of curves
-                addMonitor(myWidget, &kData, pv, w1, specData, map, &pv);
+                num = addMonitor(myWidget, &kData, pv, w1, specData, map, &pv);
+                nbMon++;
                 widget->showCurve(i, true);
 
                 tooltip.append(pv);
                 tooltip.append("<br>");
+                integerList.append(num);
             }
         }
         widget->startPlot();
@@ -1109,6 +1115,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         tooltip.append(ToolTipPostfix);
         widget->setToolTip(tooltip);
 
+        integerList.insert(0, nbMon); /* set property into widget */
+        widget->setProperty("MonitorList", integerList);
         widget->setProperty("Taken", true);
 
         //==================================================================================================================
@@ -1967,15 +1975,33 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         // stripchart ==================================================================================================================
     } else if(caStripPlot *widget = qobject_cast<caStripPlot *>(w)) {
 
+        int actPlot= data.specData[1];
         if(data.edata.connected) {
-            double y0min = widget->getYaxisLimitsMin(0);
-            double y0max = widget->getYaxisLimitsMax(0);
-            int actPlot= data.specData[1];
-            double ymin =  widget->getYaxisLimitsMin(actPlot);
-            double ymax =  widget->getYaxisLimitsMax(actPlot);
-            // we rescale this point to fit to the axis of the first plot
-            double yp = (y0max - y0min) / (ymax -ymin) * (data.edata.rvalue - ymin) + y0min;
-            widget->setData(yp, data.specData[1]);
+
+            // scaling
+            if(data.edata.initialize) {
+                if(widget->getYscalingMin(actPlot) == caStripPlot::Channel) {
+                    if(actPlot==0) widget->setYaxisLimitsMin_1(data.edata.lower_disp_limit);
+                    if(actPlot==1) widget->setYaxisLimitsMin_2(data.edata.lower_disp_limit);
+                    if(actPlot==2) widget->setYaxisLimitsMin_3(data.edata.lower_disp_limit);
+                    if(actPlot==3) widget->setYaxisLimitsMin_4(data.edata.lower_disp_limit);
+                    if(actPlot==4) widget->setYaxisLimitsMin_5(data.edata.lower_disp_limit);
+                }
+                if(widget->getYscalingMax(actPlot) == caStripPlot::Channel) {
+                    if(actPlot==0) widget->setYaxisLimitsMax_1(data.edata.upper_disp_limit);
+                    if(actPlot==1) widget->setYaxisLimitsMax_2(data.edata.upper_disp_limit);
+                    if(actPlot==2) widget->setYaxisLimitsMax_3(data.edata.upper_disp_limit);
+                    if(actPlot==3) widget->setYaxisLimitsMax_4(data.edata.upper_disp_limit);
+                    if(actPlot==4) widget->setYaxisLimitsMax_5(data.edata.upper_disp_limit);
+                }
+                if(actPlot == 0) {
+                    double ymin = widget->getYaxisLimitsMin(0);
+                    double ymax = widget->getYaxisLimitsMax(0);
+                    widget->setYscale(ymin, ymax);
+                }
+            }
+
+            widget->setData(data.edata.rvalue, actPlot);
         }
 
         // animated gif ==================================================================================================================
@@ -2312,11 +2338,31 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
 #endif
     caShellCommand *choice = qobject_cast<caShellCommand *>(sender());
     QStringList commands = choice->getFiles().split(";");
-    QStringList args = choice->getArgs().split(";");
+    QString argslist = choice->getArgs();
+
+    // we can have ; between quotes that should not be treated as separator
+    // instead of a real parsing, replace the ; between quotes by an unused character ?
+    bool inside = false;
+    for (int i = 0; i < argslist.size(); i++) {
+        if(!inside && (argslist.at(i) == QChar('\'')) || (argslist.at(i) == QChar('\"'))) {
+            inside = true;
+        } else if(inside && (argslist.at(i) == QChar('\'')) || (argslist.at(i) == QChar('\"'))) {
+            inside = false;
+        }
+        if (inside) {
+            if(argslist.at(i) == QChar(';')) {
+                argslist.replace(i, 1, "?");
+            }
+        }
+    }
+
+    QStringList args = argslist.split(";");
+
     if(indx < commands.count() && indx < args.count()) {
         QString command;
         command.append(commands[indx].trimmed());
         command.append(" ");
+        args[indx].replace("?", ";");
         command.append(args[indx].trimmed());
         // replace medm by caQtDM
         command.replace("camedm ", "caQtDM ");
@@ -2618,6 +2664,9 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     // construct info for the pv we are pointing at
     myMenu.addAction("Get Info");
     myMenu.addAction("Print");
+    if(caStripPlot* widget = qobject_cast<caStripPlot *>(w)) {
+       myMenu.addAction("Change Axis");
+    }
 
     QAction* selectedItem = myMenu.exec(pos);
 
@@ -2771,6 +2820,14 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
         } else if(selectedItem->text().contains("Print")) {
             print();
+        } else if(selectedItem->text().contains("Change Axis")) {
+            caStripPlot* widget = qobject_cast<caStripPlot *>(w);
+            limitsStripplotDialog dialog(widget, mutexKnobData, "stripplot modifications", this);
+
+            if (dialog.exec() == QDialog::Accepted) {
+            }
+
+
         }
     } else {
         // nothing was chosen

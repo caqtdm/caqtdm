@@ -25,16 +25,17 @@
 #ifndef _JSONVALUE_H_
 #define _JSONVALUE_H_
 
+#include <caQtDM_Lib_global.h>
 #include <vector>
 #include <string>
 
 #include "JSON.h"
 
-class JSON;
+class CAQTDM_LIBSHARED_EXPORT JSON;
 
 enum JSONType { JSONType_Null, JSONType_String, JSONType_Bool, JSONType_Number, JSONType_Array, JSONType_Object };
 
-class JSONValue
+class CAQTDM_LIBSHARED_EXPORT JSONValue
 {
 	friend class JSON;
 	

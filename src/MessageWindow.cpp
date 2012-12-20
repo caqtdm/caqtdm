@@ -30,6 +30,8 @@ MessageWindow::MessageWindow(QWidget* parent) : QDockWidget(parent)
         setMinimumSize(600, 150);
         setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowMinMaxButtonsHint);
         show();
+
+        move(x(), 0);
 }
 
 QString MessageWindow::QtMsgToQString(QtMsgType type, const char *msg)

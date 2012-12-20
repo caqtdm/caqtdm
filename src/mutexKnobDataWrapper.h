@@ -19,7 +19,11 @@ extern "C" {
 #endif
 
 typedef struct MutexKnobData MutexKnobData;
-extern void MutexKnobDataWrapperInit(MutexKnobData*);
+#if defined(_MSC_VER)
+   extern CAQTDM_LIBSHARED_EXPORT void MutexKnobDataWrapperInit(MutexKnobData*);
+#else
+   extern void MutexKnobDataWrapperInit(MutexKnobData*);
+#endif
 extern MutexKnobData* C_SetMutexKnobData(MutexKnobData* p, int indx, knobData data);
 extern MutexKnobData* C_GetMutexKnobData(MutexKnobData* p, int indx, knobData *data);
 extern MutexKnobData* C_SetMutexKnobDataConnected(MutexKnobData* p, int indx, int connected);

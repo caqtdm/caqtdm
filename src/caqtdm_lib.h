@@ -35,6 +35,7 @@
 #include "mutexKnobDataWrapper.h"
 #include "MessageWindow.h"
 #include "JSON.h"
+#include "limitsStripplotDialog.h"
 
 #include <QtControls>
 
