@@ -33,8 +33,10 @@ OBJECTS_DIR = obj
 
 
 DESTDIR = .
-INCLUDEPATH += .
 UI_DIR += ./
+VPATH += ./src
+INCLUDEPATH += ./src
+
 
 DEFINES += CAQTDM_LIB_LIBRARY
 
@@ -45,7 +47,8 @@ SOURCES += caqtdm_lib.cpp \
     dmsearchfile.cpp \
     MessageWindow.cpp \
     vaPrintf.c \
-    myMessageBox.cpp
+    myMessageBox.cpp \
+    limitsStripplotDialog.cpp
 
 HEADERS += caqtdm_lib.h\
         caQtDM_Lib_global.h \
@@ -60,9 +63,16 @@ HEADERS += caqtdm_lib.h\
     MessageWindow.h \
     messageWindowWrapper.h \
     vaPrintf.h \
-    myMessageBox.h
+    myMessageBox.h \
+    limitsStripplotDialog.h
+    
+HEADERS += \
+    JSONValue.h \
+    JSON.h
 
-
+SOURCES += \
+    JSONValue.cpp \
+    JSON.cpp
 
 INCLUDEPATH += $${QWTHOME}/src
 INCLUDEPATH += $${QTCONTROLS_INCLUDES}
@@ -74,14 +84,6 @@ LIBS += $${QTCONTROLS_LIBS}/libqtcontrols.a
 LIBS += $${EPICS_LIBS}/ca.lib
 LIBS += $${EPICS_LIBS}/COM.lib
 
-    win32-g++ {
-
-        QTCONTROLS_LIBS=$${QTCONTROLS}/release
-        LIBS += $${QWTHOME}/lib/libqwt.a
-        LIBS += $${QTCONTROLS_LIBS}/libqtcontrols.a
-        LIBS += $${EPICS_BASE}/lib/win32-x86-mingw/ca.lib
-        LIBS += $${EPICS_BASE}/lib/win32-x86-mingw/COM.lib
-    }
      win32-msvc* {
         DEFINES += CAQTDM_LIB_LIBRARY
         DebugBuild {
