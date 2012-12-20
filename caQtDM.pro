@@ -30,10 +30,13 @@ HEADERS  +=  \
  MOC_DIR = moc
  OBJECTS_DIR = obj
  DESTDIR = .
+ VPATH += ./src
+ UI_DIR += ./
+ 
+ RESOURCES += ./caQtDM.qrc
+ #RC_FILE = ../caQtDM.rc
 
-win32-g++ {
-  EPICS_LIBS=$${EPICS_BASE}/lib/win32-x86-mingw
-}
+
 win32-msvc* {
         DebugBuild {
                 EPICS_LIBS=$${EPICS_BASE}/lib/win32-x86
@@ -62,17 +65,7 @@ win32-msvc* {
  DEFINES += BUILDVERSION=\\\"$${CAQTDM_VERSION}\\\"
  DEFINES += BUILDARCH=\\\"$$(QMAKESPEC)\\\"
  DEFINES += SUPPORT=\\\"EPICS\\\"
- UI_DIR += ./
 
-   win32-g++ {
-
-        QTCONTROLS_LIBS=$${QTCONTROLS}/release
-        LIBS += $${CAQTDM_LIBS}/release/libcaQtDm_Lib.a
-        LIBS += $${QWTHOME}/lib/libqwt.a
-        LIBS += $${QTCONTROLS_LIBS}/libqtcontrols.a
-        LIBS += $${EPICS_BASE}/lib/win32-x86-mingw/ca.lib
-        LIBS += $${EPICS_BASE}/lib/win32-x86-mingw/COM.lib
-    }
      win32-msvc* {
         DebugBuild {
                 LIBS += $${CAQTDM_LIB}/debug/caQtDM_Lib.lib
