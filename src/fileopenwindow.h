@@ -70,6 +70,8 @@ signals:
      QTimer *timer;
 
      bool mustOpenFile;
+
+     QString lastFilePath;
  };
 
  #endif

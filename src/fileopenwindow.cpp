@@ -99,6 +99,9 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     messageWindow = new MessageWindow();
     if(minimize) messageWindow->showMinimized();
     messageWindow->setGeometry(305,0, 500, 150);
+    messageWindow->setWindowIcon (QIcon(":/caQtDM.ico"));
+    messageWindow->show();
+    messageWindow->move(messageWindow->x(), 0);
 
     sharedMemory.setKey ("caQtDM shared memory");
 
@@ -214,13 +217,15 @@ void FileOpenWindow::Callback_OpenButton()
 {
     //get a filename to open
     QString path = (QString)  getenv("CAQTDM_DISPLAY_PATH");
-    if(path.size() == 0) path.append(".");
+    if(path.size() == 0 && lastFilePath.size()==0) path.append(".");
+    else path = lastFilePath;
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open ui file"), path, tr("ui Files (*.ui)"));
     //std::cout << "Got filename: " << fileName.toStdString() << std::endl;
 
     if(!fileName.isNull()) {
         char asc[1000];
         QFileInfo fi(fileName);
+        lastFilePath = fi.absolutePath();
         if(fi.exists()) {
             QMainWindow *mainWindow = new CaQtDM_Lib(this, fileName, "", mutexKnobData, messageWindow);
             mainWindow->show();
@@ -234,7 +239,6 @@ void FileOpenWindow::Callback_OpenButton()
             lastFile = fileName;
             sprintf(asc, "last file: %s", lastFile.toAscii().constData());
             messageWindow->postMsgEvent(QtDebugMsg, asc);
-
         } else {
             QTDMMessageBox(QMessageBox::Warning, "file open error", "does not exist", QMessageBox::Close, this, Qt::Popup, true);
         }

@@ -36,6 +36,8 @@ static void unixSignalHandler(int signum) {
 
 int main(int argc, char *argv[])
 {
+    Q_INIT_RESOURCE(caQtDM);
+
     QApplication app(argc, argv);
 
     QString fileName = "";
@@ -107,7 +109,9 @@ int main(int argc, char *argv[])
     }
 
     FileOpenWindow window (0, fileName, macroString, attach, minimize);
+    window.setWindowIcon (QIcon(":/caQtDM.ico"));
     window.show();
+    window.move(0,0);
 
     if (signal(SIGINT, unixSignalHandler) == SIG_ERR) {
         qFatal("ERR - %s(%d): An error occurred while setting a signal handler.\n", __FILE__,__LINE__);
