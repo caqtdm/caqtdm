@@ -1969,7 +1969,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         } else {
             widget->setCountNumber(0);
             widget->setWhiteColors();
-            widget->setProperty("Connect", false); 
+            widget->setProperty("Connect", false);
         }
 
         // stripchart ==================================================================================================================
