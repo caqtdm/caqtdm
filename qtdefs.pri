@@ -13,8 +13,7 @@ BINARY_LOCATION=C:\QtSDK\Desktop\Qt\4.8.1
 
 # location of epics 
 EPICS_LIBS=C:/epics/base-3.14.12/lib/win32-x86-mingw
-EPICS_INCLUDES1=C:/epics/base-3.14.12/include
-EPICS_INCLUDES2=C:/epics/base-3.14.12/include/os/win32
+EPICS_BASE = C:/epics/base-3.14.12
 
 # location of the caQtDM_Lib 
 CAQTDM_LIBS=C:/work/caQtDM_Lib/release
