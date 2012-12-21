@@ -75,15 +75,16 @@ SOURCES += \
     JSON.cpp
 
 INCLUDEPATH += $${QWTHOME}/src
+INCLUDEPATH += $${QWTHOME}/include
 INCLUDEPATH += $${QTCONTROLS_INCLUDES}
-INCLUDEPATH += $${EPICS_INCLUDES1}
-INCLUDEPATH += $${EPICS_INCLUDES2}
-
-LIBS += $${QWTHOME}/lib/libqwt.a
-LIBS += $${QTCONTROLS_LIBS}/libqtcontrols.a
-LIBS += $${EPICS_LIBS}/ca.lib
-LIBS += $${EPICS_LIBS}/COM.lib
-
+INCLUDEPATH += $${EPICS_BASE}/include
+INCLUDEPATH += $${EPICS_BASE}/include/os/win32
+     win32-g++ {
+	LIBS += $${QWTHOME}/lib/libqwt.a
+	LIBS += $${QTCONTROLS_LIBS}/libqtcontrols.a
+	LIBS += $${EPICS_LIBS}/ca.lib
+	LIBS += $${EPICS_LIBS}/COM.lib
+     }
      win32-msvc* {
         DEFINES += CAQTDM_LIB_LIBRARY
         DebugBuild {
