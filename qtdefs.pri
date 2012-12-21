@@ -17,7 +17,7 @@ EPICS_BASE = C:/epics/base-3.14.12
 
 # location of the caQtDM_Lib 
 CAQTDM_LIBS=C:/work/caQtDM_Lib/release
-CAQTDM_INCLUDES=C:/work/caQtDM_Lib
+CAQTDM_INCLUDES=C:/work/caQtDM_Lib/src
 }
 
 unix {
