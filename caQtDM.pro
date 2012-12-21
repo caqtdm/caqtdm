@@ -34,7 +34,6 @@ HEADERS  +=  \
  UI_DIR += ./
  
  RESOURCES += ./caQtDM.qrc
- #RC_FILE = ../caQtDM.rc
 
 
 win32-msvc* {

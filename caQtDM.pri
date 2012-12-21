@@ -32,6 +32,5 @@ DEFINES += BUILDDATE=\\\"$$system(date '+%d-%m-%Y')\\\"
 DEFINES += BUILDVERSION=\\\"$${CAQTDM_VERSION}\\\"
 DEFINES += BUILDARCH=\\\"$$(QMAKESPEC)\\\"
 
-RESOURCES += ./caQtDM.qrc
-RC_FILE = ../caQtDM.rc
+RESOURCES += ../caQtDM.qrc
 
