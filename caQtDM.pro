@@ -33,15 +33,17 @@ HEADERS  +=  \
  VPATH += ./src
  UI_DIR += ./
  
- RESOURCES += ./caQtDM.qrc
-
+RESOURCES += ./caQtDM.qrc
+OTHER_FILES += ./caQtDM.ico
 
 win32-msvc* {
         DebugBuild {
+        	RC_FILE = caQtDM.rc
                 EPICS_LIBS=$${EPICS_BASE}/lib/win32-x86
                 OBJECTS_DIR = debug/obj
         }
         ReleaseBuild {
+        	RC_FILE = caQtDM.rc
                 EPICS_LIBS=$${EPICS_BASE}/lib/win32-x86-debug
                 OBJECTS_DIR = release/obj
         }
@@ -49,21 +51,27 @@ win32-msvc* {
  
  INCLUDEPATH += .
  INCLUDEPATH += $${QWTHOME}/src
+ INCLUDEPATH += $${QWTHOME}/include
  INCLUDEPATH += $${QTCONTROLS_INCLUDES}
  INCLUDEPATH += $${CAQTDM_INCLUDES}
- INCLUDEPATH += $${EPICS_INCLUDES1}
- INCLUDEPATH += $${EPICS_INCLUDES2}
+ INCLUDEPATH += $${EPICS_BASE}/include
+ INCLUDEPATH += $${EPICS_BASE}/include/os/win32
       
- LIBS += $${QWTHOME}/lib/libqwt.a
- LIBS += $${QTCONTROLS_LIBS}/libqtcontrols.a
- LIBS += $${EPICS_LIBS}/ca.lib
- LIBS += $${EPICS_LIBS}/COM.lib
- LIBS += $${CAQTDM_LIBS}/libcaQtDm_Lib.a
  DEFINES += BUILDTIME=\\\"\\\"
  DEFINES += BUILDDATE=\\\"\\\"
  DEFINES += BUILDVERSION=\\\"$${CAQTDM_VERSION}\\\"
  DEFINES += BUILDARCH=\\\"$$(QMAKESPEC)\\\"
  DEFINES += SUPPORT=\\\"EPICS\\\"
+
+     win32-g++ {
+	 LIBS += $${QWTHOME}/lib/libqwt.a
+	 LIBS += $${QTCONTROLS_LIBS}/libqtcontrols.a
+	 LIBS += $${EPICS_LIBS}/ca.lib
+	 LIBS += $${EPICS_LIBS}/COM.lib
+	 LIBS += $${CAQTDM_LIBS}/libcaQtDm_Lib.a
+     }
+
+
 
      win32-msvc* {
         DebugBuild {
