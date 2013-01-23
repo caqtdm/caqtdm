@@ -75,7 +75,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     QString title("caQtDM ");
     title.append(BUILDVERSION);
     title.append(" Build=");
-    title.append(BUILDDATE);
+    title.append(__DATE__);
     title.append(" ");
     title.append(BUILDTIME);
 
