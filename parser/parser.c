@@ -10,6 +10,7 @@
 int parsingCompositeFile;
 int generateFlatFile;
 int generateDeviceOnMenus;
+int legendsForStripplot;
 
 char filePrefix[128] = "";
 static  string40 formatTable[] = { "decimal", "exponential", "engr. notation", "compact", "truncated",
@@ -1872,6 +1873,9 @@ void *parseStripChart(DisplayInfo *displayInfo, FrameOffset * offset)
 
     channels[strlen(channels)-1] = '\0';
     Qt_handleString("channels", "string", channels);
+
+    if(!legendsForStripplot) Qt_handleString("LegendEnabled", "bool", "false");
+    Qt_handleString("XaxisType", "enum", "ValueScale");
 
     Qt_writeCloseTag("widget", widgetName, visibilityStatic);
 

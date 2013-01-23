@@ -42,6 +42,7 @@ int main(int argc, char *argv[])
 
     QString fileName = "";
     QString macroString = "";
+    QString geometry = "";
 
     dmsearchFile *s = new dmsearchFile("caQtDM_stylesheet.qss");
     QString fileNameFound = s->findFile();
@@ -83,9 +84,29 @@ int main(int argc, char *argv[])
 
         } else if ( strcmp (argv[in], "-displayFont" ) == 0 ) {
              in++;
+        } else if(!strcmp(argv[in],"-help") || !strcmp(argv[in],"-h") || !strcmp(argv[in],"-?")) {
+             in++;
+                 printf("Usage:\n"
+                   "  caQtDM[X options]\n"
+                   "  [-help | -h | -?]\n"
+                   "  [-x]\n"
+                   "  [-attach]\n"
+                   "  [-noMsg]\n"
+                   "  [-noStyles]      this will only work when not attaching\n"
+                   "  [-macro \"xxx=aaa,yyy=bbb, ...\"]\n"
+                   "  [-dg [xpos[xypos]][+xoffset[+yoffset]]\n"
+                   "  [file]\n"
+                   "  [&]\n"
+                   "\n"
+                   "  -x -displayFont -display are ignored !\n\n");
+                 exit(1);
+        } else if((!strcmp(argv[in],"-displayGeometry")) || (!strcmp(argv[in],"-dg"))) {
+            // [-dg [xpos[xypos]][+xoffset[+yoffset]]
+             in++;
+             geometry = QString(argv[in]);
         } else if (strncmp (argv[in], "-" , 1) == 0) {
             /* unknown application argument */
-            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -noStyles\n",in,argv[in]);
+            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -noStyles -dg -x\n",in,argv[in]);
         } else {
             printf("caQtDM -- file = <%s>\n", argv[in]);
             fileName = QString(argv[in]);
@@ -108,7 +129,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    FileOpenWindow window (0, fileName, macroString, attach, minimize);
+    FileOpenWindow window (0, fileName, macroString, attach, minimize, geometry);
     window.setWindowIcon (QIcon(":/caQtDM.ico"));
     window.show();
     window.move(0,0);

@@ -59,12 +59,14 @@ public:
 /**
  * our main window (form) constructor
  */
-FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString macroString, bool attach, bool minimize): QMainWindow(parent)
+FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString macroString,
+                               bool attach, bool minimize, QString geometry): QMainWindow(parent)
 {
     // definitions for last opened file
     lastWindow = (QMainWindow*) 0;
     lastMacro ="";
     lastFile = "";
+    lastGeometry = geometry;
     userClose = false;
 
     if(minimize) showMinimized ();
@@ -112,7 +114,9 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
             QString message(filename);
             message.append(";");
             message.append(macroString);
-            //qDebug() << "send a message with file and macro to it and exit "<< message;
+            message.append(";");
+            message.append(geometry);
+            //qDebug() << "send a message with file, macro and geometry to it and exit "<< message;
             sendMessage(message);
             sharedMemory.detach();
             exit(0);
@@ -146,6 +150,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     if(filename.size() > 0) {
         lastMacro = macroString;
         lastFile = filename;
+        lastGeometry = geometry;
         mustOpenFile = true;
     }
 
@@ -167,7 +172,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 
     if(mustOpenFile) {
         mustOpenFile = false;
-        Callback_OpenNewFile(lastFile, lastMacro);
+        Callback_OpenNewFile(lastFile, lastMacro, lastGeometry);
     }
 
     asc[0] = '\0';
@@ -236,6 +241,7 @@ void FileOpenWindow::Callback_OpenButton()
 
             lastWindow = mainWindow;
             lastMacro = "";
+            lastGeometry = "";
             lastFile = fileName;
             sprintf(asc, "last file: %s", lastFile.toAscii().constData());
             messageWindow->postMsgEvent(QtDebugMsg, asc);
@@ -248,10 +254,10 @@ void FileOpenWindow::Callback_OpenButton()
 /**
  * slot for opening file by signal
  */
-void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QString& macroString)
+void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QString& macroString, const QString& geometry)
 {
     //qDebug() << "*************************************************************************";
-    //qDebug() << "callback open new file" << inputFile << "with macro string" << macroString;
+    //qDebug() << "callback open new file" << inputFile << "with macro string" << macroString << "geometry=" << geometry;
 
     int found1 = inputFile.lastIndexOf(".ui");
     int found2 = inputFile.lastIndexOf(".adl");
@@ -269,6 +275,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     QList<QWidget *> all = this->findChildren<QWidget *>();
     foreach(QWidget* widget, all) {
         if(QMainWindow* w = qobject_cast<QMainWindow *>(widget)) {
+            QString WindowProperty = "";
             // if already exists then yust pop it up
             QFile *file = new QFile;
             file->setFileName(FileName);
@@ -276,7 +283,13 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
             title.append("&");
             title.append(macroString);
             delete file;
-            if(QString::compare(w->windowTitle(), title) == 0) {
+
+            QVariant test=w->property("WindowProperty");
+            if(!test.isNull()) {
+                WindowProperty = test.toString();
+            }
+
+            if(QString::compare(WindowProperty, title) == 0) {
                 w->activateWindow();
                 w->raise();
                 w->showNormal();
@@ -324,19 +337,28 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         mainWindow->setMinimumSize(0, 0);
         mainWindow->setMaximumSize(16777215, 16777215);
         mainWindow->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        mainWindow->setWindowFlags( mainWindow->windowFlags() );
+        mainWindow->setWindowFlags(mainWindow->windowFlags() );
+
+        if(geometry != "") {
+            parse_and_set_Geometry(mainWindow, geometry);
+        }
 
         lastWindow = mainWindow;
         lastMacro = macroString;
         lastFile = fileNameFound;
-        sprintf(asc, "last file: %s", lastFile.toAscii().constData());
+        lastGeometry = "";
+        if(lastMacro.size() > 0) {
+          sprintf(asc, "last file: %s, macro: %s", lastFile.toAscii().constData(), lastMacro.toAscii().constData());
+        } else {
+          sprintf(asc, "last file: %s", lastFile.toAscii().constData());
+        }
         messageWindow->postMsgEvent(QtDebugMsg, asc);
     }
     delete s;
 }
 
 /**
- * slot for about signal
+ * slot for icon signal
  */
 void FileOpenWindow::Callback_ActionAbout()
 {
@@ -402,7 +424,12 @@ void FileOpenWindow::Callback_ActionReload()
     mainWindow->setWindowFlags( mainWindow->windowFlags() );
 
     lastWindow = mainWindow;
-    sprintf(asc, "last file: %s", lastFile.toAscii().constData());
+
+    if(lastMacro.size() > 0) {
+      sprintf(asc, "last file: %s, macro: %s", lastFile.toAscii().constData(), lastMacro.toAscii().constData());
+    } else {
+      sprintf(asc, "last file: %s", lastFile.toAscii().constData());
+    }
     messageWindow->postMsgEvent(QtDebugMsg, asc);
 }
 
@@ -416,12 +443,12 @@ void FileOpenWindow::checkForMessage()
     if (byteArray.left(1) == "0") return;  // no message, quit
     byteArray.remove(0, 1);                // remove first character
     QString message = QString::fromUtf8(byteArray.constData()); // get and split message in filename and macro
-    QStringList vars = message.split(";", QString::SkipEmptyParts);
-    if(vars.count() == 2) {
-        emit Callback_OpenNewFile(vars.at(0), vars.at(1));
-    } else if(vars.count() == 1) {
-        emit Callback_OpenNewFile(vars.at(0), "");
-    }
+    QStringList vars = message.split(";");
+
+    //qDebug() << "received message=" << message;
+    //qDebug() << "vars" << vars.count() <<  vars;
+
+    emit Callback_OpenNewFile(vars.at(0), vars.at(1), vars.at(2));
 
     // remove message from shared memory.
     byteArray = "0";
@@ -538,4 +565,149 @@ void FileOpenWindow::fillPVtable(int &countPV, int &countNotConnected)
         pvTable->resizeColumnsToContents();
     }
 }
+/**
+ *   in medm geometry is passed through XParseGeometry:
+ *    XParseGeometry parses strings of the form
+ *   "=<width>x<height>{+-}<xoffset>{+-}<yoffset>", where
+ *   width, height, xoffset, and yoffset are unsigned integers.
+ *   Example:  "=80x24+300-49"
+ *   The equal sign is optional.
+ *   It returns a bitmask that indicates which of the four values
+ *   were actually found in the string. For each value found,
+ *   the corresponding argument is updated;  for each value
+ *   not found, the corresponding argument is left unchanged.
+ *
+ *   here we implement the following routines to implement the
+ *   same behaviour
+ */
 
+int FileOpenWindow::ReadInteger(char *string, char **NextString)
+{
+    register int Result = 0;
+    int Sign = 1;
+    if (*string == '+') string++;
+    else if (*string == '-') {
+        string++;
+        Sign = -1;
+    }
+
+    for (; (*string >= '0') && (*string <= '9'); string++) {
+        Result = (Result * 10) + (*string - '0');
+    }
+
+    *NextString = string;
+
+    if (Sign >= 0) return Result;
+    else return -Result;
+}
+
+int FileOpenWindow::parseGeometry(const char* string, int* x, int* y, int* width, int* height)
+{
+    int mask = NoValue;
+    register char *strind;
+    unsigned int tempWidth=0, tempHeight=0;
+    int tempX=0, tempY=0;
+    char *nextCharacter;
+    if (!string || (*string == '\0')) return mask;
+    if (*string == '=') string++;  /* ignore possible '=' at beg of geometry spec */
+    strind = const_cast<char *>(string);
+    if (*strind != '+' && *strind != '-' && *strind != 'x') {
+        tempWidth = ReadInteger(strind, &nextCharacter);
+        if (strind == nextCharacter)
+            return 0;
+        strind = nextCharacter;
+        mask |= WidthValue;
+    }
+
+    if (*strind == 'x' || *strind == 'X') {
+        strind++;
+        tempHeight = ReadInteger(strind, &nextCharacter);
+        if (strind == nextCharacter) return 0;
+        strind = nextCharacter;
+        mask |= HeightValue;
+    }
+
+    if ((*strind == '+') || (*strind == '-')) {
+        if (*strind == '-') {
+            strind++;
+            tempX = -ReadInteger(strind, &nextCharacter);
+            if (strind == nextCharacter) return 0;
+            strind = nextCharacter;
+            mask |= XNegative;
+        } else {
+            strind++;
+            tempX = ReadInteger(strind, &nextCharacter);
+            if (strind == nextCharacter) return 0;
+            strind = nextCharacter;
+        }
+        mask |= XValue;
+
+        if ((*strind == '+') || (*strind == '-')) {
+            if (*strind == '-') {
+                strind++;
+                tempY = -ReadInteger(strind, &nextCharacter);
+                if (strind == nextCharacter) return 0;
+                strind = nextCharacter;
+                mask |= YNegative;
+            } else {
+                strind++;
+                tempY = ReadInteger(strind, &nextCharacter);
+                if (strind == nextCharacter) return 0;
+                strind = nextCharacter;
+            }
+            mask |= YValue;
+        }
+    }
+
+    /* If strind isn't at the end of the string then it's an invalid geometry specification. */
+
+    if (*strind != '\0') return 0;
+    if (mask & XValue) *x = tempX;
+    if (mask & YValue) *y = tempY;
+    if (mask & WidthValue)  *width = tempWidth;
+    if (mask & HeightValue) *height = tempHeight;
+
+    return mask;
+}
+
+void FileOpenWindow::parse_and_set_Geometry(QMainWindow *widget, QString parsestring) {
+    int x = 0;
+    int y = 0;
+    int w = 0;
+    int h = 0;
+    int m = parseGeometry(parsestring.toLatin1().data(), &x, &y, &w, &h);
+
+    QSize minSize = widget->minimumSize();
+    QSize maxSize = widget->maximumSize();
+    if ((m & XValue) == 0)
+        x = widget->geometry().x();
+
+    if ((m & YValue) == 0)
+        y = widget->geometry().y();
+
+    if ((m & WidthValue) == 0)
+        w = widget->width();
+
+    if ((m & HeightValue) == 0)
+        h = widget->height();
+
+    w = qMin(w,maxSize.width());
+    h = qMin(h,maxSize.height());
+    w = qMax(w,minSize.width());
+    h = qMax(h,minSize.height());
+
+    if ((m & XNegative)) {
+        x = qApp->desktop()->width()  + x - w;
+        x -= (widget->frameGeometry().width() - widget->width()) / 2;
+    } else {
+        x += (widget->geometry().x() - widget->x());
+    }
+
+    if ((m & YNegative)) {
+        y = qApp->desktop()->height() + y - h;
+    } else {
+        y += (widget->geometry().y() - widget->y());
+    }
+    //qDebug() << "set window" << w << "to" << x << y << w << h;
+    widget->setGeometry(x, y, w, h);
+}

@@ -28,6 +28,7 @@ extern "C" void Qt_writeZorder();
 extern "C" int parsingCompositeFile;
 extern "C" int generateFlatFile;
 extern "C" int generateDeviceOnMenus;
+extern "C" int legendsForStripplot;
 
 typedef char string40[40];
 typedef struct _zOrder {
@@ -252,6 +253,7 @@ int main(int argc, char *argv[])
     generateFlatFile = false;
     parsingCompositeFile = false;
     generateDeviceOnMenus = false;
+    legendsForStripplot = true;
 
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
@@ -259,16 +261,28 @@ int main(int argc, char *argv[])
     for (numargs = argc, in = 1; in < numargs; in++) {
         if ( strcmp (argv[in], "-flat" ) == 0 ) {
             in++;
-            generateFlatFile = True;
+            generateFlatFile = true;
         }
         if ( strcmp (argv[in], "-deviceonmenu" ) == 0 ) {
             in++;
-            generateDeviceOnMenus = True;
+            generateDeviceOnMenus = true;
+        }
+        if ( strcmp (argv[in], "-nolegends" ) == 0 ) {
+            in++;
+            legendsForStripplot = false;
+        }
+        if(!strcmp(argv[in],"-help") || !strcmp(argv[in],"-h") || !strcmp(argv[in],"-?")) {
+            in++;
+            printf("Usage:\n adl2ui [options] file\n");
+            printf("[-flat] :        flat file will be generated, includes are integrated\n");
+            printf("[-nolegends] :   no legends will be generated for the stripplots\n");
+            printf("[-deviceonmenu : part of pv will be used for the label of menu\n");
+            exit(1);
         }
         if (strncmp (argv[in], "-" , 1) == 0) {
             /* unknown application argument */
             printf("adl2ui -- Argument %d = [%s] is unknown! ",in,argv[in]);
-            printf("possible are: '-flat and '-deviceonmenu'\n");
+            printf("possible are: '-flat and '-deviceonmenu' and '-nolegends'\n");
             exit(-1);
         } else {
             printf("adl2ui -- file = <%s>\n", argv[in]);
@@ -278,6 +292,7 @@ int main(int argc, char *argv[])
 
     if(generateFlatFile) printf("adl2ui -- a flat file will be generated\n");
     if(generateDeviceOnMenus)printf("adl2ui -- device name will be put on menus\n");
+    if(!legendsForStripplot)printf("adl2ui -- legends will not be set for stripplot\n");
 
     // input and out files
     QString inputFile = inFile;

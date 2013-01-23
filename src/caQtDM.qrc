@@ -1,5 +1,6 @@
-<!DOCTYPE RCC><RCC version="1.0">
-    <qresource>
+<RCC>
+    <qresource prefix="/">
         <file>caQtDM.ico</file>
+        <file>caQtDM.png</file>
     </qresource>
 </RCC>

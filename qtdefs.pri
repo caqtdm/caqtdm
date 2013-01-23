@@ -1,4 +1,22 @@
-CAQTDM_VERSION = V2.5
+CAQTDM_VERSION = V2.6.2
+
+# new in 2.6.2
+# about icon will present our application epics icon
+# command line parameter -g works also in attach mode
+# title bar now yust showing the filename and can be overwriten by other applications without problem
+# &X implemented in shell command (only for linux)
+
+# new in 2.6.1
+# command line parameter -dg implemented, works only in standalone mode (not when attaching)
+
+# new in 2.6
+# textentry will get its contents back if contents was changed without pressing return when leaving textentry
+# green alarm color has been changed to a darker green in order to have a better contrast
+# adl2ui got the option to suppress the legends for the stripplot, valuescale will be generated instead of timescale
+# cartesian plot was enhanced for single scalar values with only one channel
+# special arguments &A and &T were implemented in shell commands
+# cabitnames, cachoice, cashellcommand : possibility to choose the font and size, buttons will be also separated by 2 pixels
+# in case of static visibility, channels will be ignored.
 
 win32 {
 QWTHOME=C:/Qwt-6.0.1/Qwt

@@ -9,6 +9,8 @@
 //
 //******************************************************************************
 
+// used for about, icon will be changed here
+
 #include "messagebox.h"
 
 
@@ -23,6 +25,9 @@ QTDMMessageBox::QTDMMessageBox (Icon icon,
     : QMessageBox (icon,title,text,buttons, parent,f)
 
 {
+    QPixmap pixmap = QPixmap(":/caQtDM.png");
+    QPixmap scaledPixmap = pixmap.scaledToWidth(100);
+    setIconPixmap(scaledPixmap);
     timeout = 5;
     _autoClose = autoClose;
     if (_autoClose) {
