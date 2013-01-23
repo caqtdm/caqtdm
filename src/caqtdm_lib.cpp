@@ -183,9 +183,12 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     // set window title without the whole path
     QString title(file->fileName().section('/',-1));
+    thisFileShort = file->fileName().section('/',-1);
+    thisFileFull = fi.absoluteFilePath ();
+    setWindowTitle(title);
     title.append("&");
     title.append(macro);
-    setWindowTitle(title);
+    setProperty("WindowProperty", title);
     setUnifiedTitleAndToolBarOnMac(true);
 
     delete file;
@@ -212,9 +215,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
             SIGNAL(Signal_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData)), this,
             SLOT(Callback_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData)));
 
-    connect(this, SIGNAL(Signal_OpenNewWFile(const QString&, const QString&)), parent,
-            SLOT(Callback_OpenNewFile(const QString&, const QString&)));
-
+    connect(this, SIGNAL(Signal_OpenNewWFile(const QString&, const QString&, const QString&)), parent,
+            SLOT(Callback_OpenNewFile(const QString&, const QString&, const QString&)));
 
     // initialize IO
     PrepareDeviceIO();
@@ -569,7 +571,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         }
         // default format, format from ui file will be used normally except for channel precision
         widget->setFormat(1);
-        widget->setFocusPolicy(Qt::ClickFocus);
         widget->clearFocus();
 
         widget->setProperty("Taken", true);
@@ -580,8 +581,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         //qDebug() << "create caLineEdit";
 
         if(widget->getPV().size() > 0) {
-            //widget->setEnabled(false);
-            widget->setFocusPolicy(Qt::NoFocus);
             widget->setCursor(QCursor());
             widget->setReadOnly(true);
             widget->setDragEnabled(true);
@@ -1732,7 +1731,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         // lineEdit and textEntry ====================================================================================================
     } else if (caLineEdit *widget = qobject_cast<caLineEdit *>(w)) {
 
-        //qDebug() << "we have a linedit or textentry" << widget << data.edata.rvalue;
+        //qDebug() << "we have a linedit or textentry" << widget << data.edata.rvalue <<  data.edata.ivalue;
 
         QColor bg = widget->property("BColor").value<QColor>();
         QColor fg = widget->property("FColor").value<QColor>();
@@ -1763,6 +1762,10 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     }
                 }
                 widget->setCursorPosition(0);
+                // access control for textentry
+                if (caTextEntry *widget = qobject_cast<caTextEntry *>(w)) {
+                    widget->setAccessW(data.edata.accessW);
+                }
 
                 // double
             } else {
@@ -1793,6 +1796,9 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             widget->setText("");
             widget->setAlarmColors(NOTCONNECTED, 0.0, bg, fg);
             widget->setProperty("Connect", false);
+        }
+        if (caTextEntry *widget = qobject_cast<caTextEntry *>(w)) {
+            widget->updateText(widget->text());
         }
 
         // Graphics ==================================================================================================================
@@ -2302,9 +2308,9 @@ void CaQtDM_Lib::Callback_RelatedDisplayClicked(int indx)
     //qDebug() << "files:" << files;
     //qDebug() << "args" << args;
     if(indx < files.count() && indx < args.count()) {
-        emit Signal_OpenNewWFile(files[indx].trimmed(), args[indx].trimmed());
+        emit Signal_OpenNewWFile(files[indx].trimmed(), args[indx].trimmed(), "");
     } else if(indx < files.count()) {
-        emit Signal_OpenNewWFile(files[indx].trimmed(), "");
+        emit Signal_OpenNewWFile(files[indx].trimmed(), "", "");
     }
 }
 
@@ -2340,13 +2346,13 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
     QStringList commands = choice->getFiles().split(";");
     QString argslist = choice->getArgs();
 
-    // we can have ; between quotes that should not be treated as separator
+    // we can have a semicolum (;) between quotes that should not be treated as separator
     // instead of a real parsing, replace the ; between quotes by an unused character ?
     bool inside = false;
     for (int i = 0; i < argslist.size(); i++) {
-        if(!inside && (argslist.at(i) == QChar('\'')) || (argslist.at(i) == QChar('\"'))) {
+        if((!inside) && ((argslist.at(i) == QChar('\'')) || (argslist.at(i) == QChar('\"')))) {
             inside = true;
-        } else if(inside && (argslist.at(i) == QChar('\'')) || (argslist.at(i) == QChar('\"'))) {
+        } else if((inside) && ((argslist.at(i) == QChar('\'')) || (argslist.at(i) == QChar('\"')))) {
             inside = false;
         }
         if (inside) {
@@ -2368,6 +2374,14 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
         command.replace("camedm ", "caQtDM ");
         command.replace("piomedm ", "caQtDM ");
         command.replace("medm ", "caQtDM ");
+
+        command.replace("&T", thisFileShort);
+        command.replace("&A", thisFileFull);
+#ifdef linux
+        int windid = this->winId();
+        command.replace("&X", QString::number(windid));
+#endif
+
         //command.replace("&", " ");  // special character not supported
         postMessage(QtDebugMsg, (char*) qPrintable(command.trimmed()));
 #ifndef linux
@@ -2382,6 +2396,8 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
     } else if(indx < commands.count()) {
         QString command;
         command.append(commands[indx].trimmed());
+        command.replace("&T", thisFileShort);
+        command.replace("&A", thisFileFull);
         //command.replace("&", " "); // special character not supported
         postMessage(QtDebugMsg, (char*) qPrintable(command.trimmed()));
 #ifndef linux
@@ -2665,6 +2681,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     myMenu.addAction("Get Info");
     myMenu.addAction("Print");
     if(caStripPlot* widget = qobject_cast<caStripPlot *>(w)) {
+       Q_UNUSED(widget);
        myMenu.addAction("Change Axis");
     }
 
@@ -2868,6 +2885,7 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
     QString strng[4];
     QString visibilityCalc;
 
+    // caCalc has no visibility, it is a calc entity, so I have to get this away.
     if (caCalc *w = qobject_cast<caCalc *>(widget)) {
         strng[0] = w->getChannelA();
         strng[1] = w->getChannelB();
@@ -2875,36 +2893,42 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
         strng[3] = w->getChannelD();
         visibilityCalc = w->getCalc();
     } else if (caImage *w = qobject_cast<caImage *>(widget)) {
+        // while caImage uses also ImageCalc, we do not skip this, even when visibility = StaticV
         strng[0] = w->getChannelA();
         strng[1] = w->getChannelB();
         strng[2] = w->getChannelC();
         strng[3] = w->getChannelD();
         visibilityCalc = w->getVisibilityCalc();
     } else if (caGraphics *w = qobject_cast<caGraphics *>(widget)) {
+        if(w->getVisibility() == caGraphics::StaticV && w->getColorMode() == caGraphics::Static) return 0;
         strng[0] = w->getChannelA();
         strng[1] = w->getChannelB();
         strng[2] = w->getChannelC();
         strng[3] = w->getChannelD();
         visibilityCalc = w->getVisibilityCalc();
     } else if (caPolyLine *w = qobject_cast<caPolyLine *>(widget)) {
+        if(w->getVisibility() == caPolyLine::StaticV && w->getColorMode() == caPolyLine::Static) return 0;
         strng[0] = w->getChannelA();
         strng[1] = w->getChannelB();
         strng[2] = w->getChannelC();
         strng[3] = w->getChannelD();
         visibilityCalc = w->getVisibilityCalc();
     } else if (caInclude *w = qobject_cast<caInclude *>(widget)) {
+        if(w->getVisibility() == caInclude::StaticV) return 0;
         strng[0] = w->getChannelA();
         strng[1] = w->getChannelB();
         strng[2] = w->getChannelC();
         strng[3] = w->getChannelD();
         visibilityCalc = w->getVisibilityCalc();
     } else if (caFrame *w = qobject_cast<caFrame *>(widget)) {
+        if(w->getVisibility() == caFrame::StaticV) return 0;
         strng[0] = w->getChannelA();
         strng[1] = w->getChannelB();
         strng[2] = w->getChannelC();
         strng[3] = w->getChannelD();
         visibilityCalc = w->getVisibilityCalc();
     } else if (caLabel *w = qobject_cast<caLabel *>(widget)) {
+        if(w->getVisibility() == caLabel::StaticV && w->getColorMode() == caLabel::Static) return 0;
         strng[0] = w->getChannelA();
         strng[1] = w->getChannelB();
         strng[2] = w->getChannelC();
@@ -3189,7 +3213,8 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
                     sprintf(asc, "Invalid value: pv=%s value= \"%s\"\n", kPtr->pv, textValue);
                     postMessage(QtDebugMsg, asc);
                     if(caTextEntry* widget = qobject_cast<caTextEntry *>((QWidget*) auxPtr->dispW)) {
-                        widget->setText("");
+                        Q_UNUSED(widget);
+                        //widget->setText("");
                     }
                 }
             // normal int or long
@@ -3236,7 +3261,8 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
             sprintf(asc, "Invalid value: pv=%s value= \"%s\"\n", kPtr->pv, textValue);
             postMessage(QtDebugMsg, asc);
             if(caTextEntry* widget = qobject_cast<caTextEntry *>((QWidget*) auxPtr->dispW)) {
-                 widget->setText("");
+                Q_UNUSED(widget);
+                 //widget->setText("");
             }
         }
         break;
@@ -3259,7 +3285,7 @@ int CaQtDM_Lib::parseForDisplayRate(QString inputc, int &rate)
     } else {
         // Retrieve the main object
         JSONObject root;
-        if (value->IsObject() == false) {
+        if(value->IsObject() == (false)) {
             //printf("The root element is not an object");
             delete(value);
             return false;
@@ -3273,7 +3299,7 @@ int CaQtDM_Lib::parseForDisplayRate(QString inputc, int &rate)
                 // Retrieve nested object
                 JSONValue *value1 = JSON::Parse(root[L"monitor"]->Stringify().c_str());
                 // Did it go wrong?
-                if ((value1 != NULL) && (value1->IsObject() != false)) {
+                if ((value1 != NULL) && (value1->IsObject() != (false))) {
                     JSONObject root;
                     root = value1->AsObject();
                     if (root.find(L"maxdisplayrate") != root.end() && root[L"maxdisplayrate"]->IsNumber()) {

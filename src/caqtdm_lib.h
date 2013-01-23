@@ -76,8 +76,7 @@ protected:
 signals:
     void clicked(QString);
     void Signal_QLineEdit(const QString&, const QString&);
-    void Signal_OpenNewWFile(const QString&, const QString&);
-    void Signal_TextEntryChanged(const QString&);
+    void Signal_OpenNewWFile(const QString&, const QString&, const QString&);
     void Signal_ContextMenu(QWidget*);
     void clicked();
 
@@ -95,6 +94,9 @@ private:
 
     QByteArray byteArray;
     bool initTry;
+
+    QString thisFileShort;
+    QString thisFileFull;
 
 private slots:
 
