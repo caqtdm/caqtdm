@@ -1,4 +1,7 @@
-CAQTDM_VERSION = V2.6.2
+CAQTDM_VERSION = V2.6.3
+
+# new in 2.6.3
+# fixed memory overflows due to non null terminated strings from epics
 
 # new in 2.6.2
 # about icon will present our application epics icon
