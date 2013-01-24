@@ -30,6 +30,7 @@ struct ca_client_context *dbCaClientContext;
 
 #define CA_PRIORITY 50          /* CA priority */
 #define CA_TIMEOUT   2          /* CA timeout 2.0 seconds */
+#define Min(x,y)   (((x) < (y)) ? (x) : (y))
 
 #include "knobDefines.h"
 
@@ -53,8 +54,26 @@ typedef struct _connectInfo {
     chid ch;         // read channel
 } connectInfo;
 
+char* myLimitedString (char * strng) {
+    static char aux[128] = {0};
+    int i, len = -1;
+    for(i=0; i< (int) sizeof(dbr_string_t); i++) {
+        aux[i] = strng[i];
+        if(strng[i] == '\0') {
+            len = i;
+            break;
+        }
+    }
+    if(len == -1) {
+        aux[sizeof(dbr_string_t)-1] = '\0';
+        //printf("no null character found in string <%s>\n", aux);
+    }
+    return aux;
+}
+
+// due to gateway, protect copy of units
 #define AssignEpicsData \
-    strcpy(kData.edata.units, stsF->units); \
+    strcpy(kData.edata.units, myLimitedString(stsF->units)); \
     kData.edata.lower_disp_limit = stsF->lower_disp_limit; \
     kData.edata.upper_disp_limit = stsF->upper_disp_limit; \
     kData.edata.lower_alarm_limit = stsF->lower_alarm_limit; \
@@ -71,7 +90,7 @@ typedef struct _connectInfo {
     kData.edata.accessW = ca_write_access(args.chid); \
     kData.edata.accessR = ca_read_access(args.chid); \
     kData.edata.valueCount = countx; \
-    strcpy(kData.edata.fec, ca_host_name(args.chid)); \
+    strcpy(kData.edata.fec, myLimitedString((char*) ca_host_name(args.chid))); \
     kData.edata.monitorCount = info->event;
 
 /**
@@ -133,7 +152,7 @@ static void dataCallback(struct event_handler_args args)
     if(kData.index == -1) return;
 
     if (args.status != ECA_NORMAL) {
-        PRINT(printf("dataCallback:\n""  get: %s\n", ca_message_text[CA_EXTRACT_MSG_NO(args.status)]));
+        PRINT(printf("dataCallback:\n""  get: %s for %s\n", ca_name(args.chid), ca_message_text[CA_EXTRACT_MSG_NO(args.status)]));
     } else {
         kData.edata.monitorCount = info->event;
         kData.edata.connected = info->connected;
@@ -197,9 +216,10 @@ static void dataCallback(struct event_handler_args args)
 
             ptr = (char*) kData.edata.dataB;
             ptr[0] = '\0';
-            strcpy(ptr, val_ptr[0]);
+
+            strcpy(ptr, myLimitedString(val_ptr[0]));
             for (i = 1; i < args.count; i++) {
-                sprintf(ptr, "%s;%s", ptr, val_ptr[i]);
+                sprintf(ptr, "%s;%s", ptr, myLimitedString(val_ptr[i]));
             }
 
             C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
@@ -212,7 +232,6 @@ static void dataCallback(struct event_handler_args args)
             int i;
             char *ptr;
             struct dbr_ctrl_enum *stsF = (struct dbr_ctrl_enum *) args.dbr;
-            PRINT(printf("dataCallback:\n""  get: %s\n", ca_message_text[CA_EXTRACT_MSG_NO(args.status)]));
             PRINT(printf("dataCallback enum  %s %d <%d> %d <%s> status=%d count=%d enum no_str=%d size=%d\n", ca_name(args.chid), (int) args.chid,
                          stsF->value, info->index, ca_host_name(args.chid),
                          stsF->status, (int) args.count, stsF->no_str, dbr_size_n(args.type, args.count)));
@@ -234,9 +253,9 @@ static void dataCallback(struct event_handler_args args)
 
                 ptr = (char*) kData.edata.dataB;
                 ptr[0] = '\0';
-                strcpy(ptr, stsF->strs[0]);
+                strcpy(ptr, myLimitedString(stsF->strs[0]));
                 for (i = 1; i < stsF->no_str; i++) {
-                    sprintf(ptr, "%s;%s", ptr, stsF->strs[i]);
+                    sprintf(ptr, "%s;%s", ptr, myLimitedString(stsF->strs[i]));
                 }
                 C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
             }
@@ -483,7 +502,7 @@ int CreateAndConnect(int index, knobData *kData, int rate)
                                CA_PRIORITY_DEFAULT,
                                &tmp->ch);
     if(status != ECA_NORMAL) {
-        printf("ca_create_channel:\n"" %s for %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], kData->pv);
+        printf("ca_create_channel:\n"" %d %s for %s\n", (int) tmp->ch, ca_message_text[CA_EXTRACT_MSG_NO(status)], kData->pv);
     }
 
     status = ca_pend_io(CA_TIMEOUT);
@@ -514,7 +533,7 @@ void ClearMonitor(knobData *kData)
             if(tmp->ch != (chid) 0) {
                 status = ca_clear_channel(tmp->ch);
                 if(status != ECA_NORMAL) {
-                    printf("ca_clear_channel:\n"" %s %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], tmp->pv);
+                    printf("ca_clear_channel:\n"" %d %s %s\n", (int) tmp->ch, ca_message_text[CA_EXTRACT_MSG_NO(status)], tmp->pv);
                 }
             }
         } else {
@@ -535,6 +554,9 @@ int EpicsSetValue(char *pv, float rdata, long idata, char *sdata, char *object, 
     int status;
     struct dbr_ctrl_float ctrlR;
     struct dbr_sts_string ctrlS;
+
+    UNUSED(errmess);
+    UNUSED(object);
 
     if(strlen(pv) < 1)  {
             C_postMsgEvent(messageWindow, 1, vaPrintf("pv with length=0 (not translated for macro?)\n"));
