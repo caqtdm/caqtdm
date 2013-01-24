@@ -2739,11 +2739,11 @@ void *parseComposite(DisplayInfo *displayInfo, FrameOffset *offset)
                 compositeFileParse(displayInfo, compositeFile, object, frameoffset, newoffset);
 
             } else if(!strcmp(token,"children")) {
-
+				FrameOffset *newoffset;
                 sprintf(widgetName, "caFrame_%d", number++);
                 Qt_writeOpenTag("widget", "caFrame", widgetName);
 
-                FrameOffset *newoffset = (FrameOffset *)malloc(sizeof(FrameOffset));
+                newoffset = (FrameOffset *)malloc(sizeof(FrameOffset));
                 newoffset->frameX = offset->frameX;
                 newoffset->frameY = offset->frameY;
                 /*
@@ -3022,7 +3022,7 @@ void *parseOval(DisplayInfo *displayInfo, FrameOffset * offset)
              && (tokenType != T_EOF) );
 
     Qt_writeCloseTag("widget", widgetName, visibilityStatic);
-    
+
     return (void*) 0;
 }
 
@@ -3089,7 +3089,7 @@ void *parseArc(DisplayInfo *displayInfo, FrameOffset * offset)
              && (tokenType != T_EOF) );
 
     Qt_writeCloseTag("widget", widgetName, visibilityStatic);
-    
+
     return (void*) 0;
 }
 
@@ -3361,7 +3361,7 @@ void *parseBar(DisplayInfo *displayInfo, FrameOffset * offset)
     Qt_setColorMode("caThermo", COLORMODE);
 
     Qt_writeCloseTag("widget", widgetName, visibilityStatic);
-    
+
     return (void *) 0;
 }
 
@@ -3474,7 +3474,7 @@ TOKEN getToken(DisplayInfo *displayInfo, char *word)
     m = macro;
 
     while( (c=getc(filePtr)) != EOF) {
-        
+
         switch (state) {
         case NEUTRAL:
             switch(c) {

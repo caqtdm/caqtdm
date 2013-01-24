@@ -69,8 +69,9 @@ private:
 };
 
 // pointer used by external C
-myParser* myParserPtr;
-
+extern "C" {
+	myParser* myParserPtr;
+}
 // constructor
 myParser::myParser () {
 }
@@ -242,7 +243,7 @@ extern "C" myParser* C_writeStyleSheet(myParser* p, int r, int g, int b)
 }
 
 /*
- * 
+ *
  */
 class myParser;
 
