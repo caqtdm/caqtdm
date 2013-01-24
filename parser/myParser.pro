@@ -1,3 +1,4 @@
+include(../qtdefs.pri)
 TEMPLATE = app
 INCLUDEPATH += .
 
@@ -18,3 +19,17 @@ TARGET = adl2ui
 
 OTHER_FILES += \
     stylesheet.qss
+
+win32-msvc* {
+ ReleaseBuild {
+   QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\adl2ui.exe $${BINARY_LOCATION}
+   OBJECTS_DIR = release/obj	
+ }
+ DebugBuild {
+   OBJECTS_DIR = debug/obj
+ }
+
+
+
+
+}
