@@ -684,7 +684,7 @@ static void medmAcquisition(short *own_prot, int *devIOFunc, pioDevices *Cells, 
     static pioDevices     *SendCells = (pioDevices *)0;
     static int            *CellTaken = (int *)0;
 
-
+    UNUSED(own_prot);
     repetition = *rep;
     ident_number = 1;
     lisReqNo = *ReqNo;

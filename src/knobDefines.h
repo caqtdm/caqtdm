@@ -25,6 +25,8 @@
 #define MAXDISPLEN 20
 #define NBSPECS 5
 
+#define UNUSED(x) (void)(x)
+
 typedef char pv_string[MAXPVLEN];  // temporary definition, I should allocate what we need
 
 #endif
