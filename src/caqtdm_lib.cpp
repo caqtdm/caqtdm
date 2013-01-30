@@ -186,9 +186,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     thisFileShort = file->fileName().section('/',-1);
     thisFileFull = fi.absoluteFilePath ();
     setWindowTitle(title);
-    title.append("&");
-    title.append(macro);
-    setProperty("WindowProperty", title);
     setUnifiedTitleAndToolBarOnMac(true);
 
     delete file;
@@ -998,8 +995,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
             if(thisString.count() == 2 && thisString.at(0).trimmed().length() > 0 && thisString.at(1).trimmed().length() > 0) {
                 double xmin, xmax;
                 int ok=widget->getXLimits(xmin, xmax);
-                if(ok) widget->setScaleX(xmin, xmax);
-                else {
+                if(ok) {
+                    widget->setScaleX(xmin, xmax);
+                    // when channel was specified for x, but no channel was defined for the plot then set to auto
+                    QStringList thisString = widget->getPV(0).split(";");
+                    if(thisString.count() == 2 && thisString.at(0).trimmed().length() == 0)  widget->setXscaling(caCartesianPlot::Auto);
+                } else {
                   specData[0] = 0;
                   specData[2] = caCartesianPlot::CH_Xscale;
                   addMonitor(myWidget, &kData, thisString.at(0), w1, specData, map, &pv);
@@ -1031,8 +1032,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
             if(thisString.count() == 2 && thisString.at(0).trimmed().length() > 0 && thisString.at(1).trimmed().length() > 0) {
                 double ymin, ymax;
                 int ok=widget->getYLimits(ymin, ymax);
-                if(ok) widget->setScaleY(ymin, ymax);
-                else {
+                if(ok) {
+                    widget->setScaleY(ymin, ymax);
+                    // when channel was specified for x, but no channel was defined for the plot then set to auto
+                    QStringList thisString = widget->getPV(0).split(";");
+                    if(thisString.count() == 2 && thisString.at(1).trimmed().length() == 0)  widget->setYscaling(caCartesianPlot::Auto);
+                } else {
                   specData[0] = 0;
                   specData[2] = caCartesianPlot::CH_Yscale;
                   addMonitor(myWidget, &kData, thisString.at(0), w1, specData, map, &pv);
@@ -1072,7 +1077,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //qDebug() << "create caStripPlot";
 
-        QString text;
+        QString text, title;
         QList<QVariant> integerList;
         int nbMon = 0;
 
@@ -1108,11 +1113,17 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
                 integerList.append(num);
             }
         }
-        widget->startPlot();
 
         // finish tooltip
         tooltip.append(ToolTipPostfix);
         widget->setToolTip(tooltip);
+
+        title = widget->getTitlePlot();
+        if(reaffectText(map, &title)) widget->setTitlePlot(title);
+        title = widget->getTitleX();
+        if(reaffectText(map, &title)) widget->setTitleX(title);
+        title = widget->getTitleY();
+        if(reaffectText(map, &title)) widget->setTitleY(title);
 
         integerList.insert(0, nbMon); /* set property into widget */
         widget->setProperty("MonitorList", integerList);
@@ -1671,12 +1682,37 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         //qDebug() << "we have a linear gauge" << value;
 
         if(data.edata.connected) {
-            bool externalLimitsEnabled = widget->property("externalLimitsEnabled").value<bool>();
-            if((externalLimitsEnabled) && (data.edata.initialize)) {
-                widget->setLowWarning(data.edata.lower_warning_limit);
-                widget->setLowError(data.edata.lower_alarm_limit);
-                widget->setHighError(data.edata.upper_alarm_limit);
-                widget->setHighWarning(data.edata.upper_warning_limit);
+            if((widget->isExternalEnabled()) && (data.edata.initialize)) {
+
+                // when no limits defined then say no external limits
+                if( (data.edata.lower_alarm_limit == data.edata.upper_alarm_limit) &&
+                    (data.edata.lower_warning_limit == data.edata.upper_warning_limit) &&
+                    (data.edata.upper_disp_limit == data.edata.lower_disp_limit) ) {
+                    widget->setExternalEnabled(false);
+                }
+
+                // set low and high error
+                if(data.edata.lower_alarm_limit != data.edata.upper_alarm_limit) {
+                   widget->setLowError(data.edata.lower_alarm_limit);
+                   widget->setHighError(data.edata.upper_alarm_limit);
+                } else {
+                    widget->setLowError(data.edata.lower_disp_limit);
+                    widget->setHighError(data.edata.upper_disp_limit);
+                }
+
+                // warning limits, when not specified set alarm limits
+                if(data.edata.lower_warning_limit != data.edata.upper_warning_limit) {
+                   widget->setLowWarning(data.edata.lower_warning_limit);
+                   widget->setHighWarning(data.edata.upper_warning_limit);
+                } else if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
+                    widget->setHighWarning(data.edata.upper_disp_limit);
+                    widget->setLowWarning(data.edata.lower_disp_limit);
+                } else {
+                    widget->setHighWarning(1000.0);
+                    widget->setLowWarning(0.0);
+                }
+
+                // HOPR and LOPR
                 if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
                     widget->setMaxValue(data.edata.upper_disp_limit);
                     widget->setMinValue(data.edata.lower_disp_limit);
@@ -1684,6 +1720,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     widget->setMaxValue(1000.0);
                     widget->setMinValue(0.0);
                 }
+                widget->update();
             }
             widget->setValue((int) data.edata.rvalue);
         }
@@ -1693,12 +1730,36 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         //qDebug() << "we have a linear gauge" << value;
 
         if(data.edata.connected) {
-            bool externalLimitsEnabled = widget->property("externalLimitsEnabled").value<bool>();
-            if((externalLimitsEnabled) && (data.edata.initialize)) {
-                widget->setLowWarning(data.edata.lower_warning_limit);
-                widget->setLowError(data.edata.lower_alarm_limit);
-                widget->setHighError(data.edata.upper_alarm_limit);
-                widget->setHighWarning(data.edata.upper_warning_limit);
+            if((widget->isExternalEnabled()) && (data.edata.initialize)) {
+
+                // when no limits defined then say no external limits
+                if( (data.edata.lower_alarm_limit == data.edata.upper_alarm_limit) &&
+                    (data.edata.lower_warning_limit == data.edata.upper_warning_limit) &&
+                    (data.edata.upper_disp_limit == data.edata.lower_disp_limit) ) {
+                    widget->setExternalEnabled(false);
+                }
+
+                if(data.edata.lower_alarm_limit != data.edata.upper_alarm_limit) {
+                   widget->setLowError(data.edata.lower_alarm_limit);
+                   widget->setHighError(data.edata.upper_alarm_limit);
+                } else {
+                   widget->setLowError(data.edata.lower_disp_limit);
+                   widget->setHighError(data.edata.upper_disp_limit);
+                }
+
+                // warning limits, when not specified set alarm limits
+                if(data.edata.lower_warning_limit != data.edata.upper_warning_limit) {
+                   widget->setLowWarning(data.edata.lower_warning_limit);
+                   widget->setHighWarning(data.edata.upper_warning_limit);
+                } else if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
+                    widget->setHighWarning(data.edata.upper_disp_limit);
+                    widget->setLowWarning(data.edata.lower_disp_limit);
+                } else {
+                    widget->setHighWarning(1000.0);
+                    widget->setLowWarning(0.0);
+                }
+
+                // HOPR and LOPR
                 if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
                     widget->setMaxValue(data.edata.upper_disp_limit);
                     widget->setMinValue(data.edata.lower_disp_limit);
@@ -1706,6 +1767,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     widget->setMaxValue(1000.0);
                     widget->setMinValue(0.0);
                 }
+                widget->update();
             }
             widget->setValue((int) data.edata.rvalue);
         }
@@ -1902,6 +1964,11 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         int curvType = data.specData[1];  // Xonly, Yonly, XY_both;
         int XorY = data.specData[2];      // X=0; Y=1, Trigger=2, Count=3, Erase=4, Scale=5/6;
 
+        // when scaling is by channel, limits have to be different, otherwise auto will be set
+        // when scaling is user, then limits were already set and will not change
+        // when scaling is auto, then nothing will be done
+        // when scaling is given by pv's, the limits will be given by these
+
         if(data.edata.connected) {
             // scale first time on first curve
             if(data.edata.initialize && curvNB == 0 && XorY <= caCartesianPlot::CH_Y) {
@@ -1929,7 +1996,6 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                }
                // qDebug() << "scale monitor from" << data.pv << data.edata.rvalue << "min/max" << data.specData[0] << "scale" << XorY;
             }
-
 
             if(!widget->property("Connect").value<bool>()) {
                 widget->setProperty("Connect", true);
@@ -2005,9 +2071,20 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     double ymax = widget->getYaxisLimitsMax(0);
                     widget->setYscale(ymin, ymax);
                 }
+                // do this for redisplaying legend with correct limits
+                if((widget->getYscalingMin(actPlot) == caStripPlot::Channel) ||
+                   (widget->getYscalingMax(actPlot) == caStripPlot::Channel)) {
+                    widget->resize(widget->width()+1, widget->height()+1);
+                    widget->resize(widget->width()-1, widget->height()-1);
+                }
             }
 
             widget->setData(data.edata.rvalue, actPlot);
+
+            if(data.edata.initialize) {
+                widget->startPlot();
+            }
+
         }
 
         // animated gif ==================================================================================================================
@@ -2200,6 +2277,9 @@ void CaQtDM_Lib::Callback_EApplyNumeric(double value)
 {
     char errmess[255];
     caApplyNumeric *numeric = qobject_cast<caApplyNumeric *>(sender());
+
+    if(!numeric->getAccessW()) return;
+
     if(numeric->getPV().length() > 0) {
         //qDebug() << numeric->objectName() << numeric->getPV() << value;
         QString text("");
@@ -2214,6 +2294,8 @@ void CaQtDM_Lib::Callback_ENumeric(double value)
 {
     char errmess[255];
     caNumeric *numeric = qobject_cast<caNumeric *>(sender());
+
+    if(!numeric->getAccessW()) return;
 
     if(numeric->getPV().length() > 0) {
         //qDebug() << numeric->objectName() << numeric->getPV() << value;
@@ -2230,6 +2312,8 @@ void CaQtDM_Lib::Callback_Slider(double value)
 {
     char errmess[255];
     caSlider *numeric = qobject_cast<caSlider *>(sender());
+
+    if(!numeric->getAccessW()) return;
 
     if(numeric->getPV().length() > 0) {
         //qDebug() << numeric->objectName() << numeric->getPV() << value;
@@ -2256,7 +2340,9 @@ void CaQtDM_Lib::Callback_ChoiceClicked(const QString& text)
 {
     char errmess[255];
     caChoice *choice = qobject_cast<caChoice *>(sender());
-    QString pv = choice->getPV();
+
+    if(!choice->getAccessW()) return;
+
     if(choice->getPV().length() > 0) {
         //qDebug() << "choice_clicked" << text << choice->getPV();
         QStringsToChars(choice->getPV(), text,  choice->objectName().toLower());
@@ -2271,6 +2357,8 @@ void CaQtDM_Lib::Callback_MenuClicked(const QString& text)
 {
     char errmess[255];
     caMenu *menu = qobject_cast<caMenu *>(sender());
+
+    if(!menu->getAccessW()) return;
 
     if(menu->getPV().length() > 0) {
       //qDebug() << "menu_clicked" << text << menu->getPV();
@@ -2291,6 +2379,9 @@ void CaQtDM_Lib::Callback_TextEntryChanged(const QString& text)
     caTextEntry::FormatType fType;
     QWidget *w1 = qobject_cast<QWidget *>(sender());
     caTextEntry *w = qobject_cast<caTextEntry *>(sender());
+
+    if(!w->getAccessW()) return;
+
     fType = w->getFormatType();
 
     TreatRequestedValue(text, fType, w1);
@@ -2321,6 +2412,9 @@ void CaQtDM_Lib::Callback_MessageButton(int type)
 {
     QWidget *w1 = qobject_cast<QWidget *>(sender());
     caMessageButton *w = qobject_cast<caMessageButton *>(sender());
+
+    if(!w->getAccessW()) return;
+
     if(type == 0) {         // pressed
         if(w->getPressMessage().size() > 0)
             TreatRequestedValue(w->getPressMessage(), caTextEntry::decimal, w1);
@@ -2616,6 +2710,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         else strcpy(colMode, "Static");
     } else if(caLinearGauge* widget = qobject_cast<caLinearGauge *>(w)) {
         pv[0] = widget->getPV().trimmed();
+    } else if(caCircularGauge* widget = qobject_cast<caCircularGauge *>(w)) {
+        pv[0] = widget->getPV().trimmed();
     } else if(caByte* widget = qobject_cast<caByte *>(w)) {
         pv[0] = widget->getPV().trimmed();
         if(widget->getColorMode() == caByte::Alarm) strcpy(colMode, "Alarm");
@@ -2629,12 +2725,14 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         }
     } else if(caCartesianPlot* widget = qobject_cast<caCartesianPlot *>(w)) {
         nbPV = 0;
-        for(int i=0; i< 4; i++) {
+        for(int i=0; i< 6; i++) {
             QStringList thisString;
             if(i==0) thisString = widget->getPV_1().split(";");
             if(i==1) thisString = widget->getPV_2().split(";");
             if(i==2) thisString = widget->getPV_3().split(";");
             if(i==3) thisString = widget->getPV_4().split(";");
+            if(i==4) thisString = widget->getPV_5().split(";");
+            if(i==5) thisString = widget->getPV_6().split(";");
             if(thisString.count() == 2 && thisString.at(0).trimmed().length() > 0 && thisString.at(1).trimmed().length() > 0) {
                 pv[nbPV++] = thisString.at(0).trimmed();
                 pv[nbPV++] = thisString.at(1).trimmed();
@@ -2673,7 +2771,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         nbPV = 5;
 
     } else  {
-        //qDebug() << w << "not treated";
+        qDebug() << w << "not treated";
         return;
     }
 
@@ -2681,6 +2779,10 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     myMenu.addAction("Get Info");
     myMenu.addAction("Print");
     if(caStripPlot* widget = qobject_cast<caStripPlot *>(w)) {
+       Q_UNUSED(widget);
+       myMenu.addAction("Change Axis");
+    }
+    if(caCartesianPlot* widget = qobject_cast<caCartesianPlot *>(w)) {
        Q_UNUSED(widget);
        myMenu.addAction("Change Axis");
     }
@@ -2838,13 +2940,13 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         } else if(selectedItem->text().contains("Print")) {
             print();
         } else if(selectedItem->text().contains("Change Axis")) {
-            caStripPlot* widget = qobject_cast<caStripPlot *>(w);
-            limitsStripplotDialog dialog(widget, mutexKnobData, "stripplot modifications", this);
-
-            if (dialog.exec() == QDialog::Accepted) {
+            if(caStripPlot* widget = qobject_cast<caStripPlot *>(w)) {
+               limitsStripplotDialog dialog(widget, mutexKnobData, "stripplot modifications", this);
+               dialog.exec();
+            } else if(caCartesianPlot* widget = qobject_cast<caCartesianPlot *>(w)) {
+               limitsCartesianplotDialog dialog(widget, mutexKnobData, "cartesianplot modifications", this);
+               dialog.exec();
             }
-
-
         }
     } else {
         // nothing was chosen
@@ -3087,9 +3189,11 @@ void CaQtDM_Lib::ComputeNumericMaxMinPrec(QWidget* widget, const knobData& data)
                 }
 
                 if (caApplyNumeric *w = qobject_cast<caApplyNumeric *>(widget)) {
+                    //printf("%d %d\n", width-prec-1, prec);
                     w->setIntDigits(width-prec-1);
                     w->setDecDigits(prec);
                 } else if (caNumeric *w = qobject_cast<caNumeric *>(widget)) {
+                    //printf("%d %d\n", width-prec-1, prec);
                     w->setIntDigits(width-prec-1);
                     w->setDecDigits(prec);
                 }

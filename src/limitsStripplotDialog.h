@@ -1,12 +1,12 @@
  #ifndef limitsStripplotDialog_H
  #define limitsStripplotDialog_H
 
- #include <QDialog>
+#include <QDialog>
 #include <QComboBox>
 #include <QLineEdit>
- #include <QList>
- #include <QPair>
- #include <QString>
+#include <QList>
+#include <QPair>
+#include <QString>
 #include "castripplot.h"
 #include "dbrString.h"
 #include "knobDefines.h"
