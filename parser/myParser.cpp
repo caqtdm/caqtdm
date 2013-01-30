@@ -272,6 +272,10 @@ int main(int argc, char *argv[])
             in++;
             legendsForStripplot = false;
         }
+        if ( strcmp (argv[in], "-v" ) == 0 ) {
+            printf("adl2ui version %s for %s\n", BUILDVERSION, BUILDARCH);
+            exit(0);
+        }
         if(!strcmp(argv[in],"-help") || !strcmp(argv[in],"-h") || !strcmp(argv[in],"-?")) {
             in++;
             printf("Usage:\n adl2ui [options] file\n");
@@ -283,7 +287,7 @@ int main(int argc, char *argv[])
         if (strncmp (argv[in], "-" , 1) == 0) {
             /* unknown application argument */
             printf("adl2ui -- Argument %d = [%s] is unknown! ",in,argv[in]);
-            printf("possible are: '-flat and '-deviceonmenu' and '-nolegends'\n");
+            printf("possible are: '-flat and '-deviceonmenu' and '-nolegends' and '-v'\n");
             exit(-1);
         } else {
             printf("adl2ui -- file = <%s>\n", argv[in]);

@@ -184,10 +184,9 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 #endif
 
     // any open windows ?
-    //qDebug() << this->findChildren<CaQtDM_Lib *>().count();
-
-    // we want to ask with timeout if the application has to be closed
+    // we want to ask with timeout if the application has to be closed. 23-jan-2013 no yust exit
     if(this->findChildren<CaQtDM_Lib *>().count() <= 0 && userClose) {
+        /*
         QString message = QString("no more open windows, do you want to exit?");
         QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "Exit", message, QMessageBox::Yes | QMessageBox::No, this, Qt::Dialog, true);
         m->show();
@@ -202,7 +201,8 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
             if (sharedMemory.isAttached()) sharedMemory.detach();
             exit(0);
         }
-
+        */
+        exit(0);
     } else if(this->findChildren<CaQtDM_Lib *>().count() > 0){
         userClose = true;
     }
@@ -237,13 +237,11 @@ void FileOpenWindow::Callback_OpenButton()
             mainWindow->raise();
             mainWindow->setMinimumSize(0, 0);
             mainWindow->setMaximumSize(16777215, 16777215);
-            mainWindow->setWindowFlags( mainWindow->windowFlags() );
+            mainWindow->setWindowFlags(mainWindow->windowFlags() );
+            mainWindow->setProperty("fileString", fileName);
+            mainWindow->setProperty("macroString", "");
 
-            lastWindow = mainWindow;
-            lastMacro = "";
-            lastGeometry = "";
-            lastFile = fileName;
-            sprintf(asc, "last file: %s", lastFile.toAscii().constData());
+            sprintf(asc, "last file: %s", fileName.toAscii().constData());
             messageWindow->postMsgEvent(QtDebugMsg, asc);
         } else {
             QTDMMessageBox(QMessageBox::Warning, "file open error", "does not exist", QMessageBox::Close, this, Qt::Popup, true);
@@ -284,9 +282,14 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
             title.append(macroString);
             delete file;
 
-            QVariant test=w->property("WindowProperty");
-            if(!test.isNull()) {
-                WindowProperty = test.toString();
+            QVariant fileName = w->property("fileString");
+            QVariant macroString = w->property("macroString");
+            if(!fileName.isNull()) {
+                WindowProperty = fileName.toString();
+            }
+            WindowProperty.append("&");
+            if(!macroString.isNull()) {
+                WindowProperty.append(macroString.toString());
             }
 
             if(QString::compare(WindowProperty, title) == 0) {
@@ -338,19 +341,17 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         mainWindow->setMaximumSize(16777215, 16777215);
         mainWindow->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         mainWindow->setWindowFlags(mainWindow->windowFlags() );
+        mainWindow->setProperty("fileString", fileNameFound);
+        mainWindow->setProperty("macroString", macroString);
 
         if(geometry != "") {
             parse_and_set_Geometry(mainWindow, geometry);
         }
 
-        lastWindow = mainWindow;
-        lastMacro = macroString;
-        lastFile = fileNameFound;
-        lastGeometry = "";
-        if(lastMacro.size() > 0) {
-          sprintf(asc, "last file: %s, macro: %s", lastFile.toAscii().constData(), lastMacro.toAscii().constData());
+        if(macroString.size() > 0) {
+          sprintf(asc, "last file: %s, macro: %s", fileNameFound.toAscii().constData(), macroString.toAscii().constData());
         } else {
-          sprintf(asc, "last file: %s", lastFile.toAscii().constData());
+          sprintf(asc, "last file: %s", fileNameFound.toAscii().constData());
         }
         messageWindow->postMsgEvent(QtDebugMsg, asc);
     }
@@ -397,41 +398,41 @@ void FileOpenWindow::Callback_ActionExit()
 
 void FileOpenWindow::Callback_ActionReload()
 {
-    char asc[255];
     QPoint position;
+    QString macroS = "";
+    QString fileS = "";
 
-    if(lastWindow == (QMainWindow*) 0) return;
-    if(lastFile.size() <= 0) return;
-    // go through the children of the main window and find out if that window still exists
+    // go through all windows, close them and relaod them from files
     QList<QWidget *> all = this->findChildren<QWidget *>();
     foreach(QWidget* widget, all) {
-        if(QMainWindow* w = qobject_cast<QMainWindow *>(widget)) {
-            if(lastWindow == w) {
-                position=lastWindow->pos();
-                lastWindow->close();
-                break;
+        if(CaQtDM_Lib* w = qobject_cast<CaQtDM_Lib *>(widget)) {
+            QVariant fileName = w->property("fileString");
+            QVariant macroString = w->property("macroString");
+            if(!macroString.isNull()) {
+                macroS = macroString.toString();
+            }
+
+            position = w->pos();
+
+            w->close();
+            if(!fileName.isNull()) {
+                fileS = fileName.toString();
+
+                QMainWindow *mainWindow = new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, messageWindow);
+                mainWindow->show();
+                mainWindow->move(position);
+                mainWindow->raise();
+                mainWindow->setMinimumSize(0, 0);
+                mainWindow->setMaximumSize(16777215, 16777215);
+                mainWindow->setWindowFlags( mainWindow->windowFlags() );
+                mainWindow->setProperty("fileString", fileS);
+                mainWindow->setProperty("macroString", macroS);
+
             }
         }
     }
-
-    QMainWindow *mainWindow = new CaQtDM_Lib(this, lastFile, lastMacro, mutexKnobData, messageWindow);
-    mainWindow->show();
-    mainWindow->move(position);
-    mainWindow->raise();
-
-    mainWindow->setMinimumSize(0, 0);
-    mainWindow->setMaximumSize(16777215, 16777215);
-    mainWindow->setWindowFlags( mainWindow->windowFlags() );
-
-    lastWindow = mainWindow;
-
-    if(lastMacro.size() > 0) {
-      sprintf(asc, "last file: %s, macro: %s", lastFile.toAscii().constData(), lastMacro.toAscii().constData());
-    } else {
-      sprintf(asc, "last file: %s", lastFile.toAscii().constData());
-    }
-    messageWindow->postMsgEvent(QtDebugMsg, asc);
 }
+
 
 void FileOpenWindow::checkForMessage()
 {

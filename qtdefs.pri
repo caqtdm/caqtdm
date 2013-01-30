@@ -1,12 +1,26 @@
-CAQTDM_VERSION = V2.6.3
+CAQTDM_VERSION = V2.6.4
+
+# new in 2.6.4
+# circulargauge was not taken warning limits into account. adl2ui has now also better defaults for this widget
+# channel limits for stripplot were not properly displayed, a refresh had to be done
+# reload will now reload all windows from files
+# adl2ui: messagebutton per default has fontscalemode height; slider  got foreground and background
+# when no write access, cursor will change, but widget will not be disabled any more but action is prevented
+# cartesianplot got dialog in order to change its scale
+# cartesianplot will set scale to auto when channel was specified but no channel is present; adl2ui will not use the second y axis
+# slider could have the wrong orientation, should be fixed; gets now also correct colors with adl2ui
+# messagebutton got more shade, carowcolmenu also
+# default for cachoice is centered text, colors should be correct
+# epushbutton scales its text when changing scalemode
+# caQtDM will exit when closing last window; it will not ask any more with timeout
 
 # new in 2.6.3
 # fixed memory overflows due to non null terminated strings from epics
 
 # new in 2.6.2
 # about icon will present our application epics icon
-# command line parameter -g works also in attach mode
-# title bar now yust showing the filename and can be overwriten by other applications without problem
+# command line parameter -dg works also in attach mode
+# title bar now yust showing the filename and can be overwritten by other applications without problem
 # &X implemented in shell command (only for linux)
 
 # new in 2.6.1

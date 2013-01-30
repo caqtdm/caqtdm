@@ -786,6 +786,9 @@ void parseLimits(DisplayInfo *displayInfo, char *widget, int pen, int DoNotWrite
         strcpy(asc, "0.0");
         Qt_setMinimumLimit(widget, pen, asc);
     }
+
+    if(!loprSrc && !hoprSrc && !strcmp(widget, "caCircularGauge")) Qt_handleString("externalLimitsEnabled", "bool", "true");
+
 }
 
 void parseDynamicAttribute(DisplayInfo *displayInfo, char *widget, int *visibilityStatic) {
@@ -1174,7 +1177,7 @@ void parsePlotAxisDefinition(DisplayInfo *displayInfo, int axis)
                 getToken(displayInfo,token);
                 if(axis == X_AXIS_ELEMENT) {
                     Qt_setXaxisLimitSource("caCartesianPlot", token);
-                } else {
+                } else if(axis == Y1_AXIS_ELEMENT){
                     Qt_setYaxisLimitSource("caCartesianPlot", token);
                 }
             } else if (!strcmp(token,"minRange")) {
@@ -1210,19 +1213,19 @@ void parsePlotAxisDefinition(DisplayInfo *displayInfo, int axis)
         if(axis == X_AXIS_ELEMENT) {
             sprintf(range, "%s;%s", minRange, maxRange);
             Qt_handleString("XaxisLimits", "string", range);
-        } else {
+        } else if(axis == Y1_AXIS_ELEMENT){
             sprintf(range, "%s;%s", minRange, maxRange);
             Qt_handleString("YaxisLimits", "string", range);
         }
     } else {
         if(axis == X_AXIS_ELEMENT)Qt_handleString("XaxisLimits", "string", "0;1");
-        else Qt_handleString("YaxisLimits", "string", "0;1");
+        else if(axis == Y1_AXIS_ELEMENT) Qt_handleString("YaxisLimits", "string", "0;1");
     }
 
     if(!rangeStyleFound) {
         if(axis == X_AXIS_ELEMENT) {
             Qt_setXaxisLimitSource("caCartesianPlot", "channel");
-        } else {
+        } else if(axis == Y1_AXIS_ELEMENT) {
             Qt_setYaxisLimitSource("caCartesianPlot", "channel");
         }
     }
@@ -1405,7 +1408,7 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
     }
 
     if(!XrangeFound) Qt_setXaxisLimitSource("caCartesianPlot", "channel");
-    if(!Y1rangeFound && !Y2rangeFound) Qt_setYaxisLimitSource("caCartesianPlot", "channel");
+    if(!Y1rangeFound) Qt_setYaxisLimitSource("caCartesianPlot", "channel");
 
     Qt_writeCloseTag("widget", widgetName, visibilityStatic);
 
@@ -1710,6 +1713,8 @@ void *parseMeter(DisplayInfo *displayInfo, FrameOffset * offset)
              && (tokenType != T_EOF) );
 
     Qt_setColorMode("caCircularGauge", COLORMODE);
+    Qt_handleString("referenceEnabled", "bool", "false");
+    Qt_handleString("externalScale", "bool", "true");
 
     Qt_writeCloseTag("widget", widgetName, visibilityStatic);
 
@@ -2062,6 +2067,7 @@ void *parseMessageButton(DisplayInfo *displayInfo, FrameOffset * offset)
             if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, offset, "caMessageButton", True);
+                Qt_handleString("fontScaleMode", "enum", "EPushButton::Height");
             } else if(!strcmp(token,"control")) {
                 parseControl(displayInfo, "caMessageButton");
             } else if(!strcmp(token,"press_msg")) {
@@ -2348,20 +2354,20 @@ void parseControl(DisplayInfo *displayInfo, char *widget)
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 if((!strcmp(widget, "caTextEntry")) || (!strcmp(widget, "caMessageButton")) || (!strcmp(widget, "caChoice")) ||
-                   (!strcmp(widget, "caMenu")) || (!strcmp(widget, "caNumeric"))) {
+                   (!strcmp(widget, "caMenu")) || (!strcmp(widget, "caNumeric")) || (!strcmp(widget, "caSlider"))) {
                     int clr = atoi(token) % DL_MAX_COLORS;
                     Qt_setColorForeground("",displayInfo->dlColormap->dl_color[clr].r,
                                           displayInfo->dlColormap->dl_color[clr].g,
                                           displayInfo->dlColormap->dl_color[clr].b,
                                           255);
                 } else {
-                    printf("adl2ui -- forecolor  for control %s not supported (use stylesheet)\n", widget);
+                    //printf("adl2ui -- forecolor  for control %s not supported (use stylesheet)\n", widget);
                 }
             } else if (!strcmp(token,"bclr")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 if((!strcmp(widget, "caTextEntry")) || (!strcmp(widget, "caMessageButton"))|| (!strcmp(widget, "caChoice")) ||
-                   (!strcmp(widget, "caMenu")) || (!strcmp(widget, "caNumeric"))) {
+                   (!strcmp(widget, "caMenu")) || (!strcmp(widget, "caNumeric")) || (!strcmp(widget, "caSlider"))) {
                     int bclr = atoi(token) % DL_MAX_COLORS;
                     Qt_setColorBackground("",displayInfo->dlColormap->dl_color[bclr].r,
                                           displayInfo->dlColormap->dl_color[bclr].g,
@@ -2383,6 +2389,7 @@ void parseControl(DisplayInfo *displayInfo, char *widget)
         }
     } while ( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
               && (tokenType != T_EOF) );
+
 }
 
 void *parseImage(DisplayInfo *displayInfo, FrameOffset * offset)

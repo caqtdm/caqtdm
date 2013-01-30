@@ -20,6 +20,9 @@ TARGET = adl2ui
 OTHER_FILES += \
     stylesheet.qss
 
+ DEFINES += BUILDVERSION=\\\"$${CAQTDM_VERSION}\\\"
+ DEFINES += BUILDARCH=\\\"$$(QMAKESPEC)\\\"
+
 win32-msvc* {
  ReleaseBuild {
    QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\adl2ui.exe $${BINARY_LOCATION}
@@ -28,8 +31,5 @@ win32-msvc* {
  DebugBuild {
    OBJECTS_DIR = debug/obj
  }
-
-
-
 
 }
