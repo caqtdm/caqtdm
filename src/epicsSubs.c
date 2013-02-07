@@ -72,18 +72,18 @@ char* myLimitedString (char * strng) {
 }
 
 // due to gateway, protect copy of units
-#define AssignEpicsData \
+#define AssignEpicsData {\
     strcpy(kData.edata.units, myLimitedString(stsF->units)); \
-    kData.edata.lower_disp_limit = stsF->lower_disp_limit; \
-    kData.edata.upper_disp_limit = stsF->upper_disp_limit; \
-    kData.edata.lower_alarm_limit = stsF->lower_alarm_limit; \
-    kData.edata.upper_alarm_limit = stsF->upper_alarm_limit; \
-    kData.edata.lower_ctrl_limit = stsF->lower_ctrl_limit;   \
-    kData.edata.upper_ctrl_limit = stsF->upper_ctrl_limit;  \
-    kData.edata.lower_warning_limit = stsF->lower_warning_limit; \
-    kData.edata.upper_warning_limit = stsF->upper_warning_limit;
+    kData.edata.lower_disp_limit = (double) stsF->lower_disp_limit; \
+    kData.edata.upper_disp_limit = (double) stsF->upper_disp_limit; \
+    kData.edata.lower_alarm_limit = (double) stsF->lower_alarm_limit; \
+    kData.edata.upper_alarm_limit = (double) stsF->upper_alarm_limit; \
+    kData.edata.lower_ctrl_limit = (double) stsF->lower_ctrl_limit;   \
+    kData.edata.upper_ctrl_limit = (double) stsF->upper_ctrl_limit;  \
+    kData.edata.lower_warning_limit = (double) stsF->lower_warning_limit; \
+    kData.edata.upper_warning_limit = (double) stsF->upper_warning_limit; }
 
-#define AssignEpicsValue(valx, vali, countx) \
+#define AssignEpicsValue(valx, vali, countx) { \
     kData.edata.rvalue = valx; \
     kData.edata.ivalue = vali; \
     kData.edata.severity = stsF->severity; \
@@ -91,7 +91,7 @@ char* myLimitedString (char * strng) {
     kData.edata.accessR = ca_read_access(args.chid); \
     kData.edata.valueCount = countx; \
     strcpy(kData.edata.fec, myLimitedString((char*) ca_host_name(args.chid))); \
-    kData.edata.monitorCount = info->event;
+    kData.edata.monitorCount = info->event; }
 
 /**
  * general print routine with timestamp
@@ -144,7 +144,6 @@ static void access_rights_handler(struct access_rights_handler_args args)
 static void dataCallback(struct event_handler_args args)
 {
     knobData kData;
-
     connectInfo *info = (connectInfo *) ca_puser(args.chid);
     if(info == (connectInfo *) 0) return;
 
@@ -270,17 +269,19 @@ static void dataCallback(struct event_handler_args args)
                          stsF->value, stsF->units, info->index, ca_host_name(args.chid),
                          stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
 
-            if(info->event == 1) AssignEpicsData;
+            if(info->event == 1) {
+                AssignEpicsData;
+            }
             AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
             kData.edata.precision = 0;
 
             if(args.count > 1) {
-                if((int) (args.count * sizeof(int)) != kData.edata.dataSize) {
+                if((int) (args.count * sizeof(int16_t)) != kData.edata.dataSize) {
                     free(kData.edata.dataB);
-                    kData.edata.dataB = (void*) malloc(args.count * sizeof(int));
-                    kData.edata.dataSize = args.count * sizeof(int);
+                    kData.edata.dataB = (void*) malloc(args.count * sizeof(int16_t));
+                    kData.edata.dataSize = args.count * sizeof(int16_t);
                 }
-                memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(int));
+                memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(int16_t));
             }
 
             C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
@@ -295,17 +296,20 @@ static void dataCallback(struct event_handler_args args)
                          stsF->value, stsF->units, info->index, ca_host_name(args.chid),
                          stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
 
-            if(info->event == 1) AssignEpicsData;
+
+            if(info->event == 1) {
+                AssignEpicsData;
+            }
             AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
             kData.edata.precision = 0;
 
             if(args.count > 1) {
-                if((int) (args.count * sizeof(long)) != kData.edata.dataSize) {
+                if((int) (args.count * sizeof(int32_t)) != kData.edata.dataSize) {
                     free(kData.edata.dataB);
-                    kData.edata.dataB = (void*) malloc(args.count * sizeof(long));
-                    kData.edata.dataSize = args.count * sizeof(long);
+                    kData.edata.dataB = (void*) malloc(args.count * sizeof(int32_t));
+                    kData.edata.dataSize = args.count * sizeof(int32_t);
                 }
-                memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(long));
+                memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(int32_t));
             }
 
             C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
@@ -449,7 +453,7 @@ int CreateAndConnect(int index, knobData *kData, int rate)
 
     tmp = (connectInfo *) 0;
 
-    //printf("create channel for button=%d <%s>\n", index, kData->pv);
+    PRINT(printf("create channel index=%d <%s>\n", index, kData->pv));
 
     kData->edata.monitorCount = 0;
     kData->edata.displayCount = 0;
@@ -502,7 +506,7 @@ int CreateAndConnect(int index, knobData *kData, int rate)
                                CA_PRIORITY_DEFAULT,
                                &tmp->ch);
     if(status != ECA_NORMAL) {
-        printf("ca_create_channel:\n"" %d %s for %s\n", (int) tmp->ch, ca_message_text[CA_EXTRACT_MSG_NO(status)], kData->pv);
+        printf("ca_create_channel:\n"" %s for %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], kData->pv);
     }
 
     status = ca_pend_io(CA_TIMEOUT);
@@ -527,13 +531,15 @@ void ClearMonitor(knobData *kData)
     kData->index = -1;
     kData->pv[0] = '\0';
 
+   PRINT(printf("clear channel %s index=%d\n", tmp->pv, kData->index));
+
     tmp = (connectInfo *) kData->edata.info;
     if (tmp != (connectInfo *) 0) {
         if(tmp->cs == 0) { // epics
             if(tmp->ch != (chid) 0) {
                 status = ca_clear_channel(tmp->ch);
                 if(status != ECA_NORMAL) {
-                    printf("ca_clear_channel:\n"" %d %s %s\n", (int) tmp->ch, ca_message_text[CA_EXTRACT_MSG_NO(status)], tmp->pv);
+                    printf("ca_clear_channel:\n"" %s %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], tmp->pv);
                 }
             }
         } else {
@@ -547,7 +553,7 @@ void ClearMonitor(knobData *kData)
 }
 
 
-int EpicsSetValue(char *pv, float rdata, long idata, char *sdata, char *object, char *errmess)
+int EpicsSetValue(char *pv, float rdata, int32_t idata, char *sdata, char *object, char *errmess, int treatAsDouble)
 {
     chid     ch;
     chtype   chType;
@@ -584,7 +590,7 @@ int EpicsSetValue(char *pv, float rdata, long idata, char *sdata, char *object, 
 #endif
 
     // set epics value
-    PRINT(printf(" we have to set a value to an epics device <%s> %f %ld <%s>\n", pv, rdata, idata, sdata));
+    //printf(" we have to set a value to an epics device <%s> %f %ld <%s>\n", pv, rdata, idata, sdata);
     status = ca_create_channel(pv, NULL, 0, CA_PRIORITY, &ch);
     if (ch == (chid) 0) {
         return !ECA_NORMAL;
@@ -597,6 +603,8 @@ int EpicsSetValue(char *pv, float rdata, long idata, char *sdata, char *object, 
     }
 
     chType = ca_field_type(ch);
+
+    if(treatAsDouble == 1) chType = DBF_FLOAT;
 
     switch (chType) {
     case DBF_STRING:
@@ -640,7 +648,7 @@ int EpicsSetValue(char *pv, float rdata, long idata, char *sdata, char *object, 
 
     case DBF_CHAR:
 
-        //printf("put char array for <%s> with <%s>\n", pv, sdata);
+        printf("put char array for <%s> with <%s>\n", pv, sdata);
         status = ca_array_put(DBR_CHAR, strlen(sdata), ch, sdata);
         if (status != ECA_NORMAL) {
             C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
@@ -697,6 +705,7 @@ int EpicsSetValue(char *pv, float rdata, long idata, char *sdata, char *object, 
 
 void TerminateDeviceIO()
 {
+    printf("TeminateDeviceIO\n");
     ca_flush_io();
     ca_context_destroy();
     ca_task_exit();

@@ -43,7 +43,7 @@ typedef struct _connectInfo {
 #define InfoPrefix "<p style='background-color:lightyellow'><font color='#000000'>"
 #define InfoPostfix "</font></font></p>"
 
-#define ComputeVisibility(x)    \
+#define ComputeVisibility(x)  {  \
     switch(widget->getVisibility()) { \
     case x::StaticV:\
     return true;\
@@ -57,9 +57,9 @@ typedef struct _connectInfo {
     case x::Calc:\
     visible = CalcVisibility(widget, result, valid);\
     break;\
-    }
+    }}
 
-#define BuildVector(x) \
+#define BuildVector(x) {\
     switch(data.edata.fieldtype) { \
     case caFLOAT: { \
     float* P = (float*) data.edata.dataB; \
@@ -72,21 +72,21 @@ typedef struct _connectInfo {
     } \
     break; \
     case caLONG: { \
-    long* P = (long*) data.edata.dataB; \
-    for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]); \
+    int32_t* P = (int32_t*) data.edata.dataB; \
+    for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);\
     } \
     break; \
     case caINT: { \
-    short* P = (short*) data.edata.dataB; \
+    int16_t* P = (int16_t*) data.edata.dataB; \
     for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]); \
     } \
     break; \
     case caENUM: { \
-    short* P = (short*) data.edata.dataB; \
+    int16_t* P = ( int16_t*) data.edata.dataB; \
     for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]); \
     } \
     break; \
-    }
+    }}
 
 #define QStringsToChars(x,y,z) \
   char param1[MAXPVLEN], param2[255], param3[80]; \
@@ -111,7 +111,7 @@ Q_DECLARE_METATYPE(QList<int>)
 extern "C" int CreateAndConnect(int index, knobData *data, int rate);
 extern "C" void ClearMonitor(knobData *kData);
 extern "C" void PrepareDeviceIO();
-extern "C" int EpicsSetValue(char *pv, float rdata, long idata, char *sdata, char *object, char *errmess);
+extern "C" int EpicsSetValue(char *pv, float rdata, long idata, char *sdata, char *object, char *errmess, int treatAsDouble);
 extern "C" void TerminateDeviceIO();
 
 MutexKnobData *mutexKnobData;
@@ -753,6 +753,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         QWidget *thisW;
         QFile *file = new QFile;
         QUiLoader loader;
+        bool prcFile = false;
 
         // define a layout
         QGridLayout *layout = new QGridLayout;
@@ -783,7 +784,17 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         // define the file to use
         QString fileName = widget->getFileName().trimmed();
         QStringList openFile = fileName.split(".", QString::SkipEmptyParts);
-        fileName = openFile[0].append(".ui");
+
+
+        // ui file or prc file ?
+        if((openFile.count() > 1) && openFile.at(1).contains("prc")) {
+            //qDebug() << "prc file";
+            prcFile = true;
+        } else {
+           //qDebug() << "ui file";
+           fileName = openFile[0].append(".ui");
+           prcFile = false;
+        }
 
         searchFile *s = new searchFile(fileName);
         QString fileNameFound = s->findFile();
@@ -798,21 +809,31 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         // sure file exists ?
         QFileInfo fi(fileName);
         if(fi.exists()) {
-            // open and load file
-            file->setFileName(fileName);
-            file->open(QFile::ReadOnly);
 
-            thisW = loader.load(file, this);
+            // load prc or ui file
+            if(prcFile) {
+                // load new file
+#ifdef PRC
+                ParsePepFile *parsefile = new ParsePepFile(fileName);
+                thisW = parsefile->load(this);
+#else
+                thisW = (QWidget*) 0;
+#endif
+            } else {
+                // open and load ui file
+                file->setFileName(fileName);
+                file->open(QFile::ReadOnly);
+                thisW = loader.load(file, this);
+                file->close();
+            }
 
             // some error with loading
             if (!thisW) {
-                file->close();
                 postMessage(QtDebugMsg, (char*) tr("could not load include file %1").arg(fileName).toAscii().constData());
                 // seems to be ok
             } else {
 
                 includeWidgetList.append(thisW);
-                file->close();
 
                 // add widget to the gui
                 layout->addWidget(thisW);
@@ -1634,7 +1655,6 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
     } else if (caSlider *widget = qobject_cast<caSlider *>(w)) {
 
         bool channelLimitsEnabled = false;
-        if(widget->getLimitsMode() == caSlider::Channel) channelLimitsEnabled= true;
 
         if(data.edata.connected) {
             if(widget->getLimitsMode() == caSlider::Channel) channelLimitsEnabled= true;
@@ -1781,10 +1801,10 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 if(!widget->property("Connect").value<bool>()) {
                     widget->setProperty("Connect", true);
                 }
+                widget->setValue((int) data.edata.ivalue);
             } else if(colorMode == caByte::Alarm) {
                 widget->setAlarmColors(data.edata.severity);
             }
-            widget->setValue((int) data.edata.ivalue);
         } else {
             widget->setAlarmColors(NOTCONNECTED);
             widget->setProperty("Connect", false);
@@ -2284,7 +2304,7 @@ void CaQtDM_Lib::Callback_EApplyNumeric(double value)
         //qDebug() << numeric->objectName() << numeric->getPV() << value;
         QString text("");
         QStringsToChars(numeric->getPV(), text, numeric->objectName().toLower());
-        EpicsSetValue(param1, value, 0, param2, param3, errmess);
+        EpicsSetValue(param1, value, 0, param2, param3, errmess, 0);
     }
 }
 /**
@@ -2301,7 +2321,7 @@ void CaQtDM_Lib::Callback_ENumeric(double value)
         //qDebug() << numeric->objectName() << numeric->getPV() << value;
         QString text(" ");
         QStringsToChars(numeric->getPV(), text, numeric->objectName().toLower());
-        EpicsSetValue(param1, value, 0, param2, param3, errmess);
+        EpicsSetValue(param1, value, 0, param2, param3, errmess, 0);
     }
 }
 
@@ -2319,7 +2339,7 @@ void CaQtDM_Lib::Callback_Slider(double value)
         //qDebug() << numeric->objectName() << numeric->getPV() << value;
         QString text(" ");
         QStringsToChars(numeric->getPV(), text, numeric->objectName().toLower());
-        EpicsSetValue(param1, value, 0, param2, param3, errmess);
+        EpicsSetValue(param1, value, 0, param2, param3, errmess, 0);
     }
 }
 
@@ -2346,7 +2366,7 @@ void CaQtDM_Lib::Callback_ChoiceClicked(const QString& text)
     if(choice->getPV().length() > 0) {
         //qDebug() << "choice_clicked" << text << choice->getPV();
         QStringsToChars(choice->getPV(), text,  choice->objectName().toLower());
-        EpicsSetValue(param1, 0.0, 0, param2, param3, errmess);
+        EpicsSetValue(param1, 0.0, 0, param2, param3, errmess, 0);
     }
 }
 
@@ -2363,7 +2383,7 @@ void CaQtDM_Lib::Callback_MenuClicked(const QString& text)
     if(menu->getPV().length() > 0) {
       //qDebug() << "menu_clicked" << text << menu->getPV();
       QStringsToChars(menu->getPV(), text,  menu->objectName().toLower());
-      EpicsSetValue(param1, 0.0, 0, param2, param3, errmess);
+      EpicsSetValue(param1, 0.0, 0, param2, param3, errmess, 0);
     }
     // display label again when configured with it
     if(menu->getLabelDisplay()) {
@@ -2396,6 +2416,7 @@ void CaQtDM_Lib::Callback_RelatedDisplayClicked(int indx)
     //qDebug() << "relateddisplaycallback" << indx << w;
     QStringList files = w->getFiles().split(";");
     QStringList args = w->getArgs().split(";");
+    QStringList removeParents = w->getReplaceModes().split(";");
     //qDebug() << "files:" << files;
     //qDebug() << "args" << args;
     if(indx < files.count() && indx < args.count()) {
@@ -2403,6 +2424,15 @@ void CaQtDM_Lib::Callback_RelatedDisplayClicked(int indx)
     } else if(indx < files.count()) {
         emit Signal_OpenNewWFile(files[indx].trimmed(), "", "");
     }
+    // do we have to remove this window while removeparent was specified
+    if(indx < removeParents.count()) {
+        QString removeParent = removeParents.at(indx);
+        removeParent = removeParent.toLower();
+        if(removeParent.contains("true")) {
+            this->close();
+        }
+    }
+
 }
 
 /**
@@ -2549,12 +2579,11 @@ void CaQtDM_Lib::processError(QProcess::ProcessError err)
 void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
 {
     Q_UNUSED(ce);
+    qDebug() << "close event";
     for(int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
 
         knobData kData =  mutexKnobData->GetMutexKnobData(i);
 
-        //knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
-        //if((kPtr->index != -1) && (myWidget == kPtr->thisW)) {
         if((kData.index != -1) && (myWidget == kData.thisW)) {
             QString pv = kData.pv;
             QWidget* w = (QWidget*) kData.thisW;
@@ -3273,7 +3302,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
 
     switch (kPtr->edata.fieldtype) {
     case caSTRING:
-        EpicsSetValue(kPtr->pv, 0.0, 0, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess);
+        EpicsSetValue(kPtr->pv, 0.0, 0, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess, 0);
         break;
 
     case caENUM:
@@ -3286,7 +3315,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
             QStringList list = strng.split(";", QString::SkipEmptyParts);
             for (int i=0; i<list.size(); i++) {
                 if(!text.compare(list.at(i).trimmed())) {
-                    EpicsSetValue((char*) kPtr->pv, 0.0, 0, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess);
+                    EpicsSetValue((char*) kPtr->pv, 0.0, 0, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess, 0);
                     match = true;
                     break;
                 }
@@ -3294,7 +3323,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
         }
 
         if(!match) {
-            //qDebug() << "assume it is a number";
+            qDebug() << "assume it is a number";
             // Assume it is a number
             if(fType == caTextEntry::octal) {
                 longValue = strtoul(textValue, &end, 8);
@@ -3311,7 +3340,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
             // number must be between the enum possibilities
             if(kPtr->edata.fieldtype == caENUM) {
                 if(*end == 0 && end != textValue && longValue >= 0 && longValue <= kPtr->edata.enumCount) {
-                    EpicsSetValue((char*) kPtr->pv, 0.0, longValue, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess);
+                    EpicsSetValue((char*) kPtr->pv, 0.0, longValue, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess, 0);
                 } else {
                     char asc[100];
                     sprintf(asc, "Invalid value: pv=%s value= \"%s\"\n", kPtr->pv, textValue);
@@ -3323,18 +3352,21 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
                 }
             // normal int or long
             } else
-                EpicsSetValue((char*) kPtr->pv, 0.0, longValue, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess);
+                EpicsSetValue((char*) kPtr->pv, 0.0, longValue, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess, 0);
             }
 
         break;
 
     case caCHAR:
         if(fType == caTextEntry::string) {
-            EpicsSetValue((char*) kPtr->pv, 0.0, 0, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess);
+            EpicsSetValue((char*) kPtr->pv, 0.0, 0, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess, 0);
+            break;
         }
-        break;
+        //qDebug() << "fall through";
+
 
     default:
+        //qDebug() << "assume it is a double";
         // Treat as a double
         if(fType == caTextEntry::octal) {
             value = (double) strtoul(textValue, &end, 8);
@@ -3358,7 +3390,8 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
                 sprintf(asc, "SoftPV: %s  set to value: \"%s\"\n", kPtr->pv, textValue);
                 postMessage(QtDebugMsg, asc);
             } else {
-              EpicsSetValue((char*) kPtr->pv, value, 0, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess);
+              //qDebug() << "we should set a double independently if pv has another type ";
+              EpicsSetValue((char*) kPtr->pv, value, 0, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess, 1);
             }
         } else {
             char asc[100];
@@ -3366,12 +3399,12 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
             postMessage(QtDebugMsg, asc);
             if(caTextEntry* widget = qobject_cast<caTextEntry *>((QWidget*) auxPtr->dispW)) {
                 Q_UNUSED(widget);
-                 //widget->setText("");
             }
         }
         break;
     }
 }
+
 int CaQtDM_Lib::parseForDisplayRate(QString inputc, int &rate)
 {
     // Parse data
