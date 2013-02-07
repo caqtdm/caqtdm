@@ -1,4 +1,17 @@
-CAQTDM_VERSION = V2.6.4
+CAQTDM_VERSION = V2.6.6
+
+# new in 2.6.6
+# related display got the possibility to specify if the parent display has to be removed
+# setting a dbf_char had a bug and was not set. Should be fixed
+
+# new in 2.6.5
+# for the stripplot adl2ui will not generate any more the first curve as filled when a '[' is seen in the x label
+# the pipe width of caslider and cathermo are set by adl2ui to the width or height when no decorations
+# cabyte was not setting correctly the alarm colors, is fixed now
+# caslider is set now to readonly when no write access
+# cathermo had geometry update problems, fixed
+# camenu does not accept background and foreground colors when Qt style is windows. now qt applications are started with -style plastique fixing the problem
+# on 64bit architectures, waveforms of type epics long were processed with long of 64 bits. now fixed using 32bits
 
 # new in 2.6.4
 # circulargauge was not taken warning limits into account. adl2ui has now also better defaults for this widget

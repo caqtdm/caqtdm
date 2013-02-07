@@ -848,7 +848,7 @@ void parseDynamicAttribute(DisplayInfo *displayInfo, char *widget, int *visibili
              && (tokenType != T_EOF) );
 }
 
-void parseRelatedDisplayEntry(DisplayInfo *displayInfo, char *widget, char *label, char *file, char *arg)
+void parseRelatedDisplayEntry(DisplayInfo *displayInfo, char *widget, char *label, char *file, char *arg, char *policy)
 {
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
@@ -875,6 +875,7 @@ void parseRelatedDisplayEntry(DisplayInfo *displayInfo, char *widget, char *labe
             } else if(!strcmp(token,"policy")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
+                strcpy(policy, token);
             }
             break;
         case T_LEFT_BRACE:
@@ -1039,12 +1040,12 @@ void parsePlotcom(DisplayInfo *displayInfo, char *widget)
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 Qt_handleString("TitleX", "string", token);
-
+                /* this was desired by proscan and hipa, now taken out
                 if(strstr(token, "[") != (char*) 0 && strstr(widget, "caStripPlot") != (char*) 0) {
                     char asc[MAX_ASCII];
                     sprintf(asc, "%s::FillUnder", widget);
                     Qt_handleString("Style_1", "enum", asc);
-                }
+                }*/
 
             } else if (!strcmp(token,"ylabel")) {
                 getToken(displayInfo,token);
@@ -1421,6 +1422,7 @@ void *parseRelatedDisplay(DisplayInfo *displayInfo, FrameOffset * offset)
     char label[MAX_TOKEN_LENGTH] = "\0";
     char name[MAX_TOKEN_LENGTH] = "\0";
     char arg[MAX_TOKEN_LENGTH] = "\0";
+    char pol[MAX_TOKEN_LENGTH] = "\0";
     int visibilityStatic = 2; // top layer
 
     TOKEN tokenType;
@@ -1432,6 +1434,7 @@ void *parseRelatedDisplay(DisplayInfo *displayInfo, FrameOffset * offset)
     char labels[LONGSTRING] = "\0";
     char names[LONGSTRING] = "\0";
     char argus[LONGSTRING]  = "\0";
+    char remos[LONGSTRING]  = "\0";
 
     static int number = 0;
     int clr = 0;
@@ -1453,11 +1456,18 @@ void *parseRelatedDisplay(DisplayInfo *displayInfo, FrameOffset * offset)
                         displayNumber > MAX_RELATED_DISPLAYS-1) {
                     displayNumber=MAX_RELATED_DISPLAYS-1;
                 }
-                parseRelatedDisplayEntry(displayInfo, "caRelatedDisplay", label, name, arg);
+                parseRelatedDisplayEntry(displayInfo, "caRelatedDisplay", label, name, arg, pol);
 
                 strcat(names, name); strcat(names, ";");
                 strcat(argus, arg); strcat(argus, ";");
                 strcat(labels, label); strcat(labels, ";");
+                printf("<%s>\n", pol);
+                if(!strncmp(pol,"replace", 7)) {
+                    strcpy(pol, "true");
+                } else {
+                    strcpy(pol, "false");
+                }
+                strcat(remos, pol); strcat(remos, ";");
 
             } else if(!strcmp(token,"clr")) {
                 getToken(displayInfo,token);
@@ -1518,6 +1528,10 @@ void *parseRelatedDisplay(DisplayInfo *displayInfo, FrameOffset * offset)
     if(strlen(argus) > 0) {
         argus[strlen(argus) -1] = '\0';
         Qt_handleString("args", "string", argus);
+    }
+    if(strlen(remos) > 0) {
+        remos[strlen(remos) -1] = '\0';
+        Qt_handleString("removeParent", "string", remos);
     }
 
     Qt_writeCloseTag("widget", widgetName, visibilityStatic);
@@ -3358,7 +3372,15 @@ void *parseBar(DisplayInfo *displayInfo, FrameOffset * offset)
     Qt_handleString("direction", "enum", direction);
 
     if(!strcmp(look,"noLabel") || !strcmp(look,"noDeco")) {
+        char pipeWidth[10];
         Qt_handleString("scalePosition", "enum", "NoScale");
+        if(!strcmp(direction, "Up") || !strcmp(direction, "Down")) {
+            sprintf(pipeWidth, "%d", object.width);
+            Qt_handleString("pipeWidth", "number", pipeWidth);
+        } else {
+            sprintf(pipeWidth, "%d", object.height);
+            Qt_handleString("pipeWidth", "number", pipeWidth);
+        }
     } else if(!strcmp(direction, "Up") || !strcmp(direction, "Down")) {
         Qt_handleString("scalePosition", "enum", "LeftScale");
     } else if(!strcmp(direction, "Right") || !strcmp(direction, "Left")) {
@@ -3450,6 +3472,15 @@ void *parseIndicator(DisplayInfo *displayInfo, FrameOffset * offset)
 
     if(!strcmp(look,"noLabel") || !strcmp(look,"noDeco")) {
         Qt_handleString("scalePosition", "enum", "NoScale");
+        char pipeWidth[10];
+        Qt_handleString("scalePosition", "enum", "NoScale");
+        if(!strcmp(direction, "Up") || !strcmp(direction, "Down")) {
+            sprintf(pipeWidth, "%d", object.width-4);
+            Qt_handleString("pipeWidth", "number", pipeWidth);
+        } else {
+            sprintf(pipeWidth, "%d", object.height-4);
+            Qt_handleString("pipeWidth", "number", pipeWidth);
+        }
     } else if(!strcmp(direction, "Up") || !strcmp(direction, "Down")) {
         Qt_handleString("scalePosition", "enum", "LeftScale");
     } else if(!strcmp(direction, "Right") || !strcmp(direction, "Left")) {

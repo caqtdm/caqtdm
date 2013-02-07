@@ -127,7 +127,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         QByteArray byteArray("0");
         _isRunning = false;
         // create shared memory with a default value to note that no message is available.
-        if (!sharedMemory.create(100)) {
+        if (!sharedMemory.create(255)) {
             qDebug("caQtDM -- Unable to create single instance.");
         } else {
             qDebug() << "caQtDM -- created shared memory";
@@ -202,6 +202,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
             exit(0);
         }
         */
+        if (sharedMemory.isAttached()) sharedMemory.detach();
         exit(0);
     } else if(this->findChildren<CaQtDM_Lib *>().count() > 0){
         userClose = true;
