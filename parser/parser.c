@@ -3404,7 +3404,7 @@ void *parseIndicator(DisplayInfo *displayInfo, FrameOffset * offset)
     int nestingLevel = 0;
     DlObject object;
     int visibilityStatic = 2; // top layer
-
+	char pipeWidth[10];
     static int number = 0;
     char widgetName[MAX_ASCII];
     sprintf(widgetName, "caThermoM_%d", number++);
@@ -3471,8 +3471,8 @@ void *parseIndicator(DisplayInfo *displayInfo, FrameOffset * offset)
     Qt_handleString("direction", "enum", direction);
 
     if(!strcmp(look,"noLabel") || !strcmp(look,"noDeco")) {
+
         Qt_handleString("scalePosition", "enum", "NoScale");
-        char pipeWidth[10];
         Qt_handleString("scalePosition", "enum", "NoScale");
         if(!strcmp(direction, "Up") || !strcmp(direction, "Down")) {
             sprintf(pipeWidth, "%d", object.width-4);
