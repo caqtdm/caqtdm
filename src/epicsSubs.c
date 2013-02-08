@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
-
+#include <stdint.h>
 #define epicsAlarmGLOBAL
 #include <cadef.h>
 struct ca_client_context *dbCaClientContext;

@@ -11,6 +11,7 @@
 
 #include "caqtdm_lib.h"
 #include "dmsearchfile.h"
+#include <stdint.h>
 #include <math.h>
 #include <stdlib.h>
 #include <iostream>
