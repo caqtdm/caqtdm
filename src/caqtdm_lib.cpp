@@ -25,6 +25,8 @@
 #  include <sys/wait.h>
 #endif
 
+#define PRC 1
+
 #include "myMessageBox.h"
 
 #include "alarmdefs.h"
@@ -2580,7 +2582,6 @@ void CaQtDM_Lib::processError(QProcess::ProcessError err)
 void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
 {
     Q_UNUSED(ce);
-    qDebug() << "close event";
     for(int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
 
         knobData kData =  mutexKnobData->GetMutexKnobData(i);
@@ -3287,12 +3288,12 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
     long longValue;
     char *end;
     bool match;
-    char textValue[40];
+    char textValue[255];
 
     int indx =  w->property("MonitorIndex").value<int>();
     if(indx < 0) return;
 
-    strcpy(textValue, text.toAscii().constData());
+    //qDebug() << "TreatRequestedValue text" << text.toAscii().constData();
     knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
     knobData *auxPtr = kPtr;
 
@@ -3301,14 +3302,16 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
         kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
     }
 
+    //qDebug() << "fieldtype:" << kPtr->edata.fieldtype;
     switch (kPtr->edata.fieldtype) {
     case caSTRING:
-        EpicsSetValue(kPtr->pv, 0.0, 0, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess, 0);
+        EpicsSetValue(kPtr->pv, 0.0, 0, (char*) text.toAscii().constData(), (char*) w->objectName().toLower().toAscii().constData(), errmess, 0);
         break;
 
     case caENUM:
     case caINT:
     case caLONG:
+        strcpy(textValue, text.toAscii().constData());
         // Check for a match
         match = false;
         if(kPtr->edata.dataB != (void*)0 && kPtr->edata.enumCount > 0) {
@@ -3360,7 +3363,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
 
     case caCHAR:
         if(fType == caTextEntry::string) {
-            EpicsSetValue((char*) kPtr->pv, 0.0, 0, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess, 0);
+            EpicsSetValue((char*) kPtr->pv, 0.0, 0, (char*) text.toAscii().constData(), (char*) w->objectName().toLower().toAscii().constData(), errmess, 0);
             break;
         }
         //qDebug() << "fall through";
@@ -3369,6 +3372,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
     default:
         //qDebug() << "assume it is a double";
         // Treat as a double
+        strcpy(textValue, text.toAscii().constData());
         if(fType == caTextEntry::octal) {
             value = (double) strtoul(textValue, &end, 8);
         } else if(fType == caTextEntry::hexadecimal) {

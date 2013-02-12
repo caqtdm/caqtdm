@@ -637,7 +637,6 @@ int EpicsSetValue(char *pv, float rdata, int32_t idata, char *sdata, char *objec
 
     case DBF_DOUBLE:
     case DBF_FLOAT:
-
         //printf("put double/float for <%s> with data=%f\n", pv, rdata);
         status = ca_put(DBR_FLOAT, ch, &rdata);
         if (status != ECA_NORMAL) {
@@ -647,8 +646,7 @@ int EpicsSetValue(char *pv, float rdata, int32_t idata, char *sdata, char *objec
         break;
 
     case DBF_CHAR:
-
-        printf("put char array for <%s> with <%s>\n", pv, sdata);
+        //printf("put char array for <%s> with <%s>\n", pv, sdata);
         status = ca_array_put(DBR_CHAR, strlen(sdata), ch, sdata);
         if (status != ECA_NORMAL) {
             C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
@@ -665,6 +663,8 @@ int EpicsSetValue(char *pv, float rdata, int32_t idata, char *sdata, char *objec
     }
 
     // something was written, so check status
+
+    //printf("check status after write\n");
 
     switch (chType) {
 
