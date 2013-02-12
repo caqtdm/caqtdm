@@ -3308,6 +3308,8 @@ void *parseBar(DisplayInfo *displayInfo, FrameOffset * offset)
         case T_WORD:
             if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
+                if(object.width < 3) object.width=3;
+                if(object.height < 3) object.height=3;
                 writeRectangleDimensions(&object, offset, "caThermo", True);
             } else if(!strcmp(token,"monitor")) {
                 parseMonitor(displayInfo, "caThermo");
