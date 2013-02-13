@@ -23,6 +23,10 @@ OTHER_FILES += \
  DEFINES += BUILDVERSION=\\\"$${CAQTDM_VERSION}\\\"
  DEFINES += BUILDARCH=\\\"$$(QMAKESPEC)\\\"
 
+unix {
+  QMAKE_POST_LINK = cp adl2ui ../../caQtDM_Binaries/
+}
+
 win32-msvc* {
  ReleaseBuild {
    QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\adl2ui.exe $${BINARY_LOCATION}
