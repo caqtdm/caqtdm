@@ -1,0 +1,9 @@
+<RCC>
+  <qresource>
+    <file>plugins/pixmaps/econtexthelp.png</file>
+	<file>pixmaps/go-up.png</file>
+	<file>pixmaps/go-down.png</file>
+	<file>pixmaps/list-add.png</file>
+	<file>pixmaps/list-remove.png</file>
+  </qresource>
+</RCC>

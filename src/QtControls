@@ -1,0 +1,35 @@
+#ifndef _QTCONTROLS_H_LIST
+#define _QTCONTROLS_H_LIST
+
+#include <canumeric.h>
+#include <caapplynumeric.h>
+#include <eapplybutton.h>
+#include <eflag.h>
+#include <cagauge.h>
+#include <calabel.h>
+#include <caled.h>
+#include <ewidget.h>
+#include <calineedit.h>
+#include <caslider.h>
+#include <cathermo.h>
+#include <cagraphics.h>
+#include <cacartesianplot.h>
+#include <caframe.h>
+#include <castripplot.h>
+#include <cabyte.h>
+#include <caimage.h>
+#include <camenu.h>
+#include <cachoice.h>
+#include <capolyline.h>
+#include <cainclude.h>
+#include <carelateddisplay.h>
+#include <cashellcommand.h>
+#include <catextentry.h>
+#include <catable.h>
+#include <cabitnames.h>
+#include <camessagebutton.h>
+#include <cacamera.h>
+#include <cacalc.h>
+#include <capolylinetaskmenu.h> 
+#endif
+

@@ -1,0 +1,777 @@
+//******************************************************************************
+// Copyright (c) 2012 Paul Scherrer Institut PSI), Villigen, Switzerland
+// Disclaimer: neither  PSI, nor any of their employees makes any warranty
+// or assumes any legal liability or responsibility for the use of this software
+//******************************************************************************
+//******************************************************************************
+//
+//     Author : Anton Chr. Mezger
+//
+//******************************************************************************
+
+#if defined(_MSC_VER)
+#include <windows.h>
+#define QWT_DLL
+#endif
+
+#include <qapplication.h>
+#include <qlayout.h>
+#include <qlabel.h>
+#include <qpainter.h>
+#include "castripplot.h"
+
+class TimeScaleDraw: public QwtScaleDraw
+{
+public:
+
+    TimeScaleDraw(const QTime &base): baseTime(base)
+    {
+    }
+    virtual QwtText label(double v) const
+    {
+        QTime upTime = baseTime.addSecs((int)v);
+        return upTime.toString();
+    }
+
+private:
+    QTime baseTime;
+
+};
+
+caStripPlot::~caStripPlot(){
+    if(timeData != (double*) 0) free(timeData);
+}
+
+caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
+{
+    canvas()->setAttribute(Qt::WA_PaintOnScreen, true);
+
+    timerID = false;
+    thisXaxisType = TimeScale;
+    HISTORY = 60;
+    thisUnits = Second;
+    thisPeriod = 60;
+    NumberOfCurves = MAXCURVES;
+    onInit = true;
+    timeInterval = 1.0;
+    setAutoReplot(false);
+    setAutoFillBackground(true);
+    Start = true;
+
+    timeData = (double*) 0;
+
+    // define a grid
+    plotGrid = new QwtPlotGrid();
+    plotGrid->attach(this);
+
+    plotLayout()->setAlignCanvasToScales(true);
+
+    // define our axis
+    if(thisXaxisType == TimeScale) {
+        setAxisScale(QwtPlot::xBottom, 0, HISTORY);
+    } else {
+        setAxisScale(QwtPlot::xBottom, -HISTORY, 0);
+    }
+
+    setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignLeft | Qt::AlignBottom);
+    setAxisScale(QwtPlot::yLeft, 0, 1000);
+
+    if(thisXaxisType == TimeScale) {
+        // due to time scale we need some distance
+        scaleWidget = axisWidget(QwtPlot::xBottom);
+        const int fmh = QFontMetrics(scaleWidget->font()).height();
+        scaleWidget->setMinBorderDist(fmh * 2, fmh * 2);
+        // define time axis
+        QTime timeNow= QTime::currentTime();
+        setAxisScaleDraw ( QwtPlot::xBottom, new TimeScaleDraw ( timeNow ) );
+    }
+
+    // define our curves
+    for(int i=0; i< MAXCURVES; i++) {
+        curve[i] = new QwtPlotCurve();
+        errorcurve[i] = new QwtPlotIntervalCurve();
+        fillcurve[i] = new QwtPlotIntervalCurve();
+        if(i>0) {
+            curve[i]->setZ(curve[i]->z() - i);
+            fillcurve[i]->setZ(fillcurve[i]->z() - i);
+            errorcurve[i]->setZ(errorcurve[i]->z() - i);
+        }
+        curve[i]->attach(this);
+        errorcurve[i]->attach(this);
+        fillcurve[i]->attach(this);
+        showCurve(i, false);
+
+        thisYaxisLimitsMax[i] = 100;
+        thisYaxisLimitsMin[i] = 0;
+    }
+
+    // default colors and styles
+    setTitlePlot("");
+    setTitleX("");
+    setTitleY("");
+    setBackground(Qt::black);
+    setForeground(QColor(133, 190, 232));
+    setScaleColor(Qt::black);
+    setGrid(true);
+    setGridColor(Qt::gray);
+    for(int i=0; i< MAXCURVES; i++) setStyle(Lines, i);
+    setColor(Qt::white, 0);
+    setColor(Qt::red, 1);
+    setColor(Qt::yellow, 2);
+    setColor(Qt::cyan, 3);
+    setColor(Qt::magenta, 4);
+
+    setXaxisEnabled(true);
+    setYaxisEnabled(true);
+    setLegendEnabled(true);
+
+    setAxisFont(QwtPlot::xBottom, QFont("Arial", 9));
+    setAxisFont(QwtPlot::yLeft, QFont("Arial", 9));
+
+    installEventFilter(this);
+
+    Timer = new QTimer(this);
+    connect(Timer, SIGNAL(timeout()), this, SLOT(TimeOut()));
+}
+
+void caStripPlot::defineAxis(units unit, double period)
+{
+    double interval;
+
+    if(unit == Millisecond) {
+        interval = period / 1000.0;
+    } else if(unit == Second) {
+        interval = period;
+    } else if(unit == Minute) {
+        interval = period * 60;
+    } else {
+        interval = 60;
+        printf("\nunknown unit\n");
+    }
+
+    // set axis and in case of a time scale define the time axis
+    setAxis(interval, period);
+    replot();
+}
+
+void caStripPlot::setAxis(double interval, double period)
+{
+    // set axis and in case of a time scale define the time axis
+    if(thisXaxisType == TimeScale) {
+        QTime timeNow= QTime::currentTime();
+        timeNow = timeNow.addSecs((int) -interval);
+        setAxisScale(QwtPlot::xBottom, 0, interval);
+        setAxisScaleDraw ( QwtPlot::xBottom, new TimeScaleDraw (timeNow) );
+    } else {
+        setAxisScale(QwtPlot::xBottom, -period, 0);
+        setAxisScaleDraw(QwtPlot::xBottom, new QwtScaleDraw());
+    }
+}
+
+void caStripPlot::RescaleCurves(int width, units unit, double period)
+{
+
+    //printf("redefine curves with width= %d\n", width);
+    HISTORY = width; // equals canvas width
+
+    if(unit == Millisecond) {
+        timeInterval = period / (double) HISTORY;
+        INTERVAL = period / 1000.0;
+    } else if(unit == Second) {
+        timeInterval = 1000.0 * period / (double) HISTORY;
+        INTERVAL = period;
+    } else if(unit == Minute) {
+        timeInterval =  1000.0 * period * 60.0 / (double) HISTORY;
+        INTERVAL = period * 60;
+    } else {
+        // printf("\nunknown unit\n");
+        timeInterval =  1000.0 * period * 60.0 / (double) HISTORY;
+        INTERVAL = period * 60;
+    }
+
+    // define timedata
+
+    if(timeData != (double *) 0) free(timeData);
+    timeData = (double*) malloc(HISTORY * sizeof(double));
+    if(thisXaxisType == TimeScale) {
+        // we will not use really use timeData as array
+    } else {
+        for ( int i = 0; i < HISTORY; i++ ) {
+            timeData[i] = - (period * (double)i) / (double)(HISTORY-1);
+        }
+    }
+
+    for(int i=0; i < MAXCURVES; i++) {
+        // define interval data for error and fill curves
+        rangeData[i].clear();
+        fillData[i].clear();
+        for ( int j = 0; j < HISTORY; j++ ) {
+            rangeData[i].append(QwtIntervalSample(timeData[j], QwtInterval(0.0, 0.0)));
+            fillData[i].append(QwtIntervalSample(timeData[j], QwtInterval(0.0, 0.0)));
+        }
+    }
+
+    for(int i=0; i < NumberOfCurves; i++) {
+        if(thisStyle[i] == FillUnder) fillcurve[i]->setSamples(fillData[i]);
+        errorcurve[i]->setSamples(rangeData[i]);
+    }
+
+    // define update rate
+    dataCount = 0;
+    updateRate = (int) (300.0 / timeInterval);
+    if(updateRate < 1) updateRate=1;
+    //printf("\n width=%d period=%f timerInterval=%d updaterate=%d\n", HISTORY, period, (int) timeInterval, updateRate);
+
+    timerCount = 0;
+
+    if(timerID != 0) {
+        Timer->setInterval((int)timeInterval);
+        Timer->start();
+    }
+
+    replot();
+}
+
+// resize plot when resizing
+void caStripPlot::resizeEvent ( QResizeEvent * event )
+{
+    QwtPlot::resizeEvent(event);
+    RescaleCurves(canvas()->size().width(), Unit, Period);
+    if(timerID) RescaleAxis();
+}
+
+QString caStripPlot::legendText(int i)
+{
+    char min[20], max[20];
+    QString MinMax;
+    QString titre(savedTitres.at(i));
+    sprintf(min, "%.1f", thisYaxisLimitsMin[i]);
+    sprintf(max, "%.1f", thisYaxisLimitsMax[i]);
+    ReplaceTrailingZerosByBlancs(min);
+    ReplaceTrailingZerosByBlancs(max);
+    MinMax.sprintf("[%s,%s]", min, max);
+    MinMax = MinMax.simplified(); MinMax.replace( " ", "" );
+    titre.append(" ");
+    titre.append(MinMax);
+    return titre;
+}
+
+void caStripPlot::defineCurves(QStringList titres, units unit, double period, int width, int nbCurves)
+{
+    int min, max;
+
+    NumberOfCurves = nbCurves;
+    Unit = unit;
+    Period = period;
+    scaleWidget->getBorderDistHint(min, max);
+    savedTitres = titres;
+
+    defineAxis(unit, period);
+
+    // define curves
+    for(int i=0; i < MAXCURVES; i++) {
+        curvStyle s = Lines;
+        QColor c;
+
+        if(curve[i] != (QwtPlotCurve*) 0) {
+            s = getStyle(i);
+            c = getColor(i);
+            delete curve[i];
+        }
+
+        if(errorcurve[i] != (QwtPlotIntervalCurve*) 0) {
+            delete errorcurve[i];
+        }
+        if(fillcurve[i] != (QwtPlotIntervalCurve*) 0) {
+            delete fillcurve[i];
+        }
+
+        if(i < NumberOfCurves) {
+            // set title and limits to legend
+            QString titre = legendText(i);
+
+            curve[i] = new QwtPlotCurve(titre);
+            errorcurve[i] = new QwtPlotIntervalCurve(titre);
+            fillcurve[i] = new QwtPlotIntervalCurve(titre);
+            setStyle(s, i);
+
+            curve[i]->setZ(i);
+            curve[i]->attach(this);
+            fillcurve[i]->setZ(i);
+            fillcurve[i]->attach(this);
+            fillcurve[i]->setItemAttribute(QwtPlotItem::Legend, false);
+            errorcurve[i]->setZ(i);
+            errorcurve[i]->attach(this);
+            errorcurve[i]->setItemAttribute(QwtPlotItem::Legend, false);
+
+            showCurve(i, false);
+
+            realMax[i] = maxVal[i] = -1000000;
+            realMin[i] = minVal[i] =  1000000;
+            actVal[i] = realVal[i] = 0;
+        }
+    }
+
+    showCurve(0, true);
+
+    // draw legend
+    if(thisLegendshow) {
+        QwtLegend *legend = new QwtLegend;
+        insertLegend(legend, QwtPlot::BottomLegend);
+
+        // set color on legend texts
+        QList<QWidget *> list = legend->legendItems();
+        for (QList<QWidget*>::iterator it = list.begin(); it != list.end(); ++it ) {
+            QWidget *w = *it;
+            QPalette palette = w->palette();
+            palette.setColor( QPalette::WindowText, thisScaleColor); // for ticks
+            palette.setColor( QPalette::Text, thisScaleColor);       // for ticks' labels
+            w->setPalette (palette);
+            w->setFont(QFont("Arial", 8));
+        }
+    }
+    RescaleCurves(width, unit, period);
+}
+
+void caStripPlot::startPlot()
+{
+    Timer->setInterval((int)timeInterval);
+    Timer->start();
+    timerID = true;
+}
+
+void caStripPlot::addText(double x, double y, char* text, QColor c, int fontsize)
+{
+    QwtPlotMarker *mY = new QwtPlotMarker();
+    QwtText txt;
+    txt.setText(text);
+    txt.setFont(QFont("Helvetica",fontsize, QFont::Bold));
+    txt.setColor(c);
+    mY->setLabel(txt);
+    mY->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
+    mY->setXValue(x);
+    mY->setYValue(y);
+    mY->attach(this);
+    replot();
+}
+
+void caStripPlot::TimeOut()
+{
+    double elapsedTime;
+
+    // we need an exact time scale
+    if(Start) {
+        Start = false;
+        ftime(&timeStart);
+    }
+    ftime(&timeNow);
+
+    elapsedTime = ((double) timeNow.time + (double) timeNow.millitm / (double)1000) -
+            ((double) timeStart.time + (double) timeStart.millitm / (double)1000);
+
+    // change scale base in case of running time scale
+    if(thisXaxisType == TimeScale) {
+        timeData[0] = INTERVAL + elapsedTime;
+        setAxisScale(QwtPlot::xBottom, timeData[0] - INTERVAL, timeData[0]);
+        axisWidget( QwtPlot::xBottom )->update();
+        replot();
+    }
+
+    int x[10], delta;
+    double x0, x1, xnow;
+/*
+    printf("---------------- \nbefore ");
+    for(int i=0; i<10; i++) {
+        x0 = transform(QwtPlot::xBottom, rangeData[0][i].value);
+        x[i] = (int) (x0+0.5);
+        printf("%.2f ", x0);
+    }
+    printf("\n");
+*/
+    // align on pixels
+    for (int i = dataCount; i > 0; i-- ) {
+        for (int c = 0; c < NumberOfCurves; c++ ) {
+            rangeData[c][i] = rangeData[c][i-1];
+            fillData[c][i] = fillData[c][i-1];
+
+            if(thisXaxisType == TimeScale) {
+                // transform in order to hit the pixel
+                x0 = transform(QwtPlot::xBottom, rangeData[c][i-1].value);
+                x0 = invTransform(QwtPlot::xBottom, (int) (x0+0.5));
+                rangeData[c][i].value = fillData[c][i].value = x0;
+
+            } else {
+                rangeData[c][i].value = timeData[i]; // set the time correctly (none shifting scale)
+                fillData[c][i].value = timeData[i];
+            }
+        }
+    }
+
+    // treat lost data in time scale (we do not adjust the non timescale for exact time behaviour, can be done later)
+    if(thisXaxisType == TimeScale) {
+        // reaffect actual time
+        for (int c = 0; c < NumberOfCurves; c++ ) {
+            rangeData[c][0].value = timeData[0];
+        }
+
+        xnow = transform(QwtPlot::xBottom, timeData[0]);
+
+        // did we miss some ticks ?
+        x0 = transform(QwtPlot::xBottom, rangeData[0][0].value);
+        x1 = transform(QwtPlot::xBottom, rangeData[0][1].value);
+        x[0] = (int) (x0+0.5);
+        x[1] = (int) (x1+0.5);
+        delta = x[0] - x[1];
+/*
+        if(delta > 1) {
+            printf("===============> missed ticks=%d datacount=%d\n", delta, dataCount);
+        }
+        printf("after rounding ");
+        for(int i=0; i<10; i++) {
+            x0 = transform(QwtPlot::xBottom, rangeData[0][i].value);
+            printf("%.2f ", x0);
+        }
+        printf("\n");
+*/
+        // we missed some ticks
+        if(dataCount > 0 && delta > 1) {
+            // first we have to make place for the missing data
+            for (int i = dataCount; i > 0; i-- ) {
+                for (int c = 0; c < NumberOfCurves; c++ ) {
+                    rangeData[c][i+delta-1] = rangeData[c][i];
+                    fillData[c][i+delta-1] = fillData[c][i];
+                }
+            }
+/*
+            printf("after shift ");
+            for(int i=0; i<10; i++) {
+                x0 = transform(QwtPlot::xBottom, rangeData[0][i].value);
+                printf("%.2f ", x0);
+            }
+            printf("\n");
+*/
+            // and fill the holes with actual data and correct x values
+            for(int i=0; i<delta-1; i++) {
+                x0 = invTransform(QwtPlot::xBottom, (int) xnow - i -1);
+                for (int c = 0; c < NumberOfCurves; c++ ) {
+                    rangeData[c][i+1] = rangeData[c][0];
+                    fillData [c][i+1] = fillData[c][0];
+                    rangeData[c][i+1].value = x0;
+                    fillData [c][i+1].value = x0;
+                }
+            }
+/*
+            printf("after insert ");
+            for(int i=0; i<10; i++) {
+                x0 = transform(QwtPlot::xBottom, rangeData[0][i].value);
+                printf("%.2f ", x0);
+            }
+            printf("\n");
+*/
+        }
+/*
+        printf("after ");
+        for(int i=0; i<10; i++) {
+            x0 = transform(QwtPlot::xBottom, rangeData[0][i].value);
+            printf("%.2f ", x0);
+        }
+        printf("\n");
+*/
+    }
+
+    // advance
+    if (dataCount < (HISTORY -1)) dataCount++;
+
+    // update last point and plot
+    for (int c = 0; c < NumberOfCurves; c++ ) {
+        double y0, y1, y2, y3;
+        // smallest vertical width of error bar must not be zero
+        y0 = transform(QwtPlot::yLeft, minVal[c]);
+        y1 = transform(QwtPlot::yLeft, maxVal[c]);
+        if(qAbs(y1-y0) < 2.0) y0 = y0 + 1.0; y1= y1 - 1.0;
+        y2 = invTransform(QwtPlot::yLeft, (int) (y0+0.5));
+        y3 = invTransform(QwtPlot::yLeft, (int) (y1+0.5));
+
+        // set the range into the array
+        rangeData[c][0] = QwtIntervalSample( timeData[0], QwtInterval(y2, y3));
+
+        //  and to fillunder we add a range to the fill curve
+        if(thisStyle[c] == FillUnder) {
+            double value, height, y4, y5;
+            if(minVal[c] < 0.0)  value = y0; else value = y1;
+            height = canvas()->contentsRect().height();
+            y1 = transform(QwtPlot::yLeft, 0.0);
+            if(y1 > height) y1 = height;
+            if(y1 < 0.0) y1 =0.0;
+
+            y4 = invTransform(QwtPlot::yLeft, (int) (value+0.5));
+            y5 = invTransform(QwtPlot::yLeft, (int) (y1+0.5));
+
+            fillData[c][0] = QwtIntervalSample( timeData[0], QwtInterval(y4, y5));
+            fillcurve[c]->setSamples(fillData[c]);
+        }
+        errorcurve[c]->setSamples(rangeData[c]);
+    }
+
+    // don't draw faster than 3 Hz
+    if(timerCount++ >= updateRate) {
+        if(thisXaxisType == TimeScale) {
+            replot();
+        } else {
+            this->canvas()->replot();
+        }
+        timerCount=0;
+    }
+
+    // keep max and min
+    for (int c = 0; c < NumberOfCurves; c++ ) {
+        maxVal[c] = minVal[c] = actVal[c];
+        realMax[c] = realMin[c] = realVal[c];
+    }
+}
+
+void caStripPlot::setYscale(double ymin, double ymax) {
+    setAxisScale(QwtPlot::yLeft, ymin, ymax);
+    replot();
+}
+
+void caStripPlot::RescaleAxis()
+{
+    for(int i=0; i < NumberOfCurves; i++) {
+      setData(realVal[i], i);
+      if(thisLegendshow) {
+        QwtText text;
+        text.setText(legendText(i));
+        qobject_cast<QwtLegendItem*>(this->legend()->find(curve[i]))->setText(text);
+      }
+    }
+}
+
+void caStripPlot::setData(double Y, int curvIndex)
+{
+    if(curvIndex < 0 || curvIndex > (MAXCURVES-1)) return;
+    realVal[curvIndex] = Y;
+    if(Y> realMax[curvIndex]) realMax[curvIndex]  = Y;
+    if(Y< realMin[curvIndex]) realMin[curvIndex]  = Y;
+
+    double y0min = thisYaxisLimitsMin[0];
+    double y0max = thisYaxisLimitsMax[0];
+    double ymin =  thisYaxisLimitsMin[curvIndex];
+    double ymax =  thisYaxisLimitsMax[curvIndex];
+
+    actVal[curvIndex] = (y0max - y0min) / (ymax -ymin) * (realVal[curvIndex] - ymin) + y0min;
+    minVal[curvIndex] = (y0max - y0min) / (ymax -ymin) * (realMin[curvIndex] - ymin) + y0min;
+    maxVal[curvIndex] = (y0max - y0min) / (ymax -ymin) * (realMax[curvIndex] - ymin) + y0min;
+}
+
+void caStripPlot::showCurve(int number, bool on)
+{
+    if(number < 0 || number > (MAXCURVES-1)) return;
+    curve[number]->setVisible(on);
+    fillcurve[number]->setVisible(on);
+    errorcurve[number]->setVisible(on);
+    replot();
+}
+
+void caStripPlot::setXaxisEnabled(bool show)
+{
+    thisXshow = show;
+    enableAxis(xBottom, show);
+    replot();
+}
+
+void caStripPlot::setYaxisEnabled(bool show)
+{
+    thisYshow = show;
+    enableAxis(yLeft, show);
+    replot();
+}
+
+
+void caStripPlot::setLegendEnabled(bool show)
+{
+    thisLegendshow = show;
+}
+
+void caStripPlot::setTitlePlot(QString const &titel)
+{
+    thisTitle=titel;
+    if(titel.size() != 0) {
+        QwtText title(titel);
+        title.setFont(QFont("Arial", 10));
+        setTitle(title);
+        replot();
+    }
+}
+
+void caStripPlot::setTitleX(QString const &titel)
+{
+    thisTitleX=titel;
+    if(titel.size() != 0) {
+        QwtText xAxis(titel);
+        xAxis.setFont(QFont("Arial", 10));
+        setAxisTitle(xBottom, xAxis);
+    }
+    replot();
+}
+
+void caStripPlot::setTitleY(QString const &titel)
+{
+    thisTitleY=titel;
+    if(titel.size() != 0) {
+        QwtText xAxis(titel);
+        xAxis.setFont(QFont("Arial", 10));
+        setAxisTitle(yLeft, xAxis);
+    }
+    replot();
+}
+
+void caStripPlot::setGrid(bool m)
+{
+    thisGrid = m;
+    if(m) {
+        penGrid = QPen(Qt::gray);
+        penGrid.setStyle(Qt::DashLine);
+        plotGrid->setPen(penGrid);
+        plotGrid->setVisible(penGrid.style() != Qt::NoPen);
+    } else {
+        plotGrid->setVisible(false);
+    }
+    replot();
+}
+
+void caStripPlot::setGridColor(QColor c)
+{
+    thisGridColor = c;
+    penGrid = QPen(c);
+    penGrid.setStyle(Qt::DashLine);
+    plotGrid->setPen(penGrid);
+    plotGrid->setVisible(penGrid.style() != Qt::NoPen);
+    replot();
+}
+
+QwtPlotCurve::CurveStyle caStripPlot::myStyle(curvStyle s)
+{
+    QwtPlotCurve::CurveStyle ms = QwtPlotCurve::Lines;
+    switch ( s ) {
+    case Lines:
+        ms = QwtPlotCurve::Lines;  break;
+    case FillUnder:
+        ms = QwtPlotCurve::Lines;  break;
+    default:
+        ms = QwtPlotCurve::Lines; break;
+    }
+    return ms;
+}
+
+void caStripPlot::setBackground(QColor c)
+{
+    thisBackColor = c;
+    QPalette canvasPalette(c);
+    canvasPalette.setColor(QPalette::Foreground, QColor(133, 190, 232));
+    canvas()->setPalette(canvasPalette);
+    replot();
+}
+
+void caStripPlot::setForeground(QColor c)
+{
+    thisForeColor = c;
+    setPalette(QPalette(c));
+    replot();
+}
+
+void caStripPlot::setScaleColor(QColor c)
+{
+    QwtScaleWidget *scaleX =axisWidget(QwtPlot::xBottom);
+    QwtScaleWidget *scaleY =axisWidget(QwtPlot::yLeft);
+    thisScaleColor = c;
+    QPalette palette = scaleX->palette();
+    palette.setColor( QPalette::WindowText, c); // for ticks
+    palette.setColor( QPalette::Text, c);       // for ticks' labels
+    scaleX->setPalette( palette);
+    scaleY->setPalette (palette);
+
+    titleLabel()->setPalette (palette);
+}
+
+void caStripPlot::setColor(QColor c, int number)
+{
+    if(number < 0 || number > (MAXCURVES-1)) return;
+    thisLineColor[number] = c;
+
+    if(curve[number] != (QwtPlotCurve *) 0) {
+        curve[number]->setPen(QPen(c, 0));
+    }
+
+    if(fillcurve[number] != (QwtPlotIntervalCurve *) 0) {
+        fillcurve[number]->setStyle( QwtPlotIntervalCurve::NoCurve);
+        QwtIntervalSymbol *errorBar1 = new QwtIntervalSymbol( QwtIntervalSymbol::Bar );
+        errorBar1->setWidth(1);
+        errorBar1->setPen(QPen(c, 1));
+        fillcurve[number]->setSymbol( errorBar1 );
+        fillcurve[number]->setRenderHint( QwtPlotItem::RenderAntialiased, false );
+    }
+
+    if(errorcurve[number] != (QwtPlotIntervalCurve *) 0) {
+        errorcurve[number]->setStyle( QwtPlotIntervalCurve::NoCurve);
+        QwtIntervalSymbol *errorBar2 = new QwtIntervalSymbol( QwtIntervalSymbol::Bar );
+        errorBar2->setWidth(1);
+        if(thisStyle[number] == FillUnder) {
+            errorBar2->setPen(QPen(thisScaleColor,1));
+        } else {
+            errorBar2->setPen(QPen(c, 1));
+        }
+        errorcurve[number]->setSymbol( errorBar2 );
+        errorcurve[number]->setRenderHint( QwtPlotItem::RenderAntialiased, false );
+    }
+}
+
+void caStripPlot::setStyle(curvStyle s, int number)
+{
+    if(number < 0 || number > (MAXCURVES-1)) return;
+    thisStyle[number] = s;
+    setColor(thisLineColor[number], number);
+}
+
+/**
+ * eliminate stupid zero in value after the period
+ */
+void caStripPlot::ReplaceTrailingZerosByBlancs(char *asc)
+{
+    int i;
+    int dot = false;
+    for (i = 0; i < (int) strlen(asc); i++) {
+        if (asc[i] == '.') {
+            dot = true;
+            break;
+        }
+    }
+    if (dot) {
+        for (i = strlen(asc) - 1; i >= 0; i--) {
+            if (asc[i] != '0') {
+                if(asc[i] == '.') asc[i]=' ';
+                break;
+            }
+            else asc[i] = ' ';
+        }
+    }
+    if (asc[0] == '+') asc[0] = ' ';
+    if (asc[1] == '+') asc[1] = ' ';
+}
+
+
+bool caStripPlot::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::MouseButtonPress) {
+        int nButton = ((QMouseEvent*) event)->button();
+        if(nButton==2) {
+            //printf("emit from %s\n", this->objectName().toAscii().constData());
+            QPoint p;
+            emit ShowContextMenu(p);
+        }
+    }
+    return QObject::eventFilter(obj, event);
+}
+
+#include "moc_castripplot.cpp"
+

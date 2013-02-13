@@ -1,0 +1,28 @@
+#!/bin/sh
+QTBASE=/usr/local/Trolltech/$EPICS_HOST_ARCH
+DESTINATION=$QTBASE/binQt/
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM
+
+cp -v $SOURCE/caQtDM_Hipa $DESTINATION
+cp -v $SOURCE/caQtDM $DESTINATION
+
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM/parser
+cp -v $SOURCE/adl2ui $DESTINATION
+
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM_Lib
+cp -v $SOURCE/lib* $DESTINATION
+
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/QtControls/qtcontrols
+cp -v $SOURCE/lib* $DESTINATION
+
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/QtTunes
+cp -v $SOURCE/QtTunes $DESTINATION
+cp -v $SOURCE/QtTunes_Hipa $DESTINATION
+
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/probeQtProscan
+cp -v $SOURCE/probeQt $DESTINATION
+
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/QtControls/qtcontrols/plugins
+DESTINATION=$QTBASE/Qt-4.8.2/plugins/designer/
+cp -v $SOURCE/lib* $DESTINATION
+
