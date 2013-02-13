@@ -74,7 +74,8 @@ void caLineEdit::setColors(QColor bg, QColor fg)
     QColor defColor = QColor(255, 248, 220, thisBackColor.alpha());  // my default color, we do not use the stylesheet anymore
     QColor lc;
     QColor dc;
-    thisStyle = "caTextEntry,caLineEdit {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-radius: 1px; padding: 1px; border: 2px;}";
+    thisStyle = "caTextEntry,caLineEdit {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-radius: 1px; padding: 0px; }";
+    thisStyle.append("caTextEntry { border: 2px;} caLineEdit {border: 0px;}");
     if(thisColorMode == Default || thisColorMode == Alarm_Default) {
         thisStyle = thisStyle.arg(defColor.red()).arg(defColor.green()).arg(defColor.blue()).arg(defColor.alpha()).
                 arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
@@ -82,7 +83,8 @@ void caLineEdit::setColors(QColor bg, QColor fg)
         lc = defColor.lighter();
         dc = defColor.darker();
     } else {
-        thisStyle = "caTextEntry, caLineEdit {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-radius: 1px; padding: 1px; border: 2px; }";
+        thisStyle = "caTextEntry, caLineEdit {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-radius: 1px; padding: 0px; }";
+        thisStyle.append("caTextEntry { border: 2px;} caLineEdit{border: 0px;}");
         thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
                 arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
         lc = bg.lighter();
