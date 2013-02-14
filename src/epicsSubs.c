@@ -647,7 +647,7 @@ int EpicsSetValue(char *pv, float rdata, int32_t idata, char *sdata, char *objec
 
     case DBF_CHAR:
         //printf("put char array for <%s> with <%s>\n", pv, sdata);
-        status = ca_array_put(DBR_CHAR, strlen(sdata), ch, sdata);
+        status = ca_array_put(DBR_CHAR, strlen(sdata)+1, ch, sdata);
         if (status != ECA_NORMAL) {
             C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
             return status;
