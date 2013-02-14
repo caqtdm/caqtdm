@@ -62,4 +62,4 @@ LIBS += -L$${QTCONTROLS} -Wl,-rpath,$${QTCONTROLS} -lqtcontrols
 INCLUDEPATH += $(QWTHOME)/src
 INCLUDEPATH += $(EPICSINCLUDE)
 INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
-INCLUDEPATH += $(HOME)/workarea/ACS/mezger/QtControls/qtcontrols/src
+INCLUDEPATH += $(HOME)/workarea/ACS/mezger/caQtDM_QtControls/src
