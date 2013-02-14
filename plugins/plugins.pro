@@ -1,4 +1,4 @@
-include(../../../caQtDM/qtdefs.pri)
+include(../../caQtDM/qtdefs.pri)
 
 DEFINES += QT_NO_DEBUG_OUTPUT
 CONFIG += release
