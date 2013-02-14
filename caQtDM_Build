@@ -1,0 +1,30 @@
+echo =========== remove binaries from directory =============
+rm ./caQtDM_Binaries/lib*.so
+rm ./caQtDM_Binaries/caQtDM*
+rm ./caQtDM_Binaries/adl2ui
+
+
+echo ========== remove makefiles from directories ============
+rm -f ./caQtDM/Makefile
+rm -f ./caQtDM/parser/Makefile
+rm -f ./caQtDM_lib/Makefile
+rm -f ./caQtDM_QtControls/Makefile
+rm -f ./caQtDM_QtControls/plugins/Makefile
+rm -f ./probeQtProscan/Makefile
+rm -f ./QtTunes/Makefile
+
+echo =========== clean all ==================
+qmake all.pro
+dye make distclean
+
+echo ============ make all =================
+qmake all.pro
+dye make
+
+echo =========== build plugins =============
+cd caQtDM_QtControls/plugins/
+linuxbuild
+cd ..
+cd ..
+
+echo =========== do not forget to copy plugins $QTBASE/Qt-4.8.2/plugins/designer/
