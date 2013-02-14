@@ -18,8 +18,15 @@
 
 caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(this)
 {
+    // we want this font, while nice and monospace
     QFont font("Lucida Sans Typewriter");
-    setFont(font);
+    // if this font does not exist then try a next one
+    if(!font.exactMatch()) {
+        QFont  newfont("Monospace");   // not very nice, while a a dot inside the zeo to distinguish from o
+        setFont(newfont);
+    } else {
+       setFont(font);
+    }
 
     oldStyle = "";
     thisStyle = "";
