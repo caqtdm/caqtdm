@@ -2422,18 +2422,30 @@ void CaQtDM_Lib::Callback_RelatedDisplayClicked(int indx)
     QStringList removeParents = w->getReplaceModes().split(";");
     //qDebug() << "files:" << files;
     //qDebug() << "args" << args;
-    if(indx < files.count() && indx < args.count()) {
-        emit Signal_OpenNewWFile(files[indx].trimmed(), args[indx].trimmed(), "");
-    } else if(indx < files.count()) {
-        emit Signal_OpenNewWFile(files[indx].trimmed(), "", "");
-    }
+
+    // find position of this window
+    int xpos = this->pos().x();
+    int ypos = this->pos().y();
+    QString geometry = "+%1+%2";
+    geometry = geometry.arg(xpos).arg(ypos);
+
     // do we have to remove this window while removeparent was specified
     if(indx < removeParents.count()) {
         QString removeParent = removeParents.at(indx);
         removeParent = removeParent.toLower();
         if(removeParent.contains("true")) {
             this->close();
+        } else {
+            // in case we do not remove the parent let the window manager position the new window
+            geometry = "";
         }
+    }
+
+    // open new file and
+    if(indx < files.count() && indx < args.count()) {
+        emit Signal_OpenNewWFile(files[indx].trimmed(), args[indx].trimmed(), geometry);
+    } else if(indx < files.count()) {
+        emit Signal_OpenNewWFile(files[indx].trimmed(), "", geometry);
     }
 
 }
