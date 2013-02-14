@@ -12,7 +12,7 @@ cp -v $SOURCE/adl2ui $DESTINATION
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM_Lib
 cp -v $SOURCE/lib* $DESTINATION
 
-SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/QtControls/qtcontrols
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM_QtControls
 cp -v $SOURCE/lib* $DESTINATION
 
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/QtTunes
@@ -22,7 +22,7 @@ cp -v $SOURCE/QtTunes_Hipa $DESTINATION
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/probeQtProscan
 cp -v $SOURCE/probeQt $DESTINATION
 
-SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/QtControls/qtcontrols/plugins
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM_QtControls/plugins
 DESTINATION=$QTBASE/Qt-4.8.2/plugins/designer/
 cp -v $SOURCE/lib* $DESTINATION
 
