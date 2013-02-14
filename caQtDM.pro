@@ -2,7 +2,7 @@ include(qtdefs.pri)
 
 unix {
   TEMPLATE = subdirs
-  SUBDIRS = caQtDM1
+  SUBDIRS = parser caQtDM1 
   exists("/home/ACS/Control/Lib/libDEV.so") {
          SUBDIRS += caQtDM2
   }

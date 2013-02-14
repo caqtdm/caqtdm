@@ -24,7 +24,7 @@ HEADERS  +=  \
 FORMS += main.ui
 
 INCLUDEPATH += $(QWTHOME)/src
-INCLUDEPATH += $(HOME)/workarea/ACS/mezger/QtControls/qtcontrols/src
+INCLUDEPATH += $(HOME)/workarea/ACS/mezger/caQtDM_QtControls/src
 INCLUDEPATH += $(HOME)/workarea/ACS/mezger/caQtDM_Lib/src
 
 DEFINES += BUILDTIME=\\\"$$system(date '+%H:%M')\\\"
