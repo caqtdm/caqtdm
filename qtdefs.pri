@@ -2,7 +2,9 @@ CAQTDM_VERSION = V2.6.8
 
 # new in 2.6.8
 # null character was not written for array of chars in case of string, is now corrected
-# catextentry and calineedit style was slightly changed in order to get bigger characters and no shift of string in case of entering a catextentry
+# catextentry and calineedit style were slightly changed in order to get bigger characters and no shift of string in case of entering a catextentry,
+#  these widgets use the font "lucida sans typewriter". When this font does not exist, they will fall back to a monospace font, however the monospace font
+#  present a dot inside the zero, which is not very nice. If you do not like it, change the font instruction in calinedit
 # in case of a related display with removing of the parent, the parents position will be used for positioning of the new display
 
 # new in 2.6.7
