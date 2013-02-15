@@ -28,6 +28,7 @@
 #endif
 
 #define PRC 1
+#define MAXSTRIPS 7
 
 #include "myMessageBox.h"
 
@@ -1116,7 +1117,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         widget->setPVS(text);
         QStringList vars = text.split(";", QString::SkipEmptyParts);
 
-        int NumberOfCurves = min(vars.count(), 5);
+        int NumberOfCurves = min(vars.count(), MAXSTRIPS);
 
         // go through the defined curves and add monitor
 
@@ -2078,18 +2079,10 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             // scaling
             if(data.edata.initialize) {
                 if(widget->getYscalingMin(actPlot) == caStripPlot::Channel) {
-                    if(actPlot==0) widget->setYaxisLimitsMin_1(data.edata.lower_disp_limit);
-                    if(actPlot==1) widget->setYaxisLimitsMin_2(data.edata.lower_disp_limit);
-                    if(actPlot==2) widget->setYaxisLimitsMin_3(data.edata.lower_disp_limit);
-                    if(actPlot==3) widget->setYaxisLimitsMin_4(data.edata.lower_disp_limit);
-                    if(actPlot==4) widget->setYaxisLimitsMin_5(data.edata.lower_disp_limit);
+                    widget->setYaxisLimitsMin(actPlot, data.edata.lower_disp_limit);
                 }
                 if(widget->getYscalingMax(actPlot) == caStripPlot::Channel) {
-                    if(actPlot==0) widget->setYaxisLimitsMax_1(data.edata.upper_disp_limit);
-                    if(actPlot==1) widget->setYaxisLimitsMax_2(data.edata.upper_disp_limit);
-                    if(actPlot==2) widget->setYaxisLimitsMax_3(data.edata.upper_disp_limit);
-                    if(actPlot==3) widget->setYaxisLimitsMax_4(data.edata.upper_disp_limit);
-                    if(actPlot==4) widget->setYaxisLimitsMax_5(data.edata.upper_disp_limit);
+                    widget->setYaxisLimitsMax(actPlot, data.edata.upper_disp_limit);
                 }
                 if(actPlot == 0) {
                     double ymin = widget->getYaxisLimitsMin(0);
@@ -2764,13 +2757,13 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     } else if(caStripPlot* widget = qobject_cast<caStripPlot *>(w)) {
         QString pvs = widget->getPVS();
         QStringList vars = pvs.split(";", QString::SkipEmptyParts);
-        nbPV = min(vars.count(), 5);
+        nbPV = min(vars.count(), MAXSTRIPS);
         for(int i=0; i<nbPV; i++) {
             pv[i] = vars.at(i).trimmed();
         }
     } else if(caCartesianPlot* widget = qobject_cast<caCartesianPlot *>(w)) {
         nbPV = 0;
-        for(int i=0; i< 6; i++) {
+        for(int i=0; i < 6; i++) {
             QStringList thisString;
             if(i==0) thisString = widget->getPV_1().split(";");
             if(i==1) thisString = widget->getPV_2().split(";");
