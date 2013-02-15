@@ -9,8 +9,10 @@
 //
 //******************************************************************************
 
+#include "caQtDM_Lib_global.h"
 #include "caqtdm_lib.h"
 #include "dmsearchfile.h"
+#include "parsepepfile.h"
 #include <stdint.h>
 #include <math.h>
 #include <stdlib.h>
