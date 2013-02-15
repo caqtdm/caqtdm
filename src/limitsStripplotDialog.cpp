@@ -86,39 +86,12 @@ void limitsStripplotDialog::applyClicked()
             double minY = text.toDouble(&ok);
             if(ok) {
                 if(indx == 1) { // user
-                    if(i==0) {
-                        StripPlot->setYaxisLimitsMin_1(minY);
-                        StripPlot->setYscalingMin_1(caStripPlot::User);
-                    } else if(i==1) {
-                        StripPlot->setYaxisLimitsMin_2(minY);
-                        StripPlot->setYscalingMin_2(caStripPlot::User);
-                    } else if(i==2) {
-                        StripPlot->setYaxisLimitsMin_3(minY);
-                        StripPlot->setYscalingMin_3(caStripPlot::User);
-                    } else if(i==3) {
-                        StripPlot->setYaxisLimitsMin_4(minY);
-                        StripPlot->setYscalingMin_4(caStripPlot::User);
-                    } else if(i==4) {
-                        StripPlot->setYaxisLimitsMin_5(minY);
-                        StripPlot->setYscalingMin_5(caStripPlot::User);
-                    }
+                        StripPlot->setYaxisLimitsMin(i, minY);
+                        StripPlot->setYscalingMin(i, caStripPlot::User);
                 } else {
-                    if(i==0) {
-                        StripPlot->setYscalingMin_1(caStripPlot::Channel);
-                        StripPlot->setYaxisLimitsMin_1(ptr->edata.lower_disp_limit);
-                    } else if(i==1) {
-                        StripPlot->setYscalingMin_2(caStripPlot::Channel);
-                        StripPlot->setYaxisLimitsMin_2(ptr->edata.lower_disp_limit);
-                    } else if(i==2) {
-                        StripPlot->setYscalingMin_3(caStripPlot::Channel);
-                        StripPlot->setYaxisLimitsMin_3(ptr->edata.lower_disp_limit);
-                    } else if(i==3) {
-                        StripPlot->setYscalingMin_4(caStripPlot::Channel);
-                        StripPlot->setYaxisLimitsMin_4(ptr->edata.lower_disp_limit);
-                    } else if(i==4) {
-                        StripPlot->setYscalingMin_5(caStripPlot::Channel);
-                        StripPlot->setYaxisLimitsMin_5(ptr->edata.lower_disp_limit);
-                    }
+
+                        StripPlot->setYscalingMin(i, caStripPlot::Channel);
+                        StripPlot->setYaxisLimitsMin(i, ptr->edata.lower_disp_limit);
                 }
             }
 
@@ -127,39 +100,12 @@ void limitsStripplotDialog::applyClicked()
             double maxY = text.toDouble(&ok);
             if(ok) {
                 if(indx == 1) { // user
-                    if(i==0) {
-                        StripPlot->setYaxisLimitsMax_1(maxY);
-                        StripPlot->setYscalingMax_1(caStripPlot::User);
-                    } else if(i==1) {
-                        StripPlot->setYaxisLimitsMax_2(maxY);
-                        StripPlot->setYscalingMax_2(caStripPlot::User);
-                    } else if(i==2) {
-                        StripPlot->setYaxisLimitsMin_3(maxY);
-                        StripPlot->setYscalingMax_3(caStripPlot::User);
-                    } else if(i==3) {
-                        StripPlot->setYaxisLimitsMax_4(maxY);
-                        StripPlot->setYscalingMax_4(caStripPlot::User);
-                    } else if(i==4) {
-                        StripPlot->setYaxisLimitsMax_5(maxY);
-                        StripPlot->setYscalingMax_5(caStripPlot::User);
-                    }
+                        StripPlot->setYaxisLimitsMax(i, maxY);
+                        StripPlot->setYscalingMax(i, caStripPlot::User);
+
                 } else {
-                    if(i==0) {
-                        StripPlot->setYscalingMax_1(caStripPlot::Channel);
-                        StripPlot->setYaxisLimitsMax_1(ptr->edata.upper_disp_limit);
-                    } else if(i==1) {
-                        StripPlot->setYscalingMax_2(caStripPlot::Channel);
-                        StripPlot->setYaxisLimitsMax_2(ptr->edata.upper_disp_limit);
-                    } else if(i==2) {
-                        StripPlot->setYscalingMax_3(caStripPlot::Channel);
-                        StripPlot->setYaxisLimitsMax_3(ptr->edata.upper_disp_limit);
-                    } else if(i==3) {
-                        StripPlot->setYscalingMax_4(caStripPlot::Channel);
-                        StripPlot->setYaxisLimitsMax_4(ptr->edata.upper_disp_limit);
-                    } else if(i==4) {
-                        StripPlot->setYscalingMax_5(caStripPlot::Channel);
-                        StripPlot->setYaxisLimitsMax_5(ptr->edata.upper_disp_limit);
-                    }
+                        StripPlot->setYscalingMax(i, caStripPlot::Channel);
+                        StripPlot->setYaxisLimitsMax(i, ptr->edata.upper_disp_limit);
                 }
             }
             if(i==0) {
