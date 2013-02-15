@@ -1,4 +1,8 @@
-CAQTDM_VERSION = V2.6.8
+CAQTDM_VERSION = V2.7.0
+
+# new in 2.7.0
+# bug corrected in stylesheet of catextentry
+# stripplot can have now up to 7 curves
 
 # new in 2.6.8
 # null character was not written for array of chars in case of string, is now corrected
