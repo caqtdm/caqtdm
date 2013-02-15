@@ -13,15 +13,11 @@
 #define QTCONGLOBAL_H
 
 #if defined(_MSC_VER)
-	//#ifdef QTCON_DLL
-
 		#if defined(QTCON_MAKEDLL)     // create a qtControls DLL library
 			#define QTCON_EXPORT  __declspec(dllexport)
 		#else                        // use a qtControls DLL library
 			#define QTCON_EXPORT  __declspec(dllimport)
 		#endif
-
-	//#endif // QTCON_DLL
 #else
 	#define QTCON_EXPORT
 #endif
