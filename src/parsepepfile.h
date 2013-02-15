@@ -1,6 +1,7 @@
 #ifndef PARSEPEPFILE_H
 #define PARSEPEPFILE_H
 
+#include <qtcontrols_global.h>
 #include <QMap>
 #include <QBuffer>
 #include <QDataStream>
@@ -9,7 +10,7 @@
 #include <QtUiTools/QUiLoader>
 
 
-class ParsePepFile 
+class QTCON_EXPORT ParsePepFile
 {
 
 public:
