@@ -342,6 +342,9 @@ public:
     void setYaxisLimitsMax(int i, double const &newY) {if(i>= MAXCURVES) return; else thisYaxisLimitsMax[i] = newY;}
     void setYaxisLimitsMin(int i, double const &newY) {if(i>= MAXCURVES) return; else thisYaxisLimitsMin[i] = newY;}
 
+    void setYscalingMin(int i, axisScaling s) {if(i>= MAXCURVES) return; else setYscalingMin(s, i); }
+    void setYscalingMax(int i, axisScaling s) {if(i>= MAXCURVES) return; else setYscalingMax(s, i); }
+
     void showCurve(int number, bool on);
     void addText(double x, double y, char* text, QColor c, int fontsize);
     void startPlot();
