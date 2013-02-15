@@ -120,6 +120,8 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     setColor(Qt::yellow, 2);
     setColor(Qt::cyan, 3);
     setColor(Qt::magenta, 4);
+    setColor(Qt::green, 5);
+    setColor(Qt::blue, 6);
 
     setXaxisEnabled(true);
     setYaxisEnabled(true);
