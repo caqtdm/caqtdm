@@ -7,6 +7,7 @@
 #include <QDataStream>
 #include <QSharedMemory>
 #include <QWidget>
+#include <QFile>
 #include <QtUiTools/QUiLoader>
 
 
@@ -20,35 +21,55 @@ public:
 
 protected:
 
-
 private slots:
 
 private:
 
-    void displayItem(int row, int column, QString widgetType, QString text, QString pv, int span, QString *formats,
-                     QByteArray *array);
+    typedef struct _gridInfo {
+        QString widgetType, widgetText, widgetChannel, command, comlab;
+        QString formats[2];
+        int nbElem,span;
+        bool textPresent;
+    } gridInfo;
+
+
+    void TreatFile(int &nbRows, int &nbCols, QFile *file);
+    void DisplayFile(int nbRows, int nbCols, QByteArray *array);
+
+    void getColumnPositions(int nbItems, int actualGridColumn, int spanGrid, int pos[], int span[]);
+    void displayItem(int gridRow, int gridCol, gridInfo gridinfo, int spanGrid, int spanCols, int nbCols, QByteArray *array);
     void writeOpenProperty(QString property, QByteArray *array);
     void writeCloseProperty(QByteArray *array);
     void writeTaggedString(QString tag, QString value, QByteArray *array);
     void setColor(QString property, int r, int g, int b, int alpha, QByteArray *array);
+    void writeItemRowCol(int &row, int &column,  int span, QByteArray *array);
     void writeOpenTag(QString tag,  QByteArray *array);
     void writeCloseTag(QString tag,  QByteArray *array);
     void writeSimpleProperty(QString prop, QString tag, QString value, QByteArray *array);
 
-    void writeLayoutHeader(QByteArray *array);
-    void writeLayoutFooter(QByteArray *array);
-    void writeLineEdit(QString format, QString text, QString minsize[2], QString maxsize[2], QString pv, QString pointsize,
+    void writeLineEdit(QString format, QString text, QString minwidth, QString minheight, QString maxwidth, QString maxheight, QString pv, QString pointsize,
                        QString alignment, QString colormode, QString calc, QString visibility, int rgba[4], QByteArray *array);
-    void writeLabel(QString text, QString minsize[2], QString maxsize[2], QString pointsize, QString alignment,QString colormode,
-                    QString calcpv, QString calc, QString visibility, int rgba[], QByteArray *array);
-    //void writeLabel(QString text, QByteArray *array);
+
+    void writeTextEntry(QString format, QString text, QString minwidth, QString minheight, QString maxwidth, QString maxheight, QString pv, QString pointsize,
+                       QString alignment, QString colormode, QString calc, QString visibility, int rgba[4], QByteArray *array);
+
+    void writeLabel(QString text,QString minwidth,  QString minheight, QString maxwidth, QString maxheight, QString pointsize, QString alignment,QString colormode,
+                    QString calcpv, QString calc, QString visibility, bool transparent, QByteArray *array);
+
+    void writeChoice(QString pv, QByteArray *array);
     void writeWheelswitch(QString format, QString pv, QByteArray *array);
     void writeLineEdit(QString format, QString pv, QByteArray *array);
-
+    void writeShellCommand(QString label, QString command, QByteArray *array);
+    void  replaceStrings(gridInfo &grid);
     enum StringValue {evChannel, evComment, evSeparator, evEnd};
     QMap<QString, StringValue> mapStringValues;
     QSharedMemory sharedMemory;
     QBuffer *buffer;
+
+    gridInfo gridLayout[100][20];
+    int firstCols[20];
+    int maxCols[20];
+
 };
 
 #endif
