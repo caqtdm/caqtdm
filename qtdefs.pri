@@ -1,4 +1,8 @@
-CAQTDM_VERSION = V2.7.0
+CAQTDM_VERSION = V2.7.1
+
+# new in 2.7.1
+# lucida sans typewriter was not always taken event when present. fallback to monospace had to be relaxed.
+# the filename for cainclude, can be a macro now. this allows to have a generic ui file loading some include defined by macro
 
 # new in 2.7.0
 # bug corrected in stylesheet of catextentry
