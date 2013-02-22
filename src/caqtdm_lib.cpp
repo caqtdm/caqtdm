@@ -767,7 +767,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //qDebug() << "treat caInclude" << w1 << "level=" << level;
 
-         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
+        nbMonitors = InitVisibility(w1, &kData, map, specData, "");
 
         widget->setProperty("Taken", true);
 
@@ -789,6 +789,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         // define the file to use
         QString fileName = widget->getFileName().trimmed();
+        reaffectText(map, &fileName);
         QStringList openFile = fileName.split(".", QString::SkipEmptyParts);
 
 
