@@ -9,8 +9,8 @@ ParsePepFile::ParsePepFile(QString filename)
     QFile *file = new QFile;
     int nbRows, nbCols;
 
-    for(int i=0; i< 100; i++) {
-        for (int j=0; j<20; j++) {
+    for(int i=0; i< MaxLines; i++) {
+        for (int j=0; j<MaxGrid; j++) {
             gridLayout[i][j].widgetType = "";
             gridLayout[i][j].widgetText = "";
             gridLayout[i][j].widgetChannel = "";
@@ -20,7 +20,7 @@ ParsePepFile::ParsePepFile(QString filename)
             gridLayout[i][j].span = 0;
         }
     }
-    for (int j=0; j<20; j++) {
+    for (int j=0; j<MaxGrid; j++) {
         firstCols[j] = 0;
         maxCols[j] = 0;
     }
@@ -73,6 +73,21 @@ ParsePepFile::ParsePepFile(QString filename)
     delete file;
 }
 
+/**
+ * this routine (re)allocates memory and copies the old data to the new memory
+ */
+void ParsePepFile::ReAllocate(int oldsize, int newsize, void **ptr)
+{
+    void *tmp;
+    //printf("reallocate for %d size\n", newsize);
+    tmp = (void *) malloc(newsize);
+    if(oldsize > 0) {
+        memcpy(tmp, *ptr, oldsize);
+        free(*ptr);
+    }
+    *ptr = tmp;
+}
+
 void ParsePepFile::Initialize()
 {
     mapStringValues["comment"] = evComment;
@@ -118,7 +133,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
         }
 
         QStringList elements= line.split(";",  QString::SkipEmptyParts);
-/*
+        /*
         printf("%d %s\n", elements.count(), line.toAscii().constData());
         for (int i=0; i< elements.count(); i++) {
             printf("<%s>\n",  elements.at(i).toAscii().constData());
@@ -131,6 +146,10 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
         // we have a grid definition at the beginning of the file
         else if(line.contains("#!grid")) {
             grid = elements.at(1).toInt();
+            if(grid > MaxGrid) {
+                printf("parse pep file -- grid value exceeds the maximum of %d\n", MaxGrid);
+                grid = MaxGrid;
+            }
             //printf("grid=%d\n", grid);
         } else if(line.at(0) != QChar('#')){
 
@@ -185,7 +204,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                         //printf("text detected <%s>\n", elements.at(ll).toAscii().constData());
                         widgetText = elements.at(ll);
                         gridLayout[actualLine][actualColumn].textPresent = true;
-                     }
+                    }
 
                     else if(elements.at(ll).contains("-fg")) {
                         ll++;
@@ -203,8 +222,8 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                     }
 
                     if(ok && (widgetType.contains("setrdbk") ||
-                                     widgetType.contains("wheelswitch") ||
-                                     widgetType.contains("formread")) ) {
+                              widgetType.contains("wheelswitch") ||
+                              widgetType.contains("formread")) ) {
                         //printf("format detected %s\n", elements.at(ll).toAscii().constData());
                         formats[nbFormats++] =elements.at(ll);
                     }
@@ -229,9 +248,9 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                 else if(widgetType.contains("formread")) gridLayout[actualLine][actualColumn].nbElem = 2;
                 else if(widgetType.contains("wheelswitch")) {
                     if(gridLayout[actualLine][actualColumn].textPresent && gridLayout[actualLine][actualColumn].widgetText.size() == 0) {
-                       gridLayout[actualLine][actualColumn].nbElem = 1;
+                        gridLayout[actualLine][actualColumn].nbElem = 1;
                     } else {
-                       gridLayout[actualLine][actualColumn].nbElem = 2;
+                        gridLayout[actualLine][actualColumn].nbElem = 2;
                     }
                 }
                 else if(widgetType.contains("choicebutton")) gridLayout[actualLine][actualColumn].nbElem = 2;
@@ -252,6 +271,10 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                     actualColumn = 0;
                     lastColumn = 0;
                     actualLine++;
+                    if(actualLine > MaxLines -1) {
+                        printf("parse pep file -- number of lines exceeds the maximum of %d\n", MaxLines);
+                        break;
+                    }
                 }
             }
         }
@@ -287,17 +310,17 @@ void ParsePepFile::DisplayFile(int nbRows, int nbCols, QByteArray *array)
     printf("\n");
 
 
-     for (int j=0; j<nbCols; j++) {
-         firstCols[j] = 0;
-         for(int k=0; k<j; k++) firstCols[j] += maxCols[k];
-     }
+    for (int j=0; j<nbCols; j++) {
+        firstCols[j] = 0;
+        for(int k=0; k<j; k++) firstCols[j] += maxCols[k];
+    }
 
 
     for(int i=0; i< nbRows; i++) {
         for (int j=0; j<nbCols; j++) {
 
             int spanColumns = 1;
-/*
+            /*
             printf("===== %d %d %20s text=%10s span=%d col=%d\n", i, j,  gridLayout[i][j].widgetType.toAscii().constData(),
                    gridLayout[i][j].widgetText.toAscii().constData(),
                    gridLayout[i][j].span, col);
@@ -313,8 +336,8 @@ void ParsePepFile::DisplayFile(int nbRows, int nbCols, QByteArray *array)
 
             // and display it
             if(gridLayout[i][j].widgetType.size() > 0) {
-              replaceStrings(gridLayout[i][j]);
-              displayItem(i, j, gridLayout[i][j], gridLayout[i][j].span, spanColumns, nbCols, array);
+                replaceStrings(gridLayout[i][j]);
+                displayItem(i, j, gridLayout[i][j], gridLayout[i][j].span, spanColumns, nbCols, array);
             }
         }
     }
@@ -325,9 +348,9 @@ void ParsePepFile::getColumnPositions(int nbItems, int actualGridColumn, int spa
 {
 
     // to be completely reworked
-    int sum[20];
+    int sum[MaxGrid];
 
-    for(int i=0; i<20; i++) {
+    for(int i=0; i<MaxGrid; i++) {
         span[i] = 0;
     }
 
@@ -406,7 +429,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
     QString newpv = "";
     QString partialpv = "";
     int rgba[4];
-    int pos[20], span[20], count;
+    int pos[MaxGrid], span[MaxGrid], count;
 
     int effectiveColumn= firstCols[actualgridColumn];
     int effectiveSpan;
@@ -539,11 +562,11 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
         if(grid.command.size() > 0) {
             if(grid.widgetText.size() > 0) {
-               writeLabel(grid.widgetText, "", "18", "", "", "10", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", false, array);
-               writeCloseTag("item", array);
-               effectiveSpan = span[count];
-               effectiveColumn = pos[count++];
-               writeItemRowCol(actualgridRow, effectiveColumn, effectiveSpan, array);
+                writeLabel(grid.widgetText, "", "18", "", "", "10", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", false, array);
+                writeCloseTag("item", array);
+                effectiveSpan = span[count];
+                effectiveColumn = pos[count++];
+                writeItemRowCol(actualgridRow, effectiveColumn, effectiveSpan, array);
             }
             writeShellCommand(grid.comlab, grid.command, array);
             writeCloseTag("item", array);
@@ -557,7 +580,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
             } else {
                 writeLabel(grid.widgetText, "", "18", "", "", "10", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", false, array);
             }
-             writeCloseTag("item", array);
+            writeCloseTag("item", array);
         }
 
         //////////////////////////////////////////////////////////////////////////////////
@@ -568,10 +591,10 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         writeItemRowCol(actualgridRow, effectiveColumn, spanGrid, array);
 
         if(!grid.textPresent || grid.widgetText.size() != 0) {
-           writeLabel(grid.widgetChannel, "150", "18", "", "", "10", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, array);
-           writeCloseTag("item", array);
-           // write now the wheelswitch
-           writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
+            writeLabel(grid.widgetChannel, "150", "18", "", "", "10", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, array);
+            writeCloseTag("item", array);
+            // write now the wheelswitch
+            writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
         }
         writeWheelswitch(grid.formats[0], grid.widgetChannel, array);
         writeCloseTag("item", array);
@@ -713,7 +736,7 @@ void ParsePepFile::writeChoice(QString pv, QByteArray *array)
     writeOpenProperty("minimumSize", array);
     writeOpenTag("size", array);
     writeTaggedString("height", "24", array);
-     writeTaggedString("width", "80", array);
+    writeTaggedString("width", "80", array);
     writeCloseTag("size", array);
     writeCloseProperty(array);
     writeOpenProperty("maximumSize", array);
@@ -883,23 +906,20 @@ void ParsePepFile::writeLabel(QString text, QString minwidth, QString minheight,
 
 void ParsePepFile::writeOpenProperty(QString property, QByteArray *array)
 {
-    char widgetBytes[100];
-    sprintf(widgetBytes, "<property name=\"%s\">\n", property.toAscii().constData());
-    array->append(widgetBytes);
+    QString aux = QString("<property name=\"%1\">\n").arg( property);
+    array->append(aux);
 }
 
 void ParsePepFile::writeCloseProperty(QByteArray *array)
 {
-    char widgetBytes[100];
-    sprintf(widgetBytes, "</property>\n");
-    array->append(widgetBytes);
+    QString aux = QString("</property>\n");
+    array->append(aux);
 }
 
 void ParsePepFile::writeTaggedString(QString tag, QString value, QByteArray *array)
 {
-    char widgetBytes[100];
-    sprintf(widgetBytes, "<%s>%s</%s>\n", tag.toAscii().constData(), value.toAscii().constData(), tag.toAscii().constData());
-    array->append(widgetBytes);
+    QString aux = QString("<%1>%2</%3>\n").arg(tag).arg(value).arg(tag);
+    array->append(aux);
 }
 
 void ParsePepFile::setColor(QString property, int r, int g, int b, int alpha, QByteArray *array)
@@ -922,24 +942,22 @@ void ParsePepFile::setColor(QString property, int r, int g, int b, int alpha, QB
 
 void ParsePepFile::writeItemRowCol(int &row, int &column,  int span, QByteArray *array)
 {
-    char widgetBytes[1000];
-    sprintf(widgetBytes,"<item row=\"%d\" column=\"%d\" colspan=\"%d\">\n", row, column, span);
-    array->append(widgetBytes);
+    QString Qrow, Qcolumn, Qspan;
+    QString aux = QString("<item row=\"%1\" column=\"%2\" colspan=\"%3\">\n").arg(Qrow.setNum(row)).arg(Qcolumn.setNum(column)).arg(Qspan.setNum(span));
+    array->append(aux);
     column++;
 }
 
 void ParsePepFile::writeOpenTag(QString tag,  QByteArray *array)
 {
-    char widgetBytes[1000];
-    sprintf(widgetBytes, "<%s>\n", tag.toAscii().constData());
-    array->append(widgetBytes);
+    QString aux = QString("<%1>\n").arg(tag);
+    array->append(aux);
 }
 
 void ParsePepFile::writeCloseTag(QString tag,  QByteArray *array)
 {
-    char widgetBytes[1000];
-    sprintf(widgetBytes, "</%s>\n", tag.toAscii().constData());
-    array->append(widgetBytes);
+    QString aux = QString("</%1>\n").arg(tag);
+    array->append(aux);
 }
 
 void ParsePepFile::writeSimpleProperty(QString prop, QString tag, QString value, QByteArray *array)

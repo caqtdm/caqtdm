@@ -25,6 +25,9 @@ private slots:
 
 private:
 
+     enum { MaxGrid = 20};
+     enum { MaxLines = 50};
+
     typedef struct _gridInfo {
         QString widgetType, widgetText, widgetChannel, command, comlab;
         QString formats[2];
@@ -33,6 +36,7 @@ private:
     } gridInfo;
 
 
+    void ReAllocate(int oldsize, int newsize, void **ptr);
     void TreatFile(int &nbRows, int &nbCols, QFile *file);
     void DisplayFile(int nbRows, int nbCols, QByteArray *array);
 
@@ -66,9 +70,9 @@ private:
     QSharedMemory sharedMemory;
     QBuffer *buffer;
 
-    gridInfo gridLayout[100][20];
-    int firstCols[20];
-    int maxCols[20];
+    gridInfo gridLayout[MaxLines][MaxGrid];
+    int firstCols[MaxGrid];
+    int maxCols[MaxGrid];
 
 };
 
