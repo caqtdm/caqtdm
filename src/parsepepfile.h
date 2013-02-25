@@ -10,6 +10,7 @@
 #include <QFile>
 #include <QtUiTools/QUiLoader>
 
+#define PRINT(x)
 
 class QTCON_EXPORT ParsePepFile
 {
@@ -35,8 +36,6 @@ private:
         bool textPresent;
     } gridInfo;
 
-
-    void ReAllocate(int oldsize, int newsize, void **ptr);
     void TreatFile(int &nbRows, int &nbCols, QFile *file);
     void DisplayFile(int nbRows, int nbCols, QByteArray *array);
 

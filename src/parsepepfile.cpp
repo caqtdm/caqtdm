@@ -4,8 +4,10 @@
 
 ParsePepFile::ParsePepFile(QString filename)
 {
-    char header[2000];
-    char footer[100];
+    //char header[2000];
+    QString header;
+    QString footer;
+    //char footer[100];
     QFile *file = new QFile;
     int nbRows, nbCols;
 
@@ -25,8 +27,7 @@ ParsePepFile::ParsePepFile(QString filename)
         maxCols[j] = 0;
     }
 
-    // define header and footer for this display
-    strcpy(header, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+    header = QString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
            "<ui version=\"4.0\">\n"
            "<class>MainWindow</class>\n"
            "<widget class=\"QMainWindow\" name=\"MainWindow\">\n"
@@ -46,12 +47,10 @@ ParsePepFile::ParsePepFile(QString filename)
            "</property>\n");
 
 
-    strcpy(footer, "</layout></item></layout></widget></widget></ui>");
+    footer = QString("</layout></item></layout></widget></widget></ui>");
 
-    QByteArray headerBytes(header);
-    QByteArray footerBytes(footer);
     QByteArray *array= new QByteArray();
-    array->append(headerBytes);
+    array->append(header);
 
     buffer = new QBuffer();
 
@@ -61,31 +60,16 @@ ParsePepFile::ParsePepFile(QString filename)
 
     TreatFile(nbRows, nbCols, file);
 
-    printf("nbRows=%d nbCols=%d\n", nbRows, nbCols);
+    PRINT(printf("nbRows=%d nbCols=%d\n", nbRows, nbCols));
 
     DisplayFile(nbRows, nbCols, array);
 
-    array->append(footerBytes);
+    array->append(footer);
     buffer->open(QIODevice::ReadWrite);
     buffer->write(*array);
     buffer->close();
 
     delete file;
-}
-
-/**
- * this routine (re)allocates memory and copies the old data to the new memory
- */
-void ParsePepFile::ReAllocate(int oldsize, int newsize, void **ptr)
-{
-    void *tmp;
-    //printf("reallocate for %d size\n", newsize);
-    tmp = (void *) malloc(newsize);
-    if(oldsize > 0) {
-        memcpy(tmp, *ptr, oldsize);
-        free(*ptr);
-    }
-    *ptr = tmp;
 }
 
 void ParsePepFile::Initialize()
@@ -98,7 +82,6 @@ void ParsePepFile::Initialize()
 void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
 {
     int grid = 1;
-    bool textPresent = false;
     int ll;
     int span =0;
     int nbFormats = 0;
@@ -109,7 +92,6 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
     QString widgetType ="";
     QString widgetText ="";
     QString channel ="";
-    QString comment="";
 
     if (!file->open(QIODevice::ReadOnly | QIODevice::Text)) return ;
     // scan file
@@ -133,7 +115,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
         }
 
         QStringList elements= line.split(";",  QString::SkipEmptyParts);
-        /*
+/*
         printf("%d %s\n", elements.count(), line.toAscii().constData());
         for (int i=0; i< elements.count(); i++) {
             printf("<%s>\n",  elements.at(i).toAscii().constData());
@@ -150,7 +132,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                 printf("parse pep file -- grid value exceeds the maximum of %d\n", MaxGrid);
                 grid = MaxGrid;
             }
-            //printf("grid=%d\n", grid);
+            PRINT(printf("grid=%d\n", grid));
         } else if(line.at(0) != QChar('#')){
 
             if(elements.count() > 1) {
@@ -171,52 +153,53 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                 while (ll < elements.count()) {
                     bool ok;
                     float number = elements.at(ll).toFloat(&ok);
+                    Q_UNUSED(number);
 
                     if(elements.at(ll).contains("-span")) {
                         ll++;
                         if(ll < elements.count()) {
-                            //printf("span detected, value=%s\n", elements.at(ll).toAscii().constData());
+                            PRINT(printf("span detected, value=%s\n", elements.at(ll).toAscii().constData()));
                             span = elements.at(ll).toInt();
                         }
                     }
                     else if(elements.at(ll).contains("-confirm")) {
-                        //printf("confirm detected\n");
+                        PRINT(printf("confirm detected\n"));
                     }
 
                     else if(elements.at(ll).contains("-hys")) {
-                        //printf("hys detected\n");
+                        PRINT(printf("hys detected\n"));
                     }
 
                     else if(elements.at(ll).contains("-comlab")) {
                         ll++;
-                        //printf("comlab detected <%s>\n", elements.at(ll).toAscii().constData() );
+                        PRINT(printf("comlab detected <%s>\n", elements.at(ll).toAscii().constData()));
                         gridLayout[actualLine][actualColumn].comlab = elements.at(ll).toAscii().constData();
                     }
 
                     else if(elements.at(ll).contains("-command")) {
                         ll++;
-                        //printf("commmand detected <%s>\n", elements.at(ll).toAscii().constData() );
+                        PRINT(printf("commmand detected <%s>\n", elements.at(ll).toAscii().constData()));
                         gridLayout[actualLine][actualColumn].command = elements.at(ll).toAscii().constData();
                     }
 
                     else if(elements.at(ll).contains("-text")) {
                         ll++;
-                        //printf("text detected <%s>\n", elements.at(ll).toAscii().constData());
+                        PRINT(printf("text detected <%s>\n", elements.at(ll).toAscii().constData()));
                         widgetText = elements.at(ll);
                         gridLayout[actualLine][actualColumn].textPresent = true;
                     }
 
                     else if(elements.at(ll).contains("-fg")) {
                         ll++;
-                        //printf("fg detected <%s>\n", elements.at(ll).toAscii().constData());
+                        PRINT(printf("fg detected <%s>\n", elements.at(ll).toAscii().constData()));
 
                     } else if(elements.at(ll-1).contains("comment")) {
-                        //printf("comment  detected %s\n", elements.at(ll).toAscii().constData());
+                        PRINT(printf("comment  detected %s\n", elements.at(ll).toAscii().constData()));
                         widgetText = elements.at(ll);
                     }
 
                     else {
-                        printf("something else  detected %s\n", elements.at(ll).toAscii().constData());
+                        PRINT(printf("something else  detected %s\n", elements.at(ll).toAscii().constData()));
                         widgetText.append(elements.at(ll));
                         widgetText.append(" ");
                     }
@@ -224,7 +207,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                     if(ok && (widgetType.contains("setrdbk") ||
                               widgetType.contains("wheelswitch") ||
                               widgetType.contains("formread")) ) {
-                        //printf("format detected %s\n", elements.at(ll).toAscii().constData());
+                        PRINT(printf("format detected %s\n", elements.at(ll).toAscii().constData()));
                         formats[nbFormats++] =elements.at(ll);
                     }
                     ll++;
@@ -241,8 +224,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                 gridLayout[actualLine][actualColumn].formats[0] = formats[0];
                 gridLayout[actualLine][actualColumn].formats[1] = formats[1];
 
-                //printf("%d %d %d <%s>\n", actualLine, actualColumn,  span, widgetType.toAscii().constData());
-
+                PRINT(printf("%d %d %d <%s>\n", actualLine, actualColumn,  span, widgetType.toAscii().constData()));
 
                 if(widgetType.contains("led")) gridLayout[actualLine][actualColumn].nbElem = 1;
                 else if(widgetType.contains("formread")) gridLayout[actualLine][actualColumn].nbElem = 2;
@@ -284,7 +266,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
     file->close();
 
     actualLine++;
-    /*
+/*
         for(int i=0; i< actualLine; i++) {
             for (int j=0; j<grid; j++) {
                 printf("row=%d col=%d %20s text=%s nbelem=%d span=%d\n", i, j, gridLayout[i][j].widgetType.toAscii().constData(),
@@ -305,10 +287,10 @@ void ParsePepFile::DisplayFile(int nbRows, int nbCols, QByteArray *array)
             if(gridLayout[i][j].nbElem > maxCols[j]) maxCols[j] =  gridLayout[i][j].nbElem;
         }
     }
-
+/*
     for(int j=0; j<nbCols; j++) printf("%d ", maxCols[j]);
     printf("\n");
-
+*/
 
     for (int j=0; j<nbCols; j++) {
         firstCols[j] = 0;
@@ -320,7 +302,7 @@ void ParsePepFile::DisplayFile(int nbRows, int nbCols, QByteArray *array)
         for (int j=0; j<nbCols; j++) {
 
             int spanColumns = 1;
-            /*
+/*
             printf("===== %d %d %20s text=%10s span=%d col=%d\n", i, j,  gridLayout[i][j].widgetType.toAscii().constData(),
                    gridLayout[i][j].widgetText.toAscii().constData(),
                    gridLayout[i][j].span, col);
@@ -357,7 +339,7 @@ void ParsePepFile::getColumnPositions(int nbItems, int actualGridColumn, int spa
     // in case only one item has to put into a row with a span > 1 we have to calculate the internal colum position
     // and number of intercolumns to span
     if(nbItems == 1) {
-        printf("========= one item to put with span=%d\n", spanGrid);
+        PRINT(printf("========= one item to put with span=%d\n", spanGrid));
         pos[0] = firstCols[actualGridColumn];
         span[0] = 0;
         if(spanGrid > 1) {
@@ -367,14 +349,14 @@ void ParsePepFile::getColumnPositions(int nbItems, int actualGridColumn, int spa
         }
         for(int i=0; i< nbItems; i++) {
             if(span[i] < 1) span[i] = 1;
-            printf("item=%d at column=%d span=%d\n", i, pos[i], span[i]);
+            PRINT(printf("item=%d at column=%d span=%d\n", i, pos[i], span[i]));
         }
         return;
     }
 
     // more than one item with span > 1, calculate what we can put in the different columns
 
-    printf("========= more than one item nbitems=%d with span=%d\n", nbItems, spanGrid);
+    PRINT(printf("========= more than one item nbitems=%d with span=%d\n", nbItems, spanGrid));
 
     sum[0] = nbItems;
     for(int i=1; i< spanGrid; i++) {
@@ -390,7 +372,7 @@ void ParsePepFile::getColumnPositions(int nbItems, int actualGridColumn, int spa
 
     for(int i=0; i< spanGrid; i++) {
         span[i] = span[i] + maxCols[actualGridColumn+i];
-        printf("items in this grid %d nb=%d\n", i, sum[i]);
+        PRINT(printf("items in this grid %d nb=%d\n", i, sum[i]));
     }
 
     int pos1 = 0;
@@ -405,7 +387,7 @@ void ParsePepFile::getColumnPositions(int nbItems, int actualGridColumn, int spa
 
     for(int i=0; i< nbItems; i++) {
         if(span[i] < 1) span[i] = 1;
-        printf("item=%d at column=%d spancol=%d\n", i, pos[i], span[i]);
+        PRINT(printf("item=%d at column=%d spancol=%d\n", i, pos[i], span[i]));
     }
 }
 
@@ -440,7 +422,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
     if(pvElements.count() > 0) partialpv = pvElements.at(0);
 
     if(grid.widgetType.contains("menubutton")) {
-        printf("create menubutton row=%d column=%d spangrid=%d\n", actualgridRow, effectiveColumn, spanGrid);
+        PRINT(printf("create menubutton row=%d column=%d spangrid=%d\n", actualgridRow, effectiveColumn, spanGrid));
 
         writeItemRowCol(actualgridRow, effectiveColumn, spanGrid, array);
 
@@ -459,7 +441,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
         //////////////////////////////////////////////////////////////////////////////////
     } else if(grid.widgetType.contains("led")) {
-        printf("create led row=%d column=%d\n", actualgridRow, effectiveColumn);
+        PRINT(printf("create led row=%d column=%d\n", actualgridRow, effectiveColumn));
 
         writeItemRowCol(actualgridRow, effectiveColumn, spanGrid, array);
 
@@ -490,7 +472,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         //////////////////////////////////////////////////////////////////////////////////
     } else if (grid.widgetType.contains("text")) {
 
-        printf("create text row=%d column=%d\n", actualgridRow, effectiveColumn);
+        PRINT(printf("create text row=%d column=%d\n", actualgridRow, effectiveColumn));
 
         writeItemRowCol(actualgridRow, effectiveColumn, spanGrid, array);
 
@@ -514,7 +496,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         //////////////////////////////////////////////////////////////////////////////////
     } else if (grid.widgetType.contains("choicebutton")) {
 
-        printf("create choicebutton row=%d column=%d\n", actualgridRow, effectiveColumn);
+        PRINT(printf("create choicebutton row=%d column=%d\n", actualgridRow, effectiveColumn));
 
         writeItemRowCol(actualgridRow, effectiveColumn, spanGrid, array);
 
@@ -529,7 +511,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         //////////////////////////////////////////////////////////////////////////////////
     } else if (grid.widgetType.contains("separator")) {
 
-        printf("create separator over %d grid columns , %d columns\n", spanGrid, spanColumns);
+        PRINT(printf("create separator over %d grid columns , %d columns\n", spanGrid, spanColumns));
 
         writeItemRowCol(actualgridRow, effectiveColumn, spanColumns, array);
 
@@ -543,7 +525,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         //////////////////////////////////////////////////////////////////////////////////
     } else if (grid.widgetType.contains("comment")) {
 
-        printf("create comment row=%d column=%d over %d grid columns\n", actualgridRow, effectiveColumn, spanGrid);
+        PRINT(printf("create comment row=%d column=%d over %d grid columns\n", actualgridRow, effectiveColumn, spanGrid));
 
         // how many items have to be displayed
         int nbItems = 1;
@@ -558,7 +540,6 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         effectiveColumn = pos[count++];
 
         writeItemRowCol(actualgridRow, effectiveColumn, effectiveSpan, array);
-        //printf("comlab=%s comamnd=%s\n",grid.comlab.toAscii().constData(), grid.command.toAscii().constData());
 
         if(grid.command.size() > 0) {
             if(grid.widgetText.size() > 0) {
@@ -586,7 +567,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         //////////////////////////////////////////////////////////////////////////////////
     } else  if (grid.widgetType.contains("wheelswitch")){
 
-        printf("create wheelswitch row=%d column=%d\n", actualgridRow, effectiveColumn);
+        PRINT(printf("create wheelswitch row=%d column=%d\n", actualgridRow, effectiveColumn));
 
         writeItemRowCol(actualgridRow, effectiveColumn, spanGrid, array);
 
@@ -602,8 +583,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         //////////////////////////////////////////////////////////////////////////////////
     } else  if (grid.widgetType.contains("setrdbk")) {
 
-        printf("create setrdbk gridrow=%d gridcolumn=%d actual column=%d span=%d nbGridCols=%d\n", actualgridRow, actualgridColumn, firstCols[actualgridColumn], spanGrid, nbColumns);
-        printf("columns width = %d %d %d %d\n", maxCols[actualgridColumn], maxCols[actualgridColumn+1],  maxCols[actualgridColumn+2], maxCols[actualgridColumn+3]);
+        PRINT(printf("create setrdbk gridrow=%d gridcolumn=%d actual column=%d span=%d nbGridCols=%d\n", actualgridRow, actualgridColumn, firstCols[actualgridColumn], spanGrid, nbColumns));
 
         count = 0;
         getColumnPositions(7, actualgridColumn, spanGrid, pos, span);
@@ -677,7 +657,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         //////////////////////////////////////////////////////////////////////////////////
     } else  if (grid.widgetType.contains("formread")){
 
-        printf("create formread row=%d column=%d\n", actualgridRow, effectiveColumn);
+        PRINT(printf("create formread row=%d column=%d\n", actualgridRow, effectiveColumn));
 
         writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
 
@@ -692,7 +672,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         writeCloseTag("item", array);
 
     } else {
-        printf("%s not treated\n", grid.widgetType.toAscii().constData());
+        PRINT(printf("%s not treated\n", grid.widgetType.toAscii().constData()));
     }
 }
 
@@ -777,6 +757,11 @@ void ParsePepFile::writeLineEdit(QString format, QString pv, QString minwidth, Q
                                  int rgba[], QByteArray *array)
 {
     Q_UNUSED(format);
+    Q_UNUSED(alignment);
+    Q_UNUSED(colormode);
+    Q_UNUSED(calcpv);
+    Q_UNUSED(calc);
+    Q_UNUSED(visibility);
 
     // a lineedit
     writeOpenTag("widget class=\"caLineEdit\" name=\"calinedit\"", array);
@@ -820,6 +805,11 @@ void ParsePepFile::writeTextEntry(QString format, QString pv, QString minwidth, 
                                   int rgba[], QByteArray *array)
 {
     Q_UNUSED(format);
+    Q_UNUSED(alignment);
+    Q_UNUSED(colormode);
+    Q_UNUSED(calcpv);
+    Q_UNUSED(calc);
+    Q_UNUSED(visibility);
 
     // a lineedit
     writeOpenTag("widget class=\"caTextEntry\" name=\"catextentry\"", array);
