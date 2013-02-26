@@ -292,6 +292,7 @@ void caLineEdit::setText(const QString &txt)
     if(keepText == txt) {  // accelerate things
         return;
     }
+    //printf("settext: <%s>\n", txt.toAscii().constData());
     QLineEdit::setText(txt);
     FontScalingWidget::rescaleFont(text(), d_savedTextSpace);
     keepText = txt;
@@ -299,7 +300,7 @@ void caLineEdit::setText(const QString &txt)
 
 void caLineEdit::forceText(const QString &txt)
 {
-    //printf("forcetext: <%s>\n", txt.toAscii().constData());
+   // printf("forcetext: <%s>\n", txt.toAscii().constData());
     QLineEdit::setText(txt);
     FontScalingWidget::rescaleFont(text(), d_savedTextSpace);
 }

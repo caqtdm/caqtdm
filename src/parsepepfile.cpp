@@ -35,7 +35,6 @@ ParsePepFile::ParsePepFile(QString filename)
            "<string>\n"
            "QWidget#centralWidget {background: rgba(200, 200, 200, 0); }\n"
            "caLineEdit {border-radius: 1px;background: lightyellow;color: black;}\n"
-           //"caLabel { border:1px solid rgb(0, 0, 255); }\n"
            "</string>\n"
            "</property>\n"
            "<widget class=\"QWidget\" name=\"centralWidget\">\n"
@@ -70,6 +69,7 @@ ParsePepFile::ParsePepFile(QString filename)
     buffer->close();
 
     delete file;
+    delete array;
 }
 
 void ParsePepFile::Initialize()
@@ -98,6 +98,12 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
     QTextStream in(file);
     QString line = in.readLine();
     while (!line.isNull()) {
+
+        PRINT(printf("line : <%s>\n", line.toAscii().constData()));
+
+        // replace all tabs by blancs
+
+        line = line.replace("\t", " ");
 
         // replace all blancs (except these between quotes by ;
         bool inside = false;
@@ -151,7 +157,8 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
 
 
                 while (ll < elements.count()) {
-                    bool ok;
+                    bool ok = true;
+                    PRINT(printf("ll=%d elem=%s\n",ll, elements.at(ll).toAscii().constData() ));
                     float number = elements.at(ll).toFloat(&ok);
                     Q_UNUSED(number);
 
@@ -417,6 +424,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
     int effectiveSpan;
 
     rgba[0] = 150; rgba[1] = 245; rgba[2] = 120; rgba[3] = 255;
+    rgba[0] = 50; rgba[1] = 50; rgba[2] = 50; rgba[3] = 255;
 
     QStringList pvElements= grid.widgetChannel.split(":",  QString::SkipEmptyParts);
     if(pvElements.count() > 0) partialpv = pvElements.at(0);
@@ -785,7 +793,7 @@ void ParsePepFile::writeLineEdit(QString format, QString pv, QString minwidth, Q
 
     writeSimpleProperty("alignment", "set", "Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter", array);
     writeSimpleProperty("channel", "string", pv, array);
-    writeSimpleProperty("colorMode", "enum", "caLineEdit::Static", array);
+    writeSimpleProperty("colorMode", "enum", "caLineEdit::Alarm_Static", array);
     writeSimpleProperty("unitsEnabled", "bool", "true", array);
 
     setColor("background", rgba[0], rgba[1], rgba[2], rgba[3], array);
@@ -973,6 +981,7 @@ QWidget* ParsePepFile::load(QWidget *parent)
     buffer->seek(0);
     widget=loader.load(buffer, parent);
     buffer->close();
+    delete buffer;
     return widget;
 }
 

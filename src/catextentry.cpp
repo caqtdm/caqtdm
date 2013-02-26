@@ -26,9 +26,7 @@ void caTextEntry::dataInput()
 {
     //printf("return pressed %s\n", text().toAscii().constData());
     emit TextEntryChanged(text());
-    //clearFocus();
 }
-
 
 void caTextEntry::setAccessW(int access)
 {

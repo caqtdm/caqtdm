@@ -34,8 +34,6 @@
 #include <QMouseEvent>
 #include <qtcontrols_global.h>
 
-#define MAXCURVES 7
-
 class QwtPlotCurve;
 
 class QTCON_EXPORT caStripPlot : public QwtPlot
@@ -128,6 +126,8 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
     Q_PROPERTY(bool LegendEnabled READ getLegendEnabled WRITE setLegendEnabled)
 
 public:
+
+    enum {MAXCURVES = 7};
 
     enum axisScaling {Channel, User};
     enum  curvStyle {Lines = 1, FillUnder = 5};
