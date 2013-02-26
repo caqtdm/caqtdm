@@ -31,7 +31,7 @@
 
 #include "JSON.h"
 
-class CAQTDM_LIBSHARED_EXPORT JSON;
+class JSON;
 
 enum JSONType { JSONType_Null, JSONType_String, JSONType_Bool, JSONType_Number, JSONType_Array, JSONType_Object };
 

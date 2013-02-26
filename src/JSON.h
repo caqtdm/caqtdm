@@ -92,7 +92,7 @@ typedef std::map<std::wstring, JSONValue*> JSONObject;
 
 #include "JSONValue.h"
 
-class JSON
+class CAQTDM_LIBSHARED_EXPORT JSON
 {
 	friend class JSONValue;
 	
