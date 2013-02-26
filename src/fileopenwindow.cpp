@@ -260,6 +260,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
 
     int found1 = inputFile.lastIndexOf(".ui");
     int found2 = inputFile.lastIndexOf(".adl");
+    int found3 = inputFile.lastIndexOf(".prc");
     QString openFile = inputFile;
     if (found1 != -1) {
         openFile = inputFile.mid(0, found1);
@@ -268,7 +269,11 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         openFile = inputFile.mid(0, found2);
     }
 
-    QString FileName = openFile.append(".ui");
+    QString FileName;
+    if(found3 == -1)
+        FileName = openFile.append(".ui");
+    else
+        FileName = inputFile;
 
     // go through the children of this main window and find out if new or already present
     QList<QWidget *> all = this->findChildren<QWidget *>();
