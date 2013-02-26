@@ -34,10 +34,10 @@
      void applyClicked();
 
  private:
-     QComboBox *minComboBox[MAXCURVES];
-     QComboBox *maxComboBox[MAXCURVES];
-     QLineEdit *minLineEdit[MAXCURVES];
-     QLineEdit *maxLineEdit[MAXCURVES];
+     QComboBox *minComboBox[caStripPlot::MAXCURVES];
+     QComboBox *maxComboBox[caStripPlot::MAXCURVES];
+     QLineEdit *minLineEdit[caStripPlot::MAXCURVES];
+     QLineEdit *maxLineEdit[caStripPlot::MAXCURVES];
      QStringList vars;
      caStripPlot *StripPlot;
      MutexKnobData *monData;

@@ -50,6 +50,7 @@ class CAQTDM_LIBSHARED_EXPORT CaQtDM_Lib : public QMainWindow
     Q_OBJECT
 
 public:
+
     explicit CaQtDM_Lib(QWidget *parent = 0, QString="", QString="", MutexKnobData *mutexKnobData = 0, MessageWindow *msgWindow = 0);
     ~CaQtDM_Lib();
 
@@ -63,12 +64,13 @@ public:
     int setObjectVisibility(QWidget *w, double value);
     bool reaffectText(QMap<QString, QString> map, QString *text);
     int InitVisibility(QWidget* widget, knobData *kData, QMap<QString, QString> map,  int *specData, QString info);
-    void ComputeNumericMaxMinPrec(QWidget* widget, const knobData& data);
+    void ComputeNumericMaxMinPrec(QWidget* widget, const knobData &data);
     void postMessage(QtMsgType type, char *msg);
     int Execute(char *command);
     void TreatRequestedValue(QString text, caTextEntry::FormatType fType, QWidget *w);
     bool getSoftChannel(QString pv, knobData &data);
-    int parseForDisplayRate(QString input, int &rate);
+    int parseForDisplayRate(QString input, int &rate);   
+    void UpdateGauge(EAbstractGauge *w, const knobData &data);
 
 protected:
 

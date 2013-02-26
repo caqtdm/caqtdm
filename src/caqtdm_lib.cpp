@@ -28,7 +28,6 @@
 #endif
 
 #define PRC 1
-#define MAXSTRIPS 7
 
 #include "myMessageBox.h"
 
@@ -49,6 +48,7 @@ typedef struct _connectInfo {
 #define InfoPrefix "<p style='background-color:lightyellow'><font color='#000000'>"
 #define InfoPostfix "</font></font></p>"
 
+// used for calculating visibility for several types of widgets
 #define ComputeVisibility(x)  {  \
     switch(widget->getVisibility()) { \
     case x::StaticV:\
@@ -65,6 +65,7 @@ typedef struct _connectInfo {
     break;\
     }}
 
+// used for preparing the vectors of the cartesian plot
 #define BuildVector(x) {\
     switch(data.edata.fieldtype) { \
     case caFLOAT: { \
@@ -94,21 +95,74 @@ typedef struct _connectInfo {
     break; \
     }}
 
+// used for interfacing epics routines with (pv, text, ...)
 #define QStringsToChars(x,y,z) \
-  char param1[MAXPVLEN], param2[255], param3[80]; \
-  int size1, size2, size3; \
-  QByteArray Parameter_1 = x.toAscii().constData(); \
-  QByteArray Parameter_2 = y.toAscii().constData(); \
-  QByteArray Parameter_3 = z.toAscii().constData(); \
-  size1 = qMin(Parameter_1.size(), MAXPVLEN); \
-  size2 = qMin(Parameter_2.size(), 255); \
-  size3 = qMin(Parameter_3.size(), 80); \
-  strncpy(param1, Parameter_1.constData(), size1); \
-  strncpy(param2, Parameter_2.constData(), size2); \
-  strncpy(param3, Parameter_3.constData(), size3); \
-  param1[size1] = '\0'; \
-  param2[size2] = '\0'; \
-  param3[size3] = '\0';
+    char param1[MAXPVLEN], param2[255], param3[80]; \
+    int size1, size2, size3; \
+    QByteArray Parameter_1 = x.toAscii().constData(); \
+    QByteArray Parameter_2 = y.toAscii().constData(); \
+    QByteArray Parameter_3 = z.toAscii().constData(); \
+    size1 = qMin(Parameter_1.size(), MAXPVLEN); \
+    size2 = qMin(Parameter_2.size(), 255); \
+    size3 = qMin(Parameter_3.size(), 80); \
+    strncpy(param1, Parameter_1.constData(), size1); \
+    strncpy(param2, Parameter_2.constData(), size2); \
+    strncpy(param3, Parameter_3.constData(), size3); \
+    param1[size1] = '\0'; \
+    param2[size2] = '\0'; \
+    param3[size3] = '\0';
+
+// common code too many widgets; for several reasons we did not try to put similar code in base classes.
+// colors back after no connect
+#define SetColorsBack                            \
+    if(!widget->property("Connect").value<bool>()) { \
+    widget->setNormalColors();                   \
+    widget->setProperty("Connect", true);        \
+    }
+
+// colors back after no connect
+#define SetColorsNotConnected                    \
+    widget->setAlarmColors(NOTCONNECTED);        \
+    widget->setProperty("Connect", false);
+
+// ui "file" including the requested pep file (.prc), i.e. file with a layout description used at PSI
+#define uiIntern "<?xml version=\"1.0\" encoding=\"UTF-8\"?> " \
+    "<ui version=\"4.0\"> " \
+    "<class>MainWindow</class> " \
+    "<widget class=\"QMainWindow\" name=\"MainWindow\"> " \
+    "<property name=\"geometry\"> " \
+    "<rect> " \
+    "<x>0</x> " \
+    "<y>0</y> " \
+    "<width>823</width> " \
+    "<height>911</height> " \
+    "</rect> " \
+    "</property> " \
+    "<property name=\"windowTitle\"> " \
+    "<string>MainWindow</string> " \
+    "</property> " \
+    "<widget class=\"QWidget\" name=\"centralwidget\"> " \
+    "<layout class=\"QGridLayout\" name=\"gridLayout\"> " \
+    "<item row=\"0\" column=\"0\"> " \
+    "<widget class=\"caInclude\" name=\"cainclude\"> " \
+    "<property name=\"filename\" stdset=\"0\"> " \
+    "<string notr=\"true\">%1</string> " \
+    "</property> " \
+    "</widget> " \
+    "</item> " \
+    "</layout> " \
+    "</widget> " \
+    "</widget> " \
+    "<customwidgets> " \
+    "<customwidget> " \
+    "<class>caInclude</class> " \
+    "<extends>QWidget</extends> " \
+    "<header>caInclude</header> " \
+    "</customwidget> " \
+    "</customwidgets> " \
+    "<resources/> " \
+    "<connections/> " \
+    "</ui>"
 
 //===============================================================================================
 
@@ -173,19 +227,51 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     QFile *file = new QFile;
     file->setFileName(filename);
 
-    file->open(QFile::ReadOnly);
-
-    myWidget = loader.load(file, this);
-
+    // treat ui file */
     QFileInfo fi(filename);
-    if (!myWidget) {
-        QMessageBox::warning(this, tr("caQtDM"), tr("Error loading %1. Use designer to find errors").arg(filename));
+    if(filename.contains("ui")) {
+
+        file->open(QFile::ReadOnly);
+
+        myWidget = loader.load(file, this);
+
+        if (!myWidget) {
+            QMessageBox::warning(this, tr("caQtDM"), tr("Error loading %1. Use designer to find errors").arg(filename));
+            file->close();
+            delete file;
+            this->deleteLater();
+            return;
+        }
         file->close();
-        delete file;
-        this->deleteLater();
-        return;
+
+        // treat prc file and load designer description from internal buffer
+    } else if(filename.contains("prc")) {
+        QString uiString = QString(uiIntern);
+        uiString= uiString.arg(filename);
+        QByteArray *array= new QByteArray();
+        array->append(uiString);
+
+        QBuffer *buffer = new QBuffer();
+        buffer->open(QIODevice::ReadWrite);
+        buffer->write(*array);
+        delete array;
+
+        buffer->seek(0);
+        myWidget = loader.load(buffer, parent);
+        buffer->close();
+        delete buffer;
+
+        if (!myWidget) {
+            QMessageBox::warning(this, tr("caQtDM"), tr("Error loading %1. Use designer to find errors").arg(filename));
+            file->close();
+            delete file;
+            this->deleteLater();
+            return;
+        }
+
+    } else {
+        qDebug() << "caQtDM -- should never happen ??";
     }
-    file->close();
 
     // set window title without the whole path
     QString title(file->fileName().section('/',-1));
@@ -288,7 +374,7 @@ QMap<QString, QString> CaQtDM_Lib::createMap(const QString& macro)
     if(macro != NULL) {
         QStringList vars = macro.split(",", QString::SkipEmptyParts);
         for(int i=0; i< vars.count(); i++) {
-/* this would be ok if medm did not allow also an equal sign after the equal sign
+/*          this would be ok if medm did not allow also an equal sign after the equal sign
             QStringList keyvalue = vars.at(i).split("=", QString::SkipEmptyParts);
             if(keyvalue.count() == 2) {
                 map.insert(keyvalue.at(0).trimmed(), keyvalue.at(1));
@@ -382,7 +468,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //qDebug() << "create caImage";
 
-         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
+        nbMonitors = InitVisibility(w1, &kData, map, specData, "");
 
         // empty calc string, set animation
         if(widget->getImageCalc().size() == 0) {
@@ -491,17 +577,17 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
             if(i==7) {
                 QStringList thisString = widget->getDataProcChannels().split(";");
                 if(thisString.count() == 4 &&
-                   thisString.at(0).trimmed().length() > 0 &&
-                   thisString.at(1).trimmed().length() > 0  &&
-                   thisString.at(2).trimmed().length() > 0 &&
-                   thisString.at(3).trimmed().length() > 0) {
+                        thisString.at(0).trimmed().length() > 0 &&
+                        thisString.at(1).trimmed().length() > 0  &&
+                        thisString.at(2).trimmed().length() > 0 &&
+                        thisString.at(3).trimmed().length() > 0) {
                     validDataProcessingChannels = true;
                     for(int j=0; j<4; j++) {
-                      specData[0] = i+j;   // x,y,w,h
-                      text =  treatMacro(map, thisString.at(j), &doNothing);
-                      addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
-                      pvs.append(pv);
-                      if(j<3)pvs.append(";");
+                        specData[0] = i+j;   // x,y,w,h
+                        text =  treatMacro(map, thisString.at(j), &doNothing);
+                        addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
+                        pvs.append(pv);
+                        if(j<3)pvs.append(";");
                     }
                 }
             }
@@ -552,7 +638,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //qDebug() << "create caLabel";
 
-         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
+        nbMonitors = InitVisibility(w1, &kData, map, specData, "");
 
         QString text =  treatMacro(map, widget->text(), &doNothing);
         text.replace(QString::fromWCharArray(L"\u00A6"), " ");    // replace ¦ with a blanc (was used in macros for creating blancs)
@@ -603,7 +689,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //qDebug() << "create caGraphics";
 
-         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
+        nbMonitors = InitVisibility(w1, &kData, map, specData, "");
 
         widget->setProperty("Taken", true);
 
@@ -798,9 +884,9 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
             //qDebug() << "prc file";
             prcFile = true;
         } else {
-           //qDebug() << "ui file";
-           fileName = openFile[0].append(".ui");
-           prcFile = false;
+            //qDebug() << "ui file";
+            fileName = openFile[0].append(".ui");
+            prcFile = false;
         }
 
         searchFile *s = new searchFile(fileName);
@@ -986,16 +1072,16 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         // handle count channel if any
         int Number;
         if(!widget->hasCountNumber(&Number)) {
-          countChannel = widget->getCountPV();
-          if(countChannel.trimmed().length() > 0) {
-              specData[2] = caCartesianPlot::CH_Count; // Count
-              addMonitor(myWidget, &kData, countChannel, w1, specData, map, &pv);
-              tooltip.append(pv);
-              tooltip.append("<br>");
-              widget->setCountPV(pv);
-          }
+            countChannel = widget->getCountPV();
+            if(countChannel.trimmed().length() > 0) {
+                specData[2] = caCartesianPlot::CH_Count; // Count
+                addMonitor(myWidget, &kData, countChannel, w1, specData, map, &pv);
+                tooltip.append(pv);
+                tooltip.append("<br>");
+                widget->setCountPV(pv);
+            }
         } else {
-                //qDebug() << "count=" << Number;
+            //qDebug() << "count=" << Number;
         }
 
         // handle erase channel if any
@@ -1015,8 +1101,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
             if(ok) widget->setScaleX(xmin, xmax);
         } else if(widget->getXscaling() == caCartesianPlot::Auto) {
             widget->setXscaling(caCartesianPlot::Auto);
-        // in case of channel the limits will be defined later by the hopr and lopr
-        // however in case of channel, it is possible to get dynamic limits through monitors
+            // in case of channel the limits will be defined later by the hopr and lopr
+            // however in case of channel, it is possible to get dynamic limits through monitors
         } else if(widget->getXscaling() == caCartesianPlot::Channel) {
             QString pvs ="";
             QStringList thisString = widget->getXaxisLimits().split(";");
@@ -1029,20 +1115,20 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
                     QStringList thisString = widget->getPV(0).split(";");
                     if(thisString.count() == 2 && thisString.at(0).trimmed().length() == 0)  widget->setXscaling(caCartesianPlot::Auto);
                 } else {
-                  specData[0] = 0;
-                  specData[2] = caCartesianPlot::CH_Xscale;
-                  addMonitor(myWidget, &kData, thisString.at(0), w1, specData, map, &pv);
-                  tooltip.append(pv);
-                  pvs = pv;
-                  specData[0] = 1;
-                  specData[2] = caCartesianPlot::CH_Xscale;
-                  addMonitor(myWidget, &kData, thisString.at(1), w1, specData, map, &pv);
-                  tooltip.append(",");
-                  tooltip.append(pv);
-                  pvs.append(";");
-                  pvs.append(pv);
-                  tooltip.append("<br>");
-                  widget->setXaxisLimits(pvs);
+                    specData[0] = 0;
+                    specData[2] = caCartesianPlot::CH_Xscale;
+                    addMonitor(myWidget, &kData, thisString.at(0), w1, specData, map, &pv);
+                    tooltip.append(pv);
+                    pvs = pv;
+                    specData[0] = 1;
+                    specData[2] = caCartesianPlot::CH_Xscale;
+                    addMonitor(myWidget, &kData, thisString.at(1), w1, specData, map, &pv);
+                    tooltip.append(",");
+                    tooltip.append(pv);
+                    pvs.append(";");
+                    pvs.append(pv);
+                    tooltip.append("<br>");
+                    widget->setXaxisLimits(pvs);
                 }
             }
         }
@@ -1066,20 +1152,20 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
                     QStringList thisString = widget->getPV(0).split(";");
                     if(thisString.count() == 2 && thisString.at(1).trimmed().length() == 0)  widget->setYscaling(caCartesianPlot::Auto);
                 } else {
-                  specData[0] = 0;
-                  specData[2] = caCartesianPlot::CH_Yscale;
-                  addMonitor(myWidget, &kData, thisString.at(0), w1, specData, map, &pv);
-                  tooltip.append(pv);
-                  pvs = pv;
-                  specData[0] = 1;
-                  specData[2] = caCartesianPlot::CH_Yscale;
-                  addMonitor(myWidget, &kData, thisString.at(1), w1, specData, map, &pv);
-                  tooltip.append(",");
-                  tooltip.append(pv);
-                  pvs.append(";");
-                  pvs.append(pv);
-                  tooltip.append("<br>");
-                  widget->setYaxisLimits(pvs);
+                    specData[0] = 0;
+                    specData[2] = caCartesianPlot::CH_Yscale;
+                    addMonitor(myWidget, &kData, thisString.at(0), w1, specData, map, &pv);
+                    tooltip.append(pv);
+                    pvs = pv;
+                    specData[0] = 1;
+                    specData[2] = caCartesianPlot::CH_Yscale;
+                    addMonitor(myWidget, &kData, thisString.at(1), w1, specData, map, &pv);
+                    tooltip.append(",");
+                    tooltip.append(pv);
+                    pvs.append(";");
+                    pvs.append(pv);
+                    tooltip.append("<br>");
+                    widget->setYaxisLimits(pvs);
                 }
             }
         }
@@ -1118,7 +1204,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         widget->setPVS(text);
         QStringList vars = text.split(";", QString::SkipEmptyParts);
 
-        int NumberOfCurves = min(vars.count(), MAXSTRIPS);
+        int NumberOfCurves = min(vars.count(), caStripPlot::MAXCURVES);
 
         // go through the defined curves and add monitor
 
@@ -1242,11 +1328,11 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
         status = parseForDisplayRate(JSONString, rate);
         if(!status) {
             sprintf(asc, "JSON parsing error on %s ,should be like {\"monitor\":{\"maxdisplayrate\":10}}",
-                          (char*) pv.trimmed().toAscii().constData());
+                    (char*) pv.trimmed().toAscii().constData());
         } else {
-          sprintf(asc, "pv %s display rate set to maximum %dHz", trimmedPV.toAscii().constData(), rate);
+            sprintf(asc, "pv %s display rate set to maximum %dHz", trimmedPV.toAscii().constData(), rate);
         }
-         postMessage(QtDebugMsg, asc);
+        postMessage(QtDebugMsg, asc);
     }
 
     QString newpv = treatMacro(map, trimmedPV, &doNothing);
@@ -1335,7 +1421,7 @@ int CaQtDM_Lib::setObjectVisibility(QWidget *w, double value)
     if(caFrame *widget = qobject_cast<caFrame *>(w)) {
         // treat visibility if defined
         ComputeVisibility(caFrame)
-        if(widget->getVisibilityMode() == caFrame::Background) {
+                if(widget->getVisibilityMode() == caFrame::Background) {
             if(visible) widget->setAutoFillBackground(true);
             else widget->setAutoFillBackground(false);
             return visible;
@@ -1419,14 +1505,14 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
             }
             // for first record
             if(i==0 && ptr->edata.connected) {
-               valueArray[4] = 0.0;                                 /* E: Reserved */
-               valueArray[5] = 0.0;                                 /* F: Reserved */
-               valueArray[6] = ptr->edata.valueCount;               /* G: count */
-               valueArray[7] = ptr->edata.upper_disp_limit;         /* H: hopr */
-               valueArray[8] = ptr->edata.status;                   /* I: status */
-               valueArray[9] = ptr->edata.severity;                 /* J: severity */
-               valueArray[10] = ptr->edata.precision;               /* K: precision */
-               valueArray[11] = ptr->edata.lower_disp_limit;        /* L: lopr */
+                valueArray[4] = 0.0;                                 /* E: Reserved */
+                valueArray[5] = 0.0;                                 /* F: Reserved */
+                valueArray[6] = ptr->edata.valueCount;               /* G: count */
+                valueArray[7] = ptr->edata.upper_disp_limit;         /* H: hopr */
+                valueArray[8] = ptr->edata.status;                   /* I: status */
+                valueArray[9] = ptr->edata.severity;                 /* J: severity */
+                valueArray[10] = ptr->edata.precision;               /* K: precision */
+                valueArray[11] = ptr->edata.lower_disp_limit;        /* L: lopr */
             }
         }
 
@@ -1486,6 +1572,56 @@ int CaQtDM_Lib::ComputeAlarm(QWidget *w)
     return status;
 }
 
+/**
+  * update of linear and circular widget (they have common properties)
+  */
+
+void CaQtDM_Lib::UpdateGauge(EAbstractGauge *widget, const knobData &data)
+{
+    if(data.edata.connected) {
+        if((widget->isExternalEnabled()) && (data.edata.initialize)) {
+
+            // when no limits defined then say no external limits
+            if( (data.edata.lower_alarm_limit == data.edata.upper_alarm_limit) &&
+                    (data.edata.lower_warning_limit == data.edata.upper_warning_limit) &&
+                    (data.edata.upper_disp_limit == data.edata.lower_disp_limit) ) {
+                widget->setExternalEnabled(false);
+            }
+
+            // set low and high error
+            if(data.edata.lower_alarm_limit != data.edata.upper_alarm_limit) {
+                widget->setLowError(data.edata.lower_alarm_limit);
+                widget->setHighError(data.edata.upper_alarm_limit);
+            } else {
+                widget->setLowError(data.edata.lower_disp_limit);
+                widget->setHighError(data.edata.upper_disp_limit);
+            }
+
+            // warning limits, when not specified set alarm limits
+            if(data.edata.lower_warning_limit != data.edata.upper_warning_limit) {
+                widget->setLowWarning(data.edata.lower_warning_limit);
+                widget->setHighWarning(data.edata.upper_warning_limit);
+            } else if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
+                widget->setHighWarning(data.edata.upper_disp_limit);
+                widget->setLowWarning(data.edata.lower_disp_limit);
+            } else {
+                widget->setHighWarning(1000.0);
+                widget->setLowWarning(0.0);
+            }
+
+            // HOPR and LOPR
+            if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
+                widget->setMaxValue(data.edata.upper_disp_limit);
+                widget->setMinValue(data.edata.lower_disp_limit);
+            } else {
+                widget->setMaxValue(1000.0);
+                widget->setMinValue(0.0);
+            }
+            widget->update();
+        }
+        widget->setValue((int) data.edata.rvalue);
+    }
+}
 
 /**
  * updates my widgets through monitor and emit signal
@@ -1513,7 +1649,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             mutexKnobData->UpdateSoftPV(data.pv, result, myWidget);
         }
 
-    // frame ==================================================================================================================
+        // frame ==================================================================================================================
     } else if(caLabel *widget = qobject_cast<caLabel *>(w)) {
         //qDebug() << "we have a label";
 
@@ -1533,26 +1669,22 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 widget->setAlarmColors(status);
             }
 
-            // treat visibility if defined
             setObjectVisibility(widget, data.edata.rvalue);
 
         } else {
-            widget->setAlarmColors(NOTCONNECTED);
-            widget->setProperty("Connect", false);
+            SetColorsNotConnected;
         }
 
         // frame ==================================================================================================================
     } else if(caInclude *widget = qobject_cast<caInclude *>(w)) {
         //qDebug() << "we have an included frame";
 
-        // treat visibility if defined
         setObjectVisibility(widget, data.edata.rvalue);
 
         // frame ==================================================================================================================
     } else if(caFrame *widget = qobject_cast<caFrame *>(w)) {
         //qDebug() << "we have a frame";
 
-        // treat visibility if defined
         setObjectVisibility(widget, data.edata.rvalue);
 
         // menu ==================================================================================================================
@@ -1560,29 +1692,22 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         //qDebug() << "we have a menu";
 
         if(data.edata.connected) {
-          QStringList stringlist = String.split( ";");
-          // set enum strings
-          if(data.edata.fieldtype == caENUM) {
-              widget->populateCells(stringlist);
-              if(widget->getLabelDisplay()) widget->setCurrentIndex(0);
-              else widget->setCurrentIndex((int) data.edata.ivalue);
+            QStringList stringlist = String.split( ";");
+            // set enum strings
+            if(data.edata.fieldtype == caENUM) {
+                widget->populateCells(stringlist);
+                if(widget->getLabelDisplay()) widget->setCurrentIndex(0);
+                else widget->setCurrentIndex((int) data.edata.ivalue);
 
-              if (widget->getColorMode() == caMenu::Alarm) {
-                      widget->setAlarmColors(data.edata.severity);
-                  // case of static mode
-              } else {
-                  // done at initialisation, we have to set it back after no connect
-                  if(!widget->property("Connect").value<bool>()) {
-                      widget->setNormalColors();
-                      widget->setProperty("Connect", true);
-                  }
-              }
-          }
-
-          // set no connection color
+                if (widget->getColorMode() == caMenu::Alarm) {
+                    widget->setAlarmColors(data.edata.severity);
+                    // case of static mode
+                } else {
+                    SetColorsBack;
+                }
+            }
         } else {
-          widget->setAlarmColors(NOTCONNECTED);
-          widget->setProperty("Connect", false);
+            SetColorsNotConnected;
         }
         widget->setAccessW(data.edata.accessW);
 
@@ -1591,25 +1716,19 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         //qDebug() << "we have a choiceButton" << String << value;
 
         if(data.edata.connected) {
-          QStringList stringlist = String.split( ";");
-          // set enum strings
-          if(data.edata.fieldtype == caENUM) {
-              widget->populateCells(stringlist, (int) data.edata.ivalue);
-              if (widget->getColorMode() == caChoice::Alarm) {
-                      widget->setAlarmColors(data.edata.severity);
-                  // case of static mode
-              } else {
-                  // done at initialisation, we have to set it back after no connect
-                  if(!widget->property("Connect").value<bool>()) {
-                      widget->setNormalColors();
-                      widget->setProperty("Connect", true);
-                  }
-              }
-          }
-        // set no connection color
+            QStringList stringlist = String.split( ";");
+            // set enum strings
+            if(data.edata.fieldtype == caENUM) {
+                widget->populateCells(stringlist, (int) data.edata.ivalue);
+                if (widget->getColorMode() == caChoice::Alarm) {
+                    widget->setAlarmColors(data.edata.severity);
+                    // case of static mode
+                } else {
+                    SetColorsBack;
+                }
+            }
         } else {
-          widget->setAlarmColors(NOTCONNECTED);
-          widget->setProperty("Connect", false);
+            SetColorsNotConnected;
         }
         widget->setAccessW(data.edata.accessW);
 
@@ -1646,16 +1765,11 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
                 // case of static mode
             } else {
-                // done at initialisation, we have to set it back after no connect
-                if(!widget->property("Connect").value<bool>()) {
-                    widget->setNormalColors();
-                    widget->setProperty("Connect", true);
-                }
+                SetColorsBack;
             }
             // set no connection color
         } else {
-            widget->setAlarmColors(NOTCONNECTED);
-            widget->setProperty("Connect", false);
+            SetColorsNotConnected;
         }
 
         // Slider ==================================================================================================================
@@ -1692,112 +1806,26 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
                 // case of static, default mode
             } else {
-                // done at initialisation, we have to set it back after no connect
-                if(!widget->property("Connect").value<bool>()) {
-                    widget->setNormalColors();
-                    widget->setProperty("Connect", true);
-                }
+                SetColorsBack;
             }
             // set no connection color
         } else {
-            widget->setAlarmColors(NOTCONNECTED);
-            widget->setProperty("Connect", false);
+            SetColorsNotConnected;
         }
 
         // linear gauge (like thermometer) ==================================================================================================================
     } else if (caLinearGauge *widget = qobject_cast<caLinearGauge *>(w)) {
         //qDebug() << "we have a linear gauge" << value;
-
-        if(data.edata.connected) {
-            if((widget->isExternalEnabled()) && (data.edata.initialize)) {
-
-                // when no limits defined then say no external limits
-                if( (data.edata.lower_alarm_limit == data.edata.upper_alarm_limit) &&
-                    (data.edata.lower_warning_limit == data.edata.upper_warning_limit) &&
-                    (data.edata.upper_disp_limit == data.edata.lower_disp_limit) ) {
-                    widget->setExternalEnabled(false);
-                }
-
-                // set low and high error
-                if(data.edata.lower_alarm_limit != data.edata.upper_alarm_limit) {
-                   widget->setLowError(data.edata.lower_alarm_limit);
-                   widget->setHighError(data.edata.upper_alarm_limit);
-                } else {
-                    widget->setLowError(data.edata.lower_disp_limit);
-                    widget->setHighError(data.edata.upper_disp_limit);
-                }
-
-                // warning limits, when not specified set alarm limits
-                if(data.edata.lower_warning_limit != data.edata.upper_warning_limit) {
-                   widget->setLowWarning(data.edata.lower_warning_limit);
-                   widget->setHighWarning(data.edata.upper_warning_limit);
-                } else if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
-                    widget->setHighWarning(data.edata.upper_disp_limit);
-                    widget->setLowWarning(data.edata.lower_disp_limit);
-                } else {
-                    widget->setHighWarning(1000.0);
-                    widget->setLowWarning(0.0);
-                }
-
-                // HOPR and LOPR
-                if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
-                    widget->setMaxValue(data.edata.upper_disp_limit);
-                    widget->setMinValue(data.edata.lower_disp_limit);
-                } else {
-                    widget->setMaxValue(1000.0);
-                    widget->setMinValue(0.0);
-                }
-                widget->update();
-            }
-            widget->setValue((int) data.edata.rvalue);
-        }
+        Q_UNUSED(widget);
+        EAbstractGauge *gauge =  qobject_cast<EAbstractGauge *>(w);
+        UpdateGauge(gauge, data);
 
         // circular gauge  ==================================================================================================================
     } else if (caCircularGauge *widget = qobject_cast<caCircularGauge *>(w)) {
         //qDebug() << "we have a linear gauge" << value;
-
-        if(data.edata.connected) {
-            if((widget->isExternalEnabled()) && (data.edata.initialize)) {
-
-                // when no limits defined then say no external limits
-                if( (data.edata.lower_alarm_limit == data.edata.upper_alarm_limit) &&
-                    (data.edata.lower_warning_limit == data.edata.upper_warning_limit) &&
-                    (data.edata.upper_disp_limit == data.edata.lower_disp_limit) ) {
-                    widget->setExternalEnabled(false);
-                }
-
-                if(data.edata.lower_alarm_limit != data.edata.upper_alarm_limit) {
-                   widget->setLowError(data.edata.lower_alarm_limit);
-                   widget->setHighError(data.edata.upper_alarm_limit);
-                } else {
-                   widget->setLowError(data.edata.lower_disp_limit);
-                   widget->setHighError(data.edata.upper_disp_limit);
-                }
-
-                // warning limits, when not specified set alarm limits
-                if(data.edata.lower_warning_limit != data.edata.upper_warning_limit) {
-                   widget->setLowWarning(data.edata.lower_warning_limit);
-                   widget->setHighWarning(data.edata.upper_warning_limit);
-                } else if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
-                    widget->setHighWarning(data.edata.upper_disp_limit);
-                    widget->setLowWarning(data.edata.lower_disp_limit);
-                } else {
-                    widget->setHighWarning(1000.0);
-                    widget->setLowWarning(0.0);
-                }
-
-                // HOPR and LOPR
-                if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
-                    widget->setMaxValue(data.edata.upper_disp_limit);
-                    widget->setMinValue(data.edata.lower_disp_limit);
-                } else {
-                    widget->setMaxValue(1000.0);
-                    widget->setMinValue(0.0);
-                }
-                widget->update();
-            }
-            widget->setValue((int) data.edata.rvalue);
-        }
+        Q_UNUSED(widget);
+        EAbstractGauge *gauge =  qobject_cast<EAbstractGauge *>(w);
+        UpdateGauge(gauge, data);
 
         // byte ==================================================================================================================
     } else if (caByte *widget = qobject_cast<caByte *>(w)) {
@@ -1813,8 +1841,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 widget->setAlarmColors(data.edata.severity);
             }
         } else {
-            widget->setAlarmColors(NOTCONNECTED);
-            widget->setProperty("Connect", false);
+            SetColorsNotConnected;
         }
 
         // lineEdit and textEntry ====================================================================================================
@@ -1883,7 +1910,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         } else {
             widget->setText("");
-            widget->setAlarmColors(NOTCONNECTED, 0.0, bg, fg);
+            widget->setAlarmColors(NOTCONNECTED, 0.0, bg, fg);        \
             widget->setProperty("Connect", false);
         }
         if (caTextEntry *widget = qobject_cast<caTextEntry *>(w)) {
@@ -1909,12 +1936,10 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 widget->setAlarmColors(status);
             }
 
-            // treat visibility if defined
             setObjectVisibility(widget, data.edata.rvalue);
 
         } else {
-            widget->setAlarmColors(NOTCONNECTED);
-            widget->setProperty("Connect", false);
+            SetColorsNotConnected;
         }
 
         // Polyline ==================================================================================================================
@@ -1935,12 +1960,10 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 widget->setAlarmColors(status);
             }
 
-            // treat visibility if defined
             setObjectVisibility(widget, data.edata.rvalue);
 
         } else {
-            widget->setAlarmColors(NOTCONNECTED);
-            widget->setProperty("Connect", false);
+            SetColorsNotConnected;
         }
 
         // Led ==================================================================================================================
@@ -2016,12 +2039,12 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
             // monitor for scale will change the above set limits
             if((XorY == caCartesianPlot::CH_Xscale) || (XorY == caCartesianPlot::CH_Yscale)) {
-               if(XorY == caCartesianPlot::CH_Xscale) {
-                   widget->setScaleXlimits(data.edata.rvalue, curvNB);
-               } else {
-                   widget->setScaleYlimits(data.edata.rvalue, curvNB);
-               }
-               // qDebug() << "scale monitor from" << data.pv << data.edata.rvalue << "min/max" << data.specData[0] << "scale" << XorY;
+                if(XorY == caCartesianPlot::CH_Xscale) {
+                    widget->setScaleXlimits(data.edata.rvalue, curvNB);
+                } else {
+                    widget->setScaleYlimits(data.edata.rvalue, curvNB);
+                }
+                // qDebug() << "scale monitor from" << data.pv << data.edata.rvalue << "min/max" << data.specData[0] << "scale" << XorY;
             }
 
             if(!widget->property("Connect").value<bool>()) {
@@ -2038,24 +2061,24 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     y.reserve(data.edata.valueCount);
                     BuildVector(y);
                     widget->setData(y, curvNB, curvType, XorY);
-                // data from value
+                    // data from value
                 } else {
                     QVector<double> y;
                     y.append(data.edata.rvalue);
                     widget->setData(y, curvNB, curvType, XorY);
                 }
 
-            // trigger channel
+                // trigger channel
             } else if(XorY == caCartesianPlot::CH_Trigger) {
-               QVector<double> y;
-               for(int i=0; i < 4; i++) widget->setData(y, i, curvType, XorY);
+                QVector<double> y;
+                for(int i=0; i < 4; i++) widget->setData(y, i, curvType, XorY);
 
-            // count channel
+                // count channel
             } else if(XorY == caCartesianPlot::CH_Count) {
                 //qDebug() << "count channel" << data.edata.rvalue << (int) (data.edata.rvalue + 0.5);
                 widget->setCountNumber((int) (data.edata.rvalue + 0.5));
 
-            // erase channel
+                // erase channel
             } else if(XorY == caCartesianPlot::CH_Erase) {
                 if(widget->getEraseMode() == caCartesianPlot::ifnotzero) {
                     if((int) data.edata.rvalue != 0) widget->erasePlots();
@@ -2064,7 +2087,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 }
             }
 
-        // not connected
+            // not connected
         } else {
             widget->setCountNumber(0);
             widget->setWhiteColors();
@@ -2092,7 +2115,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 }
                 // do this for redisplaying legend with correct limits
                 if((widget->getYscalingMin(actPlot) == caStripPlot::Channel) ||
-                   (widget->getYscalingMax(actPlot) == caStripPlot::Channel)) {
+                        (widget->getYscalingMax(actPlot) == caStripPlot::Channel)) {
                     widget->resize(widget->width()+1, widget->height()+1);
                     widget->resize(widget->width()-1, widget->height()-1);
                 }
@@ -2248,9 +2271,9 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             } else if(data.specData[0] == 7) { // x center of mass if present
                 widget->dataProcessing((int) data.edata.rvalue, 0);
             } else if(data.specData[0] == 8) { // y center of mass if present
-               widget->dataProcessing((int) data.edata.rvalue, 1);
+                widget->dataProcessing((int) data.edata.rvalue, 1);
             } else if(data.specData[0] == 9) { // width if present
-               widget->dataProcessing((int) data.edata.rvalue, 2);
+                widget->dataProcessing((int) data.edata.rvalue, 2);
             } else if(data.specData[0] == 10) { // height if present
                 widget->dataProcessing((int) data.edata.rvalue, 3);
             } else if(data.specData[0] == 0) { // data channel
@@ -2265,21 +2288,15 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
     } else if (caMessageButton *widget = qobject_cast<caMessageButton *>(w)) {
 
         if(data.edata.connected) {
-              if (widget->getColorMode() == caMessageButton::Alarm) {
-                      widget->setAlarmColors(data.edata.severity);
-                  // case of static mode
-              } else {
-                  // done at initialisation, we have to set it back after no connect
-                  if(!widget->property("Connect").value<bool>()) {
-                      widget->setNormalColors();
-                      widget->setProperty("Connect", true);
-                  }
-              }
+            if (widget->getColorMode() == caMessageButton::Alarm) {
+                widget->setAlarmColors(data.edata.severity);
+                // case of static mode
+            } else {
+                SetColorsBack;
+            }
 
-          // set no connection color
         } else {
-          widget->setAlarmColors(NOTCONNECTED);
-          widget->setProperty("Connect", false);
+            SetColorsNotConnected;
         }
         widget->setAccessW(data.edata.accessW);
 
@@ -2288,6 +2305,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         //qDebug() << "unrecognized widget" << w->metaObject()->className();
     }
 }
+
 
 /**
  * callback will write value to device
@@ -2380,9 +2398,9 @@ void CaQtDM_Lib::Callback_MenuClicked(const QString& text)
     if(!menu->getAccessW()) return;
 
     if(menu->getPV().length() > 0) {
-      //qDebug() << "menu_clicked" << text << menu->getPV();
-      QStringsToChars(menu->getPV(), text,  menu->objectName().toLower());
-      EpicsSetValue(param1, 0.0, 0, param2, param3, errmess, 0);
+        //qDebug() << "menu_clicked" << text << menu->getPV();
+        QStringsToChars(menu->getPV(), text,  menu->objectName().toLower());
+        EpicsSetValue(param1, 0.0, 0, param2, param3, errmess, 0);
     }
     // display label again when configured with it
     if(menu->getLabelDisplay()) {
@@ -2547,7 +2565,7 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
     }
 
     // read output, but blocks application until child exits
-/*
+    /*
     QByteArray data;
     while(proc->waitForReadyRead())
         data.append(proc->readAll());
@@ -2758,20 +2776,15 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     } else if(caStripPlot* widget = qobject_cast<caStripPlot *>(w)) {
         QString pvs = widget->getPVS();
         QStringList vars = pvs.split(";", QString::SkipEmptyParts);
-        nbPV = min(vars.count(), MAXSTRIPS);
+        nbPV = min(vars.count(), caStripPlot::MAXCURVES);
         for(int i=0; i<nbPV; i++) {
             pv[i] = vars.at(i).trimmed();
         }
     } else if(caCartesianPlot* widget = qobject_cast<caCartesianPlot *>(w)) {
         nbPV = 0;
-        for(int i=0; i < 6; i++) {
+        for(int i=0; i < caCartesianPlot::curveCount; i++) {
             QStringList thisString;
-            if(i==0) thisString = widget->getPV_1().split(";");
-            if(i==1) thisString = widget->getPV_2().split(";");
-            if(i==2) thisString = widget->getPV_3().split(";");
-            if(i==3) thisString = widget->getPV_4().split(";");
-            if(i==4) thisString = widget->getPV_5().split(";");
-            if(i==5) thisString = widget->getPV_6().split(";");
+            thisString = widget->getPV(i).split(";");
             if(thisString.count() == 2 && thisString.at(0).trimmed().length() > 0 && thisString.at(1).trimmed().length() > 0) {
                 pv[nbPV++] = thisString.at(0).trimmed();
                 pv[nbPV++] = thisString.at(1).trimmed();
@@ -2818,12 +2831,12 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     myMenu.addAction("Get Info");
     myMenu.addAction("Print");
     if(caStripPlot* widget = qobject_cast<caStripPlot *>(w)) {
-       Q_UNUSED(widget);
-       myMenu.addAction("Change Axis");
+        Q_UNUSED(widget);
+        myMenu.addAction("Change Axis");
     }
     if(caCartesianPlot* widget = qobject_cast<caCartesianPlot *>(w)) {
-       Q_UNUSED(widget);
-       myMenu.addAction("Change Axis");
+        Q_UNUSED(widget);
+        myMenu.addAction("Change Axis");
     }
 
     QAction* selectedItem = myMenu.exec(pos);
@@ -2980,11 +2993,11 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             print();
         } else if(selectedItem->text().contains("Change Axis")) {
             if(caStripPlot* widget = qobject_cast<caStripPlot *>(w)) {
-               limitsStripplotDialog dialog(widget, mutexKnobData, "stripplot modifications", this);
-               dialog.exec();
+                limitsStripplotDialog dialog(widget, mutexKnobData, "stripplot modifications", this);
+                dialog.exec();
             } else if(caCartesianPlot* widget = qobject_cast<caCartesianPlot *>(w)) {
-               limitsCartesianplotDialog dialog(widget, mutexKnobData, "cartesianplot modifications", this);
-               dialog.exec();
+                limitsCartesianplotDialog dialog(widget, mutexKnobData, "cartesianplot modifications", this);
+                dialog.exec();
             }
         }
     } else {
@@ -3362,10 +3375,10 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
                         //widget->setText("");
                     }
                 }
-            // normal int or long
+                // normal int or long
             } else
                 EpicsSetValue((char*) kPtr->pv, 0.0, longValue, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess, 0);
-            }
+        }
 
         break;
 
@@ -3403,8 +3416,8 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
                 sprintf(asc, "SoftPV: %s  set to value: \"%s\"\n", kPtr->pv, textValue);
                 postMessage(QtDebugMsg, asc);
             } else {
-              //qDebug() << "we should set a double independently if pv has another type ";
-              EpicsSetValue((char*) kPtr->pv, value, 0, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess, 1);
+                //qDebug() << "we should set a double independently if pv has another type ";
+                EpicsSetValue((char*) kPtr->pv, value, 0, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess, 1);
             }
         } else {
             char asc[100];
