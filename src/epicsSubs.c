@@ -553,7 +553,7 @@ void ClearMonitor(knobData *kData)
 }
 
 
-int EpicsSetValue(char *pv, float rdata, int32_t idata, char *sdata, char *object, char *errmess, int treatAsDouble)
+int EpicsSetValue(char *pv, float rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType)
 {
     chid     ch;
     chtype   chType;
@@ -604,7 +604,8 @@ int EpicsSetValue(char *pv, float rdata, int32_t idata, char *sdata, char *objec
 
     chType = ca_field_type(ch);
 
-    if(treatAsDouble == 1) chType = DBF_FLOAT;
+    if(forceType == 1) chType = DBF_FLOAT;
+    else if(forceType == 2) chType = DBF_INT;
 
     switch (chType) {
     case DBF_STRING:
