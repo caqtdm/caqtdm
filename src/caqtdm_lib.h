@@ -109,6 +109,7 @@ private slots:
     void Callback_ENumeric(double value);
     void Callback_Slider(double value);
     void Callback_MessageButton(int type);
+    void Callback_ToggleButton(bool type);
 
     void Callback_UpdateWidget(int, QWidget *w, const QString& units,const QString& fec,
                                const QString& statusString, const knobData& data);

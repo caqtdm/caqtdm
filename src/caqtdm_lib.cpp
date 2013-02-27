@@ -171,7 +171,7 @@ Q_DECLARE_METATYPE(QList<int>)
 extern "C" int CreateAndConnect(int index, knobData *data, int rate);
 extern "C" void ClearMonitor(knobData *kData);
 extern "C" void PrepareDeviceIO();
-extern "C" int EpicsSetValue(char *pv, float rdata, long idata, char *sdata, char *object, char *errmess, int treatAsDouble);
+extern "C" int EpicsSetValue(char *pv, float rdata, long idata, char *sdata, char *object, char *errmess, int forceType);
 extern "C" void TerminateDeviceIO();
 
 MutexKnobData *mutexKnobData;
@@ -528,7 +528,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         widget->raise();
 
-        widget->setProperty("Taken", true);
+        widget->setProperty("Taken", true);  
 
         //==================================================================================================================
     } else if(caMenu* widget = qobject_cast<caMenu *>(w1)) {
@@ -746,6 +746,21 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         widget->setProperty("Taken", true);
 
+
+        //==================================================================================================================
+    } else if(caToggleButton* widget = qobject_cast<caToggleButton *>(w1)) {
+
+       // qDebug() << "create caToggleButton";
+
+        connect(widget, SIGNAL(toggleButtonSignal(bool)), this, SLOT(Callback_ToggleButton(bool)));
+
+        addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
+        widget->setPV(pv);
+
+        widget->raise();
+
+        widget->setProperty("Taken", true);
+
         //==================================================================================================================
     } else if(caLed* widget = qobject_cast<caLed *>(w1)) {
 
@@ -878,7 +893,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         reaffectText(map, &fileName);
         QStringList openFile = fileName.split(".", QString::SkipEmptyParts);
 
-
         // ui file or prc file ?
         if((openFile.count() > 1) && openFile.at(1).contains("prc")) {
             //qDebug() << "prc file";
@@ -909,6 +923,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 #ifdef PRC
                 ParsePepFile *parsefile = new ParsePepFile(fileName);
                 thisW = parsefile->load(this);
+                delete parsefile;
 #else
                 thisW = (QWidget*) 0;
 #endif
@@ -2006,6 +2021,29 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             widget->setConnectedColors(false);
         }
 
+        // Toggle =====================================================================================================
+    } else if (caToggleButton *widget = qobject_cast<caToggleButton *>(w)) {
+        //qDebug() << "caToggleButton" << widget->objectName() << data.pv;
+
+        if(data.edata.connected) {
+            int colorMode = widget->getColorMode();
+           if(colorMode == caToggleButton::Alarm) {
+                widget->setAlarmColors(data.edata.severity);
+            } else {
+               SetColorsBack;
+            }
+
+            if( data.edata.ivalue > 0) {
+                widget->setState(true);
+            } else {
+                widget->setState(false);
+            }
+
+            widget->setAccessW(data.edata.accessW);
+        } else {
+            SetColorsNotConnected;
+        }
+
         // cartesian plot ==================================================================================================================
     } else if (caCartesianPlot *widget = qobject_cast<caCartesianPlot *>(w)) {
         //qDebug() << "caCartesianPlot" << widget->objectName() << data.pv << data.specData[0] << data.specData[1]  << data.specData[2];
@@ -2480,6 +2518,31 @@ void CaQtDM_Lib::Callback_MessageButton(int type)
     } else if(type == 1) {  // released
         if(w->getReleaseMessage().size() > 0)
             TreatRequestedValue(w->getReleaseMessage(), caTextEntry::decimal, w1);
+    }
+}
+
+
+/**
+ * callback will write value to device
+ */
+void CaQtDM_Lib::Callback_ToggleButton(bool type)
+{
+    long value;
+    char errmess[255];
+    QString text(" ");
+    caToggleButton *w = qobject_cast<caToggleButton *>(sender());
+
+    if(!w->getAccessW()) return;
+
+    if(!type) {         // toggle cleared
+        value=0;
+    } else  {           // toggle checked
+        value=1;
+    }
+
+    if(w->getPV().length() > 0) {
+        QStringsToChars(w->getPV(), text,  w->objectName().toLower());
+        EpicsSetValue(param1, 0.0, value, param2, param3, errmess, 2);
     }
 }
 
