@@ -15,7 +15,7 @@ rm -f ./QtTunes/Makefile
 
 echo =========== clean all ==================
 qmake all.pro
-dye make distclean
+make distclean
 
 echo ============ make all =================
 qmake all.pro
