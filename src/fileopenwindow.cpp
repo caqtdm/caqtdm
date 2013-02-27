@@ -352,6 +352,9 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
 
         if(geometry != "") {
             parse_and_set_Geometry(mainWindow, geometry);
+        // for this kind of file we resize to a minimum while the size is not known
+        } else if (FileName.contains("prc")) {
+            mainWindow->resize(mainWindow->minimumSizeHint());
         }
 
         if(macroString.size() > 0) {
