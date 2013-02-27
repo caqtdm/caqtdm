@@ -121,7 +121,6 @@ void caInclude::setFileName(QString const &filename)
             layout->addWidget(thisLoadedWidget);
             setLayout(layout);
             thisLoadedWidget->show();
-
             return;
         }
 #endif

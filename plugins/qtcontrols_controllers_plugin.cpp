@@ -252,6 +252,24 @@ caMessageButtonInterface::caMessageButtonInterface(QObject* parent) : CustomWidg
         d_toolTip = "[send a predefined value/command to a pv]";
 }
 
+QWidget *caToggleButtonInterface::createWidget(QWidget* parent)
+{
+	return new caToggleButton(parent);
+}
+
+caToggleButtonInterface::caToggleButtonInterface(QObject* parent) : CustomWidgetInterface(parent)
+{
+        strng name[1], type[1];
+        strcpy(name[0], "channel");
+        strcpy(type[0], "multiline");
+        d_domXml = XmlFunc("caToggleButton", "catogglebutton", 0, 0, 100, 22, name, type, 1);
+	d_name = "caToggleButton";
+	d_include = "caToggleButton";
+	d_icon = QPixmap(":pixmaps/radiobutton.png");
+        d_toolTip = "[toggle bit to a pv]";
+}
+
+
 
 CustomWidgetCollectionInterface::CustomWidgetCollectionInterface(QObject *parent): QObject(parent)
 {
@@ -264,6 +282,7 @@ CustomWidgetCollectionInterface::CustomWidgetCollectionInterface(QObject *parent
     d_plugins.append(new caShellCommandInterface(this));
     d_plugins.append(new caTextEntryInterface(this));
     d_plugins.append(new caMessageButtonInterface(this));
+    d_plugins.append(new caToggleButtonInterface(this)); 
 }
 
 QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface::customWidgets(void) const

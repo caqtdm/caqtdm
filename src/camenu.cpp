@@ -18,6 +18,7 @@
 
 caMenu::caMenu(QWidget *parent) : QComboBox(parent)
 {
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     defaultPalette = palette();
     setLabelDisplay(false);
     setAccessW(true);

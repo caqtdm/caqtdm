@@ -152,6 +152,16 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
+class caToggleButtonInterface : public CustomWidgetInterface
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerCustomWidgetInterface)
+	
+public:
+    caToggleButtonInterface(QObject* parent);
+    virtual QWidget* createWidget(QWidget* parent);
+};
+
 
 
 #endif

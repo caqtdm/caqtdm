@@ -61,6 +61,7 @@ private:
 
     void writeChoice(QString pv, QByteArray *array);
     void writeWheelswitch(QString format, QString pv, QByteArray *array);
+    void writeTogglebutton(QString pv, QByteArray *array);
     void writeLineEdit(QString format, QString pv, QByteArray *array);
     void writeShellCommand(QString label, QString command, QByteArray *array);
     void  replaceStrings(gridInfo &grid);

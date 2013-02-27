@@ -37,6 +37,7 @@ class QTCON_EXPORT caMessageButton : public EPushButton
 public:
 
     caMessageButton(QWidget *parent);
+
     enum colMode {Static=0, Alarm};
 
     void setColors(QColor bg, QColor fg,  QColor hover, QColor border);

@@ -31,5 +31,6 @@
 #include <cacamera.h>
 #include <cacalc.h>
 #include <capolylinetaskmenu.h> 
+#include <catogglebutton.h>
 #endif
 
