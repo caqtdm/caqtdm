@@ -136,18 +136,27 @@ void caMenu::setAccessW(int access)
 
 void caMenu::populateCells(QStringList stringlist)
 {
+
+    // remove first event filter for the actual items
+    QList<QWidget*> widgets = this->findChildren<QWidget*>();
+    foreach (QWidget* widget, widgets) widget->removeEventFilter(this);
+
     clear();
     if(getLabelDisplay()) {
         addItem(getLabel());
     }
     addItems(stringlist);
+
+    // add now the event filter for the new items
+    widgets = this->findChildren<QWidget*>();
+    foreach (QWidget* widget, widgets) widget->installEventFilter(this);
 }
 
 bool caMenu::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::Enter) {
         if(!thisAccessW) {
-            // in principle this is not really necessary, while going into the submenu, triggers QEvent::Leave
+            // disable also menu items
             for (int i=0; i < this->count(); i++) {
               QModelIndex index = model()->index(i, 0);
               QVariant v(0);   // disable flag
@@ -160,6 +169,7 @@ bool caMenu::eventFilter(QObject *obj, QEvent *event)
         }
     } else if(event->type() == QEvent::Leave) {
         QApplication::restoreOverrideCursor();
+        // enable menu items again
         for (int i=0; i < this->count(); i++) {
           QModelIndex index = model()->index(i, 0);
           QVariant v(1 | 32);  // enable flag
