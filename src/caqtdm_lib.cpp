@@ -2563,7 +2563,7 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
     QString argslist = choice->getArgs();
 
     // we can have a semicolum (;) between quotes that should not be treated as separator
-    // instead of a real parsing, replace the ; between quotes by an unused character ?
+    // instead of a real parsing, replace the ; between quotes by an unused character \e
     bool inside = false;
     for (int i = 0; i < argslist.size(); i++) {
         if((!inside) && ((argslist.at(i) == QChar('\'')) || (argslist.at(i) == QChar('\"')))) {
@@ -2573,7 +2573,7 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
         }
         if (inside) {
             if(argslist.at(i) == QChar(';')) {
-                argslist.replace(i, 1, "?");
+                argslist.replace(i, 1, "\e");
             }
         }
     }
@@ -2584,7 +2584,7 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
         QString command;
         command.append(commands[indx].trimmed());
         command.append(" ");
-        args[indx].replace("?", ";");
+        args[indx].replace("\e", ";");
         command.append(args[indx].trimmed());
         // replace medm by caQtDM
         command.replace("camedm ", "caQtDM ");
