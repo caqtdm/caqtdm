@@ -102,10 +102,6 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
 
         PRINT(printf("line : <%s>\n", line.toAscii().constData()));
 
-        // replace all tabs by blancs
-
-        line = line.replace("\t", " ");
-
         // replace all blancs (except these between quotes by ;
         bool inside = false;
         for (int i = 0; i < line.size(); i++) {
@@ -116,12 +112,12 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
             }
             if (!inside) {
                 if(line.at(i) == QChar(' ')) {
-                    line.replace(i, 1, ";");
+                    line.replace(i, 1, "\e");
                 }
             }
         }
 
-        QStringList elements= line.split(";",  QString::SkipEmptyParts);
+        QStringList elements= line.split("\e",  QString::SkipEmptyParts);
 /*
         printf("%d %s\n", elements.count(), line.toAscii().constData());
         for (int i=0; i< elements.count(); i++) {
@@ -189,6 +185,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                         ll++;
                         PRINT(printf("commmand detected <%s>\n", elements.at(ll).toAscii().constData()));
                         gridLayout[actualLine][actualColumn].command = elements.at(ll).toAscii().constData();
+                        gridLayout[actualLine][actualColumn].command =  gridLayout[actualLine][actualColumn].command.replace("\"", "");
                     }
 
                     else if(elements.at(ll).contains("-text")) {
@@ -367,6 +364,7 @@ void ParsePepFile::getColumnPositions(int nbItems, int actualGridColumn, int spa
 
     for(int i=0; i<MaxGrid; i++) {
         span[i] = 0;
+        sum[i] = 0;
     }
 
     // in case only one item has to put into a row with a span > 1 we have to calculate the internal colum position
@@ -392,13 +390,13 @@ void ParsePepFile::getColumnPositions(int nbItems, int actualGridColumn, int spa
     PRINT(printf("========= more than one item nbitems=%d with span=%d\n", nbItems, spanGrid));
 
     sum[0] = nbItems;
-    for(int i=1; i< spanGrid; i++) {
+    for(int i=1; i< qMin(spanGrid, nbItems); i++) {
         sum[i] = maxCols[actualGridColumn+i];
         sum[0] -= sum[i];
         // nothing left in this column
         if(sum[0] <= 0) {
             sum[0] = 1;
-            sum[i]=nbItems - sum[0];
+            sum[i]= nbItems - sum[0];
         }
         if(sum[0] == 1) break;
     }
@@ -841,12 +839,16 @@ void ParsePepFile::writeTogglebutton(QString pv, QByteArray *array)
 
 void ParsePepFile::writeShellCommand(QString label, QString command, QByteArray *array)
 {
+    QString newCommand = "\"";
+    newCommand.append(command);
+    newCommand.append("\"");
     writeOpenTag("widget class=\"caShellCommand\" name=\"cashellcommand\"", array);
 
     writeSimpleProperty("label", "string", label, array);
     writeSimpleProperty("labels", "string", "1", array);
-    writeSimpleProperty("files", "string", command, array);
-    writeSimpleProperty("args", "string", "", array);
+    writeSimpleProperty("files", "string", "1", array);
+
+    writeSimpleProperty("args", "string", newCommand, array);
     writeOpenProperty("minimumSize", array);
     writeOpenTag("size", array);
     writeTaggedString("height", "24", array);
