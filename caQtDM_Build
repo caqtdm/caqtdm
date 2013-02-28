@@ -1,17 +1,23 @@
 echo =========== remove binaries from directory =============
-rm ./caQtDM_Binaries/lib*.so
-rm ./caQtDM_Binaries/caQtDM*
-rm ./caQtDM_Binaries/adl2ui
+rm -f ./caQtDM_Binaries/lib*.so
+rm -f ./caQtDM_Binaries/caQtDM*
+rm -f ./caQtDM_Binaries/adl2ui
 
 
 echo ========== remove makefiles from directories ============
 rm -f ./caQtDM/Makefile
+rm -f ./caQtDM/caQtDM1/Makefile
+rm -f ./caQtDM/caQtDM2/Makefile
 rm -f ./caQtDM/parser/Makefile
-rm -f ./caQtDM_lib/Makefile
+rm -f ./caQtDM_Lib/Makefile
+rm -f ./caQtDM_Lib/caQtDM_Lib1/Makefile
+rm -f ./caQtDM_Lib/caQtDM_Lib2/Makefile
 rm -f ./caQtDM_QtControls/Makefile
 rm -f ./caQtDM_QtControls/plugins/Makefile
 rm -f ./probeQtProscan/Makefile
 rm -f ./QtTunes/Makefile
+rm -f ./QtTunes/QtTunes1/Makefile
+rm -f ./QtTunes/QtTunes2/Makefile
 
 echo =========== clean all ==================
 qmake all.pro
