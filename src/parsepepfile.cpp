@@ -236,6 +236,10 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                 widgetType = widgetType.toLower();
                 widgetText = widgetText.replace("\"", "");
 
+                // if only blancs then there should be no text
+                QString aux = widgetText.trimmed();
+                if(aux.size() < 1) widgetText = "";
+
                 gridLayout[actualLine][actualColumn].span = span;
                 gridLayout[actualLine][actualColumn].widgetType = widgetType;
                 gridLayout[actualLine][actualColumn].widgetText = widgetText;
@@ -313,15 +317,19 @@ void ParsePepFile::DisplayFile(int nbRows, int nbCols, QByteArray *array)
         }
     }
 /*
+    printf("maxcols\n");
     for(int j=0; j<nbCols; j++) printf("%d ", maxCols[j]);
     printf("\n");
 */
-
     for (int j=0; j<nbCols; j++) {
         firstCols[j] = 0;
         for(int k=0; k<j; k++) firstCols[j] += maxCols[k];
     }
-
+/*
+    printf("firstcols\n");
+    for(int j=0; j<nbCols; j++) printf("%d ", firstCols[j]);
+    printf("\n");
+*/
 
     for(int i=0; i< nbRows; i++) {
         for (int j=0; j<nbCols; j++) {
