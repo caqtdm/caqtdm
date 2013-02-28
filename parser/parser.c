@@ -441,6 +441,8 @@ void parseDynAttrParam(DisplayInfo *displayInfo, char *widget)
     int i;
     char chanName[6];
 
+    UNUSED(widget);
+
     do {
         switch( (tokenType=getToken(displayInfo,token)) ) {
         case T_WORD:
@@ -484,6 +486,9 @@ void parseAttr(DisplayInfo *displayInfo, char *widget)
     TOKEN tokenType;
     int nestingLevel = 0;
     int clr = 0;
+
+    UNUSED(widget);
+
     do {
         switch( (tokenType=getToken(displayInfo,token)) ) {
         case T_WORD:
@@ -566,6 +571,8 @@ void parseMonitor(DisplayInfo *displayInfo, char *widget)
     int nestingLevel = 0;
     int clr = 0;
     int bclr = 0;
+
+    UNUSED(widget);
 
     do {
         switch( (tokenType=getToken(displayInfo,token)) ) {
@@ -854,6 +861,8 @@ void parseRelatedDisplayEntry(DisplayInfo *displayInfo, char *widget, char *labe
     TOKEN tokenType;
     int nestingLevel = 0;
 
+    UNUSED(widget);
+
     do {
         switch(tokenType=getToken(displayInfo,token)) {
         case T_WORD:
@@ -897,6 +906,8 @@ void parseGrid(DisplayInfo *displayInfo, char *widget)
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
     int nestingLevel = 0;
+
+    UNUSED(widget);
 
     do {
         switch( (tokenType=getToken(displayInfo,token)) ) {
@@ -1028,6 +1039,8 @@ void parsePlotcom(DisplayInfo *displayInfo, char *widget)
     int nestingLevel = 0;
     int clr = 0;
     int bclr = 0;
+
+    UNUSED(widget);
 
     do {
         switch( (tokenType=getToken(displayInfo,token)) ) {
@@ -1545,6 +1558,8 @@ void parseShellCommandEntry(DisplayInfo *displayInfo, char *widget, char *label,
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
     int nestingLevel = 0;
+
+    UNUSED(widget);
 
     do {
         switch( (tokenType=getToken(displayInfo,token)) ) {
@@ -2803,6 +2818,8 @@ void parsePolygonPoints(DisplayInfo *displayInfo, char *widget, int offsetX, int
     int x, y;
     char points[LONGSTRING];
 
+    UNUSED(widget);
+
     points[0] = '\0';
     nestingLevel = 0;
     do {
@@ -3183,7 +3200,7 @@ void *parseText(DisplayInfo *displayInfo, FrameOffset * offset)
              && (tokenType != T_EOF) );
 
     if(strlen(textix) > 0) {
-        int newWidth = .6 * object.height * strlen(textix);
+        uint newWidth = .6 * object.height * strlen(textix);
         if(newWidth > object.width) object.width = newWidth;
     }
     writeRectangleDimensions(&object, offset, "caLabel", True);
@@ -3202,6 +3219,8 @@ void parsePolylinePoints(DisplayInfo *displayInfo, char *widget, int offsetX, in
     int nestingLevel;
     int x, y;
     char points[LONGSTRING];
+
+    UNUSED(widget);
 
     points[0] = '\0';
     nestingLevel = 0;
@@ -3869,6 +3888,8 @@ void parseOldDlColor(DisplayInfo *displayInfo, FILE *filePtr,
 DlColormap *createDlColormap(DisplayInfo *displayInfo)
 {
     DlColormap *dlColormap;
+
+    UNUSED(displayInfo);
 
     dlColormap = (DlColormap *)malloc(sizeof(DlColormap));
     if(!dlColormap) return 0;

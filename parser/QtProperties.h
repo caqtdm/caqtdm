@@ -13,6 +13,8 @@ typedef struct _zOrder {
 #define True 1==1
 #define False !True
 
+#define UNUSED(x) (void)(x)
+
 extern myParser* myParserPtr;
 extern myParser* C_Parser(myParser* p, char *strng);
 extern myParser* C_writeOpenTag(myParser* p, char *type, char *cls, char *name );

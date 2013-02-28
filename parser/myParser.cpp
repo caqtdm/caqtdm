@@ -190,6 +190,7 @@ void myParser::Init(myParser* adlParser)
 }
 
 void myParser::writeMessage(char *mess) {
+    Q_UNUSED(mess);
     //qDebug() << mess;
 }
 

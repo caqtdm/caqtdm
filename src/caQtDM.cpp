@@ -23,6 +23,9 @@
 #include <signal.h>
 
 static void unixSignalHandler(int signum) {
+
+    Q_UNUSED(signum);
+
     //qDebug("DBG: main.cpp::unixSignalHandler(). signal = %s\n", strsignal(signum));
 
     /*

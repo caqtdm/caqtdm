@@ -156,6 +156,9 @@ void Qt_setWheelSwitchForm(char *widget, char *token)
 {
     int width, precision;
     char asc[10];
+
+    UNUSED(widget);
+
     wheelSwitchFormat(token, &width, &precision);
     if(precision != 0) {
       sprintf(asc, "%d", width-precision-2);
@@ -188,6 +191,9 @@ void Qt_setMaximumLimit(char *widget, int pen, char *token) {
 }
 
 void Qt_setPrecision(char *widget, int pen, char *token) {
+
+    UNUSED(pen);
+
     if(!strcmp(widget, "caStripPlot")) return;
     if(!strcmp(widget, "caThermo")) return;
     if(!strcmp(widget, "caSlider")) return;
@@ -282,6 +288,9 @@ void Qt_setMaximumLimitSource(char *widget, int pen, char *token)
 void Qt_setPrecisionSource(char *widget, int pen, char *token)
 {
     char asc[80], aux[80];
+
+    UNUSED(pen);
+
     if(!strcmp(widget, "caStripPlot")) return;
     if(!strcmp(widget, "caThermo")) return;
     if(!strcmp(widget, "caSlider")) return;
@@ -295,6 +304,8 @@ void Qt_setPrecisionSource(char *widget, int pen, char *token)
 }
 
 void Qt_setColorFill(char *widget) {
+
+    UNUSED(widget);
 
     C_writeOpenProperty(myParserPtr, "fillstyle");
     C_writeTaggedString(myParserPtr, "enum", "Filled");
@@ -369,24 +380,39 @@ static void Qt_setColor(char *property, int r, int g, int b, int alpha)
 }
 
 void Qt_setColorForeground(char *widget, int r, int g, int b, int alpha) {
+
+    UNUSED(widget);
+
     Qt_setColor("foreground", r, g, b, alpha);
 }
 
 void Qt_setColorBackground(char *widget, int r, int g, int b, int alpha) {
+
+    UNUSED(widget);
+
     Qt_setColor("background", r, g, b, alpha);
 }
 
 void Qt_setColorScale(char *widget, int r, int g, int b, int alpha) {
+
+    UNUSED(widget);
+
     Qt_setColor("scaleColor", r, g, b, alpha);
 }
 
 void Qt_setColorLine(char *widget, int r, int g, int b, int alpha) {
+
+    UNUSED(widget);
+
     Qt_setColor("lineColor", r, g, b, alpha);
 }
 
 void Qt_setColorTrace(char *widget, int r, int g, int b, int alpha, int trace)
 {
     char asc[80];
+
+    UNUSED(widget);
+
     sprintf(asc,"color_%d", trace);
     Qt_setColor(asc, r, g, b, alpha);
 }
@@ -395,6 +421,9 @@ void Qt_setColorTrace(char *widget, int r, int g, int b, int alpha, int trace)
 void Qt_setColormain(char *widget, int r, int g, int b, int alpha)
 {
     char asc[80];
+
+    UNUSED(widget);
+
     C_writeOpenProperty(myParserPtr, "palette");
 
     C_writeOpenTag(myParserPtr, "palette", "", "");
