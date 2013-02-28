@@ -3,6 +3,7 @@ CAQTDM_VERSION = V2.7.2
 # new in 2.7.2
 # a new control has been added: caToggleButton writing 0 or 1 to a channel
 # psi .prc files can be used in cainclude and can also be called directly like an ui file. file parsing and treatment are not yet finished for all cases
+# in camenu the menu items are now also non selectable when no write access
 
 # new in 2.7.1
 # lucida sans typewriter was not always taken, even when present. fallback to monospace had to be relaxed.
