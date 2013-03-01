@@ -89,6 +89,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
     QString widgetType ="";
     QString widgetText ="";
     QString channel ="";
+    QString separator((QChar)27);
 
     if (!file->open(QIODevice::ReadOnly | QIODevice::Text)) return ;
     // scan file
@@ -110,13 +111,13 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
             }
             if (!inside) {
                 if(line.at(i) == QChar(' ')) {
-                    line.replace(i, 1, "\e");
+                    line.replace(i, 1, separator);
                 }
             }
         }
 
         // break the line down in their elements
-        QStringList elements= line.split("\e",  QString::SkipEmptyParts);
+        QStringList elements= line.split(separator,  QString::SkipEmptyParts);
 /*
         printf("%d %s\n", elements.count(), line.toAscii().constData());
         for (int i=0; i< elements.count(); i++) {
