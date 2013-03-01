@@ -2584,6 +2584,7 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
         QString command;
         command.append(commands[indx].trimmed());
         command.append(" ");
+        // replace the special character back
         args[indx].replace("\e", ";");
         command.append(args[indx].trimmed());
         // replace medm by caQtDM
