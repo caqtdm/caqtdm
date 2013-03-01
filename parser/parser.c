@@ -3141,6 +3141,7 @@ void *parseText(DisplayInfo *displayInfo, FrameOffset * offset)
     DlObject object;
     int alignFound=False;
     int visibilityStatic = 0;
+	unsigned int newWidth = 0;
 
     static int number = 0;
     char widgetName[MAX_ASCII];
@@ -3200,7 +3201,7 @@ void *parseText(DisplayInfo *displayInfo, FrameOffset * offset)
              && (tokenType != T_EOF) );
 
     if(strlen(textix) > 0) {
-        uint newWidth = .6 * object.height * strlen(textix);
+        newWidth = .6 * object.height * strlen(textix);
         if(newWidth > object.width) object.width = newWidth;
     }
     writeRectangleDimensions(&object, offset, "caLabel", True);
