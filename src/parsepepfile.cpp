@@ -4,10 +4,9 @@
 
 ParsePepFile::ParsePepFile(QString filename)
 {
-    //char header[2000];
     QString header;
     QString footer;
-    //char footer[100];
+
     QFile *file = new QFile;
     int nbRows, nbCols;
 
@@ -49,35 +48,32 @@ ParsePepFile::ParsePepFile(QString filename)
 
     footer = QString("</layout></item></layout></widget></widget></ui>");
 
+    // copy first header to our byte array
     QByteArray *array= new QByteArray();
     array->append(header);
 
     buffer = new QBuffer();
 
+    // parese file
     file->setFileName(filename);
-
-    Initialize();
-
     TreatFile(nbRows, nbCols, file);
 
     PRINT(printf("nbRows=%d nbCols=%d\n", nbRows, nbCols));
 
+    // fill array with the scanned data
     DisplayFile(nbRows, nbCols, array);
 
+    // and finish with the footer
     array->append(footer);
+
+    // fill buffer with the byte array data
     buffer->open(QIODevice::ReadWrite);
     buffer->write(*array);
     buffer->close();
 
+    // delete allocated data
     delete file;
     delete array;
-}
-
-void ParsePepFile::Initialize()
-{
-    mapStringValues["comment"] = evComment;
-    mapStringValues["separator"] = evSeparator;
-    mapStringValues["end"] = evEnd;
 }
 
 void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
@@ -102,7 +98,9 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
 
         PRINT(printf("line : <%s>\n", line.toAscii().constData()));
 
-        // replace all blancs (except these between quotes by ;
+        // replace all tabs by blancs
+        line.replace("\t", " ");
+        // replace all blancs  by \e, except the ones between quotes
         bool inside = false;
         for (int i = 0; i < line.size(); i++) {
             if((!inside) && ((line.at(i) == QChar('\'')) || (line.at(i) == QChar('\"')) || (line.at(i) == QChar('{')) )) {
@@ -117,6 +115,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
             }
         }
 
+        // break the line down in their elements
         QStringList elements= line.split("\e",  QString::SkipEmptyParts);
 /*
         printf("%d %s\n", elements.count(), line.toAscii().constData());
@@ -1074,14 +1073,18 @@ QWidget* ParsePepFile::load(QWidget *parent)
 {
     QWidget *widget = new QWidget;
     QUiLoader loader;
+
+    /* used to output the data to an ui file for verification
     QFile file("out.ui");
     file.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(&file);
-
+    */
     buffer->open(QIODevice::ReadOnly);
 
+    /* output the data to the verification file
     out << buffer->data();
     file.close();
+    */
 
     buffer->seek(0);
     widget=loader.load(buffer, parent);

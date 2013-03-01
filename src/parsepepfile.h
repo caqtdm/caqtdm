@@ -17,7 +17,6 @@ class QTCON_EXPORT ParsePepFile
 
 public:
     ParsePepFile(QString filename);
-    void Initialize();
     QWidget *load(QWidget *parent);
 
 protected:
@@ -65,9 +64,7 @@ private:
     void writeLineEdit(QString format, QString pv, QByteArray *array);
     void writeShellCommand(QString label, QString command, QByteArray *array);
     void  replaceStrings(gridInfo &grid);
-    enum StringValue {evChannel, evComment, evSeparator, evEnd};
-    QMap<QString, StringValue> mapStringValues;
-    QSharedMemory sharedMemory;
+
     QBuffer *buffer;
 
     gridInfo gridLayout[MaxLines][MaxGrid];
