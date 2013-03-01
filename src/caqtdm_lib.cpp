@@ -2551,6 +2551,7 @@ void CaQtDM_Lib::Callback_ToggleButton(bool type)
  */
 void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
 {
+    QString separator((QChar)27);
 #ifndef linux
     proc = new QProcess( this);
     proc->setWorkingDirectory(".");
@@ -2563,7 +2564,8 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
     QString argslist = choice->getArgs();
 
     // we can have a semicolum (;) between quotes that should not be treated as separator
-    // instead of a real parsing, replace the ; between quotes by an unused character \e
+    // this character is normally used for shell script, therefore instead of a real
+    // parsing, replace the ; between quotes by an unused character \e
     bool inside = false;
     for (int i = 0; i < argslist.size(); i++) {
         if((!inside) && ((argslist.at(i) == QChar('\'')) || (argslist.at(i) == QChar('\"')))) {
@@ -2573,11 +2575,12 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
         }
         if (inside) {
             if(argslist.at(i) == QChar(';')) {
-                argslist.replace(i, 1, "\e");
+                argslist.replace(i, 1, separator);
             }
         }
     }
 
+    // split now the string with the ; separator
     QStringList args = argslist.split(";");
 
     if(indx < commands.count() && indx < args.count()) {
@@ -2585,7 +2588,7 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
         command.append(commands[indx].trimmed());
         command.append(" ");
         // replace the special character back
-        args[indx].replace("\e", ";");
+        args[indx].replace(separator, ";");
         command.append(args[indx].trimmed());
         // replace medm by caQtDM
         command.replace("camedm ", "caQtDM ");
