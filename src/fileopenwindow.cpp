@@ -395,6 +395,7 @@ void FileOpenWindow::Callback_ActionExit()
         foreach(QWidget* widget, all) {
             if(QMainWindow* w = qobject_cast<QMainWindow *>(widget)) {
                 if(processWindow *w1 =  qobject_cast<processWindow *>(widget)) {
+                    Q_UNUSED(w1);
                    // do not close processes
                 } else {
                   //qDebug() << "close window" << w;
