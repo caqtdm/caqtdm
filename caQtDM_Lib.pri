@@ -26,7 +26,8 @@ SOURCES += caqtdm_lib.cpp \
     vaPrintf.c \
     myMessageBox.cpp \
     limitsStripplotDialog.cpp \
-    limitsCartesianplotDialog.cpp
+    limitsCartesianplotDialog.cpp \
+    processWindow.cpp
 
 HEADERS += caqtdm_lib.h\
         caQtDM_Lib_global.h \
@@ -43,7 +44,8 @@ HEADERS += caqtdm_lib.h\
     vaPrintf.h \
     myMessageBox.h \
     limitsStripplotDialog.h \
-    limitsCartesianplotDialog.h
+    limitsCartesianplotDialog.h \
+    processWindow.h
 
 HEADERS += \
     JSONValue.h \

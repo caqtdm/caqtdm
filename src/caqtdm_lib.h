@@ -37,6 +37,7 @@
 #include "JSON.h"
 #include "limitsStripplotDialog.h"
 #include "limitsCartesianplotDialog.h"
+#include "processWindow.h"
 
 
 #include <QtControls>
@@ -110,6 +111,7 @@ private slots:
     void Callback_Slider(double value);
     void Callback_MessageButton(int type);
     void Callback_ToggleButton(bool type);
+    void Callback_ScriptButton();
 
     void Callback_UpdateWidget(int, QWidget *w, const QString& units,const QString& fec,
                                const QString& statusString, const knobData& data);
@@ -122,6 +124,8 @@ private slots:
     void ShowContextMenu(const QPoint&);
     void DisplayContextMenu(QWidget* w);
     void Callback_TextEntryChanged(const QString &);
+
+    void processTerminated();
 
     void print()
     {

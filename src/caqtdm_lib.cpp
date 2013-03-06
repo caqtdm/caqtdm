@@ -459,6 +459,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
             widget->setProperty("Taken", true);
         }
+
         return;
     }
 
@@ -759,6 +760,18 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         widget->raise();
 
+        widget->setProperty("Taken", true);
+
+
+        //==================================================================================================================
+    } else if(caScriptButton* widget = qobject_cast<caScriptButton *>(w1)) {
+
+       // qDebug() << "create caToggleButton";
+
+        connect(widget, SIGNAL(scriptButtonSignal()), this, SLOT(Callback_ScriptButton()));
+
+        widget->raise();
+        widget->setToolTip("process never started !");
         widget->setProperty("Taken", true);
 
         //==================================================================================================================
@@ -2521,6 +2534,48 @@ void CaQtDM_Lib::Callback_MessageButton(int type)
     }
 }
 
+/**
+ * callback will execute script
+ */
+void CaQtDM_Lib::Callback_ScriptButton()
+{
+    QString command = "";
+    bool displayWindow;
+    caScriptButton *w = qobject_cast<caScriptButton *>(sender());
+    command.append(w->getScriptCommand());
+
+    if(w->getScriptParam().size() > 0) {
+      command.append("\n\"");
+      command.append( w->getScriptParam());
+      command.append(" \"");
+    }
+    displayWindow = w->getDisplayShowExecution();
+
+    if(w->getAccessW()) {
+        processWindow *t = new processWindow(this, displayWindow, w);
+        connect(t, SIGNAL(processClose()), this, SLOT(processTerminated()));
+        t->start(command);
+        w->setToolTip("process running, to kill use right mouse button !");
+        w->setAccessW(false);
+        w->setProcess(t);
+    }
+}
+
+void CaQtDM_Lib::processTerminated()
+{
+    // qDebug() << "caQtDM -- process terminated callback";
+     processWindow *t = qobject_cast<processWindow *>(sender());
+     QWidget *w = t->getProcessCaller();
+     caScriptButton *w1 = qobject_cast<caScriptButton *>(w);
+     if(w1 != (QWidget*) 0) {
+          w1->setToolTip("process terminated !");
+          w1->setAccessW(true);
+          w->setEnabled(true);
+     }
+     //qDebug() << "clean up";
+
+     delete t;
+}
 
 /**
  * callback will write value to device
@@ -2556,8 +2611,7 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
     proc = new QProcess( this);
     proc->setWorkingDirectory(".");
     proc->setProcessChannelMode(QProcess::MergedChannels);
-    QObject::connect( proc, SIGNAL(error(QProcess::ProcessError)),
-                      this, SLOT(processError(QProcess::ProcessError)));
+    QObject::connect( proc, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
 #endif
     caShellCommand *choice = qobject_cast<caShellCommand *>(sender());
     QStringList commands = choice->getFiles().split(";");
@@ -2601,13 +2655,16 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
         int windid = this->winId();
         command.replace("&X", QString::number(windid));
 #endif
-
-        //command.replace("&", " ");  // special character not supported
+        command = command.trimmed();
         postMessage(QtDebugMsg, (char*) qPrintable(command.trimmed()));
 #ifndef linux
+        if(command.endsWith("&")) command.remove(command.size()-1, 1);
+        //qDebug() << "execute:" << command;
         proc->start(command.trimmed(), QIODevice::ReadWrite);
 #else
         // I had too many problems with QProcess start, use standard execl
+        if(!command.endsWith("&")) command.append("&");
+        //qDebug() << "execute:" << command;
         int status = Execute((char*)command.toAscii().constData());
         if(status != 0) {
             QMessageBox::information(0,"FailedToStart or Error", command);
@@ -2618,12 +2675,15 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
         command.append(commands[indx].trimmed());
         command.replace("&T", thisFileShort);
         command.replace("&A", thisFileFull);
-        //command.replace("&", " "); // special character not supported
         postMessage(QtDebugMsg, (char*) qPrintable(command.trimmed()));
 #ifndef linux
-        proc->start(command.trimmed(),QIODevice::ReadWrite);
+        if(command.endsWith("&")) command.remove(command.size()-1, 1);
+        //qDebug() << "execute:" << command;
+        proc->start(command.trimmed(), QIODevice::ReadWrite);
 #else
         // I had too many problems with QProcess start, use standard execl
+        if(!command.endsWith("&")) command.append("&");
+        //qDebug() << "execute:" << command;
         int status = Execute((char*)command.toAscii().constData());
         if(status != 0) {
             QMessageBox::information(0,"FailedToStart or error", command);
@@ -2631,14 +2691,6 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
 #endif
     }
 
-    // read output, but blocks application until child exits
-    /*
-    QByteArray data;
-    while(proc->waitForReadyRead())
-        data.append(proc->readAll());
-    // Output the data
-    qDebug(data.data());
-*/
 }
 
 void CaQtDM_Lib::processError(QProcess::ProcessError err)
@@ -2889,14 +2941,25 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         pv[4] = widget->getChannelB().trimmed();
         nbPV = 5;
 
+
+    } else if(caScriptButton* widget =  qobject_cast< caScriptButton *>(w)) {
+        Q_UNUSED(widget);
+       // add acion : kill associated process if running
+       if(!widget->getAccessW()) myMenu.addAction("Kill Process");
+
     } else  {
         qDebug() << w << "not treated";
         return;
     }
 
-    // construct info for the pv we are pointing at
-    myMenu.addAction("Get Info");
-    myMenu.addAction("Print");
+    if(caScriptButton* widget =  qobject_cast< caScriptButton *>(w)) {
+        Q_UNUSED(widget);
+    } else {
+       // construct info for the pv we are pointing at
+       myMenu.addAction("Get Info");
+       myMenu.addAction("Print");
+    }
+
     if(caStripPlot* widget = qobject_cast<caStripPlot *>(w)) {
         Q_UNUSED(widget);
         myMenu.addAction("Change Axis");
@@ -2909,8 +2972,13 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     QAction* selectedItem = myMenu.exec(pos);
 
     if (selectedItem) {
-        //qDebug() << "item selected=" << selectedItem << selectedItem->text();
-        if(selectedItem->text().contains("Get Info")) {
+       if(selectedItem->text().contains("Kill Process")) {
+          if(caScriptButton* widget =  qobject_cast< caScriptButton *>(w)) {
+              processWindow *t= (processWindow *) widget->getProcess();
+              t->tryTerminate();
+          }
+
+    } else  if(selectedItem->text().contains("Get Info")) {
             QString info;
             info.append(InfoPrefix);
             info.append("-------------------------------------------------<br>");
