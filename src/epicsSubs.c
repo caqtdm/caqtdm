@@ -590,7 +590,7 @@ int EpicsSetValue(char *pv, float rdata, int32_t idata, char *sdata, char *objec
 #endif
 
     // set epics value
-    //printf(" we have to set a value to an epics device <%s> %f %ld <%s>\n", pv, rdata, idata, sdata);
+    PRINT(printf(" we have to set a value to an epics device <%s> %f %ld <%s>\n", pv, rdata, idata, sdata));
     status = ca_create_channel(pv, NULL, 0, CA_PRIORITY, &ch);
     if (ch == (chid) 0) {
         return !ECA_NORMAL;
