@@ -209,7 +209,7 @@ caShellCommandInterface::caShellCommandInterface(QObject *parent): CustomWidgetI
     d_name = "caShellCommand";
     d_include = "caShellCommand";
     d_icon = QPixmap(":pixmaps/exclamation.png");
-    d_toolTip = "[menu or button for shell commands]";
+    d_toolTip = "[menu or button for detached processes]";
 }
 
 QWidget *caTextEntryInterface::createWidget(QWidget* parent)
@@ -266,10 +266,30 @@ caToggleButtonInterface::caToggleButtonInterface(QObject* parent) : CustomWidget
 	d_name = "caToggleButton";
 	d_include = "caToggleButton";
 	d_icon = QPixmap(":pixmaps/radiobutton.png");
-        d_toolTip = "[toggle bit to a pv]";
+        d_toolTip = "[toggle 0/1 to a pv]";
 }
 
+QWidget *caScriptButtonInterface::createWidget(QWidget* parent)
+{
+	return new caScriptButton(parent);
+}
 
+caScriptButtonInterface::caScriptButtonInterface(QObject* parent) : CustomWidgetInterface(parent)
+{
+        strng name[3], type[3];
+        strcpy(name[0], "label");
+        strcpy(type[0], "multiline");
+        strcpy(name[1], "scriptCommand");
+        strcpy(type[1], "multiline");
+        strcpy(name[2], "scriptParameter");
+        strcpy(type[2], "multiline");
+
+        d_domXml = XmlFunc("caScriptButton", "cascriptbutton", 0, 0, 100, 22, name, type, 3);
+	d_name = "caScriptButton";
+	d_include = "caScriptButton";
+	d_icon = QPixmap(":pixmaps/process.png");
+        d_toolTip = "[execute a script or image as detached process]";
+}
 
 CustomWidgetCollectionInterface::CustomWidgetCollectionInterface(QObject *parent): QObject(parent)
 {
@@ -283,6 +303,7 @@ CustomWidgetCollectionInterface::CustomWidgetCollectionInterface(QObject *parent
     d_plugins.append(new caTextEntryInterface(this));
     d_plugins.append(new caMessageButtonInterface(this));
     d_plugins.append(new caToggleButtonInterface(this)); 
+    d_plugins.append(new caScriptButtonInterface(this));  
 }
 
 QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface::customWidgets(void) const

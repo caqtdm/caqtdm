@@ -94,7 +94,8 @@ SOURCES	+= \
     src/capolylinetaskmenu.cpp \
     src/capolylinedialog.cpp \
     src/parsepepfile.cpp \
-    src/catogglebutton.cpp
+    src/catogglebutton.cpp \
+    src/cascriptbutton.cpp
 
 HEADERS	+= \
     src/caframe.h \
@@ -148,6 +149,7 @@ HEADERS	+= \
     src/qtcontrols_global.h \
     src/alarmdefs.h \
     src/parsepepfile.h \
-    src/catogglebutton.h
+    src/catogglebutton.h \
+    src/cascriptbutton.h
 
 OTHER_FILES += README

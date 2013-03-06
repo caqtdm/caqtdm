@@ -1,0 +1,32 @@
+<!DOCTYPE RCC><RCC version="1.0">
+    <qresource>
+        <file>pixmaps/eled.png</file>
+        <file>pixmaps/elineargauge.png</file>
+        <file>pixmaps/ecirculargauge.png</file>
+        <file>pixmaps/elabel.png</file>
+        <file>pixmaps/eflag.png</file>
+        <file>pixmaps/enumeric.png</file>
+        <file>pixmaps/eapplybutton.png</file>
+        <file>pixmaps/earrow.png</file>
+        <file>pixmaps/table.png</file>
+        <file>pixmaps/fileopen.png</file>
+        <file>pixmaps/exclamation.png</file>
+        <file>pixmaps/slider.png</file>
+        <file>pixmaps/menu.png</file>
+        <file>pixmaps/choice.png</file>
+        <file>pixmaps/textentry.png</file>
+        <file>pixmaps/frame.png</file>
+        <file>pixmaps/polyline.png</file>
+        <file>pixmaps/gtool.png</file>
+        <file>pixmaps/images.png</file>
+        <file>pixmaps/message.png</file>
+        <file>pixmaps/cartesian.png</file>
+        <file>pixmaps/thermo.png</file>
+        <file>pixmaps/textmonitor.png</file>
+        <file>pixmaps/camera.png</file>
+        <file>pixmaps/qwtplot.png</file>
+        <file>pixmaps/calc.png</file>
+        <file>pixmaps/radiobutton.png</file>
+        <file>pixmaps/process.png</file>
+    </qresource>
+</RCC>

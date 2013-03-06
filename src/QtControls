@@ -32,5 +32,6 @@
 #include <cacalc.h>
 #include <capolylinetaskmenu.h> 
 #include <catogglebutton.h>
+#include <cascriptbutton.h>
 #endif
 
