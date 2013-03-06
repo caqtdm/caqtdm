@@ -374,7 +374,7 @@ QMap<QString, QString> CaQtDM_Lib::createMap(const QString& macro)
     if(macro != NULL) {
         QStringList vars = macro.split(",", QString::SkipEmptyParts);
         for(int i=0; i< vars.count(); i++) {
-/*          this would be ok if medm did not allow also an equal sign after the equal sign
+            /*          this would be ok if medm did not allow also an equal sign after the equal sign
             QStringList keyvalue = vars.at(i).split("=", QString::SkipEmptyParts);
             if(keyvalue.count() == 2) {
                 map.insert(keyvalue.at(0).trimmed(), keyvalue.at(1));
@@ -529,7 +529,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         widget->raise();
 
-        widget->setProperty("Taken", true);  
+        widget->setProperty("Taken", true);
 
         //==================================================================================================================
     } else if(caMenu* widget = qobject_cast<caMenu *>(w1)) {
@@ -751,7 +751,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         //==================================================================================================================
     } else if(caToggleButton* widget = qobject_cast<caToggleButton *>(w1)) {
 
-       // qDebug() << "create caToggleButton";
+        // qDebug() << "create caToggleButton";
 
         connect(widget, SIGNAL(toggleButtonSignal(bool)), this, SLOT(Callback_ToggleButton(bool)));
 
@@ -766,7 +766,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         //==================================================================================================================
     } else if(caScriptButton* widget = qobject_cast<caScriptButton *>(w1)) {
 
-       // qDebug() << "create caToggleButton";
+        // qDebug() << "create caToggleButton";
 
         connect(widget, SIGNAL(scriptButtonSignal()), this, SLOT(Callback_ScriptButton()));
 
@@ -2040,10 +2040,10 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         if(data.edata.connected) {
             int colorMode = widget->getColorMode();
-           if(colorMode == caToggleButton::Alarm) {
+            if(colorMode == caToggleButton::Alarm) {
                 widget->setAlarmColors(data.edata.severity);
             } else {
-               SetColorsBack;
+                SetColorsBack;
             }
 
             if( data.edata.ivalue > 0) {
@@ -2363,16 +2363,13 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
  */
 void CaQtDM_Lib::Callback_EApplyNumeric(double value)
 {
-    char errmess[255];
+    int32_t idata = (int32_t) value;
+    float rdata = (float) value;
+
     caApplyNumeric *numeric = qobject_cast<caApplyNumeric *>(sender());
-
     if(!numeric->getAccessW()) return;
-
     if(numeric->getPV().length() > 0) {
-        //qDebug() << numeric->objectName() << numeric->getPV() << value;
-        QString text("");
-        QStringsToChars(numeric->getPV(), text, numeric->objectName().toLower());
-        EpicsSetValue(param1, value, 0, param2, param3, errmess, 0);
+        TreatOrdinaryValue(numeric->getPV(), rdata,  idata, (QWidget*) numeric);
     }
 }
 /**
@@ -2380,16 +2377,12 @@ void CaQtDM_Lib::Callback_EApplyNumeric(double value)
  */
 void CaQtDM_Lib::Callback_ENumeric(double value)
 {
-    char errmess[255];
+    int32_t idata = (int32_t) value;
+    float rdata = (float) value;
     caNumeric *numeric = qobject_cast<caNumeric *>(sender());
-
     if(!numeric->getAccessW()) return;
-
     if(numeric->getPV().length() > 0) {
-        //qDebug() << numeric->objectName() << numeric->getPV() << value;
-        QString text(" ");
-        QStringsToChars(numeric->getPV(), text, numeric->objectName().toLower());
-        EpicsSetValue(param1, value, 0, param2, param3, errmess, 0);
+        TreatOrdinaryValue(numeric->getPV(), rdata,  idata, (QWidget*) numeric);
     }
 }
 
@@ -2398,16 +2391,34 @@ void CaQtDM_Lib::Callback_ENumeric(double value)
  */
 void CaQtDM_Lib::Callback_Slider(double value)
 {
-    char errmess[255];
+    int32_t idata = (int32_t) value;
+    float rdata = (float) value;
     caSlider *numeric = qobject_cast<caSlider *>(sender());
-
     if(!numeric->getAccessW()) return;
-
     if(numeric->getPV().length() > 0) {
-        //qDebug() << numeric->objectName() << numeric->getPV() << value;
-        QString text(" ");
-        QStringsToChars(numeric->getPV(), text, numeric->objectName().toLower());
-        EpicsSetValue(param1, value, 0, param2, param3, errmess, 0);
+        TreatOrdinaryValue(numeric->getPV(), rdata, idata,  (QWidget*) numeric);
+    }
+}
+
+/**
+ * callback will write value to device
+ */
+void CaQtDM_Lib::Callback_ToggleButton(bool type)
+{
+    float value;
+    int32_t idata;
+    caToggleButton *w = qobject_cast<caToggleButton *>(sender());
+    if(!w->getAccessW()) return;
+
+    if(!type) {         // toggle cleared
+        value=0;
+    } else  {           // toggle checked
+        value=1;
+    }
+    idata = (int32_t) value;
+
+    if(w->getPV().length() > 0) {
+        TreatOrdinaryValue(w->getPV(), value, idata, (QWidget*) w);
     }
 }
 
@@ -2545,9 +2556,9 @@ void CaQtDM_Lib::Callback_ScriptButton()
     command.append(w->getScriptCommand());
 
     if(w->getScriptParam().size() > 0) {
-      command.append("\n\"");
-      command.append( w->getScriptParam());
-      command.append(" \"");
+        command.append("\n\"");
+        command.append( w->getScriptParam());
+        command.append(" \"");
     }
     displayWindow = w->getDisplayShowExecution();
 
@@ -2564,41 +2575,17 @@ void CaQtDM_Lib::Callback_ScriptButton()
 void CaQtDM_Lib::processTerminated()
 {
     // qDebug() << "caQtDM -- process terminated callback";
-     processWindow *t = qobject_cast<processWindow *>(sender());
-     QWidget *w = t->getProcessCaller();
-     caScriptButton *w1 = qobject_cast<caScriptButton *>(w);
-     if(w1 != (QWidget*) 0) {
-          w1->setToolTip("process terminated !");
-          w1->setAccessW(true);
-          w->setEnabled(true);
-     }
-     //qDebug() << "clean up";
-
-     delete t;
-}
-
-/**
- * callback will write value to device
- */
-void CaQtDM_Lib::Callback_ToggleButton(bool type)
-{
-    long value;
-    char errmess[255];
-    QString text(" ");
-    caToggleButton *w = qobject_cast<caToggleButton *>(sender());
-
-    if(!w->getAccessW()) return;
-
-    if(!type) {         // toggle cleared
-        value=0;
-    } else  {           // toggle checked
-        value=1;
+    processWindow *t = qobject_cast<processWindow *>(sender());
+    QWidget *w = t->getProcessCaller();
+    caScriptButton *w1 = qobject_cast<caScriptButton *>(w);
+    if(w1 != (QWidget*) 0) {
+        w1->setToolTip("process terminated !");
+        w1->setAccessW(true);
+        w->setEnabled(true);
     }
+    //qDebug() << "clean up";
 
-    if(w->getPV().length() > 0) {
-        QStringsToChars(w->getPV(), text,  w->objectName().toLower());
-        EpicsSetValue(param1, 0.0, value, param2, param3, errmess, 2);
-    }
+    delete t;
 }
 
 /**
@@ -2944,8 +2931,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
     } else if(caScriptButton* widget =  qobject_cast< caScriptButton *>(w)) {
         Q_UNUSED(widget);
-       // add acion : kill associated process if running
-       if(!widget->getAccessW()) myMenu.addAction("Kill Process");
+        // add acion : kill associated process if running
+        if(!widget->getAccessW()) myMenu.addAction("Kill Process");
 
     } else  {
         qDebug() << w << "not treated";
@@ -2955,9 +2942,9 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     if(caScriptButton* widget =  qobject_cast< caScriptButton *>(w)) {
         Q_UNUSED(widget);
     } else {
-       // construct info for the pv we are pointing at
-       myMenu.addAction("Get Info");
-       myMenu.addAction("Print");
+        // construct info for the pv we are pointing at
+        myMenu.addAction("Get Info");
+        myMenu.addAction("Print");
     }
 
     if(caStripPlot* widget = qobject_cast<caStripPlot *>(w)) {
@@ -2972,13 +2959,13 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     QAction* selectedItem = myMenu.exec(pos);
 
     if (selectedItem) {
-       if(selectedItem->text().contains("Kill Process")) {
-          if(caScriptButton* widget =  qobject_cast< caScriptButton *>(w)) {
-              processWindow *t= (processWindow *) widget->getProcess();
-              t->tryTerminate();
-          }
+        if(selectedItem->text().contains("Kill Process")) {
+            if(caScriptButton* widget =  qobject_cast< caScriptButton *>(w)) {
+                processWindow *t= (processWindow *) widget->getProcess();
+                t->tryTerminate();
+            }
 
-    } else  if(selectedItem->text().contains("Get Info")) {
+        } else  if(selectedItem->text().contains("Get Info")) {
             QString info;
             info.append(InfoPrefix);
             info.append("-------------------------------------------------<br>");
@@ -3434,6 +3421,30 @@ int CaQtDM_Lib::Execute(char *command)
 }
 #endif
 
+void CaQtDM_Lib::TreatOrdinaryValue(QString pv, float value, int32_t idata,  QWidget *w)
+{
+    char errmess[255];
+    int indx =  w->property("MonitorIndex").value<int>();
+    if(indx < 0) return;
+
+    knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
+
+    // when softpv get index to where it is defined
+    if(mutexKnobData->getSoftPV(kPtr->pv, &indx, (QWidget*) kPtr->thisW)) {
+        if(kPtr->soft) {
+            kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
+            kPtr->edata.rvalue = value;
+            // set value also into widget, will be overwritten when driven from other channels
+            caCalc * ww = (caCalc*) kPtr->dispW;
+            ww->setValue(value);
+        }
+    } else {
+        QString text(" ");
+        QStringsToChars(pv, text, w->objectName().toLower());
+        EpicsSetValue(param1, value, idata, param2, param3, errmess, 0);
+    }
+}
+
 /**
   * this routine will treat the string, command, value to write to the pv
   */
@@ -3543,13 +3554,13 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
         }
         if(*end == '\0' && end != textValue) {
             if(kPtr->soft) {
-                char asc[100];
+                //char asc[100];
                 kPtr->edata.rvalue = value;
                 // set value also into widget, will be overwritten when driven from other channels
                 caCalc * ww = (caCalc*) kPtr->dispW;
                 ww->setValue(value);
-                sprintf(asc, "SoftPV: %s  set to value: \"%s\"\n", kPtr->pv, textValue);
-                postMessage(QtDebugMsg, asc);
+                //sprintf(asc, "SoftPV: %s  set to value: \"%s\"\n", kPtr->pv, textValue);
+                //postMessage(QtDebugMsg, asc);
             } else {
                 //qDebug() << "we should set a double independently if pv has another type ";
                 EpicsSetValue((char*) kPtr->pv, value, 0, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess, 1);

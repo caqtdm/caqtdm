@@ -69,6 +69,7 @@ public:
     void postMessage(QtMsgType type, char *msg);
     int Execute(char *command);
     void TreatRequestedValue(QString text, caTextEntry::FormatType fType, QWidget *w);
+    void TreatOrdinaryValue(QString pv, float value, int32_t idata, QWidget *w);
     bool getSoftChannel(QString pv, knobData &data);
     int parseForDisplayRate(QString input, int &rate);   
     void UpdateGauge(EAbstractGauge *w, const knobData &data);
