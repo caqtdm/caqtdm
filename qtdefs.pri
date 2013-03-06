@@ -1,4 +1,7 @@
-CAQTDM_VERSION = V2.7.2
+CAQTDM_VERSION = V2.7.3
+
+# new in 2.7.3
+# added a control cascriptbutton for script execution, one can write a script and follow its execution
 
 # new in 2.7.2
 # a new control has been added: caToggleButton writing 0 or 1 to a channel
