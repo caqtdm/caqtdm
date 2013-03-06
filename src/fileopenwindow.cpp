@@ -394,7 +394,12 @@ void FileOpenWindow::Callback_ActionExit()
         QList<QWidget *> all = this->findChildren<QWidget *>();
         foreach(QWidget* widget, all) {
             if(QMainWindow* w = qobject_cast<QMainWindow *>(widget)) {
-                w->close();
+                if(processWindow *w1 =  qobject_cast<processWindow *>(widget)) {
+                   // do not close processes
+                } else {
+                  //qDebug() << "close window" << w;
+                  w->close();
+                }
             }
         }
 
