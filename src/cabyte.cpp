@@ -73,25 +73,29 @@ bool caByte::bitState(long value, int bitNr)
 
 void caByte::setValue(int value)
 {
-    long lvalue = (long)value;
+    thisValue = (long)value;
+    drawByte(thisValue, thisTrueColor, thisFalseColor);
+}
 
+void caByte::drawByte(long lvalue, QColor trueColor, QColor falseColor)
+{
     if(thisDirection == Down || thisDirection == Right)  {
-      for(int i=0; i<= thisEndBit - thisStartBit; i++) {
-          //printf("1 numcells=%d treat cell %d\n", numRows, i);
-        if(bitState(lvalue, i + thisStartBit)) {
-            cells[i]->writeFG(thisTrueColor);
-        } else {
-            cells[i]->writeFG(thisFalseColor);
+        for(int i=0; i<= thisEndBit - thisStartBit; i++) {
+            //printf("1 numcells=%d treat cell %d\n", numRows, i);
+            if(bitState(lvalue, i + thisStartBit)) {
+                cells[i]->writeFG(trueColor);
+            } else {
+                cells[i]->writeFG(falseColor);
+            }
         }
-      }
     } else {
         for(int i=0; i<= thisEndBit - thisStartBit; i++) {
-          //printf("2 numcells=%d treat cell %d\n", numRows, thisEndBit - thisStartBit - i);
-          if(bitState(lvalue, i + thisStartBit)) {
-              cells[thisEndBit - thisStartBit  - i]->writeFG(thisTrueColor);
-          } else {
-              cells[thisEndBit - thisStartBit  - i]->writeFG(thisFalseColor);
-          }
+            //printf("2 numcells=%d treat cell %d\n", numRows, thisEndBit - thisStartBit - i);
+            if(bitState(lvalue, i + thisStartBit)) {
+                cells[thisEndBit - thisStartBit  - i]->writeFG(trueColor);
+            } else {
+                cells[thisEndBit - thisStartBit  - i]->writeFG(falseColor);
+            }
         }
     }
 }
@@ -131,9 +135,12 @@ void caByte::setAlarmColors(short status)
         break;
     }
 
-    for(int i=0; i<= thisEndBit - thisStartBit; i++) {
-        cells[i]->writeFG(c);
+    if(status == NOTCONNECTED) {
+      for(int i=0; i<= thisEndBit - thisStartBit; i++)  cells[i]->writeFG(c);
+    } else {
+        drawByte(thisValue, c, thisFalseColor);
     }
+
 }
 
 void caByte::setStartBit(int const &bit) {

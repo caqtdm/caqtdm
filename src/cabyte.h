@@ -75,25 +75,27 @@ public:
 
     void setAlarmColors(short status);
 
+     void drawByte(long lvalue, QColor trueColor, QColor falseColor);
 
 protected:
 
     void arrangeCells();
     void resizeEvent(QResizeEvent *e);
 
-
 private:
     int                 numRows;
-    int 	        numColumns;
+    int 	            numColumns;
 
-    QColor		thisFalseColor;
-    QColor		thisTrueColor;
-    QGridLayout 	*grid;
+    QColor		        thisFalseColor;
+    QColor		        thisTrueColor;
+    QGridLayout 	   *grid;
     int                 thisStartBit;
     int                 thisEndBit;
     QString             thisPV;
     Direction           thisDirection;
     colMode             thisColorMode;
+    long                thisValue;
+
 };
 
 #endif  /* CABYTE */
