@@ -13,9 +13,11 @@
 #ifndef CAQTDM_LIB_H
 #define CAQTDM_LIB_H
 
+
 #include "caQtDM_Lib_global.h"
 
 #include "dbrString.h"
+#include <stdint.h>
 #include <QMainWindow>
 #include <QTableWidget>
 #include <QVector>
@@ -71,7 +73,7 @@ public:
     void TreatRequestedValue(QString text, caTextEntry::FormatType fType, QWidget *w);
     void TreatOrdinaryValue(QString pv, float value, int32_t idata, QWidget *w);
     bool getSoftChannel(QString pv, knobData &data);
-    int parseForDisplayRate(QString input, int &rate);   
+    int parseForDisplayRate(QString input, int &rate);
     void UpdateGauge(EAbstractGauge *w, const knobData &data);
 
 protected:
