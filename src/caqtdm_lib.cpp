@@ -1866,6 +1866,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 }
                 widget->setValue((int) data.edata.ivalue);
             } else if(colorMode == caByte::Alarm) {
+                widget->setValue((int) data.edata.ivalue);
                 widget->setAlarmColors(data.edata.severity);
             }
         } else {
@@ -2295,8 +2296,10 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             // set enum strings
             if(data.edata.fieldtype == caENUM) {
                 widget->setEnumStrings(String);
-            } else if(data.edata.fieldtype == caINT || data.edata.fieldtype == caLONG) {
+            } else if(data.edata.fieldtype == caINT || data.edata.fieldtype == caLONG ) {
                 widget->setValue(data.edata.ivalue);
+            } else if(data.edata.fieldtype == caFLOAT || data.edata.fieldtype == caDOUBLE ) {
+                widget->setValue((int) (data.edata.rvalue + 0.5));
             }
         } else {
             // todo
@@ -3494,7 +3497,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
         }
 
         if(!match) {
-            qDebug() << "assume it is a number";
+            //qDebug() << "assume it is a number";
             // Assume it is a number
             if(fType == caTextEntry::octal) {
                 longValue = strtoul(textValue, &end, 8);
