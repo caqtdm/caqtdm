@@ -21,6 +21,7 @@ OBJECTS_DIR = obj
 
 
      win32-msvc* {
+        DEFINES +=_CRT_SECURE_NO_WARNINGS
         DebugBuild {
                 EPICS_LIBS=$${EPICS_BASE}/lib/win32-x86
                 OBJECTS_DIR = debug/obj
