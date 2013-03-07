@@ -16,7 +16,7 @@ win32 {
       LIBS += $${QWTHOME}/lib/libqwt.a
      }
      win32-msvc* {
-        DEFINES += QTCON_MAKEDLL
+        DEFINES += QTCON_MAKEDLL _CRT_SECURE_NO_WARNINGS
         DebugBuild {
                 INCLUDEPATH = $${QWTHOME}/include
                 LIBS += $${QWTHOME}/lib/qwtd.lib
