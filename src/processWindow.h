@@ -7,10 +7,10 @@
 #include <QMainWindow>
 #include <QProcess>
 #include <QtGui>
-#include <qtcontrols_global.h>
+#include <caQtDM_Lib_global.h>
 
 
-class QTCON_EXPORT processWindow : public QMainWindow
+class CAQTDM_LIBSHARED_EXPORT processWindow : public QMainWindow
 {
     Q_OBJECT
 
