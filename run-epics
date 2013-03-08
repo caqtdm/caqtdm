@@ -1,8 +1,0 @@
-cao
-export IOC=pc2401-sioc
-export EPICS_BASE=$EPICS
-
-# -s is to get epics prompt (interactive ?!?)
-iocsh mySimulation.db
-
-
