@@ -957,7 +957,6 @@ void ParsePepFile::writeTextEntry(QString format, QString pv, QString minwidth, 
     writeCloseTag("font", array);
     writeCloseProperty(array);
 
-
     writeCloseTag("widget", array);
 }
 
