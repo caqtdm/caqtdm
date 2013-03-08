@@ -225,7 +225,7 @@ void FileOpenWindow::Callback_OpenButton()
     QString path = (QString)  getenv("CAQTDM_DISPLAY_PATH");
     if(path.size() == 0 && lastFilePath.size()==0) path.append(".");
     else path = lastFilePath;
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open ui file"), path, tr("ui Files (*.ui)"));
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open ui or prc file"), path, tr("ui/prc Files (*.ui *.prc)"));
     //std::cout << "Got filename: " << fileName.toStdString() << std::endl;
 
     if(!fileName.isNull()) {
