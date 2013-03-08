@@ -229,7 +229,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     // treat ui file */
     QFileInfo fi(filename);
-    if(filename.contains("ui")) {
+    if(filename.lastIndexOf(".ui") != -1) {
 
         file->open(QFile::ReadOnly);
 
@@ -245,7 +245,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         file->close();
 
         // treat prc file and load designer description from internal buffer
-    } else if(filename.contains("prc")) {
+    } else if(filename.lastIndexOf(".prc") != -1) {
+
         QString uiString = QString(uiIntern);
         uiString= uiString.arg(filename);
         QByteArray *array= new QByteArray();
@@ -904,15 +905,20 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         // define the file to use
         QString fileName = widget->getFileName().trimmed();
         reaffectText(map, &fileName);
-        QStringList openFile = fileName.split(".", QString::SkipEmptyParts);
+
+        QString openFile = "";
+        int found = fileName.lastIndexOf(".");
+        if (found != -1) {
+            openFile = fileName.mid(0, found);
+        }
 
         // ui file or prc file ?
-        if((openFile.count() > 1) && openFile.at(1).contains("prc")) {
+        if((openFile.count() > 1) && fileName.contains(".prc")) {
             //qDebug() << "prc file";
             prcFile = true;
         } else {
             //qDebug() << "ui file";
-            fileName = openFile[0].append(".ui");
+            fileName = openFile.append(".ui");
             prcFile = false;
         }
 

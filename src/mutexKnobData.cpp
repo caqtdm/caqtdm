@@ -334,7 +334,6 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 if(kPtr->edata.unconnectCount == 10) kPtr->edata.unconnectCount=0;
                 locker.unlock();
                 if(displayIt) UpdateWidget(index, (QWidget*) kPtr->dispW, units, fec, dataString, KnobData[index]);
-
             }
         }
     }

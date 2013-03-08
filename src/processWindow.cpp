@@ -63,7 +63,7 @@ bool processWindow::tryTerminate()
 {
     if(termProcess && termProcess->state() == QProcess::Running) {
         termProcess->terminate();
-        termProcess->waitForFinished(400);
+        termProcess->waitForFinished(500);
         if( termProcess->state() == QProcess::Running) {
             qDebug() << "process still running, I will kill it";
             termProcess->kill();
