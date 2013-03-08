@@ -440,6 +440,7 @@ void caStripPlot::TimeOut()
             // first we have to make place for the missing data
             for (int i = dataCount; i > 0; i-- ) {
                 for (int c = 0; c < NumberOfCurves; c++ ) {
+                    if((i+delta-1) > (HISTORY-1)) break;         // be carefull not to exceed array
                     rangeData[c][i+delta-1] = rangeData[c][i];
                     fillData[c][i+delta-1] = fillData[c][i];
                 }
