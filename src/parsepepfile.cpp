@@ -949,7 +949,7 @@ void ParsePepFile::writeTextEntry(QString format, QString pv, QString minwidth, 
     writeSimpleProperty("colorMode", "enum", "caLineEdit::Static", array);
 
     setColor("background", rgba[0], rgba[1], rgba[2], rgba[3], array);
-    setColor("foreground", 0, 0, 0, 255, array);
+    setColor("foreground", 255, 255, 255, 255, array);
 
     writeOpenProperty("font", array);
     writeOpenTag("font", array);
