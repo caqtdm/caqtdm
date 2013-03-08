@@ -3560,7 +3560,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
@@ -4947,6 +4947,11 @@ p, li { white-space: pre-wrap; }
    <header>caToggleButton</header>
   </customwidget>
   <customwidget>
+   <class>caScriptButton</class>
+   <extends>QWidget</extends>
+   <header>caScriptButton</header>
+  </customwidget>
+  <customwidget>
    <class>caFrame</class>
    <extends>QFrame</extends>
    <header>caFrame</header>
@@ -5036,11 +5041,6 @@ p, li { white-space: pre-wrap; }
    <class>caCalc</class>
    <extends>QLabel</extends>
    <header>caCalc</header>
-  </customwidget>
-  <customwidget>
-   <class>caScriptButton</class>
-   <extends>QWidget</extends>
-   <header>caScriptButton</header>
   </customwidget>
  </customwidgets>
  <resources/>

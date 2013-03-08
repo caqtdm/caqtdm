@@ -1,6 +1,9 @@
 CAQTDM_VERSION = V2.7.3
 
 # new in 2.7.3
+# calineedit was changing its stylesheet continuously and had to be optimized for that
+# on windows terminate process with the kill button was hanging for 30 seconds and is now doing right.
+# filedialog box will now use files .ui and .prc
 # added a control cascriptbutton for script execution, one can write a script and follow its execution
 
 # new in 2.7.2
