@@ -42,6 +42,9 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     thisBackColor = Qt::gray;
     thisForeColor = Qt::black;
 
+    oldBackColor = Qt::black;
+    thisForeColor = Qt::gray;
+
     setPrecisionMode(Channel);
     setLimitsMode(Channel);
     setPrecision(0);
@@ -76,39 +79,52 @@ void caLineEdit::setPV(QString const &newPV)
     thisPV = newPV;
 }
 
-// this toutine sets the correct styles for the calinedit and catextentry (inheriting from calinedit)
+// this routine sets the correct styles for the calinedit and catextentry (inheriting from calinedit)
 // the styles are now defined here and not in the style sheet any more
+// while this gives a perfomance problem, limit the use of it by testing changes
 
 void caLineEdit::setColors(QColor bg, QColor fg)
 {
-    QColor defColor = QColor(255, 248, 220, thisBackColor.alpha());  // my default color, we do not use the stylesheet anymore
-    QColor lc;
-    QColor dc;
-    thisStyle = "caTextEntry,caLineEdit {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-radius: 1px; }";
-    thisStyle.append("caLineEdit {border: 0px; padding: 0px 0px 0px 2px;} caTextEntry { border: 2px; padding: 0px;}");
-    if(thisColorMode == Default || thisColorMode == Alarm_Default) {
-        thisStyle = thisStyle.arg(defColor.red()).arg(defColor.green()).arg(defColor.blue()).arg(defColor.alpha()).
-                arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
+    if((bg != oldBackColor) || (fg != oldForeColor) || (thisStyle != oldStyle) || (thisColorMode != oldColorMode)) {
+        QColor defColor = QColor(255, 248, 220, thisBackColor.alpha());  // my default color, we do not use the stylesheet anymore
+        QColor lc;
+        QColor dc;
+        thisStyle = "caTextEntry,caLineEdit {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-radius: 1px; }";
+        thisStyle.append("caLineEdit {border: 0px; padding: 0px 0px 0px 2px;} caTextEntry { border: 2px; padding: 0px;}");
+        if(thisColorMode == Default || thisColorMode == Alarm_Default) {
+            thisStyle = thisStyle.arg(defColor.red()).arg(defColor.green()).arg(defColor.blue()).arg(defColor.alpha()).
+                    arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
 
-        lc = defColor.lighter();
-        dc = defColor.darker();
-    } else {
-        thisStyle = "caTextEntry, caLineEdit {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-radius: 1px; }";
-        thisStyle.append("caLineEdit{border: 0px; padding: 0px 0px 0px 2px;} caTextEntry { border: 2px; padding: 0px;} ");
-        thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
-                arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
-        lc = bg.lighter();
-        dc = bg.darker();
+            lc = defColor.lighter();
+            dc = defColor.darker();
+        } else {
+            thisStyle = "caTextEntry, caLineEdit {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-radius: 1px; }";
+            thisStyle.append("caLineEdit{border: 0px; padding: 0px 0px 0px 2px;} caTextEntry { border: 2px; padding: 0px;} ");
+            thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
+                    arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
+            lc = bg.lighter();
+            dc = bg.darker();
+        }
+        if(thisStyle != oldStyle || thisColorMode != oldColorMode) {
+            thisStyle.append(" caTextEntry {border-style:inset; border-color: rgba(%1, %2, %3, %4) rgba(%5, %6, %7, %8)  rgba(%9, %10, %11, %12) rgba(%13, %14, %15, %16);} caTextEntry:focus {padding: 0px; border: 2px groove darkred; border-radius: 1px;} ");
+            thisStyle = thisStyle.arg(dc.red()).arg(dc.green()).arg(dc.blue()).arg(dc.alpha()).
+                    arg(lc.red()).arg(lc.green()).arg(lc.blue()).arg(lc.alpha()).
+                    arg(lc.red()).arg(lc.green()).arg(lc.blue()).arg(lc.alpha()).
+                    arg(dc.red()).arg(dc.green()).arg(dc.blue()).arg(dc.alpha());
+            setStyleSheet(thisStyle);
+            oldStyle = thisStyle;
+        }
     }
-    if(thisStyle != oldStyle || thisColorMode != oldColorMode) {
-        thisStyle.append(" caTextEntry {border-style:inset; border-color: rgba(%1, %2, %3, %4) rgba(%5, %6, %7, %8)  rgba(%9, %10, %11, %12) rgba(%13, %14, %15, %16);} caTextEntry:focus {padding: 0px; border: 2px groove darkred; border-radius: 1px;} ");
-        thisStyle = thisStyle.arg(dc.red()).arg(dc.green()).arg(dc.blue()).arg(dc.alpha()).
-                      arg(lc.red()).arg(lc.green()).arg(lc.blue()).arg(lc.alpha()).
-                      arg(lc.red()).arg(lc.green()).arg(lc.blue()).arg(lc.alpha()).
-                      arg(dc.red()).arg(dc.green()).arg(dc.blue()).arg(dc.alpha());
-        setStyleSheet(thisStyle);
-        oldStyle = thisStyle;
-    }
+    oldBackColor = bg;
+    oldForeColor = fg;
+}
+
+void caLineEdit::setColorMode(colMode colormode)
+{
+    thisColorMode = colormode;
+    setBackground(thisBackColor);
+    setForeground(thisForeColor);
+    oldColorMode = thisColorMode;
 }
 
 void caLineEdit::setBackground(QColor c)
@@ -140,8 +156,9 @@ void caLineEdit::setForeAndBackground(QColor foreground, QColor background)
 
 bool caLineEdit::event(QEvent *e)
 {
-    if(e->type() == QEvent::Resize || e->type() == QEvent::Show)
+    if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
         FontScalingWidget::rescaleFont(text(), calculateTextSpace());
+    }
 
     return QLineEdit::event(e);
 }
@@ -292,9 +309,13 @@ void caLineEdit::setText(const QString &txt)
     if(keepText == txt) {  // accelerate things
         return;
     }
-    //printf("settext: <%s>\n", txt.toAscii().constData());
+    //printf("settext: %s <%s> <%s>\n", thisPV.toAscii().constData(),  txt.toAscii().constData(), keepText.toAscii().constData());
     QLineEdit::setText(txt);
-    FontScalingWidget::rescaleFont(text(), d_savedTextSpace);
+
+    if(keepText.size() != txt.size()) {
+       FontScalingWidget::rescaleFont(text(), d_savedTextSpace);
+    }
+
     keepText = txt;
 }
 

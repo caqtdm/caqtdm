@@ -72,12 +72,7 @@ public:
     enum colMode {Default=0, Static, Alarm_Default, Alarm_Static};
     colMode getColorMode() const { return thisColorMode; }
 
-    void setColorMode(colMode colormode) {thisColorMode = colormode;
-                                          setBackground(thisBackColor);
-                                          setForeground(thisForeColor);
-                                          oldColorMode = thisColorMode;
-                                           }
-
+    void setColorMode(colMode colormode);
 
     enum SourceMode {Channel = 0, User};
     SourceMode getPrecisionMode() const { return thisPrecMode; }
@@ -126,8 +121,8 @@ protected:
 private:
     QString thisPV;
 
-    QColor thisForeColor;
-    QColor thisBackColor;
+    QColor thisForeColor, oldForeColor;
+    QColor thisBackColor, oldBackColor;
     QPalette thisPalette;
     colMode thisColorMode;
     colMode oldColorMode;
