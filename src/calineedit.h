@@ -51,6 +51,7 @@ class QTCON_EXPORT caLineEdit : public QLineEdit, public FontScalingWidget
 public:
 
     caLineEdit( QWidget *parent = 0 );
+     ~caLineEdit(){}
 
     bool getUnitsEnabled() const { return thisUnitMode; }
     void setUnitsEnabled(bool thisUnitMode);
