@@ -25,7 +25,7 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     QString family = info.family();
     //printf("got font %s\n", family.toAscii().constData());
     if(!family.contains("Lucida Sans Typewriter")) {
-        QFont  newfont("Monospace");   // not very nice, while a a dot inside the zeo to distinguish from o
+        QFont  newfont("Monospace");   // not very nice, while a a dot inside the zero to distinguish from o
         setFont(newfont);
     } else {
        setFont(font);
@@ -43,7 +43,7 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     thisForeColor = Qt::black;
 
     oldBackColor = Qt::black;
-    thisForeColor = Qt::gray;
+    oldForeColor = Qt::gray;
 
     setPrecisionMode(Channel);
     setLimitsMode(Channel);
