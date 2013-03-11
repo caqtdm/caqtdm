@@ -146,21 +146,22 @@ extern "C" MutexKnobData* C_GetMutexKnobData(MutexKnobData* p, int indx, knobDat
 int MutexKnobData::GetMutexKnobDataIndex()
 {
     int oldsize, newsize;
-    for(int i=0; i < KnobDataArraySize; i++) {
+    QMutexLocker locker(&mutex);
+	for(int i=0; i < KnobDataArraySize; i++) {
         if(KnobData[i].index == -1) {
             return i;
         }
     }
     oldsize=KnobDataArraySize;
-    KnobDataArraySize+=200;
-    newsize = KnobDataArraySize;
+    newsize = KnobDataArraySize+200;
     void *p = &KnobData;
     //ReAllocate(oldsize * sizeof(knobData), newsize * sizeof(knobData), (void**) &KnobData);
     ReAllocate(oldsize * sizeof(knobData), newsize * sizeof(knobData), (void**) p);
     for(int i=oldsize; i < newsize; i++){
         KnobData[i].index  = -1;
     }
-    return oldsize;
+    KnobDataArraySize=newsize;
+	return oldsize;
 }
 //*********************************************************************************************************************
 
