@@ -528,10 +528,10 @@ void ClearMonitor(knobData *kData)
 
     if (kData->index == -1) return;
 
+    PRINT(printf("clear channel %s index=%d\n", kData->pv, kData->index));
+
     kData->index = -1;
     kData->pv[0] = '\0';
-
-   PRINT(printf("clear channel %s index=%d\n", tmp->pv, kData->index));
 
     tmp = (connectInfo *) kData->edata.info;
     if (tmp != (connectInfo *) 0) {
@@ -610,7 +610,7 @@ int EpicsSetValue(char *pv, float rdata, int32_t idata, char *sdata, char *objec
     switch (chType) {
     case DBF_STRING:
     case DBF_ENUM:
-        //printf("Epicsput string for <%s> with data=%s\n", pv, sdata);
+        PRINT(printf("Epicsput string for <%s> with data=%s\n", pv, sdata));
         status = ca_put(DBR_STRING, ch, sdata);
         if (status != ECA_NORMAL) {
             C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
@@ -619,7 +619,7 @@ int EpicsSetValue(char *pv, float rdata, int32_t idata, char *sdata, char *objec
         break;
 
     case DBF_INT:
-        //printf("Epicsput int for <%s> with data=%d\n", pv, (int) idata);
+        PRINT(printf("Epicsput int for <%s> with data=%d\n", pv, (int) idata));
         status = ca_put(DBR_INT, ch, &idata);
         if (status != ECA_NORMAL) {
             C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
@@ -628,7 +628,7 @@ int EpicsSetValue(char *pv, float rdata, int32_t idata, char *sdata, char *objec
         break;
 
     case DBF_LONG:
-        //printf("Epicsput long for <%s> with data=%d\n", pv, (int) idata);
+        PRINT(printf("Epicsput long for <%s> with data=%d\n", pv, (int) idata));
         status = ca_put(DBR_LONG, ch, &idata);
         if (status != ECA_NORMAL) {
             C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
@@ -638,7 +638,7 @@ int EpicsSetValue(char *pv, float rdata, int32_t idata, char *sdata, char *objec
 
     case DBF_DOUBLE:
     case DBF_FLOAT:
-        //printf("put double/float for <%s> with data=%f\n", pv, rdata);
+        PRINT(printf("put double/float for <%s> with data=%f\n", pv, rdata));
         status = ca_put(DBR_FLOAT, ch, &rdata);
         if (status != ECA_NORMAL) {
             C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s)\n", pv, ca_message (status)));
@@ -647,7 +647,7 @@ int EpicsSetValue(char *pv, float rdata, int32_t idata, char *sdata, char *objec
         break;
 
     case DBF_CHAR:
-        //printf("put char array for <%s> with <%s>\n", pv, sdata);
+        PRINT(printf("put char array for <%s> with <%s>\n", pv, sdata));
         status = ca_array_put(DBR_CHAR, strlen(sdata)+1, ch, sdata);
         if (status != ECA_NORMAL) {
             C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));

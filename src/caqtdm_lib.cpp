@@ -2416,6 +2416,8 @@ void CaQtDM_Lib::Callback_ToggleButton(bool type)
 {
     float value;
     int32_t idata;
+    QString text;
+    char errmess[255];
     caToggleButton *w = qobject_cast<caToggleButton *>(sender());
     if(!w->getAccessW()) return;
 
@@ -2427,7 +2429,8 @@ void CaQtDM_Lib::Callback_ToggleButton(bool type)
     idata = (int32_t) value;
 
     if(w->getPV().length() > 0) {
-        TreatOrdinaryValue(w->getPV(), value, idata, (QWidget*) w);
+        QStringsToChars(w->getPV(), text,  w->objectName().toLower());
+        EpicsSetValue(param1, value, idata, param2, param3, errmess, 2);
     }
 }
 
