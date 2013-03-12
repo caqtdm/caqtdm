@@ -78,11 +78,17 @@ void caChoice::arrangeCells(QStringList list, int indx)
 
     // create all buttons
     for (int i = 0; i < numCells ;i++) {
+        EPushButton* temp;
         //printf("numCells=%d start=%d end=%d\n", numCells, thisStartBit, thisEndBit);
         if((i + thisStartBit) > numCells) break;
         if((i + thisStartBit) > thisEndBit) break;
 
-        EPushButton* temp = new EPushButton(list.at(i + thisStartBit), this);
+        if(list.at(i + thisStartBit).trimmed().size() > 0) {
+          temp = new EPushButton(list.at(i + thisStartBit), this);
+        } else {
+            QString s = QString::number(i + thisStartBit);
+            temp = new EPushButton(s, this);
+        }
         temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         if(thisScaleMode == EPushButton::None) {  // in this case we may use font
             temp->setFont(this->font());
