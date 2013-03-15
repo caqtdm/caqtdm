@@ -50,7 +50,10 @@ caGraphics::caGraphics( QWidget *parent) :  QWidget(parent)
     thisSpanAngle = 90;
 
     setLineStyle(Solid);
+    setHidden(false);
 
+    setAttribute(Qt::WA_TranslucentBackground );
+    setWindowFlags(Qt::FramelessWindowHint);
 }
 
 void caGraphics::setLineSize(int size ) {
@@ -247,9 +250,18 @@ QPolygonF caGraphics::drawCircle(int x1, int x2, int y1, int y2) {
     return points;
 }
 
+void caGraphics::setHidden(bool hide)
+{
+    thisHide = hide;
+    repaint();
+}
+
 void caGraphics::paintEvent( QPaintEvent *event )
 {
     Q_UNUSED(event);
+
+    if(thisHide) return;
+
     int m_margin = 3;
     QPointF p1,p2;
     QPainter painter( this );
@@ -270,15 +282,17 @@ void caGraphics::paintEvent( QPaintEvent *event )
     int y = margin;
 
     if(thisLineStyle == Dash) {
-        painter.setPen( QPen( getLineColor(), getLineSize(), Qt::DotLine, Qt::FlatCap, Qt::RoundJoin ) );
+        painter.setPen( QPen( getLineColor(), getLineSize(), Qt::DotLine) );
     } else if (thisLineStyle == BigDash) {
-       painter.setPen( QPen( getLineColor(), getLineSize(), Qt::DashLine, Qt::FlatCap, Qt::RoundJoin ) );
+       painter.setPen( QPen( getLineColor(), getLineSize(), Qt::DashLine ) );
     } else {
-       painter.setPen( QPen( getLineColor(), getLineSize(), Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin ) );
+       painter.setPen( QPen( getLineColor(), getLineSize(), Qt::SolidLine ) );
     }
 
     if(thisFillStyle == Filled) {
         painter.setBrush(getForeground());
+    } else {
+        //painter.setBrush(QColor(0,0,0,0));
     }
 
     if(getForm() == Rectangle) {

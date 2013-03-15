@@ -92,6 +92,8 @@ public:
     void setInEditor(bool in);
     void setEditSize(int x, int y, int w, int h);
 
+    void setHidden(bool hide);
+
 protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
@@ -121,6 +123,9 @@ private:
     QPointF lastPosition;
     bool mouseMove;
     QRect editSize;
+
+    bool thisHide;
+
 };
 
 #endif

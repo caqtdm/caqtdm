@@ -31,6 +31,11 @@ caPolyLine::caPolyLine(QWidget *parent): QWidget(parent)
     initialize = true;
     inEditor = false;
     mouseMove = false;
+
+    setHidden(false);
+
+    setAttribute(Qt::WA_TranslucentBackground, true );
+    setWindowFlags(Qt::FramelessWindowHint);
 }
 
 void caPolyLine::setLineSize(int size )
@@ -173,9 +178,19 @@ void caPolyLine::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
+void caPolyLine::setHidden(bool hide)
+{
+    thisHide = hide;
+    repaint();
+}
+
 void caPolyLine::paintEvent(QPaintEvent * /* event */)
 {
+
+    if(thisHide) return;
+
     QPainter painter(this);
+
     painter.setRenderHint( QPainter::Antialiasing );
     int nbPoints = 0;
 
@@ -185,11 +200,11 @@ void caPolyLine::paintEvent(QPaintEvent * /* event */)
     }
 
     if(thisLineStyle == Dash) {
-        painter.setPen( QPen( getLineColor(), getLineSize(), Qt::DotLine, Qt::FlatCap, Qt::RoundJoin ) );
+        painter.setPen( QPen( getLineColor(), getLineSize(), Qt::DotLine ));
     } else if (thisLineStyle == BigDash) {
-        painter.setPen( QPen( getLineColor(), getLineSize(), Qt::DashLine, Qt::FlatCap, Qt::RoundJoin ) );
+        painter.setPen( QPen( getLineColor(), getLineSize(), Qt::DashLine ));
     } else {
-        painter.setPen( QPen( getLineColor(), getLineSize(), Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin ) );
+        painter.setPen( QPen( getLineColor(), getLineSize(), Qt::SolidLine ));
     }
 
     QStringList pairs = thisXYpairs.split(";", QString::SkipEmptyParts);

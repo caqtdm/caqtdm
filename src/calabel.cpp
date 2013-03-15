@@ -33,6 +33,9 @@ void caLabel::setColors(QColor bg, QColor fg)
         thisStyle = thisStyle.arg(bg.red()).arg(thisBackColor.green()).arg(bg.blue()).arg(bg.alpha()).
                 arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
         setStyleSheet(thisStyle);
+        // oups, was forgotten
+        thisBackColorOld = bg;
+        thisForeColorOld = fg;
     }
 
     if(thisStyle != oldStyle || thisColorMode != oldColorMode) {

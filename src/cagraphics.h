@@ -103,6 +103,8 @@ public:
 
     bool setPropertyEditorItems(QWidget *pTheWidget, QStringList QStringListToChange, bool bShowProperties);
 
+    void setHidden(bool hide);
+
 public slots:
 
 
@@ -133,6 +135,8 @@ private:
 
     QPolygonF drawCircle(int x1, int x2, int y1, int y2);
     QPolygonF rotateObject(int degrees, int w, int h, int linesize, const QPolygonF& object);
+
+    bool thisHide;
 };
 
 #endif // CIRCLEBAR_H
