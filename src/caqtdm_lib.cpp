@@ -338,6 +338,9 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         HandleWidget(w1, savedMacro[0], false);
     }
 
+    // build a list for getting all soft pv
+    mutexKnobData->BuildSoftPVList(myWidget);
+
     // start a timer
     startTimer(2000);
 }
@@ -752,7 +755,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         //==================================================================================================================
     } else if(caToggleButton* widget = qobject_cast<caToggleButton *>(w1)) {
 
-        // qDebug() << "create caToggleButton";
+        //qDebug() << "create caToggleButton";
 
         connect(widget, SIGNAL(toggleButtonSignal(bool)), this, SLOT(Callback_ToggleButton(bool)));
 
@@ -767,7 +770,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         //==================================================================================================================
     } else if(caScriptButton* widget = qobject_cast<caScriptButton *>(w1)) {
 
-        // qDebug() << "create caToggleButton";
+        //qDebug() << "create caToggleButton";
 
         connect(widget, SIGNAL(scriptButtonSignal()), this, SLOT(Callback_ScriptButton()));
 
@@ -1352,6 +1355,12 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
 
     QString trimmedPV = pv.trimmed();
 
+    // when we defined already the same software channel, then get back the rate that was specified
+    if(mutexKnobData->getSoftPV(pv, &indx, thisW)) {
+        knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
+        rate = kPtr->edata.repRate;
+    }
+
     // is there a json string ?
     int pos = trimmedPV.indexOf("{");
     if(pos != -1) {
@@ -1455,7 +1464,7 @@ int CaQtDM_Lib::setObjectVisibility(QWidget *w, double value)
     if(caFrame *widget = qobject_cast<caFrame *>(w)) {
         // treat visibility if defined
         ComputeVisibility(caFrame)
-                if(widget->getVisibilityMode() == caFrame::Background) {
+        if(widget->getVisibilityMode() == caFrame::Background) {
             if(visible) widget->setAutoFillBackground(true);
             else widget->setAutoFillBackground(false);
             return visible;
@@ -1478,9 +1487,13 @@ int CaQtDM_Lib::setObjectVisibility(QWidget *w, double value)
     }
 
     if(!visible) {
-        w->hide();
+        if(caPolyLine *widget = qobject_cast<caPolyLine *>(w)) widget->setHidden(true);
+        else if(caGraphics *widget = qobject_cast<caGraphics *>(w)) widget->setHidden(true);
+        else w->hide();
     } else {
-        w->show();
+        if(caPolyLine *widget = qobject_cast<caPolyLine *>(w)) widget->setHidden(false);
+         else if(caGraphics *widget = qobject_cast<caGraphics *>(w)) widget->setHidden(false);
+        else w->show();
     }
     return visible;
 }
@@ -1522,15 +1535,18 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
     // any monitors ?
     QVariant var=w->property("MonitorList");
     QVariantList list = var.toList();
+
+    if(list.size() == 0) return true;
+
     int nbMonitors = list.at(0).toInt();
-    //qDebug() << "number of monitors" << nbMonitors;
+    //qDebug() << "number of monitors" << nbMonitors << "calc=" << calcString;
     if(nbMonitors > 0)  {
 
         // scan and get the channels
         for(int i=0; i < MAX_CALC_INPUTS; i++) valueArray[i] = 0.0;
         for(int i=0; i< nbMonitors;i++) {
             knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(list.at(i+1).toInt());
-            //qDebug() << ptr->pv << ptr->edata.connected << ptr->edata.rvalue;
+            //qDebug() << "calculate from index" << ptr->index << ptr->pv << ptr->edata.connected << ptr->edata.rvalue;
             // when connected
             if(ptr->edata.connected) {
                 valueArray[i] = ptr->edata.rvalue;
@@ -1570,7 +1586,6 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
             char asc[100];
             sprintf(asc, "invalid calc %s for %s", calcString, qPrintable(w->objectName()));
             postMessage(QtDebugMsg, asc);
-            printf("%s\n",asc);
             valid = false;
             return true;
         }
@@ -1668,18 +1683,30 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 {
     Q_UNUSED(indx);
     Q_UNUSED(fec);
-    /*
-    knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer for getting all necessary information
-*/
+
+    // thread mutexknobdata emits to all instances of this class, later we will have to filter on the emit side to enhance performance
+    bool thisInstance = false;
+    QWidget *widget = w;
+      while (widget -> parentWidget()) {
+          widget = widget -> parentWidget() ;
+          if(widget == myWidget) {
+              thisInstance = true;
+              break;
+          }
+      }
+      if(!thisInstance) {
+          return;
+      }
+
     // calc ==================================================================================================================
     if(caCalc *widget = qobject_cast<caCalc *>(w)) {
         bool valid;
         double result;
-        //qDebug() << "we have a caCalc" << widget->objectName() << data.pv << "and will calculate result";
+       //qDebug() << "we have a caCalc";
 
-        CalcVisibility(w, result, valid);
+        CalcVisibility(w, result, valid);  // visibility not used, but calculation yes
         if(valid) {
-            widget->setValue(data.edata.rvalue);
+            widget->setValue(result);
             mutexKnobData->UpdateSoftPV(data.pv, result, myWidget);
         }
 
@@ -2735,7 +2762,7 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
             QWidget* w = (QWidget*) kData.thisW;
             short soft = kData.soft;
             //qDebug() << "clear monitor at" << i << "index="  << kData.index;
-            if(soft) mutexKnobData->RemoveSoftPV(pv, (QWidget*) w);
+            if(soft) mutexKnobData->RemoveSoftPV(pv, (QWidget*) w, kData.index);
             ClearMonitor(&kData);
             mutexKnobData->SetMutexKnobData(i, kData);
         }
@@ -3156,7 +3183,7 @@ void CaQtDM_Lib::mouseReleaseEvent(QMouseEvent *event)
 /**
   * get channels and create the monitors for calculating the visibility of the objects
   */
-int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, QString> map,  int *specData, QString info)
+int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, QString> map, int *specData, QString info)
 {
     QString tooltip;
     QString pv;
@@ -3172,8 +3199,9 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
     int num, nbMon = 0;
     QString strng[4];
     QString visibilityCalc;
+    QString text;
 
-    // caCalc has no visibility, it is a calc entity, so I have to get this away.
+    // caCalc has no visibility, it is a calc entity
     if (caCalc *w = qobject_cast<caCalc *>(widget)) {
         strng[0] = w->getChannelA();
         strng[1] = w->getChannelB();
@@ -3227,9 +3255,8 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
         return 0;
     }
 
-    /* add monitors for this image if any */
+    /* add monitors for this if any */
     for(int i=0; i<4; i++) {
-        /* add monitors for this image if any */
         if((num = addMonitor(myWidget, kData, strng[i], widget, specData, map, &pv)) >= 0) {
             if (caCalc *w = qobject_cast<caCalc *>(widget)) {
                 if(i==0) w->setChannelA(pv);  /* replace pv while macro could be used */
@@ -3277,13 +3304,14 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
     tooltip.append(ToolTipPostfix);
     if(nbMon> 0) widget->setToolTip(tooltip);
 
-    /* replace also some macro values in the visibility calc string */
-    QString text =  treatMacro(map, visibilityCalc, &doNothing);
-
+    // replace macros for imagecalc
     if (caImage *w = qobject_cast<caImage *>(widget)) {
         text =  treatMacro(map, w->getImageCalc(), &doNothing);
         w->setImageCalc(text);
     }
+
+    /* replace also some macro values in the visibility calc string */
+    text =  treatMacro(map, visibilityCalc, &doNothing);
 
     integerList.insert(0, nbMon); /* set property into widget */
 
@@ -3309,6 +3337,7 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
         w->setVisibilityCalc(text);
         w->setProperty("MonitorList", integerList);
     }
+
     return nbMon;
 }
 

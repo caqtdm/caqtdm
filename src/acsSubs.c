@@ -604,6 +604,7 @@ int SetDeviceStringValue(char *name, char *data)
         num = getCmdNames(&devD, &attD, &dim, bitmapping);
 
         for(i = 0; i < num; i++) {
+            bitmapping[i].bitName[7] = '\0';
             //printf("%s %s\n", bitmapping[i].bitName, data);
             if(IsInside(bitmapping[i].bitName, data)) {
                 //printf("found number=%d bitmapping is %x %x\n", i, bitmapping[i].smask, bitmapping[i].cmask);

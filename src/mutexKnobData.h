@@ -49,9 +49,10 @@ public:
     void UpdateTextLine(char *message, char *name);
 
     void InsertSoftPV(QString pv, int num, QWidget* w);
-    void RemoveSoftPV(QString pv, QWidget *w);
+    void RemoveSoftPV(QString pv, QWidget *w, int indx);
     void UpdateSoftPV(QString pv, double value, QWidget *w);
     bool getSoftPV(QString pv, int *indx, QWidget *w);
+    void BuildSoftPVList(QWidget *w);
 
 signals:
 
@@ -64,6 +65,7 @@ private:
     knobData *KnobData;
     int KnobDataArraySize;
     int timerId;
-    QMap<QString, int> variableList;
+    QMap<QString, int> softPV_WidgetList;
+    QMap<QString, int> softPV_List;
 };
 #endif // MUTEXKNOBDATA_H
