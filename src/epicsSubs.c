@@ -453,7 +453,7 @@ int CreateAndConnect(int index, knobData *kData, int rate)
 
     tmp = (connectInfo *) 0;
 
-    PRINT(printf("create channel index=%d <%s>\n", index, kData->pv));
+    PRINT(printf("create channel index=%d <%s> rate=%d\n", index, kData->pv, rate));
 
     kData->edata.monitorCount = 0;
     kData->edata.displayCount = 0;
@@ -464,7 +464,7 @@ int CreateAndConnect(int index, knobData *kData, int rate)
     kData->edata.dataSize = 0;
     kData->edata.initialize = true;
     kData->edata.lastTime = now;
-    kData->edata.repRate = rate;   // default 5 Hz, will anyhow not be higher due to scan loop
+    kData->edata.repRate = rate;   // default 5 Hz
 
     tmp = (connectInfo *) kData->edata.info;
     strcpy(tmp->pv, kData->pv);
