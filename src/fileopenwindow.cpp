@@ -244,6 +244,11 @@ void FileOpenWindow::Callback_OpenButton()
 
             sprintf(asc, "last file: %s", fileName.toAscii().constData());
             messageWindow->postMsgEvent(QtDebugMsg, asc);
+
+            if (fileName.contains("prc")) {
+                mainWindow->resize(mainWindow->minimumSizeHint());
+            }
+
         } else {
             QTDMMessageBox(QMessageBox::Warning, "file open error", "does not exist", QMessageBox::Close, this, Qt::Popup, true);
         }
