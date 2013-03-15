@@ -695,7 +695,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         //qDebug() << "create caGraphics";
 
         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
-
         widget->setProperty("Taken", true);
 
         //==================================================================================================================
@@ -704,7 +703,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         //qDebug() << "create caPolyLine";
 
         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
-        widget->setEnabled(false);  // disable editing possibility
+        widget->setEnabled(false);  // disable editing possibility, however it suppress the context menu; todo
         widget->setProperty("Taken", true);
 
         //==================================================================================================================
