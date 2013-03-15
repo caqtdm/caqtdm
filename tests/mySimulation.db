@@ -215,6 +215,16 @@ record(mbbo,"QTDM:TEST:MBBO") {
         field(TWST, "RESET")
 }
 
+record(mbbo,"QTDM:TEST1:MBBO") {
+        field(ZRVL, "0")
+        field(ONVL, "1")
+        field(TWVL, "2")
+        field(ZRST, " ")
+        field(ONST, " ")
+        field(TWST, " ")        
+}
+
+
 record(waveform, "QTDM:TEST:WAVE"){
         field(DESC, "char waveform")
         field(FTVL, "CHAR")
