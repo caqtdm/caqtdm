@@ -137,12 +137,14 @@ void caPolyLine::setEditSize(int x, int y, int w, int h) {
 
 void caPolyLine::mouseMoveEvent(QMouseEvent *event)
 {
+    if(!inEditor) return;
     actualPosition = QPointF(event->pos().x(),event->pos().y());
     update();
 }
 
 void caPolyLine::mousePressEvent(QMouseEvent *event)
 {
+    if(!inEditor) return;
     // start move
     actualPosition = QPointF(event->pos().x(),event->pos().y());
     if (event->button() == Qt::LeftButton) {
@@ -168,6 +170,7 @@ void caPolyLine::mousePressEvent(QMouseEvent *event)
 
 void caPolyLine::mouseReleaseEvent(QMouseEvent *event)
 {
+   if(!inEditor) return;
     mouseMove = false;
     // add point
     if (event->button() == Qt::LeftButton) {
