@@ -3073,11 +3073,28 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
 
                     // severity
-                    info.append("<br>Severity: ");
-                    info.append(AlarmStrings[kPtr->edata.severity]);
+                    switch(kPtr->edata.severity) {
+                    case NO_ALARM:
+                        info.append("<br>Severity: NO_ALARM");
+                        break;
+                    case MINOR_ALARM:
+                        info.append("<br>Severity: MINOR_ALARM");
+                        break;
+                    case MAJOR_ALARM:
+                        info.append("<br>Severity: MAJOR_ALARM");
+                        break;
+                    case INVALID_ALARM:
+                        info.append("<br>Severity: INVALID_ALARM");
+                        break;
+                    case NOTCONNECTED:
+                        info.append("<br>Severity: NOT_CONNECTED");
+                        break;
+                    }
 
+                    // status
                     info.append("<br>Alarm status: ");
-                    info.append(AlarmStatusStrings[kPtr->edata.status]);
+                    if(kPtr->edata.status <= 22) info.append(AlarmStatusStrings[kPtr->edata.status]);
+                    else info.append("???");
 
                     // ioc
                     info.append("<br>IOC: ");
