@@ -1,4 +1,16 @@
-CAQTDM_VERSION = V2.7.3
+CAQTDM_VERSION = V2.8.0
+
+# new in 2.8.0
+# performance has been optimized further
+# visibility of image did not work
+# softpv had some problems, some solved
+# for old acs controlsystem, problem with command has been solved
+# flashing due to hide and show eliminated for capolyline and cagraphics
+# color performance problem for calabel solved
+# epics alarm status has been added in context box
+# info could not be called for polyline; is now ok
+# when opening pep files, size of window is resized to a minimum
+# adl2ui some strings leaded to an array overflow; is now ok
 
 # new in 2.7.3
 # calineedit was changing its stylesheet continuously and had to be optimized for that

@@ -1474,7 +1474,7 @@ void *parseRelatedDisplay(DisplayInfo *displayInfo, FrameOffset * offset)
                 strcat(names, name); strcat(names, ";");
                 strcat(argus, arg); strcat(argus, ";");
                 strcat(labels, label); strcat(labels, ";");
-                printf("<%s>\n", pol);
+
                 if(!strncmp(pol,"replace", 7)) {
                     strcpy(pol, "true");
                 } else {
