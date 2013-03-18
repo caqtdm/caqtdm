@@ -87,6 +87,7 @@ char* myLimitedString (char * strng) {
     kData.edata.rvalue = valx; \
     kData.edata.ivalue = vali; \
     kData.edata.severity = stsF->severity; \
+    kData.edata.status = stsF->status; \
     kData.edata.accessW = ca_write_access(args.chid); \
     kData.edata.accessR = ca_read_access(args.chid); \
     kData.edata.valueCount = countx; \

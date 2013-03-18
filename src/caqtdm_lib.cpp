@@ -703,7 +703,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         //qDebug() << "create caPolyLine";
 
         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
-        widget->setEnabled(false);  // disable editing possibility, however it suppress the context menu; todo
         widget->setProperty("Taken", true);
 
         //==================================================================================================================
@@ -3072,24 +3071,13 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         break;
                     }
 
+
                     // severity
-                    switch(kPtr->edata.severity) {
-                    case NO_ALARM:
-                        info.append("<br>Severity: NO_ALARM");
-                        break;
-                    case MINOR_ALARM:
-                        info.append("<br>Severity: MINOR_ALARM");
-                        break;
-                    case MAJOR_ALARM:
-                        info.append("<br>Severity: MAJOR_ALARM");
-                        break;
-                    case INVALID_ALARM:
-                        info.append("<br>Severity: INVALID_ALARM");
-                        break;
-                    case NOTCONNECTED:
-                        info.append("<br>Severity: NOT_CONNECTED");
-                        break;
-                    }
+                    info.append("<br>Severity: ");
+                    info.append(AlarmStrings[kPtr->edata.severity]);
+
+                    info.append("<br>Alarm status: ");
+                    info.append(AlarmStatusStrings[kPtr->edata.status]);
 
                     // ioc
                     info.append("<br>IOC: ");
