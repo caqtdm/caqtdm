@@ -144,7 +144,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: cornsilk;}</string>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -169,7 +169,7 @@ border-radius: 2px;
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -768,7 +768,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="foreground">
-         <color>
+         <color alpha="100">
           <red>0</red>
           <green>0</green>
           <blue>255</blue>
@@ -778,7 +778,7 @@ p, li { white-space: pre-wrap; }
          <string>33,90;33,90;88,49;96,92;68,107;2,107;23,24</string>
         </property>
         <property name="fillstyle" stdset="0">
-         <enum>caPolyLine::Outline</enum>
+         <enum>caPolyLine::Filled</enum>
         </property>
         <property name="polystyle" stdset="0">
          <enum>caPolyLine::Polygon</enum>
@@ -813,6 +813,45 @@ p, li { white-space: pre-wrap; }
          <bool>true</bool>
         </property>
        </widget>
+       <widget class="caImage" name="caimage_4">
+        <property name="geometry">
+         <rect>
+          <x>265</x>
+          <y>315</y>
+          <width>81</width>
+          <height>81</height>
+         </rect>
+        </property>
+        <property name="imageCalc">
+         <string notr="true"/>
+        </property>
+        <property name="filename" stdset="0">
+         <string notr="true">earth.gif</string>
+        </property>
+       </widget>
+       <widget class="caImage" name="caimage_5">
+        <property name="geometry">
+         <rect>
+          <x>165</x>
+          <y>380</y>
+          <width>81</width>
+          <height>81</height>
+         </rect>
+        </property>
+        <property name="imageCalc">
+         <string notr="true"/>
+        </property>
+        <property name="filename" stdset="0">
+         <string notr="true">earth.gif</string>
+        </property>
+       </widget>
+       <zorder>textEdit_3</zorder>
+       <zorder>capolyline_2</zorder>
+       <zorder>calineedit_4</zorder>
+       <zorder>caimage_4</zorder>
+       <zorder>capolyline_3</zorder>
+       <zorder>caimage_5</zorder>
+       <zorder>capolyline</zorder>
       </widget>
       <widget class="QWidget" name="tab_4">
        <attribute name="title">
@@ -1306,7 +1345,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>6</number>
+       <number>11</number>
       </property>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">
@@ -3534,6 +3573,66 @@ p, li { white-space: pre-wrap; }
          <enum>caSlider::Default</enum>
         </property>
        </widget>
+       <widget class="caCalc" name="cacalc">
+        <property name="geometry">
+         <rect>
+          <x>780</x>
+          <y>385</y>
+          <width>71</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="variable">
+         <string notr="true">mycalc{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+        </property>
+        <property name="calc">
+         <string notr="true">A+1</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">mycalc</string>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_16">
+        <property name="geometry">
+         <rect>
+          <x>740</x>
+          <y>280</y>
+          <width>281</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>calculation on own soft channel</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::WidthAndHeight</enum>
+        </property>
+       </widget>
+       <widget class="caGraphics" name="cagraphics_16">
+        <property name="geometry">
+         <rect>
+          <x>800</x>
+          <y>320</y>
+          <width>101</width>
+          <height>56</height>
+         </rect>
+        </property>
+        <property name="lineSize">
+         <number>2</number>
+        </property>
+        <property name="form">
+         <enum>caGraphics::Arrow</enum>
+        </property>
+        <property name="tiltAngle">
+         <number>300</number>
+        </property>
+       </widget>
       </widget>
      </widget>
     </widget>
@@ -3560,7 +3659,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
@@ -4597,22 +4696,6 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="stackingMode" stdset="0">
          <enum>caChoice::RowColumn</enum>
-        </property>
-       </widget>
-       <widget class="caChoice" name="caChoice_5">
-        <property name="geometry">
-         <rect>
-          <x>80</x>
-          <y>380</y>
-          <width>70</width>
-          <height>55</height>
-         </rect>
-        </property>
-        <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST1:MBBO</string>
-        </property>
-        <property name="colorMode">
-         <enum>caChoice::Static</enum>
         </property>
        </widget>
       </widget>
