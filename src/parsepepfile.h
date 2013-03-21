@@ -33,6 +33,7 @@ private:
         QString formats[2];
         int nbElem,span;
         bool textPresent;
+        QColor fg, bg;
     } gridInfo;
 
     void TreatFile(int &nbRows, int &nbCols, QFile *file);
@@ -56,7 +57,7 @@ private:
                        QString alignment, QString colormode, QString calc, QString visibility, int rgba[4], QByteArray *array);
 
     void writeLabel(QString text,QString minwidth,  QString minheight, QString maxwidth, QString maxheight, QString pointsize, QString alignment,QString colormode,
-                    QString calcpv, QString calc, QString visibility, bool transparent, QByteArray *array);
+                    QString calcpv, QString calc, QString visibility, bool transparent, QColor fg, QColor bg, QByteArray *array);
 
     void writeChoice(QString pv, QByteArray *array);
     void writeWheelswitch(QString format, QString pv, QByteArray *array);
