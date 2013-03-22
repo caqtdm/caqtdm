@@ -166,12 +166,10 @@ void caCartesianPlot::setData(const QVector<double>& vector, int curvIndex, int 
         if(curvType == X_only) {
             Y[curvIndex].clear();
             for(int i=0; i< vector.size(); i++) Y[curvIndex].append(i);
-            //setYscaling(caCartesianPlot::Auto);
             // only y channel was specified, use index as x
         } else if(curvType == Y_only) {
             X[curvIndex].clear();
             for(int i=0; i< vector.size(); i++) X[curvIndex].append(i);
-            //setXscaling(caCartesianPlot::Auto);
         }
         // when triggering is specified, we will return here
         if(thisToBeTriggered) {
@@ -196,17 +194,21 @@ void caCartesianPlot::setData(const QVector<double>& vector, int curvIndex, int 
         if(X[curvIndex].size() > 1 && Y[curvIndex].size() == 1) {
             //printf("x vector, y scalar\n");
             int nbPoints = X[curvIndex].size();
+            double aux =  Y[curvIndex].at(0);
+            Y[curvIndex].reserve(nbPoints);      // increase to correct size
             double *data = Y[curvIndex].data();
-            for(int i=0; i < X[curvIndex].size(); i++) data[i] = data[0];
+            for(int i=0; i < X[curvIndex].size(); i++) data[i] = aux;
             if(thisCountNumber > 0) nbPoints = qMin(thisCountNumber, X[curvIndex].size());
             curve[curvIndex].setSamples(X[curvIndex].data(), Y[curvIndex].data(), nbPoints);
 
         // x scalar, y vector
         } else if(X[curvIndex].size() == 1 && Y[curvIndex].size() > 1) {
-            //printf("x scalar, y vector\n");
-            int nbPoints = Y[curvIndex].size();
+            //printf("x scalar, y vector\n" );
+            int nbPoints = Y[curvIndex].size(); 
+            double aux =  X[curvIndex].at(0);
+            X[curvIndex].reserve(nbPoints);      // increase to correct size
             double *data = X[curvIndex].data();
-            for(int i=0; i < Y[curvIndex].size(); i++) data[i] = data[0];
+            for(int i=0; i < Y[curvIndex].size(); i++) data[i] = aux;  // and set values to first datapoint
             if(thisCountNumber > 0) nbPoints = qMin(thisCountNumber, Y[curvIndex].size());
             curve[curvIndex].setSamples(X[curvIndex].data(), Y[curvIndex].data(), nbPoints);
 
