@@ -1,4 +1,7 @@
-CAQTDM_VERSION = V2.8.0
+CAQTDM_VERSION = V2.8.1
+
+# new in 2.8.1
+# small changes in pep file handling
 
 # new in 2.8.0
 # performance has been optimized further
