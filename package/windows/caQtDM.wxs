@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Product Id="D75A13FA-3367-4850-AC46-E69A41645E83" Name="caQtDM" Language="1033" Version="2.7.0.0" Manufacturer="Paul Scherrer Institut" UpgradeCode="CEE4C381-28DA-478F-A7C6-3A95B4DF2A89">
+    <Product Id="D75A13FA-3367-4850-AC46-E69A41645E83" Name="caQtDM" Language="1033" Version="2.8.0.0" Manufacturer="Paul Scherrer Institut" UpgradeCode="CEE4C381-28DA-478F-A7C6-3A95B4DF2A89">
         <Package Description="caQTDM Windows Manager with Qt-Designer(4.8.2)" Comments="Displaymanager for EPICS with Qt(4.8.2)" InstallerVersion="300" Compressed="yes" Manufacturer="Paul Scherrer Institut Switzerland" Keywords="EPICS, Display, Network, Control" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
         <Directory Id="TARGETDIR" Name="SourceDir">
@@ -137,7 +137,7 @@
                         <RemoveFolder Id="ProgramMenuDir" On="uninstall" />
                         <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Type="string" Value="" />
                         <Shortcut Id="UninstallProduct" Name="Uninstall" Description="Uninstalls the application" Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" />
-                        <Shortcut Id="CaQtDM_ShortCut" Name="CaQtDM" Target="[FILEPRODUCTDIR]bin\win32-x86\caQtDM.exe">
+                        <Shortcut Id="CaQtDM_ShortCut" Name="CaQtDM" Target="[FILEPRODUCTDIR]bin\win32-x86\caQtDM.exe" Arguments=" -style plastique">
                         </Shortcut>
                         <Shortcut Id="Designer_Shortcut" Name="Designer" Target="[FILEPRODUCTDIR]bin\win32-x86\designer.exe" />
                     </Component>
