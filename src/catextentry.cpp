@@ -12,6 +12,7 @@
 #include "catextentry.h"
 #include <QApplication>
 #include <QtDebug>
+#include <QMouseEvent>
 
 caTextEntry::caTextEntry(QWidget *parent) : caLineEdit(parent)
 {
@@ -58,3 +59,4 @@ bool caTextEntry::eventFilter(QObject *obj, QEvent *event)
     }
     return QObject::eventFilter(obj, event);
 }
+
