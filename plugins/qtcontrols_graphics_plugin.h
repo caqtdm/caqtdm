@@ -13,7 +13,15 @@ class CustomWidgetInterface: public QObject, public QDesignerCustomWidgetInterfa
 public:
     CustomWidgetInterface(QObject *parent);
 
-    virtual bool isContainer() const { if(d_name.contains("caFrame")) return true; else return false; };
+    virtual bool isContainer() const {
+      if(d_name.contains("caFrame")) {
+	return true; 
+      } else if(d_name.contains("caDoubleTabWidget")) {
+	return true;
+      } else {
+	return false; 
+    }
+    };
     virtual bool isInitialized() const { return d_isInitialized; };
     virtual QIcon icon() const { return d_icon; };
     virtual QString codeTemplate() const { return d_codeTemplate; };
@@ -32,7 +40,7 @@ protected:
     QString d_whatsThis; 
     QString d_domXml; 
     QString d_codeTemplate;
-    QIcon d_icon;
+    QIcon d_icon; 
 
 private:
     bool d_isInitialized;
@@ -111,6 +119,17 @@ public:
     caIncludeInterface(QObject* parent);
     virtual QWidget* createWidget(QWidget* parent);
 };
+
+class caDoubleTabWidgetInterface : public CustomWidgetInterface
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerCustomWidgetInterface)
+	
+public:
+    caDoubleTabWidgetInterface(QObject* parent);
+    virtual QWidget* createWidget(QWidget* parent);
+};
+
 
 
 #endif

@@ -95,7 +95,10 @@ SOURCES	+= \
     src/capolylinedialog.cpp \
     src/parsepepfile.cpp \
     src/catogglebutton.cpp \
-    src/cascriptbutton.cpp
+    src/cascriptbutton.cpp \
+    src/cadoubletabwidget.cpp \
+    src/cadoubletabwidgetextension.cpp \
+    src/cadoubletabwidgetextensionfactory.cpp
 
 HEADERS	+= \
     src/caframe.h \
@@ -150,6 +153,9 @@ HEADERS	+= \
     src/alarmdefs.h \
     src/parsepepfile.h \
     src/catogglebutton.h \
-    src/cascriptbutton.h
+    src/cascriptbutton.h \
+    src/cadoubletabwidget.h \
+    src/cadoubletabwidgetextension.h \
+    src/cadoubletabwidgetextensionfactory.h
 
 OTHER_FILES += README

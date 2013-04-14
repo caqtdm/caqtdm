@@ -13,6 +13,36 @@ typedef char strng[40];
 char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, strng *propertyname, strng* propertytype, int nb)
 {
   char mess[1024], *xml;
+  
+  if(strstr(name, "cadoubletabwidget") != (char*) 0) {
+        sprintf(mess, "<ui language=\"c++\">\
+        <widget class=\"%s\" name=\"%s\">\
+        <property name=\"geometry\">\
+          <rect>\
+            <x>%d</x>\
+            <y>%d</y>\
+            <width>%d</width>\
+            <height>%d</height>\
+          </rect>\
+        </property>\
+        </widget>",  clss, name, x, y, w, h);
+        if(nb > 0) {
+            sprintf(mess, "%s  <customwidgets>\
+          <customwidget>\
+             <class>%s</class>\
+             <addpagemethod>addPage</addpagemethod>\
+             <propertyspecifications>", mess, clss);
+             for(int i=0; i<nb; i++) {
+                sprintf(mess, "%s <stringpropertyspecification name=\"%s\" notr=\"true\" type=\"%s\"/>", 
+                    mess, propertyname[i], propertytype[i]);
+             }
+             strcat(mess, " </propertyspecifications>\
+                </customwidget>\
+                </customwidgets>");
+        }
+        strcat(mess, "</ui>");
+	
+  } else {
         sprintf(mess, "<ui language=\"c++\">\
         <widget class=\"%s\" name=\"%s\">\
         <property name=\"geometry\">\
@@ -38,10 +68,13 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
                 </customwidgets>");
         }
         strcat(mess, "</ui>");
-        xml = (char*) malloc(strlen(mess) * sizeof(char)+1);
-        memcpy(xml, mess, strlen(mess) * sizeof(char)+1);
-        //printf("%s\n", xml);
-   return xml;
+  }
+
+  xml = (char*) malloc(strlen(mess) * sizeof(char)+1);
+  memcpy(xml, mess, strlen(mess) * sizeof(char)+1);
+
+  //printf("%s\n", xml);
+  return xml;
 }
 
 CustomWidgetInterface::CustomWidgetInterface(QObject *parent): QObject(parent), d_isInitialized(false)
@@ -62,6 +95,12 @@ void CustomWidgetInterface::initialize(QDesignerFormEditorInterface *formEditor)
        manager->registerExtensions(new caPolyLineTaskMenuFactory(manager),
                                 Q_TYPEID(QDesignerTaskMenuExtension));
     }
+    if(d_name.contains("caDoubleTabWidget")) {
+       QExtensionManager *manager = formEditor->extensionManager();
+       Q_ASSERT(manager != 0);
+       manager->registerExtensions(new caDoubleTabWidgetExtensionFactory(manager),
+                                Q_TYPEID(QDesignerContainerExtension));
+    } 
 
     // set this property in order to find out later if we use our controls through the designer or otherwise
     qApp->setProperty("APP_SOURCE", QVariant(QString("DESIGNER")));
@@ -225,6 +264,25 @@ caIncludeInterface::caIncludeInterface(QObject* parent) : CustomWidgetInterface(
 	d_icon = QPixmap(":pixmaps/frame.png");
 }
 
+QWidget *caDoubleTabWidgetInterface::createWidget(QWidget* parent)
+{
+     caDoubleTabWidget *widget = new caDoubleTabWidget(parent);
+     return widget;
+}
+
+caDoubleTabWidgetInterface::caDoubleTabWidgetInterface(QObject* parent) : CustomWidgetInterface(parent)
+{
+        strng name[2], type[2];
+        strcpy(name[0], "itemsHorizontal");
+        strcpy(type[0], "multiline");
+        strcpy(name[1], "itemsVertical");
+        strcpy(type[1], "multiline");
+        d_domXml = XmlFunc("caDoubleTabWidget", "cadoubletabwidget", 0, 0, 250, 250, name, type, 2);
+	d_name = "caDoubleTabWidget";
+	d_include = "caDoubleTabWidget";
+	d_icon = QPixmap(":pixmaps/frame.png");
+}
+
 CustomWidgetCollectionInterface::CustomWidgetCollectionInterface(QObject *parent): QObject(parent)
 {
     d_plugins.append(new caFrameInterface(this));
@@ -233,6 +291,7 @@ CustomWidgetCollectionInterface::CustomWidgetCollectionInterface(QObject *parent
     d_plugins.append(new caPolyLineInterface(this));
     d_plugins.append(new caImageInterface(this));
     d_plugins.append(new caIncludeInterface(this));
+    d_plugins.append(new caDoubleTabWidgetInterface(this));
 }
 
 QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface::customWidgets(void) const
