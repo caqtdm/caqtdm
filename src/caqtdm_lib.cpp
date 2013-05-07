@@ -21,7 +21,6 @@
 #include <sys/timeb.h>
 #include <postfix.h>
 #include <QObject>
-//#include <QtDesigner/QFormBuilder>
 #include <iostream>
 #ifdef linux
 #  include <sys/wait.h>
@@ -498,7 +497,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         if(reaffectText(map, &text))  widget->setArgs(text);
 
         text = widget->getFiles();
-        if(reaffectText(map, &text)) widget->setFiles(text);
+        if(reaffectText(map, &text))  widget->setFiles(text);
 
         text = widget->getLabel();
         if(reaffectText(map, &text))  widget->setLabel(text);
@@ -523,7 +522,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         if(reaffectText(map, &text))  widget->setArgs(text);
 
         text = widget->getFiles();
-        if(reaffectText(map, &text))  widget->setFiles(text);
+        if(reaffectText(map, &text)) widget->setFiles(text);
 
         text = widget->getLabel();
         if(reaffectText(map, &text))  widget->setLabel(text);
