@@ -8,7 +8,7 @@ class NumberDelegate
 {
 	public:
 		NumberDelegate();
-		virtual ~NumberDelegate() {};
+        virtual ~NumberDelegate() {}
 		
 		int integerDigits() { return d_intDigits; }
 		int decimalDigits() { return d_decDigits; }

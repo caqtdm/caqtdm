@@ -9,6 +9,7 @@ bool LeftClickWithModifiersEater::eventFilter(QObject *obj, QEvent *event)
 	if(me->button() == Qt::LeftButton && me->modifiers() != Qt::NoModifier)
 	  return true;
   }
+
   return QObject::eventFilter(obj, event);
 }
 

@@ -61,7 +61,6 @@ class QTCON_EXPORT ESimpleLabel : public QLabel, public FontScalingWidget
 	virtual QSize sizeHint() const;
 	
 	virtual QSize minimumSizeHint() const;
-	
 };
 
 

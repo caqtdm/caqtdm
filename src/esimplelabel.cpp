@@ -73,3 +73,4 @@ QSize ESimpleLabel::minimumSizeHint() const
 	size = sizeHint();
   return size;
 }
+
