@@ -1,4 +1,14 @@
-CAQTDM_VERSION = V2.8.1
+CAQTDM_VERSION = V2.8.4
+
+# new in 2.8.4
+# one can use up down arrows for the wheelswitch after clicking on the digit to change
+# bug corrected for digital io in acs
+
+# new in 2.8.3
+# added a doubletabwidget: gives the possibility to have two-dimensional choices
+
+# new in 2.8.2
+# bug in cartesian plot for scalar, vector has been removed
 
 # new in 2.8.1
 # small changes in pep file handling
