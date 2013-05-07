@@ -30,6 +30,8 @@ caDoubleTabWidget::caDoubleTabWidget(QWidget *parent) : QWidget(parent)
     vTabBar = new QButtonGroup;
     buttonLayout = new QVBoxLayout();
     buttonLayout->setSpacing(0);
+
+
     QVBoxLayout* buttonStretchLayout = new QVBoxLayout();
     buttonStretchLayout->setSpacing(0);
     buttonStretchLayout->addLayout(buttonLayout);
@@ -62,19 +64,28 @@ caDoubleTabWidget::caDoubleTabWidget(QWidget *parent) : QWidget(parent)
     QPalette pal = hTabBar->palette();
     pal.setColor(QPalette::Base, QColor(255, 0, 255));
     hTabBar->setPalette(pal);
+
+    setRow(0);
+    setCol(0);
 }
 
 void caDoubleTabWidget::addPage(QWidget *page)
 {
     //printf("add a new page %s\n", page->objectName().toAscii().constData());
     QStringList stringlist = page->objectName().split( "_");
-    row= stringlist[1].toInt();
-    col = stringlist[2].toInt();
+    if(stringlist.count() > 1 ) {
+        row= stringlist[1].toInt();
+        col = stringlist[2].toInt();
+    } else {
+        row = 0;
+        col = 0;
+    }
     addPages = true;
     insertPage(count(), page);
     addPages = false;
     setRow(0);
     setCol(0);
+
 }
 
 void caDoubleTabWidget::removePage(int index)
@@ -106,7 +117,7 @@ void caDoubleTabWidget::insertPage(int index, QWidget *page)
         return;
     }
     QString title = tr("Page_%1_%2").arg(row).arg(col);
-    //printf("set window title to %s\n", title.toAscii().constData());
+    //printf("set page title to %s\n", title.toAscii().constData());
     page->setObjectName(title);
     page->setAutoFillBackground(true);
 }
@@ -223,6 +234,7 @@ int caDoubleTabWidget::lookupPage(int row, int col)
 
 void  caDoubleTabWidget::storePage(int index, int row, int col)
 {
+    //printf("store page %d %d\n", row, col);
     twoInts item;
     item.r = row;
     item.c = col;
