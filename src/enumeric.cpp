@@ -27,6 +27,7 @@ int round (double x) {
 
 ENumeric::ENumeric(QWidget *parent, int id, int dd) : QFrame(parent), FloatDelegate()
 {
+    lastLabel = -1;
     intDig = id;
     decDig = dd;
     digits = id + dd;
@@ -64,13 +65,12 @@ void ENumeric::writeAccessW(int access)
 
 QSize ENumeric::sizeHint() const
 {
-    if(d_fontScaleEnabled)
-    {
-	QFont f = font();
-	f.setPointSize(4); /* provide a size hint calculated on a minimum font of 4 points */
-	QFontMetrics fm(f);
-	int width = digits * fm.width("X") + fm.width("X"); /* in case there's the +/- sign */
-	return QSize(width, fm.height());
+    if(d_fontScaleEnabled) {
+        QFont f = font();
+        f.setPointSize(4); /* provide a size hint calculated on a minimum font of 4 points */
+        QFontMetrics fm(f);
+        int width = digits * fm.width("X") + fm.width("X"); /* in case there's the +/- sign */
+        return QSize(width, fm.height());
     }
     return QWidget::sizeHint();
 }
@@ -83,32 +83,24 @@ QSize ENumeric::minimumSizeHint() const
 void ENumeric::setDigitsFontScaleEnabled(bool en)
 {
     ESimpleLabel *int1Label = findChild<ESimpleLabel *>();
-    if(int1Label)
-    {
-/* do not make a differenz between the labels, they will get different sizes otherwise
-	if(en)
-            int1Label->setFontScaleMode(ESimpleLabel::Height);
-        else */
-            int1Label->setFontScaleMode(ESimpleLabel::None);
-
-	d_fontScaleEnabled = en;
+    if(int1Label) {
+        int1Label->setFontScaleMode(ESimpleLabel::None);
+        d_fontScaleEnabled = en;
         foreach(QLabel *l, findChildren<QLabel *>(QRegExp("layoutmember*"))) {
             l->setFont(int1Label->font());
         }
-    }
-    else
+    } else {
         printf("did not find an ESimpleLabel\n");
+    }
     d_fontScaleEnabled = en;
     valueUpdated();
 }
 
 void ENumeric::clearContainers()
 {
-    if (box)
-    {
+    if (box) {
         labels.clear();
-        foreach(QWidget *child, this->findChildren<QWidget *>(QRegExp("layoutmember*")))
-            delete child;
+        foreach(QWidget *child, this->findChildren<QWidget *>(QRegExp("layoutmember*"))) delete child;
         delete box;
         box = NULL;
     }
@@ -135,11 +127,10 @@ void ENumeric::init()
     box->setRowStretch(2,1);
     bup = new QButtonGroup(this);
     bdown = new QButtonGroup(this);
-    for (int i = 0; i < digits; i++)
-    {
+
+    for (int i = 0; i < digits; i++) {
         QLabel *l;
-        if (i == intDig)
-        {
+        if (i == intDig) {
             pointLabel = new QLabel(".", this);
             pointLabel->setAlignment(Qt::AlignCenter);
             pointLabel->setObjectName("layoutmember.");
@@ -149,20 +140,16 @@ void ENumeric::init()
         QPushButton *temp = new QPushButton(this);
         temp->setObjectName(QString("layoutmember") + QString().setNum(i));
         temp->installEventFilter(lCWME);
+
         bup->addButton(temp);
 
-        if(i == intDig - 1)
-        {
+        if(i == intDig - 1) {
             l = new ESimpleLabel(QString().setNum(i), this);
-/*
-            if(d_fontScaleEnabled)
-                dynamic_cast<ESimpleLabel *>(l)->setScaleMode(ESimpleLabel::Height);
-            else
-*/
-                dynamic_cast<ESimpleLabel *>(l)->setScaleMode(ESimpleLabel::None);
-        }
-        else
+            dynamic_cast<ESimpleLabel *>(l)->setScaleMode(ESimpleLabel::None);
+        } else {
             l = new QLabel(QString().setNum(i), this);
+        }
+
         l->setObjectName(QString("layoutmember") + QString().setNum(i));
         labels.push_back(l);
 
@@ -172,21 +159,18 @@ void ENumeric::init()
         bdown->addButton(temp2);
 
         formatDigit(temp, l, temp2);
-        if (i < intDig)
-        {
+
+        if (i < intDig) {
             box->addWidget(temp, 0, i + 1);
             box->addWidget(l, 1, i + 1);
             box->addWidget(temp2, 2, i + 1);
-        }
-        else if (i >= intDig)
-        {
+        } else if (i >= intDig) {
             box->addWidget(temp, 0, i + 2);
             box->addWidget(l, 1, i + 2);
             box->addWidget(temp2, 2, i + 2);
         }
 
-        if (i == 0)
-        {
+        if (i == 0) {
             /* messo qui per evitare casini col designer */
             signLabel = new QLabel("+", this);
             signLabel->setAlignment(Qt::AlignCenter);
@@ -194,14 +178,13 @@ void ENumeric::init()
             box->addWidget(signLabel, 1, 0);
         }
     }
-    for (int i = 0; i < box->rowCount(); i++)
-        box->setRowStretch(i, 10);
-    for (int i = 0; i < box->columnCount(); i++)
-        box->setColumnStretch(i, 10);
+    for (int i = 0; i < box->rowCount(); i++)   box->setRowStretch(i, 10);
+    for (int i = 0; i < box->columnCount(); i++) box->setColumnStretch(i, 10);
     box->setColumnStretch(0, 3);
     box->setColumnStretch(intDig+1, 1);
 
     showData();
+
     connect(bup, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(upData(QAbstractButton*)));
     connect(bdown, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(downData(QAbstractButton*)));
 }
@@ -278,86 +261,52 @@ void ENumeric::setDecDigits(int d)
 
 void ENumeric::upData(QAbstractButton* b)
 {
+    int id = b->objectName().remove("layoutmember").toInt();
+    upDataIndex(id);
+}
 
+void ENumeric::upDataIndex(int id)
+{
     if(!_AccessW) return;
-/* rounding errors on windows
-    int id = b->objectName().remove("layoutmember").toInt();
-    if ((data + pow(10.0, digits-id-1)) <= maxVal)
-    {
-        data += (long long) pow(10.0, digits-id-1);
-        emit valueChanged(data * pow(10.0, -decDig));
-        showData();
-    }
-    if (text != NULL)
-        text->hide();
-
-*/
-    int id = b->objectName().remove("layoutmember").toInt();
+    if(id == -1) return;
     double datad = (double) data;
     double power =  pow(10.0, digits-id-1);
     datad = datad + power;
-    if (datad <= (double)maxVal)
-    {
+    if (datad <= (double) maxVal) {
         data = (long long) datad;
         power = pow(10.0, -decDig);
         datad = datad * power;
         emit valueChanged(datad);
         showData();
     }
-    if (text != NULL)
-        text->hide();
-
+    if (text != NULL) text->hide();
 }
 
 void ENumeric::downData(QAbstractButton* b)
 {
+    int id = b->objectName().remove("layoutmember").toInt();
+    downDataIndex(id);
+}
+
+void ENumeric::downDataIndex(int id)
+{
     if(!_AccessW) return;
-/* rounding errors on windows
-    int id = b->objectName().remove("layoutmember").toInt();
-    if ((data - pow(10.0, digits-id-1)) >= minVal)
-    {
-        data -= (long long) pow(10.0, digits-id-1);
-        emit valueChanged(data * pow(10.0, -decDig));
-        showData();
-    }
-    if (text != NULL)
-        text->hide();
-*/
-    int id = b->objectName().remove("layoutmember").toInt();
+    if(id == -1) return;
     double datad = (double) data;
     double power =  pow(10.0, digits-id-1);
     datad = datad - power;
-    if (datad >= (double)minVal)
-    {
+    if (datad >= (double) minVal) {
         data = (long long) datad;
         power = pow(10.0, -decDig);
         datad = datad * power;
         emit valueChanged(datad);
         showData();
     }
-    if (text != NULL)
-        text->hide();
+    if (text != NULL) text->hide();
 }
 
 void ENumeric::showData()
 {
-/* rounding errors on windows
-    long long temp = data;
-    int num = 0;
-    if (data < 0)
-        signLabel->setText(QString("-"));
-    else
-        signLabel->setText(QString("+"));
-
-    for (int i = 0; i < digits; i++)
-    {
-        num = (long long) (temp / (long) pow(10.0, digits-i-1));
-        temp -= num * (long) pow(10.0, digits-i-1);
-        labels[i]->setText(QString().setNum(abs(num)));
-        labels[i]->setText
-    }
-    QTimer::singleShot(1000, this, SLOT(valueUpdated()));
-*/
     long long temp = data;
 
     double num = 0;
@@ -418,7 +367,7 @@ void ENumeric::mouseDoubleClickEvent(QMouseEvent*)
 
 bool ENumeric::eventFilter(QObject *obj, QEvent *event)
 {
-
+    QSize aux = size();
     if (event->type() == QEvent::Enter) {
         if(!_AccessW) {
             QApplication::setOverrideCursor(QCursor(Qt::ForbiddenCursor));
@@ -426,9 +375,29 @@ bool ENumeric::eventFilter(QObject *obj, QEvent *event)
             QApplication::restoreOverrideCursor();
         }
     } else if(event->type() == QEvent::Leave) {
+        lastLabel = -1;
         QApplication::restoreOverrideCursor();
+        resize(size()*0.99); // force a resize
+        resize(aux);
+        updateGeometry();
     } else if(event->type() == QEvent::MouseButtonDblClick) {
         if(!_AccessW) return true;
+    } else if (event->type() == QEvent::MouseButtonPress) {
+        QMouseEvent *ev = (QMouseEvent *) event;
+        for (int i = 0; i < digits; i++) {
+            QRect widgetRect = labels[i]->geometry();
+            if(widgetRect.contains(ev->pos())) {
+                lastLabel = i;
+                resize(size()*0.99); // force a resize
+                resize(aux);
+                break;
+            }
+        }
+    } else if(event->type() == QEvent::KeyRelease)   {
+       QKeyEvent *ev = (QKeyEvent *) event;
+       if(ev->key() == Qt::Key_Escape) text->hide();
+       if(ev->key() == Qt::Key_Up) upDataIndex(lastLabel);
+       if(ev->key() == Qt::Key_Down) downDataIndex(lastLabel);
     }
    return QObject::eventFilter(obj, event);
 }
@@ -453,9 +422,8 @@ void ENumeric::resizeEvent(QResizeEvent *e)
 
     QList<QAbstractButton *> list  = bup->buttons();
     temp =  qobject_cast<QPushButton *>(list.front());
-    if (temp)
-    {
-        QPixmap pix(temp->size());
+    if (temp) {
+        QPixmap pix(temp->size() * 0.9);
         pix.fill(palette().color(QPalette::Background));
         QPainter p(&pix);
         p.setRenderHint(QPainter::Antialiasing);
@@ -480,25 +448,35 @@ void ENumeric::resizeEvent(QResizeEvent *e)
         p.drawConvexPolygon(poly);
         p.end();
 
-        foreach (QAbstractButton* but, bup->buttons())
-        {
+        int i=0;
+        foreach (QAbstractButton* but, bup->buttons()) {
             temp = qobject_cast<QPushButton *>(but);
-            if (temp)
-            {
+            if (temp) {
                 temp->setIconSize(pix.size());
                 temp->setIcon(pix);
+                if(lastLabel == i) {
+                    temp->setStyleSheet("background: rgb(255, 0, 0); color: rgb(255, 0, 0, 0);");
+                } else {
+                    temp->setStyleSheet("");
+                }
             }
+            i++;
         }
-        //QPixmap pix2 = pix.transformed(QMatrix().rotate(180)).transformed(QMatrix().translate(-20,-20));
+
+        i = 0;
         QPixmap pix2 = pix.transformed(QMatrix().rotate(-180));
-        foreach (QAbstractButton* but, bdown->buttons())
-        {
+        foreach (QAbstractButton* but, bdown->buttons()) {
             temp = qobject_cast<QPushButton *>(but);
-            if (temp)
-            {
+            if (temp) {
                 temp->setIconSize(pix2.size());
                 temp->setIcon(pix2);
+                if(lastLabel == i) {
+                    temp->setStyleSheet("background: rgb(255, 0, 0); color: rgb(255, 0, 0, 0);");
+                } else {
+                    temp->setStyleSheet("");
+                }
             }
+            i++;
         }
     }
 
@@ -511,6 +489,7 @@ void ENumeric::resizeEvent(QResizeEvent *e)
 	 * the class FontScalingWidget, which ESimpleLabel inherits. We must provide text and size because the
 	 * method belongs to FontScalingWidget, not to ESimpleLabel.
 	 */
+    QFont signFont("Monospace");  // + and - should have same size
     QFont labelFont;
     ESimpleLabel *l1 = findChild<ESimpleLabel *>();
     labelFont = l1->font();
@@ -523,13 +502,14 @@ void ENumeric::resizeEvent(QResizeEvent *e)
         fontSize = qMin((int) fontSize, size().height() / 4 - 2);
         fontSize = qMin((int) fontSize, size().width() / (digits+1));
         labelFont.setPointSizeF(fontSize);
+        signFont.setPointSizeF(fontSize);
         //printf("digits=%d %s font size=%f\n", digits, l1->text().toAscii().constData(), fontSize);
     }
     /* all fonts equal */
-    if(d_fontScaleEnabled)
-    {
+    if(d_fontScaleEnabled){
         foreach(QLabel *l, findChildren<QLabel *>()) {
             l->setFont(labelFont);
+            if(l->objectName().contains("layoutmember+")) l->setFont(signFont);
         }
     }
 
@@ -539,25 +519,21 @@ void ENumeric::resizeEvent(QResizeEvent *e)
 
 void ENumeric::formatDigit(QPushButton *up, QLabel *l, QPushButton *down)
 {
+
     up->setText("");
-    // 	up->setAutoRepeat(true); /* used to cause infinite loop */
     up->setMinimumSize(QSize(MIN_SIZE,MIN_SIZE));
     up->setFlat(true);
-    //up->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     up->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     up->setFocusPolicy(Qt::NoFocus);
 
-    //l->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     l->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     l->setAlignment(Qt::AlignCenter);
     l->setMinimumSize(QSize(MIN_SIZE,2*MIN_SIZE));
 
     down->setText("");
-    // 	down->setAutoRepeat(true); /* used to cause infinite loop */
     down->setMinimumSize(QSize(MIN_SIZE, MIN_SIZE));
     down->setFlat(true);
     down->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    //down->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
     down->setFocusPolicy(Qt::NoFocus);
 }
 

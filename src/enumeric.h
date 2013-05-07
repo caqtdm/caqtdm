@@ -111,14 +111,15 @@ private:
     
     int idUpVuoto, idDownVuoto;
     int idUpPoint, idDownPoint;
+    void downDataIndex(int id);
+    void upDataIndex(int id);
+
 
 private slots:
     void dataInput();
     void upData(QAbstractButton*);
     void downData(QAbstractButton*);
-    
     void valueUpdated();
-
 
 private:
     void mouseDoubleClickEvent(QMouseEvent*);
@@ -126,6 +127,7 @@ private:
 
     bool d_fontScaleEnabled;
     bool _AccessW;
+    int lastLabel;
 
 protected slots:
 /* ENumeric uses ESimpleLabel::calculateFontPointSizeF method to calculate the point size of
