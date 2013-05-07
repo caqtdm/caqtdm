@@ -492,7 +492,7 @@ int CreateAndConnect(int index, knobData *kData, int rate)
     if(AddValueCell(kData->pv, index, aux) != -1) {
         strcpy(kData->edata.aux, aux);
 
-        //printf("we added an acs device <%s> %d aux=<%s>\n", kData->pv,  index, aux);
+        //printf("we added an acs device <%s> %d %d aux=<%s>\n", kData->pv,   kData->index, index, aux);
         tmp->cs = 1;                 // acs controlsystem
         // update knobdata
         C_SetMutexKnobData(KnobDataPtr, index, *kData);
@@ -522,7 +522,7 @@ int CreateAndConnect(int index, knobData *kData, int rate)
  */
 void ClearMonitor(knobData *kData)
 {
-    int status;
+    int status, aux;
     connectInfo *tmp;
 
     status = ca_attach_context(dbCaClientContext);
@@ -531,6 +531,7 @@ void ClearMonitor(knobData *kData)
 
     PRINT(printf("clear channel %s index=%d\n", kData->pv, kData->index));
 
+    aux =  kData->index;
     kData->index = -1;
     kData->pv[0] = '\0';
 
@@ -545,11 +546,12 @@ void ClearMonitor(knobData *kData)
             }
         } else {
 #ifdef ACS
-            PRINT(printf("delete acs channel %s index=%d\n", tmp->pv, kData->index));
-            RemoveValueCell(kData->index);
+            //printf("delete acs channel %s index=%d\n", tmp->pv, aux);
+            RemoveValueCell(aux);
 #endif
         }
     }
+
     status = ca_pend_io(CA_TIMEOUT);
 }
 
