@@ -591,6 +591,9 @@ int SetDeviceStringValue(char *name, char *data)
     DSC             attD = {4, 0, 0, attS};
     F_CMDT_RCRD     bitmapping[MAX_RECORDS];
     int             dim = 16, num;
+    int             found = False;
+
+    MONITOR_ENTER(serializeAccess, "thread");
 
     //printf("SendString %s %s\n", name, data);
 
@@ -604,38 +607,49 @@ int SetDeviceStringValue(char *name, char *data)
         num = getCmdNames(&devD, &attD, &dim, bitmapping);
 
         for(i = 0; i < num; i++) {
-            bitmapping[i].bitName[7] = '\0';
-            //printf("%s %s\n", bitmapping[i].bitName, data);
-            if(IsInside(bitmapping[i].bitName, data)) {
+            char aux[9];
+            strncpy(aux, bitmapping[i].bitName, 8);
+            aux[8] = '\0';
+            //printf("%s %s\n", aux, data);
+            if(IsInside(aux, data)) {
+                found = True;
                 //printf("found number=%d bitmapping is %x %x\n", i, bitmapping[i].smask, bitmapping[i].cmask);
 
                 ActivCells[0].conv = 1;
                 ActivCells[0].io_func = CELL_DIGITAL;
-                ActivCells[0].ub.int2val[0] = (short) bitmapping[i].smask;
-                ActivCells[0].ub.int2val[1] = (short) bitmapping[i].cmask;
-                sprintf(asc, "Digital Action on %.8s.%.4s;%d - Data %x %x", ActivCells[0].name,
+                ActivCells[0].ub.int2val[0] = (unsigned short) bitmapping[i].smask;
+                ActivCells[0].ub.int2val[1] = (unsigned short) bitmapping[i].cmask;
+                sprintf(asc, "Digital Action on %.8s.%.4s;%d - Data %04x %04x", ActivCells[0].name,
                         ActivCells[0].att,
                         ActivCells[0].conv,
-                        ActivCells[0].ub.int2val[0],
-                        ActivCells[0].ub.int2val[1]);
-                printf("%s\n", asc);
+                        (unsigned short) ActivCells[0].ub.int2val[0],
+                        (unsigned short) ActivCells[0].ub.int2val[1]);
 
+                C_postMsgEvent(messageWindow, 1, asc);
 
                 error = medmSingleIO(command, &value, &ival, &ecode, &ucode);
                 if(ecode != 1) {
                     getErrMsgStr(&ecode, &messD);
                     mess[ERRMSGLEN] = '\0';
-                    C_postMsgEvent(messageWindow, 1, vaPrintf("device <%s> has io-error %d %s\n", name, ecode, mess));
+                    C_postMsgEvent(messageWindow, 1, vaPrintf("device <%.8s.%.4s;%d> has io-error %d %s\n", ActivCells[0].name, ActivCells[0].att, ActivCells[0].conv, ecode, mess));
                 }
                 MONITOR_EXIT(serializeAccess, "thread");
                 return error;
             }
+        }
+        if(!found) {
+            sprintf(asc, "device  <%.8s.%.4s;%d> no bitpattern found", ActivCells[0].name, ActivCells[0].att, ActivCells[0].conv);
+            C_postMsgEvent(messageWindow, 1, asc);
+            MONITOR_EXIT(serializeAccess, "thread");
+            return 0;
         }
     } else {
         C_postMsgEvent(messageWindow, 1, vaPrintf("device <%s> fec not found\n", name));
         MONITOR_EXIT(serializeAccess, "thread");
         return 0;
     }
+
+    MONITOR_EXIT(serializeAccess, "thread");
     return 0;
 }
 
@@ -738,6 +752,13 @@ static void medmAcquisition(short *own_prot, int *devIOFunc, pioDevices *Cells, 
             if (i > 0 && PtrNull(strstr(prvFec, actFec))) {
                 indFec++;
                 total[indFec] = 0;
+                // 16-2-2009 added
+                if (!CellTaken[i]) {
+                    //printf("piosubs -- fec change <%.6s> <%.6s> copy cell %d\n", prvFec, actFec, i);
+                    CellTaken[i] = True;
+                    memcpy(&SendCells[k++], &SortCells[i], sizeof (pioDevices));
+                    total[indFec]++;
+                }
             }
             memcpy(prvFec, SortCells[i].fec, 6);
         }
@@ -809,16 +830,19 @@ static void etherReceive(pioStatusB *iosb, pio_ethbuf *irbb)
     if (error != 1) {
         GET_ETHER_ADDPROT(&AddPro);
         ADCOMP(&trtnodD, &AddPro, &errort);
-        PRINT(printf("caQtDM -- PIOREQ_ANALYZE error=%d list=%d numdevs=%d with TF=%d from <%.6s>\n", error, listNumber, numDevs,
-               tffunc, trtnod));
+        printf("caQtDM -- PIOREQ_ANALYZE error=%d list=%d numdevs=%d with TF=%d from <%.6s>\n", error, listNumber, numDevs,
+               tffunc, trtnod);
         stat = getPioErrMsgStr(&error, &messD);
         mess[69] = '\0';
         printf("            : %s\n", mess);
         return;
     }
+
     GET_ETHER_ADDPROT(&AddPro);
     ADCOMP(&trtnodD, &AddPro, &errort);
     trtnod[6] = '\0';
+
+    //printf("caQtDM -- PIOREQ_ANALYZE error=%d list=%d numdevs=%d with TF=%d from <%.6s>\n", error, listNumber, numDevs, tffunc, trtnod);
 
     /* copy data back to our cells for activ list */
 
@@ -1031,22 +1055,20 @@ static void etherReceive(pioStatusB *iosb, pio_ethbuf *irbb)
                         kData.edata.severity = 0;
 
                         // floats
-
                         if (ReceiveCells[i].unit_code > 3) {
 
                             float value = (float) Vax2HostF(&ReceiveCells[i].ub.value);
 
                             // new value ?
-                            if((fabs(kData.edata.rvalue - value) <= 1.e-7)  && (kData.edata.monitorCount > 1)) {
-                                kData.edata.monitorCount--;
-                                goto skip1;
-                            }
+                            //if((fabs(kData.edata.rvalue - value) <= 1.e-7)  && (kData.edata.monitorCount > 1)) {
+                            //    kData.edata.monitorCount--;
+                            //    goto skip1;
+                            //}
                             kData.edata.rvalue = (float) Vax2HostF(&ReceiveCells[i].ub.value);
                             kData.edata.fieldtype = caFLOAT;
                             kData.edata.precision = 3;
 
                             // integers (bitfields)
-
                         } else {
                             int status;
                             char level2Data[21];
@@ -1056,10 +1078,15 @@ static void etherReceive(pioStatusB *iosb, pio_ethbuf *irbb)
                             kData.edata.fieldtype = caINT;  // default type
 
                             // new value ?
-                            if(kData.edata.ivalue == value && kData.edata.monitorCount > 1 && kData.edata.displayCount != 0) {
-                                kData.edata.monitorCount--;
-                                goto skip1;
-                            }
+                            //if(strstr(kData.pv, "VHD0") != (char*) 0) printf("pv=<%s> old=%x new=%x mC=%d dC=%d\n",kData.pv, kData.edata.ivalue, value , kData.edata.monitorCount, kData.edata.displayCount);
+
+                            //if(kData.edata.ivalue == value && kData.edata.monitorCount > 1 && kData.edata.displayCount != 0) {
+                            //    kData.edata.monitorCount--;
+                                //if(strstr(kData.pv, "VHD0") != (char*) 0) printf("skipped\n");
+                            //    goto skip1;
+                            //}
+
+                            //if(strstr(kData.pv, "VHD0") != (char*) 0)printf("not skipped\n");
 
                             kData.edata.ivalue = ReceiveCells[i].ub.int4val;
                             kData.edata.rvalue = (float) ReceiveCells[i].ub.int4val;
