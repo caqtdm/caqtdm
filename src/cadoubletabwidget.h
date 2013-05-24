@@ -24,6 +24,7 @@ class QTCON_EXPORT caDoubleTabWidget : public QWidget
 
     Q_PROPERTY(QString itemsHorizontal READ getItemsHor WRITE setItemsHor)
     Q_PROPERTY(QString itemsVertical READ getItemsVer WRITE setItemsVer)
+    Q_PROPERTY(QString itemsVerticalPadding READ getItemsPadding WRITE setItemsPadding)
     Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex)
 
 public:
@@ -36,6 +37,9 @@ public:
 
     QString getItemsVer() const {return thisVerItems.join(";");}
     void setItemsVer(QString const &items) {thisVerItems = items.split(";"); removeTabs(1); addSampleWidget(1);}
+
+    QString getItemsPadding() const {return thisVerPadding.join(";");}
+    void setItemsPadding(QString const &items);
 
     void addSampleWidget(int);
     void removeTabs(int);
@@ -70,19 +74,17 @@ private:
 
     QStringList	thisHorItems;
     QStringList	thisVerItems;
+    QStringList	thisVerPadding;
     int row;
     int col;
     QTabBar *hTabBar;
-    //QTabBar *vTabBar;
-    //QListWidget *vTabBar;
     QButtonGroup *vTabBar;
-    QStackedWidget * viewPort;
-    QWidget SWidget[25];
+    QStackedWidget *viewPort;
     QMap<int, twoInts> lookup;
     QLineEdit *tableIndex;
     bool addPages;
-   QVBoxLayout*  buttonLayout;
-   int vCount;
+    QVBoxLayout*  buttonLayout;
+    int vCount;
 };
 
 #endif

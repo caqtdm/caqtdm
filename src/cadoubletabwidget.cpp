@@ -31,7 +31,6 @@ caDoubleTabWidget::caDoubleTabWidget(QWidget *parent) : QWidget(parent)
     buttonLayout = new QVBoxLayout();
     buttonLayout->setSpacing(0);
 
-
     QVBoxLayout* buttonStretchLayout = new QVBoxLayout();
     buttonStretchLayout->setSpacing(0);
     buttonStretchLayout->addLayout(buttonLayout);
@@ -256,10 +255,21 @@ void caDoubleTabWidget::fontChange(const QFont & oldFont) {
 
 }
 
+void caDoubleTabWidget::setItemsPadding(QString const &padding) {
+    thisVerPadding= padding.split(";");
+    setFont(1);
+}
+
 void caDoubleTabWidget::setFont(int dir)
 {
     // style for vertical buttons
     QString style;
+    int padding[vTabBar->buttons().count()];
+    for(int j=0; j<vTabBar->buttons().count(); j++) padding[j] = 0;
+    for(int j=0; j < thisVerPadding.count(); j++) {
+        padding[j] = thisVerPadding.at(j).toInt();
+    }
+
     int count =  vTabBar->buttons().count();
     for(int i = count-1; i >= 0; i--) {
         QPushButton* button = (QPushButton*) vTabBar->button(i);
@@ -270,6 +280,10 @@ void caDoubleTabWidget::setFont(int dir)
         if(this->fontInfo().underline())  style.append("text-decoration:underline; ");
         if(this->fontInfo().styleName().contains("Bold"))  style.append("font-weight: bold; ");
         if(this->fontInfo().styleName().contains("Italic")) style.append("font-style: italic; ");
+
+        style.append(tr("text-align: left; padding-left: %1px;").arg(padding[i]));
+
+
         style.append("} ");
 
         style.append("QPushButton:checked {background-color: magenta;}");
