@@ -5,7 +5,6 @@ OBJECTS_DIR = ../obj2
 TEMPLATE = lib
 
 SOURCES += acsSubs.c medmblock.c
-
 HEADERS += acsSubs.h
 
 LIBS += -L$(ACS_BUILD_LIBRARY) -lDEV -lCDB -lInclude -lProfAcc
