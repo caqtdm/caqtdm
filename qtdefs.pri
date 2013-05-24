@@ -1,4 +1,9 @@
-CAQTDM_VERSION = V2.8.4
+CAQTDM_VERSION = V3.0.1
+
+# new in 3.0.1
+# one can specify building with epics4 (in caQtDM_LIB.pri) ; this first attempt allows to read and write scalars. epics4 channel have to be specified
+# with @ in front of the name
+# print is possible on the command line; will print specified file and exit
 
 # new in 2.8.4
 # one can use up down arrows for the wheelswitch after clicking on the digit to change
