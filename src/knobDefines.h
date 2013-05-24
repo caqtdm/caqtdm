@@ -29,4 +29,13 @@
 
 typedef char pv_string[MAXPVLEN];  // temporary definition, I should allocate what we need
 
+/* we wanted to really separate epics from the display part, but we still need this information */
+
+enum caType {caSTRING	= 0, caINT = 1, caSHORT = 1, caFLOAT = 2, caENUM = 3, caCHAR = 4, caLONG = 5, caDOUBLE = 6};
+
+typedef struct _connectInfoShort {
+    int cs;          // 0= epics, 1 =acs
+    int connected;
+} connectInfoShort;
+
 #endif

@@ -1,6 +1,9 @@
 QT       += core gui
 
-CONFIG      += qt warn_on thread uitools designer plugin
+CONFIG   += qt warn_on thread uitools designer plugin
+
+#epics4
+CONFIG += epics4
 
 TARGET = caQtDM_Lib
 TEMPLATE = lib
@@ -55,6 +58,15 @@ SOURCES += \
     JSONValue.cpp \
     JSON.cpp
 
+#if we want to use epics4, define it in caQtDM_Lib.pri
+epics4: {
+SOURCES += ../src/epics4Subs.cpp pvAccessImpl.cpp
+HEADERS += ../src/epics4Subs.h pvAccessImpl.h
+EPICS4LIB = /usr/local/epics/base-4.2.0/lib/SL6-x86/
+LIBS += -L$${EPICS4LIB} -Wl,-rpath,$${EPICS4LIB}  -lpvAccess -lpvData
+INCLUDEPATH += /usr/local/epics/base-4.2.0/include
+DEFINES += epics4
+}
 
 INCLUDEPATH += .
 
@@ -65,3 +77,5 @@ INCLUDEPATH += $(QWTHOME)/src
 INCLUDEPATH += $(EPICSINCLUDE)
 INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
 INCLUDEPATH += $(HOME)/workarea/ACS/mezger/caQtDM_QtControls/src
+
+

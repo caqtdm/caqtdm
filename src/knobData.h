@@ -12,10 +12,6 @@
 #ifndef KNOBDATA_H
 #define KNOBDATA_H
 
-/* we wanted to really separate epics from the display part, but we still need this information */
-
-enum caType {caSTRING	= 0, caINT = 1, caSHORT = 1, caFLOAT = 2, caENUM = 3, caCHAR = 4, caLONG = 5, caDOUBLE = 6};
-
 #include <sys/timeb.h>
 
 #ifdef __cplusplus
