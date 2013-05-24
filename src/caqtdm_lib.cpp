@@ -32,12 +32,6 @@
 
 #include "alarmdefs.h"
 
-// not nice, we should not need this partial declaration here
-typedef struct _connectInfo {
-    int cs;          // 0= epics, 1 =acs
-    int connected;
-} connectInfo;
-
 #define PRINT(x)
 #define min(x,y)   (((x) < (y)) ? (x) : (y))
 
@@ -167,7 +161,7 @@ typedef struct _connectInfo {
 
 Q_DECLARE_METATYPE(QList<int>)
 
-extern "C" int CreateAndConnect(int index, knobData *data, int rate);
+extern "C" int CreateAndConnect(int index, knobData *data, int rate, int skip);
 extern "C" void ClearMonitor(knobData *kData);
 extern "C" void PrepareDeviceIO();
 extern "C" int EpicsSetValue(char *pv, float rdata, long idata, char *sdata, char *object, char *errmess, int forceType);
@@ -214,6 +208,12 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     mutexKnobData = mKnobData;
     messageWindow = msgWindow;
+
+#ifdef epics4
+    qDebug() << "epics4 init";
+    Epics4 = new epics4Subs(mKnobData);
+#endif
+
     //qDebug() << "open file" << filename << "with macro" << macro;
     setAttribute(Qt::WA_DeleteOnClose);
 
@@ -1351,6 +1351,13 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     if(pv.size() == 0) return -1;
 
     QString trimmedPV = pv.trimmed();
+#ifdef epics4
+    int EPICS4 = false;
+    if(trimmedPV.at( 0 ) == '@' ) {
+        trimmedPV.remove( 0, 1 );
+        EPICS4 = true;
+    }
+#endif
 
     // when we defined already the same software channel, then get back the rate that was specified
     if(mutexKnobData->getSoftPV(pv, &indx, thisW)) {
@@ -1430,8 +1437,18 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     // update our data
     mutexKnobData->SetMutexKnobData(num, *kData);
 
-    // create data acquisition
-    CreateAndConnect(num, kData, rate);
+    // create data acquisition (C routine for epics and acs)
+
+#ifdef epics4
+    if(EPICS4) {
+       CreateAndConnect(num, kData, rate, true);
+       Epics4->CreateAndConnect4(num, trimmedPV);
+    } else {
+       CreateAndConnect(num, kData, rate, false);
+    }
+#else
+    CreateAndConnect(num, kData, rate, false);
+#endif
 
     w->setProperty("MonitorIndex", num);
     w->setProperty("Connect", false);
@@ -2777,7 +2794,7 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
     for(int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
         knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
         if(myWidget == kPtr->thisW) {
-            if (kPtr->edata.info != (connectInfo *) 0) {
+            if (kPtr->edata.info != (connectInfoShort *) 0) {
                 free(kPtr->edata.info);
                 kPtr->edata.info = (void*) 0;
                 kPtr->thisW = (void*) 0;
@@ -2788,6 +2805,11 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
             }
         }
     }
+
+#ifdef epics4
+    delete Epics4;
+#endif
+
 }
 
 /**
@@ -3015,8 +3037,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                     info.append("<br>");
                     info.append(kPtr->pv);
 
-                    connectInfo *tmp = (connectInfo *) kPtr->edata.info;
-                    if (tmp != (connectInfo *) 0) {
+                    connectInfoShort *tmp = (connectInfoShort *) kPtr->edata.info;
+                    if (tmp != (connectInfoShort *) 0) {
                         if(tmp->connected) {
                             info.append(" : connected");
                         } else if(kPtr->soft) {
@@ -3483,9 +3505,14 @@ void CaQtDM_Lib::TreatOrdinaryValue(QString pv, float value, int32_t idata,  QWi
             ww->setValue(value);
         }
     } else {
+#ifdef epics4
+        QString from = QString::number(value);
+        Epics4->Epics4SetValue(kPtr->index, pv, from);
+#else
         QString text(" ");
         QStringsToChars(pv, text, w->objectName().toLower());
         EpicsSetValue(param1, value, idata, param2, param3, errmess, 0);
+#endif
     }
 }
 

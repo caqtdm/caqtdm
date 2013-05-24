@@ -13,8 +13,11 @@
 #ifndef CAQTDM_LIB_H
 #define CAQTDM_LIB_H
 
-
 #include "caQtDM_Lib_global.h"
+
+#ifdef epics4
+    #include "epics4Subs.h"
+#endif
 
 #include "dbrString.h"
 #include <stdint.h>
@@ -40,7 +43,6 @@
 #include "limitsStripplotDialog.h"
 #include "limitsCartesianplotDialog.h"
 #include "processWindow.h"
-
 
 #include <QtControls>
 
@@ -76,6 +78,45 @@ public:
     int parseForDisplayRate(QString input, int &rate);
     void UpdateGauge(EAbstractGauge *w, const knobData &data);
 
+    void print()
+    {
+        QPrinter *printer = new QPrinter;
+        QPrintDialog *printDialog = new QPrintDialog(printer, this);
+        if (printDialog->exec() == QDialog::Accepted) {
+
+            QPainter painter(printer);
+            printer->setOrientation(QPrinter::Landscape);
+            double xscale = printer->pageRect().width()/double(this->width());
+            double yscale = printer->pageRect().height()/double(this->height());
+            double scale = qMin(xscale, yscale);
+            painter.translate(printer->paperRect().x() + printer->pageRect().width()/2,
+                               printer->paperRect().y() + printer->pageRect().height()/2);
+            painter.scale(scale, scale);
+            painter.translate(-width()/2, -height()/2);
+            QPixmap pm = QPixmap::grabWidget(this);
+            painter.drawPixmap(0, 0, pm);
+        }
+    }
+    void printPS(QString filename)
+    {
+        QPrinter *printer = new QPrinter;
+        printer->setOrientation(QPrinter::Portrait);
+        printer->setOutputFormat(QPrinter::PostScriptFormat);
+        printer->setOutputFileName(filename);
+
+        QPainter painter(printer);
+        double xscale = printer->pageRect().width()/double(this->width());
+        double yscale = printer->pageRect().height()/double(this->height());
+        double scale = qMin(xscale, yscale);
+        painter.translate(printer->paperRect().x() + printer->pageRect().width()/2,
+                          printer->paperRect().y() + printer->pageRect().height()/2);
+        painter.scale(scale, scale);
+        painter.translate(-width()/2, -height()/2);
+        QPixmap pm = QPixmap::grabWidget(this);
+        painter.drawPixmap(0, 0, pm);
+    }
+
+
 protected:
 
     virtual void mouseReleaseEvent(QMouseEvent *event);
@@ -106,6 +147,10 @@ private:
     QString thisFileShort;
     QString thisFileFull;
 
+#ifdef epics4
+    epics4Subs *Epics4;
+#endif
+
 private slots:
 
     void processError(QProcess::ProcessError err);
@@ -130,25 +175,6 @@ private slots:
 
     void processTerminated();
 
-    void print()
-    {
-        QPrinter *printer = new QPrinter;
-        QPrintDialog *printDialog = new QPrintDialog(printer, this);
-        if (printDialog->exec() == QDialog::Accepted) {
-
-            QPainter painter(printer);
-            printer->setOrientation(QPrinter::Landscape);
-            double xscale = printer->pageRect().width()/double(this->width());
-            double yscale = printer->pageRect().height()/double(this->height());
-            double scale = qMin(xscale, yscale);
-            painter.translate(printer->paperRect().x() + printer->pageRect().width()/2,
-                               printer->paperRect().y() + printer->pageRect().height()/2);
-            painter.scale(scale, scale);
-            painter.translate(-width()/2, -height()/2);
-            QPixmap pm = QPixmap::grabWidget(this);
-            painter.drawPixmap(0, 0, pm);
-        }
-    }
 };
 
 #endif // CaQtDM_Lib_H

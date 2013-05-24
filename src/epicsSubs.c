@@ -437,7 +437,7 @@ void connectCallback(struct connection_handler_args args)
 /**
  * define device io and hook info to gui
  */
-int CreateAndConnect(int index, knobData *kData, int rate)
+int CreateAndConnect(int index, knobData *kData, int rate, int skip)
 {
     int status;
     connectInfo *tmp;
@@ -499,6 +499,13 @@ int CreateAndConnect(int index, knobData *kData, int rate)
         return index;
     }
 #endif
+
+    // epics4
+    if(skip) {
+        tmp->cs = 2;
+        return index;
+    }
+
     //printf("we have to add an epics device <%s>\n", kData->pv);
     status = ca_attach_context(dbCaClientContext);
     status = ca_create_channel(kData->pv,
@@ -544,6 +551,8 @@ void ClearMonitor(knobData *kData)
                     printf("ca_clear_channel:\n"" %s %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], tmp->pv);
                 }
             }
+        } else if(tmp->cs == 2) { // epics4
+
         } else {
 #ifdef ACS
             //printf("delete acs channel %s index=%d\n", tmp->pv, aux);
