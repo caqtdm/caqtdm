@@ -60,7 +60,7 @@ public:
  * our main window (form) constructor
  */
 FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString macroString,
-                               bool attach, bool minimize, QString geometry): QMainWindow(parent)
+                               bool attach, bool minimize, QString geometry, bool printscreen): QMainWindow(parent)
 {
     // definitions for last opened file
     lastWindow = (QMainWindow*) 0;
@@ -68,6 +68,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     lastFile = "";
     lastGeometry = geometry;
     userClose = false;
+    printandexit = printscreen;
 
     if(minimize) showMinimized ();
 
@@ -169,6 +170,9 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
     char asc[255];
     int countPV=0;
     int countNotConnected=0;
+    int countDisplayed = 0;
+    static int printIt = 0;
+    static int timeout = 0;
 
     if(mustOpenFile) {
         mustOpenFile = false;
@@ -186,34 +190,41 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
     // any open windows ?
     // we want to ask with timeout if the application has to be closed. 23-jan-2013 no yust exit
     if(this->findChildren<CaQtDM_Lib *>().count() <= 0 && userClose) {
-        /*
-        QString message = QString("no more open windows, do you want to exit?");
-        QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "Exit", message, QMessageBox::Yes | QMessageBox::No, this, Qt::Dialog, true);
-        m->show();
-        int selected = m->exec();
-        if(selected == QMessageBox::Yes) {
-            if (sharedMemory.isAttached()) sharedMemory.detach();
-            exit(0);
-        } else if(selected == QMessageBox::No){
-            m->deleteLater();
-            userClose = false;
-        } else {  // on timeout, the user does not seem to be interested
-            if (sharedMemory.isAttached()) sharedMemory.detach();
-            exit(0);
-        }
-        */
         if (sharedMemory.isAttached()) sharedMemory.detach();
         exit(0);
     } else if(this->findChildren<CaQtDM_Lib *>().count() > 0){
         userClose = true;
     }
 
-    // any non connected pv's ?
+    // any non connected pv's to display ?
 
-    fillPVtable(countPV, countNotConnected);
+    fillPVtable(countPV, countNotConnected, countDisplayed);
 
     sprintf(asc, "%s - PV=%d (%d NC)", asc, countPV, countNotConnected);
     statusBar()->showMessage(asc);
+
+    // we wanted a print, do it when acquired, then exit
+    if(printandexit) {
+        if(countPV > 0 && countNotConnected == 0) {
+            if(this->findChildren<CaQtDM_Lib *>().count() == 1) {
+                CaQtDM_Lib * widget = this->findChild<CaQtDM_Lib *>();
+                if(countDisplayed > 0 && countDisplayed == countPV) {
+                    printIt++;
+                    if(printIt > 2) {
+                        widget->printPS("caQtDM.ps");
+                        qDebug() << "caQtDM -- file has been printed to caQtDM.ps";
+                        exit(1);
+                    }
+                }
+            }
+        }
+        if(timeout++ > 4) {    // seems we did not get everything
+            CaQtDM_Lib * widget = this->findChild<CaQtDM_Lib *>();
+            widget->printPS("caQtDM.ps");
+            qDebug() << "caQtDM -- file has been printed to caQtDM.ps, probably with errors";
+            exit(1);
+        }
+    }
 }
 
 /**
@@ -344,9 +355,13 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         //qDebug() << "sorry -- file" << FileName << "does not exist";
     } else {
         char asc[255];
-        //qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString;
+        qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString;
         QMainWindow *mainWindow = new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, messageWindow);
-        mainWindow->show();
+        if(printandexit) {
+            mainWindow->showMinimized();
+        } else {
+            mainWindow->show();
+        }
         mainWindow->raise();
         mainWindow->setMinimumSize(0, 0);
         mainWindow->setMaximumSize(16777215, 16777215);
@@ -506,6 +521,7 @@ void FileOpenWindow::Callback_ActionUnconnected()
 {
     int countPV=0;
     int countNotConnected=0;
+    int countDisplayed = 0;
 
     if(pvWindow != (QMainWindow*) 0) {
         pvWindow->show();
@@ -530,7 +546,7 @@ void FileOpenWindow::Callback_ActionUnconnected()
     QWidget* widg = new QWidget();
     widg->setLayout(l);
 
-    fillPVtable(countPV, countNotConnected);
+    fillPVtable(countPV, countNotConnected, countDisplayed);
 
     pvWindow->setCentralWidget(widg);
     pvWindow->show();
@@ -548,9 +564,9 @@ void FileOpenWindow::Callback_PVwindowExit()
     pvWindow->hide();
 }
 
-void FileOpenWindow::fillPVtable(int &countPV, int &countNotConnected)
+void FileOpenWindow::fillPVtable(int &countPV, int &countNotConnected, int &countDisplayed)
 {
-
+    int count = 0;
     if(pvTable != (QTableWidget*) 0) {
         pvTable->clear();
         pvTable->setColumnCount(3);
@@ -564,6 +580,8 @@ void FileOpenWindow::fillPVtable(int &countPV, int &countNotConnected)
         if(kPtr->index != -1) {
             if(!kPtr->edata.connected) {
                 countNotConnected++;
+            } else {
+                if(kPtr->edata.displayCount > 0) countDisplayed++;
             }
             countPV++;
         }
@@ -571,15 +589,15 @@ void FileOpenWindow::fillPVtable(int &countPV, int &countNotConnected)
 
     if(pvTable != (QTableWidget*) 0) {
         pvTable->setRowCount(countNotConnected);
-        countNotConnected = 0;
+        count = 0;
         for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
             knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
             if(kPtr->index != -1) {
                 if(!kPtr->edata.connected) {
-                    pvTable->setItem(countNotConnected,0, new QTableWidgetItem(kPtr->pv));
-                    pvTable->setItem(countNotConnected,1, new QTableWidgetItem(kPtr->dispName));
-                    pvTable->setItem(countNotConnected,2, new QTableWidgetItem(kPtr->fileName));
-                    countNotConnected++;
+                    pvTable->setItem(count,0, new QTableWidgetItem(kPtr->pv));
+                    pvTable->setItem(count,1, new QTableWidgetItem(kPtr->dispName));
+                    pvTable->setItem(count,2, new QTableWidgetItem(kPtr->fileName));
+                    count++;
                 }
             }
         }

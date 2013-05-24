@@ -38,10 +38,10 @@
 
  public:
      FileOpenWindow(QMainWindow *parent = 0,  QString filename = "", QString macroString = "",
-                    bool attach = false, bool minimize = false, QString geometry = "");
+                    bool attach = false, bool minimize = false, QString geometry = "", bool printscreen = false);
      bool isRunning();
      bool sendMessage(const QString &message);
-     void fillPVtable(int &countPV, int &countnotConnected);
+     void fillPVtable(int &countPV, int &countnotConnected, int &countDisplayed);
      int ReadInteger(char *string, char **NextString);
      int parseGeometry(const char* string, int* x, int* y, int* width, int* height);
      void parse_and_set_Geometry(QMainWindow *w, QString parsestring);
@@ -82,6 +82,8 @@ signals:
      bool mustOpenFile;
 
      QString lastFilePath;
+
+     bool printandexit;
  };
 
  #endif
