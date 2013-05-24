@@ -276,8 +276,7 @@ knobData* MutexKnobData::GetMutexKnobDataPtr(int index)
 /**
  * update array with the received data
  */
-void MutexKnobData::SetMutexKnobDataReceived(knobData *kData){
-    QVector<double> y;
+void MutexKnobData::SetMutexKnobDataReceived(knobData *kData) {
     QMutexLocker locker(&mutex);
     int index = kData->index;
     memcpy(&KnobData[index], kData, sizeof(kData));
@@ -423,10 +422,16 @@ void MutexKnobData::timerEvent(QTimerEvent *)
  */
 void MutexKnobData::SetMutexKnobDataConnected(int index, int connected)
 {
-    QVector<double> y;
-    y.clear();
     QMutexLocker locker(&mutex);
+
+    if( KnobData[index].index == -1) return;
+
     KnobData[index].edata.connected = connected;
+
+#ifdef epics4
+    connectInfoShort *tmp = (connectInfoShort *) KnobData[index].edata.info;
+    if (tmp != (connectInfoShort *) 0) tmp->connected = connected;
+#endif
 
     if(!connected) {
         UpdateWidget(index, (QWidget*)KnobData[index].dispW, (char*) " ", (char*) " ",  (char*) " ", KnobData[index]);
@@ -444,10 +449,20 @@ extern "C" MutexKnobData* C_SetMutexKnobDataConnected(MutexKnobData* p, int inde
  * update display data
  */
 
-void MutexKnobData::UpdateWidget(int index, QWidget* w,char *units, char *fec, char *dataString, knobData knb)
+void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, char *dataString, knobData knb)
 {
+    static const QChar mu =  0x00b5;
+    static const QChar uA[2] = { 0x00b5, 0x0041};
+    QString uAs(uA, 2);
+
     //qDebug() << "========== update widget by emitting signal" << w;
-    emit Signal_UpdateWidget(index, w, units, fec, dataString, knb);
+
+    // replace special character mu by greek character mu
+    QString StringUnits = QString::fromLatin1(units);
+    StringUnits.replace("mu", mu); //B5
+    StringUnits.replace("uA", uAs);
+
+    emit Signal_UpdateWidget(index, w, StringUnits, fec, dataString, knb);
 }
 //*********************************************************************************************************************
 
