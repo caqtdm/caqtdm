@@ -264,7 +264,11 @@ void caDoubleTabWidget::setFont(int dir)
 {
     // style for vertical buttons
     QString style;
+#ifdef _MSC_VER
+	int *padding=new int[vTabBar->buttons().count()];
+#else
     int padding[vTabBar->buttons().count()];
+#endif
     for(int j=0; j<vTabBar->buttons().count(); j++) padding[j] = 0;
     for(int j=0; j < thisVerPadding.count(); j++) {
         padding[j] = thisVerPadding.at(j).toInt();
@@ -289,6 +293,12 @@ void caDoubleTabWidget::setFont(int dir)
         style.append("QPushButton:checked {background-color: magenta;}");
         style.append("QPushButton:default {border-color: navy; }");
         button->setStyleSheet(style);
+
+
+
     }
+    #ifdef _MSC_VER
+     delete[] padding;
+    #endif
 }
 
