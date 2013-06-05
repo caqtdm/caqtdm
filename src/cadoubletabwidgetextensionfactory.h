@@ -2,10 +2,11 @@
 #define CADOUBLETABWIDGETEXTENSIONFACTORY_H
 
 #include <QtDesigner/QExtensionFactory>
+#include <qtcontrols_global.h>
 
 class QExtensionManager;
 
-class caDoubleTabWidgetExtensionFactory: public QExtensionFactory
+class QTCON_EXPORT caDoubleTabWidgetExtensionFactory: public QExtensionFactory
 {
     Q_OBJECT
 
