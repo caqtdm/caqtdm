@@ -65,6 +65,7 @@ int main(int argc, char *argv[])
     bool minimize= false;
     bool nostyles = false;
     bool printscreen = false;
+    bool resizing = true;
 
     for (numargs = argc, in = 1; in < numargs; in++) {
         //qDebug() << argv[in];
@@ -96,10 +97,11 @@ int main(int argc, char *argv[])
                    "  [-x]\n"
                    "  [-attach]\n"
                    "  [-noMsg]\n"
-                   "  [-noStyles]      this will only work when not attaching\n"
+                   "  [-noStyles]      works only when not attaching\n"
                    "  [-macro \"xxx=aaa,yyy=bbb, ...\"]\n"
                    "  [-dg [xpos[xypos]][+xoffset[+yoffset]]\n"
                    "  [-print] will print file and exit\n"
+                   "  [-noResize] will prevent resizing, works only when not attaching\n"
                    "  [file]\n"
                    "  [&]\n"
                    "\n"
@@ -110,8 +112,12 @@ int main(int argc, char *argv[])
              in++;
              geometry = QString(argv[in]);
         } else if(!strcmp(argv[in], "-print")) {
-            printscreen = true;
+             printscreen = true;
              minimize = true;
+             resizing = false;
+             geometry = QString(argv[in]);
+        } else if(!strcmp(argv[in], "-noResize")) {
+            resizing = false;
         } else if (strncmp (argv[in], "-" , 1) == 0) {
             /* unknown application argument */
             printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -noStyles -dg -x -print\n",in,argv[in]);
@@ -137,7 +143,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    FileOpenWindow window (0, fileName, macroString, attach, minimize, geometry, printscreen);
+    FileOpenWindow window (0, fileName, macroString, attach, minimize, geometry, printscreen, resizing);
     window.setWindowIcon (QIcon(":/caQtDM.ico"));
     window.show();
     window.move(0,0);

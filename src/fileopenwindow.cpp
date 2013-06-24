@@ -60,7 +60,7 @@ public:
  * our main window (form) constructor
  */
 FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString macroString,
-                               bool attach, bool minimize, QString geometry, bool printscreen): QMainWindow(parent)
+                               bool attach, bool minimize, QString geometry, bool printscreen, bool resizing): QMainWindow(parent)
 {
     // definitions for last opened file
     lastWindow = (QMainWindow*) 0;
@@ -69,6 +69,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     lastGeometry = geometry;
     userClose = false;
     printandexit = printscreen;
+    allowResize = resizing;
 
     if(minimize) showMinimized ();
 
@@ -244,7 +245,12 @@ void FileOpenWindow::Callback_OpenButton()
         QFileInfo fi(fileName);
         lastFilePath = fi.absolutePath();
         if(fi.exists()) {
-            QMainWindow *mainWindow = new CaQtDM_Lib(this, fileName, "", mutexKnobData, messageWindow);
+
+            // QMainWindow *mainWindow = new CaQtDM_Lib(this, fileName, "", mutexKnobData, messageWindow);
+
+            CaQtDM_Lib *newWindow = new CaQtDM_Lib(this, fileName, "", mutexKnobData, messageWindow);
+            newWindow->allowResizing(allowResize);
+            QMainWindow *mainWindow = newWindow;
             mainWindow->show();
             mainWindow->raise();
             mainWindow->setMinimumSize(0, 0);
@@ -356,7 +362,13 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     } else {
         char asc[255];
         qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString;
-        QMainWindow *mainWindow = new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, messageWindow);
+
+        //QMainWindow *mainWindow = new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, messageWindow);
+
+        CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, messageWindow);
+        newWindow->allowResizing(allowResize);
+        QMainWindow *mainWindow = newWindow;
+
         if(printandexit) {
             mainWindow->showMinimized();
         } else {
@@ -453,7 +465,12 @@ void FileOpenWindow::Callback_ActionReload()
             if(!fileName.isNull()) {
                 fileS = fileName.toString();
 
-                QMainWindow *mainWindow = new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, messageWindow);
+                //QMainWindow *mainWindow = new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, messageWindow);
+
+                CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, messageWindow);
+                newWindow->allowResizing(allowResize);
+                QMainWindow *mainWindow = newWindow;
+
                 mainWindow->show();
                 mainWindow->move(position);
                 mainWindow->raise();
