@@ -1939,7 +1939,7 @@ void *parseTextUpdate(DisplayInfo *displayInfo, FrameOffset * offset)
             if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, offset, "caLineEdit", True);
-                Qt_handleString("fontScaleMode", "enum", "caLineEdit::Height");
+                Qt_handleString("fontScaleMode", "enum", "caLineEdit::WidthAndHeight");
             } else if(!strcmp(token,"monitor")) {
                 parseMonitor(displayInfo, "caLineEdit");
             } else if(!strcmp(token,"clrmod")) {
@@ -2096,7 +2096,7 @@ void *parseMessageButton(DisplayInfo *displayInfo, FrameOffset * offset)
             if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, offset, "caMessageButton", True);
-                Qt_handleString("fontScaleMode", "enum", "EPushButton::Height");
+                Qt_handleString("fontScaleMode", "enum", "EPushButton::WidthAndHeight");
             } else if(!strcmp(token,"control")) {
                 parseControl(displayInfo, "caMessageButton");
             } else if(!strcmp(token,"press_msg")) {
@@ -2211,7 +2211,7 @@ void *parseTextEntry(DisplayInfo *displayInfo, FrameOffset * offset)
             if(!strcmp(token,"object")) {
                 parseObject(displayInfo, &object);
                 writeRectangleDimensions(&object, offset, "caLineEdit", True);
-                Qt_handleString("fontScaleMode", "enum", "caLineEdit::Height");
+                Qt_handleString("fontScaleMode", "enum", "caLineEdit::WidthAndHeight");
             } else if(!strcmp(token,"control")) {
                 parseControl(displayInfo, "caTextEntry");
             } else if(!strcmp(token,"clrmod")) {
@@ -3168,7 +3168,7 @@ void *parseText(DisplayInfo *displayInfo, FrameOffset * offset)
                 getToken(displayInfo,token);
                 strcpy(textix, token);
                 Qt_handleString("text", "string",  token);
-                Qt_handleString("fontScaleMode", "enum",  "ESimpleLabel::Height");
+                Qt_handleString("fontScaleMode", "enum",  "ESimpleLabel::WidthAndHeight");
             } else if(!strcmp(token,"align")) {
 
                 getToken(displayInfo,token);
