@@ -11,7 +11,7 @@
 
 #include "cashellcommand.h"
 
-caShellCommand::caShellCommand(QWidget *parent) : caRowColMenu(parent) //QWidget(parent)
+caShellCommand::caShellCommand(QWidget *parent) : caRowColMenu(parent)
 {
     setStacking(Menu);
     setImage("exclamation.xpm");

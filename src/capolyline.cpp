@@ -274,7 +274,7 @@ void caPolyLine::resizeEvent(QResizeEvent *e)
              thisXYpairs.append(QString::number((int)(y+0.5)));
         }
     }
+
     actualWidth= e->size().width();
     actualHeight = e->size().height();
-
 }
