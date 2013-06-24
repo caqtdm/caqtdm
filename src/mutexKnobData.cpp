@@ -457,12 +457,21 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
 
     //qDebug() << "========== update widget by emitting signal" << w;
 
-    // replace special character mu by greek character mu
+    // replace mu by greek character mu
     QString StringUnits = QString::fromLatin1(units);
     StringUnits.replace("mu", mu); //B5
     StringUnits.replace("uA", uAs);
 
-    emit Signal_UpdateWidget(index, w, StringUnits, fec, dataString, knb);
+    // seems somebody did not know how to code mu in EGU
+    StringUnits.replace("?A", uAs);
+    // assume we have a mu on first position (not nice, but I do not know better)
+    if(dataString[0] == '?' && strlen(dataString) < 7) {
+        QString newDataString = QString::fromLatin1(dataString);
+        newDataString.replace("?", mu); //B5
+         emit Signal_UpdateWidget(index, w, StringUnits, fec, newDataString, knb);
+    } else {
+        emit Signal_UpdateWidget(index, w, StringUnits, fec, dataString, knb);
+    }
 }
 //*********************************************************************************************************************
 
