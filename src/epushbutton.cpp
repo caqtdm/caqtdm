@@ -42,7 +42,7 @@ QSize EPushButton:: sizeHint() const
   if(fontScaleEnabled())
   {
 	QFont f = font();
-	f.setPointSize(10);
+    f.setPointSize(10);
 	QFontMetrics fm(f);
 	int width = fm.width(text());
         width += 8; /* add some extra space */
@@ -60,7 +60,7 @@ QSize  EPushButton::minimumSizeHint() const
 
 QSize EPushButton::calculateTextSpace()
 {
-  qDebug() << "EPushButton::calculateTextSpace(): button size " << size();
+  //qDebug() << "EPushButton::calculateTextSpace(): button size " << size();
   QStyleOptionButton button;
   initStyleOption(&button);
   /* Use QStyle subControlRect() to retrieve the area containing the button label.

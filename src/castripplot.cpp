@@ -239,6 +239,7 @@ void caStripPlot::resizeEvent ( QResizeEvent * event )
 {
     QwtPlot::resizeEvent(event);
     RescaleCurves(canvas()->size().width(), Unit, Period);
+    replot();
     if(timerID) RescaleAxis();
 }
 
