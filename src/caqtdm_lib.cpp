@@ -209,6 +209,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     mutexKnobData = mKnobData;
     messageWindow = msgWindow;
 
+    firstResize = true;
+
 #ifdef epics4
     qDebug() << "epics4 init";
     Epics4 = new epics4Subs(mKnobData);
@@ -3073,7 +3075,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         info.append(asc);
                         info.append("<br>States: ");
                         QString States((char*) kPtr->edata.dataB);
-                        QStringList list = States.split(";", QString::SkipEmptyParts);
+                        QStringList list = States.split(";");
                         for(int i=0; i<list.count(); i++) {
                             sprintf(asc, "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%d %s", i, qPrintable(list.at(i)));
                             info.append(asc);
@@ -3704,5 +3706,231 @@ int CaQtDM_Lib::parseForDisplayRate(QString inputc, int &rate)
         }
     }
     return false;
+}
+
+void CaQtDM_Lib::allowResizing(bool allowresize)
+{
+    allowResize = allowresize;
+}
+
+void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
+{
+    static int width, height;
+    double factX, factY;
+
+    if(!allowResize) return;
+
+    if(firstResize) {
+        firstResize = false;
+        // keep original width and height
+        width = event->size().width();
+        height = event->size().height();
+        QList<QWidget *> all = this->findChildren<QWidget *>();
+        foreach(QWidget* widget, all) {
+            QList<QVariant> integerList;
+            QString className(widget->metaObject()->className());
+            integerList.insert(0, widget->geometry().x());
+            integerList.insert(1, widget->geometry().y());
+            integerList.insert(2, widget->geometry().width());
+            integerList.insert(3, widget->geometry().height());
+
+            // for a horizontal or vertical line get the linewidth
+            if(!className.compare("QFrame")) {
+                QFrame * line = (QFrame *) widget;
+                if(line->frameShape() == QFrame::HLine || line->frameShape() == QFrame::VLine) {
+                    integerList.insert(4, line->lineWidth());
+                }
+            }
+
+            integerList.insert(5, widget->font().pointSize());
+
+            widget->setProperty("GeometryList", integerList);
+        }
+    }
+
+    factX = (double) event->size().width() / (double)width;
+    factY = (double) event->size().height() / (double) height;
+
+    QObject *object;
+    QString className;
+    QMainWindow *main = this->findChild<QMainWindow *>();
+    bool mainlayoutPresent = false;
+
+    if(main == (QObject*) 0) {
+        QDialog *dialog = this->findChild<QDialog *>();
+        if(dialog == (QObject*) 0) return;  // if not a mainwindow or dialog get out
+        object = dialog;
+        if(dialog->layout() != (QObject*) 0) {
+            className = dialog->layout()->metaObject()->className();
+            mainlayoutPresent = true;
+        }
+    } else {
+        object = main;
+        if( main->centralWidget()->layout() != (QObject*) 0) {
+            className = main->centralWidget()->layout()->metaObject()->className();
+            mainlayoutPresent = true;
+        }
+    }
+
+    //qDebug() << className << mainlayoutPresent;
+
+    // if our window is not using a layout, then we we have to do the resizing ourselves
+    if(!mainlayoutPresent) {
+        //qDebug() << "no main layout present, we should do the work";
+
+    // if our window is using a layout, then Qt has to do the resizing
+    } else {
+        //qDebug() << "main layout present, Qt should do the work" << className;
+
+        // centralwidget should manage the layout itsself, we do nothing except changing font for some classes
+        if(className.contains("Layout")) {
+            //qDebug() << "but we will try to change some fonts";
+            // resize some minor stuff before leaving this routine
+            QList<QWidget *> all = this->findChildren<QWidget *>();
+            foreach(QWidget* widget, all) {
+                QString className(widget->metaObject()->className());
+                QVariant var=widget->property("GeometryList");
+                QVariantList list = var.toList();
+
+                if(list.size() >= 4) {
+                    // for horizontal or vertical line we still have to set the linewidth
+                    if(!className.compare("QFrame")) {
+                        double linewidth;
+                        QFrame * line = (QFrame *) widget;
+                        if(line->frameShape() == QFrame::HLine || line->frameShape() == QFrame::VLine) {
+                            if(line->frameShape() != QFrame::HLine) {
+                                linewidth = (double) list.at(4).toInt() * factY;
+                            } else {
+                                linewidth = (double) list.at(4).toInt() * factX;
+                            }
+                            if(linewidth < 1.0) linewidth = 1.0;
+                            line->setLineWidth((int) linewidth);
+                        }
+                    }
+                    // change fonts for next classes, when smaller needed
+                    if(!className.compare("QGroupBox")) {
+                        if(qMin(factX, factY) < 1.0) {
+                            QGroupBox *box = (QGroupBox *) widget;
+                            int fontSize = (int) (qMin(factX, factY) * (double) list.at(4).toInt() + 0.5);
+                            QFont f;
+                            f.setPointSizeF(fontSize);
+                            box->setFont(f);
+                        }
+                    }
+
+                    if(!className.compare("caMenu")) {
+                        if(qMin(factX, factY) < 1.0) {
+                            caMenu *menu = (caMenu *) widget;
+                            int fontSize = (int) (qMin(factX, factY) * (double) list.at(4).toInt() + 0.5);
+                            QFont f;
+                            f.setPointSizeF(fontSize);
+                            menu->setFont(f);
+                        }
+                    }
+                    if(!className.compare("caTable")) {
+                        if(qMin(factX, factY) < 1.0) {
+                            caTable *table = (caTable *) widget;
+                            int fontSize = (int) (qMin(factX, factY) * (double) list.at(4).toInt() + 0.5);
+                            QFont f;
+                            f.setPointSizeF(fontSize);
+                            const int rowCount = table->rowCount();
+                            const int columnCount = table->columnCount();
+
+                            for(int i = 0; i < rowCount; ++i) {
+                                for(int j = 0; j < columnCount; ++j) {
+                                    QTableWidgetItem* selectedItem = table->item(i, j);
+                                    selectedItem->setFont(f);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return;
+        }
+    }
+
+    // do all resize work ourselves
+    QList<QWidget *> all = this->findChildren<QWidget *>();
+    foreach(QWidget* widget, all) {
+        QString className(widget->metaObject()->className());
+
+        if(
+                !className.contains("QMainWindow")  &&
+                !className.contains("QRubberBand")  &&
+                !className.contains("Qwt")    &&
+                !className.contains("QWidget")    &&
+                (className.contains("ca") || className.contains("Q") || className.contains("Line"))
+                ) {
+            QWidget *w = (QWidget*) widget->parent();
+            // if this widget is managed by a layout, do not do anything
+            // parent is a layout and must be resized and repositioned
+
+            if((w->layout() != (QObject*) 0) && (w->objectName().contains("layoutWidget"))) {
+                QVariant var=w->property("GeometryList");
+                QVariantList list = var.toList();
+                double x = (double) list.at(0).toInt() * factX;
+                double y = (double) list.at(1).toInt() * factY;
+                double width = (double) list.at(2).toInt() *factX;
+                double height = (double) list.at(3).toInt() *factY;
+                QRect rectnew = QRect((int) x, (int) y, (int) width, (int) height);
+                w->setGeometry(rectnew);
+                w->updateGeometry();
+
+
+                // not a layout, widget has to be resized and repositioned
+            } else {
+                QVariant var=widget->property("GeometryList");
+                QVariantList list = var.toList();
+
+                if(list.size() >= 4) {
+                    double x = (double) list.at(0).toInt() * factX;
+                    double y = (double) list.at(1).toInt() * factY;
+                    double width = (double) list.at(2).toInt() * factX;
+                    double height = (double) list.at(3).toInt() * factY;
+                    if(width < 1.0) width=1.0;
+                    if(height < 1.0) height = 1.0;
+                    QRect rectnew = QRect((int) x, (int) y, (int) width, (int) height);
+
+                    widget->setGeometry(rectnew);
+
+                    // for horizontal or vertical line we still have to set the linewidth
+                    if(!className.compare("QFrame")) {
+                        double linewidth;
+                        QFrame * line = (QFrame *) widget;
+                        if(line->frameShape() == QFrame::HLine || line->frameShape() == QFrame::VLine) {
+                            if(line->frameShape() != QFrame::HLine) {
+                                linewidth = (double) list.at(4).toInt() * factY;
+                            } else {
+                                linewidth = (double) list.at(4).toInt() * factX;
+                            }
+                            if(linewidth < 1.0) linewidth = 1.0;
+                            line->setLineWidth((int) linewidth);
+                        }
+                    }
+
+                    if(!className.compare("QGroupBox")) {
+                        QGroupBox *box = (QGroupBox *) widget;
+                        int fontSize = (int) (qMin(factX, factY) * (double) list.at(4).toInt() + 0.5);
+                        QFont f;
+                        f.setPointSizeF(fontSize);
+                        box->setFont(f);
+                    }
+
+                    if(!className.compare("caMenu")) {
+                        caMenu *menu = (caMenu *) widget;
+                        int fontSize = (int) (qMin(factX, factY) * (double) list.at(4).toInt() + 0.5);
+                        QFont f;
+                        f.setPointSizeF(fontSize);
+                        menu->setFont(f);
+                    }
+
+                    widget->updateGeometry();
+                }
+            }
+
+        }
+    }
+
 }
 

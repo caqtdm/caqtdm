@@ -77,6 +77,7 @@ public:
     bool getSoftChannel(QString pv, knobData &data);
     int parseForDisplayRate(QString input, int &rate);
     void UpdateGauge(EAbstractGauge *w, const knobData &data);
+    void allowResizing(bool allowresize);
 
     void print()
     {
@@ -121,6 +122,7 @@ protected:
 
     virtual void mouseReleaseEvent(QMouseEvent *event);
     virtual void timerEvent(QTimerEvent *e);
+    void resizeEvent ( QResizeEvent * event );
 
 signals:
     void clicked(QString);
@@ -146,6 +148,10 @@ private:
 
     QString thisFileShort;
     QString thisFileFull;
+
+    boolean firstResize;
+    boolean allowResize;
+
 
 #ifdef epics4
     epics4Subs *Epics4;
