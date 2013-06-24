@@ -16,6 +16,7 @@
 
 caLabel::caLabel(QWidget *parent) : ESimpleLabel(parent)
 {
+    setFontScaleMode(WidthAndHeight);
     thisBackColor = Qt::gray;
     thisForeColor = Qt::black;
     thisBackColorOld = Qt::black;

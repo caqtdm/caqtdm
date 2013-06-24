@@ -57,7 +57,7 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     keepText = "";
     setText(keepText);
 
-    setFontScaleMode(Height);
+    setFontScaleMode(WidthAndHeight);
     setColorMode(Default);
     newFocusPolicy(Qt::NoFocus);
 
