@@ -3,7 +3,7 @@ QT       += core gui
 CONFIG   += qt warn_on thread uitools designer plugin
 
 #epics4
-CONFIG += epics4
+#CONFIG += epics4
 
 TARGET = caQtDM_Lib
 TEMPLATE = lib
