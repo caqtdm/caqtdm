@@ -68,16 +68,6 @@ caChoice > QPushButton {
       padding: 1px;
 }
 
-/* when font specified, no font sizing is done any more,  font: 10pt; is not bad. You could Enable this when you converted from .adl files
-caRelatedDisplay  > QPushButton {
-font: 10pt;
-}
-
-caShellCommand  > QPushButton {
-font: 10pt;
-}
-*/
-
 caSlider::groove:horizontal {
 border: 1px solid #bbb;
 background: lightgrey;
