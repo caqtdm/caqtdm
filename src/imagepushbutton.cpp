@@ -62,6 +62,8 @@ void ImagePushButton::paintEvent( QPaintEvent* event) {
     EPushButton::paintEvent(event);
     QPainter p(this);
 
+    p.setRenderHint( QPainter::Antialiasing );
+
     QRect r = this->geometry();
     x=r.x(); y=r.y(); w=r.width(); h=r.height();
     //printf("%d %d %d %d\n", x, y, w, h);
@@ -82,7 +84,8 @@ void ImagePushButton::paintEvent( QPaintEvent* event) {
             w -= pixw + 4;
         }
         r.setRect(x, y, w, h);
-        p.drawText(r, Qt::AlignCenter, myText);
+
+        //p.drawText(r, Qt::AlignCenter, myText);
     }
 }
 
