@@ -152,6 +152,8 @@ private:
     boolean firstResize;
     boolean allowResize;
 
+    int origWidth, origHeight;
+
 
 #ifdef epics4
     epics4Subs *Epics4;

@@ -1344,7 +1344,7 @@ QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, 
 int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget *w, int *specData, QMap<QString, QString> map, QString *pvRep)
 {
     // define epics monitors
-    bool doNothing;
+    bool doNothing = false;
     int cpylen;
     int indx;
 
@@ -3715,7 +3715,6 @@ void CaQtDM_Lib::allowResizing(bool allowresize)
 
 void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 {
-    static int width, height;
     double factX, factY;
 
     if(!allowResize) return;
@@ -3723,8 +3722,8 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
     if(firstResize) {
         firstResize = false;
         // keep original width and height
-        width = event->size().width();
-        height = event->size().height();
+        origWidth = event->size().width();
+        origHeight = event->size().height();
         QList<QWidget *> all = this->findChildren<QWidget *>();
         foreach(QWidget* widget, all) {
             QList<QVariant> integerList;
@@ -3746,10 +3745,11 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 
             widget->setProperty("GeometryList", integerList);
         }
+        return;
     }
 
-    factX = (double) event->size().width() / (double)width;
-    factY = (double) event->size().height() / (double) height;
+    factX = (double) event->size().width() / (double) origWidth;
+    factY = (double) event->size().height() / (double) origHeight;
 
     QObject *object;
     QString className;
