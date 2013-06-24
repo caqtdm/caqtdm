@@ -79,11 +79,17 @@ void caRowColMenu::populateCells()
 
         // more than one command, make menu
         if(numCells > 1) {
-            QString newLabel;
-            newLabel= thisLabel;
+
+            QString newLabel= thisLabel;
+            QString pixLabel = thisLabel;
+            if(pixLabel[0] == '-') {
+                pixLabel.remove(0,1);
+            } else {
+               pixLabel.insert(0, "     ");        // not very nice, we prefix with some blancs to stay outdise the pixmap
+            }
 
             // class for painting with a pixmap and text
-            ImagePushButton* temp = new ImagePushButton("", thisImage);
+            ImagePushButton* temp = new ImagePushButton(pixLabel, thisImage);
             temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
             temp->setMinimumSize(2,2); //important for resizing as small as possible
             if(thisScaleMode == EPushButton::None) {  // in this case we may use font
@@ -96,11 +102,12 @@ void caRowColMenu::populateCells()
             if(newLabel[0] == '-') {
                 newLabel.remove(0,1);
                 temp->setIconVisible(false);
+                temp->setLabelText(newLabel);
             // otherwise a pixmap
             } else {
                 temp->setIconVisible(true);
             }
-            temp->setLabelText(newLabel);
+            //temp->setLabelText(newLabel);
 
             //set colors and style
 
@@ -135,12 +142,18 @@ void caRowColMenu::populateCells()
             // menu with one command --> pushbutton
         } else {
             int alpha = 255;
-            QString newLabel;
-            newLabel= thisLabel;
+            QString newLabel= thisLabel;
+            QString pixLabel = thisLabel;
+            if(pixLabel[0] == '-') {
+                pixLabel.remove(0,1);
+            } else {
+                pixLabel.insert(0, "     ");        // not very nice, we prefix with some blancs to stay outdise the pixmap
+            }
             // class for painting with a pixmap and text
-            ImagePushButton* temp = new ImagePushButton("", thisImage);
+            ImagePushButton* temp = new ImagePushButton(pixLabel, thisImage);
             temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
             temp->setMinimumSize(2,2); //important for resizing as small as possible
+
             if(thisScaleMode == EPushButton::None) {  // in this case we may use font
                 temp->setFont(this->font());
             } else {
@@ -151,11 +164,12 @@ void caRowColMenu::populateCells()
             if(newLabel[0] == '-') {
                 newLabel.remove(0,1);
                 temp->setIconVisible(false);
+                temp->setLabelText(newLabel);
             // otherwise a pixmap
             } else {
                 temp->setIconVisible(true);
             }
-            temp->setLabelText(newLabel);
+            //temp->setLabelText(newLabel);
 
             if(thisStacking == Hidden) {
                 temp->setInVisible(thisBackColor, thisForeColor, thisBorderColor);
@@ -245,7 +259,7 @@ void caRowColMenu::populateCells()
 void caRowColMenu::setLabel(QString const &label)
 {
     thisLabel = label;
-
+/*
     if(thisStacking == Menu) {
         numCells = qMin(files.size(), args.size());
         numCells = qMin(numCells, labels.size());
@@ -263,6 +277,9 @@ void caRowColMenu::setLabel(QString const &label)
             }
         }
     }
+*/
+    populateCells();
+
 }
 
 void caRowColMenu::setImage(QString const &image) {
