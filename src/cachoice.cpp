@@ -86,7 +86,7 @@ void caChoice::arrangeCells(QStringList list, int indx)
         if(list.at(i + thisStartBit).trimmed().size() > 0) {
           temp = new EPushButton(list.at(i + thisStartBit), this);
         } else {
-            QString s = QString::number(i + thisStartBit);
+            QString s = ""; // QString::number(i + thisStartBit);
             temp = new EPushButton(s, this);
         }
         temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
