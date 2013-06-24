@@ -1,4 +1,15 @@
-CAQTDM_VERSION = V3.0.1
+CAQTDM_VERSION = V3.1.0
+
+# new in 3.1.0
+# windows are resizable, in order to have to working well one should always use fontscalemode=WidthAndHeight. in the deafult style sheet no font sizes should be specified.
+# when for the mainwindow a layout is used, Qt should do the work and caQtDM will not do anything except changing eventually some fonts.
+# if on the command line -noResize is specified, then resizing will be disabled for that instance of caQtDM (in case of attaching that will not work)
+# adl2ui will generate all texts with fontScaleMode=WidthAndHeight
+# caChoice will not display a number for empty items with enum
+# caLabel, calinedit will have per default fontscalemode=WidthAndHeight
+# caRelatedDisplay, caShellCommand modified to be correctly scalable
+# simplelabel modified to change font during typing
+# fontscalingwidget algorithme modified
 
 # new in 3.0.1
 # one can specify building with epics4 (in caQtDM_LIB.pri) ; this first attempt allows to read and write scalars. epics4 channel have to be specified
