@@ -2,7 +2,7 @@ include(../caQtDM/qtdefs.pri)
 
 DEFINES += QT_NO_DEBUG_OUTPUT
 
-CONFIG += uitools qwt plugin designer
+CONFIG += uitools qwt plugin designer warn_on
 
 TARGET = qtcontrols
 TEMPLATE = lib
