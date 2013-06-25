@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Product Id="D75A13FA-3367-4850-AC46-E69A41645E83" Name="caQtDM" Language="1033" Version="2.8.0.0" Manufacturer="Paul Scherrer Institut" UpgradeCode="CEE4C381-28DA-478F-A7C6-3A95B4DF2A89">
+    <Product Id="4EE93B2A-1775-49F8-8F6A-DFF4D2D8A9F3" Name="caQtDM" Language="1033" Version="3.0.1.0" Manufacturer="Paul Scherrer Institut" UpgradeCode="CEE4C381-28DA-478F-A7C6-3A95B4DF2A89">
         <Package Description="caQTDM Windows Manager with Qt-Designer(4.8.2)" Comments="Displaymanager for EPICS with Qt(4.8.2)" InstallerVersion="300" Compressed="yes" Manufacturer="Paul Scherrer Institut Switzerland" Keywords="EPICS, Display, Network, Control" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
         <Directory Id="TARGETDIR" Name="SourceDir">
