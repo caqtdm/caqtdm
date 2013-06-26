@@ -5,6 +5,9 @@ CONFIG   += qt warn_on thread uitools designer plugin
 #epics4
 #CONFIG += epics4
 
+QMAKE_CXXFLAGS += "-g"
+QMAKE_CFLAGS_RELEASE += "-g"
+
 TARGET = caQtDM_Lib
 TEMPLATE = lib
 
