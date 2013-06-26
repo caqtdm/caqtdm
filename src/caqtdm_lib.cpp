@@ -1244,7 +1244,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         // go through the defined curves and add monitor
 
-        widget->defineCurves(vars, widget->getUnits(), widget->getPeriod(),  widget->width(),  NumberOfCurves);
+        if(NumberOfCurves > 0) widget->defineCurves(vars, widget->getUnits(), widget->getPeriod(),  widget->width(),  NumberOfCurves);
         for(int i=0; i< NumberOfCurves; i++) {
             int num;
             QString pv = vars.at(i).trimmed();
@@ -3713,6 +3713,125 @@ void CaQtDM_Lib::allowResizing(bool allowresize)
     allowResize = allowresize;
 }
 
+void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList list, double factX, double factY)
+{
+    // for horizontal or vertical line we still have to set the linewidth
+    if(!className.compare("QFrame")) {
+        double linewidth;
+        QFrame * line = (QFrame *) widget;
+        if(line->frameShape() == QFrame::HLine || line->frameShape() == QFrame::VLine) {
+            if(line->frameShape() != QFrame::HLine) {
+                linewidth = (double) list.at(4).toInt() * factY;
+            } else {
+                linewidth = (double) list.at(4).toInt() * factX;
+            }
+            if(linewidth < 1.0) linewidth = 1.0;
+            line->setLineWidth((int) linewidth);
+        }
+    }
+
+    else if(!className.compare("caTable")) {
+        QFont f;
+        caTable *table = (caTable *) widget;
+        qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
+        f.setPointSizeF(fontSize);
+        const int rowCount = table->rowCount();
+        const int columnCount = table->columnCount();
+        table->setUpdatesEnabled(false);
+        for(int i = 0; i < rowCount; ++i) {
+            for(int j = 0; j < columnCount; ++j) {
+                QTableWidgetItem* selectedItem = table->item(i, j);
+                selectedItem->setFont(f);
+            }
+        }
+        table->verticalHeader()->setDefaultSectionSize((int) (qMin(factX, factY)*20));
+        table->setUpdatesEnabled(true);
+    }
+
+    else if(!className.compare("QLabel")) {
+        QLabel *label = (QLabel *) widget;
+        className = label->parent()->metaObject()->className();
+        if(!className.contains("Numeric") ) {  // would otherwise interfere with our wheelswitch
+            qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
+            QFont f = label->font();
+            f.setPointSizeF(fontSize);
+            label->setFont(f);
+        }
+    }
+
+    else if(!className.compare("caThermo")) {
+        if(qMin(factX, factY) < 1.0) {
+            caThermo *thermo = (caThermo *) widget;
+            qreal fontSize =  qMin(factX, factY) * (double) list.at(4).toInt();
+            QFont f = thermo->font();
+            f.setPointSizeF(fontSize);
+            thermo->setFont(f);
+        }
+    }
+
+    else if(!className.compare("caStripPlot") || !className.compare("caCartesianPlot")) {
+        QwtPlot *plot = (QwtPlot *) widget;
+
+        // change font of axis ticks
+        qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
+        QFont f = plot->axisFont(QwtPlot::xBottom);
+        f.setPointSizeF(fontSize);
+        plot->setAxisFont(QwtPlot::xBottom, f);
+        plot->setAxisFont(QwtPlot::yLeft, f);
+
+        // change font of labels and title
+        f = plot->title().font();
+        QwtText title = plot->title().text();
+        QwtText titleX = plot->axisTitle(QwtPlot::xBottom).text();
+        QwtText titleY = plot->axisTitle(QwtPlot::yLeft).text();
+        fontSize = qMin(factX, factY) * (double) list.at(6).toInt();
+        f.setPointSizeF(fontSize);
+        title.setFont(f);
+        titleX.setFont(f);
+        titleY.setFont(f);
+        plot->setTitle(title);
+        plot->setAxisTitle(QwtPlot::xBottom, titleX);
+        plot->setAxisTitle(QwtPlot::yLeft, titleY);
+
+        if(!className.compare("caStripPlot")) {
+            caStripPlot * plot = (caStripPlot *) widget;
+            fontSize = qMin(factX, factY) * (double) list.at(7).toInt();
+            f.setPointSizeF(fontSize);
+            if(plot->getLegendEnabled()) {
+                if(plot->legend() != (QwtLegend*) 0) {
+                    QList<QWidget *> list =  plot->legend()->legendItems();
+                    for (QList<QWidget*>::iterator it = list.begin(); it != list.end(); ++it ) {
+                        QWidget *w = *it;
+                        w->setFont(f);
+                    }
+                }
+            }
+        }
+    }
+
+    // change fonts for next classes, when smaller needed
+    else if(!className.compare("QGroupBox")) {
+        if(qMin(factX, factY) < 1.0) {
+            QGroupBox *box = (QGroupBox *) widget;
+            qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
+            QFont f;
+            f.setPointSizeF(fontSize);
+            box->setFont(f);
+        }
+    }
+
+    else if(!className.compare("caMenu")) {
+        if(qMin(factX, factY) < 1.0) {
+            caMenu *menu = (caMenu *) widget;
+            qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
+            QFont f;
+            f.setPointSizeF(fontSize);
+            menu->setFont(f);
+        }
+    }
+
+}
+
 void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 {
     double factX, factY;
@@ -3738,6 +3857,22 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 QFrame * line = (QFrame *) widget;
                 if(line->frameShape() == QFrame::HLine || line->frameShape() == QFrame::VLine) {
                     integerList.insert(4, line->lineWidth());
+                }
+            // for plots get the linewidth
+            } else if(!className.compare("caStripPlot") || !className.compare("caCartesianPlot")) {
+                QwtPlot * plot = (QwtPlot *) widget;
+                integerList.insert(4, plot->axisFont(QwtPlot::xBottom).pointSize());         // label of ticks
+                integerList.insert(6, plot->axisTitle(QwtPlot::xBottom).font().pointSize()); // titles have the same font
+                if(!className.compare("caStripPlot")) {
+                    caStripPlot * plot = (caStripPlot *) widget;
+                    integerList.insert(7, 9);
+                    if(plot->getLegendEnabled()) {
+                        if(plot->legend() != (QwtLegend*) 0) {
+                            if(plot->legend()->legendItems().count() > 0) {
+                                integerList.insert(7, plot->legend()->legendItems().at(0)->font().pointSize());  // legends font size
+                            }
+                        }
+                    }
                 }
             }
 
@@ -3784,7 +3919,6 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 
         // centralwidget should manage the layout itsself, we do nothing except changing font for some classes
         if(className.contains("Layout")) {
-            //qDebug() << "but we will try to change some fonts";
             // resize some minor stuff before leaving this routine
             QList<QWidget *> all = this->findChildren<QWidget *>();
             foreach(QWidget* widget, all) {
@@ -3793,57 +3927,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 QVariantList list = var.toList();
 
                 if(list.size() >= 4) {
-                    // for horizontal or vertical line we still have to set the linewidth
-                    if(!className.compare("QFrame")) {
-                        double linewidth;
-                        QFrame * line = (QFrame *) widget;
-                        if(line->frameShape() == QFrame::HLine || line->frameShape() == QFrame::VLine) {
-                            if(line->frameShape() != QFrame::HLine) {
-                                linewidth = (double) list.at(4).toInt() * factY;
-                            } else {
-                                linewidth = (double) list.at(4).toInt() * factX;
-                            }
-                            if(linewidth < 1.0) linewidth = 1.0;
-                            line->setLineWidth((int) linewidth);
-                        }
-                    }
-                    // change fonts for next classes, when smaller needed
-                    if(!className.compare("QGroupBox")) {
-                        if(qMin(factX, factY) < 1.0) {
-                            QGroupBox *box = (QGroupBox *) widget;
-                            int fontSize = (int) (qMin(factX, factY) * (double) list.at(4).toInt() + 0.5);
-                            QFont f;
-                            f.setPointSizeF(fontSize);
-                            box->setFont(f);
-                        }
-                    }
-
-                    if(!className.compare("caMenu")) {
-                        if(qMin(factX, factY) < 1.0) {
-                            caMenu *menu = (caMenu *) widget;
-                            int fontSize = (int) (qMin(factX, factY) * (double) list.at(4).toInt() + 0.5);
-                            QFont f;
-                            f.setPointSizeF(fontSize);
-                            menu->setFont(f);
-                        }
-                    }
-                    if(!className.compare("caTable")) {
-                        if(qMin(factX, factY) < 1.0) {
-                            caTable *table = (caTable *) widget;
-                            int fontSize = (int) (qMin(factX, factY) * (double) list.at(4).toInt() + 0.5);
-                            QFont f;
-                            f.setPointSizeF(fontSize);
-                            const int rowCount = table->rowCount();
-                            const int columnCount = table->columnCount();
-
-                            for(int i = 0; i < rowCount; ++i) {
-                                for(int j = 0; j < columnCount; ++j) {
-                                    QTableWidgetItem* selectedItem = table->item(i, j);
-                                    selectedItem->setFont(f);
-                                }
-                            }
-                        }
-                    }
+                   resizeSpecials(className, widget, list, factX, factY);
                 }
             }
             return;
@@ -3877,7 +3961,6 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 w->setGeometry(rectnew);
                 w->updateGeometry();
 
-
                 // not a layout, widget has to be resized and repositioned
             } else {
                 QVariant var=widget->property("GeometryList");
@@ -3893,38 +3976,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                     QRect rectnew = QRect((int) x, (int) y, (int) width, (int) height);
 
                     widget->setGeometry(rectnew);
-
-                    // for horizontal or vertical line we still have to set the linewidth
-                    if(!className.compare("QFrame")) {
-                        double linewidth;
-                        QFrame * line = (QFrame *) widget;
-                        if(line->frameShape() == QFrame::HLine || line->frameShape() == QFrame::VLine) {
-                            if(line->frameShape() != QFrame::HLine) {
-                                linewidth = (double) list.at(4).toInt() * factY;
-                            } else {
-                                linewidth = (double) list.at(4).toInt() * factX;
-                            }
-                            if(linewidth < 1.0) linewidth = 1.0;
-                            line->setLineWidth((int) linewidth);
-                        }
-                    }
-
-                    if(!className.compare("QGroupBox")) {
-                        QGroupBox *box = (QGroupBox *) widget;
-                        int fontSize = (int) (qMin(factX, factY) * (double) list.at(4).toInt() + 0.5);
-                        QFont f;
-                        f.setPointSizeF(fontSize);
-                        box->setFont(f);
-                    }
-
-                    if(!className.compare("caMenu")) {
-                        caMenu *menu = (caMenu *) widget;
-                        int fontSize = (int) (qMin(factX, factY) * (double) list.at(4).toInt() + 0.5);
-                        QFont f;
-                        f.setPointSizeF(fontSize);
-                        menu->setFont(f);
-                    }
-
+                    resizeSpecials(className, widget, list, factX, factY);
                     widget->updateGeometry();
                 }
             }

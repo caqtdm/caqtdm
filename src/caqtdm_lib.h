@@ -78,6 +78,7 @@ public:
     int parseForDisplayRate(QString input, int &rate);
     void UpdateGauge(EAbstractGauge *w, const knobData &data);
     void allowResizing(bool allowresize);
+    void resizeSpecials(QString className, QWidget *widget, QVariantList list, double factX, double factY);
 
     void print()
     {
