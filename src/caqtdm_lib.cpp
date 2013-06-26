@@ -3759,6 +3759,14 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         }
     }
 
+    else if(!className.compare("caMenu")) {
+        caMenu *label = (caMenu *) widget;
+        qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
+        QFont f = label->font();
+        f.setPointSizeF(fontSize);
+        label->setFont(f);
+    }
+
     else if(!className.compare("caThermo")) {
         if(qMin(factX, factY) < 1.0) {
             caThermo *thermo = (caThermo *) widget;
@@ -3766,6 +3774,16 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             QFont f = thermo->font();
             f.setPointSizeF(fontSize);
             thermo->setFont(f);
+        }
+    }
+
+    else if(!className.compare("caSlider")) {
+        if(qMin(factX, factY) < 1.0) {
+            caSlider *slider = (caSlider *) widget;
+            qreal fontSize =  qMin(factX, factY) * (double) list.at(4).toInt();
+            QFont f = slider->font();
+            f.setPointSizeF(fontSize);
+            slider->setFont(f);
         }
     }
 
