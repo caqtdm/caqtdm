@@ -1,7 +1,7 @@
 CAQTDM_VERSION = V3.1.1
 
 # new in 3.1.1
-# stripplot and cartesian plot will rescale their fontsizes now too
+# stripplot and cartesian plot will rescale their fontsizes now too, caSlider and caThermo text will only down scale
 
 # new in 3.1.0
 # windows are resizable, in order to have to working well one should always use fontscalemode=WidthAndHeight. in the deafult style sheet no font sizes should be specified.
