@@ -11,3 +11,6 @@ OBJECTS_DIR = ../obj2
 DEFINES += SUPPORT=\\\"EPICS_ACS\\\"
 
 QMAKE_POST_LINK = cp ../caQtDM_Hipa ../../caQtDM_Binaries/
+
+QMAKE_CXXFLAGS += "-g"
+QMAKE_CFLAGS_RELEASE += "-g"
