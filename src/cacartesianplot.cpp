@@ -83,8 +83,8 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     setYscaling(Auto);
     setXaxisLimits("0;1");
     setYaxisLimits("0;1");
-    setAxisFont(QwtPlot::xBottom, QFont("Arial", 9));
-    setAxisFont(QwtPlot::yLeft, QFont("Arial", 9));
+    setAxisFont(QwtPlot::xBottom, QFont("Arial", 10));
+    setAxisFont(QwtPlot::yLeft, QFont("Arial", 10));
 
     // this allows to have a transparent widget
     canvas()->setPaintAttribute(QwtPlotCanvas::BackingStore, false);
