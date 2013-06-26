@@ -127,8 +127,8 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     setYaxisEnabled(true);
     setLegendEnabled(true);
 
-    setAxisFont(QwtPlot::xBottom, QFont("Arial", 9));
-    setAxisFont(QwtPlot::yLeft, QFont("Arial", 9));
+    setAxisFont(QwtPlot::xBottom, QFont("Arial", 10));
+    setAxisFont(QwtPlot::yLeft, QFont("Arial", 10));
 
     installEventFilter(this);
 
@@ -330,7 +330,7 @@ void caStripPlot::defineCurves(QStringList titres, units unit, double period, in
             palette.setColor( QPalette::WindowText, thisScaleColor); // for ticks
             palette.setColor( QPalette::Text, thisScaleColor);       // for ticks' labels
             w->setPalette (palette);
-            w->setFont(QFont("Arial", 8));
+            w->setFont(QFont("Arial", 9));
         }
     }
     RescaleCurves(width, unit, period);
@@ -602,7 +602,7 @@ void caStripPlot::setTitlePlot(QString const &titel)
     thisTitle=titel;
     if(titel.size() != 0) {
         QwtText title(titel);
-        title.setFont(QFont("Arial", 10));
+        title.setFont(QFont("Arial", 11));
         setTitle(title);
         replot();
     }
@@ -613,7 +613,7 @@ void caStripPlot::setTitleX(QString const &titel)
     thisTitleX=titel;
     if(titel.size() != 0) {
         QwtText xAxis(titel);
-        xAxis.setFont(QFont("Arial", 10));
+        xAxis.setFont(QFont("Arial", 11));
         setAxisTitle(xBottom, xAxis);
     }
     replot();
@@ -624,7 +624,7 @@ void caStripPlot::setTitleY(QString const &titel)
     thisTitleY=titel;
     if(titel.size() != 0) {
         QwtText xAxis(titel);
-        xAxis.setFont(QFont("Arial", 10));
+        xAxis.setFont(QFont("Arial", 11));
         setAxisTitle(yLeft, xAxis);
     }
     replot();
