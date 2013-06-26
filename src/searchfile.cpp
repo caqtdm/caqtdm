@@ -22,7 +22,12 @@ QString searchFile::findFile()
     if(_FileName.isNull()) return NULL;
 
     QString path = (QString)  getenv("CAQTDM_DISPLAY_PATH");
+
+#ifdef _MSC_VER
+    QStringList paths = path.split(";");
+#else
     QStringList paths = path.split(":");
+#endif
 
     // first search in current directory
     QString FileName = _FileName;
