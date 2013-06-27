@@ -1946,6 +1946,8 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 list = String.split(";", QString::SkipEmptyParts);
                 if((data.edata.fieldtype == caENUM)  && ((int) data.edata.ivalue < list.count())) {
                     widget->setText(list.at((int) data.edata.ivalue).trimmed());
+                } else if((data.edata.fieldtype == caENUM)  && ((int) data.edata.ivalue > list.count()) && (data.edata.valueCount == 1)) {
+                    widget->setText(list.at(0).trimmed());
                 } else if (data.edata.fieldtype == caENUM) {
                     widget->setText("???");
                 } else {
@@ -3074,11 +3076,13 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         sprintf(asc,"<br>nbStates: %d", kPtr->edata.enumCount);
                         info.append(asc);
                         info.append("<br>States: ");
-                        QString States((char*) kPtr->edata.dataB);
-                        QStringList list = States.split(";");
-                        for(int i=0; i<list.count(); i++) {
+                        if(kPtr->edata.enumCount > 0) {
+                           QString States((char*) kPtr->edata.dataB);
+                           QStringList list = States.split(";");
+                           for(int i=0; i<list.count(); i++) {
                             sprintf(asc, "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%d %s", i, qPrintable(list.at(i)));
                             info.append(asc);
+                           }
                         }
                         break;
                     }
@@ -3767,26 +3771,6 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         label->setFont(f);
     }
 
-    else if(!className.compare("caThermo")) {
-        if(qMin(factX, factY) < 1.0) {
-            caThermo *thermo = (caThermo *) widget;
-            qreal fontSize =  qMin(factX, factY) * (double) list.at(4).toInt();
-            QFont f = thermo->font();
-            f.setPointSizeF(fontSize);
-            thermo->setFont(f);
-        }
-    }
-
-    else if(!className.compare("caSlider")) {
-        if(qMin(factX, factY) < 1.0) {
-            caSlider *slider = (caSlider *) widget;
-            qreal fontSize =  qMin(factX, factY) * (double) list.at(4).toInt();
-            QFont f = slider->font();
-            f.setPointSizeF(fontSize);
-            slider->setFont(f);
-        }
-    }
-
     else if(!className.compare("caStripPlot") || !className.compare("caCartesianPlot")) {
         QwtPlot *plot = (QwtPlot *) widget;
 
@@ -3838,13 +3822,23 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         }
     }
 
-    else if(!className.compare("caMenu")) {
+    else if(!className.compare("caThermo")) {
         if(qMin(factX, factY) < 1.0) {
-            caMenu *menu = (caMenu *) widget;
-            qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
-            QFont f;
+            caThermo *thermo = (caThermo *) widget;
+            qreal fontSize =  qMin(factX, factY) * (double) list.at(4).toInt();
+            QFont f = thermo->font();
             f.setPointSizeF(fontSize);
-            menu->setFont(f);
+            thermo->setFont(f);
+        }
+    }
+
+    else if(!className.compare("caSlider")) {
+        if(qMin(factX, factY) < 1.0) {
+            caSlider *slider = (caSlider *) widget;
+            qreal fontSize =  qMin(factX, factY) * (double) list.at(4).toInt();
+            QFont f = slider->font();
+            f.setPointSizeF(fontSize);
+            slider->setFont(f);
         }
     }
 

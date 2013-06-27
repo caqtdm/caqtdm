@@ -88,6 +88,7 @@ public:
 
             QPainter painter(printer);
             printer->setOrientation(QPrinter::Landscape);
+            printer->setResolution(300);
             double xscale = printer->pageRect().width()/double(this->width());
             double yscale = printer->pageRect().height()/double(this->height());
             double scale = qMin(xscale, yscale);
@@ -104,6 +105,7 @@ public:
         QPrinter *printer = new QPrinter;
         printer->setOrientation(QPrinter::Portrait);
         printer->setOutputFormat(QPrinter::PostScriptFormat);
+        printer->setResolution(300);
         printer->setOutputFileName(filename);
 
         QPainter painter(printer);

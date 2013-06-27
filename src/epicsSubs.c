@@ -257,8 +257,19 @@ static void dataCallback(struct event_handler_args args)
                 for (i = 1; i < stsF->no_str; i++) {
                     sprintf(ptr, "%s;%s", ptr, myLimitedString(stsF->strs[i]));
                 }
-                C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
+            } else if(args.count == 1){  // no strings, must be a value, convert it to text
+                // concatenate strings separated with ';'
+                dataSize = 40;
+                if(dataSize != kData.edata.dataSize) {
+                    free(kData.edata.dataB);
+                    kData.edata.dataB = (void*) malloc(dataSize);
+                    kData.edata.dataSize = dataSize;
+                }
+                ptr = (char*) kData.edata.dataB;
+                ptr[0] = '\0';
+                sprintf(ptr, "%d", stsF->value);
             }
+            C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
         }
         break;
 
