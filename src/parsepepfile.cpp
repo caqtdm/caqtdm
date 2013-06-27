@@ -460,6 +460,8 @@ void ParsePepFile::replaceStrings(gridInfo &grid)
 
 void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo grid, int spanGrid, int spanColumns, int nbColumns, QByteArray *array)
 {
+    QString fontSize = "12";
+    QString lineHeight = "20";
     QString newpv = "";
     QString partialpv = "";
     int rgba[4];
@@ -470,7 +472,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
     QColor fg = grid.fg;
     QColor bg = grid.bg;
 
-    rgba[0] = 50; rgba[1] = 50; rgba[2] = 50; rgba[3] = 255;
+    rgba[0] = 0; rgba[1] = 0; rgba[2] = 0; rgba[3] = 255;
 
     QStringList pvElements= grid.widgetChannel.split(":",  QString::SkipEmptyParts);
     if(pvElements.count() > 0) partialpv = pvElements.at(0);
@@ -482,9 +484,9 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
         if(!grid.textPresent || grid.widgetText.size() != 0) {
             if(!grid.textPresent) {
-               writeLabel(grid.widgetChannel, "150", "18", "", "", "10", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetChannel, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             } else {
-               writeLabel(grid.widgetText, "150", "18", "", "", "10", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetText, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             }
             writeCloseTag("item", array);
             // write now the led
@@ -502,9 +504,9 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
         if(!grid.textPresent || grid.widgetText.size() != 0) {
             if(!grid.textPresent) {
-               writeLabel(grid.widgetChannel, "150", "18", "", "", "10", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetChannel, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             } else {
-               writeLabel(grid.widgetText, "150", "18", "", "", "10", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetText, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             }
             writeCloseTag("item", array);
             // write now the led
@@ -542,21 +544,21 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
         writeItemRowCol(actualgridRow, effectiveColumn, spanGrid, array);
 
-        writeLabel(grid.widgetChannel, "", "18", "", "", "10", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+        writeLabel(grid.widgetChannel, "", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
         writeCloseTag("item", array);
 
         // write now the lineedit in next column
         writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
-        writeLineEdit(grid.formats[0], grid.widgetChannel, "100", "18", "", "", "10", "", "", "", "", "", rgba, array);
+        writeLineEdit(grid.formats[0], grid.widgetChannel, "100", lineHeight, "", "", fontSize, "", "", "", "", "", rgba, array);
         writeCloseTag("item", array);
 
         writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
-        writeLabel("new value", "", "18", "", "", "10", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+        writeLabel("new value", "", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
         writeCloseTag("item", array);
 
         // write now the textentry in next column
         writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
-        writeTextEntry(grid.formats[0], grid.widgetChannel, "100", "18", "", "", "10", "", "", "", "", "", rgba, array);
+        writeTextEntry(grid.formats[0], grid.widgetChannel, "100", lineHeight, "", "", fontSize, "", "", "", "", "", rgba, array);
         writeCloseTag("item", array);
 
         //////////////////////////////////////////////////////////////////////////////////
@@ -568,9 +570,9 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
         if(!grid.textPresent || grid.widgetText.size() != 0) {
             if(!grid.textPresent) {
-               writeLabel(grid.widgetChannel, "150", "18", "", "", "10", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetChannel, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             } else {
-               writeLabel(grid.widgetText, "150", "18", "", "", "10", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetText, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             }
             writeCloseTag("item", array);
             // write now the choicebutton
@@ -615,7 +617,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
         if(grid.command.size() > 0) {
             if(grid.widgetText.size() > 0) {
-                writeLabel(grid.widgetText, "", "18", "", "", "12", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", false, fg, bg, array);
+                writeLabel(grid.widgetText, "", "20",  "16777215", "20", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", false, fg, bg, array);
                 writeCloseTag("item", array);
                 effectiveSpan = span[count];
                 effectiveColumn = pos[count++];
@@ -628,10 +630,10 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
             // write text as label
             if(grid.widgetText.size() < 1) {
-                writeLabel("&lt;html&gt;&lt;head/&gt;&lt;body&gt;&amp;nbsp;&amp;nbsp;&lt;/body&gt;&lt;/html&gt;", "", "18", "", "", "12",
+                writeLabel("&lt;html&gt;&lt;head/&gt;&lt;body&gt;&amp;nbsp;&amp;nbsp;&lt;/body&gt;&lt;/html&gt;", "", "20",  "16777215", "20", fontSize,
                            "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "",  "", false, fg, bg, array);
             } else {
-                writeLabel(grid.widgetText, "", "18", "", "", "12", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", false, fg, bg, array);
+                writeLabel(grid.widgetText, "", "20", "16777215", "20", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", false, fg, bg, array);
             }
             writeCloseTag("item", array);
         }
@@ -645,9 +647,9 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
         if(!grid.textPresent || grid.widgetText.size() != 0) {
             if(!grid.textPresent) {
-               writeLabel(grid.widgetChannel, "150", "18", "", "", "10", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetChannel, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             } else {
-               writeLabel(grid.widgetText, "150", "18", "", "", "10", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetText, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             }
             writeCloseTag("item", array);
             // write now the wheelswitch
@@ -664,15 +666,15 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
         if(!grid.textPresent || grid.widgetText.size() != 0) {
             if(!grid.textPresent) {
-               writeLabel(grid.widgetChannel, "150", "18", "", "", "10", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetChannel, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             } else {
-               writeLabel(grid.widgetText, "150", "18", "", "", "10", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetText, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             }
             writeCloseTag("item", array);
             // write now the next stuff
             writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
         }
-        writeLineEdit(grid.formats[0], grid.widgetChannel, "100", "18", "", "", "10", "", "", "", "", "", rgba, array);
+        writeLineEdit(grid.formats[0], grid.widgetChannel, "100", lineHeight, "", "", fontSize, "", "", "", "", "", rgba, array);
         writeCloseTag("item", array);
         writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
         writeTogglebutton(grid.widgetChannel, array);
@@ -690,7 +692,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
 
         // 1. write first the label
-        writeLabel(grid.widgetChannel, "0", "18", "16777215", "18", "10", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "",  true, fg, bg, array);
+        writeLabel(grid.widgetChannel, "0", lineHeight, "16777215", lineHeight, fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "",  true, fg, bg, array);
         writeCloseTag("item", array);
 
         // 2. write now the wheelswitch
@@ -722,7 +724,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         effectiveColumn = pos[count++];
         writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
         rgba[3] = 255;
-        writeLineEdit(grid.formats[0], newpv, "100", "18", "16777215", "18", "10", "", "", "", "", "", rgba, array);
+        writeLineEdit(grid.formats[0], newpv, "100", lineHeight, "16777215", lineHeight, fontSize, "", "", "", "", "", rgba, array);
         writeCloseTag("item", array);
 
         // 6. write now the label for cycle direction, but first hardcode the new pv
@@ -731,7 +733,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         rgba[3] = 0;
         effectiveColumn = pos[count++];
         writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
-        writeLineEdit(grid.formats[0], newpv, "30", "30","30", "30", "10", "", "", "", "", "", rgba, array);
+        writeLineEdit(grid.formats[0], newpv, "30", "30","30", "30", fontSize, "", "", "", "", "", rgba, array);
         writeCloseTag("item", array);
 
         // 7. write now the led, but first hard code the new pv
@@ -749,7 +751,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         effectiveColumn = pos[count++];
         writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
         rgba[3] = 255;
-        writeLineEdit(grid.formats[0], newpv, "100", "18", "", "", "10", "", "", "", "", "", rgba, array);
+        writeLineEdit(grid.formats[0], newpv, "100", lineHeight, "", "", fontSize, "", "", "", "", "", rgba, array);
         writeCloseTag("item", array);
 
         //////////////////////////////////////////////////////////////////////////////////
@@ -761,9 +763,9 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
         if(!grid.textPresent || grid.widgetText.size() != 0) {
             if(!grid.textPresent) {
-               writeLabel(grid.widgetChannel, "150", "18", "", "", "10", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetChannel, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             } else {
-               writeLabel(grid.widgetText, "150", "18", "", "", "10", "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetText, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             }
             writeCloseTag("item", array);
             // write now the lineedit
@@ -772,7 +774,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
         // write now the lineedit
         rgba[3] = 255;
-        writeLineEdit(grid.formats[0], grid.widgetChannel, "100", "18", "", "", "10", "", "", "", "", "", rgba, array);
+        writeLineEdit(grid.formats[0], grid.widgetChannel, "100", lineHeight, "", "", fontSize, "", "", "", "", "", rgba, array);
         writeCloseTag("item", array);
 
     } else {
@@ -928,6 +930,7 @@ void ParsePepFile::writeLineEdit(QString format, QString pv, QString minwidth, Q
 
     writeOpenProperty("font", array);
     writeOpenTag("font", array);
+    writeTaggedString("family", "Lucida Sans Typewriter", array);
     writeTaggedString("pointsize", pointsize, array);
     writeCloseTag("font", array);
     writeCloseProperty(array);
@@ -975,6 +978,7 @@ void ParsePepFile::writeTextEntry(QString format, QString pv, QString minwidth, 
 
     writeOpenProperty("font", array);
     writeOpenTag("font", array);
+    writeTaggedString("family", "Lucida Sans Typewriter", array);
     writeTaggedString("pointsize", pointsize, array);
     writeCloseTag("font", array);
     writeCloseProperty(array);
@@ -996,7 +1000,7 @@ void ParsePepFile::writeLabel(QString text, QString minwidth, QString minheight,
         writeCloseTag("size", array);
         writeCloseProperty(array);
     }
-    if(maxwidth.size() > 0 || maxwidth.size() > 0) {
+    if(maxwidth.size() > 0 || maxheight.size() > 0) {
         writeOpenProperty("maximumSize", array);
         writeOpenTag("size", array);
         if(maxwidth.size() > 0) writeTaggedString("width", maxwidth, array);
@@ -1015,6 +1019,7 @@ void ParsePepFile::writeLabel(QString text, QString minwidth, QString minheight,
 
     writeOpenProperty("font", array);
     writeOpenTag("font", array);
+    writeTaggedString("family", "Lucida Sans Typewriter", array);
     writeTaggedString("pointsize", pointsize, array);
     writeCloseTag("font", array);
     writeCloseProperty(array);
@@ -1104,13 +1109,13 @@ QWidget* ParsePepFile::load(QWidget *parent)
     QFile file("out.ui");
     file.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(&file);
-    */
+*/
     buffer->open(QIODevice::ReadOnly);
 
     /* output the data to the verification file
     out << buffer->data();
     file.close();
-    */
+*/
 
     buffer->seek(0);
     widget=loader.load(buffer, parent);
