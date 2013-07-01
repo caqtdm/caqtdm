@@ -1,4 +1,12 @@
-CAQTDM_VERSION = V3.1.1
+CAQTDM_VERSION = V3.1.2
+
+# new in 3.1.3
+# modified treatment of format for pep file lineedit
+
+# new in 3.1.2
+# bug corrected for the circular gauge
+# for enums without enum string write just the value in calineedit
+# pep files: font changed, background changed and implemented the possibility to change colors for printing
 
 # new in 3.1.1
 # stripplot and cartesian plot will rescale their fontsizes now too, caSlider and caThermo text will only down scale
