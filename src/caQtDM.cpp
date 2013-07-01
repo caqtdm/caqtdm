@@ -115,7 +115,6 @@ int main(int argc, char *argv[])
              printscreen = true;
              minimize = true;
              resizing = false;
-             geometry = QString(argv[in]);
         } else if(!strcmp(argv[in], "-noResize")) {
             resizing = false;
         } else if (strncmp (argv[in], "-" , 1) == 0) {

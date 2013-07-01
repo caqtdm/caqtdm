@@ -361,11 +361,14 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         //qDebug() << "sorry -- file" << FileName << "does not exist";
     } else {
         char asc[255];
-        qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString;
+        bool willPrint = false;
+        qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString << "geometry=" << geometry;
 
         //QMainWindow *mainWindow = new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, messageWindow);
 
-        CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, messageWindow);
+        if(printandexit) willPrint = true;
+        CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, messageWindow, willPrint);
+
         newWindow->allowResizing(allowResize);
         QMainWindow *mainWindow = newWindow;
 
