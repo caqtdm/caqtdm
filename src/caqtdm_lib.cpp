@@ -203,11 +203,12 @@ CaQtDM_Lib::~CaQtDM_Lib()
 /**
  * CaQtDM_Lib constructor
  */
-CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKnobData *mKnobData, MessageWindow *msgWindow) : QMainWindow(parent)
+CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKnobData *mKnobData, MessageWindow *msgWindow, bool pepprint) : QMainWindow(parent)
 {
 
     mutexKnobData = mKnobData;
     messageWindow = msgWindow;
+    pepPrint = pepprint;
 
     firstResize = true;
 
@@ -942,7 +943,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
             if(prcFile) {
                 // load new file
 #ifdef PRC
-                ParsePepFile *parsefile = new ParsePepFile(fileName);
+                ParsePepFile *parsefile = new ParsePepFile(fileName, pepPrint);
                 thisW = parsefile->load(this);
                 delete parsefile;
 #else
@@ -1684,7 +1685,7 @@ void CaQtDM_Lib::UpdateGauge(EAbstractGauge *widget, const knobData &data)
             }
             widget->update();
         }
-        widget->setValue((int) data.edata.rvalue);
+        widget->setValue(data.edata.rvalue);
     }
 }
 

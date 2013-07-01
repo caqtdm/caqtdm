@@ -56,7 +56,7 @@ class CAQTDM_LIBSHARED_EXPORT CaQtDM_Lib : public QMainWindow
 
 public:
 
-    explicit CaQtDM_Lib(QWidget *parent = 0, QString="", QString="", MutexKnobData *mutexKnobData = 0, MessageWindow *msgWindow = 0);
+    explicit CaQtDM_Lib(QWidget *parent = 0, QString="", QString="", MutexKnobData *mutexKnobData = 0, MessageWindow *msgWindow = 0, bool willPrint = false);
     ~CaQtDM_Lib();
 
     bool bitState(int value, int bitNr);
@@ -154,6 +154,8 @@ private:
 
     boolean firstResize;
     boolean allowResize;
+
+    boolean pepPrint;
 
     int origWidth, origHeight;
 
