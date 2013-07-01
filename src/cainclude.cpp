@@ -45,7 +45,7 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
 
 caInclude::~ caInclude()
 {
-    //delete pepfile;
+
 }
 
 void caInclude::setBackground(QColor c)

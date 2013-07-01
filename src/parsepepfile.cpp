@@ -2,13 +2,15 @@
 #include <math.h>
 #include "parsepepfile.h"
 
-ParsePepFile::ParsePepFile(QString filename)
+ParsePepFile::ParsePepFile(QString filename, bool willprint)
 {
     QString header;
     QString footer;
 
     QFile *file = new QFile;
     int nbRows, nbCols;
+
+    willPrint = willprint;
 
     for(int i=0; i< MaxLines; i++) {
         for (int j=0; j<MaxGrid; j++) {
@@ -33,7 +35,7 @@ ParsePepFile::ParsePepFile(QString filename)
            "<widget class=\"QMainWindow\" name=\"MainWindow\">\n"
            "<property name=\"styleSheet\">\n"
            "<string>\n"
-           "QWidget#centralWidget {background: rgba(200, 200, 200, 0); }\n"
+           "QWidget#centralWidget {background: rgba(255, 255, 255, 255); }\n"
            "caLineEdit {border-radius: 1px;background: lightyellow;color: black;}\n"
            "</string>\n"
            "</property>\n"
@@ -233,7 +235,11 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                     }
 
                     else {
-                        PRINT(printf("something else  detected %s\n", elements.at(ll).toAscii().constData()));
+                        PRINT(printf("something else  detected <%s>\n", elements.at(ll).toAscii().constData()));
+                        QString item = elements.at(ll);
+                        // is this a format
+                        if(item.at(0) == '%') ok = true;
+                        if(item.right(1).contains("e") || item.right(1).contains("f") || item.right(1).contains("g") || item.right(1).contains("x") || item.right(1).contains("o"))   ok = true;
                         widgetText.append(elements.at(ll));
                         widgetText.append(" ");
                     }
@@ -774,7 +780,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
         // write now the lineedit
         rgba[3] = 255;
-        writeLineEdit(grid.formats[0], grid.widgetChannel, "100", lineHeight, "", "", fontSize, "", "", "", "", "", rgba, array);
+        writeLineEdit(grid.formats[0], grid.widgetChannel, "150", lineHeight, "", "", fontSize, "", "", "", "", "", rgba, array);
         writeCloseTag("item", array);
 
     } else {
@@ -893,16 +899,59 @@ void ParsePepFile::writeLineEdit(QString format, QString pv, QString minwidth, Q
                                  QString pointsize, QString alignment, QString colormode, QString calcpv, QString calc, QString visibility,
                                  int rgba[], QByteArray *array)
 {
-    Q_UNUSED(format);
     Q_UNUSED(alignment);
     Q_UNUSED(colormode);
     Q_UNUSED(calcpv);
     Q_UNUSED(calc);
     Q_UNUSED(visibility);
 
+    bool ok = true;
+    int decimalDigits = 3;
+    QString newFormat = format;
+
     // a lineedit
     writeOpenTag("widget class=\"caLineEdit\" name=\"calinedit\"", array);
 
+    // take care of format
+    if(newFormat.at(0) == '%') newFormat.remove(0,1);
+
+    if(newFormat.contains("g") || newFormat.contains("e") || newFormat.contains("f")) {
+
+        if(newFormat.contains("f")) {
+            writeSimpleProperty("formatType", "enum", "caLineEdit::decimal", array);
+        } else {
+            writeSimpleProperty("formatType", "enum", "caLineEdit::exponential", array);
+        }
+        newFormat.replace("g", "");
+        newFormat.replace("e", "");
+        newFormat.replace("f", "");
+        QStringList elements= newFormat.split(".",  QString::SkipEmptyParts);
+        if(elements.count() == 2) {
+            decimalDigits = elements[1].toInt(&ok);
+            if(ok) {
+                QString Digits= QString("%1").arg(decimalDigits);
+                writeSimpleProperty("precisionMode", "enum", "caLineEdit::User", array);
+                writeSimpleProperty("precision", "number", Digits, array);
+            }
+        }
+
+    } else if(newFormat.contains("x")) {
+        writeSimpleProperty("formatType", "enum", "caLineEdit::hexadecimal", array);
+    } else if(newFormat.contains("o")) {
+        writeSimpleProperty("formatType", "enum", "caLineEdit::octal", array);
+    } else {
+        QStringList elements= newFormat.split(".",  QString::SkipEmptyParts);
+        if(elements.count() == 2) {
+            decimalDigits = elements[1].toInt(&ok);
+            if(ok) {
+                QString Digits= QString("%1").arg(decimalDigits);
+                writeSimpleProperty("precisionMode", "enum", "caLineEdit::User", array);
+                writeSimpleProperty("precision", "number", Digits, array);
+            }
+        }
+    }
+
+    //size
     if(minwidth.size() > 0 || minheight.size() > 0) {
         writeOpenProperty("minimumSize", array);
         writeOpenTag("size", array);
@@ -920,14 +969,20 @@ void ParsePepFile::writeLineEdit(QString format, QString pv, QString minwidth, Q
         writeCloseProperty(array);
     }
 
+    // aligbment and colors
     writeSimpleProperty("alignment", "set", "Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter", array);
     writeSimpleProperty("channel", "string", pv, array);
-    writeSimpleProperty("colorMode", "enum", "caLineEdit::Alarm_Static", array);
-    writeSimpleProperty("unitsEnabled", "bool", "true", array);
-
-    setColor("background", rgba[0], rgba[1], rgba[2], rgba[3], array);
+    if(!willPrint) {
+       writeSimpleProperty("colorMode", "enum", "caLineEdit::Alarm_Static", array);
+       setColor("background", rgba[0], rgba[1], rgba[2], rgba[3], array);
+    } else {
+       setColor("background", 255, 255, 255, 0, array);
+    }
     setColor("foreground", 0, 0, 0, 255, array);
 
+    writeSimpleProperty("unitsEnabled", "bool", "true", array);
+
+    // font and font size
     writeOpenProperty("font", array);
     writeOpenTag("font", array);
     writeTaggedString("family", "Lucida Sans Typewriter", array);
@@ -1105,7 +1160,7 @@ QWidget* ParsePepFile::load(QWidget *parent)
     QWidget *widget = new QWidget;
     QUiLoader loader;
 
-    /* used to output the data to an ui file for verification
+/* used to output the data to an ui file for verification
     QFile file("out.ui");
     file.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(&file);

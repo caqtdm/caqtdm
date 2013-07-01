@@ -16,7 +16,7 @@ class QTCON_EXPORT ParsePepFile
 {
 
 public:
-    ParsePepFile(QString filename);
+    ParsePepFile(QString filename, bool willPrint = false);
     QWidget *load(QWidget *parent);
 
 protected:
@@ -24,6 +24,8 @@ protected:
 private slots:
 
 private:
+
+    bool willPrint;
 
      enum { MaxGrid = 20};
      enum { MaxLines = 50};
