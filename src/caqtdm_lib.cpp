@@ -795,7 +795,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //qDebug() << "create caBitnames";
 
-        if(widget->getEnumPV().size() > 0 && widget->getValuePV().size()) {
+        if(widget->getEnumPV().size() > 0 && widget->getValuePV().size() > 0) {
             addMonitor(myWidget, &kData, widget->getEnumPV(), w1, specData, map, &pv);
             widget->setEnumPV(pv);
             addMonitor(myWidget, &kData, widget->getValuePV(), w1, specData, map, &pv);
@@ -1411,9 +1411,15 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     kData->dispW = (void*) w;
 
     // keep actual object name
+
     cpylen = qMin(w->objectName().length(), MAXDISPLEN-1);
     strncpy(kData->dispName, w->objectName().toLower().toAscii().constData(), cpylen);
     kData->dispName[cpylen] = '\0';
+
+    QString classname = w->metaObject()->className();
+    cpylen = qMin(classname.length(), MAXDISPLEN-1);
+    strncpy(kData->clasName, classname.toLower().toAscii().constData(), cpylen);
+    kData->clasName[cpylen] = '\0';
 
     // keep actual filename
     cpylen = qMin( savedFile[level].length(), MAXFILELEN-1);

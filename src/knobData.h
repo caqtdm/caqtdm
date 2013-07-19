@@ -63,6 +63,7 @@ typedef struct _knobData {
     epicsData edata;                    /* epics data */
     int specData[NBSPECS];              /* some special data, will be replaced by properties later */
     int valPix;                         /* pixel value of caThermo */
+    char clasName[MAXDISPLEN];          /* class of widget type */
     char dispName[MAXDISPLEN];          /* name of widget type */
     char fileName[MAXFILELEN];
 } knobData;
