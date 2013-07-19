@@ -454,10 +454,15 @@ void ParsePepFile::replaceStrings(gridInfo &grid)
     grid.widgetText.replace("\"","");
     grid.widgetText.replace("\'","");
     grid.widgetText.replace("&","&amp;");
+    grid.widgetText.replace("<", "&lt;");
+    grid.widgetText.replace(">", "&gt;");
+
 
     grid.command.replace("{","");
     grid.command.replace("}","");
     grid.command.replace("&","&amp;");
+    grid.command.replace("<", "&lt;");
+    grid.command.replace(">", "&gt;");
 
     grid.comlab.replace("{","");
     grid.comlab.replace("}","");
@@ -633,7 +638,6 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
             writeCloseTag("item", array);
 
         } else {
-
             // write text as label
             if(grid.widgetText.size() < 1) {
                 writeLabel("&lt;html&gt;&lt;head/&gt;&lt;body&gt;&amp;nbsp;&amp;nbsp;&lt;/body&gt;&lt;/html&gt;", "", "20",  "16777215", "20", fontSize,
