@@ -1095,11 +1095,12 @@ static void etherReceive(pioStatusB *iosb, pio_ethbuf *irbb)
                             image2D.strPtr = (char *) image2;
 
                             // in case of ca_choice and cabitnames get also bitnames
-                            if((strstr(kData.dispName, "choice") != (char *) 0) ||
-                                    (strstr(kData.dispName, "bitnames") != (char *) 0)) {
+                            if((strstr(kData.clasName, "choice") != (char *) 0) ||
+                                    (strstr(kData.clasName, "bitnames") != (char *) 0)) {
                                 if(kData.edata.dataSize > 0) {
                                      if(kData.edata.displayCount > 0)  goto skip1;  // bitnames should not change, but value yes
                                 }
+                                memset(result, 0, sizeof(result));
                                 status = getBitNames(&devD, &attD, result);
                                 if(status == 1) {
                                     int j;
@@ -1114,8 +1115,7 @@ static void etherReceive(pioStatusB *iosb, pio_ethbuf *irbb)
                                     kData.edata.ivalue = num+1;
                                 }
 
-                            } else if((strstr(kData.dispName, "lineedit") != (char *) 0) ||
-                                      (strstr(kData.dispName, "image") != (char *) 0)) {
+                            } else if((strstr(kData.clasName, "lineedit") != (char *) 0) || (strstr(kData.clasName, "image") != (char *) 0)) {
                                 // get digital level 2
                                 int j;
                                 num = getDigLvl2ext(&devD, &attD, &ReceiveCells[i].ub.int4val, &dim,  &level2D, &image2D, offset);
@@ -1137,8 +1137,7 @@ static void etherReceive(pioStatusB *iosb, pio_ethbuf *irbb)
                             }
 
                             if(num > 0) {
-                                if((strstr(kData.dispName, "choice") != (char *) 0) ||
-                                        (strstr(kData.dispName, "bitnames") != (char *) 0)) {
+                                if((strstr(kData.clasName, "choice") != (char *) 0) || (strstr(kData.clasName, "bitnames") != (char *) 0)) {
                                     kData.edata.fieldtype = caENUM;
                                 } else {
                                     kData.edata.fieldtype = caSTRING;
