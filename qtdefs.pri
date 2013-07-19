@@ -1,7 +1,7 @@
-CAQTDM_VERSION = V3.1.2
+CAQTDM_VERSION = V3.1.3
 
 # new in 3.1.3
-# modified treatment of format for pep file lineedit
+# modified treatment of format for pep file lineedit; html code is also possible for text
 
 # new in 3.1.2
 # bug corrected for the circular gauge
