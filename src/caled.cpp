@@ -10,13 +10,15 @@
 //******************************************************************************
 
 #include "caled.h"
+#include "alarmdefs.h"
 
 caLed::caLed(QWidget *parent) : ELed(parent)
 {
-        thisBitNr = 0;
-        thisFalseColor = Qt::gray;
-        thisTrueColor = Qt::red;
-	return;
+    thisBitNr = 0;
+    thisFalseColor = Qt::gray;
+    thisTrueColor = Qt::red;
+    thisColorMode = Static;
+    return;
 }
 
 QString caLed::getPV() const
@@ -59,4 +61,32 @@ void caLed::setState(bool state)
     }
 }
 
+
+void caLed::setColorMode(colMode colormode)
+{
+    thisColorMode = colormode;
+}
+
+void caLed::setAlarmColors(short status)
+{
+    switch (status) {
+
+    case NO_ALARM:
+        ELed::setColor(AL_GREEN);
+        break;
+    case MINOR_ALARM:
+        ELed::setColor(AL_YELLOW);
+        break;
+    case MAJOR_ALARM:
+        ELed::setColor(AL_RED);
+        break;
+    case ALARM_INVALID:
+    case NOTCONNECTED:
+        ELed::setColor(AL_WHITE);
+        break;
+    default:
+        ELed::setColor(AL_DEFAULT);
+        break;
+    }
+}
 

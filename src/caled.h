@@ -22,11 +22,15 @@ Q_OBJECT
 
   Q_PROPERTY(QString channel READ getPV WRITE setPV)
   Q_PROPERTY(int bitNr READ getBitNr WRITE setBitNr)
+  Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
   Q_PROPERTY(QColor falseColor READ getFalseColor WRITE setFalseColor)
   Q_PROPERTY(QColor trueColor READ getTrueColor WRITE setTrueColor)
-
+  Q_ENUMS(colMode)
 
 public:
+
+    enum colMode {Static=0, Alarm};
+
 	caLed(QWidget*);
         virtual ~caLed(){}
 
@@ -41,12 +45,18 @@ public:
         QColor getTrueColor() const {return thisTrueColor;}
         void setTrueColor(QColor c);
 
+        colMode getColorMode() const { return thisColorMode; }
+        void setColorMode(colMode colormode);
+
         void setState(bool state);
+
+        void setAlarmColors(short status);
 
 private:
         QString thisPV;
         int thisBitNr;
         QColor thisFalseColor, thisTrueColor;
+        colMode thisColorMode;
 };
 
 #endif
