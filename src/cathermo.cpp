@@ -95,6 +95,7 @@ void caThermo::setLook(Look look)
         thisScale = false;
         break;
     }
+
     setDirection(thisDirection);
 }
 
@@ -116,7 +117,7 @@ void caThermo::setValue(double val)
 
 void caThermo::setDirection(Direction dir)
 {
-    thisLook=noDeco;
+    //thisLook=noDeco;
     thisDirection = dir;
 
     switch (dir) {
@@ -192,17 +193,17 @@ void caThermo::setUserAlarmColors(double val)
     case Up:
     case Right:
         if((thisValue < this->minValue()) || (thisValue > this->maxValue())) {
-           setColors(thisBackColor, QColor(Qt::red));
+           setColors(thisBackColor, AL_RED);
         } else {
-           setColors(thisBackColor, QColor(Qt::green));
+           setColors(thisBackColor, AL_GREEN);
         }
         break;
     case Down:
     case Left:
         if((thisValue < this->maxValue()) || (thisValue > this->minValue())) {
-           setColors(thisBackColor, QColor(Qt::red));
+           setColors(thisBackColor, AL_RED);
         } else {
-           setColors(thisBackColor, QColor(Qt::green));
+           setColors(thisBackColor, AL_GREEN);
         }
         break;
     }
