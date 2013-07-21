@@ -18,6 +18,7 @@ rm -f ./probeQtProscan/Makefile
 rm -f ./QtTunes/Makefile
 rm -f ./QtTunes/QtTunes1/Makefile
 rm -f ./QtTunes/QtTunes2/Makefile
+rm -f ./HFdispQt//Makefile
 
 echo =========== clean all ==================
 qmake all.pro
