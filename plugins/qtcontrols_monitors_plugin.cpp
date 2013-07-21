@@ -49,9 +49,7 @@ CustomWidgetInterface::CustomWidgetInterface(QObject *parent): QObject(parent), 
 
 void CustomWidgetInterface::initialize(QDesignerFormEditorInterface *)
 {
-    if (d_isInitialized)
-        return;
-
+    if (d_isInitialized) return;
     d_isInitialized = true;
 }
 
@@ -63,6 +61,7 @@ caBitnamesInterface::caBitnamesInterface(QObject *parent): CustomWidgetInterface
     strcpy(name[1], "channelValue");
     strcpy(type[1], "multiline");
     d_domXml = XmlFunc("caBitnames", "cabitnames", 0, 0, 160, 90, name, type, 2);
+    d_toolTip = "[Enum table with state]";
     d_name = "caBitnames";
     d_include = "caBitnames";
     d_icon = QPixmap(":pixmaps/eflag.png");
@@ -79,6 +78,7 @@ caLedInterface::caLedInterface(QObject *parent): CustomWidgetInterface(parent)
     strcpy(name[0], "channel");
     strcpy(type[0], "multiline");
     d_domXml = XmlFunc("caLed", "caled", 0, 0, 30, 30, name, type, 1);
+    d_toolTip = "[LED for true or false bitstate or for severity states]";
     d_name = "caLed";
     d_include = "caLed";
     d_icon = QPixmap(":pixmaps/eled.png");
@@ -95,6 +95,7 @@ caLinearGaugeInterface::caLinearGaugeInterface(QObject *parent): CustomWidgetInt
     strcpy(name[0], "channel");
     strcpy(type[0], "multiline");
     d_domXml = XmlFunc("caLinearGauge", "calineargauge", 0, 0, 40, 100, name, type, 1);
+    d_toolTip = "[Colorized bar monitor]";
     d_name = "caLinearGauge";
     d_include = "caGauge";
     d_icon = QPixmap(":pixmaps/elineargauge.png");
@@ -111,7 +112,7 @@ caCircularGaugeInterface::caCircularGaugeInterface(QObject *parent): CustomWidge
     strcpy(name[0], "channel");
     strcpy(type[0], "multiline");
     d_domXml = XmlFunc("caCircularGauge", "cacirculargauge", 0, 0, 100, 100, name, type, 1);
-    d_toolTip = "[Meter]";
+    d_toolTip = "[Colorized meter]";
     d_name = "caCircularGauge";
     d_include = "caGauge";
     d_icon = QPixmap(":pixmaps/ecirculargauge.png");
