@@ -40,7 +40,9 @@ EAbstractGauge::EAbstractGauge(QWidget *parent) : QWidget(parent),
 
 	m_valueFormat = "%.1f";
 
-	configure();
+    m_connected = true;
+    setConnected(true);
+
 }
 
 double EAbstractGauge::logarithm(double v)
@@ -229,7 +231,9 @@ void EAbstractGauge::configure()
 	}
 	else
 	{
-		if (m_value < m_lowError)
+        if(!m_connected)
+            v_c << QColor(Qt::white);
+        else if (m_value < m_lowError)
 			v_c << m_errorColor;
 		else if (m_value < m_lowWarning)
 			v_c << m_warningColor;
@@ -281,7 +285,11 @@ void EAbstractGauge::setValue(double v)
 	if (m_colorMode == SINGLECOLOR)
 	{
 		v_c.clear();
-		if (m_value < m_lowError)
+
+        if(!m_connected) {
+            m_value=m_maxValue;
+            v_c << QColor(Qt::white);
+        } else if (m_value < m_lowError)
 			v_c << m_errorColor;
 		else if (m_value < m_lowWarning)
 			v_c << m_warningColor;
@@ -300,4 +308,19 @@ void EAbstractGauge::setValue(int v)
 	setValue((double)v);
 }
 
+
+void EAbstractGauge::setConnected(bool c)
+{
+    if(m_connected) m_colorModeSaved = m_colorMode;
+    m_connected = c;
+    if(!c) {
+        m_colorMode = SINGLECOLOR;
+        configure();
+        //setValue(m_maxValue);
+    } else {
+        m_colorMode =  m_colorModeSaved;
+        configure();
+    }
+    update();
+}
 

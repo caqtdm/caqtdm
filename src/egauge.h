@@ -113,6 +113,9 @@ public:
 	
     void setValueFormat(QString s){ m_valueFormat = s; configure(); update(); }
     QString valueFormat(){ return m_valueFormat; }
+
+    void setConnected(bool c);
+    bool isConnected() { return m_connected;}
 	
 public slots:
 	void setValue(double);
@@ -126,15 +129,17 @@ protected:
 	double m_value,  m_reference;
 	/* the following always store the natural values, never transformed into logarithmic */
 	double d_naturalMinV, d_naturalMaxV, d_naturalLowWarn, d_naturalHighWarn,
-	 d_naturalLowErr, d_naturalHighErr, d_naturalValue, d_naturalReference;
+           d_naturalLowErr, d_naturalHighErr, d_naturalValue, d_naturalReference;
 	
 	ColorMode	m_colorMode;
 	bool 		m_referenceEnabled;
 	bool 		m_scaleEnabled;
-        bool 		m_externalEnabled;
-	int		m_numMajorTicks, m_numMinorTicks;
+    bool 		m_externalEnabled;
+    bool        m_connected;
+    ColorMode   m_colorModeSaved;
+    int		    m_numMajorTicks, m_numMinorTicks;
 	QStringList	labels;
-	int		longestLabelIndex;
+    int		    longestLabelIndex;
 	bool		m_externalScale;
 	
 	QVector<qreal>	v_p;
