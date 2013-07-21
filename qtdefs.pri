@@ -1,4 +1,9 @@
-CAQTDM_VERSION = V3.1.3
+CAQTDM_VERSION = V3.1.4
+
+# new in 3.1.4
+# caled can use now the severity to colorize
+# cathermo was inadverttently using nodeco mode when mode was used
+# cacirculargauge will draw a white scale when not connected
 
 # new in 3.1.3
 # modified treatment of format for pep file lineedit; html code is also possible for text
