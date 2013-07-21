@@ -144,7 +144,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: cornsilk;}</string>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -169,7 +169,7 @@ border-radius: 2px;
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -1345,7 +1345,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>11</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">
@@ -1369,11 +1369,11 @@ QWidget {background: white;} </string>
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caLabel: &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caLed: &lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;led is used for bits display&lt;/li&gt;
-&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;one can specify which bit has to be displayed.&lt;/li&gt;
-&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;colors can be chosen&lt;/li&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;led is used for bits display with two states or for alarm display with the usual alarm colors&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;one can specify which bit has to be displayed in case of bit display.&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;colors can be chosen in case of true false scheme&lt;/li&gt;
 &lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;circular or rectangular&lt;/li&gt;&lt;/ul&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -1586,6 +1586,119 @@ p, li { white-space: pre-wrap; }
          </color>
         </property>
        </widget>
+       <widget class="caLed" name="caled_2">
+        <property name="geometry">
+         <rect>
+          <x>235</x>
+          <y>395</y>
+          <width>36</width>
+          <height>32</height>
+         </rect>
+        </property>
+        <property name="rectangular">
+         <bool>true</bool>
+        </property>
+        <property name="gradientEnabled">
+         <bool>false</bool>
+        </property>
+        <property name="ledWidth">
+         <number>30</number>
+        </property>
+        <property name="ledHeight">
+         <number>30</number>
+        </property>
+        <property name="linearGradient">
+         <bool>false</bool>
+        </property>
+        <property name="scaleContents">
+         <bool>false</bool>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">QTDM:TEST:AO</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLed::Alarm</enum>
+        </property>
+       </widget>
+       <widget class="caNumeric" name="canumeric_5">
+        <property name="geometry">
+         <rect>
+          <x>295</x>
+          <y>395</y>
+          <width>186</width>
+          <height>106</height>
+         </rect>
+        </property>
+        <property name="integerDigits" stdset="0">
+         <number>3</number>
+        </property>
+        <property name="decimalDigits" stdset="0">
+         <number>0</number>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">QTDM:TEST:AO</string>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>0</red>
+          <green>85</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="precisionMode">
+         <enum>caNumeric::User</enum>
+        </property>
+       </widget>
+       <widget class="caCircularGauge" name="cacirculargauge_4">
+        <property name="geometry">
+         <rect>
+          <x>105</x>
+          <y>395</y>
+          <width>111</width>
+          <height>111</height>
+         </rect>
+        </property>
+        <property name="minValue">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="lowError">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="lowWarning">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="highError">
+         <double>5.000000000000000</double>
+        </property>
+        <property name="maxValue">
+         <double>5.000000000000000</double>
+        </property>
+        <property name="externalLimitsEnabled" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="colorMode">
+         <enum>EAbstractGauge::COLORBAR</enum>
+        </property>
+        <property name="valueFormat">
+         <string>%.0f</string>
+        </property>
+        <property name="numMajorTicks">
+         <number>6</number>
+        </property>
+        <property name="numMinorTicks">
+         <number>10</number>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">QTDM:TEST:AO</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_11">
        <attribute name="title">
@@ -1656,6 +1769,12 @@ p, li { white-space: pre-wrap; }
           <height>261</height>
          </rect>
         </property>
+        <property name="font">
+         <font>
+          <family>Arial</family>
+          <pointsize>5</pointsize>
+         </font>
+        </property>
         <property name="minValue">
          <double>0.000000000000000</double>
         </property>
@@ -1675,9 +1794,6 @@ p, li { white-space: pre-wrap; }
          <double>5.000000000000000</double>
         </property>
         <property name="referenceEnabled">
-         <bool>false</bool>
-        </property>
-        <property name="externalLimitsEnabled" stdset="0">
          <bool>false</bool>
         </property>
         <property name="colorMode">
@@ -1854,8 +1970,11 @@ p, li { white-space: pre-wrap; }
         <property name="maxValue">
          <double>5.000000000000000</double>
         </property>
+        <property name="externalLimitsEnabled" stdset="0">
+         <bool>true</bool>
+        </property>
         <property name="colorMode">
-         <enum>EAbstractGauge::GRADIENT</enum>
+         <enum>EAbstractGauge::COLORBAR</enum>
         </property>
         <property name="valueFormat">
          <string>%.0f</string>
@@ -1867,7 +1986,7 @@ p, li { white-space: pre-wrap; }
          <number>10</number>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">QTDM:TEST:AO</string>
         </property>
        </widget>
        <widget class="caCircularGauge" name="cacirculargauge_2">
@@ -2001,6 +2120,42 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="unitsEnabled">
          <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="caNumeric" name="canumeric_4">
+        <property name="geometry">
+         <rect>
+          <x>120</x>
+          <y>440</y>
+          <width>186</width>
+          <height>106</height>
+         </rect>
+        </property>
+        <property name="integerDigits" stdset="0">
+         <number>3</number>
+        </property>
+        <property name="decimalDigits" stdset="0">
+         <number>0</number>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">QTDM:TEST:AO</string>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>0</red>
+          <green>85</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="precisionMode">
+         <enum>caNumeric::User</enum>
         </property>
        </widget>
       </widget>
@@ -4988,7 +5143,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1102</width>
-     <height>24</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
