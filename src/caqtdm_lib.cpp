@@ -1902,14 +1902,24 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         //qDebug() << "we have a linear gauge" << value;
         Q_UNUSED(widget);
         EAbstractGauge *gauge =  qobject_cast<EAbstractGauge *>(w);
-        UpdateGauge(gauge, data);
+        if(data.edata.connected) {
+          if(!gauge->isConnected()) gauge->setConnected(true);
+          UpdateGauge(gauge, data);
+        } else {
+           if(gauge->isConnected()) gauge->setConnected(false);
+        }
 
         // circular gauge  ==================================================================================================================
     } else if (caCircularGauge *widget = qobject_cast<caCircularGauge *>(w)) {
         //qDebug() << "we have a linear gauge" << value;
         Q_UNUSED(widget);
         EAbstractGauge *gauge =  qobject_cast<EAbstractGauge *>(w);
-        UpdateGauge(gauge, data);
+         if(data.edata.connected) {
+           if(!gauge->isConnected()) gauge->setConnected(true);
+           UpdateGauge(gauge, data);
+         } else {
+            if(gauge->isConnected()) gauge->setConnected(false);
+         }
 
         // byte ==================================================================================================================
     } else if (caByte *widget = qobject_cast<caByte *>(w)) {
@@ -2058,13 +2068,18 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         //qDebug() << "led" << led->objectName();
 
         if(data.edata.connected) {
-            if(bitState((int) data.edata.ivalue, widget->getBitNr())) {
-                widget->setState(true);
+            int colorMode = widget->getColorMode();
+            if(colorMode == caLed::Static) {
+                if(bitState((int) data.edata.ivalue, widget->getBitNr())) {
+                    widget->setState(true);
+                } else {
+                    widget->setState(false);
+                }
             } else {
-                widget->setState(false);
+                widget->setAlarmColors(data.edata.severity);
             }
         } else {
-            widget->setColor(QColor(Qt::white));
+            widget->setAlarmColors(NOTCONNECTED);
         }
 
         // ApplyNumeric and Numeric =====================================================================================================
@@ -3855,6 +3870,12 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 {
     double factX, factY;
 
+    QMainWindow *main = this->findChild<QMainWindow *>();
+    // it seems that when mainwindow was fixed by user, then the window stays empty ?
+    if(main != (QObject*) 0) {
+      main->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    }
+
     if(!allowResize) return;
 
     if(firstResize) {
@@ -3907,7 +3928,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 
     QObject *object;
     QString className;
-    QMainWindow *main = this->findChild<QMainWindow *>();
+
     bool mainlayoutPresent = false;
 
     if(main == (QObject*) 0) {
