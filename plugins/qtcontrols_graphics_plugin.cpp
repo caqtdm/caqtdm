@@ -280,7 +280,7 @@ caDoubleTabWidgetInterface::caDoubleTabWidgetInterface(QObject* parent) : Custom
         d_domXml = XmlFunc("caDoubleTabWidget", "cadoubletabwidget", 0, 0, 250, 250, name, type, 2);
 	d_name = "caDoubleTabWidget";
 	d_include = "caDoubleTabWidget";
-	d_icon = QPixmap(":pixmaps/frame.png");
+	d_icon = QPixmap(":pixmaps/tabwidget.png");
 }
 
 CustomWidgetCollectionInterface::CustomWidgetCollectionInterface(QObject *parent): QObject(parent)
