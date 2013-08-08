@@ -2,7 +2,7 @@ include(qtdefs.pri)
 
 unix {
   TEMPLATE = subdirs
-  SUBDIRS = parser caQtDM1 
+  SUBDIRS = caQtDM1
   exists("/home/ACS/Control/Lib/libDEV.so") {
          SUBDIRS += caQtDM2
   }
@@ -37,20 +37,27 @@ RESOURCES += ./caQtDM.qrc
 OTHER_FILES += ./caQtDM.ico
 
 win32-msvc* {
+	QTCONTROLS_INCLUDES=$$(QTCONTROLS_INCLUDES)
+	QWTHOME=$$(QWTHOME)
+	CAQTDM_INCLUDES=$$(CAQTDM_INCLUDES)
+	QTCONTROLS_INCLUDES=$$(QTCONTROLS_INCLUDES)
+	EPICS_BASE=$$(EPICS_BASE)
         DebugBuild {
-        	RC_FILE = caQtDM.rc
-                EPICS_LIBS=$${EPICS_BASE}/lib/win32-x86
+        	RC_FILE = src/caQtDM.rc
+                EPICS_LIBS=$(EPICS_BASE)/lib/win32-x86
                 OBJECTS_DIR = debug/obj
         }
         ReleaseBuild {
-        	RC_FILE = caQtDM.rc
-                EPICS_LIBS=$${EPICS_BASE}/lib/win32-x86-debug
+        	RC_FILE = src/caQtDM.rc
+                EPICS_LIBS=$(EPICS_BASE)/lib/win32-x86-debug
                 OBJECTS_DIR = release/obj
         }
 }
  
  INCLUDEPATH += .
- INCLUDEPATH += $(QWTHOME)/src
+ INCLUDEPATH += $${QWTHOME}/include
+ INCLUDEPATH += $${CAQTDM_INCLUDES}
+ INCLUDEPATH += $${QTCONTROLS_INCLUDES}
  INCLUDEPATH += $${EPICS_BASE}/include
  INCLUDEPATH += $${EPICS_BASE}/include/os/win32
       
@@ -72,21 +79,21 @@ win32-msvc* {
 
      win32-msvc* {
         DebugBuild {
-                LIBS += $${CAQTDM_LIB}/debug/caQtDM_Lib.lib
-                LIBS += $${QWTHOME}/lib/qwtd.lib
-                LIBS += $${EPICS_BASE}/lib/win32-x86-debug/ca.lib
-                LIBS += $${EPICS_BASE}/lib/win32-x86-debug/COM.lib
-                LIBS += $${QTCONTROLS}/debug/qtcontrols.lib
+                LIBS += $$(CAQTDM_LIB)/debug/caQtDM_Lib.lib
+                LIBS += $$(QWTHOME)/lib/qwtd.lib
+                LIBS += $$(EPICS_BASE)/lib/win32-x86-debug/ca.lib
+                LIBS += $$(EPICS_BASE)/lib/win32-x86-debug/COM.lib
+                LIBS += $$(QTCONTROLS)/debug/qtcontrols.lib
 
         }
 
         ReleaseBuild {
-                LIBS += $${CAQTDM_LIB}/release/caQtDM_Lib.lib
-                LIBS += $${QWTHOME}/lib/qwt.lib
-                LIBS += $${EPICS_BASE}/lib/win32-x86/ca.lib
-                LIBS += $${EPICS_BASE}/lib/win32-x86/COM.lib
-                LIBS += $${QTCONTROLS}/release/qtcontrols.lib
-                QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\caQtDM.exe $${BINARY_LOCATION}
+                LIBS += $$(CAQTDM_LIB)/release/caQtDM_Lib.lib
+                LIBS += $$(QWTHOME)/lib/qwt.lib
+                LIBS += $$(EPICS_BASE)/lib/win32-x86/ca.lib
+                LIBS += $$(EPICS_BASE)/lib/win32-x86/COM.lib
+                LIBS += $$(QTCONTROLS)/release/qtcontrols.lib
+                QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\caQtDM.exe $$(BINARY_LOCATION)
         }
      }
 
