@@ -9,7 +9,7 @@ CONFIG	+= qt thread warn_on
 TEMPLATE = lib
 
 win32 {
-     INCLUDEPATH += $${QWTHOME}/src
+     INCLUDEPATH += $$(QWTHOME)/src
      
      win32-g++ {
 	     LIBS += $${QWTHOME}/lib/libqwt.a
@@ -17,15 +17,15 @@ win32 {
      }
      win32-msvc* {
 	     DebugBuild {
-	     	     INCLUDEPATH += $${QWTHOME}/include
-		     LIBS += $${QWTHOME}/lib/qwtd.lib
-		     LIBS += $${QTCONTROLS}/debug/qtcontrols.lib
+	     	     INCLUDEPATH += $$(QWTHOME)/include
+		     LIBS += $$(QWTHOME)/lib/qwtd.lib
+		     LIBS += $$(QTCONTROLS)/debug/qtcontrols.lib
 	     }
 
 	     ReleaseBuild {
-	             INCLUDEPATH += $${QWTHOME}/include
-		     LIBS += $${QWTHOME}/lib/qwt.lib
-		     LIBS += $${QTCONTROLS}/release/qtcontrols.lib
+	             INCLUDEPATH += $$(QWTHOME)/include
+		     LIBS += $$(QWTHOME)/lib/qwt.lib
+		     LIBS += $$(QTCONTROLS)/release/qtcontrols.lib
 	     }
      }
 
@@ -55,7 +55,7 @@ RESOURCES += qtcontrolsplugin.qrc
 TARGET = qtcontrols_monitors_plugin
 QMAKE_CLEAN += libqtcontrols_monitors_plugin*
   win32 {
-    QMAKE_POST_LINK = copy /Y .\release\qtcontrols_monitors_plugin.dll $${PLUGINS_LOCATION}
+    QMAKE_POST_LINK = copy /Y .\release\qtcontrols_monitors_plugin.dll $$(PLUGINS_LOCATION)
   }
 }
 
@@ -66,7 +66,7 @@ RESOURCES += qtcontrolsplugin.qrc
 TARGET = qtcontrols_controllers_plugin
 QMAKE_CLEAN += libqtcontrols_controllers_plugin*
   win32 {
-    QMAKE_POST_LINK = copy /Y .\release\qtcontrols_controllers_plugin.dll $${PLUGINS_LOCATION}
+    QMAKE_POST_LINK = copy /Y .\release\qtcontrols_controllers_plugin.dll $$(PLUGINS_LOCATION)
   }
 }
 
@@ -77,6 +77,6 @@ RESOURCES += qtcontrolsplugin.qrc
 TARGET = qtcontrols_graphics_plugin
 QMAKE_CLEAN += libqtcontrols_graphics_plugin*
   win32 {
-    QMAKE_POST_LINK = copy /Y .\release\qtcontrols_graphics_plugin.dll $${PLUGINS_LOCATION}
+    QMAKE_POST_LINK = copy /Y .\release\qtcontrols_graphics_plugin.dll $$(PLUGINS_LOCATION)
   }
 }
