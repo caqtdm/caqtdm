@@ -25,7 +25,7 @@ win32 {
         ReleaseBuild {
         	INCLUDEPATH = $$(QWTHOME)/include
                 LIBS += $$(QWTHOME)/lib/qwt.lib
-                QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\qtcontrols.dll $${BINARY_LOCATION}
+                QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\qtcontrols.dll $$(BINARY_LOCATION)
         }
      }
 }
