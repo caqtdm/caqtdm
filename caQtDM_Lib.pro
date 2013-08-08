@@ -22,12 +22,16 @@ OBJECTS_DIR = obj
 
      win32-msvc* {
         DEFINES +=_CRT_SECURE_NO_WARNINGS
+        QWTHOME=$$(QWTHOME)
+        QTCONTROLS_INCLUDES=$$(QTCONTROLS_INCLUDES)
+        EPICS_BASE=$$(EPICS_BASE)
+        
         DebugBuild {
-                EPICS_LIBS=$${EPICS_BASE}/lib/win32-x86
+                EPICS_LIBS=$$(EPICS_BASE)/lib/win32-x86
                 OBJECTS_DIR = debug/obj
         }
         ReleaseBuild {
-                EPICS_LIBS=$${EPICS_BASE}/lib/win32-x86-debug
+                EPICS_LIBS=$$(EPICS_BASE)/lib/win32-x86-debug
                 OBJECTS_DIR = release/obj
         }
      }
@@ -93,17 +97,17 @@ INCLUDEPATH += $${EPICS_BASE}/include/os/win32
      win32-msvc* {
         DEFINES += CAQTDM_LIB_LIBRARY
         DebugBuild {
-                LIBS += $${QWTHOME}/lib/qwtd.lib
+                LIBS += $$(QWTHOME)/lib/qwtd.lib
                 LIBS += $${EPICS_LIBS}/ca.lib
                 LIBS += $${EPICS_LIBS}/COM.lib
-                LIBS += $${QTCONTROLS}/debug/qtcontrols.lib
+                LIBS += $$(QTCONTROLS)/debug/qtcontrols.lib
         }
 
         ReleaseBuild {
-                LIBS += $${QWTHOME}/lib/qwt.lib
+                LIBS += $$(QWTHOME)/lib/qwt.lib
                 LIBS += $${EPICS_LIBS}/ca.lib
                 LIBS += $${EPICS_LIBS}/COM.lib
-                LIBS += $${QTCONTROLS}/release/qtcontrols.lib
+                LIBS += $$(QTCONTROLS)/release/qtcontrols.lib
                 QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\caQtDM_Lib.dll $${BINARY_LOCATION}
 
         }
