@@ -18,13 +18,13 @@ win32 {
      win32-msvc* {
         DEFINES += QTCON_MAKEDLL _CRT_SECURE_NO_WARNINGS
         DebugBuild {
-                INCLUDEPATH = $${QWTHOME}/include
-                LIBS += $${QWTHOME}/lib/qwtd.lib
+                INCLUDEPATH = $$(QWTHOME)/include
+                LIBS += $$(QWTHOME)/lib/qwtd.lib
         }
 
         ReleaseBuild {
-        	INCLUDEPATH = $${QWTHOME}/include
-                LIBS += $${QWTHOME}/lib/qwt.lib
+        	INCLUDEPATH = $$(QWTHOME)/include
+                LIBS += $$(QWTHOME)/lib/qwt.lib
                 QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\qtcontrols.dll $${BINARY_LOCATION}
         }
      }
@@ -39,8 +39,6 @@ unix {
     OBJECTS_DIR = obj
     DESTDIR = .
     QMAKE_POST_LINK = cp libqtcontrols.so ../caQtDM_Binaries/
-    QMAKE_CXXFLAGS += "-g"
-    QMAKE_CFLAGS_RELEASE += "-g"
 }
 
 INCLUDEPATH += src
