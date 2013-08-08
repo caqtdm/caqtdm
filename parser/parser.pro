@@ -29,7 +29,7 @@ unix {
 
 win32-msvc* {
  ReleaseBuild {
-   QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\adl2ui.exe $${BINARY_LOCATION}
+   QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\adl2ui.exe $$(BINARY_LOCATION)
    OBJECTS_DIR = release/obj	
  }
  DebugBuild {
