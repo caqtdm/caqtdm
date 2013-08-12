@@ -11,4 +11,4 @@ LIBS += -L$(ACS_BUILD_LIBRARY) -lDEV -lCDB -lInclude -lProfAcc
 INCLUDEPATH += $(ACS_BUILD_INCLUDE)
 DEFINES += ACS
 
-QMAKE_POST_LINK = cp ../libcaQtDM_Lib_Hipa.so ../../caQtDM_Binaries/
+QMAKE_POST_LINK = cp ../libcaQtDM_Lib_Hipa.so $(QTBASE)

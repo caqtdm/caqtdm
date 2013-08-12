@@ -17,12 +17,6 @@ INCLUDEPATH += ../src
 DESTDIR = ../
 UI_DIR += ../
 
-QWTLIB = $(QWTHOME)/lib
-QTCONTROLS = $(QTBASE)/binQt
-EPICSLIB = $(EPICSLIB)
-
-DEFINES += CAQTDM_LIB_LIBRARY
-
 SOURCES += caqtdm_lib.cpp \
     mutexKnobData.cpp \
     globalPtrs.cpp \
@@ -73,12 +67,12 @@ DEFINES += epics4
 
 INCLUDEPATH += .
 
-LIBS += -L$${EPICSLIB} -Wl,-rpath,$${EPICSLIB} -lca
-LIBS += -L$${QTCONTROLS} -Wl,-rpath,$${QTCONTROLS} -lqtcontrols
+LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca
+LIBS += -L$(QTBASE) -Wl,-rpath,$(QTCONTROLS_INSTALLED) -lqtcontrols
 
-INCLUDEPATH += $(QWTHOME)/src
+INCLUDEPATH += $(QWTINCLUDE)
 INCLUDEPATH += $(EPICSINCLUDE)
 INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
-INCLUDEPATH += $(HOME)/workarea/ACS/mezger/caQtDM_QtControls/src
+INCLUDEPATH += ../../caQtDM_QtControls/src
 
 
