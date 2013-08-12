@@ -3,13 +3,15 @@ include(qtdefs.pri)
 QT       += core gui svg
 CONFIG      += qt warn_on thread uitools
 
+unix: {
+  CONFIG += x11
+}
+
 MOC_DIR = ../moc
 VPATH += ../src
 INCLUDEPATH += ../src
 DESTDIR = ../
 UI_DIR += ../src
-
-QTCONTROLS = $(QTBASE)/binQt
 
 SOURCES +=\
     caQtDM.cpp \
@@ -23,9 +25,9 @@ HEADERS  +=  \
 
 FORMS += main.ui
 
-INCLUDEPATH += $(QWTHOME)/src
-INCLUDEPATH += $(HOME)/workarea/ACS/mezger/caQtDM_QtControls/src
-INCLUDEPATH += $(HOME)/workarea/ACS/mezger/caQtDM_Lib/src
+INCLUDEPATH += $(QWTINCLUDE)
+INCLUDEPATH += ../../caQtDM_QtControls/src
+INCLUDEPATH += ../../caQtDM_Lib/src
 
 DEFINES += BUILDTIME=\\\"$$system(date '+%H:%M')\\\"
 DEFINES += BUILDDATE=\\\"$$system(date '+%d-%m-%Y')\\\"
