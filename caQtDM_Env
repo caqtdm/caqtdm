@@ -1,0 +1,57 @@
+#!/bin/bash
+  if [ -z "$QTHOME" ];                then export   QTHOME=/usr;
+  fi
+  if [ -z "$QWTHOME" ];               then export   QWTHOME=/usr;
+  fi
+  if [ -z "$QWTINCLUDE" ];            then export   QWTINCLUDE=/usr/include/qwt;
+  fi
+  if [ -z "$QWTLIB" ];                then export   QWTLIB=${QWTHOME}/lib;
+  fi
+  if [ -z "$EPICS_BASE" ];            then export   EPICS_BASE=/usr/local/epics/base;
+  fi
+  if [ -z "$EPICSINCLUDE" ];          then export   EPICSINCLUDE=${EPICS_BASE}/include;
+  fi
+  if [ -z "$EPICSLIB" ];              then  export  EPICSLIB=${EPICS_BASE}/lib/$EPICS_HOST_ARCH;
+  fi
+  if [ -z "$EPICSEXTENSIONS" ];     then  export  EPICSEXTENSIONS=/usr/local/epics/extensions;
+  fi
+  if [ -z "$QTCONTROLS_LIBS" ];       then export  QTCONTROLS_LIBS=`pwd`/caQtDM_Binaries;
+  fi
+  export  QTBASE=${QTCONTROLS_LIBS};
+
+  if [ -z "$QTDM_LIBINSTALL" ];  then  export  QTDM_LIBINSTALL=$EPICSEXTENSIONS/lib/$EPICS_HOST_ARCH;
+  fi
+  if [ -z "$QTDM_BININSTALL" ];   then  export  QTDM_BININSTALL=$EPICSEXTENSIONS/bin/$EPICS_HOST_ARCH;
+  fi
+
+  if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:${QTBASE};
+  fi
+
+
+echo =============================================================================================
+echo in order to build this package you will eventually have to redefine following variables in 
+echo this file, they are taken from your environment if they exist, otherwise define them yourself:
+echo
+echo for building:
+echo
+echo QTHOME               now defined as ${QTHOME}               for locating Qt
+echo QWTHOME              now defined as ${QWTHOME}              for locating qwt
+echo QWTINCLUDE           now defined as ${QWTINCLUDE}           for locating the include files of qwt
+echo QWTLIB               now defined as ${QWTLIB}               for locating the libraries of qwt
+echo EPICS_BASE           now defined as ${EPICS_BASE}           for locating epics 
+echo EPICSINCLUDE         now defined as ${EPICSINCLUDE}         for locating epics include files
+echo EPICSLIB             now defined as ${EPICSLIB}             for locating epics libraries
+echo QTBASE               now defined as ${QTBASE}               for building the package locally, pointing to caQtDM_Binaries
+echo QTDM_RPATH           now defined as ${QTDM_RPATH}           for runtime search path 
+echo
+echo for install:
+echo
+echo EPICSEXTENSIONS      now defined as ${EPICSEXTENSIONS}      for locating epics extensions
+echo QTDM_LIBINSTALL      now defined as ${QTDM_LIBINSTALL}      for libraries install 
+echo QTDM_BININSTALL      now defined as ${QTDM_BININSTALL}      for binaries install
+echo ============================================================================================
+echo 
+
+
+
+

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+export QTCONTROLS_LIBS=`pwd`/caQtDM_Binaries
+export QTBASE=${QTCONTROLS_LIBS}
+export PATH=.:$QTBASE:$PATH
+export QT_PLUGIN_PATH=$QTBASE
+
+/usr/bin/designer -style plastique $*

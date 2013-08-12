@@ -1,0 +1,34 @@
+#!/bin/bash
+echo $PWD
+source $PWD/caQtDM_Env
+echo =============================================================================================
+echo
+
+echo binaries will be installed in ${QTDM_BININSTALL}
+echo libraries will be installed in ${QTDM_LIBINSTALL}
+echo plugins will be installed in ${QTDM_LIBINSTALL}/designer
+
+echo " "
+read -p "Press [Enter] key to start build "
+echo " "
+
+mkdir -p ${QTDM_LIBINSTALL}/designer
+
+cp -v caQtDM_Binaries/caQtDM  ${QTDM_BININSTALL}/
+cp -v caQtDM_Binaries/adl2ui  ${QTDM_BININSTALL}/
+
+cp -v caQtDM_Binaries/libcaQtDM_Lib.so  ${QTDM_LIBINSTALL}/
+cp -v caQtDM_Binaries/libqtcontrols.so  ${QTDM_LIBINSTALL}/
+cp -v caQtDM_Binaries/designer/libqtcontrols_*_plugin.so  ${QTDM_LIBINSTALL}/designer/
+
+cp -v startDM      ${QTDM_BININSTALL}/ 
+
+echo ""
+echo "Put these in your .profile"
+echo "export QT_PLUGIN_PATH=${QTDM_LIBINSTALL}"
+echo " "
+echo "and execute 'designer' for building GUI's, 'adl2ui' for converting medm files, 'startDM' to execute caQtDM"
+echo "you may try the test files located in caQtDM_Tests (set CAQTDM_DISPLAY_PATH accordingly)"
+echo "you may try also to execute the command 'run-epics' in caQtDM_Tests (will setup a softioc) to get the channels"
+echo "used by the test."
+echo " "
