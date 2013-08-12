@@ -34,12 +34,9 @@ win32 {
 }
 unix {
 
-  INCLUDEPATH += $(QWTHOME)/src
-  QWTLIB = $(QWTHOME)/lib
-  QTCONTROLS = $(QTBASE)/binQt
-
-  LIBS += -L$${QTCONTROLS} -Wl,-rpath,$${QTCONTROLS} -lqtcontrols
-  LIBS += -L$${QWTLIB} -Wl,-rpath,$${QWTLIB} -lqwt
+  INCLUDEPATH += $(QWTINCLUDE)
+  LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
+  LIBS += -L$(QWTLIB) -Wl,-rpath,$(QWTLIB) -lqwt
 
   MOC_DIR = moc
   OBJECTS_DIR = obj
@@ -54,6 +51,7 @@ HEADERS	+= qtcontrols_monitors_plugin.h
 RESOURCES += qtcontrolsplugin.qrc
 TARGET = qtcontrols_monitors_plugin
 QMAKE_CLEAN += libqtcontrols_monitors_plugin*
+QMAKE_POST_LINK = cp libqtcontrols_monitors_plugin.so $(QTBASE)/designer
   win32 {
     QMAKE_POST_LINK = copy /Y .\release\qtcontrols_monitors_plugin.dll $$(PLUGINS_LOCATION)
   }
@@ -65,6 +63,7 @@ HEADERS	+= qtcontrols_controllers_plugin.h
 RESOURCES += qtcontrolsplugin.qrc
 TARGET = qtcontrols_controllers_plugin
 QMAKE_CLEAN += libqtcontrols_controllers_plugin*
+QMAKE_POST_LINK = cp libqtcontrols_controllers_plugin.so $(QTBASE)/designer
   win32 {
     QMAKE_POST_LINK = copy /Y .\release\qtcontrols_controllers_plugin.dll $$(PLUGINS_LOCATION)
   }
@@ -76,6 +75,7 @@ HEADERS	+= qtcontrols_graphics_plugin.h
 RESOURCES += qtcontrolsplugin.qrc
 TARGET = qtcontrols_graphics_plugin
 QMAKE_CLEAN += libqtcontrols_graphics_plugin*
+QMAKE_POST_LINK = cp libqtcontrols_graphics_plugin.so $(QTBASE)/designer
   win32 {
     QMAKE_POST_LINK = copy /Y .\release\qtcontrols_graphics_plugin.dll $$(PLUGINS_LOCATION)
   }
