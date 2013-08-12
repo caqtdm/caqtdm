@@ -14,6 +14,7 @@
 #include "dmsearchfile.h"
 #include "parsepepfile.h"
 #include <stdint.h>
+#include <unistd.h>
 #include <math.h>
 #include <stdlib.h>
 #include <iostream>
