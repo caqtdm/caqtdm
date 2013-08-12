@@ -17,6 +17,10 @@
 #include <time.h>
 #include <sys/timeb.h>
 
+#define GCC_VERSION (__GNUC__ * 10000 \
+                               + __GNUC_MINOR__ * 100 \
+                               + __GNUC_PATCHLEVEL__)
+
 const char* MessageWindow::WINDOW_TITLE = "caQtDM Message Window";
 MessageWindow* MessageWindow::MsgHandler = NULL;
 
@@ -71,7 +75,7 @@ void MessageWindow::AppendMsgWrapper(QtMsgType type, char* msg)
 }
 
 void MessageWindow::customEvent(QEvent* event)
-{
+{    
         if (static_cast<MessageWindow::EventType>(event->type()) == MessageWindow::MessageEvent) {
 #ifdef __MINGW32__
                 msgTextEdit.append(dynamic_cast<typename MessageEvent::MessageEvent* >(event)->msg);
@@ -79,7 +83,11 @@ void MessageWindow::customEvent(QEvent* event)
         #ifdef _WIN32
                 msgTextEdit.append(dynamic_cast<::MessageEvent* >(event)->msg);
         #else
-                msgTextEdit.append(dynamic_cast<MessageEvent::MessageEvent* >(event)->msg);
+               #if GCC_VERSION > 40404
+                   msgTextEdit.append(dynamic_cast<typename MessageEvent::MessageEvent* >(event)->msg);
+               #else
+                   msgTextEdit.append(dynamic_cast<MessageEvent::MessageEvent* >(event)->msg);
+               #endif
         #endif
 #endif
         }
@@ -111,7 +119,11 @@ void MessageWindow::postMsgEvent(QtMsgType type, char* msg)
         #ifdef _WIN32
             QCoreApplication::postEvent(this, new ::MessageEvent(qmsg));
         #else
-            QCoreApplication::postEvent(this, new MessageEvent::MessageEvent(qmsg));
+            #if GCC_VERSION > 40404
+                QCoreApplication::postEvent(this, new typename MessageEvent::MessageEvent(qmsg));
+            #else
+                QCoreApplication::postEvent(this, new MessageEvent::MessageEvent(qmsg));
+            #endif
         #endif
 #endif
 }
