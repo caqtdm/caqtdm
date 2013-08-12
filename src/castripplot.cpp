@@ -30,6 +30,7 @@ public:
     virtual QwtText label(double v) const
     {
         QTime upTime = baseTime.addSecs((int)v);
+        //printf("label = addseconds=%d start plottime=%s labeltime=%s\n", (int)v, baseTime.toString().toAscii().constData(),  upTime.toString().toAscii().constData());
         return upTime.toString();
     }
 
@@ -372,9 +373,12 @@ void caStripPlot::TimeOut()
     elapsedTime = ((double) timeNow.time + (double) timeNow.millitm / (double)1000) -
             ((double) timeStart.time + (double) timeStart.millitm / (double)1000);
 
+    //printf("elapsed seconds since start %lf\n", elapsedTime);
+
     // change scale base in case of running time scale
     if(thisXaxisType == TimeScale) {
         timeData[0] = INTERVAL + elapsedTime;
+        //printf("set axis scale to %lf %lf\n",  timeData[0] - INTERVAL, timeData[0]);
         setAxisScale(QwtPlot::xBottom, timeData[0] - INTERVAL, timeData[0]);
         axisWidget( QwtPlot::xBottom )->update();
         replot();
