@@ -385,10 +385,13 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         mainWindow->setProperty("fileString", fileNameFound);
         mainWindow->setProperty("macroString", macroString);
 
+#ifdef Q_WS_X11
         if(geometry != "") {
             parse_and_set_Geometry(mainWindow, geometry);
+        }
+#endif
         // for this kind of file we resize to a minimum while the size is not known
-        } else if (FileName.contains("prc")) {
+        if (FileName.contains("prc")) {
             mainWindow->resize(mainWindow->minimumSizeHint());
         }
 
@@ -624,6 +627,8 @@ void FileOpenWindow::fillPVtable(int &countPV, int &countNotConnected, int &coun
         pvTable->resizeColumnsToContents();
     }
 }
+
+#ifdef Q_WS_X11
 /**
  *   in medm geometry is passed through XParseGeometry:
  *    XParseGeometry parses strings of the form
@@ -770,3 +775,4 @@ void FileOpenWindow::parse_and_set_Geometry(QMainWindow *widget, QString parsest
     //qDebug() << "set window" << w << "to" << x << y << w << h;
     widget->setGeometry(x, y, w, h);
 }
+#endif
