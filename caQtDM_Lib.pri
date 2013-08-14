@@ -5,17 +5,16 @@ CONFIG   += qt warn_on thread uitools designer plugin
 #epics4
 #CONFIG += epics4
 
-QMAKE_CXXFLAGS += "-g"
-QMAKE_CFLAGS_RELEASE += "-g"
-
+unix{
+ QMAKE_CXXFLAGS += "-g"
+ QMAKE_CFLAGS_RELEASE += "-g"
+ LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca
+ LIBS += -L$(QTBASE) -Wl,-rpath,$(QTCONTROLS_INSTALLED) -lqtcontrols
+ INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
+}
 TARGET = caQtDM_Lib
 TEMPLATE = lib
 
-MOC_DIR = ../moc
-VPATH += ../src
-INCLUDEPATH += ../src
-DESTDIR = ../
-UI_DIR += ../
 
 SOURCES += caqtdm_lib.cpp \
     mutexKnobData.cpp \
@@ -67,12 +66,8 @@ DEFINES += epics4
 
 INCLUDEPATH += .
 
-LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca
-LIBS += -L$(QTBASE) -Wl,-rpath,$(QTCONTROLS_INSTALLED) -lqtcontrols
 
 INCLUDEPATH += $(QWTINCLUDE)
 INCLUDEPATH += $(EPICSINCLUDE)
-INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
-INCLUDEPATH += ../../caQtDM_QtControls/src
 
 

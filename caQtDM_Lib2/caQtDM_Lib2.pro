@@ -12,3 +12,10 @@ INCLUDEPATH += $(ACS_BUILD_INCLUDE)
 DEFINES += ACS
 
 QMAKE_POST_LINK = cp ../libcaQtDM_Lib_Hipa.so $(QTBASE)
+
+MOC_DIR = ../moc
+VPATH += ../src
+INCLUDEPATH += ../src
+DESTDIR = ../
+UI_DIR += ../
+INCLUDEPATH += ../../caQtDM_QtControls/src
