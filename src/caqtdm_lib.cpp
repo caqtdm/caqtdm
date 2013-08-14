@@ -14,7 +14,6 @@
 #include "dmsearchfile.h"
 #include "parsepepfile.h"
 #include <stdint.h>
-#include <unistd.h>
 #include <math.h>
 #include <stdlib.h>
 #include <iostream>
@@ -25,6 +24,7 @@
 #include <iostream>
 #ifdef linux
 #  include <sys/wait.h>
+#  include <unistd.h>
 #endif
 
 #define PRC 1
