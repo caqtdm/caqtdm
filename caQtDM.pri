@@ -7,12 +7,6 @@ unix: {
   CONFIG += x11
 }
 
-MOC_DIR = ../moc
-VPATH += ../src
-INCLUDEPATH += ../src
-DESTDIR = ../
-UI_DIR += ../src
-
 SOURCES +=\
     caQtDM.cpp \
     fileopenwindow.cpp \
@@ -25,14 +19,18 @@ HEADERS  +=  \
 
 FORMS += main.ui
 
-INCLUDEPATH += $(QWTINCLUDE)
-INCLUDEPATH += ../../caQtDM_QtControls/src
-INCLUDEPATH += ../../caQtDM_Lib/src
 
-DEFINES += BUILDTIME=\\\"$$system(date '+%H:%M')\\\"
-DEFINES += BUILDDATE=\\\"$$system(date '+%d-%m-%Y')\\\"
+unix:{
+	DEFINES += BUILDTIME=\\\"$$system(date '+%H:%M')\\\"
+	DEFINES += BUILDDATE=\\\"$$system(date '+%d-%m-%Y')\\\"
+}
+win32{
+	DEFINES += BUILDTIME=\\\"\\\"
+	DEFINES += BUILDDATE=\\\"\\\"
+	DEFINES += SUPPORT=\\\"\\\"
+}
 DEFINES += BUILDVERSION=\\\"$${CAQTDM_VERSION}\\\"
 DEFINES += BUILDARCH=\\\"$$(QMAKESPEC)\\\"
 
-RESOURCES += ./caQtDM.qrc
-RC_FILE = ./caQtDM.rc
+RESOURCES += src/caQtDM.qrc
+RC_FILE = src/caQtDM.rc
