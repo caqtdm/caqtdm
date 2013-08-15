@@ -17,6 +17,7 @@ win32-msvc* {
         
         DebugBuild {
                 EPICS_LIBS=$$(EPICS_BASE)/lib/win32-x86
+                DESTDIR = debug
                 OBJECTS_DIR = debug/obj
                 LIBS += $$(QWTHOME)/lib/qwtd.lib
                 LIBS += $${EPICS_LIBS}/ca.lib
@@ -25,6 +26,7 @@ win32-msvc* {
         }
         ReleaseBuild {
                 EPICS_LIBS=$$(EPICS_BASE)/lib/win32-x86-debug
+                DESTDIR = release
                 OBJECTS_DIR = release/obj
                 LIBS += $$(QWTHOME)/lib/qwt.lib
                 LIBS += $${EPICS_LIBS}/ca.lib
@@ -42,7 +44,6 @@ win32-msvc* {
 MOC_DIR = ./moc
 VPATH += ./src
 INCLUDEPATH += ./src
-DESTDIR = ./
 UI_DIR += ./
 INCLUDEPATH += ../caQtDM_QtControls/src
 INCLUDEPATH += $$(EPICS_BASE)/include
