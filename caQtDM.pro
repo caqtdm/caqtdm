@@ -15,7 +15,6 @@ win32 {
 
 	MOC_DIR = moc
 	OBJECTS_DIR = obj
-	DESTDIR = .
 	VPATH += ./src
 	UI_DIR += ./
 	INCLUDEPATH += .
@@ -32,7 +31,7 @@ win32 {
 	
 	win32-msvc* {
 		DebugBuild {
-			
+			DESTDIR = debug
 			EPICS_LIBS=$${EPICS_BASE}/lib/win32-x86
 			OBJECTS_DIR = debug/obj
 			LIBS += ../caQtDM_Lib/debug/caQtDM_Lib.lib
@@ -44,7 +43,7 @@ win32 {
 
 		}
 		ReleaseBuild {
-			
+			DESTDIR = release
 			EPICS_LIBS=$$(EPICS_BASE)/lib/win32-x86-debug
 			OBJECTS_DIR = release/obj
 			LIBS += ../caQtDM_Lib/release/caQtDM_Lib.lib
