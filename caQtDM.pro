@@ -12,7 +12,7 @@ win32 {
 	TARGET = caQtDM
 	TEMPLATE = app
 	include (./caQtDM.pri)
-
+	SUBDIRS = parser
 	MOC_DIR = moc
 	OBJECTS_DIR = obj
 	VPATH += ./src
