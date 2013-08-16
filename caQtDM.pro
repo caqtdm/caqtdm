@@ -12,9 +12,7 @@ win32 {
 	TARGET = caQtDM
 	TEMPLATE = app
 	include (./caQtDM.pri)
-	SUBDIRS = parser
 	MOC_DIR = moc
-	OBJECTS_DIR = obj
 	VPATH += ./src
 	UI_DIR += ./
 	INCLUDEPATH += .
@@ -51,7 +49,7 @@ win32 {
 			LIBS += $$(EPICS_BASE)/lib/win32-x86/ca.lib
 			LIBS += $$(EPICS_BASE)/lib/win32-x86/COM.lib
 			LIBS += $$(QTCONTROLS_LIBS)/release/qtcontrols.lib
-			QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\caQtDM.exe $${BINARY_LOCATION}
+			QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\caQtDM.exe ..\caQtDM_Binaries
 
 
 		}
