@@ -13,8 +13,7 @@
   
   IF "%QTDM_LIBINSTALL%"=="" 		set QTDM_LIBINSTALL=C:\Qt\4.8.2\lib
   IF "%QTDM_BININSTALL%"=="" 		set QTDM_BININSTALL=C:\Qt\4.8.2\bin
-  IF "%QTDM_BININSTALLPLUGIN%"=="" 	set QTDM_BININSTALL_PLUGIN=C:\qt\4.8.2\plugins\designer
-  IF "%QTDM_RPATH%"==""      		set QTDM_RPATH=C:/Qt/4.8.2/bin
+  IF "%WIXHOME%"=="" 			set WIXHOME=C:\Program Files (x86)\WixEdit\wix-3.0.5419.0
 
 echo =============================================================================================
 echo in order to build this package you will eventually have to redefine following variables in 
@@ -37,7 +36,7 @@ echo.
 echo EPICSEXTENSIONS      	now defined as %EPICSEXTENSIONS%	for locating epics extensions
 echo QTDM_LIBINSTALL      	now defined as %QTDM_LIBINSTALL%	for libraries install 
 echo QTDM_BININSTALL      	now defined as %QTDM_BININSTALL%	for binaries install
-echo QTDM_BININSTALLPLUGIN      now defined as %QTDM_BININSTALLPLUGIN%	for libraries install 
+echo WIXHOME      		now defined as %WIXHOME%		for package generation 
 echo ============================================================================================
  
 
