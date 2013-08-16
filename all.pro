@@ -31,6 +31,9 @@ error("Use at least Qt 4.8.")
 
 TEMPLATE = subdirs
 SUBDIRS = caQtDM_QtControls caQtDM_Lib caQtDM 
+win32{
+ CONFIG(debug, debug | release) 
+}
 
 contains(QMAKE_HOST.name, pc2401) {
 SUBDIRS += QtTunes probeQtProscan HFdispQt
