@@ -24,3 +24,21 @@ and the qt4-designer by the script qtdesigner (all located in the main directory
 good luck and enjoy
 
 in case of problems, please contact Anton Mezger at PSI.
+
+====================================================================================================================================================================
+
+Instructions for compiling caQtDM on Windows
+
+Requirements:
+	1) Qt 4.8.2
+	2) Qwt 6.0.1
+	3) EPICS 3.12.2
+	4) MS Visual Studio 2010
+	5) Wix 3.0.5419.0
+	
+With caQtDM_Env.bat you can configure your system. All setting which are needed will be taken from here.
+
+The building can be started with the batchfile 	: caQtDM_BuildAll.bat
+The packaging is made with the batch file 	: caQtDM_Build_Package.bat
+This will gernerate a MSI installation file in the folder of caQtDM_Binaries.
+To clean the Folder you shuold use caQtDM_CleanAll.bat.
