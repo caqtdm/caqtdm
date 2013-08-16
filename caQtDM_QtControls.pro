@@ -22,7 +22,7 @@ win32 {
         }
 
         ReleaseBuild {
-        	OBJECTS_DIR = debug/obj
+        	OBJECTS_DIR = release/obj
         	INCLUDEPATH = $$(QWTHOME)/include
                 LIBS += $$(QWTHOME)/lib/qwt.lib
                 QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\qtcontrols.dll ..\caQtDM_Binaries
