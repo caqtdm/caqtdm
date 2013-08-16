@@ -32,7 +32,7 @@ win32-msvc* {
                 LIBS += $${EPICS_LIBS}/ca.lib
                 LIBS += $${EPICS_LIBS}/COM.lib
                 LIBS += $$(QTCONTROLS_LIBS)/release/qtcontrols.lib
-                QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\caQtDM_Lib.dll $$(BINARY_LOCATION)
+                QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\caQtDM_Lib.dll ..\caQtDM_Binaries
         }
  }
      win32-g++ {
