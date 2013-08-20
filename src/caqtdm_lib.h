@@ -23,6 +23,8 @@
 #include <stdint.h>
 #include <QMainWindow>
 #include <QTableWidget>
+#include <QGroupBox>
+#include <QHeaderView>
 #include <QVector>
 #include <QMutex>
 #include <QFile>
@@ -35,6 +37,8 @@
 #include <QMessageBox>
 #include <QPrinter>
 #include <QPrintDialog>
+
+#include <QUiLoader>
 
 #include "mutexKnobData.h"
 #include "mutexKnobDataWrapper.h"
@@ -104,7 +108,11 @@ public:
     {
         QPrinter *printer = new QPrinter;
         printer->setOrientation(QPrinter::Portrait);
+#if QT_VERSION< QT_VERSION_CHECK(5, 0, 0)
         printer->setOutputFormat(QPrinter::PostScriptFormat);
+#else
+        printf("caQtDM_Lib -- seems that postscript is not supoorted any more in Qt5\n");
+#endif
         printer->setResolution(300);
         printer->setOutputFileName(filename);
 
