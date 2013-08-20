@@ -24,6 +24,7 @@
 #include <QMainWindow>
 #include <QSharedMemory>
 #include <QTableWidget>
+#include <QScrollBar>
 #include "MessageWindow.h"
 #include "dbrString.h"
 #include "knobDefines.h"

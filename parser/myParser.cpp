@@ -17,6 +17,7 @@
 #include <QFileDialog>
 #include "dmsearchfile.h"
 #include <QDebug>
+#include <QFileInfo>
 
 
 extern "C" TOKEN parseAndAppendDisplayList(DisplayInfo *displayInfo, FrameOffset *offset, char *firstToken, TOKEN firstTokenType);
