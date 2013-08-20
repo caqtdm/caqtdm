@@ -381,7 +381,7 @@ QMap<QString, QString> CaQtDM_Lib::createMap(const QString& macro)
     if(macro != NULL) {
         QStringList vars = macro.split(",", QString::SkipEmptyParts);
         for(int i=0; i< vars.count(); i++) {
-            /*          this would be ok if medm did not allow also an equal sign after the equal sign
+/*          this would be ok if medm did not allow also an equal sign after the equal sign
             QStringList keyvalue = vars.at(i).split("=", QString::SkipEmptyParts);
             if(keyvalue.count() == 2) {
                 map.insert(keyvalue.at(0).trimmed(), keyvalue.at(1));
@@ -393,7 +393,7 @@ QMap<QString, QString> CaQtDM_Lib::createMap(const QString& macro)
                 QString value = vars.at(i).mid(pos+1);
                 map.insert(key.trimmed(), value);
             } else {
-                qDebug() << macro << "could not parse" << vars.at(i);
+                qDebug() <<"macro" <<  macro << "could not be parsed";
             }
         }
     }
@@ -490,7 +490,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         //==================================================================================================================
     } else if(caRelatedDisplay* widget = qobject_cast<caRelatedDisplay *>(w1)) {
 
-        //qDebug() << "create caRelatedDisplay" << widget;
+        //qDebug() << "create caRelatedDisplay" << widget << widget->getLabels() << widget->getArgs() <<  widget->getFiles();
 
         QString text;
 
@@ -561,7 +561,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         // addmonitor normally will add a tooltip to show the pv; however here we have more than one pv
         QString tooltip;
         QString pvs= "";
-        bool validDataProcessingChannels = false;
         tooltip.append(ToolTipPrefix);
 
         for(int i=0; i< 8; i++) {
@@ -589,7 +588,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
                         thisString.at(1).trimmed().length() > 0  &&
                         thisString.at(2).trimmed().length() > 0 &&
                         thisString.at(3).trimmed().length() > 0) {
-                    validDataProcessingChannels = true;
                     for(int j=0; j<4; j++) {
                         specData[0] = i+j;   // x,y,w,h
                         text =  treatMacro(map, thisString.at(j), &doNothing);
@@ -829,10 +827,17 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         // for an opposite direction, invert maximum and minimum
 
         if(widget->getDirection() == caThermo::Down || widget->getDirection() == caThermo::Left) {
+#if QWT_VERSION < 0x060100
             double max = widget->maxValue();
             double min = widget->minValue();
             widget->setMinValue(max);
             widget->setMaxValue(min);
+#else
+            double max = widget->upperBound();
+            double min = widget->lowerBound();
+            widget->setLowerBound(max);
+            widget->setUpperBound(min);
+#endif
         }
 
         widget->setProperty("Taken", true);
@@ -1829,11 +1834,19 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 // when limits are the same, do nothing
                 if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
                     if(widget->getDirection() == caThermo::Down  || widget->getDirection() == caThermo::Left) {
+ #if QWT_VERSION < 0x060100
                         widget->setMinValue(data.edata.upper_disp_limit);
                         widget->setMaxValue(data.edata.lower_disp_limit);
                     } else {
                         widget->setMaxValue(data.edata.upper_disp_limit);
                         widget->setMinValue(data.edata.lower_disp_limit);
+#else
+                        widget->setLowerBound(data.edata.upper_disp_limit);
+                        widget->setUpperBound(data.edata.lower_disp_limit);
+                    } else {
+                        widget->setUpperBound(data.edata.upper_disp_limit);
+                        widget->setLowerBound(data.edata.lower_disp_limit);
+#endif
                     }
                 }
             }
@@ -2577,7 +2590,7 @@ void CaQtDM_Lib::Callback_RelatedDisplayClicked(int indx)
     QStringList args = w->getArgs().split(";");
     QStringList removeParents = w->getReplaceModes().split(";");
     //qDebug() << "files:" << files;
-    //qDebug() << "args" << args;
+    //qDebug() << "args" <<  w->getArgs() << args;
 
     // find position of this window
     int xpos = this->pos().x();
@@ -2945,14 +2958,24 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         pv[0] = widget->getPV().trimmed();
         if(widget->getLimitsMode() == caThermo::User) {
             limitsMode = true;
+#if QWT_VERSION < 0x060100
             limitsMax = widget->maxValue();
             limitsMin = widget->minValue();
+#else
+            limitsMax = widget->upperBound();
+            limitsMin = widget->lowerBound();
+#endif
         }
         knobData *kPtr = mutexKnobData->getMutexKnobDataPV(pv[0]);
         if(kPtr->edata.lower_disp_limit == kPtr->edata.upper_disp_limit) {
             limitsDefault = true;
+#if QWT_VERSION < 0x060100
             limitsMax = widget->maxValue();
             limitsMin = widget->minValue();
+#else
+            limitsMax = widget->upperBound();
+            limitsMin = widget->lowerBound();
+#endif
         }
         if(widget->getColorMode() == caThermo::Alarm) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
@@ -3765,12 +3788,16 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         const int rowCount = table->rowCount();
         const int columnCount = table->columnCount();
         table->setUpdatesEnabled(false);
+ #if QT_VERSION< QT_VERSION_CHECK(5, 0, 0)
         for(int i = 0; i < rowCount; ++i) {
             for(int j = 0; j < columnCount; ++j) {
                 QTableWidgetItem* selectedItem = table->item(i, j);
                 selectedItem->setFont(f);
             }
         }
+#else
+        printf("caQtDM_Lib -- caTable resizing does not work yet in Qt5\n");
+#endif
         table->verticalHeader()->setDefaultSectionSize((int) (qMin(factX, factY)*20));
         table->setUpdatesEnabled(true);
     }
@@ -3818,20 +3845,19 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         plot->setAxisTitle(QwtPlot::xBottom, titleX);
         plot->setAxisTitle(QwtPlot::yLeft, titleY);
 
+
+        // font size of legends qith qwt 6.0
         if(!className.compare("caStripPlot")) {
             caStripPlot * plot = (caStripPlot *) widget;
             fontSize = qMin(factX, factY) * (double) list.at(7).toInt();
             f.setPointSizeF(fontSize);
             if(plot->getLegendEnabled()) {
-                if(plot->legend() != (QwtLegend*) 0) {
-                    QList<QWidget *> list =  plot->legend()->legendItems();
-                    for (QList<QWidget*>::iterator it = list.begin(); it != list.end(); ++it ) {
-                        QWidget *w = *it;
-                        w->setFont(f);
-                    }
-                }
+                plot->setLegendAttribute(plot->getScaleColor(), f, caStripPlot::FONT);
             }
+        } else {
+            // todo, color and font size of title for cartesian plot
         }
+
     }
 
     // change fonts for next classes, when smaller needed
@@ -3904,6 +3930,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 QwtPlot * plot = (QwtPlot *) widget;
                 integerList.insert(4, plot->axisFont(QwtPlot::xBottom).pointSize());         // label of ticks
                 integerList.insert(6, plot->axisTitle(QwtPlot::xBottom).font().pointSize()); // titles have the same font
+/*
                 if(!className.compare("caStripPlot")) {
                     caStripPlot * plot = (caStripPlot *) widget;
                     integerList.insert(7, 9);
@@ -3915,6 +3942,15 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                         }
                     }
                 }
+*/
+            if(!className.compare("caStripPlot")) {
+                caStripPlot * plot = (caStripPlot *) widget;
+                integerList.insert(7, 9);
+                if(plot->getLegendEnabled()) {
+                    plot->setLegendAttribute(plot->getScaleColor(), QFont("arial", 9), caStripPlot::FONT);
+                }
+            }
+
             }
 
             integerList.insert(5, widget->font().pointSize());
@@ -3927,7 +3963,6 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
     factX = (double) event->size().width() / (double) origWidth;
     factY = (double) event->size().height() / (double) origHeight;
 
-    QObject *object;
     QString className;
 
     bool mainlayoutPresent = false;
@@ -3935,13 +3970,11 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
     if(main == (QObject*) 0) {
         QDialog *dialog = this->findChild<QDialog *>();
         if(dialog == (QObject*) 0) return;  // if not a mainwindow or dialog get out
-        object = dialog;
         if(dialog->layout() != (QObject*) 0) {
             className = dialog->layout()->metaObject()->className();
             mainlayoutPresent = true;
         }
     } else {
-        object = main;
         if( main->centralWidget()->layout() != (QObject*) 0) {
             className = main->centralWidget()->layout()->metaObject()->className();
             mainlayoutPresent = true;

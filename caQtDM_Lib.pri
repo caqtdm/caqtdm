@@ -1,6 +1,16 @@
+include(../caQtDM/qtdefs.pri)
+
 QT       += core gui
 
-CONFIG   += qt warn_on thread uitools designer plugin
+contains(QT_VER_MAJ, 4) {
+   CONFIG   += qt warn_on thread uitools designer plugin
+}
+
+contains(QT_VER_MAJ, 5) {
+    QT     += widgets designer printsupport uitools
+    CONFIG += qt plugin warn_on thread
+    DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
+}
 
 #epics4
 #CONFIG += epics4
