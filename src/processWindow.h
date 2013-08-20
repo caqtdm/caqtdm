@@ -2,11 +2,16 @@
 #define __processWindow_H__
 
 #include <QWidget>
+#include <QDialogButtonBox>
 #include <QTextEdit>
+#include <QPushButton>
 #include <QSplitter>
 #include <QMainWindow>
 #include <QProcess>
 #include <QtGui>
+#include <QVBoxLayout>
+#include <QMessageBox>
+
 #include <caQtDM_Lib_global.h>
 
 

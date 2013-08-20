@@ -2,11 +2,16 @@
  #define limitsCartesianplotDialog_H
 
 #include <QDialog>
+#include <QDialogButtonBox>
+#include <QGridLayout>
 #include <QComboBox>
 #include <QLineEdit>
+#include <QCheckBox>
+#include <QPushButton>
 #include <QList>
 #include <QPair>
 #include <QString>
+#include <QLabel>
 #include "cacartesianplot.h"
 #include "dbrString.h"
 #include "knobDefines.h"

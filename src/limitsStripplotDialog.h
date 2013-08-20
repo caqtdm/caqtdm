@@ -4,7 +4,11 @@
 #include <QDialog>
 #include <QComboBox>
 #include <QLineEdit>
+#include <QGridLayout>
+#include <QDialogButtonBox>
 #include <QList>
+#include <QLabel>
+#include <QPushButton>
 #include <QPair>
 #include <QString>
 #include "castripplot.h"
