@@ -1,4 +1,7 @@
 #!/bin/bash
+#export QTHOME=/usr/local/Trolltech/$EPICS_HOST_ARCH/Qt-5.0.1
+
+
   if [ -z "$QTHOME" ];                then export   QTHOME=/usr;
   fi
   if [ -z "$QWTHOME" ];               then export   QWTHOME=/usr;
