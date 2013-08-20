@@ -66,12 +66,11 @@ int caImage::getFrameCount()
 
 void caImage::timerEvent(QTimerEvent *)
 {
-    bool result;
     if( _animation.isNull()) return;
     if(thisFrame > (_animation->frameCount()-1)) {
         thisFrame=0;
     }
-    result =_animation->jumpToFrame(thisFrame);
+    (void)_animation->jumpToFrame(thisFrame);
     thisFrame++;
 }
 

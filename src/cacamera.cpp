@@ -171,16 +171,14 @@ void caCamera::setMaxLevel(QString const &level) {
 
 bool caCamera::isAlphaMaxLevel()
 {
-    int maximum;
     bool ok;
-    maximum = thisMaxLevel.toInt(&ok);
+    (void) thisMaxLevel.toInt(&ok);
     return !ok;
 }
 bool caCamera::isAlphaMinLevel()
 {
-    int minimum;
     bool ok;
-    minimum = thisMinLevel.toInt(&ok);
+    (void) thisMinLevel.toInt(&ok);
     return !ok;
 }
 
