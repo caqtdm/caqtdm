@@ -115,6 +115,7 @@ EPushButton::ScaleMode caScriptButton::fontScaleMode()
 }
 
 void caScriptButton::changeEvent(QEvent *e) {
+    Q_UNUSED(e);
     setFontScaleMode(thisScaleMode);
 }
 
