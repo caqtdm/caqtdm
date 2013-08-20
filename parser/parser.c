@@ -726,7 +726,6 @@ void parseLimits(DisplayInfo *displayInfo, char *widget, int pen, int DoNotWrite
     int hoprSrc = False;
     int loprSrc = False;
     int precSrc = False;
-    int precDefault = False;
     int hoprDefault = False;
     int loprDefault = False;
 
@@ -762,7 +761,6 @@ void parseLimits(DisplayInfo *displayInfo, char *widget, int pen, int DoNotWrite
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 if(!DoNotWritePrec) Qt_setPrecision(widget, pen, token);
-                precDefault = True;
             }
             break;
         case T_LEFT_BRACE:
@@ -1256,7 +1254,6 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
     int styleFound = False;
     int XrangeFound = False;
     int Y1rangeFound = False;
-    int Y2rangeFound = False;
     int countDone = False;
     int visibilityStatic = 2; // top layer
 
@@ -1371,7 +1368,6 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
                 Y1rangeFound = True;
                 parsePlotAxisDefinition(displayInfo, Y1_AXIS_ELEMENT);
             } else if(!strcmp(token,"y2_axis")) {
-                Y2rangeFound = True;
                 parsePlotAxisDefinition(displayInfo, Y2_AXIS_ELEMENT);
             } else if(!strcmp(token,"trigger")) {
                 getToken(displayInfo,token);
@@ -3641,7 +3637,6 @@ TOKEN parseAndAppendDisplayList(DisplayInfo *displayInfo, FrameOffset *offset, c
     TOKEN tokenType;
     char token[MAX_TOKEN_LENGTH];
     int nestingLevel = 0;
-    static Boolean init = True;
     int first = 1;
     static int veryFirst = True;
     int bclr = 0;
@@ -3684,7 +3679,6 @@ TOKEN parseAndAppendDisplayList(DisplayInfo *displayInfo, FrameOffset *offset, c
             && (tokenType != T_EOF));
 
     /* Reset the init flag */
-    if(tokenType == T_EOF) init = True;
     return tokenType;
 }
 
