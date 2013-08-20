@@ -86,7 +86,6 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
     int nbFormats = 0;
     int actualLine = 0;
     int actualColumn = 0;
-    int lastColumn = 0;
     QString formats[2];
     QString widgetType ="";
     QString widgetText ="";
@@ -303,7 +302,6 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                 actualColumn += span;
                 if(actualColumn > grid-1) {
                     actualColumn = 0;
-                    lastColumn = 0;
                     actualLine++;
                     if(actualLine > MaxLines -1) {
                         printf("parse pep file -- number of lines exceeds the maximum of %d\n", MaxLines);
@@ -471,6 +469,7 @@ void ParsePepFile::replaceStrings(gridInfo &grid)
 
 void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo grid, int spanGrid, int spanColumns, int nbColumns, QByteArray *array)
 {
+    Q_UNUSED(nbColumns);
     QString fontSize = "12";
     QString lineHeight = "20";
     QString newpv = "";
