@@ -12,6 +12,13 @@
 #ifndef DOUBLEWIDGET_H
 #define DOUBLEWIDGET_H
 #include <QtGui>
+#include <QWidget>
+#include <QTabBar>
+#include <QPushButton>
+#include <QButtonGroup>
+#include <QLineEdit>
+#include <QVBoxLayout>
+#include <QStackedWidget>
 
 #include <qtcontrols_global.h>
 

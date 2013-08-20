@@ -13,6 +13,8 @@
 #define CAPOLYLINEDIALOG_H
 
 #include <QDialog>
+#include <QDialogButtonBox>
+#include <QVBoxLayout>
 #include <qtcontrols_global.h>
 
 QT_BEGIN_NAMESPACE

@@ -15,6 +15,7 @@
 #include <QtDesigner/QDesignerTaskMenuExtension>
 #include <QtDesigner/QExtensionFactory>
 #include <qtcontrols_global.h>
+#include <QAction>
 
 QT_BEGIN_NAMESPACE
 class QAction;

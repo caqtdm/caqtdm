@@ -262,6 +262,7 @@ void caDoubleTabWidget::setItemsPadding(QString const &padding) {
 
 void caDoubleTabWidget::setFont(int dir)
 {
+    Q_UNUSED(dir);
     // style for vertical buttons
     QString style;
 #ifdef _MSC_VER
