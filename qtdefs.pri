@@ -1,4 +1,13 @@
-CAQTDM_VERSION = V3.1.4
+CAQTDM_VERSION = V3.2.0
+
+QT_VERSION = $$[QT_VERSION]
+QT_VERSION = $$split(QT_VERSION, ".")
+QT_VER_MAJ = $$member(QT_VERSION, 0)
+QT_VER_MIN = $$member(QT_VERSION, 1)
+
+# new in 3.2.0
+# build mechanism for linux and windows should do on most platforms, see caQtDM_README
+# caQtDM builds for qt4.8 with qwt6.0 and for qt5 with qwt6.1
 
 # new in 3.1.4
 # caled can use now the severity to colorize
@@ -139,10 +148,4 @@ CAQTDM_VERSION = V3.1.4
 # cabitnames, cachoice, cashellcommand : possibility to choose the font and size, buttons will be also separated by 2 pixels
 # in case of static visibility, channels will be ignored.
 
-win32 {
-}
-
-unix {
-# defined by environment variables
-}
 
