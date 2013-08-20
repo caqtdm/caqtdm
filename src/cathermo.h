@@ -13,11 +13,19 @@
 #ifndef CATHERMO_H
 #define CATHERMO_H
 
+#include <qwt_global.h>
+
 #include <qtcontrols_global.h> 
-#include <qwt_thermo_marker.h>
+#if QWT_VERSION < 0x060100
+   #include <qwt_thermo_marker.h>
+#else
+   #include <qwt_thermo_marker_61.h>
+#endif
 
 class QTCON_EXPORT caThermo : public QwtThermoMarker
 {
+    Q_OBJECT
+
     Q_ENUMS(Direction)
     Q_ENUMS(Look)
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
@@ -34,7 +42,6 @@ class QTCON_EXPORT caThermo : public QwtThermoMarker
     Q_PROPERTY(SourceMode limitsMode READ getLimitsMode WRITE setLimitsMode)
     Q_ENUMS(SourceMode)
 
-    Q_OBJECT
 
 public:
 

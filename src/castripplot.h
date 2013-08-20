@@ -28,7 +28,11 @@
 #include <qwt_plot_curve.h>
 #include <qwt_scale_draw.h>
 #include <qwt_legend.h>
-#include <qwt_legend_item.h>
+#if QWT_VERSION >= 0x060100
+  #include <qwt_legend_label.h>
+#else
+  #include <qwt_legend_item.h>
+#endif
 #include <qwt_plot_canvas.h>
 #include <qwt_plot_marker.h>
 #include <QMouseEvent>
@@ -40,6 +44,12 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
 {
 
     Q_OBJECT
+
+#if QWT_VERSION >= 0x060100
+    // suppress theese properties for the designer
+    Q_PROPERTY( QBrush canvasBackground READ canvasBackground WRITE setCanvasBackground DESIGNABLE false)
+    Q_PROPERTY( bool autoReplot READ autoReplot WRITE setAutoReplot DESIGNABLE false)
+#endif
 
     Q_ENUMS(curvStyle)
     Q_ENUMS(axisScaling)
@@ -134,6 +144,8 @@ public:
     enum units { Millisecond = 0, Second, Minute};
     enum xAxisType {TimeScale, ValueScale};
 
+    enum LegendAtttribute { COLOR, FONT, TEXT};
+
     caStripPlot(QWidget * = 0);
     ~caStripPlot();
 
@@ -175,10 +187,14 @@ public:
     curvStyle getStyle(int number) const {return thisStyle[number];}
 
     void setYscalingMax(axisScaling s, int number) {thisYscalingMax[number] = s;}
-    axisScaling getYscalingMax(int number) const {return thisYscalingMax[number];}
+    axisScaling getYscalingMax(int number) const {
+      if(number < MAXCURVES) return thisYscalingMax[number]; else return thisYscalingMax[0];
+    }
 
     void setYscalingMin(axisScaling s, int number) {thisYscalingMin[number] = s;}
-    axisScaling getYscalingMin(int number) const {return thisYscalingMin[number];}
+    axisScaling getYscalingMin(int number) const {
+       if(number < MAXCURVES) return thisYscalingMin[number]; else return thisYscalingMin[0];
+    }
 
     double getYaxisLimitsMin(int number) const {return thisYaxisLimitsMin[number];}
     double getYaxisLimitsMax(int number) const {return thisYaxisLimitsMax[number];}
@@ -348,6 +364,8 @@ public:
     void showCurve(int number, bool on);
     void addText(double x, double y, char* text, QColor c, int fontsize);
     void startPlot();
+
+    void setLegendAttribute(QColor c, QFont f, LegendAtttribute sw);
 
 protected:
     void resizeEvent ( QResizeEvent * event);

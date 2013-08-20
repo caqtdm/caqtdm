@@ -43,7 +43,7 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
 
     installEventFilter(this);
 
-    setHandleSize(10,20);
+    setHandleSize(QSize(10,20));
 
     thisColorMode = Static;
     thisLimitsMode = Channel;
@@ -138,31 +138,60 @@ void caSlider::setAccessW(int access)
 
 void caSlider::setDirection(Direction dir)
 {
+#if QWT_VERSION < 0x060100
     ScalePos scalepos = this->scalePosition();
+#else
+    ScalePosition scalepos = this->scalePosition();
+#endif
     thisDirection = dir;
 
     switch (dir) {
     case Up:
+#if QWT_VERSION < 0x060100
         setScalePosition(QwtSlider::LeftScale);
+#else
+        setScalePosition(QwtSlider::TrailingScale);
+#endif
         setOrientation(Qt::Vertical);
+#if QWT_VERSION < 0x060100
         setRange(thisMinimum, thisMaximum, fmin(1.0,(fabs(thisMaximum- thisMinimum) / 100.0)), 1);
+#endif
         break;
     case Down:
+#if QWT_VERSION < 0x060100
         setScalePosition(QwtSlider::LeftScale);
+#else
+        setScalePosition(QwtSlider::LeadingScale);
+#endif
         setOrientation(Qt::Vertical);
+#if QWT_VERSION < 0x060100
         if(thisMaximum > thisMinimum) setRange(thisMaximum, thisMinimum ,  fmin(1.0,(fabs(thisMaximum- thisMinimum) / 100.0)), 1);
         else setRange(thisMinimum, thisMaximum , fmin(1.0,(fabs(thisMaximum- thisMinimum) / 100.0)), 1);
+#endif
         break;
     case Left:
+
+#if QWT_VERSION < 0x060100
         setScalePosition(QwtSlider::BottomScale);
+#else
+        setScalePosition(QwtSlider::TrailingScale);
+#endif
         setOrientation(Qt::Horizontal);
+ #if QWT_VERSION < 0x060100
         if(thisMaximum > thisMinimum) setRange(thisMaximum, thisMinimum , fmin(1.0,(fabs(thisMaximum- thisMinimum) / 100.0)), 1);
         else setRange(thisMinimum, thisMaximum , fmin(1.0,(fabs(thisMaximum- thisMinimum) / 100.0)), 1);
+#endif
         break;
     case Right:
+ #if QWT_VERSION < 0x060100
         setScalePosition(QwtSlider::BottomScale);
+#else
+        setScalePosition(QwtSlider::LeadingScale);
+#endif
         setOrientation(Qt::Horizontal);
+#if QWT_VERSION < 0x060100
         setRange(thisMinimum, thisMaximum, fmin(1.0,(fabs(thisMaximum- thisMinimum) / 100.0)), 1);
+#endif
         break;
     }
     setScalePosition(scalepos);
@@ -213,7 +242,8 @@ void caSlider::setAlarmColors(short status)
 
 void caSlider::setUserAlarmColors(double val)
 {
-     if((val< this->minValue()) || (val > this->maxValue())) {
+//     if((val< this->minValue()) || (val > this->maxValue())) {
+   if((val< thisMinimum) || (val > thisMaximum)) {
         setColors(thisBackColor, QColor(Qt::red));
      } else {
         setColors(thisBackColor, QColor(Qt::green));

@@ -46,9 +46,15 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     enableAxis(yLeft, true);
 
     // canvas
-    canvas()->setLineWidth(2);
-    canvas()->setFrameStyle(QFrame::Box | QFrame::Plain);
-    //canvas()->setBorderRadius(5);
+
+#if QWT_VERSION < 0x060100
+    //canvas()->setLineWidth(2);
+    //canvas()->setFrameStyle(QFrame::Box | QFrame::Plain);
+#else
+   QwtPlotCanvas *canvas =  (QwtPlotCanvas *) this->canvas();
+    //canvas->setLineWidth(2);
+    //canvas->setFrameStyle(QFrame::Box | QFrame::Plain);
+#endif
 
     // curves
     for(int i=0; i < curveCount; i++) {
@@ -87,10 +93,17 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     setAxisFont(QwtPlot::yLeft, QFont("Arial", 10));
 
     // this allows to have a transparent widget
+#if QWT_VERSION < 0x060100
     canvas()->setPaintAttribute(QwtPlotCanvas::BackingStore, false);
     canvas()->setPaintAttribute(QwtPlotCanvas::Opaque, false);
     canvas()->setAttribute( Qt::WA_OpaquePaintEvent, false );
     canvas()->setAutoFillBackground( false );   // use in ui file this parameter for transparency
+#else
+    canvas->setPaintAttribute(QwtPlotCanvas::BackingStore, false);
+    canvas->setPaintAttribute(QwtPlotCanvas::Opaque, false);
+    canvas->setAttribute( Qt::WA_OpaquePaintEvent, false );
+    canvas->setAutoFillBackground( false );   // use in ui file this parameter for transparency
+#endif
 
     installEventFilter(this);
 }
@@ -623,8 +636,13 @@ int caCartesianPlot::getYLimits(double &minY, double &maxY)
 
 void caCartesianPlot::setScaleXlimits(double value, int maxormin)
 {
+ #if QWT_VERSION < 0x060100
    double minX = axisScaleDiv(xBottom)->lowerBound();
    double maxX = axisScaleDiv(xBottom)->upperBound();
+#else
+   double minX = axisScaleDiv(xBottom).lowerBound();
+   double maxX = axisScaleDiv(xBottom).upperBound();
+#endif
    if(maxormin == 0) {
      setAxisScale(xBottom, value, maxX);
    } else {
@@ -635,8 +653,13 @@ void caCartesianPlot::setScaleXlimits(double value, int maxormin)
 
 void caCartesianPlot::setScaleYlimits(double value, int maxormin)
 {
+ #if QWT_VERSION < 0x060100
    double minX = axisScaleDiv(yLeft)->lowerBound();
    double maxX = axisScaleDiv(yLeft)->upperBound();
+#else
+    double minX = axisScaleDiv(yLeft).lowerBound();
+    double maxX = axisScaleDiv(yLeft).upperBound();
+#endif
    if(maxormin == 0) {
      setAxisScale(yLeft, value, maxX);
    } else {

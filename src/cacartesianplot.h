@@ -26,6 +26,12 @@ class QTCON_EXPORT caCartesianPlot : public QwtPlot
 {
     Q_OBJECT
 
+#if QWT_VERSION >= 0x060100
+    // suppress theese properties for the designer
+    Q_PROPERTY( QBrush canvasBackground READ canvasBackground WRITE setCanvasBackground DESIGNABLE false)
+    Q_PROPERTY( bool autoReplot READ autoReplot WRITE setAutoReplot DESIGNABLE false)
+#endif
+
     Q_ENUMS(curvSymbol)
     Q_ENUMS(curvStyle)
     Q_ENUMS(axisScaling)

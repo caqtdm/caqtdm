@@ -45,8 +45,6 @@ caStripPlot::~caStripPlot(){
 
 caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
 {
-    canvas()->setAttribute(Qt::WA_PaintOnScreen, true);
-
     timerID = false;
     thisXaxisType = TimeScale;
     HISTORY = 60;
@@ -64,6 +62,7 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     // define a grid
     plotGrid = new QwtPlotGrid();
     plotGrid->attach(this);
+
 
     plotLayout()->setAlignCanvasToScales(true);
 
@@ -135,6 +134,7 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
 
     Timer = new QTimer(this);
     connect(Timer, SIGNAL(timeout()), this, SLOT(TimeOut()));
+
 }
 
 void caStripPlot::defineAxis(units unit, double period)
@@ -173,8 +173,6 @@ void caStripPlot::setAxis(double interval, double period)
 
 void caStripPlot::RescaleCurves(int width, units unit, double period)
 {
-
-    //printf("redefine curves with width= %d\n", width);
     HISTORY = width; // equals canvas width
 
     if(unit == Millisecond) {
@@ -263,7 +261,6 @@ QString caStripPlot::legendText(int i)
 void caStripPlot::defineCurves(QStringList titres, units unit, double period, int width, int nbCurves)
 {
     int min, max;
-
     NumberOfCurves = nbCurves;
     Unit = unit;
     Period = period;
@@ -320,19 +317,11 @@ void caStripPlot::defineCurves(QStringList titres, units unit, double period, in
 
     // draw legend
     if(thisLegendshow) {
-        QwtLegend *legend = new QwtLegend;
-        insertLegend(legend, QwtPlot::BottomLegend);
+        QwtLegend *lgd = new QwtLegend;
+        insertLegend(lgd, QwtPlot::BottomLegend);
 
         // set color on legend texts
-        QList<QWidget *> list = legend->legendItems();
-        for (QList<QWidget*>::iterator it = list.begin(); it != list.end(); ++it ) {
-            QWidget *w = *it;
-            QPalette palette = w->palette();
-            palette.setColor( QPalette::WindowText, thisScaleColor); // for ticks
-            palette.setColor( QPalette::Text, thisScaleColor);       // for ticks' labels
-            w->setPalette (palette);
-            w->setFont(QFont("Arial", 9));
-        }
+        setLegendAttribute(thisScaleColor, QFont("arial",9), COLOR);
     }
     RescaleCurves(width, unit, period);
 }
@@ -526,7 +515,12 @@ void caStripPlot::TimeOut()
         if(thisXaxisType == TimeScale) {
             replot();
         } else {
-            this->canvas()->replot();
+#if QWT_VERSION >= 0x060100
+            QwtPlotCanvas *canvas =  (QwtPlotCanvas *) this->canvas();
+            canvas->replot();
+#else
+            canvas()->replot();
+#endif
         }
         timerCount=0;
     }
@@ -545,14 +539,114 @@ void caStripPlot::setYscale(double ymin, double ymax) {
 
 void caStripPlot::RescaleAxis()
 {
-    for(int i=0; i < NumberOfCurves; i++) {
-      setData(realVal[i], i);
-      if(thisLegendshow) {
-        QwtText text;
-        text.setText(legendText(i));
-        qobject_cast<QwtLegendItem*>(this->legend()->find(curve[i]))->setText(text);
-      }
+    int i;
+    // recale axis
+    for(i=0; i < NumberOfCurves; i++) {
+        setData(realVal[i], i);
     }
+
+    // redraw legened if any
+    setLegendAttribute(thisScaleColor, QFont("arial", 9), TEXT);
+}
+
+void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
+{
+    int i;
+
+#if QWT_VERSION < 0x060100
+    for(i=0; i < NumberOfCurves; i++) {
+
+        switch (SW) {
+        case TEXT:
+            if(thisLegendshow) {
+                QwtText text;
+                text.setText(legendText(i));
+                qobject_cast<QwtLegendItem*>(this->legend()->find(curve[i]))->setText(text);
+
+            }
+            break;
+
+        case FONT:
+
+            if(getLegendEnabled()) {
+                if(legend() != (QwtLegend*) 0) {
+                    QList<QWidget *> list =  legend()->legendItems();
+                    for (QList<QWidget*>::iterator it = list.begin(); it != list.end(); ++it ) {
+                        QWidget *w = *it;
+                        w->setFont(f);
+                    }
+                }
+            }
+            break;
+
+        case COLOR:
+            if(legend() != (QwtLegend*) 0) {
+                QList<QWidget *> list =  legend()->legendItems();
+                for (QList<QWidget*>::iterator it = list.begin(); it != list.end(); ++it ) {
+                    QWidget *w = *it;
+                    QPalette palette = w->palette();
+                    palette.setColor( QPalette::WindowText, c); // for ticks
+                    palette.setColor( QPalette::Text, c);       // for ticks' labels
+                    w->setPalette (palette);
+                    w->setFont(f);
+                }
+            }
+
+            break;
+        }
+
+    }
+#else
+    i=0;
+    foreach (QwtPlotItem *plt_item, itemList()) {
+        if ( plt_item->rtti() == QwtPlotItem::Rtti_PlotCurve ) {
+            QwtLegend *lgd = qobject_cast<QwtLegend *>(legend());
+            QList<QWidget *> legendWidgets = lgd->legendWidgets(itemToInfo(plt_item));
+            if ( legendWidgets.size() == 1 ) {
+                QwtLegendLabel *b = qobject_cast<QwtLegendLabel *>(legendWidgets[0]);
+                switch (SW) {
+
+                case TEXT:
+
+                    if(thisLegendshow) {
+
+                        QwtText text;
+                        text.setText(legendText(i++));
+                        //printf("%s %s\n", b->plainText().toAscii().constData(), legendText(i-1).toAscii().constData());
+                        b->setText(text);
+                        b->update();
+
+
+                    }
+                    break;
+
+                case FONT:
+                    //printf("%s %s\n", b->plainText().toAscii().constData(), legendText(i-1).toAscii().constData());
+
+                    b->setFont(f);
+                    b->update();
+
+                    break;
+
+                case COLOR:
+
+                    //printf("%s %s\n", b->plainText().toAscii().constData(), legendText(i-1).toAscii().constData());
+                    QPalette palette = b->palette();
+                    palette.setColor( QPalette::WindowText, c); // for ticks
+                    palette.setColor( QPalette::Text, c);       // for ticks' labels
+                    b->setPalette(palette);
+                    b->update();
+
+                    break;
+
+                }
+
+
+            }
+        }
+    }
+#endif
+
 }
 
 void caStripPlot::setData(double Y, int curvIndex)
@@ -698,8 +792,7 @@ void caStripPlot::setScaleColor(QColor c)
     palette.setColor( QPalette::Text, c);       // for ticks' labels
     scaleX->setPalette( palette);
     scaleY->setPalette (palette);
-
-    titleLabel()->setPalette (palette);
+    titleLabel()->setPalette(palette);
 }
 
 void caStripPlot::setColor(QColor c, int number)
