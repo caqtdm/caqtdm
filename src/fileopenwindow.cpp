@@ -245,9 +245,6 @@ void FileOpenWindow::Callback_OpenButton()
         QFileInfo fi(fileName);
         lastFilePath = fi.absolutePath();
         if(fi.exists()) {
-
-            // QMainWindow *mainWindow = new CaQtDM_Lib(this, fileName, "", mutexKnobData, messageWindow);
-
             CaQtDM_Lib *newWindow = new CaQtDM_Lib(this, fileName, "", mutexKnobData, messageWindow);
             newWindow->allowResizing(allowResize);
             QMainWindow *mainWindow = newWindow;
