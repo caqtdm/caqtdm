@@ -3,8 +3,14 @@ include(../../caQtDM/qtdefs.pri)
 DEFINES += QT_NO_DEBUG_OUTPUT
 CONFIG += release
 
-CONFIG += designer plugin 
-CONFIG	+= qt thread warn_on
+contains(QT_VER_MAJ, 4) {
+   CONFIG += designer plugin qt thread warn_on
+}
+
+contains(QT_VER_MAJ, 5) {
+   CONFIG += plugin qt thread warn_on
+   QT += designer widgets
+}
 
 TEMPLATE = lib
 

@@ -298,5 +298,7 @@ QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface::customWi
 {
     return d_plugins;
 }
-
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) 
+#else
 Q_EXPORT_PLUGIN2(QtControls, CustomWidgetCollectionInterface)
+#endif

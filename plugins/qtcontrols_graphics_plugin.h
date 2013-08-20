@@ -50,6 +50,9 @@ class CustomWidgetCollectionInterface: public QObject, public QDesignerCustomWid
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetCollectionInterface)
+#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)   
+    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QDesignerCustomWidgetInterface")  
+#endif 
 
 public:
     CustomWidgetCollectionInterface(QObject *parent = NULL);
