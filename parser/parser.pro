@@ -1,4 +1,10 @@
 include(../qtdefs.pri)
+
+contains(QT_VER_MAJ, 5) {
+  QT       += widgets
+  DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
+}
+
 TEMPLATE = app
 INCLUDEPATH += .
 
