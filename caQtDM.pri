@@ -1,7 +1,14 @@
 include(qtdefs.pri)
 
-QT       += core gui svg
-CONFIG      += qt warn_on thread uitools
+contains(QT_VER_MAJ, 4) {
+   QT     += core gui svg 
+   CONFIG += qt warn_on thread uitools
+}
+contains(QT_VER_MAJ, 5) {
+   QT     += core gui svg uitools  printsupport
+   CONFIG += qt warn_on thread widgets
+   DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000 
+}   
 
 unix: {
   CONFIG += x11
@@ -32,5 +39,3 @@ win32{
 DEFINES += BUILDVERSION=\\\"$${CAQTDM_VERSION}\\\"
 DEFINES += BUILDARCH=\\\"$$(QMAKESPEC)\\\"
 
-RESOURCES += src/caQtDM.qrc
-RC_FILE = src/caQtDM.rc
