@@ -2,7 +2,14 @@ include(../caQtDM/qtdefs.pri)
 
 DEFINES += QT_NO_DEBUG_OUTPUT
 
-CONFIG += uitools qwt plugin designer warn_on
+contains(QT_VER_MAJ, 4) {
+  CONFIG += uitools qwt plugin designer warn_on
+}
+contains(QT_VER_MAJ, 5) {
+  QT      += widgets designer uitools
+  CONFIG  += qwt plugin warn_on
+  DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
+}
 
 TARGET = qtcontrols
 TEMPLATE = lib
@@ -83,7 +90,6 @@ SOURCES	+= \
     src/egauge.cpp \
     src/eng_notation.cpp \
     src/cathermo.cpp \
-    src/qwt_thermo_marker.cpp\
     src/caslider.cpp \
     src/cacartesianplot.cpp \
     src/castripplot.cpp \
@@ -98,6 +104,17 @@ SOURCES	+= \
     src/cadoubletabwidget.cpp \
     src/cadoubletabwidgetextension.cpp \
     src/cadoubletabwidgetextensionfactory.cpp
+
+# assume qwt6.0 was made with qt4
+contains(QT_VER_MAJ, 4) {
+    warning("Qt $$[QT_VERSION] was detected, so compile qwt_thermo_marker")
+    SOURCES	+= src/qwt_thermo_marker.cpp
+}
+#assume qwt6.0 was made with qt5
+contains(QT_VER_MAJ, 5) {
+    warning("Qt $$[QT_VERSION] was detected, so compile qwt_thermo_marker_61")
+    SOURCES	+= src/qwt_thermo_marker_61.cpp
+}
 
 HEADERS	+= \
     src/caframe.h \
@@ -139,7 +156,6 @@ HEADERS	+= \
     src/egauge.h \
     src/eng_notation.h \
     src/cathermo.h \
-    src/qwt_thermo_marker.h\
     src/caslider.h \
     src/castripplot.h \
     src/cacartesianplot.h \
@@ -156,5 +172,17 @@ HEADERS	+= \
     src/cadoubletabwidget.h \
     src/cadoubletabwidgetextension.h \
     src/cadoubletabwidgetextensionfactory.h
+
+
+# assume qwt6.0 was made with qt4
+contains(QT_VER_MAJ, 4) {
+    warning("Qt $$[QT_VERSION] was detected, so compile qwt_thermo_marker")
+    HEADERS	+= src/qwt_thermo_marker.h
+}
+#assume qwt6.0 was made with qt5
+contains(QT_VER_MAJ, 5) {
+    warning("Qt $$[QT_VERSION] was detected, so compile qwt_thermo_marker_61")
+    HEADERS	+= src/qwt_thermo_marker_61.h
+}
 
 OTHER_FILES += README
