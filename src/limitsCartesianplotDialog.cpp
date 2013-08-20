@@ -5,7 +5,6 @@
 limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKnobData *data, const QString &title, QWidget *parent) : QDialog(parent)
 {
     bool ok1, ok2;
-    double minX, maxX, minY, maxY;
     QString xmin, xmax,  ymin, ymax;
     QStringList list;
     CartesianPlot = w;
@@ -87,9 +86,9 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
     // when one of the limits is given by a channel, we do not allow to change anything
 
     xmin = xminLineEdit->text().trimmed();
-    minX = xmin.toDouble(&ok1);
+    (void) xmin.toDouble(&ok1);
     xmax = xmaxLineEdit->text().trimmed();
-    maxX = xmax.toDouble(&ok2);
+    (void) xmax.toDouble(&ok2);
     if((!ok1 || !ok2) && (CartesianPlot->getXscaling() == caCartesianPlot::Channel)) {
         qDebug() << "not valid values, probably channels";
         xComboBox->setEnabled(false);
@@ -97,9 +96,9 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
         xmaxLineEdit->setEnabled(false);
     }
     ymin = yminLineEdit->text();
-    minY = ymin.toDouble(&ok1);
+    (void) ymin.toDouble(&ok1);
     ymax = ymaxLineEdit->text();
-    maxY = ymax.toDouble(&ok2);
+    (void) ymax.toDouble(&ok2);
     if((!ok1 || !ok2) && (CartesianPlot->getYscaling() == caCartesianPlot::Channel)) {
         qDebug() << "not valid values, probably channels";
         yComboBox->setEnabled(false);
@@ -120,7 +119,6 @@ void limitsCartesianplotDialog::cancelClicked()
 void limitsCartesianplotDialog::applyClicked()
 {
     bool ok1, ok2;
-    double minX, maxX, minY, maxY;
     QString xLimits, yLimits;
     QString xmin, xmax,  ymin, ymax;
     QStringList list;
@@ -128,9 +126,9 @@ void limitsCartesianplotDialog::applyClicked()
     int indy = yComboBox->currentIndex();
 
     xmin = xminLineEdit->text().trimmed();
-    minX = xmin.toDouble(&ok1);
+    (void) xmin.toDouble(&ok1);
     xmax = xmaxLineEdit->text().trimmed();
-    maxX = xmax.toDouble(&ok2);
+    (void) xmax.toDouble(&ok2);
     if(ok1 && ok2) {
         xLimits = xmin; xLimits.append(";"); xLimits.append(xmax);
     } else {
@@ -141,9 +139,9 @@ void limitsCartesianplotDialog::applyClicked()
     }
 
     ymin = yminLineEdit->text();
-    minY = ymin.toDouble(&ok1);
+    (void) ymin.toDouble(&ok1);
     ymax = ymaxLineEdit->text();
-    maxY = ymax.toDouble(&ok2);
+    (void) ymax.toDouble(&ok2);
     if(ok1 && ok2) {
         yLimits = ymin; yLimits.append(";"); yLimits.append(ymax);
     } else {
