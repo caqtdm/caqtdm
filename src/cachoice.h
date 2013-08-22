@@ -90,6 +90,8 @@ public:
      void setFontScaleMode(EPushButton::ScaleMode m);
      EPushButton::ScaleMode fontScaleMode();
 
+     void updateChoice();
+
 protected:
 
     void arrangeCells(QStringList list, int indx);
@@ -108,7 +110,7 @@ private:
     bool         thisAccessW;
     bool eventFilter(QObject *obj, QEvent *event);
     QSignalMapper *signalMapper;
-    QStringList   texts, labels;
+    QStringList   texts, labels, lastLabels;
     QList<EPushButton*> cells;
     int         thisStartBit;
     int         thisEndBit;
@@ -121,6 +123,7 @@ private:
     alignmentHor thisAlignment, oldAlignment;
     EPushButton::ScaleMode thisScaleMode;
 
+    int lastValue;
 };
 
 #endif  /* CACHOICE */

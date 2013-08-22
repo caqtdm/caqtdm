@@ -99,11 +99,17 @@ void caChoice::arrangeCells(QStringList list, int indx)
         temp->setBotTopBorderWidth(0);
         temp->setObjectName(texts[i + thisStartBit]);
 
+        QString style("");
+        temp->setCheckable(true);
         // mark activ button
         if(i==indx) {
-            temp->setStyleSheet("* {border-style: solid; border-width: 1px 3px 1px 3px; padding:0px 1px 0px 1px; margin:0px;}");
+            style.append("* {border-style: solid; border-width: 1px 3px 1px 3px; padding:0px 1px 0px 1px; margin:0px;}");
+            temp->setStyleSheet(style);
+            temp->setChecked(true);
         } else {
-            temp->setStyleSheet("* {border-style: solid; border-width: 0px; padding:1px 4px 1px 4px; margin:0px;}");
+            style.append("* {border-style: solid; border-width: 0px; padding:1px 4px 1px 4px; margin:0px;}");
+            temp->setStyleSheet(style);
+            temp->setChecked(false);
         }
         // take care of stacking
         if(thisStacking == Row) {
@@ -126,6 +132,7 @@ void caChoice::arrangeCells(QStringList list, int indx)
         connect(temp, SIGNAL(clicked()), signalMapper, SLOT(map()));
     }
 
+    lastValue = indx;
     connect(signalMapper, SIGNAL(mapped(QString)),this, SIGNAL(clicked(QString)));
 }
 
@@ -156,28 +163,32 @@ void caChoice::setColors(QColor back, QColor fore, QColor border, alignmentHor a
         return;
     }
 
-    if((back != oldBackColor) || fore != oldForeColor || border != oldBorderColor || alignment != oldAlignment || oldColorMode != thisColorMode) {
-
+    if((back != oldBackColor) || fore != oldForeColor || border != oldBorderColor || alignment != oldAlignment || oldColorMode != thisColorMode)
+    {
         QColor baseColor(back);
         QColor highlightColor(back);
         QColor shadowColor1(back);
         QColor shadowColor2(back);
-        highlightColor.setHsv(baseColor.hue(), baseColor.saturation(), (int) (baseColor.value() * 0.9));
+        QColor activColor(baseColor);
+        highlightColor.setHsv(baseColor.hue(), baseColor.saturation(), (int) (baseColor.value() ));
         shadowColor1.setHsv(baseColor.hue(), (int) (baseColor.saturation() * 0.6), (int) (baseColor.value() ));
         shadowColor2.setHsv((int) (baseColor.hue()*0.7), (int) (baseColor.saturation() * 0.7), (int) (baseColor.value() * 0.7));
 
+        activColor.setHsv(baseColor.hue(), baseColor.saturation(), (int) qMin((int)(baseColor.value() * 1.2), 255) );
 
-        QString background =  "border-radius: 2px;padding: 3px; border-width: 1px; ";
+        QString background =  "";
         background.append("background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, ");
         background.append("stop:0   rgba(%1, %2, %3, 255), ");
         background.append("stop:0.4 rgba(%4, %5, %6, 255), ");
         background.append("stop:0.6 rgba(%7, %8, %9, 255), ");
-        background.append("stop:1   rgba(%10, %11, %12, 255))");
+        background.append("stop:1   rgba(%10, %11, %12, 255)); ");
 
         background = background.arg(shadowColor1.red()).arg(shadowColor1.green()).arg(shadowColor1.blue())
                 .arg(baseColor.red()).arg(baseColor.green()).arg(baseColor.blue())
                 .arg(baseColor.red()).arg(baseColor.green()).arg(baseColor.blue())
                 .arg(shadowColor2.red()).arg(shadowColor2.green()).arg(shadowColor2.blue());
+
+        background.append("border-radius: 2px;padding: 3px; border-width: 1px;");
 
         QString foreground = "; color: rgb(%1, %2, %3); ";
         foreground = foreground.arg(fore.red()).arg(fore.green()).arg(fore.blue());
@@ -205,6 +216,14 @@ void caChoice::setColors(QColor back, QColor fore, QColor border, alignmentHor a
         QString hover = "QPushButton:hover {background-color: rgb(%1, %2, %3, %4);} ";
         hover = hover.arg(highlightColor.red()).arg(highlightColor.green()).arg(highlightColor.blue()).arg(255);
         style.append(hover);
+
+        QString activ = "QPushButton:checked {background-color: rgb(%1, %2, %3, %4);} ";
+        activ = activ.arg(activColor.red()).arg(activColor.green()).arg(activColor.blue()).arg(255);
+        style.append(activ);
+
+        QString hoveractiv =  "QPushButton:checked:hover {background-color: rgb(%1, %2, %3, %4);} ";
+        hoveractiv = hoveractiv.arg(highlightColor.red()).arg(highlightColor.green()).arg(highlightColor.blue()).arg(255);
+        style.append(hoveractiv);
 
         QString disabled("QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, ");
         disabled.append("stop:0   rgba(%1, %2, %3, 255), ");
@@ -289,6 +308,26 @@ void caChoice::setStacking(Stacking stacking)
 {
     thisStacking = stacking;
     populateCells(labels, -1);
+}
+
+void caChoice::updateChoice()
+{
+
+    int i = 0;
+    foreach(EPushButton *temp, cells) {
+        QString style("");
+        // mark activ button
+        if(i==lastValue) {
+            style.append("* {border-style: inset; border-width: 1px 3px 1px 3px; padding:0px 1px 0px 1px; margin:0px;}");
+            temp->setStyleSheet(style);
+            temp->setChecked(true);
+        } else {
+            style.append("* {border-style: solid; border-width: 0px; padding:1px 4px 1px 4px; margin:0px;}");
+            temp->setStyleSheet(style);
+            temp->setChecked(false);
+        }
+        i++;
+     }
 }
 
 void caChoice::populateCells(QStringList list, int indx)
