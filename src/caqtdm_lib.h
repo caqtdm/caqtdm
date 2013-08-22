@@ -111,6 +111,7 @@ public:
 #if QT_VERSION< QT_VERSION_CHECK(5, 0, 0)
         printer->setOutputFormat(QPrinter::PostScriptFormat);
 #else
+        printer->setOutputFormat(QPrinter::NativeFormat);
         printf("caQtDM_Lib -- seems that postscript is not supoorted any more in Qt5\n");
 #endif
         printer->setResolution(300);
