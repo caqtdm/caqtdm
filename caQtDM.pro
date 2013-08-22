@@ -26,6 +26,7 @@ win32 {
 	
 	OTHER_FILES += ./src/caQtDM.ico
 	DEFINES +=_CRT_SECURE_NO_WARNINGS
+	RESOURCES += ../src/caQtDM.qrc
 	
 	win32-msvc* {
 		DebugBuild {
