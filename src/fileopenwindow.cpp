@@ -298,6 +298,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     QList<QWidget *> all = this->findChildren<QWidget *>();
     foreach(QWidget* widget, all) {
         if(QMainWindow* w = qobject_cast<QMainWindow *>(widget)) {
+            //qDebug() << w;
             QString WindowProperty = "";
             // if already exists then yust pop it up
             QFile *file = new QFile;
@@ -316,7 +317,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
             if(!macroString.isNull()) {
                 WindowProperty.append(macroString.toString());
             }
-
+            //qDebug() << title << WindowProperty;
             if(QString::compare(WindowProperty, title) == 0) {
                 w->activateWindow();
                 w->raise();
