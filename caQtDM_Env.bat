@@ -6,7 +6,7 @@
   IF "%EPICS_BASE%"==""      set EPICS_BASE=C:/epics/base-3.14.12.2
   IF "%EPICSINCLUDE%"==""    set EPICSINCLUDE=C:/epics/base-3.14.12.2/include
   IF "%EPICSEXTENSIONS%"=="" set EPICSEXTENSIONS=C:/Qt/4.8.2
-  IF "%QTCONTROLS_LIBS%"=="" set QTCONTROLS_LIBS=C:/qt/4.8.2/src/caQtDM_QtControls
+  IF "%QTCONTROLS_LIBS%"=="" set QTCONTROLS_LIBS=C:/Qt/caqtdm/caQtDM_QtControls
   
   set QTBASE=%QTCONTROLS_LIBS%
   
