@@ -1,5 +1,18 @@
 Instructions for installing and running caQtDM on linux
 
+Requirements:
+	1) Qt 4.8.2
+	2) Qwt 6.0.1
+	3) EPICS 3.12.2
+	4) Designer
+	
+or
+
+	1) Qt 5.1
+	2) Qwt 6.1.0
+	3) EPICS 3.12.2
+	4) Designer
+
 1. what is caQTDM: caQtDM offers a collection of special widgets in order to display and control control system data in various ways. The widgets have been inspired from the well known MEDM package used
 at many EPICS sites. However caQtDM is not restricted to EPICS and can/could also support other control systems. At PSI caQtDM is used at several facilities and controls not only EPICS, but also simultanuously 
 an older house-made system. Moreover support has already been introduced for EPICS4, but is still in development.
@@ -16,10 +29,14 @@ an older house-made system. Moreover support has already been introduced for EPI
   
   4. the script caQtDM_BuildAll will build you the package now into the directory ./caQtDM_Binaries. You should obtain there adl2ui, caQtDM, libqtcontrols.so and libcaQtDM_Lib.so as well as a designer directory containing 3 files libqtcontrols*_plugin.so. if you encounter a problem when building due to some environment variable problem or while not everything was installed before, you may correct your problem and run the script again. In case you want to cleanup you use the script caQtDM_CleanAll, which will also delete the resulting binaries.
   
-  5. you may try to install the package: the package should normally installed in the EPICS extensions and the environment variables are pointing to them.
+  5. you may try to install the package: the package should normally be installed in the EPICS extensions and the environment variables are pointing to them.
   
 4. running caQtDM: when the package has been successfully build into the directory ./caQtDM_Binaries, you can start caQtDM by using the script startDM_Local
 and the qt4-designer by the script qtdesigner (all located in the main directory where you expanded the tar file). These scripts will set some important environment variables in order to set the path, the plugin_path and to point to the test directory provided with the package (./caQtDM_Tests). In this directory also the stylesheets are located to be used for a nice rendering. You may call the test.ui file with the above mentioned scripts. In order to test the display some EPICS channels have to be defined. This can be done by running a soft-ioc shell called with run-epics also provided in the test directory.
+
+5. in case you have qwt 6.1 you will have to use in caQtDM_QtControls/src the files qwt_thermo_marker_61.* instead of qwt_thermo_marker.*
+
+6. in case you already use Qt5.1 with qwt6.1 the building should also be straight forward.
 
 good luck and enjoy
 
@@ -40,5 +57,5 @@ With caQtDM_Env.bat you can configure your system. All setting which are needed 
 
 The building can be started with the batchfile 	: caQtDM_BuildAll.bat
 The packaging is made with the batch file 	: caQtDM_Build_Package.bat
-This will gernerate a MSI installation file in the folder of caQtDM_Binaries.
-To clean the Folder you shuold use caQtDM_CleanAll.bat.
+This will generate a MSI installation file in the folder of caQtDM_Binaries.
+To clean the Folder you should use caQtDM_CleanAll.bat.
