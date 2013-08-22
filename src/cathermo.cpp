@@ -118,53 +118,47 @@ void caThermo::setValue(double val)
 void caThermo::setDirection(Direction dir)
 {
     thisDirection = dir;
-#if QWT_VERSION < 0x060100
+
     switch (dir) {
     case Up:
     case Down:
         if(thisScale) {
             setScalePosition(LeftScale);
+#if QWT_VERSION < 0x060100
             setOrientation(Qt::Vertical, LeftScale);
+#else
+            setOrientation(Qt::Vertical);
+#endif
         } else {
+
             setScalePosition(NoScale);
+#if QWT_VERSION < 0x060100
             setOrientation(Qt::Vertical, NoScale);
+#else
+            setOrientation(Qt::Vertical);
+#endif
         }
         break;
     case Left:
     case Right:
         if(thisScale) {
             setScalePosition(BottomScale);
+#if QWT_VERSION < 0x060100
             setOrientation(Qt::Horizontal, BottomScale);
+#else
+            setOrientation(Qt::Horizontal);
+#endif
         } else {
             setScalePosition(NoScale);
+#if QWT_VERSION < 0x060100
             setOrientation(Qt::Horizontal, NoScale);
-        }
-        break;
-    }
 #else
-    switch (dir) {
-    case Down:
-    case Up:
-        if(thisScale) {
-            setScalePosition(QwtThermoMarker::TrailingScale);
-            setOrientation(Qt::Vertical);
-        } else {
-            setScalePosition(QwtThermoMarker::NoScale);
-            setOrientation(Qt::Vertical);
-        }
-        break;
-    case Left:
-    case Right:
-        if(thisScale) {
-            setScalePosition(QwtThermoMarker::TrailingScale);
             setOrientation(Qt::Horizontal);
-        } else {
-            setScalePosition(QwtThermoMarker::NoScale);
-            setOrientation(Qt::Horizontal);
+#endif
         }
         break;
     }
-#endif
+
     update();
 }
 
@@ -215,11 +209,7 @@ void caThermo::setUserAlarmColors(double val)
     switch (thisDirection) {
     case Up:
     case Right:
-#if QWT_VERSION < 0x060100
         if((thisValue < this->minValue()) || (thisValue > this->maxValue())) {
-#else
-        if((thisValue < this->lowerBound()) || (thisValue > this->upperBound())) {
-#endif
            setColors(thisBackColor, AL_RED);
         } else {
            setColors(thisBackColor, AL_GREEN);
@@ -227,11 +217,7 @@ void caThermo::setUserAlarmColors(double val)
         break;
     case Down:
     case Left:
-#if QWT_VERSION < 0x060100
         if((thisValue < this->maxValue()) || (thisValue > this->minValue())) {
-#else
-        if((thisValue < this->upperBound()) || (thisValue > this->lowerBound())) {
-#endif
            setColors(thisBackColor, AL_RED);
         } else {
            setColors(thisBackColor, AL_GREEN);
