@@ -827,17 +827,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         // for an opposite direction, invert maximum and minimum
 
         if(widget->getDirection() == caThermo::Down || widget->getDirection() == caThermo::Left) {
-#if QWT_VERSION < 0x060100
             double max = widget->maxValue();
             double min = widget->minValue();
             widget->setMinValue(max);
             widget->setMaxValue(min);
-#else
-            double max = widget->upperBound();
-            double min = widget->lowerBound();
-            widget->setLowerBound(max);
-            widget->setUpperBound(min);
-#endif
         }
 
         widget->setProperty("Taken", true);
@@ -1834,19 +1827,11 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 // when limits are the same, do nothing
                 if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
                     if(widget->getDirection() == caThermo::Down  || widget->getDirection() == caThermo::Left) {
- #if QWT_VERSION < 0x060100
                         widget->setMinValue(data.edata.upper_disp_limit);
                         widget->setMaxValue(data.edata.lower_disp_limit);
                     } else {
                         widget->setMaxValue(data.edata.upper_disp_limit);
                         widget->setMinValue(data.edata.lower_disp_limit);
-#else
-                        widget->setLowerBound(data.edata.upper_disp_limit);
-                        widget->setUpperBound(data.edata.lower_disp_limit);
-                    } else {
-                        widget->setUpperBound(data.edata.upper_disp_limit);
-                        widget->setLowerBound(data.edata.lower_disp_limit);
-#endif
                     }
                 }
             }
@@ -2531,7 +2516,10 @@ void CaQtDM_Lib::Callback_UpdateLine(const QString& text, const QString& name)
 void CaQtDM_Lib::Callback_ChoiceClicked(const QString& text)
 {
     char errmess[255];
+
     caChoice *choice = qobject_cast<caChoice *>(sender());
+
+    choice->updateChoice();
 
     if(!choice->getAccessW()) return;
 
@@ -2958,24 +2946,14 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         pv[0] = widget->getPV().trimmed();
         if(widget->getLimitsMode() == caThermo::User) {
             limitsMode = true;
-#if QWT_VERSION < 0x060100
             limitsMax = widget->maxValue();
             limitsMin = widget->minValue();
-#else
-            limitsMax = widget->upperBound();
-            limitsMin = widget->lowerBound();
-#endif
         }
         knobData *kPtr = mutexKnobData->getMutexKnobDataPV(pv[0]);
         if(kPtr->edata.lower_disp_limit == kPtr->edata.upper_disp_limit) {
             limitsDefault = true;
-#if QWT_VERSION < 0x060100
             limitsMax = widget->maxValue();
             limitsMin = widget->minValue();
-#else
-            limitsMax = widget->upperBound();
-            limitsMin = widget->lowerBound();
-#endif
         }
         if(widget->getColorMode() == caThermo::Alarm) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
