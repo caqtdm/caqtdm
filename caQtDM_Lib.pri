@@ -19,7 +19,7 @@ unix{
  QMAKE_CXXFLAGS += "-g"
  QMAKE_CFLAGS_RELEASE += "-g"
  LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca
- LIBS += -L$(QTBASE) -Wl,-rpath,$(QTCONTROLS_INSTALLED) -lqtcontrols
+ LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
  INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
 }
 TARGET = caQtDM_Lib
