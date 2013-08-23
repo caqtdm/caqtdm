@@ -26,7 +26,7 @@ read -p "Press [Enter] key to start build "
 
 echo ============ make all =================
 qmake all.pro
-dye make
+make
 
 echo =========== build plugins =============
 cd caQtDM_QtControls/plugins/
