@@ -174,7 +174,7 @@ void caChoice::setColors(QColor back, QColor fore, QColor border, alignmentHor a
         shadowColor1.setHsv(baseColor.hue(), (int) (baseColor.saturation() * 0.6), (int) (baseColor.value() ));
         shadowColor2.setHsv((int) (baseColor.hue()*0.7), (int) (baseColor.saturation() * 0.7), (int) (baseColor.value() * 0.7));
 
-        activColor.setHsv(baseColor.hue(), baseColor.saturation(), (int) qMin((int)(baseColor.value() * 1.2), 255) );
+        activColor.setHsv(baseColor.hue(), baseColor.saturation(), (int) qMin((int)(baseColor.value() * 1.1), 255) );
 
         QString background =  "";
         background.append("background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, ");
