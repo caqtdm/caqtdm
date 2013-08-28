@@ -1710,7 +1710,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
     bool thisInstance = false;
     QWidget *widget = w;
       while (widget -> parentWidget()) {
-          widget = widget -> parentWidget() ;
+          widget = widget-> parentWidget() ;
           if(widget == myWidget) {
               thisInstance = true;
               break;
@@ -3031,6 +3031,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         // construct info for the pv we are pointing at
         myMenu.addAction("Get Info");
         myMenu.addAction("Print");
+        myMenu.addAction("Raise message window");
+        myMenu.addAction("Raise main window");
     }
 
     if(caStripPlot* widget = qobject_cast<caStripPlot *>(w)) {
@@ -3050,6 +3052,16 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 processWindow *t= (processWindow *) widget->getProcess();
                 t->tryTerminate();
             }
+
+        } else  if(selectedItem->text().contains("Raise message window")) {
+            if(messageWindow == 0) return;
+            messageWindow->raise();
+            messageWindow->showNormal();
+
+        } else  if(selectedItem->text().contains("Raise main window")) {
+            QMainWindow *mainWindow = (QMainWindow *) this->parentWidget();
+            mainWindow->showNormal();
+            messageWindow->raise();
 
         } else  if(selectedItem->text().contains("Get Info")) {
             QString info;
@@ -3878,7 +3890,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
     QMainWindow *main = this->findChild<QMainWindow *>();
     // it seems that when mainwindow was fixed by user, then the window stays empty ?
     if(main != (QObject*) 0) {
-      main->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        main->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     }
 
     if(!allowResize) return;
@@ -3903,35 +3915,26 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 if(line->frameShape() == QFrame::HLine || line->frameShape() == QFrame::VLine) {
                     integerList.insert(4, line->lineWidth());
                 }
-            // for plots get the linewidth
+                // for plots get the linewidth
             } else if(!className.compare("caStripPlot") || !className.compare("caCartesianPlot")) {
                 QwtPlot * plot = (QwtPlot *) widget;
                 integerList.insert(4, plot->axisFont(QwtPlot::xBottom).pointSize());         // label of ticks
+                integerList.insert(5, 0);                                                    // empty
                 integerList.insert(6, plot->axisTitle(QwtPlot::xBottom).font().pointSize()); // titles have the same font
-/*
+
                 if(!className.compare("caStripPlot")) {
                     caStripPlot * plot = (caStripPlot *) widget;
                     integerList.insert(7, 9);
                     if(plot->getLegendEnabled()) {
-                        if(plot->legend() != (QwtLegend*) 0) {
-                            if(plot->legend()->legendItems().count() > 0) {
-                                integerList.insert(7, plot->legend()->legendItems().at(0)->font().pointSize());  // legends font size
-                            }
-                        }
+                        plot->setLegendAttribute(plot->getScaleColor(), QFont("arial", 9), caStripPlot::FONT);
                     }
                 }
-*/
-            if(!className.compare("caStripPlot")) {
-                caStripPlot * plot = (caStripPlot *) widget;
-                integerList.insert(7, 9);
-                if(plot->getLegendEnabled()) {
-                    plot->setLegendAttribute(plot->getScaleColor(), QFont("arial", 9), caStripPlot::FONT);
-                }
+
+            } else {
+                integerList.insert(4, widget->font().pointSize());
             }
 
-            }
-
-            integerList.insert(5, widget->font().pointSize());
+            //qDebug() << className << integerList;
 
             widget->setProperty("GeometryList", integerList);
         }
@@ -3965,7 +3968,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
     if(!mainlayoutPresent) {
         //qDebug() << "no main layout present, we should do the work";
 
-    // if our window is using a layout, then Qt has to do the resizing
+        // if our window is using a layout, then Qt has to do the resizing
     } else {
         //qDebug() << "main layout present, Qt should do the work" << className;
 
@@ -3979,7 +3982,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 QVariantList list = var.toList();
 
                 if(list.size() >= 4) {
-                   resizeSpecials(className, widget, list, factX, factY);
+                    resizeSpecials(className, widget, list, factX, factY);
                 }
             }
             return;
