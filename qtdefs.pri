@@ -1,9 +1,16 @@
-CAQTDM_VERSION = V3.2.0
+CAQTDM_VERSION = V3.2.2
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+
+# new in 3.2.2
+# in menu you have the possibility to raise the main and message windows
+
+# new in 3.2.1
+# when requesting a display that was already started, it did not popup but made a new instance. this has been corrected
+# this was working before, but by some modifications was not correct any more
 
 # new in 3.2.0
 # build mechanism for linux and windows should do on most platforms, see caQtDM_README
