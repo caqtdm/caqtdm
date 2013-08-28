@@ -1050,7 +1050,18 @@ void ParsePepFile::writeLabel(QString text, QString minwidth, QString minheight,
 {
     writeOpenTag("widget class=\"caLabel\" name=\"calabel\"", array);
 
-    if(minwidth.size() > 0 || minheight.size() > 0) {
+    QFont font( "Lucida Sans Typewriter", pointsize.toInt());
+    QFontMetrics metrics(font);
+    int width = metrics.width(text);
+    if( (minwidth.size() == 0) && (minheight.size() > 0) ) {
+        writeOpenProperty("minimumSize", array);
+        writeOpenTag("size", array);
+        writeTaggedString("width", QString::number(width), array);
+        writeTaggedString("height", minheight, array);
+        writeCloseTag("size", array);
+        writeCloseProperty(array);
+    } else
+        if(minwidth.size() > 0 || minheight.size() > 0) {
         writeOpenProperty("minimumSize", array);
         writeOpenTag("size", array);
         if(minwidth.size() > 0) writeTaggedString("width", minwidth, array);
@@ -1085,6 +1096,9 @@ void ParsePepFile::writeLabel(QString text, QString minwidth, QString minheight,
     if(colormode.size() > 0) {
         writeSimpleProperty("colorMode", "enum", colormode, array);
     }
+
+     writeSimpleProperty("fontScaleMode", "enum", "None", array);
+
 
     if(calc.size() > 0 && visibility.size() > 0 && calcpv.size() > 0) {
         writeSimpleProperty("visibility", "enum", visibility, array);
@@ -1163,14 +1177,17 @@ QWidget* ParsePepFile::load(QWidget *parent)
     QWidget *widget = new QWidget;
     QUiLoader loader;
 
-/* used to output the data to an ui file for verification
+/* used to output the data to an ui file for verification*/
+/*
     QFile file("out.ui");
     file.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(&file);
 */
+
     buffer->open(QIODevice::ReadOnly);
 
-    /* output the data to the verification file
+/* output the data to the verification file */
+/*
     out << buffer->data();
     file.close();
 */
