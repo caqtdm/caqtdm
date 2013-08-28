@@ -259,27 +259,7 @@ void caRowColMenu::populateCells()
 void caRowColMenu::setLabel(QString const &label)
 {
     thisLabel = label;
-/*
-    if(thisStacking == Menu) {
-        numCells = qMin(files.size(), args.size());
-        numCells = qMin(numCells, labels.size());
-        if(numCells > 1) cellsP[0]->setText(thisLabel);
-        else if(numCells == 1) {
-            QString newLabel = thisLabel;
-            if(newLabel[0] == '-') {
-                newLabel.remove(0,1);
-                cellsI[0]->setLabelText(newLabel);
-                cellsI[0]->setIconVisible(false);
-            // otherwise a pixmap
-            } else {
-               cellsI[0]->setLabelText(newLabel);
-               cellsI[0]->setIconVisible(true);
-            }
-        }
-    }
-*/
     populateCells();
-
 }
 
 void caRowColMenu::setImage(QString const &image) {
