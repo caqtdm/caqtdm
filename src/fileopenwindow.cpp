@@ -246,6 +246,9 @@ void FileOpenWindow::Callback_OpenButton()
         lastFilePath = fi.absolutePath();
         if(fi.exists()) {
             CaQtDM_Lib *newWindow = new CaQtDM_Lib(this, fileName, "", mutexKnobData, messageWindow);
+            if (fileName.contains("prc")) {
+                allowResize = false;
+            }
             newWindow->allowResizing(allowResize);
             QMainWindow *mainWindow = newWindow;
             mainWindow->show();
@@ -298,7 +301,6 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     QList<QWidget *> all = this->findChildren<QWidget *>();
     foreach(QWidget* widget, all) {
         if(QMainWindow* w = qobject_cast<QMainWindow *>(widget)) {
-            //qDebug() << w;
             QString WindowProperty = "";
             // if already exists then yust pop it up
             QFile *file = new QFile;
@@ -310,6 +312,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
 
             QVariant fileName = w->property("fileString");
             QVariant macroString = w->property("macroString");
+            //qDebug() << "existing filename with macro =" <<  w->windowTitle() << "=" <<  w->property("fileString") << macroString;
             if(!fileName.isNull()) {
                 WindowProperty = fileName.toString();
             }
@@ -367,6 +370,9 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         if(printandexit) willPrint = true;
         CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, messageWindow, willPrint);
 
+        if (FileName.contains("prc")) {
+           allowResize = false;
+        }
         newWindow->allowResizing(allowResize);
         QMainWindow *mainWindow = newWindow;
 
@@ -380,8 +386,16 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         mainWindow->setMaximumSize(16777215, 16777215);
         mainWindow->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         mainWindow->setWindowFlags(mainWindow->windowFlags() );
-        mainWindow->setProperty("fileString", fileNameFound);
+
+        // get the filename
+        QFile *file = new QFile;
+        file->setFileName(fileNameFound);
+        QString title(file->fileName().section('/',-1));
+        mainWindow->setProperty("fileString", title);
         mainWindow->setProperty("macroString", macroString);
+        delete file;
+
+        //qDebug() << "set properties in qmainwindow" << mainWindow << title << macroString;
 
 #ifdef Q_WS_X11
         if(geometry != "") {
