@@ -29,7 +29,7 @@ public:
     }
     virtual QwtText label(double v) const
     {
-        QTime upTime = baseTime.addSecs((int)v);
+        QTime upTime = baseTime.addMSecs(v * 1000.0);
         //printf("label = addseconds=%d start plottime=%s labeltime=%s\n", (int)v, baseTime.toString().toAscii().constData(),  upTime.toString().toAscii().constData());
         return upTime.toString();
     }
@@ -418,10 +418,13 @@ void caStripPlot::TimeOut()
         x[0] = (int) (x0+0.5);
         x[1] = (int) (x1+0.5);
         delta = x[0] - x[1];
+
 /*
         if(delta > 1) {
             printf("===============> missed ticks=%d datacount=%d\n", delta, dataCount);
         }
+*/
+/*
         printf("after rounding ");
         for(int i=0; i<10; i++) {
             x0 = transform(QwtPlot::xBottom, rangeData[0][i].value);
