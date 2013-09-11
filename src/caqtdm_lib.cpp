@@ -3785,6 +3785,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
                 selectedItem->setFont(f);
             }
         }
+        table->setValueFont(f);
 #else
         printf("caQtDM_Lib -- caTable resizing does not work yet in Qt5\n");
 #endif
