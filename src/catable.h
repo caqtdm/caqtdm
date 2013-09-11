@@ -14,6 +14,7 @@
 
 #include <QTableWidget>
 #include <QAction>
+#include <QFont>
 #include <qtcontrols_global.h>
 
 typedef char string40[40];
@@ -73,6 +74,8 @@ public:
 
     void createActions();
 
+    void setValueFont(QFont font);
+
 private slots:
 
     void copy();
@@ -98,6 +101,8 @@ private:
 
     QColor defaultBackColor;
     QColor defaultForeColor;
+
+    QFont thisItemFont;
 
     QAction *copyAct;
 };

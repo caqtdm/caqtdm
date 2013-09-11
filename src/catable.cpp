@@ -28,6 +28,8 @@ caTable::caTable(QWidget *parent) : QTableWidget(parent)
         setFormat(i, 1);
     }
 
+    thisItemFont = this->font();
+
     setColorMode(Static);
     setAlternatingRowColors(true);
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -148,6 +150,13 @@ void caTable::displayText(int row, int col, short status, QString const &text)
     }
 
     setItem(row, col, item);
+    item->setFont(thisItemFont);
+
+}
+
+void caTable::setValueFont(QFont font)
+{
+   thisItemFont = font;
 }
 
 
