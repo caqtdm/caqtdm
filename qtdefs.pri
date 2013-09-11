@@ -1,9 +1,13 @@
-CAQTDM_VERSION = V3.2.2
+CAQTDM_VERSION = V3.3.0
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+
+# new in 3.3.0
+# caTable gets now the correct font after resizing when values update
+# caStripPlot has been corrected for incorrect time behaviour.
 
 # new in 3.2.2
 # in menu you have the possibility to raise the main and message windows
