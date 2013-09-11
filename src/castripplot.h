@@ -404,11 +404,13 @@ private:
     QwtPlotIntervalCurve *fillcurve[MAXCURVES];
 
     // y data for error curve
+    QVector<QwtIntervalSample> base;
     QVector<QwtIntervalSample> rangeData[MAXCURVES];
     QVector<QwtIntervalSample> fillData[MAXCURVES];
 
     // x time axis data
-    double *timeData;
+    //double *timeData;
+    double timeData;
     int dataCount;
 
     bool thisXshow, thisYshow, thisLegendshow, thisGrid;

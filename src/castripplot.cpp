@@ -20,6 +20,8 @@
 #include <qpainter.h>
 #include "castripplot.h"
 
+#define MULTFOROVERLAPPINGTIMES 2.0
+
 class TimeScaleDraw: public QwtScaleDraw
 {
 public:
@@ -29,8 +31,12 @@ public:
     }
     virtual QwtText label(double v) const
     {
-        QTime upTime = baseTime.addMSecs(v * 1000.0);
-        //printf("label = addseconds=%d start plottime=%s labeltime=%s\n", (int)v, baseTime.toString().toAscii().constData(),  upTime.toString().toAscii().constData());
+        // while addsecs has a problem after some 3/4 of a month in seconds, we normalize the seconds to 24 * 3600 seconds
+        double day = 24 * 3600;
+        double normalized = v - day * floor(v/day);
+
+        QTime upTime = baseTime.addSecs((int) normalized);
+        //printf("label = addseconds=%d start plottime=%s labeltime=%s\n", seconds, baseTime.toString().toAscii().constData(),  upTime.toString().toAscii().constData());
         return upTime.toString();
     }
 
@@ -40,7 +46,6 @@ private:
 };
 
 caStripPlot::~caStripPlot(){
-    if(timeData != (double*) 0) free(timeData);
 }
 
 caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
@@ -56,8 +61,6 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     setAutoReplot(false);
     setAutoFillBackground(true);
     Start = true;
-
-    timeData = (double*) 0;
 
     // define a grid
     plotGrid = new QwtPlotGrid();
@@ -190,27 +193,18 @@ void caStripPlot::RescaleCurves(int width, units unit, double period)
         INTERVAL = period * 60;
     }
 
-    // define timedata
-
-    if(timeData != (double *) 0) free(timeData);
-    timeData = (double*) malloc(HISTORY * sizeof(double));
-    if(thisXaxisType == TimeScale) {
-        // we will not use really use timeData as array
-    } else {
-        for ( int i = 0; i < HISTORY; i++ ) {
-            timeData[i] = - (period * (double)i) / (double)(HISTORY-1);
-        }
-    }
-
     for(int i=0; i < MAXCURVES; i++) {
         // define interval data for error and fill curves
         rangeData[i].clear();
         fillData[i].clear();
-        for ( int j = 0; j < HISTORY; j++ ) {
-            rangeData[i].append(QwtIntervalSample(timeData[j], QwtInterval(0.0, 0.0)));
-            fillData[i].append(QwtIntervalSample(timeData[j], QwtInterval(0.0, 0.0)));
+        if(i==0)  base.clear();
+        for ( int j = 0; j < MULTFOROVERLAPPINGTIMES * HISTORY; j++ ) {
+            rangeData[i].append(QwtIntervalSample(0, QwtInterval(0.0, 0.0)));
+            fillData[i].append(QwtIntervalSample(0, QwtInterval(0.0, 0.0)));
+            if(i==0) base.append(QwtIntervalSample(0, QwtInterval(0.0, 0.0)));
         }
     }
+
 
     for(int i=0; i < NumberOfCurves; i++) {
         if(thisStyle[i] == FillUnder) fillcurve[i]->setSamples(fillData[i]);
@@ -219,7 +213,7 @@ void caStripPlot::RescaleCurves(int width, units unit, double period)
 
     // define update rate
     dataCount = 0;
-    updateRate = (int) (300.0 / timeInterval);
+    updateRate = (int) (100.0 / timeInterval);
     if(updateRate < 1) updateRate=1;
     //printf("\n width=%d period=%f timerInterval=%d updaterate=%d\n", HISTORY, period, (int) timeInterval, updateRate);
 
@@ -351,6 +345,7 @@ void caStripPlot::addText(double x, double y, char* text, QColor c, int fontsize
 void caStripPlot::TimeOut()
 {
     double elapsedTime;
+    int delta = 0;
 
     // we need an exact time scale
     if(Start) {
@@ -360,127 +355,103 @@ void caStripPlot::TimeOut()
     ftime(&timeNow);
 
     elapsedTime = ((double) timeNow.time + (double) timeNow.millitm / (double)1000) -
-            ((double) timeStart.time + (double) timeStart.millitm / (double)1000);
-
-    //printf("elapsed seconds since start %lf\n", elapsedTime);
+                  ((double) timeStart.time + (double) timeStart.millitm / (double)1000);
 
     // change scale base in case of running time scale
     if(thisXaxisType == TimeScale) {
-        timeData[0] = INTERVAL + elapsedTime;
-        //printf("set axis scale to %lf %lf\n",  timeData[0] - INTERVAL, timeData[0]);
-        setAxisScale(QwtPlot::xBottom, timeData[0] - INTERVAL, timeData[0]);
-        axisWidget( QwtPlot::xBottom )->update();
-        replot();
+        timeData = INTERVAL + elapsedTime;
+        setAxisScale(QwtPlot::xBottom, timeData - INTERVAL, timeData);
+        //axisWidget( QwtPlot::xBottom )->update();
+        updateAxes();
+        //replot();
     }
 
-    int x[10], delta;
-    double x0, x1, xnow;
-/*
-    printf("---------------- \nbefore ");
-    for(int i=0; i<10; i++) {
-        x0 = transform(QwtPlot::xBottom, rangeData[0][i].value);
-        x[i] = (int) (x0+0.5);
-        printf("%.2f ", x0);
-    }
-    printf("\n");
-*/
-    // align on pixels
-    for (int i = dataCount; i > 0; i-- ) {
-        for (int c = 0; c < NumberOfCurves; c++ ) {
-            rangeData[c][i] = rangeData[c][i-1];
-            fillData[c][i] = fillData[c][i-1];
+    timeData = INTERVAL + elapsedTime;
 
-            if(thisXaxisType == TimeScale) {
-                // transform in order to hit the pixel
-                x0 = transform(QwtPlot::xBottom, rangeData[c][i-1].value);
-                x0 = invTransform(QwtPlot::xBottom, (int) (x0+0.5));
-                rangeData[c][i].value = fillData[c][i].value = x0;
-
-            } else {
-                rangeData[c][i].value = timeData[i]; // set the time correctly (none shifting scale)
-                fillData[c][i].value = timeData[i];
+    // shift our timebase for the fixed scale
+    if(dataCount > 1) {
+        if(thisXaxisType != TimeScale) {
+            double value = 0.0;
+            for (int i = dataCount; i > 0; i-- ) {
+                base[i] = base[i-1];
+                for (int c = 0; c < NumberOfCurves; c++ ) {
+                    rangeData[c][i] = rangeData[c][i-1];
+                    fillData[c][i] = fillData[c][i-1];
+                    // correct value to fit again inside the interval
+                    if(Unit == Millisecond) {
+                        value = (base[i].value - elapsedTime - INTERVAL)*1000.0;
+                    } else if(Unit == Second) {
+                        value = (base[i].value - elapsedTime - INTERVAL);
+                    } else if(Unit == Minute) {
+                        value = (base[i].value - elapsedTime - INTERVAL)/60;
+                    } else {
+                        value = (base[i].value - elapsedTime - INTERVAL)/60;
+                    }
+                    rangeData[c][i].value = fillData[c][i].value = value;
+                }
             }
-        }
-    }
-
-    // treat lost data in time scale (we do not adjust the non timescale for exact time behaviour, can be done later)
-    if(thisXaxisType == TimeScale) {
-        // reaffect actual time
-        for (int c = 0; c < NumberOfCurves; c++ ) {
-            rangeData[c][0].value = timeData[0];
-        }
-
-        xnow = transform(QwtPlot::xBottom, timeData[0]);
-
-        // did we miss some ticks ?
-        x0 = transform(QwtPlot::xBottom, rangeData[0][0].value);
-        x1 = transform(QwtPlot::xBottom, rangeData[0][1].value);
-        x[0] = (int) (x0+0.5);
-        x[1] = (int) (x1+0.5);
-        delta = x[0] - x[1];
-
-/*
-        if(delta > 1) {
-            printf("===============> missed ticks=%d datacount=%d\n", delta, dataCount);
-        }
-*/
-/*
-        printf("after rounding ");
-        for(int i=0; i<10; i++) {
-            x0 = transform(QwtPlot::xBottom, rangeData[0][i].value);
-            printf("%.2f ", x0);
-        }
-        printf("\n");
-*/
-        // we missed some ticks
-        if(dataCount > 0 && delta > 1) {
-            // first we have to make place for the missing data
+        } else {
             for (int i = dataCount; i > 0; i-- ) {
                 for (int c = 0; c < NumberOfCurves; c++ ) {
-                    if((i+delta-1) > (HISTORY-1)) break;         // be carefull not to exceed array
-                    rangeData[c][i+delta-1] = rangeData[c][i];
-                    fillData[c][i+delta-1] = fillData[c][i];
+                    rangeData[c][i] = rangeData[c][i-1];
+                    fillData[c][i] = fillData[c][i-1];
                 }
+
             }
-/*
-            printf("after shift ");
-            for(int i=0; i<10; i++) {
-                x0 = transform(QwtPlot::xBottom, rangeData[0][i].value);
-                printf("%.2f ", x0);
-            }
-            printf("\n");
-*/
-            // and fill the holes with actual data and correct x values
-            for(int i=0; i<delta-1; i++) {
-                x0 = invTransform(QwtPlot::xBottom, (int) xnow - i -1);
-                for (int c = 0; c < NumberOfCurves; c++ ) {
-                    rangeData[c][i+1] = rangeData[c][0];
-                    fillData [c][i+1] = fillData[c][0];
-                    rangeData[c][i+1].value = x0;
-                    fillData [c][i+1].value = x0;
-                }
-            }
-/*
-            printf("after insert ");
-            for(int i=0; i<10; i++) {
-                x0 = transform(QwtPlot::xBottom, rangeData[0][i].value);
-                printf("%.2f ", x0);
-            }
-            printf("\n");
-*/
         }
-/*
-        printf("after ");
-        for(int i=0; i<10; i++) {
-            x0 = transform(QwtPlot::xBottom, rangeData[0][i].value);
-            printf("%.2f ", x0);
-        }
-        printf("\n");
-*/
     }
 
-    // advance
-    if (dataCount < (HISTORY -1)) dataCount++;
+    // treat space between pixels if any
+    int totalMissed = 0;
+    for (int i = 2; i < dataCount; i++ ) {
+        double x0 = transform(QwtPlot::xBottom, rangeData[0][i-1].value);
+        double x1 = transform(QwtPlot::xBottom, rangeData[0][i].value);
+        delta = (int) x0 - (int) x1 - 1;
+
+        if(delta > 0 && x0 >0 && x1 >0) {
+            double increment = (base[i-1].value - base[i].value)/ (double) (delta+1);
+            //printf("===============> missed ticks=%d at=%d x0=%d x1=%d\n", delta, i, (int) x0, (int) x1);
+            totalMissed++;
+
+            // insert missing time base data
+            if(thisXaxisType != TimeScale) {
+                base.insert(i, delta, base[i]);
+                for(int j=0; j<delta+1; j++) {
+                    base[j+i-1].value = base[i-1].value - increment * (double) j;
+                }
+            }
+
+            for (int c = 0; c < NumberOfCurves; c++ ) {
+                rangeData[c].insert(i, delta, rangeData[c][i]);
+                if(thisStyle[c] == FillUnder) {
+                    fillData[c].insert(i, delta, fillData[c][i]);
+                    for(int j=0; j<delta+1; j++) {
+                        rangeData[c][j+i-1].value = fillData[c][j+i-1].value = invTransform(QwtPlot::xBottom, (int) x0-j);
+                    }
+                } else {
+                    for(int j=0; j<delta+1; j++) {
+                        rangeData[c][j+i-1].value = invTransform(QwtPlot::xBottom, (int) x0 - j);
+                        //printf("insert at %d %d %f\n", j+i-1, (int) x0 - j, rangeData[c][j+i-1].value);
+                    }
+                }
+            }
+
+            if ((dataCount + delta) < (MULTFOROVERLAPPINGTIMES * HISTORY -1)) dataCount = dataCount + delta;
+            // prevent from growing
+            if(base.size() > HISTORY * MULTFOROVERLAPPINGTIMES) base.resize(HISTORY * MULTFOROVERLAPPINGTIMES);
+            for (int c = 0; c < NumberOfCurves; c++ ) {
+                if(rangeData[c].size()  > HISTORY * MULTFOROVERLAPPINGTIMES) {
+                    rangeData[c].resize(HISTORY * MULTFOROVERLAPPINGTIMES);
+                    if(thisStyle[c] == FillUnder) fillData[c].resize(HISTORY * MULTFOROVERLAPPINGTIMES);
+                }
+            }
+        }
+    }
+
+    //printf("===============> total missed plots=%d datacount=%d size=%d\n", totalMissed, dataCount, (int)(HISTORY * MULTFOROVERLAPPINGTIMES));
+
+    // advance data points
+    if (dataCount < (MULTFOROVERLAPPINGTIMES * HISTORY -1)) dataCount++;
 
     // update last point and plot
     for (int c = 0; c < NumberOfCurves; c++ ) {
@@ -493,7 +464,11 @@ void caStripPlot::TimeOut()
         y3 = invTransform(QwtPlot::yLeft, (int) (y1+0.5));
 
         // set the range into the array
-        rangeData[c][0] = QwtIntervalSample( timeData[0], QwtInterval(y2, y3));
+        rangeData[c][0] = QwtIntervalSample( timeData, QwtInterval(y2, y3));
+        // and set also the base time
+        if(thisXaxisType != TimeScale) {
+            base[0] = QwtIntervalSample(  timeData, QwtInterval(y2, y3));
+        }
 
         //  and to fillunder we add a range to the fill curve
         if(thisStyle[c] == FillUnder) {
@@ -507,14 +482,13 @@ void caStripPlot::TimeOut()
             y4 = invTransform(QwtPlot::yLeft, (int) (value+0.5));
             y5 = invTransform(QwtPlot::yLeft, (int) (y1+0.5));
 
-            fillData[c][0] = QwtIntervalSample( timeData[0], QwtInterval(y4, y5));
+            fillData[c][0] = QwtIntervalSample( timeData, QwtInterval(y4, y5));
             fillcurve[c]->setSamples(fillData[c]);
         }
         errorcurve[c]->setSamples(rangeData[c]);
     }
 
-    // don't draw faster than 3 Hz
-    if(timerCount++ >= updateRate) {
+//    if(timerCount++ > updateRate) {
         if(thisXaxisType == TimeScale) {
             replot();
         } else {
@@ -526,7 +500,7 @@ void caStripPlot::TimeOut()
 #endif
         }
         timerCount=0;
-    }
+//    }
 
     // keep max and min
     for (int c = 0; c < NumberOfCurves; c++ ) {
@@ -565,7 +539,6 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
                 QwtText text;
                 text.setText(legendText(i));
                 qobject_cast<QwtLegendItem*>(this->legend()->find(curve[i]))->setText(text);
-
             }
             break;
 
