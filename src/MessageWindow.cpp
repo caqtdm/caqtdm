@@ -21,7 +21,7 @@
                                + __GNUC_MINOR__ * 100 \
                                + __GNUC_PATCHLEVEL__)
 
-const char* MessageWindow::WINDOW_TITLE = "caQtDM Message Window";
+const char* MessageWindow::WINDOW_TITLE = "caQtDM Messages";
 MessageWindow* MessageWindow::MsgHandler = NULL;
 
 MessageWindow::MessageWindow(QWidget* parent) : QDockWidget(parent)

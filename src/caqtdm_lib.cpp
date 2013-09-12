@@ -3031,7 +3031,6 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         // construct info for the pv we are pointing at
         myMenu.addAction("Get Info");
         myMenu.addAction("Print");
-        myMenu.addAction("Raise message window");
         myMenu.addAction("Raise main window");
     }
 
@@ -3052,11 +3051,6 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 processWindow *t= (processWindow *) widget->getProcess();
                 t->tryTerminate();
             }
-
-        } else  if(selectedItem->text().contains("Raise message window")) {
-            if(messageWindow == 0) return;
-            messageWindow->raise();
-            messageWindow->showNormal();
 
         } else  if(selectedItem->text().contains("Raise main window")) {
             QMainWindow *mainWindow = (QMainWindow *) this->parentWidget();
