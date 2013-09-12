@@ -3,13 +3,15 @@ include(../caQtDM/qtdefs.pri)
 DEFINES += QT_NO_DEBUG_OUTPUT
 
 contains(QT_VER_MAJ, 4) {
-  CONFIG += uitools qwt plugin designer warn_on
+  CONFIG += uitools qwt plugin designer
 }
 contains(QT_VER_MAJ, 5) {
   QT      += widgets designer uitools
-  CONFIG  += qwt plugin warn_on
+  CONFIG  += qwt plugin
   DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 }
+
+#CONFIG += warn_on
 
 TARGET = qtcontrols
 TEMPLATE = lib
@@ -43,8 +45,8 @@ unix {
     OBJECTS_DIR = obj
     DESTDIR = .
     QMAKE_POST_LINK = cp libqtcontrols.so $(QTBASE)
-    QMAKE_CXXFLAGS += "-g"
-    QMAKE_CFLAGS_RELEASE += "-g"
+#    QMAKE_CXXFLAGS += "-g"
+#    QMAKE_CFLAGS_RELEASE += "-g"
 }
 MOC_DIR = moc
 INCLUDEPATH += src
