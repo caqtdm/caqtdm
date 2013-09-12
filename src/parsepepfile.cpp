@@ -639,7 +639,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         } else {
             // write text as label
             if(grid.widgetText.size() < 1) {
-                writeLabel("&lt;html&gt;&lt;head/&gt;&lt;body&gt;&amp;nbsp;&amp;nbsp;&lt;/body&gt;&lt;/html&gt;", "", "20",  "16777215", "20", fontSize,
+                writeLabel("&lt;html&gt;&lt;head/&gt;&lt;body&gt;&amp;nbsp;&amp;nbsp;&lt;/body&gt;&lt;/html&gt;", "10", "20",  "16777215", "20", fontSize,
                            "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "",  "", false, fg, bg, array);
             } else {
                 writeLabel(grid.widgetText, "", "20", "16777215", "20", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", false, fg, bg, array);
@@ -1191,7 +1191,6 @@ QWidget* ParsePepFile::load(QWidget *parent)
     out << buffer->data();
     file.close();
 */
-
     buffer->seek(0);
     widget=loader.load(buffer, parent);
     buffer->close();
