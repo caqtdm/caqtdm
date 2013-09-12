@@ -1,9 +1,12 @@
-CAQTDM_VERSION = V3.3.0
+CAQTDM_VERSION = V3.3.1
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+
+# new in 3.3.1
+# mainwindow and messagewindow have been merged
 
 # new in 3.3.0
 # caTable gets now the correct font after resizing when values update
