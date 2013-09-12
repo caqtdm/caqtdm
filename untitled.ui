@@ -6,78 +6,960 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1010</width>
+    <height>795</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="caCircularGauge" name="cacirculargauge">
+   <widget class="caStripPlot" name="caStripPlot_0">
     <property name="geometry">
      <rect>
-      <x>265</x>
-      <y>150</y>
-      <width>261</width>
-      <height>156</height>
+      <x>0</x>
+      <y>0</y>
+      <width>466</width>
+      <height>251</height>
      </rect>
     </property>
-    <property name="minValue">
-     <double>-0.600000000000000</double>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
     </property>
-    <property name="lowError">
-     <double>-0.600000000000000</double>
+    <property name="TitleX">
+     <string notr="true">10 minutes time</string>
     </property>
-    <property name="lowWarning">
-     <double>-0.600000000000000</double>
+    <property name="channels" stdset="0">
+     <string notr="true">QTDM:COUNT:1</string>
     </property>
-    <property name="highWarning">
-     <double>0.600000000000000</double>
+    <property name="units">
+     <enum>caStripPlot::Minute</enum>
     </property>
-    <property name="highError">
-     <double>0.600000000000000</double>
+    <property name="period">
+     <double>10.000000000000000</double>
     </property>
-    <property name="maxValue">
-     <double>0.600000000000000</double>
+    <property name="XaxisType">
+     <enum>caStripPlot::TimeScale</enum>
     </property>
-    <property name="reference">
+    <property name="YaxisLimitsMax_1">
+     <double>5.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_1">
      <double>0.000000000000000</double>
     </property>
-    <property name="valueFormat">
-     <string>%.2f</string>
+    <property name="YaxisScalingMax_1" stdset="0">
+     <enum>caStripPlot::User</enum>
     </property>
-    <property name="channel" stdset="0">
-     <string notr="true">test</string>
+    <property name="YaxisScalingMin_1" stdset="0">
+     <enum>caStripPlot::User</enum>
     </property>
-    <property name="label">
-     <string>test</string>
+    <property name="Style_1">
+     <enum>caStripPlot::FillUnder</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>170</red>
+      <green>255</green>
+      <blue>127</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_2">
+     <double>1000.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_2">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_2" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_2" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_2">
+     <color>
+      <red>253</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_3">
+     <double>500.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_3">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_3" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_3" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_3">
+     <color>
+      <red>26</red>
+      <green>115</green>
+      <blue>9</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_4">
+     <double>500.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_4">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_4" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_4" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_4">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_5">
+     <double>1.500000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_5">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_5" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_5" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_5">
+     <color>
+      <red>139</red>
+      <green>130</green>
+      <blue>57</blue>
+     </color>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>236</red>
+      <green>236</green>
+      <blue>236</blue>
+     </color>
+    </property>
+    <property name="background">
+     <color>
+      <red>236</red>
+      <green>236</green>
+      <blue>236</blue>
+     </color>
+    </property>
+    <property name="scaleColor">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="grid">
+     <bool>true</bool>
+    </property>
+    <property name="XaxisEnabled">
+     <bool>true</bool>
+    </property>
+    <property name="YaxisEnabled">
+     <bool>true</bool>
     </property>
    </widget>
-   <widget class="caCalc" name="cacalc">
+   <widget class="caStripPlot" name="caStripPlot_1">
     <property name="geometry">
      <rect>
-      <x>300</x>
-      <y>405</y>
-      <width>91</width>
-      <height>36</height>
+      <x>470</x>
+      <y>0</y>
+      <width>466</width>
+      <height>251</height>
      </rect>
     </property>
-    <property name="variable">
-     <string notr="true">test</string>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="TitleX">
+     <string notr="true">10 minutes value</string>
+    </property>
+    <property name="channels" stdset="0">
+     <string notr="true">QTDM:COUNT:1</string>
+    </property>
+    <property name="units">
+     <enum>caStripPlot::Minute</enum>
+    </property>
+    <property name="period">
+     <double>10.000000000000000</double>
+    </property>
+    <property name="XaxisType">
+     <enum>caStripPlot::ValueScale</enum>
+    </property>
+    <property name="YaxisLimitsMax_1">
+     <double>5.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_1">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_1" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_1" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="Style_1">
+     <enum>caStripPlot::FillUnder</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>170</red>
+      <green>255</green>
+      <blue>127</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_2">
+     <double>1000.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_2">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_2" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_2" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_2">
+     <color>
+      <red>253</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_3">
+     <double>500.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_3">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_3" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_3" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_3">
+     <color>
+      <red>26</red>
+      <green>115</green>
+      <blue>9</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_4">
+     <double>500.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_4">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_4" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_4" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_4">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_5">
+     <double>1.500000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_5">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_5" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_5" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_5">
+     <color>
+      <red>139</red>
+      <green>130</green>
+      <blue>57</blue>
+     </color>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>236</red>
+      <green>236</green>
+      <blue>236</blue>
+     </color>
+    </property>
+    <property name="background">
+     <color>
+      <red>236</red>
+      <green>236</green>
+      <blue>236</blue>
+     </color>
+    </property>
+    <property name="scaleColor">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="XaxisEnabled">
+     <bool>true</bool>
+    </property>
+    <property name="YaxisEnabled">
+     <bool>true</bool>
     </property>
    </widget>
-   <widget class="caNumeric" name="canumeric">
+   <widget class="caStripPlot" name="caStripPlot_2">
     <property name="geometry">
      <rect>
-      <x>480</x>
-      <y>390</y>
-      <width>100</width>
-      <height>50</height>
+      <x>470</x>
+      <y>255</y>
+      <width>466</width>
+      <height>251</height>
      </rect>
     </property>
-    <property name="channel" stdset="0">
-     <string notr="true">test</string>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="TitleX">
+     <string notr="true">600 seconds value</string>
+    </property>
+    <property name="channels" stdset="0">
+     <string notr="true">QTDM:COUNT:1</string>
+    </property>
+    <property name="units">
+     <enum>caStripPlot::Second</enum>
+    </property>
+    <property name="period">
+     <double>60.000000000000000</double>
+    </property>
+    <property name="XaxisType">
+     <enum>caStripPlot::ValueScale</enum>
+    </property>
+    <property name="YaxisLimitsMax_1">
+     <double>5.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_1">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_1" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_1" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="Style_1">
+     <enum>caStripPlot::FillUnder</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>170</red>
+      <green>255</green>
+      <blue>127</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_2">
+     <double>1000.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_2">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_2" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_2" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_2">
+     <color>
+      <red>253</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_3">
+     <double>500.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_3">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_3" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_3" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_3">
+     <color>
+      <red>26</red>
+      <green>115</green>
+      <blue>9</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_4">
+     <double>500.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_4">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_4" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_4" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_4">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_5">
+     <double>1.500000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_5">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_5" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_5" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_5">
+     <color>
+      <red>139</red>
+      <green>130</green>
+      <blue>57</blue>
+     </color>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>236</red>
+      <green>236</green>
+      <blue>236</blue>
+     </color>
+    </property>
+    <property name="background">
+     <color>
+      <red>236</red>
+      <green>236</green>
+      <blue>236</blue>
+     </color>
+    </property>
+    <property name="scaleColor">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="XaxisEnabled">
+     <bool>true</bool>
+    </property>
+    <property name="YaxisEnabled">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="caStripPlot" name="caStripPlot_3">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>255</y>
+      <width>466</width>
+      <height>251</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="TitleX">
+     <string notr="true">600 seconds time</string>
+    </property>
+    <property name="channels" stdset="0">
+     <string notr="true">QTDM:COUNT:1</string>
+    </property>
+    <property name="units">
+     <enum>caStripPlot::Second</enum>
+    </property>
+    <property name="period">
+     <double>60.000000000000000</double>
+    </property>
+    <property name="XaxisType">
+     <enum>caStripPlot::TimeScale</enum>
+    </property>
+    <property name="YaxisLimitsMax_1">
+     <double>5.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_1">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_1" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_1" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="Style_1">
+     <enum>caStripPlot::FillUnder</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>170</red>
+      <green>255</green>
+      <blue>127</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_2">
+     <double>1000.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_2">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_2" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_2" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_2">
+     <color>
+      <red>253</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_3">
+     <double>500.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_3">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_3" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_3" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_3">
+     <color>
+      <red>26</red>
+      <green>115</green>
+      <blue>9</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_4">
+     <double>500.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_4">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_4" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_4" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_4">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_5">
+     <double>1.500000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_5">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_5" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_5" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_5">
+     <color>
+      <red>139</red>
+      <green>130</green>
+      <blue>57</blue>
+     </color>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>236</red>
+      <green>236</green>
+      <blue>236</blue>
+     </color>
+    </property>
+    <property name="background">
+     <color>
+      <red>236</red>
+      <green>236</green>
+      <blue>236</blue>
+     </color>
+    </property>
+    <property name="scaleColor">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="grid">
+     <bool>true</bool>
+    </property>
+    <property name="XaxisEnabled">
+     <bool>true</bool>
+    </property>
+    <property name="YaxisEnabled">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="caStripPlot" name="caStripPlot_4">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>510</y>
+      <width>466</width>
+      <height>251</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="TitleX">
+     <string notr="true">6000 milliseconds time</string>
+    </property>
+    <property name="channels" stdset="0">
+     <string notr="true">QTDM:COUNT:1</string>
+    </property>
+    <property name="units">
+     <enum>caStripPlot::Millisecond</enum>
+    </property>
+    <property name="period">
+     <double>6000.000000000000000</double>
+    </property>
+    <property name="XaxisType">
+     <enum>caStripPlot::TimeScale</enum>
+    </property>
+    <property name="YaxisLimitsMax_1">
+     <double>5.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_1">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_1" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_1" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="Style_1">
+     <enum>caStripPlot::FillUnder</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>170</red>
+      <green>255</green>
+      <blue>127</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_2">
+     <double>1000.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_2">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_2" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_2" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_2">
+     <color>
+      <red>253</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_3">
+     <double>500.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_3">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_3" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_3" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_3">
+     <color>
+      <red>26</red>
+      <green>115</green>
+      <blue>9</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_4">
+     <double>500.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_4">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_4" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_4" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_4">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_5">
+     <double>1.500000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_5">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_5" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_5" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_5">
+     <color>
+      <red>139</red>
+      <green>130</green>
+      <blue>57</blue>
+     </color>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>236</red>
+      <green>236</green>
+      <blue>236</blue>
+     </color>
+    </property>
+    <property name="background">
+     <color>
+      <red>236</red>
+      <green>236</green>
+      <blue>236</blue>
+     </color>
+    </property>
+    <property name="scaleColor">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="grid">
+     <bool>true</bool>
+    </property>
+    <property name="XaxisEnabled">
+     <bool>true</bool>
+    </property>
+    <property name="YaxisEnabled">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="caStripPlot" name="caStripPlot_5">
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>510</y>
+      <width>466</width>
+      <height>251</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="TitleX">
+     <string notr="true">6000 milliseconds value</string>
+    </property>
+    <property name="channels" stdset="0">
+     <string notr="true">QTDM:COUNT:1</string>
+    </property>
+    <property name="units">
+     <enum>caStripPlot::Millisecond</enum>
+    </property>
+    <property name="period">
+     <double>6000.000000000000000</double>
+    </property>
+    <property name="XaxisType">
+     <enum>caStripPlot::ValueScale</enum>
+    </property>
+    <property name="YaxisLimitsMax_1">
+     <double>5.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_1">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_1" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_1" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="Style_1">
+     <enum>caStripPlot::FillUnder</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>170</red>
+      <green>255</green>
+      <blue>127</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_2">
+     <double>1000.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_2">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_2" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_2" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_2">
+     <color>
+      <red>253</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_3">
+     <double>500.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_3">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_3" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_3" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_3">
+     <color>
+      <red>26</red>
+      <green>115</green>
+      <blue>9</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_4">
+     <double>500.000000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_4">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_4" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_4" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_4">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="YaxisLimitsMax_5">
+     <double>1.500000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_5">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_5" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_5" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="color_5">
+     <color>
+      <red>139</red>
+      <green>130</green>
+      <blue>57</blue>
+     </color>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>236</red>
+      <green>236</green>
+      <blue>236</blue>
+     </color>
+    </property>
+    <property name="background">
+     <color>
+      <red>236</red>
+      <green>236</green>
+      <blue>236</blue>
+     </color>
+    </property>
+    <property name="scaleColor">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="grid">
+     <bool>true</bool>
+    </property>
+    <property name="XaxisEnabled">
+     <bool>true</bool>
+    </property>
+    <property name="YaxisEnabled">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>
@@ -86,8 +968,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
-     <height>24</height>
+     <width>1010</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>
@@ -95,19 +977,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>caNumeric</class>
+   <class>caStripPlot</class>
    <extends>QFrame</extends>
-   <header>caNumeric</header>
-  </customwidget>
-  <customwidget>
-   <class>caCircularGauge</class>
-   <extends>QWidget</extends>
-   <header>caGauge</header>
-  </customwidget>
-  <customwidget>
-   <class>caCalc</class>
-   <extends>QLabel</extends>
-   <header>caCalc</header>
+   <header>caStripPlot</header>
   </customwidget>
  </customwidgets>
  <resources/>
