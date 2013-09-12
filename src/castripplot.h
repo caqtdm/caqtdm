@@ -404,9 +404,9 @@ private:
     QwtPlotIntervalCurve *fillcurve[MAXCURVES];
 
     // y data for error curve
-    QVector<QwtIntervalSample> base;
-    QVector<QwtIntervalSample> rangeData[MAXCURVES];
-    QVector<QwtIntervalSample> fillData[MAXCURVES];
+    QList<QwtIntervalSample> base;
+    QList<QwtIntervalSample> rangeData[MAXCURVES];
+    QList<QwtIntervalSample> fillData[MAXCURVES];
 
     // x time axis data
     //double *timeData;
