@@ -91,7 +91,8 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     this->statusBar()->show();
 
     // connect action buttons
-    connect( this->ui.btnOpen, SIGNAL( clicked() ), this, SLOT(Callback_OpenButton()) );
+    //connect( this->ui.btnOpen, SIGNAL( clicked() ), this, SLOT(Callback_OpenButton()) );
+    connect( this->ui.fileAction, SIGNAL( triggered() ), this, SLOT(Callback_OpenButton()) );
     connect( this->ui.aboutAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionAbout()) );
     connect( this->ui.exitAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionExit()) );
     connect( this->ui.reloadAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionReload()) );
@@ -100,12 +101,26 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     setWindowTitle(title);
 
     // message window used by library and here
-    messageWindow = new MessageWindow();
+
+/*  this was for an independant window */
+#if INDEPENDENTWINDOW
+    messageWindow = new MessageWindow(widget);
     if(minimize) messageWindow->showMinimized();
     messageWindow->setGeometry(305,0, 500, 150);
     messageWindow->setWindowIcon (QIcon(":/caQtDM.ico"));
     messageWindow->show();
     messageWindow->move(messageWindow->x(), 0);
+#else
+    // message window is now integrated in main window
+    QWidget *widget =new QWidget();
+    messageWindow = new MessageWindow(widget);
+    messageWindow->setAllowedAreas(Qt::TopDockWidgetArea);
+    QGridLayout *gridLayoutCentral = new QGridLayout(this->ui.centralwidget);
+    QGridLayout *gridLayout = new QGridLayout();
+    gridLayoutCentral->addLayout(gridLayout, 0, 0, 1, 1);
+    gridLayout->addWidget(messageWindow, 0, 0, 1, 1);
+    messageWindow->show();
+#endif
 
     sharedMemory.setKey ("caQtDM shared memory");
 
