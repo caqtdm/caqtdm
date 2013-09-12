@@ -176,7 +176,7 @@ void caRowColMenu::populateCells()
                 borderSize = 0;
                 alpha = 0;
             } else {
-                borderSize = 2;
+                borderSize = 1;
             }
 
            //set colors and style filled
