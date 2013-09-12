@@ -514,7 +514,7 @@ void caStripPlot::TimeOut()
         errorcurve[c]->setSamples(rangeData[c].toVector());
     }
 
-    if(timerCount++ > updateRate) {
+//    if(timerCount++ > updateRate) {
         if(thisXaxisType == TimeScale) {
             replot();
         } else {
@@ -526,7 +526,7 @@ void caStripPlot::TimeOut()
 #endif
         }
         timerCount=0;
-    }
+//    }
 
     // keep max and min
     for (int c = 0; c < NumberOfCurves; c++ ) {
