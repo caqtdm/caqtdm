@@ -3,21 +3,23 @@ include(../caQtDM/qtdefs.pri)
 QT       += core gui
 
 contains(QT_VER_MAJ, 4) {
-   CONFIG   += qt warn_on thread uitools designer plugin
+   CONFIG   += qt thread uitools designer plugin
 }
 
 contains(QT_VER_MAJ, 5) {
     QT     += widgets designer printsupport uitools
-    CONFIG += qt plugin warn_on thread
+    CONFIG += qt plugin thread
     DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 }
+
+#CONFIG   += warn_on
 
 #epics4
 #CONFIG += epics4
 
 unix{
- QMAKE_CXXFLAGS += "-g"
- QMAKE_CFLAGS_RELEASE += "-g"
+# QMAKE_CXXFLAGS += "-g"
+# QMAKE_CFLAGS_RELEASE += "-g"
  LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca
  LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
  INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
