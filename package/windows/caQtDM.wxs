@@ -179,7 +179,7 @@
         <Property Id="CAQTDM_VERSION" Value="3.1.0.0" />
         <UIRef Id="WixUI_InstallDir" />
         <!-- UIRef Id="WixUI_Minimal" /-->
-        <Icon Id="StartMenuIcon.exe" SourceFile="$(env.QTHOME)\src\caQtDM\src\caQtDM.ico" />
+        <Icon Id="StartMenuIcon.exe" SourceFile="..\..\src\caQtDM.ico" />
         <Binary Id="caQtDM.exe" SourceFile="..\..\..\caQtDM_Binaries\caQtDM.exe" />
         <InstallExecuteSequence>
             <CreateFolders />
