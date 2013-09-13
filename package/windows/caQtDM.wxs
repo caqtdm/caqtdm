@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Product Id="D75A13FA-3367-4850-AC46-E69A41645E83" Name="caQtDM" Language="1033" Version="3.2.0.0" Manufacturer="Paul Scherrer Institut" UpgradeCode="CEE4C381-28DA-478F-A7C6-3A95B4DF2A89">
+    <Product Id="D75A13FA-3367-4850-AC46-E69A41645E83" Name="caQtDM" Language="1033" Version="3.3.1.0" Manufacturer="Paul Scherrer Institut" UpgradeCode="CEE4C381-28DA-478F-A7C6-3A95B4DF2A89">
         <Package Description="caQTDM Windows Manager with Qt-Designer(4.8.2)" Comments="Displaymanager for EPICS with Qt(4.8.2)" InstallerVersion="300" Compressed="yes" Manufacturer="Paul Scherrer Institut Switzerland" Keywords="EPICS, Display, Network, Control" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
         <Upgrade Id="CEE4C381-28DA-478F-A7C6-3A95B4DF2A89">
@@ -21,7 +21,6 @@
                                 <File Id="QTHELP4.DLL" Name="QtHelp4.dll" Source="$(env.QTHOME)\bin\QtHelp4.dll" />
                                 <File Id="QTCLUCENE4.DLL" Name="QtCLucene4.dll" Source="$(env.QTHOME)\bin\QtCLucene4.dll" />
                                 <File Id="QTSCRIPTTOOLS4.DLL" Name="QtScriptTools4.dll" Source="$(env.QTHOME)\bin\QtScriptTools4.dll" />
-                                <File Id="QTWEBKIT4.DLL" Name="QtWebKit4.dll" Source="$(env.QTHOME)\bin\QtWebKit4.dll" />
                                 <File Id="QTDECLARATIVE4.DLL" Name="QtDeclarative4.dll" Source="$(env.QTHOME)\bin\QtDeclarative4.dll" />
                                 <File Id="QTSCRIPT4.DLL" Name="QtScript4.dll" Source="$(env.QTHOME)\bin\QtScript4.dll" />
                                 <File Id="QTSVG4.DLL" Name="QtSvg4.dll" Source="$(env.QTHOME)\bin\QtSvg4.dll" />
@@ -72,8 +71,7 @@
                         </Directory>
                         <Directory Id="DESIGNER" Name="designer">
                             <Component Id="designer" Guid="C07C30FC-D521-421A-8254-771A42222C4A">
-                                        <File Id="QWEBVIEW.DLL" Name="qwebview.dll" Source="$(env.QTHOME)\plugins\designer\qwebview.dll" />
-                                <File Id="QWT_DESIGNER_PLUGIN.DLL" Name="qwt_designer_plugin.dll" Source="$(env.QTHOME)\plugins\designer\qwt_designer_plugin.dll" />
+                                <File Id="QWT_DESIGNER_PLUGIN.DLL" Name="qwt_designer_plugin.dll" Source="$(env.QWTHOME)\plugins\designer\qwt_designer_plugin.dll" />
                                 <File Id="TASKMENUEXTENSION.DLL" Name="taskmenuextension.dll" Source="$(env.QTHOME)\plugins\designer\taskmenuextension.dll" />
                                 <File Id="WORLDTIMECLOCKPLUGIN.DLL" Name="worldtimeclockplugin.dll" Source="$(env.QTHOME)\plugins\designer\worldtimeclockplugin.dll" />
                                 <File Id="ARTHURPLUGIN.DLL" Name="arthurplugin.dll" Source="$(env.QTHOME)\plugins\designer\arthurplugin.dll" />
@@ -129,7 +127,7 @@
                     </Directory>
                     <Directory Id="StyleSheet" Name="StyleSheet">
                         <Component Id="Stylesheet" Guid="6D848A8A-210B-4246-B86E-819E0C51AEFE">
-                            <File Id="STYLESHEET.QSS" Name="stylesheet.qss" Source="$(env.QTHOME)\src\caQtDM\parser\stylesheet.qss" />
+                            <File Id="STYLESHEET.QSS" Name="stylesheet.qss" Source="..\..\parser\stylesheet.qss" />
                         </Component>
                     </Directory>
                 </Directory>
@@ -182,7 +180,7 @@
         <UIRef Id="WixUI_InstallDir" />
         <!-- UIRef Id="WixUI_Minimal" /-->
         <Icon Id="StartMenuIcon.exe" SourceFile="$(env.QTHOME)\src\caQtDM\src\caQtDM.ico" />
-        <Binary Id="caQtDM.exe" SourceFile="$(env.QTHOME)\bin\caQtDM.exe" />
+        <Binary Id="caQtDM.exe" SourceFile="..\..\..\caQtDM_Binaries\caQtDM.exe" />
         <InstallExecuteSequence>
             <CreateFolders />
             <FileCost />
