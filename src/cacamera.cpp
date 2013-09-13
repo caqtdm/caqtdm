@@ -193,7 +193,11 @@ void caCamera::setColormap(colormap const &map)
         break;
     case grey:
         for(int i=0; i<ColormapSize; i++) ColorMap[i] = qRgb(i,i,i);
-        setup(false);
+        if (m_bpp==3){
+		  setup(true);
+		}else{
+          setup(false);
+	    }
         break;
     case spectrum:
         for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = rgbFromWaveLength(380.0 + (i * 400.0 / ColormapSize));
@@ -309,7 +313,7 @@ void caCamera::showImage(int datasize, char *data)
     switch (m_code) {
 
     // monochrome image
-    case 1:
+    case 1:{
 
         // start bpp switch
         switch (m_bpp) {
@@ -417,9 +421,17 @@ void caCamera::showImage(int datasize, char *data)
                     uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
 
                     for (int x = 0; x < resultSize.width(); ++x) {
-                        indx = ptr[i++] >> 4;
-                        if(indx > 255) indx = 255;
-                        *scanLine++ = ColorMap[indx];
+                        //indx = ptr[i++] >> 4;
+                        //if(indx > 255) indx = 255;
+                        //*scanLine++ = ColorMap[indx];
+                        indx=ptr[i++];
+                        Max[(indx > Max[1])] = indx;
+                        Min[(indx < Min[1])] = indx;
+						indx1=indx * 255 /(maxvalue - minvalue);
+
+						if(indx1 > 255) indx1 = 255;
+                        *scanLine++ = qRgb(indx1,indx1,indx1);
+
                     }
                     if(i >= datasize) break;
                 }
@@ -431,6 +443,8 @@ void caCamera::showImage(int datasize, char *data)
             break;
         } // end switch bpp
 
+		break;
+	}
         // color rgb image
     case 3:
 
