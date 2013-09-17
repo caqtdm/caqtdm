@@ -12,14 +12,14 @@ contains(QT_VER_MAJ, 5) {
     DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 }
 
-#CONFIG   += warn_on
+CONFIG   += warn_on
 
 #epics4
 #CONFIG += epics4
 
 unix{
-# QMAKE_CXXFLAGS += "-g"
-# QMAKE_CFLAGS_RELEASE += "-g"
+ QMAKE_CXXFLAGS += "-g"
+ QMAKE_CFLAGS_RELEASE += "-g"
  LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca
  LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
  INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
