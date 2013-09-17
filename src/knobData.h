@@ -51,6 +51,7 @@ typedef struct _epicsData {
     int          initialize;            /* first initialisation */
     char         aux[10];               /* used for acs controlsystem images */
     struct timeb lastTime;              /* last displayed time */
+    struct timeb actTime;               /* receive time */
     int          repRate;               /* repetition rate for this channel, default will be 5Hz */
 } epicsData;
 
