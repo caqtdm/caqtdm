@@ -2245,7 +2245,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 }
             }
 
-            widget->setData(data.edata.rvalue, actPlot);
+            widget->setData(data.edata.actTime, data.edata.rvalue, actPlot);
 
             if(data.edata.initialize) {
                 widget->startPlot();
@@ -3065,7 +3065,11 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             info.append(w->objectName());
             info.append("<br>");
             for(int i=0; i< nbPV; i++) {
+                // is there a json string ?
+                int pos = pv[i].indexOf("{");
+                if(pos != -1) pv[i] = pv[i].mid(0, pos);
                 knobData *kPtr = mutexKnobData->getMutexKnobDataPV(pv[i]);  // use pointer for getting all necessary information
+                qDebug() << kPtr;
                 if((kPtr != (knobData*) 0) && (pv[i].length() > 0)) {
                     char asc[255];
                     info.append("<br>");
