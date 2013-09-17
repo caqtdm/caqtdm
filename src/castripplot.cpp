@@ -46,7 +46,11 @@ private:
 
 };
 
-caStripPlot::~caStripPlot(){
+caStripPlot::~caStripPlot() {
+
+    emit timerThreadStop();
+    timerThread->wait(200);
+    timerThread->deleteLater();
 }
 
 caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
@@ -136,9 +140,18 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
 
     installEventFilter(this);
 
+    // display timer
     Timer = new QTimer(this);
+    Timer->setInterval(1000);
     connect(Timer, SIGNAL(timeout()), this, SLOT(TimeOut()));
 
+    // data collection thread
+    timerThread = new stripplotthread();
+    timerThread->start();
+    timerThread->threadSetTimer(100);
+    timerThread->setPriority(QThread::HighPriority);
+    connect(this, SIGNAL(timerThreadStop()), timerThread, SLOT(runStop()));
+    connect(timerThread, SIGNAL(update()), this, SLOT(TimeOutThread()),  Qt::DirectConnection);
 }
 
 void caStripPlot::defineAxis(units unit, double period)
@@ -194,6 +207,8 @@ void caStripPlot::RescaleCurves(int width, units unit, double period)
         INTERVAL = period;
     }
 
+    mutex.lock();
+
     for(int i=0; i < MAXCURVES; i++) {
         // define interval data for error and fill curves
         rangeData[i].clear();
@@ -206,11 +221,12 @@ void caStripPlot::RescaleCurves(int width, units unit, double period)
         }
     }
 
-
     for(int i=0; i < NumberOfCurves; i++) {
         if(thisStyle[i] == FillUnder) fillcurve[i]->setSamples(fillData[i].toVector());
         errorcurve[i]->setSamples(rangeData[i].toVector());
     }
+
+    mutex.unlock();
 
     // define update rate
     dataCount = 0;
@@ -220,9 +236,17 @@ void caStripPlot::RescaleCurves(int width, units unit, double period)
 
     timerCount = 0;
 
-    if(timerID != 0) {
-        Timer->setInterval((int)timeInterval);
+    if(timerID) {
+        // change display timer interval
+        int interval = qMax((int)timeInterval, 20);
+        Timer->setInterval(interval);
         Timer->start();
+
+        // stop run method of thread and redefine repetition time then start run
+        emit timerThreadStop();
+        timerThread->wait(200);
+        timerThread->threadSetTimer((int) timeInterval);
+        timerThread->start();
     }
 
     replot();
@@ -323,9 +347,19 @@ void caStripPlot::defineCurves(QStringList titres, units unit, double period, in
 
 void caStripPlot::startPlot()
 {
-    Timer->setInterval((int)timeInterval);
+    //change display timer interval
+    int interval = qMax((int)timeInterval, 20);
+    Timer->setInterval(interval);
     Timer->start();
+
+    // stop run method of thread and redefine repetition time then start run
+    emit timerThreadStop();
+    timerThread->wait(200);
+    timerThread->threadSetTimer((int)timeInterval);
+    timerThread->start();
+
     timerID = true;
+
 }
 
 void caStripPlot::addText(double x, double y, char* text, QColor c, int fontsize)
@@ -343,16 +377,17 @@ void caStripPlot::addText(double x, double y, char* text, QColor c, int fontsize
     replot();
 }
 
-void caStripPlot::TimeOut()
+// data collection done by timerthread
+void caStripPlot::TimeOutThread()
 {
-    int c, i, j;
+    int c, i;
     double elapsedTime = 0.0;
     QwtIntervalSample tmp;
     double value = 0.0;
     double elapsed=0.0;
-    int delta = 0;
-    double x0, x1, increment;
-    int totalMissed = 0;
+
+    if(!timerID) return;
+
     int dataCountLimit = MULTFOROVERLAPPINGTIMES * HISTORY -1;
 
     // we need an exact time scale
@@ -364,17 +399,13 @@ void caStripPlot::TimeOut()
 
     elapsedTime = ((double) timeNow.time + (double) timeNow.millitm / (double)1000) -
             ((double) timeStart.time + (double) timeStart.millitm / (double)1000);
+    //printf("elapsedTime=%.3f %p\n", elapsedTime, QObject::thread());
 
-    // change scale base in case of running time scale
-    if(thisXaxisType == TimeScale) {
-        timeData = INTERVAL + elapsedTime;
-        setAxisScale(QwtPlot::xBottom, timeData - INTERVAL, timeData);
-        //axisWidget( QwtPlot::xBottom )->update();
-        updateAxes();
-        //replot();
-    }
+    elapsedTimeOld = elapsedTime;
 
     timeData = INTERVAL + elapsedTime;
+
+    mutex.lock();
 
     if(dataCount > 1) {
 
@@ -397,9 +428,9 @@ void caStripPlot::TimeOut()
                 value = base[i].value - elapsed;
                 // correct value to fit again inside the interval
                 if(Unit == Millisecond) {
-                    value = value *1000.0;
+                    value = value * 1000.0;
                 } else if(Unit == Minute) {
-                    value = value/60.0;
+                    value = value / 60.0;
                 }
                 for (c = 0; c < NumberOfCurves; c++ ) {
                     rangeData[c][i].value = fillData[c][i].value = value;
@@ -417,71 +448,13 @@ void caStripPlot::TimeOut()
         }
     }
 
-    // treat space between pixels if any (slow algorithme, should be improved)
-
-    for (int i = 2; i < dataCount; i++ ) {
-        x0 = transform(QwtPlot::xBottom, rangeData[0][i-1].value);
-        x1 = transform(QwtPlot::xBottom, rangeData[0][i].value);
-        delta = (int) (x0+0.5) - (int) (x1+0.5) - 1;
-
-        if(delta > 0 && x0 > 0 && x1 > 0 && delta < 3) {
-            increment = (base[i-1].value - base[i].value)/ (double) (delta+1);
-            //printf("===============> missed ticks=%d at=%d x0=%.1f x1=%.1f %d %d\n", delta, i, x0, x1, (int) (x0+0.5) , (int) (x1+0.5));
-            totalMissed++;
-
-            // insert missing time base data and adjust time holes
-            if(thisXaxisType != TimeScale) {
-                for(j = 0; j < delta; j++) {
-                    base.insert(i, base[i]);
-                    base.removeLast();
-                }
-                for(j = 1; j < delta+1; j++) {
-                    base[j+i-1].value = base[i-1].value - increment * (double) j;
-                }
-            }
-/*
-            printf("before\n");
-            for(j=1; j<dataCount; j++) {
-                printf("(%d %d) ", j, (int) (transform(QwtPlot::xBottom, rangeData[0][j].value)+0.5));
-                if((j/15)*15 == j)  printf("\n");
-            }
-            printf("\n");
-*/
-            // insert missing data and timebase
-            for (c = 0; c < NumberOfCurves; c++ ) {
-                for(j = 0; j < delta; j++) {
-                    if(thisStyle[c] == FillUnder) {
-                        fillData[c].insert(i, fillData[c][i]);
-                        fillData[c].removeLast();
-                    }
-                    rangeData[c].insert(i, rangeData[c][i]);
-                    rangeData[c].removeLast();
-                }
-                for(j = 1; j < delta+1; j++) {
-                    rangeData[c][j+i-1].value = fillData[c][j+i-1].value = invTransform(QwtPlot::xBottom, (int) (x0+0.5)-j);
-                }
-            }
-/*
-            printf("after\n");
-            for(j=1; j<dataCount; j++) {
-                printf("(%d %d) ", j,  (int) (transform(QwtPlot::xBottom, rangeData[0][j].value)+0.5));
-                if((j/15)*15 == j)  printf("\n");
-            }
-            printf("\n");
-*/
-            if ((dataCount + delta) < dataCountLimit) dataCount = dataCount + delta;
-
-        }
-    }
-
-    // printf("===============> total missed plots=%d datacount=%d size=%d %d\n", totalMissed, dataCount, (int)(HISTORY * MULTFOROVERLAPPINGTIMES), base.size());
-
     // advance data points
     if (dataCount < dataCountLimit) dataCount++;
 
-    // update last point and plot
+    // update last point
     for (int c = 0; c < NumberOfCurves; c++ ) {
         double y0, y1, y2, y3;
+
         // smallest vertical width of error bar must not be zero
         y0 = transform(QwtPlot::yLeft, minVal[c]);
         y1 = transform(QwtPlot::yLeft, maxVal[c]);
@@ -497,6 +470,7 @@ void caStripPlot::TimeOut()
         }
 
         //  and to fillunder we add a range to the fill curve
+
         if(thisStyle[c] == FillUnder) {
             double value, height, y4, y5;
             if(minVal[c] < 0.0)  value = y0; else value = y1;
@@ -504,35 +478,71 @@ void caStripPlot::TimeOut()
             y1 = transform(QwtPlot::yLeft, 0.0);
             if(y1 > height) y1 = height;
             if(y1 < 0.0) y1 =0.0;
-
             y4 = invTransform(QwtPlot::yLeft, (int) (value+0.5));
             y5 = invTransform(QwtPlot::yLeft, (int) (y1+0.5));
 
+            // set the range into the array
             fillData[c][0] = QwtIntervalSample( timeData, QwtInterval(y4, y5));
-            fillcurve[c]->setSamples(fillData[c].toVector());
         }
-        errorcurve[c]->setSamples(rangeData[c].toVector());
-    }
 
-//    if(timerCount++ > updateRate) {
-        if(thisXaxisType == TimeScale) {
-            replot();
-        } else {
-#if QWT_VERSION >= 0x060100
-            QwtPlotCanvas *canvas =  (QwtPlotCanvas *) this->canvas();
-            canvas->replot();
-#else
-            canvas()->replot();
-#endif
-        }
-        timerCount=0;
-//    }
+    }
+    mutex.unlock();
 
     // keep max and min
     for (int c = 0; c < NumberOfCurves; c++ ) {
         maxVal[c] = minVal[c] = actVal[c];
         realMax[c] = realMin[c] = realVal[c];
     }
+
+
+}
+
+// display
+void caStripPlot::TimeOut()
+{
+    double elapsedTime = 0.0;
+
+    if(!timerID) return;
+
+
+    // we need an exact time scale
+    if(Start) {
+        Start = false;
+        ftime(&timeStart);
+    }
+    ftime(&timeNow);
+
+    elapsedTime = ((double) timeNow.time + (double) timeNow.millitm / (double)1000) -
+            ((double) timeStart.time + (double) timeStart.millitm / (double)1000);
+
+    // change scale base in case of running time scale
+    if(thisXaxisType == TimeScale) {
+        timeData = INTERVAL + elapsedTime;
+        setAxisScale(QwtPlot::xBottom, timeData - INTERVAL, timeData);
+    }
+
+    mutex.lock();
+    for (int c = 0; c < NumberOfCurves; c++ ) {
+
+        if(thisStyle[c] == FillUnder) {
+            fillcurve[c]->setSamples(fillData[c].toVector());
+        }
+        errorcurve[c]->setSamples(rangeData[c].toVector());
+    }
+    mutex.unlock();
+
+    if(thisXaxisType == TimeScale) {
+        replot();
+    } else {
+#if QWT_VERSION >= 0x060100
+        QwtPlotCanvas *canvas =  (QwtPlotCanvas *) this->canvas();
+        canvas->replot();
+#else
+        canvas()->replot();
+#endif
+    }
+    timerCount=0;
+
 }
 
 void caStripPlot::setYscale(double ymin, double ymax) {
@@ -545,10 +555,10 @@ void caStripPlot::RescaleAxis()
     int i;
     // recale axis
     for(i=0; i < NumberOfCurves; i++) {
-        setData(realVal[i], i);
+        setData(realTim[i], realVal[i], i);
     }
 
-    // redraw legened if any
+    // redraw legend if any
     setLegendAttribute(thisScaleColor, QFont("arial", 9), TEXT);
 }
 
@@ -651,10 +661,11 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 
 }
 
-void caStripPlot::setData(double Y, int curvIndex)
+void caStripPlot::setData(struct timeb now, double Y, int curvIndex)
 {
     if(curvIndex < 0 || curvIndex > (MAXCURVES-1)) return;
     realVal[curvIndex] = Y;
+    realTim[curvIndex] = now;
     if(Y> realMax[curvIndex]) realMax[curvIndex]  = Y;
     if(Y< realMin[curvIndex]) realMin[curvIndex]  = Y;
 

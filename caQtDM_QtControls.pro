@@ -3,7 +3,7 @@ include(../caQtDM/qtdefs.pri)
 DEFINES += QT_NO_DEBUG_OUTPUT
 
 contains(QT_VER_MAJ, 4) {
-  CONFIG += uitools qwt plugin designer
+  CONFIG += uitools qwt plugin designer thread
 }
 contains(QT_VER_MAJ, 5) {
   QT      += widgets designer uitools
@@ -11,7 +11,7 @@ contains(QT_VER_MAJ, 5) {
   DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 }
 
-#CONFIG += warn_on
+CONFIG += warn_on
 
 TARGET = qtcontrols
 TEMPLATE = lib
@@ -45,8 +45,8 @@ unix {
     OBJECTS_DIR = obj
     DESTDIR = .
     QMAKE_POST_LINK = cp libqtcontrols.so $(QTBASE)
-#    QMAKE_CXXFLAGS += "-g"
-#    QMAKE_CFLAGS_RELEASE += "-g"
+    QMAKE_CXXFLAGS += "-g"
+    QMAKE_CFLAGS_RELEASE += "-g"
 }
 MOC_DIR = moc
 INCLUDEPATH += src
@@ -105,7 +105,8 @@ SOURCES	+= \
     src/cascriptbutton.cpp \
     src/cadoubletabwidget.cpp \
     src/cadoubletabwidgetextension.cpp \
-    src/cadoubletabwidgetextensionfactory.cpp
+    src/cadoubletabwidgetextensionfactory.cpp \
+    src/stripplotthread.cpp
 
 # assume qwt6.0 was made with qt4
 contains(QT_VER_MAJ, 4) {
@@ -173,7 +174,8 @@ HEADERS	+= \
     src/cascriptbutton.h \
     src/cadoubletabwidget.h \
     src/cadoubletabwidgetextension.h \
-    src/cadoubletabwidgetextensionfactory.h
+    src/cadoubletabwidgetextensionfactory.h \
+    src/stripplotthread.h
 
 
 # assume qwt6.0 was made with qt4

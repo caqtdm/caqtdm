@@ -15,6 +15,8 @@
 #include <sys/timeb.h>
 #include <QTime>
 #include <QTimer>
+#include <QThread>
+#include <QMutex>
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_intervalcurve.h>
@@ -37,6 +39,8 @@
 #include <qwt_plot_marker.h>
 #include <QMouseEvent>
 #include <qtcontrols_global.h>
+
+#include <stripplotthread.h>
 
 class QwtPlotCurve;
 
@@ -150,7 +154,7 @@ public:
     ~caStripPlot();
 
     void defineCurves(QStringList titres, units unit, double period, int width, int nb);
-    void setData(double Y, int curvIndex);
+    void setData(struct timeb now, double Y, int curvIndex);
 
     bool getXaxisEnabled() const { return thisXshow; }
     void setXaxisEnabled(bool thisXshow);
@@ -372,9 +376,12 @@ protected:
 
 signals:
     void ShowContextMenu(const QPoint&);
+    void update();
+    void timerThreadStop();
 
 private slots:
      void TimeOut();
+     void TimeOutThread();
 
 private:
 
@@ -387,6 +394,7 @@ private:
     double Period;
     units Unit;
     QTimer *Timer;
+    //QTimer TimerThread;
     struct timeb  timeNow;
     struct timeb  timeStart;
     bool Start;
@@ -408,8 +416,6 @@ private:
     QList<QwtIntervalSample> rangeData[MAXCURVES];
     QList<QwtIntervalSample> fillData[MAXCURVES];
 
-    // x time axis data
-    //double *timeData;
     double timeData;
     int dataCount;
 
@@ -446,9 +452,14 @@ private:
 
     double maxVal[MAXCURVES], minVal[MAXCURVES], actVal[MAXCURVES];
     double realVal[MAXCURVES], realMax[MAXCURVES], realMin[MAXCURVES];
+    struct timeb realTim[MAXCURVES];
 
     QStringList savedTitres;
     QString legendText(int i);
 
+    stripplotthread *timerThread;
+
+    double elapsedTimeOld;
+    QMutex mutex;
 };
 #endif
