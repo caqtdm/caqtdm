@@ -31,12 +31,14 @@
     <property name="title">
      <string>Menu</string>
     </property>
-    <addaction name="aboutAction"/>
+    <addaction name="fileAction"/> 
     <addaction name="separator"/>
     <addaction name="separator"/>
-    <addaction name="exitAction"/>
     <addaction name="reloadAction"/>
-    <addaction name="fileAction"/>
+      <addaction name="exitAction"/>  
+        <addaction name="separator"/>
+    <addaction name="separator"/>
+       <addaction name="aboutAction"/> 
    </widget>
    <widget class="QMenu" name="menuPV">
     <property name="title">
@@ -47,11 +49,6 @@
    <addaction name="menuMenu"/>
    <addaction name="menuPV"/>
   </widget>
-  <action name="aboutAction">
-   <property name="text">
-    <string>&amp;About</string>
-   </property>
-  </action>
   <action name="exitAction">
    <property name="text">
     <string>&amp;Exit</string>
@@ -66,13 +63,24 @@
    <property name="text">
     <string>&amp;Unconnected</string>
    </property>
+   <property name="iconText">
+    <string>Unconnected PV's</string>
+   </property>
+   <property name="toolTip">
+    <string>Unconnected PV's</string>
+   </property>
   </action>
   <action name="fileAction">
    <property name="text">
-    <string>&amp;File</string>
+    <string>Open &amp;File</string>
    </property>
    <property name="toolTip">
-    <string>File</string>
+    <string>Open File</string>
+   </property>
+  </action>
+  <action name="aboutAction">
+   <property name="text">
+    <string>&amp;About</string>
    </property>
   </action>
  </widget>
