@@ -193,11 +193,11 @@ void caCamera::setColormap(colormap const &map)
         break;
     case grey:
         for(int i=0; i<ColormapSize; i++) ColorMap[i] = qRgb(i,i,i);
-        if (m_bpp==3){
+        //if (m_bpp==3){
 		  setup(true);
-		}else{
-          setup(false);
-	    }
+		//}else{
+        //  setup(false);
+	    //}
         break;
     case spectrum:
         for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = rgbFromWaveLength(380.0 + (i * 400.0 / ColormapSize));
@@ -393,7 +393,7 @@ void caCamera::showImage(int datasize, char *data)
 
         case 3: {   // monochrome 2 bpp, but used only 12 bits  (Helge cameras)
 
-            uint *ptr = (uint*) data;
+            ushort *ptr = (ushort*) data;
 
             if(ptr == (void*) 0) return;
 
@@ -417,13 +417,12 @@ void caCamera::showImage(int datasize, char *data)
 
 
             } else {
+
                 for (int y = 0; y < resultSize.height(); ++y) {
                     uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
 
                     for (int x = 0; x < resultSize.width(); ++x) {
-                        //indx = ptr[i++] >> 4;
-                        //if(indx > 255) indx = 255;
-                        //*scanLine++ = ColorMap[indx];
+
                         indx=ptr[i++];
                         Max[(indx > Max[1])] = indx;
                         Min[(indx < Min[1])] = indx;
