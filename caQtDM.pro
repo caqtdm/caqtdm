@@ -31,6 +31,7 @@ win32 {
 	
 	win32-msvc* {
 		DebugBuild {
+			CONFIG += console
 			DESTDIR = debug
 			EPICS_LIBS=$${EPICS_BASE}/lib/win32-x86
 			OBJECTS_DIR = debug/obj
