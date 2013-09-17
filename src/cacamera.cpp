@@ -284,7 +284,7 @@ void caCamera::showImage(int datasize, char *data)
     long int i=0;
     QSize resultSize;
     uint Max[2], Min[2];
-    static uint minvalue, maxvalue;
+    //static uint minvalue, maxvalue;
 
     if(!m_bppDefined) return;
     if(!m_widthDefined) return;

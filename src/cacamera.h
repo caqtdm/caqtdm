@@ -124,6 +124,7 @@ private:
     int savedSize;
     int savedWidth;
     int savedHeight;
+    uint minvalue, maxvalue;
 
     QHBoxLayout  *hbox;
     QGridLayout  *vbox;
