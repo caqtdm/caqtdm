@@ -3069,7 +3069,6 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 int pos = pv[i].indexOf("{");
                 if(pos != -1) pv[i] = pv[i].mid(0, pos);
                 knobData *kPtr = mutexKnobData->getMutexKnobDataPV(pv[i]);  // use pointer for getting all necessary information
-                qDebug() << kPtr;
                 if((kPtr != (knobData*) 0) && (pv[i].length() > 0)) {
                     char asc[255];
                     info.append("<br>");
