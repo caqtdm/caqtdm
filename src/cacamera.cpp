@@ -499,7 +499,6 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
         maxvalue = maxvalue +1;
         minvalue = minvalue -1;
         if(maxvalue > 65535) maxvalue = 65535;
-        if(minvalue < 0) minvalue = 0;
     }
 
     if(getAutomateChecked()) {
