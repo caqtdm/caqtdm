@@ -287,7 +287,6 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
     long int i=0;
     QSize resultSize;
     uint Max[2], Min[2];
-    //static uint minvalue, maxvalue;
 
     if(!m_bppDefined) return (QImage *) 0;
     if(!m_widthDefined) return (QImage *) 0;
@@ -495,6 +494,13 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
 
     minvalue = Min[1];
     maxvalue= Max[1];
+
+    if(maxvalue == minvalue) {
+        maxvalue = maxvalue +1;
+        minvalue = minvalue -1;
+        if(maxvalue > 65535) maxvalue = 65535;
+        if(minvalue < 0) minvalue = 0;
+    }
 
     if(getAutomateChecked()) {
         updateMax(Max[1]);
