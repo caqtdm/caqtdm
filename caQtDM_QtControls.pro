@@ -6,7 +6,7 @@ contains(QT_VER_MAJ, 4) {
   CONFIG += uitools qwt plugin designer thread
 }
 contains(QT_VER_MAJ, 5) {
-  QT      += widgets designer uitools
+  QT      += widgets designer uitools concurrent
   CONFIG  += qwt plugin
   DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 }
