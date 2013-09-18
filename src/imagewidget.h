@@ -14,6 +14,7 @@ public:
     ImageWidget(QWidget *parent = 0);
     ~ImageWidget(){}
     void updateImage(bool zoom, const QImage &image, bool valuesPresent[], int values[]);
+    QImage scaleImage(const QImage &image);
 
 protected:
     void paintEvent(QPaintEvent *event);

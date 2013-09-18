@@ -51,6 +51,7 @@ public:
     ~caCamera();
 
     void updateImage(const QImage &image, bool valuesPresent[], int values[]);
+    QImage * showImageCalc(int datasize, char *data);
     void showImage(int datasize, char *data);
     uint rgbFromWaveLength(double wave);
 

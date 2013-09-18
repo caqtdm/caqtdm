@@ -1,5 +1,8 @@
 #include <QtGui>
 #include <math.h>
+#ifndef QT_NO_CONCURRENT
+#include <qtconcurrentrun.h>
+#endif
 #include "cacamera.h"
 
 caCamera::caCamera(QWidget *parent) : QWidget(parent)
@@ -278,7 +281,7 @@ void caCamera::dataProcessing(int value, int id)
     values[id] = value;
 }
 
-void caCamera::showImage(int datasize, char *data)
+QImage *caCamera::showImageCalc(int datasize, char *data)
 {
     uint indx, indx1;
     long int i=0;
@@ -286,10 +289,10 @@ void caCamera::showImage(int datasize, char *data)
     uint Max[2], Min[2];
     //static uint minvalue, maxvalue;
 
-    if(!m_bppDefined) return;
-    if(!m_widthDefined) return;
-    if(!m_heightDefined) return;
-    if(!m_codeDefined) return;
+    if(!m_bppDefined) return (QImage *) 0;
+    if(!m_widthDefined) return (QImage *) 0;
+    if(!m_heightDefined) return (QImage *) 0;
+    if(!m_codeDefined) return (QImage *) 0;
 
     resultSize.setWidth((int) m_width);
     resultSize.setHeight((int) m_height);
@@ -321,7 +324,7 @@ void caCamera::showImage(int datasize, char *data)
         case 1:  {  // monochrome 1 bpp  (Damir camera)
 
             uchar *ptr = (uchar*)  data;
-            if(ptr == (void*) 0) return;
+            if(ptr == (void*) 0) return (QImage *) 0;
 
             if(thisColormap == spectrum) {
 
@@ -358,7 +361,7 @@ void caCamera::showImage(int datasize, char *data)
         case 2: {  // monochrome 2 bpp, but use only first byte of words (Damir cameras)
 
             uchar *ptr = (uchar*)  data;
-            if(ptr == (void*) 0) return;
+            if(ptr == (void*) 0) return (QImage *) 0 ;
 
             if(thisColormap == spectrum) {
 
@@ -395,7 +398,7 @@ void caCamera::showImage(int datasize, char *data)
 
             ushort *ptr = (ushort*) data;
 
-            if(ptr == (void*) 0) return;
+            if(ptr == (void*) 0) return (QImage *) 0;
 
             if(thisColormap == spectrum) {
 
@@ -453,7 +456,7 @@ void caCamera::showImage(int datasize, char *data)
         case 3: // 3 bpp, each byte with r,g,b
             if(!m_forcemonochrome) {
                 uchar *ptr = (uchar*)  data;
-                if(ptr == (void*) 0) return;
+                if(ptr == (void*) 0) return (QImage *) 0;
 
                 for (int y = 0; y < resultSize.height(); ++y) {
                     uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
@@ -465,7 +468,7 @@ void caCamera::showImage(int datasize, char *data)
                 }
             } else {  //convert color to gray scale
                 uchar *ptr = (uchar*)  data;
-                if(ptr == (void*) 0) return;
+                if(ptr == (void*) 0) return (QImage *) 0;
 
                 for (int y = 0; y < resultSize.height(); ++y) {
                     uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
@@ -504,8 +507,31 @@ void caCamera::showImage(int datasize, char *data)
             minvalue = minv;
         }
     }
+    return image;
+}
 
-    updateImage(*image, valuesPresent, values);
+void caCamera::showImage(int datasize, char *data)
+{
+/*
+    struct timeb  timeNow;
+    struct timeb  timeStart;
+    double elapsedTime;
+    ftime(&timeStart);
+*/
+    // up to now I did not really notice a difference with the routine in this thread
+#ifndef QT_NO_CONCURRENT
+    QFuture<QImage *> future = QtConcurrent::run(this, &caCamera::showImageCalc, datasize, data);
+    image = future.result();
+#else
+    image = showImageCalc(datasize, data);
+#endif
+/*
+    ftime(&timeNow);
+    elapsedTime = ((double) timeNow.time + (double) timeNow.millitm / (double)1000) -
+            ((double) timeStart.time + (double) timeStart.millitm / (double)1000);
+    printf("elapsed %.3f\n", elapsedTime);
+*/
+    if(image != (QImage *) 0) updateImage(*image, valuesPresent, values);
 }
 
 

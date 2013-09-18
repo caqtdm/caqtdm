@@ -1,4 +1,7 @@
 #include <QtGui>
+#ifndef QT_NO_CONCURRENT
+#include <qtconcurrentrun.h>
+#endif
 #include <math.h>
 #include "imagewidget.h"
 
@@ -46,12 +49,26 @@ void ImageWidget::paintEvent(QPaintEvent * event)
 
 }
 
+QImage ImageWidget::scaleImage(const QImage &image) {
+    return image.scaled(this->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+}
+
 
 void ImageWidget::updateImage(bool zoom, const QImage &image, bool valuesPresent[], int values[])
 {
     if(zoom) {
-        QImage imageNew = image.scaled(this->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        //QImage imageNew = image.scaled(this->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        QImage imageNew = scaleImage(image);
         if(imageNew.isNull()) return;
+
+#ifndef QT_NO_CONCURRENT
+        QFuture<QImage> future = QtConcurrent::run(this, &ImageWidget::scaleImage, image);
+        imageNew = future.result();
+#else
+        QImage imageNew = scaleImage(image);
+
+#endif
+
         pixmap = QPixmap::fromImage(imageNew);
     } else {
         pixmap = QPixmap::fromImage(image);
