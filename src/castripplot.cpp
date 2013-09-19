@@ -500,7 +500,12 @@ void caStripPlot::TimeOutThread()
 // display
 void caStripPlot::TimeOut()
 {
+    int c, j;
     double elapsedTime = 0.0;
+    int delta = 0;
+    double x0, x1, increment;
+    int totalMissed = 0;
+     int dataCountLimit = (int) (MULTFOROVERLAPPINGTIMES * HISTORY -1);
 
     if(!timerID) return;
 
@@ -522,6 +527,64 @@ void caStripPlot::TimeOut()
     }
 
     mutex.lock();
+
+
+    // we want to be sure that no pixels are missed
+    for (int i = 2; i < dataCount; i++ ) {
+        x0 = transform(QwtPlot::xBottom, rangeData[0][i-1].value);
+        x1 = transform(QwtPlot::xBottom, rangeData[0][i].value);
+        delta = (int) (x0+0.5) - (int) (x1+0.5) - 1;
+
+        if(delta > 0 && x0 > 0 && x1 > 0 && delta < 3) {
+            increment = (base[i-1].value - base[i].value)/ (double) (delta+1);
+            //printf("===============> missed ticks=%d at=%d x0=%.1f x1=%.1f %d %d\n", delta, i, x0, x1, (int) (x0+0.5) , (int) (x1+0.5));
+            totalMissed++;
+
+            // insert missing time base data and adjust time holes
+            if(thisXaxisType != TimeScale) {
+                for(j = 0; j < delta; j++) {
+                    base.insert(i, base[i]);
+                    base.removeLast();
+                }
+                for(j = 1; j < delta+1; j++) {
+                    base[j+i-1].value = base[i-1].value - increment * (double) j;
+                }
+            }
+/*
+            printf("before\n");
+            for(j=1; j<dataCount; j++) {
+                printf("(%d %d) ", j, (int) (transform(QwtPlot::xBottom, rangeData[0][j].value)+0.5));
+                if((j/15)*15 == j)  printf("\n");
+            }
+            printf("\n");
+*/
+            // insert missing data and timebase
+            for (c = 0; c < NumberOfCurves; c++ ) {
+                for(j = 0; j < delta; j++) {
+                    if(thisStyle[c] == FillUnder) {
+                        fillData[c].insert(i, fillData[c][i]);
+                        fillData[c].removeLast();
+                    }
+                    rangeData[c].insert(i, rangeData[c][i]);
+                    rangeData[c].removeLast();
+                }
+                for(j = 1; j < delta+1; j++) {
+                    rangeData[c][j+i-1].value = fillData[c][j+i-1].value = invTransform(QwtPlot::xBottom, (int) (x0+0.5)-j);
+                }
+            }
+/*
+            printf("after\n");
+            for(j=1; j<dataCount; j++) {
+                printf("(%d %d) ", j,  (int) (transform(QwtPlot::xBottom, rangeData[0][j].value)+0.5));
+                if((j/15)*15 == j)  printf("\n");
+            }
+            printf("\n");
+*/
+            if ((dataCount + delta) < dataCountLimit) dataCount = dataCount + delta;
+
+        }
+    }
+
     for (int c = 0; c < NumberOfCurves; c++ ) {
 
         if(thisStyle[c] == FillUnder) {
