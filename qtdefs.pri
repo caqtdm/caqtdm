@@ -1,9 +1,13 @@
-CAQTDM_VERSION = V3.3.1
+CAQTDM_VERSION = V3.3.2
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+
+# new in 3.4.0
+# caStripplot has been revisited
+# caCamera uses now concurrent mode for calculations
 
 # new in 3.3.1
 # mainwindow and messagewindow have been merged
