@@ -388,7 +388,7 @@ void caStripPlot::TimeOutThread()
 
     if(!timerID) return;
 
-    int dataCountLimit = MULTFOROVERLAPPINGTIMES * HISTORY -1;
+    int dataCountLimit = (int) (MULTFOROVERLAPPINGTIMES * HISTORY -1);
 
     // we need an exact time scale
     if(Start) {
