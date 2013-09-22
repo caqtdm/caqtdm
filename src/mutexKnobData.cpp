@@ -382,7 +382,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
             kPtr->edata.initialize = false;
             displayCount++;
 
-        } else if ((kPtr->index != -1)  && (diff >= (1.0/(double)repRate))){
+        } else if ((kPtr->index != -1)  && (diff >= (1.0/(double)repRate))) {
             if( (!kPtr->edata.connected)) {
                 QMutexLocker locker(&mutex);
                 bool displayIt = false;
