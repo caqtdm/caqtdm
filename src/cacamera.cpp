@@ -21,6 +21,7 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     frameCount = 0;
 
     image = (QImage *) 0;
+    Xpos = Ypos = 0;
 
     for(int i=0; i<ColormapSize; i++) ColorMap[i] = qRgb(i,i,i);
 
@@ -29,6 +30,7 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     labelMax = (QLineEdit*) 0;
     imageW = (ImageWidget*) 0;
     autoW = (QCheckBox *) 0;
+    intensity = (QLineEdit*) 0;
 
     vbox = new QGridLayout(this);
     vbox->setMargin(0);
@@ -37,11 +39,14 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
 
     setup(false);
 
+    buttonPressed = false;
+    installEventFilter(this);
 }
 
 caCamera::~caCamera()
 {
     if(image != (QImage *) 0) delete image;
+
     if(hbox != (QHBoxLayout*) 0) {
         delete labelMinText;
         delete labelMin;
@@ -49,12 +54,45 @@ caCamera::~caCamera()
         delete labelMax;
         delete checkAutoText;
         delete autoW;
+        delete intensityText;
+        delete intensity;
 
         delete hbox;
         delete window;
         delete imageW;
         delete vbox;
     }
+}
+
+
+bool caCamera::eventFilter(QObject *obj, QEvent *event)
+{
+  Q_UNUSED(obj);
+
+  if (event->type() == QEvent::MouseButtonPress) {
+      QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+      if(mouseEvent->button() == Qt::LeftButton) {
+          buttonPressed = true;
+          QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+      }
+  }
+  if (event->type() == QEvent::MouseButtonRelease) {
+     QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+     if(mouseEvent->button() == Qt::LeftButton) {
+         buttonPressed = false;
+         QApplication::restoreOverrideCursor();
+     }
+  }
+  if (event->type() == QEvent::MouseMove) {
+    QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+    Xpos = mouseEvent->pos().x();
+    Ypos = mouseEvent->pos().y();
+
+    if(window != (QWidget*) 0) {
+        Ypos = Ypos - window->height();
+    }
+  }
+  return false;
 }
 
 void caCamera::setup(bool interaction)
@@ -66,12 +104,18 @@ void caCamera::setup(bool interaction)
         hbox->removeWidget(labelMin);
         hbox->removeWidget(checkAutoText);
         hbox->removeWidget(autoW);
+        hbox->removeWidget(intensityText);
+        hbox->removeWidget(intensity);
+
         delete labelMinText;
         delete labelMin;
         delete labelMaxText;
         delete labelMax;
         delete checkAutoText;
         delete autoW;
+        delete intensityText;
+        delete intensity;
+
         autoW = (QCheckBox *) 0;
 
         delete hbox;
@@ -95,21 +139,26 @@ void caCamera::setup(bool interaction)
         window = new QWidget;
 
         labelMaxText = new QLabel(this);
-        labelMaxText->setText("Maximum:");
+        labelMaxText->setText(" Max:");
         labelMinText = new QLabel(this);
-        labelMinText->setText("Minimum:");
+        labelMinText->setText(" Min:");
         checkAutoText = new QLabel(this);
-        checkAutoText->setText("Auto:");
+        checkAutoText->setText(" Auto:");
+        intensityText = new QLabel(this);
+        intensityText->setText(" x/y/z:");
 
         labelMax = new QLineEdit(this);
         labelMin = new QLineEdit(this);
+        intensity = new QLineEdit(this);
         imageW   = new ImageWidget(this);
 
-        labelMax->setFixedWidth(65);
-        labelMin->setFixedWidth(65);
-        labelMaxText->setFixedWidth(70);
-        labelMinText->setFixedWidth(70);
-        checkAutoText->setFixedWidth(40);
+        labelMax->setFixedWidth(75);
+        labelMin->setFixedWidth(75);
+        labelMaxText->setFixedWidth(40);
+        labelMinText->setFixedWidth(40);
+        checkAutoText->setFixedWidth(60);
+        intensityText->setFixedWidth(75);
+        intensity->setFixedWidth(150);
 
         autoW = new QCheckBox(this);
         autoW->setChecked(true);
@@ -119,6 +168,8 @@ void caCamera::setup(bool interaction)
         hbox->addWidget(labelMax, Qt::AlignLeft);
         hbox->addWidget(checkAutoText, Qt::AlignLeft);
         hbox->addWidget(autoW,    Qt::AlignLeft);
+        hbox->addWidget(intensityText, Qt::AlignLeft);
+        hbox->addWidget(intensity, Qt::AlignLeft);
         window->setLayout(hbox);
         window->show();
 
@@ -187,7 +238,6 @@ bool caCamera::isAlphaMinLevel()
 
 void caCamera::setColormap(colormap const &map)
 {
-
     thisColormap = map;
     switch (map) {
     case Default:
@@ -196,11 +246,7 @@ void caCamera::setColormap(colormap const &map)
         break;
     case grey:
         for(int i=0; i<ColormapSize; i++) ColorMap[i] = qRgb(i,i,i);
-        //if (m_bpp==3){
-		  setup(true);
-		//}else{
-        //  setup(false);
-	    //}
+         setup(true);
         break;
     case spectrum:
         for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = rgbFromWaveLength(380.0 + (i * 400.0 / ColormapSize));
@@ -263,6 +309,12 @@ void caCamera::updateMin(int min)
     labelMin->setText(QString::number(min));
 }
 
+void caCamera::updateIntensity(QString strng)
+{
+    if(intensity == (QLineEdit*) 0) return;
+    intensity->setText(strng);
+}
+
 int caCamera::getMin()
 {
     if(labelMin == (QLineEdit*) 0) return 0;
@@ -301,8 +353,10 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
         savedSize = datasize;
         savedWidth = m_width;
         savedHeight = m_height;
+
         if(image != (QImage *) 0) delete image;
         image = new QImage(resultSize, QImage::Format_RGB32);
+
         m_init = false;
         minvalue = 0;
         maxvalue = 65535;
@@ -350,6 +404,10 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
                     for (int x = 0; x < resultSize.width(); ++x) {
                         indx = ptr[i]; i+=m_bpp;
                         *scanLine++ = ColorMap[indx];
+
+                        Max[(indx > Max[1])] = indx;
+                        Min[(indx < Min[1])] = indx;
+
                     }
                     if(i >= datasize) break;
                 }
@@ -386,6 +444,9 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
                     for (int x = 0; x < resultSize.width(); ++x) {
                         indx = ptr[i]; i+=m_bpp;
                         *scanLine++ = ColorMap[indx];
+
+                        Max[(indx > Max[1])] = indx;
+                        Min[(indx < Min[1])] = indx;
                     }
                     if(i >= datasize) break;
                 }
@@ -428,6 +489,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
                         indx=ptr[i++];
                         Max[(indx > Max[1])] = indx;
                         Min[(indx < Min[1])] = indx;
+
 						indx1=indx * 255 /(maxvalue - minvalue);
 
 						if(indx1 > 255) indx1 = 255;
@@ -465,6 +527,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
                     }
                     if(i >= datasize) break;
                 }
+
             } else {  //convert color to gray scale
                 uchar *ptr = (uchar*)  data;
                 if(ptr == (void*) 0) return (QImage *) 0;
@@ -472,9 +535,12 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
                 for (int y = 0; y < resultSize.height(); ++y) {
                     uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
                     for (int x = 0; x < resultSize.width(); ++x) {
-                        int average = (ptr[i] + ptr[i+1] + ptr[i+2]) / 3;
+                        uint average = (ptr[i] + ptr[i+1] + ptr[i+2]) / 3;
                         *scanLine++ = qRgb(average, average, average);
                         i+=3;
+
+                        Max[(average > Max[1])] = average;
+                        Min[(average < Min[1])] = average;
                     }
                     if(i >= datasize) break;
                 }
@@ -501,9 +567,107 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
         if(maxvalue > 65535) maxvalue = 65535;
     }
 
+    if(buttonPressed) {
+
+        Xnew=Xpos;
+        Ynew=Ypos;
+        double Xcorr = (double) imageW->width() / (double) savedWidth;
+        double Ycorr = (double) imageW->height() / (double) savedHeight;
+        double Correction = qMin(Xcorr, Ycorr); // aspect ratio
+
+        if(thisZoom) {
+            Xnew = Xpos / Correction;
+            Ynew = Ypos / Correction;
+        }
+
+        // find intensity
+        switch (m_code) {
+
+        // monochrome image
+        case 1:{
+
+            switch (m_bpp) {
+
+            case 1:  {  // monochrome 1 bpp  (Damir camera)
+                uchar *ptr = (uchar*)  data;
+                int index = Ynew * savedWidth + Xnew;
+                Zvalue = ptr[index];
+            }
+                break;
+
+            case 2: {   // monochrome 2 bpp  (Damir camera)
+                uchar *ptr = (uchar*)  data;
+                int index = Ynew * savedWidth*2 + 2*Xnew;
+                if(thisColormap != spectrum) Zvalue=ptr[index];
+                else Zvalue=ptr[index] * 256 + ptr[index+1];
+            }
+                break;
+
+            case 3: {   // monochrome 2 bpp, but used only 12 bits  (Helge cameras)
+
+                if(thisColormap == spectrum) {
+                } else {
+                }
+            }
+                break;
+
+            default:
+                break;
+            } // end switch bpp
+
+            break;
+        }
+            // color rgb image
+        case 3:
+
+            // start bpp switch
+            switch (m_bpp) {
+
+            case 3: // 3 bpp, each byte with r,g,b
+                if(!m_forcemonochrome) {
+                } else {  //convert color to gray scale
+                }
+                break;
+
+            default:
+                break;
+
+            } // end switch bpp
+
+            break; // end code case 3
+
+        default:
+            break;
+        } // end switch code
+
+
+
+
+
+    }
+
+    return image;
+}
+
+void caCamera::showImage(int datasize, char *data)
+{
+#ifndef QT_NO_CONCURRENT
+    QFuture<QImage *> future = QtConcurrent::run(this, &caCamera::showImageCalc, datasize, data);
+    image = future.result();
+#else
+    image = showImageCalc(datasize, data);
+#endif
+
+    if(buttonPressed) {
+        QString strng = "%1, %2, %3";
+        strng = strng.arg(Xnew).arg(Ynew).arg(Zvalue);
+        updateIntensity(strng);
+    }
+    if(image != (QImage *) 0) updateImage(*image, valuesPresent, values);
+
     if(getAutomateChecked()) {
-        updateMax(Max[1]);
-        updateMin(Min[1]);
+        updateMax(maxvalue);
+        updateMin(minvalue);
     } else {
         int minv = getMin();
         int maxv = getMax();
@@ -512,31 +676,6 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
             minvalue = minv;
         }
     }
-    return image;
-}
-
-void caCamera::showImage(int datasize, char *data)
-{
-/*
-    struct timeb  timeNow;
-    struct timeb  timeStart;
-    double elapsedTime;
-    ftime(&timeStart);
-*/
-    // up to now I did not really notice a difference with the routine in this thread
-#ifndef QT_NO_CONCURRENT
-    QFuture<QImage *> future = QtConcurrent::run(this, &caCamera::showImageCalc, datasize, data);
-    image = future.result();
-#else
-    image = showImageCalc(datasize, data);
-#endif
-/*
-    ftime(&timeNow);
-    elapsedTime = ((double) timeNow.time + (double) timeNow.millitm / (double)1000) -
-            ((double) timeStart.time + (double) timeStart.millitm / (double)1000);
-    printf("elapsed %.3f\n", elapsedTime);
-*/
-    if(image != (QImage *) 0) updateImage(*image, valuesPresent, values);
 }
 
 

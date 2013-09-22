@@ -92,6 +92,7 @@ public:
 
     void updateMax(int max);
     void updateMin(int min);
+    void updateIntensity(QString strng);
     int getMin();
     int getMax();
     bool getAutomateChecked();
@@ -103,6 +104,8 @@ protected:
 
 private:
 
+    bool eventFilter(QObject *obj, QEvent *event);
+    bool buttonPressed;
     bool m_zoom, m_forcemonochrome;
     QString thisPV_Data, thisPV_Width, thisPV_Height, thisPV_Code, thisPV_BPP;
     QStringList thisDataProcPV;
@@ -110,6 +113,7 @@ private:
     colormap thisColormap;
     zoom thisZoom;
     QImage *image;
+    int Xpos, Ypos, Xnew, Ynew, Zvalue;
     bool m_init;
     enum { ColormapSize = 256 };
     uint ColorMap[ColormapSize];
@@ -131,10 +135,12 @@ private:
     QGridLayout  *vbox;
     QLineEdit *labelMin;
     QLineEdit *labelMax;
+    QLineEdit *intensity;
     ImageWidget *imageW;
     QCheckBox *autoW;
     QLabel *labelMaxText;
     QLabel *labelMinText;
+    QLabel *intensityText;
     QLabel *checkAutoText;
     QWidget *window;
     bool valuesPresent[4];
