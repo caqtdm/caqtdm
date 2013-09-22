@@ -3027,6 +3027,14 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
     if(caScriptButton* widget =  qobject_cast< caScriptButton *>(w)) {
         Q_UNUSED(widget);
+    } else if(caCamera * widget = qobject_cast< caCamera *>(w)) {
+        Q_UNUSED(widget);
+        myMenu.addAction("Toggle Zoom");
+        myMenu.addAction("Set Spectrum");
+        myMenu.addAction("Set Greyscale");
+        myMenu.addAction("Get Info");
+        myMenu.addAction("Print");
+        myMenu.addAction("Raise main window");
     } else {
         // construct info for the pv we are pointing at
         myMenu.addAction("Get Info");
@@ -3056,6 +3064,18 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             QMainWindow *mainWindow = (QMainWindow *) this->parentWidget();
             mainWindow->showNormal();
             messageWindow->raise();
+
+        } else  if(selectedItem->text().contains("Toggle Zoom")) {
+            if(caCamera * widget = qobject_cast< caCamera *>(w)) {
+                if(widget->getZoom() == caCamera::Yes) widget->setZoom(caCamera::No);
+                else widget->setZoom(caCamera::Yes);
+            }
+
+        } else  if(selectedItem->text().contains("Set Spectrum")) {
+            if(caCamera * widget = qobject_cast< caCamera *>(w)) widget->setColormap(caCamera::spectrum);
+
+        } else  if(selectedItem->text().contains("Set Greyscale")) {
+           if(caCamera * widget = qobject_cast< caCamera *>(w)) widget->setColormap(caCamera::grey);
 
         } else  if(selectedItem->text().contains("Get Info")) {
             QString info;
