@@ -21,7 +21,7 @@
 #include "castripplot.h"
 #include <QList>
 
-#define MULTFOROVERLAPPINGTIMES 2.0
+#define MULTFOROVERLAPPINGTIMES 3.0
 
 class TimeScaleDraw: public QwtScaleDraw
 {
@@ -399,7 +399,7 @@ void caStripPlot::TimeOutThread()
 
     elapsedTime = ((double) timeNow.time + (double) timeNow.millitm / (double)1000) -
             ((double) timeStart.time + (double) timeStart.millitm / (double)1000);
-    //printf("elapsedTime=%.3f %p\n", elapsedTime, QObject::thread());
+    //printf("elapsedTime=%.3f\n", elapsedTime  - elapsedTimeOld);
 
     elapsedTimeOld = elapsedTime;
 
@@ -529,13 +529,14 @@ void caStripPlot::TimeOut()
     mutex.lock();
 
 
-    // we want to be sure that no pixels are missed
+    // we want to be sure that no pixels are missed, this is particularly important for ms windows
+    // this is really not nice and time consuming, up to now no better solution
     for (int i = 2; i < dataCount; i++ ) {
         x0 = transform(QwtPlot::xBottom, rangeData[0][i-1].value);
         x1 = transform(QwtPlot::xBottom, rangeData[0][i].value);
         delta = (int) (x0+0.5) - (int) (x1+0.5) - 1;
 
-        if(delta > 0 && x0 > 0 && x1 > 0 && delta < 3) {
+        if(delta > 0 && x0 > 0 && x1 > 0 && delta < 20) {
             increment = (base[i-1].value - base[i].value)/ (double) (delta+1);
             //printf("===============> missed ticks=%d at=%d x0=%.1f x1=%.1f %d %d\n", delta, i, x0, x1, (int) (x0+0.5) , (int) (x1+0.5));
             totalMissed++;
@@ -550,14 +551,7 @@ void caStripPlot::TimeOut()
                     base[j+i-1].value = base[i-1].value - increment * (double) j;
                 }
             }
-/*
-            printf("before\n");
-            for(j=1; j<dataCount; j++) {
-                printf("(%d %d) ", j, (int) (transform(QwtPlot::xBottom, rangeData[0][j].value)+0.5));
-                if((j/15)*15 == j)  printf("\n");
-            }
-            printf("\n");
-*/
+
             // insert missing data and timebase
             for (c = 0; c < NumberOfCurves; c++ ) {
                 for(j = 0; j < delta; j++) {
@@ -572,14 +566,7 @@ void caStripPlot::TimeOut()
                     rangeData[c][j+i-1].value = fillData[c][j+i-1].value = invTransform(QwtPlot::xBottom, (int) (x0+0.5)-j);
                 }
             }
-/*
-            printf("after\n");
-            for(j=1; j<dataCount; j++) {
-                printf("(%d %d) ", j,  (int) (transform(QwtPlot::xBottom, rangeData[0][j].value)+0.5));
-                if((j/15)*15 == j)  printf("\n");
-            }
-            printf("\n");
-*/
+
             if ((dataCount + delta) < dataCountLimit) dataCount = dataCount + delta;
 
         }
