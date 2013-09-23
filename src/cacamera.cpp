@@ -54,7 +54,6 @@ caCamera::~caCamera()
         delete labelMax;
         delete checkAutoText;
         delete autoW;
-        delete intensityText;
         delete intensity;
 
         delete hbox;
@@ -73,6 +72,8 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
       QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
       if(mouseEvent->button() == Qt::LeftButton) {
           buttonPressed = true;
+          Xpos = mouseEvent->pos().x();
+          Ypos = mouseEvent->pos().y();
           QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
       }
   }
@@ -104,7 +105,6 @@ void caCamera::setup(bool interaction)
         hbox->removeWidget(labelMin);
         hbox->removeWidget(checkAutoText);
         hbox->removeWidget(autoW);
-        hbox->removeWidget(intensityText);
         hbox->removeWidget(intensity);
 
         delete labelMinText;
@@ -113,7 +113,6 @@ void caCamera::setup(bool interaction)
         delete labelMax;
         delete checkAutoText;
         delete autoW;
-        delete intensityText;
         delete intensity;
 
         autoW = (QCheckBox *) 0;
@@ -138,38 +137,55 @@ void caCamera::setup(bool interaction)
 
         window = new QWidget;
 
-        labelMaxText = new QLabel(this);
+        // labels
+        labelMaxText = new caLabel(this);
         labelMaxText->setText(" Max:");
-        labelMinText = new QLabel(this);
+        labelMinText = new caLabel(this);
         labelMinText->setText(" Min:");
-        checkAutoText = new QLabel(this);
+        checkAutoText = new caLabel(this);
         checkAutoText->setText(" Auto:");
-        intensityText = new QLabel(this);
-        intensityText->setText(" x/y/z:");
 
+        // texts
         labelMax = new QLineEdit(this);
         labelMin = new QLineEdit(this);
         intensity = new QLineEdit(this);
+
+        // image
         imageW   = new ImageWidget(this);
 
+        // width, resize mode, font, color
         labelMax->setFixedWidth(75);
         labelMin->setFixedWidth(75);
         labelMaxText->setFixedWidth(40);
         labelMinText->setFixedWidth(40);
         checkAutoText->setFixedWidth(60);
-        intensityText->setFixedWidth(75);
         intensity->setFixedWidth(150);
+        labelMaxText->setScaleMode(caLabel::None);
+        labelMinText->setScaleMode(caLabel::None);
+        checkAutoText->setScaleMode(caLabel::None);
+        QFont font = labelMaxText->font();
+        font.setPointSize(10);
+        labelMaxText->setFont(font);
+        labelMinText->setFont(font);
+        checkAutoText->setFont(font);
+        labelMaxText->setBackground(QColor(0,0,0,0));
+        labelMinText->setBackground(QColor(0,0,0,0));
+        checkAutoText->setBackground(QColor(0,0,0,0));
 
+        // checkbox
         autoW = new QCheckBox(this);
         autoW->setChecked(true);
+
+        // add everything
         hbox->addWidget(labelMinText, Qt::AlignLeft);
         hbox->addWidget(labelMin, Qt::AlignLeft);
         hbox->addWidget(labelMaxText, Qt::AlignLeft);
         hbox->addWidget(labelMax, Qt::AlignLeft);
         hbox->addWidget(checkAutoText, Qt::AlignLeft);
         hbox->addWidget(autoW,    Qt::AlignLeft);
-        hbox->addWidget(intensityText, Qt::AlignLeft);
         hbox->addWidget(intensity, Qt::AlignLeft);
+        hbox->addStretch(1);
+
         window->setLayout(hbox);
         window->show();
 
@@ -177,6 +193,8 @@ void caCamera::setup(bool interaction)
         vbox->addWidget(imageW, 1, 0);
 
     } else {
+
+        // image
         imageW = new ImageWidget(this);
         vbox->addWidget(imageW, 0, 0);
     }
@@ -273,6 +291,7 @@ void caCamera::setWidth(int width)
 {
     m_width = width;
     m_widthDefined = true;
+
 }
 void caCamera::setHeight(int height)
 {
@@ -284,6 +303,7 @@ void caCamera::resizeEvent(QResizeEvent *e)
 {
     imageW->setFixedWidth(e->size().width());
     imageW->setFixedHeight(e->size().height());
+    //if(window != (QWidget*) 0) window->setGeometry(0, 0, e->size().width(), window->height());
 }
 
 void caCamera::updateImage(const QImage &image, bool valuesPresent[], int values[])
@@ -490,7 +510,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
                         Max[(indx > Max[1])] = indx;
                         Min[(indx < Min[1])] = indx;
 
-						indx1=indx * 255 /(maxvalue - minvalue);
+                        indx1=indx * 255 /(maxvalue - minvalue);
 
 						if(indx1 > 255) indx1 = 255;
                         *scanLine++ = qRgb(indx1,indx1,indx1);
@@ -568,16 +588,31 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
     }
 
     if(buttonPressed) {
-
         Xnew=Xpos;
         Ynew=Ypos;
+        validIntensity = true;
+
+
+        // calculate true x, y values and limits of picture
         double Xcorr = (double) imageW->width() / (double) savedWidth;
         double Ycorr = (double) imageW->height() / (double) savedHeight;
         double Correction = qMin(Xcorr, Ycorr); // aspect ratio
+        double Xmax = qMin(savedWidth,  imageW->width());
+        double Ymax = qMin(savedHeight,  imageW->height());
+
+        if(window != (QWidget*) 0) {
+           Ymax = qMin(savedHeight,  imageW->height() - window->height());
+        } else {
+           Ymax = qMin(savedHeight,  imageW->height());
+        }
 
         if(thisZoom) {
-            Xnew = Xpos / Correction;
-            Ynew = Ypos / Correction;
+            Xnew =(int)  (Xpos / Correction);
+            Ynew =(int)  (Ypos / Correction);
+            Xmax = imageW->width() / Correction;
+            Ymax = imageW->height() / Correction;
+            Xmax = qMin(savedWidth,  (int) Xmax);
+            Ymax = qMin(savedHeight,  (int) Ymax);
         }
 
         // find intensity
@@ -591,23 +626,35 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
             case 1:  {  // monochrome 1 bpp  (Damir camera)
                 uchar *ptr = (uchar*)  data;
                 int index = Ynew * savedWidth + Xnew;
-                Zvalue = ptr[index];
+                if((Xnew >=0) && (Ynew >=0)  && (Xnew < Xmax) && (Ynew < Ymax) && (index < datasize)) {
+                    Zvalue=ptr[index];
+
+                } else {
+                    validIntensity = false;
+                }
             }
                 break;
 
             case 2: {   // monochrome 2 bpp  (Damir camera)
                 uchar *ptr = (uchar*)  data;
-                int index = Ynew * savedWidth*2 + 2*Xnew;
-                if(thisColormap != spectrum) Zvalue=ptr[index];
-                else Zvalue=ptr[index] * 256 + ptr[index+1];
+                int index = Ynew * savedWidth * 2 + 2 * Xnew;
+                if((Xnew >=0) && (Ynew >=0)  &&  (Xnew < Xmax) && (Ynew < Ymax) && (index < datasize)) {
+                    if(thisColormap != spectrum) Zvalue=ptr[index];
+                    else Zvalue=ptr[index] * 256 + ptr[index+1];
+
+                } else {
+                    validIntensity = false;
+                }
             }
                 break;
 
             case 3: {   // monochrome 2 bpp, but used only 12 bits  (Helge cameras)
-
-                if(thisColormap == spectrum) {
-                } else {
-                }
+                ushort *ptr = (ushort*) data;
+                int index = Ynew * savedWidth + Xnew;
+                if((Xnew >=0) && (Ynew >=0) &&  (Xnew < Xmax) && (Ynew < Ymax) && ((index+resultSize.width())*2 < datasize))
+                    Zvalue = ptr[index];
+                 else
+                    validIntensity = false;;
             }
                 break;
 
@@ -641,9 +688,6 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
         } // end switch code
 
 
-
-
-
     }
 
     return image;
@@ -660,8 +704,13 @@ void caCamera::showImage(int datasize, char *data)
 
     if(buttonPressed) {
         QString strng = "%1, %2, %3";
-        strng = strng.arg(Xnew).arg(Ynew).arg(Zvalue);
-        updateIntensity(strng);
+        if(validIntensity) {
+           strng = strng.arg(Xnew).arg(Ynew).arg(Zvalue);
+           updateIntensity(strng);
+        } else {
+            updateIntensity("invalid");
+        }
+
     }
     if(image != (QImage *) 0) updateImage(*image, valuesPresent, values);
 

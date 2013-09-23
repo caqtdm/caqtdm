@@ -20,7 +20,8 @@ win32 {
 
     win32-g++ {
       INCLUDEPATH = $(QWTHOME)/src
-      LIBS += $(QWTHOME)/lib/libqwt.a
+      LIBS += $(QWTLIB)/libqwt.a
+      QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\qtcontrols.dll ..\caQtDM_Binaries
      }
      win32-msvc* {
         DEFINES += QTCON_MAKEDLL _CRT_SECURE_NO_WARNINGS

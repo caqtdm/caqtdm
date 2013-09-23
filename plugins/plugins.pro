@@ -18,8 +18,8 @@ win32 {
      INCLUDEPATH += $$(QWTHOME)/src
      
      win32-g++ {
-	     LIBS += $${QWTHOME}/lib/libqwt.a
-	     LIBS += $${QTCONTROLS_LIBS}/libqtcontrols.a
+	     LIBS += $$(QWTLIB)/lib/libqwt.a
+	     LIBS += $$(QTCONTROLS_LIBS)/release/libqtcontrols.a
      }
      win32-msvc* {
 	     DebugBuild {

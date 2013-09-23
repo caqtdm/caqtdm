@@ -15,11 +15,12 @@
 #include <QPixmap>
 #include <QWidget>
 #include <QSize>
-#include <QLabel>
+#include <caLabel>
 #include <QCheckBox>
 #include <QFormLayout>
 #include <qtcontrols_global.h>
 #include <imagewidget.h>
+#include <calabel.h>
 #include <time.h>
 #include <sys/timeb.h>
 
@@ -105,7 +106,7 @@ protected:
 private:
 
     bool eventFilter(QObject *obj, QEvent *event);
-    bool buttonPressed;
+    bool buttonPressed, validIntensity;
     bool m_zoom, m_forcemonochrome;
     QString thisPV_Data, thisPV_Width, thisPV_Height, thisPV_Code, thisPV_BPP;
     QStringList thisDataProcPV;
@@ -138,10 +139,10 @@ private:
     QLineEdit *intensity;
     ImageWidget *imageW;
     QCheckBox *autoW;
-    QLabel *labelMaxText;
-    QLabel *labelMinText;
-    QLabel *intensityText;
-    QLabel *checkAutoText;
+    caLabel *labelMaxText;
+    caLabel *labelMinText;
+    caLabel *intensityText;
+    caLabel *checkAutoText;
     QWidget *window;
     bool valuesPresent[4];
     int  values[4];

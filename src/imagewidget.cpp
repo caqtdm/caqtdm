@@ -57,7 +57,6 @@ QImage ImageWidget::scaleImage(const QImage &image) {
 void ImageWidget::updateImage(bool zoom, const QImage &image, bool valuesPresent[], int values[])
 {
     if(zoom) {
-        //QImage imageNew = image.scaled(this->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
         QImage imageNew = scaleImage(image);
         if(imageNew.isNull()) return;
 
