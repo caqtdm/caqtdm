@@ -1,9 +1,13 @@
-CAQTDM_VERSION = V3.4.0
+CAQTDM_VERSION = V3.4.1
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+
+# new in 3.4.1
+# cacamera displays intensity at x, y
+# cacamera context menu for grey / spectrum and zoom
 
 # new in 3.4.0
 # caStripplot has been revisited

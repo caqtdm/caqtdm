@@ -59,11 +59,13 @@ win32 {
 	}
 
 	win32-g++ {
-		LIBS += $${QWTHOME}/lib/libqwt.a
-		LIBS += $${QTCONTROLS_LIBS}/libqtcontrols.a
+	        EPICS_LIBS=$$(EPICS_BASE)/lib/win32-x86-mingw
+		LIBS += $$(QWTLIB)/libqwt.a
+		LIBS += $$(QTCONTROLS_LIBS)/release/libqtcontrols.a
 		LIBS += $${EPICS_LIBS}/ca.lib
 		LIBS += $${EPICS_LIBS}/COM.lib
-		LIBS += $${CAQTDM_LIBS}/libcaQtDm_Lib.a
+		LIBS += ../caQtDM_Lib/release/libcaQtDM_Lib.a
+		QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\caQtDM.exe ..\caQtDM_Binaries
 	}
 
 
