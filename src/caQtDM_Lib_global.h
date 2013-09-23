@@ -21,6 +21,8 @@
    #else
       #define CAQTDM_LIBSHARED_EXPORT __declspec(dllimport)
    #endif
+   
+#elseif defined(__MINGW32__)
 
 #else
 

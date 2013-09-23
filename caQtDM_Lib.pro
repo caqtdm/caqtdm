@@ -36,10 +36,12 @@ win32-msvc* {
         }
  }
      win32-g++ {
-	LIBS += $${QWTHOME}/lib/libqwt.a
-	LIBS += $${QTCONTROLS_LIBS}/libqtcontrols.a
+        EPICS_LIBS=$$(EPICS_BASE)/lib/win32-x86-mingw
+	LIBS += $$(QWTLIB)/libqwt.a
+	LIBS += $$(QTCONTROLS_LIBS)/release//libqtcontrols.a
 	LIBS += $${EPICS_LIBS}/ca.lib
 	LIBS += $${EPICS_LIBS}/COM.lib
+	QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\caQtDM_Lib.dll ..\caQtDM_Binaries
      }
 MOC_DIR = ./moc
 VPATH += ./src
