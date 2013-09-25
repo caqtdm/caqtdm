@@ -21,17 +21,18 @@
    #else
       #define CAQTDM_LIBSHARED_EXPORT __declspec(dllimport)
    #endif
-   
-#elseif defined(__MINGW32__)
 
 #else
+ #if defined(__MINGW32__)
+
+ #else
 
    #if defined(CAQTDM_LIB_LIBRARY)
      #define CAQTDM_LIBSHARED_EXPORT Q_DECL_EXPORT
    #else
      #define CAQTDM_LIBSHARED_EXPORT Q_DECL_IMPORT
    #endif
-
+ #endif
 #endif
 
 #endif // CAQTDM_LIB_GLOBAL_H
