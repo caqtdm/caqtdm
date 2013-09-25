@@ -66,33 +66,151 @@ caCamera::~caCamera()
 
 bool caCamera::eventFilter(QObject *obj, QEvent *event)
 {
-  Q_UNUSED(obj);
+    Q_UNUSED(obj);
 
-  if (event->type() == QEvent::MouseButtonPress) {
-      QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-      if(mouseEvent->button() == Qt::LeftButton) {
-          buttonPressed = true;
-          Xpos = mouseEvent->pos().x();
-          Ypos = mouseEvent->pos().y();
-          QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
-      }
-  }
-  if (event->type() == QEvent::MouseButtonRelease) {
-     QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-     if(mouseEvent->button() == Qt::LeftButton) {
-         buttonPressed = false;
-         QApplication::restoreOverrideCursor();
-     }
-  }
-  if (event->type() == QEvent::MouseMove) {
-    QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-    Xpos = mouseEvent->pos().x();
-    Ypos = mouseEvent->pos().y();
-
-    if(window != (QWidget*) 0) {
-        Ypos = Ypos - window->height();
+    if (event->type() == QEvent::MouseButtonPress) {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+        if(mouseEvent->button() == Qt::LeftButton) {
+            buttonPressed = true;
+            Xpos = mouseEvent->pos().x();
+            Ypos = mouseEvent->pos().y();
+            QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+        }
     }
-  }
+    if (event->type() == QEvent::MouseButtonRelease) {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+        if(mouseEvent->button() == Qt::LeftButton) {
+            buttonPressed = false;
+            QApplication::restoreOverrideCursor();
+        }
+    }
+    if (event->type() == QEvent::MouseMove) {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+        Xpos = mouseEvent->pos().x();
+        Ypos = mouseEvent->pos().y();
+
+        if(window != (QWidget*) 0) {
+            Ypos = Ypos - window->height();
+        }
+    }
+
+
+    if(buttonPressed) {
+        Xnew=Xpos;
+        Ynew=Ypos;
+        validIntensity = true;
+
+
+        // calculate true x, y values and limits of picture
+        double Xcorr = (double) imageW->width() / (double) savedWidth;
+        double Ycorr = (double) imageW->height() / (double) savedHeight;
+        double Correction = qMin(Xcorr, Ycorr); // aspect ratio
+        double Xmax = qMin(savedWidth,  imageW->width());
+        double Ymax = qMin(savedHeight,  imageW->height());
+
+        if(window != (QWidget*) 0) {
+            Ymax = qMin(savedHeight,  imageW->height() - window->height());
+        } else {
+            Ymax = qMin(savedHeight,  imageW->height());
+        }
+
+        if(thisZoom) {
+            Xnew =(int)  (Xpos / Correction);
+            Ynew =(int)  (Ypos / Correction);
+            Xmax = imageW->width() / Correction;
+            Ymax = imageW->height() / Correction;
+            Xmax = qMin(savedWidth,  (int) Xmax);
+            Ymax = qMin(savedHeight,  (int) Ymax);
+        }
+
+        // find intensity
+        switch (m_code) {
+
+        // monochrome image
+        case 1:{
+
+            switch (m_bpp) {
+
+            case 1:  {  // monochrome 1 bpp  (Damir camera)
+                uchar *ptr = (uchar*)  savedData;
+                int index = Ynew * savedWidth + Xnew;
+                if((Xnew >=0) && (Ynew >=0)  && (Xnew < Xmax) && (Ynew < Ymax) && (index < savedSize)) {
+                    Zvalue=ptr[index];
+
+                } else {
+                    validIntensity = false;
+                }
+            }
+                break;
+
+            case 2: {   // monochrome 2 bpp  (Damir camera)
+                uchar *ptr = (uchar*)  savedData;
+                int index = Ynew * savedWidth * 2 + 2 * Xnew;
+                if((Xnew >=0) && (Ynew >=0)  &&  (Xnew < Xmax) && (Ynew < Ymax) && (index < savedSize)) {
+                    if(thisColormap != spectrum) Zvalue=ptr[index];
+                    else Zvalue=ptr[index] * 256 + ptr[index+1];
+
+                } else {
+                    validIntensity = false;
+                }
+            }
+                break;
+
+            case 3: {   // monochrome 2 bpp, but used only 12 bits  (Helge cameras)
+                QSize resultSize;
+                resultSize.setWidth((int) savedWidth);
+                resultSize.setHeight((int) savedHeight);
+                ushort *ptr = (ushort*) savedData;
+                int index = Ynew * savedWidth + Xnew;
+                if((Xnew >=0) && (Ynew >=0) &&  (Xnew < Xmax) && (Ynew < Ymax) && ((index+resultSize.width())*2 < savedSize))
+                    Zvalue = ptr[index];
+                else
+                    validIntensity = false;;
+            }
+                break;
+
+            default:
+                break;
+            } // end switch bpp
+
+            break;
+        }
+            // color rgb image
+        case 3:
+
+            // start bpp switch
+            switch (m_bpp) {
+
+            case 3: // 3 bpp, each byte with r,g,b
+                if(!m_forcemonochrome) {
+                } else {  //convert color to gray scale
+                }
+                break;
+
+            default:
+                break;
+
+            } // end switch bpp
+
+            break; // end code case 3
+
+        default:
+            break;
+        } // end switch code
+
+        QString strng = "%1, %2, %3";
+        if(validIntensity) {
+            strng = strng.arg(Xnew).arg(Ynew).arg(Zvalue);
+            updateIntensity(strng);
+        } else {
+            updateIntensity("invalid");
+        }
+
+
+    }
+
+
+
   return false;
 }
 
@@ -383,6 +501,8 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
         ftime(&timeRef);
     }
 
+    savedData = data;
+
     Max[1] = 0;
     Min[1] = 65535;
 
@@ -587,108 +707,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
         if(maxvalue > 65535) maxvalue = 65535;
     }
 
-    if(buttonPressed) {
-        Xnew=Xpos;
-        Ynew=Ypos;
-        validIntensity = true;
 
-
-        // calculate true x, y values and limits of picture
-        double Xcorr = (double) imageW->width() / (double) savedWidth;
-        double Ycorr = (double) imageW->height() / (double) savedHeight;
-        double Correction = qMin(Xcorr, Ycorr); // aspect ratio
-        double Xmax = qMin(savedWidth,  imageW->width());
-        double Ymax = qMin(savedHeight,  imageW->height());
-
-        if(window != (QWidget*) 0) {
-           Ymax = qMin(savedHeight,  imageW->height() - window->height());
-        } else {
-           Ymax = qMin(savedHeight,  imageW->height());
-        }
-
-        if(thisZoom) {
-            Xnew =(int)  (Xpos / Correction);
-            Ynew =(int)  (Ypos / Correction);
-            Xmax = imageW->width() / Correction;
-            Ymax = imageW->height() / Correction;
-            Xmax = qMin(savedWidth,  (int) Xmax);
-            Ymax = qMin(savedHeight,  (int) Ymax);
-        }
-
-        // find intensity
-        switch (m_code) {
-
-        // monochrome image
-        case 1:{
-
-            switch (m_bpp) {
-
-            case 1:  {  // monochrome 1 bpp  (Damir camera)
-                uchar *ptr = (uchar*)  data;
-                int index = Ynew * savedWidth + Xnew;
-                if((Xnew >=0) && (Ynew >=0)  && (Xnew < Xmax) && (Ynew < Ymax) && (index < datasize)) {
-                    Zvalue=ptr[index];
-
-                } else {
-                    validIntensity = false;
-                }
-            }
-                break;
-
-            case 2: {   // monochrome 2 bpp  (Damir camera)
-                uchar *ptr = (uchar*)  data;
-                int index = Ynew * savedWidth * 2 + 2 * Xnew;
-                if((Xnew >=0) && (Ynew >=0)  &&  (Xnew < Xmax) && (Ynew < Ymax) && (index < datasize)) {
-                    if(thisColormap != spectrum) Zvalue=ptr[index];
-                    else Zvalue=ptr[index] * 256 + ptr[index+1];
-
-                } else {
-                    validIntensity = false;
-                }
-            }
-                break;
-
-            case 3: {   // monochrome 2 bpp, but used only 12 bits  (Helge cameras)
-                ushort *ptr = (ushort*) data;
-                int index = Ynew * savedWidth + Xnew;
-                if((Xnew >=0) && (Ynew >=0) &&  (Xnew < Xmax) && (Ynew < Ymax) && ((index+resultSize.width())*2 < datasize))
-                    Zvalue = ptr[index];
-                 else
-                    validIntensity = false;;
-            }
-                break;
-
-            default:
-                break;
-            } // end switch bpp
-
-            break;
-        }
-            // color rgb image
-        case 3:
-
-            // start bpp switch
-            switch (m_bpp) {
-
-            case 3: // 3 bpp, each byte with r,g,b
-                if(!m_forcemonochrome) {
-                } else {  //convert color to gray scale
-                }
-                break;
-
-            default:
-                break;
-
-            } // end switch bpp
-
-            break; // end code case 3
-
-        default:
-            break;
-        } // end switch code
-
-
-    }
 
     return image;
 }
@@ -702,16 +721,6 @@ void caCamera::showImage(int datasize, char *data)
     image = showImageCalc(datasize, data);
 #endif
 
-    if(buttonPressed) {
-        QString strng = "%1, %2, %3";
-        if(validIntensity) {
-           strng = strng.arg(Xnew).arg(Ynew).arg(Zvalue);
-           updateIntensity(strng);
-        } else {
-            updateIntensity("invalid");
-        }
-
-    }
     if(image != (QImage *) 0) updateImage(*image, valuesPresent, values);
 
     if(getAutomateChecked()) {

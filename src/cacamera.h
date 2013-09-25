@@ -114,6 +114,7 @@ private:
     colormap thisColormap;
     zoom thisZoom;
     QImage *image;
+
     int Xpos, Ypos, Xnew, Ynew, Zvalue;
     bool m_init;
     enum { ColormapSize = 256 };
@@ -130,6 +131,7 @@ private:
     int savedSize;
     int savedWidth;
     int savedHeight;
+    char *savedData;
     uint minvalue, maxvalue;
 
     QHBoxLayout  *hbox;
