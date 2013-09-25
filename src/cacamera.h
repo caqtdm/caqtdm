@@ -132,13 +132,14 @@ private:
     int savedWidth;
     int savedHeight;
     char *savedData;
+
     uint minvalue, maxvalue;
 
     QHBoxLayout  *hbox;
     QGridLayout  *vbox;
     QLineEdit *labelMin;
     QLineEdit *labelMax;
-    QLineEdit *intensity;
+    caLabel *intensity;
     ImageWidget *imageW;
     QCheckBox *autoW;
     caLabel *labelMaxText;
