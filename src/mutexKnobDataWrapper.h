@@ -29,6 +29,9 @@ extern MutexKnobData* C_GetMutexKnobData(MutexKnobData* p, int indx, knobData *d
 extern MutexKnobData* C_SetMutexKnobDataConnected(MutexKnobData* p, int indx, int connected);
 extern MutexKnobData* C_SetMutexKnobDataReceived(MutexKnobData* p, knobData *kData);
 extern MutexKnobData* C_UpdateTextLine(MutexKnobData* p, char *message, char *name);
+extern MutexKnobData* C_DataLock(MutexKnobData* p, knobData *kData);
+extern MutexKnobData* C_DataUnlock(MutexKnobData* p, knobData *kData);
+
 
 #ifdef __cplusplus
 }

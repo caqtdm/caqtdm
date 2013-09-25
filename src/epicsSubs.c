@@ -164,6 +164,8 @@ static void dataCallback(struct event_handler_args args)
 
         switch (ca_field_type(args.chid)) {
 
+        C_DataLock(KnobDataPtr, &kData);
+
         case DBF_CHAR:
         {
             int dataSize;
@@ -389,8 +391,8 @@ static void dataCallback(struct event_handler_args args)
 
         } // end switch
 
+        C_DataUnlock(KnobDataPtr, &kData);
         info->event++;
-
     }
 }
 

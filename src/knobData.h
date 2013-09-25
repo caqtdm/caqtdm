@@ -61,6 +61,7 @@ typedef struct _knobData {
     short soft;                         /* soft channel mark */
     pv_string pv;                       /* device process variable name */
     void *dispW;                        /* widget identifier */
+    void *mutex;                        /* mutex used for waveforms */
     epicsData edata;                    /* epics data */
     int specData[NBSPECS];              /* some special data, will be replaced by properties later */
     int valPix;                         /* pixel value of caThermo */

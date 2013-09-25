@@ -33,6 +33,9 @@ public:
 
     void ReAllocate(int Indx, int size, void **ptr);
 
+    void DataLock( knobData *kData);
+    void DataUnlock(knobData *kData);
+
     knobData GetMutexKnobData(int indx);
     knobData *GetMutexKnobDataPtr(int indx);
     void SetMutexKnobData(int indx, knobData data);

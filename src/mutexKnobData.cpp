@@ -27,6 +27,7 @@ MutexKnobData::MutexKnobData()
     for(int i=0; i < KnobDataArraySize; i++){
         KnobData[i].index  = -1;
         KnobData[i].thisW = (void*) 0;
+        KnobData[i].mutex = (void*) 0;
     }
 
     // start a timer with 50Hz
@@ -208,7 +209,6 @@ int MutexKnobData::GetMutexKnobDataIndex()
     oldsize=KnobDataArraySize;
     newsize = KnobDataArraySize+200;
     void *p = &KnobData;
-    //ReAllocate(oldsize * sizeof(knobData), newsize * sizeof(knobData), (void**) &KnobData);
     ReAllocate(oldsize * sizeof(knobData), newsize * sizeof(knobData), (void**) p);
     for(int i=oldsize; i < newsize; i++){
         KnobData[i].index  = -1;
@@ -273,14 +273,40 @@ knobData* MutexKnobData::GetMutexKnobDataPtr(int index)
 }
 //*********************************************************************************************************************
 
+void MutexKnobData::DataLock(knobData *kData)
+{
+    QMutex *datamutex;
+    datamutex = (QMutex*) kData->mutex;
+    datamutex->lock();
+}
+
+void MutexKnobData::DataUnlock(knobData *kData)
+{
+    QMutex *datamutex;
+    datamutex = (QMutex*) kData->mutex;
+    datamutex->unlock();
+}
+
+extern "C" MutexKnobData* C_DataLock(MutexKnobData* p, knobData *kData) {
+    p->DataLock(kData);
+    return p;
+}
+extern "C" MutexKnobData* C_DataUnlock(MutexKnobData* p, knobData *kData) {
+    p->DataUnlock(kData);
+    return p;
+}
+
+
 /**
  * update array with the received data
  */
 void MutexKnobData::SetMutexKnobDataReceived(knobData *kData) {
     QMutexLocker locker(&mutex);
     int index = kData->index;
+    DataLock(kData);
     memcpy(&KnobData[index], kData, sizeof(kData));
     memcpy(&KnobData[index].edata, &kData->edata, sizeof(epicsData));
+    DataUnlock(kData);
 }
 
 extern "C" MutexKnobData* C_SetMutexKnobDataReceived(MutexKnobData* p, knobData *kData)

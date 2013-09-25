@@ -1343,6 +1343,7 @@ QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, 
  */
 int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget *w, int *specData, QMap<QString, QString> map, QString *pvRep)
 {
+    QMutex *mutex;
     // define epics monitors
     bool doNothing = false;
     int cpylen;
@@ -1408,6 +1409,9 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     memcpy(kData->specData, specData, sizeof(int) * NBSPECS);
     kData->thisW = (void*) thisW;
     kData->dispW = (void*) w;
+
+    mutex = new QMutex;
+    kData->mutex = (void*)  mutex;
 
     // keep actual object name
 
@@ -2181,9 +2185,13 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 // data from vector
                 if(data.edata.valueCount > 0 && data.edata.dataB != (void*) 0) {
                     QVector<double> y;
+                    QMutex *datamutex;
+                    datamutex = (QMutex*) data.mutex;
+                    datamutex->lock();
                     y.clear();
                     y.reserve(data.edata.valueCount);
                     BuildVector(y);
+                    datamutex->unlock();
                     widget->setData(y, curvNB, curvType, XorY);
                     // data from value
                 } else {
@@ -2403,7 +2411,11 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             } else if(data.specData[0] == 10) { // height if present
                 widget->dataProcessing((int) data.edata.rvalue, 3);
             } else if(data.specData[0] == 0) { // data channel
+                QMutex *datamutex;
+                datamutex = (QMutex*) data.mutex;
+                datamutex->lock();
                 widget->showImage(data.edata.dataSize, (char*) data.edata.dataB);
+                datamutex->unlock();
             }
 
         } else {
@@ -2830,6 +2842,11 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
             if(kPtr->edata.dataB != (void*) 0) {
                 free(kPtr->edata.dataB);
                 kPtr->edata.dataB = (void*) 0;
+            }
+            if(kPtr->mutex != (QMutex *) 0) {
+                QMutex *mutex = (QMutex *) kPtr->mutex;
+                delete mutex;
+                kPtr->mutex = (QMutex *) 0;
             }
         }
     }
@@ -3788,18 +3805,16 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
     }
 
     else if(!className.compare("caTable")) {
-        QFont f;
         caTable *table = (caTable *) widget;
+        QFont f = table->font();
         qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
         f.setPointSizeF(fontSize);
-        const int rowCount = table->rowCount();
-        const int columnCount = table->columnCount();
         table->setUpdatesEnabled(false);
  #if QT_VERSION< QT_VERSION_CHECK(5, 0, 0)
-        for(int i = 0; i < rowCount; ++i) {
-            for(int j = 0; j < columnCount; ++j) {
+        for(int i = 0; i < table->rowCount(); ++i) {
+            for(int j = 0; j < table->columnCount(); ++j) {
                 QTableWidgetItem* selectedItem = table->item(i, j);
-                selectedItem->setFont(f);
+                if(selectedItem != (QTableWidgetItem*) 0) selectedItem->setFont(f);
             }
         }
         table->setValueFont(f);
