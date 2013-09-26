@@ -277,6 +277,7 @@ void MutexKnobData::DataLock(knobData *kData)
 {
     QMutex *datamutex;
     datamutex = (QMutex*) kData->mutex;
+
     datamutex->lock();
 }
 
@@ -296,17 +297,14 @@ extern "C" MutexKnobData* C_DataUnlock(MutexKnobData* p, knobData *kData) {
     return p;
 }
 
-
 /**
  * update array with the received data
  */
 void MutexKnobData::SetMutexKnobDataReceived(knobData *kData) {
     QMutexLocker locker(&mutex);
     int index = kData->index;
-    DataLock(kData);
     memcpy(&KnobData[index], kData, sizeof(kData));
     memcpy(&KnobData[index].edata, &kData->edata, sizeof(epicsData));
-    DataUnlock(kData);
 }
 
 extern "C" MutexKnobData* C_SetMutexKnobDataReceived(MutexKnobData* p, knobData *kData)

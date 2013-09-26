@@ -162,9 +162,9 @@ static void dataCallback(struct event_handler_args args)
         kData.edata.fieldtype = ca_field_type(args.chid);
         ftime(&now);
 
-        switch (ca_field_type(args.chid)) {
-
         C_DataLock(KnobDataPtr, &kData);
+
+        switch (ca_field_type(args.chid)) {
 
         case DBF_CHAR:
         {
