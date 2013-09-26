@@ -1,4 +1,5 @@
 #include <QtGui>
+#include<QApplication>
 #include <math.h>
 #ifndef QT_NO_CONCURRENT
 #include <qtconcurrentrun.h>
