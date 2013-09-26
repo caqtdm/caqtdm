@@ -2727,7 +2727,7 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
         // replace medm by caQtDM
         command.replace("camedm ", "caQtDM ");
         command.replace("piomedm ", "caQtDM ");
-        command.replace("medm ", "caQtDM ");
+        if(!command.contains("G_CS_medm")) command.replace("medm ", "caQtDM ");
 
         command.replace("&T", thisFileShort);
         command.replace("&A", thisFileFull);
