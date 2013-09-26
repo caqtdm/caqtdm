@@ -71,7 +71,6 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     plotGrid = new QwtPlotGrid();
     plotGrid->attach(this);
 
-
     plotLayout()->setAlignCanvasToScales(true);
 
     // define our axis
@@ -388,6 +387,8 @@ void caStripPlot::TimeOutThread()
 
     if(!timerID) return;
 
+     mutex.lock();
+
     int dataCountLimit = (int) (MULTFOROVERLAPPINGTIMES * HISTORY -1);
 
     // we need an exact time scale
@@ -399,13 +400,8 @@ void caStripPlot::TimeOutThread()
 
     elapsedTime = ((double) timeNow.time + (double) timeNow.millitm / (double)1000) -
             ((double) timeStart.time + (double) timeStart.millitm / (double)1000);
-    //printf("elapsedTime=%.3f\n", elapsedTime  - elapsedTimeOld);
-
-    elapsedTimeOld = elapsedTime;
 
     timeData = INTERVAL + elapsedTime;
-
-    mutex.lock();
 
     if(dataCount > 1) {
 
@@ -486,14 +482,13 @@ void caStripPlot::TimeOutThread()
         }
 
     }
-    mutex.unlock();
 
     // keep max and min
     for (int c = 0; c < NumberOfCurves; c++ ) {
         maxVal[c] = minVal[c] = actVal[c];
         realMax[c] = realMin[c] = realVal[c];
     }
-
+    mutex.unlock();
 
 }
 
@@ -505,10 +500,12 @@ void caStripPlot::TimeOut()
     int delta = 0;
     double x0, x1, increment;
     int totalMissed = 0;
-     int dataCountLimit = (int) (MULTFOROVERLAPPINGTIMES * HISTORY -1);
+
+    int dataCountLimit = (int) (MULTFOROVERLAPPINGTIMES * HISTORY -1);
 
     if(!timerID) return;
 
+    mutex.lock();
 
     // we need an exact time scale
     if(Start) {
@@ -525,9 +522,8 @@ void caStripPlot::TimeOut()
         timeData = INTERVAL + elapsedTime;
         setAxisScale(QwtPlot::xBottom, timeData - INTERVAL, timeData);
     }
-
-    mutex.lock();
-
+    
+    replot();
 
     // we want to be sure that no pixels are missed, this is particularly important for ms windows
     // this is really not nice and time consuming, up to now no better solution
@@ -579,7 +575,6 @@ void caStripPlot::TimeOut()
         }
         errorcurve[c]->setSamples(rangeData[c].toVector());
     }
-    mutex.unlock();
 
     if(thisXaxisType == TimeScale) {
         replot();
@@ -592,6 +587,8 @@ void caStripPlot::TimeOut()
 #endif
     }
     timerCount=0;
+    
+    mutex.unlock();
 
 }
 
@@ -714,6 +711,9 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 void caStripPlot::setData(struct timeb now, double Y, int curvIndex)
 {
     if(curvIndex < 0 || curvIndex > (MAXCURVES-1)) return;
+
+    mutex.lock();
+
     realVal[curvIndex] = Y;
     realTim[curvIndex] = now;
     if(Y> realMax[curvIndex]) realMax[curvIndex]  = Y;
@@ -727,6 +727,8 @@ void caStripPlot::setData(struct timeb now, double Y, int curvIndex)
     actVal[curvIndex] = (y0max - y0min) / (ymax -ymin) * (realVal[curvIndex] - ymin) + y0min;
     minVal[curvIndex] = (y0max - y0min) / (ymax -ymin) * (realMin[curvIndex] - ymin) + y0min;
     maxVal[curvIndex] = (y0max - y0min) / (ymax -ymin) * (realMax[curvIndex] - ymin) + y0min;
+
+    mutex.unlock();
 }
 
 void caStripPlot::showCurve(int number, bool on)
