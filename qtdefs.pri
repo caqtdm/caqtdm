@@ -1,9 +1,15 @@
-CAQTDM_VERSION = V3.4.1
+CAQTDM_VERSION = V3.4.2
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+
+# new in 3.4.2
+# camera stuff modified
+# added mutex to synchronize data and display
+# font bug in catable solved
+# found a datarace in castripplot, corrected
 
 # new in 3.4.1
 # cacamera displays intensity at x, y
