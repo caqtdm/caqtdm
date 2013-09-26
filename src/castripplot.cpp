@@ -488,8 +488,8 @@ void caStripPlot::TimeOutThread()
         maxVal[c] = minVal[c] = actVal[c];
         realMax[c] = realMin[c] = realVal[c];
     }
-    mutex.unlock();
 
+    mutex.unlock();
 }
 
 // display
@@ -523,7 +523,17 @@ void caStripPlot::TimeOut()
         setAxisScale(QwtPlot::xBottom, timeData - INTERVAL, timeData);
     }
     
-    replot();
+    // replot in order to get the exact transformation of real coordinates to pixels
+    if(thisXaxisType == TimeScale) {
+        replot();
+    } else {
+#if QWT_VERSION >= 0x060100
+        QwtPlotCanvas *canvas =  (QwtPlotCanvas *) this->canvas();
+        canvas->replot();
+#else
+        canvas()->replot();
+#endif
+    }
 
     // we want to be sure that no pixels are missed, this is particularly important for ms windows
     // this is really not nice and time consuming, up to now no better solution
