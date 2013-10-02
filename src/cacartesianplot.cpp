@@ -169,10 +169,18 @@ void caCartesianPlot::setData(const QVector<double>& vector, int curvIndex, int 
         // keep data points
         if(curvXY == CH_X) {                       // X
             X[curvIndex].resize(vector.size());
-            qCopy(vector.begin(), vector.end(), X[curvIndex].begin());
+#if QT_VERSION < 0x040700
+              ::memcpy(X[curvIndex].data(), vector.data(), vector.size()*sizeof(double));
+#else
+               qCopy(vector.begin(), vector.end(), X[curvIndex].begin());
+#endif
         } else {                                   // Y
             Y[curvIndex].resize(vector.size());
+#if QT_VERSION < 0x040700
+            ::memcpy(Y[curvIndex].data(), vector.data(), vector.size()*sizeof(double));
+#else
             qCopy(vector.begin(), vector.end(), Y[curvIndex].begin());
+#endif
         }
 
         // only x channel was specified, use index as y
@@ -207,7 +215,11 @@ void caCartesianPlot::setData(const QVector<double>& vector, int curvIndex, int 
         if(X[curvIndex].size() > 1 && Y[curvIndex].size() == 1) {
             //printf("x vector, y scalar\n");
             int nbPoints = X[curvIndex].size();
+#if QT_VERSION < 0x040700
+            double aux = Y[curvIndex][0];
+#else
             double aux =  Y[curvIndex].at(0);
+#endif
             Y[curvIndex].reserve(nbPoints);      // increase to correct size
             double *data = Y[curvIndex].data();
             for(int i=0; i < X[curvIndex].size(); i++) data[i] = aux;
@@ -218,7 +230,11 @@ void caCartesianPlot::setData(const QVector<double>& vector, int curvIndex, int 
         } else if(X[curvIndex].size() == 1 && Y[curvIndex].size() > 1) {
             //printf("x scalar, y vector\n" );
             int nbPoints = Y[curvIndex].size(); 
+#if QT_VERSION < 0x040700
+            double aux = X[curvIndex][0];
+#else
             double aux =  X[curvIndex].at(0);
+#endif
             X[curvIndex].reserve(nbPoints);      // increase to correct size
             double *data = X[curvIndex].data();
             for(int i=0; i < Y[curvIndex].size(); i++) data[i] = aux;  // and set values to first datapoint

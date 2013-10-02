@@ -246,8 +246,14 @@ void caDoubleTabWidget::fontChange(const QFont & oldFont) {
     // style for horizontal bar
     QString style=tr("QTabBar {font-size: %1pt; font-family: %2; ").arg(this->fontInfo().pointSize()).arg(this->fontInfo().family());
     if(this->fontInfo().underline())  style.append("text-decoration:underline; ");
+
+#if QT_VERSION < 0x040700
+    if(this->fontInfo().bold()) style.append("font-weight: bold; ");
+    if(this->fontInfo().italic())  style.append("font-style: italic; ");
+#else
     if(this->fontInfo().styleName().contains("Bold")) style.append("font-weight: bold; ");
     if(this->fontInfo().styleName().contains("Italic"))  style.append("font-style: italic; ");
+#endif
     style.append("} ");
     hTabBar->setStyleSheet(style);
 
@@ -283,8 +289,14 @@ void caDoubleTabWidget::setFont(int dir)
         // style for vertical list
         style.append(tr("font-size: %1pt; font-family: %2; ").arg(this->fontInfo().pointSize()).arg(this->fontInfo().family()));
         if(this->fontInfo().underline())  style.append("text-decoration:underline; ");
-        if(this->fontInfo().styleName().contains("Bold"))  style.append("font-weight: bold; ");
-        if(this->fontInfo().styleName().contains("Italic")) style.append("font-style: italic; ");
+
+#if QT_VERSION < 0x040700
+        if(this->fontInfo().bold()) style.append("font-weight: bold; ");
+        if(this->fontInfo().italic())  style.append("font-style: italic; ");
+#else
+        if(this->fontInfo().styleName().contains("Bold")) style.append("font-weight: bold; ");
+        if(this->fontInfo().styleName().contains("Italic"))  style.append("font-style: italic; ");
+#endif
 
         style.append(tr("text-align: left; padding-left: %1px;").arg(padding[i]));
 
