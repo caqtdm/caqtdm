@@ -3137,7 +3137,16 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                     case caCHAR:
                         break;
                     case caSTRING:
-                        info.append((char*)kPtr->edata.dataB);
+                        if(kPtr->edata.valueCount <= 1) {
+                            info.append((char*)kPtr->edata.dataB);
+                        } else {
+                            QString States((char*) kPtr->edata.dataB);
+                            QStringList list = States.split(";");
+                            for(int i=0; i<list.count(); i++) {
+                             sprintf(asc, "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%d %s", i, qPrintable(list.at(i)));
+                             info.append(asc);
+                            }
+                        }
                         break;
 
                     case caENUM:{

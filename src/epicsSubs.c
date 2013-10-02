@@ -198,7 +198,7 @@ static void dataCallback(struct event_handler_args args)
 
         case DBF_STRING:
         {
-            int dataSize;
+            int dataSize, len;
             int i;
             char *ptr;
             struct dbr_sts_string *stsF = (struct dbr_sts_string *) args.dbr;
@@ -222,10 +222,12 @@ static void dataCallback(struct event_handler_args args)
 
             ptr = (char*) kData.edata.dataB;
             ptr[0] = '\0';
-
+            len = 0;
             strcpy(ptr, myLimitedString(val_ptr[0]));
             for (i = 1; i < args.count; i++) {
-                sprintf(ptr, "%s;%s", ptr, myLimitedString(val_ptr[i]));
+                len = len+strlen(myLimitedString(val_ptr[i-1]));
+                strcat(&ptr[len++], ";");
+                strcat(&ptr[len], myLimitedString(val_ptr[i]));
             }
 
             C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
@@ -234,7 +236,7 @@ static void dataCallback(struct event_handler_args args)
 
         case DBF_ENUM:
         {
-            int dataSize;
+            int dataSize, len;
             int i;
             char *ptr;
             struct dbr_ctrl_enum *stsF = (struct dbr_ctrl_enum *) args.dbr;
@@ -259,11 +261,15 @@ static void dataCallback(struct event_handler_args args)
 
                 ptr = (char*) kData.edata.dataB;
                 ptr[0] = '\0';
+                len = 0;
                 strcpy(ptr, myLimitedString(stsF->strs[0]));
                 for (i = 1; i < stsF->no_str; i++) {
-                    sprintf(ptr, "%s;%s", ptr, myLimitedString(stsF->strs[i]));
+                    len = len+strlen(myLimitedString(stsF->strs[i-1]));
+                    strcat(&ptr[len++], ";");
+                    strcat(&ptr[len], myLimitedString(stsF->strs[i]));
                 }
-            } else if(args.count == 1){  // no strings, must be a value, convert it to text
+
+            } else if(args.count == 1) {  // no strings, must be a value, convert it to text
                 // concatenate strings separated with ';'
                 dataSize = 40;
                 if(dataSize != kData.edata.dataSize) {
