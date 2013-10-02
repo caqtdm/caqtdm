@@ -58,7 +58,7 @@ QT_VER_MIN = $$member(QT_VERSION, 1)
 # stripplot and cartesian plot will rescale their fontsizes now too, caSlider and caThermo text will only down scale
 
 # new in 3.1.0
-# windows are resizable, in order to have to working well one should always use fontscalemode=WidthAndHeight. in the deafult style sheet no font sizes should be specified.
+# windows are resizable, in order to have it working well one should always use fontscalemode=WidthAndHeight. in the deafult style sheet no font sizes should be specified.
 # when for the mainwindow a layout is used, Qt should do the work and caQtDM will not do anything except changing some font sizes.
 # if on the command line -noResize is specified, then resizing will be disabled for that instance of caQtDM (in case of attaching that will not work)
 # adl2ui will generate all texts with fontScaleMode=WidthAndHeight
