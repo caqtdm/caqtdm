@@ -49,9 +49,8 @@ private slots:
 
 private:
 
-    QPixmap pixmap;
     QImage imageNew;
-    QPoint pixmapOffset;
+    QPoint imageOffset;
     bool m_zoom;
     QGridLayout  *grid;
     caLineEdit *labelMin;

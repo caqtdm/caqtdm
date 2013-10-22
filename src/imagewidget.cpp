@@ -33,8 +33,8 @@
 
 ImageWidget::ImageWidget(QWidget *parent) : QWidget(parent)
 {
-    pixmapOffset.setX(0);
-    pixmapOffset.setY(0);
+    imageOffset.setX(0);
+    imageOffset.setY(0);
     for(int i=0; i<4; i++) {
         drawValues[i] =false;
         geoValues[i] = 0;
@@ -46,13 +46,13 @@ void ImageWidget::paintEvent(QPaintEvent * event)
     Q_UNUSED(event);
     QPainter painter(this);
 
-    if (imageNew.isNull()) { //pixmap.isNull()) {
+    if (imageNew.isNull()) {
         painter.setPen(Qt::white);
         painter.drawText(rect(), Qt::AlignCenter, tr("Rendering initial image, please wait..."));
         return;
     }
-    //painter.drawPixmap(pixmapOffset, pixmap);
-    painter.drawImage(0,0,imageNew);
+
+    painter.drawImage(imageOffset,imageNew);
 
     for(int i=0; i<2; i++) {
         if(i==0) painter.setPen( QPen( Qt::white )); else painter.setPen( QPen( Qt::black ));
@@ -77,14 +77,12 @@ void ImageWidget::paintEvent(QPaintEvent * event)
 }
 
 QImage ImageWidget::scaleImage(const QImage &image) {
-    return image.scaled(this->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    return image.scaled(this->size(), Qt::KeepAspectRatio, Qt::FastTransformation); // Qt::SmoothTransformation);
 }
-
 
 void ImageWidget::updateImage(bool zoom, const QImage &image, bool valuesPresent[], int values[])
 {
     if(zoom) {
-        //QImage
         imageNew = scaleImage(image);
         if(imageNew.isNull()) return;
 
@@ -92,13 +90,10 @@ void ImageWidget::updateImage(bool zoom, const QImage &image, bool valuesPresent
         QFuture<QImage> future = QtConcurrent::run(this, &ImageWidget::scaleImage, image);
         imageNew = future.result();
 #else
-        //QImage
         imageNew = scaleImage(image);
 #endif
-        //pixmap = QPixmap::fromImage(imageNew);
     } else {
         imageNew = image;
-        //pixmap = QPixmap::fromImage(image);
     }
     for(int i=0; i<4; i++) {
         drawValues[i] = valuesPresent[i];
