@@ -1,12 +1,15 @@
-CAQTDM_VERSION = V3.4.3
+CAQTDM_VERSION = V3.4.4
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
 
+# new in 3.4.4
+# enhanced performance for camera widget
+
 # new in 3.4.3
-# package can be build with Qt4.6 and qwt6.0, necessary for SL6 (cacartesianplot and cadoubletabwidget modified)
+# package can also be build with Qt4.6 and qwt6.0, necessary for SL6 (cacartesianplot, cadoubletabwidget and plugins slightly modified)
 # epics enums and strings modified for count > 1
 
 # new in 3.4.2
