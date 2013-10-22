@@ -1,3 +1,28 @@
+/*
+ *  This file is part of the caQtDM Framework, developed at the Paul Scherrer Institut,
+ *  Villigen, Switzerland
+ *
+ *  The caQtDM Framework is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  The caQtDM Framework is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with the caQtDM Framework.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Copyright (c) 2010 - 2014
+ *
+ *  Author:
+ *    Anton Mezger
+ *  Contact details:
+ *    anton.mezger@psi.ch
+ */
+
 #if defined(_MSC_VER)
   #define _CRT_SECURE_NO_WARNINGS
 #endif
@@ -11,7 +36,7 @@ typedef char strng[40];
 
 char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, strng propertyname[], strng propertytype[], int nb)
 {
-  char mess[1024], *xml;
+  char mess[2048], *xml;
         sprintf(mess, "<ui language=\"c++\">\
         <widget class=\"%s\" name=\"%s\">\
         <property name=\"geometry\">\
@@ -24,13 +49,13 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
         </property>\
         </widget>",  clss, name, x, y, w, h);
         if(nb > 0) {
-            sprintf(mess, "%s  <customwidgets>\
-          <customwidget>\
-             <class>%s</class>\
-             <propertyspecifications>", mess, clss);
+             sprintf(&mess[strlen(mess)], " <customwidgets>\
+                            <customwidget>\
+                            <class>%s</class>\
+                            <propertyspecifications>", clss);
              for(int i=0; i<nb; i++) {
-                sprintf(mess, "%s <stringpropertyspecification name=\"%s\" notr=\"true\" type=\"%s\"/>", 
-                    mess, propertyname[i], propertytype[i]);
+                sprintf(&mess[strlen(mess)], " <stringpropertyspecification name=\"%s\" notr=\"true\" type=\"%s\"/>", 
+                     propertyname[i], propertytype[i]);
              }
              strcat(mess, " </propertyspecifications>\
                 </customwidget>\
@@ -39,7 +64,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
         strcat(mess, "</ui>");
         xml = (char*) malloc(strlen(mess) * sizeof(char)+1);
         memcpy(xml, mess, strlen(mess) * sizeof(char)+1);
-        //printf("%s\n", xml);
+        //printf("%d %s\n\n", (int) strlen(mess), xml);
    return xml;
 }
 
