@@ -24,6 +24,7 @@
  */
 
 #include <QtGui>
+#include <QPainter>
 #ifndef QT_NO_CONCURRENT
 #include <qtconcurrentrun.h>
 #endif
@@ -45,12 +46,13 @@ void ImageWidget::paintEvent(QPaintEvent * event)
     Q_UNUSED(event);
     QPainter painter(this);
 
-    if (pixmap.isNull()) {
+    if (imageNew.isNull()) { //pixmap.isNull()) {
         painter.setPen(Qt::white);
         painter.drawText(rect(), Qt::AlignCenter, tr("Rendering initial image, please wait..."));
         return;
     }
-    painter.drawPixmap(pixmapOffset, pixmap);
+    //painter.drawPixmap(pixmapOffset, pixmap);
+    painter.drawImage(0,0,imageNew);
 
     for(int i=0; i<2; i++) {
         if(i==0) painter.setPen( QPen( Qt::white )); else painter.setPen( QPen( Qt::black ));
@@ -82,20 +84,21 @@ QImage ImageWidget::scaleImage(const QImage &image) {
 void ImageWidget::updateImage(bool zoom, const QImage &image, bool valuesPresent[], int values[])
 {
     if(zoom) {
-        QImage imageNew = scaleImage(image);
+        //QImage
+        imageNew = scaleImage(image);
         if(imageNew.isNull()) return;
 
 #ifndef QT_NO_CONCURRENT
         QFuture<QImage> future = QtConcurrent::run(this, &ImageWidget::scaleImage, image);
         imageNew = future.result();
 #else
-        QImage imageNew = scaleImage(image);
-
+        //QImage
+        imageNew = scaleImage(image);
 #endif
-
-        pixmap = QPixmap::fromImage(imageNew);
+        //pixmap = QPixmap::fromImage(imageNew);
     } else {
-        pixmap = QPixmap::fromImage(image);
+        imageNew = image;
+        //pixmap = QPixmap::fromImage(image);
     }
     for(int i=0; i<4; i++) {
         drawValues[i] = valuesPresent[i];

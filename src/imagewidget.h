@@ -27,6 +27,7 @@
 #define ImageWIDGET_H
 
 #include <QPixmap>
+#include <QImage>
 #include <QWidget>
 #include <QGridLayout>
 #include <caLineEdit>
@@ -49,6 +50,7 @@ private slots:
 private:
 
     QPixmap pixmap;
+    QImage imageNew;
     QPoint pixmapOffset;
     bool m_zoom;
     QGridLayout  *grid;
