@@ -38,6 +38,7 @@ SOURCES += caqtdm_lib.cpp \
     myMessageBox.cpp \
     limitsStripplotDialog.cpp \
     limitsCartesianplotDialog.cpp \
+    sliderDialog.cpp \
     processWindow.cpp
 
 HEADERS += caqtdm_lib.h\
@@ -56,6 +57,7 @@ HEADERS += caqtdm_lib.h\
     myMessageBox.h \
     limitsStripplotDialog.h \
     limitsCartesianplotDialog.h \
+    sliderDialog.h \
     processWindow.h
 
 HEADERS += \
