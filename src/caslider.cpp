@@ -45,16 +45,14 @@
 
 caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
 {
-    setScalePosition(NoScale);
-    setSpacing(0);
-    setBorderWidth(1);
-
+    thisIncrement = 1.0;
     thisDirection = Up;
     thisMinimum = -50;
     thisMaximum = 50;
 
-    setAccessW(true);
-    setDirection(Up);
+    setScalePosition(NoScale);
+    setSpacing(0);
+    setBorderWidth(1);
 
     installEventFilter(this);
 
@@ -66,6 +64,16 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
     defaultForeColor = palette().foreground().color();
     oldBackColor = QColor(Qt::white);
     oldForeColor = QColor(Qt::white);
+
+    setDirection(Up);
+    setAccessW(true);
+
+    QString style;
+    style.append("  caSlider:focus  {border: 1px solid #f00;} ");
+    setStyleSheet(style);
+
+    setFocusPolicy(Qt::ClickFocus);
+
 }
 
 QString caSlider::getPV() const
@@ -146,6 +154,12 @@ void caSlider::setSliderValue(double const &value){
     update();
 }
 
+void caSlider::setIncrementValue(double const &value){
+    thisIncrement = value;
+    setDirection(thisDirection);
+    update();
+}
+
 void caSlider::setAccessW(int access)
 {
      thisAccessW = access;
@@ -169,7 +183,7 @@ void caSlider::setDirection(Direction dir)
 #endif
         setOrientation(Qt::Vertical);
 #if QWT_VERSION < 0x060100
-        setRange(thisMinimum, thisMaximum, fmin(1.0,(fabs(thisMaximum- thisMinimum) / 100.0)), 1);
+        setRange(thisMinimum, thisMaximum, thisIncrement, 1);
 #endif
         break;
     case Down:
@@ -180,8 +194,8 @@ void caSlider::setDirection(Direction dir)
 #endif
         setOrientation(Qt::Vertical);
 #if QWT_VERSION < 0x060100
-        if(thisMaximum > thisMinimum) setRange(thisMaximum, thisMinimum ,  fmin(1.0,(fabs(thisMaximum- thisMinimum) / 100.0)), 1);
-        else setRange(thisMinimum, thisMaximum , fmin(1.0,(fabs(thisMaximum- thisMinimum) / 100.0)), 1);
+        if(thisMaximum > thisMinimum) setRange(thisMaximum, thisMinimum ,  thisIncrement, 1);
+        else setRange(thisMinimum, thisMaximum , thisIncrement, 1);
 #endif
         break;
     case Left:
@@ -192,9 +206,9 @@ void caSlider::setDirection(Direction dir)
         setScalePosition(QwtSlider::TrailingScale);
 #endif
         setOrientation(Qt::Horizontal);
- #if QWT_VERSION < 0x060100
-        if(thisMaximum > thisMinimum) setRange(thisMaximum, thisMinimum , fmin(1.0,(fabs(thisMaximum- thisMinimum) / 100.0)), 1);
-        else setRange(thisMinimum, thisMaximum , fmin(1.0,(fabs(thisMaximum- thisMinimum) / 100.0)), 1);
+#if QWT_VERSION < 0x060100
+        if(thisMaximum > thisMinimum) setRange(thisMaximum, thisMinimum , thisIncrement, 1);
+        else setRange(thisMinimum, thisMaximum , thisIncrement, 1);
 #endif
         break;
     case Right:
@@ -205,7 +219,7 @@ void caSlider::setDirection(Direction dir)
 #endif
         setOrientation(Qt::Horizontal);
 #if QWT_VERSION < 0x060100
-        setRange(thisMinimum, thisMaximum, fmin(1.0,(fabs(thisMaximum- thisMinimum) / 100.0)), 1);
+        setRange(thisMinimum, thisMaximum, thisIncrement, 1);
 #endif
         break;
     }
@@ -213,24 +227,35 @@ void caSlider::setDirection(Direction dir)
     update();
 }
 
+void caSlider::keyPressEvent(QKeyEvent *e) {
+    e->accept();
+    QwtAbstractSlider::keyPressEvent(e);
+}
+
+void caSlider::keyReleaseEvent(QKeyEvent *e) {
+     e->ignore();
+     return;
+}
+
 void caSlider::mousePressEvent(QMouseEvent *e)
 {
-    if( e->button() == Qt::LeftButton) {
-
-        if(e->type() == QEvent::MouseButtonDblClick) {
-           e->ignore();
-           return;
-        } else {
-           e->accept();
-        }
+    if( e->button() == Qt::RightButton) {
+        e->ignore();
+        return;
+    }
+    else {
+        e->accept();
         QwtAbstractSlider::mousePressEvent(e);
     }
 }
 
 void caSlider::mouseReleaseEvent( QMouseEvent *e )
 {
-    e->ignore();
-    QwtAbstractSlider::mouseReleaseEvent(e);
+    if( e->button() == Qt::LeftButton) {
+        e->accept();
+        stopMoving();
+        QwtAbstractSlider::mouseReleaseEvent(e);
+    }
 }
 
 bool caSlider::eventFilter(QObject *obj, QEvent *event)
@@ -246,10 +271,6 @@ bool caSlider::eventFilter(QObject *obj, QEvent *event)
             QApplication::restoreOverrideCursor();
             setReadOnly(false);
             clearFocus();
-
-        //} else if(event->type() == QEvent::MouseButtonDblClick) {
-        //    printf("double click\n");
-        //    event->ignore();
         }
         return QObject::eventFilter(obj, event);
 }
@@ -281,7 +302,6 @@ void caSlider::setAlarmColors(short status)
 
 void caSlider::setUserAlarmColors(double val)
 {
-//     if((val< this->minValue()) || (val > this->maxValue())) {
    if((val< thisMinimum) || (val > thisMaximum)) {
         setColors(thisBackColor, QColor(Qt::red));
      } else {

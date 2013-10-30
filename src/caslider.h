@@ -47,6 +47,7 @@ class QTCON_EXPORT caSlider : public QwtSlider
 
     Q_PROPERTY(double maxValue READ getMaxValue WRITE setMaxValue)
     Q_PROPERTY(double minValue READ getMinValue WRITE setMinValue)
+    Q_PROPERTY(double incrementValue READ getIncrementValue WRITE setIncrementValue)
     Q_PROPERTY(double value READ getSliderValue WRITE setSliderValue)
 
 public:
@@ -89,6 +90,9 @@ public:
     double getSliderValue()  const {return thisValue;}
     void setSliderValue(double const &value);
 
+    double getIncrementValue()  const {return thisIncrement;}
+    void setIncrementValue(double const &value);
+
     caSlider(QWidget *parent);
 
     void setAlarmColors(short status);
@@ -103,14 +107,16 @@ protected:
 
     virtual void mousePressEvent(QMouseEvent *e);
     virtual void mouseReleaseEvent(QMouseEvent *e);
+    virtual void keyPressEvent(QKeyEvent *e);
+    virtual void keyReleaseEvent(QKeyEvent *e);
 
 private:
-    QString thisPV;
-    double thisMaximum, thisMinimum, thisValue;
-    bool thisAccessW;
-    Direction      thisDirection;
     bool eventFilter(QObject *obj, QEvent *event);
 
+    QString thisPV;
+
+    bool thisAccessW;
+    Direction thisDirection;
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
     QPalette thisPalette;
@@ -120,6 +126,11 @@ private:
 
     QColor defaultBackColor;
     QColor defaultForeColor;
+
+    double thisMaximum;
+    double thisMinimum;
+    double thisValue;
+    double thisIncrement;
 
 };
 

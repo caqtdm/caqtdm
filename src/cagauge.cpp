@@ -166,8 +166,9 @@ void caLinearGauge::drawColorBar(QPainter *p)
             r = QRect(0, 0, barSize, 100);
         }
         QLinearGradient	grad(start, stop);
-        for (int i = 0; i < v_p.size(); i++)
+        for (int i = 0; i < v_p.size(); i++) {
             grad.setColorAt(v_p[i], v_c[i]);
+    }
         p->setBrush(grad);
         p->drawRect(r);
     }
@@ -339,9 +340,9 @@ void caLinearGauge::drawMarker(QPainter *p, bool drawValue)
     p->setPen(Qt::black);
 
     if (drawValue)
-        c = QColor(Qt::darkBlue);//EColor(Elettra::darkBlue);
+        c = QColor(Qt::darkBlue);
     else
-        c = QColor(Qt::red);//EColor(Elettra::red);
+        c = QColor(Qt::red);
     c.setAlpha(100);
     p->setBrush(c);
     p->drawPolygon(triangolo);

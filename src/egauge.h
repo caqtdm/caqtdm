@@ -29,6 +29,7 @@
 #include <math.h>
 #include <QWidget>
 #include <qtcontrols_global.h>
+#include <QtDebug>
 
 #ifdef __MINGW32__
 inline static double exp10(double x)
@@ -54,18 +55,27 @@ class QTCON_EXPORT EAbstractGauge : public QWidget
 Q_OBJECT
 
 Q_ENUMS(ColorMode)
+Q_ENUMS(displayLims)
+Q_ENUMS(alarmLims)
 
 Q_PROPERTY(double minValue READ minValue WRITE setMinValue)
+Q_PROPERTY(double maxValue READ maxValue WRITE setMaxValue)
+
+Q_PROPERTY(displayLims displayLimits READ getDisplayLimits WRITE setDisplayLimits)
+
+Q_PROPERTY(double highError READ highError WRITE setHighError)
 Q_PROPERTY(double lowError READ lowError WRITE setLowError)
+
 Q_PROPERTY(double lowWarning READ lowWarning WRITE setLowWarning)
 Q_PROPERTY(double highWarning READ highWarning WRITE setHighWarning)
-Q_PROPERTY(double highError READ highError WRITE setHighError)
-Q_PROPERTY(double maxValue READ maxValue WRITE setMaxValue)
+
+Q_PROPERTY(alarmLims alarmLimits READ getAlarmLimits WRITE setAlarmLimits)
+
 Q_PROPERTY(double value READ value WRITE setValue)
 Q_PROPERTY(double reference READ reference WRITE setReference)
 Q_PROPERTY(bool scaleEnabled READ isScaleEnabled WRITE setScaleEnabled)
 Q_PROPERTY(bool referenceEnabled READ isReferenceEnabled WRITE setReferenceEnabled)
-Q_PROPERTY(bool externalLimitsEnabled READ isExternalEnabled WRITE setExternalEnabled)
+
 Q_PROPERTY(ColorMode colorMode READ colorMode WRITE setColorMode)
 Q_PROPERTY(bool externalScale READ externalScale WRITE setExternalScale)
 Q_PROPERTY(bool logarithmicScale READ logarithmicScale WRITE setLogarithmicScale)
@@ -76,8 +86,11 @@ Q_PROPERTY(int numMinorTicks READ numMinorTicks WRITE setNumMinorTicks)
 
 public:
 
+    enum displayLims {Channel_Limits = 0 , User_Limits};
+    enum alarmLims  {Channel_Alarms = 0 , User_Alarms, None};
+
 	/**
-	 * Color Mode to be used to paint the widget
+     * Color Mode to be used to paint the widget
 	 */
 	enum ColorMode 
 	{
@@ -118,8 +131,11 @@ public:
 	void setScaleEnabled(bool b);
     bool isScaleEnabled(){ return m_scaleEnabled; }
 
-        void setExternalEnabled(bool b);
-        bool isExternalEnabled(){ return m_externalEnabled; }
+    void setDisplayLimits(displayLims lims) {m_displayLimits = lims; }
+    displayLims getDisplayLimits(){ return m_displayLimits; }
+
+    void setAlarmLimits(alarmLims lims) {m_alarmLimits = lims;}
+    alarmLims getAlarmLimits(){return m_alarmLimits; }
 	
 	void setReferenceEnabled(bool b);
     bool isReferenceEnabled(){ return m_referenceEnabled; }
@@ -158,8 +174,11 @@ protected:
 	
 	ColorMode	m_colorMode;
 	bool 		m_referenceEnabled;
+
+    alarmLims  m_alarmLimits;
+    displayLims m_displayLimits;
 	bool 		m_scaleEnabled;
-    bool 		m_externalEnabled;
+
     bool        m_connected;
     ColorMode   m_colorModeSaved;
     int		    m_numMajorTicks, m_numMinorTicks;

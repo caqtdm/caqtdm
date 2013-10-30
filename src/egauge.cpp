@@ -37,8 +37,8 @@
 #define ORANGE QColor(243, 186, 7)
 
 EAbstractGauge::EAbstractGauge(QWidget *parent) : QWidget(parent),
-	m_colorMode(COLORBAR),
-    m_referenceEnabled(true), m_scaleEnabled(true), m_externalEnabled(false),
+    m_colorMode(COLORBAR),
+    m_referenceEnabled(true), m_scaleEnabled(true),
 	m_numMajorTicks(LINEAR_MAJOR_TICKS), longestLabelIndex(-1),
         m_normalColor(QColor(Qt::green)), m_warningColor(ORANGE), m_errorColor(QColor(Qt::red)),
 	d_logarithmicScale(false)
@@ -65,9 +65,13 @@ EAbstractGauge::EAbstractGauge(QWidget *parent) : QWidget(parent),
 
 	m_valueFormat = "%.1f";
 
+    m_displayLimits = Channel_Limits;
+    m_alarmLimits = Channel_Alarms;
     m_connected = true;
     setConnected(true);
 
+    configure();
+    update();
 }
 
 double EAbstractGauge::logarithm(double v)
@@ -187,13 +191,6 @@ void EAbstractGauge::setScaleEnabled(bool b)
 	m_scaleEnabled = b;
 	configure();
 	update();
-}
-
-void EAbstractGauge::setExternalEnabled(bool b)
-{
-        m_externalEnabled = b;
-        configure();
-        update();
 }
 
 void EAbstractGauge::setReferenceEnabled(bool b)
