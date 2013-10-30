@@ -59,6 +59,7 @@
 #include "JSON.h"
 #include "limitsStripplotDialog.h"
 #include "limitsCartesianplotDialog.h"
+#include "sliderDialog.h"
 #include "processWindow.h"
 
 #include <QtControls>
@@ -162,9 +163,12 @@ private:
     QList<QWidget*> includeWidgetList;
     QwtPlotCurve curve[3];
     QVector<double> xx, yy;
+
     int level;
+    // 50 levels of includes should do it
     QString savedMacro[50];
     QString savedFile[50];
+
     QProcess *proc;
     QMap<QString, QString> createMap(const QString&);
 
@@ -181,6 +185,8 @@ private:
 
     int origWidth, origHeight;
 
+    QString includeFiles;
+
 
 #ifdef epics4
     epics4Subs *Epics4;
@@ -191,7 +197,7 @@ private slots:
     void processError(QProcess::ProcessError err);
     void Callback_EApplyNumeric(double value);
     void Callback_ENumeric(double value);
-    void Callback_Slider(double value);
+    void Callback_SliderValueChanged(double);
     void Callback_MessageButton(int type);
     void Callback_ToggleButton(bool type);
     void Callback_ScriptButton();

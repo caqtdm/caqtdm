@@ -237,6 +237,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     QUiLoader loader;
 
+    includeFiles = "";
+
     // define a layout
     QGridLayout *layout = new QGridLayout;
 
@@ -246,6 +248,12 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     // treat ui file */
     QFileInfo fi(filename);
+
+    includeFiles.append(fi.absoluteFilePath());
+    includeFiles.append("<br>");
+
+    qDebug() << filename;
+
     if(filename.lastIndexOf(".ui") != -1) {
 
         file->open(QFile::ReadOnly);
@@ -324,6 +332,11 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     connect(this, SIGNAL(Signal_OpenNewWFile(const QString&, const QString&, const QString&)), parent,
             SLOT(Callback_OpenNewFile(const QString&, const QString&, const QString&)));
+
+
+
+    setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
 
     // initialize IO
     PrepareDeviceIO();
@@ -824,7 +837,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         if(widget->getPV().size() > 0) {
             addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
             widget->setPV(pv);
-            connect(widget, SIGNAL(sliderMoved(double)), this, SLOT(Callback_Slider(double)));
+            connect(widget, SIGNAL(valueChanged(double)), this, SLOT(Callback_SliderValueChanged(double)));
         }
 
         widget->setProperty("Taken", true);
@@ -942,6 +955,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         QString fileNameFound = s->findFile();
         if(fileNameFound.isNull()) {
             qDebug() << "file" << fileName << "does not exist";
+            if(!includeFiles.contains(fileName)) {
+               includeFiles.append(fileName);
+               includeFiles.append(" does not exist <br>");
+            }
         } else {
             //qDebug() << "load file" << fileName << "with macro" << macroS;
             fileName = fileNameFound;
@@ -973,9 +990,16 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
             // some error with loading
             if (!thisW) {
                 postMessage(QtDebugMsg, (char*) tr("could not load include file %1").arg(fileName).toAscii().constData());
+                if(!includeFiles.contains(fi.absoluteFilePath())) {
+                   includeFiles.append(fi.absoluteFilePath());
+                   includeFiles.append(" could not be loaded <br>");
+                }
                 // seems to be ok
             } else {
-
+                if(!includeFiles.contains(fi.absoluteFilePath())) {
+                   includeFiles.append(fi.absoluteFilePath());
+                   includeFiles.append(" is loaded <br>");
+                }
                 includeWidgetList.append(thisW);
 
                 // add widget to the gui
@@ -1668,48 +1692,75 @@ int CaQtDM_Lib::ComputeAlarm(QWidget *w)
 void CaQtDM_Lib::UpdateGauge(EAbstractGauge *widget, const knobData &data)
 {
     if(data.edata.connected) {
-        if((widget->isExternalEnabled()) && (data.edata.initialize)) {
+        double maxval = 1000.0;
+        double minval = 0.0;
 
-            // when no limits defined then say no external limits
-            if( (data.edata.lower_alarm_limit == data.edata.upper_alarm_limit) &&
-                    (data.edata.lower_warning_limit == data.edata.upper_warning_limit) &&
-                    (data.edata.upper_disp_limit == data.edata.lower_disp_limit) ) {
-                widget->setExternalEnabled(false);
-            }
-
-            // set low and high error
-            if(data.edata.lower_alarm_limit != data.edata.upper_alarm_limit) {
-                widget->setLowError(data.edata.lower_alarm_limit);
-                widget->setHighError(data.edata.upper_alarm_limit);
-            } else {
-                widget->setLowError(data.edata.lower_disp_limit);
-                widget->setHighError(data.edata.upper_disp_limit);
-            }
-
-            // warning limits, when not specified set alarm limits
-            if(data.edata.lower_warning_limit != data.edata.upper_warning_limit) {
-                widget->setLowWarning(data.edata.lower_warning_limit);
-                widget->setHighWarning(data.edata.upper_warning_limit);
-            } else if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
-                widget->setHighWarning(data.edata.upper_disp_limit);
-                widget->setLowWarning(data.edata.lower_disp_limit);
-            } else {
-                widget->setHighWarning(1000.0);
-                widget->setLowWarning(0.0);
-            }
-
+        if((widget->getDisplayLimits() == EAbstractGauge::Channel_Limits) && (data.edata.initialize)) {
             // HOPR and LOPR
-            if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
-                widget->setMaxValue(data.edata.upper_disp_limit);
-                widget->setMinValue(data.edata.lower_disp_limit);
-            } else {
+            if(data.edata.upper_disp_limit == data.edata.lower_disp_limit) {
+                // set some default
                 widget->setMaxValue(1000.0);
                 widget->setMinValue(0.0);
+                maxval = 1000.0;
+                minval = 0.0;
+            } else {
+                if(!isnan(data.edata.lower_disp_limit)) {
+                    widget->setMinValue(data.edata.lower_disp_limit);
+                    minval = data.edata.lower_disp_limit;
+                } else {
+                    widget->setMinValue(0.0);
+                    minval = 0.0;
+                }
+                if(!isnan(data.edata.upper_disp_limit)) {
+                    widget->setMaxValue(data.edata.upper_disp_limit);
+                    maxval = data.edata.upper_disp_limit;
+                } else {
+                    widget->setMaxValue(1000.0);
+                    maxval = 1000;
+                }
             }
+
             widget->update();
+        } else {
+            maxval = widget->maxValue();
+            minval = widget->minValue();
         }
-        widget->setValue(data.edata.rvalue);
+
+        if((widget->getAlarmLimits() == EAbstractGauge::Channel_Alarms) && (data.edata.initialize)) {
+            // when no alarms defined
+            if(data.edata.lower_alarm_limit == data.edata.upper_alarm_limit) {
+                // set limits to extreme values
+                widget->setLowError(minval);
+                widget->setHighError(maxval);
+            } else {
+                if(!isnan(data.edata.lower_alarm_limit)) widget->setLowError(data.edata.lower_alarm_limit); else  widget->setLowError(minval);
+                if(!isnan(data.edata.upper_alarm_limit)) widget->setHighError(data.edata.upper_alarm_limit); else widget->setHighError(maxval);
+            }
+
+            if(data.edata.lower_warning_limit == data.edata.upper_warning_limit) {
+                // set limits to extreme values
+                widget->setLowWarning(minval);
+                widget->setHighWarning(maxval);
+            } else {
+                if(!isnan(data.edata.lower_warning_limit)) widget->setLowWarning(data.edata.lower_warning_limit); else  widget->setLowWarning(minval);
+                if(!isnan(data.edata.upper_warning_limit)) widget->setHighWarning(data.edata.upper_warning_limit); else  widget->setHighWarning(maxval);
+            }
+        } else if((widget->getAlarmLimits() == EAbstractGauge::None) && (data.edata.initialize)) {
+
+            double maxval = widget->maxValue();
+            double minval = widget->minValue();
+
+            widget->setLowError(minval);
+            widget->setHighError(maxval);
+            widget->setLowWarning(minval);
+            widget->setHighWarning(maxval);
+        }
+
+        widget->update();
+
     }
+
+    widget->setValue(data.edata.rvalue);
 }
 
 /**
@@ -1893,7 +1944,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     }
                 }
             }
-            widget->setValue((double) data.edata.rvalue);
+            widget->setSliderValue((double) data.edata.rvalue);
             widget->setAccessW(data.edata.accessW);
 
             // set colors when connected
@@ -2487,18 +2538,15 @@ void CaQtDM_Lib::Callback_ENumeric(double value)
     }
 }
 
-/**
- * callback will write value to device
- */
-void CaQtDM_Lib::Callback_Slider(double value)
+void CaQtDM_Lib::Callback_SliderValueChanged(double value)
 {
-    int32_t idata = (int32_t) value;
-    float rdata = (float) value;
-    caSlider *numeric = qobject_cast<caSlider *>(sender());
-    if(!numeric->getAccessW()) return;
-    if(numeric->getPV().length() > 0) {
-        TreatOrdinaryValue(numeric->getPV(), rdata, idata,  (QWidget*) numeric);
-    }
+   int32_t idata = (int32_t) value;
+   float rdata = (float) value;
+   caSlider *numeric = qobject_cast<caSlider *>(sender());
+   if(!numeric->getAccessW()) return;
+   if(numeric->getPV().length() > 0) {
+       TreatOrdinaryValue(numeric->getPV(), rdata, idata,  (QWidget*) numeric);
+   }
 }
 
 /**
@@ -2879,6 +2927,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     QMenu myMenu;
     QPoint pos =QCursor::pos() ;
 
+    bool onMain = false;
     QString pv[20];
     int nbPV = 1;
     int limitsDefault = false;
@@ -3051,9 +3100,13 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         // add acion : kill associated process if running
         if(!widget->getAccessW()) myMenu.addAction("Kill Process");
 
-    } else  {
-        qDebug() << w << "not treated";
-        return;
+    // must be mainwindow
+    } else if(w==myWidget->parent()->parent()) {
+        //qDebug() << "must be mainwindow?" << w << myWidget->parent()->parent();
+        onMain = true;
+        myMenu.addAction("Print");
+        myMenu.addAction("Raise main window");
+        myMenu.addAction("Include files");
     }
 
     if(caScriptButton* widget =  qobject_cast< caScriptButton *>(w)) {
@@ -3064,13 +3117,13 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         myMenu.addAction("Set Spectrum");
         myMenu.addAction("Set Greyscale");
         myMenu.addAction("Get Info");
-        myMenu.addAction("Print");
-        myMenu.addAction("Raise main window");
-    } else {
+    } else if(caSlider * widget = qobject_cast< caSlider *>(w)) {
+        Q_UNUSED(widget);
+        myMenu.addAction("Modify");;
+        myMenu.addAction("Get Info");
+    } else if(!onMain){
         // construct info for the pv we are pointing at
         myMenu.addAction("Get Info");
-        myMenu.addAction("Print");
-        myMenu.addAction("Raise main window");
     }
 
     if(caStripPlot* widget = qobject_cast<caStripPlot *>(w)) {
@@ -3108,6 +3161,14 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         } else  if(selectedItem->text().contains("Set Greyscale")) {
            if(caCamera * widget = qobject_cast< caCamera *>(w)) widget->setColormap(caCamera::grey);
 
+        } else  if(selectedItem->text().contains("Include files")) {
+            QString info;
+            info.append(InfoPrefix);
+            info.append(includeFiles);
+            info.append(InfoPostfix);
+            myMessageBox box;
+            box.setText("<html>" + info + "</html>");
+            box.exec();
         } else  if(selectedItem->text().contains("Get Info")) {
             QString info;
             info.append(InfoPrefix);
@@ -3284,7 +3345,13 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 limitsCartesianplotDialog dialog(widget, mutexKnobData, "cartesianplot modifications", this);
                 dialog.exec();
             }
+        } else if(selectedItem->text().contains("Modify")) {
+            if(caSlider* widget = qobject_cast<caSlider *>(w)) {
+                sliderDialog dialog(widget, mutexKnobData, "slider modifications", this);
+                dialog.exec();
+            }
         }
+
     } else {
         // nothing was chosen
     }
@@ -3301,7 +3368,7 @@ void CaQtDM_Lib::ShowContextMenu(const QPoint& position) // this is a slot
 
 void CaQtDM_Lib::mouseReleaseEvent(QMouseEvent *event)
 {
-    emit customContextMenuRequested(QPoint(event->x(),event->y()));
+    if(event->button() ==Qt::RightButton) emit customContextMenuRequested(QPoint(event->x(),event->y()));
 }
 
 /**
