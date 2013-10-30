@@ -614,20 +614,25 @@ void parseMonitor(DisplayInfo *displayInfo, char *widget)
                 getToken(displayInfo,token);
                 clr = atoi(token) % DL_MAX_COLORS;
 
-                Qt_setColorForeground("", displayInfo->dlColormap->dl_color[clr].r,
+                if(strstr(widget, "Gauge") != (char*) 0) {
+                } else {
+                   Qt_setColorForeground("", displayInfo->dlColormap->dl_color[clr].r,
                                       displayInfo->dlColormap->dl_color[clr].g,
                                       displayInfo->dlColormap->dl_color[clr].b,
                                       255);
-
+                }
             } else if (!strcmp(token,"bclr")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 bclr = atoi(token) % DL_MAX_COLORS;
 
-                Qt_setColorBackground("", displayInfo->dlColormap->dl_color[bclr].r,
+                if(strstr(widget, "Gauge") != (char*) 0) {
+                } else {
+                   Qt_setColorBackground("", displayInfo->dlColormap->dl_color[bclr].r,
                                       displayInfo->dlColormap->dl_color[bclr].g,
                                       displayInfo->dlColormap->dl_color[bclr].b,
                                       255);
+                }
 
             }
             break;
@@ -699,12 +704,7 @@ void parseBasicAttribute(DisplayInfo *displayInfo, char *widget)
                               displayInfo->dlColormap->dl_color[clr].g,
                               displayInfo->dlColormap->dl_color[clr].b,
                               0);
-        /*
-        Qt_setColorLine("",  displayInfo->dlColormap->dl_color[clr].r,
-                        displayInfo->dlColormap->dl_color[clr].g,
-                        displayInfo->dlColormap->dl_color[clr].b,
-                        255);
-       */
+
     } else if( (!strcmp(widget,"caPolyLine")) || (!strcmp(widget,"caGraphics")) || (!strcmp(widget,"caPolygon")) ) {
         if(!strcmp(fillstyle,"solid")) {
             Qt_setColorForeground("", displayInfo->dlColormap->dl_color[clr].r,
@@ -818,8 +818,10 @@ void parseLimits(DisplayInfo *displayInfo, char *widget, int pen, int DoNotWrite
         Qt_setMinimumLimit(widget, pen, asc);
     }
 
-    if(!loprSrc && !hoprSrc && !strcmp(widget, "caCircularGauge")) Qt_handleString("externalLimitsEnabled", "bool", "true");
-
+    if(!loprSrc && !hoprSrc && !strcmp(widget, "caCircularGauge")) {
+        Qt_handleString("displayLimits", "enum", "Channel_Limits");
+        Qt_handleString("alarmLimits", "enum", "Channel_Alarms");
+    }
 }
 
 void parseDynamicAttribute(DisplayInfo *displayInfo, char *widget, int *visibilityStatic) {
@@ -2337,7 +2339,7 @@ void *parseValuator(DisplayInfo *displayInfo, FrameOffset * offset)
             } else if(!strcmp(token,"dPrecision")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                //dlValuator->dPrecision = atof(token);
+                Qt_handleString("incrementValue", "double", token);
             } else if(!strcmp(token,"limits")) {
                 parseLimits(displayInfo,  "caSlider", 0, False);
             }
