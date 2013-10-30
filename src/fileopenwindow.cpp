@@ -510,9 +510,10 @@ void FileOpenWindow::Callback_ActionReload()
 
             w->close();
             if(!fileName.isNull()) {
-                fileS = fileName.toString();
-
-                //QMainWindow *mainWindow = new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, messageWindow);
+                QString FileName = fileName.toString();
+                dmsearchFile *s = new dmsearchFile(FileName);
+                QString fileNameFound = s->findFile();
+                fileS = fileNameFound;
 
                 CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, messageWindow);
                 newWindow->allowResizing(allowResize);

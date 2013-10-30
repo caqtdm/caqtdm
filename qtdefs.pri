@@ -1,9 +1,20 @@
-CAQTDM_VERSION = V3.4.4
+CAQTDM_VERSION = V3.4.6
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+
+# 3.4.6
+# corrected a bug for cagauge with alarms no
+# set page increment for slider to 1 for the time being
+
+# new in 3.4.5
+# caslider has now a menu to change its increment, in designer increment can be specified to
+# caslider moves also on left mouse click and an wheel scroll; when it has the focus, up and down keys can be used (when focus outline red gets drawn)
+# gauges have now following properties: alarmLimits : Channel_Alarms, User_Alarms, None
+#                                       displayLimits :  Channel_Limits, User_Limits
+# adl2ui has been corrected for these properties
 
 # new in 3.4.4
 # enhanced performance for camera widget
@@ -12,7 +23,7 @@ QT_VER_MIN = $$member(QT_VERSION, 1)
 # package can also be build with Qt4.6 and qwt6.0, necessary for SL6 (cacartesianplot, cadoubletabwidget and plugins slightly modified)
 # epics enums and strings modified for count > 1
 
-# new in 3.4.2
+# new in 3.4.24
 # camera stuff modified
 # added mutex to synchronize data and display
 # font bug in catable solved
