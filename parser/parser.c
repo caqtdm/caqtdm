@@ -3677,7 +3677,7 @@ TOKEN parseAndAppendDisplayList(DisplayInfo *displayInfo, FrameOffset *offset, c
                            displayInfo->dlColormap->dl_color[bclr].g,
                            displayInfo->dlColormap->dl_color[bclr].b);
 
-        Qt_writeOpenTag("widget", "QWidget", "centralwidget");
+        Qt_writeOpenTag("widget", "QWidget", "centralWidget");
     }
 
     /* Loop over tokens until T_EOF */
