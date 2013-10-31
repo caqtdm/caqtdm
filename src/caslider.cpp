@@ -228,8 +228,47 @@ void caSlider::setDirection(Direction dir)
 }
 
 void caSlider::keyPressEvent(QKeyEvent *e) {
-    e->accept();
-    QwtAbstractSlider::keyPressEvent(e);
+      int increment;
+    // keys supported by QwtAbstractSlider
+    switch (e->key()) {
+       case Qt::Key_Down:
+
+            if(orientation() == Qt::Vertical) {
+                if(e->modifiers() & Qt::ControlModifier) increment = -10; else increment = -1;
+                QwtDoubleRange::incValue( increment );
+                if(value() != prevValue()) Q_EMIT sliderMoved( value() );
+            }
+       break;
+
+       case Qt::Key_Up:
+
+        if(orientation() == Qt::Vertical) {
+            if(e->modifiers() & Qt::ControlModifier) increment = 10; else increment = 1;
+            QwtDoubleRange::incValue( increment );
+            if(value() != prevValue()) Q_EMIT sliderMoved( value() );
+        }
+        break;
+
+       case Qt::Key_Left:
+
+        if(orientation() == Qt::Horizontal) {
+            if(e->modifiers() & Qt::ControlModifier) increment = -10; else increment = -1;
+            QwtDoubleRange::incValue( increment );
+            if(value() != prevValue()) Q_EMIT sliderMoved( value() );
+        }
+        break;
+
+       case Qt::Key_Right:
+
+        if(orientation() == Qt::Horizontal) {
+            if(e->modifiers() & Qt::ControlModifier) increment = 10; else increment = 1;
+            QwtDoubleRange::incValue( increment );
+            if(value() != prevValue()) Q_EMIT sliderMoved( value() );
+        }
+        break;
+
+    }
+
 }
 
 void caSlider::keyReleaseEvent(QKeyEvent *e) {
