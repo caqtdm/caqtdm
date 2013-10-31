@@ -7,7 +7,7 @@ QT_VER_MIN = $$member(QT_VERSION, 1)
 
 # 3.4.6
 # corrected a bug for cagauge with alarms no
-# set page increment for slider to 1 for the time being
+# use control key for amplifying 10x the increment
 
 # new in 3.4.5
 # caslider has now a menu to change its increment, in designer increment can be specified to
