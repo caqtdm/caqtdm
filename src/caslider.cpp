@@ -34,6 +34,7 @@
 #include <QEvent>
 #include <QMouseEvent>
 #include <QApplication>
+
 #include <math.h>
 #include "alarmdefs.h"
 
@@ -174,6 +175,11 @@ void caSlider::setDirection(Direction dir)
 #endif
     thisDirection = dir;
 
+#if QWT_VERSION >= 0x060100
+    incrementValue(thisIncrement);
+    setPageSteps(1);
+#endif
+
     switch (dir) {
     case Up:
 #if QWT_VERSION < 0x060100
@@ -184,6 +190,8 @@ void caSlider::setDirection(Direction dir)
         setOrientation(Qt::Vertical);
 #if QWT_VERSION < 0x060100
         setRange(thisMinimum, thisMaximum, thisIncrement, 1);
+#else
+        setScale(thisMinimum, thisMaximum);
 #endif
         break;
     case Down:
@@ -196,6 +204,9 @@ void caSlider::setDirection(Direction dir)
 #if QWT_VERSION < 0x060100
         if(thisMaximum > thisMinimum) setRange(thisMaximum, thisMinimum ,  thisIncrement, 1);
         else setRange(thisMinimum, thisMaximum , thisIncrement, 1);
+#else
+        if(thisMaximum > thisMinimum) setScale(thisMaximum, thisMinimum);
+        else setScale(thisMinimum, thisMaximum);
 #endif
         break;
     case Left:
@@ -209,6 +220,9 @@ void caSlider::setDirection(Direction dir)
 #if QWT_VERSION < 0x060100
         if(thisMaximum > thisMinimum) setRange(thisMaximum, thisMinimum , thisIncrement, 1);
         else setRange(thisMinimum, thisMaximum , thisIncrement, 1);
+#else
+        if(thisMaximum > thisMinimum) setScale(thisMaximum, thisMinimum);
+        else setScale(thisMinimum, thisMaximum);
 #endif
         break;
     case Right:
@@ -220,6 +234,8 @@ void caSlider::setDirection(Direction dir)
         setOrientation(Qt::Horizontal);
 #if QWT_VERSION < 0x060100
         setRange(thisMinimum, thisMaximum, thisIncrement, 1);
+#else
+        setScale(thisMinimum, thisMaximum);
 #endif
         break;
     }
@@ -228,45 +244,56 @@ void caSlider::setDirection(Direction dir)
 }
 
 void caSlider::keyPressEvent(QKeyEvent *e) {
-      int increment;
-    // keys supported by QwtAbstractSlider
+    int increment = 0;
+    bool doIt = false;
+
     switch (e->key()) {
-       case Qt::Key_Down:
+    case Qt::Key_Down:
 
-            if(orientation() == Qt::Vertical) {
-                if(e->modifiers() & Qt::ControlModifier) increment = -10; else increment = -1;
-                QwtDoubleRange::incValue( increment );
-                if(value() != prevValue()) Q_EMIT sliderMoved( value() );
-            }
-       break;
+        if(orientation() == Qt::Vertical) {
+            if(e->modifiers() & Qt::ControlModifier) increment = -10; else increment = -1;
+        }
+        doIt = true;
+        break;
 
-       case Qt::Key_Up:
+    case Qt::Key_Up:
 
         if(orientation() == Qt::Vertical) {
             if(e->modifiers() & Qt::ControlModifier) increment = 10; else increment = 1;
-            QwtDoubleRange::incValue( increment );
-            if(value() != prevValue()) Q_EMIT sliderMoved( value() );
+
         }
+        doIt = true;
         break;
 
-       case Qt::Key_Left:
+    case Qt::Key_Left:
 
         if(orientation() == Qt::Horizontal) {
             if(e->modifiers() & Qt::ControlModifier) increment = -10; else increment = -1;
-            QwtDoubleRange::incValue( increment );
-            if(value() != prevValue()) Q_EMIT sliderMoved( value() );
         }
+        doIt = true;
         break;
 
-       case Qt::Key_Right:
+    case Qt::Key_Right:
 
         if(orientation() == Qt::Horizontal) {
             if(e->modifiers() & Qt::ControlModifier) increment = 10; else increment = 1;
-            QwtDoubleRange::incValue( increment );
-            if(value() != prevValue()) Q_EMIT sliderMoved( value() );
         }
+        doIt = true;
         break;
 
+    }
+
+    if(doIt) {
+#if QWT_VERSION >= 0x060100
+        incrementValue(increment);
+        Q_EMIT sliderMoved( value() );
+        Q_EMIT valueChanged( value() );
+#else
+        QwtDoubleRange::incValue( increment );
+        if(value() != prevValue())    Q_EMIT sliderMoved( value() );
+#endif
+    } else {
+        e->ignore();
     }
 
 }
@@ -283,17 +310,23 @@ void caSlider::mousePressEvent(QMouseEvent *e)
         return;
     }
     else {
-        e->accept();
+#if QWT_VERSION < 0x060100
         QwtAbstractSlider::mousePressEvent(e);
+#else
+       QwtSlider::mousePressEvent(e);
+#endif
     }
 }
 
 void caSlider::mouseReleaseEvent( QMouseEvent *e )
 {
     if( e->button() == Qt::LeftButton) {
-        e->accept();
+#if QWT_VERSION < 0x060100
         stopMoving();
         QwtAbstractSlider::mouseReleaseEvent(e);
+#else
+        QwtSlider::mouseReleaseEvent(e);
+#endif
     }
 }
 
