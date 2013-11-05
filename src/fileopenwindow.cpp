@@ -200,6 +200,8 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
     char asc[255];
     int countPV=0;
     int countNotConnected=0;
+    float highCount = 0.0;
+    QString highPV;
     int countDisplayed = 0;
     static int printIt = 0;
     static int timeout = 0;
@@ -230,7 +232,9 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 
     fillPVtable(countPV, countNotConnected, countDisplayed);
 
-    sprintf(asc, "%s - PV=%d (%d NC)", asc, countPV, countNotConnected);
+    highCount = mutexKnobData->getHighestCountPV(highPV);
+    sprintf(asc, "%s - PV=%d (%d NC), %d Monitors/s, %d Displays/s, highest=%s with %.1f Monitors/s ", asc, countPV, countNotConnected,
+                  mutexKnobData->getMonitorsPerSecond(), mutexKnobData->getDisplaysPerSecond(), highPV.toAscii().constData(), highCount);
     statusBar()->showMessage(asc);
 
     // we wanted a print, do it when acquired, then exit
@@ -392,7 +396,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     } else {
         char asc[255];
         bool willPrint = false;
-        qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString << "geometry=" << geometry;
+        //qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString << "geometry=" << geometry;
 
         //QMainWindow *mainWindow = new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, messageWindow);
 
