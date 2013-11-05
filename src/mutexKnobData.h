@@ -71,6 +71,11 @@ public:
     bool getSoftPV(QString pv, int *indx, QWidget *w);
     void BuildSoftPVList(QWidget *w);
 
+    int getMonitorsPerSecond();
+    int getDisplaysPerSecond();
+    float getHighestCountPV(QString &pv);
+    void initHighestCountPV();
+
 signals:
 
     void Signal_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, const knobData&);
@@ -84,5 +89,13 @@ private:
     int timerId;
     QMap<QString, int> softPV_WidgetList;
     QMap<QString, int> softPV_List;
+
+    int nbMonitorsPerSecond, nbMonitors;
+    int highestCount, highestIndex, highestIndexPV;
+    float highestCountPerSecond;
+    struct timeb monitorTiming;
+
+    int nbDisplayCountPerSecond, displayCount;
+    struct timeb last;
 };
 #endif // MUTEXKNOBDATA_H

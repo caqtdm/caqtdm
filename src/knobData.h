@@ -37,6 +37,7 @@ typedef struct _epicsData {
     int          connected;             /* connection flag */
     dbr_string_t fec;                   /* ioc */
     int          monitorCount;          /* acquisition counter */
+    int          monitorCountPrev;
     int          displayCount;          /* last displayed acquisition counter */
     int          unconnectCount;        /* counter for limiting the disconnected pv's */
     int          valueCount;            /* number of values */

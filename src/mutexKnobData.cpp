@@ -44,6 +44,17 @@ MutexKnobData::MutexKnobData()
         KnobData[i].mutex = (void*) 0;
     }
 
+    nbMonitorsPerSecond = 0;
+    nbMonitors = 0;
+    displayCount = 0;
+    highestCount = 0;
+    highestIndex = 0;
+    highestIndexPV = 0;
+    highestCountPerSecond = 0;
+
+    ftime(&last);
+    ftime(&monitorTiming);
+
     // start a timer with 50Hz
     timerId = startTimer(20);
 }
@@ -291,7 +302,6 @@ void MutexKnobData::DataLock(knobData *kData)
 {
     QMutex *datamutex;
     datamutex = (QMutex*) kData->mutex;
-
     datamutex->lock();
 }
 
@@ -315,10 +325,67 @@ extern "C" MutexKnobData* C_DataUnlock(MutexKnobData* p, knobData *kData) {
  * update array with the received data
  */
 void MutexKnobData::SetMutexKnobDataReceived(knobData *kData) {
+    double diff;
+    struct timeb now;
     QMutexLocker locker(&mutex);
     int index = kData->index;
     memcpy(&KnobData[index], kData, sizeof(kData));
     memcpy(&KnobData[index].edata, &kData->edata, sizeof(epicsData));
+
+    nbMonitors++;
+
+    // find monitor with highest count since last time
+    if((kData->edata.monitorCount-kData->edata.monitorCountPrev) > highestCount) {
+        highestCount = kData->edata.monitorCount -kData->edata.monitorCountPrev ;
+        highestIndex = index;
+    }
+
+    // calculate after 5 seconds our statistics
+    ftime(&now);
+    diff = ((double) now.time + (double) now.millitm / (double)1000) -
+            ((double) monitorTiming.time + (double) monitorTiming.millitm / (double)1000);
+
+    if(diff >= 5.0) {
+        ftime(&monitorTiming);
+        nbMonitorsPerSecond = (int) (nbMonitors/diff);
+        nbMonitors = 0;
+        // remember monitor count for all monitors
+        for(int i=0; i < GetMutexKnobDataSize(); i++) {
+            knobData *kPtr = (knobData*) &KnobData[i];
+            if(kPtr->index != -1) kPtr->edata.monitorCountPrev = kPtr->edata.monitorCount;
+        }
+
+        highestCountPerSecond = highestCount / diff;
+        highestIndexPV = highestIndex;
+        highestCount = 0;
+    }
+}
+
+int MutexKnobData::getMonitorsPerSecond()
+{
+    QMutexLocker locker(&mutex);
+    return nbMonitorsPerSecond;
+}
+
+int MutexKnobData::getDisplaysPerSecond()
+{
+    QMutexLocker locker(&mutex);
+    return nbDisplayCountPerSecond;
+}
+
+float MutexKnobData::getHighestCountPV(QString &pv)
+{
+    QMutexLocker locker(&mutex);
+
+    pv = KnobData[highestIndexPV].pv;
+    return highestCountPerSecond;
+}
+
+void MutexKnobData::initHighestCountPV()
+{
+    QMutexLocker locker(&mutex);
+    ftime(&monitorTiming);
+    highestCount = 0;
 }
 
 extern "C" MutexKnobData* C_SetMutexKnobDataReceived(MutexKnobData* p, knobData *kData)
@@ -339,9 +406,6 @@ void MutexKnobData::timerEvent(QTimerEvent *)
     char dataString[1024];
     struct timeb now;
     ftime(&now);
-
-    static int displayCount;
-    static struct timeb last;
 
     for(int i=0; i < GetMutexKnobDataSize(); i++) {
         knobData *kPtr = (knobData*) &KnobData[i];
@@ -448,7 +512,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
 
     if(diff >= 10.0) {
         ftime(&last);
-        //printf("displayed=%.1f/s %f\n", (displayCount/diff), diff);
+        nbDisplayCountPerSecond =  (int) (displayCount/diff);
         displayCount = 0;
     }
 }

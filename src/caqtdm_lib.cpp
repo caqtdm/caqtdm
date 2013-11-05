@@ -252,8 +252,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     includeFiles.append(fi.absoluteFilePath());
     includeFiles.append("<br>");
 
-    qDebug() << filename;
-
     if(filename.lastIndexOf(".ui") != -1) {
 
         file->open(QFile::ReadOnly);
@@ -2912,6 +2910,8 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
             }
         }
     }
+    mutexKnobData->initHighestCountPV();
+
 
 #ifdef epics4
     delete Epics4;
