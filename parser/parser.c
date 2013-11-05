@@ -821,6 +821,9 @@ void parseLimits(DisplayInfo *displayInfo, char *widget, int pen, int DoNotWrite
     if(!loprSrc && !hoprSrc && !strcmp(widget, "caCircularGauge")) {
         Qt_handleString("displayLimits", "enum", "Channel_Limits");
         Qt_handleString("alarmLimits", "enum", "Channel_Alarms");
+    } else if (!strcmp(widget, "caCircularGauge")) {
+        Qt_handleString("displayLimits", "enum", "User_Limits");
+        Qt_handleString("alarmLimits", "enum", "Channel_Alarms");
     }
 }
 
