@@ -1,9 +1,15 @@
-CAQTDM_VERSION = V3.4.6
+CAQTDM_VERSION = V3.5.0
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+
+# 3.5.0
+# caQtDM gives information now about number of monitors/s, number of displays/s and highest monitor
+
+# 3.4.7
+# adapted caslider for qwt6.1
 
 # 3.4.6
 # corrected a bug for cagauge with alarms no
@@ -23,7 +29,7 @@ QT_VER_MIN = $$member(QT_VERSION, 1)
 # package can also be build with Qt4.6 and qwt6.0, necessary for SL6 (cacartesianplot, cadoubletabwidget and plugins slightly modified)
 # epics enums and strings modified for count > 1
 
-# new in 3.4.24
+# new in 3.4.2
 # camera stuff modified
 # added mutex to synchronize data and display
 # font bug in catable solved
