@@ -2027,10 +2027,15 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     widget->setAlarmColors(data.edata.severity, (double) data.edata.ivalue, bg, fg);
                 }
                 list = String.split(";", QString::SkipEmptyParts);
-                if((data.edata.fieldtype == caENUM)  && ((int) data.edata.ivalue < list.count())) {
+                //qDebug() << String << list << data.pv << (int) data.edata.ivalue << data.edata.valueCount;
+                if((data.edata.fieldtype == caENUM)  && (list.count() == 0)) {
+                    QString str= QString::number((int) data.edata.ivalue);
+                    widget->setText(str);
+                } else if((data.edata.fieldtype == caENUM)  && ((int) data.edata.ivalue < list.count() )&& (list.count() > 0)) {
                     widget->setText(list.at((int) data.edata.ivalue).trimmed());
-                } else if((data.edata.fieldtype == caENUM)  && ((int) data.edata.ivalue > list.count()) && (data.edata.valueCount == 1)) {
-                    widget->setText(list.at(0).trimmed());
+                } else if((data.edata.fieldtype == caENUM)  && ((int) data.edata.ivalue >= list.count()) && (list.count() > 0)) {
+                    QString str= QString::number((int) data.edata.ivalue);
+                    widget->setText(str);
                 } else if (data.edata.fieldtype == caENUM) {
                     widget->setText("???");
                 } else {
