@@ -67,7 +67,7 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
     oldForeColor = QColor(Qt::white);
 
     setDirection(Up);
-    setAccessW(true);
+    setAccessW(false);  // necessary to prevent write on startup
 
     QString style;
     style.append("  caSlider:focus  {border: 1px solid #f00;} ");
@@ -246,6 +246,8 @@ void caSlider::setDirection(Direction dir)
 void caSlider::keyPressEvent(QKeyEvent *e) {
     int increment = 0;
     bool doIt = false;
+
+    if(isReadOnly()) return;
 
     switch (e->key()) {
     case Qt::Key_Down:
