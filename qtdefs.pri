@@ -1,9 +1,13 @@
-CAQTDM_VERSION = V3.5.0
+CAQTDM_VERSION = V3.5.1
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+
+# 3.5.1
+# bug corrected when unfinished enum definition
+# slider was writing to epics on first call, now it does not
 
 # 3.5.0
 # caQtDM gives information now about number of monitors/s, number of displays/s and highest monitor
