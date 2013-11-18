@@ -8,8 +8,9 @@ echo.
 
 call "C:\Program files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" x86
 
+set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2010
+set PATH=%PATH%;%QTDM_BININSTALL%
 
-set PATH=%PATH%;C:\Qt\4.8.2\bin
 
 if exist ".\caQtDM_Binaries" (
  echo "directory .\caQtDM_Binaries exists already"
