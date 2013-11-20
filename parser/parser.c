@@ -3168,7 +3168,7 @@ void *parseText(DisplayInfo *displayInfo, FrameOffset * offset)
     DlObject object;
     int alignFound=False;
     int visibilityStatic = 0;
-	unsigned int newWidth = 0;
+    unsigned int newWidth = 0;
 
     static int number = 0;
     char widgetName[MAX_ASCII];
