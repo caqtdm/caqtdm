@@ -217,11 +217,11 @@ void caPolyLine::paintEvent(QPaintEvent * /* event */)
     }
 
     if(thisLineStyle == Dash) {
-        painter.setPen( QPen( getLineColor(), getLineSize(), Qt::DotLine ));
+        painter.setPen( QPen( getLineColor(), getLineSize(), Qt::DotLine,  Qt::FlatCap));
     } else if (thisLineStyle == BigDash) {
-        painter.setPen( QPen( getLineColor(), getLineSize(), Qt::DashLine ));
+        painter.setPen( QPen( getLineColor(), getLineSize(), Qt::DashLine, Qt::FlatCap ));
     } else {
-        painter.setPen( QPen( getLineColor(), getLineSize(), Qt::SolidLine ));
+        painter.setPen( QPen( getLineColor(), getLineSize(), Qt::SolidLine, Qt::FlatCap));
     }
 
     QStringList pairs = thisXYpairs.split(";", QString::SkipEmptyParts);
@@ -258,7 +258,7 @@ void caPolyLine::paintEvent(QPaintEvent * /* event */)
     }
 
     if(inEditor && mouseMove) {
-      painter.setPen( QPen(QColor(Qt::red), getLineSize(), Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin ) );
+      painter.setPen( QPen(QColor(Qt::red), getLineSize(), Qt::SolidLine, Qt::FlatCap ) );
       if(actualPosition != lastPosition)
          painter.drawLine(actualPosition, lastPosition);
     }

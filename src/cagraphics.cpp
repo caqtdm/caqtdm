@@ -296,11 +296,11 @@ void caGraphics::paintEvent( QPaintEvent *event )
     int y = margin;
 
     if(thisLineStyle == Dash) {
-        painter.setPen( QPen( getLineColor(), getLineSize(), Qt::DotLine) );
+        painter.setPen( QPen( getLineColor(), getLineSize(), Qt::DotLine, Qt::SquareCap) );
     } else if (thisLineStyle == BigDash) {
-       painter.setPen( QPen( getLineColor(), getLineSize(), Qt::DashLine ) );
+       painter.setPen( QPen( getLineColor(), getLineSize(), Qt::DashLine, Qt::SquareCap) );
     } else {
-       painter.setPen( QPen( getLineColor(), getLineSize(), Qt::SolidLine ) );
+       painter.setPen( QPen( getLineColor(), getLineSize(), Qt::SolidLine, Qt::SquareCap) );
     }
 
     if(thisFillStyle == Filled) {
