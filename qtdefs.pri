@@ -8,6 +8,7 @@ QT_VER_MIN = $$member(QT_VERSION, 1)
 # 3.5.1
 # bug corrected when unfinished enum definition
 # slider was writing to epics on first call, now it does not
+# capolyline now does not extend its lines when linesize > 1 is used
 
 # 3.5.0
 # caQtDM gives information now about number of monitors/s, number of displays/s and highest monitor
