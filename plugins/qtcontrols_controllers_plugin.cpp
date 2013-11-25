@@ -148,7 +148,7 @@ caSliderInterface::caSliderInterface(QObject* parent) : CustomWidgetInterface(pa
         strng name[1], type[1];
         strcpy(name[0], "channel");
         strcpy(type[0], "multiline");
-        d_domXml = XmlFunc("caSlider", "caslider", 0, 0, 100, 20, name, type, 1);
+        d_domXml = XmlFunc("caSlider", "caslider", 0, 0, 20, 150, name, type, 1);
 	d_name = "caSlider";
 	d_include = "caSlider";
 	d_icon = QPixmap(":pixmaps/slider.png");
