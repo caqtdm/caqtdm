@@ -114,8 +114,8 @@ class QTCON_EXPORT QwtThermoMarker: public QWidget, public QwtAbstractScale
     Q_ENUMS( ScalePos )
     Q_ENUMS( DisplayType )
 
-    Q_PROPERTY( bool alarmEnabled READ alarmEnabled WRITE setAlarmEnabled )
-    Q_PROPERTY( double alarmLevel READ alarmLevel WRITE setAlarmLevel )
+    Q_PROPERTY( bool alarmEnabled READ alarmEnabled WRITE setAlarmEnabled  DESIGNABLE false)
+    Q_PROPERTY( double alarmLevel READ alarmLevel WRITE setAlarmLevel  DESIGNABLE false)
     Q_PROPERTY( ScalePos scalePosition READ scalePosition WRITE setScalePosition )
     Q_PROPERTY( int spacing READ spacing WRITE setSpacing )
     Q_PROPERTY( int borderWidth READ borderWidth WRITE setBorderWidth )
