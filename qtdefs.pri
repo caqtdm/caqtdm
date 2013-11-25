@@ -8,7 +8,10 @@ QT_VER_MIN = $$member(QT_VERSION, 1)
 # 3.5.1
 # bug corrected when unfinished enum definition
 # slider was writing to epics on first call, now it does not
-# capolyline now does not extend its lines when linesize > 1 is used
+# capolyline now does not extend its lines when linesize > 1 is used, reproducing the behaviour of MEDM
+# cathermo and caslider resize handle and labels according to the size, foreground and background are working correctly now
+# however with qwt6.1.0 in qwt_slider the routine scaleDraw(); must be set protected instead of private as was in qwt6.0
+
 
 # 3.5.0
 # caQtDM gives information now about number of monitors/s, number of displays/s and highest monitor
