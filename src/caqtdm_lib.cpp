@@ -220,7 +220,6 @@ CaQtDM_Lib::~CaQtDM_Lib()
  */
 CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKnobData *mKnobData, MessageWindow *msgWindow, bool pepprint) : QMainWindow(parent)
 {
-
     mutexKnobData = mKnobData;
     messageWindow = msgWindow;
     pepPrint = pepprint;
@@ -701,9 +700,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         //qDebug() << "create caLineEdit";
 
         if(widget->getPV().size() > 0) {
+            //widget->setEnabled(false);  // in order to be able to drag, but this disables context, is now done in caLineEdit
             widget->setCursor(QCursor());
             widget->setReadOnly(true);
-            widget->setDragEnabled(true);
+            //widget->setDragEnabled(true); // why it did this ??
 
             widget->setAlignment(widget->alignment());
             addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
@@ -1942,7 +1942,13 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     }
                 }
             }
+
+            // disconnect signal to prevent from firing again
+            disconnect(w, SIGNAL(valueChanged (double)), 0, 0);
             widget->setSliderValue((double) data.edata.rvalue);
+            // reconnect signal
+            connect(w, SIGNAL(valueChanged(double)), this, SLOT(Callback_SliderValueChanged(double)));
+
             widget->setAccessW(data.edata.accessW);
 
             // set colors when connected
@@ -2534,6 +2540,7 @@ void CaQtDM_Lib::Callback_ENumeric(double value)
 {
     int32_t idata = (int32_t) value;
     float rdata = (float) value;
+
     caNumeric *numeric = qobject_cast<caNumeric *>(sender());
     if(!numeric->getAccessW()) return;
     if(numeric->getPV().length() > 0) {
@@ -2545,6 +2552,7 @@ void CaQtDM_Lib::Callback_SliderValueChanged(double value)
 {
    int32_t idata = (int32_t) value;
    float rdata = (float) value;
+
    caSlider *numeric = qobject_cast<caSlider *>(sender());
    if(!numeric->getAccessW()) return;
    if(numeric->getPV().length() > 0) {
@@ -3098,7 +3106,6 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         pv[3] = widget->getChannelC().trimmed();
         pv[4] = widget->getChannelB().trimmed();
         nbPV = 5;
-
 
     } else if(caScriptButton* widget =  qobject_cast< caScriptButton *>(w)) {
         Q_UNUSED(widget);
@@ -4169,3 +4176,102 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 
 }
 
+// initiate drag, one will be able to drop to another Qt-application
+void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
+{
+
+    if((event->button() == Qt::LeftButton) ||  (event->button() == Qt::RightButton)){
+        return;
+    }
+
+    QWidget *w = static_cast<QWidget*>(childAt(event->pos()));
+    if (!w) return;
+
+    QDrag *drag = new QDrag(this);
+    QPoint hotSpot = event->pos() - w->pos();
+    QMimeData *mimeData = new QMimeData;
+    mimeData->setData("application/x-hotspot", QByteArray::number(hotSpot.x()) + " " + QByteArray::number(hotSpot.y()));
+
+    if(caCalc *widget = qobject_cast<caCalc *>(w)) {
+       mimeData->setText(widget->getVariable());
+    } else if (caMenu *widget = qobject_cast<caMenu *>(w)) {
+       mimeData->setText(widget->getPV());
+    } else if (caChoice *widget = qobject_cast<caChoice *>(w)) {
+        mimeData->setText(widget->getPV());
+    } else if (caMenu *widget = qobject_cast<caMenu *>(w->parent())) {
+       mimeData->setText(widget->getPV());
+    } else if (caChoice *widget = qobject_cast<caChoice *>(w->parent())) {
+        mimeData->setText(widget->getPV());
+    } else if (caThermo *widget = qobject_cast<caThermo *>(w)) {
+        mimeData->setText(widget->getPV());
+    } else if (caSlider *widget = qobject_cast<caSlider *>(w)) {
+        mimeData->setText(widget->getPV());
+    } else if (caLinearGauge *widget = qobject_cast<caLinearGauge *>(w)) {
+        mimeData->setText(widget->getPV());
+    } else if (caCircularGauge *widget = qobject_cast<caCircularGauge *>(w)) {
+        mimeData->setText(widget->getPV());
+    } else if (caByte *widget = qobject_cast<caByte *>(w->parent())) {
+         mimeData->setText(widget->getPV());
+    } else if (caLineEdit *widget = qobject_cast<caLineEdit *>(w)) {
+        widget->setEnabled(true);  // enable after initiating drag for context menu
+        mimeData->setText(widget->getPV());
+    } else if (caLed *widget = qobject_cast<caLed *>(w)) {
+         mimeData->setText(widget->getPV());
+    } else if (caApplyNumeric *widget = qobject_cast<caApplyNumeric *>(w)) {
+        mimeData->setText(widget->getPV());
+    } else if (caApplyNumeric *widget = qobject_cast<caApplyNumeric *>(w->parent())) {
+        mimeData->setText(widget->getPV());
+    } else if (caNumeric *widget = qobject_cast<caNumeric *>(w)) {
+        mimeData->setText(widget->getPV());
+    } else if (caNumeric *widget = qobject_cast<caNumeric *>(w->parent())) {
+        mimeData->setText(widget->getPV());
+    } else if (caToggleButton *widget = qobject_cast<caToggleButton *>(w)) {
+        mimeData->setText(widget->getPV());
+    } else if (caCamera *widget = qobject_cast<caCamera *>(w->parent())) {
+        mimeData->setText(widget->getPV_Data());
+    } else if (caMessageButton *widget = qobject_cast<caMessageButton *>(w)) {
+        mimeData->setText(widget->getPV());
+    } else if (caImage *widget = qobject_cast<caImage *>(w->parent())) {
+        mimeData->setText(widget->getChannelA());
+    } else if (caGraphics *widget = qobject_cast<caGraphics *>(w)) {
+        mimeData->setText(widget->getChannelA());
+    } else if (caLabel *widget = qobject_cast<caLabel *>(w)) {
+        mimeData->setText(widget->getChannelA());
+    } else {
+        //Debug() << "unrecognized widget" << w;
+        return;
+    }
+
+    // build a pixmap from pv text
+    //QFont font = QApplication::font();
+    QFont f = font();
+    QFontMetrics metrics(f);
+    int width = metrics.width(mimeData->text() + 20);
+    int height = metrics.height() * 1.5;
+
+    QPixmap pixmap(width, height);
+    pixmap.fill(Qt::black);
+    QPainter painter(&pixmap);
+    painter.setPen(Qt::red);
+    painter.setFont(f);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::TextAntialiasing, true);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+    painter.drawText(5,height/2+5,mimeData->text() );
+    painter.end();
+
+    // set it to the drag structure
+
+    drag->setPixmap(pixmap);
+    drag->setMimeData(mimeData);
+
+    QPoint hotSpotNew(-10,-5);
+
+    drag->setHotSpot(hotSpotNew);
+    drag->setPixmap(pixmap);
+
+    Qt::DropAction dropAction = drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
+    if (dropAction == Qt::MoveAction)w->close();
+
+
+}

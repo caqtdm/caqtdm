@@ -149,6 +149,7 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent *event);
     virtual void timerEvent(QTimerEvent *e);
     void resizeEvent ( QResizeEvent * event );
+    void mousePressEvent(QMouseEvent *event);
 
 signals:
     void clicked(QString);
