@@ -35,6 +35,7 @@
 #include "fileopenwindow.h"
 #include "QDebug"
 #include <QFileDialog>
+#include <QLocale>
 #include <signal.h>
 
 static void unixSignalHandler(int signum) {
@@ -57,6 +58,11 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(caQtDM);
 
     QApplication app(argc, argv);
+
+    // we do not want numbers with a group separators
+    QLocale loc = QLocale::system();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
+    loc.setDefault(loc);
 
     QString fileName = "";
     QString macroString = "";
