@@ -28,6 +28,8 @@
 #define QWT_DLL
 #endif
 
+#define MIN_FONT_SIZE 3
+#define MAX_FONT_SIZE 20
 
 #include "caslider.h"
 #include <QtDebug>
@@ -50,6 +52,7 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
     thisDirection = Up;
     thisMinimum = -50;
     thisMaximum = 50;
+    pointSizePrv = 0.0;
 
     setScalePosition(NoScale);
     setSpacing(0);
@@ -66,15 +69,13 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
     oldBackColor = QColor(Qt::white);
     oldForeColor = QColor(Qt::white);
 
-    setDirection(Up);
-    setAccessW(false);  // necessary to prevent write on startup
+    setBackground(QColor(224,224,224));
+    setForeground(Qt::black);
 
-    QString style;
-    style.append("  caSlider:focus  {border: 1px solid #f00;} ");
-    setStyleSheet(style);
+    setDirection(Up);
+    setAccessW(true);
 
     setFocusPolicy(Qt::ClickFocus);
-
 }
 
 QString caSlider::getPV() const
@@ -129,9 +130,17 @@ void caSlider::setColors(QColor bg, QColor fg)
 {
     if((oldBackColor == bg) && (oldForeColor == fg)) return;
     QPalette thisPalette = palette();
-    thisPalette.setColor(QPalette::Mid, bg);
+
+    QColor bgs = bg.darker(125);
+    bgs.setAlpha(255);
+
+    QString style = "caSlider {background-color: rgba(%1, %2, %3, %4); } caSlider:focus  {border: 1px solid #f00;}; ";
+    style = style.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha());
+    setStyleSheet(style);
+
+    thisPalette.setColor(QPalette::Mid, bgs);
     thisPalette.setColor(QPalette::Text, thisForeColor);
-    thisPalette.setColor(QPalette::Button, fg);
+    thisPalette.setColor(QPalette::Button, bg);
     setPalette(thisPalette);
     oldBackColor = bg;
     oldForeColor = fg;
@@ -152,7 +161,6 @@ void caSlider::setMinValue(double const &minim){
 void caSlider::setSliderValue(double const &value){
     thisValue = value;
     setValue(value);
-    update();
 }
 
 void caSlider::setIncrementValue(double const &value){
@@ -210,7 +218,6 @@ void caSlider::setDirection(Direction dir)
 #endif
         break;
     case Left:
-
 #if QWT_VERSION < 0x060100
         setScalePosition(QwtSlider::BottomScale);
 #else
@@ -226,7 +233,7 @@ void caSlider::setDirection(Direction dir)
 #endif
         break;
     case Right:
- #if QWT_VERSION < 0x060100
+#if QWT_VERSION < 0x060100
         setScalePosition(QwtSlider::BottomScale);
 #else
         setScalePosition(QwtSlider::LeadingScale);
@@ -248,6 +255,7 @@ void caSlider::keyPressEvent(QKeyEvent *e) {
     bool doIt = false;
 
     if(isReadOnly()) return;
+    if ( !isValid()) return;
 
     switch (e->key()) {
     case Qt::Key_Down:
@@ -291,8 +299,8 @@ void caSlider::keyPressEvent(QKeyEvent *e) {
         Q_EMIT sliderMoved( value() );
         Q_EMIT valueChanged( value() );
 #else
-        QwtDoubleRange::incValue( increment );
-        if(value() != prevValue())    Q_EMIT sliderMoved( value() );
+        QwtDoubleRange::setValue(value() + increment * step());
+        //QwtDoubleRange::incValue( increment );  // this rounds to step value
 #endif
     } else {
         e->ignore();
@@ -307,16 +315,12 @@ void caSlider::keyReleaseEvent(QKeyEvent *e) {
 
 void caSlider::mousePressEvent(QMouseEvent *e)
 {
-    if( e->button() == Qt::RightButton) {
+    if( e->button() == Qt::RightButton || e->button() == Qt::MiddleButton) {
         e->ignore();
         return;
     }
     else {
-#if QWT_VERSION < 0x060100
-        QwtAbstractSlider::mousePressEvent(e);
-#else
-       QwtSlider::mousePressEvent(e);
-#endif
+        QwtSlider::mousePressEvent(e);
     }
 }
 
@@ -325,7 +329,7 @@ void caSlider::mouseReleaseEvent( QMouseEvent *e )
     if( e->button() == Qt::LeftButton) {
 #if QWT_VERSION < 0x060100
         stopMoving();
-        QwtAbstractSlider::mouseReleaseEvent(e);
+        QwtSlider::mouseReleaseEvent(e);
 #else
         QwtSlider::mouseReleaseEvent(e);
 #endif
@@ -388,5 +392,97 @@ void caSlider::setNormalColors()
     setColors(thisBackColor, thisForeColor);
 }
 
+// here we adapt the scale font size and the handle size to the size of the widget
+bool caSlider::event(QEvent *e)
+{
+    if(e->type() == QEvent::Resize || e->type() == QEvent::Show || e->type() == QEvent::Paint) {
+        switch (this->scalePosition()) {
+
+        case NoScale:
+            switch (orientation()) {
+            case Qt::Vertical: {
+                QSize handlesize = QSize(width()-4, height()/10);
+                if(handlesize != this->handleSize()) {
+                    this->setHandleSize(handlesize);
+                }
+                break;
+            }
+
+            case Qt::Horizontal: {
+                QSize handlesize = QSize(width()/10, height() -4);
+                if(handlesize != this->handleSize()) {
+                    this->setHandleSize(handlesize);
+                }
+                break;
+            }
+            default:
+                break;
+            }
+            break;
+#if QWT_VERSION < 0x060100
+        case  LeftScale:
+        case  RightScale:
+        case  TopScale:
+        case  BottomScale:
+#else
+        case LeadingScale:
+        case TrailingScale:
+#endif
+            switch (orientation()) {
+
+                case Qt::Vertical: {
+                    QSize handlesize = QSize(width()/3-4, height()/10);
+                    if(handlesize != this->handleSize()) {
+                        this->setHandleSize(handlesize);
+                    }
+                    QFont f = font();
+                    int size = scaleDraw()->maxLabelWidth(f);
+
+                    float xFactor = (float) size  / ((float) width() * 2.0/3.0 -15.0);
+                    if(xFactor < 0.1) break;
+
+                    float pointSize = f.pointSizeF() / xFactor;
+                    if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
+                    if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;
+
+                    if(qAbs(pointSize - pointSizePrv) >= 0.6) {
+                        f.setPointSizeF(pointSize);
+                        pointSizePrv = pointSize;
+                        setFont(f);
+                        update();
+                    }
+                }
+                break;
+
+                case Qt::Horizontal: {
+                   QSize handlesize = QSize(width()/10, height()/3-4);
+                   if(handlesize != this->handleSize()) {
+                       this->setHandleSize(handlesize);
+                   }
+                   QFont f = font();
+                   int size = scaleDraw()->maxLabelWidth(f);
+
+                   float yFactor = (float) size  / ((float) height()*2.0/3.0 -10.0);
+                   if(yFactor < 0.1) break;
+
+                   float pointSize = f.pointSizeF() / yFactor;
+                   if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
+                   if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;
+
+                   if(qAbs(pointSize - pointSizePrv) >= 0.6) {
+                       f.setPointSizeF(pointSize);
+                       pointSizePrv = pointSize;
+                       setFont(f);
+                       update();
+                   }
+                }
+                break;
+            }
+
+        }
+
+    }
+    return QwtSlider::event(e);
+}
 #include "moc_caslider.cpp"
 

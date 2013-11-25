@@ -35,6 +35,9 @@
 #include "qwt_scale_map.h"
 #include "cathermo.h"
 
+#define MIN_FONT_SIZE 3
+#define MAX_FONT_SIZE 20
+
 caThermo::caThermo(QWidget *parent) : QwtThermoMarker(parent), m_externalEnabled(false)
 {
     thisDirection = Up;
@@ -45,7 +48,7 @@ caThermo::caThermo(QWidget *parent) : QwtThermoMarker(parent), m_externalEnabled
     setSpacing(0);
     setBorderWidth(1);
 
-    thisPalette = palette();
+    //thisPalette = palette();
 
     thisLogScale = false;
 
@@ -65,9 +68,15 @@ void caThermo::setPV(QString const &newPV)
 
 void caThermo::setColors(QColor bg, QColor fg)
 {
+
     if((oldBackColor == bg) && (oldForeColor == fg)) return;
+
     QPalette thisPalette = palette();
-    thisPalette.setColor(QPalette::Base, bg);
+    QColor bgs = bg.darker(125);
+    bgs.setAlpha(255);
+    setAutoFillBackground(true);
+    thisPalette.setColor(QPalette::Background, bg);
+    thisPalette.setColor(QPalette::Base, bgs);
     thisPalette.setColor(QPalette::ButtonText, fg);
     setPalette(thisPalette);
     oldBackColor = bg;
@@ -102,9 +111,12 @@ void caThermo::setLook(Look look)
     switch (look) {
     case Outline:
     case Limits:
-    case Channel:
+    case ChannelV:
         thisScale = true;
         break;
+    case noLabel:
+    case noDeco:
+        thisScale = false;
     default:
         thisScale = false;
         break;
@@ -172,7 +184,6 @@ void caThermo::setDirection(Direction dir)
         }
         break;
     }
-
     update();
 }
 
@@ -241,3 +252,93 @@ void caThermo::setUserAlarmColors(double val)
 }
 
 
+// here we adapt the scale font size and the handle size to the size of the widget
+bool caThermo::event(QEvent *e)
+{
+    if(e->type() == QEvent::Resize || e->type() == QEvent::Show || e->type() == QEvent::Paint) {
+        switch (thisScale) {
+
+        case false:
+            switch (thisDirection) {
+            case Up:
+            case Down: {
+                int pipewidth = width()-4;
+                if(pipewidth != this->pipeWidth()) {
+                    this->setPipeWidth(pipewidth);
+                }
+                break;
+            }
+
+            case Right:
+            case Left: {
+                int pipewidth = height() -4;
+                if(pipewidth != this->pipeWidth()) {
+                    this->setPipeWidth(pipewidth);
+                }
+                break;
+            }
+            default:
+                break;
+            }
+            break;
+
+        case  true:
+            switch (thisDirection) {
+
+                case Up:
+                case Down: {
+                    int pipewidth = width()/3-4;
+                    if(pipewidth != this->pipeWidth()) {
+                        this->setPipeWidth(pipewidth);
+                    }
+                    QFont f = font();
+                    int size = scaleDraw()->maxLabelWidth(f);
+
+                    float xFactor = (float) size  / ((float) width() * 2.0/3.0 -15.0);
+                    if(xFactor < 0.1) break;
+
+                    float pointSize = f.pointSizeF() / xFactor;
+                    if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
+                    if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;
+
+                    if(qAbs(pointSize - pointSizePrv) >= 0.6) {
+                        f.setPointSizeF(pointSize);
+                        pointSizePrv = pointSize;
+                        setFont(f);
+                        update();
+                    }
+                }
+                break;
+
+                case Right:
+                case Left: {
+                   int pipewidth = height()/3-4;
+                   if(pipewidth != this->pipeWidth()) {
+                       this->setPipeWidth(pipewidth);
+                   }
+                   QFont f = font();
+                   int size = scaleDraw()->maxLabelWidth(f);
+
+                   float yFactor = (float) size  / ((float) height()*2.0/3.0 -10.0);
+                   if(yFactor < 0.1) break;
+
+                   float pointSize = f.pointSizeF() / yFactor;
+                   if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
+                   if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;
+
+                   if(qAbs(pointSize - pointSizePrv) >= 0.6) {
+                       f.setPointSizeF(pointSize);
+                       pointSizePrv = pointSize;
+                       setFont(f);
+                       update();
+                   }
+                }
+                break;
+            }
+
+        }
+
+    }
+
+    return QwtThermoMarker::event(e);
+}

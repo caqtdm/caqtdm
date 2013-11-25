@@ -35,6 +35,8 @@
 #else
    #include <qwt_thermo_marker_61.h>
 #endif
+#include <qwt_scale_draw.h>
+
 
 class QTCON_EXPORT caThermo : public QwtThermoMarker
 {
@@ -101,13 +103,15 @@ public:
 
 protected:
 
+    virtual bool event(QEvent *);
+
 private:
     QString thisPV;
     bool    m_externalEnabled;
 
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
-    QPalette thisPalette;
+    //QPalette thisPalette;
     colMode thisColorMode;
     SourceMode thisLimitsMode;
     Direction      thisDirection;
@@ -117,7 +121,7 @@ private:
     bool thisLogScale;
     QColor defaultBackColor;
     QColor defaultForeColor;
-
+    float  pointSizePrv;
 };
 
 #endif

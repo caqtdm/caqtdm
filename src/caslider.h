@@ -28,10 +28,15 @@
 
 #include <qtcontrols_global.h>
 #include <qwt_slider.h>
+#include <qwt_scale_draw.h>
 
 class QTCON_EXPORT caSlider : public QwtSlider
 {
     Q_OBJECT
+
+    Q_PROPERTY( Qt::Orientation orientation
+                   READ orientation WRITE setOrientation  DESIGNABLE false)
+
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
     Q_PROPERTY(Direction direction READ getDirection WRITE setDirection)
     Q_ENUMS(Direction)
@@ -102,13 +107,13 @@ public:
 
 private slots:
 
-
 protected:
 
     virtual void mousePressEvent(QMouseEvent *e);
     virtual void mouseReleaseEvent(QMouseEvent *e);
     virtual void keyPressEvent(QKeyEvent *e);
     virtual void keyReleaseEvent(QKeyEvent *e);
+    virtual bool event(QEvent *);
 
 private:
     bool eventFilter(QObject *obj, QEvent *event);
@@ -131,6 +136,7 @@ private:
     double thisMinimum;
     double thisValue;
     double thisIncrement;
+    float  pointSizePrv;
 
 };
 
