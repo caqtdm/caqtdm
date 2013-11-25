@@ -29,6 +29,7 @@
 #include <QStyleOptionFrame>
 #include <QStyle>
 #include <QtDebug>
+#include <QMouseEvent>
 
 caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(this)
 {
@@ -77,6 +78,8 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
 
     d_rescaleFontOnTextChanged = true;
     connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(rescaleFont(const QString&)));
+        installEventFilter(this);
+
 }
 
 void caLineEdit::newFocusPolicy(Qt::FocusPolicy f){
@@ -172,8 +175,15 @@ bool caLineEdit::event(QEvent *e)
 {
     if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
         FontScalingWidget::rescaleFont(text(), calculateTextSpace());
-    }
 
+    // we do this to temporarily disable the widget in order to be able to initiate a drag
+    // for context menu it will be enabled again when drag gets initiated (in caQtDM_Lib)
+    } else if(e->type() == QEvent::MouseButtonPress) {
+        QMouseEvent *ev = (QMouseEvent *) e;
+        if(ev->button() == Qt::MiddleButton) {
+            setEnabled(false);
+        }
+    }
     return QLineEdit::event(e);
 }
 
