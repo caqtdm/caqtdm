@@ -1,9 +1,14 @@
-CAQTDM_VERSION = V3.5.1
+CAQTDM_VERSION = V3.5.2
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+
+# 3.5.2
+# by using CAQTDM_EXEC_LIST as environment variable (as in MEDM with the same syntax), menu items can be added to the
+# context menus
+# for cathermo in parser the look was not see as property and cathermo itsself was initializing itsself per default wrong
 
 # 3.5.1
 # bug corrected when unfinished enum definition
