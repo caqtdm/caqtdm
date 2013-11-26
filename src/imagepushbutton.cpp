@@ -44,6 +44,7 @@ ImagePushButton::ImagePushButton(const QString & text, const QString& image, QWi
         iconOK = true;
     }
     delete s;
+    resize(pixmap.width(), pixmap.height());
 }
 
 void ImagePushButton:: setLabelText(const QString& text) {
