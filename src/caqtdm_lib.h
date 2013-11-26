@@ -51,6 +51,7 @@
 #include <QPrinter>
 #include <QPrintDialog>
 #include <QClipboard>
+
 #include <QUiLoader>
 
 #include "mutexKnobData.h"
