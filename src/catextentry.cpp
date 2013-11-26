@@ -35,6 +35,7 @@ caTextEntry::caTextEntry(QWidget *parent) : caLineEdit(parent)
     setAccessW(true);
     installEventFilter(this);
     newFocusPolicy(Qt::ClickFocus);
+    this->setAcceptDrops(false);
 }
 
 void caTextEntry::dataInput()
