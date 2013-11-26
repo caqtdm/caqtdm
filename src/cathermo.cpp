@@ -294,7 +294,7 @@ bool caThermo::event(QEvent *e)
                     QFont f = font();
                     int size = scaleDraw()->maxLabelWidth(f);
 
-                    float xFactor = (float) size  / ((float) width() * 2.0/3.0 -15.0);
+                    float xFactor = (float) size  / ((float) width() * 2.0/3.0 - 15.0);
                     if(xFactor < 0.1) break;
 
                     float pointSize = f.pointSizeF() / xFactor;
