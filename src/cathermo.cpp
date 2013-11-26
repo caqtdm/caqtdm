@@ -45,15 +45,16 @@ caThermo::caThermo(QWidget *parent) : QwtThermoMarker(parent), m_externalEnabled
     defaultForeColor = palette().foreground().color();
     thisColorMode = Static;
 
+    setBackground(QColor(224,224,224));
+    setForeground(Qt::black);
+
     setSpacing(0);
     setBorderWidth(1);
-
-    //thisPalette = palette();
 
     thisLogScale = false;
 
     valPixOld = -999999;
-    setLook(Outline);
+    setLook(noLabel);
 }
 
 QString caThermo::getPV() const
