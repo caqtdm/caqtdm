@@ -3190,7 +3190,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         myMenu.addAction("Print");
         myMenu.addAction("Raise main window");
         myMenu.addAction("Include files");
-    }    
+    }
 
     if(caScriptButton* widget =  qobject_cast< caScriptButton *>(w)) {
         Q_UNUSED(widget);
@@ -3231,7 +3231,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
     QAction* selectedItem = myMenu.exec(pos);
 
-    if (selectedItem) {        
+    if (selectedItem) {
         if(selectedItem->text().contains("Kill Process")) {
             if(caScriptButton* widget =  qobject_cast< caScriptButton *>(w)) {
                 processWindow *t= (processWindow *) widget->getProcess();
@@ -4319,8 +4319,6 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
         mimeData->setText(widget->getPV());
     } else if (caApplyNumeric *widget = qobject_cast<caApplyNumeric *>(w->parent())) {
         mimeData->setText(widget->getPV());
-    } else if (caApplyNumeric *widget = qobject_cast<caApplyNumeric *>(w->parent()->parent())) {
-        mimeData->setText(widget->getPV());
     } else if (caNumeric *widget = qobject_cast<caNumeric *>(w)) {
         mimeData->setText(widget->getPV());
     } else if (caNumeric *widget = qobject_cast<caNumeric *>(w->parent())) {
@@ -4337,14 +4335,18 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
         mimeData->setText(widget->getChannelA());
     } else if (caLabel *widget = qobject_cast<caLabel *>(w)) {
         mimeData->setText(widget->getChannelA());
-    } else if (caPolyLine *widget = qobject_cast<caPolyLine *>(w)) {
-        mimeData->setText(widget->getChannelA());
     } else {
-        //qDebug() << "unrecognized widget" << w;
+        //Debug() << "unrecognized widget" << w;
         return;
     }
 
+
+	const QString text = mimeData->text().toAscii().constData();
+	QClipboard *clipboard = QApplication::clipboard();
+	clipboard->setText(text,QClipboard::Clipboard);
+
     // build a pixmap from pv text
+    //QFont font = QApplication::font();
     QFont f = font();
     QFontMetrics metrics(f);
     int width = metrics.width(mimeData->text() + 20);
