@@ -158,7 +158,15 @@ void caPolyLine::mouseMoveEvent(QMouseEvent *event)
 
 void caPolyLine::mousePressEvent(QMouseEvent *event)
 {
-    if(!inEditor) return;
+    if(!inEditor) {
+        if(event->type() == QEvent::MouseButtonPress) {
+                QMouseEvent *ev = (QMouseEvent *) event;
+                if(ev->button() == Qt::MiddleButton) {
+                     QWidget::mousePressEvent(event);
+                }
+        }
+        return;
+    }
     // start move
     actualPosition = QPointF(event->pos().x(),event->pos().y());
     if (event->button() == Qt::LeftButton) {
