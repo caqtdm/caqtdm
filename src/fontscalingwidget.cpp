@@ -102,33 +102,6 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
         double borderW1 = size.width() - d_lateralBorderWidth;
         double borderW2 = borderW1 - d_lateralBorderWidth;
 
-/* original algorithme; personally I prefer to scale according to height and then verify if width is ok
-        if( (txtWidth < borderW1 && txtWidth > borderW2) && (txtHeight < borderH1 && txtHeight > borderH2)) {
-            printf("\e[1;32m good: <%s> text w %.2f h %.2f\e[0m | borderW1: %.2f borderW2: %.2f borderH1: %.2f borderH2: %.2f\n",
-                            text.toAscii().constData(), txtWidth, txtHeight, borderW1, borderW2, borderH1,borderH2 );
-
-        } else {
-
-            while(txtWidth < borderW2 && txtHeight < borderH2) {
-                f.setPointSizeF(f.pointSizeF() + 0.5);
-                printf(" \e[1;35m ++ INCREASING font size \"%s\" :text \"%s\" width %.1f height %.1f - point size %.2f \e[0m\n",
-                         widget()->objectName().toAscii().constData(), text.toAscii().constData(),  txtWidth, txtHeight, f.pointSizeF());
-                QFontMetricsF tmpFm(f);
-                txtWidth = tmpFm.width(longestLine);
-                txtHeight = linecnt * tmpFm.lineSpacing();
-            }
-
-            while((txtWidth >= borderW1 || txtHeight >= borderH1) && f.pointSizeF() > MIN_FONT_SIZE) {
-                f.setPointSizeF(f.pointSizeF() - 0.5);
-                printf(" \e[1;36m -- DECREASING font size \"%s\" :text \"%s\" width %.1f height %.1f - point size %.2f \e[0m\n",
-                         widget()->objectName().toAscii().constData(), text.toAscii().constData(),  txtWidth, txtHeight, f.pointSizeF());
-                QFontMetricsF tmpFm(f);
-                txtWidth = tmpFm.width(longestLine);
-                txtHeight = linecnt * tmpFm.lineSpacing();
-            }
-        }
-*/
-
          /* first scale according to height (same algorithme as below) and then verify width */
         borderH2 = borderH1;
         if(txtHeight == (borderH1 + 1) || txtHeight == (borderH1)) {
@@ -139,7 +112,7 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
             while((txtHeight > borderH1) && f.pointSizeF() > MIN_FONT_SIZE) {
                 f.setPointSizeF(f.pointSizeF() - 0.5);
                 //printf(" \e[1;36m -- DECREASING font size for object \"%s\" :text \"%s\"  height %.1f - point size %.2f - h: %.2f\e[0m\n",
-                //         widget()->objectName().toAscii().constData(), text.toAscii().constData(),  txtHeight, f.pointSizeF(), borderH1);
+                //         d_widget->objectName().toAscii().constData(), text.toAscii().constData(),  txtHeight, f.pointSizeF(), borderH1);
                 QFontMetricsF tmpFm(f);
                 txtHeight = linecnt * tmpFm.lineSpacing();
             }
@@ -147,7 +120,7 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
             while(txtHeight < borderH2) {
                 f.setPointSizeF(f.pointSizeF() + 0.5);
                 //printf(" \e[1;35m ++ INCREASING font size for object\"%s\" :text \"%s\" height %.1f - point size %.2f - h: %.2f\e[0m\n",
-                //         widget()->objectName().toAscii().constData(), text.toAscii().constData(), txtHeight, f.pointSizeF(), borderH2);
+                //         d_widget->objectName().toAscii().constData(), text.toAscii().constData(), txtHeight, f.pointSizeF(), borderH2);
                 QFontMetricsF tmpFm(f);
                 txtHeight = linecnt * tmpFm.lineSpacing();
             }
@@ -159,7 +132,7 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
         while((txtWidth > borderW2) && f.pointSizeF() > MIN_FONT_SIZE) {
             f.setPointSizeF(f.pointSizeF() - 0.5);
             //printf(" \e[1;36m -- next DECREASING font size \"%s\" :text \"%s\" width %.1f height %.1f - point size %.2f - w: %.2f\e[0m\n",
-            //         widget()->objectName().toAscii().constData(), text.toAscii().constData(),  txtWidth, txtHeight, f.pointSizeF(), borderW2);
+            //         d_widget->objectName().toAscii().constData(), text.toAscii().constData(),  txtWidth, txtHeight, f.pointSizeF(), borderW2);
             QFontMetricsF tmpFm(f);
             txtWidth = tmpFm.width(longestLine);
             txtHeight = linecnt * tmpFm.lineSpacing();

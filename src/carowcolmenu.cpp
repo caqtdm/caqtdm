@@ -121,7 +121,6 @@ void caRowColMenu::populateCells()
             } else {
                 temp->setIconVisible(true);
             }
-            //temp->setLabelText(newLabel);
 
             //set colors and style
 
@@ -183,7 +182,6 @@ void caRowColMenu::populateCells()
             } else {
                 temp->setIconVisible(true);
             }
-            //temp->setLabelText(newLabel);
 
             if(thisStacking == Hidden) {
                 temp->setInVisible(thisBackColor, thisForeColor, thisBorderColor);

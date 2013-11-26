@@ -30,7 +30,7 @@
 
 EPushButton::EPushButton(const QString &text, QWidget * parent) : QPushButton(text, parent), FontScalingWidget(this)
 {
-	
+
 }
 
 EPushButton::EPushButton(QWidget * parent) : QPushButton(parent), FontScalingWidget(this)
