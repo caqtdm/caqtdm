@@ -2740,8 +2740,9 @@ void CaQtDM_Lib::Callback_ScriptButton()
 
 void CaQtDM_Lib::processTerminated()
 {
-    // qDebug() << "caQtDM -- process terminated callback";
+    //qDebug() << "caQtDM -- process terminated callback";
     processWindow *t = qobject_cast<processWindow *>(sender());
+    if(!t->isRunning()) return;
     QWidget *w = t->getProcessCaller();
     caScriptButton *w1 = qobject_cast<caScriptButton *>(w);
     if(w1 != (QWidget*) 0) {
@@ -2760,12 +2761,14 @@ void CaQtDM_Lib::processTerminated()
 void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
 {
     QString separator((QChar)27);
+/*
 #ifndef linux
     proc = new QProcess( this);
     proc->setWorkingDirectory(".");
     proc->setProcessChannelMode(QProcess::MergedChannels);
     QObject::connect( proc, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
 #endif
+*/
     caShellCommand *choice = qobject_cast<caShellCommand *>(sender());
     QStringList commands = choice->getFiles().split(";");
     QString argslist = choice->getArgs();
@@ -2801,7 +2804,8 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
         command.replace("camedm ", "caQtDM ");
         command.replace("piomedm ", "caQtDM ");
         if(!command.contains("G_CS_medm")) command.replace("medm ", "caQtDM ");
-
+        shellCommand(command);
+/*
         command.replace("&T", thisFileShort);
         command.replace("&A", thisFileFull);
 #ifdef linux
@@ -2823,9 +2827,12 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
             QMessageBox::information(0,"FailedToStart or Error", command);
         }
 #endif
+*/
     } else if(indx < commands.count()) {
         QString command;
         command.append(commands[indx].trimmed());
+        shellCommand(command);
+/*
         command.replace("&T", thisFileShort);
         command.replace("&A", thisFileFull);
         postMessage(QtDebugMsg, (char*) qPrintable(command.trimmed()));
@@ -2842,8 +2849,36 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
             QMessageBox::information(0,"FailedToStart or error", command);
         }
 #endif
+*/
     }
+}
 
+void CaQtDM_Lib::shellCommand(QString command) {
+    command.replace("&T", thisFileShort);
+    command.replace("&A", thisFileFull);
+#ifdef linux
+    int windid = this->winId();
+    command.replace("&X", QString::number(windid));
+#endif
+    command = command.trimmed();
+    postMessage(QtDebugMsg, (char*) qPrintable(command.trimmed()));
+#ifndef linux
+    if(command.endsWith("&")) command.remove(command.size()-1, 1);
+    //qDebug() << "execute:" << command;
+    proc = new QProcess( this);
+    proc->setWorkingDirectory(".");
+    proc->setProcessChannelMode(QProcess::MergedChannels);
+    QObject::connect( proc, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
+    proc->start(command.trimmed(), QIODevice::ReadWrite);
+#else
+    // I had too many problems with QProcess start, use standard execl
+    if(!command.endsWith("&")) command.append("&");
+    //qDebug() << "execute:" << command;
+    int status = Execute((char*)command.toAscii().constData());
+    if(status != 0) {
+        QMessageBox::information(0,"FailedToStart or Error", command);
+    }
+#endif
 }
 
 void CaQtDM_Lib::processError(QProcess::ProcessError err)
@@ -2940,9 +2975,10 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     QMenu myMenu;
     QPoint pos =QCursor::pos() ;
 
+    int i;
     bool onMain = false;
     QString pv[20];
-    int nbPV = 1;
+    int nbPV = 0;
     int limitsDefault = false;
     int precMode = false;
     int limitsMode = false;
@@ -2950,6 +2986,28 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     const char *caTypeStr[] = {"DBF_STRING", "DBF_INT", "DBF_FLOAT", "DBF_ENUM", "DBF_CHAR", "DBF_LONG", "DBF_DOUBLE"};
     char colMode[20] = {""};
     double limitsMax=0.0, limitsMin=0.0;
+    bool validExecListItems = false;
+    QStringList execListItems;
+
+    // execution list for context menu defined ?
+    QString execList = (QString)  getenv("CAQTDM_EXEC_LIST");
+    if(!execList.isNull() && execList.size() > 0) {
+        execListItems= execList.split(":", QString::SkipEmptyParts);
+        for(i=0; i<execListItems.count(); i++) {
+            validExecListItems = true;
+        }
+    }
+
+    // perhaps still the older MEDM list is defined
+    if(!validExecListItems) {
+        QString execList = (QString)  getenv("MEDM_EXEC_LIST");
+        if(!execList.isNull() && execList.size() > 0) {
+            execListItems= execList.split(":", QString::SkipEmptyParts);
+            for(i=0; i<execListItems.count(); i++) {
+                validExecListItems = true;
+            }
+        }
+    }
 
     if(caImage* widget = qobject_cast<caImage *>(w)) {
         pv[0] = widget->getChannelA().trimmed();
@@ -2977,12 +3035,15 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         nbPV = 4;
     } else if(caMenu* widget = qobject_cast<caMenu *>(w)) {
         pv[0] = widget->getPV().trimmed();
+        nbPV = 1;
     } else if(caChoice* widget = qobject_cast<caChoice *>(w)) {
         pv[0] = widget->getPV().trimmed();
         if(widget->getColorMode() == caChoice::Alarm) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
+        nbPV = 1;
     } else if(caTextEntry* widget = qobject_cast<caTextEntry *>(w)) {
         pv[0] = widget->getPV().trimmed();
+         nbPV = 1;
     } else if(caLineEdit* widget = qobject_cast<caLineEdit *>(w)) {
         pv[0] = widget->getPV().trimmed();
         if(widget->getPrecisionMode() == caLineEdit::User) {
@@ -2997,6 +3058,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         if(widget->getColorMode() == caLineEdit::Alarm_Default) strcpy(colMode, "Alarm");
         else if(widget->getColorMode() == caLineEdit::Alarm_Static) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
+        nbPV = 1;
 
     } else if(caGraphics* widget = qobject_cast<caGraphics *>(w)) {
         pv[0] = widget->getChannelA().trimmed();
@@ -3016,12 +3078,16 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         else strcpy(colMode, "Static");
     } else if (caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w)) {
         pv[0] = widget->getPV().trimmed();
+        nbPV = 1;
     } else if (caNumeric* widget = qobject_cast<caNumeric *>(w)) {
         pv[0] = widget->getPV();
+        nbPV = 1;
     } else if (caMessageButton* widget = qobject_cast<caMessageButton *>(w)) {
         pv[0] = widget->getPV().trimmed();
+        nbPV = 1;
     } else if(caLed* widget = qobject_cast<caLed *>(w)) {
         pv[0] = widget->getPV().trimmed();
+        nbPV = 1;
     } else if(caBitnames* widget = qobject_cast<caBitnames *>(w)) {
         pv[0] = widget->getEnumPV().trimmed();
         pv[1] = widget->getValuePV().trimmed();
@@ -3035,6 +3101,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         }
         if(widget->getColorMode() == caSlider::Alarm) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
+        nbPV = 1;
     } else if(caThermo* widget = qobject_cast<caThermo *>(w)) {
         pv[0] = widget->getPV().trimmed();
         if(widget->getLimitsMode() == caThermo::User) {
@@ -3050,14 +3117,18 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         }
         if(widget->getColorMode() == caThermo::Alarm) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
+        nbPV = 1;
     } else if(caLinearGauge* widget = qobject_cast<caLinearGauge *>(w)) {
         pv[0] = widget->getPV().trimmed();
+        nbPV = 1;
     } else if(caCircularGauge* widget = qobject_cast<caCircularGauge *>(w)) {
         pv[0] = widget->getPV().trimmed();
+        nbPV = 1;
     } else if(caByte* widget = qobject_cast<caByte *>(w)) {
         pv[0] = widget->getPV().trimmed();
         if(widget->getColorMode() == caByte::Alarm) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
+        nbPV = 1;
     } else if(caStripPlot* widget = qobject_cast<caStripPlot *>(w)) {
         QString pvs = widget->getPVS();
         QStringList vars = pvs.split(";", QString::SkipEmptyParts);
@@ -3119,7 +3190,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         myMenu.addAction("Print");
         myMenu.addAction("Raise main window");
         myMenu.addAction("Include files");
-    }
+    }    
 
     if(caScriptButton* widget =  qobject_cast< caScriptButton *>(w)) {
         Q_UNUSED(widget);
@@ -3147,9 +3218,20 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         myMenu.addAction("Change Axis");
     }
 
+    // add to context menu, the actions requested by the environment variable caQtDM_EXEC_LIST
+    if(validExecListItems) {
+        for(i=0; i<execListItems.count(); i++) {
+            QStringList item = execListItems[i].split(";");
+            if(item.count() > 1) {
+                if(!item[1].contains("&P") && onMain) myMenu.addAction(item[0]);
+                else if(item[1].contains("&P") && !onMain && nbPV > 0) myMenu.addAction(item[0]);
+            }
+        }
+    }
+
     QAction* selectedItem = myMenu.exec(pos);
 
-    if (selectedItem) {
+    if (selectedItem) {        
         if(selectedItem->text().contains("Kill Process")) {
             if(caScriptButton* widget =  qobject_cast< caScriptButton *>(w)) {
                 processWindow *t= (processWindow *) widget->getProcess();
@@ -3362,10 +3444,24 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 sliderDialog dialog(widget, mutexKnobData, "slider modifications", this);
                 dialog.exec();
             }
+        } else {
+            // any action from environment ?
+            if(validExecListItems) {
+                for(i=0; i<execListItems.count(); i++) {
+                    QStringList item = execListItems[i].split(";");
+                    if(item.count() > 1) {
+                        if(selectedItem->text().contains(item[0])) {
+                            QString command = item[1];
+                            command.replace("&P", pv[0]);
+                            shellCommand(command);
+                        }
+                    }
+                }
+            }
         }
 
     } else {
-        // nothing was chosen
+       // nothing was choosen
     }
 }
 
@@ -3649,9 +3745,11 @@ int CaQtDM_Lib::Execute(char *command)
 {
     int status;
     pid_t pid;
+/*
     QTextStream out(stdout);
     out << command << endl << endl;
     out.flush();
+*/
     pid = fork ();
     if (pid == 0) {
         execl ("/bin/sh", "/bin/sh", "-c", command, NULL);
@@ -4247,7 +4345,7 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
     QFont f = font();
     QFontMetrics metrics(f);
     int width = metrics.width(mimeData->text() + 20);
-    int height = metrics.height() * 1.5;
+    int height = (int) ((float) metrics.height() * 1.5);
 
     QPixmap pixmap(width, height);
     pixmap.fill(Qt::black);

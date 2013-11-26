@@ -97,6 +97,7 @@ public:
     void UpdateGauge(EAbstractGauge *w, const knobData &data);
     void allowResizing(bool allowresize);
     void resizeSpecials(QString className, QWidget *widget, QVariantList list, double factX, double factY);
+    void shellCommand(QString command);
 
     void print()
     {
