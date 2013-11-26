@@ -3518,6 +3518,8 @@ void *parseIndicator(DisplayInfo *displayInfo, FrameOffset * offset)
              && (tokenType != T_EOF) );
 
     Qt_handleString("direction", "enum", direction);
+    Qt_handleString("look", "enum", look);
+
 
     if(!strcmp(look,"noLabel") || !strcmp(look,"noDeco")) {
 
