@@ -4319,6 +4319,8 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
         mimeData->setText(widget->getPV());
     } else if (caApplyNumeric *widget = qobject_cast<caApplyNumeric *>(w->parent())) {
         mimeData->setText(widget->getPV());
+    } else if (caApplyNumeric *widget = qobject_cast<caApplyNumeric *>(w->parent()->parent())) {
+        mimeData->setText(widget->getPV());
     } else if (caNumeric *widget = qobject_cast<caNumeric *>(w)) {
         mimeData->setText(widget->getPV());
     } else if (caNumeric *widget = qobject_cast<caNumeric *>(w->parent())) {
@@ -4335,13 +4337,14 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
         mimeData->setText(widget->getChannelA());
     } else if (caLabel *widget = qobject_cast<caLabel *>(w)) {
         mimeData->setText(widget->getChannelA());
+    } else if (caPolyLine *widget = qobject_cast<caPolyLine *>(w)) {
+        mimeData->setText(widget->getChannelA());
     } else {
-        //Debug() << "unrecognized widget" << w;
+        //qDebug() << "unrecognized widget" << w;
         return;
     }
 
     // build a pixmap from pv text
-    //QFont font = QApplication::font();
     QFont f = font();
     QFontMetrics metrics(f);
     int width = metrics.width(mimeData->text() + 20);
