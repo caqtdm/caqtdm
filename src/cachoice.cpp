@@ -227,15 +227,8 @@ void caChoice::setColors(QColor back, QColor fore, QColor border, alignmentHor a
         }
 
         style.append("} ");
-        //QString hover = "QPushButton:hover {background-color: rgb(%1, %2, %3, %4);} ";
-        //hover = hover.arg(highlightColor.red()).arg(highlightColor.green()).arg(highlightColor.blue()).arg(255);
-
-
-
         QString hover = "QPushButton:hover {background-color: rgb(%1, %2, %3);}  QPushButton:pressed {background-color: rgb(%4, %5, %6)};";
         hover = hover.arg(highlightColor.red()).arg(highlightColor.green()).arg(highlightColor.blue()).arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue());
-
-
         style.append(hover);
 
         QString activ = "QPushButton:checked {background-color: rgb(%1, %2, %3, %4);} ";
