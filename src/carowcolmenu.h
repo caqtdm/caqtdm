@@ -81,6 +81,10 @@ public:
     void setFontScaleMode(EPushButton::ScaleMode m);
     EPushButton::ScaleMode fontScaleMode();
 
+    void updateLabel();
+    void updateColors();
+    void updateFontScaleMode();
+
 protected:
 
        void populateCells();
@@ -112,6 +116,7 @@ private:
     QString thisImage;
     int borderSize;
     EPushButton::ScaleMode thisScaleMode;
+    int alpha;
 };
 
 #endif
