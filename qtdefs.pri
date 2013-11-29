@@ -1,9 +1,13 @@
-CAQTDM_VERSION = V3.5.2
+CAQTDM_VERSION = V3.5.3
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+
+# 3.5.3
+# starting performance optimized for relateddisplay, cachoice, camenu
+# splahsscreen added for loading includes (in some cases loading time can be significant)
 
 # 3.5.2
 # by using CAQTDM_EXEC_LIST as environment variable (as in MEDM with the same syntax), menu items can be added to the
