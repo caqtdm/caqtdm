@@ -315,7 +315,13 @@ void caSlider::keyReleaseEvent(QKeyEvent *e) {
 
 void caSlider::mousePressEvent(QMouseEvent *e)
 {
+
+#if QT_VERSION< QT_VERSION_CHECK(4, 8, 0)
+    if( e->button() == Qt::RightButton || e->button() == Qt::MidButton) {
+#else
+
     if( e->button() == Qt::RightButton || e->button() == Qt::MiddleButton) {
+#endif
         e->ignore();
         return;
     }

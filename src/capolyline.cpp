@@ -161,7 +161,11 @@ void caPolyLine::mousePressEvent(QMouseEvent *event)
     if(!inEditor) {
         if(event->type() == QEvent::MouseButtonPress) {
                 QMouseEvent *ev = (QMouseEvent *) event;
+#if QT_VERSION< QT_VERSION_CHECK(4, 8, 0)
+                 if(ev->button() == Qt::MidButton) {
+#else
                 if(ev->button() == Qt::MiddleButton) {
+#endif
                      QWidget::mousePressEvent(event);
                 }
         }
