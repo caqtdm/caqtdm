@@ -62,6 +62,7 @@
 #include "limitsCartesianplotDialog.h"
 #include "sliderDialog.h"
 #include "processWindow.h"
+#include <splashscreen.h>
 
 #include <QtControls>
 
@@ -189,6 +190,11 @@ private:
     int origWidth, origHeight;
 
     QString includeFiles;
+
+    SplashScreen *splash;
+
+    int nbIncludes;
+    int splashCounter;
 
 
 #ifdef epics4

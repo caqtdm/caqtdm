@@ -342,10 +342,23 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     // say for all widgets that they have to be treated, will be set to true when treated to avoid multiple use
     // by findChildren
+    nbIncludes = 0;
+    splashCounter = 1;
     QList<QWidget *> all = this->findChildren<QWidget *>();
     foreach(QWidget* widget, all) {
         widget->setProperty("Taken", false);
+        if(caInclude* include = qobject_cast<caInclude *>(widget)){
+            Q_UNUSED(include);
+            nbIncludes++;
+        }
     }
+
+    if(nbIncludes > 0) {
+      splash = new SplashScreen(parent);
+      splash->setMaximum(nbIncludes);
+      splash->show();
+    }
+
 
     initTry = true;
     // get from the display all the calc widgets
@@ -363,6 +376,16 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         savedMacro[0] = macro;
         // open and load file
         HandleWidget(w1, savedMacro[0], false);
+    }
+
+    if(nbIncludes > 0) {
+#ifdef linux
+    usleep(200000);
+#else
+    Sleep::msleep(200);
+#endif
+       splash->finish(myWidget);
+       splash->deleteLater();
     }
 
     // build a list for getting all soft pv
@@ -898,6 +921,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //==================================================================================================================
     } else if(caInclude* widget = qobject_cast<caInclude *>(w1)) {
+        //struct timeb now, last;
         QWidget *thisW;
         QFile *file = new QFile;
         QUiLoader loader;
@@ -978,11 +1002,19 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
                 thisW = (QWidget*) 0;
 #endif
             } else {
+
                 // open and load ui file
                 file->setFileName(fileName);
                 file->open(QFile::ReadOnly);
+                //ftime(&last);
                 thisW = loader.load(file, this);
                 file->close();
+/*
+                ftime(&now);
+                double diff = ((double) now.time + (double) now.millitm / (double)1000) -
+                        ((double) last.time + (double) last.millitm / (double)1000);
+                qDebug() << diff;
+*/
             }
 
             // some error with loading
@@ -1026,6 +1058,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         delete file;
 
         macroS = savedMacro[level];
+
+        if(level == 0 && nbIncludes > 0) {
+            splash->setProgress(splashCounter++);
+        }
 
         widget->setProperty("Taken", true);
 
@@ -2742,7 +2778,6 @@ void CaQtDM_Lib::processTerminated()
 {
     //qDebug() << "caQtDM -- process terminated callback";
     processWindow *t = qobject_cast<processWindow *>(sender());
-    if(!t->isRunning()) return;
     QWidget *w = t->getProcessCaller();
     caScriptButton *w1 = qobject_cast<caScriptButton *>(w);
     if(w1 != (QWidget*) 0) {
@@ -2750,9 +2785,8 @@ void CaQtDM_Lib::processTerminated()
         w1->setAccessW(true);
         w->setEnabled(true);
     }
-    //qDebug() << "clean up";
 
-    delete t;
+    if(t != (processWindow *) 0) t->deleteLater();
 }
 
 /**

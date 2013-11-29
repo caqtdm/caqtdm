@@ -39,7 +39,8 @@ SOURCES += caqtdm_lib.cpp \
     limitsStripplotDialog.cpp \
     limitsCartesianplotDialog.cpp \
     sliderDialog.cpp \
-    processWindow.cpp
+    processWindow.cpp \
+    splashscreen.cpp
 
 HEADERS += caqtdm_lib.h\
         caQtDM_Lib_global.h \
@@ -58,7 +59,8 @@ HEADERS += caqtdm_lib.h\
     limitsStripplotDialog.h \
     limitsCartesianplotDialog.h \
     sliderDialog.h \
-    processWindow.h
+    processWindow.h \
+    splashscreen.h
 
 HEADERS += \
     JSONValue.h \
