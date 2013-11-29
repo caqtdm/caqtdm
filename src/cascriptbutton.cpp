@@ -89,8 +89,8 @@ void caScriptButton::setColors(QColor bg, QColor fg, QColor hover, QColor border
              arg(border.red()).arg(border.green()).arg(border.blue());
        style.append("border-radius: 1px; padding: 0px; border-width: 3px;"
                   "border-style: outset; margin:0px;}");
-       QString hoverC = "QPushButton:hover {background-color: rgb(%1, %2, %3);}";
-       hoverC = hoverC.arg(hover.red()).arg(hover.green()).arg(hover.blue());
+       QString hoverC = "QPushButton:hover {background-color: rgb(%1, %2, %3);} QPushButton:pressed {background-color: rgb(%4, %5, %6)};";
+       hoverC = hoverC.arg(hover.red()).arg(hover.green()).arg(hover.blue()).arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue());
        style.append(hoverC);
        setStyleSheet(style);
 

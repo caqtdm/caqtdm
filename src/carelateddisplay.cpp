@@ -25,7 +25,7 @@
 
 #include "carelateddisplay.h"
 
-caRelatedDisplay::caRelatedDisplay(QWidget *parent) : caRowColMenu(parent) //QWidget(parent)
+caRelatedDisplay::caRelatedDisplay(QWidget *parent) : caRowColMenu(parent)
 {
     setStacking(Row);
     setImage("fileopen.xpm");
