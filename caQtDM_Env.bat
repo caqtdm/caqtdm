@@ -13,7 +13,7 @@
   
   IF "%QTDM_LIBINSTALL%"=="" 		set QTDM_LIBINSTALL=C:\Qt\4.8.2\lib
   IF "%QTDM_BININSTALL%"=="" 		set QTDM_BININSTALL=C:\Qt\4.8.2\bin
-  IF "%WIXHOME%"=="" 			set WIXHOME=C:\Program Files (x86)\WixEdit\wix-3.0.5419.0
+  IF "%WIXHOME%"=="" 			set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
 
 echo =============================================================================================
 echo in order to build this package you will eventually have to redefine following variables in 
