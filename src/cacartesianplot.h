@@ -36,6 +36,9 @@
 #include <QVarLengthArray>
 #include <qtcontrols_global.h>
 
+#include <qwt_plot_zoomer.h>
+#include <qwt_plot_panner.h>
+
 class QTCON_EXPORT caCartesianPlot : public QwtPlot
 {
     Q_OBJECT
@@ -316,6 +319,8 @@ public:
     QString getPV(int indx) const {return thisPV[indx].join(";");}
     void setPV(QString const &newPV, int indx)  {thisPV[indx] = newPV.split(";");}
 
+    void resetZoom();
+
 signals:
 
     void ShowContextMenu(const QPoint&);
@@ -366,6 +371,8 @@ private:
     void setGridsColor(QColor c);
 
     bool eventFilter(QObject *obj, QEvent *event);
+
+    QwtPlotZoomer* zoomer;
 
 };
 

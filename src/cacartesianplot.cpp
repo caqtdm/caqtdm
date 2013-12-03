@@ -35,14 +35,42 @@
 #include <QtDebug>
 #include <QVector>
 
+class MyZoomer: public QwtPlotZoomer
+{
+public:
+    MyZoomer(QwtPlotCanvas *canvas):
+        QwtPlotZoomer(canvas)
+    {
+        setTrackerMode(AlwaysOn);
+    }
+
+    virtual QwtText trackerTextF(const QPointF &pos) const
+    {
+        QColor bg(Qt::white);
+        bg.setAlpha(200);
+
+        QwtText text = QwtPlotZoomer::trackerTextF(pos);
+        text.setBackgroundBrush( QBrush( bg ));
+        return text;
+    }
+};
+
+
 caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
 
 {
+    const char *text =
+           "You can zoom in using the left mouse button.\n"
+           "You can pan by dragging with the middle mouse button.\n"
+           "Choose reset zoom in the context menu for original scale.\n ";
+
     thisToBeTriggered = false;
     thisCountNumber = 0;
 
     plotGrid = new QwtPlotGrid();
     plotGrid->attach(this);
+
+    setWhatsThis(text);
 
     setTitlePlot("");
     setTitleX("");
@@ -62,13 +90,20 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     // canvas
 
 #if QWT_VERSION < 0x060100
-    //canvas()->setLineWidth(2);
-    //canvas()->setFrameStyle(QFrame::Box | QFrame::Plain);
+    zoomer = new MyZoomer(canvas());
+    QwtPlotPanner *panner = new QwtPlotPanner(canvas());
 #else
-   QwtPlotCanvas *canvas =  (QwtPlotCanvas *) this->canvas();
-    //canvas->setLineWidth(2);
-    //canvas->setFrameStyle(QFrame::Box | QFrame::Plain);
+    QwtPlotCanvas *canvas =  (QwtPlotCanvas *) this->canvas();
+    zoomer = new MyZoomer(canvas);
+    QwtPlotPanner *panner = new QwtPlotPanner(canvas);
 #endif
+
+    panner->setAxisEnabled(QwtPlot::yRight, false);
+    panner->setMouseButton(Qt::MidButton);
+
+    const QColor c(Qt::red);
+   zoomer->setRubberBandPen(c);
+   zoomer->setTrackerPen(c);
 
     // curves
     for(int i=0; i < curveCount; i++) {
@@ -120,6 +155,17 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
 #endif
 
     installEventFilter(this);
+}
+
+void caCartesianPlot::resetZoom() {
+    double minX, maxX, minY, maxY;
+    printf("reset zoom\n");
+
+    if(getXLimits(minX, maxX)) setScaleX(minX, maxX);
+    if(getYLimits(minY, maxY)) setScaleY(minY, maxY);
+    if(thisYscaling == Auto) setAxisAutoScale(yLeft, true);
+    if(thisXscaling == Auto) setAxisAutoScale(xBottom, true);
+    replot();
 }
 
 void caCartesianPlot::setTriggerPV(QString const &newPV)  {
