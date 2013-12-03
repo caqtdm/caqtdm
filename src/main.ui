@@ -24,21 +24,21 @@
      <x>0</x>
      <y>0</y>
      <width>493</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuMenu">
     <property name="title">
      <string>Menu</string>
     </property>
-    <addaction name="fileAction"/> 
+    <addaction name="fileAction"/>
     <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="reloadAction"/>
-      <addaction name="exitAction"/>  
-        <addaction name="separator"/>
+    <addaction name="exitAction"/>
     <addaction name="separator"/>
-       <addaction name="aboutAction"/> 
+    <addaction name="separator"/>
+    <addaction name="aboutAction"/>
    </widget>
    <widget class="QMenu" name="menuPV">
     <property name="title">
@@ -46,8 +46,16 @@
     </property>
     <addaction name="unconnectedAction"/>
    </widget>
+   <widget class="QMenu" name="menuUpdateType">
+    <property name="title">
+     <string>UpdateType</string>
+    </property>
+    <addaction name="directAction"/>
+    <addaction name="timedAction"/>
+   </widget>
    <addaction name="menuMenu"/>
    <addaction name="menuPV"/>
+   <addaction name="menuUpdateType"/>
   </widget>
   <action name="exitAction">
    <property name="text">
@@ -81,6 +89,22 @@
   <action name="aboutAction">
    <property name="text">
     <string>&amp;About</string>
+   </property>
+  </action>
+  <action name="directAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Direct</string>
+   </property>
+  </action>
+  <action name="timedAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Timed</string>
    </property>
   </action>
  </widget>

@@ -111,6 +111,9 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     connect( this->ui.exitAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionExit()) );
     connect( this->ui.reloadAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionReload()) );
     connect( this->ui.unconnectedAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionUnconnected()) );
+    connect( this->ui.timedAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionTimed()) );
+    connect( this->ui.directAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionDirect()) );
+    this->ui.timedAction->setChecked(true);
 
     setWindowTitle(title);
 
@@ -537,6 +540,17 @@ void FileOpenWindow::Callback_ActionReload()
     }
 }
 
+void FileOpenWindow::Callback_ActionTimed() {
+    this->ui.timedAction->setChecked(true);
+    this->ui.directAction->setChecked(false);
+    mutexKnobData->UpdateMechanism(MutexKnobData::UpdateTimed);
+}
+
+void FileOpenWindow::Callback_ActionDirect() {
+    this->ui.timedAction->setChecked(false);
+    this->ui.directAction->setChecked(true);
+    mutexKnobData->UpdateMechanism(MutexKnobData::UpdateDirect);
+}
 
 void FileOpenWindow::checkForMessage()
 {

@@ -63,6 +63,8 @@
      void parse_and_set_Geometry(QMainWindow *w, QString parsestring);
 
  private slots:
+     void Callback_ActionTimed();
+     void Callback_ActionDirect();
      void Callback_OpenButton();
      void Callback_ActionAbout();
      void Callback_ActionExit();
