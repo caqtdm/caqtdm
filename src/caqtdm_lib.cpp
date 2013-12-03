@@ -3250,6 +3250,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     if(caCartesianPlot* widget = qobject_cast<caCartesianPlot *>(w)) {
         Q_UNUSED(widget);
         myMenu.addAction("Change Axis");
+        myMenu.addAction(QWhatsThis::createAction());
+        myMenu.addAction("Reset zoom");
     }
 
     // add to context menu, the actions requested by the environment variable caQtDM_EXEC_LIST
@@ -3473,6 +3475,12 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 limitsCartesianplotDialog dialog(widget, mutexKnobData, "cartesianplot modifications", this);
                 dialog.exec();
             }
+
+         } else if(selectedItem->text().contains("Reset zoom")) {
+             if(caCartesianPlot* widget = qobject_cast<caCartesianPlot *>(w)) {
+                 widget->resetZoom();
+             }
+
         } else if(selectedItem->text().contains("Modify")) {
             if(caSlider* widget = qobject_cast<caSlider *>(w)) {
                 sliderDialog dialog(widget, mutexKnobData, "slider modifications", this);

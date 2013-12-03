@@ -44,6 +44,7 @@
 #include <QMap>
 #include <QtGui>
 #include <QtUiTools>
+#include <QWhatsThis>
 
 #include <QWidget>
 #include <QWaitCondition>
