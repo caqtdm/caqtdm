@@ -41,6 +41,9 @@ class CAQTDM_LIBSHARED_EXPORT MutexKnobData: public QObject {
     Q_OBJECT
 
 public:
+
+    enum UpdateType {UpdateTimed=0, UpdateDirect};
+
     MutexKnobData();
 
     ~MutexKnobData();
@@ -76,6 +79,8 @@ public:
     float getHighestCountPV(QString &pv);
     void initHighestCountPV();
 
+    void UpdateMechanism(UpdateType Type);
+
 signals:
 
     void Signal_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, const knobData&);
@@ -97,5 +102,7 @@ private:
 
     int nbDisplayCountPerSecond, displayCount;
     struct timeb last;
+
+    UpdateType myUpdateType;
 };
 #endif // MUTEXKNOBDATA_H

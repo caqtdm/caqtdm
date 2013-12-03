@@ -34,6 +34,10 @@
 #include <QDebug>
 #include "QtControls"
 
+
+/**
+ * this routine (re)allocates memory and copies the old data to the new memory
+ */
 MutexKnobData::MutexKnobData()
 {
     KnobDataArraySize=500;
@@ -57,6 +61,8 @@ MutexKnobData::MutexKnobData()
 
     // start a timer with 50Hz
     timerId = startTimer(20);
+
+    myUpdateType = UpdateTimed;
 }
 
 MutexKnobData:: ~MutexKnobData()
@@ -76,6 +82,15 @@ void MutexKnobData::ReAllocate(int oldsize, int newsize, void **ptr)
         free(*ptr);
     }
     *ptr = tmp;
+}
+
+/**
+ * this routine allows to change between direct updated and timed updates
+ */
+
+void MutexKnobData::UpdateMechanism(UpdateType Type)
+{
+    myUpdateType = Type;
 }
 
 /**
@@ -126,7 +141,7 @@ void MutexKnobData::RemoveSoftPV(QString pv, QWidget *w, int indx)
     sprintf(asc, "%s_%d_%p",  KnobData[indx].pv, KnobData[indx].index,  w1);
     softPV_List.remove(asc);
 
-/*
+    /*
      QMapIterator<QString, int> i(softPV_List);
      qDebug() << "list start";
      while (i.hasNext()) {
@@ -172,10 +187,10 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w)
 
                 KnobData[indx].edata.fieldtype = caDOUBLE;
                 KnobData[indx].edata.precision = 3;
-                 KnobData[indx].edata.connected = true;
-                 KnobData[indx].edata.upper_disp_limit=0.0;
-                 KnobData[indx].edata.lower_disp_limit=0.0;
-                 KnobData[indx].edata.connected = true;
+                KnobData[indx].edata.connected = true;
+                KnobData[indx].edata.upper_disp_limit=0.0;
+                KnobData[indx].edata.lower_disp_limit=0.0;
+                KnobData[indx].edata.connected = true;
             }
         }
     }
@@ -325,12 +340,19 @@ extern "C" MutexKnobData* C_DataUnlock(MutexKnobData* p, knobData *kData) {
  * update array with the received data
  */
 void MutexKnobData::SetMutexKnobDataReceived(knobData *kData) {
+    char units[40];
+    char fec[40];
+    char dataString[1024];
     double diff;
     struct timeb now;
     QMutexLocker locker(&mutex);
     int index = kData->index;
     memcpy(&KnobData[index], kData, sizeof(kData));
     memcpy(&KnobData[index].edata, &kData->edata, sizeof(epicsData));
+
+    /*****************************************************************************************/
+    // Statistics
+    /*****************************************************************************************/
 
     nbMonitors++;
 
@@ -358,6 +380,34 @@ void MutexKnobData::SetMutexKnobDataReceived(knobData *kData) {
         highestCountPerSecond = highestCount / diff;
         highestIndexPV = highestIndex;
         highestCount = 0;
+        nbDisplayCountPerSecond =  (int) (displayCount/diff);
+        displayCount = 0;
+    }
+
+    /*****************************************************************************************/
+
+    // direct update without timing
+
+    if(myUpdateType == UpdateDirect) {
+        QWidget *dispW = (QWidget*) kData->dispW;
+        dataString[0] = '\0';
+        strcpy(units, kData->edata.units);
+        strcpy(fec, kData->edata.fec);
+        int caFieldType= kData->edata.fieldtype;
+
+        if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kData->edata.dataB != (void*) 0) {
+            if(kData->edata.dataSize < 1024) {
+                memcpy(dataString, (char*) kData->edata.dataB, kData->edata.dataSize);
+                dataString[kData->edata.dataSize] = '\0';
+            }
+        }
+
+        kData->edata.displayCount = kData->edata.monitorCount;
+        locker.unlock();
+        UpdateWidget(index, dispW, units, fec, dataString, KnobData[index]);
+        kData->edata.lastTime = now;
+        kData->edata.initialize = false;
+        displayCount++;
     }
 }
 
@@ -457,32 +507,34 @@ void MutexKnobData::timerEvent(QTimerEvent *)
 
         // use specified repetition rate (normally 5Hz)
         if( ((kPtr->index != -1) && (kPtr->edata.monitorCount > kPtr->edata.displayCount) && (diff >= (1.0/(double)repRate)))){
-/*
+            /*
             printf("<%s> index=%d mcount=%d dcount=%d value=%f datasize=%d valuecount=%d\n", kPtr->pv, kPtr->index, kPtr->edata.monitorCount,
                                                                       kPtr->edata.displayCount, kPtr->edata.rvalue,
                                                                       kPtr->edata.dataSize, kPtr->edata.valueCount);
 */
-            QMutexLocker locker(&mutex);
-            int index = kPtr->index;
-            QWidget *dispW = (QWidget*) kPtr->dispW;
-            dataString[0] = '\0';
-            strcpy(units, kPtr->edata.units);
-            strcpy(fec, kPtr->edata.fec);
-            int caFieldType= kPtr->edata.fieldtype;
+            if((myUpdateType == UpdateTimed) || kPtr->soft) {
+                QMutexLocker locker(&mutex);
+                int index = kPtr->index;
+                QWidget *dispW = (QWidget*) kPtr->dispW;
+                dataString[0] = '\0';
+                strcpy(units, kPtr->edata.units);
+                strcpy(fec, kPtr->edata.fec);
+                int caFieldType= kPtr->edata.fieldtype;
 
-            if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kPtr->edata.dataB != (void*) 0) {
-                if(kPtr->edata.dataSize < 1024) {
-                    memcpy(dataString, (char*) kPtr->edata.dataB, kPtr->edata.dataSize);
-                    dataString[kPtr->edata.dataSize] = '\0';
+                if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kPtr->edata.dataB != (void*) 0) {
+                    if(kPtr->edata.dataSize < 1024) {
+                        memcpy(dataString, (char*) kPtr->edata.dataB, kPtr->edata.dataSize);
+                        dataString[kPtr->edata.dataSize] = '\0';
+                    }
                 }
-            }
 
-            kPtr->edata.displayCount = kPtr->edata.monitorCount;
-            locker.unlock();
-            UpdateWidget(index, dispW, units, fec, dataString, KnobData[index]);
-            kPtr->edata.lastTime = now;
-            kPtr->edata.initialize = false;
-            displayCount++;
+                kPtr->edata.displayCount = kPtr->edata.monitorCount;
+                locker.unlock();
+                UpdateWidget(index, dispW, units, fec, dataString, KnobData[index]);
+                kPtr->edata.lastTime = now;
+                kPtr->edata.initialize = false;
+                displayCount++;
+            }
 
         } else if ((kPtr->index != -1)  && (diff >= (1.0/(double)repRate))) {
             if( (!kPtr->edata.connected)) {
@@ -504,16 +556,6 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 if(displayIt) UpdateWidget(index, (QWidget*) kPtr->dispW, units, fec, dataString, KnobData[index]);
             }
         }
-    }
-
-    ftime(&now);
-    diff = ((double) now.time + (double) now.millitm / (double)1000) -
-            ((double) last.time + (double) last.millitm / (double)1000);
-
-    if(diff >= 10.0) {
-        ftime(&last);
-        nbDisplayCountPerSecond =  (int) (displayCount/diff);
-        displayCount = 0;
     }
 }
 
@@ -570,7 +612,7 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
     if(dataString[0] == '?' && strlen(dataString) < 7) {
         QString newDataString = QString::fromLatin1(dataString);
         newDataString.replace("?", mu); //B5
-         emit Signal_UpdateWidget(index, w, StringUnits, fec, newDataString, knb);
+        emit Signal_UpdateWidget(index, w, StringUnits, fec, newDataString, knb);
     } else {
         emit Signal_UpdateWidget(index, w, StringUnits, fec, dataString, knb);
     }
