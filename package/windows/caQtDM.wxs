@@ -1,15 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Product Id="D75A13FA-3367-4850-AC46-E69A41645E83" Name="caQtDM" Language="1033" Version="3.5.1.0" Manufacturer="Paul Scherrer Institut" UpgradeCode="CEE4C381-28DA-478F-A7C6-3A95B4DF2A89">
+    <Product Id="D75A13FA-3367-4850-AC46-E69A41645E83" Name="caQtDM" Language="1033" Version="3.5.4.0" Manufacturer="Paul Scherrer Institut" UpgradeCode="CEE4C381-28DA-478F-A7C6-3A95B4DF2A89">
         <Package Description="caQTDM Windows Manager with Qt-Designer(4.8.2)" Comments="Displaymanager for EPICS with Qt(4.8.2)" InstallerVersion="300" Compressed="yes" Manufacturer="Paul Scherrer Institut Switzerland" Keywords="EPICS, Display, Network, Control" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
         <Upgrade Id="CEE4C381-28DA-478F-A7C6-3A95B4DF2A89">
-            <UpgradeVersion OnlyDetect="yes" Minimum="3.5.1.0" Property="NEWERVERSIONDETECTED" IncludeMinimum="no" />
-            <UpgradeVersion OnlyDetect="no" Maximum="3.5.1.0" Property="OLDERVERSIONBEINGUPGRADED" IncludeMaximum="no" />
+            <UpgradeVersion OnlyDetect="yes" Minimum="3.5.4.0" Property="NEWERVERSIONDETECTED" IncludeMinimum="no" />
+            <UpgradeVersion OnlyDetect="no" Maximum="3.5.4.0" Property="OLDERVERSIONBEINGUPGRADED" IncludeMaximum="no" />
         </Upgrade>
+        <UIRef Id="WixUI_InstallDir" />
+        <Property Id="INSTALLDIR" Secure="yes" /> 
+        <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+        <Property Id="CAQTDM_VERSION" Value="3.5.2.0" />
+        <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="NO EPICS and Firewall parameter set or changed!"/>
+        <!-- UIRef Id="WixUI_Minimal" /-->
+        <Icon Id="StartMenuIcon.exe" SourceFile="..\..\src\caQtDM.ico" />
+        <Binary Id="caQtDM.exe" SourceFile="..\..\..\caQtDM_Binaries\caQtDM.exe" />
+        <InstallExecuteSequence>
+            <CreateFolders />
+            <FileCost />
+            <RemoveExistingProducts Before="InstallInitialize" />
+        </InstallExecuteSequence>
+        <WixVariable Id="WixUILicenseRtf" Value="gplv3.rtf" />
+        <WixVariable Id="WixUIDialogBmp" Value="PSI_Background.bmp" />
+        <UI />
+        
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="ProgramFilesFolder" Name="PFiles">
-                <Directory Id="FILEPRODUCTDIR" Name="caQTDM">
+                <Directory Id="INSTALLDIR" Name="caQTDM">
                     <Directory Name="bin" Id="BIN">
                         <Directory Name="win32-x86" Id="WIN32_X86">
                             <Component Id="Qt_4.8.4" Guid="925E77A5-220A-4867-BD38-5F9C1C57B0E6">
@@ -139,19 +156,19 @@
                         <RemoveFolder Id="ProgramMenuDir" On="uninstall" />
                         <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Type="string" Value="" />
                         <Shortcut Id="UninstallProduct" Name="Uninstall" Description="Uninstalls the application" Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" />
-                        <Shortcut Id="CaQtDM_ShortCut" Name="CaQtDM" Target="[FILEPRODUCTDIR]bin\win32-x86\caQtDM.exe" Arguments=" -style plastique">
+                        <Shortcut Id="CaQtDM_ShortCut" Name="CaQtDM" Target="[INSTALLDIR]bin\win32-x86\caQtDM.exe" Arguments=" -style plastique">
                         </Shortcut>
-                        <Shortcut Id="Designer_Shortcut" Name="Designer" Target="[FILEPRODUCTDIR]bin\win32-x86\designer.exe" />
+                        <Shortcut Id="Designer_Shortcut" Name="Designer" Target="[INSTALLDIR]bin\win32-x86\designer.exe" />
                     </Component>
                 </Directory>
             </Directory>
             <Component Id="Environment" Guid="C071FF0B-D353-4DA0-9C0F-D07FC5FF2CFE">
-                <Environment Id="QT_PLUGIN_PATH" Action="set" Name="QT_PLUGIN_PATH" Part="last" Permanent="no" Value="[FILEPRODUCTDIR]plugins" System="yes" />
-                <Environment Id="PATH" Name="PATH" Part="last" Permanent="no" Action="set" Value="[FILEPRODUCTDIR]bin\win32-x86\" System="yes" Separator=";" />
-                <Environment Id="CAQTDM_DISPLAY_PATH" Name="CAQTDM_DISPLAY_PATH" Action="set" Permanent="no" System="yes" Value="[FILEPRODUCTDIR]StyleSheet" />
+                <Environment Id="QT_PLUGIN_PATH" Action="set" Name="QT_PLUGIN_PATH" Part="last" Permanent="no" Value="[INSTALLDIR]plugins" System="yes" />
+                <Environment Id="PATH" Name="PATH" Part="last" Permanent="no" Action="set" Value="[INSTALLDIR]bin\win32-x86\" System="yes" Separator=";" />
+                <Environment Id="CAQTDM_DISPLAY_PATH" Name="CAQTDM_DISPLAY_PATH" Action="set" Permanent="no" System="yes" Value="[INSTALLDIR]StyleSheet" />
             </Component>
         </Directory>
-        <Feature Id="DefaultFeature" Title="Main Feature" Level="1">
+        <Feature Id="DefaultFeature" Title="Main Feature" Level="1" ConfigurableDirectory="INSTALLDIR">
             <ComponentRef Id="Qt_4.8.4" />
             <ComponentRef Id="Epics_3.14.12.2" />
             <ComponentRef Id="qwt_6.0.1" />
@@ -173,20 +190,5 @@
         <Feature Id="VCRedist" Level="1" Title="Visual C++ 10.0 Runtime" AllowAdvertise="no" Display="hidden">
             <MergeRef Id="VCRedist" />
         </Feature>
-        <UI />
-        <Property Id="WIXUI_INSTALLDIR" Value="FILEPRODUCTDIR" />
-        <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="Attention there are NO EPICS and Firewall parameter set or changed during setup! " />
-        <Property Id="CAQTDM_VERSION" Value="3.5.1.0" />
-        <UIRef Id="WixUI_InstallDir" />
-        <!-- UIRef Id="WixUI_Minimal" /-->
-        <Icon Id="StartMenuIcon.exe" SourceFile="..\..\src\caQtDM.ico" />
-        <Binary Id="caQtDM.exe" SourceFile="..\..\..\caQtDM_Binaries\caQtDM.exe" />
-        <InstallExecuteSequence>
-            <CreateFolders />
-            <FileCost />
-            <RemoveExistingProducts Before="InstallInitialize" />
-        </InstallExecuteSequence>
-        <WixVariable Id="WixUILicenseRtf" Value="gplv3.rtf" />
-        <WixVariable Id="WixUIDialogBmp" Value="PSI_Background.bmp" />
     </Product>
 </Wix>
