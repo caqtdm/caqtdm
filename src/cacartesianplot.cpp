@@ -99,11 +99,19 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
 #endif
 
     panner->setAxisEnabled(QwtPlot::yRight, false);
+    panner->setAxisEnabled(QwtPlot::yLeft, true);
+    panner->setAxisEnabled(QwtPlot::xBottom, true);
     panner->setMouseButton(Qt::MidButton);
 
     const QColor c(Qt::red);
    zoomer->setRubberBandPen(c);
    zoomer->setTrackerPen(c);
+   zoomer->setMousePattern(QwtEventPattern::MouseSelect2,Qt:: NoButton);
+   zoomer->setMousePattern(QwtEventPattern::MouseSelect3,Qt:: NoButton);
+   zoomer->setMousePattern(QwtEventPattern::MouseSelect4,Qt:: NoButton);
+   zoomer->setMousePattern(QwtEventPattern::MouseSelect5,Qt:: NoButton);
+   zoomer->setMousePattern(QwtEventPattern::MouseSelect6,Qt:: NoButton);
+
 
     // curves
     for(int i=0; i < curveCount; i++) {
@@ -159,7 +167,6 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
 
 void caCartesianPlot::resetZoom() {
     double minX, maxX, minY, maxY;
-    printf("reset zoom\n");
 
     if(getXLimits(minX, maxX)) setScaleX(minX, maxX);
     if(getYLimits(minY, maxY)) setScaleY(minY, maxY);
