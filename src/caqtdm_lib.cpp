@@ -3230,7 +3230,12 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         Q_UNUSED(widget);
     } else if(caCamera * widget = qobject_cast< caCamera *>(w)) {
         Q_UNUSED(widget);
-        myMenu.addAction("Toggle fit to size");
+        QAction *menuAction;
+        menuAction = myMenu.addAction("Toggle fit to size");
+        menuAction->setCheckable(true);
+        if(widget->getFitToSize() == caCamera::Yes) menuAction->setChecked(true);
+        else  menuAction->setChecked(false);
+
         myMenu.addAction("Set Spectrum");
         myMenu.addAction("Set Greyscale");
         myMenu.addAction("Get Info");
