@@ -143,8 +143,8 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
             Xmax = qMin(savedWidth,  (int) Xmax);
             Ymax = qMin(savedHeight,  (int) Ymax);
         } else {
-            Xnew = Xnew + scrollArea->horizontalScrollBar()->value();
-            Ynew = Ynew + scrollArea->verticalScrollBar()->value();
+            Xnew = (Xnew  + scrollArea->horizontalScrollBar()->value()) / Correction;
+            Ynew = (Ynew  + scrollArea->verticalScrollBar()->value()) / Correction;
         }
 
         // find intensity
