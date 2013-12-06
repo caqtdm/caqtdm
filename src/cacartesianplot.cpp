@@ -112,7 +112,6 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
    zoomer->setMousePattern(QwtEventPattern::MouseSelect5,Qt:: NoButton);
    zoomer->setMousePattern(QwtEventPattern::MouseSelect6,Qt:: NoButton);
 
-
     // curves
     for(int i=0; i < curveCount; i++) {
         curve[i].setLegendAttribute(QwtPlotCurve::LegendShowLine, true);
