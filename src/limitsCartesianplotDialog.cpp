@@ -44,15 +44,16 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
     xComboBox->addItem("channel");
     xComboBox->addItem("user");
 
+    xminLineEdit = new QLineEdit("");
+    xmaxLineEdit = new QLineEdit("");
+    double Xmin = CartesianPlot->axisScaleDiv(caCartesianPlot::xBottom)->lowerBound();
+    double Xmax = CartesianPlot->axisScaleDiv(caCartesianPlot::xBottom)->upperBound();
+    xminLineEdit->setText(QString::number(Xmin, 'g'));
+    xmaxLineEdit->setText(QString::number(Xmax, 'g'));
+
     if(CartesianPlot->getXscaling() == caCartesianPlot::Auto) xComboBox->setCurrentIndex(0);
     else if(CartesianPlot->getXscaling() == caCartesianPlot::Channel) xComboBox->setCurrentIndex(1);
     else if(CartesianPlot->getXscaling() == caCartesianPlot::User) xComboBox->setCurrentIndex(2);
-
-    // add linedits with correct values
-    QString xLimits = CartesianPlot->getXaxisLimits();
-    list = xLimits.split(";", QString::SkipEmptyParts);
-    xminLineEdit = new QLineEdit(list.at(0));
-    xmaxLineEdit = new QLineEdit(list.at(1));
 
     xCheckBox= new QCheckBox();
     xCheckBox->setChecked(CartesianPlot->getXaxisEnabled());
@@ -73,15 +74,16 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
     yComboBox->addItem("channel");
     yComboBox->addItem("user");
 
+    yminLineEdit = new QLineEdit("");
+    ymaxLineEdit = new QLineEdit("");
+    double Ymin = CartesianPlot->axisScaleDiv(caCartesianPlot::yLeft)->lowerBound();
+    double Ymax = CartesianPlot->axisScaleDiv(caCartesianPlot::yLeft)->upperBound();
+    yminLineEdit->setText(QString::number(Ymin, 'g'));
+    ymaxLineEdit->setText(QString::number(Ymax, 'g'));
+
     if(CartesianPlot->getYscaling() == caCartesianPlot::Auto) yComboBox->setCurrentIndex(0);
     else if(CartesianPlot->getYscaling() == caCartesianPlot::Channel) yComboBox->setCurrentIndex(1);
     else if(CartesianPlot->getYscaling() == caCartesianPlot::User) yComboBox->setCurrentIndex(2);
-
-    // // add linedits with correct values
-    QString yLimits = CartesianPlot->getYaxisLimits();
-    list = yLimits.split(";", QString::SkipEmptyParts);
-    yminLineEdit = new QLineEdit(list.at(0));
-    ymaxLineEdit = new QLineEdit(list.at(1));
 
     yCheckBox = new QCheckBox();
     yCheckBox->setChecked(CartesianPlot->getYaxisEnabled());
