@@ -1,9 +1,13 @@
-CAQTDM_VERSION = V3.5.4
+CAQTDM_VERSION = V3.6.0
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+
+# 3.6.0
+# camera images can now be zoomed and scrolled
+# reset zoom for cartesian plot did not reset correctly in case of channel limits
 
 # 3.5.4
 # added zoom mechanism for cartesian plot
