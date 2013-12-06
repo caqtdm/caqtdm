@@ -444,7 +444,10 @@ void caCamera::setFitToSize(zoom const &z)
         scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     } else {
         scaleFactor = 1.0;
+        // disconnect signal to prevent firing now
+        disconnect(zoomSlider, SIGNAL(valueChanged (int)), 0, 0);
         zoomSlider->setValue(52);
+        connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomNow()));
         scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff );
         scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     }

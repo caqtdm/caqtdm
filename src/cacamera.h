@@ -36,6 +36,7 @@
 #include <QFormLayout>
 #include <QSlider>
 #include <QToolButton>
+#include <QScrollBar>
 #include <qtcontrols_global.h>
 #include <imagewidget.h>
 #include <calabel.h>
