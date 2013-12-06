@@ -94,14 +94,14 @@ QImage ImageWidget::scaleImage(const QImage &image, const double &scaleFactor, c
 void ImageWidget::updateImage(bool FitToSize, const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor)
 {
     // in case of fit to parent widget, we calculate concurrently if possible
-    if((FitToSize) || (qAbs(scaleFactor-1) > 0.1)) {
+    if((FitToSize) || (qAbs(scaleFactor-1) > 0.01)) {
 #ifndef QT_NO_CONCURRENT
         QFuture<QImage> future = QtConcurrent::run(this, &ImageWidget::scaleImage, image, scaleFactor, FitToSize);
         imageNew = future.result();
 #else
         imageNew = scaleImage(image, scalefactor, FitToSize);
 #endif
-    // no fit to parent widget, just take the pointer
+    // no scaling, just take the pointer
     } else {
         imageNew = image;
     }
