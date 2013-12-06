@@ -39,11 +39,12 @@ class ImageWidget : public QWidget
 public:
     ImageWidget(QWidget *parent = 0);
     ~ImageWidget(){}
-    void updateImage(bool zoom, const QImage &image, bool valuesPresent[], int values[]);
-    QImage scaleImage(const QImage &image);
+    void updateImage(bool fitToSize, const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor);
+    QImage scaleImage(const QImage &image, const double &scaleFactor, bool const &FitToSize);
 
 protected:
     void paintEvent(QPaintEvent *event);
+    void resizeEvent(QResizeEvent *event);
 
 private slots:
 

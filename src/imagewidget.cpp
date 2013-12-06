@@ -54,6 +54,9 @@ void ImageWidget::paintEvent(QPaintEvent * event)
 
     painter.drawImage(imageOffset,imageNew);
 
+       painter.setPen(Qt::red);
+       painter.drawRoundedRect(0,0,this->rect().width()-1, this->rect().height()-1, 10.0, 10.0);
+
     for(int i=0; i<2; i++) {
         if(i==0) painter.setPen( QPen( Qt::white )); else painter.setPen( QPen( Qt::black ));
         if(!drawValues[0]) return;
@@ -73,25 +76,32 @@ void ImageWidget::paintEvent(QPaintEvent * event)
             else painter.drawRect(geoValues[0] -geoValues[2]/2 - 1, geoValues[1]-geoValues[3]/2 - 1, geoValues[2] + 2, geoValues[3] + 2);
         }
     }
-
 }
 
-QImage ImageWidget::scaleImage(const QImage &image) {
-    return image.scaled(this->size(), Qt::KeepAspectRatio, Qt::FastTransformation); // Qt::SmoothTransformation);
-}
-
-void ImageWidget::updateImage(bool zoom, const QImage &image, bool valuesPresent[], int values[])
+void ImageWidget::resizeEvent(QResizeEvent *e)
 {
-    if(zoom) {
-        imageNew = scaleImage(image);
-        if(imageNew.isNull()) return;
 
+}
+
+QImage ImageWidget::scaleImage(const QImage &image, const double &scaleFactor, const bool &FitToSize) {
+    if(FitToSize) {
+        return image.scaled(this->size(), Qt::KeepAspectRatio, Qt::FastTransformation);
+     } else {
+        return image.scaled(image.size() * scaleFactor, Qt::KeepAspectRatio, Qt::FastTransformation);
+    }
+}
+
+void ImageWidget::updateImage(bool FitToSize, const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor)
+{
+    // in case of fit to parent widget, we calculate concurrently if possible
+    if((FitToSize) || (qAbs(scaleFactor-1) > 0.1)) {
 #ifndef QT_NO_CONCURRENT
-        QFuture<QImage> future = QtConcurrent::run(this, &ImageWidget::scaleImage, image);
+        QFuture<QImage> future = QtConcurrent::run(this, &ImageWidget::scaleImage, image, scaleFactor, FitToSize);
         imageNew = future.result();
 #else
-        imageNew = scaleImage(image);
+        imageNew = scaleImage(image, scalefactor, FitToSize);
 #endif
+    // no fit to parent widget, just take the pointer
     } else {
         imageNew = image;
     }

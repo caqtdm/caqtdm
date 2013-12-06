@@ -33,7 +33,6 @@
 
 caCamera::caCamera(QWidget *parent) : QWidget(parent)
 {
-    m_forcemonochrome = false;
     m_init = true;
 
     m_codeDefined = false;
@@ -54,45 +53,46 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
 
     for(int i=0; i<ColormapSize; i++) ColorMap[i] = qRgb(i,i,i);
 
-    hbox = (QHBoxLayout*) 0;
-    labelMin = (QLineEdit*) 0;
-    labelMax = (QLineEdit*) 0;
-    imageW = (ImageWidget*) 0;
-    autoW = (QCheckBox *) 0;
-    intensity = (caLabel*) 0;
+    scrollArea = (QScrollArea *) 0;
 
-    vbox = new QGridLayout(this);
-    vbox->setMargin(0);
-    vbox->setSpacing(0);
-    setLayout(vbox);
+    mainLayout = new QGridLayout(this);
+    mainLayout->setMargin(0);
+    mainLayout->setSpacing(0);
+    setLayout(mainLayout);
 
-    setup(true);
+    setup();
 
     buttonPressed = false;
     installEventFilter(this);
+
+    scaleFactor = 1.0;
 }
 
 caCamera::~caCamera()
 {
     if(image != (QImage *) 0) delete image;
 
-    if(hbox != (QHBoxLayout*) 0) {
-        delete labelMinText;
-        delete labelMin;
-        delete labelMaxText;
-        delete labelMax;
-        delete checkAutoText;
-        delete autoW;
-        delete intensity;
-        delete intensityText;
+    delete valuesLayout;
+    delete labelMinText;
+    delete labelMin;
+    delete labelMaxText;
+    delete labelMax;
+    delete checkAutoText;
+    delete autoW;
+    delete intensity;
+    delete intensityText;
 
-        delete hbox;
-        delete window;
-        delete imageW;
-        delete vbox;
-    }
+    delete zoomSliderLayout;
+    delete zoomSlider;
+    delete zoomValue;
+    delete zoomInIcon;
+    delete zoomOutIcon;
+
+    delete imageW;
+    delete valuesWidget;
+    delete scrollArea;
+    delete zoomWidget;
 }
-
 
 bool caCamera::eventFilter(QObject *obj, QEvent *event)
 {
@@ -104,6 +104,8 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
             buttonPressed = true;
             Xpos = mouseEvent->pos().x();
             Ypos = mouseEvent->pos().y();
+            Ypos = Ypos - valuesWidget->height();
+
             QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
         }
     }
@@ -118,10 +120,7 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
         QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
         Xpos = mouseEvent->pos().x();
         Ypos = mouseEvent->pos().y();
-
-        if(window != (QWidget*) 0) {
-            Ypos = Ypos - window->height();
-        }
+        Ypos = Ypos - valuesWidget->height();
     }
 
     if(buttonPressed && (savedData != (char*) 0)) {
@@ -136,19 +135,16 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
         double Xmax = qMin(savedWidth,  imageW->width());
         double Ymax = qMin(savedHeight,  imageW->height());
 
-        if(window != (QWidget*) 0) {
-            Ymax = qMin(savedHeight,  imageW->height() - window->height());
-        } else {
-            Ymax = qMin(savedHeight,  imageW->height());
-        }
-
-        if(thisZoom) {
+        if(thisFitToSize) {
             Xnew =(int)  (Xpos / Correction);
             Ynew =(int)  (Ypos / Correction);
             Xmax = imageW->width() / Correction;
             Ymax = imageW->height() / Correction;
             Xmax = qMin(savedWidth,  (int) Xmax);
             Ymax = qMin(savedHeight,  (int) Ymax);
+        } else {
+            Xnew = Xnew + scrollArea->horizontalScrollBar()->value();
+            Ynew = Ynew + scrollArea->verticalScrollBar()->value();
         }
 
         // find intensity
@@ -210,21 +206,21 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
             switch (m_bpp) {
 
             case 3: // 3 bpp, each byte with r,g,b
-                 {
-                    QSize resultSize;
-                    resultSize.setWidth((int) savedWidth);
-                    resultSize.setHeight((int) savedHeight);
-                    uchar *ptr = (uchar*) savedData;
-                    int index = Ynew * savedWidth*3 + 3*Xnew;
-                    if((Xnew >=0) && (Ynew >=0) &&  (Xnew < Xmax) && (Ynew < Ymax) && ((index+2) < savedSize)) {
-                        if(thisColormap != grey)
-                           Zvalue = 2.2 * ( 0.2989 * ptr[index] +  0.5870 * ptr[index+1] + 0.1140 * ptr[index+2]);
-                        else
-                           Zvalue = ( 0.2989 * ptr[index] +  0.5870 * ptr[index+1] + 0.1140 * ptr[index+2]);
-                    } else {
-                        validIntensity = false;
-                    }
-                  }
+            {
+                QSize resultSize;
+                resultSize.setWidth((int) savedWidth);
+                resultSize.setHeight((int) savedHeight);
+                uchar *ptr = (uchar*) savedData;
+                int index = Ynew * savedWidth*3 + 3*Xnew;
+                if((Xnew >=0) && (Ynew >=0) &&  (Xnew < Xmax) && (Ynew < Ymax) && ((index+2) < savedSize)) {
+                    if(thisColormap != grey)
+                        Zvalue = 2.2 * ( 0.2989 * ptr[index] +  0.5870 * ptr[index+1] + 0.1140 * ptr[index+2]);
+                    else
+                        Zvalue = ( 0.2989 * ptr[index] +  0.5870 * ptr[index+1] + 0.1140 * ptr[index+2]);
+                } else {
+                    validIntensity = false;
+                }
+            }
 
                 break;
 
@@ -246,26 +242,27 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
         } else {
             updateIntensity("invalid");
         }
-
-
     }
-
-
-
-  return false;
+    return false;
 }
 
-void caCamera::setup(bool interaction)
+void caCamera::setup()
 {
-    if(hbox != (QHBoxLayout*) 0) {
-        hbox->removeWidget(labelMaxText);
-        hbox->removeWidget(labelMax);
-        hbox->removeWidget(labelMinText);
-        hbox->removeWidget(labelMin);
-        hbox->removeWidget(checkAutoText);
-        hbox->removeWidget(autoW);
-        hbox->removeWidget(intensity);
-        hbox->removeWidget(intensityText);
+    if(image != (QImage *) 0) delete image;
+
+    // assume everything was setup when valueslayout exists
+
+    if(scrollArea != (QScrollArea *) 0) {
+
+        valuesLayout->removeWidget(labelMaxText);
+        valuesLayout->removeWidget(labelMax);
+        valuesLayout->removeWidget(labelMinText);
+        valuesLayout->removeWidget(labelMin);
+        valuesLayout->removeWidget(checkAutoText);
+        valuesLayout->removeWidget(autoW);
+        valuesLayout->removeWidget(intensity);
+        valuesLayout->removeWidget(intensityText);
+        delete valuesLayout;
 
         delete labelMinText;
         delete labelMin;
@@ -278,103 +275,183 @@ void caCamera::setup(bool interaction)
 
         autoW = (QCheckBox *) 0;
 
-        delete hbox;
-        hbox = (QHBoxLayout*) 0;
+        zoomSliderLayout->removeWidget(zoomInIcon);
+        zoomSliderLayout->removeWidget(zoomSlider);
+        zoomSliderLayout->removeWidget(zoomOutIcon);
+        zoomSliderLayout->removeWidget(zoomValue);
+        delete zoomInIcon;
+        delete zoomSlider;
+        delete zoomOutIcon;
+        delete zoomValue;
+        delete zoomSliderLayout;
 
-        vbox->removeWidget(window);
-        delete window;
-    }
+        mainLayout->removeWidget(valuesWidget);
+        mainLayout->removeWidget(scrollArea);
+        mainLayout->removeWidget(zoomWidget);
 
-    if(imageW != (ImageWidget*) 0) {
-        vbox->removeWidget(imageW);
         delete imageW;
+        delete valuesWidget;
+        delete scrollArea;
+        delete zoomWidget;
     }
 
-    if(interaction) {
+    // labels and texts for horizontal layout containing information of the image
+    // image inside a scrollarea
+    // zoom utilities
 
-        hbox = new QHBoxLayout();
-        hbox->setMargin(0);
-        hbox->setSpacing(2);
+    // labels
+    labelMaxText = new caLabel(this);
+    labelMaxText->setText(" Max: ");
+    labelMinText = new caLabel(this);
+    labelMinText->setText(" Min: ");
+    checkAutoText = new caLabel(this);
+    checkAutoText->setText(" Auto: ");
+    intensityText = new caLabel(this);
+    intensityText->setText(" x/y/z: ");
 
-        window = new QWidget;
+    // texts
+    labelMax = new QLineEdit(this);
+    labelMin = new QLineEdit(this);
+    intensity = new caLabel(this);
 
-        // labels
-        labelMaxText = new caLabel(this);
-        labelMaxText->setText(" Max: ");
-        labelMinText = new caLabel(this);
-        labelMinText->setText(" Min: ");
-        checkAutoText = new caLabel(this);
-        checkAutoText->setText(" Auto: ");
-        intensityText = new caLabel(this);
-        intensityText->setText(" x/y/z: ");
+    // width, resize mode, font, color
+    labelMax->setFixedWidth(60);
+    labelMin->setFixedWidth(60);
+    labelMaxText->setFixedWidth(40);
+    labelMinText->setFixedWidth(40);
+    checkAutoText->setFixedWidth(60);
+    intensity->setFixedWidth(150);
+    intensity->setAlignment(Qt::AlignVCenter | Qt::AlignLeft );
+    labelMaxText->setScaleMode(caLabel::None);
+    labelMinText->setScaleMode(caLabel::None);
+    checkAutoText->setScaleMode(caLabel::None);
+    intensity->setScaleMode(caLabel::None);
+    intensityText->setScaleMode(caLabel::None);
+    QFont font = labelMaxText->font();
+    font.setPointSize(10);
+    labelMaxText->setFont(font);
+    labelMinText->setFont(font);
+    checkAutoText->setFont(font);
+    intensity->setFont(font);
+    intensityText->setFont(font);
+    labelMaxText->setBackground(QColor(0,0,0,0));
+    labelMinText->setBackground(QColor(0,0,0,0));
+    checkAutoText->setBackground(QColor(0,0,0,0));
+    intensity->setBackground(QColor(0,0,0,0));
+    intensityText->setBackground(QColor(0,0,0,0));
 
-        // texts
-        labelMax = new QLineEdit(this);
-        labelMin = new QLineEdit(this);
-        intensity = new caLabel(this);
+    // checkbox
+    autoW = new QCheckBox(this);
+    autoW->setChecked(true);
 
-        // image
-        imageW   = new ImageWidget(this);
+    // add everything to layout
+    valuesLayout = new QHBoxLayout();
+    valuesLayout->setMargin(0);
+    valuesLayout->setSpacing(2);
+    valuesLayout->addWidget(labelMinText, Qt::AlignLeft);
+    valuesLayout->addWidget(labelMin, Qt::AlignLeft);
+    valuesLayout->addWidget(labelMaxText, Qt::AlignLeft);
+    valuesLayout->addWidget(labelMax, Qt::AlignLeft);
+    valuesLayout->addWidget(checkAutoText, Qt::AlignLeft);
+    valuesLayout->addWidget(autoW,    Qt::AlignLeft);
+    valuesLayout->addWidget(intensityText, Qt::AlignLeft);
+    valuesLayout->addWidget(intensity, Qt::AlignLeft);
+    valuesLayout->addStretch(2);
 
-        // width, resize mode, font, color
-        labelMax->setFixedWidth(60);
-        labelMin->setFixedWidth(60);
-        labelMaxText->setFixedWidth(40);
-        labelMinText->setFixedWidth(40);
-        checkAutoText->setFixedWidth(60);
-        intensity->setFixedWidth(150);
-        intensity->setAlignment(Qt::AlignVCenter | Qt::AlignLeft );
-        labelMaxText->setScaleMode(caLabel::None);
-        labelMinText->setScaleMode(caLabel::None);
-        checkAutoText->setScaleMode(caLabel::None);
-        intensity->setScaleMode(caLabel::None);
-        intensityText->setScaleMode(caLabel::None);
-        QFont font = labelMaxText->font();
-        font.setPointSize(10);
-        labelMaxText->setFont(font);
-        labelMinText->setFont(font);
-        checkAutoText->setFont(font);
-        intensity->setFont(font);
-        intensityText->setFont(font);
-        labelMaxText->setBackground(QColor(0,0,0,0));
-        labelMinText->setBackground(QColor(0,0,0,0));
-        checkAutoText->setBackground(QColor(0,0,0,0));
-        intensity->setBackground(QColor(0,0,0,0));
-        intensityText->setBackground(QColor(0,0,0,0));
+    valuesWidget = new QWidget;
+    valuesWidget->setLayout(valuesLayout);
+    valuesWidget->show();
 
-        // checkbox
-        autoW = new QCheckBox(this);
-        autoW->setChecked(true);
+    // image inside a scrollarea
+    imageW   = new ImageWidget();
+    scrollArea = new QScrollArea;
+    scrollArea->setBackgroundRole(QPalette::Dark);
+    scrollArea->setWidget(imageW);
+    scrollArea->setWidgetResizable(true);
 
-        // add everything
-        hbox->addWidget(labelMinText, Qt::AlignLeft);
-        hbox->addWidget(labelMin, Qt::AlignLeft);
-        hbox->addWidget(labelMaxText, Qt::AlignLeft);
-        hbox->addWidget(labelMax, Qt::AlignLeft);
-        hbox->addWidget(checkAutoText, Qt::AlignLeft);
-        hbox->addWidget(autoW,    Qt::AlignLeft);
-        hbox->addWidget(intensityText, Qt::AlignLeft);
-        hbox->addWidget(intensity, Qt::AlignLeft);
-        hbox->addStretch(2);
+    // add some zoom utilities to our widget
+    int iconsize = style()->pixelMetric(QStyle::PM_ToolBarIconSize);
+    QSize iconSize(iconsize, iconsize);
 
-        window->setLayout(hbox);
-        window->show();
+    zoomInIcon = new QToolButton;
+    zoomInIcon->setIcon(QPixmap(":pixmaps/zoomin.png"));
+    zoomInIcon->setIconSize(iconSize);
 
-        vbox->addWidget(window, 0, 0);
-        vbox->addWidget(imageW, 1, 0);
+    zoomOutIcon = new QToolButton;
+    zoomOutIcon->setIcon(QPixmap(":pixmaps/zoomout.png"));
+    zoomOutIcon->setIconSize(iconSize);
 
-    } else {
+    zoomSlider = new QSlider;
+    zoomSlider->setMinimum(0);
+    zoomSlider->setMaximum(104);
+    zoomSlider->setValue(52);
+    zoomSlider->setTickPosition(QSlider::NoTicks);
 
-        // image
-        imageW = new ImageWidget(this);
-        vbox->addWidget(imageW, 0, 0);
-    }
+    zoomValue = new QLabel("");
+    zoomValue->setFixedWidth(60);
+
+    // add everything to layout
+    zoomSliderLayout = new QVBoxLayout();
+    zoomSliderLayout->addWidget(zoomInIcon);
+    zoomSliderLayout->addWidget(zoomSlider);
+    zoomSliderLayout->addWidget(zoomOutIcon);
+    zoomSliderLayout->addWidget(zoomValue);
+
+    zoomWidget = new QWidget;
+    zoomWidget->setLayout(zoomSliderLayout);
+
+    // connect buttons and slider
+    connect(zoomInIcon, SIGNAL(clicked()), this, SLOT(zoomIn()));
+    connect(zoomOutIcon, SIGNAL(clicked()), this, SLOT(zoomOut()));
+    connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomNow()));
+
+    // add everything to main layout
+    mainLayout->addWidget(valuesWidget, 0, 0);
+    mainLayout->addWidget(scrollArea, 1, 0);
+    mainLayout->addWidget(zoomWidget, 1, 1);
 
     for(int i=0; i<4; i++) valuesPresent[i] = false;
+}
 
+void caCamera::zoomNow()
+{
+    double scale = qPow(2.0, ((double) zoomSlider->value() - 52.0) / 13.0);
+    zoomValue->setText(QString::number(scale, 'f', 2));
+    scaleFactor = scale;
+    setFitToSize(No);
+
+    // force resize
     QResizeEvent *re = new QResizeEvent(size(), size());
     resizeEvent(re);
     delete re;
+}
+
+void caCamera::zoomIn(int level)
+{
+    zoomSlider->setValue(zoomSlider->value() + level);
+}
+
+void caCamera::zoomOut(int level)
+{
+    zoomSlider->setValue(zoomSlider->value() - level);
+}
+
+void caCamera::setFitToSize(zoom const &z)
+{
+    thisFitToSize = z;
+    if(!thisFitToSize) {
+        scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    } else {
+        scaleFactor = 1.0;
+        zoomSlider->setValue(52);
+        scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff );
+        scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    }
+
+    // force resize
+    QResizeEvent *re = new QResizeEvent(size(), size());
+    resizeEvent(re);
 }
 
 bool caCamera::getInitialAutomatic()
@@ -431,21 +508,19 @@ void caCamera::setColormap(colormap const &map)
     switch (map) {
     case Default:
         for(int i=0; i<ColormapSize; i++) ColorMap[i] = qRgb(i,i,i);
-        setup(true);
         break;
     case grey:
         for(int i=0; i<ColormapSize; i++) ColorMap[i] = qRgb(i,i,i);
-         setup(true);
         break;
     case spectrum:
         for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = rgbFromWaveLength(380.0 + (i * 400.0 / ColormapSize));
-        setup(true);
         break;
     default:
         for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = rgbFromWaveLength(380.0 + (i * 400.0 / ColormapSize));
-        setup(true);
         break;
     }
+
+    setup();
 }
 
 void caCamera::setCode(int code)
@@ -472,13 +547,19 @@ void caCamera::setHeight(int height)
 
 void caCamera::resizeEvent(QResizeEvent *e)
 {
-    imageW->setFixedWidth(e->size().width());
-    imageW->setFixedHeight(e->size().height());
+    imageW->setFixedWidth(e->size().width() - zoomWidget->width()-4);
+    imageW->setFixedHeight(e->size().height()- valuesWidget->height()-4);
+
+    if(m_widthDefined && m_heightDefined) {
+        if(!thisFitToSize) {
+            imageW->setMinimumSize(m_width * scaleFactor, m_height * scaleFactor);
+        }
+    }
 }
 
-void caCamera::updateImage(const QImage &image, bool valuesPresent[], int values[])
+void caCamera::updateImage(const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor)
 {
-    imageW->updateImage(thisZoom, image, valuesPresent, values);
+    imageW->updateImage(thisFitToSize, image, valuesPresent, values, scaleFactor);
 }
 
 bool caCamera::getAutomateChecked()
@@ -551,6 +632,10 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
         minvalue = 0;
         maxvalue = 0xFFFFFFFF;
         ftime(&timeRef);
+
+        // force resize
+        QResizeEvent *re = new QResizeEvent(size(), size());
+        resizeEvent(re);
     }
 
     savedData = data;
@@ -605,7 +690,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
                 }
             }
         }
-        break;
+            break;
 
         case 2: {  // monochrome 2 bpp, but use only first byte of words (Damir cameras)
 
@@ -644,7 +729,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
                 }
             }
         }
-        break;
+            break;
 
         case 3: {   // monochrome 2 bpp, but used only 12 bits  (Helge cameras)
 
@@ -684,7 +769,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
 
                         indx1=indx * 255 /(maxvalue - minvalue);
 
-						if(indx1 > 255) indx1 = 255;
+                        if(indx1 > 255) indx1 = 255;
                         *scanLine++ = qRgb(indx1,indx1,indx1);
 
                     }
@@ -692,14 +777,14 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
                 }
             }
         }
-        break;
+            break;
 
         default:
             break;
         } // end switch bpp
 
-		break;
-	}
+        break;
+    }
         // color rgb image
     case 3:
 
@@ -778,7 +863,7 @@ void caCamera::showImage(int datasize, char *data)
     image = showImageCalc(datasize, data);
 #endif
 
-    if(image != (QImage *) 0) updateImage(*image, valuesPresent, values);
+    if(image != (QImage *) 0) updateImage(*image, valuesPresent, values, scaleFactor);
 
     if(getAutomateChecked()) {
         updateMax(maxvalue);
@@ -792,7 +877,6 @@ void caCamera::showImage(int datasize, char *data)
         }
     }
 }
-
 
 uint caCamera::rgbFromWaveLength(double wave)
 {

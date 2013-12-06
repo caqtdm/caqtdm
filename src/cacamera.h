@@ -28,10 +28,14 @@
 
 #include <QPixmap>
 #include <QWidget>
+#include <QResizeEvent>
 #include <QSize>
 #include <caLabel>
 #include <QCheckBox>
+#include <QScrollArea>
 #include <QFormLayout>
+#include <QSlider>
+#include <QToolButton>
 #include <qtcontrols_global.h>
 #include <imagewidget.h>
 #include <calabel.h>
@@ -47,7 +51,7 @@ class QTCON_EXPORT caCamera : public QWidget
     Q_PROPERTY(QString channelHeight READ getPV_Height WRITE setPV_Height)
     Q_PROPERTY(QString channelCode READ getPV_Code WRITE setPV_Code)
     Q_PROPERTY(QString channelBPP READ getPV_BPP WRITE setPV_BPP)
-    Q_PROPERTY(zoom Zoom READ getZoom WRITE setZoom)
+    Q_PROPERTY(zoom Zoom READ getFitToSize WRITE setFitToSize)
     Q_PROPERTY(colormap ColorMap READ getColormap WRITE setColormap)
     Q_PROPERTY(bool automaticLevels READ getInitialAutomatic WRITE setInitialAutomatic)
     Q_PROPERTY(QString minLevel READ getMinLevel WRITE setMinLevel)
@@ -65,7 +69,7 @@ public:
     caCamera(QWidget *parent = 0);
     ~caCamera();
 
-    void updateImage(const QImage &image, bool valuesPresent[], int values[]);
+    void updateImage(const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor);
     QImage * showImageCalc(int datasize, char *data);
     void showImage(int datasize, char *data);
     uint rgbFromWaveLength(double wave);
@@ -87,8 +91,8 @@ public:
     colormap getColormap() const {return thisColormap;}
     void setColormap(colormap const &map);
 
-    zoom getZoom () const {return thisZoom;}
-    void setZoom(zoom const &z) {thisZoom = z;}
+    zoom getFitToSize () const {return thisFitToSize;}
+    void setFitToSize(zoom const &z);
 
     bool getInitialAutomatic();
     void setInitialAutomatic(bool automatic);
@@ -111,8 +115,13 @@ public:
     int getMin();
     int getMax();
     bool getAutomateChecked();
-    void setup(bool interaction);
+    void setup();
     void dataProcessing(int value, int id);
+
+private slots:
+    void zoomIn(int level = 1);
+    void zoomOut(int level = 1);
+    void zoomNow();
 
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -121,12 +130,12 @@ private:
 
     bool eventFilter(QObject *obj, QEvent *event);
     bool buttonPressed, validIntensity;
-    bool m_zoom, m_forcemonochrome;
+    bool forcemonochrome;
     QString thisPV_Data, thisPV_Width, thisPV_Height, thisPV_Code, thisPV_BPP;
     QStringList thisDataProcPV;
     QString thisMinLevel, thisMaxLevel;
     colormap thisColormap;
-    zoom thisZoom;
+    zoom thisFitToSize;
     QImage *image;
 
     int Xpos, Ypos, Xnew, Ynew, Zvalue;
@@ -138,7 +147,7 @@ private:
     bool m_bppDefined;
     bool m_widthDefined;
     bool m_heightDefined;
-    int m_code, m_bpp, m_width, m_height;
+    int  m_code, m_bpp, m_width, m_height;
 
     int frameCount;
     struct timeb timeRef, timeR;
@@ -149,8 +158,10 @@ private:
 
     uint minvalue, maxvalue;
 
-    QHBoxLayout  *hbox;
-    QGridLayout  *vbox;
+    QHBoxLayout  *valuesLayout;
+    QGridLayout  *mainLayout;
+    QVBoxLayout  *zoomSliderLayout;
+
     QLineEdit *labelMin;
     QLineEdit *labelMax;
     caLabel *intensity;
@@ -160,9 +171,19 @@ private:
     caLabel *labelMinText;
     caLabel *intensityText;
     caLabel *checkAutoText;
-    QWidget *window;
     bool valuesPresent[4];
     int  values[4];
+
+    QScrollArea *scrollArea;
+    QWidget *valuesWidget;
+    QWidget *zoomWidget;
+    QSlider *zoomSlider;
+    QLabel *zoomValue;
+    QToolButton *zoomInIcon;
+    QToolButton *zoomOutIcon;
+
+    double scaleFactor;
+
 };
 
 #endif
