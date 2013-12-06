@@ -46,8 +46,13 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
 
     xminLineEdit = new QLineEdit("");
     xmaxLineEdit = new QLineEdit("");
+#if QWT_VERSION < 0x060100
     double Xmin = CartesianPlot->axisScaleDiv(caCartesianPlot::xBottom)->lowerBound();
     double Xmax = CartesianPlot->axisScaleDiv(caCartesianPlot::xBottom)->upperBound();
+#else
+    double Xmin = CartesianPlot->axisScaleDiv(caCartesianPlot::xBottom).lowerBound();
+    double Xmax = CartesianPlot->axisScaleDiv(caCartesianPlot::xBottom).upperBound();
+#endif
     xminLineEdit->setText(QString::number(Xmin, 'g'));
     xmaxLineEdit->setText(QString::number(Xmax, 'g'));
 
@@ -76,8 +81,13 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
 
     yminLineEdit = new QLineEdit("");
     ymaxLineEdit = new QLineEdit("");
+#if QWT_VERSION < 0x060100
     double Ymin = CartesianPlot->axisScaleDiv(caCartesianPlot::yLeft)->lowerBound();
     double Ymax = CartesianPlot->axisScaleDiv(caCartesianPlot::yLeft)->upperBound();
+#else
+    double Ymin = CartesianPlot->axisScaleDiv(caCartesianPlot::yLeft).lowerBound();
+    double Ymax = CartesianPlot->axisScaleDiv(caCartesianPlot::yLeft).upperBound();
+#endif
     yminLineEdit->setText(QString::number(Ymin, 'g'));
     ymaxLineEdit->setText(QString::number(Ymax, 'g'));
 
