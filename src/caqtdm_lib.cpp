@@ -3230,7 +3230,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         Q_UNUSED(widget);
     } else if(caCamera * widget = qobject_cast< caCamera *>(w)) {
         Q_UNUSED(widget);
-        myMenu.addAction("Toggle Zoom");
+        myMenu.addAction("Toggle fit to size");
         myMenu.addAction("Set Spectrum");
         myMenu.addAction("Set Greyscale");
         myMenu.addAction("Get Info");
@@ -3279,10 +3279,10 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             mainWindow->showNormal();
             messageWindow->raise();
 
-        } else  if(selectedItem->text().contains("Toggle Zoom")) {
+        } else  if(selectedItem->text().contains("Toggle fit to size")) {
             if(caCamera * widget = qobject_cast< caCamera *>(w)) {
-                if(widget->getZoom() == caCamera::Yes) widget->setZoom(caCamera::No);
-                else widget->setZoom(caCamera::Yes);
+                if(widget->getFitToSize() == caCamera::Yes) widget->setFitToSize(caCamera::No);
+                else widget->setFitToSize(caCamera::Yes);
             }
 
         } else  if(selectedItem->text().contains("Set Spectrum")) {
@@ -3477,9 +3477,45 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             }
 
          } else if(selectedItem->text().contains("Reset zoom")) {
-             if(caCartesianPlot* widget = qobject_cast<caCartesianPlot *>(w)) {
-                 widget->resetZoom();
-             }
+            if(caCartesianPlot* widget = qobject_cast<caCartesianPlot *>(w)) {
+                widget->resetZoom();
+
+                /*************************************************/
+                // oops, case of axis defines by channel forgotten
+                if(widget->getXscaling() == caCartesianPlot::Channel) {
+
+                    QString pvs =widget->getPV(0);
+                    QStringList vars = pvs.split(";");
+                    if((vars.size()== 2) || (vars.at(1).trimmed().length() > 0)) {
+                        knobData *kPtr =  mutexKnobData->getMutexKnobDataPV(vars.at(0).trimmed());
+                        if(kPtr != (knobData*) 0) {
+                            if(kPtr->edata.lower_disp_limit != kPtr->edata.upper_disp_limit) {
+                                widget->setScaleX(kPtr->edata.lower_disp_limit, kPtr->edata.upper_disp_limit);
+                            } else {
+                                widget->setXscaling(caCartesianPlot::Auto);
+                            }
+                        }
+                    }
+                }
+                if(widget->getYscaling() == caCartesianPlot::Channel) {
+                    /*************************************************/
+                    // oops, case of axis defines by channel forgotten
+                    QString pvs =widget->getPV(0);
+                    QStringList vars = pvs.split(";");
+                    if((vars.size()== 2) || (vars.at(1).trimmed().length() > 0)) {
+                        knobData *kPtr =  mutexKnobData->getMutexKnobDataPV(vars.at(1).trimmed());
+                        if(kPtr != (knobData*) 0) {
+                            if(kPtr->edata.lower_disp_limit != kPtr->edata.upper_disp_limit) {
+                                widget->setScaleY(kPtr->edata.lower_disp_limit, kPtr->edata.upper_disp_limit);
+                            } else {
+                                widget->setYscaling(caCartesianPlot::Auto);
+                            }
+                        }
+                    }
+
+                }
+                /*************************************************/
+            }
 
         } else if(selectedItem->text().contains("Modify")) {
             if(caSlider* widget = qobject_cast<caSlider *>(w)) {
