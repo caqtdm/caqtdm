@@ -23,9 +23,13 @@
  *    anton.mezger@psi.ch
  */
 
-#include <qlayout.h>
-#include <qsizepolicy.h>
-#include <qpixmap.h>
+
+#include <QSizePolicy>
+#include <QPixmap>
+#include <QBitmap>
+#include <QPainter>
+#include <QLabel>
+#include <QWidget>
 #include "splashscreen.h"
 #include <QStyleOptionProgressBarV2>
 
@@ -36,6 +40,8 @@ SplashScreen::SplashScreen(QWidget *parent) : QSplashScreen(parent), m_progress(
     m_maximum = 100;
     pixmap.load(":caQtDM.png");
     this->setPixmap(pixmap);
+    //this->setMask(pixmap.mask());
+
     this->setCursor(Qt::BusyCursor);
     this->showMessage("loading include ui files", Qt::AlignBottom, QColor("white"));
     this->resize(pixmap.size().width()+200, pixmap.size().height()+100);
@@ -49,6 +55,7 @@ void SplashScreen::setMaximum(int max)
 void SplashScreen::drawContents(QPainter *painter)
     {
       QSplashScreen::drawContents(painter);
+
       QStyleOptionProgressBarV2 pbstyle;
       pbstyle.initFrom(this);
       pbstyle.state = QStyle::State_Enabled;
@@ -61,5 +68,4 @@ void SplashScreen::drawContents(QPainter *painter)
       pbstyle.textVisible = true;
       pbstyle.rect = QRect(0, pixmap.size().height()+50, pixmap.size().width()+200, 25);
       style()->drawControl(QStyle::CE_ProgressBar, &pbstyle, painter, this);
-
 }
