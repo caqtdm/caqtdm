@@ -70,7 +70,10 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
 
 caCamera::~caCamera()
 {
-    if(image != (QImage *) 0) delete image;
+    if(image != (QImage *) 0) {
+        printf("delete image 2\n");
+        delete image;
+    }
 
     delete valuesLayout;
     delete labelMinText;
@@ -248,52 +251,6 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
 
 void caCamera::setup()
 {
-    if(image != (QImage *) 0) delete image;
-
-    // assume everything was setup when valueslayout exists
-
-    if(scrollArea != (QScrollArea *) 0) {
-
-        valuesLayout->removeWidget(labelMaxText);
-        valuesLayout->removeWidget(labelMax);
-        valuesLayout->removeWidget(labelMinText);
-        valuesLayout->removeWidget(labelMin);
-        valuesLayout->removeWidget(checkAutoText);
-        valuesLayout->removeWidget(autoW);
-        valuesLayout->removeWidget(intensity);
-        valuesLayout->removeWidget(intensityText);
-        delete valuesLayout;
-
-        delete labelMinText;
-        delete labelMin;
-        delete labelMaxText;
-        delete labelMax;
-        delete checkAutoText;
-        delete autoW;
-        delete intensity;
-        delete intensityText;
-
-        autoW = (QCheckBox *) 0;
-
-        zoomSliderLayout->removeWidget(zoomInIcon);
-        zoomSliderLayout->removeWidget(zoomSlider);
-        zoomSliderLayout->removeWidget(zoomOutIcon);
-        zoomSliderLayout->removeWidget(zoomValue);
-        delete zoomInIcon;
-        delete zoomSlider;
-        delete zoomOutIcon;
-        delete zoomValue;
-        delete zoomSliderLayout;
-
-        mainLayout->removeWidget(valuesWidget);
-        mainLayout->removeWidget(scrollArea);
-        mainLayout->removeWidget(zoomWidget);
-
-        delete imageW;
-        delete valuesWidget;
-        delete scrollArea;
-        delete zoomWidget;
-    }
 
     // labels and texts for horizontal layout containing information of the image
     // image inside a scrollarea
@@ -522,8 +479,6 @@ void caCamera::setColormap(colormap const &map)
         for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = rgbFromWaveLength(380.0 + (i * 400.0 / ColormapSize));
         break;
     }
-
-    setup();
 }
 
 void caCamera::setCode(int code)
@@ -628,7 +583,11 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
         savedWidth = m_width;
         savedHeight = m_height;
 
-        if(image != (QImage *) 0) delete image;
+        if(image != (QImage *) 0) {
+            printf("delete image 1\n");
+            delete image;
+        }
+        printf("create image\n");
         image = new QImage(resultSize, QImage::Format_RGB32);
 
         m_init = false;
