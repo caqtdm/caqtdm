@@ -236,8 +236,10 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
     fillPVtable(countPV, countNotConnected, countDisplayed);
 
     highCount = mutexKnobData->getHighestCountPV(highPV);
-    sprintf(asc, "%s - PV=%d (%d NC), %d Monitors/s, %d Displays/s, highest=%s with %.1f Monitors/s ", asc, countPV, countNotConnected,
+    if(highCount != 0.0) {
+        sprintf(asc, "%s - PV=%d (%d NC), %d Monitors/s, %d Displays/s, highest=%s with %.1f Monitors/s ", asc, countPV, countNotConnected,
                   mutexKnobData->getMonitorsPerSecond(), mutexKnobData->getDisplaysPerSecond(), highPV.toAscii().constData(), highCount);
+    }
     statusBar()->showMessage(asc);
 
     // we wanted a print, do it when acquired, then exit
