@@ -49,6 +49,7 @@ MutexKnobData::MutexKnobData()
     }
 
     nbMonitorsPerSecond = 0;
+    nbDisplayCountPerSecond = 0;
     nbMonitors = 0;
     displayCount = 0;
     highestCount = 0;
@@ -427,8 +428,12 @@ float MutexKnobData::getHighestCountPV(QString &pv)
 {
     QMutexLocker locker(&mutex);
 
-    pv = KnobData[highestIndexPV].pv;
-    return highestCountPerSecond;
+    if(KnobData[highestIndexPV].index != -1) {
+        pv = KnobData[highestIndexPV].pv;
+        return highestCountPerSecond;
+    } else {
+        return 0.0;
+    }
 }
 
 void MutexKnobData::initHighestCountPV()
