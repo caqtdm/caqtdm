@@ -71,7 +71,6 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
 caCamera::~caCamera()
 {
     if(image != (QImage *) 0) {
-        printf("delete image 2\n");
         delete image;
     }
 
@@ -340,7 +339,7 @@ void caCamera::setup()
 
     zoomSlider = new QSlider;
     zoomSlider->setMinimum(0);
-    zoomSlider->setMaximum(104);
+    zoomSlider->setMaximum(90); // do not exceed 6*
     zoomSlider->setValue(52);
     zoomSlider->setTickPosition(QSlider::NoTicks);
 
@@ -373,6 +372,7 @@ void caCamera::setup()
 void caCamera::zoomNow()
 {
     double scale = qPow(2.0, ((double) zoomSlider->value() - 52.0) / 13.0);
+    if(scale > 6) scale = 6;
     zoomValue->setText(QString::number(scale, 'f', 2));
     scaleFactor = scale;
     setFitToSize(No);
@@ -584,10 +584,8 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
         savedHeight = m_height;
 
         if(image != (QImage *) 0) {
-            printf("delete image 1\n");
             delete image;
         }
-        printf("create image\n");
         image = new QImage(resultSize, QImage::Format_RGB32);
 
         m_init = false;
