@@ -107,7 +107,8 @@ SOURCES	+= \
     src/cadoubletabwidget.cpp \
     src/cadoubletabwidgetextension.cpp \
     src/cadoubletabwidgetextensionfactory.cpp \
-    src/stripplotthread.cpp
+    src/stripplotthread.cpp \
+    src/cawaterfallplot.cpp
 
 # assume qwt6.0 was made with qt4
 contains(QT_VER_MAJ, 4) {
@@ -176,7 +177,8 @@ HEADERS	+= \
     src/cadoubletabwidget.h \
     src/cadoubletabwidgetextension.h \
     src/cadoubletabwidgetextensionfactory.h \
-    src/stripplotthread.h
+    src/stripplotthread.h \
+    src/cawaterfallplot.h
 
 
 # assume qwt6.0 was made with qt4

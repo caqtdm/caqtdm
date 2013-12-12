@@ -337,6 +337,29 @@ caCalcInterface::caCalcInterface(QObject* parent) : CustomWidgetInterface(parent
 	d_icon = QPixmap(":pixmaps/calc.png");
 }
 
+QWidget *caWaterfallPlotInterface::createWidget(QWidget* parent)
+{
+	return new caWaterfallPlot(parent);
+}
+
+caWaterfallPlotInterface::caWaterfallPlotInterface(QObject* parent) : CustomWidgetInterface(parent)
+{
+        strng name[4], type[4];
+        strcpy(name[0], "channel");
+        strcpy(type[0], "multiline");
+        strcpy(name[1], "Title");
+        strcpy(type[1], "multiline");
+        strcpy(name[2], "TitleX");
+        strcpy(type[2], "multiline");
+        strcpy(name[3], "TitleY");
+        strcpy(type[3], "multiline");
+        d_domXml = XmlFunc("caWaterfallPlot", "cawaterfallplot", 0, 0, 450, 200, name, type, 4);
+        d_toolTip = "[Waterfall plot]";
+	d_name = "caWaterfallPlot";
+	d_include = "caWaterfall";
+	d_icon = QPixmap(":pixmaps/waterfall.png");
+}
+
 CustomWidgetCollectionInterface::CustomWidgetCollectionInterface(QObject *parent): QObject(parent)
 {
     d_plugins.append(new caLedInterface(this));
@@ -351,6 +374,7 @@ CustomWidgetCollectionInterface::CustomWidgetCollectionInterface(QObject *parent
     d_plugins.append(new caBitnamesInterface(this));
     d_plugins.append(new caCameraInterface(this));
     d_plugins.append(new caCalcInterface(this));
+    d_plugins.append(new caWaterfallPlotInterface(this));
 }
 
 QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface::customWidgets(void) const
