@@ -1,9 +1,13 @@
-CAQTDM_VERSION = V3.6.0
+CAQTDM_VERSION = V3.6.1
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+
+# 3.6.1
+# suppressed slidervaluecallback when setting limits from hopr, lopr
+# added a first attempt of a waterfall plot for waveforms
 
 # 3.6.0
 # camera images can now be zoomed and scrolled
