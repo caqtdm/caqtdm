@@ -293,7 +293,9 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         }
 
     } else {
-        qDebug() << "caQtDM -- should never happen ??";
+        qDebug() << "caQtDM -- internal error with fileName= " << filename;
+        this->deleteLater();
+        return;
     }
 
     // set window title without the whole path
