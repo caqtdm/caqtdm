@@ -190,10 +190,10 @@ public:
     void defineTimerUpdate(units unit, double period);
 
 private:
-    
+
     enum {nbRows = 200};
     enum {nbCols = 1000};
-    
+
     QwtPlot *plot;
     QwtPlotSpectrogram *d_spectrogram;
     QwtLinearColorMap m_colorMap;
@@ -213,7 +213,7 @@ private:
     bool thisXshow, thisYshow, thisGrid;
     int thisRows, thisCols, countRows;
     bool disableDemo;
-    
+
 public  Q_SLOTS:
     void TimeOut();
 };

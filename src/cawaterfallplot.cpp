@@ -22,8 +22,13 @@
  *  Contact details:
  *    anton.mezger@psi.ch
  */
+#if defined(_WIN32) || defined(_WIN64)
+#define QWT_DLL
+#endif
 
 #include "cawaterfallplot.h"
+
+
 
 __inline double gauss(double x)
 {
