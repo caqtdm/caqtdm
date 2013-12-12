@@ -1295,6 +1295,16 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         widget->setProperty("Taken", true);
 
         //==================================================================================================================
+    } else if(caWaterfallPlot* widget = qobject_cast<caWaterfallPlot *>(w1)) {
+
+        //qDebug() << "create caWaterfallPlot";
+
+        QString thisString = widget->getPV();
+        addMonitor(myWidget, &kData, thisString, w1, specData, map, &pv);
+        widget->setPV(pv);
+        widget->setProperty("Taken", true);
+
+        //==================================================================================================================
     } else if(caStripPlot* widget = qobject_cast<caStripPlot *>(w1)) {
 
         //qDebug() << "create caStripPlot";
@@ -1969,6 +1979,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             if((channelLimitsEnabled) && (data.edata.initialize) ) {
                 // when limits are the same, do nothing
                 if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
+                    disconnect(w, SIGNAL(valueChanged (double)), 0, 0);
                     if(widget->getDirection() == caSlider::Down  || widget->getDirection() == caSlider::Left) {
                         widget->setMinValue(data.edata.upper_disp_limit);
                         widget->setMaxValue(data.edata.lower_disp_limit);
@@ -1976,6 +1987,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                         widget->setMaxValue(data.edata.upper_disp_limit);
                         widget->setMinValue(data.edata.lower_disp_limit);
                     }
+                    connect(w, SIGNAL(valueChanged(double)), this, SLOT(Callback_SliderValueChanged(double)));
                 }
             }
 
@@ -2336,6 +2348,61 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             widget->setProperty("Connect", false);
         }
 
+        // waterfall plot ==================================================================================================================
+    } else if (caWaterfallPlot *widget = qobject_cast<caWaterfallPlot *>(w)) {
+        //qDebug() << "caWaterfallPlot" << widget->objectName() << data.pv;
+
+        if(data.edata.connected) {
+
+            // scale first time on first curve
+            if(data.edata.initialize) {
+
+                double min = widget->getIntensityMin();
+                double max = widget->getIntensityMax();
+
+                if((widget->getIntensityScalingMin() == caWaterfallPlot::Channel) && (widget->getIntensityScalingMax() == caWaterfallPlot::Channel)) {
+                    if(data.edata.lower_disp_limit < data.edata.upper_disp_limit) {
+                        widget->setIntensityMin(data.edata.lower_disp_limit);
+                        widget->setIntensityMax(data.edata.upper_disp_limit);
+                    } else {
+                        widget->setIntensityMin(0.0);
+                        widget->setIntensityMax(10.0);
+                    }
+                } else if(widget->getIntensityScalingMin() == caWaterfallPlot::Channel) {
+                    if(data.edata.lower_disp_limit < max) {
+                        widget->setIntensityMin(data.edata.lower_disp_limit);
+                    }
+                }  else if(widget->getIntensityScalingMax() == caWaterfallPlot::Channel) {
+                    if(data.edata.upper_disp_limit > min) {
+                        widget->setIntensityMax(data.edata.upper_disp_limit);
+                    }
+                }
+                widget->InitData(data.edata.valueCount);
+            }
+
+            // value(s)
+            if((data.edata.valueCount > 0) && (data.edata.dataB != (void*) 0)) {
+                QVector<double> y;
+                QMutex *datamutex;
+                datamutex = (QMutex*) data.mutex;
+                datamutex->lock();
+                y.clear();
+                y.reserve(data.edata.valueCount);
+                BuildVector(y);
+                datamutex->unlock();
+                widget->SetData(y);
+            } else {
+                QVector<double> y;
+                y.clear();
+                y.append(data.edata.rvalue);
+                widget->SetData(y);
+            }
+
+            // not connected
+        } else {
+
+        }
+
         // stripchart ==================================================================================================================
     } else if(caStripPlot *widget = qobject_cast<caStripPlot *>(w)) {
 
@@ -2590,6 +2657,7 @@ void CaQtDM_Lib::Callback_SliderValueChanged(double value)
    float rdata = (float) value;
 
    caSlider *numeric = qobject_cast<caSlider *>(sender());
+   //qDebug() << "would write to slider" << numeric->getPV() << value;
    if(!numeric->getAccessW()) return;
    if(numeric->getPV().length() > 0) {
        TreatOrdinaryValue(numeric->getPV(), rdata, idata,  (QWidget*) numeric);
@@ -3170,6 +3238,9 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         for(int i=0; i<nbPV; i++) {
             pv[i] = vars.at(i).trimmed();
         }
+    } else if(caWaterfallPlot* widget = qobject_cast<caWaterfallPlot *>(w)) {
+        pv[0] = widget->getPV().trimmed();
+        nbPV = 1;
     } else if(caCartesianPlot* widget = qobject_cast<caCartesianPlot *>(w)) {
         nbPV = 0;
         for(int i=0; i < caCartesianPlot::curveCount; i++) {
@@ -4422,6 +4493,8 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
         mimeData->setText(widget->getChannelA());
     } else if (caPolyLine *widget = qobject_cast<caPolyLine *>(w)) {
         mimeData->setText(widget->getChannelA());
+    } else if (caWaterfallPlot *widget = qobject_cast<caWaterfallPlot *>(w->parent()->parent())) {
+        mimeData->setText(widget->getPV());
     } else {
         //qDebug() << "unrecognized widget" << w;
         return;
