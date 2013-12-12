@@ -350,8 +350,9 @@ void caRowColMenu::updateColors()
             QString border ="border-radius: 3px; padding: 1px; border-style: outset; border-width: %1px;}";
             border = border.arg(borderSize);
             style.append(border);
-            QString hover = "QPushButton:hover {background-color: rgb(%1, %2, %3);}  QPushButton:pressed {background-color: rgb(%4, %5, %6)};";
-            hover = hover.arg(thisBackColorHover.red()).arg(thisBackColorHover.green()).arg(thisBackColorHover.blue()).arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue());
+            QString hover = "QPushButton:hover {background-color: rgb(%1, %2, %3, %4);}  QPushButton:pressed {background-color: rgb(%5, %6, %7, %8)};";
+            hover = hover.arg(thisBackColorHover.red()).arg(thisBackColorHover.green()).arg(thisBackColorHover.blue()).arg(alpha).
+                          arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(255);
             style.append(hover);
             temp->setStyleSheet(style);
 
