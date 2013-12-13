@@ -518,6 +518,7 @@ void caCamera::setHeight(int height)
     m_heightDefined = true;
 }
 
+
 void caCamera::resizeEvent(QResizeEvent *e)
 {
     imageW->setFixedWidth(e->size().width() - zoomWidget->width()-4);
@@ -532,7 +533,7 @@ void caCamera::resizeEvent(QResizeEvent *e)
             double scale = qMin(Xcorr, Ycorr); // aspect ratio
             // disconnect signal to prevent firing now
             disconnect(zoomSlider, SIGNAL(valueChanged (int)), 0, 0);
-            zoomSlider->setValue(13.0*log2(scale)+52.0);
+            zoomSlider->setValue(13.0*log(scale)/log(2.0)+52.0);
             zoomValue->setText(QString::number(scale, 'f', 3));
             connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomNow()));
         }
