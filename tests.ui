@@ -144,7 +144,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: cornsilk;}</string>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -1345,7 +1345,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>10</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">
@@ -1668,20 +1668,17 @@ p, li { white-space: pre-wrap; }
         <property name="minValue">
          <double>0.000000000000000</double>
         </property>
+        <property name="maxValue">
+         <double>5.000000000000000</double>
+        </property>
+        <property name="highError">
+         <double>5.000000000000000</double>
+        </property>
         <property name="lowError">
          <double>0.000000000000000</double>
         </property>
         <property name="lowWarning">
          <double>0.000000000000000</double>
-        </property>
-        <property name="highError">
-         <double>5.000000000000000</double>
-        </property>
-        <property name="maxValue">
-         <double>5.000000000000000</double>
-        </property>
-        <property name="externalLimitsEnabled" stdset="0">
-         <bool>true</bool>
         </property>
         <property name="colorMode">
          <enum>EAbstractGauge::COLORBAR</enum>
@@ -1697,6 +1694,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="channel" stdset="0">
          <string notr="true">QTDM:TEST:AO</string>
+        </property>
+        <property name="externalLimitsEnabled" stdset="0">
+         <bool>true</bool>
         </property>
        </widget>
       </widget>
@@ -1778,6 +1778,12 @@ p, li { white-space: pre-wrap; }
         <property name="minValue">
          <double>0.000000000000000</double>
         </property>
+        <property name="maxValue">
+         <double>5.000000000000000</double>
+        </property>
+        <property name="highError">
+         <double>4.000000000000000</double>
+        </property>
         <property name="lowError">
          <double>1.000000000000000</double>
         </property>
@@ -1786,12 +1792,6 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="highWarning">
          <double>3.000000000000000</double>
-        </property>
-        <property name="highError">
-         <double>4.000000000000000</double>
-        </property>
-        <property name="maxValue">
-         <double>5.000000000000000</double>
         </property>
         <property name="referenceEnabled">
          <bool>false</bool>
@@ -1821,6 +1821,12 @@ p, li { white-space: pre-wrap; }
         <property name="minValue">
          <double>0.000000000000000</double>
         </property>
+        <property name="maxValue">
+         <double>1000.000000000000000</double>
+        </property>
+        <property name="highError">
+         <double>4.000000000000000</double>
+        </property>
         <property name="lowError">
          <double>1.000000000000000</double>
         </property>
@@ -1830,17 +1836,8 @@ p, li { white-space: pre-wrap; }
         <property name="highWarning">
          <double>3.000000000000000</double>
         </property>
-        <property name="highError">
-         <double>4.000000000000000</double>
-        </property>
-        <property name="maxValue">
-         <double>1000.000000000000000</double>
-        </property>
         <property name="referenceEnabled">
          <bool>false</bool>
-        </property>
-        <property name="externalLimitsEnabled" stdset="0">
-         <bool>true</bool>
         </property>
         <property name="colorMode">
          <enum>EAbstractGauge::SINGLECOLOR</enum>
@@ -1860,6 +1857,9 @@ p, li { white-space: pre-wrap; }
         <property name="fillMode">
          <enum>caLinearGauge::FROM_ZERO</enum>
         </property>
+        <property name="externalLimitsEnabled" stdset="0">
+         <bool>true</bool>
+        </property>
        </widget>
        <widget class="caLinearGauge" name="calineargauge_3">
         <property name="geometry">
@@ -1873,6 +1873,12 @@ p, li { white-space: pre-wrap; }
         <property name="minValue">
          <double>0.000000000000000</double>
         </property>
+        <property name="maxValue">
+         <double>5.000000000000000</double>
+        </property>
+        <property name="highError">
+         <double>4.000000000000000</double>
+        </property>
         <property name="lowError">
          <double>1.000000000000000</double>
         </property>
@@ -1882,16 +1888,7 @@ p, li { white-space: pre-wrap; }
         <property name="highWarning">
          <double>3.000000000000000</double>
         </property>
-        <property name="highError">
-         <double>4.000000000000000</double>
-        </property>
-        <property name="maxValue">
-         <double>5.000000000000000</double>
-        </property>
         <property name="referenceEnabled">
-         <bool>false</bool>
-        </property>
-        <property name="externalLimitsEnabled" stdset="0">
          <bool>false</bool>
         </property>
         <property name="colorMode">
@@ -1911,6 +1908,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="fillMode">
          <enum>caLinearGauge::FROM_ZERO</enum>
+        </property>
+        <property name="externalLimitsEnabled" stdset="0">
+         <bool>false</bool>
         </property>
        </widget>
       </widget>
@@ -1958,20 +1958,20 @@ p, li { white-space: pre-wrap; }
         <property name="minValue">
          <double>0.000000000000000</double>
         </property>
+        <property name="maxValue">
+         <double>5.000000000000000</double>
+        </property>
+        <property name="displayLimits">
+         <enum>EAbstractGauge::Channel_Limits</enum>
+        </property>
+        <property name="highError">
+         <double>5.000000000000000</double>
+        </property>
         <property name="lowError">
          <double>0.000000000000000</double>
         </property>
         <property name="lowWarning">
          <double>0.000000000000000</double>
-        </property>
-        <property name="highError">
-         <double>5.000000000000000</double>
-        </property>
-        <property name="maxValue">
-         <double>5.000000000000000</double>
-        </property>
-        <property name="externalLimitsEnabled" stdset="0">
-         <bool>true</bool>
         </property>
         <property name="colorMode">
          <enum>EAbstractGauge::COLORBAR</enum>
@@ -1988,6 +1988,9 @@ p, li { white-space: pre-wrap; }
         <property name="channel" stdset="0">
          <string notr="true">QTDM:TEST:AO</string>
         </property>
+        <property name="externalLimitsEnabled" stdset="0">
+         <bool>true</bool>
+        </property>
        </widget>
        <widget class="caCircularGauge" name="cacirculargauge_2">
         <property name="geometry">
@@ -2001,6 +2004,12 @@ p, li { white-space: pre-wrap; }
         <property name="minValue">
          <double>0.000000000000000</double>
         </property>
+        <property name="maxValue">
+         <double>10.000000000000000</double>
+        </property>
+        <property name="highError">
+         <double>3.000000000000000</double>
+        </property>
         <property name="lowError">
          <double>1.000000000000000</double>
         </property>
@@ -2009,12 +2018,6 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="highWarning">
          <double>3.000000000000000</double>
-        </property>
-        <property name="highError">
-         <double>3.000000000000000</double>
-        </property>
-        <property name="maxValue">
-         <double>5.000000000000000</double>
         </property>
         <property name="colorMode">
          <enum>EAbstractGauge::GRADIENT</enum>
@@ -2038,14 +2041,23 @@ p, li { white-space: pre-wrap; }
        <widget class="caCircularGauge" name="cacirculargauge_3">
         <property name="geometry">
          <rect>
-          <x>660</x>
-          <y>210</y>
+          <x>670</x>
+          <y>240</y>
           <width>346</width>
           <height>231</height>
          </rect>
         </property>
         <property name="minValue">
          <double>0.000000000000000</double>
+        </property>
+        <property name="maxValue">
+         <double>5.000000000000000</double>
+        </property>
+        <property name="displayLimits">
+         <enum>EAbstractGauge::User_Limits</enum>
+        </property>
+        <property name="highError">
+         <double>3.000000000000000</double>
         </property>
         <property name="lowError">
          <double>1.000000000000000</double>
@@ -2056,14 +2068,8 @@ p, li { white-space: pre-wrap; }
         <property name="highWarning">
          <double>3.000000000000000</double>
         </property>
-        <property name="highError">
-         <double>3.000000000000000</double>
-        </property>
-        <property name="maxValue">
-         <double>5.000000000000000</double>
-        </property>
         <property name="colorMode">
-         <enum>EAbstractGauge::GRADIENT</enum>
+         <enum>EAbstractGauge::COLORBAR</enum>
         </property>
         <property name="externalScale">
          <bool>true</bool>
@@ -2084,7 +2090,7 @@ p, li { white-space: pre-wrap; }
          <string notr="true">QTDM:COUNT:1</string>
         </property>
         <property name="valueDisplayed">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="label">
          <string>test</string>
@@ -2094,7 +2100,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>790</x>
-          <y>430</y>
+          <y>480</y>
           <width>100</width>
           <height>20</height>
          </rect>
@@ -2156,6 +2162,122 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="precisionMode">
          <enum>caNumeric::User</enum>
+        </property>
+       </widget>
+       <widget class="caCircularGauge" name="cacirculargauge_5">
+        <property name="geometry">
+         <rect>
+          <x>680</x>
+          <y>40</y>
+          <width>346</width>
+          <height>171</height>
+         </rect>
+        </property>
+        <property name="minValue">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="maxValue">
+         <double>5.000000000000000</double>
+        </property>
+        <property name="displayLimits">
+         <enum>EAbstractGauge::User_Limits</enum>
+        </property>
+        <property name="highError">
+         <double>4.000000000000000</double>
+        </property>
+        <property name="lowError">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="lowWarning">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="highWarning">
+         <double>3.000000000000000</double>
+        </property>
+        <property name="alarmLimits">
+         <enum>EAbstractGauge::None</enum>
+        </property>
+        <property name="value">
+         <double>3.000000000000000</double>
+        </property>
+        <property name="referenceEnabled">
+         <bool>false</bool>
+        </property>
+        <property name="colorMode">
+         <enum>EAbstractGauge::COLORBAR</enum>
+        </property>
+        <property name="externalScale">
+         <bool>false</bool>
+        </property>
+        <property name="valueFormat">
+         <string>%.0f</string>
+        </property>
+        <property name="numMajorTicks">
+         <number>6</number>
+        </property>
+        <property name="numMinorTicks">
+         <number>2</number>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">QTDM:COUNT:1</string>
+        </property>
+        <property name="label">
+         <string/>
+        </property>
+        <property name="externalLimitsEnabled" stdset="0">
+         <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_17">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>230</y>
+          <width>231</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>channellimits / channelalarms</string>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_18">
+        <property name="geometry">
+         <rect>
+          <x>390</x>
+          <y>230</y>
+          <width>231</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>channellimits / channelalarms</string>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_19">
+        <property name="geometry">
+         <rect>
+          <x>720</x>
+          <y>230</y>
+          <width>231</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>userlimits / channelalarms</string>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_20">
+        <property name="geometry">
+         <rect>
+          <x>730</x>
+          <y>10</y>
+          <width>231</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>userlimits / useralarms</string>
         </property>
        </widget>
       </widget>
@@ -2339,6 +2461,16 @@ p, li { white-space: pre-wrap; }
          <double>2.000000000000000</double>
         </property>
        </widget>
+       <widget class="caLineEdit" name="calineedit_15">
+        <property name="geometry">
+         <rect>
+          <x>390</x>
+          <y>470</y>
+          <width>100</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_14">
        <attribute name="title">
@@ -2392,6 +2524,9 @@ p, li { white-space: pre-wrap; }
         <property name="direction">
          <enum>caThermo::Up</enum>
         </property>
+        <property name="look">
+         <enum>caThermo::Outline</enum>
+        </property>
         <property name="foreground">
          <color>
           <red>253</red>
@@ -2423,7 +2558,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="scalePosition">
-         <enum>QwtThermoMarker::NoScale</enum>
+         <enum>QwtThermoMarker::BottomScale</enum>
         </property>
         <property name="maxValue">
          <double>3.000000000000000</double>
@@ -2438,7 +2573,7 @@ p, li { white-space: pre-wrap; }
          <enum>caThermo::Right</enum>
         </property>
         <property name="look">
-         <enum>caThermo::noDeco</enum>
+         <enum>caThermo::Outline</enum>
         </property>
         <property name="foreground">
          <color>
@@ -2484,6 +2619,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="direction">
          <enum>caThermo::Up</enum>
+        </property>
+        <property name="look">
+         <enum>caThermo::Outline</enum>
         </property>
         <property name="foreground">
          <color>
@@ -2578,10 +2716,10 @@ p, li { white-space: pre-wrap; }
          <string>uA</string>
         </property>
         <property name="channels_1" stdset="0">
-         <string>PRO:REG2D:Y:1;PRO:REG2D:X:1</string>
+         <string notr="true">QTDM:TEST:AO_WAVE;QTDM:TEST:AO_WAVE</string>
         </property>
         <property name="Style_1">
-         <enum>caCartesianPlot::Lines</enum>
+         <enum>caCartesianPlot::FillUnder</enum>
         </property>
         <property name="symbol_1">
          <enum>caCartesianPlot::NoSymbol</enum>
@@ -2589,12 +2727,12 @@ p, li { white-space: pre-wrap; }
         <property name="color_1">
          <color>
           <red>0</red>
-          <green>0</green>
+          <green>255</green>
           <blue>0</blue>
          </color>
         </property>
         <property name="channels_2" stdset="0">
-         <string>PRO:REG2D:Y:2;PRO:REG2D:X:2</string>
+         <string notr="true"/>
         </property>
         <property name="Style_2">
          <enum>caCartesianPlot::Lines</enum>
@@ -2610,7 +2748,7 @@ p, li { white-space: pre-wrap; }
          </color>
         </property>
         <property name="channels_3" stdset="0">
-         <string>PRO:REG2D:X;PRO:REG2D:Y</string>
+         <string notr="true"/>
         </property>
         <property name="Style_3">
          <enum>caCartesianPlot::Lines</enum>
@@ -2647,32 +2785,46 @@ p, li { white-space: pre-wrap; }
          </color>
         </property>
         <property name="XaxisScaling" stdset="0">
-         <enum>caCartesianPlot::User</enum>
+         <enum>caCartesianPlot::Channel</enum>
         </property>
         <property name="YaxisScaling" stdset="0">
-         <enum>caCartesianPlot::User</enum>
+         <enum>caCartesianPlot::Channel</enum>
         </property>
         <property name="XaxisLimits">
-         <string>0;1.5</string>
+         <string>0;1000</string>
         </property>
         <property name="YaxisLimits">
-         <string>0;800.000000</string>
+         <string>0;800</string>
         </property>
        </widget>
-       <widget class="caInclude" name="caInclude_24">
+       <widget class="caNumeric" name="canumeric_6">
         <property name="geometry">
          <rect>
-          <x>825</x>
-          <y>5</y>
-          <width>166</width>
-          <height>218</height>
+          <x>635</x>
+          <y>45</y>
+          <width>186</width>
+          <height>106</height>
          </rect>
         </property>
-        <property name="macro">
-         <string>A=MMAP8Y,B=MMAP7-P</string>
+        <property name="integerDigits" stdset="0">
+         <number>3</number>
         </property>
-        <property name="filename" stdset="0">
-         <string>object_harp_nostatus.adl</string>
+        <property name="channel" stdset="0">
+         <string notr="true">QTDM:TEST:AO</string>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>0</red>
+          <green>85</green>
+          <blue>255</blue>
+         </color>
         </property>
        </widget>
       </widget>
@@ -3302,7 +3454,7 @@ p, li { white-space: pre-wrap; }
         <property name="channelBPP" stdset="0">
          <string notr="true">pc7818-1:bpp{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
-        <property name="Zoom">
+        <property name="Zoom" stdset="0">
          <enum>caCamera::No</enum>
         </property>
         <property name="ColorMap" stdset="0">
@@ -3725,7 +3877,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="scalePosition">
-         <enum>QwtSlider::LeftScale</enum>
+         <enum>QwtSlider::NoScale</enum>
         </property>
         <property name="channel" stdset="0">
          <string notr="true">mySoft1</string>
@@ -4132,6 +4284,9 @@ p, li { white-space: pre-wrap; }
           <height>22</height>
          </rect>
         </property>
+        <property name="fontScaleMode">
+         <enum>EPushButton::WidthAndHeight</enum>
+        </property>
         <property name="channel" stdset="0">
          <string notr="true">QTDM:TEST:AO</string>
         </property>
@@ -4152,11 +4307,14 @@ p, li { white-space: pre-wrap; }
        <widget class="caSlider" name="caslider">
         <property name="geometry">
          <rect>
-          <x>195</x>
+          <x>180</x>
           <y>275</y>
-          <width>56</width>
+          <width>71</width>
           <height>241</height>
          </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
         </property>
         <property name="scalePosition">
          <enum>QwtSlider::LeftScale</enum>
@@ -4164,8 +4322,18 @@ p, li { white-space: pre-wrap; }
         <property name="channel" stdset="0">
          <string notr="true">QTDM:TEST:AO</string>
         </property>
+        <property name="background">
+         <color alpha="0">
+          <red>224</red>
+          <green>223</green>
+          <blue>222</blue>
+         </color>
+        </property>
         <property name="colorMode">
-         <enum>caSlider::Default</enum>
+         <enum>caSlider::Static</enum>
+        </property>
+        <property name="incrementValue">
+         <double>0.100000000000000</double>
         </property>
        </widget>
        <widget class="caTextEntry" name="catextentry_2">
@@ -4393,22 +4561,25 @@ p, li { white-space: pre-wrap; }
         <property name="direction">
          <enum>caThermo::Up</enum>
         </property>
+        <property name="look">
+         <enum>caThermo::Outline</enum>
+        </property>
         <property name="foreground">
          <color>
-          <red>20</red>
-          <green>19</green>
-          <blue>18</blue>
+          <red>255</red>
+          <green>85</green>
+          <blue>0</blue>
          </color>
         </property>
         <property name="background">
          <color>
-          <red>224</red>
-          <green>223</green>
+          <red>222</red>
+          <green>222</green>
           <blue>222</blue>
          </color>
         </property>
         <property name="colorMode">
-         <enum>caThermo::Alarm</enum>
+         <enum>caThermo::Static</enum>
         </property>
         <property name="limitsMode">
          <enum>caThermo::Channel</enum>
@@ -4450,18 +4621,21 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>305</x>
           <y>280</y>
-          <width>256</width>
+          <width>271</width>
           <height>51</height>
          </rect>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
         </property>
         <property name="scalePosition">
          <enum>QwtSlider::BottomScale</enum>
         </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
         <property name="channel" stdset="0">
          <string notr="true">QTDM:TEST:AO</string>
+        </property>
+        <property name="direction">
+         <enum>caSlider::Right</enum>
         </property>
         <property name="colorMode">
          <enum>caSlider::Default</enum>
@@ -4611,6 +4785,102 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="colorMode">
          <enum>caToggleButton::Alarm</enum>
+        </property>
+       </widget>
+       <widget class="caThermo" name="caThermo_4">
+        <property name="geometry">
+         <rect>
+          <x>840</x>
+          <y>140</y>
+          <width>51</width>
+          <height>251</height>
+         </rect>
+        </property>
+        <property name="scalePosition">
+         <enum>QwtThermoMarker::LeftScale</enum>
+        </property>
+        <property name="maxValue">
+         <double>50.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">QTDM:TEST:AO</string>
+        </property>
+        <property name="direction">
+         <enum>caThermo::Up</enum>
+        </property>
+        <property name="look">
+         <enum>caThermo::Outline</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>255</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>170</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caThermo::Static</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caThermo::Channel</enum>
+        </property>
+       </widget>
+       <widget class="caThermo" name="caThermo_5">
+        <property name="geometry">
+         <rect>
+          <x>650</x>
+          <y>140</y>
+          <width>56</width>
+          <height>250</height>
+         </rect>
+        </property>
+        <property name="scalePosition">
+         <enum>QwtThermoMarker::LeftScale</enum>
+        </property>
+        <property name="maxValue">
+         <double>50.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">QTDM:TEST:AO</string>
+        </property>
+        <property name="direction">
+         <enum>caThermo::Up</enum>
+        </property>
+        <property name="look">
+         <enum>caThermo::Outline</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>255</red>
+          <green>85</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>222</red>
+          <green>222</green>
+          <blue>222</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caThermo::Alarm</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caThermo::Channel</enum>
         </property>
        </widget>
       </widget>
@@ -5152,7 +5422,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1102</width>
-     <height>24</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>
