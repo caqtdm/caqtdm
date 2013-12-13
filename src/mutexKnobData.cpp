@@ -64,6 +64,8 @@ MutexKnobData::MutexKnobData()
     timerId = startTimer(20);
 
     myUpdateType = UpdateTimed;
+
+    BlockProcessing(false);
 }
 
 MutexKnobData:: ~MutexKnobData()
@@ -460,6 +462,9 @@ void MutexKnobData::timerEvent(QTimerEvent *)
     char fec[40];
     char dataString[1024];
     struct timeb now;
+
+    if(blockProcess) return;
+
     ftime(&now);
 
     for(int i=0; i < GetMutexKnobDataSize(); i++) {

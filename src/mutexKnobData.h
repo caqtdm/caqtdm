@@ -81,6 +81,8 @@ public:
 
     void UpdateMechanism(UpdateType Type);
 
+    void BlockProcessing(bool block) { blockProcess= block;}
+
 signals:
 
     void Signal_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, const knobData&);
@@ -102,6 +104,8 @@ private:
 
     int nbDisplayCountPerSecond, displayCount;
     struct timeb last;
+
+    bool blockProcess;
 
     UpdateType myUpdateType;
 };
