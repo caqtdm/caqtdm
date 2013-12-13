@@ -8,6 +8,8 @@ QT_VER_MIN = $$member(QT_VERSION, 1)
 # 3.6.1
 # suppressed slidervaluecallback when setting limits from hopr, lopr
 # added a first attempt of a waterfall plot for waveforms
+# corrected for cameras, position calculated when zooming to small images
+# in case of reload, data display is now stopped until all displays are loaded again
 
 # 3.6.0
 # camera images can now be zoomed and scrolled
