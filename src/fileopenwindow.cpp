@@ -505,6 +505,9 @@ void FileOpenWindow::Callback_ActionReload()
     QString macroS = "";
     QString fileS = "";
 
+    Callback_ActionTimed();
+    mutexKnobData->BlockProcessing(true);
+
     // go through all windows, close them and relaod them from files
     QList<QWidget *> all = this->findChildren<QWidget *>();
     foreach(QWidget* widget, all) {
@@ -540,6 +543,10 @@ void FileOpenWindow::Callback_ActionReload()
             }
         }
     }
+
+    mutexKnobData->BlockProcessing(false);
+
+
 }
 
 void FileOpenWindow::Callback_ActionTimed() {
