@@ -126,6 +126,7 @@ private slots:
 
 protected:
     void resizeEvent(QResizeEvent *event);
+    void timerEvent(QTimerEvent *);
 
 private:
 
@@ -172,6 +173,7 @@ private:
     caLabel *labelMinText;
     caLabel *intensityText;
     caLabel *checkAutoText;
+    caLabel *nbUpdatesText;
     bool valuesPresent[4];
     int  values[4];
 
@@ -184,6 +186,8 @@ private:
     QToolButton *zoomOutIcon;
 
     double scaleFactor;
+
+    int UpdatesPerSecond;
 
 };
 

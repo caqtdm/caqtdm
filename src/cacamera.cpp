@@ -66,6 +66,9 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     installEventFilter(this);
 
     scaleFactor = 1.0;
+
+    UpdatesPerSecond = 0.0;
+    startTimer(1000);
 }
 
 caCamera::~caCamera()
@@ -83,6 +86,7 @@ caCamera::~caCamera()
     delete autoW;
     delete intensity;
     delete intensityText;
+    delete nbUpdatesText;
 
     delete zoomSliderLayout;
     delete zoomSlider;
@@ -94,6 +98,14 @@ caCamera::~caCamera()
     delete valuesWidget;
     delete scrollArea;
     delete zoomWidget;
+}
+
+void caCamera::timerEvent(QTimerEvent *)
+{
+    QString text= "%1 U/s";
+    text = text.arg(UpdatesPerSecond);
+    if(nbUpdatesText != (caLabel*) 0) nbUpdatesText->setText(text);
+    UpdatesPerSecond = 0;
 }
 
 bool caCamera::eventFilter(QObject *obj, QEvent *event)
@@ -133,17 +145,18 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
         // calculate true x, y values and limits of picture
         double Xcorr = (double) imageW->width() / (double) savedWidth;
         double Ycorr = (double) imageW->height() / (double) savedHeight;
+
         double Correction = qMin(Xcorr, Ycorr); // aspect ratio
-        double Xmax = qMin(savedWidth,  imageW->width());
-        double Ymax = qMin(savedHeight,  imageW->height());
+        if(scaleFactor < 1.0) Correction =  scaleFactor;
+
+        double Xmax = imageW->width() / Correction;
+        double Ymax = imageW->height() / Correction;
+        Xmax = qMin(savedWidth,  (int) Xmax);
+        Ymax = qMin(savedHeight,  (int) Ymax);
 
         if(thisFitToSize) {
             Xnew =(int)  (Xpos / Correction);
             Ynew =(int)  (Ypos / Correction);
-            Xmax = imageW->width() / Correction;
-            Ymax = imageW->height() / Correction;
-            Xmax = qMin(savedWidth,  (int) Xmax);
-            Ymax = qMin(savedHeight,  (int) Ymax);
         } else {
             Xnew = (Xnew  + scrollArea->horizontalScrollBar()->value()) / Correction;
             Ynew = (Ynew  + scrollArea->verticalScrollBar()->value()) / Correction;
@@ -265,6 +278,8 @@ void caCamera::setup()
     intensityText = new caLabel(this);
     intensityText->setText(" x/y/z: ");
 
+    nbUpdatesText = new caLabel(this);
+
     // texts
     labelMax = new QLineEdit(this);
     labelMin = new QLineEdit(this);
@@ -283,6 +298,7 @@ void caCamera::setup()
     checkAutoText->setScaleMode(caLabel::None);
     intensity->setScaleMode(caLabel::None);
     intensityText->setScaleMode(caLabel::None);
+    nbUpdatesText->setScaleMode(caLabel::None);
     QFont font = labelMaxText->font();
     font.setPointSize(10);
     labelMaxText->setFont(font);
@@ -290,11 +306,13 @@ void caCamera::setup()
     checkAutoText->setFont(font);
     intensity->setFont(font);
     intensityText->setFont(font);
+    nbUpdatesText->setFont(font);
     labelMaxText->setBackground(QColor(0,0,0,0));
     labelMinText->setBackground(QColor(0,0,0,0));
     checkAutoText->setBackground(QColor(0,0,0,0));
     intensity->setBackground(QColor(0,0,0,0));
     intensityText->setBackground(QColor(0,0,0,0));
+    nbUpdatesText->setBackground(QColor(0,0,0,0));
 
     // checkbox
     autoW = new QCheckBox(this);
@@ -312,6 +330,7 @@ void caCamera::setup()
     valuesLayout->addWidget(autoW,    Qt::AlignLeft);
     valuesLayout->addWidget(intensityText, Qt::AlignLeft);
     valuesLayout->addWidget(intensity, Qt::AlignLeft);
+    valuesLayout->addWidget(nbUpdatesText, Qt::AlignLeft);
     valuesLayout->addStretch(2);
 
     valuesWidget = new QWidget;
@@ -373,7 +392,7 @@ void caCamera::zoomNow()
 {
     double scale = qPow(2.0, ((double) zoomSlider->value() - 52.0) / 13.0);
     if(scale > 6) scale = 6;
-    zoomValue->setText(QString::number(scale, 'f', 2));
+    zoomValue->setText(QString::number(scale, 'f', 3));
     scaleFactor = scale;
     setFitToSize(No);
 
@@ -401,10 +420,6 @@ void caCamera::setFitToSize(zoom const &z)
         scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     } else {
         scaleFactor = 1.0;
-        // disconnect signal to prevent firing now
-        disconnect(zoomSlider, SIGNAL(valueChanged (int)), 0, 0);
-        zoomSlider->setValue(52);
-        connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomNow()));
         scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff );
         scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     }
@@ -511,6 +526,15 @@ void caCamera::resizeEvent(QResizeEvent *e)
     if(m_widthDefined && m_heightDefined) {
         if(!thisFitToSize) {
             imageW->setMinimumSize(m_width * scaleFactor, m_height * scaleFactor);
+        } else {
+            double Xcorr = (double) (e->size().width() - zoomWidget->width()-4) / (double) savedWidth;
+            double Ycorr = (double) (e->size().height()- valuesWidget->height()-4) / (double) savedHeight;
+            double scale = qMin(Xcorr, Ycorr); // aspect ratio
+            // disconnect signal to prevent firing now
+            disconnect(zoomSlider, SIGNAL(valueChanged (int)), 0, 0);
+            zoomSlider->setValue(13.0*log2(scale)+52.0);
+            zoomValue->setText(QString::number(scale, 'f', 3));
+            connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomNow()));
         }
     }
 }
@@ -836,6 +860,7 @@ void caCamera::showImage(int datasize, char *data)
             minvalue = minv;
         }
     }
+    UpdatesPerSecond++;
 }
 
 uint caCamera::rgbFromWaveLength(double wave)
