@@ -3625,12 +3625,14 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 void CaQtDM_Lib::ShowContextMenu(const QPoint& position) // this is a slot
 {
     Q_UNUSED(position);
+
     DisplayContextMenu(qobject_cast<QWidget *>(sender()));
 }
 
 void CaQtDM_Lib::mouseReleaseEvent(QMouseEvent *event)
 {
-    if(event->button() ==Qt::RightButton) emit customContextMenuRequested(QPoint(event->x(),event->y()));
+    // I do not know why this was done, but on microsoft windows, it generates a disturbing event
+    //if(event->button() ==Qt::RightButton) emit customContextMenuRequested(QPoint(event->x(),event->y()));
 }
 
 /**
