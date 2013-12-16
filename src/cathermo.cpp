@@ -302,7 +302,7 @@ bool caThermo::event(QEvent *e)
                     if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
                     if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;
 
-                    if(qAbs(pointSize - pointSizePrv) >= 0.6) {
+                    if(qAbs(pointSize - pointSizePrv) >= 1.0) {
                         f.setPointSizeF(pointSize);
                         pointSizePrv = pointSize;
                         setFont(f);
@@ -327,7 +327,7 @@ bool caThermo::event(QEvent *e)
                    if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
                    if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;
 
-                   if(qAbs(pointSize - pointSizePrv) >= 0.6) {
+                   if(qAbs(pointSize - pointSizePrv) >= 1.0) {
                        f.setPointSizeF(pointSize);
                        pointSizePrv = pointSize;
                        setFont(f);
