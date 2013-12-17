@@ -3625,7 +3625,6 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 void CaQtDM_Lib::ShowContextMenu(const QPoint& position) // this is a slot
 {
     Q_UNUSED(position);
-
     DisplayContextMenu(qobject_cast<QWidget *>(sender()));
 }
 
