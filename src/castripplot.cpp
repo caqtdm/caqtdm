@@ -167,7 +167,7 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     connect(timerThread, SIGNAL(update()), this, SLOT(TimeOutThread()),  Qt::DirectConnection);
 }
 
-void caStripPlot::defineAxis(units unit, double period)
+void caStripPlot::defineXaxis(units unit, double period)
 {
     double interval;
 
@@ -183,11 +183,11 @@ void caStripPlot::defineAxis(units unit, double period)
     }
 
     // set axis and in case of a time scale define the time axis
-    setAxis(interval, period);
+    setXaxis(interval, period);
     replot();
 }
 
-void caStripPlot::setAxis(double interval, double period)
+void caStripPlot::setXaxis(double interval, double period)
 {
     // set axis and in case of a time scale define the time axis
     if(thisXaxisType == TimeScale) {
@@ -199,6 +199,18 @@ void caStripPlot::setAxis(double interval, double period)
         setAxisScale(QwtPlot::xBottom, -period, 0);
         setAxisScaleDraw(QwtPlot::xBottom, new QwtScaleDraw());
     }
+}
+
+void caStripPlot::setYaxisType(yAxisType s)
+{
+    thisYaxisType = s;
+    if(s == log10) {
+        setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
+    } else {
+        setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine);
+    }
+
+    replot();
 }
 
 void caStripPlot::RescaleCurves(int width, units unit, double period)
@@ -299,7 +311,7 @@ void caStripPlot::defineCurves(QStringList titres, units unit, double period, in
     scaleWidget->getBorderDistHint(min, max);
     savedTitres = titres;
 
-    defineAxis(unit, period);
+    defineXaxis(unit, period);
 
     // define curves
     for(int i=0; i < MAXCURVES; i++) {
@@ -464,10 +476,17 @@ void caStripPlot::TimeOutThread()
     // update last point
     for (int c = 0; c < NumberOfCurves; c++ ) {
         double y0, y1, y2, y3;
+        double valueMin = minVal[c];
+        double valueMax = maxVal[c];
+
+        if(thisYaxisType == log10) {
+                if(valueMin < 1.e-20) valueMin=1.e-20;
+                if(valueMax < 1.e-20) valueMax=1.e-20;
+        }
 
         // smallest vertical width of error bar must not be zero
-        y0 = transform(QwtPlot::yLeft, minVal[c]);
-        y1 = transform(QwtPlot::yLeft, maxVal[c]);
+        y0 = transform(QwtPlot::yLeft, valueMin);
+        y1 = transform(QwtPlot::yLeft, valueMax);
         if(qAbs(y1-y0) < 2.0) y0 = y0 + 1.0; y1= y1 - 1.0;
         y2 = invTransform(QwtPlot::yLeft, (int) (y0+0.5));
         y3 = invTransform(QwtPlot::yLeft, (int) (y1+0.5));

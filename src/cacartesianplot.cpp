@@ -57,7 +57,6 @@ public:
 
 
 caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
-
 {
     const char *text =
            "You can zoom in using the left mouse button.\n"
@@ -224,7 +223,7 @@ void caCartesianPlot::erasePlots()
          Y[i].clear();
          accumulX[i].clear();
          accumulY[i].clear();
-         curve[i].setSamples(X[i].data(), Y[i].data(), Y[i].size());
+         setSamplesData(i, X[i].data(), Y[i].data(), Y[i].size(), true);
      }
      replot();
 }
@@ -235,18 +234,10 @@ void caCartesianPlot::setData(const QVector<double>& vector, int curvIndex, int 
         // keep data points
         if(curvXY == CH_X) {                       // X
             X[curvIndex].resize(vector.size());
-#if QT_VERSION < 0x040700
-              ::memcpy(X[curvIndex].data(), vector.data(), vector.size()*sizeof(double));
-#else
-               qCopy(vector.begin(), vector.end(), X[curvIndex].begin());
-#endif
+            ::memcpy(X[curvIndex].data(), vector.data(), vector.size()*sizeof(double));
         } else {                                   // Y
             Y[curvIndex].resize(vector.size());
-#if QT_VERSION < 0x040700
             ::memcpy(Y[curvIndex].data(), vector.data(), vector.size()*sizeof(double));
-#else
-            qCopy(vector.begin(), vector.end(), Y[curvIndex].begin());
-#endif
         }
 
         // only x channel was specified, use index as y
@@ -258,6 +249,7 @@ void caCartesianPlot::setData(const QVector<double>& vector, int curvIndex, int 
             X[curvIndex].clear();
             for(int i=0; i< vector.size(); i++) X[curvIndex].append(i);
         }
+
         // when triggering is specified, we will return here
         if(thisToBeTriggered) {
             //printf("we will return and show plot when trigger comes\n");
@@ -290,7 +282,7 @@ void caCartesianPlot::setData(const QVector<double>& vector, int curvIndex, int 
             double *data = Y[curvIndex].data();
             for(int i=0; i < X[curvIndex].size(); i++) data[i] = aux;
             if(thisCountNumber > 0) nbPoints = qMin(thisCountNumber, X[curvIndex].size());
-            curve[curvIndex].setSamples(X[curvIndex].data(), Y[curvIndex].data(), nbPoints);
+            setSamplesData(curvIndex, X[curvIndex].data(), Y[curvIndex].data(), nbPoints, true);
 
         // x scalar, y vector
         } else if(X[curvIndex].size() == 1 && Y[curvIndex].size() > 1) {
@@ -305,7 +297,7 @@ void caCartesianPlot::setData(const QVector<double>& vector, int curvIndex, int 
             double *data = X[curvIndex].data();
             for(int i=0; i < Y[curvIndex].size(); i++) data[i] = aux;  // and set values to first datapoint
             if(thisCountNumber > 0) nbPoints = qMin(thisCountNumber, Y[curvIndex].size());
-            curve[curvIndex].setSamples(X[curvIndex].data(), Y[curvIndex].data(), nbPoints);
+            setSamplesData(curvIndex, X[curvIndex].data(), Y[curvIndex].data(), nbPoints, true);
 
         // x scalar, y scalar
         } else if(X[curvIndex].size() == 1 && Y[curvIndex].size() == 1) {
@@ -313,7 +305,7 @@ void caCartesianPlot::setData(const QVector<double>& vector, int curvIndex, int 
             // when no count is specified or count == 1 then yust plot the point
             if(thisCountNumber <= 1) {
                //printf("yust plot the point\n");
-               curve[curvIndex].setSamples(X[curvIndex].data(), Y[curvIndex].data(), qMin(X[curvIndex].size(), Y[curvIndex].size()));
+               setSamplesData(curvIndex, X[curvIndex].data(), Y[curvIndex].data(), qMin(X[curvIndex].size(), Y[curvIndex].size()), true);
 
             // scalar scalar more than one point specified
             } else {
@@ -387,7 +379,7 @@ void caCartesianPlot::setData(const QVector<double>& vector, int curvIndex, int 
                     printf("%d %f %f\n", i, dataX[i], dataY[i]);
                 }
 */
-                curve[curvIndex].setSamples(accumulX[curvIndex].data(), accumulY[curvIndex].data(), accumulY[curvIndex].size());
+                setSamplesData(curvIndex, accumulX[curvIndex].data(), accumulY[curvIndex].data(), accumulY[curvIndex].size(), true);
             }
 
         // x vector, y vector
@@ -396,10 +388,43 @@ void caCartesianPlot::setData(const QVector<double>& vector, int curvIndex, int 
             //printf("x vector, y vector curv=%d\n", curvIndex);
             nbPoints = qMin(X[curvIndex].size(), Y[curvIndex].size());
             if(thisCountNumber > 0) nbPoints = qMin(thisCountNumber, nbPoints);
-            curve[curvIndex].setSamples(X[curvIndex].data(), Y[curvIndex].data(), nbPoints);
+            setSamplesData(curvIndex, X[curvIndex].data(), Y[curvIndex].data(), nbPoints, true);
         }
         replot();
     }
+}
+
+// this routine will prevent that we have problems with negative values when logarithmic scale
+void caCartesianPlot::setSamplesData(int index, double *x, double *y, int size, bool saveFlag)
+{
+    QVarLengthArray<double> XAUX, YAUX;
+
+    // saving the data allows to switch between log and lin when no new monitor is coming
+    if(saveFlag) {
+        XSAVE[index].resize(size);
+        YSAVE[index].resize(size);
+        memcpy(XSAVE[index].data(), x, size*sizeof(double));
+        memcpy(YSAVE[index].data(), y, size*sizeof(double));
+    }
+
+    // use auxiliary arrays, in order not to overwrite the original data
+    XAUX.resize(size);
+    YAUX.resize(size);
+    memcpy(XAUX.data(), x, size*sizeof(double));
+    memcpy(YAUX.data(), y, size*sizeof(double));
+
+    if(thisXtype == log10) {
+        for(int i=0; i< size; i++) {
+            if(x[i] < 1.e-20) XAUX[i] = 1.e-20;
+        }
+    }
+    if(thisYtype == log10) {
+        for(int i=0; i< size; i++) {
+            if(y[i] < 1.e-20) YAUX[i] = 1.e-20;
+        }
+    }
+
+    curve[index].setSamples(XAUX.data(), YAUX.data(), size);
 }
 
 void caCartesianPlot::setTitlePlot(QString const &titel)
@@ -769,6 +794,43 @@ void caCartesianPlot::setScaleY(double minY, double maxY)
     }
     replot();
 }
+
+
+void caCartesianPlot::setXaxisType(axisType s)
+{
+    thisXtype = s;
+    if(s == log10) {
+        setAxisScaleEngine(QwtPlot::xBottom, new QwtLog10ScaleEngine);
+    } else {
+        setAxisScaleEngine(QwtPlot::xBottom, new QwtLinearScaleEngine);
+    }
+
+    setXaxisLimits(getXaxisLimits());
+
+    for(int i=0; i < curveCount; i++) {
+        if(XSAVE[i].size() > 0) setSamplesData(i, XSAVE[i].data(), YSAVE[i].data(), XSAVE[i].size(), false);
+    }
+    replot();
+}
+
+void caCartesianPlot::setYaxisType(axisType s)
+{
+    thisYtype = s;
+    if(s == log10) {
+        setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
+    } else {
+        setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine);
+    }
+
+    setYaxisLimits(getYaxisLimits());
+
+    for(int i=0; i < curveCount; i++) {
+        if(XSAVE[i].size() > 0) setSamplesData(i, XSAVE[i].data(), YSAVE[i].data(), XSAVE[i].size(), false);
+    }
+
+    replot();
+}
+
 
 void caCartesianPlot::setWhiteColors()
 {

@@ -32,6 +32,7 @@
 #include <qwt_symbol.h>
 #include <qwt_scale_widget.h>
 #include <qwt_plot_marker.h>
+#include <qwt_scale_engine.h>
 #include <QMouseEvent>
 #include <QVarLengthArray>
 #include <qtcontrols_global.h>
@@ -44,7 +45,7 @@ class QTCON_EXPORT caCartesianPlot : public QwtPlot
     Q_OBJECT
 
 #if QWT_VERSION >= 0x060100
-    // suppress theese properties for the designer
+    // suppress these properties for the designer
     Q_PROPERTY( QBrush canvasBackground READ canvasBackground WRITE setCanvasBackground DESIGNABLE false)
     Q_PROPERTY( bool autoReplot READ autoReplot WRITE setAutoReplot DESIGNABLE false)
 #endif
@@ -54,6 +55,7 @@ class QTCON_EXPORT caCartesianPlot : public QwtPlot
     Q_ENUMS(axisScaling)
     Q_ENUMS(plMode)
     Q_ENUMS(eraMode)
+    Q_ENUMS(axisType)
 
     Q_PROPERTY(QString Title READ getTitlePlot WRITE setTitlePlot)
     Q_PROPERTY(QString TitleX READ getTitleX WRITE setTitleX)
@@ -113,6 +115,9 @@ class QTCON_EXPORT caCartesianPlot : public QwtPlot
     Q_PROPERTY(bool XaxisEnabled READ getXaxisEnabled WRITE setXaxisEnabled)
     Q_PROPERTY(bool YaxisEnabled READ getYaxisEnabled WRITE setYaxisEnabled)
 
+    Q_PROPERTY(axisType XaxisType READ getXaxisType WRITE setXaxisType)
+    Q_PROPERTY(axisType YAxisType READ getYaxisType WRITE setYaxisType)
+
 public:
 
     bool getXaxisEnabled() const { return thisXshow; }
@@ -150,6 +155,8 @@ public:
       ThinLines,
       HorSticks
     };
+
+    enum axisType { linear=0, log10};
 
     enum plMode {
         PlotNPointsAndStop = 0,
@@ -290,6 +297,11 @@ public:
     axisScaling getYscaling() const {return thisYscaling;}
     void setYscaling(axisScaling s);
 
+    axisType getXaxisType() const {return thisXtype;}
+    void setXaxisType(axisType s);
+    axisType getYaxisType() const {return thisYtype;}
+    void setYaxisType(axisType s);
+
     caCartesianPlot(QWidget *parent);
 
     QwtSymbol::Style myMarker(curvSymbol m);
@@ -346,6 +358,7 @@ private:
 
     bool thisGrid;
     axisScaling thisXscaling, thisYscaling;
+    axisType thisXtype, thisYtype;
 
     double AxisLowX;
     double AxisUpX;
@@ -354,8 +367,8 @@ private:
 
     QwtPlotCurve curve[curveCount];
 
-    QVarLengthArray<double> X[curveCount];
-    QVarLengthArray<double> Y[curveCount];
+    QVarLengthArray<double> X[curveCount], XSAVE[curveCount];
+    QVarLengthArray<double> Y[curveCount], YSAVE[curveCount];
 
     QVarLengthArray<double> accumulX[curveCount];
     QVarLengthArray<double> accumulY[curveCount];
@@ -369,7 +382,7 @@ private:
     void setForegroundColor(QColor c);
     void setScalesColor(QColor c);
     void setGridsColor(QColor c);
-
+    void setSamplesData(int index, double *x, double *y, int size, bool saveFlag);
     bool eventFilter(QObject *obj, QEvent *event);
 
     QwtPlotZoomer* zoomer;

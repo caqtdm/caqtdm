@@ -44,6 +44,7 @@
 #include <qwt_plot_curve.h>
 #include <qwt_scale_draw.h>
 #include <qwt_legend.h>
+#include <qwt_scale_engine.h>
 #if QWT_VERSION >= 0x060100
   #include <qwt_legend_label.h>
 #else
@@ -73,6 +74,7 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
     Q_ENUMS(axisScaling)
     Q_ENUMS(units)
     Q_ENUMS(xAxisType)
+    Q_ENUMS(yAxisType)
 
     Q_PROPERTY(QString Title READ getTitlePlot WRITE setTitlePlot)
     Q_PROPERTY(QString TitleX READ getTitleX WRITE setTitleX)
@@ -81,6 +83,7 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
     Q_PROPERTY(units units READ getUnits WRITE setUnits)
     Q_PROPERTY(double period READ getPeriod WRITE setPeriod)
     Q_PROPERTY(xAxisType XaxisType READ getXaxisType WRITE setXaxisType)
+    Q_PROPERTY(yAxisType YAxisType READ getYaxisType WRITE setYaxisType)
 
     // would have been nice to define all this with a define statement, however moc does not support that
 
@@ -161,6 +164,8 @@ public:
     enum  curvStyle {Lines = 1, FillUnder = 5};
     enum units { Millisecond = 0, Second, Minute};
     enum xAxisType {TimeScale, ValueScale};
+    enum yAxisType {linear=0, log10};
+
 
     enum LegendAtttribute { COLOR, FONT, TEXT};
 
@@ -190,13 +195,16 @@ public:
     void setPVS(QString const &newPV) {thisPVS = newPV.split(";");}
 
     units getUnits() const {return thisUnits;}
-    void setUnits(units const &newU) {thisUnits = newU; defineAxis(thisUnits, thisPeriod);}
+    void setUnits(units const &newU) {thisUnits = newU; defineXaxis(thisUnits, thisPeriod);}
 
     double getPeriod() const { return thisPeriod; }
-    void setPeriod(double const &newP) {thisPeriod = newP; defineAxis(thisUnits, thisPeriod);}
+    void setPeriod(double const &newP) {thisPeriod = newP; defineXaxis(thisUnits, thisPeriod);}
 
     xAxisType getXaxisType() const {return thisXaxisType;}
-    void setXaxisType(xAxisType s) {thisXaxisType=s; defineAxis(thisUnits, thisPeriod);}
+    void setXaxisType(xAxisType s) {thisXaxisType=s; defineXaxis(thisUnits, thisPeriod);}
+
+    yAxisType getYaxisType() const {return thisYaxisType;}
+    void setYaxisType(yAxisType s);
 
     void setColor(QColor c, int number);
     QColor getColor(int number) const {return thisLineColor[number];}
@@ -408,14 +416,13 @@ private:
     double Period;
     units Unit;
     QTimer *Timer;
-    //QTimer TimerThread;
     struct timeb  timeNow;
     struct timeb  timeStart;
     bool Start;
 
     bool eventFilter(QObject *obj, QEvent *event);
-    void setAxis(double interval, double period);
-    void defineAxis(units unit, double period);
+    void setXaxis(double interval, double period);
+    void defineXaxis(units unit, double period);
     void RescaleCurves(int width, units unit, double period);
     void RescaleAxis();
 
@@ -435,6 +442,7 @@ private:
 
     bool thisXshow, thisYshow, thisLegendshow, thisGrid;
     xAxisType thisXaxisType;
+    yAxisType thisYaxisType;
 
     QString thisTitle, thisTitleX, thisTitleY;
     units thisUnits;
