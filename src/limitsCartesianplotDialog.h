@@ -72,6 +72,8 @@
      QLineEdit *xmaxLineEdit;
      QLineEdit *yminLineEdit;
      QLineEdit *ymaxLineEdit;
+     QComboBox *XaxisType;
+     QComboBox *YaxisType;
      caCartesianPlot *CartesianPlot;
      MutexKnobData *monData;
  };

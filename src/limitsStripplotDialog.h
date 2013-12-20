@@ -67,6 +67,7 @@
      QComboBox *maxComboBox[caStripPlot::MAXCURVES];
      QLineEdit *minLineEdit[caStripPlot::MAXCURVES];
      QLineEdit *maxLineEdit[caStripPlot::MAXCURVES];
+     QComboBox *YaxisType;
      QStringList vars;
      caStripPlot *StripPlot;
      MutexKnobData *monData;

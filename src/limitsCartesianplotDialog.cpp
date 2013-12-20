@@ -60,15 +60,25 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
     else if(CartesianPlot->getXscaling() == caCartesianPlot::Channel) xComboBox->setCurrentIndex(1);
     else if(CartesianPlot->getXscaling() == caCartesianPlot::User) xComboBox->setCurrentIndex(2);
 
+    QLabel *xaxisPresent = new QLabel("axe visible");
+
     xCheckBox= new QCheckBox();
     xCheckBox->setChecked(CartesianPlot->getXaxisEnabled());
+
+    XaxisType = new QComboBox;
+    XaxisType->addItem("linear");
+    XaxisType->addItem("log10");
+    if(CartesianPlot->getXaxisType() == caCartesianPlot::log10) XaxisType->setCurrentIndex(1);
+    else XaxisType->setCurrentIndex(0);
 
     // add all to layout
     Layout->addWidget(xLabel,    0, 0);
     Layout->addWidget(xComboBox, 0, 1);
     Layout->addWidget(xminLineEdit, 0, 2);
     Layout->addWidget(xmaxLineEdit, 0, 3);
-    Layout->addWidget(xCheckBox, 0, 4);
+    Layout->addWidget(xaxisPresent,  0, 5);
+    Layout->addWidget(xCheckBox, 0, 6);
+    Layout->addWidget(XaxisType, 0, 4);
 
     // treat Y
     QLabel *yLabel = new QLabel("Y axis ");
@@ -95,15 +105,25 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
     else if(CartesianPlot->getYscaling() == caCartesianPlot::Channel) yComboBox->setCurrentIndex(1);
     else if(CartesianPlot->getYscaling() == caCartesianPlot::User) yComboBox->setCurrentIndex(2);
 
+    QLabel *yaxisPresent = new QLabel("axe visible");
+
     yCheckBox = new QCheckBox();
     yCheckBox->setChecked(CartesianPlot->getYaxisEnabled());
+
+    YaxisType = new QComboBox;
+    YaxisType->addItem("linear");
+    YaxisType->addItem("log10");
+    if(CartesianPlot->getYaxisType() == caCartesianPlot::log10) YaxisType->setCurrentIndex(1);
+    else YaxisType->setCurrentIndex(0);
 
     // add all to layout
     Layout->addWidget(yLabel,    1, 0);
     Layout->addWidget(yComboBox, 1, 1);
     Layout->addWidget(yminLineEdit, 1, 2);
     Layout->addWidget(ymaxLineEdit, 1, 3);
-    Layout->addWidget(yCheckBox, 1, 4);
+    Layout->addWidget(yaxisPresent,  1, 5);
+    Layout->addWidget(yCheckBox, 1, 6);
+    Layout->addWidget(YaxisType, 1, 4);
 
     // box with buttons
     QDialogButtonBox *box = new QDialogButtonBox( Qt::Horizontal );
@@ -242,5 +262,13 @@ void limitsCartesianplotDialog::applyClicked()
 
     CartesianPlot->setXaxisEnabled(xCheckBox->isChecked());
     CartesianPlot->setYaxisEnabled(yCheckBox->isChecked());
+
+    indx = XaxisType->currentIndex();
+    if(indx == 0) CartesianPlot->setXaxisType(caCartesianPlot::linear);
+    else if(indx == 1) CartesianPlot->setXaxisType(caCartesianPlot::log10);
+
+    indx = YaxisType->currentIndex();
+    if(indx == 0) CartesianPlot->setYaxisType(caCartesianPlot::linear);
+    else if(indx == 1) CartesianPlot->setYaxisType(caCartesianPlot::log10);
 }
 

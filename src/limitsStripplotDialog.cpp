@@ -69,6 +69,16 @@ limitsStripplotDialog::limitsStripplotDialog(caStripPlot *w, MutexKnobData *data
         }
     }
 
+    QLabel *YaxisTypelLabel = new QLabel("Y axis :");
+    YaxisType = new QComboBox;
+    YaxisType->addItem("linear");
+    YaxisType->addItem("log10");
+    if(StripPlot->getYaxisType() == caStripPlot::log10) YaxisType->setCurrentIndex(1);
+    else YaxisType->setCurrentIndex(0);
+
+    Layout->addWidget(YaxisTypelLabel,  vars.size(), 3);
+    Layout->addWidget(YaxisType,  vars.size(), 4);
+
     QDialogButtonBox *box = new QDialogButtonBox( Qt::Horizontal );
     QPushButton *button = new QPushButton( "Return" );
     connect( button, SIGNAL(clicked()), this, SLOT(cancelClicked()) );
@@ -139,6 +149,11 @@ void limitsStripplotDialog::applyClicked()
             }
         }
     }
+
+    int indx = YaxisType->currentIndex();
+    if(indx == 0) StripPlot->setYaxisType(caStripPlot::linear);
+    else if(indx == 1) StripPlot->setYaxisType(caStripPlot::log10);
+
 
     // force a resize to reinitialize the plot
     StripPlot->resize(StripPlot->width()+1, StripPlot->height()+1);
