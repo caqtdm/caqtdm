@@ -144,7 +144,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: cornsilk;}</string>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -1345,7 +1345,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>6</number>
       </property>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">
@@ -2707,7 +2707,7 @@ p, li { white-space: pre-wrap; }
          </sizepolicy>
         </property>
         <property name="Title" stdset="0">
-         <string>proscan Deflector Curve</string>
+         <string notr="true">Test Curve</string>
         </property>
         <property name="TitleX">
          <string>[kv]</string>
@@ -2726,9 +2726,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="color_1">
          <color>
-          <red>0</red>
+          <red>170</red>
           <green>255</green>
-          <blue>0</blue>
+          <blue>255</blue>
          </color>
         </property>
         <property name="channels_2" stdset="0">
@@ -2785,16 +2785,22 @@ p, li { white-space: pre-wrap; }
          </color>
         </property>
         <property name="XaxisScaling" stdset="0">
-         <enum>caCartesianPlot::Channel</enum>
+         <enum>caCartesianPlot::User</enum>
         </property>
         <property name="YaxisScaling" stdset="0">
-         <enum>caCartesianPlot::Channel</enum>
+         <enum>caCartesianPlot::User</enum>
         </property>
         <property name="XaxisLimits">
-         <string>0;1000</string>
+         <string>0.0;10</string>
         </property>
         <property name="YaxisLimits">
-         <string>0;800</string>
+         <string>0.01;10</string>
+        </property>
+        <property name="XaxisType">
+         <enum>caCartesianPlot::linear</enum>
+        </property>
+        <property name="YAxisType" stdset="0">
+         <enum>caCartesianPlot::log10</enum>
         </property>
        </widget>
        <widget class="caNumeric" name="canumeric_6">
@@ -2864,6 +2870,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="XaxisType">
          <enum>caStripPlot::TimeScale</enum>
+        </property>
+        <property name="YAxisType" stdset="0">
+         <enum>caStripPlot::log10</enum>
         </property>
         <property name="YaxisLimitsMax_1">
          <double>5.000000000000000</double>
@@ -3944,6 +3953,167 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="tiltAngle">
          <number>300</number>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_28">
+       <attribute name="title">
+        <string>Waterfallplot</string>
+       </attribute>
+       <widget class="caWaterfallPlot" name="cawaterfallplot">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>20</y>
+          <width>601</width>
+          <height>341</height>
+         </rect>
+        </property>
+        <property name="Title" stdset="0">
+         <string notr="true">waveform</string>
+        </property>
+        <property name="TitleX">
+         <string notr="true">Bucket</string>
+        </property>
+        <property name="TitleY">
+         <string notr="true">Fill</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">QTDM:TEST:AO_WAVE</string>
+        </property>
+        <property name="units">
+         <enum>caWaterfallPlot::Millisecond</enum>
+        </property>
+        <property name="period">
+         <double>100.000000000000000</double>
+        </property>
+        <property name="NumberOfTraces" stdset="0">
+         <number>300</number>
+        </property>
+        <property name="IntensityMax">
+         <double>1000.000000000000000</double>
+        </property>
+        <property name="IntensityMin">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="IntensityScalingMax">
+         <enum>caWaterfallPlot::User</enum>
+        </property>
+        <property name="IntensityScalingMin">
+         <enum>caWaterfallPlot::User</enum>
+        </property>
+       </widget>
+       <widget class="caWaterfallPlot" name="cawaterfallplot_3">
+        <property name="geometry">
+         <rect>
+          <x>720</x>
+          <y>20</y>
+          <width>271</width>
+          <height>351</height>
+         </rect>
+        </property>
+        <property name="Title" stdset="0">
+         <string notr="true">Analog on Montor</string>
+        </property>
+        <property name="TitleX">
+         <string notr="true">Bucket</string>
+        </property>
+        <property name="TitleY">
+         <string notr="true">Fill</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">QTDM:TEST:AO</string>
+        </property>
+        <property name="units">
+         <enum>caWaterfallPlot::Monitor</enum>
+        </property>
+        <property name="NumberOfTraces" stdset="0">
+         <number>300</number>
+        </property>
+        <property name="IntensityMax">
+         <double>1000.000000000000000</double>
+        </property>
+        <property name="IntensityMin">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="IntensityScalingMax">
+         <enum>caWaterfallPlot::User</enum>
+        </property>
+        <property name="IntensityScalingMin">
+         <enum>caWaterfallPlot::User</enum>
+        </property>
+       </widget>
+       <widget class="caNumeric" name="canumeric_7">
+        <property name="geometry">
+         <rect>
+          <x>570</x>
+          <y>450</y>
+          <width>186</width>
+          <height>106</height>
+         </rect>
+        </property>
+        <property name="integerDigits" stdset="0">
+         <number>3</number>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">QTDM:TEST:AO</string>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>0</red>
+          <green>85</green>
+          <blue>255</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caWaterfallPlot" name="cawaterfallplot_2">
+        <property name="geometry">
+         <rect>
+          <x>50</x>
+          <y>350</y>
+          <width>451</width>
+          <height>211</height>
+         </rect>
+        </property>
+        <property name="Title" stdset="0">
+         <string notr="true">waveform test data</string>
+        </property>
+        <property name="TitleX">
+         <string notr="true">Bucket</string>
+        </property>
+        <property name="TitleY">
+         <string notr="true">Fill</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true"/>
+        </property>
+        <property name="units">
+         <enum>caWaterfallPlot::Millisecond</enum>
+        </property>
+        <property name="period">
+         <double>100.000000000000000</double>
+        </property>
+        <property name="NumberOfTraces" stdset="0">
+         <number>300</number>
+        </property>
+        <property name="IntensityMax">
+         <double>1000.000000000000000</double>
+        </property>
+        <property name="IntensityMin">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="IntensityScalingMax">
+         <enum>caWaterfallPlot::User</enum>
+        </property>
+        <property name="IntensityScalingMin">
+         <enum>caWaterfallPlot::User</enum>
         </property>
        </widget>
       </widget>
@@ -5574,6 +5744,11 @@ p, li { white-space: pre-wrap; }
    <class>caCalc</class>
    <extends>QLabel</extends>
    <header>caCalc</header>
+  </customwidget>
+  <customwidget>
+   <class>caWaterfallPlot</class>
+   <extends>QWidget</extends>
+   <header>caWaterfall</header>
   </customwidget>
  </customwidgets>
  <resources/>
