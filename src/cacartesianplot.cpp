@@ -395,6 +395,7 @@ void caCartesianPlot::setData(const QVector<double>& vector, int curvIndex, int 
 }
 
 // this routine will prevent that we have problems with negative values when logarithmic scale
+// and will keep the values in order to switch between log and linear scale
 void caCartesianPlot::setSamplesData(int index, double *x, double *y, int size, bool saveFlag)
 {
     QVarLengthArray<double> XAUX, YAUX;
@@ -408,23 +409,27 @@ void caCartesianPlot::setSamplesData(int index, double *x, double *y, int size, 
     }
 
     // use auxiliary arrays, in order not to overwrite the original data
-    XAUX.resize(size);
-    YAUX.resize(size);
-    memcpy(XAUX.data(), x, size*sizeof(double));
-    memcpy(YAUX.data(), y, size*sizeof(double));
+    if((thisXtype == log10) ||  (thisYtype == log10)) {
+        XAUX.resize(size);
+        YAUX.resize(size);
+        memcpy(XAUX.data(), x, size*sizeof(double));
+        memcpy(YAUX.data(), y, size*sizeof(double));
 
-    if(thisXtype == log10) {
-        for(int i=0; i< size; i++) {
-            if(x[i] < 1.e-20) XAUX[i] = 1.e-20;
+        if(thisXtype == log10) {
+            for(int i=0; i< size; i++) {
+                if(x[i] < 1.e-20) XAUX[i] = 1.e-20;
+            }
         }
-    }
-    if(thisYtype == log10) {
-        for(int i=0; i< size; i++) {
-            if(y[i] < 1.e-20) YAUX[i] = 1.e-20;
+        if(thisYtype == log10) {
+            for(int i=0; i< size; i++) {
+                if(y[i] < 1.e-20) YAUX[i] = 1.e-20;
+            }
         }
+        curve[index].setSamples(XAUX.data(), YAUX.data(), size);
     }
-
-    curve[index].setSamples(XAUX.data(), YAUX.data(), size);
+    else {
+        curve[index].setSamples(x, y, size);
+    }
 }
 
 void caCartesianPlot::setTitlePlot(QString const &titel)
