@@ -1,9 +1,12 @@
-CAQTDM_VERSION = V3.6.1
+CAQTDM_VERSION = V3.6.2
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+
+# 3.6.2
+# cartesian and stripplot support now logaritmic scales
 
 # 3.6.1
 # suppressed slidervaluecallback when setting limits from hopr, lopr
