@@ -22,8 +22,8 @@ cp -v $SOURCE/QtTunes_Hipa $DESTINATION
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/HFdispQt
 cp -v $SOURCE/HFdispQt $DESTINATION
 
-SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caHFdispQt
-cp -v $SOURCE/HFdispQt $DESTINATION
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/HFdispQt
+cp -v $SOURCE/caHFdispQt $DESTINATION
 
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/probeQtProscan
 cp -v $SOURCE/probeQt $DESTINATION
