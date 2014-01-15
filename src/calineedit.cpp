@@ -46,6 +46,8 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
        setFont(font);
     }
 
+    isShown = false;
+
     oldStyle = "";
     thisStyle = "";
     thisColorMode=Default;
@@ -60,6 +62,11 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     oldBackColor = Qt::black;
     oldForeColor = Qt::gray;
 
+    // default colors will be odefined in my event handler by taking them from the palette defined by stylesheet definitions
+    //defBackColor = QColor(255, 248, 220, 255);
+    //defForeColor = Qt::black;
+    defSelectColor = Qt::red; // this does not appear in the palette
+
     setPrecisionMode(Channel);
     setLimitsMode(Channel);
     setPrecision(0);
@@ -73,13 +80,11 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     setText(keepText);
 
     setFontScaleMode(WidthAndHeight);
-    setColorMode(Default);
     newFocusPolicy(Qt::NoFocus);
 
     d_rescaleFontOnTextChanged = true;
     connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(rescaleFont(const QString&)));
-        installEventFilter(this);
-
+    installEventFilter(this);
 }
 
 void caLineEdit::newFocusPolicy(Qt::FocusPolicy f){
@@ -102,18 +107,19 @@ void caLineEdit::setPV(QString const &newPV)
 
 void caLineEdit::setColors(QColor bg, QColor fg)
 {
+    if(!defBackColor.isValid() || !defForeColor.isValid()) return;
+
     if((bg != oldBackColor) || (fg != oldForeColor) || (thisStyle != oldStyle) || (thisColorMode != oldColorMode)) {
-        QColor defColor = QColor(255, 248, 220, thisBackColor.alpha());  // my default color, we do not use the stylesheet anymore
         QColor lc;
         QColor dc;
         thisStyle = "caTextEntry,caLineEdit {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-radius: 1px; }";
         thisStyle.append("caLineEdit {border: 0px; padding: 0px 0px 0px 2px;} caTextEntry { border: 2px; padding: 0px;}");
         if(thisColorMode == Default || thisColorMode == Alarm_Default) {
-            thisStyle = thisStyle.arg(defColor.red()).arg(defColor.green()).arg(defColor.blue()).arg(defColor.alpha()).
-                    arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
+            thisStyle = thisStyle.arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
+                    arg(defForeColor.red()).arg(defForeColor.green()).arg(defForeColor.blue()).arg(defForeColor.alpha());
 
-            lc = defColor.lighter();
-            dc = defColor.darker();
+            lc = defBackColor.lighter();
+            dc = defBackColor.darker();
         } else {
             thisStyle = "caTextEntry, caLineEdit {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-radius: 1px; }";
             thisStyle.append("caLineEdit{border: 0px; padding: 0px 0px 0px 2px;} caTextEntry { border: 2px; padding: 0px;} ");
@@ -123,11 +129,12 @@ void caLineEdit::setColors(QColor bg, QColor fg)
             dc = bg.darker();
         }
         if(thisStyle != oldStyle || thisColorMode != oldColorMode) {
-            thisStyle.append(" caTextEntry {border-style:inset; border-color: rgba(%1, %2, %3, %4) rgba(%5, %6, %7, %8)  rgba(%9, %10, %11, %12) rgba(%13, %14, %15, %16);} caTextEntry:focus {padding: 0px; border: 2px groove darkred; border-radius: 1px;} ");
+            thisStyle.append(" caTextEntry {border-style:inset; border-color: rgba(%1, %2, %3, %4) rgba(%5, %6, %7, %8)  rgba(%9, %10, %11, %12) rgba(%13, %14, %15, %16);} caTextEntry:focus {padding: 0px; border: 2px groove rgba(%17, %18, %19, %20); border-radius: 1px;} ");
             thisStyle = thisStyle.arg(dc.red()).arg(dc.green()).arg(dc.blue()).arg(dc.alpha()).
                     arg(lc.red()).arg(lc.green()).arg(lc.blue()).arg(lc.alpha()).
                     arg(lc.red()).arg(lc.green()).arg(lc.blue()).arg(lc.alpha()).
-                    arg(dc.red()).arg(dc.green()).arg(dc.blue()).arg(dc.alpha());
+                    arg(dc.red()).arg(dc.green()).arg(dc.blue()).arg(dc.alpha()).
+                    arg(defSelectColor.red()).arg(defSelectColor.green()).arg(defSelectColor.blue()).arg(defSelectColor.alpha());
             setStyleSheet(thisStyle);
             oldStyle = thisStyle;
         }
@@ -175,6 +182,22 @@ bool caLineEdit::event(QEvent *e)
 {
     if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
         FontScalingWidget::rescaleFont(text(), calculateTextSpace());
+        // we try to get the default color for the background set through the external stylesheets
+
+        if(!isShown) {
+          setStyleSheet("");
+          QString c=  palette().color(QPalette::Base).name();
+          defBackColor = QColor(c);
+          //printf("%s %s\n", c.toAscii().constData(), this->objectName().toAscii().constData());
+          c=  palette().color(QPalette::Text).name();
+          defForeColor = QColor(c);
+
+          if(!defBackColor.isValid()) defBackColor = QColor(255, 248, 220, 255);
+          if(!defForeColor.isValid()) defForeColor = Qt::black;
+
+          setColors(thisBackColor, thisForeColor);
+          isShown = true;
+        }
 
     // we do this to temporarily disable the widget in order to be able to initiate a drag
     // for context menu it will be enabled again when drag gets initiated (in caQtDM_Lib)
@@ -194,21 +217,26 @@ bool caLineEdit::event(QEvent *e)
 void caLineEdit::setFormat(int prec)
 {
     int precision = prec;
+    if(precision > 17) precision = 17;
     if(thisPrecMode == User) {
         precision = getPrecision();
     }
     switch (thisFormatType) {
     case string:
     case decimal:
-        sprintf(thisFormat, "%s.%dlf", "%", precision);
+        if(precision >= 0) {
+           sprintf(thisFormat, "%s.%dlf", "%", precision);
+        } else {
+           sprintf(thisFormat, "%s.%dle", "%", -precision);
+        }
         break;
     case compact:
-        sprintf(thisFormat, "%s.%dle", "%", precision);
-        sprintf(thisFormatC, "%s.%dlf", "%", precision);
+        sprintf(thisFormat, "%s.%dle", "%", qAbs(precision));
+        sprintf(thisFormatC, "%s.%dlf", "%", qAbs(precision));
         break;
     case exponential:
     case engr_notation:
-        sprintf(thisFormat, "%s.%dle", "%", precision);
+        sprintf(thisFormat, "%s.%dle", "%", qAbs(precision));
         break;
     case truncated:
         break;
@@ -244,6 +272,7 @@ void caLineEdit::setValue(double value, const QString& units)
         strcat(asc, " ");
         strcat(asc, units.toAscii().constData());
     }
+
     setText(asc);
     setCursorPosition(0);
 }

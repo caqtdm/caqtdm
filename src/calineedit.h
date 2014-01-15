@@ -138,6 +138,7 @@ private:
 
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
+    QColor defBackColor, defForeColor, defSelectColor;
     QPalette thisPalette;
     colMode thisColorMode;
     colMode oldColorMode;
@@ -154,6 +155,8 @@ private:
     double thisMaximum, thisMinimum;
     FormatType thisFormatType;
     QString thisStyle, oldStyle;
+
+    bool isShown;
 };
 
 #endif
