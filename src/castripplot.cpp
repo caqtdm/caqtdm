@@ -205,7 +205,11 @@ void caStripPlot::setYaxisType(yAxisType s)
 {
     thisYaxisType = s;
     if(s == log10) {
+#if QWT_VERSION < 0x060100
         setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
+#else
+        setAxisScaleEngine(QwtPlot::yLeft, new QwtLogScaleEngine);
+#endif
     } else {
         setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine);
     }

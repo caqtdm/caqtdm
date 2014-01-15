@@ -805,7 +805,11 @@ void caCartesianPlot::setXaxisType(axisType s)
 {
     thisXtype = s;
     if(s == log10) {
+#if QWT_VERSION < 0x060100
         setAxisScaleEngine(QwtPlot::xBottom, new QwtLog10ScaleEngine);
+#else
+        setAxisScaleEngine(QwtPlot::xBottom, new QwtLogScaleEngine);
+#endif
     } else {
         setAxisScaleEngine(QwtPlot::xBottom, new QwtLinearScaleEngine);
     }
@@ -822,7 +826,11 @@ void caCartesianPlot::setYaxisType(axisType s)
 {
     thisYtype = s;
     if(s == log10) {
-        setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
+#if QWT_VERSION < 0x060100
+        setAxisScaleEngine(QwtPlot::xBottom, new QwtLog10ScaleEngine);
+#else
+        setAxisScaleEngine(QwtPlot::xBottom, new QwtLogScaleEngine);
+#endif
     } else {
         setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine);
     }
