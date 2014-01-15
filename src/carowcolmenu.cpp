@@ -426,6 +426,4 @@ void caRowColMenu::updateFontScaleMode()
         }
 
     }
-
 }
-
