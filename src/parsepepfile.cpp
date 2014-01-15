@@ -303,6 +303,12 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                     } else {
                         gridLayout[actualLine][actualColumn].nbElem = 2;
                     }
+
+                    if(gridLayout[actualLine][actualColumn].command.size() > 0) {
+                        printf("add an element\n");
+                         gridLayout[actualLine][actualColumn].nbElem++;
+                    }
+
                 }
 
                 else if(widgetType.contains("binary")) {
@@ -811,6 +817,12 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         writeLineEdit(grid.formats[0], grid.widgetChannel, "150", lineHeight, "", "", fontSize, "", "", "", "", "", rgba, array);
         writeCloseTag("item", array);
 
+        if(grid.command.size() > 0) {
+            writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
+            writeShellCommand(grid.comlab, grid.command, array);
+            writeCloseTag("item", array);
+        }
+
     } else {
         printf("%s not treated\n", grid.widgetType.toAscii().constData());
     }
@@ -897,20 +909,21 @@ void ParsePepFile::writeTogglebutton(QString pv, QByteArray *array)
 
 void ParsePepFile::writeShellCommand(QString label, QString command, QByteArray *array)
 {
-    QString newCommand = "\"";
+    QString newCommand = "";
     newCommand.append(command);
-    newCommand.append("\"");
+    newCommand.append("");
     writeOpenTag("widget class=\"caShellCommand\" name=\"cashellcommand\"", array);
 
     writeSimpleProperty("label", "string", label, array);
-    writeSimpleProperty("labels", "string", "1", array);
-    writeSimpleProperty("files", "string", "1", array);
+    writeSimpleProperty("labels", "string", "", array);
+    writeSimpleProperty("files", "string", "", array);
 
     writeSimpleProperty("args", "string", newCommand, array);
     writeOpenProperty("minimumSize", array);
     writeOpenTag("size", array);
     writeTaggedString("height", "24", array);
-    writeTaggedString("width", "120", array);
+    int width = 10 * (label.size() + 1);
+    writeTaggedString("width",QString::number(width) , array);
     writeCloseTag("size", array);
     writeCloseProperty(array);
     writeOpenProperty("maximumSize", array);
@@ -1203,19 +1216,21 @@ QWidget* ParsePepFile::load(QWidget *parent)
     QUiLoader loader;
 
 /* used to output the data to an ui file for verification*/
-/*
+    PRINT(
     QFile file("out.ui");
     file.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(&file);
-*/
+    )
 
     buffer->open(QIODevice::ReadOnly);
 
 /* output the data to the verification file */
-/*
+
+    PRINT(
     out << buffer->data();
     file.close();
-*/
+    )
+
     buffer->seek(0);
     widget=loader.load(buffer, parent);
     buffer->close();
