@@ -305,7 +305,6 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                     }
 
                     if(gridLayout[actualLine][actualColumn].command.size() > 0) {
-                        printf("add an element\n");
                          gridLayout[actualLine][actualColumn].nbElem++;
                     }
 
