@@ -61,7 +61,7 @@ ParsePepFile::ParsePepFile(QString filename, bool willprint)
            "<property name=\"styleSheet\">\n"
            "<string>\n"
            "QWidget#centralWidget {background: rgba(255, 255, 255, 255); }\n"
-           "caLineEdit {border-radius: 1px;background: lightyellow;color: black;}\n"
+           "caLineEdit {border-radius: 1px;background: lightyellow; color: black;}\n"
            "</string>\n"
            "</property>\n"
            "<widget class=\"QWidget\" name=\"centralWidget\">\n"
@@ -1006,7 +1006,7 @@ void ParsePepFile::writeLineEdit(QString format, QString pv, QString minwidth, Q
     } else {
        setColor("background", 255, 255, 255, 0, array);
     }
-    setColor("foreground", 0, 0, 0, 255, array);
+    setColor("foreground", 128, 128, 128, 255, array);
 
     writeSimpleProperty("unitsEnabled", "bool", "true", array);
 
