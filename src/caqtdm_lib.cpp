@@ -1978,14 +1978,14 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             // take limits from channel, in case of user limits these should already been set
             if((channelLimitsEnabled) && (data.edata.initialize) ) {
                 // when limits are the same, do nothing
-                if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
+                if(data.edata.upper_ctrl_limit != data.edata.lower_ctrl_limit) {
                     disconnect(w, SIGNAL(valueChanged (double)), 0, 0);
                     if(widget->getDirection() == caSlider::Down  || widget->getDirection() == caSlider::Left) {
-                        widget->setMinValue(data.edata.upper_disp_limit);
-                        widget->setMaxValue(data.edata.lower_disp_limit);
+                        widget->setMinValue(data.edata.upper_ctrl_limit);
+                        widget->setMaxValue(data.edata.lower_ctrl_limit);
                     } else {
-                        widget->setMaxValue(data.edata.upper_disp_limit);
-                        widget->setMinValue(data.edata.lower_disp_limit);
+                        widget->setMaxValue(data.edata.upper_ctrl_limit);
+                        widget->setMinValue(data.edata.lower_ctrl_limit);
                     }
                     connect(w, SIGNAL(valueChanged(double)), this, SLOT(Callback_SliderValueChanged(double)));
                 }
@@ -2860,6 +2860,7 @@ void CaQtDM_Lib::processTerminated()
 /**
  * callback will execute a shell command
  */
+
 void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
 {
     QString separator((QChar)27);
@@ -2872,6 +2873,7 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
 #endif
 */
     caShellCommand *choice = qobject_cast<caShellCommand *>(sender());
+
     QStringList commands = choice->getFiles().split(";");
     QString argslist = choice->getArgs();
 
@@ -3820,13 +3822,13 @@ void CaQtDM_Lib::ComputeNumericMaxMinPrec(QWidget* widget, const knobData& data)
             caMode = caNumeric::Channel;
         }
         if(limitsMode == caMode) {
-            if((data.edata.upper_disp_limit == data.edata.lower_disp_limit) ||
-                    (fabs(data.edata.upper_disp_limit - data.edata.lower_disp_limit) <= 0.001)) {
+            if((data.edata.upper_ctrl_limit == data.edata.lower_ctrl_limit) ||
+                    (fabs(data.edata.upper_ctrl_limit - data.edata.lower_ctrl_limit) <= 0.001)) {
                 maxValue = 100000.0;
                 minValue = -100000.0;
             } else {
-                maxValue = data.edata.upper_disp_limit;
-                minValue = data.edata.lower_disp_limit;
+                maxValue = data.edata.upper_ctrl_limit;
+                minValue = data.edata.lower_ctrl_limit;
             }
         } else {
             if (caApplyNumeric *w = qobject_cast<caApplyNumeric *>(widget)) {
