@@ -30,18 +30,18 @@
 
 EPushButton::EPushButton(const QString &text, QWidget * parent) : QPushButton(text, parent), FontScalingWidget(this)
 {
-
+    installEventFilter(this);
 }
 
 EPushButton::EPushButton(QWidget * parent) : QPushButton(parent), FontScalingWidget(this)
 {
-	
+    installEventFilter(this);
 }
 
 EPushButton::EPushButton(const QIcon &icon, const QString &text, QWidget *parent) : 
 	QPushButton(icon, text, parent), FontScalingWidget(this)
 {
-	
+    installEventFilter(this);
 }
 
 void EPushButton::setText(const QString& text)
@@ -94,5 +94,18 @@ QSize EPushButton::calculateTextSpace()
    */
   d_savedLabelSize = style()->subElementRect(QStyle::SE_PushButtonContents, &button, this).size();
   return d_savedLabelSize;
+}
+
+// intercept space key, so that no keyboard spacebar will trigger when button has focus
+bool EPushButton::eventFilter(QObject *obj, QEvent *event)
+{
+    if(event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
+        QKeyEvent *me = static_cast<QKeyEvent *>(event);
+        if(me->key() == Qt::Key_Space) {
+            return true;
+        }
+    }
+
+    return QObject::eventFilter(obj, event);
 }
 
