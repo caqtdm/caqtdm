@@ -1,9 +1,19 @@
-CAQTDM_VERSION = V3.6.2
+CAQTDM_VERSION = V3.6.4
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+
+# 3.6.4
+# an empty char waveform was not clearing the calineedit: corrected
+
+# 3.6.3
+# default back and foreground colors can be set now for calineedit/catextentry in ui-file stylesheet of mainwindow or in stylesheet.qss
+# negative precision was leading to an unexpected behaviour, calineedit will use the precision and switch to exponential display
+# spacebar press has been suppressed for camessagebutton, cashellcommand, carelateddisplay, carowcolmenu, cachoice
+# changed for caslider and canumeric the limits for channel to DRVL and DRVH
+# added to formread in prc file command and comlab modifiers
 
 # 3.6.2
 # cartesian and stripplot support now logaritmic scales
