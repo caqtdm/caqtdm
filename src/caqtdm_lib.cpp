@@ -2080,16 +2080,19 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 } else {
                     widget->setAlarmColors(data.edata.severity, (double) data.edata.ivalue, bg, fg);
                 }
-                //list = String.split(";", QString::SkipEmptyParts);
                 list = String.split(";");
-
                 //qDebug() << String << list << data.pv << (int) data.edata.ivalue << data.edata.valueCount;
 
                 if((data.edata.fieldtype == caENUM)  && (list.count() == 0)) {
                     QString str= QString::number((int) data.edata.ivalue);
                     widget->setText(str);
-                } else if((data.edata.fieldtype == caENUM)  && ((int) data.edata.ivalue < list.count() )&& (list.count() > 0)) {
-                    widget->setText(list.at((int) data.edata.ivalue).trimmed());
+                } else if((data.edata.fieldtype == caENUM)  && ((int) data.edata.ivalue < list.count() ) && (list.count() > 0)) {
+                    if(list.at((int) data.edata.ivalue).trimmed().size() == 0)  {  // string seems to emty, give value
+                        QString str= QString::number((int) data.edata.ivalue);
+                        widget->setText(str);
+                    } else {
+                        widget->setText(list.at((int) data.edata.ivalue).trimmed());
+                    }
                 } else if((data.edata.fieldtype == caENUM)  && ((int) data.edata.ivalue >= list.count()) && (list.count() > 0)) {
                     QString str= QString::number((int) data.edata.ivalue);
                     widget->setText(str);
