@@ -431,6 +431,11 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         QString title(file->fileName().section('/',-1));
         mainWindow->setProperty("fileString", title);
         mainWindow->setProperty("macroString", macroString);
+
+        if (FileName.contains("prc")) {
+            mainWindow->resize(mainWindow->minimumSizeHint());
+        }
+
         delete file;
 
         //qDebug() << "set properties in qmainwindow" << mainWindow << title << macroString;
@@ -539,7 +544,9 @@ void FileOpenWindow::Callback_ActionReload()
                 mainWindow->setWindowFlags( mainWindow->windowFlags() );
                 mainWindow->setProperty("fileString", fileS);
                 mainWindow->setProperty("macroString", macroS);
-
+                if (FileName.contains("prc")) {
+                    mainWindow->resize(mainWindow->minimumSizeHint());
+                }
             }
         }
     }
