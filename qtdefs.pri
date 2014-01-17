@@ -7,6 +7,8 @@ QT_VER_MIN = $$member(QT_VERSION, 1)
 
 # 3.6.4
 # an empty char waveform was not clearing the calineedit: corrected
+# enums with empty strings were not displaying correctly in calineedit
+# when reloading a .prc file, size of display was not minimized
 
 # 3.6.3
 # default back and foreground colors can be set now for calineedit/catextentry in ui-file stylesheet of mainwindow or in stylesheet.qss
