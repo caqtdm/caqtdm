@@ -211,7 +211,7 @@ record(mbbo,"QTDM:TEST:MBBO") {
         field(ONVL, "1")
         field(TWVL, "2")
         field(ZRST, "OFF")
-        field(ONST, "ON")
+        field(ONST, "")
         field(TWST, "RESET")
 }
 

@@ -1345,7 +1345,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>6</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">
@@ -2469,6 +2469,19 @@ p, li { white-space: pre-wrap; }
           <width>100</width>
           <height>20</height>
          </rect>
+        </property>
+       </widget>
+       <widget class="caLineEdit" name="calineedit_16">
+        <property name="geometry">
+         <rect>
+          <x>760</x>
+          <y>290</y>
+          <width>100</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">QTDM:TEST:MBBO</string>
         </property>
        </widget>
       </widget>
