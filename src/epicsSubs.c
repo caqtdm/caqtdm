@@ -442,6 +442,8 @@ void connectCallback(struct connection_handler_args args)
         info->connected = true;
         if (info->event == 0) {
             info->event++;
+            // when specifying zero as number of requested elements, we will get variable length arrays (zero lenght is then also considered)
+            // probably will not work with older channel access gateways
             status = ca_add_array_event( dbf_type_to_DBR_CTRL(ca_field_type(args.chid)), ca_element_count(args.chid),
                                          args.chid, dataCallback, info, 0.0,0.0,0.0, NULL);
 
