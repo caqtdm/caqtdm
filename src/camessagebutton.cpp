@@ -135,9 +135,15 @@ bool caMessageButton::eventFilter(QObject *obj, QEvent *event)
     } else if(event->type() == QEvent::Leave) {
         QApplication::restoreOverrideCursor();
     } else if(event->type() == QEvent::MouseButtonPress) {
-        if(_AccessW) buttonhandle(0);
+         QMouseEvent *me = static_cast<QMouseEvent *>(event);
+        if (me->button()==Qt::LeftButton) {
+          if(_AccessW) buttonhandle(0);
+        }
     } else if(event->type() == QEvent::MouseButtonRelease) {
-        if(_AccessW) buttonhandle(1);
+        QMouseEvent *me = static_cast<QMouseEvent *>(event);
+        if (me->button()==Qt::LeftButton) {
+           if(_AccessW) buttonhandle(1);
+        }
     // intercept space key, so that no keyboard spacebar will trigger when button has focus
     }  else if(event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
       QKeyEvent *me = static_cast<QKeyEvent *>(event);
