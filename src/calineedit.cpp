@@ -255,7 +255,7 @@ void caLineEdit::setFormat(int prec)
 
 void caLineEdit::setValue(double value, const QString& units)
 {
-    char asc[256];
+    char asc[1024];
 
     if(thisFormatType == compact) {
       if ((value < 1.e4 && value > 1.e-4) || (value > -1.e4 && value < -1.e-4) || value == 0.0) {
