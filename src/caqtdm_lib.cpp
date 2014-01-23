@@ -1384,7 +1384,9 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         }
         widget->setColumnSizes(widget->getColumnSizes());
         widget->setProperty("Taken", true);
-        widget->setToolTip("with Ctrl+C you can copy selected items to the clipboard\ninside X11 you can then do shft+ins");
+        widget->setToolTip("select row or columns, then with Ctrl+C you can copy to the clipboard\ninside X11 you can then do shft+ins\nwhen doubleclicking on a value, you may execute a shell script for that device");
+
+        connect(widget, SIGNAL(TableDoubleClickedSignal(QString)), this, SLOT(Callback_TableDoubleClicked(QString)));
     }
 
     // make a context menu for object having a monitor
@@ -2549,8 +2551,8 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             }
 
         } else {
-            widget->displayText(row, 1, NOTCONNECTED, "");
-            widget->displayText(row, 2, NOTCONNECTED, "");
+            widget->displayText(row, 1, NOTCONNECTED, "NC");
+            widget->displayText(row, 2, NOTCONNECTED, "NC");
         }
 
         // bitnames table with text and coloring according the value=========================================================
@@ -2862,6 +2864,26 @@ void CaQtDM_Lib::processTerminated()
 
     if(t != (processWindow *) 0) t->deleteLater();
 }
+
+/**
+ * callback will execute a shell command
+ */
+void CaQtDM_Lib::Callback_TableDoubleClicked(const QString& pv)
+{
+    QString command = "";
+    caTable *w = qobject_cast<caTable *>(sender());
+    if(w->getScriptCommand().trimmed().size() == 0) return;
+    command.append(w->getScriptCommand().trimmed());
+    command.append(" ");
+    command.append(pv);
+
+    if(w->getScriptParam().size() > 0) {
+        command.append( w->getScriptParam().trimmed());
+    }
+    command.append("&");
+    shellCommand(command);
+}
+
 
 /**
  * callback will execute a shell command
@@ -3396,7 +3418,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 if(pos != -1) pv[i] = pv[i].mid(0, pos);
                 knobData *kPtr = mutexKnobData->getMutexKnobDataPV(pv[i]);  // use pointer for getting all necessary information
                 if((kPtr != (knobData*) 0) && (pv[i].length() > 0)) {
-                    char asc[255];
+                    char asc[2048];
                     info.append("<br>");
                     info.append(kPtr->pv);
 
@@ -3466,7 +3488,6 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         break;
                     }
 
-
                     // severity
                     switch(kPtr->edata.severity) {
                     case NO_ALARM:
@@ -3513,6 +3534,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         sprintf(asc,"<br>Default limits: MIN:%.*f  MAX:%.*f ", Precision, limitsMin, Precision, limitsMax);
                         info.append(asc);
                     }
+                    Precision = qAbs(Precision);
                     sprintf(asc,"<br>LOPR:%.*f  HOPR:%.*f ", Precision, kPtr->edata.lower_disp_limit,
                             Precision, kPtr->edata.upper_disp_limit);
                     info.append(asc);

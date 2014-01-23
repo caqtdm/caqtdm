@@ -219,6 +219,7 @@ private slots:
     void Callback_ChoiceClicked(const QString&);
     void Callback_RelatedDisplayClicked(int);
     void Callback_ShellCommandClicked(int);
+    void Callback_TableDoubleClicked(const QString&);
 
     void ShowContextMenu(const QPoint&);
     void DisplayContextMenu(QWidget* w);
