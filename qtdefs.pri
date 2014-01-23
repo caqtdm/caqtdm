@@ -1,9 +1,13 @@
-CAQTDM_VERSION = V3.6.4
+CAQTDM_VERSION = V3.6.5
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+
+# 3.6.5
+# selection in catable can be rows or coluns now, catable can execute a specified script with the associated pv
+# eliminated sending message in camessage with right button of mouse.
 
 # 3.6.4
 # an empty char waveform was not clearing the calineedit: corrected
