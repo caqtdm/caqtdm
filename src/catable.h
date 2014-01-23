@@ -53,6 +53,9 @@ class QTCON_EXPORT caTable : public QTableWidget
     Q_PROPERTY(double maxValue READ getMaxValue WRITE setMaxValue)
     Q_PROPERTY(double minValue READ getMinValue WRITE setMinValue)
 
+    Q_PROPERTY(QString scriptCommand READ getScriptCommand WRITE setScriptCommand)
+    Q_PROPERTY(QString scriptParameter READ getScriptParam WRITE setScriptParam)
+
 public:
 
     caTable(QWidget *parent);
@@ -76,6 +79,13 @@ public:
     QString getColumnSizes() const {return thisColumnSizes.join(";");}
     void setColumnSizes(QString const &newSizes);
 
+
+    QString getScriptCommand() const {return thisScriptCommand;}
+    QString getScriptParam() const {return thisScriptParam;}
+
+    void setScriptCommand(QString const &m) {thisScriptCommand = m;}
+    void setScriptParam(QString const &m) {thisScriptParam = m;}
+
     double getMaxValue()  const {return thisMaximum;}
     void setMaxValue(double const &maxim) {thisMaximum = maxim;}
 
@@ -90,15 +100,21 @@ public:
 
     void setValueFont(QFont font);
 
+signals:
+
+   void TableDoubleClickedSignal(QString pv);
+
 private slots:
 
     void copy();
+    void celldoubleclicked(int, int);
+    void cellclicked(int, int);
 
 protected:
 
 private:
 
-    enum { MaxRows = 50 };
+    enum { MaxRows = 500 };
     enum { MaxCols = 5  };
     QStringList	thisPV;
     QStringList	thisColumnSizes;
@@ -115,6 +131,8 @@ private:
 
     QColor defaultBackColor;
     QColor defaultForeColor;
+
+    QString thisScriptCommand, thisScriptParam;
 
     QFont thisItemFont;
 

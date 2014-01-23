@@ -47,13 +47,27 @@ caTable::caTable(QWidget *parent) : QTableWidget(parent)
     setColorMode(Static);
     setAlternatingRowColors(true);
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-    setSelectionMode(NoSelection);
+    setEditTriggers(QTableWidget::NoEditTriggers);
     verticalHeader()->setDefaultSectionSize(20);
 
     defaultForeColor = palette().foreground().color();
 
     createActions();
     addAction(copyAct);
+
+    connect(this, SIGNAL( cellDoubleClicked (int, int) ), this, SLOT(celldoubleclicked( int, int ) ) );
+    //connect(this, SIGNAL( cellClicked (int, int) ), this, SLOT(cellclicked( int, int ) ) );
+}
+
+void caTable::cellclicked(int row, int col)
+{
+    printf("clicked %d %d\n", row, col);
+}
+
+void caTable::celldoubleclicked(int row, int col)
+{
+     if(col==1) emit TableDoubleClickedSignal(this->item(row, 0)->text());
+     this->item(row,col)->setSelected(false);
 }
 
 void caTable::createActions() {
@@ -79,7 +93,6 @@ void caTable::copy()
     QItemSelectionModel *select = this->selectionModel();
     if( select->hasSelection()) {
         QClipboard *clipboard = QApplication::clipboard();
-        QString out;
         QString str;
 
         QModelIndexList rows = select->selectedRows();
@@ -93,33 +106,41 @@ void caTable::copy()
             }
             i++;
         }
-        str += "\n";
-        clipboard->setText(str);
-    }
 
-    /*
-    for(int i = 0; i < rowCount(); ++i)
-    {
-        for(int j = 0; j < columnCount(); ++j)
-        {
-            QTableWidgetItem* pWidget = item(i, j);
-            out.append(pWidget->text());
-            out.append("\t");
+        if(i==0) {
+            printf("no rows were selected\n");
+            QModelIndexList cols = select->selectedColumns();
+            foreach (QModelIndex Col, cols) {
+                if (i > 0) str += "\n";
+                for(int j = 0; j < rowCount(); ++j) {
+                    if (j > 0) str += "\t";
+                    QTableWidgetItem* pWidget = item(j, Col.column());
+                    str += pWidget->text();
+                }
+                i++;
+            }
         }
-        out.append("\n");
+        if(i> 0) {
+           str += "\n";
+           clipboard->setText(str);
+        }
     }
-    clipboard->setText(out);
-*/
 }
 
 void caTable::setFormat(int row, int prec)
 {
+    int precision;
     if(row < 0 || row > MaxRows-1) return;
     if(thisPrecMode == User) {
-        int precision = getPrecision();
+        precision = getPrecision();
+    } else {
+        precision = prec;
+    }
+    if(precision > 17) precision = 17;
+    if(precision >= 0) {
         sprintf(thisFormat[row], "%s.%dlf", "%", precision);
     } else {
-        sprintf(thisFormat[row], "%s.%dlf", "%", prec);
+        sprintf(thisFormat[row], "%s.%dle", "%", -precision);
     }
 }
 
