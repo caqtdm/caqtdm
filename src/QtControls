@@ -37,5 +37,6 @@
 #include <cadoubletabwidgetextension.h>
 #include <cadoubletabwidgetextensionfactory.h>
 #include <cawaterfallplot.h>
+#include <caspinbox.h>
 #endif
 

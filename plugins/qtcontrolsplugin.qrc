@@ -30,5 +30,6 @@
         <file>pixmaps/process.png</file>
         <file>pixmaps/tabwidget.png</file>
         <file>pixmaps/waterfall.png</file>
+        <file>pixmaps/spinbox.png</file>
     </qresource>
 </RCC>

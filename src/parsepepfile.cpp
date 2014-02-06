@@ -843,19 +843,19 @@ void ParsePepFile::writeWheelswitch(QString format, QString pv, QByteArray *arra
     QString Digits1= QString("%1").arg(integerDigits);
     QString Digits2= QString("%1").arg(decimalDigits);
 
-    writeOpenTag("widget class=\"caNumeric\" name=\"canumeric\"", array);
+    writeOpenTag("widget class=\"caSpinbox\" name=\"caspinbox\"", array);
     writeSimpleProperty("channel", "string", pv, array);
     setColor("background", 150, 245, 120, 255, array);
     writeOpenProperty("minimumSize", array);
     writeOpenTag("size", array);
     writeTaggedString("width", "100", array);
-    writeTaggedString("height", "45", array);
+    writeTaggedString("height", "25", array);
     writeCloseTag("size", array);
     writeCloseProperty(array);
     writeOpenProperty("maximumSize", array);
     writeOpenTag("size", array);
     writeTaggedString("width", "150", array);
-    writeTaggedString("height", "45", array);
+    writeTaggedString("height", "25", array);
     writeCloseTag("size", array);
     writeCloseProperty(array);
     writeSimpleProperty("integerDigits", "number", Digits1, array);

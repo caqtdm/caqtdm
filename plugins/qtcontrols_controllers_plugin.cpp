@@ -316,6 +316,23 @@ caScriptButtonInterface::caScriptButtonInterface(QObject* parent) : CustomWidget
         d_toolTip = "[execute a script or image as detached process]";
 }
 
+caSpinboxInterface::caSpinboxInterface(QObject *parent): CustomWidgetInterface(parent)
+{
+        strng name[1], type[1];
+        strcpy(name[0], "channel");
+        strcpy(type[0], "multiline");
+        d_domXml = XmlFunc("caSpinbox", "caspinbox", 0, 0, 80, 30, name, type, 1);
+    d_name = "caSpinbox";
+    d_include = "caSpinbox";
+    d_icon = QPixmap(":pixmaps/spinbox.png");
+    d_toolTip = "[spinbox]";
+}
+
+QWidget *caSpinboxInterface::createWidget(QWidget *parent)
+{
+    return new caSpinbox(parent);
+}
+
 CustomWidgetCollectionInterface::CustomWidgetCollectionInterface(QObject *parent): QObject(parent)
 {
     d_plugins.append(new caNumericInterface(this));
@@ -329,6 +346,7 @@ CustomWidgetCollectionInterface::CustomWidgetCollectionInterface(QObject *parent
     d_plugins.append(new caMessageButtonInterface(this));
     d_plugins.append(new caToggleButtonInterface(this)); 
     d_plugins.append(new caScriptButtonInterface(this));  
+    d_plugins.append(new caSpinboxInterface(this));  
 }
 
 QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface::customWidgets(void) const

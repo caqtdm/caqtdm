@@ -200,7 +200,15 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
+class caSpinboxInterface: public CustomWidgetInterface 
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerCustomWidgetInterface)
 
+public:
+    caSpinboxInterface(QObject *parent);
+    virtual QWidget *createWidget(QWidget *parent);
+};
 
 
 #endif
