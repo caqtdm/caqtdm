@@ -80,7 +80,7 @@ void ImageWidget::paintEvent(QPaintEvent * event)
 
 void ImageWidget::resizeEvent(QResizeEvent *e)
 {
-
+    Q_UNUSED(e);
 }
 
 QImage ImageWidget::scaleImage(const QImage &image, const double &scaleFactor, const bool &FitToSize) {
