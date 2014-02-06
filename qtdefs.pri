@@ -1,9 +1,16 @@
-CAQTDM_VERSION = V3.6.5
+CAQTDM_VERSION = V3.7.0
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+
+# 3.7.0
+# a spinbox has been integrated in order to be smaller than the wheelswitch. for the spinbox the digit has to be activated by click
+# in order to change it.
+
+# 3.6.6
+# strings in calineedit were trimmed; took that out
 
 # 3.6.5
 # selection in catable can be rows or coluns now, catable can execute a specified script with the associated pv
