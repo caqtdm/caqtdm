@@ -150,7 +150,6 @@ public:
 
 protected:
 
-    virtual void mouseReleaseEvent(QMouseEvent *event);
     virtual void timerEvent(QTimerEvent *e);
     void resizeEvent ( QResizeEvent * event );
     void mousePressEvent(QMouseEvent *event);
@@ -207,6 +206,7 @@ private slots:
     void processError(QProcess::ProcessError err);
     void Callback_EApplyNumeric(double value);
     void Callback_ENumeric(double value);
+    void Callback_Spinbox(double value);
     void Callback_SliderValueChanged(double);
     void Callback_MessageButton(int type);
     void Callback_ToggleButton(bool type);

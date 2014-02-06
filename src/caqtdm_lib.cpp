@@ -780,6 +780,19 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         widget->setProperty("Taken", true);
 
+
+        //==================================================================================================================
+    } else if (caSpinbox* widget = qobject_cast<caSpinbox *>(w1)){
+
+        if(widget->getPV().size() > 0) {
+            addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
+            widget->setPV(pv);
+            connect(widget, SIGNAL(valueChanged(double)), this, SLOT(Callback_Spinbox(double)));
+        }
+        widget->raise();
+
+        widget->setProperty("Taken", true);
+
         //==================================================================================================================
     } else if (caMessageButton* widget = qobject_cast<caMessageButton *>(w1)) {
 
@@ -2093,7 +2106,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                         QString str= QString::number((int) data.edata.ivalue);
                         widget->setText(str);
                     } else {
-                        widget->setText(list.at((int) data.edata.ivalue).trimmed());
+                        widget->setText(list.at((int) data.edata.ivalue));
                     }
                 } else if((data.edata.fieldtype == caENUM)  && ((int) data.edata.ivalue >= list.count()) && (list.count() > 0)) {
                     QString str= QString::number((int) data.edata.ivalue);
@@ -2104,7 +2117,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     if(data.edata.valueCount == 1) {
                         widget->setText(String);
                     } else if(list.count() > 0) {
-                        widget->setText(list.at(0).trimmed());
+                        widget->setText(list.at(0));
                     }
                 }
                 widget->setCursorPosition(0);
@@ -2231,6 +2244,20 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         // Numeric =====================================================================================================
     } else if (caNumeric *widget = qobject_cast<caNumeric *>(w)) {
         //qDebug() << "caNumeric" << widget->objectName() << data.pv;
+
+        if(data.edata.connected) {
+            ComputeNumericMaxMinPrec(widget, data);
+            widget->setConnectedColors(true);
+            widget->silentSetValue(data.edata.rvalue);
+            widget->setAccessW(data.edata.accessW);
+        } else {
+            widget->setConnectedColors(false);
+        }
+
+
+        // Numeric =====================================================================================================
+    } else if (caSpinbox *widget = qobject_cast<caSpinbox *>(w)) {
+        //qDebug() << "caSpinbox" << widget->objectName() << data.pv;
 
         if(data.edata.connected) {
             ComputeNumericMaxMinPrec(widget, data);
@@ -2653,6 +2680,21 @@ void CaQtDM_Lib::Callback_ENumeric(double value)
     float rdata = (float) value;
 
     caNumeric *numeric = qobject_cast<caNumeric *>(sender());
+    if(!numeric->getAccessW()) return;
+    if(numeric->getPV().length() > 0) {
+        TreatOrdinaryValue(numeric->getPV(), rdata,  idata, (QWidget*) numeric);
+    }
+}
+
+/**
+ * callback will write value to device
+ */
+void CaQtDM_Lib::Callback_Spinbox(double value)
+{
+    int32_t idata = (int32_t) value;
+    float rdata = (float) value;
+
+    caSpinbox *numeric = qobject_cast<caSpinbox *>(sender());
     if(!numeric->getAccessW()) return;
     if(numeric->getPV().length() > 0) {
         TreatOrdinaryValue(numeric->getPV(), rdata,  idata, (QWidget*) numeric);
@@ -3214,6 +3256,9 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     } else if (caNumeric* widget = qobject_cast<caNumeric *>(w)) {
         pv[0] = widget->getPV();
         nbPV = 1;
+    } else if (caSpinbox* widget = qobject_cast<caSpinbox *>(w)) {
+        pv[0] = widget->getPV();
+        nbPV = 1;
     } else if (caMessageButton* widget = qobject_cast<caMessageButton *>(w)) {
         pv[0] = widget->getPV().trimmed();
         nbPV = 1;
@@ -3527,25 +3572,20 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
                     // limits
                     if(limitsMode) {
-                        sprintf(asc,"<br>User alarm: MIN:%.*f  MAX:%.*f ", Precision, limitsMin, Precision, limitsMax);
+                        sprintf(asc,"<br>User alarm: MIN:%g  MAX:%g ", limitsMin, limitsMax);
                         info.append(asc);
                     }
                     if(limitsDefault) {
-                        sprintf(asc,"<br>Default limits: MIN:%.*f  MAX:%.*f ", Precision, limitsMin, Precision, limitsMax);
+                        sprintf(asc,"<br>Default limits: MIN:%g  MAX:%g ",limitsMin, limitsMax);
                         info.append(asc);
                     }
-                    Precision = qAbs(Precision);
-                    sprintf(asc,"<br>LOPR:%.*f  HOPR:%.*f ", Precision, kPtr->edata.lower_disp_limit,
-                            Precision, kPtr->edata.upper_disp_limit);
+                    sprintf(asc,"<br>LOPR:%g  HOPR:%g ", kPtr->edata.lower_disp_limit, kPtr->edata.upper_disp_limit);
                     info.append(asc);
-                    sprintf(asc,"<br>LOLO:%.*f  HIHI:%.*f ", Precision,kPtr->edata.lower_alarm_limit,
-                            Precision, kPtr->edata.upper_alarm_limit);
+                    sprintf(asc,"<br>LOLO:%g  HIHI:%g ", kPtr->edata.lower_alarm_limit, kPtr->edata.upper_alarm_limit);
                     info.append(asc);
-                    sprintf(asc,"<br>LOW :%.*f  HIGH:%.*f ", Precision, kPtr->edata.lower_warning_limit,
-                            Precision, kPtr->edata.upper_warning_limit);
+                    sprintf(asc,"<br>LOW :%g  HIGH:%g ", kPtr->edata.lower_warning_limit, kPtr->edata.upper_warning_limit);
                     info.append(asc);
-                    sprintf(asc,"<br>DRVL:%.*f  DRVH:%.*f ", Precision,kPtr->edata.lower_ctrl_limit,
-                            Precision, kPtr->edata.upper_ctrl_limit);
+                    sprintf(asc,"<br>DRVL:%g  DRVH:%g ",kPtr->edata.lower_ctrl_limit, kPtr->edata.upper_ctrl_limit);
                     info.append(asc);
                     info.append("<br>");
 
@@ -3656,12 +3696,6 @@ void CaQtDM_Lib::ShowContextMenu(const QPoint& position) // this is a slot
 {
     Q_UNUSED(position);
     DisplayContextMenu(qobject_cast<QWidget *>(sender()));
-}
-
-void CaQtDM_Lib::mouseReleaseEvent(QMouseEvent *event)
-{
-    // I do not know why this was done, but on microsoft windows, it generates a disturbing event
-    //if(event->button() ==Qt::RightButton) emit customContextMenuRequested(QPoint(event->x(),event->y()));
 }
 
 /**
@@ -3848,7 +3882,13 @@ void CaQtDM_Lib::ComputeNumericMaxMinPrec(QWidget* widget, const knobData& data)
             limitsMode = w->getLimitsMode();
             fixedFormat = w->getFixedFormat();
             caMode = caNumeric::Channel;
+        } else if (caSpinbox *w = qobject_cast<caSpinbox *>(widget)) {
+            precMode = w->getPrecisionMode();
+            limitsMode = w->getLimitsMode();
+            fixedFormat = w->getFixedFormat();
+            caMode = caNumeric::Channel;
         }
+
         if(limitsMode == caMode) {
             if((data.edata.upper_ctrl_limit == data.edata.lower_ctrl_limit) ||
                     (fabs(data.edata.upper_ctrl_limit - data.edata.lower_ctrl_limit) <= 0.001)) {
@@ -3859,13 +3899,18 @@ void CaQtDM_Lib::ComputeNumericMaxMinPrec(QWidget* widget, const knobData& data)
                 minValue = data.edata.lower_ctrl_limit;
             }
         } else {
+
             if (caApplyNumeric *w = qobject_cast<caApplyNumeric *>(widget)) {
                 maxValue = w->getMaxValue();
                 minValue = w->getMinValue();
             } else if (caNumeric *w = qobject_cast<caNumeric *>(widget)) {
                 maxValue = w->getMaxValue();
                 minValue = w->getMinValue();
+            } else if (caSpinbox *w = qobject_cast<caSpinbox *>(widget)) {
+                maxValue = w->getMaxValue();
+                minValue = w->getMinValue();
             }
+
         }
 
         if (caApplyNumeric *w = qobject_cast<caApplyNumeric *>(widget)) {
@@ -3874,7 +3919,11 @@ void CaQtDM_Lib::ComputeNumericMaxMinPrec(QWidget* widget, const knobData& data)
         } else if (caNumeric *w = qobject_cast<caNumeric *>(widget)) {
             w->setMaxValue(maxValue);
             w->setMinValue(minValue);
+        } else if (caSpinbox *w = qobject_cast<caSpinbox *>(widget)) {
+            w->setMaxValue(maxValue);
+            w->setMinValue(minValue);
         }
+
         if(!fixedFormat) {
             if(precMode == caMode) {
                 prec = data.edata.precision;
@@ -3895,7 +3944,12 @@ void CaQtDM_Lib::ComputeNumericMaxMinPrec(QWidget* widget, const knobData& data)
                     //printf("%d %d\n", width-prec-1, prec);
                     w->setIntDigits(width-prec-1);
                     w->setDecDigits(prec);
+                } else if (caSpinbox *w = qobject_cast<caSpinbox *>(widget)) {
+                    //printf("%d %d\n", width-prec-1, prec);
+                    w->setIntDigits(width-prec-1);
+                    w->setDecDigits(prec);
                 }
+
             } else {
                 float maxAbsHoprLopr= qMax(fabs(maxValue), fabs(minValue));
                 if(maxAbsHoprLopr > 1.0) {
@@ -3903,11 +3957,15 @@ void CaQtDM_Lib::ComputeNumericMaxMinPrec(QWidget* widget, const knobData& data)
                 } else {
                     width = 2;
                 }
+
                 if (caApplyNumeric *w = qobject_cast<caApplyNumeric *>(widget)) {
                     w->setIntDigits(width-1);
                 } else if (caNumeric *w = qobject_cast<caNumeric *>(widget)) {
                     w->setIntDigits(width-1);
+                } else if (caSpinbox *w = qobject_cast<caSpinbox *>(widget)) {
+                    w->setIntDigits(width-1);
                 }
+
             }
         }
     }
@@ -4509,6 +4567,8 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
     } else if (caNumeric *widget = qobject_cast<caNumeric *>(w)) {
         mimeData->setText(widget->getPV());
     } else if (caNumeric *widget = qobject_cast<caNumeric *>(w->parent())) {
+        mimeData->setText(widget->getPV());
+    } else if (caSpinbox *widget = qobject_cast<caSpinbox *>(w)) {
         mimeData->setText(widget->getPV());
     } else if (caToggleButton *widget = qobject_cast<caToggleButton *>(w)) {
         mimeData->setText(widget->getPV());
