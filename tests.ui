@@ -144,7 +144,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: cornsilk;}</string>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -1141,7 +1141,7 @@ p, li { white-space: pre-wrap; }
           <double>990.000000000000000</double>
          </property>
          <property name="minValue">
-          <double>0.000000000000000</double>
+          <double>1.e-9</double>
          </property>
         </widget>
         <widget class="caGraphics" name="cagraphics_11">
@@ -1345,7 +1345,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>8</number>
       </property>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">
@@ -3331,10 +3331,10 @@ p, li { white-space: pre-wrap; }
          <string>200;100;50</string>
         </property>
         <property name="colorMode">
-         <enum>caTable::Static</enum>
+         <enum>caTable::Alarm</enum>
         </property>
         <property name="limitsMode">
-         <enum>caTable::Channel</enum>
+         <enum>caTable::User</enum>
         </property>
         <attribute name="horizontalHeaderCascadingSectionResizes">
          <bool>false</bool>
@@ -4155,7 +4155,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
@@ -4265,7 +4265,7 @@ p, li { white-space: pre-wrap; }
          <bool>true</bool>
         </property>
         <property name="limitsMode">
-         <enum>caNumeric::User</enum>
+         <enum>caNumeric::Channel</enum>
         </property>
         <property name="maxValue">
          <double>100.000000000000000</double>
@@ -4325,7 +4325,7 @@ p, li { white-space: pre-wrap; }
          <bool>true</bool>
         </property>
         <property name="limitsMode">
-         <enum>caNumeric::User</enum>
+         <enum>caNumeric::Channel</enum>
         </property>
         <property name="maxValue">
          <double>100.000000000000000</double>
@@ -4391,7 +4391,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="limitsMode">
-         <enum>caNumeric::User</enum>
+         <enum>caNumeric::Channel</enum>
         </property>
         <property name="maxValue">
          <double>100.000000000000000</double>
@@ -4431,7 +4431,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="limitsMode">
-         <enum>caNumeric::User</enum>
+         <enum>caNumeric::Channel</enum>
         </property>
         <property name="maxValue">
          <double>1000.000000000000000</double>
@@ -4451,6 +4451,29 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="text">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;no fixed format, precision mode=user, prec=2, max=1000)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+       <widget class="caSpinbox" name="caspinbox">
+        <property name="geometry">
+         <rect>
+          <x>580</x>
+          <y>40</y>
+          <width>120</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="integerDigits" stdset="0">
+         <number>4</number>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">QTDM:TEST:AO</string>
+        </property>
+        <property name="background">
+         <color>
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
         </property>
        </widget>
       </widget>
@@ -5647,7 +5670,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1102</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
@@ -5804,6 +5827,11 @@ p, li { white-space: pre-wrap; }
    <class>caWaterfallPlot</class>
    <extends>QWidget</extends>
    <header>caWaterfall</header>
+  </customwidget>
+  <customwidget>
+   <class>caSpinbox</class>
+   <extends>QFrame</extends>
+   <header>caSpinbox</header>
   </customwidget>
  </customwidgets>
  <resources/>
