@@ -188,9 +188,10 @@ bool caLineEdit::event(QEvent *e)
           setStyleSheet("");
           QString c=  palette().color(QPalette::Base).name();
           defBackColor = QColor(c);
-          //printf("%s %s\n", c.toAscii().constData(), this->objectName().toAscii().constData());
+          //printf("default back color %s %s\n", c.toAscii().constData(), this->objectName().toAscii().constData());
           c=  palette().color(QPalette::Text).name();
           defForeColor = QColor(c);
+	  //printf("default fore color %s %s\n", c.toAscii().constData(), this->objectName().toAscii().constData());
 
           if(!defBackColor.isValid()) defBackColor = QColor(255, 248, 220, 255);
           if(!defForeColor.isValid()) defForeColor = Qt::black;
