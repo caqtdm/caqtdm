@@ -40,14 +40,7 @@
 #include <QApplication>
 
 #if defined(_MSC_VER)
-int round (double x) {
-    int i = (int) x;
-    if (x >= 0.0) {
-        return ((x-i) >= 0.5) ? (i + 1) : (i);
-    } else {
-        return (-x+i >= 0.5) ? (i - 1) : (i);
-    }
-}
+extern int round (double x);
 #endif
 
 SNumeric::SNumeric(QWidget *parent, int id, int dd) : QFrame(parent), FloatDelegate()
@@ -220,7 +213,7 @@ void SNumeric::init()
 }
 
 void SNumeric::setValue(double v)
-{ 
+{
     long long temp = (long long) round(v * pow(10.0, decDig));
     if ((temp >= minVal) && (temp <= maxVal))
     {
@@ -246,7 +239,7 @@ void SNumeric::silentSetValue(double v)
 }
 
 void SNumeric::setMaximum(double v)
-{ 
+{
     if (v >= d_minAsDouble)
     {
         d_maxAsDouble = v;
@@ -255,7 +248,7 @@ void SNumeric::setMaximum(double v)
 }
 
 void SNumeric::setMinimum(double v)
-{ 
+{
     if (v <= d_maxAsDouble)
     {
         d_minAsDouble = v;
@@ -264,7 +257,7 @@ void SNumeric::setMinimum(double v)
 }
 
 void SNumeric::setIntDigits(int i)
-{ 
+{
     if (i < 1) return;
     clearContainers();
     intDig = i;
