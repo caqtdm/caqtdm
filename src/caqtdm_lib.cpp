@@ -73,35 +73,6 @@
     break;\
     }}
 
-// used for preparing the vectors of the cartesian plot
-#define BuildVector(x) {\
-    switch(data.edata.fieldtype) { \
-    case caFLOAT: { \
-    float* P = (float*) data.edata.dataB; \
-    for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]); \
-    } \
-    break; \
-    case caDOUBLE: { \
-    double* P = (double*) data.edata.dataB; \
-    for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]); \
-    } \
-    break; \
-    case caLONG: { \
-    int32_t* P = (int32_t*) data.edata.dataB; \
-    for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);\
-    } \
-    break; \
-    case caINT: { \
-    int16_t* P = (int16_t*) data.edata.dataB; \
-    for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]); \
-    } \
-    break; \
-    case caENUM: { \
-    int16_t* P = ( int16_t*) data.edata.dataB; \
-    for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]); \
-    } \
-    break; \
-    }}
 
 // used for interfacing epics routines with (pv, text, ...)
 #define QStringsToChars(x,y,z) \
@@ -934,7 +905,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //==================================================================================================================
     } else if(caInclude* widget = qobject_cast<caInclude *>(w1)) {
-        //struct timeb now, last;
+
         QWidget *thisW;
         QFile *file = new QFile;
         QUiLoader loader;
@@ -2341,16 +2312,8 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             if(XorY == caCartesianPlot::CH_X || XorY == caCartesianPlot::CH_Y) {
                 // data from vector
                 if(data.edata.valueCount > 0 && data.edata.dataB != (void*) 0) {
-                    QVector<double> y;
-                    QMutex *datamutex;
-                    datamutex = (QMutex*) data.mutex;
-                    datamutex->lock();
-                    y.clear();
-                    y.reserve(data.edata.valueCount);
-                    BuildVector(y);
-                    datamutex->unlock();
-                    widget->setData(y, curvNB, curvType, XorY);
-                    // data from value
+                    Cartesian(widget, curvNB, curvType, XorY, data);
+                // data from value
                 } else {
                     QVector<double> y;
                     y.append(data.edata.rvalue);
@@ -2360,7 +2323,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 // trigger channel
             } else if(XorY == caCartesianPlot::CH_Trigger) {
                 QVector<double> y;
-                for(int i=0; i < 4; i++) widget->setData(y, i, curvType, XorY);
+                for(int i=0; i < caCartesianPlot::curveCount; i++) widget->setData(y, i, curvType, XorY);
 
                 // count channel
             } else if(XorY == caCartesianPlot::CH_Count) {
@@ -2396,6 +2359,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 double max = widget->getIntensityMax();
 
                 if((widget->getIntensityScalingMin() == caWaterfallPlot::Channel) && (widget->getIntensityScalingMax() == caWaterfallPlot::Channel)) {
+                    qDebug() << "channels" <<  data.edata.lower_disp_limit << data.edata.upper_disp_limit;
                     if(data.edata.lower_disp_limit < data.edata.upper_disp_limit) {
                         widget->setIntensityMin(data.edata.lower_disp_limit);
                         widget->setIntensityMax(data.edata.upper_disp_limit);
@@ -2404,10 +2368,12 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                         widget->setIntensityMax(10.0);
                     }
                 } else if(widget->getIntensityScalingMin() == caWaterfallPlot::Channel) {
+                    qDebug() << "channel1" ;
                     if(data.edata.lower_disp_limit < max) {
                         widget->setIntensityMin(data.edata.lower_disp_limit);
                     }
                 }  else if(widget->getIntensityScalingMax() == caWaterfallPlot::Channel) {
+                    qDebug() << "channel2" ;
                     if(data.edata.upper_disp_limit > min) {
                         widget->setIntensityMax(data.edata.upper_disp_limit);
                     }
@@ -2417,15 +2383,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
             // value(s)
             if((data.edata.valueCount > 0) && (data.edata.dataB != (void*) 0)) {
-                QVector<double> y;
-                QMutex *datamutex;
-                datamutex = (QMutex*) data.mutex;
-                datamutex->lock();
-                y.clear();
-                y.reserve(data.edata.valueCount);
-                BuildVector(y);
-                datamutex->unlock();
-                widget->SetData(y);
+                WaterFall(widget, data);
             } else {
                 QVector<double> y;
                 y.clear();
@@ -2656,6 +2614,140 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
     }
 }
 
+void CaQtDM_Lib::Cartesian(caCartesianPlot *widget, int curvNB, int curvType, int XorY, const knobData &data)
+{
+    QMutex *datamutex;
+    datamutex = (QMutex*) data.mutex;
+    datamutex->lock();
+    switch(data.edata.fieldtype) {
+    case caFLOAT: {
+        QVector <float> y;
+        y.clear();
+        y.resize(data.edata.valueCount);
+        float* P = (float*) data.edata.dataB;
+        ::memcpy(y.data(), P, data.edata.valueCount*sizeof(float));
+        //for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);
+        datamutex->unlock();
+        widget->setData(y, curvNB, curvType, XorY);
+    }
+        break;
+    case caDOUBLE: {
+        QVector <double> y;
+        y.clear();
+        y.resize(data.edata.valueCount);
+        double* P = (double*) data.edata.dataB;
+        ::memcpy(y.data(), P, data.edata.valueCount*sizeof(double));
+        //for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);
+        datamutex->unlock();
+        widget->setData(y, curvNB, curvType, XorY);
+    }
+        break;
+    case caLONG: {
+        QVector <int32_t> y;
+        y.clear();
+        y.resize(data.edata.valueCount);
+        int32_t* P = (int32_t*) data.edata.dataB;
+        ::memcpy(y.data(), P, data.edata.valueCount*sizeof(int32_t));
+        //for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);
+        datamutex->unlock();
+        widget->setData(y, curvNB, curvType, XorY);
+    }
+        break;
+    case caINT: {
+        QVector <int16_t> y;
+        y.clear();
+        y.resize(data.edata.valueCount);
+        int16_t* P = (int16_t*) data.edata.dataB;
+        ::memcpy(y.data(), P, data.edata.valueCount*sizeof(int16_t));
+        //for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);
+        datamutex->unlock();
+        widget->setData(y, curvNB, curvType, XorY);
+    }
+        break;
+    case caENUM: {
+        QVector <int16_t> y;
+        y.clear();
+        y.resize(data.edata.valueCount);
+        int16_t* P = ( int16_t*) data.edata.dataB;
+        ::memcpy(y.data(), P, data.edata.valueCount*sizeof(int16_t));
+        //for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);
+        datamutex->unlock();
+        widget->setData(y, curvNB, curvType, XorY);
+    }
+        break;
+    default:
+        datamutex->unlock();
+        break;
+    }
+}
+
+void CaQtDM_Lib::WaterFall(caWaterfallPlot *widget, const knobData &data)
+{
+    struct timeb now, last;
+    QMutex *datamutex;
+    datamutex = (QMutex*) data.mutex;
+    datamutex->lock();
+    switch(data.edata.fieldtype) {
+    case caFLOAT: {
+        QVector <float> y;
+        y.clear();
+        y.resize(data.edata.valueCount);
+        float* P = (float*) data.edata.dataB;
+        ::memcpy(y.data(), P, data.edata.valueCount*sizeof(float));
+        //for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);
+        datamutex->unlock();
+        widget->SetData(y);
+    }
+        break;
+    case caDOUBLE: {
+        QVector <double> y;
+        y.clear();
+        y.resize(data.edata.valueCount);
+        double* P = (double*) data.edata.dataB;
+        ::memcpy(y.data(), P, data.edata.valueCount*sizeof(double));
+        //for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);
+        datamutex->unlock();
+        widget->SetData(y);
+    }
+        break;
+    case caLONG: {
+        QVector <int32_t> y;
+        y.clear();
+        y.resize(data.edata.valueCount);
+        int32_t* P = (int32_t*) data.edata.dataB;
+        ::memcpy(y.data(), P, data.edata.valueCount*sizeof(int32_t));
+        //for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);
+        datamutex->unlock();
+        widget->SetData(y);
+    }
+        break;
+    case caINT: {
+        QVector <int16_t> y;
+        y.clear();
+        y.resize(data.edata.valueCount);
+        int16_t* P = (int16_t*) data.edata.dataB;
+        ::memcpy(y.data(), P, data.edata.valueCount*sizeof(int16_t));
+        //for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);
+        datamutex->unlock();
+        widget->SetData(y);
+    }
+        break;
+    case caENUM: {
+        QVector <int16_t> y;
+        y.clear();
+        y.resize(data.edata.valueCount);
+        int16_t* P = ( int16_t*) data.edata.dataB;
+        ::memcpy(y.data(), P, data.edata.valueCount*sizeof(int16_t));
+        //for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);
+        datamutex->unlock();
+        widget->SetData(y);
+    }
+        break;
+    default:
+        datamutex->unlock();
+        break;
+    }
+}
 
 /**
  * callback will write value to device

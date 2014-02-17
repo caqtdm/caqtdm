@@ -6,6 +6,7 @@ unix {
   exists("/home/ACS/Control/Lib/libDEV.so") {
          SUBDIRS += caQtDM_Lib2
   }
+
 }
 
 win32 {
