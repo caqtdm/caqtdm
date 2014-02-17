@@ -45,65 +45,117 @@
 
 #include <qtcontrols_global.h>
 
+
 class SpectrogramData: public QwtMatrixRasterData
 {
 private:
     QVector<double> values;
+    QVector<double> valuesAveraged;
+
     int NumberOfColumns;
     int NumberOfRows;
+    int ActualNumberOfColumns;
+    int ratio;
 
 public:
 
+
+#define MAXCOLUMNS 500
     SpectrogramData() {
     }
 
-    void initData(int numCols, int numRows)
+    template <typename pureData>
+    void AverageVector(QVector<pureData> vec, QVector<double> &avg)
     {
-        NumberOfColumns = numCols;
-        NumberOfRows = numRows;
-        values.clear();
-        values.reserve(NumberOfColumns * NumberOfRows);
-        for ( int i = 0; i < NumberOfColumns * NumberOfRows; i++ ) values += 0.0;
-        setValueMatrix(values, NumberOfColumns);
+        printf("average vector double\n");
+        avg.clear();
+        for (int i=0; i< vec.size(); i+=ratio) {
+            double mean = 0;
+            for(int j=0; j< ratio; j++) {
+               mean += vec.at(i+j);
+            }
+            avg += mean / (double) ratio;
+        }
     }
 
-    void setData(const QVector<double>&  Array, int &count)
+    int initData(int numCols, int numRows)
     {
-        // in case of a plot down to the bottom, start from the top and go to botton
+        ActualNumberOfColumns = NumberOfColumns = numCols;
+        NumberOfRows = numRows;
+        ratio = 1;
+
+        // too many columns, calculate size of reduced data vector
+        if(NumberOfColumns > MAXCOLUMNS) {
+            ratio = (int) ((double) NumberOfColumns / (double) MAXCOLUMNS);
+            ActualNumberOfColumns = NumberOfColumns/ratio;
+            valuesAveraged.resize(ActualNumberOfColumns);
+        }
+
+        return ActualNumberOfColumns;
+    }
+
+    template <typename pureData>
+    int setData(const QVector<pureData> Array, int &count, int numCols, int numRows)
+    {
+        ActualNumberOfColumns = NumberOfColumns = numCols;
+        NumberOfRows = numRows;
+        ratio = 1;
+
+        // too many columns, calculate size of reduced data vector
+        if(NumberOfColumns > MAXCOLUMNS) {
+            ratio = (int) ((double) NumberOfColumns / (double) MAXCOLUMNS);
+            ActualNumberOfColumns = NumberOfColumns/ratio;
+            valuesAveraged.resize(ActualNumberOfColumns);
+        }
+        values.resize(ActualNumberOfColumns * NumberOfRows);
+
+        // calculate reduced data vector
+        if(ratio != 1) {
+            printf("we have to average %d columns to %d columns\n", Array.size(), valuesAveraged.size());
+            AverageVector(Array, valuesAveraged);
+        }
+
+        // in case of a plot down to the bottom, start from the top and go to bottom
         if(count <  NumberOfRows) {
-            int start = NumberOfColumns * count;
-            int stop = start + NumberOfColumns;
-            for ( int i = start; i < stop; i++ ) {
-                values[i] = Array[i-start];
+            int start = ActualNumberOfColumns * count;
+            int stop = start + ActualNumberOfColumns;
+            if(ratio != 1) {
+                for ( int i = start; i < stop; i++ ) values[i] = valuesAveraged[i-start];
+            } else {
+                for ( int i = start; i < stop; i++ ) values[i] = Array[i-start];
             }
             count++;
             // otherwise shift plot and add to the end
         } else {
             // delete first row
-            values.remove(0, NumberOfColumns);
+            values.remove(0, ActualNumberOfColumns);
             // resize to full size
-            values.resize(NumberOfColumns * NumberOfRows);
+            values.resize(ActualNumberOfColumns * NumberOfRows);
 
             // copy array to the end of the array data
-            int start = NumberOfColumns * NumberOfRows - NumberOfColumns;
-            int stop = NumberOfColumns * NumberOfRows;
-            for ( int i = start; i < stop; i++ ) {
-                values[i] = Array[i-start];
+            int start = ActualNumberOfColumns * NumberOfRows - ActualNumberOfColumns;
+            int stop = ActualNumberOfColumns * NumberOfRows;
+            if(ratio != 1) {
+               for ( int i = start; i < stop; i++ ) values[i] = valuesAveraged[i-start];
+            } else {
+                for ( int i = start; i < stop; i++ ) values[i] = Array[i-start];
             }
         }
 
         // update the matrix
+        setValueMatrix(values, ActualNumberOfColumns);
 
-        setValueMatrix(values, NumberOfColumns);
+        return ActualNumberOfColumns;
     }
 
-    void setLimits(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax) {
-
+    void setLimits(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
+    {
         setInterval( Qt::XAxis, QwtInterval( xmin, xmax ) );
         setInterval( Qt::YAxis, QwtInterval( ymin, ymax) );
         setInterval( Qt::ZAxis, QwtInterval( zmin, zmax) );
     }
 };
+
 
 class QTCON_EXPORT caWaterfallPlot: public QWidget
 {
@@ -183,16 +235,22 @@ public:
     int getCols() const {return thisCols;}
     void setCols(int const &cols);
 
-    void setIntensityLimits(double &zmin, double &zmax);
     void InitData(int nbCols);
-    void SetData(const QVector<double>& vector);
+
+    void myReplot();
+
+    void SetData(const QVector<float> vector);
+    void SetData(const QVector<double> vector);
+    void SetData(const QVector<int16_t> vector);
+    void SetData(const QVector<int32_t> vector);
+
     void updatePlot();
     void defineTimerUpdate(units unit, double period);
 
 private:
 
     enum {nbRows = 200};
-    enum {nbCols = 1000};
+    enum {nbCols = 500};
 
     QwtPlot *plot;
     QwtPlotSpectrogram *d_spectrogram;
@@ -200,7 +258,10 @@ private:
     QwtPlotGrid * plotGrid;
     QTimer *Timer;
     double position, drift;
-    QVector<double> vector;
+    QVector<double> vectorD;
+    QVector<float> vectorF;
+    QVector<int16_t> vectorS;
+    QVector<int32_t> vectorI;
     SpectrogramData *m_data;
 
     QString thisTitle, thisTitleX, thisTitleY;
@@ -213,6 +274,7 @@ private:
     bool thisXshow, thisYshow, thisGrid;
     int thisRows, thisCols, countRows;
     bool disableDemo;
+    int NumberOfColumns;
 
 public  Q_SLOTS:
     void TimeOut();

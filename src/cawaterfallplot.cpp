@@ -125,7 +125,7 @@ private:
     }
 };
 
-caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent) //QwtPlot(parent)
+caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent)
 {
 
     QHBoxLayout *hboxLayout = new QHBoxLayout(this);
@@ -150,17 +150,27 @@ caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent) //QwtPlot(par
 
     setRows(nbRows);
     setCols(nbCols);
+    NumberOfColumns = nbCols;
 
     // init demo data for gauss curve
-    vector.reserve(getCols());
-    for ( int i = 0; i < getCols(); i++ ) vector += 0.0;
+
+    vectorF.clear();
+    vectorI.clear();
+    vectorS.clear();
+    vectorD.clear();
+    vectorD.reserve(NumberOfColumns);
+    for ( int i = 0; i < NumberOfColumns; i++ ) vectorD += 0.0;
 
     // set 200 rows for demo
     setRows(200);
 
     // initialize data
-    m_data->initData(getCols(), getRows());
-    m_data->setLimits(0., getCols(), 0., getRows(), 0., 1000.);
+    m_data->initData(NumberOfColumns, getRows());
+    m_data->setLimits(0., NumberOfColumns, 0., getRows(), 0., 1000.);
+    thisIntensityMin = 0;
+    thisIntensityMax = 1000;
+    setIntensityScalingMax(Channel);
+    setIntensityScalingMin(Channel);
 
     // set data to spectrogram
     countRows = 0;
@@ -234,45 +244,91 @@ void caWaterfallPlot::updatePlot()
 
 void caWaterfallPlot::InitData(int numCols)
 {
+    int actualColumns;
     disableDemo = true;
+    vectorF.clear();
+    vectorI.clear();
+    vectorS.clear();
+    vectorD.clear();
     countRows = 0;
     setCols(numCols);
+    NumberOfColumns = numCols;
 
-    m_data->initData(getCols(), getRows());
+    actualColumns = m_data->initData(NumberOfColumns, getRows());
+    if(actualColumns == 0) return;
+    setCols(actualColumns);
     m_data->setLimits(0., getCols(), 0., getRows(), thisIntensityMin, thisIntensityMax);
     updatePlot();
 }
 
-void caWaterfallPlot::setIntensityLimits(double &zmin, double &zmax)
+void caWaterfallPlot::myReplot()
 {
-    if(zmin < 0) zmin = 0.0;
-    if(zmax < zmin) zmax= 1.0;
-    m_data->setLimits(0., (double) getCols(), 0., (double) getRows(), zmin, zmax);
-    updatePlot();
-}
-
-void caWaterfallPlot::SetData(const QVector<double>& vec)
-{
-    // in case of update by monitor, display now
-    if(thisUnits == Monitor) {
-        m_data->setData(vec, countRows);
-
 #if QWT_VERSION >= 0x060100
         QwtPlotCanvas *canvas =  (QwtPlotCanvas *) plot->canvas();
         canvas->replot();
 #else
         plot->canvas()->replot();
 #endif
+}
 
+void caWaterfallPlot::SetData(const QVector<double> vec)
+{
+    // in case of update by monitor, display now
+    if(thisUnits == Monitor) {
+        int actualColumns = m_data->setData(vec, countRows, NumberOfColumns, getRows());
+        setCols(actualColumns);
+        myReplot();
     // otherwise, just keep this vector
     } else {
-        vector.resize(vec.size());
-#if QT_VERSION < 0x040700
-          ::memcpy(vector.data(), vec.data(), vec.size()*sizeof(double));
-#else
-           qCopy(vec.begin(), vec.end(), vector.begin());
-#endif
+        vectorD.resize(vec.size());
+        ::memcpy(vectorD.data(), vec.data(), vec.size()*sizeof(double));
     }
+    m_data->setLimits(0., getCols(), 0., getRows(), thisIntensityMin, thisIntensityMax);
+}
+
+void caWaterfallPlot::SetData(const QVector<float> vec)
+{
+    // in case of update by monitor, display now
+    if(thisUnits == Monitor) {
+        int actualColumns = m_data->setData(vec, countRows, NumberOfColumns, getRows());
+        setCols(actualColumns);
+        myReplot();
+    // otherwise, just keep this vector
+    } else {
+        vectorF.resize(vec.size());
+        ::memcpy(vectorF.data(), vec.data(), vec.size()*sizeof(float));
+    }
+    m_data->setLimits(0., getCols(), 0., getRows(), thisIntensityMin, thisIntensityMax);
+}
+
+void caWaterfallPlot::SetData(const QVector<int32_t> vec)
+{
+    // in case of update by monitor, display now
+    if(thisUnits == Monitor) {
+        int actualColumns = m_data->setData(vec, countRows, NumberOfColumns, getRows());
+        setCols(actualColumns);
+        myReplot();
+    // otherwise, just keep this vector
+    } else {
+        vectorI.resize(vec.size());
+        ::memcpy(vectorI.data(), vec.data(), vec.size()*sizeof(int32_t));
+    }
+    m_data->setLimits(0., getCols(), 0., getRows(), thisIntensityMin, thisIntensityMax);
+}
+
+void caWaterfallPlot::SetData(const QVector<int16_t> vec)
+{
+    // in case of update by monitor, display now
+    if(thisUnits == Monitor) {
+        int actualColumns = m_data->setData(vec, countRows, NumberOfColumns, getRows());
+        setCols(actualColumns);
+        myReplot();
+    // otherwise, just keep this vector
+    } else {
+        vectorS.resize(vec.size());
+        ::memcpy(vectorS.data(), vec.data(), vec.size()*sizeof(int16_t));
+    }
+    m_data->setLimits(0., getCols(), 0., getRows(), thisIntensityMin, thisIntensityMax);
 }
 
 void caWaterfallPlot::defineTimerUpdate(units unit, double period)
@@ -299,20 +355,23 @@ void caWaterfallPlot::TimeOut()
     if(thisUnits != Monitor) {
         if(!disableDemo) {
             GausCurv(position);
-            m_data->setData(vector, countRows);
-            if(drift > 0 && position >= getCols()) drift = -1;
+            m_data->setData(vectorD, countRows, NumberOfColumns, getRows());
+            if(drift > 0 && position >= NumberOfColumns) drift = -1;
             if(drift < 0 && position <= 0)  drift = 1;
             position += drift;
         } else {
-            m_data->setData(vector, countRows);
+            if(vectorI.size() > 0) {
+                m_data->setData(vectorI, countRows, NumberOfColumns, getRows() );
+            } else if(vectorD.size() > 0) {
+                m_data->setData(vectorD, countRows, NumberOfColumns, getRows() );
+            } else if(vectorF.size() > 0) {
+                m_data->setData(vectorF, countRows, NumberOfColumns, getRows());
+            } else if(vectorS.size() > 0) {
+                m_data->setData(vectorS, countRows, NumberOfColumns, getRows());
+            }
         }
 
-#if QWT_VERSION >= 0x060100
-        QwtPlotCanvas *canvas =  (QwtPlotCanvas *) plot->canvas();
-        canvas->replot();
-#else
-        plot->canvas()->replot();
-#endif
+        myReplot();
     }
 }
 
@@ -320,11 +379,11 @@ void caWaterfallPlot::TimeOut()
 void caWaterfallPlot::GausCurv(double middle) {
 
     double min = 0.0;
-    double max = getCols();
+    double max = 1000.0;
     double range = max - min;
-    double sigma = 200.0;
+    double sigma = 100.0;
     for (int i=0; i<nbCols; i++) {
-        vector[i] =  min + range * gauss((i-middle)/sigma);
+        vectorD[i] =  min + range * gauss((i-middle)/sigma);
     }
 }
 

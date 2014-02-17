@@ -46,8 +46,6 @@ unix {
     OBJECTS_DIR = obj
     DESTDIR = .
     QMAKE_POST_LINK = cp libqtcontrols.so $(QTBASE)
-    QMAKE_CXXFLAGS += "-g"
-    QMAKE_CFLAGS_RELEASE += "-g"
 }
 MOC_DIR = moc
 INCLUDEPATH += src

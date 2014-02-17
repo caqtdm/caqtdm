@@ -307,7 +307,11 @@ public:
     QwtSymbol::Style myMarker(curvSymbol m);
     QwtPlotCurve::CurveStyle myStyle(curvStyle s);
 
-    void  setData(const QVector<double>& vector, int curvIndex, int curvType, int curvXY);
+    void setData(const QVector<double>& vector, int curvIndex, int curvType, int curvXY);
+    void setData(const QVector<float>& vector, int curvIndex, int curvType, int curvXY);
+    void setData(const QVector<int16_t>& vector, int curvIndex, int curvType, int curvXY);
+    void setData(const QVector<int32_t>& vector, int curvIndex, int curvType, int curvXY);
+
     void setScaleX(double minX, double maxX);
     void setScaleY(double minY, double maxY);
     int getYLimits(double &minY, double &maxY);
@@ -343,6 +347,11 @@ protected:
 
 private:
 
+    template <typename pureData>
+    void setDataOverloaded(const QVector<pureData>& vector, int curvIndex, int curvType, int curvXY);
+    template <typename pureData>
+    void AverageVector(QVector<pureData> vec, QVector<double> &avg, int ratio);
+
     QString thisTitle, thisTitleX, thisTitleY, thisTriggerPV, thisCountPV, thisErasePV;
     QStringList	 thisPV[curveCount], thisXaxisLimits, thisYaxisLimits;
     QColor thisForeColor;
@@ -369,6 +378,7 @@ private:
 
     QVarLengthArray<double> X[curveCount], XSAVE[curveCount];
     QVarLengthArray<double> Y[curveCount], YSAVE[curveCount];
+    QVarLengthArray<double> XAUX, YAUX;
 
     QVarLengthArray<double> accumulX[curveCount];
     QVarLengthArray<double> accumulY[curveCount];

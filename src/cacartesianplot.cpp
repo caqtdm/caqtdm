@@ -34,6 +34,7 @@
 #include <QtCore>
 #include <QtDebug>
 #include <QVector>
+#include <sys/timeb.h>
 
 class MyZoomer: public QwtPlotZoomer
 {
@@ -228,16 +229,56 @@ void caCartesianPlot::erasePlots()
      replot();
 }
 
+template <typename pureData>
+void caCartesianPlot::AverageVector(QVector<pureData> vec, QVector<double> &avg, int ratio)
+{
+    printf("average vector double\n");
+    avg.clear();
+    for (int i=0; i< vec.size(); i+=ratio) {
+        double mean = 0;
+        for(int j=0; j< ratio; j++) {
+           mean += vec.at(i+j);
+        }
+        avg += mean / (double) ratio;
+    }
+}
+
 void caCartesianPlot::setData(const QVector<double>& vector, int curvIndex, int curvType, int curvXY)
 {
+     setDataOverloaded(vector, curvIndex, curvType, curvXY);
+}
+
+void caCartesianPlot::setData(const QVector<float>& vector, int curvIndex, int curvType, int curvXY)
+{
+     setDataOverloaded(vector, curvIndex, curvType, curvXY);
+}
+
+void caCartesianPlot::setData(const QVector<int16_t>& vector, int curvIndex, int curvType, int curvXY)
+{
+     setDataOverloaded(vector, curvIndex, curvType, curvXY);
+}
+
+void caCartesianPlot::setData(const QVector<int32_t>& vector, int curvIndex, int curvType, int curvXY)
+{
+     setDataOverloaded(vector, curvIndex, curvType, curvXY);
+}
+
+template <typename pureData>
+void caCartesianPlot::setDataOverloaded(const QVector<pureData>& vector, int curvIndex, int curvType, int curvXY)
+{
+    struct timeb now, last;
+    ftime(&last);
+
     if(curvXY == CH_X || curvXY == CH_Y) {         // x or y
         // keep data points
         if(curvXY == CH_X) {                       // X
             X[curvIndex].resize(vector.size());
-            ::memcpy(X[curvIndex].data(), vector.data(), vector.size()*sizeof(double));
+            X[curvIndex].clear();
+            for(int i=0; i< vector.size(); i++) X[curvIndex].append(vector.at(i));
         } else {                                   // Y
             Y[curvIndex].resize(vector.size());
-            ::memcpy(Y[curvIndex].data(), vector.data(), vector.size()*sizeof(double));
+            Y[curvIndex].clear();
+            for(int i=0; i< vector.size(); i++) Y[curvIndex].append(vector.at(i));
         }
 
         // only x channel was specified, use index as y
@@ -391,15 +432,22 @@ void caCartesianPlot::setData(const QVector<double>& vector, int curvIndex, int 
             setSamplesData(curvIndex, X[curvIndex].data(), Y[curvIndex].data(), nbPoints, true);
         }
         replot();
+
+        ftime(&now);
+        double diff = ((double) now.time + (double) now.millitm / (double)1000) -
+                ((double) last.time + (double) last.millitm / (double)1000);
+        printf("time: %f\n", diff);
+
+
     }
 }
+
+#define MAXSIZE 500
 
 // this routine will prevent that we have problems with negative values when logarithmic scale
 // and will keep the values in order to switch between log and linear scale
 void caCartesianPlot::setSamplesData(int index, double *x, double *y, int size, bool saveFlag)
 {
-    QVarLengthArray<double> XAUX, YAUX;
-
     // saving the data allows to switch between log and lin when no new monitor is coming
     if(saveFlag) {
         XSAVE[index].resize(size);
