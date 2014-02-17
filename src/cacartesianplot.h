@@ -25,6 +25,7 @@
 
 #ifndef CACARTESIANPLOT_H
 #define CACARTESIANPLOT_H
+#include <stdint.h>
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>

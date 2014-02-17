@@ -23,6 +23,7 @@
  *    anton.mezger@psi.ch
  */
 
+#include <stdint.h>
 #include <QTimer>
 #include <QtGui>
 #include <QApplication>
