@@ -191,6 +191,8 @@ CaQtDM_Lib::~CaQtDM_Lib()
  */
 CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKnobData *mKnobData, MessageWindow *msgWindow, bool pepprint) : QMainWindow(parent)
 {
+
+    AllowsUpdate = true;
     mutexKnobData = mKnobData;
     messageWindow = msgWindow;
     pepPrint = pepprint;
@@ -1805,6 +1807,9 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
     Q_UNUSED(indx);
     Q_UNUSED(fec);
 
+    if(!AllowsUpdate) return;
+
+
     // thread mutexknobdata emits to all instances of this class, later we will have to filter on the emit side to enhance performance
     bool thisInstance = false;
     QWidget *widget = w;
@@ -2315,15 +2320,15 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     Cartesian(widget, curvNB, curvType, XorY, data);
                 // data from value
                 } else {
-                    QVector<double> y;
-                    y.append(data.edata.rvalue);
-                    widget->setData(y, curvNB, curvType, XorY);
+                    double p = data.edata.rvalue;
+                    widget->setData(&p, 1, curvNB, curvType, XorY);
+                    widget->displayData(curvNB, curvType);
                 }
 
                 // trigger channel
             } else if(XorY == caCartesianPlot::CH_Trigger) {
                 QVector<double> y;
-                for(int i=0; i < caCartesianPlot::curveCount; i++) widget->setData(y, i, curvType, XorY);
+                for(int i=0; i < caCartesianPlot::curveCount; i++) widget->displayData( curvNB, curvType); //widget->setData(y, i, curvType, XorY);
 
                 // count channel
             } else if(XorY == caCartesianPlot::CH_Count) {
@@ -2385,10 +2390,8 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             if((data.edata.valueCount > 0) && (data.edata.dataB != (void*) 0)) {
                 WaterFall(widget, data);
             } else {
-                QVector<double> y;
-                y.clear();
-                y.append(data.edata.rvalue);
-                widget->SetData(y);
+                double p = data.edata.rvalue;
+                widget->setData(&p, 1);
             }
 
             // not connected
@@ -2621,58 +2624,38 @@ void CaQtDM_Lib::Cartesian(caCartesianPlot *widget, int curvNB, int curvType, in
     datamutex->lock();
     switch(data.edata.fieldtype) {
     case caFLOAT: {
-        QVector <float> y;
-        y.clear();
-        y.resize(data.edata.valueCount);
         float* P = (float*) data.edata.dataB;
-        ::memcpy(y.data(), P, data.edata.valueCount*sizeof(float));
-        //for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);
+        widget->setData(P, data.edata.valueCount, curvNB, curvType, XorY);
         datamutex->unlock();
-        widget->setData(y, curvNB, curvType, XorY);
+        widget->displayData(curvNB, curvType);
     }
         break;
     case caDOUBLE: {
-        QVector <double> y;
-        y.clear();
-        y.resize(data.edata.valueCount);
         double* P = (double*) data.edata.dataB;
-        ::memcpy(y.data(), P, data.edata.valueCount*sizeof(double));
-        //for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);
+        widget->setData(P, data.edata.valueCount, curvNB, curvType, XorY);
         datamutex->unlock();
-        widget->setData(y, curvNB, curvType, XorY);
+        widget->displayData(curvNB, curvType);
     }
         break;
     case caLONG: {
-        QVector <int32_t> y;
-        y.clear();
-        y.resize(data.edata.valueCount);
         int32_t* P = (int32_t*) data.edata.dataB;
-        ::memcpy(y.data(), P, data.edata.valueCount*sizeof(int32_t));
-        //for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);
+        widget->setData(P, data.edata.valueCount,curvNB, curvType, XorY);
         datamutex->unlock();
-        widget->setData(y, curvNB, curvType, XorY);
+        widget->displayData(curvNB, curvType);
     }
         break;
     case caINT: {
-        QVector <int16_t> y;
-        y.clear();
-        y.resize(data.edata.valueCount);
         int16_t* P = (int16_t*) data.edata.dataB;
-        ::memcpy(y.data(), P, data.edata.valueCount*sizeof(int16_t));
-        //for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);
+        widget->setData(P, data.edata.valueCount, curvNB, curvType, XorY);
         datamutex->unlock();
-        widget->setData(y, curvNB, curvType, XorY);
+        widget->displayData(curvNB, curvType);
     }
         break;
     case caENUM: {
-        QVector <int16_t> y;
-        y.clear();
-        y.resize(data.edata.valueCount);
         int16_t* P = ( int16_t*) data.edata.dataB;
-        ::memcpy(y.data(), P, data.edata.valueCount*sizeof(int16_t));
-        //for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);
+        widget->setData(P ,data.edata.valueCount, curvNB, curvType, XorY);
         datamutex->unlock();
-        widget->setData(y, curvNB, curvType, XorY);
+        widget->displayData(curvNB, curvType);
     }
         break;
     default:
@@ -2683,64 +2666,43 @@ void CaQtDM_Lib::Cartesian(caCartesianPlot *widget, int curvNB, int curvType, in
 
 void CaQtDM_Lib::WaterFall(caWaterfallPlot *widget, const knobData &data)
 {
-    struct timeb now, last;
     QMutex *datamutex;
     datamutex = (QMutex*) data.mutex;
     datamutex->lock();
     switch(data.edata.fieldtype) {
     case caFLOAT: {
-        QVector <float> y;
-        y.clear();
-        y.resize(data.edata.valueCount);
         float* P = (float*) data.edata.dataB;
-        ::memcpy(y.data(), P, data.edata.valueCount*sizeof(float));
-        //for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);
+        widget->setData(P, data.edata.valueCount);
         datamutex->unlock();
-        widget->SetData(y);
+        widget->displayData();
     }
         break;
     case caDOUBLE: {
-        QVector <double> y;
-        y.clear();
-        y.resize(data.edata.valueCount);
         double* P = (double*) data.edata.dataB;
-        ::memcpy(y.data(), P, data.edata.valueCount*sizeof(double));
-        //for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);
+        widget->setData(P, data.edata.valueCount);
         datamutex->unlock();
-        widget->SetData(y);
+        widget->displayData();
     }
         break;
     case caLONG: {
-        QVector <int32_t> y;
-        y.clear();
-        y.resize(data.edata.valueCount);
         int32_t* P = (int32_t*) data.edata.dataB;
-        ::memcpy(y.data(), P, data.edata.valueCount*sizeof(int32_t));
-        //for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);
+        widget->setData(P, data.edata.valueCount);
         datamutex->unlock();
-        widget->SetData(y);
+        widget->displayData();
     }
         break;
     case caINT: {
-        QVector <int16_t> y;
-        y.clear();
-        y.resize(data.edata.valueCount);
         int16_t* P = (int16_t*) data.edata.dataB;
-        ::memcpy(y.data(), P, data.edata.valueCount*sizeof(int16_t));
-        //for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);
+        widget->setData(P, data.edata.valueCount);
         datamutex->unlock();
-        widget->SetData(y);
+        widget->displayData();
     }
         break;
     case caENUM: {
-        QVector <int16_t> y;
-        y.clear();
-        y.resize(data.edata.valueCount);
         int16_t* P = ( int16_t*) data.edata.dataB;
-        ::memcpy(y.data(), P, data.edata.valueCount*sizeof(int16_t));
-        //for(int i=0; i< data.edata.valueCount; i++) y.append(P[i]);
+        widget->setData(P, data.edata.valueCount);
         datamutex->unlock();
-        widget->SetData(y);
+        widget->displayData();
     }
         break;
     default:
@@ -3181,6 +3143,9 @@ void CaQtDM_Lib::processError(QProcess::ProcessError err)
 void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
 {
     Q_UNUSED(ce);
+
+    AllowsUpdate = false;
+
     for(int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
 
         knobData kData =  mutexKnobData->GetMutexKnobData(i);
@@ -3230,7 +3195,7 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
 #ifdef epics4
     delete Epics4;
 #endif
-
+    printf("closed\n");
 }
 
 /**

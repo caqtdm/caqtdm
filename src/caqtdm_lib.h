@@ -201,6 +201,7 @@ private:
     int nbIncludes;
     int splashCounter;
 
+    bool AllowsUpdate;
 
 #ifdef epics4
     epics4Subs *Epics4;
