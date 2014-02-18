@@ -48,9 +48,7 @@ public:
     virtual QwtText trackerTextF(const QPointF &pos) const
     {
         QColor bg(Qt::white);
-        bg.setAlpha(200);
-
-        QwtText text = QwtPlotZoomer::trackerTextF(pos);
+        QwtText text("(" + QString::number(pos.x()) + "," + QString::number(pos.y()) + ") ");
         text.setBackgroundBrush( QBrush( bg ));
         return text;
     }
@@ -432,6 +430,9 @@ void caCartesianPlot::displayData(int curvIndex, int curvType)
             if(thisCountNumber > 0) nbPoints = qMin(thisCountNumber, nbPoints);
             setSamplesData(curvIndex, X[curvIndex].data(), Y[curvIndex].data(), nbPoints, true);
         }
+
+        zoomer->setZoomBase();
+
         replot();
 
         ftime(&now);
@@ -442,8 +443,6 @@ void caCartesianPlot::displayData(int curvIndex, int curvType)
 
     }
 }
-
-#define MAXSIZE 5000
 
 // this routine will prevent that we have problems with negative values when logarithmic scale
 // and will keep the values in order to switch between log and linear scale
