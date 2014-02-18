@@ -25,7 +25,6 @@
 
 #ifndef CACARTESIANPLOT_H
 #define CACARTESIANPLOT_H
-#include <stdint.h>
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
@@ -40,6 +39,7 @@
 
 #include <qwt_plot_zoomer.h>
 #include <qwt_plot_panner.h>
+#include <stdint.h>
 
 class QTCON_EXPORT caCartesianPlot : public QwtPlot
 {
@@ -308,10 +308,11 @@ public:
     QwtSymbol::Style myMarker(curvSymbol m);
     QwtPlotCurve::CurveStyle myStyle(curvStyle s);
 
-    void setData(const QVector<double>& vector, int curvIndex, int curvType, int curvXY);
-    void setData(const QVector<float>& vector, int curvIndex, int curvType, int curvXY);
-    void setData(const QVector<int16_t>& vector, int curvIndex, int curvType, int curvXY);
-    void setData(const QVector<int32_t>& vector, int curvIndex, int curvType, int curvXY);
+    void setData(double *vector, int size, int curvIndex, int curvType, int curvXY);
+    void setData(float *vector, int size, int curvIndex, int curvType, int curvXY);
+    void setData(int16_t *vector, int size, int curvIndex, int curvType, int curvXY);
+    void setData(int32_t* vector, int size, int curvIndex, int curvType, int curvXY);
+    void displayData(int curvIndex, int curvType);
 
     void setScaleX(double minX, double maxX);
     void setScaleY(double minY, double maxY);
@@ -348,10 +349,12 @@ protected:
 
 private:
 
+    //template <typename pureData>
+    //void setDataOverloaded(const QVector<pureData>& vector, int curvIndex, int curvType, int curvXY);
     template <typename pureData>
-    void setDataOverloaded(const QVector<pureData>& vector, int curvIndex, int curvType, int curvXY);
-    template <typename pureData>
-    void AverageVector(QVector<pureData> vec, QVector<double> &avg, int ratio);
+    void fillData(pureData *vector, int size, int curvIndex, int curvType, int curvXY);
+
+    void AverageData(double *vec, double *avg, int size, int ratio);
 
     QString thisTitle, thisTitleX, thisTitleY, thisTriggerPV, thisCountPV, thisErasePV;
     QStringList	 thisPV[curveCount], thisXaxisLimits, thisYaxisLimits;
@@ -386,6 +389,8 @@ private:
 
     QwtPlotGrid *plotGrid;
     QPen penGrid;
+
+    int savedSize;
 
     bool thisXshow, thisYshow, thisToBeTriggered;
 

@@ -130,6 +130,8 @@ caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent)
 
     QHBoxLayout *hboxLayout = new QHBoxLayout(this);
 
+    datamutex = new QMutex;
+
     // define a new plot
     plot = new QwtPlot(this);
     QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -148,21 +150,11 @@ caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent)
     // define data
     m_data = new SpectrogramData();
 
+    // set 200 rows ( NumberofColumns columns for demo
     setRows(nbRows);
     setCols(nbCols);
-    NumberOfColumns = nbCols;
-
-    // init demo data for gauss curve
-
-    vectorF.clear();
-    vectorI.clear();
-    vectorS.clear();
-    vectorD.clear();
-    vectorD.reserve(NumberOfColumns);
-    for ( int i = 0; i < NumberOfColumns; i++ ) vectorD += 0.0;
-
-    // set 200 rows for demo
-    setRows(200);
+    ActualNumberOfColumns = NumberOfColumns = nbCols;
+    vectorD = (double*) malloc(ActualNumberOfColumns * sizeof(double));
 
     // initialize data
     m_data->initData(NumberOfColumns, getRows());
@@ -209,12 +201,12 @@ caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent)
 
 void caWaterfallPlot::setRows(int const &rows)
 {
-   thisRows = rows;
+    thisRows = rows;
 }
 
 void caWaterfallPlot::setCols(int const &cols)
 {
-   thisCols = cols;
+    thisCols = cols;
 }
 
 void caWaterfallPlot::updatePlot()
@@ -244,19 +236,19 @@ void caWaterfallPlot::updatePlot()
 
 void caWaterfallPlot::InitData(int numCols)
 {
-    int actualColumns;
     disableDemo = true;
-    vectorF.clear();
-    vectorI.clear();
-    vectorS.clear();
-    vectorD.clear();
+    if(vectorD != (double *) 0) {
+        free(vectorD);
+        vectorD = (double *) 0;
+    }
+
     countRows = 0;
     setCols(numCols);
-    NumberOfColumns = numCols;
+    ActualNumberOfColumns = NumberOfColumns = numCols;
 
-    actualColumns = m_data->initData(NumberOfColumns, getRows());
-    if(actualColumns == 0) return;
-    setCols(actualColumns);
+    ActualNumberOfColumns = m_data->initData(NumberOfColumns, getRows());
+    if(ActualNumberOfColumns == 0) return;
+    setCols(ActualNumberOfColumns);
     m_data->setLimits(0., getCols(), 0., getRows(), thisIntensityMin, thisIntensityMax);
     updatePlot();
 }
@@ -264,70 +256,85 @@ void caWaterfallPlot::InitData(int numCols)
 void caWaterfallPlot::myReplot()
 {
 #if QWT_VERSION >= 0x060100
-        QwtPlotCanvas *canvas =  (QwtPlotCanvas *) plot->canvas();
-        canvas->replot();
+    QwtPlotCanvas *canvas =  (QwtPlotCanvas *) plot->canvas();
+    canvas->replot();
 #else
-        plot->canvas()->replot();
+    plot->canvas()->replot();
 #endif
 }
 
-void caWaterfallPlot::SetData(const QVector<double> vec)
+template <typename pureData> void caWaterfallPlot::AverageArray(pureData *vec, int size, double *avg, int ratio)
 {
-    // in case of update by monitor, display now
-    if(thisUnits == Monitor) {
-        int actualColumns = m_data->setData(vec, countRows, NumberOfColumns, getRows());
-        setCols(actualColumns);
-        myReplot();
-    // otherwise, just keep this vector
-    } else {
-        vectorD.resize(vec.size());
-        ::memcpy(vectorD.data(), vec.data(), vec.size()*sizeof(double));
+    int AverageCounter = 0;
+    for (int i=0; i<size-ratio; i+=ratio) {
+        double mean = 0;
+        for(int j=0; j<ratio; j++) {
+            mean += vec[i+j];
+        }
+        avg[AverageCounter++]= mean / (double) ratio;
     }
-    m_data->setLimits(0., getCols(), 0., getRows(), thisIntensityMin, thisIntensityMax);
 }
 
-void caWaterfallPlot::SetData(const QVector<float> vec)
+template <typename pureData> void caWaterfallPlot::CompressAndkeepArray(pureData *vec, int size)
 {
-    // in case of update by monitor, display now
-    if(thisUnits == Monitor) {
-        int actualColumns = m_data->setData(vec, countRows, NumberOfColumns, getRows());
-        setCols(actualColumns);
-        myReplot();
-    // otherwise, just keep this vector
-    } else {
-        vectorF.resize(vec.size());
-        ::memcpy(vectorF.data(), vec.data(), vec.size()*sizeof(float));
+    datamutex->lock();
+    int ratio = m_data->getRatio(NumberOfColumns, ActualNumberOfColumns);
+    if(vectorD != (double *) 0) {
+        free(vectorD);
+        vectorD = (double *) 0;
     }
-    m_data->setLimits(0., getCols(), 0., getRows(), thisIntensityMin, thisIntensityMax);
+    vectorD = (double*) malloc(ActualNumberOfColumns * sizeof(double));
+    AverageArray(vec, size, vectorD, ratio);
+    datamutex->unlock();
 }
 
-void caWaterfallPlot::SetData(const QVector<int32_t> vec)
+void caWaterfallPlot::setData(double *vector, int size)
 {
-    // in case of update by monitor, display now
-    if(thisUnits == Monitor) {
-        int actualColumns = m_data->setData(vec, countRows, NumberOfColumns, getRows());
-        setCols(actualColumns);
-        myReplot();
-    // otherwise, just keep this vector
+    ActualNumberOfColumns = NumberOfColumns = size;
+    if(thisUnits != Monitor) {
+        CompressAndkeepArray(vector, size);
     } else {
-        vectorI.resize(vec.size());
-        ::memcpy(vectorI.data(), vec.data(), vec.size()*sizeof(int32_t));
+        int actualColumns = m_data->setData(vector, countRows, NumberOfColumns, getRows());
+        setCols(actualColumns);
     }
-    m_data->setLimits(0., getCols(), 0., getRows(), thisIntensityMin, thisIntensityMax);
 }
 
-void caWaterfallPlot::SetData(const QVector<int16_t> vec)
+void caWaterfallPlot::setData(float *vector, int size)
 {
-    // in case of update by monitor, display now
-    if(thisUnits == Monitor) {
-        int actualColumns = m_data->setData(vec, countRows, NumberOfColumns, getRows());
-        setCols(actualColumns);
-        myReplot();
-    // otherwise, just keep this vector
+    ActualNumberOfColumns = NumberOfColumns = size;
+    if(thisUnits != Monitor) {
+        CompressAndkeepArray(vector, size);
     } else {
-        vectorS.resize(vec.size());
-        ::memcpy(vectorS.data(), vec.data(), vec.size()*sizeof(int16_t));
+        int actualColumns = m_data->setData(vector, countRows, NumberOfColumns, getRows());
+        setCols(actualColumns);
     }
+}
+
+void caWaterfallPlot::setData(int16_t *vector, int size)
+{
+    ActualNumberOfColumns = NumberOfColumns = size;
+    if(thisUnits != Monitor) {
+        CompressAndkeepArray(vector, size);
+    } else {
+        int actualColumns = m_data->setData(vector, countRows, NumberOfColumns, getRows());
+        setCols(actualColumns);
+    }
+}
+
+void caWaterfallPlot::setData(int32_t *vector, int size)
+{
+    ActualNumberOfColumns = NumberOfColumns = size;
+    if(thisUnits != Monitor) {
+        CompressAndkeepArray(vector, size);
+    } else {
+        int actualColumns = m_data->setData(vector, countRows, NumberOfColumns, getRows());
+        setCols(actualColumns);
+    }
+}
+
+void caWaterfallPlot::displayData()
+{
+    if(thisUnits == Monitor) myReplot();
     m_data->setLimits(0., getCols(), 0., getRows(), thisIntensityMin, thisIntensityMax);
 }
 
@@ -355,22 +362,18 @@ void caWaterfallPlot::TimeOut()
     if(thisUnits != Monitor) {
         if(!disableDemo) {
             GausCurv(position);
-            m_data->setData(vectorD, countRows, NumberOfColumns, getRows());
+            m_data->setData(vectorD, countRows, ActualNumberOfColumns, getRows());
             if(drift > 0 && position >= NumberOfColumns) drift = -1;
             if(drift < 0 && position <= 0)  drift = 1;
             position += drift;
         } else {
-            if(vectorI.size() > 0) {
-                m_data->setData(vectorI, countRows, NumberOfColumns, getRows() );
-            } else if(vectorD.size() > 0) {
-                m_data->setData(vectorD, countRows, NumberOfColumns, getRows() );
-            } else if(vectorF.size() > 0) {
-                m_data->setData(vectorF, countRows, NumberOfColumns, getRows());
-            } else if(vectorS.size() > 0) {
-                m_data->setData(vectorS, countRows, NumberOfColumns, getRows());
+            if(vectorD != (double*) 0) {
+                datamutex->lock();
+                //printf("actualnumberofcolumns=%d\n", ActualNumberOfColumns);
+                m_data->setData(vectorD, countRows, ActualNumberOfColumns, getRows() );
+                datamutex->unlock();
             }
         }
-
         myReplot();
     }
 }

@@ -229,66 +229,61 @@ void caCartesianPlot::erasePlots()
      replot();
 }
 
-template <typename pureData>
-void caCartesianPlot::AverageVector(QVector<pureData> vec, QVector<double> &avg, int ratio)
+void caCartesianPlot::AverageData(double *vec, double *avg, int size, int ratio)
 {
-    printf("average vector double\n");
-    avg.clear();
-    for (int i=0; i< vec.size(); i+=ratio) {
+    int counter = 0;
+    for (int i=0; i< size; i+=ratio) {
         double mean = 0;
         for(int j=0; j< ratio; j++) {
-           mean += vec.at(i+j);
+           mean += vec[i+j];
         }
-        avg += mean / (double) ratio;
+        avg[counter++] = mean / (double) ratio;
     }
 }
 
-void caCartesianPlot::setData(const QVector<double>& vector, int curvIndex, int curvType, int curvXY)
+void caCartesianPlot::setData(double *vector, int size, int curvIndex, int curvType, int curvXY)
 {
-     setDataOverloaded(vector, curvIndex, curvType, curvXY);
+     fillData(vector, size, curvIndex, curvType, curvXY);
 }
 
-void caCartesianPlot::setData(const QVector<float>& vector, int curvIndex, int curvType, int curvXY)
+void caCartesianPlot::setData(float *vector, int size, int curvIndex, int curvType, int curvXY)
 {
-     setDataOverloaded(vector, curvIndex, curvType, curvXY);
+    fillData(vector, size, curvIndex, curvType, curvXY);
 }
 
-void caCartesianPlot::setData(const QVector<int16_t>& vector, int curvIndex, int curvType, int curvXY)
+void caCartesianPlot::setData(int16_t *vector, int size, int curvIndex, int curvType, int curvXY)
 {
-     setDataOverloaded(vector, curvIndex, curvType, curvXY);
+    fillData(vector, size, curvIndex, curvType, curvXY);
 }
 
-void caCartesianPlot::setData(const QVector<int32_t>& vector, int curvIndex, int curvType, int curvXY)
+void caCartesianPlot::setData(int32_t *vector, int size, int curvIndex, int curvType, int curvXY)
 {
-     setDataOverloaded(vector, curvIndex, curvType, curvXY);
+    fillData(vector, size, curvIndex, curvType, curvXY);
 }
 
 template <typename pureData>
-void caCartesianPlot::setDataOverloaded(const QVector<pureData>& vector, int curvIndex, int curvType, int curvXY)
+void caCartesianPlot::fillData(pureData *vector, int size, int curvIndex, int curvType, int curvXY)
 {
-    struct timeb now, last;
-    ftime(&last);
-
     if(curvXY == CH_X || curvXY == CH_Y) {         // x or y
         // keep data points
         if(curvXY == CH_X) {                       // X
-            X[curvIndex].resize(vector.size());
+            X[curvIndex].resize(size);
             X[curvIndex].clear();
-            for(int i=0; i< vector.size(); i++) X[curvIndex].append(vector.at(i));
+            for(int i=0; i< size; i++) X[curvIndex].append(vector[i]);
         } else {                                   // Y
-            Y[curvIndex].resize(vector.size());
+            Y[curvIndex].resize(size);
             Y[curvIndex].clear();
-            for(int i=0; i< vector.size(); i++) Y[curvIndex].append(vector.at(i));
+            for(int i=0; i< size; i++) Y[curvIndex].append(vector[i]);
         }
 
         // only x channel was specified, use index as y
         if(curvType == X_only) {
             Y[curvIndex].clear();
-            for(int i=0; i< vector.size(); i++) Y[curvIndex].append(i);
+            for(int i=0; i< size; i++) Y[curvIndex].append(i);
             // only y channel was specified, use index as x
         } else if(curvType == Y_only) {
             X[curvIndex].clear();
-            for(int i=0; i< vector.size(); i++) X[curvIndex].append(i);
+            for(int i=0; i< size; i++) X[curvIndex].append(i);
         }
 
         // when triggering is specified, we will return here
@@ -306,6 +301,12 @@ void caCartesianPlot::setDataOverloaded(const QVector<pureData>& vector, int cur
                 X[curvIndex][i-1], Y[curvIndex][j-1]);
 */
     }
+}
+
+void caCartesianPlot::displayData(int curvIndex, int curvType)
+{
+    struct timeb now, last;
+    ftime(&last);
 
     // draw curve
     if(X[curvIndex].size() > 0 && Y[curvIndex].size() > 0) {
@@ -319,7 +320,7 @@ void caCartesianPlot::setDataOverloaded(const QVector<pureData>& vector, int cur
 #else
             double aux =  Y[curvIndex].at(0);
 #endif
-            Y[curvIndex].reserve(nbPoints);      // increase to correct size
+            Y[curvIndex].resize(nbPoints);      // increase to correct size
             double *data = Y[curvIndex].data();
             for(int i=0; i < X[curvIndex].size(); i++) data[i] = aux;
             if(thisCountNumber > 0) nbPoints = qMin(thisCountNumber, X[curvIndex].size());
@@ -334,7 +335,7 @@ void caCartesianPlot::setDataOverloaded(const QVector<pureData>& vector, int cur
 #else
             double aux =  X[curvIndex].at(0);
 #endif
-            X[curvIndex].reserve(nbPoints);      // increase to correct size
+            X[curvIndex].resize(nbPoints);      // increase to correct size
             double *data = X[curvIndex].data();
             for(int i=0; i < Y[curvIndex].size(); i++) data[i] = aux;  // and set values to first datapoint
             if(thisCountNumber > 0) nbPoints = qMin(thisCountNumber, Y[curvIndex].size());
@@ -434,21 +435,22 @@ void caCartesianPlot::setDataOverloaded(const QVector<pureData>& vector, int cur
         replot();
 
         ftime(&now);
-        double diff = ((double) now.time + (double) now.millitm / (double)1000) -
-                ((double) last.time + (double) last.millitm / (double)1000);
-        printf("time: %f\n", diff);
+        //double diff = ((double) now.time + (double) now.millitm / (double)1000) -
+        //        ((double) last.time + (double) last.millitm / (double)1000);
+        //printf("time: %f\n", diff);
 
 
     }
 }
 
-#define MAXSIZE 500
+#define MAXSIZE 5000
 
 // this routine will prevent that we have problems with negative values when logarithmic scale
 // and will keep the values in order to switch between log and linear scale
 void caCartesianPlot::setSamplesData(int index, double *x, double *y, int size, bool saveFlag)
 {
     // saving the data allows to switch between log and lin when no new monitor is coming
+
     if(saveFlag) {
         XSAVE[index].resize(size);
         YSAVE[index].resize(size);
@@ -457,7 +459,7 @@ void caCartesianPlot::setSamplesData(int index, double *x, double *y, int size, 
     }
 
     // use auxiliary arrays, in order not to overwrite the original data
-    if((thisXtype == log10) ||  (thisYtype == log10)) {
+    if((thisXtype == log10) || (thisYtype == log10)) {
         XAUX.resize(size);
         YAUX.resize(size);
         memcpy(XAUX.data(), x, size*sizeof(double));

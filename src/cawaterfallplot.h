@@ -23,11 +23,11 @@
  *    anton.mezger@psi.ch
  */
 
-#include <stdint.h>
 #include <QTimer>
 #include <QtGui>
 #include <QApplication>
 #include <QHBoxLayout>
+#include <QMutex>
 #include <qwt_plot.h>
 #include <qwt_plot_canvas.h>
 #include <qwt_color_map.h>
@@ -43,9 +43,11 @@
 #include <qwt_point_3d.h>
 #include <qwt_plot_spectrocurve.h>
 #include <sys/timeb.h>
+#include <stdint.h>
+//#include <sys/timeb.h>
 
 #include <qtcontrols_global.h>
-
+#define MAXCOLUMNS 500
 
 class SpectrogramData: public QwtMatrixRasterData
 {
@@ -60,60 +62,65 @@ private:
 
 public:
 
-
-#define MAXCOLUMNS 500
     SpectrogramData() {
     }
 
     template <typename pureData>
-    void AverageVector(QVector<pureData> vec, QVector<double> &avg)
+    void AverageVector(pureData *vec, int size, QVector<double> &avg)
     {
-        printf("average vector double\n");
         avg.clear();
-        for (int i=0; i< vec.size(); i+=ratio) {
+        for (int i=0; i< size-ratio; i+=ratio) {
             double mean = 0;
             for(int j=0; j< ratio; j++) {
-               mean += vec.at(i+j);
+                mean += vec[i+j];
             }
             avg += mean / (double) ratio;
         }
+    }
+
+    int getRatio(int NumberOfColumns, int &MaximumColumns) {
+        ratio = 1;
+        if(NumberOfColumns > MAXCOLUMNS) {
+           ratio = (int) ((double) NumberOfColumns / (double) MAXCOLUMNS);
+           if(ratio < 1) ratio = 1;
+           MaximumColumns = NumberOfColumns/ratio;
+        }
+        return ratio;
     }
 
     int initData(int numCols, int numRows)
     {
         ActualNumberOfColumns = NumberOfColumns = numCols;
         NumberOfRows = numRows;
-        ratio = 1;
+
+        ratio = getRatio(NumberOfColumns, ActualNumberOfColumns);
 
         // too many columns, calculate size of reduced data vector
-        if(NumberOfColumns > MAXCOLUMNS) {
-            ratio = (int) ((double) NumberOfColumns / (double) MAXCOLUMNS);
-            ActualNumberOfColumns = NumberOfColumns/ratio;
+        if(ratio != 1) {
             valuesAveraged.resize(ActualNumberOfColumns);
         }
 
         return ActualNumberOfColumns;
     }
 
-    template <typename pureData>
-    int setData(const QVector<pureData> Array, int &count, int numCols, int numRows)
+    template <typename pureData> int setData(pureData* Array, int &count, int numCols, int numRows)
     {
+        //struct timeb now, last;
+        //ftime(&last);
         ActualNumberOfColumns = NumberOfColumns = numCols;
         NumberOfRows = numRows;
-        ratio = 1;
+
+        ratio = getRatio(NumberOfColumns, ActualNumberOfColumns);
 
         // too many columns, calculate size of reduced data vector
-        if(NumberOfColumns > MAXCOLUMNS) {
-            ratio = (int) ((double) NumberOfColumns / (double) MAXCOLUMNS);
-            ActualNumberOfColumns = NumberOfColumns/ratio;
+        if(ratio != 1) {
             valuesAveraged.resize(ActualNumberOfColumns);
         }
         values.resize(ActualNumberOfColumns * NumberOfRows);
 
         // calculate reduced data vector
         if(ratio != 1) {
-            printf("we have to average %d columns to %d columns\n", Array.size(), valuesAveraged.size());
-            AverageVector(Array, valuesAveraged);
+            AverageVector(Array, NumberOfColumns, valuesAveraged);
         }
 
         // in case of a plot down to the bottom, start from the top and go to bottom
@@ -137,11 +144,16 @@ public:
             int start = ActualNumberOfColumns * NumberOfRows - ActualNumberOfColumns;
             int stop = ActualNumberOfColumns * NumberOfRows;
             if(ratio != 1) {
-               for ( int i = start; i < stop; i++ ) values[i] = valuesAveraged[i-start];
+                for ( int i = start; i < stop; i++ ) values[i] = valuesAveraged[i-start];
             } else {
                 for ( int i = start; i < stop; i++ ) values[i] = Array[i-start];
             }
         }
+
+        //ftime(&now);
+        //double diff = ((double) now.time + (double) now.millitm / (double)1000) -
+        //        ((double) last.time + (double) last.millitm / (double)1000);
+        //printf("%f\n", diff);
 
         // update the matrix
         setValueMatrix(values, ActualNumberOfColumns);
@@ -151,7 +163,8 @@ public:
 
     void setLimits(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
     {
-        setInterval( Qt::XAxis, QwtInterval( xmin, xmax ) );
+        //printf("%f %f %f %f %f %f\n", xmin, xmax, ymin, ymax, zmin, zmax);
+        setInterval( Qt::XAxis, QwtInterval( xmin, xmax ) );;
         setInterval( Qt::YAxis, QwtInterval( ymin, ymax) );
         setInterval( Qt::ZAxis, QwtInterval( zmin, zmax) );
     }
@@ -240,18 +253,27 @@ public:
 
     void myReplot();
 
-    void SetData(const QVector<float> vector);
-    void SetData(const QVector<double> vector);
-    void SetData(const QVector<int16_t> vector);
-    void SetData(const QVector<int32_t> vector);
+    void setData(double *vector, int size);
+    void setData(float *vector, int size);
+    void setData(int16_t *vector, int size);
+    void setData(int32_t *vector, int size);
+    void displayData();
 
     void updatePlot();
     void defineTimerUpdate(units unit, double period);
+
 
 private:
 
     enum {nbRows = 200};
     enum {nbCols = 500};
+
+    int ActualNumberOfColumns;
+
+    template <typename pureData>void AverageArray(pureData *vec, int size, double *avg, int ratio);
+    template <typename pureData> void CompressAndkeepArray(pureData *vec, int size);
+
+    QMutex *datamutex;
 
     QwtPlot *plot;
     QwtPlotSpectrogram *d_spectrogram;
@@ -259,10 +281,9 @@ private:
     QwtPlotGrid * plotGrid;
     QTimer *Timer;
     double position, drift;
-    QVector<double> vectorD;
-    QVector<float> vectorF;
-    QVector<int16_t> vectorS;
-    QVector<int32_t> vectorI;
+
+    double *vectorD;
+
     SpectrogramData *m_data;
 
     QString thisTitle, thisTitleX, thisTitleY;
