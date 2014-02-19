@@ -52,6 +52,7 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     thisStyle = "";
     thisColorMode=Default;
     oldColorMode =Static;
+
     thisFormatC[0] = '\0';
 
     setUnitsEnabled(false);
@@ -62,7 +63,18 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     oldBackColor = Qt::black;
     oldForeColor = Qt::gray;
 
-    // default colors will be odefined in my event handler by taking them from the palette defined by stylesheet definitions
+    thisFrameColor = Qt::black;
+    oldFrameColor = Qt::gray;
+
+    thisFramePresent = false;
+    oldFramepresent = false;
+
+    thisFrameLineWidth = 0;
+    oldFrameLineWidth = 0;
+
+    thisAlarmHandling = onForeground;
+
+    // default colors will be defined in my event handler by taking them from the palette defined by stylesheet definitions
     //defBackColor = QColor(255, 248, 220, 255);
     //defForeColor = Qt::black;
     defSelectColor = Qt::red; // this does not appear in the palette
@@ -105,29 +117,44 @@ void caLineEdit::setPV(QString const &newPV)
 // the styles are now defined here and not in the style sheet any more
 // while this gives a perfomance problem, limit the use of it by testing changes
 
-void caLineEdit::setColors(QColor bg, QColor fg)
+void caLineEdit::setColors(QColor bg, QColor fg, QColor frame, int lineWidth)
 {
     if(!defBackColor.isValid() || !defForeColor.isValid()) return;
 
-    if((bg != oldBackColor) || (fg != oldForeColor) || (thisStyle != oldStyle) || (thisColorMode != oldColorMode)) {
-        QColor lc;
-        QColor dc;
-        thisStyle = "caTextEntry,caLineEdit {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-radius: 1px; }";
-        thisStyle.append("caLineEdit {border: 0px; padding: 0px 0px 0px 2px;} caTextEntry { border: 2px; padding: 0px;}");
+    if((bg != oldBackColor) || (fg != oldForeColor) || (thisColorMode != oldColorMode) || (frame != oldFrameColor) || lineWidth != oldFrameLineWidth) {
+        QColor lc, dc;
+        QColor blc = frame.lighter();
+        QColor bdc = frame.darker();
+        thisStyle = "caTextEntry,caLineEdit {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-radius: 1px;} ";
+        thisStyle.append("caLineEdit {border: %9px; border-style:outset; padding: 0px 0px 0px 2px; border-color: rgba(%10, %11, %12, %13) rgba(%14, %15, %16, %17)  rgba(%18, %19, %20, %21) rgba(%22, %23, %24, %25);} caTextEntry { border: 2px; padding: 0px;}");
+
+        setBotTopBorderWidth((double) lineWidth+1);
+        setLateralBorderWidth((double) lineWidth+1);
+
         if(thisColorMode == Default || thisColorMode == Alarm_Default) {
             thisStyle = thisStyle.arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
-                    arg(defForeColor.red()).arg(defForeColor.green()).arg(defForeColor.blue()).arg(defForeColor.alpha());
+                    arg(defForeColor.red()).arg(defForeColor.green()).arg(defForeColor.blue()).arg(defForeColor.alpha()).
+                    arg(lineWidth).
+                    arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha()).
+                    arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
+                    arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
+                    arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha());
 
             lc = defBackColor.lighter();
             dc = defBackColor.darker();
         } else {
-            thisStyle = "caTextEntry, caLineEdit {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-radius: 1px; }";
-            thisStyle.append("caLineEdit{border: 0px; padding: 0px 0px 0px 2px;} caTextEntry { border: 2px; padding: 0px;} ");
             thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
-                    arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
+                    arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha()).
+                    arg(lineWidth).
+                    arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha()).
+                    arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
+                    arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
+                    arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha());
+
             lc = bg.lighter();
             dc = bg.darker();
         }
+
         if(thisStyle != oldStyle || thisColorMode != oldColorMode) {
             thisStyle.append(" caTextEntry {border-style:inset; border-color: rgba(%1, %2, %3, %4) rgba(%5, %6, %7, %8)  rgba(%9, %10, %11, %12) rgba(%13, %14, %15, %16);} caTextEntry:focus {padding: 0px; border: 2px groove rgba(%17, %18, %19, %20); border-radius: 1px;} ");
             thisStyle = thisStyle.arg(dc.red()).arg(dc.green()).arg(dc.blue()).arg(dc.alpha()).
@@ -141,6 +168,8 @@ void caLineEdit::setColors(QColor bg, QColor fg)
     }
     oldBackColor = bg;
     oldForeColor = fg;
+    oldFrameColor = frame;
+    oldFrameLineWidth = lineWidth;
 }
 
 void caLineEdit::setColorMode(colMode colormode)
@@ -154,28 +183,46 @@ void caLineEdit::setColorMode(colMode colormode)
 void caLineEdit::setBackground(QColor c)
 {
     thisBackColor = c;
-    setColors(thisBackColor, thisForeColor);
+    setColors(thisBackColor, thisForeColor, thisFrameColor, thisFrameLineWidth);
 }
 
 void caLineEdit::setForeground(QColor c)
 {
     thisForeColor = c;
-    setColors(thisBackColor, thisForeColor);
+    setColors(thisBackColor, thisForeColor, thisFrameColor, thisFrameLineWidth);
 }
 
-void caLineEdit::forceForeAndBackground(QColor fg, QColor bg)
+void caLineEdit::forceForeAndBackground(QColor fg, QColor bg, QColor fr)
 {
     colMode aux = thisColorMode;
     thisColorMode = Alarm_Static;
-    setColors(fg, bg);
+    setColors(fg, bg, fr, thisFrameLineWidth);
     thisColorMode = aux;
 }
 
-void caLineEdit::setForeAndBackground(QColor foreground, QColor background)
+void caLineEdit::setForeAndBackground(QColor foreground, QColor background, QColor frame)
 {
     thisForeColor = foreground;
     thisBackColor = background;
-    setColors(thisBackColor, thisForeColor);
+    thisFrameColor = frame;
+    setColors(thisBackColor, thisForeColor, thisFrameColor, thisFrameLineWidth);
+}
+
+void caLineEdit::setFrame(bool frame) {
+    thisFramePresent = frame;
+    if(!thisFramePresent) setLinewidth(0);
+}
+
+void caLineEdit::setFrameColor(QColor c) {
+    thisFrameColor = c;
+    setColors(thisBackColor, thisForeColor, thisFrameColor, thisFrameLineWidth);
+}
+
+void caLineEdit::setLinewidth(int width)
+{
+    if(width < 0) thisFrameLineWidth = 0;
+    else thisFrameLineWidth = width;
+    setColors(thisBackColor, thisForeColor, thisFrameColor, thisFrameLineWidth);
 }
 
 bool caLineEdit::event(QEvent *e)
@@ -196,7 +243,7 @@ bool caLineEdit::event(QEvent *e)
           if(!defBackColor.isValid()) defBackColor = QColor(255, 248, 220, 255);
           if(!defForeColor.isValid()) defForeColor = Qt::black;
 
-          setColors(thisBackColor, thisForeColor);
+          setColors(thisBackColor, thisForeColor, thisFrameColor, thisFrameLineWidth);
           isShown = true;
         }
 
@@ -306,9 +353,10 @@ void caLineEdit::setAlarmColors(short status, double value, QColor bgAtInit, QCo
 
         if(thisColorMode == Alarm_Static || thisColorMode == Alarm_Default) {
             c = AL_GREEN;
-            setForeAndBackground(c, bgAtInit);
+            if(thisAlarmHandling == onForeground) setForeAndBackground(c, bgAtInit, thisFrameColor);
+            else setForeAndBackground(fgAtInit, c, thisFrameColor);
         } else {
-            setForeAndBackground(fgAtInit, bgAtInit);
+            setForeAndBackground(fgAtInit, bgAtInit, thisFrameColor);
         }
         break;
 
@@ -316,9 +364,10 @@ void caLineEdit::setAlarmColors(short status, double value, QColor bgAtInit, QCo
         //qDebug() << "minor alarm";
         if(thisColorMode == Alarm_Static || thisColorMode == Alarm_Default) {
             c = AL_YELLOW;
-            setForeAndBackground(c, bgAtInit);
+            if(thisAlarmHandling == onForeground) setForeAndBackground(c, bgAtInit, thisFrameColor);
+            else setForeAndBackground(fgAtInit, c, thisFrameColor);
         } else {
-            setForeAndBackground(fgAtInit, bgAtInit);
+            setForeAndBackground(fgAtInit, bgAtInit, thisFrameColor);
         }
         break;
 
@@ -327,9 +376,10 @@ void caLineEdit::setAlarmColors(short status, double value, QColor bgAtInit, QCo
 
         if(thisColorMode == Alarm_Static || thisColorMode == Alarm_Default) {
             c = AL_RED;
-            setForeAndBackground(c, bgAtInit);
+            if(thisAlarmHandling == onForeground) setForeAndBackground(c, bgAtInit, thisFrameColor);
+            else setForeAndBackground(fgAtInit, c, thisFrameColor);
         } else {
-            setForeAndBackground(fgAtInit, bgAtInit);
+            setForeAndBackground(fgAtInit, bgAtInit, thisFrameColor);
         }
         break;
 
@@ -338,24 +388,26 @@ void caLineEdit::setAlarmColors(short status, double value, QColor bgAtInit, QCo
 
         if(thisColorMode == Alarm_Static) {
             c =AL_WHITE;
-            setForeAndBackground(c, bgAtInit);
+            if(thisAlarmHandling == onForeground) setForeAndBackground(c, bgAtInit, thisFrameColor);
+            else setForeAndBackground(fgAtInit, c, thisFrameColor);
         } else {
-            setForeAndBackground(fgAtInit, bgAtInit);
+            setForeAndBackground(fgAtInit, bgAtInit, thisFrameColor);
         }
         break;
 
     case NOTCONNECTED:
         //qDebug() << "no connection";
-        forceForeAndBackground(AL_WHITE, AL_WHITE);
+        forceForeAndBackground(AL_WHITE, AL_WHITE, thisFrameColor);
         break;
 
     default:
         //qDebug() << "Alarm default" << status;
         if(thisColorMode == Alarm_Static) {
             c = AL_DEFAULT;
-            setForeAndBackground(c, bgAtInit);
+            if(thisAlarmHandling == onForeground) setForeAndBackground(c, bgAtInit, thisFrameColor);
+            else setForeAndBackground(fgAtInit, c, thisFrameColor);
         } else {
-            setForeAndBackground(fgAtInit, bgAtInit);
+            setForeAndBackground(fgAtInit, bgAtInit, thisFrameColor);
         }
 
         break;

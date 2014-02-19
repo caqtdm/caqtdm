@@ -39,6 +39,12 @@ class QTCON_EXPORT caTextEntry : public caLineEdit
     Q_OBJECT
     Q_PROPERTY(bool unitsEnabled READ getUnitsEnabled WRITE setUnitsEnabled DESIGNABLE false)
 
+    Q_PROPERTY(bool framePresent READ getFrame WRITE setFrame  DESIGNABLE false)
+    Q_PROPERTY(QColor frameColor READ getFrameColor WRITE setFrameColor  DESIGNABLE false)
+    Q_PROPERTY(int frameLineWidth READ getLineWidth WRITE setLinewidth  DESIGNABLE false)
+    Q_PROPERTY(alertHandling alarmHandling READ getAlarmHandling WRITE setAlarmHandling DESIGNABLE false )
+
+
 public:
 
     caTextEntry( QWidget *parent = 0 );

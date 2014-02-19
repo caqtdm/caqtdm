@@ -40,6 +40,15 @@ class QTCON_EXPORT caLineEdit : public QLineEdit, public FontScalingWidget
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
     Q_ENUMS(colMode)
 
+    Q_PROPERTY(bool frame READ getFrame WRITE setFrame DESIGNABLE false)
+
+    Q_PROPERTY(bool framePresent READ getFrame WRITE setFrame)
+    Q_PROPERTY(QColor frameColor READ getFrameColor WRITE setFrameColor)
+    Q_PROPERTY(int frameLineWidth READ getLineWidth WRITE setLinewidth)
+
+    Q_PROPERTY(alertHandling alarmHandling READ getAlarmHandling WRITE setAlarmHandling)
+    Q_ENUMS(alertHandling)
+
     Q_PROPERTY(int precision READ getPrecision WRITE setPrecision)
     Q_PROPERTY(SourceMode precisionMode READ getPrecisionMode WRITE setPrecisionMode)
 
@@ -86,8 +95,19 @@ public:
 
     enum colMode {Default=0, Static, Alarm_Default, Alarm_Static};
     colMode getColorMode() const { return thisColorMode; }
-
     void setColorMode(colMode colormode);
+
+    bool getFrame() const { return thisFramePresent;}
+    void setFrame(bool frame);
+
+    QColor getFrameColor() const {return thisFrameColor;}
+    void setFrameColor(QColor c);
+    int getLineWidth() const {return thisFrameLineWidth;}
+    void setLinewidth(int width);
+
+    enum alertHandling { onForeground = 0, onBackground };
+    alertHandling getAlarmHandling() const { return thisAlarmHandling;}
+    void setAlarmHandling(alertHandling alarmHandling) {thisAlarmHandling = alarmHandling;}
 
     enum SourceMode {Channel = 0, User};
     SourceMode getPrecisionMode() const { return thisPrecMode; }
@@ -118,10 +138,10 @@ public:
     void setFormatType(FormatType m) { thisFormatType = m; }
     FormatType getFormatType() { return thisFormatType; }
 
-    void setForeAndBackground(QColor foreground, QColor background);
-    void forceForeAndBackground(QColor foreground, QColor background);
+    void setForeAndBackground(QColor foreground, QColor background, QColor frame);
+    void forceForeAndBackground(QColor foreground, QColor background, QColor frame);
     void setAlarmColors(short status, double value, QColor bgAtInit, QColor fgAtInit);
-    void setColors(QColor bg, QColor fg);
+    void setColors(QColor bg, QColor fg, QColor fr, int lineWidth);
     void newFocusPolicy(Qt::FocusPolicy f);
 
 private slots:
@@ -157,6 +177,14 @@ private:
     QString thisStyle, oldStyle;
 
     bool isShown;
+
+
+    bool thisFramePresent, oldFramepresent;
+    QColor thisFrameColor, oldFrameColor;
+    int thisFrameLineWidth, oldFrameLineWidth;
+    alertHandling thisAlarmHandling;
+
+
 };
 
 #endif
