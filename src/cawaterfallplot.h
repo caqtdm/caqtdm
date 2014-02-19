@@ -253,10 +253,10 @@ public:
 
     void myReplot();
 
-    void setData(double *vector, int size);
-    void setData(float *vector, int size);
-    void setData(int16_t *vector, int size);
-    void setData(int32_t *vector, int size);
+    void setData(double *array, int size);
+    void setData(float *array, int size);
+    void setData(int16_t *array, int size);
+    void setData(int32_t *array, int size);
     void displayData();
 
     void updatePlot();
@@ -282,7 +282,7 @@ private:
     QTimer *Timer;
     double position, drift;
 
-    double *vectorD;
+    double *reducedArray;
 
     SpectrogramData *m_data;
 

@@ -349,12 +349,10 @@ protected:
 
 private:
 
-    //template <typename pureData>
-    //void setDataOverloaded(const QVector<pureData>& vector, int curvIndex, int curvType, int curvXY);
     template <typename pureData>
-    void fillData(pureData *vector, int size, int curvIndex, int curvType, int curvXY);
+    void fillData(pureData *array, int size, int curvIndex, int curvType, int curvXY);
 
-    void AverageData(double *vec, double *avg, int size, int ratio);
+    void AverageData(double *array, double *avg, int size, int ratio);
 
     QString thisTitle, thisTitleX, thisTitleY, thisTriggerPV, thisCountPV, thisErasePV;
     QStringList	 thisPV[curveCount], thisXaxisLimits, thisYaxisLimits;

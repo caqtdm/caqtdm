@@ -154,7 +154,7 @@ caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent)
     setRows(nbRows);
     setCols(nbCols);
     ActualNumberOfColumns = NumberOfColumns = nbCols;
-    vectorD = (double*) malloc(ActualNumberOfColumns * sizeof(double));
+    reducedArray = (double*) malloc(ActualNumberOfColumns * sizeof(double));
 
     // initialize data
     m_data->initData(NumberOfColumns, getRows());
@@ -237,9 +237,9 @@ void caWaterfallPlot::updatePlot()
 void caWaterfallPlot::InitData(int numCols)
 {
     disableDemo = true;
-    if(vectorD != (double *) 0) {
-        free(vectorD);
-        vectorD = (double *) 0;
+    if(reducedArray != (double *) 0) {
+        free(reducedArray);
+        reducedArray = (double *) 0;
     }
 
     countRows = 0;
@@ -279,55 +279,55 @@ template <typename pureData> void caWaterfallPlot::CompressAndkeepArray(pureData
 {
     datamutex->lock();
     int ratio = m_data->getRatio(NumberOfColumns, ActualNumberOfColumns);
-    if(vectorD != (double *) 0) {
-        free(vectorD);
-        vectorD = (double *) 0;
+    if(reducedArray != (double *) 0) {
+        free(reducedArray);
+        reducedArray = (double *) 0;
     }
-    vectorD = (double*) malloc(ActualNumberOfColumns * sizeof(double));
-    AverageArray(vec, size, vectorD, ratio);
+    reducedArray = (double*) malloc(ActualNumberOfColumns * sizeof(double));
+    AverageArray(vec, size, reducedArray, ratio);
     datamutex->unlock();
 }
 
-void caWaterfallPlot::setData(double *vector, int size)
+void caWaterfallPlot::setData(double *array, int size)
 {
     ActualNumberOfColumns = NumberOfColumns = size;
     if(thisUnits != Monitor) {
-        CompressAndkeepArray(vector, size);
+        CompressAndkeepArray(array, size);
     } else {
-        int actualColumns = m_data->setData(vector, countRows, NumberOfColumns, getRows());
+        int actualColumns = m_data->setData(array, countRows, NumberOfColumns, getRows());
         setCols(actualColumns);
     }
 }
 
-void caWaterfallPlot::setData(float *vector, int size)
+void caWaterfallPlot::setData(float *array, int size)
 {
     ActualNumberOfColumns = NumberOfColumns = size;
     if(thisUnits != Monitor) {
-        CompressAndkeepArray(vector, size);
+        CompressAndkeepArray(array, size);
     } else {
-        int actualColumns = m_data->setData(vector, countRows, NumberOfColumns, getRows());
+        int actualColumns = m_data->setData(array, countRows, NumberOfColumns, getRows());
         setCols(actualColumns);
     }
 }
 
-void caWaterfallPlot::setData(int16_t *vector, int size)
+void caWaterfallPlot::setData(int16_t *array, int size)
 {
     ActualNumberOfColumns = NumberOfColumns = size;
     if(thisUnits != Monitor) {
-        CompressAndkeepArray(vector, size);
+        CompressAndkeepArray(array, size);
     } else {
-        int actualColumns = m_data->setData(vector, countRows, NumberOfColumns, getRows());
+        int actualColumns = m_data->setData(array, countRows, NumberOfColumns, getRows());
         setCols(actualColumns);
     }
 }
 
-void caWaterfallPlot::setData(int32_t *vector, int size)
+void caWaterfallPlot::setData(int32_t *array, int size)
 {
     ActualNumberOfColumns = NumberOfColumns = size;
     if(thisUnits != Monitor) {
-        CompressAndkeepArray(vector, size);
+        CompressAndkeepArray(array, size);
     } else {
-        int actualColumns = m_data->setData(vector, countRows, NumberOfColumns, getRows());
+        int actualColumns = m_data->setData(array, countRows, NumberOfColumns, getRows());
         setCols(actualColumns);
     }
 }
@@ -361,16 +361,18 @@ void caWaterfallPlot::TimeOut()
     // demo curve
     if(thisUnits != Monitor) {
         if(!disableDemo) {
+            datamutex->lock();
             GausCurv(position);
-            m_data->setData(vectorD, countRows, ActualNumberOfColumns, getRows());
+            m_data->setData(reducedArray, countRows, ActualNumberOfColumns, getRows());
+            datamutex->unlock();
             if(drift > 0 && position >= NumberOfColumns) drift = -1;
             if(drift < 0 && position <= 0)  drift = 1;
             position += drift;
         } else {
-            if(vectorD != (double*) 0) {
+            if(reducedArray != (double*) 0) {
                 datamutex->lock();
                 //printf("actualnumberofcolumns=%d\n", ActualNumberOfColumns);
-                m_data->setData(vectorD, countRows, ActualNumberOfColumns, getRows() );
+                m_data->setData(reducedArray, countRows, ActualNumberOfColumns, getRows() );
                 datamutex->unlock();
             }
         }
@@ -386,7 +388,7 @@ void caWaterfallPlot::GausCurv(double middle) {
     double range = max - min;
     double sigma = 100.0;
     for (int i=0; i<nbCols; i++) {
-        vectorD[i] =  min + range * gauss((i-middle)/sigma);
+        reducedArray[i] =  min + range * gauss((i-middle)/sigma);
     }
 }
 

@@ -23,12 +23,10 @@
  *    anton.mezger@psi.ch
  */
 
-
 #if defined(_MSC_VER)
 #include <windows.h>
 #define QWT_DLL
 #endif
-
 
 #include "cacartesianplot.h"
 #include <QtCore>
@@ -48,6 +46,8 @@ public:
     virtual QwtText trackerTextF(const QPointF &pos) const
     {
         QColor bg(Qt::white);
+        bg.setAlpha(200);
+
         QwtText text("(" + QString::number(pos.x()) + "," + QString::number(pos.y()) + ") ");
         text.setBackgroundBrush( QBrush( bg ));
         return text;
@@ -227,51 +227,51 @@ void caCartesianPlot::erasePlots()
      replot();
 }
 
-void caCartesianPlot::AverageData(double *vec, double *avg, int size, int ratio)
+void caCartesianPlot::AverageData(double *array, double *avg, int size, int ratio)
 {
     int counter = 0;
     for (int i=0; i< size; i+=ratio) {
         double mean = 0;
         for(int j=0; j< ratio; j++) {
-           mean += vec[i+j];
+           mean += array[i+j];
         }
         avg[counter++] = mean / (double) ratio;
     }
 }
 
-void caCartesianPlot::setData(double *vector, int size, int curvIndex, int curvType, int curvXY)
+void caCartesianPlot::setData(double *array, int size, int curvIndex, int curvType, int curvXY)
 {
-     fillData(vector, size, curvIndex, curvType, curvXY);
+     fillData(array, size, curvIndex, curvType, curvXY);
 }
 
-void caCartesianPlot::setData(float *vector, int size, int curvIndex, int curvType, int curvXY)
+void caCartesianPlot::setData(float *array, int size, int curvIndex, int curvType, int curvXY)
 {
-    fillData(vector, size, curvIndex, curvType, curvXY);
+    fillData(array, size, curvIndex, curvType, curvXY);
 }
 
-void caCartesianPlot::setData(int16_t *vector, int size, int curvIndex, int curvType, int curvXY)
+void caCartesianPlot::setData(int16_t *array, int size, int curvIndex, int curvType, int curvXY)
 {
-    fillData(vector, size, curvIndex, curvType, curvXY);
+    fillData(array, size, curvIndex, curvType, curvXY);
 }
 
-void caCartesianPlot::setData(int32_t *vector, int size, int curvIndex, int curvType, int curvXY)
+void caCartesianPlot::setData(int32_t *array, int size, int curvIndex, int curvType, int curvXY)
 {
-    fillData(vector, size, curvIndex, curvType, curvXY);
+    fillData(array, size, curvIndex, curvType, curvXY);
 }
 
 template <typename pureData>
-void caCartesianPlot::fillData(pureData *vector, int size, int curvIndex, int curvType, int curvXY)
+void caCartesianPlot::fillData(pureData *array, int size, int curvIndex, int curvType, int curvXY)
 {
     if(curvXY == CH_X || curvXY == CH_Y) {         // x or y
         // keep data points
         if(curvXY == CH_X) {                       // X
             X[curvIndex].resize(size);
             X[curvIndex].clear();
-            for(int i=0; i< size; i++) X[curvIndex].append(vector[i]);
+            for(int i=0; i< size; i++) X[curvIndex].append(array[i]);
         } else {                                   // Y
             Y[curvIndex].resize(size);
             Y[curvIndex].clear();
-            for(int i=0; i< size; i++) Y[curvIndex].append(vector[i]);
+            for(int i=0; i< size; i++) Y[curvIndex].append(array[i]);
         }
 
         // only x channel was specified, use index as y
@@ -303,9 +303,6 @@ void caCartesianPlot::fillData(pureData *vector, int size, int curvIndex, int cu
 
 void caCartesianPlot::displayData(int curvIndex, int curvType)
 {
-    struct timeb now, last;
-    ftime(&last);
-
     // draw curve
     if(X[curvIndex].size() > 0 && Y[curvIndex].size() > 0) {
 
@@ -434,13 +431,6 @@ void caCartesianPlot::displayData(int curvIndex, int curvType)
         zoomer->setZoomBase();
 
         replot();
-
-        ftime(&now);
-        //double diff = ((double) now.time + (double) now.millitm / (double)1000) -
-        //        ((double) last.time + (double) last.millitm / (double)1000);
-        //printf("time: %f\n", diff);
-
-
     }
 }
 
