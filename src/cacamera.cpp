@@ -67,7 +67,7 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
 
     scaleFactor = 1.0;
 
-    UpdatesPerSecond = 0.0;
+    UpdatesPerSecond = 0;
     startTimer(1000);
 }
 
@@ -158,8 +158,8 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
             Xnew =(int)  (Xpos / Correction);
             Ynew =(int)  (Ypos / Correction);
         } else {
-            Xnew = (Xnew  + scrollArea->horizontalScrollBar()->value()) / Correction;
-            Ynew = (Ynew  + scrollArea->verticalScrollBar()->value()) / Correction;
+            Xnew =(int) ((Xnew  + scrollArea->horizontalScrollBar()->value()) / Correction);
+            Ynew =(int) ((Ynew  + scrollArea->verticalScrollBar()->value()) / Correction);
         }
 
         // find intensity
@@ -229,9 +229,9 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
                 int index = Ynew * savedWidth*3 + 3*Xnew;
                 if((Xnew >=0) && (Ynew >=0) &&  (Xnew < Xmax) && (Ynew < Ymax) && ((index+2) < savedSize)) {
                     if(thisColormap != grey)
-                        Zvalue = 2.2 * ( 0.2989 * ptr[index] +  0.5870 * ptr[index+1] + 0.1140 * ptr[index+2]);
+                        Zvalue =(int) (2.2 * ( 0.2989 * ptr[index] +  0.5870 * ptr[index+1] + 0.1140 * ptr[index+2]));
                     else
-                        Zvalue = ( 0.2989 * ptr[index] +  0.5870 * ptr[index+1] + 0.1140 * ptr[index+2]);
+                        Zvalue = (int) (0.2989 * ptr[index] +  0.5870 * ptr[index+1] + 0.1140 * ptr[index+2]);
                 } else {
                     validIntensity = false;
                 }
@@ -526,14 +526,14 @@ void caCamera::resizeEvent(QResizeEvent *e)
 
     if(m_widthDefined && m_heightDefined) {
         if(!thisFitToSize) {
-            imageW->setMinimumSize(m_width * scaleFactor, m_height * scaleFactor);
+            imageW->setMinimumSize((int) (m_width * scaleFactor), (int) (m_height * scaleFactor));
         } else {
             double Xcorr = (double) (e->size().width() - zoomWidget->width()-4) / (double) savedWidth;
             double Ycorr = (double) (e->size().height()- valuesWidget->height()-4) / (double) savedHeight;
             double scale = qMin(Xcorr, Ycorr); // aspect ratio
             // disconnect signal to prevent firing now
             disconnect(zoomSlider, SIGNAL(valueChanged (int)), 0, 0);
-            zoomSlider->setValue(13.0*log(scale)/log(2.0)+52.0);
+            zoomSlider->setValue((int)(13.0*log(scale)/log(2.0)+52.0));
             zoomValue->setText(QString::number(scale, 'f', 3));
             connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomNow()));
         }
@@ -785,7 +785,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
                 for (int y = 0; y < resultSize.height(); ++y) {
                     uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
                     for (int x = 0; x < resultSize.width(); ++x) {
-                        intensity =  2.2 * (0.2989 * ptr[i] +  0.5870 * ptr[i+1] + 0.1140 * ptr[i+2]);
+                        intensity = (int) (2.2 * (0.2989 * ptr[i] +  0.5870 * ptr[i+1] + 0.1140 * ptr[i+2]));
                         *scanLine = qRgb(ptr[i],ptr[i+1],ptr[i+2]);
                         i+=3;
 
@@ -804,7 +804,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
                 for (int y = 0; y < resultSize.height(); ++y) {
                     uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
                     for (int x = 0; x < resultSize.width(); ++x) {
-                        average = 0.2989 * ptr[i] + 0.5870 * ptr[i+1] +  + 0.1140 * ptr[i+2];
+                        average =(int) (0.2989 * ptr[i] + 0.5870 * ptr[i+1] +  + 0.1140 * ptr[i+2]);
                         *scanLine++ = qRgb(average, average, average);
                         i+=3;
 

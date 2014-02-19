@@ -84,7 +84,7 @@ public:
         double r,g,b;
         for (int i = 0; i < 255; ++i) {
             rgbFromWaveLength(380.0 + (i * 400.0 / 255), r, g, b);
-            addColorStop((double)(i)/255.0, QColor(r,g,b));
+            addColorStop((double)(i)/255.0, QColor((int) r, (int) g, (int) b));
         }
     }
 private:
@@ -191,7 +191,7 @@ caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent)
     thisPeriod = 100;
 
     Timer = new QTimer(this);
-    Timer->setInterval(thisPeriod);
+    Timer->setInterval((int) thisPeriod);
     Timer->start();
     position = 0.0;
     drift = 1.0;
