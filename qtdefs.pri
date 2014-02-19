@@ -11,7 +11,7 @@ unix {
 }
 
 # 3.7.1
-# improved performance for cartesian and waterfall plot; very long arrays can be displayed,
+# improved performance for cartesian and waterfall plot; very long arrays can be displayed
 # zoom in cartesian plot was not working well for small values and has been corrected
 # epics request for arrays (ca_add_array_event) changed to a request for 0 elements in order to get the arrays with their actual length
 # added properties to calineedit in order to be able to make a framed border
