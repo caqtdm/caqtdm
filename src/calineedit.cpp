@@ -50,8 +50,9 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
 
     oldStyle = "";
     thisStyle = "";
-    thisColorMode=Default;
-    oldColorMode =Static;
+
+    setColorMode(Default);
+    setAlarmHandling(onForeground);
 
     thisFormatC[0] = '\0';
 
@@ -71,8 +72,6 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
 
     thisFrameLineWidth = 0;
     oldFrameLineWidth = 0;
-
-    thisAlarmHandling = onForeground;
 
     // default colors will be defined in my event handler by taking them from the palette defined by stylesheet definitions
     //defBackColor = QColor(255, 248, 220, 255);
