@@ -3195,7 +3195,7 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
 #ifdef epics4
     delete Epics4;
 #endif
-    printf("closed\n");
+    //printf("closed\n");
 }
 
 /**
