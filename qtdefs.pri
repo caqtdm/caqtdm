@@ -1,9 +1,20 @@
-CAQTDM_VERSION = V3.7.0
+CAQTDM_VERSION = V3.7.1
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+
+unix {
+    QMAKE_CXXFLAGS += "-g"
+    QMAKE_CFLAGS_RELEASE += "-g"
+}
+
+# 3.7.1
+# improved performance for cartesian and waterfall plot; very long arrays can be displayed,
+# zoom in cartesian plot was not working well for small values and has been corrected
+# epics request for arrays (ca_add_array_event) changed to a request for 0 elements in order to get the arrays with their actual length
+# added properties to calineedit in order to be able to make a framed border
 
 # 3.7.0
 # a spinbox has been integrated in order to be smaller than the wheelswitch. for the spinbox the digit has to be activated by click
@@ -13,7 +24,7 @@ QT_VER_MIN = $$member(QT_VERSION, 1)
 # strings in calineedit were trimmed; took that out
 
 # 3.6.5
-# selection in catable can be rows or coluns now, catable can execute a specified script with the associated pv
+# selection in catable can be rows or coluns now, catable can execute a specified script with the associated pv when doubleclicking on the value
 # eliminated sending message in camessage with right button of mouse.
 
 # 3.6.4
