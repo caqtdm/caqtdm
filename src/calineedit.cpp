@@ -73,6 +73,8 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     thisFrameLineWidth = 0;
     oldFrameLineWidth = 0;
 
+    Alarm = 0;
+
     // default colors will be defined in my event handler by taking them from the palette defined by stylesheet definitions
     //defBackColor = QColor(255, 248, 220, 255);
     //defForeColor = Qt::black;
@@ -124,6 +126,7 @@ void caLineEdit::setColors(QColor bg, QColor fg, QColor frame, int lineWidth)
         QColor lc, dc;
         QColor blc = frame.lighter();
         QColor bdc = frame.darker();
+
         thisStyle = "caTextEntry,caLineEdit {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-radius: 1px;} ";
         thisStyle.append("caLineEdit {border: %9px; border-style:outset; padding: 0px 0px 0px 2px; border-color: rgba(%10, %11, %12, %13) rgba(%14, %15, %16, %17)  rgba(%18, %19, %20, %21) rgba(%22, %23, %24, %25);} caTextEntry { border: 2px; padding: 0px;}");
 
@@ -131,7 +134,8 @@ void caLineEdit::setColors(QColor bg, QColor fg, QColor frame, int lineWidth)
         setLateralBorderWidth((double) lineWidth+1);
 
         if(thisColorMode == Default || thisColorMode == Alarm_Default) {
-            thisStyle = thisStyle.arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
+            if(Alarm != 2) {
+              thisStyle = thisStyle.arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
                     arg(defForeColor.red()).arg(defForeColor.green()).arg(defForeColor.blue()).arg(defForeColor.alpha()).
                     arg(lineWidth).
                     arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha()).
@@ -139,8 +143,31 @@ void caLineEdit::setColors(QColor bg, QColor fg, QColor frame, int lineWidth)
                     arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
                     arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha());
 
-            lc = defBackColor.lighter();
-            dc = defBackColor.darker();
+              lc = defBackColor.lighter();
+              dc = defBackColor.darker();
+            } else {
+                if(thisAlarmHandling == onForeground) {
+                   thisStyle = thisStyle.
+                        arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
+                        arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha()).
+                        arg(lineWidth).
+                        arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha()).
+                        arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
+                        arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
+                        arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha());
+                } else {
+                    thisStyle = thisStyle.
+                         arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
+                         arg(defForeColor.red()).arg(defForeColor.green()).arg(defForeColor.blue()).arg(defForeColor.alpha()).
+                         arg(lineWidth).
+                         arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha()).
+                         arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
+                         arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
+                         arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha());
+                }
+                lc = defBackColor.lighter();
+                dc = defBackColor.darker();
+            }
         } else {
             thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
                     arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha()).
@@ -327,16 +354,16 @@ void caLineEdit::setValue(double value, const QString& units)
 void caLineEdit::setAlarmColors(short status, double value, QColor bgAtInit, QColor fgAtInit)
 {
     QColor c;
-    short Alarm = 0;
+    Alarm = 0;
 
     if(status != NOTCONNECTED) {
         if(thisLimitsMode == Channel) {
             Alarm = status;
         } else if(thisLimitsMode == User) {
             if(value > getMaxValue() || value < getMinValue()) {
-                Alarm = 2;
+                Alarm = MAJOR_ALARM;
             } else {
-                Alarm = 0;
+                Alarm = NO_ALARM;
             }
         } else {
              //return;

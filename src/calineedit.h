@@ -183,7 +183,7 @@ private:
     QColor thisFrameColor, oldFrameColor;
     int thisFrameLineWidth, oldFrameLineWidth;
     alertHandling thisAlarmHandling;
-
+    short Alarm;
 
 };
 

@@ -34,6 +34,7 @@
 #include <QtDesigner/QDesignerPropertySheetExtension>
 #include <iostream>
 */
+
 #include <math.h>
 #include "cagraphics.h"
 
