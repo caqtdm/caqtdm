@@ -2331,13 +2331,16 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
                 // trigger channel
             } else if(XorY == caCartesianPlot::CH_Trigger) {
-                QVector<double> y;
-                for(int i=0; i < caCartesianPlot::curveCount; i++) widget->displayData( curvNB, curvType); //widget->setData(y, i, curvType, XorY);
+                for(int i=0; i < caCartesianPlot::curveCount; i++) {
+                    double p;
+                    widget->setData(&p, 1, curvNB, curvType, XorY);
+                    widget->displayData(curvNB, curvType);
+                }
 
                 // count channel
             } else if(XorY == caCartesianPlot::CH_Count) {
                 //qDebug() << "count channel" << data.edata.rvalue << (int) (data.edata.rvalue + 0.5);
-                widget->setCountNumber((int) (data.edata.rvalue + 0.5));
+                if(data.edata.rvalue >= 0.5) widget->setCountNumber((int) (data.edata.rvalue + 0.5));
 
                 // erase channel
             } else if(XorY == caCartesianPlot::CH_Erase) {
