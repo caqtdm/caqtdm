@@ -305,7 +305,6 @@ void caCartesianPlot::fillData(pureData *array, int size, int curvIndex, int cur
 
 void caCartesianPlot::displayData(int curvIndex, int curvType)
 {
-    printf("display data\n");
     if(thisToBeTriggered) {
         if(!thisTriggerNow) {
             //printf("display data return\n");
