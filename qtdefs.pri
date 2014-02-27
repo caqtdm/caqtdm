@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.7.2
+CAQTDM_VERSION = V3.7.3
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -9,6 +9,8 @@ unix {
     QMAKE_CXXFLAGS += "-g"
     QMAKE_CFLAGS_RELEASE += "-g"
 }
+# 3.7.3
+# after the iimproved performance of the cartesian plot, the trigger mode disappeared, corrected
 
 # 3.7.2
 # cagraphic lost its linecolor after no connection
