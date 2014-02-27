@@ -63,6 +63,7 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
            "Choose reset zoom in the context menu for original scale.\n ";
 
     thisToBeTriggered = false;
+    thisTriggerNow = true;
     thisCountNumber = 0;
 
     plotGrid = new QwtPlotGrid();
@@ -286,23 +287,33 @@ void caCartesianPlot::fillData(pureData *array, int size, int curvIndex, int cur
 
         // when triggering is specified, we will return here
         if(thisToBeTriggered) {
+            thisTriggerNow = false;
             //printf("we will return and show plot when trigger comes\n");
-            return;
          }
     } else if(curvXY == CH_Trigger) {
 /*
         int i = X[curvIndex].size();
-        int j = Y[curvIndex].size();
+        int j = Y[curvIndex].size();    
         if(i != 0 && j != 0)
          printf("trigger came for curvIndex=%d %d %d %f %f\n", curvIndex,
                 X[curvIndex].size(), Y[curvIndex].size(),
                 X[curvIndex][i-1], Y[curvIndex][j-1]);
 */
+         thisTriggerNow = true;
     }
 }
 
 void caCartesianPlot::displayData(int curvIndex, int curvType)
 {
+    printf("display data\n");
+    if(thisToBeTriggered) {
+        if(!thisTriggerNow) {
+            //printf("display data return\n");
+            return;
+        } else {
+            thisTriggerNow = false;
+        }
+    }
     // draw curve
     if(X[curvIndex].size() > 0 && Y[curvIndex].size() > 0) {
 
@@ -341,7 +352,7 @@ void caCartesianPlot::displayData(int curvIndex, int curvType)
             //printf("x scalar, y scalar\n");
             // when no count is specified or count == 1 then yust plot the point
             if(thisCountNumber <= 1) {
-               //printf("yust plot the point\n");
+               printf("yust plot the point\n");
                setSamplesData(curvIndex, X[curvIndex].data(), Y[curvIndex].data(), qMin(X[curvIndex].size(), Y[curvIndex].size()), true);
 
             // scalar scalar more than one point specified

@@ -401,6 +401,8 @@ private:
 
     QwtPlotZoomer* zoomer;
 
+    bool thisTriggerNow;
+
 };
 
 #endif
