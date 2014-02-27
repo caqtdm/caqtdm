@@ -453,10 +453,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
     QColor bg = w1->property("background").value<QColor>();
     QColor fg = w1->property("foreground").value<QColor>();
+    QColor lg = w1->property("lineColor").value<QColor>();
 
     // keep original colors
     w1->setProperty("BColor", bg);
     w1->setProperty("FColor", fg);
+    w1->setProperty("LColor", lg);
 
     // when first pass specified, treat only caCalc
     //==================================================================================================================
@@ -2146,8 +2148,9 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 // done at initialisation, we have to set it back after no connect
                 if(!widget->property("Connect").value<bool>()) {
                     QColor fg = widget->property("FColor").value<QColor>();
+                    QColor lg = widget->property("LColor").value<QColor>();
                     widget->setForeground(fg);
-                    widget->setLineColor(fg);
+                    widget->setLineColor(lg);
                     widget->setProperty("Connect", true);
                 }
             } else if(colorMode == caGraphics::Alarm) {
@@ -2170,8 +2173,9 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 // done at initialisation, we have to set it back after no connect
                 if(!widget->property("Connect").value<bool>()) {
                     QColor fg = widget->property("FColor").value<QColor>();
+                    QColor lg = widget->property("LColor").value<QColor>();
                     widget->setForeground(fg);
-                    widget->setLineColor(fg);
+                    widget->setLineColor(lg);
                     widget->setProperty("Connect", true);
                 }
             } else if(colorMode == caPolyLine::Alarm) {
