@@ -656,4 +656,8 @@ record(mbbi,"LI:OP:demoMI") {
 	field(SIML,"0")
 	field(SIMS,"NO_ALARM")
 }
-
+record (bo, "QTDM:TEST:BO1")
+{
+field(ZNAM, "DONE")
+field(ONAM, "HOME")
+}

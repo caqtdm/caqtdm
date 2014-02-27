@@ -144,7 +144,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: cornsilk;}</string>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -1141,7 +1141,7 @@ p, li { white-space: pre-wrap; }
           <double>990.000000000000000</double>
          </property>
          <property name="minValue">
-          <double>1.e-9</double>
+          <double>0.000000001000000</double>
          </property>
         </widget>
         <widget class="caGraphics" name="cagraphics_11">
@@ -1345,7 +1345,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>8</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">
@@ -2402,7 +2402,7 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>345</x>
           <y>340</y>
-          <width>81</width>
+          <width>98</width>
           <height>36</height>
          </rect>
         </property>
@@ -2418,6 +2418,13 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="colorMode">
          <enum>caLineEdit::Static</enum>
+        </property>
+        <property name="frameColor">
+         <color>
+          <red>255</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
         </property>
         <property name="formatType">
          <enum>caLineEdit::hexadecimal</enum>
@@ -2470,6 +2477,27 @@ p, li { white-space: pre-wrap; }
           <height>20</height>
          </rect>
         </property>
+        <property name="channel" stdset="0">
+         <string notr="true">QTDM:COUNT:1</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLineEdit::Alarm_Default</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>1</number>
+        </property>
+        <property name="alarmHandling">
+         <enum>caLineEdit::onBackground</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caLineEdit::User</enum>
+        </property>
+        <property name="maxValue">
+         <double>2.000000000000000</double>
+        </property>
        </widget>
        <widget class="caLineEdit" name="calineedit_16">
         <property name="geometry">
@@ -2482,6 +2510,135 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="channel" stdset="0">
          <string notr="true">QTDM:TEST:MBBO</string>
+        </property>
+       </widget>
+       <widget class="caLineEdit" name="calineedit_17">
+        <property name="geometry">
+         <rect>
+          <x>629</x>
+          <y>377</y>
+          <width>56</width>
+          <height>26</height>
+         </rect>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">QTDM:COUNT:1</string>
+        </property>
+        <property name="background">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineEdit::Alarm_Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="alarmHandling">
+         <enum>caLineEdit::onBackground</enum>
+        </property>
+        <property name="precision">
+         <number>1</number>
+        </property>
+        <property name="precisionMode">
+         <enum>caLineEdit::User</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caLineEdit::User</enum>
+        </property>
+        <property name="maxValue">
+         <double>2.000000000000000</double>
+        </property>
+       </widget>
+       <widget class="caLineEdit" name="calineedit_18">
+        <property name="geometry">
+         <rect>
+          <x>700</x>
+          <y>304</y>
+          <width>56</width>
+          <height>26</height>
+         </rect>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">QTDM:COUNT:1</string>
+        </property>
+        <property name="background">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineEdit::Alarm_Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameColor">
+         <color>
+          <red>85</red>
+          <green>0</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+        <property name="alarmHandling">
+         <enum>caLineEdit::onBackground</enum>
+        </property>
+        <property name="precision">
+         <number>1</number>
+        </property>
+        <property name="precisionMode">
+         <enum>caLineEdit::User</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caLineEdit::User</enum>
+        </property>
+        <property name="maxValue">
+         <double>2.000000000000000</double>
+        </property>
+       </widget>
+       <widget class="caLineEdit" name="calineedit_19">
+        <property name="geometry">
+         <rect>
+          <x>537</x>
+          <y>492</y>
+          <width>100</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">QTDM:COUNT:1</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLineEdit::Alarm_Default</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>1</number>
+        </property>
+        <property name="alarmHandling">
+         <enum>caLineEdit::onForeground</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caLineEdit::User</enum>
+        </property>
+        <property name="maxValue">
+         <double>2.000000000000000</double>
         </property>
        </widget>
       </widget>
@@ -4155,7 +4312,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
@@ -5089,6 +5246,102 @@ p, li { white-space: pre-wrap; }
          <enum>caThermo::Channel</enum>
         </property>
        </widget>
+       <widget class="caMessageButton" name="camessagebutton_3">
+        <property name="geometry">
+         <rect>
+          <x>292</x>
+          <y>130</y>
+          <width>100</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>QTDM:TEST:BO</string>
+        </property>
+        <property name="fontScaleMode">
+         <enum>EPushButton::WidthAndHeight</enum>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">QTDM:TEST:BO</string>
+        </property>
+        <property name="label">
+         <string notr="true">QTDM:TEST:BO</string>
+        </property>
+        <property name="background">
+         <color>
+          <red>200</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="pressMessage">
+         <string notr="true">1</string>
+        </property>
+       </widget>
+       <widget class="caMessageButton" name="camessagebutton_5">
+        <property name="geometry">
+         <rect>
+          <x>293</x>
+          <y>155</y>
+          <width>100</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>QTDM:TEST:BO1</string>
+        </property>
+        <property name="fontScaleMode">
+         <enum>EPushButton::WidthAndHeight</enum>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">QTDM:TEST:BO1</string>
+        </property>
+        <property name="label">
+         <string notr="true">QTDM:TEST:BO1</string>
+        </property>
+        <property name="background">
+         <color>
+          <red>200</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="pressMessage">
+         <string notr="true">1</string>
+        </property>
+       </widget>
+       <widget class="caMessageButton" name="camessagebutton_6">
+        <property name="geometry">
+         <rect>
+          <x>295</x>
+          <y>182</y>
+          <width>100</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>QTDM:TEST:BO1</string>
+        </property>
+        <property name="fontScaleMode">
+         <enum>EPushButton::WidthAndHeight</enum>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">QTDM:TEST:BO1</string>
+        </property>
+        <property name="label">
+         <string notr="true">QTDM:TEST:BO1</string>
+        </property>
+        <property name="background">
+         <color>
+          <red>200</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="pressMessage">
+         <string notr="true">DONE</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_19">
        <attribute name="title">
@@ -5670,7 +5923,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1102</width>
-     <height>21</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>
@@ -5731,6 +5984,11 @@ p, li { white-space: pre-wrap; }
    <class>caScriptButton</class>
    <extends>QWidget</extends>
    <header>caScriptButton</header>
+  </customwidget>
+  <customwidget>
+   <class>caSpinbox</class>
+   <extends>QFrame</extends>
+   <header>caSpinbox</header>
   </customwidget>
   <customwidget>
    <class>caFrame</class>
@@ -5827,11 +6085,6 @@ p, li { white-space: pre-wrap; }
    <class>caWaterfallPlot</class>
    <extends>QWidget</extends>
    <header>caWaterfall</header>
-  </customwidget>
-  <customwidget>
-   <class>caSpinbox</class>
-   <extends>QFrame</extends>
-   <header>caSpinbox</header>
   </customwidget>
  </customwidgets>
  <resources/>
