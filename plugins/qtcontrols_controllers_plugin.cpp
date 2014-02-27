@@ -83,14 +83,16 @@ void CustomWidgetInterface::initialize(QDesignerFormEditorInterface *)
 
 caNumericInterface::caNumericInterface(QObject *parent): CustomWidgetInterface(parent)
 {
-        strng name[1], type[1];
+        strng name[2], type[2];
         strcpy(name[0], "channel");
         strcpy(type[0], "multiline");
+
         d_domXml = XmlFunc("caNumeric", "canumeric", 0, 0, 100, 50, name, type, 1);
     d_name = "caNumeric";
     d_include = "caNumeric";
     d_icon = QPixmap(":pixmaps/enumeric.png");
     d_toolTip = "[wheelswitch, immediate change]";
+    d_whatsThis = "hello, i am a whatsthis string";
 }
 
 QWidget *caNumericInterface::createWidget(QWidget *parent)
@@ -108,6 +110,7 @@ caApplyNumericInterface::caApplyNumericInterface(QObject *parent): CustomWidgetI
     d_include = "caApplyNumeric";
     d_icon = QPixmap(":pixmaps/enumeric.png");
     d_toolTip = "[wheelswitch with applybutton]";
+    d_whatsThis = "hello, i am a whatsthis string"; 
 }
 
 QWidget *caApplyNumericInterface::createWidget(QWidget *parent)
@@ -153,6 +156,7 @@ caSliderInterface::caSliderInterface(QObject* parent) : CustomWidgetInterface(pa
 	d_include = "caSlider";
 	d_icon = QPixmap(":pixmaps/slider.png");
         d_toolTip = "[slider]";
+	 d_whatsThis = "hello, i am a whatsthis string";
 }
 
 QWidget *caMenuInterface::createWidget(QWidget *parent)
@@ -170,6 +174,7 @@ caMenuInterface::caMenuInterface(QObject *parent): CustomWidgetInterface(parent)
     d_include = "caMenu";
     d_icon = QPixmap(":pixmaps/menu.png");
     d_toolTip = "[menu combobox for display & control of enums with/without pv-label]";
+     d_whatsThis = "hello, i am a whatsthis string";
 }
 
 QWidget *caChoiceInterface::createWidget(QWidget *parent)
@@ -187,6 +192,7 @@ caChoiceInterface::caChoiceInterface(QObject *parent): CustomWidgetInterface(par
     d_include = "caChoice";
     d_icon = QPixmap(":pixmaps/choice.png");
     d_toolTip = "[choice with different stacking modes for display & control of enums]";
+     d_whatsThis = "hello, i am a whatsthis string";
 }
 
 QWidget *caRelatedDisplayInterface::createWidget(QWidget *parent)
@@ -212,6 +218,7 @@ caRelatedDisplayInterface::caRelatedDisplayInterface(QObject *parent): CustomWid
     d_include = "caRelatedDisplay";
     d_icon = QPixmap(":pixmaps/fileopen.png");
     d_toolTip = "[displays a new or popups a synoptic view]";
+    d_whatsThis = "hello, i am a whatsthis string";
 }
 
 QWidget *caShellCommandInterface::createWidget(QWidget *parent)
@@ -235,6 +242,7 @@ caShellCommandInterface::caShellCommandInterface(QObject *parent): CustomWidgetI
     d_include = "caShellCommand";
     d_icon = QPixmap(":pixmaps/exclamation.png");
     d_toolTip = "[menu or button for detached processes]";
+    d_whatsThis = "hello, i am a whatsthis string";
 }
 
 QWidget *caTextEntryInterface::createWidget(QWidget* parent)
@@ -252,6 +260,7 @@ caTextEntryInterface::caTextEntryInterface(QObject* parent) : CustomWidgetInterf
 	d_include = "caTextEntry";
 	d_icon = QPixmap(":pixmaps/textentry.png");
         d_toolTip = "[enters a value/command to a pv]";
+        d_whatsThis = "hello, i am a whatsthis string";
 }
 
 QWidget *caMessageButtonInterface::createWidget(QWidget* parent)
@@ -275,6 +284,7 @@ caMessageButtonInterface::caMessageButtonInterface(QObject* parent) : CustomWidg
 	d_include = "caMessageButton";
 	d_icon = QPixmap(":pixmaps/message.png");
         d_toolTip = "[send a predefined value/command to a pv]";
+	d_whatsThis = "hello, i am a whatsthis string";
 }
 
 QWidget *caToggleButtonInterface::createWidget(QWidget* parent)
@@ -292,6 +302,7 @@ caToggleButtonInterface::caToggleButtonInterface(QObject* parent) : CustomWidget
 	d_include = "caToggleButton";
 	d_icon = QPixmap(":pixmaps/radiobutton.png");
         d_toolTip = "[toggle 0/1 to a pv]";
+        d_whatsThis = "hello, i am a whatsthis string";
 }
 
 QWidget *caScriptButtonInterface::createWidget(QWidget* parent)
@@ -314,6 +325,7 @@ caScriptButtonInterface::caScriptButtonInterface(QObject* parent) : CustomWidget
 	d_include = "caScriptButton";
 	d_icon = QPixmap(":pixmaps/process.png");
         d_toolTip = "[execute a script or image as detached process]";
+        d_whatsThis = "hello, i am a whatsthis string";
 }
 
 caSpinboxInterface::caSpinboxInterface(QObject *parent): CustomWidgetInterface(parent)
@@ -326,6 +338,7 @@ caSpinboxInterface::caSpinboxInterface(QObject *parent): CustomWidgetInterface(p
     d_include = "caSpinbox";
     d_icon = QPixmap(":pixmaps/spinbox.png");
     d_toolTip = "[spinbox]";
+    d_whatsThis = "hello, i am a whatsthis string"; 
 }
 
 QWidget *caSpinboxInterface::createWidget(QWidget *parent)
