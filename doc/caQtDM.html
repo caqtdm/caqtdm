@@ -1,0 +1,1892 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>caQtDM Custom Widgets Manual</title>
+<link href="classic.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div >
+  <h1 ><b>caQtDM Custom Widgets Manual</b></h1>
+</div>
+<br/>
+<br/>
+<b >Anton Mezger</b> <br/>
+<b>February 2014</b> <br/>
+<br/>
+Paul Scherrer Institute <br/>
+CH-5232 Villigen <br/>
+Switzerland
+<h2><b><a name="contents" id="contents" rel="Contents">Contents</a></b></h2>
+<br/>
+Copyright <br/>
+Introduction <br/>
+Designer: editor <br/>
+caQtDM: Command Line <br/>
+Custom widgets description <br/>
+CALC Expressions <br/>
+Grid <br/>
+Macro Substitution <br/>
+Display List <br/>
+Message Window <br/>
+Statistics
+Window <br/>
+Print Setup <br/>
+PV Info <br/>
+PV Limits and
+Precision <br/>
+Resizing Displays <br/>
+Editing <br/>
+Execute-Mode
+Popup
+Menu <br/>
+Printing <br/>
+Execute Menu <br/>
+Environment
+Variables <br/>
+<br/>
+Technical Support
+<h2></h2>
+<h2><b><a name="manual" id="manual" rel="Section">This manual</a></b></h2>
+     This manual has been written in html and after conversion introduced in the Qt assistant in order to get help for the caQtDM system. It has to be noted that caQtDM is though as a replacement of the very known EPICS Display Manager MEDM, therefore this manual is of course also inspired of the existing MEDM manual. 
+    <h2><b><a name="introduction" id="introduction" rel="Section">Introduction</a></b></h2>
+
+caQtDM is a package based on Qt developed at PSI as a successor of MEDM, a well known package used in the EPICS community for building synoptic displays. The caQtDM package uses the standard Qt GUI (Qt designer) for designing synoptic displays, containing all the controls graphical elements necessary to visualize and control a facility. Qt designer uses the custom widgets designed for this purpose and writes a description file (.ui file) that will be used by the synoptic viewer caQtDM. A reload function in caQtDM allows to rapidly see the changes made by the editor in order to accelerate the process of editing and viewing. <br/>
+<br/>
+The heart of the package are the graphical objects (Widgets) plugged into the Qt designer. These widgets will be described in detail with their properties below. Many objects have been built and more are introduced as soon as they are needed. The Qt system allows in a very easy way to add continously new objects or to modify these. <br/>
+<br/>
+Technically the package consists of 3 class libraries with the graphical objects, a class library used by the viewer or other applications and the viewer (caQTDM) itsself as well as 3 libraries with the plugin definitions for the Qt designer. The editor (Qt designer) is part of Qt. It has to be noted that the graphical objects are not control system aware. The graphical objects have properties and methods used by the editor. The control system knowledge is then integrated and handled by the viewer. This architecture allowed us to handle easily three control systems: epics, epics4 and an older in house control system. These are all handled by the viewer. This distribution supports per default epics 3. Epics4 can be integrated when building it, but only a few tests could be done while not many process variables could be tested so far. <br/>
+<br/>
+Part of the package is also a converter (adl2ui) that can convert MEDM .adl files into .ui files used by the caQtDM package. In most cases this converter gives good results. Besides the already mentioned .ui files the viewer can also uses in house developed .prc files. These last files represent asci files to be editd with any text editor using are in house syntax. <br/>
+<br/>
+The Qt system is widely used today on many platforms and is therefore an ideal system to develop new applications. The advantage of Qt is therefore that an application using this architecture will run on many platforms, so that caQtDM will run on linux as well as on windows systems. <br/>
+
+<h2><b><a name="designer" id="designer" rel="Section">Designer: editor</a></b></h2>
+The designer coming with Qt is the editor used for developing the synoptic screens. In this manual we will not describe this editor exhaustively, while the editor has it own manual that can be called by pressing the F1 key. The editor allows by dragging and dropping the graphical objects to be used into the synoptic display. The properties of the graphical objects can then be customized in the property editor. The most important property is normally the device that is monitored or controlled and is represented by the property channel. An exhaustive description of the graphical objects and their properties will be given below.
+
+<h2><b><a name="installation" id="installation" rel="Section">Install</a></b></h2>
+Since version 3.1.4 of caQtDM a new build and installation procedure working for several linux platforms are available. <br/><br/>First you will have to unpack the tar archive, which will create the nessary directories and files. In the upper directory you will find the necessary procedures to build the package, run it locally without installing and also an installtion procedure.
+
+<ol>
+<li>
+you will have to install Qt-4.8 and qwt-6 when they are not already installed. On modern systems Qt4 should already be installed, but the qt4-designer not necessarily and you should install it (eventually with sudo apt-get install qt4-designer). qwt is normally not installed and you should install this too.
+</li>
+<li>
+you will have to install EPICS
+</li>
+<li>
+all the environment variables used for the installation will be defined in the script caQtDM_Env. When some of the variables are already defined in your environment, the script will use them, otherwise they will be defined. It is up to you to edit this file and adapt the variables to your environment.
+</li>
+<li>
+the script caQtDM_BuildAll will build you the package now into the directory ./caQtDM_Binaries. You should obtain there adl2ui, caQtDM, libqtcontrols.so and libcaQtDM_Lib.so as well as a designer directory containing 3 files libqtcontrols*_plugin.so. if you encounter a problem when building due to some environment variable problem or while not everything was installed before, you may correct your problem and run the script again. In case you want to cleanup you use the script caQtDM_CleanAll, which will also delete the resulting binaries.
+</li>
+<li>
+you may try to install the package: the package should normally be installed in the EPICS extensions and the environment variables are pointing to them.
+</li>
+<li>
+running caQtDM: when the package has been successfully build into the directory ./caQtDM_Binaries, you can start caQtDM by using the script startDM_Local and the qt4-designer by the script qtdesigner (all located in the main directory where you expanded the tar file). These scripts will set some important environment variables in order to set the path, the plugin_path and to point to the test directory provided with the package (./caQtDM_Tests). In this directory also the stylesheets are located to be used for a nice rendering. You may call the test.ui file with the above mentioned scripts. In order to test the display some EPICS channels have to be defined. This can be done by running a soft-ioc shell called with run-epics also provided in the test directory.
+</li>
+<li>
+in case you have qwt 6.1 you will have to use in caQtDM_QtControls/src the files qwt_thermo_marker_61.* instead of qwt_thermo_marker.*
+</li>
+<li>
+in case you already use Qt5.1 with qwt6.1 the building should also be straight forward.
+</li>
+<li>
+Instructions for compiling caQtDM on Windows
+
+Requirements:
+<ul>
+<li>Qt 4.8.2</li>
+<li>Qwt 6.0.1</li>
+<li>EPICS 3.12.2</li>
+<li>MS Visual Studio 2010</li>
+<li>Wix 3.0.5419.0</li>
+</ul>
+
+ With caQtDM_Env.bat you can configure your system. All settings which are needed will be taken from here.<br/>
+ The building can be started with the batchfile : caQtDM_BuildAll.bat<br/>
+ The packaging is made with the batch file : caQtDM_Build_Package.bat<br/>
+ This will generate a MSI installation file in the folder of caQtDM_Binaries.<br/>
+ To clean the Folder you should use caQtDM_CleanAll.bat.<br/>
+ </li>
+</ol>
+
+<h2><b><a name="development" id="development" rel="Section">Development history</a></b></h2>
+
+The following list describe the new features and bug fixes for every release. You can follow the development history and detect if a bug in the used version has been solved. <br/><br/>
+<font color="#0000ff">3.7.2</font>
+<ul>
+  <li> cagraphic lost its linecolor after no connection, corrected </li>
+  <li> calineedit was not showing alarm colors in alarm_default mode, corrected </li>
+</ul>
+<div>
+<font color="#0000ff">3.7.1</font>
+</div>
+<ul>
+  <li> improved performance for cartesian and waterfall plot; very long arrays can be displayed </li>
+  <li> zoom in cartesian plot was not working well for small values and has been corrected </li>
+  <li> epics request for arrays (ca_add_array_event) changed to a request for 0 elements in order to get the arrays with their actual length </li>
+  <li> added properties to caLineEdit in order to be able to make a framed border </li>
+</ul>
+<div>
+<font color="#0000ff"> 3.7.0</font>
+</div>
+<ul>
+  <li> a spinbox has been integrated in order to be smaller than the wheelswitch. for the spinbox the digit has to be activated by clicking in order to change it.</li>
+  <li> strings in caLineEdit were trimmed; took that out</li>
+  <li> selection in caTable can be rows or coluns now, caTable can execute a specified script with the associated pv</li>
+  <li> eliminated sending message in caMessage with right button of mouse.</li>
+</ul>
+<div>
+<font color="#0000ff">3.6.4</font>
+</div>
+<ul>
+  <li>an empty char waveform was not clearing the caLineEdit: corrected</li>
+  <li>enums with empty strings were not displaying correctly in caLineEdit</li>
+  <li>when reloading a .prc file, size of display was not minimized</li>
+  <li>default back and foreground colors can be set now for caLineEdit/caTextEntry in ui-file stylesheet of mainwindow or in stylesheet.qss</li>
+  <li>negative precision was leading to an unexpected behaviour, caLineEdit will use the precision and switch to exponential display</li>
+  <li>spacebar press has been suppressed for caMessageButton, caShellCommand, caRelatedDisplay, caRowcolMenu, caChoice</li>
+  <li>changed for caSlider and caNumeric the limits for channel to DRVL and DRVH</li>
+  <li>added to formread in prc file command and comlab modifiers</li>
+</ul>
+<div>
+<font color="#0000ff"> 3.6.2</font>
+</div>
+<ul>
+  <li> caCcartesian plot and caStripPlot can have a logarithmic scale now </li>
+</ul>
+<div>
+<font color="#0000ff"> 3.6.1</font>
+</div>
+<ul>
+  <li> suppressed slidervaluecallback when setting limits from hopr, lopr</li>
+  <li> added a first attempt of a caWaterfall plot for waveforms</li>
+  <li> corrected for caCamera, position calculated when zooming to small images</li>
+  <li> in case of reload, data display is now stopped until all displays are loaded again</li>
+  <li> camera images can now be zoomed and scrolled</li>
+  <li> reset zoom for caCartesianPlot did not reset correctly in case of channel limits</li>
+  <li> added zoom mechanism for caCartesianPlot</li>
+  <li> added update mechanism choice in main menu in order to switch to direct monitoring or timed monitoring</li>
+  <li> starting performance optimized for caRelatedDisplay, caChoice, caMenu</li>
+  <li> splashscreen added for loading includes (in some cases loading time can be significant)</li>
+</ul>
+<div>
+<font color="#0000ff">3.5.2</font>
+</div>
+<ul>
+  <li> by using CAQTDM_EXEC_LIST as environment variable (as in MEDM with the same syntax), menu items can be added to the context menus </li>
+  <li> for caThermo in parser the look was not see as property and caThermo itsself was initializing itsself per default wrong </li>
+</ul>
+<div>
+<font color="#0000ff">3.5.1</font>
+</div>
+<ul>
+  <li> bug corrected when unfinished enum definition </li>
+  <li> slider was writing to epics on first call, now it does not </li>
+  <li> caPolyLine now does not extend its lines when linesize &gt; 1 is used, reproducing the behaviour of MEDM </li>
+  <li> caThermo and caSlider resize handle and labels according to the size, foreground and background are working correctly now </li>
+  <li> however with qwt6.1.0 in qwt_slider the routine scaleDraw(); must be set protected instead of private as was in qwt6.0 </li>
+</ul>
+<div>
+<font color="#0000ff">3.5.0</font>
+</div>
+<ul>
+  <li> caQtDM gives information now about number of monitors/s, number of displays/s and highest monitor</li>
+</ul>
+<div>
+<font color="#0000ff">3.4.7</font>
+</div>
+<ul>
+  <li> adapted caSlider for qwt6.1</li>
+</ul>
+<div>
+<font color="#0000ff">3.4.6</font>
+</div>
+<ul>
+  <li> corrected a bug for caGauge with alarms no</li>
+  <li> use control key for amplifying 10x the increment</li>
+</ul>
+<div>
+<font color="#0000ff"> 3.4.5</font>
+</div>
+<ul>
+  <li> caSlider has now a menu to change its increment, in designer increment can be specified to</li>
+  <li> caSlider moves also on left mouse click and an wheel scroll; when it has the focus, up and down keys can be used (when focus outline red gets drawn)</li>
+  <li> gauges have now following properties: alarmLimits : Channel_Alarms, User_Alarms, None</li>
+  <li> displayLimits :  Channel_Limits, User_Limits</li>
+  <li> adl2ui has been corrected for these properties</li>
+</ul>
+<div>
+<font color="#0000ff">3.4.4</font>
+</div>
+<ul>
+  <li> enhanced performance for caCamera widget</li>
+</ul>
+<div>
+<font color="#0000ff">3.4.3</font>
+</div>
+<ul>
+  <li> package can also be build with Qt4.6 and qwt6.0, necessary for SL6 (caCartesianplot, caDoubletabWidget and plugins slightly modified)</li>
+  <li> epics enums and strings modified for count &gt; 1</li>
+</ul>
+<div>
+<font color="#0000ff">3.4.2</font>
+</div>
+<ul>
+  <li> caCamera stuff modified</li>
+  <li> added mutex to synchronize data and display</li>
+  <li> font bug in caTable solved</li>
+  <li> found a datarace in caStripplot, corrected</li>
+</ul>
+<div>
+<font color="#0000ff">3.4.1</font>
+</div>
+<ul>
+  <li> caCamera displays intensity at x, y</li>
+  <li> caCamera context menu for grey / spectrum and zoom</li>
+</ul>
+<div>
+<font color="#0000ff">3.4.0</font>
+</div>
+<ul>
+  <li> caStripplot has been revisited</li>
+  <li> caCamera uses now concurrent mode for calculations</li>
+</ul>
+<div>
+<font color="#0000ff">3.3.1</font>
+</div>
+<ul>
+  <li> mainwindow and messagewindow have been merged</li>
+</ul>
+<div>
+<font color="#0000ff">3.3.0</font>
+</div>
+<ul>
+  <li> caTable gets now the correct font after resizing when values update</li>
+  <li> caStripPlot has been corrected for incorrect time behaviour.</li>
+</ul>
+<div>
+<font color="#0000ff">3.2.2</font>
+</div>
+<ul>
+  <li> in menu you have the possibility to raise the main and message windows</li>
+</ul>
+<div>
+<font color="#0000ff">3.2.1</font>
+</div>
+<ul>
+  <li> when requesting a display that was already started, it did not popup but made a new instance. this has been corrected</li>
+  <li> this was working before, but by some modifications was not correct any more</li>
+</ul>
+<div>
+<font color="#0000ff">3.2.0</font>
+</div>
+<ul>
+  <li>The build mechanism for linux and windows should do on most platforms, see caQtDM_README</li>
+  <li>caQtDM build for qt4.8 with qwt6.0 and for qt5.1 with qwt6.1</li>
+  <li>caLed can use now the severity to colorize</li>
+  <li>caThermo was inadvertently using nodeco mode when mode was used</li>
+  <li>caCircularGauge will draw a white scale when not connected and bug corrected</li>
+  <li>for enums without enum string write just the value in caLineEdit</li>
+</ul>
+<div>
+<font color="#0000ff">3.1.1</font>
+</div>
+<ul>
+  <li>The main characteristic of this version is that you can resize the caQtDM synoptic display  windows without using Qt layouts. You can build a display normally and everything will be resized when you resize the window. </li>
+  <li>In order to make the resizing correctly, you should specify for the fontscalemode of caLabel and caLineEdit the parameter &quot;WidthAndHeight&quot;. </li>
+  <li>When you convert MEDM displays with the utility adl2ui, this is done automatically.</li>
+  <li>When you do not want a window to be resized, you can specify -noResize on the command line.</li>
+  <li>Another enhancement existing since version 2.8 is the fact that you can hook a digit of the wheelswitch to the keyboard in order to modify it with the up and down keys.</li>
+</ul>
+<div>
+<font color="#0000ff">2.8 </font>
+</div>
+<ul>
+  <li>All the changes have been documented in qtdefs.pri</li>
+</ul>
+<div>
+<font color="#0000ff">2.5</font>
+</div>
+<ul>
+  <li>Scales of Stripplot can now be changed during runtime. The caQtDM application normally limits the update rate of monitors to 5 Hz,</li>
+  <li>however now a JSON string can be written behind the channel name.</li>
+  <li>An example is given in the presentation <a href="caQtDM_introduction.ppt">&quot;introduction to caQtDM&quot;</a>.</li>
+  <li>Color mode for calabel is now working (was forgotten). Also an icon is presented on the window bars.</li>
+  <li>A Windows distribution package allowing to work immediately with the designer and caQtDM has been build and can be downloaded here</li>
+  <li>(this package does not contain any sources, merely executables, work done by H.Brands at PSI). </li>
+</ul>
+<div>
+<font color="#0000ff">2.3</font>
+</div>
+<ul>
+  <li>Timebase of Stripplot was wrong and has been corrected. Some other compiler warnings have been eliminated and the building process was slightly modified.</li>
+</ul>
+<div>
+<font color="#0000ff">2.1</font>
+</div>
+<ul>
+  <li>When using correctly the layout possibilities offered by Qt, one can resize a window (you will find an example in work/caQtDM/parser/proscanFiles/phaseslitsnew.ui).</li>
+  <li>Up to now when using &quot;includes&quot; only a placeholder could be seen in the designer. Now the included ui file is displayed inside the designer.</li>
+  <li>For polylines and polygones, a graphical editor is integrated into the designer. One can create segments by pressing the left mouse button when moving the</li>
+  <li> mouse and one can delete the last created segment by pressing the right mouse button.</li>
+  <li>The graphical entities (rectangles, circles, ellipses, lines, arrows, triangles) can be  rotated by specifying a tilt angle.</li>
+</ul>
+<div>
+<font color="#0000ff">2.0</font>
+</div>
+<ul>
+  <li>The major changes in this version are changes for stability (in the previous version sometimes crashes occurred) and the introduction</li>
+  <li>of soft pv's. A variable can be defined, calculated and used as a normal pv.</li>
+  <li>All the features of medm used for the cartesian plots are implemented now. The caCartesian plot background can be transparent so that a camera image can be</li>
+  <li>underlaid. The limits of the x and y axes can be changed by specifiying pv's instead of values when using channel limits. The stripplot widget has been</li>
+  <li>modified while the behaviour was not quite correct. The message button and textentry were not working well and have been corrected. Labels can be transparent too.</li>
+  <li>A camera widget has been introduced. At PSI we can now display are usual cameras bw and color. You can easily modify the code to treat other formats</li>
+  <li>of camera waveforms.</li>
+  <li>caQtDM gives the number of connected and unconnected channels, furthermore a list of unconnected channels with their file location can be shown.</li>
+  <li>caQtDM is now protected against ui description file syntax errors;</li>
+  <li>caQtDM supports the command line parameters -attach -noMsg -display -macro -x -noStyles -dg. -x has no effect but suppresses the error message when</li>
+  <li>keeping the medm command line parameters.</li>
+  <li>caQtDM runs in native mode on linux as well as on microsoft windows.</li>
+</ul>
+
+<h2><b><a name="widgets" id="widgets" rel="Section">caQtDM Custom Widgets</a></b></h2>
+The custom widgets used in caQtDM have been divide in three categories as was done in MEDM. MEDM users are used to these cartegories and we have therefore kept the categorisation in Graphics, Controller and Monitors. As in MEDM, Graphics are items such as frames, labels, graphical entities like rectangles, triangles, lines, ..., images and composite objects (called here includes, while included from other ui files. Monitors are objects that monitor the state or values of process variables through display of values, plots, tables, thermometers, dials, ... Controllers are objects that change the values of process variables through many different objects. you will find here an exact description of them with their properties: For all objects, you have normally their geometry (position and size),, sizepolicy and some other properties like tooltips. It has to be noted that for many widgets their stylesheet will be overwritten in order to get the representation that is requested when specifying for example background, foreground, border colors or other properties. The stylesheet can be influenced in some cases by specifying a stylesheet for the mainwindow or in stylesheet.qss, a stylesheet found in the caQtDM path. The adl2ui converter uses normally this stylesheet to integrate these defaults into the generated ui file. You may delete this stylesheet or change it to your convenience. However as mentioned before, many styles will be overwritten. <br/>
+<br/>
+The following table gives you an overview of all objects that are actually available: <br/>
+<table border="1" cellspacing="0" cellpadding="2" width="70%">
+  <tr>
+    <td valign="top" width="25%"><br/>
+      <b >Graphics</b></td>
+    <td valign="top" width="25%"><br/>
+      <b >Monitors</b></td>
+    <td  valign="top"  width="25%"><br/>
+      <b >Controllers</b></td>
+  </tr>
+  <tr >
+    <td valign="top"><br/>
+      <a href="caQtDM.html#caGraphics">caGraphics: </a> Rectangle, Circle, Arc, Triangle, Line, Arrow </td>
+    <td  valign="top" ><br/>
+      <a href="caQtDM.html#caLineEdit">caLineEdit</a></td>
+    <td valign="top" ><br/>
+      <a href="caQtDM.html#caChoice">caChoice</a></td>
+  </tr>
+  <tr >
+    <td  valign="top" ><br/>
+      <a href="caQtDM.html#caPolyLine">caPolyline: </a>polyline and polygon</td>
+    <td  valign="top" ><br/>
+      <a href="caQtDM.html#caLed">caLed</a></td>
+    <td valign="top" ><br/>
+      <a href="caQtDM.html#caMenu">caMenu</a></td>
+  </tr>
+  <tr >
+    <td  valign="top" ><br/>
+      <a href="caQtDM.html#caLabel">caLabel: </a>text</td>
+    <td valign="top" ><br/>
+      <a href="caQtDM.html#caCartesianPlot"> caCartesianPlot</a></td>
+    <td  valign="top" ><br/>
+      <a href="caQtDM.html#caMessageButton">caMessageButton</a></td>
+  </tr>
+  <tr >
+    <td  valign="top" ><br/>
+      <a href="caQtDM.html#caFrame">caFrame</a></td>
+    <td  valign="top" ><br/>
+      <a href="caQtDM.html#caLinearGauge">caLinearGauge, caCircularGauge</a></td>
+    <td  valign="top" ><br/>
+      <a href="caQtDM.html#caRelatedDisplay">caRelatedDisplay</a></td>
+  </tr>
+  <tr >
+    <td  valign="top" ><br/>
+      <a href="caQtDM.html#caImage">caImage: </a>any image format, mostly used for animated gif </td>
+    <td  valign="top" ><br/>
+      <a href="caQtDM.html#caThermo">caThermo</a></td>
+    <td  valign="top" ><br/>
+      <a href="caQtDM.html#caShellCommand">caShellCommand</a></td>
+  </tr>
+  <tr >
+    <td  valign="top" ><br/>
+      <a href="caQtDM.html#caInclude">caInclude: </a>the equivalent to composite of MEDM</td>
+    <td valign="top" ><br/>
+      <a href="caQtDM.html#caStripPlot">caStripPlot</a></td>
+    <td  valign="top" ><br/>
+      <a href="caQtDM.html#caSlider">caSlider</a></td>
+  </tr>
+  <tr >
+    <td  valign="top" ><br/>
+      <a href="caQtDM.html#caDoubleTabWidget">caDoubleTabWidget: </a>a general purpose widget</td>
+    <td  valign="top" ><br/>
+      <a href="caQtDM.html#caByte">caByte</a></td>
+    <td valign="top" ><br/>
+      <a href="caQtDM.html#caTextEntry">caTextEntry</a></td>
+  </tr>
+  <tr >
+    <td valign="top" ><br/></td>
+    <td valign="top" ><br/>
+      <a href="caQtDM.html#caCamera">caCamera</a></td>
+    <td valign="top" ><br/>
+      <a href="caQtDM.html#caNumeric">caNumeric, caApplyNumeric</a></td>
+  </tr>
+  <tr >
+    <td valign="top" ><br/></td>
+    <td valign="top" ><br/>
+      <a href="caQtDM.html#caWaterfallPlot">caWaterfallPlot</a></td>
+    <td valign="top" ><br/>
+      <a href="caQtDM.html#caToggleButton">caToggleButton</a></td>
+  </tr>
+  <tr >
+    <td valign="top" ><br/></td>
+    <td valign="top" ><br/>
+      <a href="caQtDM.html#caBitNames">caBitNames</a></td>
+    <td valign="top" ><br/>
+      <a href="caQtDM.html#caScriptButton">caScriptButton</a></td>
+  </tr>
+  <tr >
+    <td valign="top" ><br/></td>
+    <td valign="top" ><br/>
+      <a href="caQtDM.html#caCalc">caCalc</a></td>
+    <td  valign="top" ><br/> 
+      <a href="caQtDM.html#caSpinBox">caSpinBox</a></td>
+  </tr>
+  <tr >
+    <td valign="top" ><br/></td>
+    <td valign="top" ><br/>
+      <a href="caQtDM.html#caTable">caTable</a></td>
+    <td  valign="top" ><br/></td>
+  </tr>
+</table>
+
+<br/>
+Their main properties are described below. It has to be noted that through inheritance of Objects, other properties exist, that are not necessary relevant here.
+
+  <h2><b> <a name="monitors" id="monitors" rel="Subsection">all monitor objects</a></b></h2>
+
+<hr />
+  <h3><a name="caLineEdit" rel="help" id="caLineEdit"><font color="#ff00ff">caLineEdit</font>, the most used graphical object for data monitoring</a></h3>
+
+is the equivalent of the Text Update in MEDM.
+
+<blockquote>
+
+     <a href="#geometry">Geometry</a> is used for any object
+
+    <dl>
+      <dt><strong>channel:</strong></dt>
+      <dd>
+          QString: this string represents the control system process variable
+          <br/></dd>
+      
+      <dt><strong>foreground:</strong></dt>
+      <dd>
+          QColor: color used for the foreground
+          <br/></dd>
+      
+      <dt><strong>background:</strong></dt>
+      <dd>
+          QColor: color used for the background
+          <br/></dd>
+      
+      <dt><strong>colorMode:</strong></dt>
+      <dd>
+      <table border="1" cellspacing="0" cellpadding="2">
+      <tr>
+        <td  valign="top">Default</td>
+        <td  valign="top" >Show the object in colors given by stylesheets.</td>
+      </tr>    
+      <tr>
+        <td  valign="top">Static</td>
+        <td  valign="top" >Show the object in colors given by the properties background and foreground.</td>
+      </tr>
+      <tr>
+        <td  valign="top" >Alarm_Default</td>
+        <td  valign="top" >Show the object in alarm colors based on the severity of the associated process variable. (green, yellow, red, white or gray). The foregound or the background are given by the stylesheets depending on the alarmHandling specifying if alarm handling is done on the foreground or on the background.</td>
+       </tr>
+       <tr>
+         <td valign="top">Alarm</td>
+         <td valign="top">as Alarm_Default, but the foreground or background color is taken from the properties background or foreground</td>
+    </tr>
+</table>
+      <br/>
+      </dd>
+      <dt><strong>framePresent:</strong></dt>
+      <dd>
+          boolean: specifies if a border will be drawn around the object, frameLineWidth must be different from zero in order to see the border
+          <br/></dd>
+      
+      <dt><strong>frameColor:</strong></dt>
+      <dd>
+          QColor: color used for the border
+          <br/></dd>
+      
+      <dt><strong>frameLineWidth:</strong></dt>
+      <dd>
+          Integer: linewidth of the border
+          <br/></dd>
+
+      <dt><strong>alarmHandling:</strong> </dt>
+      <dd>
+          when colormode is set to alarm, it can be specified here if the foreground or the background will show alarm colors.
+          <br/></dd>
+
+      <dt><strong>precision:</strong></dt>
+      <dd>
+          Integer: precision in case of precisionMode=User
+          <br/></dd>
+
+      <dt><strong>precisionMode:</strong></dt>
+      <dd>
+        <table border="1" cellspacing="0" cellpadding="2">
+       <tr>
+        <td  valign="top">Channel</td>
+        <td  valign="top">Precision specified by the control system will be used </td>
+       </tr>
+        <tr>
+        <td  valign="top">User</td>
+        <td  valign="top">Precision specified by the user will be used</td>
+      </tr> 
+      </table>
+      <br/>
+      </dd>
+
+      <dt><strong>limitsMode:</strong></dt>
+      <dd>
+        <table border="1" cellspacing="0" cellpadding="2">
+       <tr>
+        <td  valign="top">Channel</td>
+        <td  valign="top">Limits specified by the control system will be usd (HOPR, LOPR for EPICS)</td>
+       </tr>
+        <tr>
+        <td  valign="top">User</td>
+        <td  valign="top">Limits specified by the user will be used.</td>
+      </tr> 
+      </table>
+<br/>
+      </dd>
+
+      <dt><strong>maxValue:</strong></dt>
+      <dd>
+          float: maximum value used in case of limitsMode=User
+          <br/></dd>
+
+      <dt><strong>minValue:</strong></dt>
+      <dd>
+          float: minimum value used in case of limitsMode=User
+          <br/></dd>
+
+      <dt><strong>fontScaleMode:</strong></dt>
+    <dd>
+        <table border="1" cellspacing="0" cellpadding="2">
+       <tr>
+        <td  valign="top">None</td>
+        <td  valign="top">No scaling will be done</td>
+       </tr>
+        <tr>
+        <td  valign="top">Height</td>
+        <td  valign="top">Text will be scaled to the height of its containing box</td>
+      </tr> 
+        <tr>
+        <td  valign="top">WidthAndHeight</td>
+        <td  valign="top">Text will be scaled to the height and width of its scaling box; this should be used for a correct resizing of the display </td>
+      </tr> 
+      </table>
+      <br/>
+      </dd>
+
+      <dt><strong>unitsEnabled:</strong></dt>
+      <dd>
+          boolean: when checked will append the unit to the value
+          <br/></dd>
+
+      <dt><strong>formatType:</strong></dt>
+      <dd>
+        <table border="1" cellspacing="0" cellpadding="2">
+       <tr>
+        <td  valign="top">decimal</td>
+        <td  valign="top">value encoded in f format using precision from user or channel, in case of negative precision will switch to e format</td>
+       </tr>
+        <tr>
+        <td  valign="top">exponential, engr_notation</td>
+        <td  valign="top">value encoded in e format using absolaute precision from user or channel</td>
+      </tr> 
+        <tr>
+        <td  valign="top">compact</td>
+        <td  valign="top">value encode in e or f format using absolaute precision from user or channel, format will switch to e format for values &lt; 1.0e-4
+         </td>
+      </tr> 
+        <tr>
+        <td  valign="top">truncated, sexagesimal, sexagesimal_hms, sexagesimal_dms</td>
+        <td  valign="top">not supported yet</td>
+      </tr> 
+        <tr>
+        <td  valign="top">hexadecimal</td>
+        <td  valign="top">value will be encoded in hexadecimal format</td>
+      </tr> 
+        <tr>
+        <td  valign="top">octal</td>
+        <td  valign="top">value will be encoded in octal formatoct</td>
+      </tr> 
+        <tr>
+        <td  valign="top">string</td>
+        <td  valign="top">will be treated as decimal formal</td>
+      </tr> 
+
+      </table>
+<br/>
+</dd>
+    </dl>
+</blockquote>
+<hr />
+  <h3><a name="caThermo" rel="help" id="caThermo"><font color="#ff00ff">caThermo</font></a></h3>
+
+     is the equivalent of the Bar Monitor in MEDM.
+<blockquote>
+
+    <a href="#geometry">Geometry</a> is used for any object
+    <dl>
+      <dt><strong>channel:</strong></dt>
+      <dd>
+          QString: this string represents the control system process variable
+          <br/></dd>
+      
+      <dt><strong>foreground:</strong></dt>
+      <dd>
+          QColor: color used for the foreground
+          <br/></dd>
+      
+      <dt><strong>background:</strong></dt>
+      <dd>
+          QColor: color used for the background
+          <br/></dd>
+      
+      <dt><strong>colorMode:</strong></dt>
+      <dd>
+         <table border="1" cellspacing="0" cellpadding="2">
+         <tr>
+            <td  valign="top">Default</td>
+            <td  valign="top" >Show the object in colors given by stylesheets.</td>
+         </tr>    
+         <tr>
+            <td  valign="top">Static</td>
+            <td  valign="top" >Show the object in colors given by the properties background and foreground.</td>
+         </tr>
+         <tr>
+            <td valign="top">Alarm</td>
+            <td valign="top">Show the object in colors given by the properties background and foreground, but change the color of the pipe in case of alarm</td>
+         </tr>
+       </table>
+     <br/>
+     </dd>
+
+     <dt><strong>direction:</strong></dt>
+     <dd>Up, Down, Left, Right<br/></dd>
+
+     <dt><strong>look:</strong></dt>
+     <dd>noLabel, noDeco, Outline, Limits, ChannelV; These property values are for compatibility with MEDM, and should be implemented later. Actually Outline, Limits and ChannelV will give you a scale when scalePosition is different from noScale; noLabel and noDeco will have no scale.<br/></dd>
+
+     <dt><strong>logScale:</strong></dt>
+     <dd>
+          boolean: true or false
+          <br/></dd>
+
+      <dt><strong>limitsMode:</strong></dt>
+      <dd>
+        <table border="1" cellspacing="0" cellpadding="2">
+       <tr>
+        <td  valign="top">Channel</td>
+        <td  valign="top">Limits specified by the control system will be usd (HOPR, LOPR for EPICS)</td>
+       </tr>
+        <tr>
+        <td  valign="top">User</td>
+        <td  valign="top">Limits specified by the user will be used.</td>
+      </tr> 
+      </table>
+      <br/>
+      </dd>
+
+     <dt><strong>type:</strong></dt>
+     <dd>Pipe, marker, PipefromCenter<br/></dd>
+
+     <dt><strong>scalePosition:</strong></dt>
+     <dd>Noscale, LeftScale, RightScale, TopScale, Bottomscale<br/></dd>
+
+     <dt><strong>maxValue:</strong></dt>
+     <dd>
+          float: maximum value used in case of limitsMode=User
+          <br/></dd>
+
+     <dt><strong>minValue:</strong></dt>
+     <dd>
+          float: minimum value used in case of limitsMode=User
+          <br/></dd>
+   </dl>
+
+</blockquote>
+
+<hr />
+  <h3><a  name="caLed" rel="help" id="caLed"><font color="#ff00ff">caLed</font></a></h3>
+
+     has no equivalent in MEDM.
+<blockquote>
+
+    <a href="#geometry">Geometry</a> is used for any object
+</blockquote>
+
+<hr/>
+  <h3><a  name="caLinearGauge" rel="help" id="caLinearGauge"><font color="#ff00ff">caLinearGauge</font></a></h3>
+
+    is the equivalent of the Bar Monitor in MEDM.
+<blockquote>
+
+    <a href="#geometry">Geometry</a> is used for any object
+</blockquote>
+
+<hr />
+  <h3><a  name="caCircularGauge" rel="help" id="caCircularGauge"><font color="#ff00ff">caCircularGauge</font></a></h3>
+
+    is the equivalent of the Meter Monitor in MEDM.
+<blockquote>
+
+    <a href="#geometry">Geometry</a> is used for any object
+</blockquote>
+
+<hr />
+  <h3><a name="caCartesianPlot" rel="help" id="caCartesianPlot"><font color="#ff00ff">caCartesianPlot</font></a></h3>
+
+    is the equivalent of the Cartesian plot in MEDM and will plot up to 6 curves
+<blockquote>
+
+    <a href="#geometry">Geometry</a> is used for any object
+    <dl>
+	<dt><strong>Title</strong></dt>
+      	<dd>QString: Titel of the plot<br/></dd>
+
+	<dt><strong>TitleX</strong></dt>
+      	<dd>QString: Title of the X-axis<br/></dd>
+
+	<dt><strong>TitleY</strong></dt>
+      <dd>QString: Title of the Y-axis<br/></dd>
+
+      <dt><strong>channels_1, channels_2, channels_3, channels_4, channels_5, channels_6</strong></dt>
+      <dd>QString: these strings represents the control system process variables; each channelpair is composed of two channels separated by a semicolumn.<br/>
+          When specifying only one channel, you will have to put a semicolumn in fron or at the end of the string in order to specify x or y, you will find in the table below 
+          how the cartesian plot behaves in case of array or scalars or when only one channel is specified.<br /></dd>
+
+     <dt><strong>Style_1, Style_2, Style_3, Style_4, Style_5, Style_6:</strong></dt>
+      <dd>
+        <table border="1" cellspacing="0" cellpadding="2">
+       <tr>
+        <td  valign="top">NoCurve</td>
+        <td  valign="top">no curve, only symbols will be drawn when they are specified</td>
+       </tr>
+        <tr>
+        <td  valign="top">Lines</td>
+        <td  valign="top">normal curve drawn with lines</td>
+      </tr> 
+        <tr>
+        <td  valign="top">Sticks</td>
+        <td  valign="top">curve draw with sticks from the x base</td>
+      </tr> 
+        <tr>
+        <td  valign="top">Steps</td>
+        <td  valign="top">curve drawn with steps</td>
+      </tr> 
+        <tr>
+        <td  valign="top">Dots</td>
+        <td  valign="top">curve only dots are drawn</td>
+      </tr> 
+        <tr>
+        <td  valign="top">FillUnder</td>
+        <td  valign="top">curve will be filled from the x base</td>
+      </tr> 
+        <tr>
+        <td  valign="top">ThinLines</td>
+        <td  valign="top">curve draw with thin lines</td>
+      </tr> 
+        <tr>
+        <td  valign="top">HorSticks</td>
+        <td  valign="top">curve drawn with sticks from the y base</td>
+      </tr> 
+      </table>
+      <br/>
+      </dd>
+
+   <dt><strong>symbol_1, symbol_2, symbol_3, symbol_4, symbol_5, symbol_6:</strong></dt>
+      <dd>
+        <table border="1" cellspacing="0" cellpadding="2">
+       <tr>
+        <td  valign="top">NoSymbol</td>
+        <td  valign="top">no symbol will be drawn</td>
+       </tr>
+        <tr>
+        <td  valign="top">Ellipse</td>
+        <td  valign="top"></td>
+      </tr> 
+        <tr>
+        <td  valign="top">Diamond</td>
+        <td  valign="top"></td>
+      </tr> 
+        <tr>
+        <td  valign="top">Triangle</td>
+        <td  valign="top"></td>
+      </tr> 
+        <tr>
+        <td  valign="top">DTriangle</td>
+        <td  valign="top"></td>
+      </tr> 
+        <tr>
+        <td  valign="top">UTriangle</td>
+        <td  valign="top"></td>
+      </tr> 
+        <tr>
+        <td  valign="top">LTriangle</td>
+        <td  valign="top"></td>
+      </tr> 
+        <tr>
+        <td  valign="top">RTriangle</td>
+        <td  valign="top"></td>
+      </tr> 
+        <tr>
+        <td  valign="top">Cross</td>
+        <td  valign="top"></td>
+      </tr> 
+        <tr>
+        <td  valign="top">XCross</td>
+        <td  valign="top"></td>
+      </tr> 
+        <tr>
+        <td  valign="top">HLine</td>
+        <td  valign="top"></td>
+      </tr> 
+        <tr>
+        <td  valign="top">VLine</td>
+        <td  valign="top"></td>
+      </tr> 
+        <tr>
+        <td  valign="top">Star1</td>
+        <td  valign="top"></td>
+      </tr> 
+        <tr>
+        <td  valign="top">Star2</td>
+        <td  valign="top"></td>
+      </tr> 
+        <tr>
+        <td  valign="top">Hexagon</td>
+        <td  valign="top"></td>
+      </tr> 
+      </table>
+      <br/>
+      </dd>
+
+      <dt><strong>color_1, color_2, color_3, color_4, color_5, color_6:</strong></dt>
+      <dd> QColor: color used for the curve<br/></dd>
+
+      <dt><strong>countNumOrChannel</strong></dt>
+      <dd>QString: The Count for the Cartesian Plot may be an integer or the name of a process variable.  If the value starts with a non-digit, then it is considered to be a process variable name, and the value of Count will come from the process variable.  If the process variable is not found or its value is less than 1, Count will not be executed<br/></dd>
+      <dt><strong>triggerChannel</strong></dt>
+      <dd>QString: The Trigger Channel is a process variable that causes the entire plot to be updated.  If there is a trigger channel, the plot is updated whenever the value of that process variable changes.  Otherwise, each individual trace is updated whenever any of the data for that trace changes.<br/></dd>
+
+      <dt><strong>eraseChannel</strong></dt>
+      <dd>QString: The Erase Channel is a process variable that causes erasing of the plot. If there is an Erase Channel, the plot erases when the process variable turns either zero or non-zero, depending on the Erase Mode . The Erase Mode is only relevant if there is an erase channel.<br/></dd>
+
+      <dt><strong>eraseMode:</strong></dt>
+      <dd>
+         <table border="1" cellspacing="0" cellpadding="2">
+         <tr>
+            <td  valign="top">ifnotzero</td>
+            <td  valign="top">Erase the plot if the erase-channel process variable is not zero</td>
+         </tr>    
+         <tr>
+            <td  valign="top">ifzero</td>
+            <td  valign="top">Erase the plot if the erase-channel process variable is zero</td>
+         </tr>
+       </table>
+     <br/>
+     </dd>
+
+      <dt><strong>plotMode:</strong></dt>
+      <dd>
+         <table border="1" cellspacing="0" cellpadding="2">
+         <tr>
+            <td  valign="top">PlotNPointsAndStop</td>
+            <td  valign="top">Plot n points corresponding to the first n changes of the process variable, then do not plot any more points</td>
+         </tr>    
+         <tr>
+            <td  valign="top">PlotLastNPoints</td>
+            <td  valign="top">Plot n points corresponding to the last n changes of the process variable, overwriting previous points.</td>
+         </tr>
+
+       </table>
+     <br/>
+     </dd>
+
+      <dt><strong>XaxisType/YaxisType:</strong></dt>
+      <dd>
+         <table border="1" cellspacing="0" cellpadding="2">
+         <tr>
+            <td  valign="top">linear</td>
+            <td  valign="top">Use a linear axis</td>
+         </tr>    
+         <tr>
+            <td  valign="top">log10</td>
+            <td  valign="top">Use a log axis</td>
+         </tr>
+
+       </table>
+     <br/>
+     </dd>
+
+      <dt><strong>XaxisScaling/YaxisScaling:</strong></dt>
+      <dd>
+         <table border="1" cellspacing="0" cellpadding="2">
+         <tr>
+            <td  valign="top">Auto</td>
+            <td  valign="top">Let the graph routine decide on the axis range depending on the data</td>
+         </tr>    
+         <tr>
+            <td  valign="top">Channel</td>
+            <td  valign="top">Get the axis range from the process variable</td>
+         </tr>
+         <tr>
+            <td  valign="top">User</td>
+            <td  valign="top">Specifically specify the minimum and maximum values for the axis.</td>
+         </tr>
+
+       </table>
+     <br/>
+     </dd>
+      
+      <dt><strong>background:</strong></dt>
+      <dd>QColor: color used for the background<br/></dd>
+      <dt><strong>foreground:</strong></dt>
+      <dd>QColor: color used for the foreground<br/></dd>
+      <dt><strong>scaleColor:</strong></dt>
+      <dd>QColor: color used for the scale if scales are specified<br/></dd>
+      <dt><strong>gridColor:</strong></dt>
+      <dd>QColor: color used for the grid if grid is specified<br/></dd>
+
+      <dt><strong>XaxisEnabled:</strong></dt>
+      <dd>bool: specifies if the x axis should be drawn<br/></dd>
+      <dt><strong>YaxisEnabled:</strong></dt>
+      <dd>bool: specifies if the y axis should be drawn<br/></dd> 
+      <dt><strong>grid:</strong></dt>
+      <dd>bool: specifies if a grid should be drawn<br/></dd>
+
+     <dt><strong>XaxisLimits:</strong></dt>
+     <dd>
+          QString: minimum value used in case of limitsMode=User; the values must be separated by a semicolumn
+          <br/></dd>
+     <dt><strong>YaxisLimits:</strong></dt>
+     <dd>
+          QString: minimum value used in case of limitsMode=User; the values must be separated by a semicolumn
+          <br/></dd>
+   </dl>
+
+</blockquote>
+
+  in caQtDM curve can be zoomed with the mouse by pressing the left mouse button and selecting the area that has to be zoomed. The area is shown by a rubberband rectangle. Reset zoom can be chosen through the context menu. Translation can be done by pressing the middle mouse button and moving the mouse.
+  Pressing the right mouse button will bring up a context menu (for pvInfo, resetting zoom and changing axes)<br /><br />
+
+  A caQtDM Cartesian Plot has the same conventions as a MEDM Cartesian Plot. This plot is a very important tool used in control systems and its behaviour was taken from MEDM. The Cartesian consists of an X and one or two Y axes on which data can be plotted. The sets of data are called traces and consist of a set of (x, y) pairswith the properties shown above. The traces correspond to curves on the plot. Currently there can be up to six traces on a plot. Each trace can (but does not have to) have a process variable from which to get the x values and another from which to get the y values. These process variables can be array process variables, such as Waveforms, or they can be scalar process variables with only a single value. The variables have to be separated by a semicolumn (see above).<br /><br />
+
+  There are eight possible kinds of traces as seen in the following table. The traces for a given plot do not all have to be of the same kind – they can be mixed. (In the table Nx is the number of elements in the process variable specified for x, and Ny is the number of elements in the process variable specified for y. The letter n denotes a number greater than one, and a blank indicates no process variable is specified. The axis limits LOPR and HOPR denote the limits obtained from Channel Access for the process variable. Typically, these are the fields LOPR and HOPR in the associated record, but can be specified by the user with the properties XaxisScaling and YaxisScaling. Count is the specified Count for the Cartesian Plot, which is described in more detail below.)<br />
+  <table border="1" cellspacing="0" cellpadding="2">
+    <tr>
+      <td colspan="9">Kinds of XY Traces</td>
+    </tr>
+    <tr>
+      <td> Nx</td>
+      <td> Ny</td>
+      <td> Type</td>
+      <td> Points</td>
+      <td> Xmin</td>
+      <td> Xmax</td>
+      <td> Ymin</td>
+      <td> Ymax</td>
+      <td> NPoints</td>
+    </tr>
+    <tr>
+      <td> n</td>
+      <td> n</td>
+      <td> X,Y Vector</td>
+      <td> x(i),y(i)</td>
+      <td> LOPR</td>
+      <td> HOPR</td>
+      <td> LOPR</td>
+      <td> HOPR</td>
+      <td> Min(Nx, Ny)</td>
+    </tr>
+    <tr>
+      <td> n</td>
+      <td> 1</td>
+      <td> X Vector, Y Scalar</td>
+      <td> x(i),y</td>
+      <td> LOPR</td>
+      <td> HOPR</td>
+      <td> LOPR</td>
+      <td> HOPR</td>
+      <td> Nx</td>
+    </tr>
+    <tr>
+      <td> 1</td>
+      <td> n</td>
+      <td> Y Vector, X Scalar</td>
+      <td> x, y(i)</td>
+      <td> LOPR</td>
+      <td> HOPR</td>
+      <td> LOPR</td>
+      <td> HOPR</td>
+      <td> Ny</td>
+    </tr>
+    <tr>
+      <td> n</td>
+      <td></td>
+      <td> X Vector</td>
+      <td> x(i),i</td>
+      <td> LOPR</td>
+      <td> HOPR</td>
+      <td> 0</td>
+      <td> Count - 1</td>
+      <td> Nx</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td> n</td>
+      <td> Y Vector</td>
+      <td> i,y(i)</td>
+      <td> 0</td>
+      <td> Count - 1</td>
+      <td> LOPR</td>
+      <td> HOPR</td>
+      <td> Ny</td>
+    </tr>
+    <tr>
+      <td> 1</td>
+      <td> 1</td>
+      <td> X,Y Scalar</td>
+      <td> x(i),y(i)</td>
+      <td> LOPR</td>
+      <td> HOPR</td>
+      <td> LOPR</td>
+      <td> HOPR</td>
+      <td> Count</td>
+    </tr>
+    <tr>
+      <td> 1</td>
+      <td></td>
+      <td> X Scalar</td>
+      <td> x(i),i</td>
+      <td> x(i),i</td>
+      <td> LOPR</td>
+      <td> HOPR</td>
+      <td> 0 </td>
+      <td>Count - 1</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td> 1 </td>
+      <td>Y Scalar </td>
+      <td> i,y(i) </td>
+      <td>0 </td>
+      <td>Count - 1 </td>
+      <td>LOPR </td>
+      <td>HOPR </td>
+      <td>Count</td>
+    </tr>
+  </table>
+     <br/>
+
+     If one of the process variables is an array with more than one element and if Count is a number greater than zero, then the specified Count is ignored and the value shown in the last column of the table is used. Under the same circumstances, if Count is a name, then it is used only if it is greater than 0 and less than what would be used if it were a number. That is, Count from a process variable can only restrict NPoints to a lower number than it would be otherwise. The points are plotted from i = 0 to NPoints - 1 and update as the values change. In the cases where one of the process variables is not specified, the history is plotted on that axis against values from 0 to NPoints – 1 on the other axis. <br /><br />If one of the process variables is an array with more than one element and the CA server of the process variable supports dynamic arrays, then when a zero is specified for Count, the number of array elements will be set to the current number of valid elements in the array which may vary with subsequent array update events. <br /><br />In the remaining cases, where neither process variable is an array with more than one element, Count corresponds to a history of the process variable. (These are the cases where NPoints is shown as Count in the table.) Each time the process variable changes (or when either one changes, in the case of X, Y Scalar) a new point is plotted until there are Count points. The points are plotted from i = 0 to the lesser of Count -1 and the number of updates. When the Plot Mode is “plot n pts & stop,” no more points are plotted. When the Plot Mode is “plot last n pts,” the earliest point is discarded, the others are moved down, and the latest is plotted at the end. In the cases where one of the process variables is not specified, the history is plotted on that axis against values from 0 to Count – 1 on the other axis. <br /><br /> 
+
+The above behaviour still has to be tested thoroughly. It appeared already that perhaps Count must be twice the value described above ?
+
+
+<hr />
+  <h3><a name="caStripPlot" rel="help" id="caStripPlot"><font color="#ff00ff">caStripPlot</font></a></h3>
+
+    is the equivalent of the StripChart Monitor in MEDM.
+<blockquote>
+
+    <a href="#geometry">Geometry</a> is used for any object
+ 
+ <h3><a name="timeunits" id="timeunits"></a><b>Time Units</b></h3>
+
+  <table border="1" cellspacing="0" cellpadding="0">
+  <tr>
+      <td  valign="top">milli-second</td>
+      <td  valign="top" >The update period is in milli-seconds.</td>
+    </tr>
+  <tr>
+      <td valign="top">second</td>
+      <td valign="top">The update period is in seconds.</td>
+    </tr>
+  <tr>
+      <td valign="top" >minute</td>
+      <td valign="top" >The update period is in minutes.</td>
+    </tr>
+</table>
+</blockquote>
+
+<hr />
+  <h3><a  name="caByte" rel="help" id="caByte"><font color="#ff00ff">caByte</font></a></h3>
+
+    is the equivalent of the Byte Monitor in MEDM.
+<blockquote>
+
+    <a href="#geometry">Geometry</a> is used for any object
+</blockquote>
+
+
+<hr />
+  <h3><a  name="caCamera" rel="help" id="caCamera"><font color="#ff00ff">caCamera</font></a></h3>
+
+    has no equivalent in MEDM.
+<blockquote>
+
+    <a href="#geometry">Geometry</a> is used for any object
+</blockquote>
+
+<hr />
+  <h3><a  name="caCalc" rel="help" id="caCalc"><font color="#ff00ff">caCalc</font></a></h3>
+
+   has no  equivalent in MEDM.
+<blockquote>
+
+    <a href="#geometry">Geometry</a> is used for any object
+</blockquote>
+
+<hr />
+  <h3><a  name="caWaterfallPlot" rel="help" id="caWaterfallPlot"><font color="#ff00ff">caWaterfallPlot</font></a></h3>
+
+  has no  equivalent in MEDM.
+<blockquote>
+
+    <a href="#geometry">Geometry</a> is used for any object
+</blockquote>
+
+<hr />
+  <h3><a  name="caBitNames" rel="help" id="caBitNames"><font color="#ff00ff">caBitNames</font></a></h3>
+
+  has no  equivalent in MEDM.
+<blockquote>
+
+    <a href="#geometry">Geometry</a> is used for any object
+</blockquote>
+
+<hr />
+  <h3><a  name="caTable" rel="help" id="caTable"><font color="#ff00ff">caTable</font></a></h3>
+
+  has no  equivalent in MEDM.
+<blockquote>
+
+    <a href="#geometry">Geometry</a> is used for any object
+</blockquote>
+
+<hr /><hr />
+  <h2><b> <a  name="graphics" id="graphics" rel="Subsection">all graphical objects</a></b></h2>
+
+<hr />
+  <h3><a  name="caLabel" rel="help" id="caLabel"><font color="#ff00ff">caLabel</font></a></h3>
+
+    is the equivalent of Text in MEDM.
+
+<blockquote>
+
+    <a href="#geometry">Geometry</a> is used for any object
+</blockquote>
+
+<hr />
+  <h3><a  name="caGraphics" rel="help" id="caGraphics"><font color="#ff00ff">caGraphics</font></a></h3>
+
+ is the equivalent of all primary graphical objects (like circles, lines, arcs, triangles, arrows, ...) in MEDM.
+
+<blockquote>
+
+    <a href="#geometry">Geometry</a> is used for any object
+</blockquote>
+
+<hr />
+  <h3><a  name="caFrame" rel="help" id="caFrame"><font color="#ff00ff">caFrame</font></a></h3>
+ has no equivalent of Text in MEDM.
+<blockquote>
+
+    <a href="#geometry">Geometry</a> is used for any object
+</blockquote>
+
+<hr />
+  <h3><a  name="caImage" rel="help" id="caImage"><font color="#ff00ff">caImage</font></a></h3>
+ is the equivalent of image in MEDM.
+<blockquote>
+
+    <a href="#geometry">Geometry</a> is used for any object<br /><br />
+
+ Qt supports many graphics format, try yours to see if it will be displayed. The most interesting format is however the animated GIF format. These GIF image files may include multiple frames, transparency, and most other features supported by the GIF format. If the GIF image file has multiple frames, caQtDM can choose to animate the images or to display a specified frame. The default is to animate if there is more than one frame. To display a specific frame, enter an
+  expression for the Image Calc that returns a frame number. Frame numbers start with 0. The <a href="#CalcExpression">syntax</a> for the Image Calc expression is the same as that for the Visibilty property, and it uses channels A-D in the Dynamic Attribute. The only difference is that the CALC expression should return a frame number, not True or False. The value will be rounded to the nearest integer. Frame numbers that are too high will use the last frame, and frame numbers that are too small will use the first frame. The Image will be black in EXECUTE mode if the Image Calc expression is invalid. The visibility of the Image is determined in the usual way if there is a channel specified. A multiple-frame Image even with no  process variables specified for the Dynamic Attribute does update with some speed. Use the Image Calc expression and the process variables in the Dynamic
+  Attribute to specify when to display each color. 
+There is an <a href="#EPICSExtension">EPICS extension</a>called <a href="http://www.aps.anl.gov/epics/extensions/index.php">Simple GIF Animator (SGA)</a> that allows you to create and modify animated GIFs for use in caQTDM. There are also many other GIF animators available, especially for Microsoft Windows. It does not make any difference which platform you use to create or manipulate the images. You cannot use SGA or most of the animators to create the images themselves, only to add, delete, and rearrange
+  them plus modify some of the GIF parameters. There are many drawing and image editing programs that allow you to create and edit images. For UNIX, the <a
+href="http://www.gimp.org/">GNU Image Manipulation Program (GIMP)</a>is a good choice and is free.
+</blockquote>
+
+<hr />
+  <h3><a name="caPolyLine" rel="help" id="caPolyLine"><font color="#ff00ff">caPolyLine</font></a></h3>
+
+ is the equivalent of Polyline and Polygone in MEDM.
+<blockquote>
+
+    <a href="#geometry">Geometry</a> is used for any object
+</blockquote>
+
+<hr />
+  <h3><a name="caInclude" rel="help" id="caInclude"><font color="#ff00ff">caInclude</font></a></h3>
+
+is the equivalent of the Composite in MEDM
+
+<blockquote>
+
+    <a href="#geometry">Geometry</a> is used for any object<br /><br />
+
+  Composite  objects are created by the designer as a new ui file to be included in a main file. For many operations they are treated as one object. Its uses also visibility
+ (Color  Mode, Visibility, Visibility Calc, Channels A-D) properties. One can specify <a href="#MacroSubstitution">macros</a>. you can specify them by
+  placing a semi-colon after the file name and entering them as on the command
+  line. 
+</blockquote>
+<hr />
+  <h3><a  name="caDoubleTabWidget" rel="help" id="caDoubleTabWidget"><font color="#ff00ff">caDoubleTabWidget</font></a></h3>
+has no equivalent in MEDM and is not a controls object
+<blockquote>
+
+    <a href="#geometry">Geometry</a> is used for any object<br /><br />
+</blockquote>
+
+  <h2><b> <a  name="controllers" id="controllers" rel="Subsection">all controller objects</a></b></h2>
+
+<hr />
+  <h3><a  name="caNumeric" rel="help" id="caNumeric"><font color="#ff00ff">caNumeric</font></a></h3>
+is the equivalent of the Wheelswitch in MEDM
+
+    <a href="#geometry">Geometry</a> is used for any object<br /><br />
+<blockquote>
+ The WheelSwitch has arrow buttons above and below the digits that are used to change individual digits, and it also accepts keyboard input. The up and down arrow buttons are the main feature of the WheelSwitch. You click them to increment the
+  digit. The arrow buttons can also be navigated and operated via the keyboard. You have to put the focus on the selected digit, which get surrounded with a red color. The cursor has to remain inside the widget otherwise the focus will be lost. The up and down arrow keys increment or decrement the selected digit. Clicking on an arrow button will 
+  increment or decrement the digit. The WheelSwitch will also accept input of a new value via the keyboard by double clicking on the value. Escape aborts the input.  Type Enter to
+  finish the input.
+</blockquote>
+
+
+<hr />
+  <h3><a  name="caApplyNumeric" rel="help" id="caApplyNumeric"><font color="#ff00ff">caApplyNumeric</font></a></h3>
+is the equivalent of the Wheelswitch in MEDM
+
+    <a href="#geometry">Geometry</a> is used for any object<br /><br />
+<blockquote>
+The same behaviour as the Wheelswitch, with the difference that the value will be applied when pressing the apply button.
+</blockquote>
+
+<hr />
+  <h3><a name="caSlider" rel="help" id="caSlider"><font color="#ff00ff">caSlider</font></a></h3>
+
+is the equivalent of the Wheelswitch in MEDM
+
+    <a href="#geometry">Geometry</a> is used for any object<br /><br />
+<blockquote>
+
+</blockquote>
+
+<hr />
+  <h3><a  name="caShellCommand" rel="help" id="caShellCommand"><font color="#ff00ff">caShellCommand</font></a></h3>
+
+
+is the equivalent of the Shell command in MEDM
+
+    <a href="#geometry">Geometry</a> is used for any object<br /><br />
+<blockquote>
+
+</blockquote>
+
+<hr />
+  <h3><a  name="caMenu" rel="help" id="caMenu"><font color="#ff00ff">caMenu</font></a></h3>
+
+is the equivalent of the Menu in MEDM
+
+    <a href="#geometry">Geometry</a> is used for any object<br /><br />
+<blockquote>
+
+</blockquote>
+
+<hr />
+  <h3><a  name="caChoice" rel="help" id="caChoice"><font color="#ff00ff">caChoice</font></a></h3>
+
+is the equivalent of the Choice Button in MEDM
+
+    <a href="#geometry">Geometry</a> is used for any object<br /><br />
+<blockquote>
+
+
+
+ <h3><a name="stacking" id="stacking"></a><b>Stacking</b></h3>
+
+For the <a href="#ChoiceButton">Choice Button</a>.
+<table border="1" cellspacing="0" cellpadding="0">
+  <tr>
+      <td valign="top">column</td>
+      <td  valign="top">The buttons are arranged in a row. (This appears to be a mistake, which
+      will not be corrected because of existing screens.)</td>
+    </tr>
+  <tr>
+      <td valign="top">row</td>
+      <td valign="top">The buttons are arranged in a column. (This appears to be a mistake, which
+      will not be corrected because of existing screens.) </td>
+    </tr>
+  <tr>
+      <td valign="top">row column</td>
+      <td  valign="top" >The buttons are automatically arranged in rows and
+      columns.</td>
+    </tr>
+</table>
+</blockquote>
+
+<hr />
+  <h3><a name="caRelatedDisplay" rel="help" id="caRelatedDisplay"><font color="#ff00ff">caRelatedDisplay</font></a></h3>
+
+is the equivalent of the Related Display in MEDM
+
+    <a href="#geometry">Geometry</a> is used for any object<br /><br />
+<blockquote>
+
+</blockquote>
+  <table border="1" cellspacing="0" cellpadding="0">
+  <tr>
+      <td valign="top">create new display</td>
+      <td valign="top">Create a new display and leave the current one.</td>
+    </tr>
+  <tr>
+      <td valign="top" >replace display</td>
+      <td valign="top">Create a new display that replaces the current one.</td>
+    </tr>
+</table>
+
+<br />
+  <table border="1" cellspacing="0" cellpadding="0">
+  <tr>
+      <td  valign="top" >menu</td>
+      <td valign="top">Use a pull down menu for the choices.</td>
+    </tr>
+  <tr>
+      <td valign="top">a row of buttons</td>
+      <td  valign="top">Use a row of buttons for the choices.</td>
+    </tr>
+  <tr>
+      <td  valign="top" >a column of buttons</td>
+      <td  valign="top">Use a column of buttons for the choices.</td>
+    </tr>
+  <tr>
+      <td valign="top">invisible</td>
+      <td  valign="top" >Do not show anything for the choices. This mode is intended to be used with
+      a graphic or other object on top of the related display. The graphic should make the operation
+      of the Related Display clear. In EXECUTE mode, the <a href="#ExecuteModePopupMenu">Execute-Mode Popup Menu </a> contains an item to toggle the makring of hidden buttons in case the user cannot find them.</td>
+    </tr>
+</table>
+<br />
+<hr />
+  <h3><a name="caTextEntry" rel="help" id="caTextEntry"><font color="#ff00ff">caTextEntry</font></a></h3>
+
+is the equivalent of the Text Entry in MEDM
+
+    <a href="#geometry">Geometry</a> is used for any object<br /><br />
+<blockquote>
+
+</blockquote>
+ 
+
+<hr />
+  <h3><a  name="caMessageButton" rel="help" id="caMessageButton"><font color="#ff00ff">caMessageButton</font></a></h3>
+
+is the equivalent of the Message Button in MEDM
+
+    <a href="#geometry">Geometry</a> is used for any object<br /><br />
+<blockquote>
+
+</blockquote>
+
+
+<hr />
+  <h3><a name="caToggleButton" rel="help" id="caToggleButton"><font color="#ff00ff">caToggleButton</font></a></h3>
+
+has no equivalent in MEDM
+
+    <a href="#geometry">Geometry</a> is used for any object<br /><br />
+<blockquote>
+
+</blockquote>
+
+<hr />
+  <h3><a  name="caScriptButton" rel="help" id="caScriptButton"><font color="#ff00ff">caScriptButton</font></a></h3>
+
+has no equivalent in MEDM
+
+    <a href="#geometry">Geometry</a> is used for any object<br /><br />
+<blockquote>
+
+</blockquote>
+
+<hr />
+  <h3><a  name="caSpinBox" rel="help" id="caSpinBox"><font color="#ff00ff">caSpinBox</font></a></h3>
+
+represent a simplified Wheelswitch
+
+    <a href="#geometry">Geometry</a> is used for any object<br /><br />
+<blockquote>
+
+</blockquote>
+
+<hr />
+<hr />
+<h2><b><a href="requirements" name="requirements" id="requirements" rel="Section">Requirements</a></b></h2>
+caQtDM requires that Qt, qwt and EPICS are installed. Actually the suported version are Qt4.6 and above, qwt6.0 and above. Qt5 needs at least qwt6.1. The synoptic editor (designer) is part of Qt and the caQtDM objects are plugged into the designer. This help can be called from the designer by pressing F1 on any object and requires the assistant which is a part of Qt. caQtDM runs in principle on any plattform and has been tested for several linux flavours and also on Microsoft Windows. For MAC OS probably some work has to be done. Qt requires actually on linux normally X11 on Microsoft Windows the native window system. <br/>
+caQtDM requires that Qt, qwt and EPICS are installed. Actually the suported version are Qt4.6 and above, qwt6.0 and above. Qt5 needs at least qwt6.1. The synoptic editor (designer) is part of Qt and the caQtDM objects are plugged into the designer. This help can be called from the designer by pressing F1 on any object and requires the assistant which is a part of Qt. caQtDM runs in principle on any plattform and has been tested for several linux flavours and also on Microsoft Windows. For MAC OS probably some work has to be done. Qt requires actually on linux normally X11 on Microsoft Windows the native window system.
+<h2><b><a href="commandline" name="commandline" id="commandline" rel="Section">Command Line Options</a></b></h2>
+caQtDM can be executed with the same options as MEDM; this to be compatible with its options.
+
+the following options are supported:<br/>
+<br/>
+[-help
+| -h | -&#8204;], <em>gives a description of the options</em><br/>
+[-x], <em>has no effect</em> <br/>
+[-attach], <em>will attach to a running caQtDM</em> <br/>
+[-noMsg], <em>will iconize the main window</em> <br/>
+[-noStyles], <em>no stylesheet will be loaded, works only when not attaching</em> <br/>
+[-print], <em>will print file and exit</em> <br/>
+[-noResize], <em>will prevent resizing, works only when not attaching</em> <br/>
+[-macro
+&quot;<i >xxx</i>=<i
+>aaa</i>,<i >yyy</i>=<i >bbb</i>, ...&quot;], <em>will apply macro substitution to replace occurrences of $(xxx<i
+>) with </i>value aaa<i>.</i></em> <br/>
+[-dg
+[<i >xpos</i>[x<i >ypos</i>]][+<i >xoffset</i>[+<i >yoffset</i>s]], <em>specifies the geometry (location and size) of the synoptic display</em>. <br/>
+<br/>
+Parameters
+in square brackets [] are optional.
+<h3 >Examples:</h3>
+Start up, performing macro substitution of all occurrences of &#036;(a) and &#036;(c) in the display file, xyz.ui: <br/>
+<strong>caQtDM -macro &quot;a=b,c=d&quot; xyz.adl &amp;</strong><br/>
+Start
+up in execute mode; resize the display window corresponding to abc.adl to 100 by 100 pixels and move it to the location, x
+= 100 and y = 100; and move the display window corresponding to def.adl to x = 400 and y = 150: <br/>
+<strong>caQtDM –dg 100x100+100+100 abc.ui&amp;</strong>
+<h2><b><a href="files" name="files" id="files" rel="Section">Description Files</a></b></h2>
+With the Qt designer you produce xml files with the extension .ui. These files are used as input for the synoptic viewer caQtDM. These xml ascii file can be edited by hand, but care has to be taken while caQtDM and Qt designer do not forgive any error. Qt designer will however tell you at what line the mistake is produced. <br/>
+The files are normally loaded from the current directory and/or from the directory specified by the environment variable CAQTDM_DISPLAY_PATH. The directories are specified with the separator : for linux and ; for microsoft windows.
+<h2><b><a href="connection" name="connection" id="connection" rel="Section">Connection Problems and Access Rights</a></b></h2>
+When caQtDM cannot connect the specified process variable normally white colors will be drawn. A list of unconnected process variables can be called through the menu of the main window of caQtDM. When a process variable is not writeable the cursor will change to some special sign.
+<h2><b><a href="fonts" name="fonts" id="fonts" rel="Section">Fonts</a></b></h2>
+The custom widgets make extensively use of the Qt font<em> &quot;Lucida Sans Typewriter&quot;</em>. If this font does not exist in some cases it will fall back to a font called &quot;Monospace&quot;. However the &quot;Lucida&quot; font is really the appropriated font to display numbers and it is warmly advised to have this font installed. <br/>
+
+<h2><b><a name="properties" id="properties" rel="Section">General Properties</a></b></h2>
+<blockquote>
+<h3><a name="geometry" id="geometry" rel="Section">Geometry</a></h3>
+<div>
+All the widgets have geometry properties that can be set by the designer; these properties are normally at the top of the property sheet: <br/>
+</div>
+<table border="1" cellspacing="0" cellpadding="2">
+  <tr>
+    <td valign="top">X Position</td>
+    <td  valign="top">x coordinate of the top left corner of the objectrelative to the display.</td>
+  </tr>
+  <tr>
+    <td  valign="top">Y Position</td>
+    <td  valign="top">y coordinate of the top left corner of the object relative to the display.</td>
+  </tr>
+  <tr>
+    <td  valign="top">Width</td>
+    <td  valign="top">Width of the object.</td>
+  </tr>
+  <tr>
+    <td  valign="top">Height</td>
+    <td  valign="top">Height of the object.</td>
+  </tr>
+</table>
+
+<h3><a name="visibility" id="visibility" rel="Section">Visibility</a></h3>
+<div>
+For the <a href="#graphics">graphical objects</a> except caDoubleTabWidget which is not a control widget
+</div>
+  <table border="1" cellspacing="0" cellpadding="2">
+  <tr>
+      <td  valign="top">Color Mode</td>
+      <td  valign="top">Color Mode for the object. only for caGraphics, caLabel and caPolyLine, See the <a href="#colormode">ColorMode</a> property</td>
+    </tr>
+  <tr>
+      <td  valign="top">Visibility</td>
+      <td  valign="top">Visibility mode for the object. See the <a href="#visibilitymode">Visibility</a> property</td>
+    </tr>
+  <tr>
+      <td valign="top" >Visibility Calc</td>
+      <td valign="top" >A CALC expression that determines whether the object is displayed or not. The
+      expression should return 0 for False and anything else for True. See <a href="#calcexpression">CALC Expression</a> .</td>
+    </tr>
+  <tr>
+      <td valign="top" >Channel A</td>
+      <td valign="top">Name of the main process variable associated with the object. An A in the CALC expression is replaced by the value of this process variable, and the values
+      corresponding to G through L are obtained from this process variable. </td>
+    </tr>
+  <tr>
+      <td valign="top">Channel B</td>
+      <td  valign="top">Name of the second process variable associated with the object. A B in the CALC
+      expression is replaced by the value of this process variable.</td>
+    </tr>
+  <tr>
+      <td  valign="top" >Channel C</td>
+      <td valign="top">Name of the third process variable associated with the object. A C in the CALC
+      expression is replaced by the value of this process variable.</td>
+    </tr>
+  <tr>
+      <td  valign="top" >Channel D</td>
+      <td valign="top">Name of the fourth process variable associated with the object. A D in the CALC
+      expression is replaced by the value of this process variable.</td>
+    </tr>
+</table>
+
+ <h3><a name="colormode" id="colormode" rel="Section">Color Mode</a></h3>
+<br />
+  <table border="1" cellspacing="0" cellpadding="2">
+  <tr>
+      <td  valign="top">static</td>
+      <td  valign="top">Show the object in its normal colors.</td>
+  </tr>
+  <tr>
+      <td  valign="top">alarm</td>
+      <td  valign="top">Show the object in alarm colors based on the severity of the associated process variable. The alarm colors are Green for
+      NO_ALARM, Yellow for MINOR_ALARM, Red for MAJOR_ALARM, White for INVALID_ALARM, and Gray if the alarm has an unknown value (because of an
+      error in the record, for example).</td>
+    </tr>
+</table>
+
+  <h3><a name="visibilitymode" id="visibilitymode" rel="Section">Visibility Mode</a></h3>
+<br />
+  <table border="1" cellspacing="0" cellpadding="2">
+  <tr>
+      <td valign="top" >static</td>
+      <td valign="top">The object is displayed always. Updating objects are always above non-updating objects.</td>
+    </tr>
+  <tr>
+      <td valign="top">if not zero</td>
+      <td  valign="top">The object is displayed if the process variable is
+      
+      not zero.</td>
+    </tr>
+  <tr>
+      <td valign="top">if zero</td>
+      <td valign="top">The object is displayed if the object is zero.</td>
+    </tr>
+  <tr>
+      <td valign="top">calc</td>
+      <td valign="top" >Use calc expression to determine the visability.</td>
+    </tr>
+</table>
+
+
+ <h3><a name="direction" id="direction" rel="Section">Direction</a></h3>
+<div>
+ For the <a href="#BarMonitor">Bar Monitor</a> , <a href="#ByteMonitor">Byte Monitor</a> , <a href="#ScaleIndicator">Scale Monitor</a> , and 
+ <a href="#Slider">Slider</a>
+</div>
+  <table border="1" cellspacing="0" cellpadding="2">
+  <tr>
+      <td valign="top" >up</td>
+      <td valign="top">Direction for the object is up or up/down.</td>
+    </tr>
+  <tr>
+      <td valign="top" >right</td>
+      <td valign="top" >Direction for the object is right or left/right.</td>
+    </tr>
+  <tr>
+      <td valign="top" >down</td>
+      <td valign="top" >Only used in the Bar Monitor. Otherwise, MEDM treats this the same as up.</td>
+    </tr>
+  <tr>
+      <td valign="top" >left</td>
+      <td  valign="top">Only used in the Bar Monitor. Otherwise, MEDM treats this the same as right.</td>
+    </tr>
+</table>
+<br />
+
+<h3><a name="label" id="label" rel="Section">Label</a></h3>
+<div>
+For the <a href="#Meter">Meter</a>, <a href="#BarMonitor">Bar Monitor</a>, <a href="#ScaleIndicator">Scale Monitor</a>, and <a href="#Slider">Slider</a>.
+</div>
+  <table border="1" cellspacing="0" cellpadding="2">
+  <tr>
+      <td  valign="top" >none</td>
+      <td  valign="top">No extra features, except the limits are shown for
+      the meter. You can eliminate the
+      limits on the meter by resizing it vertically so they do not show.</td>
+    </tr>
+  <tr>
+      <td  valign="top" >no decorations</td>
+      <td valign="top">Same as none except for the Bar Monitor. For the Bar Monitor only the
+      background and the bar show. This
+      allows making bar graphs in MEDM.</td>
+    </tr>
+  <tr>
+      <td valign="top">outline</td>
+      <td  valign="top">Show limits.</td>
+    </tr>
+  <tr>
+      <td valign="top">limits</td>
+      <td valign="top">Show limits and a box for the value (except there is
+      no box for the Slider).</td>
+    </tr>
+  <tr>
+      <td  valign="top">channel</td>
+      <td valign="top" >Show limits, a box for the value, and the process
+      variable name (except there is no box for the Slider).</td>
+    </tr>
+</table>
+ 
+<h3><a name="textalign" id="textalign" rel="Section">Text Align</a></h3>
+<br />
+  <table border="1" cellspacing="0" cellpadding="2">
+  <tr>
+      <td valign="top">horiz. left </td>
+      <td  valign="top">Align the text at the top left of the object. (Capital letters will line up with the
+      top of the object, and the text will start at the left of the object.)</td>
+    </tr>
+  <tr>
+      <td valign="top" >horiz. centered</td>
+      <td  valign="top" >Align the text at the top center of the object. (Capital letters will line up with the
+      top of the object, and the text will be horizontally centered in the object.)</td>
+    </tr>
+  <tr>
+      <td valign="top" >horiz. right</td>
+      <td  valign="top">Align the text at the top right of the object. (Capital letters will line up with the
+      top of the object, and the text will end at the right of the object.)</td>
+    </tr>
+  <tr>
+      <td valign="top">vert. top</td>
+      <td valign="top">No longer used. In ADL files MEDM treats this the
+      same as horiz. left (as it used to) for backward
+      compatibility.</td>
+    </tr>
+  <tr>
+      <td valign="top" >vert. centered</td>
+      <td  valign="top">No longer used. In ADL files MEDM treats this the
+      same as horiz. center (as it used to) for backward
+      compatibility.</td>
+    </tr>
+  <tr>
+      <td valign="top">vert. bottom </td>
+      <td valign="top">No longer used. In ADL files MEDM treats this the
+      same as horiz. right (as it used to) for backward compatibility.</td>
+    </tr>
+</table>
+
+<h3><a name="TextFormat" id="TextFormat" rel="Section">Text Format</a></h3>
+<div>
+For the <a href="#TextEntry">Text Entry</a> and <a href="#TextIndicator">Text Monitor</a> . For all of the formats, the result depends on the number itself and the
+  precision as returned from channel access for the process variable. The precision is typically the PREC
+  field for the associated record. The PREC field is only determined when
+  the process variable is connected, so subsequent changes to the PREC do not
+  affect the format until the synoptic display is reloaded.</div>
+
+<h3><a name="calcexpressions" id="calcexpressions" rel="Section">CALC Expressions</a></h3>
+<div>
+CALC expressions are used to determine visibility for graphical objects and to determine the frame number for the <a href="#caImage">caImage</a> , which also has a Dynamic Attribute. For visibility the expression should return 0 for False and anything else for True. For the frame number for the Image it
+  should return a number, which will be rounded to the nearest integer. Frame numbers start with 0. The
+  complete syntax of the CALC expression is described in detail in the Record Reference Manual found in the <a href="http://www.aps.anl.gov/epics">Epics
+  Documentation</a> under IOC software for any version of EPICS base, through at least Base 3.13. It is a case-independent C expression
+  that can include functions such as ABS, SQR, MIN, MAX, CEIL, FLOOR, LOG, LOGE,
+  EXP, SIN, SINH, ASIN, COS, COSH, ACOS, TAN, TANH, and ATAN, as well as the usual C operators, except that != is replaced by # and == is replaced by
+  =. The letters A-L obtain their
+  values from the Channels A-D and are replaced as follows.<br />
+</div>
+<table border="1" cellspacing="0" cellpadding="2">
+  <tr>
+      <td  valign="top" >A</td>
+      <td valign="top">The value of Channel A.</td>
+  </tr>
+  <tr>
+      <td valign="top">B</td>
+      <td valign="top" >The value of Channel B.</td>
+  </tr>
+  <tr>
+      <td valign="top" >C</td>
+      <td valign="top" >The value of Channel C.</td>
+  </tr>
+  <tr>
+      <td valign="top" >D</td>
+      <td  valign="top">The value of Channel D.</td>
+  </tr>
+  <tr>
+      <td valign="top">E</td>
+      <td >Reserved.</td>
+  </tr>
+  <tr>
+      <td  valign="top">F</td>
+      <td  valign="top">Reserved.</td>
+  </tr>
+  <tr>
+      <td valign="top">G</td>
+      <td  valign="top">The COUNT of Channel A.</td>
+  </tr>
+  <tr>
+      <td valign="top">H</td>
+      <td valign="top" >The HOPR of Channel A.</td>
+  </tr>
+  <tr>
+      <td valign="top">I</td>
+      <td  valign="top" >The STATUS of Channel A.</td>
+  </tr>
+  <tr >
+      <td valign="top">J</td>
+      <td  valign="top">The SEVERITY of Channel A.</td>
+  </tr>
+  <tr>
+      <td valign="top">K</td>
+      <td valign="top">The PRECISION of Channel A.</td>
+  </tr>
+  <tr>
+      <td valign="top">L</td>
+      <td valign="top">The LOPR of Channel A.</td>
+  </tr>
+</table>
+<div><br />
+Examples are: <br />
+Show the object whenever the value of Channel A is zero:  !A<br />
+Show the object whenever the value of Channel A is not zero: A<br />
+Show the object whenever the value of Channel A is 12: A=12<br />
+Show the object whenever the value of Channel A is not 12: A#12<br />
+Show the object whenever the values of Channel A, Channel B, and Channel C are all negative: A&lt;0&amp;&amp;B&lt;0&amp;&amp;C&lt;0<br />
+Show the object whenever the main process variable is within 90% of its HOPR or LOPR limits: A&lt;.9*L||A&gt;.9*H<br />
+Show the object whenever the SEVERITY of the main process variable is not 0: !J <br/>
+</div>
+
+</blockquote>
+
+<h3><a name="macrosubstitution" id="macrosubstitution">Macro Substitution</a></h3>
+
+Strings of the form $(name) in an ADL file can be replaced by some other string, both on the command line and when calling a 
+<a href="#RelatedDisplay">related display</a>. Specific directions for each of these cases are given in the correspoonding sections of the manual.
+In general, there is an argument string of the form &#8220;name1=value1[,name2=value2]&#8230;&#8221;. All
+occurrences of &#8220;$(name1)&#8221; in the ADL file are replaced with &#8220;value1&#8221;, then all occurences of $(name2)
+are replaced by value2, <i>etc</i>. The substitition is recursive; that is, if value1 contains an occurrence of $(name2), then when
+name2=value2 is processed, that occurrence will be replaced by value2.<br />
+
+
+<h3><a name="draganddrop" id="draganddrop">Drag-And-Drop</a></h3>
+
+you may drag and drop an item to some destination, however there is no drag and drop possible between Qt and X11. When using KDE you may drag and drop to a konsole. For simple cut and paste you can call the pv info box and get the variable you want to paste. 
+
+
+<h3><a name="mainwindow" id="mainwindow">Main Window</a></h3>
+     The main window of caQTDM present messages, a menu bar and a status bar. <br /><br />
+     The menu bar has the following items: <br />
+    <table border="1" cellspacing="0" cellpadding="2">
+  <tr>
+      <td  valign="top">Menu</td>
+      <td valign="top">Open File</td>
+      <td valign="top">calls a dialog box for opening a .ui or .prc file (.prc files represent psi special ascii files for rapid prototyping)</td>
+  </tr>
+  <tr>
+      <td valign="top"></td>
+      <td valign="top">Reload</td>
+      <td valign="top">will close and reload all displays; very handy during editing</td>
+  </tr>
+  <tr>
+      <td valign="top"></td>
+      <td valign="top">Exit</td>
+      <td valign="top">will exit caQTDM</td>
+  </tr>
+  <tr>
+      <td valign="top"></td>
+      <td valign="top">About</td>
+      <td valign="top">gives some information about the build and author</td>
+  </tr>
+  <tr>
+      <td valign="top">PV</td>
+      <td valign="top"></td>
+      <td valign="top"> will display a list of unconnected PV's</td>
+  </tr>
+  <tr>
+      <td valign="top">UpdataType</td>
+      <td valign="top">Direct</td>
+      <td valign="top">Wenn caQtDM is in this mode, all the monitors will be displayed as soon as they come</td>
+  </tr>
+  <tr>
+      <td valign="top"></td>
+      <td valign="top">Timed</td>
+      <td valign="top">
+          Wenn caQtDM is in this mode, all the monitors will be displayed will be displayed with a highest rate of 5Hz, however this rate can be set on a individual base by a JSON string after the channel (in designer) with the following syntax channel{"monitor":{"maxdisplayrate":20}}, where you can choose your display rate.
+        </td>
+  </tr>
+</table>
+<br /><br />
+the Status bar will display the following information:
+memory used by caQtDM, the number of connected and unconnected PV's, the number of monitors per second, the number of displays per second and the monitor with the highest rate.
+
+<h3><a name="contextmenu" id="contextmenu">Context Menu</a></h3>
+
+By pressing the right mouse button over an object you will get a context menu. This menu contains at least an item called PV info in order to get information about all the process variables associated with that object. For some other objects you will find other items for example for changing axes of the caStripplot and caCartesianplot or for interaction with caCamera.
+
+<h3><a name="contextcustomize" id="contextcustomize">Context Menu Customization</a></h3> 
+ The context menu can be configured by adding other items with their actions. This 
+  configuration is specified in the CAQTDM_EXEC_LIST environment variable. This variable is of the form: name1;
+  program1[[:name2; program2]&#8230;].The items between colons represent each menu item. All of the characters up to the first semi-colon in each item are the
+  text that appears on the menu. The remaining characters represent the system command that will be executed when the item is selected. The system command
+  can include the following special characters:
+    <br />
+  <table border="1" cellspacing="0" cellpadding="2">
+  <tr>
+      <td  valign="top">&amp;P</td>
+      <td  valign="top" >The process variable will be automatically taken from the object.
+      </td>
+    </tr>
+  <tr>
+      <td valign="top">&amp;A</td>
+      <td  valign="top">The full path name of the ui file associated with the display.</td>
+    </tr>
+  <tr>
+      <td valign="top" >&amp;T</td>
+      <td  valign="top">The short name of the file.</td>
+    </tr>
+  <tr>
+      <td  valign="top" >&amp;X</td>
+      <td  valign="top" >The X window id of the ui screen. This can be used with commands like Xwd, for example. only for linux</td>
+    </tr>
+</table>
+    <br /><br />
+    Examples are: 
+    <br />
+    export CAQTDM_EXEC_LIST='Probe;probe &P &:PV Name(s);echo &P' <br />
+    export MEDM_EXEC_LIST='Full Name;echo &A:Short Name;echo &T' <br />
+    export MEDM_EXEC_LIST='XTerm;xterm -fg black -bg white &' <br />
+    export MEDM_EXEC_LIST='XTerm;xterm &?' <br />
+    export CAQTDM_EXEC_LIST=' Dump;xwd -id &X | xwdtopnm | pnmtops | lpr &'
+
+  <h3><a name="help" id="help">Help</a></h3>
+    You may obtain help for any widget in the designer by pressing F1. For the caQtDM custom widgets the help file generated from this html file should be registered by the Qt assistant.
+
+ <h3><a name="resizing" id="resizing">Resizing Displays</a></h3>Displays
+  With caQtDM you can resize the synoptic display windows without using Qt layouts. You can build a display normally and everything will be resized when you resize the window. Furthermore you could try Qt designer layouts (for experts only) 
+<br/>
+
+
+  <h3><a name="printing" id="printing">Printing</a></h3> By pressing the right mouse button on the background of your synoptic display you may get a context menu with the item "Print". Normally you should get a print dialog.
+  <br />
+  
+
+<h3><a name="environmentvariables" id="environmentvariables">Environment Variables</a> </h3>
+MEDM uses the following environment variables:
+  <table border="1" cellspacing="0" cellpadding="0">
+  <tr>
+      <td width="192" valign="top"><a name="caqtdm_display_path" id="caqtdm_display_path"></a>CAQTDM_DISPLAY_PATH</td>
+      <td width="391" valign="top">A colon-separated (semi-colon-separated on Mircosoft Windows) list of directories in which to look for display
+      files. Only looks in the current working directory if not specified. Related Displays have to be in your current directory or in this path</td>
+    </tr>
+  <tr >
+      <td width="192" valign="top" >CAQTDM_EXEC_LIST</td>
+      <td width="391" valign="top">A list of commands for the Context Menu</a> . See the <a href="#contextcustomize">Context Menu</a> for the format.</td>
+    </tr>
+</table>
+    <br />
+  </body>
+</html>
