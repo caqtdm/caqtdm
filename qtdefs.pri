@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.7.1
+CAQTDM_VERSION = V3.7.2
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -9,6 +9,10 @@ unix {
     QMAKE_CXXFLAGS += "-g"
     QMAKE_CFLAGS_RELEASE += "-g"
 }
+
+# 3.7.2
+# cagraphic lost its linecolor after no connection
+# calineedit was not showing alarm colors in alarm_default mode
 
 # 3.7.1
 # improved performance for cartesian and waterfall plot; very long arrays can be displayed
