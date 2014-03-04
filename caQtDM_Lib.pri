@@ -20,10 +20,18 @@ CONFIG   += warn_on
 unix{
  QMAKE_CXXFLAGS += "-g"
  QMAKE_CFLAGS_RELEASE += "-g"
+}
+unix:!macx {
  LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca
  LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
  INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
 }
+macx: {
+ LIBS += -L$(EPICSLIB)  -lca
+ LIBS += -L$(QTBASE)  -lqtcontrols
+ INCLUDEPATH += $(EPICSINCLUDE)/os/Darwin
+}
+
 TARGET = caQtDM_Lib
 TEMPLATE = lib
 
