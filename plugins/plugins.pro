@@ -41,12 +41,25 @@ win32 {
 unix {
 
   INCLUDEPATH += $(QWTINCLUDE)
-  LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
-  LIBS += -L$(QWTLIB) -Wl,-rpath,$(QWTLIB) -lqwt
 
   MOC_DIR = moc
   OBJECTS_DIR = obj
 }
+
+unix:!macx {
+    LIBS += -L$(QWTLIB) -Wl,-rpath,$(QWTLIB) -lqwt
+    LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
+}
+
+macx: {
+    QMAKE_LFLAGS_PLUGIN -= -dynamiclib
+    QMAKE_LFLAGS_PLUGIN += -bundle
+    LIBS += -F$(QWTLIB) -framework qwt
+    LIBS += -L $(QTBASE) -lqtcontrols
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
+
+}
+
 
 INCLUDEPATH += ../src
 INCLUDEPATH += .
@@ -57,9 +70,13 @@ HEADERS	+= qtcontrols_monitors_plugin.h
 RESOURCES += qtcontrolsplugin.qrc
 TARGET = qtcontrols_monitors_plugin
 QMAKE_CLEAN += libqtcontrols_monitors_plugin*
-unix {
+unix:!macx {
   QMAKE_POST_LINK = cp libqtcontrols_monitors_plugin.so $(QTBASE)/designer
 }
+macx: {
+  QMAKE_POST_LINK = cp libqtcontrols_monitors_plugin.dylib $(QTBASE)/designer
+}
+
   win32 {
    ReleaseBuild {
     QMAKE_POST_LINK = copy /Y .\release\qtcontrols_monitors_plugin.dll ..\..\caQtDM_Binaries\designer
@@ -73,8 +90,11 @@ HEADERS	+= qtcontrols_controllers_plugin.h
 RESOURCES += qtcontrolsplugin.qrc
 TARGET = qtcontrols_controllers_plugin
 QMAKE_CLEAN += libqtcontrols_controllers_plugin*
-unix {
+unix:!macx  {
   QMAKE_POST_LINK = cp libqtcontrols_controllers_plugin.so $(QTBASE)/designer
+}
+macx: {
+  QMAKE_POST_LINK = cp libqtcontrols_controllers_plugin.dylib $(QTBASE)/designer
 }
   win32 {
    ReleaseBuild {
@@ -89,8 +109,11 @@ HEADERS	+= qtcontrols_graphics_plugin.h
 RESOURCES += qtcontrolsplugin.qrc
 TARGET = qtcontrols_graphics_plugin
 QMAKE_CLEAN += libqtcontrols_graphics_plugin*
-unix {
+unix:!macx {
   QMAKE_POST_LINK = cp libqtcontrols_graphics_plugin.so $(QTBASE)/designer
+}
+macx: {
+  QMAKE_POST_LINK = cp libqtcontrols_graphics_plugin.dylib $(QTBASE)/designer
 }
   win32 {
    ReleaseBuild {

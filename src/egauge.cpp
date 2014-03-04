@@ -278,7 +278,7 @@ void EAbstractGauge::configure()
 	for (int i = 0; i < m_numMajorTicks; i++)
 	{
 		double representedValue = val;
-#if defined(_MSC_VER)
+#if defined(_MSC_VER)||defined(__APPLE__)
 		d_logarithmicScale ? representedValue  = pow(10,val) : representedValue  = val;
 #else
 		d_logarithmicScale ? representedValue  = exp10(val) : representedValue  = val;

@@ -42,11 +42,25 @@ win32 {
 
 unix {
     INCLUDEPATH += $(QWTINCLUDE)
-    LIBS += -L$(QWTLIB) -Wl,-rpath,$(QWTLIB) -lqwt
     OBJECTS_DIR = obj
     DESTDIR = .
-    QMAKE_POST_LINK = cp libqtcontrols.so $(QTBASE)
 }
+
+unix:!macx {
+    QMAKE_POST_LINK = cp libqtcontrols.so $(QTBASE)	
+    LIBS += -L$(QWTLIB) -Wl,-rpath,$(QWTLIB) -lqwt
+}
+
+macx: {
+    CONFIG += lib_bundle
+    QMAKE_POST_LINK = cp libqtcontrols.dylib $(QTBASE)
+    LIBS += -F$(QWTLIB) -framework qwt
+    	
+}
+
+
+
+
 MOC_DIR = moc
 INCLUDEPATH += src
 RESOURCES = qtcontrols.qrc
