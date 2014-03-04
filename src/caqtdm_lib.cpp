@@ -2399,6 +2399,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             } else {
                 double p = data.edata.rvalue;
                 widget->setData(&p, 1);
+                widget->displayData();
             }
 
             // not connected
