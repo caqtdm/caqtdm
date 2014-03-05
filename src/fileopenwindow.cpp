@@ -403,8 +403,6 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         bool willPrint = false;
         //qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString << "geometry=" << geometry;
 
-        //QMainWindow *mainWindow = new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, messageWindow);
-
         if(printandexit) willPrint = true;
         CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, messageWindow, willPrint);
 
@@ -426,17 +424,17 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         mainWindow->setWindowFlags(mainWindow->windowFlags() );
 
         // get the filename
-        QFile *file = new QFile;
-        file->setFileName(fileNameFound);
-        QString title(file->fileName().section('/',-1));
-        mainWindow->setProperty("fileString", title);
+        //QFile *file = new QFile;
+        //file->setFileName(fileNameFound);
+        //QString title(file->fileName().section('/',-1));
+        mainWindow->setProperty("fileString", fileNameFound);
         mainWindow->setProperty("macroString", macroString);
 
         if (FileName.contains("prc")) {
             mainWindow->resize(mainWindow->minimumSizeHint());
         }
 
-        delete file;
+        //delete file;
 
         //qDebug() << "set properties in qmainwindow" << mainWindow << title << macroString;
 
@@ -522,6 +520,7 @@ void FileOpenWindow::Callback_ActionReload()
             if(!macroString.isNull()) {
                 macroS = macroString.toString();
             }
+            //qDebug() << fileName;
 
             position = w->pos();
 
