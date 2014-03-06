@@ -603,6 +603,12 @@ void ClearMonitor(knobData *kData)
     status = ca_pend_io(CA_TIMEOUT);
 }
 
+void DetachContext()
+{
+    ca_detach_context();
+    ca_context_destroy();
+}
+
 
 int EpicsSetValue(char *pv, float rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType)
 {
