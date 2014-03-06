@@ -59,7 +59,7 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
 
 caInclude::~ caInclude()
 {
-
+   delete layout;
 }
 
 void caInclude::setBackground(QColor c)
@@ -81,7 +81,6 @@ void caInclude::removeIncludedWidget()
 
 void caInclude::setFileName(QString const &filename)
 {
-    QFile *file = new QFile;
     QUiLoader loader;
     newFileName = filename.trimmed();
 
@@ -158,9 +157,11 @@ void caInclude::setFileName(QString const &filename)
         removeIncludedWidget();
 
         // load new file
+        QFile *file = new QFile;
         file->setFileName(fileNameFound);
         file->open(QFile::ReadOnly);
         thisLoadedWidget = loader.load(file, thisParent);
+        delete file;
         if(thisLoadedWidget == (QWidget*) 0) return;
         layout->addWidget(thisLoadedWidget);
         setLayout(layout);
