@@ -106,7 +106,7 @@ private:
     QString         thisString;
 
     QList<QVariant> tf;
-    QStringList stringlist;
+
     EFlag::alignmentHor    thisAlignment;
 };
 

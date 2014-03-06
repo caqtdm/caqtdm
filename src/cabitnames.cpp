@@ -70,7 +70,7 @@ bool caBitnames::bitState(long value, int bitNr)
 void caBitnames::setEnumStrings(QString string)
 {
     thisString = string;
-    stringlist = thisString.split( ";" );
+    QStringList stringlist= thisString.split( ";" );
     for(int i=0; i<= thisEndBit - thisStartBit; i++) {
         if(i+thisStartBit >= stringlist.count()) return;
         EFlag::setEnumDisplay(i, 1, stringlist[i+thisStartBit], thisTrueColor);
