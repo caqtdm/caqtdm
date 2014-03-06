@@ -508,7 +508,11 @@ void FileOpenWindow::Callback_ActionReload()
     QString macroS = "";
     QString fileS = "";
 
+    // block reload button
+   this->ui.reloadAction->blockSignals(true);
+
     Callback_ActionTimed();
+    // block processing during reload
     mutexKnobData->BlockProcessing(true);
 
     // go through all windows, close them and relaod them from files
@@ -552,7 +556,7 @@ void FileOpenWindow::Callback_ActionReload()
 
     mutexKnobData->BlockProcessing(false);
 
-
+    this->ui.reloadAction->blockSignals(false);
 }
 
 void FileOpenWindow::Callback_ActionTimed() {
