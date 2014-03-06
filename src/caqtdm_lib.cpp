@@ -149,6 +149,7 @@ Q_DECLARE_METATYPE(QList<int>)
 
 extern "C" int CreateAndConnect(int index, knobData *data, int rate, int skip);
 extern "C" void ClearMonitor(knobData *kData);
+extern "C" void DetachContext();
 extern "C" void PrepareDeviceIO();
 extern "C" int EpicsSetValue(char *pv, float rdata, long idata, char *sdata, char *object, char *errmess, int forceType);
 extern "C" void TerminateDeviceIO();
@@ -175,8 +176,7 @@ public:
 CaQtDM_Lib::~CaQtDM_Lib()
 {
     //qDebug() << "nb elements:" << includeWidgetList.count();
-    for (int i = includeWidgetList.count()-1; i >= 0; --i)
-    {
+    for (int i = includeWidgetList.count()-1; i >= 0; --i) {
         QWidget *widget;
         widget= includeWidgetList.at(i);
         //qDebug() << "delete" << widget;
@@ -184,6 +184,7 @@ CaQtDM_Lib::~CaQtDM_Lib()
     }
     delete myWidget;
     includeWidgetList.clear();
+    topIncludesWidgetList.clear();
 }
 
 /**
@@ -191,7 +192,6 @@ CaQtDM_Lib::~CaQtDM_Lib()
  */
 CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKnobData *mKnobData, MessageWindow *msgWindow, bool pepprint) : QMainWindow(parent)
 {
-
     AllowsUpdate = true;
     mutexKnobData = mKnobData;
     messageWindow = msgWindow;
@@ -314,7 +314,11 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     level=0;
 
     // say for all widgets that they have to be treated, will be set to true when treated to avoid multiple use
-    // by findChildren
+    // by findChildren, and get the list of all the includes at this level
+
+    includeWidgetList.clear();
+    topIncludesWidgetList.clear();
+
     nbIncludes = 0;
     splashCounter = 1;
     QList<QWidget *> all = this->findChildren<QWidget *>();
@@ -322,6 +326,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         widget->setProperty("Taken", false);
         if(caInclude* include = qobject_cast<caInclude *>(widget)){
             Q_UNUSED(include);
+            topIncludesWidgetList.append(include);
             nbIncludes++;
         }
     }
@@ -331,7 +336,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
       splash->setMaximum(nbIncludes);
       splash->show();
     }
-
 
     initTry = true;
     // get from the display all the calc widgets
@@ -350,7 +354,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         // open and load file
         HandleWidget(w1, savedMacro[0], false);
     }
-
     if(nbIncludes > 0) {
 #ifdef linux
     usleep(200000);
@@ -911,7 +914,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caInclude* widget = qobject_cast<caInclude *>(w1)) {
 
         QWidget *thisW;
-        QFile *file = new QFile;
         QUiLoader loader;
         bool prcFile = false;
 
@@ -990,13 +992,14 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
                 thisW = (QWidget*) 0;
 #endif
             } else {
-
+                QFile *file = new QFile;
                 // open and load ui file
                 file->setFileName(fileName);
                 file->open(QFile::ReadOnly);
                 //ftime(&last);
                 thisW = loader.load(file, this);
                 file->close();
+                delete file;
 /*
                 ftime(&now);
                 double diff = ((double) now.time + (double) now.millitm / (double)1000) -
@@ -1043,12 +1046,16 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
             qDebug() << "sorry, file" << fileName << " does not exist";
         }
 
-        delete file;
-
         macroS = savedMacro[level];
 
-        if(level == 0 && nbIncludes > 0) {
-            splash->setProgress(splashCounter++);
+        // increment splascounter when include is in list
+        if(nbIncludes > 0) {
+           for (int i = topIncludesWidgetList.count()-1; i >= 0; --i) {
+               if(w1 ==  topIncludesWidgetList.at(i)) {
+                   splash->setProgress(splashCounter++);
+                   break;
+               }
+           }
         }
 
         widget->setProperty("Taken", true);
@@ -3158,7 +3165,7 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
 
         knobData kData =  mutexKnobData->GetMutexKnobData(i);
 
-        if((kData.index != -1) && (myWidget == kData.thisW)) {
+        if((kData.index != -1) && (myWidget == (QWidget*) kData.thisW)) {
             QString pv = kData.pv;
             QWidget* w = (QWidget*) kData.thisW;
             short soft = kData.soft;
@@ -3180,7 +3187,7 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
     // you will run into trouble
     for(int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
         knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
-        if(myWidget == kPtr->thisW) {
+        if(myWidget == (QWidget*) kPtr->thisW) {
             if (kPtr->edata.info != (connectInfoShort *) 0) {
                 free(kPtr->edata.info);
                 kPtr->edata.info = (void*) 0;
@@ -3203,7 +3210,9 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
 #ifdef epics4
     delete Epics4;
 #endif
+
     //printf("closed\n");
+    //DetachContext();
 }
 
 /**

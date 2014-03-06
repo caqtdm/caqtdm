@@ -170,6 +170,7 @@ private:
 
     QWidget *myWidget;
     QList<QWidget*> includeWidgetList;
+    QList<QWidget*> topIncludesWidgetList;
     QwtPlotCurve curve[3];
     QVector<double> xx, yy;
 
@@ -189,7 +190,6 @@ private:
 
     boolean firstResize;
     boolean allowResize;
-
     boolean pepPrint;
 
     int origWidth, origHeight;
