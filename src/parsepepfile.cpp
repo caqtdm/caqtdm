@@ -949,9 +949,12 @@ void ParsePepFile::writeLineEdit(QString format, QString pv, QString minwidth, Q
     int decimalDigits = 3;
     QString newFormat = format;
 
+    printf("newformat=<%s> %d\n", newFormat.toAscii().constData(), newFormat.size());
+
     // a lineedit
     writeOpenTag("widget class=\"caLineEdit\" name=\"calinedit\"", array);
 
+    if(newFormat.size() != 0) {
     // take care of format
     if(newFormat.at(0) == '%') newFormat.remove(0,1);
 
@@ -989,6 +992,7 @@ void ParsePepFile::writeLineEdit(QString format, QString pv, QString minwidth, Q
                 writeSimpleProperty("precision", "number", Digits, array);
             }
         }
+    }
     }
 
     //size
