@@ -153,7 +153,8 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
             //qDebug() << "send a message with file, macro and geometry to it and exit "<< message;
             sendMessage(message);
             sharedMemory.detach();
-            exit(0);
+            //exit(0);
+            qApp->exit(0);
         } else {
             qDebug() << "caQtDM -- another instance of caQtDM detected, but no attach specified ==> standalone";
         }
@@ -226,7 +227,8 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
     // we want to ask with timeout if the application has to be closed. 23-jan-2013 no yust exit
     if(this->findChildren<CaQtDM_Lib *>().count() <= 0 && userClose) {
         if (sharedMemory.isAttached()) sharedMemory.detach();
-        exit(0);
+       // exit(0);
+        qApp->exit(0);
     } else if(this->findChildren<CaQtDM_Lib *>().count() > 0){
         userClose = true;
     }
@@ -252,7 +254,9 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
                     if(printIt > 2) {
                         widget->printPS("caQtDM.ps");
                         qDebug() << "caQtDM -- file has been printed to caQtDM.ps";
-                        exit(1);
+                        //exit(1);
+                        qApp->exit(1);
+
                     }
                 }
             }
@@ -261,7 +265,8 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
             CaQtDM_Lib * widget = this->findChild<CaQtDM_Lib *>();
             widget->printPS("caQtDM.ps");
             qDebug() << "caQtDM -- file has been printed to caQtDM.ps, probably with errors";
-            exit(1);
+            //exit(1);
+            qApp->exit(1);
         }
     }
 }
@@ -498,7 +503,8 @@ void FileOpenWindow::Callback_ActionExit()
 // detach shared memory, delete pv container
         if (sharedMemory.isAttached()) sharedMemory.detach();
         delete mutexKnobData;
-        exit(0);
+       qApp->exit(0);
+        //exit(0);
     }
 }
 

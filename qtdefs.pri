@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.7.3
+CAQTDM_VERSION = V3.7.4
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -9,6 +9,12 @@ unix {
     QMAKE_CXXFLAGS += "-g"
     QMAKE_CFLAGS_RELEASE += "-g"
 }
+
+# 3.7.4
+# reload did not find the ui file any more when started with explicit path. corrected
+# splash screen did not count correctly in some situations. corrected
+# small memory leak repaired in cainclude
+
 # 3.7.3
 # after the iimproved performance of the cartesian plot, the trigger mode disappeared, corrected
 
