@@ -949,50 +949,48 @@ void ParsePepFile::writeLineEdit(QString format, QString pv, QString minwidth, Q
     int decimalDigits = 3;
     QString newFormat = format;
 
-    printf("newformat=<%s> %d\n", newFormat.toAscii().constData(), newFormat.size());
-
     // a lineedit
     writeOpenTag("widget class=\"caLineEdit\" name=\"calinedit\"", array);
 
     if(newFormat.size() != 0) {
-    // take care of format
-    if(newFormat.at(0) == '%') newFormat.remove(0,1);
+        // take care of format
+        if(newFormat.at(0) == '%') newFormat.remove(0,1);
 
-    if(newFormat.contains("g") || newFormat.contains("e") || newFormat.contains("f")) {
+        if(newFormat.contains("g") || newFormat.contains("e") || newFormat.contains("f")) {
 
-        if(newFormat.contains("f")) {
-            writeSimpleProperty("formatType", "enum", "caLineEdit::decimal", array);
+            if(newFormat.contains("f")) {
+                writeSimpleProperty("formatType", "enum", "caLineEdit::decimal", array);
+            } else {
+                writeSimpleProperty("formatType", "enum", "caLineEdit::exponential", array);
+            }
+            newFormat.replace("g", "");
+            newFormat.replace("e", "");
+            newFormat.replace("f", "");
+            QStringList elements= newFormat.split(".",  QString::SkipEmptyParts);
+            if(elements.count() == 2) {
+                decimalDigits = elements[1].toInt(&ok);
+                if(ok) {
+                    QString Digits= QString("%1").arg(decimalDigits);
+                    writeSimpleProperty("precisionMode", "enum", "caLineEdit::User", array);
+                    writeSimpleProperty("precision", "number", Digits, array);
+                }
+            }
+
+        } else if(newFormat.contains("x")) {
+            writeSimpleProperty("formatType", "enum", "caLineEdit::hexadecimal", array);
+        } else if(newFormat.contains("o")) {
+            writeSimpleProperty("formatType", "enum", "caLineEdit::octal", array);
         } else {
-            writeSimpleProperty("formatType", "enum", "caLineEdit::exponential", array);
-        }
-        newFormat.replace("g", "");
-        newFormat.replace("e", "");
-        newFormat.replace("f", "");
-        QStringList elements= newFormat.split(".",  QString::SkipEmptyParts);
-        if(elements.count() == 2) {
-            decimalDigits = elements[1].toInt(&ok);
-            if(ok) {
-                QString Digits= QString("%1").arg(decimalDigits);
-                writeSimpleProperty("precisionMode", "enum", "caLineEdit::User", array);
-                writeSimpleProperty("precision", "number", Digits, array);
+            QStringList elements= newFormat.split(".",  QString::SkipEmptyParts);
+            if(elements.count() == 2) {
+                decimalDigits = elements[1].toInt(&ok);
+                if(ok) {
+                    QString Digits= QString("%1").arg(decimalDigits);
+                    writeSimpleProperty("precisionMode", "enum", "caLineEdit::User", array);
+                    writeSimpleProperty("precision", "number", Digits, array);
+                }
             }
         }
-
-    } else if(newFormat.contains("x")) {
-        writeSimpleProperty("formatType", "enum", "caLineEdit::hexadecimal", array);
-    } else if(newFormat.contains("o")) {
-        writeSimpleProperty("formatType", "enum", "caLineEdit::octal", array);
-    } else {
-        QStringList elements= newFormat.split(".",  QString::SkipEmptyParts);
-        if(elements.count() == 2) {
-            decimalDigits = elements[1].toInt(&ok);
-            if(ok) {
-                QString Digits= QString("%1").arg(decimalDigits);
-                writeSimpleProperty("precisionMode", "enum", "caLineEdit::User", array);
-                writeSimpleProperty("precision", "number", Digits, array);
-            }
-        }
-    }
     }
 
     //size
