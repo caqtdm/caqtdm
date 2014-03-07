@@ -105,7 +105,6 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     this->statusBar()->show();
 
     // connect action buttons
-    //connect( this->ui.btnOpen, SIGNAL( clicked() ), this, SLOT(Callback_OpenButton()) );
     connect( this->ui.fileAction, SIGNAL( triggered() ), this, SLOT(Callback_OpenButton()) );
     connect( this->ui.aboutAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionAbout()) );
     connect( this->ui.exitAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionExit()) );
@@ -113,6 +112,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     connect( this->ui.unconnectedAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionUnconnected()) );
     connect( this->ui.timedAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionTimed()) );
     connect( this->ui.directAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionDirect()) );
+    connect( this->ui.helpAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionHelp()) );
     this->ui.timedAction->setChecked(true);
 
     setWindowTitle(title);
@@ -472,6 +472,14 @@ void FileOpenWindow::Callback_ActionAbout()
     message = message.arg(BUILDVERSION, QT_VERSION_STR, BUILDARCH, SUPPORT);
     QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Information, "About", message, QMessageBox::Close, this, Qt::Dialog, true);
     m->show();
+}
+
+/**
+ * slot for help signal
+ */
+void FileOpenWindow::Callback_ActionHelp()
+{
+    shellCommand("assistant");
 }
 
 /**
@@ -861,3 +869,42 @@ void FileOpenWindow::parse_and_set_Geometry(QMainWindow *widget, QString parsest
     widget->setGeometry(x, y, w, h);
 }
 #endif
+
+void FileOpenWindow::shellCommand(QString command) {
+    command = command.trimmed();
+
+    QProcess *proc = new QProcess( this);
+    proc->setWorkingDirectory(".");
+    proc->setProcessChannelMode(QProcess::MergedChannels);
+    QObject::connect( proc, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
+    proc->start(command.trimmed(), QIODevice::ReadWrite);
+
+}
+
+void FileOpenWindow::processError(QProcess::ProcessError err)
+{
+    switch(err)
+    {
+    case QProcess::FailedToStart:
+        QMessageBox::information(0,"FailedToStart","FailedToStart");
+        break;
+    case QProcess::Crashed:
+        QMessageBox::information(0,"Crashed","Crashed");
+        break;
+    case QProcess::Timedout:
+        QMessageBox::information(0,"FailedToStart","FailedToStart");
+        break;
+    case QProcess::WriteError:
+        QMessageBox::information(0,"Timedout","Timedout");
+        break;
+    case QProcess::ReadError:
+        QMessageBox::information(0,"ReadError","ReadError");
+        break;
+    case QProcess::UnknownError:
+        QMessageBox::information(0,"UnknownError","UnknownError");
+        break;
+    default:
+        QMessageBox::information(0,"default","default");
+        break;
+    }
+}

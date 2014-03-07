@@ -40,6 +40,7 @@
 #include <QTableWidget>
 #include <QScrollBar>
 #include <QFile>
+#include <QProcess>
 #include "MessageWindow.h"
 #include "dbrString.h"
 #include "knobDefines.h"
@@ -61,6 +62,7 @@
      int ReadInteger(char *string, char **NextString);
      int parseGeometry(const char* string, int* x, int* y, int* width, int* height);
      void parse_and_set_Geometry(QMainWindow *w, QString parsestring);
+     void shellCommand(QString command);
 
  private slots:
      void Callback_ActionTimed();
@@ -68,11 +70,13 @@
      void Callback_OpenButton();
      void Callback_ActionAbout();
      void Callback_ActionExit();
+     void Callback_ActionHelp();
      void Callback_ActionReload();
      void Callback_ActionUnconnected();
      void Callback_OpenNewFile(const QString&, const QString&, const QString&);
      void checkForMessage();
      void Callback_PVwindowExit();
+    void processError(QProcess::ProcessError err);
 
  public slots:
      void doSomething() { printf("About to quit!\n"); sharedMemory.detach();}

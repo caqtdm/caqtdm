@@ -24,7 +24,7 @@
      <x>0</x>
      <y>0</y>
      <width>493</width>
-     <height>25</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuMenu">
@@ -53,9 +53,16 @@
     <addaction name="directAction"/>
     <addaction name="timedAction"/>
    </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="helpAction"/>
+   </widget>
    <addaction name="menuMenu"/>
    <addaction name="menuPV"/>
    <addaction name="menuUpdateType"/>
+   <addaction name="menuHelp"/>
   </widget>
   <action name="exitAction">
    <property name="text">
@@ -105,6 +112,11 @@
    </property>
    <property name="text">
     <string>Timed</string>
+   </property>
+  </action>
+  <action name="helpAction">
+   <property name="text">
+    <string>Contents</string>
    </property>
   </action>
  </widget>
