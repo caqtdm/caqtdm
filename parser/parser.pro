@@ -29,8 +29,12 @@ OTHER_FILES += \
  DEFINES += BUILDVERSION=\\\"$${CAQTDM_VERSION}\\\"
  DEFINES += BUILDARCH=\\\"$$(QMAKESPEC)\\\"
 
-unix {
+unix:!macx {
   QMAKE_POST_LINK = cp adl2ui ../../caQtDM_Binaries/
+}
+
+macx: {
+  QMAKE_POST_LINK = cp -R ./adl2ui.app ../../caQtDM_Binaries/
 }
 
 win32-msvc* {
