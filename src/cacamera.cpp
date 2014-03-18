@@ -791,7 +791,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
 
                         Max[(intensity > Max[1])] = intensity;
                         Min[(intensity < Min[1])] = intensity;
-                        *scanLine++;
+                        //*scanLine++;
                     }
                     if(i+2 >= datasize) break;
                 }

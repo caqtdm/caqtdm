@@ -23,7 +23,7 @@
  *    anton.mezger@psi.ch
  */
 
-#ifndef caMessage_H
+#ifndef caMessageMenu_H
 #define caMessageMenu_H
 
 #include <QString>

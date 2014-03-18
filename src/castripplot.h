@@ -454,13 +454,14 @@ private:
     QColor thisScaleColor;
     QColor thisLineColor[MAXCURVES], thisGridColor;
 
-    axisScaling thisXscaling, thisYscalingMax[MAXCURVES], thisYscalingMin[MAXCURVES];
+    //axisScaling thisXscaling;
+    axisScaling thisYscalingMax[MAXCURVES], thisYscalingMin[MAXCURVES];
 
     double thisPeriod;
-    double AxisLowX;
-    double AxisUpX;
-    double AxisLowY;
-    double AxisUp;
+    //double AxisLowX;
+    //double AxisUpX;
+    //double AxisLowY;
+    //double AxisUp;
 
     QwtPlotGrid *plotGrid;
     QPen penGrid;
@@ -481,7 +482,7 @@ private:
 
     stripplotthread *timerThread;
 
-    double elapsedTimeOld;
+    //double elapsedTimeOld;
     QMutex mutex;
 };
 #endif
