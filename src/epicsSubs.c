@@ -376,7 +376,6 @@ static void dataCallback(struct event_handler_args args)
                 }
                 memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(float));
             }
-
             C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
         }
         break;

@@ -32,7 +32,7 @@
 
 #define boolean int 
 #define true 1==1
-#define false !true
+#define false !(true)
 
 #define MAXFILELEN 60
 #define MAXPVLEN 120

@@ -62,7 +62,8 @@ typedef struct _epicsData {
     int          accessR;
     void         *info;                 /* pointer to  epics connection info */
     int          dataSize;              /* size of vector data */
-    void         *dataB;                /* vector data */
+    void         *dataB;                /* vector data, right size will be allocated on data receive and waveform copied into*/
+    void         *dataPtr;
     int          initialize;            /* first initialisation */
     char         aux[10];               /* used for acs controlsystem images */
     struct timeb lastTime;              /* last displayed time */
