@@ -31,7 +31,11 @@
 #endif
 
 #include "dmsearchfile.h"
+#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
+#include <QtGui/QGuiApplication>
+#else
 #include <QtGui/QApplication>
+#endif
 #include "fileopenwindow.h"
 #include "QDebug"
 #include <QFileDialog>
