@@ -351,7 +351,6 @@ void caCartesianPlot::displayData(int curvIndex, int curvType)
             //printf("x scalar, y scalar\n");
             // when no count is specified or count == 1 then yust plot the point
             if(thisCountNumber <= 1) {
-               printf("yust plot the point\n");
                setSamplesData(curvIndex, X[curvIndex].data(), Y[curvIndex].data(), qMin(X[curvIndex].size(), Y[curvIndex].size()), true);
 
             // scalar scalar more than one point specified
@@ -876,9 +875,9 @@ void caCartesianPlot::setYaxisType(axisType s)
     thisYtype = s;
     if(s == log10) {
 #if QWT_VERSION < 0x060100
-        setAxisScaleEngine(QwtPlot::xBottom, new QwtLog10ScaleEngine);
+        setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
 #else
-        setAxisScaleEngine(QwtPlot::xBottom, new QwtLogScaleEngine);
+        setAxisScaleEngine(QwtPlot::yLeft, new QwtLogScaleEngine);
 #endif
     } else {
         setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine);
