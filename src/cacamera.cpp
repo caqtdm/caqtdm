@@ -395,11 +395,6 @@ void caCamera::zoomNow()
     zoomValue->setText(QString::number(scale, 'f', 3));
     scaleFactor = scale;
     setFitToSize(No);
-
-    // force resize
-    QResizeEvent *re = new QResizeEvent(size(), size());
-    resizeEvent(re);
-    delete re;
 }
 
 void caCamera::zoomIn(int level)
@@ -427,6 +422,7 @@ void caCamera::setFitToSize(zoom const &z)
     // force resize
     QResizeEvent *re = new QResizeEvent(size(), size());
     resizeEvent(re);
+    delete re;
 }
 
 bool caCamera::getInitialAutomatic()
@@ -510,7 +506,6 @@ void caCamera::setWidth(int width)
 {
     m_width = width;
     m_widthDefined = true;
-
 }
 void caCamera::setHeight(int height)
 {
@@ -518,11 +513,10 @@ void caCamera::setHeight(int height)
     m_heightDefined = true;
 }
 
-
 void caCamera::resizeEvent(QResizeEvent *e)
 {
-    imageW->setFixedWidth(e->size().width() - zoomWidget->width()-4);
-    imageW->setFixedHeight(e->size().height()- valuesWidget->height()-4);
+    //imageW->setFixedWidth(e->size().width() - zoomWidget->width()-4);
+    //imageW->setFixedHeight(e->size().height()- valuesWidget->height()-4);
 
     if(m_widthDefined && m_heightDefined) {
         if(!thisFitToSize) {
@@ -537,6 +531,8 @@ void caCamera::resizeEvent(QResizeEvent *e)
             zoomValue->setText(QString::number(scale, 'f', 3));
             connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomNow()));
         }
+        imageW->setFixedWidth(e->size().width() - zoomWidget->width()-4);
+        imageW->setFixedHeight(e->size().height()- valuesWidget->height()-4);
     }
 }
 
