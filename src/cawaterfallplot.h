@@ -163,11 +163,11 @@ public:
 
     void setLimits(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
     {
-        //printf("%f %f %f %f %f %f\n", xmin, xmax, ymin, ymax, zmin, zmax);
-        setInterval( Qt::XAxis, QwtInterval( xmin, xmax ) );;
+        setInterval( Qt::XAxis, QwtInterval( xmin, xmax ) );
         setInterval( Qt::YAxis, QwtInterval( ymin, ymax) );
         setInterval( Qt::ZAxis, QwtInterval( zmin, zmax) );
     }
+
 };
 
 
@@ -211,10 +211,10 @@ public:
     void setYaxisEnabled(bool thisYshow);
 
     double getIntensityMax() const {return thisIntensityMax;}
-    void setIntensityMax(double const &newY) {thisIntensityMax = newY;}
+    void setIntensityMax(double const &newY) {thisIntensityMax = newY; firstDemoPlot=true; updatePlot();}
 
     double getIntensityMin() const {return thisIntensityMin;}
-    void setIntensityMin(double const &newY) {thisIntensityMin = newY;}
+    void setIntensityMin(double const &newY) {thisIntensityMin = newY;  firstDemoPlot=true; updatePlot();}
 
     void setIntensityScalingMax(intensityScaling s) {thisIntensityScalingMax = s;}
     intensityScaling getIntensityScalingMax() const {return thisIntensityScalingMax; }
@@ -297,6 +297,8 @@ private:
     int thisRows, thisCols, countRows;
     bool disableDemo;
     int NumberOfColumns;
+
+    bool firstMonitorPlot, firstDemoPlot, firstTimerPlot;
 
 public  Q_SLOTS:
     void TimeOut();

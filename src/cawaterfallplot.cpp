@@ -1,3 +1,4 @@
+
 /*
  *  This file is part of the caQtDM Framework, developed at the Paul Scherrer Institut,
  *  Villigen, Switzerland
@@ -157,8 +158,8 @@ caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent)
     reducedArray = (double*) malloc(ActualNumberOfColumns * sizeof(double));
 
     // initialize data
+
     m_data->initData(NumberOfColumns, getRows());
-    m_data->setLimits(0., NumberOfColumns, 0., getRows(), 0., 1000.);
     thisIntensityMin = 0;
     thisIntensityMax = 1000;
     setIntensityScalingMax(Channel);
@@ -182,8 +183,9 @@ caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent)
     setXaxisEnabled(true);
     setYaxisEnabled(true);
 
-    // define everything and plot
     updatePlot();
+
+    firstMonitorPlot = firstDemoPlot = firstTimerPlot = true;
 
     // set a timer for nice demo
 
@@ -211,14 +213,12 @@ void caWaterfallPlot::setCols(int const &cols)
 
 void caWaterfallPlot::updatePlot()
 {
-    QwtInterval zInterval = d_spectrogram->data()->interval( Qt::ZAxis );
-
     // A color bar on the right axis
     QwtScaleWidget *rightAxis = plot->axisWidget(QwtPlot::yRight);
     rightAxis->setTitle("Intensity");
     rightAxis->setColorBarEnabled(true);
-    rightAxis->setColorMap( zInterval, new ColorMap_Heat());
-    plot->setAxisScale(QwtPlot::yRight, zInterval.minValue(), zInterval.maxValue() );
+    rightAxis->setColorMap(QwtInterval(thisIntensityMin, thisIntensityMax), new ColorMap_Heat());
+    plot->setAxisScale(QwtPlot::yRight, thisIntensityMin, thisIntensityMax);
     plot->enableAxis(QwtPlot::yRight);
 
     // disble labels of left axis
@@ -228,9 +228,11 @@ void caWaterfallPlot::updatePlot()
 
     plot->plotLayout()->setAlignCanvasToScales(true);
     plot->setAxisScale(QwtPlot::xTop, 0, getCols());
+    plot->setAxisScale(QwtPlot::xBottom, 0, getCols());
     plot->setAxisMaxMinor(QwtPlot::xTop, 0);
     plot->setAxisScale(QwtPlot::yLeft, getRows(), 0.0);
     plot->setAxisMaxMinor(QwtPlot::yLeft, 0);
+
     plot->replot();
 }
 
@@ -249,8 +251,6 @@ void caWaterfallPlot::InitData(int numCols)
     ActualNumberOfColumns = m_data->initData(NumberOfColumns, getRows());
     if(ActualNumberOfColumns == 0) return;
     setCols(ActualNumberOfColumns);
-    m_data->setLimits(0., getCols(), 0., getRows(), thisIntensityMin, thisIntensityMax);
-    updatePlot();
 }
 
 void caWaterfallPlot::myReplot()
@@ -334,8 +334,18 @@ void caWaterfallPlot::setData(int32_t *array, int size)
 
 void caWaterfallPlot::displayData()
 {
-    if(thisUnits == Monitor) myReplot();
-    m_data->setLimits(0., getCols(), 0., getRows(), thisIntensityMin, thisIntensityMax);
+    // displayData will always be called, but in case of monitor will have to be executed
+    // otherwise the timer will display the data
+    if(thisUnits == Monitor) {
+        if(firstMonitorPlot) {
+            updatePlot();
+            m_data->setLimits(0., getCols(), 0., getRows(), thisIntensityMin, thisIntensityMax);
+            firstMonitorPlot = false;
+        } else {
+            myReplot();
+        }
+
+    }
 }
 
 void caWaterfallPlot::defineTimerUpdate(units unit, double period)
@@ -361,18 +371,32 @@ void caWaterfallPlot::TimeOut()
     // demo curve
     if(thisUnits != Monitor) {
         if(!disableDemo) {
+            //printf("update demo\n");
             datamutex->lock();
             GausCurv(position);
             m_data->setData(reducedArray, countRows, ActualNumberOfColumns, getRows());
+            setCols(ActualNumberOfColumns);
+
+            if(firstDemoPlot) {
+                updatePlot();
+                m_data->setLimits(0., getCols(), 0., getRows(), thisIntensityMin, thisIntensityMax);
+                firstDemoPlot = false;
+            }
+
             datamutex->unlock();
             if(drift > 0 && position >= NumberOfColumns) drift = -1;
             if(drift < 0 && position <= 0)  drift = 1;
             position += drift;
         } else {
+             //printf("update with timer\n");
             if(reducedArray != (double*) 0) {
                 datamutex->lock();
-                //printf("actualnumberofcolumns=%d\n", ActualNumberOfColumns);
                 m_data->setData(reducedArray, countRows, ActualNumberOfColumns, getRows() );
+                if(firstTimerPlot) {
+                    updatePlot();
+                    m_data->setLimits(0., getCols(), 0., getRows(), thisIntensityMin, thisIntensityMax);
+                    firstTimerPlot = false;
+                }
                 datamutex->unlock();
             }
         }
