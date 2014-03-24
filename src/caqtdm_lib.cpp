@@ -3940,7 +3940,7 @@ void CaQtDM_Lib::ComputeNumericMaxMinPrec(QWidget* widget, const knobData& data)
 {
     double maxValue = 1.0, minValue = 0.0;
     int precMode=0, limitsMode=0;
-    int width, prec, caMode;
+    int width, prec, caMode = 0;
     float maxAbsHoprLopr = 0.0;
     bool fixedFormat = false;
 
