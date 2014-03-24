@@ -532,7 +532,6 @@ void caCamera::resizeEvent(QResizeEvent *e)
 
         imageW->setFixedWidth(e->size().width() - zoomWidget->width()-4);
         imageW->setFixedHeight(e->size().height()- valuesWidget->height()-4);
-
     }
 }
 
