@@ -59,7 +59,6 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     mainLayout->setMargin(0);
     mainLayout->setSpacing(0);
     setLayout(mainLayout);
-
     setup();
 
     buttonPressed = false;
@@ -506,6 +505,7 @@ void caCamera::setWidth(int width)
 {
     m_width = width;
     m_widthDefined = true;
+
 }
 void caCamera::setHeight(int height)
 {
@@ -513,11 +513,9 @@ void caCamera::setHeight(int height)
     m_heightDefined = true;
 }
 
+
 void caCamera::resizeEvent(QResizeEvent *e)
 {
-    //imageW->setFixedWidth(e->size().width() - zoomWidget->width()-4);
-    //imageW->setFixedHeight(e->size().height()- valuesWidget->height()-4);
-
     if(m_widthDefined && m_heightDefined) {
         if(!thisFitToSize) {
             imageW->setMinimumSize((int) (m_width * scaleFactor), (int) (m_height * scaleFactor));
@@ -531,8 +529,10 @@ void caCamera::resizeEvent(QResizeEvent *e)
             zoomValue->setText(QString::number(scale, 'f', 3));
             connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomNow()));
         }
+
         imageW->setFixedWidth(e->size().width() - zoomWidget->width()-4);
         imageW->setFixedHeight(e->size().height()- valuesWidget->height()-4);
+
     }
 }
 
