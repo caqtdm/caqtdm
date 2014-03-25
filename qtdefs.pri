@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.7.4
+CAQTDM_VERSION = V3.7.5
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -9,6 +9,9 @@ unix {
     QMAKE_CXXFLAGS += "-g"
     QMAKE_CFLAGS_RELEASE += "-g"
 }
+
+# 3.7.5
+# on mac osx camera and waterfall plot were crashing; this has been corrected
 
 # 3.7.4
 # reload did not find the ui file any more when started with explicit path. corrected
