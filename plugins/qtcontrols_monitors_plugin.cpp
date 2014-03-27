@@ -344,16 +344,18 @@ QWidget *caWaterfallPlotInterface::createWidget(QWidget* parent)
 
 caWaterfallPlotInterface::caWaterfallPlotInterface(QObject* parent) : CustomWidgetInterface(parent)
 {
-        strng name[4], type[4];
+        strng name[5], type[5];
         strcpy(name[0], "channel");
         strcpy(type[0], "multiline");
-        strcpy(name[1], "Title");
-        strcpy(type[1], "multiline");
-        strcpy(name[2], "TitleX");
+        strcpy(name[1], "countNumOrChannel");
+        strcpy(type[1], "multiline");	
+        strcpy(name[2], "Title");
         strcpy(type[2], "multiline");
-        strcpy(name[3], "TitleY");
+        strcpy(name[3], "TitleX");
         strcpy(type[3], "multiline");
-        d_domXml = XmlFunc("caWaterfallPlot", "cawaterfallplot", 0, 0, 450, 200, name, type, 4);
+        strcpy(name[4], "TitleY");
+        strcpy(type[4], "multiline");
+        d_domXml = XmlFunc("caWaterfallPlot", "cawaterfallplot", 0, 0, 450, 200, name, type, 5);
         d_toolTip = "[Waterfall plot]";
 	d_name = "caWaterfallPlot";
 	d_include = "caWaterfall";

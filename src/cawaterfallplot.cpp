@@ -131,6 +131,8 @@ caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent)
 
     QHBoxLayout *hboxLayout = new QHBoxLayout(this);
 
+    thisCountNumber = 0;
+
     datamutex = new QMutex;
 
     // define a new plot
@@ -236,6 +238,31 @@ void caWaterfallPlot::updatePlot()
     plot->replot();
 }
 
+void caWaterfallPlot::setCountPV(QString const &newPV)  {
+    bool isNumber = false;
+    thisCountPV = newPV;
+    thisCountNumber=0;
+    if(thisCountPV.trimmed().length() > 0) {
+        thisCountNumber = thisCountPV.toInt(&isNumber);
+        if(!isNumber) {
+            //printf("however not a number\n");
+            thisCountNumber=0;
+        }
+    }
+}
+
+bool caWaterfallPlot::hasCountNumber(int *Number) {
+    bool isNumber = false;
+    if(thisCountPV.trimmed().length() > 0) {
+        *Number = thisCountPV.toInt(&isNumber);
+    }
+    return isNumber;
+}
+
+void caWaterfallPlot::setCountNumber(int number) {
+    thisCountNumber = number;
+}
+
 void caWaterfallPlot::InitData(int numCols)
 {
     disableDemo = true;
@@ -290,9 +317,13 @@ template <typename pureData> void caWaterfallPlot::CompressAndkeepArray(pureData
 
 void caWaterfallPlot::setData(double *array, int size)
 {
-    ActualNumberOfColumns = NumberOfColumns = size;
+    //printf("size=%d count=%d\n", size, thisCountNumber);
+    int newSize = size;
+    if(thisCountNumber > 0) newSize = qMin(thisCountNumber, size);
+
+    ActualNumberOfColumns = NumberOfColumns = newSize;
     if(thisUnits != Monitor) {
-        CompressAndkeepArray(array, size);
+        CompressAndkeepArray(array, newSize);
     } else {
         int actualColumns = m_data->setData(array, countRows, NumberOfColumns, getRows());
         setCols(actualColumns);
@@ -301,9 +332,13 @@ void caWaterfallPlot::setData(double *array, int size)
 
 void caWaterfallPlot::setData(float *array, int size)
 {
-    ActualNumberOfColumns = NumberOfColumns = size;
+    //printf("size=%d count=%d\n", size, thisCountNumber);
+    int newSize = size;
+    if(thisCountNumber > 0) newSize = qMin(thisCountNumber, size);
+
+    ActualNumberOfColumns = NumberOfColumns = newSize;
     if(thisUnits != Monitor) {
-        CompressAndkeepArray(array, size);
+        CompressAndkeepArray(array, newSize);
     } else {
         int actualColumns = m_data->setData(array, countRows, NumberOfColumns, getRows());
         setCols(actualColumns);
@@ -312,9 +347,13 @@ void caWaterfallPlot::setData(float *array, int size)
 
 void caWaterfallPlot::setData(int16_t *array, int size)
 {
-    ActualNumberOfColumns = NumberOfColumns = size;
+    //printf("size=%d count=%d\n", size, thisCountNumber);
+    int newSize = size;
+    if(thisCountNumber > 0) newSize = qMin(thisCountNumber, size);
+
+    ActualNumberOfColumns = NumberOfColumns = newSize;
     if(thisUnits != Monitor) {
-        CompressAndkeepArray(array, size);
+        CompressAndkeepArray(array, newSize);
     } else {
         int actualColumns = m_data->setData(array, countRows, NumberOfColumns, getRows());
         setCols(actualColumns);
@@ -323,9 +362,13 @@ void caWaterfallPlot::setData(int16_t *array, int size)
 
 void caWaterfallPlot::setData(int32_t *array, int size)
 {
-    ActualNumberOfColumns = NumberOfColumns = size;
+     //printf("size=%d count=%d\n", size, thisCountNumber);
+     int newSize = size;
+     if(thisCountNumber > 0) newSize = qMin(thisCountNumber, size);
+
+    ActualNumberOfColumns = NumberOfColumns = newSize;
     if(thisUnits != Monitor) {
-        CompressAndkeepArray(array, size);
+        CompressAndkeepArray(array, newSize);
     } else {
         int actualColumns = m_data->setData(array, countRows, NumberOfColumns, getRows());
         setCols(actualColumns);

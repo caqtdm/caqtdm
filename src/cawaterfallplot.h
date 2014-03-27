@@ -181,7 +181,10 @@ class QTCON_EXPORT caWaterfallPlot: public QWidget
     Q_PROPERTY(QString Title READ getTitlePlot WRITE setTitlePlot)
     Q_PROPERTY(QString TitleX READ getTitleX WRITE setTitleX)
     Q_PROPERTY(QString TitleY READ getTitleY WRITE setTitleY)
+
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
+    Q_PROPERTY(QString countNumOrChannel READ getCountPV WRITE setCountPV)
+
     Q_PROPERTY(units units READ getUnits WRITE setUnits)
     Q_PROPERTY(double period READ getPeriod WRITE setPeriod)
 
@@ -249,6 +252,14 @@ public:
     int getCols() const {return thisCols;}
     void setCols(int const &cols);
 
+    QString getCountPV() const {return thisCountPV;}
+    void setCountPV(QString const &newPV);
+    bool hasCountNumber(int *Number);
+    void setCountNumber(int number);
+
+    void setCountReceived(bool received) {thisCountReceived = received;}
+    bool getCountReceived() const {return thisCountReceived;}
+
     void InitData(int nbCols);
 
     void myReplot();
@@ -288,7 +299,7 @@ private:
 
     QString thisTitle, thisTitleX, thisTitleY;
     units thisUnits;
-    QString	 thisPV;
+    QString	 thisPV, thisCountPV;
     double thisIntensityMax, thisIntensityMin;
 
     intensityScaling thisIntensityScalingMax, thisIntensityScalingMin;
@@ -299,6 +310,9 @@ private:
     int NumberOfColumns;
 
     bool firstMonitorPlot, firstDemoPlot, firstTimerPlot;
+
+    int thisCountNumber;
+    bool thisCountReceived;
 
 public  Q_SLOTS:
     void TimeOut();
