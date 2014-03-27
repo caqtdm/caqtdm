@@ -12,6 +12,7 @@ unix {
 
 # 3.7.5
 # on mac osx camera and waterfall plot were crashing; this has been corrected
+# added a property to the waterfall plot in order to define the maximum number of points treated in the waveform
 
 # 3.7.4
 # reload did not find the ui file any more when started with explicit path. corrected
