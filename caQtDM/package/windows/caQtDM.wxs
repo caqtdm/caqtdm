@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?define CaQtDMVersion = '3.7.3.0' ?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="*" Name="caQtDM" Language="1033" Version="$(var.CaQtDMVersion)" Manufacturer="Paul Scherrer Institut" UpgradeCode="CEE4C381-28DA-478F-A7C6-3A95B4DF2A89">
+        <Package Description="caQTDM Windows Manager with Qt-Designer(4.8.2)" Comments="Displaymanager for EPICS with Qt(4.8.2)" InstallerVersion="300" Compressed="yes" Manufacturer="Paul Scherrer Institut Switzerland" Keywords="EPICS, Display, Network, Control" />
+        <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
+        <Upgrade Id="CEE4C381-28DA-478F-A7C6-3A95B4DF2A89">
+            <UpgradeVersion OnlyDetect="yes" Minimum="$(var.CaQtDMVersion)" Property="NEWERVERSIONDETECTED" IncludeMinimum="no" />
+            <UpgradeVersion OnlyDetect="no" Maximum="$(var.CaQtDMVersion)" Property="OLDERVERSIONBEINGUPGRADED" IncludeMaximum="no" />
+        </Upgrade>
+        <UIRef Id="WixUI_InstallDir" />
+        <Property Id="INSTALLDIR" Secure="yes" /> 
+        <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+        <Property Id="CAQTDM_VERSION" Value="$(var.CaQtDMVersion)" />
+        <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="NO EPICS and Firewall parameter set or changed!"/>
+        <!-- UIRef Id="WixUI_Minimal" /-->
+        <Icon Id="StartMenuIcon.exe" SourceFile="..\..\src\caQtDM.ico" />
+        <Binary Id="caQtDM.exe" SourceFile="..\..\..\caQtDM_Binaries\caQtDM.exe" />
+        <InstallExecuteSequence>
+            <CreateFolders />
+            <FileCost />
+            <RemoveExistingProducts Before="InstallInitialize" />
+        </InstallExecuteSequence>
+        <WixVariable Id="WixUILicenseRtf" Value="gplv3.rtf" />
+        <WixVariable Id="WixUIDialogBmp" Value="PSI_Background.bmp" />
+        <UI />
+        
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFilesFolder" Name="PFiles">
+                <Directory Id="INSTALLDIR" Name="caQTDM">
+                    <Directory Name="bin" Id="BIN">
+                        <Directory Name="win32-x86" Id="WIN32_X86">
+                            <Component Id="Qt_4.8.4" Guid="925E77A5-220A-4867-BD38-5F9C1C57B0E6">
+                                <File Id="QTCORE4.DLL" Name="QtCore4.dll" Source="$(env.QTHOME)\bin\QtCore4.dll" />
+                                <File Id="QTGUI4.DLL" Name="QtGui4.dll" Source="$(env.QTHOME)\bin\QtGui4.dll" />
+                                <File Id="DESIGNER.EXE" Name="designer.exe" Source="$(env.QTHOME)\bin\designer.exe" />
+                                <File Id="QTDESIGNERCOMPONENTS4.DLL_1" Name="QtDesignerComponents4.dll" Source="$(env.QTHOME)\bin\QtDesignerComponents4.dll" />
+                                <File Id="QTDESIGNER4.DLL_1" Name="QtDesigner4.dll" Source="$(env.QTHOME)\bin\QtDesigner4.dll" />
+                                <File Id="QTHELP4.DLL" Name="QtHelp4.dll" Source="$(env.QTHOME)\bin\QtHelp4.dll" />
+                                <File Id="QTCLUCENE4.DLL" Name="QtCLucene4.dll" Source="$(env.QTHOME)\bin\QtCLucene4.dll" />
+                                <File Id="QTSCRIPTTOOLS4.DLL" Name="QtScriptTools4.dll" Source="$(env.QTHOME)\bin\QtScriptTools4.dll" />
+                                <File Id="QTDECLARATIVE4.DLL" Name="QtDeclarative4.dll" Source="$(env.QTHOME)\bin\QtDeclarative4.dll" />
+                                <File Id="QTSCRIPT4.DLL" Name="QtScript4.dll" Source="$(env.QTHOME)\bin\QtScript4.dll" />
+                                <File Id="QTSVG4.DLL" Name="QtSvg4.dll" Source="$(env.QTHOME)\bin\QtSvg4.dll" />
+                                <File Id="QTMULTIMEDIA4.DLL" Name="QtMultimedia4.dll" Source="$(env.QTHOME)\bin\QtMultimedia4.dll" />
+                                <File Id="PHONON4.DLL" Name="phonon4.dll" Source="$(env.QTHOME)\bin\phonon4.dll" />
+                                <File Id="QTXMLPATTERNS4.DLL" Name="QtXmlPatterns4.dll" Source="$(env.QTHOME)\bin\QtXmlPatterns4.dll" />
+                                <File Id="QTOPENGL4.DLL" Name="QtOpenGL4.dll" Source="$(env.QTHOME)\bin\QtOpenGL4.dll" />
+                                <File Id="QTXML4.DLL" Name="QtXml4.dll" Source="$(env.QTHOME)\bin\QtXml4.dll" />
+                                <File Id="QTNETWORK4.DLL" Name="QtNetwork4.dll" Source="$(env.QTHOME)\bin\QtNetwork4.dll" />
+                                <File Id="ASSISTANT.EXE" Name="assistant.exe" Source="$(env.QTHOME)\bin\assistant.exe" />
+                            </Component>
+                            <Component Id="Epics_3.14.12.2" Guid="B7D7E8AE-F448-43F8-A68A-A35895605B8C">
+                                <File Id="CAREPEATER.EXE" Name="caRepeater.exe" Source="$(env.EPICS_BASE)\bin\win32-x86\caRepeater.exe" />
+                                <File Id="CA.DLL" Name="ca.dll" Source="$(env.EPICS_BASE)\bin\win32-x86\ca.dll" />
+                                <File Id="COM.DLL" Name="Com.dll" Source="$(env.EPICS_BASE)\bin\win32-x86\Com.dll" />
+                            </Component>
+                            <Component Id="qwt_6.0.1" Guid="6FC6A35B-B1B8-4023-AFC5-4A7FE586D79F">
+                                <File Id="QWT.DLL" Name="qwt.dll" Source="$(env.QWTHOME)\lib\qwt.dll" />
+                            </Component>
+                            <Component Id="CaQtDM" Guid="0E0D0339-624A-499A-8A5D-EFEA21AE8E6F">
+                                <File Id="CAQTDM.EXE" Name="caQtDM.exe" Source="..\..\..\caQtDM_Binaries\caQtDM.exe" />
+                                <File Id="QTCONTROLS.DLL" Name="qtcontrols.dll" Source="..\..\..\caQtDM_Binaries\qtcontrols.dll" />
+                                <File Id="CAQTDM_LIB.DLL" Name="caQtDM_Lib.dll" Source="..\..\..\caQtDM_Binaries\caQtDM_Lib.dll" />
+                                <File Id="ADL2UI.EXE" Name="adl2ui.exe" Source="..\..\..\caQtDM_Binaries\adl2ui.exe" />
+                            </Component>
+                        </Directory>
+                    </Directory>
+                    <Directory Id="PLUGINS" Name="plugins">
+                        <Directory Id="ACCESSIBLE" Name="accessible">
+                            <Component Id="accessible" Guid="B8D0F4E5-7877-481D-89B0-2893373F02E6">
+                                <File Id="QTACCESSIBLEWIDGETS4.DLL" Name="qtaccessiblewidgets4.dll" Source="$(env.QTHOME)\plugins\accessible\qtaccessiblewidgets4.dll" />
+                                <File Id="QTACCESSIBLECOMPATWIDGETS4.DLL" Name="qtaccessiblecompatwidgets4.dll" Source="$(env.QTHOME)\plugins\accessible\qtaccessiblecompatwidgets4.dll" />
+                            </Component>
+                        </Directory>
+                        <Directory Id="BEARER" Name="bearer">
+                            <Component Id="bearer" Guid="DE99AA1C-997A-4453-9795-C178EFB1009E">
+                                <File Id="QNATIVEWIFIBEARER4.DLL" Name="qnativewifibearer4.dll" Source="$(env.QTHOME)\plugins\bearer\qnativewifibearer4.dll" />
+                                <File Id="QGENERICBEARER4.DLL" Name="qgenericbearer4.dll" Source="$(env.QTHOME)\plugins\bearer\qgenericbearer4.dll" />
+                            </Component>
+                        </Directory>
+                        <Directory Id="CODECS" Name="codecs">
+                            <Component Id="codecs" Guid="F946753E-135D-4019-B00D-9900DC3622FC">
+                                <File Id="QTWCODECS4.DLL" Name="qtwcodecs4.dll" Source="$(env.QTHOME)\plugins\codecs\qtwcodecs4.dll" />
+                                <File Id="QCNCODECS4.DLL" Name="qcncodecs4.dll" Source="$(env.QTHOME)\plugins\codecs\qcncodecs4.dll" />
+                                <File Id="QJPCODECS4.DLL" Name="qjpcodecs4.dll" Source="$(env.QTHOME)\plugins\codecs\qjpcodecs4.dll" />
+                                <File Id="QKRCODECS4.DLL" Name="qkrcodecs4.dll" Source="$(env.QTHOME)\plugins\codecs\qkrcodecs4.dll" />
+                            </Component>
+                        </Directory>
+                        <Directory Id="DESIGNER" Name="designer">
+                            <Component Id="designer" Guid="C07C30FC-D521-421A-8254-771A42222C4A">
+                                <File Id="QWT_DESIGNER_PLUGIN.DLL" Name="qwt_designer_plugin.dll" Source="$(env.QWTHOME)\plugins\designer\qwt_designer_plugin.dll" />
+                                <File Id="TASKMENUEXTENSION.DLL" Name="taskmenuextension.dll" Source="$(env.QTHOME)\plugins\designer\taskmenuextension.dll" />
+                                <File Id="WORLDTIMECLOCKPLUGIN.DLL" Name="worldtimeclockplugin.dll" Source="$(env.QTHOME)\plugins\designer\worldtimeclockplugin.dll" />
+                                <File Id="ARTHURPLUGIN.DLL" Name="arthurplugin.dll" Source="$(env.QTHOME)\plugins\designer\arthurplugin.dll" />
+                                <File Id="CONTAINEREXTENSION.DLL" Name="containerextension.dll" Source="$(env.QTHOME)\plugins\designer\containerextension.dll" />
+                                <File Id="CUSTOMWIDGETPLUGIN.DLL" Name="customwidgetplugin.dll" Source="$(env.QTHOME)\plugins\designer\customwidgetplugin.dll" />
+                                <File Id="PHONONWIDGETS.DLL" Name="phononwidgets.dll" Source="$(env.QTHOME)\plugins\designer\phononwidgets.dll" />
+                                <File Id="QAXWIDGET.DLL" Name="qaxwidget.dll" Source="$(env.QTHOME)\plugins\designer\qaxwidget.dll" />
+                                <File Id="QDECLARATIVEVIEW.DLL" Name="qdeclarativeview.dll" Source="$(env.QTHOME)\plugins\designer\qdeclarativeview.dll" />
+                                <File Id="QT3SUPPORTWIDGETS.DLL" Name="qt3supportwidgets.dll" Source="$(env.QTHOME)\plugins\designer\qt3supportwidgets.dll" />
+                                <File Id="QTCONTROLS_CONTROLLERS_PLUGIN.DLL" Name="qtcontrols_controllers_plugin.dll" Source="..\..\..\caQtDM_Binaries\designer\qtcontrols_controllers_plugin.dll" />
+                                <File Id="QTCONTROLS_MONITORS_PLUGIN.DLL" Name="qtcontrols_monitors_plugin.dll" Source="..\..\..\caQtDM_Binaries\designer\qtcontrols_monitors_plugin.dll" />
+                                <File Id="QTCONTROLS_GRAPHICS_PLUGIN.DLL" Name="qtcontrols_graphics_plugin.dll" Source="..\..\..\caQtDM_Binaries\designer\qtcontrols_graphics_plugin.dll" />
+                            </Component>
+                        </Directory>
+                        <Directory Id="GRAPHICSSYSTEMS" Name="graphicssystems">
+                            <Component Id="graphicssystems" Guid="88AC787D-C835-40BD-BC9B-2B4E07DFEA2E">
+                                <File Id="QTRACEGRAPHICSSYSTEM4.DLL" Name="qtracegraphicssystem4.dll" Source="$(env.QTHOME)\plugins\graphicssystems\qtracegraphicssystem4.dll" />
+                                <File Id="QGLGRAPHICSSYSTEM4.DLL" Name="qglgraphicssystem4.dll" Source="$(env.QTHOME)\plugins\graphicssystems\qglgraphicssystem4.dll" />
+                            </Component>
+                        </Directory>
+                        <Directory Id="ICONENGINES" Name="iconengines">
+                            <Component Id="iconengines" Guid="4E558010-2DA5-4CFE-9AF9-44AB42F103A3">
+                                <File Id="QSVGICON4.DLL" Name="qsvgicon4.dll" Source="$(env.QTHOME)\plugins\iconengines\qsvgicon4.dll" />
+                            </Component>
+                        </Directory>
+                        <Directory Id="IMAGEFORMATS" Name="imageformats">
+                            <Component Id="imageformats" Guid="31664808-DE94-4A32-A44C-0E5667952DEC">
+                                <File Id="QTIFF4.DLL" Name="qtiff4.dll" Source="$(env.QTHOME)\plugins\imageformats\qtiff4.dll" />
+                                <File Id="QGIF4.DLL" Name="qgif4.dll" Source="$(env.QTHOME)\plugins\imageformats\qgif4.dll" />
+                                <File Id="QICO4.DLL" Name="qico4.dll" Source="$(env.QTHOME)\plugins\imageformats\qico4.dll" />
+                                <File Id="QJPEG4.DLL" Name="qjpeg4.dll" Source="$(env.QTHOME)\plugins\imageformats\qjpeg4.dll" />
+                                <File Id="QMNG4.DLL" Name="qmng4.dll" Source="$(env.QTHOME)\plugins\imageformats\qmng4.dll" />
+                                <File Id="QSVG4.DLL" Name="qsvg4.dll" Source="$(env.QTHOME)\plugins\imageformats\qsvg4.dll" />
+                                <File Id="QTGA4.DLL" Name="qtga4.dll" Source="$(env.QTHOME)\plugins\imageformats\qtga4.dll" />
+                            </Component>
+                        </Directory>
+                        <Directory Id="PHONON_BACKEND" Name="phonon_backend">
+                            <Component Id="phonon_backend" Guid="876C8ACA-4243-4736-9D65-808269D32F82">
+                                <File Id="PHONON_DS94.DLL" Name="phonon_ds94.dll" Source="$(env.QTHOME)\plugins\phonon_backend\phonon_ds94.dll" />
+                            </Component>
+                        </Directory>
+                        <Directory Id="QMLTOOLING" Name="qmltooling">
+                            <Component Id="qmltooling" Guid="DC8BD59F-22E0-4244-840A-66F1B3945B69">
+                                <File Id="QMLDBG_TCP4.DLL" Name="qmldbg_tcp4.dll" Source="$(env.QTHOME)\plugins\qmltooling\qmldbg_tcp4.dll" />
+                                <File Id="QMLDBG_INSPECTOR4.DLL" Name="qmldbg_inspector4.dll" Source="$(env.QTHOME)\plugins\qmltooling\qmldbg_inspector4.dll" />
+                            </Component>
+                        </Directory>
+                        <Directory Id="SQLDRIVERS" Name="sqldrivers">
+                            <Component Id="sqldrivers" Guid="90DE98B5-F308-41B0-9C01-72DE14F127FF">
+                                <File Id="QSQLITE4.DLL" Name="qsqlite4.dll" Source="$(env.QTHOME)\plugins\sqldrivers\qsqlite4.dll" />
+                            </Component>
+                        </Directory>
+                    </Directory>
+                    <Directory Id="StyleSheet" Name="StyleSheet">
+                        <Component Id="Stylesheet" Guid="6D848A8A-210B-4246-B86E-819E0C51AEFE">
+                            <File Id="STYLESHEET.QSS" Name="stylesheet.qss" Source="..\..\parser\stylesheet.qss" />
+                        </Component>
+                    </Directory>
+                </Directory>
+                <Merge Id="VCRedist" Language="0" SourceFile="C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC100_CRT_x86.msm" DiskId="1" />
+            </Directory>
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="ProgramMenuDir" Name="caQtDM">
+                    <Component Id="StartMenuShortcuts" Guid="3DB7C20F-EA04-40D1-BF31-3ADDB310127F">
+                        <RemoveFolder Id="ProgramMenuDir" On="uninstall" />
+                        <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Type="string" Value="" />
+                        <Shortcut Id="UninstallProduct" Name="Uninstall" Description="Uninstalls the application" Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" />
+                        <Shortcut Id="CaQtDM_ShortCut" Name="CaQtDM" Target="[INSTALLDIR]bin\win32-x86\caQtDM.exe" Arguments=" -style plastique">
+                        </Shortcut>
+                        <Shortcut Id="Designer_Shortcut" Name="Designer" Target="[INSTALLDIR]bin\win32-x86\designer.exe" />
+                    </Component>
+                </Directory>
+            </Directory>
+            <Component Id="Environment" Guid="C071FF0B-D353-4DA0-9C0F-D07FC5FF2CFE">
+                <Environment Id="QT_PLUGIN_PATH" Action="set" Name="QT_PLUGIN_PATH" Part="last" Permanent="no" Value="[INSTALLDIR]plugins" System="yes" />
+                <Environment Id="PATH" Name="PATH" Part="last" Permanent="no" Action="set" Value="[INSTALLDIR]bin\win32-x86\" System="yes" Separator=";" />
+                <Environment Id="CAQTDM_DISPLAY_PATH" Name="CAQTDM_DISPLAY_PATH" Action="set" Permanent="no" System="yes" Value="[INSTALLDIR]StyleSheet" />
+            </Component>
+        </Directory>
+        <Feature Id="DefaultFeature" Title="Main Feature" Level="1" ConfigurableDirectory="INSTALLDIR">
+            <ComponentRef Id="Qt_4.8.4" />
+            <ComponentRef Id="Epics_3.14.12.2" />
+            <ComponentRef Id="qwt_6.0.1" />
+            <ComponentRef Id="CaQtDM" />
+            <ComponentRef Id="accessible" />
+            <ComponentRef Id="bearer" />
+            <ComponentRef Id="codecs" />
+            <ComponentRef Id="designer" />
+            <ComponentRef Id="graphicssystems" />
+            <ComponentRef Id="iconengines" />
+            <ComponentRef Id="imageformats" />
+            <ComponentRef Id="phonon_backend" />
+            <ComponentRef Id="qmltooling" />
+            <ComponentRef Id="sqldrivers" />
+            <ComponentRef Id="StartMenuShortcuts" />
+            <ComponentRef Id="Environment" />
+            <ComponentRef Id="Stylesheet" />
+        </Feature>
+        <Feature Id="VCRedist" Level="1" Title="Visual C++ 10.0 Runtime" AllowAdvertise="no" Display="hidden">
+            <MergeRef Id="VCRedist" />
+        </Feature>
+    </Product>
+</Wix>

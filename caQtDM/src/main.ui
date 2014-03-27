@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>493</width>
+    <height>144</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>493</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuMenu">
+    <property name="title">
+     <string>Menu</string>
+    </property>
+    <addaction name="fileAction"/>
+    <addaction name="separator"/>
+    <addaction name="separator"/>
+    <addaction name="reloadAction"/>
+    <addaction name="exitAction"/>
+    <addaction name="separator"/>
+    <addaction name="separator"/>
+    <addaction name="aboutAction"/>
+   </widget>
+   <widget class="QMenu" name="menuPV">
+    <property name="title">
+     <string>PV</string>
+    </property>
+    <addaction name="unconnectedAction"/>
+   </widget>
+   <widget class="QMenu" name="menuUpdateType">
+    <property name="title">
+     <string>UpdateType</string>
+    </property>
+    <addaction name="directAction"/>
+    <addaction name="timedAction"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="helpAction"/>
+   </widget>
+   <addaction name="menuMenu"/>
+   <addaction name="menuPV"/>
+   <addaction name="menuUpdateType"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <action name="exitAction">
+   <property name="text">
+    <string>&amp;Exit</string>
+   </property>
+  </action>
+  <action name="reloadAction">
+   <property name="text">
+    <string>&amp;Reload</string>
+   </property>
+  </action>
+  <action name="unconnectedAction">
+   <property name="text">
+    <string>&amp;Unconnected</string>
+   </property>
+   <property name="iconText">
+    <string>Unconnected PV's</string>
+   </property>
+   <property name="toolTip">
+    <string>Unconnected PV's</string>
+   </property>
+  </action>
+  <action name="fileAction">
+   <property name="text">
+    <string>Open &amp;File</string>
+   </property>
+   <property name="toolTip">
+    <string>Open File</string>
+   </property>
+  </action>
+  <action name="aboutAction">
+   <property name="text">
+    <string>&amp;About</string>
+   </property>
+  </action>
+  <action name="directAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Direct</string>
+   </property>
+  </action>
+  <action name="timedAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Timed</string>
+   </property>
+  </action>
+  <action name="helpAction">
+   <property name="text">
+    <string>Contents</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
