@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <QtHelpProject version="1.0">
+     <namespace>caQtDM</namespace>
+     <virtualFolder>doc</virtualFolder>
+          <customFilter name="caQtDM 1.0">
+         <filterAttribute>caQtDM</filterAttribute>
+         <filterAttribute>1.0</filterAttribute>
+     </customFilter>
+     <filterSection>
+         <filterAttribute>caQtDM</filterAttribute>
+         <filterAttribute>1.0</filterAttribute>
+         <toc>
+             <section title="caQtDM Manual" ref="index.html">
+		  <section title="Contents" ref="caQtDM.html#contents"/>
+		  <section title="This Manual" ref="caQtDM.html#manual"/>
+		  <section title="Introduction" ref="caQtDM.html#introduction"/>
+		  <section title="Editor: Qt designer" ref="caQtDM.html#designer"/>
+		  <section title="Installation" ref="caQtDM.html#installation"/>
+		  <section title="Development History" ref="caQtDM.html#development"/>
+		  
+                  <section title="caQtDM Custom Widgets" ref="caQtDM.html#widgets">
+		     <section title="Monitoring Objects" ref="caQtDM.html#monitors">  
+		
+			<section title="caLineEdit" ref="caQtDM.html#caLineEdit"/>
+			<section title="caThermo" ref="caQtDM.html#caThermo"/>
+			<section title="caLed" ref="caQtDM.html#caLed"/>
+			<section title="caLinearGauge" ref="caQtDM.html#caLinearGauge"/>
+			<section title="caCircularGauge" ref="caQtDM.html#caCircularGauge"/>
+			<section title="caCartesianPlot" ref="caQtDM.html#caCartesianPlot"/>
+			<section title="caStripPlot" ref="caQtDM.html#caStripPlot"/>
+			<section title="caByte" ref="caQtDM.html#caByte"/>
+			<section title="caTable" ref="caQtDM.html#caTable"/>
+			<section title="caCamera" ref="caQtDM.html#caCamera"/>
+			<section title="caCalc" ref="caQtDM.html#caCalc"/>
+			<section title="caWaterfallPlot" ref="caQtDM.html#caWaterfallPlot"/>                 
+		    </section>
+		    
+		    <section title="Graphical Objects" ref="caQtDM.html#monitors">  
+		
+			<section title="caGraphics" ref="caQtDM.html#caGraphics"/>
+			<section title="caPolyLine" ref="caQtDM.html#caPolyLine"/>
+			<section title="caLabel" ref="caQtDM.html#caLabel"/>
+			<section title="caFrame" ref="caQtDM.html#caFrame"/>
+			<section title="caImage" ref="caQtDM.html#caImage"/>
+			<section title="caCartesianPlot" ref="caQtDM.html#caCartesianPlot"/>
+			<section title="caInclude" ref="caQtDM.html#caInclude"/>                
+		    </section>
+		    
+		    <section title="Controlling Objects" ref="caQtDM.html#monitors">  
+		
+			<section title="caChoice" ref="caQtDM.html#caChoice"/>
+			<section title="caMenu" ref="caQtDM.html#caMenu"/>
+			<section title="caMessageButton" ref="caQtDM.html#caMessageButton"/>
+			<section title="caRelatedDisplay" ref="caQtDM.html#caRelatedDisplay"/>
+			<section title="caShellCommand" ref="caQtDM.html#caShellCommand"/>
+			<section title="caSlider" ref="caQtDM.html#caSlider"/>
+			<section title="caTextEntry" ref="caQtDM.html#caTextEntry"/>
+			<section title="caNumeric" ref="caQtDM.html#caNumeric"/>
+			<section title="caApplyNumeric" ref="caQtDM.html#caApplyNumeric"/>
+			<section title="caToggleButton" ref="caQtDM.html#caToggleButton"/>
+			<section title="caScriptButton" ref="caQtDM.html#caScriptButton"/>
+			<section title="caSpinBox" ref="caQtDM.html#caSpinBox"/>                 
+		    </section>
+		    
+		</section>
+		
+		<section title="Requirements" ref="caQtDM.html#requirements"/>
+		<section title="Command Line Options" ref="caQtDM.html#commandline"/>
+		<section title="Description Files" ref="caQtDM.html#files"/>
+		<section title="Connection Problems" ref="caQtDM.html#connection"/>
+		<section title="Fonts" ref="caQtDM.html#fonts"/>
+		<section title="General Properties" ref="caQtDM.html#properties">
+		   <section title="Geometry" ref="caQtDM.html#geometry"/>
+		   <section title="Visibility" ref="caQtDM.html#visibility"/>
+		   <section title="Direction" ref="caQtDM.html#direction"/>
+		   <section title="Label" ref="caQtDM.html#label"/>
+		   <section title="Text Align" ref="caQtDM.html#textalign"/>
+		   <section title="Text Format" ref="caQtDM.html#textformat"/>
+		</section>
+		<section title="CALC Expressions" ref="caQtDM.html#calcexpressions"/>
+		<section title="Macro Substitution" ref="caQtDM.html#macrosubstitution"/>
+		<section title="Drag-And-Drop" ref="caQtDM.html#draganddrop"/>
+		<section title="MainWindow" ref="caQtDM.html#mainwindow"/>
+		<section title="Context Menu" ref="caQtDM.html#contextmenu"/>
+	        <section title="Context Menu Customization" ref="caQtDM.html#contextcustomize"/>
+		<section title="Help" ref="caQtDM.html#help"/>
+		<section title="Resizing" ref="caQtDM.html#resizing"/>
+		<section title="Printing" ref="caQtDM.html#printing"/>
+		<section title="Environment Variables" ref="caQtDM.html#environmentvariables"/>
+             </section>
+         </toc>
+         <keywords>
+	      <keyword name="widgets" ref="caQtDM.html#widgets"/>
+             
+	      <keyword name="caLineEdit" id="caLineEdit" ref="caQtDM.html#caLineEdit"/>
+	      <keyword name="caThermo" id="caThermo" ref="caQtDM.html#caThermo"/>
+	      <keyword name="caLed" id="caLed" ref="caQtDM.html#caLed"/>
+	      <keyword name="caLinearGauge" id="caLinearGauge" ref="caQtDM.html#caLinearGauge"/>
+	      <keyword name="caCircularGauge" id="caCircularGauge" ref="caQtDM.html#caCircularGauge"/>
+	      <keyword name="caCartesianPlot" id="caCartesianPlot" ref="caQtDM.html#caCartesianPlot"/>
+	      <keyword name="caStripPlot" id="caStripPlot" ref="caQtDM.html#caStripPlot"/>
+	      <keyword name="caByte" id="caByte" ref="caQtDM.html#caByte"/>
+	      <keyword name="caTable" id="caTable" ref="caQtDM.html#caTable"/>
+	      <keyword name="caCamera" id="caCamera" ref="caQtDM.html#caCamera"/>
+	      <keyword name="caCalc" id="caCalc" ref="caQtDM.html#caCalc"/>
+	      <keyword name="caWaterfallPlot" id="caWaterfallPlot" ref="caQtDM.html#caWaterfallPlot"/>
+ 
+	      <keyword name="caQtDM monitors" ref="caQtDM.html#monitors"/>
+	      <keyword name="caQtDM controllers" ref="caQtDM.html#controllers"/>
+	      <keyword name="caQtDM graphics" ref="caQtDM.html#graphics"/>
+         </keywords>
+         <files>
+             <file>classic.css</file>
+             <file>caQtDM.html</file>
+         </files>
+     </filterSection>
+</QtHelpProject>

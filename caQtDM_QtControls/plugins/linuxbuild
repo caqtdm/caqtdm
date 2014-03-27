@@ -1,0 +1,18 @@
+qmake plugins.pro CONFIG+=configA
+make clean
+qmake plugins.pro CONFIG+=configA
+make
+
+qmake plugins.pro CONFIG+=configB
+make clean
+qmake plugins.pro CONFIG+=configB
+make
+
+qmake plugins.pro CONFIG+=configC
+make clean
+qmake plugins.pro CONFIG+=configC
+make
+
+# I made a link from /usr/local/Trolltech/SL5-x86/Qt-4.8.2/plugins/designer to here
+#scp libqtcontrols*.so root@pc2401:/usr/local/Trolltech/Qt-4.8.2/plugins/designer/
+
