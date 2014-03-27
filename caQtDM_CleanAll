@@ -1,0 +1,33 @@
+#!/bin/bash
+
+source caQtDM_Env
+
+echo package will be removed from ./caQtDM_Binaries and all directories will be cleaned up
+
+read -p "Press [Enter] key to start cleanup "
+
+echo ========== remove binaries from directories ============
+if [ -d "./caQtDM_Binaries" ]; then
+rm -rf ./caQtDM_Binaries/*
+fi
+
+echo ========== remove makefiles from directories ============
+rm -f Makefile
+rm -f ./caQtDM/Makefile
+rm -f ./caQtDM/caQtDM1/Makefile
+rm -f ./caQtDM/caQtDM2/Makefile
+rm -f ./caQtDM/parser/Makefile
+rm -f ./caQtDM_Lib/Makefile
+rm -f ./caQtDM_Lib/caQtDM_Lib1/Makefile
+rm -f ./caQtDM_Lib/caQtDM_Lib2/Makefile
+rm -f ./caQtDM_QtControls/Makefile
+rm -f ./caQtDM_QtControls/plugins/Makefile
+rm -f ./caQtDM_Lib/*.so
+rm -f ./caQtDM_QtControls/*.so
+rm -f ./caQtDM_QtControls/plugins/*.so
+
+echo =========== clean all ==================
+qmake all.pro
+make distclean
+
+

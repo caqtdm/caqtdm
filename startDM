@@ -1,0 +1,10 @@
+#!/bin/sh
+echo
+echo caQtDM must be in path and QT_PLUGIN_PATH must be defined correctly
+echo stylesheets and ui files should be located in CAQTDM_DISPLAY_PATH where you will 
+echo save your ui files. You can copy them from caQTDM_Tests
+echo
+echo see also caQtDM switches for options
+echo
+
+caQtDM -style plastique $*&

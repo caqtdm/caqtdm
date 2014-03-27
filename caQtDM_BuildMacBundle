@@ -1,0 +1,30 @@
+#!/bin/bash
+
+source caQtDM_Env
+
+echo
+echo ========== Collect Files for Mac Bundle ============
+echo
+chmod 755 ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libca.3.14.12.dylib
+chmod 755 ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libCom.3.14.12.dylib
+install_name_tool -change libqtcontrols_controllers_plugin.dylib @executable_path/../PlugIns/designer/libqtcontrols_controllers_plugin.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_controllers_plugin.dylib  
+install_name_tool -change libqtcontrols_graphics_plugin.dylib @executable_path/../PlugIns/designer/libqtcontrols_graphics_plugin.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_graphics_plugin.dylib
+install_name_tool -change libqtcontrols_monitors_plugin.dylib @executable_path/../PlugIns/designer/libqtcontrols_monitors_plugin.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_monitors_plugin.dylib
+
+macdeployqt ./caQtDM_Binaries/caQtDM.app
+
+install_name_tool -id @executable_path/../Frameworks/libca.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libca.3.14.12.dylib
+install_name_tool -id @executable_path/../Frameworks/libCom.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libCom.3.14.12.dylib
+
+install_name_tool -change "/Users/helge/Documents/Entwicklung/epics/base-3.14.12.4/lib/darwin-x86/libCom.3.14.12.dylib" @executable_path/../Frameworks/libCom.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libca.3.14.12.dylib
+
+
+
+install_name_tool -change libca.3.14.12.dylib @executable_path/../Frameworks/libca.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQTDM_Lib.dylib
+
+install_name_tool -change "/Users/helge/Documents/Entwicklung/epics/base-3.14.12.4/lib/darwin-x86/libCom.3.14.12.dylib" "@executable_path/../Frameworks/libCom.3.14.12.dylib" ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
+install_name_tool -change "/Users/helge/Documents/Entwicklung/epics/base-3.14.12.4/lib/darwin-x86/libca.3.14.12.dylib" "@executable_path/../Frameworks/libca.3.14.12.dylib" ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
+
+cd caQtDM_Binaries
+macdeployqt caQtDM.app -dmg
+cd ..

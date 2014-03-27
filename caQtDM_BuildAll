@@ -1,0 +1,35 @@
+#!/bin/bash
+
+source caQtDM_Env
+
+echo
+echo ========== create destination directory if not exists============
+echo
+
+if [ -d "./caQtDM_Binaries" ]; then
+echo directory ./caQtDM_Binaries exists already
+else
+echo create directory ./caQtDM_Binaries
+mkdir -p ./caQtDM_Binaries
+fi
+
+if [ -d "./caQtDM_Binaries/designer" ]; then
+echo directory ./caQtDM_Binaries/designer exists already
+else
+echo create directory ./caQtDM_Binaries/designer
+mkdir -p ./caQtDM_Binaries/designer
+fi
+
+echo package will be build in ./caQtDM_Binaries
+echo
+read -p "Press [Enter] key to start build "
+
+echo ============ make all =================
+qmake all.pro
+make
+
+echo =========== build plugins =============
+cd caQtDM_QtControls/plugins/
+./linuxbuild;
+cd ..; cd ..
+

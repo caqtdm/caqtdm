@@ -1,0 +1,4 @@
+#!/bin/bash
+caQtDM_CleanAll
+
+tar cvf QtDM_Package.tar all.pro COPYING caQtDM_README caQtDM_BuildAll caQtDM_CleanAll caQtDM_Env caQtDM_Install caQtDM caQtDM_Lib caQtDM_QtControls caQtDM_Tests qtdesigner startDM startDM_Local  --exclude='parser/*Files' --exclude='CVS' --exclude='.__afs*'
