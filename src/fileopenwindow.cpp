@@ -84,8 +84,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     userClose = false;
     printandexit = printscreen;
     allowResize = resizing;
-
-    if(minimize) showMinimized ();
+    minimizeMessageWindow = minimize;
 
     // set window title without the whole path
     QString title("caQtDM ");
@@ -213,6 +212,11 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
     if(mustOpenFile) {
         mustOpenFile = false;
         Callback_OpenNewFile(lastFile, lastMacro, lastGeometry);
+    }
+
+    if(minimizeMessageWindow) {
+        minimizeMessageWindow = false;
+        showMinimized ();
     }
 
     asc[0] = '\0';

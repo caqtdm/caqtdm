@@ -107,6 +107,7 @@ signals:
 
      bool printandexit;
      bool allowResize;
+     bool minimizeMessageWindow;
  };
 
  #endif
