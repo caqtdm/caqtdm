@@ -1,0 +1,5 @@
+export IOC=$HOSTNAME-sioc
+# -s is to get epics prompt (interactive ?!?)
+iocsh mySimulation.db
+
+

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="caSlider" name="caslider">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>50</y>
+      <width>81</width>
+      <height>321</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>19</pointsize>
+     </font>
+    </property>
+    <property name="scalePosition">
+     <enum>QwtSlider::LeftScale</enum>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">QTDM:TEST:AO</string>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>20</red>
+      <green>19</green>
+      <blue>18</blue>
+     </color>
+    </property>
+    <property name="background">
+     <color>
+      <red>224</red>
+      <green>223</green>
+      <blue>222</blue>
+     </color>
+    </property>
+    <property name="colorMode">
+     <enum>caSlider::Default</enum>
+    </property>
+   </widget>
+   <widget class="caSlider" name="caslider_2">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>190</y>
+      <width>331</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>18</pointsize>
+     </font>
+    </property>
+    <property name="scalePosition">
+     <enum>QwtSlider::TopScale</enum>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">QTDM:TEST:AO</string>
+    </property>
+    <property name="direction">
+     <enum>caSlider::Right</enum>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>20</red>
+      <green>19</green>
+      <blue>18</blue>
+     </color>
+    </property>
+    <property name="background">
+     <color>
+      <red>224</red>
+      <green>223</green>
+      <blue>222</blue>
+     </color>
+    </property>
+    <property name="colorMode">
+     <enum>caSlider::Default</enum>
+    </property>
+   </widget>
+   <widget class="caSlider" name="caslider_3">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>50</y>
+      <width>61</width>
+      <height>441</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>13</pointsize>
+     </font>
+    </property>
+    <property name="scalePosition">
+     <enum>QwtSlider::NoScale</enum>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">QTDM:TEST:AO</string>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>20</red>
+      <green>19</green>
+      <blue>18</blue>
+     </color>
+    </property>
+    <property name="background">
+     <color>
+      <red>224</red>
+      <green>223</green>
+      <blue>222</blue>
+     </color>
+    </property>
+    <property name="colorMode">
+     <enum>caSlider::Default</enum>
+    </property>
+   </widget>
+   <widget class="caSlider" name="caslider_4">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>350</y>
+      <width>391</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>17</pointsize>
+     </font>
+    </property>
+    <property name="scalePosition">
+     <enum>QwtSlider::NoScale</enum>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">QTDM:TEST:AO</string>
+    </property>
+    <property name="direction">
+     <enum>caSlider::Right</enum>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>20</red>
+      <green>19</green>
+      <blue>18</blue>
+     </color>
+    </property>
+    <property name="background">
+     <color>
+      <red>224</red>
+      <green>223</green>
+      <blue>222</blue>
+     </color>
+    </property>
+    <property name="colorMode">
+     <enum>caSlider::Default</enum>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>24</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caSlider</class>
+   <extends>QWidget</extends>
+   <header>caSlider</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
