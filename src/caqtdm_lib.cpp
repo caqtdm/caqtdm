@@ -1294,9 +1294,40 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //qDebug() << "create caWaterfallPlot";
 
-        QString thisString = widget->getPV();
-        addMonitor(myWidget, &kData, thisString, w1, specData, map, &pv);
+       QString countChannel, waveChannel;
+
+         // addmonitor normally will add a tooltip to show the pv; however here we have more than one pv
+        QString tooltip;
+        tooltip.append(ToolTipPrefix);
+
+        // handle count channel if any
+        int Number;
+        specData[1] = 0; // Count must not be waited for
+        if(!widget->hasCountNumber(&Number)) {
+            countChannel = widget->getCountPV();
+            if(countChannel.trimmed().length() > 0) {
+                specData[0] = 1; // Count
+                specData[1] = 1; // Count must be waited for
+                addMonitor(myWidget, &kData, countChannel, w1, specData, map, &pv);
+                tooltip.append(pv);
+                tooltip.append("<br>");
+                widget->setCountPV(pv);
+            }
+        } else {
+            //qDebug() << "count=" << Number;
+        }
+
+        waveChannel = widget->getPV();
+        specData[0] = 0; // waveform
+        addMonitor(myWidget, &kData, waveChannel, w1, specData, map, &pv);
         widget->setPV(pv);
+        tooltip.append(pv);
+        tooltip.append("<br>");
+
+        // finish tooltip
+        tooltip.append(ToolTipPostfix);
+        widget->setToolTip(tooltip);
+
         widget->setProperty("Taken", true);
 
         //==================================================================================================================
@@ -2369,7 +2400,16 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
     } else if (caWaterfallPlot *widget = qobject_cast<caWaterfallPlot *>(w)) {
         //qDebug() << "caWaterfallPlot" << widget->objectName() << data.pv;
 
+        int pvType = data.specData[0];      // waveform=0; Count=1
+        int countRequested = data.specData[1];
+
         if(data.edata.connected) {
+
+            if(pvType == 1) {
+                 //qDebug() << "count channel" << data.edata.rvalue << (int) (data.edata.rvalue + 0.5);
+                 if(data.edata.rvalue >= 0.5) widget->setCountNumber((int) (data.edata.rvalue + 0.5));
+                 widget->setCountReceived(true);
+            } else if(widget->getCountReceived() || !countRequested) {
 
             // scale first time on first curve
             if(data.edata.initialize) {
@@ -2407,6 +2447,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 double p = data.edata.rvalue;
                 widget->setData(&p, 1);
                 widget->displayData();
+            }
             }
 
             // not connected
@@ -3388,8 +3429,10 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             pv[i] = vars.at(i).trimmed();
         }
     } else if(caWaterfallPlot* widget = qobject_cast<caWaterfallPlot *>(w)) {
-        pv[0] = widget->getPV().trimmed();
-        nbPV = 1;
+        nbPV = 0;
+        pv[nbPV++] = widget->getPV().trimmed();
+        QString CountPV = widget->getCountPV();
+        if(CountPV.trimmed().length() > 0) pv[nbPV++] = CountPV.trimmed();
     } else if(caCartesianPlot* widget = qobject_cast<caCartesianPlot *>(w)) {
         nbPV = 0;
         for(int i=0; i < caCartesianPlot::curveCount; i++) {
