@@ -36,7 +36,7 @@ qmake all.pro
 nmake all
 
 echo =========== build parser =============
-cd .\caQtDM\parser
+cd .\caQtDM_Viewer\parser
 qmake parser.pro
 nmake all
 cd ..\..
