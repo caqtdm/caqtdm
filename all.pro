@@ -30,7 +30,7 @@ error("Use at least Qt 4.6.")
 }
 
 TEMPLATE = subdirs
-SUBDIRS = caQtDM_QtControls caQtDM_Lib caQtDM 
+SUBDIRS = caQtDM_QtControls caQtDM_Lib caQtDM_Viewer 
 win32{
  CONFIG(debug, debug | release) 
 }
