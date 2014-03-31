@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.7.5
+CAQTDM_VERSION = V3.7.6
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -10,9 +10,13 @@ unix {
     QMAKE_CFLAGS_RELEASE += "-g"
 }
 
-# 3.7.5
-# on mac osx camera and waterfall plot were crashing; this has been corrected
+
+# 3.7.6
 # added a property to the waterfall plot in order to define the maximum number of points treated in the waveform
+
+# 3.7.5
+
+# on mac osx camera and waterfall plot were crashing; this has been corrected
 
 # 3.7.4
 # reload did not find the ui file any more when started with explicit path. corrected
