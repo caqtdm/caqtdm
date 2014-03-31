@@ -290,19 +290,23 @@ void caWaterfallPlot::myReplot()
 #endif
 }
 
-template <typename pureData> void caWaterfallPlot::AverageArray(pureData *vec, int size, double *avg, int ratio)
+template <typename pureData> void caWaterfallPlot::AverageArray(pureData *vec, int size, int arraySize, double *avg, int ratio)
 {
     int AverageCounter = 0;
     for (int i=0; i<size-ratio; i+=ratio) {
         double mean = 0;
         for(int j=0; j<ratio; j++) {
-            mean += vec[i+j];
+            if((i+j) >= arraySize) {
+                break;
+            } else {
+               mean += vec[i+j];
+            }
         }
         avg[AverageCounter++]= mean / (double) ratio;
     }
 }
 
-template <typename pureData> void caWaterfallPlot::CompressAndkeepArray(pureData *vec, int size)
+template <typename pureData> void caWaterfallPlot::CompressAndkeepArray(pureData *vec, int size, int arraySize)
 {
     datamutex->lock();
     int ratio = m_data->getRatio(NumberOfColumns, ActualNumberOfColumns);
@@ -311,7 +315,7 @@ template <typename pureData> void caWaterfallPlot::CompressAndkeepArray(pureData
         reducedArray = (double *) 0;
     }
     reducedArray = (double*) malloc(ActualNumberOfColumns * sizeof(double));
-    AverageArray(vec, size, reducedArray, ratio);
+    AverageArray(vec, size, arraySize, reducedArray, ratio);
     datamutex->unlock();
 }
 
@@ -319,13 +323,20 @@ void caWaterfallPlot::setData(double *array, int size)
 {
     //printf("size=%d count=%d\n", size, thisCountNumber);
     int newSize = size;
-    if(thisCountNumber > 0) newSize = qMin(thisCountNumber, size);
+
+    if(thisCountNumber > 0) {
+        newSize = thisCountNumber;
+    } else {
+        newSize = thisCountNumber = size;
+    }
+
+    //if(thisCountNumber > 0) newSize = qMin(thisCountNumber, size);
 
     ActualNumberOfColumns = NumberOfColumns = newSize;
     if(thisUnits != Monitor) {
-        CompressAndkeepArray(array, newSize);
+        CompressAndkeepArray(array, newSize, size);
     } else {
-        int actualColumns = m_data->setData(array, countRows, NumberOfColumns, getRows());
+        int actualColumns = m_data->setData(array, countRows, NumberOfColumns, getRows(), size);
         setCols(actualColumns);
     }
 }
@@ -334,13 +345,20 @@ void caWaterfallPlot::setData(float *array, int size)
 {
     //printf("size=%d count=%d\n", size, thisCountNumber);
     int newSize = size;
-    if(thisCountNumber > 0) newSize = qMin(thisCountNumber, size);
+
+    if(thisCountNumber > 0) {
+        newSize = thisCountNumber;
+    } else {
+        newSize = thisCountNumber = size;
+    }
+
+    //if(thisCountNumber > 0) newSize = qMin(thisCountNumber, size);
 
     ActualNumberOfColumns = NumberOfColumns = newSize;
     if(thisUnits != Monitor) {
-        CompressAndkeepArray(array, newSize);
+        CompressAndkeepArray(array, newSize, size);
     } else {
-        int actualColumns = m_data->setData(array, countRows, NumberOfColumns, getRows());
+        int actualColumns = m_data->setData(array, countRows, NumberOfColumns, getRows(), size);
         setCols(actualColumns);
     }
 }
@@ -349,13 +367,20 @@ void caWaterfallPlot::setData(int16_t *array, int size)
 {
     //printf("size=%d count=%d\n", size, thisCountNumber);
     int newSize = size;
-    if(thisCountNumber > 0) newSize = qMin(thisCountNumber, size);
+
+    if(thisCountNumber > 0) {
+        newSize = thisCountNumber;
+    } else {
+        newSize = thisCountNumber = size;
+    }
+
+    //if(thisCountNumber > 0) newSize = qMin(thisCountNumber, size);
 
     ActualNumberOfColumns = NumberOfColumns = newSize;
     if(thisUnits != Monitor) {
-        CompressAndkeepArray(array, newSize);
+        CompressAndkeepArray(array, newSize, size);
     } else {
-        int actualColumns = m_data->setData(array, countRows, NumberOfColumns, getRows());
+        int actualColumns = m_data->setData(array, countRows, NumberOfColumns, getRows(), size);
         setCols(actualColumns);
     }
 }
@@ -364,13 +389,20 @@ void caWaterfallPlot::setData(int32_t *array, int size)
 {
      //printf("size=%d count=%d\n", size, thisCountNumber);
      int newSize = size;
-     if(thisCountNumber > 0) newSize = qMin(thisCountNumber, size);
+
+     if(thisCountNumber > 0) {
+         newSize = thisCountNumber;
+     } else {
+         newSize = thisCountNumber = size;
+     }
+
+     //if(thisCountNumber > 0) newSize = qMin(thisCountNumber, size);
 
     ActualNumberOfColumns = NumberOfColumns = newSize;
     if(thisUnits != Monitor) {
-        CompressAndkeepArray(array, newSize);
+        CompressAndkeepArray(array, newSize, size);
     } else {
-        int actualColumns = m_data->setData(array, countRows, NumberOfColumns, getRows());
+        int actualColumns = m_data->setData(array, countRows, NumberOfColumns, getRows(), size);
         setCols(actualColumns);
     }
 }
@@ -417,7 +449,7 @@ void caWaterfallPlot::TimeOut()
             //printf("update demo\n");
             datamutex->lock();
             GausCurv(position);
-            m_data->setData(reducedArray, countRows, ActualNumberOfColumns, getRows());
+            m_data->setData(reducedArray, countRows, ActualNumberOfColumns, getRows(), ActualNumberOfColumns);
             setCols(ActualNumberOfColumns);
 
             if(firstDemoPlot) {
@@ -434,7 +466,7 @@ void caWaterfallPlot::TimeOut()
              //printf("update with timer\n");
             if(reducedArray != (double*) 0) {
                 datamutex->lock();
-                m_data->setData(reducedArray, countRows, ActualNumberOfColumns, getRows() );
+                m_data->setData(reducedArray, countRows, ActualNumberOfColumns, getRows(),  ActualNumberOfColumns);
                 if(firstTimerPlot) {
                     updatePlot();
                     m_data->setLimits(0., getCols(), 0., getRows(), thisIntensityMin, thisIntensityMax);
