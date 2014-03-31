@@ -67,6 +67,23 @@ echo
 install_name_tool -change libqtcontrols.dylib @executable_path/../Frameworks/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_monitors_plugin.dylib
 install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_monitors_plugin.dylib
 
+echo
+echo ========== mkdir Applications ============
+echo
+
+mkdir ./caQtDM_Binaries/caQtDM.app/Contents/Applications
+
+echo
+echo ========== add designer.app ============
+echo
+
+cp -R ${QTHOME}/bin/Designer.app ./caQtDM_Binaries/caQtDM.app/Contents/Applications
+
+echo
+echo ========== add adl2ui.app ============
+echo
+
+cp -R ./caQtDM_Binaries/adl2ui.app ./caQtDM_Binaries/caQtDM.app/Contents/Applications
 
 cd caQtDM_Binaries
 macdeployqt caQtDM.app -dmg
