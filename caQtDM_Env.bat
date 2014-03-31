@@ -1,19 +1,19 @@
   
-  IF "%QTHOME%"==""          set QTHOME=C:/Qt/4.8.2
-  IF "%QWTHOME%"==""         set QWTHOME=C:/Qt/Qwt-6.0.1
-  IF "%QWTINCLUDE%"==""      set QWTINCLUDE=C:/Qt/Qwt-6.0.1/include
-  IF "%QWTLIB%"==""          set QWTLIB=C:/Qt/Qwt-6.0.1/lib
-  IF "%EPICS_BASE%"==""      set EPICS_BASE=C:/epics/base-3.14.12.2
-  IF "%EPICSINCLUDE%"==""    set EPICSINCLUDE=C:/epics/base-3.14.12.2/include
-  IF "%EPICSEXTENSIONS%"=="" set EPICSEXTENSIONS=C:/Qt/4.8.2
-  IF "%QTCONTROLS_LIBS%"=="" set QTCONTROLS_LIBS=C:/Qt/caqtdm/caQtDM_QtControls
+  IF "%QTHOME%"==""          set QTHOME=X:/qt/4.8.5
+  IF "%QWTHOME%"==""         set QWTHOME=X:/qt/Qwt-6.0.1
+  IF "%QWTINCLUDE%"==""      set QWTINCLUDE=X:/qt/Qwt-6.0.1/include
+  IF "%QWTLIB%"==""          set QWTLIB=X:/qt/Qwt-6.0.1/lib
+  IF "%EPICS_BASE%"==""      set EPICS_BASE=X:/epics/base-3.14.12.4
+  IF "%EPICSINCLUDE%"==""    set EPICSINCLUDE=X:/epics/base-3.14.12.4/include
+  IF "%EPICSEXTENSIONS%"=="" set EPICSEXTENSIONS=X:/Qt/4.8.5
+  IF "%QTCONTROLS_LIBS%"=="" set QTCONTROLS_LIBS=X:/Qt/caqtdm_project/caQtDM_QtControls
   
   set QTBASE=%QTCONTROLS_LIBS%
   
   
-  IF "%QTDM_LIBINSTALL%"=="" 		set QTDM_LIBINSTALL=C:\Qt\4.8.2\lib
-  IF "%QTDM_BININSTALL%"=="" 		set QTDM_BININSTALL=C:\Qt\4.8.2\bin
-  IF "%WIXHOME%"=="" 			set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
+  IF "%QTDM_LIBINSTALL%"=="" 		set QTDM_LIBINSTALL=X:\Qt\4.8.5\lib
+  IF "%QTDM_BININSTALL%"=="" 		set QTDM_BININSTALL=X:\qt\4.8.5\bin
+  IF "%WIXHOME%"=="" 			set WIXHOME=C:\Program Files (x86)\WixEdit\wix-3.0.5419.0
 
 echo =============================================================================================
 echo in order to build this package you will eventually have to redefine following variables in 

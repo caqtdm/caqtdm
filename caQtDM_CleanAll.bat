@@ -12,14 +12,14 @@ echo package will be removed from .\caQtDM_Binaries and all directories will be 
 echo Press [Enter] key to start cleanup
 
 echo ========== remove binaries from directories ============
-if exist .\caQtDM\Makefile (
- cd .\caQtDM\
+if exist .\caQtDM_Viewer\Makefile (
+ cd .\caQtDM_Viewer\
  nmake clean
  cd ..
 ) 
 
-if exist .\caQtDM\parser\Makefile (
- cd .\caQtDM\parser\
+if exist .\caQtDM_Viewer\parser\Makefile (
+ cd .\caQtDM_Viewer\parser\
  nmake clean
  cd ..\..
 )
@@ -45,21 +45,21 @@ cd ..\..
 
 echo ========== remove makefiles from directories ============
 del Makefile
-del .\caQtDM\Makefile*
+del .\caQtDM_Viewer\Makefile*
 
-del .\caQtDM\parser\Makefile*
+del .\caQtDM_Viewer\parser\Makefile*
 del .\caQtDM_Lib\Makefile*
 
 del .\caQtDM_QtControls\Makefile*
 del .\caQtDM_QtControls\plugins\Makefile*
 
-rmdir /S /Q .\caQtDM\release
-rmdir /S /Q .\caQtDM\debug
-rmdir /S /Q .\caQtDM\moc
+rmdir /S /Q .\caQtDM_Viewer\release
+rmdir /S /Q .\caQtDM_Viewer\debug
+rmdir /S /Q .\caQtDM_Viewer\moc
 
-rmdir /S /Q .\caQtDM\parser\release
-rmdir /S /Q .\caQtDM\parser\debug
-rmdir /S /Q .\caQtDM\parser\moc
+rmdir /S /Q .\caQtDM_Viewer\parser\release
+rmdir /S /Q .\caQtDM_Viewer\parser\debug
+rmdir /S /Q .\caQtDM_Viewer\parser\moc
 
 
 rmdir /S /Q .\caQtDM_Lib\release
@@ -78,9 +78,9 @@ rmdir /S /Q .\caQtDM_Binaries
 
 echo =========== remove package files ==================
 
-del .\caQtDM\package\windows\caQtDM.msi
-del .\caQtDM\package\windows\caQtDM.wixobj
-del .\caQtDM\package\windows\caQtDM.wixpdb
+del .\caQtDM_Viewer\package\windows\caQtDM.msi
+del .\caQtDM_Viewer\package\windows\caQtDM.wixobj
+del .\caQtDM_Viewer\package\windows\caQtDM.wixpdb
 
 echo =========== clean all ==================
 
