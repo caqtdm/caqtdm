@@ -1,9 +1,7 @@
-@echo off
-set PATH=C:\epics\base-3.14.12.2\bin\win32-x86;%PATH%
-cd C:\epics\softioc_win32
-set EPICS_DRIVER_PATH=%~dp0%\bin\win32-x86\
-cd C:\epics\softioc_win32\iocBoot\softioc\
-..\..\bin\win32-x86\ioc.exe C:\Qt\4.8.2\src\caQtDM\tests\st.cmd
+@echo on
+set PATH=X:\epics\base-3.14.12.4\bin\win32-x86;%PATH%
+cd X:\qt\caqtdm\caQtDM_Tests\
+softioc.exe -D X:\epics\base-3.14.12.4\dbd\softioc.dbd st.cmd
 cd ..\..
 
 pause
