@@ -5,25 +5,68 @@ source caQtDM_Env
 echo
 echo ========== Collect Files for Mac Bundle ============
 echo
+
 chmod 755 ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libca.3.14.12.dylib
 chmod 755 ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libCom.3.14.12.dylib
-install_name_tool -change libqtcontrols_controllers_plugin.dylib @executable_path/../PlugIns/designer/libqtcontrols_controllers_plugin.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_controllers_plugin.dylib  
-install_name_tool -change libqtcontrols_graphics_plugin.dylib @executable_path/../PlugIns/designer/libqtcontrols_graphics_plugin.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_graphics_plugin.dylib
-install_name_tool -change libqtcontrols_monitors_plugin.dylib @executable_path/../PlugIns/designer/libqtcontrols_monitors_plugin.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_monitors_plugin.dylib
 
 macdeployqt ./caQtDM_Binaries/caQtDM.app
+
+echo
+echo ========== change EPICS LIBS ============
+echo
 
 install_name_tool -id @executable_path/../Frameworks/libca.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libca.3.14.12.dylib
 install_name_tool -id @executable_path/../Frameworks/libCom.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libCom.3.14.12.dylib
 
-install_name_tool -change "/Users/helge/Documents/Entwicklung/epics/base-3.14.12.4/lib/darwin-x86/libCom.3.14.12.dylib" @executable_path/../Frameworks/libCom.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libca.3.14.12.dylib
-
-
-
+install_name_tool -change "${EPICSLIB}/libCom.3.14.12.dylib" @executable_path/../Frameworks/libCom.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libca.3.14.12.dylib
 install_name_tool -change libca.3.14.12.dylib @executable_path/../Frameworks/libca.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQTDM_Lib.dylib
 
-install_name_tool -change "/Users/helge/Documents/Entwicklung/epics/base-3.14.12.4/lib/darwin-x86/libCom.3.14.12.dylib" "@executable_path/../Frameworks/libCom.3.14.12.dylib" ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
-install_name_tool -change "/Users/helge/Documents/Entwicklung/epics/base-3.14.12.4/lib/darwin-x86/libca.3.14.12.dylib" "@executable_path/../Frameworks/libca.3.14.12.dylib" ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
+echo
+echo ========== change caqtdm ============
+echo
+
+install_name_tool -change libcaQtDM_Lib.dylib @executable_path/../Frameworks/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/MacOS/caQtDM
+
+echo
+echo ========== change libcaQtDM_Lib.dylib ============
+echo
+
+install_name_tool -change libqtcontrols.dylib @executable_path/../Frameworks/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
+
+install_name_tool -change "${EPICSLIB}/libCom.3.14.12.dylib" "@executable_path/../Frameworks/libCom.3.14.12.dylib" ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
+install_name_tool -change "${EPICSLIB}/libca.3.14.12.dylib" "@executable_path/../Frameworks/libca.3.14.12.dylib" ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
+
+install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
+
+echo
+echo ========== change libqtcontrols.dylib ============
+echo
+
+install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libqtcontrols.dylib
+
+
+echo
+echo ========== change libqtcontrols_controllers_plugin.dylib ============
+echo
+
+install_name_tool -change libqtcontrols.dylib @executable_path/../Frameworks/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_controllers_plugin.dylib  
+install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_controllers_plugin.dylib 
+
+
+echo
+echo ========== change libqtcontrols_graphics_plugin.dylib ============
+echo
+
+install_name_tool -change libqtcontrols.dylib @executable_path/../Frameworks/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_graphics_plugin.dylib
+install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_graphics_plugin.dylib
+
+echo
+echo ========== change libqtcontrols_monitors_plugin.dylib ============
+echo
+
+install_name_tool -change libqtcontrols.dylib @executable_path/../Frameworks/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_monitors_plugin.dylib
+install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_monitors_plugin.dylib
+
 
 cd caQtDM_Binaries
 macdeployqt caQtDM.app -dmg

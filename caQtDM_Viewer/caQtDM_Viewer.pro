@@ -1,4 +1,5 @@
 include(qtdefs.pri)
+include($$(QWTHOME)/qwt.prf)
 
 unix {
   TEMPLATE = subdirs

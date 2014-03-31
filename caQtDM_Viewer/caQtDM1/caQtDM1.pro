@@ -12,7 +12,11 @@ unix:!macx {
   QMAKE_POST_LINK = cp ../caQtDM $(QTBASE)
 }
 macx: {
-  QMAKE_POST_LINK = cp -R ../caQtDM.app ../../caQtDM_Binaries/
+  QMAKE_INFO_PLIST = ../src/Info.plist
+  QMAKE_POST_LINK += cp -R ../caQtDM.app ../../caQtDM_Binaries/ &&
+  QMAKE_POST_LINK += cp ../../caQtDM_Binaries/libcaQtDM_Lib.dylib ../../caQtDM_Binaries/caQtDM.app/Contents/Frameworks &&
+  QMAKE_POST_LINK += cp ../../caQtDM_Binaries/libqtcontrols.dylib ../../caQtDM_Binaries/caQtDM.app/Contents/Frameworks 
+  ##QMAKE_POST_LINK += cp -R $(QWTLIB)/qwt.framework ../../caQtDM_Binaries/caQtDM.app/Contents/Frameworks
 }
 
 
