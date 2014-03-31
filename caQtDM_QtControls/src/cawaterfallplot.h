@@ -66,13 +66,17 @@ public:
     }
 
     template <typename pureData>
-    void AverageVector(pureData *vec, int size, QVector<double> &avg)
+    void AverageVector(pureData *vec, int size, QVector<double> &avg, int arraySize)
     {
         avg.clear();
         for (int i=0; i< size-ratio; i+=ratio) {
             double mean = 0;
             for(int j=0; j< ratio; j++) {
-                mean += vec[i+j];
+                if((i+j) >= arraySize) {
+                    break;
+                } else {
+                   mean += vec[i+j];
+                }
             }
             avg += mean / (double) ratio;
         }
@@ -103,7 +107,7 @@ public:
         return ActualNumberOfColumns;
     }
 
-    template <typename pureData> int setData(pureData* Array, int &count, int numCols, int numRows)
+    template <typename pureData> int setData(pureData* Array, int &count, int numCols, int numRows, int arraySize)
     {
         //struct timeb now, last;
         //ftime(&last);
@@ -120,7 +124,7 @@ public:
 
         // calculate reduced data vector
         if(ratio != 1) {
-            AverageVector(Array, NumberOfColumns, valuesAveraged);
+            AverageVector(Array, NumberOfColumns, valuesAveraged, arraySize);
         }
 
         // in case of a plot down to the bottom, start from the top and go to bottom
@@ -128,9 +132,17 @@ public:
             int start = ActualNumberOfColumns * count;
             int stop = start + ActualNumberOfColumns;
             if(ratio != 1) {
-                for ( int i = start; i < stop; i++ ) values[i] = valuesAveraged[i-start];
+                for ( int i = start; i < stop; i++ ) {
+                    values[i] = valuesAveraged[i-start];
+                }
             } else {
-                for ( int i = start; i < stop; i++ ) values[i] = Array[i-start];
+                for ( int i = start; i < stop; i++ ) {
+                    if((i-start) >= arraySize) {
+                        break;
+                    } else {
+                       values[i] = Array[i-start];
+                    }
+                }
             }
             count++;
             // otherwise shift plot and add to the end
@@ -144,9 +156,17 @@ public:
             int start = ActualNumberOfColumns * NumberOfRows - ActualNumberOfColumns;
             int stop = ActualNumberOfColumns * NumberOfRows;
             if(ratio != 1) {
-                for ( int i = start; i < stop; i++ ) values[i] = valuesAveraged[i-start];
+                for ( int i = start; i < stop; i++ ) {
+                    values[i] = valuesAveraged[i-start];
+                }
             } else {
-                for ( int i = start; i < stop; i++ ) values[i] = Array[i-start];
+                for ( int i = start; i < stop; i++ ) {
+                    if((i-start) >= arraySize) {
+                        break;
+                    } else {
+                       values[i] = Array[i-start];
+                    }
+                }
             }
         }
 
@@ -281,8 +301,8 @@ private:
 
     int ActualNumberOfColumns;
 
-    template <typename pureData>void AverageArray(pureData *vec, int size, double *avg, int ratio);
-    template <typename pureData> void CompressAndkeepArray(pureData *vec, int size);
+    template <typename pureData>void AverageArray(pureData *vec, int size, int ArraySize, double *avg, int ratio);
+    template <typename pureData> void CompressAndkeepArray(pureData *vec, int size, int arraySize);
 
     QMutex *datamutex;
 
