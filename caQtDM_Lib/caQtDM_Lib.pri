@@ -1,4 +1,4 @@
-include(../caQtDM/qtdefs.pri)
+include(../caQtDM_Viewer/qtdefs.pri)
 
 QT       += core gui
 
