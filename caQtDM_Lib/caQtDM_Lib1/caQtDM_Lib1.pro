@@ -12,8 +12,8 @@ macx: {
   INCLUDEPATH += $$(EPICS_BASE)/include/os/Darwin
   QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
   LIBS += -F$(QWTLIB) -framework qwt
-  LIBS += ${EPICS_LIBS}/libca.dylib
-  LIBS += ${EPICS_LIBS}/libCom.dylib
+  LIBS += ${EPICSLIB}/libca.dylib
+  LIBS += ${EPICSLIB}/libCom.dylib
 }
 
 MOC_DIR = ../moc
