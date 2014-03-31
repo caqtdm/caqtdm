@@ -14,7 +14,7 @@ pause
 
 set PATH=%PATH%;%WIXHOME%
 
-cd .\caQtDM\package\windows
+cd .\caQtDM_Viewer\package\windows
 
 candle caQtDM.wxs -ext WixUIExtension
 
