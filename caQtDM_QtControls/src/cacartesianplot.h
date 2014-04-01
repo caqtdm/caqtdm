@@ -371,10 +371,10 @@ private:
     axisScaling thisXscaling, thisYscaling;
     axisType thisXtype, thisYtype;
 
-    double AxisLowX;
-    double AxisUpX;
-    double AxisLowY;
-    double AxisUp;
+    //double AxisLowX;
+    //double AxisUpX;
+    //double AxisLowY;
+    //double AxisUp;
 
     QwtPlotCurve curve[curveCount];
 
@@ -388,7 +388,7 @@ private:
     QwtPlotGrid *plotGrid;
     QPen penGrid;
 
-    int savedSize;
+    //int savedSize;
 
     bool thisXshow, thisYshow, thisToBeTriggered;
 
