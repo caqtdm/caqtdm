@@ -34,7 +34,3 @@ SUBDIRS = caQtDM_QtControls caQtDM_Lib caQtDM_Viewer
 win32{
  CONFIG(debug, debug | release) 
 }
-
-contains(QMAKE_HOST.name, pc2401) {
-SUBDIRS += QtTunes probeQtProscan HFdispQt
-}
