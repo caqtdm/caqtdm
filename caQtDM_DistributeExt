@@ -1,0 +1,23 @@
+#!/bin/sh
+QTBASE=/usr/local/Trolltech/$EPICS_HOST_ARCH
+
+DESTINATION=$QTBASE/Qt46-Extensions/binQt
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM_Project/caQtDM
+cp -v $SOURCE/caQtDM $DESTINATION
+
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM_Project/caQtDM/parser
+cp -v $SOURCE/adl2ui $DESTINATION
+
+DESTINATION=$QTBASE/Qt46-Extensions/libQt
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM_Project/caQtDM_Lib
+cp -v $SOURCE/lib* $DESTINATION
+
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM_Project/caQtDM_QtControls
+cp -v $SOURCE/lib* $DESTINATION
+
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM_Project/caQtDM_QtControls/doc
+cp -v $SOURCE/caQtDM.qch $DESTINATION
+
+DESTINATION=$QTBASE/Qt46-Extensions/libQt/designer
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM_Project/caQtDM_QtControls/plugins
+cp -v $SOURCE/lib* $DESTINATION

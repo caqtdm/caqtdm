@@ -1,0 +1,6 @@
+#!/bin/sh
+QTBASE=/usr/local/Trolltech/$EPICS_HOST_ARCH
+DESTINATION=$QTBASE/binQt/
+
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM_Project/caQtDM_QtControls/doc
+cp -v $SOURCE/caQtDM.qch $DESTINATION
