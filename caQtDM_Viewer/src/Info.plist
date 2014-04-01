@@ -17,7 +17,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>ch.psi.caQtDM</string>
 	<key>CFBundleVersion</key>
-	<string>3.7.4</string>
+	<string>3.7.6</string>
 	<key>NSSupportsSuddenTermination</key>
 	<true/>
 	<key>CFBundleInfoDictionaryVersion</key>
