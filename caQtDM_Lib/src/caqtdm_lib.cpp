@@ -1705,7 +1705,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
         status = postfix(calcString, post, &errnum);
         if(status) {
             char asc[100];
-            sprintf(asc, "invalid calc %s for %s", calcString, qPrintable(w->objectName()));
+            sprintf(asc, "Invalid Calc %s for %s", calcString, qPrintable(w->objectName()));
             postMessage(QtDebugMsg, asc);
             //printf("%s\n", asc);
             valid = false;
