@@ -52,6 +52,7 @@ unix:!macx {
 }
 
 macx: {
+    INCLUDEPATH += $$(QTHOME)/include 
     QMAKE_LFLAGS_PLUGIN -= -dynamiclib
     QMAKE_LFLAGS_PLUGIN += -bundle
     LIBS += -F$(QWTLIB) -framework qwt
