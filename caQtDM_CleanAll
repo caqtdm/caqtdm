@@ -25,6 +25,8 @@ rm -f ./caQtDM_QtControls/plugins/Makefile
 rm -f ./caQtDM_Lib/*.so
 rm -f ./caQtDM_QtControls/*.so
 rm -f ./caQtDM_QtControls/plugins/*.so
+rm -f ./caQtDM_QtControls/plugins/moc/*
+rm -f ./caQtDM_QtControls/plugins/obj/*
 
 echo =========== clean all ==================
 qmake all.pro
