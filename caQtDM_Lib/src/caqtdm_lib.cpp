@@ -1701,7 +1701,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                 valueArray[11] = ptr->edata.lower_disp_limit;        /* L: lopr */
             }
         }
-
+        setlocale(LC_NUMERIC, "C");
         status = postfix(calcString, post, &errnum);
         if(status) {
             char asc[100];
