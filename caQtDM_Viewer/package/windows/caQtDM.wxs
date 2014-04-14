@@ -2,7 +2,7 @@
 <?define CaQtDMVersion = '3.7.6.0' ?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Product Id="*" Name="caQtDM" Language="1033" Version="$(var.CaQtDMVersion)" Manufacturer="Paul Scherrer Institut" UpgradeCode="CEE4C381-28DA-478F-A7C6-3A95B4DF2A89">
-        <Package Description="caQTDM Windows Manager with Qt-Designer(4.8.2)" Comments="Displaymanager for EPICS with Qt(4.8.2)" InstallerVersion="300" Compressed="yes" Manufacturer="Paul Scherrer Institut Switzerland" Keywords="EPICS, Display, Network, Control" />
+        <Package Description="caQTDM Windows Manager with Qt-Designer(4.8.5)" Comments="Displaymanager for EPICS with Qt(4.8.5)" InstallerVersion="300" Compressed="yes" Manufacturer="Paul Scherrer Institut Switzerland" Keywords="EPICS, Display, Network, Control" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
         <Upgrade Id="CEE4C381-28DA-478F-A7C6-3A95B4DF2A89">
             <UpgradeVersion OnlyDetect="yes" Minimum="$(var.CaQtDMVersion)" Property="NEWERVERSIONDETECTED" IncludeMinimum="no" />
@@ -89,7 +89,7 @@
                         </Directory>
                         <Directory Id="DESIGNER" Name="designer">
                             <Component Id="designer" Guid="C07C30FC-D521-421A-8254-771A42222C4A">
-                                <File Id="QWT_DESIGNER_PLUGIN.DLL" Name="qwt_designer_plugin.dll" Source="$(env.QWTHOME)\plugins\designer\qwt_designer_plugin.dll" />
+                                <File Id="QWT_DESIGNER_PLUGIN.DLL" Name="qwt_designer_plugin.dll" Source="$(env.QWTHOME)\designer\plugins\designer\qwt_designer_plugin.dll" />
                                 <File Id="TASKMENUEXTENSION.DLL" Name="taskmenuextension.dll" Source="$(env.QTHOME)\plugins\designer\taskmenuextension.dll" />
                                 <File Id="WORLDTIMECLOCKPLUGIN.DLL" Name="worldtimeclockplugin.dll" Source="$(env.QTHOME)\plugins\designer\worldtimeclockplugin.dll" />
                                 <File Id="ARTHURPLUGIN.DLL" Name="arthurplugin.dll" Source="$(env.QTHOME)\plugins\designer\arthurplugin.dll" />
