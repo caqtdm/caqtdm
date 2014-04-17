@@ -361,12 +361,13 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
             //qDebug() << "existing filename with macro =" <<  w->windowTitle() << "=" <<  w->property("fileString") << macroString;
             if(!fileName.isNull()) {
                 WindowProperty = fileName.toString();
+                WindowProperty= WindowProperty.section('/',-1);
             }
             WindowProperty.append("&");
             if(!macroString.isNull()) {
                 WindowProperty.append(macroString.toString());
             }
-            //qDebug() << title << WindowProperty;
+            //qDebug() << "title=" << title << " windowproperty=" << WindowProperty;
             if(QString::compare(WindowProperty, title) == 0) {
                 w->activateWindow();
                 w->raise();
@@ -381,14 +382,15 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
                     Display *dpy      = QX11Info::display();
                     NET_ACTIVE_WINDOW = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", False);
                 }
+                xev.serial       = 0;
+                xev.send_event   = True;
                 xev.type         = ClientMessage;
                 xev.window       = w->winId();
                 xev.message_type = NET_ACTIVE_WINDOW;
                 xev.format       = 32;
-                xev.data.l[0]    = MESSAGE_SOURCE_PAGER;
-                xev.data.l[1]    = QX11Info::appUserTime();
-                xev.data.l[2]    = xev.data.l[3] = xev.data.l[4] = 0;
 
+                xev.data.l[0]    = MESSAGE_SOURCE_PAGER;
+                xev.data.l[1] = xev.data.l[2] = xev.data.l[3] = xev.data.l[4] = 0;
                 XSendEvent(QX11Info::display(), QX11Info::appRootWindow(), False, SubstructureNotifyMask | SubstructureRedirectMask, (XEvent*)&xev);
 #endif //Q_WS_X11
 
@@ -432,9 +434,6 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         mainWindow->setWindowFlags(mainWindow->windowFlags() );
 
         // get the filename
-        //QFile *file = new QFile;
-        //file->setFileName(fileNameFound);
-        //QString title(file->fileName().section('/',-1));
         mainWindow->setProperty("fileString", fileNameFound);
         mainWindow->setProperty("macroString", macroString);
 
@@ -442,9 +441,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
             mainWindow->resize(mainWindow->minimumSizeHint());
         }
 
-        //delete file;
-
-        //qDebug() << "set properties in qmainwindow" << mainWindow << title << macroString;
+        //qDebug() << "set properties in qmainwindow" << mainWindow << macroString;
 
 #ifdef Q_WS_X11
         if(geometry != "") {
