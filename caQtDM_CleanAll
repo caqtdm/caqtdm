@@ -13,10 +13,10 @@ fi
 
 echo ========== remove makefiles from directories ============
 rm -f Makefile
-rm -f ./caQtDM/Makefile
-rm -f ./caQtDM/caQtDM1/Makefile
-rm -f ./caQtDM/caQtDM2/Makefile
-rm -f ./caQtDM/parser/Makefile
+rm -f ./caQtDM_Viewer/Makefile
+rm -f ./caQtDM_Viewer/caQtDM1/Makefile
+rm -f ./caQtDM_Viewer/caQtDM2/Makefile
+rm -f ./caQtDM_Viewer/parser/Makefile
 rm -f ./caQtDM_Lib/Makefile
 rm -f ./caQtDM_Lib/caQtDM_Lib1/Makefile
 rm -f ./caQtDM_Lib/caQtDM_Lib2/Makefile
