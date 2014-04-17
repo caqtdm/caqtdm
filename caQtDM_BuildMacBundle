@@ -104,7 +104,7 @@ echo
 cp -R ./caQtDM_Binaries/adl2ui.app ./caQtDM_Binaries/caQtDM.app/Contents/Applications/
 macdeployqt ./caQtDM_Binaries/caQtDM.app/Contents/Applications/adl2ui.app
 
-cd caQtDM_Binaries
+#cd caQtDM_Binaries
 #macdeployqt caQtDM.app -dmg
 echo
 echo ========== modifiy dmg image ============
