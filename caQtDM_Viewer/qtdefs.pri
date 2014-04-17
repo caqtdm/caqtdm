@@ -13,7 +13,7 @@ unix {
 
 # 3.7.6
 # added a property to the waterfall plot in order to define the maximum number of points treated in the waveform
-# due to the change 3.7.4 for reload, the popup of an existing window was not working correcrly
+# due to the change 3.7.4 for reload, the popup of an existing window was not working correctly
 
 # 3.7.5
 # on mac osx camera and waterfall plot were crashing; this has been corrected
