@@ -24,10 +24,24 @@
   fi
   if [ -z "$QTDM_BININSTALL" ];   then  export  QTDM_BININSTALL=$EPICSEXTENSIONS/bin/$EPICS_HOST_ARCH;
   fi
+  
+  if [ -z "$TROLLTECH" ]; then
+    echo
+    echo ====== do not use psi trolltech directories
+    echo
+    if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:$TROLLTECH/binQt:${QTBASE};
+    fi
+  else
+    echo
+    echo ====== use psi trolltech directories
+    echo 
+    if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:$TROLLTECH/binQt;
+    fi 
+  fi
 
   #if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:${QTBASE};
   #fi
- if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:$TROLLTECH/binQt;
+ if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:$TROLLTECH/binQt:${QTBASE};
  fi
 
 echo =============================================================================================
