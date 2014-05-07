@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.7.6
+CAQTDM_VERSION = V3.7.7
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -10,6 +10,8 @@ unix {
     QMAKE_CFLAGS_RELEASE += "-g"
 }
 
+# 3.7.7
+# in waterfall plot the demo plot was not erased at initialization with real data, corrected
 
 # 3.7.6
 # added a property to the waterfall plot in order to define the maximum number of points treated in the waveform

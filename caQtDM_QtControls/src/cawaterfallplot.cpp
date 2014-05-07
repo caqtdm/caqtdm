@@ -158,6 +158,7 @@ caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent)
     setCols(nbCols);
     ActualNumberOfColumns = NumberOfColumns = nbCols;
     reducedArray = (double*) malloc(ActualNumberOfColumns * sizeof(double));
+    memset(reducedArray, 0, ActualNumberOfColumns *sizeof(double));
 
     // initialize data
 
@@ -315,6 +316,7 @@ template <typename pureData> void caWaterfallPlot::CompressAndkeepArray(pureData
         reducedArray = (double *) 0;
     }
     reducedArray = (double*) malloc(ActualNumberOfColumns * sizeof(double));
+    memset(reducedArray, 0, ActualNumberOfColumns *sizeof(double));
     AverageArray(vec, size, arraySize, reducedArray, ratio);
     datamutex->unlock();
 }
@@ -446,7 +448,6 @@ void caWaterfallPlot::TimeOut()
     // demo curve
     if(thisUnits != Monitor) {
         if(!disableDemo) {
-            //printf("update demo\n");
             datamutex->lock();
             GausCurv(position);
             m_data->setData(reducedArray, countRows, ActualNumberOfColumns, getRows(), ActualNumberOfColumns);
@@ -463,7 +464,6 @@ void caWaterfallPlot::TimeOut()
             if(drift < 0 && position <= 0)  drift = 1;
             position += drift;
         } else {
-             //printf("update with timer\n");
             if(reducedArray != (double*) 0) {
                 datamutex->lock();
                 m_data->setData(reducedArray, countRows, ActualNumberOfColumns, getRows(),  ActualNumberOfColumns);

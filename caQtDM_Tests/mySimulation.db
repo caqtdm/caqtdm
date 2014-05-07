@@ -313,9 +313,9 @@ record(calc, "QUAD:IST:3"){
 record(waveform, "QTDM:TEST:AO_WAVE"){
         field(FTVL, "DOUBLE")
         field(NELM, "100")
-#       field(SCAN, ".2 second")
+        field(SCAN, ".2 second")
         field(PREC, "3")
-#        field(INP, QTDM:TEST:AO)
+        field(INP, QTDM:TEST:AO)
 	field(HOPR,"1200")
 	field(LOPR,"-200")
 }

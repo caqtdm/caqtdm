@@ -103,6 +103,8 @@ public:
         if(ratio != 1) {
             valuesAveraged.resize(ActualNumberOfColumns);
         }
+        values.clear();
+        valuesAveraged.clear();
 
         return ActualNumberOfColumns;
     }

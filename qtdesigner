@@ -5,4 +5,7 @@ export QTBASE=${QTCONTROLS_LIBS}
 export PATH=.:$QTBASE:$PATH
 export QT_PLUGIN_PATH=$QTBASE
 
+# insert help into designer
+assistant -register `pwd`/caQtDM_QtControls/doc/caQtDM.qch
+
 designer -style plastique $*

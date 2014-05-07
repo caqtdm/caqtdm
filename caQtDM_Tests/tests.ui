@@ -1345,7 +1345,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>12</number>
       </property>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">
@@ -4151,6 +4151,9 @@ p, li { white-space: pre-wrap; }
         <property name="channel" stdset="0">
          <string notr="true">QTDM:TEST:AO_WAVE</string>
         </property>
+        <property name="countNumOrChannel" stdset="0">
+         <string notr="true">2</string>
+        </property>
         <property name="units">
          <enum>caWaterfallPlot::Millisecond</enum>
         </property>
@@ -4158,7 +4161,7 @@ p, li { white-space: pre-wrap; }
          <double>100.000000000000000</double>
         </property>
         <property name="NumberOfTraces" stdset="0">
-         <number>300</number>
+         <number>200</number>
         </property>
         <property name="IntensityMax">
          <double>1000.000000000000000</double>
