@@ -33,6 +33,7 @@ can further on be packaged via rpm or some other package format.
 The caqtdm package (created by the package script) is supposed to be installed in `/usr/caqtdm`
 
 To build the package for different linux architectures use following servers:
+
  * SL6 64Bit gfalcd.psi.ch
  * SL6 32Bit gfalc6032.psi.ch
  * SL5 32Bit gfalc5732.psi.ch
