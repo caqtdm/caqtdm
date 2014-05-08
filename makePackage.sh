@@ -6,8 +6,8 @@ PACKAGE_BUILD_BASE=~/caqtdm_package
 PACKAGE_INST_BASE=/usr/caqtdm
 # Location where build binaries are located
 BUILD_HOME=~/caqtdm_project/caQtDM_Binaries
-# Location where to assemble temporary tar file
-QWT_TAR_HOME=~/qwt.tar.gz
+
+ARCHITECTURE=`uname -m`
 
 # Clean and create package build base
 rm -rf $PACKAGE_BUILD_BASE
@@ -17,9 +17,14 @@ mkdir -p $PACKAGE_BUILD_BASE
 mkdir -p ${PACKAGE_BUILD_BASE}${PACKAGE_INST_BASE}
 
 # Copy required qwt 6.0.1 into place
+
+cd /tmp
+TAR_NAME=qwt-6.0.1_${ARCHITECTURE}.tar.gz
+wget http://yoke.psi.ch/artifactory/releases/${TAR_NAME}
 cd ${PACKAGE_BUILD_BASE}${PACKAGE_INST_BASE}
-tar xfvz $QWT_TAR_HOME
+tar xfvz /tmp/${TAR_NAME}
 mv qwt-6.0.1 qwt
+rm /tmp/${TAR_NAME}
 
 mkdir -p ${PACKAGE_BUILD_BASE}${PACKAGE_INST_BASE}/lib
 cd ${PACKAGE_BUILD_BASE}${PACKAGE_INST_BASE}/lib
