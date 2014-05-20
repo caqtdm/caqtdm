@@ -50,6 +50,7 @@ export QWTLIB=${INSTALL_ROOT}/usr/local/qwt-6.0.1/lib
 To build the package qwt-6.0.1 and epics base is required (adapt the paths above if required).
 
  * After caqtdm is build run the packaging script
+  * the packaging script requires the `chrpath` command. Make sure that this command is available on the build machine!
 
 ```
 ./makePackage.sh
