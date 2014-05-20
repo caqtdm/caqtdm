@@ -6,7 +6,12 @@ To package caqtdm for SL5 and SL6 following steps are needed
   * Build and install sources
 
 ```
+wget http://yoke.psi.ch/artifactory/releases/qwt-6.0.1_source.tar.gz
+tar xfvz qwt-6.0.1_source.tar.gz
+cd qwt-6.0.1
+
 export INSTALL_ROOT=~
+export PATH=/usr/lib64/qt4/bin:$PATH
 qmake
 make
 make install
