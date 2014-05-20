@@ -35,13 +35,13 @@ cp -r $BUILD_HOME/* .
 # Adapt rpath for binaries
 # This requires chrpath to be installed on the system (yum install chrpath)
 
-chrpath -r /usr/local/epics/extensions/lib/SL6-x86_64:$PACKAGE_INST_BASE/lib caQtDM
-chrpath -r /usr/local/epics/base/lib/SL6-x86_64:/usr/local/epics/extensions/lib/SL6-x86_64:$PACKAGE_INST_BASE/lib libcaQtDM_Lib.so
+chrpath -r /usr/local/epics/extensions/lib/${EPICS_HOST_ARCH}:$PACKAGE_INST_BASE/lib caQtDM
+chrpath -r /usr/local/epics/base/lib/${EPICS_HOST_ARCH}:/usr/local/epics/extensions/lib/${EPICS_HOST_ARCH}:$PACKAGE_INST_BASE/lib libcaQtDM_Lib.so
 chrpath -r $PACKAGE_INST_BASE/qwt/lib libqtcontrols.so
 
-chrpath -r $PACKAGE_INST_BASE/qwt/lib:/usr/local/epics/extensions/lib/SL6-x86_64:$PACKAGE_INST_BASE/lib designer/libqtcontrols_controllers_plugin.so
-chrpath -r $PACKAGE_INST_BASE/qwt/lib:/usr/local/epics/extensions/lib/SL6-x86_64:$PACKAGE_INST_BASE/lib designer/libqtcontrols_graphics_plugin.so
-chrpath -r $PACKAGE_INST_BASE/qwt/lib:/usr/local/epics/extensions/lib/SL6-x86_64:$PACKAGE_INST_BASE/lib designer/libqtcontrols_monitors_plugin.so
+chrpath -r $PACKAGE_INST_BASE/qwt/lib:/usr/local/epics/extensions/lib/${EPICS_HOST_ARCH}:$PACKAGE_INST_BASE/lib designer/libqtcontrols_controllers_plugin.so
+chrpath -r $PACKAGE_INST_BASE/qwt/lib:/usr/local/epics/extensions/lib/${EPICS_HOST_ARCH}:$PACKAGE_INST_BASE/lib designer/libqtcontrols_graphics_plugin.so
+chrpath -r $PACKAGE_INST_BASE/qwt/lib:/usr/local/epics/extensions/lib/${EPICS_HOST_ARCH}:$PACKAGE_INST_BASE/lib designer/libqtcontrols_monitors_plugin.so
 
 mkdir -p ${PACKAGE_BUILD_BASE}${PACKAGE_INST_BASE}/bin
 cd ${PACKAGE_BUILD_BASE}${PACKAGE_INST_BASE}/bin
