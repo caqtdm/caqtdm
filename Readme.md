@@ -2,7 +2,7 @@
 To package caqtdm for SL5 and SL6 following steps are needed
 
  * Compile qwt libraries
-  * Download and extract sources
+  * Download and extract qwt sources - http://yoke.psi.ch/artifactory/releases/qwt-6.0.1_source.tar.gz
   * Build and install sources
 
 ```
