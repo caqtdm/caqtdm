@@ -18,6 +18,12 @@ make install
 git clone https://github.psi.ch/scm/qtdm/caqtdm_project.git
 ```
 
+ * Ensure that you are on base `work`
+
+```
+cb work
+```
+
  * Build caqtdm binaries for architecture
 
 ```
