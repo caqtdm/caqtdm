@@ -1,6 +1,7 @@
 # Packaging
 To package caqtdm for SL5 and SL6 following steps are needed
 
+## QWT
  * Compile qwt libraries
   * Download and extract qwt sources - http://yoke.psi.ch/artifactory/releases/qwt-6.0.1_source.tar.gz
   * Build and install sources
@@ -15,12 +16,18 @@ export PATH=/usr/lib64/qt4/bin:$PATH
 qmake
 make
 make install
+cd ..
 ```
 
+ * Remove doc directory in qwt release
+ * Package qwt and upload to artifactory
+
+## CAQTDM
  * Clone caqtdm sources
 
 ```
 git clone https://github.psi.ch/scm/qtdm/caqtdm_project.git
+cd caqtdm_project
 ```
 
  * Ensure that you are on base `work`
