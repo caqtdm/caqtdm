@@ -1,6 +1,17 @@
 # Packaging
 To package caqtdm for SL5 and SL6 following steps are needed
 
+ * Compile qwt libraries
+  * Download and extract sources
+  * Build and install sources
+
+```
+export INSTALL_ROOT=~
+qmake
+make
+make install
+```
+
  * Clone caqtdm sources
 
 ```
@@ -11,9 +22,9 @@ git clone https://github.psi.ch/scm/qtdm/caqtdm_project.git
 
 ```
 export PATH=/usr/lib64/qt4/bin:$PATH
-export QWTHOME=/usr/local/qwt-6.0.1/features
-export QWTINCLUDE=/usr/local/qwt-6.0.1/include
-export QWTLIB=/usr/local/qwt-6.0.1/lib
+export QWTHOME=${INSTALL_ROOT}/usr/local/qwt-6.0.1/features
+export QWTINCLUDE=${INSTALL_ROOT}/usr/local/qwt-6.0.1/include
+export QWTLIB=${INSTALL_ROOT}/usr/local/qwt-6.0.1/lib
 
 ./caQtDM_BuildAll
 ```
