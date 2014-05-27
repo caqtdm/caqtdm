@@ -528,10 +528,9 @@ void caCamera::resizeEvent(QResizeEvent *e)
             zoomSlider->setValue((int)(13.0*log(scale)/log(2.0)+52.0));
             zoomValue->setText(QString::number(scale, 'f', 3));
             connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomNow()));
+            imageW->setFixedWidth(e->size().width() - zoomWidget->width()-4);
+            imageW->setFixedHeight(e->size().height()- valuesWidget->height()-4);
         }
-
-        imageW->setFixedWidth(e->size().width() - zoomWidget->width()-4);
-        imageW->setFixedHeight(e->size().height()- valuesWidget->height()-4);
     }
 }
 

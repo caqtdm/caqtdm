@@ -31,7 +31,10 @@ caLed::caLed(QWidget *parent) : ELed(parent)
     thisBitNr = 0;
     thisFalseColor = Qt::gray;
     thisTrueColor = Qt::red;
+    thisUndefinedColor = Qt::black;
     thisColorMode = Static;
+    setTrueValue("1");
+    setFalseValue("0");
     return;
 }
 
@@ -60,21 +63,27 @@ void caLed::setTrueColor(QColor c)
     thisTrueColor = c;
 }
 
+void caLed::setUndefinedColor(QColor c)
+{
+    thisUndefinedColor = c;
+}
+
 void caLed::setFalseColor(QColor c)
 {
     thisFalseColor = c;
     ELed::setColor(c);
 }
 
-void caLed::setState(bool state)
+void caLed::setState(Qt::CheckState state)
 {
-    if(state) {
+    if(state == Qt::Checked) {
         ELed::setColor(thisTrueColor);
-    } else {
+    } else if(state ==  Qt::Unchecked){
         ELed::setColor(thisFalseColor);
+    } else {
+        ELed::setColor(thisUndefinedColor);
     }
 }
-
 
 void caLed::setColorMode(colMode colormode)
 {

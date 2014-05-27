@@ -51,7 +51,7 @@ public:
     virtual QIcon icon() const { return d_icon; };
     virtual QString codeTemplate() const { return d_codeTemplate; };
     virtual QString domXml() const { return d_domXml; };
-    virtual QString group() const { return "caQt_Graphics"; };
+    virtual QString group() const { return "caQtDM Graphics -PSI"; };
     virtual QString includeFile() const { return d_include; };
     virtual QString name() const { return d_name; };
     virtual QString toolTip() const { return d_toolTip; };

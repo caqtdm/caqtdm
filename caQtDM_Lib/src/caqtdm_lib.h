@@ -77,7 +77,7 @@ class CAQTDM_LIBSHARED_EXPORT CaQtDM_Lib : public QMainWindow
 
 public:
 
-    explicit CaQtDM_Lib(QWidget *parent = 0, QString="", QString="", MutexKnobData *mutexKnobData = 0, MessageWindow *msgWindow = 0, bool willPrint = false);
+    explicit CaQtDM_Lib(QWidget *parent = 0, QString="", QString="", MutexKnobData *mutexKnobData = 0, MessageWindow *msgWindow = 0, bool willPrint = false, QWidget *parentAS = 0);
     ~CaQtDM_Lib();
 
     void allowResizing(bool allowresize);
@@ -157,10 +157,11 @@ private:
     void postMessage(QtMsgType type, char *msg);
     int Execute(char *command);
     void TreatRequestedValue(QString text, caTextEntry::FormatType fType, QWidget *w);
-    void TreatOrdinaryValue(QString pv, float value, int32_t idata, QWidget *w);
+    void TreatOrdinaryValue(QString pv, double value, int32_t idata, QWidget *w);
     bool getSoftChannel(QString pv, knobData &data);
     int parseForDisplayRate(QString input, int &rate);
     void UpdateGauge(EAbstractGauge *w, const knobData &data);
+    void getStatesToggleAndLed(QWidget *widget, const knobData &data, const QString &String, Qt::CheckState &state);
 
     void resizeSpecials(QString className, QWidget *widget, QVariantList list, double factX, double factY);
     void shellCommand(QString command);
@@ -202,6 +203,8 @@ private:
     int splashCounter;
 
     bool AllowsUpdate;
+
+    bool fromAS;
 
 #ifdef epics4
     epics4Subs *Epics4;

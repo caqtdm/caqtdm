@@ -26,6 +26,8 @@
 #ifndef QTCONGLOBAL_H
 #define QTCONGLOBAL_H
 
+#define NOMINMAX
+
 #if defined(_MSC_VER)
 		#if defined(QTCON_MAKEDLL)     // create a qtControls DLL library
 			#define QTCON_EXPORT  __declspec(dllexport)

@@ -38,12 +38,16 @@ class QTCON_EXPORT caToggleButton : public QCheckBox
 
     Q_ENUMS(colMode)
 
+    Q_PROPERTY( bool tristate DESIGNABLE false)
+
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
 
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
 
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
+    Q_PROPERTY(QString trueValue READ getTrueValue WRITE setTrueValue)
+    Q_PROPERTY(QString falseValue READ getFalseValue WRITE setFalseValue)
 
 public:
 
@@ -69,11 +73,16 @@ public:
     QString getPV() const;
     void setPV(QString const &newPV);
 
-    void setState(bool state);
+    void setState(Qt::CheckState state);
     bool bitState(long value);
 
     int getAccessW() const {return _AccessW;}
     void setAccessW(int access);
+
+    QString getTrueValue() const {return thisTrueValue;}
+    void setTrueValue(QString const &trueValue) {thisTrueValue = trueValue;}
+    QString getFalseValue() const {return thisFalseValue;}
+    void setFalseValue(QString const &falseValue) {thisFalseValue = falseValue;}
 
 private slots:
 
@@ -89,6 +98,7 @@ protected:
 
 private:
 
+    QString thisTrueValue, thisFalseValue;
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
     QPalette thisPalette;

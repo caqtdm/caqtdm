@@ -68,305 +68,319 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
    return xml;
 }
 
-CustomWidgetInterface::CustomWidgetInterface(QObject *parent): QObject(parent), d_isInitialized(false)
-{
-}
+        CustomWidgetInterface::CustomWidgetInterface(QObject *parent): QObject(parent), d_isInitialized(false)
+        {
+        }
 
-void CustomWidgetInterface::initialize(QDesignerFormEditorInterface *)
-{
-    if (d_isInitialized)
-        return;
+        void CustomWidgetInterface::initialize(QDesignerFormEditorInterface *)
+        {
+            if (d_isInitialized)
+                return;
 
-    d_isInitialized = true;
-}
+            d_isInitialized = true;
+        }
 
 
-caNumericInterface::caNumericInterface(QObject *parent): CustomWidgetInterface(parent)
-{
-        strng name[2], type[2];
-        strcpy(name[0], "channel");
-        strcpy(type[0], "multiline");
+        caNumericInterface::caNumericInterface(QObject *parent): CustomWidgetInterface(parent)
+        {
+            strng name[2], type[2];
+            strcpy(name[0], "channel");
+            strcpy(type[0], "multiline");
 
-        d_domXml = XmlFunc("caNumeric", "canumeric", 0, 0, 100, 50, name, type, 1);
-    d_name = "caNumeric";
-    d_include = "caNumeric";
-    d_icon = QPixmap(":pixmaps/enumeric.png");
-    d_toolTip = "[wheelswitch, immediate change]";
-    d_whatsThis = "hello, i am a whatsthis string";
-}
+            d_domXml = XmlFunc("caNumeric", "canumeric", 0, 0, 100, 50, name, type, 1);
+            d_name = "caNumeric";
+            d_include = "caNumeric";
+            QPixmap qpixmap =  QPixmap(":pixmaps/enumeric.png");
+            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_toolTip = "[wheelswitch, immediate change]";
+            d_whatsThis = "hello, i am a whatsthis string";
+        }
 
-QWidget *caNumericInterface::createWidget(QWidget *parent)
-{
-    return new caNumeric(parent);
-}
+        QWidget *caNumericInterface::createWidget(QWidget *parent)
+        {
+            return new caNumeric(parent);
+        }
 
-caApplyNumericInterface::caApplyNumericInterface(QObject *parent): CustomWidgetInterface(parent)
-{
-        strng name[1], type[1];
-        strcpy(name[0], "channel");
-        strcpy(type[0], "multiline");
-        d_domXml = XmlFunc("caApplyNumeric", "caapplynumeric", 0, 0, 160, 70, name, type, 1);
-    d_name = "caApplyNumeric";
-    d_include = "caApplyNumeric";
-    d_icon = QPixmap(":pixmaps/enumeric.png");
-    d_toolTip = "[wheelswitch with applybutton]";
-    d_whatsThis = "hello, i am a whatsthis string"; 
-}
+        caApplyNumericInterface::caApplyNumericInterface(QObject *parent): CustomWidgetInterface(parent)
+        {
+            strng name[1], type[1];
+            strcpy(name[0], "channel");
+            strcpy(type[0], "multiline");
+            d_domXml = XmlFunc("caApplyNumeric", "caapplynumeric", 0, 0, 160, 70, name, type, 1);
+            d_name = "caApplyNumeric";
+            d_include = "caApplyNumeric";
+            QPixmap qpixmap =  QPixmap(":pixmaps/enumeric.png");
+            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_toolTip = "[wheelswitch with applybutton]";
+            d_whatsThis = "hello, i am a whatsthis string";
+        }
 
-QWidget *caApplyNumericInterface::createWidget(QWidget *parent)
-{
-    return new caApplyNumeric(parent);
-}
+        QWidget *caApplyNumericInterface::createWidget(QWidget *parent)
+        {
+            return new caApplyNumeric(parent);
+        }
 
-EApplyButtonInterface::EApplyButtonInterface(QObject *parent): CustomWidgetInterface(parent)
-{
-    d_name = "EApplyButton";
-    d_include = "EApplyButton";
-    d_icon = QPixmap(":pixmaps/eapplybutton.png");
-    d_domXml = 
-        "<widget class=\"EApplyButton\" name=\"eApplyButton\">\n"
-        " <property name=\"geometry\">\n"
-        "  <rect>\n"
-        "   <x>0</x>\n"
-        "   <y>0</y>\n"
-        "   <width>87</width>\n"
-        "   <height>28</height>\n"
-        "  </rect>\n"
-        " </property>\n"
-        "</widget>\n";
-}
+        EApplyButtonInterface::EApplyButtonInterface(QObject *parent): CustomWidgetInterface(parent)
+        {
+            d_name = "EApplyButton";
+            d_include = "EApplyButton";
+            QPixmap qpixmap = QPixmap(":pixmaps/eapplybutton.png");
+            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio);
+            d_domXml =
+                    "<widget class=\"EApplyButton\" name=\"eApplyButton\">\n"
+                    " <property name=\"geometry\">\n"
+                    "  <rect>\n"
+                    "   <x>0</x>\n"
+                    "   <y>0</y>\n"
+                    "   <width>87</width>\n"
+                    "   <height>28</height>\n"
+                    "  </rect>\n"
+                    " </property>\n"
+                    "</widget>\n";
+        }
 
-QWidget *EApplyButtonInterface::createWidget(QWidget *parent)
-{
-    return new EApplyButton(parent);
-}
+        QWidget *EApplyButtonInterface::createWidget(QWidget *parent)
+        {
+            return new EApplyButton(parent);
+        }
 
-QWidget *caSliderInterface::createWidget(QWidget* parent)
-{
-	return new caSlider(parent);
-}
+        QWidget *caSliderInterface::createWidget(QWidget* parent)
+        {
+            return new caSlider(parent);
+        }
 
-caSliderInterface::caSliderInterface(QObject* parent) : CustomWidgetInterface(parent)
-{
-        strng name[1], type[1];
-        strcpy(name[0], "channel");
-        strcpy(type[0], "multiline");
-        d_domXml = XmlFunc("caSlider", "caslider", 0, 0, 20, 150, name, type, 1);
-	d_name = "caSlider";
-	d_include = "caSlider";
-	d_icon = QPixmap(":pixmaps/slider.png");
-        d_toolTip = "[slider]";
-	 d_whatsThis = "hello, i am a whatsthis string";
-}
+        caSliderInterface::caSliderInterface(QObject* parent) : CustomWidgetInterface(parent)
+        {
+            strng name[1], type[1];
+            strcpy(name[0], "channel");
+            strcpy(type[0], "multiline");
+            d_domXml = XmlFunc("caSlider", "caslider", 0, 0, 20, 150, name, type, 1);
+            d_name = "caSlider";
+            d_include = "caSlider";
+            QPixmap qpixmap = QPixmap(":pixmaps/slider.png");
+            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_toolTip = "[slider]";
+            d_whatsThis = "hello, i am a whatsthis string";
+        }
 
-QWidget *caMenuInterface::createWidget(QWidget *parent)
-{
-    return new caMenu(parent);
-}
+        QWidget *caMenuInterface::createWidget(QWidget *parent)
+        {
+            return new caMenu(parent);
+        }
 
-caMenuInterface::caMenuInterface(QObject *parent): CustomWidgetInterface(parent)
-{
-        strng name[1], type[1];
-        strcpy(name[0], "channel");
-        strcpy(type[0], "multiline");
-        d_domXml = XmlFunc("caMenu", "camenu", 0, 0, 100, 30, name, type, 1);
-    d_name = "caMenu";
-    d_include = "caMenu";
-    d_icon = QPixmap(":pixmaps/menu.png");
-    d_toolTip = "[menu combobox for display & control of enums with/without pv-label]";
-     d_whatsThis = "hello, i am a whatsthis string";
-}
+        caMenuInterface::caMenuInterface(QObject *parent): CustomWidgetInterface(parent)
+        {
+            strng name[1], type[1];
+            strcpy(name[0], "channel");
+            strcpy(type[0], "multiline");
+            d_domXml = XmlFunc("caMenu", "camenu", 0, 0, 100, 30, name, type, 1);
+            d_name = "caMenu";
+            d_include = "caMenu";
+            QPixmap qpixmap =  QPixmap(":pixmaps/menu.png");
+            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_toolTip = "[menu combobox for display & control of enums with/without pv-label]";
+            d_whatsThis = "hello, i am a whatsthis string";
+        }
 
-QWidget *caChoiceInterface::createWidget(QWidget *parent)
-{
-    return new caChoice(parent);
-}
+        QWidget *caChoiceInterface::createWidget(QWidget *parent)
+        {
+            return new caChoice(parent);
+        }
 
-caChoiceInterface::caChoiceInterface(QObject *parent): CustomWidgetInterface(parent)
-{
-        strng name[1], type[1];
-        strcpy(name[0], "channel");
-        strcpy(type[0], "multiline");
-        d_domXml = XmlFunc("caChoice", "cachoice", 0, 0, 150, 150, name, type, 1);
-    d_name = "caChoice";
-    d_include = "caChoice";
-    d_icon = QPixmap(":pixmaps/choice.png");
-    d_toolTip = "[choice with different stacking modes for display & control of enums]";
-     d_whatsThis = "hello, i am a whatsthis string";
-}
+        caChoiceInterface::caChoiceInterface(QObject *parent): CustomWidgetInterface(parent)
+        {
+            strng name[1], type[1];
+            strcpy(name[0], "channel");
+            strcpy(type[0], "multiline");
+            d_domXml = XmlFunc("caChoice", "cachoice", 0, 0, 150, 150, name, type, 1);
+            d_name = "caChoice";
+            d_include = "caChoice";
+            QPixmap qpixmap =  QPixmap(":pixmaps/choice.png");
+            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_toolTip = "[choice with different stacking modes for display & control of enums]";
+            d_whatsThis = "hello, i am a whatsthis string";
+        }
 
-QWidget *caRelatedDisplayInterface::createWidget(QWidget *parent)
-{
-    return new caRelatedDisplay(parent);
-}
+        QWidget *caRelatedDisplayInterface::createWidget(QWidget *parent)
+        {
+            return new caRelatedDisplay(parent);
+        }
 
-caRelatedDisplayInterface::caRelatedDisplayInterface(QObject *parent): CustomWidgetInterface(parent)
-{
-        strng name[5], type[5];
-        strcpy(name[0], "label");
-        strcpy(type[0], "multiline");
-        strcpy(name[1], "labels");
-        strcpy(type[1], "multiline");
-        strcpy(name[2], "files");
-        strcpy(type[2], "multiline");
-        strcpy(name[3], "args");
-        strcpy(type[3], "multiline");
-        strcpy(name[4], "replaceModes");
-        strcpy(type[4], "multiline");
-        d_domXml = XmlFunc("caRelatedDisplay", "carelateddisplay", 0, 0, 150, 50, name, type, 5);
-    d_name = "caRelatedDisplay";
-    d_include = "caRelatedDisplay";
-    d_icon = QPixmap(":pixmaps/fileopen.png");
-    d_toolTip = "[displays a new or popups a synoptic view]";
-    d_whatsThis = "hello, i am a whatsthis string";
-}
+        caRelatedDisplayInterface::caRelatedDisplayInterface(QObject *parent): CustomWidgetInterface(parent)
+        {
+            strng name[5], type[5];
+            strcpy(name[0], "label");
+            strcpy(type[0], "multiline");
+            strcpy(name[1], "labels");
+            strcpy(type[1], "multiline");
+            strcpy(name[2], "files");
+            strcpy(type[2], "multiline");
+            strcpy(name[3], "args");
+            strcpy(type[3], "multiline");
+            strcpy(name[4], "replaceModes");
+            strcpy(type[4], "multiline");
+            d_domXml = XmlFunc("caRelatedDisplay", "carelateddisplay", 0, 0, 150, 50, name, type, 5);
+            d_name = "caRelatedDisplay";
+            d_include = "caRelatedDisplay";
+            QPixmap qpixmap =   QPixmap(":pixmaps/fileopen.png");
+            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_toolTip = "[displays a new or popups a synoptic view]";
+            d_whatsThis = "hello, i am a whatsthis string";
+        }
 
-QWidget *caShellCommandInterface::createWidget(QWidget *parent)
-{
-    return new caShellCommand(parent);
-}
+        QWidget *caShellCommandInterface::createWidget(QWidget *parent)
+        {
+            return new caShellCommand(parent);
+        }
 
-caShellCommandInterface::caShellCommandInterface(QObject *parent): CustomWidgetInterface(parent)
-{
-        strng name[4], type[4];
-        strcpy(name[0], "label");
-        strcpy(type[0], "multiline");
-        strcpy(name[1], "labels");
-        strcpy(type[1], "multiline");
-        strcpy(name[2], "files");
-        strcpy(type[2], "multiline");
-        strcpy(name[3], "args");
-        strcpy(type[3], "multiline");
-        d_domXml = XmlFunc("caShellCommand", "cashellcommand", 0, 0, 150, 50, name, type, 4);
-    d_name = "caShellCommand";
-    d_include = "caShellCommand";
-    d_icon = QPixmap(":pixmaps/exclamation.png");
-    d_toolTip = "[menu or button for detached processes]";
-    d_whatsThis = "hello, i am a whatsthis string";
-}
+        caShellCommandInterface::caShellCommandInterface(QObject *parent): CustomWidgetInterface(parent)
+        {
+            strng name[4], type[4];
+            strcpy(name[0], "label");
+            strcpy(type[0], "multiline");
+            strcpy(name[1], "labels");
+            strcpy(type[1], "multiline");
+            strcpy(name[2], "files");
+            strcpy(type[2], "multiline");
+            strcpy(name[3], "args");
+            strcpy(type[3], "multiline");
+            d_domXml = XmlFunc("caShellCommand", "cashellcommand", 0, 0, 150, 50, name, type, 4);
+            d_name = "caShellCommand";
+            d_include = "caShellCommand";
+            QPixmap qpixmap =   QPixmap(":pixmaps/exclamation.png");
+            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_toolTip = "[menu or button for detached processes]";
+            d_whatsThis = "hello, i am a whatsthis string";
+        }
 
-QWidget *caTextEntryInterface::createWidget(QWidget* parent)
-{
-	return new caTextEntry(parent);
-}
+        QWidget *caTextEntryInterface::createWidget(QWidget* parent)
+        {
+            return new caTextEntry(parent);
+        }
 
-caTextEntryInterface::caTextEntryInterface(QObject* parent) : CustomWidgetInterface(parent)
-{
-        strng name[1], type[1];
-        strcpy(name[0], "channel");
-        strcpy(type[0], "multiline");
-        d_domXml = XmlFunc("caTextEntry", "catextentry", 0, 0, 100, 22, name, type, 1);
-	d_name = "caTextEntry";
-	d_include = "caTextEntry";
-	d_icon = QPixmap(":pixmaps/textentry.png");
-        d_toolTip = "[enters a value/command to a pv]";
-        d_whatsThis = "hello, i am a whatsthis string";
-}
+        caTextEntryInterface::caTextEntryInterface(QObject* parent) : CustomWidgetInterface(parent)
+        {
+            strng name[1], type[1];
+            strcpy(name[0], "channel");
+            strcpy(type[0], "multiline");
+            d_domXml = XmlFunc("caTextEntry", "catextentry", 0, 0, 100, 22, name, type, 1);
+            d_name = "caTextEntry";
+            d_include = "caTextEntry";
 
-QWidget *caMessageButtonInterface::createWidget(QWidget* parent)
-{
-	return new caMessageButton(parent);
-}
+            QPixmap qpixmap =   QPixmap(":pixmaps/textentry.png");
+            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_toolTip = "[enters a value/command to a pv]";
+            d_whatsThis = "hello, i am a whatsthis string";
+        }
 
-caMessageButtonInterface::caMessageButtonInterface(QObject* parent) : CustomWidgetInterface(parent)
-{
-        strng name[4], type[4];
-        strcpy(name[0], "channel");
-        strcpy(type[0], "multiline");
-        strcpy(name[1], "label");
-        strcpy(type[1], "multiline");
-        strcpy(name[2], "releaseMessage");
-        strcpy(type[2], "multiline");
-        strcpy(name[3], "pressMessage");
-        strcpy(type[3], "multiline");
-        d_domXml = XmlFunc("caMessageButton", "camessagebutton", 0, 0, 100, 22, name, type, 4);
-	d_name = "caMessageButton";
-	d_include = "caMessageButton";
-	d_icon = QPixmap(":pixmaps/message.png");
-        d_toolTip = "[send a predefined value/command to a pv]";
-	d_whatsThis = "hello, i am a whatsthis string";
-}
+        QWidget *caMessageButtonInterface::createWidget(QWidget* parent)
+        {
+            return new caMessageButton(parent);
+        }
 
-QWidget *caToggleButtonInterface::createWidget(QWidget* parent)
-{
-	return new caToggleButton(parent);
-}
+        caMessageButtonInterface::caMessageButtonInterface(QObject* parent) : CustomWidgetInterface(parent)
+        {
+            strng name[4], type[4];
+            strcpy(name[0], "channel");
+            strcpy(type[0], "multiline");
+            strcpy(name[1], "label");
+            strcpy(type[1], "multiline");
+            strcpy(name[2], "releaseMessage");
+            strcpy(type[2], "multiline");
+            strcpy(name[3], "pressMessage");
+            strcpy(type[3], "multiline");
+            d_domXml = XmlFunc("caMessageButton", "camessagebutton", 0, 0, 100, 22, name, type, 4);
+            d_name = "caMessageButton";
+            d_include = "caMessageButton";
+            QPixmap qpixmap =  QPixmap(":pixmaps/message.png");
+            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_toolTip = "[send a predefined value/command to a pv]";
+            d_whatsThis = "hello, i am a whatsthis string";
+        }
 
-caToggleButtonInterface::caToggleButtonInterface(QObject* parent) : CustomWidgetInterface(parent)
-{
-        strng name[1], type[1];
-        strcpy(name[0], "channel");
-        strcpy(type[0], "multiline");
-        d_domXml = XmlFunc("caToggleButton", "catogglebutton", 0, 0, 100, 22, name, type, 1);
-	d_name = "caToggleButton";
-	d_include = "caToggleButton";
-	d_icon = QPixmap(":pixmaps/radiobutton.png");
-        d_toolTip = "[toggle 0/1 to a pv]";
-        d_whatsThis = "hello, i am a whatsthis string";
-}
+        QWidget *caToggleButtonInterface::createWidget(QWidget* parent)
+        {
+            return new caToggleButton(parent);
+        }
 
-QWidget *caScriptButtonInterface::createWidget(QWidget* parent)
-{
-	return new caScriptButton(parent);
-}
+        caToggleButtonInterface::caToggleButtonInterface(QObject* parent) : CustomWidgetInterface(parent)
+        {
+            strng name[1], type[1];
+            strcpy(name[0], "channel");
+            strcpy(type[0], "multiline");
+            d_domXml = XmlFunc("caToggleButton", "catogglebutton", 0, 0, 100, 22, name, type, 1);
+            d_name = "caToggleButton";
+            d_include = "caToggleButton";
+            QPixmap qpixmap = QPixmap(":pixmaps/radiobutton.png");
+            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_toolTip = "[toggle 0/1 to a pv]";
+            d_whatsThis = "hello, i am a whatsthis string";
+        }
 
-caScriptButtonInterface::caScriptButtonInterface(QObject* parent) : CustomWidgetInterface(parent)
-{
-        strng name[3], type[3];
-        strcpy(name[0], "label");
-        strcpy(type[0], "multiline");
-        strcpy(name[1], "scriptCommand");
-        strcpy(type[1], "multiline");
-        strcpy(name[2], "scriptParameter");
-        strcpy(type[2], "multiline");
+        QWidget *caScriptButtonInterface::createWidget(QWidget* parent)
+        {
+            return new caScriptButton(parent);
+        }
 
-        d_domXml = XmlFunc("caScriptButton", "cascriptbutton", 0, 0, 100, 22, name, type, 3);
-	d_name = "caScriptButton";
-	d_include = "caScriptButton";
-	d_icon = QPixmap(":pixmaps/process.png");
-        d_toolTip = "[execute a script or image as detached process]";
-        d_whatsThis = "hello, i am a whatsthis string";
-}
+        caScriptButtonInterface::caScriptButtonInterface(QObject* parent) : CustomWidgetInterface(parent)
+        {
+            strng name[3], type[3];
+            strcpy(name[0], "label");
+            strcpy(type[0], "multiline");
+            strcpy(name[1], "scriptCommand");
+            strcpy(type[1], "multiline");
+            strcpy(name[2], "scriptParameter");
+            strcpy(type[2], "multiline");
 
-caSpinboxInterface::caSpinboxInterface(QObject *parent): CustomWidgetInterface(parent)
-{
-        strng name[1], type[1];
-        strcpy(name[0], "channel");
-        strcpy(type[0], "multiline");
-        d_domXml = XmlFunc("caSpinbox", "caspinbox", 0, 0, 80, 30, name, type, 1);
-    d_name = "caSpinbox";
-    d_include = "caSpinbox";
-    d_icon = QPixmap(":pixmaps/spinbox.png");
-    d_toolTip = "[spinbox]";
-    d_whatsThis = "hello, i am a whatsthis string"; 
-}
+            d_domXml = XmlFunc("caScriptButton", "cascriptbutton", 0, 0, 100, 22, name, type, 3);
+            d_name = "caScriptButton";
+            d_include = "caScriptButton";
+            QPixmap qpixmap = QPixmap(":pixmaps/process.png");
+            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_toolTip = "[execute a script or image as detached process]";
+            d_whatsThis = "hello, i am a whatsthis string";
+        }
 
-QWidget *caSpinboxInterface::createWidget(QWidget *parent)
-{
-    return new caSpinbox(parent);
-}
+        caSpinboxInterface::caSpinboxInterface(QObject *parent): CustomWidgetInterface(parent)
+        {
+            strng name[1], type[1];
+            strcpy(name[0], "channel");
+            strcpy(type[0], "multiline");
+            d_domXml = XmlFunc("caSpinbox", "caspinbox", 0, 0, 80, 30, name, type, 1);
+            d_name = "caSpinbox";
+            d_include = "caSpinbox";
+            QPixmap qpixmap = QPixmap(":pixmaps/spinbox.png");
+            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_toolTip = "[spinbox]";
+            d_whatsThis = "hello, i am a whatsthis string";
+        }
 
-CustomWidgetCollectionInterface::CustomWidgetCollectionInterface(QObject *parent): QObject(parent)
-{
-    d_plugins.append(new caNumericInterface(this));
-    d_plugins.append(new caApplyNumericInterface(this));
-    d_plugins.append(new caSliderInterface(this));
-    d_plugins.append(new caMenuInterface(this));
-    d_plugins.append(new caChoiceInterface(this));
-    d_plugins.append(new caRelatedDisplayInterface(this));
-    d_plugins.append(new caShellCommandInterface(this));
-    d_plugins.append(new caTextEntryInterface(this));
-    d_plugins.append(new caMessageButtonInterface(this));
-    d_plugins.append(new caToggleButtonInterface(this)); 
-    d_plugins.append(new caScriptButtonInterface(this));  
-    d_plugins.append(new caSpinboxInterface(this));  
-}
+        QWidget *caSpinboxInterface::createWidget(QWidget *parent)
+        {
+            return new caSpinbox(parent);
+        }
 
-QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface::customWidgets(void) const
-{
-    return d_plugins;
-}
+        CustomWidgetCollectionInterface::CustomWidgetCollectionInterface(QObject *parent): QObject(parent)
+        {
+            d_plugins.append(new caNumericInterface(this));
+            d_plugins.append(new caApplyNumericInterface(this));
+            d_plugins.append(new caSliderInterface(this));
+            d_plugins.append(new caMenuInterface(this));
+            d_plugins.append(new caChoiceInterface(this));
+            d_plugins.append(new caRelatedDisplayInterface(this));
+            d_plugins.append(new caShellCommandInterface(this));
+            d_plugins.append(new caTextEntryInterface(this));
+            d_plugins.append(new caMessageButtonInterface(this));
+            d_plugins.append(new caToggleButtonInterface(this));
+            d_plugins.append(new caScriptButtonInterface(this));
+            d_plugins.append(new caSpinboxInterface(this));
+        }
+
+        QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface::customWidgets(void) const
+        {
+            return d_plugins;
+        }
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) 
 #else
-Q_EXPORT_PLUGIN2(QtControls, CustomWidgetCollectionInterface)
+        Q_EXPORT_PLUGIN2(QtControls, CustomWidgetCollectionInterface)
 #endif

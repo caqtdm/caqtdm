@@ -97,6 +97,7 @@ signals:
 
 private:
 
+    enum {MAXITEMS = 16};
     QList<EPushButton*> cellsP;
     QList<ImagePushButton*> cellsI;
     QGridLayout  *grid;

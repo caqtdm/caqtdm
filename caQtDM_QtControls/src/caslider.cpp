@@ -176,11 +176,13 @@ void caSlider::setAccessW(int access)
 
 void caSlider::setDirection(Direction dir)
 {
+/*
 #if QWT_VERSION < 0x060100
     ScalePos scalepos = this->scalePosition();
 #else
     ScalePosition scalepos = this->scalePosition();
 #endif
+*/
     thisDirection = dir;
 
 #if QWT_VERSION >= 0x060100
@@ -246,7 +248,7 @@ void caSlider::setDirection(Direction dir)
 #endif
         break;
     }
-    setScalePosition(scalepos);
+
     update();
 }
 
@@ -402,6 +404,9 @@ void caSlider::setNormalColors()
 bool caSlider::event(QEvent *e)
 {
     if(e->type() == QEvent::Resize || e->type() == QEvent::Show || e->type() == QEvent::Paint) {
+
+        const caSlider* that = this;
+
         switch (this->scalePosition()) {
 
         case NoScale:
@@ -442,16 +447,17 @@ bool caSlider::event(QEvent *e)
                         this->setHandleSize(handlesize);
                     }
                     QFont f = font();
-                    int size = scaleDraw()->maxLabelWidth(f);
+                    int size = that->scaleDraw()->maxLabelWidth(f);
+                    float xFactor = (float) size  / ((float) width() * 2.0/3.0 - 15.0);
 
-                    float xFactor = (float) size  / ((float) width() * 2.0/3.0 -15.0);
                     if(xFactor < 0.1) break;
 
                     float pointSize = f.pointSizeF() / xFactor;
+
                     if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
                     if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;
 
-                    if(qAbs(pointSize - pointSizePrv) >= 1.0) {
+                    if(qAbs(pointSize - pointSizePrv) >= 2.0) {
                         f.setPointSizeF(pointSize);
                         pointSizePrv = pointSize;
                         setFont(f);
@@ -466,16 +472,16 @@ bool caSlider::event(QEvent *e)
                        this->setHandleSize(handlesize);
                    }
                    QFont f = font();
-                   int size = scaleDraw()->maxLabelWidth(f);
-
+                   int size = that->scaleDraw()->maxLabelWidth(f);
                    float yFactor = (float) size  / ((float) height()*2.0/3.0 -10.0);
+
                    if(yFactor < 0.1) break;
 
                    float pointSize = f.pointSizeF() / yFactor;
                    if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
                    if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;
 
-                   if(qAbs(pointSize - pointSizePrv) >= 1.0) {
+                   if(qAbs(pointSize - pointSizePrv) >= 2.0) {
                        f.setPointSizeF(pointSize);
                        pointSizePrv = pointSize;
                        setFont(f);
@@ -490,5 +496,7 @@ bool caSlider::event(QEvent *e)
     }
     return QwtSlider::event(e);
 }
+
+
 #include "moc_caslider.cpp"
 

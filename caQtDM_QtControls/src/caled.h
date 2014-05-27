@@ -35,10 +35,14 @@ class QTCON_EXPORT caLed : public ELed
 Q_OBJECT
 
   Q_PROPERTY(QString channel READ getPV WRITE setPV)
-  Q_PROPERTY(int bitNr READ getBitNr WRITE setBitNr)
   Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
   Q_PROPERTY(QColor falseColor READ getFalseColor WRITE setFalseColor)
   Q_PROPERTY(QColor trueColor READ getTrueColor WRITE setTrueColor)
+  Q_PROPERTY(QColor undefinedColor READ getUndefinedColor WRITE setUndefinedColor)
+
+  Q_PROPERTY(QString trueValue READ getTrueValue WRITE setTrueValue)
+  Q_PROPERTY(QString falseValue READ getFalseValue WRITE setFalseValue)
+
   Q_ENUMS(colMode)
 
 public:
@@ -59,18 +63,28 @@ public:
         QColor getTrueColor() const {return thisTrueColor;}
         void setTrueColor(QColor c);
 
+        QColor getUndefinedColor() const {return thisUndefinedColor;}
+        void setUndefinedColor(QColor c);
+
         colMode getColorMode() const { return thisColorMode; }
         void setColorMode(colMode colormode);
 
-        void setState(bool state);
+
+        void setState(Qt::CheckState state);
 
         void setAlarmColors(short status);
+
+        QString getTrueValue() const {return thisTrueValue;}
+        void setTrueValue(QString const &trueValue) {thisTrueValue = trueValue;}
+        QString getFalseValue() const {return thisFalseValue;}
+        void setFalseValue(QString const &falseValue) {thisFalseValue = falseValue;}
 
 private:
         QString thisPV;
         int thisBitNr;
-        QColor thisFalseColor, thisTrueColor;
+        QColor thisFalseColor, thisTrueColor, thisUndefinedColor;
         colMode thisColorMode;
+        QString thisTrueValue, thisFalseValue;
 };
 
 #endif

@@ -151,7 +151,7 @@ extern "C" int CreateAndConnect(int index, knobData *data, int rate, int skip);
 extern "C" void ClearMonitor(knobData *kData);
 extern "C" void DetachContext();
 extern "C" void PrepareDeviceIO();
-extern "C" int EpicsSetValue(char *pv, float rdata, long idata, char *sdata, char *object, char *errmess, int forceType);
+extern "C" int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
 extern "C" void TerminateDeviceIO();
 
 MutexKnobData *mutexKnobData;
@@ -182,7 +182,7 @@ CaQtDM_Lib::~CaQtDM_Lib()
         //qDebug() << "delete" << widget;
         delete widget;
     }
-    delete myWidget;
+    if(!fromAS) delete myWidget;
     includeWidgetList.clear();
     topIncludesWidgetList.clear();
 }
@@ -190,14 +190,20 @@ CaQtDM_Lib::~CaQtDM_Lib()
 /**
  * CaQtDM_Lib constructor
  */
-CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKnobData *mKnobData, MessageWindow *msgWindow, bool pepprint) : QMainWindow(parent)
+CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKnobData *mKnobData, MessageWindow *msgWindow, bool pepprint, QWidget *parentAS) : QMainWindow(parent)
 {
+    QUiLoader loader;
+    fromAS = false;
     AllowsUpdate = true;
     mutexKnobData = mKnobData;
     messageWindow = msgWindow;
     pepPrint = pepprint;
-
     firstResize = true;
+
+    if(parentAS != (QWidget*) 0) {
+        fromAS = true;
+        myWidget = parentAS;
+    }
 
 #ifdef epics4
     qDebug() << "epics4 init";
@@ -206,8 +212,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     //qDebug() << "open file" << filename << "with macro" << macro;
     setAttribute(Qt::WA_DeleteOnClose);
-
-    QUiLoader loader;
 
     includeFiles = "";
 
@@ -224,73 +228,75 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     includeFiles.append(fi.absoluteFilePath());
     includeFiles.append("<br>");
 
-    if(filename.lastIndexOf(".ui") != -1) {
+    if(!fromAS) {
+        if(filename.lastIndexOf(".ui") != -1) {
 
-        file->open(QFile::ReadOnly);
+            file->open(QFile::ReadOnly);
 
-        myWidget = loader.load(file, this);
+            myWidget = loader.load(file, this);
 
-        if (!myWidget) {
-            QMessageBox::warning(this, tr("caQtDM"), tr("Error loading %1. Use designer to find errors").arg(filename));
+            if (!myWidget) {
+                QMessageBox::warning(this, tr("caQtDM"), tr("Error loading %1. Use designer to find errors").arg(filename));
+                file->close();
+                delete file;
+                this->deleteLater();
+                return;
+            }
             file->close();
-            delete file;
+
+            // treat prc file and load designer description from internal buffer
+        } else if(filename.lastIndexOf(".prc") != -1) {
+
+            QString uiString = QString(uiIntern);
+            uiString= uiString.arg(filename);
+            QByteArray *array= new QByteArray();
+            array->append(uiString);
+
+            QBuffer *buffer = new QBuffer();
+            buffer->open(QIODevice::ReadWrite);
+            buffer->write(*array);
+            delete array;
+
+            buffer->seek(0);
+            myWidget = loader.load(buffer, parent);
+            buffer->close();
+            delete buffer;
+
+            if (!myWidget) {
+                QMessageBox::warning(this, tr("caQtDM"), tr("Error loading %1. Use designer to find errors").arg(filename));
+                file->close();
+                delete file;
+                this->deleteLater();
+                return;
+            }
+
+        } else {
+            qDebug() << "caQtDM -- internal error with fileName= " << filename;
             this->deleteLater();
             return;
         }
-        file->close();
 
-        // treat prc file and load designer description from internal buffer
-    } else if(filename.lastIndexOf(".prc") != -1) {
+        // set window title without the whole path
+        QString title(file->fileName().section('/',-1));
+        thisFileShort = file->fileName().section('/',-1);
+        thisFileFull = fi.absoluteFilePath ();
+        setWindowTitle(title);
+        setUnifiedTitleAndToolBarOnMac(true);
 
-        QString uiString = QString(uiIntern);
-        uiString= uiString.arg(filename);
-        QByteArray *array= new QByteArray();
-        array->append(uiString);
+        delete file;
 
-        QBuffer *buffer = new QBuffer();
-        buffer->open(QIODevice::ReadWrite);
-        buffer->write(*array);
-        delete array;
+        // define size of application
+        setMinimumSize(myWidget->width(), myWidget->height());
+        setMaximumSize(myWidget->width(), myWidget->height());
 
-        buffer->seek(0);
-        myWidget = loader.load(buffer, parent);
-        buffer->close();
-        delete buffer;
+        // add widget to the gui
+        layout->addWidget(myWidget);
 
-        if (!myWidget) {
-            QMessageBox::warning(this, tr("caQtDM"), tr("Error loading %1. Use designer to find errors").arg(filename));
-            file->close();
-            delete file;
-            this->deleteLater();
-            return;
-        }
-
-    } else {
-        qDebug() << "caQtDM -- internal error with fileName= " << filename;
-        this->deleteLater();
-        return;
+        QWidget *centralWidget = new QWidget;
+        centralWidget->setLayout(layout);
+        centralWidget->layout()->setContentsMargins(0,0,0,0);
+        setCentralWidget(centralWidget);
     }
-
-    // set window title without the whole path
-    QString title(file->fileName().section('/',-1));
-    thisFileShort = file->fileName().section('/',-1);
-    thisFileFull = fi.absoluteFilePath ();
-    setWindowTitle(title);
-    setUnifiedTitleAndToolBarOnMac(true);
-
-    delete file;
-
-    // define size of application
-    setMinimumSize(myWidget->width(), myWidget->height());
-    setMaximumSize(myWidget->width(), myWidget->height());
-
-    // add widget to the gui
-    layout->addWidget(myWidget);
-
-    QWidget *centralWidget = new QWidget;
-    centralWidget->setLayout(layout);
-    centralWidget->layout()->setContentsMargins(0,0,0,0);
-    setCentralWidget(centralWidget);
 
     qRegisterMetaType<knobData>("knobData");
 
@@ -302,8 +308,10 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
             SIGNAL(Signal_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData)), this,
             SLOT(Callback_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData)));
 
-    connect(this, SIGNAL(Signal_OpenNewWFile(const QString&, const QString&, const QString&)), parent,
-            SLOT(Callback_OpenNewFile(const QString&, const QString&, const QString&)));
+    if(!fromAS) {
+        connect(this, SIGNAL(Signal_OpenNewWFile(const QString&, const QString&, const QString&)), parent,
+                SLOT(Callback_OpenNewFile(const QString&, const QString&, const QString&)));
+    }
 
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
@@ -321,7 +329,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     nbIncludes = 0;
     splashCounter = 1;
-    QList<QWidget *> all = this->findChildren<QWidget *>();
+    QList<QWidget *> all = myWidget->findChildren<QWidget *>();
     foreach(QWidget* widget, all) {
         widget->setProperty("Taken", false);
         if(caInclude* include = qobject_cast<caInclude *>(widget)){
@@ -332,14 +340,14 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     }
 
     if(nbIncludes > 0) {
-      splash = new SplashScreen(parent);
-      splash->setMaximum(nbIncludes);
-      splash->show();
+        splash = new SplashScreen(parent);
+        splash->setMaximum(nbIncludes);
+        splash->show();
     }
 
     initTry = true;
     // get from the display all the calc widgets
-    QList<QWidget *> widgets1 = this->findChildren<QWidget *>();
+    QList<QWidget *> widgets1 = myWidget->findChildren<QWidget *>();
     foreach(QWidget *w1, widgets1) {
         savedFile[0] = fi.baseName();
         savedMacro[0] = macro;
@@ -347,7 +355,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         HandleWidget(w1, savedMacro[0], true);
     }
     // get from the display all the widgets having a monitor associated
-    QList<QWidget *> widgets2 = this->findChildren<QWidget *>();
+    QList<QWidget *> widgets2 = myWidget->findChildren<QWidget *>();
     foreach(QWidget *w1, widgets2) {
         savedFile[0] = fi.baseName();
         savedMacro[0] = macro;
@@ -356,12 +364,12 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     }
     if(nbIncludes > 0) {
 #ifdef linux
-    usleep(200000);
+        usleep(200000);
 #else
-    Sleep::msleep(200);
+        Sleep::msleep(200);
 #endif
-       splash->finish(myWidget);
-       splash->deleteLater();
+        splash->finish(myWidget);
+        splash->deleteLater();
     }
 
     // build a list for getting all soft pv
@@ -1422,6 +1430,16 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         w1->setProperty("Connect", false);
     }
 
+    // add our context to AS widgets
+    /*
+    if(className.contains("QE")) {
+        w1->setContextMenuPolicy(Qt::CustomContextMenu);
+        disconnect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), 0, 0);
+        connect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
+        w1->setProperty("Connect", false);
+    }
+    */
+
 }
 /**
   * this routine uses macro table to replace inside the pv the macro part
@@ -1849,7 +1867,6 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
     if(!AllowsUpdate) return;
 
-
     // thread mutexknobdata emits to all instances of this class, later we will have to filter on the emit side to enhance performance
     bool thisInstance = false;
     QWidget *widget = w;
@@ -2230,15 +2247,25 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         // Led ==================================================================================================================
     } else if (caLed *widget = qobject_cast<caLed *>(w)) {
         //qDebug() << "led" << led->objectName();
+        Qt::CheckState state;
 
         if(data.edata.connected) {
             int colorMode = widget->getColorMode();
             if(colorMode == caLed::Static) {
+
+
+                getStatesToggleAndLed(widget, data, String, state);
+                widget->setState(state);
+
+
+
+/*
                 if(bitState((int) data.edata.ivalue, widget->getBitNr())) {
                     widget->setState(true);
                 } else {
                     widget->setState(false);
                 }
+*/
             } else {
                 widget->setAlarmColors(data.edata.severity);
             }
@@ -2272,7 +2299,6 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             widget->setConnectedColors(false);
         }
 
-
         // Numeric =====================================================================================================
     } else if (caSpinbox *widget = qobject_cast<caSpinbox *>(w)) {
         //qDebug() << "caSpinbox" << widget->objectName() << data.pv;
@@ -2289,6 +2315,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         // Toggle =====================================================================================================
     } else if (caToggleButton *widget = qobject_cast<caToggleButton *>(w)) {
         //qDebug() << "caToggleButton" << widget->objectName() << data.pv;
+        Qt::CheckState state;
 
         if(data.edata.connected) {
             int colorMode = widget->getColorMode();
@@ -2298,12 +2325,64 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 SetColorsBack;
             }
 
-            if( data.edata.ivalue > 0) {
-                widget->setState(true);
-            } else {
-                widget->setState(false);
-            }
+           getStatesToggleAndLed(widget, data, String, state);
+           widget->setState(state);
+/*
+            QString trueString = widget->getTrueValue().trimmed();
+            QString falseString = widget->getFalseValue().trimmed();
 
+            if(data.edata.fieldtype == caINT || data.edata.fieldtype == caLONG ) {
+                int trueValue = trueString.toInt(&ok1);
+                int falseValue = falseString.toInt(&ok2);
+                if(ok1 && trueValue == data.edata.ivalue) {
+                    widget->setState(Qt::Checked);
+                } else if(ok2 && falseValue == data.edata.ivalue) {
+                    widget->setState(Qt::Unchecked);
+                } else {
+                    widget->setState(Qt::PartiallyChecked);
+                }
+            } else if(data.edata.fieldtype == caFLOAT || data.edata.fieldtype == caDOUBLE ) {
+                double trueValue = trueString.toDouble(&ok1);
+                double falseValue = falseString.toDouble(&ok2);
+                if(ok1 && trueValue == data.edata.rvalue) {
+                    widget->setState(Qt::Checked);
+                } else if(ok2 && falseValue == data.edata.rvalue) {
+                    widget->setState(Qt::Unchecked);
+                } else {
+                    widget->setState(Qt::PartiallyChecked);
+                }
+            } else if(data.edata.fieldtype == caENUM || data.edata.fieldtype == caSTRING) {
+                int trueValue = trueString.toInt(&ok1);
+                int falseValue = falseString.toInt(&ok2);
+                widget->setState(Qt::PartiallyChecked);
+
+                QString str = "";
+                QStringList list;
+                list = String.split(";");
+
+                if((int) data.edata.ivalue < list.count()  && (list.count() > 0))  str = list.at((int) data.edata.ivalue);
+
+                // integer value given
+                if(ok1) {
+                    if(trueValue == data.edata.ivalue) {
+                        widget->setState(Qt::Checked);
+                    }
+                    // string value
+                } else {
+                    if(trueString.compare(str) == 0) widget->setState(Qt::Checked);
+                }
+
+                // integer value given
+                if(ok2) {
+                    if(falseValue == data.edata.ivalue) {
+                        widget->setState(Qt::Unchecked);
+                    }
+                    // string value
+                } else {
+                    if(falseString.compare(str) == 0) widget->setState(Qt::Unchecked);
+                }
+            }
+*/
             widget->setAccessW(data.edata.accessW);
         } else {
             SetColorsNotConnected;
@@ -2767,6 +2846,71 @@ void CaQtDM_Lib::WaterFall(caWaterfallPlot *widget, const knobData &data)
     }
 }
 
+void CaQtDM_Lib::getStatesToggleAndLed(QWidget *widget, const knobData &data, const QString &String, Qt::CheckState &state)
+{
+    QString trueString, falseString;
+    bool ok1, ok2;
+    if (caLed *w = qobject_cast<caLed *>(widget)) {
+       trueString = w->getTrueValue().trimmed();
+       falseString = w->getFalseValue().trimmed();
+    } else if(caToggleButton *w = qobject_cast<caToggleButton *>(widget)) {
+        trueString = w->getTrueValue().trimmed();
+        falseString = w->getFalseValue().trimmed();
+    }
+
+    if(data.edata.fieldtype == caINT || data.edata.fieldtype == caLONG ) {
+        int trueValue = trueString.toInt(&ok1);
+        int falseValue = falseString.toInt(&ok2);
+        if(ok1 && trueValue == data.edata.ivalue) {
+            state = Qt::Checked;
+        } else if(ok2 && falseValue == data.edata.ivalue) {
+            state = Qt::Unchecked;
+        } else {
+            state = Qt::PartiallyChecked;
+        }
+    } else if(data.edata.fieldtype == caFLOAT || data.edata.fieldtype == caDOUBLE ) {
+        double trueValue = trueString.toDouble(&ok1);
+        double falseValue = falseString.toDouble(&ok2);
+        if(ok1 && trueValue == data.edata.rvalue) {
+            state = Qt::Checked;
+        } else if(ok2 && falseValue == data.edata.rvalue) {
+            state = Qt::Unchecked;
+        } else {
+            state = Qt::PartiallyChecked;
+        }
+    } else if(data.edata.fieldtype == caENUM || data.edata.fieldtype == caSTRING) {
+        int trueValue = trueString.toInt(&ok1);
+        int falseValue = falseString.toInt(&ok2);
+        state = Qt::PartiallyChecked;
+
+        QString str = "";
+        QStringList list;
+        list = String.split(";");
+
+        if((int) data.edata.ivalue < list.count()  && (list.count() > 0))  str = list.at((int) data.edata.ivalue);
+
+        // integer value given
+        if(ok1) {
+            if(trueValue == data.edata.ivalue) {
+                state = Qt::Checked;
+            }
+            // string value
+        } else {
+            if(trueString.compare(str) == 0) state = Qt::Checked;
+        }
+
+        // integer value given
+        if(ok2) {
+            if(falseValue == data.edata.ivalue) {
+                state = Qt::Unchecked;
+            }
+            // string value
+        } else {
+            if(falseString.compare(str) == 0) state = Qt::Unchecked;
+        }
+    }
+}
+
 /**
  * callback will write value to device
  */
@@ -2829,23 +2973,37 @@ void CaQtDM_Lib::Callback_SliderValueChanged(double value)
  */
 void CaQtDM_Lib::Callback_ToggleButton(bool type)
 {
-    float value;
-    int32_t idata;
-    QString text;
+    bool ok1, ok2;
+    double rvalue = 0.0;
+    int32_t ivalue = 0;
+    QString svalue ="";
     char errmess[255];
     caToggleButton *w = qobject_cast<caToggleButton *>(sender());
     if(!w->getAccessW()) return;
 
-    if(!type) {         // toggle cleared
-        value=0;
-    } else  {           // toggle checked
-        value=1;
+    QString trueString = w->getTrueValue().trimmed();
+    QString falseString = w->getFalseValue().trimmed();
+    if(type) svalue = trueString; else svalue = falseString;
+
+    int trueValueI = trueString.toInt(&ok1);
+    int falseValueI = falseString.toInt(&ok2);
+    if(ok1 && type) {
+        ivalue = trueValueI;
+    } else if(ok2  && !type) {
+        ivalue = falseValueI;
     }
-    idata = (int32_t) value;
+
+    double trueValueD = trueString.toDouble(&ok1);
+    double falseValueD = falseString.toDouble(&ok2);
+    if(ok1 && type) {
+        rvalue = trueValueD;
+    } else if(ok2 && !type) {
+        rvalue = falseValueD;
+    }
 
     if(w->getPV().length() > 0) {
-        QStringsToChars(w->getPV(), text,  w->objectName().toLower());
-        EpicsSetValue(param1, value, idata, param2, param3, errmess, 2);
+        QStringsToChars(w->getPV(), svalue,  w->objectName().toLower());
+        EpicsSetValue(param1, rvalue, ivalue, param2, param3, errmess, 0);
     }
 }
 
@@ -3378,6 +3536,9 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         pv[0] = widget->getPV().trimmed();
         nbPV = 1;
     } else if(caLed* widget = qobject_cast<caLed *>(w)) {
+        pv[0] = widget->getPV().trimmed();
+        nbPV = 1;
+    } else if(caToggleButton* widget = qobject_cast<caToggleButton *>(w)) {
         pv[0] = widget->getPV().trimmed();
         nbPV = 1;
     } else if(caBitnames* widget = qobject_cast<caBitnames *>(w)) {
@@ -4123,7 +4284,7 @@ int CaQtDM_Lib::Execute(char *command)
 }
 #endif
 
-void CaQtDM_Lib::TreatOrdinaryValue(QString pv, float value, int32_t idata,  QWidget *w)
+void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QWidget *w)
 {
     char errmess[255];
     int indx =  w->property("MonitorIndex").value<int>();
@@ -4453,7 +4614,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             box->setFont(f);
         }
     }
-
+/* no, we do this inside the class now
     else if(!className.compare("caThermo")) {
         if(qMin(factX, factY) < 1.0) {
             caThermo *thermo = (caThermo *) widget;
@@ -4473,7 +4634,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             slider->setFont(f);
         }
     }
-
+*/
 }
 
 void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
@@ -4493,7 +4654,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
         // keep original width and height
         origWidth = event->size().width();
         origHeight = event->size().height();
-        QList<QWidget *> all = this->findChildren<QWidget *>();
+        QList<QWidget *> all = myWidget->findChildren<QWidget *>();
         foreach(QWidget* widget, all) {
             QList<QVariant> integerList;
             QString className(widget->metaObject()->className());
@@ -4568,7 +4729,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
         // centralwidget should manage the layout itsself, we do nothing except changing font for some classes
         if(className.contains("Layout")) {
             // resize some minor stuff before leaving this routine
-            QList<QWidget *> all = this->findChildren<QWidget *>();
+            QList<QWidget *> all = myWidget->findChildren<QWidget *>();
             foreach(QWidget* widget, all) {
                 QString className(widget->metaObject()->className());
                 QVariant var=widget->property("GeometryList");
@@ -4583,7 +4744,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
     }
 
     // do all resize work ourselves
-    QList<QWidget *> all = this->findChildren<QWidget *>();
+    QList<QWidget *> all = myWidget->findChildren<QWidget *>();
     foreach(QWidget* widget, all) {
         QString className(widget->metaObject()->className());
 

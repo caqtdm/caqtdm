@@ -45,6 +45,9 @@ caToggleButton::caToggleButton(QWidget *parent) : QCheckBox(parent)
     installEventFilter(this);
     connect(this, SIGNAL(clicked()), this, SLOT(buttonToggled()) );
 
+    setTrueValue("1");
+    setFalseValue("0");
+
     setAccessW(true);
 }
 
@@ -64,13 +67,9 @@ void caToggleButton::setPV(QString const &newPV)
     thisPV = newPV;
 }
 
-void caToggleButton::setState(bool check)
+void caToggleButton::setState(Qt::CheckState state)
 {
-    if(check) {
-        setCheckState( Qt::Checked );
-    } else {
-        setCheckState( Qt::Unchecked );
-    }
+    setCheckState(state);
 }
 
 void caToggleButton::setColors(QColor bg, QColor fg)

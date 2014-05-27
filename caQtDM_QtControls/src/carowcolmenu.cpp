@@ -35,10 +35,10 @@
 caRowColMenu::caRowColMenu(QWidget *parent) : QWidget(parent)
 {
     numCells = 2;
-    files << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10";
-    args  << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10";
-    labels << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10";
-    texts << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10";
+    files << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";
+    args  << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";
+    labels<< "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";
+    texts << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";
     signalMapper = new QSignalMapper(this);
 
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -67,7 +67,7 @@ void caRowColMenu::populateCells()
     numCells = qMin(numCells, labels.size());
 
     if(numCells < 1) return;
-    if(numCells > 10) numCells=10;
+    if(numCells > MAXITEMS) numCells=MAXITEMS;
 
     if(thisStacking == Hidden) numCells = 1;
 

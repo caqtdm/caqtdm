@@ -609,12 +609,12 @@ void DetachContext()
 }
 
 
-int EpicsSetValue(char *pv, float rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType)
+int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType)
 {
     chid     ch;
     chtype   chType;
     int status;
-    struct dbr_ctrl_float ctrlR;
+    struct dbr_ctrl_double ctrlR;
     struct dbr_sts_string ctrlS;
 
     UNUSED(errmess);
@@ -660,7 +660,7 @@ int EpicsSetValue(char *pv, float rdata, int32_t idata, char *sdata, char *objec
 
     chType = ca_field_type(ch);
 
-    if(forceType == 1) chType = DBF_FLOAT;
+    if(forceType == 1) chType = DBF_DOUBLE;
     else if(forceType == 2) chType = DBF_INT;
 
     switch (chType) {
@@ -694,8 +694,8 @@ int EpicsSetValue(char *pv, float rdata, int32_t idata, char *sdata, char *objec
 
     case DBF_DOUBLE:
     case DBF_FLOAT:
-        PRINT(printf("put double/float for <%s> with data=%f\n", pv, rdata));
-        status = ca_put(DBR_FLOAT, ch, &rdata);
+        PRINT(printf("put double/float for <%s> with data=%f chid=%p\n", pv, rdata, ch));
+        status = ca_put(DBR_DOUBLE, ch, &rdata);
         if (status != ECA_NORMAL) {
             C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s)\n", pv, ca_message (status)));
             return status;
@@ -730,7 +730,7 @@ int EpicsSetValue(char *pv, float rdata, int32_t idata, char *sdata, char *objec
 
     case DBF_DOUBLE:
     case DBF_FLOAT:
-        status = ca_get(DBR_CTRL_FLOAT, ch, &ctrlR);
+        status = ca_get(DBR_CTRL_DOUBLE, ch, &ctrlR);
         status = ca_pend_io(CA_TIMEOUT);
         if (status != ECA_NORMAL) {
             C_postMsgEvent(messageWindow, 1, vaPrintf("get pv (%s) %s\n", pv, ca_message (status)));

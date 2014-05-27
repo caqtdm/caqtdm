@@ -40,10 +40,13 @@
 
 caThermo::caThermo(QWidget *parent) : QwtThermoMarker(parent), m_externalEnabled(false)
 {
+
     thisDirection = Up;
     defaultBackColor = QWidget::palette().background().color();
     defaultForeColor = palette().foreground().color();
     thisColorMode = Static;
+
+    pointSizePrv = 0.0;
 
     setBackground(QColor(224,224,224));
     setForeground(Qt::black);
@@ -257,6 +260,9 @@ void caThermo::setUserAlarmColors(double val)
 bool caThermo::event(QEvent *e)
 {
     if(e->type() == QEvent::Resize || e->type() == QEvent::Show || e->type() == QEvent::Paint) {
+
+        const caThermo* that = this;
+
         switch (thisScale) {
 
         case false:
@@ -288,21 +294,22 @@ bool caThermo::event(QEvent *e)
 
                 case Up:
                 case Down: {
+
                     int pipewidth = width()/3-4;
                     if(pipewidth != this->pipeWidth()) {
                         this->setPipeWidth(pipewidth);
                     }
                     QFont f = font();
-                    int size = scaleDraw()->maxLabelWidth(f);
-
+                    int size = that->scaleDraw()->maxLabelWidth(f);
                     float xFactor = (float) size  / ((float) width() * 2.0/3.0 - 15.0);
+
                     if(xFactor < 0.1) break;
 
                     float pointSize = f.pointSizeF() / xFactor;
                     if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
                     if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;
 
-                    if(qAbs(pointSize - pointSizePrv) >= 1.0) {
+                    if(qAbs(pointSize - pointSizePrv) >= 2.0) {
                         f.setPointSizeF(pointSize);
                         pointSizePrv = pointSize;
                         setFont(f);
@@ -318,16 +325,16 @@ bool caThermo::event(QEvent *e)
                        this->setPipeWidth(pipewidth);
                    }
                    QFont f = font();
-                   int size = scaleDraw()->maxLabelWidth(f);
+                   int size = that->scaleDraw()->maxLabelWidth(f);
+                   float yFactor = (float) size  / ((float) height()*2.0/3.0 - 10.0);
 
-                   float yFactor = (float) size  / ((float) height()*2.0/3.0 -10.0);
                    if(yFactor < 0.1) break;
 
                    float pointSize = f.pointSizeF() / yFactor;
                    if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
                    if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;
 
-                   if(qAbs(pointSize - pointSizePrv) >= 1.0) {
+                   if(qAbs(pointSize - pointSizePrv) >= 2.0) {
                        f.setPointSizeF(pointSize);
                        pointSizePrv = pointSize;
                        setFont(f);

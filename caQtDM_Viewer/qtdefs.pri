@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.7.7
+CAQTDM_VERSION = V3.7.8
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -9,6 +9,15 @@ unix {
     QMAKE_CXXFLAGS += "-g"
     QMAKE_CFLAGS_RELEASE += "-g"
 }
+
+# 3.7.8
+# when writing a double, float was used so that the precision was lost, corrected
+# related display modified for up to 16 items
+# changed names for designer groups to include PSI Name
+# changed caToggleButton and caLed behaviour
+# changed caSlider and caThermo to be compilable with the standard version of qwt6.1 when using qt5.2
+# modified caQtDM_Lib to be callable from the software of the Australian lightsource
+# fixed a bug in the scrollbar behaviour of the camera widget
 
 # 3.7.7
 # in waterfall plot the demo plot was not erased at initialization with real data, corrected
@@ -26,7 +35,7 @@ unix {
 # small memory leak repaired in cainclude
 
 # 3.7.3
-# after the iimproved performance of the cartesian plot, the trigger mode disappeared, corrected
+# after the improved performance of the cartesian plot, the trigger mode disappeared, corrected
 
 # 3.7.2
 # cagraphic lost its linecolor after no connection
