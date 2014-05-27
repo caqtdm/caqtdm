@@ -38,7 +38,7 @@ class QTCON_EXPORT caToggleButton : public QCheckBox
 
     Q_ENUMS(colMode)
 
-    Q_PROPERTY( bool tristate DESIGNABLE false)
+    Q_PROPERTY(bool tristate READ isTristate WRITE setTristate DESIGNABLE false)
 
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
 
