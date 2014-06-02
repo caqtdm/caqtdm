@@ -17,6 +17,8 @@ CONFIG   += warn_on
 #epics4
 #CONFIG += epics4
 
+#CONFIG += australian
+
 unix{
  QMAKE_CXXFLAGS += "-g"
  QMAKE_CFLAGS_RELEASE += "-g"
@@ -68,7 +70,8 @@ HEADERS += caqtdm_lib.h\
     limitsCartesianplotDialog.h \
     sliderDialog.h \
     processWindow.h \
-    splashscreen.h
+    splashscreen.h \
+    epicsExternals.h
 
 HEADERS += \
     JSONValue.h \
@@ -78,7 +81,7 @@ SOURCES += \
     JSONValue.cpp \
     JSON.cpp
 
-#if we want to use epics4, define it in caQtDM_Lib.pri
+#if we want to use epics4, define it above
 epics4: {
 SOURCES += ../src/epics4Subs.cpp pvAccessImpl.cpp
 HEADERS += ../src/epics4Subs.h pvAccessImpl.h
@@ -86,6 +89,16 @@ EPICS4LIB = /usr/local/epics/base-4.2.0/lib/SL6-x86/
 LIBS += -L$${EPICS4LIB} -Wl,-rpath,$${EPICS4LIB}  -lpvAccess -lpvData
 INCLUDEPATH += /usr/local/epics/base-4.2.0/include
 DEFINES += epics4
+}
+
+#if we want some info from the australian lightsource, define it above
+australian: {
+  DEFINES +=_AUSTRALIAN
+  INCLUDEPATH += ../../../epicsQt/2.8.1/framework/widgets/include
+  INCLUDEPATH += ../../../epicsQt/2.8.1/framework/data/include
+  INCLUDEPATH += ../../../epicsQt/2.8.1/framework/api/include
+  INCLUDEPATH += ../../../epicsQt/2.8.1/framework/common
+  LIBS += -L$(QTBASE)/designer -lQEPlugin
 }
 
 INCLUDEPATH += .

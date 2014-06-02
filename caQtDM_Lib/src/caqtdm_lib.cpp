@@ -47,6 +47,12 @@
 
 #include "alarmdefs.h"
 
+#include "epicsExternals.h"
+
+#ifdef AUSTRALIAN
+#include <QEWidget.h>
+#endif
+
 #define PRINT(x)
 #define min(x,y)   (((x) < (y)) ? (x) : (y))
 
@@ -148,10 +154,10 @@
 Q_DECLARE_METATYPE(QList<int>)
 
 extern "C" int CreateAndConnect(int index, knobData *data, int rate, int skip);
-extern "C" void ClearMonitor(knobData *kData);
 extern "C" void DetachContext();
 extern "C" void PrepareDeviceIO();
-extern "C" int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
+extern "C" void ClearMonitor(knobData *kData);
+
 extern "C" void TerminateDeviceIO();
 
 MutexKnobData *mutexKnobData;
@@ -1431,14 +1437,14 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     }
 
     // add our context to AS widgets
-    /*
-    if(className.contains("QE")) {
+
+    if(className.contains("QEAnalogProgressBar")) {
         w1->setContextMenuPolicy(Qt::CustomContextMenu);
         disconnect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), 0, 0);
         connect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
         w1->setProperty("Connect", false);
     }
-    */
+
 
 }
 /**
@@ -3435,6 +3441,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     double limitsMax=0.0, limitsMin=0.0;
     bool validExecListItems = false;
     QStringList execListItems;
+    QString className = w->metaObject()->className();
 
     // execution list for context menu defined ?
     QString execList = (QString)  getenv("CAQTDM_EXEC_LIST");
@@ -3640,6 +3647,10 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         Q_UNUSED(widget);
         // add acion : kill associated process if running
         if(!widget->getAccessW()) myMenu.addAction("Kill Process");
+
+    } else if(className.contains("QE")) {
+        qDebug() << "treat" << w;
+
 
     // must be mainwindow
     } else if(w==myWidget->parent()->parent()) {
@@ -4589,7 +4600,6 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         plot->setAxisTitle(QwtPlot::xBottom, titleX);
         plot->setAxisTitle(QwtPlot::yLeft, titleY);
 
-
         // font size of legends qith qwt 6.0
         if(!className.compare("caStripPlot")) {
             caStripPlot * plot = (caStripPlot *) widget;
@@ -4614,27 +4624,6 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             box->setFont(f);
         }
     }
-/* no, we do this inside the class now
-    else if(!className.compare("caThermo")) {
-        if(qMin(factX, factY) < 1.0) {
-            caThermo *thermo = (caThermo *) widget;
-            qreal fontSize =  qMin(factX, factY) * (double) list.at(4).toInt();
-            QFont f = thermo->font();
-            f.setPointSizeF(fontSize);
-            thermo->setFont(f);
-        }
-    }
-
-    else if(!className.compare("caSlider")) {
-        if(qMin(factX, factY) < 1.0) {
-            caSlider *slider = (caSlider *) widget;
-            qreal fontSize =  qMin(factX, factY) * (double) list.at(4).toInt();
-            QFont f = slider->font();
-            f.setPointSizeF(fontSize);
-            slider->setFont(f);
-        }
-    }
-*/
 }
 
 void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
