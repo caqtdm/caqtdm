@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.7.8
+CAQTDM_VERSION = V3.7.9
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -9,6 +9,9 @@ unix {
     QMAKE_CXXFLAGS += "-g"
     QMAKE_CFLAGS_RELEASE += "-g"
 }
+# 3.7.9
+# minor adjustments
+# caslider was modified so that scale behaviour was incorrect, this has been corrected
 
 # 3.7.8
 # when writing a double, float was used so that the precision was lost, corrected

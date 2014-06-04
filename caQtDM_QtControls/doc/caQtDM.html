@@ -579,8 +579,15 @@ has no equivalent in MEDM.
     <dd> QString: this string represents the control system process variable <br/>
     </dd>
 
-    <dt><strong>bitNr:</strong></dt>
-    <dd>Integer: the bit that has to be considered<br/>
+    <dt><strong>trueValue:</strong></dt>
+    <dd>
+          QString: the value or string for the trueColor
+          <br/>
+    </dd>
+    <dt><strong>falseValue:</strong></dt>
+    <dd>
+          QString: the value or string for the falseColor
+          <br/>
     </dd>
 
     <dt><strong>falseColor:</strong></dt>
@@ -588,6 +595,9 @@ has no equivalent in MEDM.
     </dd>
     <dt><strong>trueColor:</strong></dt>
     <dd> QColor: color used when the bit is set <br/>
+    </dd>
+    <dt><strong>undefinedColor:</strong></dt>
+    <dd> QColor: color when not true and not false<br/>
     </dd>
     <dt><strong>colorMode:</strong></dt>
     <dd>
@@ -1108,9 +1118,68 @@ is the equivalent of the StripChart Monitor in MEDM.
 <h3><a  name="caByte" rel="help" id="caByte"><font color="#ff00ff">caByte</font></a></h3>
 is the equivalent of the Byte Monitor in MEDM.
 <blockquote> <a href="#geometry">Geometry</a> is used for any object<br /><br />
+
 <b>Description:</b><br /><br />
- </blockquote>
-<hr />
+ <dl>
+    <dt><strong>channel:</strong></dt>
+    <dd> QString: this string represents the control system process variable <br/>
+    </dd>
+
+ <dt><strong>direction:</strong></dt>
+    <dd>
+      <table border="1" cellspacing="0" cellpadding="2">
+        <tr>
+          <td  valign="top">Up</td>
+        </tr>
+        <tr>
+          <td valign="top">Down</td>
+        </tr>
+        <tr>
+          <td  valign="top">Left</td>
+        </tr>
+        <tr>
+          <td valign="top">Right</td>
+        </tr>
+      </table>
+      <br/>
+    </dd>
+    <dt><strong>startBit:</strong></dt>
+    <dd>
+          Integer: the first bit to be displayed
+          <br/>
+    </dd>
+    <dt><strong>endBit:</strong></dt>
+    <dd>
+          Integer: the last bit to be displayed 
+          <br/>
+    </dd>
+
+    <dt><strong>foreGround:</strong></dt>
+    <dd> QColor: color used when the bit is not set <br/>
+    </dd>
+    <dt><strong>background:</strong></dt>
+    <dd> QColor: color used when the bit is set <br/>
+    </dd>
+    <dt><strong>colorMode:</strong></dt>
+    <dd>
+      <table border="1" cellspacing="0" cellpadding="2">
+        <tr>
+          <td  valign="top">Static</td>
+          <td  valign="top" >Show the object in colors given by the properties background and foreground.</td>
+        </tr>
+        <tr>
+          <td valign="top">Alarm</td>
+          <td valign="top">Show the object in colors given by the properties background and foreground, but with alarm handling</td>
+        </tr>
+      </table>
+      <br/>
+    </dd>
+
+  </dl>
+</blockquote>
+<hr/>
+
+
 <h3><a  name="caCamera" rel="help" id="caCamera"><font color="#ff00ff">caCamera</font></a></h3>
 has no equivalent in MEDM.
 <blockquote> <a href="#geometry">Geometry</a> is used for any object <br /><br />
@@ -1139,9 +1208,80 @@ has no  equivalent in MEDM.
 has no  equivalent in MEDM.
 <blockquote> <a href="#geometry">Geometry</a> is used for any object <br /><br />
 <b>Description:</b><br /><br />
+
+  <dl>
+
+    <dt><strong>channels</strong></dt>
+    <dd>QString: this string represents the control system process variables; the channels have to be separated by a semicolumn.<br/>
+    </dd>
+    <dt><strong>columnSizes</strong></dt>
+<dd>QString: this string is used to specifiy the columnwidths (3columns); the widths are separated by a semicolumn.<br/>
+    </dd>
+   <dt><strong>colorMode:</strong></dt>
+    <dd>
+      <table border="1" cellspacing="0" cellpadding="2">
+        <tr>
+          <td  valign="top">Static</td>
+          <td  valign="top" >Show the object in colors given by the properties background and foreground.</td>
+        </tr>
+        <tr>
+          <td valign="top">Alarm</td>
+          <td valign="top">Show the object in colors given by the properties background and foreground, but with alarm handling</td>
+        </tr>
+      </table>
+      <br/>
+    </dd>
+ <dt><strong>Precision:</strong></dt>
+<dd>
+          Integer: precision in case of precisionMode=User
+          <br />
+</dd>
+
+    <dt><strong>precisionMode:</strong></dt>
+    <dd>
+      <table border="1" cellspacing="0" cellpadding="2">
+        <tr>
+          <td  valign="top">Channel</td>
+          <td  valign="top">Precision specified by the control system will be used </td>
+        </tr>
+        <tr>
+          <td  valign="top">User</td>
+          <td  valign="top">Precision specified by the user will be used</td>
+        </tr>
+      </table>
+      <br/>
+    </dd>
+    <dt><strong>limitsMode:</strong></dt>
+    <dd>
+      <table border="1" cellspacing="0" cellpadding="2">
+        <tr>
+          <td  valign="top">Channel</td>
+          <td  valign="top">Limits specified by the control system will be usd (HOPR, LOPR for EPICS)</td>
+        </tr>
+        <tr>
+          <td  valign="top">User</td>
+          <td  valign="top">Limits specified by the user will be used.</td>
+        </tr>
+      </table>
+      <br/>
+    </dd>
+    <dt><strong>maxValue:</strong></dt>
+    <dd> float: maximum value used in case of limitsMode=User <br/>
+    </dd>
+    <dt><strong>minValue:</strong></dt>
+    <dd> float: minimum value used in case of limitsMode=User <br/>
+    </dd>
+    <dt><strong>scriptCommand:</strong></dt>
+    <dd> QString: shell script that will be executed when the value of the pv is doubleclicked. the pv is appended as first parameter <br/>
+    </dd>
+    <dt><strong>scriptParameter:</strong></dt>
+    <dd> QString: paremeter that will be appended to the shell script after the pv name <br/>
+    </dd>
+</dl>
+
 </blockquote>
 <hr />
-<hr />
+
 <h2><b> <a  name="graphics" id="graphics" rel="Subsection">all graphical objects</a></b></h2>
 <hr />
 <h3><a  name="caLabel" rel="help" id="caLabel"><font color="#ff00ff">caLabel</font></a></h3>

@@ -217,7 +217,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             strcpy(type[2], "multiline");
             strcpy(name[3], "args");
             strcpy(type[3], "multiline");
-            strcpy(name[4], "replaceModes");
+            strcpy(name[4], "removeParent");
             strcpy(type[4], "multiline");
             d_domXml = XmlFunc("caRelatedDisplay", "carelateddisplay", 0, 0, 150, 50, name, type, 5);
             d_name = "caRelatedDisplay";
@@ -305,10 +305,14 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
 
         caToggleButtonInterface::caToggleButtonInterface(QObject* parent) : CustomWidgetInterface(parent)
         {
-            strng name[1], type[1];
+            strng name[3], type[3];
             strcpy(name[0], "channel");
             strcpy(type[0], "multiline");
-            d_domXml = XmlFunc("caToggleButton", "catogglebutton", 0, 0, 100, 22, name, type, 1);
+            strcpy(name[1], "trueValue");
+            strcpy(type[1], "multiline");
+            strcpy(name[2], "falseValue");
+            strcpy(type[2], "multiline");	    
+            d_domXml = XmlFunc("caToggleButton", "catogglebutton", 0, 0, 100, 22, name, type, 3);
             d_name = "caToggleButton";
             d_include = "caToggleButton";
             QPixmap qpixmap = QPixmap(":pixmaps/radiobutton.png");

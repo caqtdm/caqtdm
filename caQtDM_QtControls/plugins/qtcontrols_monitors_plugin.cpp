@@ -84,7 +84,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             strcpy(name[0], "channelEnum");
             strcpy(type[0], "multiline");
             strcpy(name[1], "channelValue");
-            strcpy(type[1], "multiline");
+            strcpy(type[1], "multiline");	    
             d_domXml = XmlFunc("caBitnames", "cabitnames", 0, 0, 160, 90, name, type, 2);
             d_toolTip = "[Enum table with state]";
             d_name = "caBitnames";
@@ -100,10 +100,14 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
 
         caLedInterface::caLedInterface(QObject *parent): CustomWidgetInterface(parent)
         {
-            strng name[1], type[1];
+            strng name[3], type[3];
             strcpy(name[0], "channel");
             strcpy(type[0], "multiline");
-            d_domXml = XmlFunc("caLed", "caled", 0, 0, 30, 30, name, type, 1);
+            strcpy(name[1], "trueValue");
+            strcpy(type[1], "multiline");	 
+            strcpy(name[2], "falseValue");
+            strcpy(type[2], "multiline");	    
+            d_domXml = XmlFunc("caLed", "caled", 0, 0, 30, 30, name, type, 3);
             d_toolTip = "[LED for true or false bitstate or for severity states]";
             d_name = "caLed";
             d_include = "caLed";
@@ -195,7 +199,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
 
         caCartesianPlotInterface::caCartesianPlotInterface(QObject* parent) : CustomWidgetInterface(parent)
         {
-            strng name[12], type[12];
+            strng name[14], type[14];
             strcpy(name[0], "channels_1");
             strcpy(type[0], "multiline");
             strcpy(name[1], "channels_2");
@@ -220,7 +224,11 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             strcpy(type[10], "multiline");
             strcpy(name[11], "TitleY");
             strcpy(type[11], "multiline");
-            d_domXml = XmlFunc("caCartesianPlot", "cacartesianplot", 0, 0, 200, 50, name, type, 12);
+            strcpy(name[12], "XaxisLimits");
+            strcpy(type[12], "multiline");	
+            strcpy(name[13], "YaxisLimits");
+            strcpy(type[13], "multiline");	    
+            d_domXml = XmlFunc("caCartesianPlot", "cacartesianplot", 0, 0, 200, 50, name, type, 14);
             d_toolTip = "[Cartesian Plot]";
             d_name = "caCartesianPlot";
             d_include = "caCartesianPlot";
@@ -272,10 +280,14 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
 
         caTableInterface::caTableInterface(QObject *parent): CustomWidgetInterface(parent)
         {
-            strng name[1], type[1];
+            strng name[3], type[3];
             strcpy(name[0], "channels");
             strcpy(type[0], "multiline");
-            d_domXml = XmlFunc("caTable", "catable", 0, 0, 120, 120, name, type, 1);
+            strcpy(name[1], "scriptCommand");
+            strcpy(type[1], "multiline");
+            strcpy(name[2], "scriptParameter");
+            strcpy(type[2], "multiline");	    
+            d_domXml = XmlFunc("caTable", "catable", 0, 0, 120, 120, name, type, 3);
             d_toolTip = "[Table Monitor]";
             d_name = "caTable";
             d_include = "caTable";

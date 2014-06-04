@@ -176,13 +176,13 @@ void caSlider::setAccessW(int access)
 
 void caSlider::setDirection(Direction dir)
 {
-/*
+
 #if QWT_VERSION < 0x060100
     ScalePos scalepos = this->scalePosition();
 #else
     ScalePosition scalepos = this->scalePosition();
 #endif
-*/
+
     thisDirection = dir;
 
 #if QWT_VERSION >= 0x060100
@@ -248,7 +248,7 @@ void caSlider::setDirection(Direction dir)
 #endif
         break;
     }
-
+    setScalePosition(scalepos);
     update();
 }
 
