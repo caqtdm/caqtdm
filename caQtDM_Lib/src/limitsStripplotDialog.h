@@ -68,6 +68,7 @@
      QLineEdit *minLineEdit[caStripPlot::MAXCURVES];
      QLineEdit *maxLineEdit[caStripPlot::MAXCURVES];
      QComboBox *YaxisType;
+     QComboBox *YaxisScaling;
      QStringList vars;
      caStripPlot *StripPlot;
      MutexKnobData *monData;

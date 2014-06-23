@@ -46,7 +46,6 @@ protected:
 signals:
      void update();
 
-
 private slots:
      void TimeOut();
      void runStop();

@@ -30,12 +30,14 @@
 #include <camessagebutton.h>
 #include <cacamera.h>
 #include <cacalc.h>
-#include <capolylinetaskmenu.h> 
 #include <catogglebutton.h>
 #include <cascriptbutton.h>
 #include <cadoubletabwidget.h>
-#include <cadoubletabwidgetextension.h>
-#include <cadoubletabwidgetextensionfactory.h>
+#ifndef Q_OS_IOS
+  #include <cadoubletabwidgetextension.h>
+  #include <cadoubletabwidgetextensionfactory.h>
+  #include <capolylinetaskmenu.h>
+#endif
 #include <cawaterfallplot.h>
 #include <caspinbox.h>
 #endif

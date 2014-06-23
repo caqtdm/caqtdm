@@ -35,7 +35,7 @@
 
 typedef char strng[40];
 
-char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, strng *propertyname, strng* propertytype, int nb)
+static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, strng *propertyname, strng* propertytype, int nb)
 {
   char mess[1024], *xml;
   
@@ -102,17 +102,17 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
   return xml;
 }
 
-  CustomWidgetInterface::CustomWidgetInterface(QObject *parent): QObject(parent), d_isInitialized(false)
+  CustomWidgetInterface_Graphics::CustomWidgetInterface_Graphics(QObject *parent): QObject(parent), d_isInitialized(false)
   {
   }
 
-  void CustomWidgetInterface::initialize(QDesignerFormEditorInterface *formEditor)
+  void CustomWidgetInterface_Graphics::initialize(QDesignerFormEditorInterface *formEditor)
   {
       //printf("initialize function for %s\n", d_name.toAscii().constData());
 
       if (d_isInitialized)
           return;
-
+#ifndef Q_OS_IOS
       // extension for PolyDraw
       if(d_name.contains("caPolyLine")) {
           QExtensionManager *manager = formEditor->extensionManager();
@@ -126,14 +126,14 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
           manager->registerExtensions(new caDoubleTabWidgetExtensionFactory(manager),
                                       Q_TYPEID(QDesignerContainerExtension));
       }
-
+#endif
       // set this property in order to find out later if we use our controls through the designer or otherwise
       qApp->setProperty("APP_SOURCE", QVariant(QString("DESIGNER")));
 
       d_isInitialized = true;
   }
 
-  caLabelInterface::caLabelInterface(QObject* parent) : CustomWidgetInterface(parent)
+  caLabelInterface::caLabelInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
   {
       strng name[5], type[5];
       strcpy(name[0], "channel");
@@ -163,7 +163,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
       return new caFrame(parent);
   }
 
-  caFrameInterface::caFrameInterface(QObject* parent) : CustomWidgetInterface(parent)
+  caFrameInterface::caFrameInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
   {
       strng name[6], type[6];
       strcpy(name[0], "channel");
@@ -185,7 +185,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
       d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
   }
 
-  caImageInterface::caImageInterface(QObject *parent): CustomWidgetInterface(parent)
+  caImageInterface::caImageInterface(QObject *parent): CustomWidgetInterface_Graphics(parent)
   {
       strng name[7], type[7];
       strcpy(name[0], "channel");
@@ -219,7 +219,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
       return new caPolyLine(parent);
   }
 
-  caPolyLineInterface::caPolyLineInterface(QObject *parent): CustomWidgetInterface(parent)
+  caPolyLineInterface::caPolyLineInterface(QObject *parent): CustomWidgetInterface_Graphics(parent)
   {
       strng name[6], type[6];
       strcpy(name[0], "channel");
@@ -246,7 +246,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
       return new caGraphics(parent);
   }
 
-  caGraphicsInterface::caGraphicsInterface(QObject* parent) : CustomWidgetInterface(parent)
+  caGraphicsInterface::caGraphicsInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
   {
       strng name[5], type[5];
       strcpy(name[0], "channel");
@@ -271,7 +271,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
       return new caInclude(parent);
   }
 
-  caIncludeInterface::caIncludeInterface(QObject* parent) : CustomWidgetInterface(parent)
+  caIncludeInterface::caIncludeInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
   {
       strng name[7], type[7];
       strcpy(name[0], "channel");
@@ -301,7 +301,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
       return widget;
   }
 
-  caDoubleTabWidgetInterface::caDoubleTabWidgetInterface(QObject* parent) : CustomWidgetInterface(parent)
+  caDoubleTabWidgetInterface::caDoubleTabWidgetInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
   {
       strng name[2], type[2];
       strcpy(name[0], "itemsHorizontal");
@@ -315,7 +315,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
       d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
   }
 
-  CustomWidgetCollectionInterface::CustomWidgetCollectionInterface(QObject *parent): QObject(parent)
+  CustomWidgetCollectionInterface_Graphics::CustomWidgetCollectionInterface_Graphics(QObject *parent): QObject(parent)
   {
       d_plugins.append(new caFrameInterface(this));
       d_plugins.append(new caLabelInterface(this) );
@@ -326,11 +326,11 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
       d_plugins.append(new caDoubleTabWidgetInterface(this));
   }
 
-  QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface::customWidgets(void) const
+  QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface_Graphics::customWidgets(void) const
   {
       return d_plugins;
   }
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) 
 #else
-  Q_EXPORT_PLUGIN2(QtControls, CustomWidgetCollectionInterface)
+  Q_EXPORT_PLUGIN2(QtControls, CustomWidgetCollectionInterface_Graphics)
 #endif

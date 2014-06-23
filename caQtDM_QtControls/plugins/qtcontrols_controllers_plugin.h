@@ -30,13 +30,13 @@
 
 #include <QDesignerCustomWidgetInterface>
 
-class CustomWidgetInterface: public QObject, public QDesignerCustomWidgetInterface
+class CustomWidgetInterface_Controllers: public QObject, public QDesignerCustomWidgetInterface
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
 
 public:
-    CustomWidgetInterface(QObject *parent);
+    CustomWidgetInterface_Controllers(QObject *parent);
 
     virtual bool isContainer() const { if(d_name.contains("caFrame")) return true; else return false; };
     virtual bool isInitialized() const { return d_isInitialized; };
@@ -63,7 +63,7 @@ private:
     bool d_isInitialized;
 };
 
-class CustomWidgetCollectionInterface: public QObject, public QDesignerCustomWidgetCollectionInterface
+class CustomWidgetCollectionInterface_Controllers: public QObject, public QDesignerCustomWidgetCollectionInterface
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetCollectionInterface)
@@ -72,7 +72,7 @@ class CustomWidgetCollectionInterface: public QObject, public QDesignerCustomWid
 #endif 
 
 public:
-    CustomWidgetCollectionInterface(QObject *parent = NULL);
+    CustomWidgetCollectionInterface_Controllers(QObject *parent = NULL);
 
     virtual QList<QDesignerCustomWidgetInterface*> customWidgets() const;
 
@@ -80,7 +80,7 @@ private:
     QList<QDesignerCustomWidgetInterface*> d_plugins;
 };
 
-class caNumericInterface: public CustomWidgetInterface 
+class caNumericInterface: public CustomWidgetInterface_Controllers
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -90,7 +90,7 @@ public:
     virtual QWidget *createWidget(QWidget *parent);
 };
 
-class EApplyButtonInterface: public CustomWidgetInterface 
+class EApplyButtonInterface: public CustomWidgetInterface_Controllers
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -100,7 +100,7 @@ public:
     virtual QWidget *createWidget(QWidget *parent);
 };
 
-class caApplyNumericInterface: public CustomWidgetInterface 
+class caApplyNumericInterface: public CustomWidgetInterface_Controllers
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -110,7 +110,7 @@ public:
     virtual QWidget *createWidget(QWidget *parent);
 };
 
-class caSliderInterface : public CustomWidgetInterface
+class caSliderInterface : public CustomWidgetInterface_Controllers
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -120,7 +120,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caMenuInterface : public CustomWidgetInterface
+class caMenuInterface : public CustomWidgetInterface_Controllers
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -130,7 +130,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caChoiceInterface : public CustomWidgetInterface
+class caChoiceInterface : public CustomWidgetInterface_Controllers
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -140,7 +140,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caRelatedDisplayInterface : public CustomWidgetInterface
+class caRelatedDisplayInterface : public CustomWidgetInterface_Controllers
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -150,7 +150,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caShellCommandInterface : public CustomWidgetInterface
+class caShellCommandInterface : public CustomWidgetInterface_Controllers
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -160,7 +160,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caTextEntryInterface : public CustomWidgetInterface
+class caTextEntryInterface : public CustomWidgetInterface_Controllers
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -170,7 +170,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caMessageButtonInterface : public CustomWidgetInterface
+class caMessageButtonInterface : public CustomWidgetInterface_Controllers
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -180,7 +180,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caToggleButtonInterface : public CustomWidgetInterface
+class caToggleButtonInterface : public CustomWidgetInterface_Controllers
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -190,7 +190,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caScriptButtonInterface : public CustomWidgetInterface
+class caScriptButtonInterface : public CustomWidgetInterface_Controllers
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -200,7 +200,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caSpinboxInterface: public CustomWidgetInterface 
+class caSpinboxInterface: public CustomWidgetInterface_Controllers
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)

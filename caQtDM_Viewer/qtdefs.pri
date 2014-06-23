@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.7.9
+CAQTDM_VERSION = V3.8.0
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -9,6 +9,11 @@ unix {
     QMAKE_CXXFLAGS += "-g"
     QMAKE_CFLAGS_RELEASE += "-g"
 }
+
+# 3.8.0
+# adapted source code in order to run on ios (ipad)
+# cachoice crashed when index was higher than the number of ENUMS, fixed
+
 # 3.7.9
 # minor adjustments
 # caslider was modified so that scale behaviour was incorrect, this has been corrected

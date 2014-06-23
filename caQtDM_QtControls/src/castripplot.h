@@ -59,6 +59,9 @@
 
 class QwtPlotCurve;
 
+#include "qwtplotcurvenan.h"
+
+
 class QTCON_EXPORT caStripPlot : public QwtPlot
 {
 
@@ -75,6 +78,7 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
     Q_ENUMS(units)
     Q_ENUMS(xAxisType)
     Q_ENUMS(yAxisType)
+    Q_ENUMS(yAxisScaling)
 
     Q_PROPERTY(QString Title READ getTitlePlot WRITE setTitlePlot)
     Q_PROPERTY(QString TitleX READ getTitleX WRITE setTitleX)
@@ -84,6 +88,7 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
     Q_PROPERTY(double period READ getPeriod WRITE setPeriod)
     Q_PROPERTY(xAxisType XaxisType READ getXaxisType WRITE setXaxisType)
     Q_PROPERTY(yAxisType YAxisType READ getYaxisType WRITE setYaxisType)
+    Q_PROPERTY(yAxisScaling YAxisScaling READ getYaxisScaling WRITE setYaxisScaling)
 
     // would have been nice to define all this with a define statement, however moc does not support that
 
@@ -165,6 +170,7 @@ public:
     enum units { Millisecond = 0, Second, Minute};
     enum xAxisType {TimeScale, ValueScale};
     enum yAxisType {linear=0, log10};
+    enum yAxisScaling {fixedScale=0, autoScale};
 
 
     enum LegendAtttribute { COLOR, FONT, TEXT};
@@ -205,6 +211,9 @@ public:
 
     yAxisType getYaxisType() const {return thisYaxisType;}
     void setYaxisType(yAxisType s);
+
+    yAxisScaling getYaxisScaling() const {return thisYaxisScaling;}
+    void setYaxisScaling(yAxisScaling s) {thisYaxisScaling = s;}
 
     void setColor(QColor c, int number);
     QColor getColor(int number) const {return thisLineColor[number];}
@@ -413,29 +422,28 @@ private:
     int updateRate;
     int timerCount;
     int NumberOfCurves;
-    double Period;
-    units Unit;
     QTimer *Timer;
     struct timeb  timeNow;
     struct timeb  timeStart;
-    bool Start;
+    bool RestartPlot1, RestartPlot2;
 
     bool eventFilter(QObject *obj, QEvent *event);
     void setXaxis(double interval, double period);
     void defineXaxis(units unit, double period);
     void RescaleCurves(int width, units unit, double period);
     void RescaleAxis();
+    void TimersStart();
 
     // curve only used to define nicely the legend
     QwtPlotCurve *curve[MAXCURVES];
     // curve for plotting line/point from minimum to maximum value
-    QwtPlotIntervalCurve *errorcurve[MAXCURVES];
-    QwtPlotIntervalCurve *fillcurve[MAXCURVES];
+    QwtPlotIntervalCurveNaN *errorcurve[MAXCURVES];
+    QwtPlotCurveNaN *fillcurve[MAXCURVES];
 
     // y data for error curve
     QList<QwtIntervalSample> base;
     QList<QwtIntervalSample> rangeData[MAXCURVES];
-    QList<QwtIntervalSample> fillData[MAXCURVES];
+    QList<QPointF> fillData[MAXCURVES];
 
     double timeData;
     int dataCount;
@@ -443,6 +451,7 @@ private:
     bool thisXshow, thisYshow, thisLegendshow, thisGrid;
     xAxisType thisXaxisType;
     yAxisType thisYaxisType;
+    yAxisScaling thisYaxisScaling;
 
     QString thisTitle, thisTitleX, thisTitleY;
     units thisUnits;
@@ -453,15 +462,13 @@ private:
     QColor thisBackColor;
     QColor thisScaleColor;
     QColor thisLineColor[MAXCURVES], thisGridColor;
+    bool thisAutoscale;
+    double AutoscaleMaxY;
+    double AutoscaleMinY;
 
-    //axisScaling thisXscaling;
     axisScaling thisYscalingMax[MAXCURVES], thisYscalingMin[MAXCURVES];
 
     double thisPeriod;
-    //double AxisLowX;
-    //double AxisUpX;
-    //double AxisLowY;
-    //double AxisUp;
 
     QwtPlotGrid *plotGrid;
     QPen penGrid;
@@ -482,7 +489,6 @@ private:
 
     stripplotthread *timerThread;
 
-    //double elapsedTimeOld;
     QMutex mutex;
 };
 #endif

@@ -39,8 +39,6 @@
     fi 
   fi
 
-  #if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:${QTBASE};
-  #fi
  if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:$TROLLTECH/binQt:${QTBASE};
  fi
 

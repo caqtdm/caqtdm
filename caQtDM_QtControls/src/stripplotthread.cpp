@@ -41,11 +41,11 @@ void stripplotthread:: run(){
     connect(&timer, SIGNAL(timeout()), this, SLOT(TimeOut()), Qt::DirectConnection);
     timer.setInterval(interval);
     timer.start();   // puts one event in the threads event queue
+    emit update();   // for first shot
     exec();
 
     timer.stop();
 }
-
 
 void stripplotthread::runStop()
 {

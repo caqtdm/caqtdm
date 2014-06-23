@@ -302,6 +302,14 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         centralWidget->setLayout(layout);
         centralWidget->layout()->setContentsMargins(0,0,0,0);
         setCentralWidget(centralWidget);
+
+#ifdef Q_OS_IOS
+        // add a menu to the window; this is especially important for tablets
+         QMenu *windowMenu = new QMenu(tr("Options"), this);
+         QAction *closeAction = windowMenu->addAction(tr("Close"));
+         connect(closeAction, SIGNAL(triggered()), this, SLOT(closeWindow()));
+         menuBar()->addMenu(windowMenu);
+#endif
     }
 
     qRegisterMetaType<knobData>("knobData");
@@ -686,7 +694,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
 
         QString text =  treatMacro(map, widget->text(), &doNothing);
-        text.replace(QString::fromWCharArray(L"\u00A6"), " ");    // replace ¦ with a blanc (was used in macros for creating blancs)
+        text.replace(QString::fromWCharArray(L"\u00A6"), " ");    // replace Â¦ with a blanc (was used in macros for creating blancs)
         widget->setText(text);
 
         widget->setProperty("Taken", true);
@@ -1431,9 +1439,15 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
     // make a context menu for object having a monitor
     if(className.contains("ca") && !className.contains("caRel") && !className.contains("caTable") && nbMonitors > 0) {
+
         w1->setContextMenuPolicy(Qt::CustomContextMenu);
         connect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
         w1->setProperty("Connect", false);
+        // in order to get the context on tablets
+#ifdef Q_OS_IOS
+        w1->grabGesture(Qt::TapAndHoldGesture);
+        w1->installEventFilter(this);
+#endif
     }
 
     // add our context to AS widgets
@@ -1886,6 +1900,11 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
       if(!thisInstance) {
           return;
       }
+
+      //char debug[100];
+      //postMessage(QtDebugMsg, (char*) tr("updatewidget %1").arg(w->objectName()).toAscii().constData());
+      //sprintf(debug, "%d", data.edata.connected);
+      //postMessage(QtDebugMsg, (char*) debug);
 
     // calc ==================================================================================================================
     if(caCalc *widget = qobject_cast<caCalc *>(w)) {
@@ -3357,6 +3376,11 @@ void CaQtDM_Lib::processError(QProcess::ProcessError err)
     }
 }
 
+void CaQtDM_Lib::closeWindow()
+{
+    close();
+}
+
 /**
   * when closing the window, we will clear all associated monitors and free data
   */
@@ -3659,7 +3683,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         myMenu.addAction("Print");
         myMenu.addAction("Raise main window");
         myMenu.addAction("Include files");
-    }    
+    }
 
     if(caScriptButton* widget =  qobject_cast< caScriptButton *>(w)) {
         Q_UNUSED(widget);
@@ -3707,7 +3731,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
     QAction* selectedItem = myMenu.exec(pos);
 
-    if (selectedItem) {        
+    if (selectedItem) {
         if(selectedItem->text().contains("Kill Process")) {
             if(caScriptButton* widget =  qobject_cast< caScriptButton *>(w)) {
                 processWindow *t= (processWindow *) widget->getProcess();
@@ -4600,6 +4624,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         plot->setAxisTitle(QwtPlot::xBottom, titleX);
         plot->setAxisTitle(QwtPlot::yLeft, titleY);
 
+
         // font size of legends qith qwt 6.0
         if(!className.compare("caStripPlot")) {
             caStripPlot * plot = (caStripPlot *) widget;
@@ -4623,6 +4648,51 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             f.setPointSizeF(fontSize);
             box->setFont(f);
         }
+    }
+/* no, we do this inside the class now
+    else if(!className.compare("caThermo")) {
+        if(qMin(factX, factY) < 1.0) {
+            caThermo *thermo = (caThermo *) widget;
+            qreal fontSize =  qMin(factX, factY) * (double) list.at(4).toInt();
+            QFont f = thermo->font();
+            f.setPointSizeF(fontSize);
+            thermo->setFont(f);
+        }
+    }
+
+    else if(!className.compare("caSlider")) {
+        if(qMin(factX, factY) < 1.0) {
+            caSlider *slider = (caSlider *) widget;
+            qreal fontSize =  qMin(factX, factY) * (double) list.at(4).toInt();
+            QFont f = slider->font();
+            f.setPointSizeF(fontSize);
+            slider->setFont(f);
+        }
+    }
+*/
+}
+
+
+bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::Gesture) {
+        return gestureEvent(obj, static_cast<QGestureEvent*>(event));
+    }
+    return QWidget::eventFilter(obj, event);
+}
+
+bool CaQtDM_Lib::gestureEvent(QObject *obj, QGestureEvent *event)
+{
+   if (QGesture *tapAndHold = event->gesture(Qt::TapAndHoldGesture))
+        tapAndHoldTriggered(obj, static_cast<QTapAndHoldGesture*>(tapAndHold));
+    return true;
+}
+
+void CaQtDM_Lib::tapAndHoldTriggered(QObject *obj, QTapAndHoldGesture* tapAndHold)
+{
+    if (tapAndHold->state() == Qt::GestureFinished) {
+        qDebug() << obj->objectName();
+        DisplayContextMenu((QWidget*) obj);
     }
 }
 

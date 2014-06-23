@@ -24,7 +24,7 @@
      <x>0</x>
      <y>0</y>
      <width>493</width>
-     <height>24</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuMenu">
@@ -39,6 +39,8 @@
     <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="aboutAction"/>
+    <addaction name="separator"/>
+    <addaction name="EpicsAction"/>
    </widget>
    <widget class="QMenu" name="menuPV">
     <property name="title">
@@ -117,6 +119,11 @@
   <action name="helpAction">
    <property name="text">
     <string>Contents</string>
+   </property>
+  </action>
+  <action name="EpicsAction">
+   <property name="text">
+    <string>Load Epics Configuration</string>
    </property>
   </action>
  </widget>

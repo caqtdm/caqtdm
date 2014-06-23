@@ -69,14 +69,24 @@ limitsStripplotDialog::limitsStripplotDialog(caStripPlot *w, MutexKnobData *data
         }
     }
 
-    QLabel *YaxisTypelLabel = new QLabel("Y axis :");
+    QLabel *YaxisScalingLabel = new QLabel("Y Scaling :");
+    YaxisScaling = new QComboBox;
+    YaxisScaling->addItem("fixedScale");
+    YaxisScaling->addItem("autoScale");
+    if(StripPlot->getYaxisScaling() == caStripPlot::fixedScale) YaxisScaling->setCurrentIndex(0);
+    else YaxisScaling->setCurrentIndex(1);
+
+    QLabel *YaxisTypeLabel = new QLabel("Y axis :");
     YaxisType = new QComboBox;
     YaxisType->addItem("linear");
     YaxisType->addItem("log10");
     if(StripPlot->getYaxisType() == caStripPlot::log10) YaxisType->setCurrentIndex(1);
     else YaxisType->setCurrentIndex(0);
 
-    Layout->addWidget(YaxisTypelLabel,  vars.size(), 3);
+    Layout->addWidget(YaxisScalingLabel,  vars.size(), 1);
+    Layout->addWidget(YaxisScaling,  vars.size(), 2);
+
+    Layout->addWidget(YaxisTypeLabel,  vars.size(), 3);
     Layout->addWidget(YaxisType,  vars.size(), 4);
 
     QDialogButtonBox *box = new QDialogButtonBox( Qt::Horizontal );
@@ -153,6 +163,10 @@ void limitsStripplotDialog::applyClicked()
     int indx = YaxisType->currentIndex();
     if(indx == 0) StripPlot->setYaxisType(caStripPlot::linear);
     else if(indx == 1) StripPlot->setYaxisType(caStripPlot::log10);
+
+    indx = YaxisScaling->currentIndex();
+    if(indx == 0) StripPlot->setYaxisScaling(caStripPlot::fixedScale);
+    else if(indx == 1) StripPlot->setYaxisScaling(caStripPlot::autoScale);
 
 
     // force a resize to reinitialize the plot

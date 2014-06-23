@@ -96,6 +96,7 @@ void caChoice::arrangeCells(QStringList list, int indx)
         //printf("numCells=%d start=%d end=%d\n", numCells, thisStartBit, thisEndBit);
         if((i + thisStartBit) > numCells) break;
         if((i + thisStartBit) > thisEndBit) break;
+        if((i + thisStartBit) >= list.count()) break;
 
         if(list.at(i + thisStartBit).trimmed().size() > 0) {
           temp = new EPushButton(list.at(i + thisStartBit), this);

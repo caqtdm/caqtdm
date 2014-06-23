@@ -15,9 +15,36 @@ CONFIG += warn_on
 
 TARGET = qtcontrols
 TEMPLATE = lib
+OBJECTS_DIR = obj
+DESTDIR = .
+MOC_DIR = moc
+INCLUDEPATH += src
+RESOURCES = qtcontrols.qrc
+
+ios {
+   CONFIG += staticlib
+   QMAKE_POST_LINK = cp libqtcontrols.a ../caQtDM_Binaries/
+   INCLUDEPATH += $(QWTINCLUDE)
+}
+
+!ios {
+  unix {
+    INCLUDEPATH += $(QWTINCLUDE)
+  }
+
+  unix:!macx {
+    QMAKE_POST_LINK = cp libqtcontrols.so $(QTBASE)
+    LIBS += -L$(QWTLIB) -Wl,-rpath,$(QWTLIB) -lqwt
+  }
+
+  macx: {
+    CONFIG += lib_bundle
+    QMAKE_POST_LINK = cp libqtcontrols.dylib $(QTBASE)
+    LIBS += -F$(QWTLIB) -framework qwt
+  }
+}
 
 win32 {
-
     win32-g++ {
       INCLUDEPATH = $(QWTHOME)/src
       LIBS += $(QWTLIB)/libqwt.a
@@ -27,43 +54,18 @@ win32 {
         DEFINES += QTCON_MAKEDLL _CRT_SECURE_NO_WARNINGS
         DebugBuild {
                 OBJECTS_DIR = debug/obj
-                INCLUDEPATH = $$(QWTHOME)/include
+                INCLUDEPATH += $$(QWTHOME)/include
                 LIBS += $$(QWTHOME)/lib/qwtd.lib
         }
 
         ReleaseBuild {
-        	OBJECTS_DIR = release/obj
-        	INCLUDEPATH = $$(QWTHOME)/include
+                OBJECTS_DIR = release/obj
+                INCLUDEPATH += $$(QWTHOME)/include
                 LIBS += $$(QWTHOME)/lib/qwt.lib
                 QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\qtcontrols.dll ..\caQtDM_Binaries
         }
      }
 }
-
-unix {
-    INCLUDEPATH += $(QWTINCLUDE)
-    OBJECTS_DIR = obj
-    DESTDIR = .
-}
-
-unix:!macx {
-    QMAKE_POST_LINK = cp libqtcontrols.so $(QTBASE)	
-    LIBS += -L$(QWTLIB) -Wl,-rpath,$(QWTLIB) -lqwt
-}
-
-macx: {
-    CONFIG += lib_bundle
-    QMAKE_POST_LINK = cp libqtcontrols.dylib $(QTBASE)
-    LIBS += -F$(QWTLIB) -framework qwt
-    	
-}
-
-
-
-
-MOC_DIR = moc
-INCLUDEPATH += src
-RESOURCES = qtcontrols.qrc
 
 SOURCES	+= \
     src/caframe.cpp \
@@ -122,7 +124,8 @@ SOURCES	+= \
     src/stripplotthread.cpp \
     src/cawaterfallplot.cpp \
     src/snumeric.cpp \
-    src/caspinbox.cpp
+    src/caspinbox.cpp \
+    src/qwtplotcurvenan.cpp
 
 # assume qwt6.0 was made with qt4
 contains(QT_VER_MAJ, 4) {
@@ -194,7 +197,8 @@ HEADERS	+= \
     src/stripplotthread.h \
     src/cawaterfallplot.h \
     src/snumeric.h \
-    src/caspinbox.h
+    src/caspinbox.h \
+    src/qwtplotcurvenan.h
 
 
 # assume qwt6.0 was made with qt4

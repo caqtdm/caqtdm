@@ -14,29 +14,31 @@ contains(QT_VER_MAJ, 5) {
 
 CONFIG   += warn_on
 
-#epics4
 #CONFIG += epics4
-
 #CONFIG += australian
 
-unix{
+unix {
  QMAKE_CXXFLAGS += "-g"
  QMAKE_CFLAGS_RELEASE += "-g"
 }
-unix:!macx {
- LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca
- LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
- INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
-}
-macx: {
- LIBS += -L$(EPICSLIB)  -lca
- LIBS += -L$(QTBASE)  -lqtcontrols
- INCLUDEPATH += $(EPICSINCLUDE)/os/Darwin
+
+!ios {
+   unix:!macx {
+      LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca
+      LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
+      INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
+   }
+   macx: {
+      LIBS += -L$(EPICSLIB)  -lca
+      LIBS += -L$(QTBASE)  -lqtcontrols
+      INCLUDEPATH += $(EPICSINCLUDE)/os/Darwin
+   }
 }
 
-TARGET = caQtDM_Lib
-TEMPLATE = lib
-
+ios {
+      INCLUDEPATH += $(EPICSINCLUDE)
+      INCLUDEPATH += $(EPICSINCLUDE)/os/iOS
+}
 
 SOURCES += caqtdm_lib.cpp \
     mutexKnobData.cpp \
@@ -102,8 +104,6 @@ australian: {
 }
 
 INCLUDEPATH += .
-
-
 INCLUDEPATH += $(QWTINCLUDE)
 INCLUDEPATH += $(EPICSINCLUDE)
 

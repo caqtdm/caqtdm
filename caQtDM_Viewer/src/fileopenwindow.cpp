@@ -57,6 +57,19 @@
         #define MESSAGE_SOURCE_PAGER          2
 #endif //Q_WS_X11
 
+#if defined(_MSC_VER)
+int setenv(const char *name, const char *value, int overwrite)
+{
+    int errcode = 0;
+    if(!overwrite) {
+        size_t envsize = 0;
+        errcode = getenv_s(&envsize, NULL, 0, name);
+        if(errcode || envsize) return errcode;
+    }
+    return _putenv_s(name, value);
+}
+#endif
+
 class Sleep
 {
 public:
@@ -94,6 +107,17 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     title.append(" ");
     title.append(BUILDTIME);
 
+    // set for epics longer waveforms
+    QString maxBytes = (QString)  getenv("EPICS_CA_MAX_ARRAY_BYTES");
+    if(maxBytes.size() == 0) setenv("EPICS_CA_MAX_ARRAY_BYTES", "150000000", 1);
+
+    // in case of tablets, use static plugins linked in
+ #ifdef Q_OS_IOS
+    Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Controllers);
+    Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Monitors);
+    Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Graphics);
+ #endif
+
     // create a class for exchanging data
     mutexKnobData = new MutexKnobData();
     MutexKnobDataWrapperInit(mutexKnobData);
@@ -112,6 +136,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     connect( this->ui.timedAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionTimed()) );
     connect( this->ui.directAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionDirect()) );
     connect( this->ui.helpAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionHelp()) );
+    connect( this->ui.EpicsAction, SIGNAL(triggered()), this, SLOT(Callback_setEpicsConfig()));
     this->ui.timedAction->setChecked(true);
 
     setWindowTitle(title);
@@ -197,6 +222,34 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     pvTable = (QTableWidget*) 0;
 }
 
+void FileOpenWindow::Callback_setEpicsConfig()
+{
+    char asc[255];
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Epics Configuration file"), "./", tr("EPICS conf Files (*.epics)"));
+    if(!fileName.isNull()) {
+        QFile file(fileName);
+        if(!file.open(QIODevice::ReadOnly)) {
+            QMessageBox::information(0, "open file error", file.errorString());
+            return;
+        }
+
+        QTextStream in(&file);
+
+        while(!in.atEnd()) {
+            QString line = in.readLine();
+            QStringList fields = line.split(" ");
+            if(fields.count() > 1) setenv(fields.at(0).toAscii().constData(), fields.at(1).toAscii().constData(), 1);
+            else if(line.size() > 0){
+                sprintf(asc, "environment variable could not be set from %s", line.toAscii().constData());
+                messageWindow->postMsgEvent(QtDebugMsg, asc);
+            }
+        }
+        sprintf(asc, "epics configuration file loaded: %s", fileName.toAscii().constData());
+        messageWindow->postMsgEvent(QtDebugMsg, asc);
+        file.close();
+    }
+}
+
 void FileOpenWindow::timerEvent(QTimerEvent *event)
 {
     Q_UNUSED(event);
@@ -228,7 +281,8 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 #endif
 
     // any open windows ?
-    // we want to ask with timeout if the application has to be closed. 23-jan-2013 no yust exit
+    // we want to ask with timeout if the application has to be closed. 23-jan-2013 no yust exit (in case of tablet do not exit)
+ #ifndef Q_OS_IOS
     if(this->findChildren<CaQtDM_Lib *>().count() <= 0 && userClose) {
         if (sharedMemory.isAttached()) sharedMemory.detach();
         qApp->exit(0);
@@ -236,7 +290,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
     } else if(this->findChildren<CaQtDM_Lib *>().count() > 0) {
         userClose = true;
     }
-
+#endif
     // any non connected pv's to display ?
 
     fillPVtable(countPV, countNotConnected, countDisplayed);
@@ -311,6 +365,8 @@ void FileOpenWindow::Callback_OpenButton()
             if (fileName.contains("prc")) {
                 mainWindow->resize(mainWindow->minimumSizeHint());
             }
+
+            //mainWindow->hide();
 
         } else {
             QTDMMessageBox(QMessageBox::Warning, "file open error", "does not exist", QMessageBox::Close, this, Qt::Popup, true);

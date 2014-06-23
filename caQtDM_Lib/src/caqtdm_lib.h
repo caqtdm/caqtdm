@@ -63,10 +63,12 @@
 #include "limitsCartesianplotDialog.h"
 #include "sliderDialog.h"
 #include "processWindow.h"
-#include <splashscreen.h>
+#include "splashscreen.h"
 
 #include <QtControls>
-
+#include <QGestureEvent>
+#include <QTapAndHoldGesture>
+#include <QMenuBar>
 
 namespace Ui {
     class CaQtDM_Lib;
@@ -86,6 +88,7 @@ public:
 
     void print()
     {
+#ifndef Q_OS_IOS
         QPrinter *printer = new QPrinter;
         QPrintDialog *printDialog = new QPrintDialog(printer, this);
         if (printDialog->exec() == QDialog::Accepted) {
@@ -103,9 +106,11 @@ public:
             QPixmap pm = QPixmap::grabWidget(this);
             painter.drawPixmap(0, 0, pm);
         }
+#endif
     }
     void printPS(QString filename)
     {
+#ifndef Q_OS_IOS
         QPrinter *printer = new QPrinter;
         printer->setOrientation(QPrinter::Portrait);
 #if QT_VERSION< QT_VERSION_CHECK(5, 0, 0)
@@ -127,11 +132,11 @@ public:
         painter.translate(-width()/2, -height()/2);
         QPixmap pm = QPixmap::grabWidget(this);
         painter.drawPixmap(0, 0, pm);
+#endif
     }
 
 
 protected:
-
     virtual void timerEvent(QTimerEvent *e);
     void resizeEvent ( QResizeEvent * event );
     void mousePressEvent(QMouseEvent *event);
@@ -144,7 +149,6 @@ signals:
     void clicked();
 
 private:
-
     bool bitState(int value, int bitNr);
     QString treatMacro(QMap<QString, QString> map, const QString& pv, bool *doNothing);
     void HandleWidget(QWidget *w, QString macro, bool firstPass);
@@ -169,6 +173,10 @@ private:
 
     void WaterFall(caWaterfallPlot *widget, const knobData &data);
     void Cartesian(caCartesianPlot *widget, int curvNB, int curvType, int XorY, const knobData &data);
+
+    bool eventFilter(QObject *obj, QEvent *event);
+    bool gestureEvent(QObject *obj, QGestureEvent *event);
+    void tapAndHoldTriggered(QObject *obj, QTapAndHoldGesture* tapAndHold);
 
     QWidget *myWidget;
     QList<QWidget*> includeWidgetList;
@@ -236,7 +244,7 @@ private slots:
     void Callback_TextEntryChanged(const QString &);
 
     void processTerminated();
-
+    void closeWindow();
 };
 
 #endif // CaQtDM_Lib_H

@@ -33,7 +33,7 @@
 #include <QtPlugin>
 typedef char strng[40];
 
-char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, strng propertyname[], strng propertytype[], int nb)
+static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, strng propertyname[], strng propertytype[], int nb)
 {
   char mess[2048], *xml;
         sprintf(mess, "<ui language=\"c++\">\
@@ -68,23 +68,23 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
 }
 
 
-        CustomWidgetInterface::CustomWidgetInterface(QObject *parent): QObject(parent), d_isInitialized(false)
+        CustomWidgetInterface_Monitors::CustomWidgetInterface_Monitors(QObject *parent): QObject(parent), d_isInitialized(false)
         {
         }
 
-        void CustomWidgetInterface::initialize(QDesignerFormEditorInterface *)
+        void CustomWidgetInterface_Monitors::initialize(QDesignerFormEditorInterface *)
         {
             if (d_isInitialized) return;
             d_isInitialized = true;
         }
 
-        caBitnamesInterface::caBitnamesInterface(QObject *parent): CustomWidgetInterface(parent)
+        caBitnamesInterface::caBitnamesInterface(QObject *parent): CustomWidgetInterface_Monitors(parent)
         {
             strng name[2], type[2];
             strcpy(name[0], "channelEnum");
             strcpy(type[0], "multiline");
             strcpy(name[1], "channelValue");
-            strcpy(type[1], "multiline");	    
+            strcpy(type[1], "multiline");
             d_domXml = XmlFunc("caBitnames", "cabitnames", 0, 0, 160, 90, name, type, 2);
             d_toolTip = "[Enum table with state]";
             d_name = "caBitnames";
@@ -98,16 +98,12 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caBitnames(parent);
         }
 
-        caLedInterface::caLedInterface(QObject *parent): CustomWidgetInterface(parent)
+        caLedInterface::caLedInterface(QObject *parent): CustomWidgetInterface_Monitors(parent)
         {
-            strng name[3], type[3];
+            strng name[1], type[1];
             strcpy(name[0], "channel");
             strcpy(type[0], "multiline");
-            strcpy(name[1], "trueValue");
-            strcpy(type[1], "multiline");	 
-            strcpy(name[2], "falseValue");
-            strcpy(type[2], "multiline");	    
-            d_domXml = XmlFunc("caLed", "caled", 0, 0, 30, 30, name, type, 3);
+            d_domXml = XmlFunc("caLed", "caled", 0, 0, 30, 30, name, type, 1);
             d_toolTip = "[LED for true or false bitstate or for severity states]";
             d_name = "caLed";
             d_include = "caLed";
@@ -120,7 +116,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caLed(parent);
         }
 
-        caLinearGaugeInterface::caLinearGaugeInterface(QObject *parent): CustomWidgetInterface(parent)
+        caLinearGaugeInterface::caLinearGaugeInterface(QObject *parent): CustomWidgetInterface_Monitors(parent)
         {
             strng name[1], type[1];
             strcpy(name[0], "channel");
@@ -138,7 +134,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caLinearGauge(parent);
         }
 
-        caCircularGaugeInterface::caCircularGaugeInterface(QObject *parent): CustomWidgetInterface(parent)
+        caCircularGaugeInterface::caCircularGaugeInterface(QObject *parent): CustomWidgetInterface_Monitors(parent)
         {
             strng name[1], type[1];
             strcpy(name[0], "channel");
@@ -161,7 +157,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caLineEdit(parent);
         }
 
-        caLineEditInterface::caLineEditInterface(QObject* parent) : CustomWidgetInterface(parent)
+        caLineEditInterface::caLineEditInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
         {
             strng name[1], type[1];
             strcpy(name[0], "channel");
@@ -179,7 +175,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caThermo(parent);
         }
 
-        caThermoInterface::caThermoInterface(QObject* parent) : CustomWidgetInterface(parent)
+        caThermoInterface::caThermoInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
         {
             strng name[1], type[1];
             strcpy(name[0], "channel");
@@ -197,9 +193,9 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caCartesianPlot(parent);
         }
 
-        caCartesianPlotInterface::caCartesianPlotInterface(QObject* parent) : CustomWidgetInterface(parent)
+        caCartesianPlotInterface::caCartesianPlotInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
         {
-            strng name[14], type[14];
+            strng name[12], type[12];
             strcpy(name[0], "channels_1");
             strcpy(type[0], "multiline");
             strcpy(name[1], "channels_2");
@@ -224,11 +220,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             strcpy(type[10], "multiline");
             strcpy(name[11], "TitleY");
             strcpy(type[11], "multiline");
-            strcpy(name[12], "XaxisLimits");
-            strcpy(type[12], "multiline");	
-            strcpy(name[13], "YaxisLimits");
-            strcpy(type[13], "multiline");	    
-            d_domXml = XmlFunc("caCartesianPlot", "cacartesianplot", 0, 0, 200, 50, name, type, 14);
+            d_domXml = XmlFunc("caCartesianPlot", "cacartesianplot", 0, 0, 200, 50, name, type, 12);
             d_toolTip = "[Cartesian Plot]";
             d_name = "caCartesianPlot";
             d_include = "caCartesianPlot";
@@ -241,7 +233,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caStripPlot(parent);
         }
 
-        caStripPlotInterface::caStripPlotInterface(QObject* parent) : CustomWidgetInterface(parent)
+        caStripPlotInterface::caStripPlotInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
         {
             strng name[4], type[4];
             strcpy(name[0], "channels");
@@ -260,7 +252,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
         }
 
-        caByteInterface::caByteInterface(QObject *parent): CustomWidgetInterface(parent)
+        caByteInterface::caByteInterface(QObject *parent): CustomWidgetInterface_Monitors(parent)
         {
             strng name[1], type[1];
             strcpy(name[0], "channel");
@@ -278,16 +270,12 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caByte(parent);
         }
 
-        caTableInterface::caTableInterface(QObject *parent): CustomWidgetInterface(parent)
+        caTableInterface::caTableInterface(QObject *parent): CustomWidgetInterface_Monitors(parent)
         {
-            strng name[3], type[3];
+            strng name[1], type[1];
             strcpy(name[0], "channels");
             strcpy(type[0], "multiline");
-            strcpy(name[1], "scriptCommand");
-            strcpy(type[1], "multiline");
-            strcpy(name[2], "scriptParameter");
-            strcpy(type[2], "multiline");	    
-            d_domXml = XmlFunc("caTable", "catable", 0, 0, 120, 120, name, type, 3);
+            d_domXml = XmlFunc("caTable", "catable", 0, 0, 120, 120, name, type, 1);
             d_toolTip = "[Table Monitor]";
             d_name = "caTable";
             d_include = "caTable";
@@ -305,7 +293,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caCamera(parent);
         }
 
-        caCameraInterface::caCameraInterface(QObject* parent) : CustomWidgetInterface(parent)
+        caCameraInterface::caCameraInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
         {
             strng name[8], type[8];
             strcpy(name[0], "channelData");
@@ -337,7 +325,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caCalc(parent);
         }
 
-        caCalcInterface::caCalcInterface(QObject* parent) : CustomWidgetInterface(parent)
+        caCalcInterface::caCalcInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
         {
             strng name[6], type[6];
             strcpy(name[0], "channel");
@@ -366,7 +354,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caWaterfallPlot(parent);
         }
 
-        caWaterfallPlotInterface::caWaterfallPlotInterface(QObject* parent) : CustomWidgetInterface(parent)
+        caWaterfallPlotInterface::caWaterfallPlotInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
         {
             strng name[5], type[5];
             strcpy(name[0], "channel");
@@ -387,7 +375,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
         }
 
-        CustomWidgetCollectionInterface::CustomWidgetCollectionInterface(QObject *parent): QObject(parent)
+        CustomWidgetCollectionInterface_Monitors::CustomWidgetCollectionInterface_Monitors(QObject *parent): QObject(parent)
         {
             d_plugins.append(new caLedInterface(this));
             d_plugins.append(new caLinearGaugeInterface(this));
@@ -404,12 +392,12 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             d_plugins.append(new caWaterfallPlotInterface(this));
         }
 
-        QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface::customWidgets(void) const
+        QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface_Monitors::customWidgets(void) const
         {
             return d_plugins;
         }
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) 
 #else
-        Q_EXPORT_PLUGIN2(QtControls, CustomWidgetCollectionInterface)
+        Q_EXPORT_PLUGIN2(QtControls, CustomWidgetCollectionInterface_Monitors)
 #endif

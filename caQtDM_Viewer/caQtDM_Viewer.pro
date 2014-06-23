@@ -1,5 +1,12 @@
 include(qtdefs.pri)
-include($$(QWTHOME)/qwt.prf)
+
+ios {
+  include(../../qwt-6.1.0.ios/qwt.prf)
+}
+
+!ios {
+  include($$(QWTHOME)/qwt.prf)
+}
 
 unix {
   TEMPLATE = subdirs

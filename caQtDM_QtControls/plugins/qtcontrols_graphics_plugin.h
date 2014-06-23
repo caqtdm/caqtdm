@@ -30,13 +30,13 @@
 
 #include <QDesignerCustomWidgetInterface>
 
-class CustomWidgetInterface: public QObject, public QDesignerCustomWidgetInterface
+class CustomWidgetInterface_Graphics: public QObject, public QDesignerCustomWidgetInterface
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
 
 public:
-    CustomWidgetInterface(QObject *parent);
+    CustomWidgetInterface_Graphics(QObject *parent);
 
     virtual bool isContainer() const {
       if(d_name.contains("caFrame")) {
@@ -71,7 +71,7 @@ private:
     bool d_isInitialized;
 };
 
-class CustomWidgetCollectionInterface: public QObject, public QDesignerCustomWidgetCollectionInterface
+class CustomWidgetCollectionInterface_Graphics: public QObject, public QDesignerCustomWidgetCollectionInterface
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetCollectionInterface)
@@ -80,7 +80,7 @@ class CustomWidgetCollectionInterface: public QObject, public QDesignerCustomWid
 #endif 
 
 public:
-    CustomWidgetCollectionInterface(QObject *parent = NULL);
+    CustomWidgetCollectionInterface_Graphics(QObject *parent = NULL);
 
     virtual QList<QDesignerCustomWidgetInterface*> customWidgets() const;
 
@@ -88,7 +88,7 @@ private:
     QList<QDesignerCustomWidgetInterface*> d_plugins;
 };
 
-class caLabelInterface : public CustomWidgetInterface
+class caLabelInterface : public CustomWidgetInterface_Graphics
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -98,7 +98,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caGraphicsInterface : public CustomWidgetInterface
+class caGraphicsInterface : public CustomWidgetInterface_Graphics
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -108,7 +108,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caFrameInterface : public CustomWidgetInterface
+class caFrameInterface : public CustomWidgetInterface_Graphics
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -118,7 +118,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caImageInterface : public CustomWidgetInterface
+class caImageInterface : public CustomWidgetInterface_Graphics
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -128,7 +128,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caPolyLineInterface : public CustomWidgetInterface
+class caPolyLineInterface : public CustomWidgetInterface_Graphics
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -138,7 +138,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caIncludeInterface : public CustomWidgetInterface
+class caIncludeInterface : public CustomWidgetInterface_Graphics
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -148,7 +148,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caDoubleTabWidgetInterface : public CustomWidgetInterface
+class caDoubleTabWidgetInterface : public CustomWidgetInterface_Graphics
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)

@@ -34,7 +34,7 @@
 
 typedef char strng[40];
 
-char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, strng propertyname[], strng propertytype[], int nb)
+static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, strng propertyname[], strng propertytype[], int nb)
 {
   char mess[2048], *xml;
         sprintf(mess, "<ui language=\"c++\">\
@@ -68,11 +68,11 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
    return xml;
 }
 
-        CustomWidgetInterface::CustomWidgetInterface(QObject *parent): QObject(parent), d_isInitialized(false)
+        CustomWidgetInterface_Controllers::CustomWidgetInterface_Controllers(QObject *parent): QObject(parent), d_isInitialized(false)
         {
         }
 
-        void CustomWidgetInterface::initialize(QDesignerFormEditorInterface *)
+        void CustomWidgetInterface_Controllers::initialize(QDesignerFormEditorInterface *)
         {
             if (d_isInitialized)
                 return;
@@ -81,7 +81,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
         }
 
 
-        caNumericInterface::caNumericInterface(QObject *parent): CustomWidgetInterface(parent)
+        caNumericInterface::caNumericInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
         {
             strng name[2], type[2];
             strcpy(name[0], "channel");
@@ -101,7 +101,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caNumeric(parent);
         }
 
-        caApplyNumericInterface::caApplyNumericInterface(QObject *parent): CustomWidgetInterface(parent)
+        caApplyNumericInterface::caApplyNumericInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
         {
             strng name[1], type[1];
             strcpy(name[0], "channel");
@@ -120,7 +120,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caApplyNumeric(parent);
         }
 
-        EApplyButtonInterface::EApplyButtonInterface(QObject *parent): CustomWidgetInterface(parent)
+        EApplyButtonInterface::EApplyButtonInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
         {
             d_name = "EApplyButton";
             d_include = "EApplyButton";
@@ -149,7 +149,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caSlider(parent);
         }
 
-        caSliderInterface::caSliderInterface(QObject* parent) : CustomWidgetInterface(parent)
+        caSliderInterface::caSliderInterface(QObject* parent) : CustomWidgetInterface_Controllers(parent)
         {
             strng name[1], type[1];
             strcpy(name[0], "channel");
@@ -168,7 +168,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caMenu(parent);
         }
 
-        caMenuInterface::caMenuInterface(QObject *parent): CustomWidgetInterface(parent)
+        caMenuInterface::caMenuInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
         {
             strng name[1], type[1];
             strcpy(name[0], "channel");
@@ -187,7 +187,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caChoice(parent);
         }
 
-        caChoiceInterface::caChoiceInterface(QObject *parent): CustomWidgetInterface(parent)
+        caChoiceInterface::caChoiceInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
         {
             strng name[1], type[1];
             strcpy(name[0], "channel");
@@ -206,7 +206,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caRelatedDisplay(parent);
         }
 
-        caRelatedDisplayInterface::caRelatedDisplayInterface(QObject *parent): CustomWidgetInterface(parent)
+        caRelatedDisplayInterface::caRelatedDisplayInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
         {
             strng name[5], type[5];
             strcpy(name[0], "label");
@@ -217,7 +217,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             strcpy(type[2], "multiline");
             strcpy(name[3], "args");
             strcpy(type[3], "multiline");
-            strcpy(name[4], "removeParent");
+            strcpy(name[4], "replaceModes");
             strcpy(type[4], "multiline");
             d_domXml = XmlFunc("caRelatedDisplay", "carelateddisplay", 0, 0, 150, 50, name, type, 5);
             d_name = "caRelatedDisplay";
@@ -233,7 +233,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caShellCommand(parent);
         }
 
-        caShellCommandInterface::caShellCommandInterface(QObject *parent): CustomWidgetInterface(parent)
+        caShellCommandInterface::caShellCommandInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
         {
             strng name[4], type[4];
             strcpy(name[0], "label");
@@ -258,7 +258,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caTextEntry(parent);
         }
 
-        caTextEntryInterface::caTextEntryInterface(QObject* parent) : CustomWidgetInterface(parent)
+        caTextEntryInterface::caTextEntryInterface(QObject* parent) : CustomWidgetInterface_Controllers(parent)
         {
             strng name[1], type[1];
             strcpy(name[0], "channel");
@@ -278,7 +278,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caMessageButton(parent);
         }
 
-        caMessageButtonInterface::caMessageButtonInterface(QObject* parent) : CustomWidgetInterface(parent)
+        caMessageButtonInterface::caMessageButtonInterface(QObject* parent) : CustomWidgetInterface_Controllers(parent)
         {
             strng name[4], type[4];
             strcpy(name[0], "channel");
@@ -303,16 +303,12 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caToggleButton(parent);
         }
 
-        caToggleButtonInterface::caToggleButtonInterface(QObject* parent) : CustomWidgetInterface(parent)
+        caToggleButtonInterface::caToggleButtonInterface(QObject* parent) : CustomWidgetInterface_Controllers(parent)
         {
-            strng name[3], type[3];
+            strng name[1], type[1];
             strcpy(name[0], "channel");
             strcpy(type[0], "multiline");
-            strcpy(name[1], "trueValue");
-            strcpy(type[1], "multiline");
-            strcpy(name[2], "falseValue");
-            strcpy(type[2], "multiline");	    
-            d_domXml = XmlFunc("caToggleButton", "catogglebutton", 0, 0, 100, 22, name, type, 3);
+            d_domXml = XmlFunc("caToggleButton", "catogglebutton", 0, 0, 100, 22, name, type, 1);
             d_name = "caToggleButton";
             d_include = "caToggleButton";
             QPixmap qpixmap = QPixmap(":pixmaps/radiobutton.png");
@@ -326,7 +322,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caScriptButton(parent);
         }
 
-        caScriptButtonInterface::caScriptButtonInterface(QObject* parent) : CustomWidgetInterface(parent)
+        caScriptButtonInterface::caScriptButtonInterface(QObject* parent) : CustomWidgetInterface_Controllers(parent)
         {
             strng name[3], type[3];
             strcpy(name[0], "label");
@@ -345,7 +341,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             d_whatsThis = "hello, i am a whatsthis string";
         }
 
-        caSpinboxInterface::caSpinboxInterface(QObject *parent): CustomWidgetInterface(parent)
+        caSpinboxInterface::caSpinboxInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
         {
             strng name[1], type[1];
             strcpy(name[0], "channel");
@@ -364,7 +360,7 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             return new caSpinbox(parent);
         }
 
-        CustomWidgetCollectionInterface::CustomWidgetCollectionInterface(QObject *parent): QObject(parent)
+        CustomWidgetCollectionInterface_Controllers::CustomWidgetCollectionInterface_Controllers(QObject *parent): QObject(parent)
         {
             d_plugins.append(new caNumericInterface(this));
             d_plugins.append(new caApplyNumericInterface(this));
@@ -380,11 +376,11 @@ char *XmlFunc(const char *clss, const char *name, int x, int y, int w, int h, st
             d_plugins.append(new caSpinboxInterface(this));
         }
 
-        QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface::customWidgets(void) const
+        QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface_Controllers::customWidgets(void) const
         {
             return d_plugins;
         }
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) 
 #else
-        Q_EXPORT_PLUGIN2(QtControls, CustomWidgetCollectionInterface)
+        Q_EXPORT_PLUGIN2(QtControls, CustomWidgetCollectionInterface_Controllers)
 #endif

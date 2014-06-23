@@ -30,13 +30,13 @@
 
 #include <QDesignerCustomWidgetInterface>
 
-class CustomWidgetInterface: public QObject, public QDesignerCustomWidgetInterface
+class CustomWidgetInterface_Monitors: public QObject, public QDesignerCustomWidgetInterface
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
 
 public:
-    CustomWidgetInterface(QObject *parent);
+    CustomWidgetInterface_Monitors(QObject *parent);
 
     virtual bool isContainer() const { if(d_name.contains("caFrame")) return true; else return false; };
     virtual bool isInitialized() const { return d_isInitialized; };
@@ -63,7 +63,7 @@ private:
     bool d_isInitialized;
 };
 
-class CustomWidgetCollectionInterface: public QObject, public QDesignerCustomWidgetCollectionInterface
+class CustomWidgetCollectionInterface_Monitors: public QObject, public QDesignerCustomWidgetCollectionInterface
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetCollectionInterface)
@@ -72,7 +72,7 @@ class CustomWidgetCollectionInterface: public QObject, public QDesignerCustomWid
 #endif 
 
 public:
-    CustomWidgetCollectionInterface(QObject *parent = NULL);
+    CustomWidgetCollectionInterface_Monitors(QObject *parent = NULL);
 
     virtual QList<QDesignerCustomWidgetInterface*> customWidgets() const;
 
@@ -81,7 +81,7 @@ private:
 };
 
 /* CustomWidgetInterface */
-class caBitnamesInterface: public CustomWidgetInterface 
+class caBitnamesInterface: public CustomWidgetInterface_Monitors
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -91,7 +91,7 @@ public:
     virtual QWidget *createWidget(QWidget *parent);
 };
 
-class caLedInterface: public CustomWidgetInterface 
+class caLedInterface: public CustomWidgetInterface_Monitors
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -101,7 +101,7 @@ public:
     virtual QWidget *createWidget(QWidget *parent);
 };
 
-class caLinearGaugeInterface: public CustomWidgetInterface 
+class caLinearGaugeInterface: public CustomWidgetInterface_Monitors
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -111,7 +111,7 @@ public:
     virtual QWidget *createWidget(QWidget *parent);
 };
 
-class caCircularGaugeInterface: public CustomWidgetInterface 
+class caCircularGaugeInterface: public CustomWidgetInterface_Monitors
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -121,7 +121,7 @@ public:
     virtual QWidget *createWidget(QWidget *parent);
 };
 
-class caLineEditInterface : public CustomWidgetInterface
+class caLineEditInterface : public CustomWidgetInterface_Monitors
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -131,7 +131,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caThermoInterface : public CustomWidgetInterface
+class caThermoInterface : public CustomWidgetInterface_Monitors
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -141,7 +141,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caCartesianPlotInterface : public CustomWidgetInterface
+class caCartesianPlotInterface : public CustomWidgetInterface_Monitors
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -151,7 +151,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caStripPlotInterface : public CustomWidgetInterface
+class caStripPlotInterface : public CustomWidgetInterface_Monitors
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -161,7 +161,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caByteInterface : public CustomWidgetInterface
+class caByteInterface : public CustomWidgetInterface_Monitors
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -171,7 +171,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caTableInterface : public CustomWidgetInterface
+class caTableInterface : public CustomWidgetInterface_Monitors
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -181,7 +181,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caCameraInterface : public CustomWidgetInterface
+class caCameraInterface : public CustomWidgetInterface_Monitors
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -191,7 +191,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caCalcInterface : public CustomWidgetInterface
+class caCalcInterface : public CustomWidgetInterface_Monitors
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -201,7 +201,7 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caWaterfallPlotInterface : public CustomWidgetInterface
+class caWaterfallPlotInterface : public CustomWidgetInterface_Monitors
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)

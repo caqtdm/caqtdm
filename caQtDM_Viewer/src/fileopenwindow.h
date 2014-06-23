@@ -76,7 +76,8 @@
      void Callback_OpenNewFile(const QString&, const QString&, const QString&);
      void checkForMessage();
      void Callback_PVwindowExit();
-    void processError(QProcess::ProcessError err);
+     void processError(QProcess::ProcessError err);
+     void Callback_setEpicsConfig();
 
  public slots:
      void doSomething() { printf("About to quit!\n"); sharedMemory.detach();}
