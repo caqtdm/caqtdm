@@ -26,6 +26,10 @@
 #ifndef QWTPLOTCURVENAN_H
 #define QWTPLOTCURVENAN_H
 
+#if defined(_MSC_VER)
+#define QWT_DLL
+#endif
+
 #include <qtcontrols_global.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_intervalcurve.h>

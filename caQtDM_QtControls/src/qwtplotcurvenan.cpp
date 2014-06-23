@@ -22,6 +22,10 @@
  *  Contact details:
  *    anton.mezger@psi.ch
  */
+#if defined(_MSC_VER)
+#include <float.h>
+#define isnan _isnan
+#endif
 
 #include "qwtplotcurvenan.h"
 

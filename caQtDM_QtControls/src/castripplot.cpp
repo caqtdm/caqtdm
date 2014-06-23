@@ -25,7 +25,11 @@
 
 #if defined(_MSC_VER)
 #include <windows.h>
+#include <float.h>
+#define isnan _isnan
 #define QWT_DLL
+#define INFINITY (DBL_MAX+DBL_MAX)
+#define NAN (INFINITY-INFINITY)
 #endif
 
 #include <qapplication.h>
@@ -632,7 +636,7 @@ void caStripPlot::TimeOut()
 
     // replot
     replot();
-    
+
     mutex.unlock();
 }
 
