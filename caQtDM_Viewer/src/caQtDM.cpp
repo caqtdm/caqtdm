@@ -63,6 +63,9 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(caQtDM);
 
     QApplication app(argc, argv);
+    QApplication::setOrganizationName("Paul Scherrer Institut");
+    QApplication::setApplicationName("caQtDM");
+
 
     // we do not want numbers with a group separators
     QLocale loc = QLocale::system();

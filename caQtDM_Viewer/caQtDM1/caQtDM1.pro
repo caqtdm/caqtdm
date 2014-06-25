@@ -8,12 +8,12 @@ ios {
    CONFIG += staticlib
    LIBS += ../../caQtDM_Binaries/libcaQtDM_Lib.a
    LIBS += ../../caQtDM_Binaries/libqtcontrols.a
-   LIBS += ../../../qwt-6.1.0.ios/lib/libqwt.a
+   LIBS += $$(QWTHOME)/lib/libqwt.a
    LIBS += ../../caQtDM_Binaries/libqtcontrols_controllers_plugin.a
    LIBS += ../../caQtDM_Binaries/libqtcontrols_monitors_plugin.a
    LIBS += ../../caQtDM_Binaries/libqtcontrols_graphics_plugin.a
-   LIBS += ../../../epics/base/lib/ios-x86/libca.a
-   LIBS += ../../../epics/base/lib/ios-x86/libCom.a
+   LIBS += $$(EPICSLIB)/libca.a
+   LIBS += $$(EPICSLIB)/libCom.a
 }
 
 !ios {

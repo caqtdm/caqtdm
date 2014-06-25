@@ -6,11 +6,12 @@ ios {
 
 !ios {
   include($$(QWTHOME)/qwt.prf)
+  SUBDIRS += parser
 }
 
 unix {
   TEMPLATE = subdirs
-  SUBDIRS = parser caQtDM1 
+  SUBDIRS += caQtDM1
   exists("/home/ACS/Control/Lib/libDEV.so") {
          SUBDIRS += caQtDM2
   }

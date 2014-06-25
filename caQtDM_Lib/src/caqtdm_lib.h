@@ -49,8 +49,10 @@
 #include <QWidget>
 #include <QWaitCondition>
 #include <QMessageBox>
-#include <QPrinter>
-#include <QPrintDialog>
+#ifndef Q_OS_IOS
+ #include <QPrinter>
+ #include <QPrintDialog>
+#endif
 #include <QClipboard>
 
 #include <QUiLoader>

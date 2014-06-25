@@ -162,7 +162,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     gridLayout->addWidget(messageWindow, 0, 0, 1, 1);
     messageWindow->show();
 #endif
-
+#ifndef Q_OS_IOS
     sharedMemory.setKey ("caQtDM shared memory");
 
     if (sharedMemory.attach()) {
@@ -201,7 +201,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
             timer->start(1000);
         }
     }
-
+#endif
     // when file was specified, open it
     // when called from here on Windows, the actual size of the window
     // is not found => defer opening

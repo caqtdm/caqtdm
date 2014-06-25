@@ -16,10 +16,10 @@ TEMPLATE = lib
 
 ios {
   CONFIG += static
-  LIBS += ../../caQtDM_Binaries/qwt.a
+  LIBS += $$(QWTHOME)/lib/qwt.a
   LIBS += ../../caQtDM_Binaries/libqtcontrols.a
-  INCLUDEPATH += ../../../Qt5.3.0/5.3/ios/include
-  INCLUDEPATH += ../../../qwt-6.1.0.ios/src
+  INCLUDEPATH += $$(QWTHOME)/include
+  INCLUDEPATH += $$(QWTHOME)/src
   MOC_DIR = moc
   OBJECTS_DIR = obj
 }

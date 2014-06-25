@@ -14,6 +14,11 @@ unix: {
   CONFIG += x11
 }
 
+ }
+ios: {
+  QMAKE_CFLAGS += -gdwarf-2
+  QMAKE_CXXFLAGS += -gdwarf-2
+ }
 !ios {
   macx: {
      CONFIG += app_bundle
