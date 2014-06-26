@@ -39,7 +39,7 @@
 #include <QtDebug>
 #include <QApplication>
 
-#if (_MFC_VER > 0x1100)
+#if (_MSC_VER == 1600)
 int round (double x) {
   int i = (int) x;
   if (x >= 0.0) {
@@ -215,7 +215,7 @@ void ENumeric::init()
 }
 
 void ENumeric::setValue(double v)
-{ 
+{
     long long temp = (long long) round(v * pow(10.0, decDig));
     if ((temp >= minVal) && (temp <= maxVal))
     {
@@ -241,7 +241,7 @@ void ENumeric::silentSetValue(double v)
 }
 
 void ENumeric::setMaximum(double v)
-{ 
+{
     if (v >= d_minAsDouble)
     {
         d_maxAsDouble = v;
@@ -250,7 +250,7 @@ void ENumeric::setMaximum(double v)
 }
 
 void ENumeric::setMinimum(double v)
-{ 
+{
     if (v <= d_maxAsDouble)
     {
         d_minAsDouble = v;
@@ -259,7 +259,7 @@ void ENumeric::setMinimum(double v)
 }
 
 void ENumeric::setIntDigits(int i)
-{ 
+{
     if (i < 1) return;
     clearContainers();
     intDig = i;

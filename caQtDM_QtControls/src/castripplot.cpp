@@ -29,9 +29,9 @@
 #include <float.h>
 #define isnan _isnan
 #define QWT_DLL
-#if (_MFC_VER > 0x1100)
+#if (_MSC_VER == 1600)
   #define INFINITY (DBL_MAX+DBL_MAX)
- #define NAN (INFINITY-INFINITY)
+  #define NAN (INFINITY-INFINITY)
 #endif
 #endif
 
