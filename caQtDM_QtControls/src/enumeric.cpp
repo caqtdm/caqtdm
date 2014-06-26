@@ -39,7 +39,7 @@
 #include <QtDebug>
 #include <QApplication>
 
-#if defined(_MSC_VER)
+#if (_MFC_VER > 0x1100)
 int round (double x) {
   int i = (int) x;
   if (x >= 0.0) {

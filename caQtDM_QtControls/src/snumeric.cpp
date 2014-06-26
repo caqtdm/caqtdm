@@ -39,7 +39,7 @@
 #include <QtDebug>
 #include <QApplication>
 
-#if defined(_MSC_VER)
+#if (_MFC_VER > 0x1100)
 extern int round (double x);
 #endif
 

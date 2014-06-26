@@ -24,6 +24,7 @@
  */
 
 #if defined(_MSC_VER)
+#define NOMINMAX
 #include <windows.h>
 #define QWT_DLL
 #endif

@@ -24,12 +24,15 @@
  */
 
 #if defined(_MSC_VER)
+#define NOMINMAX
 #include <windows.h>
 #include <float.h>
 #define isnan _isnan
 #define QWT_DLL
-#define INFINITY (DBL_MAX+DBL_MAX)
-#define NAN (INFINITY-INFINITY)
+#if (_MFC_VER > 0x1100)
+  #define INFINITY (DBL_MAX+DBL_MAX)
+ #define NAN (INFINITY-INFINITY)
+#endif
 #endif
 
 #include <qapplication.h>
