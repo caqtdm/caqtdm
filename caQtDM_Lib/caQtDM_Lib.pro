@@ -15,7 +15,7 @@ win32 {
         TEMPLATE = lib
         
         DebugBuild {
-                EPICS_LIBS=$$(EPICS_BASE)/lib/win32-x86
+                EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
                 DESTDIR = debug
                 OBJECTS_DIR = debug/obj
                 LIBS += $$(QWTHOME)/lib/qwtd.lib
@@ -24,7 +24,7 @@ win32 {
                 LIBS += $$(QTCONTROLS_LIBS)/debug/qtcontrols.lib
         }
         ReleaseBuild {
-                EPICS_LIBS=$$(EPICS_BASE)/lib/win32-x86-debug
+                EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
                 DESTDIR = release
                 OBJECTS_DIR = release/obj
                 LIBS += $$(QWTHOME)/lib/qwt.lib

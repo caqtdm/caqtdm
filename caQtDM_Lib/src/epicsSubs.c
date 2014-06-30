@@ -25,6 +25,7 @@
 
 #ifdef _MSC_VER
     #include <windows.h>
+    #include <stdbool.h>
 #else
     #include <unistd.h>
 #endif

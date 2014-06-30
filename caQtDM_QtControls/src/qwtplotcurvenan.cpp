@@ -25,6 +25,7 @@
 #if defined(_MSC_VER)
 #include <float.h>
 #define isnan _isnan
+#define QWT_DLL
 #endif
 
 #include "qwtplotcurvenan.h"

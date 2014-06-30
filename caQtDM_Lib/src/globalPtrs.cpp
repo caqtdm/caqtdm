@@ -23,6 +23,11 @@
  *    anton.mezger@psi.ch
  */
 
+#if defined(_MSC_VER)
+ #define NOMINMAX
+#endif
+
+
 #include "dbrString.h"
 #include "knobDefines.h"
 

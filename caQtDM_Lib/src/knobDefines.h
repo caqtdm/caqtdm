@@ -30,9 +30,12 @@
 
 #define PRINT(x)
 
-#define boolean int 
-#define true 1==1
-#define false !(true)
+#ifndef _MSC_VER
+ #define boolean int
+ #define true 1==1
+ #define false !(true)
+#endif
+
 
 #define MAXFILELEN 60
 #define MAXPVLEN 120
