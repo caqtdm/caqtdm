@@ -4,6 +4,7 @@
   IF "%QWTINCLUDE%"==""      set QWTINCLUDE=X:/qt/Qwt-6.0.1/include
   IF "%QWTLIB%"==""          set QWTLIB=X:/qt/Qwt-6.0.1/lib
   IF "%EPICS_BASE%"==""      set EPICS_BASE=X:/epics/base-3.14.12.4
+  IF "%EPICS_HOST_ARCH%"=="" set EPICS_HOST_ARCH=win32-x86
   IF "%EPICSINCLUDE%"==""    set EPICSINCLUDE=X:/epics/base-3.14.12.4/include
   IF "%EPICSEXTENSIONS%"=="" set EPICSEXTENSIONS=X:/Qt/4.8.5
   IF "%QTCONTROLS_LIBS%"=="" set QTCONTROLS_LIBS=X:/Qt/caqtdm_project/caQtDM_QtControls
