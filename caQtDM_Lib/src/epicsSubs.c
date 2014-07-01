@@ -23,9 +23,11 @@
  *    anton.mezger@psi.ch
  */
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
     #include <windows.h>
-    #include <stdbool.h>
+    #if (_MSC_VER == 1800)
+      #include <stdbool.h>
+    #endif
 #else
     #include <unistd.h>
 #endif

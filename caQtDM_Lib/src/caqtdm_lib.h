@@ -200,9 +200,9 @@ private:
     QString thisFileShort;
     QString thisFileFull;
 
-    boolean firstResize;
-    boolean allowResize;
-    boolean pepPrint;
+    bool firstResize;
+    bool allowResize;
+    bool pepPrint;
 
     int origWidth, origHeight;
 

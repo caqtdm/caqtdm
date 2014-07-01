@@ -30,7 +30,7 @@
 
 #define PRINT(x)
 
-#ifndef _MSC_VER
+#if _MSC_VER !=1800
  #define boolean int
  #define true 1==1
  #define false !(true)
