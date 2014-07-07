@@ -286,6 +286,18 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         QString title(file->fileName().section('/',-1));
         thisFileShort = file->fileName().section('/',-1);
         thisFileFull = fi.absoluteFilePath ();
+
+        // user wants to have its own title
+        QVariant myTitle=myWidget->property("Title");
+        if(!myTitle.isNull()) {
+            QString Title = myTitle.toString();
+            QMap<QString, QString> map;
+            map = createMap(macro);
+            reaffectText(map, &Title);
+            qDebug() << myTitle;
+            title = Title;
+        }
+
         setWindowTitle(title);
         setUnifiedTitleAndToolBarOnMac(true);
 

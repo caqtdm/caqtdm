@@ -13,6 +13,7 @@ unix {
 # 3.8.0
 # adapted source code in order to run on ios (ipad)
 # cachoice crashed when index was higher than the number of ENUMS, fixed
+# the title of the display can now be set in the window caption by defining the dynamic property "Title" for the mainwindow. when using a macro definition, this will be expanded.
 
 # 3.7.9
 # minor adjustments
