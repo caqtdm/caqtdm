@@ -294,7 +294,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
             QMap<QString, QString> map;
             map = createMap(macro);
             reaffectText(map, &Title);
-            qDebug() << myTitle;
             title = Title;
         }
 
