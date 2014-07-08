@@ -124,6 +124,9 @@ border-radius: 2px;
 }
 </string>
   </property>
+  <property name="Title" stdset="0">
+   <string>This title can be changed with the designer</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="autoFillBackground">
     <bool>false</bool>
