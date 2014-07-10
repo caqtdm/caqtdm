@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<?define CaQtDMVersion = '3.7.9.0' ?>
+<?define CaQtDMVersion = '3.8.0.0' ?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Product Id="*" Name="caQtDM" Language="1033" Version="$(var.CaQtDMVersion)" Manufacturer="Paul Scherrer Institut" UpgradeCode="CEE4C381-28DA-478F-A7C6-3A95B4DF2A89">
+    <Product Id="*" Name="caQtDM" Language="1033" Version="$(var.CaQtDMVersion)" Manufacturer="Paul Scherrer Institut" UpgradeCode="86ABEDAA-C06B-4485-9DF0-5EFE2EB497DD">
         <Package Description="caQTDM Windows Manager with Qt-Designer(5.3.1)" Comments="Displaymanager for EPICS with Qt(5.3.1)" InstallerVersion="405" Compressed="yes" Manufacturer="Paul Scherrer Institut Switzerland" Keywords="EPICS, Display, Network, Control" Platform="x64" InstallScope="perMachine" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
-        <Upgrade Id="CEE4C381-28DA-478F-A7C6-3A95B4DF2A89">
+        <Upgrade Id="86ABEDAA-C06B-4485-9DF0-5EFE2EB497DD">
             <UpgradeVersion OnlyDetect="yes" Minimum="$(var.CaQtDMVersion)" Property="NEWERVERSIONDETECTED" IncludeMinimum="no" />
             <UpgradeVersion OnlyDetect="no" Maximum="$(var.CaQtDMVersion)" Property="OLDERVERSIONBEINGUPGRADED" IncludeMaximum="no" />
         </Upgrade>
@@ -29,7 +29,7 @@
                 <Directory Id="INSTALLDIR" Name="caQTDM">
                     <Directory Name="bin" Id="BIN">
                         <Directory Name="windows-x64" Id="WINDOWS_X64">
-                            <Component Id="Qt_5.3.1" Guid="925E77A5-220A-4867-BD38-5F9C1C57B0E6" Win64="yes">
+                            <Component Id="Qt_5.3.1" Guid="30F3975A-A151-4A59-9C05-658F0319F3F7" Win64="yes">
                                 <File Id="DESIGNER.EXE" Name="designer.exe" Source="$(env.QTHOME)\bin\designer.exe" />
                                 <File Id="ASSISTANT.EXE" Name="assistant.exe" Source="$(env.QTHOME)\bin\assistant.exe" />
                                 <File Id="QT5QUICKPARTICLES.DLL" Name="Qt5QuickParticles.dll" Source="$(env.QTHOME)\bin\Qt5QuickParticles.dll" />
@@ -74,10 +74,10 @@
                                 <File Id="CA.DLL" Name="ca.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\ca.dll" />
                                 <File Id="COM.DLL" Name="Com.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\Com.dll" />
                             </Component>
-                            <Component Id="qwt_6.1.0" Guid="6FC6A35B-B1B8-4023-AFC5-4A7FE586D79F" Win64="yes">
+                            <Component Id="qwt_6.1.0" Guid="A6CEE0D5-9524-4F6E-A04A-0BA4A5116B35" Win64="yes">
                                 <File Id="QWT.DLL" Name="qwt.dll" Source="$(env.QWTHOME)\lib\qwt.dll" />
                             </Component>
-                            <Component Id="CaQtDM" Guid="0E0D0339-624A-499A-8A5D-EFEA21AE8E6F" Win64="yes">
+                            <Component Id="CaQtDM" Guid="ECDE0227-4100-43B8-B817-88D6BCD7FF49" Win64="yes">
                                 <File Id="CAQTDM.EXE" Name="caQtDM.exe" Source="..\..\..\caQtDM_Binaries\caQtDM.exe" />
                                 <File Id="QTCONTROLS.DLL" Name="qtcontrols.dll" Source="..\..\..\caQtDM_Binaries\qtcontrols.dll" />
                                 <File Id="CAQTDM_LIB.DLL" Name="caQtDM_Lib.dll" Source="..\..\..\caQtDM_Binaries\caQtDM_Lib.dll" />
