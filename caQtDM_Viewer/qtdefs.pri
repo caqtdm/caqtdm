@@ -10,6 +10,12 @@ unix {
     QMAKE_CFLAGS_RELEASE += "-g"
 }
 
+# enable specialized version, wehere files will be downloaded to a local directory (used specially for IOS)
+CONFIG += NETWORKDOWNLOADSUPPORT
+NETWORKDOWNLOADSUPPORT {
+DEFINES += NETWORKDOWNLOADSUPPORT
+}
+
 # 3.8.0
 # adapted source code in order to run on ios (ipad)
 # cachoice crashed when index was higher than the number of ENUMS, fixed

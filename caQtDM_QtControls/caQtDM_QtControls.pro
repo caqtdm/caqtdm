@@ -127,6 +127,17 @@ SOURCES	+= \
     src/caspinbox.cpp \
     src/qwtplotcurvenan.cpp
 
+NETWORKDOWNLOADSUPPORT: {
+QT += network
+HEADERS += \
+    src/networkaccess.h \
+    src/fileFunctions.h
+
+SOURCES +=  \
+    src/networkaccess.cpp \
+    src/fileFunctions.cpp
+}
+
 # assume qwt6.0 was made with qt4
 contains(QT_VER_MAJ, 4) {
     warning("Qt $$[QT_VERSION] was detected, so compile qwt_thermo_marker")

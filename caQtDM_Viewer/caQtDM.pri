@@ -1,7 +1,7 @@
 include(qtdefs.pri)
 
 contains(QT_VER_MAJ, 4) {
-   QT     += core gui svg 
+   QT     += core gui svg
    CONFIG += qt warn_on thread uitools
 }
 contains(QT_VER_MAJ, 5) {
@@ -14,7 +14,7 @@ unix: {
   CONFIG += x11
 }
 
- 
+
 ios: {
   QMAKE_CFLAGS += -gdwarf-2
   QMAKE_CXXFLAGS += -gdwarf-2
@@ -41,11 +41,18 @@ ios: {
 SOURCES +=\
     caQtDM.cpp \
     fileopenwindow.cpp \
-    messagebox.cpp
+    messagebox.cpp \
 
 HEADERS  +=  \
     messagebox.h \
     fileopenwindow.h \
+
+NETWORKDOWNLOADSUPPORT {
+
+   QT += network
+   SOURCES += configDialog.cpp
+   HEADERS  +=  configDialog.h
+}
 
 
 FORMS += main.ui

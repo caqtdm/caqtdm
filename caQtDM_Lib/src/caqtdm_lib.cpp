@@ -41,6 +41,10 @@
 #  include <unistd.h>
 #endif
 
+#ifdef  NETWORKDOWNLOADSUPPORT
+#include "fileFunctions.h"
+#endif
+
 #define PRC 1
 
 #include "myMessageBox.h"
@@ -995,6 +999,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
             fileName = openFile.append(".ui");
             prcFile = false;
         }
+
+        // this will download the file from a http server
+#ifdef NETWORKDOWNLOADSUPPORT
+        fileFunctions filefunction;
+        filefunction.checkFileAndDownload(fileName);
+#endif
 
         searchFile *s = new searchFile(fileName);
         QString fileNameFound = s->findFile();

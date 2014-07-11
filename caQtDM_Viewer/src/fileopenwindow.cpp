@@ -42,6 +42,11 @@
 #include <QString>
 #include "messagebox.h"
 
+#ifdef NETWORKDOWNLOADSUPPORT
+#include "configDialog.h"
+#include "fileFunctions.h"
+#endif
+
 #ifdef linux
 #include <sys/resource.h>
 #include <sys/time.h>
@@ -70,19 +75,6 @@ int setenv(const char *name, const char *value, int overwrite)
     return _putenv_s(name, value);
 }
 #endif
-
-class Sleep
-{
-public:
-    static void msleep(unsigned long msecs)
-    {
-        QMutex mutex;
-        mutex.lock();
-        QWaitCondition waitCondition;
-        waitCondition.wait(&mutex, msecs);
-        mutex.unlock();
-    }
-};
 
 /**
  * our main window (form) constructor
@@ -221,33 +213,127 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 
     pvWindow = (QMainWindow*) 0;
     pvTable = (QTableWidget*) 0;
+
+#ifdef  NETWORKDOWNLOADSUPPORT
+// test reading a local configuration file in order to start caQtDM for ios (read caQTDM_IOS_Config.xml, display its data, choose configuration,
+// then get from the choosen website and choosen config file the epics configuration and ui file to launch
+
+    QList<QString> urls;
+    QList<QString> files;
+    QString url, file;
+    // parse the config file for urls and files
+    parseConfigFile("caQtDM_IOS_Config.xml", urls, files);
+    qDebug() << urls;
+    qDebug() << files;
+
+    // display the results and get the user choices
+    configDialog dialog(urls, files, this);
+    int retCode = dialog.exec();
+    dialog.getChoice(url, file);
+    qDebug() << url << file;
+
+    fileFunctions filefunction;
+
+    // download the choosen configurations file from the choosen url
+    int success = filefunction.checkFileAndDownload(file, url);
+    if(!success) {
+        QMessageBox::critical(0, tr("caQtDM"), tr("could not download file %1 from %2").arg(file).arg(url));
+        exit(0);
+    }
+
+    //set all the environment varaibles that we need
+    setAllEnviromentVariables(file);
+
+    // now check if file exists and download it. (file is specified by the environment variables CAQTDM_LAUNCHFILE and CAQTDM_URL_DISPLAY)
+    QString launchFile = (QString)  getenv("CAQTDM_LAUNCHFILE");
+    filefunction.checkFileAndDownload(launchFile);
+
+    // lauch the display with the file
+    if(launchFile.size() > 0) {
+        lastMacro = "";
+        lastFile = launchFile;
+        lastGeometry = "";
+        mustOpenFile = true;
+    }
+#endif
+}
+
+
+#ifdef  NETWORKDOWNLOADSUPPORT
+void FileOpenWindow::parseConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files)
+{
+
+    QFile* file = new QFile(filename);
+
+      /* can not open file */
+      if (!file->open(QIODevice::ReadOnly | QIODevice::Text)) {
+          QMessageBox::critical(0, tr("caQtDM"), tr("could not open configuration file: %1").arg(filename));
+          exit(0);
+      }
+
+      QXmlStreamReader xml(file);
+
+      /* parse the XML file*/
+      while(!xml.atEnd() && !xml.hasError()) {
+          /* Read next element.*/
+          QXmlStreamReader::TokenType token = xml.readNext();
+          /* StartDocument, follow up*/
+          if(token == QXmlStreamReader::StartDocument)  continue;
+
+          /* If token is StartElement, we'll see if we can read it.*/
+          if(token == QXmlStreamReader::StartElement) {
+              if(xml.name() == "configuration") continue;
+
+              if(xml.name() == "url") {
+                  QXmlStreamAttributes attributes = xml.attributes();
+                  if(attributes.hasAttribute("value")) urls.append(attributes.value("value").toString());
+              }
+
+              if(xml.name() == "config") {
+                  QXmlStreamAttributes attributes = xml.attributes();
+                  if(attributes.hasAttribute("value")) files.append(attributes.value("value").toString());
+              }
+          }
+      }
+      /* Error handling. */
+      if(xml.hasError()) {
+          QMessageBox::warning(this, tr("caQtDM"), tr("could not parse configuation file: error=%1").arg( xml.errorString()));
+      }
+
+      xml.clear();
+}
+#endif
+
+void FileOpenWindow::setAllEnviromentVariables(const QString &fileName)
+{
+    char asc[255];
+    QFile file(fileName);
+    if(!file.open(QIODevice::ReadOnly)) {
+        QMessageBox::information(0, "open file error", file.errorString());
+        return;
+    }
+
+    QTextStream in(&file);
+
+    while(!in.atEnd()) {
+        QString line = in.readLine();
+        QStringList fields = line.split(" ");
+        if(fields.count() > 1) setenv(fields.at(0).toAscii().constData(), fields.at(1).toAscii().constData(), 1);
+        else if(line.size() > 0){
+            sprintf(asc, "environment variable could not be set from %s", line.toAscii().constData());
+            messageWindow->postMsgEvent(QtDebugMsg, asc);
+        }
+    }
+    sprintf(asc, "epics configuration file loaded: %s", fileName.toAscii().constData());
+    messageWindow->postMsgEvent(QtDebugMsg, asc);
+    file.close();
 }
 
 void FileOpenWindow::Callback_setEpicsConfig()
 {
-    char asc[255];
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Epics Configuration file"), "./", tr("EPICS conf Files (*.epics)"));
     if(!fileName.isNull()) {
-        QFile file(fileName);
-        if(!file.open(QIODevice::ReadOnly)) {
-            QMessageBox::information(0, "open file error", file.errorString());
-            return;
-        }
-
-        QTextStream in(&file);
-
-        while(!in.atEnd()) {
-            QString line = in.readLine();
-            QStringList fields = line.split(" ");
-            if(fields.count() > 1) setenv(fields.at(0).toAscii().constData(), fields.at(1).toAscii().constData(), 1);
-            else if(line.size() > 0){
-                sprintf(asc, "environment variable could not be set from %s", line.toAscii().constData());
-                messageWindow->postMsgEvent(QtDebugMsg, asc);
-            }
-        }
-        sprintf(asc, "epics configuration file loaded: %s", fileName.toAscii().constData());
-        messageWindow->postMsgEvent(QtDebugMsg, asc);
-        file.close();
+        setAllEnviromentVariables(fileName);
     }
 }
 
@@ -336,6 +422,17 @@ void FileOpenWindow::Callback_OpenButton()
 {
     //get a filename to open
     QString path = (QString)  getenv("CAQTDM_DISPLAY_PATH");
+
+/*
+    FileDownloadDialog dialog("http://epics.web.psi.ch/software/caqtdm/qtDir/", "UIfiles_Index.txt", this);
+    if(dialog.openUrl()) {
+        int retCode = dialog.exec();
+        if ( retCode==QDialog::Accepted ) {
+            QString str = dialog.fileChoice->text();
+        } else if ( retCode==QDialog::Rejected ) {
+        }
+    }
+*/
     if(path.size() == 0 && lastFilePath.size()==0) path.append(".");
     else path = lastFilePath;
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open ui or prc file"), path, tr("ui/prc Files (*.ui *.prc)"));

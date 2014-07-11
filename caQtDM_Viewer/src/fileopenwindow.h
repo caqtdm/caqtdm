@@ -63,6 +63,11 @@
      int parseGeometry(const char* string, int* x, int* y, int* width, int* height);
      void parse_and_set_Geometry(QMainWindow *w, QString parsestring);
      void shellCommand(QString command);
+     void setAllEnviromentVariables(const QString &fileName);
+
+#ifdef NETWORKDOWNLOADSUPPORT
+     void parseConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files);
+#endif
 
  private slots:
      void Callback_ActionTimed();

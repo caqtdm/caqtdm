@@ -18,7 +18,7 @@ SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/QtTunes
 cp -v $SOURCE/QtTunes $DESTINATION
 
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/HFdispQt
-cp -v $SOURCE/caHFdispQt $DESTINATION
+cp -v $SOURCE/caHFdispQt /home/ACS/Control/Bin/
 
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/probeQtProscan
 cp -v $SOURCE/probeQt $DESTINATION

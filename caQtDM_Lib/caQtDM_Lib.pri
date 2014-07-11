@@ -54,6 +54,7 @@ SOURCES += caqtdm_lib.cpp \
     processWindow.cpp \
     splashscreen.cpp
 
+
 HEADERS += caqtdm_lib.h\
         caQtDM_Lib_global.h \
     mutexKnobDataWrapper.h \
@@ -74,6 +75,7 @@ HEADERS += caqtdm_lib.h\
     processWindow.h \
     splashscreen.h \
     epicsExternals.h
+
 
 HEADERS += \
     JSONValue.h \

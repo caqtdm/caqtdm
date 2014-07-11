@@ -47,3 +47,8 @@ INCLUDEPATH += ../../caQtDM_Lib/src
 
 RESOURCES += ../src/caQtDM.qrc
 RC_FILE = ../src/caQtDM.rc
+
+ios {
+APP_XML_FILES.files = ../caQtDM_IOS_Config.xml
+QMAKE_BUNDLE_DATA += APP_XML_FILES
+}
