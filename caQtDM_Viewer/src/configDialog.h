@@ -37,7 +37,7 @@
 #include <QDialogButtonBox>
 #include <QHeaderView>
 #include <QTableWidget>
-#include <QRadiobutton>
+#include <QRadioButton>
 #include <QGroupBox>
 
 class configDialog: public QDialog

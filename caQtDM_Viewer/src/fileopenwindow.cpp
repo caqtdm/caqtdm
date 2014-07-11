@@ -129,7 +129,6 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     connect( this->ui.timedAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionTimed()) );
     connect( this->ui.directAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionDirect()) );
     connect( this->ui.helpAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionHelp()) );
-    connect( this->ui.EpicsAction, SIGNAL(triggered()), this, SLOT(Callback_setEpicsConfig()));
     this->ui.timedAction->setChecked(true);
 
     setWindowTitle(title);
@@ -242,7 +241,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     }
 
     //set all the environment varaibles that we need
-    setAllEnviromentVariables(file);
+    setAllEnvironmentVariables(file);
 
     // now check if file exists and download it. (file is specified by the environment variables CAQTDM_LAUNCHFILE and CAQTDM_URL_DISPLAY)
     QString launchFile = (QString)  getenv("CAQTDM_LAUNCHFILE");
@@ -302,9 +301,8 @@ void FileOpenWindow::parseConfigFile(const QString &filename, QList<QString> &ur
 
       xml.clear();
 }
-#endif
 
-void FileOpenWindow::setAllEnviromentVariables(const QString &fileName)
+void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
 {
     char asc[255];
     QString EnvFile="../Documents/";
@@ -330,14 +328,7 @@ void FileOpenWindow::setAllEnviromentVariables(const QString &fileName)
     messageWindow->postMsgEvent(QtDebugMsg, asc);
     file.close();
 }
-
-void FileOpenWindow::Callback_setEpicsConfig()
-{
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Epics Configuration file"), "./", tr("EPICS conf Files (*.epics)"));
-    if(!fileName.isNull()) {
-        setAllEnviromentVariables(fileName);
-    }
-}
+#endif
 
 void FileOpenWindow::timerEvent(QTimerEvent *event)
 {

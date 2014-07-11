@@ -63,9 +63,9 @@
      int parseGeometry(const char* string, int* x, int* y, int* width, int* height);
      void parse_and_set_Geometry(QMainWindow *w, QString parsestring);
      void shellCommand(QString command);
-     void setAllEnviromentVariables(const QString &fileName);
 
 #ifdef NETWORKDOWNLOADSUPPORT
+     void setAllEnvironmentVariables(const QString &fileName);
      void parseConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files);
 #endif
 
@@ -82,7 +82,6 @@
      void checkForMessage();
      void Callback_PVwindowExit();
      void processError(QProcess::ProcessError err);
-     void Callback_setEpicsConfig();
 
  public slots:
      void doSomething() { printf("About to quit!\n"); sharedMemory.detach();}

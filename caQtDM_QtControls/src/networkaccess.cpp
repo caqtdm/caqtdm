@@ -68,14 +68,12 @@ void NetworkAccess::finishReply()
     // seems we want to download the file to a file with  the filename "thisFile"
     qDebug() << "open and write the file";
     if(thisTable == 0 && thisFile.length() > 0) {
-        QDir bidon_path("./");
 
-        QString bidon="";//= bidon_path.absolutePath ();
-                bidon.append("../Documents/");
-                bidon.append(thisFile);
-        QFile file(bidon);
+        QString filePath = "../Documents/";
+        filePath.append(thisFile);
+        QFile file(filePath);
         if(!file.open(QIODevice::ReadWrite)) {
-            QMessageBox::warning(0, tr("caQtDM"), tr("error: file %1 could not be opened for write").arg(bidon));
+            QMessageBox::warning(0, tr("caQtDM"), tr("error: file %1 could not be opened for write").arg(filePath));
             return;
         } else {
             file.write(reply->readAll());
