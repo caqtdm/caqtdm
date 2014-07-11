@@ -26,6 +26,7 @@
 #include <QNetworkAccessManager>
 #include <QDebug>
 #include <QFile>
+#include <QDir>
 #include <QEventLoop>
 #include "networkaccess.h"
 
@@ -67,9 +68,14 @@ void NetworkAccess::finishReply()
     // seems we want to download the file to a file with  the filename "thisFile"
     qDebug() << "open and write the file";
     if(thisTable == 0 && thisFile.length() > 0) {
-        QFile file(thisFile);
-        if(!file.open(QIODevice::WriteOnly)) {
-            QMessageBox::warning(0, tr("caQtDM"), tr("error: file %1 could not be opened for write").arg(thisFile));
+        QDir bidon_path("./");
+
+        QString bidon="";//= bidon_path.absolutePath ();
+                bidon.append("../Documents/");
+                bidon.append(thisFile);
+        QFile file(bidon);
+        if(!file.open(QIODevice::ReadWrite)) {
+            QMessageBox::warning(0, tr("caQtDM"), tr("error: file %1 could not be opened for write").arg(bidon));
             return;
         } else {
             file.write(reply->readAll());

@@ -14,6 +14,8 @@ ios {
    LIBS += ../../caQtDM_Binaries/libqtcontrols_graphics_plugin.a
    LIBS += $$(EPICSLIB)/libca.a
    LIBS += $$(EPICSLIB)/libCom.a
+   #QMAKE_INFO_PLIST = ../src/Info.plist
+   ICON = ../src/caQtDM.icns
 }
 
 !ios {

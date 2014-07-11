@@ -307,9 +307,11 @@ void FileOpenWindow::parseConfigFile(const QString &filename, QList<QString> &ur
 void FileOpenWindow::setAllEnviromentVariables(const QString &fileName)
 {
     char asc[255];
-    QFile file(fileName);
+    QString EnvFile="../Documents/";
+    EnvFile.append(fileName);
+    QFile file(EnvFile);
     if(!file.open(QIODevice::ReadOnly)) {
-        QMessageBox::information(0, "open file error", file.errorString());
+        QMessageBox::information(0, "open file error setAllEnviromentVariables", file.errorString());
         return;
     }
 
