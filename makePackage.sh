@@ -68,7 +68,7 @@ cat > caqtdm << "EOF"
 CAQTDM_HOME=/usr/caqtdm
 
 export QT_PLUGIN_PATH=$CAQTDM_HOME/lib
-$CAQTDM_HOME/lib/caQtDM $@
+$CAQTDM_HOME/lib/caQtDM -style plastique $@
 
 EOF
 
