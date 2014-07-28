@@ -27,18 +27,20 @@
 #ifndef MYMESSAGEBOX_H
 #define MYMESSAGEBOX_H
 
-
+#include <QDialogButtonBox>
 #include <QDialog>
 #include <QTextEdit>
 
-class myMessageBox : public QDialog
+class myMessageBox : public QWidget
 {
 public:
     explicit myMessageBox(QWidget *parent = 0);
     void setText(QString strng) const;
+    void exec();
 
 private:
     QTextEdit *thisText;
+    QDialogButtonBox *buttonBox;
 };
 
 

@@ -26,10 +26,24 @@
 #include <myMessageBox.h>
 #include <QVBoxLayout>
 #include <QPushButton>
-#include <QDialogButtonBox>
+#include <QEventLoop>
+#include <QStyle>
+#include <QDesktopWidget>
+#include <QApplication>
 
-myMessageBox::myMessageBox(QWidget *parent) : QDialog(parent)
+myMessageBox::myMessageBox(QWidget *parent) : QWidget(parent)
 {
+
+    Qt::WindowFlags flags = Qt::Dialog;
+    setWindowFlags(flags);
+    setWindowModality (Qt::ApplicationModal);
+
+#ifdef Q_OS_IOS
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(350,500), qApp->desktop()->availableGeometry()));
+#else
+    move(parent->x() + parent->width() / 2 - 175, parent->y()+25);
+#endif
+
     thisText = new QTextEdit(this);
     thisText->setReadOnly(true);
     thisText->setTextInteractionFlags(Qt::TextSelectableByMouse);
@@ -37,18 +51,17 @@ myMessageBox::myMessageBox(QWidget *parent) : QDialog(parent)
 
     QPushButton *cancelButton = new QPushButton(tr("Close"));
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(Qt::Horizontal);
+    buttonBox = new QDialogButtonBox(Qt::Horizontal);
     buttonBox->addButton(cancelButton, QDialogButtonBox::RejectRole);
-
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     QVBoxLayout *lt = new QVBoxLayout;
     lt->addWidget(thisText);
     lt->addWidget(buttonBox);
 
-    setMinimumSize(300,500);
+    setMinimumSize(350,500);
 
     setLayout(lt);
+    showNormal();
 }
 
 void myMessageBox::setText(QString strng) const
@@ -56,3 +69,9 @@ void myMessageBox::setText(QString strng) const
    thisText->setText(strng);
 }
 
+void myMessageBox::exec()
+{
+    QEventLoop loop;
+    connect(buttonBox, SIGNAL(rejected()), &loop, SLOT(quit()) );
+    loop.exec();
+}

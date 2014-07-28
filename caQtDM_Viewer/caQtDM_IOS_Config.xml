@@ -1,8 +1,13 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <url value="http://epics.web.psi.ch/software/caqtdm/qtDir" />
-    <url value="http://epics.web.psi.ch/software/caqtdm/qtDir" />
-    <config value="ProScan_MA85.config" />
-    <config value="HIPA_MA85.config" />
+    <url value="http://epics.web.psi.ch/software/caqtdm/qtDir"/>
+    <url value="http://epics.web.psi.ch/software/caqtdm/qtDir"/>
+    <url value=""/>
+    <url value=""/>
+    <url value=""/>
+    <config value="ProScan_MA85.config"/>
+    <config value="HIPA_MA85.config"/>
+    <config value=""/>
+    <config value=""/>
+    <config value=""/>
 </configuration>
-   

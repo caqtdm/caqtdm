@@ -35,6 +35,7 @@
 #include <sys/timeb.h>
 #include <postfix.h>
 #include <QObject>
+#include <QToolBar>
 #include <iostream>
 #ifdef linux
 #  include <sys/wait.h>
@@ -320,10 +321,14 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
 #ifdef Q_OS_IOS
         // add a menu to the window; this is especially important for tablets
-         QMenu *windowMenu = new QMenu(tr("Options"), this);
-         QAction *closeAction = windowMenu->addAction(tr("Close"));
+
+         QToolBar *toolBar = addToolBar("Options");
+         QAction *closeAction = new QAction("&Close", this);
+         QAction *nextAction = new QAction("&Cycle Window", this);
          connect(closeAction, SIGNAL(triggered()), this, SLOT(closeWindow()));
-         menuBar()->addMenu(windowMenu);
+         toolBar->addAction(closeAction);
+         toolBar->addAction(nextAction);
+         connect(nextAction, SIGNAL(triggered()), parent, SLOT(nextWindow()));
 #endif
     }
 
@@ -3781,7 +3786,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             info.append(InfoPrefix);
             info.append(includeFiles);
             info.append(InfoPostfix);
-            myMessageBox box;
+            myMessageBox box(this);
             box.setText("<html>" + info + "</html>");
             box.exec();
         } else  if(selectedItem->text().contains("Get Info")) {
@@ -3941,7 +3946,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             }
             info.append(InfoPostfix);
 
-            myMessageBox box;
+            myMessageBox box(this);
             box.setText("<html>" + info + "</html>");
             box.exec();
 

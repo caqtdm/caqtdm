@@ -39,6 +39,7 @@
 #include <QTableWidget>
 #include <QRadioButton>
 #include <QGroupBox>
+#include <QMessageBox>
 
 class configDialog: public QDialog
 {
@@ -48,11 +49,13 @@ public:
     configDialog(const QList<QString> &urlString, const QList<QString> &indexFile, QWidget *parent = 0);
     int openUrl();
     void executeQuery();
-    void getChoice(QString &url, QString &file);
+    void getChoice(QString &url, QString &file, QList<QString> &urls, QList<QString> &files);
     QLineEdit *fileChoice;
+    int NumberOfFiles();
 
 private slots:
 
+    void clearClicked();
 
 private:
 
@@ -62,11 +65,15 @@ private:
     QLabel *deviceLabel;
     QPushButton *cancelButton;
 
-   QRadioButton *urlRadio[10];
-   QRadioButton *fileRadio[10];
+   QRadioButton *urlRadio[5];
+   QRadioButton *fileRadio[5];
 
-   QLineEdit *urlEdit[10];
-   QLineEdit *fileEdit[10];
+   QLineEdit *urlEdit[5];
+   QLineEdit *fileEdit[5];
+
+   QDialogButtonBox *buttonBox;
+
+   QLabel *fileCountLabel;
 
 };
 

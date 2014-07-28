@@ -63,10 +63,12 @@
      int parseGeometry(const char* string, int* x, int* y, int* width, int* height);
      void parse_and_set_Geometry(QMainWindow *w, QString parsestring);
      void shellCommand(QString command);
+     void cycleWindows();
 
 #ifdef NETWORKDOWNLOADSUPPORT
      void setAllEnvironmentVariables(const QString &fileName);
      void parseConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files);
+     void saveConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files);
 #endif
 
  private slots:
@@ -85,6 +87,7 @@
 
  public slots:
      void doSomething() { printf("About to quit!\n"); sharedMemory.detach();}
+     void nextWindow();
 
  protected:
          virtual void timerEvent(QTimerEvent *e);
@@ -113,6 +116,8 @@ signals:
      bool printandexit;
      bool allowResize;
      bool minimizeMessageWindow;
+
+     int activWindow;
  };
 
  #endif

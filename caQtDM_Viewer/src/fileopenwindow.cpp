@@ -91,6 +91,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     printandexit = printscreen;
     allowResize = resizing;
     minimizeMessageWindow = minimize;
+    activWindow = 0;
 
     // set window title without the whole path
     QString title("caQtDM ");
@@ -214,22 +215,23 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     pvTable = (QTableWidget*) 0;
 
 #ifdef  NETWORKDOWNLOADSUPPORT
-// test reading a local configuration file in order to start caQtDM for ios (read caQTDM_IOS_Config.xml, display its data, choose configuration,
-// then get from the choosen website and choosen config file the epics configuration and ui file to launch
+    // test reading a local configuration file in order to start caQtDM for ios (read caQTDM_IOS_Config.xml, display its data, choose configuration,
+    // then get from the choosen website and choosen config file the epics configuration and ui file to launch
 
     QList<QString> urls;
     QList<QString> files;
     QString url, file;
     // parse the config file for urls and files
     parseConfigFile("caQtDM_IOS_Config.xml", urls, files);
-    qDebug() << urls;
-    qDebug() << files;
+    qDebug() << "urls" << urls;
 
     // display the results and get the user choices
     configDialog dialog(urls, files, this);
-    int retCode = dialog.exec();
-    dialog.getChoice(url, file);
-    qDebug() << url << file;
+    dialog.exec();
+    dialog.getChoice(url, file, urls, files);
+
+    // and save the changes
+    saveConfigFile("caQtDM_IOS_Config.xml", urls, files);
 
     fileFunctions filefunction;
 
@@ -257,50 +259,84 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 #endif
 }
 
-
 #ifdef  NETWORKDOWNLOADSUPPORT
 void FileOpenWindow::parseConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files)
 {
-
     QFile* file = new QFile(filename);
 
-      /* can not open file */
-      if (!file->open(QIODevice::ReadOnly | QIODevice::Text)) {
-          QMessageBox::critical(0, tr("caQtDM"), tr("could not open configuration file: %1").arg(filename));
-          exit(0);
-      }
+    /* can not open file */
+    if (!file->open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::critical(0, tr("caQtDM"), tr("could not open configuration file: %1").arg(filename));
+        exit(0);
+    }
 
-      QXmlStreamReader xml(file);
+    QXmlStreamReader xml(file);
 
-      /* parse the XML file*/
-      while(!xml.atEnd() && !xml.hasError()) {
-          /* Read next element.*/
-          QXmlStreamReader::TokenType token = xml.readNext();
-          /* StartDocument, follow up*/
-          if(token == QXmlStreamReader::StartDocument)  continue;
+    /* parse the XML file*/
+    while(!xml.atEnd() && !xml.hasError()) {
+        /* Read next element.*/
+        QXmlStreamReader::TokenType token = xml.readNext();
+        /* StartDocument, follow up*/
+        if(token == QXmlStreamReader::StartDocument)  continue;
 
-          /* If token is StartElement, we'll see if we can read it.*/
-          if(token == QXmlStreamReader::StartElement) {
-              if(xml.name() == "configuration") continue;
+        /* If token is StartElement, we'll see if we can read it.*/
+        if(token == QXmlStreamReader::StartElement) {
+            if(xml.name() == "configuration") continue;
 
-              if(xml.name() == "url") {
-                  QXmlStreamAttributes attributes = xml.attributes();
-                  if(attributes.hasAttribute("value")) urls.append(attributes.value("value").toString());
-              }
+            if(xml.name() == "url") {
+                QXmlStreamAttributes attributes = xml.attributes();
+                if(attributes.hasAttribute("value")) urls.append(attributes.value("value").toString());
+            }
 
-              if(xml.name() == "config") {
-                  QXmlStreamAttributes attributes = xml.attributes();
-                  if(attributes.hasAttribute("value")) files.append(attributes.value("value").toString());
-              }
-          }
-      }
-      /* Error handling. */
-      if(xml.hasError()) {
-          QMessageBox::warning(this, tr("caQtDM"), tr("could not parse configuation file: error=%1").arg( xml.errorString()));
-      }
+            if(xml.name() == "config") {
+                QXmlStreamAttributes attributes = xml.attributes();
+                if(attributes.hasAttribute("value")) files.append(attributes.value("value").toString());
+            }
+        }
+    }
+    /* Error handling. */
+    if(xml.hasError()) {
+        QMessageBox::warning(this, tr("caQtDM"), tr("could not parse configuation file: error=%1").arg( xml.errorString()));
+    }
 
-      xml.clear();
+    xml.clear();
+
+    file->close();
 }
+
+void FileOpenWindow::saveConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files)
+{
+    QFile *file = new QFile(filename);
+
+    /* can not open file */
+    if (!file->open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(0, tr("caQtDM"), tr("could not open configuration file: %1").arg(filename));
+        exit(0);
+    }
+
+    QXmlStreamWriter xmlWriter(file);
+    xmlWriter.setAutoFormatting(true);
+    xmlWriter.writeStartDocument();
+
+    xmlWriter.writeStartElement("configuration");
+
+    for(int i=0; i<urls.length(); i++) {
+        xmlWriter.writeStartElement("url");
+        xmlWriter.writeAttribute("value", urls.at(i));
+        xmlWriter.writeEndElement();
+    }
+    for(int i=0; i<files.length(); i++) {
+        xmlWriter.writeStartElement("config");
+        xmlWriter.writeAttribute("value", files.at(i));
+        xmlWriter.writeEndElement();
+    }
+
+    xmlWriter.writeEndElement();
+    xmlWriter.writeEndDocument();
+
+    file->close();
+}
+
 
 void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
 {
@@ -416,16 +452,6 @@ void FileOpenWindow::Callback_OpenButton()
     //get a filename to open
     QString path = (QString)  getenv("CAQTDM_DISPLAY_PATH");
 
-/*
-    FileDownloadDialog dialog("http://epics.web.psi.ch/software/caqtdm/qtDir/", "UIfiles_Index.txt", this);
-    if(dialog.openUrl()) {
-        int retCode = dialog.exec();
-        if ( retCode==QDialog::Accepted ) {
-            QString str = dialog.fileChoice->text();
-        } else if ( retCode==QDialog::Rejected ) {
-        }
-    }
-*/
     if(path.size() == 0 && lastFilePath.size()==0) path.append(".");
     else path = lastFilePath;
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open ui or prc file"), path, tr("ui/prc Files (*.ui *.prc)"));
@@ -463,6 +489,27 @@ void FileOpenWindow::Callback_OpenButton()
             QTDMMessageBox(QMessageBox::Warning, "file open error", "does not exist", QMessageBox::Close, this, Qt::Popup, true);
         }
     }
+}
+
+/**
+ * slot for going to next window (for tablet)
+ */
+void FileOpenWindow::cycleWindows()
+{
+    QList<CaQtDM_Lib *> all = this->findChildren<CaQtDM_Lib *>();
+    if(all.count() == 0) return;
+    if(activWindow > all.count()-1) activWindow = 0;
+    QWidget *w = all.at(activWindow);
+    w->activateWindow();
+    w->raise();
+    w->setFocus();
+    activWindow++;
+    return;
+}
+
+void FileOpenWindow::nextWindow()
+{
+    cycleWindows();
 }
 
 /**
@@ -518,7 +565,9 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
             if(QString::compare(WindowProperty, title) == 0) {
                 w->activateWindow();
                 w->raise();
+#ifndef Q_OS_IOS
                 w->showNormal();
+#endif
                 w->setFocus();
 // all these past commands will only give you a notification in the taskbar
 // in case of x windows, we will pop the window really up
@@ -546,7 +595,12 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         }
     }
 
-    // open file
+    // this will download the file from a http server
+#ifdef NETWORKDOWNLOADSUPPORT
+    fileFunctions filefunction;
+    filefunction.checkFileAndDownload(FileName);
+#endif
+        // open file
     dmsearchFile *s = new dmsearchFile(FileName);
     QString fileNameFound = s->findFile();
     if(fileNameFound.isNull()) {

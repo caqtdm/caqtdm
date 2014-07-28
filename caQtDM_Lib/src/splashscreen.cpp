@@ -34,21 +34,26 @@
 #include <QStyleOptionProgressBarV2>
 #include <QDebug>
 #include <QDesktopWidget>
- #include <QApplication>
+#include <QApplication>
 
 SplashScreen::SplashScreen(QWidget *parent) : QSplashScreen(parent), m_progress(0)
 
 {
     Qt::WindowFlags flags = 0;
-     flags |= Qt::WindowStaysOnTopHint | Qt::SplashScreen ;
+    flags |= Qt::WindowStaysOnTopHint | Qt::SplashScreen ;
     setWindowFlags(flags);
 
     m_maximum = 100;
     pixmap.load(":caQtDM.png");
+    this->resize(pixmap.size().width()+200, pixmap.size().height()+100);
 
     // in order to have a pseudo-transparent image, I load the background
-    this->resize(pixmap.size().width()+200, pixmap.size().height()+100);
+#ifndef Q_OS_IOS
     QPixmap desktopBackground= QPixmap::grabWindow(QApplication::desktop()->winId(), x()- width()/2, y()-height()/2, width(),height());
+#else
+    QPixmap desktopBackground( width(),height());
+    desktopBackground.fill(Qt::gray);
+#endif
 
     // and merge the two pixmaps
     QPainter p;
@@ -66,10 +71,6 @@ SplashScreen::SplashScreen(QWidget *parent) : QSplashScreen(parent), m_progress(
     p.end();
 
     this->setPixmap(desktopBackground);
-
-    // this makes everything transparent, also texts and progressbar
-    //this->setMask(pixmap.mask());
-
     this->setCursor(Qt::BusyCursor);
     this->showMessage("loading include ui files", Qt::AlignBottom, QColor(Qt::black));
 }
