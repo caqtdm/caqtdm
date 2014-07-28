@@ -222,7 +222,13 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     QList<QString> files;
     QString url, file;
     // parse the config file for urls and files
-    parseConfigFile("caQtDM_IOS_Config.xml", urls, files);
+    QFileInfo fi("../Documents/caQtDM_IOS_Config.xml");
+    if(fi.exists()) {
+       parseConfigFile("../Documents/caQtDM_IOS_Config.xml", urls, files);
+    }else{
+       parseConfigFile("caQtDM_IOS_Config.xml", urls, files);
+    }
+
     qDebug() << "urls" << urls;
 
     // display the results and get the user choices
@@ -231,7 +237,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     dialog.getChoice(url, file, urls, files);
 
     // and save the changes
-    saveConfigFile("caQtDM_IOS_Config.xml", urls, files);
+    saveConfigFile("../Documents/caQtDM_IOS_Config.xml", urls, files);
 
     fileFunctions filefunction;
 
