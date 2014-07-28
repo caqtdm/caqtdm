@@ -41,7 +41,7 @@ NetworkAccess::NetworkAccess(QTableWidget *w, const QString &file)
 QIODevice* NetworkAccess::requestUrl(const QUrl url)
 {
         finished = false;
-        qDebug() << "download" << url.toString();
+        printf("download %s", url.toString().toAscii().constData());
         downloadUrl = url;
         QNetworkReply* reply = manager->get(QNetworkRequest(url));
         connect(reply, SIGNAL(finished()), this, SLOT(finishReply()));
@@ -61,7 +61,7 @@ void NetworkAccess::finishReply()
 
     if(reply->error()) {
         qDebug() << "reply error";
-        QMessageBox::warning(0, tr("caQtDM"), tr("network error: %1 for file %2").arg(parseError(reply->error())).arg(downloadUrl.toString()));
+        //QMessageBox::warning(0, tr("caQtDM"), tr("network error: %1 for file %2").arg(parseError(reply->error())).arg(downloadUrl.toString()));
         return;
     }
 
@@ -69,7 +69,7 @@ void NetworkAccess::finishReply()
     qDebug() << "open and write the file";
     if(thisTable == 0 && thisFile.length() > 0) {
 
-        QString filePath = "../Documents/";
+        QString filePath =  "../Documents/";
         filePath.append(thisFile);
         QFile file(filePath);
         if(!file.open(QIODevice::ReadWrite)) {
