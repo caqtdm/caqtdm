@@ -26,23 +26,23 @@ cd ..
 
  * Create build directory
  
- ```
- mkdir build
- cd build
- export BUILD_ROOT=$(pwd)
- cd $BUILD_ROOT
- ```
+```
+mkdir build
+cd build
+export BUILD_ROOT=$(pwd)
+cd $BUILD_ROOT
+```
  
  * Download qwt
  
- ```
- wget http://yoke.psi.ch/artifactory/releases/qwt-6.0.1_${uname -m}.tar.gz
- mkdir -p usr/local
- cd usr/local
- tar xfvz ../../qwt-6.0.1_*.tar.gz
- cd  $BUILD_ROOT
- rm -rf qwt-6.0.1_*.tar.gz
- ```
+```
+wget http://yoke.psi.ch/artifactory/releases/qwt-6.0.1_${uname -m}.tar.gz
+mkdir -p usr/local
+cd usr/local
+tar xfvz ../../qwt-6.0.1_*.tar.gz
+cd  $BUILD_ROOT
+rm -rf qwt-6.0.1_*.tar.gz
+```
 
  * Clone caqtdm sources
 
