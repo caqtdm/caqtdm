@@ -23,11 +23,33 @@ cd ..
  * Package qwt and upload to artifactory
 
 ## CAQTDM
+
+ * Create build directory
+ 
+ ```
+ mkdir build
+ cd build
+ export BUILD_ROOT=$(pwd)
+ cd $BUILD_ROOT
+ ```
+ 
+ * Download qwt
+ 
+ ```
+ wget http://yoke.psi.ch/artifactory/releases/qwt-6.0.1_${uname -m}.tar.gz
+ mkdir -p usr/local
+ cd usr/local
+ tar xfvz ../../qwt-6.0.1_*.tar.gz
+ cd  $BUILD_ROOT
+ rm -rf qwt-6.0.1_*.tar.gz
+ ```
+
  * Clone caqtdm sources
 
 ```
 git clone https://github.psi.ch/scm/qtdm/caqtdm_project.git
 cd caqtdm_project
+git checkout <tag>
 ```
 
  * Ensure that you are on base `work`
@@ -39,10 +61,16 @@ cb work
  * Build caqtdm binaries for architecture
 
 ```
-export PATH=/usr/lib64/qt4/bin:$PATH
-export QWTHOME=${INSTALL_ROOT}/usr/local/qwt-6.0.1/features
-export QWTINCLUDE=${INSTALL_ROOT}/usr/local/qwt-6.0.1/include
-export QWTLIB=${INSTALL_ROOT}/usr/local/qwt-6.0.1/lib
+if [ $(uname -m) == "i686" ];then 
+    # 32Bit machine
+    export PATH=/usr/lib/qt4/bin:$PATH
+else
+    # 64Bit machine
+    export PATH=/usr/lib64/qt4/bin:$PATH
+fi
+export QWTHOME=${BUILD_ROOT}/usr/local/qwt-6.0.1/features
+export QWTINCLUDE=${BUILD_ROOT}/usr/local/qwt-6.0.1/include
+export QWTLIB=${BUILD_ROOT}/usr/local/qwt-6.0.1/lib
 
 ./caQtDM_BuildAll
 ```

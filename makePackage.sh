@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Location where package is assembled
-PACKAGE_BUILD_BASE=~/caqtdm_package
+PACKAGE_BUILD_BASE=$BUILD_ROOT/caqtdm_package
 # Location where package will be finally installed
 PACKAGE_INST_BASE=/usr/caqtdm
 # Location where build binaries are located
-BUILD_HOME=~/caqtdm_project/caQtDM_Binaries
+BUILD_HOME=$BUILD_ROOT/caqtdm_project/caQtDM_Binaries
 
 ARCHITECTURE=`uname -m`
 
@@ -73,3 +73,6 @@ $CAQTDM_HOME/lib/caQtDM -style plastique $@
 EOF
 
 chmod 755 caqtdm
+
+cd $PACKAGE_BUILD_BASE
+tar cfvz caqtdm-version_$ARCHITECTURE.tar.gz usr
