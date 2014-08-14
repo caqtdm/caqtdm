@@ -37,6 +37,7 @@
 #include <QObject>
 #include <QToolBar>
 #include <iostream>
+#include <cadef.h>
 #ifdef linux
 #  include <sys/wait.h>
 #  include <unistd.h>
@@ -1766,6 +1767,40 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
             }
         }
         setlocale(LC_NUMERIC, "C");
+        // Regexp will used when is marked with %/regexp/
+        QRegExp checkregexp("%\\/(\\S+)\\/");
+        checkregexp.setMinimal(true);
+        if (checkregexp.indexIn(calcString)!= -1){
+          knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(list.at(1).toInt());
+          char dataString[1024];
+          int caFieldType= ptr->edata.fieldtype;
+          QString captured_Calc = checkregexp.cap(1);
+          if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && ptr->edata.dataB != (void*) 0) {
+              if(ptr->edata.dataSize < 1024) {
+                  memcpy(dataString, (char*) ptr->edata.dataB, ptr->edata.dataSize);
+                  dataString[ptr->edata.dataSize] = '\0';
+              }else
+              {
+                  char asc[100];
+                  sprintf(asc, "Invalid channel data type %s", qPrintable(w->objectName()));
+                  postMessage(QtDebugMsg, asc);
+                  valid = false;
+                  return true;
+              }
+          }
+          QRegExp check_A(captured_Calc);
+          check_A.setMinimal(true);
+          if (check_A.exactMatch(dataString)){
+            result=1;
+            valid = true;
+            return true;
+          }else{
+            result=0;
+            valid = true;
+            return false;
+          }
+        }
+        //normal EPICS Calulation
         status = postfix(calcString, post, &errnum);
         if(status) {
             char asc[100];
