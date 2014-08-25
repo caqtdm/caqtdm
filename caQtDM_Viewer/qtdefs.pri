@@ -11,7 +11,7 @@ unix {
 }
 
 # enable specialized version, wehere files will be downloaded to a local directory (used specially for IOS)
-CONFIG += NETWORKDOWNLOADSUPPORT
+#CONFIG += NETWORKDOWNLOADSUPPORT
 NETWORKDOWNLOADSUPPORT {
 DEFINES += NETWORKDOWNLOADSUPPORT
 }

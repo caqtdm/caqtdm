@@ -346,7 +346,7 @@ void FileOpenWindow::saveConfigFile(const QString &filename, QList<QString> &url
 
 void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
 {
-    char asc[255];
+    char asc[2048];
     QString EnvFile="../Documents/";
     EnvFile.append(fileName);
     QFile file(EnvFile);
@@ -616,7 +616,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         m->show();
         //qDebug() << "sorry -- file" << FileName << "does not exist";
     } else {
-        char asc[255];
+        char asc[2048];
         bool willPrint = false;
         //qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString << "geometry=" << geometry;
 
