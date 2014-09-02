@@ -272,11 +272,17 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
 
         caTableInterface::caTableInterface(QObject *parent): CustomWidgetInterface_Monitors(parent)
         {
-            strng name[1], type[1];
+            strng name[4], type[4];
             strcpy(name[0], "channels");
             strcpy(type[0], "multiline");
-            d_domXml = XmlFunc("caTable", "catable", 0, 0, 120, 120, name, type, 1);
-            d_toolTip = "[Table Monitor]";
+	    strcpy(name[1], "scriptCommand");
+            strcpy(type[1], "multiline"); 
+	    strcpy(name[2], "scriptParameter");
+            strcpy(type[2], "multiline"); 
+	    strcpy(name[3], "columnSizes");
+            strcpy(type[3], "multiline"); 
+            d_domXml = XmlFunc("caTable", "catable", 0, 0, 120, 120, name, type, 4);
+            d_toolTip = "[Table Monitor for a list of channels]";
             d_name = "caTable";
             d_include = "caTable";
             QPixmap qpixmap = QPixmap(":pixmaps/table.png");
@@ -287,6 +293,24 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
         {
             return new caTable(parent);
         }
+        
+         caWaveTableInterface::caWaveTableInterface(QObject *parent): CustomWidgetInterface_Monitors(parent)
+        {
+            strng name[1], type[1];
+            strcpy(name[0], "channel");
+            strcpy(type[0], "multiline");
+            d_domXml = XmlFunc("caWaveTable", "cawavetable", 0, 0, 120, 60, name, type, 1);
+            d_toolTip = "[Table Monitor for waveform]";
+            d_name = "caWaveTable";
+            d_include = "caWaveTable";
+            QPixmap qpixmap = QPixmap(":pixmaps/wavetable.png");
+            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+        }
+
+        QWidget *caWaveTableInterface::createWidget(QWidget *parent)
+        {
+            return new caWaveTable(parent);
+        }       
 
         QWidget *caCameraInterface::createWidget(QWidget* parent)
         {
@@ -386,6 +410,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
             d_plugins.append(new caStripPlotInterface(this));
             d_plugins.append(new caByteInterface(this));
             d_plugins.append(new caTableInterface(this));
+	    d_plugins.append(new caWaveTableInterface(this));
             d_plugins.append(new caBitnamesInterface(this));
             d_plugins.append(new caCameraInterface(this));
             d_plugins.append(new caCalcInterface(this));

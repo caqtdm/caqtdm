@@ -40,6 +40,7 @@ caTable::caTable(QWidget *parent) : QTableWidget(parent)
     setMaxValue(1.0);
     for(int i=0; i< MaxRows; i++) {
         setFormat(i, 1);
+        for(int j=0; j< MaxCols; j++) tableItem[i][j] = (QTableWidgetItem*) 0;
     }
 
     thisItemFont = this->font();
@@ -61,7 +62,7 @@ caTable::caTable(QWidget *parent) : QTableWidget(parent)
 
 void caTable::cellclicked(int row, int col)
 {
-    printf("clicked %d %d\n", row, col);
+    //printf("clicked %d %d\n", row, col);
 }
 
 void caTable::celldoubleclicked(int row, int col)
@@ -108,7 +109,7 @@ void caTable::copy()
         }
 
         if(i==0) {
-            printf("no rows were selected\n");
+            //printf("no rows were selected\n");
             QModelIndexList cols = select->selectedColumns();
             foreach (QModelIndex Col, cols) {
                 if (i > 0) str += "\n";
@@ -149,14 +150,17 @@ void caTable::displayText(int row, int col, short status, QString const &text)
     if(row < 0 || row > MaxRows-1) return;
     if(col < 0 || col > MaxCols-1) return;
 
-    if(keepText[row][col] == text) {  // accelerate things
-        return;
-    }
     if(row >= rowCount() || col >= columnCount()) return;
 
-    QTableWidgetItem* item = new QTableWidgetItem(text);
-    if(col==0) item->setTextAlignment(Qt::AlignAbsolute | Qt:: AlignLeft);
-    else item->setTextAlignment(Qt::AlignAbsolute | Qt:: AlignRight);
+    if(tableItem[row][col] != (QTableWidgetItem*) 0) {
+        tableItem[row][col]->setText(text);
+    } else {
+        tableItem[row][col] = new QTableWidgetItem(text);
+        tableItem[row][col]->setFont(thisItemFont);
+        if(col==0) tableItem[row][col]->setTextAlignment(Qt::AlignAbsolute | Qt:: AlignLeft);
+        else tableItem[row][col]->setTextAlignment(Qt::AlignAbsolute | Qt:: AlignRight);
+        setItem(row, col, tableItem[row][col]);
+    }
 
     if(thisColorMode == Alarm) {
 
@@ -164,28 +168,28 @@ void caTable::displayText(int row, int col, short status, QString const &text)
         case -1:
             break;
         case NO_ALARM:
-            item->setForeground(AL_GREEN);
+            tableItem[row][col]->setForeground(AL_GREEN);
             break;
         case MINOR_ALARM:
-            item->setForeground(AL_YELLOW);
+            tableItem[row][col]->setForeground(AL_YELLOW);
             break;
         case MAJOR_ALARM:
-            item->setForeground(AL_RED);
+            tableItem[row][col]->setForeground(AL_RED);
             break;
         case ALARM_INVALID:
         case NOTCONNECTED:
-            item->setForeground(AL_WHITE);
+            tableItem[row][col]->setForeground(AL_WHITE);
             break;
         default:
-            item->setForeground(AL_DEFAULT);
+            tableItem[row][col]->setForeground(AL_DEFAULT);
             break;
         }
     }   else {
-        item->setForeground(defaultForeColor);
+        tableItem[row][col]->setForeground(defaultForeColor);
     }
 
-    setItem(row, col, item);
-    item->setFont(thisItemFont);
+    //setItem(row, col, tableItem[row][col]);
+    //item->setFont(thisItemFont);
 
 }
 

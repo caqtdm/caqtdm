@@ -1462,7 +1462,19 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         widget->setToolTip("select row or columns, then with Ctrl+C you can copy to the clipboard\ninside X11 you can then do shft+ins\nwhen doubleclicking on a value, you may execute a shell script for that device");
 
         connect(widget, SIGNAL(TableDoubleClickedSignal(QString)), this, SLOT(Callback_TableDoubleClicked(QString)));
+
+    //==================================================================================================================
+    } else if(caWaveTable* widget = qobject_cast<caWaveTable *>(w1)) {
+
+     if(widget->getPV().size() > 0) {
+          addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
+          widget->setPV(pv);
     }
+
+    widget->setProperty("Taken", true);
+
+}
+    //==================================================================================================================
 
     // make a context menu for object having a monitor
     if(className.contains("ca") && !className.contains("caRel") && !className.contains("caTable") && nbMonitors > 0) {
@@ -2338,20 +2350,8 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         if(data.edata.connected) {
             int colorMode = widget->getColorMode();
             if(colorMode == caLed::Static) {
-
-
                 getStatesToggleAndLed(widget, data, String, state);
                 widget->setState(state);
-
-
-
-/*
-                if(bitState((int) data.edata.ivalue, widget->getBitNr())) {
-                    widget->setState(true);
-                } else {
-                    widget->setState(false);
-                }
-*/
             } else {
                 widget->setAlarmColors(data.edata.severity);
             }
@@ -2413,63 +2413,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
            getStatesToggleAndLed(widget, data, String, state);
            widget->setState(state);
-/*
-            QString trueString = widget->getTrueValue().trimmed();
-            QString falseString = widget->getFalseValue().trimmed();
-
-            if(data.edata.fieldtype == caINT || data.edata.fieldtype == caLONG ) {
-                int trueValue = trueString.toInt(&ok1);
-                int falseValue = falseString.toInt(&ok2);
-                if(ok1 && trueValue == data.edata.ivalue) {
-                    widget->setState(Qt::Checked);
-                } else if(ok2 && falseValue == data.edata.ivalue) {
-                    widget->setState(Qt::Unchecked);
-                } else {
-                    widget->setState(Qt::PartiallyChecked);
-                }
-            } else if(data.edata.fieldtype == caFLOAT || data.edata.fieldtype == caDOUBLE ) {
-                double trueValue = trueString.toDouble(&ok1);
-                double falseValue = falseString.toDouble(&ok2);
-                if(ok1 && trueValue == data.edata.rvalue) {
-                    widget->setState(Qt::Checked);
-                } else if(ok2 && falseValue == data.edata.rvalue) {
-                    widget->setState(Qt::Unchecked);
-                } else {
-                    widget->setState(Qt::PartiallyChecked);
-                }
-            } else if(data.edata.fieldtype == caENUM || data.edata.fieldtype == caSTRING) {
-                int trueValue = trueString.toInt(&ok1);
-                int falseValue = falseString.toInt(&ok2);
-                widget->setState(Qt::PartiallyChecked);
-
-                QString str = "";
-                QStringList list;
-                list = String.split(";");
-
-                if((int) data.edata.ivalue < list.count()  && (list.count() > 0))  str = list.at((int) data.edata.ivalue);
-
-                // integer value given
-                if(ok1) {
-                    if(trueValue == data.edata.ivalue) {
-                        widget->setState(Qt::Checked);
-                    }
-                    // string value
-                } else {
-                    if(trueString.compare(str) == 0) widget->setState(Qt::Checked);
-                }
-
-                // integer value given
-                if(ok2) {
-                    if(falseValue == data.edata.ivalue) {
-                        widget->setState(Qt::Unchecked);
-                    }
-                    // string value
-                } else {
-                    if(falseString.compare(str) == 0) widget->setState(Qt::Unchecked);
-                }
-            }
-*/
-            widget->setAccessW(data.edata.accessW);
+           widget->setAccessW(data.edata.accessW);
         } else {
             SetColorsNotConnected;
         }
@@ -2739,7 +2683,6 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         // table with pv name, value and unit==========================================================================
     } else if(caTable *widget = qobject_cast<caTable *>(w)) {
 
-        //qDebug() << "table" << table->objectName() << kPtr->pv << data.edata.value << data.edata.connected;
         int row= data.specData[0];
 
         if(data.edata.connected) {
@@ -2762,6 +2705,32 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         } else {
             widget->displayText(row, 1, NOTCONNECTED, "NC");
             widget->displayText(row, 2, NOTCONNECTED, "NC");
+        }
+
+        // table for vwaveform values==========================================================================
+    } else if(caWaveTable *widget = qobject_cast<caWaveTable *>(w)) {
+
+        if(data.edata.connected) {
+            // data from vector
+            if(data.edata.valueCount > 0 && data.edata.dataB != (void*) 0) {
+                if((widget->getPrecisionMode() != caWaveTable::User) && (data.edata.initialize)) {
+                    widget->setFormat(data.edata.precision);
+                }
+                if(widget->getOrientation() == caWaveTable::Horizontal) {
+                  widget->setColumnCount(data.edata.valueCount);
+                  widget->setRowCount(1);
+                } else {
+                    widget->setRowCount(data.edata.valueCount);
+                    widget->setColumnCount(1);
+                }
+                WaveTable(widget, data);
+            // data from value
+            } else {
+               //widget->displayText(0, 0, NOTCONNECTED, "not a waveform");
+            }
+
+        } else {
+            //widget->displayText(0, 0, NOTCONNECTED, "NC");
         }
 
         // bitnames table with text and coloring according the value=========================================================
@@ -2884,6 +2853,49 @@ void CaQtDM_Lib::Cartesian(caCartesianPlot *widget, int curvNB, int curvType, in
         break;
     }
 }
+
+void CaQtDM_Lib::WaveTable(caWaveTable *widget, const knobData &data)
+{
+    QMutex *datamutex;
+    datamutex = (QMutex*) data.mutex;
+    datamutex->lock();
+    switch(data.edata.fieldtype) {
+    case caFLOAT: {
+        float* P = (float*) data.edata.dataB;
+        widget->setData(P, data.edata.valueCount);
+        datamutex->unlock();
+    }
+        break;
+    case caDOUBLE: {
+        double* P = (double*) data.edata.dataB;
+        widget->setData(P, data.edata.valueCount);
+        datamutex->unlock();
+    }
+        break;
+    case caLONG: {
+        int32_t* P = (int32_t*) data.edata.dataB;
+        widget->setData(P, data.edata.valueCount);
+        datamutex->unlock();
+    }
+        break;
+    case caINT: {
+        int16_t* P = (int16_t*) data.edata.dataB;
+        widget->setData(P, data.edata.valueCount);
+        datamutex->unlock();
+    }
+        break;
+    case caENUM: {
+        int16_t* P = ( int16_t*) data.edata.dataB;
+        widget->setData(P ,data.edata.valueCount);
+        datamutex->unlock();
+    }
+        break;
+    default:
+        datamutex->unlock();
+        break;
+    }
+}
+
 
 void CaQtDM_Lib::WaterFall(caWaterfallPlot *widget, const knobData &data)
 {
@@ -3664,6 +3676,9 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         else strcpy(colMode, "Static");
         nbPV = 1;
     } else if(caLinearGauge* widget = qobject_cast<caLinearGauge *>(w)) {
+        pv[0] = widget->getPV().trimmed();
+        nbPV = 1;
+    } else if(caWaveTable* widget = qobject_cast<caWaveTable *>(w)) {
         pv[0] = widget->getPV().trimmed();
         nbPV = 1;
     } else if(caCircularGauge* widget = qobject_cast<caCircularGauge *>(w)) {

@@ -40,5 +40,6 @@
 #endif
 #include <cawaterfallplot.h>
 #include <caspinbox.h>
+#include <cawavetable.h>
 #endif
 

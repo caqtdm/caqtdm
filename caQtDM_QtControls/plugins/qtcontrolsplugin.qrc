@@ -31,5 +31,6 @@
         <file>pixmaps/tabwidget.png</file>
         <file>pixmaps/waterfall.png</file>
         <file>pixmaps/spinbox.png</file>
+        <file>pixmaps/wavetable.png</file>
     </qresource>
 </RCC>

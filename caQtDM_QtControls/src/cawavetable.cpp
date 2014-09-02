@@ -48,6 +48,7 @@ caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
     setEditTriggers(QTableWidget::NoEditTriggers);
     setSelectionMode(QAbstractItemView::NoSelection);
     verticalHeader()->setDefaultSectionSize(40);
+    setColumnSize(40);
     setOrientation(Horizontal);
 }
 

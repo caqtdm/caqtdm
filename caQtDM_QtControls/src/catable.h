@@ -79,7 +79,6 @@ public:
     QString getColumnSizes() const {return thisColumnSizes.join(";");}
     void setColumnSizes(QString const &newSizes);
 
-
     QString getScriptCommand() const {return thisScriptCommand;}
     QString getScriptParam() const {return thisScriptParam;}
 
@@ -121,8 +120,8 @@ private:
     double thisMaximum, thisMinimum;
     QString thisStyle;
     QString oldStyle;
-    QString keepText[MaxRows][MaxCols];
     string40 thisFormat[MaxRows];
+    QTableWidgetItem* tableItem[MaxRows][MaxCols];
 
     colMode thisColorMode;
     int thisPrecision;

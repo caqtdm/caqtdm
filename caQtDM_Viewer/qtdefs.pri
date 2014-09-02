@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.8.0
+CAQTDM_VERSION = V3.8.1
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -15,6 +15,9 @@ unix {
 NETWORKDOWNLOADSUPPORT {
 DEFINES += NETWORKDOWNLOADSUPPORT
 }
+
+# 3.8.1
+# added cawavetable in order to display a waveform numerically (maximum items = 300)
 
 # 3.8.0
 # adapted source code in order to run on ios (ipad)

@@ -175,6 +175,7 @@ private:
 
     void WaterFall(caWaterfallPlot *widget, const knobData &data);
     void Cartesian(caCartesianPlot *widget, int curvNB, int curvType, int XorY, const knobData &data);
+    void WaveTable(caWaveTable *widget, const knobData &data);
 
     bool eventFilter(QObject *obj, QEvent *event);
     bool gestureEvent(QObject *obj, QGestureEvent *event);

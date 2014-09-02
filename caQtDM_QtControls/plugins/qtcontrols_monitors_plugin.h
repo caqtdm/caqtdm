@@ -181,6 +181,17 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
+class caWaveTableInterface : public CustomWidgetInterface_Monitors
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerCustomWidgetInterface)
+	
+public:
+    caWaveTableInterface(QObject* parent);
+    virtual QWidget* createWidget(QWidget* parent);
+};
+
+
 class caCameraInterface : public CustomWidgetInterface_Monitors
 {
     Q_OBJECT
