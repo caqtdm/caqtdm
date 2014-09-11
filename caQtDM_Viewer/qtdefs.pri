@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.8.1
+CAQTDM_VERSION = V3.8.2
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -16,8 +16,11 @@ NETWORKDOWNLOADSUPPORT {
 DEFINES += NETWORKDOWNLOADSUPPORT
 }
 
+# 3.8.2
+# modified catogglebutton in order to be able to resize its label
+
 # 3.8.1
-# added cawavetable in order to display a waveform numerically (maximum items = 300)
+# added cawavetable in order to display a waveform numerically (maximum items = 500)
 
 # 3.8.0
 # adapted source code in order to run on ios (ipad)
