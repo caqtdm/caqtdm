@@ -147,7 +147,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: cornsilk;}</string>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -4358,7 +4358,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>5</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
@@ -5059,6 +5059,9 @@ p, li { white-space: pre-wrap; }
           <height>23</height>
          </rect>
         </property>
+        <property name="fontScaleMode">
+         <enum>EPushButton::WidthAndHeight</enum>
+        </property>
         <property name="channel" stdset="0">
          <string notr="true">QTDM:TEST:AO.PROC</string>
         </property>
@@ -5180,10 +5183,10 @@ p, li { white-space: pre-wrap; }
        <widget class="caToggleButton" name="catogglebutton">
         <property name="geometry">
          <rect>
-          <x>605</x>
-          <y>70</y>
-          <width>163</width>
-          <height>22</height>
+          <x>572</x>
+          <y>68</y>
+          <width>249</width>
+          <height>65</height>
          </rect>
         </property>
         <property name="text">
@@ -5191,6 +5194,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="channel" stdset="0">
          <string notr="true">QTDM:TEST:AO</string>
+        </property>
+        <property name="fontScaleMode">
+         <enum>caToggleButton::WidthAndHeight</enum>
         </property>
         <property name="colorMode">
          <enum>caToggleButton::Alarm</enum>
@@ -5759,6 +5765,34 @@ p, li { white-space: pre-wrap; }
          <enum>caRowColMenu::Menu</enum>
         </property>
        </widget>
+       <widget class="caRelatedDisplay" name="carelateddisplay_2">
+        <property name="geometry">
+         <rect>
+          <x>513</x>
+          <y>420</y>
+          <width>222</width>
+          <height>32</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton::menu-indicator {image: url(none.png); width: 0}</string>
+        </property>
+        <property name="label">
+         <string notr="true">choice</string>
+        </property>
+        <property name="labels">
+         <string notr="true">label1;label2;label3</string>
+        </property>
+        <property name="files">
+         <string notr="true">test1;test2;test3</string>
+        </property>
+        <property name="args">
+         <string notr="true">1;2;3</string>
+        </property>
+        <property name="stackingMode" stdset="0">
+         <enum>caRowColMenu::Menu</enum>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_17">
        <attribute name="title">
@@ -5869,7 +5903,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1102</width>
-     <height>24</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

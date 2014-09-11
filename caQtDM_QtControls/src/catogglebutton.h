@@ -31,12 +31,14 @@
 #include <QColor>
 #include <QEvent>
 #include <qtcontrols_global.h>
+#include <fontscalingwidget.h>
 
-class QTCON_EXPORT caToggleButton : public QCheckBox
+class QTCON_EXPORT caToggleButton : public QCheckBox, public FontScalingWidget
 {
     Q_OBJECT
 
     Q_ENUMS(colMode)
+    Q_ENUMS(ScaleMode)
 
     Q_PROPERTY(bool tristate READ isTristate WRITE setTristate DESIGNABLE false)
 
@@ -44,6 +46,8 @@ class QTCON_EXPORT caToggleButton : public QCheckBox
 
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
+
+    Q_PROPERTY(ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleMode)
 
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
     Q_PROPERTY(QString trueValue READ getTrueValue WRITE setTrueValue)
@@ -54,6 +58,7 @@ public:
     caToggleButton(QWidget *parent);
 
     enum colMode {Default, Static, Alarm};
+    enum ScaleMode { None, Height, WidthAndHeight};
 
     QColor getForeground() const {return thisForeColor;}
     void setForeground(QColor c);
@@ -84,9 +89,15 @@ public:
     QString getFalseValue() const {return thisFalseValue;}
     void setFalseValue(QString const &falseValue) {thisFalseValue = falseValue;}
 
+    QString text() const { return QCheckBox::text(); }
+
+    void setFontScaleMode(ScaleMode m) { FontScalingWidget::setScaleMode((int) m);}
+    ScaleMode fontScaleMode() { return (ScaleMode) FontScalingWidget::scaleMode(); }
+
 private slots:
 
     void buttonToggled();
+    void rescaleFont(const QString& newText);
 
 signals:
 
@@ -94,7 +105,7 @@ signals:
 
 
 protected:
-
+    QSize calculateTextSpace();
 
 private:
 

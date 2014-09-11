@@ -28,8 +28,10 @@
 #include <QtDebug>
 #include <QMessageBox>
 #include <QApplication>
+#include <QStyleOptionFrame>
+#include <QStyle>
 
-caToggleButton::caToggleButton(QWidget *parent) : QCheckBox(parent)
+caToggleButton::caToggleButton(QWidget *parent) : QCheckBox(parent), FontScalingWidget(this)
 {
     setCheckable(true);
     setTristate(true);
@@ -49,6 +51,8 @@ caToggleButton::caToggleButton(QWidget *parent) : QCheckBox(parent)
     setFalseValue("0");
 
     setAccessW(true);
+
+    setFontScaleMode(WidthAndHeight);
 }
 
 void  caToggleButton::buttonToggled()
@@ -144,9 +148,24 @@ void caToggleButton::setAccessW(int access)
      _AccessW = access;
 }
 
+QSize caToggleButton::calculateTextSpace()
+{
+    QStyleOptionButton option;
+    option.initFrom(this);
+    d_savedTextSpace = style()->subElementRect(QStyle::SE_CheckBoxContents, &option, this).size();
+    return d_savedTextSpace;
+}
+
+void caToggleButton::rescaleFont(const QString& newText)
+{
+        FontScalingWidget::rescaleFont(newText, d_savedTextSpace);
+}
+
 bool caToggleButton::eventFilter(QObject *obj, QEvent *event)
 {
-    if (event->type() == QEvent::Enter) {
+    if(event->type() == QEvent::Resize || event->type() == QEvent::Show) {
+        FontScalingWidget::rescaleFont(text(), calculateTextSpace());
+    } else if (event->type() == QEvent::Enter) {
         if(!_AccessW) {
             QApplication::setOverrideCursor(QCursor(Qt::ForbiddenCursor));
             setEnabled(false);
