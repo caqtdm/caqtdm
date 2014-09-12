@@ -29,6 +29,7 @@
 #include <QTableWidget>
 #include <QAction>
 #include <QFont>
+#include <stdint.h>
 #include <qtcontrols_global.h>
 
 typedef char string40[40];
