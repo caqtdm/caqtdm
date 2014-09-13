@@ -147,7 +147,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: cornsilk;}</string>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -1348,7 +1348,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>6</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">
@@ -3079,7 +3079,7 @@ p, li { white-space: pre-wrap; }
          <double>30.000000000000000</double>
         </property>
         <property name="XaxisType">
-         <enum>caStripPlot::TimeScale</enum>
+         <enum>caStripPlot::ValueScale</enum>
         </property>
         <property name="YAxisType" stdset="0">
          <enum>caStripPlot::linear</enum>

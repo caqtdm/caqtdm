@@ -77,6 +77,7 @@ caStripPlot::~caStripPlot() {
 
 caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
 {
+    initCurves = true;
     timerID = false;
     thisXaxisType = TimeScale;
     thisYaxisScaling = fixedScale;
@@ -259,6 +260,9 @@ void caStripPlot::RescaleCurves(int width, units unit, double period)
             setXaxis(INTERVAL, newPeriod);
         }
     }
+
+    if(!initCurves) return;
+    initCurves = false;
 
     mutex.lock();
 
@@ -602,7 +606,7 @@ void caStripPlot::TimeOut()
     // in case of restart plot, get start time and for the running time scale the new scale
     if(RestartPlot2) {
         RestartPlot2 = false;
-        ftime(&timeStart);
+        ftime(&plotStart);
         if(thisXaxisType == TimeScale) {
             QTime timeNow= QTime::currentTime();
             timeNow = timeNow.addSecs((int) -INTERVAL);
@@ -616,7 +620,7 @@ void caStripPlot::TimeOut()
 
     // get time since restart
     elapsedTime = ((double) timeNow.time + (double) timeNow.millitm / (double)1000) -
-            ((double) timeStart.time + (double) timeStart.millitm / (double)1000);
+            ((double) plotStart.time + (double) plotStart.millitm / (double)1000);
 
     // change scale base in case of running time scale
     if(thisXaxisType == TimeScale) {
@@ -632,6 +636,15 @@ void caStripPlot::TimeOut()
         }
         errorcurve[c]->setSamplesList(rangeData[c]);
         errorcurve[c]->setSamples(rangeData[c].toVector());
+/*
+        if(c==0) {
+            printf("-----------------------\n");
+            for(int j=0; j!=rangeData[c].size();j++) {
+                printf("%d %f %f\n", j, rangeData[c][j].value, rangeData[c][j].interval.maxValue());
+                if(isnan(rangeData[c][j].interval.maxValue())) break;
+            }
+        }
+*/
     }
 
     // in case of autoscale adjust the vertical scale
@@ -988,6 +1001,7 @@ bool caStripPlot::eventFilter(QObject *obj, QEvent *event)
             QPoint p;
             emit ShowContextMenu(p);
         }
+    } else if(event->type() == QEvent::Show) {
     }
     return QObject::eventFilter(obj, event);
 }

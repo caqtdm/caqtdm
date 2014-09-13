@@ -425,6 +425,7 @@ private:
     QTimer *Timer;
     struct timeb  timeNow;
     struct timeb  timeStart;
+    struct timeb plotStart;
     bool RestartPlot1, RestartPlot2;
 
     bool eventFilter(QObject *obj, QEvent *event);
@@ -490,5 +491,7 @@ private:
     stripplotthread *timerThread;
 
     QMutex mutex;
+
+    bool initCurves;
 };
 #endif
