@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>caQtDM.ico</file>
         <file>caQtDM.png</file>
+        <file>caQtDM-76@2x.png</file>
     </qresource>
 </RCC>

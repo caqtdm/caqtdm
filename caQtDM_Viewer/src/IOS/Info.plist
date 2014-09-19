@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>UIInterfaceOrientation</key>
-	<string>UIInterfaceOrientationLandscapeLeft</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
@@ -28,7 +26,9 @@
 	<key>CFBundleIdentifier</key>
 	<string>ch.psi.caQtDM</string>
 	<key>UILaunchImageFile</key>
-	<string>caQtDM.png</string>
+	<string>StartScreen-Landscape.png</string>
+	<key>UIInterfaceOrientation</key>
+	<string>UIInterfaceOrientationLandscapeLeft</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

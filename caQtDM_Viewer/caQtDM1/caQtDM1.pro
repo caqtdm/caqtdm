@@ -22,7 +22,8 @@ ios {
    APP_ICON.files += ../../caQtDM_Viewer/src/caQtDM-76@2x.png
    APP1_ICON.files = ../../caQtDM_Viewer/src/caQtDM.icns
    APP_XML_FILES.files = ../../caQtDM_Viewer/caQtDM_IOS_Config.xml
-   QMAKE_BUNDLE_DATA += APP_XML_FILES APP_ICON APP1_ICON
+   StartScreen.files += ../../caQtDM_Viewer/src/StartScreen-Landscape.png
+   QMAKE_BUNDLE_DATA += APP_XML_FILES APP_ICON APP1_ICON StartScreen
 }
 
 !ios {
