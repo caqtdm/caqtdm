@@ -27,6 +27,8 @@
 
 configDialog::configDialog(const QList<QString> &urls, const QList<QString> &files, QWidget *parent): QDialog(parent)
 {
+
+    ClearConfigButtonClicked = false;
     QVBoxLayout *mainLayout = new QVBoxLayout;
 
     setWindowTitle("caQtDM tablet configuration");
@@ -42,9 +44,13 @@ configDialog::configDialog(const QList<QString> &urls, const QList<QString> &fil
     clearLayout->addWidget(label, 0, 0);
     clearLayout->addWidget(fileCountLabel, 0, 1);
 
-    QPushButton* clearButton = new QPushButton("Clear files");
-    clearLayout->addWidget(clearButton, 0, 2);
-    connect(clearButton, SIGNAL(clicked()), this, SLOT(clearClicked()) );
+    QPushButton* clearConfigButton = new QPushButton("Clear config files");
+    clearLayout->addWidget(clearConfigButton, 0, 2);
+    connect(clearConfigButton, SIGNAL(clicked()), this, SLOT(clearConfigClicked()) );
+
+    QPushButton* clearUiButton = new QPushButton("Clear ui files");
+    clearLayout->addWidget(clearUiButton, 0, 3);
+    connect(clearUiButton, SIGNAL(clicked()), this, SLOT(clearUiClicked()) );
 
     clearBox->setLayout(clearLayout);
     mainLayout->addWidget(clearBox);
@@ -104,7 +110,7 @@ void configDialog::getChoice(QString &url, QString &file, QList<QString> &urls, 
     }
 }
 
-void configDialog::clearClicked()
+void configDialog::clearUiClicked()
 {
     QString path = "../Documents";
     QDir dir(path);
@@ -115,6 +121,24 @@ void configDialog::clearClicked()
     QString str= QString::number((int) NumberOfFiles());
     fileCountLabel->setText(str);
 }
+
+void configDialog::clearConfigClicked()
+{
+    QString path = "../Documents";
+    QDir dir(path);
+    dir.setNameFilters(QStringList() << "*.config" << "*.xml");
+    dir.setFilter(QDir::Files);
+    foreach(QString dirFile, dir.entryList()) dir.remove(dirFile);
+    ClearConfigButtonClicked = true;
+    close();
+}
+
+bool configDialog::isClearConfig()
+{
+    return ClearConfigButtonClicked;
+}
+
+
 
 int configDialog::NumberOfFiles()
 {

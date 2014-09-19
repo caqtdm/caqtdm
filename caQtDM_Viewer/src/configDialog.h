@@ -52,10 +52,12 @@ public:
     void getChoice(QString &url, QString &file, QList<QString> &urls, QList<QString> &files);
     QLineEdit *fileChoice;
     int NumberOfFiles();
+    bool isClearConfig();
 
 private slots:
 
-    void clearClicked();
+    void clearUiClicked();
+    void clearConfigClicked();
 
 private:
 
@@ -74,6 +76,8 @@ private:
    QDialogButtonBox *buttonBox;
 
    QLabel *fileCountLabel;
+
+   bool ClearConfigButtonClicked;
 
 };
 

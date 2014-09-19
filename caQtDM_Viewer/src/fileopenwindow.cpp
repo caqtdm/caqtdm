@@ -217,10 +217,11 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 #ifdef  NETWORKDOWNLOADSUPPORT
     // test reading a local configuration file in order to start caQtDM for ios (read caQTDM_IOS_Config.xml, display its data, choose configuration,
     // then get from the choosen website and choosen config file the epics configuration and ui file to launch
-
+ again:
     QList<QString> urls;
     QList<QString> files;
     QString url, file;
+
     // parse the config file for urls and files
     QFileInfo fi("../Documents/caQtDM_IOS_Config.xml");
     if(fi.exists()) {
@@ -232,8 +233,14 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     qDebug() << "urls" << urls;
 
     // display the results and get the user choices
+
     configDialog dialog(urls, files, this);
     dialog.exec();
+    // when clear config files is used, then reload dialog from original
+    if(dialog.isClearConfig()) {
+        dialog.close();
+        goto again;
+    }
     dialog.getChoice(url, file, urls, files);
 
     // and save the changes

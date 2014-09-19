@@ -149,6 +149,7 @@ signals:
     void Signal_OpenNewWFile(const QString&, const QString&, const QString&);
     void Signal_ContextMenu(QWidget*);
     void clicked();
+    void Signal_NextWindow();
 
 private:
     bool bitState(int value, int bitNr);
@@ -180,6 +181,8 @@ private:
     bool eventFilter(QObject *obj, QEvent *event);
     bool gestureEvent(QObject *obj, QGestureEvent *event);
     void tapAndHoldTriggered(QObject *obj, QTapAndHoldGesture* tapAndHold);
+    void swipeTriggered(QSwipeGesture *gesture);
+    void panTriggered(QPanGesture *gesture);
 
     QWidget *myWidget;
     QList<QWidget*> includeWidgetList;

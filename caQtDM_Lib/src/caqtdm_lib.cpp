@@ -330,6 +330,12 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
          toolBar->addAction(closeAction);
          toolBar->addAction(nextAction);
          connect(nextAction, SIGNAL(triggered()), parent, SLOT(nextWindow()));
+         connect(this, SIGNAL(Signal_NextWindow()), parent, SLOT(nextWindow()));
+
+         setAttribute(Qt::WA_AcceptTouchEvents);
+         grabGesture(Qt::SwipeGesture);
+         grabGesture(Qt::PanGesture);
+         installEventFilter(this);
 #endif
     }
 
@@ -4725,27 +4731,6 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             box->setFont(f);
         }
     }
-/* no, we do this inside the class now
-    else if(!className.compare("caThermo")) {
-        if(qMin(factX, factY) < 1.0) {
-            caThermo *thermo = (caThermo *) widget;
-            qreal fontSize =  qMin(factX, factY) * (double) list.at(4).toInt();
-            QFont f = thermo->font();
-            f.setPointSizeF(fontSize);
-            thermo->setFont(f);
-        }
-    }
-
-    else if(!className.compare("caSlider")) {
-        if(qMin(factX, factY) < 1.0) {
-            caSlider *slider = (caSlider *) widget;
-            qreal fontSize =  qMin(factX, factY) * (double) list.at(4).toInt();
-            QFont f = slider->font();
-            f.setPointSizeF(fontSize);
-            slider->setFont(f);
-        }
-    }
-*/
 }
 
 
@@ -4759,18 +4744,46 @@ bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
 
 bool CaQtDM_Lib::gestureEvent(QObject *obj, QGestureEvent *event)
 {
-   if (QGesture *tapAndHold = event->gesture(Qt::TapAndHoldGesture))
+   if (QGesture *tapAndHold = event->gesture(Qt::TapAndHoldGesture)) {
+        postMessage(QtDebugMsg, (char*) "tapandhold");
         tapAndHoldTriggered(obj, static_cast<QTapAndHoldGesture*>(tapAndHold));
+    } else if (QGesture *swipe = event->gesture(Qt::SwipeGesture)) {
+        swipeTriggered(static_cast<QSwipeGesture *>(swipe));
+     } else if (QGesture *pan = event->gesture(Qt::PanGesture)) {
+       panTriggered(static_cast<QPanGesture *>(pan));
+    }
     return true;
 }
 
 void CaQtDM_Lib::tapAndHoldTriggered(QObject *obj, QTapAndHoldGesture* tapAndHold)
 {
     if (tapAndHold->state() == Qt::GestureFinished) {
-        qDebug() << obj->objectName();
         DisplayContextMenu((QWidget*) obj);
     }
 }
+
+void CaQtDM_Lib::swipeTriggered(QSwipeGesture *gesture)
+ {
+     if (gesture->state() == Qt::GestureFinished) {
+         postMessage(QtDebugMsg, (char*) "swipe");
+         if (gesture->horizontalDirection() == QSwipeGesture::Left) {
+         } else if(gesture->verticalDirection() == QSwipeGesture::Right) {
+             emit Signal_NextWindow();
+         } else if(gesture->verticalDirection() == QSwipeGesture::Up) {
+             closeWindow();
+         }
+     }
+ }
+
+void CaQtDM_Lib::panTriggered(QPanGesture *pan)
+ {
+     if (pan->state() == Qt::GestureFinished) {
+         char asc[100];
+         const QPointF offset = pan->offset();
+         sprintf(asc, "pan with %f %f", offset.x(), offset.y());
+         postMessage(QtDebugMsg, (char*) asc);
+     }
+ }
 
 void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 {
