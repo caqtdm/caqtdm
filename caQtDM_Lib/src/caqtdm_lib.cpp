@@ -332,9 +332,13 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
          connect(nextAction, SIGNAL(triggered()), parent, SLOT(nextWindow()));
          connect(this, SIGNAL(Signal_NextWindow()), parent, SLOT(nextWindow()));
 
-         setAttribute(Qt::WA_AcceptTouchEvents);
-         grabGesture(Qt::SwipeGesture);
-         grabGesture(Qt::PanGesture);
+         //setAttribute(Qt::WA_AcceptTouchEvents);
+         grabGesture(Qt::TapGesture);
+          grabGesture(Qt::TapAndHoldGesture);
+          grabGesture(Qt::PanGesture);
+          grabGesture(Qt::PinchGesture);
+          grabGesture(Qt::SwipeGesture);
+          grabGesture(Qt::CustomGesture);
          installEventFilter(this);
 #endif
     }
@@ -4744,7 +4748,23 @@ bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
 
 bool CaQtDM_Lib::gestureEvent(QObject *obj, QGestureEvent *event)
 {
-   if (QGesture *tapAndHold = event->gesture(Qt::TapAndHoldGesture)) {
+    qDebug() << "gestureEvent";
+    if (QGesture *tap = event->gesture(Qt::TapGesture)) {
+        qDebug() << "TapGesture";
+        QTapGesture* gesttap=static_cast<QTapGesture *>(tap);
+        const QPointF position = gesttap->position();
+        char asc[100];
+        sprintf(asc, "tab with %f %f", position.x(), position.y());
+        qDebug() << asc;
+
+        }
+
+
+
+    if (QGesture *pinch = event->gesture(Qt::PinchGesture)) qDebug() << "PinchGesture";
+    if (QGesture *swipe = event->gesture(Qt::SwipeGesture)) qDebug() << "SwipeGesture";
+
+    if (QGesture *tapAndHold = event->gesture(Qt::TapAndHoldGesture)) {
         postMessage(QtDebugMsg, (char*) "tapandhold");
         tapAndHoldTriggered(obj, static_cast<QTapAndHoldGesture*>(tapAndHold));
     } else if (QGesture *swipe = event->gesture(Qt::SwipeGesture)) {
@@ -4765,11 +4785,18 @@ void CaQtDM_Lib::tapAndHoldTriggered(QObject *obj, QTapAndHoldGesture* tapAndHol
 void CaQtDM_Lib::swipeTriggered(QSwipeGesture *gesture)
  {
      if (gesture->state() == Qt::GestureFinished) {
+         qDebug() << "swipe";
          postMessage(QtDebugMsg, (char*) "swipe");
          if (gesture->horizontalDirection() == QSwipeGesture::Left) {
+             qDebug() << "swipeLeft";
          } else if(gesture->verticalDirection() == QSwipeGesture::Right) {
+             qDebug() << "swipeRight";
              emit Signal_NextWindow();
          } else if(gesture->verticalDirection() == QSwipeGesture::Up) {
+             qDebug() << "swipe up";
+             closeWindow();
+         }else if(gesture->verticalDirection() == QSwipeGesture::Down){
+             qDebug() << "swipe down";
              closeWindow();
          }
      }
@@ -4781,6 +4808,7 @@ void CaQtDM_Lib::panTriggered(QPanGesture *pan)
          char asc[100];
          const QPointF offset = pan->offset();
          sprintf(asc, "pan with %f %f", offset.x(), offset.y());
+         qDebug() << asc;
          postMessage(QtDebugMsg, (char*) asc);
      }
  }
