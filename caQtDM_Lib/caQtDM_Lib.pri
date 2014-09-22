@@ -38,6 +38,9 @@ unix {
 ios {
       INCLUDEPATH += $(EPICSINCLUDE)
       INCLUDEPATH += $(EPICSINCLUDE)/os/iOS
+
+      SOURCES +=     fingerswipegesture.cpp
+      HEADERS +=     fingerswipegesture.h
 }
 
 SOURCES += caqtdm_lib.cpp \

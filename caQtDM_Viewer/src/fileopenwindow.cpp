@@ -35,6 +35,10 @@
 #include "fileopenwindow.h"
 #include "caqtdm_lib.h"
 
+#ifdef Q_OS_IOS
+  #include "fingerswipegesture.h"
+#endif
+
 #include <iostream>
 #include <string>
 
@@ -270,6 +274,12 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         mustOpenFile = true;
     }
 #endif
+
+#ifdef Q_OS_IOS
+    // add fingerswipe gesture
+    QGestureRecognizer* pRecognizer = new FingerSwipeGestureRecognizer();
+    fingerSwipeGestureType = QGestureRecognizer::registerRecognizer(pRecognizer);
+#endif
 }
 
 #ifdef  NETWORKDOWNLOADSUPPORT
@@ -480,6 +490,10 @@ void FileOpenWindow::Callback_OpenButton()
                 allowResize = false;
             }
             newWindow->allowResizing(allowResize);
+ #ifdef Q_OS_IOS
+            newWindow->grabSwipeGesture(fingerSwipeGestureType);
+ #endif
+
             QMainWindow *mainWindow = newWindow;
             mainWindow->show();
             mainWindow->raise();
@@ -629,7 +643,9 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
 
         if(printandexit) willPrint = true;
         CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, messageWindow, willPrint);
-
+ #ifdef Q_OS_IOS
+        newWindow->grabSwipeGesture(fingerSwipeGestureType);
+#endif
         if (FileName.contains("prc")) {
            allowResize = false;
         }
@@ -765,6 +781,9 @@ void FileOpenWindow::Callback_ActionReload()
 
                 CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, messageWindow);
                 newWindow->allowResizing(allowResize);
+#ifdef Q_OS_IOS
+                newWindow->grabSwipeGesture(fingerSwipeGestureType);
+#endif
                 QMainWindow *mainWindow = newWindow;
 
                 mainWindow->show();

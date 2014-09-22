@@ -68,8 +68,13 @@
 #include "splashscreen.h"
 
 #include <QtControls>
+
+#ifdef Q_OS_IOS
 #include <QGestureEvent>
 #include <QTapAndHoldGesture>
+#include "fingerswipegesture.h"
+#endif
+
 #include <QMenuBar>
 
 namespace Ui {
@@ -87,6 +92,9 @@ public:
 
     void allowResizing(bool allowresize);
     int addMonitor(QWidget *thisW, knobData *data, QString pv, QWidget *w, int *specData, QMap<QString, QString> map, QString *pvRep);
+#ifdef Q_OS_IOS
+    void grabSwipeGesture(Qt::GestureType fingerSwipeGestureTypeID);
+#endif
 
     void print()
     {
@@ -137,7 +145,6 @@ public:
 #endif
     }
 
-
 protected:
     virtual void timerEvent(QTimerEvent *e);
     void resizeEvent ( QResizeEvent * event );
@@ -178,11 +185,13 @@ private:
     void Cartesian(caCartesianPlot *widget, int curvNB, int curvType, int XorY, const knobData &data);
     void WaveTable(caWaveTable *widget, const knobData &data);
 
+#ifdef Q_OS_IOS
     bool eventFilter(QObject *obj, QEvent *event);
     bool gestureEvent(QObject *obj, QGestureEvent *event);
     void tapAndHoldTriggered(QObject *obj, QTapAndHoldGesture* tapAndHold);
-    void swipeTriggered(QSwipeGesture *gesture);
-    void panTriggered(QPanGesture *gesture);
+    void fingerswipeTriggered(FingerSwipeGesture *gesture);
+    Qt::GestureType fingerSwipeGestureType;
+#endif
 
     QWidget *myWidget;
     QList<QWidget*> includeWidgetList;
@@ -218,7 +227,6 @@ private:
     int splashCounter;
 
     bool AllowsUpdate;
-
     bool fromAS;
 
 #ifdef epics4

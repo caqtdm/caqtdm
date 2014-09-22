@@ -322,23 +322,18 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
 #ifdef Q_OS_IOS
         // add a menu to the window; this is especially important for tablets
-
+/*
          QToolBar *toolBar = addToolBar("Options");
          QAction *closeAction = new QAction("&Close", this);
          QAction *nextAction = new QAction("&Cycle Window", this);
          connect(closeAction, SIGNAL(triggered()), this, SLOT(closeWindow()));
+         connect(nextAction, SIGNAL(triggered()), parent, SLOT(nextWindow()));
          toolBar->addAction(closeAction);
          toolBar->addAction(nextAction);
-         connect(nextAction, SIGNAL(triggered()), parent, SLOT(nextWindow()));
+  */
+         // info can be called with tapandhold
          connect(this, SIGNAL(Signal_NextWindow()), parent, SLOT(nextWindow()));
-
-         //setAttribute(Qt::WA_AcceptTouchEvents);
-         grabGesture(Qt::TapGesture);
-          grabGesture(Qt::TapAndHoldGesture);
-          grabGesture(Qt::PanGesture);
-          grabGesture(Qt::PinchGesture);
-          grabGesture(Qt::SwipeGesture);
-          grabGesture(Qt::CustomGesture);
+         grabGesture(Qt::TapAndHoldGesture);
          installEventFilter(this);
 #endif
     }
@@ -1493,10 +1488,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         connect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
         w1->setProperty("Connect", false);
         // in order to get the context on tablets
-#ifdef Q_OS_IOS
+//#ifdef Q_OS_IOS
         w1->grabGesture(Qt::TapAndHoldGesture);
         w1->installEventFilter(this);
-#endif
+//#endif
     }
 
     // add our context to AS widgets
@@ -4737,7 +4732,8 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
     }
 }
 
-
+// treat gesture events (we use tapandhold and fingerswipe, custom gesture)
+#ifdef Q_OS_IOS
 bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::Gesture) {
@@ -4748,29 +4744,12 @@ bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
 
 bool CaQtDM_Lib::gestureEvent(QObject *obj, QGestureEvent *event)
 {
-    qDebug() << "gestureEvent";
-    if (QGesture *tap = event->gesture(Qt::TapGesture)) {
-        qDebug() << "TapGesture";
-        QTapGesture* gesttap=static_cast<QTapGesture *>(tap);
-        const QPointF position = gesttap->position();
-        char asc[100];
-        sprintf(asc, "tab with %f %f", position.x(), position.y());
-        qDebug() << asc;
-
-        }
-
-
-
-    if (QGesture *pinch = event->gesture(Qt::PinchGesture)) qDebug() << "PinchGesture";
-    if (QGesture *swipe = event->gesture(Qt::SwipeGesture)) qDebug() << "SwipeGesture";
-
     if (QGesture *tapAndHold = event->gesture(Qt::TapAndHoldGesture)) {
         postMessage(QtDebugMsg, (char*) "tapandhold");
         tapAndHoldTriggered(obj, static_cast<QTapAndHoldGesture*>(tapAndHold));
-    } else if (QGesture *swipe = event->gesture(Qt::SwipeGesture)) {
-        swipeTriggered(static_cast<QSwipeGesture *>(swipe));
-     } else if (QGesture *pan = event->gesture(Qt::PanGesture)) {
-       panTriggered(static_cast<QPanGesture *>(pan));
+    } else if(QGesture *fingerswipe = event->gesture(fingerSwipeGestureType)) {
+       postMessage(QtDebugMsg, (char*) "fingerSwipeGesture");
+       fingerswipeTriggered(static_cast<FingerSwipeGesture *>(fingerswipe));
     }
     return true;
 }
@@ -4782,36 +4761,32 @@ void CaQtDM_Lib::tapAndHoldTriggered(QObject *obj, QTapAndHoldGesture* tapAndHol
     }
 }
 
-void CaQtDM_Lib::swipeTriggered(QSwipeGesture *gesture)
- {
-     if (gesture->state() == Qt::GestureFinished) {
-         qDebug() << "swipe";
-         postMessage(QtDebugMsg, (char*) "swipe");
-         if (gesture->horizontalDirection() == QSwipeGesture::Left) {
-             qDebug() << "swipeLeft";
-         } else if(gesture->verticalDirection() == QSwipeGesture::Right) {
-             qDebug() << "swipeRight";
-             emit Signal_NextWindow();
-         } else if(gesture->verticalDirection() == QSwipeGesture::Up) {
-             qDebug() << "swipe up";
-             closeWindow();
-         }else if(gesture->verticalDirection() == QSwipeGesture::Down){
-             qDebug() << "swipe down";
-             closeWindow();
-         }
-     }
- }
+void CaQtDM_Lib::fingerswipeTriggered(FingerSwipeGesture *swipe) {
+    if (swipe->isLeftToRight()) {
+        emit Signal_NextWindow();
+        //postMessage(QtDebugMsg, (char*) "leftttoright");
+    }
+    else if (swipe->isRightToLeft()) {
+        //postMessage(QtDebugMsg, (char*) "righttoleft");
+        emit Signal_NextWindow();
+    }
+    else if (swipe->isBottomToTop()) {
+        //postMessage(QtDebugMsg, (char*) "bottomtotop");
+        closeWindow();
+    }
+    else if (swipe->isTopToBottom()) {
+        //postMessage(QtDebugMsg, (char*) "toptobottom");
+        closeWindow();
+    }
+}
 
-void CaQtDM_Lib::panTriggered(QPanGesture *pan)
- {
-     if (pan->state() == Qt::GestureFinished) {
-         char asc[100];
-         const QPointF offset = pan->offset();
-         sprintf(asc, "pan with %f %f", offset.x(), offset.y());
-         qDebug() << asc;
-         postMessage(QtDebugMsg, (char*) asc);
-     }
- }
+// called from parent to define the custom gesture event
+void CaQtDM_Lib::grabSwipeGesture(Qt::GestureType fingerSwipeGestureTypeID)
+{
+    fingerSwipeGestureType = fingerSwipeGestureTypeID;
+    grabGesture(fingerSwipeGestureType);
+}
+#endif
 
 void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 {
@@ -5079,6 +5054,6 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
 
     Qt::DropAction dropAction = drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
     if (dropAction == Qt::MoveAction)w->close();
-
-
 }
+
+

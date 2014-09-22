@@ -91,6 +91,7 @@
 
  protected:
          virtual void timerEvent(QTimerEvent *e);
+     Qt::GestureType fingerSwipeGestureType;
 
 signals:
    void messageAvailable(QString message);
