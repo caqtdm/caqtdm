@@ -321,7 +321,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         setCentralWidget(centralWidget);
 
 #ifdef Q_OS_IOS
-        // add a menu to the window; this is especially important for tablets
 /*
          QToolBar *toolBar = addToolBar("Options");
          QAction *closeAction = new QAction("&Close", this);
@@ -330,13 +329,18 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
          connect(nextAction, SIGNAL(triggered()), parent, SLOT(nextWindow()));
          toolBar->addAction(closeAction);
          toolBar->addAction(nextAction);
-  */
+*/
          // info can be called with tapandhold
          connect(this, SIGNAL(Signal_NextWindow()), parent, SLOT(nextWindow()));
          grabGesture(Qt::TapAndHoldGesture);
          installEventFilter(this);
 #endif
     }
+
+#ifdef NETWORKDOWNLOADSUPPORT
+        // connect close lauchfile action to parent
+        connect(this, SIGNAL(Signal_IosExit()), parent, SLOT(Callback_IosExit()));
+#endif
 
     qRegisterMetaType<knobData>("knobData");
 
@@ -3513,13 +3517,18 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
     }
     mutexKnobData->initHighestCountPV();
 
-
 #ifdef epics4
     delete Epics4;
 #endif
 
-    //printf("closed\n");
-    //DetachContext();
+    // in case of network launcher, close the application when launcher window is closed
+#ifdef NETWORKDOWNLOADSUPPORT
+    QString thisFileName =  property("fileString").toString().section('/',-1);
+    QString launchFile = (QString)  getenv("CAQTDM_LAUNCHFILE");
+    if(thisFileName.contains(launchFile)) {
+        emit Signal_IosExit();
+    }
+#endif
 }
 
 /**
@@ -4745,11 +4754,11 @@ bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
 bool CaQtDM_Lib::gestureEvent(QObject *obj, QGestureEvent *event)
 {
     if (QGesture *tapAndHold = event->gesture(Qt::TapAndHoldGesture)) {
-        postMessage(QtDebugMsg, (char*) "tapandhold");
+        //postMessage(QtDebugMsg, (char*) "tapandhold");
         tapAndHoldTriggered(obj, static_cast<QTapAndHoldGesture*>(tapAndHold));
     } else if(QGesture *fingerswipe = event->gesture(fingerSwipeGestureType)) {
-       postMessage(QtDebugMsg, (char*) "fingerSwipeGesture");
-       fingerswipeTriggered(static_cast<FingerSwipeGesture *>(fingerswipe));
+        //postMessage(QtDebugMsg, (char*) "fingerSwipeGesture");
+        fingerswipeTriggered(static_cast<FingerSwipeGesture *>(fingerswipe));
     }
     return true;
 }

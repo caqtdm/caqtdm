@@ -25,7 +25,7 @@
 
 #include "configDialog.h"
 
-configDialog::configDialog(const QList<QString> &urls, const QList<QString> &files, QWidget *parent): QDialog(parent)
+configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, const QList<QString> &files, QWidget *parent): QDialog(parent)
 {
 
     ClearConfigButtonClicked = false;
@@ -51,6 +51,13 @@ configDialog::configDialog(const QList<QString> &urls, const QList<QString> &fil
     QPushButton* clearUiButton = new QPushButton("Clear ui files");
     clearLayout->addWidget(clearUiButton, 0, 3);
     connect(clearUiButton, SIGNAL(clicked()), this, SLOT(clearUiClicked()) );
+
+    QLabel *debugLabel = new QLabel("   ");
+    clearLayout->addWidget(debugLabel, 0, 4);
+
+    debugCheckBox = new QCheckBox("Debug window");
+    debugCheckBox->setChecked(debugWindow);
+    clearLayout->addWidget(debugCheckBox, 0, 5);
 
     clearBox->setLayout(clearLayout);
     mainLayout->addWidget(clearBox);
@@ -91,7 +98,7 @@ configDialog::configDialog(const QList<QString> &urls, const QList<QString> &fil
     setLayout(mainLayout);
 }
 
-void configDialog::getChoice(QString &url, QString &file, QList<QString> &urls, QList<QString> &files)
+void configDialog::getChoice(QString &url, QString &file, QList<QString> &urls, QList<QString> &files, bool &debugWindow)
 {
     urls.clear();
     files.clear();
@@ -108,6 +115,7 @@ void configDialog::getChoice(QString &url, QString &file, QList<QString> &urls, 
             file = fileEdit[i]->text();
         }
     }
+    debugWindow = debugCheckBox->isChecked();
 }
 
 void configDialog::clearUiClicked()

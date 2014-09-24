@@ -88,9 +88,10 @@
  public slots:
      void doSomething() { printf("About to quit!\n"); sharedMemory.detach();}
      void nextWindow();
+     void Callback_IosExit();
 
  protected:
-         virtual void timerEvent(QTimerEvent *e);
+     virtual void timerEvent(QTimerEvent *e);
      Qt::GestureType fingerSwipeGestureType;
 
 signals:
@@ -119,6 +120,8 @@ signals:
      bool minimizeMessageWindow;
 
      int activWindow;
+     bool debugWindow;
+     bool fromIOS;
  };
 
  #endif

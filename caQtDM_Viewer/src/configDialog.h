@@ -39,6 +39,7 @@
 #include <QTableWidget>
 #include <QRadioButton>
 #include <QGroupBox>
+#include <QCheckBox>
 #include <QMessageBox>
 
 class configDialog: public QDialog
@@ -46,10 +47,10 @@ class configDialog: public QDialog
     Q_OBJECT
 
 public:
-    configDialog(const QList<QString> &urlString, const QList<QString> &indexFile, QWidget *parent = 0);
+    configDialog(const bool debugWindow, const QList<QString> &urlString, const QList<QString> &indexFile, QWidget *parent = 0);
     int openUrl();
     void executeQuery();
-    void getChoice(QString &url, QString &file, QList<QString> &urls, QList<QString> &files);
+    void getChoice(QString &url, QString &file, QList<QString> &urls, QList<QString> &files, bool &debugWindow);
     QLineEdit *fileChoice;
     int NumberOfFiles();
     bool isClearConfig();
@@ -76,6 +77,8 @@ private:
    QDialogButtonBox *buttonBox;
 
    QLabel *fileCountLabel;
+
+   QCheckBox *debugCheckBox;
 
    bool ClearConfigButtonClicked;
 

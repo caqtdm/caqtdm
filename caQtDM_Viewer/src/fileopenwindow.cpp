@@ -87,6 +87,8 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
                                bool attach, bool minimize, QString geometry, bool printscreen, bool resizing): QMainWindow(parent)
 {
     // definitions for last opened file
+    debugWindow = true;
+    fromIOS = false;
     lastWindow = (QMainWindow*) 0;
     lastMacro ="";
     lastFile = "";
@@ -225,6 +227,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     QList<QString> urls;
     QList<QString> files;
     QString url, file;
+    debugWindow = false;
 
     // parse the config file for urls and files
     QFileInfo fi("../Documents/caQtDM_IOS_Config.xml");
@@ -238,14 +241,14 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 
     // display the results and get the user choices
 
-    configDialog dialog(urls, files, this);
+    configDialog dialog(debugWindow, urls, files, this);
     dialog.exec();
     // when clear config files is used, then reload dialog from original
     if(dialog.isClearConfig()) {
         dialog.close();
         goto again;
     }
-    dialog.getChoice(url, file, urls, files);
+    dialog.getChoice(url, file, urls, files, debugWindow);
 
     // and save the changes
     saveConfigFile("../Documents/caQtDM_IOS_Config.xml", urls, files);
@@ -421,7 +424,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 
     // any open windows ?
     // we want to ask with timeout if the application has to be closed. 23-jan-2013 no yust exit (in case of tablet do not exit)
- #ifndef Q_OS_IOS
+#ifndef Q_OS_IOS
     if(this->findChildren<CaQtDM_Lib *>().count() <= 0 && userClose) {
         if (sharedMemory.isAttached()) sharedMemory.detach();
         qApp->exit(0);
@@ -430,6 +433,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
         userClose = true;
     }
 #endif
+
     // any non connected pv's to display ?
 
     fillPVtable(countPV, countNotConnected, countDisplayed);
@@ -509,8 +513,7 @@ void FileOpenWindow::Callback_OpenButton()
             if (fileName.contains("prc")) {
                 mainWindow->resize(mainWindow->minimumSizeHint());
             }
-
-            //mainWindow->hide();
+            activWindow=0;
 
         } else {
             QTDMMessageBox(QMessageBox::Warning, "file open error", "does not exist", QMessageBox::Close, this, Qt::Popup, true);
@@ -526,6 +529,7 @@ void FileOpenWindow::cycleWindows()
     QList<CaQtDM_Lib *> all = this->findChildren<CaQtDM_Lib *>();
     if(all.count() == 0) return;
     if(activWindow > all.count()-1) activWindow = 0;
+
     QWidget *w = all.at(activWindow);
     w->activateWindow();
     w->raise();
@@ -670,6 +674,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         if (FileName.contains("prc")) {
             mainWindow->resize(mainWindow->minimumSizeHint());
         }
+        activWindow = 0;
 
         //qDebug() << "set properties in qmainwindow" << mainWindow << macroString;
 
@@ -713,17 +718,34 @@ void FileOpenWindow::Callback_ActionHelp()
 }
 
 /**
- * slot for exit signal
+ * slots for exit signal
  */
+void FileOpenWindow::Callback_IosExit()
+{
+    fromIOS = true;
+    Callback_ActionExit();
+    fromIOS = false;
+}
+
 void FileOpenWindow::Callback_ActionExit()
 {
-    QString message = QString("Are you sure to want to exit?");
-    QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "Exit", message, QMessageBox::Yes | QMessageBox::No, this, Qt::Dialog, false);
-    m->show();
-    int selected = m->exec();
+    int selected;
+
+    // launch window close
+    if(!fromIOS) {
+        QString message = QString("Are you sure to want to exit?");
+        QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "Exit", message, QMessageBox::Yes | QMessageBox::No, this, Qt::Dialog, false);
+        m->show();
+        selected = m->exec();
+    // normal close
+    } else {
+        if(debugWindow) selected = QMessageBox::No;
+        else selected = QMessageBox::Yes;
+    }
+
     if(selected == QMessageBox::Yes) {
 
-// we are first going to close all open windows
+// we are first going to close all open process windows
         // go through the children of the main window and find out if that window still exists
         QList<QWidget *> all = this->findChildren<QWidget *>();
         foreach(QWidget* widget, all) {
@@ -797,6 +819,7 @@ void FileOpenWindow::Callback_ActionReload()
                 if (FileName.contains("prc")) {
                     mainWindow->resize(mainWindow->minimumSizeHint());
                 }
+                activWindow = 0;
             }
         }
     }

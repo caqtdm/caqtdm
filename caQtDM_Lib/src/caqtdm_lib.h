@@ -157,6 +157,7 @@ signals:
     void Signal_ContextMenu(QWidget*);
     void clicked();
     void Signal_NextWindow();
+    void Signal_IosExit();
 
 private:
     bool bitState(int value, int bitNr);
