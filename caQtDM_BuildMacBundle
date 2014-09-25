@@ -1,13 +1,28 @@
 #!/bin/bash
 
 source caQtDM_Env
+export PATH=$PATH:${QTHOME}/bin
 
+pwd 
 echo
 echo ========== Collect Files for Mac Bundle ============
 echo
 
 chmod 755 ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libca.3.14.12.dylib
 chmod 755 ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libCom.3.14.12.dylib
+cp -R ${QWTHOME}/lib/qwt.framework ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/
+cp -R ${QTHOME}/lib/QtOpenGl.framework ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/
+echo
+echo ========== add libcoca ============
+echo
+
+mkdir ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/platforms/
+cp ${QTHOME}/plugins/platforms/libqcocoa.dylib  ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/platforms/
+
+echo
+echo ========== macdeployqt caQtDM ============
+echo
+
 
 macdeployqt ./caQtDM_Binaries/caQtDM.app
 
@@ -68,50 +83,70 @@ install_name_tool -change libqtcontrols.dylib @executable_path/../Frameworks/lib
 install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_monitors_plugin.dylib
 
 echo
-echo ========== mkdir Applications/Frameworks ============
+echo ========== change QtOpenGL.framework ============
 echo
 
-mkdir ./caQtDM_Binaries/caQtDM.app/Contents/Applications
+install_name_tool -id  @executable_path/../Frameworks/QtOpenGL.framework/Versions/5/QtOpenGL ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/Versions/5/QtOpenGL
+install_name_tool -change /usr/local/Qt-5.3.1/lib/QtWidgets.framework/Versions/5/QtWidgets @executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/Versions/5/QtOpenGL
+install_name_tool -change /usr/local/Qt-5.3.1/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/Versions/5/QtOpenGL
+install_name_tool -change /usr/local/Qt-5.3.1/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/Versions/5/QtOpenGL
+
+echo
+echo ========== change qwt.framework ============
+echo
+
+install_name_tool -change /usr/local/Qt-5.3.1/lib/QtOpenGL.framework/Versions/5/QtOpenGL @executable_path/../Frameworks/QtOpenGL.framework/Versions/5/QtOpenGL ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
+install_name_tool -change /usr/local/Qt-5.3.1/lib/QtWidgets.framework/Versions/5/QtWidgets @executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
+install_name_tool -change /usr/local/Qt-5.3.1/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
+install_name_tool -change /usr/local/Qt-5.3.1/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
+install_name_tool -change /usr/local/Qt-5.3.1/lib/QtPrintSupport.framework/Versions/5/QtPrintSupport @executable_path/../Frameworks/QtPrintSupport.framework/Versions/5/QtPrintSupport ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
+install_name_tool -change /usr/local/Qt-5.3.1/lib/QtConcurrent.framework/Versions/5/QtConcurrent  @executable_path/../Frameworks/QtConcurrent.framework/Versions/5/QtConcurrent ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
 
 
 echo
 echo ========== add designer.app ============
 echo
 
-cp -R ${QTHOME}/bin/Designer.app ./caQtDM_Binaries/caQtDM.app/Contents/Applications/
-mkdir ./caQtDM_Binaries/caQtDM.app/Contents/Applications/Designer.app/Contents/Frameworks/
+cp -R ${QTHOME}/bin/Designer.app ./caQtDM_Binaries/
+mkdir ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
 
 
-cp ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Applications/Designer.app/Contents/Frameworks/
-cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework ./caQtDM_Binaries/caQtDM.app/Contents/Applications/Designer.app/Contents/Frameworks/
-cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtSvg.framework ./caQtDM_Binaries/caQtDM.app/Contents/Applications/Designer.app/Contents/Frameworks/
+cp ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libqtcontrols.dylib ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
+cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
+cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtSvg.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
+cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
+cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtConcurrent.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
 
+mkdir ./caQtDM_Binaries//Designer.app/Contents/PlugIns
+mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer
 
-mkdir ./caQtDM_Binaries/caQtDM.app/Contents/Applications/Designer.app/Contents/PlugIns
-mkdir ./caQtDM_Binaries/caQtDM.app/Contents/Applications/Designer.app/Contents/PlugIns/designer
-
-cp ./caQtDM_Binaries/designer/*.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Applications/Designer.app/Contents/PlugIns/designer/
-macdeployqt ./caQtDM_Binaries/caQtDM.app/Contents/Applications/Designer.app
-install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/caQtDM.app/Contents/Applications/Designer.app/Contents/PlugIns/designer/libqtcontrols_controllers_plugin.dylib 
-install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/caQtDM.app/Contents/Applications/Designer.app/Contents/PlugIns/designer/libqtcontrols_graphics_plugin.dylib
-install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/caQtDM.app/Contents/Applications/Designer.app/Contents/PlugIns/designer/libqtcontrols_monitors_plugin.dylib
+cp ./caQtDM_Binaries/designer/*.dylib ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer/
+macdeployqt ./caQtDM_Binaries/Designer.app
+install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer/libqtcontrols_controllers_plugin.dylib 
+install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer/libqtcontrols_graphics_plugin.dylib
+install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer/libqtcontrols_monitors_plugin.dylib
 
 
 echo
 echo ========== add adl2ui.app ============
 echo
 
-cp -R ./caQtDM_Binaries/adl2ui.app ./caQtDM_Binaries/caQtDM.app/Contents/Applications/
-macdeployqt ./caQtDM_Binaries/caQtDM.app/Contents/Applications/adl2ui.app
+#cp -R ./caQtDM_Binaries/adl2ui.app ./caQtDM_Binaries/caQtDM.app/Contents/Applications/
+macdeployqt ./caQtDM_Binaries/adl2ui.app
 
 #cd caQtDM_Binaries
 #macdeployqt caQtDM.app -dmg
 echo
 echo ========== modifiy dmg image ============
 echo
-hdiutil create -format UDRW ./caQtDM_Binaries/caqtdm.dmg -srcfolder ./caQtDM_Binaries/caQtDM.app
+hdiutil create -megabytes 120 -format UDRW ./caQtDM_Binaries/caqtdm.dmg -srcfolder ./caQtDM_Binaries/caQtDM.app
 hdiutil attach -readwrite ./caQtDM_Binaries/caQtDM.dmg
+
 ln -s /Applications /Volumes/caQtDM/Applications
+cp -R ./caQtDM_Binaries/Designer.app /Volumes/caQtDM/
+#cp -R ./caQtDM_Binaries/adl2ui.app /Volumes/caQtDM/
 hdiutil detach /Volumes/caQtDM/
+hdiutil convert ./caQtDM_Binaries/caqtdm.dmg -format UDZO -o ./caQtDM_Binaries/caqtdm_package.dmg
+rm ./caQtDM_Binaries/caqtdm.dmg
 
 cd ..
