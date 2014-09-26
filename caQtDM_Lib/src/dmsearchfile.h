@@ -28,7 +28,7 @@
 
 #include <QString>
 #include <QFileDialog>
-#include <caQtDM_Lib_global.h>
+#include "caQtDM_Lib_global.h"
 
 class CAQTDM_LIBSHARED_EXPORT dmsearchFile
 {

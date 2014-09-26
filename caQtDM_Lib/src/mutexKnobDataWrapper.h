@@ -26,7 +26,7 @@
 #ifndef MUTEXKNOBDATAWRAPPER_H
 #define MUTEXKNOBDATAWRAPPER_H
 
-#include <caQtDM_Lib_global.h>
+#include "caQtDM_Lib_global.h"
 
 #ifdef __cplusplus
 extern "C" {

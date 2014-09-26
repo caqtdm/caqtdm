@@ -25,7 +25,7 @@
 #ifndef _JSONVALUE_H_
 #define _JSONVALUE_H_
 
-#include <caQtDM_Lib_global.h>
+#include "caQtDM_Lib_global.h"
 #include <vector>
 #include <string>
 

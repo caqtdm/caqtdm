@@ -26,7 +26,7 @@
 #ifndef MUTEXKNOBDATA_H
 #define MUTEXKNOBDATA_H
 
-#include <caQtDM_Lib_global.h>
+#include "caQtDM_Lib_global.h"
 
 #include "dbrString.h"
 #include "knobDefines.h"

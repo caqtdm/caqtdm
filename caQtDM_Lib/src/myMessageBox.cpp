@@ -23,7 +23,7 @@
  *    anton.mezger@psi.ch
  */
 
-#include <myMessageBox.h>
+#include "myMessageBox.h"
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QEventLoop>

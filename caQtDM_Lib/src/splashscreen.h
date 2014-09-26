@@ -30,7 +30,7 @@
 #include <QSplashScreen>
 #include <QApplication>
 
-#include <caQtDM_Lib_global.h>
+#include "caQtDM_Lib_global.h"
 
 class CAQTDM_LIBSHARED_EXPORT  SplashScreen : public QSplashScreen
 {

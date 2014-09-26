@@ -30,7 +30,7 @@
 #include <QDockWidget>
 #include <QTextEdit>
 #include <QEvent>
-#include <caQtDM_Lib_global.h>
+#include "caQtDM_Lib_global.h"
 
 /**
  * Message Window. Handling errors and other messages.

@@ -34,7 +34,7 @@
 #include "knobData.h"
 #include "mutexKnobData.h"
 #include "mutexKnobDataWrapper.h"
-#include <caQtDM_Lib_global.h>
+#include "caQtDM_Lib_global.h"
 
 #ifdef __cplusplus
 extern "C" {
