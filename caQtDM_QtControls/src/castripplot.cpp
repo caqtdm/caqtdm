@@ -43,7 +43,7 @@
 #include <QList>
 
 // increase the array size given by the canvas width to be sure that the whole range is covered
-#define SOMEMORE 500
+#define SOMEMORE 5000
 
 class TimeScaleDraw: public QwtScaleDraw
 {
@@ -458,6 +458,7 @@ void caStripPlot::TimeOutThread()
     mutex.lock();
 
     int dataCountLimit = (int) (HISTORY - 1 + SOMEMORE);
+    printf("dataCountLimit = %d\n", dataCountLimit);
 
     // we need an exact time scale
     if(RestartPlot1) {
