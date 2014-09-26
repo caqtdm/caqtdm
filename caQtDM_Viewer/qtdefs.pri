@@ -18,6 +18,7 @@ DEFINES += NETWORKDOWNLOADSUPPORT
 
 # 3.8.3
 # castripplot has been modified so that resizing does not clear the curves
+# epics timestamp introduced for info box
 
 # 3.8.2
 # modified catogglebutton in order to be able to resize its label
