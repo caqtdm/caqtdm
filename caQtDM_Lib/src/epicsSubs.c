@@ -23,11 +23,8 @@
  *    anton.mezger@psi.ch
  */
 
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
     #include <windows.h>
-    #if (_MSC_VER == 1800)
-      #include <stdbool.h>
-    #endif
 #else
     #include <unistd.h>
 #endif
@@ -42,6 +39,7 @@
 struct ca_client_context *dbCaClientContext;
 #include <alarm.h>
 #include <epicsExport.h>
+#include "tsDefs.h"
 
 #undef epicsAlarmGLOBAL
 
@@ -777,5 +775,43 @@ void TerminateDeviceIO()
 void ExitHandler(int sig)
 {
     printf("Exiting with signal=%d\n", sig);
+}
+
+int EpicsGetTimeStamp(char *pv, char *timestamp)
+{
+    chid     ch;
+    int status;
+    struct dbr_time_string ctrlS;
+    char tsString[32];
+    timestamp[0] = '\0';
+
+    if(strlen(pv) < 1)  {
+            C_postMsgEvent(messageWindow, 1, vaPrintf("pv with length=0 (not translated for macro?)\n"));
+            return !ECA_NORMAL;
+    }
+
+    // get epics timestamp
+    status = ca_create_channel(pv, NULL, 0, CA_PRIORITY, &ch);
+    if (ch == (chid) 0) return !ECA_NORMAL;
+
+    status = ca_pend_io(CA_TIMEOUT/2);
+
+    if (ca_state(ch) != cs_conn) {
+        C_postMsgEvent(messageWindow, 1, vaPrintf("pv (%s) is not connected\n", pv));
+        return status;
+    }
+
+    status = ca_get(DBR_TIME_STRING, ch, &ctrlS);
+    if (status != ECA_NORMAL) {
+        C_postMsgEvent(messageWindow, 1, vaPrintf("get pv (%s) %s\n", pv, ca_message (status)));
+        return status;
+    }
+
+    status = ca_pend_io(CA_TIMEOUT/2);
+
+    sprintf(timestamp, "TimeStamp: %s\n", tsStampToText(&ctrlS.stamp,TS_TEXT_MONDDYYYY, tsString));
+
+    return ECA_NORMAL;
+
 }
 

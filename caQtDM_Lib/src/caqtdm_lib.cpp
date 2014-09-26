@@ -3856,7 +3856,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         } else  if(selectedItem->text().contains("Get Info")) {
             QString info;
             info.append(InfoPrefix);
-            info.append("-------------------------------------------------<br>");
+            info.append("-----------------------------------------------------------------<br>");
+
             info.append("Object: ");
             info.append(w->objectName());
             info.append("<br>");
@@ -3867,6 +3868,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 knobData *kPtr = mutexKnobData->getMutexKnobDataPV(pv[i]);  // use pointer for getting all necessary information
                 if((kPtr != (knobData*) 0) && (pv[i].length() > 0)) {
                     char asc[2048];
+                    char timestamp[50];
                     info.append("<br>");
                     info.append(kPtr->pv);
 
@@ -3885,7 +3887,14 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         }
                     }
 
-                    info.append("<br>=========================<br>Type: ");
+
+                    info.append("<br>=====================================");
+                    if(!kPtr->soft) {
+                        EpicsGetTimeStamp((char*) pv[i].toAscii().constData(), timestamp);
+                        info.append("<br>");
+                        info.append(timestamp);
+                    }
+                    info.append("<br>Type: ");
                     info.append(caTypeStr[kPtr->edata.fieldtype]);
 
                     sprintf(asc,"<br>Count: %d", kPtr->edata.valueCount);
