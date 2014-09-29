@@ -458,7 +458,7 @@ void caStripPlot::TimeOutThread()
     mutex.lock();
 
     int dataCountLimit = (int) (HISTORY - 1 + SOMEMORE);
-    printf("dataCountLimit = %d\n", dataCountLimit);
+    //printf("dataCountLimit = %d\n", dataCountLimit);
 
     // we need an exact time scale
     if(RestartPlot1) {
