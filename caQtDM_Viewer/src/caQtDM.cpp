@@ -176,11 +176,8 @@ int main(int argc, char *argv[])
     window.setWindowIcon (QIcon(":/caQtDM.ico"));
     window.show();
     window.move(0,0);
-/*
-#ifdef Q_OS_IOS
-    window.hide();
-#endif
-*/
+
+
 
     if (signal(SIGINT, unixSignalHandler) == SIG_ERR) {
         qFatal("ERR - %s(%d): An error occurred while setting a signal handler.\n", __FILE__,__LINE__);

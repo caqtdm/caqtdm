@@ -31,7 +31,7 @@
 #include "dmsearchfile.h"
 
 #include <QtGui>
-
+#include "qstandardpaths.h"
 #include "fileopenwindow.h"
 #include "caqtdm_lib.h"
 
@@ -230,9 +230,12 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     debugWindow = false;
 
     // parse the config file for urls and files
-    QFileInfo fi("../Documents/caQtDM_IOS_Config.xml");
+    QString stdpathdoc=QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    stdpathdoc.append("/caQtDM_IOS_Config.xml");
+
+    QFileInfo fi(stdpathdoc);
     if(fi.exists()) {
-       parseConfigFile("../Documents/caQtDM_IOS_Config.xml", urls, files);
+       parseConfigFile(stdpathdoc, urls, files);
     }else{
        parseConfigFile("caQtDM_IOS_Config.xml", urls, files);
     }
@@ -251,7 +254,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     dialog.getChoice(url, file, urls, files, debugWindow);
 
     // and save the changes
-    saveConfigFile("../Documents/caQtDM_IOS_Config.xml", urls, files);
+    saveConfigFile(stdpathdoc, urls, files);
 
     fileFunctions filefunction;
 
@@ -367,7 +370,9 @@ void FileOpenWindow::saveConfigFile(const QString &filename, QList<QString> &url
 void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
 {
     char asc[2048];
-    QString EnvFile="../Documents/";
+    QString stdpathdoc=QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    QString EnvFile=stdpathdoc;
+    EnvFile.append("/");
     EnvFile.append(fileName);
     QFile file(EnvFile);
     if(!file.open(QIODevice::ReadOnly)) {
@@ -386,6 +391,9 @@ void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
             messageWindow->postMsgEvent(QtDebugMsg, asc);
         }
     }
+    //Replacement for standard wirtable directory
+    setenv("CAQTDM_DISPLAY_PATH",stdpathdoc.toAscii().constData(),1);
+
     sprintf(asc, "epics configuration file loaded: %s", fileName.toAscii().constData());
     messageWindow->postMsgEvent(QtDebugMsg, asc);
     file.close();

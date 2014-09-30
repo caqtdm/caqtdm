@@ -28,6 +28,7 @@
 #include <QFile>
 #include <QDir>
 #include <QEventLoop>
+#include "qstandardpaths.h"
 #include "networkaccess.h"
 
 NetworkAccess::NetworkAccess(QTableWidget *w, const QString &file)
@@ -68,8 +69,8 @@ void NetworkAccess::finishReply()
     // seems we want to download the file to a file with  the filename "thisFile"
     qDebug() << "open and write the file";
     if(thisTable == 0 && thisFile.length() > 0) {
-
-        QString filePath =  "../Documents/";
+        QString filePath=QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+        filePath.append("/");
         filePath.append(thisFile);
         QFile file(filePath);
         if(!file.open(QIODevice::ReadWrite)) {

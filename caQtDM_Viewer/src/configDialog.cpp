@@ -24,6 +24,7 @@
  */
 
 #include "configDialog.h"
+#include "qstandardpaths.h"
 
 configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, const QList<QString> &files, QWidget *parent): QDialog(parent)
 {
@@ -120,7 +121,8 @@ void configDialog::getChoice(QString &url, QString &file, QList<QString> &urls, 
 
 void configDialog::clearUiClicked()
 {
-    QString path = "../Documents";
+    QString path = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    path.append("/");
     QDir dir(path);
     dir.setNameFilters(QStringList() << "*.ui" << "*.prc");
     dir.setFilter(QDir::Files);
@@ -132,7 +134,8 @@ void configDialog::clearUiClicked()
 
 void configDialog::clearConfigClicked()
 {
-    QString path = "../Documents";
+    QString path = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    path.append("/");
     QDir dir(path);
     dir.setNameFilters(QStringList() << "*.config" << "*.xml");
     dir.setFilter(QDir::Files);
@@ -151,7 +154,8 @@ bool configDialog::isClearConfig()
 int configDialog::NumberOfFiles()
 {
     int count = 0;
-    QString path = "../Documents";
+    QString path = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    path.append("/");
     QDir dir(path);
     dir.setNameFilters(QStringList() << "*.ui" << "*.prc");
     dir.setFilter(QDir::Files);
