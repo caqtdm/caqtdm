@@ -43,7 +43,8 @@
 #include <QList>
 
 // increase the array size given by the canvas width to be sure that the whole range is covered
-#define SOMEMORE 5000
+#define MAXIMUMSIZE 5000
+#define SOMEMORE 500
 
 class TimeScaleDraw: public QwtScaleDraw
 {
@@ -272,7 +273,7 @@ void caStripPlot::RescaleCurves(int width, units unit, double period)
         rangeData[i].clear();
         fillData[i].clear();
         if(i==0)  base.clear();
-        for ( int j = 0; j <  HISTORY + SOMEMORE; j++ ) {
+        for ( int j = 0; j <  MAXIMUMSIZE; j++ ) {
             rangeData[i].append(QwtIntervalSample(0, QwtInterval(NAN, NAN)));
             fillData[i].append(QPointF(NAN,NAN));
             if(i==0) base.append(QwtIntervalSample(0, QwtInterval(NAN, NAN)));
@@ -458,7 +459,6 @@ void caStripPlot::TimeOutThread()
     mutex.lock();
 
     int dataCountLimit = (int) (HISTORY - 1 + SOMEMORE);
-    //printf("dataCountLimit = %d\n", dataCountLimit);
 
     // we need an exact time scale
     if(RestartPlot1) {
@@ -473,7 +473,10 @@ void caStripPlot::TimeOutThread()
 
     timeData = INTERVAL + elapsedTime;  // in seconds
     interval = INTERVAL;
-
+/*
+    printf("dataCountLimit = %d datacount=%d history=%d interval=%f elapsed=%f siz=%d\n",
+           dataCountLimit, dataCount, HISTORY, interval, elapsedTime,  rangeData[0].size());
+*/
     // correct value to fit again inside the interval (only for the fixed scale)
     if(thisXaxisType != TimeScale) {
         if(thisUnits == Millisecond) {
