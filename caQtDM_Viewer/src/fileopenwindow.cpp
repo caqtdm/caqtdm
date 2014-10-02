@@ -31,11 +31,12 @@
 #include "dmsearchfile.h"
 
 #include <QtGui>
-#include "qstandardpaths.h"
+
 #include "fileopenwindow.h"
 #include "caqtdm_lib.h"
 
 #ifdef Q_OS_IOS
+  #include "qstandardpaths.h"
   #include "fingerswipegesture.h"
 #endif
 
