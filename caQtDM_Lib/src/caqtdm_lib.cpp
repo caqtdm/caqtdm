@@ -3354,51 +3354,10 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
         command.replace("piomedm ", "caQtDM ");
         if(!command.contains("G_CS_medm")) command.replace("medm ", "caQtDM ");
         shellCommand(command);
-/*
-        command.replace("&T", thisFileShort);
-        command.replace("&A", thisFileFull);
-#ifdef linux
-        int windid = this->winId();
-        command.replace("&X", QString::number(windid));
-#endif
-        command = command.trimmed();
-        postMessage(QtDebugMsg, (char*) qPrintable(command.trimmed()));
-#ifndef linux
-        if(command.endsWith("&")) command.remove(command.size()-1, 1);
-        //qDebug() << "execute:" << command;
-        proc->start(command.trimmed(), QIODevice::ReadWrite);
-#else
-        // I had too many problems with QProcess start, use standard execl
-        if(!command.endsWith("&")) command.append("&");
-        //qDebug() << "execute:" << command;
-        int status = Execute((char*)command.toAscii().constData());
-        if(status != 0) {
-            QMessageBox::information(0,"FailedToStart or Error", command);
-        }
-#endif
-*/
     } else if(indx < commands.count()) {
         QString command;
         command.append(commands[indx].trimmed());
         shellCommand(command);
-/*
-        command.replace("&T", thisFileShort);
-        command.replace("&A", thisFileFull);
-        postMessage(QtDebugMsg, (char*) qPrintable(command.trimmed()));
-#ifndef linux
-        if(command.endsWith("&")) command.remove(command.size()-1, 1);
-        //qDebug() << "execute:" << command;
-        proc->start(command.trimmed(), QIODevice::ReadWrite);
-#else
-        // I had too many problems with QProcess start, use standard execl
-        if(!command.endsWith("&")) command.append("&");
-        //qDebug() << "execute:" << command;
-        int status = Execute((char*)command.toAscii().constData());
-        if(status != 0) {
-            QMessageBox::information(0,"FailedToStart or error", command);
-        }
-#endif
-*/
     }
 }
 

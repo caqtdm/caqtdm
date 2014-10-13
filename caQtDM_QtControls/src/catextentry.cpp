@@ -46,7 +46,7 @@ void caTextEntry::dataInput()
 
 void caTextEntry::setAccessW(int access)
 {
-     _AccessW = access;
+    _AccessW = access;
 }
 
 void caTextEntry::updateText(const QString &txt)
@@ -57,6 +57,19 @@ void caTextEntry::updateText(const QString &txt)
 
 bool caTextEntry::eventFilter(QObject *obj, QEvent *event)
 {
+    // repeat enter or return key are not really wanted
+    QKeyEvent *ev = static_cast<QKeyEvent *>(event);
+    if( ev->key()==Qt::Key_Return || ev->key()==Qt::Key_Enter ) {
+        if(ev->isAutoRepeat() ) {
+            //printf("keyPressEvent ignore\n");
+            event->ignore();
+        } else {
+            //printf("keyPressEvent accept\n");
+            event->accept();
+        }
+    }
+
+    // treat mouse enter and leave as well as focus out
     if (event->type() == QEvent::Enter) {
         if(!_AccessW) {
             QApplication::setOverrideCursor(QCursor(Qt::ForbiddenCursor));
@@ -69,9 +82,8 @@ bool caTextEntry::eventFilter(QObject *obj, QEvent *event)
         setReadOnly(false);
         clearFocus();
     } else if(event->type() == QEvent::FocusOut) {
-          //printf("lost focus, set text to %s\n", startText.toAscii().constData());
-          forceText(startText);
+        //printf("lost focus, set text to %s\n", startText.toAscii().constData());
+        forceText(startText);
     }
     return QObject::eventFilter(obj, event);
 }
-

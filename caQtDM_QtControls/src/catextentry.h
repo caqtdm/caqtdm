@@ -56,11 +56,11 @@ private slots:
     void dataInput();
 
 signals:
-
     void TextEntryChanged(QString);
 
 private:
     bool eventFilter(QObject *obj, QEvent *event);
+
     bool _AccessW;
     QString startText;
     bool emitted;
