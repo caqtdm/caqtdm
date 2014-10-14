@@ -111,19 +111,21 @@ FingerSwipeGesture::FingerSwipeGesture(QObject *parent): QGesture(parent), m_tri
 FingerSwipeGesture::~FingerSwipeGesture()
 { }
 
+#define movelength 300
+
 bool FingerSwipeGesture::isLeftToRight() const
 {
-    return m_startPos.x()+80 < m_currentPos.x();
+    return m_startPos.x()+movelength < m_currentPos.x();
 }
 bool FingerSwipeGesture::isRightToLeft() const
 {
-    return m_startPos.x() > m_currentPos.x()+80;
+    return m_startPos.x() > m_currentPos.x()+movelength;
 }
 bool FingerSwipeGesture::isBottomToTop() const
 {
-    return m_startPos.y()+80 < m_currentPos.y();
+    return m_startPos.y()+movelength < m_currentPos.y();
 }
 bool FingerSwipeGesture::isTopToBottom() const
 {
-    return m_startPos.y() > m_currentPos.y()+80;
+    return m_startPos.y() > m_currentPos.y()+movelength;
 }
