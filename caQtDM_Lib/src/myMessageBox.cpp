@@ -36,7 +36,7 @@ myMessageBox::myMessageBox(QWidget *parent) : QWidget(parent)
 
     Qt::WindowFlags flags = Qt::Dialog;
     setWindowFlags(flags);
-    setWindowModality (Qt::ApplicationModal);
+    setWindowModality (Qt::WindowModal);
 
 #ifdef Q_OS_IOS
     setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(350,500), qApp->desktop()->availableGeometry()));
@@ -74,4 +74,5 @@ void myMessageBox::exec()
     QEventLoop loop;
     connect(buttonBox, SIGNAL(rejected()), &loop, SLOT(quit()) );
     loop.exec();
+    deleteLater();
 }
