@@ -336,6 +336,14 @@ void caStripPlot::resizeEvent ( QResizeEvent * event )
     if(timerID) RescaleAxis();
 }
 
+void caStripPlot:: UpdateScaling()
+{
+    initCurves = true;
+    RescaleCurves(canvas()->size().width(), thisUnits, thisPeriod);
+    replot();
+    if(timerID) RescaleAxis();
+}
+
 QString caStripPlot::legendText(int i)
 {
     char min[20], max[20];

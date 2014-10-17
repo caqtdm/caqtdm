@@ -170,7 +170,8 @@ void limitsStripplotDialog::applyClicked()
 
 
     // force a resize to reinitialize the plot
-    StripPlot->resize(StripPlot->width()+1, StripPlot->height()+1);
-    StripPlot->resize(StripPlot->width()-1, StripPlot->height()-1);
+    //StripPlot->resize(StripPlot->width()+1, StripPlot->height()+1);
+   // StripPlot->resize(StripPlot->width()-1, StripPlot->height()-1);
+    StripPlot->UpdateScaling();
 }
 

@@ -399,6 +399,7 @@ public:
     void showCurve(int number, bool on);
     void addText(double x, double y, char* text, QColor c, int fontsize);
     void startPlot();
+    void UpdateScaling();
 
     void setLegendAttribute(QColor c, QFont f, LegendAtttribute sw);
 
