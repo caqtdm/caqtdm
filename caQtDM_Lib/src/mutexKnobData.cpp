@@ -618,6 +618,9 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
 
     // seems somebody did not know how to code mu in EGU
     StringUnits.replace("?A", uAs);
+#ifdef __APPLE__
+    StringUnits.replace(0x00B5, "u");
+#endif
     // assume we have a mu on first position (not nice, but I do not know better)
     if(dataString[0] == '?' && strlen(dataString) < 7) {
         QString newDataString = QString::fromLatin1(dataString);
