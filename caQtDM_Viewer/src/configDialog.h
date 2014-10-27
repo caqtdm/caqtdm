@@ -41,8 +41,10 @@
 #include <QGroupBox>
 #include <QCheckBox>
 #include <QMessageBox>
+#include <QDesktopWidget>
+#include <QApplication>
 
-class configDialog: public QDialog
+class configDialog: public QWidget
 {
     Q_OBJECT
 
@@ -54,11 +56,15 @@ public:
     QLineEdit *fileChoice;
     int NumberOfFiles();
     bool isClearConfig();
+    void exec();
 
 private slots:
 
     void clearUiClicked();
     void clearConfigClicked();
+
+protected:
+    virtual void closeEvent(QCloseEvent *event);
 
 private:
 
@@ -67,21 +73,15 @@ private:
 
     QLabel *deviceLabel;
     QPushButton *cancelButton;
-
-   QRadioButton *urlRadio[5];
-   QRadioButton *fileRadio[5];
-
-   QLineEdit *urlEdit[5];
-   QLineEdit *fileEdit[5];
-
-   QDialogButtonBox *buttonBox;
-
-   QLabel *fileCountLabel;
-
-   QCheckBox *debugCheckBox;
-
-   bool ClearConfigButtonClicked;
-
+    QRadioButton *urlRadio[5];
+    QRadioButton *fileRadio[5];
+    QLineEdit *urlEdit[5];
+    QLineEdit *fileEdit[5];
+    QDialogButtonBox *buttonBox;
+    QLabel *fileCountLabel;
+    QCheckBox *debugCheckBox;
+    bool ClearConfigButtonClicked;
+    QEventLoop loop;
 };
 
 #endif

@@ -250,9 +250,11 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     // when clear config files is used, then reload dialog from original
     if(dialog.isClearConfig()) {
         dialog.close();
+        dialog.deleteLater();
         goto again;
     }
     dialog.getChoice(url, file, urls, files, debugWindow);
+    dialog.deletelater();
 
     // and save the changes
     saveConfigFile(stdpathdoc, urls, files);

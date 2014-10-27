@@ -26,8 +26,13 @@
 #include "configDialog.h"
 #include "qstandardpaths.h"
 
-configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, const QList<QString> &files, QWidget *parent): QDialog(parent)
+configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, const QList<QString> &files, QWidget *parent): QWidget(parent)
 {
+    Qt::WindowFlags flags = Qt::Dialog;
+    setWindowFlags(flags);
+    setWindowModality (Qt::WindowModal);
+    //setPalette(Qt::transparent);
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(350,500), qApp->desktop()->availableGeometry()));
 
     ClearConfigButtonClicked = false;
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -63,9 +68,9 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     clearBox->setLayout(clearLayout);
     mainLayout->addWidget(clearBox);
 
-    QDialogButtonBox *box = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal );
-    connect(box, SIGNAL(rejected()), this, SLOT(reject()));
-    connect(box, SIGNAL(accepted()), this, SLOT(accept()));
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal );
+    //connect(box, SIGNAL(rejected()), this, SLOT(reject()));
+    //connect(box, SIGNAL(accepted()), this, SLOT(accept()));
 
     QGridLayout* urlLayout = new QGridLayout;
     QGroupBox* urlBox = new QGroupBox("Choose your url where your config file is located");
@@ -94,9 +99,10 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     fileBox->setLayout(fileLayout);
     mainLayout->addWidget(fileBox);
 
-    mainLayout->addWidget(box);
-
+    mainLayout->addWidget(buttonBox);
+    setMinimumSize(600,500);
     setLayout(mainLayout);
+    showNormal();
 }
 
 void configDialog::getChoice(QString &url, QString &file, QList<QString> &urls, QList<QString> &files, bool &debugWindow)
@@ -149,8 +155,6 @@ bool configDialog::isClearConfig()
     return ClearConfigButtonClicked;
 }
 
-
-
 int configDialog::NumberOfFiles()
 {
     int count = 0;
@@ -163,4 +167,15 @@ int configDialog::NumberOfFiles()
     return count;
 }
 
+void configDialog::exec()
+{
+    connect(buttonBox, SIGNAL(rejected()), &loop, SLOT(quit()) );
+    connect(buttonBox, SIGNAL(accepted()), &loop, SLOT(quit()) );
+    loop.exec();
+    close();
+}
 
+void configDialog::closeEvent(QCloseEvent *event)
+{
+    loop.quit();
+}
