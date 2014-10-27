@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<?define CaQtDMVersion = '3.8.3.0' ?>
+<?define CaQtDMVersion = '3.8.4.0' ?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Product Id="*" Name="caQtDM" Language="1033" Version="$(var.CaQtDMVersion)" Manufacturer="Paul Scherrer Institut" UpgradeCode="CEE4C381-28DA-478F-A7C6-3A95B4DF2A89">
         <Package Description="caQTDM Windows Manager with Qt-Designer(4.8.5)" Comments="Displaymanager for EPICS with Qt(4.8.5)" InstallerVersion="300" Compressed="yes" Manufacturer="Paul Scherrer Institut Switzerland" Keywords="EPICS, Display, Network, Control" />
