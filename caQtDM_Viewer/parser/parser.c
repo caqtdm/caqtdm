@@ -36,6 +36,7 @@
 int parsingCompositeFile;
 int generateFlatFile;
 int generateDeviceOnMenus;
+int expandText;
 int legendsForStripplot;
 
 char filePrefix[128] = "";
@@ -3227,10 +3228,11 @@ void *parseText(DisplayInfo *displayInfo, FrameOffset * offset)
     } while( (tokenType != T_RIGHT_BRACE) && (nestingLevel > 0)
              && (tokenType != T_EOF) );
 
-    if(strlen(textix) > 0) {
+    if(strlen(textix) > 0  && expandText) {
         newWidth = .6 * object.height * strlen(textix);
         if(newWidth > object.width) object.width = newWidth;
     }
+
     writeRectangleDimensions(&object, offset, "caLabel", True);
 
     if(!alignFound) Qt_handleString("alignment", "set", "Qt::AlignAbsolute|Qt::AlignLeft|Qt::AlignVCenter");

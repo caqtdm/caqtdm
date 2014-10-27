@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.8.4
+CAQTDM_VERSION = V3.8.5
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -16,8 +16,13 @@ NETWORKDOWNLOADSUPPORT {
 DEFINES += NETWORKDOWNLOADSUPPORT
 }
 
+# 3.8.5
+# adl2ui will not expand label width per default, when required, then use the option expandtext
+
 # 3.8.4
 # more changes for ios
+# greek micro replaced by u when macos or ios
+# when rescaling castripplot, figure will be cleared
 
 # 3.8.3
 # castripplot has been modified so that resizing does not clear the curves

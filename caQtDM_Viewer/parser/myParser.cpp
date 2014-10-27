@@ -43,6 +43,7 @@ extern "C" void Qt_writeZorder();
 extern "C" int parsingCompositeFile;
 extern "C" int generateFlatFile;
 extern "C" int generateDeviceOnMenus;
+extern "C" int expandText;
 extern "C" int legendsForStripplot;
 
 typedef char string40[40];
@@ -270,6 +271,7 @@ int main(int argc, char *argv[])
     generateFlatFile = false;
     parsingCompositeFile = false;
     generateDeviceOnMenus = false;
+    expandText = false;
     legendsForStripplot = true;
 
     char token[MAX_TOKEN_LENGTH];
@@ -288,6 +290,10 @@ int main(int argc, char *argv[])
             in++;
             legendsForStripplot = false;
         }
+        if ( strcmp (argv[in], "-expandtext" ) == 0 ) {
+            in++;
+            expandText= true;
+        }
         if ( strcmp (argv[in], "-v" ) == 0 ) {
             printf("adl2ui version %s for %s\n", BUILDVERSION, BUILDARCH);
             exit(0);
@@ -297,7 +303,8 @@ int main(int argc, char *argv[])
             printf("Usage:\n adl2ui [options] file\n");
             printf("[-flat] :        flat file will be generated, includes are integrated\n");
             printf("[-nolegends] :   no legends will be generated for the stripplots\n");
-            printf("[-deviceonmenu : part of pv will be used for the label of menu\n");
+            printf("[-deviceonmenu] : part of pv will be used for the label of menu\n");
+            printf("[-expandtext] : when textlabels do not fit, try this option\n");
             exit(1);
         }
         if (strncmp (argv[in], "-" , 1) == 0) {
@@ -314,6 +321,7 @@ int main(int argc, char *argv[])
     if(generateFlatFile) printf("adl2ui -- a flat file will be generated\n");
     if(generateDeviceOnMenus)printf("adl2ui -- device name will be put on menus\n");
     if(!legendsForStripplot)printf("adl2ui -- legends will not be set for stripplot\n");
+    if(expandText)printf("adl2ui -- try to adjust lenght of labels thta do not fit\n");
 
     // input and out files
     QString inputFile = inFile;
