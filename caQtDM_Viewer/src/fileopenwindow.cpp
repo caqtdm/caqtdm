@@ -254,7 +254,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         goto again;
     }
     dialog.getChoice(url, file, urls, files, debugWindow);
-    dialog.deletelater();
+    dialog.deleteLater();
 
     // and save the changes
     saveConfigFile(stdpathdoc, urls, files);
