@@ -24,12 +24,6 @@
  */
 
 #include "myMessageBox.h"
-#include <QVBoxLayout>
-#include <QPushButton>
-#include <QEventLoop>
-#include <QStyle>
-#include <QDesktopWidget>
-#include <QApplication>
 
 myMessageBox::myMessageBox(QWidget *parent) : QWidget(parent)
 {
@@ -71,8 +65,23 @@ void myMessageBox::setText(QString strng) const
 
 void myMessageBox::exec()
 {
-    QEventLoop loop;
     connect(buttonBox, SIGNAL(rejected()), &loop, SLOT(quit()) );
     loop.exec();
     deleteLater();
 }
+
+void myMessageBox::closeEvent(QCloseEvent *event)
+{
+    loop.quit();
+}
+
+void myMessageBox::paintEvent(QPaintEvent *e)
+{
+    QPainter painter(this);
+    QPen pen(Qt::black, 3, Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin);
+    painter.setPen(pen);
+    painter.drawRoundedRect(5, 5, width()-7, height()-7, 3, 3);
+
+    QWidget::paintEvent(e);
+}
+

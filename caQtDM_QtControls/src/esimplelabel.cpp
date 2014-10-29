@@ -52,7 +52,7 @@ void ESimpleLabel::setText(const QString &txt)
 
 bool ESimpleLabel::event(QEvent *e)
 {
-  if(e->type() == QEvent::Resize || e->type() == QEvent::Show || e->type() == QEvent::Paint) {
+  if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
 	FontScalingWidget::rescaleFont(text(), calculateTextSpace());
   }
   return QLabel::event(e);

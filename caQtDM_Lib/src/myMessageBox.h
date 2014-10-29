@@ -30,6 +30,13 @@
 #include <QDialogButtonBox>
 #include <QDialog>
 #include <QTextEdit>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QEventLoop>
+#include <QStyle>
+#include <QDesktopWidget>
+#include <QApplication>
+#include <QPainter>
 
 class myMessageBox : public QWidget
 {
@@ -38,9 +45,14 @@ public:
     void setText(QString strng) const;
     void exec();
 
+protected:
+    virtual void closeEvent(QCloseEvent *event);
+    virtual void paintEvent(QPaintEvent *e);
+
 private:
     QTextEdit *thisText;
     QDialogButtonBox *buttonBox;
+    QEventLoop loop;
 };
 
 

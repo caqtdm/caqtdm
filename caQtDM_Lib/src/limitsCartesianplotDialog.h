@@ -41,6 +41,7 @@
 #include <QDesktopWidget>
 #include <QApplication>
 #include <QGroupBox>
+#include <QPainter>
 
 #include "cacartesianplot.h"
 #include "dbrString.h"
@@ -71,6 +72,7 @@
 
  protected:
      virtual void closeEvent(QCloseEvent *event);
+     virtual void paintEvent(QPaintEvent *e);
 
  private:
      QComboBox *xComboBox;

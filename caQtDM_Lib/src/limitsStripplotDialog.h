@@ -36,6 +36,12 @@
 #include <QPushButton>
 #include <QPair>
 #include <QString>
+#include <QEventLoop>
+#include <QDesktopWidget>
+#include <QApplication>
+#include <QGroupBox>
+#include <QPainter>
+
 #include "castripplot.h"
 #include "dbrString.h"
 #include "knobDefines.h"
@@ -50,17 +56,22 @@
  class QTextEdit;
  class QWidget;
 
- class limitsStripplotDialog : public QDialog
+ class limitsStripplotDialog : public QWidget
 {
      Q_OBJECT
 
  public:
 
      limitsStripplotDialog(caStripPlot *w, MutexKnobData *data, const QString &title, QWidget *parent);
+     void exec();
 
  public slots:
      void cancelClicked();
      void applyClicked();
+
+ protected:
+     virtual void closeEvent(QCloseEvent *event);
+     virtual void paintEvent(QPaintEvent *e);
 
  private:
      QComboBox *minComboBox[caStripPlot::MAXCURVES];
@@ -72,6 +83,8 @@
      QStringList vars;
      caStripPlot *StripPlot;
      MutexKnobData *monData;
+     QDialogButtonBox *buttonBox;
+     QEventLoop loop;
  };
 
 

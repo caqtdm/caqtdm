@@ -34,6 +34,7 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
     int thisHeight = 150;
     CartesianPlot = w;
     monData = data;
+
     QGridLayout *Layout = new QGridLayout;
 
     Qt::WindowFlags flags = Qt::Dialog;
@@ -301,4 +302,15 @@ void limitsCartesianplotDialog::closeEvent(QCloseEvent *event)
 {
     loop.quit();
 }
+
+void limitsCartesianplotDialog::paintEvent(QPaintEvent *e)
+{
+    QPainter painter(this);
+    QPen pen(Qt::black, 3, Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin);
+    painter.setPen(pen);
+    painter.drawRoundedRect(5, 5, width()-7, height()-7, 3, 3);
+
+    QWidget::paintEvent(e);
+}
+
 

@@ -26,12 +26,23 @@
 #include <QtGui>
 #include "limitsStripplotDialog.h"
 
-limitsStripplotDialog::limitsStripplotDialog(caStripPlot *w, MutexKnobData *data, const QString &title, QWidget *parent) : QDialog(parent)
+limitsStripplotDialog::limitsStripplotDialog(caStripPlot *w, MutexKnobData *data, const QString &title, QWidget *parent) : QWidget(parent)
 {
-
+    int thisWidth = 650;
+    int thisHeight = 150;
     StripPlot = w;
     monData = data;
     QGridLayout *Layout = new QGridLayout;
+
+    Qt::WindowFlags flags = Qt::Dialog;
+    setWindowFlags(flags);
+    setWindowModality (Qt::WindowModal);
+#ifdef Q_OS_IOS
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(thisWidth,thisHeight), qApp->desktop()->availableGeometry()));
+#else
+    move(parent->x() + parent->width() / 2 - thisWidth / 2 , parent->y() + parent->height() /2 -thisHeight/2);
+#endif
+
     QString text = StripPlot->getPVS();
 
     vars = text.split(";", QString::SkipEmptyParts);
@@ -89,26 +100,25 @@ limitsStripplotDialog::limitsStripplotDialog(caStripPlot *w, MutexKnobData *data
     Layout->addWidget(YaxisTypeLabel,  vars.size(), 3);
     Layout->addWidget(YaxisType,  vars.size(), 4);
 
-    QDialogButtonBox *box = new QDialogButtonBox( Qt::Horizontal );
+    buttonBox = new QDialogButtonBox( Qt::Horizontal );
     QPushButton *button = new QPushButton( "Return" );
     connect( button, SIGNAL(clicked()), this, SLOT(cancelClicked()) );
-    box->addButton(button, QDialogButtonBox::RejectRole );
+    buttonBox->addButton(button, QDialogButtonBox::RejectRole );
 
     button = new QPushButton( "Apply" );
     connect( button, SIGNAL(clicked()), this, SLOT(applyClicked()) );
-    box->addButton(button, QDialogButtonBox::ApplyRole );
+    buttonBox->addButton(button, QDialogButtonBox::ApplyRole );
 
-    Layout->addWidget(box, vars.size(), 0);
+    Layout->addWidget(buttonBox, vars.size(), 0);
 
     setLayout(Layout);
-
     setWindowTitle(title);
-
+    showNormal();
 }
 
 void limitsStripplotDialog::cancelClicked()
 {
-    reject();
+    close();
 }
 
 void limitsStripplotDialog::applyClicked()
@@ -168,10 +178,30 @@ void limitsStripplotDialog::applyClicked()
     if(indx == 0) StripPlot->setYaxisScaling(caStripPlot::fixedScale);
     else if(indx == 1) StripPlot->setYaxisScaling(caStripPlot::autoScale);
 
-
-    // force a resize to reinitialize the plot
-    //StripPlot->resize(StripPlot->width()+1, StripPlot->height()+1);
-   // StripPlot->resize(StripPlot->width()-1, StripPlot->height()-1);
     StripPlot->UpdateScaling();
+}
+
+void limitsStripplotDialog::exec()
+{
+    connect(buttonBox, SIGNAL(rejected()), &loop, SLOT(quit()) );
+    connect(buttonBox, SIGNAL(accepted()), &loop, SLOT(quit()) );
+    loop.exec();
+    close();
+    deleteLater();
+}
+
+void limitsStripplotDialog::closeEvent(QCloseEvent *event)
+{
+    loop.quit();
+}
+
+void limitsStripplotDialog::paintEvent(QPaintEvent *e)
+{
+    QPainter painter(this);
+    QPen pen(Qt::black, 3, Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin);
+    painter.setPen(pen);
+    painter.drawRoundedRect(5, 5, width()-7, height()-7, 3, 3);
+
+    QWidget::paintEvent(e);
 }
 
