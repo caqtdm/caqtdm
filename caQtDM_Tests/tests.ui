@@ -1348,7 +1348,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>5</number>
+       <number>11</number>
       </property>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">
@@ -3851,10 +3851,10 @@ p, li { white-space: pre-wrap; }
        <widget class="QFrame" name="frame">
         <property name="geometry">
          <rect>
-          <x>230</x>
-          <y>185</y>
-          <width>96</width>
-          <height>36</height>
+          <x>202</x>
+          <y>163</y>
+          <width>124</width>
+          <height>58</height>
          </rect>
         </property>
         <property name="frameShape">
@@ -3872,6 +3872,9 @@ p, li { white-space: pre-wrap; }
            <height>16</height>
           </rect>
          </property>
+         <property name="fontScaleMode">
+          <enum>ESimpleLabel::WidthAndHeight</enum>
+         </property>
          <property name="variable">
           <string notr="true">mySoft1</string>
          </property>
@@ -3884,9 +3887,12 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>50</x>
            <y>10</y>
-           <width>31</width>
-           <height>16</height>
+           <width>58</width>
+           <height>28</height>
           </rect>
+         </property>
+         <property name="fontScaleMode">
+          <enum>ESimpleLabel::WidthAndHeight</enum>
          </property>
          <property name="variable">
           <string notr="true">mySoft2</string>
@@ -5903,7 +5909,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1102</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>

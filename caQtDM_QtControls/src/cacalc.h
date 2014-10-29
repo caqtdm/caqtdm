@@ -28,10 +28,11 @@
 
 #include <QWidget>
 #include <QLabel>
+#include "esimplelabel.h"
 #include <qtcontrols_global.h>
 
 
-class  QTCON_EXPORT caCalc : public  QLabel
+class  QTCON_EXPORT caCalc : public  ESimpleLabel
 {
     Q_OBJECT
 

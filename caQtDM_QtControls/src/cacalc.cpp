@@ -26,7 +26,7 @@
 #include "cacalc.h"
 
 
-caCalc::caCalc( QWidget *parent ) :  QLabel(parent)
+caCalc::caCalc( QWidget *parent ) :  ESimpleLabel(parent)
 {
     thisChannelA="";
     thisChannelB="";
