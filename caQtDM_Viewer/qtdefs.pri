@@ -18,6 +18,7 @@ DEFINES += NETWORKDOWNLOADSUPPORT
 
 # 3.8.5
 # adl2ui will not expand label width per default, when required, then use the option expandtext
+# dialogs have been modified for better display on ios
 
 # 3.8.4
 # more changes for ios
