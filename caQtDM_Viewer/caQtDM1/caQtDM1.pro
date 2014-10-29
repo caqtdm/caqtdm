@@ -23,7 +23,9 @@ ios {
    APP1_ICON.files = ../../caQtDM_Viewer/src/caQtDM.icns
    APP_XML_FILES.files = ../../caQtDM_Viewer/caQtDM_IOS_Config.xml
    StartScreen.files += ../../caQtDM_Viewer/src/StartScreen-Landscape.png
-   QMAKE_BUNDLE_DATA += APP_XML_FILES APP_ICON APP1_ICON StartScreen
+   APP-FONTS.files = ../../caQtDM_Viewer/lucida-sans-typewriter.ttf
+   APP-FONTS.path = fonts
+   QMAKE_BUNDLE_DATA += APP_XML_FILES APP_ICON APP1_ICON StartScreen APP-FONTS
 }
 
 !ios {
@@ -35,6 +37,9 @@ ios {
   }
   macx: {
    QMAKE_INFO_PLIST = ../src/Mac/Info.plist
+   APP-FONTS.files = ../../caQtDM_Viewer/lucida-sans-typewriter.ttf
+   APP-FONTS.path = fonts
+   QMAKE_BUNDLE_DATA += APP-FONTS
    QMAKE_POST_LINK += cp -R ../caQtDM.app ../../caQtDM_Binaries/ &&
    QMAKE_POST_LINK += cp ../../caQtDM_Binaries/libcaQtDM_Lib.dylib ../../caQtDM_Binaries/caQtDM.app/Contents/Frameworks &&
    QMAKE_POST_LINK += cp ../../caQtDM_Binaries/libqtcontrols.dylib ../../caQtDM_Binaries/caQtDM.app/Contents/Frameworks
