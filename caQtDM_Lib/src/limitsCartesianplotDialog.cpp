@@ -26,14 +26,27 @@
 #include <QtGui>
 #include "limitsCartesianplotDialog.h"
 
-limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKnobData *data, const QString &title, QWidget *parent) : QDialog(parent)
+limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKnobData *data, const QString &title, QWidget *parent) : QWidget(parent)
 {
     bool ok1, ok2;
     QString xmin, xmax,  ymin, ymax;
-    QStringList list;
+    int thisWidth = 650;
+    int thisHeight = 150;
     CartesianPlot = w;
     monData = data;
     QGridLayout *Layout = new QGridLayout;
+
+    Qt::WindowFlags flags = Qt::Dialog;
+    setWindowFlags(flags);
+    setWindowModality (Qt::WindowModal);
+#ifdef Q_OS_IOS
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(thisWidth,thisHeight), qApp->desktop()->availableGeometry()));
+#else
+    move(parent->x() + parent->width() / 2 - thisWidth / 2 , parent->y() + parent->height() /2 -thisHeight/2);
+#endif
+
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    QGroupBox *groupBox = new QGroupBox("cartesian plot scaling");
 
     // treat X
     QLabel *xLabel = new QLabel("X axis ");
@@ -126,18 +139,21 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
     Layout->addWidget(YaxisType, 1, 4);
 
     // box with buttons
-    QDialogButtonBox *box = new QDialogButtonBox( Qt::Horizontal );
+    buttonBox = new QDialogButtonBox( Qt::Horizontal );
     QPushButton *button = new QPushButton( "Return" );
     connect( button, SIGNAL(clicked()), this, SLOT(cancelClicked()) );
-    box->addButton(button, QDialogButtonBox::RejectRole );
+    buttonBox->addButton(button, QDialogButtonBox::RejectRole );
 
     button = new QPushButton( "Apply" );
     connect( button, SIGNAL(clicked()), this, SLOT(applyClicked()) );
-    box->addButton(button, QDialogButtonBox::ApplyRole );
+    buttonBox->addButton(button, QDialogButtonBox::ApplyRole );
 
-    Layout->addWidget(box, 2, 0);
+    Layout->addWidget(buttonBox, 2, 0);
 
-    setLayout(Layout);
+    groupBox->setLayout(Layout);
+    mainLayout->addWidget(groupBox);
+
+    setLayout(mainLayout);
 
     // when one of the limits is given by a channel, we do not allow to change anything
 
@@ -162,14 +178,14 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
         ymaxLineEdit->setEnabled(false);
     }
 
-
-
     setWindowTitle(title);
+
+    showNormal();
 }
 
 void limitsCartesianplotDialog::cancelClicked()
 {
-    reject();
+    close();
 }
 
 void limitsCartesianplotDialog::applyClicked()
@@ -270,5 +286,19 @@ void limitsCartesianplotDialog::applyClicked()
     indx = YaxisType->currentIndex();
     if(indx == 0) CartesianPlot->setYaxisType(caCartesianPlot::linear);
     else if(indx == 1) CartesianPlot->setYaxisType(caCartesianPlot::log10);
+}
+
+void limitsCartesianplotDialog::exec()
+{
+    connect(buttonBox, SIGNAL(rejected()), &loop, SLOT(quit()) );
+    connect(buttonBox, SIGNAL(accepted()), &loop, SLOT(quit()) );
+    loop.exec();
+    close();
+    deleteLater();
+}
+
+void limitsCartesianplotDialog::closeEvent(QCloseEvent *event)
+{
+    loop.quit();
 }
 

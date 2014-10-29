@@ -37,6 +37,11 @@
 #include <QPair>
 #include <QString>
 #include <QLabel>
+#include <QEventLoop>
+#include <QDesktopWidget>
+#include <QApplication>
+#include <QGroupBox>
+
 #include "cacartesianplot.h"
 #include "dbrString.h"
 #include "knobDefines.h"
@@ -51,17 +56,21 @@
  class QTextEdit;
  class QWidget;
 
- class limitsCartesianplotDialog : public QDialog
+ class limitsCartesianplotDialog : public QWidget
 {
      Q_OBJECT
 
  public:
 
      limitsCartesianplotDialog(caCartesianPlot *w, MutexKnobData *data, const QString &title, QWidget *parent);
+     void exec();
 
  public slots:
      void cancelClicked();
      void applyClicked();
+
+ protected:
+     virtual void closeEvent(QCloseEvent *event);
 
  private:
      QComboBox *xComboBox;
@@ -76,6 +85,8 @@
      QComboBox *YaxisType;
      caCartesianPlot *CartesianPlot;
      MutexKnobData *monData;
+     QDialogButtonBox *buttonBox;
+     QEventLoop loop;
  };
 
 

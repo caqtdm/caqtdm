@@ -28,11 +28,13 @@
 
 configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, const QList<QString> &files, QWidget *parent): QWidget(parent)
 {
+    int thisWidth = 600;
+    int thisHeight = 500;
     Qt::WindowFlags flags = Qt::Dialog;
     setWindowFlags(flags);
     setWindowModality (Qt::WindowModal);
     //setPalette(Qt::transparent);
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(350,500), qApp->desktop()->availableGeometry()));
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(thisWidth,thisHeight), qApp->desktop()->availableGeometry()));
 
     ClearConfigButtonClicked = false;
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -100,7 +102,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     mainLayout->addWidget(fileBox);
 
     mainLayout->addWidget(buttonBox);
-    setMinimumSize(600,500);
+
     setLayout(mainLayout);
     showNormal();
 }
