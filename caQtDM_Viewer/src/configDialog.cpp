@@ -29,7 +29,7 @@
 configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, const QList<QString> &files, QWidget *parent): QWidget(parent)
 {
     int thisWidth = 600;
-    int thisHeight = 500;
+    int thisHeight = 400;
     Qt::WindowFlags flags = Qt::Dialog;
     setWindowFlags(flags);
     setWindowModality (Qt::WindowModal);
@@ -39,9 +39,12 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     ClearConfigButtonClicked = false;
     QVBoxLayout *mainLayout = new QVBoxLayout;
 
-    setWindowTitle("caQtDM tablet configuration");
     mainLayout->setSizeConstraint(QLayout::SetNoConstraint);
-    mainLayout->addWidget(new QLabel("<h1>Configuration data</h1>"), 0, Qt::AlignCenter);
+    QLabel *title = new QLabel("<h1>Start settings</h1>");
+    title->setFixedWidth(thisWidth-20);
+    title->setStyleSheet("QLabel {background-color : #aaffff; color : black; }");
+    title->setAlignment(Qt::AlignCenter);
+    mainLayout->addWidget(title, 0, Qt::AlignCenter);
 
     QGridLayout *clearLayout = new QGridLayout;
     QGroupBox* clearBox = new QGroupBox("Local ui/prc files");
@@ -60,48 +63,54 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     clearLayout->addWidget(clearUiButton, 0, 3);
     connect(clearUiButton, SIGNAL(clicked()), this, SLOT(clearUiClicked()) );
 
-    QLabel *debugLabel = new QLabel("   ");
+    QLabel *debugLabel = new QLabel(" Message window:");
     clearLayout->addWidget(debugLabel, 0, 4);
 
-    debugCheckBox = new QCheckBox("Debug window");
-    debugCheckBox->setChecked(debugWindow);
-    clearLayout->addWidget(debugCheckBox, 0, 5);
+    debugComboBox = new QComboBox();
+    debugComboBox->setEditable(false);
+    debugComboBox->addItem("No");
+    debugComboBox->addItem("Yes");
+    debugComboBox->setCurrentIndex(0);
+    clearLayout->addWidget(debugComboBox, 0, 5);
 
     clearBox->setLayout(clearLayout);
     mainLayout->addWidget(clearBox);
 
-    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal );
-    //connect(box, SIGNAL(rejected()), this, SLOT(reject()));
-    //connect(box, SIGNAL(accepted()), this, SLOT(accept()));
-
     QGridLayout* urlLayout = new QGridLayout;
     QGroupBox* urlBox = new QGroupBox("Choose your url where your config file is located");
+    urlComboBox = new QComboBox();
+    urlComboBox->setEditable(true);
+    urlComboBox->setInsertPolicy(QComboBox::InsertAtCurrent);
     for(int i=0; i< 5; i++) {
-           urlEdit[i] = new QLineEdit();
-           if(i< urls.length())  urlEdit[i]->setText(urls.at(i));
-           urlLayout->addWidget(urlEdit[i], i, 0);
-           urlRadio[i] = new QRadioButton();
-           urlLayout->addWidget(urlRadio[i], i, 1);
+            if(i>=urls.length()) urlComboBox->addItem(QString::number(i+1));
+            else  urlComboBox->addItem(urls.at(i));
     }
-    urlRadio[0]->setChecked(true);
+    urlComboBox->setCurrentIndex(0);
+
+    urlLayout->addWidget(urlComboBox, 0, 0);
     urlBox->setLayout(urlLayout);
     mainLayout->addWidget(urlBox);
 
     QGridLayout* fileLayout = new QGridLayout;
     QGroupBox* fileBox = new QGroupBox("Choose your config file at the above url");
+    fileComboBox = new QComboBox();
+    fileComboBox->setEditable(true);
+    fileComboBox->setInsertPolicy(QComboBox::InsertAtCurrent);
 
     for(int i=0; i< 5; i++) {
-           fileEdit[i] = new QLineEdit();
-           if(i< files.length())  fileEdit[i]->setText(files.at(i));
-           fileLayout->addWidget(fileEdit[i], i, 0);
-           fileRadio[i] = new QRadioButton();
-           fileLayout->addWidget(fileRadio[i], i, 1);
+        if(i>=files.length()) fileComboBox->addItem(QString::number(i+1));
+        else fileComboBox->addItem(files.at(i));
     }
-    fileRadio[0]->setChecked(true);
+    fileComboBox->setCurrentIndex(0);
+
+    fileLayout->addWidget(fileComboBox, 0, 0);
     fileBox->setLayout(fileLayout);
     mainLayout->addWidget(fileBox);
 
-    mainLayout->addWidget(buttonBox);
+    QPushButton *startButton = new QPushButton(QIcon(":/caQtDM.ico"), "Start");
+    connect(startButton, SIGNAL(clicked()), this, SLOT(startClicked()) );
+
+    mainLayout->addWidget(startButton);
 
     setLayout(mainLayout);
     showNormal();
@@ -111,20 +120,16 @@ void configDialog::getChoice(QString &url, QString &file, QList<QString> &urls, 
 {
     urls.clear();
     files.clear();
-
     for(int i=0; i< 5; i++) {
-        urls.append(urlEdit[i]->text());
-        if(urlRadio[i]->isChecked()) {
-            url = urlEdit[i]->text();
-        }
+        urls.append(urlComboBox->itemText(i));
+        url = urlComboBox->currentText();
     }
     for(int i=0; i< 5; i++) {
-        files.append(fileEdit[i]->text());
-        if(fileRadio[i]->isChecked()) {
-            file = fileEdit[i]->text();
-        }
+        files.append(fileComboBox->itemText(i));
+        file = fileComboBox->currentText();
     }
-    debugWindow = debugCheckBox->isChecked();
+    if(debugComboBox->currentIndex() == 1) debugWindow = true;
+    else debugWindow = false;
 }
 
 void configDialog::clearUiClicked()
@@ -152,6 +157,11 @@ void configDialog::clearConfigClicked()
     close();
 }
 
+void configDialog::startClicked()
+{
+    close();
+}
+
 bool configDialog::isClearConfig()
 {
     return ClearConfigButtonClicked;
@@ -171,8 +181,6 @@ int configDialog::NumberOfFiles()
 
 void configDialog::exec()
 {
-    connect(buttonBox, SIGNAL(rejected()), &loop, SLOT(quit()) );
-    connect(buttonBox, SIGNAL(accepted()), &loop, SLOT(quit()) );
     loop.exec();
     close();
 }

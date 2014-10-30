@@ -40,6 +40,7 @@
 #include <QRadioButton>
 #include <QGroupBox>
 #include <QCheckBox>
+#include <QComboBox>
 #include <QMessageBox>
 #include <QDesktopWidget>
 #include <QApplication>
@@ -62,6 +63,7 @@ private slots:
 
     void clearUiClicked();
     void clearConfigClicked();
+    void startClicked();
 
 protected:
     virtual void closeEvent(QCloseEvent *event);
@@ -73,13 +75,11 @@ private:
 
     QLabel *deviceLabel;
     QPushButton *cancelButton;
-    QRadioButton *urlRadio[5];
-    QRadioButton *fileRadio[5];
-    QLineEdit *urlEdit[5];
-    QLineEdit *fileEdit[5];
-    QDialogButtonBox *buttonBox;
+    QComboBox* fileComboBox;
+    QComboBox* urlComboBox;
+
     QLabel *fileCountLabel;
-    QCheckBox *debugCheckBox;
+    QComboBox *debugComboBox;
     bool ClearConfigButtonClicked;
     QEventLoop loop;
 };
