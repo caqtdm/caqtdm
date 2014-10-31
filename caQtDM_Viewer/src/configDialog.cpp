@@ -26,25 +26,55 @@
 #include "configDialog.h"
 #include "qstandardpaths.h"
 
+//#include <QMacStyle>
+
 configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, const QList<QString> &files, QWidget *parent): QWidget(parent)
 {
     int thisWidth = 600;
-    int thisHeight = 400;
+    int thisHeight = 350;
     Qt::WindowFlags flags = Qt::Dialog;
     setWindowFlags(flags);
     setWindowModality (Qt::WindowModal);
-    //setPalette(Qt::transparent);
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(thisWidth,thisHeight), qApp->desktop()->availableGeometry()));
+
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, qApp->desktop()->size(), qApp->desktop()->availableGeometry()));
+
+    QPixmap bg(":/StartScreen-Landscape.png");
+    QMatrix rotated;
+    rotated.rotate(-90);
+    bg = bg.transformed(rotated);
+    bg = bg.scaled(qApp->desktop()->size());
+    QPalette palette;
+    palette.setBrush(QPalette::Background, bg);
+    setPalette(palette);
+
+    QFrame *frame = new QFrame();
+
+    QRect rect((qApp->desktop()->size().width()-thisWidth)/2,
+               (qApp->desktop()->size().height()-thisHeight)/2, thisWidth, thisHeight);
+    frame->setFrameStyle(QFrame::StyledPanel || QFrame::Raised);
+    frame->setLineWidth(5);
+
+    QPalette framePalette = frame->palette();
+    framePalette.setColor(backgroundRole(), QColor(210,210,210));
+    frame->setPalette(framePalette);
+    frame->setAutoFillBackground(true);
+    frame->setGeometry(rect);
+    frame->setFixedSize(thisWidth+30, thisHeight);
+    frame->setMaximumSize(rect.width()+30, rect.height());
 
     ClearConfigButtonClicked = false;
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    QGridLayout *mainLayout = new QGridLayout();
+    mainLayout->addWidget(frame);
 
-    mainLayout->setSizeConstraint(QLayout::SetNoConstraint);
+    QVBoxLayout *frameLayout = new QVBoxLayout();
+    mainLayout->addLayout(frameLayout,0,0);
+    frameLayout->setContentsMargins(15,15,15,15);
+
     QLabel *title = new QLabel("<h1>Start settings</h1>");
     title->setFixedWidth(thisWidth-20);
     title->setStyleSheet("QLabel {background-color : #aaffff; color : black; }");
     title->setAlignment(Qt::AlignCenter);
-    mainLayout->addWidget(title, 0, Qt::AlignCenter);
+    frameLayout->addWidget(title, 0, Qt::AlignCenter);
 
     QGridLayout *clearLayout = new QGridLayout;
     QGroupBox* clearBox = new QGroupBox("Local ui/prc files");
@@ -74,7 +104,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     clearLayout->addWidget(debugComboBox, 0, 5);
 
     clearBox->setLayout(clearLayout);
-    mainLayout->addWidget(clearBox);
+    frameLayout->addWidget(clearBox);
 
     QGridLayout* urlLayout = new QGridLayout;
     QGroupBox* urlBox = new QGroupBox("Choose your url where your config file is located");
@@ -83,13 +113,14 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     urlComboBox->setInsertPolicy(QComboBox::InsertAtCurrent);
     for(int i=0; i< 5; i++) {
             if(i>=urls.length()) urlComboBox->addItem(QString::number(i+1));
-            else  urlComboBox->addItem(urls.at(i));
+            else  if(urls.at(i).trimmed().length() < 1) urlComboBox->addItem(QString::number(i+1));
+            else urlComboBox->addItem(urls.at(i));
     }
     urlComboBox->setCurrentIndex(0);
 
     urlLayout->addWidget(urlComboBox, 0, 0);
     urlBox->setLayout(urlLayout);
-    mainLayout->addWidget(urlBox);
+    frameLayout->addWidget(urlBox);
 
     QGridLayout* fileLayout = new QGridLayout;
     QGroupBox* fileBox = new QGroupBox("Choose your config file at the above url");
@@ -99,18 +130,19 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
     for(int i=0; i< 5; i++) {
         if(i>=files.length()) fileComboBox->addItem(QString::number(i+1));
+        else  if(files.at(i).trimmed().length() < 1) fileComboBox->addItem(QString::number(i+1));
         else fileComboBox->addItem(files.at(i));
     }
     fileComboBox->setCurrentIndex(0);
 
     fileLayout->addWidget(fileComboBox, 0, 0);
     fileBox->setLayout(fileLayout);
-    mainLayout->addWidget(fileBox);
+    frameLayout->addWidget(fileBox);
 
     QPushButton *startButton = new QPushButton(QIcon(":/caQtDM.ico"), "Start");
     connect(startButton, SIGNAL(clicked()), this, SLOT(startClicked()) );
 
-    mainLayout->addWidget(startButton);
+    frameLayout->addWidget(startButton);
 
     setLayout(mainLayout);
     showNormal();
@@ -121,11 +153,11 @@ void configDialog::getChoice(QString &url, QString &file, QList<QString> &urls, 
     urls.clear();
     files.clear();
     for(int i=0; i< 5; i++) {
-        urls.append(urlComboBox->itemText(i));
+        if(urlComboBox->itemText(i).length() > 1) urls.append(urlComboBox->itemText(i));
         url = urlComboBox->currentText();
     }
     for(int i=0; i< 5; i++) {
-        files.append(fileComboBox->itemText(i));
+        if(fileComboBox->itemText(i).length() > 1) files.append(fileComboBox->itemText(i));
         file = fileComboBox->currentText();
     }
     if(debugComboBox->currentIndex() == 1) debugWindow = true;
