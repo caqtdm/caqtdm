@@ -38,10 +38,10 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
     setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, qApp->desktop()->size(), qApp->desktop()->availableGeometry()));
 
-    QPixmap bg(":/StartScreen-Landscape.png");
+    QPixmap bg(":/caQtDM-BGL-2048.png");
     QMatrix rotated;
-    rotated.rotate(-90);
-    bg = bg.transformed(rotated);
+    //rotated.rotate(90);
+    //bg = bg.transformed(rotated);
     bg = bg.scaled(qApp->desktop()->size());
     QPalette palette;
     palette.setBrush(QPalette::Background, bg);
