@@ -34,7 +34,7 @@
 		<string>fetch</string>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>3.8.5</string>
+	<string>3.8.6</string>
 	<key>NSSupportsSuddenTermination</key>
 	<false/>
 	<key>CFBundleInfoDictionaryVersion</key>
