@@ -36,7 +36,9 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     setWindowFlags(flags);
     setWindowModality (Qt::WindowModal);
 
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, qApp->desktop()->size(), qApp->desktop()->availableGeometry()));
+    QSize size = QSize(0,20);
+
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, qApp->desktop()->size() - size , qApp->desktop()->availableGeometry()));
 
     QPixmap bg(":/caQtDM-BGL-2048.png");
     QMatrix rotated;
@@ -51,16 +53,12 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
     QRect rect((qApp->desktop()->size().width()-thisWidth)/2,
                (qApp->desktop()->size().height()-thisHeight)/2, thisWidth, thisHeight);
-    frame->setFrameStyle(QFrame::StyledPanel || QFrame::Raised);
-    frame->setLineWidth(5);
 
-    QPalette framePalette = frame->palette();
-    framePalette.setColor(backgroundRole(), QColor(210,210,210));
-    frame->setPalette(framePalette);
     frame->setAutoFillBackground(true);
     frame->setGeometry(rect);
     frame->setFixedSize(thisWidth+30, thisHeight);
     frame->setMaximumSize(rect.width()+30, rect.height());
+    frame->setStyleSheet("border:0px solid gray; border-radius: 15px; background: rgba(255,255,255,0.7)");
 
     ClearConfigButtonClicked = false;
     QGridLayout *mainLayout = new QGridLayout();
