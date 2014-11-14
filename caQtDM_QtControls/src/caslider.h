@@ -111,9 +111,11 @@ protected:
 
     virtual void mousePressEvent(QMouseEvent *e);
     virtual void mouseReleaseEvent(QMouseEvent *e);
+    virtual void mouseMoveEvent(QMouseEvent *e);
     virtual void keyPressEvent(QKeyEvent *e);
     virtual void keyReleaseEvent(QKeyEvent *e);
     virtual bool event(QEvent *);
+    virtual void timerEvent( QTimerEvent *e );
 
 private:
     bool eventFilter(QObject *obj, QEvent *event);
@@ -137,7 +139,8 @@ private:
     double thisValue;
     double thisIncrement;
     float  pointSizePrv;
-
+    int timerID;
+    int direction;
 };
 
 #endif

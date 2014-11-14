@@ -54,6 +54,8 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
     thisMinimum = -50;
     thisMaximum = 50;
     pointSizePrv = 0.0;
+    direction = 0;
+    timerID = 0;
 
     setScalePosition(NoScale);
     setSpacing(0);
@@ -95,7 +97,7 @@ void caSlider::setBackground(QColor c)
     if(thisColorMode == Default) {
         thisBackColor = defaultBackColor;
     } else {
-      thisBackColor = color;
+        thisBackColor = color;
     }
     setColors(thisBackColor, thisForeColor);
 }
@@ -104,7 +106,7 @@ QColor caSlider::getForeground() {
     if(thisColorMode == Default) {
         return defaultForeColor;
     } else {
-      return thisForeColor;
+        return thisForeColor;
     }
 }
 
@@ -112,7 +114,7 @@ QColor caSlider::getBackground() {
     if(thisColorMode == Default) {
         return defaultBackColor;
     } else {
-      return thisBackColor;
+        return thisBackColor;
     }
 }
 
@@ -120,9 +122,9 @@ void caSlider::setForeground(QColor c)
 {
     QColor color = c;
     if(thisColorMode == Default) {
-       thisForeColor= defaultForeColor;
+        thisForeColor= defaultForeColor;
     } else {
-      thisForeColor = color;
+        thisForeColor = color;
     }
     setColors(thisBackColor, thisForeColor);
 }
@@ -172,7 +174,7 @@ void caSlider::setIncrementValue(double const &value){
 
 void caSlider::setAccessW(int access)
 {
-     thisAccessW = access;
+    thisAccessW = access;
 }
 
 void caSlider::setDirection(Direction dir)
@@ -298,12 +300,10 @@ void caSlider::keyPressEvent(QKeyEvent *e) {
 
     if(doIt) {
 #if QWT_VERSION >= 0x060100
-        incrementValue(increment);
-        Q_EMIT sliderMoved( value() );
-        Q_EMIT valueChanged( value() );
+        setStepAlignment(false);
+        setValue(value() + increment * thisIncrement);
 #else
         QwtDoubleRange::setValue(value() + increment * step());
-        //QwtDoubleRange::incValue( increment );  // this rounds to step value
 #endif
     } else {
         e->ignore();
@@ -312,8 +312,8 @@ void caSlider::keyPressEvent(QKeyEvent *e) {
 }
 
 void caSlider::keyReleaseEvent(QKeyEvent *e) {
-     e->ignore();
-     return;
+    e->ignore();
+    return;
 }
 
 void caSlider::mousePressEvent(QMouseEvent *e)
@@ -329,7 +329,28 @@ void caSlider::mousePressEvent(QMouseEvent *e)
         return;
     }
     else {
-        QwtSlider::mousePressEvent(e);
+        // I have to do the work myself due to the snapping
+#if QWT_VERSION >= 0x060100
+        const int markerPos = transform( value() );
+        double step = thisIncrement;
+        const QPoint &p = e->pos();
+        direction = 1;
+        if (orientation() == Qt::Horizontal ) {
+            if ( p.x() < markerPos ) direction = -1;
+        } else {
+            if ( p.y() > markerPos ) direction = -1;
+        }
+        setValue(value() + step * direction);
+        e->ignore();
+        timerID = startTimer(200);
+#else
+        QwtAbstractSlider::ScrollMode scrollMode;
+        const QPoint &p = e->pos();
+        getScrollMode(p,  scrollMode, direction);
+        QwtDoubleRange::setValue(value() + double(direction) * step());
+        e->ignore();
+        timerID = startTimer(200);
+#endif
     }
 }
 
@@ -343,23 +364,55 @@ void caSlider::mouseReleaseEvent( QMouseEvent *e )
         QwtSlider::mouseReleaseEvent(e);
 #endif
     }
+
+    if(timerID != 0) {
+        killTimer(timerID);
+        timerID = 0;
+    }
+}
+
+void caSlider::timerEvent( QTimerEvent *e )
+{
+#if QWT_VERSION >= 0x060100
+    double step = thisIncrement;
+    setValue(value() + step * direction);
+#else
+    QwtDoubleRange::setValue(value() + double(direction) * step());
+#endif
+}
+
+void caSlider::mouseMoveEvent( QMouseEvent *e )
+{
+#if QWT_VERSION >= 0x060100
+    double val = scrolledTo( e->pos() );
+    val = qBound( minimum(), val, maximum());
+    Q_EMIT valueChanged( val );
+    e->ignore();
+#else
+    QwtAbstractSlider::ScrollMode scrollMode;
+    int direction;
+    const QPoint &p = e->pos();
+    getScrollMode(p,  scrollMode, direction);
+    if(scrollMode == QwtAbstractSlider::ScrMouse) setPosition( e->pos());
+     e->ignore();
+#endif
 }
 
 bool caSlider::eventFilter(QObject *obj, QEvent *event)
 {
-        if (event->type() == QEvent::Enter) {
-            if(!thisAccessW) {
-                QApplication::setOverrideCursor(QCursor(Qt::ForbiddenCursor));
-                setReadOnly(true);
-            } else {
-                QApplication::restoreOverrideCursor();
-            }
-        } else if(event->type() == QEvent::Leave) {
+    if (event->type() == QEvent::Enter) {
+        if(!thisAccessW) {
+            QApplication::setOverrideCursor(QCursor(Qt::ForbiddenCursor));
+            setReadOnly(true);
+        } else {
             QApplication::restoreOverrideCursor();
-            setReadOnly(false);
-            clearFocus();
         }
-        return QObject::eventFilter(obj, event);
+    } else if(event->type() == QEvent::Leave) {
+        QApplication::restoreOverrideCursor();
+        setReadOnly(false);
+        clearFocus();
+    }
+    return QObject::eventFilter(obj, event);
 }
 
 void caSlider::setAlarmColors(short status)
@@ -389,11 +442,11 @@ void caSlider::setAlarmColors(short status)
 
 void caSlider::setUserAlarmColors(double val)
 {
-   if((val< thisMinimum) || (val > thisMaximum)) {
+    if((val< thisMinimum) || (val > thisMaximum)) {
         setColors(thisBackColor, QColor(Qt::red));
-     } else {
+    } else {
         setColors(thisBackColor, QColor(Qt::green));
-     }
+    }
 }
 
 void caSlider::setNormalColors()
@@ -442,53 +495,53 @@ bool caSlider::event(QEvent *e)
 #endif
             switch (orientation()) {
 
-                case Qt::Vertical: {
-                    QSize handlesize = QSize(width()/3-4, height()/10);
-                    if(handlesize != this->handleSize()) {
-                        this->setHandleSize(handlesize);
-                    }
-                    QFont f = font();
-                    int size = that->scaleDraw()->maxLabelWidth(f);
-                    float xFactor = (float) size  / ((float) width() * 2.0/3.0 - 15.0);
-
-                    if(xFactor < 0.1) break;
-
-                    float pointSize = f.pointSizeF() / xFactor;
-
-                    if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
-                    if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;
-
-                    if(qAbs(pointSize - pointSizePrv) >= 2.0) {
-                        f.setPointSizeF(pointSize);
-                        pointSizePrv = pointSize;
-                        setFont(f);
-                        update();
-                    }
+            case Qt::Vertical: {
+                QSize handlesize = QSize(width()/3-4, height()/10);
+                if(handlesize != this->handleSize()) {
+                    this->setHandleSize(handlesize);
                 }
+                QFont f = font();
+                int size = that->scaleDraw()->maxLabelWidth(f);
+                float xFactor = (float) size  / ((float) width() * 2.0/3.0 - 15.0);
+
+                if(xFactor < 0.1) break;
+
+                float pointSize = f.pointSizeF() / xFactor;
+
+                if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
+                if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;
+
+                if(qAbs(pointSize - pointSizePrv) >= 2.0) {
+                    f.setPointSizeF(pointSize);
+                    pointSizePrv = pointSize;
+                    setFont(f);
+                    update();
+                }
+            }
                 break;
 
-                case Qt::Horizontal: {
-                   QSize handlesize = QSize(width()/10, height()/3-4);
-                   if(handlesize != this->handleSize()) {
-                       this->setHandleSize(handlesize);
-                   }
-                   QFont f = font();
-                   int size = that->scaleDraw()->maxLabelWidth(f);
-                   float yFactor = (float) size  / ((float) height()*2.0/3.0 -10.0);
-
-                   if(yFactor < 0.1) break;
-
-                   float pointSize = f.pointSizeF() / yFactor;
-                   if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
-                   if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;
-
-                   if(qAbs(pointSize - pointSizePrv) >= 2.0) {
-                       f.setPointSizeF(pointSize);
-                       pointSizePrv = pointSize;
-                       setFont(f);
-                       update();
-                   }
+            case Qt::Horizontal: {
+                QSize handlesize = QSize(width()/10, height()/3-4);
+                if(handlesize != this->handleSize()) {
+                    this->setHandleSize(handlesize);
                 }
+                QFont f = font();
+                int size = that->scaleDraw()->maxLabelWidth(f);
+                float yFactor = (float) size  / ((float) height()*2.0/3.0 -10.0);
+
+                if(yFactor < 0.1) break;
+
+                float pointSize = f.pointSizeF() / yFactor;
+                if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
+                if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;
+
+                if(qAbs(pointSize - pointSizePrv) >= 2.0) {
+                    f.setPointSizeF(pointSize);
+                    pointSizePrv = pointSize;
+                    setFont(f);
+                    update();
+                }
+            }
                 break;
             }
 
