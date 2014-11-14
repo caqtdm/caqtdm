@@ -437,9 +437,10 @@ void caWaterfallPlot::defineTimerUpdate(units unit, double period)
     } else if(unit == Minute) {
         INTERVAL = (int) (1000.0 * period * 60);
     } else {
-        // printf("\nunknown unit\n");
+        //printf("\nunknown unit\n");
         INTERVAL = (int) period;
     }
+    if(INTERVAL < 100) INTERVAL = 100;
     Timer->setInterval(INTERVAL);
 }
 
