@@ -59,6 +59,7 @@ ENumeric::ENumeric(QWidget *parent, int id, int dd) : QFrame(parent), FloatDeleg
     data = 0;
     minVal = (int) -pow(10.0, digits) + 1;
     maxVal = (int) pow(10.0, digits) - 1;
+
 #ifdef _MSC_VER
     d_minAsDouble = (double) round(minVal);
     d_maxAsDouble = (double) round(maxVal);
@@ -165,6 +166,9 @@ void ENumeric::init()
         QPushButton *temp = new QPushButton(this);
         temp->setObjectName(QString("layoutmember") + QString().setNum(i));
         temp->installEventFilter(lCWME);
+        temp->setAutoRepeat(true);
+        temp->setAutoRepeatInterval(200);
+        temp->setAutoRepeatDelay(500);
 
         bup->addButton(temp);
 
@@ -181,6 +185,11 @@ void ENumeric::init()
         QPushButton *temp2 = new QPushButton(this);
         temp2->setObjectName(QString("layoutmember") + QString().setNum(i));
         temp2->installEventFilter(lCWME);
+        temp2->setAutoRepeat(true);
+        temp2->setAutoRepeatInterval(200);
+        temp2->setAutoRepeatDelay(500);
+
+
         bdown->addButton(temp2);
 
         formatDigit(temp, l, temp2);
@@ -427,7 +436,6 @@ bool ENumeric::eventFilter(QObject *obj, QEvent *event)
    return QObject::eventFilter(obj, event);
 }
 
-
 void ENumeric::reconstructGeometry()
 {
 
@@ -540,7 +548,6 @@ void ENumeric::resizeEvent(QResizeEvent *e)
 
     QWidget::resizeEvent(e);
 }
-
 
 void ENumeric::formatDigit(QPushButton *up, QLabel *l, QPushButton *down)
 {
