@@ -58,22 +58,30 @@ class QTCON_EXPORT caCamera : public QWidget
     Q_PROPERTY(QString minLevel READ getMinLevel WRITE setMinLevel)
     Q_PROPERTY(QString maxLevel READ getMaxLevel WRITE setMaxLevel)
 
-    Q_PROPERTY(QString dataProcChannels READ getDataProcChannels WRITE setDataProcChannels)
+    Q_PROPERTY(QString dimensionMarking_Channels READ getROIChannelsRead WRITE setROIChannelsRead)
+    Q_PROPERTY(ROI_type ROI_writeType READ getROIwriteType WRITE setROIwriteType)
+    Q_PROPERTY(QString ROI_writeChannels READ getROIChannelsWrite WRITE setROIChannelsWrite)
 
     Q_ENUMS(zoom)
     Q_ENUMS(colormap)
+    Q_ENUMS(ROI_type)
 
 public:
     enum zoom {No=0, Yes};
     enum colormap { Default=0, grey, spectrum};
+    enum ROI_type {upperleftxy_width_height=0, upperleftxy_lowerleftxy, centerxy_width_height};
 
     caCamera(QWidget *parent = 0);
     ~caCamera();
 
     void updateImage(const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor);
+    bool getROI(int &x, int &y, int &w, int &h);
     QImage * showImageCalc(int datasize, char *data);
     void showImage(int datasize, char *data);
     uint rgbFromWaveLength(double wave);
+
+    int getAccessW() const {return _AccessW;}
+    void setAccessW(int access);
 
     QString getPV_Data() const {return thisPV_Data;}
     void setPV_Data(QString const &newPV) {thisPV_Data = newPV;}
@@ -86,8 +94,13 @@ public:
     QString getPV_BPP() const {return thisPV_BPP;}
     void setPV_BPP(QString const &newPV) {thisPV_BPP = newPV;}
 
-    QString getDataProcChannels() const {return thisDataProcPV.join(";");}
-    void setDataProcChannels(QString const &newPV) {thisDataProcPV = newPV.split(";");}
+    ROI_type getROIwriteType() const {return thisROItype;}
+    void setROIwriteType(ROI_type const &roitype) {thisROItype = roitype;}
+    QString getROIChannelsWrite() const {return thisPV_ROI_Write.join(";");}
+    void setROIChannelsWrite(QString const &newPV) {thisPV_ROI_Write = newPV.split(";");}
+
+    QString getROIChannelsRead() const {return thisPV_ROI_Read.join(";");}
+    void setROIChannelsRead(QString const &newPV) {thisPV_ROI_Read = newPV.split(";");}
 
     colormap getColormap() const {return thisColormap;}
     void setColormap(colormap const &map);
@@ -131,16 +144,19 @@ protected:
 private:
 
     bool eventFilter(QObject *obj, QEvent *event);
+    void Coordinates(int posX, int posY, double &newX, double &newY, double &maxX, double &maxY);
+
     bool buttonPressed, validIntensity;
     bool forcemonochrome;
     QString thisPV_Data, thisPV_Width, thisPV_Height, thisPV_Code, thisPV_BPP;
-    QStringList thisDataProcPV;
+    ROI_type thisROItype;
+    QStringList thisPV_ROI_Read, thisPV_ROI_Write;
     QString thisMinLevel, thisMaxLevel;
     colormap thisColormap;
     zoom thisFitToSize;
     QImage *image;
 
-    int Xpos, Ypos, Xnew, Ynew, Zvalue;
+    int Xpos, Ypos, Zvalue;
     bool m_init;
     enum { ColormapSize = 256 };
     uint ColorMap[ColormapSize];
@@ -189,6 +205,13 @@ private:
 
     int UpdatesPerSecond;
 
+    bool selectionStarted;
+    QRect selectionRect;
+
+    int ROIx, ROIy, ROIw, ROIh;
+    bool ROIdetected;
+
+    bool _AccessW;
 };
 
 #endif
