@@ -103,9 +103,7 @@ signals:
 
 protected:
     virtual void showEvent(QShowEvent *);
-
     virtual QSize sizeHint() const;
-
     virtual QSize minimumSizeHint() const;
 
 private:
@@ -138,7 +136,6 @@ private:
     int idUpPoint, idDownPoint;
     void downDataIndex(int id);
     void upDataIndex(int id);
-
 
 private slots:
     void dataInput();

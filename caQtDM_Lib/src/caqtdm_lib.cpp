@@ -163,6 +163,7 @@ extern "C" int CreateAndConnect(int index, knobData *data, int rate, int skip);
 extern "C" void DetachContext();
 extern "C" void PrepareDeviceIO();
 extern "C" void ClearMonitor(knobData *kData);
+extern "C" void EpicsFlushIO();
 
 extern "C" void TerminateDeviceIO();
 
@@ -420,7 +421,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     mutexKnobData->BuildSoftPVList(myWidget);
 
     // start a timer
-    startTimer(2000);
+    startTimer(1000);
 }
 
 /**
@@ -429,6 +430,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 void CaQtDM_Lib::timerEvent(QTimerEvent *event)
 {
     Q_UNUSED(event);
+    // for epics we flush the buffer evry 2 seconds
+    EpicsFlushIO();
 }
 
 /**
@@ -637,10 +640,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         // addmonitor normally will add a tooltip to show the pv; however here we have more than one pv
         QString tooltip;
-        QString pvs= "";
+        QString pvs1= "";
+        QString pvs2= "";
         tooltip.append(ToolTipPrefix);
 
-        for(int i=0; i< 8; i++) {
+        for(int i=0; i< 9; i++) {
             QString text;
             bool alpha = true;
             if(i==0) text = widget->getPV_Data();
@@ -657,20 +661,25 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
                 alpha = widget->isAlphaMaxLevel();
                 text = widget->getMaxLevel();
             }
-            // for dataprocessing data x,y,w,h
-            if(i==7) {
-                QStringList thisString = widget->getDataProcChannels().split(";");
+            // for dataprocessing data x,y,w,h ROI read and write
+            if(i > 6) {
+                QStringList thisString;
+                if(i==7) thisString = widget->getROIChannelsRead().split(";");
+                if(i==8) thisString = widget->getROIChannelsWrite().split(";");
+
                 if(thisString.count() == 4 &&
                         thisString.at(0).trimmed().length() > 0 &&
                         thisString.at(1).trimmed().length() > 0  &&
                         thisString.at(2).trimmed().length() > 0 &&
                         thisString.at(3).trimmed().length() > 0) {
                     for(int j=0; j<4; j++) {
-                        specData[0] = i+j;   // x,y,w,h
-                        text =  treatMacro(map, thisString.at(j), &doNothing);
-                        addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
-                        pvs.append(pv);
-                        if(j<3)pvs.append(";");
+                        if(i==7)specData[0] = i+j;   // x,y,w,h
+                        text = treatMacro(map, thisString.at(j), &doNothing);
+                        if(i==7)addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
+                        if(i==7)pvs1.append(pv);
+                        if(i==8)pvs2.append(text);
+                        if((j<3) && (i==7))pvs1.append(";");
+                        if((j<3) && (i==8))pvs2.append(";");
                     }
                 }
             }
@@ -678,7 +687,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
             if(text.size() > 0 && alpha) {
                 specData[0] = i;   // pv type
                 text =  treatMacro(map, text, &doNothing);
-                if(i!=7) addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
+                if((i!=7) && (i!=8)) addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
                 if(i==0) widget->setPV_Data(pv);
                 if(i==1) widget->setPV_Width(pv);
                 if(i==2) widget->setPV_Height(pv);
@@ -686,9 +695,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
                 if(i==4) widget->setPV_BPP(pv);
                 if(i==5) widget->setMinLevel(pv);
                 if(i==6) widget->setMaxLevel(pv);
-                if(i==7) widget->setDataProcChannels(pvs);
+                if(i==7) widget->setROIChannelsRead(pvs1);
+                if(i==8) widget->setROIChannelsWrite(pvs2);
                 if(i>0) tooltip.append("<br>");
-                if(i<=6) tooltip.append(pv); else tooltip.append(pvs);
+                if(i<=6) tooltip.append(pv);
+                else if(i==7) tooltip.append(pvs1);
+                else if(i==8) tooltip.append(pvs2);
             } else if (i==3) {  // code missing (assume 1 for Helge)
                 widget->setCode(1);
             } else if (i==4) {  // bpp missing (assume 3 for Helge)
@@ -2789,7 +2801,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 widget->showImage(data.edata.dataSize, (char*) data.edata.dataB);
                 datamutex->unlock();
             }
-
+            widget->setAccessW(data.edata.accessW);
         } else {
             // todo
         }
@@ -3068,7 +3080,6 @@ void CaQtDM_Lib::Callback_SliderValueChanged(double value)
    float rdata = (float) value;
 
    caSlider *numeric = qobject_cast<caSlider *>(sender());
-   //qDebug() << "would write to slider" << numeric->getPV() << value;
    if(!numeric->getAccessW()) return;
    if(numeric->getPV().length() > 0) {
        TreatOrdinaryValue(numeric->getPV(), rdata, idata,  (QWidget*) numeric);
@@ -3696,16 +3707,34 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         if(ErasePV.trimmed().length() > 0) pv[nbPV++] = ErasePV.trimmed();
     } else if(caCamera* widget = qobject_cast<caCamera *>(w)) {
         nbPV=0;
-        for(int i=0; i< 5; i++) {
+        for(int i=0; i< 6; i++) {
             QString text;
             if(i==0) text = widget->getPV_Data();
             if(i==1) text = widget->getPV_Width();
             if(i==2) text = widget->getPV_Height();
             if(i==3) text = widget->getPV_Code();
             if(i==4) text = widget->getPV_BPP();
-            if(text.size() > 0) {
+            if(i<5 && text.size() > 0) {
                 pv[nbPV] = text;
                 nbPV++;
+            } else if(i==5) {
+                for(int j=0; j<2; j++) {
+                    QStringList thisString;
+                    if(j==0) thisString = widget->getROIChannelsRead().split(";");
+                    if(j==1) thisString = widget->getROIChannelsWrite().split(";");
+
+                    if(thisString.count() == 4 &&
+                            thisString.at(0).trimmed().length() > 0 &&
+                            thisString.at(1).trimmed().length() > 0 &&
+                            thisString.at(2).trimmed().length() > 0 &&
+                            thisString.at(3).trimmed().length() > 0) {
+                        for(int k=0; k<4; k++) {
+                            text = thisString.at(k);
+                            pv[nbPV] = text;
+                            nbPV++;
+                        }
+                    }
+                }
             }
         }
     } else if(caCalc* widget = qobject_cast<caCalc *>(w)) {
@@ -4923,6 +4952,56 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 
 }
 
+// used for region of interest write to variables
+void CaQtDM_Lib::mouseReleaseEvent(QMouseEvent *event)
+{
+    if(event->button() == Qt::LeftButton) {
+        QWidget *w = static_cast<QWidget*>(childAt(event->pos()));
+        if (!w) return;
+        if (caCamera *widget = qobject_cast<caCamera *>(w->parent()->parent()->parent())) {
+            int x,y,w,h;
+
+                enum ROI_type {upperleftxy_width_height=0, upperleftxy_lowerleftxy, centerxy_width_height};
+
+            if(widget->getROI(x, y, w, h)) {
+                int values[4];
+                values[0] = x;
+                values[1] = y;
+
+                // we seem to want center, width and height
+                if(widget->getROIwriteType() == caCamera::centerxy_width_height) {
+                    values[0] = x+w/2;
+                    values[1] = y+h/2;
+                    values[2]=w;
+                    values[3]=h;
+                } else if(widget->getROIwriteType() == caCamera::upperleftxy_lowerleftxy){
+                    values[2]=x+w;
+                    values[3]=y+h;
+                } else {
+                    values[2]=w;
+                    values[3]=h;
+                }
+                // write to pv when defined
+                QStringList thisString = widget->getROIChannelsWrite().split(";");
+
+                if(thisString.count() == 4 &&
+                        thisString.at(0).trimmed().length() > 0 &&
+                        thisString.at(1).trimmed().length() > 0 &&
+                        thisString.at(2).trimmed().length() > 0 &&
+                        thisString.at(3).trimmed().length() > 0) {
+
+                    if(!widget->getAccessW()) return;
+                    for(int i=0; i<4; i++) {
+                        int32_t idata = (int32_t) values[i];
+                        float rdata = (float) values[i];
+                        TreatOrdinaryValue(thisString.at(i), rdata,  idata, (QWidget*) widget);
+                    }
+                }
+            }
+        }
+    }
+}
+
 // initiate drag, one will be able to drop to another Qt-application
 void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
 {
@@ -4978,7 +5057,7 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
         mimeData->setText(widget->getPV());
     } else if (caToggleButton *widget = qobject_cast<caToggleButton *>(w)) {
         mimeData->setText(widget->getPV());
-    } else if (caCamera *widget = qobject_cast<caCamera *>(w->parent())) {
+    } else if (caCamera *widget = qobject_cast<caCamera *>(w->parent()->parent()->parent())) {
         mimeData->setText(widget->getPV_Data());
     } else if (caMessageButton *widget = qobject_cast<caMessageButton *>(w)) {
         mimeData->setText(widget->getPV());

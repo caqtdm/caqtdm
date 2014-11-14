@@ -59,13 +59,15 @@ bool caTextEntry::eventFilter(QObject *obj, QEvent *event)
 {
     // repeat enter or return key are not really wanted
     QKeyEvent *ev = static_cast<QKeyEvent *>(event);
-    if( ev->key()==Qt::Key_Return || ev->key()==Qt::Key_Enter ) {
-        if(ev->isAutoRepeat() ) {
-            //printf("keyPressEvent ignore\n");
-            event->ignore();
-        } else {
-            //printf("keyPressEvent accept\n");
-            event->accept();
+    if(ev != (QKeyEvent *) 0) {
+        if( ev->key()==Qt::Key_Return || ev->key()==Qt::Key_Enter ) {
+            if(ev->isAutoRepeat() ) {
+                //printf("keyPressEvent ignore\n");
+                event->ignore();
+            } else {
+                //printf("keyPressEvent accept\n");
+                event->accept();
+            }
         }
     }
 

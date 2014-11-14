@@ -39,8 +39,10 @@ class ImageWidget : public QWidget
 public:
     ImageWidget(QWidget *parent = 0);
     ~ImageWidget(){}
-    void updateImage(bool fitToSize, const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor);
+    void updateImage(bool fitToSize, const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor,
+                     bool selectionStarted, QRect selectionRect);
     QImage scaleImage(const QImage &image, const double &scaleFactor, bool const &FitToSize);
+    void getImageDimensions(int &width, int &height);
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -59,6 +61,11 @@ private:
     QWidget *imageW;
     bool drawValues[4];
     int geoValues[4];
+
+    bool selectionStarted;
+    QRect selectionRect;
+
+
 };
 
 #endif

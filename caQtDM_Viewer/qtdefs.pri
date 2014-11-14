@@ -22,6 +22,10 @@ DEFINES += NETWORKDOWNLOADSUPPORT
 # adl2ui will not expand label width per default, when required, then use the option expandtext
 # dialogs have been modified for better display on ios
 # cacalc has now a scalable font
+# region of interest selection with write to channels for cacamera
+# autorepeat for caslider and canumeric
+# epics data monitor changed to DBR_STS with correct initialisation when defining channels and on ioc reboot
+# protected cawaterfall plot agains to fast update
 
 # 3.8.4
 # more changes for ios

@@ -44,10 +44,15 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     savedWidth = 0;
     savedHeight = 0;
     frameCount = 0;
+    selectionStarted=false;
 
     savedData = (char*) 0;
 
     image = (QImage *) 0;
+
+    labelMin = (QLineEdit *) 0;
+    labelMax = (QLineEdit *) 0;
+    intensity = (caLabel *) 0;
 
     Xpos = Ypos = 0;
 
@@ -62,6 +67,10 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     setup();
 
     buttonPressed = false;
+    ROIdetected = false;
+    thisROItype = centerxy_width_height;
+
+    setAccessW(true);
     installEventFilter(this);
 
     scaleFactor = 1.0;
@@ -107,6 +116,45 @@ void caCamera::timerEvent(QTimerEvent *)
     UpdatesPerSecond = 0;
 }
 
+bool caCamera::getROI(int &x, int &y, int &w, int &h)
+{
+    x = ROIx;
+    y = ROIy;
+    w = ROIw;
+    h = ROIh;
+
+    // rectangle always from upper left corner
+    if(ROIw < 0) {
+        x = ROIx + ROIw;
+        w = -ROIw;
+    }
+    if(ROIh < 0) {
+        y = ROIy + ROIh;
+        h = -ROIh;
+    }
+
+    return ROIdetected;
+}
+
+void caCamera::Coordinates(int posX, int posY, double &newX, double &newY, double &maxX, double &maxY)
+{
+    // calculate true x, y values and limits of picture
+    int width, height;
+    imageW->getImageDimensions(width, height);
+    double Xcorr = (double) width / (double) savedWidth;
+    double Ycorr = (double) height / (double) savedHeight;
+
+    double Correction = qMin(Xcorr, Ycorr); // aspect ratio
+    if(scaleFactor < 1.0) Correction =  scaleFactor;
+
+    maxX = width / Correction;
+    maxY = height / Correction;
+    maxX = qMin(savedWidth,  (int) maxX);
+    maxY = qMin(savedHeight,  (int) maxY);
+    newX = (posX  + scrollArea->horizontalScrollBar()->value()) / Correction;
+    newY = (posY  + scrollArea->verticalScrollBar()->value()) / Correction;
+}
+
 bool caCamera::eventFilter(QObject *obj, QEvent *event)
 {
     Q_UNUSED(obj);
@@ -115,18 +163,48 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
         QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
         if(mouseEvent->button() == Qt::LeftButton) {
             buttonPressed = true;
+            ROIdetected = false;
             Xpos = mouseEvent->pos().x();
             Ypos = mouseEvent->pos().y();
             Ypos = Ypos - valuesWidget->height();
 
             QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+
+            selectionStarted=true;
+            QPoint mouseOffset = mouseEvent->pos() ;
+            mouseOffset.setY(mouseOffset.y() - valuesWidget->height() + scrollArea->verticalScrollBar()->value());
+            mouseOffset.setX(mouseOffset.x() + scrollArea->horizontalScrollBar()->value());
+
+            selectionRect.setTopLeft(mouseOffset);
+            selectionRect.setBottomRight(mouseOffset);
         }
     }
     if (event->type() == QEvent::MouseButtonRelease) {
+        double Xnew1, Ynew1, Xnew2, Ynew2, Xmax, Ymax;
         QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
         if(mouseEvent->button() == Qt::LeftButton) {
             buttonPressed = false;
             QApplication::restoreOverrideCursor();
+
+            if(selectionStarted) {
+                selectionStarted=false;
+                if(qAbs(selectionRect.width()) > 5 &&  qAbs(selectionRect.height()) > 5) {
+                    int x1, y1, x2, y2;
+                    selectionRect.getCoords(&x1, &y1, &x2, &y2);
+                    x1 = x1 - scrollArea->horizontalScrollBar()->value();
+                    y1 = y1 - scrollArea->verticalScrollBar()->value();
+                    x2 = x2 - scrollArea->horizontalScrollBar()->value();
+                    y2 = y2 - scrollArea->verticalScrollBar()->value();
+                    selectionRect.setCoords(x1, y1, x2, y2);
+                    Coordinates( selectionRect.x(), selectionRect.y(),  Xnew1, Ynew1, Xmax, Ymax);
+                    Coordinates( selectionRect.x() + selectionRect.width(), selectionRect.y() + selectionRect.height(),  Xnew2, Ynew2, Xmax, Ymax);
+                    ROIx = (int) Xnew1;
+                    ROIy = (int) Ynew1;
+                    ROIw = (int) (Xnew2 - Xnew1);
+                    ROIh = (int) (Ynew2 - Ynew1);
+                    ROIdetected = true;
+                }
+            }
         }
     }
     if (event->type() == QEvent::MouseMove) {
@@ -134,32 +212,19 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
         Xpos = mouseEvent->pos().x();
         Ypos = mouseEvent->pos().y();
         Ypos = Ypos - valuesWidget->height();
+
+        QPoint mouseOffset = mouseEvent->pos() ;
+        mouseOffset.setY(mouseOffset.y() - valuesWidget->height() + scrollArea->verticalScrollBar()->value());
+        mouseOffset.setX(mouseOffset.x() + scrollArea->horizontalScrollBar()->value());
+
+        selectionRect.setBottomRight(mouseOffset);
     }
 
     if(buttonPressed && (savedData != (char*) 0)) {
-        Xnew=Xpos;
-        Ynew=Ypos;
+        double Xnew, Ynew, Xmax, Ymax;
         validIntensity = true;
 
-        // calculate true x, y values and limits of picture
-        double Xcorr = (double) imageW->width() / (double) savedWidth;
-        double Ycorr = (double) imageW->height() / (double) savedHeight;
-
-        double Correction = qMin(Xcorr, Ycorr); // aspect ratio
-        if(scaleFactor < 1.0) Correction =  scaleFactor;
-
-        double Xmax = imageW->width() / Correction;
-        double Ymax = imageW->height() / Correction;
-        Xmax = qMin(savedWidth,  (int) Xmax);
-        Ymax = qMin(savedHeight,  (int) Ymax);
-
-        if(thisFitToSize) {
-            Xnew =(int)  (Xpos / Correction);
-            Ynew =(int)  (Ypos / Correction);
-        } else {
-            Xnew =(int) ((Xnew  + scrollArea->horizontalScrollBar()->value()) / Correction);
-            Ynew =(int) ((Ynew  + scrollArea->verticalScrollBar()->value()) / Correction);
-        }
+        Coordinates(Xpos, Ypos, Xnew, Ynew, Xmax, Ymax);
 
         // find intensity
         switch (m_code) {
@@ -171,7 +236,7 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
 
             case 1:  {  // monochrome 1 bpp  (Damir camera)
                 uchar *ptr = (uchar*)  savedData;
-                int index = Ynew * savedWidth + Xnew;
+                int index = (int) ((int) Ynew * savedWidth + (int) Xnew);
                 if((Xnew >=0) && (Ynew >=0)  && (Xnew < Xmax) && (Ynew < Ymax) && (index < savedSize)) {
                     Zvalue=ptr[index];
 
@@ -183,7 +248,7 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
 
             case 2: {   // monochrome 2 bpp  (Damir camera)
                 uchar *ptr = (uchar*)  savedData;
-                int index = Ynew * savedWidth * 2 + 2 * Xnew;
+                int index = (int) ((int) Ynew * savedWidth * 2 + 2 * (int) Xnew);
                 if((Xnew >=0) && (Ynew >=0)  &&  (Xnew < Xmax) && (Ynew < Ymax) && (index < savedSize)) {
                     if(thisColormap != spectrum) Zvalue=ptr[index];
                     else Zvalue=ptr[index] * 256 + ptr[index+1];
@@ -199,7 +264,7 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
                 resultSize.setWidth((int) savedWidth);
                 resultSize.setHeight((int) savedHeight);
                 ushort *ptr = (ushort*) savedData;
-                int index = Ynew * savedWidth + Xnew;
+                int index = (int) ((int) Ynew * savedWidth + (int) Xnew);
                 if((Xnew >=0) && (Ynew >=0) &&  (Xnew < Xmax) && (Ynew < Ymax) && ((index+resultSize.width())*2 < savedSize))
                     Zvalue = ptr[index];
                 else
@@ -225,7 +290,7 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
                 resultSize.setWidth((int) savedWidth);
                 resultSize.setHeight((int) savedHeight);
                 uchar *ptr = (uchar*) savedData;
-                int index = Ynew * savedWidth*3 + 3*Xnew;
+                int index = (int) ((int) Ynew * savedWidth*3 + 3 * (int) Xnew);
                 if((Xnew >=0) && (Ynew >=0) &&  (Xnew < Xmax) && (Ynew < Ymax) && ((index+2) < savedSize)) {
                     if(thisColormap != grey)
                         Zvalue =(int) (2.2 * ( 0.2989 * ptr[index] +  0.5870 * ptr[index+1] + 0.1140 * ptr[index+2]));
@@ -251,7 +316,7 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
 
         QString strng = "%1, %2, %3";
         if(validIntensity) {
-            strng = strng.arg(Xnew).arg(Ynew).arg(Zvalue);
+            strng = strng.arg((int) Xnew).arg((int) Ynew).arg(Zvalue);
             updateIntensity(strng);
         } else {
             updateIntensity("invalid");
@@ -536,7 +601,7 @@ void caCamera::resizeEvent(QResizeEvent *e)
 
 void caCamera::updateImage(const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor)
 {
-    imageW->updateImage(thisFitToSize, image, valuesPresent, values, scaleFactor);
+    imageW->updateImage(thisFitToSize, image, valuesPresent, values, scaleFactor, selectionStarted, selectionRect);
 }
 
 bool caCamera::getAutomateChecked()
@@ -895,4 +960,7 @@ uint caCamera::rgbFromWaveLength(double wave)
     return qRgb(int(r * 255), int(g * 255), int(b * 255));
 }
 
-
+void caCamera::setAccessW(int access)
+{
+    _AccessW = access;
+}
