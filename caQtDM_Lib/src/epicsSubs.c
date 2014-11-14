@@ -67,6 +67,7 @@ typedef struct _connectInfo {
     int event;
     pv_string pv;    // channel name
     chid ch;         // read channel
+    evid evID;       // epics event id
 } connectInfo;
 
 char* myLimitedString (char * strng) {
@@ -158,6 +159,7 @@ static void access_rights_handler(struct access_rights_handler_args args)
 /**
  * initiate data acquisition
  */
+
 static void dataCallback(struct event_handler_args args)
 {
     knobData kData;
@@ -185,16 +187,12 @@ static void dataCallback(struct event_handler_args args)
         {
             int dataSize;
             char* ptr;
-            struct dbr_ctrl_char *stsF = (struct dbr_ctrl_char *) args.dbr;
+            struct dbr_sts_char *stsF = (struct dbr_sts_char *) args.dbr;
             dbr_char_t *val_ptr = dbr_value_ptr(args.dbr, DBR_CTRL_CHAR);
 
             PRINT(printf("dataCallback char %s %d %d <%s> status=%d count=%d nBytes=%d\n", ca_name(args.chid), (int) args.chid,
                          info->index, ca_host_name(args.chid),
                          stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
-
-            AssignEpicsValue((double) 0.0, (long) 0, args.count);
-            kData.edata.precision = 0;
-            kData.edata.units[0] = '\0';
 
             dataSize = dbr_size_n(args.type, args.count) + sizeof(char);
             if(dataSize != kData.edata.dataSize) {
@@ -223,9 +221,6 @@ static void dataCallback(struct event_handler_args args)
                          stsF->value, info->index, ca_host_name(args.chid),
                          stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
 
-            AssignEpicsValue((double) 0.0, (long) 0, args.count);
-            kData.edata.precision = 0;
-            kData.edata.units[0] = '\0';
 
             // concatenate strings separated with ';'
             dataSize = dbr_size_n(args.type, args.count) + (args.count+1) * sizeof(char);
@@ -251,18 +246,185 @@ static void dataCallback(struct event_handler_args args)
 
         case DBF_ENUM:
         {
+            struct dbr_sts_enum *stsF = (struct dbr_sts_enum *) args.dbr;
+            PRINT(printf("dataCallback enum  %s %d <%d> %d <%s> status=%d count=%d size=%d\n", ca_name(args.chid), (int) args.chid,
+                         stsF->value, info->index, ca_host_name(args.chid),
+                         stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
+
+            AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
+
+            C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
+        }
+        break;
+
+        case DBF_INT:
+        {
+            struct dbr_sts_int *stsF = (struct dbr_sts_int *) args.dbr;
+
+            PRINT(printf("dataCallback int values %s %d %d %d <%s> status=%d count=%d size=%d\n", ca_name(args.chid), (int) args.chid,
+                         stsF->value, info->index, ca_host_name(args.chid),
+                         stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
+
+
+            AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
+
+            if(args.count > 1) {
+                if((int) (args.count * sizeof(int16_t)) != kData.edata.dataSize) {
+                    free(kData.edata.dataB);
+                    kData.edata.dataB = (void*) malloc(args.count * sizeof(int16_t));
+                    kData.edata.dataSize = args.count * sizeof(int16_t);
+                }
+                memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(int16_t));
+            }
+
+            C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
+        }
+        break;
+
+        case DBF_LONG:
+        {
+            struct dbr_sts_long *stsF = (struct dbr_sts_long *) args.dbr;
+
+            PRINT(printf("dataCallback long values %s %d %lx %d <%s> status=%d count=%d size=%d\n", ca_name(args.chid), (int) args.chid,
+                         stsF->value, info->index, ca_host_name(args.chid),
+                         stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
+
+
+            AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
+
+
+            if(args.count > 1) {
+                if((int) (args.count * sizeof(int32_t)) != kData.edata.dataSize) {
+                    free(kData.edata.dataB);
+                    kData.edata.dataB = (void*) malloc(args.count * sizeof(int32_t));
+                    kData.edata.dataSize = args.count * sizeof(int32_t);
+                }
+                memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(int32_t));
+            }
+
+            C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
+        }
+        break;
+
+        case DBF_FLOAT:
+        {
+            struct dbr_sts_float *stsF = (struct dbr_sts_float *) args.dbr;
+
+            PRINT(printf("dataCallback float values %s %d %f %d <%s> status=%d count=%d size=%d\n", ca_name(args.chid), (int) args.chid,
+                         stsF->value, info->index, ca_host_name(args.chid),
+                         stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
+
+            AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
+
+            if(args.count > 1) {
+                if((int) (args.count * sizeof(float)) != kData.edata.dataSize) {
+                    free(kData.edata.dataB);
+                    kData.edata.dataB = (void*) malloc(args.count * sizeof(float));
+                    kData.edata.dataSize = args.count * sizeof(float);
+                }
+                memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(float));
+            }
+            C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
+        }
+        break;
+
+        case DBF_DOUBLE:
+        {
+            struct dbr_sts_double *stsF = (struct dbr_sts_double *) args.dbr;
+
+            PRINT(printf("dataCallback double values %s %d %f %d <%s> status=%d count=%d size=%d\n", ca_name(args.chid), (int) args.chid,
+                         stsF->value, info->index, ca_host_name(args.chid),
+                         stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
+
+
+            AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
+
+            if(args.count > 1) {
+                if((int) (args.count * sizeof(double)) != kData.edata.dataSize) {
+                    free(kData.edata.dataB);
+                    kData.edata.dataB = (void*) malloc(args.count * sizeof(double));
+                    memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(double));
+                    kData.edata.dataSize = args.count * sizeof(double);
+                }
+                memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(double));
+            }
+            C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
+
+        }
+        break;
+
+        } // end switch
+
+        C_DataUnlock(KnobDataPtr, &kData);
+        info->event++;
+    }
+}
+
+static void displayCallback(struct event_handler_args args) {
+    knobData kData;
+    struct timeb now;
+    int status;
+
+    connectInfo *info = (connectInfo *) ca_puser(args.chid);
+    if(info == (connectInfo *) 0) return;
+
+    C_GetMutexKnobData(KnobDataPtr, info->index, &kData);
+    if(kData.index == -1) return;
+
+    if (args.status != ECA_NORMAL) {
+        PRINT(printf("displayCallback:\n""  get: %s for %s\n", ca_name(args.chid), ca_message_text[CA_EXTRACT_MSG_NO(args.status)]));
+    } else {
+        kData.edata.initialize = true;
+        kData.edata.monitorCount = kData.edata.displayCount = info->event;
+        kData.edata.connected = info->connected;
+        kData.edata.fieldtype = ca_field_type(args.chid);
+        ftime(&now);
+
+        C_DataLock(KnobDataPtr, &kData);
+
+        switch (ca_field_type(args.chid)) {
+
+        case DBF_CHAR:
+        {
+            struct dbr_ctrl_char *stsF = (struct dbr_ctrl_char *) args.dbr;
+
+            PRINT(printf("displayCallback char %s %d %d <%s> status=%d count=%d nBytes=%d\n", ca_name(args.chid), (int) args.chid,
+                         info->index, ca_host_name(args.chid),
+                         stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
+
+            AssignEpicsValue((double) 0.0, (long) 0, args.count);
+            kData.edata.precision = 0;
+            kData.edata.units[0] = '\0';
+        }
+        break;
+
+        case DBF_STRING:
+        {
+            struct dbr_sts_string *stsF = (struct dbr_sts_string *) args.dbr;
+
+            PRINT(printf("displayCallback string %s %d <%s> %d <%s> status=%d count=%d nBytes=%d\n", ca_name(args.chid), (int) args.chid,
+                         stsF->value, info->index, ca_host_name(args.chid),
+                         stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
+
+            AssignEpicsValue((double) 0.0, (long) 0, args.count);
+            kData.edata.precision = 0;
+            kData.edata.units[0] = '\0';
+        }
+        break;
+
+        case DBF_ENUM:
+        {
             int dataSize, len;
             int i;
             char *ptr;
             struct dbr_ctrl_enum *stsF = (struct dbr_ctrl_enum *) args.dbr;
-            PRINT(printf("dataCallback enum  %s %d <%d> %d <%s> status=%d count=%d enum no_str=%d size=%d\n", ca_name(args.chid), (int) args.chid,
+            PRINT(printf("displayCallback enum  %s %d <%d> %d <%s> status=%d count=%d enum no_str=%d size=%d\n", ca_name(args.chid), (int) args.chid,
                          stsF->value, info->index, ca_host_name(args.chid),
                          stsF->status, (int) args.count, stsF->no_str, dbr_size_n(args.type, args.count)));
 
             AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
             kData.edata.precision = 0;
             kData.edata.units[0] = '\0';
-
             kData.edata.enumCount = stsF->no_str;
 
             if(stsF->no_str>0) {
@@ -296,7 +458,6 @@ static void dataCallback(struct event_handler_args args)
                 ptr[0] = '\0';
                 sprintf(ptr, "%d", stsF->value);
             }
-            C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
         }
         break;
 
@@ -304,26 +465,13 @@ static void dataCallback(struct event_handler_args args)
         {
             struct dbr_ctrl_int *stsF = (struct dbr_ctrl_int *) args.dbr;
 
-            PRINT(printf("dataCallback int values %s %d %d <%s> %d <%s> status=%d count=%d size=%d\n", ca_name(args.chid), (int) args.chid,
+            PRINT(printf("displayCallback int values %s %d %d <%s> %d <%s> status=%d count=%d size=%d\n", ca_name(args.chid), (int) args.chid,
                          stsF->value, stsF->units, info->index, ca_host_name(args.chid),
                          stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
 
-            if(info->event == 1) {
-                AssignEpicsData;
-            }
+            AssignEpicsData;
             AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
             kData.edata.precision = 0;
-
-            if(args.count > 1) {
-                if((int) (args.count * sizeof(int16_t)) != kData.edata.dataSize) {
-                    free(kData.edata.dataB);
-                    kData.edata.dataB = (void*) malloc(args.count * sizeof(int16_t));
-                    kData.edata.dataSize = args.count * sizeof(int16_t);
-                }
-                memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(int16_t));
-            }
-
-            C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
         }
         break;
 
@@ -331,27 +479,13 @@ static void dataCallback(struct event_handler_args args)
         {
             struct dbr_ctrl_long *stsF = (struct dbr_ctrl_long *) args.dbr;
 
-            PRINT(printf("dataCallback long values %s %d %lx <%s> %d <%s> status=%d count=%d size=%d\n", ca_name(args.chid), (int) args.chid,
+            PRINT(printf("displayCallback long values %s %d %lx <%s> %d <%s> status=%d count=%d size=%d\n", ca_name(args.chid), (int) args.chid,
                          stsF->value, stsF->units, info->index, ca_host_name(args.chid),
                          stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
 
-
-            if(info->event == 1) {
-                AssignEpicsData;
-            }
+            AssignEpicsData;
             AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
             kData.edata.precision = 0;
-
-            if(args.count > 1) {
-                if((int) (args.count * sizeof(int32_t)) != kData.edata.dataSize) {
-                    free(kData.edata.dataB);
-                    kData.edata.dataB = (void*) malloc(args.count * sizeof(int32_t));
-                    kData.edata.dataSize = args.count * sizeof(int32_t);
-                }
-                memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(int32_t));
-            }
-
-            C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
         }
         break;
 
@@ -359,25 +493,13 @@ static void dataCallback(struct event_handler_args args)
         {
             struct dbr_ctrl_float *stsF = (struct dbr_ctrl_float *) args.dbr;
 
-            PRINT(printf("dataCallback float values %s %d %f <%s> %d <%s> status=%d count=%d size=%d\n", ca_name(args.chid), (int) args.chid,
+            PRINT(printf("displayCallback float values %s %d %f <%s> %d <%s> status=%d count=%d size=%d\n", ca_name(args.chid), (int) args.chid,
                          stsF->value, stsF->units, info->index, ca_host_name(args.chid),
                          stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
 
-            if(info->event == 1) {
-                kData.edata.precision = stsF->precision;
-                AssignEpicsData;
-            }
+            AssignEpicsData;
             AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
-
-            if(args.count > 1) {
-                if((int) (args.count * sizeof(float)) != kData.edata.dataSize) {
-                    free(kData.edata.dataB);
-                    kData.edata.dataB = (void*) malloc(args.count * sizeof(float));
-                    kData.edata.dataSize = args.count * sizeof(float);
-                }
-                memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(float));
-            }
-            C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
+            kData.edata.precision = stsF->precision;
         }
         break;
 
@@ -385,36 +507,35 @@ static void dataCallback(struct event_handler_args args)
         {
             struct dbr_ctrl_double *stsF = (struct dbr_ctrl_double *) args.dbr;
 
-            PRINT(printf("dataCallback double values %s %d %f <%s> %d <%s> status=%d count=%d size=%d\n", ca_name(args.chid), (int) args.chid,
+            PRINT(printf("displayCallback double values %s %d %f <%s> %d <%s> status=%d count=%d size=%d\n", ca_name(args.chid), (int) args.chid,
                          stsF->value, stsF->units, info->index, ca_host_name(args.chid),
                          stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
 
-            if(info->event == 1) {
-                kData.edata.precision = stsF->precision;
-                AssignEpicsData;
-            }
+            AssignEpicsData;
             AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
-
-            if(args.count > 1) {
-                if((int) (args.count * sizeof(double)) != kData.edata.dataSize) {
-                    free(kData.edata.dataB);
-                    kData.edata.dataB = (void*) malloc(args.count * sizeof(double));
-                    memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(double));
-                    kData.edata.dataSize = args.count * sizeof(double);
-                }
-                memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(double));
-            }
-            C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
-
+            kData.edata.precision = stsF->precision;
         }
         break;
 
         } // end switch
 
+        // when specifying zero as number of requested elements, we will get variable length arrays (zero lenght is then also considered)
+        // probably will not work with older channel access gateways
+        PRINT(printf("ca_add_array_event for %s with chid=%d\n", ca_name(args.chid), args.chid));
+        status = ca_add_array_event(dbf_type_to_DBR_STS(ca_field_type(args.chid)), 0, //ca_element_count(args.chid),
+                                     args.chid, dataCallback, info, 0.0,0.0,0.0, &info->evID);
+
+        if (status != ECA_NORMAL) {
+            PRINT(printf("ca_add_array_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+        }
+
+        C_SetMutexKnobData(KnobDataPtr, kData.index, kData);
+
         C_DataUnlock(KnobDataPtr, &kData);
         info->event++;
     }
 }
+
 
 /**
  * epics connect callback
@@ -434,22 +555,24 @@ void connectCallback(struct connection_handler_args args)
         info->connected = false;
         break;
     case cs_prev_conn:
-        PRINT(printf("%d, %s has just disconnected\n", args.chid, ca_name(args.chid)));
+        PRINT(printf("%s with channel %d has just disconnected, evid=%d\n", ca_name(args.chid), args.chid, info->evID));
         info->connected = false;
+        info->event = 0;
+        status = ca_clear_event(info->evID);
+        if (status != ECA_NORMAL) {
+            PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+        }
         break;
     case cs_conn:
         PRINT(printf("%s has just connected with channel id=%d count=%d native type=%s\n", ca_name(args.chid), (int) args.chid, ca_element_count(args.chid), dbf_type_to_text(ca_field_type(args.chid))));
         info->connected = true;
         if (info->event == 0) {
             info->event++;
-            // when specifying zero as number of requested elements, we will get variable length arrays (zero lenght is then also considered)
-            // probably will not work with older channel access gateways
-            status = ca_add_array_event( dbf_type_to_DBR_CTRL(ca_field_type(args.chid)), 0, //ca_element_count(args.chid),
-                                         args.chid, dataCallback, info, 0.0,0.0,0.0, NULL);
-
+            status = ca_array_get_callback(dbf_type_to_DBR_CTRL(ca_field_type(args.chid)), 1, args.chid, displayCallback, NULL);
             if (status != ECA_NORMAL) {
-                PRINT(printf("ca_add_array_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+                PRINT(printf("ca_array_get_callback:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
             }
+
             /* install access rights monitor */
             status = ca_replace_access_rights_event(args.chid, access_rights_handler);
             if (status != ECA_NORMAL) {
@@ -470,7 +593,6 @@ void connectCallback(struct connection_handler_args args)
 
     // update knobdata connection
     C_SetMutexKnobDataConnected(KnobDataPtr, info->index, info->connected);
-
 }
 
 /**
@@ -557,6 +679,9 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
     }
 
     status = ca_pend_io(CA_TIMEOUT);
+    if(status != ECA_NORMAL) {
+        printf("ca_pend_io:\n"" %s for %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], kData->pv);
+    }
 
     //printf("channel created for button=%d <%s> chid=%d\n", index, kData->pv, tmp->ch);
 
@@ -767,6 +892,11 @@ void TerminateDeviceIO()
     ca_flush_io();
     ca_context_destroy();
     ca_task_exit();
+}
+
+void EpicsFlushIO()
+{
+    ca_flush_io();
 }
 
 /**

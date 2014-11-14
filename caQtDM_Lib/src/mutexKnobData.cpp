@@ -350,7 +350,6 @@ void MutexKnobData::SetMutexKnobDataReceived(knobData *kData) {
     struct timeb now;
     QMutexLocker locker(&mutex);
     int index = kData->index;
-    //memcpy(&KnobData[index], kData, sizeof(knobData)); // we do not need this
     memcpy(&KnobData[index].edata, &kData->edata, sizeof(epicsData));
 
     /*****************************************************************************************/
