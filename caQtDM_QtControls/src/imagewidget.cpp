@@ -41,6 +41,12 @@ ImageWidget::ImageWidget(QWidget *parent) : QWidget(parent)
     }
 }
 
+void ImageWidget::getImageDimensions(int &width, int &height)
+{
+    width = imageNew.size().width();
+    height = imageNew.size().height();
+}
+
 void ImageWidget::paintEvent(QPaintEvent * event)
 {
     Q_UNUSED(event);
@@ -54,8 +60,12 @@ void ImageWidget::paintEvent(QPaintEvent * event)
 
     painter.drawImage(imageOffset,imageNew);
 
-       painter.setPen(Qt::red);
-       painter.drawRoundedRect(0,0,this->rect().width()-1, this->rect().height()-1, 10.0, 10.0);
+    painter.setPen(Qt::red);
+
+    int width = imageNew.size().width();
+    int height = imageNew.size().height();
+
+    painter.drawRoundedRect(0,0,width-1, height-1, 10.0, 10.0);
 
     for(int i=0; i<2; i++) {
         if(i==0) painter.setPen( QPen( Qt::white )); else painter.setPen( QPen( Qt::black ));
@@ -76,6 +86,12 @@ void ImageWidget::paintEvent(QPaintEvent * event)
             else painter.drawRect(geoValues[0] -geoValues[2]/2 - 1, geoValues[1]-geoValues[3]/2 - 1, geoValues[2] + 2, geoValues[3] + 2);
         }
     }
+
+    if(selectionStarted) {
+      painter.setPen(QPen(QBrush(QColor(0,0,0,180)),1,Qt::DashLine));
+      painter.setBrush(QBrush(QColor(255,255,255,120)));
+      painter.drawRect(selectionRect);
+    }
 }
 
 void ImageWidget::resizeEvent(QResizeEvent *e)
@@ -86,13 +102,16 @@ void ImageWidget::resizeEvent(QResizeEvent *e)
 QImage ImageWidget::scaleImage(const QImage &image, const double &scaleFactor, const bool &FitToSize) {
     if(FitToSize) {
         return image.scaled(this->size(), Qt::KeepAspectRatio, Qt::FastTransformation);
-     } else {
+    } else {
         return image.scaled(image.size() * scaleFactor, Qt::KeepAspectRatio, Qt::FastTransformation);
     }
 }
 
-void ImageWidget::updateImage(bool FitToSize, const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor)
+void ImageWidget::updateImage(bool FitToSize, const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor,
+                              bool selectStarted, QRect selectRect)
 {
+    selectionRect = selectRect;
+    selectionStarted = selectStarted;
     // in case of fit to parent widget, we calculate concurrently if possible
     if((FitToSize) || (qAbs(scaleFactor-1) > 0.01)) {
 #ifndef QT_NO_CONCURRENT
@@ -101,13 +120,25 @@ void ImageWidget::updateImage(bool FitToSize, const QImage &image, bool valuesPr
 #else
         imageNew = scaleImage(image, scalefactor, FitToSize);
 #endif
-    // no scaling, just take the pointer
+        // no scaling, just take the pointer
     } else {
         imageNew = image;
     }
     for(int i=0; i<4; i++) {
         drawValues[i] = valuesPresent[i];
-        if(drawValues[i]) geoValues[i] = values[i];
+        if(drawValues[i]) {
+            if(!FitToSize) {
+               geoValues[i] = values[i] * scaleFactor;
+            } else {
+                double factorX = (double) this->size().width() / (double) image.size().width();
+                double factorY = (double) this->size().height() /(double) image.size().height();
+                double factor = qMin(factorX, factorY);
+                //printf("(%d,%d) (%d,%d)  (%f,%f)\n", this->size().width(), this->size().height(),
+                //                                     image.size().width(), image.size().height(),
+                //                                    factorX, factorY);
+               geoValues[i] = values[i] * factor;
+            }
+        }
         else geoValues[i] = 0;
     }
     update();
