@@ -3036,7 +3036,7 @@ void CaQtDM_Lib::getStatesToggleAndLed(QWidget *widget, const knobData &data, co
 void CaQtDM_Lib::Callback_EApplyNumeric(double value)
 {
     int32_t idata = (int32_t) value;
-    float rdata = (float) value;
+    double rdata = value;
 
     caApplyNumeric *numeric = qobject_cast<caApplyNumeric *>(sender());
     if(!numeric->getAccessW()) return;
@@ -3050,7 +3050,7 @@ void CaQtDM_Lib::Callback_EApplyNumeric(double value)
 void CaQtDM_Lib::Callback_ENumeric(double value)
 {
     int32_t idata = (int32_t) value;
-    float rdata = (float) value;
+    double rdata = value;
 
     caNumeric *numeric = qobject_cast<caNumeric *>(sender());
     if(!numeric->getAccessW()) return;
@@ -3065,7 +3065,7 @@ void CaQtDM_Lib::Callback_ENumeric(double value)
 void CaQtDM_Lib::Callback_Spinbox(double value)
 {
     int32_t idata = (int32_t) value;
-    float rdata = (float) value;
+    double rdata = value;
 
     caSpinbox *numeric = qobject_cast<caSpinbox *>(sender());
     if(!numeric->getAccessW()) return;
@@ -3077,7 +3077,7 @@ void CaQtDM_Lib::Callback_Spinbox(double value)
 void CaQtDM_Lib::Callback_SliderValueChanged(double value)
 {
    int32_t idata = (int32_t) value;
-   float rdata = (float) value;
+   double rdata = value;
 
    caSlider *numeric = qobject_cast<caSlider *>(sender());
    if(!numeric->getAccessW()) return;
