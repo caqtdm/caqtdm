@@ -141,6 +141,8 @@ private:
     float  pointSizePrv;
     int timerID;
     int direction;
+    bool isMoving;
+    bool isScrolling;
 };
 
 #endif

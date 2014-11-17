@@ -56,6 +56,8 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
     pointSizePrv = 0.0;
     direction = 0;
     timerID = 0;
+    isMoving = false;
+    isScrolling = false;
 
     setScalePosition(NoScale);
     setSpacing(0);
@@ -308,7 +310,6 @@ void caSlider::keyPressEvent(QKeyEvent *e) {
     } else {
         e->ignore();
     }
-
 }
 
 void caSlider::keyReleaseEvent(QKeyEvent *e) {
@@ -329,7 +330,7 @@ void caSlider::mousePressEvent(QMouseEvent *e)
         return;
     }
     else {
-        // I have to do the work myself due to the snapping
+        // I have to do the work myself due to the unwanted snapping
 #if QWT_VERSION >= 0x060100
         const int markerPos = transform( value() );
         double step = thisIncrement;
@@ -340,6 +341,7 @@ void caSlider::mousePressEvent(QMouseEvent *e)
         } else {
             if ( p.y() > markerPos ) direction = -1;
         }
+        if(isScrollPosition(e->pos())) isScrolling = true;
         setValue(value() + step * direction);
         e->ignore();
         timerID = startTimer(200);
@@ -356,6 +358,8 @@ void caSlider::mousePressEvent(QMouseEvent *e)
 
 void caSlider::mouseReleaseEvent( QMouseEvent *e )
 {
+    isMoving = false;
+    isScrolling = false;
     if( e->button() == Qt::LeftButton) {
 #if QWT_VERSION < 0x060100
         stopMoving();
@@ -364,7 +368,6 @@ void caSlider::mouseReleaseEvent( QMouseEvent *e )
         QwtSlider::mouseReleaseEvent(e);
 #endif
     }
-
     if(timerID != 0) {
         killTimer(timerID);
         timerID = 0;
@@ -373,6 +376,7 @@ void caSlider::mouseReleaseEvent( QMouseEvent *e )
 
 void caSlider::timerEvent( QTimerEvent *e )
 {
+    if(isMoving) return;
 #if QWT_VERSION >= 0x060100
     double step = thisIncrement;
     setValue(value() + step * direction);
@@ -383,10 +387,16 @@ void caSlider::timerEvent( QTimerEvent *e )
 
 void caSlider::mouseMoveEvent( QMouseEvent *e )
 {
+    isMoving = true;
 #if QWT_VERSION >= 0x060100
-    double val = scrolledTo( e->pos() );
-    val = qBound( minimum(), val, maximum());
-    Q_EMIT valueChanged( val );
+    const QPoint p = e->pos();
+    if(isScrolling) {
+        double val = scrolledTo(e->pos());
+        val = qBound( minimum(), val, maximum());
+        Q_EMIT sliderMoved( val );
+        Q_EMIT valueChanged( val );
+        printf("emit %d %f\n", e->pos().y(), val);
+    }
     e->ignore();
 #else
     QwtAbstractSlider::ScrollMode scrollMode;
@@ -394,7 +404,7 @@ void caSlider::mouseMoveEvent( QMouseEvent *e )
     const QPoint &p = e->pos();
     getScrollMode(p,  scrollMode, direction);
     if(scrollMode == QwtAbstractSlider::ScrMouse) setPosition( e->pos());
-     e->ignore();
+    e->ignore();
 #endif
 }
 
