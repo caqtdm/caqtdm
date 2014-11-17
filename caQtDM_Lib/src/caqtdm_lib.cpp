@@ -3320,14 +3320,7 @@ void CaQtDM_Lib::Callback_TableDoubleClicked(const QString& pv)
 void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
 {
     QString separator((QChar)27);
-/*
-#ifndef linux
-    proc = new QProcess( this);
-    proc->setWorkingDirectory(".");
-    proc->setProcessChannelMode(QProcess::MergedChannels);
-    QObject::connect( proc, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
-#endif
-*/
+
     caShellCommand *choice = qobject_cast<caShellCommand *>(sender());
 
     QStringList commands = choice->getFiles().split(";");
@@ -3384,10 +3377,7 @@ void CaQtDM_Lib::shellCommand(QString command) {
 #ifndef linux
     if(command.endsWith("&")) command.remove(command.size()-1, 1);
     //qDebug() << "execute:" << command;
-    proc = new QProcess( this);
-    proc->setWorkingDirectory(".");
-    proc->setProcessChannelMode(QProcess::MergedChannels);
-    QObject::connect( proc, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
+    proc = new myQProcess( this);
     proc->start(command.trimmed(), QIODevice::ReadWrite);
 #else
     // I had too many problems with QProcess start, use standard execl
@@ -3400,33 +3390,6 @@ void CaQtDM_Lib::shellCommand(QString command) {
 #endif
 }
 
-void CaQtDM_Lib::processError(QProcess::ProcessError err)
-{
-    switch(err)
-    {
-    case QProcess::FailedToStart:
-        QMessageBox::information(0,"FailedToStart","FailedToStart");
-        break;
-    case QProcess::Crashed:
-        QMessageBox::information(0,"Crashed","Crashed");
-        break;
-    case QProcess::Timedout:
-        QMessageBox::information(0,"FailedToStart","FailedToStart");
-        break;
-    case QProcess::WriteError:
-        QMessageBox::information(0,"Timedout","Timedout");
-        break;
-    case QProcess::ReadError:
-        QMessageBox::information(0,"ReadError","ReadError");
-        break;
-    case QProcess::UnknownError:
-        QMessageBox::information(0,"UnknownError","UnknownError");
-        break;
-    default:
-        QMessageBox::information(0,"default","default");
-        break;
-    }
-}
 
 void CaQtDM_Lib::closeWindow()
 {

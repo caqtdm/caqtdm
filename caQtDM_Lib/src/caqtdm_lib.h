@@ -57,6 +57,7 @@
 
 #include <QUiLoader>
 
+#include "myQProcess.h"
 #include "mutexKnobData.h"
 #include "mutexKnobDataWrapper.h"
 #include "MessageWindow.h"
@@ -206,7 +207,7 @@ private:
     QString savedMacro[50];
     QString savedFile[50];
 
-    QProcess *proc;
+    myQProcess *proc;
     QMap<QString, QString> createMap(const QString&);
 
     QByteArray byteArray;
@@ -237,7 +238,6 @@ private:
 
 private slots:
 
-    void processError(QProcess::ProcessError err);
     void Callback_EApplyNumeric(double value);
     void Callback_ENumeric(double value);
     void Callback_Spinbox(double value);
