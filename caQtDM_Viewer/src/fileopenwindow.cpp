@@ -213,7 +213,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         mustOpenFile = true;
     }
 
-    setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowMinMaxButtonsHint);
+    setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint);
 
     // start a timer
     startTimer(1000);
@@ -912,7 +912,7 @@ void FileOpenWindow::Callback_ActionUnconnected()
     }
     pvWindow = new QMainWindow();
     pvWindow->setWindowTitle(QString::fromUtf8("unconnected PV's"));
-    pvWindow->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowMinMaxButtonsHint);
+    pvWindow->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
 
     QVBoxLayout *l = new QVBoxLayout();
 
@@ -1145,7 +1145,6 @@ void FileOpenWindow::shellCommand(QString command) {
     proc->setProcessChannelMode(QProcess::MergedChannels);
     QObject::connect( proc, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
     proc->start(command.trimmed(), QIODevice::ReadWrite);
-
 }
 
 void FileOpenWindow::processError(QProcess::ProcessError err)
@@ -1174,4 +1173,11 @@ void FileOpenWindow::processError(QProcess::ProcessError err)
         QMessageBox::information(0,"default","default");
         break;
     }
+}
+void FileOpenWindow::closeEvent(QCloseEvent* ce)
+{
+    Q_UNUSED(ce);
+    fromIOS = false;
+    Callback_ActionExit();
+    ce->ignore();
 }

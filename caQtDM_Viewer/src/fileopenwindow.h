@@ -98,6 +98,8 @@ signals:
    void messageAvailable(QString message);
 
  private:
+
+     void closeEvent(QCloseEvent* ce);
      QMainWindow *lastWindow;
      QString lastMacro, lastFile, lastGeometry;
      Ui::MainWindow ui;

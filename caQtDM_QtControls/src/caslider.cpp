@@ -342,14 +342,20 @@ void caSlider::mousePressEvent(QMouseEvent *e)
             if ( p.y() > markerPos ) direction = -1;
         }
         if(isScrollPosition(e->pos())) isScrolling = true;
-        setValue(value() + step * direction);
+
+        thisValue = thisValue + double(direction) * step;
+        Q_EMIT sliderMoved( thisValue );
+        Q_EMIT valueChanged( thisValue );
+
         e->ignore();
         timerID = startTimer(200);
 #else
         QwtAbstractSlider::ScrollMode scrollMode;
         const QPoint &p = e->pos();
         getScrollMode(p,  scrollMode, direction);
-        QwtDoubleRange::setValue(value() + double(direction) * step());
+        thisValue = thisValue + double(direction) * step();
+        Q_EMIT sliderMoved( thisValue );
+        Q_EMIT valueChanged( thisValue );
         e->ignore();
         timerID = startTimer(200);
 #endif
@@ -376,12 +382,17 @@ void caSlider::mouseReleaseEvent( QMouseEvent *e )
 
 void caSlider::timerEvent( QTimerEvent *e )
 {
+    Q_UNUSED(e);
     if(isMoving) return;
 #if QWT_VERSION >= 0x060100
     double step = thisIncrement;
-    setValue(value() + step * direction);
+    thisValue = thisValue + double(direction) * step;
+    Q_EMIT sliderMoved( thisValue );
+    Q_EMIT valueChanged( thisValue );
 #else
-    QwtDoubleRange::setValue(value() + double(direction) * step());
+    thisValue = thisValue + double(direction) * step();
+    Q_EMIT sliderMoved( thisValue );
+    Q_EMIT valueChanged( thisValue );
 #endif
 }
 
@@ -395,7 +406,6 @@ void caSlider::mouseMoveEvent( QMouseEvent *e )
         val = qBound( minimum(), val, maximum());
         Q_EMIT sliderMoved( val );
         Q_EMIT valueChanged( val );
-        printf("emit %d %f\n", e->pos().y(), val);
     }
     e->ignore();
 #else
