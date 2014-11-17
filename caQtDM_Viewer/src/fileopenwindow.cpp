@@ -1140,40 +1140,10 @@ void FileOpenWindow::parse_and_set_Geometry(QMainWindow *widget, QString parsest
 void FileOpenWindow::shellCommand(QString command) {
     command = command.trimmed();
 
-    QProcess *proc = new QProcess( this);
-    proc->setWorkingDirectory(".");
-    proc->setProcessChannelMode(QProcess::MergedChannels);
-    QObject::connect( proc, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
+    myQProcess *proc = new myQProcess( this);
     proc->start(command.trimmed(), QIODevice::ReadWrite);
 }
 
-void FileOpenWindow::processError(QProcess::ProcessError err)
-{
-    switch(err)
-    {
-    case QProcess::FailedToStart:
-        QMessageBox::information(0,"FailedToStart","FailedToStart");
-        break;
-    case QProcess::Crashed:
-        QMessageBox::information(0,"Crashed","Crashed");
-        break;
-    case QProcess::Timedout:
-        QMessageBox::information(0,"FailedToStart","FailedToStart");
-        break;
-    case QProcess::WriteError:
-        QMessageBox::information(0,"Timedout","Timedout");
-        break;
-    case QProcess::ReadError:
-        QMessageBox::information(0,"ReadError","ReadError");
-        break;
-    case QProcess::UnknownError:
-        QMessageBox::information(0,"UnknownError","UnknownError");
-        break;
-    default:
-        QMessageBox::information(0,"default","default");
-        break;
-    }
-}
 void FileOpenWindow::closeEvent(QCloseEvent* ce)
 {
     Q_UNUSED(ce);

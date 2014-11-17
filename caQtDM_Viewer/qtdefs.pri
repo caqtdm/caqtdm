@@ -19,6 +19,7 @@ DEFINES += NETWORKDOWNLOADSUPPORT
 }
 
 # 3.8.5
+# drvh, drvl changed back to hopr, lopr for caslider and canumeric
 # adl2ui will not expand label width per default, when required, then use the option expandtext
 # dialogs have been modified for better display on ios
 # cacalc has now a scalable font

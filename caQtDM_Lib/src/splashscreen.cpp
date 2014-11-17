@@ -44,7 +44,7 @@ SplashScreen::SplashScreen(QWidget *parent) : QSplashScreen(parent), m_progress(
     setWindowFlags(flags);
 
     m_maximum = 100;
-    pixmap.load(":caQtDM.png");
+    pixmap.load(":caQtDM-logos.png");
     this->resize(pixmap.size().width()+200, pixmap.size().height()+100);
 
     // in order to have a pseudo-transparent image, I load the background
@@ -58,7 +58,7 @@ SplashScreen::SplashScreen(QWidget *parent) : QSplashScreen(parent), m_progress(
     // and merge the two pixmaps
     QPainter p;
     p.begin(&desktopBackground);
-    QPixmap scaledPixmap = pixmap.scaled(pixmap.size().width()+200,  pixmap.size().height());
+    QPixmap scaledPixmap = pixmap.scaled(pixmap.size().width()+200,  pixmap.size().height()+200);
     p.drawPixmap(0, 0, scaledPixmap);
 
     p.setPen(QPen(QColor(200,200,200), 2));

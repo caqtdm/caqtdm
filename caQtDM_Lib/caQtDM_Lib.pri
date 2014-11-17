@@ -55,7 +55,8 @@ SOURCES += caqtdm_lib.cpp \
     limitsCartesianplotDialog.cpp \
     sliderDialog.cpp \
     processWindow.cpp \
-    splashscreen.cpp
+    splashscreen.cpp \
+    myQProcess.cpp
 
 
 HEADERS += caqtdm_lib.h\
@@ -77,7 +78,8 @@ HEADERS += caqtdm_lib.h\
     sliderDialog.h \
     processWindow.h \
     splashscreen.h \
-    epicsExternals.h
+    epicsExternals.h \
+    myQProcess.h
 
 
 HEADERS += \

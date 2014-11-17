@@ -42,7 +42,7 @@ QTDMMessageBox::QTDMMessageBox (Icon icon,
     QPixmap pixmap = QPixmap(":/caQtDM.png");
     QPixmap scaledPixmap = pixmap.scaledToWidth(100);
     setIconPixmap(scaledPixmap);
-    timeout = 15;
+    timeout = 10;
     _autoClose = autoClose;
     if (_autoClose) {
         currentTime = 0;

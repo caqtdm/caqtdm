@@ -40,7 +40,7 @@
 #include <QTableWidget>
 #include <QScrollBar>
 #include <QFile>
-#include <QProcess>
+#include "myQProcess.h"
 #include "MessageWindow.h"
 #include "dbrString.h"
 #include "knobDefines.h"
@@ -83,7 +83,6 @@
      void Callback_OpenNewFile(const QString&, const QString&, const QString&);
      void checkForMessage();
      void Callback_PVwindowExit();
-     void processError(QProcess::ProcessError err);
 
  public slots:
      void doSomething() { printf("About to quit!\n"); sharedMemory.detach();}
