@@ -330,6 +330,10 @@ void caSlider::mousePressEvent(QMouseEvent *e)
         return;
     }
     else {
+        if(!thisAccessW) {
+            e->ignore();
+            return;
+        }
         // I have to do the work myself due to the unwanted snapping
 #if QWT_VERSION >= 0x060100
         const int markerPos = transform( value() );
@@ -384,6 +388,7 @@ void caSlider::timerEvent( QTimerEvent *e )
 {
     Q_UNUSED(e);
     if(isMoving) return;
+    if(!thisAccessW) return;
 #if QWT_VERSION >= 0x060100
     double step = thisIncrement;
     thisValue = thisValue + double(direction) * step;
@@ -399,6 +404,10 @@ void caSlider::timerEvent( QTimerEvent *e )
 void caSlider::mouseMoveEvent( QMouseEvent *e )
 {
     isMoving = true;
+    if(!thisAccessW) {
+        e->ignore();
+        return;
+    }
 #if QWT_VERSION >= 0x060100
     const QPoint p = e->pos();
     if(isScrolling) {
