@@ -26,11 +26,12 @@
 #ifndef MYQPROCESS_H
 #define MYQPROCESS_H
 
+#include "caQtDM_Lib_global.h"
 #include <QObject>
 #include <QProcess>
 #include <QIODevice>
 
-class myQProcess : public QObject
+class CAQTDM_LIBSHARED_EXPORT myQProcess : public QObject
 {
     Q_OBJECT
 public:
@@ -52,6 +53,6 @@ private:
 private Q_SLOTS:
     void error(QProcess::ProcessError error);
     void finished(int exitCode, QProcess::ExitStatus status);
-}; 
+};
 
 #endif
