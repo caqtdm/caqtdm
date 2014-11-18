@@ -39,8 +39,8 @@ QTDMMessageBox::QTDMMessageBox (Icon icon,
     : QMessageBox (icon,title,text,buttons, parent,f)
 
 {
-    QPixmap pixmap = QPixmap(":/caQtDM.png");
-    QPixmap scaledPixmap = pixmap.scaledToWidth(100);
+    QPixmap pixmap = QPixmap(":/caQtDM-logospsi.png");
+    QPixmap scaledPixmap = pixmap.scaledToWidth(150);
     setIconPixmap(scaledPixmap);
     timeout = 10;
     _autoClose = autoClose;
