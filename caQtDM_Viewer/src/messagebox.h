@@ -36,6 +36,7 @@ public:
 QTDMMessageBox ( Icon icon,
              const QString & title,
              const QString & text,
+             const QString & iconString,
              StandardButtons buttons = NoButton,
              QWidget * parent = 0,
              Qt::WindowFlags f = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint,

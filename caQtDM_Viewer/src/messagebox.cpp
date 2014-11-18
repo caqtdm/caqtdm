@@ -31,6 +31,7 @@
 QTDMMessageBox::QTDMMessageBox (Icon icon,
                         const QString & title,
                         const QString & text,
+                        const QString & iconString,
                         StandardButtons buttons,
                         QWidget * parent,
                         Qt::WindowFlags f,
@@ -39,7 +40,7 @@ QTDMMessageBox::QTDMMessageBox (Icon icon,
     : QMessageBox (icon,title,text,buttons, parent,f)
 
 {
-    QPixmap pixmap = QPixmap(":/caQtDM-logospsi.png");
+    QPixmap pixmap = QPixmap(iconString);
     QPixmap scaledPixmap = pixmap.scaledToWidth(150);
     setIconPixmap(scaledPixmap);
     timeout = 10;

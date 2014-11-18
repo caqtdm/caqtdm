@@ -527,7 +527,7 @@ void FileOpenWindow::Callback_OpenButton()
             activWindow=0;
 
         } else {
-            QTDMMessageBox(QMessageBox::Warning, "file open error", "does not exist", QMessageBox::Close, this, Qt::Popup, true);
+            QTDMMessageBox(QMessageBox::Warning, "file open error", "does not exist", ":/caQtDM-logos.png", QMessageBox::Close, this, Qt::Popup, true);
         }
     }
 }
@@ -648,7 +648,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     if(fileNameFound.isNull()) {
         QString message = QString(FileName);
         message.append(" does not exist");
-        QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "file open error", message, QMessageBox::Close, this, Qt::Dialog, true);
+        QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "file open error", message, ":/caQtDM-logos.png", QMessageBox::Close, this, Qt::Dialog, true);
         m->show();
         //qDebug() << "sorry -- file" << FileName << "does not exist";
     } else {
@@ -716,7 +716,7 @@ void FileOpenWindow::Callback_ActionAbout()
 {
     QString message = QString("Qt-based Epics Display Manager Version %1 using Qt %2 and %3 with data from %4 developed at Paul Scherrer Institut, by Anton Mezger\n");
     message = message.arg(BUILDVERSION, QT_VERSION_STR, BUILDARCH, SUPPORT);
-    QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Information, "About", message, QMessageBox::Close, this, Qt::Dialog, true);
+    QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Information, "About", message, ":/caQtDM-logospsi.png", QMessageBox::Close, this, Qt::Dialog, true);
     m->show();
 }
 
@@ -745,7 +745,7 @@ void FileOpenWindow::Callback_ActionExit()
     // launch window close
     if(!fromIOS) {
         QString message = QString("Are you sure to want to exit?");
-        QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "Exit", message, QMessageBox::Yes | QMessageBox::No, this, Qt::Dialog, false);
+        QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "Exit", message, ":/caQtDM-logos.png", QMessageBox::Yes | QMessageBox::No, this, Qt::Dialog, false);
         m->show();
         selected = m->exec();
     // normal close

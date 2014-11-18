@@ -17,6 +17,9 @@ ios{
 NETWORKDOWNLOADSUPPORT {
 DEFINES += NETWORKDOWNLOADSUPPORT
 }
+# 3.8.6
+# drvh, drvl changed back to hopr, lopr for caslider and canumeric
+# slider will not move when no write access
 
 # 3.8.5
 # drvh, drvl changed back to hopr, lopr for caslider and canumeric
