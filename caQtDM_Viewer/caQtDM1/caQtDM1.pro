@@ -6,12 +6,12 @@ TEMPLATE = app
 # static build
 ios {
    CONFIG += staticlib
-   LIBS += ../../caQtDM_Binaries/libcaQtDM_Lib.a
-   LIBS += ../../caQtDM_Binaries/libqtcontrols.a
+   LIBS += ../$(CAQTDM_COLLECT)/libcaQtDM_Lib.a
+   LIBS += ../$(CAQTDM_COLLECT)/libqtcontrols.a
    LIBS += $$(QWTHOME)/lib/libqwt.a
-   LIBS += ../../caQtDM_Binaries/libqtcontrols_controllers_plugin.a
-   LIBS += ../../caQtDM_Binaries/libqtcontrols_monitors_plugin.a
-   LIBS += ../../caQtDM_Binaries/libqtcontrols_graphics_plugin.a
+   LIBS += ../$(CAQTDM_COLLECT)/libqtcontrols_controllers_plugin.a
+   LIBS += ../$(CAQTDM_COLLECT)/libqtcontrols_monitors_plugin.a
+   LIBS += ../$(CAQTDM_COLLECT)/libqtcontrols_graphics_plugin.a
    LIBS += $$(EPICSLIB)/libca.a
    LIBS += $$(EPICSLIB)/libCom.a
    QMAKE_INFO_PLIST = ../src/IOS/Info.plist
@@ -40,9 +40,6 @@ ios {
    APP-FONTS.files = ../../caQtDM_Viewer/lucida-sans-typewriter.ttf
    APP-FONTS.path = fonts
    QMAKE_BUNDLE_DATA += APP-FONTS
-   QMAKE_POST_LINK += cp -R ../caQtDM.app ../../caQtDM_Binaries/ &&
-   QMAKE_POST_LINK += cp ../../caQtDM_Binaries/libcaQtDM_Lib.dylib ../../caQtDM_Binaries/caQtDM.app/Contents/Frameworks &&
-   QMAKE_POST_LINK += cp ../../caQtDM_Binaries/libqtcontrols.dylib ../../caQtDM_Binaries/caQtDM.app/Contents/Frameworks
   }
 }
 
@@ -54,7 +51,7 @@ DEFINES += SUPPORT=\\\"EPICS\\\"
 MOC_DIR = ../moc
 VPATH += ../src
 INCLUDEPATH += ../src
-DESTDIR = ../
+DESTDIR = ../$(CAQTDM_COLLECT)
 UI_DIR += ../src
 
 INCLUDEPATH += $(QWTINCLUDE)

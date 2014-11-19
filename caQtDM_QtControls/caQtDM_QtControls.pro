@@ -16,15 +16,16 @@ CONFIG += warn_on
 TARGET = qtcontrols
 TEMPLATE = lib
 OBJECTS_DIR = obj
-DESTDIR = .
+DESTDIR = $(CAQTDM_COLLECT)
 MOC_DIR = moc
 INCLUDEPATH += src
 RESOURCES = qtcontrols.qrc
 
 ios {
    CONFIG += staticlib
-   QMAKE_POST_LINK = cp libqtcontrols.a ../caQtDM_Binaries/
+
    INCLUDEPATH += $(QWTINCLUDE)
+
 }
 
 !ios {
@@ -33,13 +34,13 @@ ios {
   }
 
   unix:!macx {
-    QMAKE_POST_LINK = cp libqtcontrols.so $(QTBASE)
+
     LIBS += -L$(QWTLIB) -Wl,-rpath,$(QWTLIB) -lqwt
   }
 
   macx: {
     CONFIG += lib_bundle
-    QMAKE_POST_LINK = cp libqtcontrols.dylib $(QTBASE)
+
     LIBS += -F$(QWTLIB) -framework qwt
   }
 }
@@ -48,22 +49,23 @@ win32 {
     win32-g++ {
       INCLUDEPATH = $(QWTHOME)/src
       LIBS += $(QWTLIB)/libqwt.a
-      QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\qtcontrols.dll ..\caQtDM_Binaries
+      Q
      }
      win32-msvc* {
         DEFINES += QTCON_MAKEDLL _CRT_SECURE_NO_WARNINGS
         DebugBuild {
                 OBJECTS_DIR = debug/obj
+                DESTDIR = $(CAQTDM_COLLECT)/debug
                 INCLUDEPATH += $$(QWTHOME)/include
                 LIBS += $$(QWTHOME)/lib/qwtd.lib
         }
 
         ReleaseBuild {
+                DESTDIR = $(CAQTDM_COLLECT)
                 OBJECTS_DIR = release/obj
                 INCLUDEPATH += $$(QWTHOME)/include
                 LIBS += $$(QWTHOME)/lib/qwt.lib
-                QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\qtcontrols.dll ..\caQtDM_Binaries
-        }
+         }
      }
 }
 

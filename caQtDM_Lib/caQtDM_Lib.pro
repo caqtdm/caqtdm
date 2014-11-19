@@ -16,7 +16,7 @@ win32 {
         
         DebugBuild {
                 EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
-                DESTDIR = debug
+                DESTDIR = $(CAQTDM_COLLECT)/debug
                 OBJECTS_DIR = debug/obj
                 LIBS += $$(QWTHOME)/lib/qwtd.lib
                 LIBS += $${EPICS_LIBS}/ca.lib
@@ -25,7 +25,7 @@ win32 {
         }
         ReleaseBuild {
                 EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
-                DESTDIR = release
+                DESTDIR = $(CAQTDM_COLLECT)
                 OBJECTS_DIR = release/obj
                 LIBS += $$(QWTHOME)/lib/qwt.lib
                 LIBS += $${EPICS_LIBS}/ca.lib
