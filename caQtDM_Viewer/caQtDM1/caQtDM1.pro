@@ -9,9 +9,9 @@ ios {
    LIBS += ../$(CAQTDM_COLLECT)/libcaQtDM_Lib.a
    LIBS += ../$(CAQTDM_COLLECT)/libqtcontrols.a
    LIBS += $$(QWTHOME)/lib/libqwt.a
-   LIBS += ../$(CAQTDM_COLLECT)/libqtcontrols_controllers_plugin.a
-   LIBS += ../$(CAQTDM_COLLECT)/libqtcontrols_monitors_plugin.a
-   LIBS += ../$(CAQTDM_COLLECT)/libqtcontrols_graphics_plugin.a
+   LIBS += ../$(CAQTDM_COLLECT)/designer/libqtcontrols_controllers_plugin.a
+   LIBS += ../$(CAQTDM_COLLECT)/designer/libqtcontrols_monitors_plugin.a
+   LIBS += ../$(CAQTDM_COLLECT)/designer/libqtcontrols_graphics_plugin.a
    LIBS += $$(EPICSLIB)/libca.a
    LIBS += $$(EPICSLIB)/libCom.a
    QMAKE_INFO_PLIST = ../src/IOS/Info.plist

@@ -24,12 +24,10 @@ ios {
   OBJECTS_DIR = obj
 }
 
-DebugBuild {
-   DESTDIR = ../$(CAQTDM_COLLECT)/debug/designer
-}
-ReleaseBuild {
-   DESTDIR = ../$(CAQTDM_COLLECT)/designer
-}
+debug: DESTDIR = ../$(CAQTDM_COLLECT)/debug/designer
+
+release: DESTDIR = ../$(CAQTDM_COLLECT)/designer
+
 win32 {
      INCLUDEPATH += $$(QWTHOME)/src
      
