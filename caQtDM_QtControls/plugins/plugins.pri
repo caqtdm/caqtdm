@@ -1,7 +1,5 @@
 include(../../caQtDM_Viewer/qtdefs.pri)
 
-DEFINES += QT_NO_DEBUG_OUTPUT
-CONFIG += release
 
 contains(QT_VER_MAJ, 4) {
    CONFIG += designer plugin qt thread warn_on
@@ -24,9 +22,11 @@ ios {
   OBJECTS_DIR = obj
 }
 
-debug: DESTDIR = ../$(CAQTDM_COLLECT)/debug/designer
-
-release: DESTDIR = ../$(CAQTDM_COLLECT)/designer
+CONFIG(debug, debug|release) {
+	DESTDIR = ../$(CAQTDM_COLLECT)/debug/designer
+}else{
+	DESTDIR = ../$(CAQTDM_COLLECT)/designer
+}
 
 win32 {
      INCLUDEPATH += $$(QWTHOME)/src
