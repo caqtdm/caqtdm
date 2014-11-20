@@ -8,7 +8,7 @@
   IF "%EPICSINCLUDE%"==""    set EPICSINCLUDE=X:/epics/base-3.14.12.4/include
   IF "%EPICSEXTENSIONS%"=="" set EPICSEXTENSIONS=X:/Qt/4.8.5
   IF "%QTCONTROLS_LIBS%"=="" set QTCONTROLS_LIBS=X:/Qt/caqtdm_project/caQtDM_QtControls
-  
+  IF "%CAQTDM_COLLECT%"==""  set CAQTDM_COLLECT=../caQtDM_Binaries
   set QTBASE=%QTCONTROLS_LIBS%
   
   
@@ -31,6 +31,7 @@ echo EPICSINCLUDE         now defined as %EPICSINCLUDE%		for locating epics incl
 echo EPICSLIB             now defined as %EPICSLIB%		for locating epics libraries
 echo QTBASE               now defined as %QTBASE%		for building the package locally, pointing to caQtDM_Binaries
 echo QTDM_RPATH           now defined as %QTDM_RPATH%		for runtime search path 
+echo CAQTDM_COLLECT       now defined as %CAQTDM_COLLECT%	for target path compile 
 echo.
 echo for install:
 echo.

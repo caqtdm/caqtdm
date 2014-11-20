@@ -21,7 +21,7 @@ win32 {
                 LIBS += $$(QWTHOME)/lib/qwtd.lib
                 LIBS += $${EPICS_LIBS}/ca.lib
                 LIBS += $${EPICS_LIBS}/COM.lib
-                LIBS += $$(QTCONTROLS_LIBS)/debug/qtcontrols.lib
+                LIBS += $(CAQTDM_COLLECT)/debug/qtcontrols.lib
         }
         ReleaseBuild {
                 EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
@@ -30,8 +30,8 @@ win32 {
                 LIBS += $$(QWTHOME)/lib/qwt.lib
                 LIBS += $${EPICS_LIBS}/ca.lib
                 LIBS += $${EPICS_LIBS}/COM.lib
-                LIBS += $$(QTCONTROLS_LIBS)/release/qtcontrols.lib
-                QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\caQtDM_Lib.dll ..\caQtDM_Binaries
+                LIBS += $(CAQTDM_COLLECT)/qtcontrols.lib
+                
         }
    }
    win32-g++ {

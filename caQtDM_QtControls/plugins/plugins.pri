@@ -17,13 +17,19 @@ TEMPLATE = lib
 ios {
   CONFIG += static
   LIBS += $$(QWTHOME)/lib/qwt.a
-  LIBS += ../../caQtDM_Binaries/libqtcontrols.a
+  LIBS += ../$(CAQTDM_COLLECT)/libqtcontrols.a
   INCLUDEPATH += $(QWTINCLUDE)
   INCLUDEPATH += $$(QWTHOME)/src
   MOC_DIR = moc
   OBJECTS_DIR = obj
 }
 
+DebugBuild {
+   DESTDIR = ../$(CAQTDM_COLLECT)/debug/designer
+}
+ReleaseBuild {
+   DESTDIR = ../$(CAQTDM_COLLECT)/designer
+}
 win32 {
      INCLUDEPATH += $$(QWTHOME)/src
      
@@ -35,13 +41,13 @@ win32 {
 	     DebugBuild {
                      INCLUDEPATH += $(QWTINCLUDE)
 		     LIBS += $$(QWTHOME)/lib/qwtd.lib
-		     LIBS += $$(QTCONTROLS_LIBS)/debug/qtcontrols.lib
+		     LIBS += ../$(CAQTDM_COLLECT)/debug/qtcontrols.lib
 	     }
 
 	     ReleaseBuild {
                      INCLUDEPATH += $(QWTINCLUDE)
 		     LIBS += $$(QWTHOME)/lib/qwt.lib
-		     LIBS += $$(QTCONTROLS_LIBS)/release/qtcontrols.lib
+		     LIBS += ../$(CAQTDM_COLLECT)/qtcontrols.lib
 	     }
      }  
 }
@@ -63,7 +69,7 @@ win32 {
       QMAKE_LFLAGS_PLUGIN -= -dynamiclib
       QMAKE_LFLAGS_PLUGIN += -bundle
       LIBS += -F$(QWTLIB) -framework qwt
-      LIBS += -L $(QTBASE) -lqtcontrols
+      LIBS += -L $(CAQTDM_COLLECT) -lqtcontrols
       QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
    }
 }

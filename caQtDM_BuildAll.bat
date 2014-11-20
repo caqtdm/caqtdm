@@ -43,9 +43,12 @@ cd ..\..
 
 echo =========== build plugins =============
 cd caQtDM_QtControls\plugins\
-call .\winbuild_msc.bat
-
-
+qmake qtcontrols_controllers.pro
+nmake all
+qmake qtcontrols_graphics.pro
+nmake all
+qmake qtcontrols_monitors.pro
+nmake all
 cd ..
 cd ..
 
