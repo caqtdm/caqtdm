@@ -9,7 +9,7 @@ INCLUDEPATH += ../src
 
 UI_DIR += ../
 INCLUDEPATH += ../../caQtDM_QtControls/src
-DESTDIR = ../$(CAQTDM_COLLECT)
+DESTDIR = $(CAQTDM_COLLECT)
 !ios {
 
    macx: {
