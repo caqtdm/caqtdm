@@ -346,7 +346,7 @@ void caLineEdit::setValue(double value, const QString& units)
         strcat(asc, " ");
         strcat(asc, units.toAscii().constData());
     }
-
+    unitsLast = units;
     setText(asc);
     setCursorPosition(0);
 }
@@ -376,7 +376,6 @@ void caLineEdit::setAlarmColors(short status, double value, QColor bgAtInit, QCo
 
     case NO_ALARM:
         //qDebug() << "no alarm" << kPtr->pv;
-
         if(thisColorMode == Alarm_Static || thisColorMode == Alarm_Default) {
             c = AL_GREEN;
             if(thisAlarmHandling == onForeground) setForeAndBackground(c, bgAtInit, thisFrameColor);
@@ -399,7 +398,6 @@ void caLineEdit::setAlarmColors(short status, double value, QColor bgAtInit, QCo
 
     case MAJOR_ALARM:
         //qDebug() << "serious alarm" << kPtr->pv;
-
         if(thisColorMode == Alarm_Static || thisColorMode == Alarm_Default) {
             c = AL_RED;
             if(thisAlarmHandling == onForeground) setForeAndBackground(c, bgAtInit, thisFrameColor);
@@ -411,7 +409,6 @@ void caLineEdit::setAlarmColors(short status, double value, QColor bgAtInit, QCo
 
     case ALARM_INVALID:
         //qDebug() << "invalid alarm";
-
         if(thisColorMode == Alarm_Static) {
             c =AL_WHITE;
             if(thisAlarmHandling == onForeground) setForeAndBackground(c, bgAtInit, thisFrameColor);
@@ -438,6 +435,17 @@ void caLineEdit::setAlarmColors(short status, double value, QColor bgAtInit, QCo
 
         break;
     }
+
+    statusLast = status;
+    valueLast = value;
+    bgAtInitLast = bgAtInit;
+    fgAtInitLast = fgAtInit;
+}
+
+void caLineEdit::updateAlarmColors()
+{
+    setAlarmColors(statusLast, valueLast, bgAtInitLast, fgAtInitLast);
+    setValue(valueLast, unitsLast);
 }
 
 void caLineEdit::setText(const QString &txt)

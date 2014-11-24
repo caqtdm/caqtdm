@@ -141,6 +141,7 @@ public:
     void setForeAndBackground(QColor foreground, QColor background, QColor frame);
     void forceForeAndBackground(QColor foreground, QColor background, QColor frame);
     void setAlarmColors(short status, double value, QColor bgAtInit, QColor fgAtInit);
+    void updateAlarmColors();
     void setColors(QColor bg, QColor fg, QColor fr, int lineWidth);
     void newFocusPolicy(Qt::FocusPolicy f);
 
@@ -185,6 +186,11 @@ private:
     alertHandling thisAlarmHandling;
     short Alarm;
 
+    short statusLast;
+    double valueLast;
+    QColor bgAtInitLast;
+    QColor fgAtInitLast;
+    QString unitsLast;
 };
 
 #endif
