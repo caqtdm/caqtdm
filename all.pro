@@ -46,6 +46,7 @@ parser.file = caQtDM_Viewer/parser/parser.pro
 
 caQtDM_Viewer.depends = caQtDM_QtControls caQtDM_Lib qtcontrols_controllers qtcontrols_graphics qtcontrols_monitors
 
+caQtDM_Lib.depends = caQtDM_QtControls 
 
 win32{
  CONFIG(debug, debug | release) 
