@@ -6,7 +6,7 @@ contains(QT_VER_MAJ, 4) {
 }
 
 contains(QT_VER_MAJ, 5) {
-   CONFIG += plugin qt thread warn_on
+   CONFIG += plugin uitools qt thread warn_on
    QT += designer widgets
 }
 
@@ -22,13 +22,13 @@ ios {
   OBJECTS_DIR = obj
 }
 
-CONFIG(debug, debug|release) {
-	DESTDIR = ../$(CAQTDM_COLLECT)/debug/designer
-}else{
-	DESTDIR = ../$(CAQTDM_COLLECT)/designer
-}
 
 win32 {
+     CONFIG(debug, debug|release) {
+	 DESTDIR = $(CAQTDM_COLLECT)/debug/designer
+     }else{
+	 DESTDIR = $(CAQTDM_COLLECT)/designer
+     }
      INCLUDEPATH += $$(QWTHOME)/src
      
      win32-g++ {
@@ -51,6 +51,7 @@ win32 {
 }
 
 !ios {
+   DESTDIR = $(CAQTDM_COLLECT)/designer
    unix {
      INCLUDEPATH += $(QWTINCLUDE)
      MOC_DIR = moc
