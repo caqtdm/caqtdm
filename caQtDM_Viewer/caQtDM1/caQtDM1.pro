@@ -47,13 +47,15 @@ unix:!macx {
    QMAKE_BUNDLE_DATA += APP-FONTS
    CONFIG += app_bundle
    ICON = ../src/caQtDM.icns
-   cplugins.path = Contents/PlugIns/designer
-   cplugins.files = $(CAQTDM_COLLECT)/designer/libqtcontrols_controllers_plugin.dylib
-   gplugins.path = Contents/Plugins/designer
-   gplugins.files = $(CAQTDM_COLLECT)/designer/libqtcontrols_graphics_plugin.dylib
-   mplugins.path = Contents/Plugins/designer
-   mplugins.files = $(CAQTDM_COLLECT)/designer/libqtcontrols_monitors_plugin.dylib
-   QMAKE_BUNDLE_DATA += cplugins gplugins mplugins
+   plugins.path = Contents/PlugIns/designer
+   plugins.files = $(CAQTDM_COLLECT)/designer/libqtcontrols_controllers_plugin.dylib
+   plugins.files += $(CAQTDM_COLLECT)/designer/libqtcontrols_graphics_plugin.dylib
+   plugins.files += $(CAQTDM_COLLECT)/designer/libqtcontrols_monitors_plugin.dylib
+   caqtdmlibs.path = Contents/Frameworks/
+   caqtdmlibs.files = $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib $(CAQTDM_COLLECT)/libqtcontrols.dylib
+   caqtdmlibs.files += $(CAQTDM_COLLECT)/libqtcontrols.dylib
+   QMAKE_BUNDLE_DATA += plugins caqtdmlibs
+
    calib.path = Contents/Frameworks
    calib.files = $$(EPICS_BASE)/lib/darwin-x86/libca.3.14.12.dylib
    comlib.path = Contents/Frameworks
