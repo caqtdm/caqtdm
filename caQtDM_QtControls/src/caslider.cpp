@@ -46,6 +46,22 @@
 #define fmin min
 #endif
 
+// I need to overload the scaleengine of qwt in order to get the upper and lower scale ticks drawn
+class myScaleEngine: public QwtLinearScaleEngine
+{
+    virtual QwtScaleDiv divideScale(double x1, double x2, int maxMajorSteps, int maxMinorSteps, double stepSize  ) const {
+        QwtScaleDiv sd = QwtLinearScaleEngine::divideScale(x1, x2, maxMajorSteps, maxMinorSteps, stepSize );
+        QList<double> ticks = sd.ticks( QwtScaleDiv::MajorTick );
+        if(ticks.count() > 0) {
+            if ( ticks.last() < sd.upperBound() || ticks.first() > sd.lowerBound()){
+                if(ticks.last() < sd.upperBound()) ticks.append(sd.upperBound());
+                if(ticks.first() > sd.lowerBound()) ticks.prepend(sd.lowerBound());
+                sd.setTicks( QwtScaleDiv::MajorTick, ticks );
+            }
+        }
+        return sd;
+    }
+};
 
 caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
 {
@@ -62,6 +78,7 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
     setScalePosition(NoScale);
     setSpacing(0);
     setBorderWidth(1);
+    setSliderValue(0.0);
 
     installEventFilter(this);
 
@@ -81,6 +98,9 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
     setAccessW(true);
 
     setFocusPolicy(Qt::ClickFocus);
+
+    QwtLinearScaleEngine *scaleEngine = new myScaleEngine();
+    setScaleEngine( scaleEngine );
 }
 
 QString caSlider::getPV() const

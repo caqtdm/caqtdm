@@ -38,6 +38,24 @@
 #define MIN_FONT_SIZE 3
 #define MAX_FONT_SIZE 20
 
+
+// I need to overload the scaleengine of qwt in order to get the upper and lower scale ticks drawn
+class myScaleEngine: public QwtLinearScaleEngine
+{
+    virtual QwtScaleDiv divideScale(double x1, double x2, int maxMajorSteps, int maxMinorSteps, double stepSize  ) const {
+        QwtScaleDiv sd = QwtLinearScaleEngine::divideScale(x1, x2, maxMajorSteps, maxMinorSteps, stepSize );
+        QList<double> ticks = sd.ticks( QwtScaleDiv::MajorTick );
+        if(ticks.count() > 0) {
+            if ( ticks.last() < sd.upperBound() || ticks.first() > sd.lowerBound()){
+                if(ticks.last() < sd.upperBound()) ticks.append(sd.upperBound());
+                if(ticks.first() > sd.lowerBound()) ticks.prepend(sd.lowerBound());
+                sd.setTicks( QwtScaleDiv::MajorTick, ticks );
+            }
+        }
+        return sd;
+    }
+};
+
 caThermo::caThermo(QWidget *parent) : QwtThermoMarker(parent), m_externalEnabled(false)
 {
 
@@ -45,6 +63,7 @@ caThermo::caThermo(QWidget *parent) : QwtThermoMarker(parent), m_externalEnabled
     defaultBackColor = QWidget::palette().background().color();
     defaultForeColor = palette().foreground().color();
     thisColorMode = Static;
+    thisLimitsMode = Channel;
 
     pointSizePrv = 0.0;
 
@@ -58,6 +77,9 @@ caThermo::caThermo(QWidget *parent) : QwtThermoMarker(parent), m_externalEnabled
 
     valPixOld = -999999;
     setLook(noLabel);
+
+    QwtLinearScaleEngine *scaleEngine = new myScaleEngine();
+    setScaleEngine( scaleEngine );
 }
 
 QString caThermo::getPV() const

@@ -36,7 +36,7 @@
    #include <qwt_thermo_marker_61.h>
 #endif
 #include <qwt_scale_draw.h>
-
+#include <qwt_scale_engine.h>
 
 class QTCON_EXPORT caThermo : public QwtThermoMarker
 {
@@ -92,7 +92,7 @@ public:
 
     enum SourceMode {Channel = 0, User};
     SourceMode getLimitsMode() const { return thisLimitsMode; }
-    void setLimitsMode(SourceMode limitsmode) { thisLimitsMode = limitsmode;}
+    void setLimitsMode(SourceMode limitsmode) {thisLimitsMode = limitsmode;}
 
     void setAlarmColors(short status);
     void setUserAlarmColors(double val);

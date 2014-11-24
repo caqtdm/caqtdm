@@ -29,6 +29,7 @@
 #include <qtcontrols_global.h>
 #include <qwt_slider.h>
 #include <qwt_scale_draw.h>
+#include <qwt_scale_engine.h>
 
 class QTCON_EXPORT caSlider : public QwtSlider
 {
