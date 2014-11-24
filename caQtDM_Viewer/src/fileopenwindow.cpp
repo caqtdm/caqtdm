@@ -714,7 +714,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
  */
 void FileOpenWindow::Callback_ActionAbout()
 {
-    QString message = QString("Qt-based Epics Display Manager Version %1 using Qt %2 and %3 with data from %4 developed at Paul Scherrer Institut, by Anton Mezger\n");
+    QString message = QString("Qt-based Epics Display Manager Version %1 using Qt %2 and %3 with data from %4 developed at Paul Scherrer Institut, by Anton Mezger\nPlattform support is supported by H.Brands\n");
     message = message.arg(BUILDVERSION, QT_VERSION_STR, BUILDARCH, SUPPORT);
     QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Information, "About", message, ":/caQtDM-logospsi.png", QMessageBox::Close, this, Qt::Dialog, true);
     m->show();
