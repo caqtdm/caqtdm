@@ -193,6 +193,7 @@ void limitsStripplotDialog::exec()
 void limitsStripplotDialog::closeEvent(QCloseEvent *event)
 {
     loop.quit();
+    deleteLater();
 }
 
 void limitsStripplotDialog::paintEvent(QPaintEvent *e)
