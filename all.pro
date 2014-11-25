@@ -48,6 +48,3 @@ caQtDM_Viewer.depends = caQtDM_QtControls caQtDM_Lib qtcontrols_controllers qtco
 
 caQtDM_Lib.depends = caQtDM_QtControls 
 
-win32{
- CONFIG(debug, debug | release) 
-}
