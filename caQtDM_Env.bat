@@ -8,7 +8,11 @@
   IF "%EPICSINCLUDE%"==""    set EPICSINCLUDE=X:/epics/base-3.14.12.4/include
   IF "%EPICSEXTENSIONS%"=="" set EPICSEXTENSIONS=X:/Qt/4.8.5
   IF "%QTCONTROLS_LIBS%"=="" set QTCONTROLS_LIBS=X:/Qt/caqtdm_project/caQtDM_QtControls
-  IF "%CAQTDM_COLLECT%"==""  set CAQTDM_COLLECT=../caQtDM_Binaries
+  IF "%CAQTDM_COLLECT%"==""  set CAQTDM_COLLECT=X:/Qt/caqtdm_project/caQtDM_Binaries
+  rem IF "%JOM%"==""             set JOM=X:\qt\jom
+  
+  
+  
   set QTBASE=%QTCONTROLS_LIBS%
   
   

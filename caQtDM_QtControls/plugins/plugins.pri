@@ -6,7 +6,7 @@ contains(QT_VER_MAJ, 4) {
 }
 
 contains(QT_VER_MAJ, 5) {
-   CONFIG += plugin qt thread warn_on
+   CONFIG += plugin uitools qt thread warn_on
    QT += designer widgets
 }
 
@@ -22,11 +22,6 @@ ios {
   OBJECTS_DIR = obj
 }
 
-CONFIG(debug, debug|release) {
-	DESTDIR = ../$(CAQTDM_COLLECT)/debug/designer
-}else{
-	DESTDIR = ../$(CAQTDM_COLLECT)/designer
-}
 
 win32 {
      INCLUDEPATH += $$(QWTHOME)/src
@@ -36,21 +31,28 @@ win32 {
 	     LIBS += $$(QTCONTROLS_LIBS)/release/libqtcontrols.a
      }
      win32-msvc* {
-	     DebugBuild {
+	     message($$CONFIG)
+	     
+	     CONFIG(DebugBuild, DebugBuild|ReleaseBuild) { 
                      INCLUDEPATH += $(QWTINCLUDE)
 		     LIBS += $$(QWTHOME)/lib/qwtd.lib
-		     LIBS += ../$(CAQTDM_COLLECT)/debug/qtcontrols.lib
+		     LIBS += $(CAQTDM_COLLECT)/debug/qtcontrols.lib
+		     DESTDIR = $(CAQTDM_COLLECT)/debug/designer
+		     
 	     }
 
-	     ReleaseBuild {
-                     INCLUDEPATH += $(QWTINCLUDE)
+	     CONFIG( ReleaseBuild, DebugBuild|ReleaseBuild) {
+	             INCLUDEPATH += $(QWTINCLUDE)
 		     LIBS += $$(QWTHOME)/lib/qwt.lib
-		     LIBS += ../$(CAQTDM_COLLECT)/qtcontrols.lib
+		     LIBS += $(CAQTDM_COLLECT)/qtcontrols.lib
+		     DESTDIR = $(CAQTDM_COLLECT)/designer
+		    
 	     }
      }  
 }
 
-!ios {
+unix:!ios {
+   DESTDIR = $(CAQTDM_COLLECT)/designer
    unix {
      INCLUDEPATH += $(QWTINCLUDE)
      MOC_DIR = moc

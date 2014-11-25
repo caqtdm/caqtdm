@@ -14,30 +14,6 @@ unix: {
   CONFIG += x11
 }
 
-
-ios: {
-  QMAKE_CFLAGS += -gdwarf-2
-  QMAKE_CXXFLAGS += -gdwarf-2
- }
-!ios {
-  macx: {
-     CONFIG += app_bundle
-     ICON = ../src/caQtDM.icns
-     cplugins.path = Contents/PlugIns/designer
-     cplugins.files = ../../caQtDM_QtControls/plugins/libqtcontrols_controllers_plugin.dylib
-     gplugins.path = Contents/Plugins/designer
-     gplugins.files = ../../caQtDM_QtControls/plugins/libqtcontrols_graphics_plugin.dylib
-     mplugins.path = Contents/Plugins/designer
-     mplugins.files = ../../caQtDM_QtControls/plugins/libqtcontrols_monitors_plugin.dylib
-     QMAKE_BUNDLE_DATA += cplugins gplugins mplugins
-     calib.path = Contents/Frameworks
-     calib.files = $$(EPICS_BASE)/lib/darwin-x86/libca.3.14.12.dylib
-     comlib.path = Contents/Frameworks
-     comlib.files = $$(EPICS_BASE)/lib/darwin-x86/libCom.3.14.12.dylib
-     QMAKE_BUNDLE_DATA += calib comlib
-  }
-}
-
 SOURCES +=\
     caQtDM.cpp \
     fileopenwindow.cpp \

@@ -1,6 +1,9 @@
 @echo off
-
+SETLOCAL ENABLEEXTENSIONS
+echo "========== Blub1 ============"
 call caQtDM_Env.bat
+
+set PATH=%PATH%;%JOM%
 
 echo.
 echo "========== create destination directory if not exists============"
@@ -33,7 +36,7 @@ pause
 
 echo ============ make all =================
 qmake all.pro
-nmake all
-
+where /q jom.exe 
+IF %ERRORLEVEL% NEQ 0 (nmake all) ELSE (jom all)
 
 pause

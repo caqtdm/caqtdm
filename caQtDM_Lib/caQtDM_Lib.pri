@@ -30,7 +30,7 @@ unix {
    }
    macx: {
       LIBS += -L$(EPICSLIB)  -lca
-      LIBS += -L$(QTBASE)  -lqtcontrols
+      LIBS += -L$(CAQTDM_COLLECT)  -lqtcontrols
       INCLUDEPATH += $(EPICSINCLUDE)/os/Darwin
    }
 }
