@@ -25,7 +25,7 @@ unix {
 !ios {
    unix:!macx {
       LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca
-      LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
+      LIBS += -L$(CAQTDM_COLLECT) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
       INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
    }
    macx: {

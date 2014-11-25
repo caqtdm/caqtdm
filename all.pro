@@ -30,7 +30,21 @@ error("Use at least Qt 4.6.")
 }
 
 TEMPLATE = subdirs
-SUBDIRS = caQtDM_QtControls caQtDM_Lib caQtDM_Viewer 
+SUBDIRS = caQtDM_QtControls caQtDM_Lib caQtDM_Viewer qtcontrols_controllers qtcontrols_graphics qtcontrols_monitors parser
+
+qtcontrols_controllers.file = caQtDM_QtControls/plugins/qtcontrols_controllers.pro 
+qtcontrols_controllers.depends = caQtDM_QtControls caQtDM_Lib
+
+qtcontrols_graphics.file = caQtDM_QtControls/plugins/qtcontrols_graphics.pro 
+qtcontrols_graphics.depends = caQtDM_QtControls caQtDM_Lib
+
+
+qtcontrols_monitors.file = caQtDM_QtControls/plugins/qtcontrols_monitors.pro 
+qtcontrols_monitors.depends = caQtDM_QtControls caQtDM_Lib
+
+parser.file = caQtDM_Viewer/parser/parser.pro
+
+
 win32{
  CONFIG(debug, debug | release) 
 }

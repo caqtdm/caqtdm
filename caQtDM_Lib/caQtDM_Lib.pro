@@ -16,22 +16,22 @@ win32 {
         
         DebugBuild {
                 EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
-                DESTDIR = debug
+                DESTDIR = $(CAQTDM_COLLECT)/debug
                 OBJECTS_DIR = debug/obj
                 LIBS += $$(QWTHOME)/lib/qwtd.lib
                 LIBS += $${EPICS_LIBS}/ca.lib
                 LIBS += $${EPICS_LIBS}/COM.lib
-                LIBS += $$(QTCONTROLS_LIBS)/debug/qtcontrols.lib
+                LIBS += $(CAQTDM_COLLECT)/debug/qtcontrols.lib
         }
         ReleaseBuild {
                 EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
-                DESTDIR = release
+                DESTDIR = $(CAQTDM_COLLECT)
                 OBJECTS_DIR = release/obj
                 LIBS += $$(QWTHOME)/lib/qwt.lib
                 LIBS += $${EPICS_LIBS}/ca.lib
                 LIBS += $${EPICS_LIBS}/COM.lib
-                LIBS += $$(QTCONTROLS_LIBS)/release/qtcontrols.lib
-                QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\caQtDM_Lib.dll ..\caQtDM_Binaries
+                LIBS += $(CAQTDM_COLLECT)/qtcontrols.lib
+                
         }
    }
    win32-g++ {

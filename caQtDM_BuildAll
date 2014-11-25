@@ -28,8 +28,4 @@ echo ============ make all =================
 qmake all.pro
 make
 
-echo =========== build plugins =============
-cd caQtDM_QtControls/plugins/
-./linuxbuild;
-cd ..; cd ..
 

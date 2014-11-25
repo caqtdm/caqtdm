@@ -35,18 +35,5 @@ echo ============ make all =================
 qmake all.pro
 nmake all
 
-echo =========== build parser =============
-cd .\caQtDM_Viewer\parser
-qmake parser.pro
-nmake all
-cd ..\..
-
-echo =========== build plugins =============
-cd caQtDM_QtControls\plugins\
-call .\winbuild_msc.bat
-
-
-cd ..
-cd ..
 
 pause

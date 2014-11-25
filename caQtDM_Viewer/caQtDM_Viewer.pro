@@ -41,29 +41,26 @@ win32 {
 	win32-msvc* {
 		DebugBuild {
 			CONFIG += console
-			DESTDIR = debug
+                        DESTDIR = $(CAQTDM_COLLECT)/debug
 			EPICS_LIBS=$${EPICS_BASE}/lib/$$(EPICS_HOST_ARCH)
 			OBJECTS_DIR = debug/obj
-			LIBS += ../caQtDM_Lib/debug/caQtDM_Lib.lib
+			LIBS += $(CAQTDM_COLLECT)/debug/caQtDM_Lib.lib
 			LIBS += $$(QWTHOME)/lib/qwtd.lib
 			LIBS += $$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)/ca.lib
 			LIBS += $$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)/COM.lib
-			LIBS += $$(QTCONTROLS_LIBS)/debug/qtcontrols.lib
+			LIBS += $(CAQTDM_COLLECT)/debug/qtcontrols.lib
 
 
 		}
 		ReleaseBuild {
-			DESTDIR = release
+                        DESTDIR = $(CAQTDM_COLLECT)
 			EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
 			OBJECTS_DIR = release/obj
-			LIBS += ../caQtDM_Lib/release/caQtDM_Lib.lib
+			LIBS += $(CAQTDM_COLLECT)/caQtDM_Lib.lib
 			LIBS += $$(QWTHOME)/lib/qwt.lib
 			LIBS += $$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)/ca.lib
 			LIBS += $$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)/COM.lib
-			LIBS += $$(QTCONTROLS_LIBS)/release/qtcontrols.lib
-			QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\caQtDM.exe ..\caQtDM_Binaries
-
-
+			LIBS += $(CAQTDM_COLLECT)/qtcontrols.lib
 		}
 	}
 
