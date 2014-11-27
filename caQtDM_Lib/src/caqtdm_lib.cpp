@@ -2511,13 +2511,12 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         // ApplyNumeric and Numeric =====================================================================================================
     } else if (caApplyNumeric *widget = qobject_cast<caApplyNumeric *>(w)) {
-        qDebug() << "caApplyNumeric" << widget->objectName() << data.pv << data.edata.monitorCount;
+        //qDebug() << "caApplyNumeric" << widget->objectName() << data.pv << data.edata.monitorCount;
 
         if(data.edata.connected) {
             ComputeNumericMaxMinPrec(widget, data);
             widget->setConnectedColors(true);
             widget->silentSetValue(data.edata.rvalue);
-            qDebug() << "setvalue=" << data.edata.rvalue;
             widget->setAccessW(data.edata.accessW);
         } else {
             widget->setConnectedColors(false);
@@ -2525,7 +2524,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         // Numeric =====================================================================================================
     } else if (caNumeric *widget = qobject_cast<caNumeric *>(w)) {
-        qDebug() << "caNumeric" << widget->objectName() << data.pv;
+       // qDebug() << "caNumeric" << widget->objectName() << data.pv;
 
         if(data.edata.connected) {
             ComputeNumericMaxMinPrec(widget, data);
@@ -4467,6 +4466,7 @@ void CaQtDM_Lib::ComputeNumericMaxMinPrec(QWidget* widget, const knobData& data)
 
             } else {
                 float maxAbsHoprLopr= qMax(fabs(maxValue), fabs(minValue));
+
                 if(maxAbsHoprLopr > 1.0) {
                     width = (int)log10(maxAbsHoprLopr) + 2 ;
                 } else {

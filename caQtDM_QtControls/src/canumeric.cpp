@@ -33,6 +33,7 @@ caNumeric::caNumeric(QWidget *parent) : ENumeric(parent)
      setLimitsMode(Channel);
      thisMaximum = 100000.0;
      thisMinimum = -100000.0;
+     thisFixedFormat = false;
      setDigitsFontScaleEnabled(true);
      setForeground(Qt::black);
      setBackground(QColor(230,230,230));

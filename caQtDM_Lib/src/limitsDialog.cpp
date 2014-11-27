@@ -276,7 +276,7 @@ void limitsDialog::applyClicked()
         knobData *kPtr = monData->getMutexKnobDataPV(widget, thisPV);
         if(kPtr != (knobData*) 0) widget->setSliderValue(kPtr->edata.rvalue);
 
-    // ************* we have a thermometer
+        // ************* we have a thermometer
     } else if(caThermo* widget = qobject_cast<caThermo *>(thisWidget)) {
 
         if(limitsMode == Channel) {
@@ -291,7 +291,7 @@ void limitsDialog::applyClicked()
             widget->setMinValue(min);
         }
 
-    // ************* we have a calineedit or catextentry
+        // ************* we have a calineedit or catextentry
     } else if(caLineEdit* widget = qobject_cast<caLineEdit *>(thisWidget)) {
 
         if(limitsMode == Channel) {
@@ -317,58 +317,61 @@ void limitsDialog::applyClicked()
         widget->updateAlarmColors();
 
         // ************* we have a caNumeric
-        } else if(caNumeric* widget = qobject_cast<caNumeric *>(thisWidget)) {
+    } else if(caNumeric* widget = qobject_cast<caNumeric *>(thisWidget)) {
 
-            if(limitsMode == Channel) {
-                widget->setLimitsMode(caNumeric::Channel);
-                if(!doNothing) {
-                    widget->setMaxValue(channelUpperLimit);
-                    widget->setMinValue(channelLowerLimit);
-                }
-            } else if(limitsMode == User){
-                widget->setLimitsMode(caNumeric::User);
-                widget->setMaxValue(max);
-                widget->setMinValue(min);
+        if(limitsMode == Channel) {
+            widget->setLimitsMode(caNumeric::Channel);
+            if(!doNothing) {
+                widget->setMaxValue(channelUpperLimit);
+                widget->setMinValue(channelLowerLimit);
             }
+        } else if(limitsMode == User){
+            widget->setLimitsMode(caNumeric::User);
+            widget->setMaxValue(max);
+            widget->setMinValue(min);
+        }
 
-            if(precisionMode == Channel) {
-                widget->setPrecisionMode(caNumeric::Channel);
-                widget->setDecDigits((int) channelPrecision);
-            } else if(precisionMode == User){
-                widget->setPrecisionMode(caNumeric::User);
-                widget->setDecDigits(prec);
+        if(precisionMode == Channel) {
+            widget->setPrecisionMode(caNumeric::Channel);
+            widget->setDecDigits((int) channelPrecision);
+        } else if(precisionMode == User){
+            widget->setPrecisionMode(caNumeric::User);
+            widget->setDecDigits(prec);
+        }
+
+        knobData *kPtr = monData->getMutexKnobDataPV(widget, thisPV);
+        CaQtDM_Lib *compute = (CaQtDM_Lib *) widget;
+        if(kPtr != (knobData*) 0) {
+            kPtr->edata.initialize = true;
+            compute->ComputeNumericMaxMinPrec(widget, *kPtr);
+        }
+
+        // ************* we have a caApplyNumeric
+    } else if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(thisWidget)) {
+
+        if(limitsMode == Channel) {
+            widget->setLimitsMode(caApplyNumeric::Channel);
+            if(!doNothing) {
+                widget->setMaxValue(channelUpperLimit);
+                widget->setMinValue(channelLowerLimit);
             }
+        } else if(limitsMode == User){
+            widget->setLimitsMode(caApplyNumeric::User);
+            widget->setMaxValue(max);
+            widget->setMinValue(min);
+        }
 
-            knobData *kPtr = monData->getMutexKnobDataPV(widget, thisPV);
-            CaQtDM_Lib *compute = (CaQtDM_Lib *) widget;
-            if(kPtr != (knobData*) 0) compute->ComputeNumericMaxMinPrec(widget, *kPtr);
+        if(precisionMode == Channel) {
+            widget->setPrecisionMode(caApplyNumeric::Channel);
+            widget->setDecDigits((int) channelPrecision);
+        } else if(precisionMode == User){
+            widget->setPrecisionMode(caApplyNumeric::User);
+            widget->setDecDigits(prec);
+        }
 
-            // ************* we have a caApplyNumeric
-            } else if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(thisWidget)) {
-
-                if(limitsMode == Channel) {
-                    widget->setLimitsMode(caApplyNumeric::Channel);
-                    if(!doNothing) {
-                        widget->setMaxValue(channelUpperLimit);
-                        widget->setMinValue(channelLowerLimit);
-                    }
-                } else if(limitsMode == User){
-                    widget->setLimitsMode(caApplyNumeric::User);
-                    widget->setMaxValue(max);
-                    widget->setMinValue(min);
-                }
-
-                if(precisionMode == Channel) {
-                    widget->setPrecisionMode(caApplyNumeric::Channel);
-                    widget->setDecDigits((int) channelPrecision);
-                } else if(precisionMode == User){
-                    widget->setPrecisionMode(caApplyNumeric::User);
-                    widget->setDecDigits(prec);
-                }
-
-                knobData *kPtr = monData->getMutexKnobDataPV(widget, thisPV);
-                CaQtDM_Lib *compute = (CaQtDM_Lib *) widget;
-                if(kPtr != (knobData*) 0) compute->ComputeNumericMaxMinPrec(widget, *kPtr);
+        knobData *kPtr = monData->getMutexKnobDataPV(widget, thisPV);
+        CaQtDM_Lib *compute = (CaQtDM_Lib *) widget;
+        if(kPtr != (knobData*) 0) compute->ComputeNumericMaxMinPrec(widget, *kPtr);
     }
 }
 

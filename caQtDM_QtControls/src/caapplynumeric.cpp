@@ -37,7 +37,7 @@ caApplyNumeric::caApplyNumeric(QWidget *parent) : EApplyNumeric(parent)
     setDigitsFontScaleEnabled(true);
     setForeground(Qt::black);
     setBackground(QColor(230,230,230));
-
+    thisFixedFormat = false;
     installEventFilter(this);
 }
 
