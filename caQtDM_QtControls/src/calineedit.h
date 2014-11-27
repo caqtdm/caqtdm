@@ -178,7 +178,7 @@ private:
     QString thisStyle, oldStyle;
 
     bool isShown;
-
+    bool isValue;
 
     bool thisFramePresent, oldFramepresent;
     QColor thisFrameColor, oldFrameColor;

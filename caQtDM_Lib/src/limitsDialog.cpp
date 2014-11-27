@@ -163,7 +163,7 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
         maximumLineEdit->setText(QString::number(initMax, 'g'));
 
         mode = widget->getPrecisionMode();
-        if(mode == caNumeric::Channel) {
+        if(mode == caApplyNumeric::Channel) {
             initPrecision =  channelPrecision;
         } else {
             initPrecision = widget->decDigits();
@@ -197,8 +197,10 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
         mode = widget->getPrecisionMode();
         if(mode == caLineEdit::Channel) {
             initPrecision =  channelPrecision;
+            precisionComboBox->setCurrentIndex(0);
         } else {
             initPrecision = widget->getPrecision();
+            precisionComboBox->setCurrentIndex(1);
         }
         precisionLineEdit->setValue(initPrecision);
     }

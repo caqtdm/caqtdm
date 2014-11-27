@@ -47,6 +47,7 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     }
 
     isShown = false;
+    isValue = false;
 
     oldStyle = "";
     thisStyle = "";
@@ -330,6 +331,7 @@ void caLineEdit::setFormat(int prec)
 void caLineEdit::setValue(double value, const QString& units)
 {
     char asc[1024];
+    isValue = true;
 
     if(thisFormatType == compact) {
       if ((value < 1.e4 && value > 1.e-4) || (value > -1.e4 && value < -1.e-4) || value == 0.0) {
@@ -347,6 +349,7 @@ void caLineEdit::setValue(double value, const QString& units)
         strcat(asc, units.toAscii().constData());
     }
     unitsLast = units;
+    valueLast = value;
     setText(asc);
     setCursorPosition(0);
 }
@@ -444,8 +447,7 @@ void caLineEdit::setAlarmColors(short status, double value, QColor bgAtInit, QCo
 
 void caLineEdit::updateAlarmColors()
 {
-    setAlarmColors(statusLast, valueLast, bgAtInitLast, fgAtInitLast);
-    setValue(valueLast, unitsLast);
+    if (isValue) setValue(valueLast, unitsLast);
 }
 
 void caLineEdit::setText(const QString &txt)
