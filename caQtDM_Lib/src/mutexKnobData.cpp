@@ -289,15 +289,15 @@ extern "C" MutexKnobData* C_SetMutexKnobData(MutexKnobData* p, int index, knobDa
 /**
  * get all data for a knob given by the pv
  */
-
-knobData* MutexKnobData::getMutexKnobDataPV(QString pv)
+knobData* MutexKnobData::getMutexKnobDataPV(QWidget *widget, QString pv)
 {
     QMutexLocker locker(&mutex);
     for(int i=0; i < GetMutexKnobDataSize(); i++) {
         knobData *kPtr = (knobData*) &KnobData[i];
         if(kPtr->index != -1) {
+            QWidget *w = (QWidget *) kPtr->dispW;
             QString kpv(kPtr->pv);
-            if(kpv == pv) {
+            if(kpv == pv && widget == w) {  // we really have to get the pointer for the display object, while we could have stop the IO
                 return kPtr;
             }
         }

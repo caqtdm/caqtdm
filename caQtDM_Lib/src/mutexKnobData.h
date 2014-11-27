@@ -59,7 +59,7 @@ public:
     int GetMutexKnobDataIndex();
     int GetMutexKnobDataSize();
     void SetMutexKnobDataReceived(knobData *kData);
-    knobData *getMutexKnobDataPV(QString pv);
+    knobData *getMutexKnobDataPV(QWidget *widget, QString pv);
 
     void timerEvent(QTimerEvent *);
 
