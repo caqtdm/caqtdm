@@ -64,6 +64,7 @@
 #include "JSON.h"
 #include "limitsStripplotDialog.h"
 #include "limitsCartesianplotDialog.h"
+#include "limitsDialog.h"
 #include "sliderDialog.h"
 #include "processWindow.h"
 #include "splashscreen.h"
@@ -93,6 +94,7 @@ public:
 
     void allowResizing(bool allowresize);
     int addMonitor(QWidget *thisW, knobData *data, QString pv, QWidget *w, int *specData, QMap<QString, QString> map, QString *pvRep);
+    void ComputeNumericMaxMinPrec(QWidget* widget, const knobData &data);
 #ifdef Q_OS_IOS
     void grabSwipeGesture(Qt::GestureType fingerSwipeGestureTypeID);
 #endif
@@ -162,6 +164,7 @@ signals:
     void Signal_IosExit();
 
 private:
+    QTabWidget* getTabParent(QWidget *w1);
     bool bitState(int value, int bitNr);
     QString treatMacro(QMap<QString, QString> map, const QString& pv, bool *doNothing);
     void HandleWidget(QWidget *w, QString macro, bool firstPass);
@@ -171,7 +174,6 @@ private:
     int setObjectVisibility(QWidget *w, double value);
     bool reaffectText(QMap<QString, QString> map, QString *text);
     int InitVisibility(QWidget* widget, knobData *kData, QMap<QString, QString> map,  int *specData, QString info);
-    void ComputeNumericMaxMinPrec(QWidget* widget, const knobData &data);
     void postMessage(QtMsgType type, char *msg);
     int Execute(char *command);
     void TreatRequestedValue(QString text, caTextEntry::FormatType fType, QWidget *w);
@@ -187,6 +189,7 @@ private:
     void WaterFall(caWaterfallPlot *widget, const knobData &data);
     void Cartesian(caCartesianPlot *widget, int curvNB, int curvType, int XorY, const knobData &data);
     void WaveTable(caWaveTable *widget, const knobData &data);
+    void EnableDisableIO();
 
 #ifdef Q_OS_IOS
     bool eventFilter(QObject *obj, QEvent *event);
@@ -232,6 +235,8 @@ private:
     bool AllowsUpdate;
     bool fromAS;
 
+    int loopTimer;
+
 #ifdef epics4
     epics4Subs *Epics4;
 #endif
@@ -254,6 +259,8 @@ private slots:
     void Callback_RelatedDisplayClicked(int);
     void Callback_ShellCommandClicked(int);
     void Callback_TableDoubleClicked(const QString&);
+
+    void Callback_TabChanged(int);
 
     void ShowContextMenu(const QPoint&);
     void DisplayContextMenu(QWidget* w);

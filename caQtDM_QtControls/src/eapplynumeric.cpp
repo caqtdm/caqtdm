@@ -59,6 +59,11 @@ void EApplyNumeric::setDigitsFontScaleEnabled(bool en)
         printf("EApplyNumeric ENumeric not initialized");
 }
 
+void EApplyNumeric::silentSetValue(double v)
+{
+     data->silentSetValue(v);
+}
+
 void EApplyNumeric::init()
 {
 	if (box)

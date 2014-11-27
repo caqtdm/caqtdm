@@ -18,6 +18,8 @@
   fi
   if [ -z "$QTCONTROLS_LIBS" ];       then export  QTCONTROLS_LIBS=`pwd`/caQtDM_Binaries;
   fi
+  if [ -z "$CAQTDM_COLLECT" ];       then export  CAQTDM_COLLECT=`pwd`/caQtDM_Binaries;
+  fi
   export  QTBASE=${QTCONTROLS_LIBS};
 
   if [ -z "$QTDM_LIBINSTALL" ];  then  export  QTDM_LIBINSTALL=$EPICSEXTENSIONS/lib/$EPICS_HOST_ARCH;

@@ -158,6 +158,7 @@
 //===============================================================================================
 
 Q_DECLARE_METATYPE(QList<int>)
+Q_DECLARE_METATYPE(QTabWidget*)
 
 extern "C" int CreateAndConnect(int index, knobData *data, int rate, int skip);
 extern "C" void DetachContext();
@@ -212,6 +213,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     messageWindow = msgWindow;
     pepPrint = pepprint;
     firstResize = true;
+    loopTimer = 0;
 
     if(parentAS != (QWidget*) 0) {
         fromAS = true;
@@ -322,15 +324,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         setCentralWidget(centralWidget);
 
 #ifdef Q_OS_IOS
-/*
-         QToolBar *toolBar = addToolBar("Options");
-         QAction *closeAction = new QAction("&Close", this);
-         QAction *nextAction = new QAction("&Cycle Window", this);
-         connect(closeAction, SIGNAL(triggered()), this, SLOT(closeWindow()));
-         connect(nextAction, SIGNAL(triggered()), parent, SLOT(nextWindow()));
-         toolBar->addAction(closeAction);
-         toolBar->addAction(nextAction);
-*/
          // info can be called with tapandhold
          connect(this, SIGNAL(Signal_NextWindow()), parent, SLOT(nextWindow()));
          grabGesture(Qt::TapAndHoldGesture);
@@ -420,18 +413,138 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     // build a list for getting all soft pv
     mutexKnobData->BuildSoftPVList(myWidget);
 
+    // setup changeevent for QTabWidgets
+    QList<QTabWidget *> allTabs = myWidget->findChildren<QTabWidget *>();
+    foreach(QTabWidget* widget, allTabs) {
+         connect(widget, SIGNAL(currentChanged(int)), this, SLOT(Callback_TabChanged(int)));
+    }
+
     // start a timer
     startTimer(1000);
+
+    EpicsFlushIO();
 }
 
 /**
- * timer event, not used
+ * when a QTabWidget exist, this slot will enable or disable the io for invisible sttuff
+ */
+void CaQtDM_Lib::Callback_TabChanged(int current)
+{
+    Q_UNUSED(current);
+    // Enable & Disable IO when in invisible page of a TabWidget
+    EnableDisableIO();
+    EpicsFlushIO();
+}
+
+/**
+ * find for a widget if it is contained in a parent QTabWidget
+ */
+QTabWidget* CaQtDM_Lib::getTabParent(QWidget *w1)
+{
+    QObject *Parent = w1->parent();
+    QTabWidget *tabWidget = (QTabWidget*) 0;
+    //qDebug() << w1->objectName() << i;
+
+    while(Parent != (QObject*) 0) {
+        //qDebug() << "parent=" << Parent;
+        Parent = Parent->parent();
+        if(Parent != (QObject*) 0) {
+            if(QTabWidget* widget = qobject_cast<QTabWidget *>(Parent)) {
+                tabWidget = widget;
+                return tabWidget;
+            }
+        } else {
+            return (QTabWidget *) 0;
+        }
+    }
+    return (QTabWidget *) 0;
+}
+
+/**
+ * this routine will go through all are ca objects, find their nearest QTabWidget if any and decides
+ * to enable or disable their monitor
+ */
+void CaQtDM_Lib::EnableDisableIO()
+{
+    /* for version 8.5.6 now activated */
+    void *ptr;
+
+    // any tabwidgets in this window ? when not do nothing
+    //qDebug() << "================================";
+    QList<QTabWidget *> all = myWidget->findChildren<QTabWidget *>();
+    if(all.count() == 0) return;
+
+    // go through are QTabWidgets
+    foreach(QTabWidget* widget, all) {
+
+        // go through their pages
+        for(int i=0; i<widget->count(); i++) {
+
+            //qDebug() << widget << widget->currentIndex() << widget->tabText(i);
+            QList<QWidget*> children = widget->widget(i)->findChildren<QWidget *>();
+
+            // go through our ca objects on this page (except for caStripplot, needing history data)
+            foreach(QWidget* w1, children) {
+                if(w1->objectName().contains("ca") && !w1->objectName().contains("caStripPlot")) {
+
+                    // nearest parent tab
+                    QTabWidget* tabWidget = w1->property("parentTab").value<QTabWidget*>();
+
+                    // no tab
+                    if(tabWidget != (QTabWidget*)0) {
+                        // the widget to be considered
+                        if(tabWidget == widget) {
+                            bool hidden = false;
+                            //qDebug() << w1->objectName() << "sitting in " << tabWidget << "at position" << i << "actual position is" << tabWidget->currentIndex();
+
+                            if(!tabWidget->isVisible()) {
+                                hidden = true;
+                            } else if(i == tabWidget->currentIndex()) {
+                                //qDebug() << "thus on visible tab";
+                                hidden = false;
+                            } else {
+                                //qDebug() << "thus on hidden tab";
+                                hidden = true;
+                            }
+
+                            // get the associated monitor pointers and add or remove the event
+                            QVariant var=w1->property("InfoList");
+                            QVariantList infoList = var.toList();
+                            for(int j=0; j<infoList.count(); j++) {
+                                ptr = (void*) infoList.at(j).value<void *>();
+                                if(!hidden) {
+                                    addEvent(ptr);
+                                } else {
+                                    clearEvent(ptr);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    EpicsFlushIO();
+
+}
+
+
+/**
+ * timer event
  */
 void CaQtDM_Lib::timerEvent(QTimerEvent *event)
 {
     Q_UNUSED(event);
-    // for epics we flush the buffer evry 2 seconds
+    // for epics we flush the buffer every second
     EpicsFlushIO();
+
+    if(loopTimer == 5){
+        loopTimer = false;
+        EnableDisableIO();
+        loopTimer = 0;
+    }
+    loopTimer++;
+
 }
 
 /**
@@ -1497,6 +1610,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 }
     //==================================================================================================================
 
+    // search for a QTabwidget as nearest parent and set it as property
+    if(className.contains("ca")) {
+         QTabWidget *tabWidget = getTabParent(w1);
+         w1->setProperty("parentTab",QVariant::fromValue(tabWidget) );
+    }
+
     // make a context menu for object having a monitor
     if(className.contains("ca") && !className.contains("caRel") && !className.contains("caTable") && nbMonitors > 0) {
 
@@ -1504,10 +1623,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         connect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
         w1->setProperty("Connect", false);
         // in order to get the context on tablets
-//#ifdef Q_OS_IOS
+#ifdef Q_OS_IOS
         w1->grabGesture(Qt::TapAndHoldGesture);
         w1->installEventFilter(this);
-//#endif
+#endif
     }
 
     // add our context to AS widgets
@@ -1673,6 +1792,16 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     w->setProperty("MonitorIndex", num);
     w->setProperty("Connect", false);
 
+    // add for this widget the io info
+    if(!kData->soft) {
+        QVariant v = qVariantFromValue((void*) kData->edata.info);
+        QVariant var=w->property("InfoList");
+        QVariantList infoList = var.toList();
+        infoList.append(v);
+        w->setProperty("InfoList", infoList);
+    }
+
+    // clear data
     memset(kData, 0, sizeof (knobData));
 
     return num;
@@ -2248,7 +2377,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     widget->setAlarmColors(data.edata.severity, (double) data.edata.ivalue, bg, fg);
                 }
                 list = String.split(";");
-                //qDebug() << String << list << data.pv << (int) data.edata.ivalue << data.edata.valueCount;
+                //qDebug() << widget << String << list << data.pv << (int) data.edata.ivalue << data.edata.valueCount;
 
                 if((data.edata.fieldtype == caENUM)  && (list.count() == 0)) {
                     QString str= QString::number((int) data.edata.ivalue);
@@ -2382,12 +2511,13 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         // ApplyNumeric and Numeric =====================================================================================================
     } else if (caApplyNumeric *widget = qobject_cast<caApplyNumeric *>(w)) {
-        //qDebug() << "caApplyNumeric" << wheel->objectName() << kPtr->pv << data.edata.monitorCount;
+        qDebug() << "caApplyNumeric" << widget->objectName() << data.pv << data.edata.monitorCount;
 
         if(data.edata.connected) {
             ComputeNumericMaxMinPrec(widget, data);
             widget->setConnectedColors(true);
-            widget->setValue(data.edata.rvalue);
+            widget->silentSetValue(data.edata.rvalue);
+            qDebug() << "setvalue=" << data.edata.rvalue;
             widget->setAccessW(data.edata.accessW);
         } else {
             widget->setConnectedColors(false);
@@ -2395,7 +2525,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         // Numeric =====================================================================================================
     } else if (caNumeric *widget = qobject_cast<caNumeric *>(w)) {
-        //qDebug() << "caNumeric" << widget->objectName() << data.pv;
+        qDebug() << "caNumeric" << widget->objectName() << data.pv;
 
         if(data.edata.connected) {
             ComputeNumericMaxMinPrec(widget, data);
@@ -3613,7 +3743,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             limitsMax = widget->maxValue();
             limitsMin = widget->minValue();
         }
-        knobData *kPtr = mutexKnobData->getMutexKnobDataPV(pv[0]);
+        knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv[0]);
         if(kPtr->edata.lower_disp_limit == kPtr->edata.upper_disp_limit) {
             limitsDefault = true;
             limitsMax = widget->maxValue();
@@ -3726,8 +3856,11 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         myMenu.addAction("Include files");
     }
 
+    // add some more actions
     if(caScriptButton* widget =  qobject_cast< caScriptButton *>(w)) {
         Q_UNUSED(widget);
+
+    // for the camera widget
     } else if(caCamera * widget = qobject_cast< caCamera *>(w)) {
         Q_UNUSED(widget);
         QAction *menuAction;
@@ -3735,29 +3868,45 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         menuAction->setCheckable(true);
         if(widget->getFitToSize() == caCamera::Yes) menuAction->setChecked(true);
         else  menuAction->setChecked(false);
-
+        myMenu.addAction("Get Info");
         myMenu.addAction("Set Spectrum");
         myMenu.addAction("Set Greyscale");
-        myMenu.addAction("Get Info");
+
+    // for the slider
     } else if(caSlider * widget = qobject_cast< caSlider *>(w)) {
         Q_UNUSED(widget);
-        myMenu.addAction("Modify");;
         myMenu.addAction("Get Info");
+        myMenu.addAction("Change Increment/Value");
+
+    // all other widgets
     } else if(!onMain){
         // construct info for the pv we are pointing at
         myMenu.addAction("Get Info");
     }
 
+    // for stripplot add one more action
     if(caStripPlot* widget = qobject_cast<caStripPlot *>(w)) {
         Q_UNUSED(widget);
         myMenu.addAction("Change Axis");
     }
+
+    // for cartesian plot add more actions
     if(caCartesianPlot* widget = qobject_cast<caCartesianPlot *>(w)) {
         Q_UNUSED(widget);
         myMenu.addAction("Change Axis");
         myMenu.addAction(QWhatsThis::createAction());
         myMenu.addAction("Reset zoom");
     }
+
+
+    // for some widgets one more action
+    if(caSlider * widget = qobject_cast< caSlider *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
+    if(caLineEdit* widget = qobject_cast<caLineEdit *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
+    if(caThermo* widget = qobject_cast<caThermo *>(w)){Q_UNUSED(widget);  myMenu.addAction("Change Limits/Precision");}
+    if(caNumeric* widget = qobject_cast<caNumeric *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
+    if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
+    if(caLinearGauge* widget = qobject_cast<caLinearGauge *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
+    if(caCircularGauge* widget = qobject_cast<caCircularGauge *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
 
     // add to context menu, the actions requested by the environment variable caQtDM_EXEC_LIST
     if(validExecListItems) {
@@ -3816,7 +3965,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 // is there a json string ?
                 int pos = pv[i].indexOf("{");
                 if(pos != -1) pv[i] = pv[i].mid(0, pos);
-                knobData *kPtr = mutexKnobData->getMutexKnobDataPV(pv[i]);  // use pointer for getting all necessary information
+                knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv[i]);  // use pointer for getting all necessary information
                 if((kPtr != (knobData*) 0) && (pv[i].length() > 0)) {
                     char asc[2048];
                     char timestamp[50];
@@ -3996,7 +4145,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                     QString pvs =widget->getPV(0);
                     QStringList vars = pvs.split(";");
                     if((vars.size()== 2) || (vars.at(1).trimmed().length() > 0)) {
-                        knobData *kPtr =  mutexKnobData->getMutexKnobDataPV(vars.at(0).trimmed());
+                        knobData *kPtr =  mutexKnobData->getMutexKnobDataPV(w, vars.at(0).trimmed());
                         if(kPtr != (knobData*) 0) {
                             if(kPtr->edata.lower_disp_limit != kPtr->edata.upper_disp_limit) {
                                 widget->setScaleX(kPtr->edata.lower_disp_limit, kPtr->edata.upper_disp_limit);
@@ -4012,7 +4161,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                     QString pvs =widget->getPV(0);
                     QStringList vars = pvs.split(";");
                     if((vars.size()== 2) || (vars.at(1).trimmed().length() > 0)) {
-                        knobData *kPtr =  mutexKnobData->getMutexKnobDataPV(vars.at(1).trimmed());
+                        knobData *kPtr =  mutexKnobData->getMutexKnobDataPV(w, vars.at(1).trimmed());
                         if(kPtr != (knobData*) 0) {
                             if(kPtr->edata.lower_disp_limit != kPtr->edata.upper_disp_limit) {
                                 widget->setScaleY(kPtr->edata.lower_disp_limit, kPtr->edata.upper_disp_limit);
@@ -4026,11 +4175,14 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 /*************************************************/
             }
 
-        } else if(selectedItem->text().contains("Modify")) {
+        } else if(selectedItem->text().contains("Change Increment/Value")) {
             if(caSlider* widget = qobject_cast<caSlider *>(w)) {
-                sliderDialog dialog(widget, mutexKnobData, "slider modifications", this);
+                sliderDialog dialog(widget, mutexKnobData, "slider Increment/Value change", this);
                 dialog.exec();
             }
+        } else if(selectedItem->text().contains("Change Limits/Precision")) {
+                limitsDialog dialog(w, mutexKnobData, "Limits/Precision change", this);
+                dialog.exec();
         } else {
             // any action from environment ?
             if(validExecListItems) {
@@ -4771,9 +4923,10 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 
     if(firstResize) {
         firstResize = false;
-        // keep original width and height
-        origWidth = event->size().width();
-        origHeight = event->size().height();
+        // keep original width and height (first event on linux/windows was ui window size, on ios however now display size
+        // changed to myWidget size
+        origWidth = myWidget->width(); //event->size().width();
+        origHeight = myWidget->height(); //event->size().height();
         QList<QWidget *> all = myWidget->findChildren<QWidget *>();
         foreach(QWidget* widget, all) {
             QList<QVariant> integerList;

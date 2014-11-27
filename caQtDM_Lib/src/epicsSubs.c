@@ -68,6 +68,7 @@ typedef struct _connectInfo {
     pv_string pv;    // channel name
     chid ch;         // read channel
     evid evID;       // epics event id
+    int  evAdded;    // epics event added yes/no
 } connectInfo;
 
 char* myLimitedString (char * strng) {
@@ -172,7 +173,7 @@ static void dataCallback(struct event_handler_args args)
     if(kData.index == -1) return;
 
     if (args.status != ECA_NORMAL) {
-        PRINT(printf("dataCallback:\n""  get: %s for %s\n", ca_name(args.chid), ca_message_text[CA_EXTRACT_MSG_NO(args.status)]));
+        PRINT(printf("dataCallback:  get: %s for %s\n", ca_name(args.chid), ca_message_text[CA_EXTRACT_MSG_NO(args.status)]));
     } else {
         kData.edata.monitorCount = info->event;
         kData.edata.connected = info->connected;
@@ -524,6 +525,7 @@ static void displayCallback(struct event_handler_args args) {
         PRINT(printf("ca_add_array_event for %s with chid=%d\n", ca_name(args.chid), args.chid));
         status = ca_add_array_event(dbf_type_to_DBR_STS(ca_field_type(args.chid)), 0, //ca_element_count(args.chid),
                                      args.chid, dataCallback, info, 0.0,0.0,0.0, &info->evID);
+        info->evAdded = true;
 
         if (status != ECA_NORMAL) {
             PRINT(printf("ca_add_array_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
@@ -533,6 +535,56 @@ static void displayCallback(struct event_handler_args args) {
 
         C_DataUnlock(KnobDataPtr, &kData);
         info->event++;
+    }
+}
+
+/**
+ * routine used to suspend the monitor when requested
+ */
+void clearEvent(void * ptr)
+{
+    connectInfo *info = (connectInfo *) ptr;
+    if(info == (connectInfo *) 0) return;
+    if(!info->connected) return;  // must be connected
+    if(info->event < 2) return;  // a first normal addevent must be done
+    if(info->evAdded) {
+      //printf("clear event %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded);
+      info->evAdded = false;
+      int status = ca_clear_event(info->evID);
+      if (status != ECA_NORMAL) {
+          PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+      }
+    }
+}
+
+/**
+ * routine used to add the monitor again when requested
+ */
+void addEvent(void * ptr)
+{
+    connectInfo *info = (connectInfo *) ptr;
+    if(info == (connectInfo *) 0) return;
+    if(!info->connected) return; // must be connected
+    if(info->event < 2) return;  // a first normal addevent must be done
+    if(!info->evAdded) {
+
+        knobData kData;
+        int status;
+        C_GetMutexKnobData(KnobDataPtr, info->index, &kData);
+        if(kData.index == -1) return;
+
+        C_DataLock(KnobDataPtr, &kData);
+        //printf("add event %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded);
+        status = ca_add_array_event(dbf_type_to_DBR_STS(ca_field_type(info->ch)), 0,
+                                        info->ch, dataCallback, info, 0.0,0.0,0.0, &info->evID);
+        info->evAdded = true;
+
+        if (status != ECA_NORMAL) {
+            PRINT(printf("ca_add_array_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+        }
+        C_SetMutexKnobData(KnobDataPtr, kData.index, kData);
+
+        C_DataUnlock(KnobDataPtr, &kData);
     }
 }
 
@@ -558,6 +610,7 @@ void connectCallback(struct connection_handler_args args)
         PRINT(printf("%s with channel %d has just disconnected, evid=%d\n", ca_name(args.chid), args.chid, info->evID));
         info->connected = false;
         info->event = 0;
+        info->evAdded = false;
         status = ca_clear_event(info->evID);
         if (status != ECA_NORMAL) {
             PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
@@ -566,6 +619,7 @@ void connectCallback(struct connection_handler_args args)
     case cs_conn:
         PRINT(printf("%s has just connected with channel id=%d count=%d native type=%s\n", ca_name(args.chid), (int) args.chid, ca_element_count(args.chid), dbf_type_to_text(ca_field_type(args.chid))));
         info->connected = true;
+        info->evAdded = false;
         if (info->event == 0) {
             info->event++;
             status = ca_array_get_callback(dbf_type_to_DBR_CTRL(ca_field_type(args.chid)), 1, args.chid, displayCallback, NULL);

@@ -105,6 +105,7 @@ public:
 	 * @param v	the value to be displayed
 	 */
     void setValue(double v){ data->setValue(v); }
+    void silentSetValue(double v);
 	/**
 	 * returns the value displayed by the widget
 	 * @return the value displayed

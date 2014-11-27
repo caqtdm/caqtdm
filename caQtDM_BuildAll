@@ -26,6 +26,6 @@ read -p "Press [Enter] key to start build "
 
 echo ============ make all =================
 qmake all.pro
-make
+make -j8
 
 

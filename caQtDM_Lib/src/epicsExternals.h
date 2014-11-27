@@ -28,5 +28,7 @@
 
 extern "C" int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
 extern "C" int EpicsGetTimeStamp(char *pv, char *timestamp);
+extern "C" void clearEvent(void * ptr);
+extern "C" void addEvent(void * ptr);
 
 #endif
