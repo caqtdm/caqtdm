@@ -47,7 +47,6 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     }
 
     isShown = false;
-    isValue = false;
 
     oldStyle = "";
     thisStyle = "";
@@ -92,6 +91,7 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
 
     keepText = "";
     setText(keepText);
+    setValueType(false);
 
     setFontScaleMode(WidthAndHeight);
     newFocusPolicy(Qt::NoFocus);
@@ -99,6 +99,11 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     d_rescaleFontOnTextChanged = true;
     connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(rescaleFont(const QString&)));
     installEventFilter(this);
+}
+
+void caLineEdit::setValueType(bool isvalue)
+{
+    isValue = isvalue;
 }
 
 void caLineEdit::newFocusPolicy(Qt::FocusPolicy f){

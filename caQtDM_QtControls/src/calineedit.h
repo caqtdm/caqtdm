@@ -145,6 +145,8 @@ public:
     void setColors(QColor bg, QColor fg, QColor fr, int lineWidth);
     void newFocusPolicy(Qt::FocusPolicy f);
 
+    void setValueType(bool isvalue);
+
 private slots:
     void rescaleFont(const QString& newText);
 

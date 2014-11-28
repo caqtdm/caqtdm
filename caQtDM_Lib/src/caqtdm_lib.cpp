@@ -2367,6 +2367,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             // enum string
             if(data.edata.fieldtype == caENUM || data.edata.fieldtype == caSTRING || data.edata.fieldtype == caCHAR) {
                 QStringList list;
+                widget->setValueType(false);
                 int colorMode = widget->getColorMode();
                 if(colorMode == caLineEdit::Static || colorMode == caLineEdit::Default) { // done at initialisation
                     if(!widget->property("Connect").value<bool>()) {                    // but was disconnected before
@@ -2411,6 +2412,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             } else {
                 int colorMode = widget->getColorMode();
                 int precMode = widget->getPrecisionMode();
+                widget->setValueType(true);
 
                 if(colorMode == caLineEdit::Static || colorMode == caLineEdit::Default) { // done at initialisation
                     if(!widget->property("Connect").value<bool>()) {                      // but was disconnected before
@@ -2433,6 +2435,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             }
 
         } else {
+            widget->setValueType(false);
             widget->setText("");
             widget->setAlarmColors(NOTCONNECTED, 0.0, bg, fg);        \
             widget->setProperty("Connect", false);

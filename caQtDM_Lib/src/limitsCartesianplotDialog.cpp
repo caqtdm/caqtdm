@@ -301,7 +301,6 @@ void limitsCartesianplotDialog::exec()
 void limitsCartesianplotDialog::closeEvent(QCloseEvent *event)
 {
     loop.quit();
-    deleteLater();
 }
 
 void limitsCartesianplotDialog::paintEvent(QPaintEvent *e)

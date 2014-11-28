@@ -391,7 +391,6 @@ void limitsDialog::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event);
     loop.quit();
-    deleteLater();
 }
 
 void limitsDialog::paintEvent(QPaintEvent *e)
