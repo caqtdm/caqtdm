@@ -543,6 +543,7 @@ static void displayCallback(struct event_handler_args args) {
  */
 void clearEvent(void * ptr)
 {
+    int status;
     connectInfo *info = (connectInfo *) ptr;
     if(info == (connectInfo *) 0) return;
     if(!info->connected) return;  // must be connected
@@ -550,7 +551,7 @@ void clearEvent(void * ptr)
     if(info->evAdded) {
       //printf("clear event %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded);
       info->evAdded = false;
-      int status = ca_clear_event(info->evID);
+      status = ca_clear_event(info->evID);
       if (status != ECA_NORMAL) {
           PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
       }
