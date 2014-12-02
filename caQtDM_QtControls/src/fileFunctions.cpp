@@ -66,10 +66,10 @@ int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &
     NetworkAccess *displayGet = new NetworkAccess(0, fileName);
     displayGet->requestUrl(displayUrl);
 
-    //wait until download was done (up to 2 seconds)
+    //wait until download was done (up to 3 seconds)
     for(int i=0; i<10; i++) {
         qApp->processEvents();
-        Sleep::msleep(200);
+        Sleep::msleep(300);
         qApp->processEvents();
         if(displayGet->downloadFinished()) {
             break;
