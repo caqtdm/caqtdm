@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.8.6
+CAQTDM_VERSION = V3.8.7
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -17,6 +17,13 @@ ios{
 NETWORKDOWNLOADSUPPORT {
 DEFINES += NETWORKDOWNLOADSUPPORT
 }
+
+# 3.8.7
+# added limits and precision dialogs for several objects
+# in case of tabbed widgets, monitoring of hidden pages is now suspended in order release network traffic and cpu load
+# build of product is now optimized with dependencies (thanks H.Brands)
+# modified dialogs for virtual keyboard in IOS
+
 # 3.8.6
 # drvh, drvl changed back to hopr, lopr for caslider and canumeric
 # slider will not move when no write access
