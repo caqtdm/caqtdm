@@ -109,6 +109,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     urlComboBox = new QComboBox();
     urlComboBox->setEditable(true);
     urlComboBox->setInsertPolicy(QComboBox::InsertAtCurrent);
+    urlComboBox->setFocusPolicy(Qt::StrongFocus);
     for(int i=0; i< 5; i++) {
             if(i>=urls.length()) urlComboBox->addItem(QString::number(i+1));
             else  if(urls.at(i).trimmed().length() < 1) urlComboBox->addItem(QString::number(i+1));
@@ -125,6 +126,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     fileComboBox = new QComboBox();
     fileComboBox->setEditable(true);
     fileComboBox->setInsertPolicy(QComboBox::InsertAtCurrent);
+    fileComboBox->setFocusPolicy(Qt::StrongFocus);
 
     for(int i=0; i< 5; i++) {
         if(i>=files.length()) fileComboBox->addItem(QString::number(i+1));
