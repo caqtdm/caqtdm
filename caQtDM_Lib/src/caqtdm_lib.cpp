@@ -483,9 +483,12 @@ void CaQtDM_Lib::EnableDisableIO()
             //qDebug() << widget << widget->currentIndex() << widget->tabText(i);
             QList<QWidget*> children = widget->widget(i)->findChildren<QWidget *>();
 
-            // go through our ca objects on this page (except for caStripplot, needing history data)
+            // go through our ca objects on this page (except for caStripplot and cawaterfallplot, needing history data)
             foreach(QWidget* w1, children) {
-                if(w1->objectName().contains("ca") && !w1->objectName().contains("caStripPlot")) {
+                QString className = w1->metaObject()->className();
+                if(className.contains("ca") &&
+                  !className.contains("caStripPlot") &&
+                  !className.contains("caWaterfallPlot")) {
 
                     // nearest parent tab
                     QTabWidget* tabWidget = w1->property("parentTab").value<QTabWidget*>();
