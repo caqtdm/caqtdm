@@ -36,13 +36,17 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
     monData = data;
 
     QGridLayout *Layout = new QGridLayout;
-
-    Qt::WindowFlags flags = Qt::Dialog;
-    setWindowFlags(flags);
     setWindowModality (Qt::WindowModal);
+
 #ifdef Q_OS_IOS
+    QPalette palette;
+    palette.setBrush(QPalette::Background, QColor(255,255,224,255));
+    setPalette(palette);
+    setAutoFillBackground(true);
     setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(thisWidth,thisHeight), qApp->desktop()->availableGeometry()));
 #else
+    Qt::WindowFlags flags = Qt::Dialog;
+    setWindowFlags(flags);
     move(parent->x() + parent->width() / 2 - thisWidth / 2 , parent->y() + parent->height() /2 -thisHeight/2);
 #endif
 
