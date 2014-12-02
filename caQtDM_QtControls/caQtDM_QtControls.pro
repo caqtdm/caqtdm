@@ -68,7 +68,13 @@ win32 {
          }
      }
 }
-
+PRE_TARGETDEPS += \
+     moc/moc_caslider.cpp \
+     moc/moc_cacartesianplot.cpp \
+     moc/moc_castripplot.cpp
+contains(QT_VER_MAJ, 5) {
+  PRE_TARGETDEPS += moc/moc_qwt_thermo_marker_61.cpp
+}
 SOURCES	+= \
     src/caframe.cpp \
     src/cainclude.cpp \

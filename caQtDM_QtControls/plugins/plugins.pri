@@ -6,8 +6,8 @@ contains(QT_VER_MAJ, 4) {
 }
 
 contains(QT_VER_MAJ, 5) {
-   CONFIG += plugin uitools qt thread warn_on
-   QT += designer widgets
+   CONFIG += plugin qt thread warn_on
+   QT += designer widgets uitools
 }
 
 TEMPLATE = lib
@@ -51,7 +51,7 @@ win32 {
      }  
 }
 
-unix:!ios {
+unix {
    DESTDIR = $(CAQTDM_COLLECT)/designer
    unix {
      INCLUDEPATH += $(QWTINCLUDE)

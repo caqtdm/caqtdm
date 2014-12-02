@@ -1,6 +1,9 @@
 _QTHOME=$$(QTHOME)
 _QWTHOME=$$(QWTHOME)
 _EPICSBASE=$$(EPICS_BASE)
+_EPICSHOSTARCH=$$(EPICS_HOST_ARCH)
+
+
 
 isEmpty(_QTHOME){
  message("QTHOME must be defined in order to locate QT")
@@ -22,6 +25,14 @@ isEmpty(_EPICSBASE){
 }else{
  message("EPICS located in $$_EPICSBASE")
 }
+
+isEmpty(_EPICSHOSTARCH){
+ message("EPICS_HOST_ARCH must be defined in order to use EPICS")
+ error(please define EPICS_HOST_ARCH.)
+}else{
+ message("EPICS located in $$_EPICSHOSTARCH")
+}
+
 
 #version check qt
 contains(QT_VERSION, ^4\\.[0-5]\\..*) {
