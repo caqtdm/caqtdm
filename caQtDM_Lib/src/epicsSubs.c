@@ -189,7 +189,7 @@ static void dataCallback(struct event_handler_args args)
             int dataSize;
             char* ptr;
             struct dbr_sts_char *stsF = (struct dbr_sts_char *) args.dbr;
-            dbr_char_t *val_ptr = dbr_value_ptr(args.dbr, DBR_CTRL_CHAR);
+            dbr_char_t *val_ptr = dbr_value_ptr(args.dbr, DBR_STS_CHAR);
 
             PRINT(printf("dataCallback char %s %d %d <%s> status=%d count=%d nBytes=%d\n", ca_name(args.chid), (int) args.chid,
                          info->index, ca_host_name(args.chid),
