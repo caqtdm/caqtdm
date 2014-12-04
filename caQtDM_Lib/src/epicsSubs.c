@@ -609,13 +609,15 @@ void connectCallback(struct connection_handler_args args)
         break;
     case cs_prev_conn:
         PRINT(printf("%s with channel %d has just disconnected, evid=%d\n", ca_name(args.chid), args.chid, info->evID));
+        if(info->evAdded) {
+            status = ca_clear_event(info->evID);
+            if (status != ECA_NORMAL) {
+               PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+            }
+        }
         info->connected = false;
         info->event = 0;
         info->evAdded = false;
-        status = ca_clear_event(info->evID);
-        if (status != ECA_NORMAL) {
-            PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
-        }
         break;
     case cs_conn:
         PRINT(printf("%s has just connected with channel id=%d count=%d native type=%s\n", ca_name(args.chid), (int) args.chid, ca_element_count(args.chid), dbf_type_to_text(ca_field_type(args.chid))));
