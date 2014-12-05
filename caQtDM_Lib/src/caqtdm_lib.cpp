@@ -420,9 +420,13 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     }
 
     // start a timer
-    startTimer(1000);
+    loopTimerID = startTimer(1000);
 
     EpicsFlushIO();
+
+    // performance test
+    benchmarkTimer = 0;
+    //speedTimer.start();
 }
 
 /**
@@ -542,7 +546,6 @@ void CaQtDM_Lib::timerEvent(QTimerEvent *event)
     EpicsFlushIO();
 
     if(loopTimer == 5){
-        loopTimer = false;
         EnableDisableIO();
         loopTimer = 0;
     }
@@ -671,6 +674,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     if(caImage* widget = qobject_cast<caImage *>(w1)) {
 
         //qDebug() << "create caImage";
+        w1->setProperty("ObjectType", caImage_Widget);
 
         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
 
@@ -687,6 +691,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caRelatedDisplay* widget = qobject_cast<caRelatedDisplay *>(w1)) {
 
         //qDebug() << "create caRelatedDisplay" << widget << widget->getLabels() << widget->getArgs() <<  widget->getFiles();
+        w1->setProperty("ObjectType", caRelatedDisplay_Widget);
 
         QString text;
 
@@ -713,6 +718,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caShellCommand* widget = qobject_cast<caShellCommand *>(w1)) {
 
         //qDebug() << "create caShellCommand";
+        w1->setProperty("ObjectType", caShellCommand_Widget);
 
         QString text;
         text= widget->getLabels();
@@ -738,6 +744,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caMenu* widget = qobject_cast<caMenu *>(w1)) {
 
         //qDebug() << "create caMenu";
+        w1->setProperty("ObjectType", caMenu_Widget);
 
         QString text = widget->getPV();
         if(text.size() > 0) {
@@ -753,6 +760,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caCamera* widget = qobject_cast<caCamera *>(w1)) {
 
         //qDebug() << "create caCamera";
+        w1->setProperty("ObjectType", caCamera_Widget);
 
         // addmonitor normally will add a tooltip to show the pv; however here we have more than one pv
         QString tooltip;
@@ -833,6 +841,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caChoice* widget = qobject_cast<caChoice *>(w1)) {
 
         //qDebug() << "create caChoice";
+        w1->setProperty("ObjectType", caChoice_Widget);
 
         QString text = widget->getPV();
         if(text.size() > 0) {
@@ -848,6 +857,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caLabel* widget = qobject_cast<caLabel *>(w1)) {
 
         //qDebug() << "create caLabel";
+        w1->setProperty("ObjectType", caLabel_Widget);
 
         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
 
@@ -861,6 +871,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caTextEntry* widget = qobject_cast<caTextEntry *>(w1)) {
 
         //qDebug() << "create caTextEntry";
+        w1->setProperty("ObjectType", caTextEntry_Widget);
 
         if(widget->getPV().size() > 0) {
             widget->setEnabled(true);
@@ -879,6 +890,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caLineEdit* widget = qobject_cast<caLineEdit *>(w1)) {
 
         //qDebug() << "create caLineEdit";
+        w1->setProperty("ObjectType", caLineEdit_Widget);
 
         if(widget->getPV().size() > 0) {
             //widget->setEnabled(false);  // in order to be able to drag, but this disables context, is now done in caLineEdit
@@ -900,6 +912,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caGraphics* widget = qobject_cast<caGraphics *>(w1)) {
 
         //qDebug() << "create caGraphics";
+        w1->setProperty("ObjectType", caGraphics_Widget);
 
         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
         widget->setProperty("Taken", true);
@@ -908,6 +921,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caPolyLine* widget = qobject_cast<caPolyLine *>(w1)) {
 
         //qDebug() << "create caPolyLine";
+        w1->setProperty("ObjectType", caPolyLine_Widget);
 
         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
         widget->setProperty("Taken", true);
@@ -916,6 +930,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if (caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w1)){
 
         //qDebug() << "create caAppyNumeric";
+        w1->setProperty("ObjectType", caApplyNumeric_Widget);
 
         if(widget->getPV().size() > 0) {
             addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
@@ -928,6 +943,9 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //==================================================================================================================
     } else if (caNumeric* widget = qobject_cast<caNumeric *>(w1)){
+
+        //qDebug() << "create caNumeric";
+        w1->setProperty("ObjectType", caNumeric_Widget);
 
         if(widget->getPV().size() > 0) {
             addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
@@ -942,6 +960,9 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         //==================================================================================================================
     } else if (caSpinbox* widget = qobject_cast<caSpinbox *>(w1)){
 
+        //qDebug() << "create caSpinbox";
+        w1->setProperty("ObjectType", caSpinbox_Widget);
+
         if(widget->getPV().size() > 0) {
             addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
             widget->setPV(pv);
@@ -954,8 +975,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         //==================================================================================================================
     } else if (caMessageButton* widget = qobject_cast<caMessageButton *>(w1)) {
 
-        QString text;
         //qDebug() << "create caMessageButton" <<  widget->getPV();
+        w1->setProperty("ObjectType", caMessageButton_Widget);
+
+        QString text;
+
         if(widget->getPV().size() > 0) {
             addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
             widget->setPV(pv);
@@ -974,6 +998,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caToggleButton* widget = qobject_cast<caToggleButton *>(w1)) {
 
         //qDebug() << "create caToggleButton";
+        w1->setProperty("ObjectType", caToggleButton_Widget);
 
         connect(widget, SIGNAL(toggleButtonSignal(bool)), this, SLOT(Callback_ToggleButton(bool)));
 
@@ -988,7 +1013,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         //==================================================================================================================
     } else if(caScriptButton* widget = qobject_cast<caScriptButton *>(w1)) {
 
-        //qDebug() << "create caToggleButton";
+        //qDebug() << "create caScriptButton";
+        w1->setProperty("ObjectType", caScriptButton_Widget);
 
         connect(widget, SIGNAL(scriptButtonSignal()), this, SLOT(Callback_ScriptButton()));
 
@@ -1000,6 +1026,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caLed* widget = qobject_cast<caLed *>(w1)) {
 
         //qDebug() << "create caLed";
+        w1->setProperty("ObjectType", caLed_Widget);
 
         if(widget->getPV().size() > 0) {
             addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
@@ -1012,6 +1039,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caBitnames* widget = qobject_cast<caBitnames *>(w1)) {
 
         //qDebug() << "create caBitnames";
+        w1->setProperty("ObjectType", caBitnames_Widget);
 
         if(widget->getEnumPV().size() > 0 && widget->getValuePV().size() > 0) {
             addMonitor(myWidget, &kData, widget->getEnumPV(), w1, specData, map, &pv);
@@ -1025,6 +1053,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caSlider* widget = qobject_cast<caSlider *>(w1)) {
 
         //qDebug() << "create caSlider";
+        w1->setProperty("ObjectType", caSlider_Widget);
 
         if(widget->getPV().size() > 0) {
             addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
@@ -1038,6 +1067,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caThermo* widget = qobject_cast<caThermo *>(w1)) {
 
         //qDebug() << "create caThermo";
+        w1->setProperty("ObjectType", caThermo_Widget);
 
         if(widget->getPV().size() > 0) {
             addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
@@ -1058,6 +1088,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caLinearGauge* widget = qobject_cast<caLinearGauge *>(w1)) {
 
         //qDebug() << "create lineargauge for" << widget->getPV();
+        w1->setProperty("ObjectType", caLinearGauge_Widget);
 
         if(widget->getPV().size() > 0) {
             addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
@@ -1070,6 +1101,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caCircularGauge* widget = qobject_cast<caCircularGauge *>(w1)) {
 
         //qDebug() << "create circulargauge for" << widget->getPV();
+        w1->setProperty("ObjectType", caCircularGauge_Widget);
 
         if(widget->getPV().size() > 0) {
             addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
@@ -1082,6 +1114,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caByte* widget = qobject_cast<caByte *>(w1)) {
 
         //qDebug() << "create caByte" << w1;
+        w1->setProperty("ObjectType", caByte_Widget);
 
         if(widget->getPV().size() > 0) {
             addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
@@ -1092,6 +1125,9 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //==================================================================================================================
     } else if(caInclude* widget = qobject_cast<caInclude *>(w1)) {
+
+        //qDebug() << "create caInclude" << w1;
+        w1->setProperty("ObjectType", caInclude_Widget);
 
         QWidget *thisW;
         QUiLoader loader;
@@ -1186,12 +1222,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
                 thisW = loader.load(file, this);
                 file->close();
                 delete file;
-/*
-                ftime(&now);
-                double diff = ((double) now.time + (double) now.millitm / (double)1000) -
-                        ((double) last.time + (double) last.millitm / (double)1000);
-                qDebug() << diff;
-*/
             }
 
             // some error with loading
@@ -1250,6 +1280,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caFrame* widget = qobject_cast<caFrame *>(w1)) {
 
         //qDebug() << "treat caFrame" << w1;
+        w1->setProperty("ObjectType", caFrame_Widget);
 
         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
 
@@ -1290,6 +1321,9 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //==================================================================================================================
     } else if(caCartesianPlot* widget = qobject_cast<caCartesianPlot *>(w1)) {
+
+        //qDebug() << "treat caCartesianPlot" << w1;
+        w1->setProperty("ObjectType", caCartesianPlot_Widget);
 
         QString triggerChannel, countChannel, eraseChannel, title;
 
@@ -1478,7 +1512,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         //==================================================================================================================
     } else if(caWaterfallPlot* widget = qobject_cast<caWaterfallPlot *>(w1)) {
 
-        //qDebug() << "create caWaterfallPlot";
+       //qDebug() << "create caWaterfallPlot";
+       w1->setProperty("ObjectType", caWaterfallPlot_Widget);
 
        QString countChannel, waveChannel;
 
@@ -1520,6 +1555,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caStripPlot* widget = qobject_cast<caStripPlot *>(w1)) {
 
         //qDebug() << "create caStripPlot";
+        w1->setProperty("ObjectType", caStripPlot_Widget);
 
         QString text, title;
         QList<QVariant> integerList;
@@ -1577,6 +1613,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     } else if(caTable* widget = qobject_cast<caTable *>(w1)) {
 
         //qDebug() << "create caTable" << widget->getPVS();
+        w1->setProperty("ObjectType", caTable_Widget);
 
         QStringList vars = widget->getPVS().split(";", QString::SkipEmptyParts);
         widget->setColumnCount(3);
@@ -1603,14 +1640,17 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     //==================================================================================================================
     } else if(caWaveTable* widget = qobject_cast<caWaveTable *>(w1)) {
 
-     if(widget->getPV().size() > 0) {
-          addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
-          widget->setPV(pv);
+        //qDebug() << "create caWaveTable" << widget->getPVS();
+        w1->setProperty("ObjectType", caWaveTable_Widget);
+
+        if(widget->getPV().size() > 0) {
+             addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
+             widget->setPV(pv);
+        }
+
+        widget->setProperty("Taken", true);
+
     }
-
-    widget->setProperty("Taken", true);
-
-}
     //==================================================================================================================
 
     // search for a QTabwidget as nearest parent and set it as property
@@ -2116,21 +2156,18 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
     // thread mutexknobdata emits to all instances of this class, later we will have to filter on the emit side to enhance performance
     bool thisInstance = false;
     QWidget *widget = w;
-      while (widget -> parentWidget()) {
+    while (widget -> parentWidget()) {
           widget = widget-> parentWidget() ;
           if(widget == myWidget) {
               thisInstance = true;
               break;
           }
-      }
-      if(!thisInstance) {
+    }
+    if(!thisInstance) {
           return;
-      }
+    }
 
-      //char debug[100];
-      //postMessage(QtDebugMsg, (char*) tr("updatewidget %1").arg(w->objectName()).toAscii().constData());
-      //sprintf(debug, "%d", data.edata.connected);
-      //postMessage(QtDebugMsg, (char*) debug);
+    //nanoTimer.restart();
 
     // calc ==================================================================================================================
     if(caCalc *widget = qobject_cast<caCalc *>(w)) {
@@ -2961,6 +2998,16 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
     } else {
         //qDebug() << "unrecognized widget" << w->metaObject()->className();
     }
+/*
+    benchmarkTimer++;
+    if(benchmarkTimer >= 10000) {
+       int Milliseconds = speedTimer.elapsed();
+       qint64 nanoSec = nanoTimer.nsecsElapsed();
+       printf("Mean Time taken (ms) over %d runs: %lf only this routine %lf\n", benchmarkTimer, (double) Milliseconds/(double)benchmarkTimer, nanoSec/1.e6 );
+       benchmarkTimer = 0;
+       speedTimer.restart();
+    }
+*/
 }
 
 void CaQtDM_Lib::Cartesian(caCartesianPlot *widget, int curvNB, int curvType, int XorY, const knobData &data)
@@ -3538,6 +3585,8 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
 {
     Q_UNUSED(ce);
 
+    killTimer(loopTimerID);
+
     AllowsUpdate = false;
 
     for(int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
@@ -3711,12 +3760,33 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         else strcpy(colMode, "Static");
     } else if (caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w)) {
         pv[0] = widget->getPV().trimmed();
+        knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv[0]);
+        if(widget->getPrecisionMode() == caApplyNumeric::User) {
+            precMode = true;
+            Precision = widget->decDigits();
+        } else {
+            Precision =  kPtr->edata.precision;
+        }
         nbPV = 1;
     } else if (caNumeric* widget = qobject_cast<caNumeric *>(w)) {
         pv[0] = widget->getPV();
+        knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv[0]);
+        if(widget->getPrecisionMode() == caNumeric::User) {
+            precMode = true;
+            Precision = widget->decDigits();
+        } else {
+            Precision =  kPtr->edata.precision;
+        }
         nbPV = 1;
     } else if (caSpinbox* widget = qobject_cast<caSpinbox *>(w)) {
         pv[0] = widget->getPV();
+        knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv[0]);
+        if(widget->getPrecisionMode() == caSpinbox::User) {
+            precMode = true;
+            Precision = widget->decDigits();
+        } else {
+            Precision =  kPtr->edata.precision;
+        }
         nbPV = 1;
     } else if (caMessageButton* widget = qobject_cast<caMessageButton *>(w)) {
         pv[0] = widget->getPV().trimmed();
@@ -3910,6 +3980,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     if(caThermo* widget = qobject_cast<caThermo *>(w)){Q_UNUSED(widget);  myMenu.addAction("Change Limits/Precision");}
     if(caNumeric* widget = qobject_cast<caNumeric *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
     if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
+    if(caSpinbox* widget = qobject_cast<caSpinbox *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
     if(caLinearGauge* widget = qobject_cast<caLinearGauge *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
     if(caCircularGauge* widget = qobject_cast<caCircularGauge *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
 
@@ -4084,8 +4155,13 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         Precision = kPtr->edata.precision;
                     } else {
                         sprintf(asc,"<br>Precision (user) :%d ", Precision);
-                    }
+                    } 
+
                     info.append(asc);
+                    if(className.contains("Gauge")) {
+                        sprintf(asc, "not used for scale") ;
+                       info.append(asc);
+                    }
 
                     // limits
                     if(limitsMode) {

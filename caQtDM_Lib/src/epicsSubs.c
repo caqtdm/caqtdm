@@ -522,7 +522,7 @@ static void displayCallback(struct event_handler_args args) {
 
         // when specifying zero as number of requested elements, we will get variable length arrays (zero lenght is then also considered)
         // probably will not work with older channel access gateways
-        PRINT(printf("ca_add_array_event for %s with chid=%d\n", ca_name(args.chid), args.chid));
+        PRINT(printf("ca_add_array_event for %s with chid=%d index=%d\n", ca_name(args.chid), args.chid, kData.index));
         status = ca_add_array_event(dbf_type_to_DBR_STS(ca_field_type(args.chid)), 0, //ca_element_count(args.chid),
                                      args.chid, dataCallback, info, 0.0,0.0,0.0, &info->evID);
         info->evAdded = true;
@@ -549,7 +549,7 @@ void clearEvent(void * ptr)
     if(!info->connected) return;  // must be connected
     if(info->event < 2) return;  // a first normal addevent must be done
     if(info->evAdded) {
-      //printf("clear event %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded);
+      PRINT(printf("clear event %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded));
       info->evAdded = false;
       status = ca_clear_event(info->evID);
       if (status != ECA_NORMAL) {
@@ -575,7 +575,7 @@ void addEvent(void * ptr)
         if(kData.index == -1) return;
 
         C_DataLock(KnobDataPtr, &kData);
-        //printf("add event %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded);
+        PRINT(printf("add event %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded));
         status = ca_add_array_event(dbf_type_to_DBR_STS(ca_field_type(info->ch)), 0,
                                         info->ch, dataCallback, info, 0.0,0.0,0.0, &info->evID);
         info->evAdded = true;
@@ -658,7 +658,7 @@ void connectCallback(struct connection_handler_args args)
 int CreateAndConnect(int index, knobData *kData, int rate, int skip)
 {
     int status;
-    connectInfo *tmp;
+    connectInfo *info = (connectInfo *) 0;
     struct timeb now;
     ftime(&now);
 #ifdef ACS
@@ -667,13 +667,9 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
 #endif
 
     /* initialize channels */
-
-    kData->index = index;
-
-    tmp = (connectInfo *) 0;
-
     PRINT(printf("create channel index=%d <%s> rate=%d\n", index, kData->pv, rate));
 
+    kData->index = index;
     kData->edata.monitorCount = 0;
     kData->edata.displayCount = 0;
     kData->edata.precision = 0; //default
@@ -685,14 +681,15 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
     kData->edata.lastTime = now;
     kData->edata.repRate = rate;   // default 5 Hz
 
-    tmp = (connectInfo *) kData->edata.info;
-    strcpy(tmp->pv, kData->pv);
+    info = (connectInfo *) kData->edata.info;
 
-    tmp->connected = false;
-    tmp->index = index;
-    tmp->event = 0;
-    tmp->ch = 0;
-    tmp->cs = 0;
+    strcpy(info->pv, kData->pv);
+    info->connected = false;
+    info->index = index;
+    info->event = 0;
+    info->evAdded = false;
+    info->ch = 0;
+    info->cs = 0;
 
     // update knobdata
     C_SetMutexKnobData(KnobDataPtr, index, *kData);
@@ -711,7 +708,7 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
         strcpy(kData->edata.aux, aux);
 
         //printf("we added an acs device <%s> %d %d aux=<%s>\n", kData->pv,   kData->index, index, aux);
-        tmp->cs = 1;                 // acs controlsystem
+        info->cs = 1;                 // acs controlsystem
         // update knobdata
         C_SetMutexKnobData(KnobDataPtr, index, *kData);
         return index;
@@ -720,7 +717,7 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
 
     // epics4
     if(skip) {
-        tmp->cs = 2;
+        info->cs = 2;
         return index;
     }
 
@@ -728,9 +725,9 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
     status = ca_attach_context(dbCaClientContext);
     status = ca_create_channel(kData->pv,
                                (void(*)())connectCallback,
-                               tmp,
+                               info,
                                CA_PRIORITY_DEFAULT,
-                               &tmp->ch);
+                               &info->ch);
     if(status != ECA_NORMAL) {
         printf("ca_create_channel:\n"" %s for %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], kData->pv);
     }
@@ -740,7 +737,7 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
         printf("ca_pend_io:\n"" %s for %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], kData->pv);
     }
 
-    //printf("channel created for button=%d <%s> chid=%d\n", index, kData->pv, tmp->ch);
+    //printf("channel created for button=%d <%s> chid=%d\n", index, kData->pv, info->ch);
 
     return index;
 }
@@ -751,7 +748,7 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
 void ClearMonitor(knobData *kData)
 {
     int status, aux;
-    connectInfo *tmp;
+    connectInfo *info;
 
     status = ca_attach_context(dbCaClientContext);
 
@@ -763,20 +760,33 @@ void ClearMonitor(knobData *kData)
     kData->index = -1;
     kData->pv[0] = '\0';
 
-    tmp = (connectInfo *) kData->edata.info;
-    if (tmp != (connectInfo *) 0) {
-        if(tmp->cs == 0) { // epics
-            if(tmp->ch != (chid) 0) {
-                status = ca_clear_channel(tmp->ch);
-                if(status != ECA_NORMAL) {
-                    printf("ca_clear_channel:\n"" %s %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], tmp->pv);
+    info = (connectInfo *) kData->edata.info;
+    if (info != (connectInfo *) 0) {
+        if(info->cs == 0) { // epics
+            if(info->ch != (chid) 0) {
+                if(info->evAdded) {
+                    info->evAdded = false;
+                    PRINT(printf("ca_clear_event: %s index=%d\n", info->pv, aux));
+                    status = ca_clear_event(info->evID);
+                    if (status != ECA_NORMAL) {
+                        PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+                    }
+                    status = ca_clear_channel(info->ch);
+                    PRINT(printf("ca_clear_channel: %s index=%d\n", info->pv, aux));
+                    info->connected = false;
+                    info->event = 0;
+                    info->ch = 0;
+                    if(status != ECA_NORMAL) {
+                        printf("ca_clear_channel: %s %s index=%d\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], info->pv, aux);
+                    }
+                    info->pv[0] = '\0';
                 }
             }
-        } else if(tmp->cs == 2) { // epics4
+        } else if(info->cs == 2) { // epics4
 
         } else {
 #ifdef ACS
-            //printf("delete acs channel %s index=%d\n", tmp->pv, aux);
+            //printf("delete acs channel %s index=%d\n", info->pv, aux);
             RemoveValueCell(aux);
 #endif
         }

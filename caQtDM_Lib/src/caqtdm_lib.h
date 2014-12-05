@@ -95,6 +95,8 @@ public:
     void allowResizing(bool allowresize);
     int addMonitor(QWidget *thisW, knobData *data, QString pv, QWidget *w, int *specData, QMap<QString, QString> map, QString *pvRep);
     void ComputeNumericMaxMinPrec(QWidget* widget, const knobData &data);
+    void UpdateGauge(EAbstractGauge *w, const knobData &data);
+
 #ifdef Q_OS_IOS
     void grabSwipeGesture(Qt::GestureType fingerSwipeGestureTypeID);
 #endif
@@ -180,7 +182,6 @@ private:
     void TreatOrdinaryValue(QString pv, double value, int32_t idata, QWidget *w);
     bool getSoftChannel(QString pv, knobData &data);
     int parseForDisplayRate(QString input, int &rate);
-    void UpdateGauge(EAbstractGauge *w, const knobData &data);
     void getStatesToggleAndLed(QWidget *widget, const knobData &data, const QString &String, Qt::CheckState &state);
 
     void resizeSpecials(QString className, QWidget *widget, QVariantList list, double factX, double factY);
@@ -236,6 +237,12 @@ private:
     bool fromAS;
 
     int loopTimer;
+    int loopTimerID;
+
+    // performance measurement
+    int benchmarkTimer;
+    QTime speedTimer;
+    QElapsedTimer nanoTimer;
 
 #ifdef epics4
     epics4Subs *Epics4;

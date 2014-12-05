@@ -111,7 +111,7 @@ int EngString::extractSignificantDigits(const QString &fmt)
   if(fmt.contains(ENGFMT))
   {
 	/* not escaped pattern %(\d+)(?:.{0,1}\d*)eng */
-	QString pattern = QString("%(\\d+)(?:.{0,1}\\d*)%1").arg(ENGFMT);
+    QString pattern = QString("%(\\d+)(?:.{0,1}\\d*)%1").arg(ENGFMT);
 	QRegExp re(pattern);
 	int pos = re.indexIn(fmt);
 // 	printf("looking for pattern \"%s\" in \"%s\" : pos %d\n", qstoc(pattern), qstoc(fmt), pos);

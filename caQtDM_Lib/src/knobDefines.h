@@ -50,6 +50,42 @@ typedef char pv_string[MAXPVLEN];  // temporary definition, I should allocate wh
 
 enum caType {caSTRING	= 0, caINT = 1, caSHORT = 1, caFLOAT = 2, caENUM = 3, caCHAR = 4, caLONG = 5, caDOUBLE = 6};
 
+
+// not really used, now just inserted as property in the widgets, not used elsewhere
+enum objectType {caCalc_Widget = 0,
+                 caLabel_Widget,
+                 caInclude_Widget,
+                 caFrame_Widget,
+                 caMenu_Widget,
+                 caChoice_Widget,
+                 caThermo_Widget,
+                 caSlider_Widget,
+                 caLinearGauge_Widget,
+                 caCircularGauge_Widget,
+                 caByte_Widget,
+                 caLineEdit_Widget,
+                 caGraphics_Widget,
+                 caPolyLine_Widget,
+                 caLed_Widget,
+                 caApplyNumeric_Widget,
+                 caNumeric_Widget,
+                 caSpinbox_Widget,
+                 caToggleButton_Widget,
+                 caCartesianPlot_Widget,
+                 caWaterfallPlot_Widget,
+                 caStripPlot_Widget,
+                 caImage_Widget,
+                 caTable_Widget,
+                 caWaveTable_Widget,
+                 caBitnames_Widget,
+                 caCamera_Widget,
+                 caMessageButton_Widget,
+                 caRelatedDisplay_Widget,
+                 caShellCommand_Widget,
+                 caTextEntry_Widget,
+                 caScriptButton_Widget
+                };
+
 typedef struct _connectInfoShort {
     int cs;          // 0= epics, 1 =acs
     int connected;

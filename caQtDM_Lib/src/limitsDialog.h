@@ -74,9 +74,10 @@
      limitsDialog(QWidget *w, MutexKnobData *data, const QString &title, QWidget *parent);
      void exec();
 
- public slots:
+ private slots:
      void cancelClicked();
      void applyClicked();
+     void indexChanged(int);
 
  protected:
      virtual void closeEvent(QCloseEvent *event);
@@ -84,15 +85,20 @@
 
  private:
      enum SourceMode {Channel = 0, User};
+     int extractPrecisionFromFormat(const QString &fmt);
+     QString getFormatFromPrecision(int prec);
 
      QWidget *thisWidget;
      QString thisPV;
      QWidget *thisParent;
      QComboBox *limitsComboBox;
      QComboBox *precisionComboBox;
+     QComboBox *formatComboBox;
      QLineEdit *minimumLineEdit;
      QLineEdit *maximumLineEdit;
      QSpinBox *precisionLineEdit;
+     QSpinBox *integerLineEdit;
+     QSpinBox *decimalLineEdit;
      MutexKnobData *monData;
      QDialogButtonBox *buttonBox;
      QEventLoop loop;
