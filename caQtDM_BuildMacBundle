@@ -12,6 +12,9 @@ chmod 755 ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libca.3.14.12.dylib
 chmod 755 ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libCom.3.14.12.dylib
 cp -R ${QWTHOME}/lib/qwt.framework ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/
 cp -R ${QTHOME}/lib/QtOpenGl.framework ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/
+
+
+
 echo
 echo ========== add libcoca ============
 echo
@@ -101,6 +104,7 @@ install_name_tool -change $QTHOME/lib/QtGui.framework/Versions/5/QtGui @executab
 install_name_tool -change $QTHOME/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
 install_name_tool -change $QTHOME/lib/QtPrintSupport.framework/Versions/5/QtPrintSupport @executable_path/../Frameworks/QtPrintSupport.framework/Versions/5/QtPrintSupport ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
 install_name_tool -change $QTHOME/lib/QtConcurrent.framework/Versions/5/QtConcurrent  @executable_path/../Frameworks/QtConcurrent.framework/Versions/5/QtConcurrent ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
+install_name_tool -change $QTHOME/lib/QtSvg.framework/Versions/5/QtSvg @executable_path/../Frameworks/QtSvg.framework/Versions/5/QtSvg ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
 
 
 echo
