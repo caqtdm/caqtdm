@@ -87,20 +87,20 @@ echo ========== change QtOpenGL.framework ============
 echo
 
 install_name_tool -id  @executable_path/../Frameworks/QtOpenGL.framework/Versions/5/QtOpenGL ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/Versions/5/QtOpenGL
-install_name_tool -change /usr/local/Qt-5.3.1/lib/QtWidgets.framework/Versions/5/QtWidgets @executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/Versions/5/QtOpenGL
-install_name_tool -change /usr/local/Qt-5.3.1/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/Versions/5/QtOpenGL
-install_name_tool -change /usr/local/Qt-5.3.1/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/Versions/5/QtOpenGL
+install_name_tool -change $QTHOME/lib/QtWidgets.framework/Versions/5/QtWidgets @executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/Versions/5/QtOpenGL
+install_name_tool -change $QTHOME/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/Versions/5/QtOpenGL
+install_name_tool -change $QTHOME/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/Versions/5/QtOpenGL
 
 echo
 echo ========== change qwt.framework ============
 echo
 
-install_name_tool -change /usr/local/Qt-5.3.1/lib/QtOpenGL.framework/Versions/5/QtOpenGL @executable_path/../Frameworks/QtOpenGL.framework/Versions/5/QtOpenGL ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
-install_name_tool -change /usr/local/Qt-5.3.1/lib/QtWidgets.framework/Versions/5/QtWidgets @executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
-install_name_tool -change /usr/local/Qt-5.3.1/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
-install_name_tool -change /usr/local/Qt-5.3.1/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
-install_name_tool -change /usr/local/Qt-5.3.1/lib/QtPrintSupport.framework/Versions/5/QtPrintSupport @executable_path/../Frameworks/QtPrintSupport.framework/Versions/5/QtPrintSupport ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
-install_name_tool -change /usr/local/Qt-5.3.1/lib/QtConcurrent.framework/Versions/5/QtConcurrent  @executable_path/../Frameworks/QtConcurrent.framework/Versions/5/QtConcurrent ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
+install_name_tool -change $QTHOME/lib/QtOpenGL.framework/Versions/5/QtOpenGL @executable_path/../Frameworks/QtOpenGL.framework/Versions/5/QtOpenGL ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
+install_name_tool -change $QTHOME/lib/QtWidgets.framework/Versions/5/QtWidgets @executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
+install_name_tool -change $QTHOME/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
+install_name_tool -change $QTHOME/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
+install_name_tool -change $QTHOME/lib/QtPrintSupport.framework/Versions/5/QtPrintSupport @executable_path/../Frameworks/QtPrintSupport.framework/Versions/5/QtPrintSupport ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
+install_name_tool -change $QTHOME/lib/QtConcurrent.framework/Versions/5/QtConcurrent  @executable_path/../Frameworks/QtConcurrent.framework/Versions/5/QtConcurrent ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
 
 
 echo
