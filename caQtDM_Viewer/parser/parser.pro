@@ -35,6 +35,7 @@ CONFIG += console
    OBJECTS_DIR = release/obj	
  }
  DebugBuild {
+   DESTDIR = $(CAQTDM_COLLECT)/debug
    OBJECTS_DIR = debug/obj
  }
 
