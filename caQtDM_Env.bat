@@ -9,7 +9,7 @@
   IF "%EPICSEXTENSIONS%"=="" set EPICSEXTENSIONS=X:/Qt/4.8.5
   IF "%QTCONTROLS_LIBS%"=="" set QTCONTROLS_LIBS=X:/Qt/caqtdm_project/caQtDM_QtControls
   IF "%CAQTDM_COLLECT%"==""  set CAQTDM_COLLECT=X:/Qt/caqtdm_project/caQtDM_Binaries
-  rem IF "%JOM%"==""             set JOM=X:\qt\jom
+  IF "%JOM%"==""             set JOM=X:\qt\jom
   
   
   
