@@ -173,10 +173,10 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
 
     if(className.contains("Gauge")) {
         QLabel *Title = new QLabel(thisPV + " / " + w->objectName() + " (warning/alarm limits can not yet be changed)");
-        Layout->addWidget(Title,0,0);
+        Layout->addWidget(Title,0,0,1,-1);
     } else {
         QLabel *Title = new QLabel(thisPV + " / " + w->objectName());
-        Layout->addWidget(Title,0,0);
+        Layout->addWidget(Title,0,0,1,-1);
     }
 
     // get channel limits if needed later
