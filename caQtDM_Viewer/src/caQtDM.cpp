@@ -172,12 +172,18 @@ int main(int argc, char *argv[])
         }
     }
 
+#ifdef IO_OPTIMIZED_FOR_TABWIDGETS
+    printf("caQtDM -- viewer will disable monitors for hidden pages of QTabWidgets, in case of problems\n");
+    printf("          you may disable this by not defining IO_OPTIMIZED_FOR_TABWIDGETS in qtdefs.pri\n");
+#else
+    printf("caQtDM -- viewer will not disable monitors for hidden pages of QTabWidgets\n");
+    printf("          you may enable this by defining IO_OPTIMIZED_FOR_TABWIDGETS in qtdefs.pri\n");
+#endif
+
     FileOpenWindow window (0, fileName, macroString, attach, minimize, geometry, printscreen, resizing);
     window.setWindowIcon (QIcon(":/caQtDM.ico"));
     window.show();
     window.move(0,0);
-
-
 
     if (signal(SIGINT, unixSignalHandler) == SIG_ERR) {
         qFatal("ERR - %s(%d): An error occurred while setting a signal handler.\n", __FILE__,__LINE__);

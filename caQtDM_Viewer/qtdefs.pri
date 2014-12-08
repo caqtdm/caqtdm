@@ -18,6 +18,9 @@ NETWORKDOWNLOADSUPPORT {
 DEFINES += NETWORKDOWNLOADSUPPORT
 }
 
+# undefine this in order not to disable monitors for hidden pages of QTabWidgets
+DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
+
 # 3.8.7
 # added limits and precision dialogs for several objects
 # in case of tabbed widgets, monitoring of hidden pages is now suspended in order release network traffic and cpu load

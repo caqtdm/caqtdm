@@ -128,11 +128,11 @@ public:
 #ifndef Q_OS_IOS
         QPrinter *printer = new QPrinter;
         printer->setOrientation(QPrinter::Portrait);
-#if QT_VERSION< QT_VERSION_CHECK(5, 0, 0)
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
         printer->setOutputFormat(QPrinter::PostScriptFormat);
 #else
         printer->setOutputFormat(QPrinter::NativeFormat);
-        printf("caQtDM_Lib -- seems that postscript is not supoorted any more in Qt5\n");
+        printf("caQtDM_Lib -- seems that postscript is not supported any more in Qt5\n");
 #endif
         printer->setResolution(300);
         printer->setOutputFileName(filename);

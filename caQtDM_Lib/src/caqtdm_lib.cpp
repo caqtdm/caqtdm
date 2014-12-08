@@ -470,7 +470,8 @@ QTabWidget* CaQtDM_Lib::getTabParent(QWidget *w1)
  */
 void CaQtDM_Lib::EnableDisableIO()
 {
-    /* for version 8.5.6 now activated */
+#ifdef IO_OPTIMIZED_FOR_TABWIDGETS
+
     void *ptr;
 
     // any tabwidgets in this window ? when not do nothing
@@ -530,9 +531,9 @@ void CaQtDM_Lib::EnableDisableIO()
                 }
             }
         }
-    }
+    }  
     EpicsFlushIO();
-
+#endif
 }
 
 
@@ -4859,7 +4860,14 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         }
         table->setValueFont(f);
 #else
-        printf("caQtDM_Lib -- caTable resizing does not work yet in Qt5\n");
+        //printf("caQtDM_Lib -- caTable resizing seems now to work in Qt5\n");
+        for(int i = 0; i < table->rowCount(); ++i) {
+            for(int j = 0; j < table->columnCount(); ++j) {
+                QTableWidgetItem* selectedItem = table->item(i, j);
+                if(selectedItem != (QTableWidgetItem*) 0) selectedItem->setFont(f);
+            }
+        }
+        table->setValueFont(f);
 #endif
         table->verticalHeader()->setDefaultSectionSize((int) (qMin(factX, factY)*20));
         table->setUpdatesEnabled(true);
