@@ -5,9 +5,9 @@ echo ===========================================================================
 
 call caQtDM_Env.bat
 
-call "C:\Program files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" x86
-set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2010
-set PATH=%PATH%;%QTDM_BININSTALL%
+call "C:\Program files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
+set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
+set PATH=%PATH%;%QTHOME%\bin
 
 echo package will be removed from .\caQtDM_Binaries and all directories will be cleaned up
 
@@ -15,7 +15,8 @@ echo Press [Enter] key to start cleanup
 
 echo ========== remove binaries from directories ============
 qmake all.pro
-nmake clean
+where /q jom.exe 
+IF %ERRORLEVEL% NEQ 0 (nmake clean) ELSE (jom clean)
 
 
 echo ========== remove makefiles from directories ============
@@ -49,7 +50,7 @@ rmdir /S /Q .\caQtDM_QtControls\moc
 rmdir /S /Q .\caQtDM_QtControls\plugins\release
 rmdir /S /Q .\caQtDM_QtControls\plugins\debug
 
-rmdir /S /Q .\caQtDM_Binaries
+rem rmdir /S /Q .\caQtDM_Binaries
 
 echo =========== remove package files ==================
 

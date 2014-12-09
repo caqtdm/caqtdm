@@ -1,18 +1,18 @@
 @echo off
 SETLOCAL ENABLEEXTENSIONS
-echo "========== Blub1 ============"
+echo "========== Parameter ============"
 call caQtDM_Env.bat
 
 set PATH=%PATH%;%JOM%
+set PATH=%PATH%;%QTHOME%\bin
 
 echo.
 echo "========== create destination directory if not exists============"
 echo.
 
-call "C:\Program files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" x86
 
-set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2010
-set PATH=%PATH%;%QTDM_BININSTALL%
+
+
 
 
 if exist ".\caQtDM_Binaries" (
