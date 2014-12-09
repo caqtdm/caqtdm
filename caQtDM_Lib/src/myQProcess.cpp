@@ -36,7 +36,7 @@ myQProcess::myQProcess(QObject *parent) : QObject(parent), started(false)
     process->setProcessChannelMode(QProcess::MergedChannels);
     connect(process, SIGNAL(error(QProcess::ProcessError)), SLOT(error(QProcess::ProcessError)));
     connect(process, SIGNAL(finished(int, QProcess::ExitStatus)), SLOT(finished(int, QProcess::ExitStatus)));
-} 
+}
 
 void myQProcess::start(QString program, QIODevice::OpenMode mode)
 {
@@ -44,16 +44,18 @@ void myQProcess::start(QString program, QIODevice::OpenMode mode)
     prog = program;
     process->start(program, mode);
     //qDebug() << process->readAllStandardOutput();
-} 
+}
 
 void myQProcess::error(QProcess::ProcessError err)
 {
     switch(err)
     {
     case QProcess::FailedToStart:
+        started = false;
         QMessageBox::information(0,"FailedToStart","FailedToStart <" + prog + ">");
         break;
     case QProcess::Crashed:
+        started = false;
         QMessageBox::information(0,"Crashed","Crashed <" + prog + ">");
         break;
     case QProcess::Timedout:
@@ -84,5 +86,5 @@ void myQProcess::finished(int exitCode, QProcess::ExitStatus exitStatus)
         QMessageBox::information(0,"Some failure","failure on <" + prog + ">");
     }
     process->deleteLater();
-} 
+}
 
