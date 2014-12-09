@@ -41,26 +41,26 @@ win32 {
 	win32-msvc* {
 		DebugBuild {
 			CONFIG += console
-                        DESTDIR = $(CAQTDM_COLLECT)/debug
+                        DESTDIR = $$(CAQTDM_COLLECT)/debug
 			EPICS_LIBS=$${EPICS_BASE}/lib/$$(EPICS_HOST_ARCH)
 			OBJECTS_DIR = debug/obj
-			LIBS += $(CAQTDM_COLLECT)/debug/caQtDM_Lib.lib
-			LIBS += $$(QWTHOME)/lib/qwtd.lib
+			LIBS += $$(CAQTDM_COLLECT)/debug/caQtDM_Lib.lib
+			LIBS += $$(QWTLIB)/qwtd.lib
 			LIBS += $$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)/ca.lib
 			LIBS += $$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)/COM.lib
-			LIBS += $(CAQTDM_COLLECT)/debug/qtcontrols.lib
+			LIBS += $$(CAQTDM_COLLECT)/debug/qtcontrols.lib
 
 
 		}
 		ReleaseBuild {
-                        DESTDIR = $(CAQTDM_COLLECT)
+                        DESTDIR = $$(CAQTDM_COLLECT)
 			EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
 			OBJECTS_DIR = release/obj
-			LIBS += $(CAQTDM_COLLECT)/caQtDM_Lib.lib
-			LIBS += $$(QWTHOME)/lib/qwt.lib
+			LIBS += $$(CAQTDM_COLLECT)/caQtDM_Lib.lib
+			LIBS += $$(QWTLIB)/qwt.lib
 			LIBS += $$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)/ca.lib
 			LIBS += $$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)/COM.lib
-			LIBS += $(CAQTDM_COLLECT)/qtcontrols.lib
+			LIBS += $$(CAQTDM_COLLECT)/qtcontrols.lib
 		}
 	}
 

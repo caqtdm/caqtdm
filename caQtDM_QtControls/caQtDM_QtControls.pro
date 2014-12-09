@@ -56,14 +56,14 @@ win32 {
         DebugBuild {
                 OBJECTS_DIR = debug/obj
                 DESTDIR = $(CAQTDM_COLLECT)/debug
-                INCLUDEPATH += $$(QWTHOME)/include
+                INCLUDEPATH += $$(QWTINCLUDE)
                 LIBS += $$(QWTHOME)/lib/qwtd.lib
         }
 
         ReleaseBuild {
                 DESTDIR = $(CAQTDM_COLLECT)
                 OBJECTS_DIR = release/obj
-                INCLUDEPATH += $$(QWTHOME)/include
+                INCLUDEPATH += $$(QWTINCLUDE)
                 LIBS += $$(QWTHOME)/lib/qwt.lib
          }
      }
