@@ -38,6 +38,7 @@ public:
 
     explicit myQProcess(QObject *parent = 0);
     ~myQProcess() {
+     if (process != (QProcess *) 0)
         if (started && process->state() != QProcess::NotRunning)
             process->kill();
     }
