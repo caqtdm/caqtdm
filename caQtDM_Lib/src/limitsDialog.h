@@ -48,13 +48,7 @@
 #include "knobDefines.h"
 #include "knobData.h"
 #include "mutexKnobData.h"
-#include "caslider.h"
-#include "calineedit.h"
-#include "cathermo.h"
-#include "catextentry.h"
-#include "canumeric.h"
-#include "caspinbox.h"
-#include "cagauge.h"
+#include "inlines.h"
 #include "caqtdm_lib.h"
 
  class QCheckBox;
@@ -106,6 +100,5 @@
      bool doNothing;
      double channelLowerLimit, channelUpperLimit, channelPrecision;
  };
-
 
  #endif

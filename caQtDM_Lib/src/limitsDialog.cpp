@@ -465,113 +465,44 @@ void limitsDialog::applyClicked()
         }
         widget->updateAlarmColors();
 
-        // ************* we have a caNumeric
-    } else if(caNumeric* widget = qobject_cast<caNumeric *>(thisWidget)) {
+        // ************* we have a caNumeric, caApplyNumeric or caSpinbox
+    } else if(className.contains("caNumeric") || className.contains("caApplyNumeric")  || className.contains("caSpinbox")) {
 
         if(limitsMode == Channel) {
-            widget->setLimitsMode(caNumeric::Channel);
+            setLimitsModeChannel(thisWidget);
             if(!doNothing) {
-                widget->setMaxValue(channelUpperLimit);
-                widget->setMinValue(channelLowerLimit);
+                setMaxValueA(thisWidget, channelUpperLimit);
+                setMinValueA(thisWidget, channelLowerLimit);
             }
         } else if(limitsMode == User){
-            widget->setLimitsMode(caNumeric::User);
-            widget->setMaxValue(max);
-            widget->setMinValue(min);
+            setLimitsModeUser(thisWidget);
+            setMaxValueA(thisWidget, max);
+            setMinValueA(thisWidget, min);
         }
 
         if(fixedFormat) {
-           widget->setFixedFormat(true);
-           widget->setDecDigits(decDigits);
-           widget->setIntDigits(intDigits);
+           setFixedFormatA(thisWidget, true);
+           setDecDigitsA(thisWidget, decDigits);
+           setIntDigitsA(thisWidget, intDigits);
         } else {
-           widget->setFixedFormat(false);
+           setFixedFormatA(thisWidget, false);
            if(precisionMode == Channel) {
-               widget->setPrecisionMode(caNumeric::Channel);
-               widget->setDecDigits((int) channelPrecision);
+               setPrecisionModeChannel(thisWidget);
+               setDecDigitsA(thisWidget, (int) channelPrecision);
            } else if(precisionMode == User){
-               widget->setPrecisionMode(caNumeric::User);
-               widget->setDecDigits(prec);
+               setPrecisionModeUser(thisWidget);
+               setDecDigitsA(thisWidget, prec);
            }
         }
-        knobData *kPtr = monData->getMutexKnobDataPV(widget, thisPV);
-        CaQtDM_Lib *compute = (CaQtDM_Lib *) widget;
+
+        knobData *kPtr = monData->getMutexKnobDataPV(thisWidget, thisPV);
+        CaQtDM_Lib *compute = (CaQtDM_Lib *) thisWidget;
         if(kPtr != (knobData*) 0) {
             kPtr->edata.initialize = true;
-            compute->ComputeNumericMaxMinPrec(widget, *kPtr);
+            compute->ComputeNumericMaxMinPrec(thisWidget, *kPtr);
+            kPtr->edata.initialize = false;
         }
 
-        // ************* we have a caApplyNumeric, we just cut and paste the above code, not nice, we should redesign the widgets
-    } else if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(thisWidget)) {
-
-        if(limitsMode == Channel) {
-            widget->setLimitsMode(caApplyNumeric::Channel);
-            if(!doNothing) {
-                widget->setMaxValue(channelUpperLimit);
-                widget->setMinValue(channelLowerLimit);
-            }
-        } else if(limitsMode == User){
-            widget->setLimitsMode(caApplyNumeric::User);
-            widget->setMaxValue(max);
-            widget->setMinValue(min);
-        }
-
-        if(fixedFormat) {
-           widget->setFixedFormat(true);
-           widget->setDecDigits(decDigits);
-           widget->setIntDigits(intDigits);
-        } else {
-           widget->setFixedFormat(false);
-           if(precisionMode == Channel) {
-               widget->setPrecisionMode(caApplyNumeric::Channel);
-               widget->setDecDigits((int) channelPrecision);
-           } else if(precisionMode == User){
-               widget->setPrecisionMode(caApplyNumeric::User);
-               widget->setDecDigits(prec);
-           }
-        }
-        knobData *kPtr = monData->getMutexKnobDataPV(widget, thisPV);
-        CaQtDM_Lib *compute = (CaQtDM_Lib *) widget;
-        if(kPtr != (knobData*) 0) {
-            kPtr->edata.initialize = true;
-            compute->ComputeNumericMaxMinPrec(widget, *kPtr);
-        }
-
-        // ************* we have a caSpinbox, we just cut and paste the above code, not nice, we should redesign the widgets
-    } else if(caSpinbox* widget = qobject_cast<caSpinbox *>(thisWidget)) {
-
-        if(limitsMode == Channel) {
-            widget->setLimitsMode(caSpinbox::Channel);
-            if(!doNothing) {
-                widget->setMaxValue(channelUpperLimit);
-                widget->setMinValue(channelLowerLimit);
-            }
-        } else if(limitsMode == User){
-            widget->setLimitsMode(caSpinbox::User);
-            widget->setMaxValue(max);
-            widget->setMinValue(min);
-        }
-
-        if(fixedFormat) {
-           widget->setFixedFormat(true);
-           widget->setDecDigits(decDigits);
-           widget->setIntDigits(intDigits);
-        } else {
-           widget->setFixedFormat(false);
-           if(precisionMode == Channel) {
-               widget->setPrecisionMode(caSpinbox::Channel);
-               widget->setDecDigits((int) channelPrecision);
-           } else if(precisionMode == User){
-               widget->setPrecisionMode(caSpinbox::User);
-               widget->setDecDigits(prec);
-           }
-        }
-        knobData *kPtr = monData->getMutexKnobDataPV(widget, thisPV);
-        CaQtDM_Lib *compute = (CaQtDM_Lib *) widget;
-        if(kPtr != (knobData*) 0) {
-            kPtr->edata.initialize = true;
-            compute->ComputeNumericMaxMinPrec(widget, *kPtr);
-        }
     } else if(EAbstractGauge* widget = qobject_cast<EAbstractGauge *>(thisWidget)) {
 
         if(limitsMode == Channel) {
@@ -590,12 +521,11 @@ void limitsDialog::applyClicked()
         if(kPtr != (knobData*) 0) {
             kPtr->edata.initialize = true;
             compute->UpdateGauge(widget, *kPtr);
+            kPtr->edata.initialize = false;
         }
         widget->setValueFormat(getFormatFromPrecision(prec));
-
     }
 }
-
 
 void limitsDialog::exec()
 {

@@ -81,8 +81,8 @@ HEADERS += caqtdm_lib.h\
     processWindow.h \
     splashscreen.h \
     epicsExternals.h \
-    myQProcess.h
-
+    myQProcess.h \
+    inlines.h
 
 HEADERS += \
     JSONValue.h \
