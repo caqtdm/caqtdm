@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.8.7
+CAQTDM_VERSION = V3.8.8
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -20,6 +20,9 @@ DEFINES += NETWORKDOWNLOADSUPPORT
 
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
+
+# 3.8.8
+# modified the shared memory key for x-windows in order to distinguish the display used
 
 # 3.8.7
 # added limits and precision dialogs for several objects
