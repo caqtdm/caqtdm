@@ -163,8 +163,13 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     messageWindow->show();
 #endif
 #ifndef Q_OS_IOS
+#ifdef Q_WS_X11
+    QString uniqueKey = QString("caQtDM shared memory:") + DisplayString(QX11Info::display());
+    sharedMemory.setKey (uniqueKey);
+#else
+    QString uniqueKey = QString("caQtDM shared memory");
     sharedMemory.setKey ("caQtDM shared memory");
-
+#endif
     if (sharedMemory.attach()) {
         _isRunning = true;
         if(attach) {
