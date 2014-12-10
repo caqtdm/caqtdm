@@ -25,6 +25,9 @@
 
 #ifdef _MSC_VER
     #include <windows.h>
+  #if (_MSC_VER > 1700)
+    #include <stdbool.h>
+  #endif
 #else
     #include <unistd.h>
 #endif
