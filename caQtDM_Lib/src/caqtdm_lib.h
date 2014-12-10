@@ -27,6 +27,9 @@
 #define CAQTDM_LIB_H
 
 #include "caQtDM_Lib_global.h"
+#if defined(_MSC_VER)
+   #define _MATH_DEFINES_DEFINED
+#endif
 
 #ifdef epics4
     #include "epics4Subs.h"

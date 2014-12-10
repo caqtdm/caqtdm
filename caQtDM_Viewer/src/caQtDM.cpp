@@ -23,11 +23,11 @@
  *    anton.mezger@psi.ch
  */
 
-#include "dmsearchfile.h"
-
 #if defined(_MSC_VER)
+   #define _MATH_DEFINES_DEFINED
    #define NOMINMAX
    #include <windows.h>
+   #define strdup _strdup
 #endif
 
 #include "dmsearchfile.h"

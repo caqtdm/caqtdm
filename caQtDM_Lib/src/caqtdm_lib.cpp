@@ -22,11 +22,7 @@
  *  Contact details:
  *    anton.mezger@psi.ch
  */
-
 #include "caQtDM_Lib_global.h"
-#include "caqtdm_lib.h"
-#include "dmsearchfile.h"
-#include "parsepepfile.h"
 #include <stdint.h>
 #include <math.h>
 #include <stdlib.h>
@@ -42,6 +38,9 @@
 #  include <sys/wait.h>
 #  include <unistd.h>
 #endif
+#include "caqtdm_lib.h"
+#include "dmsearchfile.h"
+#include "parsepepfile.h"
 
 #ifdef  NETWORKDOWNLOADSUPPORT
 #include "fileFunctions.h"
@@ -531,7 +530,7 @@ void CaQtDM_Lib::EnableDisableIO()
                 }
             }
         }
-    }  
+    }
     EpicsFlushIO();
 #endif
 }
@@ -4156,7 +4155,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         Precision = kPtr->edata.precision;
                     } else {
                         sprintf(asc,"<br>Precision (user) :%d ", Precision);
-                    } 
+                    }
 
                     info.append(asc);
                     if(className.contains("Gauge")) {
