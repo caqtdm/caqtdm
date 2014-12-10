@@ -31,8 +31,6 @@ win32 {
 	     LIBS += $$(QTCONTROLS_LIBS)/release/libqtcontrols.a
      }
      win32-msvc* {
-	     message($$CONFIG)
-	     
 	     CONFIG(DebugBuild, DebugBuild|ReleaseBuild) { 
                      INCLUDEPATH += $(QWTINCLUDE)
 		     LIBS += $$(QWTHOME)/lib/qwtd.lib
