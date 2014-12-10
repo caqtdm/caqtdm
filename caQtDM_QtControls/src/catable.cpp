@@ -62,6 +62,8 @@ caTable::caTable(QWidget *parent) : QTableWidget(parent)
 
 void caTable::cellclicked(int row, int col)
 {
+    Q_UNUSED(row);
+    Q_UNUSED(col);
     //printf("clicked %d %d\n", row, col);
 }
 

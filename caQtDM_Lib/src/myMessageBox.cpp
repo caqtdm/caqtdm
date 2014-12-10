@@ -72,6 +72,7 @@ void myMessageBox::exec()
 
 void myMessageBox::closeEvent(QCloseEvent *event)
 {
+    Q_UNUSED(event);
     loop.quit();
 }
 

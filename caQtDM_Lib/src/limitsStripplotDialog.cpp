@@ -198,6 +198,7 @@ void limitsStripplotDialog::exec()
 
 void limitsStripplotDialog::closeEvent(QCloseEvent *event)
 {
+    Q_UNUSED(event);
     loop.quit();
 }
 
