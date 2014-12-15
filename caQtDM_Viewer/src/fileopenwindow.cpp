@@ -393,13 +393,20 @@ void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
     while(!in.atEnd()) {
         QString line = in.readLine();
         QStringList fields = line.split(" ");
-        if(fields.count() > 1) setenv(fields.at(0).toAscii().constData(), fields.at(1).toAscii().constData(), 1);
-        else if(line.size() > 0){
+        if(fields.count() > 1) {
+            QString envString = "";
+            for(int i=1; i<fields.count(); i++) {
+                envString.append(fields.at(i));
+                if(i<fields.count() -1) envString.append(" ");
+            }
+            setenv(fields.at(0).toAscii().constData(), envString.toAscii().constData(), 1);
+            //messageWindow->postMsgEvent(QtDebugMsg, (char*)envString.toAscii().constData());
+        } else if(line.size() > 0) {
             sprintf(asc, "environment variable could not be set from %s", line.toAscii().constData());
             messageWindow->postMsgEvent(QtDebugMsg, asc);
         }
     }
-    //Replacement for standard wirtable directory
+    //Replacement for standard writable directory
     setenv("CAQTDM_DISPLAY_PATH",stdpathdoc.toAscii().constData(),1);
 
     sprintf(asc, "epics configuration file loaded: %s", fileName.toAscii().constData());
