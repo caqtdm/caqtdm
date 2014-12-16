@@ -209,6 +209,8 @@ static void dataCallback(struct event_handler_args args)
             memcpy(ptr, val_ptr, args.count *sizeof(char));
             ptr[args.count] = '\0';
 
+            kData.edata.valueCount =  args.count;
+
             C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
         }
         break;
@@ -954,6 +956,88 @@ int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *obje
 
     return ECA_NORMAL;
 
+}
+
+int EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess)
+{
+    chid     ch;
+    chtype   chType;
+    int status;
+
+    UNUSED(errmess);
+    UNUSED(object);
+
+    if(strlen(pv) < 1)  {
+            C_postMsgEvent(messageWindow, 1, vaPrintf("pv with length=0 (not translated for macro?)\n"));
+            return !ECA_NORMAL;
+    }
+
+
+    status = ca_create_channel(pv, NULL, 0, CA_PRIORITY, &ch);
+    if (ch == (chid) 0) {
+        return !ECA_NORMAL;
+    }
+    status = ca_pend_io(CA_TIMEOUT);
+
+    if (ca_state(ch) != cs_conn) {
+        C_postMsgEvent(messageWindow, 1, vaPrintf("pv (%s) is not connected\n", pv));
+        return status;
+    }
+
+    chType = ca_field_type(ch);
+
+
+    switch (chType) {
+
+    case DBF_ENUM:
+        printf("EpicsPutWave -- data type not treated for <%s>?\n", pv);
+        return ECA_BADTYPE;
+    case DBF_DOUBLE:
+        //printf("set %d elements %lf %lf %lf %lf\n", nelm, rdata[0], rdata[1], rdata[2], rdata[3]);
+        status = ca_array_put (DBR_DOUBLE, nelm, ch, ddata);
+        if (status != ECA_NORMAL) {
+            C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
+            return status;
+        }
+        break;
+    case DBF_FLOAT:
+        //printf("set %d elements %lf %lf %lf %lf\n", nelm, rdata[0], rdata[1], rdata[2], rdata[3]);
+        status = ca_array_put (DBR_FLOAT, nelm, ch, fdata);
+        if (status != ECA_NORMAL) {
+            C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
+            return status;
+        }
+        break;
+    case DBF_INT:
+        status = ca_array_put (DBR_INT, nelm, ch, data16);
+        if (status != ECA_NORMAL) {
+            C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
+            return status;
+        }
+        break;
+    case DBF_LONG:
+        status = ca_array_put (DBR_LONG, nelm, ch, data32);
+        if (status != ECA_NORMAL) {
+            C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
+            return status;
+        }
+        break;
+    case DBF_CHAR:
+        status = ca_array_put (DBR_CHAR, nelm, ch, sdata);
+        if (status != ECA_NORMAL) {
+            C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
+            return status;
+        }
+        break;
+    }
+
+    status = ca_pend_io(CA_TIMEOUT);
+    if (status != ECA_NORMAL) {
+        C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
+        return status;
+    }
+
+    return ECA_NORMAL;
 }
 
 void TerminateDeviceIO()

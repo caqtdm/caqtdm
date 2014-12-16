@@ -337,6 +337,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     qRegisterMetaType<knobData>("knobData");
 
+
     // connect signals to slots for exchanging data
     connect(mutexKnobData, SIGNAL(Signal_QLineEdit(const QString&, const QString&)), this,
             SLOT(Callback_UpdateLine(const QString&, const QString&)));
@@ -1646,10 +1647,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         if(widget->getPV().size() > 0) {
              addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
              widget->setPV(pv);
+             connect(widget, SIGNAL(WaveEntryChanged(double, int)), this,
+                     SLOT(Callback_WaveEntryChanged(double, int)));
         }
-
         widget->setProperty("Taken", true);
-
+        widget->setToolTip("select row or columns, then with Ctrl+C you can copy to the clipboard\ninside X11 you can then do shft+ins\nwhen doubleclicking on a value, you can change the value");
     }
     //==================================================================================================================
 
@@ -2909,15 +2911,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 if((widget->getPrecisionMode() != caWaveTable::User) && (data.edata.initialize)) {
                     widget->setFormat(data.edata.precision);
                 }
-                if(widget->getOrientation() == caWaveTable::Horizontal) {
-                  widget->setColumnCount(data.edata.valueCount);
-                  widget->setRowCount(1);
-                } else {
-                    widget->setRowCount(data.edata.valueCount);
-                    widget->setColumnCount(1);
-                }
                 WaveTable(widget, data);
-            // data from value
             } else {
                //widget->displayText(0, 0, NOTCONNECTED, "not a waveform");
             }
@@ -2932,7 +2926,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             // set enum strings
             if(data.edata.fieldtype == caENUM) {
                 widget->setEnumStrings(String);
-            } else if(data.edata.fieldtype == caINT || data.edata.fieldtype == caLONG ) {
+            } else if(data.edata.fieldtype == caINT || data.edata.fieldtype == caLONG) {
                 widget->setValue(data.edata.ivalue);
             } else if(data.edata.fieldtype == caFLOAT || data.edata.fieldtype == caDOUBLE ) {
                 widget->setValue((int) (data.edata.rvalue + 0.5));
@@ -3087,8 +3081,8 @@ void CaQtDM_Lib::WaveTable(caWaveTable *widget, const knobData &data)
         datamutex->unlock();
     }
         break;
-    case caENUM: {
-        int16_t* P = ( int16_t*) data.edata.dataB;
+    case caCHAR: {
+        char * P = (char*) data.edata.dataB;
         widget->setData(P ,data.edata.valueCount);
         datamutex->unlock();
     }
@@ -3159,7 +3153,7 @@ void CaQtDM_Lib::getStatesToggleAndLed(QWidget *widget, const knobData &data, co
         falseString = w->getFalseValue().trimmed();
     }
 
-    if(data.edata.fieldtype == caINT || data.edata.fieldtype == caLONG ) {
+    if(data.edata.fieldtype == caINT || data.edata.fieldtype == caLONG) {
         int trueValue = trueString.toInt(&ok1);
         int falseValue = falseString.toInt(&ok2);
         if(ok1 && trueValue == data.edata.ivalue) {
@@ -3372,6 +3366,18 @@ void CaQtDM_Lib::Callback_TextEntryChanged(const QString& text)
     fType = w->getFormatType();
 
     TreatRequestedValue(text, fType, w1);
+}
+
+void CaQtDM_Lib::Callback_WaveEntryChanged(double value, int index)
+{
+    QWidget *w1 = qobject_cast<QWidget *>(sender());
+    caWaveTable *w = qobject_cast<caWaveTable *>(sender());
+
+    if(!w->getAccessW()) return;
+
+    //qDebug() << "should write" << value << "at index" << index;
+
+    TreatRequestedWave(value, index, w1);
 }
 
 /**
@@ -4764,6 +4770,72 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
     }
 }
 
+/**
+  * this routine will treat the values to write to the pv
+  */
+void CaQtDM_Lib::TreatRequestedWave(double value, int index, QWidget *w)
+{
+    char errmess[255];
+    char sdata[40];
+    int32_t data32[1];
+    int16_t data16[1];
+    float   fdata[1];
+    double  ddata[1];
+
+    int indx =  w->property("MonitorIndex").value<int>();
+    if(indx < 0) return;
+
+    knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
+
+    QMutex *datamutex;
+    datamutex = (QMutex*) kPtr->mutex;
+    datamutex->lock();
+
+    switch(kPtr->edata.fieldtype) {
+    case caFLOAT: {
+        float* P = (float*) kPtr->edata.dataB;
+        P[index] = (float) value;
+        EpicsSetWave((char*) kPtr->pv, P, ddata, data16, data32, sdata, kPtr->edata.valueCount,
+                     (char*) w->objectName().toLower().toAscii().constData(), errmess);
+    }
+        break;
+    case caDOUBLE: {
+        double* P = (double*) kPtr->edata.dataB;
+        P[index] = (double) value;
+        for(int i=0; i<kPtr->edata.valueCount;i++) printf("%f ", P[i]);
+        printf("\n");
+        EpicsSetWave((char*) kPtr->pv, fdata, P, data16, data32, sdata, kPtr->edata.valueCount,
+                     (char*) w->objectName().toLower().toAscii().constData(), errmess);
+    }
+        break;
+    case caLONG: {
+        int32_t* P = (int32_t*) kPtr->edata.dataB;
+        P[index] = (int32_t) value;
+        EpicsSetWave((char*) kPtr->pv, fdata, ddata, data16, P, sdata, kPtr->edata.valueCount,
+                     (char*) w->objectName().toLower().toAscii().constData(), errmess);
+    }
+        break;
+    case caINT: {
+        int16_t* P = (int16_t*) kPtr->edata.dataB;
+        P[index] = (int16_t) value;
+        EpicsSetWave((char*) kPtr->pv, fdata, ddata, P, data32, sdata, kPtr->edata.valueCount,
+                     (char*) w->objectName().toLower().toAscii().constData(), errmess);
+    }
+        break;
+    case caCHAR: {
+        char* P = (char*) kPtr->edata.dataB;
+        P[index] = (char) ((int) value);
+        EpicsSetWave((char*) kPtr->pv, fdata, ddata, data16, data32, P, kPtr->edata.valueCount,
+                     (char*) w->objectName().toLower().toAscii().constData(), errmess);
+    }
+        break;
+    default:
+        break;
+    }
+
+    datamutex->unlock();
+}
+
 int CaQtDM_Lib::parseForDisplayRate(QString inputc, int &rate)
 {
     // Parse data
@@ -4850,7 +4922,6 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
         f.setPointSizeF(fontSize);
         table->setUpdatesEnabled(false);
- #if QT_VERSION< QT_VERSION_CHECK(5, 0, 0)
         for(int i = 0; i < table->rowCount(); ++i) {
             for(int j = 0; j < table->columnCount(); ++j) {
                 QTableWidgetItem* selectedItem = table->item(i, j);
@@ -4858,20 +4929,25 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             }
         }
         table->setValueFont(f);
-#else
-        //printf("caQtDM_Lib -- caTable resizing seems now to work in Qt5\n");
-        for(int i = 0; i < table->rowCount(); ++i) {
-            for(int j = 0; j < table->columnCount(); ++j) {
-                QTableWidgetItem* selectedItem = table->item(i, j);
-                if(selectedItem != (QTableWidgetItem*) 0) selectedItem->setFont(f);
-            }
-        }
-        table->setValueFont(f);
-#endif
         table->verticalHeader()->setDefaultSectionSize((int) (qMin(factX, factY)*20));
         table->setUpdatesEnabled(true);
     }
-
+    else if(!className.compare("caWaveTable")) {
+        caWaveTable *table = (caWaveTable *) widget;
+        QFont f = table->font();
+        qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
+        f.setPointSizeF(fontSize);
+        table->setUpdatesEnabled(false);
+        for(int i = 0; i < table->rowCount(); ++i) {
+            for(int j = 0; j < table->columnCount(); ++j) {
+                QTableWidgetItem* selectedItem = table->item(i, j);
+                if(selectedItem != (QTableWidgetItem*) 0) selectedItem->setFont(f);
+            }
+        }
+        table->setValueFont(f);
+        table->verticalHeader()->setDefaultSectionSize((int) (qMin(factX, factY)*20));
+        table->setUpdatesEnabled(true);
+    }
     else if(!className.compare("QLabel")) {
         QLabel *label = (QLabel *) widget;
         className = label->parent()->metaObject()->className();

@@ -182,6 +182,7 @@ private:
     void postMessage(QtMsgType type, char *msg);
     int Execute(char *command);
     void TreatRequestedValue(QString text, caTextEntry::FormatType fType, QWidget *w);
+    void TreatRequestedWave(double value, int index, QWidget *w);
     void TreatOrdinaryValue(QString pv, double value, int32_t idata, QWidget *w);
     bool getSoftChannel(QString pv, knobData &data);
     int parseForDisplayRate(QString input, int &rate);
@@ -245,7 +246,7 @@ private:
     // performance measurement
     int benchmarkTimer;
     QTime speedTimer;
-    QElapsedTimer nanoTimer;
+    //QElapsedTimer nanoTimer;
 
 #ifdef epics4
     epics4Subs *Epics4;
@@ -275,6 +276,7 @@ private slots:
     void ShowContextMenu(const QPoint&);
     void DisplayContextMenu(QWidget* w);
     void Callback_TextEntryChanged(const QString &);
+    void Callback_WaveEntryChanged(double value, int index);
 
     void processTerminated();
     void closeWindow();

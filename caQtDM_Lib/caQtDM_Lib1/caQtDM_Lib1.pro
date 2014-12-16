@@ -7,6 +7,8 @@ MOC_DIR = ../moc
 VPATH += ../src
 INCLUDEPATH += ../src
 
+DEFINES += EPICS
+
 UI_DIR += ../
 INCLUDEPATH += ../../caQtDM_QtControls/src
 DESTDIR = $(CAQTDM_COLLECT)

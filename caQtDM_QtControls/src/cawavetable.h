@@ -29,6 +29,9 @@
 #include <QTableWidget>
 #include <QAction>
 #include <QFont>
+#include <QEvent>
+#include <QKeyEvent>
+#include <QTimer>
 #include <stdint.h>
 #include <qtcontrols_global.h>
 
@@ -38,12 +41,15 @@ class QTCON_EXPORT caWaveTable : public QTableWidget
 {
 
     Q_OBJECT
+    Q_PROPERTY(int rowCount READ rowCount WRITE setRowCount DESIGNABLE false)
+    Q_PROPERTY(int columnCount READ columnCount WRITE setColumnCount DESIGNABLE false)
 
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
+    Q_PROPERTY(int numberOfRows READ getNumberOfRows WRITE setNumberOfRows)
+    Q_PROPERTY(int numberOfColumns READ getNumberOfColumns WRITE setNumberOfColumns)
     Q_PROPERTY(int columnSize READ getColumnSize WRITE setColumnSize)
     Q_PROPERTY(int precision READ getPrecision WRITE setPrecision)
     Q_PROPERTY(SourceMode precisionMode READ getPrecisionMode WRITE setPrecisionMode)
-    Q_PROPERTY(Orientation orientation READ getOrientation WRITE setOrientation)
     Q_ENUMS(SourceMode)
     Q_ENUMS(Orientation)
 
@@ -55,9 +61,6 @@ public:
     SourceMode getPrecisionMode() const { return thisPrecMode; }
     void setPrecisionMode(SourceMode precmode) {thisPrecMode = precmode;}
 
-    enum Orientation {Horizontal = 0, Vertical};
-    Orientation getOrientation() const { return thisOrientation; }
-    void setOrientation(Orientation orientation);
     int getPrecision() const {return thisPrecision;}
     void setPrecision(int prec) {thisPrecision = prec; setFormat(prec);}
 
@@ -76,35 +79,60 @@ public:
     void setData(float *vector, int size);
     void setData(int16_t *vector, int size);
     void setData(int32_t* vector, int size);
+     void setData(char* vector, int size);
 
-signals:
+    int getAccessW() const {return _AccessW;}
+    void setAccessW(int access);
+    void updateText(const QString &text);
+
+    int getNumberOfRows() const {return rowcount;}
+    void setNumberOfRows(int nbRows);
+    int getNumberOfColumns() const {return colcount;}
+    void setNumberOfColumns(int nbCols);
 
 private slots:
+    void copy();
+    void dataInput(int, int);
+    void cellDoubleclicked(int, int);
+    void cellClicked(int, int);
+    void cellChange(int, int, int, int);
 
-protected:
+signals:
+    void WaveEntryChanged(double value, int index);
 
 private:
+    bool eventFilter(QObject *obj, QEvent *event);
+    void createActions();
+    void enableEdit(QTableWidgetItem* pItem);
+    void disableEdit(QTableWidgetItem* pItem);
+    void setupItems(int nbRows, int nbCols);
+    int toIndex(int row, int col);
+    void fromIndex(int index, int &row, int &col);
+
+    bool _AccessW;
+    QString startText;
+    bool emitted;
 
    template <typename pureData>
    void fillData(pureData *array, int size);
 
-    enum { MaxItems = 500 };
     QString	thisPV;
     int	thisColumnSize;
-
-    QString keepText[MaxItems];
     string40 thisFormat;
-
     int thisPrecision;
     SourceMode thisPrecMode;
-
     QFont thisItemFont;
-
     QAction *copyAct;
 
-    QTableWidgetItem* tableItem[MaxItems];
+    QVector<QString> keepText;
+    QVector<double> keepValue;
+    QVector<bool> blockItem;
 
-    Orientation thisOrientation;
+    int timerID;
+    int colcount;
+    int rowcount;
+    bool dataPresent;
+    bool charsPresent;
 };
 
 #endif
