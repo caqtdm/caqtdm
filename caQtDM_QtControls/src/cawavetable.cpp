@@ -40,7 +40,7 @@ caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
 {
     setPrecisionMode(Channel);
     setPrecision(0);
-    colcount = rowcount = 0;
+    colcount = rowcount = 1;
     dataPresent = false;
     charsPresent = false;
 
@@ -96,13 +96,10 @@ void caWaveTable::setupItems(int nbRows, int nbCols)
             }
         }
     }
-
     keepText.resize(rowcount*colcount+1);
     keepValue.resize(rowcount*colcount+1);
     blockItem.resize(rowcount*colcount+1);
     blockItem.fill(false);
-
-    update();
 }
 
 void caWaveTable::cellChange(int currentRow, int currentColumn, int previousRow, int previousColumn) {
@@ -129,9 +126,9 @@ void caWaveTable::dataInput(int row, int col)
 {
     double value;
     int index = toIndex(row,col);
-
-    if(blockItem.at(index) && dataPresent) {
-        bool ok;
+    if(!dataPresent) return;
+    if(blockItem.at(index)) {
+        bool ok=true;
         blockItem[index] = false;
         QString valueText =  item(row, col)->text();
 
@@ -245,6 +242,7 @@ void caWaveTable::displayText(int index, QString const &text)
 {
     int column =0;
     int row = 0;
+
     if(index > colcount * rowcount) return;
     if(keepText[index] == text) return;
 
