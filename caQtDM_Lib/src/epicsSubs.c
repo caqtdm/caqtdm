@@ -989,11 +989,7 @@ int EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t
 
     switch (chType) {
 
-    case DBF_ENUM:
-        printf("EpicsPutWave -- data type not treated for <%s>?\n", pv);
-        return ECA_BADTYPE;
     case DBF_DOUBLE:
-        //printf("set %d elements %lf %lf %lf %lf\n", nelm, rdata[0], rdata[1], rdata[2], rdata[3]);
         status = ca_array_put (DBR_DOUBLE, nelm, ch, ddata);
         if (status != ECA_NORMAL) {
             C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
@@ -1001,7 +997,6 @@ int EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t
         }
         break;
     case DBF_FLOAT:
-        //printf("set %d elements %lf %lf %lf %lf\n", nelm, rdata[0], rdata[1], rdata[2], rdata[3]);
         status = ca_array_put (DBR_FLOAT, nelm, ch, fdata);
         if (status != ECA_NORMAL) {
             C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));

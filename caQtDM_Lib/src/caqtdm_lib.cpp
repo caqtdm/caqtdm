@@ -2913,11 +2913,11 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 }
                 WaveTable(widget, data);
             } else {
-               //widget->displayText(0, 0, NOTCONNECTED, "not a waveform");
+               widget->displayText(0, "not a waveform");
             }
 
         } else {
-            //widget->displayText(0, 0, NOTCONNECTED, "NC");
+            widget->displayText(0, "NC");
         }
 
         // bitnames table with text and coloring according the value=========================================================
@@ -4802,8 +4802,6 @@ void CaQtDM_Lib::TreatRequestedWave(double value, int index, QWidget *w)
     case caDOUBLE: {
         double* P = (double*) kPtr->edata.dataB;
         P[index] = (double) value;
-        for(int i=0; i<kPtr->edata.valueCount;i++) printf("%f ", P[i]);
-        printf("\n");
         EpicsSetWave((char*) kPtr->pv, fdata, P, data16, data32, sdata, kPtr->edata.valueCount,
                      (char*) w->objectName().toLower().toAscii().constData(), errmess);
     }
