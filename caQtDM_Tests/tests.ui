@@ -219,7 +219,7 @@ border-radius: 2px;
          <string notr="true"/>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
        </widget>
        <widget class="QTextEdit" name="textEdit">
@@ -315,7 +315,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="background">
          <color>
@@ -449,7 +449,7 @@ p, li { white-space: pre-wrap; }
          <string notr="true">A&gt;1</string>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
        </widget>
        <widget class="caGraphics" name="cagraphics_4">
@@ -648,7 +648,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="background">
          <color>
@@ -704,7 +704,7 @@ p, li { white-space: pre-wrap; }
          <string notr="true">A&gt;1</string>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
        </widget>
        <widget class="QTextEdit" name="textEdit_3">
@@ -797,7 +797,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="background">
          <color>
@@ -920,7 +920,7 @@ p, li { white-space: pre-wrap; }
          <string>turbo.gif</string>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
        </widget>
        <widget class="caImage" name="caimage">
@@ -1115,7 +1115,7 @@ p, li { white-space: pre-wrap; }
           <bool>true</bool>
          </property>
          <property name="channel" stdset="0">
-          <string>QTDM:TEST:AO</string>
+          <string>ACM:TEST:AO</string>
          </property>
          <property name="foreground">
           <color>
@@ -1247,7 +1247,7 @@ p, li { white-space: pre-wrap; }
           <bool>true</bool>
          </property>
          <property name="channel" stdset="0">
-          <string>QTDM:TEST:AO</string>
+          <string>ACM:TEST:AO</string>
          </property>
          <property name="foreground">
           <color>
@@ -1348,7 +1348,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>11</number>
+       <number>9</number>
       </property>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">
@@ -1438,7 +1438,7 @@ p, li { white-space: pre-wrap; }
          <bool>true</bool>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="falseColor">
          <color>
@@ -1475,7 +1475,7 @@ p, li { white-space: pre-wrap; }
          <bool>true</bool>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="falseColor">
          <color>
@@ -1509,7 +1509,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="background">
          <color>
@@ -1553,7 +1553,7 @@ p, li { white-space: pre-wrap; }
          <bool>true</bool>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="falseColor">
          <color>
@@ -1602,7 +1602,7 @@ p, li { white-space: pre-wrap; }
          <bool>true</bool>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="falseColor">
          <color>
@@ -1654,7 +1654,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="colorMode">
          <enum>caLed::Alarm</enum>
@@ -1676,7 +1676,7 @@ p, li { white-space: pre-wrap; }
          <number>0</number>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="foreground">
          <color>
@@ -1733,7 +1733,7 @@ p, li { white-space: pre-wrap; }
          <number>10</number>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="externalLimitsEnabled" stdset="0">
          <bool>true</bool>
@@ -1781,7 +1781,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="background">
          <color>
@@ -1843,7 +1843,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="fillMode">
          <enum>caLinearGauge::FROM_ZERO</enum>
@@ -1892,7 +1892,7 @@ p, li { white-space: pre-wrap; }
          <string>%.0f</string>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="fillMode">
          <enum>caLinearGauge::FROM_ZERO</enum>
@@ -1941,7 +1941,7 @@ p, li { white-space: pre-wrap; }
          <string>%.0f</string>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -2026,7 +2026,7 @@ p, li { white-space: pre-wrap; }
          <number>10</number>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="externalLimitsEnabled" stdset="0">
          <bool>true</bool>
@@ -2075,7 +2075,7 @@ p, li { white-space: pre-wrap; }
          <number>2</number>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
        </widget>
        <widget class="caCircularGauge" name="cacirculargauge_3">
@@ -2127,7 +2127,7 @@ p, li { white-space: pre-wrap; }
          <number>2</number>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="valueDisplayed">
          <bool>true</bool>
@@ -2149,7 +2149,7 @@ p, li { white-space: pre-wrap; }
          <set>Qt::AlignCenter</set>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="background">
          <color>
@@ -2184,7 +2184,7 @@ p, li { white-space: pre-wrap; }
          <number>0</number>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="foreground">
          <color>
@@ -2259,7 +2259,7 @@ p, li { white-space: pre-wrap; }
          <number>2</number>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="label">
          <string/>
@@ -2363,7 +2363,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="background">
          <color>
@@ -2392,7 +2392,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="background">
          <color>
@@ -2418,7 +2418,7 @@ p, li { white-space: pre-wrap; }
          <set>Qt::AlignCenter</set>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="background">
          <color>
@@ -2447,7 +2447,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="background">
          <color>
@@ -2483,7 +2483,7 @@ p, li { white-space: pre-wrap; }
          <set>Qt::AlignCenter</set>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="background">
          <color>
@@ -2518,7 +2518,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="colorMode">
          <enum>caLineEdit::Alarm_Default</enum>
@@ -2549,7 +2549,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:MBBO</string>
+         <string notr="true">ACM:TEST:MBBO</string>
         </property>
        </widget>
        <widget class="caLineEdit" name="calineedit_17">
@@ -2565,7 +2565,7 @@ p, li { white-space: pre-wrap; }
          <set>Qt::AlignCenter</set>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="background">
          <color>
@@ -2609,7 +2609,7 @@ p, li { white-space: pre-wrap; }
          <set>Qt::AlignCenter</set>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="background">
          <color>
@@ -2660,7 +2660,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:COUNT:1</string>
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="colorMode">
          <enum>caLineEdit::Alarm_Default</enum>
@@ -2729,7 +2729,7 @@ p, li { white-space: pre-wrap; }
          <double>-2.000000000000000</double>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="direction">
          <enum>caThermo::Up</enum>
@@ -2777,7 +2777,7 @@ p, li { white-space: pre-wrap; }
          <double>-2.000000000000000</double>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="direction">
          <enum>caThermo::Right</enum>
@@ -2825,7 +2825,7 @@ p, li { white-space: pre-wrap; }
          <double>0.000000000000000</double>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="direction">
          <enum>caThermo::Up</enum>
@@ -2926,7 +2926,7 @@ p, li { white-space: pre-wrap; }
          <string>uA</string>
         </property>
         <property name="channels_1" stdset="0">
-         <string notr="true">QTDM:TEST:AO_WAVE;QTDM:TEST:AO_WAVE</string>
+         <string notr="true">ACM:TEST:DOUBLE_WAVE;ACM:TEST:DOUBLE_WAVE</string>
         </property>
         <property name="Style_1">
          <enum>caCartesianPlot::FillUnder</enum>
@@ -3013,36 +3013,6 @@ p, li { white-space: pre-wrap; }
          <enum>caCartesianPlot::log10</enum>
         </property>
        </widget>
-       <widget class="caNumeric" name="canumeric_6">
-        <property name="geometry">
-         <rect>
-          <x>635</x>
-          <y>45</y>
-          <width>186</width>
-          <height>106</height>
-         </rect>
-        </property>
-        <property name="integerDigits" stdset="0">
-         <number>3</number>
-        </property>
-        <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
-        </property>
-        <property name="foreground">
-         <color>
-          <red>255</red>
-          <green>255</green>
-          <blue>0</blue>
-         </color>
-        </property>
-        <property name="background">
-         <color>
-          <red>0</red>
-          <green>85</green>
-          <blue>255</blue>
-         </color>
-        </property>
-       </widget>
       </widget>
       <widget class="QWidget" name="tab_22">
        <attribute name="title">
@@ -3070,13 +3040,13 @@ p, li { white-space: pre-wrap; }
          <string notr="true">[counts]</string>
         </property>
         <property name="channels" stdset="0">
-         <string notr="true">QTDM:COUNT:1{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}};QTDM:TEST:AO;mySoft1</string>
+         <string notr="true">ACM:COUNT:1{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}};ACM:TEST:AO;mySoft1</string>
         </property>
         <property name="units">
          <enum>caStripPlot::Second</enum>
         </property>
         <property name="period">
-         <double>30.000000000000000</double>
+         <double>60.000000000000000</double>
         </property>
         <property name="XaxisType">
          <enum>caStripPlot::ValueScale</enum>
@@ -3283,7 +3253,7 @@ p, li { white-space: pre-wrap; }
          <bool>true</bool>
         </property>
         <property name="channel" stdset="0">
-         <string>QTDM:TEST:AO</string>
+         <string>ACM:TEST:AO</string>
         </property>
         <property name="background">
          <color>
@@ -3323,7 +3293,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string>QTDM:TEST:LO</string>
+         <string>ACM:TEST:LO</string>
         </property>
         <property name="direction">
          <enum>caByte::Down</enum>
@@ -3362,7 +3332,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string>QTDM:TEST:LO</string>
+         <string>ACM:TEST:LO</string>
         </property>
         <property name="direction">
          <enum>caByte::Right</enum>
@@ -3425,7 +3395,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:LO</string>
+         <string notr="true">ACM:TEST:LO</string>
         </property>
        </widget>
        <widget class="caTextEntry" name="catextentry_6">
@@ -3438,7 +3408,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:LO.HHSV </string>
+         <string notr="true">ACM:TEST:LO.HHSV </string>
         </property>
        </widget>
        <widget class="caLabel" name="calabel_13">
@@ -3525,7 +3495,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channels" stdset="0">
-         <string notr="true">QTDM:TEST:AO;  QUAD:SOL:1;  QUAD:IST:2; QTDM:COUNT:1</string>
+         <string notr="true">ACM:TEST:AO;  QUAD:SOL:1;  QUAD:IST:2; ACM:COUNT:1</string>
         </property>
         <property name="columnSizes">
          <string>200;100;50</string>
@@ -3574,6 +3544,1190 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </widget>
+      <widget class="QWidget" name="tab_29">
+       <attribute name="title">
+        <string>caWaveTable</string>
+       </attribute>
+       <widget class="caWaveTable" name="cawavetable">
+        <property name="geometry">
+         <rect>
+          <x>170</x>
+          <y>5</y>
+          <width>826</width>
+          <height>134</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:DOUBLE_WAVE</string>
+        </property>
+        <property name="numberOfRows">
+         <number>5</number>
+        </property>
+        <property name="precision">
+         <number>1</number>
+        </property>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <item row="0" column="0">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="1">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="2">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="3">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="4">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="5">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="6">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="7">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="8">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="9">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="0">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="1">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="2">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="3">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="4">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="5">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="6">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="7">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="8">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="9">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="0">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="1">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="2">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="3">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="4">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="5">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="6">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="7">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="8">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="9">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="0">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="1">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="2">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="3">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="4">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="5">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="6">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="7">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="8">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="9">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="0">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="1">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="2">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="3">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="4">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="5">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="6">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="7">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="8">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="9">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+       </widget>
+       <widget class="caWaveTable" name="cawavetable_2">
+        <property name="geometry">
+         <rect>
+          <x>172</x>
+          <y>141</y>
+          <width>826</width>
+          <height>134</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:LONG_WAVE</string>
+        </property>
+        <property name="numberOfRows">
+         <number>5</number>
+        </property>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <item row="0" column="0">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="1">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="2">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="3">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="4">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="5">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="6">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="7">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="8">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="9">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="0">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="1">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="2">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="3">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="4">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="5">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="6">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="7">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="8">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="9">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="0">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="1">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="2">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="3">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="4">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="5">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="6">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="7">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="8">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="9">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="0">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="1">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="2">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="3">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="4">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="5">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="6">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="7">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="8">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="9">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="0">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="1">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="2">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="3">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="4">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="5">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="6">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="7">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="8">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="9">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+       </widget>
+       <widget class="caWaveTable" name="cawavetable_3">
+        <property name="geometry">
+         <rect>
+          <x>172</x>
+          <y>277</y>
+          <width>826</width>
+          <height>134</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:CHAR_WAVE</string>
+        </property>
+        <property name="numberOfRows">
+         <number>5</number>
+        </property>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <item row="0" column="0">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="1">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="2">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="3">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="4">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="5">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="6">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="7">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="8">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="9">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="0">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="1">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="2">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="3">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="4">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="5">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="6">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="7">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="8">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="9">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="0">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="1">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="2">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="3">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="4">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="5">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="6">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="7">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="8">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="9">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="0">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="1">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="2">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="3">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="4">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="5">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="6">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="7">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="8">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="9">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="0">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="1">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="2">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="3">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="4">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="5">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="6">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="7">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="8">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="9">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+       </widget>
+       <widget class="caWaveTable" name="cawavetable_4">
+        <property name="geometry">
+         <rect>
+          <x>172</x>
+          <y>415</y>
+          <width>826</width>
+          <height>134</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:SHORT_WAVE</string>
+        </property>
+        <property name="numberOfRows">
+         <number>5</number>
+        </property>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <item row="0" column="0">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="1">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="2">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="3">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="4">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="5">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="6">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="7">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="8">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="0" column="9">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="0">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="1">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="2">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="3">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="4">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="5">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="6">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="7">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="8">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="1" column="9">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="0">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="1">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="2">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="3">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="4">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="5">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="6">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="7">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="8">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="2" column="9">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="0">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="1">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="2">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="3">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="4">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="5">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="6">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="7">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="8">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="3" column="9">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="0">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="1">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="2">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="3">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="4">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="5">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="6">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="7">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="8">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+        <item row="4" column="9">
+         <property name="font">
+          <font/>
+         </property>
+        </item>
+       </widget>
+       <widget class="caLabel" name="calabel_21">
+        <property name="geometry">
+         <rect>
+          <x>38</x>
+          <y>58</y>
+          <width>90</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>double</string>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_22">
+        <property name="geometry">
+         <rect>
+          <x>38</x>
+          <y>180</y>
+          <width>90</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>long</string>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_23">
+        <property name="geometry">
+         <rect>
+          <x>44</x>
+          <y>309</y>
+          <width>90</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>char</string>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_24">
+        <property name="geometry">
+         <rect>
+          <x>45</x>
+          <y>456</y>
+          <width>90</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>short</string>
+        </property>
+       </widget>
+      </widget>
       <widget class="QWidget" name="tab_25">
        <attribute name="title">
         <string>caBitNames</string>
@@ -3593,10 +4747,10 @@ p, li { white-space: pre-wrap; }
          </font>
         </property>
         <property name="channelEnum" stdset="0">
-         <string>QTDM:TEST:MBBO</string>
+         <string>ACM:TEST:MBBO</string>
         </property>
         <property name="channelValue" stdset="0">
-         <string>QTDM:COUNT:1</string>
+         <string>ACM:COUNT:1</string>
         </property>
         <property name="endBit">
          <number>2</number>
@@ -3691,7 +4845,7 @@ p, li { white-space: pre-wrap; }
         <property name="maxLevel">
          <string notr="true">4500</string>
         </property>
-        <property name="dataProcChannels">
+        <property name="dataProcChannels" stdset="0">
          <string notr="true"/>
         </property>
        </widget>
@@ -4198,7 +5352,7 @@ p, li { white-space: pre-wrap; }
          <string notr="true">Fill</string>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO_WAVE</string>
+         <string notr="true">ACM:TEST:AO_WAVE</string>
         </property>
         <property name="countNumOrChannel" stdset="0">
          <string notr="true">2</string>
@@ -4244,7 +5398,7 @@ p, li { white-space: pre-wrap; }
          <string notr="true">Fill</string>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="units">
          <enum>caWaterfallPlot::Monitor</enum>
@@ -4278,7 +5432,7 @@ p, li { white-space: pre-wrap; }
          <number>3</number>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="foreground">
          <color>
@@ -4416,7 +5570,7 @@ p, li { white-space: pre-wrap; }
          <bool>true</bool>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="foreground">
          <color>
@@ -4458,7 +5612,7 @@ p, li { white-space: pre-wrap; }
          <bool>true</bool>
         </property>
         <property name="channel" stdset="0">
-         <string>QTDM:TEST:AO</string>
+         <string>ACM:TEST:AO</string>
         </property>
         <property name="background">
          <color>
@@ -4518,7 +5672,7 @@ p, li { white-space: pre-wrap; }
          <bool>true</bool>
         </property>
         <property name="channel" stdset="0">
-         <string>QTDM:TEST:AO</string>
+         <string>ACM:TEST:AO</string>
         </property>
         <property name="background">
          <color>
@@ -4591,7 +5745,7 @@ p, li { white-space: pre-wrap; }
          <bool>true</bool>
         </property>
         <property name="channel" stdset="0">
-         <string>QTDM:TEST:AO</string>
+         <string>ACM:TEST:AO</string>
         </property>
         <property name="precisionMode">
          <enum>caNumeric::Channel</enum>
@@ -4631,7 +5785,7 @@ p, li { white-space: pre-wrap; }
          <bool>true</bool>
         </property>
         <property name="channel" stdset="0">
-         <string>QTDM:TEST:AO</string>
+         <string>ACM:TEST:AO</string>
         </property>
         <property name="precisionMode">
          <enum>caNumeric::User</enum>
@@ -4675,7 +5829,7 @@ p, li { white-space: pre-wrap; }
          <number>4</number>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="background">
          <color>
@@ -4703,10 +5857,10 @@ p, li { white-space: pre-wrap; }
          <enum>EPushButton::WidthAndHeight</enum>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="label">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="background">
          <color>
@@ -4735,7 +5889,7 @@ p, li { white-space: pre-wrap; }
          <enum>QwtSlider::LeftScale</enum>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="background">
          <color alpha="0">
@@ -4761,7 +5915,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_6">
@@ -4838,7 +5992,7 @@ p, li { white-space: pre-wrap; }
          <bool>true</bool>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="background">
          <color>
@@ -4906,7 +6060,7 @@ p, li { white-space: pre-wrap; }
          <string notr="true">set 1;set 2;set 3</string>
         </property>
         <property name="files">
-         <string notr="true">caput QTDM:TEST:AO 10;caput QTDM:TEST:AO 20; caput QTDM:TEST:AO 30</string>
+         <string notr="true">caput ACM:TEST:AO 10;caput ACM:TEST:AO 20; caput ACM:TEST:AO 30</string>
         </property>
         <property name="args">
          <string/>
@@ -4935,7 +6089,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="foreground">
          <color>
@@ -4971,7 +6125,7 @@ p, li { white-space: pre-wrap; }
          <double>0.000000000000000</double>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="direction">
          <enum>caThermo::Up</enum>
@@ -5016,7 +6170,7 @@ p, li { white-space: pre-wrap; }
          <number>0</number>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="precisionMode">
          <enum>caApplyNumeric::User</enum>
@@ -5047,7 +6201,7 @@ p, li { white-space: pre-wrap; }
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="direction">
          <enum>caSlider::Right</enum>
@@ -5069,10 +6223,10 @@ p, li { white-space: pre-wrap; }
          <enum>EPushButton::WidthAndHeight</enum>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO.PROC</string>
+         <string notr="true">ACM:TEST:AO.PROC</string>
         </property>
         <property name="label">
-         <string notr="true">QTDM:TEST:AO.PROC</string>
+         <string notr="true">ACM:TEST:AO.PROC</string>
         </property>
         <property name="pressMessage">
          <string notr="true">1</string>
@@ -5101,7 +6255,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:WAVE</string>
+         <string notr="true">ACM:TEST:WAVE</string>
         </property>
         <property name="formatType">
          <enum>caLineEdit::string</enum>
@@ -5117,7 +6271,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:WAVE</string>
+         <string notr="true">ACM:TEST:WAVE</string>
         </property>
        </widget>
        <widget class="caMenu" name="caMenu_2">
@@ -5163,7 +6317,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:MBBO</string>
+         <string notr="true">ACM:TEST:MBBO</string>
         </property>
         <property name="colorMode">
          <enum>caMenu::Static</enum>
@@ -5199,7 +6353,7 @@ p, li { white-space: pre-wrap; }
          <string>toggle value (double)</string>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="fontScaleMode">
          <enum>caToggleButton::WidthAndHeight</enum>
@@ -5233,7 +6387,7 @@ p, li { white-space: pre-wrap; }
          <double>0.000000000000000</double>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="direction">
          <enum>caThermo::Up</enum>
@@ -5281,7 +6435,7 @@ p, li { white-space: pre-wrap; }
          <double>0.000000000000000</double>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="direction">
          <enum>caThermo::Up</enum>
@@ -5320,16 +6474,16 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="text">
-         <string>QTDM:TEST:BO</string>
+         <string>ACM:TEST:BO</string>
         </property>
         <property name="fontScaleMode">
          <enum>EPushButton::WidthAndHeight</enum>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:BO</string>
+         <string notr="true">ACM:TEST:BO</string>
         </property>
         <property name="label">
-         <string notr="true">QTDM:TEST:BO</string>
+         <string notr="true">ACM:TEST:BO</string>
         </property>
         <property name="background">
          <color>
@@ -5352,16 +6506,16 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="text">
-         <string>QTDM:TEST:BO1</string>
+         <string>ACM:TEST:BO1</string>
         </property>
         <property name="fontScaleMode">
          <enum>EPushButton::WidthAndHeight</enum>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:BO1</string>
+         <string notr="true">ACM:TEST:BO1</string>
         </property>
         <property name="label">
-         <string notr="true">QTDM:TEST:BO1</string>
+         <string notr="true">ACM:TEST:BO1</string>
         </property>
         <property name="background">
          <color>
@@ -5384,16 +6538,16 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="text">
-         <string>QTDM:TEST:BO1</string>
+         <string>ACM:TEST:BO1</string>
         </property>
         <property name="fontScaleMode">
          <enum>EPushButton::WidthAndHeight</enum>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:BO1</string>
+         <string notr="true">ACM:TEST:BO1</string>
         </property>
         <property name="label">
-         <string notr="true">QTDM:TEST:BO1</string>
+         <string notr="true">ACM:TEST:BO1</string>
         </property>
         <property name="background">
          <color>
@@ -5419,7 +6573,7 @@ p, li { white-space: pre-wrap; }
          <string>toggle value (ENUM Value)</string>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:MBBO</string>
+         <string notr="true">ACM:TEST:MBBO</string>
         </property>
         <property name="colorMode">
          <enum>caToggleButton::Alarm</enum>
@@ -5441,7 +6595,7 @@ p, li { white-space: pre-wrap; }
          <string>toggle value (ENUM String)</string>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:MBBO</string>
+         <string notr="true">ACM:TEST:MBBO</string>
         </property>
         <property name="colorMode">
          <enum>caToggleButton::Alarm</enum>
@@ -5481,7 +6635,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:MBBO</string>
+         <string notr="true">ACM:TEST:MBBO</string>
         </property>
         <property name="colorMode">
          <enum>caMenu::Static</enum>
@@ -5500,7 +6654,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:MBBO</string>
+         <string notr="true">ACM:TEST:MBBO</string>
         </property>
         <property name="colorMode">
          <enum>caMenu::Static</enum>
@@ -5533,7 +6687,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:MBBO</string>
+         <string notr="true">ACM:TEST:MBBO</string>
         </property>
         <property name="colorMode">
          <enum>caMenu::Static</enum>
@@ -5574,7 +6728,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:MBBO</string>
+         <string notr="true">ACM:TEST:MBBO</string>
         </property>
         <property name="foreground">
          <color>
@@ -5610,7 +6764,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">QTDM:TEST:MBBO</string>
+         <string notr="true">ACM:TEST:MBBO</string>
         </property>
         <property name="background">
          <color>
@@ -5646,7 +6800,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string>QTDM:TEST:MBBO</string>
+         <string>ACM:TEST:MBBO</string>
         </property>
         <property name="colorMode">
          <enum>caChoice::Static</enum>
@@ -5668,7 +6822,7 @@ p, li { white-space: pre-wrap; }
          </font>
         </property>
         <property name="channel" stdset="0">
-         <string>QTDM:TEST:MBBO</string>
+         <string>ACM:TEST:MBBO</string>
         </property>
         <property name="alignment">
          <enum>caChoice::center</enum>
@@ -5693,7 +6847,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string>QTDM:TEST:MBBO</string>
+         <string>ACM:TEST:MBBO</string>
         </property>
         <property name="colorMode">
          <enum>caChoice::Static</enum>
@@ -5829,7 +6983,7 @@ p, li { white-space: pre-wrap; }
         <property name="scriptParameter" stdset="0">
          <string notr="true"> for  i in $(seq 1 100);  
    do      echo $i;       
-   caput QTDM:TEST:AO $i;     
+   caput ACM:TEST:AO $i;     
    sleep 1;  
  done </string>
         </property>
@@ -6051,6 +7205,11 @@ p, li { white-space: pre-wrap; }
    <class>caTable</class>
    <extends>QTableWidget</extends>
    <header>caTable</header>
+  </customwidget>
+  <customwidget>
+   <class>caWaveTable</class>
+   <extends>QTableWidget</extends>
+   <header>caWaveTable</header>
   </customwidget>
   <customwidget>
    <class>caBitnames</class>
