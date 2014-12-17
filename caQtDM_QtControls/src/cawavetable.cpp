@@ -55,6 +55,8 @@ caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     verticalHeader()->setDefaultSectionSize(20);
     verticalHeader()->setSortIndicatorShown(true);
+    horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+
     setColumnSize(80);
     setAttribute(Qt::WA_Hover);
 
