@@ -4728,7 +4728,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
             // number must be between the enum possibilities
             if(kPtr->edata.fieldtype == caENUM) {
                 if(*end == 0 && end != textValue && longValue >= 0 && longValue <= kPtr->edata.enumCount) {
-                    qDebug() << "decode value *end=0, set a longvalue to enum" << longValue;
+                    //qDebug() << "decode value *end=0, set a longvalue to enum" << longValue;
                     EpicsSetValue((char*) kPtr->pv, 0.0, longValue, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess, 0);
                 } else {
                     char asc[100];
