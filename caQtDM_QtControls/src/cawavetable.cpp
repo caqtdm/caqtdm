@@ -38,12 +38,17 @@
 caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
 
 {
+    thisFormatC[0] = '\0';
+    thisFormat[0] = '\0';
+
     setPrecisionMode(Channel);
+    setFormatType(decimal);
     setPrecision(0);
+    setActualPrecision(0);
+
     colcount = rowcount = 1;
     dataPresent = false;
     charsPresent = false;
-
     thisItemFont = this->font();
 
     setAlternatingRowColors(true);
@@ -67,6 +72,10 @@ caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
 
     createActions();
     addAction(copyAct);
+
+    defaultForeColor = palette().foreground().color();
+
+    blockIndex = -1;
 
     installEventFilter(this);
 }
@@ -97,15 +106,14 @@ void caWaveTable::setupItems(int nbRows, int nbCols)
         }
     }
     keepText.resize(rowcount*colcount+1);
-    keepValue.resize(rowcount*colcount+1);
-    blockItem.resize(rowcount*colcount+1);
-    blockItem.fill(false);
 }
 
 void caWaveTable::cellChange(int currentRow, int currentColumn, int previousRow, int previousColumn) {
-    //printf("focus changed to another cell\n");
-    int index = toIndex(previousRow, previousColumn);
-    if( dataPresent) blockItem[index] = false;
+    Q_UNUSED(currentRow);
+    Q_UNUSED(currentColumn);
+    Q_UNUSED(previousRow);
+    Q_UNUSED(previousColumn);
+    blockIndex = -1;
 }
 
 void caWaveTable::enableEdit(QTableWidgetItem* pItem)
@@ -124,31 +132,23 @@ void caWaveTable::disableEdit(QTableWidgetItem* pItem)
 
 void caWaveTable::dataInput(int row, int col)
 {
-    double value;
     int index = toIndex(row,col);
     if(!dataPresent) return;
-    if(blockItem.at(index)) {
+
+    if(index == blockIndex) {
         bool ok=true;
-        blockItem[index] = false;
+        blockIndex = -1;
         QString valueText =  item(row, col)->text();
 
-        // in case of a char array, transmit the value as an ascii code in a double
-        if(charsPresent) {
-            value = (double) valueText.trimmed().begin()->toAscii();
-        // otherwise always as double
-        } else {
-            value = valueText.trimmed().toDouble(&ok);
-        }
-        keepValue[index] = value;
         clearSelection();
 
-        //printf("modify at index=%d with value=%lf\n", index, keepValue[index]);
-
-        if(ok) emit WaveEntryChanged(keepValue[index], index);
-
+        // set the value back (dataInput is now blocked again
         if(item(row,col) != (QTableWidgetItem*) 0) {
             item(row,col)->setText(keepText[index]);
         }
+
+        // and write it to the control system
+        if(ok) emit WaveEntryChanged(valueText, index);
     }
 }
 
@@ -162,11 +162,10 @@ void caWaveTable::cellClicked(int row, int col)
 
 void caWaveTable::cellDoubleclicked(int row, int col)
 {
-    //printf("set row=%d col=%d editable\n", row, col);
     enableEdit(item(row,col));
 
     // prevent monitoring change of this item until focus is lost again
-    blockItem[toIndex(row, col)] = true;
+    blockIndex = toIndex(row, col);
 }
 
 bool caWaveTable::eventFilter(QObject *obj, QEvent *event)
@@ -210,20 +209,104 @@ void caWaveTable::setColumnSize(int newSize)
     horizontalHeader()->setVisible(true);
 }
 
-void caWaveTable::setFormat(int prec)
+void caWaveTable::setActualPrecision(int prec)
 {
-    int precision;
     if(thisPrecMode == User) {
-        precision = getPrecision();
+        actualPrecision = getPrecision();
     } else {
-        precision = prec;
+        channelPrecision = prec;
+        actualPrecision = channelPrecision;
     }
-    if(precision > 17) precision = 17;
-    if(precision >= 0) {
-        sprintf(thisFormat, "%s.%dlf", "%", precision);
-    } else {
-        sprintf(thisFormat, "%s.%dle", "%", -precision);
+    if(actualPrecision > 17) actualPrecision = 17;
+}
+
+void caWaveTable::setFormat(DataType dataType)
+{
+    if(dataType == doubles) {
+        switch (thisFormatType) {
+        case string:
+        case decimal:
+            if(actualPrecision >= 0) {
+                sprintf(thisFormat, "%s.%dlf", "%", actualPrecision);
+            } else {
+                sprintf(thisFormat, "%s.%dle", "%", -actualPrecision);
+            }
+            break;
+        case compact:
+            sprintf(thisFormat, "%s.%dle", "%", qAbs(actualPrecision));
+            sprintf(thisFormatC, "%s.%dlf", "%", qAbs(actualPrecision));
+            break;
+        case exponential:
+            sprintf(thisFormat, "%s.%dle", "%", qAbs(actualPrecision));
+            break;
+        case hexadecimal:
+            strcpy(thisFormat, "0x%x");
+            break;
+        case octal:
+            strcpy(thisFormat, "O%o");
+            break;
+        }
+
+    } else if (dataType == longs) {
+        switch (thisFormatType) {
+        case string:
+        case decimal:
+        case compact:
+        case exponential:
+            strcpy(thisFormat, "%d");
+            strcpy(thisFormatC, "%d");
+            break;
+            break;
+        case hexadecimal:
+            strcpy(thisFormat, "0x%x");
+            break;
+        case octal:
+            strcpy(thisFormat, "O%o");
+            break;
+        }
+    } else if(dataType == characters) {
+        switch (thisFormatType) {
+        case string:
+            strcpy(thisFormat, "%c");
+            strcpy(thisFormatC, "%c");
+            break;
+        case decimal:
+        case compact:
+        case exponential:
+            strcpy(thisFormat, "%d");
+            strcpy(thisFormatC, "%d");
+            break;
+        case hexadecimal:
+            strcpy(thisFormat, "0x%x");
+            break;
+        case octal:
+            strcpy(thisFormat, "O%o");
+            break;
+        }
     }
+
+}
+
+QString caWaveTable::setValue(double value, DataType dataType)
+{
+    char asc[40];
+    if(dataType == doubles) {
+        if(thisFormatType == compact) {
+            if ((value < 1.e4 && value > 1.e-4) || (value > -1.e4 && value < -1.e-4) || value == 0.0) {
+                sprintf(asc, thisFormatC, value);
+            } else {
+                sprintf(asc, thisFormat, value);
+            }
+        } else {
+            sprintf(asc, thisFormat, value);
+        }
+    } else if(dataType == longs) {
+        sprintf(asc, thisFormat, (int) value);
+    } else if(dataType == characters) {
+        sprintf(asc, thisFormat, (int) value);
+    }
+
+    return QString(asc);
 }
 
 // calcualte from the row and column indexes the array index
@@ -238,7 +321,7 @@ void caWaveTable::fromIndex(int index, int &row, int &col)
     col = index - row * colcount;
 }
 
-void caWaveTable::displayText(int index, QString const &text)
+void caWaveTable::displayText(int index, short status, QString const &text)
 {
     int column =0;
     int row = 0;
@@ -248,11 +331,41 @@ void caWaveTable::displayText(int index, QString const &text)
 
     keepText[index] = text;
 
-    if(blockItem.at(index)) return;
+    if(index == blockIndex) return;
 
     row = index / colcount;
     column = index - row * colcount;
-    if(this->item(row, column) != 0)  this->item(row,column)->setText(text);
+    if(this->item(row, column) != 0)  {
+
+        this->item(row,column)->setText(text);
+
+        if(thisColorMode == Alarm) {
+
+            switch (status) {
+            case -1:
+                break;
+            case NO_ALARM:
+                this->item(row, column)->setForeground(AL_GREEN);
+                break;
+            case MINOR_ALARM:
+                this->item(row, column)->setForeground(AL_YELLOW);
+                break;
+            case MAJOR_ALARM:
+                this->item(row, column)->setForeground(AL_RED);
+                break;
+            case ALARM_INVALID:
+            case NOTCONNECTED:
+                this->item(row, column)->setForeground(AL_WHITE);
+                break;
+            default:
+                this->item(row, column)->setForeground(AL_DEFAULT);
+                break;
+            }
+        }   else {
+            this->item(row, column)->setForeground(defaultForeColor);
+        }
+    }
+
 }
 
 void caWaveTable::setValueFont(QFont font)
@@ -270,61 +383,61 @@ void caWaveTable::setPV(QString const &newPV)
     thisPV = newPV;
 }
 
-void caWaveTable::setData(double *array, int size)
+void caWaveTable::setData(double *array, short status, int size)
 {
-    string40 text;
+
     int maxSize = rowcount * colcount;
+    setFormat(doubles);
     for(int i=0; i< qMin(size, maxSize); i++) {
-        keepValue[i] = (double) array[i];
-        sprintf(text, thisFormat, array[i]);
-        displayText(i, text);
+        //keepValue[i] = (double) array[i];
+        displayText(i, status, setValue(array[i], doubles));
     }
     dataPresent = true;
 }
 
-void caWaveTable::setData(float *array, int size)
+void caWaveTable::setData(float *array, short status, int size)
 {
-    string40 text;
+
     int maxSize = rowcount * colcount;
+    setFormat(doubles);
     for(int i=0; i< qMin(size, maxSize); i++) {
-        keepValue[i] = (double) array[i];
-        sprintf(text, thisFormat, array[i]);
-        displayText(i, text);
+        //keepValue[i] = (double) array[i];
+        displayText(i, status, setValue(array[i], doubles));
     }
     dataPresent = true;
 }
 
-void caWaveTable::setData(int16_t *array, int size)
+void caWaveTable::setData(int16_t *array, short status, int size)
 {
-    string40 text;
+
     int maxSize = rowcount * colcount;
+    setFormat(longs);
     for(int i=0; i< qMin(size, maxSize); i++) {
-        keepValue[i] = (double) array[i];
-        sprintf(text, "%d", array[i]);
-        displayText(i, text);
+        //keepValue[i] = (double) array[i];
+        displayText(i, status, setValue(array[i], longs));
     }
     dataPresent = true;
 }
 
-void caWaveTable::setData(int32_t *array, int size)
+void caWaveTable::setData(int32_t *array, short status, int size)
 {
-    string40 text;
+
     int maxSize = rowcount * colcount;
+    setFormat(longs);
     for(int i=0; i< qMin(size, maxSize); i++) {
-        keepValue[i] = (double) array[i];
-        sprintf(text, "%d", array[i]);
-        displayText(i, text);
+        //keepValue[i] = (double) array[i];
+        displayText(i, status, setValue(array[i], longs));
     }
     dataPresent = true;
 }
 
-void caWaveTable::setData(char *array, int size)
+void caWaveTable::setData(char *array, short status, int size)
 {
     int maxSize = rowcount * colcount;
+    setFormat(characters);
     for(int i=0; i< qMin(size, maxSize); i++) {
-        keepValue[i] = (double) ((int) array[i]);
-        QString str= QChar(array[i]);
-        displayText(i, str);
+        //keepValue[i] = (double) ((int) array[i]);
+        displayText(i, status, setValue((double) ((int) array[i]), characters));
     }
     dataPresent = true;
     charsPresent = true;
@@ -334,7 +447,6 @@ void caWaveTable::setAccessW(int access)
 {
     _AccessW = access;
 }
-
 
 void caWaveTable::copy()
 {
@@ -369,8 +481,8 @@ void caWaveTable::copy()
             }
         }
         if(i> 0) {
-           str += "\n";
-           clipboard->setText(str);
+            str += "\n";
+            clipboard->setText(str);
         }
     }
 }

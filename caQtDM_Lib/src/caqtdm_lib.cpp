@@ -1647,8 +1647,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         if(widget->getPV().size() > 0) {
              addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
              widget->setPV(pv);
-             connect(widget, SIGNAL(WaveEntryChanged(double, int)), this,
-                     SLOT(Callback_WaveEntryChanged(double, int)));
+             connect(widget, SIGNAL(WaveEntryChanged(QString, int)), this,
+                     SLOT(Callback_WaveEntryChanged(QString, int)));
         }
         widget->setProperty("Taken", true);
         widget->setToolTip("select row or columns, then with Ctrl+C you can copy to the clipboard\ninside X11 you can then do shft+ins\nwhen doubleclicking on a value, you can change the value");
@@ -2909,15 +2909,21 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             // data from vector
             if(data.edata.valueCount > 0 && data.edata.dataB != (void*) 0) {
                 if((widget->getPrecisionMode() != caWaveTable::User) && (data.edata.initialize)) {
-                    widget->setFormat(data.edata.precision);
+                    widget->setActualPrecision(data.edata.precision);
                 }
                 WaveTable(widget, data);
             } else {
-               widget->displayText(0, "not a waveform");
+               widget->displayText(0, NOTCONNECTED, "????");
             }
 
         } else {
-            widget->displayText(0, "NC");
+            for(int i=0; i<widget->getNumberOfRows(); i++) {
+                int nbCol = widget->getNumberOfColumns();
+                int nbRow = i*nbCol;
+                for(int j=0; j<nbCol; j++) {
+                   widget->displayText(nbRow+j, NOTCONNECTED, "NC");
+                }
+            }
         }
 
         // bitnames table with text and coloring according the value=========================================================
@@ -3059,31 +3065,31 @@ void CaQtDM_Lib::WaveTable(caWaveTable *widget, const knobData &data)
     switch(data.edata.fieldtype) {
     case caFLOAT: {
         float* P = (float*) data.edata.dataB;
-        widget->setData(P, data.edata.valueCount);
+        widget->setData(P, data.edata.severity, data.edata.valueCount);
         datamutex->unlock();
     }
         break;
     case caDOUBLE: {
         double* P = (double*) data.edata.dataB;
-        widget->setData(P, data.edata.valueCount);
+        widget->setData(P, data.edata.severity, data.edata.valueCount);
         datamutex->unlock();
     }
         break;
     case caLONG: {
         int32_t* P = (int32_t*) data.edata.dataB;
-        widget->setData(P, data.edata.valueCount);
+        widget->setData(P, data.edata.severity, data.edata.valueCount);
         datamutex->unlock();
     }
         break;
     case caINT: {
         int16_t* P = (int16_t*) data.edata.dataB;
-        widget->setData(P, data.edata.valueCount);
+        widget->setData(P, data.edata.severity, data.edata.valueCount);
         datamutex->unlock();
     }
         break;
     case caCHAR: {
         char * P = (char*) data.edata.dataB;
-        widget->setData(P ,data.edata.valueCount);
+        widget->setData(P, data.edata.severity, data.edata.valueCount);
         datamutex->unlock();
     }
         break;
@@ -3364,20 +3370,20 @@ void CaQtDM_Lib::Callback_TextEntryChanged(const QString& text)
     if(!w->getAccessW()) return;
 
     fType = w->getFormatType();
-
     TreatRequestedValue(text, fType, w1);
 }
 
-void CaQtDM_Lib::Callback_WaveEntryChanged(double value, int index)
+void CaQtDM_Lib::Callback_WaveEntryChanged(const QString& text, int index)
 {
+    caWaveTable::FormatType fType;
     QWidget *w1 = qobject_cast<QWidget *>(sender());
     caWaveTable *w = qobject_cast<caWaveTable *>(sender());
 
     if(!w->getAccessW()) return;
 
-    //qDebug() << "should write" << value << "at index" << index;
-
-    TreatRequestedWave(value, index, w1);
+    //qDebug() << "should write" << text << "at index" << index;
+    fType = w->getFormatType();
+    TreatRequestedWave(text, fType, index, w1);
 }
 
 /**
@@ -4638,6 +4644,25 @@ void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QW
     }
 }
 
+
+/**
+  * this routine will get a value from a string with hex and octal representation
+  */
+long CaQtDM_Lib::getValueFromString(char *textValue, formatsType fType, char **end)
+{
+    if(fType == octal) {
+        return strtoul(textValue, end, 8);
+    } else if(fType == hexadecimal) {
+        return strtoul(textValue,end,16);
+    } else {
+        if((strlen(textValue) > (size_t) 2) && (textValue[0] == '0') && (textValue[1] == 'x' || textValue[1] == 'X')) {
+            return strtoul(textValue,end,16);
+        } else {
+            return strtol(textValue,end,10);
+        }
+    }
+}
+
 /**
   * this routine will treat the string, command, value to write to the pv
   */
@@ -4646,14 +4671,21 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
     char errmess[255];
     double value;
     long longValue;
-    char *end;
+    char *end = NULL, textValue[255];
     bool match;
-    char textValue[255];
+
+    formatsType fTypeNew;
+
+    if(fType == caTextEntry::octal) fTypeNew = octal;
+    else if(fType == caTextEntry::hexadecimal) fTypeNew = hexadecimal;
+    else if(fType == caTextEntry::string) fTypeNew = string;
+    else fTypeNew = decimal;
 
     int indx =  w->property("MonitorIndex").value<int>();
     if(indx < 0) return;
 
     //qDebug() << "TreatRequestedValue text" << text.toAscii().constData();
+
     knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
     knobData *auxPtr = kPtr;
 
@@ -4665,6 +4697,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
     //qDebug() << "fieldtype:" << kPtr->edata.fieldtype;
     switch (kPtr->edata.fieldtype) {
     case caSTRING:
+        //qDebug() << "set string" << text;
         EpicsSetValue(kPtr->pv, 0.0, 0, (char*) text.toAscii().constData(), (char*) w->objectName().toLower().toAscii().constData(), errmess, 0);
         break;
 
@@ -4672,13 +4705,14 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
     case caINT:
     case caLONG:
         strcpy(textValue, text.toAscii().constData());
-        // Check for a match
+        // Check for an enum text
         match = false;
         if(kPtr->edata.dataB != (void*)0 && kPtr->edata.enumCount > 0) {
             QString strng((char*) kPtr->edata.dataB);
             QStringList list = strng.split(";", QString::SkipEmptyParts);
             for (int i=0; i<list.size(); i++) {
                 if(!text.compare(list.at(i).trimmed())) {
+                    //qDebug() << "set enum text" << textValue;
                     EpicsSetValue((char*) kPtr->pv, 0.0, 0, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess, 0);
                     match = true;
                     break;
@@ -4689,21 +4723,12 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
         if(!match) {
             //qDebug() << "assume it is a number";
             // Assume it is a number
-            if(fType == caTextEntry::octal) {
-                longValue = strtoul(textValue, &end, 8);
-            } else if(fType == caTextEntry::hexadecimal) {
-                longValue = strtoul(textValue,&end,16);
-            } else {
-                if((strlen(textValue) > (size_t) 2) && (textValue[0] == '0') && (textValue[1] == 'x' || textValue[1] == 'X')) {
-                    longValue = strtoul(textValue,&end,16);
-                } else {
-                    longValue = strtol(textValue,&end,10);
-                }
-            }
+            longValue = getValueFromString(textValue, fTypeNew, &end);
 
             // number must be between the enum possibilities
             if(kPtr->edata.fieldtype == caENUM) {
                 if(*end == 0 && end != textValue && longValue >= 0 && longValue <= kPtr->edata.enumCount) {
+                    qDebug() << "decode value *end=0, set a longvalue to enum" << longValue;
                     EpicsSetValue((char*) kPtr->pv, 0.0, longValue, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess, 0);
                 } else {
                     char asc[100];
@@ -4711,11 +4736,11 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
                     postMessage(QtDebugMsg, asc);
                     if(caTextEntry* widget = qobject_cast<caTextEntry *>((QWidget*) auxPtr->dispW)) {
                         Q_UNUSED(widget);
-                        //widget->setText("");
                     }
                 }
                 // normal int or long
             } else
+                //qDebug() << "set normal longvalue" << longValue;
                 EpicsSetValue((char*) kPtr->pv, 0.0, longValue, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess, 0);
         }
 
@@ -4723,41 +4748,31 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
 
     case caCHAR:
         if(fType == caTextEntry::string) {
+            //qDebug() << "set string" << text;
             EpicsSetValue((char*) kPtr->pv, 0.0, 0, (char*) text.toAscii().constData(), (char*) w->objectName().toLower().toAscii().constData(), errmess, 0);
             break;
         }
-        //qDebug() << "fall through";
-
+        //qDebug() << "fall through default case";
 
     default:
         //qDebug() << "assume it is a double";
         // Treat as a double
         strcpy(textValue, text.toAscii().constData());
-        if(fType == caTextEntry::octal) {
-            value = (double) strtoul(textValue, &end, 8);
-        } else if(fType == caTextEntry::hexadecimal) {
-            value = (double) strtoul(textValue, &end, 16);
-        } else {
-            if((strlen(textValue) > (size_t) 2) && (textValue[0] == '0')
-                    && (textValue[1] == 'x' || textValue[1] == 'X')) {
-                value = (double)strtoul(textValue, &end, 16);
-            } else {
-                value = (double)strtod(textValue, &end);
-            }
-        }
+        value = (double) getValueFromString(textValue, fTypeNew, &end);
+
+        // decoded value ?
         if(*end == '\0' && end != textValue) {
+            //qDebug() << "decoded value *end=0, set a double";
             if(kPtr->soft) {
-                //char asc[100];
                 kPtr->edata.rvalue = value;
                 // set value also into widget, will be overwritten when driven from other channels
                 caCalc * ww = (caCalc*) kPtr->dispW;
                 ww->setValue(value);
-                //sprintf(asc, "SoftPV: %s  set to value: \"%s\"\n", kPtr->pv, textValue);
-                //postMessage(QtDebugMsg, asc);
             } else {
-                //qDebug() << "we should set a double independently if pv has another type ";
+                //qDebug() << "set a double" << value;
                 EpicsSetValue((char*) kPtr->pv, value, 0, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess, 1);
             }
+        // normal value
         } else {
             char asc[100];
             sprintf(asc, "Invalid value: pv=%s value= \"%s\"\n", kPtr->pv, textValue);
@@ -4773,17 +4788,27 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
 /**
   * this routine will treat the values to write to the pv
   */
-void CaQtDM_Lib::TreatRequestedWave(double value, int index, QWidget *w)
+void CaQtDM_Lib::TreatRequestedWave(QString text, caWaveTable::FormatType fType, int index, QWidget *w)
 {
-    char errmess[255];
-    char sdata[40];
+    char    errmess[255], sdata[40];
     int32_t data32[1];
     int16_t data16[1];
     float   fdata[1];
-    double  ddata[1];
+    double  value, ddata[1];
+    long    longValue;
+    char    *end = NULL, textValue[255];
+
+    formatsType fTypeNew;
+
+    if(fType == caWaveTable::octal) fTypeNew = octal;
+    else if(fType == caWaveTable::hexadecimal) fTypeNew = hexadecimal;
+    else if(fType == caWaveTable::string) fTypeNew = string;
+    else fTypeNew = decimal;
 
     int indx =  w->property("MonitorIndex").value<int>();
     if(indx < 0) return;
+
+    //qDebug() << "treat requested wave";
 
     knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
 
@@ -4791,43 +4816,66 @@ void CaQtDM_Lib::TreatRequestedWave(double value, int index, QWidget *w)
     datamutex = (QMutex*) kPtr->mutex;
     datamutex->lock();
 
-    switch(kPtr->edata.fieldtype) {
-    case caFLOAT: {
-        float* P = (float*) kPtr->edata.dataB;
-        P[index] = (float) value;
-        EpicsSetWave((char*) kPtr->pv, P, ddata, data16, data32, sdata, kPtr->edata.valueCount,
-                     (char*) w->objectName().toLower().toAscii().constData(), errmess);
-    }
+    //qDebug() << "fieldtype:" << kPtr->edata.fieldtype;
+    switch (kPtr->edata.fieldtype) {
+
+    case caINT:
+    case caLONG:
+    case caCHAR:
+        strcpy(textValue, text.toAscii().constData());
+        longValue = getValueFromString(textValue, fTypeNew, &end);
+
+        if(kPtr->edata.fieldtype == caLONG) {
+            int32_t* P = (int32_t*) kPtr->edata.dataB;
+            P[index] = (int32_t) longValue;
+            EpicsSetWave((char*) kPtr->pv, fdata, ddata, data16, P, sdata, kPtr->edata.valueCount,
+                         (char*) w->objectName().toLower().toAscii().constData(), errmess);
+        } else if(kPtr->edata.fieldtype == caINT) {
+            int16_t* P = (int16_t*) kPtr->edata.dataB;
+            P[index] = (int16_t) longValue;
+            EpicsSetWave((char*) kPtr->pv, fdata, ddata, P, data32, sdata, kPtr->edata.valueCount,
+                         (char*) w->objectName().toLower().toAscii().constData(), errmess);
+        } else {
+            if(fTypeNew == string) {
+                char* P = (char*) kPtr->edata.dataB;
+                P[index] = (char) textValue[0];
+                EpicsSetWave((char*) kPtr->pv, fdata, ddata, data16, data32, P, kPtr->edata.valueCount,
+                             (char*) w->objectName().toLower().toAscii().constData(), errmess);
+            } else {
+                char* P = (char*) kPtr->edata.dataB;
+                P[index] = (char) ((int) longValue);
+                EpicsSetWave((char*) kPtr->pv, fdata, ddata, data16, data32, P, kPtr->edata.valueCount,
+                             (char*) w->objectName().toLower().toAscii().constData(), errmess);
+            }
+        }
+
         break;
-    case caDOUBLE: {
-        double* P = (double*) kPtr->edata.dataB;
-        P[index] = (double) value;
-        EpicsSetWave((char*) kPtr->pv, fdata, P, data16, data32, sdata, kPtr->edata.valueCount,
-                     (char*) w->objectName().toLower().toAscii().constData(), errmess);
-    }
-        break;
-    case caLONG: {
-        int32_t* P = (int32_t*) kPtr->edata.dataB;
-        P[index] = (int32_t) value;
-        EpicsSetWave((char*) kPtr->pv, fdata, ddata, data16, P, sdata, kPtr->edata.valueCount,
-                     (char*) w->objectName().toLower().toAscii().constData(), errmess);
-    }
-        break;
-    case caINT: {
-        int16_t* P = (int16_t*) kPtr->edata.dataB;
-        P[index] = (int16_t) value;
-        EpicsSetWave((char*) kPtr->pv, fdata, ddata, P, data32, sdata, kPtr->edata.valueCount,
-                     (char*) w->objectName().toLower().toAscii().constData(), errmess);
-    }
-        break;
-    case caCHAR: {
-        char* P = (char*) kPtr->edata.dataB;
-        P[index] = (char) ((int) value);
-        EpicsSetWave((char*) kPtr->pv, fdata, ddata, data16, data32, P, kPtr->edata.valueCount,
-                     (char*) w->objectName().toLower().toAscii().constData(), errmess);
-    }
-        break;
-    default:
+
+    case caFLOAT:
+    case caDOUBLE:
+        // Treat as a double
+        strcpy(textValue, text.toAscii().constData());
+        value = (double) getValueFromString(textValue, fTypeNew, &end);
+        //qDebug() << "value=" << value;
+        if(*end == '\0' && end != textValue) {
+            if(kPtr->edata.fieldtype == caFLOAT) {
+                float* P = (float*) kPtr->edata.dataB;
+                P[index] = (float) value;
+                EpicsSetWave((char*) kPtr->pv, P, ddata, data16, data32, sdata, kPtr->edata.valueCount,
+                             (char*) w->objectName().toLower().toAscii().constData(), errmess);
+
+            } else {  // double
+                double* P = (double*) kPtr->edata.dataB;
+                P[index] = (double) value;
+                EpicsSetWave((char*) kPtr->pv, fdata, P, data16, data32, sdata, kPtr->edata.valueCount,
+                             (char*) w->objectName().toLower().toAscii().constData(), errmess);
+            }
+        } else {
+            char asc[100];
+            sprintf(asc, "Invalid value: pv=%s value= \"%s\"\n", kPtr->pv, textValue);
+            postMessage(QtDebugMsg, asc);
+
+        }
         break;
     }
 

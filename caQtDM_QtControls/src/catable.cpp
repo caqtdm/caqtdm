@@ -64,7 +64,6 @@ void caTable::cellclicked(int row, int col)
 {
     Q_UNUSED(row);
     Q_UNUSED(col);
-    //printf("clicked %d %d\n", row, col);
 }
 
 void caTable::celldoubleclicked(int row, int col)
@@ -189,10 +188,6 @@ void caTable::displayText(int row, int col, short status, QString const &text)
     }   else {
         tableItem[row][col]->setForeground(defaultForeColor);
     }
-
-    //setItem(row, col, tableItem[row][col]);
-    //item->setFont(thisItemFont);
-
 }
 
 void caTable::setValueFont(QFont font)

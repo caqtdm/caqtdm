@@ -48,21 +48,35 @@ class QTCON_EXPORT caWaveTable : public QTableWidget
     Q_PROPERTY(int numberOfRows READ getNumberOfRows WRITE setNumberOfRows)
     Q_PROPERTY(int numberOfColumns READ getNumberOfColumns WRITE setNumberOfColumns)
     Q_PROPERTY(int columnSize READ getColumnSize WRITE setColumnSize)
+
+
+    Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
+    Q_ENUMS(colMode)
+
     Q_PROPERTY(int precision READ getPrecision WRITE setPrecision)
     Q_PROPERTY(SourceMode precisionMode READ getPrecisionMode WRITE setPrecisionMode)
     Q_ENUMS(SourceMode)
-    Q_ENUMS(Orientation)
+
+    Q_PROPERTY(FormatType formatType READ getFormatType WRITE setFormatType)
+     Q_ENUMS(FormatType)
 
 public:
 
     caWaveTable(QWidget *parent);
 
+    enum FormatType {decimal, exponential, compact, hexadecimal, octal, string};
+    enum DataType {doubles, longs, characters};
+
     enum SourceMode {Channel = 0, User};
     SourceMode getPrecisionMode() const { return thisPrecMode; }
-    void setPrecisionMode(SourceMode precmode) {thisPrecMode = precmode;}
+    void setPrecisionMode(SourceMode precmode) {thisPrecMode = precmode; setActualPrecision(thisPrecision);}
 
     int getPrecision() const {return thisPrecision;}
-    void setPrecision(int prec) {thisPrecision = prec; setFormat(prec);}
+    void setPrecision(int prec) {thisPrecision = prec; setActualPrecision(prec);}
+
+    enum colMode {Static=0, Alarm};
+    colMode getColorMode() const { return thisColorMode; }
+    void setColorMode(colMode colormode) {thisColorMode = colormode;}
 
     int getColumnSize() const {return thisColumnSize;}
     void setColumnSize(int newSize);
@@ -70,16 +84,16 @@ public:
     QString getPV() const;
     void setPV(QString const &newPV);
 
-    void setFormat(int prec);
-    void displayText(int index, QString const &text);
+    void setActualPrecision(int prec);
+    void displayText(int index, short status, QString const &text);
 
     void setValueFont(QFont font);
 
-    void setData(double *vector, int size);
-    void setData(float *vector, int size);
-    void setData(int16_t *vector, int size);
-    void setData(int32_t* vector, int size);
-     void setData(char* vector, int size);
+    void setData(double *vector, short status, int size);
+    void setData(float *vector, short status, int size);
+    void setData(int16_t *vector, short status, int size);
+    void setData(int32_t* vector, short status, int size);
+    void setData(char* vector, short status, int size);
 
     int getAccessW() const {return _AccessW;}
     void setAccessW(int access);
@@ -90,6 +104,9 @@ public:
     int getNumberOfColumns() const {return colcount;}
     void setNumberOfColumns(int nbCols);
 
+    void setFormatType(FormatType m) { thisFormatType = m;}
+    FormatType getFormatType() { return thisFormatType; }
+
 private slots:
     void copy();
     void dataInput(int, int);
@@ -98,7 +115,7 @@ private slots:
     void cellChange(int, int, int, int);
 
 signals:
-    void WaveEntryChanged(double value, int index);
+    void WaveEntryChanged(const QString &text, int index);
 
 private:
     bool eventFilter(QObject *obj, QEvent *event);
@@ -108,31 +125,38 @@ private:
     void setupItems(int nbRows, int nbCols);
     int toIndex(int row, int col);
     void fromIndex(int index, int &row, int &col);
+    void setFormat(DataType dataType);
+    QString setValue(double value, DataType dataType);
 
     bool _AccessW;
     QString startText;
     bool emitted;
 
-   template <typename pureData>
-   void fillData(pureData *array, int size);
-
     QString	thisPV;
     int	thisColumnSize;
-    string40 thisFormat;
+    char thisFormat[20];
+    char thisFormatC[20];
+    FormatType thisFormatType;
     int thisPrecision;
     SourceMode thisPrecMode;
+    colMode thisColorMode;
     QFont thisItemFont;
     QAction *copyAct;
 
     QVector<QString> keepText;
-    QVector<double> keepValue;
-    QVector<bool> blockItem;
+    int blockIndex;
 
     int timerID;
     int colcount;
     int rowcount;
     bool dataPresent;
     bool charsPresent;
+
+    QColor defaultBackColor;
+    QColor defaultForeColor;
+
+    int channelPrecision;
+    int actualPrecision;
 };
 
 #endif
