@@ -894,10 +894,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         w1->setProperty("ObjectType", caLineEdit_Widget);
 
         if(widget->getPV().size() > 0) {
-            //widget->setEnabled(false);  // in order to be able to drag, but this disables context, is now done in caLineEdit
             widget->setCursor(QCursor());
             widget->setReadOnly(true);
-            //widget->setDragEnabled(true); // why it did this ??
 
             widget->setAlignment(widget->alignment());
             addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
@@ -3843,6 +3841,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         pv[0] = widget->getPV().trimmed();
         nbPV = 1;
     } else if(caWaveTable* widget = qobject_cast<caWaveTable *>(w)) {
+        widget->clearSelection();
         pv[0] = widget->getPV().trimmed();
         nbPV = 1;
     } else if(caCircularGauge* widget = qobject_cast<caCircularGauge *>(w)) {
@@ -5336,7 +5335,6 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
     if((event->button() == Qt::LeftButton) ||  (event->button() == Qt::RightButton)){
         return;
     }
-
     QWidget *w = static_cast<QWidget*>(childAt(event->pos()));
     if (!w) return;
 
