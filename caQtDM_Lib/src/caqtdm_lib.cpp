@@ -2544,7 +2544,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         // Led ==================================================================================================================
     } else if (caLed *widget = qobject_cast<caLed *>(w)) {
         //qDebug() << "led" << led->objectName();
-        Qt::CheckState state;
+        Qt::CheckState state = Qt::Unchecked;
 
         if(data.edata.connected) {
             int colorMode = widget->getColorMode();
@@ -2600,7 +2600,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         // Toggle =====================================================================================================
     } else if (caToggleButton *widget = qobject_cast<caToggleButton *>(w)) {
         //qDebug() << "caToggleButton" << widget->objectName() << data.pv;
-        Qt::CheckState state;
+        Qt::CheckState state = Qt::Unchecked;
 
         if(data.edata.connected) {
             int colorMode = widget->getColorMode();

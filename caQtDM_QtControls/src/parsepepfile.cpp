@@ -1213,7 +1213,7 @@ void ParsePepFile::writeSimpleProperty(QString prop, QString tag, QString value,
 
 QWidget* ParsePepFile::load(QWidget *parent)
 {
-    QWidget *widget = new QWidget;
+    QWidget *widget; // = new QWidget;
     QUiLoader loader;
 
 /* used to output the data to an ui file for verification*/

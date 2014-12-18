@@ -73,6 +73,8 @@ void EApplyNumeric::init()
 		box = new QHBoxLayout(this);
 	else if (buttonPos == Qt::Vertical)
 		box = new QVBoxLayout(this);
+    else
+        box = new QHBoxLayout(this);
 
 	box->setMargin(0);
 	box->setSpacing(3);

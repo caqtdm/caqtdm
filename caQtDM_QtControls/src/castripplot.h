@@ -420,8 +420,6 @@ private:
     int HISTORY;
     int timerID;
     double INTERVAL;
-    int updateRate;
-    int timerCount;
     int NumberOfCurves;
     QTimer *Timer;
     struct timeb  timeNow;
@@ -464,7 +462,6 @@ private:
     QColor thisBackColor;
     QColor thisScaleColor;
     QColor thisLineColor[MAXCURVES], thisGridColor;
-    bool thisAutoscale;
     double AutoscaleMaxY;
     double AutoscaleMinY;
 
