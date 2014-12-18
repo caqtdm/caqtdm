@@ -331,7 +331,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     }
 
 #ifdef NETWORKDOWNLOADSUPPORT
-        // connect close lauchfile action to parent
+        // connect close launchfile action to parent
         connect(this, SIGNAL(Signal_IosExit()), parent, SLOT(Callback_IosExit()));
 #endif
 
@@ -520,10 +520,12 @@ void CaQtDM_Lib::EnableDisableIO()
                             QVariantList infoList = var.toList();
                             for(int j=0; j<infoList.count(); j++) {
                                 ptr = (void*) infoList.at(j).value<void *>();
-                                if(!hidden) {
-                                    addEvent(ptr);
-                                } else {
-                                    clearEvent(ptr);
+                                if(ptr != (void*) 0) {
+                                    if(!hidden) {
+                                        addEvent(ptr);
+                                    } else {
+                                        clearEvent(ptr);
+                                    }
                                 }
                             }
                         }
@@ -1735,7 +1737,7 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     // when we defined already the same software channel, then get back the rate that was specified
     if(mutexKnobData->getSoftPV(pv, &indx, thisW)) {
         knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
-        rate = kPtr->edata.repRate;
+        if(kPtr != (knobData*) 0) rate = kPtr->edata.repRate;
     }
 
     // is there a json string ?
@@ -1952,58 +1954,61 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
         for(int i=0; i < MAX_CALC_INPUTS; i++) valueArray[i] = 0.0;
         for(int i=0; i< nbMonitors;i++) {
             knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(list.at(i+1).toInt());
-            //qDebug() << "calculate from index" << ptr->index << ptr->pv << ptr->edata.connected << ptr->edata.rvalue;
-            // when connected
-            if(ptr->edata.connected) {
-                valueArray[i] = ptr->edata.rvalue;
-            } else {
-                valueArray[i] = 0.0;
-            }
-            // for first record
-            if(i==0 && ptr->edata.connected) {
-                valueArray[4] = 0.0;                                 /* E: Reserved */
-                valueArray[5] = 0.0;                                 /* F: Reserved */
-                valueArray[6] = ptr->edata.valueCount;               /* G: count */
-                valueArray[7] = ptr->edata.upper_disp_limit;         /* H: hopr */
-                valueArray[8] = ptr->edata.status;                   /* I: status */
-                valueArray[9] = ptr->edata.severity;                 /* J: severity */
-                valueArray[10] = ptr->edata.precision;               /* K: precision */
-                valueArray[11] = ptr->edata.lower_disp_limit;        /* L: lopr */
+            if(ptr != (knobData*) 0) {
+                //qDebug() << "calculate from index" << ptr->index << ptr->pv << ptr->edata.connected << ptr->edata.rvalue;
+                // when connected
+                if(ptr->edata.connected) {
+                    valueArray[i] = ptr->edata.rvalue;
+                } else {
+                    valueArray[i] = 0.0;
+                }
+                // for first record
+                if(i==0 && ptr->edata.connected) {
+                    valueArray[4] = 0.0;                                 /* E: Reserved */
+                    valueArray[5] = 0.0;                                 /* F: Reserved */
+                    valueArray[6] = ptr->edata.valueCount;               /* G: count */
+                    valueArray[7] = ptr->edata.upper_disp_limit;         /* H: hopr */
+                    valueArray[8] = ptr->edata.status;                   /* I: status */
+                    valueArray[9] = ptr->edata.severity;                 /* J: severity */
+                    valueArray[10] = ptr->edata.precision;               /* K: precision */
+                    valueArray[11] = ptr->edata.lower_disp_limit;        /* L: lopr */
+                }
             }
         }
         setlocale(LC_NUMERIC, "C");
         // Regexp will used when is marked with %/regexp/
         QRegExp checkregexp("%\\/(\\S+)\\/");
         checkregexp.setMinimal(true);
-        if (checkregexp.indexIn(calcString)!= -1){
-          knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(list.at(1).toInt());
-          char dataString[1024];
-          int caFieldType= ptr->edata.fieldtype;
-          QString captured_Calc = checkregexp.cap(1);
-          if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && ptr->edata.dataB != (void*) 0) {
-              if(ptr->edata.dataSize < 1024) {
-                  memcpy(dataString, (char*) ptr->edata.dataB, ptr->edata.dataSize);
-                  dataString[ptr->edata.dataSize] = '\0';
-              }else
-              {
-                  char asc[100];
-                  sprintf(asc, "Invalid channel data type %s", qPrintable(w->objectName()));
-                  postMessage(QtDebugMsg, asc);
-                  valid = false;
-                  return true;
-              }
-          }
-          QRegExp check_A(captured_Calc);
-          check_A.setMinimal(true);
-          if (check_A.exactMatch(dataString)){
-            result=1;
-            valid = true;
-            return true;
-          }else{
-            result=0;
-            valid = true;
-            return false;
-          }
+        if (checkregexp.indexIn(calcString) != -1){
+            knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(list.at(1).toInt());
+            if(ptr != (knobData *) 0) {
+                char dataString[1024];
+                int caFieldType= ptr->edata.fieldtype;
+                QString captured_Calc = checkregexp.cap(1);
+                if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && ptr->edata.dataB != (void*) 0) {
+                    if(ptr->edata.dataSize < 1024) {
+                        memcpy(dataString, (char*) ptr->edata.dataB, ptr->edata.dataSize);
+                        dataString[ptr->edata.dataSize] = '\0';
+                    } else  {
+                        char asc[100];
+                        sprintf(asc, "Invalid channel data type %s", qPrintable(w->objectName()));
+                        postMessage(QtDebugMsg, asc);
+                        valid = false;
+                        return true;
+                    }
+                }
+                QRegExp check_A(captured_Calc);
+                check_A.setMinimal(true);
+                if (check_A.exactMatch(dataString)){
+                    result=1;
+                    valid = true;
+                    return true;
+                } else{
+                    result=0;
+                    valid = true;
+                    return false;
+                }
+            }
         }
         //normal EPICS Calulation
         status = postfix(calcString, post, &errnum);
@@ -2050,12 +2055,13 @@ int CaQtDM_Lib::ComputeAlarm(QWidget *w)
 
         // medm uses however only first channel
         knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(list.at(1).toInt());
-        //qDebug() << ptr->pv << ptr->edata.connected << ptr->edata.rvalue;
-        // when connected
-        if(ptr->edata.connected) {
-            status = status | ptr->edata.severity;
-        } else {
-            return NOTCONNECTED;
+        if(ptr != (knobData *) 0) {
+            // when connected
+            if(ptr->edata.connected) {
+                status = status | ptr->edata.severity;
+            } else {
+                return NOTCONNECTED;
+            }
         }
     }
     return status;
@@ -2836,12 +2842,13 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 for(int i=0; i < 4; i++) valueArray[i] = 0.0;
                 for(int i=0; i< nbMonitors;i++) {
                     knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(list.at(i+1).toInt());
-                    //qDebug() << ptr->pv << ptr->edata.connected << ptr->edata.value;
-                    // when connected
-                    if(ptr->edata.connected) {
-                        valueArray[i] = ptr->edata.rvalue;
-                    } else {
-                        valueArray[i] = 0.0;
+                    if(ptr != (knobData *) 0) {
+                        // when connected
+                        if(ptr->edata.connected) {
+                            valueArray[i] = ptr->edata.rvalue;
+                        } else {
+                            valueArray[i] = 0.0;
+                        }
                     }
                 }
 
@@ -3625,20 +3632,22 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
     // you will run into trouble
     for(int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
         knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
-        if(myWidget == (QWidget*) kPtr->thisW) {
-            if (kPtr->edata.info != (connectInfoShort *) 0) {
-                free(kPtr->edata.info);
-                kPtr->edata.info = (void*) 0;
-                kPtr->thisW = (void*) 0;
-            }
-            if(kPtr->edata.dataB != (void*) 0) {
-                free(kPtr->edata.dataB);
-                kPtr->edata.dataB = (void*) 0;
-            }
-            if(kPtr->mutex != (QMutex *) 0) {
-                QMutex *mutex = (QMutex *) kPtr->mutex;
-                delete mutex;
-                kPtr->mutex = (QMutex *) 0;
+        if(kPtr != (knobData *) 0) {
+            if(myWidget == (QWidget*) kPtr->thisW) {
+                if (kPtr->edata.info != (connectInfoShort *) 0) {
+                    free(kPtr->edata.info);
+                    kPtr->edata.info = (void*) 0;
+                    kPtr->thisW = (void*) 0;
+                }
+                if(kPtr->edata.dataB != (void*) 0) {
+                    free(kPtr->edata.dataB);
+                    kPtr->edata.dataB = (void*) 0;
+                }
+                if(kPtr->mutex != (QMutex *) 0) {
+                    QMutex *mutex = (QMutex *) kPtr->mutex;
+                    delete mutex;
+                    kPtr->mutex = (QMutex *) 0;
+                }
             }
         }
     }
@@ -3770,32 +3779,32 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         else strcpy(colMode, "Static");
     } else if (caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w)) {
         pv[0] = widget->getPV().trimmed();
-        knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv[0]);
         if(widget->getPrecisionMode() == caApplyNumeric::User) {
             precMode = true;
             Precision = widget->decDigits();
         } else {
-            Precision =  kPtr->edata.precision;
+            knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv[0]);
+            if(kPtr != (knobData *) 0) Precision =  kPtr->edata.precision;
         }
         nbPV = 1;
     } else if (caNumeric* widget = qobject_cast<caNumeric *>(w)) {
         pv[0] = widget->getPV();
-        knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv[0]);
         if(widget->getPrecisionMode() == caNumeric::User) {
             precMode = true;
             Precision = widget->decDigits();
         } else {
-            Precision =  kPtr->edata.precision;
+            knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv[0]);
+            if(kPtr != (knobData *) 0) Precision =  kPtr->edata.precision;
         }
         nbPV = 1;
     } else if (caSpinbox* widget = qobject_cast<caSpinbox *>(w)) {
         pv[0] = widget->getPV();
-        knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv[0]);
         if(widget->getPrecisionMode() == caSpinbox::User) {
             precMode = true;
             Precision = widget->decDigits();
         } else {
-            Precision =  kPtr->edata.precision;
+            knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv[0]);
+            if(kPtr != (knobData *) 0) Precision =  kPtr->edata.precision;
         }
         nbPV = 1;
     } else if (caMessageButton* widget = qobject_cast<caMessageButton *>(w)) {
@@ -3829,10 +3838,12 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             limitsMin = widget->minValue();
         }
         knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv[0]);
-        if(kPtr->edata.lower_disp_limit == kPtr->edata.upper_disp_limit) {
+        if(kPtr != (knobData *) 0) {
+           if(kPtr->edata.lower_disp_limit == kPtr->edata.upper_disp_limit) {
             limitsDefault = true;
             limitsMax = widget->maxValue();
             limitsMin = widget->minValue();
+          }
         }
         if(widget->getColorMode() == caThermo::Alarm) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
@@ -4053,7 +4064,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 int pos = pv[i].indexOf("{");
                 if(pos != -1) pv[i] = pv[i].mid(0, pos);
                 knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv[i]);  // use pointer for getting all necessary information
-                if((kPtr != (knobData*) 0) && (pv[i].length() > 0)) {
+                if((kPtr != (knobData *) 0) && (pv[i].length() > 0)) {
                     char asc[2048];
                     char timestamp[50];
                     info.append("<br>");
@@ -4238,7 +4249,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                     QStringList vars = pvs.split(";");
                     if((vars.size()== 2) || (vars.at(1).trimmed().length() > 0)) {
                         knobData *kPtr =  mutexKnobData->getMutexKnobDataPV(w, vars.at(0).trimmed());
-                        if(kPtr != (knobData*) 0) {
+                        if(kPtr != (knobData *) 0) {
                             if(kPtr->edata.lower_disp_limit != kPtr->edata.upper_disp_limit) {
                                 widget->setScaleX(kPtr->edata.lower_disp_limit, kPtr->edata.upper_disp_limit);
                             } else {
@@ -4254,7 +4265,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                     QStringList vars = pvs.split(";");
                     if((vars.size()== 2) || (vars.at(1).trimmed().length() > 0)) {
                         knobData *kPtr =  mutexKnobData->getMutexKnobDataPV(w, vars.at(1).trimmed());
-                        if(kPtr != (knobData*) 0) {
+                        if(kPtr != (knobData *) 0) {
                             if(kPtr->edata.lower_disp_limit != kPtr->edata.upper_disp_limit) {
                                 widget->setScaleY(kPtr->edata.lower_disp_limit, kPtr->edata.upper_disp_limit);
                             } else {
@@ -4621,7 +4632,7 @@ void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QW
     if(indx < 0) return;
 
     knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
-
+    if(kPtr == (knobData *) 0) return;
     // when softpv get index to where it is defined
     if(mutexKnobData->getSoftPV(kPtr->pv, &indx, (QWidget*) kPtr->thisW)) {
         if(kPtr->soft) {
@@ -4687,10 +4698,12 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
 
     knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
     knobData *auxPtr = kPtr;
+    if(kPtr == (knobData *) 0) return;
 
     // when softpv get index to where it is defined
     if(mutexKnobData->getSoftPV(kPtr->pv, &indx, (QWidget*) kPtr->thisW)) {
         kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
+        if(kPtr == (knobData *) 0) return;
     }
 
     //qDebug() << "fieldtype:" << kPtr->edata.fieldtype;
@@ -4810,6 +4823,7 @@ void CaQtDM_Lib::TreatRequestedWave(QString text, caWaveTable::FormatType fType,
     //qDebug() << "treat requested wave";
 
     knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
+    if(kPtr == (knobData *) 0) return;
 
     QMutex *datamutex;
     datamutex = (QMutex*) kPtr->mutex;
