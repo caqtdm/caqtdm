@@ -1281,7 +1281,7 @@ void *parseCartesianPlot(DisplayInfo *displayInfo, FrameOffset * offset)
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
     int nestingLevel = 0;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int traceNumber;
     int styleFound = False;
     int XrangeFound = False;
@@ -1470,7 +1470,7 @@ void *parseRelatedDisplay(DisplayInfo *displayInfo, FrameOffset * offset)
     int nestingLevel = 0;
     int displayNumber;
     int rc;
-    DlObject object;
+    DlObject object={0,0,0,0};
     char visual[MAX_TOKEN_LENGTH] = "Menu";
     char labels[LONGSTRING] = "\0";
     char names[LONGSTRING] = "\0";
@@ -1629,7 +1629,7 @@ void *parseShellCommand(DisplayInfo *displayInfo, FrameOffset * offset)
     int nestingLevel = 0;
     int cmdNumber;
     int rc;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int clr = 0;
     int bclr = 0;
 
@@ -1725,7 +1725,7 @@ void *parseMeter(DisplayInfo *displayInfo, FrameOffset * offset)
     TOKEN tokenType;
     int nestingLevel = 0;
     static int number = 0;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int visibilityStatic = 2; // top layer
 
     char widgetName[MAX_ASCII];
@@ -1784,7 +1784,7 @@ void *parseByte( DisplayInfo *displayInfo, FrameOffset * offset) {
     char COLORMODE[MAX_TOKEN_LENGTH] = "static";
     TOKEN tokenType;
     int nestingLevel = 0;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int visibilityStatic = 2; // top layer
 
     int sbitFound = False;
@@ -1867,7 +1867,7 @@ void *parseStripChart(DisplayInfo *displayInfo, FrameOffset * offset)
     char channels[LONGSTRING] = "";
     TOKEN tokenType;
     int nestingLevel = 0;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int penNumber;
     int visibilityStatic = 2; // top layer
 
@@ -1951,7 +1951,7 @@ void *parseTextUpdate(DisplayInfo *displayInfo, FrameOffset * offset)
     char COLORMODE[MAX_TOKEN_LENGTH] = "static";
     TOKEN tokenType;
     int nestingLevel = 0;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int alignFound=False;
     int i= 0, format=0;
     int visibilityStatic = 2; // top layer
@@ -2052,7 +2052,7 @@ void *parseChoiceButton(DisplayInfo *displayInfo, FrameOffset * offset)
     char COLORMODE[MAX_TOKEN_LENGTH] = "static";
     TOKEN tokenType;
     int nestingLevel = 0;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int visibilityStatic = 2; // top layer
 
     static int number = 0;
@@ -2110,7 +2110,7 @@ void *parseMessageButton(DisplayInfo *displayInfo, FrameOffset * offset)
     char COLORMODE[MAX_TOKEN_LENGTH] = "static";
     TOKEN tokenType;
     int nestingLevel = 0;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int visibilityStatic = 2; // top layer
 
     static int number = 0;
@@ -2172,7 +2172,7 @@ void *parseMenu(DisplayInfo *displayInfo, FrameOffset * offset)
     char COLORMODE[MAX_TOKEN_LENGTH] = "static";
     TOKEN tokenType;
     int nestingLevel = 0;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int visibilityStatic = 2; // top layer
 
     static int number = 0;
@@ -2224,7 +2224,7 @@ void *parseTextEntry(DisplayInfo *displayInfo, FrameOffset * offset)
     char COLORMODE[MAX_TOKEN_LENGTH] = "static";
     TOKEN tokenType;
     int nestingLevel = 0;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int i= 0, format=0;
     int visibilityStatic = 2; // top layer
 
@@ -2289,7 +2289,7 @@ void *parseValuator(DisplayInfo *displayInfo, FrameOffset * offset)
     char look[MAX_TOKEN_LENGTH] = "noDeco";
     TOKEN tokenType;
     int nestingLevel = 0;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int visibilityStatic = 2; // top layer
 
     static int number = 0;
@@ -2454,7 +2454,7 @@ void *parseImage(DisplayInfo *displayInfo, FrameOffset * offset)
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
     int nestingLevel = 0;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int visibilityStatic = 0;
 
     static int number = 0;
@@ -2733,9 +2733,12 @@ void *parseComposite(DisplayInfo *displayInfo, FrameOffset *offset)
     FrameOffset *newoffset;
 
     object = (DlObject *)malloc(sizeof(DlObject));
+    memset(object, 0, sizeof(DlObject));
 
     frameoffset = (FrameOffset *)malloc(sizeof(FrameOffset));
     actoffset = (FrameOffset *)malloc(sizeof(FrameOffset));
+    memset(frameoffset, 0, sizeof(FrameOffset));
+    memset(actoffset, 0, sizeof(FrameOffset));
 
     do {
         switch(tokenType=getToken(displayInfo,token)) {
@@ -2890,7 +2893,7 @@ void *parseWheelSwitch(DisplayInfo *displayInfo, FrameOffset * offset)
     char COLORMODE[MAX_TOKEN_LENGTH] = "static";
     TOKEN tokenType;
     int nestingLevel = 0;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int visibilityStatic = 2; // top layer
     int formatFound=False;
 
@@ -2951,7 +2954,7 @@ void *parsePolygon(DisplayInfo *displayInfo, FrameOffset * offset)
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
     int nestingLevel = 0;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int visibilityStatic = 0;
     int offsetX=0, offsetY=0;
 
@@ -3005,7 +3008,7 @@ void *parseRectangle(DisplayInfo *displayInfo, FrameOffset * offset)
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
     int nestingLevel = 0;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int visibilityStatic = 0;
 
     static int number = 0;
@@ -3051,7 +3054,7 @@ void *parseOval(DisplayInfo *displayInfo, FrameOffset * offset)
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
     int nestingLevel = 0;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int visibilityStatic = 0;
 
     static int number = 0;
@@ -3098,7 +3101,7 @@ void *parseArc(DisplayInfo *displayInfo, FrameOffset * offset)
     char asc[MAX_ASCII];
     TOKEN tokenType;
     int nestingLevel = 0;
-    DlObject object;
+    DlObject object = {0,0,0,0};
     int visibilityStatic = 0;
     int startAngle = 0;
     int spanAngle = 0;
@@ -3166,7 +3169,7 @@ void *parseText(DisplayInfo *displayInfo, FrameOffset * offset)
     char textix[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
     int nestingLevel = 0;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int alignFound=False;
     int visibilityStatic = 0;
     unsigned int newWidth = 0;
@@ -3292,7 +3295,7 @@ void *parsePolyline(DisplayInfo *displayInfo, FrameOffset * offset)
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
     int nestingLevel = 0;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int offsetX=0, offsetY=0;
     int visibilityStatic = 0;
 
@@ -3344,7 +3347,7 @@ void *parseBar(DisplayInfo *displayInfo, FrameOffset * offset)
     char direction[MAX_TOKEN_LENGTH] = "Right";
     TOKEN tokenType;
     int nestingLevel = 0;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int visibilityStatic = 2; // top layer
 
     static int number = 0;
@@ -3454,7 +3457,7 @@ void *parseIndicator(DisplayInfo *displayInfo, FrameOffset * offset)
     char direction[MAX_TOKEN_LENGTH] = "Right";
     TOKEN tokenType;
     int nestingLevel = 0;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int visibilityStatic = 2; // top layer
 	char pipeWidth[10];
     static int number = 0;
@@ -3722,12 +3725,11 @@ void *parseDisplay(DisplayInfo *displayInfo)
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
     int nestingLevel = 0;
-    DlObject object;
+    DlObject object={0,0,0,0};
     int clr, bclr;
     char cmap[MAX_TOKEN_LENGTH];
 
-    FrameOffset offset;
-    offset.frameX = offset.frameY =0;
+    FrameOffset offset ={0,0,0,0};
 
     do {
         switch( (tokenType=getToken(displayInfo,token)) ) {
