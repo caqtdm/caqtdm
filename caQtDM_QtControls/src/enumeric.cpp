@@ -166,10 +166,11 @@ void ENumeric::init()
         QPushButton *temp = new QPushButton(this);
         temp->setObjectName(QString("layoutmember") + QString().setNum(i));
         temp->installEventFilter(lCWME);
+#ifndef Q_OS_IOS
         temp->setAutoRepeat(true);
         temp->setAutoRepeatInterval(200);
         temp->setAutoRepeatDelay(500);
-
+#endif
         bup->addButton(temp);
 
         if(i == intDig - 1) {
@@ -185,11 +186,11 @@ void ENumeric::init()
         QPushButton *temp2 = new QPushButton(this);
         temp2->setObjectName(QString("layoutmember") + QString().setNum(i));
         temp2->installEventFilter(lCWME);
+#ifndef Q_OS_IOS
         temp2->setAutoRepeat(true);
         temp2->setAutoRepeatInterval(200);
         temp2->setAutoRepeatDelay(500);
-
-
+#endif
         bdown->addButton(temp2);
 
         formatDigit(temp, l, temp2);
