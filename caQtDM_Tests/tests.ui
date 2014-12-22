@@ -147,7 +147,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: cornsilk;}</string>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -3506,18 +3506,6 @@ p, li { white-space: pre-wrap; }
         <property name="limitsMode">
          <enum>caTable::User</enum>
         </property>
-        <attribute name="horizontalHeaderCascadingSectionResizes">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="horizontalHeaderHighlightSections">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="horizontalHeaderStretchLastSection">
-         <bool>true</bool>
-        </attribute>
        </widget>
        <widget class="QTextEdit" name="textEdit_21">
         <property name="geometry">
@@ -6965,6 +6953,53 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="text">
          <string>send 5</string>
+        </property>
+       </widget>
+       <widget class="caNumeric" name="caNumeric_10">
+        <property name="geometry">
+         <rect>
+          <x>306</x>
+          <y>495</y>
+          <width>96</width>
+          <height>56</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="integerDigits" stdset="0">
+         <number>3</number>
+        </property>
+        <property name="decimalDigits" stdset="0">
+         <number>0</number>
+        </property>
+        <property name="digitsFontScaleEnabled">
+         <bool>true</bool>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true"/>
+        </property>
+        <property name="background">
+         <color>
+          <red>170</red>
+          <green>170</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="precisionMode">
+         <enum>caNumeric::Channel</enum>
+        </property>
+        <property name="fixedFormat">
+         <bool>true</bool>
+        </property>
+        <property name="limitsMode">
+         <enum>caNumeric::Channel</enum>
+        </property>
+        <property name="maxValue">
+         <double>10.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>-10.000000000000000</double>
         </property>
        </widget>
       </widget>
