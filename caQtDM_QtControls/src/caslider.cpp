@@ -71,7 +71,6 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
     thisMaximum = 50;
     pointSizePrv = 0.0;
     direction = 0;
-    timerID = 0;
     isMoving = false;
     isScrolling = false;
 
@@ -101,6 +100,10 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
 
     QwtLinearScaleEngine *scaleEngine = new myScaleEngine();
     setScaleEngine( scaleEngine );
+
+    repeatTimer = new QTimer(this);
+    repeatTimer->setInterval(200);
+    connect(repeatTimer, SIGNAL(timeout()), this, SLOT(repeater()));
 }
 
 QString caSlider::getPV() const
@@ -366,13 +369,17 @@ void caSlider::mousePressEvent(QMouseEvent *e)
             if ( p.y() > markerPos ) direction = -1;
         }
         if(isScrollPosition(e->pos())) isScrolling = true;
+        printf("%d %d\n", handleRect().width(), handleRect().height());
 
-        thisValue = thisValue + double(direction) * step;
-        Q_EMIT sliderMoved( thisValue );
-        Q_EMIT valueChanged( thisValue );
+        if(sliderRect().contains(e->pos())) {
+            thisValue = thisValue + double(direction) * step;
+            Q_EMIT sliderMoved( thisValue );
+            Q_EMIT valueChanged( thisValue );
+            repeatTimer->start();
+        }
 
         e->ignore();
-        timerID = startTimer(200);
+
 #else
         QwtAbstractSlider::ScrollMode scrollMode;
         const QPoint &p = e->pos();
@@ -381,7 +388,7 @@ void caSlider::mousePressEvent(QMouseEvent *e)
         Q_EMIT sliderMoved( thisValue );
         Q_EMIT valueChanged( thisValue );
         e->ignore();
-        timerID = startTimer(200);
+        repeatTimer->start();
 #endif
     }
 }
@@ -398,15 +405,11 @@ void caSlider::mouseReleaseEvent( QMouseEvent *e )
         QwtSlider::mouseReleaseEvent(e);
 #endif
     }
-    if(timerID != 0) {
-        killTimer(timerID);
-        timerID = 0;
-    }
+    repeatTimer->stop();
 }
 
-void caSlider::timerEvent( QTimerEvent *e )
+void caSlider::repeater( )
 {
-    Q_UNUSED(e);
     if(isMoving) return;
     if(!thisAccessW) return;
 #if QWT_VERSION >= 0x060100
@@ -421,6 +424,16 @@ void caSlider::timerEvent( QTimerEvent *e )
 #endif
 }
 
+bool caSlider::timerActive()
+{
+    return repeatTimer->isActive();
+}
+
+void caSlider::stopUpdating()
+{
+  repeatTimer->stop();
+}
+
 void caSlider::mouseMoveEvent( QMouseEvent *e )
 {
     isMoving = true;
@@ -429,7 +442,6 @@ void caSlider::mouseMoveEvent( QMouseEvent *e )
         return;
     }
 #if QWT_VERSION >= 0x060100
-    const QPoint p = e->pos();
     if(isScrolling) {
         double val = scrolledTo(e->pos());
         val = qBound( minimum(), val, maximum());

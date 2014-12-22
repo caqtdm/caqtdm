@@ -325,7 +325,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 #ifdef Q_OS_IOS
          // info can be called with tapandhold
          connect(this, SIGNAL(Signal_NextWindow()), parent, SLOT(nextWindow()));
-         grabGesture(Qt::TapAndHoldGesture);
          installEventFilter(this);
 #endif
     }
@@ -5091,6 +5090,9 @@ bool CaQtDM_Lib::gestureEvent(QObject *obj, QGestureEvent *event)
 {
     if (QGesture *tapAndHold = event->gesture(Qt::TapAndHoldGesture)) {
         //postMessage(QtDebugMsg, (char*) "tapandhold");
+        if (caSlider *widget = qobject_cast<caSlider *>(obj)) {
+            if(widget->timerActive()) return false;
+        }
         tapAndHoldTriggered(obj, static_cast<QTapAndHoldGesture*>(tapAndHold));
     } else if(QGesture *fingerswipe = event->gesture(fingerSwipeGestureType)) {
         //postMessage(QtDebugMsg, (char*) "fingerSwipeGesture");

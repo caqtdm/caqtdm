@@ -26,7 +26,6 @@
 #include <QtGui>
 #include "limitsDialog.h"
 
-
 int limitsDialog::extractPrecisionFromFormat(const QString &fmt)
 {
     int prec = -1;
@@ -66,7 +65,7 @@ QString limitsDialog::getFormatFromPrecision(int prec)
 limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title, QWidget *parent) : QWidget(parent)
 {
     int thisWidth = 650;
-    int thisHeight = 150;
+    int thisHeight = 250;
 
     thisWidget = w;
     thisParent = parent;

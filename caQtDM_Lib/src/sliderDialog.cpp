@@ -26,12 +26,34 @@
 #include <QtGui>
 #include "sliderDialog.h"
 
-sliderDialog::sliderDialog(caSlider *w, MutexKnobData *data, const QString &title, QWidget *parent) : QDialog(parent)
+sliderDialog::sliderDialog(caSlider *w, MutexKnobData *data, const QString &title, QWidget *parent) : QWidget(parent)
 {
     QString text;
+    int thisWidth = 650;
+    int thisHeight = 200;
+
     slider = w;
+    thisParent = parent;
+
     monData = data;
+
     QGridLayout *Layout = new QGridLayout;
+    setWindowModality (Qt::WindowModal);
+
+#ifdef Q_OS_IOS
+    QPalette palette;
+    palette.setBrush(QPalette::Background, QColor(255,255,224,255));
+    setPalette(palette);
+    setAutoFillBackground(true);
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(thisWidth,thisHeight), qApp->desktop()->availableGeometry()));
+#else
+    Qt::WindowFlags flags = Qt::Dialog;
+    setWindowFlags(flags);
+    move(parent->x() + parent->width() / 2 - thisWidth / 2 , parent->y() + parent->height() /2 -thisHeight/2);
+#endif
+
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    QGroupBox *groupBox = new QGroupBox("Increment and value change");
 
     QLabel *label1 = new QLabel("increment");
     text = text.setNum(slider->getIncrementValue());
@@ -41,32 +63,39 @@ sliderDialog::sliderDialog(caSlider *w, MutexKnobData *data, const QString &titl
     text = text.setNum(slider->getSliderValue());
     valueEdit = new QLineEdit(text);
 
-    Layout->addWidget(label1,    0, 0);
-    Layout->addWidget(incrementEdit,  0, 1);
-    Layout->addWidget(label2,  1, 0);
-    Layout->addWidget(valueEdit,  1, 1);
+    Layout->addWidget(label1,    1, 0);
+    Layout->addWidget(incrementEdit,  1, 1);
+    Layout->addWidget(label2,  2, 0);
+    Layout->addWidget(valueEdit,  2, 1);
 
-    QDialogButtonBox *box = new QDialogButtonBox( Qt::Horizontal );
-    QPushButton *button = new QPushButton( "Return" );
-    connect( button, SIGNAL(clicked()), this, SLOT(cancelClicked()) );
+    buttonBox = new QDialogButtonBox( Qt::Horizontal );
+    QPushButton *buttonReturn = new QPushButton( "Return" );
+    connect( buttonReturn, SIGNAL(clicked()), this, SLOT(cancelClicked()) );
+    buttonBox->addButton(buttonReturn, QDialogButtonBox::RejectRole );
 
-    box->addButton(button, QDialogButtonBox::RejectRole );
+    QPushButton *buttonApply = new QPushButton( "Apply" );
+    connect(buttonApply, SIGNAL(clicked()), this, SLOT(applyClicked()) );
+    buttonBox->addButton(buttonApply, QDialogButtonBox::ApplyRole);
 
-    button = new QPushButton( "Apply" );
-    connect( button, SIGNAL(clicked()), this, SLOT(applyClicked()) );
-    box->addButton(button, QDialogButtonBox::ApplyRole );
+    Layout->addWidget(buttonBox, 3, 0);
 
-    Layout->addWidget(box, 2, 0);
+    groupBox->setLayout(Layout);
+    mainLayout->addWidget(groupBox);
 
-    setLayout(Layout);
+    setLayout(mainLayout);
+
+    thisPV = slider->getPV();
+    QLabel *Title = new QLabel(thisPV + " / " + w->objectName());
+    Layout->addWidget(Title,0,0,1,-1);
 
     setWindowTitle(title);
 
+    showNormal();
 }
 
 void sliderDialog::cancelClicked()
 {
-    reject();
+       close();
 }
 
 void sliderDialog::applyClicked()
@@ -75,12 +104,35 @@ void sliderDialog::applyClicked()
 
     QString text = incrementEdit->text();
     double value = text.toDouble(&ok);
-
-    if(ok) slider->setIncrementValue(text.toDouble(&ok));
+    if(ok) slider->setIncrementValue(value);
 
     text = valueEdit->text();
     value = text.toDouble(&ok);
+    if(ok) slider->setSliderValue(value);
+}
 
-    if(ok) slider->setSliderValue(text.toDouble(&ok));
+void sliderDialog::exec()
+{
+    connect(buttonBox, SIGNAL(rejected()), &loop, SLOT(quit()) );
+    connect(buttonBox, SIGNAL(accepted()), &loop, SLOT(quit()) );
+    loop.exec();
+    close();
+    deleteLater();
+}
+
+void sliderDialog::closeEvent(QCloseEvent *event)
+{
+    Q_UNUSED(event);
+    loop.quit();
+}
+
+void sliderDialog::paintEvent(QPaintEvent *e)
+{
+    QPainter painter(this);
+    QPen pen(Qt::black, 3, Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin);
+    painter.setPen(pen);
+    painter.drawRoundedRect(5, 5, width()-7, height()-7, 3, 3);
+
+    QWidget::paintEvent(e);
 }
 

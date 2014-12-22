@@ -31,6 +31,8 @@
 #include <qwt_scale_draw.h>
 #include <qwt_scale_engine.h>
 
+#include <QTimer>
+
 class QTCON_EXPORT caSlider : public QwtSlider
 {
     Q_OBJECT
@@ -105,8 +107,11 @@ public:
     void setUserAlarmColors(double val);
     void setColors(QColor bg, QColor fg);
     void setNormalColors();
+    bool timerActive();
+    void stopUpdating();
 
 private slots:
+    void repeater();
 
 protected:
 
@@ -116,7 +121,7 @@ protected:
     virtual void keyPressEvent(QKeyEvent *e);
     virtual void keyReleaseEvent(QKeyEvent *e);
     virtual bool event(QEvent *);
-    virtual void timerEvent( QTimerEvent *e );
+    //virtual void timerEvent( QTimerEvent *e );
 
 private:
     bool eventFilter(QObject *obj, QEvent *event);
@@ -140,7 +145,7 @@ private:
     double thisValue;
     double thisIncrement;
     float  pointSizePrv;
-    int timerID;
+    QTimer *repeatTimer;
     int direction;
     bool isMoving;
     bool isScrolling;

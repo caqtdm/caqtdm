@@ -42,25 +42,42 @@
 #include "knobData.h"
 #include "mutexKnobData.h"
 
+#include <QEventLoop>
+#include <QDesktopWidget>
+#include <QApplication>
+#include <QGroupBox>
+#include <QPainter>
+
  class QDialogButtonBox;
  class QLabel;
  class QLineEdit;
  class QTextEdit;
  class QWidget;
 
- class sliderDialog : public QDialog
+ class sliderDialog : public QWidget
 {
      Q_OBJECT
 
  public:
-
      sliderDialog(caSlider *w, MutexKnobData *data, const QString &title, QWidget *parent);
+     void exec();
 
- public slots:
+ private slots:
      void cancelClicked();
      void applyClicked();
 
+ protected:
+     virtual void closeEvent(QCloseEvent *event);
+     virtual void paintEvent(QPaintEvent *e);
+
  private:
+     QWidget *thisWidget;
+     QWidget *thisParent;
+     QString thisPV;
+
+     QDialogButtonBox *buttonBox;
+
+     QEventLoop loop;
 
      caSlider *slider;
      MutexKnobData *monData;
