@@ -23,6 +23,14 @@ DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 
 # 3.8.9
 # modified cawavetable to display as matrix with a finite number of elements; elements can be modified and representation choosen
+# caWaveTable can display now values as decimal, string, hex and octal
+# on ipad the slider click and tapandhold interfered, this has been solved
+# on ipad the autorepeat option of the wheelswitch has been disabled while interfering with tapandhold
+# on ipad it is possible now to give multiple ip addresses in the EPICS_CA_ADDR_LIST separated by blancs
+# eliminated some warnings
+# test for null pointers added in case of absence of channels
+# resizing of caTable and caWaveTable has been changed
+#
 
 # 3.8.8
 # modified the shared memory key for x-windows in order to distinguish the display used
