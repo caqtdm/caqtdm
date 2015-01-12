@@ -31,7 +31,7 @@
 configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, const QList<QString> &files, QWidget *parent): QWidget(parent)
 {
     int thisWidth = 600;
-    int thisHeight = 350;
+    int thisHeight = 370;
     Qt::WindowFlags flags = Qt::Dialog;
     setWindowFlags(flags);
     setWindowModality (Qt::WindowModal);
@@ -41,9 +41,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, qApp->desktop()->size() - size , qApp->desktop()->availableGeometry()));
 
     QPixmap bg(":/caQtDM-BGL-2048.png");
-    QMatrix rotated;
-    //rotated.rotate(90);
-    //bg = bg.transformed(rotated);
+
     bg = bg.scaled(qApp->desktop()->size());
     QPalette palette;
     palette.setBrush(QPalette::Background, bg);
@@ -143,6 +141,12 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     connect(startButton, SIGNAL(clicked()), this, SLOT(startClicked()) );
 
     frameLayout->addWidget(startButton);
+    QString message = QString("<h5>Qt-based Epics Display Manager Version %1</h5>");
+    message = message.arg(BUILDVERSION);
+
+    QLabel *version = new QLabel(message);
+    version->setAlignment(Qt::AlignRight);
+    frameLayout->addWidget(version);
 
     setLayout(mainLayout);
     showNormal();
