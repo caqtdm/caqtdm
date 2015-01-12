@@ -1,4 +1,4 @@
-record(ao,"QTDM:TEST:AO") {
+record(ao,"ACM:TEST:AO") {
     field(DESC,"analog output record")
     field(SCAN,"Passive")
     field(PINI,"NO")
@@ -44,7 +44,22 @@ record(ao,"QTDM:TEST:AO") {
     field(IVOV,"0.000000000000000e+00")
 }
 
-record(bo,"QTDM:TEST:BO") {
+record(ao,"ACM:TEST:AO:AMP") {
+    field(DESC,"analog output noise amplitude")
+    field(SCAN,"Passive")
+}
+
+record(calc, "ACM:TEST:AO:NOISE"){
+        field(DESC,"analog output with noise")
+	field(INPA, "ACM:TEST:AO MS")
+	field(INPB, "ACM:TEST:AO:AMP MS")
+	field(CALC, "A+B*RNDM")
+	field(EGU,  "Units")
+	field(PREC, "1")
+        field(SCAN,".1 second")
+}
+
+record(bo,"ACM:TEST:BO") {
     field(DESC,"binary output record")
     field(SCAN,"1 second")
     field(PINI,"NO")
@@ -71,7 +86,7 @@ record(bo,"QTDM:TEST:BO") {
     field(IVOA,"Continue normally")
     field(IVOV,"0")
 }
-record(ai,"QTDM:TEST:AI") {
+record(ai,"ACM:TEST:AI") {
     field(DESC,"analog input record")
     field(SCAN,"Passive")
     field(PINI,"NO")
@@ -109,7 +124,7 @@ record(ai,"QTDM:TEST:AI") {
     field(SIML,"0.000000000000000e+00")
     field(SIMS,"NO_ALARM")
 }
-record(longin,"QTDM:TEST:LI") {
+record(longin,"ACM:TEST:LI") {
     field(DESC,"long input record")
     field(SCAN,"Passive")
     field(PINI,"NO")
@@ -140,7 +155,7 @@ record(longin,"QTDM:TEST:LI") {
     field(SIML,"0.000000000000000e+00")
     field(SIMS,"NO_ALARM")
 }
-record(bi,"QTDM:TEST:BI") {
+record(bi,"ACM:TEST:BI") {
     field(DESC,"binary input record")
     field(SCAN,"Passive")
     field(PINI,"NO")
@@ -162,7 +177,7 @@ record(bi,"QTDM:TEST:BI") {
     field(SIML,"0.000000000000000e+00")
     field(SIMS,"NO_ALARM")
 }
-record(longout,"QTDM:TEST:LO") {
+record(longout,"ACM:TEST:LO") {
     field(DESC,"long output record")
     field(SCAN,"Passive")
     field(PINI,"NO")
@@ -206,7 +221,7 @@ record(stringin, "mynow")
    field(SCAN,"1 second")
 }
 
-record(mbbo,"QTDM:TEST:MBBO") {
+record(mbbo,"ACM:TEST:MBBO") {
         field(ZRVL, "0")
         field(ONVL, "1")
         field(TWVL, "2")
@@ -215,7 +230,7 @@ record(mbbo,"QTDM:TEST:MBBO") {
         field(TWST, "RESET")
 }
 
-record(mbbo,"QTDM:TEST1:MBBO") {
+record(mbbo,"ACM:TEST1:MBBO") {
         field(ZRVL, "0")
         field(ONVL, "1")
         field(TWVL, "2")
@@ -225,26 +240,26 @@ record(mbbo,"QTDM:TEST1:MBBO") {
 }
 
 
-record(waveform, "QTDM:TEST:WAVE"){
+record(waveform, "ACM:TEST:WAVE"){
         field(DESC, "char waveform")
         field(FTVL, "CHAR")
         field(NELM, "128")
 }
 
-record(calc,"QTDM:COUNT:1") {
+record(calc,"ACM:COUNT:1") {
         field(DESC, "counter")
         field(EGU, "value")
         field(CALC, "A+1")
-        field(INPA, "QTDM:COUNT:1")
+        field(INPA, "ACM:COUNT:1")
         field(PREC, "2")
         field(SCAN, "1 second")
 }
 
-record(calcout,"QTDM:COUNT:2") {
+record(calcout,"ACM:COUNT:2") {
         field(CALC, "A>4?0:B")
-        field(INPA, "QTDM:COUNT:1")
-        field(INPB, "QTDM:COUNT:1")
-        field(OUT,  "QTDM:COUNT:1")
+        field(INPA, "ACM:COUNT:1")
+        field(INPB, "ACM:COUNT:1")
+        field(OUT,  "ACM:COUNT:1")
         field(PREC, "2")
         field(SCAN, "1 second")
 }
@@ -310,12 +325,29 @@ record(calc, "QUAD:IST:3"){
 }
 
 
-record(waveform, "QTDM:TEST:AO_WAVE"){
+record(waveform, "ACM:TEST:DOUBLE_WAVE"){
         field(FTVL, "DOUBLE")
         field(NELM, "100")
-        field(SCAN, ".2 second")
-        field(PREC, "3")
-        field(INP, QTDM:TEST:AO)
+        field(PREC, "2")
+}
+
+record(waveform, "ACM:TEST:LONG_WAVE"){
+        field(FTVL, "LONG")
+        field(NELM, "100")
+	field(HOPR,"1200")
+	field(LOPR,"-200")
+}
+
+record(waveform, "ACM:TEST:CHAR_WAVE"){
+        field(FTVL, "CHAR")
+        field(NELM, "100")
+	field(HOPR,"1200")
+	field(LOPR,"-200")
+}
+
+record(waveform,"ACM:TEST:SHORT_WAVE") {
+        field(FTVL, "SHORT")
+        field(NELM, "100")
 	field(HOPR,"1200")
 	field(LOPR,"-200")
 }
@@ -656,8 +688,85 @@ record(mbbi,"LI:OP:demoMI") {
 	field(SIML,"0")
 	field(SIMS,"NO_ALARM")
 }
-record (bo, "QTDM:TEST:BO1")
+record (bo, "ACM:TEST:BO1")
 {
 field(ZNAM, "DONE")
 field(ONAM, "HOME")
+}
+
+record(waveform, "ACM:REG2D:X:1"){
+        field(FTVL, "DOUBLE")
+        field(NELM, "100")
+        field(PREC, "3")
+}
+record(waveform, "ACM:REG2D:Y:1"){
+        field(FTVL, "DOUBLE")
+        field(NELM, "100")
+        field(PREC, "3")
+}
+record(waveform, "ACM:REG2D:X:2"){
+        field(FTVL, "DOUBLE")
+        field(NELM, "100")
+        field(PREC, "3")
+}
+record(waveform, "ACM:REG2D:Y:2"){
+        field(FTVL, "DOUBLE")
+        field(NELM, "100")
+        field(PREC, "3")
+}
+record(waveform, "ACM:REG2D:X"){
+        field(FTVL, "DOUBLE")
+        field(NELM, "100")
+        field(PREC, "3")
+}
+record(waveform, "ACM:REG2D:Y"){
+        field(FTVL, "DOUBLE")
+        field(NELM, "100")
+        field(PREC, "3")
+}
+
+record(ao, "roi:x"){
+	field(DESC, "Sollwert")
+	field(PREC, "0")
+}
+record(ao, "roi:y"){
+	field(DESC, "Sollwert")
+	field(PREC, "0")
+}
+record(ao, "roi:w"){
+	field(DESC, "Sollwert")
+	field(PREC, "0")
+}
+record(ao, "roi:h"){
+	field(DESC, "Sollwert")
+	field(PREC, "0")
+}
+record(ao, "99:SliderAO") {
+  field(DTYP, "Soft Channel")
+  field(PREC, "0")
+  field(DRVH, "100")
+  field(DRVL, "0")
+  field(HOPR, "95")
+  field(LOPR, "5")
+  field(HIGH, "100")
+  field(LOW, "0")
+  field(FLNK, "99:MeterAI")
+  field(OUT, "99:MeterAI PP")
+}
+
+record(ai, "99:MeterAI") {
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(PREC, "0")
+  field(HOPR, "50")
+  field(LOPR, "0")
+  field(HIGH, "80")
+  field(LOW, "20")
+  field(FLNK, "99:SliderCountBO")
+  field(HIHI, "90")
+  field(LOLO, "10")
+  field(HHSV, "MAJOR")
+  field(LLSV, "MAJOR")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
 }
