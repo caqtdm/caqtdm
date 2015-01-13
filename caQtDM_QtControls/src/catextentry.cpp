@@ -30,7 +30,8 @@
 
 caTextEntry::caTextEntry(QWidget *parent) : caLineEdit(parent)
 {
-    connect(this, SIGNAL(returnPressed()), this, SLOT(dataInput()));
+  // this dis not really worked on ios, while the events had another order
+  //connect(this, SIGNAL(returnPressed()), this, SLOT(dataInput()));
     clearFocus();
     setAccessW(true);
     installEventFilter(this);
@@ -38,9 +39,10 @@ caTextEntry::caTextEntry(QWidget *parent) : caLineEdit(parent)
     this->setAcceptDrops(false);
 }
 
+// routine not used any more
 void caTextEntry::dataInput()
 {
-    //printf("return pressed %s\n", text().toAscii().constData());
+    //printf("dataInput %s\n", text().toAscii().constData());
     emit TextEntryChanged(text());
 }
 
@@ -65,8 +67,9 @@ bool caTextEntry::eventFilter(QObject *obj, QEvent *event)
                 //printf("keyPressEvent ignore\n");
                 event->ignore();
             } else {
-                //printf("keyPressEvent accept\n");
                 event->accept();
+                //printf("keyPressEvent accept, set text to %s entered=%s ?\n", startText.toAscii().constData(), text().toAscii().constData());
+                emit TextEntryChanged(text().toAscii().constData());
             }
         }
     }
@@ -79,6 +82,7 @@ bool caTextEntry::eventFilter(QObject *obj, QEvent *event)
         } else {
             QApplication::restoreOverrideCursor();
         }
+        this->activateWindow();  // I added this for ios while I could not get the focus
     } else if(event->type() == QEvent::Leave) {
         QApplication::restoreOverrideCursor();
         setReadOnly(false);
@@ -86,6 +90,8 @@ bool caTextEntry::eventFilter(QObject *obj, QEvent *event)
     } else if(event->type() == QEvent::FocusOut) {
         //printf("lost focus, set text to %s\n", startText.toAscii().constData());
         forceText(startText);
+    } else if (event->type() == QEvent::FocusIn) {
+        //printf("focus in\n");
     }
     return QObject::eventFilter(obj, event);
 }

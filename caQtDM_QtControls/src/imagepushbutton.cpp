@@ -33,6 +33,7 @@ ImagePushButton::ImagePushButton(const QString & text, const QString& image, QWi
     myImage= image;
     iconPresent = false;
     invisible = false;
+  /*
     searchFile *s = new searchFile(image);
     QString fileNameFound = s->findFile();
 
@@ -44,6 +45,12 @@ ImagePushButton::ImagePushButton(const QString & text, const QString& image, QWi
         iconOK = true;
     }
     delete s;
+*/
+    // instead of the previous dynamic load from file, we do it now from the resources
+    iconOK = true;
+    QString fileName =  ":/pixmaps/%1";
+    fileName = fileName.arg(image);
+    pixmap = QPixmap(fileName);
     resize(pixmap.width(), pixmap.height());
 }
 
@@ -99,8 +106,6 @@ void ImagePushButton::paintEvent( QPaintEvent* event) {
             w -= pixw + 4;
         }
         r.setRect(x, y, w, h);
-
-        //p.drawText(r, Qt::AlignCenter, myText);
     }
 }
 

@@ -28,7 +28,7 @@
 caRelatedDisplay::caRelatedDisplay(QWidget *parent) : caRowColMenu(parent)
 {
     setStacking(Row);
-    setImage("fileopen.xpm");
+    setImage("fileopen.png");
     replacemodes << "false" << "false" << "false" << "false" << "false" << "false" << "false" << "false" << "false" << "false"<< "false" << "false" << "false" << "false" << "false" << "false";
 }
 

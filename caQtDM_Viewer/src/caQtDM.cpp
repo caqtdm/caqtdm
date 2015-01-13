@@ -62,11 +62,11 @@ static void unixSignalHandler(int signum) {
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(caQtDM);
+    Q_INIT_RESOURCE(qtcontrols);
 
     QApplication app(argc, argv);
     QApplication::setOrganizationName("Paul Scherrer Institut");
     QApplication::setApplicationName("caQtDM");
-
 
     // we do not want numbers with a group separators
     QLocale loc = QLocale::system();

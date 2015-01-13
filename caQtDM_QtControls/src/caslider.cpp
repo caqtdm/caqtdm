@@ -369,7 +369,7 @@ void caSlider::mousePressEvent(QMouseEvent *e)
             if ( p.y() > markerPos ) direction = -1;
         }
         if(isScrollPosition(e->pos())) isScrolling = true;
-        printf("%d %d\n", handleRect().width(), handleRect().height());
+        //printf("%d %d\n", handleRect().width(), handleRect().height());
 
         if(sliderRect().contains(e->pos())) {
             thisValue = thisValue + double(direction) * step;

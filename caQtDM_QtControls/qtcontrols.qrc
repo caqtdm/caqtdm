@@ -1,11 +1,13 @@
 <RCC>
-  <qresource>
-    <file>plugins/pixmaps/econtexthelp.png</file>
-	<file>pixmaps/go-up.png</file>
-	<file>pixmaps/go-down.png</file>
-	<file>pixmaps/list-add.png</file>
-	<file>pixmaps/list-remove.png</file>
-	<file>pixmaps/zoomin.png</file>
+    <qresource prefix="/">
+        <file>plugins/pixmaps/econtexthelp.png</file>
+        <file>pixmaps/go-up.png</file>
+        <file>pixmaps/go-down.png</file>
+        <file>pixmaps/list-add.png</file>
+        <file>pixmaps/list-remove.png</file>
+        <file>pixmaps/zoomin.png</file>
         <file>pixmaps/zoomout.png</file>
-  </qresource>
+        <file>pixmaps/exclamation.png</file>
+        <file>pixmaps/fileopen.png</file>
+    </qresource>
 </RCC>
