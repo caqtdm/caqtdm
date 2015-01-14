@@ -389,7 +389,7 @@ void ENumeric::mouseDoubleClickEvent(QMouseEvent*)
     {
         text = new QLineEdit(this);
         connect(text, SIGNAL(returnPressed()), this, SLOT(dataInput()));
-        connect(text, SIGNAL(lostFocus()), text, SLOT(hide()));
+        connect(text, SIGNAL(editingFinished() ), text, SLOT(hide()));
     }
     text->setGeometry(QRect(box->cellRect(1, 0).topLeft(), box->cellRect(1, box->columnCount() - 1).bottomRight()));
     text->setFont(signLabel->font());
