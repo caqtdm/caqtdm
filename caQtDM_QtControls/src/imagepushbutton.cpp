@@ -88,7 +88,6 @@ void ImagePushButton::paintEvent( QPaintEvent* event) {
 
     QRect r = this->geometry();
     x=r.x(); y=r.y(); w=r.width(); h=r.height();
-    //printf("%d %d %d %d\n", x, y, w, h);
 
     if(invisible) {
         thisbg.setAlpha(0);
@@ -96,12 +95,12 @@ void ImagePushButton::paintEvent( QPaintEvent* event) {
         p.setBackground(thisbg);
         p.setPen(thisfg);
         p.drawRect(QRect(0, 0, w, h));
-
     }  else {
         if(iconPresent && iconOK) {
-            int pixw = pixmap.width();
-            int pixh = pixmap.height();
-            p.drawPixmap( 1, y+h/2-pixh/2, pixmap );
+            QPixmap pixnew = pixmap.scaledToHeight(h);
+            int pixw = pixnew.width();
+            int pixh = pixnew.height();
+            p.drawPixmap( 1, y+h/2-pixh/2, pixnew);
             x += pixw + 4;
             w -= pixw + 4;
         }
