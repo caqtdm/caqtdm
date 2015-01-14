@@ -99,7 +99,7 @@ void ImagePushButton::paintEvent( QPaintEvent* event) {
         if(iconPresent && iconOK) {
             int hpix = h * 0.9;
             QPixmap pixnew1 = pixmap.scaledToHeight(hpix);
-            int wpix = pixnew1.width() * 0.9;
+            int wpix = pixnew1.width() * 0.85;
             QPixmap pixnew2 = pixnew1.scaled(wpix, hpix, Qt::IgnoreAspectRatio);
             int pixw = pixnew2.width();
             int pixh = pixnew2.height();
