@@ -97,12 +97,13 @@ void ImagePushButton::paintEvent( QPaintEvent* event) {
         p.drawRect(QRect(0, 0, w, h));
     }  else {
         if(iconPresent && iconOK) {
-            int hpix = h-10;
-            if(hpix < 5) hpix = 5;
-            QPixmap pixnew = pixmap.scaledToHeight(hpix);
-            int pixw = pixnew.width();
-            int pixh = pixnew.height();
-            p.drawPixmap( 1, y+h/2-pixh/2, pixnew);
+            int hpix = h * 0.9;
+            QPixmap pixnew1 = pixmap.scaledToHeight(hpix);
+            int wpix = pixnew1.width() * 0.9;
+            QPixmap pixnew2 = pixnew1.scaled(wpix, hpix, Qt::IgnoreAspectRatio);
+            int pixw = pixnew2.width();
+            int pixh = pixnew2.height();
+            p.drawPixmap( 1, y+h/2-pixh/2, pixnew2);
             x += pixw + 4;
             w -= pixw + 4;
         }
