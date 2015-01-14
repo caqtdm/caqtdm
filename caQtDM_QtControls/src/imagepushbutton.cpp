@@ -97,7 +97,9 @@ void ImagePushButton::paintEvent( QPaintEvent* event) {
         p.drawRect(QRect(0, 0, w, h));
     }  else {
         if(iconPresent && iconOK) {
-            QPixmap pixnew = pixmap.scaledToHeight(h);
+            int hpix = h-10;
+            if(hpix < 5) hpix = 5;
+            QPixmap pixnew = pixmap.scaledToHeight(hpix);
             int pixw = pixnew.width();
             int pixh = pixnew.height();
             p.drawPixmap( 1, y+h/2-pixh/2, pixnew);
