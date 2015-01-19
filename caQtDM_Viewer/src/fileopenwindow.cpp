@@ -522,6 +522,17 @@ void FileOpenWindow::Callback_OpenButton()
  #endif
 
             QMainWindow *mainWindow = newWindow;
+
+#if defined(WIN32) && !defined(__GNUC__)
+			QDesktopWidget * Desktop = QApplication::desktop();
+			QRect defscreengeo = Desktop->availableGeometry(-1);//Defaultscreen=-1
+			int mainw_width = mainWindow->width();
+			int mainw_height = mainWindow->height();
+			int movx = (defscreengeo.width() / 2) - (mainw_width / 2);
+			int movy = (defscreengeo.height() / 2) - (mainw_height / 2);
+			mainWindow->move(movx, movy);
+#endif
+
             mainWindow->show();
             mainWindow->raise();
             mainWindow->setMinimumSize(0, 0);
@@ -678,6 +689,17 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         }
         newWindow->allowResizing(allowResize);
         QMainWindow *mainWindow = newWindow;
+
+#if defined(WIN32) && !defined(__GNUC__)
+		QDesktopWidget * Desktop = QApplication::desktop();
+		QRect defscreengeo = Desktop->availableGeometry(-1);//Defaultscreen=-1
+		int mainw_width = mainWindow->width();
+		int mainw_height = mainWindow->height();
+		int movx = (defscreengeo.width() / 2) - (mainw_width / 2);
+		int movy = (defscreengeo.height() / 2) - (mainw_height / 2);
+		mainWindow->move(movx, movy);
+#endif
+
 
         if(printandexit) {
             mainWindow->showMinimized();
