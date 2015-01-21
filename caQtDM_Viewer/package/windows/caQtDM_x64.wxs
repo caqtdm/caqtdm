@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <?define CaQtDMVersion = '3.8.9.0' ?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <Product Id="*" Name="caQtDM" Language="1033" Version="$(var.CaQtDMVersion)" Manufacturer="Paul Scherrer Institut" UpgradeCode="86ABEDAA-C06B-4485-9DF0-5EFE2EB497DD">
         <Package Description="caQTDM Windows Manager with Qt-Designer(5.4.0)" Comments="Displaymanager for EPICS with Qt(5.4.0)" InstallerVersion="405" Compressed="yes" Manufacturer="Paul Scherrer Institut Switzerland" Keywords="EPICS, Display, Network, Control" Platform="x64" InstallScope="perMachine" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
@@ -14,8 +14,8 @@
         <Property Id="CAQTDM_VERSION" Value="$(var.CaQtDMVersion)" />
         <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="NO EPICS and Firewall parameter set or changed!" />
         <!-- UIRef Id="WixUI_Minimal" /-->
-        <Icon Id="StartMenuIcon.exe" SourceFile="..\..\src\caQtDM.ico" />
-        <Binary Id="caQtDM.exe" SourceFile="..\..\..\caQtDM_Binaries\caQtDM.exe" />
+        <Icon Id="StartMenuIcon.exe" SourceFile="..\..\..\src\caQtDM.ico" />
+        <Binary Id="caQtDM.exe" SourceFile="$(env.CAQTDM_COLLECT)\caQtDM.exe" />
         <InstallExecuteSequence>
             <CreateFolders />
             <FileCost />
@@ -24,8 +24,8 @@
         </InstallExecuteSequence>
         <CustomAction Id="caRepeaterKill" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="immediate" Return="ignore" />
         <Property Id="QtExecCmdLine" Value="&quot;taskkill.exe&quot; /f /im caRepeater.exe" />
-        <WixVariable Id="WixUILicenseRtf" Value="gplv3.rtf" />
-        <WixVariable Id="WixUIDialogBmp" Value="PSI_Background.bmp" />
+        <WixVariable Id="WixUILicenseRtf" Value="..\gplv3.rtf" />
+        <WixVariable Id="WixUIDialogBmp" Value="..\PSI_Background.bmp" />
         <UI />
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="ProgramFiles64Folder" Name="PFiles">
@@ -122,7 +122,7 @@
                     </Directory>
                     <Directory Id="StyleSheet" Name="StyleSheet">
                         <Component Id="Stylesheet" Guid="6D848A8A-210B-4246-B86E-819E0C51AEFE" Win64="yes">
-                            <File Id="STYLESHEET.QSS" Name="stylesheet.qss" Source="..\..\parser\stylesheet.qss" />
+                            <File Id="STYLESHEET.QSS" Name="stylesheet.qss" Source="..\..\..\parser\stylesheet.qss" />
                         </Component>
                     </Directory>
                 </Directory>

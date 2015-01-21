@@ -14,15 +14,15 @@
         <Property Id="CAQTDM_VERSION" Value="$(var.CaQtDMVersion)" />
         <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="NO EPICS and Firewall parameter set or changed!"/>
         <!-- UIRef Id="WixUI_Minimal" /-->
-        <Icon Id="StartMenuIcon.exe" SourceFile="..\..\src\caQtDM.ico" />
-        <Binary Id="caQtDM.exe" SourceFile="..\..\..\caQtDM_Binaries\caQtDM.exe" />
+        <Icon Id="StartMenuIcon.exe" SourceFile="..\..\..\src\caQtDM.ico" />
+        <Binary Id="caQtDM.exe" SourceFile="$(env.CAQTDM_COLLECT)\caQtDM.exe" />
         <InstallExecuteSequence>
             <CreateFolders />
             <FileCost />
             <RemoveExistingProducts Before="InstallInitialize" />
         </InstallExecuteSequence>
-        <WixVariable Id="WixUILicenseRtf" Value="gplv3.rtf" />
-        <WixVariable Id="WixUIDialogBmp" Value="PSI_Background.bmp" />
+        <WixVariable Id="WixUILicenseRtf" Value="..\gplv3.rtf" />
+        <WixVariable Id="WixUIDialogBmp" Value="..\PSI_Background.bmp" />
         <UI />
         
         <Directory Id="TARGETDIR" Name="SourceDir">
@@ -59,7 +59,7 @@
                                 <File Id="QWT.DLL" Name="qwt.dll" Source="$(env.QWTHOME)\lib\qwt.dll" />
                             </Component>
                             <Component Id="CaQtDM" Guid="0E0D0339-624A-499A-8A5D-EFEA21AE8E6F">
-                                <File Id="CAQTDM.EXE" Name="caQtDM.exe" Source="..\..\..\caQtDM_Binaries\caQtDM.exe" />
+                                <File Id="CAQTDM.EXE" Name="caQtDM.exe" Source="$(env.CAQTDM_COLLECT)\caQtDM.exe" />
                                 <File Id="QTCONTROLS.DLL" Name="qtcontrols.dll" Source="$(env.CAQTDM_COLLECT)\qtcontrols.dll" />
                                 <File Id="CAQTDM_LIB.DLL" Name="caQtDM_Lib.dll" Source="$(env.CAQTDM_COLLECT)\caQtDM_Lib.dll" />
                                 <File Id="ADL2UI.EXE" Name="adl2ui.exe" Source="$(env.CAQTDM_COLLECT)\adl2ui.exe" />
@@ -145,7 +145,7 @@
                     </Directory>
                     <Directory Id="StyleSheet" Name="StyleSheet">
                         <Component Id="Stylesheet" Guid="6D848A8A-210B-4246-B86E-819E0C51AEFE">
-                            <File Id="STYLESHEET.QSS" Name="stylesheet.qss" Source="..\..\parser\stylesheet.qss" />
+                            <File Id="STYLESHEET.QSS" Name="stylesheet.qss" Source="..\..\..\parser\stylesheet.qss" />
                         </Component>
                     </Directory>
                 </Directory>
