@@ -54,9 +54,9 @@ rem rmdir /S /Q .\caQtDM_Binaries
 
 echo =========== remove package files ==================
 
-del .\caQtDM_Viewer\package\windows\caQtDM.msi
-del .\caQtDM_Viewer\package\windows\caQtDM.wixobj
-del .\caQtDM_Viewer\package\windows\caQtDM.wixpdb
+rmdir /S /Q .\caQtDM_Viewer\package\windows\project
+rmdir /S /Q  .\caQtDM_Viewer\package\windows\project_x64
+rmdir /S /Q  .\caQtDM_Viewer\package\windows\project_x86
 
 echo =========== clean all ==================
 

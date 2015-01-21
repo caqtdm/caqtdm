@@ -37,7 +37,7 @@ REM ============================================================================
   
   IF "%QTDM_LIBINSTALL%"=="" 		set QTDM_LIBINSTALL=X:\Qt\4.8.5\lib
   IF "%QTDM_BININSTALL%"=="" 		set QTDM_BININSTALL=X:\qt\4.8.5\bin
-  IF "%WIXHOME%"=="" 			set WIXHOME=C:\Program Files (x86)\WixEdit\wix-3.0.5419.0
+  IF "%WIXHOME%"=="" 			set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2010
   
 GOTO PRINTOUT
@@ -66,7 +66,7 @@ REM ============================================================================
  
   set QTBASE=%QTCONTROLS_LIBS%
   
-  IF "%WIXHOME%"=="" 			set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8
+  IF "%WIXHOME%"=="" 			set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
 GOTO PRINTOUT
 
@@ -95,7 +95,7 @@ REM ============================================================================
  
   set QTBASE=%QTCONTROLS_LIBS%
   
-  IF "%WIXHOME%"=="" 			set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8
+  IF "%WIXHOME%"=="" 			set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
 GOTO PRINTOUT
 
