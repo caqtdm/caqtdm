@@ -188,6 +188,11 @@ public:
  */
 CaQtDM_Lib::~CaQtDM_Lib()
 {
+
+    disconnect(mutexKnobData,
+            SIGNAL(Signal_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData)), this,
+            SLOT(Callback_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData)));
+
     //qDebug() << "nb elements:" << includeWidgetList.count();
     for (int i = includeWidgetList.count()-1; i >= 0; --i) {
         QWidget *widget;
