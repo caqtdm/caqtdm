@@ -4667,12 +4667,12 @@ long CaQtDM_Lib::getValueFromString(char *textValue, formatsType fType, char **e
     if(fType == octal) {
         return strtoul(textValue, end, 8);
     } else if(fType == hexadecimal) {
-        return strtoul(textValue,end,16);
+        return strtoul(textValue, end, 16);
     } else {
         if((strlen(textValue) > (size_t) 2) && (textValue[0] == '0') && (textValue[1] == 'x' || textValue[1] == 'X')) {
-            return strtoul(textValue,end,16);
+            return strtoul(textValue, end, 16);
         } else {
-            return strtol(textValue,end,10);
+            return strtol(textValue, end, 10);
         }
     }
 }
@@ -4771,24 +4771,29 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
         //qDebug() << "fall through default case";
 
     default:
+        match = false;
         //qDebug() << "assume it is a double";
-        // Treat as a double
         strcpy(textValue, text.toAscii().constData());
         value = (double) getValueFromString(textValue, fTypeNew, &end);
-
-        // decoded value ?
-        if(*end == '\0' && end != textValue) {
-            //qDebug() << "decoded value *end=0, set a double";
+        if(*end == '\0' && end != textValue) {        // decoded as long
+            match = true;
+        } else if(*end !='\0') {
+            value = (double)strtod(textValue, &end);  // decoded as double
+            if(*end == '\0' && end != textValue) {
+                match = true;
+            }
+        }
+        if(match) {
+            //qDebug() << "decoded as double, and set as double" << value;
             if(kPtr->soft) {
                 kPtr->edata.rvalue = value;
                 // set value also into widget, will be overwritten when driven from other channels
                 caCalc * ww = (caCalc*) kPtr->dispW;
                 ww->setValue(value);
             } else {
-                //qDebug() << "set a double" << value;
                 EpicsSetValue((char*) kPtr->pv, value, 0, textValue, (char*) w->objectName().toLower().toAscii().constData(), errmess, 1);
             }
-        // normal value
+
         } else {
             char asc[100];
             sprintf(asc, "Invalid value: pv=%s value= \"%s\"\n", kPtr->pv, textValue);
@@ -4813,6 +4818,7 @@ void CaQtDM_Lib::TreatRequestedWave(QString text, caWaveTable::FormatType fType,
     double  value, ddata[1];
     long    longValue;
     char    *end = NULL, textValue[255];
+    bool    match;
 
     formatsType fTypeNew;
 
@@ -4870,28 +4876,34 @@ void CaQtDM_Lib::TreatRequestedWave(QString text, caWaveTable::FormatType fType,
 
     case caFLOAT:
     case caDOUBLE:
+        match = false;
         // Treat as a double
         strcpy(textValue, text.toAscii().constData());
         value = (double) getValueFromString(textValue, fTypeNew, &end);
-        //qDebug() << "value=" << value;
-        if(*end == '\0' && end != textValue) {
-            if(kPtr->edata.fieldtype == caFLOAT) {
+        if(*end == '\0' && end != textValue) {        // decoded as long
+            match = true;
+        } else if(*end !='\0') {
+             value = (double)strtod(textValue, &end);
+             if(*end == '\0' && end != textValue) {   // decoded as double
+                match = true;
+             }
+        }
+        if(match) {
+           if(kPtr->edata.fieldtype == caFLOAT) {
                 float* P = (float*) kPtr->edata.dataB;
                 P[index] = (float) value;
                 EpicsSetWave((char*) kPtr->pv, P, ddata, data16, data32, sdata, kPtr->edata.valueCount,
                              (char*) w->objectName().toLower().toAscii().constData(), errmess);
-
-            } else {  // double
+            } else  {
                 double* P = (double*) kPtr->edata.dataB;
                 P[index] = (double) value;
                 EpicsSetWave((char*) kPtr->pv, fdata, P, data16, data32, sdata, kPtr->edata.valueCount,
                              (char*) w->objectName().toLower().toAscii().constData(), errmess);
-            }
+                }
         } else {
             char asc[100];
             sprintf(asc, "Invalid value: pv=%s value= \"%s\"\n", kPtr->pv, textValue);
             postMessage(QtDebugMsg, asc);
-
         }
         break;
     }
