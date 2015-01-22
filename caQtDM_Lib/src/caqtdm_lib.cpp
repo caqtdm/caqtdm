@@ -4777,7 +4777,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
         value = (double) getValueFromString(textValue, fTypeNew, &end);
         if(*end == '\0' && end != textValue) {        // decoded as long
             match = true;
-        } else if(*end !='\0') {
+        } else {
             value = (double)strtod(textValue, &end);  // decoded as double
             if(*end == '\0' && end != textValue) {
                 match = true;
@@ -4882,7 +4882,7 @@ void CaQtDM_Lib::TreatRequestedWave(QString text, caWaveTable::FormatType fType,
         value = (double) getValueFromString(textValue, fTypeNew, &end);
         if(*end == '\0' && end != textValue) {        // decoded as long
             match = true;
-        } else if(*end !='\0') {
+        } else {
              value = (double)strtod(textValue, &end);
              if(*end == '\0' && end != textValue) {   // decoded as double
                 match = true;
