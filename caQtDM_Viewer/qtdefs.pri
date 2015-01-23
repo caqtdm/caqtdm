@@ -22,6 +22,8 @@ DEFINES += NETWORKDOWNLOADSUPPORT
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 
 # 3.8.9
+# change for g++ 4.4.7
+# pixmaps on buttons are now rescaled
 # modified cawavetable to display as matrix with a finite number of elements; elements can be modified and representation choosen
 # caWaveTable can display now values as decimal, string, hex and octal
 # on ipad the slider click and tapandhold interfered, this has been solved
