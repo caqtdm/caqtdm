@@ -317,13 +317,13 @@ bool caThermo::event(QEvent *e)
                 case Up:
                 case Down: {
 
-                    int pipewidth = width()/3-4;
+                    int pipewidth = width()*2/5-4;
                     if(pipewidth != this->pipeWidth()) {
                         this->setPipeWidth(pipewidth);
                     }
                     QFont f = font();
                     int size = that->scaleDraw()->maxLabelWidth(f);
-                    float xFactor = (float) size  / ((float) width() * 2.0/3.0 - 15.0);
+                    float xFactor = (float) size  / ((float) width() * 3.0/5.0 - 15.0);
 
                     if(xFactor < 0.1) break;
 
@@ -342,13 +342,13 @@ bool caThermo::event(QEvent *e)
 
                 case Right:
                 case Left: {
-                   int pipewidth = height()/3-4;
+                   int pipewidth = height()*2/5-4;
                    if(pipewidth != this->pipeWidth()) {
                        this->setPipeWidth(pipewidth);
                    }
                    QFont f = font();
                    int size = that->scaleDraw()->maxLabelWidth(f);
-                   float yFactor = (float) size  / ((float) height()*2.0/3.0 - 10.0);
+                   float yFactor = (float) size  / ((float) height()*3.0/5.0 - 10.0);
 
                    if(yFactor < 0.1) break;
 

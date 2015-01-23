@@ -159,8 +159,8 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     setYaxisEnabled(true);
     setLegendEnabled(true);
 
-    setAxisFont(QwtPlot::xBottom, QFont("Arial", 10));
-    setAxisFont(QwtPlot::yLeft, QFont("Arial", 10));
+    setAxisFont(QwtPlot::xBottom, QFont("Arial", 9));
+    setAxisFont(QwtPlot::yLeft, QFont("Arial", 9));
 
     installEventFilter(this);
 
@@ -848,7 +848,7 @@ void caStripPlot::setTitlePlot(QString const &titel)
     thisTitle=titel;
     if(titel.size() != 0) {
         QwtText title(titel);
-        title.setFont(QFont("Arial", 11));
+        title.setFont(QFont("Arial", 10));
         setTitle(title);
         replot();
     }
@@ -859,7 +859,7 @@ void caStripPlot::setTitleX(QString const &titel)
     thisTitleX=titel;
     if(titel.size() != 0) {
         QwtText xAxis(titel);
-        xAxis.setFont(QFont("Arial", 11));
+        xAxis.setFont(QFont("Arial", 10));
         setAxisTitle(xBottom, xAxis);
     }
     replot();
@@ -870,7 +870,7 @@ void caStripPlot::setTitleY(QString const &titel)
     thisTitleY=titel;
     if(titel.size() != 0) {
         QwtText xAxis(titel);
-        xAxis.setFont(QFont("Arial", 11));
+        xAxis.setFont(QFont("Arial", 10));
         setAxisTitle(yLeft, xAxis);
     }
     replot();

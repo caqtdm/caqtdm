@@ -39,6 +39,13 @@
 
 #include <qwt_plot_zoomer.h>
 #include <qwt_plot_panner.h>
+
+#if QWT_VERSION >= 0x060100
+  #include <qwt_legend_label.h>
+#else
+  #include <qwt_legend_item.h>
+#endif
+
 #include <stdint.h>
 
 class QTCON_EXPORT caCartesianPlot : public QwtPlot

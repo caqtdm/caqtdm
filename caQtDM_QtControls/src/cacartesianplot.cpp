@@ -145,8 +145,8 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     setYscaling(Auto);
     setXaxisLimits("0;1");
     setYaxisLimits("0;1");
-    setAxisFont(QwtPlot::xBottom, QFont("Arial", 10));
-    setAxisFont(QwtPlot::yLeft, QFont("Arial", 10));
+    setAxisFont(QwtPlot::xBottom, QFont("Arial", 9));
+    setAxisFont(QwtPlot::yLeft, QFont("Arial", 9));
 
     // this allows to have a transparent widget
 #if QWT_VERSION < 0x060100
@@ -486,7 +486,7 @@ void caCartesianPlot::setTitlePlot(QString const &titel)
     thisTitle=titel;
     if(titel.size() != 0) {
         QwtText title(titel);
-        title.setFont(QFont("Arial", 11));
+        title.setFont(QFont("Arial", 10));
         setTitle(title);
         replot();
     }
@@ -497,7 +497,7 @@ void caCartesianPlot::setTitleX(QString const &titel)
     thisTitleX=titel;
     if(titel.size() != 0) {
         QwtText xAxis(titel);
-        xAxis.setFont(QFont("Arial", 11));
+        xAxis.setFont(QFont("Arial", 10));
         setAxisTitle(xBottom, xAxis);
     }
     replot();
@@ -508,7 +508,7 @@ void caCartesianPlot::setTitleY(QString const &titel)
     thisTitleY=titel;
     if(titel.size() != 0) {
         QwtText xAxis(titel);
-        xAxis.setFont(QFont("Arial", 11));
+        xAxis.setFont(QFont("Arial", 10));
         setAxisTitle(yLeft, xAxis);
     }
     replot();
@@ -627,7 +627,7 @@ void caCartesianPlot::setScalesColor(QColor c)
     palette.setColor( QPalette::Text, c);       // for ticks' labels
     scaleX->setPalette( palette);
     scaleY->setPalette (palette);
-
+    titleLabel()->setPalette(palette);
     replot();
 }
 

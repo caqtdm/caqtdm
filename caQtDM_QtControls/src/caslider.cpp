@@ -557,13 +557,13 @@ bool caSlider::event(QEvent *e)
             switch (orientation()) {
 
             case Qt::Vertical: {
-                QSize handlesize = QSize(width()/3-4, height()/10);
+                QSize handlesize = QSize(width()*2/5-4, height()/10);
                 if(handlesize != this->handleSize()) {
                     this->setHandleSize(handlesize);
                 }
                 QFont f = font();
                 int size = that->scaleDraw()->maxLabelWidth(f);
-                float xFactor = (float) size  / ((float) width() * 2.0/3.0 - 15.0);
+                float xFactor = (float) size  / ((float) width() * 3.0/5.0 - 15.0);
 
                 if(xFactor < 0.1) break;
 
@@ -582,13 +582,13 @@ bool caSlider::event(QEvent *e)
                 break;
 
             case Qt::Horizontal: {
-                QSize handlesize = QSize(width()/10, height()/3-4);
+                QSize handlesize = QSize(width()/10, height()*2/5-4);
                 if(handlesize != this->handleSize()) {
                     this->setHandleSize(handlesize);
                 }
                 QFont f = font();
                 int size = that->scaleDraw()->maxLabelWidth(f);
-                float yFactor = (float) size  / ((float) height()*2.0/3.0 -10.0);
+                float yFactor = (float) size  / ((float) height()*3.0/5.0 -10.0);
 
                 if(yFactor < 0.1) break;
 

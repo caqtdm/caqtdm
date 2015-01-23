@@ -5076,7 +5076,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
                 plot->setLegendAttribute(plot->getScaleColor(), f, caStripPlot::FONT);
             }
         } else {
-            // todo, color and font size of title for cartesian plot
+
         }
 
     }
