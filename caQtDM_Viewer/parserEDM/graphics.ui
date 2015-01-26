@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+<class>MainWindow</class>
+<widget class="QMainWindow" name="MainWindow">
+    <property name="geometry">
+        <rect>
+            <x>479</x>
+            <y>193</y>
+            <width>500</width>
+            <height>600</height>
+        </rect>
+    </property>
+    <property name="styleSheet">
+        <string>
+
+QWidget#centralWidget {background: rgba(255, 255, 255, 255);}
+
+caTable {
+       font: 10pt;
+       background: cornsilk;
+       alternate-background-color: wheat;
+}
+
+caLineEdit {
+     border-radius: 1px;
+     background: lightyellow;
+     color: black;
+ }
+
+caTextEntry {
+    color: rgb(127, 0, 63);
+    background-color: cornsilk;
+    selection-color: #0a214c;
+    selection-background-color: wheat;
+    border: 1px groove black;
+    border-radius: 1px;
+    padding: 1px;
+}
+
+caTextEntry:focus {
+    padding: 0px;
+    border: 2px groove darkred;
+    border-radius: 1px;
+}
+
+QPushButton {
+      border-color: #00b;
+      border-radius: 2px;
+      padding: 3px;
+      border-width: 1px;
+
+	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
+						   stop:0   rgba(224, 239, 255, 255),
+						   stop:0.5 rgba(199, 215, 230, 255),
+						   stop:1   rgba(184, 214, 236, 255));
+}
+QPushButton:hover {
+	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
+						stop:0   rgba(201, 226, 255, 255),
+						stop:0.5 rgba(177, 204, 230, 255),
+						stop:1   rgba(163, 205, 236, 255));
+}
+QPushButton:pressed {
+	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
+						stop:0   rgba(174, 219, 255, 255),
+						stop:0.5 rgba(165, 199, 230, 255),
+						stop:1   rgba(134, 188, 236, 255));
+}
+
+QPushButton:disabled {
+	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
+						stop:0   rgba(174, 219, 255, 255),
+						stop:0.5 rgba(165, 199, 230, 255),
+						stop:1   rgba(134, 188, 236, 255));
+}
+
+caChoice {
+      background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                  stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
+                                  stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);
+}
+
+caChoice &gt; QPushButton {
+      text-align: left;
+      padding: 1px;
+}
+
+/* when font specified, no font sizing is done any more,  font: 10pt; is not bad. You could Enable this when you converted from .adl files
+caRelatedDisplay  &gt; QPushButton {
+font: 10pt;
+}
+
+caShellCommand  &gt; QPushButton {
+font: 10pt;
+}
+*/
+
+caSlider::groove:horizontal {
+border: 1px solid #bbb;
+background: lightgrey;
+height: 20px;
+border-radius: 4px;
+}
+
+caSlider::handle:horizontal {
+background: red;
+border: 1px solid #777;
+width: 13px;
+margin-top: -2px;
+margin-bottom: -2px;
+border-radius: 2px;
+}
+
+
+
+</string>
+    </property>
+    <widget class="QWidget" name="centralWidget">
+        <widget class="caPolyLine" name="caPolyLine_0">
+            <property name="geometry">
+                <rect>
+                    <x>84</x>
+                    <y>48</y>
+                    <width>166</width>
+                    <height>265</height>
+                </rect>
+            </property>
+            <property name="lineColor">
+                <color alpha="255">
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+            </property>
+            <property name="xyPairs">
+                <string>102,52;66,26;10,200;9,201;48,81;71,81;96,85;118,78;104,265;166,32;83,1;0,0;</string>
+            </property>
+            <property name="channel">
+                <string>                                                                               </string>
+            </property>
+        </widget>
+        <widget class="caGraphics" name="caGraphics_1">
+            <property name="form">
+                <enum>caGraphics::Rectangle</enum>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>85</x>
+                    <y>358</y>
+                    <width>251</width>
+                    <height>100</height>
+                </rect>
+            </property>
+            <property name="lineColor">
+                <color alpha="255">
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+            </property>
+            <property name="foreground">
+                <color alpha="255">
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+            </property>
+            <property name="linestyle">
+                <string>Solid</string>
+            </property>
+            <property name="fillstyle">
+                <string>Outline</string>
+            </property>
+            <property name="channel">
+                <string>                                                                               </string>
+            </property>
+        </widget>
+        <widget class="caGraphics" name="caGraphics_2">
+            <property name="form">
+                <enum>caGraphics::Circle</enum>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>391</x>
+                    <y>63</y>
+                    <width>84</width>
+                    <height>149</height>
+                </rect>
+            </property>
+            <property name="lineColor">
+                <color alpha="255">
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+            </property>
+            <property name="foreground">
+                <color alpha="255">
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+            </property>
+            <property name="linestyle">
+                <string>Solid</string>
+            </property>
+            <property name="fillstyle">
+                <string>Outline</string>
+            </property>
+            <property name="channel">
+                <string>                                                                               </string>
+            </property>
+            <property name="visibility">
+                <string>Calc</string>
+            </property>
+            <property name="visibilityCalc">
+                <string>A&gt;                                       &amp;&amp;A&lt;=                                       </string>
+            </property>
+        </widget>
+        <widget class="caGraphics" name="caGraphics_3">
+            <property name="form">
+                <enum>caGraphics::Arc</enum>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>78</x>
+                    <y>491</y>
+                    <width>153</width>
+                    <height>96</height>
+                </rect>
+            </property>
+            <property name="lineColor">
+                <color alpha="255">
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+            </property>
+            <property name="foreground">
+                <color alpha="255">
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+            </property>
+            <property name="linestyle">
+                <string>Solid</string>
+            </property>
+            <property name="fillstyle">
+                <string>Filled</string>
+            </property>
+            <property name="startAngle">
+                <number>0</number>
+            </property>
+            <property name="spanAngle">
+                <number>90</number>
+            </property>
+            <property name="fillstyle">
+                <string>Outline</string>
+            </property>
+            <property name="channel">
+                <string>                                                                               </string>
+            </property>
+        </widget>
+        <widget class="caLabel" name="caLabel_4">
+            <property name="geometry">
+                <rect>
+                    <x>325</x>
+                    <y>247</y>
+                    <width>25</width>
+                    <height>11</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Hello</string>
+            </property>
+            <property name="fontScaleMode">
+                <enum>ESimpleLabel::WidthAndHeight</enum>
+            </property>
+            <property name="alignment">
+                <set>Qt::AlignAbsolute|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+            <property name="foreground">
+                <color alpha="255">
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+            </property>
+            <property name="background">
+                <color alpha="0">
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+            </property>
+        </widget>
+        <widget class="caInclude" name="caInclude_5">
+            <property name="geometry">
+                <rect>
+                    <x>367</x>
+                    <y>289</y>
+                    <width>113</width>
+                    <height>75</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="caGraphics" name="caGraphics_6">
+            <property name="form">
+                <enum>caGraphics::Circle</enum>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>376</x>
+                    <y>436</y>
+                    <width>104</width>
+                    <height>82</height>
+                </rect>
+            </property>
+            <property name="lineColor">
+                <color alpha="255">
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+            </property>
+            <property name="foreground">
+                <color alpha="255">
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>192</blue>
+                </color>
+            </property>
+            <property name="linestyle">
+                <string>Solid</string>
+            </property>
+            <property name="fillstyle">
+                <string>Filled</string>
+            </property>
+            <property name="channel">
+                <string>LI:OP:demoAI</string>
+            </property>
+            <property name="visibility">
+                <string>Calc</string>
+            </property>
+            <property name="visibilityCalc">
+                <string>A&gt;1&amp;&amp;A&lt;=5</string>
+            </property>
+        </widget>
+        <zorder>caPolyLine_0</zorder>
+        <zorder>caGraphics_1</zorder>
+        <zorder>caGraphics_2</zorder>
+        <zorder>caGraphics_3</zorder>
+        <zorder>caLabel_4</zorder>
+        <zorder>caInclude_5</zorder>
+        <zorder>caGraphics_6</zorder>
+    </widget>
+</widget>
+</ui>

@@ -1,0 +1,28 @@
+#ifndef __tag_pkg_str
+#define __tag_pkg_str 1
+
+#define tagClass_str1 (char *) "Error - junk follows \"{\" near line %-d %s\n"
+#define tagClass_str2 (char *) "Missing data after \"{\" near line %-d %s\n"
+#define tagClass_str3 (char *) "Cannot find tag: %s, near line %-d %s\n"
+#define tagClass_str4 (char *) "Expected simple color value on same line as keyword: %s\n"
+#define tagClass_str5 (char *) "Color index syntax error\n"
+#define tagClass_str6 (char *) "Expected array of color values for keyword: %s\n"
+#define tagClass_str7 (char *) "Color index array syntax error for tag %s near line %-d %s\n"
+#define tagClass_str8 (char *) "Expected integer value on same line as keyword: %s\n"
+#define tagClass_str9 (char *) "Expected unsigned integer value on same line as keyword: %s\n"
+#define tagClass_str10 (char *) "Expected enum value on same line as keyword: %s\n"
+#define tagClass_str11 (char *) "Enumerated value not found for tag [%s] near line %-d %s\n"
+#define tagClass_str12 (char *) "No value for tag [%s] near line %-d %s\n"
+#define tagClass_str13 (char *) "Expected array of enum values for keyword: %s\n"
+#define tagClass_str14 (char *) "Index out of bounds for tag [%s] near line %-d %s\n"
+#define tagClass_str15 (char *) "Expected real value on same line as keyword: %s\n"
+#define tagClass_str16 (char *) "Expected array of strings for keyword: %s\n"
+#define tagClass_str17 (char *) "Memory allocation failed at line %-d in file %s\n"
+#define tagClass_str18 (char *) "Expected array of integer values for keyword: %s\n"
+#define tagClass_str19 (char *) "Expected array of unsigned integer values for keyword: %s\n"
+#define tagClass_str20 (char *) "Expected array of real values for keyword: %s\n"
+#define tagClass_str21 (char *) "No tags found\n"
+#define tagClass_str22 (char *) "Enumerated Value %-d not in set, using 0\n"
+#define tagClass_str23 (char *) "Tag without value, [%s]\n"
+#define tagClass_str24 (char *) "Missing data for tag %s near line %-d %s\n"
+#endif

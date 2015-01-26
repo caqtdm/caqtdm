@@ -1,0 +1,1764 @@
+4 0 1
+beginScreenProperties
+major 4
+minor 0
+release 1
+x 458
+y 126
+w 1010
+h 597
+font "helvetica-medium-r-18.0"
+ctlFont "helvetica-medium-r-8.0"
+btnFont "helvetica-medium-r-18.0"
+fgColor index 9
+bgColor index 55
+textColor index 14
+ctlFgColor1 index 30
+ctlFgColor2 index 32
+ctlBgColor1 index 34
+ctlBgColor2 index 35
+topShadowColor index 37
+botShadowColor index 44
+snapToGrid
+gridSize 5
+endScreenProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 520
+y 5
+w 220
+h 20
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "To choose from a list of options ..."
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 536
+y 24
+w 268
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Push the left button on your selection "
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 537
+y 70
+w 244
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Push the left mouse button to display a "
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 7
+y 4
+w 352
+h 20
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "To control a `binary' (on/off) output ..."
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 26
+y 30
+w 352
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "`Toggle' buttons change when the left mouse"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 25
+y 75
+w 352
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "`Momentary' buttons send `on' when the"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 26
+y 48
+w 352
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "button is depressed in an active area."
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 25
+y 95
+w 352
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "left button is depressed, `0ff' when released."
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 3
+y 117
+w 352
+h 20
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Current state can be displayed as ..."
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 109
+y 137
+w 70
+h 18
+font "bitstream charter-bold-r-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Text"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 207
+y 149
+w 173
+h 18
+font "bitstream charter-bold-r-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Dynamic objects"
+}
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 365
+y 136
+w 47
+h 47
+lineColor index 3
+fill
+fillColor index 3
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 418
+y 163
+w 20
+h 2
+lineColor index 14
+fillColor index 14
+lineWidth 2
+numPoints 0
+xPoints {
+}
+yPoints {
+}
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 458
+y 163
+w 20
+h 2
+lineColor index 14
+fillColor index 14
+lineWidth 2
+numPoints 0
+xPoints {
+}
+yPoints {
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 537
+y 86
+w 244
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "menu of choices. Select your choice by"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 537
+y 102
+w 244
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "releasing the button on your choice."
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 516
+y 122
+w 352
+h 20
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Current state can be displayed as ..."
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 915
+y 119
+w 70
+h 18
+font "bitstream charter-bold-r-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Text"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 648
+y 146
+w 162
+h 18
+font "bitstream charter-bold-r-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Button Panel"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 2
+y 197
+w 352
+h 20
+font "bitstream charter-bold-r-10.0"
+fgColor index 9
+bgColor index 0
+useDisplayBg
+value {
+  "To adjust an `analog' value ..."
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 10
+y 215
+w 352
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Depress the left mouse button on the slider"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 10
+y 233
+w 352
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "and drag it while holding down the button."
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 10
+y 413
+w 352
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "While the cursor is in the active slider region,"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 10
+y 429
+w 352
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "use the left and right arrow keys on the keyboard"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 10
+y 486
+w 352
+h 13
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "A value can also be typed in a `text entry' field"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 400
+y 197
+w 352
+h 20
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Current values can be displayed as ..."
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 631
+y 222
+w 70
+h 18
+font "bitstream charter-bold-r-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Text"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 459
+y 217
+w 106
+h 18
+font "bitstream charter-bold-r-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Indicator"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 449
+y 283
+w 70
+h 18
+font "bitstream charter-bold-r-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Meter"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 779
+y 197
+w 171
+h 18
+font "bitstream charter-bold-r-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Bar Graphs"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 745
+y 282
+w 171
+h 18
+font "bitstream charter-bold-r-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Strip Chart"
+}
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 365
+y 136
+w 47
+h 47
+lineColor index 16
+fill
+fillColor index 16
+visPv "CALC\\\{(A)\}(LI:OP:demoBI)"
+visInvert
+visMin "0"
+visMax "1"
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 435
+y 147
+w 25
+h 2
+lineColor index 14
+fillColor index 14
+lineWidth 2
+visPv "CALC\\\{(A)\}(LI:OP:demoBI)"
+visMin "0"
+visMax "1"
+numPoints 0
+xPoints {
+}
+yPoints {
+}
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 435
+y 163
+w 25
+h 2
+lineColor index 14
+fillColor index 14
+lineWidth 2
+visPv "CALC\\\{(A)\}(LI:OP:demoBI)"
+visInvert
+visMin "0"
+visMax "1"
+numPoints 0
+xPoints {
+}
+yPoints {
+}
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 7
+release 0
+x 105
+y 153
+w 80
+h 31
+controlPv "LI:OP:demoBI"
+format "decimal"
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 1
+autoHeight
+nullColor index 32
+smartRefresh
+fastUpdate
+useHexPrefix
+newPos
+objType "controls"
+noExecuteClipMask
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 7
+release 0
+x 898
+y 138
+w 111
+h 20
+controlPv "LI:OP:demoMI"
+format "decimal"
+font "bitstream charter-bold-r-10.0"
+fontAlign "center"
+fgColor index 9
+bgColor index 1
+autoHeight
+nullColor index 32
+smartRefresh
+fastUpdate
+useHexPrefix
+newPos
+objType "controls"
+noExecuteClipMask
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 7
+release 0
+x 623
+y 243
+w 82
+h 22
+controlPv "LI:OP:demoAI"
+format "decimal"
+font "bitstream charter-bold-r-10.0"
+fontAlign "center"
+fgColor index 9
+fgAlarm
+bgColor index 1
+autoHeight
+nullColor index 32
+smartRefresh
+fastUpdate
+useHexPrefix
+newPos
+objType "controls"
+noExecuteClipMask
+endObjectProperties
+
+# (Bar)
+object activeBarClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 406
+y 235
+w 198
+h 41
+indicatorColor index 16
+fgColor index 14
+bgColor index 1
+indicatorPv "LI:OP:demoAI"
+showScale
+font "helvetica-medium-r-8.0"
+labelTicks "1"
+majorTicks "10"
+minorTicks "0"
+border
+limitsFromDb
+scaleFormat "FFloat"
+endObjectProperties
+
+# (Meter)
+object activeMeterClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 404
+y 300
+w 159
+h 82
+caseColor index 1
+scaleColor index 16
+labelColor index 16
+fgColor index 16
+bgColor index 1
+topShadowColor index 16
+botShadowColor index 16
+readPv "LI:OP:demoAI"
+showScale
+scaleFormat "FFloat"
+scalePrecision "1"
+useDisplayBg
+labelIntervals "2"
+majorIntervals "2"
+minorIntervals "0"
+complexNeedle
+3d
+scaleMin "0"
+scaleMax "20"
+labelFontTag "bitstream charter-bold-r-10.0"
+scaleFontTag "bitstream charter-bold-r-10.0"
+endObjectProperties
+
+# (Bar)
+object activeBarClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 720
+y 216
+w 266
+h 60
+indicatorColor index 27
+indicatorAlarm
+fgColor index 14
+fgAlarm
+bgColor index 1
+indicatorPv "LI:OP:demoAI"
+showScale
+font "helvetica-medium-r-8.0"
+labelTicks "1"
+majorTicks "10"
+minorTicks "0"
+border
+scaleFormat "FFloat"
+endObjectProperties
+
+# (Bar)
+object activeBarClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 935
+y 297
+w 67
+h 106
+indicatorColor index 16
+indicatorAlarm
+fgColor index 14
+fgAlarm
+bgColor index 1
+indicatorPv "LI:OP:demoAI"
+showScale
+font "helvetica-medium-r-8.0"
+labelTicks "1"
+majorTicks "10"
+minorTicks "0"
+border
+limitsFromDb
+scaleFormat "FFloat"
+orientation "vertical"
+endObjectProperties
+
+# (Motif Slider)
+object activeMotifSliderClass
+beginObjectProperties
+major 4
+minor 2
+release 0
+x 33
+y 255
+w 236
+h 42
+fgColor index 14
+bgColor index 51
+2ndBgColor index 4
+topShadowColor index 2
+botShadowColor index 12
+controlPv "LI:OP:demoAI"
+controlLabelType "pvName"
+font "helvetica-medium-r-10.0"
+limitsFromDb
+showLimits
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 7
+release 0
+x 112
+y 504
+w 135
+h 30
+controlPv "LI:OP:demoAI"
+format "decimal"
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 51
+editable
+autoHeight
+motifWidget
+nullColor index 32
+smartRefresh
+fastUpdate
+useHexPrefix
+newPos
+objType "controls"
+noExecuteClipMask
+endObjectProperties
+
+# (X-Y Graph)
+object xyGraphClass
+beginObjectProperties
+major 4
+minor 8
+release 0
+# Geometry
+x 718
+y 299
+w 202
+h 82
+# Appearance
+border
+plotAreaBorder
+graphTitle "Trend display"
+fgColor index 14
+bgColor index 1
+gridColor index 14
+font "courier 10 pitch-medium-r-8.0"
+# Operating Modes
+plotMode "plotLastNPts"
+nPts 200
+# X axis properties
+xAxisSrc "fromUser"
+xMax 60
+xLablePrecision 1
+# Y axis properties
+showYAxis
+yAxisSrc "AutoScale"
+yMax 1
+# Y2 axis properties
+showY2Axis
+y2AxisSrc "AutoScale"
+y2Max 1
+# Trace Properties
+numTraces 1
+yPv {
+  0 "LI:OP:demoAI"
+}
+plotUpdateMode {
+  0 "y"
+}
+opMode {
+  0 "plot"
+}
+plotColor {
+  0 index 27
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 10
+y 303
+w 352
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Depress the left mouse button in the active slider "
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 10
+y 319
+w 352
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "region, to the left of the slider to decrement;"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 10
+y 446
+w 352
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "to increment or decrement the setting. Depress the"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 10
+y 462
+w 352
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "control key to increment by a larger amount."
+}
+endObjectProperties
+
+# (X-Y Graph)
+object xyGraphClass
+beginObjectProperties
+major 4
+minor 8
+release 0
+# Geometry
+x 576
+y 284
+w 120
+h 100
+# Appearance
+border
+graphTitle "XY Plot"
+fgColor index 14
+bgColor index 1
+gridColor index 14
+font "helvetica-medium-r-10.0"
+# Operating Modes
+plotMode "plotLastNPts"
+nPts 3
+# X axis properties
+showXAxis
+xAxisSrc "AutoScale"
+xMin -9
+xMax 0
+xLablePrecision 1
+# Y axis properties
+showYAxis
+yAxisSrc "AutoScale"
+yMin -9
+yMax 10
+# Y2 axis properties
+y2Max 1
+# Trace Properties
+numTraces 1
+xPv {
+  0 "LI:OP:demoAI"
+}
+yPv {
+  0 "LI:OP:demoCC"
+}
+plotUpdateMode {
+  0 "x"
+}
+plotSymbolType {
+  0 "circle"
+}
+plotColor {
+  0 index 20
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 602
+y 269
+w 70
+h 18
+font "bitstream charter-bold-r-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "XY Plot"
+}
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 2
+y 191
+w 1012
+h 4
+lineColor index 9
+fill
+fillColor index 9
+lineWidth 7
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 508
+y 3
+w 4
+h 182
+lineColor index 9
+fill
+fillColor index 9
+lineWidth 7
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 381
+y 421
+w 352
+h 20
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "To call up a related display ..."
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 392
+y 473
+w 244
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "releasing the button on your choice. Use"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 392
+y 457
+w 244
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "menu of choices. Select your choice by"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 392
+y 441
+w 244
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Push the left mouse button to display a "
+}
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 377
+y 193
+w 4
+h 348
+lineColor index 9
+fill
+fillColor index 9
+lineWidth 7
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 379
+y 418
+w 632
+h 4
+lineColor index 9
+fill
+fillColor index 9
+lineWidth 7
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 10
+y 389
+w 352
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "sensitivity of the slider, or to type in a value."
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 10
+y 373
+w 352
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Depress the right mouse button to modify the "
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 10
+y 335
+w 352
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "to the right of the slider to increment. Hold down"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 10
+y 351
+w 352
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "left button to auto-increment/decrement."
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 539
+y 397
+w 200
+h 14
+font "bitstream charter-bold-r-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "on the XY plot to change axis range"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 534
+y 385
+w 210
+h 14
+font "bitstream charter-bold-r-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Depress the right mouse button"
+}
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 710
+y 419
+w 4
+h 122
+lineColor index 9
+fill
+fillColor index 9
+lineWidth 7
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 716
+y 420
+w 200
+h 20
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "To exit a display ..."
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 713
+y 456
+w 244
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "area of the screen (not in a slider, text"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 713
+y 442
+w 244
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Push the right mouse button in an inactive"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 713
+y 471
+w 244
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "entry, menu, etc). Drag down the menu to"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 713
+y 486
+w 244
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "select 'close' and release the button."
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 713
+y 501
+w 244
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Select 'print' to print the display to "
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 713
+y 516
+w 244
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "the default printer."
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 390
+y 487
+w 244
+h 14
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "the menu below to call up additional demos."
+}
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 0
+y 545
+w 1012
+h 4
+lineColor index 9
+fill
+fillColor index 9
+lineWidth 7
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 4
+y 549
+w 352
+h 20
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "EPICS Documentation:"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 23
+y 567
+w 900
+h 13
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "All EPICS documentation is available on the World Wide Web (WWW). Select WEB on this button        to start the xmosaic viewer to the WWW."
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 21
+y 581
+w 900
+h 13
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "From the APS home page, navigate to Accelerator Systems Division, Controls Group, Controls Software for current documentation."
+}
+endObjectProperties
+
+# (Menu Button)
+object activeMenuButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 828
+y 76
+w 118
+h 30
+fgColor index 14
+bgColor index 51
+inconsistentColor index 12
+topShadowColor index 2
+botShadowColor index 12
+controlPv "LI:OP:demoMI"
+indicatorPv "LI:OP:demoMI"
+font "helvetica-medium-r-10.0"
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 357
+y 74
+w 71
+h 32
+fgColor index 14
+onColor index 51
+offColor index 51
+topShadowColor index 0
+botShadowColor index 14
+controlPv "LI:OP:demoBI"
+pressValue "0"
+releaseValue "1"
+onLabel "OFF"
+offLabel "ON"
+3d
+useEnumNumeric
+font "courier 10 pitch-medium-r-8.0"
+endObjectProperties
+
+# (Related Display)
+object relatedDisplayClass
+beginObjectProperties
+major 4
+minor 4
+release 0
+x 491
+y 505
+w 87
+h 29
+fgColor index 14
+bgColor index 51
+topShadowColor index 2
+botShadowColor index 12
+font "courier 10 pitch-medium-r-8.0"
+invisible
+buttonLabel "test"
+numPvs 4
+numDsps 3
+displayFileName {
+  0 "xx"
+  1 "xxx"
+  2 "yyy"
+}
+menuLabel {
+  0 "xx"
+  1 "xxxLabel"
+  2 "yyylabel"
+}
+symbols {
+  1 "A=hello"
+  2 "B=again"
+}
+icon
+endObjectProperties
+
+# (Shell Command)
+object shellCmdClass
+beginObjectProperties
+major 4
+minor 3
+release 0
+x 750
+y 560
+w 75
+h 30
+fgColor index 14
+bgColor index 51
+topShadowColor index 2
+botShadowColor index 12
+font "courier 10 pitch-medium-r-8.0"
+buttonLabel "WEB"
+numCmds 1
+commandLabel {
+  0 "WEB"
+}
+command {
+  0 "xterm -iconic -e xmosaic &"
+}
+endObjectProperties
+
+# (Menu Button)
+object activeMenuButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 350
+y 30
+w 85
+h 30
+fgColor index 14
+bgColor index 34
+inconsistentColor index 35
+topShadowColor index 37
+botShadowColor index 44
+controlPv "LI:OP:demoBI"
+font "courier 10 pitch-medium-r-8.0"
+endObjectProperties
+
+# (Radio Box)
+object activeRadioButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 825
+y 10
+w 140
+h 45
+fgColor index 14
+bgColor index 34
+buttonColor index 35
+selectColor index 30
+topShadowColor index 37
+botShadowColor index 44
+controlPv "LI:OP:demoBI"
+font "courier 10 pitch-medium-r-8.0"
+endObjectProperties
+

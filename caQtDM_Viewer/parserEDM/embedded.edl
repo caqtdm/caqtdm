@@ -1,0 +1,54 @@
+4 0 1
+beginScreenProperties
+major 4
+minor 0
+release 1
+x 379
+y 184
+w 500
+h 600
+font "bitstream charter-bold-r-12.0 "
+ctlFont "bitstream charter-bold-r-12.0 "
+btnFont "bitstream charter-bold-r-12.0 "
+fgColor index 14
+bgColor index 0
+textColor index 14
+ctlFgColor1 index 14
+ctlFgColor2 index 0
+ctlBgColor1 index 0
+ctlBgColor2 index 14
+topShadowColor index 0
+botShadowColor index 14
+endScreenProperties
+
+# (Embedded Window)
+object activePipClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 48
+y 51
+w 361
+h 230
+fgColor index 14
+bgColor index 0
+topShadowColor index 0
+botShadowColor index 14
+displaySource "menu"
+filePv "LOC\\select=i=0"
+file "object_quad.edl"
+center
+sizeOfs 5
+numDsps 1
+displayFileName {
+  0 "object_quad.edl"
+}
+menuLabel {
+  0 "one"
+}
+symbols {
+  0 "A=QMA1"
+}
+endObjectProperties
+

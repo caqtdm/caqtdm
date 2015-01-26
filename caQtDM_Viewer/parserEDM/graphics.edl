@@ -1,0 +1,168 @@
+4 0 1
+beginScreenProperties
+major 4
+minor 0
+release 1
+x 479
+y 193
+w 500
+h 600
+font "bitstream charter-bold-r-12.0 "
+ctlFont "bitstream charter-bold-r-12.0 "
+btnFont "bitstream charter-bold-r-12.0 "
+fgColor index 14
+bgColor index 0
+textColor index 14
+ctlFgColor1 index 14
+ctlFgColor2 index 0
+ctlBgColor1 index 0
+ctlBgColor2 index 14
+topShadowColor index 0
+botShadowColor index 14
+endScreenProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 84
+y 48
+w 166
+h 265
+lineColor index 14
+fillColor index 0
+numPoints 12
+xPoints {
+  0 186
+  1 150
+  2 94
+  3 93
+  4 132
+  5 155
+  6 180
+  7 202
+  8 188
+  9 250
+  10 167
+  11 84
+}
+yPoints {
+  0 100
+  1 74
+  2 248
+  3 249
+  4 129
+  5 129
+  6 133
+  7 126
+  8 313
+  9 80
+  10 49
+  11 48
+}
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 85
+y 358
+w 251
+h 100
+lineColor index 14
+fillColor index 0
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 391
+y 63
+w 84
+h 149
+lineColor index 14
+fillColor index 0
+endObjectProperties
+
+# (Arc)
+object activeArcClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 78
+y 491
+w 153
+h 96
+lineColor index 14
+fillColor index 0
+startAngle 0
+totalAngle 90
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 325
+y 247
+w 25
+h 11
+font "bitstream charter-bold-r-10.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Hello"
+}
+autoSize
+endObjectProperties
+
+# (Embedded Window)
+object activePipClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 367
+y 289
+w 113
+h 75
+fgColor index 14
+bgColor index 0
+topShadowColor index 0
+botShadowColor index 14
+displaySource "file"
+file "object_quad.ui"
+sizeOfs 5
+numDsps 0
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 376
+y 436
+w 104
+h 82
+lineColor index 14
+fill
+fillColor index 27
+visPv "LI:OP:demoAI"
+visMin "1"
+visMax "5"
+endObjectProperties
+
