@@ -24,6 +24,7 @@ del Makefile
 del .\caQtDM_Viewer\Makefile*
 
 del .\caQtDM_Viewer\parser\Makefile*
+del .\caQtDM_Viewer\parserEDM\Makefile*
 del .\caQtDM_Lib\Makefile*
 
 del .\caQtDM_QtControls\Makefile*
@@ -37,6 +38,9 @@ rmdir /S /Q .\caQtDM_Viewer\parser\release
 rmdir /S /Q .\caQtDM_Viewer\parser\debug
 rmdir /S /Q .\caQtDM_Viewer\parser\moc
 
+rmdir /S /Q .\caQtDM_Viewer\parserEDM\release
+rmdir /S /Q .\caQtDM_Viewer\parserEDM\debug
+rmdir /S /Q .\caQtDM_Viewer\parserEDM\moc
 
 rmdir /S /Q .\caQtDM_Lib\release
 rmdir /S /Q .\caQtDM_Lib\debug
