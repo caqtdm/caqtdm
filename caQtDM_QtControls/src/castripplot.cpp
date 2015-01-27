@@ -734,50 +734,52 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 #else
     i=0;
     foreach (QwtPlotItem *plt_item, itemList()) {
-        if ( plt_item->rtti() == QwtPlotItem::Rtti_PlotCurve ) {
-            QwtLegend *lgd = qobject_cast<QwtLegend *>(legend());
-            QList<QWidget *> legendWidgets = lgd->legendWidgets(itemToInfo(plt_item));
-            if ( legendWidgets.size() == 1 ) {
-                QwtLegendLabel *b = qobject_cast<QwtLegendLabel *>(legendWidgets[0]);
-                switch (SW) {
+		if (plt_item->rtti() == QwtPlotItem::Rtti_PlotCurve) {
+			QwtLegend *lgd = qobject_cast<QwtLegend *>(legend());
+			if (lgd != (QwtLegend *) 0){
+				QList<QWidget *> legendWidgets = lgd->legendWidgets(itemToInfo(plt_item));
+				if (legendWidgets.size() == 1) {
+					QwtLegendLabel *b = qobject_cast<QwtLegendLabel *>(legendWidgets[0]);
+					switch (SW) {
 
-                case TEXT:
+					case TEXT:
 
-                    if(thisLegendshow) {
+						if (thisLegendshow) {
 
-                        QwtText text;
-                        text.setText(legendText(i++));
-                        //printf("%s %s\n", b->plainText().toAscii().constData(), legendText(i-1).toAscii().constData());
-                        b->setText(text);
-                        b->update();
-
-
-                    }
-                    break;
-
-                case FONT:
-                    //printf("%s %s\n", b->plainText().toAscii().constData(), legendText(i-1).toAscii().constData());
-
-                    b->setFont(f);
-                    b->update();
-
-                    break;
-
-                case COLOR:
-
-                    //printf("%s %s\n", b->plainText().toAscii().constData(), legendText(i-1).toAscii().constData());
-                    QPalette palette = b->palette();
-                    palette.setColor( QPalette::WindowText, c); // for ticks
-                    palette.setColor( QPalette::Text, c);       // for ticks' labels
-                    b->setPalette(palette);
-                    b->update();
-
-                    break;
-
-                }
+							QwtText text;
+							text.setText(legendText(i++));
+							//printf("%s %s\n", b->plainText().toAscii().constData(), legendText(i-1).toAscii().constData());
+							b->setText(text);
+							b->update();
 
 
-            }
+						}
+						break;
+
+					case FONT:
+						//printf("%s %s\n", b->plainText().toAscii().constData(), legendText(i-1).toAscii().constData());
+
+						b->setFont(f);
+						b->update();
+
+						break;
+
+					case COLOR:
+
+						//printf("%s %s\n", b->plainText().toAscii().constData(), legendText(i-1).toAscii().constData());
+						QPalette palette = b->palette();
+						palette.setColor(QPalette::WindowText, c); // for ticks
+						palette.setColor(QPalette::Text, c);       // for ticks' labels
+						b->setPalette(palette);
+						b->update();
+
+						break;
+
+					}
+
+
+				}
+			}
         }
     }
 #endif
