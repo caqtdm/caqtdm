@@ -18,6 +18,11 @@
 
 #define __expString_cc 1
 
+#if defined(_MSC_VER)
+   #define popen _popen
+#endif
+
+
 #include "expString.h"
 #include "utility.h"
 #include "environment.str"

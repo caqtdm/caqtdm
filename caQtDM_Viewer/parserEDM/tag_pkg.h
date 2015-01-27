@@ -2,6 +2,12 @@
 #define __tag_pkg_h 1
 
 // class for reading info from files by tag/value pairs
+#if defined(_MSC_VER)
+   #define _CRT_SECURE_NO_WARNINGS
+   #include <windows.h>
+   #define strdup _strdup
+   #define strtok_r strtok_s
+#endif
 
 #include <stdio.h>
 #include <string.h>

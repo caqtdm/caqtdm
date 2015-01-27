@@ -1,6 +1,10 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+#ifdef linux
+  #include <unistd.h>
+#endif
+
 #include "utility.h"
 #include "tag_pkg.h"
 #include "myParserEDM.h"
