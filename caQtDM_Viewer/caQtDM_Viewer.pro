@@ -6,7 +6,6 @@ ios {
 
 !ios {
   include($$(QWTHOME)/qwt.prf)
-  SUBDIRS += parser parserEDM
 }
 
 unix {
