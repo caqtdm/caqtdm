@@ -311,7 +311,6 @@ void caStripPlot::TimersStart()
     int interval = qMax((int)timeInterval, 100);
     Timer->stop();
     Timer->setInterval(interval);
-    printf("interval=%d\n", interval);
     Timer->start();
 
     // stop run method of thread and redefine repetition time then start run
