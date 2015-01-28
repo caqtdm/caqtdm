@@ -87,7 +87,7 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
     Q_PROPERTY(QString channels READ getPVS WRITE setPVS)
     Q_PROPERTY(units units READ getUnits WRITE setUnits)
     Q_PROPERTY(double period READ getPeriod WRITE setPeriod)
-    Q_PROPERTY(cpuUsage usageCPU READ getUsageCPU WRITE setUsageCPU)
+    Q_PROPERTY(cpuUsage refreshRate READ getUsageCPU WRITE setUsageCPU)
     Q_PROPERTY(xAxisType XaxisType READ getXaxisType WRITE setXaxisType)
     Q_PROPERTY(yAxisType YAxisType READ getYaxisType WRITE setYaxisType)
     Q_PROPERTY(yAxisScaling YAxisScaling READ getYaxisScaling WRITE setYaxisScaling)
