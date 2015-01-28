@@ -79,6 +79,7 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
     Q_ENUMS(xAxisType)
     Q_ENUMS(yAxisType)
     Q_ENUMS(yAxisScaling)
+    Q_ENUMS(cpuUsage)
 
     Q_PROPERTY(QString Title READ getTitlePlot WRITE setTitlePlot)
     Q_PROPERTY(QString TitleX READ getTitleX WRITE setTitleX)
@@ -86,6 +87,7 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
     Q_PROPERTY(QString channels READ getPVS WRITE setPVS)
     Q_PROPERTY(units units READ getUnits WRITE setUnits)
     Q_PROPERTY(double period READ getPeriod WRITE setPeriod)
+    Q_PROPERTY(cpuUsage usageCPU READ getUsageCPU WRITE setUsageCPU)
     Q_PROPERTY(xAxisType XaxisType READ getXaxisType WRITE setXaxisType)
     Q_PROPERTY(yAxisType YAxisType READ getYaxisType WRITE setYaxisType)
     Q_PROPERTY(yAxisScaling YAxisScaling READ getYaxisScaling WRITE setYaxisScaling)
@@ -164,6 +166,8 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
 public:
 
     enum {MAXCURVES = 7};
+
+    enum cpuUsage {Low, Medium, High};
 
     enum axisScaling {Channel, User};
     enum  curvStyle {Lines = 1, FillUnder = 5};
@@ -390,6 +394,9 @@ public:
     void setColor_7(QColor c) {setColor(c, 6); }
    //===================================================================================
 
+    cpuUsage getUsageCPU() const {return thisUsageCPU;}
+    void setUsageCPU(cpuUsage usage) {thisUsageCPU = usage; }
+
     void setYaxisLimitsMax(int i, double const &newY) {if(i>= MAXCURVES) return; else thisYaxisLimitsMax[i] = newY;}
     void setYaxisLimitsMin(int i, double const &newY) {if(i>= MAXCURVES) return; else thisYaxisLimitsMin[i] = newY;}
 
@@ -441,12 +448,14 @@ private:
     QwtPlotCurveNaN *fillcurve[MAXCURVES];
 
     // y data for error curve
-    QList<QwtIntervalSample> base;
-    QList<QwtIntervalSample> rangeData[MAXCURVES];
-    QList<QPointF> fillData[MAXCURVES];
+    QVector<QwtIntervalSample> base;
+    QVector<QwtIntervalSample> rangeData[MAXCURVES];
+    QVector<QPointF> fillData[MAXCURVES];
 
     double timeData;
     int dataCount;
+
+    cpuUsage  thisUsageCPU;
 
     bool thisXshow, thisYshow, thisLegendshow, thisGrid;
     xAxisType thisXaxisType;

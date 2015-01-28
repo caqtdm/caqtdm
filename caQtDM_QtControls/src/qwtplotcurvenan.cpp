@@ -35,7 +35,7 @@ QwtPlotCurveNaN::QwtPlotCurveNaN(const QString& title)
     setTitle(title);
 }
 
-void QwtPlotCurveNaN::setSamplesList(QList<QPointF>& Samples)
+void QwtPlotCurveNaN::setSamplesList(const QVector<QPointF>& Samples)
 {
     samples = Samples;
 }
@@ -48,10 +48,11 @@ void QwtPlotCurveNaN::drawSeries(QPainter *painter, const QwtScaleMap &xMap,cons
     //int nbCount = 0;
     if(samples.size() < 1) return;
     QPointF Pstart = samples.at(0);
+    QPointF P;
 
     for (int counter = 1; counter < samples.size(); counter++)
     {
-        QPointF P = samples.at(counter);
+        P = samples.at(counter);
 
         if(isnan(P.y())) continue;  // continue = skip next instruction in loop
         if((CurvType == ValueCurv) && (P.x() < -Interval)) break;
@@ -75,7 +76,7 @@ QwtPlotIntervalCurveNaN::QwtPlotIntervalCurveNaN(const QString& title)
     setTitle(title);
 }
 
-void QwtPlotIntervalCurveNaN::setSamplesList(QList<QwtIntervalSample> &Samples)
+void QwtPlotIntervalCurveNaN::setSamplesList(const QVector<QwtIntervalSample> &Samples)
 {
     samples = Samples;
 }
@@ -90,10 +91,11 @@ void QwtPlotIntervalCurveNaN::drawSeries(QPainter *painter, const QwtScaleMap &x
 
     if(samples.size() < 1) return;
     QwtIntervalSample Pstart = samples.at(0);
+    QwtIntervalSample P;
 
     for (int counter = 1; counter < samples.size(); counter++)
     {
-        QwtIntervalSample P = samples.at(counter);
+        P = samples.at(counter);
 
         if(isnan(P.interval.minValue()) || isnan(P.interval.maxValue())) continue; // continue = skip next instruction in loop
         if((CurvType == ValueCurv) && (P.value < -Interval)) break;

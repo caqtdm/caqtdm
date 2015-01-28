@@ -93,6 +93,8 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     RestartPlot1 = true;
     RestartPlot2 = false;
 
+    setUsageCPU(Medium);
+
     // define a grid
     plotGrid = new QwtPlotGrid();
     plotGrid->attach(this);
@@ -271,8 +273,13 @@ void caStripPlot::RescaleCurves(int width, units unit, double period)
     for(int i=0; i < MAXCURVES; i++) {
         // define interval data for error and fill curves
         rangeData[i].clear();
+        rangeData[i].reserve(MAXIMUMSIZE+5);
         fillData[i].clear();
-        if(i==0)  base.clear();
+        fillData[i].reserve(MAXIMUMSIZE+5);
+        if(i==0)  {
+            base.clear();
+            base.reserve(MAXIMUMSIZE+5);
+        }
         for ( int j = 0; j <  MAXIMUMSIZE; j++ ) {
             rangeData[i].append(QwtIntervalSample(0, QwtInterval(NAN, NAN)));
             fillData[i].append(QPointF(NAN,NAN));
@@ -284,10 +291,10 @@ void caStripPlot::RescaleCurves(int width, units unit, double period)
     for(int i=0; i < NumberOfCurves; i++) {
         if(thisStyle[i] == FillUnder) {
             fillcurve[i]->setSamplesList(fillData[i]);
-            fillcurve[i]->setSamples(fillData[i].toVector());
+            fillcurve[i]->setSamples(fillData[i]);
         }
         errorcurve[i]->setSamplesList(rangeData[i]);
-        errorcurve[i]->setSamples(rangeData[i].toVector());
+        errorcurve[i]->setSamples(rangeData[i]);
     }
 
     mutex.unlock();
@@ -308,7 +315,12 @@ void caStripPlot::RescaleCurves(int width, units unit, double period)
 void caStripPlot::TimersStart()
 {
     // change display timer interval, limit to 10 Hz
-    int interval = qMax((int)timeInterval, 100);
+    int interval;
+    if(thisUsageCPU == Medium) interval = qMax((int)timeInterval, 200);
+    else if(thisUsageCPU == High) interval = qMax((int)timeInterval, 100);
+    else if(thisUsageCPU == Low) interval = qMax((int)timeInterval, 400);
+    else  interval = qMax((int)timeInterval, 200);
+
     Timer->stop();
     Timer->setInterval(interval);
     Timer->start();
@@ -499,6 +511,7 @@ void caStripPlot::TimeOutThread()
         }
     }
 
+    // tell interval to base class nan
     for (int c = 0; c < NumberOfCurves; c++ ) {
         if(thisXaxisType == ValueScale) {
             fillcurve[c]->setInterval(ValueCurv, interval);
@@ -517,15 +530,15 @@ void caStripPlot::TimeOutThread()
             for (c = 0; c < NumberOfCurves; c++ ) {
                 // shift left and cur last
                 rangeData[c].prepend(tmp);
-                rangeData[c].removeLast();
+                rangeData[c].erase(rangeData[c].end() - 1);
                 if(thisStyle[c] == FillUnder) {
                     fillData[c].prepend(tmpP);
-                    fillData[c].removeLast();
+                    fillData[c].erase(fillData[c].end() - 1);
                 }
             }
 
             base.prepend(tmp);
-            base.removeLast();
+            base.erase(base.end() - 1);
 
             for (i = dataCount; i > 0; i-- ) {
                 value = base[i].value - timeData;
@@ -540,8 +553,8 @@ void caStripPlot::TimeOutThread()
             for (c = 0; c < NumberOfCurves; c++ ) {
                 rangeData[c].prepend(tmp);
                 if(thisStyle[c] == FillUnder) fillData[c].prepend(tmpP);
-                rangeData[c].removeLast();
-                if(thisStyle[c] == FillUnder) fillData[c].removeLast();
+                rangeData[c].erase(rangeData[c].end() - 1);
+                if(thisStyle[c] == FillUnder) fillData[c].erase(fillData[c].end() - 1);
             }
         }
 
@@ -657,10 +670,10 @@ void caStripPlot::TimeOut()
     for (int c = 0; c < NumberOfCurves; c++ ) {
         if(thisStyle[c] == FillUnder) {
             fillcurve[c]->setSamplesList(fillData[c]);
-            fillcurve[c]->setSamples(fillData[c].toVector());
+            fillcurve[c]->setSamples(fillData[c]);
         }
         errorcurve[c]->setSamplesList(rangeData[c]);
-        errorcurve[c]->setSamples(rangeData[c].toVector());
+        errorcurve[c]->setSamples(rangeData[c]);
 /*
         if(c==0) {
             printf("-----------------------\n");
