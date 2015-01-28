@@ -26,6 +26,7 @@
 #ifndef QWTPLOTCURVENAN_H
 #define QWTPLOTCURVENAN_H
 
+enum curvType {TimeCurv=0, ValueCurv};
 
 #include <qtcontrols_global.h>
 #include <qwt_plot_curve.h>
@@ -42,6 +43,7 @@ public:
     QwtPlotCurveNaN(const QString &title = QString::null );
     void setSamplesList(QList<QPointF>& Samples);
     void getLimits(double &ymin, double &ymax);
+    void setInterval(curvType type, double interval);
 
 protected:
 
@@ -50,6 +52,8 @@ protected:
 private:
 
     QList<QPointF> samples;
+    double Interval;
+    curvType CurvType;
 };
 
 
@@ -61,6 +65,7 @@ public:
     QwtPlotIntervalCurveNaN(const QString &title = QString::null );
     void setSamplesList(QList<QwtIntervalSample>& Samples);
     void getLimits(double &ymin, double &ymax);
+    void setInterval(curvType type, double interval);
 
 protected:
 
@@ -69,6 +74,8 @@ protected:
 private:
 
     QList<QwtIntervalSample> samples;
+    double Interval;
+    curvType CurvType;
 };
 #endif // QWTPLOTCURVENAN_H
 

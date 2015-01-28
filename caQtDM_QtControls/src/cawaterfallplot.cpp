@@ -193,7 +193,7 @@ caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent)
     // set a timer for nice demo
 
     thisUnits = Millisecond;
-    thisPeriod = 100;
+    thisPeriod = 200;
 
     Timer = new QTimer(this);
     Timer->setInterval((int) thisPeriod);

@@ -307,9 +307,11 @@ void caStripPlot::RescaleCurves(int width, units unit, double period)
 
 void caStripPlot::TimersStart()
 {
-    // change display timer interval, limit to 20 Hz
-    int interval = qMax((int)timeInterval, 50);
+    // change display timer interval, limit to 10 Hz
+    int interval = qMax((int)timeInterval, 100);
+    Timer->stop();
     Timer->setInterval(interval);
+    printf("interval=%d\n", interval);
     Timer->start();
 
     // stop run method of thread and redefine repetition time then start run
@@ -498,6 +500,16 @@ void caStripPlot::TimeOutThread()
         }
     }
 
+    for (int c = 0; c < NumberOfCurves; c++ ) {
+        if(thisXaxisType == ValueScale) {
+            fillcurve[c]->setInterval(ValueCurv, interval);
+            errorcurve[c]->setInterval(ValueCurv, interval);
+        } else {
+            fillcurve[c]->setInterval(TimeCurv, interval);
+            errorcurve[c]->setInterval(TimeCurv, interval);
+        }
+    }
+
     // shift data back
     if(dataCount > 1) {
 
@@ -612,6 +624,8 @@ void caStripPlot::TimeOut()
     double elapsedTime = 0.0;
 
     if(!timerID) return;
+
+    //printf("timeout for numberofcurves=%d\n", NumberOfCurves);
 
     mutex.lock();
 

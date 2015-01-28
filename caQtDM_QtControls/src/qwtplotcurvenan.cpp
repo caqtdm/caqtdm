@@ -44,13 +44,30 @@ void QwtPlotCurveNaN::drawSeries(QPainter *painter, const QwtScaleMap &xMap,cons
 {
     Q_UNUSED(from);
     Q_UNUSED(to);
+
+    //int nbCount = 0;
+    if(samples.size() < 1) return;
+    QPointF Pstart = samples.at(0);
+
     for (int counter = 1; counter < samples.size(); counter++)
     {
         QPointF P = samples.at(counter);
-        if(isnan(P.y())) continue;
+
+        if(isnan(P.y())) continue;  // continue = skip next instruction in loop
+        if((CurvType == ValueCurv) && (P.x() < -Interval)) break;
+        else if((CurvType == TimeCurv) && ((P.x() - Pstart.x()) < -Interval)) break;
 
         QwtPlotCurve::drawSeries(painter, xMap, yMap, canvRect, counter-1, counter);
+
+        //nbCount++;
     }
+    //printf("plotted 1 = %d\n", nbCount);
+}
+
+void QwtPlotCurveNaN::setInterval(curvType type, double interval)
+{
+   CurvType = type;
+   Interval = interval;
 }
 
 QwtPlotIntervalCurveNaN::QwtPlotIntervalCurveNaN(const QString& title)
@@ -63,16 +80,37 @@ void QwtPlotIntervalCurveNaN::setSamplesList(QList<QwtIntervalSample> &Samples)
     samples = Samples;
 }
 
+
 void QwtPlotIntervalCurveNaN::drawSeries(QPainter *painter, const QwtScaleMap &xMap,const QwtScaleMap &yMap, const QRectF &canvRect, int from, int to) const
 {
     Q_UNUSED(from);
     Q_UNUSED(to);
+
+    //int nbCount = 0;
+
+    if(samples.size() < 1) return;
+    QwtIntervalSample Pstart = samples.at(0);
+
     for (int counter = 1; counter < samples.size(); counter++)
     {
         QwtIntervalSample P = samples.at(counter);
-        if(isnan(P.interval.minValue()) || isnan(P.interval.maxValue())) continue;
+
+        if(isnan(P.interval.minValue()) || isnan(P.interval.maxValue())) continue; // continue = skip next instruction in loop
+        if((CurvType == ValueCurv) && (P.value < -Interval)) break;
+        else if((CurvType == TimeCurv)  && ((P.value - Pstart.value) < -Interval)) break;
 
         QwtPlotIntervalCurve::drawSeries(painter, xMap, yMap, canvRect, counter-1, counter);
+
+        //nbCount++;
     }
+
+    //printf("plotted 2 = %d @ %03d\n", nbCount, timeR.millitm);
 }
+
+void QwtPlotIntervalCurveNaN::setInterval(curvType type, double interval)
+{
+    CurvType = type;
+    Interval = interval;
+}
+
 

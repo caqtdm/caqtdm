@@ -6195,7 +6195,10 @@ p, li { white-space: pre-wrap; }
          </color>
         </property>
         <property name="colorMode">
-         <enum>caSlider::Static</enum>
+         <enum>caSlider::Alarm</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caSlider::User</enum>
         </property>
         <property name="incrementValue">
          <double>0.100000000000000</double>
