@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.8.9
+CAQTDM_VERSION = V3.8.10
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -20,6 +20,10 @@ DEFINES += NETWORKDOWNLOADSUPPORT
 
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
+
+# 3.8.10
+# caStripPlot was eating the CPU and has been optimized; refreshrate (low, medium, high) has been introduced, so that it can be
+# adjusted by the user
 
 # 3.8.9
 # change for g++ 4.4.7
