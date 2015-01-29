@@ -451,7 +451,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
     if(this->findChildren<CaQtDM_Lib *>().count() <= 0 && userClose) {
         if (sharedMemory.isAttached()) sharedMemory.detach();
         qApp->exit(0);
-        exit(0);
+        //exit(0);
     } else if(this->findChildren<CaQtDM_Lib *>().count() > 0) {
         userClose = true;
     }
@@ -459,8 +459,8 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 
     // any non connected pv's to display ?
 
-    fillPVtable(countPV, countNotConnected, countDisplayed);
     if (!mutexKnobData){
+        fillPVtable(countPV, countNotConnected, countDisplayed);
         highCount = mutexKnobData->getHighestCountPV(highPV);
         if(highCount != 0.0) {
             sprintf(asc, "%s - PV=%d (%d NC), %d Monitors/s, %d Displays/s, highest=%s with %.1f Monitors/s ", asc, countPV, countNotConnected,
