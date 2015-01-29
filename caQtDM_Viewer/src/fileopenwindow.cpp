@@ -459,7 +459,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 
     // any non connected pv's to display ?
 
-    if (!mutexKnobData){
+    if (mutexKnobData != (MutexKnobData *) 0){
         fillPVtable(countPV, countNotConnected, countDisplayed);
         highCount = mutexKnobData->getHighestCountPV(highPV);
         if(highCount != 0.0) {
