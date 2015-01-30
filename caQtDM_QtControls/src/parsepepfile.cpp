@@ -1002,7 +1002,7 @@ void ParsePepFile::writeLineEdit(QString format, QString pv, QString minwidth, Q
         writeCloseTag("size", array);
         writeCloseProperty(array);
     }
-    if(maxwidth.size() > 0 || maxwidth.size() > 0) {
+    if(maxwidth.size() > 0 || maxheight.size() > 0) {
         writeOpenProperty("maximumSize", array);
         writeOpenTag("size", array);
         if(maxwidth.size() > 0) writeTaggedString("width", maxwidth, array);
@@ -1057,7 +1057,7 @@ void ParsePepFile::writeTextEntry(QString format, QString pv, QString minwidth, 
         writeCloseTag("size", array);
         writeCloseProperty(array);
     }
-    if(maxwidth.size() > 0 || maxwidth.size() > 0) {
+    if(maxwidth.size() > 0 || maxheight.size() > 0) {
         writeOpenProperty("maximumSize", array);
         writeOpenTag("size", array);
         if(maxwidth.size() > 0) writeTaggedString("width", maxwidth, array);
