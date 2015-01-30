@@ -22,8 +22,8 @@ DEFINES += NETWORKDOWNLOADSUPPORT
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 
 # 3.8.10
-# caStripPlot was eating the CPU and has been optimized; refreshrate (low, medium, high) has been introduced, so that it can be
-# adjusted by the user
+# caStripPlot was eating the CPU and has been optimized; refreshrate (low, medium, high) has been introduced, so that it can be adjusted by the user
+# some crash conditions eliminated
 
 # 3.8.9
 # change for g++ 4.4.7
