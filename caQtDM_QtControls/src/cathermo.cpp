@@ -143,6 +143,7 @@ void caThermo::setLook(Look look)
     case noLabel:
     case noDeco:
         thisScale = false;
+        break;
     default:
         thisScale = false;
         break;

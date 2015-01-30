@@ -90,6 +90,7 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     setFrame(false);
 
     keepText = "";
+    unitsLast = "";
     setText(keepText);
     setValueType(false);
 
@@ -352,8 +353,9 @@ void caLineEdit::setValue(double value, const QString& units)
     if(thisUnitMode) {
         strcat(asc, " ");
         strcat(asc, units.toAscii().constData());
+        unitsLast = units;
     }
-    unitsLast = units;
+
     valueLast = value;
     setText(asc);
     setCursorPosition(0);

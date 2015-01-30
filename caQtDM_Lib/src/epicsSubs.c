@@ -604,7 +604,7 @@ void connectCallback(struct connection_handler_args args)
 
     connectInfo *info = (connectInfo *) ca_puser(args.chid);
 
-    //printf("connectInfo pv=<%s>\n", info->pv);
+    //printf("connectInfo %p pv=<%s> %d chid=%d\n", info, info->pv, info->evAdded, args.chid);
 
     switch (ca_state(args.chid)) {
 
@@ -742,7 +742,7 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
         printf("ca_pend_io:\n"" %s for %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], kData->pv);
     }
 
-    //printf("channel created for button=%d <%s> chid=%d\n", index, kData->pv, info->ch);
+    //printf("channel created for button=%d <%s> info=%p, chid=%d\n", index, kData->pv, info, info->ch);
 
     return index;
 }
@@ -776,16 +776,17 @@ void ClearMonitor(knobData *kData)
                     if (status != ECA_NORMAL) {
                         PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
                     }
-                    status = ca_clear_channel(info->ch);
-                    PRINT(printf("ca_clear_channel: %s index=%d\n", info->pv, aux));
-                    info->connected = false;
-                    info->event = 0;
-                    info->ch = 0;
-                    if(status != ECA_NORMAL) {
-                        printf("ca_clear_channel: %s %s index=%d\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], info->pv, aux);
-                    }
-                    info->pv[0] = '\0';
                 }
+                status = ca_clear_channel(info->ch);
+                PRINT(printf("ca_clear_channel: %s chid=%d, index=%d\n", info->pv, info->ch, aux));
+                info->connected = false;
+                info->event = 0;
+                info->ch = 0;
+                if(status != ECA_NORMAL) {
+                    printf("ca_clear_channel: %s %s index=%d\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], info->pv, aux);
+                }
+                info->pv[0] = '\0';
+
             }
         } else if(info->cs == 2) { // epics4
 

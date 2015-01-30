@@ -261,7 +261,6 @@ void caWaveTable::setFormat(DataType dataType)
             strcpy(thisFormat, "%d");
             strcpy(thisFormatC, "%d");
             break;
-            break;
         case hexadecimal:
             strcpy(thisFormat, "0x%x");
             break;
