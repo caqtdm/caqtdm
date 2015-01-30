@@ -808,9 +808,8 @@ void FileOpenWindow::Callback_ActionExit()
 
 // detach shared memory, delete pv container
         if (sharedMemory.isAttached()) sharedMemory.detach();
-        delete mutexKnobData;
         qApp->exit(0);
-        exit(0);
+        //exit(0);
     }
 }
 
