@@ -3,11 +3,11 @@ include(../caQtDM_Viewer/qtdefs.pri)
 QT       += core gui
 
 contains(QT_VER_MAJ, 4) {
-   CONFIG   += qt thread uitools designer plugin
+   CONFIG   += qt thread uitools plugin
 }
 
 contains(QT_VER_MAJ, 5) {
-    QT     += widgets designer printsupport uitools
+    QT     += widgets printsupport uitools
     CONFIG += qt plugin thread
     DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 }
