@@ -20,7 +20,13 @@ echo ========== add libcoca ============
 echo
 
 mkdir ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/platforms/
+mkdir ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/imageformats/
+mkdir ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/printsupport/
 cp ${QTHOME}/plugins/platforms/libqcocoa.dylib  ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/platforms/
+cp ${QTHOME}/plugins/imageformats/libqgif.dylib  ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/imageformats/
+cp ${QTHOME}/plugins/imageformats/libqjpeg.dylib  ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/imageformats/
+cp ${QTHOME}/plugins/imageformats/libqico.dylib  ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/imageformats/
+cp ${QTHOME}/plugins/printsupport/libcocoaprintersupport.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/printsupport/
 
 echo
 echo ========== macdeployqt caQtDM ============
