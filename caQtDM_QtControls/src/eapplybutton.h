@@ -56,11 +56,11 @@ public slots:
 	/**
 	 * resets font color to black
 	 */
-	void clearModified();
+    void clearModified();
 
 private:
 	QColor defaultTextColor;
-	bool d_modified;
+    bool d_modified;
 };
 
 #endif

@@ -42,7 +42,7 @@ NetworkAccess::NetworkAccess(QTableWidget *w, const QString &file)
 QIODevice* NetworkAccess::requestUrl(const QUrl url)
 {
         finished = false;
-        printf("download %s", url.toString().toAscii().constData());
+        printf("download %s\n", url.toString().toAscii().constData());
         downloadUrl = url;
         QNetworkReply* reply = manager->get(QNetworkRequest(url));
         connect(reply, SIGNAL(finished()), this, SLOT(finishReply()));

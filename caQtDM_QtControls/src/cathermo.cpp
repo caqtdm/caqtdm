@@ -35,7 +35,7 @@
 #include "qwt_scale_map.h"
 #include "cathermo.h"
 
-#define MIN_FONT_SIZE 3
+#define MIN_FONT_SIZE 5
 #define MAX_FONT_SIZE 20
 
 
@@ -50,7 +50,7 @@ class myScaleEngine: public QwtLinearScaleEngine
                 if(ticks.last() < sd.upperBound()) ticks.append(sd.upperBound());
                 if(ticks.first() > sd.lowerBound()) ticks.prepend(sd.lowerBound());
                 sd.setTicks( QwtScaleDiv::MajorTick, ticks );
-            }
+            } 
         }
         return sd;
     }
@@ -317,7 +317,6 @@ bool caThermo::event(QEvent *e)
 
                 case Up:
                 case Down: {
-
                     int pipewidth = width()*2/5-4;
                     if(pipewidth != this->pipeWidth()) {
                         this->setPipeWidth(pipewidth);

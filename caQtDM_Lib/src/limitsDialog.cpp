@@ -61,6 +61,18 @@ QString limitsDialog::getFormatFromPrecision(int prec)
     return format;
 }
 
+void limitsDialog::setNewStyleSheet(QWidget* w, QSize size, QString myStyle, int pointSizeCorrection)
+{
+    int pointSize;
+    if(size.height() > 500) pointSize = 16;
+    else pointSize = 10;
+
+    pointSize = pointSize + pointSizeCorrection;
+
+    QString style = "font: %1pt; %2";
+    style = style.arg(pointSize).arg(myStyle);
+    w->setStyleSheet(style);
+}
 
 limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title, QWidget *parent) : QWidget(parent)
 {
@@ -76,6 +88,11 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
     setWindowModality (Qt::WindowModal);
 
 #ifdef Q_OS_IOS
+    if(qApp->desktop()->size().height() < 500) {
+        thisWidth=430;  // normal for iphone
+        thisHeight=200;
+    }
+    setNewStyleSheet(this, qApp->desktop()->size());
     QPalette palette;
     palette.setBrush(QPalette::Background, QColor(255,255,224,255));
     setPalette(palette);
@@ -140,9 +157,9 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
 
     QString className = w->metaObject()->className();
     if(className.contains("caNumeric") || className.contains("caApplyNumeric") || className.contains("caSpinbox")) {
-         Layout->addWidget(buttonBox, 5, 0);
+         Layout->addWidget(buttonBox, 5, 0, 1, -1);
     } else {
-         Layout->addWidget(buttonBox, 3, 0);
+         Layout->addWidget(buttonBox, 3, 0, 1, -1);
     }
 
     groupBox->setLayout(Layout);

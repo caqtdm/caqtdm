@@ -43,6 +43,7 @@ class myMessageBox : public QWidget
 public:
     explicit myMessageBox(QWidget *parent = 0);
     void setText(QString strng) const;
+    void setNewStyleSheet(QWidget* w, QSize size, QString myStyle = "", int pointSizeCorrection = 0);
     void exec();
 
 protected:

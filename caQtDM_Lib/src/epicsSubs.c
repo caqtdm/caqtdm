@@ -40,6 +40,7 @@
 #define epicsAlarmGLOBAL
 #include <cadef.h>
 struct ca_client_context *dbCaClientContext;
+
 #include <alarm.h>
 #include <epicsExport.h>
 #include "tsDefs.h"
@@ -527,11 +528,10 @@ static void displayCallback(struct event_handler_args args) {
 
         // when specifying zero as number of requested elements, we will get variable length arrays (zero lenght is then also considered)
         // probably will not work with older channel access gateways
-        PRINT(printf("ca_add_array_event for %s with chid=%d index=%d\n", ca_name(args.chid), args.chid, kData.index));
         status = ca_add_array_event(dbf_type_to_DBR_STS(ca_field_type(args.chid)), 0, //ca_element_count(args.chid),
                                      args.chid, dataCallback, info, 0.0,0.0,0.0, &info->evID);
         info->evAdded = true;
-
+        PRINT(printf("ca_add_array_event added for %s with chid=%d index=%d info->evAdded=%d\n", ca_name(args.chid), args.chid, kData.index, info->evAdded));
         if (status != ECA_NORMAL) {
             PRINT(printf("ca_add_array_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
         }
@@ -554,7 +554,7 @@ void clearEvent(void * ptr)
     if(!info->connected) return;  // must be connected
     if(info->event < 2) return;  // a first normal addevent must be done
     if(info->evAdded) {
-      PRINT(printf("clear event %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded));
+      PRINT(printf("clearEvent -- %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded));
       info->evAdded = false;
       status = ca_clear_event(info->evID);
       if (status != ECA_NORMAL) {
@@ -580,7 +580,7 @@ void addEvent(void * ptr)
         if(kData.index == -1) return;
 
         C_DataLock(KnobDataPtr, &kData);
-        PRINT(printf("add event %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded));
+        PRINT(printf("addEvent -- %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded));
         status = ca_add_array_event(dbf_type_to_DBR_STS(ca_field_type(info->ch)), 0,
                                         info->ch, dataCallback, info, 0.0,0.0,0.0, &info->evID);
         info->evAdded = true;
@@ -747,6 +747,70 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
     return index;
 }
 
+void EpicsReconnect(knobData *kData)
+{
+    int status;
+    // in case of a soft channel there is nothing to do
+    if(kData->soft) return;
+
+    connectInfo *info = (connectInfo *) kData->edata.info;
+
+    PRINT(printf("create channel for an epics device <%s>\n", kData->pv));
+
+    if (info != (connectInfo *) 0) {
+        if(info->cs == 0) { // epics
+            status = ca_attach_context(dbCaClientContext);
+            status = ca_create_channel(kData->pv,
+                                       (void(*)())connectCallback,
+                                       info,
+                                       CA_PRIORITY_DEFAULT,
+                                       &info->ch);
+            if(status != ECA_NORMAL) {
+                printf("ca_create_channel:\n"" %s for %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], kData->pv);
+            }
+        }
+    }
+}
+
+void EpicsDisconnect(knobData *kData)
+{
+    int status;
+    connectInfo *info;
+
+    status = ca_attach_context(dbCaClientContext);
+
+    if (kData->index == -1) return;
+
+    printf("clear channel %s index=%d\n", kData->pv, kData->index);
+    info = (connectInfo *) kData->edata.info;
+    if (info != (connectInfo *) 0) {
+        if(info->cs == 0) { // epics
+            if(info->ch != (chid) 0) {
+                printf("event added=%d\n", info->evAdded);
+                if(info->evAdded) {
+                    info->evAdded = false;
+                    printf("ca_clear_event: %s index=%d\n", info->pv, kData->index);
+                    status = ca_clear_event(info->evID);
+                    if (status != ECA_NORMAL) {
+                        PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+                    }
+                }
+                if(info->connected) {
+                printf("ca_clear_channel: %s chid=%d, index=%d\n", info->pv, info->ch, kData->index);
+                status = ca_clear_channel(info->ch);
+                info->connected = false;
+                info->event = 0;
+                info->ch = 0;
+                if(status != ECA_NORMAL) {
+                    printf("ca_clear_channel: %s %s index=%d\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], info->pv, kData->index);
+                }
+                }
+            }
+        }
+    }
+}
+
+
 /**
  * unhook the device that has been hooked here on the gui
  */
@@ -759,7 +823,7 @@ void ClearMonitor(knobData *kData)
 
     if (kData->index == -1) return;
 
-    PRINT(printf("clear channel %s index=%d\n", kData->pv, kData->index));
+    PRINT(printf("ClearMonitor -- clear channel %s index=%d\n", kData->pv, kData->index));
 
     aux =  kData->index;
     kData->index = -1;
@@ -801,12 +865,12 @@ void ClearMonitor(knobData *kData)
     status = ca_pend_io(CA_TIMEOUT);
 }
 
-void DetachContext()
+void DestroyContext()
 {
-    ca_detach_context();
+    int status = ca_pend_io(CA_TIMEOUT);
+    printf("destroycontext\n");
     ca_context_destroy();
 }
-
 
 int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType)
 {
@@ -1094,4 +1158,3 @@ int EpicsGetTimeStamp(char *pv, char *timestamp)
     return ECA_NORMAL;
 
 }
-

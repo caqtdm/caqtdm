@@ -81,6 +81,88 @@ int setenv(const char *name, const char *value, int overwrite)
 }
 #endif
 
+
+void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
+{
+#ifdef Q_OS_IOS
+    int pendio;
+
+         switch (state) {
+         case Qt::ApplicationSuspended:
+             qDebug() << "application state changed to suspended";
+             exit(0);
+             break;
+         case Qt::ApplicationHidden:
+             qDebug() << "application state changed to hidden";
+             break;
+         case Qt::ApplicationInactive:
+             qDebug() << "application state changed to inactive";
+/*
+             pendio = false;
+             if (mutexKnobData != (MutexKnobData *) 0) {
+                 for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
+                     knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
+                     if(kPtr->index != -1)  {
+                       qDebug() << "should disconnect" << kPtr->pv;
+                       EpicsDisconnect(kPtr);
+                       mutexKnobData->SetMutexKnobData(i, *kPtr);
+                       pendio = true;
+                     }
+                 }
+                 if(pendio)  EpicsFlushIO();
+             }
+
+             // everything disconnected ?
+             if (mutexKnobData != (MutexKnobData *) 0) {
+                 for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
+                     knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
+                     if(kPtr->index != -1)  {
+                        connectInfoShort *tmp = (connectInfoShort *) kPtr->edata.info;
+                        qDebug() << "connected" << kPtr->pv << tmp->connected;
+                        if(tmp->connected) return;
+                     }
+                 }
+             }
+             //DestroyContext();
+*/
+             break;
+         case Qt::ApplicationActive:
+             qDebug() << "application state changed to active";
+/*
+             //PrepareDeviceIO();
+             pendio = false;
+              if (mutexKnobData != (MutexKnobData *) 0) {
+                  for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
+                      knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
+                      if(kPtr->index != -1) {
+                        //qDebug() << "should reconnect" << kPtr->pv;
+                        EpicsReconnect(kPtr);
+                        pendio = true;
+                      }
+                  }
+                  if(pendio)  EpicsFlushIO();
+              }
+*/
+             break;
+         }
+#endif
+
+}
+
+
+void FileOpenWindow::setNewStyleSheet(QWidget* w, QSize size, QString myStyle, int pointSizeCorrection)
+{
+    int pointSize;
+    if(size.height() > 500) pointSize = 16;
+    else pointSize = 10;
+
+    pointSize = pointSize + pointSizeCorrection;
+
+    QString style = "font: %1pt; %2";
+    style = style.arg(pointSize).arg(myStyle);
+    w->setStyleSheet(style);
+}
+
 /**
  * our main window (form) constructor
  */
@@ -100,7 +182,9 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     minimizeMessageWindow = minimize;
     activWindow = 0;
 
-    // set window title without the whole path
+    qDebug() <<  qApp->desktop()->size();
+
+    // Set Window Title without the whole path
     QString title("caQtDM ");
     title.append(BUILDVERSION);
     title.append(" Build=");
@@ -142,26 +226,18 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     setWindowTitle(title);
 
     // message window used by library and here
-
-/*  this was for an independant window */
-#if INDEPENDENTWINDOW
-    messageWindow = new MessageWindow(widget);
-    if(minimize) messageWindow->showMinimized();
-    messageWindow->setGeometry(305,0, 500, 150);
-    messageWindow->setWindowIcon (QIcon(":/caQtDM.ico"));
-    messageWindow->show();
-    messageWindow->move(messageWindow->x(), 0);
-#else
-    // message window is now integrated in main window
     QWidget *widget =new QWidget();
     messageWindow = new MessageWindow(widget);
+#ifdef Q_OS_IOS
+    setNewStyleSheet(messageWindow, qApp->desktop()->size());
+#endif
     messageWindow->setAllowedAreas(Qt::TopDockWidgetArea);
     QGridLayout *gridLayoutCentral = new QGridLayout(this->ui.centralwidget);
     QGridLayout *gridLayout = new QGridLayout();
     gridLayoutCentral->addLayout(gridLayout, 0, 0, 1, 1);
     gridLayout->addWidget(messageWindow, 0, 0, 1, 1);
     messageWindow->show();
-#endif
+
 #ifndef Q_OS_IOS
 #ifdef Q_WS_X11
     QString uniqueKey = QString("caQtDM shared memory:") + DisplayString(QX11Info::display());
@@ -293,6 +369,11 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     // add fingerswipe gesture
     QGestureRecognizer* pRecognizer = new FingerSwipeGestureRecognizer();
     fingerSwipeGestureType = QGestureRecognizer::registerRecognizer(pRecognizer);
+#endif
+
+    // application state handler
+#ifdef Q_OS_IOS
+    connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this, SLOT(onApplicationStateChange(Qt::ApplicationState)));
 #endif
 }
 

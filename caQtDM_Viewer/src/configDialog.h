@@ -56,6 +56,7 @@ public:
     void getChoice(QString &url, QString &file, QList<QString> &urls, QList<QString> &files, bool &debugWindow);
     QLineEdit *fileChoice;
     int NumberOfFiles();
+    void setNewStyleSheet(QWidget* w, QSize size, QString myStyle ="", int pointSizeCorrection = 0);
     bool isClearConfig();
     void exec();
 

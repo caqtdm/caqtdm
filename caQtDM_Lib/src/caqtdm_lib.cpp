@@ -341,7 +341,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     qRegisterMetaType<knobData>("knobData");
 
-
     // connect signals to slots for exchanging data
     connect(mutexKnobData, SIGNAL(Signal_QLineEdit(const QString&, const QString&)), this,
             SLOT(Callback_UpdateLine(const QString&, const QString&)));
@@ -5066,8 +5065,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         plot->setAxisTitle(QwtPlot::xBottom, titleX);
         plot->setAxisTitle(QwtPlot::yLeft, titleY);
 
-
-        // font size of legends qith qwt 6.0
+        // font size of legends with qwt 6.0
         if(!className.compare("caStripPlot")) {
             caStripPlot * plot = (caStripPlot *) widget;
             fontSize = qMin(factX, factY) * (double) list.at(7).toInt();
@@ -5075,10 +5073,16 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             if(plot->getLegendEnabled()) {
                 plot->setLegendAttribute(plot->getScaleColor(), f, caStripPlot::FONT);
             }
-        } else {
-
         }
-
+        // resize ticks (will not do for the timescale of the castripplot, while new every time)
+        plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MajorTick, factY * (double) list.at(8).toInt());
+        plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MediumTick, factY * (double) list.at(9).toInt());
+        plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MinorTick, factY * (double) list.at(10).toInt());
+        plot->axisScaleDraw(QwtPlot::xBottom)->setSpacing(0.0);
+        plot->axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MajorTick, factX * (double) list.at(8).toInt());
+        plot->axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MediumTick, factX * (double) list.at(9).toInt());
+        plot->axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MinorTick, factX * (double) list.at(10).toInt());
+        plot->axisScaleDraw(QwtPlot::xBottom)->setSpacing(0.0);
     }
 
     // change fonts for next classes, when smaller needed
@@ -5198,7 +5202,12 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                     if(plot->getLegendEnabled()) {
                         plot->setLegendAttribute(plot->getScaleColor(), QFont("arial", 9), caStripPlot::FONT);
                     }
+                } else {
+                    integerList.insert(7, 9);
                 }
+                integerList.insert(8, plot->axisScaleDraw(QwtPlot::xBottom)->tickLength(QwtScaleDiv::MajorTick));
+                integerList.insert(9, plot->axisScaleDraw(QwtPlot::xBottom)->tickLength(QwtScaleDiv::MediumTick));
+                integerList.insert(10, plot->axisScaleDraw(QwtPlot::xBottom)->tickLength(QwtScaleDiv::MinorTick));
 
             } else {
                 integerList.insert(4, widget->font().pointSize());

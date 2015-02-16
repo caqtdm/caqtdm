@@ -30,7 +30,7 @@
 #define qslisttoc(x) 			do {}while(0)
 
 #define FONT_SIZE_TOLERANCE_MARGIN 	3 /* pixel */
-#define MIN_FONT_SIZE 			6
+#define MIN_FONT_SIZE 			4
 
 FontScalingWidget::FontScalingWidget(QWidget *parent)
 {

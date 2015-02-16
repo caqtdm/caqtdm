@@ -28,21 +28,44 @@
 
 //#include <QMacStyle>
 
+void configDialog::setNewStyleSheet(QWidget* w, QSize size, QString myStyle, int pointSizeCorrection)
+{
+    int pointSize;
+    if(size.height() > 500) pointSize = 22;
+    else pointSize = 15;
+
+    pointSize = pointSize + pointSizeCorrection;
+
+    QString style = "font: %1pt; %2";
+    style = style.arg(pointSize).arg(myStyle);
+    w->setStyleSheet(style);
+}
+
 configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, const QList<QString> &files, QWidget *parent): QWidget(parent)
 {
-    int thisWidth = 600;
+    int thisWidth = 600;  // normal for ipad
     int thisHeight = 370;
+
     Qt::WindowFlags flags = Qt::Dialog;
     setWindowFlags(flags);
     setWindowModality (Qt::WindowModal);
 
     QSize size = QSize(0,20);
 
+    if(qApp->desktop()->size().height() < 500) {
+        thisWidth=430;  // normal for iphone
+        thisHeight=275;
+    }
+
     setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, qApp->desktop()->size() - size , qApp->desktop()->availableGeometry()));
+
+    //qDebug() << "size=" << qApp->desktop()->size();
+    //qDebug() << "geometry=" << qApp->desktop()->geometry();
+    //qDebug() << "dpi=" << qApp->desktop()->logicalDpiX();
 
     QPixmap bg(":/caQtDM-BGL-2048.png");
 
-    bg = bg.scaled(qApp->desktop()->size());
+    bg = bg.scaled(qApp->desktop()->size()-QSize(0,10));
     QPalette palette;
     palette.setBrush(QPalette::Background, bg);
     setPalette(palette);
@@ -56,7 +79,8 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     frame->setGeometry(rect);
     frame->setFixedSize(thisWidth+30, thisHeight);
     frame->setMaximumSize(rect.width()+30, rect.height());
-    frame->setStyleSheet("border:0px solid gray; border-radius: 15px; background: rgba(255,255,255,0.7)");
+
+    setNewStyleSheet(frame, qApp->desktop()->size(), "border:0px solid gray; border-radius: 15px; background: rgba(255,255,255,0.7);");
 
     ClearConfigButtonClicked = false;
     QGridLayout *mainLayout = new QGridLayout();
@@ -64,19 +88,25 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
     QVBoxLayout *frameLayout = new QVBoxLayout();
     mainLayout->addLayout(frameLayout,0,0);
-    frameLayout->setContentsMargins(15,15,15,15);
+    frameLayout->setContentsMargins(5,5,5,0);
 
-    QLabel *title = new QLabel("<h1>Start settings</h1>");
+    QLabel *title = new QLabel("Start settings");
+    setNewStyleSheet(title, qApp->desktop()->size(), "", 4);
     title->setFixedWidth(thisWidth-20);
     title->setStyleSheet("QLabel {background-color : #aaffff; color : black; }");
     title->setAlignment(Qt::AlignCenter);
     frameLayout->addWidget(title, 0, Qt::AlignCenter);
 
     QGridLayout *clearLayout = new QGridLayout;
+    clearLayout->setSpacing(2);
+    clearLayout->setContentsMargins(3, 3, 3, 3);
+
     QGroupBox* clearBox = new QGroupBox("Local ui/prc files");
+    setNewStyleSheet(clearBox, qApp->desktop()->size());
 
     QString str= QString::number((int) NumberOfFiles());
     QLabel *label = new QLabel("Number:");
+
     fileCountLabel = new QLabel(str);
     clearLayout->addWidget(label, 0, 0);
     clearLayout->addWidget(fileCountLabel, 0, 1);
@@ -89,7 +119,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     clearLayout->addWidget(clearUiButton, 0, 3);
     connect(clearUiButton, SIGNAL(clicked()), this, SLOT(clearUiClicked()) );
 
-    QLabel *debugLabel = new QLabel(" Message window:");
+    QLabel *debugLabel = new QLabel(" Messages:");
     clearLayout->addWidget(debugLabel, 0, 4);
 
     debugComboBox = new QComboBox();
@@ -103,7 +133,12 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     frameLayout->addWidget(clearBox);
 
     QGridLayout* urlLayout = new QGridLayout;
+    urlLayout->setSpacing(2);
+    urlLayout->setContentsMargins(3, 3, 3, 3);
+
     QGroupBox* urlBox = new QGroupBox("Choose your url where your config file is located");
+    setNewStyleSheet(urlBox, qApp->desktop()->size());
+
     urlComboBox = new QComboBox();
     urlComboBox->setEditable(true);
     urlComboBox->setInsertPolicy(QComboBox::InsertAtCurrent);
@@ -120,7 +155,12 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     frameLayout->addWidget(urlBox);
 
     QGridLayout* fileLayout = new QGridLayout;
+    fileLayout->setSpacing(2);
+    fileLayout->setContentsMargins(3, 3, 3, 3);
+
     QGroupBox* fileBox = new QGroupBox("Choose your config file at the above url");
+    setNewStyleSheet(fileBox, qApp->desktop()->size());
+
     fileComboBox = new QComboBox();
     fileComboBox->setEditable(true);
     fileComboBox->setInsertPolicy(QComboBox::InsertAtCurrent);
@@ -138,6 +178,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     frameLayout->addWidget(fileBox);
 
     QPushButton *startButton = new QPushButton(QIcon(":/caQtDM.ico"), "Start");
+    setNewStyleSheet(startButton, qApp->desktop()->size(), "", 2);
     connect(startButton, SIGNAL(clicked()), this, SLOT(startClicked()) );
 
     frameLayout->addWidget(startButton);
@@ -149,7 +190,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     frameLayout->addWidget(version);
 
     setLayout(mainLayout);
-    showNormal();
+    show();
 }
 
 void configDialog::getChoice(QString &url, QString &file, QList<QString> &urls, QList<QString> &files, bool &debugWindow)

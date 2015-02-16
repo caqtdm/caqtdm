@@ -49,6 +49,10 @@
 #include "ui_main.h"
 #include <stdio.h>
 
+#ifdef Q_OS_IOS
+#include "epicsExternals.h"
+#endif
+
  class FileOpenWindow : public QMainWindow
  {
      Q_OBJECT
@@ -64,6 +68,7 @@
      void parse_and_set_Geometry(QMainWindow *w, QString parsestring);
      void shellCommand(QString command);
      void cycleWindows();
+     void setNewStyleSheet(QWidget* w, QSize size, QString myStyle = "", int pointSizeCorrection = 0);
 
 #ifdef NETWORKDOWNLOADSUPPORT
      void setAllEnvironmentVariables(const QString &fileName);
@@ -83,6 +88,7 @@
      void Callback_OpenNewFile(const QString&, const QString&, const QString&);
      void checkForMessage();
      void Callback_PVwindowExit();
+     void onApplicationStateChange(Qt::ApplicationState state);
 
  public slots:
      void doSomething() { printf("About to quit!\n"); sharedMemory.detach();}

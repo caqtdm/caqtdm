@@ -8,6 +8,7 @@
 	<string>Created by Qt/QMake</string>
 	<key>CFBundleIconFiles</key>
 	<array>
+		<string>Default-568h@2x.png</string>
 		<string>caQtDM-72.png</string>
 		<string>caQtDM-60@2x.png</string>
 		<string>caQtDM-76.png</string>
@@ -15,6 +16,8 @@
 	</array>
 	<key>CFBundleIdentifier</key>
 	<string>ch.psi.caQtDM</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundlePackageType</key>
@@ -39,8 +42,10 @@
 	</array>
 	<key>UIInterfaceOrientation</key>
 	<string>UIInterfaceOrientationLandscapeLeft</string>
-	<key>UILaunchImageFile</key>
+	<key>UILaunchImageFile~ipad</key>
 	<string>StartScreen-Landscape.png</string>
+	<key>CFBundleName</key>
+	<string></string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationLandscapeLeft</string>

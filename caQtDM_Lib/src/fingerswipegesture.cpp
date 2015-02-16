@@ -32,6 +32,8 @@
 #include <QEvent>
 #include <QTouchEvent>
 #include <QtDebug>
+#include <QDesktopWidget>
+#include <QApplication>
 
 FingerSwipeGestureRecognizer::FingerSwipeGestureRecognizer()
 {
@@ -111,21 +113,33 @@ FingerSwipeGesture::FingerSwipeGesture(QObject *parent): QGesture(parent), m_tri
 FingerSwipeGesture::~FingerSwipeGesture()
 { }
 
-#define movelength 300
+//#define movelength 300
 
 bool FingerSwipeGesture::isLeftToRight() const
 {
+    QSize size = qApp->desktop()->size();
+    int movelength = size.width() / 3;
+    //printf("horiz movelenght=%d\n", movelength);
     return m_startPos.x()+movelength < m_currentPos.x();
 }
 bool FingerSwipeGesture::isRightToLeft() const
 {
+    QSize size = qApp->desktop()->size();
+    int movelength = size.width() / 3;
+    //printf("horiz movelenght=%d\n", movelength);
     return m_startPos.x() > m_currentPos.x()+movelength;
 }
 bool FingerSwipeGesture::isBottomToTop() const
 {
+    QSize size = qApp->desktop()->size();
+    int movelength = size.height() / 2;
+    //printf("vert movelenght=%d\n", movelength);
     return m_startPos.y()+movelength < m_currentPos.y();
 }
 bool FingerSwipeGesture::isTopToBottom() const
 {
+    QSize size = qApp->desktop()->size();
+    int movelength = size.height() / 2;
+    //printf("vert movelenght=%d\n", movelength);
     return m_startPos.y() > m_currentPos.y()+movelength;
 }

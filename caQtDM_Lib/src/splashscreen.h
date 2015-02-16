@@ -56,6 +56,7 @@ protected:
 
 private:
         QPixmap pixmap;
+        QPixmap pixmapLoad;
         int m_maximum;
 
 };

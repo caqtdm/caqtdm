@@ -26,6 +26,19 @@
 #include <QtGui>
 #include "limitsStripplotDialog.h"
 
+void limitsStripplotDialog::setNewStyleSheet(QWidget* w, QSize size, QString myStyle, int pointSizeCorrection)
+{
+    int pointSize;
+    if(size.height() > 500) pointSize = 16;
+    else pointSize = 10;
+
+    pointSize = pointSize + pointSizeCorrection;
+
+    QString style = "font: %1pt; %2";
+    style = style.arg(pointSize).arg(myStyle);
+    w->setStyleSheet(style);
+}
+
 limitsStripplotDialog::limitsStripplotDialog(caStripPlot *w, MutexKnobData *data, const QString &title, QWidget *parent) : QWidget(parent)
 {
     int thisWidth = 650;
@@ -36,7 +49,17 @@ limitsStripplotDialog::limitsStripplotDialog(caStripPlot *w, MutexKnobData *data
     QGridLayout *Layout = new QGridLayout;
     setWindowModality (Qt::WindowModal);
 
+    QString text = StripPlot->getPVS();
+    vars = text.split(";", QString::SkipEmptyParts);
+
 #ifdef Q_OS_IOS
+    if(qApp->desktop()->size().height() < 500) {
+        thisWidth=430;  // normal for iphone
+        thisHeight=100 + vars.size() * 13;
+    } else {
+        thisHeight=100 + vars.size() * 20;
+    }
+    setNewStyleSheet(this, qApp->desktop()->size());
     QPalette palette;
     palette.setBrush(QPalette::Background, QColor(255,255,224,255));
     setPalette(palette);
@@ -47,11 +70,6 @@ limitsStripplotDialog::limitsStripplotDialog(caStripPlot *w, MutexKnobData *data
     setWindowFlags(flags);
     move(parent->x() + parent->width() / 2 - thisWidth / 2 , parent->y() + parent->height() /2 -thisHeight/2);
 #endif
-
-
-    QString text = StripPlot->getPVS();
-
-    vars = text.split(";", QString::SkipEmptyParts);
 
     for(int i=0; i< vars.size(); i++) {
         QString pv = vars.at(i).trimmed();

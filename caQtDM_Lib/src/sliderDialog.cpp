@@ -26,6 +26,19 @@
 #include <QtGui>
 #include "sliderDialog.h"
 
+void sliderDialog::setNewStyleSheet(QWidget* w, QSize size, QString myStyle, int pointSizeCorrection)
+{
+    int pointSize;
+    if(size.height() > 500) pointSize = 16;
+    else pointSize = 10;
+
+    pointSize = pointSize + pointSizeCorrection;
+
+    QString style = "font: %1pt; %2";
+    style = style.arg(pointSize).arg(myStyle);
+    w->setStyleSheet(style);
+}
+
 sliderDialog::sliderDialog(caSlider *w, MutexKnobData *data, const QString &title, QWidget *parent) : QWidget(parent)
 {
     QString text;
@@ -41,6 +54,11 @@ sliderDialog::sliderDialog(caSlider *w, MutexKnobData *data, const QString &titl
     setWindowModality (Qt::WindowModal);
 
 #ifdef Q_OS_IOS
+    if(qApp->desktop()->size().height() < 500) {
+        thisWidth=430;  // normal for iphone
+        thisHeight=150;
+    }
+    setNewStyleSheet(this, qApp->desktop()->size());
     QPalette palette;
     palette.setBrush(QPalette::Background, QColor(255,255,224,255));
     setPalette(palette);

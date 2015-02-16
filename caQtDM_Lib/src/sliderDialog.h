@@ -60,6 +60,7 @@
 
  public:
      sliderDialog(caSlider *w, MutexKnobData *data, const QString &title, QWidget *parent);
+     void setNewStyleSheet(QWidget* w, QSize size, QString myStyle = "", int pointSizeCorrection = 0);
      void exec();
 
  private slots:

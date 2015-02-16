@@ -25,6 +25,19 @@
 
 #include "myMessageBox.h"
 
+void myMessageBox::setNewStyleSheet(QWidget* w, QSize size, QString myStyle, int pointSizeCorrection)
+{
+    int pointSize;
+    if(size.height() > 500) pointSize = 16;
+    else pointSize = 10;
+
+    pointSize = pointSize + pointSizeCorrection;
+
+    QString style = "font: %1pt; %2";
+    style = style.arg(pointSize).arg(myStyle);
+    w->setStyleSheet(style);
+}
+
 myMessageBox::myMessageBox(QWidget *parent) : QWidget(parent)
 {
 
@@ -33,15 +46,27 @@ myMessageBox::myMessageBox(QWidget *parent) : QWidget(parent)
     setWindowModality (Qt::WindowModal);
 
 #ifdef Q_OS_IOS
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(350,500), qApp->desktop()->availableGeometry()));
+    QSize size = qApp->desktop()->size();
+    if(size.height() < 500) {
+        setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(250,250), qApp->desktop()->availableGeometry()));
+        setMinimumSize(250,250);
+    } else {
+        setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(350,500), qApp->desktop()->availableGeometry()));
+        setMinimumSize(350,500);
+    }
 #else
     move(parent->x() + parent->width() / 2 - 175, parent->y()+25);
+    setMinimumSize(350,500);
 #endif
 
     thisText = new QTextEdit(this);
     thisText->setReadOnly(true);
     thisText->setTextInteractionFlags(Qt::TextSelectableByMouse);
     thisText->setLineWrapMode(QTextEdit::NoWrap);
+
+#ifdef Q_OS_IOS
+    setNewStyleSheet(thisText, qApp->desktop()->size());
+#endif
 
     QPushButton *cancelButton = new QPushButton(tr("Close"));
 
@@ -51,8 +76,6 @@ myMessageBox::myMessageBox(QWidget *parent) : QWidget(parent)
     QVBoxLayout *lt = new QVBoxLayout;
     lt->addWidget(thisText);
     lt->addWidget(buttonBox);
-
-    setMinimumSize(350,500);
 
     setLayout(lt);
     showNormal();

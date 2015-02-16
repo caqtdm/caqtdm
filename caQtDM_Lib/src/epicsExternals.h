@@ -31,5 +31,9 @@ extern "C" int EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data
 extern "C" int EpicsGetTimeStamp(char *pv, char *timestamp);
 extern "C" void clearEvent(void * ptr);
 extern "C" void addEvent(void * ptr);
-
+extern "C" void EpicsReconnect(knobData *kData);
+extern "C" void EpicsDisconnect(knobData *kData);
+extern "C" void EpicsFlushIO();
+extern "C" void DestroyContext();
+extern "C" void PrepareDeviceIO();
 #endif

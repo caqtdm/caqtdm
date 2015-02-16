@@ -27,7 +27,7 @@
 #define CAINCLUDE_H
 
 #include <QWidget>
-#include <QtUiTools/QUiLoader>
+//#include <QtUiTools/QUiLoader>
 #include <QVBoxLayout>
 #include <qtcontrols_global.h>
 

@@ -26,6 +26,20 @@
 #include <QtGui>
 #include "limitsCartesianplotDialog.h"
 
+void limitsCartesianplotDialog::setNewStyleSheet(QWidget* w, QSize size, QString myStyle, int pointSizeCorrection)
+{
+    int pointSize;
+    if(size.height() > 500) pointSize = 16;
+    else pointSize = 10;
+
+    pointSize = pointSize + pointSizeCorrection;
+
+    QString style = "font: %1pt; %2";
+    style = style.arg(pointSize).arg(myStyle);
+    w->setStyleSheet(style);
+}
+
+
 limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKnobData *data, const QString &title, QWidget *parent) : QWidget(parent)
 {
     bool ok1, ok2;
@@ -39,6 +53,11 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
     setWindowModality (Qt::WindowModal);
 
 #ifdef Q_OS_IOS
+    if(qApp->desktop()->size().height() < 500) {
+        thisWidth=430;  // normal for iphone
+        thisHeight=150;
+    }
+    setNewStyleSheet(this, qApp->desktop()->size());
     QPalette palette;
     palette.setBrush(QPalette::Background, QColor(255,255,224,255));
     setPalette(palette);
@@ -153,7 +172,7 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
     connect( button, SIGNAL(clicked()), this, SLOT(applyClicked()) );
     buttonBox->addButton(button, QDialogButtonBox::ApplyRole );
 
-    Layout->addWidget(buttonBox, 2, 0);
+    Layout->addWidget(buttonBox, 2, 0, 1, -1);
 
     groupBox->setLayout(Layout);
     mainLayout->addWidget(groupBox);

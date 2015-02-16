@@ -74,8 +74,8 @@ ENumeric::ENumeric(QWidget *parent, int id, int dd) : QFrame(parent), FloatDeleg
     text = NULL;
     d_fontScaleEnabled = false;
     setFrameShape(QFrame::NoFrame);
-    setMinimumHeight(35);
-    setMinimumWidth(15*digits);
+    setMinimumHeight(20);
+    setMinimumWidth(5*digits);
     LeftClickWithModifiersEater *leftClickWithModifiersEater = new LeftClickWithModifiersEater(this);
     leftClickWithModifiersEater->setObjectName("leftClickWithModifiersEater");
 

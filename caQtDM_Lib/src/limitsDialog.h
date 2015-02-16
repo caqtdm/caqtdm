@@ -65,6 +65,7 @@
      Q_OBJECT
 
  public:
+     void setNewStyleSheet(QWidget* w, QSize size, QString myStyle = "", int pointSizeCorrection = 0);
      limitsDialog(QWidget *w, MutexKnobData *data, const QString &title, QWidget *parent);
      void exec();
 

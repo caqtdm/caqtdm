@@ -3,10 +3,16 @@ include(../caQtDM_Viewer/qtdefs.pri)
 DEFINES += QT_NO_DEBUG_OUTPUT
 
 contains(QT_VER_MAJ, 4) {
-  CONFIG += uitools qwt plugin designer thread
+      CONFIG += qwt plugin thread uitools
+!ios {
+      CONFIG += designer
+     }
 }
 contains(QT_VER_MAJ, 5) {
-  QT      += widgets designer uitools concurrent
+      QT += widgets concurrent uitools
+!ios {
+      QT += designer
+     }
   CONFIG  += qwt plugin
   DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 }
@@ -121,20 +127,26 @@ SOURCES	+= \
     src/cacamera.cpp \
     src/imagewidget.cpp \
     src/cacalc.cpp \
-    src/capolylinetaskmenu.cpp \
-    src/capolylinedialog.cpp \
     src/parsepepfile.cpp \
     src/catogglebutton.cpp \
     src/cascriptbutton.cpp \
     src/cadoubletabwidget.cpp \
     src/cadoubletabwidgetextension.cpp \
-    src/cadoubletabwidgetextensionfactory.cpp \
     src/stripplotthread.cpp \
     src/cawaterfallplot.cpp \
     src/snumeric.cpp \
     src/caspinbox.cpp \
     src/qwtplotcurvenan.cpp \
     src/cawavetable.cpp
+
+!ios {
+SOURCES += src/capolylinetaskmenu.cpp
+SOURCES += src/capolylinedialog.cpp
+SOURCES += src/cadoubletabwidgetextensionfactory.cpp
+HEADERS += src/capolylinetaskmenu.h
+HEADERS += src/capolylinedialog.h
+HEADERS += src/cadoubletabwidgetextensionfactory.h
+}
 
 NETWORKDOWNLOADSUPPORT: {
 QT += network
@@ -204,8 +216,6 @@ HEADERS	+= \
     src/cacamera.h \
     src/imagewidget.h \
     src/cacalc.h \
-    src/capolylinetaskmenu.h \
-    src/capolylinedialog.h \
     src/qtcontrols_global.h \
     src/alarmdefs.h \
     src/parsepepfile.h \
@@ -213,7 +223,6 @@ HEADERS	+= \
     src/cascriptbutton.h \
     src/cadoubletabwidget.h \
     src/cadoubletabwidgetextension.h \
-    src/cadoubletabwidgetextensionfactory.h \
     src/stripplotthread.h \
     src/cawaterfallplot.h \
     src/snumeric.h \
