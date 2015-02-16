@@ -40,6 +40,10 @@
 #include <QTableWidget>
 #include <QScrollBar>
 #include <QFile>
+
+#ifdef Q_OS_IOS
+#include <QGuiApplication>
+#endif
 #include "myQProcess.h"
 #include "MessageWindow.h"
 #include "dbrString.h"
@@ -49,7 +53,7 @@
 #include "ui_main.h"
 #include <stdio.h>
 
-#ifdef Q_OS_IOS
+#ifdef Q_OS_IOS
 #include "epicsExternals.h"
 #endif
 
@@ -88,7 +92,9 @@
      void Callback_OpenNewFile(const QString&, const QString&, const QString&);
      void checkForMessage();
      void Callback_PVwindowExit();
+#if QT_VERSION > 0x050000
      void onApplicationStateChange(Qt::ApplicationState state);
+#endif
 
  public slots:
      void doSomething() { printf("About to quit!\n"); sharedMemory.detach();}

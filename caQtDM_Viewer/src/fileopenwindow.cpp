@@ -82,9 +82,9 @@ int setenv(const char *name, const char *value, int overwrite)
 #endif
 
 
+#ifdef Q_OS_IOS
 void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
 {
-#ifdef Q_OS_IOS
     int pendio;
 
          switch (state) {
@@ -145,10 +145,8 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
 */
              break;
          }
-#endif
-
 }
-
+#endif
 
 void FileOpenWindow::setNewStyleSheet(QWidget* w, QSize size, QString myStyle, int pointSizeCorrection)
 {
