@@ -750,10 +750,11 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
 void EpicsReconnect(knobData *kData)
 {
     int status;
+    connectInfo *info;
     // in case of a soft channel there is nothing to do
     if(kData->soft) return;
 
-    connectInfo *info = (connectInfo *) kData->edata.info;
+    info = (connectInfo *) kData->edata.info;
 
     PRINT(printf("create channel for an epics device <%s>\n", kData->pv));
 
