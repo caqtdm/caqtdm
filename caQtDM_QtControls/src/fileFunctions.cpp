@@ -26,6 +26,7 @@
 
 #include "fileFunctions.h"
 #include "networkaccess.h"
+#include "searchfile.h"
 
 class Sleep
 {
@@ -49,7 +50,10 @@ int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &
     QString displayPath;
     QFileInfo fi(fileName);
 
-    if(fi.exists()) return true;
+    //printf("filename to download %s\n", fileName.toAscii().constData());
+    searchFile *s = new searchFile(fileName);
+    QString fileNameFound = s->findFile();
+    if(!fileNameFound.isNull()) return true;
 
     // use specified url
     if(url.size() > 0) {
