@@ -32,7 +32,6 @@
 #include <postfix.h>
 #include <QObject>
 #include <QToolBar>
-#include <iostream>
 #include <cadef.h>
 #ifdef linux
 #  include <sys/wait.h>
@@ -2013,7 +2012,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                 }
             }
         }
-        //normal EPICS Calulation
+        //normal EPICS Calculation
         status = postfix(calcString, post, &errnum);
         if(status) {
             char asc[100];
@@ -2433,7 +2432,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     QString str= QString::number((int) data.edata.ivalue);
                     widget->setText(str);
                 } else if((data.edata.fieldtype == caENUM)  && ((int) data.edata.ivalue < list.count() ) && (list.count() > 0)) {
-                    if(list.at((int) data.edata.ivalue).trimmed().size() == 0)  {  // string seems to emty, give value
+                    if(list.at((int) data.edata.ivalue).trimmed().size() == 0)  {  // string seems to empty, give value
                         QString str= QString::number((int) data.edata.ivalue);
                         widget->setText(str);
                     } else {

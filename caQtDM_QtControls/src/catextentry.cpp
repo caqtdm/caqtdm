@@ -37,6 +37,7 @@ caTextEntry::caTextEntry(QWidget *parent) : caLineEdit(parent)
     installEventFilter(this);
     newFocusPolicy(Qt::ClickFocus);
     this->setAcceptDrops(false);
+    setFromTextEntry();
 }
 
 // routine not used any more

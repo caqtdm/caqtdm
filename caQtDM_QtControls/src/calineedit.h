@@ -146,6 +146,7 @@ public:
     void newFocusPolicy(Qt::FocusPolicy f);
 
     void setValueType(bool isvalue);
+    void setFromTextEntry();
 
 private slots:
     void rescaleFont(const QString& newText);

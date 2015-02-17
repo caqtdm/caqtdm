@@ -98,8 +98,13 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     newFocusPolicy(Qt::NoFocus);
 
     d_rescaleFontOnTextChanged = true;
-    connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(rescaleFont(const QString&)));
+
     installEventFilter(this);
+}
+
+void caLineEdit::setFromTextEntry()
+{
+    connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(rescaleFont(const QString&)));
 }
 
 void caLineEdit::setValueType(bool isvalue)
@@ -487,6 +492,7 @@ QSize caLineEdit::calculateTextSpace()
     return d_savedTextSpace;
 }
 
+// will now be used only for catextentry (performance)
 void caLineEdit::rescaleFont(const QString& newText)
 {
     if(d_rescaleFontOnTextChanged) {
