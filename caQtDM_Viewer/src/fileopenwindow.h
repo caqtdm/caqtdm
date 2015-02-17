@@ -92,10 +92,9 @@
      void Callback_OpenNewFile(const QString&, const QString&, const QString&);
      void checkForMessage();
      void Callback_PVwindowExit();
-#if defined Q_OS_IOS
- #if QT_VERSION > 0x050000
+
+#if QT_VERSION > 0x050000
      void onApplicationStateChange(Qt::ApplicationState state);
- #endif
 #endif
 
  public slots:

@@ -44,6 +44,8 @@
 	<string>UIInterfaceOrientationLandscapeLeft</string>
 	<key>UILaunchImageFile~ipad</key>
 	<string>StartScreen-Landscape.png</string>
+	<key>UILaunchImageFile~iphone</key>
+	<string>StartScreen-568h@2x.png</string>
 	<key>CFBundleName</key>
 	<string></string>
 	<key>UISupportedInterfaceOrientations</key>

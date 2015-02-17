@@ -21,10 +21,11 @@ ios {
    APP_ICON.files += $$PWD/../src/caQtDM-72.png
    APP_ICON.files += $$PWD/../src/caQtDM-76.png
    APP_ICON.files += $$PWD/../src/caQtDM-76@2x.png
-   APP_ICON.files += $$PWD/../src/Default-568h@2x.png
+
    APP1_ICON.files = $$PWD/../src/caQtDM.icns
    APP_XML_FILES.files = $$PWD/../caQtDM_IOS_Config.xml
    StartScreen.files += $$PWD/../src/StartScreen-Landscape.png
+   StartScreen.files += $$PWD/../src/StartScreen-568h@2x.png
    APP-FONTS.files = $$PWD/../lucida-sans-typewriter.ttf
    APP-FONTS.path = fonts
    QMAKE_BUNDLE_DATA += APP_XML_FILES APP_ICON APP1_ICON StartScreen APP-FONTS

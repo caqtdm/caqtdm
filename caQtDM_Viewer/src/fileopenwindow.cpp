@@ -82,12 +82,13 @@ int setenv(const char *name, const char *value, int overwrite)
 #endif
 
 
-#ifdef Q_OS_IOS
+#if QT_VERSION > 0x050000
 void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
 {
     int pendio;
 
-         switch (state) {
+#ifdef Q_OS_IOS
+    switch (state) {
          case Qt::ApplicationSuspended:
              qDebug() << "application state changed to suspended";
              exit(0);
@@ -145,6 +146,7 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
 */
              break;
          }
+#endif
 }
 #endif
 
@@ -370,7 +372,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 #endif
 
     // application state handler
-#ifdef Q_OS_IOS
+#if QT_VERSION > 0x050000
     connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this, SLOT(onApplicationStateChange(Qt::ApplicationState)));
 #endif
 }
