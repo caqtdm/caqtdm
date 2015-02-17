@@ -182,7 +182,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     minimizeMessageWindow = minimize;
     activWindow = 0;
 
-    qDebug() <<  qApp->desktop()->size();
+    //qDebug() <<  qApp->desktop()->size();
 
     // Set Window Title without the whole path
     QString title("caQtDM ");

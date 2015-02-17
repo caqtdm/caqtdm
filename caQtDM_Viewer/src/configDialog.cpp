@@ -182,11 +182,12 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     connect(startButton, SIGNAL(clicked()), this, SLOT(startClicked()) );
 
     frameLayout->addWidget(startButton);
-    QString message = QString("<h5>Qt-based Epics Display Manager Version %1</h5>");
-    message = message.arg(BUILDVERSION);
+    QString message = QString("Qt-based Epics Display Manager Version %1 (%2)  ");
+    message = message.arg(BUILDVERSION).arg(BUILDDATE);
 
     QLabel *version = new QLabel(message);
     version->setAlignment(Qt::AlignRight);
+    setNewStyleSheet(version, qApp->desktop()->size(), "", -4);
     frameLayout->addWidget(version);
 
     setLayout(mainLayout);
