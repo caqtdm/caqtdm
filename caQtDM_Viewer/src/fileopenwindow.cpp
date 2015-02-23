@@ -91,59 +91,45 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
     switch (state) {
          case Qt::ApplicationSuspended:
              qDebug() << "application state changed to suspended";
-             exit(0);
+             //exit(0);
              break;
          case Qt::ApplicationHidden:
              qDebug() << "application state changed to hidden";
              break;
          case Qt::ApplicationInactive:
              qDebug() << "application state changed to inactive";
-/*
+             PrepareDeviceIO();
              pendio = false;
              if (mutexKnobData != (MutexKnobData *) 0) {
                  for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
                      knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
                      if(kPtr->index != -1)  {
-                       qDebug() << "should disconnect" << kPtr->pv;
+                       //qDebug() << "should disconnect" << kPtr->pv;
                        EpicsDisconnect(kPtr);
                        mutexKnobData->SetMutexKnobData(i, *kPtr);
                        pendio = true;
                      }
                  }
-                 if(pendio)  EpicsFlushIO();
              }
+             TerminateDeviceIO();
 
-             // everything disconnected ?
-             if (mutexKnobData != (MutexKnobData *) 0) {
-                 for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
-                     knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
-                     if(kPtr->index != -1)  {
-                        connectInfoShort *tmp = (connectInfoShort *) kPtr->edata.info;
-                        qDebug() << "connected" << kPtr->pv << tmp->connected;
-                        if(tmp->connected) return;
-                     }
-                 }
-             }
-             //DestroyContext();
-*/
              break;
          case Qt::ApplicationActive:
              qDebug() << "application state changed to active";
-/*
-             //PrepareDeviceIO();
+
+             PrepareDeviceIO();
              pendio = false;
               if (mutexKnobData != (MutexKnobData *) 0) {
                   for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
                       knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
                       if(kPtr->index != -1) {
-                        //qDebug() << "should reconnect" << kPtr->pv;
                         EpicsReconnect(kPtr);
                         pendio = true;
                       }
                   }
                   if(pendio)  EpicsFlushIO();
               }
-*/
+
              break;
          }
 #endif
@@ -195,6 +181,9 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     // set for epics longer waveforms
     QString maxBytes = (QString)  getenv("EPICS_CA_MAX_ARRAY_BYTES");
     if(maxBytes.size() == 0) setenv("EPICS_CA_MAX_ARRAY_BYTES", "150000000", 1);
+
+    // for epics initialize a mutex
+    InitializeContextMutex();
 
     // in case of tablets, use static plugins linked in
  #ifdef Q_OS_IOS

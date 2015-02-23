@@ -158,14 +158,6 @@
 Q_DECLARE_METATYPE(QList<int>)
 Q_DECLARE_METATYPE(QTabWidget*)
 
-extern "C" int CreateAndConnect(int index, knobData *data, int rate, int skip);
-extern "C" void DetachContext();
-extern "C" void PrepareDeviceIO();
-extern "C" void ClearMonitor(knobData *kData);
-extern "C" void EpicsFlushIO();
-
-extern "C" void TerminateDeviceIO();
-
 MutexKnobData *mutexKnobData;
 MessageWindow *messageWindow;
 

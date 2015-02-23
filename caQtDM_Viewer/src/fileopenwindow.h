@@ -53,9 +53,7 @@
 #include "ui_main.h"
 #include <stdio.h>
 
-#ifdef Q_OS_IOS
 #include "epicsExternals.h"
-#endif
 
  class FileOpenWindow : public QMainWindow
  {

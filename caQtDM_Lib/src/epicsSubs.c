@@ -39,11 +39,11 @@
 #include <stdint.h>
 #define epicsAlarmGLOBAL
 #include <cadef.h>
-struct ca_client_context *dbCaClientContext;
 
 #include <alarm.h>
 #include <epicsExport.h>
-#include "tsDefs.h"
+//#include "tsDefs.h"
+#include "epicsTime.h"
 
 #undef epicsAlarmGLOBAL
 
@@ -61,6 +61,41 @@ struct ca_client_context *dbCaClientContext;
 #ifdef ACS
 #include "acsSubs.h"
 #endif
+
+#include <pthread.h>
+
+pthread_mutex_t serializeAccess;
+pthread_mutex_t protectAccess;
+
+#define MONITOR_CREATE(x)  {  \
+                            pthread_mutexattr_t attr; \
+                            if(pthread_mutexattr_init(&attr) == -1) { \
+                               perror("pthread_mutexattr_init failed"); \
+                               exit(1);  \
+                            }  \
+                            if(pthread_mutex_init(x, &attr) == -1) { \
+                               perror("pthread_mutex_init failed"); \
+                               exit(2);  \
+                            }  \
+                           }
+
+#define MONITOR_ENTER(x) { \
+                          /*printf("enter pthread_mutex_lock\n");*/  \
+                          if(pthread_mutex_lock(&(x)) == -1) { \
+                            perror("pthread_mutex_lock failed"); \
+                            exit(3); \
+                          } \
+                         }
+
+#define MONITOR_EXIT(x)  { \
+                          /*printf("enter pthread_mutex_unlock\n");*/  \
+                          if(pthread_mutex_unlock(&(x)) == -1) { \
+                            perror("pthread_mutex_unlock failed"); \
+                            exit(4); \
+                          } \
+                         }
+
+
 
 extern MutexKnobData* KnobDataPtr;
 
@@ -132,25 +167,45 @@ void Exceptionhandler(struct exception_handler_args args)
                                             args.ctx, pName, args.op, dbr_type_to_text(args.type), args.count));
 }
 
+
+/**
+ * setup of our mutex
+ */
+void InitializeContextMutex()
+{
+    MONITOR_CREATE(&serializeAccess);
+}
+
 /**
  * define what we need for network IO
  */
 void PrepareDeviceIO(void)
 {
-    //PRINT(printf("create epics context\n"));
-    int status = ca_context_create(ca_enable_preemptive_callback);
-    if (status != ECA_NORMAL) {
-        printf("ca_context_create:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]);
-        exit(1);
-    }
-    dbCaClientContext = ca_current_context();
+    //printf("preparedeviceio\n");
+    int status;
 
-    ca_add_exception_event(Exceptionhandler, 0);
+    MONITOR_ENTER(serializeAccess);
+
+    if(!ca_current_context()) {
+        //printf("create context\n");
+        status = ca_context_create(ca_enable_preemptive_callback);
+        if (status != ECA_NORMAL) {
+            printf("ca_context_create:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]);
+            exit(1);
+        }
+        ca_add_exception_event(Exceptionhandler, 0);
+    } else {
+        //printf("context exists\n");
+        status = ca_attach_context(ca_current_context());
+    }
+    MONITOR_EXIT(serializeAccess);
 }
 
 static void access_rights_handler(struct access_rights_handler_args args)
 {
     knobData kData;
+
+    PrepareDeviceIO();
 
     connectInfo *info = (connectInfo *) ca_puser(args.chid);
     C_GetMutexKnobData(KnobDataPtr, info->index, &kData);
@@ -551,9 +606,13 @@ void clearEvent(void * ptr)
     int status;
     connectInfo *info = (connectInfo *) ptr;
     if(info == (connectInfo *) 0) return;
+
     if(!info->connected) return;  // must be connected
     if(info->event < 2) return;  // a first normal addevent must be done
     if(info->evAdded) {
+
+      PrepareDeviceIO();
+
       PRINT(printf("clearEvent -- %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded));
       info->evAdded = false;
       status = ca_clear_event(info->evID);
@@ -570,12 +629,16 @@ void addEvent(void * ptr)
 {
     connectInfo *info = (connectInfo *) ptr;
     if(info == (connectInfo *) 0) return;
+
     if(!info->connected) return; // must be connected
     if(info->event < 2) return;  // a first normal addevent must be done
     if(!info->evAdded) {
 
         knobData kData;
         int status;
+
+        PrepareDeviceIO();
+
         C_GetMutexKnobData(KnobDataPtr, info->index, &kData);
         if(kData.index == -1) return;
 
@@ -604,7 +667,7 @@ void connectCallback(struct connection_handler_args args)
 
     connectInfo *info = (connectInfo *) ca_puser(args.chid);
 
-    //printf("connectInfo %p pv=<%s> %d chid=%d\n", info, info->pv, info->evAdded, args.chid);
+    //printf("connectcallback %p pv=<%s> %d chid=%d\n", info, info->pv, info->evAdded, args.chid);
 
     switch (ca_state(args.chid)) {
 
@@ -671,6 +734,7 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
     static int first = true;
 #endif
 
+    PrepareDeviceIO();
     /* initialize channels */
     PRINT(printf("create channel index=%d <%s> rate=%d\n", index, kData->pv, rate));
 
@@ -727,7 +791,6 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
     }
 
     //printf("we have to add an epics device <%s>\n", kData->pv);
-    status = ca_attach_context(dbCaClientContext);
     status = ca_create_channel(kData->pv,
                                (void(*)())connectCallback,
                                info,
@@ -751,8 +814,11 @@ void EpicsReconnect(knobData *kData)
 {
     int status;
     connectInfo *info;
+
     // in case of a soft channel there is nothing to do
     if(kData->soft) return;
+
+    PrepareDeviceIO();
 
     info = (connectInfo *) kData->edata.info;
 
@@ -760,7 +826,6 @@ void EpicsReconnect(knobData *kData)
 
     if (info != (connectInfo *) 0) {
         if(info->cs == 0) { // epics
-            status = ca_attach_context(dbCaClientContext);
             status = ca_create_channel(kData->pv,
                                        (void(*)())connectCallback,
                                        info,
@@ -778,33 +843,31 @@ void EpicsDisconnect(knobData *kData)
     int status;
     connectInfo *info;
 
-    status = ca_attach_context(dbCaClientContext);
+    PrepareDeviceIO();
 
     if (kData->index == -1) return;
 
-    printf("clear channel %s index=%d\n", kData->pv, kData->index);
     info = (connectInfo *) kData->edata.info;
     if (info != (connectInfo *) 0) {
         if(info->cs == 0) { // epics
             if(info->ch != (chid) 0) {
-                printf("event added=%d\n", info->evAdded);
                 if(info->evAdded) {
                     info->evAdded = false;
-                    printf("ca_clear_event: %s index=%d\n", info->pv, kData->index);
                     status = ca_clear_event(info->evID);
                     if (status != ECA_NORMAL) {
                         PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
                     }
                 }
                 if(info->connected) {
-                printf("ca_clear_channel: %s chid=%d, index=%d\n", info->pv, info->ch, kData->index);
-                status = ca_clear_channel(info->ch);
-                info->connected = false;
-                info->event = 0;
-                info->ch = 0;
-                if(status != ECA_NORMAL) {
-                    printf("ca_clear_channel: %s %s index=%d\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], info->pv, kData->index);
-                }
+                    status = ca_clear_channel(info->ch);
+                    info->connected = false;
+                    info->event = 0;
+                    info->ch = 0;
+                    if(status != ECA_NORMAL) {
+                        printf("ca_clear_channel: %s %s index=%d\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], info->pv, kData->index);
+                    }
+                    kData->edata.connected=false;
+                    kData->edata.unconnectCount;
                 }
             }
         }
@@ -820,9 +883,9 @@ void ClearMonitor(knobData *kData)
     int status, aux;
     connectInfo *info;
 
-    status = ca_attach_context(dbCaClientContext);
-
     if (kData->index == -1) return;
+
+    PrepareDeviceIO();
 
     PRINT(printf("ClearMonitor -- clear channel %s index=%d\n", kData->pv, kData->index));
 
@@ -868,8 +931,8 @@ void ClearMonitor(knobData *kData)
 
 void DestroyContext()
 {
-    int status = ca_pend_io(CA_TIMEOUT);
-    printf("destroycontext\n");
+    PrepareDeviceIO();
+    ca_pend_io(CA_TIMEOUT);
     ca_context_destroy();
 }
 
@@ -888,6 +951,8 @@ int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *obje
             C_postMsgEvent(messageWindow, 1, vaPrintf("pv with length=0 (not translated for macro?)\n"));
             return !ECA_NORMAL;
     }
+
+    PrepareDeviceIO();
 
 #ifdef ACS
     if(SetActivCell(pv) != -1) {
@@ -984,7 +1049,6 @@ int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *obje
     }
 
     // something was written, so check status
-
     //printf("check status after write\n");
 
     switch (chType) {
@@ -1033,11 +1097,12 @@ int EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t
     UNUSED(errmess);
     UNUSED(object);
 
+    PrepareDeviceIO();
+
     if(strlen(pv) < 1)  {
             C_postMsgEvent(messageWindow, 1, vaPrintf("pv with length=0 (not translated for macro?)\n"));
             return !ECA_NORMAL;
     }
-
 
     status = ca_create_channel(pv, NULL, 0, CA_PRIORITY, &ch);
     if (ch == (chid) 0) {
@@ -1103,14 +1168,21 @@ int EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t
 
 void TerminateDeviceIO()
 {
-    printf("TeminateDeviceIO\n");
-    ca_flush_io();
+    int status;
+    PrepareDeviceIO();
+
+    status = ca_pend_io(CA_TIMEOUT);
+    if (status != ECA_NORMAL) {
+        C_postMsgEvent(messageWindow, 1, vaPrintf("ca_pend_io (%s)\n", ca_message (status)));
+    }
+
     ca_context_destroy();
-    ca_task_exit();
 }
 
 void EpicsFlushIO()
 {
+
+    PrepareDeviceIO();
     ca_flush_io();
 }
 
@@ -1129,6 +1201,8 @@ int EpicsGetTimeStamp(char *pv, char *timestamp)
     struct dbr_time_string ctrlS;
     char tsString[32];
     timestamp[0] = '\0';
+
+    PrepareDeviceIO();
 
     if(strlen(pv) < 1)  {
             C_postMsgEvent(messageWindow, 1, vaPrintf("pv with length=0 (not translated for macro?)\n"));
@@ -1154,7 +1228,9 @@ int EpicsGetTimeStamp(char *pv, char *timestamp)
 
     status = ca_pend_io(CA_TIMEOUT/2);
 
-    sprintf(timestamp, "TimeStamp: %s\n", tsStampToText(&ctrlS.stamp,TS_TEXT_MONDDYYYY, tsString));
+    //sprintf(timestamp, "TimeStamp: %s\n", epicsTimeToStrfTime(&ctrlS.stamp,TS_TEXT_MONDDYYYY, tsString));
+    epicsTimeToStrftime(tsString, 32,"%b %d, %Y %H:%M:%S.%09f", &ctrlS.stamp);
+    sprintf(timestamp, "TimeStamp: %s\n", tsString);
 
     return ECA_NORMAL;
 

@@ -26,9 +26,9 @@
 #ifndef EPICSEXTERNALS_H
 #define EPICSEXTERNALS_H
 
-extern "C" int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
-extern "C" int EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess);
-extern "C" int EpicsGetTimeStamp(char *pv, char *timestamp);
+extern "C" int  EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
+extern "C" int  EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess);
+extern "C" int  EpicsGetTimeStamp(char *pv, char *timestamp);
 extern "C" void clearEvent(void * ptr);
 extern "C" void addEvent(void * ptr);
 extern "C" void EpicsReconnect(knobData *kData);
@@ -36,4 +36,8 @@ extern "C" void EpicsDisconnect(knobData *kData);
 extern "C" void EpicsFlushIO();
 extern "C" void DestroyContext();
 extern "C" void PrepareDeviceIO();
+extern "C" void TerminateDeviceIO();
+extern "C" void InitializeContextMutex();
+extern "C" int  CreateAndConnect(int index, knobData *kData, int rate, int skip);
+extern "C" void ClearMonitor(knobData *kData);
 #endif
