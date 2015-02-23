@@ -32,7 +32,7 @@ caImage::caImage(QWidget* parent) : QWidget(parent)
 {
     _container = new QLabel(this);
     _layout = new QVBoxLayout(this);
-    thisFrame = 0;
+    thisFrame = prevFrame = 0;
     setVisibility(StaticV);
     timerId = 0;
     thisDelay = 500;
@@ -69,7 +69,6 @@ void caImage::init(const QString& filename) {
     setLayout(_layout);
 
     setHidden(false);
-
 }
 
 int caImage::getFrameCount()
@@ -84,14 +83,20 @@ void caImage::timerEvent(QTimerEvent *)
     if(thisFrame > (_animation->frameCount()-1)) {
         thisFrame=0;
     }
-    (void)_animation->jumpToFrame(thisFrame);
+    // display only when frame changed
+    if(thisFrame != prevFrame) {
+      (void)_animation->jumpToFrame(thisFrame);
+      prevFrame = thisFrame;
+    }
     thisFrame++;
 }
 
 void caImage::startMovie()
 {
+    // kill default timer
     if(timerId != 0) killTimer(timerId);
-    timerId = startTimer(thisDelay);
+    //start timer, but 0 milliseconds means no timer
+    if(thisDelay > 0) timerId = startTimer(thisDelay);
 }
 
 void caImage::setInvalid(QColor c)
@@ -126,5 +131,6 @@ void caImage::setFrame(int frame)
 {
     thisFrame = frame;
     if( _animation.isNull()) return;
-    _animation->jumpToFrame(frame);
+    (void)_animation->jumpToFrame(frame);
+    prevFrame= thisFrame;
 }

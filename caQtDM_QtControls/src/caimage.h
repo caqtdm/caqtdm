@@ -89,6 +89,7 @@ private:
     QVBoxLayout* _layout;
     QString thisFileName;
     int thisFrame, thisDelay;
+    int prevFrame;
     QString thisImageCalc;
     int timerId;
     QColor oldColor;
