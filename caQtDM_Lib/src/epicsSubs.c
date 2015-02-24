@@ -62,40 +62,8 @@
 #include "acsSubs.h"
 #endif
 
-#include <pthread.h>
-
-pthread_mutex_t serializeAccess;
-pthread_mutex_t protectAccess;
-
-#define MONITOR_CREATE(x)  {  \
-                            pthread_mutexattr_t attr; \
-                            if(pthread_mutexattr_init(&attr) == -1) { \
-                               perror("pthread_mutexattr_init failed"); \
-                               exit(1);  \
-                            }  \
-                            if(pthread_mutex_init(x, &attr) == -1) { \
-                               perror("pthread_mutex_init failed"); \
-                               exit(2);  \
-                            }  \
-                           }
-
-#define MONITOR_ENTER(x) { \
-                          /*printf("enter pthread_mutex_lock\n");*/  \
-                          if(pthread_mutex_lock(&(x)) == -1) { \
-                            perror("pthread_mutex_lock failed"); \
-                            exit(3); \
-                          } \
-                         }
-
-#define MONITOR_EXIT(x)  { \
-                          /*printf("enter pthread_mutex_unlock\n");*/  \
-                          if(pthread_mutex_unlock(&(x)) == -1) { \
-                            perror("pthread_mutex_unlock failed"); \
-                            exit(4); \
-                          } \
-                         }
-
-
+#include <epicsMutex.h>
+static epicsMutexId lockEpics;
 
 extern MutexKnobData* KnobDataPtr;
 
@@ -173,7 +141,7 @@ void Exceptionhandler(struct exception_handler_args args)
  */
 void InitializeContextMutex()
 {
-    MONITOR_CREATE(&serializeAccess);
+    lockEpics = epicsMutexCreate();
 }
 
 /**
@@ -184,7 +152,7 @@ void PrepareDeviceIO(void)
     //printf("preparedeviceio\n");
     int status;
 
-    MONITOR_ENTER(serializeAccess);
+    epicsMutexLock(lockEpics);
 
     if(!ca_current_context()) {
         //printf("create context\n");
@@ -198,7 +166,7 @@ void PrepareDeviceIO(void)
         //printf("context exists\n");
         status = ca_attach_context(ca_current_context());
     }
-    MONITOR_EXIT(serializeAccess);
+    epicsMutexUnlock(lockEpics);
 }
 
 static void access_rights_handler(struct access_rights_handler_args args)
