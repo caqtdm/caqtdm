@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.8.10
+CAQTDM_VERSION = V3.9.0
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -20,6 +20,13 @@ DEFINES += NETWORKDOWNLOADSUPPORT
 
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
+
+# 3.9.0
+# many changes for iphone, epics can now also reconnect after being suspended
+# calineedit a bit more performant
+# on ipad/iphone files were aways downloaded, this has been optimized
+# graphic plugings were missing on osx/ios, has been corrected
+# prevented crash on exit
 
 # 3.8.10
 # caStripPlot was eating the CPU and has been optimized; refreshrate (low, medium, high) has been introduced, so that it can be adjusted by the user
