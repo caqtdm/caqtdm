@@ -173,10 +173,10 @@ void PrepareDeviceIO(void)
 static void access_rights_handler(struct access_rights_handler_args args)
 {
     knobData kData;
-
+    connectInfo *info;
     PrepareDeviceIO();
 
-    connectInfo *info = (connectInfo *) ca_puser(args.chid);
+    info = (connectInfo *) ca_puser(args.chid);
     C_GetMutexKnobData(KnobDataPtr, info->index, &kData);
     kData.edata.accessW = ca_write_access(args.chid);
     kData.edata.accessR = ca_read_access(args.chid);
