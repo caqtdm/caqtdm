@@ -834,8 +834,8 @@ void EpicsDisconnect(knobData *kData)
                     if(status != ECA_NORMAL) {
                         printf("ca_clear_channel: %s %s index=%d\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], info->pv, kData->index);
                     }
-                    kData->edata.connected=false;
-                    kData->edata.unconnectCount;
+                    kData->edata.connected = false;
+                    kData->edata.unconnectCount = 0;
                 }
             }
         }
