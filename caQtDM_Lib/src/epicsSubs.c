@@ -39,7 +39,8 @@
 #include <stdint.h>
 #define epicsAlarmGLOBAL
 #include <cadef.h>
-
+#include "caQtDM_Lib_global.h"
+#include "epicsExternals.h"
 #include <alarm.h>
 #include <epicsExport.h>
 //#include "tsDefs.h"

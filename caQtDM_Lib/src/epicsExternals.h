@@ -26,18 +26,36 @@
 #ifndef EPICSEXTERNALS_H
 #define EPICSEXTERNALS_H
 
-extern "C" int  EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
-extern "C" int  EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess);
-extern "C" int  EpicsGetTimeStamp(char *pv, char *timestamp);
-extern "C" void clearEvent(void * ptr);
-extern "C" void addEvent(void * ptr);
-extern "C" void EpicsReconnect(knobData *kData);
-extern "C" void EpicsDisconnect(knobData *kData);
-extern "C" void EpicsFlushIO();
-extern "C" void DestroyContext();
-extern "C" void PrepareDeviceIO();
-extern "C" void TerminateDeviceIO();
-extern "C" void InitializeContextMutex();
-extern "C" int  CreateAndConnect(int index, knobData *kData, int rate, int skip);
-extern "C" void ClearMonitor(knobData *kData);
-#endif
+#include "caQtDM_Lib_global.h"
+#include <stdint.h>
+#include "knobDefines.h"
+#include "knobData.h"
+
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+
+CAQTDM_LIBSHARED_EXPORT int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
+CAQTDM_LIBSHARED_EXPORT int EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess);
+CAQTDM_LIBSHARED_EXPORT int  EpicsGetTimeStamp(char *pv, char *timestamp);
+CAQTDM_LIBSHARED_EXPORT void clearEvent(void * ptr);
+CAQTDM_LIBSHARED_EXPORT void addEvent(void * ptr);
+CAQTDM_LIBSHARED_EXPORT void EpicsReconnect(knobData *kData);
+CAQTDM_LIBSHARED_EXPORT void EpicsDisconnect(knobData *kData);
+CAQTDM_LIBSHARED_EXPORT void EpicsFlushIO();
+CAQTDM_LIBSHARED_EXPORT void DestroyContext();
+CAQTDM_LIBSHARED_EXPORT void PrepareDeviceIO();
+CAQTDM_LIBSHARED_EXPORT void TerminateDeviceIO();
+CAQTDM_LIBSHARED_EXPORT void InitializeContextMutex();
+CAQTDM_LIBSHARED_EXPORT int  CreateAndConnect(int index, knobData *kData, int rate, int skip);
+CAQTDM_LIBSHARED_EXPORT void ClearMonitor(knobData *kData);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
+
+#endif //EPICSEXTERNALS_H
