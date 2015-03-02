@@ -7,9 +7,6 @@ echo binaries will be installed in %QTDM_BININSTALL%
 echo libraries will be installed in %QTDM_LIBINSTALL%
 echo plugins will be installed in %QTDM_LIBINSTALL%/designer
 echo.
-echo "Press [Enter] key to start build "
-echo.
-pause
 
 set PATH=%PATH%;%WIXHOME%
 set WINCAQTDM_COLLECT=%CAQTDM_COLLECT:/=\%
