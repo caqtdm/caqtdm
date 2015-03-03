@@ -824,10 +824,10 @@ void EpicsDisconnect(knobData *kData)
                     info->evAdded = false;
                     status = ca_clear_event(info->evID);
                     if (status != ECA_NORMAL) {
-                        PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+                        printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]);
                     }
                 }
-                if(info->connected) {
+
                     status = ca_clear_channel(info->ch);
                     info->connected = false;
                     info->event = 0;
@@ -837,7 +837,6 @@ void EpicsDisconnect(knobData *kData)
                     }
                     kData->edata.connected = false;
                     kData->edata.unconnectCount = 0;
-                }
             }
         }
     }
