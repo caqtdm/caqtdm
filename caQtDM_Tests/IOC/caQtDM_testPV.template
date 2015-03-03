@@ -1,0 +1,390 @@
+# display pv's
+#######################################################################################
+record(ao,"$(LBL):TEST-AO") {
+	field(VAL,	"5.0")
+	field(DESC,	"test ao")
+	field(SCAN,	"Passive")
+	field(PINI,	"YES")
+	field(PHAS,	"0")
+	field(EVNT,	"0")
+	field(DTYP,	"Soft Channel")
+	field(DISV,	"1")
+	field(SDIS,	"0")
+	field(DISS,	"NO_ALARM")
+	field(PRIO,	"LOW")
+	field(FLNK,	"0")
+	field(PREC,	"4")
+	field(LINR,	"NO CONVERSION")
+	field(EGUF,	"0")								
+	field(EGUL,	"0")
+	field(EGU,	"Volt")
+	field(HOPR,	"10")
+	field(LOPR,	"0")
+	field(HIHI,	"9")
+	field(LOLO,	"1")
+	field(HIGH,	"7")
+	field(LOW,	"3")
+	field(HHSV,	"MAJOR")
+	field(LLSV,	"MAJOR")
+	field(HSV,	"MINOR")
+	field(LSV,	"MINOR")
+	field(HYST,	"0")
+	field(ADEL,	"0")
+	field(MDEL,	"0")
+	field(SIOL,	"0")
+	field(SIML,	"0")
+	field(SIMS,	"NO_ALARM")
+}
+
+record(longout,"$(LBL):TEST-LO") {
+   	field(DESC,	"test long output")
+    	field(SCAN,	"Passive")
+    	field(PINI,	"YES")
+    	field(PHAS,	"0")
+    	field(EVNT,	"0")
+    	field(DTYP,	"Soft Channel")
+    	field(DISV,	"1")
+    	field(SDIS,	"0")
+    	field(DISS,	"NO_ALARM")
+    	field(PRIO,	"LOW")
+    	field(FLNK,	"0.000000000000000e+00")
+    	field(OUT, 	"0.000000000000000e+00")
+    	field(DOL, 	"0.000000000000000e+00")
+    	field(OMSL,	"supervisory")
+    	field(EGU, 	"mm")
+    	field(HOPR,	"0")
+    	field(LOPR,	"0")
+    	field(HIHI,	"0")
+    	field(LOLO,	"0")
+    	field(HIGH,	"0")
+    	field(LOW,	"0")
+    	field(HHSV,	"NO_ALARM")
+    	field(LLSV,	"NO_ALARM")
+    	field(HSV, 	"NO_ALARM")
+    	field(LSV, 	"NO_ALARM")
+    	field(HYST,	"0")
+    	field(ADEL,	"0")
+    	field(MDEL,	"0")
+    	field(SIOL,	"0")
+    	field(SIML,	"0")
+    	field(SIMS,	"NO_ALARM")
+   	field(IVOA,	"Continue normally")
+    	field(IVOV,	"0")
+}
+
+# test pv's
+#######################################################################################
+
+# to disable when motors or tasks busy or not DONE
+record (bo, "$(LBL):TEST-TMP")
+{
+    field (DESC, "Measurement Ready")
+    field (ZNAM, "-")
+    field (ONAM, "ready")
+    field (DISS, "INVALID")
+}
+
+#######################################################################################################################################
+#
+# Alarm Tests
+#
+#######################################################################################################################################
+
+# start Alarm Test 0
+record (seq, "$(LBL):ALARM_T0")
+{
+    field (DOL1, "0")
+    field (LNK1, "$(LBL):TEST-LT-MODE PP")      # MODE 0
+    field (DOL2, "5.0")
+    field (LNK2, "$(LBL):TEST-AO PP") 		# VAL = 5.0 = INI Value
+    field (DOL3, "1")                     
+    field (LNK3, "$(LBL):TEST-LT-DONE PP")      # set Test 1 done
+    field (DOL4, "0")
+    field (LNK4, "$(LBL):#VALUE.DISA PP") 	# DISA = 0 = Disable calc...
+    field (DISA, "1")  
+    field (DISV, "0") 
+} 
+
+# start Limits Test 1
+record (seq, "$(LBL):ALARM_T1")
+{
+    field (DESC, "start Test 1")
+    field (DOL1, "1")
+    field (LNK1, "$(LBL):TEST-LT-MODE PP")      # MODE 1
+    field (DLY2, "0.5")
+    field (DOL2, "5.5")
+    field (LNK2, "$(LBL):TEST-AO PP") 		# VAL = 5.5
+    field (DLY3, "0.5")
+    field (DOL3, "7.5")
+    field (LNK3, "$(LBL):TEST-AO PP") 		# VAL = 7.5
+    field (DLY4, "0.5")
+    field (DOL4, "9.5")
+    field (LNK4, "$(LBL):TEST-AO PP") 		# VAL = 9.5
+    field (DOL5, "1")                     
+    field (LNK5, "$(LBL):TEST-LT-DONE PP")      # set Test 1 done
+    field (DISA, "1")  
+    field (DISV, "0") 
+}
+
+# time variable for test sequence delay 
+record(ao,"$(LBL):#SEQ-DLY") {
+ 	field(VAL,	"0.5")
+	field(PINI,	"YES")
+	field(PREC,	"2")
+	field(HOPR,	"10")
+	field(LOPR,	"0")
+}
+
+
+# start Limits Test 2
+record (seq, "$(LBL):ALARM_T2")
+{
+    field (DESC, "start Test 2")
+    field (DOL1, "1")
+    field (LNK1, "$(LBL):TEST-LT-MODE PP")      # MODE 1
+    field (DLY2, "0.5")
+    field (DOL2, "5.5")
+    field (LNK2, "$(LBL):TEST-AO PP") 		# VAL = 5.5
+    field (DLY3, "0.5")
+    field (DOL3, "0.99")
+    field (LNK3, "$(LBL):TEST-AO PP") 		# VAL = 0.99
+    field (DLY4, "0.5")
+    field (DOL4, "1.01")
+    field (LNK4, "$(LBL):TEST-AO PP") 		# VAL = 1.01
+    field (DLY5, "0.5")
+    field (DOL5, "2.99")
+    field (LNK5, "$(LBL):TEST-AO PP") 		# VAL = 2.99
+    field (DLY6, "0.5")
+    field (DOL6, "3.01")
+    field (LNK6, "$(LBL):TEST-AO PP") 		# VAL = 3.01
+    field (DLY7, "0.5")
+    field (DOL7, "6.99")
+    field (LNK7, "$(LBL):TEST-AO PP") 		# VAL = 6.99
+    field (DLY8, "0.5")
+    field (DOL8, "7.01")
+    field (LNK8, "$(LBL):TEST-AO PP") 		# VAL = 7.01
+    field (DLY9, "0.5")
+    field (DOL9, "8.99")
+    field (LNK9, "$(LBL):TEST-AO PP") 		# VAL = 8.99
+    field (DLYA, "0.5")
+    field (DOLA, "9.01")
+    field (LNKA, "$(LBL):TEST-AO PP") 		# VAL = 9.01
+    field (DISA, "1")  
+    field (DISV, "0") 
+}
+
+# start Limits Test 3
+record (seq, "$(LBL):ALARM_T3")
+{
+    field (DESC, "start Test 3")
+    field (DOL1, "2")
+    field (LNK1, "$(LBL):TEST-LT-MODE PP")      # MODE 2
+    field (DOL2, "0")
+    field (LNK2, "$(LBL):#VALUE PP") 		# VAL = 0
+    field (DOL3, "1")
+    field (LNK3, "$(LBL):#VALUE.DISA PP") 	# DISA = 1 = Enable calc...
+    field (DISA, "1")  
+    field (DISV, "0") 
+}
+record(ao,"$(LBL):#INCVAL") {
+	field(VAL,	"0.1")
+	field(DESC,	"inc value")
+	field(SCAN,	"Passive")
+	field(PINI,	"YES")
+}
+record (calcout, "$(LBL):#VALUE") 
+{
+    field (DESC, "value for ai test")
+    field (SCAN, ".1 second")
+    field (INPA, "$(LBL):#VALUE")		# value
+    field (INPB, "$(LBL):#INCVAL")
+    field (INPC, "$(LBL):TEST-AO.HOPR")		# max of values
+    field (CALC, "A>=C?A=0:A+B")			# when value >= max then value = 0 else value = value + incval
+    field (OUT,  "$(LBL):TEST-AO PP")
+    field (DISA, "0")  
+    field (DISV, "0") 
+}
+
+
+# Alarm strings equivalents
+#
+#    "NO_ALARM"		0
+#    "MINOR"		1
+#    "MAJOR"		2
+#    "INVALID"		3
+
+
+#######################################################################################################################################
+#
+# Limit Tests
+#
+#######################################################################################################################################
+# ao Limit 1 Test
+record(ao,"$(LBL):LIMIT1-AO") {
+	field(VAL,	"7.70")
+	field(DESC,	"test ao")
+	field(SCAN,	"Passive")
+	field(PINI,	"YES")
+	field(DISV,	"1")
+	field(SDIS,	"0")
+	field(PREC,	"4")
+	field(HOPR,	"10")
+	field(LOPR,	"0")
+}
+record(ao,"$(LBL):LIMIT2-AO") {
+	field(VAL,	"33")
+	field(DESC,	"test ao")
+	field(SCAN,	"Passive")
+	field(PINI,	"YES")
+	field(DISV,	"1")
+	field(SDIS,	"0")
+	field(PREC,	"3")
+	field(HOPR,	"100")
+	field(LOPR,	"0")
+}
+record(ao,"$(LBL):LIMIT3-AO") {
+	field(VAL,	"-222.22")
+	field(DESC,	"test ao")
+	field(SCAN,	"Passive")
+	field(PINI,	"YES")
+	field(DISV,	"1")
+	field(SDIS,	"0")
+	field(PREC,	"2")
+	field(HOPR,	"1000.0")
+	field(LOPR,	"-1000.0")
+}
+
+
+# start Limits Test 0
+record (seq, "$(LBL):LIMIT_T0")
+{
+    field (DESC, "reset limits")
+    field (DOL1, "5.0")
+    field (LNK1, "$(LBL):TEST-AO PP") 		# VAL = 5.0 = INI Value
+    field (DOL2, "10.0")
+    field (LNK2, "$(LBL):TEST-AO.HOPR PP") 	# HOPR = 10.0
+    field (DOL3, "0.0")
+    field (LNK3, "$(LBL):TEST-AO.LOPR PP") 	# LOPR = 0.0
+    field (DOL4, "0.0")
+    field (LNK4, "$(LBL):TEST-AO.HIHI PP") 	# 
+    field (DOL5, "0.0")
+    field (LNK5, "$(LBL):TEST-AO.LOLO PP") 	# 
+    field (DOL6, "0.0")
+    field (LNK6, "$(LBL):TEST-AO.HIGH PP") 	# 
+    field (DOL7, "0.0")
+    field (LNK7, "$(LBL):TEST-AO.LOW PP") 	#
+    field (DOL8, "NO_ALARM")
+    field (LNK8, "$(LBL):TEST-AO.HHSV PP") 	#
+    field (DOL9, "NO_ALARM")
+    field (LNK9, "$(LBL):TEST-AO.LLSV PP") 	#
+    field (DOLA, "1")
+    field (LNKA, "$(LBL):#LIMIT_T00 PP") 	# Trigger next seq record
+    field (DISA, "1")  
+    field (DISV, "0") 
+} 
+record (seq, "$(LBL):#LIMIT_T00")
+{
+    field (DESC, "reset limits")
+    field (DOL1, "NO_ALARM")
+    field (LNK1, "$(LBL):TEST-AO.HSV PP") 	#
+    field (DOL2, "NO_ALARM")
+    field (LNK2, "$(LBL):TEST-AO.LSV PP") 	#
+    field (DISA, "1")  
+    field (DISV, "0") 
+} 
+
+
+# start Limits Test 1
+record (seq, "$(LBL):LIMIT_T1")
+{
+    field (DESC, "start Test 1")
+    field (DOL1, "500.0")
+    field (LNK1, "$(LBL):TEST-AO PP") 		# VAL = 5.0 = INI Value
+    field (DOL2, "1000.0")
+    field (LNK2, "$(LBL):TEST-AO.HOPR PP") 	# HOPR = 10.0
+    field (DOL3, "0.0")
+    field (LNK3, "$(LBL):TEST-AO.LOPR PP") 	# LOPR = 0.0
+    field (DISA, "1")  
+    field (DISV, "0") 
+}
+
+# start Limits Test 2
+record (seq, "$(LBL):LIMIT_T2")
+{
+    field (DESC, "start Test 2")
+    field (DOL1, "0.0")
+    field (LNK1, "$(LBL):TEST-AO PP") 		# VAL = 5.0 = INI Value
+    field (DOL2, "1000.0")
+    field (LNK2, "$(LBL):TEST-AO.HOPR PP") 	# HOPR = 10.0
+    field (DOL3, "-1000.0")
+    field (LNK3, "$(LBL):TEST-AO.LOPR PP") 	# LOPR = 0.0
+    field (DISA, "1")  
+    field (DISV, "0") 
+}
+
+
+#######################################################################################################################################
+#
+# define all limit test modes
+# 0=  
+record (mbbi, "$(LBL):TEST-LT-MODE")
+{
+    field (DESC, "limit modes")
+    field (VAL,  "0")
+    field (PINI, "YES")      # set a default startup mode  DIRECT 
+    field (ZRVL, "0")
+    field (ZRST, "RESET")
+    field (ZRSV, "NO_ALARM")
+    field (ONVL, "1")
+    field (ONST, "HIGH MINOR")
+    field (ONSV, "MAJOR")
+    field (TWVL, "2")
+    field (TWST, "GRID_SCAN")
+    field (TWSV, "MAJOR")
+    field (THVL, "3")
+    field (THST, "HELICAL_SCAN")
+    field (THSV, "MAJOR")
+    field (FRVL, "4")
+    field (FRST, "LOCKED")
+    field (FRSV, "MAJOR")
+}
+
+
+# bit to set when test is done...
+record(mbboDirect, "$(LBL):TEST-LT-DONE")
+{
+    field(DESC,"limits test done")
+    field(NOBT,"16")
+}
+
+
+
+#######################################################################################################################################
+#
+# Visibility Tests
+#
+#######################################################################################################################################
+
+record (calcout, "$(LBL):#VISIBILITY") 
+{
+    field (DESC, "value for ai test")
+    field (SCAN, "1 second")
+    field (INPA, "$(LBL):#VISIBILITY")		# value
+    field (CALC, "A>=6?A=0:A+1")		# when value >= 6 then value = 0 else value = value + 1
+    field (OUT,  "$(LBL):#VISIBILITY PP")
+    field (DISA, "1")  
+    field (DISV, "0") 
+}
+
+
+
+record (calcout, "$(LBL):#V") 
+{
+    field (DESC, "value for ai test")
+    field (SCAN, "1 second")
+    field (INPA, "$(LBL):#V")		# value
+    field (CALC, "A>=6?A=0:A+1")		# when value >= 6 then value = 0 else value = value + 1
+    field (OUT,  "$(LBL):#V PP")
+    field (DISA, "1")  
+    field (DISV, "0") 
+}

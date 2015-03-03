@@ -1,0 +1,48 @@
+#--------------------------------------------------------------------
+#
+# Macros:
+#   LBL    - Labl of PVs
+#   NAME   - Record Name
+#--------------------------------------------------------------------
+
+record(ao,"$(LBL):$(NAME)") {
+# woist	field(VAL,	"0.0")
+	field(DESC,	"demo pv")
+#ai	field(ASG,	"")
+	field(SCAN,	"Passive")
+	field(PINI,	"$(PINI)")
+	field(PHAS,	"0")
+	field(EVNT,	"0")
+#ai	field(TSEL,	"0")
+	field(DTYP,	"Soft Channel")
+	field(DISV,	"1")
+	field(SDIS,	"0")
+	field(DISS,	"NO_ALARM")
+	field(PRIO,	"LOW")
+	field(FLNK,	"0")
+#ai	field(INP,	"0.0")
+	field(PREC,	"$(PREC)")
+	field(LINR,	"$(LINR)")
+	field(EGUF,	"0")								
+	field(EGUL,	"0")
+	field(EGU,	"$(EGU)")
+	field(HOPR,	"$(HOPR)")
+	field(LOPR,	"$(LOPR)")
+#ai	field(AOFF,	"0")
+#ai	field(ASLO,	"1")
+#ai	field(SMOO,	"0") 
+	field(HIHI,	"$(HIHI)")
+	field(LOLO,	"$(LOLO)")
+	field(HIGH,	"$(HIGH)")
+	field(LOW,	"$(LOW)")
+	field(HHSV,	"$(HHSV)")
+	field(LLSV,	"$(LLSV)")
+	field(HSV,	"$(HSV)")
+	field(LSV,	"$(LSV)")
+	field(HYST,	"0")
+	field(ADEL,	"0")
+	field(MDEL,	"0")
+	field(SIOL,	"0")
+	field(SIML,	"0")
+	field(SIMS,	"NO_ALARM")
+}

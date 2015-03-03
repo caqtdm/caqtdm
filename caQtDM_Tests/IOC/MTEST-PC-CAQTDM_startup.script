@@ -1,0 +1,38 @@
+#!/usr/local/epics/base-3.14.12/bin/SL5-x86/softIoc
+
+
+require "SynApps"
+#addScan  0.01 
+
+## 
+dbLoadTemplate("MTEST-PC-CAQTDM_main.subs")
+
+
+################################################################
+#
+# Debug-output level: (initially 0). Increase to get more info 
+# messages printed to the console
+###save_restoreSet_Debug(0)
+#
+# Number of sequenced backup files to write
+###save_restoreSet_NumSeqFiles(1)
+#
+# Specify directory where save/restore files are stored. 
+# set_savefile_path ("as")
+#
+# specify what save files should be restored.  .
+# (pass 0) restore before record initialization
+# (pass 1) restore after record initialization
+# set_pass1_restoreFile "myData.sav" 
+#
+################################################################
+
+#iocInit()
+
+################################################################
+#
+# Start up the autosave task and tell it what to do.
+create_monitor_set("MTEST-PC-CAQTDM_set_myData.req", 60 "")
+#
+################################################################
+

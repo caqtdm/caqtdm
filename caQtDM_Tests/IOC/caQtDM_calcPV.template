@@ -1,0 +1,61 @@
+#--------------------------------------------------------------------
+#
+# Macros:
+#   LBL    - Labl of PVs
+#   NAME   - Record Name
+#--------------------------------------------------------------------
+
+record(calc,"$(LBL):$(NAME)") {
+	field(DESC,	"")
+	field(ASG,	"")
+	field(SCAN,	"1 second")
+	field(PINI,	"NO")
+	field(PHAS,	"0")
+	field(EVNT,	"0")
+	field(TSEL,	"0")
+	field(DISV,	"1")
+	field(SDIS,	"0")
+	field(DISS,	"NO_ALARM")
+	field(PRIO,	"LOW")
+	field(FLNK,	"0")
+	field(CALC,	"$(CALC)")
+	field(INPA,	"$(INPA)")
+	field(INPB,	"0")
+	field(INPC,	"0")
+	field(INPD,	"0")
+	field(INPE,	"0")
+	field(INPF,	"0")
+	field(INPG,	"0")
+	field(INPH,	"0")
+	field(INPI,	"0")
+	field(INPJ,	"0")
+	field(INPK,	"0")
+	field(INPL,	"0")
+	field(EGU,	"$(EGU)")
+	field(PREC,	"$(PREC)")
+	field(HOPR,	"10")
+	field(LOPR,	"0")
+	field(HIHI,	"0")
+	field(LOLO,	"0")
+	field(HIGH,	"0")
+	field(LOW,	"0")
+	field(HHSV,	"NO_ALARM")
+	field(LLSV,	"NO_ALARM")
+	field(HSV,	"NO_ALARM")
+	field(LSV,	"NO_ALARM")
+	field(HYST,	"0")
+	field(ADEL,	"0")
+	field(MDEL,	"0")
+}
+#ai	field(IVOA, "Don't drive outputs")
+
+record(calcout,"$(LBL):COUNT:2") {
+        field(CALC, "A>4?0:B")
+        field(INPA, "$(LBL):COUNT:1")
+        field(INPB, "$(LBL):COUNT:1")
+        field(OUT,  "$(LBL):COUNT:1")
+        field(PREC, "2")
+        field(SCAN, "1 second")
+}
+
+

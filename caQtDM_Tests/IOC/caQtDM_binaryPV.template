@@ -1,0 +1,35 @@
+#--------------------------------------------------------------------
+#
+# Macros:
+#   LBL    - Labl of PVs
+#   NAME   - Record Name
+#--------------------------------------------------------------------
+
+record(bo,"$(LBL):$(NAME)") {
+    	field(DESC,"binary output record")
+    	field(SCAN,"$(SCAN)")
+    	field(PINI,"$(PINI)")
+    	field(PHAS,"0")
+    	field(EVNT,"0")
+    	field(DTYP,"Soft Channel")
+    	field(DISV,"1")
+    	field(SDIS,"0.000000000000000e+00")
+    	field(DISS,"NO_ALARM")
+    	field(PRIO,"LOW")
+    	field(FLNK,"0.000000")
+#bo	field(OMSL,"supervisory")
+#bo    	field(DOL,"0.000000000000000e+00")
+#bo	field(OUT,"0.000000000000000e+00")
+#bi	field(INP,"0.000000000000000e+00")
+#bo	field(HIGH,"0.000000")
+    	field(ZNAM,"$(ZNAM)")
+	field(ONAM,"$(ONAM)")
+	field(ZSV,"$(ZSV)")
+    	field(OSV,"$(OSV)")
+    	field(COSV,"NO_ALARM")
+    	field(SIOL,"0.000000000000000e+00")
+    	field(SIML,"0.000000000000000e+00")
+    	field(SIMS,"NO_ALARM")
+#bo	field(IVOA,"Continue normally")
+#bo	field(IVOV,"0")
+}

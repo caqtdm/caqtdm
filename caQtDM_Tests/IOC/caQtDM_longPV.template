@@ -1,0 +1,45 @@
+#--------------------------------------------------------------------
+#
+# Macros:
+#   LBL    - Labl of PVs
+#   NAME   - Record Name
+#--------------------------------------------------------------------
+
+record(longout,"$(LBL):$(NAME)") {
+
+   	field(DESC,"long output record")
+    	field(SCAN,"Passive")
+    	field(PINI,"$(PINI)")
+    	field(PHAS,"0")
+    	field(EVNT,"0")
+    	field(DTYP,"Soft Channel")
+    	field(DISV,"1")
+    	field(SDIS,"0")
+    	field(DISS,"NO_ALARM")
+    	field(PRIO,"LOW")
+    	field(FLNK,"0.000000000000000e+00")
+    	field(OUT,"0.000000000000000e+00")
+    	field(DOL,"0.000000000000000e+00")
+    	field(OMSL,"supervisory")
+    	field(EGU,"$(EGU)")
+    	field(HOPR,"$(HOPR)")
+    	field(LOPR,"$(LOPR)")
+    	field(HIHI,"$(HIHI)")
+    	field(LOLO,"$(LOLO)")
+    	field(HIGH,"$(HIGH)")
+    	field(LOW,"$(LOW)")
+    	field(HHSV,"$(HHSV)")
+    	field(LLSV,"$(LLSV)")
+    	field(HSV, "$(HSV)")
+    	field(LSV, "$(LSV)")
+    	field(HYST,"0")
+    	field(ADEL,"0")
+    	field(MDEL,"0")
+    	field(SIOL,"0")
+    	field(SIML,"0")
+    	field(SIMS,"NO_ALARM")
+#lo   	field(IVOA,"Continue normally")
+    	field(IVOV,"0")
+}
+
+

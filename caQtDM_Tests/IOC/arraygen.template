@@ -1,0 +1,85 @@
+record (calcout, "$(NAME):TRIGGERCOUNT")
+{
+   
+   field(SEVR, "NO_ALARM")
+   field(A, "0")
+   field(CALC, "A+1")
+#   field (SCAN, ".01 second")
+   field (SCAN, ".1 second")
+   field(OUT,  "$(NAME):TRIGGERCOUNT.A PP")
+   field(FLNK,  "$(NAME):TRIGGER PP")
+}
+
+record (acalcout, "$(NAME):TRIGGER")
+{
+   field(DTYP,"Soft Channel")
+   field(SEVR, "NO_ALARM")
+   field(INPA, "$(NAME):TRIGGERCOUNT.A")
+   
+   field(INAA, "$(NAME):DATASTORE1")
+   field(INBB, "$(NAME):DATASTORE2")
+   
+   field(CALC, "(A&1=1)?AA*A:BB*A")
+   field(OUT,  "$(NAME):SPECTRUM PP")
+   field(NELM, "$(ARRAY_LENGTH)")
+}
+
+record (calcout, "$(NAME):#RESETWAVE") 
+{
+    field (DESC, "check if wave reach max.")
+#    field (SCAN, "1 second")
+    field (INPA, "$(NAME):TRIGGER CP")		# value
+    field (CALC, "A>10?0")		        # when value > 10 then value = 0 else value = value + 1
+    field (OOPT, "When Zero")
+    field (OUT,  "$(NAME):#TAO PP")
+#    field (OUT,  "$(NAME):TRIGGER.A PP")
+    field (DISA, "1")  
+    field (DISV, "0") 
+}
+record(ao,"$(NAME):#TAO") {
+	field(VAL,	"99.0")
+#	field(PINI,	"YES")
+	field(DISV,	"1")
+	field(SDIS,	"0")
+	field(PREC,	"2")
+}
+
+
+
+
+record (waveform, "$(NAME):DATASTORE1")
+{
+    field (DESC, "Channel 1")
+    field (UDF,  "0")
+    field (SEVR, "NO_ALARM")
+    field (FTVL, "DOUBLE")
+    field (NELM, "$(ARRAY_LENGTH)")
+    field (NORD, "$(ARRAY_LENGTH)")
+    field (PINI, "YES")
+    field(PREC,  "1")
+}
+
+record (waveform, "$(NAME):DATASTORE2")
+{
+    field (DESC, "Channel 1")
+    field (UDF,  "0")
+    field (SEVR, "NO_ALARM")
+    field (FTVL, "DOUBLE")
+    field (NELM, "$(ARRAY_LENGTH)")
+    field (NORD, "$(ARRAY_LENGTH)")
+    field (PINI, "YES")
+    field(PREC,  "2")
+}
+
+record (waveform, "$(NAME):SPECTRUM")
+{
+    field (DESC, "Channel 1")
+    field (UDF,  "0")
+    field (SEVR, "NO_ALARM")
+    field (FTVL, "DOUBLE")
+    field (SCAN, ".1 second")
+    field (NELM, "$(ARRAY_LENGTH_NELM_SPECTRUM)")
+    field (NORD, "$(ARRAY_LENGTH)")
+    field(PREC,  "1")
+}
+
