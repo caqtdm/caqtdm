@@ -179,7 +179,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     title.append(BUILDTIME);
 
     // set for epics longer waveforms
-    QString maxBytes = (QString)  getenv("EPICS_CA_MAX_ARRAY_BYTES");
+    QString maxBytes = (QString)  qgetenv("EPICS_CA_MAX_ARRAY_BYTES");
     if(maxBytes.size() == 0) setenv("EPICS_CA_MAX_ARRAY_BYTES", "150000000", 1);
 
     // for epics initialize a mutex
@@ -342,7 +342,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     setAllEnvironmentVariables(file);
 
     // now check if file exists and download it. (file is specified by the environment variables CAQTDM_LAUNCHFILE and CAQTDM_URL_DISPLAY)
-    QString launchFile = (QString)  getenv("CAQTDM_LAUNCHFILE");
+    QString launchFile = (QString)  qgetenv("CAQTDM_LAUNCHFILE");
     filefunction.checkFileAndDownload(launchFile);
 
     // lauch the display with the file
@@ -571,7 +571,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 void FileOpenWindow::Callback_OpenButton()
 {
     //get a filename to open
-    QString path = (QString)  getenv("CAQTDM_DISPLAY_PATH");
+    QString path = (QString)  qgetenv("CAQTDM_DISPLAY_PATH");
 
     if(path.size() == 0 && lastFilePath.size()==0) path.append(".");
     else path = lastFilePath;

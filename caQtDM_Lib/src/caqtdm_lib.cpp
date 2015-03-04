@@ -3654,7 +3654,7 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
     // in case of network launcher, close the application when launcher window is closed
 #ifdef NETWORKDOWNLOADSUPPORT
     QString thisFileName =  property("fileString").toString().section('/',-1);
-    QString launchFile = (QString)  getenv("CAQTDM_LAUNCHFILE");
+    QString launchFile = (QString)  qgetenv("CAQTDM_LAUNCHFILE");
     if(thisFileName.contains(launchFile)) {
         emit Signal_IosExit();
     }
@@ -3683,11 +3683,17 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     bool validExecListItems = false;
     QStringList execListItems;
     QString className = w->metaObject()->className();
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 
     // execution list for context menu defined ?
-    QString execList = (QString)  getenv("CAQTDM_EXEC_LIST");
+    QString execList = (QString)  qgetenv("CAQTDM_EXEC_LIST");
+
     if(!execList.isNull() && execList.size() > 0) {
-        execListItems= execList.split(":", QString::SkipEmptyParts);
+        #ifdef _MSC_VER
+            execListItems= execList.split(";", QString::SkipEmptyParts);
+        #else
+            execListItems= execList.split(":", QString::SkipEmptyParts);
+        #endif
         for(i=0; i<execListItems.count(); i++) {
             validExecListItems = true;
         }
@@ -3695,10 +3701,15 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
     // perhaps still the older MEDM list is defined
     if(!validExecListItems) {
-        QString execList = (QString)  getenv("MEDM_EXEC_LIST");
+        QString execList = (QString)  qgetenv("MEDM_EXEC_LIST");
+
         if(!execList.isNull() && execList.size() > 0) {
-            execListItems= execList.split(":", QString::SkipEmptyParts);
-            for(i=0; i<execListItems.count(); i++) {
+            #ifdef _MSC_VER
+                execListItems= execList.split(";", QString::SkipEmptyParts);
+            #else
+                execListItems= execList.split(":", QString::SkipEmptyParts);
+            #endif
+             for(i=0; i<execListItems.count(); i++) {
                 validExecListItems = true;
             }
         }

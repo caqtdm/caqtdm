@@ -60,7 +60,7 @@ int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &
        displayPath = url;
     // otherwise use url from environment variable
     } else {
-       displayPath = (QString)  getenv("CAQTDM_URL_DISPLAY_PATH");
+       displayPath = (QString)  qgetenv("CAQTDM_URL_DISPLAY_PATH");
     }
 
     displayPath.append("/");
