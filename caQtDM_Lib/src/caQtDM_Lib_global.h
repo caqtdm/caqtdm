@@ -38,13 +38,16 @@
 
 #else
  #if defined(__MINGW32__)
-
- #else
-
-   #if defined(CAQTDM_LIB_LIBRARY)
-     #define CAQTDM_LIBSHARED_EXPORT Q_DECL_EXPORT
+    #if defined(CAQTDM_LIB_LIBRARY)
+      #define CAQTDM_LIBSHARED_EXPORT Q_DECL_EXPORT
+    #else
+      #define CAQTDM_LIBSHARED_EXPORT Q_DECL_IMPORT
+    #endif
+#else
+  #if defined(CAQTDM_LIB_LIBRARY)
+     #define CAQTDM_LIBSHARED_EXPORT
    #else
-     #define CAQTDM_LIBSHARED_EXPORT Q_DECL_IMPORT
+     #define CAQTDM_LIBSHARED_EXPORT
    #endif
  #endif
 #endif
