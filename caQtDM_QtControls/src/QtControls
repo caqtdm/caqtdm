@@ -33,11 +33,9 @@
 #include <catogglebutton.h>
 #include <cascriptbutton.h>
 #include <cadoubletabwidget.h>
-#ifndef Q_OS_IOS
-  #include <cadoubletabwidgetextension.h>
-  #include <cadoubletabwidgetextensionfactory.h>
-  #include <capolylinetaskmenu.h>
-#endif
+#include <cadoubletabwidgetextension.h>
+#include <cadoubletabwidgetextensionfactory.h>
+#include <capolylinetaskmenu.h>
 #include <cawaterfallplot.h>
 #include <caspinbox.h>
 #include <cawavetable.h>

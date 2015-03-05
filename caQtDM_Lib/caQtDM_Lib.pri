@@ -38,7 +38,13 @@ unix {
 ios {
       INCLUDEPATH += $(EPICSINCLUDE)
       INCLUDEPATH += $(EPICSINCLUDE)/os/iOS
+      SOURCES +=     fingerswipegesture.cpp
+      HEADERS +=     fingerswipegesture.h
+}
 
+android {
+      INCLUDEPATH += $(EPICSINCLUDE)
+      INCLUDEPATH += $(EPICSINCLUDE)/os/android
       SOURCES +=     fingerswipegesture.cpp
       HEADERS +=     fingerswipegesture.h
 }

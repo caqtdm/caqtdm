@@ -112,7 +112,8 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
 
       if (d_isInitialized)
           return;
-#ifndef Q_OS_IOS
+
+#ifndef MOBILE
       // extension for PolyDraw
       if(d_name.contains("caPolyLine")) {
           QExtensionManager *manager = formEditor->extensionManager();
@@ -127,6 +128,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
                                       Q_TYPEID(QDesignerContainerExtension));
       }
 #endif
+
       // set this property in order to find out later if we use our controls through the designer or otherwise
       qApp->setProperty("APP_SOURCE", QVariant(QString("DESIGNER")));
 

@@ -23,7 +23,6 @@
  *    anton.mezger@psi.ch
  */
 
-
 #include "fileFunctions.h"
 #include "networkaccess.h"
 #include "searchfile.h"
@@ -41,10 +40,11 @@ public:
     }
 };
 
+
 fileFunctions::fileFunctions()
 {
 }
-
+#include <unistd.h>
 int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &url)
 {
     QString displayPath;
@@ -71,15 +71,23 @@ int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &
     displayGet->requestUrl(displayUrl);
 
     //wait until download was done (up to 3 seconds)
+    int looped = 0;
     for(int i=0; i<10; i++) {
         qApp->processEvents();
+#ifndef MOBILE_ANDROID
         Sleep::msleep(300);
+#else // not nice, but the above does not work on android now (does not wait)
+        usleep(500000);
+#endif
         qApp->processEvents();
         if(displayGet->downloadFinished()) {
+            qDebug() << "download finished succesfully\n";
             break;
         }
+        looped++;
     }
     if(!displayGet->downloadFinished()) {
+        qDebug() << "download not finished\n";
         return false;
     }
     displayGet->deleteLater();

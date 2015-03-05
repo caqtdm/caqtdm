@@ -1,18 +1,18 @@
 include(../../caQtDM_Viewer/qtdefs.pri)
 
-
 contains(QT_VER_MAJ, 4) {
-   CONFIG += designer plugin qt thread warn_on
+      CONFIG += plugin qt thread warn_on
+      CONFIG += designer
 }
-
 contains(QT_VER_MAJ, 5) {
-   CONFIG += plugin qt thread warn_on
-   QT += designer widgets uitools
+      CONFIG += plugin qt thread warn_on
+      QT += widgets uitools
+      QT += designer
 }
 
 TEMPLATE = lib
 
-ios {
+ios | android {
   CONFIG += static
   LIBS += $$(QWTHOME)/lib/qwt.a
   LIBS += ../$(CAQTDM_COLLECT)/libqtcontrols.a

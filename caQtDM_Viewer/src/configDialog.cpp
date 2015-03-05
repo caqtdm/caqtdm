@@ -24,25 +24,10 @@
  */
 
 #include "configDialog.h"
-#include "qstandardpaths.h"
-
-//#include <QMacStyle>
-
-void configDialog::setNewStyleSheet(QWidget* w, QSize size, QString myStyle, int pointSizeCorrection)
-{
-    int pointSize;
-    if(size.height() > 500) pointSize = 22;
-    else pointSize = 15;
-
-    pointSize = pointSize + pointSizeCorrection;
-
-    QString style = "font: %1pt; %2";
-    style = style.arg(pointSize).arg(myStyle);
-    w->setStyleSheet(style);
-}
 
 configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, const QList<QString> &files, QWidget *parent): QWidget(parent)
 {
+    Specials specials;
     int thisWidth = 600;  // normal for ipad
     int thisHeight = 370;
 
@@ -53,15 +38,26 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     QSize size = QSize(0,20);
 
     if(qApp->desktop()->size().height() < 500) {
+#ifndef MOBILE_ANDROID
         thisWidth=430;  // normal for iphone
         thisHeight=275;
+#else
+        thisWidth=800;
+        thisHeight=600;
+#endif
     }
 
     setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, qApp->desktop()->size() - size , qApp->desktop()->availableGeometry()));
 
-    //qDebug() << "size=" << qApp->desktop()->size();
+    // I do not know why this is necessary, but move to center of screen
+#ifdef MOBILE_ANDROID
+    const QRect screen = QApplication::desktop()->screenGeometry();
+    move( screen.center() - this->rect().center() );
+#endif
+
+    //qDebug() << "size=" << qApp->desktop()->size() << qApp->desktop()->devicePixelRatio();
     //qDebug() << "geometry=" << qApp->desktop()->geometry();
-    //qDebug() << "dpi=" << qApp->desktop()->logicalDpiX();
+    //qDebug() << "logicaldpi=" << qApp->desktop()->logicalDpiX();
 
     QPixmap bg(":/caQtDM-BGL-2048.png");
 
@@ -70,8 +66,10 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     palette.setBrush(QPalette::Background, bg);
     setPalette(palette);
 
-    QFrame *frame = new QFrame();
+    ClearConfigButtonClicked = false;
+    QGridLayout *mainLayout = new QGridLayout();
 
+    QFrame *frame = new QFrame();
     QRect rect((qApp->desktop()->size().width()-thisWidth)/2,
                (qApp->desktop()->size().height()-thisHeight)/2, thisWidth, thisHeight);
 
@@ -80,10 +78,8 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     frame->setFixedSize(thisWidth+30, thisHeight);
     frame->setMaximumSize(rect.width()+30, rect.height());
 
-    setNewStyleSheet(frame, qApp->desktop()->size(), "border:0px solid gray; border-radius: 15px; background: rgba(255,255,255,0.7);");
+    specials.setNewStyleSheet(frame, qApp->desktop()->size(), 22, 15, "border:0px solid gray; border-radius: 15px; background: rgba(255,255,255,0.7);");
 
-    ClearConfigButtonClicked = false;
-    QGridLayout *mainLayout = new QGridLayout();
     mainLayout->addWidget(frame);
 
     QVBoxLayout *frameLayout = new QVBoxLayout();
@@ -91,7 +87,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     frameLayout->setContentsMargins(5,5,5,0);
 
     QLabel *title = new QLabel("Start settings");
-    setNewStyleSheet(title, qApp->desktop()->size(), "", 4);
+    specials.setNewStyleSheet(title, qApp->desktop()->size(), 22, 15, "", 4);
     title->setFixedWidth(thisWidth-20);
     title->setStyleSheet("QLabel {background-color : #aaffff; color : black; }");
     title->setAlignment(Qt::AlignCenter);
@@ -102,7 +98,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     clearLayout->setContentsMargins(3, 3, 3, 3);
 
     QGroupBox* clearBox = new QGroupBox("Local ui/prc files");
-    setNewStyleSheet(clearBox, qApp->desktop()->size());
+    specials.setNewStyleSheet(clearBox, qApp->desktop()->size(), 22, 15, "");
 
     QString str= QString::number((int) NumberOfFiles());
     QLabel *label = new QLabel("Number:");
@@ -115,9 +111,18 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     clearLayout->addWidget(clearConfigButton, 0, 2);
     connect(clearConfigButton, SIGNAL(clicked()), this, SLOT(clearConfigClicked()) );
 
+#ifdef MOBILE_ANDROID
+    int height = clearConfigButton->fontMetrics().boundingRect(clearConfigButton->text()).height() * 2;
+    clearConfigButton->setFixedHeight(height);
+#endif
+
     QPushButton* clearUiButton = new QPushButton("Clear ui files");
     clearLayout->addWidget(clearUiButton, 0, 3);
     connect(clearUiButton, SIGNAL(clicked()), this, SLOT(clearUiClicked()) );
+
+#ifdef MOBILE_ANDROID
+    clearUiButton->setFixedHeight(height);
+#endif
 
     QLabel *debugLabel = new QLabel(" Messages:");
     clearLayout->addWidget(debugLabel, 0, 4);
@@ -137,7 +142,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     urlLayout->setContentsMargins(3, 3, 3, 3);
 
     QGroupBox* urlBox = new QGroupBox("Choose your url where your config file is located");
-    setNewStyleSheet(urlBox, qApp->desktop()->size());
+    specials.setNewStyleSheet(urlBox, qApp->desktop()->size(), 22, 15);
 
     urlComboBox = new QComboBox();
     urlComboBox->setEditable(true);
@@ -149,6 +154,10 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
             else urlComboBox->addItem(urls.at(i));
     }
     urlComboBox->setCurrentIndex(0);
+#ifdef MOBILE_ANDROID
+    height = urlComboBox->fontMetrics().boundingRect(urlComboBox->currentText()).height() * 2.5;
+    urlComboBox->setFixedHeight(height);
+#endif
 
     urlLayout->addWidget(urlComboBox, 0, 0);
     urlBox->setLayout(urlLayout);
@@ -159,7 +168,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     fileLayout->setContentsMargins(3, 3, 3, 3);
 
     QGroupBox* fileBox = new QGroupBox("Choose your config file at the above url");
-    setNewStyleSheet(fileBox, qApp->desktop()->size());
+    specials.setNewStyleSheet(fileBox, qApp->desktop()->size(), 22, 15, "");
 
     fileComboBox = new QComboBox();
     fileComboBox->setEditable(true);
@@ -172,14 +181,23 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
         else fileComboBox->addItem(files.at(i));
     }
     fileComboBox->setCurrentIndex(0);
+#ifdef MOBILE_ANDROID
+    height = fileComboBox->fontMetrics().boundingRect(fileComboBox->currentText()).height() * 2.5;
+    fileComboBox->setFixedHeight(height);
+#endif
 
     fileLayout->addWidget(fileComboBox, 0, 0);
     fileBox->setLayout(fileLayout);
     frameLayout->addWidget(fileBox);
 
     QPushButton *startButton = new QPushButton(QIcon(":/caQtDM.ico"), "Start");
-    setNewStyleSheet(startButton, qApp->desktop()->size(), "", 2);
+    specials.setNewStyleSheet(startButton, qApp->desktop()->size(), 22, 15, "", 2);
     connect(startButton, SIGNAL(clicked()), this, SLOT(startClicked()) );
+
+#ifdef MOBILE_ANDROID
+    height = startButton->fontMetrics().boundingRect(startButton->text()).height() * 2;
+    startButton->setFixedHeight(height);
+#endif
 
     frameLayout->addWidget(startButton);
     QString message = QString("Qt-based Epics Display Manager Version %1 (%2)  ");
@@ -187,7 +205,8 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
     QLabel *version = new QLabel(message);
     version->setAlignment(Qt::AlignRight);
-    setNewStyleSheet(version, qApp->desktop()->size(), "", -4);
+    specials.setNewStyleSheet(version, qApp->desktop()->size(), 22, 15, "background-color: transparent;", -4);
+
     frameLayout->addWidget(version);
 
     setLayout(mainLayout);
@@ -212,7 +231,10 @@ void configDialog::getChoice(QString &url, QString &file, QList<QString> &urls, 
 
 void configDialog::clearUiClicked()
 {
-    QString path = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    // get path for downloaded documents
+    Specials specials;
+    QString path = specials.stdpathdoc;
+
     path.append("/");
     QDir dir(path);
     dir.setNameFilters(QStringList() << "*.ui" << "*.prc");
@@ -225,7 +247,10 @@ void configDialog::clearUiClicked()
 
 void configDialog::clearConfigClicked()
 {
-    QString path = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    // get path for downloaded documents
+    Specials specials;
+    QString path = specials.stdpathdoc;
+
     path.append("/");
     QDir dir(path);
     dir.setNameFilters(QStringList() << "*.config" << "*.xml");
@@ -248,7 +273,10 @@ bool configDialog::isClearConfig()
 int configDialog::NumberOfFiles()
 {
     int count = 0;
-    QString path = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    // get path for downloaded documents
+    Specials specials;
+    QString path = specials.stdpathdoc;
+
     path.append("/");
     QDir dir(path);
     dir.setNameFilters(QStringList() << "*.ui" << "*.prc");

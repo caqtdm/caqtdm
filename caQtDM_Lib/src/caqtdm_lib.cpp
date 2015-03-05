@@ -155,6 +155,8 @@
 
 //===============================================================================================
 
+#define MIN_FONT_SIZE 3
+
 Q_DECLARE_METATYPE(QList<int>)
 Q_DECLARE_METATYPE(QTabWidget*)
 
@@ -318,7 +320,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         centralWidget->layout()->setContentsMargins(0,0,0,0);
         setCentralWidget(centralWidget);
 
-#ifdef Q_OS_IOS
+#ifdef MOBILE
          // info can be called with tapandhold
          connect(this, SIGNAL(Signal_NextWindow()), parent, SLOT(nextWindow()));
          installEventFilter(this);
@@ -1662,7 +1664,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         connect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
         w1->setProperty("Connect", false);
         // in order to get the context on tablets
-#ifdef Q_OS_IOS
+#ifdef MOBILE
         w1->grabGesture(Qt::TapAndHoldGesture);
         w1->installEventFilter(this);
 #endif
@@ -4996,6 +4998,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         caTable *table = (caTable *) widget;
         QFont f = table->font();
         qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
+        if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         f.setPointSizeF(fontSize);
         table->setUpdatesEnabled(false);
         for(int i = 0; i < table->rowCount(); ++i) {
@@ -5012,6 +5015,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         caWaveTable *table = (caWaveTable *) widget;
         QFont f = table->font();
         qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
+        if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         f.setPointSizeF(fontSize);
         table->setUpdatesEnabled(false);
         for(int i = 0; i < table->rowCount(); ++i) {
@@ -5029,6 +5033,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         className = label->parent()->metaObject()->className();
         if(!className.contains("Numeric") ) {  // would otherwise interfere with our wheelswitch
             qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
+            if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
             QFont f = label->font();
             f.setPointSizeF(fontSize);
             label->setFont(f);
@@ -5038,6 +5043,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
     else if(!className.compare("caMenu")) {
         caMenu *label = (caMenu *) widget;
         qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
+        if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         QFont f = label->font();
         f.setPointSizeF(fontSize);
         label->setFont(f);
@@ -5048,6 +5054,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
 
         // change font of axis ticks
         qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
+        if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         QFont f = plot->axisFont(QwtPlot::xBottom);
         f.setPointSizeF(fontSize);
         plot->setAxisFont(QwtPlot::xBottom, f);
@@ -5059,6 +5066,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         QwtText titleX = plot->axisTitle(QwtPlot::xBottom).text();
         QwtText titleY = plot->axisTitle(QwtPlot::yLeft).text();
         fontSize = qMin(factX, factY) * (double) list.at(6).toInt();
+        if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         f.setPointSizeF(fontSize);
         title.setFont(f);
         titleX.setFont(f);
@@ -5071,6 +5079,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         if(!className.compare("caStripPlot")) {
             caStripPlot * plot = (caStripPlot *) widget;
             fontSize = qMin(factX, factY) * (double) list.at(7).toInt();
+            if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
             f.setPointSizeF(fontSize);
             if(plot->getLegendEnabled()) {
                 plot->setLegendAttribute(plot->getScaleColor(), f, caStripPlot::FONT);
@@ -5092,15 +5101,34 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         if(qMin(factX, factY) < 1.0) {
             QGroupBox *box = (QGroupBox *) widget;
             qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
+            if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
             QFont f;
             f.setPointSizeF(fontSize);
             box->setFont(f);
         }
     }
+
+    // this does not really work yet, to be studied when I have time
+    else if(!className.compare("QTabWidget")) {
+            QTabWidget *box = (QTabWidget *) widget;
+            qreal fontSize = (qMin(factX, factY) * (double) list.at(4).toInt());
+            if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
+
+            QString thisStyle = "QTabBar::tab {font: %1pt; min-width: %2px; height: %3px; margin: 0px};";
+            double width = (double) list.at(6).toInt() * factX;
+            width=10;
+            double height = (double) list.at(5).toInt() * factY /1.5;
+            if(width < 15) width = 15;
+            if(height < 5) height = 5;
+            thisStyle = thisStyle.arg((int)(fontSize+0.5)).arg((int) (width+0.5)).arg((int)(height+0.5));
+            //qDebug() << thisStyle << list.at(6).toInt() << list.at(5).toInt() << factX << factY;
+            //box->tabBar()->setStyleSheet(thisStyle);
+            //box->tabBar()->setElideMode(Qt::ElideRight);
+    }
 }
 
 // treat gesture events (we use tapandhold and fingerswipe, custom gesture)
-#ifdef Q_OS_IOS
+#ifdef MOBILE
 bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::Gesture) {
@@ -5210,6 +5238,12 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 integerList.insert(8, plot->axisScaleDraw(QwtPlot::xBottom)->tickLength(QwtScaleDiv::MajorTick));
                 integerList.insert(9, plot->axisScaleDraw(QwtPlot::xBottom)->tickLength(QwtScaleDiv::MediumTick));
                 integerList.insert(10, plot->axisScaleDraw(QwtPlot::xBottom)->tickLength(QwtScaleDiv::MinorTick));
+
+            } else if(!className.compare("QTabWidget")) {
+                QTabWidget *tabW = (QTabWidget *) widget;
+                integerList.insert(4, widget->font().pointSize());
+                integerList.insert(5, tabW->tabBar()->height());
+                integerList.insert(6, tabW->tabBar()->width());
 
             } else {
                 integerList.insert(4, widget->font().pointSize());

@@ -61,46 +61,41 @@ QString limitsDialog::getFormatFromPrecision(int prec)
     return format;
 }
 
-void limitsDialog::setNewStyleSheet(QWidget* w, QSize size, QString myStyle, int pointSizeCorrection)
-{
-    int pointSize;
-    if(size.height() > 500) pointSize = 16;
-    else pointSize = 10;
-
-    pointSize = pointSize + pointSizeCorrection;
-
-    QString style = "font: %1pt; %2";
-    style = style.arg(pointSize).arg(myStyle);
-    w->setStyleSheet(style);
-}
-
 limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title, QWidget *parent) : QWidget(parent)
 {
     int thisWidth = 650;
     int thisHeight = 250;
+    bool showMax = false;
 
     thisWidget = w;
     thisParent = parent;
 
     monData = data;
 
+    Qt::WindowFlags flags = Qt::Dialog;
+    setWindowFlags(flags);
     QGridLayout *Layout = new QGridLayout;
     setWindowModality (Qt::WindowModal);
 
-#ifdef Q_OS_IOS
+#if defined(MOBILE_IOS)
     if(qApp->desktop()->size().height() < 500) {
         thisWidth=430;  // normal for iphone
         thisHeight=200;
     }
-    setNewStyleSheet(this, qApp->desktop()->size());
+    Specials special;
+    special.setNewStyleSheet(this, qApp->desktop()->size(), 16, 10);
     QPalette palette;
     palette.setBrush(QPalette::Background, QColor(255,255,224,255));
     setPalette(palette);
     setAutoFillBackground(true);
     setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(thisWidth,thisHeight), qApp->desktop()->availableGeometry()));
+#elif defined(MOBILE_ANDROID)
+    QPalette palette;
+    palette.setBrush(QPalette::Background, QColor(255,255,224,255));
+    setPalette(palette);
+    setAutoFillBackground(true);
+    showMax = true;
 #else
-    Qt::WindowFlags flags = Qt::Dialog;
-    setWindowFlags(flags);
     move(parent->x() + parent->width() / 2 - thisWidth / 2 , parent->y() + parent->height() /2 -thisHeight/2);
 #endif
 
@@ -347,7 +342,8 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
 
     setWindowTitle(title);
 
-    showNormal();
+    if(!showMax) showNormal();
+    else showMaximized();
 }
 
 void limitsDialog::indexChanged(int) {

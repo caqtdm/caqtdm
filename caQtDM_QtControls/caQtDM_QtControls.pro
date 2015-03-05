@@ -4,20 +4,17 @@ DEFINES += QT_NO_DEBUG_OUTPUT
 
 contains(QT_VER_MAJ, 4) {
       CONFIG += qwt plugin thread uitools
-!ios {
       CONFIG += designer
-     }
 }
 contains(QT_VER_MAJ, 5) {
       QT += widgets concurrent uitools
-!ios {
       QT += designer
-     }
-  CONFIG  += qwt plugin
-  DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
+      CONFIG  += qwt plugin
+      DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 }
 
-CONFIG += warn_on
+CONFIG += warn_on debug
+CONFIG += console
 
 TARGET = qtcontrols
 TEMPLATE = lib
@@ -27,28 +24,26 @@ MOC_DIR = moc
 INCLUDEPATH += src
 RESOURCES = qtcontrols.qrc
 
-ios {
+ios | android {
    CONFIG += staticlib
-
    INCLUDEPATH += $(QWTINCLUDE)
-
 }
 
 !ios {
+!android {
   unix {
     INCLUDEPATH += $(QWTINCLUDE)
   }
 
   unix:!macx {
-
     LIBS += -L$(QWTLIB) -Wl,-rpath,$(QWTLIB) -lqwt
   }
 
   macx: {
     CONFIG += lib_bundle
-
     LIBS += -F$(QWTLIB) -framework qwt
   }
+}
 }
 
 win32 {
@@ -137,16 +132,11 @@ SOURCES	+= \
     src/snumeric.cpp \
     src/caspinbox.cpp \
     src/qwtplotcurvenan.cpp \
-    src/cawavetable.cpp
-
-!ios {
-SOURCES += src/capolylinetaskmenu.cpp
-SOURCES += src/capolylinedialog.cpp
-SOURCES += src/cadoubletabwidgetextensionfactory.cpp
-HEADERS += src/capolylinetaskmenu.h
-HEADERS += src/capolylinedialog.h
-HEADERS += src/cadoubletabwidgetextensionfactory.h
-}
+    src/cawavetable.cpp \
+    src/capolylinetaskmenu.cpp \
+    src/capolylinedialog.cpp \
+    src/cadoubletabwidgetextensionfactory.cpp \
+    src/specialFunctions.cpp
 
 NETWORKDOWNLOADSUPPORT: {
 QT += network
@@ -164,7 +154,7 @@ contains(QT_VER_MAJ, 4) {
     warning("Qt $$[QT_VERSION] was detected, so compile qwt_thermo_marker")
     SOURCES	+= src/qwt_thermo_marker.cpp
 }
-#assume qwt6.0 was made with qt5
+#assume qwt6.1 was made with qt5
 contains(QT_VER_MAJ, 5) {
     warning("Qt $$[QT_VERSION] was detected, so compile qwt_thermo_marker_61")
     SOURCES	+= src/qwt_thermo_marker_61.cpp
@@ -228,14 +218,18 @@ HEADERS	+= \
     src/snumeric.h \
     src/caspinbox.h \
     src/qwtplotcurvenan.h \
-    src/cawavetable.h
+    src/cawavetable.h \
+    src/capolylinetaskmenu.h \
+    src/capolylinedialog.h \
+    src/cadoubletabwidgetextensionfactory.h \
+    src/specialFunctions.h
 
 # assume qwt6.0 was made with qt4
 contains(QT_VER_MAJ, 4) {
     warning("Qt $$[QT_VERSION] was detected, so compile qwt_thermo_marker")
     HEADERS	+= src/qwt_thermo_marker.h
 }
-#assume qwt6.0 was made with qt5
+#assume qwt6.1 was made with qt5
 contains(QT_VER_MAJ, 5) {
     warning("Qt $$[QT_VERSION] was detected, so compile qwt_thermo_marker_61")
     HEADERS	+= src/qwt_thermo_marker_61.h

@@ -34,6 +34,8 @@
 
 #include <QtDebug>
 
+#define MIN_FONT_SIZE 3
+
 caAbstractGauge::caAbstractGauge(QWidget *parent) : EAbstractGauge(parent)
 {
 
@@ -661,7 +663,9 @@ void caCircularGauge::drawValue(QPainter *p)
     {
         if ((p->fontMetrics().width(s) > (w-2)))
         {
-            f.setPointSizeF(f.pointSizeF()-.5);
+            qreal fontSize = f.pointSizeF()-.5;
+            if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
+            f.setPointSizeF(fontSize);
             p->setFont(f);
         }
         else

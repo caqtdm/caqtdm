@@ -11,9 +11,17 @@ unix {
 }
 
 # enable specialized version, wehere files will be downloaded to a local directory (used specially for IOS)
-ios{
+ios | android {
  CONFIG += NETWORKDOWNLOADSUPPORT
+ DEFINES += MOBILE
 }
+ios {
+  DEFINES += MOBILE_IOS
+}
+android {
+  DEFINES += MOBILE_ANDROID
+}
+
 NETWORKDOWNLOADSUPPORT {
 DEFINES += NETWORKDOWNLOADSUPPORT
 }

@@ -42,8 +42,13 @@
 	#include <cstdlib>
 #endif
 
+#if (defined(__ANDROID__) && defined(__GNUC__))
+    static inline bool isnanNew(double x) { return x != x; }
+    static inline bool isinf(double x) { return !isnanNew(x) && isnanNew(x - x); }
+#endif
+
 // Mac compile fixes - from quaker66, Lion fix by dabrahams
-#if defined(__APPLE__) && __DARWIN_C_LEVEL < 200809L || (defined(WIN32) && defined(__GNUC__))
+#if defined(__APPLE__) && __DARWIN_C_LEVEL < 200809L || (defined(WIN32) && defined(__GNUC__)) || (defined(__ANDROID__) && defined(__GNUC__))
 	#include <wctype.h>
 	#include <wchar.h>
 	

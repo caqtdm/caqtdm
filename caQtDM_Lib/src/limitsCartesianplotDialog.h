@@ -48,6 +48,7 @@
 #include "knobDefines.h"
 #include "knobData.h"
 #include "mutexKnobData.h"
+#include "specialFunctions.h"
 
  class QCheckBox;
  class QDialogButtonBox;
@@ -64,7 +65,6 @@
  public:
 
      limitsCartesianplotDialog(caCartesianPlot *w, MutexKnobData *data, const QString &title, QWidget *parent);
-     void setNewStyleSheet(QWidget* w, QSize size, QString myStyle = "", int pointSizeCorrection = 0);
      void exec();
 
  public slots:

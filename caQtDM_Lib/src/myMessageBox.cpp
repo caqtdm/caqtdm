@@ -25,27 +25,20 @@
 
 #include "myMessageBox.h"
 
-void myMessageBox::setNewStyleSheet(QWidget* w, QSize size, QString myStyle, int pointSizeCorrection)
-{
-    int pointSize;
-    if(size.height() > 500) pointSize = 16;
-    else pointSize = 10;
-
-    pointSize = pointSize + pointSizeCorrection;
-
-    QString style = "font: %1pt; %2";
-    style = style.arg(pointSize).arg(myStyle);
-    w->setStyleSheet(style);
-}
-
 myMessageBox::myMessageBox(QWidget *parent) : QWidget(parent)
 {
-
+    bool showMax = false;
     Qt::WindowFlags flags = Qt::Dialog;
     setWindowFlags(flags);
     setWindowModality (Qt::WindowModal);
 
-#ifdef Q_OS_IOS
+    thisText = new QTextEdit(this);
+    thisText->setReadOnly(true);
+    thisText->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    thisText->setLineWrapMode(QTextEdit::NoWrap);
+
+#if defined(MOBILE_IOS)
+    Specials special;
     QSize size = qApp->desktop()->size();
     if(size.height() < 500) {
         setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(250,250), qApp->desktop()->availableGeometry()));
@@ -54,18 +47,12 @@ myMessageBox::myMessageBox(QWidget *parent) : QWidget(parent)
         setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(350,500), qApp->desktop()->availableGeometry()));
         setMinimumSize(350,500);
     }
+    special.setNewStyleSheet(thisText, qApp->desktop()->size(), 16, 10);
+#elif defined(MOBILE_ANDROID)
+    showMax = true;
 #else
     move(parent->x() + parent->width() / 2 - 175, parent->y()+25);
     setMinimumSize(350,500);
-#endif
-
-    thisText = new QTextEdit(this);
-    thisText->setReadOnly(true);
-    thisText->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    thisText->setLineWrapMode(QTextEdit::NoWrap);
-
-#ifdef Q_OS_IOS
-    setNewStyleSheet(thisText, qApp->desktop()->size());
 #endif
 
     QPushButton *cancelButton = new QPushButton(tr("Close"));
@@ -78,7 +65,8 @@ myMessageBox::myMessageBox(QWidget *parent) : QWidget(parent)
     lt->addWidget(buttonBox);
 
     setLayout(lt);
-    showNormal();
+    if(!showMax) showNormal();
+    else showMaximized();
 }
 
 void myMessageBox::setText(QString strng) const

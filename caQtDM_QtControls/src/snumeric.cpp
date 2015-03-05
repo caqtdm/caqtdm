@@ -39,6 +39,8 @@
 #include <QtDebug>
 #include <QApplication>
 
+#define MIN_FONT_SIZE 3
+
 #if (_MSC_VER == 1600)
 extern int round (double x);
 #endif
@@ -524,6 +526,7 @@ void SNumeric::resizeEvent(QResizeEvent *e)
         double fontSize = 80;
         fontSize = qMin((int) fontSize, size().height()/2+2);
         fontSize = qMin((int) fontSize, size().width() / (digits+1));
+        if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         labelFont.setPointSizeF(fontSize);
         signFont.setPointSizeF(fontSize);
         //printf("digits=%d %s font size=%f\n", digits, l1->text().toAscii().constData(), fontSize);

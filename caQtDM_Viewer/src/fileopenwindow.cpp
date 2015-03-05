@@ -34,9 +34,9 @@
 
 #include "fileopenwindow.h"
 #include "caqtdm_lib.h"
+#include "specialFunctions.h"
 
-#ifdef Q_OS_IOS
-  #include "qstandardpaths.h"
+#ifdef MOBILE
   #include "fingerswipegesture.h"
 #endif
 
@@ -85,9 +85,9 @@ int setenv(const char *name, const char *value, int overwrite)
 #if QT_VERSION > 0x050000
 void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
 {
-    int pendio;
 
-#ifdef Q_OS_IOS
+#ifdef MOBILE
+    int pendio;
     switch (state) {
          case Qt::ApplicationSuspended:
              qDebug() << "application state changed to suspended";
@@ -136,19 +136,6 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
 }
 #endif
 
-void FileOpenWindow::setNewStyleSheet(QWidget* w, QSize size, QString myStyle, int pointSizeCorrection)
-{
-    int pointSize;
-    if(size.height() > 500) pointSize = 16;
-    else pointSize = 10;
-
-    pointSize = pointSize + pointSizeCorrection;
-
-    QString style = "font: %1pt; %2";
-    style = style.arg(pointSize).arg(myStyle);
-    w->setStyleSheet(style);
-}
-
 /**
  * our main window (form) constructor
  */
@@ -167,8 +154,10 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     allowResize = resizing;
     minimizeMessageWindow = minimize;
     activWindow = 0;
-
-    //qDebug() <<  qApp->desktop()->size();
+#ifdef MOBILE
+    Specials specials;
+#endif
+    qDebug() <<  qApp->desktop()->size();
 
     // Set Window Title without the whole path
     QString title("caQtDM ");
@@ -186,11 +175,11 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     InitializeContextMutex();
 
     // in case of tablets, use static plugins linked in
- #ifdef Q_OS_IOS
+#ifdef MOBILE
     Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Controllers);
     Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Monitors);
     Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Graphics);
- #endif
+#endif
 
     // create a class for exchanging data
     mutexKnobData = new MutexKnobData();
@@ -217,8 +206,8 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     // message window used by library and here
     QWidget *widget =new QWidget();
     messageWindow = new MessageWindow(widget);
-#ifdef Q_OS_IOS
-    setNewStyleSheet(messageWindow, qApp->desktop()->size());
+#ifdef MOBILE
+    specials.setNewStyleSheet(messageWindow, qApp->desktop()->size(), 16, 10);
 #endif
     messageWindow->setAllowedAreas(Qt::TopDockWidgetArea);
     QGridLayout *gridLayoutCentral = new QGridLayout(this->ui.centralwidget);
@@ -227,7 +216,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     gridLayout->addWidget(messageWindow, 0, 0, 1, 1);
     messageWindow->show();
 
-#ifndef Q_OS_IOS
+#ifndef MOBILE
 #ifdef Q_WS_X11
     QString uniqueKey = QString("caQtDM shared memory:") + DisplayString(QX11Info::display());
     sharedMemory.setKey (uniqueKey);
@@ -298,17 +287,23 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     QList<QString> urls;
     QList<QString> files;
     QString url, file;
+    QString stdpathdoc = specials.stdpathdoc;
     debugWindow = false;
 
     // parse the config file for urls and files
-    QString stdpathdoc=QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
     stdpathdoc.append("/caQtDM_IOS_Config.xml");
 
     QFileInfo fi(stdpathdoc);
     if(fi.exists()) {
        parseConfigFile(stdpathdoc, urls, files);
-    }else{
-       parseConfigFile("caQtDM_IOS_Config.xml", urls, files);
+    } else{
+        QString defpathdoc;
+#ifdef Q_OS_ANDROID
+        defpathdoc ="assets:/caQtDM_IOS_Config.xml";
+#else
+        defpathdoc ="caQtDM_IOS_Config.xml";
+#endif
+        parseConfigFile(defpathdoc, urls, files);
     }
 
     qDebug() << "urls" << urls;
@@ -320,11 +315,9 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     // when clear config files is used, then reload dialog from original
     if(dialog.isClearConfig()) {
         dialog.close();
-        //dialog.deleteLater();
         goto again;
     }
     dialog.getChoice(url, file, urls, files, debugWindow);
-    //dialog.deleteLater();
 
     // and save the changes
     saveConfigFile(stdpathdoc, urls, files);
@@ -354,7 +347,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     }
 #endif
 
-#ifdef Q_OS_IOS
+#ifdef MOBILE
     // add fingerswipe gesture
     QGestureRecognizer* pRecognizer = new FingerSwipeGestureRecognizer();
     fingerSwipeGestureType = QGestureRecognizer::registerRecognizer(pRecognizer);
@@ -448,7 +441,9 @@ void FileOpenWindow::saveConfigFile(const QString &filename, QList<QString> &url
 void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
 {
     char asc[2048];
-    QString stdpathdoc=QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    Specials specials;
+    QString stdpathdoc = specials.stdpathdoc;
+
     QString EnvFile=stdpathdoc;
     EnvFile.append("/");
     EnvFile.append(fileName);
@@ -517,7 +512,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 
     // any open windows ?
     // we want to ask with timeout if the application has to be closed. 23-jan-2013 no yust exit (in case of tablet do not exit)
-#ifndef Q_OS_IOS
+#ifndef MOBILE
     if(this->findChildren<CaQtDM_Lib *>().count() <= 0 && userClose) {
         if (sharedMemory.isAttached()) sharedMemory.detach();
         qApp->exit(0);
@@ -588,7 +583,7 @@ void FileOpenWindow::Callback_OpenButton()
                 allowResize = false;
             }
             newWindow->allowResizing(allowResize);
- #ifdef Q_OS_IOS
+ #ifdef MOBILE
             newWindow->grabSwipeGesture(fingerSwipeGestureType);
  #endif
 
@@ -701,7 +696,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
             if(QString::compare(WindowProperty, title) == 0) {
                 w->activateWindow();
                 w->raise();
-#ifndef Q_OS_IOS
+#ifndef MOBILE
                 w->showNormal();
 #endif
                 w->setFocus();
@@ -736,7 +731,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     fileFunctions filefunction;
     filefunction.checkFileAndDownload(FileName);
 #endif
-        // open file
+    // open file
     dmsearchFile *s = new dmsearchFile(FileName);
     QString fileNameFound = s->findFile();
     if(fileNameFound.isNull()) {
@@ -744,7 +739,6 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         message.append(" does not exist");
         QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "file open error", message, ":/caQtDM-logos.png", QMessageBox::Close, this, Qt::Dialog, true);
         m->show();
-        //qDebug() << "sorry -- file" << FileName << "does not exist";
     } else {
         char asc[2048];
         bool willPrint = false;
@@ -752,7 +746,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
 
         if(printandexit) willPrint = true;
         CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, messageWindow, willPrint);
- #ifdef Q_OS_IOS
+#ifdef MOBILE
         newWindow->grabSwipeGesture(fingerSwipeGestureType);
 #endif
         if (FileName.contains("prc")) {
@@ -918,7 +912,7 @@ void FileOpenWindow::Callback_ActionReload()
 
                 CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, messageWindow);
                 newWindow->allowResizing(allowResize);
-#ifdef Q_OS_IOS
+#ifdef MOBILE
                 newWindow->grabSwipeGesture(fingerSwipeGestureType);
 #endif
                 QMainWindow *mainWindow = newWindow;

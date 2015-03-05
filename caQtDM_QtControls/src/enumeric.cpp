@@ -39,6 +39,8 @@
 #include <QtDebug>
 #include <QApplication>
 
+#define MIN_FONT_SIZE 3
+
 #if (_MSC_VER == 1600)
 int round (double x) {
   int i = (int) x;
@@ -166,7 +168,7 @@ void ENumeric::init()
         QPushButton *temp = new QPushButton(this);
         temp->setObjectName(QString("layoutmember") + QString().setNum(i));
         temp->installEventFilter(lCWME);
-#ifndef Q_OS_IOS
+#ifndef MOBILE
         temp->setAutoRepeat(true);
         temp->setAutoRepeatInterval(200);
         temp->setAutoRepeatDelay(500);
@@ -186,7 +188,7 @@ void ENumeric::init()
         QPushButton *temp2 = new QPushButton(this);
         temp2->setObjectName(QString("layoutmember") + QString().setNum(i));
         temp2->installEventFilter(lCWME);
-#ifndef Q_OS_IOS
+#ifndef MOBILE
         temp2->setAutoRepeat(true);
         temp2->setAutoRepeatInterval(200);
         temp2->setAutoRepeatDelay(500);
@@ -535,6 +537,7 @@ void ENumeric::resizeEvent(QResizeEvent *e)
         double fontSize = 80;
         fontSize = qMin((int) fontSize, size().height() / 4 - 2);
         fontSize = qMin((int) fontSize, size().width() / (digits+1));
+        if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         labelFont.setPointSizeF(fontSize);
         signFont.setPointSizeF(fontSize);
         //printf("digits=%d %s font size=%f\n", digits, l1->text().toAscii().constData(), fontSize);

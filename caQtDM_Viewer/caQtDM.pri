@@ -24,15 +24,12 @@ HEADERS  +=  \
     fileopenwindow.h \
 
 NETWORKDOWNLOADSUPPORT {
-
    QT += network
    SOURCES += configDialog.cpp
    HEADERS  +=  configDialog.h
 }
 
-
 FORMS += main.ui
-
 
 unix:{
 	DEFINES += BUILDTIME=\\\"$$system(date '+%H:%M')\\\"

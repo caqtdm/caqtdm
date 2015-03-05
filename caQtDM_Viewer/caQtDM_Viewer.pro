@@ -1,7 +1,10 @@
 include(qtdefs.pri)
 
 ios {
-  include(../../qwt-6.1.0.ios/qwt.prf)
+  include(../../qwt-6.1.1_ios/qwt.prf)
+}
+android {
+include(../../qwt-6.1.1_android/qwt.prf)
 }
 
 !ios {

@@ -13,7 +13,7 @@ UI_DIR += ../
 INCLUDEPATH += ../../caQtDM_QtControls/src
 DESTDIR = $(CAQTDM_COLLECT)
 !ios {
-
+!android {
    macx: {
 
       INCLUDEPATH += $$(EPICS_BASE)/include
@@ -24,9 +24,11 @@ DESTDIR = $(CAQTDM_COLLECT)
       LIBS += ${EPICSLIB}/libCom.dylib
    }
 }
-
-
-ios {
-   CONFIG += staticlib
 }
+
+ios | android {
+   CONFIG += staticlib
+   INCLUDEPATH += $(QWTINCLUDE)
+}
+
 

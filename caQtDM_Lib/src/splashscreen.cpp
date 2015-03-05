@@ -44,7 +44,8 @@ SplashScreen::SplashScreen(QWidget *parent) : QSplashScreen(parent), m_progress(
     setWindowFlags(flags);
 
     m_maximum = 100;
-#ifdef Q_OS_IOS
+
+#if defined(MOBILE_IOS)
     pixmapLoad.load(":caQtDM-logos.png");
     QSize size = qApp->desktop()->size();
     if(size.height() < 500) {
@@ -52,13 +53,17 @@ SplashScreen::SplashScreen(QWidget *parent) : QSplashScreen(parent), m_progress(
     } else {
        pixmap = pixmapLoad.scaled(pixmapLoad.size().width(), pixmapLoad.size().height());
     }
+#elif defined(MOBILE_ANDROID)
+    pixmapLoad.load(":caQtDM-logos.png");
+    pixmap = pixmapLoad.scaled(pixmapLoad.size().width()*1.5, pixmapLoad.size().height()*1.5); // probably wrong
 #else
     pixmap.load(":caQtDM-logos.png");
 #endif
+
     this->resize(pixmap.size().width()+200, pixmap.size().height()+100);
 
     // in order to have a pseudo-transparent image, I load the background
-#ifndef Q_OS_IOS
+#ifndef MOBILE
     QPixmap desktopBackground= QPixmap::grabWindow(QApplication::desktop()->winId(), x()- width()/2, y()-height()/2, width(),height());
 #else
     QPixmap desktopBackground( width(),height());

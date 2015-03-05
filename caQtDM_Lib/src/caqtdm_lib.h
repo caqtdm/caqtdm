@@ -52,7 +52,7 @@
 #include <QWidget>
 #include <QWaitCondition>
 #include <QMessageBox>
-#ifndef Q_OS_IOS
+#ifndef MOBILE
  #include <QPrinter>
  #include <QPrintDialog>
 #endif
@@ -74,7 +74,7 @@
 
 #include <QtControls>
 
-#ifdef Q_OS_IOS
+#ifdef MOBILE
 #include <QGestureEvent>
 #include <QTapAndHoldGesture>
 #include "fingerswipegesture.h"
@@ -100,13 +100,13 @@ public:
     void ComputeNumericMaxMinPrec(QWidget* widget, const knobData &data);
     void UpdateGauge(EAbstractGauge *w, const knobData &data);
 
-#ifdef Q_OS_IOS
+#ifdef MOBILE
     void grabSwipeGesture(Qt::GestureType fingerSwipeGestureTypeID);
 #endif
 
     void print()
     {
-#ifndef Q_OS_IOS
+#ifndef MOBILE
         QPrinter *printer = new QPrinter;
         QPrintDialog *printDialog = new QPrintDialog(printer, this);
         if (printDialog->exec() == QDialog::Accepted) {
@@ -128,7 +128,7 @@ public:
     }
     void printPS(QString filename)
     {
-#ifndef Q_OS_IOS
+#ifndef MOBILE
         QPrinter *printer = new QPrinter;
         printer->setOrientation(QPrinter::Portrait);
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
@@ -150,6 +150,8 @@ public:
         painter.translate(-width()/2, -height()/2);
         QPixmap pm = QPixmap::grabWidget(this);
         painter.drawPixmap(0, 0, pm);
+#else
+        Q_UNUSED(filename);
 #endif
     }
 
@@ -196,7 +198,7 @@ private:
     void WaveTable(caWaveTable *widget, const knobData &data);
     void EnableDisableIO();
 
-#ifdef Q_OS_IOS
+#ifdef MOBILE
     bool eventFilter(QObject *obj, QEvent *event);
     bool gestureEvent(QObject *obj, QGestureEvent *event);
     void tapAndHoldTriggered(QObject *obj, QTapAndHoldGesture* tapAndHold);

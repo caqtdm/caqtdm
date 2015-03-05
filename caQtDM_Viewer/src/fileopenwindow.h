@@ -41,7 +41,7 @@
 #include <QScrollBar>
 #include <QFile>
 
-#ifdef Q_OS_IOS
+#ifdef MOBILE
 #include <QGuiApplication>
 #endif
 #include "myQProcess.h"
@@ -70,7 +70,6 @@
      void parse_and_set_Geometry(QMainWindow *w, QString parsestring);
      void shellCommand(QString command);
      void cycleWindows();
-     void setNewStyleSheet(QWidget* w, QSize size, QString myStyle = "", int pointSizeCorrection = 0);
 
 #ifdef NETWORKDOWNLOADSUPPORT
      void setAllEnvironmentVariables(const QString &fileName);

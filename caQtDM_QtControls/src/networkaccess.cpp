@@ -28,7 +28,7 @@
 #include <QFile>
 #include <QDir>
 #include <QEventLoop>
-#include "qstandardpaths.h"
+#include "specialFunctions.h"
 #include "networkaccess.h"
 
 NetworkAccess::NetworkAccess(QTableWidget *w, const QString &file)
@@ -61,20 +61,22 @@ void NetworkAccess::finishReply()
     QNetworkReply* reply = qobject_cast<QNetworkReply*>(obj);
 
     if(reply->error()) {
-        qDebug() << "reply error";
-        //QMessageBox::warning(0, tr("caQtDM"), tr("network error: %1 for file %2").arg(parseError(reply->error())).arg(downloadUrl.toString()));
+        //QMessageBox::information(0,"finishreply", "network error");
+        qDebug() << "network error:" << parseError(reply->error()) << "for file" << downloadUrl.toString();
         return;
     }
 
     // seems we want to download the file to a file with  the filename "thisFile"
-    qDebug() << "open and write the file";
     if(thisTable == 0 && thisFile.length() > 0) {
-        QString filePath=QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+        Specials specials;
+        QString filePath = specials.stdpathdoc;
+
         filePath.append("/");
         filePath.append(thisFile);
+
         QFile file(filePath);
         if(!file.open(QIODevice::ReadWrite)) {
-            QMessageBox::warning(0, tr("caQtDM"), tr("error: file %1 could not be opened for write").arg(filePath));
+            qDebug() << "file:" << filePath << "could not be opened for write";
             return;
         } else {
             file.write(reply->readAll());

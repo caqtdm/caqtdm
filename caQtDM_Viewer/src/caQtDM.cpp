@@ -62,7 +62,7 @@ static void unixSignalHandler(int signum) {
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(caQtDM);
-#ifdef Q_OS_IOS
+#ifdef MOBILE
     Q_INIT_RESOURCE(qtcontrols);
 #endif
     QApplication app(argc, argv);

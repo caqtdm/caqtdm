@@ -26,46 +26,40 @@
 #include <QtGui>
 #include "limitsCartesianplotDialog.h"
 
-void limitsCartesianplotDialog::setNewStyleSheet(QWidget* w, QSize size, QString myStyle, int pointSizeCorrection)
-{
-    int pointSize;
-    if(size.height() > 500) pointSize = 16;
-    else pointSize = 10;
-
-    pointSize = pointSize + pointSizeCorrection;
-
-    QString style = "font: %1pt; %2";
-    style = style.arg(pointSize).arg(myStyle);
-    w->setStyleSheet(style);
-}
-
-
 limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKnobData *data, const QString &title, QWidget *parent) : QWidget(parent)
 {
     bool ok1, ok2;
     QString xmin, xmax,  ymin, ymax;
     int thisWidth = 650;
     int thisHeight = 150;
+    int showMax = false;
     CartesianPlot = w;
     monData = data;
 
     QGridLayout *Layout = new QGridLayout;
+    Qt::WindowFlags flags = Qt::Dialog;
+    setWindowFlags(flags);
     setWindowModality (Qt::WindowModal);
 
-#ifdef Q_OS_IOS
+#if defined(MOBILE_IOS)
     if(qApp->desktop()->size().height() < 500) {
         thisWidth=430;  // normal for iphone
         thisHeight=150;
     }
-    setNewStyleSheet(this, qApp->desktop()->size());
+    Specials special;
+    special.setNewStyleSheet(this, qApp->desktop()->size(), 16, 10);
     QPalette palette;
     palette.setBrush(QPalette::Background, QColor(255,255,224,255));
     setPalette(palette);
     setAutoFillBackground(true);
     setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(thisWidth,thisHeight), qApp->desktop()->availableGeometry()));
+#elif defined(MOBILE_ANDROID)
+    QPalette palette;
+    palette.setBrush(QPalette::Background, QColor(255,255,224,255));
+    setPalette(palette);
+    setAutoFillBackground(true);
+    showMax = true;
 #else
-    Qt::WindowFlags flags = Qt::Dialog;
-    setWindowFlags(flags);
     move(parent->x() + parent->width() / 2 - thisWidth / 2 , parent->y() + parent->height() /2 -thisHeight/2);
 #endif
 
@@ -204,7 +198,8 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
 
     setWindowTitle(title);
 
-    showNormal();
+    if(!showMax) showNormal();
+    else showMaximized();
 }
 
 void limitsCartesianplotDialog::cancelClicked()
