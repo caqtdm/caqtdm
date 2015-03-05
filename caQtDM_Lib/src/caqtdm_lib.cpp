@@ -5110,6 +5110,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
 
     // this does not really work yet, to be studied when I have time
     else if(!className.compare("QTabWidget")) {
+        /*
             QTabWidget *box = (QTabWidget *) widget;
             qreal fontSize = (qMin(factX, factY) * (double) list.at(4).toInt());
             if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
@@ -5124,6 +5125,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             //qDebug() << thisStyle << list.at(6).toInt() << list.at(5).toInt() << factX << factY;
             //box->tabBar()->setStyleSheet(thisStyle);
             //box->tabBar()->setElideMode(Qt::ElideRight);
+         */
     }
 }
 
@@ -5240,10 +5242,10 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 integerList.insert(10, plot->axisScaleDraw(QwtPlot::xBottom)->tickLength(QwtScaleDiv::MinorTick));
 
             } else if(!className.compare("QTabWidget")) {
-                QTabWidget *tabW = (QTabWidget *) widget;
+                //QTabWidget *tabW = (QTabWidget *) widget;
                 integerList.insert(4, widget->font().pointSize());
-                integerList.insert(5, tabW->tabBar()->height());
-                integerList.insert(6, tabW->tabBar()->width());
+                //integerList.insert(5, tabW->tabBar()->height());
+                //integerList.insert(6, tabW->tabBar()->width());
 
             } else {
                 integerList.insert(4, widget->font().pointSize());

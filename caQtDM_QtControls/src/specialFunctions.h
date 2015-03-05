@@ -29,7 +29,9 @@
 #include <QtGui>
 #include <QDesktopWidget>
 #include <QApplication>
+#ifdef MOBILE
 #include <QStandardPaths>
+#endif
 
 class Specials {
 
