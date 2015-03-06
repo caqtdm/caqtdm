@@ -84,8 +84,8 @@ void caCamera::deleteWidgets()
     if(valuesLayout != (QHBoxLayout *) 0)        delete valuesLayout;
     if(labelMaxText != (caLabel *) 0)            delete labelMaxText;
     if(labelMinText != (caLabel *) 0)            delete labelMinText;
-    if(labelMin != (QLineEdit *) 0)              delete labelMin;
-    if(labelMax != (QLineEdit *) 0)              delete labelMax;
+    if(labelMin != (caLineEdit *) 0)              delete labelMin;
+    if(labelMax != (caLineEdit *) 0)              delete labelMax;
     if(checkAutoText != (caLabel *) 0)           delete checkAutoText;
     if(autoW != (QCheckBox *) 0)                 delete autoW;
     if(intensity != (caLabel *) 0)               delete intensity;
@@ -107,8 +107,8 @@ void caCamera::deleteWidgets()
 void caCamera::initWidgets()
 {
     image = (QImage *) 0;
-    labelMin = (QLineEdit *) 0;
-    labelMax = (QLineEdit *) 0;
+    labelMin = (caLineEdit *) 0;
+    labelMax = (caLineEdit *) 0;
     intensity = (caLabel *) 0;
     imageW = (ImageWidget *) 0;
     autoW = (QCheckBox *) 0;
@@ -376,17 +376,17 @@ void caCamera::setup()
         nbUpdatesText = new caLabel(this);
 
         // texts
-        labelMax = new QLineEdit(this);
-        labelMin = new QLineEdit(this);
+        labelMax = new caLineEdit(this);
+        labelMin = new caLineEdit(this);
         intensity = new caLabel(this);
 
         // width, resize mode, font, color
-        labelMax->setFixedWidth(60);
-        labelMin->setFixedWidth(60);
-        labelMaxText->setFixedWidth(40);
-        labelMinText->setFixedWidth(40);
-        checkAutoText->setFixedWidth(60);
-        intensity->setFixedWidth(150);
+        //labelMax->setFixedWidth(60);
+        //labelMin->setFixedWidth(60);
+        //labelMaxText->setFixedWidth(40);
+        //labelMinText->setFixedWidth(40);
+        //checkAutoText->setFixedWidth(60);
+        //intensity->setFixedWidth(150);
         intensity->setAlignment(Qt::AlignVCenter | Qt::AlignLeft );
         labelMaxText->setScaleMode(caLabel::None);
         labelMinText->setScaleMode(caLabel::None);
@@ -653,13 +653,13 @@ bool caCamera::getAutomateChecked()
 
 void caCamera::updateMax(int max)
 {
-    if(labelMax == (QLineEdit*) 0) return;
+    if(labelMax == (caLineEdit*) 0) return;
     labelMax->setText(QString::number(max));
 }
 
 void caCamera::updateMin(int min)
 {
-    if(labelMin == (QLineEdit*) 0) return;
+    if(labelMin == (caLineEdit*) 0) return;
     labelMin->setText(QString::number(min));
 }
 
@@ -671,12 +671,12 @@ void caCamera::updateIntensity(QString strng)
 
 int caCamera::getMin()
 {
-    if(labelMin == (QLineEdit*) 0) return 0;
+    if(labelMin == (caLineEdit*) 0) return 0;
     return labelMin->text().toInt();
 }
 int caCamera::getMax()
 {
-    if(labelMax == (QLineEdit*) 0) return 65535;
+    if(labelMax == (caLineEdit*) 0) return 65535;
     return labelMax->text().toInt();
 }
 

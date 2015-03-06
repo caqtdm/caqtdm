@@ -186,8 +186,8 @@ private:
     QGridLayout  *mainLayout;
     QVBoxLayout  *zoomSliderLayout;
 
-    QLineEdit *labelMin;
-    QLineEdit *labelMax;
+    caLineEdit *labelMin;
+    caLineEdit *labelMax;
     caLabel *intensity;
     ImageWidget *imageW;
     QCheckBox *autoW;
