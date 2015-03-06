@@ -40,7 +40,7 @@ public:
     ImageWidget(QWidget *parent = 0);
     ~ImageWidget(){}
     void updateImage(bool fitToSize, const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor,
-                     bool selectionStarted, QRect selectionRect);
+                     bool selectionStarted, QRect selectionRect, bool selectSimpleView);
     QImage scaleImage(const QImage &image, const double &scaleFactor, bool const &FitToSize);
     void getImageDimensions(int &width, int &height);
 
@@ -64,6 +64,7 @@ private:
 
     bool selectionStarted;
     QRect selectionRect;
+    bool simpleView;
 
 
 };

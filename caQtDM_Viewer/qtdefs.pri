@@ -30,11 +30,15 @@ DEFINES += NETWORKDOWNLOADSUPPORT
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 
 # 3.9.0
+# many changes involving android
 # many changes for iphone, epics can now also reconnect after being suspended
 # calineedit a bit more performant
 # on ipad/iphone files were aways downloaded, this has been optimized
 # graphic plugings were missing on osx/ios, has been corrected
 # prevented crash on exit
+# cacamera can be displayed without toolbuttons and will be zoomed in ints container
+# cascriptbutton has now the possibility of a macro in its parameter
+# truncate in calineedit is now implemented
 
 # 3.8.10
 # caStripPlot was eating the CPU and has been optimized; refreshrate (low, medium, high) has been introduced, so that it can be adjusted by the user

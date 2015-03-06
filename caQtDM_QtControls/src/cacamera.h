@@ -52,6 +52,7 @@ class QTCON_EXPORT caCamera : public QWidget
     Q_PROPERTY(QString channelHeight READ getPV_Height WRITE setPV_Height)
     Q_PROPERTY(QString channelCode READ getPV_Code WRITE setPV_Code)
     Q_PROPERTY(QString channelBPP READ getPV_BPP WRITE setPV_BPP)
+    Q_PROPERTY(bool simpleZoomedView READ getSimpleView WRITE setSimpleView)
     Q_PROPERTY(zoom Zoom READ getFitToSize WRITE setFitToSize)
     Q_PROPERTY(colormap ColorMap READ getColormap WRITE setColormap)
     Q_PROPERTY(bool automaticLevels READ getInitialAutomatic WRITE setInitialAutomatic)
@@ -111,6 +112,9 @@ public:
     bool getInitialAutomatic();
     void setInitialAutomatic(bool automatic);
 
+    bool getSimpleView() { return thisSimpleView;}
+    void setSimpleView(bool simpleV) {thisSimpleView = simpleV; setup();}
+
     QString getMinLevel() const {return thisMinLevel;}
     bool isAlphaMinLevel();
     void setMinLevel(QString const &level);
@@ -145,6 +149,8 @@ private:
 
     bool eventFilter(QObject *obj, QEvent *event);
     void Coordinates(int posX, int posY, double &newX, double &newY, double &maxX, double &maxY);
+    void deleteWidgets();
+    void initWidgets();
 
     bool buttonPressed, validIntensity;
     bool forcemonochrome;
@@ -212,6 +218,8 @@ private:
     bool ROIdetected;
 
     bool _AccessW;
+
+    bool thisSimpleView;
 };
 
 #endif

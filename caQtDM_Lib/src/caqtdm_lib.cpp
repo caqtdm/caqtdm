@@ -1010,10 +1010,14 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         //==================================================================================================================
     } else if(caScriptButton* widget = qobject_cast<caScriptButton *>(w1)) {
 
+        QString text;
         //qDebug() << "create caScriptButton";
         w1->setProperty("ObjectType", caScriptButton_Widget);
 
         connect(widget, SIGNAL(scriptButtonSignal()), this, SLOT(Callback_ScriptButton()));
+
+        text= widget->getScriptParam();
+        if(reaffectText(map, &text))  widget->setScriptParam(text);
 
         widget->raise();
         widget->setToolTip("process never started !");

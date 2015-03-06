@@ -54,11 +54,15 @@ void ImageWidget::paintEvent(QPaintEvent * event)
 
     if (imageNew.isNull()) {
         painter.setPen(Qt::white);
+        painter.setBrush(QBrush(QColor(100,100,100,255)));
+        painter.drawRect(rect());
         painter.drawText(rect(), Qt::AlignCenter, tr("Rendering initial image, please wait..."));
         return;
     }
 
     painter.drawImage(imageOffset,imageNew);
+
+    if(simpleView) return;
 
     painter.setPen(Qt::red);
 
@@ -108,10 +112,11 @@ QImage ImageWidget::scaleImage(const QImage &image, const double &scaleFactor, c
 }
 
 void ImageWidget::updateImage(bool FitToSize, const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor,
-                              bool selectStarted, QRect selectRect)
+                              bool selectStarted, QRect selectRect, bool selectSimpleView)
 {
     selectionRect = selectRect;
     selectionStarted = selectStarted;
+    simpleView = selectSimpleView;
     // in case of fit to parent widget, we calculate concurrently if possible
     if((FitToSize) || (qAbs(scaleFactor-1) > 0.01)) {
 #ifndef QT_NO_CONCURRENT
@@ -124,6 +129,12 @@ void ImageWidget::updateImage(bool FitToSize, const QImage &image, bool valuesPr
     } else {
         imageNew = image;
     }
+
+    if(simpleView) {
+        update();
+        return;
+    }
+
     for(int i=0; i<4; i++) {
         drawValues[i] = valuesPresent[i];
         if(drawValues[i]) {

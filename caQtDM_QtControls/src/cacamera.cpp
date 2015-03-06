@@ -39,6 +39,8 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     m_bppDefined = false;
     m_widthDefined = false;
     m_heightDefined = false;
+
+    thisSimpleView = false;
     thisColormap = Default;
     savedSize = 0;
     savedWidth = 0;
@@ -48,11 +50,7 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
 
     savedData = (char*) 0;
 
-    image = (QImage *) 0;
-
-    labelMin = (QLineEdit *) 0;
-    labelMax = (QLineEdit *) 0;
-    intensity = (caLabel *) 0;
+    initWidgets();
 
     Xpos = Ypos = 0;
 
@@ -79,33 +77,62 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     startTimer(1000);
 }
 
+void caCamera::deleteWidgets()
+{
+    if(image != (QImage *) 0)                    delete image;
+
+    if(valuesLayout != (QHBoxLayout *) 0)        delete valuesLayout;
+    if(labelMaxText != (caLabel *) 0)            delete labelMaxText;
+    if(labelMinText != (caLabel *) 0)            delete labelMinText;
+    if(labelMin != (QLineEdit *) 0)              delete labelMin;
+    if(labelMax != (QLineEdit *) 0)              delete labelMax;
+    if(checkAutoText != (caLabel *) 0)           delete checkAutoText;
+    if(autoW != (QCheckBox *) 0)                 delete autoW;
+    if(intensity != (caLabel *) 0)               delete intensity;
+    if(intensityText != (caLabel *) 0)           delete intensityText;
+    if(nbUpdatesText != (caLabel *) 0)           delete nbUpdatesText;
+
+    if(zoomSliderLayout != ( QVBoxLayout *) 0)   delete zoomSliderLayout;
+    if(zoomSlider != (QSlider *) 0)              delete zoomSlider;
+    if(zoomValue != (caLabel *) 0)               delete zoomValue;
+    if(zoomInIcon != (QToolButton *) 0)          delete zoomInIcon;
+    if(zoomOutIcon != (QToolButton *) 0)         delete zoomOutIcon;
+
+    if(imageW != (ImageWidget *) 0)              delete imageW;
+    if(valuesWidget != (QWidget *) 0)            delete valuesWidget;
+    if(scrollArea != (QScrollArea *) 0)          delete scrollArea;
+    if(zoomWidget != (QWidget *) 0)              delete zoomWidget;
+}
+
+void caCamera::initWidgets()
+{
+    image = (QImage *) 0;
+    labelMin = (QLineEdit *) 0;
+    labelMax = (QLineEdit *) 0;
+    intensity = (caLabel *) 0;
+    imageW = (ImageWidget *) 0;
+    autoW = (QCheckBox *) 0;
+    labelMaxText = (caLabel *) 0;
+    labelMinText = (caLabel *) 0;
+    intensityText = (caLabel *) 0;
+    checkAutoText = (caLabel *) 0;
+    nbUpdatesText = (caLabel *) 0;
+    scrollArea = (QScrollArea *) 0;
+    valuesWidget = (QWidget *) 0;
+    zoomWidget = (QWidget *) 0;
+    zoomSlider = (QSlider *) 0;
+    zoomValue = (caLabel *) 0;
+    zoomInIcon = (QToolButton *) 0;
+    zoomOutIcon = (QToolButton *) 0;
+
+    valuesLayout = (QHBoxLayout *) 0;
+    zoomSliderLayout = ( QVBoxLayout *) 0;
+}
+
 caCamera::~caCamera()
 {
-    if(image != (QImage *) 0) {
-        delete image;
-    }
-
-    delete valuesLayout;
-    delete labelMinText;
-    delete labelMin;
-    delete labelMaxText;
-    delete labelMax;
-    delete checkAutoText;
-    delete autoW;
-    delete intensity;
-    delete intensityText;
-    delete nbUpdatesText;
-
-    delete zoomSliderLayout;
-    delete zoomSlider;
-    delete zoomValue;
-    delete zoomInIcon;
-    delete zoomOutIcon;
-
-    delete imageW;
-    delete valuesWidget;
-    delete scrollArea;
-    delete zoomWidget;
+    deleteWidgets();
+    initWidgets();
 }
 
 void caCamera::timerEvent(QTimerEvent *)
@@ -158,6 +185,8 @@ void caCamera::Coordinates(int posX, int posY, double &newX, double &newY, doubl
 bool caCamera::eventFilter(QObject *obj, QEvent *event)
 {
     Q_UNUSED(obj);
+
+    if(thisSimpleView) return false;
 
     if (event->type() == QEvent::MouseButtonPress) {
         QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
@@ -327,129 +356,137 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
 
 void caCamera::setup()
 {
-
+    deleteWidgets();
+    initWidgets();
     // labels and texts for horizontal layout containing information of the image
     // image inside a scrollarea
     // zoom utilities
 
     // labels
-    labelMaxText = new caLabel(this);
-    labelMaxText->setText(" Max: ");
-    labelMinText = new caLabel(this);
-    labelMinText->setText(" Min: ");
-    checkAutoText = new caLabel(this);
-    checkAutoText->setText(" Auto: ");
-    intensityText = new caLabel(this);
-    intensityText->setText(" x/y/z: ");
+    if(!thisSimpleView) {
+        labelMaxText = new caLabel(this);
+        labelMaxText->setText(" Max: ");
+        labelMinText = new caLabel(this);
+        labelMinText->setText(" Min: ");
+        checkAutoText = new caLabel(this);
+        checkAutoText->setText(" Auto: ");
+        intensityText = new caLabel(this);
+        intensityText->setText(" x/y/z: ");
 
-    nbUpdatesText = new caLabel(this);
+        nbUpdatesText = new caLabel(this);
 
-    // texts
-    labelMax = new QLineEdit(this);
-    labelMin = new QLineEdit(this);
-    intensity = new caLabel(this);
+        // texts
+        labelMax = new QLineEdit(this);
+        labelMin = new QLineEdit(this);
+        intensity = new caLabel(this);
 
-    // width, resize mode, font, color
-    labelMax->setFixedWidth(60);
-    labelMin->setFixedWidth(60);
-    labelMaxText->setFixedWidth(40);
-    labelMinText->setFixedWidth(40);
-    checkAutoText->setFixedWidth(60);
-    intensity->setFixedWidth(150);
-    intensity->setAlignment(Qt::AlignVCenter | Qt::AlignLeft );
-    labelMaxText->setScaleMode(caLabel::None);
-    labelMinText->setScaleMode(caLabel::None);
-    checkAutoText->setScaleMode(caLabel::None);
-    intensity->setScaleMode(caLabel::None);
-    intensityText->setScaleMode(caLabel::None);
-    nbUpdatesText->setScaleMode(caLabel::None);
-    QFont font = labelMaxText->font();
-    font.setPointSize(10);
-    labelMaxText->setFont(font);
-    labelMinText->setFont(font);
-    checkAutoText->setFont(font);
-    intensity->setFont(font);
-    intensityText->setFont(font);
-    nbUpdatesText->setFont(font);
-    labelMaxText->setBackground(QColor(0,0,0,0));
-    labelMinText->setBackground(QColor(0,0,0,0));
-    checkAutoText->setBackground(QColor(0,0,0,0));
-    intensity->setBackground(QColor(0,0,0,0));
-    intensityText->setBackground(QColor(0,0,0,0));
-    nbUpdatesText->setBackground(QColor(0,0,0,0));
+        // width, resize mode, font, color
+        labelMax->setFixedWidth(60);
+        labelMin->setFixedWidth(60);
+        labelMaxText->setFixedWidth(40);
+        labelMinText->setFixedWidth(40);
+        checkAutoText->setFixedWidth(60);
+        intensity->setFixedWidth(150);
+        intensity->setAlignment(Qt::AlignVCenter | Qt::AlignLeft );
+        labelMaxText->setScaleMode(caLabel::None);
+        labelMinText->setScaleMode(caLabel::None);
+        checkAutoText->setScaleMode(caLabel::None);
+        intensity->setScaleMode(caLabel::None);
+        intensityText->setScaleMode(caLabel::None);
+        nbUpdatesText->setScaleMode(caLabel::None);
+        QFont font = labelMaxText->font();
+        font.setPointSize(10);
+        labelMaxText->setFont(font);
+        labelMinText->setFont(font);
+        checkAutoText->setFont(font);
+        intensity->setFont(font);
+        intensityText->setFont(font);
+        nbUpdatesText->setFont(font);
+        labelMaxText->setBackground(QColor(0,0,0,0));
+        labelMinText->setBackground(QColor(0,0,0,0));
+        checkAutoText->setBackground(QColor(0,0,0,0));
+        intensity->setBackground(QColor(0,0,0,0));
+        intensityText->setBackground(QColor(0,0,0,0));
+        nbUpdatesText->setBackground(QColor(0,0,0,0));
 
-    // checkbox
-    autoW = new QCheckBox(this);
-    autoW->setChecked(true);
+        // checkbox
+        autoW = new QCheckBox(this);
+        autoW->setChecked(true);
 
-    // add everything to layout
-    valuesLayout = new QHBoxLayout();
-    valuesLayout->setMargin(0);
-    valuesLayout->setSpacing(2);
-    valuesLayout->addWidget(labelMinText, Qt::AlignLeft);
-    valuesLayout->addWidget(labelMin, Qt::AlignLeft);
-    valuesLayout->addWidget(labelMaxText, Qt::AlignLeft);
-    valuesLayout->addWidget(labelMax, Qt::AlignLeft);
-    valuesLayout->addWidget(checkAutoText, Qt::AlignLeft);
-    valuesLayout->addWidget(autoW,    Qt::AlignLeft);
-    valuesLayout->addWidget(intensityText, Qt::AlignLeft);
-    valuesLayout->addWidget(intensity, Qt::AlignLeft);
-    valuesLayout->addWidget(nbUpdatesText, Qt::AlignLeft);
-    valuesLayout->addStretch(2);
+        // add everything to layout
+        valuesLayout = new QHBoxLayout();
+        valuesLayout->setMargin(0);
+        valuesLayout->setSpacing(2);
+        valuesLayout->addWidget(labelMinText, Qt::AlignLeft);
+        valuesLayout->addWidget(labelMin, Qt::AlignLeft);
+        valuesLayout->addWidget(labelMaxText, Qt::AlignLeft);
+        valuesLayout->addWidget(labelMax, Qt::AlignLeft);
+        valuesLayout->addWidget(checkAutoText, Qt::AlignLeft);
+        valuesLayout->addWidget(autoW,    Qt::AlignLeft);
+        valuesLayout->addWidget(intensityText, Qt::AlignLeft);
+        valuesLayout->addWidget(intensity, Qt::AlignLeft);
+        valuesLayout->addWidget(nbUpdatesText, Qt::AlignLeft);
+        valuesLayout->addStretch(2);
 
-    valuesWidget = new QWidget;
-    valuesWidget->setLayout(valuesLayout);
-    valuesWidget->show();
+        valuesWidget = new QWidget;
+        valuesWidget->setLayout(valuesLayout);
+        valuesWidget->show();
 
-    // image inside a scrollarea
-    imageW   = new ImageWidget();
-    scrollArea = new QScrollArea;
-    scrollArea->setBackgroundRole(QPalette::Dark);
-    scrollArea->setWidget(imageW);
-    scrollArea->setWidgetResizable(true);
+        // image inside a scrollarea
+        imageW   = new ImageWidget();
+        scrollArea = new QScrollArea;
+        scrollArea->setBackgroundRole(QPalette::Dark);
+        scrollArea->setWidget(imageW);
+        scrollArea->setWidgetResizable(true);
 
-    // add some zoom utilities to our widget
-    int iconsize = style()->pixelMetric(QStyle::PM_ToolBarIconSize);
-    QSize iconSize(iconsize, iconsize);
+        // add some zoom utilities to our widget
+        int iconsize = style()->pixelMetric(QStyle::PM_ToolBarIconSize);
+        QSize iconSize(iconsize, iconsize);
 
-    zoomInIcon = new QToolButton;
-    zoomInIcon->setIcon(QPixmap(":pixmaps/zoomin.png"));
-    zoomInIcon->setIconSize(iconSize);
+        zoomInIcon = new QToolButton;
+        zoomInIcon->setIcon(QPixmap(":pixmaps/zoomin.png"));
+        zoomInIcon->setIconSize(iconSize);
 
-    zoomOutIcon = new QToolButton;
-    zoomOutIcon->setIcon(QPixmap(":pixmaps/zoomout.png"));
-    zoomOutIcon->setIconSize(iconSize);
+        zoomOutIcon = new QToolButton;
+        zoomOutIcon->setIcon(QPixmap(":pixmaps/zoomout.png"));
+        zoomOutIcon->setIconSize(iconSize);
 
-    zoomSlider = new QSlider;
-    zoomSlider->setMinimum(0);
-    zoomSlider->setMaximum(90); // do not exceed 6*
-    zoomSlider->setValue(52);
-    zoomSlider->setTickPosition(QSlider::NoTicks);
+        zoomSlider = new QSlider;
+        zoomSlider->setMinimum(0);
+        zoomSlider->setMaximum(90); // do not exceed 6*
+        zoomSlider->setValue(52);
+        zoomSlider->setTickPosition(QSlider::NoTicks);
 
-    zoomValue = new QLabel("");
-    zoomValue->setFixedWidth(60);
+        zoomValue = new QLabel("");
+        zoomValue->setFixedWidth(60);
 
-    // add everything to layout
-    zoomSliderLayout = new QVBoxLayout();
-    zoomSliderLayout->addWidget(zoomInIcon);
-    zoomSliderLayout->addWidget(zoomSlider);
-    zoomSliderLayout->addWidget(zoomOutIcon);
-    zoomSliderLayout->addWidget(zoomValue);
+        // add everything to layout
+        zoomSliderLayout = new QVBoxLayout();
+        zoomSliderLayout->addWidget(zoomInIcon);
+        zoomSliderLayout->addWidget(zoomSlider);
+        zoomSliderLayout->addWidget(zoomOutIcon);
+        zoomSliderLayout->addWidget(zoomValue);
 
-    zoomWidget = new QWidget;
-    zoomWidget->setLayout(zoomSliderLayout);
+        zoomWidget = new QWidget;
+        zoomWidget->setLayout(zoomSliderLayout);
 
-    // connect buttons and slider
-    connect(zoomInIcon, SIGNAL(clicked()), this, SLOT(zoomIn()));
-    connect(zoomOutIcon, SIGNAL(clicked()), this, SLOT(zoomOut()));
-    connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomNow()));
+        // connect buttons and slider
+        connect(zoomInIcon, SIGNAL(clicked()), this, SLOT(zoomIn()));
+        connect(zoomOutIcon, SIGNAL(clicked()), this, SLOT(zoomOut()));
+        connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomNow()));
 
-    // add everything to main layout
-    mainLayout->addWidget(valuesWidget, 0, 0);
-    mainLayout->addWidget(scrollArea, 1, 0);
-    mainLayout->addWidget(zoomWidget, 1, 1);
+        // add everything to main layout
+        mainLayout->addWidget(valuesWidget, 0, 0);
+        mainLayout->addWidget(scrollArea, 1, 0);
+        mainLayout->addWidget(zoomWidget, 1, 1);
 
-    for(int i=0; i<4; i++) valuesPresent[i] = false;
+        for(int i=0; i<4; i++) valuesPresent[i] = false;
+    } else {
+        imageW   = new ImageWidget();
+        // add to main layout
+        mainLayout->addWidget(imageW, 0, 0);
+        setFitToSize(Yes);
+    }
 }
 
 void caCamera::zoomNow()
@@ -473,7 +510,9 @@ void caCamera::zoomOut(int level)
 
 void caCamera::setFitToSize(zoom const &z)
 {
+    if(thisSimpleView) return;
     thisFitToSize = z;
+
     if(!thisFitToSize) {
         scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
         scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -581,6 +620,8 @@ void caCamera::setHeight(int height)
 
 void caCamera::resizeEvent(QResizeEvent *e)
 {
+    if(thisSimpleView) return;
+
     if(m_widthDefined && m_heightDefined) {
         if(!thisFitToSize) {
             imageW->setMinimumSize((int) (m_width * scaleFactor), (int) (m_height * scaleFactor));
@@ -601,7 +642,7 @@ void caCamera::resizeEvent(QResizeEvent *e)
 
 void caCamera::updateImage(const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor)
 {
-    imageW->updateImage(thisFitToSize, image, valuesPresent, values, scaleFactor, selectionStarted, selectionRect);
+    imageW->updateImage(thisFitToSize, image, valuesPresent, values, scaleFactor, selectionStarted, selectionRect, thisSimpleView);
 }
 
 bool caCamera::getAutomateChecked()
