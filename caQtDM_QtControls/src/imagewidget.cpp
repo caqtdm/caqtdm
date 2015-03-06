@@ -47,6 +47,12 @@ void ImageWidget::getImageDimensions(int &width, int &height)
     height = imageNew.size().height();
 }
 
+void ImageWidget::updateDisconnected()
+{
+    disconnected = true;
+    update();
+}
+
 void ImageWidget::paintEvent(QPaintEvent * event)
 {
     Q_UNUSED(event);
@@ -57,6 +63,12 @@ void ImageWidget::paintEvent(QPaintEvent * event)
         painter.setBrush(QBrush(QColor(100,100,100,255)));
         painter.drawRect(rect());
         painter.drawText(rect(), Qt::AlignCenter, tr("Rendering initial image, please wait..."));
+        return;
+    }
+    if(disconnected) {
+        painter.setPen(Qt::white);
+        painter.setBrush(QBrush(QColor(255,255,255,255)));
+        painter.drawRect(rect());
         return;
     }
 
@@ -114,6 +126,7 @@ QImage ImageWidget::scaleImage(const QImage &image, const double &scaleFactor, c
 void ImageWidget::updateImage(bool FitToSize, const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor,
                               bool selectStarted, QRect selectRect, bool selectSimpleView)
 {
+    disconnected = false;
     selectionRect = selectRect;
     selectionStarted = selectStarted;
     simpleView = selectSimpleView;

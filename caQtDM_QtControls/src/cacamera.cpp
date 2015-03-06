@@ -84,8 +84,8 @@ void caCamera::deleteWidgets()
     if(valuesLayout != (QHBoxLayout *) 0)        delete valuesLayout;
     if(labelMaxText != (caLabel *) 0)            delete labelMaxText;
     if(labelMinText != (caLabel *) 0)            delete labelMinText;
-    if(labelMin != (caLineEdit *) 0)              delete labelMin;
-    if(labelMax != (caLineEdit *) 0)              delete labelMax;
+    if(labelMin != (caLineEdit *) 0)             delete labelMin;
+    if(labelMax != (caLineEdit *) 0)             delete labelMax;
     if(checkAutoText != (caLabel *) 0)           delete checkAutoText;
     if(autoW != (QCheckBox *) 0)                 delete autoW;
     if(intensity != (caLabel *) 0)               delete intensity;
@@ -380,13 +380,6 @@ void caCamera::setup()
         labelMin = new caLineEdit(this);
         intensity = new caLabel(this);
 
-        // width, resize mode, font, color
-        //labelMax->setFixedWidth(60);
-        //labelMin->setFixedWidth(60);
-        //labelMaxText->setFixedWidth(40);
-        //labelMinText->setFixedWidth(40);
-        //checkAutoText->setFixedWidth(60);
-        //intensity->setFixedWidth(150);
         intensity->setAlignment(Qt::AlignVCenter | Qt::AlignLeft );
         labelMaxText->setScaleMode(caLabel::None);
         labelMinText->setScaleMode(caLabel::None);
@@ -481,11 +474,14 @@ void caCamera::setup()
         mainLayout->addWidget(zoomWidget, 1, 1);
 
         for(int i=0; i<4; i++) valuesPresent[i] = false;
+
+        updateMin(0);
+        updateMax(0);
     } else {
         imageW   = new ImageWidget();
         // add to main layout
         mainLayout->addWidget(imageW, 0, 0);
-        setFitToSize(Yes);
+        thisFitToSize = Yes;
     }
 }
 
@@ -643,6 +639,11 @@ void caCamera::resizeEvent(QResizeEvent *e)
 void caCamera::updateImage(const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor)
 {
     imageW->updateImage(thisFitToSize, image, valuesPresent, values, scaleFactor, selectionStarted, selectionRect, thisSimpleView);
+}
+
+void caCamera::showDisconnected()
+{
+    imageW->updateDisconnected();
 }
 
 bool caCamera::getAutomateChecked()

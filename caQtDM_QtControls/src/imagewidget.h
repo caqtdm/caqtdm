@@ -43,6 +43,7 @@ public:
                      bool selectionStarted, QRect selectionRect, bool selectSimpleView);
     QImage scaleImage(const QImage &image, const double &scaleFactor, bool const &FitToSize);
     void getImageDimensions(int &width, int &height);
+    void updateDisconnected();
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -65,6 +66,7 @@ private:
     bool selectionStarted;
     QRect selectionRect;
     bool simpleView;
+    bool disconnected;
 
 
 };

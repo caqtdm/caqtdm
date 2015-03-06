@@ -135,6 +135,7 @@ public:
     bool getAutomateChecked();
     void setup();
     void dataProcessing(int value, int id);
+    void showDisconnected();
 
 private slots:
     void zoomIn(int level = 1);

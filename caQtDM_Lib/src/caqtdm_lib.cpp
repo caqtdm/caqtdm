@@ -2980,6 +2980,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             }
             widget->setAccessW(data.edata.accessW);
         } else {
+            widget->showDisconnected();
             // todo
         }
 
