@@ -325,6 +325,7 @@ void caLineEdit::setFormat(int prec)
         sprintf(thisFormat, "%s.%dle", "%", qAbs(precision));
         break;
     case truncated:
+        strcpy(thisFormat, "%d");
         break;
     case hexadecimal:
         strcpy(thisFormat, "0x%x");
@@ -351,6 +352,8 @@ void caLineEdit::setValue(double value, const QString& units)
         sprintf(asc, thisFormat, value);
       }
     } else if(thisFormatType == hexadecimal || thisFormatType == octal)  {
+        sprintf(asc, thisFormat, (int) value);
+    } else if(thisFormatType == truncated) {
         sprintf(asc, thisFormat, (int) value);
     } else {
         sprintf(asc, thisFormat, value);
