@@ -64,7 +64,7 @@
 #endif
 
 #include <epicsMutex.h>
-static epicsMutexId lockEpics;
+static epicsMutexId lockEpics = (epicsMutexId) 0;
 
 extern MutexKnobData* KnobDataPtr;
 
@@ -152,6 +152,8 @@ void PrepareDeviceIO(void)
 {
     //printf("preparedeviceio\n");
     int status;
+
+    if(lockEpics == (epicsMutexId) 0) InitializeContextMutex();
 
     epicsMutexLock(lockEpics);
 
