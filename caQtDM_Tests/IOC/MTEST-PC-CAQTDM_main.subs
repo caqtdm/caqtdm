@@ -11,47 +11,47 @@ file arraygen.template {
 }
 
 
-file caQtDM_analogPV.template {
-    pattern {LBL    NAME          HOPR  LOPR  HIHI  LOLO  HIGH  LOW   HHSV     LLSV     HSV      LSV       PINI  PREC  EGU   LINR            }   
-            {GM84   OP:demo1AI    10    0     9     0     7     0     MAJOR    NO_ALARM MINOR    NO_ALARM  YES   2     Volts "NO CONVERSION" }
-            {GM84   OP:demo2AI    10    0     10    1     10    2     NO_ALARM MAJOR    NO_ALARM MINOR     YES   2     Volts "NO CONVERSION" }
-            {GM84   OP:demo3AI    10    0     10    1.5   6.5   3     NO_ALARM MAJOR    NO_ALARM MINOR     YES   2     Volts "NO CONVERSION" }
-            {GM84   OP:demo4AI    10    0     8.5   0     0     0     MAJOR    NO_ALARM MINOR    NO_ALARM  YES   2     Volts "NO CONVERSION" }
-            {GM84   OP:demoAI     10    0     0     0     0     0     NO_ALARM NO_ALARM NO_ALARM NO_ALARM  YES   2     Volts "NO CONVERSION" }
-            {GM84   TEST:AI       0     0     0     0     0     0     NO_ALARM NO_ALARM NO_ALARM NO_ALARM  NO    6     Volts "LINEAR"        }
-            {GM84   TEST:AO       900.0 0.0   900.0 0.0   450.0 0.0   MAJOR    NO_ALARM MINOR    NO_ALARM  NO    2     Volts "NO CONVERSION" }
-            {GM84   SOL:1         65535 -65535 0    0     0     0     NO_ALARM NO_ALARM NO_ALARM NO_ALARM  NO    0     Units "NO CONVERSION" }
-}
+#file caQtDM_analogPV.template {
+#    pattern {LBL    NAME          HOPR  LOPR  HIHI  LOLO  HIGH  LOW   HHSV     LLSV     HSV      LSV       PINI  PREC  EGU   LINR            }   
+#            {GM84   OP:demo1AI    10    0     9     0     7     0     MAJOR    NO_ALARM MINOR    NO_ALARM  YES   2     Volts "NO CONVERSION" }
+#            {GM84   OP:demo2AI    10    0     10    1     10    2     NO_ALARM MAJOR    NO_ALARM MINOR     YES   2     Volts "NO CONVERSION" }
+#            {GM84   OP:demo3AI    10    0     10    1.5   6.5   3     NO_ALARM MAJOR    NO_ALARM MINOR     YES   2     Volts "NO CONVERSION" }
+#            {GM84   OP:demo4AI    10    0     8.5   0     0     0     MAJOR    NO_ALARM MINOR    NO_ALARM  YES   2     Volts "NO CONVERSION" }
+#            {GM84   OP:demoAI     10    0     0     0     0     0     NO_ALARM NO_ALARM NO_ALARM NO_ALARM  YES   2     Volts "NO CONVERSION" }
+#            {GM84   TEST:AI       0     0     0     0     0     0     NO_ALARM NO_ALARM NO_ALARM NO_ALARM  NO    6     Volts "LINEAR"        }
+#            {GM84   TEST:AO       900.0 0.0   900.0 0.0   450.0 0.0   MAJOR    NO_ALARM MINOR    NO_ALARM  NO    2     Volts "NO CONVERSION" }
+#            {GM84   SOL:1         65535 -65535 0    0     0     0     NO_ALARM NO_ALARM NO_ALARM NO_ALARM  NO    0     Units "NO CONVERSION" }
+#}
 
-file caQtDM_longPV.template {
-    pattern {LBL    NAME       HOPR  LOPR  HIHI  LOLO  HIGH  LOW   HHSV     LLSV     HSV      LSV       PINI  PREC  EGU   LINR            }   
-            {GM84   TEST:LO    0     0     0     0     0     0     NO_ALARM NO_ALARM NO_ALARM NO_ALARM  NO    2     Volts "NO CONVERSION" }
-            {GM84   TEST:LI    0     0     0     0     0     0     NO_ALARM NO_ALARM NO_ALARM NO_ALARM  NO    2     Units "NO CONVERSION" }
-}
+#file caQtDM_longPV.template {
+#    pattern {LBL    NAME       HOPR  LOPR  HIHI  LOLO  HIGH  LOW   HHSV     LLSV     HSV      LSV       PINI  PREC  EGU   LINR            }   
+#            {GM84   TEST:LO    0     0     0     0     0     0     NO_ALARM NO_ALARM NO_ALARM NO_ALARM  NO    2     Volts "NO CONVERSION" }
+#            {GM84   TEST:LI    0     0     0     0     0     0     NO_ALARM NO_ALARM NO_ALARM NO_ALARM  NO    2     Units "NO CONVERSION" }
+#}
 
-file caQtDM_calcPV.template {
-    pattern {LBL    NAME	INPA				CALC		EGU		PREC }
-            {GM84   COUNT:1	"GM84:COUNT:1"			"A+1"		"value"		2    }
-            {GM84   SOLRB:1	"GM84:SOL:1 MS CP"		"A"		"Units"		0    }
-            {GM84   IST:1	"GM84:SOL:1 MS CP"		"A"		"Units"		3    }
-            {GM84   IST:2	"GM84:SOL:1 MS CP"		"A"		"A"		3    }
-            {GM84   IST:3	"GM84:SOL:1 MS CP"		"A"		"kG"		3    }
-            {GM84   OP:demoCC	"GM84:OP:demoCC.VAL NPP NMS"	"A"		"counts"	0    }
-}
+#file caQtDM_calcPV.template {
+#    pattern {LBL    NAME	INPA				CALC		EGU		PREC }
+#            {GM84   COUNT:1	"GM84:COUNT:1"			"A+1"		"value"		2    }
+#            {GM84   SOLRB:1	"GM84:SOL:1 MS CP"		"A"		"Units"		0    }
+#            {GM84   IST:1	"GM84:SOL:1 MS CP"		"A"		"Units"		3    }
+#            {GM84   IST:2	"GM84:SOL:1 MS CP"		"A"		"A"		3    }
+#            {GM84   IST:3	"GM84:SOL:1 MS CP"		"A"		"kG"		3    }
+#            {GM84   OP:demoCC	"GM84:OP:demoCC.VAL NPP NMS"	"A"		"counts"	0    }
+#}
 
-file caQtDM_binaryPV.template {
-    pattern {LBL    NAME            PINI  SCAN        ZNAM     ONAM     ZSV        OSV       }   
-            {GM84   TEST:BO         YES   "1 second"  "false"  "true"   NO_ALARM   NO_ALARM  }
-            {GM84   TEST:BO1        NO    ""          "DONE"   "HOME"   NO_ALARM   NO_ALARM  }
-            {GM84   TEST:BI         NO    "Passive"   "false"  "true"   NO_ALARM   NO_ALARM  }
-            {GM84   OP:demoBI       YES   "Passive"   "Off"    "On"     NO_ALARM   MAJOR     }
-}
+#file caQtDM_binaryPV.template {
+#    pattern {LBL    NAME            PINI  SCAN        ZNAM     ONAM     ZSV        OSV       }   
+#            {GM84   TEST:BO         YES   "1 second"  "false"  "true"   NO_ALARM   NO_ALARM  }
+#            {GM84   TEST:BO1        NO    ""          "DONE"   "HOME"   NO_ALARM   NO_ALARM  }
+#            {GM84   TEST:BI         NO    "Passive"   "false"  "true"   NO_ALARM   NO_ALARM  }
+#            {GM84   OP:demoBI       YES   "Passive"   "Off"    "On"     NO_ALARM   MAJOR     }
+#}
 
-file caQtDM_otherPV.template {
-    {
-    	LBL          = GM84
-    }
-}
+#file caQtDM_otherPV.template {
+#    {
+#    	LBL          = GM84
+#    }
+#}
 
 # this templates are for Tests...
 file caQtDM_testPV.template {

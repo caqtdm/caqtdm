@@ -388,3 +388,31 @@ record (calcout, "$(LBL):#V")
     field (DISA, "1")  
     field (DISV, "0") 
 }
+
+
+#######################################################################################################################################
+#
+# binary output
+#
+#######################################################################################################################################
+record(bo,"$(LBL):OP:demoBI") {
+    	field(DESC,"binary output record")
+    	field(SCAN,"Passive")
+    	field(PINI,"YES")
+    	field(PHAS,"0")
+    	field(EVNT,"0")
+    	field(DTYP,"Soft Channel")
+    	field(DISV,"1")
+    	field(SDIS,"0.000000000000000e+00")
+    	field(DISS,"NO_ALARM")
+    	field(PRIO,"LOW")
+    	field(FLNK,"0.000000")
+    	field(ZNAM,"Off")
+	field(ONAM,"On")
+	field(ZSV,"NO_ALARM")
+    	field(OSV,"MAJOR")
+    	field(COSV,"NO_ALARM")
+    	field(SIOL,"0.000000000000000e+00")
+    	field(SIML,"0.000000000000000e+00")
+    	field(SIMS,"NO_ALARM")
+}

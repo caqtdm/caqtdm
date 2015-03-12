@@ -2339,7 +2339,7 @@ border-radius: 2px;
         </property>
         <property name="font">
          <font>
-          <pointsize>7</pointsize>
+          <pointsize>6</pointsize>
          </font>
         </property>
         <property name="channel" stdset="0">
@@ -3547,7 +3547,7 @@ LOPR - HOPR</string>
         </property>
         <property name="font">
          <font>
-          <pointsize>7</pointsize>
+          <pointsize>6</pointsize>
          </font>
         </property>
         <property name="channel" stdset="0">
@@ -3911,7 +3911,7 @@ LOPR - HOPR</string>
         </property>
         <property name="font">
          <font>
-          <pointsize>7</pointsize>
+          <pointsize>6</pointsize>
          </font>
         </property>
         <property name="channel" stdset="0">
@@ -4275,7 +4275,7 @@ LOPR - HOPR</string>
         </property>
         <property name="font">
          <font>
-          <pointsize>7</pointsize>
+          <pointsize>6</pointsize>
          </font>
         </property>
         <property name="channel" stdset="0">
@@ -10586,213 +10586,13 @@ LOPR - HOPR</string>
      <attribute name="title">
       <string>Wave</string>
      </attribute>
-     <widget class="caWaveTable" name="cawavetable">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>140</y>
-        <width>621</width>
-        <height>66</height>
-       </rect>
-      </property>
-      <property name="channel" stdset="0">
-       <string notr="true">GM84:SPECTRUM</string>
-      </property>
-      <property name="columnSize">
-       <number>60</number>
-      </property>
-      <property name="precision">
-       <number>1</number>
-      </property>
-      <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>55</number>
-      </attribute>
-      <row/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <item row="0" column="0">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="1">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="2">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="3">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="4">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="5">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="6">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="7">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="8">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="9">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-     </widget>
-     <widget class="caWaterfallPlot" name="cawaterfallplot_4">
-      <property name="geometry">
-       <rect>
-        <x>540</x>
-        <y>360</y>
-        <width>450</width>
-        <height>200</height>
-       </rect>
-      </property>
-      <property name="Title" stdset="0">
-       <string notr="true">SPECTRUM</string>
-      </property>
-      <property name="channel" stdset="0">
-       <string notr="true">GM84:SPECTRUM</string>
-      </property>
-      <property name="units">
-       <enum>caWaterfallPlot::Monitor</enum>
-      </property>
-      <property name="IntensityScalingMax">
-       <enum>caWaterfallPlot::User</enum>
-      </property>
-      <property name="IntensityScalingMin">
-       <enum>caWaterfallPlot::User</enum>
-      </property>
-     </widget>
-     <widget class="caCartesianPlot" name="caCartesianPlot_1">
-      <property name="geometry">
-       <rect>
-        <x>65</x>
-        <y>370</y>
-        <width>406</width>
-        <height>176</height>
-       </rect>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <property name="Title" stdset="0">
-       <string notr="true">caCartesianPlot</string>
-      </property>
-      <property name="TitleX">
-       <string>ARRAY INDEX</string>
-      </property>
-      <property name="TitleY">
-       <string notr="true">value</string>
-      </property>
-      <property name="channels_1" stdset="0">
-       <string notr="true">;GM84:SPECTRUM</string>
-      </property>
-      <property name="Style_1">
-       <enum>caCartesianPlot::Dots</enum>
-      </property>
-      <property name="symbol_1">
-       <enum>caCartesianPlot::Rect</enum>
-      </property>
-      <property name="color_1">
-       <color>
-        <red>0</red>
-        <green>0</green>
-        <blue>0</blue>
-       </color>
-      </property>
-      <property name="Style_2">
-       <enum>caCartesianPlot::Lines</enum>
-      </property>
-      <property name="symbol_2">
-       <enum>caCartesianPlot::Rect</enum>
-      </property>
-      <property name="Style_3">
-       <enum>caCartesianPlot::Lines</enum>
-      </property>
-      <property name="symbol_3">
-       <enum>caCartesianPlot::Triangle</enum>
-      </property>
-      <property name="countNumOrChannel" stdset="0">
-       <string>1000</string>
-      </property>
-      <property name="eraseMode">
-       <enum>caCartesianPlot::ifzero</enum>
-      </property>
-      <property name="foreground">
-       <color>
-        <red>255</red>
-        <green>255</green>
-        <blue>255</blue>
-       </color>
-      </property>
-      <property name="background">
-       <color>
-        <red>255</red>
-        <green>255</green>
-        <blue>255</blue>
-       </color>
-      </property>
-      <property name="scaleColor">
-       <color>
-        <red>0</red>
-        <green>0</green>
-        <blue>0</blue>
-       </color>
-      </property>
-      <property name="XaxisScaling" stdset="0">
-       <enum>caCartesianPlot::Auto</enum>
-      </property>
-      <property name="YaxisScaling" stdset="0">
-       <enum>caCartesianPlot::Auto</enum>
-      </property>
-      <property name="XaxisLimits">
-       <string>0;1</string>
-      </property>
-      <property name="YaxisLimits">
-       <string>0;1</string>
-      </property>
-     </widget>
      <widget class="caFrame" name="caframe_14">
       <property name="geometry">
        <rect>
-        <x>155</x>
-        <y>0</y>
+        <x>835</x>
+        <y>5</y>
         <width>261</width>
-        <height>136</height>
+        <height>181</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -10999,7 +10799,7 @@ LOPR - HOPR</string>
         <rect>
          <x>5</x>
          <y>85</y>
-         <width>101</width>
+         <width>126</width>
          <height>16</height>
         </rect>
        </property>
@@ -11012,7 +10812,7 @@ LOPR - HOPR</string>
         <enum>QFrame::NoFrame</enum>
        </property>
        <property name="text">
-        <string>#TAO</string>
+        <string>TRIGGERCOUNT.SCAN</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -11035,59 +10835,47 @@ LOPR - HOPR</string>
         </color>
        </property>
       </widget>
-      <widget class="caLineEdit" name="calineedit_87">
+      <widget class="caRelatedDisplay" name="carelateddisplay_8">
        <property name="geometry">
         <rect>
-         <x>115</x>
-         <y>80</y>
-         <width>81</width>
-         <height>20</height>
+         <x>10</x>
+         <y>140</y>
+         <width>161</width>
+         <height>26</height>
         </rect>
        </property>
-       <property name="text">
-        <string/>
+       <property name="autoFillBackground">
+        <bool>false</bool>
        </property>
-       <property name="channel" stdset="0">
-        <string notr="true">$(DEVICE):#TAO</string>
+       <property name="label">
+        <string notr="true">Limit Properties</string>
        </property>
-       <property name="colorMode">
-        <enum>caLineEdit::Static</enum>
+       <property name="labels">
+        <string notr="true">Limit Properties</string>
        </property>
-       <property name="precision">
-        <number>2</number>
+       <property name="files">
+        <string notr="true">TST-CAQTDM-A-PROP.ui</string>
        </property>
-       <property name="precisionMode">
-        <enum>caLineEdit::User</enum>
+       <property name="args">
+        <string notr="true">PV=$(DEVICE):LIMIT3-AO</string>
+       </property>
+       <property name="stackingMode" stdset="0">
+        <enum>caRowColMenu::Row</enum>
        </property>
       </widget>
-     </widget>
-     <widget class="caRelatedDisplay" name="carelateddisplay_8">
-      <property name="geometry">
-       <rect>
-        <x>450</x>
-        <y>70</y>
-        <width>161</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="autoFillBackground">
-       <bool>false</bool>
-      </property>
-      <property name="label">
-       <string notr="true">Limit Properties</string>
-      </property>
-      <property name="labels">
-       <string notr="true">Limit Properties</string>
-      </property>
-      <property name="files">
-       <string notr="true">TST-CAQTDM-A-PROP.ui</string>
-      </property>
-      <property name="args">
-       <string notr="true">PV=$(DEVICE):LIMIT3-AO</string>
-      </property>
-      <property name="stackingMode" stdset="0">
-       <enum>caRowColMenu::Row</enum>
-      </property>
+      <widget class="caTextEntry" name="catextentry_2">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>80</y>
+         <width>126</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="channel" stdset="0">
+        <string notr="true">$(DEVICE):TRIGGERCOUNT.SCAN</string>
+       </property>
+      </widget>
      </widget>
      <widget class="caFrame" name="caframe">
       <property name="geometry">
@@ -11333,7 +11121,7 @@ LOPR - HOPR</string>
        <property name="geometry">
         <rect>
          <x>5</x>
-         <y>115</y>
+         <y>110</y>
          <width>721</width>
          <height>46</height>
         </rect>
@@ -11444,410 +11232,181 @@ LOPR - HOPR</string>
        </item>
       </widget>
      </widget>
-     <widget class="caWaveTable" name="cawavetable_2">
+     <widget class="caFrame" name="caframe_6">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>220</y>
-        <width>676</width>
-        <height>46</height>
+        <x>5</x>
+        <y>5</y>
+        <width>826</width>
+        <height>431</height>
        </rect>
       </property>
-      <property name="editTriggers">
-       <set>QAbstractItemView::DoubleClicked</set>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
       </property>
-      <property name="channel" stdset="0">
+      <widget class="caCartesianPlot" name="caCartesianPlot_1">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>5</y>
+         <width>816</width>
+         <height>176</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="Title" stdset="0">
+        <string notr="true">caCartesianPlot</string>
+       </property>
+       <property name="TitleX">
+        <string>ARRAY INDEX</string>
+       </property>
+       <property name="TitleY">
+        <string notr="true">value</string>
+       </property>
+       <property name="channels_1" stdset="0">
+        <string notr="true">;GM84:SPECTRUM</string>
+       </property>
+       <property name="Style_1">
+        <enum>caCartesianPlot::Dots</enum>
+       </property>
+       <property name="symbol_1">
+        <enum>caCartesianPlot::Rect</enum>
+       </property>
+       <property name="color_1">
+        <color>
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+       <property name="Style_2">
+        <enum>caCartesianPlot::Lines</enum>
+       </property>
+       <property name="symbol_2">
+        <enum>caCartesianPlot::Rect</enum>
+       </property>
+       <property name="Style_3">
+        <enum>caCartesianPlot::Lines</enum>
+       </property>
+       <property name="symbol_3">
+        <enum>caCartesianPlot::Triangle</enum>
+       </property>
+       <property name="countNumOrChannel" stdset="0">
+        <string>1000</string>
+       </property>
+       <property name="eraseMode">
+        <enum>caCartesianPlot::ifzero</enum>
+       </property>
+       <property name="foreground">
+        <color>
+         <red>255</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </property>
+       <property name="background">
+        <color>
+         <red>255</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </property>
+       <property name="scaleColor">
+        <color>
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+       <property name="XaxisScaling" stdset="0">
+        <enum>caCartesianPlot::Auto</enum>
+       </property>
+       <property name="YaxisScaling" stdset="0">
+        <enum>caCartesianPlot::Auto</enum>
+       </property>
+       <property name="XaxisLimits">
+        <string>0;1</string>
+       </property>
+       <property name="YaxisLimits">
+        <string>0;1</string>
+       </property>
+      </widget>
+      <widget class="caWaterfallPlot" name="cawaterfallplot_4">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>200</y>
+         <width>646</width>
+         <height>221</height>
+        </rect>
+       </property>
+       <property name="Title" stdset="0">
+        <string notr="true">SPECTRUM</string>
+       </property>
+       <property name="channel" stdset="0">
+        <string notr="true">GM84:SPECTRUM</string>
+       </property>
+       <property name="units">
+        <enum>caWaterfallPlot::Monitor</enum>
+       </property>
+       <property name="IntensityScalingMax">
+        <enum>caWaterfallPlot::User</enum>
+       </property>
+       <property name="IntensityScalingMin">
+        <enum>caWaterfallPlot::User</enum>
+       </property>
+      </widget>
+     </widget>
+     <widget class="caStripPlot" name="castripplot">
+      <property name="geometry">
+       <rect>
+        <x>620</x>
+        <y>226</y>
+        <width>413</width>
+        <height>331</height>
+       </rect>
+      </property>
+      <property name="Title" stdset="0">
+       <string notr="true">caStripPlot</string>
+      </property>
+      <property name="channels" stdset="0">
        <string notr="true">GM84:SPECTRUM</string>
       </property>
-      <property name="columnSize">
-       <number>60</number>
+      <property name="period">
+       <double>10.000000000000000</double>
       </property>
-      <property name="precision">
-       <number>1</number>
+      <property name="refreshRate" stdset="0">
+       <enum>caStripPlot::High</enum>
       </property>
-      <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>55</number>
-      </attribute>
-      <attribute name="verticalHeaderShowSortIndicator" stdset="0">
-       <bool>false</bool>
-      </attribute>
-      <row>
-       <property name="text">
-        <string>DATASTORE1</string>
-       </property>
-      </row>
-      <row/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <item row="0" column="0">
-       <property name="text">
-        <string/>
-       </property>
-      </item>
-      <item row="0" column="1">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="2">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="3">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="4">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="5">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="6">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="7">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="8">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="9">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="0">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="1">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="2">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="3">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="4">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="5">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="6">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="7">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="8">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="9">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-     </widget>
-     <widget class="caWaveTable" name="cawavetable_3">
-      <property name="geometry">
-       <rect>
-        <x>145</x>
-        <y>280</y>
-        <width>621</width>
-        <height>66</height>
-       </rect>
+      <property name="YaxisLimitsMax_1">
+       <double>1000.000000000000000</double>
       </property>
-      <property name="editTriggers">
-       <set>QAbstractItemView::DoubleClicked</set>
+      <property name="YaxisLimitsMax_2">
+       <double>1000.000000000000000</double>
       </property>
-      <property name="channel" stdset="0">
-       <string notr="true">GM84:DATASTORE1</string>
+      <property name="YaxisLimitsMax_3">
+       <double>1000.000000000000000</double>
       </property>
-      <property name="numberOfRows">
-       <number>2</number>
+      <property name="YaxisLimitsMax_4">
+       <double>1000.000000000000000</double>
       </property>
-      <property name="numberOfColumns">
-       <number>15</number>
+      <property name="YaxisLimitsMax_5">
+       <double>1000.000000000000000</double>
       </property>
-      <property name="columnSize">
-       <number>60</number>
+      <property name="YaxisLimitsMax_6">
+       <double>1000.000000000000000</double>
       </property>
-      <property name="precision">
-       <number>1</number>
+      <property name="YaxisLimitsMax_7">
+       <double>1000.000000000000000</double>
       </property>
-      <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>55</number>
-      </attribute>
-      <attribute name="verticalHeaderVisible">
-       <bool>false</bool>
-      </attribute>
-      <row/>
-      <row/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <column/>
-      <item row="0" column="0">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="1">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="2">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="3">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="4">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="5">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="6">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="7">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="8">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="9">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="10">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="11">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="12">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="13">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="0" column="14">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="0">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="1">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="2">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="3">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="4">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="5">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="6">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="7">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="8">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="9">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="10">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="11">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="12">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="13">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
-      <item row="1" column="14">
-       <property name="font">
-        <font/>
-       </property>
-      </item>
+      <property name="YaxisScalingMax_7" stdset="0">
+       <enum>caStripPlot::Channel</enum>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
@@ -14717,6 +14276,94 @@ LOPR - HOPR</string>
       </property>
      </widget>
     </widget>
+    <widget class="QWidget" name="tab_4">
+     <attribute name="title">
+      <string>Page</string>
+     </attribute>
+     <widget class="caMessageButton" name="camessagebutton">
+      <property name="geometry">
+       <rect>
+        <x>75</x>
+        <y>575</y>
+        <width>100</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="caTextEntry" name="catextentry">
+      <property name="geometry">
+       <rect>
+        <x>115</x>
+        <y>510</y>
+        <width>100</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="caSpinbox" name="caspinbox">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>605</y>
+        <width>80</width>
+        <height>30</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="caScriptButton" name="cascriptbutton">
+      <property name="geometry">
+       <rect>
+        <x>535</x>
+        <y>410</y>
+        <width>100</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="caToggleButton" name="catogglebutton_2">
+      <property name="geometry">
+       <rect>
+        <x>415</x>
+        <y>520</y>
+        <width>251</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>caTogleButton</string>
+      </property>
+     </widget>
+     <widget class="caChoice" name="cachoice_3">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>225</y>
+        <width>150</width>
+        <height>150</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="caMenu" name="camenu_3">
+      <property name="geometry">
+       <rect>
+        <x>95</x>
+        <y>360</y>
+        <width>100</width>
+        <height>30</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="caCartesianPlot" name="cacartesianplot">
+      <property name="geometry">
+       <rect>
+        <x>550</x>
+        <y>230</y>
+        <width>224</width>
+        <height>107</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -14776,6 +14423,11 @@ LOPR - HOPR</string>
    <class>caToggleButton</class>
    <extends>QCheckBox</extends>
    <header>caToggleButton</header>
+  </customwidget>
+  <customwidget>
+   <class>caScriptButton</class>
+   <extends>QWidget</extends>
+   <header>caScriptButton</header>
   </customwidget>
   <customwidget>
    <class>caSpinbox</class>
@@ -14842,6 +14494,11 @@ LOPR - HOPR</string>
    <class>caCartesianPlot</class>
    <extends>QwtPlot</extends>
    <header>caCartesianPlot</header>
+  </customwidget>
+  <customwidget>
+   <class>caStripPlot</class>
+   <extends>QwtPlot</extends>
+   <header>caStripPlot</header>
   </customwidget>
   <customwidget>
    <class>caByte</class>
