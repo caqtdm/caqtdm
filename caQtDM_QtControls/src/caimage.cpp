@@ -27,6 +27,9 @@
 #include "searchfile.h"
 #include <QtDebug>
 #include <QFileDialog>
+#ifdef NETWORKDOWNLOADSUPPORT
+#include "fileFunctions.h"
+#endif
 
 caImage::caImage(QWidget* parent) : QWidget(parent)
 {
@@ -45,7 +48,14 @@ caImage::~caImage() {
 
 void caImage::init(const QString& filename) {
     //create the movie
-
+    // this will download the file from a http server
+#ifdef NETWORKDOWNLOADSUPPORT
+    fileFunctions filefunction;
+    int success = filefunction.checkFileAndDownload(filename);
+    if(!success) {
+        QMessageBox::critical(0, tr("caQtDM"), tr("could not download file %1, however continue").arg(filename));
+    }
+#endif
     searchFile *s = new searchFile(filename);
     QString fileNameFound = s->findFile();
     if(fileNameFound.isNull()) {

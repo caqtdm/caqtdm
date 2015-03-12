@@ -51,9 +51,6 @@ android {
    LOCAL_LDLIBS += -llog
 
    ICON = ../src/caQtDM.icns$$PWD/../src/caQtDM.png
-   #APP_ICON.files += $$PWD/../src/caQtDM-60@2x.png
-   #APP_ICON.files += $$PWD/../src/caQtDM-72.png
-   #APP_ICON.files += $$PWD/../src/caQtDM-76.png
    APP_ICON.files += $$PWD/../src/caqtdm762x.png
    APP_ICON.path = /res/drawable
 
@@ -65,8 +62,6 @@ android {
    APP-FONTS.files = $$PWD/../lucida-sans-typewriter.ttf
    APP-FONTS.path = /fonts
    QMAKE_BUNDLE_DATA += APP_XML_FILES APP_ICON APP1_ICON StartScreen APP-FONTS
-   #QMAKE_CFLAGS += -gdwarf-2
-   #QMAKE_CXXFLAGS += -gdwarf-2
 
    deployment.files += $$PWD/../caQtDM_IOS_Config.xml
    deployment.path = /assets

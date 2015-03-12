@@ -29,6 +29,9 @@
 #include <QApplication>
 #include "cainclude.h"
 #include "searchfile.h"
+#ifdef NETWORKDOWNLOADSUPPORT
+#include "fileFunctions.h"
+#endif
 
 caInclude::caInclude(QWidget *parent) : QWidget(parent)
 {
@@ -82,6 +85,9 @@ void caInclude::removeIncludedWidget()
 void caInclude::setFileName(QString const &filename)
 {
     QUiLoader loader;
+#ifdef NETWORKDOWNLOADSUPPORT
+    fileFunctions filefunction;
+#endif
     newFileName = filename.trimmed();
 
     // load widgets from includes
@@ -110,6 +116,10 @@ void caInclude::setFileName(QString const &filename)
         if(newFileName.contains(".prc")) {
             // we have a pep file to scan
             //printf("we have to scan pep file %s\n", newFileName.toAscii().constData());
+            // this will download the file from a http server
+#ifdef NETWORKDOWNLOADSUPPORT
+            filefunction.checkFileAndDownload(newFileName);
+#endif
             searchFile *s = new searchFile(newFileName);
             QString fileNameFound = s->findFile();
 
@@ -140,6 +150,10 @@ void caInclude::setFileName(QString const &filename)
 
         QStringList openFile = newFileName.split(".", QString::SkipEmptyParts);
         QString fileName = openFile[0].append(".ui");
+        // this will download the file from a http server
+#ifdef NETWORKDOWNLOADSUPPORT
+        filefunction.checkFileAndDownload(fileName);
+#endif
         searchFile *s = new searchFile(fileName);
         QString fileNameFound = s->findFile();
 

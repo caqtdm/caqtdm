@@ -52,7 +52,7 @@ class configDialog: public QWidget
     Q_OBJECT
 
 public:
-    configDialog(const bool debugWindow, const QList<QString> &urlString, const QList<QString> &indexFile, QWidget *parent = 0);
+    configDialog(const bool debugWindow, const QList<QString> &urlString, const QList<QString> &indexFile, QSize desktopSize, QWidget *parent = 0);
     int openUrl();
     void executeQuery();
     void getChoice(QString &url, QString &file, QList<QString> &urls, QList<QString> &files, bool &debugWindow);
