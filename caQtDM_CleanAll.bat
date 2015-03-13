@@ -2,7 +2,7 @@
 echo =============================================================================================
 cd
 echo =============================================================================================
-
+if "%CAQTDM_GENERAL_COMPILATION%"=="1" GOTO :clean
 call caQtDM_Env.bat
 
 call "C:\Program files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
@@ -12,7 +12,7 @@ set PATH=%PATH%;%QTHOME%\bin
 echo package will be removed from .\caQtDM_Binaries and all directories will be cleaned up
 
 echo Press [Enter] key to start cleanup
-
+:clean
 echo ========== remove binaries from directories ============
 qmake all.pro
 where /q jom.exe 
@@ -64,5 +64,5 @@ rmdir /S /Q  .\caQtDM_Viewer\package\windows\project_x86
 
 echo =========== clean all ==================
 
-
+if "%CAQTDM_GENERAL_COMPILATION%"=="1" GOTO :eof
 pause

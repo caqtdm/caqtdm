@@ -1,3 +1,11 @@
+REM =============================================================================================
+REM For general compiling
+REM =============================================================================================
+
+IF "%1"=="1" GOTO SELECT1
+IF "%1"=="2" GOTO SELECT2
+IF "%1"=="3" GOTO SELECT3
+
 echo =============================================================================================
 echo Select Build Environment
 echo 1) QT 4.8.5 QWT6.0.1  32 Bit VS2010  
@@ -6,10 +14,10 @@ echo 3) QT 5.4.0 QWT6.1.1  32 Bit VS2013
 set /P SELCTION=Select: 
 echo =============================================================================================
  
-IF %SELCTION%==1 GOTO SELECT1
-IF %SELCTION%==2 GOTO SELECT2
-IF %SELCTION%==3 GOTO SELECT3
-
+IF %SELCTION%==1 GOTO :SELECT1
+IF %SELCTION%==2 GOTO :SELECT2
+IF %SELCTION%==3 GOTO :SELECT3
+IF %SELCTION%==A GOTO :SELECTA
 
 REM =============================================================================================
 REM SELECT1
@@ -19,25 +27,25 @@ REM ============================================================================
  
   call "C:\Program files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" x86
  
-  IF "%QTHOME%"==""          set QTHOME=X:/qt/4.8.5
-  IF "%QWTHOME%"==""         set QWTHOME=X:/qt/qwt-6.0.1
-  IF "%QWTINCLUDE%"==""      set QWTINCLUDE=%QWTHOME%/src
-  IF "%QWTLIB%"==""          set QWTLIB=%QWTHOME%/lib
+  set QTHOME=X:/qt/4.8.5
+  set QWTHOME=X:/qt/qwt-6.0.1
+  set QWTINCLUDE=%QWTHOME%/src
+  set QWTLIB=%QWTHOME%/lib
   
   
-  IF "%EPICS_BASE%"==""      set EPICS_BASE=X:/epics/base-3.14.12.4
-  IF "%EPICS_HOST_ARCH%"=="" set EPICS_HOST_ARCH=win32-x86
+  set EPICS_BASE=X:/epics/base-3.14.12.4
+  set EPICS_HOST_ARCH=win32-x86
   
-  IF "%EPICSINCLUDE%"==""    set EPICSINCLUDE=%EPICS_BASE%/include
-  IF "%QTCONTROLS_LIBS%"=="" set QTCONTROLS_LIBS=X:/Qt/caqtdm_project/caQtDM_QtControls
-  IF "%CAQTDM_COLLECT%"==""  set CAQTDM_COLLECT=X:/Qt/caqtdm_project/caQtDM_Binaries
-  IF "%JOM%"==""             set JOM=X:\qt\jom
+  set EPICSINCLUDE=%EPICS_BASE%/include
+  set QTCONTROLS_LIBS=X:/Qt/caqtdm_project/caQtDM_QtControls 
+  set CAQTDM_COLLECT=X:/Qt/caqtdm_project/caQtDM_Binaries
   
+  set JOM=X:\qt\jom
   set QTBASE=%QTCONTROLS_LIBS%
   
-  IF "%QTDM_LIBINSTALL%"=="" 		set QTDM_LIBINSTALL=X:\Qt\4.8.5\lib
-  IF "%QTDM_BININSTALL%"=="" 		set QTDM_BININSTALL=X:\qt\4.8.5\bin
-  IF "%WIXHOME%"=="" 			set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
+  set QTDM_LIBINSTALL=X:\Qt\4.8.5\lib
+  set QTDM_BININSTALL=X:\qt\4.8.5\bin
+  set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2010
   
 GOTO PRINTOUT
@@ -49,24 +57,24 @@ REM ============================================================================
  
   call "C:\Program files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
  
-  IF "%QTHOME%"==""          set QTHOME=X:/qt/5.4.0_64bit/qtbase
+  set QTHOME=X:/qt/5.4.0_64bit/qtbase
   
-  IF "%QWTHOME%"==""         set QWTHOME=X:/qt/qwt-6.1.1_5_64bit
-  IF "%QWTINCLUDE%"==""      set QWTINCLUDE=%QWTHOME%/src
-  IF "%QWTLIB%"==""          set QWTLIB=%QWTHOME%/lib
+  set QWTHOME=X:/qt/qwt-6.1.1_5_64bit
+  set QWTINCLUDE=%QWTHOME%/src
+  set QWTLIB=%QWTHOME%/lib
   
   
-  IF "%EPICS_BASE%"==""      set EPICS_BASE=X:/epics/base-3.14.12.4
-  IF "%EPICS_HOST_ARCH%"=="" set EPICS_HOST_ARCH=windows-x64
+  set EPICS_BASE=X:/epics/base-3.14.12.4
+  set EPICS_HOST_ARCH=windows-x64
 
-  IF "%EPICSINCLUDE%"==""    set EPICSINCLUDE=%EPICS_BASE%/include
-  IF "%QTCONTROLS_LIBS%"=="" set QTCONTROLS_LIBS=X:/Qt/caqtdm_project/caQtDM_QtControls
-  IF "%CAQTDM_COLLECT%"==""  set CAQTDM_COLLECT=X:/Qt/caqtdm_project/caQtDM_Binaries_64Bit
-  IF "%JOM%"==""             set JOM=X:\qt\jom
+  set EPICSINCLUDE=%EPICS_BASE%/include
+  set QTCONTROLS_LIBS=X:/Qt/caqtdm_project/caQtDM_QtControls
+  set CAQTDM_COLLECT=X:/Qt/caqtdm_project/caQtDM_Binaries_64Bit
+  set JOM=X:\qt\jom
  
   set QTBASE=%QTCONTROLS_LIBS%
   
-  IF "%WIXHOME%"=="" 			set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
+  set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
 GOTO PRINTOUT
 
@@ -78,31 +86,31 @@ REM ============================================================================
  
   call "C:\Program files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
  
-  IF "%QTHOME%"==""          set QTHOME=X:/qt/5.4.0_32bit/qtbase
+  set QTHOME=X:/qt/5.4.0_32bit/qtbase
   
-  IF "%QWTHOME%"==""         set QWTHOME=X:/qt/qwt-6.1.1_5_32bit
-  IF "%QWTINCLUDE%"==""      set QWTINCLUDE=%QWTHOME%/src
-  IF "%QWTLIB%"==""          set QWTLIB=%QWTHOME%/lib
+  set QWTHOME=X:/qt/qwt-6.1.1_5_32bit
+  set QWTINCLUDE=%QWTHOME%/src
+  set QWTLIB=%QWTHOME%/lib
   
   
-  IF "%EPICS_BASE%"==""      set EPICS_BASE=X:/epics/base-3.14.12.4
-  IF "%EPICS_HOST_ARCH%"=="" set EPICS_HOST_ARCH=win32-x86
+  set EPICS_BASE=X:/epics/base-3.14.12.4
+  set EPICS_HOST_ARCH=win32-x86
 
-  IF "%EPICSINCLUDE%"==""    set EPICSINCLUDE=%EPICS_BASE%/include
-  IF "%QTCONTROLS_LIBS%"=="" set QTCONTROLS_LIBS=X:/Qt/caqtdm_project/caQtDM_QtControls
-  IF "%CAQTDM_COLLECT%"==""  set CAQTDM_COLLECT=X:/Qt/caqtdm_project/caQtDM_Binaries_32Bit
-  IF "%JOM%"==""             set JOM=X:\qt\jom
+  set EPICSINCLUDE=%EPICS_BASE%/include
+  set QTCONTROLS_LIBS=X:/Qt/caqtdm_project/caQtDM_QtControls
+  set CAQTDM_COLLECT=X:/Qt/caqtdm_project/caQtDM_Binaries_32Bit
+  set JOM=X:\qt\jom
  
   set QTBASE=%QTCONTROLS_LIBS%
   
-  IF "%WIXHOME%"=="" 			set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
+  set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
 GOTO PRINTOUT
 
 
-
-
-
+:SELECTA
+ set CAQTDM_GENERAL_COMPILATION=1
+GOTO :eof
 
 
 :PRINTOUT
