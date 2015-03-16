@@ -50,11 +50,14 @@ qtcontrols_graphics.depends = caQtDM_QtControls caQtDM_Lib
 qtcontrols_monitors.file = caQtDM_QtControls/plugins/qtcontrols_monitors.pro 
 qtcontrols_monitors.depends = caQtDM_QtControls caQtDM_Lib
 
+SUBDIRS += parser
+parser.file = caQtDM_Viewer/parser/parser.pro
+
+
 unix {
 !ios {
       !android {
- SUBDIRS +=  parserEDM parser
- parser.file = caQtDM_Viewer/parser/parser.pro
+ SUBDIRS +=  parserEDM
  parserEDM.file = caQtDM_Viewer/parserEDM/parserEDM.pro
 }
 }
