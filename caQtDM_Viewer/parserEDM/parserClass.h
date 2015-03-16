@@ -45,7 +45,7 @@ private:
     int fileClose ( FILE *f);
     FILE *fileOpen (char *name, char *mode);
     char fileRev[31+1], fileNameAndRev[287+1];
-    char fileName[128];
+    char fileName[1000];
     int haveComments;
     unknownTagList unknownTags;
 
