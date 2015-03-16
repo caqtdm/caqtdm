@@ -305,7 +305,7 @@ FILE *parserClass::openAny (char *name, char *mode )
 
     f = fopen( name, mode );
     if ( f ) {
-        strncpy( fileName, buf, 255 ); // update fileName
+    /*    strncpy( fileName, buf, 255 ); // update fileName - SLAC commented out due to  buffer overflow error*/
         return f;
     }
     return NULL;
@@ -461,11 +461,12 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 // Discard all content up to "endObjectProperties"
 
                 fprintf( stderr, "Line %-d, Error creating object \"%s\"\n", tag.line(), objName );
+                gotOne = tag.getName( tagName, 255, f ); // Zai
+                continue;                                // Zai
 
                 tag.init();
                 tag.loadR( "endObjectProperties", 63, objName );
                 stat = tag.readTags( f, "endObjectProperties" );
-
                 // Start looking for leading keywords again
                 tag.init();
                 tag.loadR( "object", 63, objName );
@@ -1391,7 +1392,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
             case shellCmdButton :
             {
                 int n;
-                char args[256], files[256], labels[256];
+                char args[1024], files[1024], labels[1024];//ababbitt 3-13-15: increased to 1024 to no longer receiver buffer overflow message 
                 args[0] = files[0] = labels[0] = '\0';
                 tagClass tag;
 
@@ -1441,7 +1442,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_setColorBackground("", rgb[bgColor].r/256, rgb[bgColor].g/256, rgb[bgColor].b/256, 255);
 
                 for(int i=0; i<numCmds; i++) {
-                    strcat(labels, labelS[i].getRaw()); strcat(labels, ";");
+                    strcat(labels, labelS[i].getRaw());
+		    strcat(labels, ";");
                     strcat(files, shellCommand[i].getRaw()); strcat(files, ";");
                 }
                 if(strlen(files) > 0) files[strlen(files) -1] = '\0';
@@ -1622,7 +1624,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
             case relatedDisplay :
             {
 
-                char args[256], files[256], labels[256], remove[256];
+                char args[1024], files[1024], labels[1024], remove[1024];//ababbitt 3-13-15: increased to 1024 to no longer receive buffer overflow message
                 args[0] = files[0] = labels[0] = remove[0] = '\0';
                 tagClass tag;
                 tag.init();
@@ -1678,11 +1680,11 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->writeRectangleDimensions(x, y, w, h);
                 myParser->Qt_setColorForeground("", rgb[fgColor].r/256, rgb[fgColor].g/256, rgb[fgColor].b/256, 255);
                 myParser->Qt_setColorBackground("", rgb[bgColor].r/256, rgb[bgColor].g/256, rgb[bgColor].b/256, 255);
-
                 for(int i=0; i<numDsps; i++) {
                     strcat(files, displayFileName[i].getRaw()); strcat(files, ";");
-                    strcat(labels, relLabel[i].getRaw()); strcat(labels, ";");
-                    strcat(args, symbolsExpStr[i].getRaw()); strcat(args, ";");
+                    strcat(labels, relLabel[i].getRaw());
+                    strcat(labels, ";"); //ababbitt 3-13-15: buffer overload error before increasing char size to 1024
+                    strcat(args, symbolsExpStr[i].getRaw());strcat(args, ";");
                     if(replaceSymbols[i] == 0) strcat(remove, "false"); else strcat(remove, "true"); strcat(remove, ";");
                 }
                 if(strlen(files) > 0) files[strlen(files) -1] = '\0';
@@ -1711,8 +1713,9 @@ int parserClass::loadFile (myParserEDM *myParser) {
             gotOne = tag.getName( tagName, 255, f );
 
         } else {
-            fprintf( stderr, "Unknown tag name: [%s]\n", tagName );
+// Zai            fprintf( stderr, "Unknown tag name: [%s]\n", tagName );
             gotOne = NULL;
+            gotOne = tag.getName( tagName, 255, f );    //Zai
 
         }
 
