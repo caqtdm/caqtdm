@@ -378,6 +378,10 @@ void caCamera::setup()
         // texts
         labelMax = new caLineEdit(this);
         labelMin = new caLineEdit(this);
+
+        labelMax->newFocusPolicy(Qt::ClickFocus);
+        labelMin->newFocusPolicy(Qt::ClickFocus);
+
         intensity = new caLabel(this);
 
         intensity->setAlignment(Qt::AlignVCenter | Qt::AlignLeft );
