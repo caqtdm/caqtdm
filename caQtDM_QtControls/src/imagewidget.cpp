@@ -76,7 +76,7 @@ void ImageWidget::paintEvent(QPaintEvent * event)
 
     if(simpleView) return;
 
-    painter.setPen(Qt::red);
+    painter.setPen(Qt::blue);
 
     int width = imageNew.size().width();
     int height = imageNew.size().height();
