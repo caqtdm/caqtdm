@@ -115,7 +115,7 @@ INCLUDEPATH += ../../caQtDM_Lib/src
 
 RESOURCES += ../src/caQtDM.qrc
 RC_FILE = ../src/caQtDM.rc
-
+android {
 DISTFILES += /Users/mezger/Documents/Entwicklung/qt/caqtdm_project/caQtDM_Viewer/caQtDM1/caQtDM_Viewer/caQtDM1/android/AndroidManifest.xml \
     caQtDM_Viewer/caQtDM1/android/gradle/wrapper/gradle-wrapper.jar \
     caQtDM_Viewer/caQtDM1/android/res/values/libs.xml \
@@ -125,5 +125,5 @@ DISTFILES += /Users/mezger/Documents/Entwicklung/qt/caqtdm_project/caQtDM_Viewer
     caQtDM_Viewer/caQtDM1/android/gradlew.bat
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/caQtDM_Viewer/caQtDM1/android
-
+}
 
