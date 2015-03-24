@@ -223,7 +223,6 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
             minimumLineEdit->setText(QString::number(initMin, 'g'));
             maximumLineEdit->setText(QString::number(initMax, 'g'));
             if(widget->getPrecisionMode() == caMeter::Channel) {
-                qDebug() << "channel precision" << channelPrecision;
                 initPrecision =  channelPrecision;
                 precisionComboBox->setCurrentIndex(0);
             } else {

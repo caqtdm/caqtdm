@@ -254,10 +254,12 @@ void caMeter::updateMeter()
 
 void caMeter::setValueUnits(double value, const QString &units)
 {
+    if(lastValue == value && lastUnits == units) return;
     setValue(value);
     thisLabel = setLabel(value, units);
     lastValue = value;
     lastUnits = units;
+    update();
 }
 
 QPalette caMeter::colorTheme( const QColor &base ) const
@@ -298,6 +300,9 @@ void caMeter::invalidate()
     invalidateCache();
     setScale(getMinValue()-1, getMaxValue()+1);
     setScale(getMinValue(), getMaxValue());
+#else
+    setRange(thisMinValue, thisMaxValue);
+    setScale(-1, 2, (thisMinValue - thisMaxValue)/10.0);
 #endif
 }
 

@@ -2179,18 +2179,15 @@ void CaQtDM_Lib::UpdateGauge(EAbstractGauge *widget, const knobData &data)
             widget->setHighWarning(maxval);
         }
 
+        widget->setValue(data.edata.rvalue);
         widget->update();
 
     }
-
-    widget->setValue(data.edata.rvalue);
 }
 
 void CaQtDM_Lib::UpdateMeter(caMeter *widget, const knobData &data)
 {
     if(data.edata.connected) {
-        double maxval = 1000.0;
-        double minval = 0.0;
 
         if((widget->getLimitsMode() == caMeter::Channel) && (data.edata.initialize)) {
             // HOPR and LOPR
@@ -2198,29 +2195,20 @@ void CaQtDM_Lib::UpdateMeter(caMeter *widget, const knobData &data)
                 // set some default
                 widget->setMaxValue(1000.0);
                 widget->setMinValue(0.0);
-                maxval = 1000.0;
-                minval = 0.0;
             } else {
                 if(!isnan(data.edata.lower_disp_limit)) {
                     widget->setMinValue(data.edata.lower_disp_limit);
-                    minval = data.edata.lower_disp_limit;
                 } else {
                     widget->setMinValue(0.0);
-                    minval = 0.0;
                 }
                 if(!isnan(data.edata.upper_disp_limit)) {
                     widget->setMaxValue(data.edata.upper_disp_limit);
-                    maxval = data.edata.upper_disp_limit;
                 } else {
                     widget->setMaxValue(1000.0);
-                    maxval = 1000;
                 }
             }
 
             widget->update();
-        } else {
-            maxval = widget->getMaxValue();
-            minval = widget->getMinValue();
         }
 
         int precMode = widget->getPrecisionMode();
@@ -2228,11 +2216,9 @@ void CaQtDM_Lib::UpdateMeter(caMeter *widget, const knobData &data)
             widget->setPrecision(data.edata.precision);
             widget->updateMeter();
         }
-
-        widget->update();
+        widget->setValueUnits(data.edata.rvalue, data.edata.units);
     }
 
-    widget->setValueUnits(data.edata.rvalue, data.edata.units);
 }
 
 /**
