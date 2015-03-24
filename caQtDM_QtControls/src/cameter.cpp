@@ -157,9 +157,7 @@ void caMeter::setMaxValue(double v) {
 
 void caMeter::drawScaleContents(QPainter *painter, const QPointF &center, double radius) const
 {
-    QRectF rect( 0.0, 0.0, 2.0 * radius, 2.0 * radius - 10.0);
-    rect.moveCenter(center);
-
+    QRectF rect( 2./10.*width(), 0.0, 6.0/10.0*width(), 9.0/10.0*height());
 
     const QColor color = palette().color(QPalette::Text);
     painter->setPen(color);
@@ -176,10 +174,12 @@ void caMeter::drawScaleContents(QPainter *painter, const QPointF &center, double
         fontBoundRect = painter->fontMetrics().boundingRect(rect.toRect(),flags, thisLabel);
     }
 
-    painter->setBrush(prevColor);
-    painter->setPen(prevColor);
+    painter->setBrush(QColor(0,0,0,0));
+    painter->setPen(QColor(0,0,0,0));
+    //painter->setBrush(Qt::gray);
+    //painter->setPen(Qt::gray);
 
-    painter->drawRect(fontBoundRect);
+    painter->drawRect(rect);
 
     if(thisScaleDefaultColor) {
        painter->setPen(thisBaseColor.dark( 200 ).light( 800 ));
