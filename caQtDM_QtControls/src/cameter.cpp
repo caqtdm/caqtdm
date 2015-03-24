@@ -250,6 +250,7 @@ QString caMeter::setLabel(double value, const QString& units)
 void caMeter::updateMeter()
 {
     setValueUnits(lastValue, lastUnits);
+    update();
 }
 
 void caMeter::setValueUnits(double value, const QString &units)
@@ -304,6 +305,7 @@ void caMeter::invalidate()
     setRange(thisMinValue, thisMaxValue);
     setScale(-1, 2, (thisMinValue - thisMaxValue)/10.0);
 #endif
+    update();
 }
 
 void caMeter::setNormalColors()

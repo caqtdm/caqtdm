@@ -90,7 +90,7 @@ public:
     SourceMode getPrecisionMode() const { return thisPrecMode; }
     void setPrecisionMode(SourceMode precmode) {thisPrecMode = precmode;}
     int getPrecision() const {return thisPrecision;}
-    void setPrecision(int prec) {thisPrecision = prec; setFormat(prec);}
+    void setPrecision(int prec) {thisPrecision = prec; setFormat(prec); invalidate();}
 
     void setFormat(int prec);
     void setValueUnits(double value, const QString& units);
