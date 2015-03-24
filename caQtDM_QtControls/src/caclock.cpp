@@ -152,3 +152,4 @@ void caClock::setAlarmColors(short status)
       setPalette( colorTheme( c) );
     }
 }
+#include "moc_caclock.cpp"

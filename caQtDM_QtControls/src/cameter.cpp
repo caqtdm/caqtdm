@@ -79,7 +79,7 @@ caMeter::~caMeter() {
 caMeter::caMeter(QWidget *parent) : QwtDial(parent)
 {
 
-    thisBaseColor = QColor( Qt::gray);   
+    thisBaseColor = QColor( Qt::gray);
     thisScaleColor = thisBaseColor.dark( 200 ).light( 800 );
     setScaleDefaultColor(true);
 
@@ -351,3 +351,4 @@ void caMeter::setAlarmColors(short status)
     }
 
 }
+#include "moc_cameter.cpp"
