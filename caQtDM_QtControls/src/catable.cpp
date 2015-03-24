@@ -178,7 +178,7 @@ void caTable::displayText(int row, int col, short status, QString const &text)
         case MAJOR_ALARM:
             tableItem[row][col]->setForeground(AL_RED);
             break;
-        case ALARM_INVALID:
+        case INVALID_ALARM:
         case NOTCONNECTED:
             tableItem[row][col]->setForeground(AL_WHITE);
             break;

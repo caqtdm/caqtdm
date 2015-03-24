@@ -222,4 +222,14 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
+class caMeterInterface : public CustomWidgetInterface_Monitors
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerCustomWidgetInterface)
+	
+public:
+    caMeterInterface(QObject* parent);
+    virtual QWidget* createWidget(QWidget* parent);
+};
+
 #endif

@@ -180,6 +180,8 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
         thisPV = widget->getPV();
     } else if(caCircularGauge* widget = qobject_cast<caCircularGauge *>(w)) {
         thisPV = widget->getPV();
+    } else if(caMeter* widget = qobject_cast<caMeter *>(w)) {
+        thisPV = widget->getPV();
     }
 
     if(className.contains("Gauge")) {
@@ -211,6 +213,24 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
         maximumLineEdit->setText(QString::number(initMax, 'g'));
         precisionComboBox->setDisabled(true);
         precisionLineEdit->setDisabled(true);
+
+        // fill fields
+     } else if(caMeter* widget = qobject_cast<caMeter *>(w)) {
+            caMeter::SourceMode mode = widget->getLimitsMode();
+            if(mode == caMeter::Channel) limitsComboBox->setCurrentIndex(0); else limitsComboBox->setCurrentIndex(1);
+            initMin = widget->getMinValue();
+            initMax = widget->getMaxValue();
+            minimumLineEdit->setText(QString::number(initMin, 'g'));
+            maximumLineEdit->setText(QString::number(initMax, 'g'));
+            if(widget->getPrecisionMode() == caMeter::Channel) {
+                qDebug() << "channel precision" << channelPrecision;
+                initPrecision =  channelPrecision;
+                precisionComboBox->setCurrentIndex(0);
+            } else {
+                initPrecision = widget->getPrecision();
+                precisionComboBox->setCurrentIndex(1);
+            }
+            if(initPrecision >=0) precisionLineEdit->setValue(initPrecision);
 
     } else if(EAbstractGauge* widget = qobject_cast<EAbstractGauge *>(w)) {
             EAbstractGauge::displayLims mode = widget->getDisplayLimits();
@@ -436,6 +456,29 @@ void limitsDialog::applyClicked()
         // set eventual missed value
         knobData *kPtr = monData->getMutexKnobDataPV(widget, thisPV);
         if(kPtr != (knobData*) 0) widget->setSliderValue(kPtr->edata.rvalue);
+
+    } else if(caMeter* widget = qobject_cast<caMeter *>(thisWidget)) {
+        if(limitsMode == Channel) {
+            widget->setLimitsMode(caMeter::Channel);
+            if(!doNothing) {
+                widget->setMaxValue(channelUpperLimit);
+                widget->setMinValue(channelLowerLimit);
+            }
+        } else if(limitsMode == User){
+            widget->setLimitsMode(caMeter::User);
+            widget->setMaxValue(max);
+            widget->setMinValue(min);
+        }
+
+        if(precisionMode == Channel) {
+            widget->setPrecisionMode(caMeter::Channel);
+            widget->setPrecision(channelPrecision);
+        } else if(precisionMode == User){
+            widget->setPrecisionMode(caMeter::User);
+            widget->setPrecision(prec);
+        }
+        widget->updateMeter();
+        widget->invalidate();
 
         // ************* we have a thermometer
     } else if(caThermo* widget = qobject_cast<caThermo *>(thisWidget)) {

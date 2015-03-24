@@ -100,7 +100,7 @@ void caMenu::setAlarmColors(short status)
     case MAJOR_ALARM:
         bg = AL_RED;
         break;
-    case ALARM_INVALID:
+    case INVALID_ALARM:
     case NOTCONNECTED:
         bg = AL_WHITE;
         fg = bg;

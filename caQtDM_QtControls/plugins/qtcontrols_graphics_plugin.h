@@ -158,6 +158,15 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
+class caClockInterface : public CustomWidgetInterface_Graphics
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerCustomWidgetInterface)
+	
+public:
+    caClockInterface(QObject* parent);
+    virtual QWidget* createWidget(QWidget* parent);
+};
 
 
 #endif

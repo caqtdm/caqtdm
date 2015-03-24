@@ -196,7 +196,7 @@ void caGraphics::setAlarmColors(short status)
         setForeground(AL_RED);
         setLineColor(AL_RED);
         break;
-    case ALARM_INVALID:
+    case INVALID_ALARM:
     case NOTCONNECTED:
         setForeground(AL_WHITE);
         setLineColor(AL_WHITE);

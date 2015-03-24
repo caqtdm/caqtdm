@@ -39,5 +39,7 @@
 #include <cawaterfallplot.h>
 #include <caspinbox.h>
 #include <cawavetable.h>
+#include <caclock.h>
+#include <cameter.h>
 #endif
 

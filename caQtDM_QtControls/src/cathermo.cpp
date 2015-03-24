@@ -228,7 +228,7 @@ void caThermo::setAlarmColors(short status)
     case MAJOR_ALARM:
         c=AL_RED;
         break;
-    case ALARM_INVALID:
+    case INVALID_ALARM:
     case NOTCONNECTED:
         c=AL_WHITE;
         break;

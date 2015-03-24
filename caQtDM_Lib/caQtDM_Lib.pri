@@ -74,7 +74,7 @@ HEADERS += caqtdm_lib.h\
     knobDefines.h \
     knobData.h \
     dbrString.h \
-    alarmdefs.h \
+    alarmstrings.h \
     dmsearchfile.h \
     MessageWindow.h \
     messageWindowWrapper.h \

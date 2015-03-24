@@ -81,6 +81,8 @@ void caToggleButton::setColors(QColor bg, QColor fg)
     if((oldBackColor == bg) && (oldForeColor == fg)) return;
     QPalette thisPalette = palette();
     thisPalette.setColor(QPalette::WindowText, fg);
+    //thisPalette.setColor(QPalette::Text, fg); // causes problem with tristate
+
     thisPalette.setColor(QPalette::Button, bg);
     setPalette(thisPalette);
     oldBackColor = bg;
@@ -123,7 +125,7 @@ void caToggleButton::setAlarmColors(short status)
     case MAJOR_ALARM:
         c=AL_RED;
         break;
-    case ALARM_INVALID:
+    case INVALID_ALARM:
     case NOTCONNECTED:
         c=AL_WHITE;
         break;

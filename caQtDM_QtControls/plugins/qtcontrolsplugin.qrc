@@ -32,5 +32,7 @@
         <file>pixmaps/waterfall.png</file>
         <file>pixmaps/spinbox.png</file>
         <file>pixmaps/wavetable.png</file>
+        <file>pixmaps/clock.png</file>
+        <file>pixmaps/meter.png</file>
     </qresource>
 </RCC>

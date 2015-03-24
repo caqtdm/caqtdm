@@ -425,7 +425,7 @@ void caLineEdit::setAlarmColors(short status, double value, QColor bgAtInit, QCo
         }
         break;
 
-    case ALARM_INVALID:
+    case INVALID_ALARM:
         //qDebug() << "invalid alarm";
         if(thisColorMode == Alarm_Static) {
             c =AL_WHITE;

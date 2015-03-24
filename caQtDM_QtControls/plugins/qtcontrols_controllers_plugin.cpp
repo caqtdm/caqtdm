@@ -91,7 +91,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
             d_name = "caNumeric";
             d_include = "caNumeric";
             QPixmap qpixmap =  QPixmap(":pixmaps/enumeric.png");
-            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
             d_toolTip = "[wheelswitch, immediate change]";
             d_whatsThis = "hello, i am a whatsthis string";
         }
@@ -110,7 +110,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
             d_name = "caApplyNumeric";
             d_include = "caApplyNumeric";
             QPixmap qpixmap =  QPixmap(":pixmaps/enumeric.png");
-            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
             d_toolTip = "[wheelswitch with applybutton]";
             d_whatsThis = "hello, i am a whatsthis string";
         }
@@ -125,7 +125,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
             d_name = "EApplyButton";
             d_include = "EApplyButton";
             QPixmap qpixmap = QPixmap(":pixmaps/eapplybutton.png");
-            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio);
+            d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio);
             d_domXml =
                     "<widget class=\"EApplyButton\" name=\"eApplyButton\">\n"
                     " <property name=\"geometry\">\n"
@@ -158,7 +158,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
             d_name = "caSlider";
             d_include = "caSlider";
             QPixmap qpixmap = QPixmap(":pixmaps/slider.png");
-            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
             d_toolTip = "[slider]";
             d_whatsThis = "hello, i am a whatsthis string";
         }
@@ -177,7 +177,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
             d_name = "caMenu";
             d_include = "caMenu";
             QPixmap qpixmap =  QPixmap(":pixmaps/menu.png");
-            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
             d_toolTip = "[menu combobox for display & control of enums with/without pv-label]";
             d_whatsThis = "hello, i am a whatsthis string";
         }
@@ -196,7 +196,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
             d_name = "caChoice";
             d_include = "caChoice";
             QPixmap qpixmap =  QPixmap(":pixmaps/choice.png");
-            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
             d_toolTip = "[choice with different stacking modes for display & control of enums]";
             d_whatsThis = "hello, i am a whatsthis string";
         }
@@ -223,7 +223,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
             d_name = "caRelatedDisplay";
             d_include = "caRelatedDisplay";
             QPixmap qpixmap =   QPixmap(":pixmaps/fileopen.png");
-            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
             d_toolTip = "[displays a new or popups a synoptic view]";
             d_whatsThis = "hello, i am a whatsthis string";
         }
@@ -248,7 +248,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
             d_name = "caShellCommand";
             d_include = "caShellCommand";
             QPixmap qpixmap =   QPixmap(":pixmaps/exclamation.png");
-            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
             d_toolTip = "[menu or button for detached processes]";
             d_whatsThis = "hello, i am a whatsthis string";
         }
@@ -268,7 +268,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
             d_include = "caTextEntry";
 
             QPixmap qpixmap =   QPixmap(":pixmaps/textentry.png");
-            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
             d_toolTip = "[enters a value/command to a pv]";
             d_whatsThis = "hello, i am a whatsthis string";
         }
@@ -293,7 +293,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
             d_name = "caMessageButton";
             d_include = "caMessageButton";
             QPixmap qpixmap =  QPixmap(":pixmaps/message.png");
-            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
             d_toolTip = "[send a predefined value/command to a pv]";
             d_whatsThis = "hello, i am a whatsthis string";
         }
@@ -312,7 +312,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
             d_name = "caToggleButton";
             d_include = "caToggleButton";
             QPixmap qpixmap = QPixmap(":pixmaps/radiobutton.png");
-            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
             d_toolTip = "[toggle 0/1 to a pv]";
             d_whatsThis = "hello, i am a whatsthis string";
         }
@@ -336,7 +336,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
             d_name = "caScriptButton";
             d_include = "caScriptButton";
             QPixmap qpixmap = QPixmap(":pixmaps/process.png");
-            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
             d_toolTip = "[execute a script or image as detached process]";
             d_whatsThis = "hello, i am a whatsthis string";
         }
@@ -350,7 +350,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
             d_name = "caSpinbox";
             d_include = "caSpinbox";
             QPixmap qpixmap = QPixmap(":pixmaps/spinbox.png");
-            d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
             d_toolTip = "[spinbox]";
             d_whatsThis = "hello, i am a whatsthis string";
         }

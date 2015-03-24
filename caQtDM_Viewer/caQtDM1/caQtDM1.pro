@@ -5,7 +5,7 @@ TEMPLATE = app
 DESTDIR = $(CAQTDM_COLLECT)
 android {
 DESTDIR =/Users/mezger/Documents/Entwicklung/qt/caqtdm_project/caQtDM_Binaries_SIM_ANDROID
-ANDROID_PACKAGE_SOURCE_DIR = /Users/mezger/Documents/Entwicklung/qt/caqtdm_project/caQtDM_Viewer/caQtDM1/caQtDM_Viewer/caQtDM1/android
+ANDROID_PACKAGE_SOURCE_DIR = /Users/mezger/Documents/Entwicklung/qt/caqtdm_project/caQtDM_Viewer/caQtDM1/caQtDM_Viewer/caQtDM1/android
 }
 
 # static build

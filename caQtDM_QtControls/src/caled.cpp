@@ -103,7 +103,7 @@ void caLed::setAlarmColors(short status)
     case MAJOR_ALARM:
         ELed::setColor(AL_RED);
         break;
-    case ALARM_INVALID:
+    case INVALID_ALARM:
     case NOTCONNECTED:
         ELed::setColor(AL_WHITE);
         break;

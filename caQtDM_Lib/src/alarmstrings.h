@@ -23,10 +23,8 @@
  *    anton.mezger@psi.ch
  */
 
-#ifndef ALARMS_H
-#define ALARMS_H
-
-enum Alarms {NO_ALARM=0, MINOR_ALARM, MAJOR_ALARM, INVALID_ALARM, NOTCONNECTED=99};
+#ifndef ALARMDEFS_H
+#define ALARMDEFS_H
 
 char AlarmStatusStrings[][30] = {"OK", "READ_ALARM", "WRITE_ALARM", "HIHI_ALARM", "HIGH_ALARM", "LOLO_ALARM", "LOW_ALARM", "STATE_ALARM", "COS_ALARM",
                           "COMM_ALARM", "TIMEOUT_ALARM", "HW_LIMIT_ALARM", "CALC_ALARM", "SCAN_ALARM", "LINK_ALARM", "SOFT_ALARM", "BAD_SUB_ALARM",

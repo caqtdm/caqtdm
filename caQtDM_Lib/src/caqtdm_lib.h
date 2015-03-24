@@ -48,6 +48,7 @@
 #include <QtGui>
 #include <QtUiTools>
 #include <QWhatsThis>
+#include <QTextBrowser>
 
 #include <QWidget>
 #include <QWaitCondition>
@@ -197,6 +198,7 @@ private:
     void Cartesian(caCartesianPlot *widget, int curvNB, int curvType, int XorY, const knobData &data);
     void WaveTable(caWaveTable *widget, const knobData &data);
     void EnableDisableIO();
+    void UpdateMeter(caMeter *widget, const knobData &data);
 
 #ifdef MOBILE
     bool eventFilter(QObject *obj, QEvent *event);

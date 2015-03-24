@@ -357,7 +357,7 @@ void caWaveTable::displayText(int index, short status, QString const &text)
             case MAJOR_ALARM:
                 this->item(row, column)->setForeground(AL_RED);
                 break;
-            case ALARM_INVALID:
+            case INVALID_ALARM:
             case NOTCONNECTED:
                 this->item(row, column)->setForeground(AL_WHITE);
                 break;

@@ -88,7 +88,9 @@ enum objectType {caCalc_Widget = 0,
                  caRelatedDisplay_Widget,
                  caShellCommand_Widget,
                  caTextEntry_Widget,
-                 caScriptButton_Widget
+                 caScriptButton_Widget,
+                 caClock_Widget,
+                 caMeter_Widget
                 };
 
 typedef struct _connectInfoShort {

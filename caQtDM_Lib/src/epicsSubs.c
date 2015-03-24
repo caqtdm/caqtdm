@@ -237,6 +237,7 @@ static void dataCallback(struct event_handler_args args)
             ptr[args.count] = '\0';
 
             kData.edata.valueCount =  args.count;
+            kData.edata.actTime = now;
 
             C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
         }
@@ -272,6 +273,7 @@ static void dataCallback(struct event_handler_args args)
                 strcat(&ptr[len++], ";");
                 strcat(&ptr[len], myLimitedString(val_ptr[i]));
             }
+            kData.edata.actTime = now;
 
             C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
         }
@@ -1166,6 +1168,11 @@ void ExitHandler(int sig)
 
 int EpicsGetTimeStamp(char *pv, char *timestamp)
 {
+    /*
+    const double EPICS2UNIX_EPOCH = 631152000.0;
+    struct tm * timeinfo;
+    time_t time;
+    */
     chid     ch;
     int status;
     struct dbr_time_string ctrlS;
@@ -1175,8 +1182,8 @@ int EpicsGetTimeStamp(char *pv, char *timestamp)
     PrepareDeviceIO();
 
     if(strlen(pv) < 1)  {
-            C_postMsgEvent(messageWindow, 1, vaPrintf("pv with length=0 (not translated for macro?)\n"));
-            return !ECA_NORMAL;
+        C_postMsgEvent(messageWindow, 1, vaPrintf("pv with length=0 (not translated for macro?)\n"));
+        return !ECA_NORMAL;
     }
 
     // get epics timestamp
@@ -1198,10 +1205,15 @@ int EpicsGetTimeStamp(char *pv, char *timestamp)
 
     status = ca_pend_io(CA_TIMEOUT/2);
 
-    //sprintf(timestamp, "TimeStamp: %s\n", epicsTimeToStrfTime(&ctrlS.stamp,TS_TEXT_MONDDYYYY, tsString));
-    epicsTimeToStrftime(tsString, 32,"%b %d, %Y %H:%M:%S.%09f", &ctrlS.stamp);
+    epicsTimeToStrftime(tsString, 32, "%b %d, %Y %H:%M:%S.%09f", &ctrlS.stamp);
     sprintf(timestamp, "TimeStamp: %s\n", tsString);
 
+    // calculate unix time from epics timestamp
+    /*
+   time = (EPICS2UNIX_EPOCH + (double) (ctrlS.stamp.secPastEpoch) + 1.0e-9 * (double) ctrlS.stamp.nsec);
+   timeinfo = localtime (&time);
+    printf ("Current local time and date: %s", asctime(timeinfo));
+    */
     return ECA_NORMAL;
 
 }

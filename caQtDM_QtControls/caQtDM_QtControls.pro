@@ -136,7 +136,9 @@ SOURCES	+= \
     src/capolylinetaskmenu.cpp \
     src/capolylinedialog.cpp \
     src/cadoubletabwidgetextensionfactory.cpp \
-    src/specialFunctions.cpp
+    src/specialFunctions.cpp \
+    src/caclock.cpp \
+    src/cameter.cpp
 
 NETWORKDOWNLOADSUPPORT: {
 QT += network
@@ -222,7 +224,9 @@ HEADERS	+= \
     src/capolylinetaskmenu.h \
     src/capolylinedialog.h \
     src/cadoubletabwidgetextensionfactory.h \
-    src/specialFunctions.h
+    src/specialFunctions.h \
+    src/caclock.h \
+    src/cameter.h
 
 # assume qwt6.0 was made with qt4
 contains(QT_VER_MAJ, 4) {

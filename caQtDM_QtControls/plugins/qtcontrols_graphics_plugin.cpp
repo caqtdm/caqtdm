@@ -152,7 +152,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
       d_name = "caLabel";
       d_include = "caLabel";
       QPixmap qpixmap = QPixmap(":pixmaps/elabel.png");
-      d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+      d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
   }
 
   QWidget* caLabelInterface::createWidget(QWidget* parent)
@@ -184,7 +184,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
       d_name = "caFrame";
       d_include = "caFrame";
       QPixmap qpixmap =  QPixmap(":pixmaps/frame.png");
-      d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+      d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
   }
 
   caImageInterface::caImageInterface(QObject *parent): CustomWidgetInterface_Graphics(parent)
@@ -208,7 +208,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
       d_name = "caImage";
       d_include = "caImage";
       QPixmap qpixmap = QPixmap(":pixmaps/images.png");
-      d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+      d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
   }
 
   QWidget *caImageInterface::createWidget(QWidget *parent)
@@ -240,7 +240,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
       d_name = "caPolyLine";
       d_include = "caPolyLine";
       QPixmap qpixmap = QPixmap(":pixmaps/polyline.png");
-      d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+      d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
   }
 
   QWidget *caGraphicsInterface::createWidget(QWidget* parent)
@@ -265,7 +265,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
       d_name = "caGraphics";
       d_include = "caGraphics";
       QPixmap qpixmap = QPixmap(":pixmaps/gtool.png");
-      d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+      d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
   }
 
   QWidget *caIncludeInterface::createWidget(QWidget* parent)
@@ -294,7 +294,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
       d_name = "caInclude";
       d_include = "caInclude";
       QPixmap qpixmap = QPixmap(":pixmaps/frame.png");
-      d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+      d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
   }
 
   QWidget *caDoubleTabWidgetInterface::createWidget(QWidget* parent)
@@ -314,7 +314,25 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
       d_name = "caDoubleTabWidget";
       d_include = "caDoubleTabWidget";
       QPixmap qpixmap = QPixmap(":pixmaps/tabwidget.png");
-      d_icon = qpixmap.scaled(40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+      d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+  }
+
+  QWidget *caClockInterface::createWidget(QWidget* parent)
+  {
+      caClock *widget = new caClock(parent);
+      return widget;
+  }
+
+  caClockInterface::caClockInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
+  {
+      strng name[2], type[2];
+      strcpy(name[0], "channel");
+      strcpy(type[0], "multiline");
+      d_domXml = XmlFunc("caClock", "caclock", 0, 0, 125, 125, name, type, 1);
+      d_name = "caClock";
+      d_include = "caClock";
+      QPixmap qpixmap = QPixmap(":pixmaps/clock.png");
+      d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
   }
 
   CustomWidgetCollectionInterface_Graphics::CustomWidgetCollectionInterface_Graphics(QObject *parent): QObject(parent)
@@ -326,6 +344,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
       d_plugins.append(new caImageInterface(this));
       d_plugins.append(new caIncludeInterface(this));
       d_plugins.append(new caDoubleTabWidgetInterface(this));
+      d_plugins.append(new caClockInterface(this));
   }
 
   QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface_Graphics::customWidgets(void) const

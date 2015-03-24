@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.9.0
+CAQTDM_VERSION = V3.9.1
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -29,16 +29,22 @@ DEFINES += NETWORKDOWNLOADSUPPORT
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 
+# 3.9.1
+# added a clock allowing to display normal time or reception time of a process variable; alarm handling can be enabled to colorize the clock
+# added a new dial
+# problem with soft pv corrected
+# QTextBrowser can be used with macros in order to dynamically load files for display thmen in this textbrowser
+
 # 3.9.0
 # many changes involving android
 # many changes for iphone, epics can now also reconnect after being suspended
 # calineedit a bit more performant
-# on ipad/iphone files were aways downloaded, this has been optimized
+# on ipad/iphone files were always downloaded, this has been optimized
 # graphic plugings were missing on osx/ios, has been corrected
 # prevented crash on exit
 # cacamera can be displayed without toolbuttons and will be zoomed in ints container
 # cascriptbutton has now the possibility of a macro in its parameter
-# truncate in calineedit is now implemented
+# truncate value display in calineedit is now implemented
 
 # 3.8.10
 # caStripPlot was eating the CPU and has been optimized; refreshrate (low, medium, high) has been introduced, so that it can be adjusted by the user

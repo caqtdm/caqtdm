@@ -105,7 +105,10 @@ void MutexKnobData::InsertSoftPV(QString pv, int num, QWidget *w)
     char asc[MAXPVLEN+20];
     QMutexLocker locker(&mutex);
     sprintf(asc, "%s_%p", pv.toAscii().constData(),  w);
-    if(!getSoftPV(pv, &indx, (QWidget*) w)) softPV_WidgetList.insert(asc, num);
+    if(!getSoftPV(pv, &indx, (QWidget*) w)) {
+        softPV_WidgetList.insert(asc, num);
+        //qDebug() << "insert softpv_widgetList" << asc;
+    }
 }
 
 /**
@@ -123,6 +126,7 @@ void  MutexKnobData::BuildSoftPVList(QWidget *w)
             if(w == w1) {
                 sprintf(asc, "%s_%d_%p", KnobData[i].pv, KnobData[i].index, w);
                 softPV_List.insert(asc, KnobData[i].index);
+                //qDebug() << "insert softpv_list" << asc << KnobData[i].dispName ;
             }
         }
     }
@@ -144,7 +148,7 @@ void MutexKnobData::RemoveSoftPV(QString pv, QWidget *w, int indx)
     sprintf(asc, "%s_%d_%p",  KnobData[indx].pv, KnobData[indx].index,  w1);
     softPV_List.remove(asc);
 
-    /*
+/*
      QMapIterator<QString, int> i(softPV_List);
      qDebug() << "list start";
      while (i.hasNext()) {
@@ -209,7 +213,7 @@ bool MutexKnobData::getSoftPV(QString pv, int *indx, QWidget *w)
     sprintf(asc, "%s_%p", pv.toAscii().constData(),  w);
     QMap<QString, int>::const_iterator name = softPV_WidgetList.find(asc);
     if(name != softPV_WidgetList.end()) {
-        //qDebug() << "found softpv" << pv << "list item=" << name.key() << "index=" << name.value();
+        //qDebug() << "found softpv" << pv << "list item=" << name.key() << "index=" << name.value() << w;
         *indx = name.value();
         return true;
     }
@@ -466,6 +470,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
 
     ftime(&now);
 
+    //qDebug() << "============================================";
     for(int i=0; i < GetMutexKnobDataSize(); i++) {
         knobData *kPtr = (knobData*) &KnobData[i];
 
@@ -477,9 +482,9 @@ void MutexKnobData::timerEvent(QTimerEvent *)
         }
 
         // update all graphical items for this soft pv when a value changes
-        if(kPtr->index != -1 && kPtr->soft && (diff >= (1.0/(double)repRate))) {
+        if(kPtr->index != -1 && kPtr->softMain && (diff >= (1.0/(double)repRate))) {
             int indx;
-            //qDebug() << "I am a soft channel" << kPtr->pv << kPtr->dispName << kPtr->edata.rvalue << kPtr->index << w;
+            //qDebug() << "I am a soft channel" << kPtr->pv << kPtr->dispName << kPtr->edata.rvalue << kPtr->index;
             // get for this soft pv the index of the corresponding caCalc into the knobData array where the data were updated
             if(getSoftPV(kPtr->pv, &indx, (QWidget*) kPtr->thisW)) {
                 // get value from (updated) QMap variable list

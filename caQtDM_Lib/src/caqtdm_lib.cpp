@@ -49,7 +49,7 @@
 
 #include "myMessageBox.h"
 
-#include "alarmdefs.h"
+#include "alarmstrings.h"
 
 #include "epicsExternals.h"
 
@@ -622,7 +622,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     //qDebug() << w1->metaObject()->className() << w1->objectName();
     QString className(w1->metaObject()->className());
 
-    if(className.contains("ca")) {
+    if(className.contains("ca") || className.contains("QTextBrowser")) {
         PRINT(printf("\n%*c %s macro=<%s>", 15 * level, '+', qPrintable(w1->objectName()), qPrintable(macro)));
         map = createMap(macro);
     }
@@ -643,12 +643,14 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
             // soft channel
             kData.soft = true;
+            kData.softMain = true;
 
             // add soft channel
             addMonitor(myWidget, &kData, widget->getVariable().toAscii().constData(), w1, specData, map, &pv);
 
             // other channels if any
             kData.soft = false;
+            kData.softMain = false;
             nbMonitors = InitVisibility(w1, &kData, map, specData, widget->getVariable().toAscii().constData());
 
             // when no monitors then inititalize value
@@ -668,9 +670,20 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         return;
     }
 
+    // not a ca widget, but offer the possibility to load files into the text browser by using macros
+    //==================================================================================================================
+    if(QTextBrowser* widget = qobject_cast<QTextBrowser *>(w1)) {
+
+        //qDebug() << "create QTextBrowser";
+
+        QString source = widget->source().toString();
+        if(reaffectText(map, &source))  widget->setSource(source);
+
+        widget->setProperty("Taken", true);
+
     // the different widgets to be handled
     //==================================================================================================================
-    if(caImage* widget = qobject_cast<caImage *>(w1)) {
+    } else if(caImage* widget = qobject_cast<caImage *>(w1)) {
 
         //qDebug() << "create caImage";
         w1->setProperty("ObjectType", caImage_Widget);
@@ -1050,6 +1063,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         }
 
         widget->setProperty("Taken", true);
+
         //==================================================================================================================
     } else if(caSlider* widget = qobject_cast<caSlider *>(w1)) {
 
@@ -1060,6 +1074,19 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
             addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
             widget->setPV(pv);
             connect(widget, SIGNAL(valueChanged(double)), this, SLOT(Callback_SliderValueChanged(double)));
+        }
+
+        widget->setProperty("Taken", true);
+
+        //==================================================================================================================
+    } else if(caClock* widget = qobject_cast<caClock *>(w1)) {
+
+        //qDebug() << "create caClock";
+        w1->setProperty("ObjectType", caClock_Widget);
+
+        if(widget->getPV().size() > 0) {
+            addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
+            widget->setPV(pv);
         }
 
         widget->setProperty("Taken", true);
@@ -1103,6 +1130,19 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
         //qDebug() << "create circulargauge for" << widget->getPV();
         w1->setProperty("ObjectType", caCircularGauge_Widget);
+
+        if(widget->getPV().size() > 0) {
+            addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
+            widget->setPV(pv);
+        }
+
+        widget->setProperty("Taken", true);
+
+        //==================================================================================================================
+    } else if(caMeter* widget = qobject_cast<caMeter *>(w1)) {
+
+        //qDebug() << "create circulargauge for" << widget->getPV();
+        w1->setProperty("ObjectType", caMeter_Widget);
 
         if(widget->getPV().size() > 0) {
             addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
@@ -1938,6 +1978,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
     }
     else if(caCalc *calc = qobject_cast<caCalc *>(w)) {
         strcpy(calcString, calc->getCalc().toAscii().constData());
+        //qDebug() << "for" << w << "calc=" << calcString;
     }
 
     // any monitors ?
@@ -2143,6 +2184,55 @@ void CaQtDM_Lib::UpdateGauge(EAbstractGauge *widget, const knobData &data)
     }
 
     widget->setValue(data.edata.rvalue);
+}
+
+void CaQtDM_Lib::UpdateMeter(caMeter *widget, const knobData &data)
+{
+    if(data.edata.connected) {
+        double maxval = 1000.0;
+        double minval = 0.0;
+
+        if((widget->getLimitsMode() == caMeter::Channel) && (data.edata.initialize)) {
+            // HOPR and LOPR
+            if(data.edata.upper_disp_limit == data.edata.lower_disp_limit) {
+                // set some default
+                widget->setMaxValue(1000.0);
+                widget->setMinValue(0.0);
+                maxval = 1000.0;
+                minval = 0.0;
+            } else {
+                if(!isnan(data.edata.lower_disp_limit)) {
+                    widget->setMinValue(data.edata.lower_disp_limit);
+                    minval = data.edata.lower_disp_limit;
+                } else {
+                    widget->setMinValue(0.0);
+                    minval = 0.0;
+                }
+                if(!isnan(data.edata.upper_disp_limit)) {
+                    widget->setMaxValue(data.edata.upper_disp_limit);
+                    maxval = data.edata.upper_disp_limit;
+                } else {
+                    widget->setMaxValue(1000.0);
+                    maxval = 1000;
+                }
+            }
+
+            widget->update();
+        } else {
+            maxval = widget->getMaxValue();
+            minval = widget->getMinValue();
+        }
+
+        int precMode = widget->getPrecisionMode();
+        if((precMode != caMeter::User) && (data.edata.initialize)) {
+            widget->setPrecision(data.edata.precision);
+            widget->updateMeter();
+        }
+
+        widget->update();
+    }
+
+    widget->setValueUnits(data.edata.rvalue, data.edata.units);
 }
 
 /**
@@ -2359,6 +2449,19 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             SetColorsNotConnected;
         }
 
+        // Clock ==================================================================================================================
+    } else if (caClock *widget = qobject_cast<caClock *>(w)) {
+        if(data.edata.connected) {
+            if(widget->getTimeType() == caClock::ReceiveTime) {
+               widget->setAlarmColors(data.edata.severity);
+               QDateTime dattim = QDateTime::fromTime_t(data.edata.actTime.time + data.edata.actTime.millitm/1000.0);
+               widget->updateClock(dattim.time());
+            }
+            // set no connection color
+        } else {
+            SetColorsNotConnected;
+        }
+
         // linear gauge (like thermometer) ==================================================================================================================
     } else if (caLinearGauge *widget = qobject_cast<caLinearGauge *>(w)) {
         //qDebug() << "we have a linear gauge" << value;
@@ -2376,12 +2479,30 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         //qDebug() << "we have a linear gauge" << value;
         Q_UNUSED(widget);
         EAbstractGauge *gauge =  qobject_cast<EAbstractGauge *>(w);
-         if(data.edata.connected) {
-           if(!gauge->isConnected()) gauge->setConnected(true);
-           UpdateGauge(gauge, data);
-         } else {
+        if(data.edata.connected) {
+            if(!gauge->isConnected()) gauge->setConnected(true);
+            UpdateGauge(gauge, data);
+        } else {
             if(gauge->isConnected()) gauge->setConnected(false);
-         }
+        }
+
+         // simple meter ==================================================================================================================
+    } else if (caMeter *widget = qobject_cast<caMeter *>(w)) {
+        //qDebug() << "we have a simple meter";
+
+        if(data.edata.connected) {
+            UpdateMeter(widget, data);
+            // set colors when connected
+            // case of alarm mode
+            if (widget->getColorMode() == caMeter::Alarm) {
+                widget->setAlarmColors(data.edata.severity);
+                // case of static mode
+            } else {
+                SetColorsBack;
+            }
+        } else {
+            SetColorsNotConnected;
+        }
 
         // byte ==================================================================================================================
     } else if (caByte *widget = qobject_cast<caByte *>(w)) {
@@ -3842,6 +3963,12 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         if(widget->getColorMode() == caSlider::Alarm) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
         nbPV = 1;
+    } else if (caClock* widget = qobject_cast<caClock *>(w)) {
+        pv[0] = widget->getPV().trimmed();
+        nbPV = 1;
+    } else if (caMeter* widget = qobject_cast<caMeter *>(w)) {
+        pv[0] = widget->getPV().trimmed();
+        nbPV = 1;
     } else if(caThermo* widget = qobject_cast<caThermo *>(w)) {
         pv[0] = widget->getPV().trimmed();
         if(widget->getLimitsMode() == caThermo::User) {
@@ -4017,6 +4144,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     if(caSpinbox* widget = qobject_cast<caSpinbox *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
     if(caLinearGauge* widget = qobject_cast<caLinearGauge *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
     if(caCircularGauge* widget = qobject_cast<caCircularGauge *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
+    if(caMeter* widget = qobject_cast<caMeter *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
 
     // add to context menu, the actions requested by the environment variable caQtDM_EXEC_LIST
     if(validExecListItems) {
@@ -5441,6 +5569,10 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
     } else if (caThermo *widget = qobject_cast<caThermo *>(w)) {
         mimeData->setText(widget->getPV());
     } else if (caSlider *widget = qobject_cast<caSlider *>(w)) {
+        mimeData->setText(widget->getPV());
+    } else if (caClock *widget = qobject_cast<caClock *>(w)) {
+        mimeData->setText(widget->getPV());
+    } else if (caMeter *widget = qobject_cast<caMeter *>(w)) {
         mimeData->setText(widget->getPV());
     } else if (caLinearGauge *widget = qobject_cast<caLinearGauge *>(w)) {
         mimeData->setText(widget->getPV());
