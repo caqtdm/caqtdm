@@ -5234,7 +5234,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             qreal fontSize = (qMin(factX, factY) * (double) list.at(4).toInt());
             if(fontSize < MIN_FONT_SIZE+2) fontSize = MIN_FONT_SIZE+2;
             if(fontSize > (double) list.at(4).toInt()) fontSize = (double) list.at(4).toInt();
-            int height = qMax(qMin(factX, factY), 1.0);
+            int height = 1.5;
 
             QString thisStyle = "QTabBar::tab {font: %1pt;  height:%2em;}";
             thisStyle = thisStyle.arg((int)(fontSize+0.5)).arg(height);
