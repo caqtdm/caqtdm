@@ -221,6 +221,7 @@ private:
     bool _AccessW;
 
     bool thisSimpleView;
+    bool thisInitialAutomatic;
 };
 
 #endif

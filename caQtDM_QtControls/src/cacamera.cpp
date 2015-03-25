@@ -530,12 +530,14 @@ void caCamera::setFitToSize(zoom const &z)
 
 bool caCamera::getInitialAutomatic()
 {
+    if(thisSimpleView) return thisInitialAutomatic;
     if(autoW == (QCheckBox *) 0) return false;
     return autoW->isChecked();
 }
 
 void caCamera::setInitialAutomatic(bool automatic)
 {
+    if(thisSimpleView) thisInitialAutomatic = automatic;
     if(autoW == (QCheckBox *) 0) return;
     autoW->setChecked(automatic);
 }
@@ -652,6 +654,9 @@ void caCamera::showDisconnected()
 
 bool caCamera::getAutomateChecked()
 {
+    if(thisSimpleView) {
+       return thisInitialAutomatic;
+    }
     if(autoW == (QCheckBox *) 0) return false;
     return autoW->isChecked();
 }
@@ -676,11 +681,15 @@ void caCamera::updateIntensity(QString strng)
 
 int caCamera::getMin()
 {
+    bool ok;
+    if(thisSimpleView) return  thisMinLevel.toInt(&ok);
     if(labelMin == (caLineEdit*) 0) return 0;
     return labelMin->text().toInt();
 }
 int caCamera::getMax()
 {
+    bool ok;
+    if(thisSimpleView) return  thisMaxLevel.toInt(&ok);
     if(labelMax == (caLineEdit*) 0) return 65535;
     return labelMax->text().toInt();
 }
@@ -964,6 +973,9 @@ void caCamera::showImage(int datasize, char *data)
         if(maxv > minv) {
             maxvalue = maxv;
             minvalue = minv;
+        } else {
+            maxvalue = minv;
+            minvalue = maxv;
         }
     }
     UpdatesPerSecond++;
