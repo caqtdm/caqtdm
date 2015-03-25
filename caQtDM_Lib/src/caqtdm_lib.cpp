@@ -5232,10 +5232,13 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             QString style= "";
             QTabWidget *box = (QTabWidget *) widget;
             qreal fontSize = (qMin(factX, factY) * (double) list.at(4).toInt());
-            if(fontSize < MIN_FONT_SIZE+2) fontSize = MIN_FONT_SIZE+2;
+            if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
             if(fontSize > (double) list.at(4).toInt()) fontSize = (double) list.at(4).toInt();
-            int height = 1.5;
-
+#ifdef MOBILE
+            qreal height = 1.5;
+#else
+            qreal height = 1.0;
+#endif
             QString thisStyle = "QTabBar::tab {font: %1pt;  height:%2em;}";
             thisStyle = thisStyle.arg((int)(fontSize+0.5)).arg(height);
 
