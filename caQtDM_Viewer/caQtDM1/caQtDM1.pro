@@ -22,6 +22,7 @@ ios {
    QMAKE_INFO_PLIST = ../src/IOS/Info.plist
    ICON = ../src/caQtDM.icns
    APP_ICON.files = $$PWD/../src/caQtDM.png
+   APP_ICON.files += $$PWD/../src/caQtDM-57.png
    APP_ICON.files += $$PWD/../src/caQtDM-60@2x.png
    APP_ICON.files += $$PWD/../src/caQtDM-72.png
    APP_ICON.files += $$PWD/../src/caQtDM-76.png
