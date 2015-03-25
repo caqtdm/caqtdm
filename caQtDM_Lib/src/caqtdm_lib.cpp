@@ -155,7 +155,7 @@
 
 //===============================================================================================
 
-#define MIN_FONT_SIZE 3
+#define MIN_FONT_SIZE 4
 
 Q_DECLARE_METATYPE(QList<int>)
 Q_DECLARE_METATYPE(QTabWidget*)
@@ -5227,24 +5227,23 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         }
     }
 
-    // this does not really work yet, to be studied when I have time
+    // Tabbar adjustment
     else if(!className.compare("QTabWidget")) {
-        /*
+            QString style= "";
             QTabWidget *box = (QTabWidget *) widget;
             qreal fontSize = (qMin(factX, factY) * (double) list.at(4).toInt());
-            if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
+            if(fontSize < MIN_FONT_SIZE+2) fontSize = MIN_FONT_SIZE+2;
+            if(fontSize > (double) list.at(4).toInt()) fontSize = (double) list.at(4).toInt();
+            int height = qMax(qMin(factX, factY), 1.0);
 
-            QString thisStyle = "QTabBar::tab {font: %1pt; min-width: %2px; height: %3px; margin: 0px};";
-            double width = (double) list.at(6).toInt() * factX;
-            width=10;
-            double height = (double) list.at(5).toInt() * factY /1.5;
-            if(width < 15) width = 15;
-            if(height < 5) height = 5;
-            thisStyle = thisStyle.arg((int)(fontSize+0.5)).arg((int) (width+0.5)).arg((int)(height+0.5));
-            //qDebug() << thisStyle << list.at(6).toInt() << list.at(5).toInt() << factX << factY;
-            //box->tabBar()->setStyleSheet(thisStyle);
-            //box->tabBar()->setElideMode(Qt::ElideRight);
-         */
+            QString thisStyle = "QTabBar::tab {font: %1pt;  height:%2em;}";
+            thisStyle = thisStyle.arg((int)(fontSize+0.5)).arg(height);
+
+            // get eventual stylesheet from property set at start for addition
+            QVariant Style=box->property("Stylesheet");
+            if(!Style.isNull()) style = Style.toString();
+            box->setStyleSheet(thisStyle + style);;
+
     }
 }
 
@@ -5361,16 +5360,13 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 integerList.insert(10, plot->axisScaleDraw(QwtPlot::xBottom)->tickLength(QwtScaleDiv::MinorTick));
 
             } else if(!className.compare("QTabWidget")) {
-                //QTabWidget *tabW = (QTabWidget *) widget;
+                QTabWidget *tabW = (QTabWidget *) widget;
                 integerList.insert(4, widget->font().pointSize());
-                //integerList.insert(5, tabW->tabBar()->height());
-                //integerList.insert(6, tabW->tabBar()->width());
+                tabW->setProperty("Stylesheet", tabW->styleSheet());
 
             } else {
                 integerList.insert(4, widget->font().pointSize());
             }
-
-            //qDebug() << className << integerList;
 
             widget->setProperty("GeometryList", integerList);
         }
