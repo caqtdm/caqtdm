@@ -29,6 +29,8 @@
 #include <QWidget>
 #include <qtcontrols_global.h>
 
+// would be so nice to get rid of my includes, however it would break the compatibility with former ui files, so I leave it like that
+// class  QTCON_EXPORT caGraphics : public caVisibility
 class  QTCON_EXPORT caGraphics : public QWidget
 {
     Q_OBJECT
