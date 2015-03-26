@@ -970,13 +970,14 @@ void caCamera::showImage(int datasize, char *data)
     } else {
         int minv = getMin();
         int maxv = getMax();
-        if(maxv > minv) {
+        if(maxv >= minv) {
             maxvalue = maxv;
             minvalue = minv;
         } else {
             maxvalue = minv;
             minvalue = maxv;
         }
+        if(maxvalue == minvalue) maxvalue = minvalue + 1000;
     }
     UpdatesPerSecond++;
 }
