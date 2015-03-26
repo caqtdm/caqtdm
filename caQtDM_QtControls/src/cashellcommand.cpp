@@ -29,7 +29,6 @@ caShellCommand::caShellCommand(QWidget *parent) : caRowColMenu(parent)
 {
     setImage("exclamation.png");
     setStacking(Menu);
-    printf("in caRowColMenu setimage with exclamation\n");
 }
 
 
