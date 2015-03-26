@@ -34,6 +34,9 @@ DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 # added a new dial
 # problem with soft pv corrected
 # QTextBrowser can be used with macros in order to dynamically load files for display thmen in this textbrowser
+# modified the configdialog for ios and android
+# prevent caQtDM from crashing when maxvalue and minvalue have the same value.
+# for some images, the last row was missing and is corrected now
 
 # 3.9.0
 # many changes involving android
