@@ -29,29 +29,13 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 {
     const QString buttonStyle = "background-color: lightgray; border-style: outset; border-width: 3px; border-radius: 10px; border-color: cyan; padding: 6px";
     Specials specials;
-    int thisWidth = 600;  // normal for ipad
-    int thisHeight = 370;
 
     Qt::WindowFlags flags = Qt::Dialog;
     setWindowFlags(flags);
     setWindowModality (Qt::WindowModal);
 
-    QSize size = QSize(0,20);
-
-    if(desktopSize.height() < 500) {
-        thisWidth=430;  // normal for iphone
-        thisHeight=275;
-    }
-
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, desktopSize - size , qApp->desktop()->availableGeometry()));
-
-    // I do not know why this is necessary, but move to center of screen
-#ifdef MOBILE_ANDROID
-    const QRect screen = QApplication::desktop()->screenGeometry();
-    move( screen.center() - this->rect().center() );
-#endif
-
-    qDebug() << "size=" << desktopSize << qApp->desktop()->devicePixelRatio() <<  qApp->desktop()->logicalDpiX();
+    setGeometry(0,0, desktopSize.width(), desktopSize.height());
+    qDebug() << "size=" << desktopSize <<  qApp->desktop()->logicalDpiX();
 
     QPixmap bg(":/caQtDM-BGL-2048.png");
 
@@ -64,94 +48,99 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     QGridLayout *mainLayout = new QGridLayout();
 
     QFrame *frame = new QFrame();
-    QRect rect((desktopSize.width()-thisWidth)/2, (desktopSize.height()-thisHeight)/2, thisWidth, thisHeight);
 
     frame->setAutoFillBackground(true);
-    frame->setGeometry(rect);
-    frame->setFixedSize(thisWidth+30, thisHeight);
-    frame->setMaximumSize(rect.width()+30, rect.height());
+    frame->setObjectName("topFrame");
+    frame->setStyleSheet("QFrame#topFrame {border:0px solid gray; border-radius: 15px; background: rgba(255,255,255,150);}");
 
-    specials.setNewStyleSheet(frame, desktopSize, 22, 15, "border:0px solid gray; border-radius: 15px; background: rgba(255,255,255,0.7); ");
+    // layout for the window, with margins as % of the display size
+    QVBoxLayout* windowlayout = new QVBoxLayout;
+    windowlayout->setContentsMargins(desktopSize.width() * 0.1, desktopSize.height() * 0.05, desktopSize.width() * 0.1, desktopSize.height() * 0.07);
+    setLayout(windowlayout);
+    windowlayout->addWidget(frame); // add frame to layout
 
-    // I did not manage this on android, sizes are too different
-#ifndef MOBILE_ANDROID
-    mainLayout->addWidget(frame);
-#endif
-
+    // framelayout containing the other widgets
     QVBoxLayout *frameLayout = new QVBoxLayout();
     mainLayout->addLayout(frameLayout,0,0);
     frameLayout->setContentsMargins(5,5,5,0);
 
+    // title
     QLabel *title = new QLabel("Start settings");
 #ifndef MOBILE_ANDROID
-    specials.setNewStyleSheet(title, desktopSize, 22, 15, "", 4);
+    specials.setNewStyleSheet(title, desktopSize, 22, 15, "background-color : #aaffff; color : black; ", 4);
 #else
-    specials.setNewStyleSheet(title, desktopSize, 30, 15, "", 4);
+    specials.setNewStyleSheet(title, desktopSize, 30, 15, "background-color : #aaffff; color : black; ", 4);
 #endif
-    title->setFixedWidth(thisWidth-20);
-    title->setStyleSheet("QLabel {background-color : #aaffff; color : black; }");
+    //title->setStyleSheet("QLabel {background-color : #aaffff; color : black; }");
     title->setAlignment(Qt::AlignCenter);
     frameLayout->addWidget(title, 0, Qt::AlignCenter);
 
+    // first layout for first group
     QGridLayout *clearLayout = new QGridLayout;
     clearLayout->setSpacing(2);
     clearLayout->setContentsMargins(3, 3, 3, 3);
 
+    // first group
     QGroupBox* clearBox = new QGroupBox("Local ui/prc/graphic files");
-    specials.setNewStyleSheet(clearBox, desktopSize, 22, 15, "");
+    specials.setNewStyleSheet(clearBox, desktopSize, 22, 13, "");
+
+    // first group, labels
     QString str= QString::number((int) NumberOfFiles());
     QLabel *label = new QLabel("Number:");
-
     fileCountLabel = new QLabel(str);
     clearLayout->addWidget(label, 0, 0);
     clearLayout->addWidget(fileCountLabel, 0, 1);
 
+    // first group, clear config button
     QPushButton* clearConfigButton = new QPushButton("Clear config files");
     clearLayout->addWidget(clearConfigButton, 0, 2);
     connect(clearConfigButton, SIGNAL(clicked()), this, SLOT(clearConfigClicked()) );
-
 #ifdef MOBILE_ANDROID
     specials.setNewStyleSheet(clearConfigButton, desktopSize, 22, 15, buttonStyle, 2);
     int height = clearConfigButton->fontMetrics().boundingRect(clearConfigButton->text()).height() * 1.5;
     clearConfigButton->setFixedHeight(height);
 #endif
 
+    // first group, clear ui button
     QPushButton* clearUiButton = new QPushButton("Clear ui files");
     clearLayout->addWidget(clearUiButton, 0, 3);
     connect(clearUiButton, SIGNAL(clicked()), this, SLOT(clearUiClicked()) );
-
 #ifdef MOBILE_ANDROID
     specials.setNewStyleSheet(clearUiButton, desktopSize, 22, 15, buttonStyle, 2);
     clearUiButton->setFixedHeight(height);
 #endif
 
+    // first group, messages label
     QLabel *debugLabel = new QLabel(" Messages:");
     clearLayout->addWidget(debugLabel, 0, 4);
 
+    // first group, combo yes/no
     debugComboBox = new QComboBox();
     debugComboBox->setEditable(false);
     debugComboBox->addItem("No");
     debugComboBox->addItem("Yes");
     debugComboBox->setCurrentIndex(0);
-
+    clearLayout->addWidget(debugComboBox, 0, 5);
 #ifdef MOBILE_ANDROID
     specials.setNewStyleSheet(debugComboBox, desktopSize, 22, 15, "");
     height = debugComboBox->fontMetrics().boundingRect(debugComboBox->currentText()).height() * 1.0;
     debugComboBox->setFixedHeight(height);
 #endif
 
-    clearLayout->addWidget(debugComboBox, 0, 5);
-
+    // add it
     clearBox->setLayout(clearLayout);
     frameLayout->addWidget(clearBox);
 
+    // second layout for second group
     QGridLayout* urlLayout = new QGridLayout;
     urlLayout->setSpacing(2);
     urlLayout->setContentsMargins(3, 3, 3, 3);
 
+    // second group
     QGroupBox* urlBox = new QGroupBox("Choose your url where your config file is located");
-    specials.setNewStyleSheet(urlBox, desktopSize, 22, 15, "");
+    specials.setNewStyleSheet(urlBox, desktopSize, 22, 13, "");
 
+    // second group, second combo
     urlComboBox = new QComboBox();
     urlComboBox->setEditable(true);
     urlComboBox->setInsertPolicy(QComboBox::InsertAtCurrent);
@@ -162,23 +151,27 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
             else urlComboBox->addItem(urls.at(i));
     }
     urlComboBox->setCurrentIndex(0);
+    urlLayout->addWidget(urlComboBox, 0, 0);
 #ifdef MOBILE_ANDROID
     specials.setNewStyleSheet(urlComboBox, desktopSize, 22, 15, "");
     height = urlComboBox->fontMetrics().boundingRect(urlComboBox->currentText()).height() * 2.0;
     urlComboBox->setFixedHeight(height);
 #endif
 
-    urlLayout->addWidget(urlComboBox, 0, 0);
+    // add it
     urlBox->setLayout(urlLayout);
     frameLayout->addWidget(urlBox);
 
+    // third layout for third group
     QGridLayout* fileLayout = new QGridLayout;
     fileLayout->setSpacing(2);
     fileLayout->setContentsMargins(3, 3, 3, 3);
 
+    // third group
     QGroupBox* fileBox = new QGroupBox("Choose your config file at the above url");
-    specials.setNewStyleSheet(fileBox, desktopSize, 22, 15, "");
+    specials.setNewStyleSheet(fileBox, desktopSize, 22, 13, "");
 
+    // third group, third combo
     fileComboBox = new QComboBox();
     fileComboBox->setEditable(true);
     fileComboBox->setInsertPolicy(QComboBox::InsertAtCurrent);
@@ -190,37 +183,43 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
         else fileComboBox->addItem(files.at(i));
     }
     fileComboBox->setCurrentIndex(0);
-
+    fileLayout->addWidget(fileComboBox, 0, 0);
 #ifdef MOBILE_ANDROID
     specials.setNewStyleSheet(fileComboBox, desktopSize, 22, 15, "");
     height = fileComboBox->fontMetrics().boundingRect(fileComboBox->currentText()).height() * 2.0;
     fileComboBox->setFixedHeight(height);
 #endif
 
-    fileLayout->addWidget(fileComboBox, 0, 0);
+    // add it
     fileBox->setLayout(fileLayout);
     frameLayout->addWidget(fileBox);
 
+    // start button
     QPushButton *startButton = new QPushButton(QIcon(":/caQtDM.ico"), "Start");
     connect(startButton, SIGNAL(clicked()), this, SLOT(startClicked()) );
-
+    frameLayout->addWidget(startButton);
 #ifdef MOBILE_ANDROID
     specials.setNewStyleSheet(startButton, desktopSize, 22, 15, buttonStyle, 2);
     height = startButton->fontMetrics().boundingRect(startButton->text()).height() * 1.5;
     startButton->setFixedHeight(height);
 #endif
 
-    frameLayout->addWidget(startButton);
+    // add message
     QString message = QString("Qt-based Epics Display Manager Version %1 (%2)  ");
     message = message.arg(BUILDVERSION).arg(BUILDDATE);
-
     QLabel *version = new QLabel(message);
     version->setAlignment(Qt::AlignRight);
-    specials.setNewStyleSheet(version, desktopSize, 22, 15, "background-color: transparent;", -4);
+    specials.setNewStyleSheet(version, desktopSize, 22, 13, "background-color: transparent;", -4);
 
+    // add it
     frameLayout->addWidget(version);
 
-    setLayout(mainLayout);
+    // all should expand
+    clearBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    urlBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    fileBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    frame->setLayout(mainLayout);
     show();
 }
 
