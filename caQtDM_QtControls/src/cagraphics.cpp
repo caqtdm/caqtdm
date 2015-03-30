@@ -52,8 +52,8 @@ caGraphics::caGraphics( QWidget *parent) :  QWidget(parent)
     thisLineColor = Qt::black;
     thisForeColor = Qt::black;
 
-    thisLineColorOld = Qt::white;
-    thisForeColorOld = Qt::white;
+    thisLineColorOld = QColor(255, 254, 253);
+    thisForeColorOld = QColor(255, 254, 253);
 
     thisColorMode = Static;
     thisVisibility = StaticV;
