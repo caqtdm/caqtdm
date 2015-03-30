@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <QApplication>
 #include <QWidget>
+#include <QToolTip>
 #include "cadoubletabwidget.h"
 
 #define PRINT(x)
