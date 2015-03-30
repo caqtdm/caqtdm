@@ -93,8 +93,12 @@ public:
     int count() const;
     int currentIndex() const;
     QWidget *widget(int index);
-    int  lookupPage(int row, int col);
-    void storePage(int index, int row, int col);
+
+    // array handling routines
+    int  lookupArrayIndex(int row, int col);
+    void storeArrayIndex(int index, int row, int col);
+    void deleteArrayIndex(int pageIndex);
+
     void setFont(int dir);
 
 public slots:
@@ -117,6 +121,8 @@ private:
         int r;
         int c;
     };
+
+    bool eventFilter(QObject *obj, QEvent *event);
 
     QStringList	thisHorItems;
     QStringList	thisVerItems;
