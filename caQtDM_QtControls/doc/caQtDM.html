@@ -64,6 +64,158 @@ First you will have to unpack the tar archive, which will create the necessary d
 <h2><b><a name="development" id="development" rel="Section">Development history</a></b></h2>
 The following list describe the new features and bug fixes for every release. You can follow the development history and detect if a bug in the used version has been solved. <br/>
 <br/>
+
+
+<font color="#0000ff">3.9.1</font>
+<ul>
+<li> added a clock allowing to display normal time or reception time of a process variable; alarm handling can be enabled to colorize the clock</li>
+<li> added a new dial</li>
+<li> problem with soft pv corrected</li>
+<li>  QTextBrowser can be used with macros in order to dynamically load files for display thmen in this textbrowser</li>
+<li> modified the configdialog for ios and android</li>
+<li> prevent caQtDM from crashing when maxvalue and minvalue have the same value.</li>
+<li> for some images, the last row was missing and is corrected now</li>
+</ul>
+
+<font color="#0000ff">3.9.0</font>
+<ul>
+<li>  many changes involving android</li>
+<li>  many changes for iphone, epics can now also reconnect after being suspended</li>
+<li>  calineedit a bit more performant</li>
+<li> on ipad/iphone files were always downloaded, this has been optimized</li>
+<li> graphic plugings were missing on osx/ios, has been corrected</li>
+<li>  prevented crash on exit</li>
+<li>  cacamera can be displayed without toolbuttons and will be zoomed in ints container</li>
+<li>  cascriptbutton has now the possibility of a macro in its parameter</li>
+<li>  truncate value display in calineedit is now implemented</li>
+</ul>
+
+<font color="#0000ff">3.8.10</font>
+<ul>
+<li> caStripPlot was eating the CPU and has been optimized; refreshrate (low, medium, high) has been introduced, so that it can be adjusted by the user</li>
+<li> some crash conditions eliminated</li>
+</ul>
+
+<font color="#0000ff">3.8.9</font>
+<ul>
+<li>  change for g++ 4.4.7</li>
+<li>  pixmaps on buttons are now rescaled</li>
+<li> modified cawavetable to display as matrix with a finite number of elements; elements can be modified and representation choosen</li>
+<li>  caWaveTable can display now values as decimal, string, hex and octal</li>
+<li> on ipad the slider click and tapandhold interfered, this has been solved</li>
+<li>  on ipad the autorepeat option of the wheelswitch has been disabled while interfering with tapandhold</li>
+<li>  on ipad it is possible now to give multiple ip addresses in the EPICS_CA_ADDR_LIST separated by blancs</li>
+<li>  eliminated some warnings</li>
+<li> test for null pointers added in case of absence of channels</li>
+<li> resizing of caTable and caWaveTable has been changed</li>
+</ul>
+
+<font color="#0000ff">3.8.8</font>
+<ul>
+<li>modified the shared memory key for x-windows in order to distinguish the display used</li>
+</ul>
+
+<font color="#0000ff">3.8.7</font>
+<ul>
+<li>added limits and precision dialogs for several objects</li>
+<li> in case of tabbed widgets, monitoring of hidden pages is now suspended in order release network traffic and cpu load</li>
+<li> build of product is now optimized with dependencies (thanks H.Brands)</li>
+<li> modified dialogs for virtual keyboard in IOS</li>
+</ul>
+
+<font color="#0000ff">3.8.6</font>
+<ul>
+<li>  drvh, drvl changed back to hopr, lopr for caslider and canumeric</li>
+<li> slider will not move when no write access</li>
+</ul>
+
+<font color="#0000ff">3.8.5</font>
+<ul>
+<li>  drvh, drvl changed back to hopr, lopr for caslider and canumeric</li>
+<li>adl2ui will not expand label width per default, when required, then use the option expandtext</li>
+<li>dialogs have been modified for better display on ios</li>
+<li> cacalc has now a scalable font</li>
+<li> region of interest selection with write to channels for cacamera</li>
+<li> autorepeat for caslider and canumeric</li>
+<li> epics data monitor changed to DBR_STS with correct initialisation when defining channels and on ioc reboot</li>
+<li>protected cawaterfall plot agains to fast update</li>
+</ul>
+
+<font color="#0000ff">3.8.4</font>
+<ul>
+<li>  more changes for ios</li>
+<li>  greek micro replaced by u when macos or ios</li>
+<li> when rescaling castripplot, figure will be cleared</li>
+</ul>
+
+<font color="#0000ff">3.8.3</font>
+<ul>
+<li> castripplot has been modified so that resizing does not clear the curves</li>
+<li> epics timestamp introduced for info box</li>
+</ul>
+
+<font color="#0000ff">3.8.2</font>
+<ul>
+<li> modified catogglebutton in order to be able to resize its label</li>
+</ul>
+
+<font color="#0000ff">3.8.1</font>
+<ul>
+<li> added cawavetable in order to display a waveform numerically (maximum items = 500)</li>
+</ul>
+
+<font color="#0000ff">3.8.0</font>
+<ul>
+<li> adapted source code in order to run on ios (ipad)</li>
+<li> cachoice crashed when index was higher than the number of ENUMS, fixed</li>
+<li> castripplot changed in order to get also auto scaling</li>
+<li> the title of the display can now be set in the window caption by defining the dynamic property "Title" for the mainwindow. when using a macro definition, this will be expanded.</li>
+</ul>
+
+<font color="#0000ff">3.7.9</font>
+<ul>
+<li> minor adjustments</li>
+<li> caslider was modified so that scale behaviour was incorrect, this has been corrected</li>
+</ul>
+
+<font color="#0000ff">3.7.8</font>
+<ul>
+<li> when writing a double, float was used so that the precision was lost, corrected</li>
+<li> related display modified for up to 16 items</li>
+<li> changed names for designer groups to include PSI Name</li>
+<li> changed caToggleButton and caLed behaviour</li>
+<li> changed caSlider and caThermo to be compilable with the standard version of qwt6.1 when using qt5.2</li>
+<li>  modified caQtDM_Lib to be callable from the software of the Australian lightsource</li>
+<li> fixed a bug in the scrollbar behaviour of the camera widget</li>
+</ul>
+
+<font color="#0000ff">3.7.7</font>
+<ul>
+<li> in waterfall plot the demo plot was not erased at initialization with real data, corrected</li>
+</ul>
+
+<font color="#0000ff">3.7.6</font>
+<ul>
+<li> added a property to the waterfall plot in order to define the maximum number of points treated in the waveform</li>
+<li> due to the change 3.7.4 for reload, the popup of an existing window was not working correctly</li>
+</ul>
+
+<font color="#0000ff">3.7.5</font>
+<li> on mac osx camera and waterfall plot were crashing; this has been corrected</li>
+</ul>
+
+<font color="#0000ff">3.7.4</font>
+<ul>
+<li> reload did not find the ui file any more when started with explicit path. corrected</li>
+<li> splash screen did not count correctly in some situations. corrected</li>
+<li> small memory leak repaired in cainclude</li>
+</ul>
+
+<font color="#0000ff">3.7.3</font>
+<ul>
+<li> after the improved performance of the cartesian plot, the trigger mode disappeared, corrected</li>
+</ul>
+
 <font color="#0000ff">3.7.2</font>
 <ul>
   <li> cagraphic lost its linecolor after no connection, corrected </li>
@@ -628,6 +780,14 @@ is the equivalent of the Bar Monitor in MEDM.
 <hr />
 <h3><a  name="caCircularGauge" rel="help" id="caCircularGauge"><font color="#ff00ff">caCircularGauge</font></a></h3>
 is the equivalent of the Meter Monitor in MEDM.
+<blockquote> <a href="#geometry">Geometry</a> is used for any object <br /><br />
+<b>Description:</b><br /><br />
+
+</blockquote>
+
+<hr />
+<h3><a  name="caMeter" rel="help" id="caMeter"><font color="#ff00ff">caMeter</font></a></h3>
+is the equivalent of the Meter Monitor in MEDM, Another look as the above circular gauge
 <blockquote> <a href="#geometry">Geometry</a> is used for any object <br /><br />
 <b>Description:</b><br /><br />
 
@@ -1285,28 +1445,195 @@ has no  equivalent in MEDM.
 <hr />
 
 <h2><b> <a  name="graphics" id="graphics" rel="Subsection">all graphical objects</a></b></h2>
+
+<blockquote> 
+<a href="#geometry">Geometry</a> is used for any object<br /><br />
+<a href="#visibility">Visibility</a> is used for any object except for caClock and caDoubleTabWidget<br />
+<dl>
+    <dt><strong>visibility:</strong> </dt>
+    <dd>  <table border="1" cellspacing="0" cellpadding="2">
+        <tr>
+          <td  valign="top">StaticV</td>
+          <td  valign="top" >visibility will be static (always visible)</td>
+        </tr>
+        <tr>
+          <td  valign="top">ifNotZero</td>
+          <td  valign="top" >visbility will be calculated through the  <a href="#calcexpression">VisibilityCalc</a> string</td>
+        </tr>
+        <tr>
+          <td  valign="top">ifZero</td>
+          <td  valign="top" >visbility will be calculated through the  <a href="#calcexpression">VisibilityCalc</a> string</td>
+        </tr>
+        <tr>
+          <td  valign="top">Calc</td>
+          <td  valign="top" >visibility will be calculated through the <a href="#calcexpression">VisibilityCalc</a> string</td>
+        </tr>
+      </table> <br/>
+    </dd>
+    <dt><strong>visibilityCalc:</strong></dt>
+    <dd> QString: CALC or regular expression <br/>
+    </dd>
+    <dt><strong>channel:</strong></dt>
+    <dd> Channel A for calculation<br/>
+   </dd>
+    <dt><strong>channelB:</strong></dt>
+    <dd> Channel B for calculation<br/>
+   </dd>
+    <dt><strong>channelC:</strong></dt>
+    <dd> Channel C for calculation<br/>
+   </dd>
+    <dt><strong>channelD:</strong></dt>
+    <dd> Channel D for calculation<br/>
+    </dd>
+  </dl>
+
+</blockquote>
+
 <hr />
 <h3><a  name="caLabel" rel="help" id="caLabel"><font color="#ff00ff">caLabel</font></a></h3>
 is the equivalent of Text in MEDM.
 <blockquote> <a href="#geometry">Geometry</a> is used for any object <br /><br />
+<a href="#visibility">Visibility</a> is used for any object
+      <br />
+      <br />
 <b>Description:</b><br /><br />
 </blockquote>
 <hr />
 <h3><a  name="caGraphics" rel="help" id="caGraphics"><font color="#ff00ff">caGraphics</font></a></h3>
 is the equivalent of all primary graphical objects (like circles, lines, arcs, triangles, arrows, ...) in MEDM.
 <blockquote> <a href="#geometry">Geometry</a> is used for any object <br /><br />
+<a href="#visibility">Visibility</a> is used for any object
+      <br />
+      <br />
 <b>Description:</b><br /><br />
+
+ <dl>
+    <dt><strong>foreground:</strong></dt>
+    <dd> QColor: color used for the foreground <br/>
+    </dd>
+    <dt><strong>lineStyle: style used for the outer lines</strong></dt>
+    <dd>
+      <table border="1" cellspacing="0" cellpadding="2">
+        <tr>
+          <td  valign="top">Solid</td>
+          <td  valign="top" ></td>
+        </tr>
+        <tr>
+          <td  valign="top">Dash</td>
+          <td  valign="top" ></td>
+        </tr>
+        <tr>
+          <td  valign="top" >BigDash</td>
+          <td  valign="top" ></td>
+        </tr>
+      </table>
+      <br/>
+    </dd>
+    <dt><strong>fillStyle: the graphical object can be filled or only outlined</strong></dt>
+    <dd>
+      <table border="1" cellspacing="0" cellpadding="2">
+        <tr>
+          <td  valign="top">Outline</td>
+          <td  valign="top" ></td>
+        </tr>
+        <tr>
+          <td  valign="top">Filled</td>
+          <td  valign="top" ></td>
+        </tr>
+      </table>
+      <br/>
+    </dd>
+    <dt><strong>lineSize:</strong></dt>
+    <dd> int:  thickness of the lines<br/>
+    </dd>
+    <dt><strong>lineColor:</strong></dt>
+    <dd> QColor: color used for the lines <br/>
+    </dd>
+    <dt><strong>colorMode:</strong></dt>
+    <dd>  <table border="1" cellspacing="0" cellpadding="2">
+        <tr>
+          <td  valign="top">Static</td>
+          <td  valign="top" >specified colors will be used</td>
+        </tr>
+        <tr>
+          <td  valign="top">Alarm</td>
+          <td  valign="top" >alarm colors will be used</td>
+        </tr>
+      </table><br/>
+    </dd>
+    <dt><strong>form:</strong></dt>
+    <dd>
+      <table border="1" cellspacing="0" cellpadding="2">
+        <tr>
+          <td  valign="top">Rectangle</td>
+          <td  valign="top">Limits specified by the control system will be usd (HOPR, LOPR for EPICS)</td>
+        </tr>
+        <tr>
+          <td  valign="top">Circle</td>
+          <td  valign="top">Limits specified by the user will be used.</td>
+        </tr>
+        <tr>
+          <td  valign="top">Arc</td>
+          <td  valign="top">Limits specified by the user will be used.</td>
+        </tr>
+        <tr>
+          <td  valign="top">Triangle</td>
+          <td  valign="top">Limits specified by the user will be used.</td>
+        </tr>
+        <tr>
+          <td  valign="top">Line</td>
+          <td  valign="top">Limits specified by the user will be used.</td>
+        </tr>
+        <tr>
+          <td  valign="top">Arrow</td>
+          <td  valign="top">Limits specified by the user will be used.</td>
+        </tr>
+      </table>
+      <br/>
+    </dd>
+    <dt><strong>arrowSize:</strong></dt>
+    <dd>
+          int: size of arrow 
+          <br/>
+    </dd>
+    <dt><strong>arrowMode:</strong></dt>
+    <dd> <table border="1" cellspacing="0" cellpadding="2">
+        <tr>
+          <td  valign="top">Single</td>
+          <td  valign="top" >Arrow only on one side of the line</td>
+        </tr>
+        <tr>
+          <td  valign="top">Double</td>
+          <td  valign="top" >Arrow on both sides of the line</td>
+        </tr>
+      </table> <br/>
+    </dd>
+    <dt><strong>tiltAngle:</strong></dt>
+    <dd>  int: tilt of the graphical object
+      <br/>
+    </dd>
+    <dt><strong>startAngle:</strong></dt>
+    <dd> int: in case of arcs the start angle<br/>
+    </dd>
+     <dt><strong>spanAngle:</strong></dt>
+    <dd> int: in case of arcs the end angle<br/>
+    </dd>   
+  </dl>
 </blockquote>
 <hr />
 <h3><a  name="caFrame" rel="help" id="caFrame"><font color="#ff00ff">caFrame</font></a></h3>
-has no equivalent of Text in MEDM.
-<blockquote> <a href="#geometry">Geometry</a> is used for any object <br /><br />
-<b>Description:</b><br /><br />
+     has no equivalent of Text in MEDM. s 
+    <blockquote> <a href="#geometry">Geometry</a> is used for any object <br /><br />
+<a href="#visibility">Visibility</a> is used for any object 
+      <br /><br />
+      <b>Description:<br /><br /></b>caFrame can be used to put several objects in to get a nice look and to be able to set visibility of a group of objects<br /><br />
 </blockquote>
 <hr />
 <h3><a  name="caImage" rel="help" id="caImage"><font color="#ff00ff">caImage</font></a></h3>
 is the equivalent of image in MEDM.
 <blockquote> <a href="#geometry">Geometry</a> is used for any object<br /><br />
+<a href="#visibility">Visibility</a> is used for any object 
+      <br /><br />
 <b>Description: </b><br /><br />
 
   Qt supports many graphics format, try yours to see if it will be displayed. The most interesting format is however the animated GIF format. These GIF image files may include multiple frames, transparency, and most other features supported by the GIF format. If the GIF image file has multiple frames, caQtDM can choose to animate the images or to display a specified frame. The default is to animate if there is more than one frame. To display a specific frame, enter an
@@ -1319,6 +1646,8 @@ href="http://www.gimp.org/">GNU Image Manipulation Program (GIMP)</a>is a good c
 <h3><a name="caPolyLine" rel="help" id="caPolyLine"><font color="#ff00ff">caPolyLine</font></a></h3>
 is the equivalent of Polyline and Polygone in MEDM.
 <blockquote> <a href="#geometry">Geometry</a> is used for any object   <br /><br />
+<a href="#visibility">Visibility</a> is used for any object 
+      <br /><br />
 <b>Description:</b><br /><br />
 </blockquote>
 <hr />
@@ -1326,6 +1655,8 @@ is the equivalent of Polyline and Polygone in MEDM.
 <h3><a name="caInclude" rel="help" id="caInclude"><font color="#ff00ff">caInclude</font></a></h3>
 is the equivalent of the Composite in MEDM
 <blockquote> <a href="#geometry">Geometry</a> is used for any object<br /><br />
+<a href="#visibility">Visibility</a> is used for any object 
+      <br /><br />
 <b>Description:</b> 
   Composite  objects are created by the designer as a new ui file to be included in a main file. For many operations they are treated as one object. Its uses also visibility
   (Color  Mode, Visibility, Visibility Calc, Channels A-D) properties. One can specify <a href="#MacroSubstitution">macros</a>. you can specify them by
@@ -1336,6 +1667,15 @@ is the equivalent of the Composite in MEDM
 has no equivalent in MEDM and is not a controls object
 <blockquote> <a href="#geometry">Geometry</a> is used for any object<br /><br />
 <b>Description:</b><br /><br />
+
+</blockquote>
+
+<h3><a  name="caClock" rel="help" id="caClock"><font color="#ff00ff">caClock</font></a></h3>
+has no equivalent in MEDM 
+<blockquote> <a href="#geometry">Geometry</a> is used for any object<br /><br />
+<b>Description:</b><br /><br />
+
+The clock can be used to give your local system time or a channel receive time.
 
 </blockquote>
 
@@ -1602,9 +1942,7 @@ The custom widgets make extensively use of the Qt font<em> &quot;Lucida Sans Typ
     </tr>
     <tr>
       <td valign="top">if not zero</td>
-      <td  valign="top">The object is displayed if the process variable is
-        
-        not zero.</td>
+      <td  valign="top">The object is displayed if the process variable is not zero.</td>
     </tr>
     <tr>
       <td valign="top">if zero</td>
@@ -1777,6 +2115,8 @@ The custom widgets make extensively use of the Qt font<em> &quot;Lucida Sans Typ
     Show the object whenever the values of Channel A, Channel B, and Channel C are all negative: A&lt;0&amp;&amp;B&lt;0&amp;&amp;C&lt;0<br />
     Show the object whenever the main process variable is within 90% of its HOPR or LOPR limits: A&lt;.9*L||A&gt;.9*H<br />
     Show the object whenever the SEVERITY of the main process variable is not 0: !J <br/>
+
+    It is also possible to use a regular expression as CALC string. The regular expression should start with %/ and finish with / and should return true or false. The regular expression uses only the channel A. An example would be %/^$|\\s+/. This expression gives true or false when the string given by channel A is empty or not.
   </div>
 </blockquote>
 <h3><a name="macrosubstitution" id="macrosubstitution">Macro Substitution</a></h3>
