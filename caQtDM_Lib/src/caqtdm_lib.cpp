@@ -643,14 +643,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
 
             // soft channel
             kData.soft = true;
-            kData.softMain = true;
 
             // add soft channel
             addMonitor(myWidget, &kData, widget->getVariable().toAscii().constData(), w1, specData, map, &pv);
 
             // other channels if any
             kData.soft = false;
-            kData.softMain = false;
             nbMonitors = InitVisibility(w1, &kData, map, specData, widget->getVariable().toAscii().constData());
 
             // when no monitors then inititalize value
@@ -1978,7 +1976,10 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
     }
     else if(caCalc *calc = qobject_cast<caCalc *>(w)) {
         strcpy(calcString, calc->getCalc().toAscii().constData());
-        //qDebug() << "for" << w << "calc=" << calcString;
+        if(strlen(calcString) < 1) {
+           valid = true;
+           return true;
+        }
     }
 
     // any monitors ?
@@ -2254,8 +2255,8 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
     // calc ==================================================================================================================
     if(caCalc *widget = qobject_cast<caCalc *>(w)) {
         bool valid;
-        double result;
-       //qDebug() << "we have a caCalc";
+        double result = data.edata.rvalue;
+        //qDebug() << "we have a caCalc" << w;
 
         CalcVisibility(w, result, valid);  // visibility not used, but calculation yes
         if(valid) {

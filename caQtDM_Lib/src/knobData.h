@@ -75,7 +75,6 @@ typedef struct _knobData {
     void *thisW;                        /* mainwindow identifier */
     int  index;                         /* index (-1 for not used) */
     short soft;                         /* soft channel mark */
-    short softMain;                     /* main soft channel */
     pv_string pv;                       /* device process variable name */
     void *dispW;                        /* widget identifier */
     void *mutex;                        /* mutex used for waveforms */

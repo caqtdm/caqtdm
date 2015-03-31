@@ -30,6 +30,45 @@
 #include <qtconcurrentrun.h>
 #endif
 #include "cacamera.h"
+#include <qwt_color_map.h>
+
+class ColorMap_Hot : public  QwtLinearColorMap {
+public:
+    ColorMap_Hot() : QwtLinearColorMap(QColor(0,0,0), QColor(1,1,1)) {
+
+        float r[] = { 0, 0.03968253968253968, 0.07936507936507936, 0.119047619047619, 0.1587301587301587, 0.1984126984126984, 0.2380952380952381, 0.2777777777777778, 0.3174603174603174, 0.3571428571428571, 0.3968253968253968, 0.4365079365079365, 0.4761904761904762, 0.5158730158730158, 0.5555555555555556, 0.5952380952380952, 0.6349206349206349, 0.6746031746031745, 0.7142857142857142, 0.753968253968254, 0.7936507936507936, 0.8333333333333333, 0.873015873015873, 0.9126984126984127, 0.9523809523809523, 0.992063492063492, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+        float g[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.03174603174603163, 0.0714285714285714, 0.1111111111111112, 0.1507936507936507, 0.1904761904761905, 0.23015873015873, 0.2698412698412698, 0.3095238095238093, 0.3492063492063491, 0.3888888888888888, 0.4285714285714284, 0.4682539682539679, 0.5079365079365079, 0.5476190476190477, 0.5873015873015872, 0.6269841269841268, 0.6666666666666665, 0.7063492063492065, 0.746031746031746, 0.7857142857142856, 0.8253968253968254, 0.8650793650793651, 0.9047619047619047, 0.9444444444444442, 0.984126984126984, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+        float b[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.04761904761904745, 0.1269841269841265, 0.2063492063492056, 0.2857142857142856, 0.3650793650793656, 0.4444444444444446, 0.5238095238095237, 0.6031746031746028, 0.6825396825396828, 0.7619047619047619, 0.8412698412698409, 0.92063492063492, 1};
+        double pos;
+        for(int i=0; i<256; i++) {
+            pos= (double) i/ 255.0;
+            int j = (int) (i+0.5) / 4.0;
+            addColorStop(pos, QColor(255*r[j], 255*g[j], 255*b[j]));
+        }
+    }
+};
+
+class ColorMap_Jet: public QwtLinearColorMap
+{
+public:
+    ColorMap_Jet(): QwtLinearColorMap(QColor(0,0,189), QColor(132,0,0))
+    {
+        double pos;
+        pos = 1.0/13.0*1.0; addColorStop(pos, QColor(0,0,255));
+        pos = 1.0/13.0*2.0; addColorStop(pos, QColor(0,66,255));
+        pos = 1.0/13.0*3.0; addColorStop(pos, QColor(0,132,255));
+        pos = 1.0/13.0*4.0; addColorStop(pos, QColor(0,189,255));
+        pos = 1.0/13.0*5.0; addColorStop(pos, QColor(0,255,255));
+        pos = 1.0/13.0*6.0; addColorStop(pos, QColor(66,255,189));
+        pos = 1.0/13.0*7.0; addColorStop(pos, QColor(132,255,132));
+        pos = 1.0/13.0*8.0; addColorStop(pos, QColor(189,255,66));
+        pos = 1.0/13.0*9.0; addColorStop(pos, QColor(255,255,0));
+        pos = 1.0/13.0*10.0; addColorStop(pos, QColor(255,189,0));
+        pos = 1.0/13.0*12.0; addColorStop(pos, QColor(255,66,0));
+        pos = 1.0/13.0*13.0; addColorStop(pos, QColor(189,0,0));
+    }
+};
+
 
 caCamera::caCamera(QWidget *parent) : QWidget(parent)
 {
@@ -588,10 +627,19 @@ void caCamera::setColormap(colormap const &map)
     case grey:
         for(int i=0; i<ColormapSize; i++) ColorMap[i] = qRgb(i,i,i);
         break;
-    case spectrum:
+    case spectrum: {
+/*
+        QwtLinearColorMap *heatColormap =  new ColorMap_Jet();
+        for (int i = 0; i < ColormapSize; ++i) {
+            ColorMap[i] = heatColormap->rgb(QwtInterval(0, ColormapSize-1), i);
+        }
+*/
+        //for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = floatRGB((double) i, 0.0, ColormapSize -1);
         for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = rgbFromWaveLength(380.0 + (i * 400.0 / ColormapSize));
         break;
+    }
     default:
+        //for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = floatRGB((double) i, 0.0, ColormapSize-1);
         for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = rgbFromWaveLength(380.0 + (i * 400.0 / ColormapSize));
         break;
     }
@@ -982,6 +1030,7 @@ void caCamera::showImage(int datasize, char *data)
     UpdatesPerSecond++;
 }
 
+// rainbow
 uint caCamera::rgbFromWaveLength(double wave)
 {
     double r = 0.0;
@@ -1018,6 +1067,24 @@ uint caCamera::rgbFromWaveLength(double wave)
     b = pow(b * s, 0.8);
     return qRgb(int(r * 255), int(g * 255), int(b * 255));
 }
+
+// heat from blue to yellow
+uint caCamera::floatRGB(double mag, double min, double max)
+{
+    double r = 0.0;
+    double g = 0.0;
+    double b = 0.0;
+
+    double x = (mag-min) / (max-min);
+    b = qMin(qMax(4*(0.75-x), 0.0), 1.0);
+    r = qMin(qMax(4*(x-0.25), 0.0), 1.0);
+    g = qMin(qMax(4*fabs(x-0.5)-1.0, 0.0), 1.0);
+
+    printf("%f %f %f\n", r, g, b);
+
+    return qRgb(int(r * 255), int(g * 255), int(b * 255));
+}
+
 
 void caCamera::setAccessW(int access)
 {

@@ -153,6 +153,8 @@ private:
     void deleteWidgets();
     void initWidgets();
 
+    uint floatRGB(double mag, double min, double max);
+
     bool buttonPressed, validIntensity;
     bool forcemonochrome;
     QString thisPV_Data, thisPV_Width, thisPV_Height, thisPV_Code, thisPV_BPP;

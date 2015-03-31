@@ -189,9 +189,9 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w)
         if(pv == list.at(0)) {
             int indx = i.value();
             if(KnobData[indx].index != -1 && KnobData[indx].pv == pv && ((QWidget*) list.at(2).toInt(0,16) ==  w)) {
+                if(KnobData[indx].pv == pv) return;
                 //qDebug() <<  "     update index=" << i.value() << i.key() <<  w << "with" << value;
                 KnobData[indx].edata.rvalue = value;
-
                 KnobData[indx].edata.fieldtype = caDOUBLE;
                 KnobData[indx].edata.precision = 3;
                 KnobData[indx].edata.connected = true;
@@ -482,7 +482,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
         }
 
         // update all graphical items for this soft pv when a value changes
-        if(kPtr->index != -1 && kPtr->softMain && (diff >= (1.0/(double)repRate))) {
+        if(kPtr->index != -1 && kPtr->soft && (diff >= (1.0/(double)repRate))) {
             int indx;
             //qDebug() << "I am a soft channel" << kPtr->pv << kPtr->dispName << kPtr->edata.rvalue << kPtr->index;
             // get for this soft pv the index of the corresponding caCalc into the knobData array where the data were updated
@@ -496,7 +496,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 kPtr->edata.accessR = true;
                 //increase monitor count when value has changed
                 if(kPtr->edata.oldsoftvalue != ptr->edata.rvalue) {
-                    //qDebug() << kPtr->pv << "will be updated with value=" << ptr->edata.rvalue << "from" << ptr->pv << "index=" << ptr->index << "oldvalue=" << kPtr->edata.oldsoftvalue;
+                    //qDebug() << kPtr->pv << kPtr->dispName << "will be updated with value=" << ptr->edata.rvalue << "from" << ptr->pv << "index=" << ptr->index << "oldvalue=" << kPtr->edata.oldsoftvalue;
                     kPtr->edata.monitorCount++;
                 }
 
