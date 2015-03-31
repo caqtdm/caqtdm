@@ -48,6 +48,28 @@ public:
     }
 };
 
+class ColorMap_Custom : public  QwtLinearColorMap {
+public:
+    ColorMap_Custom() : QwtLinearColorMap() {
+    }
+
+    void initColormap(int *colorIndexes, int nbColors) {
+
+        for ( int i = 0; i < nbColors; i++ ) {
+            if(colorIndexes[i] < 2) colorIndexes[i] = 2;
+            if(colorIndexes[i] > 18) colorIndexes[i] = 18;
+        }
+
+        //setMode( QwtLinearColorMap::FixedColors );
+
+        setColorInterval( Qt::GlobalColor( colorIndexes[0] ), Qt::GlobalColor(colorIndexes[nbColors-1]) );
+
+        for ( int i = 1; i < nbColors; i++ ) {
+            addColorStop( i / (double) nbColors, Qt::GlobalColor(colorIndexes[i]) );
+        }
+    }
+};
+
 class ColorMap_Jet: public QwtLinearColorMap
 {
 public:
@@ -106,6 +128,8 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     buttonPressed = false;
     ROIdetected = false;
     thisROItype = centerxy_width_height;
+
+    setCustomMap("");
 
     setAccessW(true);
     installEventFilter(this);
@@ -629,13 +653,30 @@ void caCamera::setColormap(colormap const &map)
         break;
     case spectrum: {
 /*
-        QwtLinearColorMap *heatColormap =  new ColorMap_Jet();
+        QwtLinearColorMap *heatColormap =  new ColorMap_Custom();
         for (int i = 0; i < ColormapSize; ++i) {
             ColorMap[i] = heatColormap->rgb(QwtInterval(0, ColormapSize-1), i);
         }
 */
-        //for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = floatRGB((double) i, 0.0, ColormapSize -1);
-        for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = rgbFromWaveLength(380.0 + (i * 400.0 / ColormapSize));
+        // user has the possibility to input its own colormap with discrete QtColors from 2 t0 18
+        // when nothing given, fallback to default colormap
+        if(thisCustomMap.count() > 2) {
+           //int colorIndexes[17] = {2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17, 18};  // available colors
+            int colorIndexes[thisCustomMap.count()];
+            for(int i=0; i< thisCustomMap.count(); i++) {
+                bool ok;
+                int index = thisCustomMap.at(i).toInt(&ok);
+                if(ok) colorIndexes[i] = index; else colorIndexes[i] = 2; // black
+            }
+
+           ColorMap_Custom * colormap =  new ColorMap_Custom();
+           colormap->initColormap(colorIndexes, thisCustomMap.count());
+           for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = colormap->rgb(QwtInterval(0, ColormapSize-1), i);
+        } else {
+            //for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = floatRGB((double) i, 0.0, ColormapSize -1);
+            for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = rgbFromWaveLength(380.0 + (i * 400.0 / ColormapSize));
+        }
+
         break;
     }
     default:

@@ -59,6 +59,8 @@ class QTCON_EXPORT caCamera : public QWidget
     Q_PROPERTY(QString minLevel READ getMinLevel WRITE setMinLevel)
     Q_PROPERTY(QString maxLevel READ getMaxLevel WRITE setMaxLevel)
 
+    Q_PROPERTY(QString customColorMap READ getCustomMap WRITE setCustomMap)
+
     Q_PROPERTY(QString dimensionMarking_Channels READ getROIChannelsRead WRITE setROIChannelsRead)
     Q_PROPERTY(ROI_type ROI_writeType READ getROIwriteType WRITE setROIwriteType)
     Q_PROPERTY(QString ROI_writeChannels READ getROIChannelsWrite WRITE setROIChannelsWrite)
@@ -105,6 +107,9 @@ public:
 
     colormap getColormap() const {return thisColormap;}
     void setColormap(colormap const &map);
+
+    QString getCustomMap() const {return thisCustomMap.join(";");}
+    void setCustomMap(QString const &newmap) {thisCustomMap = newmap.split(";"); setColormap(thisColormap);}
 
     zoom getFitToSize () const {return thisFitToSize;}
     void setFitToSize(zoom const &z);
@@ -158,6 +163,7 @@ private:
     bool buttonPressed, validIntensity;
     bool forcemonochrome;
     QString thisPV_Data, thisPV_Width, thisPV_Height, thisPV_Code, thisPV_BPP;
+    QStringList thisCustomMap;
     ROI_type thisROItype;
     QStringList thisPV_ROI_Read, thisPV_ROI_Write;
     QString thisMinLevel, thisMaxLevel;
