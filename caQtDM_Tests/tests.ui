@@ -178,7 +178,7 @@ border-radius: 2px;
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>5</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -1354,7 +1354,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>12</number>
+       <number>11</number>
       </property>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">
@@ -5180,23 +5180,93 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;and minlevel/maxlevel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
-       <widget class="caClock" name="caclock">
+       <widget class="caCamera" name="cacamera_2">
         <property name="geometry">
          <rect>
-          <x>55</x>
-          <y>254</y>
-          <width>174</width>
-          <height>136</height>
+          <x>189</x>
+          <y>368</y>
+          <width>179</width>
+          <height>163</height>
          </rect>
         </property>
-        <property name="channel" stdset="0">
-         <string>pc7818-1:data{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
+        <property name="channelData" stdset="0">
+         <string notr="true">pc7818-1:data{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
         </property>
-        <property name="TimeType">
-         <enum>caClock::ReceiveTime</enum>
+        <property name="channelWidth" stdset="0">
+         <string notr="true">pc7818-1:width{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
-        <property name="colorMode">
-         <enum>caClock::Alarm</enum>
+        <property name="channelHeight" stdset="0">
+         <string notr="true">pc7818-1:height{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+        </property>
+        <property name="channelCode" stdset="0">
+         <string notr="true">pc7818-1:code{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+        </property>
+        <property name="channelBPP" stdset="0">
+         <string notr="true">pc7818-1:bpp{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+        </property>
+        <property name="simpleZoomedView" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="Zoom" stdset="0">
+         <enum>caCamera::Yes</enum>
+        </property>
+        <property name="ColorMap" stdset="0">
+         <enum>caCamera::grey</enum>
+        </property>
+        <property name="automaticLevels" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="minLevel">
+         <string notr="true">800</string>
+        </property>
+        <property name="maxLevel">
+         <string notr="true">4500</string>
+        </property>
+       </widget>
+       <widget class="caCamera" name="cacamera_3">
+        <property name="geometry">
+         <rect>
+          <x>11</x>
+          <y>206</y>
+          <width>179</width>
+          <height>163</height>
+         </rect>
+        </property>
+        <property name="channelData" stdset="0">
+         <string notr="true">pc7818-1:data{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
+        </property>
+        <property name="channelWidth" stdset="0">
+         <string notr="true">pc7818-1:width{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+        </property>
+        <property name="channelHeight" stdset="0">
+         <string notr="true">pc7818-1:height{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+        </property>
+        <property name="channelCode" stdset="0">
+         <string notr="true">pc7818-1:code{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+        </property>
+        <property name="channelBPP" stdset="0">
+         <string notr="true">pc7818-1:bpp{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+        </property>
+        <property name="simpleZoomedView" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="Zoom" stdset="0">
+         <enum>caCamera::Yes</enum>
+        </property>
+        <property name="ColorMap" stdset="0">
+         <enum>caCamera::spectrum</enum>
+        </property>
+        <property name="automaticLevels" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="minLevel">
+         <string notr="true">800</string>
+        </property>
+        <property name="maxLevel">
+         <string notr="true">4500</string>
+        </property>
+        <property name="customColorMap" stdset="0">
+         <string>2;15;9;17;11;16;10;14;8;13;7;18;12;3</string>
         </property>
        </widget>
       </widget>
@@ -7650,7 +7720,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1102</width>
-     <height>26</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>
@@ -7749,6 +7819,11 @@ p, li { white-space: pre-wrap; }
    <header>caInclude</header>
   </customwidget>
   <customwidget>
+   <class>caClock</class>
+   <extends>QWidget</extends>
+   <header>caClock</header>
+  </customwidget>
+  <customwidget>
    <class>caLed</class>
    <extends>QWidget</extends>
    <header>caLed</header>
@@ -7762,6 +7837,11 @@ p, li { white-space: pre-wrap; }
    <class>caCircularGauge</class>
    <extends>QWidget</extends>
    <header>caGauge</header>
+  </customwidget>
+  <customwidget>
+   <class>caMeter</class>
+   <extends>QWidget</extends>
+   <header>caMeter</header>
   </customwidget>
   <customwidget>
    <class>caLineEdit</class>
@@ -7817,16 +7897,6 @@ p, li { white-space: pre-wrap; }
    <class>caWaterfallPlot</class>
    <extends>QWidget</extends>
    <header>caWaterfall</header>
-  </customwidget>
-  <customwidget>
-   <class>caClock</class>
-   <extends>QWidget</extends>
-   <header>caClock</header>
-  </customwidget>
-  <customwidget>
-   <class>caMeter</class>
-   <extends>QWidget</extends>
-   <header>caMeter</header>
   </customwidget>
  </customwidgets>
  <resources/>
