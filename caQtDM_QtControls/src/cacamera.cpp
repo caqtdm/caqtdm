@@ -593,9 +593,13 @@ void caCamera::setup()
         zoomValue = new QLabel("");
         zoomValue->setFixedWidth(60);
 
-        colormapWidget = new QwtScaleWidget;
+        colormapWidget = new QwtScaleWidget();
         colormapWidget->setColorBarEnabled(true);
         colormapWidget->setHidden(true);
+#if QWT_VERSION >= 0x060100
+        QwtScaleDiv *div = new QwtScaleDiv(0.0, 1.0);
+        colormapWidget->setScaleDiv(*div);
+#endif
 
         // add everything to layout
         zoomSliderLayout = new QGridLayout();
