@@ -9,8 +9,8 @@ IF "%1"=="3" GOTO SELECT3
 echo =============================================================================================
 echo Select Build Environment
 echo 1) QT 4.8.5 QWT6.0.1  32 Bit VS2010  
-echo 2) QT 5.4.0 QWT6.1.1  64 Bit VS2013  
-echo 3) QT 5.4.0 QWT6.1.1  32 Bit VS2013  
+echo 2) QT 5.4.1 QWT6.1.2  64 Bit VS2013  
+echo 3) QT 5.4.1 QWT6.1.2  32 Bit VS2013  
 set /P SELCTION=Select: 
 echo =============================================================================================
  
@@ -57,18 +57,18 @@ REM ============================================================================
  
   call "C:\Program files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
  
-  set QTHOME=X:/qt/5.4.0_64bit/qtbase
+  set QTHOME=X:/qt/5.4.1_64bit/qtbase
   
-  set QWTHOME=X:/qt/qwt-6.1.1_5_64bit
+  set QWTHOME=X:/qt/qwt-6.1.2_64bit
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
   
   
-  set EPICS_BASE=X:/epics/base-3.14.12.4
+  set EPICS_BASE=X:/epics/Package/base
   set EPICS_HOST_ARCH=windows-x64
 
   set EPICSINCLUDE=%EPICS_BASE%/include
-  set QTCONTROLS_LIBS=X:/Qt/caqtdm_project/caQtDM_QtControls
+  set QTCONTROLS_LIBS=X:/Qt/caqtdm_project/caQtDM_QtControls_64Bit
   set CAQTDM_COLLECT=X:/Qt/caqtdm_project/caQtDM_Binaries_64Bit
   set JOM=X:\qt\jom
  
@@ -86,18 +86,18 @@ REM ============================================================================
  
   call "C:\Program files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
  
-  set QTHOME=X:/qt/5.4.0_32bit/qtbase
+  set QTHOME=X:/qt/5.4.1_32bit/qtbase
   
-  set QWTHOME=X:/qt/qwt-6.1.1_5_32bit
+  set QWTHOME=X:/qt/qwt-6.1.2_32bit
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
   
   
-  set EPICS_BASE=X:/epics/base-3.14.12.4
+  set EPICS_BASE=X:/epics/Package/base
   set EPICS_HOST_ARCH=win32-x86
 
   set EPICSINCLUDE=%EPICS_BASE%/include
-  set QTCONTROLS_LIBS=X:/Qt/caqtdm_project/caQtDM_QtControls
+  set QTCONTROLS_LIBS=X:/Qt/caqtdm_project/caQtDM_QtControls_32Bit
   set CAQTDM_COLLECT=X:/Qt/caqtdm_project/caQtDM_Binaries_32Bit
   set JOM=X:\qt\jom
  
