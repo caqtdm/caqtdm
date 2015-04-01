@@ -40,6 +40,9 @@
 #include <qtcontrols_global.h>
 #include <imagewidget.h>
 #include <calabel.h>
+
+#include <qwt_color_map.h>
+#include <qwt_scale_widget.h>
 #include <time.h>
 #include <sys/timeb.h>
 
@@ -193,7 +196,7 @@ private:
 
     QHBoxLayout  *valuesLayout;
     QGridLayout  *mainLayout;
-    QVBoxLayout  *zoomSliderLayout;
+    QGridLayout  *zoomSliderLayout;
 
     caLineEdit *labelMin;
     caLineEdit *labelMax;
@@ -215,6 +218,7 @@ private:
     QLabel *zoomValue;
     QToolButton *zoomInIcon;
     QToolButton *zoomOutIcon;
+    QwtScaleWidget *colormapWidget;
 
     double scaleFactor;
 

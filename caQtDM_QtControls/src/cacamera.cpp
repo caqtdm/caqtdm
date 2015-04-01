@@ -30,7 +30,7 @@
 #include <qtconcurrentrun.h>
 #endif
 #include "cacamera.h"
-#include <qwt_color_map.h>
+
 
 class ColorMap_Hot : public  QwtLinearColorMap {
 public:
@@ -48,6 +48,27 @@ public:
     }
 };
 
+// heat from blue to yellow
+class ColorMap_Heat : public  QwtLinearColorMap {
+public:
+    ColorMap_Heat() : QwtLinearColorMap(QColor(0,0,0), QColor(1,1,1)) {
+        double r,g,b;
+        for (int i = 0; i < 256; ++i) {
+            rgbHeat((double) i, r, g, b);
+            addColorStop((double)(i)/255.0, QColor((int) r, (int) g, (int) b));
+        }
+    }
+private:
+    void rgbHeat(double wave, double &r, double &g, double &b) {
+        double max = 255.0;
+        double min = 0.0;
+        double x = (wave-min) / (max-min);
+        b = 255 * qMin(qMax(4*(0.75-x), 0.0), 1.0);
+        r = 255 * qMin(qMax(4*(x-0.25), 0.0), 1.0);
+        g = 255 * qMin(qMax(4*fabs(x-0.5)-1.0, 0.0), 1.0);
+    }
+};
+
 class ColorMap_Custom : public  QwtLinearColorMap {
 public:
     ColorMap_Custom() : QwtLinearColorMap() {
@@ -60,8 +81,7 @@ public:
             if(colorIndexes[i] > 18) colorIndexes[i] = 18;
         }
 
-        //setMode( QwtLinearColorMap::FixedColors );
-
+        setMode( QwtLinearColorMap::FixedColors );
         setColorInterval( Qt::GlobalColor( colorIndexes[0] ), Qt::GlobalColor(colorIndexes[nbColors-1]) );
 
         for ( int i = 1; i < nbColors; i++ ) {
@@ -90,6 +110,56 @@ public:
         pos = 1.0/13.0*13.0; addColorStop(pos, QColor(189,0,0));
     }
 };
+
+class ColorMap_Wavelenght: public QwtLinearColorMap
+{
+public:
+    ColorMap_Wavelenght():QwtLinearColorMap(QColor(80,80,0), QColor(100,0,0))
+    {
+        double r,g,b;
+        for (int i = 0; i < 256; ++i) {
+            rgbFromWaveLength(380.0 + (i * 400.0 / 255), r, g, b);
+            addColorStop((double)(i)/255.0, QColor((int) r, (int) g, (int) b));
+        }
+    }
+private:
+    void rgbFromWaveLength(double wave, double &r, double &g, double &b)
+    {
+        r = 0.0;
+        g = 0.0;
+        b = 0.0;
+
+        if (wave >= 380.0 && wave <= 440.0) {
+            r = -1.0 * (wave - 440.0) / (440.0 - 380.0);
+            b = 1.0;
+        } else if (wave >= 440.0 && wave <= 490.0) {
+            g = (wave - 440.0) / (490.0 - 440.0);
+            b = 1.0;
+        } else if (wave >= 490.0 && wave <= 510.0) {
+            g = 1.0;
+            b = -1.0 * (wave - 510.0) / (510.0 - 490.0);
+        } else if (wave >= 510.0 && wave <= 580.0) {
+            r = (wave - 510.0) / (580.0 - 510.0);
+            g = 1.0;
+        } else if (wave >= 580.0 && wave <= 645.0) {
+            r = 1.0;
+            g = -1.0 * (wave - 645.0) / (645.0 - 580.0);
+        } else if (wave >= 645.0 && wave <= 780.0) {
+            r = 1.0;
+        }
+
+        double s = 1.0;
+        if (wave > 700.0)
+            s = 0.3 + 0.7 * (780.0 - wave) / (780.0 - 700.0);
+        else if (wave <  420.0)
+            s = 0.3 + 0.7 * (wave - 380.0) / (420.0 - 380.0);
+
+        r = pow(r * s, 0.8) * 255;
+        g = pow(g * s, 0.8) * 255;
+        b = pow(b * s, 0.8) * 255;
+    }
+};
+
 
 
 caCamera::caCamera(QWidget *parent) : QWidget(parent)
@@ -155,7 +225,7 @@ void caCamera::deleteWidgets()
     if(intensityText != (caLabel *) 0)           delete intensityText;
     if(nbUpdatesText != (caLabel *) 0)           delete nbUpdatesText;
 
-    if(zoomSliderLayout != ( QVBoxLayout *) 0)   delete zoomSliderLayout;
+    if(zoomSliderLayout != ( QGridLayout *) 0)   delete zoomSliderLayout;
     if(zoomSlider != (QSlider *) 0)              delete zoomSlider;
     if(zoomValue != (caLabel *) 0)               delete zoomValue;
     if(zoomInIcon != (QToolButton *) 0)          delete zoomInIcon;
@@ -164,6 +234,7 @@ void caCamera::deleteWidgets()
     if(imageW != (ImageWidget *) 0)              delete imageW;
     if(valuesWidget != (QWidget *) 0)            delete valuesWidget;
     if(scrollArea != (QScrollArea *) 0)          delete scrollArea;
+    if(colormapWidget != (QwtScaleWidget *) 0)   delete colormapWidget;
     if(zoomWidget != (QWidget *) 0)              delete zoomWidget;
 }
 
@@ -189,7 +260,8 @@ void caCamera::initWidgets()
     zoomOutIcon = (QToolButton *) 0;
 
     valuesLayout = (QHBoxLayout *) 0;
-    zoomSliderLayout = ( QVBoxLayout *) 0;
+    zoomSliderLayout = ( QGridLayout *) 0;
+    colormapWidget = (QwtScaleWidget *) 0;
 }
 
 caCamera::~caCamera()
@@ -520,12 +592,18 @@ void caCamera::setup()
         zoomValue = new QLabel("");
         zoomValue->setFixedWidth(60);
 
+        colormapWidget = new QwtScaleWidget;
+        colormapWidget->setColorBarEnabled(true);
+        colormapWidget->setHidden(true);
+
         // add everything to layout
-        zoomSliderLayout = new QVBoxLayout();
-        zoomSliderLayout->addWidget(zoomInIcon);
-        zoomSliderLayout->addWidget(zoomSlider);
-        zoomSliderLayout->addWidget(zoomOutIcon);
-        zoomSliderLayout->addWidget(zoomValue);
+        zoomSliderLayout = new QGridLayout();
+        zoomSliderLayout->setSpacing(0);
+        zoomSliderLayout->addWidget(zoomInIcon, 0, 1);
+        zoomSliderLayout->addWidget(zoomSlider, 1, 1);
+        zoomSliderLayout->addWidget(zoomOutIcon, 2, 1);
+        zoomSliderLayout->addWidget(zoomValue, 3, 1);
+        zoomSliderLayout->addWidget(colormapWidget,0,0,4,1);
 
         zoomWidget = new QWidget;
         zoomWidget->setLayout(zoomSliderLayout);
@@ -538,7 +616,7 @@ void caCamera::setup()
         // add everything to main layout
         mainLayout->addWidget(valuesWidget, 0, 0);
         mainLayout->addWidget(scrollArea, 1, 0);
-        mainLayout->addWidget(zoomWidget, 1, 1);
+        mainLayout->addWidget(zoomWidget, 1, 2);
 
         for(int i=0; i<4; i++) valuesPresent[i] = false;
 
@@ -648,18 +726,20 @@ void caCamera::setColormap(colormap const &map)
     switch (map) {
     case Default:
         for(int i=0; i<ColormapSize; i++) ColorMap[i] = qRgb(i,i,i);
+        // hide the colormap bar
+        if(colormapWidget != ( QwtScaleWidget *) 0) colormapWidget->setHidden(true);
         break;
     case grey:
         for(int i=0; i<ColormapSize; i++) ColorMap[i] = qRgb(i,i,i);
+        // hide the colormap bar
+        if(colormapWidget != ( QwtScaleWidget *) 0) colormapWidget->setHidden(true);
         break;
     case spectrum: {
-
         // user has the possibility to input its own colormap with discrete QtColors from 2 t0 18
         // when nothing given, fallback to default colormap
 
-
         if(thisCustomMap.count() > 2) {
-			colorIndexes=(int *) malloc(thisCustomMap.count()*sizeof(int));//thisCustomMap.count()
+            colorIndexes=(int *) malloc(thisCustomMap.count()*sizeof(int));
 
             for(int i=0; i< thisCustomMap.count(); i++) {
                 bool ok;
@@ -671,18 +751,38 @@ void caCamera::setColormap(colormap const &map)
            colormap->initColormap(colorIndexes, thisCustomMap.count());
            for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = colormap->rgb(QwtInterval(0, ColormapSize-1), i);
            free(colorIndexes);
+           // display the colormap bar
+           if(colormapWidget != ( QwtScaleWidget *) 0) {
+               colormapWidget->setHidden(false);
+               colormapWidget->setColorMap(QwtInterval(0,1), colormap);
+           }
+
         } else {
-            //for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = floatRGB((double) i, 0.0, ColormapSize -1);
-            for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = rgbFromWaveLength(380.0 + (i * 400.0 / ColormapSize));
+            ColorMap_Wavelenght * colormap =  new ColorMap_Wavelenght();
+            for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = colormap->rgb(QwtInterval(0, ColormapSize-1), i);
+            // display the colormap bar
+            if(colormapWidget != ( QwtScaleWidget *) 0) {
+                colormapWidget->setHidden(false);
+                colormapWidget->setColorMap(QwtInterval(0,1), colormap);
+            }
         }
 
         break;
     }
     default:
-        //for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = floatRGB((double) i, 0.0, ColormapSize-1);
-        for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = rgbFromWaveLength(380.0 + (i * 400.0 / ColormapSize));
+        ColorMap_Wavelenght * colormap =  new ColorMap_Wavelenght();
+        for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = colormap->rgb(QwtInterval(0, ColormapSize-1), i);
+        // display the colormap bar
+        if(colormapWidget != ( QwtScaleWidget *) 0) {
+            colormapWidget->setHidden(false);
+            colormapWidget->setColorMap(QwtInterval(0,1), colormap);
+        }
         break;
     }
+    // force resize
+    if(zoomWidget != (QWidget*) 0) zoomWidget->adjustSize();
+    QResizeEvent *re = new QResizeEvent(size(), size());
+    resizeEvent(re);
 }
 
 void caCamera::setCode(int code)
@@ -1068,61 +1168,6 @@ void caCamera::showImage(int datasize, char *data)
         if(maxvalue == minvalue) maxvalue = minvalue + 1000;
     }
     UpdatesPerSecond++;
-}
-
-// rainbow
-uint caCamera::rgbFromWaveLength(double wave)
-{
-    double r = 0.0;
-    double g = 0.0;
-    double b = 0.0;
-
-    if (wave >= 380.0 && wave <= 440.0) {
-        r = -1.0 * (wave - 440.0) / (440.0 - 380.0);
-        b = 1.0;
-    } else if (wave >= 440.0 && wave <= 490.0) {
-        g = (wave - 440.0) / (490.0 - 440.0);
-        b = 1.0;
-    } else if (wave >= 490.0 && wave <= 510.0) {
-        g = 1.0;
-        b = -1.0 * (wave - 510.0) / (510.0 - 490.0);
-    } else if (wave >= 510.0 && wave <= 580.0) {
-        r = (wave - 510.0) / (580.0 - 510.0);
-        g = 1.0;
-    } else if (wave >= 580.0 && wave <= 645.0) {
-        r = 1.0;
-        g = -1.0 * (wave - 645.0) / (645.0 - 580.0);
-    } else if (wave >= 645.0 && wave <= 780.0) {
-        r = 1.0;
-    }
-
-    double s = 1.0;
-    if (wave > 700.0)
-        s = 0.3 + 0.7 * (780.0 - wave) / (780.0 - 700.0);
-    else if (wave <  420.0)
-        s = 0.3 + 0.7 * (wave - 380.0) / (420.0 - 380.0);
-
-    r = pow(r * s, 0.8);
-    g = pow(g * s, 0.8);
-    b = pow(b * s, 0.8);
-    return qRgb(int(r * 255), int(g * 255), int(b * 255));
-}
-
-// heat from blue to yellow
-uint caCamera::floatRGB(double mag, double min, double max)
-{
-    double r = 0.0;
-    double g = 0.0;
-    double b = 0.0;
-
-    double x = (mag-min) / (max-min);
-    b = qMin(qMax(4*(0.75-x), 0.0), 1.0);
-    r = qMin(qMax(4*(x-0.25), 0.0), 1.0);
-    g = qMin(qMax(4*fabs(x-0.5)-1.0, 0.0), 1.0);
-
-    printf("%f %f %f\n", r, g, b);
-
-    return qRgb(int(r * 255), int(g * 255), int(b * 255));
 }
 
 
