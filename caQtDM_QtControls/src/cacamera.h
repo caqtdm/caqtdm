@@ -63,6 +63,7 @@ class QTCON_EXPORT caCamera : public QWidget
     Q_PROPERTY(QString maxLevel READ getMaxLevel WRITE setMaxLevel)
 
     Q_PROPERTY(QString customColorMap READ getCustomMap WRITE setCustomMap)
+    Q_PROPERTY(bool discreteCustomColorMap READ getDiscreteCustomMap WRITE setDiscreteCustomMap)
 
     Q_PROPERTY(QString dimensionMarking_Channels READ getROIChannelsRead WRITE setROIChannelsRead)
     Q_PROPERTY(ROI_type ROI_writeType READ getROIwriteType WRITE setROIwriteType)
@@ -113,6 +114,9 @@ public:
 
     QString getCustomMap() const {return thisCustomMap.join(";");}
     void setCustomMap(QString const &newmap) {thisCustomMap = newmap.split(";"); setColormap(thisColormap);}
+
+    bool getDiscreteCustomMap() const {return thisDiscreteMap;}
+    void setDiscreteCustomMap(bool discrete) {thisDiscreteMap = discrete; setColormap(thisColormap);}
 
     zoom getFitToSize () const {return thisFitToSize;}
     void setFitToSize(zoom const &z);
@@ -234,6 +238,7 @@ private:
 
     bool thisSimpleView;
     bool thisInitialAutomatic;
+    bool thisDiscreteMap;
 };
 
 #endif

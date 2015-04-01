@@ -81,7 +81,7 @@ public:
             if(colorIndexes[i] > 18) colorIndexes[i] = 18;
         }
 
-        setMode( QwtLinearColorMap::FixedColors );
+        //setMode( QwtLinearColorMap::FixedColors );
         setColorInterval( Qt::GlobalColor( colorIndexes[0] ), Qt::GlobalColor(colorIndexes[nbColors-1]) );
 
         for ( int i = 1; i < nbColors; i++ ) {
@@ -200,6 +200,7 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     thisROItype = centerxy_width_height;
 
     setCustomMap("");
+    setDiscreteCustomMap(false);
 
     setAccessW(true);
     installEventFilter(this);
@@ -741,16 +742,20 @@ void caCamera::setColormap(colormap const &map)
         if(thisCustomMap.count() > 2) {
             colorIndexes=(int *) malloc(thisCustomMap.count()*sizeof(int));
 
+            // get the discrete colors
             for(int i=0; i< thisCustomMap.count(); i++) {
                 bool ok;
                 int index = thisCustomMap.at(i).toInt(&ok);
                 if(ok) colorIndexes[i] = index; else colorIndexes[i] = 2; // black
             }
 
+           // create colormap
            ColorMap_Custom * colormap =  new ColorMap_Custom();
+           if(getDiscreteCustomMap()) colormap->setMode( QwtLinearColorMap::FixedColors );
            colormap->initColormap(colorIndexes, thisCustomMap.count());
            for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = colormap->rgb(QwtInterval(0, ColormapSize-1), i);
            free(colorIndexes);
+
            // display the colormap bar
            if(colormapWidget != ( QwtScaleWidget *) 0) {
                colormapWidget->setHidden(false);
