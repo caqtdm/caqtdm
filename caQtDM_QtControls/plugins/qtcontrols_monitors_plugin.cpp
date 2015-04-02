@@ -338,7 +338,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
 
         caCameraInterface::caCameraInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
         {
-            strng name[9], type[9];
+            strng name[10], type[10];
             strcpy(name[0], "channelData");
             strcpy(type[0], "multiline");
             strcpy(name[1], "channelWidth");
@@ -349,15 +349,17 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
             strcpy(type[3], "multiline");
             strcpy(name[4], "channelBPP");
             strcpy(type[4], "multiline");
-            strcpy(name[5], "ROI_dimensionMarking_Channels");
+            strcpy(name[5], "minLevel");
             strcpy(type[5], "multiline");
-            strcpy(name[6], "minLevel");
+            strcpy(name[6], "maxLevel");
             strcpy(type[6], "multiline");
-            strcpy(name[7], "maxLevel");
+            strcpy(name[7], "customColorMap");
             strcpy(type[7], "multiline");
-            strcpy(name[8], "ROI_writeChannels");
+            strcpy(name[8], "dimensionMarking_Channels");
             strcpy(type[8], "multiline");	    
-            d_domXml = XmlFunc("caCamera", "cacamera", 0, 0, 200, 200, name, type, 9);
+            strcpy(name[9], "ROI_writeChannels");
+            strcpy(type[9], "multiline");
+            d_domXml = XmlFunc("caCamera", "cacamera", 0, 0, 200, 200, name, type, 10);
             d_toolTip = "[Image from camera]";
             d_name = "caCamera";
             d_include = "caCamera";
