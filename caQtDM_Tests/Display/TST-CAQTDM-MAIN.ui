@@ -14,115 +14,7 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QWidget#centralwidget {background: rgb(58, 94, 171);}
-
- QTabWidget::pane { /* The tab widget frame */
-     border: 2px solid black;
- }
-
- /* Style the tab using the tab sub-control. Note that
-     it reads QTabBar _not_ QTabWidget */
- QTabBar::tab {
-     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                 stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
-                                 stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);
-     border: 2px solid #C4C4C3;
-     border-bottom-color: #C2C7CB; /* same as the pane color */
-     border-top-left-radius: 4px;
-     border-top-right-radius: 4px;
-     min-width: 8ex;
-     padding: 5px;
- }
-
- QTabBar::tab:selected, QTabBar::tab:hover {
-     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                 stop: 0 #fafafa, stop: 0.4 #f4f4f4,
-                                 stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);
- }
-
- QTabBar::tab:selected {
-     border-color: #9B9B9B;
-     border-bottom-color: #C2C7CB; /* same as pane color */
- }
-
- 
-caTable {
-       font: 10pt;
-       background: cornsilk;
-       alternate-background-color: wheat;
-}
-
-caLineEdit {
-     border-radius: 1px;
-     background: lightgray;
-     color: black;
- }
-
-caTextEntry {
-    color: rgb(127, 0, 63);
-    background-color: cornsilk;
-    selection-color: #0a214c;
-    selection-background-color: wheat;
-    border: 1px groove black;
-    border-radius: 1px;
-    padding: 1px;
-}
-
-caTextEntry:focus {
-    padding: 0px;
-    border: 2px groove darkred;
-    border-radius: 1px;
-}
-
-QPushButton {
-      border-color: #00b;
-      border-radius: 2px;
-      padding: 3px;
-      border-width: 1px;
-
-	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
-						   stop:0   rgba(224, 239, 255, 255),
-						   stop:0.5 rgba(199, 215, 230, 255),
-						   stop:1   rgba(184, 214, 236, 255));
-}
-QPushButton:hover {
-	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
-						stop:0   rgba(201, 226, 255, 255),
-						stop:0.5 rgba(177, 204, 230, 255),
-						stop:1   rgba(163, 205, 236, 255));
-}
-QPushButton:pressed {
-	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
-						stop:0   rgba(174, 219, 255, 255),
-						stop:0.5 rgba(165, 199, 230, 255),
-						stop:1   rgba(134, 188, 236, 255));
-}
-
-QPushButton:disabled {
-	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
-						stop:0   rgba(174, 219, 255, 255),
-						stop:0.5 rgba(165, 199, 230, 255),
-						stop:1   rgba(134, 188, 236, 255));
-}
-
-
-
-caSlider::groove:horizontal {
-border: 1px solid #bbb;
-background: lightgrey;
-height: 20px;
-border-radius: 4px;
-}
-
-caSlider::handle:horizontal {
-background: red;
-border: 1px solid #777;
-width: 13px;
-margin-top: -2px;
-margin-bottom: -2px;
-border-radius: 2px;
-}
-</string>
+   <string notr="true"/>
   </property>
   <property name="Title" stdset="0">
    <string>This title can be changed with the designer</string>
@@ -153,7 +45,7 @@ border-radius: 2px;
      <enum>QTabWidget::North</enum>
     </property>
     <property name="currentIndex">
-     <number>6</number>
+     <number>9</number>
     </property>
     <widget class="QWidget" name="tab_Tests_Alarms">
      <attribute name="title">
@@ -7526,7 +7418,7 @@ LOPR - HOPR</string>
       </widget>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab">
+    <widget class="QWidget" name="tab_Test_Format">
      <attribute name="title">
       <string>Format</string>
      </attribute>
@@ -10585,7 +10477,7 @@ LOPR - HOPR</string>
       </widget>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab_3">
+    <widget class="QWidget" name="tab_Test_Wave">
      <attribute name="title">
       <string>Wave</string>
      </attribute>
@@ -11412,7 +11304,7 @@ LOPR - HOPR</string>
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab_2">
+    <widget class="QWidget" name="tab_Test_AlarmsBinary">
      <attribute name="title">
       <string>Alarms binary</string>
      </attribute>
@@ -14399,9 +14291,9 @@ LOPR - HOPR</string>
       </widget>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab_4">
+    <widget class="QWidget" name="tab_Test_underCoonstruction">
      <attribute name="title">
-      <string>Page</string>
+      <string>under construction</string>
      </attribute>
      <widget class="caFrame" name="caframe_7">
       <property name="geometry">
@@ -14409,7 +14301,7 @@ LOPR - HOPR</string>
         <x>5</x>
         <y>5</y>
         <width>476</width>
-        <height>716</height>
+        <height>736</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -14592,7 +14484,7 @@ LOPR - HOPR</string>
          <x>5</x>
          <y>150</y>
          <width>471</width>
-         <height>251</height>
+         <height>356</height>
         </rect>
        </property>
        <property name="frameShape">
@@ -14639,22 +14531,190 @@ LOPR - HOPR</string>
          </color>
         </property>
        </widget>
-       <widget class="caDoubleTabWidget" name="cadoubletabwidget">
+       <widget class="caDoubleTabWidget" name="cadoubletabwidget_newcaQt">
         <property name="geometry">
          <rect>
-          <x>20</x>
-          <y>20</y>
-          <width>391</width>
-          <height>196</height>
+          <x>95</x>
+          <y>55</y>
+          <width>250</width>
+          <height>250</height>
          </rect>
         </property>
+        <property name="itemsHorizontal" stdset="0">
+         <string notr="true">a;b;c</string>
+        </property>
+        <property name="itemsVertical" stdset="0">
+         <string notr="true">  0  ;  1  ;  2  </string>
+        </property>
+        <widget class="QWidget" name="Page_0_0">
+         <widget class="caLed" name="caled_4">
+          <property name="geometry">
+           <rect>
+            <x>5</x>
+            <y>5</y>
+            <width>30</width>
+            <height>30</height>
+           </rect>
+          </property>
+          <property name="channel" stdset="0">
+           <string notr="true">$(DEVICE):OP:demoBI</string>
+          </property>
+          <property name="colorMode">
+           <enum>caLed::Alarm</enum>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="Page_0_1">
+         <widget class="caLed" name="caled_7">
+          <property name="geometry">
+           <rect>
+            <x>80</x>
+            <y>5</y>
+            <width>30</width>
+            <height>30</height>
+           </rect>
+          </property>
+          <property name="channel" stdset="0">
+           <string notr="true">$(DEVICE):OP:demoBI</string>
+          </property>
+          <property name="colorMode">
+           <enum>caLed::Alarm</enum>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="Page_0_2">
+         <widget class="caLed" name="caled_8">
+          <property name="geometry">
+           <rect>
+            <x>170</x>
+            <y>5</y>
+            <width>30</width>
+            <height>30</height>
+           </rect>
+          </property>
+          <property name="channel" stdset="0">
+           <string notr="true">$(DEVICE):OP:demoBI</string>
+          </property>
+          <property name="colorMode">
+           <enum>caLed::Alarm</enum>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="Page_1_0">
+         <widget class="caLed" name="caled_9">
+          <property name="geometry">
+           <rect>
+            <x>5</x>
+            <y>75</y>
+            <width>30</width>
+            <height>30</height>
+           </rect>
+          </property>
+          <property name="channel" stdset="0">
+           <string notr="true">$(DEVICE):OP:demoBI</string>
+          </property>
+          <property name="colorMode">
+           <enum>caLed::Alarm</enum>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="Page_1_1">
+         <widget class="caLed" name="caled_10">
+          <property name="geometry">
+           <rect>
+            <x>75</x>
+            <y>75</y>
+            <width>30</width>
+            <height>30</height>
+           </rect>
+          </property>
+          <property name="channel" stdset="0">
+           <string notr="true">$(DEVICE):OP:demoBI</string>
+          </property>
+          <property name="colorMode">
+           <enum>caLed::Alarm</enum>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="Page_1_2">
+         <widget class="caLed" name="caled_11">
+          <property name="geometry">
+           <rect>
+            <x>170</x>
+            <y>70</y>
+            <width>30</width>
+            <height>30</height>
+           </rect>
+          </property>
+          <property name="channel" stdset="0">
+           <string notr="true">$(DEVICE):OP:demoBI</string>
+          </property>
+          <property name="colorMode">
+           <enum>caLed::Alarm</enum>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="Page_2_0">
+         <widget class="caLed" name="caled_12">
+          <property name="geometry">
+           <rect>
+            <x>5</x>
+            <y>145</y>
+            <width>30</width>
+            <height>30</height>
+           </rect>
+          </property>
+          <property name="channel" stdset="0">
+           <string notr="true">$(DEVICE):OP:demoBI</string>
+          </property>
+          <property name="colorMode">
+           <enum>caLed::Alarm</enum>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="Page_2_1">
+         <widget class="caLed" name="caled_13">
+          <property name="geometry">
+           <rect>
+            <x>80</x>
+            <y>150</y>
+            <width>30</width>
+            <height>30</height>
+           </rect>
+          </property>
+          <property name="channel" stdset="0">
+           <string notr="true">$(DEVICE):OP:demoBI</string>
+          </property>
+          <property name="colorMode">
+           <enum>caLed::Alarm</enum>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="Page_2_2">
+         <widget class="caLed" name="caled_14">
+          <property name="geometry">
+           <rect>
+            <x>165</x>
+            <y>150</y>
+            <width>30</width>
+            <height>30</height>
+           </rect>
+          </property>
+          <property name="channel" stdset="0">
+           <string notr="true">$(DEVICE):OP:demoBI</string>
+          </property>
+          <property name="colorMode">
+           <enum>caLed::Alarm</enum>
+          </property>
+         </widget>
+        </widget>
        </widget>
       </widget>
       <widget class="caFrame" name="caframe_15">
        <property name="geometry">
         <rect>
          <x>5</x>
-         <y>400</y>
+         <y>505</y>
          <width>471</width>
          <height>120</height>
         </rect>
@@ -14721,9 +14781,9 @@ LOPR - HOPR</string>
        <property name="geometry">
         <rect>
          <x>5</x>
-         <y>520</y>
+         <y>625</y>
          <width>471</width>
-         <height>176</height>
+         <height>111</height>
         </rect>
        </property>
        <property name="frameShape">
@@ -14774,9 +14834,9 @@ LOPR - HOPR</string>
         <property name="geometry">
          <rect>
           <x>15</x>
-          <y>10</y>
+          <y>5</y>
           <width>306</width>
-          <height>146</height>
+          <height>101</height>
          </rect>
         </property>
         <property name="channels" stdset="0">
@@ -14840,21 +14900,11 @@ LOPR - HOPR</string>
         </color>
        </property>
       </widget>
-      <widget class="caRelatedDisplay" name="carelateddisplay">
-       <property name="geometry">
-        <rect>
-         <x>15</x>
-         <y>141</y>
-         <width>150</width>
-         <height>131</height>
-        </rect>
-       </property>
-      </widget>
       <widget class="caTextEntry" name="catextentry_3">
        <property name="geometry">
         <rect>
          <x>15</x>
-         <y>285</y>
+         <y>610</y>
          <width>100</width>
          <height>22</height>
         </rect>
@@ -14864,27 +14914,30 @@ LOPR - HOPR</string>
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>325</y>
+         <y>550</y>
          <width>224</width>
-         <height>107</height>
+         <height>56</height>
         </rect>
        </property>
       </widget>
       <widget class="caByte" name="cabyte">
        <property name="geometry">
         <rect>
-         <x>35</x>
-         <y>455</y>
+         <x>190</x>
+         <y>634</y>
          <width>20</width>
-         <height>120</height>
+         <height>76</height>
         </rect>
+       </property>
+       <property name="endBit">
+        <number>5</number>
        </property>
       </widget>
       <widget class="caWaveTable" name="cawavetable">
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>605</y>
+         <x>0</x>
+         <y>650</y>
          <width>120</width>
          <height>61</height>
         </rect>
@@ -14950,6 +15003,366 @@ LOPR - HOPR</string>
          <font/>
         </property>
        </item>
+      </widget>
+      <widget class="caDoubleTabWidget" name="cadoubletabwidget_gehtnicht">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>250</width>
+         <height>250</height>
+        </rect>
+       </property>
+       <property name="itemsHorizontal" stdset="0">
+        <string notr="true">a;b;c</string>
+       </property>
+       <property name="itemsVertical" stdset="0">
+        <string notr="true">  0  ;  1  ;  2  </string>
+       </property>
+       <widget class="QWidget" name="Page_0_3">
+        <widget class="caFrame" name="caframe_0_6">
+         <property name="geometry">
+          <rect>
+           <x>5</x>
+           <y>5</y>
+           <width>120</width>
+           <height>120</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_1_3">
+        <widget class="caFrame" name="caframe_1_3">
+         <property name="geometry">
+          <rect>
+           <x>40</x>
+           <y>35</y>
+           <width>120</width>
+           <height>120</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::Panel</enum>
+         </property>
+         <property name="background">
+          <color>
+           <red>0</red>
+           <green>255</green>
+           <blue>255</blue>
+          </color>
+         </property>
+         <property name="backgroundMode">
+          <enum>caFrame::Filled</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_1_4">
+        <widget class="caFrame" name="caframe_1_4">
+         <property name="geometry">
+          <rect>
+           <x>75</x>
+           <y>30</y>
+           <width>120</width>
+           <height>120</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::Panel</enum>
+         </property>
+         <property name="background">
+          <color>
+           <red>0</red>
+           <green>255</green>
+           <blue>255</blue>
+          </color>
+         </property>
+         <property name="backgroundMode">
+          <enum>caFrame::Filled</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_0_4">
+        <widget class="caFrame" name="caframe_0_7">
+         <property name="geometry">
+          <rect>
+           <x>45</x>
+           <y>5</y>
+           <width>120</width>
+           <height>120</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_2_3">
+        <widget class="caFrame" name="caframe_0_8">
+         <property name="geometry">
+          <rect>
+           <x>5</x>
+           <y>124</y>
+           <width>120</width>
+           <height>56</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_0_5">
+        <widget class="caFrame" name="caframe_0_9">
+         <property name="geometry">
+          <rect>
+           <x>80</x>
+           <y>5</y>
+           <width>120</width>
+           <height>120</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_2_4">
+        <widget class="caFrame" name="caframe_0_10">
+         <property name="geometry">
+          <rect>
+           <x>40</x>
+           <y>125</y>
+           <width>120</width>
+           <height>56</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_2_5">
+        <widget class="caFrame" name="caframe_0_11">
+         <property name="geometry">
+          <rect>
+           <x>80</x>
+           <y>125</y>
+           <width>120</width>
+           <height>56</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_1_5">
+        <widget class="caFrame" name="caframe_1_5">
+         <property name="geometry">
+          <rect>
+           <x>5</x>
+           <y>35</y>
+           <width>120</width>
+           <height>120</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::Panel</enum>
+         </property>
+         <property name="background">
+          <color>
+           <red>0</red>
+           <green>255</green>
+           <blue>255</blue>
+          </color>
+         </property>
+         <property name="backgroundMode">
+          <enum>caFrame::Filled</enum>
+         </property>
+        </widget>
+       </widget>
+      </widget>
+      <widget class="caDoubleTabWidget" name="cadoubletabwidget_newcaQt_COPIED">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>285</y>
+         <width>250</width>
+         <height>250</height>
+        </rect>
+       </property>
+       <property name="itemsHorizontal" stdset="0">
+        <string notr="true">a;b;c</string>
+       </property>
+       <property name="itemsVertical" stdset="0">
+        <string notr="true">  0  ;  1  ;  2  </string>
+       </property>
+       <widget class="QWidget" name="Page_0_9">
+        <widget class="caLed" name="caled_15">
+         <property name="geometry">
+          <rect>
+           <x>5</x>
+           <y>5</y>
+           <width>30</width>
+           <height>30</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">$(DEVICE):OP:demoBI</string>
+         </property>
+         <property name="colorMode">
+          <enum>caLed::Alarm</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_0_10">
+        <widget class="caLed" name="caled_16">
+         <property name="geometry">
+          <rect>
+           <x>80</x>
+           <y>5</y>
+           <width>30</width>
+           <height>30</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">$(DEVICE):OP:demoBI</string>
+         </property>
+         <property name="colorMode">
+          <enum>caLed::Alarm</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_0_11">
+        <widget class="caLed" name="caled_17">
+         <property name="geometry">
+          <rect>
+           <x>170</x>
+           <y>5</y>
+           <width>30</width>
+           <height>30</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">$(DEVICE):OP:demoBI</string>
+         </property>
+         <property name="colorMode">
+          <enum>caLed::Alarm</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_1_9">
+        <widget class="caLed" name="caled_18">
+         <property name="geometry">
+          <rect>
+           <x>5</x>
+           <y>75</y>
+           <width>30</width>
+           <height>30</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">$(DEVICE):OP:demoBI</string>
+         </property>
+         <property name="colorMode">
+          <enum>caLed::Alarm</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_1_10">
+        <widget class="caLed" name="caled_19">
+         <property name="geometry">
+          <rect>
+           <x>75</x>
+           <y>75</y>
+           <width>30</width>
+           <height>30</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">$(DEVICE):OP:demoBI</string>
+         </property>
+         <property name="colorMode">
+          <enum>caLed::Alarm</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_1_11">
+        <widget class="caLed" name="caled_20">
+         <property name="geometry">
+          <rect>
+           <x>170</x>
+           <y>70</y>
+           <width>30</width>
+           <height>30</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">$(DEVICE):OP:demoBI</string>
+         </property>
+         <property name="colorMode">
+          <enum>caLed::Alarm</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_2_9">
+        <widget class="caLed" name="caled_21">
+         <property name="geometry">
+          <rect>
+           <x>5</x>
+           <y>145</y>
+           <width>30</width>
+           <height>30</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">$(DEVICE):OP:demoBI</string>
+         </property>
+         <property name="colorMode">
+          <enum>caLed::Alarm</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_2_10">
+        <widget class="caLed" name="caled_22">
+         <property name="geometry">
+          <rect>
+           <x>80</x>
+           <y>150</y>
+           <width>30</width>
+           <height>30</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">$(DEVICE):OP:demoBI</string>
+         </property>
+         <property name="colorMode">
+          <enum>caLed::Alarm</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_2_11">
+        <widget class="caLed" name="caled_23">
+         <property name="geometry">
+          <rect>
+           <x>165</x>
+           <y>150</y>
+           <width>30</width>
+           <height>30</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">$(DEVICE):OP:demoBI</string>
+         </property>
+         <property name="colorMode">
+          <enum>caLed::Alarm</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_0_0"/>
       </widget>
      </widget>
      <widget class="caFrame" name="caframe_17">
@@ -15191,8 +15604,8 @@ LOPR - HOPR</string>
       <widget class="caCalc" name="cacalc_2">
        <property name="geometry">
         <rect>
-         <x>70</x>
-         <y>560</y>
+         <x>10</x>
+         <y>580</y>
          <width>96</width>
          <height>21</height>
         </rect>
@@ -15216,8 +15629,8 @@ LOPR - HOPR</string>
       <widget class="caCalc" name="cacalc_14">
        <property name="geometry">
         <rect>
-         <x>140</x>
-         <y>600</y>
+         <x>10</x>
+         <y>620</y>
          <width>96</width>
          <height>21</height>
         </rect>
@@ -15240,6 +15653,3072 @@ LOPR - HOPR</string>
        <property name="channelD">
         <string notr="true"/>
        </property>
+      </widget>
+      <widget class="caDoubleTabWidget" name="cadoubletabwidget_3">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>315</y>
+         <width>250</width>
+         <height>250</height>
+        </rect>
+       </property>
+       <property name="itemsHorizontal" stdset="0">
+        <string notr="true">a;b;c</string>
+       </property>
+       <property name="itemsVertical" stdset="0">
+        <string notr="true">  0  ;  1  ;  2  </string>
+       </property>
+       <widget class="QWidget" name="Page_0_0">
+        <widget class="caFrame" name="caframe_0_0">
+         <property name="geometry">
+          <rect>
+           <x>5</x>
+           <y>5</y>
+           <width>120</width>
+           <height>120</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_1_1">
+        <widget class="caFrame" name="caframe_1_1">
+         <property name="geometry">
+          <rect>
+           <x>40</x>
+           <y>35</y>
+           <width>120</width>
+           <height>120</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::Panel</enum>
+         </property>
+         <property name="background">
+          <color>
+           <red>0</red>
+           <green>255</green>
+           <blue>255</blue>
+          </color>
+         </property>
+         <property name="backgroundMode">
+          <enum>caFrame::Filled</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_1_2">
+        <widget class="caFrame" name="caframe_1_2">
+         <property name="geometry">
+          <rect>
+           <x>75</x>
+           <y>30</y>
+           <width>120</width>
+           <height>120</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::Panel</enum>
+         </property>
+         <property name="background">
+          <color>
+           <red>0</red>
+           <green>255</green>
+           <blue>255</blue>
+          </color>
+         </property>
+         <property name="backgroundMode">
+          <enum>caFrame::Filled</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_0_1">
+        <widget class="caFrame" name="caframe_0_1">
+         <property name="geometry">
+          <rect>
+           <x>45</x>
+           <y>5</y>
+           <width>120</width>
+           <height>120</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_2_0">
+        <widget class="caFrame" name="caframe_2_0">
+         <property name="geometry">
+          <rect>
+           <x>5</x>
+           <y>124</y>
+           <width>120</width>
+           <height>56</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_0_2">
+        <widget class="caFrame" name="caframe_0_2">
+         <property name="geometry">
+          <rect>
+           <x>80</x>
+           <y>5</y>
+           <width>120</width>
+           <height>120</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_2_1">
+        <widget class="caFrame" name="caframe_2_1">
+         <property name="geometry">
+          <rect>
+           <x>40</x>
+           <y>125</y>
+           <width>120</width>
+           <height>56</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_2_2">
+        <widget class="caFrame" name="caframe_2_2">
+         <property name="geometry">
+          <rect>
+           <x>80</x>
+           <y>125</y>
+           <width>120</width>
+           <height>56</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Page_1_0">
+        <widget class="caFrame" name="caframe_1_0">
+         <property name="geometry">
+          <rect>
+           <x>5</x>
+           <y>35</y>
+           <width>120</width>
+           <height>120</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::Panel</enum>
+         </property>
+         <property name="background">
+          <color>
+           <red>0</red>
+           <green>255</green>
+           <blue>255</blue>
+          </color>
+         </property>
+         <property name="backgroundMode">
+          <enum>caFrame::Filled</enum>
+         </property>
+        </widget>
+       </widget>
+      </widget>
+      <widget class="caLabel" name="caLabel_293">
+       <property name="geometry">
+        <rect>
+         <x>100</x>
+         <y>305</y>
+         <width>26</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="fontScaleMode">
+        <enum>ESimpleLabel::Height</enum>
+       </property>
+       <property name="foreground">
+        <color>
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+       <property name="background">
+        <color alpha="0">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+      </widget>
+      <widget class="caLabel" name="caLabel_294">
+       <property name="geometry">
+        <rect>
+         <x>145</x>
+         <y>305</y>
+         <width>26</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="text">
+        <string>1</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="fontScaleMode">
+        <enum>ESimpleLabel::Height</enum>
+       </property>
+       <property name="foreground">
+        <color>
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+       <property name="background">
+        <color alpha="0">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+      </widget>
+      <widget class="caLabel" name="caLabel_296">
+       <property name="geometry">
+        <rect>
+         <x>200</x>
+         <y>305</y>
+         <width>26</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="text">
+        <string>2</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="fontScaleMode">
+        <enum>ESimpleLabel::Height</enum>
+       </property>
+       <property name="foreground">
+        <color>
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+       <property name="background">
+        <color alpha="0">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_Test_stylesSheet">
+     <attribute name="title">
+      <string>stylesSheet</string>
+     </attribute>
+     <widget class="caFrame" name="caframe_21">
+      <property name="geometry">
+       <rect>
+        <x>405</x>
+        <y>20</y>
+        <width>346</width>
+        <height>716</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton{ background-color: rgba(0, 255, 0, 255); color: rgb(0, 0, 0); border-color: rgb(107, 107, 109);border-radius: 1px; padding: 0px; border-width: 3px;border-style: outset; margin:0px;}
+QPushButton:hover {background-color: rgba(0, 255, 255, 255);border-color: rgb(0, 0, 0);border-width: 1px;border-radius: 3px; border-style: solid;}   
+
+QPushButton:pressed {background-color: rgb(160, 160, 164);border-width: 3px;border-style: inset;}  </string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <widget class="caFrame" name="caframe_27">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>145</y>
+         <width>336</width>
+         <height>186</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <widget class="caLabel" name="caLabel_319">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>5</y>
+          <width>121</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>ColorMode: Default</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caChoice" name="cachoice_11">
+        <property name="geometry">
+         <rect>
+          <x>195</x>
+          <y>5</y>
+          <width>131</width>
+          <height>116</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton { border-color: rgb(0, 0, 176); } </string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+        </property>
+        <property name="endBit">
+         <number>4</number>
+        </property>
+       </widget>
+       <widget class="caChoice" name="cachoice_7">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>160</y>
+          <width>136</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="colorMode">
+         <enum>caChoice::Default</enum>
+        </property>
+        <property name="stackingMode" stdset="0">
+         <enum>caChoice::Column</enum>
+        </property>
+        <property name="endBit">
+         <number>1</number>
+        </property>
+       </widget>
+       <widget class="QListWidget" name="listWidget_2">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>65</y>
+          <width>186</width>
+          <height>61</height>
+         </rect>
+        </property>
+        <property name="autoScroll">
+         <bool>false</bool>
+        </property>
+        <property name="isWrapping" stdset="0">
+         <bool>false</bool>
+        </property>
+        <item>
+         <property name="text">
+          <string>QPushButton { border-color: rgb(0, 0, 176); } </string>
+         </property>
+        </item>
+       </widget>
+       <widget class="caLabel" name="caLabel_340">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>45</y>
+          <width>166</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>styleSheet -&gt; modified</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+      </widget>
+      <widget class="caFrame" name="caframe_28">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>335</y>
+         <width>336</width>
+         <height>186</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <widget class="caChoice" name="cachoice_12">
+        <property name="geometry">
+         <rect>
+          <x>195</x>
+          <y>5</y>
+          <width>131</width>
+          <height>116</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton { border-color: rgb(0, 0, 176); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(129, 178, 133, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgb(0, 0, 0); text-align: center; } QPushButton:hover {background-color: rgb(155, 255, 255);}  QPushButton:pressed {background-color: rgb(0, 0, 176)};QPushButton:checked {background-color: rgb(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgb(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(129, 178, 133, 255)); etch-disabled-text: true; color: grey;}</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+        </property>
+        <property name="colorMode">
+         <enum>caChoice::Static</enum>
+        </property>
+        <property name="endBit">
+         <number>4</number>
+        </property>
+       </widget>
+       <widget class="caMessageButton" name="camessagebutton_24">
+        <property name="geometry">
+         <rect>
+          <x>195</x>
+          <y>155</y>
+          <width>61</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>0</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="label">
+         <string notr="true">0</string>
+        </property>
+        <property name="releaseMessage">
+         <string notr="true">0</string>
+        </property>
+       </widget>
+       <widget class="caMessageButton" name="camessagebutton_25">
+        <property name="geometry">
+         <rect>
+          <x>270</x>
+          <y>155</y>
+          <width>61</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>1</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="label">
+         <string notr="true">1</string>
+        </property>
+        <property name="releaseMessage">
+         <string notr="true">1</string>
+        </property>
+       </widget>
+       <widget class="caMessageButton" name="camessagebutton_34">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>45</y>
+          <width>71</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Set 1</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+        </property>
+        <property name="label">
+         <string notr="true">Set 1</string>
+        </property>
+        <property name="pressMessage">
+         <string notr="true">1</string>
+        </property>
+        <property name="colorMode">
+         <enum>caMessageButton::Static</enum>
+        </property>
+       </widget>
+       <widget class="caChoice" name="cachoice_4">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>160</y>
+          <width>136</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="colorMode">
+         <enum>caChoice::Static</enum>
+        </property>
+        <property name="stackingMode" stdset="0">
+         <enum>caChoice::Column</enum>
+        </property>
+        <property name="endBit">
+         <number>1</number>
+        </property>
+       </widget>
+       <widget class="caMessageButton" name="camessagebutton_23">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>70</y>
+          <width>71</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Set 2</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+        </property>
+        <property name="label">
+         <string notr="true">Set 2</string>
+        </property>
+        <property name="pressMessage">
+         <string notr="true">2</string>
+        </property>
+        <property name="colorMode">
+         <enum>caMessageButton::Static</enum>
+        </property>
+       </widget>
+       <widget class="caLabel" name="caLabel_327">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>5</y>
+          <width>121</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>styleSheet: none</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caLabel" name="caLabel_320">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>25</y>
+          <width>121</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>ColorMode: Static</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caChoice" name="cachoice_5">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>60</y>
+          <width>71</width>
+          <height>71</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+        </property>
+        <property name="endBit">
+         <number>4</number>
+        </property>
+       </widget>
+      </widget>
+      <widget class="caFrame" name="caframe_26">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>525</y>
+         <width>336</width>
+         <height>186</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <widget class="caMessageButton" name="camessagebutton_20">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>70</y>
+          <width>71</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Set 2</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+        </property>
+        <property name="label">
+         <string notr="true">Set 2</string>
+        </property>
+        <property name="pressMessage">
+         <string notr="true">2</string>
+        </property>
+        <property name="colorMode">
+         <enum>caMessageButton::Alarm</enum>
+        </property>
+       </widget>
+       <widget class="caLabel" name="caLabel_318">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>25</y>
+          <width>121</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>ColorMode: Alarm</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caChoice" name="cachoice_10">
+        <property name="geometry">
+         <rect>
+          <x>195</x>
+          <y>5</y>
+          <width>131</width>
+          <height>116</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton { border-color: rgb(0, 0, 176); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(129, 178, 133, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgb(0, 0, 0); text-align: center; } QPushButton:hover {background-color: rgb(155, 255, 255);}  QPushButton:pressed {background-color: rgb(0, 0, 176)};QPushButton:checked {background-color: rgb(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgb(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(129, 178, 133, 255)); etch-disabled-text: true; color: grey;}</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+        </property>
+        <property name="colorMode">
+         <enum>caChoice::Alarm</enum>
+        </property>
+        <property name="endBit">
+         <number>4</number>
+        </property>
+       </widget>
+       <widget class="caMessageButton" name="camessagebutton_21">
+        <property name="geometry">
+         <rect>
+          <x>195</x>
+          <y>155</y>
+          <width>61</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>0</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="label">
+         <string notr="true">0</string>
+        </property>
+        <property name="releaseMessage">
+         <string notr="true">0</string>
+        </property>
+        <property name="colorMode">
+         <enum>caMessageButton::Alarm</enum>
+        </property>
+       </widget>
+       <widget class="caMessageButton" name="camessagebutton_22">
+        <property name="geometry">
+         <rect>
+          <x>270</x>
+          <y>155</y>
+          <width>61</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>1</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="label">
+         <string notr="true">1</string>
+        </property>
+        <property name="releaseMessage">
+         <string notr="true">1</string>
+        </property>
+        <property name="colorMode">
+         <enum>caMessageButton::Alarm</enum>
+        </property>
+       </widget>
+       <widget class="caMessageButton" name="camessagebutton_33">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>45</y>
+          <width>71</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Set 1</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+        </property>
+        <property name="label">
+         <string notr="true">Set 1</string>
+        </property>
+        <property name="pressMessage">
+         <string notr="true">1</string>
+        </property>
+        <property name="colorMode">
+         <enum>caMessageButton::Alarm</enum>
+        </property>
+       </widget>
+       <widget class="caLabel" name="caLabel_325">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>5</y>
+          <width>121</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>styleSheet: none</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caChoice" name="cachoice_3">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>160</y>
+          <width>136</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="colorMode">
+         <enum>caChoice::Alarm</enum>
+        </property>
+        <property name="stackingMode" stdset="0">
+         <enum>caChoice::Column</enum>
+        </property>
+        <property name="endBit">
+         <number>1</number>
+        </property>
+       </widget>
+      </widget>
+      <widget class="caLabel" name="caLabel_324">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>5</y>
+         <width>166</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="text">
+        <string>styleSheet -&gt; modified</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="fontScaleMode">
+        <enum>ESimpleLabel::Height</enum>
+       </property>
+       <property name="foreground">
+        <color>
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+       <property name="background">
+        <color alpha="0">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+      </widget>
+      <widget class="QListWidget" name="listWidget">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>25</y>
+         <width>336</width>
+         <height>116</height>
+        </rect>
+       </property>
+       <property name="autoScroll">
+        <bool>false</bool>
+       </property>
+       <property name="isWrapping" stdset="0">
+        <bool>false</bool>
+       </property>
+       <item>
+        <property name="text">
+         <string>QPushButton{ background-color: rgba(0, 255, 0, 255); color: rgb(0, 0, 0); border-color: rgb(107, 107, 109);border-radius: 1px; padding: 0px; border-width: 3px;border-style: outset; margin:0px;}
+QPushButton:hover {background-color: rgba(0, 255, 255, 255);border-color: rgb(0, 0, 0);border-width: 1px;border-radius: 3px; border-style: solid;}   
+
+QPushButton:pressed {background-color: rgb(160, 160, 164);border-width: 3px;border-style: inset;}  </string>
+        </property>
+       </item>
+      </widget>
+     </widget>
+     <widget class="caFrame" name="caframe_22">
+      <property name="geometry">
+       <rect>
+        <x>750</x>
+        <y>20</y>
+        <width>346</width>
+        <height>716</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <widget class="caFrame" name="caframe_29">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>145</y>
+         <width>336</width>
+         <height>186</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <widget class="caLabel" name="caLabel_321">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>5</y>
+          <width>121</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>ColorMode: Default</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caChoice" name="cachoice_17">
+        <property name="geometry">
+         <rect>
+          <x>195</x>
+          <y>5</y>
+          <width>131</width>
+          <height>116</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton { border-color: rgb(0, 0, 176); } </string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+        </property>
+        <property name="endBit">
+         <number>4</number>
+        </property>
+       </widget>
+      </widget>
+      <widget class="caFrame" name="caframe_30">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>335</y>
+         <width>336</width>
+         <height>186</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <widget class="caMessageButton" name="camessagebutton_26">
+        <property name="geometry">
+         <rect>
+          <x>195</x>
+          <y>130</y>
+          <width>91</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton{ background-color: rgba(160, 160, 164, 255); color: rgb(0, 0, 0); border-color: rgb(107, 107, 109);border-radius: 1px; padding: 0px; border-width: 3px;border-style: outset; margin:0px;}
+QPushButton:hover {background-color: rgb(192, 192, 197);}  
+QPushButton:pressed {background-color: rgb(107, 107, 109)};</string>
+        </property>
+        <property name="text">
+         <string>Set 1</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+        </property>
+        <property name="label">
+         <string notr="true">Set 1</string>
+        </property>
+        <property name="pressMessage">
+         <string notr="true">1</string>
+        </property>
+        <property name="colorMode">
+         <enum>caMessageButton::Static</enum>
+        </property>
+       </widget>
+       <widget class="caLabel" name="caLabel_322">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>5</y>
+          <width>121</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>ColorMode: Static</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caChoice" name="cachoice_18">
+        <property name="geometry">
+         <rect>
+          <x>195</x>
+          <y>5</y>
+          <width>131</width>
+          <height>116</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton { border-color: rgb(0, 0, 176); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(129, 178, 133, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgb(0, 0, 0); text-align: center; } QPushButton:hover {background-color: rgb(155, 255, 255);}  QPushButton:pressed {background-color: rgb(0, 0, 176)};QPushButton:checked {background-color: rgb(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgb(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(129, 178, 133, 255)); etch-disabled-text: true; color: grey;}</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+        </property>
+        <property name="colorMode">
+         <enum>caChoice::Static</enum>
+        </property>
+        <property name="endBit">
+         <number>4</number>
+        </property>
+       </widget>
+       <widget class="caMessageButton" name="camessagebutton_27">
+        <property name="geometry">
+         <rect>
+          <x>195</x>
+          <y>155</y>
+          <width>61</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton{ background-color: rgba(160, 160, 164, 255); color: rgb(0, 0, 0); border-color: rgb(107, 107, 109);border-radius: 1px; padding: 0px; border-width: 3px;border-style: outset; margin:0px;}
+QPushButton:hover {background-color: rgb(192, 192, 197);}  
+QPushButton:pressed {background-color: rgb(107, 107, 109)};</string>
+        </property>
+        <property name="text">
+         <string>0</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="label">
+         <string notr="true">0</string>
+        </property>
+        <property name="releaseMessage">
+         <string notr="true">0</string>
+        </property>
+       </widget>
+       <widget class="caMessageButton" name="camessagebutton_28">
+        <property name="geometry">
+         <rect>
+          <x>270</x>
+          <y>155</y>
+          <width>61</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton{ background-color: rgba(160, 160, 164, 255); color: rgb(0, 0, 0); border-color: rgb(107, 107, 109);border-radius: 1px; padding: 0px; border-width: 3px;border-style: outset; margin:0px;}
+QPushButton:hover {background-color: rgb(192, 192, 197);}  
+QPushButton:pressed {background-color: rgb(107, 107, 109)};</string>
+        </property>
+        <property name="text">
+         <string>1</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="label">
+         <string notr="true">1</string>
+        </property>
+        <property name="releaseMessage">
+         <string notr="true">1</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="caFrame" name="caframe_31">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>525</y>
+         <width>336</width>
+         <height>186</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <widget class="caMessageButton" name="camessagebutton_29">
+        <property name="geometry">
+         <rect>
+          <x>195</x>
+          <y>130</y>
+          <width>91</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton{ background-color: rgba(160, 160, 164, 255); color: rgb(0, 0, 0); border-color: rgb(107, 107, 109);border-radius: 1px; padding: 0px; border-width: 3px;border-style: outset; margin:0px;}
+QPushButton:hover {background-color: rgb(192, 192, 197);border-color: rgb(0, 0, 0);border-width: 1px;border-radius: 3px; border-style: solid;}   
+
+QPushButton:pressed {background-color: rgb(160, 160, 164);border-width: 3px;border-style: inset;}  </string>
+        </property>
+        <property name="text">
+         <string>Set 1</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+        </property>
+        <property name="label">
+         <string notr="true">Set 1</string>
+        </property>
+        <property name="pressMessage">
+         <string notr="true">1</string>
+        </property>
+        <property name="colorMode">
+         <enum>caMessageButton::Alarm</enum>
+        </property>
+       </widget>
+       <widget class="caLabel" name="caLabel_323">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>5</y>
+          <width>121</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>ColorMode: Alarm</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caChoice" name="cachoice_19">
+        <property name="geometry">
+         <rect>
+          <x>195</x>
+          <y>5</y>
+          <width>131</width>
+          <height>116</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton { border-color: rgb(0, 0, 176); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(129, 178, 133, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgb(0, 0, 0); text-align: center; } QPushButton:hover {background-color: rgb(155, 255, 255);}  QPushButton:pressed {background-color: rgb(0, 0, 176)};QPushButton:checked {background-color: rgb(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgb(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(129, 178, 133, 255)); etch-disabled-text: true; color: grey;}</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+        </property>
+        <property name="colorMode">
+         <enum>caChoice::Alarm</enum>
+        </property>
+        <property name="endBit">
+         <number>4</number>
+        </property>
+       </widget>
+       <widget class="caMessageButton" name="camessagebutton_30">
+        <property name="geometry">
+         <rect>
+          <x>195</x>
+          <y>155</y>
+          <width>61</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="label">
+         <string notr="true">0</string>
+        </property>
+        <property name="releaseMessage">
+         <string notr="true">0</string>
+        </property>
+        <property name="colorMode">
+         <enum>caMessageButton::Alarm</enum>
+        </property>
+       </widget>
+       <widget class="caMessageButton" name="camessagebutton_31">
+        <property name="geometry">
+         <rect>
+          <x>270</x>
+          <y>155</y>
+          <width>61</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>1</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="label">
+         <string notr="true">1</string>
+        </property>
+        <property name="releaseMessage">
+         <string notr="true">1</string>
+        </property>
+        <property name="colorMode">
+         <enum>caMessageButton::Alarm</enum>
+        </property>
+       </widget>
+      </widget>
+      <widget class="caLabel" name="caLabel_326">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>5</y>
+         <width>181</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="text">
+        <string>styleSheet -&gt; none</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="fontScaleMode">
+        <enum>ESimpleLabel::Height</enum>
+       </property>
+       <property name="foreground">
+        <color>
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+       <property name="background">
+        <color alpha="0">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+      </widget>
+      <widget class="caMessageButton" name="camessagebutton_12">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>55</y>
+         <width>76</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">
+QPushButton{ background-color: rgba(160, 160, 164, 255); color: rgb(0, 0, 0); border-color: rgb(107, 107, 109);border-radius: 1px; padding: 0px; border-width: 3px;border-style: outset; margin:0px;}
+QPushButton:hover {background-color: rgb(192, 192, 197);border-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));border-width: 3px;border-radius: 3px; border-style: solid;}   
+
+QPushButton:pressed {background-color: rgb(160, 160, 164);border-width: 3px;border-style: inset;}  </string>
+       </property>
+       <property name="text">
+        <string>Set 1</string>
+       </property>
+       <property name="channel" stdset="0">
+        <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+       </property>
+       <property name="label">
+        <string notr="true">Set 1</string>
+       </property>
+       <property name="pressMessage">
+        <string notr="true">1</string>
+       </property>
+       <property name="colorMode">
+        <enum>caMessageButton::Static</enum>
+       </property>
+      </widget>
+     </widget>
+     <widget class="caFrame" name="caframe_23">
+      <property name="geometry">
+       <rect>
+        <x>60</x>
+        <y>20</y>
+        <width>346</width>
+        <height>716</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <widget class="caFrame" name="caframe_32">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>145</y>
+         <width>336</width>
+         <height>186</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <widget class="caLabel" name="caLabel_328">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>5</y>
+          <width>121</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>ColorMode: Default</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caChoice" name="cachoice_20">
+        <property name="geometry">
+         <rect>
+          <x>195</x>
+          <y>5</y>
+          <width>131</width>
+          <height>116</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+        </property>
+        <property name="endBit">
+         <number>4</number>
+        </property>
+       </widget>
+       <widget class="caChoice" name="cachoice_8">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>160</y>
+          <width>136</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="colorMode">
+         <enum>caChoice::Default</enum>
+        </property>
+        <property name="stackingMode" stdset="0">
+         <enum>caChoice::Column</enum>
+        </property>
+        <property name="endBit">
+         <number>1</number>
+        </property>
+       </widget>
+       <widget class="caLabel" name="caLabel_338">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>25</y>
+          <width>131</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>styleSheet -&gt; none</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+      </widget>
+      <widget class="caFrame" name="caframe_33">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>335</y>
+         <width>336</width>
+         <height>186</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <widget class="caChoice" name="cachoice_21">
+        <property name="geometry">
+         <rect>
+          <x>195</x>
+          <y>5</y>
+          <width>131</width>
+          <height>116</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton { border-color: rgb(0, 0, 176); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(129, 178, 133, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgb(0, 0, 0); text-align: center; } QPushButton:hover {background-color: rgb(155, 255, 255);}  QPushButton:pressed {background-color: rgb(0, 0, 176)};QPushButton:checked {background-color: rgb(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgb(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(129, 178, 133, 255)); etch-disabled-text: true; color: grey;}</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+        </property>
+        <property name="colorMode">
+         <enum>caChoice::Static</enum>
+        </property>
+        <property name="endBit">
+         <number>4</number>
+        </property>
+       </widget>
+       <widget class="caMessageButton" name="camessagebutton_32">
+        <property name="geometry">
+         <rect>
+          <x>195</x>
+          <y>155</y>
+          <width>61</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>0</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="label">
+         <string notr="true">0</string>
+        </property>
+        <property name="releaseMessage">
+         <string notr="true">0</string>
+        </property>
+       </widget>
+       <widget class="caMessageButton" name="camessagebutton_35">
+        <property name="geometry">
+         <rect>
+          <x>270</x>
+          <y>155</y>
+          <width>61</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>1</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="label">
+         <string notr="true">1</string>
+        </property>
+        <property name="releaseMessage">
+         <string notr="true">1</string>
+        </property>
+       </widget>
+       <widget class="caMessageButton" name="camessagebutton_36">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>45</y>
+          <width>71</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Set 1</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+        </property>
+        <property name="label">
+         <string notr="true">Set 1</string>
+        </property>
+        <property name="pressMessage">
+         <string notr="true">1</string>
+        </property>
+        <property name="colorMode">
+         <enum>caMessageButton::Static</enum>
+        </property>
+       </widget>
+       <widget class="caChoice" name="cachoice_9">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>160</y>
+          <width>136</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton { border-color: rgb(0, 0, 176); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(129, 178, 133, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgb(0, 0, 0); text-align: center; } QPushButton:hover {background-color: rgb(155, 255, 255);}  QPushButton:pressed {background-color: rgb(0, 0, 176)};QPushButton:checked {background-color: rgb(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgb(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(129, 178, 133, 255)); etch-disabled-text: true; color: grey;}</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="colorMode">
+         <enum>caChoice::Static</enum>
+        </property>
+        <property name="stackingMode" stdset="0">
+         <enum>caChoice::Column</enum>
+        </property>
+        <property name="endBit">
+         <number>1</number>
+        </property>
+       </widget>
+       <widget class="caMessageButton" name="camessagebutton_37">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>70</y>
+          <width>71</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Set 2</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+        </property>
+        <property name="label">
+         <string notr="true">Set 2</string>
+        </property>
+        <property name="pressMessage">
+         <string notr="true">2</string>
+        </property>
+        <property name="colorMode">
+         <enum>caMessageButton::Static</enum>
+        </property>
+       </widget>
+       <widget class="caLabel" name="caLabel_329">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>5</y>
+          <width>121</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>styleSheet: none</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caLabel" name="caLabel_330">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>25</y>
+          <width>121</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>ColorMode: Static</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+      </widget>
+      <widget class="caFrame" name="caframe_34">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>525</y>
+         <width>336</width>
+         <height>186</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <widget class="caMessageButton" name="camessagebutton_38">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>70</y>
+          <width>71</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Set 2</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+        </property>
+        <property name="label">
+         <string notr="true">Set 2</string>
+        </property>
+        <property name="pressMessage">
+         <string notr="true">2</string>
+        </property>
+        <property name="colorMode">
+         <enum>caMessageButton::Alarm</enum>
+        </property>
+       </widget>
+       <widget class="caLabel" name="caLabel_335">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>25</y>
+          <width>121</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>ColorMode: Alarm</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caChoice" name="cachoice_22">
+        <property name="geometry">
+         <rect>
+          <x>195</x>
+          <y>5</y>
+          <width>131</width>
+          <height>116</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton { border-color: rgb(0, 0, 176); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(129, 178, 133, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgb(0, 0, 0); text-align: center; } QPushButton:hover {background-color: rgb(155, 255, 255);}  QPushButton:pressed {background-color: rgb(0, 0, 176)};QPushButton:checked {background-color: rgb(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgb(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(129, 178, 133, 255)); etch-disabled-text: true; color: grey;}</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+        </property>
+        <property name="colorMode">
+         <enum>caChoice::Alarm</enum>
+        </property>
+        <property name="endBit">
+         <number>4</number>
+        </property>
+       </widget>
+       <widget class="caMessageButton" name="camessagebutton_39">
+        <property name="geometry">
+         <rect>
+          <x>195</x>
+          <y>155</y>
+          <width>61</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>0</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="label">
+         <string notr="true">0</string>
+        </property>
+        <property name="releaseMessage">
+         <string notr="true">0</string>
+        </property>
+        <property name="colorMode">
+         <enum>caMessageButton::Alarm</enum>
+        </property>
+       </widget>
+       <widget class="caMessageButton" name="camessagebutton_40">
+        <property name="geometry">
+         <rect>
+          <x>270</x>
+          <y>155</y>
+          <width>61</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>1</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="label">
+         <string notr="true">1</string>
+        </property>
+        <property name="releaseMessage">
+         <string notr="true">1</string>
+        </property>
+        <property name="colorMode">
+         <enum>caMessageButton::Alarm</enum>
+        </property>
+       </widget>
+       <widget class="caMessageButton" name="camessagebutton_41">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>45</y>
+          <width>71</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Set 1</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-LT-MODE</string>
+        </property>
+        <property name="label">
+         <string notr="true">Set 1</string>
+        </property>
+        <property name="pressMessage">
+         <string notr="true">1</string>
+        </property>
+        <property name="colorMode">
+         <enum>caMessageButton::Alarm</enum>
+        </property>
+       </widget>
+       <widget class="caLabel" name="caLabel_336">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>5</y>
+          <width>121</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>styleSheet: none</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caChoice" name="cachoice_23">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>160</y>
+          <width>136</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton { border-color: rgb(0, 0, 176); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(129, 178, 133, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgb(0, 0, 0); text-align: center; } QPushButton:hover {background-color: rgb(155, 255, 255);}  QPushButton:pressed {background-color: rgb(0, 0, 176)};QPushButton:checked {background-color: rgb(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgb(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(129, 178, 133, 255)); etch-disabled-text: true; color: grey;}</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="colorMode">
+         <enum>caChoice::Alarm</enum>
+        </property>
+        <property name="stackingMode" stdset="0">
+         <enum>caChoice::Column</enum>
+        </property>
+        <property name="endBit">
+         <number>1</number>
+        </property>
+       </widget>
+      </widget>
+      <widget class="caLabel" name="caLabel_337">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>5</y>
+         <width>166</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="text">
+        <string>styleSheet -&gt; none</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="fontScaleMode">
+        <enum>ESimpleLabel::Height</enum>
+       </property>
+       <property name="foreground">
+        <color>
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+       <property name="background">
+        <color alpha="0">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_Test_underConstruction2">
+     <attribute name="title">
+      <string>under construction 2</string>
+     </attribute>
+     <widget class="caFrame" name="frame_Tests_Alarm_left_4">
+      <property name="geometry">
+       <rect>
+        <x>75</x>
+        <y>5</y>
+        <width>551</width>
+        <height>566</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <widget class="caLabel" name="caLabel_98">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>5</y>
+         <width>116</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="text">
+        <string>analog ...</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="fontScaleMode">
+        <enum>ESimpleLabel::Height</enum>
+       </property>
+       <property name="foreground">
+        <color>
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+       <property name="background">
+        <color alpha="0">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+      </widget>
+      <widget class="QFrame" name="frame_Test_LineEdit_30">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>25</y>
+         <width>546</width>
+         <height>121</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="caLineEdit" name="calineedit_70">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>20</y>
+          <width>100</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>caLineEdit</string>
+        </property>
+        <property name="whatsThis">
+         <string extracomment="wha...."/>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-AO</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLineEdit::Alarm_Default</enum>
+        </property>
+       </widget>
+       <widget class="caLabel" name="caLabel_295">
+        <property name="geometry">
+         <rect>
+          <x>250</x>
+          <y>20</y>
+          <width>66</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>ArrowCursor</cursorShape>
+        </property>
+        <property name="mouseTracking">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>this is a toolTip</string>
+        </property>
+        <property name="toolTipDuration">
+         <number>5</number>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>caLineEdit</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButton">
+        <property name="geometry">
+         <rect>
+          <x>340</x>
+          <y>65</y>
+          <width>75</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>tool tip Push Button</string>
+        </property>
+        <property name="toolTipDuration">
+         <number>-1</number>
+        </property>
+        <property name="text">
+         <string>PushButton</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="caLabel" name="caLabel_311">
+       <property name="geometry">
+        <rect>
+         <x>255</x>
+         <y>5</y>
+         <width>66</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="text">
+        <string>Widget</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="fontScaleMode">
+        <enum>ESimpleLabel::Height</enum>
+       </property>
+       <property name="foreground">
+        <color>
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+       <property name="background">
+        <color alpha="0">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+      </widget>
+      <widget class="QFrame" name="frame_Test_TextEntry_3">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>145</y>
+         <width>546</width>
+         <height>56</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="caLabel" name="caLabel_315">
+        <property name="geometry">
+         <rect>
+          <x>250</x>
+          <y>5</y>
+          <width>71</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>caTextEntry</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caTextEntry" name="catextentry_33">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>5</y>
+          <width>100</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-AO</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLineEdit::Alarm_Default</enum>
+        </property>
+       </widget>
+       <widget class="caTextEntry" name="catextentry_34">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>30</y>
+          <width>100</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-AO</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLineEdit::Alarm_Static</enum>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QFrame" name="frame__Test_Graphics_3">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>200</y>
+         <width>546</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="caLabel" name="caLabel_339">
+        <property name="geometry">
+         <rect>
+          <x>250</x>
+          <y>5</y>
+          <width>71</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>caGraphics</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caGraphics" name="cagraphics_22">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>5</y>
+          <width>51</width>
+          <height>51</height>
+         </rect>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>255</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="fillstyle" stdset="0">
+         <enum>caGraphics::Filled</enum>
+        </property>
+        <property name="lineSize">
+         <number>4</number>
+        </property>
+        <property name="colorMode">
+         <enum>caGraphics::Alarm</enum>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-AO</string>
+        </property>
+        <property name="tiltAngle">
+         <number>45</number>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QFrame" name="frame_Test_Led_2">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>320</y>
+         <width>546</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="caLabel" name="caLabel_341">
+        <property name="geometry">
+         <rect>
+          <x>250</x>
+          <y>5</y>
+          <width>71</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>caLed</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caLed" name="caled_6">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>5</y>
+          <width>36</width>
+          <height>32</height>
+         </rect>
+        </property>
+        <property name="rectangular">
+         <bool>true</bool>
+        </property>
+        <property name="gradientEnabled">
+         <bool>false</bool>
+        </property>
+        <property name="ledWidth">
+         <number>30</number>
+        </property>
+        <property name="ledHeight">
+         <number>30</number>
+        </property>
+        <property name="linearGradient">
+         <bool>false</bool>
+        </property>
+        <property name="scaleContents">
+         <bool>false</bool>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-AO</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLed::Alarm</enum>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QFrame" name="frame__Test_Polyline_3">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>260</y>
+         <width>546</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="caPolyLine" name="capolyline_10">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>0</y>
+          <width>76</width>
+          <height>51</height>
+         </rect>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caPolyLine::Alarm</enum>
+        </property>
+        <property name="xyPairs" stdset="0">
+         <string>23,36;23,36;56,21;64,36;44,46;2,46;15,10</string>
+        </property>
+        <property name="fillstyle" stdset="0">
+         <enum>caPolyLine::Filled</enum>
+        </property>
+        <property name="polystyle" stdset="0">
+         <enum>caPolyLine::Polygon</enum>
+        </property>
+        <property name="visibility">
+         <enum>caPolyLine::Calc</enum>
+        </property>
+        <property name="visibilityCalc">
+         <string notr="true">A&gt;1</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-AO</string>
+        </property>
+       </widget>
+       <widget class="caLabel" name="caLabel_343">
+        <property name="geometry">
+         <rect>
+          <x>250</x>
+          <y>0</y>
+          <width>71</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>caPolyline</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>caDoubleTabWidget</string>
+     </attribute>
+     <widget class="caFrame" name="caframe_24">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>5</y>
+        <width>476</width>
+        <height>736</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <widget class="caLabel" name="caLabel_96">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>5</y>
+         <width>116</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="text">
+        <string>not tested jet</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="fontScaleMode">
+        <enum>ESimpleLabel::Height</enum>
+       </property>
+       <property name="foreground">
+        <color>
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+       <property name="background">
+        <color alpha="0">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+      </widget>
+      <widget class="caFrame" name="caframe_36">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>150</y>
+         <width>471</width>
+         <height>356</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <widget class="caLabel" name="caLabel_299">
+        <property name="geometry">
+         <rect>
+          <x>200</x>
+          <y>10</y>
+          <width>146</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>caDoubleTabWidget</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caDoubleTabWidget" name="cadoubletabwidget">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>80</y>
+          <width>250</width>
+          <height>250</height>
+         </rect>
+        </property>
+        <property name="itemsHorizontal" stdset="0">
+         <string notr="true">a;b;c</string>
+        </property>
+        <property name="itemsVertical" stdset="0">
+         <string notr="true">  0  ;  1;  2</string>
+        </property>
+        <widget class="QWidget" name="Page_0_0">
+         <widget class="caLed" name="caled">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>5</y>
+            <width>30</width>
+            <height>30</height>
+           </rect>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="Page_0_1">
+         <widget class="caLed" name="caled_24">
+          <property name="geometry">
+           <rect>
+            <x>70</x>
+            <y>5</y>
+            <width>30</width>
+            <height>30</height>
+           </rect>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="Page_0_2">
+         <widget class="caLed" name="caled_25">
+          <property name="geometry">
+           <rect>
+            <x>165</x>
+            <y>5</y>
+            <width>30</width>
+            <height>30</height>
+           </rect>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="Page_1_0">
+         <widget class="caLed" name="caled_26">
+          <property name="geometry">
+           <rect>
+            <x>5</x>
+            <y>70</y>
+            <width>30</width>
+            <height>30</height>
+           </rect>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="Page_1_1">
+         <widget class="caLed" name="caled_27">
+          <property name="geometry">
+           <rect>
+            <x>80</x>
+            <y>70</y>
+            <width>30</width>
+            <height>30</height>
+           </rect>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="Page_1_2">
+         <widget class="caLed" name="caled_28">
+          <property name="geometry">
+           <rect>
+            <x>165</x>
+            <y>75</y>
+            <width>30</width>
+            <height>30</height>
+           </rect>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="Page_2_0">
+         <widget class="caLed" name="caled_29">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>140</y>
+            <width>30</width>
+            <height>30</height>
+           </rect>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="Page_2_1">
+         <widget class="caLed" name="caled_30">
+          <property name="geometry">
+           <rect>
+            <x>85</x>
+            <y>145</y>
+            <width>30</width>
+            <height>30</height>
+           </rect>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="Page_2_2">
+         <widget class="caLed" name="caled_31">
+          <property name="geometry">
+           <rect>
+            <x>160</x>
+            <y>145</y>
+            <width>30</width>
+            <height>30</height>
+           </rect>
+          </property>
+         </widget>
+        </widget>
+       </widget>
       </widget>
      </widget>
     </widget>
