@@ -45,7 +45,7 @@
      <enum>QTabWidget::North</enum>
     </property>
     <property name="currentIndex">
-     <number>9</number>
+     <number>6</number>
     </property>
     <widget class="QWidget" name="tab_Tests_Alarms">
      <attribute name="title">
@@ -14368,7 +14368,7 @@ LOPR - HOPR</string>
           <x>20</x>
           <y>20</y>
           <width>150</width>
-          <height>50</height>
+          <height>21</height>
          </rect>
         </property>
        </widget>
@@ -14376,7 +14376,7 @@ LOPR - HOPR</string>
         <property name="geometry">
          <rect>
           <x>200</x>
-          <y>30</y>
+          <y>25</y>
           <width>106</width>
           <height>16</height>
          </rect>
@@ -14484,7 +14484,7 @@ LOPR - HOPR</string>
          <x>5</x>
          <y>150</y>
          <width>471</width>
-         <height>356</height>
+         <height>271</height>
         </rect>
        </property>
        <property name="frameShape">
@@ -14534,8 +14534,8 @@ LOPR - HOPR</string>
        <widget class="caDoubleTabWidget" name="cadoubletabwidget_newcaQt">
         <property name="geometry">
          <rect>
-          <x>95</x>
-          <y>55</y>
+          <x>5</x>
+          <y>25</y>
           <width>250</width>
           <height>250</height>
          </rect>
@@ -14714,9 +14714,9 @@ LOPR - HOPR</string>
        <property name="geometry">
         <rect>
          <x>5</x>
-         <y>505</y>
+         <y>424</y>
          <width>471</width>
-         <height>120</height>
+         <height>201</height>
         </rect>
        </property>
        <property name="frameShape">
@@ -14726,21 +14726,45 @@ LOPR - HOPR</string>
         <property name="geometry">
          <rect>
           <x>5</x>
-          <y>20</y>
+          <y>0</y>
           <width>386</width>
-          <height>96</height>
+          <height>126</height>
          </rect>
         </property>
+        <property name="TitleY">
+         <string notr="true">calcVarY</string>
+        </property>
         <property name="channels" stdset="0">
-         <string notr="true">testInc1</string>
+         <string notr="true">calcVarX;calcVarY</string>
+        </property>
+        <property name="period">
+         <double>10.000000000000000</double>
+        </property>
+        <property name="XaxisType">
+         <enum>caStripPlot::TimeScale</enum>
+        </property>
+        <property name="YaxisLimitsMax_1">
+         <double>1.100000000000000</double>
+        </property>
+        <property name="YaxisLimitsMin_1">
+         <double>-1.100000000000000</double>
+        </property>
+        <property name="YaxisScalingMax_1" stdset="0">
+         <enum>caStripPlot::User</enum>
+        </property>
+        <property name="YaxisLimitsMax_2">
+         <double>1.100000000000000</double>
+        </property>
+        <property name="YaxisLimitsMin_2">
+         <double>-1.100000000000000</double>
         </property>
        </widget>
        <widget class="caLabel" name="caLabel_287">
         <property name="geometry">
          <rect>
-          <x>325</x>
+          <x>400</x>
           <y>5</y>
-          <width>106</width>
+          <width>66</width>
           <height>16</height>
          </rect>
         </property>
@@ -14776,13 +14800,345 @@ LOPR - HOPR</string>
          </color>
         </property>
        </widget>
+       <widget class="caLabel" name="caLabel_293">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>135</y>
+          <width>46</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>calc X</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caTextEntry" name="catextentry_37">
+        <property name="geometry">
+         <rect>
+          <x>140</x>
+          <y>130</y>
+          <width>71</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">calcVarX</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLineEdit::Alarm_Default</enum>
+        </property>
+        <property name="precision">
+         <number>3</number>
+        </property>
+        <property name="precisionMode">
+         <enum>caLineEdit::User</enum>
+        </property>
+       </widget>
+       <widget class="caLabel" name="caLabel_294">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>160</y>
+          <width>41</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>calc Y</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caTextEntry" name="catextentry_38">
+        <property name="geometry">
+         <rect>
+          <x>140</x>
+          <y>155</y>
+          <width>71</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">calcVarY</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLineEdit::Alarm_Default</enum>
+        </property>
+        <property name="precision">
+         <number>3</number>
+        </property>
+        <property name="precisionMode">
+         <enum>caLineEdit::User</enum>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_6">
+        <property name="geometry">
+         <rect>
+          <x>385</x>
+          <y>170</y>
+          <width>76</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">angleVar</string>
+        </property>
+        <property name="calc">
+         <string notr="true">A&gt;=360?A=0:A+5</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">angleVar</string>
+        </property>
+        <property name="channelB">
+         <string notr="true"/>
+        </property>
+        <property name="channelC">
+         <string notr="true"/>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_16">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>155</y>
+          <width>76</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">calcVarY</string>
+        </property>
+        <property name="calc">
+         <string notr="true">SIN(A*3.1416/180)</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">angleVar</string>
+        </property>
+        <property name="channelB">
+         <string notr="true"/>
+        </property>
+        <property name="channelC">
+         <string notr="true"/>
+        </property>
+        <property name="channelD">
+         <string notr="true"/>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_17">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>130</y>
+          <width>76</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">calcVarX</string>
+        </property>
+        <property name="calc">
+         <string notr="true">SIN(A*3.1416/180)</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">angleVar</string>
+        </property>
+        <property name="channelB">
+         <string notr="true"/>
+        </property>
+        <property name="channelC">
+         <string notr="true"/>
+        </property>
+        <property name="channelD">
+         <string notr="true"/>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_18">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>130</y>
+          <width>76</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">calcVarYa</string>
+        </property>
+        <property name="calc">
+         <string notr="true">SIN(A*3.1416/180)</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">angleVar</string>
+        </property>
+        <property name="channelB">
+         <string notr="true"/>
+        </property>
+        <property name="channelC">
+         <string notr="true"/>
+        </property>
+        <property name="channelD">
+         <string notr="true"/>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_19">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>150</y>
+          <width>76</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">calcVarYb</string>
+        </property>
+        <property name="calc">
+         <string notr="true">SIN(A*3.1416/180)</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">angleVar</string>
+        </property>
+        <property name="channelB">
+         <string notr="true"/>
+        </property>
+        <property name="channelC">
+         <string notr="true"/>
+        </property>
+        <property name="channelD">
+         <string notr="true"/>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_20">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>170</y>
+          <width>76</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">calcVarYc</string>
+        </property>
+        <property name="calc">
+         <string notr="true">SIN(A*3.1416/180)</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">angleVar</string>
+        </property>
+        <property name="channelB">
+         <string notr="true"/>
+        </property>
+        <property name="channelC">
+         <string notr="true"/>
+        </property>
+        <property name="channelD">
+         <string notr="true"/>
+        </property>
+       </widget>
+       <widget class="caLabel" name="caLabel_296">
+        <property name="geometry">
+         <rect>
+          <x>385</x>
+          <y>150</y>
+          <width>66</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>angleVar</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
       </widget>
       <widget class="caFrame" name="caframe_16">
        <property name="geometry">
         <rect>
          <x>5</x>
          <y>625</y>
-         <width>471</width>
+         <width>366</width>
          <height>111</height>
         </rect>
        </property>
@@ -14792,9 +15148,9 @@ LOPR - HOPR</string>
        <widget class="caLabel" name="caLabel_288">
         <property name="geometry">
          <rect>
-          <x>325</x>
+          <x>315</x>
           <y>5</y>
-          <width>106</width>
+          <width>51</width>
           <height>16</height>
          </rect>
         </property>
@@ -14833,7 +15189,7 @@ LOPR - HOPR</string>
        <widget class="caTable" name="catable">
         <property name="geometry">
          <rect>
-          <x>15</x>
+          <x>5</x>
           <y>5</y>
           <width>306</width>
           <height>101</height>
@@ -15185,184 +15541,86 @@ LOPR - HOPR</string>
         </widget>
        </widget>
       </widget>
-      <widget class="caDoubleTabWidget" name="cadoubletabwidget_newcaQt_COPIED">
+      <widget class="caCalc" name="cacalc_15">
        <property name="geometry">
         <rect>
-         <x>5</x>
-         <y>285</y>
-         <width>250</width>
-         <height>250</height>
+         <x>90</x>
+         <y>430</y>
+         <width>96</width>
+         <height>21</height>
         </rect>
        </property>
-       <property name="itemsHorizontal" stdset="0">
-        <string notr="true">a;b;c</string>
+       <property name="variable">
+        <string notr="true">blatestblannnnnn</string>
        </property>
-       <property name="itemsVertical" stdset="0">
-        <string notr="true">  0  ;  1  ;  2  </string>
+       <property name="calc">
+        <string notr="true">SIN(A*3.1416/180)</string>
        </property>
-       <widget class="QWidget" name="Page_0_9">
-        <widget class="caLed" name="caled_15">
-         <property name="geometry">
-          <rect>
-           <x>5</x>
-           <y>5</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="channel" stdset="0">
-          <string notr="true">$(DEVICE):OP:demoBI</string>
-         </property>
-         <property name="colorMode">
-          <enum>caLed::Alarm</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_0_10">
-        <widget class="caLed" name="caled_16">
-         <property name="geometry">
-          <rect>
-           <x>80</x>
-           <y>5</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="channel" stdset="0">
-          <string notr="true">$(DEVICE):OP:demoBI</string>
-         </property>
-         <property name="colorMode">
-          <enum>caLed::Alarm</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_0_11">
-        <widget class="caLed" name="caled_17">
-         <property name="geometry">
-          <rect>
-           <x>170</x>
-           <y>5</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="channel" stdset="0">
-          <string notr="true">$(DEVICE):OP:demoBI</string>
-         </property>
-         <property name="colorMode">
-          <enum>caLed::Alarm</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_1_9">
-        <widget class="caLed" name="caled_18">
-         <property name="geometry">
-          <rect>
-           <x>5</x>
-           <y>75</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="channel" stdset="0">
-          <string notr="true">$(DEVICE):OP:demoBI</string>
-         </property>
-         <property name="colorMode">
-          <enum>caLed::Alarm</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_1_10">
-        <widget class="caLed" name="caled_19">
-         <property name="geometry">
-          <rect>
-           <x>75</x>
-           <y>75</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="channel" stdset="0">
-          <string notr="true">$(DEVICE):OP:demoBI</string>
-         </property>
-         <property name="colorMode">
-          <enum>caLed::Alarm</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_1_11">
-        <widget class="caLed" name="caled_20">
-         <property name="geometry">
-          <rect>
-           <x>170</x>
-           <y>70</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="channel" stdset="0">
-          <string notr="true">$(DEVICE):OP:demoBI</string>
-         </property>
-         <property name="colorMode">
-          <enum>caLed::Alarm</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_2_9">
-        <widget class="caLed" name="caled_21">
-         <property name="geometry">
-          <rect>
-           <x>5</x>
-           <y>145</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="channel" stdset="0">
-          <string notr="true">$(DEVICE):OP:demoBI</string>
-         </property>
-         <property name="colorMode">
-          <enum>caLed::Alarm</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_2_10">
-        <widget class="caLed" name="caled_22">
-         <property name="geometry">
-          <rect>
-           <x>80</x>
-           <y>150</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="channel" stdset="0">
-          <string notr="true">$(DEVICE):OP:demoBI</string>
-         </property>
-         <property name="colorMode">
-          <enum>caLed::Alarm</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_2_11">
-        <widget class="caLed" name="caled_23">
-         <property name="geometry">
-          <rect>
-           <x>165</x>
-           <y>150</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="channel" stdset="0">
-          <string notr="true">$(DEVICE):OP:demoBI</string>
-         </property>
-         <property name="colorMode">
-          <enum>caLed::Alarm</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_0_0"/>
+       <property name="channel" stdset="0">
+        <string notr="true">testInc</string>
+       </property>
+       <property name="channelB">
+        <string notr="true"/>
+       </property>
+       <property name="channelC">
+        <string notr="true"/>
+       </property>
+       <property name="channelD">
+        <string notr="true"/>
+       </property>
+      </widget>
+      <widget class="caCalc" name="cacalc_2">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>350</y>
+         <width>96</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="variable">
+        <string notr="true">testInc</string>
+       </property>
+       <property name="calc">
+        <string notr="true">A&gt;=360?A=0:A+2</string>
+       </property>
+       <property name="channel" stdset="0">
+        <string notr="true">testInc</string>
+       </property>
+       <property name="channelB">
+        <string notr="true"/>
+       </property>
+       <property name="channelC">
+        <string notr="true"/>
+       </property>
+      </widget>
+      <widget class="caCalc" name="cacalc_14">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>390</y>
+         <width>96</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="variable">
+        <string notr="true">blatestbla</string>
+       </property>
+       <property name="calc">
+        <string notr="true">SIN(A*3.1416/180)+1</string>
+       </property>
+       <property name="channel" stdset="0">
+        <string notr="true">testInc</string>
+       </property>
+       <property name="channelB">
+        <string notr="true"/>
+       </property>
+       <property name="channelC">
+        <string notr="true"/>
+       </property>
+       <property name="channelD">
+        <string notr="true"/>
+       </property>
       </widget>
      </widget>
      <widget class="caFrame" name="caframe_17">
@@ -15371,7 +15629,7 @@ LOPR - HOPR</string>
         <x>485</x>
         <y>5</y>
         <width>336</width>
-        <height>716</height>
+        <height>736</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -15383,7 +15641,7 @@ LOPR - HOPR</string>
          <x>5</x>
          <y>5</y>
          <width>331</width>
-         <height>146</height>
+         <height>161</height>
         </rect>
        </property>
        <property name="frameShape">
@@ -15401,13 +15659,15 @@ LOPR - HOPR</string>
         <property name="font">
          <font>
           <pointsize>9</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
         <property name="text">
-         <string>caBitnames</string>
+         <string>caCalc</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -15430,12 +15690,319 @@ LOPR - HOPR</string>
          </color>
         </property>
        </widget>
+       <widget class="caTextEntry" name="catextentry_35">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>30</y>
+          <width>241</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):caCalc_Calc</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLineEdit::Alarm_Default</enum>
+        </property>
+       </widget>
+       <widget class="caLabel" name="caLabel_297">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>35</y>
+          <width>81</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>calc</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caLabel" name="caLabel_298">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>60</y>
+          <width>81</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>channelA</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caTextEntry" name="catextentry_36">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>55</y>
+          <width>86</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):TEST-AO</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLineEdit::Alarm_Default</enum>
+        </property>
+       </widget>
+       <widget class="caTextEntry" name="catextentry_40">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>80</y>
+          <width>86</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">caCalt_T1:calc</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLineEdit::Alarm_Default</enum>
+        </property>
+       </widget>
+       <widget class="caLabel" name="caLabel_304">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>85</y>
+          <width>81</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>channelB</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caTextEntry" name="catextentry_41">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>105</y>
+          <width>86</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">caCalt_T1.calc</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLineEdit::Alarm_Default</enum>
+        </property>
+       </widget>
+       <widget class="caLabel" name="caLabel_305">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>110</y>
+          <width>81</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>channelC</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caTextEntry" name="catextentry_42">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>130</y>
+          <width>86</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">caCalt_T1</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLineEdit::Alarm_Default</enum>
+        </property>
+       </widget>
+       <widget class="caLabel" name="caLabel_306">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>135</y>
+          <width>81</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>channelD</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::Height</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_5">
+        <property name="geometry">
+         <rect>
+          <x>245</x>
+          <y>85</y>
+          <width>76</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">caCalt_T1</string>
+        </property>
+        <property name="calc">
+         <string notr="true">$(DEVICE):caCalc_Calc</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">caCalt_T1</string>
+        </property>
+        <property name="channelB">
+         <string notr="true">$(DEVICE):caCalc_Calc</string>
+        </property>
+       </widget>
       </widget>
       <widget class="caFrame" name="caframe_19">
        <property name="geometry">
         <rect>
          <x>5</x>
-         <y>150</y>
+         <y>165</y>
          <width>331</width>
          <height>146</height>
         </rect>
@@ -15601,23 +16168,23 @@ LOPR - HOPR</string>
         </property>
        </widget>
       </widget>
-      <widget class="caCalc" name="cacalc_2">
+      <widget class="caCalc" name="cacalc_7">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>580</y>
-         <width>96</width>
+         <x>60</x>
+         <y>410</y>
+         <width>76</width>
          <height>21</height>
         </rect>
        </property>
        <property name="variable">
-        <string notr="true">testInc</string>
+        <string notr="true">ANG</string>
        </property>
        <property name="calc">
-        <string notr="true">A&gt;=360?A=0:A+2</string>
+        <string notr="true">A&gt;=360?A=0:A+5</string>
        </property>
        <property name="channel" stdset="0">
-        <string notr="true">testInc</string>
+        <string notr="true">ANG</string>
        </property>
        <property name="channelB">
         <string notr="true"/>
@@ -15626,23 +16193,64 @@ LOPR - HOPR</string>
         <string notr="true"/>
        </property>
       </widget>
-      <widget class="caCalc" name="cacalc_14">
+      <widget class="caLabel" name="caLabel_300">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>620</y>
-         <width>96</width>
+         <x>60</x>
+         <y>390</y>
+         <width>66</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="text">
+        <string>ANG</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="fontScaleMode">
+        <enum>ESimpleLabel::Height</enum>
+       </property>
+       <property name="foreground">
+        <color>
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+       <property name="background">
+        <color alpha="0">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+      </widget>
+      <widget class="caCalc" name="cacalc_21">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>460</y>
+         <width>76</width>
          <height>21</height>
         </rect>
        </property>
        <property name="variable">
-        <string notr="true">blatestbla</string>
+        <string notr="true">CA1</string>
        </property>
        <property name="calc">
-        <string notr="true">SIN(A*3.1416/180)+1</string>
+        <string notr="true">SIN(A*3.1416/180)</string>
        </property>
        <property name="channel" stdset="0">
-        <string notr="true">testInc</string>
+        <string notr="true">ANG</string>
        </property>
        <property name="channelB">
         <string notr="true"/>
@@ -15654,308 +16262,88 @@ LOPR - HOPR</string>
         <string notr="true"/>
        </property>
       </widget>
-      <widget class="caDoubleTabWidget" name="cadoubletabwidget_3">
+      <widget class="caCalc" name="cacalc_22">
        <property name="geometry">
         <rect>
-         <x>40</x>
-         <y>315</y>
-         <width>250</width>
-         <height>250</height>
+         <x>60</x>
+         <y>485</y>
+         <width>76</width>
+         <height>21</height>
         </rect>
        </property>
-       <property name="itemsHorizontal" stdset="0">
-        <string notr="true">a;b;c</string>
+       <property name="variable">
+        <string notr="true">CA2</string>
        </property>
-       <property name="itemsVertical" stdset="0">
-        <string notr="true">  0  ;  1  ;  2  </string>
+       <property name="calc">
+        <string notr="true">SIN(A*3.1416/180)</string>
        </property>
-       <widget class="QWidget" name="Page_0_0">
-        <widget class="caFrame" name="caframe_0_0">
-         <property name="geometry">
-          <rect>
-           <x>5</x>
-           <y>5</y>
-           <width>120</width>
-           <height>120</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_1_1">
-        <widget class="caFrame" name="caframe_1_1">
-         <property name="geometry">
-          <rect>
-           <x>40</x>
-           <y>35</y>
-           <width>120</width>
-           <height>120</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::Panel</enum>
-         </property>
-         <property name="background">
-          <color>
-           <red>0</red>
-           <green>255</green>
-           <blue>255</blue>
-          </color>
-         </property>
-         <property name="backgroundMode">
-          <enum>caFrame::Filled</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_1_2">
-        <widget class="caFrame" name="caframe_1_2">
-         <property name="geometry">
-          <rect>
-           <x>75</x>
-           <y>30</y>
-           <width>120</width>
-           <height>120</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::Panel</enum>
-         </property>
-         <property name="background">
-          <color>
-           <red>0</red>
-           <green>255</green>
-           <blue>255</blue>
-          </color>
-         </property>
-         <property name="backgroundMode">
-          <enum>caFrame::Filled</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_0_1">
-        <widget class="caFrame" name="caframe_0_1">
-         <property name="geometry">
-          <rect>
-           <x>45</x>
-           <y>5</y>
-           <width>120</width>
-           <height>120</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_2_0">
-        <widget class="caFrame" name="caframe_2_0">
-         <property name="geometry">
-          <rect>
-           <x>5</x>
-           <y>124</y>
-           <width>120</width>
-           <height>56</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_0_2">
-        <widget class="caFrame" name="caframe_0_2">
-         <property name="geometry">
-          <rect>
-           <x>80</x>
-           <y>5</y>
-           <width>120</width>
-           <height>120</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_2_1">
-        <widget class="caFrame" name="caframe_2_1">
-         <property name="geometry">
-          <rect>
-           <x>40</x>
-           <y>125</y>
-           <width>120</width>
-           <height>56</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_2_2">
-        <widget class="caFrame" name="caframe_2_2">
-         <property name="geometry">
-          <rect>
-           <x>80</x>
-           <y>125</y>
-           <width>120</width>
-           <height>56</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_1_0">
-        <widget class="caFrame" name="caframe_1_0">
-         <property name="geometry">
-          <rect>
-           <x>5</x>
-           <y>35</y>
-           <width>120</width>
-           <height>120</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::Panel</enum>
-         </property>
-         <property name="background">
-          <color>
-           <red>0</red>
-           <green>255</green>
-           <blue>255</blue>
-          </color>
-         </property>
-         <property name="backgroundMode">
-          <enum>caFrame::Filled</enum>
-         </property>
-        </widget>
-       </widget>
-      </widget>
-      <widget class="caLabel" name="caLabel_293">
-       <property name="geometry">
-        <rect>
-         <x>100</x>
-         <y>305</y>
-         <width>26</width>
-         <height>16</height>
-        </rect>
+       <property name="channel" stdset="0">
+        <string notr="true">ANG</string>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>9</pointsize>
-        </font>
+       <property name="channelB">
+        <string notr="true"/>
        </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
+       <property name="channelC">
+        <string notr="true"/>
        </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-       <property name="fontScaleMode">
-        <enum>ESimpleLabel::Height</enum>
-       </property>
-       <property name="foreground">
-        <color>
-         <red>0</red>
-         <green>0</green>
-         <blue>0</blue>
-        </color>
-       </property>
-       <property name="background">
-        <color alpha="0">
-         <red>0</red>
-         <green>0</green>
-         <blue>0</blue>
-        </color>
+       <property name="channelD">
+        <string notr="true"/>
        </property>
       </widget>
-      <widget class="caLabel" name="caLabel_294">
+      <widget class="caCalc" name="cacalc_23">
        <property name="geometry">
         <rect>
-         <x>145</x>
-         <y>305</y>
-         <width>26</width>
-         <height>16</height>
+         <x>60</x>
+         <y>510</y>
+         <width>76</width>
+         <height>21</height>
         </rect>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>9</pointsize>
-        </font>
+       <property name="variable">
+        <string notr="true">CA3</string>
        </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
+       <property name="calc">
+        <string notr="true">SIN(A*3.1416/180)</string>
        </property>
-       <property name="text">
-        <string>1</string>
+       <property name="channel" stdset="0">
+        <string notr="true">ANG</string>
        </property>
-       <property name="alignment">
-        <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       <property name="channelB">
+        <string notr="true"/>
        </property>
-       <property name="fontScaleMode">
-        <enum>ESimpleLabel::Height</enum>
+       <property name="channelC">
+        <string notr="true"/>
        </property>
-       <property name="foreground">
-        <color>
-         <red>0</red>
-         <green>0</green>
-         <blue>0</blue>
-        </color>
-       </property>
-       <property name="background">
-        <color alpha="0">
-         <red>0</red>
-         <green>0</green>
-         <blue>0</blue>
-        </color>
+       <property name="channelD">
+        <string notr="true"/>
        </property>
       </widget>
-      <widget class="caLabel" name="caLabel_296">
+      <widget class="caCalc" name="cacalc_24">
        <property name="geometry">
         <rect>
-         <x>200</x>
-         <y>305</y>
-         <width>26</width>
-         <height>16</height>
+         <x>60</x>
+         <y>535</y>
+         <width>76</width>
+         <height>21</height>
         </rect>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>9</pointsize>
-        </font>
+       <property name="variable">
+        <string notr="true">CA4</string>
        </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
+       <property name="calc">
+        <string notr="true">SIN(A*3.1416/180)</string>
        </property>
-       <property name="text">
-        <string>2</string>
+       <property name="channel" stdset="0">
+        <string notr="true">ANG</string>
        </property>
-       <property name="alignment">
-        <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       <property name="channelB">
+        <string notr="true"/>
        </property>
-       <property name="fontScaleMode">
-        <enum>ESimpleLabel::Height</enum>
+       <property name="channelC">
+        <string notr="true"/>
        </property>
-       <property name="foreground">
-        <color>
-         <red>0</red>
-         <green>0</green>
-         <blue>0</blue>
-        </color>
-       </property>
-       <property name="background">
-        <color alpha="0">
-         <red>0</red>
-         <green>0</green>
-         <blue>0</blue>
-        </color>
+       <property name="channelD">
+        <string notr="true"/>
        </property>
       </widget>
      </widget>
