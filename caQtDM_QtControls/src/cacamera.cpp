@@ -966,6 +966,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
 
                         Max[(indx > Max[1])] = indx;
                         Min[(indx < Min[1])] = indx;
+                        if(i >= datasize) break;
                     }
                     if(i >= datasize) break;
                 }
@@ -980,7 +981,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
 
                         Max[(indx > Max[1])] = indx;
                         Min[(indx < Min[1])] = indx;
-
+                        if(i >= datasize) break;
                     }
                     if(i >= datasize) break;
                 }
@@ -1007,6 +1008,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
 
                         Max[(indx > Max[1])] = indx;
                         Min[(indx < Min[1])] = indx;
+                        if(i >= datasize) break;
                     }
                     if(i >= datasize) break;
                 }
@@ -1020,6 +1022,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
 
                         Max[(indx > Max[1])] = indx;
                         Min[(indx < Min[1])] = indx;
+                        if(i >= datasize) break;
                     }
                     if(i >= datasize) break;
                 }
@@ -1047,6 +1050,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
 
                         Max[(indx > Max[1])] = indx;
                         Min[(indx < Min[1])] = indx;
+						if ((i * 2) >= datasize) break;
                     }
                     if((i*2) >= datasize) break;
                 }
@@ -1067,9 +1071,9 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
 
                         if(indx1 > 255) indx1 = 255;
                         *scanLine++ = qRgb(indx1,indx1,indx1);
-
+						if((i*2) >= datasize) break;
                     }
-                    if((i*2) >= datasize) break;
+					if ((i * 2) >= datasize) break;
                 }
             }
         }
