@@ -2256,12 +2256,15 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
     if(caCalc *widget = qobject_cast<caCalc *>(w)) {
         bool valid;
         double result = data.edata.rvalue;
-        //qDebug() << "we have a caCalc" << w;
+        //qDebug() << "we have a caCalc" << widget->getVariable() << "  " <<  data.pv;
 
         CalcVisibility(w, result, valid);  // visibility not used, but calculation yes
         if(valid) {
+         if (!QString::compare(widget->getVariable(), data.pv, Qt::CaseInsensitive)){
             widget->setValue(result);
             mutexKnobData->UpdateSoftPV(data.pv, result, myWidget);
+            //qDebug() << "we have a caCalc" << widget->getVariable() << "  " <<  data.pv;
+         }
         }
 
         // frame ==================================================================================================================
@@ -4522,6 +4525,7 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
     for(int i=0; i<4; i++) {
         if((num = addMonitor(myWidget, kData, strng[i], widget, specData, map, &pv)) >= 0) {
             if (caCalc *w = qobject_cast<caCalc *>(widget)) {
+                //qDebug() << "caCalc" << num << "  " << w->getVariable() << "  " <<  pv;
                 if(i==0) w->setChannelA(pv);  /* replace pv while macro could be used */
                 if(i==1) w->setChannelB(pv);  /* replace pv while macro could be used */
                 if(i==2) w->setChannelC(pv);  /* replace pv while macro could be used */
