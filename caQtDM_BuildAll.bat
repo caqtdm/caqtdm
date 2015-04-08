@@ -21,6 +21,7 @@ REM ============================================================================
 REM GENERAL_COMPILATION SELECT1
 REM =============================================================================================
 call caQtDM_Env.bat 1
+call caQtDM_CleanAll.bat
 call :compile
 call caQtDM_CleanAll.bat
 ENDLOCAL
