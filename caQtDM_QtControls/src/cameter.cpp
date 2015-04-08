@@ -98,6 +98,23 @@ caMeter::caMeter(QWidget *parent) : QwtDial(parent)
 
     setOrigin(135.0);
     setScaleArc(0.0, 270.0);
+    thisLabel = "V";
+	thisMinValue = 0;
+	thisMaxValue = 300;
+
+#if QWT_VERSION < 0x060100
+    setScaleComponents(QwtAbstractScaleDraw::Ticks | QwtAbstractScaleDraw::Labels);
+    setScaleTicks(0, 4, 8);
+    setRange(thisMinValue, thisMaxValue);
+    setScale(-1, 2, (thisMaxValue-thisMinValue)/10.0);  //maxMajIntv: Maximum major interval, maxMinIntv: Maximum minor interval
+#else
+    setScale( thisMinValue, thisMaxValue);
+    setScaleStepSize((thisMinValue - thisMaxValue)/10.0);
+#endif
+		
+	//setMinValue(0.0);
+	//setMaxValue(300.0);
+
 
     ScaleDraw->setPenWidth(1);
     setLineWidth(1);
@@ -110,8 +127,6 @@ caMeter::caMeter(QWidget *parent) : QwtDial(parent)
     setNeedle(needle);
 
     setColorMode(Static);
-    setMinValue(0.0);
-    setMaxValue(300.0);
     setScaleEnabled(true);
     setValueDisplayed(true);
     setUnitsEnabled(true);
@@ -120,16 +135,9 @@ caMeter::caMeter(QWidget *parent) : QwtDial(parent)
     setFormatType(decimal);
     setLimitsMode(Channel);
 
-#if QWT_VERSION < 0x060100
-    setScaleComponents(QwtAbstractScaleDraw::Ticks | QwtAbstractScaleDraw::Labels);
-    setScaleTicks(0, 4, 8);
-    setRange(thisMinValue, thisMaxValue);
-    setScale(-1, 2, (thisMaxValue-thisMinValue)/10.0);  //maxMajIntv: Maximum major interval, maxMinIntv: Maximum minor interval
-#else
-    setScale( thisMinValue, thisMaxValue);
-    setScaleStepSize((thisMinValue - thisMaxValue)/10.0);
-#endif
-    thisLabel = "V";
+
+
+
 }
 
 void caMeter::setMinValue(double v) {
