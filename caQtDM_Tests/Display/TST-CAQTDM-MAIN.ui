@@ -14752,11 +14752,20 @@ LOPR - HOPR</string>
         <property name="YaxisScalingMax_1" stdset="0">
          <enum>caStripPlot::User</enum>
         </property>
+        <property name="YaxisScalingMin_1" stdset="0">
+         <enum>caStripPlot::User</enum>
+        </property>
         <property name="YaxisLimitsMax_2">
          <double>1.100000000000000</double>
         </property>
         <property name="YaxisLimitsMin_2">
          <double>-1.100000000000000</double>
+        </property>
+        <property name="YaxisScalingMax_2" stdset="0">
+         <enum>caStripPlot::User</enum>
+        </property>
+        <property name="YaxisScalingMin_2" stdset="0">
+         <enum>caStripPlot::User</enum>
         </property>
        </widget>
        <widget class="caLabel" name="caLabel_287">
@@ -15360,187 +15369,6 @@ LOPR - HOPR</string>
         </property>
        </item>
       </widget>
-      <widget class="caDoubleTabWidget" name="cadoubletabwidget_gehtnicht">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>40</y>
-         <width>250</width>
-         <height>250</height>
-        </rect>
-       </property>
-       <property name="itemsHorizontal" stdset="0">
-        <string notr="true">a;b;c</string>
-       </property>
-       <property name="itemsVertical" stdset="0">
-        <string notr="true">  0  ;  1  ;  2  </string>
-       </property>
-       <widget class="QWidget" name="Page_0_3">
-        <widget class="caFrame" name="caframe_0_6">
-         <property name="geometry">
-          <rect>
-           <x>5</x>
-           <y>5</y>
-           <width>120</width>
-           <height>120</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_1_3">
-        <widget class="caFrame" name="caframe_1_3">
-         <property name="geometry">
-          <rect>
-           <x>40</x>
-           <y>35</y>
-           <width>120</width>
-           <height>120</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::Panel</enum>
-         </property>
-         <property name="background">
-          <color>
-           <red>0</red>
-           <green>255</green>
-           <blue>255</blue>
-          </color>
-         </property>
-         <property name="backgroundMode">
-          <enum>caFrame::Filled</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_1_4">
-        <widget class="caFrame" name="caframe_1_4">
-         <property name="geometry">
-          <rect>
-           <x>75</x>
-           <y>30</y>
-           <width>120</width>
-           <height>120</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::Panel</enum>
-         </property>
-         <property name="background">
-          <color>
-           <red>0</red>
-           <green>255</green>
-           <blue>255</blue>
-          </color>
-         </property>
-         <property name="backgroundMode">
-          <enum>caFrame::Filled</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_0_4">
-        <widget class="caFrame" name="caframe_0_7">
-         <property name="geometry">
-          <rect>
-           <x>45</x>
-           <y>5</y>
-           <width>120</width>
-           <height>120</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_2_3">
-        <widget class="caFrame" name="caframe_0_8">
-         <property name="geometry">
-          <rect>
-           <x>5</x>
-           <y>124</y>
-           <width>120</width>
-           <height>56</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_0_5">
-        <widget class="caFrame" name="caframe_0_9">
-         <property name="geometry">
-          <rect>
-           <x>80</x>
-           <y>5</y>
-           <width>120</width>
-           <height>120</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_2_4">
-        <widget class="caFrame" name="caframe_0_10">
-         <property name="geometry">
-          <rect>
-           <x>40</x>
-           <y>125</y>
-           <width>120</width>
-           <height>56</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_2_5">
-        <widget class="caFrame" name="caframe_0_11">
-         <property name="geometry">
-          <rect>
-           <x>80</x>
-           <y>125</y>
-           <width>120</width>
-           <height>56</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="Page_1_5">
-        <widget class="caFrame" name="caframe_1_5">
-         <property name="geometry">
-          <rect>
-           <x>5</x>
-           <y>35</y>
-           <width>120</width>
-           <height>120</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::Panel</enum>
-         </property>
-         <property name="background">
-          <color>
-           <red>0</red>
-           <green>255</green>
-           <blue>255</blue>
-          </color>
-         </property>
-         <property name="backgroundMode">
-          <enum>caFrame::Filled</enum>
-         </property>
-        </widget>
-       </widget>
-      </widget>
       <widget class="caCalc" name="cacalc_15">
        <property name="geometry">
         <rect>
@@ -15620,6 +15448,156 @@ LOPR - HOPR</string>
        </property>
        <property name="channelD">
         <string notr="true"/>
+       </property>
+      </widget>
+      <widget class="caFrame" name="caframe_25">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>85</y>
+         <width>202</width>
+         <height>183</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <widget class="caLed" name="caled_15">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>5</y>
+          <width>30</width>
+          <height>30</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLed::Alarm</enum>
+        </property>
+       </widget>
+       <widget class="caLed" name="caled_16">
+        <property name="geometry">
+         <rect>
+          <x>170</x>
+          <y>5</y>
+          <width>30</width>
+          <height>30</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLed::Alarm</enum>
+        </property>
+       </widget>
+       <widget class="caLed" name="caled_17">
+        <property name="geometry">
+         <rect>
+          <x>170</x>
+          <y>70</y>
+          <width>30</width>
+          <height>30</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLed::Alarm</enum>
+        </property>
+       </widget>
+       <widget class="caLed" name="caled_18">
+        <property name="geometry">
+         <rect>
+          <x>165</x>
+          <y>150</y>
+          <width>30</width>
+          <height>30</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLed::Alarm</enum>
+        </property>
+       </widget>
+       <widget class="caLed" name="caled_19">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>150</y>
+          <width>30</width>
+          <height>30</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLed::Alarm</enum>
+        </property>
+       </widget>
+       <widget class="caLed" name="caled_20">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>145</y>
+          <width>30</width>
+          <height>30</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">$(DEVICE):OP:demoBI</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLed::Alarm</enum>
+        </property>
+       </widget>
+      </widget>
+      <widget class="caLabel" name="caLabel_301">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>65</y>
+         <width>191</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="text">
+        <string>same size as caDoubleTabWidget</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignAbsolute|Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="fontScaleMode">
+        <enum>ESimpleLabel::Height</enum>
+       </property>
+       <property name="foreground">
+        <color>
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+       <property name="background">
+        <color alpha="0">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
        </property>
       </widget>
      </widget>
