@@ -539,6 +539,9 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                     if(kPtr->edata.dataSize < 1024) {
                         memcpy(dataString, (char*) kPtr->edata.dataB, kPtr->edata.dataSize);
                         dataString[kPtr->edata.dataSize] = '\0';
+                    } else {
+                        memcpy(dataString, (char*) kPtr->edata.dataB, 1024);
+                        dataString[1024] = '\0';
                     }
                 }
 

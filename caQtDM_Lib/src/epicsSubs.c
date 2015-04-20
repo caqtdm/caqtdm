@@ -236,8 +236,10 @@ static void dataCallback(struct event_handler_args args)
             memcpy(ptr, val_ptr, args.count *sizeof(char));
             ptr[args.count] = '\0';
 
-            kData.edata.valueCount =  args.count;
-            kData.edata.actTime = now;
+            //kData.edata.valueCount =  args.count;
+            //kData.edata.actTime = now;
+
+            AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
 
             C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
         }
@@ -273,7 +275,9 @@ static void dataCallback(struct event_handler_args args)
                 strcat(&ptr[len++], ";");
                 strcat(&ptr[len], myLimitedString(val_ptr[i]));
             }
-            kData.edata.actTime = now;
+            //kData.edata.actTime = now;
+
+            AssignEpicsValue((double) 0, (long) stsF->value, args.count);
 
             C_SetMutexKnobDataReceived(KnobDataPtr, &kData);
         }
