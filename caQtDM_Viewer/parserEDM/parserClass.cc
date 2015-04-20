@@ -305,7 +305,6 @@ FILE *parserClass::openAny (char *name, char *mode )
 
     f = fopen( name, mode );
     if ( f ) {
-    /*    strncpy( fileName, buf, 255 ); // update fileName - SLAC commented out due to  buffer overflow error*/
         return f;
     }
     return NULL;
@@ -446,6 +445,9 @@ int parserClass::loadFile (myParserEDM *myParser) {
             else if ( strcmp( objName, "activeArcClass" ) == 0 ) activeClass = activeArc;
             else if ( strcmp( objName, "activeXTextClass" ) == 0 ) activeClass = activeXText;
             else if ( strcmp( objName, "activeXTextDspClass" ) == 0 ) activeClass = activeXTextDsp;
+            else if ( strcmp( objName, "activeXTextDspClass:noedit" ) == 0 ) activeClass = activeXTextDsp;  // Zai
+            else if ( strcmp( objName, "TextupdateClass" ) == 0 ) activeClass = TextUpdate; // Zai
+            else if ( strcmp( objName, "TextentryClass" ) == 0 ) activeClass = TextEntry; // Zai
             else if ( strcmp( objName, "activeMeterClass" ) == 0 ) activeClass = activeMeter;
             else if ( strcmp( objName, "activeBarClass" ) == 0 ) activeClass = activeBar;
             else if ( strcmp( objName, "activeMessageBoxClass" ) == 0 ) activeClass = activeMessageBox;
@@ -1061,6 +1063,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
 
                 //***************************************************************************************************************
             case activeXTextDsp :
+            case TextEntry :    // Zai
+            case TextUpdate :   // Zai
 
             {
                 tagClass tag;
@@ -1082,6 +1086,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 tag.loadR( "fgAlarm", &colorMode, &zero );
                 tag.loadR( "bgColor", ci, &bgColor );
                 tag.loadR( "bgAlarm", &bgColorMode, &zero );
+                tag.loadR( "fill", &fill, &zero );  // Zai - avoid warnings
                 tag.loadR( "useDisplayBg", &useDisplayBg, &zero );
                 tag.loadR( "editable", &editable, &zero );
                 tag.loadR( "autoHeight", &autoHeight, &zero );
@@ -1125,7 +1130,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 }
 
                 // ----------------- write the properties to the ui file
-                if(!editable) {
+                if(activeClass == TextUpdate || activeClass != TextEntry && /* Zai added */!editable) {
                     sprintf(widgetName, "caLineEdit_%d", widgetNumber++);
                     myParser->Qt_writeOpenTag("widget", "caLineEdit", widgetName);
                 } else {
@@ -1392,7 +1397,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
             case shellCmdButton :
             {
                 int n;
-                char args[1024], files[1024], labels[1024];//ababbitt 3-13-15: increased to 1024 to no longer receiver buffer overflow message 
+                char args[1024], files[1024], labels[1024];
                 args[0] = files[0] = labels[0] = '\0';
                 tagClass tag;
 
@@ -1443,8 +1448,9 @@ int parserClass::loadFile (myParserEDM *myParser) {
 
                 for(int i=0; i<numCmds; i++) {
                     strcat(labels, labelS[i].getRaw());
-		    strcat(labels, ";");
-                    strcat(files, shellCommand[i].getRaw()); strcat(files, ";");
+                    strcat(labels, ";");
+                    strcat(files, shellCommand[i].getRaw());
+                    strcat(files, ";");
                 }
                 if(strlen(files) > 0) files[strlen(files) -1] = '\0';
                 if(strlen(labels) > 0) labels[strlen(labels) -1] = '\0';
@@ -1624,7 +1630,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
             case relatedDisplay :
             {
 
-                char args[1024], files[1024], labels[1024], remove[1024];//ababbitt 3-13-15: increased to 1024 to no longer receive buffer overflow message
+                char args[1024], files[1024], labels[1024], remove[1024];
                 args[0] = files[0] = labels[0] = remove[0] = '\0';
                 tagClass tag;
                 tag.init();
@@ -1680,12 +1686,16 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->writeRectangleDimensions(x, y, w, h);
                 myParser->Qt_setColorForeground("", rgb[fgColor].r/256, rgb[fgColor].g/256, rgb[fgColor].b/256, 255);
                 myParser->Qt_setColorBackground("", rgb[bgColor].r/256, rgb[bgColor].g/256, rgb[bgColor].b/256, 255);
+
                 for(int i=0; i<numDsps; i++) {
-                    strcat(files, displayFileName[i].getRaw()); strcat(files, ";");
+                    strcat(files, displayFileName[i].getRaw());
+                    strcat(files, ";");
                     strcat(labels, relLabel[i].getRaw());
-                    strcat(labels, ";"); //ababbitt 3-13-15: buffer overload error before increasing char size to 1024
-                    strcat(args, symbolsExpStr[i].getRaw());strcat(args, ";");
-                    if(replaceSymbols[i] == 0) strcat(remove, "false"); else strcat(remove, "true"); strcat(remove, ";");
+                    strcat(labels, ";");
+                    strcat(args, symbolsExpStr[i].getRaw());
+                    strcat(args, ";");
+                    if(replaceSymbols[i] == 0) strcat(remove, "false"); else strcat(remove, "true");
+                    strcat(remove, ";");
                 }
                 if(strlen(files) > 0) files[strlen(files) -1] = '\0';
                 if(strlen(labels) > 0) labels[strlen(labels) -1] = '\0';

@@ -1,10 +1,6 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef linux
-  #include <unistd.h>
-#endif
-
+#include <unistd.h>
 #include "utility.h"
 #include "tag_pkg.h"
 #include "myParserEDM.h"
@@ -15,7 +11,7 @@
 #define LONGSTRING       4096
 
 enum classType {activeLine, activeRectangle, activeCircle, activeArc ,
-                xyGraph, activePip, activeXText, activeXTextDsp,
+                xyGraph, activePip, activeXText, activeXTextDsp, TextUpdate, TextEntry, // Zai added two items
                 activeMeter, activeBar, activeMessageBox,
                 activeMotifSlider, activeButton, activeMenuButton, activeRadioButton,
                 activeMessageButton, activeExitButton, relatedDisplay, shellCmdButton,
