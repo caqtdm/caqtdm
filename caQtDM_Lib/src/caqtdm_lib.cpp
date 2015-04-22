@@ -1983,26 +1983,29 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
     }
 
     // any monitors ?
-    QVariant var=w->property("MonitorList");
-    QVariantList list = var.toList();
+    QVariant monitorList=w->property("MonitorList");
+    QVariantList MonitorList = monitorList.toList();
+    QVariant indexList=w->property("IndexList");
+    QVariantList IndexList = indexList.toList();
 
-    if(list.size() == 0) return true;
+    if(MonitorList.size() == 0) return true;
 
-    int nbMonitors = list.at(0).toInt();
+    int nbMonitors = MonitorList.at(0).toInt();
     //qDebug() << "number of monitors" << nbMonitors << "calc=" << calcString;
     if(nbMonitors > 0)  {
 
         // scan and get the channels
         for(int i=0; i < MAX_CALC_INPUTS; i++) valueArray[i] = 0.0;
         for(int i=0; i< nbMonitors;i++) {
-            knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(list.at(i+1).toInt());
+            knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(MonitorList.at(i+1).toInt());
             if(ptr != (knobData*) 0) {
-                //qDebug() << "calculate from index" << ptr->index << ptr->pv << ptr->edata.connected << ptr->edata.rvalue;
+                //qDebug() << "calculate from index" << i << ptr->index << ptr->pv << ptr->edata.connected << ptr->edata.rvalue << IndexList.at(i+1).toInt();
                 // when connected
+                int j = IndexList.at(i+1).toInt(); // input a,b,c,d
                 if(ptr->edata.connected) {
-                    valueArray[i] = ptr->edata.rvalue;
+                    valueArray[j] = ptr->edata.rvalue;
                 } else {
-                    valueArray[i] = 0.0;
+                    valueArray[j] = 0.0;
                 }
                 // for first record
                 if(i==0 && ptr->edata.connected) {
@@ -2022,7 +2025,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
         QRegExp checkregexp("%\\/(\\S+)\\/");
         checkregexp.setMinimal(true);
         if (checkregexp.indexIn(calcString) != -1){
-            knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(list.at(1).toInt());
+            knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(MonitorList.at(1).toInt());
             if(ptr != (knobData *) 0) {
                 char dataString[1024];
                 int caFieldType= ptr->edata.fieldtype;
@@ -2260,11 +2263,11 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         CalcVisibility(w, result, valid);  // visibility not used, but calculation yes
         if(valid) {
-         if (!QString::compare(widget->getVariable(), data.pv, Qt::CaseInsensitive)){
-            widget->setValue(result);
-            mutexKnobData->UpdateSoftPV(data.pv, result, myWidget);
-            //qDebug() << "we have a caCalc" << widget->getVariable() << "  " <<  data.pv;
-         }
+            if (!QString::compare(widget->getVariable(), data.pv, Qt::CaseInsensitive)){
+                widget->setValue(result);
+                mutexKnobData->UpdateSoftPV(data.pv, result, myWidget);
+                //qDebug() << "we have a caCalc" << widget->getVariable() << "  " <<  data.pv;
+            }
         }
 
         // frame ==================================================================================================================
@@ -4461,7 +4464,8 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
         tooltip.append("<br>");
     }
 
-    QList<QVariant> integerList;
+    QList<QVariant> monitorList;
+    QList<QVariant> indexList;
     int num, nbMon = 0;
     QString strng[4];
     QString visibilityCalc;
@@ -4564,7 +4568,8 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
 
             tooltip.append(pv);
             tooltip.append("<br>");
-            integerList.append(num);
+            monitorList.append(num);
+            indexList.append(i);
             nbMon++;
         }
     }
@@ -4580,29 +4585,38 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
     /* replace also some macro values in the visibility calc string */
     text =  treatMacro(map, visibilityCalc, &doNothing);
 
-    integerList.insert(0, nbMon); /* set property into widget */
+    monitorList.insert(0, nbMon);
+    indexList.insert(0,nbMon);
 
+    /* set property into widget */
     if (caCalc *w = qobject_cast<caCalc *>(widget)) {
         w->setCalc(text);
-        w->setProperty("MonitorList", integerList);
+        w->setProperty("MonitorList", monitorList);
+        w->setProperty("IndexList", indexList);
     } else if (caImage *w = qobject_cast<caImage *>(widget)) {
         w->setVisibilityCalc(text);
-        w->setProperty("MonitorList", integerList);
+        w->setProperty("MonitorList", monitorList);
+        w->setProperty("IndexList", indexList);
     } else if (caGraphics *w = qobject_cast<caGraphics *>(widget)) {
         w->setVisibilityCalc(text);
-        w->setProperty("MonitorList", integerList);
+        w->setProperty("MonitorList", monitorList);
+        w->setProperty("IndexList", indexList);
     } else if (caPolyLine *w = qobject_cast<caPolyLine *>(widget)) {
         w->setVisibilityCalc(text);
-        w->setProperty("MonitorList", integerList);
+        w->setProperty("MonitorList", monitorList);
+        w->setProperty("IndexList", indexList);
     } else if (caInclude *w = qobject_cast<caInclude *>(widget)) {
         w->setVisibilityCalc(text);
-        w->setProperty("MonitorList", integerList);
+        w->setProperty("MonitorList", monitorList);
+        w->setProperty("IndexList", indexList);
     } else if (caFrame *w = qobject_cast<caFrame *>(widget)) {
         w->setVisibilityCalc(text);
-        w->setProperty("MonitorList", integerList);
+        w->setProperty("MonitorList", monitorList);
+        w->setProperty("IndexList", indexList);
     } else if (caLabel *w = qobject_cast<caLabel *>(widget)) {
         w->setVisibilityCalc(text);
-        w->setProperty("MonitorList", integerList);
+        w->setProperty("MonitorList", monitorList);
+        w->setProperty("IndexList", indexList);
     }
 
     return nbMon;

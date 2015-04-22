@@ -129,6 +129,18 @@ void  MutexKnobData::BuildSoftPVList(QWidget *w)
                 //qDebug() << "insert softpv_list" << asc << KnobData[i].dispName ;
             }
         }
+        // for softpvs that were not yet known as soft pv, add them
+        if(KnobData[i].index != -1) {
+            int index;
+            if(getSoftPV(KnobData[i].pv, &index, (QWidget *) KnobData[i].thisW)) {
+                mutex.unlock();
+                sprintf(asc, "%s_%d_%p", KnobData[i].pv, KnobData[i].index, w);
+                softPV_List.insert(asc, KnobData[i].index);
+                InsertSoftPV(KnobData[i].pv, KnobData[i].index, (QWidget *) KnobData[i].thisW);
+                //qDebug() << "insert untill now unknown pv" << asc << KnobData[i].index;
+                mutex.lock();
+            }
+        }
     }
 }
 
@@ -189,7 +201,6 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w)
         if(pv == list.at(0)) {
             int indx = i.value();
             if(KnobData[indx].index != -1 && KnobData[indx].pv == pv && ((QWidget*) list.at(2).toInt(0,16) ==  w)) {
-                if(KnobData[indx].pv == pv) return;
                 //qDebug() <<  "     update index=" << i.value() << i.key() <<  w << "with" << value;
                 KnobData[indx].edata.rvalue = value;
                 KnobData[indx].edata.fieldtype = caDOUBLE;
@@ -213,11 +224,9 @@ bool MutexKnobData::getSoftPV(QString pv, int *indx, QWidget *w)
     sprintf(asc, "%s_%p", pv.toAscii().constData(),  w);
     QMap<QString, int>::const_iterator name = softPV_WidgetList.find(asc);
     if(name != softPV_WidgetList.end()) {
-        //qDebug() << "found softpv" << pv << "list item=" << name.key() << "index=" << name.value() << w;
         *indx = name.value();
         return true;
     }
-    //qDebug() << "did not find (yet) softpv" << pv;
     return false;
 }
 
@@ -541,7 +550,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                         dataString[kPtr->edata.dataSize] = '\0';
                     } else {
                         memcpy(dataString, (char*) kPtr->edata.dataB, 1024);
-                        dataString[1024] = '\0';
+                        dataString[1023] = '\0';
                     }
                 }
 

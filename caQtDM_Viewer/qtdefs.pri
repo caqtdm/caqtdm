@@ -30,10 +30,11 @@ DEFINES += NETWORKDOWNLOADSUPPORT
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 
 # 3.9.1
+# build 22.4.2015: severity of a char/string record was not considered and is corrected, Char waveforms longer as 1024 were not displayed in calineedit and is corrected.
 # added a clock allowing to display normal time or reception time of a process variable; alarm handling can be enabled to colorize the clock
 # added a new dial
 # problem with soft pv corrected
-# QTextBrowser can be used with macros in order to dynamically load files for display thmen in this textbrowser
+# QTextBrowser can be used with macros in order to dynamically load files for display them in this textbrowser
 # modified the configdialog for ios and android
 # prevent caQtDM from crashing when maxvalue and minvalue have the same value.
 # for some images, the last row was missing and is corrected now
