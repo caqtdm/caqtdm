@@ -62,13 +62,13 @@ SplashScreen::SplashScreen(QWidget *parent) : QSplashScreen(parent), m_progress(
 
     this->resize(pixmap.size().width()+200, pixmap.size().height()+100);
 
-    // in order to have a pseudo-transparent image, I load the background
-#ifndef MOBILE
-    QPixmap desktopBackground= QPixmap::grabWindow(QApplication::desktop()->winId(), x()- width()/2, y()-height()/2, width(),height());
-#else
+    // in order to have a pseudo-transparent image, I load the background (22.4.2015 do not do this anymore, while for Qt5 not ok anyhow
+//#ifndef MOBILE
+//    QPixmap desktopBackground= QPixmap::grabWindow(QApplication::desktop()->winId(), x()- width()/2, y()-height()/2, width(),height());
+//#else
     QPixmap desktopBackground( width(),height());
     desktopBackground.fill(Qt::gray);
-#endif
+//#endif
 
     // and merge the two pixmaps
     QPainter p;

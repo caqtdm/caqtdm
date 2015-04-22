@@ -30,7 +30,8 @@ DEFINES += NETWORKDOWNLOADSUPPORT
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 
 # 3.9.1
-# build 22.4.2015: severity of a char/string record was not considered and is corrected, Char waveforms longer as 1024 were not displayed in calineedit and is corrected.
+# build 22.4.2015: severity of a char/string record was not considered and is corrected, Char waveforms longer as 1024 were not displayed in calineedit and is corrected. in edl2ui
+# zais addons were integrated
 # added a clock allowing to display normal time or reception time of a process variable; alarm handling can be enabled to colorize the clock
 # added a new dial
 # problem with soft pv corrected
