@@ -1291,6 +1291,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
                 savedFile[level] = fi.baseName();
 
                 foreach(QWidget *child, childs) {
+                    HandleWidget(child, macroS, true);
                     HandleWidget(child, macroS, false);
                 }
                 level--;
@@ -1350,6 +1351,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         savedFile[level] = savedFile[level-1];
 
         foreach(QWidget *child, childs) {
+            HandleWidget(child, macroS, true);
             HandleWidget(child, macroS, false);
         }
         level--;
