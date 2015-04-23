@@ -34,8 +34,13 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     setWindowFlags(flags);
     setWindowModality (Qt::WindowModal);
 
+#ifdef MOBILE_ANDROID
+    int FONTSIZE_ANDROID = 24;
+    if(desktopSize.height() >= 1100) FONTSIZE_ANDROID = 28;
+#endif
+
     setGeometry(0,0, desktopSize.width(), desktopSize.height());
-    qDebug() << "size=" << desktopSize <<  qApp->desktop()->logicalDpiX();
+    //qDebug() << "size=" << desktopSize;
 
     QPixmap bg(":/caQtDM-BGL-2048.png");
 
@@ -122,8 +127,8 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     debugComboBox->setCurrentIndex(0);
     clearLayout->addWidget(debugComboBox, 0, 5);
 #ifdef MOBILE_ANDROID
-    specials.setNewStyleSheet(debugComboBox, desktopSize, 22, 15, "");
-    height = debugComboBox->fontMetrics().boundingRect(debugComboBox->currentText()).height() * 1.0;
+    specials.setNewStyleSheet(debugComboBox, desktopSize, FONTSIZE_ANDROID, 15, "");
+    height = debugComboBox->fontMetrics().boundingRect(debugComboBox->currentText()).height() * 2.0;
     debugComboBox->setFixedHeight(height);
 #endif
 
@@ -153,7 +158,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     urlComboBox->setCurrentIndex(0);
     urlLayout->addWidget(urlComboBox, 0, 0);
 #ifdef MOBILE_ANDROID
-    specials.setNewStyleSheet(urlComboBox, desktopSize, 22, 15, "");
+    specials.setNewStyleSheet(urlComboBox, desktopSize, FONTSIZE_ANDROID, 15, "");
     height = urlComboBox->fontMetrics().boundingRect(urlComboBox->currentText()).height() * 2.0;
     urlComboBox->setFixedHeight(height);
 #endif
@@ -185,7 +190,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     fileComboBox->setCurrentIndex(0);
     fileLayout->addWidget(fileComboBox, 0, 0);
 #ifdef MOBILE_ANDROID
-    specials.setNewStyleSheet(fileComboBox, desktopSize, 22, 15, "");
+    specials.setNewStyleSheet(fileComboBox, desktopSize, FONTSIZE_ANDROID, 15, "");
     height = fileComboBox->fontMetrics().boundingRect(fileComboBox->currentText()).height() * 2.0;
     fileComboBox->setFixedHeight(height);
 #endif
