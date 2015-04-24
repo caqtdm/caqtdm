@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.9.1
+CAQTDM_VERSION = V3.9.2
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -29,9 +29,12 @@ DEFINES += NETWORKDOWNLOADSUPPORT
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 
+# 3.9.2
+# severity of a char/string record was not considered and is corrected, Char waveforms longer as 1024 were not displayed in calineedit and is corrected.
+# in edl2ui zais addons were integrated
+# softpv's in include file enabled
+
 # 3.9.1
-# build 22.4.2015: severity of a char/string record was not considered and is corrected, Char waveforms longer as 1024 were not displayed in calineedit and is corrected. in edl2ui
-# zais addons were integrated
 # added a clock allowing to display normal time or reception time of a process variable; alarm handling can be enabled to colorize the clock
 # added a new dial
 # problem with soft pv corrected
