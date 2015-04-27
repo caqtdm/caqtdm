@@ -381,21 +381,36 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     initTry = true;
     // get from the display all the calc widgets
-    QList<QWidget *> widgets1 = myWidget->findChildren<QWidget *>();
+    //QList<QWidget *> widgets1 = myWidget->findChildren<QWidget *>();
+
+    savedFile[0] = fi.baseName();
+    savedMacro[0] = macro;
+
+    scanWidgets(myWidget->findChildren<QWidget *>(), macro);
+/*
+    // get first all primary softs (inorder that pv working on their own value will always be treated first
     foreach(QWidget *w1, widgets1) {
         savedFile[0] = fi.baseName();
         savedMacro[0] = macro;
         // open and load file
-        HandleWidget(w1, savedMacro[0], true);
+        HandleWidget(w1, savedMacro[0], true, true);
     }
+    foreach(QWidget *w1, widgets1) {
+        savedFile[0] = fi.baseName();
+        savedMacro[0] = macro;
+        // open and load file
+        HandleWidget(w1, savedMacro[0], true, false);
+    }
+
     // get from the display all the widgets having a monitor associated
     QList<QWidget *> widgets2 = myWidget->findChildren<QWidget *>();
     foreach(QWidget *w1, widgets2) {
         savedFile[0] = fi.baseName();
         savedMacro[0] = macro;
         // open and load file
-        HandleWidget(w1, savedMacro[0], false);
+        HandleWidget(w1, savedMacro[0], false, false);
     }
+ */
     if(nbIncludes > 0) {
 #ifdef linux
         usleep(200000);
@@ -598,10 +613,26 @@ QMap<QString, QString> CaQtDM_Lib::createMap(const QString& macro)
     return map;
 }
 
+void CaQtDM_Lib::scanWidgets(QList<QWidget*> list, QString macro)
+{
+    // get first all primary softs (inorder that pv working on their own value will always be treated first
+    foreach(QWidget *w1, list) {
+        HandleWidget(w1, macro, true, true);
+    }
+    // other softpvs
+    foreach(QWidget *w1, list) {
+        HandleWidget(w1, macro, true, false);
+    }
+    // other pvs
+    foreach(QWidget *w1, list) {
+        HandleWidget(w1, macro, false, false);
+    }
+}
+
 /**
  * this routine handles the initialization of all widgets
  */
-void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
+void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool treatPrimary)
 {
     QMap<QString, QString> map;
     knobData kData;
@@ -640,6 +671,17 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
     //==================================================================================================================
     if(firstPass) {
         if(caCalc* widget = qobject_cast<caCalc *>(w1)) {
+
+            bool doit;
+
+            qDebug() <<  "treatPrimary:" << treatPrimary << widget->getVariable() << widget << PrimarySoftPV(widget, map);
+
+            // "primary" softchannels have to be done first
+            if(PrimarySoftPV(widget, map) && treatPrimary) doit=true;
+            else if(!PrimarySoftPV(widget, map) && !treatPrimary) doit=true;
+            else return;
+
+            qDebug() << "treatPrimary:" << treatPrimary << "doit:" << doit;
 
             // soft channel
             kData.soft = true;
@@ -1284,16 +1326,18 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
                 widget->setLineSize(0);
 
                 // go through its childs
-                QList<QWidget *> childs = thisW->findChildren<QWidget *>();
+                //QList<QWidget *> childs = thisW->findChildren<QWidget *>();
                 level++;
 
                 // keep actual filename
                 savedFile[level] = fi.baseName();
 
-                foreach(QWidget *child, childs) {
-                    HandleWidget(child, macroS, true);
-                    HandleWidget(child, macroS, false);
-                }
+                scanWidgets(thisW->findChildren<QWidget *>(), macroS);
+
+                //foreach(QWidget *child, childs) {
+                //    HandleWidget(child, macroS, true, false);
+                //    HandleWidget(child, macroS, false, false);
+                //}
                 level--;
             }
 
@@ -1344,16 +1388,18 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         macroS = treatMacro(map, macroS, &doNothing);
         savedMacro[level] = treatMacro(map, savedMacro[level], &doNothing);
 
-        QList<QWidget *> childs = widget->findChildren<QWidget *>();
+        //QList<QWidget *> childs = widget->findChildren<QWidget *>();
         level++;
 
         // get actual filename from previous level
         savedFile[level] = savedFile[level-1];
 
-        foreach(QWidget *child, childs) {
-            HandleWidget(child, macroS, true);
-            HandleWidget(child, macroS, false);
-        }
+        scanWidgets(widget->findChildren<QWidget *>(), macroS);
+
+        //foreach(QWidget *child, childs) {
+        //    HandleWidget(child, macroS, true, false);
+        //    HandleWidget(child, macroS, false, false);
+        //}
         level--;
 
         macroS= savedMacro[level];
@@ -1692,7 +1738,107 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass)
         }
         widget->setProperty("Taken", true);
         widget->setToolTip("select row or columns, then with Ctrl+C you can copy to the clipboard\ninside X11 you can then do shft+ins\nwhen doubleclicking on a value, you can change the value");
+
+        //==================================================================================================================
+#ifdef ADDSCAN2D
+    } else if(caScan2D* widget = qobject_cast<caScan2D *>(w1)) {
+
+        //qDebug() << "create caScan2D";
+
+        QString text;
+
+        // addmonitor normally will add a tooltip to show the pv; however here we have more than one pv
+        QString tooltip;
+        QString pvs= "";
+        bool validDataProcessingChannels = false;
+        tooltip.append(ToolTipPrefix);
+
+        for(int i=0; i<15; i++) {
+            bool alpha = true;
+
+            if(i==0) {text = widget->getPV_Data(); if (text.size() > 0) specData[0] = i;}
+            if(i==1) {text = widget->getPV_Width(); if (text.size() > 0) specData[0] = i;}
+            if(i==2) {text = widget->getPV_Height(); if (text.size() > 0) specData[0] = i;}
+            if(i==3) {text = widget->getPV_Code(); if (text.size() > 0) specData[0] = i;}
+            if(i==4) {text = widget->getPV_BPP(); if (text.size() > 0) specData[0] = i;}
+            // for spectrum pseudo levels
+            if(i==5) {
+                alpha = widget->isAlphaMinLevel();
+                text = widget->getMinLevel();
+                if ((text.size() > 0) && alpha) specData[0] = i;
+            }
+            if(i==6) {
+                alpha = widget->isAlphaMaxLevel();
+                text = widget->getMaxLevel();
+                if ((text.size() > 0) && alpha) specData[0] = i;
+            }
+            // for dataprocessing data x,y,w,h
+            if(i==7) {
+                QStringList thisString = widget->getDataProcChannels().split(";");
+                if(thisString.count() == 4 &&
+                        thisString.at(0).trimmed().length() > 0 &&
+                        thisString.at(1).trimmed().length() > 0  &&
+                        thisString.at(2).trimmed().length() > 0 &&
+                        thisString.at(3).trimmed().length() > 0) {
+                    validDataProcessingChannels = true;
+                    for(int j=0; j<4; j++) {
+                        specData[0] = i+j;   // x,y,w,h
+                        text =  treatMacro(map, thisString.at(j), &doNothing);
+                        addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
+                        pvs.append(pv);
+                        if(j<3)pvs.append(";");
+                    }
+                }
+                if (text.size() > 0) specData[0] = i;
+
+            }
+            if (i==8) {text = widget->getPV_XCPT(); if (text.size() > 0) specData[0] = 11;}
+            if (i==9) {text = widget->getPV_YCPT(); if (text.size() > 0) specData[0] = 12;}
+            if (i==10) {text = widget->getPV_XNEWDATA(); if (text.size() > 0) specData[0] = 13;}
+            if (i==11) {text = widget->getPV_YNEWDATA(); if (text.size() > 0) specData[0] = 14;}
+            if (i==12) {text = widget->getPV_SAVEDATA_PATH(); if (text.size() > 0) specData[0] = 15;}
+            if (i==13) {text = widget->getPV_SAVEDATA_SUBDIR(); if (text.size() > 0) specData[0] = 16;}
+            if (i==14) {text = widget->getPV_SAVEDATA_FILENAME(); if (text.size() > 0) specData[0] = 17;}
+
+            if(text.size() > 0 && alpha) {
+                text =  treatMacro(map, text, &doNothing);
+                if(i!=7) addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
+                if(i==0) widget->setPV_Data(pv);
+                if(i==1) widget->setPV_Width(pv);
+                if(i==2) widget->setPV_Height(pv);
+                if(i==3) widget->setPV_Code(pv);
+                if(i==4) widget->setPV_BPP(pv);
+                if(i==5) widget->setMinLevel(pv);
+                if(i==6) widget->setMaxLevel(pv);
+                if(i==7) widget->setDataProcChannels(pvs);
+
+                if(i==8) widget->setPV_XCPT(pv);
+                if(i==9) widget->setPV_YCPT(pv);
+                if(i==10) widget->setPV_XNEWDATA(pv);
+                if(i==11) widget->setPV_YNEWDATA(pv);
+                if(i==12) widget->setPV_SAVEDATA_PATH(pv);
+                if(i==13) widget->setPV_SAVEDATA_SUBDIR(pv);
+                if(i==14) widget->setPV_SAVEDATA_FILENAME(pv);
+
+                if(i>0) tooltip.append("<br>");
+                if(i!=7) tooltip.append(pv); else tooltip.append(pvs);
+            }
+        }
+
+        // Try adding the monitor for the array data last, to ensure that setPV_YCPT will be called before setPV_Data,
+        // to see if this reduces the likelihood of skipped lines in fast scans.
+        //text = widget->getPV_Data(); if (text.size() > 0) specData[0] = 0;
+        //addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
+        //widget->setPV_Data(pv);
+
+        // finish tooltip
+        tooltip.append(ToolTipPostfix);
+        widget->setToolTip(tooltip);
+
+        widget->setProperty("Taken", true);
+#endif
     }
+
     //==================================================================================================================
 
     // search for a QTabwidget as nearest parent and set it as property
@@ -3034,7 +3180,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 }
                 WaveTable(widget, data);
             } else {
-               widget->displayText(0, NOTCONNECTED, "????");
+                widget->displayText(0, NOTCONNECTED, "????");
             }
 
         } else {
@@ -3042,7 +3188,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 int nbCol = widget->getNumberOfColumns();
                 int nbRow = i*nbCol;
                 for(int j=0; j<nbCol; j++) {
-                   widget->displayText(nbRow+j, NOTCONNECTED, "NC");
+                    widget->displayText(nbRow+j, NOTCONNECTED, "NC");
                 }
             }
         }
@@ -3099,6 +3245,58 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             widget->showDisconnected();
             // todo
         }
+
+#ifdef ADDSCAN2D
+        // scan2d =========================================================
+    } else if (caScan2D *widget = qobject_cast<caScan2D *>(w)) {
+
+        //qDebug() << "Callback_UpdateWidget: caScan2D" << data.pv << data.edata.connected << data.specData[0];
+        if (data.edata.connected) {
+            switch (data.specData[0]) {
+            case 1:        // width channel
+                widget->setWidth((int) data.edata.rvalue); break;
+            case 2: // height channel
+                widget->setHeight((int) data.edata.rvalue); break;
+            case 3: // code channel if present
+                widget->setCode((int) data.edata.rvalue); break;
+            case 4: // bpp channel if present
+                widget->setBPP((int) data.edata.rvalue); break;
+            case 5: // minimum level channel if present
+                widget->updateMin((int) data.edata.rvalue); break;
+            case 6: // maximum level channel if present
+                widget->updateMax((int) data.edata.rvalue); break;
+            case 7: // x center of mass if present
+                widget->dataProcessing((int) data.edata.rvalue, 0); break;
+            case 8: // y center of mass if present
+                widget->dataProcessing((int) data.edata.rvalue, 1); break;
+            case 9: // width if present
+                widget->dataProcessing((int) data.edata.rvalue, 2); break;
+            case 10: // height if present
+                widget->dataProcessing((int) data.edata.rvalue, 3); break;
+            case 11: // XCPT
+                widget->setXCPT((int) data.edata.rvalue); break;
+            case 12: // YCPT
+                widget->setYCPT((int) data.edata.rvalue); break;
+            case 13: // XNEWDATA
+                widget->setXNEWDATA((int) data.edata.rvalue); break;
+            case 14: // YNEWDATA
+                widget->setYNEWDATA((int) data.edata.rvalue); break;
+            case 15: // SAVEDATA_PATH
+                widget->setSAVEDATA_PATH(String); break;
+            case 16: // SAVEDATA_SUBDIR
+                widget->setSAVEDATA_SUBDIR(String); break;
+            case 17: // SAVEDATA_FILENAME
+                widget->setSAVEDATA_FILENAME(String); break;
+
+            case 0: // data channel
+                widget->newArray(data.edata.dataSize, (float*) data.edata.dataB); break;
+            default: // ?
+                break;
+            }
+        } else {
+            //widget->showDisconnected();
+        }
+#endif
 
         // messagebutton, yust treat access ==========================================================================
     } else if (caMessageButton *widget = qobject_cast<caMessageButton *>(w)) {
@@ -4074,6 +4272,22 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         // add acion : kill associated process if running
         if(!widget->getAccessW()) myMenu.addAction("Kill Process");
 
+#ifdef ADDSCAN2D
+    } else if(caScan2D* widget = qobject_cast<caScan2D *>(w)) {
+        nbPV=0;
+        for(int i=0; i< 5; i++) {
+            QString text;
+            if(i==0) text = widget->getPV_Data();
+            if(i==1) text = widget->getPV_Width();
+            if(i==2) text = widget->getPV_Height();
+            if(i==3) text = widget->getPV_Code();
+            if(i==4) text = widget->getPV_BPP();
+            if(text.size() > 0) {
+                pv[nbPV] = text;
+                nbPV++;
+            }
+        }
+#endif
     } else if(className.contains("QE")) {
         qDebug() << "treat" << w;
 
@@ -4449,6 +4663,33 @@ void CaQtDM_Lib::ShowContextMenu(const QPoint& position) // this is a slot
 {
     Q_UNUSED(position);
     DisplayContextMenu(qobject_cast<QWidget *>(sender()));
+}
+
+/**
+  * this function will return true when a pv is doing something on its own (Ex: incrementing)
+  */
+bool CaQtDM_Lib::PrimarySoftPV(QWidget* widget, QMap<QString, QString> map)
+{
+        if (caCalc *w = qobject_cast<caCalc *>(widget)) {
+            QString strng[5];
+            bool doNothing = false;
+
+            strng[0] = w->getChannelA();
+            strng[1] = w->getChannelB();
+            strng[2] = w->getChannelC();
+            strng[3] = w->getChannelD();
+            strng[4] = w->getVariable();
+            for(int i=0; i<5; i++) {
+               QString trimmedPV = strng[i].trimmed();
+               strng[i] = treatMacro(map, trimmedPV, &doNothing);
+            }
+            for(int i=0; i<4; i++) {
+                if(strng[4] == strng[i]) return true;
+            }
+            return false;
+        } else {
+            return false;
+        }
 }
 
 /**

@@ -26,6 +26,11 @@ NETWORKDOWNLOADSUPPORT {
 DEFINES += NETWORKDOWNLOADSUPPORT
 }
 
+
+unix:!macx | win32: {
+DEFINES += ADDSCAN2D
+}
+
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 

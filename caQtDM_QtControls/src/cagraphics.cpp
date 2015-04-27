@@ -27,13 +27,6 @@
 #include <QPainter>
 #include <QDebug>
 #include "alarmdefs.h"
-/*
-#include <QtDesigner/abstractformwindow.h>
-#include <QtDesigner/QExtensionManager>
-#include <QtDesigner/QDesignerFormEditorInterface>
-#include <QtDesigner/QDesignerPropertySheetExtension>
-#include <iostream>
-*/
 
 #include <math.h>
 #include "cagraphics.h"
@@ -47,7 +40,7 @@ caGraphics::caGraphics( QWidget *parent) :  QWidget(parent)
     thisChannelB="";
     thisChannelC="";
     thisChannelD="";
-    thisForm = Rectangle;
+    setForm(Rectangle);
     thisLineSize = 1;
     thisLineColor = Qt::black;
     thisForeColor = Qt::black;
@@ -100,14 +93,42 @@ void caGraphics::setColorMode(colMode colormode)
     thisColorMode = colormode;
 }
 
+bool caGraphics::isPropertyVisible(Properties property)
+{
+    return designerVisible[property];
+}
+
+void caGraphics::setPropertyVisible(Properties property, bool visible)
+{
+    designerVisible[property] = visible;
+}
+
 void caGraphics::setForm(Form form)
 {
     thisForm = form;
-/*
-    QStringList List;
-    List << "arrowSize";
-    setPropertyEditorItems((QWidget*) this, List, false);
-*/
+
+    setPropertyVisible(arrowsize, false);
+    setPropertyVisible(arrowmode, false);
+    setPropertyVisible(startangle, false);
+    setPropertyVisible(spanangle, false);
+    setPropertyVisible(tiltangle, true);
+
+    switch (form) {
+    case Rectangle:
+    case Circle:
+    case Triangle:
+    case Line:
+        break;
+    case Arc:
+        setPropertyVisible(startangle, true);
+        setPropertyVisible(spanangle, true);
+        setPropertyVisible(tiltangle, false);
+        break;
+    case Arrow:
+         setPropertyVisible(arrowsize, true);
+         setPropertyVisible(arrowmode, true);
+        break;
+    }
     update();
 }
 
@@ -378,66 +399,5 @@ void caGraphics::paintEvent( QPaintEvent *event )
 
 }
 
-/*
-//================================================== ===================
-// METHOD : setPropertyEditorItems()
-//
-// DESCRIPTION:
-// Used by plugins in order to hide/show specific property editor properties
-//
-// PRECONDITIONS:
-// A valid list of properties
-//
-// POSTCONDITIONS:
-// NONE
-//
-// EXCEPTIONS:
-// NONE
-//
-// PARAMETERS:
-// pTheWidget: A Pointer to the widget whos properties in designer are to be updated
-// QStringListToChange: the QStringList list of the names of property editor properties to hide or show
-// bShowProperties: A bool, when true, will show the properties in QStringListToHide, when false will hide them
-//
-// RETURN VALUE:
-// True if able to complete operation, false otherwise
-//================================================== ===================
-bool caGraphics::setPropertyEditorItems(QWidget *pTheWidget, QStringList QStringListToChange, bool bShowProperties)
-{
-    bool bRetVal = false;
-    int iLoopVal, iPropertyIndex;
-    QDesignerFormWindowInterface *pFormWindow = 0;
 
-    // attempting to get a pointer to the property editor control methods
-    pFormWindow = QDesignerFormWindowInterface::findFormWindow(pTheWidget);
-    if (pFormWindow && false == QStringListToChange.isEmpty())
-    {
-        bRetVal = true;
-
-        QDesignerFormEditorInterface *pFormEditor = pFormWindow->core();
-        QExtensionManager *pExtensionManager = pFormEditor->extensionManager();
-        QDesignerPropertySheetExtension *pPropertySheet;
-        pPropertySheet = qt_extension<QDesignerPropertySheetExtension*>(pExtensionManager, pTheWidget);
-
-        // now traversing our list and setting the properties accordingly
-        for (iLoopVal = 0; iLoopVal < QStringListToChange.size(); iLoopVal++)
-        {
-            iPropertyIndex = pPropertySheet->indexOf(QStringListToChange[iLoopVal]);
-            std::cout << "name is " << pPropertySheet->propertyName(iPropertyIndex).toStdString() << std::endl;
-            std::cout << "Found index of " << iPropertyIndex << " for string " << QStringListToChange[iLoopVal].toStdString() << std::endl;
-            std::cout << "Setting value to " << bShowProperties << std::endl;
-
-            // visibility does not work, however changing value works
-
-            pPropertySheet->setVisible(iPropertyIndex, true);
-            pPropertySheet->setProperty(iPropertyIndex, 100);
-            pPropertySheet->setChanged(iPropertyIndex, true);
-
-        }
-        delete pPropertySheet;
-
-    }
-    return bRetVal;
-}
-*/
 

@@ -231,5 +231,16 @@ public:
     caMeterInterface(QObject* parent);
     virtual QWidget* createWidget(QWidget* parent);
 };
-
+ 
+#ifdef ADDSCAN2D
+class caScan2DInterface : public CustomWidgetInterface_Monitors
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerCustomWidgetInterface)
+	
+public:
+    caScan2DInterface(QObject* parent);
+    virtual QWidget* createWidget(QWidget* parent);
+};
+#endif
 #endif
