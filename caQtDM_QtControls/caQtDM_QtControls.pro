@@ -78,7 +78,7 @@ win32 {
                src/mda-load.h \
                src/xdr_hack.h
 
-     DEFINES += XDR_HACK
+     DEFINES += XDR_HACK XDR_LE
 }
 PRE_TARGETDEPS += \
      moc/moc_caslider.cpp \
