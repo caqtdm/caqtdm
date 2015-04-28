@@ -141,17 +141,15 @@ SOURCES	+= \
     src/specialFunctions.cpp \
     src/caclock.cpp \
     src/cameter.cpp
+
+# add support scan2D
+ADDSCAN2D {
 SOURCES	+= src/cascan2d.cpp \
     src/mdaReader.cpp \
     src/mda_loader.c
 HEADERS += src/cascan2d.h \
     src/mdaReader.h \
     src/mda-load.h
-}
-
-XDR_HACK: {
-    SOURCES += src/xdr_hack.c
-    HEADERS += src/xdr_hack.h
 }
 
 NETWORKDOWNLOADSUPPORT: {
