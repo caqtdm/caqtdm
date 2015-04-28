@@ -152,6 +152,11 @@ HEADERS += src/cascan2d.h \
     src/mda-load.h
 }
 
+XDR_HACK {
+    SOURCES += src/xdr_hack.c
+    HEADERS += src/xdr_hack.h
+}
+
 NETWORKDOWNLOADSUPPORT: {
 QT += network
 HEADERS += \
