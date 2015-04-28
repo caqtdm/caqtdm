@@ -674,14 +674,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
             bool doit;
 
-            qDebug() <<  "treatPrimary:" << treatPrimary << widget->getVariable() << widget << PrimarySoftPV(widget, map);
+            //qDebug() <<  "treatPrimary:" << treatPrimary << widget->getVariable() << widget << PrimarySoftPV(widget, map);
 
             // "primary" softchannels have to be done first
             if(PrimarySoftPV(widget, map) && treatPrimary) doit=true;
             else if(!PrimarySoftPV(widget, map) && !treatPrimary) doit=true;
             else return;
-
-            qDebug() << "treatPrimary:" << treatPrimary << "doit:" << doit;
 
             // soft channel
             kData.soft = true;
