@@ -68,17 +68,6 @@ win32 {
                 LIBS += $$(QWTHOME)/lib/qwt.lib
          }
      }
-# add support scan2D
-    SOURCES += src/cascan2d.cpp \
-               src/mdaReader.cpp \
-               src/mda_loader.c \
-               src/xdr_hack.c
-    HEADERS += src/cascan2d.h \
-               src/mdaReader.h \
-               src/mda-load.h \
-               src/xdr_hack.h
-
-     DEFINES += XDR_HACK XDR_LE
 }
 PRE_TARGETDEPS += \
      moc/moc_caslider.cpp \
@@ -154,7 +143,7 @@ SOURCES	+= \
     src/cameter.cpp
 
 # add support scan2D
-unix:!macx {
+ADDSCAN2D {
 SOURCES	+= src/cascan2d.cpp \
     src/mdaReader.cpp \
     src/mda_loader.c
