@@ -1053,6 +1053,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
         widget->setPV(pv);
 
+        QString text =  treatMacro(map, widget->text(), &doNothing);
+        text.replace(QString::fromWCharArray(L"\u00A6"), " ");    // replace Â¦ with a blanc (was used in macros for creating blancs)
+        widget->setText(text);
+
         widget->raise();
 
         widget->setProperty("Taken", true);
