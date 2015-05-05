@@ -227,7 +227,11 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     if (sharedMemory.attach()) {
         _isRunning = true;
         if(attach) {
+#ifdef Q_WS_X11
             qDebug() << "caQtDM -- another instance of caQtDM detected ==> attach to it (" << DisplayString(QX11Info::display()) <<")" ;
+#else
+            qDebug() << "caQtDM -- another instance of caQtDM detected ==> attach to it";
+#endif
             QString message(filename);
             message.append(";");
             message.append(macroString);
