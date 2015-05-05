@@ -1738,7 +1738,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         widget->setToolTip("select row or columns, then with Ctrl+C you can copy to the clipboard\ninside X11 you can then do shft+ins\nwhen doubleclicking on a value, you can change the value");
 
         //==================================================================================================================
-#ifdef ADDSCAN2D
+
     } else if(caScan2D* widget = qobject_cast<caScan2D *>(w1)) {
 
         //qDebug() << "create caScan2D";
@@ -1747,18 +1747,19 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         // addmonitor normally will add a tooltip to show the pv; however here we have more than one pv
         QString tooltip;
+        QString pvs1= "";
+        QString pvs2= "";
         QString pvs= "";
-        bool validDataProcessingChannels = false;
+
         tooltip.append(ToolTipPrefix);
 
-        for(int i=0; i<15; i++) {
+        for(int i=0; i<17; i++) {
             bool alpha = true;
+            text = "";
 
             if(i==0) {text = widget->getPV_Data(); if (text.size() > 0) specData[0] = i;}
             if(i==1) {text = widget->getPV_Width(); if (text.size() > 0) specData[0] = i;}
             if(i==2) {text = widget->getPV_Height(); if (text.size() > 0) specData[0] = i;}
-            if(i==3) {text = widget->getPV_Code(); if (text.size() > 0) specData[0] = i;}
-            if(i==4) {text = widget->getPV_BPP(); if (text.size() > 0) specData[0] = i;}
             // for spectrum pseudo levels
             if(i==5) {
                 alpha = widget->isAlphaMinLevel();
@@ -1770,26 +1771,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                 text = widget->getMaxLevel();
                 if ((text.size() > 0) && alpha) specData[0] = i;
             }
-            // for dataprocessing data x,y,w,h
-            if(i==7) {
-                QStringList thisString = widget->getDataProcChannels().split(";");
-                if(thisString.count() == 4 &&
-                        thisString.at(0).trimmed().length() > 0 &&
-                        thisString.at(1).trimmed().length() > 0  &&
-                        thisString.at(2).trimmed().length() > 0 &&
-                        thisString.at(3).trimmed().length() > 0) {
-                    validDataProcessingChannels = true;
-                    for(int j=0; j<4; j++) {
-                        specData[0] = i+j;   // x,y,w,h
-                        text =  treatMacro(map, thisString.at(j), &doNothing);
-                        addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
-                        pvs.append(pv);
-                        if(j<3)pvs.append(";");
-                    }
-                }
-                if (text.size() > 0) specData[0] = i;
-
-            }
             if (i==8) {text = widget->getPV_XCPT(); if (text.size() > 0) specData[0] = 11;}
             if (i==9) {text = widget->getPV_YCPT(); if (text.size() > 0) specData[0] = 12;}
             if (i==10) {text = widget->getPV_XNEWDATA(); if (text.size() > 0) specData[0] = 13;}
@@ -1798,18 +1779,37 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             if (i==13) {text = widget->getPV_SAVEDATA_SUBDIR(); if (text.size() > 0) specData[0] = 16;}
             if (i==14) {text = widget->getPV_SAVEDATA_FILENAME(); if (text.size() > 0) specData[0] = 17;}
 
+            // for dataprocessing data x,y,w,h ROI read and write
+            if(i > 14) {
+                QStringList thisString;
+                if(i==15) thisString = widget->getROIChannelsRead().split(";");
+                if(i==16) thisString = widget->getROIChannelsWrite().split(";");
+
+                if(thisString.count() == 4 &&
+                        thisString.at(0).trimmed().length() > 0 &&
+                        thisString.at(1).trimmed().length() > 0  &&
+                        thisString.at(2).trimmed().length() > 0 &&
+                        thisString.at(3).trimmed().length() > 0) {
+                    for(int j=0; j<4; j++) {
+                        if(i==15)specData[0] = i+j+3;   // x,y,w,h
+                        text = treatMacro(map, thisString.at(j), &doNothing);
+                        if(i==15)addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
+                        if(i==15)pvs1.append(pv);
+                        if(i==16)pvs2.append(text);
+                        if((j<3) && (i==15))pvs1.append(";");
+                        if((j<3) && (i==16))pvs2.append(";");
+                    }
+                }
+            }
+
             if(text.size() > 0 && alpha) {
                 text =  treatMacro(map, text, &doNothing);
-                if(i!=7) addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
+                if((i!=15) && (i!=16)) addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
                 if(i==0) widget->setPV_Data(pv);
                 if(i==1) widget->setPV_Width(pv);
                 if(i==2) widget->setPV_Height(pv);
-                if(i==3) widget->setPV_Code(pv);
-                if(i==4) widget->setPV_BPP(pv);
                 if(i==5) widget->setMinLevel(pv);
                 if(i==6) widget->setMaxLevel(pv);
-                if(i==7) widget->setDataProcChannels(pvs);
-
                 if(i==8) widget->setPV_XCPT(pv);
                 if(i==9) widget->setPV_YCPT(pv);
                 if(i==10) widget->setPV_XNEWDATA(pv);
@@ -1818,8 +1818,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                 if(i==13) widget->setPV_SAVEDATA_SUBDIR(pv);
                 if(i==14) widget->setPV_SAVEDATA_FILENAME(pv);
 
+
                 if(i>0) tooltip.append("<br>");
-                if(i!=7) tooltip.append(pv); else tooltip.append(pvs);
+                if(i<15) tooltip.append(pv);
+                else if(i==15) tooltip.append(pvs1);
+                else if(i==16) tooltip.append(pvs2);
             }
         }
 
@@ -1834,7 +1837,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         widget->setToolTip(tooltip);
 
         widget->setProperty("Taken", true);
-#endif
     }
 
     //==================================================================================================================
@@ -3244,7 +3246,6 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             // todo
         }
 
-#ifdef ADDSCAN2D
         // scan2d =========================================================
     } else if (caScan2D *widget = qobject_cast<caScan2D *>(w)) {
 
@@ -3255,22 +3256,10 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 widget->setWidth((int) data.edata.rvalue); break;
             case 2: // height channel
                 widget->setHeight((int) data.edata.rvalue); break;
-            case 3: // code channel if present
-                widget->setCode((int) data.edata.rvalue); break;
-            case 4: // bpp channel if present
-                widget->setBPP((int) data.edata.rvalue); break;
             case 5: // minimum level channel if present
                 widget->updateMin((int) data.edata.rvalue); break;
             case 6: // maximum level channel if present
                 widget->updateMax((int) data.edata.rvalue); break;
-            case 7: // x center of mass if present
-                widget->dataProcessing((int) data.edata.rvalue, 0); break;
-            case 8: // y center of mass if present
-                widget->dataProcessing((int) data.edata.rvalue, 1); break;
-            case 9: // width if present
-                widget->dataProcessing((int) data.edata.rvalue, 2); break;
-            case 10: // height if present
-                widget->dataProcessing((int) data.edata.rvalue, 3); break;
             case 11: // XCPT
                 widget->setXCPT((int) data.edata.rvalue); break;
             case 12: // YCPT
@@ -3285,7 +3274,14 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 widget->setSAVEDATA_SUBDIR(String); break;
             case 17: // SAVEDATA_FILENAME
                 widget->setSAVEDATA_FILENAME(String); break;
-
+            case 18:  // x center of mass if present
+                widget->dataProcessing((int) data.edata.rvalue, 0); break;
+            case 19: // y center of mass if present
+                widget->dataProcessing((int) data.edata.rvalue, 1); break;
+            case 20: // width if present
+                widget->dataProcessing((int) data.edata.rvalue, 2); break;
+            case 21: // height if present
+                widget->dataProcessing((int) data.edata.rvalue, 3); break;
             case 0: // data channel
                 widget->newArray(data.edata.dataSize, (float*) data.edata.dataB); break;
             default: // ?
@@ -3294,7 +3290,6 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         } else {
             //widget->showDisconnected();
         }
-#endif
 
         // messagebutton, yust treat access ==========================================================================
     } else if (caMessageButton *widget = qobject_cast<caMessageButton *>(w)) {
@@ -4270,7 +4265,6 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         // add acion : kill associated process if running
         if(!widget->getAccessW()) myMenu.addAction("Kill Process");
 
-#ifdef ADDSCAN2D
     } else if(caScan2D* widget = qobject_cast<caScan2D *>(w)) {
         nbPV=0;
         for(int i=0; i< 5; i++) {
@@ -4278,14 +4272,12 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             if(i==0) text = widget->getPV_Data();
             if(i==1) text = widget->getPV_Width();
             if(i==2) text = widget->getPV_Height();
-            if(i==3) text = widget->getPV_Code();
-            if(i==4) text = widget->getPV_BPP();
             if(text.size() > 0) {
                 pv[nbPV] = text;
                 nbPV++;
             }
         }
-#endif
+
     } else if(className.contains("QE")) {
         qDebug() << "treat" << w;
 
@@ -4312,8 +4304,39 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         if(widget->getFitToSize() == caCamera::Yes) menuAction->setChecked(true);
         else  menuAction->setChecked(false);
         myMenu.addAction("Get Info");
-        myMenu.addAction("Set Spectrum");
         myMenu.addAction("Set Greyscale");
+        myMenu.addAction("Set Spectrum Wavelength");
+        myMenu.addAction("Set Spectrum Hot");
+        myMenu.addAction("Set Spectrum Heat");
+        myMenu.addAction("Set Spectrum Jet");
+        myMenu.addAction("Set Spectrum Custom");
+
+        // for the scan2d widget
+    } else if(caScan2D * widget = qobject_cast< caScan2D *>(w)) {
+        Q_UNUSED(widget);
+        QAction *menuAction;
+        menuAction = myMenu.addAction("Toggle fit to size");
+        menuAction->setCheckable(true);
+        if(widget->getFitToSize() == caScan2D::Yes) menuAction->setChecked(true);
+        else  menuAction->setChecked(false);
+        myMenu.addAction("Get Info");
+        myMenu.addAction("Set Greyscale");
+        myMenu.addAction("Set Spectrum Wavelength");
+        myMenu.addAction("Set Spectrum Hot");
+        myMenu.addAction("Set Spectrum Heat");
+        myMenu.addAction("Set Spectrum Jet");
+        myMenu.addAction("Set Spectrum Custom");
+
+        // for the waterfall widget
+    } else if(caWaterfallPlot * widget = qobject_cast< caWaterfallPlot *>(w)) {
+        Q_UNUSED(widget);
+        myMenu.addAction("Get Info");
+        myMenu.addAction("Set Greyscale");
+        myMenu.addAction("Set Spectrum Wavelength");
+        myMenu.addAction("Set Spectrum Hot");
+        myMenu.addAction("Set Spectrum Heat");
+        myMenu.addAction("Set Spectrum Jet");
+        myMenu.addAction("Set Spectrum Custom");
 
     // for the slider
     } else if(caSlider * widget = qobject_cast< caSlider *>(w)) {
@@ -4383,12 +4406,40 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 if(widget->getFitToSize() == caCamera::Yes) widget->setFitToSize(caCamera::No);
                 else widget->setFitToSize(caCamera::Yes);
             }
+            else if(caScan2D * widget = qobject_cast< caScan2D *>(w)) {
+                if(widget->getFitToSize() == caScan2D::Yes) widget->setFitToSize(caScan2D::No);
+                else widget->setFitToSize(caScan2D::Yes);
+            }
 
-        } else  if(selectedItem->text().contains("Set Spectrum")) {
-            if(caCamera * widget = qobject_cast< caCamera *>(w)) widget->setColormap(caCamera::spectrum);
+        } else  if(selectedItem->text().contains("Set Spectrum Wavelength")) {
+            if(caCamera * widget = qobject_cast< caCamera *>(w)) widget->setColormap(caCamera::spectrum_wavelength);
+            else if(caScan2D * widget = qobject_cast< caScan2D *>(w)) widget->setColormap(caScan2D::spectrum_wavelength);
+            else if(caWaterfallPlot * widget = qobject_cast< caWaterfallPlot *>(w)) widget->setColormap(caWaterfallPlot::spectrum_wavelength);
+
+        } else  if(selectedItem->text().contains("Set Spectrum Hot")) {
+            if(caCamera * widget = qobject_cast< caCamera *>(w)) widget->setColormap(caCamera::spectrum_hot);
+            else if(caScan2D * widget = qobject_cast< caScan2D *>(w)) widget->setColormap(caScan2D::spectrum_hot);
+            else if(caWaterfallPlot * widget = qobject_cast< caWaterfallPlot *>(w)) widget->setColormap(caWaterfallPlot::spectrum_hot);
+
+        } else  if(selectedItem->text().contains("Set Spectrum Heat")) {
+            if(caCamera * widget = qobject_cast< caCamera *>(w)) widget->setColormap(caCamera::spectrum_heat);
+            else if(caScan2D * widget = qobject_cast< caScan2D *>(w)) widget->setColormap(caScan2D::spectrum_heat);
+            else if(caWaterfallPlot * widget = qobject_cast< caWaterfallPlot *>(w)) widget->setColormap(caWaterfallPlot::spectrum_heat);
+
+        } else  if(selectedItem->text().contains("Set Spectrum Jet")) {
+            if(caCamera * widget = qobject_cast< caCamera *>(w)) widget->setColormap(caCamera::spectrum_jet);
+            else if(caScan2D * widget = qobject_cast< caScan2D *>(w)) widget->setColormap(caScan2D::spectrum_jet);
+            else if(caWaterfallPlot * widget = qobject_cast< caWaterfallPlot *>(w)) widget->setColormap(caWaterfallPlot::spectrum_jet);
+
+        } else  if(selectedItem->text().contains("Set Spectrum Custom")) {
+            if(caCamera * widget = qobject_cast< caCamera *>(w)) widget->setColormap(caCamera::spectrum_custom);
+            else if(caScan2D * widget = qobject_cast< caScan2D *>(w)) widget->setColormap(caScan2D::spectrum_custom);
+            else if(caWaterfallPlot * widget = qobject_cast< caWaterfallPlot *>(w)) widget->setColormap(caWaterfallPlot::spectrum_custom);
 
         } else  if(selectedItem->text().contains("Set Greyscale")) {
            if(caCamera * widget = qobject_cast< caCamera *>(w)) widget->setColormap(caCamera::grey);
+           else if(caScan2D * widget = qobject_cast< caScan2D *>(w)) widget->setColormap(caScan2D::grey);
+           else if(caWaterfallPlot * widget = qobject_cast< caWaterfallPlot *>(w)) widget->setColormap(caWaterfallPlot::grey);
 
         } else  if(selectedItem->text().contains("Include files")) {
             QString info;
@@ -5745,7 +5796,7 @@ void CaQtDM_Lib::mouseReleaseEvent(QMouseEvent *event)
         if (caCamera *widget = qobject_cast<caCamera *>(w->parent()->parent()->parent())) {
             int x,y,w,h;
 
-                enum ROI_type {upperleftxy_width_height=0, upperleftxy_lowerleftxy, centerxy_width_height};
+            enum ROI_type {upperleftxy_width_height=0, upperleftxy_lowerleftxy, centerxy_width_height};
 
             if(widget->getROI(x, y, w, h)) {
                 int values[4];
@@ -5759,6 +5810,47 @@ void CaQtDM_Lib::mouseReleaseEvent(QMouseEvent *event)
                     values[2]=w;
                     values[3]=h;
                 } else if(widget->getROIwriteType() == caCamera::upperleftxy_lowerleftxy){
+                    values[2]=x+w;
+                    values[3]=y+h;
+                } else {
+                    values[2]=w;
+                    values[3]=h;
+                }
+                // write to pv when defined
+                QStringList thisString = widget->getROIChannelsWrite().split(";");
+
+                if(thisString.count() == 4 &&
+                        thisString.at(0).trimmed().length() > 0 &&
+                        thisString.at(1).trimmed().length() > 0 &&
+                        thisString.at(2).trimmed().length() > 0 &&
+                        thisString.at(3).trimmed().length() > 0) {
+
+                    if(!widget->getAccessW()) return;
+                    for(int i=0; i<4; i++) {
+                        int32_t idata = (int32_t) values[i];
+                        float rdata = (float) values[i];
+                        TreatOrdinaryValue(thisString.at(i), rdata,  idata, (QWidget*) widget);
+                    }
+                }
+            }
+        }
+        else if (caScan2D *widget = qobject_cast<caScan2D *>(w->parent()->parent()->parent())) {
+            int x,y,w,h;
+
+                enum ROI_type {upperleftxy_width_height=0, upperleftxy_lowerleftxy, centerxy_width_height};
+
+            if(widget->getROI(x, y, w, h)) {
+                int values[4];
+                values[0] = x;
+                values[1] = y;
+
+                // we seem to want center, width and height
+                if(widget->getROIwriteType() == caScan2D::centerxy_width_height) {
+                    values[0] = x+w/2;
+                    values[1] = y+h/2;
+                    values[2]=w;
+                    values[3]=h;
+                } else if(widget->getROIwriteType() == caScan2D::upperleftxy_lowerleftxy){
                     values[2]=x+w;
                     values[3]=y+h;
                 } else {

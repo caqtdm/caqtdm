@@ -49,6 +49,8 @@
 #include <time.h>
 #include <sys/timeb.h>
 
+#include "colormaps.h"
+
 class QTCON_EXPORT caCamera : public QWidget
 {
     Q_OBJECT
@@ -60,13 +62,14 @@ class QTCON_EXPORT caCamera : public QWidget
     Q_PROPERTY(QString channelBPP READ getPV_BPP WRITE setPV_BPP)
     Q_PROPERTY(bool simpleZoomedView READ getSimpleView WRITE setSimpleView)
     Q_PROPERTY(zoom Zoom READ getFitToSize WRITE setFitToSize)
-    Q_PROPERTY(colormap ColorMap READ getColormap WRITE setColormap)
+
     Q_PROPERTY(bool automaticLevels READ getInitialAutomatic WRITE setInitialAutomatic)
     Q_PROPERTY(QString minLevel READ getMinLevel WRITE setMinLevel)
     Q_PROPERTY(QString maxLevel READ getMaxLevel WRITE setMaxLevel)
 
-    Q_PROPERTY(QString customColorMap READ getCustomMap WRITE setCustomMap)
-    Q_PROPERTY(bool discreteCustomColorMap READ getDiscreteCustomMap WRITE setDiscreteCustomMap)
+    Q_PROPERTY(colormap ColorMap READ getColormap WRITE setColormap)
+    Q_PROPERTY(QString customColorMap READ getCustomMap WRITE setCustomMap  DESIGNABLE isPropertyVisible(customcolormap))
+    Q_PROPERTY(bool discreteCustomColorMap READ getDiscreteCustomMap WRITE setDiscreteCustomMap DESIGNABLE isPropertyVisible(discretecolormap))
 
     Q_PROPERTY(QString dimensionMarking_Channels READ getROIChannelsRead WRITE setROIChannelsRead)
     Q_PROPERTY(ROI_type ROI_writeType READ getROIwriteType WRITE setROIwriteType)
@@ -78,8 +81,9 @@ class QTCON_EXPORT caCamera : public QWidget
 
 public:
     enum zoom {No=0, Yes};
-    enum colormap { Default=0, grey, spectrum};
+    enum colormap {grey=0, spectrum_wavelength, spectrum_hot, spectrum_heat, spectrum_jet, spectrum_custom};
     enum ROI_type {upperleftxy_width_height=0, upperleftxy_lowerleftxy, centerxy_width_height};
+    enum Properties { customcolormap = 0, discretecolormap};
 
     caCamera(QWidget *parent = 0);
     ~caCamera();
@@ -136,6 +140,9 @@ public:
     QString getMaxLevel() const {return thisMaxLevel;}
     bool isAlphaMaxLevel();
     void setMaxLevel(QString const &level);
+
+    bool isPropertyVisible(Properties property);
+    void setPropertyVisible(Properties property, bool visible);
 
     void setCode(int code);
     void setBPP(int bpp);
@@ -242,6 +249,8 @@ private:
     bool thisSimpleView;
     bool thisInitialAutomatic;
     bool thisDiscreteMap;
+
+    bool designerVisible[10];
 };
 
 #endif

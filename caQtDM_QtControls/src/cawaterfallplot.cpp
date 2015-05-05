@@ -29,102 +29,10 @@
 
 #include "cawaterfallplot.h"
 
-
-
 __inline double gauss(double x)
 {
     return exp(-0.5*x*x);
 }
-
-class ColorMap_Color: public QwtLinearColorMap
-{
-public:
-    ColorMap_Color():QwtLinearColorMap(Qt::darkCyan, Qt::red)
-    {
-        addColorStop(0.1, Qt::cyan);
-        addColorStop(0.6, Qt::green);
-        addColorStop(0.9, Qt::yellow);
-    }
-
-};
-
-class ColorMap_Grey: public QwtLinearColorMap
-{
-public:
-    ColorMap_Grey():QwtLinearColorMap(Qt::black, Qt::white)
-    {
-    }
-};
-
-class ColorMap_Heat: public QwtLinearColorMap
-{
-public:
-    ColorMap_Heat(): QwtLinearColorMap(QColor(0,0,189), QColor(132,0,0))
-    {
-        double pos;
-        pos = 1.0/13.0*1.0; addColorStop(pos, QColor(0,0,255));
-        pos = 1.0/13.0*2.0; addColorStop(pos, QColor(0,66,255));
-        pos = 1.0/13.0*3.0; addColorStop(pos, QColor(0,132,255));
-        pos = 1.0/13.0*4.0; addColorStop(pos, QColor(0,189,255));
-        pos = 1.0/13.0*5.0; addColorStop(pos, QColor(0,255,255));
-        pos = 1.0/13.0*6.0; addColorStop(pos, QColor(66,255,189));
-        pos = 1.0/13.0*7.0; addColorStop(pos, QColor(132,255,132));
-        pos = 1.0/13.0*8.0; addColorStop(pos, QColor(189,255,66));
-        pos = 1.0/13.0*9.0; addColorStop(pos, QColor(255,255,0));
-        pos = 1.0/13.0*10.0; addColorStop(pos, QColor(255,189,0));
-        pos = 1.0/13.0*12.0; addColorStop(pos, QColor(255,66,0));
-        pos = 1.0/13.0*13.0; addColorStop(pos, QColor(189,0,0));
-    }
-};
-
-class ColorMap_Custom: public QwtLinearColorMap
-{
-public:
-    ColorMap_Custom():QwtLinearColorMap(QColor(80,80,0), QColor(100,0,0))
-    {
-        double r,g,b;
-        for (int i = 0; i < 255; ++i) {
-            rgbFromWaveLength(380.0 + (i * 400.0 / 255), r, g, b);
-            addColorStop((double)(i)/255.0, QColor((int) r, (int) g, (int) b));
-        }
-    }
-private:
-    void rgbFromWaveLength(double wave, double &r, double &g, double &b)
-    {
-        r = 0.0;
-        g = 0.0;
-        b = 0.0;
-
-        if (wave >= 380.0 && wave <= 440.0) {
-            r = -1.0 * (wave - 440.0) / (440.0 - 380.0);
-            b = 1.0;
-        } else if (wave >= 440.0 && wave <= 490.0) {
-            g = (wave - 440.0) / (490.0 - 440.0);
-            b = 1.0;
-        } else if (wave >= 490.0 && wave <= 510.0) {
-            g = 1.0;
-            b = -1.0 * (wave - 510.0) / (510.0 - 490.0);
-        } else if (wave >= 510.0 && wave <= 580.0) {
-            r = (wave - 510.0) / (580.0 - 510.0);
-            g = 1.0;
-        } else if (wave >= 580.0 && wave <= 645.0) {
-            r = 1.0;
-            g = -1.0 * (wave - 645.0) / (645.0 - 580.0);
-        } else if (wave >= 645.0 && wave <= 780.0) {
-            r = 1.0;
-        }
-
-        double s = 1.0;
-        if (wave > 700.0)
-            s = 0.3 + 0.7 * (780.0 - wave) / (780.0 - 700.0);
-        else if (wave <  420.0)
-            s = 0.3 + 0.7 * (wave - 380.0) / (420.0 - 380.0);
-
-        r = pow(r * s, 0.8) * 255;
-        g = pow(g * s, 0.8) * 255;
-        b = pow(b * s, 0.8) * 255;
-    }
-};
 
 caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent)
 {
@@ -148,7 +56,7 @@ caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent)
     d_spectrogram->setRenderThreadCount(0); // use system specific thread count
 
     // set a colormap for it
-    d_spectrogram->setColorMap(new ColorMap_Heat());
+    d_spectrogram->setColorMap(new ColorMap_Wavelength());
 
     // define data
     m_data = new SpectrogramData();
@@ -186,6 +94,9 @@ caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent)
     setXaxisEnabled(true);
     setYaxisEnabled(true);
 
+    setCustomMap("");
+    setDiscreteCustomMap(false);
+
     updatePlot();
 
     firstMonitorPlot = firstDemoPlot = firstTimerPlot = true;
@@ -204,6 +115,16 @@ caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent)
     connect(Timer, SIGNAL(timeout()), this, SLOT(TimeOut()));
 }
 
+bool caWaterfallPlot::isPropertyVisible(Properties property)
+{
+    return designerVisible[property];
+}
+
+void caWaterfallPlot::setPropertyVisible(Properties property, bool visible)
+{
+    designerVisible[property] = visible;
+}
+
 void caWaterfallPlot::setRows(int const &rows)
 {
     thisRows = rows;
@@ -220,7 +141,7 @@ void caWaterfallPlot::updatePlot()
     QwtScaleWidget *rightAxis = plot->axisWidget(QwtPlot::yRight);
     rightAxis->setTitle("Intensity");
     rightAxis->setColorBarEnabled(true);
-    rightAxis->setColorMap(QwtInterval(thisIntensityMin, thisIntensityMax), new ColorMap_Heat());
+    rightAxis->setColorMap(QwtInterval(thisIntensityMin, thisIntensityMax), new ColorMap_Wavelength());
     plot->setAxisScale(QwtPlot::yRight, thisIntensityMin, thisIntensityMax);
     plot->enableAxis(QwtPlot::yRight);
 
@@ -479,6 +400,63 @@ void caWaterfallPlot::TimeOut()
         myReplot();
     }
 }
+
+void caWaterfallPlot::setColormap(colormap const &map)
+{
+    thisColormap = map;
+    setPropertyVisible(customcolormap, false);
+    setPropertyVisible(discretecolormap, false);
+
+    switch (map) {
+
+    case grey:
+        d_spectrogram->setColorMap(new ColorMap_Grey());
+        break;
+    case spectrum_wavelength:
+        d_spectrogram->setColorMap(new ColorMap_Wavelength());
+        break;
+    case spectrum_hot:
+        d_spectrogram->setColorMap(new ColorMap_Hot());
+        break;
+    case spectrum_heat:
+        d_spectrogram->setColorMap(new ColorMap_Heat());
+        break;
+    case spectrum_jet:
+        d_spectrogram->setColorMap(new ColorMap_Jet());
+        break;
+    case spectrum_custom: {
+        int *colorIndexes=NULL;
+        setPropertyVisible(customcolormap, true);
+        setPropertyVisible(discretecolormap, true);
+        // user has the possibility to input its own colormap with discrete QtColors from 2 t0 18
+        // when nothing given, fallback to default colormap
+        if(thisCustomMap.count() > 2) {
+            colorIndexes=(int *) malloc(thisCustomMap.count()*sizeof(int));
+
+            // get the discrete colors
+            for(int i=0; i< thisCustomMap.count(); i++) {
+                bool ok;
+                int index = thisCustomMap.at(i).toInt(&ok);
+                if(ok) colorIndexes[i] = index; else colorIndexes[i] = 2; // black
+            }
+
+            // create colormap
+            ColorMap_Custom * colormap =  new ColorMap_Custom();
+            colormap->initColormap(colorIndexes, thisCustomMap.count(), thisDiscreteMap);
+            d_spectrogram->setColorMap(colormap);
+            free(colorIndexes);
+
+        } else {
+            d_spectrogram->setColorMap(new ColorMap_Wavelength());
+        }
+    }
+        break;
+    default:
+        d_spectrogram->setColorMap(new ColorMap_Wavelength());
+        break;
+    }
+}
+
 
 // gaus curve for demo drawing
 void caWaterfallPlot::GausCurv(double middle) {

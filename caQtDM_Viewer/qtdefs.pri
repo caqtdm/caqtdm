@@ -26,10 +26,6 @@ NETWORKDOWNLOADSUPPORT {
 DEFINES += NETWORKDOWNLOADSUPPORT
 }
 
-# support for scan2D
-DEFINES += ADDSCAN2D
-CONFIG += ADDSCAN2D
-
 # for some architectures this has to be defined for scan2D
 macx | win32 | ios | android {
 DEFINES += XDR_HACK

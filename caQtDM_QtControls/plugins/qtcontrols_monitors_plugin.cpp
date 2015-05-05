@@ -422,13 +422,12 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
             d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
         }
         
-#ifdef ADDSCAN2D 
  	QWidget *caScan2DInterface::createWidget(QWidget* parent)
 	{
 	    return new caScan2D(parent);
 	}
 
-	#define NUM_SCAN2D_PARAMS 15
+	#define NUM_SCAN2D_PARAMS 17
 	caScan2DInterface::caScan2DInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 	{
 		strng name[NUM_SCAN2D_PARAMS], type[NUM_SCAN2D_PARAMS];
@@ -442,7 +441,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
 		strcpy(type[3], "multiline");
 		strcpy(name[4], "channelBPP");
 		strcpy(type[4], "multiline");
-		strcpy(name[5], "dataProcChannels"); // min level, max level, x center of mass, y c.o.m.
+		strcpy(name[5], "customColorMap"); // min level, max level, x center of mass, y c.o.m.
 		strcpy(type[5], "multiline");
 		strcpy(name[6], "minLevel");
 		strcpy(type[6], "multiline");
@@ -463,6 +462,10 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
 		strcpy(type[13], "multiline");
 		strcpy(name[14], "channelSAVEDATA_FILENAME");
 		strcpy(type[14], "multiline");
+		strcpy(name[15], "dimensionMarking_Channels");
+		strcpy(type[15], "multiline");	    
+		strcpy(name[16], "ROI_writeChannels");
+		strcpy(type[16], "multiline");
 
 		d_domXml = XmlFunc("caScan2D", "cascan2d", 0, 0, 200, 200, name, type, NUM_SCAN2D_PARAMS);
 		d_toolTip = "[Image from Scan2D]";
@@ -470,7 +473,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
 		d_include = "caScan2D";
 		d_icon = QPixmap(":pixmaps/scan2d.png");
 	}       
-#endif
+
         CustomWidgetCollectionInterface_Monitors::CustomWidgetCollectionInterface_Monitors(QObject *parent): QObject(parent)
         {
             d_plugins.append(new caLedInterface(this));
@@ -488,9 +491,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
             d_plugins.append(new caCameraInterface(this));
             d_plugins.append(new caCalcInterface(this));
             d_plugins.append(new caWaterfallPlotInterface(this));
-#ifdef ADDSCAN2D
-	    d_plugins.append(new caScan2DInterface(this)); 
-#endif	    
+	    d_plugins.append(new caScan2DInterface(this));    
         }
 
         QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface_Monitors::customWidgets(void) const

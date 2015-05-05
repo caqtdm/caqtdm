@@ -44,6 +44,7 @@ public:
 fileFunctions::fileFunctions()
 {
 }
+
 #include <unistd.h>
 int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &url)
 {

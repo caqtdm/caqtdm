@@ -31,137 +31,6 @@
 #endif
 #include "cacamera.h"
 
-
-class ColorMap_Hot : public  QwtLinearColorMap {
-public:
-    ColorMap_Hot() : QwtLinearColorMap(QColor(0,0,0), QColor(1,1,1)) {
-
-        double r[] = { 0, 0.03968253968253968, 0.07936507936507936, 0.119047619047619, 0.1587301587301587, 0.1984126984126984, 0.2380952380952381, 0.2777777777777778, 0.3174603174603174, 0.3571428571428571, 0.3968253968253968, 0.4365079365079365, 0.4761904761904762, 0.5158730158730158, 0.5555555555555556, 0.5952380952380952, 0.6349206349206349, 0.6746031746031745, 0.7142857142857142, 0.753968253968254, 0.7936507936507936, 0.8333333333333333, 0.873015873015873, 0.9126984126984127, 0.9523809523809523, 0.992063492063492, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-        double g[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.03174603174603163, 0.0714285714285714, 0.1111111111111112, 0.1507936507936507, 0.1904761904761905, 0.23015873015873, 0.2698412698412698, 0.3095238095238093, 0.3492063492063491, 0.3888888888888888, 0.4285714285714284, 0.4682539682539679, 0.5079365079365079, 0.5476190476190477, 0.5873015873015872, 0.6269841269841268, 0.6666666666666665, 0.7063492063492065, 0.746031746031746, 0.7857142857142856, 0.8253968253968254, 0.8650793650793651, 0.9047619047619047, 0.9444444444444442, 0.984126984126984, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-        double b[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.04761904761904745, 0.1269841269841265, 0.2063492063492056, 0.2857142857142856, 0.3650793650793656, 0.4444444444444446, 0.5238095238095237, 0.6031746031746028, 0.6825396825396828, 0.7619047619047619, 0.8412698412698409, 0.92063492063492, 1};
-        double pos;
-        for(int i=0; i<256; i++) {
-            pos= (double) i/ 255.0;
-            int j = (int) (i+0.5) / 4.0;
-            addColorStop(pos, QColor(255*r[j], 255*g[j], 255*b[j]));
-        }
-    }
-};
-
-// heat from blue to yellow
-class ColorMap_Heat : public  QwtLinearColorMap {
-public:
-    ColorMap_Heat() : QwtLinearColorMap(QColor(0,0,0), QColor(1,1,1)) {
-        double r,g,b;
-        for (int i = 0; i < 256; ++i) {
-            rgbHeat((double) i, r, g, b);
-            addColorStop((double)(i)/255.0, QColor((int) r, (int) g, (int) b));
-        }
-    }
-private:
-    void rgbHeat(double wave, double &r, double &g, double &b) {
-        double max = 255.0;
-        double min = 0.0;
-        double x = (wave-min) / (max-min);
-        b = 255 * qMin(qMax(4*(0.75-x), 0.0), 1.0);
-        r = 255 * qMin(qMax(4*(x-0.25), 0.0), 1.0);
-        g = 255 * qMin(qMax(4*fabs(x-0.5)-1.0, 0.0), 1.0);
-    }
-};
-
-class ColorMap_Custom : public  QwtLinearColorMap {
-public:
-    ColorMap_Custom() : QwtLinearColorMap() {
-    }
-
-    void initColormap(int *colorIndexes, int nbColors) {
-
-        for ( int i = 0; i < nbColors; i++ ) {
-            if(colorIndexes[i] < 2) colorIndexes[i] = 2;
-            if(colorIndexes[i] > 18) colorIndexes[i] = 18;
-        }
-
-        //setMode( QwtLinearColorMap::FixedColors );
-        setColorInterval( Qt::GlobalColor( colorIndexes[0] ), Qt::GlobalColor(colorIndexes[nbColors-1]) );
-
-        for ( int i = 1; i < nbColors; i++ ) {
-            addColorStop( i / (double) nbColors, Qt::GlobalColor(colorIndexes[i]) );
-        }
-    }
-};
-
-class ColorMap_Jet: public QwtLinearColorMap
-{
-public:
-    ColorMap_Jet(): QwtLinearColorMap(QColor(0,0,189), QColor(132,0,0))
-    {
-        double pos;
-        pos = 1.0/13.0*1.0; addColorStop(pos, QColor(0,0,255));
-        pos = 1.0/13.0*2.0; addColorStop(pos, QColor(0,66,255));
-        pos = 1.0/13.0*3.0; addColorStop(pos, QColor(0,132,255));
-        pos = 1.0/13.0*4.0; addColorStop(pos, QColor(0,189,255));
-        pos = 1.0/13.0*5.0; addColorStop(pos, QColor(0,255,255));
-        pos = 1.0/13.0*6.0; addColorStop(pos, QColor(66,255,189));
-        pos = 1.0/13.0*7.0; addColorStop(pos, QColor(132,255,132));
-        pos = 1.0/13.0*8.0; addColorStop(pos, QColor(189,255,66));
-        pos = 1.0/13.0*9.0; addColorStop(pos, QColor(255,255,0));
-        pos = 1.0/13.0*10.0; addColorStop(pos, QColor(255,189,0));
-        pos = 1.0/13.0*12.0; addColorStop(pos, QColor(255,66,0));
-        pos = 1.0/13.0*13.0; addColorStop(pos, QColor(189,0,0));
-    }
-};
-
-class ColorMap_Wavelenght: public QwtLinearColorMap
-{
-public:
-    ColorMap_Wavelenght():QwtLinearColorMap(QColor(80,80,0), QColor(100,0,0))
-    {
-        double r,g,b;
-        for (int i = 0; i < 256; ++i) {
-            rgbFromWaveLength(380.0 + (i * 400.0 / 255), r, g, b);
-            addColorStop((double)(i)/255.0, QColor((int) r, (int) g, (int) b));
-        }
-    }
-private:
-    void rgbFromWaveLength(double wave, double &r, double &g, double &b)
-    {
-        r = 0.0;
-        g = 0.0;
-        b = 0.0;
-
-        if (wave >= 380.0 && wave <= 440.0) {
-            r = -1.0 * (wave - 440.0) / (440.0 - 380.0);
-            b = 1.0;
-        } else if (wave >= 440.0 && wave <= 490.0) {
-            g = (wave - 440.0) / (490.0 - 440.0);
-            b = 1.0;
-        } else if (wave >= 490.0 && wave <= 510.0) {
-            g = 1.0;
-            b = -1.0 * (wave - 510.0) / (510.0 - 490.0);
-        } else if (wave >= 510.0 && wave <= 580.0) {
-            r = (wave - 510.0) / (580.0 - 510.0);
-            g = 1.0;
-        } else if (wave >= 580.0 && wave <= 645.0) {
-            r = 1.0;
-            g = -1.0 * (wave - 645.0) / (645.0 - 580.0);
-        } else if (wave >= 645.0 && wave <= 780.0) {
-            r = 1.0;
-        }
-
-        double s = 1.0;
-        if (wave > 700.0)
-            s = 0.3 + 0.7 * (780.0 - wave) / (780.0 - 700.0);
-        else if (wave <  420.0)
-            s = 0.3 + 0.7 * (wave - 380.0) / (420.0 - 380.0);
-
-        r = pow(r * s, 0.8) * 255;
-        g = pow(g * s, 0.8) * 255;
-        b = pow(b * s, 0.8) * 255;
-    }
-};
-
-
-
 caCamera::caCamera(QWidget *parent) : QWidget(parent)
 {
     m_init = true;
@@ -172,7 +41,6 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     m_heightDefined = false;
 
     thisSimpleView = false;
-    thisColormap = Default;
     savedSize = 0;
     savedWidth = 0;
     savedHeight = 0;
@@ -184,8 +52,6 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     initWidgets();
 
     Xpos = Ypos = 0;
-
-    for(int i=0; i<ColormapSize; i++) ColorMap[i] = qRgb(i,i,i);
 
     scrollArea = (QScrollArea *) 0;
 
@@ -199,6 +65,7 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     ROIdetected = false;
     thisROItype = centerxy_width_height;
 
+    setColormap(spectrum_wavelength);
     setCustomMap("");
     setDiscreteCustomMap(false);
 
@@ -210,6 +77,17 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     UpdatesPerSecond = 0;
     startTimer(1000);
 }
+
+bool caCamera::isPropertyVisible(Properties property)
+{
+    return designerVisible[property];
+}
+
+void caCamera::setPropertyVisible(Properties property, bool visible)
+{
+    designerVisible[property] = visible;
+}
+
 
 void caCamera::deleteWidgets()
 {
@@ -363,8 +241,8 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
                     selectionRect.setCoords(x1, y1, x2, y2);
                     Coordinates( selectionRect.x(), selectionRect.y(),  Xnew1, Ynew1, Xmax, Ymax);
                     Coordinates( selectionRect.x() + selectionRect.width(), selectionRect.y() + selectionRect.height(),  Xnew2, Ynew2, Xmax, Ymax);
-                    ROIx = (int) Xnew1;
-                    ROIy = (int) Ynew1;
+                    ROIx = (int) (Xnew1+0.5);
+                    ROIy = (int) (Ynew1+0.5);
                     ROIw = (int) (Xnew2 - Xnew1);
                     ROIh = (int) (Ynew2 - Ynew1);
                     ROIdetected = true;
@@ -415,7 +293,7 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
                 uchar *ptr = (uchar*)  savedData;
                 int index = (int) ((int) Ynew * savedWidth * 2 + 2 * (int) Xnew);
                 if((Xnew >=0) && (Ynew >=0)  &&  (Xnew < Xmax) && (Ynew < Ymax) && (index < savedSize)) {
-                    if(thisColormap != spectrum) Zvalue=ptr[index];
+                    if(thisColormap == grey) Zvalue=ptr[index];
                     else Zvalue=ptr[index] * 256 + ptr[index+1];
 
                 } else {
@@ -586,7 +464,7 @@ void caCamera::setup()
 
         zoomSlider = new QSlider;
         zoomSlider->setMinimum(0);
-        zoomSlider->setMaximum(90); // do not exceed 6*
+        zoomSlider->setMaximum(120); // do not exceed 6*
         zoomSlider->setValue(52);
         zoomSlider->setTickPosition(QSlider::NoTicks);
 
@@ -638,7 +516,7 @@ void caCamera::setup()
 void caCamera::zoomNow()
 {
     double scale = qPow(2.0, ((double) zoomSlider->value() - 52.0) / 13.0);
-    if(scale > 6) scale = 6;
+    if(scale > 32) scale = 32;
     zoomValue->setText(QString::number(scale, 'f', 3));
     scaleFactor = scale;
     setFitToSize(No);
@@ -727,65 +605,40 @@ bool caCamera::isAlphaMinLevel()
 void caCamera::setColormap(colormap const &map)
 {
     thisColormap = map;
-    int *colorIndexes=NULL;
+    colorMaps colormaps;
+    setPropertyVisible(customcolormap, false);
+    setPropertyVisible(discretecolormap, false);
+
     switch (map) {
-    case Default:
-        for(int i=0; i<ColormapSize; i++) ColorMap[i] = qRgb(i,i,i);
-        // hide the colormap bar
-        if(colormapWidget != ( QwtScaleWidget *) 0) colormapWidget->setHidden(true);
-        break;
+
     case grey:
-        for(int i=0; i<ColormapSize; i++) ColorMap[i] = qRgb(i,i,i);
-        // hide the colormap bar
-        if(colormapWidget != ( QwtScaleWidget *) 0) colormapWidget->setHidden(true);
+        colormaps.getColormap(colorMaps::grey, false, thisCustomMap, ColormapSize, ColorMap, colormapWidget);
         break;
-    case spectrum: {
+    case spectrum_wavelength:
+        colormaps.getColormap(colorMaps::spectrum_wavelength, false, thisCustomMap, ColormapSize, ColorMap, colormapWidget);
+        break;
+    case spectrum_hot:
+        colormaps.getColormap(colorMaps::spectrum_hot, false, thisCustomMap, ColormapSize, ColorMap, colormapWidget);
+        break;
+    case spectrum_heat:
+        colormaps.getColormap(colorMaps::spectrum_heat, false, thisCustomMap, ColormapSize, ColorMap, colormapWidget);
+        break;
+    case spectrum_jet:
+        colormaps.getColormap(colorMaps::spectrum_jet, false, thisCustomMap, ColormapSize, ColorMap, colormapWidget);
+        break;
+    case spectrum_custom:
+        setPropertyVisible(customcolormap, true);
+        setPropertyVisible(discretecolormap, true);
         // user has the possibility to input its own colormap with discrete QtColors from 2 t0 18
         // when nothing given, fallback to default colormap
-
         if(thisCustomMap.count() > 2) {
-            colorIndexes=(int *) malloc(thisCustomMap.count()*sizeof(int));
-
-            // get the discrete colors
-            for(int i=0; i< thisCustomMap.count(); i++) {
-                bool ok;
-                int index = thisCustomMap.at(i).toInt(&ok);
-                if(ok) colorIndexes[i] = index; else colorIndexes[i] = 2; // black
-            }
-
-           // create colormap
-           ColorMap_Custom * colormap =  new ColorMap_Custom();
-           if(getDiscreteCustomMap()) colormap->setMode( QwtLinearColorMap::FixedColors );
-           colormap->initColormap(colorIndexes, thisCustomMap.count());
-           for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = colormap->rgb(QwtInterval(0, ColormapSize-1), i);
-           free(colorIndexes);
-
-           // display the colormap bar
-           if(colormapWidget != ( QwtScaleWidget *) 0) {
-               colormapWidget->setHidden(false);
-               colormapWidget->setColorMap(QwtInterval(0,1), colormap);
-           }
-
+           colormaps.getColormap(colorMaps::spectrum_custom, thisDiscreteMap, thisCustomMap, ColormapSize, ColorMap, colormapWidget);
         } else {
-            ColorMap_Wavelenght * colormap =  new ColorMap_Wavelenght();
-            for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = colormap->rgb(QwtInterval(0, ColormapSize-1), i);
-            // display the colormap bar
-            if(colormapWidget != ( QwtScaleWidget *) 0) {
-                colormapWidget->setHidden(false);
-                colormapWidget->setColorMap(QwtInterval(0,1), colormap);
-            }
+           colormaps.getColormap(colorMaps::spectrum_wavelength, false, thisCustomMap, ColormapSize, ColorMap, colormapWidget);
         }
-
         break;
-    }
     default:
-        ColorMap_Wavelenght * colormap =  new ColorMap_Wavelenght();
-        for (int i = 0; i < ColormapSize; ++i) ColorMap[i] = colormap->rgb(QwtInterval(0, ColormapSize-1), i);
-        // display the colormap bar
-        if(colormapWidget != ( QwtScaleWidget *) 0) {
-            colormapWidget->setHidden(false);
-            colormapWidget->setColorMap(QwtInterval(0,1), colormap);
-        }
+        colormaps.getColormap(colorMaps::grey, false, thisCustomMap, ColormapSize, ColorMap, colormapWidget);
         break;
     }
     // force resize
@@ -835,6 +688,7 @@ void caCamera::resizeEvent(QResizeEvent *e)
             connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomNow()));
             imageW->setFixedWidth(e->size().width() - zoomWidget->width()-4);
             imageW->setFixedHeight(e->size().height()- valuesWidget->height()-4);
+            scaleFactor = scale;
         }
     }
 }
@@ -952,7 +806,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
             uchar *ptr = (uchar*)  data;
             if(ptr == (void*) 0) return (QImage *) 0;
 
-            if(thisColormap == spectrum) {
+            if(thisColormap != grey) {
 
                 for (int y = 0; y < resultSize.height(); ++y) {
                     uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
@@ -994,7 +848,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
             uchar *ptr = (uchar*)  data;
             if(ptr == (void*) 0) return (QImage *) 0 ;
 
-            if(thisColormap == spectrum) {
+            if(thisColormap != grey) {
 
                 for (int y = 0; y < resultSize.height(); ++y) {
                     uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
@@ -1036,7 +890,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
 
             if(ptr == (void*) 0) return (QImage *) 0;
 
-            if(thisColormap == spectrum) {
+            if(thisColormap != grey) {
 
                 for (int y = 0; y < resultSize.height(); ++y) {
                     uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));

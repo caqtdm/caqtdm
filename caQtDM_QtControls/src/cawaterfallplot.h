@@ -47,6 +47,9 @@
 //#include <sys/timeb.h>
 
 #include <qtcontrols_global.h>
+
+#include "colormaps.h"
+
 #define MAXCOLUMNS 500
 
 class SpectrogramData: public QwtMatrixRasterData
@@ -187,7 +190,7 @@ public:
     {
         setInterval( Qt::XAxis, QwtInterval( xmin, xmax ) );
         setInterval( Qt::YAxis, QwtInterval( ymin, ymax) );
-        setInterval( Qt::ZAxis, QwtInterval( zmin, zmax) );
+        setInterval( Qt::ZAxis, QwtInterval( zmin, zmax+(zmax-zmin)*5.0/1000.0) );
     }
 
 };
@@ -217,6 +220,10 @@ class QTCON_EXPORT caWaterfallPlot: public QWidget
     Q_PROPERTY(intensityScaling IntensityScalingMax READ getIntensityScalingMax WRITE setIntensityScalingMax)
     Q_PROPERTY(intensityScaling IntensityScalingMin READ getIntensityScalingMin WRITE setIntensityScalingMin)
 
+    Q_PROPERTY(colormap ColorMap READ getColormap WRITE setColormap)
+    Q_PROPERTY(QString customColorMap READ getCustomMap WRITE setCustomMap  DESIGNABLE isPropertyVisible(customcolormap))
+    Q_PROPERTY(bool discreteCustomColorMap READ getDiscreteCustomMap WRITE setDiscreteCustomMap DESIGNABLE isPropertyVisible(discretecolormap))
+
     Q_PROPERTY(bool grid READ getGrid WRITE setGrid)
     Q_PROPERTY(bool XaxisEnabled READ getXaxisEnabled WRITE setXaxisEnabled)
     Q_PROPERTY(bool YaxisEnabled READ getYaxisEnabled WRITE setYaxisEnabled)
@@ -226,6 +233,9 @@ public:
 
     enum units {Monitor=0,  Millisecond, Second, Minute};
     enum intensityScaling {Channel, User};
+
+    enum colormap {grey=0, spectrum_wavelength, spectrum_hot, spectrum_heat, spectrum_jet, spectrum_custom};
+    enum Properties { customcolormap = 0, discretecolormap};
 
     caWaterfallPlot(QWidget * = NULL);
     void GausCurv(double middle);
@@ -246,6 +256,18 @@ public:
 
     void setIntensityScalingMin(intensityScaling s) {thisIntensityScalingMin = s;}
     intensityScaling getIntensityScalingMin() const {return thisIntensityScalingMin;}
+
+    colormap getColormap() const {return thisColormap;}
+    void setColormap(colormap const &map);
+
+    QString getCustomMap() const {return thisCustomMap.join(";");}
+    void setCustomMap(QString const &newmap) {thisCustomMap = newmap.split(";"); setColormap(thisColormap);}
+
+    bool getDiscreteCustomMap() const {return thisDiscreteMap;}
+    void setDiscreteCustomMap(bool discrete) {thisDiscreteMap = discrete; setColormap(thisColormap);}
+
+    bool isPropertyVisible(Properties property);
+    void setPropertyVisible(Properties property, bool visible);
 
     QString getTitlePlot() const {return thisTitle;}
     void setTitlePlot(QString const &title);
@@ -301,6 +323,9 @@ private:
     enum {nbRows = 200};
     enum {nbCols = 500};
 
+    enum { ColormapSize = 256 };
+    uint ColorMap[ColormapSize];
+
     int ActualNumberOfColumns;
 
     template <typename pureData>void AverageArray(pureData *vec, int size, int ArraySize, double *avg, int ratio);
@@ -335,6 +360,12 @@ private:
 
     int thisCountNumber;
     bool thisCountReceived;
+
+    bool thisDiscreteMap;
+    colormap thisColormap;
+    QStringList thisCustomMap;
+
+    bool designerVisible[10];
 
 public  Q_SLOTS:
     void TimeOut();

@@ -160,7 +160,8 @@ void ImageWidget::updateImage(bool FitToSize, const QImage &image, bool valuesPr
                 //printf("(%d,%d) (%d,%d)  (%f,%f)\n", this->size().width(), this->size().height(),
                 //                                     image.size().width(), image.size().height(),
                 //                                    factorX, factorY);
-               geoValues[i] = values[i] * factor;
+               geoValues[i] = (int) (((values[i]+0.5) * factor));
+               //printf("geovalues %d %f %d\n", values[i], factor, geoValues[i]);
             }
         }
         else geoValues[i] = 0;

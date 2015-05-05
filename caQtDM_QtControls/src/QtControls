@@ -41,8 +41,6 @@
 #include <cawavetable.h>
 #include <caclock.h>
 #include <cameter.h>
-#ifdef ADDSCAN2D
 #include <cascan2d.h>
-#endif
 #endif
 

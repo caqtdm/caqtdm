@@ -157,7 +157,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 #ifdef MOBILE
     Specials specials;
 #endif
-    qDebug() <<  qApp->desktop()->size();
+    qDebug() <<  "caQtDM -- desktop size:" << qApp->desktop()->size();
 
     // Set Window Title without the whole path
     QString title("caQtDM ");
@@ -227,7 +227,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     if (sharedMemory.attach()) {
         _isRunning = true;
         if(attach) {
-            qDebug() << "caQtDM -- another instance of caQtDM detected ==> attach to it";
+            qDebug() << "caQtDM -- another instance of caQtDM detected ==> attach to it (" << DisplayString(QX11Info::display()) <<")" ;
             QString message(filename);
             message.append(";");
             message.append(macroString);
@@ -517,7 +517,6 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
     if(this->findChildren<CaQtDM_Lib *>().count() <= 0 && userClose) {
         if (sharedMemory.isAttached()) sharedMemory.detach();
         qApp->exit(0);
-        //exit(0);
     } else if(this->findChildren<CaQtDM_Lib *>().count() > 0) {
         userClose = true;
     }
