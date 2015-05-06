@@ -22,6 +22,9 @@
  *  Contact details:
  *    anton.mezger@psi.ch
  */
+#if defined(_WIN32) || defined(_WIN64)
+#define QWT_DLL
+#endif
 
 #include "colormaps.h"
 
