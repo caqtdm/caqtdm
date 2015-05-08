@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.9.2
+CAQTDM_VERSION = V3.9.3
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -35,6 +35,8 @@ CONFIG += XDR_HACK
 
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
+
+# 3.9.3
 
 # 3.9.2
 # severity of a char/string record was not considered and is corrected, Char waveforms longer as 1024 were not displayed in calineedit and is corrected.
