@@ -153,7 +153,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: cornsilk;}</string>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -1354,7 +1354,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>11</number>
+       <number>12</number>
       </property>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">
@@ -5141,9 +5141,6 @@ p, li { white-space: pre-wrap; }
         <property name="Zoom" stdset="0">
          <enum>caCamera::Yes</enum>
         </property>
-        <property name="ColorMap" stdset="0">
-         <enum>caCamera::grey</enum>
-        </property>
         <property name="automaticLevels" stdset="0">
          <bool>true</bool>
         </property>
@@ -5152,6 +5149,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="maxLevel">
          <string notr="true">4500</string>
+        </property>
+        <property name="ColorMap" stdset="0">
+         <enum>caCamera::grey</enum>
         </property>
        </widget>
        <widget class="QTextEdit" name="textEdit_23">
@@ -5210,9 +5210,6 @@ p, li { white-space: pre-wrap; }
         <property name="Zoom" stdset="0">
          <enum>caCamera::Yes</enum>
         </property>
-        <property name="ColorMap" stdset="0">
-         <enum>caCamera::grey</enum>
-        </property>
         <property name="automaticLevels" stdset="0">
          <bool>true</bool>
         </property>
@@ -5221,6 +5218,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="maxLevel">
          <string notr="true">4500</string>
+        </property>
+        <property name="ColorMap" stdset="0">
+         <enum>caCamera::spectrum_hot</enum>
         </property>
        </widget>
        <widget class="caCamera" name="cacamera_3">
@@ -5253,9 +5253,6 @@ p, li { white-space: pre-wrap; }
         <property name="Zoom" stdset="0">
          <enum>caCamera::Yes</enum>
         </property>
-        <property name="ColorMap" stdset="0">
-         <enum>caCamera::spectrum</enum>
-        </property>
         <property name="automaticLevels" stdset="0">
          <bool>true</bool>
         </property>
@@ -5265,8 +5262,150 @@ p, li { white-space: pre-wrap; }
         <property name="maxLevel">
          <string notr="true">4500</string>
         </property>
+        <property name="ColorMap" stdset="0">
+         <enum>caCamera::spectrum_wavelength</enum>
+        </property>
         <property name="customColorMap" stdset="0">
          <string>2;15;9;17;11;16;10;14;8;13;7;18;12;3</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="caScan2D">
+       <attribute name="title">
+        <string>caScan2D</string>
+       </attribute>
+       <widget class="caScan2D" name="cascan2d_2">
+        <property name="geometry">
+         <rect>
+          <x>502</x>
+          <y>100</y>
+          <width>258</width>
+          <height>257</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="sizeIncrement">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="channelData" stdset="0">
+         <string notr="true">TEST:scan1.D01DA</string>
+        </property>
+        <property name="channelWidth" stdset="0">
+         <string notr="true">TEST:scan1.NPTS</string>
+        </property>
+        <property name="channelHeight" stdset="0">
+         <string notr="true">TEST:scan2.NPTS</string>
+        </property>
+        <property name="simpleZoomedView" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="Zoom" stdset="0">
+         <enum>caScan2D::Yes</enum>
+        </property>
+        <property name="channelYCPT" stdset="0">
+         <string notr="true">TEST:scan2.CPT{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+        </property>
+        <property name="channelXNEWDATA" stdset="0">
+         <string notr="true">TEST:scan1.DATA{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+        </property>
+        <property name="channelYNEWDATA" stdset="0">
+         <string notr="true">TEST:scan2.DATA{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+        </property>
+        <property name="channelSAVEDATA_PATH" stdset="0">
+         <string notr="true">$(SAVEDATAPATH)</string>
+        </property>
+        <property name="channelSAVEDATA_SUBDIR" stdset="0">
+         <string notr="true">TEST:saveData_subDir</string>
+        </property>
+        <property name="channelSAVEDATA_FILENAME" stdset="0">
+         <string notr="true">TEST:saveData_fileName</string>
+        </property>
+        <property name="automaticLevels" stdset="0">
+         <bool>false</bool>
+        </property>
+        <property name="minLevel">
+         <string notr="true">0</string>
+        </property>
+        <property name="maxLevel">
+         <string notr="true">65535</string>
+        </property>
+       </widget>
+       <widget class="caScan2D" name="cascan2d">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>50</y>
+          <width>461</width>
+          <height>395</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="sizeIncrement">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="channelData" stdset="0">
+         <string notr="true">TEST:scan1.D03DA</string>
+        </property>
+        <property name="channelWidth" stdset="0">
+         <string notr="true">TEST:scan1.NPTS</string>
+        </property>
+        <property name="channelHeight" stdset="0">
+         <string notr="true">TEST:scan2.NPTS</string>
+        </property>
+        <property name="Zoom" stdset="0">
+         <enum>caScan2D::Yes</enum>
+        </property>
+        <property name="channelYCPT" stdset="0">
+         <string notr="true">TEST:scan2.CPT{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+        </property>
+        <property name="channelXNEWDATA" stdset="0">
+         <string notr="true">TEST:scan1.DATA{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+        </property>
+        <property name="channelYNEWDATA" stdset="0">
+         <string notr="true">TEST:scan2.DATA{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+        </property>
+        <property name="channelSAVEDATA_PATH" stdset="0">
+         <string notr="true">$(SAVEDATAPATH)</string>
+        </property>
+        <property name="channelSAVEDATA_SUBDIR" stdset="0">
+         <string notr="true">TEST:saveData_subDir</string>
+        </property>
+        <property name="channelSAVEDATA_FILENAME" stdset="0">
+         <string notr="true">TEST:saveData_fileName</string>
+        </property>
+        <property name="automaticLevels" stdset="0">
+         <bool>false</bool>
+        </property>
+        <property name="minLevel">
+         <string notr="true">0</string>
+        </property>
+        <property name="maxLevel">
+         <string notr="true">65535</string>
+        </property>
+        <property name="customColorMap" stdset="0">
+         <string>2;3;4;5;7;8</string>
+        </property>
+        <property name="dimensionMarking_Channels" stdset="0">
+         <string>roi:x;roi:y;roi:w;roi:h</string>
+        </property>
+        <property name="ROI_writeChannels" stdset="0">
+         <string>roi:x;roi:y;roi:w;roi:h</string>
         </property>
        </widget>
       </widget>
@@ -7919,6 +8058,11 @@ p, li { white-space: pre-wrap; }
    <class>caWaterfallPlot</class>
    <extends>QWidget</extends>
    <header>caWaterfall</header>
+  </customwidget>
+  <customwidget>
+   <class>caScan2D</class>
+   <extends>QWidget</extends>
+   <header>caScan2D</header>
   </customwidget>
  </customwidgets>
  <resources/>

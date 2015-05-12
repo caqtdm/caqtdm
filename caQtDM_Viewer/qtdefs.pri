@@ -36,12 +36,13 @@ CONFIG += XDR_HACK
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 
-# 3.9.3
 
-# 3.9.2
+# 3.9.2 and 3.9.3
 # severity of a char/string record was not considered and is corrected, Char waveforms longer as 1024 were not displayed in calineedit and is corrected.
 # in edl2ui zais addons were integrated
 # softpv's in include file enabled
+# more colortables for caCamera, caScan2D, caWaterfallPlot
+# caScan2D added
 
 # 3.9.1
 # added a clock allowing to display normal time or reception time of a process variable; alarm handling can be enabled to colorize the clock
