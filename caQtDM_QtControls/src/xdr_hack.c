@@ -47,6 +47,7 @@ int xdr_int8_t( FILE *fptr, int8_t *my_int8)
 int xdr_int16_t( FILE *fptr, int16_t *my_int16)
 {
 #ifdef XDR_LE
+  int i;
   union
   {
     char b[2];
@@ -57,7 +58,6 @@ int xdr_int16_t( FILE *fptr, int16_t *my_int16)
   if( fseek( fptr, 2, SEEK_CUR) )
     return 0;
 #ifdef XDR_LE
-  int i;
   for( i = 1; i >= 0; i--)
     if( !fread( data.b + i, 1, 1, fptr) )
       return 0;
