@@ -175,7 +175,8 @@ private:
     QTabWidget* getTabParent(QWidget *w1);
     bool bitState(int value, int bitNr);
     QString treatMacro(QMap<QString, QString> map, const QString& pv, bool *doNothing);
-    void HandleWidget(QWidget *w, QString macro, bool firstPass);
+    void scanWidgets(QList<QWidget*> list, QString macro);
+    void HandleWidget(QWidget *w, QString macro, bool firstPass, bool treatPrimaries);
     void closeEvent(QCloseEvent* ce);
     bool CalcVisibility(QWidget *w, double &result, bool &valid);
     int ComputeAlarm(QWidget *w);
@@ -199,6 +200,7 @@ private:
     void WaveTable(caWaveTable *widget, const knobData &data);
     void EnableDisableIO();
     void UpdateMeter(caMeter *widget, const knobData &data);
+    bool PrimarySoftPV(QWidget* widget, QMap<QString, QString> map);
 
 #ifdef MOBILE
     bool eventFilter(QObject *obj, QEvent *event);

@@ -140,7 +140,16 @@ SOURCES	+= \
     src/cadoubletabwidgetextensionfactory.cpp \
     src/specialFunctions.cpp \
     src/caclock.cpp \
-    src/cameter.cpp
+    src/cameter.cpp \
+    src/colormaps.cpp \
+    src/cascan2d.cpp \
+    src/mdaReader.cpp \
+    src/mda_loader.c
+
+XDR_HACK {
+    SOURCES += src/xdr_hack.c
+    HEADERS += src/xdr_hack.h
+}
 
 NETWORKDOWNLOADSUPPORT: {
 QT += network
@@ -228,7 +237,11 @@ HEADERS	+= \
     src/cadoubletabwidgetextensionfactory.h \
     src/specialFunctions.h \
     src/caclock.h \
-    src/cameter.h
+    src/cameter.h \
+    src/colormaps.h \
+    src/cascan2d.h \
+    src/mdaReader.h \
+    src/mda-load.h
 
 # assume qwt6.0 was made with qt4
 contains(QT_VER_MAJ, 4) {

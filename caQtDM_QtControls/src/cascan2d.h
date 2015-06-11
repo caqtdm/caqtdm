@@ -1,5 +1,6 @@
 /*
- *  This file is part of the caQtDM Framework, developed at the Paul Scherrer Institut,
+ *  This file is part of the caQtDM Framework, was developed  by Tim Mooney from Argonne,
+ *  based on cacamera by Anton Chr. Mezger at the Paul Scherrer Institut,
  *  Villigen, Switzerland
  *
  *  The caQtDM Framework is free software: you can redistribute it and/or modify
@@ -17,14 +18,14 @@
  *
  *  Copyright (c) 2010 - 2014
  *
- *  Author:
- *    Anton Mezger
+ *  Authors:
+ *    Tim Mooney (Argonne), Anton Mezger (PSI)
  *  Contact details:
  *    anton.mezger@psi.ch
  */
 
-#ifndef CameraWidget_H
-#define CameraWidget_H
+#ifndef Scan2DWidget_H
+#define Scan2DWidget_H
 
 #include <QPixmap>
 #include <QWidget>
@@ -48,20 +49,30 @@
 #endif
 #include <time.h>
 #include <sys/timeb.h>
+#include "mdaReader.h"
 
-#include "colormaps.h"
+#include "cacamera.h"
 
-class QTCON_EXPORT caCamera : public QWidget
+#define XMAXPTS 1000
+#define YMAXPTS 1000
+
+class QTCON_EXPORT caScan2D : public QWidget
 {
     Q_OBJECT
 
     Q_PROPERTY(QString channelData READ getPV_Data WRITE setPV_Data)
     Q_PROPERTY(QString channelWidth READ getPV_Width WRITE setPV_Width)
     Q_PROPERTY(QString channelHeight READ getPV_Height WRITE setPV_Height)
-    Q_PROPERTY(QString channelCode READ getPV_Code WRITE setPV_Code)
-    Q_PROPERTY(QString channelBPP READ getPV_BPP WRITE setPV_BPP)
     Q_PROPERTY(bool simpleZoomedView READ getSimpleView WRITE setSimpleView)
     Q_PROPERTY(zoom Zoom READ getFitToSize WRITE setFitToSize)
+
+    Q_PROPERTY(QString channelXCPT READ getPV_XCPT WRITE setPV_XCPT)
+    Q_PROPERTY(QString channelYCPT READ getPV_YCPT WRITE setPV_YCPT)
+    Q_PROPERTY(QString channelXNEWDATA READ getPV_XNEWDATA WRITE setPV_XNEWDATA)
+    Q_PROPERTY(QString channelYNEWDATA READ getPV_YNEWDATA WRITE setPV_YNEWDATA)
+    Q_PROPERTY(QString channelSAVEDATA_PATH READ getPV_SAVEDATA_PATH WRITE setPV_SAVEDATA_PATH)
+    Q_PROPERTY(QString channelSAVEDATA_SUBDIR READ getPV_SAVEDATA_SUBDIR WRITE setPV_SAVEDATA_SUBDIR)
+    Q_PROPERTY(QString channelSAVEDATA_FILENAME READ getPV_SAVEDATA_FILENAME WRITE setPV_SAVEDATA_FILENAME)
 
     Q_PROPERTY(bool automaticLevels READ getInitialAutomatic WRITE setInitialAutomatic)
     Q_PROPERTY(QString minLevel READ getMinLevel WRITE setMinLevel)
@@ -85,14 +96,14 @@ public:
     enum ROI_type {upperleftxy_width_height=0, upperleftxy_lowerleftxy, centerxy_width_height};
     enum Properties { customcolormap = 0, discretecolormap};
 
-    caCamera(QWidget *parent = 0);
-    ~caCamera();
+    caScan2D(QWidget *parent = 0);
+    ~caScan2D();
 
     void updateImage(const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor);
     bool getROI(int &x, int &y, int &w, int &h);
-    QImage * showImageCalc(int datasize, char *data);
-    void showImage(int datasize, char *data);
-    uint rgbFromWaveLength(double wave);
+    void newArray(int numDataBytes, float *data);
+    void showImage(int numXDataValues, int numYDataValues);
+    void refreshImage();
 
     int getAccessW() const {return _AccessW;}
     void setAccessW(int access);
@@ -103,10 +114,6 @@ public:
     void setPV_Width(QString const &newPV) {thisPV_Width = newPV;}
     QString getPV_Height() const {return thisPV_Height;}
     void setPV_Height(QString const &newPV) {thisPV_Height = newPV;}
-    QString getPV_Code() const {return thisPV_Code;}
-    void setPV_Code(QString const &newPV) {thisPV_Code = newPV;}
-    QString getPV_BPP() const {return thisPV_BPP;}
-    void setPV_BPP(QString const &newPV) {thisPV_BPP = newPV;}
 
     ROI_type getROIwriteType() const {return thisROItype;}
     void setROIwriteType(ROI_type const &roitype) {thisROItype = roitype;}
@@ -115,6 +122,22 @@ public:
 
     QString getROIChannelsRead() const {return thisPV_ROI_Read.join(";");}
     void setROIChannelsRead(QString const &newPV) {thisPV_ROI_Read = newPV.split(";");}
+
+    //sscanRecord PVs
+    QString getPV_XCPT() const {return thisPV_XCPT;}
+    void setPV_XCPT(QString const &newPV) {thisPV_XCPT = newPV;}
+    QString getPV_YCPT() const {return thisPV_YCPT;}
+    void setPV_YCPT(QString const &newPV) {thisPV_YCPT = newPV;}
+    QString getPV_XNEWDATA() const {return thisPV_XNEWDATA;}
+    void setPV_XNEWDATA(QString const &newPV) {thisPV_XNEWDATA = newPV;}
+    QString getPV_YNEWDATA() const {return thisPV_YNEWDATA;}
+    void setPV_YNEWDATA(QString const &newPV) {thisPV_YNEWDATA = newPV;}
+    QString getPV_SAVEDATA_PATH() const {return thisPV_SAVEDATA_PATH;}
+    void setPV_SAVEDATA_PATH(QString const &newPV) {thisPV_SAVEDATA_PATH = newPV;}
+    QString getPV_SAVEDATA_SUBDIR() const {return thisPV_SAVEDATA_SUBDIR;}
+    void setPV_SAVEDATA_SUBDIR(QString const &newPV) {thisPV_SAVEDATA_SUBDIR = newPV;}
+    QString getPV_SAVEDATA_FILENAME() const {return thisPV_SAVEDATA_FILENAME;}
+    void setPV_SAVEDATA_FILENAME(QString const &newPV) {thisPV_SAVEDATA_FILENAME = newPV;}
 
     colormap getColormap() const {return thisColormap;}
     void setColormap(colormap const &map);
@@ -144,10 +167,17 @@ public:
     bool isPropertyVisible(Properties property);
     void setPropertyVisible(Properties property, bool visible);
 
-    void setCode(int code);
-    void setBPP(int bpp);
     void setWidth(int width);
     void setHeight(int height);
+
+    void setXCPT(int xcpt);
+    void setYCPT(int ycpt);
+    void setXNEWDATA(int xnewdata);
+    void setYNEWDATA(int ynewdata);
+    void setSAVEDATA_PATH(const QString &savedata_path);
+    void setSAVEDATA_SUBDIR(const QString &savedata_subdir);
+    void setSAVEDATA_FILENAME(const QString &savedata_filename);
+    void attemptInitialPlot();
 
     void updateMax(int max);
     void updateMin(int min);
@@ -175,38 +205,44 @@ private:
     void deleteWidgets();
     void initWidgets();
 
-    uint floatRGB(double mag, double min, double max);
-
     bool buttonPressed, validIntensity;
-    bool forcemonochrome;
+
     QString thisPV_Data, thisPV_Width, thisPV_Height, thisPV_Code, thisPV_BPP;
     QStringList thisCustomMap;
     ROI_type thisROItype;
     QStringList thisPV_ROI_Read, thisPV_ROI_Write;
+    QString thisPV_XCPT, thisPV_YCPT, thisPV_XNEWDATA, thisPV_YNEWDATA;
+    QString thisPV_SAVEDATA_PATH, thisPV_SAVEDATA_SUBDIR, thisPV_SAVEDATA_FILENAME;
+    QStringList thisDataProcPV;
     QString thisMinLevel, thisMaxLevel;
     colormap thisColormap;
     zoom thisFitToSize;
     QImage *image;
 
-    int Xpos, Ypos, Zvalue;
+    int Xpos, Ypos;
+    float Zvalue;
     bool m_init;
     enum { ColormapSize = 256 };
     uint ColorMap[ColormapSize];
 
-    bool m_codeDefined;
-    bool m_bppDefined;
     bool m_widthDefined;
     bool m_heightDefined;
-    int  m_code, m_bpp, m_width, m_height;
+    int m_code, m_bpp, m_width, m_height;
 
     int frameCount;
     struct timeb timeRef, timeR;
     int savedSize;
     int savedWidth;
     int savedHeight;
-    char *savedData;
+    float *savedData;
 
     uint minvalue, maxvalue;
+
+    // sscanRecord
+    bool m_xcptDefined, m_ycptDefined, m_xnewdataDefined, m_ynewdataDefined;
+    bool m_savedata_pathDefined, m_savedata_subdirDefined, m_savedata_filenameDefined;
+    int m_xcpt, m_ycpt, m_xnewdata, m_ynewdata;
+    QString m_savedata_path, m_savedata_subdir, m_savedata_filename;
 
     QHBoxLayout  *valuesLayout;
     QGridLayout  *mainLayout;
@@ -222,9 +258,6 @@ private:
     caLabel *intensityText;
     caLabel *checkAutoText;
     caLabel *nbUpdatesText;
-    bool valuesPresent[4];
-    int  values[4];
-
     QScrollArea *scrollArea;
     QWidget *valuesWidget;
     QWidget *zoomWidget;
@@ -234,6 +267,9 @@ private:
     QToolButton *zoomOutIcon;
     QwtScaleWidget *colormapWidget;
 
+    bool valuesPresent[4];
+    int  values[4];
+
     double scaleFactor;
 
     int UpdatesPerSecond;
@@ -241,6 +277,9 @@ private:
     bool selectionStarted;
     QRect selectionRect;
 
+    // tmm:later we'll do this right
+    int haveY[YMAXPTS];
+    float xdata[YMAXPTS*XMAXPTS];
     int ROIx, ROIy, ROIw, ROIh;
     bool ROIdetected;
 
@@ -251,6 +290,7 @@ private:
     bool thisDiscreteMap;
 
     bool designerVisible[10];
+
 };
 
 #endif

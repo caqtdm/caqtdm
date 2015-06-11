@@ -153,7 +153,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: cornsilk;}</string>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -6066,7 +6066,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
@@ -7694,6 +7694,28 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="args">
          <string notr="true">untitled.ui&amp;</string>
+        </property>
+       </widget>
+       <widget class="caShellCommand" name="cashellcommand_3">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>250</y>
+          <width>171</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="label">
+         <string notr="true">listing</string>
+        </property>
+        <property name="labels">
+         <string notr="true">1</string>
+        </property>
+        <property name="files">
+         <string notr="true">sh -c</string>
+        </property>
+        <property name="args">
+         <string notr="true">&quot;cd /home/mezger;ls&quot;</string>
         </property>
        </widget>
       </widget>

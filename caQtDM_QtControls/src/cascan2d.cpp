@@ -1,5 +1,6 @@
 /*
- *  This file is part of the caQtDM Framework, developed at the Paul Scherrer Institut,
+ *  This file is part of the caQtDM Framework, was developed  by Tim Mooney from Argonne,
+ *  based on cacamera by Anton Chr. Mezger at the Paul Scherrer Institut,
  *  Villigen, Switzerland
  *
  *  The caQtDM Framework is free software: you can redistribute it and/or modify
@@ -17,28 +18,32 @@
  *
  *  Copyright (c) 2010 - 2014
  *
- *  Author:
- *    Anton Mezger
+ *  Authors:
+ *    Tim Mooney (Argonne), Anton Mezger (PSI)
  *  Contact details:
  *    anton.mezger@psi.ch
  */
-#define QWT_DLL
+
 #include <QtGui>
-#include<QApplication>
+#include <QApplication>
 #include <math.h>
-#ifndef QT_NO_CONCURRENT
-#include <qtconcurrentrun.h>
-#endif
+#include "cascan2d.h"
 #include "cacamera.h"
 
-caCamera::caCamera(QWidget *parent) : QWidget(parent)
+caScan2D::caScan2D(QWidget *parent) : QWidget(parent)
 {
     m_init = true;
 
-    m_codeDefined = false;
-    m_bppDefined = false;
     m_widthDefined = false;
     m_heightDefined = false;
+
+    m_xcptDefined = false;
+    m_ycptDefined = false;
+    m_xnewdataDefined = false;
+    m_ynewdataDefined = false;
+    m_savedata_pathDefined = false;
+    m_savedata_subdirDefined = false;
+    m_savedata_filenameDefined = false;
 
     thisSimpleView = false;
     savedSize = 0;
@@ -47,7 +52,7 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     frameCount = 0;
     selectionStarted=false;
 
-    savedData = (char*) 0;
+    savedData = (float*) 0;
 
     initWidgets();
 
@@ -59,6 +64,7 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     mainLayout->setMargin(0);
     mainLayout->setSpacing(0);
     setLayout(mainLayout);
+
     setup();
 
     buttonPressed = false;
@@ -78,18 +84,18 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     startTimer(1000);
 }
 
-bool caCamera::isPropertyVisible(Properties property)
+bool caScan2D::isPropertyVisible(Properties property)
 {
     return designerVisible[property];
 }
 
-void caCamera::setPropertyVisible(Properties property, bool visible)
+void caScan2D::setPropertyVisible(Properties property, bool visible)
 {
     designerVisible[property] = visible;
 }
 
 
-void caCamera::deleteWidgets()
+void caScan2D::deleteWidgets()
 {
     if(image != (QImage *) 0)                    delete image;
 
@@ -117,7 +123,7 @@ void caCamera::deleteWidgets()
     if(zoomWidget != (QWidget *) 0)              delete zoomWidget;
 }
 
-void caCamera::initWidgets()
+void caScan2D::initWidgets()
 {
     image = (QImage *) 0;
     labelMin = (caLineEdit *) 0;
@@ -143,26 +149,28 @@ void caCamera::initWidgets()
     colormapWidget = (QwtScaleWidget *) 0;
 }
 
-caCamera::~caCamera()
+caScan2D::~caScan2D()
 {
     deleteWidgets();
     initWidgets();
 }
 
-void caCamera::timerEvent(QTimerEvent *)
+void caScan2D::timerEvent(QTimerEvent *)
 {
     QString text= "%1 U/s";
     text = text.arg(UpdatesPerSecond);
-    if(nbUpdatesText != (caLabel*) 0) nbUpdatesText->setText(text);
+    //if(nbUpdatesText != (caLabel*) 0) nbUpdatesText->setText(text);
     UpdatesPerSecond = 0;
 }
 
-bool caCamera::getROI(int &x, int &y, int &w, int &h)
+bool caScan2D::getROI(int &x, int &y, int &w, int &h)
 {
     x = ROIx;
     y = ROIy;
     w = ROIw;
     h = ROIh;
+
+    printf("%d %d %d %d\n", x,y,w,h);
 
     // rectangle always from upper left corner
     if(ROIw < 0) {
@@ -177,7 +185,7 @@ bool caCamera::getROI(int &x, int &y, int &w, int &h)
     return ROIdetected;
 }
 
-void caCamera::Coordinates(int posX, int posY, double &newX, double &newY, double &maxX, double &maxY)
+void caScan2D::Coordinates(int posX, int posY, double &newX, double &newY, double &maxX, double &maxY)
 {
     // calculate true x, y values and limits of picture
     int width, height;
@@ -196,7 +204,7 @@ void caCamera::Coordinates(int posX, int posY, double &newX, double &newY, doubl
     newY = (posY  + scrollArea->verticalScrollBar()->value()) / Correction;
 }
 
-bool caCamera::eventFilter(QObject *obj, QEvent *event)
+bool caScan2D::eventFilter(QObject *obj, QEvent *event)
 {
     Q_UNUSED(obj);
 
@@ -247,6 +255,7 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
                     ROIh = (int) (Ynew2 - Ynew1);
                     ROIdetected = true;
                 }
+                refreshImage();
             }
         }
     }
@@ -261,101 +270,22 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
         mouseOffset.setX(mouseOffset.x() + scrollArea->horizontalScrollBar()->value());
 
         selectionRect.setBottomRight(mouseOffset);
+        refreshImage();
     }
 
-    if(buttonPressed && (savedData != (char*) 0)) {
+    if(buttonPressed && (savedData != (float*) 0)) {
         double Xnew, Ynew, Xmax, Ymax;
         validIntensity = true;
 
         Coordinates(Xpos, Ypos, Xnew, Ynew, Xmax, Ymax);
 
-        // find intensity
-        switch (m_code) {
-
-        // monochrome image
-        case 1:{
-
-            switch (m_bpp) {
-
-            case 1:  {  // monochrome 1 bpp  (Damir camera)
-                uchar *ptr = (uchar*)  savedData;
-                int index = (int) ((int) Ynew * savedWidth + (int) Xnew);
-                if((Xnew >=0) && (Ynew >=0)  && (Xnew < Xmax) && (Ynew < Ymax) && (index < savedSize)) {
-                    Zvalue=ptr[index];
-
-                } else {
-                    validIntensity = false;
-                }
-            }
-                break;
-
-            case 2: {   // monochrome 2 bpp  (Damir camera)
-                uchar *ptr = (uchar*)  savedData;
-                int index = (int) ((int) Ynew * savedWidth * 2 + 2 * (int) Xnew);
-                if((Xnew >=0) && (Ynew >=0)  &&  (Xnew < Xmax) && (Ynew < Ymax) && (index < savedSize)) {
-                    if(thisColormap == grey) Zvalue=ptr[index];
-                    else Zvalue=ptr[index] * 256 + ptr[index+1];
-
-                } else {
-                    validIntensity = false;
-                }
-            }
-                break;
-
-            case 3: {   // monochrome 2 bpp, but used only 12 bits  (Helge cameras)
-                QSize resultSize;
-                resultSize.setWidth((int) savedWidth);
-                resultSize.setHeight((int) savedHeight);
-                ushort *ptr = (ushort*) savedData;
-                int index = (int) ((int) Ynew * savedWidth + (int) Xnew);
-                if((Xnew >=0) && (Ynew >=0) &&  (Xnew < Xmax) && (Ynew < Ymax) && ((index+resultSize.width())*2 < savedSize))
-                    Zvalue = ptr[index];
-                else
-                    validIntensity = false;
-            }
-                break;
-
-            default:
-                break;
-            } // end switch bpp
-
-            break;
+        float *ptr = (float*)  savedData;
+        int index = (int) ((int) Ynew * savedWidth + (int) Xnew);
+        if((Xnew >=0) && (Ynew >=0)  && (Xnew < Xmax) && (Ynew < Ymax) && (index < savedSize)) {
+            Zvalue=ptr[index];
+        } else {
+            validIntensity = false;
         }
-            // color rgb image
-        case 3:
-
-            // start bpp switch
-            switch (m_bpp) {
-
-            case 3: // 3 bpp, each byte with r,g,b
-            {
-                QSize resultSize;
-                resultSize.setWidth((int) savedWidth);
-                resultSize.setHeight((int) savedHeight);
-                uchar *ptr = (uchar*) savedData;
-                int index = (int) ((int) Ynew * savedWidth*3 + 3 * (int) Xnew);
-                if((Xnew >=0) && (Ynew >=0) &&  (Xnew < Xmax) && (Ynew < Ymax) && ((index+2) < savedSize)) {
-                    if(thisColormap != grey)
-                        Zvalue =(int) (2.2 * ( 0.2989 * ptr[index] +  0.5870 * ptr[index+1] + 0.1140 * ptr[index+2]));
-                    else
-                        Zvalue = (int) (0.2989 * ptr[index] +  0.5870 * ptr[index+1] + 0.1140 * ptr[index+2]);
-                } else {
-                    validIntensity = false;
-                }
-            }
-
-                break;
-
-            default:
-                break;
-
-            } // end switch bpp
-
-            break; // end code case 3
-
-        default:
-            break;
-        } // end switch code
 
         QString strng = "%1, %2, %3";
         if(validIntensity) {
@@ -368,7 +298,7 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
     return false;
 }
 
-void caCamera::setup()
+void caScan2D::setup()
 {
     deleteWidgets();
     initWidgets();
@@ -464,6 +394,7 @@ void caCamera::setup()
 
         zoomSlider = new QSlider;
         zoomSlider->setMinimum(0);
+        //zoomSlider->setMaximum(90); // do not exceed 6*
         zoomSlider->setMaximum(120); // do not exceed 6*
         zoomSlider->setValue(52);
         zoomSlider->setTickPosition(QSlider::NoTicks);
@@ -513,7 +444,7 @@ void caCamera::setup()
     }
 }
 
-void caCamera::zoomNow()
+void caScan2D::zoomNow()
 {
     double scale = qPow(2.0, ((double) zoomSlider->value() - 52.0) / 13.0);
     if(scale > 32) scale = 32;
@@ -522,17 +453,17 @@ void caCamera::zoomNow()
     setFitToSize(No);
 }
 
-void caCamera::zoomIn(int level)
+void caScan2D::zoomIn(int level)
 {
     zoomSlider->setValue(zoomSlider->value() + level);
 }
 
-void caCamera::zoomOut(int level)
+void caScan2D::zoomOut(int level)
 {
     zoomSlider->setValue(zoomSlider->value() - level);
 }
 
-void caCamera::setFitToSize(zoom const &z)
+void caScan2D::setFitToSize(zoom const &z)
 {
     if(thisSimpleView) return;
     thisFitToSize = z;
@@ -541,7 +472,7 @@ void caCamera::setFitToSize(zoom const &z)
         scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
         scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     } else {
-        scaleFactor = 1.0;
+        //scaleFactor = 1.0;
         scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff );
         scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     }
@@ -552,21 +483,21 @@ void caCamera::setFitToSize(zoom const &z)
     delete re;
 }
 
-bool caCamera::getInitialAutomatic()
+bool caScan2D::getInitialAutomatic()
 {
     if(thisSimpleView) return thisInitialAutomatic;
     if(autoW == (QCheckBox *) 0) return false;
     return autoW->isChecked();
 }
 
-void caCamera::setInitialAutomatic(bool automatic)
+void caScan2D::setInitialAutomatic(bool automatic)
 {
     if(thisSimpleView) thisInitialAutomatic = automatic;
     if(autoW == (QCheckBox *) 0) return;
     autoW->setChecked(automatic);
 }
 
-void caCamera::setMinLevel(QString const &level) {
+void caScan2D::setMinLevel(QString const &level) {
     int minimum;
     bool ok;
     thisMinLevel = level;
@@ -577,7 +508,7 @@ void caCamera::setMinLevel(QString const &level) {
         labelMin->setText("");
     }
 }
-void caCamera::setMaxLevel(QString const &level) {
+void caScan2D::setMaxLevel(QString const &level) {
     int maximum;
     bool ok;
     thisMaxLevel = level;
@@ -589,20 +520,20 @@ void caCamera::setMaxLevel(QString const &level) {
     }
 }
 
-bool caCamera::isAlphaMaxLevel()
+bool caScan2D::isAlphaMaxLevel()
 {
     bool ok;
     (void) thisMaxLevel.toInt(&ok);
     return !ok;
 }
-bool caCamera::isAlphaMinLevel()
+bool caScan2D::isAlphaMinLevel()
 {
     bool ok;
     (void) thisMinLevel.toInt(&ok);
     return !ok;
 }
 
-void caCamera::setColormap(colormap const &map)
+void caScan2D::setColormap(colormap const &map)
 {
     thisColormap = map;
     colorMaps colormaps;
@@ -632,9 +563,9 @@ void caCamera::setColormap(colormap const &map)
         // user has the possibility to input its own colormap with discrete QtColors from 2 t0 18
         // when nothing given, fallback to default colormap
         if(thisCustomMap.count() > 2) {
-           colormaps.getColormap(colorMaps::spectrum_custom, thisDiscreteMap, thisCustomMap, ColormapSize, ColorMap, colormapWidget);
+            colormaps.getColormap(colorMaps::spectrum_custom, thisDiscreteMap, thisCustomMap, ColormapSize, ColorMap, colormapWidget);
         } else {
-           colormaps.getColormap(colorMaps::spectrum_wavelength, false, thisCustomMap, ColormapSize, ColorMap, colormapWidget);
+            colormaps.getColormap(colorMaps::spectrum_wavelength, false, thisCustomMap, ColormapSize, ColorMap, colormapWidget);
         }
         break;
     default:
@@ -647,36 +578,112 @@ void caCamera::setColormap(colormap const &map)
     resizeEvent(re);
 }
 
-void caCamera::setCode(int code)
+void caScan2D::setXCPT(int xcpt)
 {
-    m_code = code;
-    m_codeDefined = true;
+    //printf("caScan2D::setXCPT xpt=%d\n", xcpt);
+    m_xcpt = xcpt;
+    m_xcptDefined = true;
 }
-void caCamera::setBPP(int bpp)
+
+void caScan2D::setYCPT(int ycpt)
 {
-    m_bpp = bpp;
-    m_bppDefined = true;
+    //printf("caScan2D::setYCPT ypt=%d\n", ycpt);
+    m_ycpt = ycpt;
+    m_ycptDefined = true;
+    if (m_init) attemptInitialPlot();
 }
-void caCamera::setWidth(int width)
+
+void caScan2D::setXNEWDATA(int xnewdata)
+{
+    m_xnewdata = xnewdata;
+    m_xnewdataDefined = true;
+}
+
+void caScan2D::setYNEWDATA(int ynewdata)
+{
+    int i, status=0;
+
+    // I get two calls per monitor event for some reason
+    if (m_ynewdata == ynewdata) {
+        //printf("caScan2D::setYNEWDATA for pv %s %d (ignored)\n", getPV_Data().toAscii().constData(), ynewdata);
+        return;
+    }
+    m_ynewdata = ynewdata;
+    m_ynewdataDefined = true;
+    if (!m_widthDefined || !m_heightDefined)
+        return;
+
+    //printf("caScan2D::setYNEWDATA for pv %s %d\n", getPV_Data().toAscii().constData(), ynewdata);
+    if (m_ynewdata == 0) {
+        for (i=0; i<m_width*m_height; i++) xdata[i] = 0.;
+        for (i=0; i<m_height; i++) haveY[i] = 0;
+    } else {
+        // Get all data from file
+        if (m_savedata_pathDefined && m_savedata_subdirDefined && m_savedata_filenameDefined && m_ycptDefined) {
+            QString dataFile = m_savedata_path + QString("/") + m_savedata_subdir + QString("/") + m_savedata_filename;
+            status = mdaReader_gimmeYerData(dataFile, thisPV_Data, xdata, m_width, m_height, m_ycpt);
+        }
+    }
+    // Don't call showImage() on m_init, because xdata may not have been initialized from the data file
+    if (status == 0 && !m_init) showImage(m_width, m_height);
+}
+
+void caScan2D::setSAVEDATA_PATH(const QString &savedata_path)
+{
+    m_savedata_path = savedata_path;
+    m_savedata_pathDefined = true;
+    if (m_init) attemptInitialPlot();
+}
+
+void caScan2D::setSAVEDATA_SUBDIR(const QString &savedata_subdir)
+{
+    m_savedata_subdir = savedata_subdir;
+    m_savedata_subdirDefined = true;
+    if (m_init) attemptInitialPlot();
+}
+
+void caScan2D::setSAVEDATA_FILENAME(const QString &savedata_filename)
+{
+    m_savedata_filename = savedata_filename;
+    m_savedata_filenameDefined = true;
+    if (m_init) attemptInitialPlot();
+}
+
+void caScan2D::attemptInitialPlot() {
+    if (m_init && m_widthDefined && m_heightDefined && m_savedata_pathDefined && m_savedata_subdirDefined && m_savedata_filenameDefined && m_ycptDefined) {
+        QString dataFile = m_savedata_path + QString("/") + m_savedata_subdir + QString("/") + m_savedata_filename;
+        mdaReader_gimmeYerData(dataFile, thisPV_Data, xdata, m_width, m_height, m_ycpt);
+        showImage(m_width, m_height);
+    }
+}
+
+void caScan2D::setWidth(int width)
 {
     m_width = width;
     m_widthDefined = true;
-
+    if (m_init) attemptInitialPlot();
 }
-void caCamera::setHeight(int height)
+
+void caScan2D::setHeight(int height)
 {
     m_height = height;
     m_heightDefined = true;
+    if (m_init) attemptInitialPlot();
 }
 
-
-void caCamera::resizeEvent(QResizeEvent *e)
+void caScan2D::resizeEvent(QResizeEvent *e)
 {
-    if(thisSimpleView) return;
+    if(thisSimpleView) {
+        if(m_widthDefined && m_heightDefined) {
+            showImage(m_width, m_height);
+        }
+        return;
+    }
 
     if(m_widthDefined && m_heightDefined) {
         if(!thisFitToSize) {
             imageW->setMinimumSize((int) (m_width * scaleFactor), (int) (m_height * scaleFactor));
+            showImage((int) (m_width * scaleFactor), (int) (m_height * scaleFactor));
         } else {
             double Xcorr = (double) (e->size().width() - zoomWidget->width()-4) / (double) savedWidth;
             double Ycorr = (double) (e->size().height()- valuesWidget->height()-4) / (double) savedHeight;
@@ -689,55 +696,69 @@ void caCamera::resizeEvent(QResizeEvent *e)
             imageW->setFixedWidth(e->size().width() - zoomWidget->width()-4);
             imageW->setFixedHeight(e->size().height()- valuesWidget->height()-4);
             scaleFactor = scale;
+            showImage(m_width, m_height);
         }
     }
 }
 
-void caCamera::updateImage(const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor)
+void caScan2D::refreshImage()
+{
+    if(m_widthDefined && m_heightDefined) {
+        if(!thisFitToSize) {
+            imageW->setMinimumSize((int) (m_width * scaleFactor), (int) (m_height * scaleFactor));
+            showImage((int) (m_width * scaleFactor), (int) (m_height * scaleFactor));
+        } else {
+            showImage((int) (m_width), (int) (m_height));
+        }
+    }
+}
+
+void caScan2D::updateImage(const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor)
 {
     imageW->updateImage(thisFitToSize, image, valuesPresent, values, scaleFactor, selectionStarted, selectionRect, thisSimpleView);
 }
 
-void caCamera::showDisconnected()
+void caScan2D::showDisconnected()
 {
     imageW->updateDisconnected();
 }
 
-bool caCamera::getAutomateChecked()
+
+bool caScan2D::getAutomateChecked()
 {
     if(thisSimpleView) {
-       return thisInitialAutomatic;
+        return thisInitialAutomatic;
     }
     if(autoW == (QCheckBox *) 0) return false;
     return autoW->isChecked();
 }
 
-void caCamera::updateMax(int max)
+void caScan2D::updateMax(int max)
 {
-    if(labelMax == (caLineEdit*) 0) return;
+    if(labelMax == (QLineEdit*) 0) return;
     labelMax->setText(QString::number(max));
 }
 
-void caCamera::updateMin(int min)
+void caScan2D::updateMin(int min)
 {
-    if(labelMin == (caLineEdit*) 0) return;
+    if(labelMin == (QLineEdit*) 0) return;
     labelMin->setText(QString::number(min));
 }
 
-void caCamera::updateIntensity(QString strng)
+void caScan2D::updateIntensity(QString strng)
 {
     if(intensity == (caLabel*) 0) return;
     intensity->setText(strng);
 }
 
-int caCamera::getMin()
+int caScan2D::getMin()
 {
     bool ok;
     if(thisSimpleView) return  thisMinLevel.toInt(&ok);
     if(labelMin == (caLineEdit*) 0) return 0;
     return labelMin->text().toInt();
 }
-int caCamera::getMax()
+int caScan2D::getMax()
 {
     bool ok;
     if(thisSimpleView) return  thisMaxLevel.toInt(&ok);
@@ -745,300 +766,127 @@ int caCamera::getMax()
     return labelMax->text().toInt();
 }
 
-void caCamera::dataProcessing(int value, int id)
+void caScan2D::dataProcessing(int value, int id)
 {
+
     if(id < 0 || id > 3) return;
     valuesPresent[id] = true;
     values[id] = value;
+
+    refreshImage();
 }
 
-QImage *caCamera::showImageCalc(int datasize, char *data)
+void caScan2D::newArray(int numDataBytes, float *data) {
+    int numDataPts = numDataBytes/4;
+    int i, j;
+
+    if(!m_widthDefined || !m_heightDefined ||  !m_ycptDefined) return;
+
+    if (numDataPts > m_width) numDataPts = m_width;
+    //printf("caScan2D::newArray ypt=%d\n", m_ycpt);
+    // We're normally going to get new data before the outer scan has posted
+    // the new CPT value, so it's useable directly as an array index even though
+    // it really means the number of data points acquired.
+    if (m_ycpt >= m_height) return;
+    if (haveY[m_ycpt]) return;
+    for (i=m_ycpt*m_width, j=0; j<numDataPts; i++, j++) {
+        xdata[i] = data[j];
+    }
+    haveY[m_ycpt] = 1;
+    showImage(m_width, m_height);
+    savedData = xdata;
+}
+
+void caScan2D::showImage(int numXDataValues, int numYDataValues)
 {
     uint indx, indx1;
-    long int i=0;
+    long int i;
     QSize resultSize;
     uint Max[2], Min[2];
+    static uint minvalue, maxvalue;
+    float dataMin=1.e9, dataMax=-1.e9;
+    float dataOffset, dataFactor;
+    int numDataValues = numXDataValues * numYDataValues;
 
-    if(!m_bppDefined) return (QImage *) 0;
-    if(!m_widthDefined) return (QImage *) 0;
-    if(!m_heightDefined) return (QImage *) 0;
-    if(!m_codeDefined) return (QImage *) 0;
+    if(!m_widthDefined) return;
+    if(!m_heightDefined) return;
+    // We don't actually use this now
+    //if(!m_xcptDefined) return;
+    //if(!m_ycptDefined) return;
+    //if(!m_xnewdataDefined) return;
+    //if(!m_ynewdataDefined) return;
+
 
     resultSize.setWidth((int) m_width);
     resultSize.setHeight((int) m_height);
 
     // first time get image
-    if(m_init || datasize != savedSize || m_width != savedWidth || m_height != savedHeight) {
-        savedSize = datasize;
+    if(m_init || numDataValues != savedSize || m_width != savedWidth || m_height != savedHeight) {
+        savedSize = numDataValues;
         savedWidth = m_width;
         savedHeight = m_height;
-
-        if(image != (QImage *) 0) {
-            delete image;
-        }
+        if(image != (QImage *) 0) delete image;
         image = new QImage(resultSize, QImage::Format_RGB32);
-
         m_init = false;
         minvalue = 0;
-        maxvalue = 0xFFFFFFFF;
+        maxvalue = 65535;
+
+        //for (i=0; i<YMAXPTS; i++) haveY[i] = 0;
+        //for (i=0; i<YMAXPTS*XMAXPTS; i++) xdata[i] = 0.;
+        //mdaReader_RegisterPV(thisPV_Data);
         ftime(&timeRef);
-
-        // force resize
-        QResizeEvent *re = new QResizeEvent(size(), size());
-        resizeEvent(re);
     }
-
-    savedData = data;
 
     Max[1] = 0;
     Min[1] = 65535;
 
-    switch (m_code) {
-
-    // monochrome image
-    case 1:{
-
-        // start bpp switch
-        switch (m_bpp) {
-
-        case 1:  {  // monochrome 1 bpp  (Damir camera)
-
-            uchar *ptr = (uchar*)  data;
-            if(ptr == (void*) 0) return (QImage *) 0;
-
-            if(thisColormap != grey) {
-
-                for (int y = 0; y < resultSize.height(); ++y) {
-                    uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
-
-                    for (int x = 0; x < resultSize.width(); ++x) {
-                        indx = ptr[i]; i+=m_bpp;
-                        indx1 = (indx - minvalue) * (ColormapSize-1) / (maxvalue - minvalue);
-                        if(indx1 >= ColormapSize) indx1=ColormapSize -1;
-
-                        *scanLine++ = ColorMap[indx1];
-
-                        Max[(indx > Max[1])] = indx;
-                        Min[(indx < Min[1])] = indx;
-                        if(i >= datasize) break;
-                    }
-                    if(i >= datasize) break;
-                }
-
-            } else {
-                for (int y = 0; y < resultSize.height(); ++y) {
-                    uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
-
-                    for (int x = 0; x < resultSize.width(); ++x) {
-                        indx = ptr[i]; i+=m_bpp;
-                        *scanLine++ = ColorMap[indx];
-
-                        Max[(indx > Max[1])] = indx;
-                        Min[(indx < Min[1])] = indx;
-                        if(i >= datasize) break;
-                    }
-                    if(i >= datasize) break;
-                }
-            }
-        }
-            break;
-
-        case 2: {  // monochrome 2 bpp, but use only first byte of words (Damir cameras)
-
-            uchar *ptr = (uchar*)  data;
-            if(ptr == (void*) 0) return (QImage *) 0 ;
-
-            if(thisColormap != grey) {
-
-                for (int y = 0; y < resultSize.height(); ++y) {
-                    uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
-
-                    for (int x = 0; x < resultSize.width(); ++x) {
-                        indx = ptr[i]*256 + ptr[i+1]; i+=m_bpp;
-                        indx1 = (indx - minvalue) * (ColormapSize-1) / (maxvalue - minvalue);
-                        if(indx1 >= ColormapSize) indx1=ColormapSize -1;
-
-                        *scanLine++ = ColorMap[indx1];
-
-                        Max[(indx > Max[1])] = indx;
-                        Min[(indx < Min[1])] = indx;
-                        if(i >= datasize) break;
-                    }
-                    if(i >= datasize) break;
-                }
-            } else {
-                for (int y = 0; y < resultSize.height(); ++y) {
-                    uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
-
-                    for (int x = 0; x < resultSize.width(); ++x) {
-                        indx = ptr[i]; i+=m_bpp;
-                        *scanLine++ = ColorMap[indx];
-
-                        Max[(indx > Max[1])] = indx;
-                        Min[(indx < Min[1])] = indx;
-                        if(i >= datasize) break;
-                    }
-                    if(i >= datasize) break;
-                }
-            }
-        }
-            break;
-
-        case 3: {   // monochrome 2 bpp, but used only 12 bits  (Helge cameras)
-
-            ushort *ptr = (ushort*) data;
-
-            if(ptr == (void*) 0) return (QImage *) 0;
-
-            if(thisColormap != grey) {
-
-                for (int y = 0; y < resultSize.height(); ++y) {
-                    uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
-
-                    for (int x = 0; x < resultSize.width(); ++x) {
-                        indx = ptr[i++];
-                        indx1 = (indx - minvalue) * (ColormapSize-1) / (maxvalue - minvalue);
-                        if(indx1 >= ColormapSize) indx1=ColormapSize -1;
-
-                        *scanLine++ = ColorMap[indx1];
-
-                        Max[(indx > Max[1])] = indx;
-                        Min[(indx < Min[1])] = indx;
-						if ((i * 2) >= datasize) break;
-                    }
-                    if((i*2) >= datasize) break;
-                }
-
-
-            } else {
-
-                for (int y = 0; y < resultSize.height(); ++y) {
-                    uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
-
-                    for (int x = 0; x < resultSize.width(); ++x) {
-
-                        indx=ptr[i++];
-                        Max[(indx > Max[1])] = indx;
-                        Min[(indx < Min[1])] = indx;
-
-                        indx1=indx * 255 /(maxvalue - minvalue);
-
-                        if(indx1 > 255) indx1 = 255;
-                        *scanLine++ = qRgb(indx1,indx1,indx1);
-						if((i*2) >= datasize) break;
-                    }
-					if ((i * 2) >= datasize) break;
-                }
-            }
-        }
-            break;
-
-        default:
-            break;
-        } // end switch bpp
-
-        break;
+    for (i=0; i<numDataValues; i++) {
+        if (xdata[i] < dataMin) dataMin = xdata[i];
+        if (xdata[i] > dataMax) dataMax = xdata[i];
     }
-        // color rgb image
-    case 3:
+    dataOffset = dataMin;
+    dataFactor = (maxvalue - minvalue)/(dataMax-dataMin);
+    i = 0;
 
-        // start bpp switch
-        switch (m_bpp) {
+    for (int y = 0; y < resultSize.height(); ++y) {
+        uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
 
-        case 3: // 3 bpp, each byte with r,g,b
-            if(thisColormap != grey) {
-                uint intensity;
-                uchar *ptr = (uchar*)  data;
-                if(ptr == (void*) 0) return (QImage *) 0;
+        for (int x = 0; x < resultSize.width(); ++x) {
+            indx = (uint) ((xdata[i]-dataMin)*dataFactor);
+            i++;
+            indx1 = (indx - minvalue) * (ColormapSize-1) / (maxvalue - minvalue);
+            if(indx1 >= ColormapSize) indx1 = ColormapSize -1;
 
-                for (int y = 0; y < resultSize.height(); ++y) {
-                    uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
-                    for (int x = 0; x < resultSize.width(); ++x) {
-                        intensity = (int) (2.2 * (0.2989 * ptr[i] +  0.5870 * ptr[i+1] + 0.1140 * ptr[i+2]));
-                        *scanLine = qRgb(ptr[i],ptr[i+1],ptr[i+2]);
-                        i+=3;
+            *scanLine++ = ColorMap[indx1];
 
-                        Max[(intensity > Max[1])] = intensity;
-                        Min[(intensity < Min[1])] = intensity;
-                        //*scanLine++;
-                    }
-                    if(i+2 >= datasize) break;
-                }
-
-            } else {  //convert color to gray scale
-                uint average;
-                uchar *ptr = (uchar*)  data;
-                if(ptr == (void*) 0) return (QImage *) 0;
-
-                for (int y = 0; y < resultSize.height(); ++y) {
-                    uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
-                    for (int x = 0; x < resultSize.width(); ++x) {
-                        average =(int) (0.2989 * ptr[i] + 0.5870 * ptr[i+1] +  + 0.1140 * ptr[i+2]);
-                        *scanLine++ = qRgb(average, average, average);
-                        i+=3;
-
-                        Max[(average > Max[1])] = average;
-                        Min[(average < Min[1])] = average;
-                    }
-                    if(i+2 >= datasize) break;
-                }
-            }
-            break;
-
-        default:
-            break;
-
-        } // end switch bpp
-
-        break; // end code case 3
-
-    default:
-        break;
-    } // end switch code
+            Max[(indx > Max[1])] = indx;
+            Min[(indx < Min[1])] = indx;
+        }
+        if(i >= numDataValues) break;
+    }
 
     minvalue = Min[1];
     maxvalue= Max[1];
 
-    if(maxvalue == minvalue) {
-        maxvalue = maxvalue +1;
-        minvalue = minvalue -1;
-        if(maxvalue > 0xFFFFFFFE) maxvalue = 0xFFFFFFFE;
-    }
-
-    return image;
-}
-
-void caCamera::showImage(int datasize, char *data)
-{
-#ifndef QT_NO_CONCURRENT
-    QFuture<QImage *> future = QtConcurrent::run(this, &caCamera::showImageCalc, datasize, data);
-    image = future.result();
-#else
-    image = showImageCalc(datasize, data);
-#endif
-
-    if(image != (QImage *) 0) updateImage(*image, valuesPresent, values, scaleFactor);
-
     if(getAutomateChecked()) {
-        updateMax(maxvalue);
-        updateMin(minvalue);
+        updateMax(Max[1]);
+        updateMin(Min[1]);
     } else {
         int minv = getMin();
         int maxv = getMax();
-        if(maxv >= minv) {
+        if(maxv > minv) {
             maxvalue = maxv;
             minvalue = minv;
-        } else {
-            maxvalue = minv;
-            minvalue = maxv;
         }
-        if(maxvalue == minvalue) maxvalue = minvalue + 1000;
     }
-    UpdatesPerSecond++;
+
+    updateImage(*image, valuesPresent, values, scaleFactor);
 }
 
-
-void caCamera::setAccessW(int access)
+void caScan2D::setAccessW(int access)
 {
     _AccessW = access;
 }
+
+
+

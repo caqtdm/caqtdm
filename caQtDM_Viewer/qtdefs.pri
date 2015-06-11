@@ -26,6 +26,13 @@ NETWORKDOWNLOADSUPPORT {
 DEFINES += NETWORKDOWNLOADSUPPORT
 }
 
+# for some architectures this has to be defined for scan2D
+macx | win32 | ios | android {
+DEFINES += XDR_HACK
+DEFINES += XDR_LE
+CONFIG += XDR_HACK
+}
+
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 

@@ -46,12 +46,12 @@ class  QTCON_EXPORT caGraphics : public QWidget
 
     Q_PROPERTY(Form form READ getForm WRITE setForm)
 
-    Q_PROPERTY( int arrowSize READ getArrowSize WRITE setArrowSize DESIGNABLE true)
-    Q_PROPERTY( ArrowMode arrowMode READ getArrowMode WRITE setArrowMode DESIGNABLE true)
+    Q_PROPERTY( int arrowSize READ getArrowSize WRITE setArrowSize DESIGNABLE isPropertyVisible(arrowsize))
+    Q_PROPERTY( ArrowMode arrowMode READ getArrowMode WRITE setArrowMode DESIGNABLE isPropertyVisible(arrowmode))
 
-    Q_PROPERTY( int tiltAngle READ getTiltAngle WRITE setTiltAngle DESIGNABLE true)
-    Q_PROPERTY( int startAngle READ getStartAngle WRITE setStartAngle DESIGNABLE true)
-    Q_PROPERTY( int spanAngle READ getSpanAngle WRITE setSpanAngle DESIGNABLE true)
+    Q_PROPERTY( int tiltAngle READ getTiltAngle WRITE setTiltAngle DESIGNABLE isPropertyVisible(tiltangle))
+    Q_PROPERTY( int startAngle READ getStartAngle WRITE setStartAngle DESIGNABLE isPropertyVisible(startangle))
+    Q_PROPERTY( int spanAngle READ getSpanAngle WRITE setSpanAngle DESIGNABLE isPropertyVisible(spanangle))
 
     Q_ENUMS(Form)
     Q_ENUMS(colMode)
@@ -66,6 +66,8 @@ public:
     enum LineStyle {Solid = 0, Dash, BigDash};
     enum FillStyle {Filled = 0, Outline};
     enum Form {Rectangle = 0, Circle, Arc, Triangle, Line, Arrow};
+
+    enum Properties { arrowsize = 0, arrowmode, startangle, spanangle, tiltangle};
 
     enum ArrowMode { Single, Double};
 
@@ -121,6 +123,9 @@ public:
 
     void setHidden(bool hide);
 
+    bool isPropertyVisible(Properties property);
+    void setPropertyVisible(Properties property, bool visible);
+
 public slots:
 
 
@@ -153,6 +158,7 @@ private:
     QPolygonF rotateObject(int degrees, int w, int h, int linesize, const QPolygonF& object);
 
     bool thisHide;
+    bool designerVisible[10];
 };
 
 #endif // CIRCLEBAR_H

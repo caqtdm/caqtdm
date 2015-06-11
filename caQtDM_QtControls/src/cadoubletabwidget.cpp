@@ -91,6 +91,7 @@ caDoubleTabWidget::caDoubleTabWidget(QWidget *parent) : QWidget(parent)
 
 bool caDoubleTabWidget::eventFilter(QObject *obj, QEvent *event)
 {
+    Q_UNUSED(obj);
     QVariant source = qApp->property("APP_SOURCE").value<QVariant>();
     if(source.isValid()) {
         if(!source.isNull()) {
@@ -205,6 +206,7 @@ void caDoubleTabWidget::removePage(int index)
 // insert a new viewport
 void caDoubleTabWidget::insertPage(int index, QWidget *page)
 {
+    Q_UNUSED(index)
     page->setParent(viewPort);
     page->activateWindow();
 
@@ -305,7 +307,7 @@ void caDoubleTabWidget::addSampleWidget(int dir)
 void caDoubleTabWidget::setCurrentIndex(int pageIndex)
 {
     int Index;
-    PRINT(printf("setcurrent pageIndex %d row=%d col=%d\n", pageIndex, row, col));
+    Q_UNUSED(pageIndex)
     QString title = tr("Page_%1_%2").arg(row).arg(col);
     tableIndex->setText(title);
 

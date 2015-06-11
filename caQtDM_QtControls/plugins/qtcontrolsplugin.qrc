@@ -34,5 +34,6 @@
         <file>pixmaps/wavetable.png</file>
         <file>pixmaps/clock.png</file>
         <file>pixmaps/meter.png</file>
+        <file>pixmaps/scan2d.png</file>
     </qresource>
 </RCC>

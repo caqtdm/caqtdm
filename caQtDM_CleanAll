@@ -25,8 +25,20 @@ rm -f ./caQtDM_QtControls/plugins/Makefile
 rm -f ./caQtDM_Lib/*.so
 rm -f ./caQtDM_QtControls/*.so
 rm -f ./caQtDM_QtControls/plugins/*.so
+
+echo ========== remove moc/obj from directories ============
 rm -f ./caQtDM_QtControls/plugins/moc/*
 rm -f ./caQtDM_QtControls/plugins/obj/*
+rm -f ./caQtDM_QtControls/moc/*
+rm -f ./caQtDM_QtControls/obj/*
+rm -f ./caQtDM_Lib/obj1/*
+rm -f ./caQtDM_Lib/moc/*
+rm -f ./caQtDM_Viewer/obj1/*
+rm -f ./caQtDM_Viewer/moc/*
+rm -f ./caQtDM_Viewer/parser/moc/*
+rm -f ./caQtDM_Viewer/parser/obj/*
+rm -f ./caQtDM_Viewer/parserEDM/moc/*
+rm -f ./caQtDM_Viewer/parserEDM/obj/*
 
 echo =========== clean all ==================
 qmake all.pro

@@ -165,6 +165,8 @@ void caMeter::setMaxValue(double v) {
 
 void caMeter::drawScaleContents(QPainter *painter, const QPointF &center, double radius) const
 {
+    Q_UNUSED(center);
+    Q_UNUSED(radius);
     QRectF rect( 2./10.*width(), 0.0, 6.0/10.0*width(), 9.0/10.0*height());
 
     const QColor color = palette().color(QPalette::Text);
