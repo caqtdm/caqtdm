@@ -28,11 +28,11 @@
 
 #include "caQtDM_Lib_global.h"
 #if defined(_MSC_VER)
-   #define _MATH_DEFINES_DEFINED
+#define _MATH_DEFINES_DEFINED
 #endif
 
 #ifdef epics4
-    #include "epics4Subs.h"
+#include "epics4Subs.h"
 #endif
 
 #include "dbrString.h"
@@ -54,8 +54,8 @@
 #include <QWaitCondition>
 #include <QMessageBox>
 #ifndef MOBILE
- #include <QPrinter>
- #include <QPrintDialog>
+#include <QPrinter>
+#include <QPrintDialog>
 #endif
 #include <QClipboard>
 
@@ -84,7 +84,7 @@
 #include <QMenuBar>
 
 namespace Ui {
-    class CaQtDM_Lib;
+class CaQtDM_Lib;
 }
 
 class CAQTDM_LIBSHARED_EXPORT CaQtDM_Lib : public QMainWindow
@@ -105,21 +105,69 @@ public:
     void grabSwipeGesture(Qt::GestureType fingerSwipeGestureTypeID);
 #endif
 
+#ifdef linux
+    QString getDefaultPrinterFromSystem() {
+        QProcess Process;
+        QString exec = "lpstat";
+        QStringList params;
+        params << "-d"  ;
+        Process.start(exec, params);
+        Process.waitForFinished(); // sets current thread to sleep and waits for Process end
+        QString output(Process.readAllStandardOutput());
+
+        QRegExp noDefaultReg("[^:]*no .*default");
+        int pos = noDefaultReg.indexIn(output);
+        if (pos >= 0) {
+            return QString();
+        }
+
+        QRegExp defaultReg("default.*: *([a-zA-Z0-9_]+)");
+        defaultReg.indexIn(output);
+        QString printer = defaultReg.cap(1);
+        return printer;
+    }
+#else
+    QString getDefaultPrinterFromSystem() {
+        QString printer = "";
+        return printer;
+    }
+#endif
+
     void print()
     {
 #ifndef MOBILE
+#ifdef linux
+        QString defaultPrinter =  getDefaultPrinterFromSystem();
+#endif
         QPrinter *printer = new QPrinter;
+#ifdef linux
+        printer->setPrinterName(defaultPrinter);
+        printer->setOutputFileName(0);
+        printer->setPrintProgram("lpr");
+        printer->setOrientation(QPrinter::Landscape);
+        printer->setResolution(300);
+        printer->setOutputFormat(QPrinter::NativeFormat);
+#else
+        printer->setOrientation(QPrinter::Landscape);
+        printer->setResolution(300);
+#endif
         QPrintDialog *printDialog = new QPrintDialog(printer, this);
+
+#ifdef linux
+        QList<QWidget*> childWidgets = printDialog->findChildren<QWidget*>(QLatin1String("printers"));
+        if (childWidgets.count() == 1) {
+            QComboBox* comboBox(qobject_cast<QComboBox*>(childWidgets.at(0)));
+            comboBox->addItem(defaultPrinter);
+        }
+#endif
         if (printDialog->exec() == QDialog::Accepted) {
 
             QPainter painter(printer);
-            printer->setOrientation(QPrinter::Landscape);
-            printer->setResolution(300);
             double xscale = printer->pageRect().width()/double(this->width());
             double yscale = printer->pageRect().height()/double(this->height());
             double scale = qMin(xscale, yscale);
             painter.translate(printer->paperRect().x() + printer->pageRect().width()/2,
-                               printer->paperRect().y() + printer->pageRect().height()/2);
+                              printer->paperRect().y() + printer->pageRect().height()/2);
             painter.scale(scale, scale);
             painter.translate(-width()/2, -height()/2);
             QPixmap pm = QPixmap::grabWidget(this);
@@ -127,6 +175,7 @@ public:
         }
 #endif
     }
+
     void printPS(QString filename)
     {
 #ifndef MOBILE
