@@ -77,6 +77,7 @@ int main(int argc, char *argv[])
     QString fileName = "";
     QString macroString = "";
     QString geometry = "";
+    QString macroFile = "";
 
     dmsearchFile *s = new dmsearchFile("caQtDM_stylesheet.qss");
     QString fileNameFound = s->findFile();
@@ -113,6 +114,10 @@ int main(int argc, char *argv[])
         } else if ( strcmp (argv[in], "-noMsg" ) == 0 ) {
             printf("caQtDM -- will minimize its main windows\n");
             minimize = true;
+        } else if( strcmp (argv[in], "-macrodefs" ) == 0) {
+            in++;
+            printf("caQtDM -- will load macro string from file <%s>\n", strdup(argv[in]));
+            macroFile = QString(argv[in]);
         } else if ( strcmp (argv[in], "-noStyles" ) == 0 ) {
             printf("caQtDM -- will not replace the default application stylesheet caQtDM_stylesheet.qss\n");
             nostyles = true;
@@ -130,6 +135,7 @@ int main(int argc, char *argv[])
                    "  [-noMsg]\n"
                    "  [-noStyles]      works only when not attaching\n"
                    "  [-macro \"xxx=aaa,yyy=bbb, ...\"]\n"
+                   "  [-macrodefs filename] will load macro definitions from file\n"
                    "  [-dg [xpos[xypos]][+xoffset[+yoffset]]\n"
                    "  [-print] will print file and exit\n"
                    "  [-noResize] will prevent resizing, works only when not attaching\n"
@@ -172,6 +178,21 @@ int main(int argc, char *argv[])
             file.close();
         }
     }
+
+    // load macro definitions from file (located in this directory or in the caQTDM_DISPLAY_PATH)
+    if(macroFile.length() > 0) {
+        s = new dmsearchFile(macroFile);
+        fileNameFound = s->findFile();
+        if(fileNameFound.isNull()) {
+            printf("caQtDM -- file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toAscii().constData());
+        } else {
+            QFile file(fileNameFound);
+            file.open(QFile::ReadOnly);
+            macroString = QLatin1String(file.readAll());
+            file.close();
+        }
+    }
+
 
 #ifdef IO_OPTIMIZED_FOR_TABWIDGETS
     printf("caQtDM -- viewer will disable monitors for hidden pages of QTabWidgets, in case of problems\n");
