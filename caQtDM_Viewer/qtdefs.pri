@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.9.3
+CAQTDM_VERSION = V3.9.4
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -35,6 +35,8 @@ CONFIG += XDR_HACK
 
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
+
+# 3.9.4
 
 
 # 3.9.2 and 3.9.3
