@@ -42,10 +42,10 @@ public:
     QString getStdPath() {
 #ifdef MOBILE
 #ifdef MOBILE_ANDROID
-    return stdpathdoc=QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 #endif
 #ifdef MOBILE_IOS
-    return stdpathdoc=QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    return QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
 #endif
 #else
     QString path = QDir::tempPath();
