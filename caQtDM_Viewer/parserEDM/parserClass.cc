@@ -448,6 +448,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
             else if ( strcmp( objName, "activeXTextDspClass:noedit" ) == 0 ) activeClass = activeXTextDsp;  // Zai
             else if ( strcmp( objName, "TextupdateClass" ) == 0 ) activeClass = TextUpdate; // Zai
             else if ( strcmp( objName, "TextentryClass" ) == 0 ) activeClass = TextEntry; // Zai
+            else if ( strcmp( objName, "ByteClass" ) == 0 ) activeClass = Byte; // Zai
             else if ( strcmp( objName, "activeMeterClass" ) == 0 ) activeClass = activeMeter;
             else if ( strcmp( objName, "activeBarClass" ) == 0 ) activeClass = activeBar;
             else if ( strcmp( objName, "activeMessageBoxClass" ) == 0 ) activeClass = activeMessageBox;
@@ -455,6 +456,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
             else if ( strcmp( objName, "activeButtonClass" ) == 0 ) activeClass = activeButton;
             else if ( strcmp( objName, "activeMenuButtonClass" ) == 0 ) activeClass = activeMenuButton;
             else if ( strcmp( objName, "activeRadioButtonClass" ) == 0 ) activeClass = activeRadioButton;
+            else if ( strcmp( objName, "activeChoiceButtonClass" ) == 0 ) activeClass = activeChoiceButton;
             else if ( strcmp( objName, "activeMessageButtonClass" ) == 0 )  activeClass = activeMessageButton;
             else if ( strcmp( objName, "activeExitButtonClass" ) == 0 ) activeClass = activeExitButton;
             else if ( strcmp( objName, "shellCmdClass") == 0) activeClass = shellCmdButton;
@@ -1062,6 +1064,49 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 break;
 
                 //***************************************************************************************************************
+            case Byte :
+                // Zai added
+            {
+                tagClass tag;
+
+                tag.init();
+                tag.loadR( "beginObjectProperties" );
+                tag.loadR( unknownTags );
+                tag.loadR( "major", &major );
+                tag.loadR( "minor", &minor );
+                tag.loadR( "release", &release );
+                tag.loadR( "x", &x );
+                tag.loadR( "y", &y );
+                tag.loadR( "w", &w );
+                tag.loadR( "h", &h );
+                tag.loadR( "lineColor", ci, &lineColor );
+                tag.loadR( "onColor", ci, &onColor );
+                tag.loadR( "offColor", ci, &offColor );
+                tag.loadR( "controlPv", &controlPvExpStr, emptyStr );
+                tag.loadR( "numBits", &numBits );
+                tag.loadR( "endObjectProperties" );
+
+                stat = tag.readTags( f, "endObjectProperties" );
+                if ( !( stat & 1 ) ) {
+                    printf("%s\n", tag.errMsg() );
+                }
+
+                // ----------------- write the properties to the ui file
+                sprintf(widgetName, "caByte_%d", widgetNumber++);
+                myParser->Qt_writeOpenTag("widget", "caByte", widgetName);
+                myParser->writeRectangleDimensions(x, y, w, h);
+                myParser->Qt_handleString("channel", "string", controlPvExpStr.getRaw());
+                myParser->Qt_handleString("startBit", "enum", "0");
+                myParser->Qt_handleString("endBit", "enum", (char*)QString::number(numBits - 1).toStdString().c_str());
+                if (w > h){
+                    myParser->Qt_handleString("direction", "enum", "Right");
+                }
+                else{
+                    myParser->Qt_handleString("direction", "enum", "Down");
+                }
+                myParser->Qt_writeCloseTag("widget", widgetName, 0);
+            }
+                break;
             case activeXTextDsp :
             case TextEntry :    // Zai
             case TextUpdate :   // Zai
@@ -1466,6 +1511,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
 
 
                 //***************************************************************************************************************
+            case activeChoiceButton: // Zai added
             case activeRadioButton:
             {
                 tagClass tag;
@@ -1490,6 +1536,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 tag.loadR( "botShadowColor", ci, &botShadowColor );
                 tag.loadR( "controlPv", &controlPvExpStr, emptyStr );
                 tag.loadR( "font", 63, fontTag );
+                tag.loadR( "inconsistentColor", ci, &inconsistentColor );  // Zai added for ChoiceButton
+                tag.loadR( "orientation", 2, orienTypeEnumStr, orienTypeEnum, &horizontal, &horz ); // Zai added for ChoiceButton
                 tag.loadR( "endObjectProperties" );
 
                 stat = tag.readTags( f, "endObjectProperties" );
@@ -1504,6 +1552,16 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_setColorForeground("", rgb[fgColor].r/256, rgb[fgColor].g/256, rgb[fgColor].b/256, 255);
                 myParser->Qt_setColorBackground("", rgb[bgColor].r/256, rgb[bgColor].g/256, rgb[bgColor].b/256, 255);
                 myParser->Qt_handleString("channel", "string", controlPvExpStr.getRaw());
+                // Zai added
+                if (activeClass == activeChoiceButton){
+                    if(horizontal == 0) {
+                        myParser->Qt_handleString("stackingMode", "enum", "Row");
+                    } else {
+                        myParser->Qt_handleString("stackingMode", "enum", "Column");
+                    }
+                    myParser->Qt_handleString("startBit", "number", "0");
+                    myParser->Qt_handleString("endBit", "number", "2");
+                } // Zai added end
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
             }
                 break;

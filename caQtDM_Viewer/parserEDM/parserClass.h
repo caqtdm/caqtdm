@@ -11,9 +11,9 @@
 #define LONGSTRING       4096
 
 enum classType {activeLine, activeRectangle, activeCircle, activeArc ,
-                xyGraph, activePip, activeXText, activeXTextDsp, TextUpdate, TextEntry, // Zai added two items
+                xyGraph, activePip, activeXText, activeXTextDsp, TextUpdate, TextEntry, Byte, // Zai added three items
                 activeMeter, activeBar, activeMessageBox,
-                activeMotifSlider, activeButton, activeMenuButton, activeRadioButton,
+                activeMotifSlider, activeButton, activeMenuButton, activeRadioButton, activeChoiceButton, // Zai added one item
                 activeMessageButton, activeExitButton, relatedDisplay, shellCmdButton,
                unknown};
 
@@ -106,6 +106,9 @@ private:
     char fieldLenInfo[7+1];
     char id[31+1];
     int nullDetectMode;
+    // Zai added
+    // reading ByteClass data
+    int numBits;
 
     // reading activeRectangleClass data
     int lineColor, fillColor, lineColorMode, fill, fillColorMode, lineWidth, lineStyle, invisible;

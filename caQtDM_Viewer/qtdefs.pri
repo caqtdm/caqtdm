@@ -37,9 +37,11 @@ CONFIG += XDR_HACK
 
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
-
 # 3.9.4
-
+# caQtDM will now also download from http when CAQTDM_URL_DISPLAY_PATH is defined
+# When caQtDM is built with the option NETWORKCONFIGURATOR (in qtdefs.pri), you will get the configuration screen in order to use network files as in mobile apps.
+# macros can now also be read when specifying -macrodefs filename
+# Zai added some edl objects
 
 # 3.9.2 and 3.9.3
 # severity of a char/string record was not considered and is corrected, Char waveforms longer as 1024 were not displayed in calineedit and is corrected.
