@@ -319,6 +319,10 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 #elseif MOBILE_IOS
         defpathdoc ="caQtDM_IOS_Config.xml";
 #else
+        // first create direcory in temp path.
+        QDir dir;
+        dir.mkpath(specials.getStdPath());
+        // create file
         QList<QString> httpstring;
         QList<QString> configfile;
         // write a default configuration file while no file found
