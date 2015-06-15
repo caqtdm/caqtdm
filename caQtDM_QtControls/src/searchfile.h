@@ -28,9 +28,8 @@
 
 #include <QString>
 #include <QFileDialog>
-#include <qtcontrols_global.h>
 
-class QTCON_EXPORT searchFile
+class searchFile
 {
 public:
     searchFile(QString FileName);

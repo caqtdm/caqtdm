@@ -72,12 +72,14 @@ android {
 !ios {
 !android {
   LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
+  LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
   LIBS += -L$(CAQTDM_COLLECT) -L$(CAQTDM_COLLECT)/designer
 
 unix:!macx {
 
   }
   macx: {
+
    QMAKE_INFO_PLIST = ../src/Mac/Info.plist
    APP-FONTS.files = ../../caQtDM_Viewer/lucida-sans-typewriter.ttf
    APP-FONTS.path = fonts
