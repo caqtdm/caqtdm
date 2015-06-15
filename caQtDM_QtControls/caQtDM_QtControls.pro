@@ -151,7 +151,6 @@ XDR_HACK {
     HEADERS += src/xdr_hack.h
 }
 
-NETWORKDOWNLOADSUPPORT: {
 QT += network
 HEADERS += \
     src/networkaccess.h \
@@ -160,7 +159,6 @@ HEADERS += \
 SOURCES +=  \
     src/networkaccess.cpp \
     src/fileFunctions.cpp
-}
 
 # assume qwt6.0 was made with qt4
 contains(QT_VER_MAJ, 4) {

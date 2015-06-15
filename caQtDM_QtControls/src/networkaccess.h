@@ -38,9 +38,9 @@ class NetworkAccess:public QObject
     Q_OBJECT
 
 public:
-    NetworkAccess(QTableWidget *w = 0, const QString &file = 0);
+    NetworkAccess();
     ~NetworkAccess(){}
-    QIODevice* requestUrl(const QUrl url);
+    bool requestUrl(const QUrl url, const QString &file = 0 );
     int downloadFinished();
 
 signals:
@@ -52,7 +52,7 @@ protected slots:
     const QString parseError(QNetworkReply::NetworkError error);
 
 private:
-    QNetworkAccessManager* manager;
+    QNetworkAccessManager *manager;
     QTableWidget *thisTable;
     QString thisFile;
     int finished;

@@ -30,7 +30,7 @@
    #define strdup _strdup
 #endif
 
-#include "dmsearchfile.h"
+#include "searchfile.h"
 
 #include "fileopenwindow.h"
 #include "QDebug"
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     QString geometry = "";
     QString macroFile = "";
 
-    dmsearchFile *s = new dmsearchFile("caQtDM_stylesheet.qss");
+    searchFile *s = new searchFile("caQtDM_stylesheet.qss");
     QString fileNameFound = s->findFile();
     if(fileNameFound.isNull()) {
         printf("caQtDM -- file <caQtDM_stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toAscii().constData());
@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
     }
 
     if(!nostyles) {
-        s = new dmsearchFile("stylesheet.qss");
+        s = new searchFile("stylesheet.qss");
         fileNameFound = s->findFile();
         if(fileNameFound.isNull()) {
             printf("caQtDM -- file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toAscii().constData());
@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
 
     // load macro definitions from file (located in this directory or in the caQTDM_DISPLAY_PATH)
     if(macroFile.length() > 0) {
-        s = new dmsearchFile(macroFile);
+        s = new searchFile(macroFile);
         fileNameFound = s->findFile();
         if(fileNameFound.isNull()) {
             printf("caQtDM -- file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toAscii().constData());

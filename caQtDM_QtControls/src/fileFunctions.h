@@ -31,8 +31,9 @@
 #include <QDebug>
 #include <QString>
 #include <QMessageBox>
+#include <qtcontrols_global.h>
 
-class fileFunctions
+class QTCON_EXPORT fileFunctions
 {
 
 public:

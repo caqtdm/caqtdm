@@ -35,6 +35,7 @@ class QTCON_EXPORT searchFile
 public:
     searchFile(QString FileName);
     QString findFile();
+    QString displayPath();
 
 private:
     QString _FileName;

@@ -1,11 +1,11 @@
 include(qtdefs.pri)
 
 contains(QT_VER_MAJ, 4) {
-   QT     += core gui svg
+   QT     += core gui svg network
    CONFIG += qt warn_on thread uitools
 }
 contains(QT_VER_MAJ, 5) {
-   QT     += core gui svg uitools  printsupport
+   QT     += core gui svg uitools  printsupport network
    CONFIG += qt warn_on thread widgets
    DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000 
 }   
@@ -23,8 +23,7 @@ HEADERS  +=  \
     messagebox.h \
     fileopenwindow.h \
 
-NETWORKDOWNLOADSUPPORT {
-   QT += network
+NETWORKCONFIGURATOR {
    SOURCES += configDialog.cpp
    HEADERS  +=  configDialog.h
 }

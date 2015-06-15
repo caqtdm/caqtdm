@@ -37,14 +37,22 @@ class Specials {
 
 public:
 
+    void setNewStyleSheet(QWidget* w, QSize size, int bigPtSize=16, int smallPtSize=10, QString myStyle ="", int pointSizeCorrection = 0);
+
+    QString getStdPath() {
+#ifdef MOBILE
 #ifdef MOBILE_ANDROID
-    QString stdpathdoc=QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    return stdpathdoc=QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 #endif
 #ifdef MOBILE_IOS
-    QString stdpathdoc=QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    return stdpathdoc=QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
 #endif
-
-    void setNewStyleSheet(QWidget* w, QSize size, int bigPtSize=16, int smallPtSize=10, QString myStyle ="", int pointSizeCorrection = 0);
+#else
+    QString path = QDir::tempPath();
+    path.append("/caQtDM");
+    return path;
+#endif
+    }
 
 };
 #endif

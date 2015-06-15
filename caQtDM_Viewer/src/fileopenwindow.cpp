@@ -27,14 +27,14 @@
   #define NOMINMAX
   #include <windows.h>
 #endif
-
-#include "dmsearchfile.h"
+#include "searchfile.h"
 
 #include <QtGui>
 
 #include "fileopenwindow.h"
 #include "caqtdm_lib.h"
 #include "specialFunctions.h"
+#include "fileFunctions.h"
 
 #ifdef MOBILE
   #include "fingerswipegesture.h"
@@ -47,9 +47,8 @@
 #include <QString>
 #include "messagebox.h"
 
-#ifdef NETWORKDOWNLOADSUPPORT
+#ifdef NETWORKCONFIGURATOR
 #include "configDialog.h"
-#include "fileFunctions.h"
 #endif
 
 #ifdef linux
@@ -154,9 +153,8 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     allowResize = resizing;
     minimizeMessageWindow = minimize;
     activWindow = 0;
-#ifdef MOBILE
     Specials specials;
-#endif
+
     qDebug() <<  "caQtDM -- desktop size:" << qApp->desktop()->size();
 
     // Set Window Title without the whole path
@@ -199,7 +197,17 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     connect( this->ui.timedAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionTimed()) );
     connect( this->ui.directAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionDirect()) );
     connect( this->ui.helpAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionHelp()) );
+    connect( this->ui.emptycacheAction, SIGNAL( triggered() ), this, SLOT(Callback_EmptyCache()) );
     this->ui.timedAction->setChecked(true);
+
+    QString urlpath = (QString)  qgetenv("CAQTDM_URL_DISPLAY_PATH");
+    if(urlpath.length() > 0) {
+      QString displayPath="url from environment=";
+      displayPath.append( (QString)  qgetenv("CAQTDM_URL_DISPLAY_PATH"));
+      this->ui.displayUrl->setText(displayPath);
+    } else {
+        this->ui.menuHttp->setEnabled(false);
+    }
 
     setWindowTitle(title);
 
@@ -284,7 +292,8 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     pvWindow = (QMainWindow*) 0;
     pvTable = (QTableWidget*) 0;
 
-#ifdef  NETWORKDOWNLOADSUPPORT
+//************************************************************************************************************************************************
+#ifdef  NETWORKCONFIGURATOR
     // test reading a local configuration file in order to start caQtDM for ios (read caQTDM_IOS_Config.xml, display its data, choose configuration,
     // then get from the choosen website and choosen config file the epics configuration and ui file to launch
     QSize desktopSize = qApp->desktop()->size();
@@ -292,21 +301,31 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     QList<QString> urls;
     QList<QString> files;
     QString url, file;
-    QString stdpathdoc = specials.stdpathdoc;
+    QString stdpathdoc = specials.getStdPath();
     debugWindow = false;
 
     // parse the config file for urls and files
     stdpathdoc.append("/caQtDM_IOS_Config.xml");
+
+    qDebug() << stdpathdoc;
 
     QFileInfo fi(stdpathdoc);
     if(fi.exists()) {
        parseConfigFile(stdpathdoc, urls, files);
     } else{
         QString defpathdoc;
-#ifdef Q_OS_ANDROID
+#ifdef MOBILE_ANDROID
         defpathdoc ="assets:/caQtDM_IOS_Config.xml";
-#else
+#elseif MOBILE_IOS
         defpathdoc ="caQtDM_IOS_Config.xml";
+#else
+        QList<QString> httpstring;
+        QList<QString> configfile;
+        // write a default configuration file while no file found
+        httpstring << "http://epics.web.psi.ch/software/caqtdm/qtDir" << "http://epics.web.psi.ch/software/caqtdm/qtDir";
+        configfile << "Proscan_MA85.config" << "HIPA_MA85.config";
+        saveConfigFile(stdpathdoc, httpstring, configfile);
+        defpathdoc = stdpathdoc;
 #endif
         parseConfigFile(defpathdoc, urls, files);
     }
@@ -317,6 +336,8 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 
     configDialog dialog(debugWindow, urls, files, desktopSize, this);
     dialog.exec();
+    if(!dialog.isStartButtonClicked())  exit(0);
+
     // when clear config files is used, then reload dialog from original
     if(dialog.isClearConfig()) {
         dialog.close();
@@ -351,6 +372,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         mustOpenFile = true;
     }
 #endif
+//************************************************************************************************************************************************
 
 #ifdef MOBILE
     // add fingerswipe gesture
@@ -364,10 +386,12 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 #endif
 }
 
-#ifdef  NETWORKDOWNLOADSUPPORT
+#ifdef  NETWORKCONFIGURATOR
 void FileOpenWindow::parseConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files)
 {
     QFile* file = new QFile(filename);
+
+    qDebug() << filename;
 
     /* can not open file */
     if (!file->open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -447,7 +471,7 @@ void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
 {
     char asc[2048];
     Specials specials;
-    QString stdpathdoc = specials.stdpathdoc;
+    QString stdpathdoc =  specials.getStdPath();
 
     QString EnvFile=stdpathdoc;
     EnvFile.append("/");
@@ -562,6 +586,22 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
             exit(1);
         }
     }
+}
+
+/**
+ * slot for emptying our local http cache
+ */
+void FileOpenWindow::Callback_EmptyCache()
+{
+#ifndef MOBILE
+    Specials specials;
+    QString path =  specials.getStdPath();
+    path.append("/");
+    QDir dir(path);
+    dir.setNameFilters(QStringList() << "*.ui" << "*.prc" << "*.gif" << "*.jpg" << "*.png");
+    dir.setFilter(QDir::Files);
+    foreach(QString dirFile, dir.entryList()) dir.remove(dirFile);
+#endif
 }
 
 /**
@@ -730,13 +770,12 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         }
     }
 
-    // this will download the file from a http server
-#ifdef NETWORKDOWNLOADSUPPORT
+    // this will check for file existence and when an url is defined, download the file from a http server
     fileFunctions filefunction;
     filefunction.checkFileAndDownload(FileName);
-#endif
+
     // open file
-    dmsearchFile *s = new dmsearchFile(FileName);
+    searchFile *s = new searchFile(FileName);
     QString fileNameFound = s->findFile();
     if(fileNameFound.isNull()) {
         QString message = QString(FileName);
@@ -909,8 +948,15 @@ void FileOpenWindow::Callback_ActionReload()
 
             w->close();
             if(!fileName.isNull()) {
-                QString FileName = fileName.toString();
-                dmsearchFile *s = new dmsearchFile(FileName);
+
+                QString FileName = fileName.toString();  
+
+                // this will check for file existence and when an url is defined, download the file from a http server
+                QFileInfo fi(FileName);
+                fileFunctions filefunction;
+                filefunction.checkFileAndDownload(fi.fileName());
+
+                searchFile *s = new searchFile(FileName);
                 QString fileNameFound = s->findFile();
                 fileS = fileNameFound;
 

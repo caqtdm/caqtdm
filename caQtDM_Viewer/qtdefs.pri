@@ -12,7 +12,7 @@ unix {
 
 # enable specialized version, wehere files will be downloaded to a local directory (used specially for IOS)
 ios | android {
- CONFIG += NETWORKDOWNLOADSUPPORT
+ CONFIG += NETWORKCONFIGURATOR
  DEFINES += MOBILE
 }
 ios {
@@ -22,8 +22,10 @@ android {
   DEFINES += MOBILE_ANDROID
 }
 
-NETWORKDOWNLOADSUPPORT {
-DEFINES += NETWORKDOWNLOADSUPPORT
+CONFIG += NETWORKCONFIGURATOR
+
+NETWORKCONFIGURATOR {
+DEFINES += NETWORKCONFIGURATOR
 }
 
 # for some architectures this has to be defined for scan2D

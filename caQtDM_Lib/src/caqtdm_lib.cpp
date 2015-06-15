@@ -33,17 +33,16 @@
 #include <QObject>
 #include <QToolBar>
 #include <cadef.h>
+
 #ifdef linux
 #  include <sys/wait.h>
 #  include <unistd.h>
 #endif
-#include "caqtdm_lib.h"
-#include "dmsearchfile.h"
-#include "parsepepfile.h"
 
-#ifdef  NETWORKDOWNLOADSUPPORT
+#include "caqtdm_lib.h"
+//#include "dmsearchfile.h"
+#include "parsepepfile.h"
 #include "fileFunctions.h"
-#endif
 
 #define PRC 1
 
@@ -327,7 +326,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 #endif
     }
 
-#ifdef NETWORKDOWNLOADSUPPORT
+#ifdef NETWORKCONFIGURATOR
         // connect close launchfile action to parent
         connect(this, SIGNAL(Signal_IosExit()), parent, SLOT(Callback_IosExit()));
 #endif
@@ -1262,11 +1261,9 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             prcFile = false;
         }
 
-        // this will download the file from a http server
-#ifdef NETWORKDOWNLOADSUPPORT
+        // this will check for file existence and when an url is defined, download the file from a http server
         fileFunctions filefunction;
         filefunction.checkFileAndDownload(fileName);
-#endif
 
         searchFile *s = new searchFile(fileName);
         QString fileNameFound = s->findFile();
@@ -3970,7 +3967,7 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
 #endif
 
     // in case of network launcher, close the application when launcher window is closed
-#ifdef NETWORKDOWNLOADSUPPORT
+#ifdef NETWORKCONFIGURATOR
     QString thisFileName =  property("fileString").toString().section('/',-1);
     QString launchFile = (QString)  qgetenv("CAQTDM_LAUNCHFILE");
     if(thisFileName.contains(launchFile)) {

@@ -27,7 +27,6 @@
 
 configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, const QList<QString> &files, QSize desktopSize, QWidget *parent): QWidget(parent)
 {
-    const QString buttonStyle = "background-color: lightgray; border-style: outset; border-width: 3px; border-radius: 10px; border-color: cyan; padding: 6px";
     Specials specials;
 
     Qt::WindowFlags flags = Qt::Dialog;
@@ -40,7 +39,6 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 #endif
 
     setGeometry(0,0, desktopSize.width(), desktopSize.height());
-    //qDebug() << "size=" << desktopSize;
 
     QPixmap bg(":/caQtDM-BGL-2048.png");
 
@@ -50,6 +48,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     setPalette(palette);
 
     ClearConfigButtonClicked = false;
+    StartButtonClicked = false;
     QGridLayout *mainLayout = new QGridLayout();
 
     QFrame *frame = new QFrame();
@@ -60,7 +59,15 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
     // layout for the window, with margins as % of the display size
     QVBoxLayout* windowlayout = new QVBoxLayout;
+
+#ifdef MOBILE_ANDROID
     windowlayout->setContentsMargins(desktopSize.width() * 0.1, desktopSize.height() * 0.05, desktopSize.width() * 0.1, desktopSize.height() * 0.07);
+#elseif MOBILE_IOS
+    windowlayout->setContentsMargins(desktopSize.width() * 0.1, desktopSize.height() * 0.2, desktopSize.width() * 0.1, desktopSize.height() * 0.2);
+#else
+    windowlayout->setContentsMargins(desktopSize.width() * 0.1, desktopSize.height() * 0.2, desktopSize.width() * 0.1, desktopSize.height() * 0.2);
+#endif
+
     setLayout(windowlayout);
     windowlayout->addWidget(frame); // add frame to layout
 
@@ -76,7 +83,6 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 #else
     specials.setNewStyleSheet(title, desktopSize, 30, 15, "background-color : #aaffff; color : black; ", 4);
 #endif
-    //title->setStyleSheet("QLabel {background-color : #aaffff; color : black; }");
     title->setAlignment(Qt::AlignCenter);
     frameLayout->addWidget(title, 0, Qt::AlignCenter);
 
@@ -248,7 +254,7 @@ void configDialog::clearUiClicked()
 {
     // get path for downloaded documents
     Specials specials;
-    QString path = specials.stdpathdoc;
+    QString path = specials.getStdPath();
 
     path.append("/");
     QDir dir(path);
@@ -264,7 +270,7 @@ void configDialog::clearConfigClicked()
 {
     // get path for downloaded documents
     Specials specials;
-    QString path = specials.stdpathdoc;
+    QString path =  specials.getStdPath();
 
     path.append("/");
     QDir dir(path);
@@ -277,7 +283,14 @@ void configDialog::clearConfigClicked()
 
 void configDialog::startClicked()
 {
+    StartButtonClicked = true;
     close();
+}
+
+bool configDialog::isStartButtonClicked()
+{
+    return StartButtonClicked;
+
 }
 
 bool configDialog::isClearConfig()
@@ -290,7 +303,7 @@ int configDialog::NumberOfFiles()
     int count = 0;
     // get path for downloaded documents
     Specials specials;
-    QString path = specials.stdpathdoc;
+    QString path =  specials.getStdPath();
 
     path.append("/");
     QDir dir(path);

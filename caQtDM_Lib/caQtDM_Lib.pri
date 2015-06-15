@@ -53,7 +53,6 @@ SOURCES += caqtdm_lib.cpp \
     mutexKnobData.cpp \
     globalPtrs.cpp \
     epicsSubs.c \
-    dmsearchfile.cpp \
     MessageWindow.cpp \
     vaPrintf.c \
     myMessageBox.cpp \
@@ -75,7 +74,6 @@ HEADERS += caqtdm_lib.h\
     knobData.h \
     dbrString.h \
     alarmstrings.h \
-    dmsearchfile.h \
     MessageWindow.h \
     messageWindowWrapper.h \
     vaPrintf.h \
