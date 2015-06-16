@@ -38,26 +38,6 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     int FONTSIZE_ANDROID = 24;
     if(desktopSize.height() >= 1100) FONTSIZE_ANDROID = 28;
 #endif
-
-    setGeometry(0,0, desktopSize.width(), desktopSize.height());
-
-    QPixmap bg(":/caQtDM-BGL-2048.png");
-
-    bg = bg.scaled(desktopSize-QSize(0,10));
-    QPalette palette;
-    palette.setBrush(QPalette::Background, bg);
-    setPalette(palette);
-
-    ClearConfigButtonClicked = false;
-    StartButtonClicked = false;
-    QGridLayout *mainLayout = new QGridLayout();
-
-    QFrame *frame = new QFrame();
-
-    frame->setAutoFillBackground(true);
-    frame->setObjectName("topFrame");
-    frame->setStyleSheet("QFrame#topFrame {border:0px solid gray; border-radius: 15px; background: rgba(255,255,255,150);}");
-
     // layout for the window, with margins as % of the display size
     QVBoxLayout* windowlayout = new QVBoxLayout;
 
@@ -76,6 +56,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 	    QDesktopWidget * Desktop = QApplication::desktop();
 		QRect defscreengeo = Desktop->availableGeometry(-1);
 		setGeometry(0,0, defscreengeo.width(), defscreengeo.height());
+        desktopSize=defscreengeo.size();
         windowlayout->setContentsMargins(defscreengeo.width() * 0.2, defscreengeo.height() * 0.2, defscreengeo.width() * 0.2, defscreengeo.height() * 0.2);
        //#else
         //windowlayout->setContentsMargins(desktopSize.width() * 0.1, desktopSize.height() * 0.2, desktopSize.width() * 0.1, desktopSize.height() * 0.2);
@@ -84,6 +65,26 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 #endif
 
     setLayout(windowlayout);
+    //setGeometry(0,0, desktopSize.width(), desktopSize.height());
+
+    QPixmap bg(":/caQtDM-BGL-2048.png");
+
+    bg = bg.scaled(desktopSize-QSize(0,10));
+    QPalette palette;
+    palette.setBrush(QPalette::Background, bg);
+    setPalette(palette);
+
+    ClearConfigButtonClicked = false;
+    StartButtonClicked = false;
+    QGridLayout *mainLayout = new QGridLayout();
+
+    QFrame *frame = new QFrame();
+
+    frame->setAutoFillBackground(true);
+    frame->setObjectName("topFrame");
+    frame->setStyleSheet("QFrame#topFrame {border:0px solid gray; border-radius: 15px; background: rgba(255,255,255,150);}");
+
+
     windowlayout->addWidget(frame); // add frame to layout
 
     // framelayout containing the other widgets
@@ -232,7 +233,12 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
     // add message
     QString message = QString("Qt-based Epics Display Manager Version %1 (%2)  ");
-    message = message.arg(BUILDVERSION).arg(BUILDDATE);
+
+    #if defined(_MSC_VER)
+     message = message.arg(BUILDVERSION).arg(__DATE__);
+    #else
+     message = message.arg(BUILDVERSION).arg(BUILDDATE);
+    #endif
     QLabel *version = new QLabel(message);
     version->setAlignment(Qt::AlignRight);
     specials.setNewStyleSheet(version, desktopSize, 22, 13, "background-color: transparent;", -4);
