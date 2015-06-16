@@ -227,8 +227,8 @@ void caRowColMenu::setFiles(QString const &newL)
 void caRowColMenu::setBackground(QColor c)
 {
     thisBackColor = c;
-    thisBackColorHover = c.light(120);
-    thisBorderColor = c.dark(150);
+    thisBackColorHover = c.lighter(120);
+    thisBorderColor = c.darker(150);
     updateColors();
 }
 
