@@ -71,7 +71,15 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
           windowlayout->setContentsMargins(desktopSize.width() * 0.1, desktopSize.height() * 0.05, desktopSize.width() * 0.1, desktopSize.height() * 0.07);
        }
     #else
-       windowlayout->setContentsMargins(desktopSize.width() * 0.1, desktopSize.height() * 0.2, desktopSize.width() * 0.1, desktopSize.height() * 0.2);
+       // this here is a test on windows for the primary screen
+	   #if defined(WIN32) && !defined(__GNUC__)
+	    QDesktopWidget * Desktop = QApplication::desktop();
+		QRect defscreengeo = Desktop->availableGeometry(-1);
+		setGeometry(0,0, defscreengeo.width(), defscreengeo.height());
+		windowlayout->setContentsMargins(defscreengeo.width() * 0.1, defscreengeo.height() * 0.2, defscreengeo.width() * 0.1, defscreengeo.height() * 0.2);
+	   #else
+        windowlayout->setContentsMargins(desktopSize.width() * 0.1, desktopSize.height() * 0.2, desktopSize.width() * 0.1, desktopSize.height() * 0.2);
+	   #endif
     #endif
 #endif
 
