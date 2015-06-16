@@ -26,7 +26,7 @@
 #include "configDialog.h"
 
 configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, const QList<QString> &files, QSize desktopSize, QWidget *parent): QWidget(parent)
-{
+{ 
     Specials specials;
 
     Qt::WindowFlags flags = Qt::Dialog;
@@ -34,6 +34,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     setWindowModality (Qt::WindowModal);
 
 #ifdef MOBILE_ANDROID
+    const QString buttonStyle = "background-color: lightgray; border-style: outset; border-width: 3px; border-radius: 10px; border-color: cyan; padding: 6px";
     int FONTSIZE_ANDROID = 24;
     if(desktopSize.height() >= 1100) FONTSIZE_ANDROID = 28;
 #endif
@@ -62,10 +63,16 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
 #ifdef MOBILE_ANDROID
     windowlayout->setContentsMargins(desktopSize.width() * 0.1, desktopSize.height() * 0.05, desktopSize.width() * 0.1, desktopSize.height() * 0.07);
-#elseif MOBILE_IOS
-    windowlayout->setContentsMargins(desktopSize.width() * 0.1, desktopSize.height() * 0.2, desktopSize.width() * 0.1, desktopSize.height() * 0.2);
 #else
-    windowlayout->setContentsMargins(desktopSize.width() * 0.1, desktopSize.height() * 0.2, desktopSize.width() * 0.1, desktopSize.height() * 0.2);
+    #ifdef MOBILE_IOS
+       if(qApp->desktop()->heightMM() > 100) { // probably an ipad
+          windowlayout->setContentsMargins(desktopSize.width() * 0.2, desktopSize.height() * 0.25, desktopSize.width() * 0.2, desktopSize.height() * 0.25);
+       } else { // probably an iphone
+          windowlayout->setContentsMargins(desktopSize.width() * 0.1, desktopSize.height() * 0.05, desktopSize.width() * 0.1, desktopSize.height() * 0.07);
+       }
+    #else
+       windowlayout->setContentsMargins(desktopSize.width() * 0.1, desktopSize.height() * 0.2, desktopSize.width() * 0.1, desktopSize.height() * 0.2);
+    #endif
 #endif
 
     setLayout(windowlayout);

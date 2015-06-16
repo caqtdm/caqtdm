@@ -1,5 +1,12 @@
 include(qtdefs.pri)
 
+NETWORKCONFIGURATOR {
+message("caQtDM will be build with a network configuration screen at startup")
+}
+!NETWORKCONFIGURATOR {
+message("caQtDM will be build with normal command line startup")
+}
+
 contains(QT_VER_MAJ, 4) {
    QT     += core gui svg network
    CONFIG += qt warn_on thread uitools

@@ -30,6 +30,7 @@
 #include <QEventLoop>
 #include "specialFunctions.h"
 #include "networkaccess.h"
+#include <unistd.h>
 
 
 class Sleep

@@ -313,12 +313,13 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     if(fi.exists()) {
        parseConfigFile(stdpathdoc, urls, files);
     } else{
-        QString defpathdoc;
+        QString defpathdoc;        
 #ifdef MOBILE_ANDROID
         defpathdoc ="assets:/caQtDM_IOS_Config.xml";
-#elseif MOBILE_IOS
-        defpathdoc ="caQtDM_IOS_Config.xml";
 #else
+   #ifdef MOBILE_IOS
+        defpathdoc ="caQtDM_IOS_Config.xml";
+   #else
         // first create direcory in temp path.
         QDir dir;
         dir.mkpath(specials.getStdPath());
@@ -330,6 +331,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         configfile << "Proscan_MA85.config" << "HIPA_MA85.config";
         saveConfigFile(stdpathdoc, httpstring, configfile);
         defpathdoc = stdpathdoc;
+    #endif
 #endif
         parseConfigFile(defpathdoc, urls, files);
     }

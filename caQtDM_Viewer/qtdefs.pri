@@ -22,14 +22,10 @@ android {
   DEFINES += MOBILE_ANDROID
 }
 
-CONFIG += NETWORKCONFIGURATOR
+#CONFIG += NETWORKCONFIGURATOR
 
 NETWORKCONFIGURATOR {
 DEFINES += NETWORKCONFIGURATOR
-message("caQtDM will be build with a network configuration screen at startup")
-}
-!NETWORKCONFIGURATOR {
-message("caQtDM will be build with normal command line startup")
 }
 
 # for some architectures this has to be defined for scan2D
