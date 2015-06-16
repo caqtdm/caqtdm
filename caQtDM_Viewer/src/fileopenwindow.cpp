@@ -353,7 +353,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         exit(0);
     }
 
-    //set all the environment varaibles that we need
+    //set all the environment variables that we need
     setAllEnvironmentVariables(file);
 
     // now check if file exists and download it. (file is specified by the environment variables CAQTDM_LAUNCHFILE and CAQTDM_URL_DISPLAY)
@@ -570,11 +570,14 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 
     if (mutexKnobData != (MutexKnobData *) 0) {
         char msg[255];
+        msg[0] = '\0';
         fillPVtable(countPV, countNotConnected, countDisplayed);
         highCount = mutexKnobData->getHighestCountPV(highPV);
         if(highCount != 0.0) {
             sprintf(msg, "%s - PV=%d (%d NC), %d Monitors/s, %d Displays/s, highest=%s with %.1f Monitors/s ", asc, countPV, countNotConnected,
                       mutexKnobData->getMonitorsPerSecond(), mutexKnobData->getDisplaysPerSecond(), highPV.toAscii().constData(), highCount);
+        } else {
+            strcpy(msg, asc);
         }
         statusBar()->showMessage(msg);
     }
