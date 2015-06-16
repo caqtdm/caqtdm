@@ -202,6 +202,13 @@ int main(int argc, char *argv[])
     printf("          you may enable this by defining IO_OPTIMIZED_FOR_TABWIDGETS in qtdefs.pri\n");
 #endif
 
+#ifndef CONFIGURATOR
+    QString displayPath = (QString)  qgetenv("CAQTDM_URL_DISPLAY_PATH");
+    if(displayPath.length() > 0) {
+         printf("caQtDM -- files will be downloaded from <%s> when not locally found\n", displayPath.toAscii().constData());
+    }
+#endif
+
     FileOpenWindow window (0, fileName, macroString, attach, minimize, geometry, printscreen, resizing);
     window.setWindowIcon (QIcon(":/caQtDM.ico"));
     window.show();

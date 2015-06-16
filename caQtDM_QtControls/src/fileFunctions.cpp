@@ -37,7 +37,7 @@ int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &
 {
     QString displayPath;
 
-    printf("checkFileAndDownload <%s>\n", fileName.toAscii().constData());
+    //printf("checkFileAndDownload <%s>\n", fileName.toAscii().constData());
 
     // in case of http support without the configuration support, we add the temporary directory name to the CAQTDM_DISPLAY_PATH if not already set
 #ifndef NETWORKCONFIGURATOR
@@ -53,7 +53,7 @@ int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &
     QString fileNameFound = s->findFile();
     if(!fileNameFound.isNull()) return true;
 
-    printf("filename to download %s\n", fileName.toAscii().constData());
+    //printf("filename to download %s\n", fileName.toAscii().constData());
 
     // use specified url
     if(url.size() > 0) {

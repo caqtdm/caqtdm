@@ -56,7 +56,7 @@ bool NetworkAccess::requestUrl(const QUrl url, const QString &file)
 {
     finished = false;
     thisFile = file;
-    printf("download %s\n", url.toString().toAscii().constData());
+    printf("caQtDM -- download %s\n", url.toString().toAscii().constData());
     downloadUrl = url;
     QNetworkReply* reply = manager->get(QNetworkRequest(url));
     connect(reply, SIGNAL(finished()), this, SLOT(finishReply()));
@@ -72,13 +72,13 @@ bool NetworkAccess::requestUrl(const QUrl url, const QString &file)
 #endif
         qApp->processEvents();
         if(downloadFinished()) {
-            qDebug() << "download finished succesfully\n";
+            //qDebug() << "download finished succesfully\n";
             return true;
         }
         looped++;
     }
     if(!downloadFinished()) {
-        qDebug() << "download not finished\n";
+        //qDebug() << "download not finished\n";
         return false;
     }
     return false;
@@ -91,7 +91,7 @@ int NetworkAccess::downloadFinished()
 
 void NetworkAccess::finishReply()
 {
-    printf("newtwork reply completed! thisFile=%s\n",  thisFile.toAscii().constData());
+    //printf("newtwork reply completed! thisFile=%s\n",  thisFile.toAscii().constData());
     QObject* obj = sender();
     QNetworkReply* reply = qobject_cast<QNetworkReply*>(obj);
 
@@ -120,7 +120,7 @@ void NetworkAccess::finishReply()
             file.write(reply->readAll());
             file.close();
         }
-        printf("file download to %s\n", thisFile.toAscii().constData());
+        //printf("file download to %s\n", thisFile.toAscii().constData());
 
     }
     finished = true;

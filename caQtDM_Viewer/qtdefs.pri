@@ -22,6 +22,7 @@ android {
   DEFINES += MOBILE_ANDROID
 }
 
+# enable network configurator instead of command line version
 #CONFIG += NETWORKCONFIGURATOR
 
 NETWORKCONFIGURATOR {
