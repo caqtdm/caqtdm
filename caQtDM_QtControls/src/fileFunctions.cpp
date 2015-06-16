@@ -45,8 +45,6 @@ int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &
     QString fileNameFound = s->findFile();
     if(!fileNameFound.isNull()) return true;
 
-    printf("filename to download %s\n", fileName.toAscii().constData());
-
     // use specified url
     if(url.size() > 0) {
        displayPath = url;
@@ -56,6 +54,8 @@ int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &
     }
 
     if(displayPath.length() < 1) return false;
+
+    printf("filename to download %s\n", fileName.toAscii().constData());
 
     displayPath.append("/");
     displayPath.append(fileName);

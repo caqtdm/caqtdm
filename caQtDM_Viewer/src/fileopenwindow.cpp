@@ -154,8 +154,6 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     activWindow = 0;
     Specials specials;
 
-    qDebug() << "http" << HTTPCONFIGURATOR;
-
     qDebug() <<  "caQtDM -- desktop size:" << qApp->desktop()->size();
 
     // Set Window Title without the whole path
