@@ -29,11 +29,12 @@
 #include <QtGui>
 #include <QDesktopWidget>
 #include <QApplication>
+#include <qtcontrols_global.h>
 #ifdef MOBILE
 #include <QStandardPaths>
 #endif
 
-class Specials {
+class QTCON_EXPORT Specials {
 
 public:
 

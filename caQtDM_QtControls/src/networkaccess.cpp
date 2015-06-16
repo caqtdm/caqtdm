@@ -30,7 +30,9 @@
 #include <QEventLoop>
 #include "specialFunctions.h"
 #include "networkaccess.h"
-#include <unistd.h>
+#ifdef MOBILE_ANDROID
+#  include <unistd.h>
+#endif
 
 
 class Sleep
