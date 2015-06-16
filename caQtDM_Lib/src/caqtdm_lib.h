@@ -222,7 +222,6 @@ signals:
 
 private:
     QTabWidget* getTabParent(QWidget *w1);
-    bool bitState(int value, int bitNr);
     QString treatMacro(QMap<QString, QString> map, const QString& pv, bool *doNothing);
     void scanWidgets(QList<QWidget*> list, QString macro);
     void HandleWidget(QWidget *w, QString macro, bool firstPass, bool treatPrimaries);

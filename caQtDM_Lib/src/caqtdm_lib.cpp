@@ -2038,14 +2038,6 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
 }
 
 /**
-  * return true or false accoprding the bit inside a value
-  */
-bool CaQtDM_Lib::bitState(int value, int bitNr)
-{
-    return ((((int) value >> bitNr) & 1) == 1);
-}
-
-/**
   * treat visibility of our objects
   */
 int CaQtDM_Lib::setObjectVisibility(QWidget *w, double value)
@@ -2653,9 +2645,9 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 if(!widget->property("Connect").value<bool>()) {
                     widget->setProperty("Connect", true);
                 }
-                widget->setValue((int) data.edata.ivalue);
+                widget->setValue(data.edata.ivalue);
             } else if(colorMode == caByte::Alarm) {
-                widget->setValue((int) data.edata.ivalue);
+                widget->setValue(data.edata.ivalue);
                 widget->setAlarmColors(data.edata.severity);
             }
         } else {

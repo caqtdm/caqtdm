@@ -77,7 +77,7 @@ public:
     QColor getFalseColor() const {return thisFalseColor;}
 
     QList<rectangle*> cells;
-    void setValue(int value);
+    void setValue(long value);
 
     int getStartBit()  const {return thisStartBit;}
     void setStartBit(int const &bit);

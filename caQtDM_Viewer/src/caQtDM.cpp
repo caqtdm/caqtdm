@@ -105,10 +105,10 @@ int main(int argc, char *argv[])
         //qDebug() << argv[in];
         if ( strcmp (argv[in], "-display" ) == 0 ) {
             in++;
-            printf("caQtDM -- display <%s>\n", strdup(argv[in]));
+            printf("caQtDM -- display <%s>\n", argv[in]);
         } else if ( strcmp (argv[in], "-macro" ) == 0 ) {
             in++;
-            printf("caQtDM -- macro <%s>\n", strdup(argv[in]));
+            printf("caQtDM -- macro <%s>\n", argv[in]);
             macroString = QString(argv[in]);
         } else if ( strcmp (argv[in], "-attach" ) == 0 ) {
             printf("caQtDM -- will attach to another caQtDM if running\n");
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
             minimize = true;
         } else if( strcmp (argv[in], "-macrodefs" ) == 0) {
             in++;
-            printf("caQtDM -- will load macro string from file <%s>\n", strdup(argv[in]));
+            printf("caQtDM -- will load macro string from file <%s>\n", argv[in]);
             macroFile = QString(argv[in]);
         } else if ( strcmp (argv[in], "-noStyles" ) == 0 ) {
             printf("caQtDM -- will not replace the default application stylesheet caQtDM_stylesheet.qss\n");
@@ -215,7 +215,10 @@ int main(int argc, char *argv[])
     QString displayPath = (QString)  qgetenv("CAQTDM_URL_DISPLAY_PATH");
     if(displayPath.length() > 0) {
          printf("caQtDM -- files will be downloaded from <%s> when not locally found\n", displayPath.toAscii().constData());
+    } else {
+        printf("caQtDM -- files will not download files when not locally found\n");
     }
+
 #endif
 
     FileOpenWindow window (0, fileName, macroString, attach, minimize, geometry, printscreen, resizing);

@@ -199,16 +199,6 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     connect( this->ui.emptycacheAction, SIGNAL( triggered() ), this, SLOT(Callback_EmptyCache()) );
     this->ui.timedAction->setChecked(true);
 
-    // show url in menu
-    QString urlpath = (QString)  qgetenv("CAQTDM_URL_DISPLAY_PATH");
-    if(urlpath.length() > 0) {
-      QString displayPath="url from environment=";
-      displayPath.append( (QString)  qgetenv("CAQTDM_URL_DISPLAY_PATH"));
-      this->ui.displayUrl->setText(displayPath);
-    } else {
-        this->ui.menuHttp->setEnabled(false);
-    }
-
     setWindowTitle(title);
 
     // message window used by library and here
@@ -342,7 +332,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 
     configDialog dialog(debugWindow, urls, files, desktopSize, this);
     dialog.exec();
-    if(!dialog.isStartButtonClicked())  exit(0);
+    if(!dialog.isStartButtonClicked() && !dialog.isClearConfig())  exit(0);
 
     // when clear config files is used, then reload dialog from original
     if(dialog.isClearConfig()) {
@@ -388,6 +378,16 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
        setenv("CAQTDM_DISPLAY_PATH", (char*) displayPath.toAscii().constData(), 1);
     }
 #endif
+
+    // show url in menu when defined
+    QString urlpath = (QString)  qgetenv("CAQTDM_URL_DISPLAY_PATH");
+    if(urlpath.length() > 0) {
+      QString displayPath="url from environment=";
+      displayPath.append( (QString)  qgetenv("CAQTDM_URL_DISPLAY_PATH"));
+      this->ui.displayUrl->setText(displayPath);
+    } else {
+        this->ui.menuHttp->setEnabled(false);
+    }
 
 //************************************************************************************************************************************************
 
@@ -568,14 +568,15 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 
     // any non connected pv's to display ?
 
-    if (mutexKnobData != (MutexKnobData *) 0){
+    if (mutexKnobData != (MutexKnobData *) 0) {
+        char msg[255];
         fillPVtable(countPV, countNotConnected, countDisplayed);
         highCount = mutexKnobData->getHighestCountPV(highPV);
         if(highCount != 0.0) {
-            sprintf(asc, "%s - PV=%d (%d NC), %d Monitors/s, %d Displays/s, highest=%s with %.1f Monitors/s ", asc, countPV, countNotConnected,
+            sprintf(msg, "%s - PV=%d (%d NC), %d Monitors/s, %d Displays/s, highest=%s with %.1f Monitors/s ", asc, countPV, countNotConnected,
                       mutexKnobData->getMonitorsPerSecond(), mutexKnobData->getDisplaysPerSecond(), highPV.toAscii().constData(), highCount);
         }
-        statusBar()->showMessage(asc);
+        statusBar()->showMessage(msg);
     }
 
     // we wanted a print, do it when acquired, then exit
