@@ -12,7 +12,6 @@ unix {
 
 # enable specialized version, wehere files will be downloaded to a local directory (used specially for IOS)
 ios | android {
- CONFIG += NETWORKCONFIGURATOR
  DEFINES += MOBILE
 }
 ios {
@@ -20,13 +19,6 @@ ios {
 }
 android {
   DEFINES += MOBILE_ANDROID
-}
-
-# enable network configurator instead of command line version
-#CONFIG += NETWORKCONFIGURATOR
-
-NETWORKCONFIGURATOR {
-DEFINES += NETWORKCONFIGURATOR
 }
 
 # for some architectures this has to be defined for scan2D
@@ -40,7 +32,7 @@ CONFIG += XDR_HACK
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 # 3.9.4
 # caQtDM will now also download from http when CAQTDM_URL_DISPLAY_PATH is defined
-# When caQtDM is built with the option NETWORKCONFIGURATOR (in qtdefs.pri), you will get the configuration screen in order to use network files as in mobile apps.
+# When starting with the option -httpconfig you will get the configuration screen in order to use network files as in mobile apps.
 # macros can now also be read when specifying -macrodefs filename
 # Zai added some edl objects
 

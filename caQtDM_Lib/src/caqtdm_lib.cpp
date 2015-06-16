@@ -326,10 +326,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 #endif
     }
 
-#ifdef NETWORKCONFIGURATOR
-        // connect close launchfile action to parent
-        connect(this, SIGNAL(Signal_IosExit()), parent, SLOT(Callback_IosExit()));
-#endif
+    // connect close launchfile action to parent
+    connect(this, SIGNAL(Signal_IosExit()), parent, SLOT(Callback_IosExit()));
 
     qRegisterMetaType<knobData>("knobData");
 
@@ -3967,13 +3965,11 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
 #endif
 
     // in case of network launcher, close the application when launcher window is closed
-#ifdef NETWORKCONFIGURATOR
     QString thisFileName =  property("fileString").toString().section('/',-1);
     QString launchFile = (QString)  qgetenv("CAQTDM_LAUNCHFILE");
     if(thisFileName.contains(launchFile)) {
         emit Signal_IosExit();
     }
-#endif
 }
 
 /**

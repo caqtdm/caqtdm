@@ -59,6 +59,8 @@ static void unixSignalHandler(int signum) {
     QCoreApplication::exit(0);
 }
 
+extern bool HTTPCONFIGURATOR;
+
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(caQtDM);
@@ -137,6 +139,7 @@ int main(int argc, char *argv[])
                    "  [-macro \"xxx=aaa,yyy=bbb, ...\"]\n"
                    "  [-macrodefs filename] will load macro definitions from file\n"
                    "  [-dg [xpos[xypos]][+xoffset[+yoffset]]\n"
+                   "  [-httpconfig] will display a network configuration screen at startup\n"
                    "  [-print] will print file and exit\n"
                    "  [-noResize] will prevent resizing, works only when not attaching\n"
                    "  [file]\n"
@@ -154,6 +157,8 @@ int main(int argc, char *argv[])
              resizing = false;
         } else if(!strcmp(argv[in], "-noResize")) {
             resizing = false;
+        } else if(!strcmp(argv[in], "-httpconfig")) {
+            HTTPCONFIGURATOR = true;
         } else if (strncmp (argv[in], "-" , 1) == 0) {
             /* unknown application argument */
             printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -noStyles -dg -x -print\n",in,argv[in]);
@@ -163,6 +168,11 @@ int main(int argc, char *argv[])
             break;
         }
     }
+
+    // must be always true for mobile plattforms
+#ifdef MOBILE
+     HTTPCONFIGURATOR = true;
+#endif
 
     if(!nostyles) {
         s = new searchFile("stylesheet.qss");
@@ -192,7 +202,6 @@ int main(int argc, char *argv[])
             file.close();
         }
     }
-
 
 #ifdef IO_OPTIMIZED_FOR_TABWIDGETS
     printf("caQtDM -- viewer will disable monitors for hidden pages of QTabWidgets, in case of problems\n");

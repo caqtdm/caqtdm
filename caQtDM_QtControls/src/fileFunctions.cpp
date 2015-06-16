@@ -37,23 +37,15 @@ int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &
 {
     QString displayPath;
 
+    //QString Path = (QString)  qgetenv("CAQTDM_DISPLAY_PATH");
+    //printf("<%s>\n", Path.toAscii().constData());
     //printf("checkFileAndDownload <%s>\n", fileName.toAscii().constData());
-
-    // in case of http support without the configuration support, we add the temporary directory name to the CAQTDM_DISPLAY_PATH if not already set
-#ifndef NETWORKCONFIGURATOR
-    Specials specials;
-    displayPath = (QString)  qgetenv("CAQTDM_URL_DISPLAY_PATH");
-    if(!displayPath.contains(specials.getStdPath())) {
-       displayPath.append(":"); displayPath.append(specials.getStdPath());
-       setenv("CAQTDM_DISPLAY_PATH", (char*) displayPath.toAscii().constData(), 1);
-    }
-#endif
 
     searchFile *s = new searchFile(fileName);
     QString fileNameFound = s->findFile();
     if(!fileNameFound.isNull()) return true;
 
-    //printf("filename to download %s\n", fileName.toAscii().constData());
+    printf("filename to download %s\n", fileName.toAscii().constData());
 
     // use specified url
     if(url.size() > 0) {
@@ -62,6 +54,8 @@ int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &
     } else {
        displayPath = (QString)  qgetenv("CAQTDM_URL_DISPLAY_PATH");
     }
+
+    if(displayPath.length() < 1) return false;
 
     displayPath.append("/");
     displayPath.append(fileName);

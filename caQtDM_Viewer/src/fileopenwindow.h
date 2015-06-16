@@ -71,11 +71,9 @@
      void shellCommand(QString command);
      void cycleWindows();
 
-#ifdef NETWORKCONFIGURATOR
      void setAllEnvironmentVariables(const QString &fileName);
      void parseConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files);
      void saveConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files);
-#endif
 
  private slots:
      void Callback_ActionTimed();

@@ -23,6 +23,8 @@
  *    anton.mezger@psi.ch
  */
 
+bool HTTPCONFIGURATOR = false;
+
 #if defined(_MSC_VER)
   #define NOMINMAX
   #include <windows.h>
@@ -46,10 +48,7 @@
 #include <QFileDialog>
 #include <QString>
 #include "messagebox.h"
-
-#ifdef NETWORKCONFIGURATOR
 #include "configDialog.h"
-#endif
 
 #ifdef linux
 #include <sys/resource.h>
@@ -155,6 +154,8 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     activWindow = 0;
     Specials specials;
 
+    qDebug() << "http" << HTTPCONFIGURATOR;
+
     qDebug() <<  "caQtDM -- desktop size:" << qApp->desktop()->size();
 
     // Set Window Title without the whole path
@@ -200,6 +201,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     connect( this->ui.emptycacheAction, SIGNAL( triggered() ), this, SLOT(Callback_EmptyCache()) );
     this->ui.timedAction->setChecked(true);
 
+    // show url in menu
     QString urlpath = (QString)  qgetenv("CAQTDM_URL_DISPLAY_PATH");
     if(urlpath.length() > 0) {
       QString displayPath="url from environment=";
@@ -293,7 +295,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     pvTable = (QTableWidget*) 0;
 
 //************************************************************************************************************************************************
-#ifdef  NETWORKCONFIGURATOR
+    if(HTTPCONFIGURATOR) {
     // test reading a local configuration file in order to start caQtDM for ios (read caQTDM_IOS_Config.xml, display its data, choose configuration,
     // then get from the choosen website and choosen config file the epics configuration and ui file to launch
     QSize desktopSize = qApp->desktop()->size();
@@ -377,7 +379,18 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         lastGeometry = "";
         mustOpenFile = true;
     }
+    }
+
+    // in case of http support, we add the temporary directory name to the CAQTDM_DISPLAY_PATH if not already set
+    // only in case of non mobile plattforms
+#ifndef MOBILE
+    QString displayPath = (QString)  qgetenv("CAQTDM_DISPLAY_PATH");
+    if(!displayPath.contains(specials.getStdPath())) {
+       displayPath.append(":"); displayPath.append(specials.getStdPath());
+       setenv("CAQTDM_DISPLAY_PATH", (char*) displayPath.toAscii().constData(), 1);
+    }
 #endif
+
 //************************************************************************************************************************************************
 
 #ifdef MOBILE
@@ -392,7 +405,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 #endif
 }
 
-#ifdef  NETWORKCONFIGURATOR
+
 void FileOpenWindow::parseConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files)
 {
     QFile* file = new QFile(filename);
@@ -513,7 +526,6 @@ void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
     messageWindow->postMsgEvent(QtDebugMsg, asc);
     file.close();
 }
-#endif
 
 void FileOpenWindow::timerEvent(QTimerEvent *event)
 {
@@ -880,10 +892,12 @@ void FileOpenWindow::Callback_ActionHelp()
  * slots for exit signal
  */
 void FileOpenWindow::Callback_IosExit()
-{
-    fromIOS = true;
-    Callback_ActionExit();
-    fromIOS = false;
+{    
+    if(HTTPCONFIGURATOR) {
+        fromIOS = true;
+        Callback_ActionExit();
+        fromIOS = false;
+    }
 }
 
 void FileOpenWindow::Callback_ActionExit()
