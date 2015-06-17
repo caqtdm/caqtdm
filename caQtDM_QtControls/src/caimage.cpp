@@ -49,7 +49,7 @@ void caImage::init(const QString& filename) {
     fileFunctions filefunction;
     int success = filefunction.checkFileAndDownload(filename);
     if(!success) {
-        QMessageBox::critical(0, tr("caQtDM"), tr("could not download file %1, however continue").arg(filename));
+        //QMessageBox::critical(0, tr("caQtDM"), tr("could not download file %1, however continue").arg(filename));
     }
 
     searchFile *s = new searchFile(filename);
