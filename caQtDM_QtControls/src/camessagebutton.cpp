@@ -74,8 +74,8 @@ void caMessageButton::setColors(QColor bg, QColor fg, QColor hover, QColor borde
 void caMessageButton::setBackground(QColor c)
 {
     thisBackColor = c;
-    thisHoverColor = c.light(120);
-    thisBorderColor = c.dark(150);
+    thisHoverColor = c.lighter(120);
+    thisBorderColor = c.darker(150);
     setColors(thisBackColor, thisForeColor, thisHoverColor, thisBorderColor);
 }
 
