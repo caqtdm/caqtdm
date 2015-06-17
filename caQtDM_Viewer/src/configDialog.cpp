@@ -223,6 +223,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
     // start button
     QPushButton *startButton = new QPushButton(QIcon(":/caQtDM.ico"), "Start");
+    specials.setNewStyleSheet(startButton, desktopSize, 22, 13, "");
     connect(startButton, SIGNAL(clicked()), this, SLOT(startClicked()) );
     frameLayout->addWidget(startButton);
 #ifdef MOBILE_ANDROID
