@@ -326,7 +326,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         parseConfigFile(defpathdoc, urls, files);
     }
 
-    qDebug() << "urls" << urls;
+    //qDebug() << "urls" << urls;
 
     // display the results and get the user choices
 
@@ -367,6 +367,9 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         lastGeometry = "";
         mustOpenFile = true;
     }
+
+    // we do not want to reload, while when closing all files, the application will also exit
+    this->ui.reloadAction->setEnabled(false);
     }
 
     // in case of http support, we add the temporary directory name to the CAQTDM_DISPLAY_PATH if not already set
@@ -793,6 +796,8 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     // this will check for file existence and when an url is defined, download the file from a http server
     fileFunctions filefunction;
     filefunction.checkFileAndDownload(FileName);
+    if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) filefunction.lastInfo().toAscii().constData());
+    if(filefunction.lastError().length() > 0)  messageWindow->postMsgEvent(QtCriticalMsg, (char*)filefunction.lastError().toAscii().constData());
 
     // open file
     searchFile *s = new searchFile(FileName);
@@ -955,7 +960,7 @@ void FileOpenWindow::Callback_ActionReload()
     // block processing during reload
     mutexKnobData->BlockProcessing(true);
 
-    // go through all windows, close them and relaod them from files
+    // go through all windows, close them and reload them from files
     QList<QWidget *> all = this->findChildren<QWidget *>();
     foreach(QWidget* widget, all) {
         if(CaQtDM_Lib* w = qobject_cast<CaQtDM_Lib *>(widget)) {
@@ -977,6 +982,8 @@ void FileOpenWindow::Callback_ActionReload()
                 QFileInfo fi(FileName);
                 fileFunctions filefunction;
                 filefunction.checkFileAndDownload(fi.fileName());
+                if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) filefunction.lastInfo().toAscii().constData());
+                if(filefunction.lastError().length() > 0) messageWindow->postMsgEvent(QtCriticalMsg, (char*)filefunction.lastError().toAscii().constData());
 
                 searchFile *s = new searchFile(FileName);
                 QString fileNameFound = s->findFile();

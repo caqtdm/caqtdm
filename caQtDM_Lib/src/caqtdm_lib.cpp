@@ -723,6 +723,14 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         //qDebug() << "create caImage";
         w1->setProperty("ObjectType", caImage_Widget);
 
+        // any error messages for this object?
+        while(widget->anyMessages()) {
+            //qDebug() << widget->getMessages();
+            QString message = widget->getMessages();
+            if(message.contains("Info:")) postMessage(QtWarningMsg, (char*)message.toAscii().constData());
+            else postMessage(QtCriticalMsg, (char*) message.toAscii().constData());
+        }
+
         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
 
         // empty calc string, set animation
@@ -1946,8 +1954,8 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
 
     if(doNothing) {
         char asc[255];
-        sprintf(asc, "malformed pv '%s' (due to macro?)", (char*) newpv.toAscii().constData());
-        postMessage(QtDebugMsg, asc);
+        sprintf(asc, "Info: malformed pv '%s' (due to macro?)", (char*) newpv.toAscii().constData());
+        postMessage(QtWarningMsg, asc);
     }
 
     *pvRep = newpv;

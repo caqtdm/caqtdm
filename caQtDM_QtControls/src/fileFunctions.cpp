@@ -32,9 +32,23 @@ fileFunctions::fileFunctions()
 {
 }
 
+const QString fileFunctions::lastError()
+{
+    if(errorString.length() > 0) return errorString;
+    else return QString::null;
+}
+
+const QString fileFunctions::lastInfo()
+{
+    if(infoString.length() > 0) return "Info: " + infoString;
+    else return QString::null;
+}
+
 int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &url)
 {
     QString displayPath;
+    errorString = "";
+    infoString = "";
 
     //QString Path = (QString)  qgetenv("CAQTDM_DISPLAY_PATH");
     //printf("<%s>\n", Path.toAscii().constData());
@@ -54,15 +68,19 @@ int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &
 
     if(displayPath.length() < 1) return false;
 
-    printf("filename to download %s\n", fileName.toAscii().constData());
+    //printf("filename to download %s\n", fileName.toAscii().constData());
 
     displayPath.append("/");
     displayPath.append(fileName);
     QUrl displayUrl(displayPath);
+    infoString = "download file " + displayPath;
 
     NetworkAccess *displayGet = new NetworkAccess();
-    displayGet->requestUrl(displayUrl, fileName);
+    if(!displayGet->requestUrl(displayUrl, fileName)) {
+        errorString = displayGet->lastError();
+        displayGet->deleteLater();
+        return false;
+    }
     displayGet->deleteLater();
-
     return true;
 }

@@ -144,7 +144,8 @@ SOURCES	+= \
     src/colormaps.cpp \
     src/cascan2d.cpp \
     src/mdaReader.cpp \
-    src/mda_loader.c
+    src/mda_loader.c \
+    src/messageQueue.cpp
 
 XDR_HACK {
     SOURCES += src/xdr_hack.c
@@ -239,7 +240,8 @@ HEADERS	+= \
     src/colormaps.h \
     src/cascan2d.h \
     src/mdaReader.h \
-    src/mda-load.h
+    src/mda-load.h \
+    src/messageQueue.h
 
 # assume qwt6.0 was made with qt4
 contains(QT_VER_MAJ, 4) {

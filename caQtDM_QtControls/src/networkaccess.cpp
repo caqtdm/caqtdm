@@ -34,7 +34,6 @@
 #  include <unistd.h>
 #endif
 
-
 class Sleep
 {
 public:
@@ -52,13 +51,14 @@ NetworkAccess::NetworkAccess()
 {
     finished = false;
     manager = new QNetworkAccessManager;
+    errorString = "";
 }
 
 bool NetworkAccess::requestUrl(const QUrl url, const QString &file)
 {
     finished = false;
     thisFile = file;
-    printf("caQtDM -- download %s\n", url.toString().toAscii().constData());
+    //printf("caQtDM -- download %s\n", url.toString().toAscii().constData());
     downloadUrl = url;
     QNetworkReply* reply = manager->get(QNetworkRequest(url));
     connect(reply, SIGNAL(finished()), this, SLOT(finishReply()));
@@ -74,13 +74,11 @@ bool NetworkAccess::requestUrl(const QUrl url, const QString &file)
 #endif
         qApp->processEvents();
         if(downloadFinished()) {
-            //qDebug() << "download finished succesfully\n";
             return true;
         }
         looped++;
     }
     if(!downloadFinished()) {
-        //qDebug() << "download not finished\n";
         return false;
     }
     return false;
@@ -98,7 +96,7 @@ void NetworkAccess::finishReply()
     QNetworkReply* reply = qobject_cast<QNetworkReply*>(obj);
 
     if(reply->error()) {
-        printf("network error: %s for file %s\n", parseError(reply->error()).toAscii().constData(), downloadUrl.toString().toAscii().constData());
+        errorString = tr("%1: %2").arg(parseError(reply->error())).arg(downloadUrl.toString());
         return;
     }
 
@@ -116,16 +114,20 @@ void NetworkAccess::finishReply()
 
         QFile file(filePath);
         if(!file.open(QIODevice::ReadWrite)) {
-            printf("file: %s could not be opened for write\n", filePath.toAscii().constData());
+            errorString = tr("network error: %1 could not be opened for write").arg(filePath);
             return;
         } else {
             file.write(reply->readAll());
             file.close();
         }
-        //printf("file download to %s\n", thisFile.toAscii().constData());
 
     }
     finished = true;
+}
+
+const QString NetworkAccess::lastError()
+{
+    return errorString;
 }
 
 const QString NetworkAccess::parseError(QNetworkReply::NetworkError error)
@@ -134,25 +136,25 @@ const QString NetworkAccess::parseError(QNetworkReply::NetworkError error)
     switch(error)
     {
     case QNetworkReply::ConnectionRefusedError:
-        errstr = tr("Connection refused!");
+        errstr = tr("ConnectionRefusedError");
         break;
     case QNetworkReply::HostNotFoundError:
-        errstr = tr("Host not found!");
+        errstr = tr("HostNotFoundError");
         break;
     case QNetworkReply::RemoteHostClosedError:
-        errstr = tr("Remote host closed!");
+        errstr = tr("RemoteHostClosedError");
         break;
     case QNetworkReply::TimeoutError:
-        errstr = tr("Timeout!");
+        errstr = tr("TimeoutError");
         break;
     case QNetworkReply::ContentAccessDenied:
-        errstr = tr("Content access denied!");
+        errstr = tr("ContentAccessDenied");
         break;
     case QNetworkReply::ProtocolFailure:
-        errstr = tr("Protocol failure!");
+        errstr = tr("ProtocolFailure");
         break;
     case QNetworkReply::ContentNotFoundError:
-        errstr = tr("Content not found!");
+        errstr = tr("ContentNotFoundError");
         break;
     default:
         break;

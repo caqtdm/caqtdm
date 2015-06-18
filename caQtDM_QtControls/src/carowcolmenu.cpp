@@ -324,13 +324,13 @@ void caRowColMenu::updateColors()
 
             //set colors and style
 
-            QString style = "QPushButton{ background-color: rgb(%1, %2, %3, %4); color: rgb(%5, %6, %7, %8); border-color: rgb(%9, %10, %11, %12);";
+            QString style = "QPushButton{ background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-color: rgba(%9, %10, %11, %12);";
             style = style.arg(thisBackColor.red()).arg(thisBackColor.green()).arg(thisBackColor.blue()).arg(thisBackColor.alpha()).
                     arg(thisForeColor.red()).arg(thisForeColor.green()).arg(thisForeColor.blue()).arg(thisForeColor.alpha()).
                     arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
             style.append("border-radius: 3px; padding: 1px; border-width: 1px;"
                          "border-style: outset;}");
-            QString hover = "QPushButton:hover {background-color: rgb(%1, %2, %3, %4);}  QPushButton:pressed {background-color: rgb(%5, %6, %7, %8)};";
+            QString hover = "QPushButton:hover {background-color: rgba(%1, %2, %3, %4);}  QPushButton:pressed {background-color: rgba(%5, %6, %7, %8)};";
             hover = hover.arg(thisBackColorHover.red()).arg(thisBackColorHover.green()).arg(thisBackColorHover.blue()).arg(thisBackColorHover.alpha()).
                     arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
 
@@ -344,15 +344,15 @@ void caRowColMenu::updateColors()
             ImagePushButton *temp = cellsI[0];
 
            //set colors and style filled
-            QString style = "QPushButton{ background-color: rgba(%1, %2, %3, %4); color: rgb(%5, %6, %7, %8); border-color: rgb(%9, %10, %11, %12);";
-            style = style.arg(thisBackColor.red()).arg(thisBackColor.green()).arg(thisBackColor.blue()).arg(alpha).
+            QString style = "QPushButton{ background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-color: rgba(%9, %10, %11, %12);";
+            style = style.arg(thisBackColor.red()).arg(thisBackColor.green()).arg(thisBackColor.blue()).arg(thisBackColor.alpha()).
                     arg(thisForeColor.red()).arg(thisForeColor.green()).arg(thisForeColor.blue()).arg(thisForeColor.alpha()).
                     arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
             QString border ="border-radius: 3px; padding: 1px; border-style: outset; border-width: %1px;}";
             border = border.arg(borderSize);
             style.append(border);
-            QString hover = "QPushButton:hover {background-color: rgb(%1, %2, %3, %4);}  QPushButton:pressed {background-color: rgb(%5, %6, %7, %8)};";
-            hover = hover.arg(thisBackColorHover.red()).arg(thisBackColorHover.green()).arg(thisBackColorHover.blue()).arg(alpha).
+            QString hover = "QPushButton:hover {background-color: rgba(%1, %2, %3, %4);}  QPushButton:pressed {background-color: rgba(%5, %6, %7, %8)};";
+            hover = hover.arg(thisBackColorHover.red()).arg(thisBackColorHover.green()).arg(thisBackColorHover.blue()).arg(thisBackColorHover.alpha()).
                           arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
             style.append(hover);
             temp->setStyleSheet(style);
@@ -366,13 +366,13 @@ void caRowColMenu::updateColors()
             EPushButton * temp = (EPushButton *) cellsP[i];
 
             //set colors and style
-            QString style = "QPushButton{ background-color: rgb(%1, %2, %3, %4); color: rgb(%5, %6, %7, %8); border-color: rgb(%9, %10, %11, %12);";
+            QString style = "QPushButton{ background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-color: rgba(%9, %10, %11, %12);";
             style = style.arg(thisBackColor.red()).arg(thisBackColor.green()).arg(thisBackColor.blue()).arg(thisBackColor.alpha()).
                     arg(thisForeColor.red()).arg(thisForeColor.green()).arg(thisForeColor.blue()).arg(thisForeColor.alpha()).
                     arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
             style.append("border-radius: 3px; padding: 1px; border-width: 1px;"
                          "border-style: outset;}");
-            QString hover = "QPushButton:hover {background-color: rgb(%1, %2, %3, %4);}  QPushButton:pressed {background-color: rgb(%5, %6, %7, %8)};";
+            QString hover = "QPushButton:hover {background-color: rgba(%1, %2, %3, %4);}  QPushButton:pressed {background-color: rgba(%5, %6, %7, %8)};";
             hover= hover.arg(thisBackColorHover.red()).arg(thisBackColorHover.green()).arg(thisBackColorHover.blue()).arg(thisBackColorHover.alpha()).
                     arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
             style.append(hover);

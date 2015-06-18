@@ -44,7 +44,7 @@ caLabel::caLabel(QWidget *parent) : ESimpleLabel(parent)
 void caLabel::setColors(QColor bg, QColor fg)
 {
     if((bg != thisBackColorOld) || (fg != thisForeColorOld)) {
-        thisStyle = "background-color: rgb(%1, %2, %3, %4); color: rgb(%5, %6, %7, %8);";
+        thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
         thisStyle = thisStyle.arg(bg.red()).arg(thisBackColor.green()).arg(bg.blue()).arg(bg.alpha()).
                 arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
         setStyleSheet(thisStyle);

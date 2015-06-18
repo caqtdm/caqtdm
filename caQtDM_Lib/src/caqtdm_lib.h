@@ -72,6 +72,7 @@
 #include "sliderDialog.h"
 #include "processWindow.h"
 #include "splashscreen.h"
+#include "messageQueue.h"
 
 #include <QtControls>
 

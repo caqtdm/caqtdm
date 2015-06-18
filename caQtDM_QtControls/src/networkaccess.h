@@ -40,8 +40,9 @@ class NetworkAccess:public QObject
 public:
     NetworkAccess();
     ~NetworkAccess(){}
-    bool requestUrl(const QUrl url, const QString &file = 0 );
+    bool requestUrl(const QUrl url, const QString &file = QString::null);
     int downloadFinished();
+    const QString lastError();
 
 signals:
     void networkError(const QString);
@@ -57,6 +58,7 @@ private:
     QString thisFile;
     int finished;
     QUrl downloadUrl;
+    QString errorString;
 };
 
 #endif

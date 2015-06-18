@@ -166,8 +166,8 @@ void caChoice::setColors(QColor back, QColor fore, QColor border, alignmentHor a
         oldColorMode = thisColorMode;
 
         if(border != oldBorderColor) {
-            QString bordercolor = "border-color: rgb(%1, %2, %3); ";
-            bordercolor = bordercolor.arg(border.red()).arg(border.green()).arg(border.blue());
+            QString bordercolor = "border-color: rgba(%1, %2, %3, %4); ";
+            bordercolor = bordercolor.arg(border.red()).arg(border.green()).arg(border.blue()).arg(border.alpha());
             QString style ="QPushButton { ";
             style.append(bordercolor);
             style.append("} ");
@@ -193,23 +193,23 @@ void caChoice::setColors(QColor back, QColor fore, QColor border, alignmentHor a
 
         QString background =  "";
         background.append("background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, ");
-        background.append("stop:0   rgba(%1, %2, %3, 255), ");
-        background.append("stop:0.4 rgba(%4, %5, %6, 255), ");
-        background.append("stop:0.6 rgba(%7, %8, %9, 255), ");
-        background.append("stop:1   rgba(%10, %11, %12, 255)); ");
+        background.append("stop:0   rgba(%1, %2, %3, %4), ");
+        background.append("stop:0.4 rgba(%5, %6, %7, %8), ");
+        background.append("stop:0.6 rgba(%9, %10, %11, %12), ");
+        background.append("stop:1   rgba(%13, %14, %15, %16)); ");
 
-        background = background.arg(shadowColor1.red()).arg(shadowColor1.green()).arg(shadowColor1.blue())
-                .arg(baseColor.red()).arg(baseColor.green()).arg(baseColor.blue())
-                .arg(baseColor.red()).arg(baseColor.green()).arg(baseColor.blue())
-                .arg(shadowColor2.red()).arg(shadowColor2.green()).arg(shadowColor2.blue());
+        background = background.arg(shadowColor1.red()).arg(shadowColor1.green()).arg(shadowColor1.blue()).arg(shadowColor1.alpha())
+                .arg(baseColor.red()).arg(baseColor.green()).arg(baseColor.blue()).arg(baseColor.alpha())
+                .arg(baseColor.red()).arg(baseColor.green()).arg(baseColor.blue()).arg(baseColor.alpha())
+                .arg(shadowColor2.red()).arg(shadowColor2.green()).arg(shadowColor2.blue()).arg(shadowColor2.alpha());
 
         background.append("border-radius: 2px;padding: 3px; border-width: 1px;");
 
-        QString foreground = "; color: rgb(%1, %2, %3); ";
-        foreground = foreground.arg(fore.red()).arg(fore.green()).arg(fore.blue());
+        QString foreground = "; color: rgba(%1, %2, %3, %4); ";
+        foreground = foreground.arg(fore.red()).arg(fore.green()).arg(fore.blue()).arg(fore.alpha());
 
-        QString bordercolor = "border-color: rgb(%1, %2, %3); ";
-        bordercolor = bordercolor.arg(border.red()).arg(border.green()).arg(border.blue());
+        QString bordercolor = "border-color: rgba(%1, %2, %3, %4); ";
+        bordercolor = bordercolor.arg(border.red()).arg(border.green()).arg(border.blue()).arg(border.alpha());
 
         QString style ="QPushButton { ";
         style.append(bordercolor);
@@ -228,28 +228,29 @@ void caChoice::setColors(QColor back, QColor fore, QColor border, alignmentHor a
         }
 
         style.append("} ");
-        QString hover = "QPushButton:hover {background-color: rgb(%1, %2, %3);}  QPushButton:pressed {background-color: rgb(%4, %5, %6)};";
-        hover = hover.arg(highlightColor.red()).arg(highlightColor.green()).arg(highlightColor.blue()).arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue());
+        QString hover = "QPushButton:hover {background-color: rgba(%1, %2, %3, %4);}  QPushButton:pressed {background-color: rgba(%5, %6, %7, %8)};";
+        hover = hover.arg(highlightColor.red()).arg(highlightColor.green()).arg(highlightColor.blue()).arg(highlightColor.alpha())
+                .arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
         style.append(hover);
 
-        QString activ = "QPushButton:checked {background-color: rgb(%1, %2, %3, %4);} ";
-        activ = activ.arg(activColor.red()).arg(activColor.green()).arg(activColor.blue()).arg(255);
+        QString activ = "QPushButton:checked {background-color: rgba(%1, %2, %3, %4);} ";
+        activ = activ.arg(activColor.red()).arg(activColor.green()).arg(activColor.blue()).arg(activColor.alpha());
         style.append(activ);
 
-        QString hoveractiv =  "QPushButton:checked:hover {background-color: rgb(%1, %2, %3, %4);} ";
-        hoveractiv = hoveractiv.arg(highlightColor.red()).arg(highlightColor.green()).arg(highlightColor.blue()).arg(255);
+        QString hoveractiv =  "QPushButton:checked:hover {background-color: rgba(%1, %2, %3, %4);} ";
+        hoveractiv = hoveractiv.arg(highlightColor.red()).arg(highlightColor.green()).arg(highlightColor.blue()).arg(highlightColor.alpha());
         style.append(hoveractiv);
 
         QString disabled("QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, ");
-        disabled.append("stop:0   rgba(%1, %2, %3, 255), ");
-        disabled.append("stop:0.4 rgba(%4, %5, %6, 255), ");
-        disabled.append("stop:0.6 rgba(%7, %8, %9, 255), ");
-        disabled.append("stop:1   rgba(%10, %11, %12, 255))");
+        disabled.append("stop:0   rgba(%1, %2, %3, %4), ");
+        disabled.append("stop:0.4 rgba(%5, %6, %7, %8), ");
+        disabled.append("stop:0.6 rgba(%9, %10, %11, %12), ");
+        disabled.append("stop:1   rgba(%13, %14, %15, %16))");
         baseColor.setHsv(baseColor.hue(), baseColor.saturation(), (int) (baseColor.value() * 0.8));
-        disabled = disabled.arg(shadowColor1.red()).arg(shadowColor1.green()).arg(shadowColor1.blue())
-                .arg(baseColor.red()).arg(baseColor.green()).arg(baseColor.blue())
-                .arg(baseColor.red()).arg(baseColor.green()).arg(baseColor.blue())
-                .arg(shadowColor2.red()).arg(shadowColor2.green()).arg(shadowColor2.blue());
+        disabled = disabled.arg(shadowColor1.red()).arg(shadowColor1.green()).arg(shadowColor1.blue()).arg(shadowColor1.alpha())
+                .arg(baseColor.red()).arg(baseColor.green()).arg(baseColor.blue()).arg(baseColor.alpha())
+                .arg(baseColor.red()).arg(baseColor.green()).arg(baseColor.blue()).arg(baseColor.alpha())
+                .arg(shadowColor2.red()).arg(shadowColor2.green()).arg(shadowColor2.blue()).arg(shadowColor2.alpha());
 
         disabled.append("; etch-disabled-text: true; color: grey;}");
         style.append(disabled);

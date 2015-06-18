@@ -30,6 +30,7 @@
 
 caImage::caImage(QWidget* parent) : QWidget(parent)
 {
+    messagequeue = new messageQueue();
     _container = new QLabel(this);
     _layout = new QVBoxLayout(this);
     thisFrame = prevFrame = 0;
@@ -43,13 +44,29 @@ caImage::~caImage() {
    delete _animation;
 }
 
+QString caImage::getMessages()
+{
+    if(!messagequeue->isEmpty()) {
+        return messagequeue->dequeue();
+    } else {
+      return NULL;
+    }
+}
+
+bool caImage::anyMessages()
+{
+    return !messagequeue->isEmpty();
+}
+
 void caImage::init(const QString& filename) {
 
     // this will check for file existence and when an url is defined, download the file from a http server
     fileFunctions filefunction;
     int success = filefunction.checkFileAndDownload(filename);
+    if(filefunction.lastInfo().length() > 0) messagequeue->enqueue(filefunction.lastInfo());
     if(!success) {
-        //QMessageBox::critical(0, tr("caQtDM"), tr("could not download file %1, however continue").arg(filename));
+        if(filefunction.lastError().length() > 0) messagequeue->enqueue(filefunction.lastError());
+        messagequeue->enqueue(tr("Info: could not find or download file %1, however continue").arg(filename));
     }
 
     searchFile *s = new searchFile(filename);

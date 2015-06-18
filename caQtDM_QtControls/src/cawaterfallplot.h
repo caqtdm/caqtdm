@@ -202,6 +202,7 @@ class QTCON_EXPORT caWaterfallPlot: public QWidget
 
     Q_ENUMS(units)
     Q_ENUMS(intensityScaling)
+    Q_ENUMS(colormap)
 
     Q_PROPERTY(QString Title READ getTitlePlot WRITE setTitlePlot)
     Q_PROPERTY(QString TitleX READ getTitleX WRITE setTitleX)

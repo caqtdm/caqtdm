@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
             HTTPCONFIGURATOR = true;
         } else if (strncmp (argv[in], "-" , 1) == 0) {
             /* unknown application argument */
-            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -noStyles -dg -x -print\n",in,argv[in]);
+            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -noStyles -dg -x -print -httpconfig\n",in,argv[in]);
         } else {
             printf("caQtDM -- file = <%s>\n", argv[in]);
             fileName = QString(argv[in]);
@@ -218,7 +218,6 @@ int main(int argc, char *argv[])
     } else {
         printf("caQtDM -- files will not download files when not locally found\n");
     }
-
 #endif
 
     FileOpenWindow window (0, fileName, macroString, attach, minimize, geometry, printscreen, resizing);
