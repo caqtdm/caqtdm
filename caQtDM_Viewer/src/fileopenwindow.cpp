@@ -297,7 +297,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     // parse the config file for urls and files
     stdpathdoc.append("/caQtDM_IOS_Config.xml");
 
-    qDebug() << stdpathdoc;
+    //qDebug() << stdpathdoc;
 
     QFileInfo fi(stdpathdoc);
     if(fi.exists()) {
@@ -332,6 +332,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 
     configDialog dialog(debugWindow, urls, files, desktopSize, this);
     dialog.exec();
+    if(dialog.isEscapeButtonClicked()) exit(0);
     if(!dialog.isStartButtonClicked() && !dialog.isClearConfig())  exit(0);
 
     // when clear config files is used, then reload dialog from original

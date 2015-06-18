@@ -33,6 +33,10 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     setWindowFlags(flags);
     setWindowModality (Qt::WindowModal);
 
+#ifndef MOBILE
+    installEventFilter(this);
+#endif
+
 #ifdef MOBILE_ANDROID
     const QString buttonStyle = "background-color: lightgray; border-style: outset; border-width: 3px; border-radius: 10px; border-color: cyan; padding: 6px";
     int FONTSIZE_ANDROID = 24;
@@ -76,6 +80,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
     ClearConfigButtonClicked = false;
     StartButtonClicked = false;
+    EscapeButtonClicked = false;
     QGridLayout *mainLayout = new QGridLayout();
 
     QFrame *frame = new QFrame();
@@ -309,6 +314,11 @@ void configDialog::startClicked()
     close();
 }
 
+bool configDialog::isEscapeButtonClicked()
+{
+    return EscapeButtonClicked;
+}
+
 bool configDialog::isStartButtonClicked()
 {
     return StartButtonClicked;
@@ -344,3 +354,19 @@ void configDialog::closeEvent(QCloseEvent *event)
 {
     loop.quit();
 }
+
+bool configDialog::eventFilter(QObject *obj, QEvent *event)
+{
+   if(event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
+      QKeyEvent *me = static_cast<QKeyEvent *>(event);
+      if(me->key() == Qt::Key_Return) {
+           StartButtonClicked = true;
+           close();
+      } else  if(me->key() == Qt::Key_Escape) {
+          EscapeButtonClicked = true;
+          close();
+      }
+    }
+    return QObject::eventFilter(obj, event);
+}
+
