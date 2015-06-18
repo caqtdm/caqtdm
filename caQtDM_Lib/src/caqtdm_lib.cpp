@@ -5062,21 +5062,31 @@ int CaQtDM_Lib::Execute(char *command)
 void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QWidget *w)
 {
     char errmess[255];
-    int indx =  w->property("MonitorIndex").value<int>();
-    if(indx < 0) return;
+    int indx;
 
-    knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
-    if(kPtr == (knobData *) 0) return;
-    // when softpv get index to where it is defined
-    if(mutexKnobData->getSoftPV(kPtr->pv, &indx, (QWidget*) kPtr->thisW)) {
-        if(kPtr->soft) {
-            kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
-            kPtr->edata.rvalue = value;
-            // set value also into widget, will be overwritten when driven from other channels
-            caCalc * ww = (caCalc*) kPtr->dispW;
-            ww->setValue(value);
+    //qDebug() << "treatordinary value" << pv << w;
+
+    knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv);
+    //qDebug() << "see if this pv exists in our monitor list" << kPtr;
+    if(kPtr != (knobData *) 0) {
+        //qDebug() << "try to find out if this is a soft pv" << pv;
+        // when softpv get index to where it is defined
+        if(mutexKnobData->getSoftPV(pv, &indx, (QWidget*) kPtr->thisW)) {
+            if(kPtr->soft) {
+                //qDebug() << "write softpv";
+                kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
+                kPtr->edata.rvalue = value;
+                // set value also into widget, will be overwritten when driven from other channels
+                caCalc * ww = (caCalc*) kPtr->dispW;
+                ww->setValue(value);
+                return;
+            }
+
+        } else {
+            //qDebug() << "we found the pv";
         }
-    } else {
+    }
+
 #ifdef epics4
         QString from = QString::number(value);
         Epics4->Epics4SetValue(kPtr->index, pv, from);
@@ -5085,9 +5095,7 @@ void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QW
         QStringsToChars(pv, text, w->objectName().toLower());
         EpicsSetValue(param1, value, idata, param2, param3, errmess, 0);
 #endif
-    }
 }
-
 
 /**
   * this routine will get a value from a string with hex and octal representation
@@ -5825,7 +5833,7 @@ void CaQtDM_Lib::mouseReleaseEvent(QMouseEvent *event)
                     if(!widget->getAccessW()) return;
                     for(int i=0; i<4; i++) {
                         int32_t idata = (int32_t) values[i];
-                        float rdata = (float) values[i];
+                        double rdata = (double) values[i];
                         TreatOrdinaryValue(thisString.at(i), rdata,  idata, (QWidget*) widget);
                     }
                 }
