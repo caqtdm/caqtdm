@@ -234,8 +234,8 @@ private:
     int InitVisibility(QWidget* widget, knobData *kData, QMap<QString, QString> map,  int *specData, QString info);
     void postMessage(QtMsgType type, char *msg);
     int Execute(char *command);
-    void TreatRequestedValue(QString text, caTextEntry::FormatType fType, QWidget *w);
-    void TreatRequestedWave(QString text, caWaveTable::FormatType fType, int index, QWidget *w);
+    void TreatRequestedValue(QString pv, QString text, caTextEntry::FormatType fType, QWidget *w);
+    void TreatRequestedWave(QString pv, QString text, caWaveTable::FormatType fType, int index, QWidget *w);
     void TreatOrdinaryValue(QString pv, double value, int32_t idata, QWidget *w);
     bool getSoftChannel(QString pv, knobData &data);
     int parseForDisplayRate(QString input, int &rate);

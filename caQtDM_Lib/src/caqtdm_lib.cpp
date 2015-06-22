@@ -384,30 +384,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     savedMacro[0] = macro;
 
     scanWidgets(myWidget->findChildren<QWidget *>(), macro);
-/*
-    // get first all primary softs (inorder that pv working on their own value will always be treated first
-    foreach(QWidget *w1, widgets1) {
-        savedFile[0] = fi.baseName();
-        savedMacro[0] = macro;
-        // open and load file
-        HandleWidget(w1, savedMacro[0], true, true);
-    }
-    foreach(QWidget *w1, widgets1) {
-        savedFile[0] = fi.baseName();
-        savedMacro[0] = macro;
-        // open and load file
-        HandleWidget(w1, savedMacro[0], true, false);
-    }
 
-    // get from the display all the widgets having a monitor associated
-    QList<QWidget *> widgets2 = myWidget->findChildren<QWidget *>();
-    foreach(QWidget *w1, widgets2) {
-        savedFile[0] = fi.baseName();
-        savedMacro[0] = macro;
-        // open and load file
-        HandleWidget(w1, savedMacro[0], false, false);
-    }
- */
     if(nbIncludes > 0) {
 #ifdef linux
         usleep(200000);
@@ -1034,9 +1011,17 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         QString text;
 
         if(widget->getPV().size() > 0) {
+            specData[0] = 0;
             addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
             widget->setPV(pv);
         }
+
+        if(widget->getDisablePV().size() > 0) {
+            specData[0] = 1;
+            addMonitor(myWidget, &kData, widget->getDisablePV(), w1, specData, map, &pv);
+            widget->setDisablePV(pv);
+        }
+
         connect(widget, SIGNAL(messageButtonSignal(int)), this, SLOT(Callback_MessageButton(int)));
 
         text = widget->getLabel();
@@ -1339,10 +1324,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
                 scanWidgets(thisW->findChildren<QWidget *>(), macroS);
 
-                //foreach(QWidget *child, childs) {
-                //    HandleWidget(child, macroS, true, false);
-                //    HandleWidget(child, macroS, false, false);
-                //}
                 level--;
             }
 
@@ -2027,7 +2008,6 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     CreateAndConnect(num, kData, rate, false);
 #endif
 
-    w->setProperty("MonitorIndex", num);
     w->setProperty("Connect", false);
 
     // add for this widget the io info
@@ -3294,11 +3274,20 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
     } else if (caMessageButton *widget = qobject_cast<caMessageButton *>(w)) {
 
         if(data.edata.connected) {
+
             if (widget->getColorMode() == caMessageButton::Alarm) {
                 widget->setAlarmColors(data.edata.severity);
                 // case of static mode
             } else {
                 SetColorsBack;
+            }
+            // enable or disable this button
+            if(data.specData[0] == 1) {
+                if((data.edata.rvalue != 0) || (data.edata.ivalue != 0)) {
+                    widget->setEnabled(false);
+                } else {
+                    widget->setEnabled(true);
+                }
             }
 
         } else {
@@ -3682,7 +3671,7 @@ void CaQtDM_Lib::Callback_TextEntryChanged(const QString& text)
     if(!w->getAccessW()) return;
 
     fType = w->getFormatType();
-    TreatRequestedValue(text, fType, w1);
+    TreatRequestedValue(w->getPV(), text, fType, w1);
 }
 
 void CaQtDM_Lib::Callback_WaveEntryChanged(const QString& text, int index)
@@ -3695,7 +3684,7 @@ void CaQtDM_Lib::Callback_WaveEntryChanged(const QString& text, int index)
 
     //qDebug() << "should write" << text << "at index" << index;
     fType = w->getFormatType();
-    TreatRequestedWave(text, fType, index, w1);
+    TreatRequestedWave(w->getPV(), text, fType, index, w1);
 }
 
 /**
@@ -3750,10 +3739,10 @@ void CaQtDM_Lib::Callback_MessageButton(int type)
 
     if(type == 0) {         // pressed
         if(w->getPressMessage().size() > 0)
-            TreatRequestedValue(w->getPressMessage(), caTextEntry::decimal, w1);
+            TreatRequestedValue(w->getPV(), w->getPressMessage(), caTextEntry::decimal, w1);
     } else if(type == 1) {  // released
         if(w->getReleaseMessage().size() > 0)
-            TreatRequestedValue(w->getReleaseMessage(), caTextEntry::decimal, w1);
+            TreatRequestedValue(w->getPV(), w->getReleaseMessage(), caTextEntry::decimal, w1);
     }
 }
 
@@ -5065,12 +5054,10 @@ void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QW
     int indx;
 
     //qDebug() << "treatordinary value" << pv << w;
-
     knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv);
-    //qDebug() << "see if this pv exists in our monitor list" << kPtr;
     if(kPtr != (knobData *) 0) {
         //qDebug() << "try to find out if this is a soft pv" << pv;
-        // when softpv get index to where it is defined
+        // when softpv treat it and get out
         if(mutexKnobData->getSoftPV(pv, &indx, (QWidget*) kPtr->thisW)) {
             if(kPtr->soft) {
                 //qDebug() << "write softpv";
@@ -5080,10 +5067,7 @@ void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QW
                 caCalc * ww = (caCalc*) kPtr->dispW;
                 ww->setValue(value);
                 return;
-            }
-
-        } else {
-            //qDebug() << "we found the pv";
+            };
         }
     }
 
@@ -5118,13 +5102,14 @@ long CaQtDM_Lib::getValueFromString(char *textValue, formatsType fType, char **e
 /**
   * this routine will treat the string, command, value to write to the pv
   */
-void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType, QWidget *w)
+void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::FormatType fType, QWidget *w)
 {
     char errmess[255];
     double value;
     long longValue;
     char *end = NULL, textValue[255];
     bool match;
+    int indx;
 
     formatsType fTypeNew;
 
@@ -5133,14 +5118,9 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
     else if(fType == caTextEntry::string) fTypeNew = string;
     else fTypeNew = decimal;
 
-    int indx =  w->property("MonitorIndex").value<int>();
-    if(indx < 0) return;
-
-    //qDebug() << "TreatRequestedValue text" << text.toAscii().constData();
-
-    knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
+    knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv);
+    if(kPtr == (knobData *) 0)return;
     knobData *auxPtr = kPtr;
-    if(kPtr == (knobData *) 0) return;
 
     // when softpv get index to where it is defined
     if(mutexKnobData->getSoftPV(kPtr->pv, &indx, (QWidget*) kPtr->thisW)) {
@@ -5247,7 +5227,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString text, caTextEntry::FormatType fType
 /**
   * this routine will treat the values to write to the pv
   */
-void CaQtDM_Lib::TreatRequestedWave(QString text, caWaveTable::FormatType fType, int index, QWidget *w)
+void CaQtDM_Lib::TreatRequestedWave(QString pv, QString text, caWaveTable::FormatType fType, int index, QWidget *w)
 {
     char    errmess[255], sdata[40];
     int32_t data32[1];
@@ -5265,13 +5245,9 @@ void CaQtDM_Lib::TreatRequestedWave(QString text, caWaveTable::FormatType fType,
     else if(fType == caWaveTable::string) fTypeNew = string;
     else fTypeNew = decimal;
 
-    int indx =  w->property("MonitorIndex").value<int>();
-    if(indx < 0) return;
-
     //qDebug() << "treat requested wave";
-
-    knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
-    if(kPtr == (knobData *) 0) return;
+    knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv);
+    if(kPtr == (knobData *) 0)return;
 
     QMutex *datamutex;
     datamutex = (QMutex*) kPtr->mutex;

@@ -34,6 +34,8 @@ DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 # caQtDM will now also download from http when CAQTDM_URL_DISPLAY_PATH is defined
 # When starting with the option -httpconfig you will get the configuration screen in order to use network files as in mobile apps.
 # macros can now also be read when specifying -macrodefs filename
+# caMessageButton can be disabled/enabled by a second channel
+# configdialog for http configuration slightly changed
 # Zai added some edl objects
 
 # 3.9.2 and 3.9.3

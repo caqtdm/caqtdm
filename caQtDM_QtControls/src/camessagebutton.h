@@ -42,6 +42,8 @@ class QTCON_EXPORT caMessageButton : public EPushButton
     Q_PROPERTY(QString label READ getLabel WRITE setLabel)
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
+    Q_PROPERTY(QColor disabledForeground READ getDisabledForeground WRITE setDisabledForeground)
+    Q_PROPERTY(QString disableChannel READ getDisablePV WRITE setDisablePV)
     Q_PROPERTY(QString releaseMessage READ getReleaseMessage WRITE setReleaseMessage)
     Q_PROPERTY(QString pressMessage READ getPressMessage WRITE setPressMessage)
 
@@ -54,7 +56,7 @@ public:
 
     enum colMode {Static=0, Alarm};
 
-    void setColors(QColor bg, QColor fg,  QColor hover, QColor border);
+    void setColors(QColor bg, QColor fg,  QColor hover, QColor border, QColor disabledFg);
     void setNormalColors();
     void setAlarmColors(short status);
 
@@ -72,6 +74,10 @@ public:
     QColor getBackground() const {return thisBackColor;}
     void setBackground(QColor c);
 
+
+    QColor getDisabledForeground() const {return thisDisabledForeColor;}
+    void setDisabledForeground(QColor c);
+
     QString getLabel() const {return thisLabel;}
     void setLabel(QString const &label);
 
@@ -82,6 +88,9 @@ public:
 
     QString getPV() const {return thisPV;}
     void setPV(QString const &newPV){ thisPV = newPV;}
+
+    QString getDisablePV() const {return thisDisablePV;}
+    void setDisablePV(QString const &newPV){ thisDisablePV = newPV;}
 
     int getAccessW() const {return _AccessW;}
     void setAccessW(int access);
@@ -101,11 +110,12 @@ signals:
 
 private:
 
-    QString thisPV;
+    QString thisPV, thisDisablePV;
     QString thisLabel;
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
     QColor thisHoverColor, oldHoverColor;
+    QColor thisDisabledForeColor, oldDisabledForeColor;
     QColor thisBorderColor;
     QPalette thisPalette;
 
