@@ -1197,6 +1197,20 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         widget->setProperty("Taken", true);
 
         //==================================================================================================================
+    } else if(caByteController* widget = qobject_cast<caByteController *>(w1)) {
+
+        //qDebug() << "create caByteController" << w1;
+        w1->setProperty("ObjectType", caByteController_Widget);
+
+        if(widget->getPV().size() > 0) {
+            addMonitor(myWidget, &kData, widget->getPV(), w1, specData, map, &pv);
+            widget->setPV(pv);
+            connect(widget, SIGNAL(clicked(int)), this, SLOT(Callback_ByteControllerClicked(int)));
+        }
+
+        widget->setProperty("Taken", true);
+
+        //==================================================================================================================
     } else if(caInclude* widget = qobject_cast<caInclude *>(w1)) {
 
         //qDebug() << "create caInclude" << w1;
@@ -2642,6 +2656,25 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             SetColorsNotConnected;
         }
 
+        // byte ==================================================================================================================
+    } else if (caByteController *widget = qobject_cast<caByteController *>(w)) {
+
+        if(data.edata.connected) {
+            int colorMode = widget->getColorMode();
+            if(colorMode == caByteController::Static) {
+                if(!widget->property("Connect").value<bool>()) {
+                    widget->setProperty("Connect", true);
+                }
+                widget->setValue(data.edata.ivalue);
+            } else if(colorMode == caByteController::Alarm) {
+                widget->setValue(data.edata.ivalue);
+                widget->setAlarmColors(data.edata.severity);
+            }
+        } else {
+            SetColorsNotConnected;
+        }
+
+
         // lineEdit and textEntry ====================================================================================================
     } else if (caLineEdit *widget = qobject_cast<caLineEdit *>(w)) {
 
@@ -3747,6 +3780,29 @@ void CaQtDM_Lib::Callback_MessageButton(int type)
 }
 
 /**
+ * callback will write value to device
+ */
+void CaQtDM_Lib::Callback_ByteControllerClicked(int bit)
+{
+    QWidget *w1 = qobject_cast<QWidget *>(sender());
+    caByteController *w = qobject_cast<caByteController *>(sender());
+
+    if(!w->getAccessW()) return;
+
+    long number = w->getValue();
+
+    // bit set
+    if(w->bitState(w->getValue(), bit)) {
+        number &= ~(1 << bit);
+        TreatOrdinaryValue(w->getPV(), (double) number, number,  w1);
+    // bit not set
+    } else {
+       number |= 1 << bit;
+       TreatOrdinaryValue(w->getPV(), (double) number, number,  w1);
+    }
+}
+
+/**
  * callback will execute script
  */
 void CaQtDM_Lib::Callback_ScriptButton()
@@ -4172,6 +4228,11 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     } else if(caByte* widget = qobject_cast<caByte *>(w)) {
         pv[0] = widget->getPV().trimmed();
         if(widget->getColorMode() == caByte::Alarm) strcpy(colMode, "Alarm");
+        else strcpy(colMode, "Static");
+        nbPV = 1;
+    } else if(caByteController* widget = qobject_cast<caByteController *>(w)) {
+        pv[0] = widget->getPV().trimmed();
+        if(widget->getColorMode() == caByteController::Alarm) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
         nbPV = 1;
     } else if(caStripPlot* widget = qobject_cast<caStripPlot *>(w)) {
@@ -5897,6 +5958,8 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
     } else if (caCircularGauge *widget = qobject_cast<caCircularGauge *>(w)) {
         mimeData->setText(widget->getPV());
     } else if (caByte *widget = qobject_cast<caByte *>(w->parent())) {
+         mimeData->setText(widget->getPV());
+    } else if (caByteController *widget = qobject_cast<caByteController *>(w->parent())) {
          mimeData->setText(widget->getPV());
     } else if (caLineEdit *widget = qobject_cast<caLineEdit *>(w)) {
         widget->setEnabled(true);  // enable after initiating drag for context menu

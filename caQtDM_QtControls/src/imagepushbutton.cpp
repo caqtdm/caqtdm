@@ -33,20 +33,8 @@ ImagePushButton::ImagePushButton(const QString & text, const QString& image, QWi
     myImage= image;
     iconPresent = false;
     invisible = false;
-  /*
-    searchFile *s = new searchFile(image);
-    QString fileNameFound = s->findFile();
 
-    if(fileNameFound.isNull()) {
-        //printf("file <%s> does not exist\n", qPrintable(image));
-        iconOK = false;
-    } else {
-        pixmap.load(fileNameFound);
-        iconOK = true;
-    }
-    delete s;
-*/
-    // instead of the previous dynamic load from file, we do it now from the resources
+    //  load from the resources
     iconOK = true;
     QString fileName =  ":/pixmaps/%1";
     fileName = fileName.arg(image);

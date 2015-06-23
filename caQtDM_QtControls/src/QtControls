@@ -42,5 +42,6 @@
 #include <caclock.h>
 #include <cameter.h>
 #include <cascan2d.h>
+#include <cabytecontroller.h>
 #endif
 

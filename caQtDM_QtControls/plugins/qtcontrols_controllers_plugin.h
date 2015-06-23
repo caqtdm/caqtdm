@@ -210,5 +210,15 @@ public:
     virtual QWidget *createWidget(QWidget *parent);
 };
 
+class caByteControllerInterface: public CustomWidgetInterface_Controllers
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerCustomWidgetInterface)
+
+public:
+    caByteControllerInterface(QObject *parent);
+    virtual QWidget *createWidget(QWidget *parent);
+};
+
 
 #endif

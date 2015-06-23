@@ -145,7 +145,8 @@ SOURCES	+= \
     src/cascan2d.cpp \
     src/mdaReader.cpp \
     src/mda_loader.c \
-    src/messageQueue.cpp
+    src/messageQueue.cpp \
+    src/cabytecontroller.cpp
 
 XDR_HACK {
     SOURCES += src/xdr_hack.c
@@ -241,7 +242,8 @@ HEADERS	+= \
     src/cascan2d.h \
     src/mdaReader.h \
     src/mda-load.h \
-    src/messageQueue.h
+    src/messageQueue.h \
+    src/cabytecontroller.h
 
 # assume qwt6.0 was made with qt4
 contains(QT_VER_MAJ, 4) {

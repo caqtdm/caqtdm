@@ -328,6 +328,7 @@ private slots:
     void Callback_RelatedDisplayClicked(int);
     void Callback_ShellCommandClicked(int);
     void Callback_TableDoubleClicked(const QString&);
+    void Callback_ByteControllerClicked(int);
 
     void Callback_TabChanged(int);
 
