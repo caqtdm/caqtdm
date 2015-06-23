@@ -72,6 +72,8 @@ public:
     void Qt_extractString(char *str, char*retStr, int *status);
 
     void writeRectangleDimensions(int x, int y, int w, int h);
+    // Zai added
+    void writeFontProperties(int size, bool bold);
 
     void test();
     void Init(myParserEDM* edlParser);

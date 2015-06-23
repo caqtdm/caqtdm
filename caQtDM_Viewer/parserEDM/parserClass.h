@@ -213,4 +213,7 @@ private:
    char requiredHostName[15+1];
    expStringClass labelS[maxCmds];
    expStringClass shellCommand[maxCmds];
+
+   // set font based on EDM font string - Zai added
+   void setFont(myParserEDM *myParser, char fontTag[80]);
 };
