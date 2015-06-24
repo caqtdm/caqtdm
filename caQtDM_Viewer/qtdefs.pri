@@ -37,6 +37,9 @@ DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 # caMessageButton can be disabled/enabled by a second channel
 # configdialog for http configuration slightly changed
 # Zai added some edl objects
+# added cabytecontroller,for reading and setting individual bits
+# camenu: prevented scrolling of menu with mouse scroll while it interferes with scrollareas
+# changed default direction of caByte in parser.c in order to be compatible with MEDM
 
 # 3.9.2 and 3.9.3
 # severity of a char/string record was not considered and is corrected, Char waveforms longer as 1024 were not displayed in calineedit and is corrected.
