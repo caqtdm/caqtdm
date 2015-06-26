@@ -4181,7 +4181,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         nbPV = 1;
     } else if (caMessageButton* widget = qobject_cast<caMessageButton *>(w)) {
         pv[0] = widget->getPV().trimmed();
-        nbPV = 1;
+        pv[1] = widget->getDisablePV().trimmed();
+        nbPV = 2;
     } else if(caLed* widget = qobject_cast<caLed *>(w)) {
         pv[0] = widget->getPV().trimmed();
         nbPV = 1;
@@ -5617,7 +5618,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             // get eventual stylesheet from property set at start for addition
             QVariant Style=box->property("Stylesheet");
             if(!Style.isNull()) style = Style.toString();
-            box->setStyleSheet(thisStyle + style);;
+            box->setStyleSheet(thisStyle + style);
 
     }
 }
