@@ -40,6 +40,8 @@ DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 # added cabytecontroller,for reading and setting individual bits
 # camenu: prevented scrolling of menu with mouse scroll while it interferes with scrollareas
 # changed default direction of caByte in parser.c in order to be compatible with MEDM
+# softpv name can now contain a macro
+# added calc string to info window
 
 # 3.9.2 and 3.9.3
 # severity of a char/string record was not considered and is corrected, Char waveforms longer as 1024 were not displayed in calineedit and is corrected.
