@@ -412,6 +412,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     // performance test
     benchmarkTimer = 0;
     //speedTimer.start();
+
+    //emit this->startSignal();
 }
 
 /**
@@ -1269,6 +1271,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         // this will check for file existence and when an url is defined, download the file from a http server
         fileFunctions filefunction;
         filefunction.checkFileAndDownload(fileName);
+        if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) filefunction.lastInfo().toAscii().constData());
+        if(filefunction.lastError().length() > 0)  messageWindow->postMsgEvent(QtCriticalMsg, (char*)filefunction.lastError().toAscii().constData());
 
         searchFile *s = new searchFile(fileName);
         QString fileNameFound = s->findFile();
@@ -4035,6 +4039,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     int Precision = 0;
     const char *caTypeStr[] = {"DBF_STRING", "DBF_INT", "DBF_FLOAT", "DBF_ENUM", "DBF_CHAR", "DBF_LONG", "DBF_DOUBLE"};
     char colMode[20] = {""};
+    QString calcString = "";
     double limitsMax=0.0, limitsMin=0.0;
     bool validExecListItems = false;
     QStringList execListItems;
@@ -4076,24 +4081,28 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         pv[1] = widget->getChannelB().trimmed();
         pv[2] = widget->getChannelC().trimmed();
         pv[3] = widget->getChannelB().trimmed();
+        calcString = widget->getImageCalc();
         nbPV = 4;
     } else if(caFrame* widget = qobject_cast<caFrame *>(w)) {
         pv[0] = widget->getChannelA().trimmed();
         pv[1] = widget->getChannelB().trimmed();
         pv[2] = widget->getChannelC().trimmed();
         pv[3] = widget->getChannelB().trimmed();
+        calcString = widget->getVisibilityCalc();
         nbPV = 4;
     } else if(caInclude* widget = qobject_cast<caInclude *>(w)) {
         pv[0] = widget->getChannelA().trimmed();
         pv[1] = widget->getChannelB().trimmed();
         pv[2] = widget->getChannelC().trimmed();
         pv[3] = widget->getChannelB().trimmed();
+        calcString = widget->getVisibilityCalc();
         nbPV = 4;
     } else if(caLabel* widget = qobject_cast<caLabel *>(w)) {
         pv[0] = widget->getChannelA().trimmed();
         pv[1] = widget->getChannelB().trimmed();
         pv[2] = widget->getChannelC().trimmed();
         pv[3] = widget->getChannelB().trimmed();
+        calcString = widget->getVisibilityCalc();
         nbPV = 4;
     } else if(caMenu* widget = qobject_cast<caMenu *>(w)) {
         pv[0] = widget->getPV().trimmed();
@@ -4127,6 +4136,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         pv[1] = widget->getChannelB().trimmed();
         pv[2] = widget->getChannelC().trimmed();
         pv[3] = widget->getChannelB().trimmed();
+        calcString = widget->getVisibilityCalc();
         nbPV = 4;
         if(widget->getColorMode() == caGraphics::Alarm) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
@@ -4135,6 +4145,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         pv[1] = widget->getChannelB().trimmed();
         pv[2] = widget->getChannelC().trimmed();
         pv[3] = widget->getChannelB().trimmed();
+        calcString = widget->getVisibilityCalc();
         nbPV = 4;
         if(widget->getColorMode() == caPolyLine::Alarm) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
@@ -4304,7 +4315,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         pv[1] = widget->getChannelA().trimmed();
         pv[2] = widget->getChannelB().trimmed();
         pv[3] = widget->getChannelC().trimmed();
-        pv[4] = widget->getChannelB().trimmed();
+        pv[4] = widget->getChannelD().trimmed();
+        calcString = widget->getCalc();
         nbPV = 5;
 
     } else if(caScriptButton* widget =  qobject_cast< caScriptButton *>(w)) {
@@ -4504,11 +4516,18 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             info.append("Object: ");
             info.append(w->objectName());
             info.append("<br>");
+            if(!calcString.isEmpty()) {
+               info.append("<br>");
+               info.append("Calc: ");
+               info.append(Qt::escape(calcString));
+               info.append("<br>");
+            }
             for(int i=0; i< nbPV; i++) {
                 // is there a json string ?
                 int pos = pv[i].indexOf("{");
                 if(pos != -1) pv[i] = pv[i].mid(0, pos);
                 knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv[i]);  // use pointer for getting all necessary information
+
                 if((kPtr != (knobData *) 0) && (pv[i].length() > 0)) {
                     char asc[2048];
                     char timestamp[50];
@@ -4529,7 +4548,6 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                             }
                         }
                     }
-
 
                     info.append("<br>=====================================");
                     if(!kPtr->soft) {
@@ -4778,6 +4796,7 @@ bool CaQtDM_Lib::PrimarySoftPV(QWidget* widget, QMap<QString, QString> map)
             for(int i=0; i<5; i++) {
                QString trimmedPV = strng[i].trimmed();
                strng[i] = treatMacro(map, trimmedPV, &doNothing);
+               if(i==4) w->setVariable(strng[i]);  // update variable name when macro used
             }
             for(int i=0; i<4; i++) {
                 if(strng[4] == strng[i]) return true;
