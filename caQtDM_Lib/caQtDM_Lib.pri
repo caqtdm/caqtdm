@@ -23,10 +23,17 @@ unix {
 }
 
 PYTHONCALC: {
-unix:!macx {
-  DEFINES += PYTHON
-  INCLUDEPATH += /usr/include/python2.6/
-  LIBS += -L/usr/lib/ -lpython2.6
+!ios {
+   unix:!macx {
+      DEFINES += PYTHON
+      INCLUDEPATH += /usr/include/python2.6/
+      LIBS += -L/usr/lib/ -lpython2.6
+    }
+    unix:macx {
+       DEFINES += PYTHON
+       INCLUDEPATH += /System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7/
+       LIBS += -L/System/Library/Frameworks/Python.framework/Versions/2.7/lib/ -lpython2.7
+    }
   }
 }
 
@@ -34,7 +41,6 @@ unix:!macx {
    unix:!macx {
       LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca
       LIBS += -L$(CAQTDM_COLLECT) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
-
       INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
    }
    macx: {

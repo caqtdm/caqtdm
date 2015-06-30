@@ -29,6 +29,7 @@ CONFIG += XDR_HACK
 }
 
 # we can add python for calculations cacalc & visibility
+# include definitions and libraries are defined in caQtDM_Lib.pri for linux and macos
 CONFIG += PYTHONCALC
 
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
