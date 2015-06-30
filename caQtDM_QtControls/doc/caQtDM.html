@@ -2048,7 +2048,7 @@ The custom widgets make extensively use of the Qt font<em> &quot;Lucida Sans Typ
     affect the format until the synoptic display is reloaded.</div>
   <h3><a name="calcexpressions" id="calcexpressions" rel="Section">CALC Expressions</a></h3>
   <div> CALC expressions are used to determine visibility for graphical objects and to determine the frame number for the <a href="#caImage">caImage</a> , which also has a Dynamic Attribute. For visibility the expression should return 0 for False and anything else for True. For the frame number for the Image it
-    should return a number, which will be rounded to the nearest integer. Frame numbers start with 0. The usual method (the simplest one) is to use the CALC expression as described in detail in the Record Reference Manual found under IOC software for any version of EPICS base, through at least Base 3.13. It is a case-independent C expression
+    should return a number, which will be rounded to the nearest integer. Frame numbers start with 0. CALC expression are also used for calculations in the caCalc widget in order to calculate internally an internal variable. The usual method (the simplest one) is to use the CALC expression as described in detail in the Record Reference Manual found under IOC software for any version of EPICS base, through at least Base 3.13. It is a case-independent C expression
     that can include functions such as ABS, SQR, MIN, MAX, CEIL, FLOOR, LOG, LOGE,
     EXP, SIN, SINH, ASIN, COS, COSH, ACOS, TAN, TANH, and ATAN, as well as the usual C operators, except that != is replaced by # and == is replaced by
     =. The letters A-L obtain their
@@ -2117,11 +2117,11 @@ The custom widgets make extensively use of the Qt font<em> &quot;Lucida Sans Typ
     It is also possible to use a regular expression as CALC string. The regular expression should start with %/ and finish with / and should return true or false. The regular expression uses only the channel A. An example would be %/^$|\\s+/. This expression gives true or false when the string given by channel A is empty or not.<br/><br/>
 
     As from version 3.9.4 a Python function can also be used and has to be introduced into the CALC field the following way:<br/><br/>
-%P/def PythonCalc(x, y):<br/>
-	return (x*y)<br/>
+%P/def PythonCalc(a, b, c, d):<br/>
+	return (a*b)<br/>
 /<br/><br/>
 
-    The function name is fixed (PythonCalc). The string has to start with %P/ and finish with /. Be aware of the fact that tabs have to be used in Python. The values will be taken from from the 4 channels if present and the function will have to return a real value.<br/><br/>
+    The function name is fixed (PythonCalc) and must have 4 variables in its parameter list (not doing so the function will be disabled). The string has to start with %P/ and finish with /. Be aware of the fact that tabs have to be used in Python. The values will be taken from from the 4 channels if present and the function will have to return a real value.<br/><br/>
   </div>
 </blockquote>
 <h3><a name="macrosubstitution" id="macrosubstitution">Macro Substitution</a></h3>

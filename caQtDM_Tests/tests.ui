@@ -1500,8 +1500,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>431</width>
-           <height>191</height>
+           <width>100</width>
+           <height>30</height>
           </rect>
          </property>
          <attribute name="label">
@@ -6248,7 +6248,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>910</x>
-          <y>370</y>
+          <y>410</y>
           <width>71</width>
           <height>21</height>
          </rect>
@@ -6267,7 +6267,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>510</x>
-          <y>370</y>
+          <y>410</y>
           <width>371</width>
           <height>21</height>
          </rect>
@@ -6286,38 +6286,13 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>920</x>
-          <y>410</y>
+          <y>450</y>
           <width>100</width>
           <height>22</height>
          </rect>
         </property>
         <property name="channel" stdset="0">
          <string notr="true">mystring</string>
-        </property>
-       </widget>
-       <widget class="caCalc" name="cacalc_5">
-        <property name="geometry">
-         <rect>
-          <x>910</x>
-          <y>330</y>
-          <width>71</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="variable">
-         <string notr="true">myPython{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
-        </property>
-        <property name="calc">
-         <string notr="true">%P/def PythonCalc(x, y):
-	return (x*y)
-/
-</string>
-        </property>
-        <property name="channel" stdset="0">
-         <string notr="true">mySoft1</string>
-        </property>
-        <property name="channelB">
-         <string notr="true">mySoft2</string>
         </property>
        </widget>
        <widget class="caLabel" name="calabel_26">
@@ -6343,7 +6318,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>920</x>
-          <y>490</y>
+          <y>530</y>
           <width>101</width>
           <height>25</height>
          </rect>
@@ -6362,7 +6337,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>910</x>
-          <y>450</y>
+          <y>490</y>
           <width>71</width>
           <height>21</height>
          </rect>
@@ -6381,7 +6356,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>510</x>
-          <y>450</y>
+          <y>490</y>
           <width>371</width>
           <height>21</height>
          </rect>
@@ -6394,6 +6369,56 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="fontScaleMode">
          <enum>ESimpleLabel::WidthAndHeight</enum>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_5">
+        <property name="geometry">
+         <rect>
+          <x>910</x>
+          <y>330</y>
+          <width>71</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">myPython1{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+        </property>
+        <property name="calc">
+         <string notr="true">%P/def PythonCalc(a, b, c, d):
+	return (a*b)
+/
+</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">mySoft1</string>
+        </property>
+        <property name="channelB">
+         <string notr="true">mySoft2</string>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_7">
+        <property name="geometry">
+         <rect>
+          <x>910</x>
+          <y>360</y>
+          <width>71</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">myPython2{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+        </property>
+        <property name="calc">
+         <string notr="true">%P/def PythonCalc(a, b, c, d):
+	return (2 * a + b)
+/
+</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">mySoft1</string>
+        </property>
+        <property name="channelB">
+         <string notr="true">mySoft2</string>
         </property>
        </widget>
       </widget>

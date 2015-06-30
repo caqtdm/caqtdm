@@ -2234,7 +2234,13 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
         // python function
         } else if(calcQString.startsWith("%P/")) {
 
-            for(int i=0; i < MAX_CALC_INPUTS; i++) valueArray[i] = 0.0;
+           Py_Initialize();
+#define MAXMONITORS 4
+            PyObject *pArgs, *pValue, *pValueA[MAX_CALC_INPUTS], *pFunc;
+            PyObject *pGlobal = PyDict_New();
+            PyObject *pLocal;
+
+            for(int i=0; i < MAXMONITORS; i++) valueArray[i] = 0.0;
             for(int i=0; i< nbMonitors;i++) {
                 knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(MonitorList.at(i+1).toInt());
                 if(ptr == (knobData*) 0) {
@@ -2246,17 +2252,13 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
             // get rid of %P/ and last / on new line
             calcQString = calcQString.mid(3, calcQString.length()-4);
 
-            PyObject *pArgs, *pValue, *pValueA[MAX_CALC_INPUTS], *pFunc;
-            PyObject *pGlobal = PyDict_New();
-            PyObject *pLocal;
-
             char newCalc[2048];
             strcpy(newCalc, calcQString.toAscii().constData());
 
             //Create a new module object
-            PyObject *pNewMod = PyModule_New("myModule");
+            QString myModule("myModule"+w->objectName());
+            PyObject *pNewMod = PyModule_New(myModule.toAscii().constData());
 
-            Py_Initialize();
             PyModule_AddStringConstant(pNewMod, "__file__", "");
 
             //Get the dictionary object from my module
@@ -2264,33 +2266,33 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
 
             //Define my function in the newly created module, when error then we get a null pointer back
             pValue = PyRun_String(calcQString.toAscii().constData(), Py_file_input, pGlobal, pLocal);
-            //printf("pointer=%p\n", pValue);
             if(pValue == (PyObject *) 0) {
                 char asc[100];
-                sprintf(asc, "probably a syntax error on the python function (calc will be disabled)%s", qPrintable(w->objectName()));
+                sprintf(asc, "probably a syntax error on the python function (calc will be disabled) %s", qPrintable(w->objectName()));
                 postMessage(QtWarningMsg, asc);
                 setCalcToNothing(w);
+                Py_DECREF(pNewMod);
                 valid = false;
-                 Py_Finalize();
                 return visible;
             }
-            Py_DECREF(pValue) ;
+            Py_DECREF(pValue);
 
             //Get a pointer to the function I just defined
             pFunc = PyObject_GetAttrString(pNewMod, "PythonCalc");
-            if(pFunc == (PyObject *) 0) {
+            if((pFunc == (PyObject *) 0) || (!PyCallable_Check(pFunc))) {
                 char asc[100];
                 sprintf(asc, "python function not found, must be called PythonCalc (calc will be disabled) %s", qPrintable(w->objectName()));
                 postMessage(QtWarningMsg, asc);
                 setCalcToNothing(w);
+                Py_DECREF(pNewMod);
                 valid = false;
-                Py_Finalize();
                 return visible;
             }
 
             //Build a tuple to hold my arguments (just the number 4 in this case)
-            pArgs = PyTuple_New(nbMonitors);
-            for(int i=0; i< nbMonitors;i++) {
+            pArgs = PyTuple_New(MAXMONITORS);
+            for(int i=0; i< MAXMONITORS; i++) pValueA[i] = PyFloat_FromDouble(0.0);
+            for(int i=0; i< nbMonitors; i++) {
                 knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(MonitorList.at(i+1).toInt());
                 if(ptr != (knobData*) 0) {
                     // when connected
@@ -2303,19 +2305,30 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                     pValueA[i] = PyFloat_FromDouble(valueArray[i]);
                 }
             }
-            for(int i=0; i < nbMonitors; i++)  PyTuple_SetItem(pArgs, i, pValueA[i]);
+            for(int i=0; i < MAXMONITORS; i++)  PyTuple_SetItem(pArgs, i, pValueA[i]);
 
             //Call my function, passing it the number four
             pValue = PyObject_CallObject(pFunc, pArgs);
-            Py_DECREF(pArgs);
-            //printf("Returned val: %ld\n", PyInt_AsLong(pValue));
-            result = PyFloat_AsDouble(pValue);
+            if (pValue != (PyObject *) 0) {
+                  result = PyFloat_AsDouble(pValue);
+                  Py_DECREF(pValue);
+                  Py_DECREF(pArgs);
+                  Py_XDECREF(pFunc);
+                  Py_DECREF(pNewMod);
+                  valid = true;
+            } else {
+                result = 0.0;
+                char asc[100];
+                sprintf(asc, "some error in the python function (calc will be disabled) %s", qPrintable(w->objectName()));
+                postMessage(QtWarningMsg, asc);
+                setCalcToNothing(w);
+                Py_DECREF(pArgs);
+                Py_XDECREF(pFunc);
+                Py_DECREF(pNewMod);
+                Py_Finalize();
+                valid = false;
+            }
 
-            Py_DECREF(pValue);
-            Py_XDECREF(pFunc);
-            Py_DECREF(pNewMod);
-
-            valid = true;
             return visible;
 #else
         } else if(calcQString.startsWith("%P/")) {
@@ -3162,7 +3175,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 double max = widget->getIntensityMax();
 
                 if((widget->getIntensityScalingMin() == caWaterfallPlot::Channel) && (widget->getIntensityScalingMax() == caWaterfallPlot::Channel)) {
-                    qDebug() << "channels" <<  data.edata.lower_disp_limit << data.edata.upper_disp_limit;
+                    //qDebug() << "channels" <<  data.edata.lower_disp_limit << data.edata.upper_disp_limit;
                     if(data.edata.lower_disp_limit < data.edata.upper_disp_limit) {
                         widget->setIntensityMin(data.edata.lower_disp_limit);
                         widget->setIntensityMax(data.edata.upper_disp_limit);
@@ -3171,12 +3184,12 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                         widget->setIntensityMax(10.0);
                     }
                 } else if(widget->getIntensityScalingMin() == caWaterfallPlot::Channel) {
-                    qDebug() << "channel1" ;
+                    //qDebug() << "channel1" ;
                     if(data.edata.lower_disp_limit < max) {
                         widget->setIntensityMin(data.edata.lower_disp_limit);
                     }
                 }  else if(widget->getIntensityScalingMax() == caWaterfallPlot::Channel) {
-                    qDebug() << "channel2" ;
+                    //qDebug() << "channel2" ;
                     if(data.edata.upper_disp_limit > min) {
                         widget->setIntensityMax(data.edata.upper_disp_limit);
                     }
