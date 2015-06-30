@@ -3,7 +3,18 @@
 source caQtDM_Env
 export PATH=$PATH:${QTHOME}/bin
 
-pwd 
+pwd
+
+
+
+echo
+echo ========== CodeSignning for caQtDM ============
+echo
+
+find ./caQtDM_Binaries/caQtDM.app -type d -name 'Headers' -print -exec rm -rf {} \;
+codesign --verbose=2 --deep --force -s "Mac Developer: Helge Brands (8G5FY9T8QT)" -vvvv ./caQtDM_Binaries/caQtDM.app
+
+ 
 echo
 echo ========== Collect Files for Mac Bundle ============
 echo
@@ -33,7 +44,16 @@ echo ========== macdeployqt caQtDM ============
 echo
 
 
-macdeployqt ./caQtDM_Binaries/caQtDM.app
+macdeployqt ./caQtDM_Binaries/caQtDM.app -executable=./caQtDM_Binaries/caQtDM.app/Contents/MacOS/caQtDM
+
+echo
+echo ========== fix for codesignning  ============
+echo
+
+rm -rf ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/Headers
+rm -rf ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/QtOpenGL_debug
+rm -f ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/*.prl
+
 
 echo
 echo ========== change EPICS LIBS ============

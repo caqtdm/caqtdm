@@ -82,7 +82,7 @@ unix:!macx {
 
    QMAKE_INFO_PLIST = ../src/Mac/Info.plist
    APP-FONTS.files = ../../caQtDM_Viewer/lucida-sans-typewriter.ttf
-   APP-FONTS.path = fonts
+   APP-FONTS.path = Contents/Resources/fonts
    QMAKE_BUNDLE_DATA += APP-FONTS
    CONFIG += app_bundle
    ICON = ../src/caQtDM.icns
