@@ -26,13 +26,13 @@ PYTHONCALC: {
 !ios {
    unix:!macx {
       DEFINES += PYTHON
-      INCLUDEPATH += /usr/include/python2.6/
-      LIBS += -L/usr/lib/ -lpython2.6
+      INCLUDEPATH += $(PYTHONINCLUDE)
+      LIBS += -L$(PYTHONLIB) -Wl,-rpath,$(PYTHONLIB) -lpython$(PYTHONVERSION)
     }
     unix:macx {
        DEFINES += PYTHON
-       INCLUDEPATH += /System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7/
-       LIBS += -L/System/Library/Frameworks/Python.framework/Versions/2.7/lib/ -lpython2.7
+       INCLUDEPATH += /System/Library/Frameworks/Python.framework/Versions/$(PYTHONVERSION)/include/python$(PYTHONVERSION)/
+       LIBS += -L/System/Library/Frameworks/Python.framework/Versions/$(PYTHONVERSION)/lib/ -lpython$(PYTHONVERSION)
     }
   }
 }
