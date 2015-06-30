@@ -6409,8 +6409,14 @@ p, li { white-space: pre-wrap; }
          <string notr="true">myPython2{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
         </property>
         <property name="calc">
-         <string notr="true">%P/def PythonCalc(a, b, c, d):
-	return (2 * a + b)
+         <string notr="true">%P/
+#!/usr/bin/python
+def PythonCalc(a, b, c, d):
+	import decimal
+	try:
+		return (2 * a / b)
+	except:
+		return float('NaN')
 /
 </string>
         </property>

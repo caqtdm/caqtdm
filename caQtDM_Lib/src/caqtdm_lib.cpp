@@ -2249,6 +2249,8 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                 }
             }
 
+            PyDict_SetItemString( pGlobal, "__builtins__", PyEval_GetBuiltins() );
+
             // get rid of %P/ and last / on new line
             calcQString = calcQString.mid(3, calcQString.length()-4);
 
@@ -2267,11 +2269,15 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
             //Define my function in the newly created module, when error then we get a null pointer back
             pValue = PyRun_String(calcQString.toAscii().constData(), Py_file_input, pGlobal, pLocal);
             if(pValue == (PyObject *) 0) {
-                char asc[100];
-                sprintf(asc, "probably a syntax error on the python function (calc will be disabled) %s", qPrintable(w->objectName()));
+                PyObject *ptype, *perror, *ptraceback;
+                PyErr_Fetch(&ptype, &perror, &ptraceback);
+                char *pStrErrorMessage = PyString_AsString(perror);
+                char asc[1000];
+                sprintf(asc, "probably a syntax error on the python function (calc will be disabled) %s (%s)", qPrintable(w->objectName()), pStrErrorMessage);
                 postMessage(QtWarningMsg, asc);
                 setCalcToNothing(w);
                 Py_DECREF(pNewMod);
+                Py_Finalize();
                 valid = false;
                 return visible;
             }
@@ -2285,6 +2291,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                 postMessage(QtWarningMsg, asc);
                 setCalcToNothing(w);
                 Py_DECREF(pNewMod);
+                Py_Finalize();
                 valid = false;
                 return visible;
             }
@@ -2317,9 +2324,12 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                   Py_DECREF(pNewMod);
                   valid = true;
             } else {
+                PyObject *ptype, *perror, *ptraceback;
+                PyErr_Fetch(&ptype, &perror, &ptraceback);
+                char *pStrErrorMessage = PyString_AsString(perror);
                 result = 0.0;
-                char asc[100];
-                sprintf(asc, "some error in the python function (calc will be disabled) %s", qPrintable(w->objectName()));
+                char asc[1000];
+                sprintf(asc, "some error in the python function (calc will be disabled) %s (%s)", qPrintable(w->objectName()), pStrErrorMessage);
                 postMessage(QtWarningMsg, asc);
                 setCalcToNothing(w);
                 Py_DECREF(pArgs);
