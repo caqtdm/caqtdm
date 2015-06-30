@@ -2317,6 +2317,14 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
 
             valid = true;
             return visible;
+#else
+        } else if(calcQString.startsWith("%P/")) {
+            char asc[100];
+            sprintf(asc, "python is not enabled in this caqtdm version(calc will be disabled) %s", qPrintable(w->objectName()));
+            postMessage(QtWarningMsg, asc);
+            setCalcToNothing(w);
+            valid = false;
+            return visible;
 #endif
         //normal EPICS Calculation
         } else {
