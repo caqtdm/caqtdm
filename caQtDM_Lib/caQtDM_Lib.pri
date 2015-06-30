@@ -22,10 +22,19 @@ unix {
  QMAKE_CFLAGS_RELEASE += "-g"
 }
 
+PYTHONCALC: {
+unix:!macx {
+  DEFINES += PYTHON
+  INCLUDEPATH += /usr/include/python2.6/
+  LIBS += -L/usr/lib/ -lpython2.6
+  }
+}
+
 !ios {
    unix:!macx {
       LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca
       LIBS += -L$(CAQTDM_COLLECT) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
+
       INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
    }
    macx: {

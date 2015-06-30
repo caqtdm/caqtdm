@@ -251,6 +251,7 @@ private:
     void EnableDisableIO();
     void UpdateMeter(caMeter *widget, const knobData &data);
     bool PrimarySoftPV(QWidget* widget, QMap<QString, QString> map);
+    void setCalcToNothing(QWidget* widget);
 
 #ifdef MOBILE
     bool eventFilter(QObject *obj, QEvent *event);

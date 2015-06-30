@@ -22,6 +22,11 @@
  *  Contact details:
  *    anton.mezger@psi.ch
  */
+
+#ifdef PYTHON
+#include <Python.h>
+#endif
+
 #include "caQtDM_Lib_global.h"
 #include <stdint.h>
 #include <math.h>
@@ -1949,6 +1954,12 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
         postMessage(QtDebugMsg, asc);
     }
 
+    // for soft channels the rate has perhaps already been defined before
+    QVariant oldRate = w->property("RATE");
+    if (oldRate.isValid()) {
+        rate = w->property("RATE").value<int>();
+    }
+
     QString newpv = treatMacro(map, trimmedPV, &doNothing);
 
     if(doNothing) {
@@ -2089,6 +2100,30 @@ int CaQtDM_Lib::setObjectVisibility(QWidget *w, double value)
     return visible;
 }
 
+void CaQtDM_Lib::setCalcToNothing(QWidget* w) {
+    if(caFrame *frame = qobject_cast<caFrame *>(w)) {
+        frame->setVisibilityCalc("");
+    }
+    else if(caInclude *include = qobject_cast<caInclude *>(w)) {
+        include->setVisibilityCalc("");
+    }
+    else if(caImage *image = qobject_cast<caImage *>(w)) {
+        image->setVisibilityCalc("");
+    }
+    else if(caGraphics *graphic = qobject_cast<caGraphics *>(w)) {
+        graphic->setVisibilityCalc("");
+    }
+    else if(caPolyLine *line = qobject_cast<caPolyLine *>(w)) {
+        line->setVisibilityCalc("");
+    }
+    else if(caLabel *label = qobject_cast<caLabel *>(w)) {
+        label->setVisibilityCalc("");
+    }
+    else if(caCalc *calc = qobject_cast<caCalc *>(w)) {
+        calc->setCalc("");
+    }
+}
+
 /**
   * routine used by the above routine for calculating the visibilty of our objects
   */
@@ -2099,33 +2134,39 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
     char calcString[256];
     long status;
     short errnum;
-    bool visible;
+    bool visible = true;
+    QString calcQString = "";
 
     if(caFrame *frame = qobject_cast<caFrame *>(w)) {
-        strcpy(calcString, frame->getVisibilityCalc().toAscii().constData());
+        calcQString = frame->getVisibilityCalc();
     }
-    if(caInclude *frame = qobject_cast<caInclude *>(w)) {
-        strcpy(calcString, frame->getVisibilityCalc().toAscii().constData());
+    else if(caInclude *include = qobject_cast<caInclude *>(w)) {
+        calcQString = include->getVisibilityCalc();
     }
     else if(caImage *image = qobject_cast<caImage *>(w)) {
-        strcpy(calcString, image->getVisibilityCalc().toAscii().constData());
+        calcQString = image->getVisibilityCalc();
     }
-    else if(caGraphics *image = qobject_cast<caGraphics *>(w)) {
-        strcpy(calcString, image->getVisibilityCalc().toAscii().constData());
+    else if(caGraphics *graphic = qobject_cast<caGraphics *>(w)) {
+        calcQString = graphic->getVisibilityCalc();
     }
     else if(caPolyLine *line = qobject_cast<caPolyLine *>(w)) {
-        strcpy(calcString, line->getVisibilityCalc().toAscii().constData());
+        calcQString = line->getVisibilityCalc();
     }
     else if(caLabel *label = qobject_cast<caLabel *>(w)) {
-        strcpy(calcString, label->getVisibilityCalc().toAscii().constData());
+        calcQString = label->getVisibilityCalc();
     }
     else if(caCalc *calc = qobject_cast<caCalc *>(w)) {
-        strcpy(calcString, calc->getCalc().toAscii().constData());
-        if(strlen(calcString) < 1) {
-           valid = true;
-           return true;
-        }
+        calcQString = calc->getCalc();
     }
+
+    // no calc
+    if(calcQString.length() < 1) {
+       valid = true;
+       return true;
+    }
+
+    calcQString=calcQString.trimmed();
+    strcpy(calcString, calcQString.toAscii().constData());
 
     // any monitors ?
     QVariant monitorList=w->property("MonitorList");
@@ -2139,33 +2180,8 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
     //qDebug() << "number of monitors" << nbMonitors << "calc=" << calcString;
     if(nbMonitors > 0)  {
 
-        // scan and get the channels
-        for(int i=0; i < MAX_CALC_INPUTS; i++) valueArray[i] = 0.0;
-        for(int i=0; i< nbMonitors;i++) {
-            knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(MonitorList.at(i+1).toInt());
-            if(ptr != (knobData*) 0) {
-                //qDebug() << "calculate from index" << i << ptr->index << ptr->pv << ptr->edata.connected << ptr->edata.rvalue << IndexList.at(i+1).toInt();
-                // when connected
-                int j = IndexList.at(i+1).toInt(); // input a,b,c,d
-                if(ptr->edata.connected) {
-                    valueArray[j] = ptr->edata.rvalue;
-                } else {
-                    valueArray[j] = 0.0;
-                }
-                // for first record
-                if(i==0 && ptr->edata.connected) {
-                    valueArray[4] = 0.0;                                 /* E: Reserved */
-                    valueArray[5] = 0.0;                                 /* F: Reserved */
-                    valueArray[6] = ptr->edata.valueCount;               /* G: count */
-                    valueArray[7] = ptr->edata.upper_disp_limit;         /* H: hopr */
-                    valueArray[8] = ptr->edata.status;                   /* I: status */
-                    valueArray[9] = ptr->edata.severity;                 /* J: severity */
-                    valueArray[10] = ptr->edata.precision;               /* K: precision */
-                    valueArray[11] = ptr->edata.lower_disp_limit;        /* L: lopr */
-                }
-            }
-        }
         setlocale(LC_NUMERIC, "C");
+
         // Regexp will used when is marked with %/regexp/
         QRegExp checkregexp("%\\/(\\S+)\\/");
         checkregexp.setMinimal(true);
@@ -2179,6 +2195,21 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                     if(ptr->edata.dataSize < 1024) {
                         memcpy(dataString, (char*) ptr->edata.dataB, ptr->edata.dataSize);
                         dataString[ptr->edata.dataSize] = '\0';
+
+                        // in case of enum we have to get the right string from the value
+                        if(caFieldType == DBF_ENUM) {
+                            QString String(dataString);
+                            QStringList list;
+                            list = String.split(";");
+                            if((ptr->edata.fieldtype == caENUM)  && ((int) ptr->edata.ivalue < list.count() ) && (list.count() > 0)) {
+                                if(list.at((int) ptr->edata.ivalue).trimmed().size() != 0)  {  // string seems to empty, give value
+                                    QString strng = list.at((int) ptr->edata.ivalue);
+                                    QByteArray ba = strng.toLatin1();
+                                    strcpy(dataString, ba.data());
+                                }
+                            }
+                        }
+
                     } else  {
                         char asc[100];
                         sprintf(asc, "Invalid channel data type %s", qPrintable(w->objectName()));
@@ -2199,30 +2230,149 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                     return false;
                 }
             }
-        }
-        //normal EPICS Calculation
-        status = postfix(calcString, post, &errnum);
-        if(status) {
-            char asc[100];
-            sprintf(asc, "Invalid Calc %s for %s", calcString, qPrintable(w->objectName()));
-            postMessage(QtDebugMsg, asc);
-            //printf("%s\n", asc);
-            valid = false;
-            return true;
-        }
-        // Perform the calculation
-        status = calcPerform(valueArray, &result, post);
-        if(!status) {
-            visible = (result?true:false);
-            //qDebug() << "valid result" << result << visible;
+#ifdef PYTHON
+        // python function
+        } else if(calcQString.startsWith("%P/")) {
+
+            for(int i=0; i < MAX_CALC_INPUTS; i++) valueArray[i] = 0.0;
+            for(int i=0; i< nbMonitors;i++) {
+                knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(MonitorList.at(i+1).toInt());
+                if(ptr == (knobData*) 0) {
+                    valid = false;
+                    return false;
+                }
+            }
+
+            // get rid of %P/ and last / on new line
+            calcQString = calcQString.mid(3, calcQString.length()-4);
+
+            PyObject *pArgs, *pValue, *pValueA[MAX_CALC_INPUTS], *pFunc;
+            PyObject *pGlobal = PyDict_New();
+            PyObject *pLocal;
+
+            char newCalc[2048];
+            strcpy(newCalc, calcQString.toAscii().constData());
+
+            //Create a new module object
+            PyObject *pNewMod = PyModule_New("myModule");
+
+            Py_Initialize();
+            PyModule_AddStringConstant(pNewMod, "__file__", "");
+
+            //Get the dictionary object from my module
+            pLocal = PyModule_GetDict(pNewMod);
+
+            //Define my function in the newly created module, when error then we get a null pointer back
+            pValue = PyRun_String(calcQString.toAscii().constData(), Py_file_input, pGlobal, pLocal);
+            //printf("pointer=%p\n", pValue);
+            if(pValue == (PyObject *) 0) {
+                char asc[100];
+                sprintf(asc, "probably a syntax error on the python function (calc will be disabled)%s", qPrintable(w->objectName()));
+                postMessage(QtWarningMsg, asc);
+                setCalcToNothing(w);
+                valid = false;
+                 Py_Finalize();
+                return visible;
+            }
+            Py_DECREF(pValue) ;
+
+            //Get a pointer to the function I just defined
+            pFunc = PyObject_GetAttrString(pNewMod, "PythonCalc");
+            if(pFunc == (PyObject *) 0) {
+                char asc[100];
+                sprintf(asc, "python function not found, must be called PythonCalc (calc will be disabled) %s", qPrintable(w->objectName()));
+                postMessage(QtWarningMsg, asc);
+                setCalcToNothing(w);
+                valid = false;
+                Py_Finalize();
+                return visible;
+            }
+
+            //Build a tuple to hold my arguments (just the number 4 in this case)
+            pArgs = PyTuple_New(nbMonitors);
+            for(int i=0; i< nbMonitors;i++) {
+                knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(MonitorList.at(i+1).toInt());
+                if(ptr != (knobData*) 0) {
+                    // when connected
+                    int j = IndexList.at(i+1).toInt(); // input a,b,c,d
+                    if(ptr->edata.connected) {
+                        valueArray[j] = ptr->edata.rvalue;
+                    } else {
+                        valueArray[j] = 0.0;
+                    }
+                    pValueA[i] = PyFloat_FromDouble(valueArray[i]);
+                }
+            }
+            for(int i=0; i < nbMonitors; i++)  PyTuple_SetItem(pArgs, i, pValueA[i]);
+
+            //Call my function, passing it the number four
+            pValue = PyObject_CallObject(pFunc, pArgs);
+            Py_DECREF(pArgs);
+            //printf("Returned val: %ld\n", PyInt_AsLong(pValue));
+            result = PyFloat_AsDouble(pValue);
+
+            Py_DECREF(pValue);
+            Py_XDECREF(pFunc);
+            Py_DECREF(pNewMod);
+
             valid = true;
             return visible;
+#endif
+        //normal EPICS Calculation
         } else {
-            char asc[100];
-            sprintf(asc, "invalid calc %s for %s", calcString, qPrintable(w->objectName()));
-            postMessage(QtDebugMsg, asc);
-            valid = false;
-            return true;
+
+            // scan and get the channels
+            for(int i=0; i < MAX_CALC_INPUTS; i++) valueArray[i] = 0.0;
+            for(int i=0; i< nbMonitors;i++) {
+                knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(MonitorList.at(i+1).toInt());
+                if(ptr != (knobData*) 0) {
+                    //qDebug() << "calculate from index" << i << ptr->index << ptr->pv << ptr->edata.connected << ptr->edata.rvalue << IndexList.at(i+1).toInt();
+                    // when connected
+                    int j = IndexList.at(i+1).toInt(); // input a,b,c,d
+                    if(ptr->edata.connected) {
+                        valueArray[j] = ptr->edata.rvalue;
+                    } else {
+                        valueArray[j] = 0.0;
+                    }
+                    // for first record
+                    if(i==0 && ptr->edata.connected) {
+                        valueArray[4] = 0.0;                                 /* E: Reserved */
+                        valueArray[5] = 0.0;                                 /* F: Reserved */
+                        valueArray[6] = ptr->edata.valueCount;               /* G: count */
+                        valueArray[7] = ptr->edata.upper_disp_limit;         /* H: hopr */
+                        valueArray[8] = ptr->edata.status;                   /* I: status */
+                        valueArray[9] = ptr->edata.severity;                 /* J: severity */
+                        valueArray[10] = ptr->edata.precision;               /* K: precision */
+                        valueArray[11] = ptr->edata.lower_disp_limit;        /* L: lopr */
+                    }
+                }
+            }
+            // calculate
+            status = postfix(calcString, post, &errnum);
+            if(status) {
+                char asc[100];
+                sprintf(asc, "Invalid Calc %s for %s (calc will be disabled)", calcString, qPrintable(w->objectName()));
+                setCalcToNothing(w);
+                postMessage(QtDebugMsg, asc);
+                //printf("%s\n", asc);
+                valid = false;
+                return true;
+            }
+            // Perform the calculation
+            status = calcPerform(valueArray, &result, post);
+            if(!status) {
+                visible = (result?true:false);
+                //qDebug() << "valid result" << result << visible;
+                valid = true;
+                return visible;
+            } else {
+                char asc[100];
+                sprintf(asc, "invalid calc %s for %s (calc will be disabled)", calcString, qPrintable(w->objectName()));
+                setCalcToNothing(w);
+                postMessage(QtDebugMsg, asc);
+                valid = false;
+                return true;
+            }
         }
     }
     valid = false;
@@ -4785,27 +4935,55 @@ void CaQtDM_Lib::ShowContextMenu(const QPoint& position) // this is a slot
   */
 bool CaQtDM_Lib::PrimarySoftPV(QWidget* widget, QMap<QString, QString> map)
 {
-        if (caCalc *w = qobject_cast<caCalc *>(widget)) {
-            QString strng[5];
-            bool doNothing = false;
+    if (caCalc *w = qobject_cast<caCalc *>(widget)) {
+        QString strng[5];
+        QString JSONString = "";
+        bool doNothing = false;
+        int rate = 5;
 
-            strng[0] = w->getChannelA();
-            strng[1] = w->getChannelB();
-            strng[2] = w->getChannelC();
-            strng[3] = w->getChannelD();
-            strng[4] = w->getVariable();
-            for(int i=0; i<5; i++) {
-               QString trimmedPV = strng[i].trimmed();
-               strng[i] = treatMacro(map, trimmedPV, &doNothing);
-               if(i==4) w->setVariable(strng[i]);  // update variable name when macro used
+        strng[0] = w->getChannelA();
+        strng[1] = w->getChannelB();
+        strng[2] = w->getChannelC();
+        strng[3] = w->getChannelD();
+        strng[4] = w->getVariable();
+        for(int i=0; i<5; i++) {
+            QString trimmedPV = strng[i].trimmed();
+            int pos = trimmedPV.indexOf("{");  // jason string
+            if(pos != -1) JSONString = trimmedPV.mid(pos);
+            if(pos != -1) trimmedPV = trimmedPV.mid(0, pos);
+            strng[i] = treatMacro(map, trimmedPV, &doNothing);
+            if(i==4) {
+                char asc[256];
+                QString pv = w->getVariable();
+                w->setVariable(strng[i]);  // update variable name when macro used
+                if(pos != -1) {
+                    int status = parseForDisplayRate(JSONString, rate);
+                    if(!status) {
+                        sprintf(asc, "JSON parsing error on %s ,should be like {\"monitor\":{\"maxdisplayrate\":10}}",
+                                (char*) pv.trimmed().toAscii().constData());
+                    } else {
+                        sprintf(asc, "pv %s display rate set to maximum %dHz", trimmedPV.toAscii().constData(), rate);
+                    }
+                    postMessage(QtDebugMsg, asc);
+                }
             }
-            for(int i=0; i<4; i++) {
-                if(strng[4] == strng[i]) return true;
-            }
-            return false;
-        } else {
-            return false;
         }
+
+        // keep this rate for further use
+        QVariant oldRate = widget->property("RATE");
+        if (!oldRate.isValid()) {
+            widget->setProperty("RATE", rate);
+        } else {
+           rate = w->property("RATE").value<int>();
+        }
+
+        for(int i=0; i<4; i++) {
+            if(strng[4] == strng[i]) return true;
+        }
+        return false;
+    } else {
+        return false;
+    }
 }
 
 /**

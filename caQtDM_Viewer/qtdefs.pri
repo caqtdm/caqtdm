@@ -28,6 +28,9 @@ DEFINES += XDR_LE
 CONFIG += XDR_HACK
 }
 
+# we can add python for calculations cacalc & visibility
+CONFIG += PYTHONCALC
+
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 # 3.9.4
