@@ -2126,6 +2126,7 @@ void CaQtDM_Lib::setCalcToNothing(QWidget* w) {
 
 bool CaQtDM_Lib::Python_Error(QWidget *w, QString message)
 {
+#ifdef PYTHON
     char asc[1000];
     PyObject *ptype, *perror, *ptraceback;
     PyErr_Fetch(&ptype, &perror, &ptraceback);
@@ -2134,6 +2135,10 @@ bool CaQtDM_Lib::Python_Error(QWidget *w, QString message)
     postMessage(QtWarningMsg, asc);
     setCalcToNothing(w);
     Py_Finalize();
+#else
+    Q_UNUSED(w);
+    Q_UNUSED(message);
+#endif
     return true;
 }
 
