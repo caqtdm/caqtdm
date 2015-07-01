@@ -24,6 +24,7 @@ unix {
 
 PYTHONCALC: {
 !ios {
+!android {
    unix:!macx {
       DEFINES += PYTHON
       INCLUDEPATH += $(PYTHONINCLUDE)
@@ -35,6 +36,7 @@ PYTHONCALC: {
        LIBS += -L/System/Library/Frameworks/Python.framework/Versions/$(PYTHONVERSION)/lib/ -lpython$(PYTHONVERSION)
     }
   }
+}
 }
 
 !ios {
