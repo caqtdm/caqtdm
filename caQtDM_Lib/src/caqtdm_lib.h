@@ -252,6 +252,7 @@ private:
     void UpdateMeter(caMeter *widget, const knobData &data);
     bool PrimarySoftPV(QWidget* widget, QMap<QString, QString> map);
     void setCalcToNothing(QWidget* widget);
+    bool Python_Error(QWidget *w, QString message);
 
 #ifdef MOBILE
     bool eventFilter(QObject *obj, QEvent *event);

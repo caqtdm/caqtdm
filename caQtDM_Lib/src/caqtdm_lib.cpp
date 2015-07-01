@@ -2124,6 +2124,19 @@ void CaQtDM_Lib::setCalcToNothing(QWidget* w) {
     }
 }
 
+bool CaQtDM_Lib::Python_Error(QWidget *w, QString message)
+{
+    char asc[1000];
+    PyObject *ptype, *perror, *ptraceback;
+    PyErr_Fetch(&ptype, &perror, &ptraceback);
+    char *pStrErrorMessage = PyString_AsString(perror);
+    sprintf(asc, "%s %s (%s)", qPrintable(message), qPrintable(w->objectName()), pStrErrorMessage);
+    postMessage(QtWarningMsg, asc);
+    setCalcToNothing(w);
+    Py_Finalize();
+    return true;
+}
+
 /**
   * routine used by the above routine for calculating the visibilty of our objects
   */
@@ -2259,7 +2272,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
 
             //Create a new module object
             QString myModule("myModule"+w->objectName());
-            PyObject *pNewMod = PyModule_New(myModule.toAscii().constData());
+            PyObject *pNewMod = PyModule_New((char*)myModule.toAscii().constData());
 
             PyModule_AddStringConstant(pNewMod, "__file__", "");
 
@@ -2269,31 +2282,18 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
             //Define my function in the newly created module, when error then we get a null pointer back
             pValue = PyRun_String(calcQString.toAscii().constData(), Py_file_input, pGlobal, pLocal);
             if(pValue == (PyObject *) 0) {
-                PyObject *ptype, *perror, *ptraceback;
-                PyErr_Fetch(&ptype, &perror, &ptraceback);
-                char *pStrErrorMessage = PyString_AsString(perror);
-                char asc[1000];
-                sprintf(asc, "probably a syntax error on the python function (calc will be disabled) %s (%s)", qPrintable(w->objectName()), pStrErrorMessage);
-                postMessage(QtWarningMsg, asc);
-                setCalcToNothing(w);
-                Py_DECREF(pNewMod);
-                Py_Finalize();
                 valid = false;
-                return visible;
+                Py_DECREF(pNewMod);
+                return Python_Error(w, "probably a syntax error on the python function (calc will be disabled)");
             }
             Py_DECREF(pValue);
 
             //Get a pointer to the function I just defined
             pFunc = PyObject_GetAttrString(pNewMod, "PythonCalc");
             if((pFunc == (PyObject *) 0) || (!PyCallable_Check(pFunc))) {
-                char asc[100];
-                sprintf(asc, "python function not found, must be called PythonCalc (calc will be disabled) %s", qPrintable(w->objectName()));
-                postMessage(QtWarningMsg, asc);
-                setCalcToNothing(w);
-                Py_DECREF(pNewMod);
-                Py_Finalize();
                 valid = false;
-                return visible;
+                Py_DECREF(pNewMod);
+                return Python_Error(w, "python function not found, must be called PythonCalc (calc will be disabled)");
             }
 
             //Build a tuple to hold my arguments (just the number 4 in this case)
@@ -2324,19 +2324,12 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                   Py_DECREF(pNewMod);
                   valid = true;
             } else {
-                PyObject *ptype, *perror, *ptraceback;
-                PyErr_Fetch(&ptype, &perror, &ptraceback);
-                char *pStrErrorMessage = PyString_AsString(perror);
                 result = 0.0;
-                char asc[1000];
-                sprintf(asc, "some error in the python function (calc will be disabled) %s (%s)", qPrintable(w->objectName()), pStrErrorMessage);
-                postMessage(QtWarningMsg, asc);
-                setCalcToNothing(w);
+                valid = false;
                 Py_DECREF(pArgs);
                 Py_XDECREF(pFunc);
                 Py_DECREF(pNewMod);
-                Py_Finalize();
-                valid = false;
+                return Python_Error(w, "some error in the python function (calc will be disabled)");
             }
 
             return visible;
