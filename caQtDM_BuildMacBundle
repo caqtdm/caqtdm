@@ -8,14 +8,6 @@ pwd
 
 
 echo
-echo ========== CodeSignning for caQtDM ============
-echo
-
-find ./caQtDM_Binaries/caQtDM.app -type d -name 'Headers' -print -exec rm -rf {} \;
-codesign --verbose=2 --deep --force -s "Mac Developer: Helge Brands (8G5FY9T8QT)" -vvvv ./caQtDM_Binaries/caQtDM.app
-
- 
-echo
 echo ========== Collect Files for Mac Bundle ============
 echo
 
