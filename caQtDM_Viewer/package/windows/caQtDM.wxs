@@ -14,13 +14,17 @@
         <Property Id="CAQTDM_VERSION" Value="$(var.CaQtDMVersion)" />
         <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="NO EPICS and Firewall parameter set or changed!"/>
         <!-- UIRef Id="WixUI_Minimal" /-->
-        <Icon Id="StartMenuIcon.exe" SourceFile="..\..\..\src\caQtDM.ico" />
+        <Icon Id="caQtDM.ico" SourceFile="..\..\..\src\caQtDM.ico" />
+        <Property Id="ARPPRODUCTICON" Value="caQtDM.ico" />
         <Binary Id="caQtDM.exe" SourceFile="$(env.CAQTDM_COLLECT)\caQtDM.exe" />
         <InstallExecuteSequence>
             <CreateFolders />
             <FileCost />
             <RemoveExistingProducts Before="InstallInitialize" />
+            <Custom Action="caRepeaterKill" Before="InstallValidate">REMOVE="ALL"</Custom>
         </InstallExecuteSequence>
+	<CustomAction Id="caRepeaterKill" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="immediate" Return="ignore" />
+	<Property Id="QtExecCmdLine" Value="&quot;taskkill.exe&quot; /f /im caRepeater.exe" />
         <WixVariable Id="WixUILicenseRtf" Value="..\gplv3.rtf" />
         <WixVariable Id="WixUIDialogBmp" Value="..\PSI_Background.bmp" />
         <UI />
