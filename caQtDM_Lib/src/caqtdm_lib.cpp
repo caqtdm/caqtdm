@@ -390,16 +390,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     scanWidgets(myWidget->findChildren<QWidget *>(), macro);
 
-    if(nbIncludes > 0) {
-#ifdef linux
-        usleep(200000);
-#else
-        Sleep::msleep(200);
-#endif
-        splash->finish(myWidget);
-        splash->deleteLater();
-    }
-
     // build a list for getting all soft pv
     mutexKnobData->BuildSoftPVList(myWidget);
 
@@ -419,6 +409,19 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     //speedTimer.start();
 
     //emit this->startSignal();
+
+    // due to crash in connection with the ssplash screen, changed
+    // these instructions to the botton of this class
+    if(nbIncludes > 0) {
+#ifdef linux
+        usleep(200000);
+#else
+        Sleep::msleep(200);
+#endif
+        splash->finish(this);
+
+        splash->deleteLater();
+    }
 }
 
 /**
