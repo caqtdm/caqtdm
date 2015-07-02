@@ -39,7 +39,7 @@ echo
 macdeployqt ./caQtDM_Binaries/caQtDM.app -executable=./caQtDM_Binaries/caQtDM.app/Contents/MacOS/caQtDM
 
 echo
-echo ========== fix for codesignning  ============
+echo ========== fix for codesigning  ============
 echo
 
 rm -rf ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/Headers
@@ -155,9 +155,14 @@ echo
 
 #cp -R ./caQtDM_Binaries/adl2ui.app ./caQtDM_Binaries/caQtDM.app/Contents/Applications/
 macdeployqt ./caQtDM_Binaries/adl2ui.app
+echo
+echo ========== codesigning  ============
+echo
+echo Identity = ${CAQTDM_MAC_CODESIGN}
 
-#cd caQtDM_Binaries
-#macdeployqt caQtDM.app -dmg
+codesign --verbose=2 --deep --force -s ${CAQTDM_MAC_CODESIGN} -vvvv ./caQtDM_Binaries/caQtDM.app
+
+
 echo
 echo ========== modifiy dmg image ============
 echo
