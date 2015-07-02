@@ -62,6 +62,9 @@ win32 {
         }
 
         ReleaseBuild {
+		QMAKE_CXXFLAGS += /Z7
+		QMAKE_CFLAGS   += /Z7
+		QMAKE_LFLAGS   += /DEBUG /OPT:REF /OPT:ICF
                 DESTDIR = $(CAQTDM_COLLECT)
                 OBJECTS_DIR = release/obj
                 INCLUDEPATH += $$(QWTINCLUDE)

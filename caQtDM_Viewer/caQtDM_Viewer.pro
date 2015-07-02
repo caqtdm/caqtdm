@@ -52,6 +52,9 @@ win32 {
 
 		}
 		ReleaseBuild {
+			QMAKE_CXXFLAGS += /Z7
+			QMAKE_CFLAGS   += /Z7
+			QMAKE_LFLAGS   += /DEBUG /OPT:REF /OPT:ICF
                         DESTDIR = $$(CAQTDM_COLLECT)
 			EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
 			OBJECTS_DIR = release/obj
