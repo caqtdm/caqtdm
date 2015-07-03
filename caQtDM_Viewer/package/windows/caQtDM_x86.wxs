@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <?include caQtDM_Version.wxi ?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"  xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Product Id="*" Name="caQtDM" Language="1033" Version="$(var.CaQtDMVersion)" Manufacturer="Paul Scherrer Institut" UpgradeCode="$(var.CaQtDM_x86_ProductUpgradeCode)">
         <Package Description="caQTDM Windows Manager with Qt-Designer(5.4.0)" Comments="Displaymanager for EPICS with Qt(5.4.0)" InstallerVersion="405" Compressed="yes" Manufacturer="Paul Scherrer Institut Switzerland" Keywords="EPICS, Display, Network, Control" InstallScope="perMachine" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
@@ -24,7 +24,9 @@
             <Custom Action="caRepeaterKill" Before="InstallValidate">REMOVE="ALL"</Custom>
         </InstallExecuteSequence>
         <CustomAction Id="caRepeaterKill" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="immediate" Return="ignore" />
+        <SetProperty Id="INSTALLDIR_BIN" After="InstallInitialize" Value="[INSTALLDIR]bin\win32-x86\" Sequence="execute" />
         <Property Id="QtExecCmdLine" Value="&quot;taskkill.exe&quot; /f /im caRepeater.exe" />
+        <Property Id="INSTALLDIR_BIN" Value="empty" />
         <WixVariable Id="WixUILicenseRtf" Value="..\gplv3.rtf" />
         <WixVariable Id="WixUIDialogBmp" Value="..\PSI_Background.bmp" />
         <UI />
@@ -87,6 +89,10 @@
                                 <File Id="CAQTDM_LIB.DLL" Name="caQtDM_Lib.dll" Source="$(env.CAQTDM_COLLECT)\caQtDM_Lib.dll" />
                                 <File Id="ADL2UI.EXE" Name="adl2ui.exe" Source="$(env.CAQTDM_COLLECT)\adl2ui.exe" />
                             </Component>
+                            <Component Guid="20B55404-03CD-429F-84FF-AA020B794FB6" Id="qt_conf">
+                                <IniFile Id="qt_conf_file" Action="createLine" Key="Prefix" Name="qt.conf" Section="Paths" Value="[INSTALLDIR]bin\windows-x64\" Directory="INSTALLDIR_BIN" />
+                                <CreateFolder />
+                            </Component>
                         </Directory>
                     </Directory>
                     <Directory Id="PLUGINS" Name="plugins">
@@ -120,10 +126,23 @@
                                 <File Id="QJP2.DLL" Name="qjp2.dll" Source="$(env.QTHOME)\plugins\imageformats\qjp2.dll" />
                             </Component>
                         </Directory>
+                        <Directory Id="SQLDRIVERS" Name="sqldrivers">
+                            <Component Id="sqldrivers_c" Guid="19B2BB0B-CABC-48E4-A67F-C664E572F398">
+                                <File Id="QSQLITE.DLL" Name="qsqlite.dll" Source="$(env.QTHOME)\plugins\sqldrivers\qsqlite.dll" />
+                            </Component>
+                        </Directory>
                     </Directory>
                     <Directory Id="StyleSheet" Name="StyleSheet">
                         <Component Id="Stylesheet" Guid="A47469F9-7320-4F9A-B513-680A0F66305D">
                             <File Id="STYLESHEET.QSS" Name="stylesheet.qss" Source="..\..\..\parser\stylesheet.qss" />
+                        </Component>
+                    </Directory>
+                    <Directory Id="Help" Name="Help">
+                        <Component Guid="D45902EC-9BC3-4E2A-96A1-BFDA64EA6535" Id="caQtDMHelp">
+                            <File Id="CAQTDM.HTML" Name="caQtDM.html" Source="$(env.CAQTDM_COLLECT)\..\caQtDM_QtControls\doc\caQtDM.html" />
+                            <File Id="CAQTDM.QCH" Name="caQtDM.qch" Source="$(env.CAQTDM_COLLECT)\..\caQtDM_QtControls\doc\caQtDM.qch" />
+                            <File Id="CAQTDM.QHC" Name="caQtDM.qhc" Source="$(env.CAQTDM_COLLECT)\..\caQtDM_QtControls\doc\caQtDM.qhc" />
+                            <File Id="CLASSIC.CSS" Name="classic.css" Source="$(env.CAQTDM_COLLECT)\..\caQtDM_QtControls\doc\classic.css" />
                         </Component>
                     </Directory>
                 </Directory>
@@ -158,6 +177,9 @@
             <ComponentRef Id="Environment" />
             <ComponentRef Id="platforms" />
             <ComponentRef Id="imageformats" />
+            <ComponentRef Id="caQtDMHelp" />
+            <ComponentRef Id="sqldrivers_c" />
+            <ComponentRef Id="qt_conf" />
         </Feature>
         <Feature Id="VCRedist" Level="1" Title="Visual C++ 12.0 Runtime" AllowAdvertise="no" Display="hidden">
             <MergeRef Id="VCRedist" />

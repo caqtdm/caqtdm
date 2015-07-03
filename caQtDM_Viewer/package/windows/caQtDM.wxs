@@ -9,10 +9,10 @@
             <UpgradeVersion OnlyDetect="no" Maximum="$(var.CaQtDMVersion)" Property="OLDERVERSIONBEINGUPGRADED" IncludeMaximum="no" />
         </Upgrade>
         <UIRef Id="WixUI_InstallDir" />
-        <Property Id="INSTALLDIR" Secure="yes" /> 
+        <Property Id="INSTALLDIR" Secure="yes" />
         <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
         <Property Id="CAQTDM_VERSION" Value="$(var.CaQtDMVersion)" />
-        <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="NO EPICS and Firewall parameter set or changed!"/>
+        <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="NO EPICS and Firewall parameter set or changed!" />
         <!-- UIRef Id="WixUI_Minimal" /-->
         <Icon Id="caQtDM.ico" SourceFile="..\..\..\src\caQtDM.ico" />
         <Property Id="ARPPRODUCTICON" Value="caQtDM.ico" />
@@ -23,12 +23,13 @@
             <RemoveExistingProducts Before="InstallInitialize" />
             <Custom Action="caRepeaterKill" Before="InstallValidate">REMOVE="ALL"</Custom>
         </InstallExecuteSequence>
-	<CustomAction Id="caRepeaterKill" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="immediate" Return="ignore" />
-	<Property Id="QtExecCmdLine" Value="&quot;taskkill.exe&quot; /f /im caRepeater.exe" />
+        <CustomAction Id="caRepeaterKill" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="immediate" Return="ignore" />
+        <SetProperty Id="INSTALLDIR_BIN" After="InstallInitialize" Value="[INSTALLDIR]bin\win32-x86\" Sequence="execute" />
+        <Property Id="QtExecCmdLine" Value="&quot;taskkill.exe&quot; /f /im caRepeater.exe" />
+        <Property Id="INSTALLDIR_BIN" Value="empty" />
         <WixVariable Id="WixUILicenseRtf" Value="..\gplv3.rtf" />
         <WixVariable Id="WixUIDialogBmp" Value="..\PSI_Background.bmp" />
         <UI />
-        
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="ProgramFilesFolder" Name="PFiles">
                 <Directory Id="INSTALLDIR" Name="caQTDM">
@@ -53,6 +54,7 @@
                                 <File Id="QTXML4.DLL" Name="QtXml4.dll" Source="$(env.QTHOME)\bin\QtXml4.dll" />
                                 <File Id="QTNETWORK4.DLL" Name="QtNetwork4.dll" Source="$(env.QTHOME)\bin\QtNetwork4.dll" />
                                 <File Id="ASSISTANT.EXE" Name="assistant.exe" Source="$(env.QTHOME)\bin\assistant.exe" />
+                                <File Id="QTSQL4.dll" Name="QtSql4.dll" Source="$(env.QTHOME)\bin\QtSql4.dll" />
                             </Component>
                             <Component Id="Epics_3.14.12.2" Guid="B7D7E8AE-F448-43F8-A68A-A35895605B8C">
                                 <File Id="CAREPEATER.EXE" Name="caRepeater.exe" Source="$(env.EPICS_BASE)\bin\win32-x86\caRepeater.exe" />
@@ -67,6 +69,10 @@
                                 <File Id="QTCONTROLS.DLL" Name="qtcontrols.dll" Source="$(env.CAQTDM_COLLECT)\qtcontrols.dll" />
                                 <File Id="CAQTDM_LIB.DLL" Name="caQtDM_Lib.dll" Source="$(env.CAQTDM_COLLECT)\caQtDM_Lib.dll" />
                                 <File Id="ADL2UI.EXE" Name="adl2ui.exe" Source="$(env.CAQTDM_COLLECT)\adl2ui.exe" />
+                            </Component>
+                            <Component Guid="DA389183-2F82-4D47-8039-FC53BF8E27E6" Id="qt_conf">
+                                <IniFile Id="qt_conf_file" Action="createLine" Key="Prefix" Name="qt.conf" Section="Paths" Value="[INSTALLDIR]bin\windows-x64\" Directory="INSTALLDIR_BIN" />
+                                <CreateFolder />
                             </Component>
                         </Directory>
                     </Directory>
@@ -152,6 +158,14 @@
                             <File Id="STYLESHEET.QSS" Name="stylesheet.qss" Source="..\..\..\parser\stylesheet.qss" />
                         </Component>
                     </Directory>
+                    <Directory Id="Help" Name="Help">
+                        <Component Guid="C933C171-2AF3-445A-88B0-A32A96F2B46A" Id="caQtDMHelp">
+                            <File Id="CAQTDM.HTML" Name="caQtDM.html" Source="$(env.CAQTDM_COLLECT)\..\caQtDM_QtControls\doc\caQtDM.html" />
+                            <File Id="CAQTDM.QCH" Name="caQtDM.qch" Source="$(env.CAQTDM_COLLECT)\..\caQtDM_QtControls\doc\caQtDM.qch" />
+                            <File Id="CAQTDM.QHC" Name="caQtDM.qhc" Source="$(env.CAQTDM_COLLECT)\..\caQtDM_QtControls\doc\caQtDM.qhc" />
+                            <File Id="CLASSIC.CSS" Name="classic.css" Source="$(env.CAQTDM_COLLECT)\..\caQtDM_QtControls\doc\classic.css" />
+                        </Component>
+                    </Directory>
                 </Directory>
                 <Merge Id="VCRedist" Language="0" SourceFile="C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC100_CRT_x86.msm" DiskId="1" />
             </Directory>
@@ -191,6 +205,8 @@
             <ComponentRef Id="StartMenuShortcuts" />
             <ComponentRef Id="Environment" />
             <ComponentRef Id="Stylesheet" />
+            <ComponentRef Id="caQtDMHelp" />
+            <ComponentRef Id="qt_conf" />
         </Feature>
         <Feature Id="VCRedist" Level="1" Title="Visual C++ 10.0 Runtime" AllowAdvertise="no" Display="hidden">
             <MergeRef Id="VCRedist" />
