@@ -19,7 +19,9 @@
 	<key>CFBundleIdentifier</key>
 	<string>ch.psi.caQtDM</string>
 	<key>CFBundleVersion</key>
-	<string>3.9.4</string>
+	<string>3.9.5</string>
+	<key>CFBundleVersion</key>
+	<string>1.0.0</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>UIAppFonts</key>
