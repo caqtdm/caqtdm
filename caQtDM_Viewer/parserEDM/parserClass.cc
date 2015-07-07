@@ -19,6 +19,8 @@
 
 #include <math.h>
 #include "parserClass.h"
+#include <QStringList>
+#include <QDebug>
 
 static char *alignEnumStr[3] = {"left","center","right"};
 static int alignEnum[3] = {0,1,2};
@@ -448,6 +450,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
             else if ( strcmp( objName, "activeXTextDspClass:noedit" ) == 0 ) activeClass = activeXTextDsp;  // Zai
             else if ( strcmp( objName, "TextupdateClass" ) == 0 ) activeClass = TextUpdate; // Zai
             else if ( strcmp( objName, "TextentryClass" ) == 0 ) activeClass = TextEntry; // Zai
+            else if ( strcmp( objName, "ByteClass" ) == 0 ) activeClass = Byte; // Zai
             else if ( strcmp( objName, "activeMeterClass" ) == 0 ) activeClass = activeMeter;
             else if ( strcmp( objName, "activeBarClass" ) == 0 ) activeClass = activeBar;
             else if ( strcmp( objName, "activeMessageBoxClass" ) == 0 ) activeClass = activeMessageBox;
@@ -455,6 +458,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
             else if ( strcmp( objName, "activeButtonClass" ) == 0 ) activeClass = activeButton;
             else if ( strcmp( objName, "activeMenuButtonClass" ) == 0 ) activeClass = activeMenuButton;
             else if ( strcmp( objName, "activeRadioButtonClass" ) == 0 ) activeClass = activeRadioButton;
+            else if ( strcmp( objName, "activeChoiceButtonClass" ) == 0 ) activeClass = activeChoiceButton;
             else if ( strcmp( objName, "activeMessageButtonClass" ) == 0 )  activeClass = activeMessageButton;
             else if ( strcmp( objName, "activeExitButtonClass" ) == 0 ) activeClass = activeExitButton;
             else if ( strcmp( objName, "shellCmdClass") == 0) activeClass = shellCmdButton;
@@ -1045,7 +1049,10 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_writeOpenTag("widget", "caLabel", widgetName);
                 myParser->writeRectangleDimensions(x, y, w, h);
                 myParser->Qt_handleString("text", "string",  value.getRaw());
-                myParser->Qt_handleString("fontScaleMode", "enum",  "ESimpleLabel::WidthAndHeight");
+                myParser->Qt_handleString("channel", "string", pvExpStr.getRaw());
+
+                setFont(myParser, fontTag); // Zai added
+// Zai                myParser->Qt_handleString("fontScaleMode", "enum",  "WidthAndHeight");
                 if(alignment==0) {
                     myParser->Qt_handleString("alignment", "set", "Qt::AlignAbsolute|Qt::AlignLeft|Qt::AlignVCenter");
                 } else if(alignment==1) {
@@ -1062,6 +1069,49 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 break;
 
                 //***************************************************************************************************************
+            case Byte :
+                // Zai added
+            {
+                tagClass tag;
+
+                tag.init();
+                tag.loadR( "beginObjectProperties" );
+                tag.loadR( unknownTags );
+                tag.loadR( "major", &major );
+                tag.loadR( "minor", &minor );
+                tag.loadR( "release", &release );
+                tag.loadR( "x", &x );
+                tag.loadR( "y", &y );
+                tag.loadR( "w", &w );
+                tag.loadR( "h", &h );
+                tag.loadR( "lineColor", ci, &lineColor );
+                tag.loadR( "onColor", ci, &onColor );
+                tag.loadR( "offColor", ci, &offColor );
+                tag.loadR( "controlPv", &controlPvExpStr, emptyStr );
+                tag.loadR( "numBits", &numBits );
+                tag.loadR( "endObjectProperties" );
+
+                stat = tag.readTags( f, "endObjectProperties" );
+                if ( !( stat & 1 ) ) {
+                    printf("%s\n", tag.errMsg() );
+                }
+
+                // ----------------- write the properties to the ui file
+                sprintf(widgetName, "caByte_%d", widgetNumber++);
+                myParser->Qt_writeOpenTag("widget", "caByte", widgetName);
+                myParser->writeRectangleDimensions(x, y, w, h);
+                myParser->Qt_handleString("channel", "string", controlPvExpStr.getRaw());
+                myParser->Qt_handleString("startBit", "enum", "0");
+                myParser->Qt_handleString("endBit", "enum", (char*)QString::number(numBits - 1).toStdString().c_str());
+                if (w > h){
+                    myParser->Qt_handleString("direction", "enum", "Right");
+                }
+                else{
+                    myParser->Qt_handleString("direction", "enum", "Down");
+                }
+                myParser->Qt_writeCloseTag("widget", widgetName, 0);
+            }
+                break;
             case activeXTextDsp :
             case TextEntry :    // Zai
             case TextUpdate :   // Zai
@@ -1130,7 +1180,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 }
 
                 // ----------------- write the properties to the ui file
-                if(activeClass == TextUpdate || activeClass != TextEntry && /* Zai added */!editable) {
+                if(activeClass == TextUpdate || (activeClass != TextEntry && /* Zai added */!editable)) {
                     sprintf(widgetName, "caLineEdit_%d", widgetNumber++);
                     myParser->Qt_writeOpenTag("widget", "caLineEdit", widgetName);
                 } else {
@@ -1139,7 +1189,9 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 }
                 myParser->writeRectangleDimensions(x, y, w, h);
                 myParser->Qt_handleString("channel", "string", pvExpStr.getRaw());
-                myParser->Qt_handleString("fontScaleMode", "enum",  "WidthAndHeight");
+
+                setFont(myParser, fontTag); // Zai added
+// Zai                myParser->Qt_handleString("fontScaleMode", "enum",  "WidthAndHeight");
                 if(alignment==0) {
                     myParser->Qt_handleString("alignment", "set", "Qt::AlignAbsolute|Qt::AlignLeft|Qt::AlignVCenter");
                 } else if(alignment==1) {
@@ -1466,6 +1518,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
 
 
                 //***************************************************************************************************************
+            case activeChoiceButton: // Zai added
             case activeRadioButton:
             {
                 tagClass tag;
@@ -1490,6 +1543,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 tag.loadR( "botShadowColor", ci, &botShadowColor );
                 tag.loadR( "controlPv", &controlPvExpStr, emptyStr );
                 tag.loadR( "font", 63, fontTag );
+                tag.loadR( "inconsistentColor", ci, &inconsistentColor );  // Zai added for ChoiceButton
+                tag.loadR( "orientation", 2, orienTypeEnumStr, orienTypeEnum, &horizontal, &horz ); // Zai added for ChoiceButton
                 tag.loadR( "endObjectProperties" );
 
                 stat = tag.readTags( f, "endObjectProperties" );
@@ -1504,6 +1559,17 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_setColorForeground("", rgb[fgColor].r/256, rgb[fgColor].g/256, rgb[fgColor].b/256, 255);
                 myParser->Qt_setColorBackground("", rgb[bgColor].r/256, rgb[bgColor].g/256, rgb[bgColor].b/256, 255);
                 myParser->Qt_handleString("channel", "string", controlPvExpStr.getRaw());
+                setFont(myParser, fontTag); // Zai added
+                // Zai added
+                if (activeClass == activeChoiceButton){
+                    if(horizontal == 0) {
+                        myParser->Qt_handleString("stackingMode", "enum", "Row");
+                    } else {
+                        myParser->Qt_handleString("stackingMode", "enum", "Column");
+                    }
+                    myParser->Qt_handleString("startBit", "number", "0");
+                    myParser->Qt_handleString("endBit", "number", "2");
+                } // Zai added end
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
             }
                 break;
@@ -1549,6 +1615,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 sprintf(widgetName, "caMenu_%d", widgetNumber++);
                 myParser->Qt_writeOpenTag("widget", "caMenu", widgetName);
                 myParser->writeRectangleDimensions(x, y, w, h);
+                setFont(myParser, fontTag); // Zai added
                 myParser->Qt_setColorForeground("", rgb[fgColor].r/256, rgb[fgColor].g/256, rgb[fgColor].b/256, 255);
                 myParser->Qt_setColorBackground("", rgb[bgColor].r/256, rgb[bgColor].g/256, rgb[bgColor].b/256, 255);
                 myParser->Qt_handleString("channel", "string", controlPvExpStr.getRaw());
@@ -1609,6 +1676,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 sprintf(widgetName, "caMessageButton_%d", widgetNumber++);
                 myParser->Qt_writeOpenTag("widget", "caMessageButton", widgetName);
                 myParser->writeRectangleDimensions(x, y, w, h);
+                setFont(myParser, fontTag); // Zai added
                 myParser->Qt_setColorForeground("", rgb[fgColor].r/256, rgb[fgColor].g/256, rgb[fgColor].b/256, 255);
                 myParser->Qt_setColorBackground("", rgb[onColor].r/256, rgb[onColor].g/256, rgb[onColor].b/256, 255);
                 myParser->Qt_handleString("channel", "string", destPvExpStringM.getRaw());
@@ -1684,6 +1752,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 sprintf(widgetName, "caRelatedDisplay_%d", widgetNumber++);
                 myParser->Qt_writeOpenTag("widget", "caRelatedDisplay", widgetName);
                 myParser->writeRectangleDimensions(x, y, w, h);
+                setFont(myParser, fontTag); // Zai added
                 myParser->Qt_setColorForeground("", rgb[fgColor].r/256, rgb[fgColor].g/256, rgb[fgColor].b/256, 255);
                 myParser->Qt_setColorBackground("", rgb[bgColor].r/256, rgb[bgColor].g/256, rgb[bgColor].b/256, 255);
 
@@ -1733,6 +1802,25 @@ int parserClass::loadFile (myParserEDM *myParser) {
 
     fclose( f );
     return 1;
+}
+// Zai added
+void parserClass::setFont(myParserEDM *myParser, char fontTag[80]){
+    QStringList fontTagStringList = QString((char*)fontTag).split("-");
+    bool bold = false;
+    int fontSize = 10;
+    if (fontTagStringList.count() < 4) return;
+    if (fontTagStringList.at(1).contains("bold")){
+        // set Bold
+//        qDebug() << "set bold";
+        bold = true;
+    }
+    if (!fontTagStringList.at(3).isEmpty()){
+        // set Font size
+        fontSize = QString(fontTagStringList.at(3)).toDouble()/1;
+//        qDebug() << "Set  Font Size: " << fontSize;
+    }
+    myParser->writeFontProperties(fontSize, bold);
+    myParser->Qt_handleString("fontScaleMode", "enum",  "None");
 }
 
 

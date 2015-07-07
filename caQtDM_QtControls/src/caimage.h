@@ -32,6 +32,7 @@
 #include <QMenu>
 #include <QMouseEvent>
 #include <qtcontrols_global.h>
+#include "messageQueue.h"
 
 class QTCON_EXPORT caImage : public QWidget
 {
@@ -67,6 +68,10 @@ public:
     void startMovie();
     void setInvalid(QColor c);
     void setValid();
+    QString getMessages();
+    bool anyMessages();
+
+
 
 virtual ~caImage();
 
@@ -84,6 +89,7 @@ private:
 
     void init(const QString& filename);
 
+    messageQueue *messagequeue;
     QPointer<QLabel> _container;
     QPointer<QMovie> _animation;
     QVBoxLayout* _layout;

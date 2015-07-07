@@ -83,14 +83,15 @@ void caScriptButton::setColors(QColor bg, QColor fg, QColor hover, QColor border
 {
     //set colors and style filled
     if((bg != oldBackColor) || (fg != oldForeColor) || (hover != oldHoverColor)) {
-       QString style = "QPushButton{ background-color: rgba(%1, %2, %3, %4); color: rgb(%5, %6, %7); border-color: rgb(%8, %9, %10);";
-       style = style.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(255).
-             arg(fg.red()).arg(fg.green()).arg(fg.blue()).
-             arg(border.red()).arg(border.green()).arg(border.blue());
+       QString style = "QPushButton{ background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-color: rgba(%9, %10, %11, %12);";
+       style = style.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
+             arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha()).
+             arg(border.red()).arg(border.green()).arg(border.blue()).arg(border.alpha());
        style.append("border-radius: 1px; padding: 0px; border-width: 3px;"
                   "border-style: outset; margin:0px;}");
-       QString hoverC = "QPushButton:hover {background-color: rgb(%1, %2, %3);} QPushButton:pressed {background-color: rgb(%4, %5, %6)};";
-       hoverC = hoverC.arg(hover.red()).arg(hover.green()).arg(hover.blue()).arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue());
+       QString hoverC = "QPushButton:hover {background-color: rgba(%1, %2, %3, %4);} QPushButton:pressed {background-color: rgba(%5, %6, %7, %8)};";
+       hoverC = hoverC.arg(hover.red()).arg(hover.green()).arg(hover.blue()).arg(hover.alpha()).
+               arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
        style.append(hoverC);
        setStyleSheet(style);
 
@@ -103,8 +104,8 @@ void caScriptButton::setColors(QColor bg, QColor fg, QColor hover, QColor border
 void caScriptButton::setBackground(QColor c)
 {
     thisBackColor = c;
-    thisHoverColor = c.light(120);
-    thisBorderColor = c.dark(150);
+    thisHoverColor = c.lighter(120);
+    thisBorderColor = c.darker(150);
     setColors(thisBackColor, thisForeColor, thisHoverColor, thisBorderColor);
 }
 

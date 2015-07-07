@@ -23,22 +23,24 @@
  *    anton.mezger@psi.ch
  */
 
-#ifndef SEARCHFILE_H
-#define SEARCHFILE_H
+#ifndef MESSAGEQUEUE_H
+#define MESSAGEQUEUE_H
 
 #include <QString>
-#include <QFileDialog>
+#include <QQueue>
 #include <qtcontrols_global.h>
 
-class QTCON_EXPORT searchFile
+class QTCON_EXPORT messageQueue
 {
 public:
-    searchFile(QString FileName);
-    QString findFile();
-    QString displayPath();
+   messageQueue();
+   void enqueue(const QString &message);
+   QString dequeue();
+   bool isEmpty();
 
 private:
-    QString _FileName;
+   QQueue<QString> queue;
+   
 };
-
-#endif // SEARCHFILE_H
+   
+#endif

@@ -23,7 +23,7 @@
  *    anton.mezger@psi.ch
  */
 
-#define _CRT_SECURE_NO_WARNINGS
+
 #include <cstdlib>
 
 #include <iostream>
@@ -219,6 +219,27 @@ void myParserEDM::writeRectangleDimensions(int x, int y, int w, int h)
     writeTaggedString("height", asc);
 
     writeCloseTag("rect");
+    writeCloseProperty();
+}
+// Zai added
+void myParserEDM::writeFontProperties(int size, bool bold)
+{
+    char asc[MAX_ASCII];
+
+    writeOpenProperty("font");
+    writeOpenTag("font", "", "");
+
+    sprintf(asc, "%d", size - 4);
+    writeTaggedString("pointsize", asc);
+
+    if (bold && size > 14){
+//        std::string trueString;
+//        trueString.append("true");
+        sprintf(asc, "%s", "true");
+        writeTaggedString("bold", asc);
+    }
+
+    writeCloseTag("font");
     writeCloseProperty();
 }
 

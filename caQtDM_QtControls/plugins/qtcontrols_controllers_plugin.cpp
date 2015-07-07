@@ -359,6 +359,25 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
         {
             return new caSpinbox(parent);
         }
+        
+        caByteControllerInterface::caByteControllerInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
+        {
+            strng name[1], type[1];
+            strcpy(name[0], "channel");
+            strcpy(type[0], "multiline");
+            d_domXml = XmlFunc("caByteController", "cabytecontroller", 0, 0, 20, 120, name, type, 1);
+            d_toolTip = "[Byte Controller]";
+            d_name = "caByteController";
+            d_include = "caByteController";
+            QPixmap qpixmap = QPixmap(":pixmaps/eflag.png");
+            d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+        }
+
+        QWidget *caByteControllerInterface::createWidget(QWidget *parent)
+        {
+            return new caByteController(parent);
+        }
+
 
         CustomWidgetCollectionInterface_Controllers::CustomWidgetCollectionInterface_Controllers(QObject *parent): QObject(parent)
         {
@@ -374,6 +393,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
             d_plugins.append(new caToggleButtonInterface(this));
             d_plugins.append(new caScriptButtonInterface(this));
             d_plugins.append(new caSpinboxInterface(this));
+	    d_plugins.append(new caByteControllerInterface(this)); 
         }
 
         QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface_Controllers::customWidgets(void) const

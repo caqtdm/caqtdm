@@ -30,7 +30,7 @@
    #define strdup _strdup
 #endif
 
-#include "dmsearchfile.h"
+#include "searchfile.h"
 
 #include "fileopenwindow.h"
 #include "QDebug"
@@ -59,6 +59,8 @@ static void unixSignalHandler(int signum) {
     QCoreApplication::exit(0);
 }
 
+extern bool HTTPCONFIGURATOR;
+
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(caQtDM);
@@ -77,8 +79,9 @@ int main(int argc, char *argv[])
     QString fileName = "";
     QString macroString = "";
     QString geometry = "";
+    QString macroFile = "";
 
-    dmsearchFile *s = new dmsearchFile("caQtDM_stylesheet.qss");
+    searchFile *s = new searchFile("caQtDM_stylesheet.qss");
     QString fileNameFound = s->findFile();
     if(fileNameFound.isNull()) {
         printf("caQtDM -- file <caQtDM_stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toAscii().constData());
@@ -102,10 +105,10 @@ int main(int argc, char *argv[])
         //qDebug() << argv[in];
         if ( strcmp (argv[in], "-display" ) == 0 ) {
             in++;
-            printf("caQtDM -- display <%s>\n", strdup(argv[in]));
+            printf("caQtDM -- display <%s>\n", argv[in]);
         } else if ( strcmp (argv[in], "-macro" ) == 0 ) {
             in++;
-            printf("caQtDM -- macro <%s>\n", strdup(argv[in]));
+            printf("caQtDM -- macro <%s>\n", argv[in]);
             macroString = QString(argv[in]);
         } else if ( strcmp (argv[in], "-attach" ) == 0 ) {
             printf("caQtDM -- will attach to another caQtDM if running\n");
@@ -113,6 +116,10 @@ int main(int argc, char *argv[])
         } else if ( strcmp (argv[in], "-noMsg" ) == 0 ) {
             printf("caQtDM -- will minimize its main windows\n");
             minimize = true;
+        } else if( strcmp (argv[in], "-macrodefs" ) == 0) {
+            in++;
+            printf("caQtDM -- will load macro string from file <%s>\n", argv[in]);
+            macroFile = QString(argv[in]);
         } else if ( strcmp (argv[in], "-noStyles" ) == 0 ) {
             printf("caQtDM -- will not replace the default application stylesheet caQtDM_stylesheet.qss\n");
             nostyles = true;
@@ -130,7 +137,9 @@ int main(int argc, char *argv[])
                    "  [-noMsg]\n"
                    "  [-noStyles]      works only when not attaching\n"
                    "  [-macro \"xxx=aaa,yyy=bbb, ...\"]\n"
+                   "  [-macrodefs filename] will load macro definitions from file\n"
                    "  [-dg [xpos[xypos]][+xoffset[+yoffset]]\n"
+                   "  [-httpconfig] will display a network configuration screen at startup\n"
                    "  [-print] will print file and exit\n"
                    "  [-noResize] will prevent resizing, works only when not attaching\n"
                    "  [file]\n"
@@ -148,9 +157,11 @@ int main(int argc, char *argv[])
              resizing = false;
         } else if(!strcmp(argv[in], "-noResize")) {
             resizing = false;
+        } else if(!strcmp(argv[in], "-httpconfig")) {
+            HTTPCONFIGURATOR = true;
         } else if (strncmp (argv[in], "-" , 1) == 0) {
             /* unknown application argument */
-            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -noStyles -dg -x -print\n",in,argv[in]);
+            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -noStyles -dg -x -print -httpconfig\n",in,argv[in]);
         } else {
             printf("caQtDM -- file = <%s>\n", argv[in]);
             fileName = QString(argv[in]);
@@ -158,8 +169,13 @@ int main(int argc, char *argv[])
         }
     }
 
+    // must be always true for mobile plattforms
+#ifdef MOBILE
+     HTTPCONFIGURATOR = true;
+#endif
+
     if(!nostyles) {
-        s = new dmsearchFile("stylesheet.qss");
+        s = new searchFile("stylesheet.qss");
         fileNameFound = s->findFile();
         if(fileNameFound.isNull()) {
             printf("caQtDM -- file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toAscii().constData());
@@ -173,12 +189,35 @@ int main(int argc, char *argv[])
         }
     }
 
+    // load macro definitions from file (located in this directory or in the caQTDM_DISPLAY_PATH)
+    if(macroFile.length() > 0) {
+        s = new searchFile(macroFile);
+        fileNameFound = s->findFile();
+        if(fileNameFound.isNull()) {
+            printf("caQtDM -- file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toAscii().constData());
+        } else {
+            QFile file(fileNameFound);
+            file.open(QFile::ReadOnly);
+            macroString = QLatin1String(file.readAll());
+            file.close();
+        }
+    }
+
 #ifdef IO_OPTIMIZED_FOR_TABWIDGETS
     printf("caQtDM -- viewer will disable monitors for hidden pages of QTabWidgets, in case of problems\n");
     printf("          you may disable this by not defining IO_OPTIMIZED_FOR_TABWIDGETS in qtdefs.pri\n");
 #else
     printf("caQtDM -- viewer will not disable monitors for hidden pages of QTabWidgets\n");
     printf("          you may enable this by defining IO_OPTIMIZED_FOR_TABWIDGETS in qtdefs.pri\n");
+#endif
+
+#ifndef CONFIGURATOR
+    QString displayPath = (QString)  qgetenv("CAQTDM_URL_DISPLAY_PATH");
+    if(displayPath.length() > 0) {
+         printf("caQtDM -- files will be downloaded from <%s> when not locally found\n", displayPath.toAscii().constData());
+    } else {
+        printf("caQtDM -- files will not download files when not locally found\n");
+    }
 #endif
 
     FileOpenWindow window (0, fileName, macroString, attach, minimize, geometry, printscreen, resizing);

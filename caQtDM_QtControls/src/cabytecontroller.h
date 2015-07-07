@@ -23,17 +23,19 @@
  *    anton.mezger@psi.ch
  */
 
-#ifndef CABYTE_H
-#define CABYTE_H
+#ifndef CABYTECONTROLLER_H
+#define CABYTECONTROLLER_H
 
 #include <QString>
 #include <QColor>
+#include <QSignalMapper>
+#include <QApplication>
 #include <qtcontrols_global.h>
-#include <rectangle.h>
+#include "epushbutton.h"
 
 class QGridLayout;
 
-class QTCON_EXPORT caByte : public QWidget
+class QTCON_EXPORT caByteController : public QWidget
 {
     Q_OBJECT
 
@@ -49,8 +51,11 @@ class QTCON_EXPORT caByte : public QWidget
 
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
 
-    Q_PROPERTY(QColor foreground   READ getTrueColor     WRITE setTrueColor)
-    Q_PROPERTY(QColor background  READ getFalseColor    WRITE setFalseColor)
+    Q_PROPERTY(QColor foreground  READ getTrueColor  WRITE setTrueColor)
+    Q_PROPERTY(QColor background  READ getFalseColor WRITE setFalseColor)
+    Q_PROPERTY(QColor textColor  READ getTextColor   WRITE setTextColor)
+
+    Q_PROPERTY(EPushButton::ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleMode)
 
 public:
 
@@ -63,7 +68,7 @@ public:
     colMode getColorMode() const { return thisColorMode; }
     void setColorMode(colMode colormode) {thisColorMode = colormode;}
 
-    caByte(QWidget *parent);
+    caByteController(QWidget *parent);
 
     QString getPV() const;
     void setPV(QString const &newPV);
@@ -76,8 +81,12 @@ public:
     void setFalseColor(QColor c);
     QColor getFalseColor() const {return thisFalseColor;}
 
-    QList<rectangle*> cells;
+    void setTextColor(QColor c);
+    QColor getTextColor() const {return thisTextColor;}
+
+    QList<EPushButton*> cells;
     void setValue(long value);
+    long getValue();
 
     int getStartBit()  const {return thisStartBit;}
     void setStartBit(int const &bit);
@@ -91,17 +100,30 @@ public:
 
      void drawByte(long lvalue, QColor trueColor, QColor falseColor);
 
-protected:
+     void setFontScaleMode(EPushButton::ScaleMode m);
+     EPushButton::ScaleMode fontScaleMode();
 
+     int getAccessW() const {return _AccessW;}
+     void setAccessW(int access);
+
+signals:
+    void clicked(int bit);
+
+protected:
     void arrangeCells();
     void resizeEvent(QResizeEvent *e);
 
 private:
+    void   setColor(EPushButton *button, QColor c, QColor text);
+    bool   eventFilter(QObject *obj, QEvent *event);
     int                 numRows;
     int 	            numColumns;
 
+    QSignalMapper      *signalMapper;
+
     QColor		        thisFalseColor;
     QColor		        thisTrueColor;
+     QColor		        thisTextColor;
     QGridLayout 	   *grid;
     int                 thisStartBit;
     int                 thisEndBit;
@@ -109,7 +131,10 @@ private:
     Direction           thisDirection;
     colMode             thisColorMode;
     long                thisValue;
+    bool               _AccessW;
+
+    EPushButton::ScaleMode thisScaleMode;
 
 };
 
-#endif  /* CABYTE */
+#endif  /* CABYTECONTROLLER */

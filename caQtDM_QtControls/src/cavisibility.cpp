@@ -39,7 +39,8 @@ caVisibility::caVisibility( QWidget *parent) :  QWidget(parent)
 void caVisibility::setHidden(bool hide)
 {
        thisHide = hide;
-       repaint();
+       //repaint();
+       update();
 }
     
 bool caVisibility::getHidden() 

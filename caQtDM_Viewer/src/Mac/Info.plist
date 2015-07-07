@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>ATSApplicationFontsPath</key>
+	<string>fonts/</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>CFBundleIconFile</key>
@@ -17,7 +19,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>ch.psi.caQtDM</string>
 	<key>CFBundleVersion</key>
-	<string>3.9.2</string>
+	<string>3.9.4</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>UIAppFonts</key>

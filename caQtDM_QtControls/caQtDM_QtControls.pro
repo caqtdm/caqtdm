@@ -19,29 +19,29 @@ CONFIG += console
 TARGET = qtcontrols
 TEMPLATE = lib
 OBJECTS_DIR = obj
-DESTDIR = $(CAQTDM_COLLECT)
+DESTDIR = $$(CAQTDM_COLLECT)
 MOC_DIR = moc
 INCLUDEPATH += src
 RESOURCES = qtcontrols.qrc
 
 ios | android {
    CONFIG += staticlib
-   INCLUDEPATH += $(QWTINCLUDE)
+   INCLUDEPATH += $$(QWTINCLUDE)
 }
 
 !ios {
 !android {
   unix {
-    INCLUDEPATH += $(QWTINCLUDE)
+    INCLUDEPATH += $$(QWTINCLUDE)
   }
 
   unix:!macx {
-    LIBS += -L$(QWTLIB) -Wl,-rpath,$(QWTLIB) -lqwt
+    LIBS += -L$$(QWTLIB) -Wl,-rpath,$(QWTLIB) -lqwt
   }
 
   macx: {
     CONFIG += lib_bundle
-    LIBS += -F$(QWTLIB) -framework qwt
+    LIBS += -F$$(QWTLIB) -framework qwt
   }
 }
 }
@@ -49,19 +49,22 @@ ios | android {
 win32 {
     win32-g++ {
       INCLUDEPATH = $(QWTHOME)/src
-      LIBS += $(QWTLIB)/libqwt.a
+      LIBS += $$(QWTLIB)/libqwt.a
       Q
      }
      win32-msvc* {
         DEFINES += QTCON_MAKEDLL _CRT_SECURE_NO_WARNINGS
         DebugBuild {
                 OBJECTS_DIR = debug/obj
-                DESTDIR = $(CAQTDM_COLLECT)/debug
+                DESTDIR = $$(CAQTDM_COLLECT)/debug
                 INCLUDEPATH += $$(QWTINCLUDE)
                 LIBS += $$(QWTHOME)/lib/qwtd.lib
         }
 
         ReleaseBuild {
+		QMAKE_CXXFLAGS += /Z7
+		QMAKE_CFLAGS   += /Z7
+		QMAKE_LFLAGS   += /DEBUG /OPT:REF /OPT:ICF
                 DESTDIR = $(CAQTDM_COLLECT)
                 OBJECTS_DIR = release/obj
                 INCLUDEPATH += $$(QWTINCLUDE)
@@ -144,14 +147,15 @@ SOURCES	+= \
     src/colormaps.cpp \
     src/cascan2d.cpp \
     src/mdaReader.cpp \
-    src/mda_loader.c
+    src/mda_loader.c \
+    src/messageQueue.cpp \
+    src/cabytecontroller.cpp
 
 XDR_HACK {
     SOURCES += src/xdr_hack.c
     HEADERS += src/xdr_hack.h
 }
 
-NETWORKDOWNLOADSUPPORT: {
 QT += network
 HEADERS += \
     src/networkaccess.h \
@@ -160,7 +164,6 @@ HEADERS += \
 SOURCES +=  \
     src/networkaccess.cpp \
     src/fileFunctions.cpp
-}
 
 # assume qwt6.0 was made with qt4
 contains(QT_VER_MAJ, 4) {
@@ -241,7 +244,9 @@ HEADERS	+= \
     src/colormaps.h \
     src/cascan2d.h \
     src/mdaReader.h \
-    src/mda-load.h
+    src/mda-load.h \
+    src/messageQueue.h \
+    src/cabytecontroller.h
 
 # assume qwt6.0 was made with qt4
 contains(QT_VER_MAJ, 4) {

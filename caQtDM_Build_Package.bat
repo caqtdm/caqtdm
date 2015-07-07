@@ -20,8 +20,8 @@ IF %SELCTION%==3 GOTO BUILDQT5_32
 
 :BUILDQT4_32
 IF EXIST .\project (cd project && del /q /f /s *.*) ELSE (mkdir project && cd project)
-candle ../caQtDM.wxs -ext WixUIExtension
-light caQtDM.wixobj -ext WixUIExtension
+candle ../caQtDM.wxs -ext WixUIExtension -ext WixUtilExtension
+light caQtDM.wixobj -ext WixUIExtension -ext WixUtilExtension
 copy caQtDM.msi %WINCAQTDM_COLLECT% 
 GOTO FINISHED
 

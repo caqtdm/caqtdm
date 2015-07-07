@@ -71,11 +71,9 @@
      void shellCommand(QString command);
      void cycleWindows();
 
-#ifdef NETWORKDOWNLOADSUPPORT
      void setAllEnvironmentVariables(const QString &fileName);
      void parseConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files);
      void saveConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files);
-#endif
 
  private slots:
      void Callback_ActionTimed();
@@ -86,6 +84,7 @@
      void Callback_ActionHelp();
      void Callback_ActionReload();
      void Callback_ActionUnconnected();
+     void Callback_EmptyCache();
      void Callback_OpenNewFile(const QString&, const QString&, const QString&);
      void checkForMessage();
      void Callback_PVwindowExit();

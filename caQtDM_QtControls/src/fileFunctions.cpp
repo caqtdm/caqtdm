@@ -26,32 +26,34 @@
 #include "fileFunctions.h"
 #include "networkaccess.h"
 #include "searchfile.h"
-
-class Sleep
-{
-public:
-    static void msleep(unsigned long msecs)
-    {
-        QMutex mutex;
-        mutex.lock();
-        QWaitCondition waitCondition;
-        waitCondition.wait(&mutex, msecs);
-        mutex.unlock();
-    }
-};
-
+#include "specialFunctions.h"
 
 fileFunctions::fileFunctions()
 {
 }
 
-#include <unistd.h>
+const QString fileFunctions::lastError()
+{
+    if(errorString.length() > 0) return errorString;
+    else return QString::null;
+}
+
+const QString fileFunctions::lastInfo()
+{
+    if(infoString.length() > 0) return "Info: " + infoString;
+    else return QString::null;
+}
+
 int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &url)
 {
     QString displayPath;
-    QFileInfo fi(fileName);
+    errorString = "";
+    infoString = "";
 
-    //printf("filename to download %s\n", fileName.toAscii().constData());
+    //QString Path = (QString)  qgetenv("CAQTDM_DISPLAY_PATH");
+    //printf("<%s>\n", Path.toAscii().constData());
+    //printf("checkFileAndDownload <%s>\n", fileName.toAscii().constData());
+
     searchFile *s = new searchFile(fileName);
     QString fileNameFound = s->findFile();
     if(!fileNameFound.isNull()) return true;
@@ -64,31 +66,19 @@ int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &
        displayPath = (QString)  qgetenv("CAQTDM_URL_DISPLAY_PATH");
     }
 
+    if(displayPath.length() < 1) return false;
+
+    //printf("filename to download %s\n", fileName.toAscii().constData());
+
     displayPath.append("/");
     displayPath.append(fileName);
     QUrl displayUrl(displayPath);
+    infoString = "download file " + displayPath;
 
-    NetworkAccess *displayGet = new NetworkAccess(0, fileName);
-    displayGet->requestUrl(displayUrl);
-
-    //wait until download was done (up to 3 seconds)
-    int looped = 0;
-    for(int i=0; i<10; i++) {
-        qApp->processEvents();
-#ifndef MOBILE_ANDROID
-        Sleep::msleep(300);
-#else // not nice, but the above does not work on android now (does not wait)
-        usleep(500000);
-#endif
-        qApp->processEvents();
-        if(displayGet->downloadFinished()) {
-            qDebug() << "download finished succesfully\n";
-            break;
-        }
-        looped++;
-    }
-    if(!displayGet->downloadFinished()) {
-        qDebug() << "download not finished\n";
+    NetworkAccess *displayGet = new NetworkAccess();
+    if(!displayGet->requestUrl(displayUrl, fileName)) {
+        errorString = displayGet->lastError();
+        displayGet->deleteLater();
         return false;
     }
     displayGet->deleteLater();

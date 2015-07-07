@@ -42,11 +42,11 @@ caClock::caClock(QWidget *parent) : QwtAnalogClock(parent)
     setFocusPolicy(Qt::NoFocus);
 
     thisBaseColor = QColor( Qt::gray);
-    thisScaleColor = thisBaseColor.dark( 200 ).light( 800 );
+    thisScaleColor = thisBaseColor.darker( 200 ).lighter( 800 );
     setScaleDefaultColor(true);
 
-    const QColor knobColor = thisBaseColor.light(130);
-    setPalette( colorTheme( thisBaseColor.dark( 150 ) ) );
+    const QColor knobColor = thisBaseColor.lighter(130);
+    setPalette( colorTheme( thisBaseColor.darker( 150 ) ) );
 
     scaleDraw()->setPenWidth(3);
     setLineWidth(3);
@@ -56,7 +56,7 @@ caClock::caClock(QWidget *parent) : QwtAnalogClock(parent)
     scaleDraw()->setSpacing(3.0);
 
     for ( int i = 0; i < QwtAnalogClock::NHands; i++) {
-        QColor handColor = thisBaseColor.light(150);
+        QColor handColor = thisBaseColor.lighter(150);
         int width = 5;
         if ( i == QwtAnalogClock::SecondHand ) {
             handColor = Qt::red;
@@ -81,17 +81,17 @@ QPalette caClock::colorTheme( const QColor &base ) const
 {
     QPalette palette;
     palette.setColor( QPalette::Base, base );
-    palette.setColor( QPalette::Window, base.dark( 150 ) );
-    palette.setColor( QPalette::Mid, base.dark( 110 ) );
-    palette.setColor( QPalette::Light, base.light( 170 ) );
-    palette.setColor( QPalette::Dark, base.dark( 170 ) );
+    palette.setColor( QPalette::Window, base.darker( 150 ) );
+    palette.setColor( QPalette::Mid, base.darker( 110 ) );
+    palette.setColor( QPalette::Light, base.lighter( 170 ) );
+    palette.setColor( QPalette::Dark, base.darker( 170 ) );
 
     if(thisScaleDefaultColor) {
-       palette.setColor( QPalette::Text, base.dark( 200 ).light( 800 ) );
+       palette.setColor( QPalette::Text, base.darker( 200 ).lighter( 800 ) );
     } else {
        palette.setColor( QPalette::Text, thisScaleColor );
     }
-    palette.setColor( QPalette::WindowText, base.dark( 200 ) );
+    palette.setColor( QPalette::WindowText, base.darker( 200 ) );
 
     return palette;
 }
@@ -124,25 +124,25 @@ void caClock::setAlarmColors(short status)
 
     case NO_ALARM:
         c=AL_GREEN;
-        if(thisColorMode == Static) c= thisBaseColor.dark( 150 );
+        if(thisColorMode == Static) c= thisBaseColor.darker( 150 );
         break;
     case MINOR_ALARM:
         c=AL_YELLOW;
-        if(thisColorMode == Static) c= thisBaseColor.dark( 150 );
+        if(thisColorMode == Static) c= thisBaseColor.darker( 150 );
         break;
     case MAJOR_ALARM:
         c=AL_RED;
-        if(thisColorMode == Static) c= thisBaseColor.dark( 150 );
+        if(thisColorMode == Static) c= thisBaseColor.darker( 150 );
         break;
     case INVALID_ALARM:
         c=AL_WHITE;
-        if(thisColorMode == Static) c= thisBaseColor.dark( 150 );
+        if(thisColorMode == Static) c= thisBaseColor.darker( 150 );
         break;
     case NOTCONNECTED:
         c=AL_WHITE;
         break;
     default:
-        c= thisBaseColor.dark( 150 );
+        c= thisBaseColor.darker( 150 );
         break;
     }
     if((prevColor != c) || (thisScaleDefaultColor != prevScaleDefaultColor) || (thisScaleColor != prevScaleColor)){

@@ -60,10 +60,18 @@
     </property>
     <addaction name="helpAction"/>
    </widget>
+   <widget class="QMenu" name="menuHttp">
+    <property name="title">
+     <string>Http</string>
+    </property>
+    <addaction name="emptycacheAction"/>
+    <addaction name="displayUrl"/>
+   </widget>
    <addaction name="menuMenu"/>
    <addaction name="menuPV"/>
    <addaction name="menuUpdateType"/>
    <addaction name="menuHelp"/>
+   <addaction name="menuHttp"/>
   </widget>
   <action name="exitAction">
    <property name="text">
@@ -118,6 +126,19 @@
   <action name="helpAction">
    <property name="text">
     <string>Contents</string>
+   </property>
+  </action>
+  <action name="emptycacheAction">
+   <property name="text">
+    <string>Emptycache</string>
+   </property>
+   <property name="toolTip">
+    <string>empty http download directory</string>
+   </property>
+  </action>
+  <action name="displayUrl">
+   <property name="text">
+    <string>url</string>
    </property>
   </action>
  </widget>

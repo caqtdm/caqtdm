@@ -22,6 +22,23 @@ unix {
  QMAKE_CFLAGS_RELEASE += "-g"
 }
 
+PYTHONCALC: {
+!ios {
+!android {
+   unix:!macx {
+      DEFINES += PYTHON
+      INCLUDEPATH += $(PYTHONINCLUDE)
+      LIBS += -L$(PYTHONLIB) -Wl,-rpath,$(PYTHONLIB) -lpython$(PYTHONVERSION)
+    }
+    unix:macx {
+       DEFINES += PYTHON
+       INCLUDEPATH += /System/Library/Frameworks/Python.framework/Versions/$(PYTHONVERSION)/include/python$(PYTHONVERSION)/
+       LIBS += -L/System/Library/Frameworks/Python.framework/Versions/$(PYTHONVERSION)/lib/ -lpython$(PYTHONVERSION)
+    }
+  }
+}
+}
+
 !ios {
    unix:!macx {
       LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca
@@ -53,7 +70,6 @@ SOURCES += caqtdm_lib.cpp \
     mutexKnobData.cpp \
     globalPtrs.cpp \
     epicsSubs.c \
-    dmsearchfile.cpp \
     MessageWindow.cpp \
     vaPrintf.c \
     myMessageBox.cpp \
@@ -75,7 +91,6 @@ HEADERS += caqtdm_lib.h\
     knobData.h \
     dbrString.h \
     alarmstrings.h \
-    dmsearchfile.h \
     MessageWindow.h \
     messageWindowWrapper.h \
     vaPrintf.h \

@@ -80,7 +80,7 @@ caMeter::caMeter(QWidget *parent) : QwtDial(parent)
 {
 
     thisBaseColor = QColor( Qt::gray);
-    thisScaleColor = thisBaseColor.dark( 200 ).light( 800 );
+    thisScaleColor = thisBaseColor.darker( 200 ).lighter( 800 );
     setScaleDefaultColor(true);
 
 #if QWT_VERSION < 0x060100
@@ -94,7 +94,7 @@ caMeter::caMeter(QWidget *parent) : QwtDial(parent)
     setWrapping(false);
     setReadOnly(true);
     setFocusPolicy(Qt::NoFocus);
-    setPalette( colorTheme(thisBaseColor.dark( 150 ) ) );
+    setPalette( colorTheme(thisBaseColor.darker( 150 ) ) );
 
     setOrigin(135.0);
     setScaleArc(0.0, 270.0);
@@ -123,7 +123,7 @@ caMeter::caMeter(QWidget *parent) : QwtDial(parent)
     ScaleDraw->setTickLength( QwtScaleDiv::MajorTick, 6);
     ScaleDraw->setSpacing(3.0);
 
-    QwtDialSimpleNeedle *needle = new QwtDialSimpleNeedle( QwtDialSimpleNeedle::Arrow, true, Qt::red, QColor(Qt::gray).light(130));
+    QwtDialSimpleNeedle *needle = new QwtDialSimpleNeedle( QwtDialSimpleNeedle::Arrow, true, Qt::red, QColor(Qt::gray).lighter(130));
     setNeedle(needle);
 
     setColorMode(Static);
@@ -192,7 +192,7 @@ void caMeter::drawScaleContents(QPainter *painter, const QPointF &center, double
     painter->drawRect(rect);
 
     if(thisScaleDefaultColor) {
-       painter->setPen(thisBaseColor.dark( 200 ).light( 800 ));
+       painter->setPen(thisBaseColor.darker( 200 ).lighter( 800 ));
     } else {
        painter->setPen(thisScaleColor);
     }
@@ -277,16 +277,16 @@ QPalette caMeter::colorTheme( const QColor &base ) const
 {
     QPalette palette;
     palette.setColor( QPalette::Base, base );
-    palette.setColor( QPalette::Window, base.dark( 150 ) );
-    palette.setColor( QPalette::Mid, base.dark( 110 ) );
-    palette.setColor( QPalette::Light, base.light( 170 ) );
-    palette.setColor( QPalette::Dark, base.dark( 170 ) );
+    palette.setColor( QPalette::Window, base.darker( 150 ) );
+    palette.setColor( QPalette::Mid, base.darker( 110 ) );
+    palette.setColor( QPalette::Light, base.lighter( 170 ) );
+    palette.setColor( QPalette::Dark, base.darker( 170 ) );
     if(thisScaleDefaultColor) {
-       palette.setColor( QPalette::Text, base.dark( 200 ).light( 800 ) );
+       palette.setColor( QPalette::Text, base.darker( 200 ).lighter( 800 ) );
     } else {
        palette.setColor( QPalette::Text, thisScaleColor );
     }
-    palette.setColor( QPalette::WindowText, base.dark( 200 ) );
+    palette.setColor( QPalette::WindowText, base.darker( 200 ) );
     return palette;
 }
 
@@ -331,25 +331,25 @@ void caMeter::setAlarmColors(short status)
 
     case NO_ALARM:
         c=AL_GREEN;
-        if(thisColorMode == Static) c= thisBaseColor.dark( 150 );
+        if(thisColorMode == Static) c= thisBaseColor.darker( 150 );
         break;
     case MINOR_ALARM:
         c=AL_YELLOW;
-        if(thisColorMode == Static) c= thisBaseColor.dark( 150 );
+        if(thisColorMode == Static) c= thisBaseColor.darker( 150 );
         break;
     case MAJOR_ALARM:
         c=AL_RED;
-        if(thisColorMode == Static) c= thisBaseColor.dark( 150 );
+        if(thisColorMode == Static) c= thisBaseColor.darker( 150 );
         break;
     case INVALID_ALARM:
         c=AL_WHITE;
-        if(thisColorMode == Static) c= thisBaseColor.dark( 150 );
+        if(thisColorMode == Static) c= thisBaseColor.darker( 150 );
         break;
     case NOTCONNECTED:
         c=AL_WHITE;
         break;
     default:
-        c= thisBaseColor.dark( 150 );
+        c= thisBaseColor.darker( 150 );
         break;
     }
 

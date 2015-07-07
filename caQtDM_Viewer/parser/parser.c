@@ -1780,7 +1780,7 @@ void *parseMeter(DisplayInfo *displayInfo, FrameOffset * offset)
 
 void *parseByte( DisplayInfo *displayInfo, FrameOffset * offset) {
     char token[MAX_TOKEN_LENGTH];
-    char direction[MAX_TOKEN_LENGTH] = "Down";
+    char direction[MAX_TOKEN_LENGTH] = "Right";
     char COLORMODE[MAX_TOKEN_LENGTH] = "static";
     TOKEN tokenType;
     int nestingLevel = 0;

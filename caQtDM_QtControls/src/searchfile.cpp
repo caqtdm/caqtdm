@@ -24,7 +24,6 @@
  */
 
 #include "searchfile.h"
-#include <QDebug>
 
 searchFile::searchFile(QString filename)
 {
@@ -35,7 +34,7 @@ QString searchFile::findFile()
 {
     if(_FileName.isNull()) return NULL;
 
-    QString path = (QString)  qgetenv("CAQTDM_DISPLAY_PATH");
+    QString path = (QString) qgetenv("CAQTDM_DISPLAY_PATH");
 
 #ifdef _MSC_VER
     QStringList paths = path.split(";");
@@ -70,4 +69,9 @@ QString searchFile::findFile()
         return FileName;
     }
     else return NULL;
+}
+
+QString searchFile::displayPath()
+{
+    return (QString)  qgetenv("CAQTDM_DISPLAY_PATH");
 }

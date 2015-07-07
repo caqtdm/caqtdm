@@ -30,14 +30,14 @@
 
 caByte::caByte(QWidget *parent) : QWidget(parent)
 {
-    numRows = 16;
+    numRows = 32;
 
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     grid = new QGridLayout(this);
     grid->setMargin(0);
     grid->setSpacing(0);
     thisStartBit = 0;
-    thisEndBit = 15;
+    thisEndBit = 31;
     thisColorMode=Static;
     setDirection(Down);
     setTrueColor(Qt::blue);
@@ -85,7 +85,7 @@ bool caByte::bitState(long value, int bitNr)
     return ((((int) value >> bitNr) & 1) == 1);
 }
 
-void caByte::setValue(int value)
+void caByte::setValue(long value)
 {
     thisValue = (long)value;
     drawByte(thisValue, thisTrueColor, thisFalseColor);
@@ -164,10 +164,10 @@ void caByte::setStartBit(int const &bit) {
         thisStartBit=0;
         thisEndBit = 0;
         numRows = 1;
-    } else if(numRows > 16) {
+    } else if(numRows > 32) {
         thisStartBit=0;
-        thisEndBit = 15;
-        numRows = 16;
+        thisEndBit = 31;
+        numRows = 32;
     }
     arrangeCells();
 }
@@ -179,10 +179,10 @@ void caByte::setEndBit(int const &bit) {
         thisStartBit=0;
         thisEndBit = 0;
         numRows = 1;
-    } else if(numRows > 16) {
+    } else if(numRows > 32) {
         thisStartBit=0;
-        thisEndBit = 15;
-        numRows = 16;
+        thisEndBit = 31;
+        numRows = 32;
     }
     arrangeCells();
 }

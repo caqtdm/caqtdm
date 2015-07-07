@@ -27,6 +27,13 @@
   if [ -z "$QTDM_BININSTALL" ];   then  export  QTDM_BININSTALL=$EPICSEXTENSIONS/bin/$EPICS_HOST_ARCH;
   fi
   
+  if [ -z "$PYTHONVERSION" ];   then  export  PYTHONVERSION=2.6;
+  fi
+  if [ -z "$PYTHONINCLUDE" ];   then  export  PYTHONINCLUDE=/usr/include/python$PYTHONVERSION;
+  fi
+  if [ -z "$PYTHONLIB" ];   then  export  PYTHONLIB=/usr/lib/;
+  fi 
+  
   if [ -z "$TROLLTECH" ]; then
     echo
     echo ====== do not use psi trolltech directories
@@ -59,6 +66,12 @@ echo EPICSINCLUDE         now defined as ${EPICSINCLUDE}         for locating ep
 echo EPICSLIB             now defined as ${EPICSLIB}             for locating epics libraries
 echo QTBASE               now defined as ${QTBASE}               for building the package locally, pointing to caQtDM_Binaries
 echo QTDM_RPATH           now defined as ${QTDM_RPATH}           for runtime search path 
+echo
+echo for python:
+echo
+echo PYTHONVERSION        now defined as ${PYTHONVERSION}        for locating python
+echo PYTHONINCLUDE        now defined as ${PYTHONINCLUDE}        for locating python include files
+echo PYTHONLIB            now defined as ${PYTHONLIB}            for locating python libraries
 echo
 echo for install:
 echo

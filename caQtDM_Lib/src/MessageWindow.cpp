@@ -40,16 +40,21 @@ MessageWindow* MessageWindow::MsgHandler = NULL;
 
 MessageWindow::MessageWindow(QWidget* parent) : QDockWidget(parent)
 {
-        setFeatures(QDockWidget::NoDockWidgetFeatures);
-        setWindowTitle(tr(WINDOW_TITLE));
-        msgTextEdit.setReadOnly(true);
-        setWidget(&msgTextEdit);
-        MessageWindow::MsgHandler = this;
-        setMinimumSize(600, 150);
-        setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowMinMaxButtonsHint);
-        show();
 
-        move(x(), 0);
+    QFont font("Monospace");
+    font.setStyleHint(QFont::TypeWriter);
+    msgTextEdit.setFont(font);
+
+    setFeatures(QDockWidget::NoDockWidgetFeatures);
+    setWindowTitle(tr(WINDOW_TITLE));
+    msgTextEdit.setReadOnly(true);
+    setWidget(&msgTextEdit);
+    MessageWindow::MsgHandler = this;
+    setMinimumSize(600, 150);
+    setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowMinMaxButtonsHint);
+    show();
+
+    move(x(), 0);
 }
 
 QString MessageWindow::QtMsgToQString(QtMsgType type, const char *msg)

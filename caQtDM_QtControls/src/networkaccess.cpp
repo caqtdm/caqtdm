@@ -30,23 +30,58 @@
 #include <QEventLoop>
 #include "specialFunctions.h"
 #include "networkaccess.h"
+#ifdef MOBILE_ANDROID
+#  include <unistd.h>
+#endif
 
-NetworkAccess::NetworkAccess(QTableWidget *w, const QString &file)
+class Sleep
 {
-        finished = false;
-        manager = new QNetworkAccessManager;
-        thisTable = w;
-        thisFile = file;
+public:
+    static void msleep(unsigned long msecs)
+    {
+        QMutex mutex;
+        mutex.lock();
+        QWaitCondition waitCondition;
+        waitCondition.wait(&mutex, msecs);
+        mutex.unlock();
+    }
+};
+
+NetworkAccess::NetworkAccess()
+{
+    finished = false;
+    manager = new QNetworkAccessManager;
+    errorString = "";
 }
 
-QIODevice* NetworkAccess::requestUrl(const QUrl url)
+bool NetworkAccess::requestUrl(const QUrl url, const QString &file)
 {
-        finished = false;
-        printf("download %s\n", url.toString().toAscii().constData());
-        downloadUrl = url;
-        QNetworkReply* reply = manager->get(QNetworkRequest(url));
-        connect(reply, SIGNAL(finished()), this, SLOT(finishReply()));
-        return reply;
+    finished = false;
+    thisFile = file;
+    //printf("caQtDM -- download %s\n", url.toString().toAscii().constData());
+    downloadUrl = url;
+    QNetworkReply* reply = manager->get(QNetworkRequest(url));
+    connect(reply, SIGNAL(finished()), this, SLOT(finishReply()));
+
+    //wait until download was done (up to 3 seconds)
+    int looped = 0;
+    for(int i=0; i<10; i++) {
+        qApp->processEvents();
+#ifndef MOBILE_ANDROID
+        Sleep::msleep(300);
+#else // not nice, but the above does not work on android now (does not wait)
+        usleep(500000);
+#endif
+        qApp->processEvents();
+        if(downloadFinished()) {
+            return true;
+        }
+        looped++;
+    }
+    if(!downloadFinished()) {
+        return false;
+    }
+    return false;
 }
 
 int NetworkAccess::downloadFinished()
@@ -56,80 +91,73 @@ int NetworkAccess::downloadFinished()
 
 void NetworkAccess::finishReply()
 {
-    qDebug() << "Finished!";
+    //printf("newtwork reply completed! thisFile=%s\n",  thisFile.toAscii().constData());
     QObject* obj = sender();
     QNetworkReply* reply = qobject_cast<QNetworkReply*>(obj);
 
     if(reply->error()) {
-        //QMessageBox::information(0,"finishreply", "network error");
-        qDebug() << "network error:" << parseError(reply->error()) << "for file" << downloadUrl.toString();
+        errorString = tr("%1: %2").arg(parseError(reply->error())).arg(downloadUrl.toString());
         return;
     }
 
     // seems we want to download the file to a file with  the filename "thisFile"
-    if(thisTable == 0 && thisFile.length() > 0) {
+    if(thisFile.length() > 0) {
         Specials specials;
-        QString filePath = specials.stdpathdoc;
+        QString filePath = specials.getStdPath();
+
+#ifndef MOBILE
+        if(!QDir(filePath).exists()) QDir().mkdir(filePath);
+#endif
 
         filePath.append("/");
         filePath.append(thisFile);
 
         QFile file(filePath);
         if(!file.open(QIODevice::ReadWrite)) {
-            qDebug() << "file:" << filePath << "could not be opened for write";
+            errorString = tr("network error: %1 could not be opened for write").arg(filePath);
             return;
         } else {
             file.write(reply->readAll());
             file.close();
         }
 
-    // seems we want to fill the dialog with filenames
-    } else {
-        QString myString(reply->readAll());
-        qDebug() << myString;
-        QStringList list = myString.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
-        qDebug() << list;
-
-        for(int i=0; i< list.count(); i++) {
-            QTableWidgetItem *FileItem = new QTableWidgetItem(list.at(i));
-            FileItem->setFlags(FileItem->flags() ^ Qt::ItemIsEditable);
-            thisTable->insertRow(i);
-            thisTable->setItem(i, 0, FileItem);
-        }
     }
     finished = true;
-    qDebug() << "exit finishreply";
+}
+
+const QString NetworkAccess::lastError()
+{
+    return errorString;
 }
 
 const QString NetworkAccess::parseError(QNetworkReply::NetworkError error)
 {
     QString errstr = "";
-        switch(error)
-        {
-                case QNetworkReply::ConnectionRefusedError:
-                errstr = tr("Connection refused!");
-                break;
-                case QNetworkReply::HostNotFoundError:
-                errstr = tr("Host not found!");
-                break;
-                case QNetworkReply::RemoteHostClosedError:
-                errstr = tr("Remote host closed!");
-                break;
-                case QNetworkReply::TimeoutError:
-                errstr = tr("Timeout!");
-                break;
-                case QNetworkReply::ContentAccessDenied:
-                errstr = tr("Content access denied!");
-                break;
-                case QNetworkReply::ProtocolFailure:
-                errstr = tr("Protocol failure!");
-                break;
-                case QNetworkReply::ContentNotFoundError:
-                errstr = tr("Content not found!");
-                break;
-                default:
-                break;
-        }
-        qDebug() << "error" << errstr;
-        return errstr;
+    switch(error)
+    {
+    case QNetworkReply::ConnectionRefusedError:
+        errstr = tr("ConnectionRefusedError");
+        break;
+    case QNetworkReply::HostNotFoundError:
+        errstr = tr("HostNotFoundError");
+        break;
+    case QNetworkReply::RemoteHostClosedError:
+        errstr = tr("RemoteHostClosedError");
+        break;
+    case QNetworkReply::TimeoutError:
+        errstr = tr("TimeoutError");
+        break;
+    case QNetworkReply::ContentAccessDenied:
+        errstr = tr("ContentAccessDenied");
+        break;
+    case QNetworkReply::ProtocolFailure:
+        errstr = tr("ProtocolFailure");
+        break;
+    case QNetworkReply::ContentNotFoundError:
+        errstr = tr("ContentNotFoundError");
+        break;
+    default:
+        break;
+    }
+    return errstr;
 }

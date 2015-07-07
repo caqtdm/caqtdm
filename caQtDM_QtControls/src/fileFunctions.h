@@ -31,14 +31,21 @@
 #include <QDebug>
 #include <QString>
 #include <QMessageBox>
+#include <qtcontrols_global.h>
 
-class fileFunctions
+class QTCON_EXPORT fileFunctions
 {
 
 public:
    fileFunctions();
    ~fileFunctions() {}
 
-   int checkFileAndDownload(const QString &file, const QString &url = 0);
+   int checkFileAndDownload(const QString &file, const QString &url = QString::null );
+   const QString lastError();
+   const QString lastInfo();
+
+private:
+   QString errorString;
+   QString infoString;
 };   
     

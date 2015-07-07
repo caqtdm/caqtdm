@@ -33,7 +33,10 @@ char* vaPrintf(const char *fmt, ...)
 
     va_start(alist, fmt);
     status = vsprintf(errmsg, fmt, alist);
-    if (status == EOF) return (char*) 0;
+    if (status == EOF) {
+        va_end(alist);
+        return (char*) 0;
+    }
     va_end(alist);
     return errmsg;
 }

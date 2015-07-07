@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.9.2
+CAQTDM_VERSION = V3.9.4
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -12,7 +12,6 @@ unix {
 
 # enable specialized version, wehere files will be downloaded to a local directory (used specially for IOS)
 ios | android {
- CONFIG += NETWORKDOWNLOADSUPPORT
  DEFINES += MOBILE
 }
 ios {
@@ -22,10 +21,6 @@ android {
   DEFINES += MOBILE_ANDROID
 }
 
-NETWORKDOWNLOADSUPPORT {
-DEFINES += NETWORKDOWNLOADSUPPORT
-}
-
 # for some architectures this has to be defined for scan2D
 macx | win32 | ios | android {
 DEFINES += XDR_HACK
@@ -33,13 +28,31 @@ DEFINES += XDR_LE
 CONFIG += XDR_HACK
 }
 
+# we can add python for calculations cacalc & visibility
+# include definitions and libraries are defined in caQtDM_Lib.pri for linux and macos
+CONFIG += PYTHONCALC
+
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
+# 3.9.4
+# caQtDM will now also download from http when CAQTDM_URL_DISPLAY_PATH is defined
+# When starting with the option -httpconfig you will get the configuration screen in order to use network files as in mobile apps.
+# macros can now also be read when specifying -macrodefs filename
+# caMessageButton can be disabled/enabled by a second channel
+# configdialog for http configuration slightly changed
+# Zai added some edl objects
+# added cabytecontroller,for reading and setting individual bits
+# camenu: prevented scrolling of menu with mouse scroll while it interferes with scrollareas
+# changed default direction of caByte in parser.c in order to be compatible with MEDM
+# softpv name can now contain a macro
+# added calc string to info window
 
-# 3.9.2
+# 3.9.2 and 3.9.3
 # severity of a char/string record was not considered and is corrected, Char waveforms longer as 1024 were not displayed in calineedit and is corrected.
 # in edl2ui zais addons were integrated
 # softpv's in include file enabled
+# more colortables for caCamera, caScan2D, caWaterfallPlot
+# caScan2D added
 
 # 3.9.1
 # added a clock allowing to display normal time or reception time of a process variable; alarm handling can be enabled to colorize the clock

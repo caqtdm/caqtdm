@@ -24,6 +24,9 @@ win32 {
                 LIBS += $(CAQTDM_COLLECT)/debug/qtcontrols.lib
         }
         ReleaseBuild {
+                QMAKE_CXXFLAGS += /Z7
+                QMAKE_CFLAGS   += /Z7
+                QMAKE_LFLAGS   += /DEBUG /OPT:REF /OPT:ICF
                 EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
                 DESTDIR = $(CAQTDM_COLLECT)
                 OBJECTS_DIR = release/obj

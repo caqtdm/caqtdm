@@ -59,6 +59,8 @@ public:
     QLineEdit *fileChoice;
     int NumberOfFiles();
     bool isClearConfig();
+    bool isStartButtonClicked();
+    bool isEscapeButtonClicked();
     void exec();
 
 private slots:
@@ -71,7 +73,7 @@ protected:
     virtual void closeEvent(QCloseEvent *event);
 
 private:
-
+    bool eventFilter(QObject *obj, QEvent *event);
     QPushButton *createButton(const QString &text, const char *member);
     void createfilesTable();
 
@@ -83,6 +85,8 @@ private:
     QLabel *fileCountLabel;
     QComboBox *debugComboBox;
     bool ClearConfigButtonClicked;
+    bool StartButtonClicked;
+    bool EscapeButtonClicked;
     QEventLoop loop;
 };
 

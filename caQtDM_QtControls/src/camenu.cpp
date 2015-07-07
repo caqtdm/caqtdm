@@ -189,6 +189,10 @@ bool caMenu::eventFilter(QObject *obj, QEvent *event)
           QVariant v(1 | 32);  // enable flag
           model()->setData(index, v, Qt::UserRole - 1);
         }
+
+    } else if(event->type() == QEvent::Wheel) {
+        event->ignore();
+        return true;
     }
     return QObject::eventFilter(obj, event);
 }

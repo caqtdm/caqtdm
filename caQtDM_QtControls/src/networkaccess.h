@@ -38,10 +38,11 @@ class NetworkAccess:public QObject
     Q_OBJECT
 
 public:
-    NetworkAccess(QTableWidget *w = 0, const QString &file = 0);
+    NetworkAccess();
     ~NetworkAccess(){}
-    QIODevice* requestUrl(const QUrl url);
+    bool requestUrl(const QUrl url, const QString &file = QString::null);
     int downloadFinished();
+    const QString lastError();
 
 signals:
     void networkError(const QString);
@@ -52,11 +53,12 @@ protected slots:
     const QString parseError(QNetworkReply::NetworkError error);
 
 private:
-    QNetworkAccessManager* manager;
+    QNetworkAccessManager *manager;
     QTableWidget *thisTable;
     QString thisFile;
     int finished;
     QUrl downloadUrl;
+    QString errorString;
 };
 
 #endif

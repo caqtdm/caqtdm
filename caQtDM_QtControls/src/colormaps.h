@@ -53,8 +53,8 @@ public:
         double pos;
         for(int i=0; i<256; i++) {
             pos= (double) i/ 255.0;
-            int j = (int) (i+0.5) / 4.0;
-            addColorStop(pos, QColor(255*r[j], 255*g[j], 255*b[j]));
+            int j = (int) ((i+0.5) / 4.0);
+            addColorStop(pos, QColor((int) (255*r[j]), (int) (255*g[j]), (int) (255*b[j])));
         }
     }
 };

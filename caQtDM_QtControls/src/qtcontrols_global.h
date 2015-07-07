@@ -38,5 +38,9 @@
 	#define QTCON_EXPORT
 #endif
 
+#if defined(__OSX__) || defined(__APPLE__)
+  #include <cmath>
+  #define isnan(x) std::isnan(x)
+#endif
 
 #endif //QTCONGLOBAL_H

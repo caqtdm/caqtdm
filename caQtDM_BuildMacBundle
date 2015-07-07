@@ -3,7 +3,10 @@
 source caQtDM_Env
 export PATH=$PATH:${QTHOME}/bin
 
-pwd 
+pwd
+
+
+
 echo
 echo ========== Collect Files for Mac Bundle ============
 echo
@@ -33,7 +36,16 @@ echo ========== macdeployqt caQtDM ============
 echo
 
 
-macdeployqt ./caQtDM_Binaries/caQtDM.app
+macdeployqt ./caQtDM_Binaries/caQtDM.app -executable=./caQtDM_Binaries/caQtDM.app/Contents/MacOS/caQtDM
+
+echo
+echo ========== fix for codesigning  ============
+echo
+
+rm -rf ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/Headers
+rm -rf ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/QtOpenGL_debug
+rm -f ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/*.prl
+
 
 echo
 echo ========== change EPICS LIBS ============
@@ -143,9 +155,14 @@ echo
 
 #cp -R ./caQtDM_Binaries/adl2ui.app ./caQtDM_Binaries/caQtDM.app/Contents/Applications/
 macdeployqt ./caQtDM_Binaries/adl2ui.app
+echo
+echo ========== codesigning  ============
+echo
+echo Identity = ${CAQTDM_MAC_CODESIGN}
 
-#cd caQtDM_Binaries
-#macdeployqt caQtDM.app -dmg
+codesign --verbose=2 --deep --force -s "${CAQTDM_MAC_CODESIGN}" -vvvv ./caQtDM_Binaries/caQtDM.app
+
+
 echo
 echo ========== modifiy dmg image ============
 echo
