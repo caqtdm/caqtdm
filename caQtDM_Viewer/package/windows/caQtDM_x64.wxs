@@ -26,7 +26,7 @@
         <CustomAction Id="caRepeaterKill" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="immediate" Return="ignore" />
         <SetProperty Id="INSTALLDIR_BIN" After="InstallInitialize" Value="[INSTALLDIR]bin\windows-x64\" Sequence="execute" />
         <Property Id="QtExecCmdLine" Value="&quot;taskkill.exe&quot; /f /im caRepeater.exe" />
-        <Property Id="INSTALLDIR_BIN" Value="empty" />
+        <Property Id="INSTALLDIR_BIN" Value="C:\" />
         <WixVariable Id="WixUILicenseRtf" Value="..\gplv3.rtf" />
         <WixVariable Id="WixUIDialogBmp" Value="..\PSI_Background.bmp" />
         <UI />
@@ -164,6 +164,7 @@
                 <Environment Id="QT_PLUGIN_PATH" Action="set" Name="QT_PLUGIN_PATH" Part="last" Permanent="no" Value="[INSTALLDIR]plugins" System="yes" />
                 <Environment Id="PATH" Name="PATH" Part="last" Permanent="no" Action="set" Value="[INSTALLDIR]bin\windows-x64\" System="yes" Separator=";" />
                 <Environment Id="CAQTDM_DISPLAY_PATH" Name="CAQTDM_DISPLAY_PATH" Action="set" Permanent="no" System="yes" Value="[INSTALLDIR]StyleSheet" />
+                <Environment Id="QT_QPA_PLATFORM_PLUGIN_PATH" Name="QT_QPA_PLATFORM_PLUGIN_PATH" Action="set" Permanent="no" System="yes" Value="[INSTALLDIR]plugins\platforms" />
             </Component>
         </Directory>
         <Feature Id="DefaultFeature" Title="Main Feature" Level="1" ConfigurableDirectory="INSTALLDIR">
