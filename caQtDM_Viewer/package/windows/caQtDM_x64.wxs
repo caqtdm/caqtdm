@@ -26,7 +26,7 @@
         <CustomAction Id="caRepeaterKill" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="immediate" Return="ignore" />
         <SetProperty Id="INSTALLDIR_BIN" After="InstallInitialize" Value="[INSTALLDIR]bin\windows-x64\" Sequence="execute" />
         <Property Id="QtExecCmdLine" Value="&quot;taskkill.exe&quot; /f /im caRepeater.exe" />
-        <Property Id="INSTALLDIR_BIN" Value="empty" />
+        <Property Id="INSTALLDIR_BIN" Value="C:\" />
         <WixVariable Id="WixUILicenseRtf" Value="..\gplv3.rtf" />
         <WixVariable Id="WixUIDialogBmp" Value="..\PSI_Background.bmp" />
         <UI />
