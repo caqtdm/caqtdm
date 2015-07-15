@@ -875,6 +875,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
 
                 myParser->Qt_handleString("channel", "string", visPvExpStr.getRaw());
 
+                addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
 
             }
@@ -940,6 +941,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
 
                 myParser->Qt_handleString("channel", "string", visPvExpStr.getRaw());
 
+                addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
 
             }
@@ -998,7 +1000,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_handleString("channel", "string", visPvExpStr.getRaw());
 
 
-
+                addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
 
             }
@@ -1064,6 +1066,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_setColorForeground("", rgb[fgColor].r/256, rgb[fgColor].g/256, rgb[fgColor].b/256, 255);
                 myParser->Qt_setColorBackground("", rgb[bgColor].r/256, rgb[bgColor].g/256, rgb[bgColor].b/256, alpha);
 
+                addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
             }
                 break;
@@ -1621,6 +1624,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_handleString("channel", "string", controlPvExpStr.getRaw());
                 myParser->Qt_handleString("colorMode", "string", "Static");
 
+                addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
             }
 
@@ -1685,6 +1689,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 sprintf(label, "%s / %s", onLabel.getRaw(), offLabel.getRaw());
                 myParser->Qt_handleString("label", "string", label);
 
+                addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
 
             }
