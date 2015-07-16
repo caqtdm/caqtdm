@@ -622,10 +622,10 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 }
                 myParser->writeRectangleDimensions(x, y, w, h);
 
-                myParser->Qt_setColorForeground("", rgb[fgColor].r/256, rgb[fgColor].g/256, rgb[fgColor].b/256, 255);
-                myParser->Qt_setColorBackground("", rgb[bgColor].r/256, rgb[bgColor].g/256, rgb[bgColor].b/256, 255);
+                myParser->Qt_setColorForeground("", rgb[bgColor].r/256, rgb[bgColor].g/256, rgb[bgColor].b/256, 255);
+                myParser->Qt_setColorBackground("", rgb[bgColor].r/256, rgb[bgColor].g/256, rgb[bgColor].b/256, 255); //Background color is not working
                 myParser->Qt_setColorGrid("", rgb[gridColor].r/256, rgb[gridColor].g/256, rgb[gridColor].b/256, 255);
-                myParser->Qt_setColorScale("", rgb[bgColor].r/256, rgb[bgColor].g/256, rgb[bgColor].b/256, 255);
+                myParser->Qt_setColorScale("", rgb[fgColor].r/256, rgb[fgColor].g/256, rgb[fgColor].b/256, 255);
 
                 myParser-> Qt_handleString("Title", "string", graphTitle.getRaw());
                 myParser-> Qt_handleString("TitleX", "string", xLabel.getRaw());
