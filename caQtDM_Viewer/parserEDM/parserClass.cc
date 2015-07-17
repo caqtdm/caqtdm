@@ -1107,8 +1107,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_writeOpenTag("widget", "caByte", widgetName);
                 myParser->writeRectangleDimensions(x, y, w, h);
                 myParser->Qt_handleString("channel", "string", controlPvExpStr.getRaw());
-                myParser->Qt_handleString("startBit", "enum", "0");
-                myParser->Qt_handleString("endBit", "enum", (char*)QString::number(numBits - 1).toStdString().c_str());
+                myParser->Qt_handleString("startBit", "string", "0");
+                myParser->Qt_handleString("endBit", "string", (char*)QString::number(numBits - 1).toStdString().c_str());
                 if (w > h){
                     myParser->Qt_handleString("direction", "enum", "Right");
                 }
