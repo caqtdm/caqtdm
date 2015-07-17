@@ -1099,6 +1099,9 @@ int parserClass::loadFile (myParserEDM *myParser) {
                     printf("%s\n", tag.errMsg() );
                 }
 
+		if(numBits == 0) //Needed because EDM does not write on edl file if numBits = 16
+			numBits = 16;
+
                 // ----------------- write the properties to the ui file
                 sprintf(widgetName, "caByte_%d", widgetNumber++);
                 myParser->Qt_writeOpenTag("widget", "caByte", widgetName);
