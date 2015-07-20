@@ -1879,7 +1879,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_handleString("args", "string", args);
                 myParser->Qt_handleString("removeParent", "string", remove);
                 myParser->Qt_handleString("label", "string", buttonLabel.getRaw());
-                myParser->Qt_handleString("stackingMode", "enum", "Menu");
+                myParser->Qt_handleString("stackingMode", "enum", "Row");
 
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
             }
