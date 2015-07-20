@@ -14,7 +14,7 @@ enum classType {activeLine, activeRectangle, activeCircle, activeArc ,
                 xyGraph, activePip, activeXText, activeXTextDsp, TextUpdate, TextEntry, Byte, // Zai added three items
                 activeMeter, activeBar, activeMessageBox,
                 activeMotifSlider, activeButton, activeMenuButton, activeRadioButton, activeChoiceButton, // Zai added one item
-                activeMessageButton, activeExitButton, relatedDisplay, shellCmdButton,
+                activeMessageButton, activeExitButton, relatedDisplay, shellCmdButton, activeGroup,
                unknown};
 
 struct RGB {
@@ -44,6 +44,16 @@ private:
     char fileName[1000];
     int haveComments;
     unknownTagList unknownTags;
+
+    struct group
+    {
+	int major, minor, release, x, y, w, h;
+	char name[80];
+    };
+ 
+    vector<group> groups;
+    int openGroups;
+
 
     int x,y,w,h,major, minor,release, alignment;
     void *ci;
@@ -216,4 +226,9 @@ private:
 
    // set font based on EDM font string - Zai added
    void setFont(myParserEDM *myParser, char fontTag[80]);
+
+   // verify the actual x and y for widgets inside groups. Necessary because while EDM widgets work with absolute values
+   // inside groups, QT widgets work with relative values inside caFrame
+
+   void adjustGeometry(int *x, int *y);
 };

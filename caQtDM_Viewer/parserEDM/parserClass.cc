@@ -219,7 +219,22 @@ parserClass::parserClass (char *filename)
     a180 = 180;
     useDisplayBg = 1;
     widgetNumber = 0;
+    openGroups = 0;
 }
+
+void parserClass::adjustGeometry(int *x, int *y)
+{
+	int i;
+	if(openGroups > 0)
+	{
+		for(i = 0; i < openGroups; i++)
+		{
+			*x = *x - groups[i].x;
+			*y = *y - groups[i].y;
+		}
+	}
+} 
+
 
 void parserClass::readCommentsAndVersion (FILE *f)
 {
@@ -463,6 +478,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
             else if ( strcmp( objName, "activeExitButtonClass" ) == 0 ) activeClass = activeExitButton;
             else if ( strcmp( objName, "shellCmdClass") == 0) activeClass = shellCmdButton;
             else if ( strcmp( objName, "relatedDisplayClass" ) == 0 )  activeClass = relatedDisplay;
+            else if ( strcmp( objName, "activeGroupClass" ) == 0 )  activeClass = activeGroup;
             else {
                 // Discard all content up to "endObjectProperties"
 
@@ -503,6 +519,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 tag.loadR( "y", &y );
                 tag.loadR( "w", &w );
                 tag.loadR( "h", &h );
+
+
 
                 //tag.loadR( "# Appearance" );
                 tag.loadR( "border", &border, &zero );
@@ -603,6 +621,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 if ( !( stat & 1 ) ) {
                     printf("%s\n", tag.errMsg() );
                 }
+
+		adjustGeometry(&x, &y);
 
                 // do we want a stripplot or xyplot ?
                 bool stripPlot = false;
@@ -737,6 +757,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                     printf("%s\n", tag.errMsg() );
                 }
 
+		adjustGeometry(&x, &y);
+
                 // ----------------- write the properties to the ui file
                 sprintf(widgetName, "caInclude_%d", widgetNumber++);
                 myParser->Qt_writeOpenTag("widget", "caInclude", widgetName);
@@ -784,6 +806,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 if ( !( stat & 1 ) ) {
                     printf("%s\n", tag.errMsg() );
                 }
+
+		adjustGeometry(&x, &y);
 
                 // ----------------- write the properties to the ui file
                 sprintf(widgetName, "caGraphics_%d", widgetNumber++);
@@ -844,6 +868,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 if ( !( stat & 1 ) ) {
                     printf("%s\n", tag.errMsg() );
                 }
+
+		adjustGeometry(&x, &y);
 
                 // ----------------- write the properties to the ui file
                 sprintf(widgetName, "caGraphics_%d", widgetNumber++);
@@ -920,6 +946,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                     printf("%s\n", tag.errMsg() );
                 }
 
+		adjustGeometry(&x, &y);
+
                 if ( numPoints == 0 ) {
                     if ( xSize < ySize ) numPoints = xSize;
                     else numPoints = ySize;
@@ -981,6 +1009,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 if ( !( stat & 1 ) ) {
                     printf("%s\n", tag.errMsg() );
                 }
+
+		adjustGeometry(&x, &y);
 
                 // ----------------- write the properties to the ui file
                 sprintf(widgetName, "caGraphics_%d", widgetNumber++);
@@ -1046,6 +1076,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                     printf("%s\n", tag.errMsg() );
                 }
 
+		adjustGeometry(&x, &y);
+
                 // ----------------- write the properties to the ui file
                 sprintf(widgetName, "caLabel_%d", widgetNumber++);
                 myParser->Qt_writeOpenTag("widget", "caLabel", widgetName);
@@ -1098,6 +1130,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 if ( !( stat & 1 ) ) {
                     printf("%s\n", tag.errMsg() );
                 }
+
+		adjustGeometry(&x, &y);
 
 		if(numBits == 0) //Needed because EDM does not write on edl file if numBits = 16
 			numBits = 16;
@@ -1185,6 +1219,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                     printf("%s\n", tag.errMsg() );
                 }
 
+		adjustGeometry(&x, &y);
+
                 // ----------------- write the properties to the ui file
                 if(activeClass == TextUpdate || (activeClass != TextEntry && /* Zai added */!editable)) {
                     sprintf(widgetName, "caLineEdit_%d", widgetNumber++);
@@ -1266,6 +1302,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                     printf("%s\n", tag.errMsg() );
                 }
 
+		adjustGeometry(&x, &y);
+
                 // ----------------- write the properties to the ui file
                 sprintf(widgetName, "caCircularGauge_%d", widgetNumber++);
                 myParser->Qt_writeOpenTag("widget", "caCircularGauge", widgetName);
@@ -1344,6 +1382,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                     printf("%s\n", tag.errMsg() );
                 }
 
+		adjustGeometry(&x, &y);
+
                 // ----------------- write the properties to the ui file
                 sprintf(widgetName, "caThermoM_%d", widgetNumber++);
                 myParser->Qt_writeOpenTag("widget", "caThermo", widgetName);
@@ -1421,6 +1461,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                     printf("%s\n", tag.errMsg() );
                 }
 
+		adjustGeometry(&x, &y);
+
                 // ----------------- write the properties to the ui file
                 sprintf(widgetName, "caSlider_%d", widgetNumber++);
                 myParser->Qt_writeOpenTag("widget", "caSlider", widgetName);
@@ -1497,6 +1539,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                     printf("%s\n", tag.errMsg() );
                 }
 
+		adjustGeometry(&x, &y);
+
                 // ----------------- write the properties to the ui file
                 sprintf(widgetName, "caShellCommand_%d", widgetNumber++);
                 myParser->Qt_writeOpenTag("widget", "caShellCommand", widgetName);
@@ -1558,6 +1602,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                     printf("%s\n", tag.errMsg() );
                 }
 
+		adjustGeometry(&x, &y);
+
                 // ----------------- write the properties to the ui file
                 sprintf(widgetName, "caChoice_%d", widgetNumber++);
                 myParser->Qt_writeOpenTag("widget", "caChoice", widgetName);
@@ -1616,6 +1662,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 if ( !( stat & 1 ) ) {
                     printf("%s\n", tag.errMsg() );
                 }
+
+		adjustGeometry(&x, &y);
 
                 // ----------------- write the properties to the ui file
                 sprintf(widgetName, "caMenu_%d", widgetNumber++);
@@ -1679,6 +1727,9 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 if ( !( stat & 1 ) ) {
                     printf("%s\n", tag.errMsg() );
                 }
+
+		adjustGeometry(&x, &y);
+
                 // ----------------- write the properties to the ui file
                 sprintf(widgetName, "caMessageButton_%d", widgetNumber++);
                 myParser->Qt_writeOpenTag("widget", "caMessageButton", widgetName);
@@ -1703,6 +1754,49 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 break;
 
                 //***************************************************************************************************************
+            case activeGroup:
+            {
+		tagClass tag;
+                tag.init();
+                tag.loadR( "beginObjectProperties" );
+                tag.loadR( unknownTags );
+                tag.loadR( "major", &major );
+                tag.loadR( "minor", &minor );
+                tag.loadR( "release", &release );
+                tag.loadR( "x", &x );
+                tag.loadR( "y", &y );
+                tag.loadR( "w", &w );
+                tag.loadR( "h", &h );
+
+		tag.loadR( "beginGroup");
+
+                stat = tag.readTags( f, "beginGroup" );
+                if ( !( stat & 1 ) ) {
+                    printf("%s\n", tag.errMsg() );
+                }
+
+		adjustGeometry(&x, &y);
+
+		group g;
+		g.major = major;
+		g.minor = minor;
+		g.release = release;
+		g.x = x;
+		g.y = y;
+		g.w = w;
+		g.h = h;
+
+                // ----------------- write the properties to the ui file
+                sprintf(g.name, "caFrame_%d", widgetNumber++);
+
+                myParser->Qt_writeOpenTag("widget", "caFrame", g.name);
+
+		groups.push_back(g);
+		openGroups ++;
+
+                myParser->writeRectangleDimensions(x, y, w, h);
+            }
+		break;
             case relatedDisplay :
             {
 
@@ -1756,6 +1850,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                     printf("%s\n", tag.errMsg() );
                 }
 
+		adjustGeometry(&x, &y);
+
                 // ----------------- write the properties to the ui file
                 sprintf(widgetName, "caRelatedDisplay_%d", widgetNumber++);
                 myParser->Qt_writeOpenTag("widget", "caRelatedDisplay", widgetName);
@@ -1799,7 +1895,30 @@ int parserClass::loadFile (myParserEDM *myParser) {
 
             gotOne = tag.getName( tagName, 255, f );
 
-        } else {
+        }
+	else if(strcmp( tagName, "endGroup" ) == 0)
+	{
+                tag.loadR( "visPv", &visPvExpStr, emptyStr );
+                tag.loadR( "visInvert", &visInverted, &zero );
+                tag.loadR( "visMin", 39, minVisString, emptyStr );
+                tag.loadR( "visMax", 39, maxVisString, emptyStr );
+
+                stat = tag.readTags( f, "endObjectProperties" );
+
+		addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
+
+                if ( !( stat & 1 ) ) {
+                    printf("error message = %s\n", tag.errMsg() );
+                }
+
+		myParser->Qt_writeCloseTag("widget", groups[openGroups-1].name, 0);
+		openGroups--;
+		groups.pop_back();
+
+		gotOne = tag.getName( tagName, 255, f );
+	} 
+
+	else {
 // Zai            fprintf( stderr, "Unknown tag name: [%s]\n", tagName );
             gotOne = NULL;
             gotOne = tag.getName( tagName, 255, f );    //Zai
