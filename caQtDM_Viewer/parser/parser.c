@@ -1779,6 +1779,7 @@ void *parseMeter(DisplayInfo *displayInfo, FrameOffset * offset)
 }
 
 void *parseByte( DisplayInfo *displayInfo, FrameOffset * offset) {
+    char start[50], end[50];
     char token[MAX_TOKEN_LENGTH];
     char direction[MAX_TOKEN_LENGTH] = "Right";
     char COLORMODE[MAX_TOKEN_LENGTH] = "static";
@@ -1786,9 +1787,8 @@ void *parseByte( DisplayInfo *displayInfo, FrameOffset * offset) {
     int nestingLevel = 0;
     DlObject object={0,0,0,0};
     int visibilityStatic = 2; // top layer
-
-    int sbitFound = False;
-    int ebitFound = False;
+    int startBit = 15;
+    int endBit = 0;
 
     static int number = 0;
     char widgetName[MAX_ASCII];
@@ -1822,12 +1822,12 @@ void *parseByte( DisplayInfo *displayInfo, FrameOffset * offset) {
             } else if(!strcmp(token,"sbit")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                sbitFound = True;
+                startBit = atoi(token);
                 Qt_handleString("startBit", "number", token);
             } else if(!strcmp(token,"ebit")) {
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
-                ebitFound = True;
+                endBit = atoi(token);
                 Qt_handleString("endBit", "number", token);
             }
             break;
@@ -1847,11 +1847,28 @@ void *parseByte( DisplayInfo *displayInfo, FrameOffset * offset) {
 
     Qt_setColorMode("caByte", COLORMODE);
 
-    if(!sbitFound || !ebitFound) {
-        Qt_handleString("startBit", "enum", "0");
-        Qt_handleString("endBit", "enum", "15");
+    // things were a little bit more complication, while bits can be missing and right and up direction are determined by
+    // the start end endbit
+    sprintf(start, "%d", startBit);
+    sprintf(end, "%d", endBit);
+
+    if(!strcmp(direction,"Right") && startBit > endBit)  {
+        int aux = startBit;
+        strcpy(direction, "Left");
+        startBit = endBit;
+        endBit = aux;
+    }
+    if(!strcmp(direction,"Down") && startBit > endBit)  {
+        int aux = startBit;
+        strcpy(direction, "Up");
+        startBit = endBit;
+        endBit = aux;
     }
 
+    sprintf(start, "%d", startBit);
+    sprintf(end, "%d", endBit);
+    Qt_handleString("startBit", "number", start);
+    Qt_handleString("endBit", "number", end);
     Qt_handleString("direction", "enum", direction);
 
     Qt_writeCloseTag("widget", widgetName, visibilityStatic);
