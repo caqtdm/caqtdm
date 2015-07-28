@@ -4,6 +4,7 @@
 #include "utility.h"
 #include "tag_pkg.h"
 #include "myParserEDM.h"
+#include <vector>
 
 #define AWC_MAXTMPLPARAMS 30
 #define AWC_TMPLPARAMSIZE 35
