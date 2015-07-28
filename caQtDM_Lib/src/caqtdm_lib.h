@@ -220,7 +220,6 @@ signals:
     void clicked();
     void Signal_NextWindow();
     void Signal_IosExit();
-    void startSignal();
 
 private:
     QTabWidget* getTabParent(QWidget *w1);

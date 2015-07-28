@@ -408,8 +408,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     benchmarkTimer = 0;
     //speedTimer.start();
 
-    //emit this->startSignal();
-
     // due to crash in connection with the ssplash screen, changed
     // these instructions to the botton of this class
     if(nbIncludes > 0) {
@@ -1934,12 +1932,6 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     }
 #endif
 
-    // when we defined already the same software channel, then get back the rate that was specified
-    if(mutexKnobData->getSoftPV(pv, &indx, thisW)) {
-        knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
-        if(kPtr != (knobData*) 0) rate = kPtr->edata.repRate;
-    }
-
     // is there a json string ?
     int pos = trimmedPV.indexOf("{");
     if(pos != -1) {
@@ -1973,16 +1965,24 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
 
     *pvRep = newpv;
 
+    cpylen = qMin(newpv.length(), MAXPVLEN-1);
+    strncpy(kData->pv, (char*) newpv.toAscii().constData(), cpylen);
+    kData->pv[cpylen] = '\0';
+
+    // when we defined already the same cacalc software channel, then do nothing
+    if(mutexKnobData->getSoftPV(kData->pv, &indx, thisW)) {
+        //qDebug() << "software channel already defined" << w;
+        knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
+        if(kPtr != (knobData*) 0) rate = kPtr->edata.repRate;
+        if(caCalc *calc = qobject_cast<caCalc *>(w)) return kPtr->index;
+    }
+
     // set pvname as tooltip
     QString tooltip;
     tooltip.append(ToolTipPrefix);
     tooltip.append(newpv);
     tooltip.append(ToolTipPostfix);
     w->setToolTip(tooltip);
-
-    cpylen = qMin(newpv.length(), MAXPVLEN-1);
-    strncpy(kData->pv, (char*) newpv.toAscii().constData(), cpylen);
-    kData->pv[cpylen] = '\0';
 
     memcpy(kData->specData, specData, sizeof(int) * NBSPECS);
     kData->thisW = (void*) thisW;
