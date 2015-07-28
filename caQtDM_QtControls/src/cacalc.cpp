@@ -37,6 +37,9 @@ caCalc::caCalc( QWidget *parent ) :  ESimpleLabel(parent)
     keepText="";
 
     setForeAndBackground(Qt::black, Qt::lightGray);
+
+    thisEventSignal = Never;
+    eventFired = false;
 }
 
 void caCalc::setValue(double value)
@@ -44,6 +47,15 @@ void caCalc::setValue(double value)
     QString strng;
     strng.setNum(value);
     setText(strng);
+
+    // emit signal when requested
+    if(thisEventSignal == onFirstChange) {
+        if(!eventFired) emit emitSignal();
+        eventFired = true;
+    } else if(thisEventSignal == onAnyChange) {
+        printf("emitsignal\n");
+        emit emitSignal();
+    }
 }
 
 void caCalc::setText(const QString &txt)

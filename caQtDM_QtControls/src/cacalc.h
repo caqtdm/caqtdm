@@ -44,8 +44,9 @@ class  QTCON_EXPORT caCalc : public  ESimpleLabel
     Q_PROPERTY(QString channelD READ getChannelD WRITE setChannelD)
     Q_PROPERTY(double initialValue READ getInitialValue WRITE setInitialValue)
 
-public:
+#include "addevent.h"
 
+public:
 
     QString getVariable() const {return thisVariable;}
     void setVariable(QString const &var) {thisVariable = var;}
@@ -74,18 +75,7 @@ public:
     void setText(const QString &txt);
     void setForeAndBackground(QColor fg, QColor bg);
 
-
-public slots:
-
-
-signals:
-
-
-protected:
-
-
 private:
-
     QString thisChannelA, thisChannelB, thisChannelC, thisChannelD, thisVariable;
     QString thisCalc;
     QString keepText;
