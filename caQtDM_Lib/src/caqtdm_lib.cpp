@@ -2901,6 +2901,9 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     widget->setText(str);
                 } else if (data.edata.fieldtype == caENUM) {
                     widget->setText("???");
+                } else if(data.edata.fieldtype == caCHAR) {
+                    QString str= QString::number((int) data.edata.ivalue);
+                    widget->setText(str);
                 } else {
                     if(data.edata.valueCount == 1) {
                         widget->setText(String);
@@ -4747,6 +4750,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                     info.append("<br>Value: ");
                     switch (kPtr->edata.fieldtype) {
                     case caCHAR:
+                        sprintf(asc,"%ld (0x%lx)", kPtr->edata.ivalue, kPtr->edata.ivalue);
+                        info.append(asc);
                         break;
                     case caSTRING:
                         if(kPtr->edata.valueCount <= 1) {
