@@ -26,9 +26,7 @@
 
 #include <QtGui>
 #include <QApplication>
-#include <math.h>
 #include "cascan2d.h"
-#include "cacamera.h"
 
 caScan2D::caScan2D(QWidget *parent) : QWidget(parent)
 {
@@ -49,7 +47,6 @@ caScan2D::caScan2D(QWidget *parent) : QWidget(parent)
     savedSize = 0;
     savedWidth = 0;
     savedHeight = 0;
-    frameCount = 0;
     selectionStarted=false;
 
     savedData = (float*) 0;
@@ -159,7 +156,6 @@ void caScan2D::timerEvent(QTimerEvent *)
 {
     QString text= "%1 U/s";
     text = text.arg(UpdatesPerSecond);
-    //if(nbUpdatesText != (caLabel*) 0) nbUpdatesText->setText(text);
     UpdatesPerSecond = 0;
 }
 
@@ -279,8 +275,8 @@ bool caScan2D::eventFilter(QObject *obj, QEvent *event)
 
         Coordinates(Xpos, Ypos, Xnew, Ynew, Xmax, Ymax);
 
-        float *ptr = (float*)  savedData;
-        int index = (int) ((int) Ynew * savedWidth + (int) Xnew);
+        float *ptr = savedData;
+        int index = ((int) Ynew * savedWidth + (int) Xnew);
         if((Xnew >=0) && (Ynew >=0)  && (Xnew < Xmax) && (Ynew < Ymax) && (index < savedSize)) {
             Zvalue=ptr[index];
         } else {
@@ -394,7 +390,6 @@ void caScan2D::setup()
 
         zoomSlider = new QSlider;
         zoomSlider->setMinimum(0);
-        //zoomSlider->setMaximum(90); // do not exceed 6*
         zoomSlider->setMaximum(120); // do not exceed 6*
         zoomSlider->setValue(52);
         zoomSlider->setTickPosition(QSlider::NoTicks);
@@ -605,7 +600,7 @@ void caScan2D::setYNEWDATA(int ynewdata)
 
     // I get two calls per monitor event for some reason
     if (m_ynewdata == ynewdata) {
-        //printf("caScan2D::setYNEWDATA for pv %s %d (ignored)\n", getPV_Data().toAscii().constData(), ynewdata);
+        //printf("caScan2D::setYNEWDATA for pv %s %d (ignored)\n", getPV_Data().toLatin1().constData(), ynewdata);
         return;
     }
     m_ynewdata = ynewdata;
@@ -613,9 +608,9 @@ void caScan2D::setYNEWDATA(int ynewdata)
     if (!m_widthDefined || !m_heightDefined)
         return;
 
-    //printf("caScan2D::setYNEWDATA for pv %s %d\n", getPV_Data().toAscii().constData(), ynewdata);
+    //printf("caScan2D::setYNEWDATA for pv %s %d\n", getPV_Data().toLatin1().constData(), ynewdata);
     if (m_ynewdata == 0) {
-        for (i=0; i<m_width*m_height; i++) xdata[i] = 0.;
+        for (i=0; i<m_width*m_height; i++) xdata[i] = (float) 0.0;
         for (i=0; i<m_height; i++) haveY[i] = 0;
     } else {
         // Get all data from file
@@ -684,7 +679,7 @@ void caScan2D::resizeEvent(QResizeEvent *e)
         if(!thisFitToSize) {
             imageW->setMinimumSize((int) (m_width * scaleFactor), (int) (m_height * scaleFactor));
             showImage((int) (m_width * scaleFactor), (int) (m_height * scaleFactor));
-        } else {
+        } else if((zoomWidget != (QWidget*) 0) && (valuesWidget != (QWidget*) 0)) {
             double Xcorr = (double) (e->size().width() - zoomWidget->width()-4) / (double) savedWidth;
             double Ycorr = (double) (e->size().height()- valuesWidget->height()-4) / (double) savedHeight;
             double scale = qMin(Xcorr, Ycorr); // aspect ratio
@@ -708,7 +703,7 @@ void caScan2D::refreshImage()
             imageW->setMinimumSize((int) (m_width * scaleFactor), (int) (m_height * scaleFactor));
             showImage((int) (m_width * scaleFactor), (int) (m_height * scaleFactor));
         } else {
-            showImage((int) (m_width), (int) (m_height));
+            showImage(m_width, m_height);
         }
     }
 }
@@ -803,22 +798,16 @@ void caScan2D::showImage(int numXDataValues, int numYDataValues)
     long int i;
     QSize resultSize;
     uint Max[2], Min[2];
-    static uint minvalue, maxvalue;
-    float dataMin=1.e9, dataMax=-1.e9;
-    float dataOffset, dataFactor;
+    static uint minvalue=0, maxvalue=65535;
+    float dataMin=(float) 1.e9, dataMax= (float) -1.e9;
+    float dataFactor;
     int numDataValues = numXDataValues * numYDataValues;
 
     if(!m_widthDefined) return;
     if(!m_heightDefined) return;
-    // We don't actually use this now
-    //if(!m_xcptDefined) return;
-    //if(!m_ycptDefined) return;
-    //if(!m_xnewdataDefined) return;
-    //if(!m_ynewdataDefined) return;
 
-
-    resultSize.setWidth((int) m_width);
-    resultSize.setHeight((int) m_height);
+    resultSize.setWidth(m_width);
+    resultSize.setHeight(m_height);
 
     // first time get image
     if(m_init || numDataValues != savedSize || m_width != savedWidth || m_height != savedHeight) {
@@ -830,10 +819,6 @@ void caScan2D::showImage(int numXDataValues, int numYDataValues)
         m_init = false;
         minvalue = 0;
         maxvalue = 65535;
-
-        //for (i=0; i<YMAXPTS; i++) haveY[i] = 0;
-        //for (i=0; i<YMAXPTS*XMAXPTS; i++) xdata[i] = 0.;
-        //mdaReader_RegisterPV(thisPV_Data);
         ftime(&timeRef);
     }
 
@@ -844,7 +829,7 @@ void caScan2D::showImage(int numXDataValues, int numYDataValues)
         if (xdata[i] < dataMin) dataMin = xdata[i];
         if (xdata[i] > dataMax) dataMax = xdata[i];
     }
-    dataOffset = dataMin;
+
     dataFactor = (maxvalue - minvalue)/(dataMax-dataMin);
     i = 0;
 
@@ -883,7 +868,7 @@ void caScan2D::showImage(int numXDataValues, int numYDataValues)
     updateImage(*image, valuesPresent, values, scaleFactor);
 }
 
-void caScan2D::setAccessW(int access)
+void caScan2D::setAccessW(bool access)
 {
     _AccessW = access;
 }

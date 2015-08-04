@@ -51,8 +51,8 @@ QString searchFile::findFile()
     if(!fi.exists()) {
        for(int i=0; i< paths.count(); i++) {
            FileName = paths[i] + "/" + _FileName;
-           QFileInfo fi(FileName);
-           if(fi.exists()) {
+           QFileInfo fin(FileName);
+           if(fin.exists()) {
              fileFound = true;
              break;
            }
@@ -65,7 +65,7 @@ QString searchFile::findFile()
 
     // return filename or null
     if(fileFound) {
-        //printf("searchFile -- %s\n", FileName.toAscii().constData());
+        //printf("searchFile -- %s\n", FileName.toLatin1().constData());
         return FileName;
     }
     else return NULL;

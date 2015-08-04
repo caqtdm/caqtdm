@@ -44,7 +44,6 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     savedSize = 0;
     savedWidth = 0;
     savedHeight = 0;
-    frameCount = 0;
     selectionStarted=false;
 
     savedData = (char*) 0;
@@ -279,7 +278,7 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
 
             case 1:  {  // monochrome 1 bpp  (Damir camera)
                 uchar *ptr = (uchar*)  savedData;
-                int index = (int) ((int) Ynew * savedWidth + (int) Xnew);
+                int index = ((int) Ynew * savedWidth + (int) Xnew);
                 if((Xnew >=0) && (Ynew >=0)  && (Xnew < Xmax) && (Ynew < Ymax) && (index < savedSize)) {
                     Zvalue=ptr[index];
 
@@ -291,7 +290,7 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
 
             case 2: {   // monochrome 2 bpp  (Damir camera)
                 uchar *ptr = (uchar*)  savedData;
-                int index = (int) ((int) Ynew * savedWidth * 2 + 2 * (int) Xnew);
+                int index = ((int) Ynew * savedWidth * 2 + 2 * (int) Xnew);
                 if((Xnew >=0) && (Ynew >=0)  &&  (Xnew < Xmax) && (Ynew < Ymax) && (index < savedSize)) {
                     if(thisColormap == grey) Zvalue=ptr[index];
                     else Zvalue=ptr[index] * 256 + ptr[index+1];
@@ -304,10 +303,10 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
 
             case 3: {   // monochrome 2 bpp, but used only 12 bits  (Helge cameras)
                 QSize resultSize;
-                resultSize.setWidth((int) savedWidth);
-                resultSize.setHeight((int) savedHeight);
+                resultSize.setWidth(savedWidth);
+                resultSize.setHeight(savedHeight);
                 ushort *ptr = (ushort*) savedData;
-                int index = (int) ((int) Ynew * savedWidth + (int) Xnew);
+                int index = ((int) Ynew * savedWidth + (int) Xnew);
                 if((Xnew >=0) && (Ynew >=0) &&  (Xnew < Xmax) && (Ynew < Ymax) && ((index+resultSize.width())*2 < savedSize))
                     Zvalue = ptr[index];
                 else
@@ -330,10 +329,10 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
             case 3: // 3 bpp, each byte with r,g,b
             {
                 QSize resultSize;
-                resultSize.setWidth((int) savedWidth);
-                resultSize.setHeight((int) savedHeight);
+                resultSize.setWidth(savedWidth);
+                resultSize.setHeight(savedHeight);
                 uchar *ptr = (uchar*) savedData;
-                int index = (int) ((int) Ynew * savedWidth*3 + 3 * (int) Xnew);
+                int index = ((int) Ynew * savedWidth*3 + 3 * (int) Xnew);
                 if((Xnew >=0) && (Ynew >=0) &&  (Xnew < Xmax) && (Ynew < Ymax) && ((index+2) < savedSize)) {
                     if(thisColormap != grey)
                         Zvalue =(int) (2.2 * ( 0.2989 * ptr[index] +  0.5870 * ptr[index+1] + 0.1140 * ptr[index+2]));
@@ -677,7 +676,7 @@ void caCamera::resizeEvent(QResizeEvent *e)
     if(m_widthDefined && m_heightDefined) {
         if(!thisFitToSize) {
             imageW->setMinimumSize((int) (m_width * scaleFactor), (int) (m_height * scaleFactor));
-        } else {
+        } else if((zoomWidget != (QWidget*) 0) && (valuesWidget != (QWidget*) 0)) {
             double Xcorr = (double) (e->size().width() - zoomWidget->width()-4) / (double) savedWidth;
             double Ycorr = (double) (e->size().height()- valuesWidget->height()-4) / (double) savedHeight;
             double scale = qMin(Xcorr, Ycorr); // aspect ratio
@@ -764,8 +763,8 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
     if(!m_heightDefined) return (QImage *) 0;
     if(!m_codeDefined) return (QImage *) 0;
 
-    resultSize.setWidth((int) m_width);
-    resultSize.setHeight((int) m_height);
+    resultSize.setWidth(m_width);
+    resultSize.setHeight(m_height);
 
     // first time get image
     if(m_init || datasize != savedSize || m_width != savedWidth || m_height != savedHeight) {
@@ -1038,7 +1037,7 @@ void caCamera::showImage(int datasize, char *data)
 }
 
 
-void caCamera::setAccessW(int access)
+void caCamera::setAccessW(bool access)
 {
     _AccessW = access;
 }

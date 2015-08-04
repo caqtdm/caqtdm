@@ -277,14 +277,14 @@ void EAbstractGauge::configure()
 	longestLabelIndex = -1;
 	for (int i = 0; i < m_numMajorTicks; i++)
 	{
-		double representedValue = val;
+        double representedValue;
 #if defined(_MSC_VER)||defined(__APPLE__)||defined(__ANDROID__)
 		d_logarithmicScale ? representedValue  = pow(10,val) : representedValue  = val;
 #else
 		d_logarithmicScale ? representedValue  = exp10(val) : representedValue  = val;
 #endif
 
-		EngString engString(QString().sprintf(m_valueFormat.toAscii(), representedValue), m_valueFormat, representedValue);
+        EngString engString(QString().sprintf(m_valueFormat.toLatin1(), representedValue), m_valueFormat, representedValue);
 // 		QString s = QString::number(representedValue);
 		if ((longestLabelIndex == -1) || engString.length() > labels[longestLabelIndex].length())
 			longestLabelIndex = i;

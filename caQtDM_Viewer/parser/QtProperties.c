@@ -293,7 +293,7 @@ void Qt_setMinimumLimitSource(char *widget, int pen, char *token)
 
 void Qt_setMaximumLimitSource(char *widget, int pen, char *token)
 {
-    char strng[30];
+    char strng[30] = {'\0'};
 
     if(strstr(widget, "Gauge") != (char*) 0) return;
 

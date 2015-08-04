@@ -50,7 +50,6 @@
 
 #define CA_PRIORITY 50          /* CA priority */
 #define CA_TIMEOUT   2          /* CA timeout 2.0 seconds */
-#define Min(x,y)   (((x) < (y)) ? (x) : (y))
 
 #include "knobDefines.h"
 
@@ -228,16 +227,13 @@ static void dataCallback(struct event_handler_args args)
             dataSize = dbr_size_n(args.type, args.count) + sizeof(char);
             if(dataSize != kData.edata.dataSize) {
                 free(kData.edata.dataB);
-                kData.edata.dataB = (void*) malloc(dataSize);
+                kData.edata.dataB = (void*) malloc((size_t) dataSize);
                 kData.edata.dataSize = dataSize;
             }
 
             ptr = (char*) kData.edata.dataB;
             memcpy(ptr, val_ptr, args.count *sizeof(char));
             ptr[args.count] = '\0';
-
-            //kData.edata.valueCount =  args.count;
-            //kData.edata.actTime = now;
 
             AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
 
@@ -262,7 +258,7 @@ static void dataCallback(struct event_handler_args args)
             dataSize = dbr_size_n(args.type, args.count) + (args.count+1) * sizeof(char);
             if(dataSize != kData.edata.dataSize) {
                 free(kData.edata.dataB);
-                kData.edata.dataB = (void*) malloc(dataSize);
+                kData.edata.dataB = (void*) malloc((size_t) dataSize);
                 kData.edata.dataSize = dataSize;
             }
 
@@ -271,7 +267,7 @@ static void dataCallback(struct event_handler_args args)
             len = 0;
             strcpy(ptr, myLimitedString(val_ptr[0]));
             for (i = 1; i < args.count; i++) {
-                len = len+strlen(myLimitedString(val_ptr[i-1]));
+                len = len+ (int) strlen(myLimitedString(val_ptr[i-1]));
                 strcat(&ptr[len++], ";");
                 strcat(&ptr[len], myLimitedString(val_ptr[i]));
             }
@@ -311,7 +307,7 @@ static void dataCallback(struct event_handler_args args)
                 if((int) (args.count * sizeof(int16_t)) != kData.edata.dataSize) {
                     free(kData.edata.dataB);
                     kData.edata.dataB = (void*) malloc(args.count * sizeof(int16_t));
-                    kData.edata.dataSize = args.count * sizeof(int16_t);
+                    kData.edata.dataSize = args.count * (int) sizeof(int16_t);
                 }
                 memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(int16_t));
             }
@@ -336,7 +332,7 @@ static void dataCallback(struct event_handler_args args)
                 if((int) (args.count * sizeof(int32_t)) != kData.edata.dataSize) {
                     free(kData.edata.dataB);
                     kData.edata.dataB = (void*) malloc(args.count * sizeof(int32_t));
-                    kData.edata.dataSize = args.count * sizeof(int32_t);
+                    kData.edata.dataSize = args.count * (int) sizeof(int32_t);
                 }
                 memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(int32_t));
             }
@@ -359,7 +355,7 @@ static void dataCallback(struct event_handler_args args)
                 if((int) (args.count * sizeof(float)) != kData.edata.dataSize) {
                     free(kData.edata.dataB);
                     kData.edata.dataB = (void*) malloc(args.count * sizeof(float));
-                    kData.edata.dataSize = args.count * sizeof(float);
+                    kData.edata.dataSize = args.count * (int) sizeof(float);
                 }
                 memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(float));
             }
@@ -383,7 +379,7 @@ static void dataCallback(struct event_handler_args args)
                     free(kData.edata.dataB);
                     kData.edata.dataB = (void*) malloc(args.count * sizeof(double));
                     memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(double));
-                    kData.edata.dataSize = args.count * sizeof(double);
+                    kData.edata.dataSize = args.count * (int) sizeof(double);
                 }
                 memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(double));
             }
@@ -391,6 +387,9 @@ static void dataCallback(struct event_handler_args args)
 
         }
         break;
+
+            default:
+                C_postMsgEvent(messageWindow, 1, vaPrintf("unhandled epics type (%d) in datacallback\n", ca_field_type(args.chid)));
 
         } // end switch
 
@@ -471,7 +470,7 @@ static void displayCallback(struct event_handler_args args) {
                 dataSize = dbr_size_n(args.type, args.count) + stsF->no_str * sizeof(char);
                 if(dataSize != kData.edata.dataSize) {
                     free(kData.edata.dataB);
-                    kData.edata.dataB = (void*) malloc(dataSize);
+                    kData.edata.dataB = (void*) malloc((size_t) dataSize);
                     kData.edata.dataSize = dataSize;
                 }
 
@@ -480,7 +479,7 @@ static void displayCallback(struct event_handler_args args) {
                 len = 0;
                 strcpy(ptr, myLimitedString(stsF->strs[0]));
                 for (i = 1; i < stsF->no_str; i++) {
-                    len = len+strlen(myLimitedString(stsF->strs[i-1]));
+                    len = len + (int) strlen(myLimitedString(stsF->strs[i-1]));
                     strcat(&ptr[len++], ";");
                     strcat(&ptr[len], myLimitedString(stsF->strs[i]));
                 }
@@ -490,7 +489,7 @@ static void displayCallback(struct event_handler_args args) {
                 dataSize = 40;
                 if(dataSize != kData.edata.dataSize) {
                     free(kData.edata.dataB);
-                    kData.edata.dataB = (void*) malloc(dataSize);
+                    kData.edata.dataB = (void*) malloc((size_t) dataSize);
                     kData.edata.dataSize = dataSize;
                 }
                 ptr = (char*) kData.edata.dataB;
@@ -555,6 +554,9 @@ static void displayCallback(struct event_handler_args args) {
             kData.edata.precision = stsF->precision;
         }
         break;
+
+            default:
+                C_postMsgEvent(messageWindow, 1, vaPrintf("unhandled epics type (d) in displaycallback %d\n", ca_field_type(args.chid)));
 
         } // end switch
 
@@ -1016,6 +1018,9 @@ int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *obje
         }
         break;
 
+        default:
+            C_postMsgEvent(messageWindow, 1, vaPrintf("unhandled epics type (%d) in epicssetvalue\n", chType));
+
     }
 
     status = ca_pend_io(CA_TIMEOUT);
@@ -1058,6 +1063,9 @@ int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *obje
 
     case DBF_CHAR:
         break;
+
+        default:
+            C_postMsgEvent(messageWindow, 1, vaPrintf("unhandled epics type (%d) in epicssetvalue\n", chType));
     }
 
     return ECA_NORMAL;
@@ -1097,40 +1105,43 @@ int EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t
     switch (chType) {
 
     case DBF_DOUBLE:
-        status = ca_array_put (DBR_DOUBLE, nelm, ch, ddata);
+        status = ca_array_put (DBR_DOUBLE, (unsigned long) nelm, ch, ddata);
         if (status != ECA_NORMAL) {
             C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
             return status;
         }
         break;
     case DBF_FLOAT:
-        status = ca_array_put (DBR_FLOAT, nelm, ch, fdata);
+        status = ca_array_put (DBR_FLOAT, (unsigned long) nelm, ch, fdata);
         if (status != ECA_NORMAL) {
             C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
             return status;
         }
         break;
     case DBF_INT:
-        status = ca_array_put (DBR_INT, nelm, ch, data16);
+        status = ca_array_put (DBR_INT, (unsigned long) nelm, ch, data16);
         if (status != ECA_NORMAL) {
             C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
             return status;
         }
         break;
     case DBF_LONG:
-        status = ca_array_put (DBR_LONG, nelm, ch, data32);
+        status = ca_array_put (DBR_LONG, (unsigned long) nelm, ch, data32);
         if (status != ECA_NORMAL) {
             C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
             return status;
         }
         break;
     case DBF_CHAR:
-        status = ca_array_put (DBR_CHAR, nelm, ch, sdata);
+        status = ca_array_put (DBR_CHAR, (unsigned long) nelm, ch, sdata);
         if (status != ECA_NORMAL) {
             C_postMsgEvent(messageWindow, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
             return status;
         }
         break;
+
+        default:
+            C_postMsgEvent(messageWindow, 1, vaPrintf("unhandled epics type (%d) in epicssetwave\n", chType));
     }
 
     status = ca_pend_io(CA_TIMEOUT);
@@ -1172,11 +1183,6 @@ void ExitHandler(int sig)
 
 int EpicsGetTimeStamp(char *pv, char *timestamp)
 {
-    /*
-    const double EPICS2UNIX_EPOCH = 631152000.0;
-    struct tm * timeinfo;
-    time_t time;
-    */
     chid     ch;
     int status;
     struct dbr_time_string ctrlS;
@@ -1212,12 +1218,49 @@ int EpicsGetTimeStamp(char *pv, char *timestamp)
     epicsTimeToStrftime(tsString, 32, "%b %d, %Y %H:%M:%S.%09f", &ctrlS.stamp);
     sprintf(timestamp, "TimeStamp: %s\n", tsString);
 
-    // calculate unix time from epics timestamp
-    /*
-   time = (EPICS2UNIX_EPOCH + (double) (ctrlS.stamp.secPastEpoch) + 1.0e-9 * (double) ctrlS.stamp.nsec);
-   timeinfo = localtime (&time);
-    printf ("Current local time and date: %s", asctime(timeinfo));
-    */
-    return ECA_NORMAL;
+    ca_clear_channel(ch);
 
+    return ECA_NORMAL;
 }
+
+int EpicsGetDescription(char *pv, char *description)
+{
+    chid     ch;
+    int status;
+    pv_desc pvDesc = {'\0'};
+    dbr_string_t value;
+
+    PrepareDeviceIO();
+
+    if(strlen(pv) < 1)  {
+        C_postMsgEvent(messageWindow, 1, vaPrintf("pv with length=0 (not translated for macro?)\n"));
+        return !ECA_NORMAL;
+    }
+
+    sprintf(pvDesc, "%s.DESC", pv);
+
+    // get description
+    status = ca_create_channel(pvDesc, NULL, 0, CA_PRIORITY, &ch);
+    if (ch == (chid) 0) return !ECA_NORMAL;
+
+    status = ca_pend_io(CA_TIMEOUT/2);
+
+    if (ca_state(ch) != cs_conn) {
+        C_postMsgEvent(messageWindow, 1, vaPrintf("pv (%s) is not connected\n", pvDesc));
+        return status;
+    }
+
+    status = ca_get(DBR_STRING, ch, &value);
+    if (status != ECA_NORMAL) {
+        C_postMsgEvent(messageWindow, 1, vaPrintf("get pv (%s) %s\n", pv, ca_message (status)));
+        return status;
+    }
+
+    status = ca_pend_io(CA_TIMEOUT/2);
+    strcpy(description, value);
+
+    ca_clear_channel(ch);
+
+    return ECA_NORMAL;
+}
+

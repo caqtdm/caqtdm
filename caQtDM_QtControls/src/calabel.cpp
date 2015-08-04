@@ -25,7 +25,6 @@
 
 #include "calabel.h"
 #include "alarmdefs.h"
-#include <QtDebug>
 #include <QEvent>
 
 caLabel::caLabel(QWidget *parent) : ESimpleLabel(parent)

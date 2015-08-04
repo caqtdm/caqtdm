@@ -59,7 +59,7 @@ class QTCON_EXPORT caLineEdit : public QLineEdit, public FontScalingWidget
     Q_PROPERTY(double minValue READ getMinValue WRITE setMinValue)
 
     Q_PROPERTY(bool fontScaleEnabled READ fontScaleEnabled DESIGNABLE false)
-    Q_PROPERTY(ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleMode)
+    Q_PROPERTY(ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleModeL)
     Q_PROPERTY(double fontScaleFactor READ fontScaleFactor WRITE setFontScaleFactor DESIGNABLE false)
 
     Q_PROPERTY(bool unitsEnabled READ getUnitsEnabled WRITE setUnitsEnabled)
@@ -122,15 +122,12 @@ public:
                       hexadecimal, octal, string, sexagesimal, sexagesimal_hms, sexagesimal_dms};
 
     enum ScaleMode { None, Height, WidthAndHeight};
-    virtual void setText(const QString&);
+    void setTextLine(const QString&);
     void forceText(const QString&);
     QString text() const { return QLineEdit::text(); }
 
-    void setFontScaleMode(ScaleMode m) { FontScalingWidget::setScaleMode((int) m);}
+    void setFontScaleModeL(ScaleMode m) { FontScalingWidget::setScaleMode((int) m);}
     ScaleMode fontScaleMode() { return (ScaleMode) FontScalingWidget::scaleMode(); }
-
-    bool rescaleFontOnTextChanged() { return d_rescaleFontOnTextChanged; }
-    void setRescaleFontOnTextChanged(bool en) { d_rescaleFontOnTextChanged = en; }
 
     void setFormat(int prec);
     void setValue(double value, const QString& units);
@@ -171,7 +168,7 @@ private:
     SourceMode thisPrecMode;
     SourceMode thisLimitsMode;
 
-    int thisUnitMode;
+    bool thisUnitMode;
     QString keepText;
     char thisFormat[20];
     char thisFormatC[20];
@@ -183,7 +180,7 @@ private:
     bool isShown;
     bool isValue;
 
-    bool thisFramePresent, oldFramepresent;
+    bool thisFramePresent;
     QColor thisFrameColor, oldFrameColor;
     int thisFrameLineWidth, oldFrameLineWidth;
     alertHandling thisAlarmHandling;

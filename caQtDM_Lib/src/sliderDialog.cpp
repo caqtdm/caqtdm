@@ -28,15 +28,13 @@
 
 sliderDialog::sliderDialog(caSlider *w, MutexKnobData *data, const QString &title, QWidget *parent) : QWidget(parent)
 {
+    Q_UNUSED(data);
     QString text;
     int showMax = false;
     int thisWidth = 650;
     int thisHeight = 200;
 
     slider = w;
-    thisParent = parent;
-
-    monData = data;
 
     QGridLayout *Layout = new QGridLayout;
     Qt::WindowFlags flags = Qt::Dialog;

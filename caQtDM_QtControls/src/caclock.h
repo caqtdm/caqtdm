@@ -26,7 +26,6 @@
 #ifndef CACLOCK_H
 #define CACLOCK_H
 
-#include <QtDebug>
 #include <QEvent>
 #include <QMouseEvent>
 #include <QTimer>

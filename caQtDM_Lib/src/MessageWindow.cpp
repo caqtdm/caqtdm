@@ -24,10 +24,9 @@
  */
 
 #include "MessageWindow.h"
-#include <QMessageBox>
 #include <QCoreApplication>
 #include <QMutexLocker>
-#include <QDebug>
+#include <stdio.h>
 #include <time.h>
 #include <sys/timeb.h>
 
@@ -90,7 +89,7 @@ void MessageWindow::AppendMsgWrapper(QtMsgType type, char* msg)
         if (MessageWindow::MsgHandler != NULL)
                 return MessageWindow::MsgHandler->postMsgEvent(type, msg);
         else
-                fprintf(stderr, "%s\n", MessageWindow::QtMsgToQString(type, msg).toAscii().constData());
+                fprintf(stderr, "%s\n", MessageWindow::QtMsgToQString(type, msg).toLatin1().constData());
 }
 
 void MessageWindow::customEvent(QEvent* event)

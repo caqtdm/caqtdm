@@ -249,7 +249,7 @@ QString caMeter::setLabel(double value, const QString& units)
     }
     if(thisUnitMode) {
         strcat(asc, " ");
-        strcat(asc, units.toAscii().constData());
+        strcat(asc, units.toLatin1().constData());
     }
 
     label = QString::fromAscii(asc);
@@ -296,7 +296,7 @@ void caMeter::resizeEvent(QResizeEvent *e)
 
     int Width = width();
     QFont f = font();
-    float size = Width/25.0;
+    float size = (float) (Width/25.0);
     if(size < 3.0) size = 3.0;
     f.setPointSizeF(size);
 

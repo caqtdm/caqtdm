@@ -28,7 +28,6 @@
 #include <QApplication>
 #include <QGridLayout>
 #include <QMouseEvent>
-#include <QtDebug>
 #include <math.h>
 
 caChoice::caChoice(QWidget *parent) : QWidget(parent)
@@ -185,8 +184,8 @@ void caChoice::setColors(QColor back, QColor fore, QColor border, alignmentHor a
         QColor shadowColor1(back);
         QColor shadowColor2(back);
         QColor activColor(baseColor);
-        highlightColor.setHsv(baseColor.hue(), baseColor.saturation(), (int) (baseColor.value() ));
-        shadowColor1.setHsv(baseColor.hue(), (int) (baseColor.saturation() * 0.6), (int) (baseColor.value() ));
+        highlightColor.setHsv(baseColor.hue(), baseColor.saturation(), baseColor.value());
+        shadowColor1.setHsv(baseColor.hue(), (int) (baseColor.saturation() * 0.6), baseColor.value());
         shadowColor2.setHsv((int) (baseColor.hue()*0.7), (int) (baseColor.saturation() * 0.7), (int) (baseColor.value() * 0.7));
 
         activColor.setHsv(baseColor.hue(), baseColor.saturation(), (int) qMin((int)(baseColor.value() * 1.1), 255) );
@@ -406,7 +405,7 @@ void caChoice::resizeEvent(QResizeEvent *e)
      Q_UNUSED(e);
 }
 
-void caChoice::setFontScaleMode(EPushButton::ScaleMode m)
+void caChoice::setFontScaleModeL(EPushButton::ScaleMode m)
 {
    thisScaleMode = m;
    populateCells(labels, -1);

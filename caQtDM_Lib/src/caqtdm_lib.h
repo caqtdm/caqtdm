@@ -228,7 +228,7 @@ private:
     void HandleWidget(QWidget *w, QString macro, bool firstPass, bool treatPrimaries);
     void closeEvent(QCloseEvent* ce);
     bool CalcVisibility(QWidget *w, double &result, bool &valid);
-    int ComputeAlarm(QWidget *w);
+    short ComputeAlarm(QWidget *w);
     int setObjectVisibility(QWidget *w, double value);
     bool reaffectText(QMap<QString, QString> map, QString *text);
     int InitVisibility(QWidget* widget, knobData *kData, QMap<QString, QString> map,  int *specData, QString info);
@@ -267,8 +267,6 @@ private:
     QWidget *myWidget;
     QList<QWidget*> includeWidgetList;
     QList<QWidget*> topIncludesWidgetList;
-    QwtPlotCurve curve[3];
-    QVector<double> xx, yy;
 
     int level;
     // 50 levels of includes should do it
@@ -277,9 +275,6 @@ private:
 
     myQProcess *proc;
     QMap<QString, QString> createMap(const QString&);
-
-    QByteArray byteArray;
-    bool initTry;
 
     QString thisFileShort;
     QString thisFileFull;
@@ -302,11 +297,6 @@ private:
 
     int loopTimer;
     int loopTimerID;
-
-    // performance measurement
-    int benchmarkTimer;
-    QTime speedTimer;
-    //QElapsedTimer nanoTimer;
 
 #ifdef epics4
     epics4Subs *Epics4;

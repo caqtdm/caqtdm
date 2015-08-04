@@ -48,7 +48,6 @@ caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
 
     colcount = rowcount = 1;
     dataPresent = false;
-    charsPresent = false;
     thisItemFont = this->font();
 
     setAlternatingRowColors(true);
@@ -138,7 +137,6 @@ void caWaveTable::dataInput(int row, int col)
     if(!dataPresent) return;
 
     if(index == blockIndex) {
-        bool ok=true;
         blockIndex = -1;
         QString valueText =  item(row, col)->text();
 
@@ -150,7 +148,7 @@ void caWaveTable::dataInput(int row, int col)
         }
 
         // and write it to the control system
-        if(ok) emit WaveEntryChanged(valueText, index);
+        emit WaveEntryChanged(valueText, index);
     }
 }
 
@@ -444,10 +442,9 @@ void caWaveTable::setData(char *array, short status, int size)
         displayText(i, status, setValue((double) ((int) array[i]), characters));
     }
     dataPresent = true;
-    charsPresent = true;
 }
 
-void caWaveTable::setAccessW(int access)
+void caWaveTable::setAccessW(bool access)
 {
     _AccessW = access;
 }

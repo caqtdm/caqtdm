@@ -15,7 +15,7 @@ void mdaReaderThread(const char *dataFile, int y_cpy);
 struct mda_file *mdaData = NULL;
 
 void mdaReader_RegisterPV(QString pvName) {
-	PRINT(printf("Somebody registered %s\n", pvName.toAscii().constData()));
+    PRINT(printf("Somebody registered %s\n", pvName.toLatin1().constData()));
 	return;
 }
 
@@ -24,7 +24,7 @@ int mdaReader_gimmeYerData(QString QS_dataFile, QString QS_pvName, float *data, 
 	char pvName[60] = "";
 	struct mda_scan *thisScan = NULL;
 
-	strcpy(pvName, QS_pvName.toAscii().constData());
+    strcpy(pvName, QS_pvName.toLatin1().constData());
 	detNum = atol(&(pvName[strlen(pvName)-4]));
 	detNum--; // convert from pvName number 01..70 to array index 0..69
 	if (detNum < 0) {
@@ -34,7 +34,7 @@ int mdaReader_gimmeYerData(QString QS_dataFile, QString QS_pvName, float *data, 
 	PRINT(printf("Somebody requested data for %s (detNum=%d), y_cpt=%d\n", pvName, detNum, y_cpt));
 	
 	// This should be a message to a reader thread.  For now, we just read the whole file.
-	mdaReaderThread(QS_dataFile.toAscii().constData(), y_cpt);
+    mdaReaderThread(QS_dataFile.toLatin1().constData(), y_cpt);
 	if (!mdaData) {
 		return(-1);
 	}

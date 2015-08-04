@@ -86,7 +86,7 @@ ENumeric::ENumeric(QWidget *parent, int id, int dd) : QFrame(parent), FloatDeleg
     writeAccessW(true);
 }
 
-void ENumeric::writeAccessW(int access)
+void ENumeric::writeAccessW(bool access)
 {
      _AccessW = access;
 }
@@ -540,7 +540,7 @@ void ENumeric::resizeEvent(QResizeEvent *e)
         if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         labelFont.setPointSizeF(fontSize);
         signFont.setPointSizeF(fontSize);
-        //printf("digits=%d %s font size=%f\n", digits, l1->text().toAscii().constData(), fontSize);
+        //printf("digits=%d %s font size=%f\n", digits, l1->text().toLatin1().constData(), fontSize);
     }
     /* all fonts equal */
     if(d_fontScaleEnabled){

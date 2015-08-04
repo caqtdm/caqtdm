@@ -88,7 +88,7 @@ private:
 bool eventFilter(QObject *obj, QEvent *event);
 
 QString thisPV;
-bool thisAccessW;
+int thisAccessW;
 double thisMaximum, thisMinimum;
 SourceMode thisPrecMode;
 SourceMode thisLimitsMode;

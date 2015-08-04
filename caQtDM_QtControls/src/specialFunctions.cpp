@@ -46,6 +46,6 @@ void Specials::setNewStyleSheet(QWidget* w, QSize size, int bigPtSize, int small
 
     QString style = "font: %1pt; %2";
     style = style.arg(pointSize).arg(myStyle);
-    //printf("%s\n", style.toAscii().constData());
+    //printf("%s\n", style.toLatin1().constData());
     w->setStyleSheet(style);
 }

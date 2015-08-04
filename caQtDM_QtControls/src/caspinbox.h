@@ -54,8 +54,8 @@ public:
     QString getPV() const;
     void setPV(QString const &newPV);
 
-    int getAccessW() const {return thisAccessW;}
-    void setAccessW(int access);
+    bool getAccessW() const {return thisAccessW;}
+    void setAccessW(bool access);
 
     enum SourceMode {Channel = 0, User};
     SourceMode getPrecisionMode() const { return thisPrecMode; }
@@ -95,6 +95,5 @@ private:
     bool thisFixedFormat;
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
-    bool _perm;
 };
 #endif

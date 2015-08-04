@@ -55,7 +55,7 @@ class QTCON_EXPORT caByteController : public QWidget
     Q_PROPERTY(QColor background  READ getFalseColor WRITE setFalseColor)
     Q_PROPERTY(QColor textColor  READ getTextColor   WRITE setTextColor)
 
-    Q_PROPERTY(EPushButton::ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleMode)
+    Q_PROPERTY(EPushButton::ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleModeL)
 
 public:
 
@@ -72,8 +72,6 @@ public:
 
     QString getPV() const;
     void setPV(QString const &newPV);
-
-    void setEnumDisplay(int cell, unsigned int value, QString corresponding_str, QColor corresponding_color);
 
     void setTrueColor(QColor c);
     QColor getTrueColor() const {return thisTrueColor;}
@@ -100,11 +98,11 @@ public:
 
      void drawByte(long lvalue, QColor trueColor, QColor falseColor);
 
-     void setFontScaleMode(EPushButton::ScaleMode m);
+     void setFontScaleModeL(EPushButton::ScaleMode m);
      EPushButton::ScaleMode fontScaleMode();
 
-     int getAccessW() const {return _AccessW;}
-     void setAccessW(int access);
+     bool getAccessW() const {return _AccessW;}
+     void setAccessW(bool access);
 
 signals:
     void clicked(int bit);
@@ -117,10 +115,7 @@ private:
     void   setColor(EPushButton *button, QColor c, QColor text);
     bool   eventFilter(QObject *obj, QEvent *event);
     int                 numRows;
-    int 	            numColumns;
-
     QSignalMapper      *signalMapper;
-
     QColor		        thisFalseColor;
     QColor		        thisTrueColor;
      QColor		        thisTextColor;
@@ -132,9 +127,7 @@ private:
     colMode             thisColorMode;
     long                thisValue;
     bool               _AccessW;
-
     EPushButton::ScaleMode thisScaleMode;
-
 };
 
 #endif  /* CABYTECONTROLLER */

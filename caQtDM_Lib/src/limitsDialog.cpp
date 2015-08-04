@@ -68,7 +68,6 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
     bool showMax = false;
 
     thisWidget = w;
-    thisParent = parent;
 
     monData = data;
 
@@ -162,26 +161,26 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
 
     setLayout(mainLayout);
 
-    if(caSlider* widget = qobject_cast<caSlider *>(w)) {
-        thisPV = widget->getPV();
-    } else if(caLineEdit* widget  = qobject_cast<caLineEdit *>(w)) {
-        thisPV = widget->getPV();
-    } else if(caTextEntry* widget  = qobject_cast<caTextEntry *>(w)) {
-        thisPV = widget->getPV();
-    } else if(caThermo* widget  = qobject_cast<caThermo *>(w)) {
-        thisPV = widget->getPV();
-    } else if(caNumeric* widget = qobject_cast<caNumeric *>(w)) {
-        thisPV = widget->getPV();
-    } else if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w)) {
-        thisPV = widget->getPV();
-    } else if(caSpinbox* widget = qobject_cast<caSpinbox *>(w)) {
-        thisPV = widget->getPV();
-    } else if(caLinearGauge* widget = qobject_cast<caLinearGauge *>(w)) {
-        thisPV = widget->getPV();
-    } else if(caCircularGauge* widget = qobject_cast<caCircularGauge *>(w)) {
-        thisPV = widget->getPV();
-    } else if(caMeter* widget = qobject_cast<caMeter *>(w)) {
-        thisPV = widget->getPV();
+    if(caSlider* sliderWidget = qobject_cast<caSlider *>(w)) {
+        thisPV = sliderWidget->getPV();
+    } else if(caLineEdit* lineeditWidget  = qobject_cast<caLineEdit *>(w)) {
+        thisPV = lineeditWidget->getPV();
+    } else if(caTextEntry* textentryWidget  = qobject_cast<caTextEntry *>(w)) {
+        thisPV = textentryWidget->getPV();
+    } else if(caThermo* thermoWidget  = qobject_cast<caThermo *>(w)) {
+        thisPV = thermoWidget->getPV();
+    } else if(caNumeric* numericWidget = qobject_cast<caNumeric *>(w)) {
+        thisPV = numericWidget->getPV();
+    } else if(caApplyNumeric* applynumericWidget = qobject_cast<caApplyNumeric *>(w)) {
+        thisPV = applynumericWidget->getPV();
+    } else if(caSpinbox* spinboxWidget = qobject_cast<caSpinbox *>(w)) {
+        thisPV = spinboxWidget->getPV();
+    } else if(caLinearGauge* lineargaugeWidget = qobject_cast<caLinearGauge *>(w)) {
+        thisPV = lineargaugeWidget->getPV();
+    } else if(caCircularGauge* circulargaugeWidget = qobject_cast<caCircularGauge *>(w)) {
+        thisPV = circulargaugeWidget->getPV();
+    } else if(caMeter* meterWidget = qobject_cast<caMeter *>(w)) {
+        thisPV = meterWidget->getPV();
     }
 
     if(className.contains("Gauge")) {
@@ -204,80 +203,80 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
     }
 
     // fill fields
-    if(caSlider* widget = qobject_cast<caSlider *>(w)) {
-        caSlider::SourceMode mode = widget->getLimitsMode();
+    if(caSlider* sliderWidget = qobject_cast<caSlider *>(w)) {
+        caSlider::SourceMode mode = sliderWidget->getLimitsMode();
         if(mode == caSlider::Channel) limitsComboBox->setCurrentIndex(0); else limitsComboBox->setCurrentIndex(1);
-        initMin = widget->getMinValue();
-        initMax = widget->getMaxValue();
+        initMin = sliderWidget->getMinValue();
+        initMax = sliderWidget->getMaxValue();
         minimumLineEdit->setText(QString::number(initMin, 'g'));
         maximumLineEdit->setText(QString::number(initMax, 'g'));
         precisionComboBox->setDisabled(true);
         precisionLineEdit->setDisabled(true);
 
         // fill fields
-     } else if(caMeter* widget = qobject_cast<caMeter *>(w)) {
-            caMeter::SourceMode mode = widget->getLimitsMode();
+     } else if(caMeter* meterWidget = qobject_cast<caMeter *>(w)) {
+            caMeter::SourceMode mode = meterWidget->getLimitsMode();
             if(mode == caMeter::Channel) limitsComboBox->setCurrentIndex(0); else limitsComboBox->setCurrentIndex(1);
-            initMin = widget->getMinValue();
-            initMax = widget->getMaxValue();
+            initMin = meterWidget->getMinValue();
+            initMax = meterWidget->getMaxValue();
             minimumLineEdit->setText(QString::number(initMin, 'g'));
             maximumLineEdit->setText(QString::number(initMax, 'g'));
-            if(widget->getPrecisionMode() == caMeter::Channel) {
+            if(meterWidget->getPrecisionMode() == caMeter::Channel) {
                 initPrecision =  channelPrecision;
                 precisionComboBox->setCurrentIndex(0);
             } else {
-                initPrecision = widget->getPrecision();
+                initPrecision = meterWidget->getPrecision();
                 precisionComboBox->setCurrentIndex(1);
             }
             if(initPrecision >=0) precisionLineEdit->setValue(initPrecision);
 
-    } else if(EAbstractGauge* widget = qobject_cast<EAbstractGauge *>(w)) {
-            EAbstractGauge::displayLims mode = widget->getDisplayLimits();
+    } else if(EAbstractGauge* abstractgaugeWidget = qobject_cast<EAbstractGauge *>(w)) {
+            EAbstractGauge::displayLims mode = abstractgaugeWidget->getDisplayLimits();
             if(mode == EAbstractGauge::Channel_Limits) limitsComboBox->setCurrentIndex(0); else limitsComboBox->setCurrentIndex(1);
-            initMin = widget->minValue();
-            initMax = widget->maxValue();
+            initMin = abstractgaugeWidget->minValue();
+            initMax = abstractgaugeWidget->maxValue();
             minimumLineEdit->setText(QString::number(initMin, 'g'));
             maximumLineEdit->setText(QString::number(initMax, 'g'));
             precisionComboBox->setCurrentIndex(1);
             precisionComboBox->setDisabled(true);
-            initPrecision = extractPrecisionFromFormat(widget->valueFormat());
+            initPrecision = extractPrecisionFromFormat(abstractgaugeWidget->valueFormat());
             if(initPrecision >=0) precisionLineEdit->setValue(initPrecision);
 
     } else  if(className.contains("caNumeric") || className.contains("caApplyNumeric")  || className.contains("caSpinbox")) {
         int decDigits=2, intDigits=4;
         bool fixedFormat = false;
 
-        if(caNumeric* widget = qobject_cast<caNumeric *>(w)) {
-            if(widget->getLimitsMode()== caNumeric::Channel) limitsComboBox->setCurrentIndex(0); else limitsComboBox->setCurrentIndex(1);
-            if(widget->getPrecisionMode() == caNumeric::Channel) {
+        if(caNumeric* numericWidget = qobject_cast<caNumeric *>(w)) {
+            if(numericWidget->getLimitsMode()== caNumeric::Channel) limitsComboBox->setCurrentIndex(0); else limitsComboBox->setCurrentIndex(1);
+            if(numericWidget->getPrecisionMode() == caNumeric::Channel) {
                 initPrecision =  channelPrecision;
                 precisionComboBox->setCurrentIndex(0);
             } else {
-                initPrecision = widget->decDigits();
+                initPrecision = numericWidget->decDigits();
                 precisionComboBox->setCurrentIndex(1);
             }
 
-            decDigits = widget->decDigits();
-            intDigits = widget->intDigits();
-            initMin = widget->getMinValue();
-            initMax = widget->getMaxValue();
-            fixedFormat = widget->getFixedFormat();
-        } else if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w)) {
-            if(widget->getLimitsMode() == caApplyNumeric::Channel) limitsComboBox->setCurrentIndex(0); else limitsComboBox->setCurrentIndex(1);
-            if(widget->getPrecisionMode() == caApplyNumeric::Channel) initPrecision =  channelPrecision; else initPrecision = widget->decDigits();
-            decDigits = widget->decDigits();
-            intDigits = widget->intDigits();
-            initMin = widget->getMinValue();
-            initMax = widget->getMaxValue();
-            fixedFormat = widget->getFixedFormat();
-        } else if(caSpinbox* widget = qobject_cast<caSpinbox *>(w)) {
-            if(widget->getLimitsMode() == caSpinbox::Channel) limitsComboBox->setCurrentIndex(0); else limitsComboBox->setCurrentIndex(1);
-            if(widget->getPrecisionMode() == caSpinbox::Channel) initPrecision =  channelPrecision; else initPrecision = widget->decDigits();
-            decDigits = widget->decDigits();
-            intDigits = widget->intDigits();
-            initMin = widget->getMinValue();
-            initMax = widget->getMaxValue();
-            fixedFormat = widget->getFixedFormat();
+            decDigits = numericWidget->decDigits();
+            intDigits = numericWidget->intDigits();
+            initMin = numericWidget->getMinValue();
+            initMax = numericWidget->getMaxValue();
+            fixedFormat = numericWidget->getFixedFormat();
+        } else if(caApplyNumeric* applynumericWidget = qobject_cast<caApplyNumeric *>(w)) {
+            if(applynumericWidget->getLimitsMode() == caApplyNumeric::Channel) limitsComboBox->setCurrentIndex(0); else limitsComboBox->setCurrentIndex(1);
+            if(applynumericWidget->getPrecisionMode() == caApplyNumeric::Channel) initPrecision =  channelPrecision; else initPrecision = applynumericWidget->decDigits();
+            decDigits = applynumericWidget->decDigits();
+            intDigits = applynumericWidget->intDigits();
+            initMin = applynumericWidget->getMinValue();
+            initMax = applynumericWidget->getMaxValue();
+            fixedFormat = applynumericWidget->getFixedFormat();
+        } else if(caSpinbox* spinboxWidget = qobject_cast<caSpinbox *>(w)) {
+            if(spinboxWidget->getLimitsMode() == caSpinbox::Channel) limitsComboBox->setCurrentIndex(0); else limitsComboBox->setCurrentIndex(1);
+            if(spinboxWidget->getPrecisionMode() == caSpinbox::Channel) initPrecision =  channelPrecision; else initPrecision = spinboxWidget->decDigits();
+            decDigits = spinboxWidget->decDigits();
+            intDigits = spinboxWidget->intDigits();
+            initMin = spinboxWidget->getMinValue();
+            initMax = spinboxWidget->getMaxValue();
+            fixedFormat = spinboxWidget->getFixedFormat();
         }
 
         minimumLineEdit->setText(QString::number(initMin, 'g'));
@@ -324,36 +323,36 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
 
         connect(formatComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(indexChanged(int)));
 
-    } else if(caThermo* widget = qobject_cast<caThermo *>(w)) {
-        caThermo::SourceMode mode = widget->getLimitsMode();
+    } else if(caThermo* thermoWidget = qobject_cast<caThermo *>(w)) {
+        caThermo::SourceMode mode = thermoWidget->getLimitsMode();
         if(mode == caThermo::Channel) limitsComboBox->setCurrentIndex(0); else limitsComboBox->setCurrentIndex(1);
-        initMin = widget->minValue();
-        initMax = widget->maxValue();
+        initMin = thermoWidget->minValue();
+        initMax = thermoWidget->maxValue();
         minimumLineEdit->setText(QString::number(initMin, 'g'));
         maximumLineEdit->setText(QString::number(initMax, 'g'));
         precisionComboBox->setDisabled(true);
         precisionLineEdit->setDisabled(true);
 
-    } else if(caLineEdit* widget  = qobject_cast<caLineEdit *>(w)) {
-        caLineEdit::SourceMode mode = widget->getLimitsMode();
+    } else if(caLineEdit* lineeditWidget  = qobject_cast<caLineEdit *>(w)) {
+        caLineEdit::SourceMode mode = lineeditWidget->getLimitsMode();
         if(mode == caLineEdit::Channel) {
             limitsComboBox->setCurrentIndex(0);
             initMin = channelLowerLimit;
             initMax = channelUpperLimit;
         } else {
             limitsComboBox->setCurrentIndex(1);
-            initMin = widget->getMinValue();
-            initMax = widget->getMaxValue();
+            initMin = lineeditWidget->getMinValue();
+            initMax = lineeditWidget->getMaxValue();
         }
         minimumLineEdit->setText(QString::number(initMin, 'g'));
         maximumLineEdit->setText(QString::number(initMax, 'g'));
 
-        mode = widget->getPrecisionMode();
+        mode = lineeditWidget->getPrecisionMode();
         if(mode == caLineEdit::Channel) {
             initPrecision =  channelPrecision;
             precisionComboBox->setCurrentIndex(0);
         } else {
-            initPrecision = widget->getPrecision();
+            initPrecision = lineeditWidget->getPrecision();
             precisionComboBox->setCurrentIndex(1);
         }
         precisionLineEdit->setValue(initPrecision);
@@ -435,89 +434,89 @@ void limitsDialog::applyClicked()
     }
 
     // ************* we have a slider
-    if(caSlider* widget = qobject_cast<caSlider *>(thisWidget)) {
+    if(caSlider* sliderWidget = qobject_cast<caSlider *>(thisWidget)) {
 
         // do this to prevent qwtslider to set the value when changing bounds
         // however we could miss a value coming from the monitor (is this really true?)
-        widget->blockSignals(true);
+        sliderWidget->blockSignals(true);
         if(limitsMode == Channel) {
-            widget->setLimitsMode(caSlider::Channel);
+            sliderWidget->setLimitsMode(caSlider::Channel);
             if(!doNothing) {
-                widget->setMaxValue(channelUpperLimit);
-                widget->setMinValue(channelLowerLimit);
+                sliderWidget->setMaxValue(channelUpperLimit);
+                sliderWidget->setMinValue(channelLowerLimit);
             }
         } else if(limitsMode == User){
-            widget->setLimitsMode(caSlider::User);
-            widget->setMaxValue(max);
-            widget->setMinValue(min);
+            sliderWidget->setLimitsMode(caSlider::User);
+            sliderWidget->setMaxValue(max);
+            sliderWidget->setMinValue(min);
         }
-        widget->blockSignals(false);
+        sliderWidget->blockSignals(false);
         // set eventual missed value
-        knobData *kPtr = monData->getMutexKnobDataPV(widget, thisPV);
-        if(kPtr != (knobData*) 0) widget->setSliderValue(kPtr->edata.rvalue);
+        knobData *kPtr = monData->getMutexKnobDataPV(sliderWidget, thisPV);
+        if(kPtr != (knobData*) 0) sliderWidget->setSliderValue(kPtr->edata.rvalue);
 
-    } else if(caMeter* widget = qobject_cast<caMeter *>(thisWidget)) {
+    } else if(caMeter* meterWidget = qobject_cast<caMeter *>(thisWidget)) {
         if(limitsMode == Channel) {
-            widget->setLimitsMode(caMeter::Channel);
+            meterWidget->setLimitsMode(caMeter::Channel);
             if(!doNothing) {
-                widget->setMaxValue(channelUpperLimit);
-                widget->setMinValue(channelLowerLimit);
+                meterWidget->setMaxValue(channelUpperLimit);
+                meterWidget->setMinValue(channelLowerLimit);
             }
         } else if(limitsMode == User){
-            widget->setLimitsMode(caMeter::User);
-            widget->setMaxValue(max);
-            widget->setMinValue(min);
+            meterWidget->setLimitsMode(caMeter::User);
+            meterWidget->setMaxValue(max);
+            meterWidget->setMinValue(min);
         }
 
         if(precisionMode == Channel) {
-            widget->setPrecisionMode(caMeter::Channel);
-            widget->setPrecision(channelPrecision);
+            meterWidget->setPrecisionMode(caMeter::Channel);
+            meterWidget->setPrecision(channelPrecision);
         } else if(precisionMode == User){
-            widget->setPrecisionMode(caMeter::User);
-            widget->setPrecision(prec);
+            meterWidget->setPrecisionMode(caMeter::User);
+            meterWidget->setPrecision(prec);
         }
-        widget->updateMeter();
-        widget->invalidate();
+        meterWidget->updateMeter();
+        meterWidget->invalidate();
 
         // ************* we have a thermometer
-    } else if(caThermo* widget = qobject_cast<caThermo *>(thisWidget)) {
+    } else if(caThermo* thermoWidget = qobject_cast<caThermo *>(thisWidget)) {
 
         if(limitsMode == Channel) {
-            widget->setLimitsMode(caThermo::Channel);
+            thermoWidget->setLimitsMode(caThermo::Channel);
             if(!doNothing) {
-                widget->setMaxValue(channelUpperLimit);
-                widget->setMinValue(channelLowerLimit);
+                thermoWidget->setMaxValue(channelUpperLimit);
+                thermoWidget->setMinValue(channelLowerLimit);
             }
         } else if(limitsMode == User){
-            widget->setLimitsMode(caThermo::User);
-            widget->setMaxValue(max);
-            widget->setMinValue(min);
+            thermoWidget->setLimitsMode(caThermo::User);
+            thermoWidget->setMaxValue(max);
+            thermoWidget->setMinValue(min);
         }
 
         // ************* we have a calineedit or catextentry
-    } else if(caLineEdit* widget = qobject_cast<caLineEdit *>(thisWidget)) {
+    } else if(caLineEdit* lineeditWidget = qobject_cast<caLineEdit *>(thisWidget)) {
 
         if(limitsMode == Channel) {
-            widget->setLimitsMode(caLineEdit::Channel);
+            lineeditWidget->setLimitsMode(caLineEdit::Channel);
             if(!doNothing) {
-                widget->setMaxValue(channelUpperLimit);
-                widget->setMinValue(channelLowerLimit);
+                lineeditWidget->setMaxValue(channelUpperLimit);
+                lineeditWidget->setMinValue(channelLowerLimit);
             }
         } else if(limitsMode == User){
-            widget->setLimitsMode(caLineEdit::User);
-            widget->setMaxValue(max);
-            widget->setMinValue(min);
+            lineeditWidget->setLimitsMode(caLineEdit::User);
+            lineeditWidget->setMaxValue(max);
+            lineeditWidget->setMinValue(min);
         }
 
         if(precisionMode == Channel) {
-            widget->setPrecisionMode(caLineEdit::Channel);
-            widget->setFormat(channelPrecision);
+            lineeditWidget->setPrecisionMode(caLineEdit::Channel);
+            lineeditWidget->setFormat(channelPrecision);
         } else if(precisionMode == User){
-            widget->setPrecisionMode(caLineEdit::User);
-            widget->setPrecision(prec);
-            widget->setFormat(prec);
+            lineeditWidget->setPrecisionMode(caLineEdit::User);
+            lineeditWidget->setPrecision(prec);
+            lineeditWidget->setFormat(prec);
         }
-        widget->updateAlarmColors();
+        lineeditWidget->updateAlarmColors();
 
         // ************* we have a caNumeric, caApplyNumeric or caSpinbox
     } else if(className.contains("caNumeric") || className.contains("caApplyNumeric")  || className.contains("caSpinbox")) {
@@ -557,27 +556,27 @@ void limitsDialog::applyClicked()
             kPtr->edata.initialize = false;
         }
 
-    } else if(EAbstractGauge* widget = qobject_cast<EAbstractGauge *>(thisWidget)) {
+    } else if(EAbstractGauge* abstractgaugeWidget = qobject_cast<EAbstractGauge *>(thisWidget)) {
 
         if(limitsMode == Channel) {
-            widget->setDisplayLimits(EAbstractGauge::Channel_Limits);
+            abstractgaugeWidget->setDisplayLimits(EAbstractGauge::Channel_Limits);
         } else if(limitsMode == User){
-            widget->setDisplayLimits(EAbstractGauge::User_Limits);
-            widget->setMaxValue(max);
-            widget->setMinValue(min);
-            widget->setLowWarning(min);
-            widget->setHighWarning(max);
-            widget->setLowError(min);
-            widget->setHighError(max);
+            abstractgaugeWidget->setDisplayLimits(EAbstractGauge::User_Limits);
+            abstractgaugeWidget->setMaxValue(max);
+            abstractgaugeWidget->setMinValue(min);
+            abstractgaugeWidget->setLowWarning(min);
+            abstractgaugeWidget->setHighWarning(max);
+            abstractgaugeWidget->setLowError(min);
+            abstractgaugeWidget->setHighError(max);
         }
-        knobData *kPtr = monData->getMutexKnobDataPV(widget, thisPV);
-        CaQtDM_Lib *compute = (CaQtDM_Lib *) widget;
+        knobData *kPtr = monData->getMutexKnobDataPV(abstractgaugeWidget, thisPV);
+        CaQtDM_Lib *compute = (CaQtDM_Lib *) abstractgaugeWidget;
         if(kPtr != (knobData*) 0) {
             kPtr->edata.initialize = true;
-            compute->UpdateGauge(widget, *kPtr);
+            compute->UpdateGauge(abstractgaugeWidget, *kPtr);
             kPtr->edata.initialize = false;
         }
-        widget->setValueFormat(getFormatFromPrecision(prec));
+        abstractgaugeWidget->setValueFormat(getFormatFromPrecision(prec));
     }
 }
 

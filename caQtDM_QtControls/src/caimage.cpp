@@ -25,7 +25,6 @@
 
 #include "caimage.h"
 #include "searchfile.h"
-#include <QFileDialog>
 #include "fileFunctions.h"
 
 caImage::caImage(QWidget* parent) : QWidget(parent)

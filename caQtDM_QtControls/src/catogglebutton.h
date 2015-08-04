@@ -47,7 +47,7 @@ class QTCON_EXPORT caToggleButton : public QCheckBox, public FontScalingWidget
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
 
-    Q_PROPERTY(ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleMode)
+    Q_PROPERTY(ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleModeL)
 
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
     Q_PROPERTY(QString trueValue READ getTrueValue WRITE setTrueValue)
@@ -71,7 +71,6 @@ public:
                                           setForeground(thisForeColor);
                                            }
     void setAlarmColors(short status);
-    void setUserAlarmColors(double val);
     void setColors(QColor bg, QColor fg);
     void setNormalColors();
 
@@ -79,10 +78,9 @@ public:
     void setPV(QString const &newPV);
 
     void setState(Qt::CheckState state);
-    bool bitState(long value);
 
-    int getAccessW() const {return _AccessW;}
-    void setAccessW(int access);
+    bool getAccessW() const {return _AccessW;}
+    void setAccessW(bool access);
 
     QString getTrueValue() const {return thisTrueValue;}
     void setTrueValue(QString const &trueValue) {thisTrueValue = trueValue;}
@@ -91,7 +89,7 @@ public:
 
     QString text() const { return QCheckBox::text(); }
 
-    void setFontScaleMode(ScaleMode m) { FontScalingWidget::setScaleMode((int) m);}
+    void setFontScaleModeL(ScaleMode m) { FontScalingWidget::setScaleMode((int) m);}
     ScaleMode fontScaleMode() { return (ScaleMode) FontScalingWidget::scaleMode(); }
 
 private slots:

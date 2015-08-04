@@ -30,26 +30,29 @@
 
 #define PRINT(x)
 
+#if defined(_MSC_VER) || !defined(__cplusplus)
 #if _MSC_VER !=1800
  #define boolean int
  #define true 1==1
  #define false !(true)
 #endif
-
+#endif
 
 #define MAXFILELEN 60
 #define MAXPVLEN 120
 #define MAXDISPLEN 20
 #define NBSPECS 5
+#define MAXPVDESC 130
 
 #define UNUSED(x) (void)(x)
 
 typedef char pv_string[MAXPVLEN];  // temporary definition, I should allocate what we need
+typedef char pv_desc[MAXPVDESC];
 
 /* we wanted to really separate epics from the display part, but we still need this information */
 
 #ifndef EPICS
-enum caType {caSTRING	= 0, caINT = 1, caSHORT = 1, caFLOAT = 2, caENUM = 3, caCHAR = 4, caLONG = 5, caDOUBLE = 6};
+enum caType {caSTRING	= 0, caINT = 1, caFLOAT = 2, caENUM = 3, caCHAR = 4, caLONG = 5, caDOUBLE = 6};
 #else
 #include "cadef.h"
 enum caType {caSTRING = DBF_STRING, caINT = DBF_INT, caSHORT = DBF_INT, caFLOAT = DBF_FLOAT, caENUM = DBF_ENUM, caCHAR = DBF_CHAR, caLONG = DBF_LONG, caDOUBLE = DBF_DOUBLE};

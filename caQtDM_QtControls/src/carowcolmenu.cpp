@@ -26,8 +26,6 @@
 #include "carowcolmenu.h"
 #include <QApplication>
 #include <QGridLayout>
-#include <QMouseEvent>
-#include <QtDebug>
 #include <QMenu>
 #include <math.h>
 #include <QPainter>
@@ -215,7 +213,7 @@ void  caRowColMenu::setLabels(QString const &newL)
 
 void caRowColMenu::setArgs(QString const &newL)
 {
-    //printf("new arguments=<%s>\n", newL.toAscii().constData());
+    //printf("new arguments=<%s>\n", newL.toLatin1().constData());
     args = newL.split(";");
 }
 
@@ -243,7 +241,7 @@ void caRowColMenu::resizeEvent(QResizeEvent *e)
     Q_UNUSED(e);
 }
 
-void caRowColMenu::setFontScaleMode(EPushButton::ScaleMode m)
+void caRowColMenu::setFontScaleModeL(EPushButton::ScaleMode m)
 {
    thisScaleMode = m;
    updateFontScaleMode();

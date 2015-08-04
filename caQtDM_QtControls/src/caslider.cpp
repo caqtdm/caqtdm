@@ -33,12 +33,9 @@
 #define MAX_FONT_SIZE 20
 
 #include "caslider.h"
-#include <QtDebug>
 #include <QEvent>
 #include <QMouseEvent>
 #include <QApplication>
-
-#include <math.h>
 #include "alarmdefs.h"
 
 #if defined(_MSC_VER)
@@ -197,7 +194,7 @@ void caSlider::setIncrementValue(double const &value){
     update();
 }
 
-void caSlider::setAccessW(int access)
+void caSlider::setAccessW(bool access)
 {
     thisAccessW = access;
 }
@@ -214,7 +211,7 @@ void caSlider::setDirection(Direction dir)
     thisDirection = dir;
 
 #if QWT_VERSION >= 0x060100
-    incrementValue(thisIncrement);
+    incrementValue((int) thisIncrement);
     setPageSteps(1);
 #endif
 

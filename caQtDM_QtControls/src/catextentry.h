@@ -48,8 +48,8 @@ class QTCON_EXPORT caTextEntry : public caLineEdit
 public:
 
     caTextEntry( QWidget *parent = 0 );
-    int getAccessW() const {return _AccessW;}
-    void setAccessW(int access);
+    bool getAccessW() const {return _AccessW;}
+    void setAccessW(bool access);
     void updateText(const QString &text);
 
 private slots:
@@ -63,6 +63,5 @@ private:
 
     bool _AccessW;
     QString startText;
-    bool emitted;
 };
 #endif

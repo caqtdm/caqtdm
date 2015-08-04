@@ -98,7 +98,7 @@ void myParser::openFile(char *outFile)
     dmsearchFile *s = new dmsearchFile("stylesheet.qss");
     QString fileNameFound = s->findFile();
     if(fileNameFound.isNull()) {
-        printf("adl2ui -- file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toAscii().constData());
+        printf("adl2ui -- file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toLatin1().constData());
         printf("adl2ui -- could be a problem!\n");
     } else {
         QFile file(fileNameFound);
@@ -354,7 +354,7 @@ int main(int argc, char *argv[])
 
     // get path for composite file parsing
     //qDebug() << fi.absolutePath();
-    strcpy(filePrefix, fi.absolutePath().toAscii().data());
+    strcpy(filePrefix, fi.absolutePath().toLatin1().data());
 
     // init adlParser
     myParser *adlParser = new myParser;
@@ -362,10 +362,10 @@ int main(int argc, char *argv[])
 
     //get rid of path, we want to generate where we are
     outputFile = outputFile.section('/',-1);
-    adlParser->openFile(outputFile.toAscii().data());
+    adlParser->openFile(outputFile.toLatin1().data());
 
     // open input file
-    FILE *filePtr = fopen(inputFile.toAscii().data(), "r");
+    FILE *filePtr = fopen(inputFile.toLatin1().data(), "r");
     FrameOffset offset;
 
     DisplayInfo *cdi = (DisplayInfo *) malloc(sizeof (DisplayInfo));

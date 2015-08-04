@@ -24,10 +24,7 @@
  */
 
 #include <QPaintEvent>
-
 #include <QPainter>
-#include <QDebug>
-
 #include "rectangle.h"
 
 rectangle::rectangle( QWidget *parent ) : QWidget( parent )

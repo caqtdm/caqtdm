@@ -81,8 +81,6 @@ public:
     colMode getColorMode() const { return thisColorMode; }
     void setColorMode(colMode colormode);
 
-    int value() const;
-
     void setLineSize( int size );
     int getLineSize() {
         return thisLineSize;
@@ -119,9 +117,7 @@ public:
 
     void setAlarmColors(short status);
 
-    bool setPropertyEditorItems(QWidget *pTheWidget, QStringList QStringListToChange, bool bShowProperties);
-
-    void setHidden(bool hide);
+    void setHide(bool hide);
 
     bool isPropertyVisible(Properties property);
     void setPropertyVisible(Properties property, bool visible);
@@ -149,7 +145,6 @@ private:
     colMode thisColorMode;
     FillStyle thisFillStyle;
     LineStyle thisLineStyle;
-    QPoint lastPoint;
     int thisArrowSize;
     ArrowMode thisArrowMode;
     int thisStartAngle, thisSpanAngle, thisTiltAngle;

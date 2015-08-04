@@ -1,3 +1,5 @@
+
+
 /*
  *  This file is part of the caQtDM Framework, developed at the Paul Scherrer Institut,
  *  Villigen, Switzerland
@@ -92,8 +94,8 @@ public:
     QString getDisablePV() const {return thisDisablePV;}
     void setDisablePV(QString const &newPV){ thisDisablePV = newPV;}
 
-    int getAccessW() const {return _AccessW;}
-    void setAccessW(int access);
+    bool getAccessW() const {return _AccessW;}
+    void setAccessW(bool access);
 
     void buttonhandle(int type);
 

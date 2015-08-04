@@ -59,7 +59,7 @@ void myParserEDM::openFile(char *outFile)
     dmsearchFile *s = new dmsearchFile("stylesheet.qss");
     QString fileNameFound = s->findFile();
     if(fileNameFound.isNull()) {
-        printf("edl2ui -- file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toAscii().constData());
+        printf("edl2ui -- file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toLatin1().constData());
         printf("edl2ui -- could be a problem!\n");
     } else {
         QFile file(fileNameFound);
@@ -285,26 +285,26 @@ void myParserEDM::Qt_setColorScale(char *widget, int r, int g, int b, int alpha)
 void myParserEDM::Qt_setColorTrace(char *widget, int r, int g, int b, int alpha, int trace) {
     QString prop = "color_%1";
     prop = prop.arg(trace+1);
-    Qt_setColor((char*) prop.toAscii().constData(), r, g, b, alpha);
+    Qt_setColor((char*) prop.toLatin1().constData(), r, g, b, alpha);
 }
 
 void myParserEDM::Qt_setSymbolTrace(char *widget, char *symbol, int trace) {
     QString prop = "symbol_%1";
     prop = prop.arg(trace+1);
-    Qt_handleString((char*) prop.toAscii().constData(), "enum", symbol);
+    Qt_handleString((char*) prop.toLatin1().constData(), "enum", symbol);
 }
 
 void myParserEDM::Qt_setStyleTrace(char *widget, char *style, int trace) {
     QString prop = "Style_%1";
     prop = prop.arg(trace+1);
-    Qt_handleString((char*) prop.toAscii().constData(), "enum", style);
+    Qt_handleString((char*) prop.toLatin1().constData(), "enum", style);
 }
 
 
 void myParserEDM::Qt_ChannelsXY(char *widget, char *channels, int trace) {
     QString prop = "channels_%1";
     prop = prop.arg(trace+1);
-    Qt_handleString((char *)prop.toAscii().constData(), "string", channels);
+    Qt_handleString((char *)prop.toLatin1().constData(), "string", channels);
 }
 
 void myParserEDM::Qt_extractString(char *str, char *retStr, int *status) {
@@ -320,7 +320,7 @@ void myParserEDM::Qt_extractString(char *str, char *retStr, int *status) {
         return;
     }
     if(newStr.endsWith(")")) newStr.remove(newStr.size()-1,1);
-    strcpy(retStr, (char*) newStr.toAscii().constData());
+    strcpy(retStr, (char*) newStr.toLatin1().constData());
     *status = true;
 }
 
@@ -391,7 +391,7 @@ int main(int argc, char *argv[])
 
     // get path for composite file parsing
     //qDebug() << fi.absolutePath();
-    //strcpy(filePrefix, fi.absolutePath().toAscii().data());
+    //strcpy(filePrefix, fi.absolutePath().toLatin1().data());
 
     // init edlParser
     myParserEDM *edlParser = new myParserEDM;
@@ -399,11 +399,11 @@ int main(int argc, char *argv[])
 
     //get rid of path, we want to generate where we are
     outputFile = outputFile.section('/',-1);
-    edlParser->openFile(outputFile.toAscii().data());
+    edlParser->openFile(outputFile.toLatin1().data());
 
     // open input file
-    //FILE *filePtr = fopen(inputFile.toAscii().data(), "r");
-    parserClass *parser = new parserClass(inputFile.toAscii().data());
+    //FILE *filePtr = fopen(inputFile.toLatin1().data(), "r");
+    parserClass *parser = new parserClass(inputFile.toLatin1().data());
     parser->loadFile(edlParser);
 
 

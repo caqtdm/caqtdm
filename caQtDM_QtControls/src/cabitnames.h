@@ -44,7 +44,7 @@ class QTCON_EXPORT caBitnames : public EFlag
     Q_PROPERTY(QColor foreground   READ getTrueColor     WRITE setTrueColor)
     Q_PROPERTY(QColor background  READ getFalseColor    WRITE setFalseColor)
     Q_PROPERTY(EFlag::alignmentHor alignment READ getAlignment WRITE setAlignment)
-    Q_PROPERTY(ESimpleLabel::ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleMode)
+    Q_PROPERTY(ESimpleLabel::ScaleMode fontScaleMode READ fontScaleModeL WRITE setFontScaleModeL)
 
 
     Q_PROPERTY(int numRows READ readNumRows WRITE setNumRows DESIGNABLE false)
@@ -64,8 +64,6 @@ public:
     QString getValuePV() const;
     void setValuePV(QString const &newPV);
 
-    void setEnumDisplay(int cell, unsigned int value, QString corresponding_str, QColor corresponding_color);
-
     void setTrueColor(QColor c);
     QColor getTrueColor() const {return thisTrueColor;}
 
@@ -82,10 +80,9 @@ public:
 
     bool bitState(long value, int bitNr);
     void setEnumStrings(QString string);
-    void setStrings(QString string);
 
-    void setFontScaleMode(ESimpleLabel::ScaleMode m);
-    ESimpleLabel::ScaleMode fontScaleMode();
+    void setFontScaleModeL(ESimpleLabel::ScaleMode m);
+    ESimpleLabel::ScaleMode fontScaleModeL();
 
     EFlag::alignmentHor getAlignment() const {return thisAlignment;}
     void setAlignment(EFlag::alignmentHor alignment);
@@ -96,17 +93,13 @@ protected:
 
 private:
     int	            numRows;
-    int 	        numColumns;
-
     QColor		    thisFalseColor;
     QColor		    thisTrueColor;
     int             thisStartBit;
     int             thisEndBit;
     QString         thisEnumPV, thisValuePV;
     QString         thisString;
-
     QList<QVariant> tf;
-
     EFlag::alignmentHor    thisAlignment;
 };
 

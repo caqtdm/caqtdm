@@ -520,11 +520,7 @@ void caWaterfallPlot::setTitlePlot(QString const &titel)
 void caWaterfallPlot::setGrid(bool m)
 {
     thisGrid = m;
-    if(m) {
-        plotGrid->setVisible(true);
-    } else {
-        plotGrid->setVisible(false);
-    }
+    plotGrid->setVisible(m ? true : false);
     plot->replot();
 }
 

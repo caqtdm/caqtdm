@@ -40,7 +40,8 @@ extern "C" {
 
 CAQTDM_LIBSHARED_EXPORT int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
 CAQTDM_LIBSHARED_EXPORT int EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess);
-CAQTDM_LIBSHARED_EXPORT int  EpicsGetTimeStamp(char *pv, char *timestamp);
+CAQTDM_LIBSHARED_EXPORT int EpicsGetTimeStamp(char *pv, char *timestamp);
+CAQTDM_LIBSHARED_EXPORT int EpicsGetDescription(char *pv, char *description);
 CAQTDM_LIBSHARED_EXPORT void clearEvent(void * ptr);
 CAQTDM_LIBSHARED_EXPORT void addEvent(void * ptr);
 CAQTDM_LIBSHARED_EXPORT void EpicsReconnect(knobData *kData);

@@ -26,7 +26,6 @@
 #include "cabytecontroller.h"
 #include "alarmdefs.h"
 #include <QGridLayout>
-#include <QtDebug>
 
 caByteController::caByteController(QWidget *parent) : QWidget(parent)
 {
@@ -83,7 +82,7 @@ void caByteController::arrangeCells()
         if(thisDirection == Down || thisDirection == Right)  {
            temp = new EPushButton(QString::number(i + thisStartBit), this);
         } else {
-           temp = new EPushButton(QString::number(thisEndBit - thisStartBit  - i), this);
+           temp = new EPushButton(QString::number(thisEndBit - i), this);
         }
 
         temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -103,7 +102,11 @@ void caByteController::arrangeCells()
         cells.push_back(temp);
         temp->show();
 
-        signalMapper->setMapping(temp, i + thisStartBit);
+        if(thisDirection == Down || thisDirection == Right) {
+            signalMapper->setMapping(temp, i + thisStartBit);
+        } else {
+            signalMapper->setMapping(temp, thisEndBit - thisStartBit  - i);
+        }
         connect(temp, SIGNAL(clicked()), signalMapper, SLOT(map()));
     }
     setValue(0);
@@ -117,7 +120,7 @@ bool caByteController::bitState(long value, int bitNr)
 
 void caByteController::setValue(long value)
 {
-    thisValue = (long)value;
+    thisValue = value;
     drawByte(thisValue, thisTrueColor, thisFalseColor);
 }
 
@@ -257,7 +260,7 @@ void caByteController::resizeEvent(QResizeEvent *e)
 }
 
 
-void caByteController::setFontScaleMode(EPushButton::ScaleMode m)
+void caByteController::setFontScaleModeL(EPushButton::ScaleMode m)
 {
    thisScaleMode = m;
    arrangeCells();
@@ -270,7 +273,7 @@ EPushButton::ScaleMode caByteController::fontScaleMode()
 }
 
 
-void caByteController::setAccessW(int access)
+void caByteController::setAccessW(bool access)
 {
     _AccessW = access;
 }

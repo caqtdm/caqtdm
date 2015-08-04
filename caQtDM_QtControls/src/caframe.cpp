@@ -50,11 +50,7 @@ void caFrame::setBackground(QColor c)
     thisPalette.setColor(QPalette::Dark, thisDarkColor);
     thisPalette.setColor(QPalette::Window, thisBackgroundColor);
     setPalette(thisPalette);
-    if(thisBackgroundMode == Filled) {
-        setAutoFillBackground(true);
-    } else {
-        setAutoFillBackground(false);
-    }
+    setAutoFillBackground(thisBackgroundMode == Filled ? true : false);
     update();
 }
 

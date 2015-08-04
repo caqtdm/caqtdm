@@ -31,9 +31,6 @@
 
 #include "cacartesianplot.h"
 #include <QtCore>
-#include <QtDebug>
-#include <QVector>
-#include <sys/timeb.h>
 
 class MyZoomer: public QwtPlotZoomer
 {
@@ -417,10 +414,10 @@ void caCartesianPlot::displayData(int curvIndex, int curvType)
                     accumulX[curvIndex].append(dataX[0]);
                     accumulY[curvIndex].append(dataY[0]);
                 }
-
+/*
                 dataX = accumulX[curvIndex].data();
                 dataY = accumulY[curvIndex].data();
-/*
+
                 printf("array size=%d wanted count=%d\n", accumulX[curvIndex].size(), thisCountNumber);
                 for(int i=0; i< accumulX[curvIndex].size(); i++) {
                     printf("%d %f %f\n", i, dataX[i], dataY[i]);
@@ -431,9 +428,8 @@ void caCartesianPlot::displayData(int curvIndex, int curvType)
 
         // x vector, y vector
         } else {
-            int nbPoints = Y[curvIndex].size();
             //printf("x vector, y vector curv=%d\n", curvIndex);
-            nbPoints = qMin(X[curvIndex].size(), Y[curvIndex].size());
+            int nbPoints = qMin(X[curvIndex].size(), Y[curvIndex].size());
             if(thisCountNumber > 0) nbPoints = qMin(thisCountNumber, nbPoints);
             setSamplesData(curvIndex, X[curvIndex].data(), Y[curvIndex].data(), nbPoints, true);
         }
@@ -529,7 +525,7 @@ void caCartesianPlot::setGrid(bool m){
 
 QwtSymbol::Style caCartesianPlot::myMarker(curvSymbol m)
 {
-    QwtSymbol::Style ms = QwtSymbol::NoSymbol;
+    QwtSymbol::Style ms;
     switch ( m ) {
     case Ellipse:
         ms = QwtSymbol::Ellipse;  break;
@@ -569,7 +565,7 @@ QwtSymbol::Style caCartesianPlot::myMarker(curvSymbol m)
 
 QwtPlotCurve::CurveStyle caCartesianPlot::myStyle(curvStyle s)
 {
-    QwtPlotCurve::CurveStyle ms = QwtPlotCurve::Lines;
+    QwtPlotCurve::CurveStyle ms;
     switch ( s ) {
     case NoCurve:
         ms = QwtPlotCurve::NoCurve;  break;

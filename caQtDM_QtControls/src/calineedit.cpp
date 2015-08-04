@@ -38,7 +38,7 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     // if this font does not exist then try a next one
     QFontInfo info(font);
     QString family = info.family();
-    //printf("got font %s\n", family.toAscii().constData());
+    //printf("got font %s\n", family.toLatin1().constData());
     if(!family.contains("Lucida Sans Typewriter")) {
         QFont  newfont("Monospace");   // not very nice, while a a dot inside the zero to distinguish from o
         newfont.setStyleHint(QFont::TypeWriter);
@@ -69,7 +69,6 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     oldFrameColor = Qt::gray;
 
     thisFramePresent = false;
-    oldFramepresent = false;
 
     thisFrameLineWidth = 0;
     oldFrameLineWidth = 0;
@@ -92,10 +91,10 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
 
     keepText = "";
     unitsLast = "";
-    setText(keepText);
+    setTextLine(keepText);
     setValueType(false);
 
-    setFontScaleMode(WidthAndHeight);
+    setFontScaleModeL(WidthAndHeight);
     newFocusPolicy(Qt::NoFocus);
 
     d_rescaleFontOnTextChanged = true;
@@ -274,10 +273,10 @@ bool caLineEdit::event(QEvent *e)
           setStyleSheet("");
           QString c=  palette().color(QPalette::Base).name();
           defBackColor = QColor(c);
-          //printf("default back color %s %s\n", c.toAscii().constData(), this->objectName().toAscii().constData());
+          //printf("default back color %s %s\n", c.toLatin1().constData(), this->objectName().toLatin1().constData());
           c=  palette().color(QPalette::Text).name();
           defForeColor = QColor(c);
-	  //printf("default fore color %s %s\n", c.toAscii().constData(), this->objectName().toAscii().constData());
+      //printf("default fore color %s %s\n", c.toLatin1().constData(), this->objectName().toLatin1().constData());
 
           if(!defBackColor.isValid()) defBackColor = QColor(255, 248, 220, 255);
           if(!defForeColor.isValid()) defForeColor = Qt::black;
@@ -361,12 +360,12 @@ void caLineEdit::setValue(double value, const QString& units)
     }
     if(thisUnitMode) {
         strcat(asc, " ");
-        strcat(asc, units.toAscii().constData());
+        strcat(asc, units.toLatin1().constData());
         unitsLast = units;
     }
 
     valueLast = value;
-    setText(asc);
+    setTextLine(asc);
     setCursorPosition(0);
 }
 
@@ -466,12 +465,12 @@ void caLineEdit::updateAlarmColors()
     if (isValue) setValue(valueLast, unitsLast);
 }
 
-void caLineEdit::setText(const QString &txt)
+void caLineEdit::setTextLine(const QString &txt)
 {
     if(keepText == txt) {  // accelerate things
         return;
     }
-    //printf("settext: %s <%s> <%s>\n", thisPV.toAscii().constData(),  txt.toAscii().constData(), keepText.toAscii().constData());
+    //printf("settext: %s <%s> <%s>\n", thisPV.toLatin1().constData(),  txt.toLatin1().constData(), keepText.toLatin1().constData());
     QLineEdit::setText(txt);
 
     if(keepText.size() != txt.size()) {
@@ -483,7 +482,7 @@ void caLineEdit::setText(const QString &txt)
 
 void caLineEdit::forceText(const QString &txt)
 {
-    //printf("forcetext: <%s>\n", txt.toAscii().constData());
+    //printf("forcetext: <%s>\n", txt.toLatin1().constData());
     QLineEdit::setText(txt);
     FontScalingWidget::rescaleFont(text(), d_savedTextSpace);
 }

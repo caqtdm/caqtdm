@@ -58,7 +58,7 @@ caGraphics::caGraphics( QWidget *parent) :  QWidget(parent)
     thisSpanAngle = 90;
 
     setLineStyle(Solid);
-    setHidden(false);
+    setHide(false);
 
     setAttribute(Qt::WA_TranslucentBackground );
     setWindowFlags(Qt::FramelessWindowHint);
@@ -286,7 +286,7 @@ QPolygonF caGraphics::drawCircle(int x1, int x2, int y1, int y2) {
     return points;
 }
 
-void caGraphics::setHidden(bool hide)
+void caGraphics::setHide(bool hide)
 {
     thisHide = hide;
     repaint();
@@ -327,8 +327,6 @@ void caGraphics::paintEvent( QPaintEvent *event )
 
     if(thisFillStyle == Filled) {
         painter.setBrush(getForeground());
-    } else {
-        //painter.setBrush(QColor(0,0,0,0));
     }
 
     if(getForm() == Rectangle) {

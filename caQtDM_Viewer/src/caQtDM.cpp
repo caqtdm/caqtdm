@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
     searchFile *s = new searchFile("caQtDM_stylesheet.qss");
     QString fileNameFound = s->findFile();
     if(fileNameFound.isNull()) {
-        printf("caQtDM -- file <caQtDM_stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toAscii().constData());
+        printf("caQtDM -- file <caQtDM_stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toLatin1().constData());
     } else {
         QFile file(fileNameFound);
         file.open(QFile::ReadOnly);
@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
         s = new searchFile("stylesheet.qss");
         fileNameFound = s->findFile();
         if(fileNameFound.isNull()) {
-            printf("caQtDM -- file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toAscii().constData());
+            printf("caQtDM -- file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toLatin1().constData());
         } else {
             QFile file(fileNameFound);
             file.open(QFile::ReadOnly);
@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
         s = new searchFile(macroFile);
         fileNameFound = s->findFile();
         if(fileNameFound.isNull()) {
-            printf("caQtDM -- file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toAscii().constData());
+            printf("caQtDM -- file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", s->displayPath().toLatin1().constData());
         } else {
             QFile file(fileNameFound);
             file.open(QFile::ReadOnly);
@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
 #ifndef CONFIGURATOR
     QString displayPath = (QString)  qgetenv("CAQTDM_URL_DISPLAY_PATH");
     if(displayPath.length() > 0) {
-         printf("caQtDM -- files will be downloaded from <%s> when not locally found\n", displayPath.toAscii().constData());
+         printf("caQtDM -- files will be downloaded from <%s> when not locally found\n", displayPath.toLatin1().constData());
     } else {
         printf("caQtDM -- files will not download files when not locally found\n");
     }

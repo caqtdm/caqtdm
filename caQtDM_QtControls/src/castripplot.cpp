@@ -40,7 +40,6 @@
 #include <qlabel.h>
 #include <qpainter.h>
 #include "castripplot.h"
-#include <QList>
 
 // increase the array size given by the canvas width to be sure that the whole range is covered
 #define MAXIMUMSIZE 5000
@@ -60,7 +59,7 @@ public:
         double normalized = v - day * floor(v/day);
 
         QTime upTime = baseTime.addSecs((int) normalized);
-        //printf("label = addseconds=%d start plottime=%s labeltime=%s\n", seconds, baseTime.toString().toAscii().constData(),  upTime.toString().toAscii().constData());
+        //printf("label = addseconds=%d start plottime=%s labeltime=%s\n", seconds, baseTime.toString().toLatin1().constData(),  upTime.toString().toLatin1().constData());
         return upTime.toString();
     }
 
@@ -479,7 +478,7 @@ void caStripPlot::TimeOutThread()
 
     mutex.lock();
 
-    int dataCountLimit = (int) (HISTORY - 1 + SOMEMORE);
+    int dataCountLimit = HISTORY - 1 + SOMEMORE;
 
     // we need an exact time scale
     if(RestartPlot1) {
@@ -512,7 +511,7 @@ void caStripPlot::TimeOutThread()
     }
 
     // tell interval to base class nan
-    for (int c = 0; c < NumberOfCurves; c++ ) {
+    for (c = 0; c < NumberOfCurves; c++ ) {
         if(thisXaxisType == ValueScale) {
             fillcurve[c]->setInterval(ValueCurv, interval);
             errorcurve[c]->setInterval(ValueCurv, interval);
@@ -561,7 +560,7 @@ void caStripPlot::TimeOutThread()
     }
 
     // update last point
-    for (int c = 0; c < NumberOfCurves; c++ ) {
+    for (c = 0; c < NumberOfCurves; c++ ) {
         double valueMin = minVal[c];
         double valueMax = maxVal[c];
 
@@ -570,13 +569,13 @@ void caStripPlot::TimeOutThread()
             if(valueMax < 1.e-20) valueMax=1.e-20;
         }
 
-        QwtInterval tmp;
-        tmp.setMaxValue( valueMax);
-        tmp.setMinValue( valueMin);
+        QwtInterval tmpr;
+        tmpr.setMaxValue( valueMax);
+        tmpr.setMinValue( valueMin);
 
-        rangeData[c][0] = QwtIntervalSample( timeData, tmp);
+        rangeData[c][0] = QwtIntervalSample( timeData, tmpr);
         if(thisXaxisType != TimeScale) {
-            base[0] = QwtIntervalSample(timeData, tmp);
+            base[0] = QwtIntervalSample(timeData, tmpr);
         }
         if(thisStyle[c] == FillUnder) {
             fillData[c][0] = QPointF(timeData, (valueMax+valueMin)/2);
@@ -594,7 +593,7 @@ void caStripPlot::TimeOutThread()
     }
 
     // keep max and min of every curve
-    for (int c = 0; c < NumberOfCurves; c++ ) {
+    for (c = 0; c < NumberOfCurves; c++ ) {
         maxVal[c] = minVal[c] = actVal[c];
         realMax[c] = realMin[c] = realVal[c];
     }
@@ -604,7 +603,7 @@ void caStripPlot::TimeOutThread()
         AutoscaleMaxY = -INFINITY;
         AutoscaleMinY = INFINITY;
 
-        for (int c = 0; c < NumberOfCurves; c++ ) {
+        for (c = 0; c < NumberOfCurves; c++ ) {
             for (int counter = 0; counter < dataCount; counter++) {
                 QwtIntervalSample P = rangeData[c].at(counter);
                 if(!isnan(P.interval.maxValue()) && P.interval.maxValue() > AutoscaleMaxY) AutoscaleMaxY = P.interval.maxValue();
@@ -621,7 +620,7 @@ void caStripPlot::TimeOutThread()
         }
 
         if(thisYaxisType == log10) {
-            for (int c = 0; c < NumberOfCurves; c++ ) {
+            for (c = 0; c < NumberOfCurves; c++ ) {
                 if(AutoscaleMinY < thisYaxisLimitsMin[c]) AutoscaleMinY = thisYaxisLimitsMin[c];
             }
         }
@@ -774,7 +773,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 
 							QwtText text;
 							text.setText(legendText(i++));
-							//printf("%s %s\n", b->plainText().toAscii().constData(), legendText(i-1).toAscii().constData());
+                            //printf("%s %s\n", b->plainText().toLatin1().constData(), legendText(i-1).toLatin1().constData());
 							b->setText(text);
 							b->update();
 
@@ -783,7 +782,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 						break;
 
 					case FONT:
-						//printf("%s %s\n", b->plainText().toAscii().constData(), legendText(i-1).toAscii().constData());
+                        //printf("%s %s\n", b->plainText().toLatin1().constData(), legendText(i-1).toLatin1().constData());
 
 						b->setFont(f);
 						b->update();
@@ -792,7 +791,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 
 					case COLOR:
 
-						//printf("%s %s\n", b->plainText().toAscii().constData(), legendText(i-1).toAscii().constData());
+                        //printf("%s %s\n", b->plainText().toLatin1().constData(), legendText(i-1).toLatin1().constData());
 						QPalette palette = b->palette();
 						palette.setColor(QPalette::WindowText, c); // for ticks
 						palette.setColor(QPalette::Text, c);       // for ticks' labels
@@ -930,7 +929,7 @@ void caStripPlot::setGridColor(QColor c)
 
 QwtPlotCurve::CurveStyle caStripPlot::myStyle(curvStyle s)
 {
-    QwtPlotCurve::CurveStyle ms = QwtPlotCurve::Lines;
+    QwtPlotCurve::CurveStyle ms;
     switch ( s ) {
     case Lines:
         ms = QwtPlotCurve::Lines;  break;
@@ -1037,7 +1036,7 @@ bool caStripPlot::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::MouseButtonPress) {
         int nButton = ((QMouseEvent*) event)->button();
         if(nButton==2) {
-            //printf("emit from %s\n", this->objectName().toAscii().constData());
+            //printf("emit from %s\n", this->objectName().toLatin1().constData());
             QPoint p;
             emit ShowContextMenu(p);
         }

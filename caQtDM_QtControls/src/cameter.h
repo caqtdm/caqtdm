@@ -152,13 +152,13 @@ private:
    QString thisPV;
    colMode thisColorMode;
    QColor prevColor;
-   double thisMinValue, thisMaxValue, thisValue, lastValue;
+   double thisMinValue, thisMaxValue, lastValue;
    bool thisScaleEnabled, thisValueDisplayed;
    SourceMode thisLimitsMode;
    int thisPrecision;
    SourceMode thisPrecMode;
    FormatType thisFormatType;
-   int thisUnitMode;
+   bool thisUnitMode;
    char thisFormat[20];
    char thisFormatC[20];
    QString lastUnits;

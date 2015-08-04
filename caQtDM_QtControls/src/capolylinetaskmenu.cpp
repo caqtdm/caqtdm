@@ -24,8 +24,6 @@
  */
 
 #include <QtDesigner/QtDesigner>
-#include <QtGui>
-
 #include "capolyline.h"
 #include "capolylinedialog.h"
 #include "capolylinetaskmenu.h"

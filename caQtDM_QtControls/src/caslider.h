@@ -86,8 +86,8 @@ public:
     SourceMode getLimitsMode() const { return thisLimitsMode; }
     void setLimitsMode(SourceMode limitsmode) { thisLimitsMode = limitsmode;}
 
-    int getAccessW() const {return thisAccessW;}
-    void setAccessW(int access);
+    bool getAccessW() const {return thisAccessW;}
+    void setAccessW(bool access);
 
     double getMaxValue()  const {return thisMaximum;}
     void setMaxValue(double const &maxim);
@@ -121,7 +121,6 @@ protected:
     virtual void keyPressEvent(QKeyEvent *e);
     virtual void keyReleaseEvent(QKeyEvent *e);
     virtual bool event(QEvent *);
-    //virtual void timerEvent( QTimerEvent *e );
 
 private:
     bool eventFilter(QObject *obj, QEvent *event);

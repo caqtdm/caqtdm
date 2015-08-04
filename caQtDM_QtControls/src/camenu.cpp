@@ -25,7 +25,6 @@
 
 #include "camenu.h"
 #include "alarmdefs.h"
-#include <QtDebug>
 #include <QLineEdit>
 #include <QMouseEvent>
 #include<QApplication>

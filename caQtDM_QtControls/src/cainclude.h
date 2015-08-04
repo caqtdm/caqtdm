@@ -63,9 +63,6 @@ public:
     void setBackground(QColor c);
 
     void setLineSize( int size );
-    int getLineSize() {
-        return thisLineSize;
-    }
 
     void removeIncludedWidget();
 

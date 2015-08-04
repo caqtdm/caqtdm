@@ -95,9 +95,8 @@ public:
     void setData(int32_t* vector, short status, int size);
     void setData(char* vector, short status, int size);
 
-    int getAccessW() const {return _AccessW;}
-    void setAccessW(int access);
-    void updateText(const QString &text);
+    bool getAccessW() const {return _AccessW;}
+    void setAccessW(bool access);
 
     int getNumberOfRows() const {return rowcount;}
     void setNumberOfRows(int nbRows);
@@ -129,8 +128,6 @@ private:
     QString setValue(double value, DataType dataType);
 
     bool _AccessW;
-    QString startText;
-    bool emitted;
 
     QString	thisPV;
     int	thisColumnSize;
@@ -146,13 +143,11 @@ private:
     QVector<QString> keepText;
     int blockIndex;
 
-    int timerID;
     int colcount;
     int rowcount;
     bool dataPresent;
-    bool charsPresent;
 
-    QColor defaultBackColor;
+    //QColor defaultBackColor;
     QColor defaultForeColor;
 
     int channelPrecision;

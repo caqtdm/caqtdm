@@ -81,8 +81,8 @@ private:
     QColor thisBackColor, oldBackColor;
     QPalette thisPalette;
     bool thisLabelDisplay;
-    bool thisAccessW;
-    colMode  thisColorMode, oldColorMode;
+    int thisAccessW;
+    colMode  thisColorMode;
     QPalette defaultPalette;
 
     bool eventFilter(QObject *obj, QEvent *event);

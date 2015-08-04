@@ -24,8 +24,6 @@
  */
 
 #include "cascriptbutton.h"
-#include "alarmdefs.h"
-#include <QtDebug>
 #include <QApplication>
 
 caScriptButton::caScriptButton(QWidget *parent) : QWidget(parent)
@@ -40,7 +38,7 @@ caScriptButton::caScriptButton(QWidget *parent) : QWidget(parent)
     buttonScript = new EPushButton( "Action", this );
     buttonScript->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    setFontScaleMode(EPushButton::WidthAndHeight);
+    setFontScaleModeL(EPushButton::WidthAndHeight);
 
     l->addWidget(buttonScript, 0, 0);
     l->addWidget(displayScript, 0, 1);
@@ -114,7 +112,7 @@ void caScriptButton::setForeground(QColor c)
     thisForeColor = c;
     setColors(thisBackColor, thisForeColor, thisHoverColor, thisBorderColor);
 }
-void caScriptButton::setFontScaleMode(EPushButton::ScaleMode m)
+void caScriptButton::setFontScaleModeL(EPushButton::ScaleMode m)
 {
    thisScaleMode = m;
    if(thisScaleMode == EPushButton::None) {  // in this case we may use font
@@ -131,7 +129,7 @@ EPushButton::ScaleMode caScriptButton::fontScaleMode()
 
 void caScriptButton::changeEvent(QEvent *e) {
     Q_UNUSED(e);
-    setFontScaleMode(thisScaleMode);
+    setFontScaleModeL(thisScaleMode);
 }
 
 void caScriptButton::setScriptDisplay(defaultDisplay m)

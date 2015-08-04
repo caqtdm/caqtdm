@@ -125,7 +125,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
     QString line = in.readLine();
     while (!line.isNull()) {
 
-        PRINT(printf("line : <%s>\n", line.toAscii().constData()));
+        PRINT(printf("line : <%s>\n", line.toLatin1().constData()));
 
         // replace all tabs by blancs
         line.replace("\t", " ");
@@ -147,9 +147,9 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
         // break the line down in their elements
         QStringList elements= line.split(separator,  QString::SkipEmptyParts);
 /*
-        printf("%d %s\n", elements.count(), line.toAscii().constData());
+        printf("%d %s\n", elements.count(), line.toLatin1().constData());
         for (int i=0; i< elements.count(); i++) {
-            printf("<%s>\n",  elements.at(i).toAscii().constData());
+            printf("<%s>\n",  elements.at(i).toLatin1().constData());
         }
 */
         // empty line ?
@@ -186,14 +186,14 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
 
                 while (ll < elements.count()) {
                     bool ok = true;
-                    PRINT(printf("ll=%d elem=%s\n",ll, elements.at(ll).toAscii().constData() ));
+                    PRINT(printf("ll=%d elem=%s\n",ll, elements.at(ll).toLatin1().constData() ));
                     float number = elements.at(ll).toFloat(&ok);
                     Q_UNUSED(number);
 
                     if(elements.at(ll).contains("-span")) {
                         ll++;
                         if(ll < elements.count()) {
-                            PRINT(printf("span detected, value=%s\n", elements.at(ll).toAscii().constData()));
+                            PRINT(printf("span detected, value=%s\n", elements.at(ll).toLatin1().constData()));
                             span = elements.at(ll).toInt();
                         }
                     }
@@ -207,20 +207,20 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
 
                     else if(elements.at(ll).contains("-comlab")) {
                         ll++;
-                        PRINT(printf("comlab detected <%s>\n", elements.at(ll).toAscii().constData()));
-                        gridLayout[actualLine][actualColumn].comlab = elements.at(ll).toAscii().constData();
+                        PRINT(printf("comlab detected <%s>\n", elements.at(ll).toLatin1().constData()));
+                        gridLayout[actualLine][actualColumn].comlab = elements.at(ll).toLatin1().constData();
                     }
 
                     else if(elements.at(ll).contains("-command")) {
                         ll++;
-                        PRINT(printf("commmand detected <%s>\n", elements.at(ll).toAscii().constData()));
-                        gridLayout[actualLine][actualColumn].command = elements.at(ll).toAscii().constData();
+                        PRINT(printf("commmand detected <%s>\n", elements.at(ll).toLatin1().constData()));
+                        gridLayout[actualLine][actualColumn].command = elements.at(ll).toLatin1().constData();
                         gridLayout[actualLine][actualColumn].command =  gridLayout[actualLine][actualColumn].command.replace("\"", "");
                     }
 
                     else if(elements.at(ll).contains("-text")) {
                         ll++;
-                        PRINT(printf("text detected <%s>\n", elements.at(ll).toAscii().constData()));
+                        PRINT(printf("text detected <%s>\n", elements.at(ll).toLatin1().constData()));
                         widgetText = elements.at(ll);
                         gridLayout[actualLine][actualColumn].textPresent = true;
                     }
@@ -239,7 +239,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                         QString fgs;
                         ll++;
 
-                        PRINT(printf("fg detected <%s>\n", elements.at(ll).toAscii().constData()));
+                        PRINT(printf("fg detected <%s>\n", elements.at(ll).toLatin1().constData()));
                         fgs = elements.at(ll);
                         fgs = fgs.replace("\"", "");
                         fg = QColor(fgs);
@@ -248,18 +248,18 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                     else if(elements.at(ll).contains("-bg")) {
                         QString bgs;
                         ll++;
-                        PRINT(printf("fg detected <%s>\n", elements.at(ll).toAscii().constData()));
+                        PRINT(printf("fg detected <%s>\n", elements.at(ll).toLatin1().constData()));
                         bgs = elements.at(ll);
                         bgs = bgs.replace("\"", "");
                         bg = QColor(bgs);
 
                     } else if(elements.at(ll-1).contains("comment")) {
-                        PRINT(printf("comment  detected %s\n", elements.at(ll).toAscii().constData()));
+                        PRINT(printf("comment  detected %s\n", elements.at(ll).toLatin1().constData()));
                         widgetText = elements.at(ll);
                     }
 
                     else {
-                        PRINT(printf("something else  detected <%s>\n", elements.at(ll).toAscii().constData()));
+                        PRINT(printf("something else  detected <%s>\n", elements.at(ll).toLatin1().constData()));
                         QString item = elements.at(ll);
                         // is this a format
                         if(item.at(0) == '%') ok = true;
@@ -271,7 +271,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                     if(ok && (widgetType.contains("setrdbk") ||
                               widgetType.contains("wheelswitch") ||
                               widgetType.contains("formread")) ) {
-                        PRINT(printf("format detected %s\n", elements.at(ll).toAscii().constData()));
+                        PRINT(printf("format detected %s\n", elements.at(ll).toLatin1().constData()));
                         formats[nbFormats++] =elements.at(ll);
                     }
                     ll++;
@@ -294,7 +294,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                 gridLayout[actualLine][actualColumn].fg = fg;
                 gridLayout[actualLine][actualColumn].bg = bg;
 
-                PRINT(printf("%d %d %d <%s>\n", actualLine, actualColumn,  span, widgetType.toAscii().constData()));
+                PRINT(printf("%d %d %d <%s>\n", actualLine, actualColumn,  span, widgetType.toLatin1().constData()));
 
                 if(widgetType.contains("led") || widgetType.contains("formread") || widgetType.contains("wheelswitch") || widgetType.contains("choicebutton") ||
                   widgetType.contains("menubutton")) {
@@ -350,8 +350,8 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
 /*
         for(int i=0; i< actualLine; i++) {
             for (int j=0; j<grid; j++) {
-                printf("row=%d col=%d %20s text=%s nbelem=%d span=%d\n", i, j, gridLayout[i][j].widgetType.toAscii().constData(),
-                       gridLayout[i][j].widgetText.toAscii().constData(), gridLayout[i][j].nbElem, gridLayout[i][j].span);
+                printf("row=%d col=%d %20s text=%s nbelem=%d span=%d\n", i, j, gridLayout[i][j].widgetType.toLatin1().constData(),
+                       gridLayout[i][j].widgetText.toLatin1().constData(), gridLayout[i][j].nbElem, gridLayout[i][j].span);
             }
         }
 */
@@ -388,8 +388,8 @@ void ParsePepFile::DisplayFile(int nbRows, int nbCols, QByteArray *array)
 
             int spanColumns = 1;
 /*
-            printf("===== %d %d %20s text=%10s span=%d col=%d\n", i, j,  gridLayout[i][j].widgetType.toAscii().constData(),
-                   gridLayout[i][j].widgetText.toAscii().constData(),
+            printf("===== %d %d %20s text=%10s span=%d col=%d\n", i, j,  gridLayout[i][j].widgetType.toLatin1().constData(),
+                   gridLayout[i][j].widgetText.toLatin1().constData(),
                    gridLayout[i][j].span, col);
 */
 
@@ -604,7 +604,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         //////////////////////////////////////////////////////////////////////////////////
     } else if (grid.widgetType.contains("choicebutton")) {
 
-        PRINT(printf("create choicebutton row=%d column=%d <%s>\n", actualgridRow, effectiveColumn,grid.widgetText.toAscii().constData()));
+        PRINT(printf("create choicebutton row=%d column=%d <%s>\n", actualgridRow, effectiveColumn,grid.widgetText.toLatin1().constData()));
 
         writeItemRowCol(actualgridRow, effectiveColumn, spanGrid, array);
 
@@ -823,7 +823,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         }
 
     } else {
-        printf("%s not treated\n", grid.widgetType.toAscii().constData());
+        printf("%s not treated\n", grid.widgetType.toLatin1().constData());
     }
 }
 
@@ -1117,7 +1117,7 @@ void ParsePepFile::writeLabel(QString text, QString minwidth, QString minheight,
         writeCloseProperty(array);
     }
 
-    writeSimpleProperty("text", "string",  text.toAscii().constData(), array);
+    writeSimpleProperty("text", "string",  text.toLatin1().constData(), array);
     writeSimpleProperty("alignment", "set", alignment, array);
 
     if(transparent) setColor("background", 200, 200, 200, 0, array);

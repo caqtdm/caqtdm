@@ -336,7 +336,6 @@ private:
 
     QwtPlot *plot;
     QwtPlotSpectrogram *d_spectrogram;
-    QwtLinearColorMap m_colorMap;
     QwtPlotGrid * plotGrid;
     QTimer *Timer;
     double position, drift;

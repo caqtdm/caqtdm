@@ -55,7 +55,7 @@ class QTCON_EXPORT caChoice : public QWidget
     Q_PROPERTY(int startBit READ getStartBit WRITE setStartBit)
     Q_PROPERTY(int endBit   READ getEndBit   WRITE setEndBit)
 
-    Q_PROPERTY(EPushButton::ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleMode)
+    Q_PROPERTY(EPushButton::ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleModeL)
 
 public:
 
@@ -101,7 +101,7 @@ public:
      alignmentHor getAlignment() const {return thisAlignment;}
      void setAlignment(alignmentHor alignment);
 
-     void setFontScaleMode(EPushButton::ScaleMode m);
+     void setFontScaleModeL(EPushButton::ScaleMode m);
      EPushButton::ScaleMode fontScaleMode();
 
      void updateChoice();
@@ -124,7 +124,7 @@ private:
     bool         thisAccessW;
     bool eventFilter(QObject *obj, QEvent *event);
     QSignalMapper *signalMapper;
-    QStringList   texts, labels, lastLabels;
+    QStringList   texts, labels;
     QList<EPushButton*> cells;
     int         thisStartBit;
     int         thisEndBit;

@@ -25,7 +25,6 @@
 
 #include "camessagebutton.h"
 #include "alarmdefs.h"
-#include <QtDebug>
 #include <QApplication>
 
 caMessageButton::caMessageButton(QWidget *parent) : EPushButton(parent)
@@ -135,7 +134,7 @@ void caMessageButton::setNormalColors()
     setColors(thisBackColor, thisForeColor, thisHoverColor, thisBorderColor, thisDisabledForeColor);
 }
 
-void caMessageButton::setAccessW(int access)
+void caMessageButton::setAccessW(bool access)
 {
      _AccessW = access;
 }

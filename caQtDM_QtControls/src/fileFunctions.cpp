@@ -51,8 +51,8 @@ int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &
     infoString = "";
 
     //QString Path = (QString)  qgetenv("CAQTDM_DISPLAY_PATH");
-    //printf("<%s>\n", Path.toAscii().constData());
-    //printf("checkFileAndDownload <%s>\n", fileName.toAscii().constData());
+    //printf("<%s>\n", Path.toLatin1().constData());
+    //printf("checkFileAndDownload <%s>\n", fileName.toLatin1().constData());
 
     searchFile *s = new searchFile(fileName);
     QString fileNameFound = s->findFile();
@@ -68,7 +68,7 @@ int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &
 
     if(displayPath.length() < 1) return false;
 
-    //printf("filename to download %s\n", fileName.toAscii().constData());
+    //printf("filename to download %s\n", fileName.toLatin1().constData());
 
     displayPath.append("/");
     displayPath.append(fileName);

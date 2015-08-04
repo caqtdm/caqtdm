@@ -37,7 +37,7 @@ caBitnames::caBitnames(QWidget *parent) : EFlag(parent)
     setFalseColor(Qt::gray);
     numRows = 16;
     thisAlignment = EFlag::left;
-    setFontScaleMode(ESimpleLabel::WidthAndHeight);
+    setFontScaleModeL(ESimpleLabel::WidthAndHeight);
     setEnumStrings("1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16");
     setValue(0);
 }
@@ -82,7 +82,7 @@ void caBitnames::setValue(int valueP)
 {
     tf.clear();
     for (int i = thisStartBit; i <= thisEndBit; i++) {
-        if(bitState((int) valueP, i)) {
+        if(bitState(valueP, i)) {
             tf << 1;
         } else {
             tf << 0;
@@ -139,12 +139,12 @@ void caBitnames::setAlignment(alignmentHor alignment)
     EFlag::setTextAlignment(alignment);
 }
 
-void caBitnames::setFontScaleMode(ESimpleLabel::ScaleMode m)
+void caBitnames::setFontScaleModeL(ESimpleLabel::ScaleMode m)
 {
    EFlag::setFontScaleMode(m);
 }
 
-ESimpleLabel::ScaleMode caBitnames::fontScaleMode()
+ESimpleLabel::ScaleMode caBitnames::fontScaleModeL()
 {
    return EFlag::fontScaleMode();
 }

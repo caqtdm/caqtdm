@@ -76,8 +76,6 @@ public:
 
     void setAlarmColors(short status);
 
-    int value() const;
-
     void setLineSize( int size );
     int getLineSize() {
         return thisLineSize;
@@ -106,7 +104,7 @@ public:
     void setInEditor(bool in);
     void setEditSize(int x, int y, int w, int h);
 
-    void setHidden(bool hide);
+    void setHide(bool hide);
 
 protected:
     void mouseMoveEvent(QMouseEvent *event);

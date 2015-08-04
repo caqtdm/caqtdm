@@ -29,6 +29,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 { 
     Specials specials;
     int height;
+    Q_UNUSED(debugWindow);
 
 #ifndef MOBILE
     float COMBOHEIGHTFACTOR = 1.3;
@@ -369,6 +370,7 @@ void configDialog::exec()
 
 void configDialog::closeEvent(QCloseEvent *event)
 {
+    Q_UNUSED(event);
     loop.quit();
 }
 

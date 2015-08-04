@@ -26,13 +26,8 @@
 #include "cagauge.h"
 #include <QPainter>
 #include <QPaintEvent>
-#include <QConicalGradient>
-#include <QRadialGradient>
-#include <QPolygonF>
 #include <QApplication>
 #include <eng_notation.h>
-
-#include <QtDebug>
 
 #define MIN_FONT_SIZE 3
 
@@ -217,7 +212,7 @@ void caLinearGauge::drawColorBar(QPainter *p)
 
     if (m_fillMode != ALL)
     {
-        float v1, v2, min = 0.0, max = 0.0;
+        double v1, v2, min = 0.0, max = 0.0;
         v1 = (m_value-m_minValue)/(m_maxValue-m_minValue);
 
         p->setPen(Qt::black);
@@ -622,7 +617,7 @@ void caCircularGauge::drawLabels(QPainter *p)
     if (m_externalScale)
         f.setPointSizeF(5.5);
     else
-        f.setPointSizeF(5.5);
+        f.setPointSizeF(5.4);
     p->setFont(f);
     for (int i = 0; i < m_numMajorTicks; i++)
     {
@@ -641,7 +636,7 @@ void caCircularGauge::drawValue(QPainter *p)
     QString s;
     if (isEnabled())
     {
-        EngString engString(QString().sprintf(m_valueFormat.toAscii(), d_naturalValue), m_valueFormat, d_naturalValue);
+        EngString engString(QString().sprintf(m_valueFormat.toLatin1(), d_naturalValue), m_valueFormat, d_naturalValue);
         s = engString;
     }
     else

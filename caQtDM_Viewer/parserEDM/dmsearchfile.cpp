@@ -66,7 +66,7 @@ QString dmsearchFile::findFile()
 
     // return filename or null
     if(fileFound) {
-        //printf("dmsearchFile %s\n", FileName.toAscii().constData());
+        //printf("dmsearchFile %s\n", FileName.toLatin1().constData());
         return FileName;
     }
     else return NULL;

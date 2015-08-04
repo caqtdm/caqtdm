@@ -68,8 +68,6 @@ public:
     QString getPV() const;
     void setPV(QString const &newPV);
 
-    void setEnumDisplay(int cell, unsigned int value, QString corresponding_str, QColor corresponding_color);
-
     void setTrueColor(QColor c);
     QColor getTrueColor() const {return thisTrueColor;}
 
@@ -98,8 +96,6 @@ protected:
 
 private:
     int                 numRows;
-    int 	            numColumns;
-
     QColor		        thisFalseColor;
     QColor		        thisTrueColor;
     QGridLayout 	   *grid;

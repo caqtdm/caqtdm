@@ -92,10 +92,9 @@ public:
     bool getROI(int &x, int &y, int &w, int &h);
     QImage * showImageCalc(int datasize, char *data);
     void showImage(int datasize, char *data);
-    uint rgbFromWaveLength(double wave);
 
-    int getAccessW() const {return _AccessW;}
-    void setAccessW(int access);
+    bool getAccessW() const {return _AccessW;}
+    void setAccessW(bool access);
 
     QString getPV_Data() const {return thisPV_Data;}
     void setPV_Data(QString const &newPV) {thisPV_Data = newPV;}
@@ -175,10 +174,7 @@ private:
     void deleteWidgets();
     void initWidgets();
 
-    uint floatRGB(double mag, double min, double max);
-
     bool buttonPressed, validIntensity;
-    bool forcemonochrome;
     QString thisPV_Data, thisPV_Width, thisPV_Height, thisPV_Code, thisPV_BPP;
     QStringList thisCustomMap;
     ROI_type thisROItype;
@@ -198,9 +194,7 @@ private:
     bool m_widthDefined;
     bool m_heightDefined;
     int  m_code, m_bpp, m_width, m_height;
-
-    int frameCount;
-    struct timeb timeRef, timeR;
+    struct timeb timeRef;
     int savedSize;
     int savedWidth;
     int savedHeight;

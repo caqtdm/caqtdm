@@ -105,8 +105,8 @@ public:
     void showImage(int numXDataValues, int numYDataValues);
     void refreshImage();
 
-    int getAccessW() const {return _AccessW;}
-    void setAccessW(int access);
+    bool getAccessW() const {return _AccessW;}
+    void setAccessW(bool access);
 
     QString getPV_Data() const {return thisPV_Data;}
     void setPV_Data(QString const &newPV) {thisPV_Data = newPV;}
@@ -207,13 +207,12 @@ private:
 
     bool buttonPressed, validIntensity;
 
-    QString thisPV_Data, thisPV_Width, thisPV_Height, thisPV_Code, thisPV_BPP;
+    QString thisPV_Data, thisPV_Width, thisPV_Height;
     QStringList thisCustomMap;
     ROI_type thisROItype;
     QStringList thisPV_ROI_Read, thisPV_ROI_Write;
     QString thisPV_XCPT, thisPV_YCPT, thisPV_XNEWDATA, thisPV_YNEWDATA;
     QString thisPV_SAVEDATA_PATH, thisPV_SAVEDATA_SUBDIR, thisPV_SAVEDATA_FILENAME;
-    QStringList thisDataProcPV;
     QString thisMinLevel, thisMaxLevel;
     colormap thisColormap;
     zoom thisFitToSize;
@@ -227,10 +226,9 @@ private:
 
     bool m_widthDefined;
     bool m_heightDefined;
-    int m_code, m_bpp, m_width, m_height;
+    int m_width, m_height;
 
-    int frameCount;
-    struct timeb timeRef, timeR;
+    struct timeb timeRef;
     int savedSize;
     int savedWidth;
     int savedHeight;

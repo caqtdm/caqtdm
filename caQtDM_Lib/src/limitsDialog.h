@@ -85,7 +85,6 @@
 
      QWidget *thisWidget;
      QString thisPV;
-     QWidget *thisParent;
      QComboBox *limitsComboBox;
      QComboBox *precisionComboBox;
      QComboBox *formatComboBox;
@@ -97,9 +96,11 @@
      MutexKnobData *monData;
      QDialogButtonBox *buttonBox;
      QEventLoop loop;
-     double initMin, initMax, initPrecision;
+     double initMin, initMax;
+     int initPrecision;
      bool doNothing;
-     double channelLowerLimit, channelUpperLimit, channelPrecision;
+     double channelLowerLimit, channelUpperLimit;
+     int channelPrecision;
  };
 
  #endif

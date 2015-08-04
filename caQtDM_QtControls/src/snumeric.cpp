@@ -78,7 +78,7 @@ SNumeric::SNumeric(QWidget *parent, int id, int dd) : QFrame(parent), FloatDeleg
     writeAccessW(true);
 }
 
-void SNumeric::writeAccessW(int access)
+void SNumeric::writeAccessW(bool access)
 {
     _AccessW = access;
 }
@@ -477,8 +477,8 @@ void SNumeric::resizeEvent(QResizeEvent *e)
         int i=0;
 
         // put a border around selected digit
-        for(int i=0; i< digits; i++) {
-            labels[i]->setStyleSheet("");
+        for(int j=0; j< digits; j++) {
+            labels[j]->setStyleSheet("");
         }
         if(lastLabel != -1)
             labels[lastLabel]->setStyleSheet("border: 2px solid red;");
@@ -529,7 +529,7 @@ void SNumeric::resizeEvent(QResizeEvent *e)
         if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         labelFont.setPointSizeF(fontSize);
         signFont.setPointSizeF(fontSize);
-        //printf("digits=%d %s font size=%f\n", digits, l1->text().toAscii().constData(), fontSize);
+        //printf("digits=%d %s font size=%f\n", digits, l1->text().toLatin1().constData(), fontSize);
     }
     /* all fonts equal */
     if(d_fontScaleEnabled){

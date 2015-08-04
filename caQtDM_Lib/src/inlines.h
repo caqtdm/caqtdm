@@ -41,88 +41,88 @@
 
 // max, min values
 inline void setMaxValueA(QWidget *w, double &v) {
-    if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w)) widget->setMaxValue(v);
-    else if(caNumeric* widget = qobject_cast<caNumeric *>(w)) widget->setMaxValue(v);
-    else if(caSpinbox* widget = qobject_cast<caSpinbox *>(w)) widget->setMaxValue(v);
-    else if(caSlider* widget = qobject_cast<caSlider *>(w)) widget->setMaxValue(v);
-    else if(caThermo* widget = qobject_cast<caThermo *>(w)) widget->setMaxValue(v);
-    else if(caLineEdit* widget = qobject_cast<caLineEdit *>(w)) widget->setMaxValue(v);
-    else if(EAbstractGauge* widget = qobject_cast<EAbstractGauge *>(w)) widget->setMaxValue(v);
-    else if(caTable* widget = qobject_cast<caTable *>(w)) widget->setMaxValue(v);
+    if(caApplyNumeric* caapplynumericWidget = qobject_cast<caApplyNumeric *>(w)) caapplynumericWidget->setMaxValue(v);
+    else if(caNumeric* canumericWidget = qobject_cast<caNumeric *>(w)) canumericWidget->setMaxValue(v);
+    else if(caSpinbox* caspinboxWidget = qobject_cast<caSpinbox *>(w)) caspinboxWidget->setMaxValue(v);
+    else if(caSlider* casliderWidget = qobject_cast<caSlider *>(w)) casliderWidget->setMaxValue(v);
+    else if(caThermo* cathermoWidget = qobject_cast<caThermo *>(w)) cathermoWidget->setMaxValue(v);
+    else if(caLineEdit* calineeditWidget = qobject_cast<caLineEdit *>(w)) calineeditWidget->setMaxValue(v);
+    else if(EAbstractGauge* abstractgaugeWidget = qobject_cast<EAbstractGauge *>(w)) abstractgaugeWidget->setMaxValue(v);
+    else if(caTable* tableWidget = qobject_cast<caTable *>(w)) tableWidget->setMaxValue(v);
     else printf("caQtDM -- setMaxValueA not implemented\n");
 }
 
 inline void setMinValueA(QWidget *w, double &v) {
-    if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w)) widget->setMinValue(v);
-    else if(caNumeric* widget = qobject_cast<caNumeric *>(w)) widget->setMinValue(v);
-    else if(caSpinbox* widget = qobject_cast<caSpinbox *>(w)) widget->setMinValue(v);
-    else if(caSlider* widget = qobject_cast<caSlider *>(w)) widget->setMinValue(v);
-    else if(caThermo* widget = qobject_cast<caThermo *>(w)) widget->setMinValue(v);
-    else if(caLineEdit* widget = qobject_cast<caLineEdit *>(w)) widget->setMinValue(v);
-    else if(EAbstractGauge* widget = qobject_cast<EAbstractGauge *>(w)) widget->setMinValue(v);
-    else if(caTable* widget = qobject_cast<caTable *>(w)) widget->setMinValue(v);
+    if(caApplyNumeric* caapplynumericWidget = qobject_cast<caApplyNumeric *>(w)) caapplynumericWidget->setMinValue(v);
+    else if(caNumeric* canumericWidget = qobject_cast<caNumeric *>(w)) canumericWidget->setMinValue(v);
+    else if(caSpinbox* caspinboxWidget = qobject_cast<caSpinbox *>(w)) caspinboxWidget->setMinValue(v);
+    else if(caSlider* casliderWidget = qobject_cast<caSlider *>(w)) casliderWidget->setMinValue(v);
+    else if(caThermo* cathermoWidget = qobject_cast<caThermo *>(w)) cathermoWidget->setMinValue(v);
+    else if(caLineEdit* calineeditWidget = qobject_cast<caLineEdit *>(w)) calineeditWidget->setMinValue(v);
+    else if(EAbstractGauge* abstractgaugeWidget = qobject_cast<EAbstractGauge *>(w)) abstractgaugeWidget->setMinValue(v);
+    else if(caTable* tableWidget = qobject_cast<caTable *>(w)) tableWidget->setMinValue(v);
     else printf("caQtDM -- setMinValueA not implemented\n");
 }
 
 // limitsmode
 inline void setLimitsModeChannel(QWidget *w) {
-    if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w))  widget->setLimitsMode(caApplyNumeric::Channel);
-    else if(caNumeric* widget = qobject_cast<caNumeric *>(w))  widget->setLimitsMode(caNumeric::Channel);
-    else if(caSpinbox* widget = qobject_cast<caSpinbox *>(w)) widget->setLimitsMode(caSpinbox::Channel);
-    else if(caSlider* widget = qobject_cast<caSlider *>(w)) widget->setLimitsMode(caSlider::Channel);
-    else if(caThermo* widget = qobject_cast<caThermo *>(w)) widget->setLimitsMode(caThermo::Channel);
-    else if(caLineEdit* widget = qobject_cast<caLineEdit *>(w)) widget->setLimitsMode(caLineEdit::Channel);
-    else if(caTable* widget = qobject_cast<caTable *>(w)) widget->setLimitsMode(caTable::Channel);
+    if(caApplyNumeric* caapplynumericWidget = qobject_cast<caApplyNumeric *>(w))  caapplynumericWidget->setLimitsMode(caApplyNumeric::Channel);
+    else if(caNumeric* canumericWidget = qobject_cast<caNumeric *>(w))  canumericWidget->setLimitsMode(caNumeric::Channel);
+    else if(caSpinbox* caspinboxWidget = qobject_cast<caSpinbox *>(w)) caspinboxWidget->setLimitsMode(caSpinbox::Channel);
+    else if(caSlider* casliderWidget = qobject_cast<caSlider *>(w)) casliderWidget->setLimitsMode(caSlider::Channel);
+    else if(caThermo* cathermoWidget = qobject_cast<caThermo *>(w)) cathermoWidget->setLimitsMode(caThermo::Channel);
+    else if(caLineEdit* calineeditWidget = qobject_cast<caLineEdit *>(w)) calineeditWidget->setLimitsMode(caLineEdit::Channel);
+    else if(caTable* tableWidget = qobject_cast<caTable *>(w)) tableWidget->setLimitsMode(caTable::Channel);
     else printf("caQtDM -- setLimitsModeChannel not implemented\n");
 }
 inline void setLimitsModeUser(QWidget *w) {
-    if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w))  widget->setLimitsMode(caApplyNumeric::User);
-    else if(caNumeric* widget = qobject_cast<caNumeric *>(w))  widget->setLimitsMode(caNumeric::User);
-    else if(caSpinbox* widget = qobject_cast<caSpinbox *>(w)) widget->setLimitsMode(caSpinbox::User);
-    else if(caSlider* widget = qobject_cast<caSlider *>(w)) widget->setLimitsMode(caSlider::User);
-    else if(caThermo* widget = qobject_cast<caThermo *>(w)) widget->setLimitsMode(caThermo::User);
-    else if(caLineEdit* widget = qobject_cast<caLineEdit *>(w)) widget->setLimitsMode(caLineEdit::User);
-    else if(caTable* widget = qobject_cast<caTable *>(w)) widget->setLimitsMode(caTable::User);
+    if(caApplyNumeric* caapplynumericWidget = qobject_cast<caApplyNumeric *>(w))  caapplynumericWidget->setLimitsMode(caApplyNumeric::User);
+    else if(caNumeric* canumericWidget = qobject_cast<caNumeric *>(w))  canumericWidget->setLimitsMode(caNumeric::User);
+    else if(caSpinbox* caspinboxWidget = qobject_cast<caSpinbox *>(w)) caspinboxWidget->setLimitsMode(caSpinbox::User);
+    else if(caSlider* casliderWidget = qobject_cast<caSlider *>(w)) casliderWidget->setLimitsMode(caSlider::User);
+    else if(caThermo* cathermoWidget = qobject_cast<caThermo *>(w)) cathermoWidget->setLimitsMode(caThermo::User);
+    else if(caLineEdit* calineeditWidget = qobject_cast<caLineEdit *>(w)) calineeditWidget->setLimitsMode(caLineEdit::User);
+    else if(caTable* catableWidget = qobject_cast<caTable *>(w)) catableWidget->setLimitsMode(caTable::User);
     else printf("caQtDM -- setLimitsModeUser not implemented\n");
 }
 
 // precisionmode
 inline void setPrecisionModeChannel(QWidget *w) {
-    if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w))  widget->setPrecisionMode(caApplyNumeric::Channel);
-    else if(caNumeric* widget = qobject_cast<caNumeric *>(w))  widget->setPrecisionMode(caNumeric::Channel);
-    else if(caSpinbox* widget = qobject_cast<caSpinbox *>(w)) widget->setPrecisionMode(caSpinbox::Channel);
-    else if(caLineEdit* widget = qobject_cast<caLineEdit *>(w)) widget->setPrecisionMode(caLineEdit::Channel);
-    else if(caTable* widget = qobject_cast<caTable *>(w)) widget->setPrecisionMode(caTable::Channel);
+    if(caApplyNumeric* caapplynumericWidget = qobject_cast<caApplyNumeric *>(w))  caapplynumericWidget->setPrecisionMode(caApplyNumeric::Channel);
+    else if(caNumeric* canumericWidget = qobject_cast<caNumeric *>(w))  canumericWidget->setPrecisionMode(caNumeric::Channel);
+    else if(caSpinbox* caspinboxWidget = qobject_cast<caSpinbox *>(w)) caspinboxWidget->setPrecisionMode(caSpinbox::Channel);
+    else if(caLineEdit* calineeditWidget = qobject_cast<caLineEdit *>(w)) calineeditWidget->setPrecisionMode(caLineEdit::Channel);
+    else if(caTable* catableWidget = qobject_cast<caTable *>(w)) catableWidget->setPrecisionMode(caTable::Channel);
     else printf("caQtDM -- setPrecisionModeChannel not implemented\n");
 }
 inline void setPrecisionModeUser(QWidget *w) {
-    if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w))  widget->setPrecisionMode(caApplyNumeric::User);
-    else if(caNumeric* widget = qobject_cast<caNumeric *>(w))  widget->setPrecisionMode(caNumeric::User);
-    else if(caSpinbox* widget = qobject_cast<caSpinbox *>(w)) widget->setPrecisionMode(caSpinbox::User);
-    else if(caLineEdit* widget = qobject_cast<caLineEdit *>(w)) widget->setPrecisionMode(caLineEdit::User);
-    else if(caTable* widget = qobject_cast<caTable *>(w)) widget->setPrecisionMode(caTable::User);
+    if(caApplyNumeric* caapplynumericWidget = qobject_cast<caApplyNumeric *>(w))  caapplynumericWidget->setPrecisionMode(caApplyNumeric::User);
+    else if(caNumeric* canumericWidget = qobject_cast<caNumeric *>(w))  canumericWidget->setPrecisionMode(caNumeric::User);
+    else if(caSpinbox* caspinboxWidget = qobject_cast<caSpinbox *>(w)) caspinboxWidget->setPrecisionMode(caSpinbox::User);
+    else if(caLineEdit* calineeditWidget = qobject_cast<caLineEdit *>(w)) calineeditWidget->setPrecisionMode(caLineEdit::User);
+    else if(caTable* catableWidget = qobject_cast<caTable *>(w)) catableWidget->setPrecisionMode(caTable::User);
     else printf("caQtDM -- setPrecisionModeUser not implemented\n");
 }
 
 // format and digits for spinbox and numeric
 inline void setDecDigitsA(QWidget *w, int v) {
-    if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w))  widget->setDecDigits(v);
-    else if(caNumeric* widget = qobject_cast<caNumeric *>(w))  widget->setDecDigits(v);
-    else if(caSpinbox* widget = qobject_cast<caSpinbox *>(w)) widget->setDecDigits(v);
+    if(caApplyNumeric* caapplynumericWidget = qobject_cast<caApplyNumeric *>(w))  caapplynumericWidget->setDecDigits(v);
+    else if(caNumeric* canumericWidget = qobject_cast<caNumeric *>(w))  canumericWidget->setDecDigits(v);
+    else if(caSpinbox* caspinboxWidget = qobject_cast<caSpinbox *>(w)) caspinboxWidget->setDecDigits(v);
     else printf("caQtDM -- setDecDigitsA not implemented\n");
 }
 
 inline void setIntDigitsA(QWidget *w, int &v) {
-    if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w))  widget->setIntDigits(v);
-    else if(caNumeric* widget = qobject_cast<caNumeric *>(w))  widget->setIntDigits(v);
-    else if(caSpinbox* widget = qobject_cast<caSpinbox *>(w)) widget->setIntDigits(v);
+    if(caApplyNumeric* caapplynumericWidget = qobject_cast<caApplyNumeric *>(w))  caapplynumericWidget->setIntDigits(v);
+    else if(caNumeric* canumericWidget = qobject_cast<caNumeric *>(w))  canumericWidget->setIntDigits(v);
+    else if(caSpinbox* caspinboxWidget = qobject_cast<caSpinbox *>(w)) caspinboxWidget->setIntDigits(v);
     else printf("caQtDM -- setIntDigitsA not implemented\n");
 }
 
 inline void setFixedFormatA(QWidget *w, bool v) {
-    if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w))  widget->setFixedFormat(v);
-    else if(caNumeric* widget = qobject_cast<caNumeric *>(w))  widget->setFixedFormat(v);
-    else if(caSpinbox* widget = qobject_cast<caSpinbox *>(w)) widget->setFixedFormat(v);
+    if(caApplyNumeric* caapplynumericWidget = qobject_cast<caApplyNumeric *>(w))  caapplynumericWidget->setFixedFormat(v);
+    else if(caNumeric* canumericWidget = qobject_cast<caNumeric *>(w))  canumericWidget->setFixedFormat(v);
+    else if(caSpinbox* caspinboxWidget = qobject_cast<caSpinbox *>(w)) caspinboxWidget->setFixedFormat(v);
     else printf("caQtDM -- setFixedFormatA not implemented\n");
 }
 

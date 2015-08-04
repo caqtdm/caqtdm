@@ -44,7 +44,7 @@ class QTCON_EXPORT caScriptButton : public QWidget
     Q_PROPERTY(QString label READ getLabel WRITE setLabel)
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
-    Q_PROPERTY(EPushButton::ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleMode)
+    Q_PROPERTY(EPushButton::ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleModeL)
 
     Q_PROPERTY(defaultDisplay scriptDisplay READ getScriptDisplay WRITE setScriptDisplay)
 
@@ -77,14 +77,14 @@ public:
 
     bool getDisplayShowExecution() const { return thisShowExecution;}
 
-    void setFontScaleMode(EPushButton::ScaleMode m);
+    void setFontScaleModeL(EPushButton::ScaleMode m);
     EPushButton::ScaleMode fontScaleMode();
 
     void setScriptDisplay(defaultDisplay m);
     defaultDisplay getScriptDisplay() {return  thisDefaultDisplay;}
 
-    int getAccessW() const {return _AccessW;}
-    void setAccessW(int access) {_AccessW = access;}
+    bool getAccessW() const {return _AccessW;}
+    void setAccessW(bool access) {_AccessW = access;}
 
     void *getProcess() const {return thisProcess;}
     void setProcess(void *t) {thisProcess = t;}

@@ -87,7 +87,7 @@ bool caByte::bitState(long value, int bitNr)
 
 void caByte::setValue(long value)
 {
-    thisValue = (long)value;
+    thisValue = value;
     drawByte(thisValue, thisTrueColor, thisFalseColor);
 }
 

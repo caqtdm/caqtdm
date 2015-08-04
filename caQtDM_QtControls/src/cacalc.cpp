@@ -63,7 +63,7 @@ void caCalc::setText(const QString &txt)
     if(keepText == txt) {  // accelerate things
         return;
     }
-    //printf("set qstring=%s old=%s\n", txt.toAscii().constData(), keepText.toAscii().constData());
+    //printf("set qstring=%s old=%s\n", txt.toLatin1().constData(), keepText.toLatin1().constData());
     QLabel::setText(txt);
     keepText = txt;
 }

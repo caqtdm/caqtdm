@@ -48,7 +48,7 @@ void caSpinbox::setPV(QString const &newPV)
         thisPV = newPV;
     }
 
-void caSpinbox::setAccessW(int access)
+void caSpinbox::setAccessW(bool access)
 {
      thisAccessW = access;
      writeAccessW(thisAccessW);

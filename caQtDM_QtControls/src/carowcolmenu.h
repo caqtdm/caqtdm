@@ -46,7 +46,7 @@ class QTCON_EXPORT caRowColMenu : public QWidget
     Q_PROPERTY(QString labels READ getLabels WRITE setLabels)
     Q_PROPERTY(QString files READ getFiles WRITE setFiles)
     Q_PROPERTY(QString args READ getArgs WRITE setArgs)
-    Q_PROPERTY(EPushButton::ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleMode)
+    Q_PROPERTY(EPushButton::ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleModeL)
 
 public:
 
@@ -71,14 +71,12 @@ public:
     QString getArgs() const {return args.join(";");}
     void setArgs(QString const &newL) ;
 
-    void setMouseTracking(bool en);
-
     QString getLabel() const {return thisLabel;}
     void setLabel(QString const &label);
 
     void setImage(QString const &image);
 
-    void setFontScaleMode(EPushButton::ScaleMode m);
+    void setFontScaleModeL(EPushButton::ScaleMode m);
     EPushButton::ScaleMode fontScaleMode();
 
     void updateLabel();

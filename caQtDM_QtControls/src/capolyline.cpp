@@ -46,7 +46,7 @@ caPolyLine::caPolyLine(QWidget *parent): QWidget(parent)
     inEditor = false;
     mouseMove = false;
 
-    setHidden(false);
+    setHide(false);
 
     setAttribute(Qt::WA_TranslucentBackground, true );
     setWindowFlags(Qt::FramelessWindowHint);
@@ -160,7 +160,7 @@ void caPolyLine::mousePressEvent(QMouseEvent *event)
 {
     if(!inEditor) {
         if(event->type() == QEvent::MouseButtonPress) {
-                QMouseEvent *ev = (QMouseEvent *) event;
+                QMouseEvent *ev = event;
 #if QT_VERSION< QT_VERSION_CHECK(4, 8, 0)
                  if(ev->button() == Qt::MidButton) {
 #else
@@ -207,7 +207,7 @@ void caPolyLine::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
-void caPolyLine::setHidden(bool hide)
+void caPolyLine::setHide(bool hide)
 {
     thisHide = hide;
     repaint();
@@ -242,8 +242,8 @@ void caPolyLine::paintEvent(QPaintEvent * /* event */)
     for(int i=0; i< pairs.count(); i++) {
         QStringList xy = pairs.at(i).split(",", QString::SkipEmptyParts);
         if(xy.count() == 2) {
-            polygon.putPoints(i, 1, atoi(xy.at(0).toAscii().constData()), atoi(xy.at(1).toAscii().constData()));
-            lastPosition =  QPointF(atoi(xy.at(0).toAscii().constData()), atoi(xy.at(1).toAscii().constData()));
+            polygon.putPoints(i, 1, atoi(xy.at(0).toLatin1().constData()), atoi(xy.at(1).toLatin1().constData()));
+            lastPosition =  QPointF(atoi(xy.at(0).toLatin1().constData()), atoi(xy.at(1).toLatin1().constData()));
             nbPoints++;
         }
     }
@@ -252,7 +252,7 @@ void caPolyLine::paintEvent(QPaintEvent * /* event */)
     if((thisPolyStyle == Polygon) && (nbPoints > 2)) {
         QStringList xy = pairs.at(0).split(",", QString::SkipEmptyParts);
         if(xy.count() == 2) {
-            polygon.putPoints(nbPoints, 1, atoi(xy.at(0).toAscii().constData()), atoi(xy.at(1).toAscii().constData()));
+            polygon.putPoints(nbPoints, 1, atoi(xy.at(0).toLatin1().constData()), atoi(xy.at(1).toLatin1().constData()));
             nbPoints++;
         }
     }
@@ -292,8 +292,8 @@ void caPolyLine::resizeEvent(QResizeEvent *e)
     for(int i=0; i< pairs.count(); i++) {
         QStringList xy = pairs.at(i).split(",", QString::SkipEmptyParts);
         if(xy.count() == 2) {
-             double x = atof(xy.at(0).toAscii().constData()) * resizeX;
-             double y = atof(xy.at(1).toAscii().constData()) * resizeY;
+             double x = atof(xy.at(0).toLatin1().constData()) * resizeX;
+             double y = atof(xy.at(1).toLatin1().constData()) * resizeY;
              if(i!=0) thisXYpairs.append(";");
              thisXYpairs.append(QString::number((int)(x+0.5)));
              thisXYpairs.append(",");

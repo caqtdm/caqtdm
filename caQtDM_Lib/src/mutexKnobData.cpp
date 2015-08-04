@@ -34,7 +34,6 @@
 #include <QDebug>
 #include "QtControls"
 
-
 /**
  * this routine (re)allocates memory and copies the old data to the new memory
  */
@@ -79,9 +78,9 @@ void MutexKnobData::ReAllocate(int oldsize, int newsize, void **ptr)
 {
     void *tmp;
     //printf("reallocate for %d size\n", newsize);
-    tmp = (void *) malloc(newsize);
+    tmp = (void *) malloc((size_t) newsize);
     if(oldsize > 0) {
-        memcpy(tmp, *ptr, oldsize);
+        memcpy(tmp, *ptr, (size_t) oldsize);
         free(*ptr);
     }
     *ptr = tmp;
@@ -104,7 +103,7 @@ void MutexKnobData::InsertSoftPV(QString pv, int num, QWidget *w)
     int indx;
     char asc[MAXPVLEN+20];
     QMutexLocker locker(&mutex);
-    sprintf(asc, "%s_%p", pv.toAscii().constData(),  w);
+    sprintf(asc, "%s_%p", pv.toLatin1().constData(),  w);
     if(!getSoftPV(pv, &indx, (QWidget*) w)) {
         softPV_WidgetList.insert(asc, num);
         //qDebug() << "insert softpv_widgetList" << asc;
@@ -152,7 +151,7 @@ void MutexKnobData::RemoveSoftPV(QString pv, QWidget *w, int indx)
     char asc[MAXPVLEN+20];
     QMutexLocker locker(&mutex);
     // remove from the softpv list
-    sprintf(asc, "%s_%p", pv.toAscii().constData(),  w);
+    sprintf(asc, "%s_%p", pv.toLatin1().constData(),  w);
     softPV_WidgetList.remove(asc);
 
     // and remove from the global list
@@ -180,7 +179,7 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w)
 
     // update the right data
 
-    sprintf(asc, "%s_%p", pv.toAscii().constData(),  w);
+    sprintf(asc, "%s_%p", pv.toLatin1().constData(),  w);
     QMap<QString, int>::const_iterator name = softPV_WidgetList.find(asc);
     if(name != softPV_WidgetList.end()) {
         knobData *ptr = GetMutexKnobDataPtr(name.value());
@@ -200,7 +199,7 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w)
         QStringList list = i.key().split("_");
         if(pv == list.at(0)) {
             int indx = i.value();
-            if(KnobData[indx].index != -1 && KnobData[indx].pv == pv && ((QWidget*) list.at(2).toInt(0,16) ==  w)) {
+            if(KnobData[indx].index != -1 && KnobData[indx].pv == pv && ((QWidget*) list.at(2).toLong(0,16) ==  w)) {
                 //qDebug() <<  "     update index=" << i.value() << i.key() <<  w << "with" << value;
                 KnobData[indx].edata.rvalue = value;
                 KnobData[indx].edata.fieldtype = caDOUBLE;
@@ -221,7 +220,7 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w)
 bool MutexKnobData::getSoftPV(QString pv, int *indx, QWidget *w)
 {
     char asc[MAXPVLEN+20];
-    sprintf(asc, "%s_%p", pv.toAscii().constData(),  w);
+    sprintf(asc, "%s_%p", pv.toLatin1().constData(),  w);
     QMap<QString, int>::const_iterator name = softPV_WidgetList.find(asc);
     if(name != softPV_WidgetList.end()) {
         *indx = name.value();
@@ -265,7 +264,7 @@ int MutexKnobData::GetMutexKnobDataIndex()
     oldsize=KnobDataArraySize;
     newsize = KnobDataArraySize+200;
     void *p = &KnobData;
-    ReAllocate(oldsize * sizeof(knobData), newsize * sizeof(knobData), (void**) p);
+    ReAllocate(oldsize * (int) sizeof(knobData), newsize * (int) sizeof(knobData), (void**) p);
     for(int i=oldsize; i < newsize; i++){
         KnobData[i].index  = -1;
     }
@@ -392,7 +391,7 @@ void MutexKnobData::SetMutexKnobDataReceived(knobData *kData) {
             if(kPtr->index != -1) kPtr->edata.monitorCountPrev = kPtr->edata.monitorCount;
         }
 
-        highestCountPerSecond = highestCount / diff;
+        highestCountPerSecond = highestCount / (float) diff;
         highestIndexPV = highestIndex;
         highestCount = 0;
         nbDisplayCountPerSecond =  (int) (displayCount/diff);
@@ -412,7 +411,7 @@ void MutexKnobData::SetMutexKnobDataReceived(knobData *kData) {
 
         if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kData->edata.dataB != (void*) 0) {
             if(kData->edata.dataSize < 1024) {
-                memcpy(dataString, (char*) kData->edata.dataB, kData->edata.dataSize);
+                memcpy(dataString, (char*) kData->edata.dataB, (size_t) kData->edata.dataSize);
                 dataString[kData->edata.dataSize] = '\0';
             }
         }
@@ -469,7 +468,7 @@ extern "C" MutexKnobData* C_SetMutexKnobDataReceived(MutexKnobData* p, knobData 
   */
 void MutexKnobData::timerEvent(QTimerEvent *)
 {
-    double diff, repRate;
+    double diff=0.2, repRate=5.0;
     char units[40];
     char fec[40];
     char dataString[1024];
@@ -523,7 +522,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 kPtr->edata.oldsoftvalue = ptr->edata.rvalue;
                 QWidget *ww = (QWidget *)kPtr->dispW;
                 if (caTextEntry *widget = qobject_cast<caTextEntry *>(ww)) {
-                    widget->setAccessW(kPtr->edata.accessW);
+                    widget->setAccessW((bool) kPtr->edata.accessW);
                 }
             }
         }
@@ -546,7 +545,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
 
                 if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kPtr->edata.dataB != (void*) 0) {
                     if(kPtr->edata.dataSize < 1024) {
-                        memcpy(dataString, (char*) kPtr->edata.dataB, kPtr->edata.dataSize);
+                        memcpy(dataString, (char*) kPtr->edata.dataB, (size_t) kPtr->edata.dataSize);
                         dataString[kPtr->edata.dataSize] = '\0';
                     } else {
                         memcpy(dataString, (char*) kPtr->edata.dataB, 1024);

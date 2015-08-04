@@ -66,8 +66,8 @@ public:
     SNumeric(QWidget *parent, int intDigits = 2, int decDigits = 1);
     ~SNumeric(){}
 
-    int readAccessW() const {return _AccessW;}
-    void writeAccessW(int access);
+    bool readAccessW() const {return _AccessW;}
+    void writeAccessW(bool access);
     
     void setValue(double v);
 

@@ -199,7 +199,7 @@ void caTable::setValueFont(QFont font)
 
 void caTable::setValue(int row, int col, short status, double value, QString const &unit)
 {
-    string40 text;
+    string40 text = {'\0'};
     short Alarm = -1;
 
     if(row < 0 || row > MaxRows-1) return;

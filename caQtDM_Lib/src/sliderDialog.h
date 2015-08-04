@@ -72,8 +72,6 @@
      virtual void paintEvent(QPaintEvent *e);
 
  private:
-     QWidget *thisWidget;
-     QWidget *thisParent;
      QString thisPV;
 
      QDialogButtonBox *buttonBox;
@@ -81,7 +79,6 @@
      QEventLoop loop;
 
      caSlider *slider;
-     MutexKnobData *monData;
      QLineEdit  *incrementEdit, *valueEdit;
  };
 
