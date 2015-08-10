@@ -73,6 +73,7 @@
 #include "processWindow.h"
 #include "splashscreen.h"
 #include "messageQueue.h"
+#include "controlsinterface.h"
 
 #include <QtControls>
 
@@ -94,7 +95,7 @@ class CAQTDM_LIBSHARED_EXPORT CaQtDM_Lib : public QMainWindow
 
 public:
 
-    explicit CaQtDM_Lib(QWidget *parent = 0, QString="", QString="", MutexKnobData *mutexKnobData = 0, MessageWindow *msgWindow = 0, bool willPrint = false, QWidget *parentAS = 0);
+    explicit CaQtDM_Lib(QWidget *parent = 0, QString="", QString="", MutexKnobData *mutexKnobData = 0,  QMap<QString, ControlsInterface *> interfaces = QMap<QString, ControlsInterface *>(), MessageWindow *msgWindow = 0, bool willPrint = false, QWidget *parentAS = 0);
     ~CaQtDM_Lib();
 
     void allowResizing(bool allowresize);
@@ -252,6 +253,8 @@ private:
     bool PrimarySoftPV(QWidget* widget, QMap<QString, QString> map);
     void setCalcToNothing(QWidget* widget);
     bool Python_Error(QWidget *w, QString message);
+    ControlsInterface * getControlInterface(QString interface);
+    void FlushAllInterfaces();
 
 #ifdef MOBILE
     bool eventFilter(QObject *obj, QEvent *event);
@@ -297,6 +300,9 @@ private:
 
     int loopTimer;
     int loopTimerID;
+
+    QMap<QString, ControlsInterface*> controlsInterfaces;
+
 
 #ifdef epics4
     epics4Subs *Epics4;

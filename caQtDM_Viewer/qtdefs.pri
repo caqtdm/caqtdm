@@ -28,12 +28,27 @@ DEFINES += XDR_LE
 CONFIG += XDR_HACK
 }
 
+# undefine this for epics4 plugin support (only preliminary version as example)
+#CONFIG += epics4
+
+# undefine this when you need to combine caQtDM with the australian epicsqt package
+#CONFIG += australian
+
 # we can add python for calculations cacalc & visibility
 # include definitions and libraries are defined in caQtDM_Lib.pri for linux and macos
 CONFIG += PYTHONCALC
 
+
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
+
+# 3.9.5
+# calinedit for DBF_CHAR was missing.
+# infobox got epics description of channel
+# some small bugs corrected in infobox
+# some reingineering done
+# cabytecontroller directions corrected
+
 # 3.9.4
 # caQtDM will now also download from http when CAQTDM_URL_DISPLAY_PATH is defined
 # When starting with the option -httpconfig you will get the configuration screen in order to use network files as in mobile apps.

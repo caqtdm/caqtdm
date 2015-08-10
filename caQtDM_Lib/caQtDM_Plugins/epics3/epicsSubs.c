@@ -43,7 +43,6 @@
 #include "epicsExternals.h"
 #include <alarm.h>
 #include <epicsExport.h>
-//#include "tsDefs.h"
 #include "epicsTime.h"
 
 #undef epicsAlarmGLOBAL
@@ -58,17 +57,12 @@
 #include "messageWindowWrapper.h"
 #include "vaPrintf.h"
 
-#ifdef ACS
-#include "acsSubs.h"
-#endif
-
 #include <epicsMutex.h>
 static epicsMutexId lockEpics = (epicsMutexId) 0;
 
 extern MutexKnobData* KnobDataPtr;
 
 typedef struct _connectInfo {
-    int cs;          // 0= epics, 1 =acs
     int connected;
     int index;
     int event;
@@ -134,7 +128,6 @@ void Exceptionhandler(struct exception_handler_args args)
     C_postMsgEvent(messageWindow, 1, vaPrintf("Channel Access Exception %s on %s (op=%ld data_type=%s count=%ld)\n",
                                             args.ctx, pName, args.op, dbr_type_to_text(args.type), args.count));
 }
-
 
 /**
  * setup of our mutex
@@ -646,7 +639,7 @@ void connectCallback(struct connection_handler_args args)
 
     connectInfo *info = (connectInfo *) ca_puser(args.chid);
 
-    //printf("connectcallback %p pv=<%s> %d chid=%d\n", info, info->pv, info->evAdded, args.chid);
+    PRINT(printf("connectcallback %p pv=<%s> %d chid=%d\n", info, info->pv, info->evAdded, args.chid));
 
     switch (ca_state(args.chid)) {
 
@@ -706,29 +699,13 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
 {
     int status;
     connectInfo *info = (connectInfo *) 0;
-    struct timeb now;
-    ftime(&now);
-#ifdef ACS
-    char aux[10];
-    static int first = true;
-#endif
 
     PrepareDeviceIO();
+
     /* initialize channels */
     PRINT(printf("create channel index=%d <%s> rate=%d\n", index, kData->pv, rate));
 
-    kData->index = index;
-    kData->edata.monitorCount = 0;
-    kData->edata.displayCount = 0;
-    kData->edata.precision = 0; //default
-    kData->edata.units[0] = '\0';
     kData->edata.info = (connectInfo *) malloc(sizeof (connectInfo));
-    kData->edata.dataB =(void*) 0;
-    kData->edata.dataSize = 0;
-    kData->edata.initialize = true;
-    kData->edata.lastTime = now;
-    kData->edata.repRate = rate;   // default 5 Hz
-
     info = (connectInfo *) kData->edata.info;
 
     strcpy(info->pv, kData->pv);
@@ -737,37 +714,9 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
     info->event = 0;
     info->evAdded = false;
     info->ch = 0;
-    info->cs = 0;
 
     // update knobdata
     C_SetMutexKnobData(KnobDataPtr, index, *kData);
-
-    // in case of a soft channel there is nothing to do
-    if(kData->soft) return index;
-
-    // otherwise define data acquisition
-#ifdef ACS
-    if(first) {
-        StartPIOserver();
-        first = false;
-    }
-    kData->edata.severity = -4;
-    if(AddValueCell(kData->pv, index, aux) != -1) {
-        strcpy(kData->edata.aux, aux);
-
-        //printf("we added an acs device <%s> %d %d aux=<%s>\n", kData->pv,   kData->index, index, aux);
-        info->cs = 1;                 // acs controlsystem
-        // update knobdata
-        C_SetMutexKnobData(KnobDataPtr, index, *kData);
-        return index;
-    }
-#endif
-
-    // epics4
-    if(skip) {
-        info->cs = 2;
-        return index;
-    }
 
     //printf("we have to add an epics device <%s>\n", kData->pv);
     status = ca_create_channel(kData->pv,
@@ -804,15 +753,13 @@ void EpicsReconnect(knobData *kData)
     PRINT(printf("create channel for an epics device <%s>\n", kData->pv));
 
     if (info != (connectInfo *) 0) {
-        if(info->cs == 0) { // epics
-            status = ca_create_channel(kData->pv,
-                                       (void(*)())connectCallback,
-                                       info,
-                                       CA_PRIORITY_DEFAULT,
-                                       &info->ch);
-            if(status != ECA_NORMAL) {
-                printf("ca_create_channel:\n"" %s for %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], kData->pv);
-            }
+        status = ca_create_channel(kData->pv,
+                                   (void(*)())connectCallback,
+                                   info,
+                                   CA_PRIORITY_DEFAULT,
+                                   &info->ch);
+        if(status != ECA_NORMAL) {
+            printf("ca_create_channel:\n"" %s for %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], kData->pv);
         }
     }
 }
@@ -828,26 +775,24 @@ void EpicsDisconnect(knobData *kData)
 
     info = (connectInfo *) kData->edata.info;
     if (info != (connectInfo *) 0) {
-        if(info->cs == 0) { // epics
-            if(info->ch != (chid) 0) {
-                if(info->evAdded) {
-                    info->evAdded = false;
-                    status = ca_clear_event(info->evID);
-                    if (status != ECA_NORMAL) {
-                        printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]);
-                    }
+        if(info->ch != (chid) 0) {
+            if(info->evAdded) {
+                info->evAdded = false;
+                status = ca_clear_event(info->evID);
+                if (status != ECA_NORMAL) {
+                    printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]);
                 }
-
-                    status = ca_clear_channel(info->ch);
-                    info->connected = false;
-                    info->event = 0;
-                    info->ch = 0;
-                    if(status != ECA_NORMAL) {
-                        printf("ca_clear_channel: %s %s index=%d\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], info->pv, kData->index);
-                    }
-                    kData->edata.connected = false;
-                    kData->edata.unconnectCount = 0;
             }
+
+            status = ca_clear_channel(info->ch);
+            info->connected = false;
+            info->event = 0;
+            info->ch = 0;
+            if(status != ECA_NORMAL) {
+                printf("ca_clear_channel: %s %s index=%d\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], info->pv, kData->index);
+            }
+            kData->edata.connected = false;
+            kData->edata.unconnectCount = 0;
         }
     }
 }
@@ -873,34 +818,24 @@ void ClearMonitor(knobData *kData)
 
     info = (connectInfo *) kData->edata.info;
     if (info != (connectInfo *) 0) {
-        if(info->cs == 0) { // epics
-            if(info->ch != (chid) 0) {
-                if(info->evAdded) {
-                    info->evAdded = false;
-                    PRINT(printf("ca_clear_event: %s index=%d\n", info->pv, aux));
-                    status = ca_clear_event(info->evID);
-                    if (status != ECA_NORMAL) {
-                        PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
-                    }
+        if(info->ch != (chid) 0) {
+            if(info->evAdded) {
+                info->evAdded = false;
+                PRINT(printf("ca_clear_event: %s index=%d\n", info->pv, aux));
+                status = ca_clear_event(info->evID);
+                if (status != ECA_NORMAL) {
+                    PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
                 }
-                status = ca_clear_channel(info->ch);
-                PRINT(printf("ca_clear_channel: %s chid=%d, index=%d\n", info->pv, info->ch, aux));
-                info->connected = false;
-                info->event = 0;
-                info->ch = 0;
-                if(status != ECA_NORMAL) {
-                    printf("ca_clear_channel: %s %s index=%d\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], info->pv, aux);
-                }
-                info->pv[0] = '\0';
-
             }
-        } else if(info->cs == 2) { // epics4
-
-        } else {
-#ifdef ACS
-            //printf("delete acs channel %s index=%d\n", info->pv, aux);
-            RemoveValueCell(aux);
-#endif
+            status = ca_clear_channel(info->ch);
+            PRINT(printf("ca_clear_channel: %s chid=%d, index=%d\n", info->pv, info->ch, aux));
+            info->connected = false;
+            info->event = 0;
+            info->ch = 0;
+            if(status != ECA_NORMAL) {
+                printf("ca_clear_channel: %s %s index=%d\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], info->pv, aux);
+            }
+            info->pv[0] = '\0';
         }
     }
 
@@ -931,26 +866,6 @@ int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *obje
     }
 
     PrepareDeviceIO();
-
-#ifdef ACS
-    if(SetActivCell(pv) != -1) {
-        PRINT(printf("we have to set a value to an acs device <%s> %f %ld <%s> object=%s\n", pv, rdata, idata, sdata, object));
-        if(strstr(object, "numeric") != (char*) 0) {
-            SetDeviceFloatValue(pv, &rdata);
-        } else if(strstr(object, "slider") != (char*) 0) {
-            SetDeviceFloatValue(pv, &rdata);
-        } else if(strstr(object, "choice") != (char*) 0) {
-            SetDeviceStringValue(pv, sdata);
-        } else if(strstr(object, "menu") != (char*) 0) {
-            SetDeviceStringValue(pv, sdata);
-        } else if(strstr(object, "message") != (char*) 0) {
-            SetDeviceStringValue(pv, sdata);
-        } else if(strstr(object, "textEntry") != (char*) 0) {
-            SetDeviceStringValue(pv, sdata);
-        }
-        return 0;
-    }
-#endif
 
     // set epics value
     PRINT(printf(" we have to set a value to an epics device <%s> %f %ld <%s>\n", pv, rdata, idata, sdata));

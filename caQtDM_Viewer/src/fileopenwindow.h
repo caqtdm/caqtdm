@@ -50,6 +50,7 @@
 #include "knobDefines.h"
 #include "knobData.h"
 #include "mutexKnobData.h"
+#include "caqtdm_lib.h"
 #include "ui_main.h"
 #include <stdio.h>
 
@@ -132,6 +133,13 @@ signals:
      int activWindow;
      bool debugWindow;
      bool fromIOS;
+     
+     bool loadPlugin();
+
+     ControlsInterface *controlsInterface;
+
+     QMap<QString, ControlsInterface*> interfaces;
+
  };
 
  #endif

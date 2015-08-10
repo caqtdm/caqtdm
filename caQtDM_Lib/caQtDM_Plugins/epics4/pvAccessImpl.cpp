@@ -460,7 +460,7 @@ void MonitorRequesterImpl::ParseScalar(QString fieldName, PVScalarPtr const & pv
         PVShortPtr data = static_pointer_cast<PVShort>(pvs);
 
         if(thisFieldName.contains("value")) {
-            kPtr->edata.fieldtype = caSHORT;
+            kPtr->edata.fieldtype = caINT;
             kPtr->edata.rvalue = data->get();
             kPtr->edata.ivalue = (int)data->get();
         }

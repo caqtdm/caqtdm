@@ -20,6 +20,13 @@ echo create directory ./caQtDM_Binaries/designer
 mkdir -p ./caQtDM_Binaries/designer
 fi
 
+if [ -d "./caQtDM_Binaries/controlsystems" ]; then
+echo directory ./caQtDM_Binaries/controlsystems exists already
+else
+echo create directory ./caQtDM_Binaries/controlsystems
+mkdir -p ./caQtDM_Binaries/controlsystems
+fi
+
 echo package will be build in ./caQtDM_Binaries
 echo
 read -p "Press [Enter] key to start build "

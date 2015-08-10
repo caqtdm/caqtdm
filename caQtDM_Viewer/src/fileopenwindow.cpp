@@ -34,7 +34,6 @@ bool HTTPCONFIGURATOR = false;
 #include <QtGui>
 
 #include "fileopenwindow.h"
-#include "caqtdm_lib.h"
 #include "specialFunctions.h"
 #include "fileFunctions.h"
 
@@ -136,6 +135,57 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
 }
 #endif
 
+bool FileOpenWindow::loadPlugin()
+{
+    char asc[256];
+    int nbInterfaces = 0;
+    QList<QString> allPaths;
+
+    // get the controlsystem plugins from QT_PLUGIN_PATH
+    QString pluginPath = (QString)  qgetenv("QT_PLUGIN_PATH");
+    pluginPath.append("/controlsystems");
+    allPaths.append(pluginPath);
+
+    // alternative path
+    QString alternativePath(qApp->applicationDirPath());
+    alternativePath.append("/controlsystems");
+    allPaths.append(alternativePath);
+
+    for (int i = 0; i < allPaths.size(); ++i) {
+        QString path = allPaths.at(i);
+        QDir pluginsDir(path);
+        qDebug() << pluginsDir << pluginsDir.entryList(QDir::Files).length();
+
+        // seems are plugins are located here
+        if( pluginsDir.entryList(QDir::Files).length() > 0) {
+            if(i==0) {
+                sprintf(asc, "Controlsystem plugins will be loaded from QT_PLUGIN_PATH=%s", path.toLatin1().constData());
+            } else {
+                sprintf(asc, "Controlsystem plugins will be loaded from application path=%s", path.toLatin1().constData());
+            }
+            messageWindow->postMsgEvent(QtWarningMsg, asc);
+
+            foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
+                QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
+                QObject *plugin = pluginLoader.instance();
+                if (plugin) {
+                    controlsInterface = qobject_cast<ControlsInterface *>(plugin);
+                    if (controlsInterface) {
+                        qDebug() << controlsInterface->pluginName();
+                        controlsInterface->initCommunicationLayer(mutexKnobData);
+                        interfaces.insert(controlsInterface->pluginName(), controlsInterface);
+                        nbInterfaces++;
+                    }
+                }
+            }
+            break;
+        }
+    }
+
+    if(nbInterfaces== 0) return false; else return true;
+}
+
+
 /**
  * our main window (form) constructor
  */
@@ -170,9 +220,6 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     QString maxBytes = (QString)  qgetenv("EPICS_CA_MAX_ARRAY_BYTES");
     if(maxBytes.size() == 0) setenv("EPICS_CA_MAX_ARRAY_BYTES", "150000000", 1);
 
-    // for epics initialize a mutex
-    InitializeContextMutex();
-
     // in case of tablets, use static plugins linked in
 #ifdef MOBILE
     Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Controllers);
@@ -180,9 +227,27 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Graphics);
 #endif
 
+    // message window used by library and here
+    QWidget *widget =new QWidget();
+    messageWindow = new MessageWindow(widget);
+
     // create a class for exchanging data
     mutexKnobData = new MutexKnobData();
-    MutexKnobDataWrapperInit(mutexKnobData);
+
+    // load controls plugins
+    if (!loadPlugin()) {
+        QMessageBox::critical(this, "Error", "Could not load any plugin");
+    } else {
+        if(!interfaces.isEmpty()) {
+            QMapIterator<QString, ControlsInterface *> i(interfaces);
+            while (i.hasNext()) {
+                char asc[256];
+                i.next();
+                sprintf(asc, "Info: plugin %s loaded", i.key().toLatin1().constData());
+                messageWindow->postMsgEvent(QtWarningMsg, asc);
+            }
+        }
+    }
 
     // create form
     ui.setupUi(this);
@@ -203,9 +268,6 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 
     setWindowTitle(title);
 
-    // message window used by library and here
-    QWidget *widget =new QWidget();
-    messageWindow = new MessageWindow(widget);
 #ifdef MOBILE
     specials.setNewStyleSheet(messageWindow, qApp->desktop()->size(), 16, 10);
 #endif
@@ -649,7 +711,7 @@ void FileOpenWindow::Callback_OpenButton()
         QFileInfo fi(fileName);
         lastFilePath = fi.absolutePath();
         if(fi.exists()) {
-            CaQtDM_Lib *newWindow = new CaQtDM_Lib(this, fileName, "", mutexKnobData, messageWindow);
+            CaQtDM_Lib *newWindow = new CaQtDM_Lib(this, fileName, "", mutexKnobData, interfaces, messageWindow);
             if (fileName.contains("prc")) {
                 allowResize = false;
             }
@@ -817,7 +879,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         //qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString;
 
         if(printandexit) willPrint = true;
-        CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, messageWindow, willPrint);
+        CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, interfaces, messageWindow, willPrint);
 #ifdef MOBILE
         newWindow->grabSwipeGesture(fingerSwipeGestureType);
 #endif
@@ -995,7 +1057,7 @@ void FileOpenWindow::Callback_ActionReload()
                 QString fileNameFound = s->findFile();
                 fileS = fileNameFound;
 
-                CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, messageWindow);
+                CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, interfaces, messageWindow);
                 newWindow->allowResizing(allowResize);
 #ifdef MOBILE
                 newWindow->grabSwipeGesture(fingerSwipeGestureType);
