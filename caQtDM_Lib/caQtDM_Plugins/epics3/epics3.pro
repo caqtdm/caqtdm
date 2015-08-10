@@ -6,7 +6,15 @@ INCLUDEPATH    += .
 INCLUDEPATH    += ../
 INCLUDEPATH    += ../../src
 INCLUDEPATH    += $(EPICSINCLUDE)
-INCLUDEPATH    += $(EPICSINCLUDE)/os/Linux
+unix:!macx {
+ INCLUDEPATH    += $(EPICSINCLUDE)/os/Linux
+}
+macx: {
+ INCLUDEPATH += $(EPICSINCLUDE)/os/Darwin
+}
+win32 {
+  INCLUDEPATH += $$(EPICS_BASE)/include/os/win32
+}
 HEADERS         = epics3_plugin.h ../controlsinterface.h
 SOURCES         = epics3_plugin.cpp epicsSubs.c
 TARGET          = $$qtLibraryTarget(epics3_plugin)
