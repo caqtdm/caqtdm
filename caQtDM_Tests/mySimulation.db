@@ -221,6 +221,12 @@ record(stringin, "mynow")
    field(SCAN,"1 second")
 }
 
+record(stringin, "mystring")
+{
+   field (DESC, "a string")
+   field(SCAN,"1 second")
+}
+
 record(mbbo,"ACM:TEST:MBBO") {
         field(ZRVL, "0")
         field(ONVL, "1")
@@ -244,6 +250,13 @@ record(waveform, "ACM:TEST:WAVE"){
         field(DESC, "char waveform")
         field(FTVL, "CHAR")
         field(NELM, "128")
+}
+
+record(waveform,"BUSY") {
+        field(DESC, "busy")
+        field(FTVL, "CHAR")
+        field(NELM, "1")
+
 }
 
 record(calc,"ACM:COUNT:1") {
@@ -770,3 +783,15 @@ record(ai, "99:MeterAI") {
   field(HSV, "MINOR")
   field(LSV, "MINOR")
 }
+
+record(mbbiDirect, "MBBIDIECT" )
+{
+ field(DESC, "BIT")
+ field(SCAN, "Passive")
+ field(DTYP, "Soft Channel")
+}
+
+
+
+
+

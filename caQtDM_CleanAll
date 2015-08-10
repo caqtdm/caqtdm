@@ -17,10 +17,10 @@ rm -f ./caQtDM_Viewer/Makefile
 rm -f ./caQtDM_Viewer/parser/Makefile
 rm -f ./caQtDM_Viewer/parserEDM/Makefile
 rm -f ./caQtDM_Lib/Makefile
-rm -f ./caQtDM_Lib/caQtDM_Plugins/Makefile
-rm -f ./caQtDM_Lib/caQtDM_Plugins/demo/Makefile
-rm -f ./caQtDM_Lib/caQtDM_Plugins/epics3/Makefile
-rm -f ./caQtDM_Lib/caQtDM_Plugins/epics4/Makefile
+rm -f ./caQtDM_Lib/caQtDM_Plugins/Makefile.csplugins
+rm -f ./caQtDM_Lib/caQtDM_Plugins/demo/Makefile.csplugins
+rm -f ./caQtDM_Lib/caQtDM_Plugins/epics3/Makefile.csplugins
+rm -f ./caQtDM_Lib/caQtDM_Plugins/epics4/Makefile.csplugins
 rm -f ./caQtDM_QtControls/Makefile
 rm -f ./caQtDM_QtControls/plugins/Makefile
 rm -f ./caQtDM_Lib/*.so
