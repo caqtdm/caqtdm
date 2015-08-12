@@ -15,7 +15,7 @@ INCLUDEPATH    += $(EPICSINCLUDE)
 
 unix:!macx {
  INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
- LIBS += -L$(EPICSLIB) -Wl, -rpath,$(EPICSLIB) -lca -lCom
+ LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
  LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
 }
 
