@@ -1,4 +1,3 @@
-#include <QtGui>
 #include <QDebug>
 #include "demo_plugin.h"
 
@@ -176,4 +175,8 @@ int DemoPlugin::TerminateIO() {
     return true;
 }
 
-Q_EXPORT_PLUGIN2(DemoPlugin, DemoPlugin)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#else
+    Q_EXPORT_PLUGIN2(DemoPlugin, DemoPlugin)
+#endif
+

@@ -52,6 +52,7 @@ qtcontrols_monitors.file = caQtDM_QtControls/plugins/qtcontrols_monitors.pro
 qtcontrols_monitors.depends = caQtDM_QtControls caQtDM_Lib
 
 caQtDM_Plugins.file = caQtDM_Lib/caQtDM_Plugins/csplugins.pro 
+caQtDM_Plugins.depends = caQtDM_QtControls caQtDM_Lib
 
 !ios {
 SUBDIRS += parser

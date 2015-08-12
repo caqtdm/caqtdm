@@ -147,9 +147,15 @@ bool FileOpenWindow::loadPlugin()
     allPaths.append(pluginPath);
 
     // alternative path
+#if defined(__OSX__) || defined(__APPLE__)
+    QString alternativePath(qApp->applicationDirPath());
+    alternativePath.append("/../Plugins/controlsystems");
+    allPaths.append(alternativePath);
+#else
     QString alternativePath(qApp->applicationDirPath());
     alternativePath.append("/controlsystems");
     allPaths.append(alternativePath);
+#endif
 
     for (int i = 0; i < allPaths.size(); ++i) {
         QString path = allPaths.at(i);
@@ -158,14 +164,16 @@ bool FileOpenWindow::loadPlugin()
 
         // seems are plugins are located here
         if( pluginsDir.entryList(QDir::Files).length() > 0) {
+            QString currentPath = pluginsDir.absolutePath();
             if(i==0) {
-                sprintf(asc, "Controlsystem plugins will be loaded from QT_PLUGIN_PATH=%s", path.toLatin1().constData());
+                sprintf(asc, "Controlsystem plugins will be loaded from QT_PLUGIN_PATH=%s", currentPath.toLatin1().constData());
             } else {
-                sprintf(asc, "Controlsystem plugins will be loaded from application path=%s", path.toLatin1().constData());
+                sprintf(asc, "Controlsystem plugins will be loaded from application path=%s", currentPath.toLatin1().constData());
             }
             messageWindow->postMsgEvent(QtWarningMsg, asc);
 
             foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
+                qDebug() << "load " << pluginsDir.absoluteFilePath(fileName);
                 QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
                 QObject *plugin = pluginLoader.instance();
                 if (plugin) {

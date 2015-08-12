@@ -14,10 +14,6 @@ android {
 include(../../qwt-6.1.1_android/qwt.prf)
 }
 
-!ios {
-  include($$(QWTHOME)/qwt.prf)
-}
-
 TARGET = caQtDM
 TEMPLATE = app
 DESTDIR = $(CAQTDM_COLLECT)
@@ -150,17 +146,17 @@ android {
   LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
   LIBS += -L$(CAQTDM_COLLECT) -L$(CAQTDM_COLLECT)/designer
 
-unix:!macx {
+  unix:!macx {
 
   }
   macx: {
 
-   QMAKE_INFO_PLIST = ../src/Mac/Info.plist
-   APP-FONTS.files = ../caQtDM_Viewer/lucida-sans-typewriter.ttf
+   QMAKE_INFO_PLIST = ./src/Mac/Info.plist
+   APP-FONTS.files = lucida-sans-typewriter.ttf
    APP-FONTS.path = Contents/Resources/fonts
    QMAKE_BUNDLE_DATA += APP-FONTS
    CONFIG += app_bundle
-   ICON = ../src/caQtDM.icns
+   ICON = ./src/caQtDM.icns
    plugins.path = Contents/PlugIns/designer
    plugins.files = $(CAQTDM_COLLECT)/designer/libqtcontrols_controllers_plugin.dylib
    plugins.files += $(CAQTDM_COLLECT)/designer/libqtcontrols_graphics_plugin.dylib

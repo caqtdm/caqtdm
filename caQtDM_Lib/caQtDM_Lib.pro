@@ -61,7 +61,7 @@ ios | android {
 
 !ios {
    unix:!macx {
-      LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca
+      LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
       LIBS += -L$(CAQTDM_COLLECT) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
       INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
       INCLUDEPATH += ./caQtDM_Plugins
@@ -71,6 +71,7 @@ ios | android {
       INCLUDEPATH += ./caQtDM_Plugins
       QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
       LIBS += -F$(QWTLIB) -framework qwt
+      LIBS += -L$(CAQTDM_COLLECT) -lqtcontrols
       LIBS += ${EPICSLIB}/libca.dylib
       LIBS += ${EPICSLIB}/libCom.dylib
    }

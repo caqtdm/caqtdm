@@ -1,5 +1,5 @@
-#ifndef EPICS4PLUGIN_H
-#define EPICS4PLUGIN_H
+#ifndef DEMOPLUGIN_H
+#define DEMOPLUGIN_H
 
 #include <QObject>
 #include <QMap>
@@ -12,6 +12,9 @@ class DemoPlugin : public QObject, ControlsInterface
 {
     Q_OBJECT
     Q_INTERFACES(ControlsInterface)
+#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
+    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.democontrols")
+#endif
 
 public:
     QString pluginName();

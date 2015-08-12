@@ -1,4 +1,3 @@
-#include <QtGui>
 #include <QDebug>
 #include "epics3_plugin.h"
 
@@ -95,5 +94,9 @@ int Epics3Plugin::TerminateIO() {
     return true;
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#else
+    Q_EXPORT_PLUGIN2(Epics3Plugin, Epics3Plugin)
+#endif
 
-Q_EXPORT_PLUGIN2(Epics3Plugin, Epics3Plugin)
+

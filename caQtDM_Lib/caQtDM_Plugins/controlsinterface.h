@@ -1,9 +1,11 @@
-#ifndef CONTROLSNTERFACE_H
+#ifndef CONTROLSINTERFACE_H
 #define CONTROLSINTERFACE_H
 #include "mutexKnobData.h"
 #include <QString>
+#include <QtPlugin>
 
 class ControlsInterface
+
 {
 public:
     virtual ~ControlsInterface() {}

@@ -1,4 +1,3 @@
-#include <QtGui>
 #include <QDebug>
 #include <QString>
 #include "epics4_plugin.h"
@@ -93,4 +92,8 @@ int Epics4Plugin::TerminateIO() {
     return true;
 }
 
-Q_EXPORT_PLUGIN2(Epics4Plugin, Epics4Plugin)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#else
+    Q_EXPORT_PLUGIN2(Epics4Plugin, Epics4Plugin)
+#endif
+
