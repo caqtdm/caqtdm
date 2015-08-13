@@ -19,7 +19,7 @@ demo_plugin {
                 INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
 
                 win32-msvc* {
-                        CONFIG += Define_DebugBuild_caQtDM_Lib Define_ReleaseBuild_caQtDM_Lib
+                        CONFIG += Define_Build_caQtDM_Lib Define_Symbols
                 }
 
                 win32-g++ {
@@ -54,8 +54,8 @@ epics3_plugin {
   		INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
 
                 win32-msvc* {
-                        CONFIG += Define_DebugBuild_epics_controls Define_ReleaseBuild_epics_controls
-                        CONFIG += Define_DebugBuild_caQtDM_Lib Define_ReleaseBuild_caQtDM_Lib
+                        CONFIG += Define_Build_epics_controls 
+                        CONFIG += Define_Build_caQtDM_Lib Define_Symbols
                 }
 
                 win32-g++ {
@@ -88,10 +88,10 @@ epics4_plugin {
 	}	
 	win32 {
                 message(“epics4_plugin configuration win32”)
-  		INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
+  		
                 win32-msvc* {
-                        CONFIG += Define_DebugBuild_epics_controls Define_ReleaseBuild_epics_controls
-                        CONFIG += Define_DebugBuild_caQtDM_Lib Define_ReleaseBuild_caQtDM_Lib
+                        CONFIG += Define_Build_epics_controls Define_Build_objDirs
+                        CONFIG += Define_Build_caQtDM_Lib Define_Symbols
                 }
 
                 win32-g++ {
@@ -105,29 +105,35 @@ epics4_plugin {
 
 #==========================================================================================================
 caQtDM_QtControls {
-        message(“caQtDM_QtControls configuration”)
+        message("caQtDM_QtControls configuration")
   	unix:!macx {
-                message(“caQtDM_QtControls configuration : unix:!macx”)
+                message("caQtDM_QtControls configuration : unix:!macx")
+ 		OBJECTS_DIR = obj
+		DESTDIR = $$(CAQTDM_COLLECT)
  		INCLUDEPATH += $$(QWTINCLUDE)
     		LIBS += -L$$(QWTLIB) -Wl,-rpath,$(QWTLIB) -lqwt
   	}
 
         macx {
-                message(“caQtDM_QtControls configuration : macx”)
+                message("caQtDM_QtControls configuration : macx")
  		INCLUDEPATH += $$(QWTINCLUDE)
+    		OBJECTS_DIR = obj
+		DESTDIR = $$(CAQTDM_COLLECT)
     		CONFIG += lib_bundle
     		LIBS += -F$$(QWTLIB) -framework qwt
   	}
 
 	ios | android {
-                message(“caQtDM_QtControls configuration : ios or android”)
+                message("caQtDM_QtControls configuration : ios or android")
+		OBJECTS_DIR = obj
+		DESTDIR = $$(CAQTDM_COLLECT)
 		INCLUDEPATH += $$(QWTINCLUDE)
    		CONFIG += staticlib
    		
 	}
 
 	win32 {
-                message(“caQtDM_QtControls sconfiguration : win32”)
+                message("caQtDM_QtControls sconfiguration : win32")
                 INCLUDEPATH += $$(QWTINCLUDE)
     		win32-g++ {
       			INCLUDEPATH = $(QWTHOME)/src
@@ -135,24 +141,26 @@ caQtDM_QtControls {
      		}
      		win32-msvc* {
         		DEFINES += QTCON_MAKEDLL _CRT_SECURE_NO_WARNINGS
-                        CONFIG += Define_DebugBuild_qwt Define_ReleaseBuild_qwt
+                        CONFIG += Define_Build_qwt Define_Build_objDirs Define_Symbols Define_Build_OutputDir
      		}
 	}
 }
 
 #==========================================================================================================
 caQtDM_Lib {
-        message(“caQtDM_Lib configuration”)
+        message("caQtDM_Lib configuration")
    	unix:!macx {
-                message(“caQtDM_Lib configuration : unix:!macx”)
+                message("caQtDM_Lib configuration : unix:!macx")
       		LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
       		LIBS += -L$(CAQTDM_COLLECT) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
       		INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
       		INCLUDEPATH += ./caQtDM_Plugins
+      		DESTDIR = $(CAQTDM_COLLECT)
+
    	}
 
         macx {
-                message(“caQtDM_Lib configuration : macx”)
+                message("caQtDM_Lib configuration : macx")
       		INCLUDEPATH += $(EPICSINCLUDE)/os/Darwin
       		INCLUDEPATH += ./caQtDM_Plugins
       		QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
@@ -160,13 +168,16 @@ caQtDM_Lib {
       		LIBS += -L$(CAQTDM_COLLECT) -lqtcontrols
       		LIBS += ${EPICSLIB}/libca.dylib
       		LIBS += ${EPICSLIB}/libCom.dylib
+      		DESTDIR = $(CAQTDM_COLLECT)
+
    	}
 
 	ios | android {
-                message(“caQtDM_Lib configuration : !os or android”)
+                message("caQtDM_Lib configuration : !os or android")
    		CONFIG += staticlib
                 SOURCES +=     fingerswipegesture.cpp
       		HEADERS +=     fingerswipegesture.h
+		DESTDIR = $(CAQTDM_COLLECT)
 
 		ios {
       			INCLUDEPATH += $(EPICSINCLUDE)/os/iOS
@@ -178,7 +189,7 @@ caQtDM_Lib {
 	}
 
 	win32 {
-                message(“caQtDM_Lib configuration : win32”)
+                message("caQtDM_Lib configuration : win32")
    		INCLUDEPATH += $$(EPICS_BASE)/include
    		INCLUDEPATH += $$(EPICS_BASE)/include/os/win32
 
@@ -186,8 +197,8 @@ caQtDM_Lib {
         		DEFINES +=_CRT_SECURE_NO_WARNINGS
         		DEFINES += CAQTDM_LIB_LIBRARY
         		TEMPLATE = lib
-                        CONFIG += Define_DebugBuild_qwt Define_ReleaseBuild_qwt
-                        CONFIG += Define_DebugBuild_epics_controls Define_ReleaseBuild_epics_controls
+                        CONFIG += Define_Build_qwt Define_Build_objDirs
+                        CONFIG += Define_Build_epics_controls Define_Symbols Define_Build_OutputDir
    		}
    		win32-g++ {
        			EPICS_LIBS=$$(EPICS_BASE)/lib/win32-x86-mingw
@@ -200,28 +211,28 @@ caQtDM_Lib {
 
 	}
 }
-
+#==========================================================================================================
 caQtDM_Viewer {
-        message(“caQtDM_viewer configuration”)
+        message("caQtDM_viewer configuration")
         DEFINES += BUILDVERSION=\\\"$${CAQTDM_VERSION}\\\"
         DEFINES += BUILDARCH=\\\"$$(QMAKESPEC)\\\"
 
 	unix {
-                message(“caQtDM_viewer configuration : unix”)
+                message("caQtDM_viewer configuration : unix")
   		CONFIG += x11
 		DEFINES += BUILDTIME=\\\"$$system(date '+%H:%M')\\\"
 		DEFINES += BUILDDATE=\\\"$$system(date '+%d-%m-%Y')\\\"
         }
 
         !ios!android {
-                message(“caQtDM_viewer configuration : !ios!android (all unixes + mac)”)
+                message("caQtDM_viewer configuration : !ios!android (all unixes + mac)")
                 LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
                 LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
                 LIBS += -L$(CAQTDM_COLLECT) -L$(CAQTDM_COLLECT)/designer
 	}
 
  	macx {
-                message(“caQtDM_viewer configuration : macx (only mac)”)
+                message("caQtDM_viewer configuration : macx (only mac)")
    		QMAKE_INFO_PLIST = ./src/Mac/Info.plist
    		APP-FONTS.files = lucida-sans-typewriter.ttf
                 APP-FONTS.path = Contents/Resources/fonts
@@ -243,7 +254,7 @@ caQtDM_Viewer {
   	}
 
         ios {
-                message(“caQtDM_viewer configuration : ios”)
+                message("caQtDM_viewer configuration : ios")
    		CONFIG += staticlib
    		LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.a
    		LIBS += $(CAQTDM_COLLECT)/libqtcontrols.a
@@ -274,7 +285,7 @@ caQtDM_Viewer {
 	}
 
 	android {
-                message(“caQtDM_viewer configuration : android”)
+                message("caQtDM_viewer configuration : android")
                 include(../../qwt-6.1.1_android/qwt.prf)
    		CONFIG += staticlib
    		LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_controllers_plugin.a
@@ -317,7 +328,7 @@ caQtDM_Viewer {
 	}
 
 	win32 {
-                message(“caQtDM_viewer configuration : win32”)
+                message("caQtDM_viewer configuration : win32")
 		DEFINES += BUILDTIME=\\\"\\\"
 		DEFINES += BUILDDATE=\\\"\\\"
 		DEFINES += SUPPORT=\\\"\\\"
@@ -343,9 +354,10 @@ caQtDM_Viewer {
                 RC_FILE = ./src/caQtDM.rc
 
 		win32-msvc* {
-                        CONFIG += Define_DebugBuild_qwt Define_ReleaseBuild_qwt
-                        CONFIG += Define_DebugBuild_epics_controls Define_ReleaseBuild_epics_controls
-                        CONFIG += Define_DebugBuild_caQtDM_Lib Define_ReleaseBuild_caQtDM_Lib
+                        CONFIG += Define_Build_qwt Define_Build_objDirs
+                        CONFIG += Define_Build_epics_controls
+                        CONFIG += Define_Build_caQtDM_Lib Define_Symbols 
+                        CONFIG += Define_Build_OutputDir
 		}
 
                 win32-g++ {
@@ -360,61 +372,96 @@ caQtDM_Viewer {
 	}
 
 }
+#==========================================================================================================
+caQtDM_adl2ui{
+        message("adl2ui configuration")
+	unix:!macx {
+                message("adl2ui configuration unix!macx")
+		OBJECTS_DIR = obj
+		DESTDIR = $(CAQTDM_COLLECT)
+	}
 
-Define_DebugBuild_qwt {
-     Debug_Build {
-         OBJECTS_DIR = debug/obj
-         DESTDIR = $$(CAQTDM_COLLECT)/debug
-         LIBS += $$(QWTHOME)/lib/qwtd.lib
-     }
+        macx {
+                message("adl2ui configuration macx")
+		OBJECTS_DIR = obj
+		DESTDIR = $(CAQTDM_COLLECT)
+        }
+
+        win32 {
+                message("adl2ui configuration win32")
+                win32-msvc* {
+                        CONFIG += Define_Build_OutputDir
+                }
+
+                win32-g++ {
+			OBJECTS_DIR = obj
+			DESTDIR = $(CAQTDM_COLLECT)
+                }
+        }
 }
-
-Define_ReleaseBuild_qwt {
-    ReleaseBuild {
-	QMAKE_CXXFLAGS += /Z7
-	QMAKE_CFLAGS   += /Z7
-	QMAKE_LFLAGS   += /DEBUG /OPT:REF /OPT:ICF
-        DESTDIR = $(CAQTDM_COLLECT)
-        OBJECTS_DIR = release/obj
-        LIBS += $$(QWTHOME)/lib/qwt.lib
-    }
-}
-
-Define_DebugBuild_epics_controls {
-     Debug_Build {
-        CONFIG += console
-        DESTDIR = $(CAQTDM_COLLECT)/debug
-        EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
-        OBJECTS_DIR = debug/obj
-        LIBS += $${EPICS_LIBS}/ca.lib
-        LIBS += $${EPICS_LIBS}/COM.lib
-        LIBS += $(CAQTDM_COLLECT)/debug/qtcontrols.lib
-     }
-}
-
-Define_ReleaseBuild_epics_controls {
+#==========================================================================================================
+Define_Symbols{
     ReleaseBuild {
         QMAKE_CXXFLAGS += /Z7
         QMAKE_CFLAGS   += /Z7
         QMAKE_LFLAGS   += /DEBUG /OPT:REF /OPT:ICF
-        DESTDIR = $(CAQTDM_COLLECT)
-        EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
-        OBJECTS_DIR = release/obj
-        LIBS += $${EPICS_LIBS}/ca.lib
-        LIBS += $${EPICS_LIBS}/COM.lib
-        LIBS += $(CAQTDM_COLLECT)/qtcontrols.lib
     }
 }
 
-Define_DebugBuild_caQtDM_Lib {
-     Debug_Build {
-	LIBS += $$(CAQTDM_COLLECT)/debug/caQtDM_Lib.lib
+
+
+Define_Build_qwt {
+     DebugBuild {
+         message("QWT Debug configuration : win32")
+         LIBS += $$(QWTHOME)/lib/qwtd.lib
      }
+    ReleaseBuild {
+        message("QWT Release configuration : win32")
+        LIBS += $$(QWTHOME)/lib/qwt.lib
+    }
+}
+Define_Build_objDirs {
+     DebugBuild {
+        OBJECTS_DIR = debug/obj
+     }
+    ReleaseBuild {
+        OBJECTS_DIR = release/obj
+    }
 }
 
-Define_ReleaseBuild_caQtDM_Lib {
+Define_Build_epics_controls {
+     DebugBuild {
+        CONFIG += console
+        EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
+        LIBS += $${EPICS_LIBS}/ca.lib
+        LIBS += $${EPICS_LIBS}/COM.lib
+        LIBS += $$(CAQTDM_COLLECT)/debug/qtcontrols.lib
+     }
+    ReleaseBuild {
+        INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
+        EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
+        LIBS += $${EPICS_LIBS}/ca.lib
+        LIBS += $${EPICS_LIBS}/COM.lib
+        LIBS += $$(CAQTDM_COLLECT)/qtcontrols.lib
+    }
+}
+
+Define_Build_caQtDM_Lib {
+     DebugBuild {
+	LIBS += $$(CAQTDM_COLLECT)/debug/caQtDM_Lib.lib
+     }
     ReleaseBuild {
 	LIBS += $$(CAQTDM_COLLECT)/caQtDM_Lib.lib
     }
+
+}
+Define_Build_OutputDir {
+     DebugBuild {
+	DESTDIR = $$(CAQTDM_COLLECT)/debug
+     }
+    ReleaseBuild {
+	DESTDIR = $$(CAQTDM_COLLECT)
+    }
+
 }
 		

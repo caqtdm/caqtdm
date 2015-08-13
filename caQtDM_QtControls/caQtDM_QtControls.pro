@@ -20,8 +20,6 @@ CONFIG += console
 
 TARGET = qtcontrols
 TEMPLATE = lib
-OBJECTS_DIR = obj
-DESTDIR = $$(CAQTDM_COLLECT)
 MOC_DIR = moc
 INCLUDEPATH += src
 RESOURCES = qtcontrols.qrc
