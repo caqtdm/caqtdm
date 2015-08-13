@@ -1,4 +1,6 @@
 include (../caQtDM_Viewer/qtdefs.pri)
+CONFIG += caQtDM_Lib
+include(../caQtDM.pri)
 
 QT += core gui
 
@@ -55,40 +57,6 @@ PYTHONCALC: {
 }
 }
 
-ios | android {
-   CONFIG += staticlib
-}
-
-!ios {
-   unix:!macx {
-      LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
-      LIBS += -L$(CAQTDM_COLLECT) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
-      INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
-      INCLUDEPATH += ./caQtDM_Plugins
-   }
-   macx: {
-      INCLUDEPATH += $(EPICSINCLUDE)/os/Darwin
-      INCLUDEPATH += ./caQtDM_Plugins
-      QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
-      LIBS += -F$(QWTLIB) -framework qwt
-      LIBS += -L$(CAQTDM_COLLECT) -lqtcontrols
-      LIBS += ${EPICSLIB}/libca.dylib
-      LIBS += ${EPICSLIB}/libCom.dylib
-   }
-}
-
-ios {
-      INCLUDEPATH += $(EPICSINCLUDE)/os/iOS
-      SOURCES +=     fingerswipegesture.cpp
-      HEADERS +=     fingerswipegesture.h
-}
-
-android {
-      INCLUDEPATH += $(EPICSINCLUDE)/os/android
-      SOURCES +=     fingerswipegesture.cpp
-      HEADERS +=     fingerswipegesture.h
-}
-
 SOURCES += caqtdm_lib.cpp \
     mutexKnobData.cpp \
     MessageWindow.cpp \
@@ -141,47 +109,5 @@ australian: {
   INCLUDEPATH += ../../../epicsQt/2.8.1/framework/api/include
   INCLUDEPATH += ../../../epicsQt/2.8.1/framework/common
   LIBS += -L$(QTBASE)/designer -lQEPlugin
-}
-
-win32 {
-  win32-msvc* {
-        DEFINES +=_CRT_SECURE_NO_WARNINGS
-        DEFINES += CAQTDM_LIB_LIBRARY
-        TEMPLATE = lib
-        
-        DebugBuild {
-                EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
-                DESTDIR = $(CAQTDM_COLLECT)/debug
-                OBJECTS_DIR = debug/obj
-                LIBS += $$(QWTHOME)/lib/qwtd.lib
-                LIBS += $${EPICS_LIBS}/ca.lib
-                LIBS += $${EPICS_LIBS}/COM.lib
-                LIBS += $(CAQTDM_COLLECT)/debug/qtcontrols.lib
-        }
-        ReleaseBuild {
-                QMAKE_CXXFLAGS += /Z7
-                QMAKE_CFLAGS   += /Z7
-                QMAKE_LFLAGS   += /DEBUG /OPT:REF /OPT:ICF
-                EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
-                DESTDIR = $(CAQTDM_COLLECT)
-                OBJECTS_DIR = release/obj
-                LIBS += $$(QWTHOME)/lib/qwt.lib
-                LIBS += $${EPICS_LIBS}/ca.lib
-                LIBS += $${EPICS_LIBS}/COM.lib
-                LIBS += $(CAQTDM_COLLECT)/qtcontrols.lib
-                
-        }
-   }
-   win32-g++ {
-       EPICS_LIBS=$$(EPICS_BASE)/lib/win32-x86-mingw
-	LIBS += $$(QWTLIB)/libqwt.a
-	LIBS += $$(QTCONTROLS_LIBS)/release//libqtcontrols.a
-	LIBS += $${EPICS_LIBS}/ca.lib
-	LIBS += $${EPICS_LIBS}/COM.lib
-	QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\caQtDM_Lib.dll ..\caQtDM_Binaries
-   }
-
-   INCLUDEPATH += $$(EPICS_BASE)/include
-   INCLUDEPATH += $$(EPICS_BASE)/include/os/win32
 }
 

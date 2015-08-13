@@ -1,12 +1,9 @@
-# this plugin has to be linked with epics4 libaries, while caQtDM_Lib is only
-# linked with epics3
-# the actual implementation of epics 4 is of an old type
-
+include (../../../caQtDM_Viewer/qtdefs.pri)
 QT += core gui
 CONFIG += warn_on
 CONFIG += release
-
-include (../../../caQtDM_Viewer/qtdefs.pri)
+CONFIG += epics4_plugin
+include (../../../caQtDM.pri)
 
 TEMPLATE        = lib
 CONFIG         += plugin
@@ -40,18 +37,3 @@ epics4: {
   DEFINES += EPICS4
 }
 
-
-unix:!macx {
- INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
- LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
- LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
-}
-
-macx: {
-        LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
-        LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
-        LIBS += $$(EPICSLIB)/libca.dylib
-        LIBS += $$(EPICSLIB)/libCom.dylib
-        plugins.path = Contents/PlugIns/controlsystems
-        plugins.files += $(CAQTDM_COLLECT)/controlsystems/libepics4_plugin.dylib
-}
