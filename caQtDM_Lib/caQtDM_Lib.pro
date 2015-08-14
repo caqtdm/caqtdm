@@ -16,43 +16,21 @@ contains(QT_VER_MAJ, 5) {
 
 CONFIG   += warn_on
 
-unix {
- QMAKE_CXXFLAGS += "-g"
- QMAKE_CFLAGS_RELEASE += "-g"
-}
-
 TARGET = caQtDM_Lib
 OBJECTS_DIR = ./obj
 TEMPLATE = lib
 MOC_DIR = ./moc
 VPATH += ./src
-INCLUDEPATH += ./src
 UI_DIR += ./
 
-INCLUDEPATH += ../caQtDM_QtControls/src
 INCLUDEPATH += .
+INCLUDEPATH += ./src
+INCLUDEPATH += ./caQtDM_Plugins
+INCLUDEPATH += ../caQtDM_QtControls/src
 INCLUDEPATH += $(QWTINCLUDE)
 INCLUDEPATH += $(EPICSINCLUDE)
 
-DESTDIR = $(CAQTDM_COLLECT)
 
-PYTHONCALC: {
-  warning("for image and visibility calculation, python will be build in")
-!ios {
-!android {
-   unix:!macx {
-      DEFINES += PYTHON
-      INCLUDEPATH += $(PYTHONINCLUDE)
-      LIBS += -L$(PYTHONLIB) -Wl,-rpath,$(PYTHONLIB) -lpython$(PYTHONVERSION)
-    }
-    unix:macx {
-       DEFINES += PYTHON
-       INCLUDEPATH += /System/Library/Frameworks/Python.framework/Versions/$(PYTHONVERSION)/include/python$(PYTHONVERSION)/
-       LIBS += -L/System/Library/Frameworks/Python.framework/Versions/$(PYTHONVERSION)/lib/ -lpython$(PYTHONVERSION)
-    }
-  }
-}
-}
 
 SOURCES += caqtdm_lib.cpp \
     mutexKnobData.cpp \

@@ -180,7 +180,9 @@ caQtDM_Lib {
       		INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
       		INCLUDEPATH += ./caQtDM_Plugins
       		DESTDIR = $(CAQTDM_COLLECT)
-
+		QMAKE_CXXFLAGS += "-g"
+		QMAKE_CFLAGS_RELEASE += "-g"
+		CONFIG += Define_Build_Python
    	}
 
         macx {
@@ -193,6 +195,7 @@ caQtDM_Lib {
       		LIBS += ${EPICSLIB}/libca.dylib
       		LIBS += ${EPICSLIB}/libCom.dylib
       		DESTDIR = $(CAQTDM_COLLECT)
+      		CONFIG += Define_Build_Python
 
    	}
 
@@ -430,6 +433,27 @@ caQtDM_adl2ui{
         }
 }
 #==========================================================================================================
+Define_Build_Python {
+	PYTHONCALC: {
+	  warning("for image and visibility calculation, python will be build in")
+	!ios {
+	!android {
+	   unix:!macx {
+	      DEFINES += PYTHON
+	      INCLUDEPATH += $(PYTHONINCLUDE)
+	      LIBS += -L$(PYTHONLIB) -Wl,-rpath,$(PYTHONLIB) -lpython$(PYTHONVERSION)
+	    }
+	    unix:macx {
+	       DEFINES += PYTHON
+	       INCLUDEPATH += /System/Library/Frameworks/Python.framework/Versions/$(PYTHONVERSION)/include/python$(PYTHONVERSION)/
+	       LIBS += -L/System/Library/Frameworks/Python.framework/Versions/$(PYTHONVERSION)/lib/ -lpython$(PYTHONVERSION)
+	    }
+	  }
+	}
+	}
+}
+
+
 Define_Symbols{
     ReleaseBuild {
         QMAKE_CXXFLAGS += /Z7
