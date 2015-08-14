@@ -1,4 +1,8 @@
 include(../qtdefs.pri)
+CONFIG += caQtDM_adl2ui
+include(../../caQtDM.pri)
+
+
 
 contains(QT_VER_MAJ, 5) {
   QT       += widgets
@@ -9,8 +13,6 @@ TEMPLATE = app
 INCLUDEPATH += .
 
 MOC_DIR = moc
-OBJECTS_DIR = obj
-DESTDIR = $(CAQTDM_COLLECT)
 
 # Input
 HEADERS += XmlWriter.h parser.h \
@@ -31,12 +33,4 @@ OTHER_FILES += \
 
 
 CONFIG += console
- ReleaseBuild {
-   OBJECTS_DIR = release/obj	
- }
- DebugBuild {
-   DESTDIR = $(CAQTDM_COLLECT)/debug
-   OBJECTS_DIR = debug/obj
- }
-
 

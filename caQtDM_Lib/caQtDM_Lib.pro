@@ -17,7 +17,7 @@ contains(QT_VER_MAJ, 5) {
 CONFIG   += warn_on
 
 TARGET = caQtDM_Lib
-OBJECTS_DIR = ./obj
+
 TEMPLATE = lib
 MOC_DIR = ./moc
 VPATH += ./src

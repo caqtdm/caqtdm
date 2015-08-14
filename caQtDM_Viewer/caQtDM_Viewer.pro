@@ -16,7 +16,7 @@ TARGET = caQtDM
 TEMPLATE = app
 DESTDIR = $(CAQTDM_COLLECT)
 
-OBJECTS_DIR = ./obj
+
 DEFINES += SUPPORT=\\\"EPICS\\\"
 
 MOC_DIR = ./moc
