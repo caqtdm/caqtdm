@@ -12,7 +12,7 @@ INCLUDEPATH    += ../
 INCLUDEPATH    += ../../src
 HEADERS         = epics4_plugin.h ../controlsinterface.h
 SOURCES         = epics4_plugin.cpp 
-TARGET          = $$qtLibraryTarget(epics4_plugin)
+TARGET          = epics4_plugin
 DESTDIR         = $(CAQTDM_COLLECT)/controlsystems
 
 #if we want to use epics4, define it above

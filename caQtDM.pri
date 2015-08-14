@@ -1,14 +1,15 @@
 #==========================================================================================================
 demo_plugin {
         message(“demo_plugin configuration”)
-	unix:!macx {
-                message(“demo_plugin configuration unix!macx”)
+        unix:!macx:!ios:!android {
+                message(“demo_plugin configuration unix:!macx:!ios:!android”)
  		INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
  		LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
 	}
 
         macx {
                 message(“demo_plugin configuration macx”)
+                INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
         	LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
         	plugins.path = Contents/PlugIns/controlsystems
         	plugins.files += $(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.dylib
@@ -32,8 +33,8 @@ demo_plugin {
 #==========================================================================================================
 epics3_plugin {
         message(“epics3_plugin configuration”)
-	unix:!macx {
-                message(“epics3_plugin configuration unix!macx”)
+        unix:!macx:!ios:!android  {
+                message(“epics3_plugin configuration unix:!macx:!ios:!android ”)
  		INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
  		LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
  		LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
@@ -47,7 +48,19 @@ epics3_plugin {
  		LIBS += $$(EPICSLIB)/libCom.dylib
  		plugins.path = Contents/PlugIns/controlsystems
  		plugins.files += $(CAQTDM_COLLECT)/controlsystems/libepics3_plugin.dylib
-		}
+        }
+
+        ios | android {
+                message(“demo_plugin configuration : ios or android”)
+                CONFIG += staticlib
+                ios {
+                        INCLUDEPATH += $(EPICSINCLUDE)/os/iOS
+                }
+                android {
+                        INCLUDEPATH += $(EPICSINCLUDE)/os/android
+                }
+        }
+
 
 	win32 {
                 message(“epics3_plugin configuration win32”)
@@ -69,8 +82,8 @@ epics3_plugin {
 #==========================================================================================================
 epics4_plugin {
         message(“epics4_plugin configuration”)
-	unix:!macx {
-                message(“epics4_plugin configuration unix!macx”)
+        unix:!macx:!ios:!android {
+                message(“epics4_plugin configuration unix:!macx:!ios:!android”)
  		INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
  		LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
  		LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
@@ -85,7 +98,19 @@ epics4_plugin {
         	LIBS += $$(EPICSLIB)/libCom.dylib
         	plugins.path = Contents/PlugIns/controlsystems
         	plugins.files += $(CAQTDM_COLLECT)/controlsystems/libepics4_plugin.dylib
-	}	
+        }
+
+        ios | android {
+                message(“epics4_plugin configuration : ios or android”)
+                CONFIG += staticlib
+                ios {
+                        INCLUDEPATH += $(EPICSINCLUDE)/os/iOS
+                }
+                android {
+                        INCLUDEPATH += $(EPICSINCLUDE)/os/android
+                }
+        }
+
 	win32 {
                 message(“epics4_plugin configuration win32”)
   		
@@ -106,8 +131,8 @@ epics4_plugin {
 #==========================================================================================================
 caQtDM_QtControls {
         message("caQtDM_QtControls configuration")
-  	unix:!macx {
-                message("caQtDM_QtControls configuration : unix:!macx")
+        unix:!macx:!ios:!android {
+                message("caQtDM_QtControls configuration : unix:!macx:!ios:!android")
  		OBJECTS_DIR = obj
 		DESTDIR = $$(CAQTDM_COLLECT)
  		INCLUDEPATH += $$(QWTINCLUDE)
@@ -129,7 +154,6 @@ caQtDM_QtControls {
 		DESTDIR = $$(CAQTDM_COLLECT)
 		INCLUDEPATH += $$(QWTINCLUDE)
    		CONFIG += staticlib
-   		
 	}
 
 	win32 {
@@ -149,8 +173,8 @@ caQtDM_QtControls {
 #==========================================================================================================
 caQtDM_Lib {
         message("caQtDM_Lib configuration")
-   	unix:!macx {
-                message("caQtDM_Lib configuration : unix:!macx")
+        unix:!macx:!ios:!android  {
+                message("caQtDM_Lib configuration : unix:!macx:!ios:!android ")
       		LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
       		LIBS += -L$(CAQTDM_COLLECT) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
       		INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
@@ -178,7 +202,7 @@ caQtDM_Lib {
                 SOURCES +=     fingerswipegesture.cpp
       		HEADERS +=     fingerswipegesture.h
 		DESTDIR = $(CAQTDM_COLLECT)
-
+                INCLUDEPATH += ./caQtDM_Plugins
 		ios {
       			INCLUDEPATH += $(EPICSINCLUDE)/os/iOS
 		}
@@ -224,7 +248,7 @@ caQtDM_Viewer {
 		DEFINES += BUILDDATE=\\\"$$system(date '+%d-%m-%Y')\\\"
         }
 
-        !ios!android {
+        !ios:!android {
                 message("caQtDM_viewer configuration : !ios!android (all unixes + mac)")
                 LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
                 LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
@@ -262,22 +286,28 @@ caQtDM_Viewer {
    		LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_controllers_plugin.a
    		LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_monitors_plugin.a
    		LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_graphics_plugin.a
+                LIBS += $(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.a
+                LIBS += $(CAQTDM_COLLECT)/controlsystems/libepics3_plugin.a
+                LIBS += $(CAQTDM_COLLECT)/controlsystems/libepics4_plugin.a
+
    		LIBS += $$(EPICSLIB)/libca.a
    		LIBS += $$(EPICSLIB)/libCom.a
-   		QMAKE_INFO_PLIST = ../src/IOS/Info.plist
-   		ICON = ../src/caQtDM.icns
-   		APP_ICON.files = $$PWD/src/caQtDM.png
-   		APP_ICON.files += $$PWD/src/caQtDM-57.png
-   		APP_ICON.files += $$PWD/src/caQtDM-60@2x.png
-   		APP_ICON.files += $$PWD/src/caQtDM-72.png
-   		APP_ICON.files += $$PWD/src/caQtDM-76.png
-   		APP_ICON.files += $$PWD/src/caQtDM-76@2x.png
 
-   		APP1_ICON.files = $$PWD/src/caQtDM.icns
-   		APP_XML_FILES.files = $$PWD/caQtDM_IOS_Config.xml
-   		StartScreen.files += $$PWD/src/StartScreen-Landscape.png
-   		StartScreen.files += $$PWD/src/StartScreen-568h@2x.png
-   		APP-FONTS.files = $$PWD/lucida-sans-typewriter.ttf
+
+                QMAKE_INFO_PLIST = $$PWD/caQtDM_Viewer/src/IOS/Info.plist
+                ICON = $$PWD/caQtDM_Viewer/src/caQtDM.icns
+                APP_ICON.files = $$PWD/caQtDM_Viewer/src/caQtDM.png
+                APP_ICON.files += $$PWD/caQtDM_Viewer/src/caQtDM-57.png
+                APP_ICON.files += $$PWD/caQtDM_Viewer/src/caQtDM-60@2x.png
+                APP_ICON.files += $$PWD/caQtDM_Viewer/src/caQtDM-72.png
+                APP_ICON.files += $$PWD/caQtDM_Viewer/src/caQtDM-76.png
+                APP_ICON.files += $$PWD/caQtDM_Viewer/src/caQtDM-76@2x.png
+
+                APP1_ICON.files = $$PWD/caQtDM_Viewer/src/caQtDM.icns
+                APP_XML_FILES.files = $$PWD/caQtDM_Viewer/caQtDM_IOS_Config.xml
+                StartScreen.files += $$PWD/caQtDM_Viewer/src/StartScreen-Landscape.png
+                StartScreen.files += $$PWD/caQtDM_Viewer/src/StartScreen-568h@2x.png
+                APP-FONTS.files = $$PWD/caQtDM_Viewer/lucida-sans-typewriter.ttf
    		APP-FONTS.path = fonts
    		QMAKE_BUNDLE_DATA += APP_XML_FILES APP_ICON APP1_ICON StartScreen APP-FONTS
    		QMAKE_CFLAGS += -gdwarf-2

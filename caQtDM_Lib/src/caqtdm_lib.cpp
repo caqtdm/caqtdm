@@ -2024,10 +2024,10 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     if(!pluginName.contains("intern")) {
         interface = getControlInterface(pluginName);
         // and set it to the widget and the pointer to the data
-        kData->interface = (void *) interface;
-        QVariant plugin = qVariantFromValue(kData->interface);
+        kData->pluginInterface = (void *) interface;
+        QVariant plugin = qVariantFromValue(kData->pluginInterface);
         w->setProperty("Interface", plugin);
-        if(kData->interface == (void *) 0) {
+        if(kData->pluginInterface == (void *) 0) {
             char asc[255];
             sprintf(asc, "could not find a control plugin for %s with name %s\n",
                     (char*) trimmedPV.toLatin1().constData(),  (char*) pluginName.trimmed().toLatin1().constData());

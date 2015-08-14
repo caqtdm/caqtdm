@@ -14,7 +14,7 @@ INCLUDEPATH    += $(EPICSINCLUDE)
 
 HEADERS         = epics3_plugin.h ../controlsinterface.h
 SOURCES         = epics3_plugin.cpp epicsSubs.c
-TARGET          = $$qtLibraryTarget(epics3_plugin)
+TARGET          = epics3_plugin
 DESTDIR         = $(CAQTDM_COLLECT)/controlsystems
 
 

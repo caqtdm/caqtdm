@@ -21,8 +21,6 @@ unix {
  QMAKE_CFLAGS_RELEASE += "-g"
 }
 
-
-unix {
 TARGET = caQtDM_Lib
 OBJECTS_DIR = ./obj
 TEMPLATE = lib
@@ -30,7 +28,6 @@ MOC_DIR = ./moc
 VPATH += ./src
 INCLUDEPATH += ./src
 UI_DIR += ./
-}
 
 INCLUDEPATH += ../caQtDM_QtControls/src
 INCLUDEPATH += .
