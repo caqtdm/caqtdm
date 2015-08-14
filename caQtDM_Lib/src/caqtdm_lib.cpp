@@ -405,6 +405,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         splash = new SplashScreen(parent);
         splash->setMaximum(nbIncludes);
         splash->show();
+        splash->setProgress(0);
     }
 
     savedFile[0] = fi.baseName();
@@ -1872,7 +1873,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
     //==================================================================================================================
 
-    // search for a QTabcalcWidget as nearest parent and set it as property
+    // search for a QTabWidget as nearest parent and set it as property
     if(className.contains("ca")) {
         QTabWidget *tabWidget = getTabParent(w1);
         w1->setProperty("parentTab",QVariant::fromValue(tabWidget) );
@@ -2133,15 +2134,15 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
         return num;
     }
 
+    // define data acquisition
+    if(interface != (ControlsInterface *) 0) interface->pvAddMonitor(num, kData, rate, false);
+
     // add for this widget the io info
     QVariant v = qVariantFromValue(kData->edata.info);
     QVariant var=w->property("InfoList");
     QVariantList infoList = var.toList();
     infoList.append(v);
     w->setProperty("InfoList", infoList);
-
-    // define data acquisition
-    if(interface != (ControlsInterface *) 0) interface->pvAddMonitor(num, kData, rate, false);
 
     // clear data
     memset(kData, 0, sizeof (knobData));
@@ -5852,7 +5853,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         if(fontSize > (double) list.at(4).toInt()) fontSize = (double) list.at(4).toInt();
 #ifdef MOBILE
-        qreal height = 1.5;
+        qreal height = 1.0;
 #else
         qreal height = 1.0;
 #endif
@@ -5863,6 +5864,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         QVariant Style=box->property("Stylesheet");
         if(!Style.isNull()) style = Style.toString();
         box->setStyleSheet(thisStyle + style);
+        qDebug()  << thisStyle << style;
 
     }
 }

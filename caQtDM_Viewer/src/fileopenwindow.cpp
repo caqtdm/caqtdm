@@ -137,8 +137,10 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
 
 bool FileOpenWindow::loadPlugin()
 {
-    char asc[256];
     int nbInterfaces = 0;
+#ifndef MOBILE
+    qDebug() << "not a mobile device";
+    char asc[256];
     QList<QString> allPaths;
 
     // get the controlsystem plugins from QT_PLUGIN_PATH
@@ -189,6 +191,21 @@ bool FileOpenWindow::loadPlugin()
             break;
         }
     }
+#else
+    qDebug() << "mobile device";
+    foreach (QObject *plugin, QPluginLoader::staticInstances())
+    {
+        if (plugin) {
+            controlsInterface = qobject_cast<ControlsInterface *>(plugin);
+            if (controlsInterface) {
+                qDebug() << controlsInterface->pluginName();
+                controlsInterface->initCommunicationLayer(mutexKnobData);
+                interfaces.insert(controlsInterface->pluginName(), controlsInterface);
+                nbInterfaces++;
+            }
+        }
+    }
+#endif
 
     if(nbInterfaces== 0) return false; else return true;
 }
@@ -233,6 +250,9 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Controllers);
     Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Monitors);
     Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Graphics);
+    Q_IMPORT_PLUGIN(DemoPlugin);
+    Q_IMPORT_PLUGIN(Epics3Plugin);
+    Q_IMPORT_PLUGIN(Epics4Plugin);
 #endif
 
     // message window used by library and here
@@ -241,21 +261,6 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 
     // create a class for exchanging data
     mutexKnobData = new MutexKnobData();
-
-    // load controls plugins
-    if (!loadPlugin()) {
-        QMessageBox::critical(this, "Error", "Could not load any plugin");
-    } else {
-        if(!interfaces.isEmpty()) {
-            QMapIterator<QString, ControlsInterface *> i(interfaces);
-            while (i.hasNext()) {
-                char asc[256];
-                i.next();
-                sprintf(asc, "Info: plugin %s loaded", i.key().toLatin1().constData());
-                messageWindow->postMsgEvent(QtWarningMsg, asc);
-            }
-        }
-    }
 
     // create form
     ui.setupUi(this);
@@ -429,6 +434,21 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 
     //set all the environment variables that we need
     setAllEnvironmentVariables(file);
+
+    // load the control plugins (must be done after setting the environment)
+    if (!loadPlugin()) {
+        QMessageBox::critical(this, "Error", "Could not load any plugin");
+    } else {
+        if(!interfaces.isEmpty()) {
+            QMapIterator<QString, ControlsInterface *> i(interfaces);
+            while (i.hasNext()) {
+                char asc[256];
+                i.next();
+                sprintf(asc, "Info: plugin %s loaded", i.key().toLatin1().constData());
+                messageWindow->postMsgEvent(QtWarningMsg, asc);
+            }
+        }
+    }
 
     // now check if file exists and download it. (file is specified by the environment variables CAQTDM_LAUNCHFILE and CAQTDM_URL_DISPLAY)
     QString launchFile = (QString)  qgetenv("CAQTDM_LAUNCHFILE");
