@@ -253,7 +253,7 @@ private:
     bool PrimarySoftPV(QWidget* widget, QMap<QString, QString> map);
     void setCalcToNothing(QWidget* widget);
     bool Python_Error(QWidget *w, QString message);
-    ControlsInterface * getControlInterface(QString interface);
+    ControlsInterface * getControlInterface(QString plugininterface);
     void FlushAllInterfaces();
 
 #ifdef MOBILE

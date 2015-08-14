@@ -535,12 +535,12 @@ void CaQtDM_Lib::EnableDisableIO()
                             for(int j=0; j<infoList.count(); j++) {
                                 ptr = (void*) infoList.at(j).value<void *>();
                                 if(ptr != (void*) 0) {
-                                    ControlsInterface * interface = (ControlsInterface *) w1->property("Interface").value<void *>();
-                                    if(interface != (ControlsInterface *) 0) {
+                                    ControlsInterface * plugininterface = (ControlsInterface *) w1->property("Interface").value<void *>();
+                                    if(plugininterface != (ControlsInterface *) 0) {
                                         if(!hidden) {
-                                            interface->pvAddEvent(ptr);
+                                            plugininterface->pvAddEvent(ptr);
                                         } else {
-                                            interface->pvClearEvent(ptr);
+                                            plugininterface->pvClearEvent(ptr);
                                         }
                                     }
                                 }
@@ -1928,15 +1928,15 @@ QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, 
     return newText;
 }
 
-ControlsInterface * CaQtDM_Lib::getControlInterface(QString interface)
+ControlsInterface * CaQtDM_Lib::getControlInterface(QString plugininterface)
 {
     // find the plugin we are going to use
     if(!controlsInterfaces.isEmpty()) {
         QMapIterator<QString, ControlsInterface *> i(controlsInterfaces);
         while (i.hasNext()) {
             i.next();
-            if(i.key().contains(interface)) {
-                //qDebug() << "interface returned for requested" << interface ;
+            if(i.key().contains(plugininterface)) {
+                //qDebug() << "interface returned for requested" << plugininterface ;
                 return  i.value();
             }
         }
@@ -1951,8 +1951,8 @@ void CaQtDM_Lib::FlushAllInterfaces()
         QMapIterator<QString, ControlsInterface *> i(controlsInterfaces);
         while (i.hasNext()) {
             i.next();
-            ControlsInterface *interface = i.value();
-            if(interface != (ControlsInterface *) 0) interface->FlushIO();
+            ControlsInterface *plugininterface = i.value();
+            if(plugininterface != (ControlsInterface *) 0) plugininterface->FlushIO();
         }
     }
 }
@@ -1968,7 +1968,7 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     int cpylen;
     int indx;
     QString pluginName;
-    ControlsInterface *interface = (ControlsInterface *) 0;
+    ControlsInterface *plugininterface = (ControlsInterface *) 0;
 
 
     ftime(&now);
@@ -2023,9 +2023,9 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
 
     // find the plugin we are going to use
     if(!pluginName.contains("intern")) {
-        interface = getControlInterface(pluginName);
+        plugininterface = getControlInterface(pluginName);
         // and set it to the widget and the pointer to the data
-        kData->pluginInterface = (void *) interface;
+        kData->pluginInterface = (void *) plugininterface;
         QVariant plugin = qVariantFromValue(kData->pluginInterface);
         w->setProperty("Interface", plugin);
         if(kData->pluginInterface == (void *) 0) {
@@ -2135,7 +2135,7 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     }
 
     // define data acquisition
-    if(interface != (ControlsInterface *) 0) interface->pvAddMonitor(num, kData, rate, false);
+    if(plugininterface != (ControlsInterface *) 0) plugininterface->pvAddMonitor(num, kData, rate, false);
 
     // add for this widget the io info
     QVariant v = qVariantFromValue(kData->edata.info);
@@ -3908,8 +3908,8 @@ void CaQtDM_Lib::Callback_ToggleButton(bool type)
 
     if(w->getPV().length() > 0) {
         QStringsToChars(w->getPV(), svalue,  w->objectName().toLower());
-        ControlsInterface * interface = (ControlsInterface *) w->property("Interface").value<void *>();
-        if(interface != (ControlsInterface *) 0) interface->pvSetValue(param1, rvalue, ivalue, param2, param3, errmess, 0);
+        ControlsInterface * plugininterface = (ControlsInterface *) w->property("Interface").value<void *>();
+        if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue(param1, rvalue, ivalue, param2, param3, errmess, 0);
     }
 }
 
@@ -3939,8 +3939,8 @@ void CaQtDM_Lib::Callback_ChoiceClicked(const QString& text)
     if(choice->getPV().length() > 0) {
         //qDebug() << "choice_clicked" << text << choice->getPV();
         QStringsToChars(choice->getPV(), text,  choice->objectName().toLower());
-        ControlsInterface * interface = (ControlsInterface *) choice->property("Interface").value<void *>();
-        if(interface != (ControlsInterface *) 0) interface->pvSetValue(param1, 0.0, 0, param2, param3, errmess, 0);
+        ControlsInterface * plugininterface = (ControlsInterface *) choice->property("Interface").value<void *>();
+        if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue(param1, 0.0, 0, param2, param3, errmess, 0);
     }
 }
 
@@ -3957,8 +3957,8 @@ void CaQtDM_Lib::Callback_MenuClicked(const QString& text)
     if(menu->getPV().length() > 0) {
         //qDebug() << "menu_clicked" << text << menu->getPV();
         QStringsToChars(menu->getPV(), text,  menu->objectName().toLower());
-        ControlsInterface * interface = (ControlsInterface *) menu->property("Interface").value<void *>();
-        if(interface != (ControlsInterface *) 0) interface->pvSetValue(param1, 0.0, 0, param2, param3, errmess, 0);
+        ControlsInterface * plugininterface = (ControlsInterface *) menu->property("Interface").value<void *>();
+        if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue(param1, 0.0, 0, param2, param3, errmess, 0);
     }
     // display label again when configured with it
     if(menu->getLabelDisplay()) {
@@ -4245,8 +4245,8 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
             if(soft) {
                 mutexKnobData->RemoveSoftPV(pv, w, kData.index);
             } else {
-               ControlsInterface * interface = getControlInterface(kData.pluginName);
-               if(interface != (ControlsInterface *) 0) interface->pvClearMonitor(&kData);
+               ControlsInterface * plugininterface = getControlInterface(kData.pluginName);
+               if(plugininterface != (ControlsInterface *) 0) plugininterface->pvClearMonitor(&kData);
             }
             kData.index = -1;
             kData.pv[0] = '\0';
@@ -4774,13 +4774,13 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                     info.append("<br>");
                     info.append("Plugin: ");
                     info.append(kPtr->pluginName);
-                    ControlsInterface * interface = getControlInterface(kPtr->pluginName);
-                    if(interface == (ControlsInterface *) 0) {
+                    ControlsInterface * plugininterface = getControlInterface(kPtr->pluginName);
+                    if(plugininterface == (ControlsInterface *) 0) {
                          if(!kPtr->soft)info.append(" : not loaded");
                     } else {
                          info.append(" : loaded");
                     }
-                    if((interface != (ControlsInterface *) 0) || (kPtr->soft)) {
+                    if((plugininterface != (ControlsInterface *) 0) || (kPtr->soft)) {
                         if(kPtr->soft) {
                             info.append(" : soft channel from caCalc");
                         } else if(kPtr->edata.connected) {
@@ -4795,9 +4795,9 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         if(!kPtr->soft) {
                             info.append("<br>");
                             info.append("Description: ");
-                            if(interface != (ControlsInterface *) 0) interface->pvGetDescription((char*) pv[i].toLatin1().constData(), description);
+                            if(plugininterface != (ControlsInterface *) 0) plugininterface->pvGetDescription((char*) pv[i].toLatin1().constData(), description);
                             info.append(description);
-                            if(interface != (ControlsInterface *) 0) interface->pvGetTimeStamp((char*) pv[i].toLatin1().constData(), timestamp);
+                            if(plugininterface != (ControlsInterface *) 0) plugininterface->pvGetTimeStamp((char*) pv[i].toLatin1().constData(), timestamp);
                             info.append("<br>");
                             info.append(timestamp);
                         }
@@ -5392,8 +5392,8 @@ void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QW
 
     QString text(" ");
     QStringsToChars(pv, text, w->objectName().toLower());
-    ControlsInterface * interface = getControlInterface(kPtr->pluginName);
-    if(interface != (ControlsInterface *) 0) interface->pvSetValue(param1, value, idata, param2, param3, errmess, 0);
+    ControlsInterface * plugininterface = getControlInterface(kPtr->pluginName);
+    if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue(param1, value, idata, param2, param3, errmess, 0);
 }
 
 /**
@@ -5426,8 +5426,8 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
     bool match;
     int indx;
 
-    ControlsInterface * interface = (ControlsInterface *) w->property("Interface").value<void *>();
-    if(interface == (ControlsInterface *) 0) return;
+    ControlsInterface * plugininterface = (ControlsInterface *) w->property("Interface").value<void *>();
+    if(plugininterface == (ControlsInterface *) 0) return;
 
     formatsType fTypeNew;
 
@@ -5450,7 +5450,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
     switch (kPtr->edata.fieldtype) {
     case caSTRING:
         //qDebug() << "set string" << text;
-        interface->pvSetValue(kPtr->pv, 0.0, 0, (char*) text.toLatin1().constData(), (char*) w->objectName().toLower().toLatin1().constData(), errmess, 0);
+        plugininterface->pvSetValue(kPtr->pv, 0.0, 0, (char*) text.toLatin1().constData(), (char*) w->objectName().toLower().toLatin1().constData(), errmess, 0);
         break;
 
     case caENUM:
@@ -5465,7 +5465,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
             for (int i=0; i<list.size(); i++) {
                 if(!text.compare(list.at(i).trimmed())) {
                     //qDebug() << "set enum text" << textValue;
-                    interface->pvSetValue((char*) kPtr->pv, 0.0, 0, textValue, (char*) w->objectName().toLower().toLatin1().constData(), errmess, 0);
+                    plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, textValue, (char*) w->objectName().toLower().toLatin1().constData(), errmess, 0);
                     match = true;
                     break;
                 }
@@ -5481,7 +5481,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
             if(kPtr->edata.fieldtype == caENUM) {
                 if(*end == 0 && end != textValue && longValue >= 0 && longValue <= kPtr->edata.enumCount) {
                     //qDebug() << "decode value *end=0, set a longvalue to enum" << longValue;
-                    interface->pvSetValue((char*) kPtr->pv, 0.0, (int32_t) longValue, textValue, (char*) w->objectName().toLower().toLatin1().constData(), errmess, 0);
+                    plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int32_t) longValue, textValue, (char*) w->objectName().toLower().toLatin1().constData(), errmess, 0);
                 } else {
                     char asc[100];
                     sprintf(asc, "Invalid value: pv=%s value= \"%s\"\n", kPtr->pv, textValue);
@@ -5493,7 +5493,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
                 // normal int or long
             } else
                 //qDebug() << "set normal longvalue" << longValue;
-                interface->pvSetValue((char*) kPtr->pv, 0.0, (int32_t) longValue, textValue, (char*) w->objectName().toLower().toLatin1().constData(), errmess, 0);
+                plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int32_t) longValue, textValue, (char*) w->objectName().toLower().toLatin1().constData(), errmess, 0);
         }
 
         break;
@@ -5501,7 +5501,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
     case caCHAR:
         if(fType == caTextEntry::string) {
             //qDebug() << "set string" << text;
-            interface->pvSetValue((char*) kPtr->pv, 0.0, 0, (char*) text.toLatin1().constData(), (char*) w->objectName().toLower().toLatin1().constData(), errmess, 0);
+            plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, (char*) text.toLatin1().constData(), (char*) w->objectName().toLower().toLatin1().constData(), errmess, 0);
             break;
         }
         //qDebug() << "fall through default case";
@@ -5527,7 +5527,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
                 caCalc * ww = (caCalc*) kPtr->dispW;
                 ww->setValue(value);
             } else {
-                interface->pvSetValue((char*) kPtr->pv, value, 0, textValue, (char*) w->objectName().toLower().toLatin1().constData(), errmess, 1);
+                plugininterface->pvSetValue((char*) kPtr->pv, value, 0, textValue, (char*) w->objectName().toLower().toLatin1().constData(), errmess, 1);
             }
 
         } else {
@@ -5556,8 +5556,8 @@ void CaQtDM_Lib::TreatRequestedWave(QString pv, QString text, caWaveTable::Forma
     char    *end = NULL, textValue[255];
     bool    match;
 
-    ControlsInterface * interface = (ControlsInterface *) w->property("Interface").value<void *>();
-    if(interface == (ControlsInterface *) 0) return;
+    ControlsInterface * plugininterface = (ControlsInterface *) w->property("Interface").value<void *>();
+    if(plugininterface == (ControlsInterface *) 0) return;
 
     formatsType fTypeNew;
 
@@ -5586,23 +5586,23 @@ void CaQtDM_Lib::TreatRequestedWave(QString pv, QString text, caWaveTable::Forma
         if(kPtr->edata.fieldtype == caLONG) {
             int32_t* P = (int32_t*) kPtr->edata.dataB;
             P[index] = (int32_t) longValue;
-            interface->pvSetWave((char*) kPtr->pv, fdata, ddata, data16, P, sdata, kPtr->edata.valueCount,
+            plugininterface->pvSetWave((char*) kPtr->pv, fdata, ddata, data16, P, sdata, kPtr->edata.valueCount,
                                  (char*) w->objectName().toLower().toLatin1().constData(), errmess);
         } else if(kPtr->edata.fieldtype == caINT) {
             int16_t* P = (int16_t*) kPtr->edata.dataB;
             P[index] = (int16_t) longValue;
-            interface->pvSetWave((char*) kPtr->pv, fdata, ddata, P, data32, sdata, kPtr->edata.valueCount,
+            plugininterface->pvSetWave((char*) kPtr->pv, fdata, ddata, P, data32, sdata, kPtr->edata.valueCount,
                                  (char*) w->objectName().toLower().toLatin1().constData(), errmess);
         } else {
             if(fTypeNew == string) {
                 char* P = (char*) kPtr->edata.dataB;
                 P[index] = textValue[0];
-                interface->pvSetWave((char*) kPtr->pv, fdata, ddata, data16, data32, P, kPtr->edata.valueCount,
+                plugininterface->pvSetWave((char*) kPtr->pv, fdata, ddata, data16, data32, P, kPtr->edata.valueCount,
                                      (char*) w->objectName().toLower().toLatin1().constData(), errmess);
             } else {
                 char* P = (char*) kPtr->edata.dataB;
                 P[index] = (char) ((int) longValue);
-                interface->pvSetWave((char*) kPtr->pv, fdata, ddata, data16, data32, P, kPtr->edata.valueCount,
+                plugininterface->pvSetWave((char*) kPtr->pv, fdata, ddata, data16, data32, P, kPtr->edata.valueCount,
                                      (char*) w->objectName().toLower().toLatin1().constData(), errmess);
             }
         }
@@ -5627,12 +5627,12 @@ void CaQtDM_Lib::TreatRequestedWave(QString pv, QString text, caWaveTable::Forma
             if(kPtr->edata.fieldtype == caFLOAT) {
                 float* P = (float*) kPtr->edata.dataB;
                 P[index] = (float) value;
-                interface->pvSetWave((char*) kPtr->pv, P, ddata, data16, data32, sdata, kPtr->edata.valueCount,
+                plugininterface->pvSetWave((char*) kPtr->pv, P, ddata, data16, data32, sdata, kPtr->edata.valueCount,
                                      (char*) w->objectName().toLower().toLatin1().constData(), errmess);
             } else  {
                 double* P = (double*) kPtr->edata.dataB;
                 P[index] = value;
-                interface->pvSetWave((char*) kPtr->pv, fdata, P, data16, data32, sdata, kPtr->edata.valueCount,
+                plugininterface->pvSetWave((char*) kPtr->pv, fdata, P, data16, data32, sdata, kPtr->edata.valueCount,
                                      (char*) w->objectName().toLower().toLatin1().constData(), errmess);
             }
         } else {
