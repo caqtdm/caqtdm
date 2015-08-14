@@ -34,7 +34,7 @@ class Epics3Plugin : public QObject, ControlsInterface
     Q_OBJECT
     Q_INTERFACES(ControlsInterface)
 #if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
-    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.epics3controls")
+    Q_PLUGIN_METADATA(IID "ch.psi.caqtdm.Plugin.ControlsInterface/1.0.epics3controls")
 #endif
 
 public:

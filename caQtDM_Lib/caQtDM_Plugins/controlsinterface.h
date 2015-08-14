@@ -53,7 +53,7 @@ public:
 };
 
 QT_BEGIN_NAMESPACE
-Q_DECLARE_INTERFACE(ControlsInterface, "Plugin.ControlsInterface/1.0")
+Q_DECLARE_INTERFACE(ControlsInterface, "ch.psi.caqtdm.Plugin.ControlsInterface/1.0")
 QT_END_NAMESPACE
 
 #endif
