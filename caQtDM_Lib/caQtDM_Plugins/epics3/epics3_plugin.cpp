@@ -25,7 +25,9 @@
 #include <QDebug>
 #include "epics3_plugin.h"
 
-MutexKnobData* KnobDataPtr;
+extern "C"{
+ MutexKnobData* KnobDataPtr;
+}
 
 QString Epics3Plugin::pluginName()
 {

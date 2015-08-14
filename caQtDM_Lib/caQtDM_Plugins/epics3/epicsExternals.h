@@ -38,21 +38,21 @@ extern "C" {
 #endif /* __cplusplus */
 
 
-CAQTDM_LIBSHARED_EXPORT int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
-CAQTDM_LIBSHARED_EXPORT int EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess);
-CAQTDM_LIBSHARED_EXPORT int EpicsGetTimeStamp(char *pv, char *timestamp);
-CAQTDM_LIBSHARED_EXPORT int EpicsGetDescription(char *pv, char *description);
-CAQTDM_LIBSHARED_EXPORT void clearEvent(void * ptr);
-CAQTDM_LIBSHARED_EXPORT void addEvent(void * ptr);
-CAQTDM_LIBSHARED_EXPORT void EpicsReconnect(knobData *kData);
-CAQTDM_LIBSHARED_EXPORT void EpicsDisconnect(knobData *kData);
-CAQTDM_LIBSHARED_EXPORT void EpicsFlushIO();
-CAQTDM_LIBSHARED_EXPORT void DestroyContext();
-CAQTDM_LIBSHARED_EXPORT void PrepareDeviceIO();
-CAQTDM_LIBSHARED_EXPORT void TerminateDeviceIO();
-CAQTDM_LIBSHARED_EXPORT void InitializeContextMutex();
-CAQTDM_LIBSHARED_EXPORT int  CreateAndConnect(int index, knobData *kData, int rate, int skip);
-CAQTDM_LIBSHARED_EXPORT void ClearMonitor(knobData *kData);
+int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
+int EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess);
+int EpicsGetTimeStamp(char *pv, char *timestamp);
+int EpicsGetDescription(char *pv, char *description);
+void clearEvent(void * ptr);
+void addEvent(void * ptr);
+void EpicsReconnect(knobData *kData);
+void EpicsDisconnect(knobData *kData);
+void EpicsFlushIO();
+void DestroyContext();
+void PrepareDeviceIO();
+void TerminateDeviceIO();
+void InitializeContextMutex();
+int  CreateAndConnect(int index, knobData *kData, int rate, int skip);
+void ClearMonitor(knobData *kData);
 
 #ifdef __cplusplus
 }

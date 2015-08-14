@@ -24,9 +24,11 @@
  */
 #ifndef CONTROLSINTERFACE_H
 #define CONTROLSINTERFACE_H
+#include <stdint.h>
 #include "mutexKnobData.h"
 #include <QString>
 #include <QtPlugin>
+
 
 class ControlsInterface
 
