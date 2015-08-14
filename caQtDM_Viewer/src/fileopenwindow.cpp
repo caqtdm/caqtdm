@@ -435,21 +435,6 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     //set all the environment variables that we need
     setAllEnvironmentVariables(file);
 
-    // load the control plugins (must be done after setting the environment)
-    if (!loadPlugin()) {
-        QMessageBox::critical(this, "Error", "Could not load any plugin");
-    } else {
-        if(!interfaces.isEmpty()) {
-            QMapIterator<QString, ControlsInterface *> i(interfaces);
-            while (i.hasNext()) {
-                char asc[256];
-                i.next();
-                sprintf(asc, "Info: plugin %s loaded", i.key().toLatin1().constData());
-                messageWindow->postMsgEvent(QtWarningMsg, asc);
-            }
-        }
-    }
-
     // now check if file exists and download it. (file is specified by the environment variables CAQTDM_LAUNCHFILE and CAQTDM_URL_DISPLAY)
     QString launchFile = (QString)  qgetenv("CAQTDM_LAUNCHFILE");
     filefunction.checkFileAndDownload(launchFile);
@@ -464,6 +449,21 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 
     // we do not want to reload, while when closing all files, the application will also exit
     this->ui.reloadAction->setEnabled(false);
+    }
+
+    // load the control plugins (must be done after setting the environment)
+    if (!loadPlugin()) {
+        QMessageBox::critical(this, "Error", "Could not load any plugin");
+    } else {
+        if(!interfaces.isEmpty()) {
+            QMapIterator<QString, ControlsInterface *> i(interfaces);
+            while (i.hasNext()) {
+                char asc[256];
+                i.next();
+                sprintf(asc, "Info: plugin %s loaded", i.key().toLatin1().constData());
+                messageWindow->postMsgEvent(QtWarningMsg, asc);
+            }
+        }
     }
 
     // in case of http support, we add the temporary directory name to the CAQTDM_DISPLAY_PATH if not already set
