@@ -65,6 +65,7 @@
 #include "mutexKnobData.h"
 #include "mutexKnobDataWrapper.h"
 #include "MessageWindow.h"
+#include "MessageWindowWrapper.h"
 #include "JSON.h"
 #include "limitsStripplotDialog.h"
 #include "limitsCartesianplotDialog.h"
