@@ -32,7 +32,7 @@
 #include <QTimer>
 #include "controlsinterface.h"
 
-class DemoPlugin : public QObject, ControlsInterface
+class Q_DECL_EXPORT DemoPlugin : public QObject, ControlsInterface
 {
     Q_OBJECT
     Q_INTERFACES(ControlsInterface)

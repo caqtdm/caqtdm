@@ -26,8 +26,10 @@
 #include "epics3_plugin.h"
 
 // global variables defined here for access through c routines in epicsSubs.c
-MutexKnobData* mutexKnobdataPtr;
-MessageWindow *messageWindowPtr;
+extern "C" {
+ MutexKnobData* mutexKnobdataPtr;
+ MessageWindow *messageWindowPtr;
+}
 
 QString Epics3Plugin::pluginName()
 {

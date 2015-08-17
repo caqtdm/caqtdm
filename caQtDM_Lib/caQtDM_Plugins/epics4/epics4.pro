@@ -1,5 +1,8 @@
 include (../../../caQtDM_Viewer/qtdefs.pri)
 QT += core gui
+contains(QT_VER_MAJ, 5) {
+    QT     += widgets
+}
 CONFIG += warn_on
 CONFIG += release
 CONFIG += epics4_plugin
@@ -13,7 +16,7 @@ INCLUDEPATH    += ../../src
 HEADERS         = epics4_plugin.h ../controlsinterface.h
 SOURCES         = epics4_plugin.cpp 
 TARGET          = epics4_plugin
-DESTDIR         = $(CAQTDM_COLLECT)/controlsystems
+
 
 #if we want to use epics4, define it above
 epics4: {

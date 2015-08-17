@@ -31,7 +31,7 @@
   #include "epics4Subs.h"
 #endif
 
-class Epics4Plugin : public QObject, ControlsInterface
+class Q_DECL_EXPORT Epics4Plugin : public QObject, ControlsInterface
 {
     Q_OBJECT
     Q_INTERFACES(ControlsInterface)
