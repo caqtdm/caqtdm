@@ -53,7 +53,7 @@ void DemoPlugin::updateInterface()
 
     // go through our devices
     foreach(int index, listOfIndexes) {
-        knobData* kData = mutexknobdata->GetMutexKnobDataPtr(index);
+        knobData* kData = mutexknobdataP->GetMutexKnobDataPtr(index);
         if((kData != (knobData *) 0) && (kData->index != -1)) {
             QString key = kData->pv;
 
@@ -70,8 +70,8 @@ void DemoPlugin::updateInterface()
             kData->edata.connected = true;
             kData->edata.accessR = kData->edata.accessW = true;
             kData->edata.monitorCount++;
-            mutexknobdata->SetMutexKnobData(kData->index, *kData);
-            mutexknobdata->SetMutexKnobDataReceived(kData);
+            mutexknobdataP->SetMutexKnobData(kData->index, *kData);
+            mutexknobdataP->SetMutexKnobDataReceived(kData);
         }
     }
 }
@@ -85,10 +85,13 @@ void DemoPlugin::updateValues()
 }
 
 // initialize our communicationlayer with everything you need
-int DemoPlugin::initCommunicationLayer(MutexKnobData *data)
+int DemoPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow)
 {
     qDebug() << "DemoPlugin: InitCommunicationLayer" << data;
-    mutexknobdata = data;
+
+    mutexknobdataP = data;
+    messagewindowP = messageWindow;
+
     initValue = 0.0;
 
     // we want to update our internal doubles every second

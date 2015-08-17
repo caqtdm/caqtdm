@@ -26,6 +26,7 @@
 #define CONTROLSINTERFACE_H
 #include <stdint.h>
 #include "mutexKnobData.h"
+#include "MessageWindow.h"
 #include <QString>
 #include <QtPlugin>
 
@@ -36,7 +37,7 @@ class ControlsInterface
 public:
     virtual ~ControlsInterface() {}
     virtual QString pluginName() = 0;
-    virtual int initCommunicationLayer(MutexKnobData *data) = 0;
+    virtual int initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow) = 0;
     virtual int pvAddMonitor(int index, knobData *kData, int rate, int skip) = 0;
     virtual int pvClearMonitor(knobData *kData) = 0;
     virtual int pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType) = 0;

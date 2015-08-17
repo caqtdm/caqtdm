@@ -43,7 +43,7 @@ public:
     QString pluginName();
     Epics4Plugin();
 
-    int initCommunicationLayer(MutexKnobData *data);
+    int initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow);
     int pvAddMonitor(int index, knobData *kData, int rate, int skip);
     int pvClearMonitor(knobData *kData);
     int pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
@@ -58,7 +58,8 @@ public:
     int TerminateIO();
 
   private:
-    MutexKnobData* _mutexknobdata;
+    MutexKnobData *mutexknobdataP;
+    MessageWindow *messagewindowP;
 #ifdef EPICS4
     epics4Subs *Epics4;
 #endif

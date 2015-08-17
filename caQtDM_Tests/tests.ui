@@ -153,7 +153,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: cornsilk;}</string>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -178,7 +178,7 @@ border-radius: 2px;
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>7</number>
+       <number>6</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -826,9 +826,6 @@ p, li { white-space: pre-wrap; }
         <property name="readOnly">
          <bool>true</bool>
         </property>
-        <property name="cursorMoveStyle">
-         <enum>Qt::VisualMoveStyle</enum>
-        </property>
         <property name="channel" stdset="0">
          <string notr="true">ACM:COUNT:1</string>
         </property>
@@ -1376,15 +1373,15 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="page">
          <property name="geometry">
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>100</width>
-           <height>30</height>
+           <width>431</width>
+           <height>191</height>
           </rect>
          </property>
          <attribute name="label">
@@ -1422,9 +1419,6 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="readOnly">
            <bool>true</bool>
-          </property>
-          <property name="cursorMoveStyle">
-           <enum>Qt::VisualMoveStyle</enum>
           </property>
           <property name="channel" stdset="0">
            <string notr="true">ACM:COUNT:1</string>
@@ -1500,8 +1494,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>431</width>
-           <height>191</height>
+           <width>100</width>
+           <height>30</height>
           </rect>
          </property>
          <attribute name="label">
@@ -1627,7 +1621,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>14</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">

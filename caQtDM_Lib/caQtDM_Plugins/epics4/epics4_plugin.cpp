@@ -36,8 +36,11 @@ Epics4Plugin::Epics4Plugin()
     qDebug() << "Epics4Plugin: Create";
 }
 
-int Epics4Plugin::initCommunicationLayer(MutexKnobData *data)
+int Epics4Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow)
 {
+    mutexknobdataP = data;
+    messagewindowP = messageWindow;
+
     qDebug() << "Epics4Plugin: InitCommunicationLayer";
 #ifdef EPICS4
     Epics4 = new epics4Subs(data);

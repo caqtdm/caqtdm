@@ -192,9 +192,6 @@
 Q_DECLARE_METATYPE(QList<int>)
 Q_DECLARE_METATYPE(QTabWidget*)
 
-MutexKnobData *mutexKnobData;
-MessageWindow *messageWindow;
-
 class Sleep
 {
 public:
@@ -214,7 +211,7 @@ public:
 CaQtDM_Lib::~CaQtDM_Lib()
 {
 
-    disconnect(mutexKnobData,
+    disconnect(mutexKnobDataP,
                SIGNAL(Signal_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData)), this,
                SLOT(Callback_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData)));
     /*
@@ -239,8 +236,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     QUiLoader loader;
     fromAS = false;
     AllowsUpdate = true;
-    mutexKnobData = mKnobData;
-    messageWindow = msgWindow;
+    mutexKnobDataP = mKnobData;
+    messageWindowP = msgWindow;
     controlsInterfaces = interfaces;
     pepPrint = pepprint;
     firstResize = true;
@@ -363,10 +360,10 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     qRegisterMetaType<knobData>("knobData");
 
     // connect signals to slots for exchanging data
-    connect(mutexKnobData, SIGNAL(Signal_QLineEdit(const QString&, const QString&)), this,
+    connect(mutexKnobDataP, SIGNAL(Signal_QLineEdit(const QString&, const QString&)), this,
             SLOT(Callback_UpdateLine(const QString&, const QString&)));
 
-    connect(mutexKnobData,
+    connect(mutexKnobDataP,
             SIGNAL(Signal_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData)), this,
             SLOT(Callback_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData)));
 
@@ -414,7 +411,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     scanWidgets(myWidget->findChildren<QWidget *>(), macro);
 
     // build a list for getting all soft pv
-    mutexKnobData->BuildSoftPVList(myWidget);
+    mutexKnobDataP->BuildSoftPVList(myWidget);
 
     // setup changeevent for QTabWidgets
     QList<QTabWidget *> allTabs = myWidget->findChildren<QTabWidget *>();
@@ -702,7 +699,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             if(nbMonitors == 0) {
                 //qDebug() << "update " << calcWidget->getVariable().toLatin1().constData()<< "initial value" << calcWidget->getInitialValue();
                 calcWidget->setValue(calcWidget->getInitialValue());
-                mutexKnobData->UpdateSoftPV(calcWidget->getVariable().toLatin1().constData(), calcWidget->getInitialValue(), myWidget);
+                mutexKnobDataP->UpdateSoftPV(calcWidget->getVariable().toLatin1().constData(), calcWidget->getInitialValue(), myWidget);
             }
 
             w1->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -1302,8 +1299,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         // this will check for file existence and when an url is defined, download the file from a http server
         fileFunctions filefunction;
         filefunction.checkFileAndDownload(fileName);
-        if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) filefunction.lastInfo().toLatin1().constData());
-        if(filefunction.lastError().length() > 0)  messageWindow->postMsgEvent(QtCriticalMsg, (char*)filefunction.lastError().toLatin1().constData());
+        if(filefunction.lastInfo().length() > 0) messageWindowP->postMsgEvent(QtWarningMsg, (char*) filefunction.lastInfo().toLatin1().constData());
+        if(filefunction.lastError().length() > 0)  messageWindowP->postMsgEvent(QtCriticalMsg, (char*)filefunction.lastError().toLatin1().constData());
 
         searchFile *s = new searchFile(fileName);
         QString fileNameFound = s->findFile();
@@ -2011,7 +2008,7 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
         pluginName = "epics3";
         trimmedPV = newPV;
         if(kData->soft) pluginName = "intern";
-        if(mutexKnobData->getSoftPV(trimmedPV, &indx, thisW)) pluginName = "intern";
+        if(mutexKnobDataP->getSoftPV(trimmedPV, &indx, thisW)) pluginName = "intern";
     }
 
     *pvRep = trimmedPV;
@@ -2051,9 +2048,9 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     }
 
     // when we defined already the same cacalc software channel, then do nothing
-    if(mutexKnobData->getSoftPV(kData->pv, &indx, thisW)) {
+    if(mutexKnobDataP->getSoftPV(kData->pv, &indx, thisW)) {
         //qDebug() << "software channel already defined" << w;
-        knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
+        knobData *kPtr = mutexKnobDataP->GetMutexKnobDataPtr(indx);  // use pointer
         if(kPtr != (knobData*) 0) {
             if(caCalc *calc = qobject_cast<caCalc *>(w)) {
                 Q_UNUSED(calc);
@@ -2096,7 +2093,7 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     }
 
     // get an index in the data list
-    int num = mutexKnobData->GetMutexKnobDataIndex();
+    int num = mutexKnobDataP->GetMutexKnobDataIndex();
     if(num == -1) {
         qDebug() << "this should never happen";
         return num;
@@ -2105,11 +2102,11 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     // insert into the softpv list when we create a soft channel
     if(kData->soft) {
         strcpy(kData->pluginName, "intern");
-        mutexKnobData->InsertSoftPV(kData->pv, num, thisW);
+        mutexKnobDataP->InsertSoftPV(kData->pv, num, thisW);
     }
 
     // did we use a new soft channel here, then set it
-    if(mutexKnobData->getSoftPV(kData->pv, &indx, thisW)) kData->soft= true;
+    if(mutexKnobDataP->getSoftPV(kData->pv, &indx, thisW)) kData->soft= true;
 
     // initialize channels
     //qDebug() << "pv" << kData->pv << "create channel index=" << indx << "soft=" << kData->soft << "plugin=" << kData->pluginName;
@@ -2126,7 +2123,7 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     kData->edata.repRate = rate;   // default 5 Hz
 
     // update data structure
-    mutexKnobData->SetMutexKnobData(num, *kData);
+    mutexKnobDataP->SetMutexKnobData(num, *kData);
 
     // in case of a soft channel there is nothing to do
     if(kData->soft) {
@@ -2300,7 +2297,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
         QRegExp checkregexp("%\\/(\\S+)\\/");
         checkregexp.setMinimal(true);
         if (checkregexp.indexIn(calcString) != -1){
-            knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(MonitorList.at(1).toInt());
+            knobData *ptr = mutexKnobDataP->GetMutexKnobDataPtr(MonitorList.at(1).toInt());
             if(ptr != (knobData *) 0) {
                 char dataString[1024];
                 int caFieldType= ptr->edata.fieldtype;
@@ -2356,7 +2353,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
 
             for(int i=0; i < MAXMONITORS; i++) valueArray[i] = 0.0;
             for(int i=0; i< nbMonitors;i++) {
-                knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(MonitorList.at(i+1).toInt());
+                knobData *ptr = mutexKnobDataP->GetMutexKnobDataPtr(MonitorList.at(i+1).toInt());
                 if(ptr == (knobData*) 0) {
                     valid = false;
                     return false;
@@ -2401,7 +2398,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
             pArgs = PyTuple_New(MAXMONITORS);
             for(int i=0; i< MAXMONITORS; i++) pValueA[i] = PyFloat_FromDouble(0.0);
             for(int i=0; i< nbMonitors; i++) {
-                knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(MonitorList.at(i+1).toInt());
+                knobData *ptr = mutexKnobDataP->GetMutexKnobDataPtr(MonitorList.at(i+1).toInt());
                 if(ptr != (knobData*) 0) {
                     // when connected
                     int j = IndexList.at(i+1).toInt(); // input a,b,c,d
@@ -2449,7 +2446,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
             // scan and get the channels
             for(int i=0; i < MAX_CALC_INPUTS; i++) valueArray[i] = 0.0;
             for(int i=0; i< nbMonitors;i++) {
-                knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(MonitorList.at(i+1).toInt());
+                knobData *ptr = mutexKnobDataP->GetMutexKnobDataPtr(MonitorList.at(i+1).toInt());
                 if(ptr != (knobData*) 0) {
                     //qDebug() << "calculate from index" << i << ptr->index << ptr->pv << ptr->edata.connected << ptr->edata.rvalue << IndexList.at(i+1).toInt();
                     // when connected
@@ -2519,7 +2516,7 @@ short CaQtDM_Lib::ComputeAlarm(QWidget *w)
     if(nbMonitors > 0)  {
 
         // medm uses however only first channel
-        knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(list.at(1).toInt());
+        knobData *ptr = mutexKnobDataP->GetMutexKnobDataPtr(list.at(1).toInt());
         if(ptr != (knobData *) 0) {
             // when connected
             if(ptr->edata.connected) {
@@ -2684,7 +2681,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         if(valid) {
             if (!QString::compare(calcWidget->getVariable(), data.pv, Qt::CaseInsensitive)){
                 calcWidget->setValue(result);
-                mutexKnobData->UpdateSoftPV(data.pv, result, myWidget);
+                mutexKnobDataP->UpdateSoftPV(data.pv, result, myWidget);
                 //qDebug() << "we have a caCalc" << calcWidget->getVariable() << "  " <<  data.pv;
             }
         }
@@ -3041,8 +3038,11 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             lineeditWidget->setAlarmColors(NOTCONNECTED, 0.0, bg, fg);        \
             lineeditWidget->setProperty("Connect", false);
         }
-        if (caTextEntry *textentryWidget = qobject_cast<caTextEntry *>(w)) {
-            textentryWidget->updateText(lineeditWidget->text());
+
+        if(data.edata.connected) {
+            if (caTextEntry *textentryWidget = qobject_cast<caTextEntry *>(w)) {
+                textentryWidget->updateText(lineeditWidget->text());
+            }
         }
 
         // Graphics ==================================================================================================================
@@ -3396,7 +3396,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 // scan and get the channels
                 for(int i=0; i < 4; i++) valueArray[i] = 0.0;
                 for(int i=0; i< nbMonitors;i++) {
-                    knobData *ptr = mutexKnobData->GetMutexKnobDataPtr(list.at(i+1).toInt());
+                    knobData *ptr = mutexKnobDataP->GetMutexKnobDataPtr(list.at(i+1).toInt());
                     if(ptr != (knobData *) 0) {
                         // when connected
                         if(ptr->edata.connected) {
@@ -4233,9 +4233,9 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
 
     AllowsUpdate = false;
 
-    for(int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
+    for(int i=0; i < mutexKnobDataP->GetMutexKnobDataSize(); i++) {
 
-        knobData kData =  mutexKnobData->GetMutexKnobData(i);
+        knobData kData =  mutexKnobDataP->GetMutexKnobData(i);
 
         if((kData.index != -1) && (myWidget == (QWidget*) kData.thisW)) {
             QString pv = kData.pv;
@@ -4243,14 +4243,14 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
             short soft = kData.soft;
             //qDebug() << pv << "clear monitor at" << i << "index="  << kData.index << "plugin" << kData.pluginName;
             if(soft) {
-                mutexKnobData->RemoveSoftPV(pv, w, kData.index);
+                mutexKnobDataP->RemoveSoftPV(pv, w, kData.index);
             } else {
                ControlsInterface * plugininterface = getControlInterface(kData.pluginName);
                if(plugininterface != (ControlsInterface *) 0) plugininterface->pvClearMonitor(&kData);
             }
             kData.index = -1;
             kData.pv[0] = '\0';
-            mutexKnobData->SetMutexKnobData(i, kData);
+            mutexKnobDataP->SetMutexKnobData(i, kData);
         }
     }
 
@@ -4263,8 +4263,8 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
     // get rid of memory, that was allocated before for this window.
     // it has not been done previously, while otherwise in the datacallback
     // you will run into trouble
-    for(int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
-        knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
+    for(int i=0; i < mutexKnobDataP->GetMutexKnobDataSize(); i++) {
+        knobData *kPtr = mutexKnobDataP->GetMutexKnobDataPtr(i);
         if(kPtr != (knobData *) 0) {
             if(myWidget == (QWidget*) kPtr->thisW) {
                 if (kPtr->edata.info != (void *) 0) {
@@ -4284,7 +4284,7 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
             }
         }
     }
-    mutexKnobData->initHighestCountPV();
+    mutexKnobDataP->initHighestCountPV();
 
     // in case of network launcher, close the application when launcher window is closed
     QString thisFileName =  property("fileString").toString().section('/',-1);
@@ -4408,7 +4408,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             precMode = true;
             Precision = applynumericWidget->decDigits();
         } else {
-            knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv[0]);
+            knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv[0]);
             if(kPtr != (knobData *) 0) Precision =  kPtr->edata.precision;
         }
         nbPV = 1;
@@ -4418,7 +4418,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             precMode = true;
             Precision = numericWidget->decDigits();
         } else {
-            knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv[0]);
+            knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv[0]);
             if(kPtr != (knobData *) 0) Precision =  kPtr->edata.precision;
         }
         nbPV = 1;
@@ -4428,7 +4428,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             precMode = true;
             Precision = spinboxWidget->decDigits();
         } else {
-            knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv[0]);
+            knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv[0]);
             if(kPtr != (knobData *) 0) Precision =  kPtr->edata.precision;
         }
         nbPV = 1;
@@ -4469,7 +4469,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             limitsMax = thermoWidget->maxValue();
             limitsMin = thermoWidget->minValue();
         }
-        knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv[0]);
+        knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv[0]);
         if(kPtr != (knobData *) 0) {
             if(kPtr->edata.lower_disp_limit == kPtr->edata.upper_disp_limit) {
                 limitsDefault = true;
@@ -4681,7 +4681,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         } else  if(selectedItem->text().contains("Raise main window")) {
             QMainWindow *mainWindow = (QMainWindow *) this->parentWidget();
             mainWindow->showNormal();
-            messageWindow->raise();
+            messageWindowP->raise();
 
         } else  if(selectedItem->text().contains("Toggle fit to size")) {
             if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) {
@@ -4762,7 +4762,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 // is there a json string ?
                 int pos = pv[i].indexOf("{");
                 if(pos != -1) pv[i] = pv[i].mid(0, pos);
-                knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv[i]);  // use pointer for getting all necessary information
+                knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv[i]);  // use pointer for getting all necessary information
 
                 if((kPtr != (knobData *) 0) && (pv[i].length() > 0)) {
                     char asc[2048] = {'\0'};
@@ -4949,10 +4949,10 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             print();
         } else if(selectedItem->text().contains("Change Axis")) {
             if(caStripPlot* stripplotWidget = qobject_cast<caStripPlot *>(w)) {
-                limitsStripplotDialog dialog(stripplotWidget, mutexKnobData, "stripplot modifications", this);
+                limitsStripplotDialog dialog(stripplotWidget, mutexKnobDataP, "stripplot modifications", this);
                 dialog.exec();
             } else if(caCartesianPlot* cartesianplotWidget = qobject_cast<caCartesianPlot *>(w)) {
-                limitsCartesianplotDialog dialog(cartesianplotWidget, mutexKnobData, "cartesianplot modifications", this);
+                limitsCartesianplotDialog dialog(cartesianplotWidget, mutexKnobDataP, "cartesianplot modifications", this);
                 dialog.exec();
             }
 
@@ -4967,7 +4967,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                     QString pvs =cartesianplotWidget->getPV(0);
                     QStringList vars = pvs.split(";");
                     if((vars.size()== 2) || (vars.at(1).trimmed().length() > 0)) {
-                        knobData *kPtr =  mutexKnobData->getMutexKnobDataPV(w, vars.at(0).trimmed());
+                        knobData *kPtr =  mutexKnobDataP->getMutexKnobDataPV(w, vars.at(0).trimmed());
                         if(kPtr != (knobData *) 0) {
                             if(kPtr->edata.lower_disp_limit != kPtr->edata.upper_disp_limit) {
                                 cartesianplotWidget->setScaleX(kPtr->edata.lower_disp_limit, kPtr->edata.upper_disp_limit);
@@ -4983,7 +4983,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                     QString pvs =cartesianplotWidget->getPV(0);
                     QStringList vars = pvs.split(";");
                     if((vars.size()== 2) || (vars.at(1).trimmed().length() > 0)) {
-                        knobData *kPtr =  mutexKnobData->getMutexKnobDataPV(w, vars.at(1).trimmed());
+                        knobData *kPtr =  mutexKnobDataP->getMutexKnobDataPV(w, vars.at(1).trimmed());
                         if(kPtr != (knobData *) 0) {
                             if(kPtr->edata.lower_disp_limit != kPtr->edata.upper_disp_limit) {
                                 cartesianplotWidget->setScaleY(kPtr->edata.lower_disp_limit, kPtr->edata.upper_disp_limit);
@@ -4999,11 +4999,11 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
         } else if(selectedItem->text().contains("Change Increment/Value")) {
             if(caSlider* sliderWidget = qobject_cast<caSlider *>(w)) {
-                sliderDialog dialog(sliderWidget, mutexKnobData, "slider Increment/Value change", this);
+                sliderDialog dialog(sliderWidget, mutexKnobDataP, "slider Increment/Value change", this);
                 dialog.exec();
             }
         } else if(selectedItem->text().contains("Change Limits/Precision")) {
-            limitsDialog dialog(w, mutexKnobData, "Limits/Precision change", this);
+            limitsDialog dialog(w, mutexKnobDataP, "Limits/Precision change", this);
             dialog.exec();
         } else {
             // any action from environment ?
@@ -5337,8 +5337,8 @@ void CaQtDM_Lib::ComputeNumericMaxMinPrec(QWidget* widget, const knobData& data)
   */
 void CaQtDM_Lib::postMessage(QtMsgType type, char *msg)
 {
-    if(messageWindow == 0) return;
-    messageWindow->postMsgEvent(type, msg);
+    if(messageWindowP == 0) return;
+    messageWindowP->postMsgEvent(type, msg);
 }
 
 /**
@@ -5373,14 +5373,14 @@ void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QW
     int indx;
 
     //qDebug() << "treatordinary value" << pv << w;
-    knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv);
+    knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv);
     if(kPtr != (knobData *) 0) {
         //qDebug() << "try to find out if this is a soft pv" << pv;
         // when softpv treat it and get out
-        if(mutexKnobData->getSoftPV(pv, &indx, (QWidget*) kPtr->thisW)) {
+        if(mutexKnobDataP->getSoftPV(pv, &indx, (QWidget*) kPtr->thisW)) {
             if(kPtr->soft) {
                 //qDebug() << "write softpv";
-                kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
+                kPtr = mutexKnobDataP->GetMutexKnobDataPtr(indx);  // use pointer
                 kPtr->edata.rvalue = value;
                 // set value also into widget, will be overwritten when driven from other channels
                 caCalc * ww = (caCalc*) kPtr->dispW;
@@ -5436,13 +5436,13 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
     else if(fType == caTextEntry::string) fTypeNew = string;
     else fTypeNew = decimal;
 
-    knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv);
-    if(kPtr == (knobData *) 0)return;
+    knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv);
+    if(kPtr == (knobData *) 0) return;
     knobData *auxPtr = kPtr;
 
     // when softpv get index to where it is defined
-    if(mutexKnobData->getSoftPV(kPtr->pv, &indx, (QWidget*) kPtr->thisW)) {
-        kPtr = mutexKnobData->GetMutexKnobDataPtr(indx);  // use pointer
+    if(mutexKnobDataP->getSoftPV(kPtr->pv, &indx, (QWidget*) kPtr->thisW)) {
+        kPtr = mutexKnobDataP->GetMutexKnobDataPtr(indx);  // use pointer
         if(kPtr == (knobData *) 0) return;
     }
 
@@ -5567,7 +5567,7 @@ void CaQtDM_Lib::TreatRequestedWave(QString pv, QString text, caWaveTable::Forma
     else fTypeNew = decimal;
 
     //qDebug() << "treat requested wave";
-    knobData *kPtr = mutexKnobData->getMutexKnobDataPV(w, pv);
+    knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv);
     if(kPtr == (knobData *) 0)return;
 
     QMutex *datamutex;

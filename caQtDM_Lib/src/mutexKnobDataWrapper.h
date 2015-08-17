@@ -42,7 +42,6 @@ extern CAQTDM_LIBSHARED_EXPORT MutexKnobData* C_UpdateTextLine(MutexKnobData* p,
 extern CAQTDM_LIBSHARED_EXPORT MutexKnobData* C_DataLock(MutexKnobData* p, knobData *kData);
 extern CAQTDM_LIBSHARED_EXPORT MutexKnobData* C_DataUnlock(MutexKnobData* p, knobData *kData);
 
-
 #ifdef __cplusplus
 }
 #endif

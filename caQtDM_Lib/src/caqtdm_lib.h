@@ -303,6 +303,8 @@ private:
     int loopTimerID;
 
     QMap<QString, ControlsInterface*> controlsInterfaces;
+    MutexKnobData *mutexKnobDataP;
+    MessageWindow *messageWindowP;
 
 
 #ifdef epics4

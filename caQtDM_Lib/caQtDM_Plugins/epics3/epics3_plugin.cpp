@@ -25,9 +25,9 @@
 #include <QDebug>
 #include "epics3_plugin.h"
 
-extern "C"{
- MutexKnobData* KnobDataPtr;
-}
+// global variables defined here for access through c routines in epicsSubs.c
+MutexKnobData* mutexKnobdataPtr;
+MessageWindow *messageWindowPtr;
 
 QString Epics3Plugin::pluginName()
 {
@@ -39,10 +39,15 @@ Epics3Plugin::Epics3Plugin()
     qDebug() << "Epics3Plugin: Create";
 }
 
-int Epics3Plugin::initCommunicationLayer(MutexKnobData *data)
+int Epics3Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow)
 {
     qDebug() << "Epics3Plugin: InitCommunicationLayer";
-    KnobDataPtr = data;
+
+    mutexknobdataP = data;
+    messagewindowP = messageWindow;
+    mutexKnobdataPtr = data;
+    messageWindowPtr = messageWindow;
+
     PrepareDeviceIO();
     return true;
 }

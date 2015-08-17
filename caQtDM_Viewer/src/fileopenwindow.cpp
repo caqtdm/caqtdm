@@ -182,7 +182,7 @@ bool FileOpenWindow::loadPlugin()
                     controlsInterface = qobject_cast<ControlsInterface *>(plugin);
                     if (controlsInterface) {
                         qDebug() << controlsInterface->pluginName();
-                        controlsInterface->initCommunicationLayer(mutexKnobData);
+                        controlsInterface->initCommunicationLayer(mutexKnobData, messageWindow);
                         interfaces.insert(controlsInterface->pluginName(), controlsInterface);
                         nbInterfaces++;
                     }
@@ -199,7 +199,7 @@ bool FileOpenWindow::loadPlugin()
             controlsInterface = qobject_cast<ControlsInterface *>(plugin);
             if (controlsInterface) {
                 qDebug() << controlsInterface->pluginName();
-                controlsInterface->initCommunicationLayer(mutexKnobData);
+                controlsInterface->initCommunicationLayer(mutexKnobData, messageWindow);
                 interfaces.insert(controlsInterface->pluginName(), controlsInterface);
                 nbInterfaces++;
             }

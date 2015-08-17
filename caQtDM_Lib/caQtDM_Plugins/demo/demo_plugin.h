@@ -44,7 +44,7 @@ public:
     QString pluginName();
     DemoPlugin();
 
-    int initCommunicationLayer(MutexKnobData *data);
+    int initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow);
     int pvAddMonitor(int index, knobData *kData, int rate, int skip);
     int pvClearMonitor(knobData *kData);
     int pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
@@ -66,7 +66,8 @@ private slots:
 
 private:
     QMutex mutex;
-    MutexKnobData* mutexknobdata;
+    MutexKnobData *mutexknobdataP;
+    MessageWindow *messagewindowP;
     QMap<QString, double> listOfDoubles;
     QList<int> listOfIndexes;
     double initValue;
