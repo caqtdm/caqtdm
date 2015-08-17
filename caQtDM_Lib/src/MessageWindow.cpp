@@ -25,7 +25,7 @@
 
 
 #include "MessageWindow.h"
-#include "MessageWindowWrapper.h"
+#include "messageWindowWrapper.h"
 #include <QCoreApplication>
 #include <QMutexLocker>
 #include <stdio.h>

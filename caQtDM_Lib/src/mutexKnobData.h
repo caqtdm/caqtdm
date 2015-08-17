@@ -37,7 +37,7 @@
 #include <QMap>
 #include <QWaitCondition>
 #include "knobData.h"
-#include "mutexknobDataWrapper.h"
+#include "mutexKnobDataWrapper.h"
 
 
 
