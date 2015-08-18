@@ -8,6 +8,9 @@ CONFIG += release
 CONFIG += demo_plugin
 include (../../../caQtDM.pri)
 
+MOC_DIR = ./moc
+VPATH += ./src
+
 TEMPLATE        = lib
 CONFIG         += plugin
 INCLUDEPATH    += .
