@@ -133,10 +133,6 @@ signals:
      int activWindow;
      bool debugWindow;
      bool fromIOS;
-     
-     bool loadPlugin();
-
-     ControlsInterface *controlsInterface;
 
      QMap<QString, ControlsInterface*> interfaces;
 

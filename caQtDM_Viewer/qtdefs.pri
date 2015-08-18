@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.9.5
+CAQTDM_VERSION = V4.0
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -41,6 +41,13 @@ CONFIG += PYTHONCALC
 
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
+
+# 4.0
+# caQtDM has now a controlsystem plugin structure. CS can be added by writing a plugin (see demo plugin) that will automatically loaded. By specifying the plugin in front
+# of the pv name (i.e epics3://somepv) that plugin will be used
+# fixed a small problem while writing a string to epics (could crash)
+# the build files have been simplified
+# edl2ui enhanced (by Lucas Carvalho)
 
 # 3.9.5
 # calinedit for DBF_CHAR was missing.

@@ -36,6 +36,7 @@ bool HTTPCONFIGURATOR = false;
 #include "fileopenwindow.h"
 #include "specialFunctions.h"
 #include "fileFunctions.h"
+#include "loadPlugins.h"
 
 #ifdef MOBILE
   #include "fingerswipegesture.h"
@@ -134,82 +135,6 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
 #endif
 }
 #endif
-
-bool FileOpenWindow::loadPlugin()
-{
-    int nbInterfaces = 0;
-#ifndef MOBILE
-    qDebug() << "not a mobile device";
-    char asc[256];
-    QList<QString> allPaths;
-
-    // get the controlsystem plugins from QT_PLUGIN_PATH
-    QString pluginPath = (QString)  qgetenv("QT_PLUGIN_PATH");
-    pluginPath.append("/controlsystems");
-    allPaths.append(pluginPath);
-
-    // alternative path
-#if defined(__OSX__) || defined(__APPLE__)
-    QString alternativePath(qApp->applicationDirPath());
-    alternativePath.append("/../Plugins/controlsystems");
-    allPaths.append(alternativePath);
-#else
-    QString alternativePath(qApp->applicationDirPath());
-    alternativePath.append("/controlsystems");
-    allPaths.append(alternativePath);
-#endif
-
-    for (int i = 0; i < allPaths.size(); ++i) {
-        QString path = allPaths.at(i);
-        QDir pluginsDir(path);
-        qDebug() << pluginsDir << pluginsDir.entryList(QDir::Files).length();
-
-        // seems are plugins are located here
-        if( pluginsDir.entryList(QDir::Files).length() > 0) {
-            QString currentPath = pluginsDir.absolutePath();
-            if(i==0) {
-                sprintf(asc, "Controlsystem plugins will be loaded from QT_PLUGIN_PATH=%s", currentPath.toLatin1().constData());
-            } else {
-                sprintf(asc, "Controlsystem plugins will be loaded from application path=%s", currentPath.toLatin1().constData());
-            }
-            messageWindow->postMsgEvent(QtWarningMsg, asc);
-
-            foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
-                qDebug() << "load " << pluginsDir.absoluteFilePath(fileName);
-                QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
-                QObject *plugin = pluginLoader.instance();
-                if (plugin) {
-                    controlsInterface = qobject_cast<ControlsInterface *>(plugin);
-                    if (controlsInterface) {
-                        qDebug() << controlsInterface->pluginName();
-                        controlsInterface->initCommunicationLayer(mutexKnobData, messageWindow);
-                        interfaces.insert(controlsInterface->pluginName(), controlsInterface);
-                        nbInterfaces++;
-                    }
-                }
-            }
-            break;
-        }
-    }
-#else
-    qDebug() << "mobile device";
-    foreach (QObject *plugin, QPluginLoader::staticInstances())
-    {
-        if (plugin) {
-            controlsInterface = qobject_cast<ControlsInterface *>(plugin);
-            if (controlsInterface) {
-                qDebug() << controlsInterface->pluginName();
-                controlsInterface->initCommunicationLayer(mutexKnobData, messageWindow);
-                interfaces.insert(controlsInterface->pluginName(), controlsInterface);
-                nbInterfaces++;
-            }
-        }
-    }
-#endif
-
-    if(nbInterfaces== 0) return false; else return true;
-}
-
 
 /**
  * our main window (form) constructor
@@ -452,7 +377,8 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     }
 
     // load the control plugins (must be done after setting the environment)
-    if (!loadPlugin()) {
+    loadPlugins loadplugins;
+    if (!loadplugins.loadAll(interfaces, mutexKnobData, messageWindow )) {
         QMessageBox::critical(this, "Error", "Could not load any plugin");
     } else {
         if(!interfaces.isEmpty()) {

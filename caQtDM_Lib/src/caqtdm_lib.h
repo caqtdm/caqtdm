@@ -96,13 +96,18 @@ class CAQTDM_LIBSHARED_EXPORT CaQtDM_Lib : public QMainWindow
 
 public:
 
-    explicit CaQtDM_Lib(QWidget *parent = 0, QString="", QString="", MutexKnobData *mutexKnobData = 0,  QMap<QString, ControlsInterface *> interfaces = QMap<QString, ControlsInterface *>(), MessageWindow *msgWindow = 0, bool willPrint = false, QWidget *parentAS = 0);
+    explicit CaQtDM_Lib(QWidget *parent = 0, QString="", QString="", MutexKnobData *mutexKnobData = 0,
+                                                                     QMap<QString, ControlsInterface *> interfaces = QMap<QString, ControlsInterface *>(),
+                                                                     MessageWindow *msgWindow = 0,
+                                                                     bool willPrint = false,
+                                                                     QWidget *parentAS = 0);
     ~CaQtDM_Lib();
 
     void allowResizing(bool allowresize);
     int addMonitor(QWidget *thisW, knobData *data, QString pv, QWidget *w, int *specData, QMap<QString, QString> map, QString *pvRep);
     void ComputeNumericMaxMinPrec(QWidget* widget, const knobData &data);
     void UpdateGauge(EAbstractGauge *w, const knobData &data);
+    ControlsInterface * getControlInterface(QString plugininterface);
 
 #ifdef MOBILE
     void grabSwipeGesture(Qt::GestureType fingerSwipeGestureTypeID);
@@ -254,7 +259,6 @@ private:
     bool PrimarySoftPV(QWidget* widget, QMap<QString, QString> map);
     void setCalcToNothing(QWidget* widget);
     bool Python_Error(QWidget *w, QString message);
-    ControlsInterface * getControlInterface(QString plugininterface);
     void FlushAllInterfaces();
 
 #ifdef MOBILE

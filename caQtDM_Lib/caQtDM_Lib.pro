@@ -30,8 +30,6 @@ INCLUDEPATH += ../caQtDM_QtControls/src
 INCLUDEPATH += $(QWTINCLUDE)
 INCLUDEPATH += $(EPICSINCLUDE)
 
-
-
 SOURCES += caqtdm_lib.cpp \
     mutexKnobData.cpp \
     MessageWindow.cpp \
@@ -43,7 +41,8 @@ SOURCES += caqtdm_lib.cpp \
     sliderDialog.cpp \
     processWindow.cpp \
     splashscreen.cpp \
-    myQProcess.cpp 
+    myQProcess.cpp \
+    loadPlugins.cpp
     
 
 HEADERS += caqtdm_lib.h\
@@ -66,7 +65,8 @@ HEADERS += caqtdm_lib.h\
     splashscreen.h \
     epicsExternals.h \
     myQProcess.h \
-    inlines.h 
+    inlines.h \
+    loadPlugins.h
 
 HEADERS += \
     JSONValue.h \

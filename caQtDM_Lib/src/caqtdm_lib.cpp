@@ -1299,8 +1299,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         // this will check for file existence and when an url is defined, download the file from a http server
         fileFunctions filefunction;
         filefunction.checkFileAndDownload(fileName);
-        if(filefunction.lastInfo().length() > 0) messageWindowP->postMsgEvent(QtWarningMsg, (char*) filefunction.lastInfo().toLatin1().constData());
-        if(filefunction.lastError().length() > 0)  messageWindowP->postMsgEvent(QtCriticalMsg, (char*)filefunction.lastError().toLatin1().constData());
+        if(messageWindowP != (MessageWindow *) 0) {
+            if(filefunction.lastInfo().length() > 0) messageWindowP->postMsgEvent(QtWarningMsg, (char*) filefunction.lastInfo().toLatin1().constData());
+            if(filefunction.lastError().length() > 0)  messageWindowP->postMsgEvent(QtCriticalMsg, (char*)filefunction.lastError().toLatin1().constData());
+        }
 
         searchFile *s = new searchFile(fileName);
         QString fileNameFound = s->findFile();
@@ -4681,7 +4683,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         } else  if(selectedItem->text().contains("Raise main window")) {
             QMainWindow *mainWindow = (QMainWindow *) this->parentWidget();
             mainWindow->showNormal();
-            messageWindowP->raise();
+             if(messageWindowP != (MessageWindow *) 0) messageWindowP->raise();
 
         } else  if(selectedItem->text().contains("Toggle fit to size")) {
             if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) {
@@ -5337,7 +5339,7 @@ void CaQtDM_Lib::ComputeNumericMaxMinPrec(QWidget* widget, const knobData& data)
   */
 void CaQtDM_Lib::postMessage(QtMsgType type, char *msg)
 {
-    if(messageWindowP == 0) return;
+    if(messageWindowP == (MessageWindow *) 0) return;
     messageWindowP->postMsgEvent(type, msg);
 }
 

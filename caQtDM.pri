@@ -8,7 +8,6 @@ demo_plugin {
  		INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
  		LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
  		CONFIG += release
-
 	}
 
         macx {
@@ -18,7 +17,6 @@ demo_plugin {
         	plugins.path = Contents/PlugIns/controlsystems
         	plugins.files += $(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.dylib
         	CONFIG += release
-
         }
 
         win32 {
@@ -47,7 +45,6 @@ epics3_plugin {
  		LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
  		LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
  		CONFIG += release
-
 	}
 
         macx {
@@ -59,7 +56,6 @@ epics3_plugin {
  		plugins.path = Contents/PlugIns/controlsystems
  		plugins.files += $(CAQTDM_COLLECT)/controlsystems/libepics3_plugin.dylib
  		CONFIG += release
-
         }
 
         ios | android {
@@ -102,7 +98,6 @@ epics4_plugin {
  		LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
  		LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
  		CONFIG += release
-
 	}
 	
         macx {
@@ -115,7 +110,6 @@ epics4_plugin {
         	plugins.path = Contents/PlugIns/controlsystems
         	plugins.files += $(CAQTDM_COLLECT)/controlsystems/libepics4_plugin.dylib
         	CONFIG += release
-
         }
 
         ios | android {
