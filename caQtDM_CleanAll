@@ -34,6 +34,14 @@ rm -f ./caQtDM_QtControls/moc/*
 rm -f ./caQtDM_QtControls/obj/*
 rm -f ./caQtDM_Lib/obj/*
 rm -f ./caQtDM_Lib/moc/*
+
+rm -f ./caQtDM_Lib/caQtDM_Plugins/demo/obj/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/demo/moc/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/epics3/obj/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/epics3/moc/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/epics4/obj/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/epics4/moc/*
+
 rm -f ./caQtDM_Viewer/obj/*
 rm -f ./caQtDM_Viewer/moc/*
 rm -f ./caQtDM_Viewer/parser/moc/*
