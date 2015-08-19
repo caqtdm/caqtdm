@@ -14,8 +14,6 @@ contains(QT_VER_MAJ, 5) {
 
 TARGET = caQtDM
 TEMPLATE = app
-DESTDIR = $(CAQTDM_COLLECT)
-
 
 DEFINES += SUPPORT=\\\"EPICS\\\"
 

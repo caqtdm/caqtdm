@@ -1,8 +1,6 @@
 include(../qtdefs.pri)
-CONFIG += caQtDM_adl2ui
+CONFIG += caQtDM_xdl2ui
 include(../../caQtDM.pri)
-
-
 
 contains(QT_VER_MAJ, 5) {
   QT       += widgets
@@ -11,7 +9,6 @@ contains(QT_VER_MAJ, 5) {
 
 TEMPLATE = app
 INCLUDEPATH += .
-
 MOC_DIR = moc
 
 # Input
@@ -28,9 +25,4 @@ TARGET = adl2ui
 OTHER_FILES += \
     stylesheet.qss
 
- DEFINES += BUILDVERSION=\\\"$${CAQTDM_VERSION}\\\"
- DEFINES += BUILDARCH=\\\"$$(QMAKESPEC)\\\"
-
-
-CONFIG += console
 

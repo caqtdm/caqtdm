@@ -190,7 +190,7 @@ int DemoPlugin::pvDisconnect(knobData *kData) {
 
 // flush any io
 int DemoPlugin::FlushIO() {
-    //qDebug() << "DemoPlugin:FlushIO";
+    qDebug() << "DemoPlugin:FlushIO";
     return true;
 }
 

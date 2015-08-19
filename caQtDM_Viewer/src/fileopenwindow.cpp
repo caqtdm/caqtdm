@@ -115,8 +115,6 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
              break;
          case Qt::ApplicationActive:
              qDebug() << "application state changed to active";
-
-             PrepareDeviceIO();
              pendio = false;
               if (mutexKnobData != (MutexKnobData *) 0) {
                   for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
