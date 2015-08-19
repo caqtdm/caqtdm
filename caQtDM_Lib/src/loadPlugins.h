@@ -27,11 +27,11 @@
 #include <QDebug>
 #include <QApplication>
 #include <QPluginLoader>
-#include <qtcontrols_global.h>
+#include "caQtDM_Lib_global.h"
 #include "MessageWindow.h"
 #include "controlsinterface.h"
 
-class QTCON_EXPORT loadPlugins
+class CAQTDM_LIBSHARED_EXPORT loadPlugins
 {
 
 public:
