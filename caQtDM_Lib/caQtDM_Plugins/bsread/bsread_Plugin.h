@@ -74,7 +74,7 @@ private:
     QTimer *timer, *timerValues;
 
     void * zmqcontex;
-    void * zmqsocket;
+    QList<void *> zmqsocket;
 
 };
 

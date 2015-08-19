@@ -88,6 +88,7 @@ void bsreadPlugin::updateValues()
 // initialize our communicationlayer with everything you need
 int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow)
 {
+    int i;
     int rc;
 
     qDebug() << "bsreadPlugin: InitCommunicationLayer" << data;
@@ -98,18 +99,23 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
 
     // INIT ZMQ Layer
     zmqcontex = zmq_init (1);
-    QString ZMQ_ADDR_LIST = (QString)  qgetenv("ZMQ_ADDR_LIST");
+    QString ZMQ_ADDR_LIST = (QString)  qgetenv("BSREAD_ZMQ_ADDR_LIST");
+#ifdef _MSC_VER
+    QStringList BSREAD_ZMQ_ADDRS = ZMQ_ADDR_LIST.split(";");
+#else
+    QStringList BSREAD_ZMQ_ADDRS = ZMQ_ADDR_LIST.split(" ");
+#endif
+    for (i=0;i<ZMQ_ADDR_LIST.count();i++){
+        zmqsocket.append(zmq_socket (zmqcontex, ZMQ_PULL));
+        if (!zmqsocket.last()) {
+            printf ("error in zmq_socket: %s\n", zmq_strerror (errno));
+        }
+        rc = zmq_connect (zmqsocket.last(), ZMQ_ADDR_LIST.toLatin1().constData());
+        if (rc != 0) {
+            printf ("error in zmq_bind: %s(%s)\n", zmq_strerror (errno),ZMQ_ADDR_LIST.toLatin1().constData());
 
-    zmqsocket = zmq_socket (zmqcontex, ZMQ_PULL);
-    if (!zmqsocket) {
-        printf ("error in zmq_socket: %s\n", zmq_strerror (errno));
+        }
     }
-    rc = zmq_connect (zmqsocket, ZMQ_ADDR_LIST.toLatin1());
-    if (rc != 0) {
-        printf ("error in zmq_bind: %s\n", zmq_strerror (errno));
-
-    }
-
 
 
     // we want to update our internal doubles every second
@@ -222,6 +228,6 @@ int bsreadPlugin::TerminateIO() {
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 #else
-    Q_EXPORT_PLUGIN2(bsreadPlugin, bsreadPlugin)
+Q_EXPORT_PLUGIN2(bsreadPlugin, bsreadPlugin)
 #endif
 
