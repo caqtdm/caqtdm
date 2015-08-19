@@ -96,20 +96,21 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
              break;
          case Qt::ApplicationInactive:
              qDebug() << "application state changed to inactive";
-             PrepareDeviceIO();
              pendio = false;
              if (mutexKnobData != (MutexKnobData *) 0) {
                  for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
                      knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
                      if(kPtr->index != -1)  {
                        //qDebug() << "should disconnect" << kPtr->pv;
-                       EpicsDisconnect(kPtr);
+                       ControlsInterface * plugininterface = (ControlsInterface *) kPtr->pluginInterface;
+                       plugininterface->pvDisconnect(kPtr);
                        mutexKnobData->SetMutexKnobData(i, *kPtr);
                        pendio = true;
                      }
                  }
              }
-             TerminateDeviceIO();
+             //TerminateDeviceIO();
+             TerminateAllInterfaces();
 
              break;
          case Qt::ApplicationActive:
@@ -121,11 +122,15 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
                   for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
                       knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
                       if(kPtr->index != -1) {
-                        EpicsReconnect(kPtr);
+                        ControlsInterface * plugininterface = (ControlsInterface *) kPtr->pluginInterface;
+                        if(plugininterface != (ControlsInterface *) 0) plugininterface->pvReconnect(kPtr);
                         pendio = true;
                       }
                   }
-                  if(pendio)  EpicsFlushIO();
+                  if(pendio)  {
+                      FlushAllInterfaces();
+                      //EpicsFlushIO();
+                  }
               }
 
              break;
@@ -135,6 +140,32 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
 #endif
 }
 #endif
+
+void FileOpenWindow::FlushAllInterfaces()
+{
+    // flush all plugins
+    if(!interfaces.isEmpty()) {
+        QMapIterator<QString, ControlsInterface *> i(interfaces);
+        while (i.hasNext()) {
+            i.next();
+            ControlsInterface *plugininterface = i.value();
+            if(plugininterface != (ControlsInterface *) 0) plugininterface->FlushIO();
+        }
+    }
+}
+
+void FileOpenWindow::TerminateAllInterfaces()
+{
+    // flush all plugins
+    if(!interfaces.isEmpty()) {
+        QMapIterator<QString, ControlsInterface *> i(interfaces);
+        while (i.hasNext()) {
+            i.next();
+            ControlsInterface *plugininterface = i.value();
+            if(plugininterface != (ControlsInterface *) 0) plugininterface->TerminateIO();
+        }
+    }
+}
 
 /**
  * our main window (form) constructor

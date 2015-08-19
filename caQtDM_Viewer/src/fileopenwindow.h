@@ -109,6 +109,8 @@ signals:
  private:
 
      void closeEvent(QCloseEvent* ce);
+     void FlushAllInterfaces();
+     void TerminateAllInterfaces();
      QMainWindow *lastWindow;
      QString lastMacro, lastFile, lastGeometry;
      Ui::MainWindow ui;
