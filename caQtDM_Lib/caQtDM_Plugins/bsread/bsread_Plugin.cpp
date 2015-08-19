@@ -105,16 +105,19 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
 #else
     QStringList BSREAD_ZMQ_ADDRS = ZMQ_ADDR_LIST.split(" ");
 #endif
-    for (i=0;i<ZMQ_ADDR_LIST.count();i++){
+    for (i=0;i<BSREAD_ZMQ_ADDRS.count();i++){
         zmqsocket.append(zmq_socket (zmqcontex, ZMQ_PULL));
         if (!zmqsocket.last()) {
             printf ("error in zmq_socket: %s\n", zmq_strerror (errno));
         }
-        rc = zmq_connect (zmqsocket.last(), ZMQ_ADDR_LIST.toLatin1().constData());
+        rc = zmq_connect (zmqsocket.last(), BSREAD_ZMQ_ADDRS.toLatin1().constData());
         if (rc != 0) {
-            printf ("error in zmq_bind: %s(%s)\n", zmq_strerror (errno),ZMQ_ADDR_LIST.toLatin1().constData());
+            printf ("error in zmq_bind: %s(%s)\n", zmq_strerror (errno),BSREAD_ZMQ_ADDRS.toLatin1().constData());
 
         }
+
+
+
     }
 
 

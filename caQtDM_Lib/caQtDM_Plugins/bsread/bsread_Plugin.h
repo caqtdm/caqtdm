@@ -22,8 +22,8 @@
  *  Contact details:
  *    anton.mezger@psi.ch
  */
-#ifndef DEMOPLUGIN_H
-#define DEMOPLUGIN_H
+#ifndef BSREADPLUGIN_H
+#define BSREADPLUGIN_H
 
 #include <QObject>
 #include <QMap>
