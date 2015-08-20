@@ -29,11 +29,23 @@ loadPlugins::loadPlugins()
 {
 }
 
+void loadPlugins::printPlugins(const QMap<QString,ControlsInterface*> interfaces)
+{
+    qDebug() << "printPlugins" << interfaces;
+    if(!interfaces.isEmpty()) {
+        QMapIterator<QString, ControlsInterface *> i(interfaces);
+        while (i.hasNext()) {
+            i.next();
+            qDebug() << "Info: plugin" <<  i.key() << "loaded";
+        }
+    }
+}
+
 bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKnobData *mutexKnobData, MessageWindow *messageWindow)
 {
     int nbInterfaces = 0;
 #ifndef MOBILE
-    qDebug() << "load dynamic plugins";
+    //qDebug() << "load dynamic plugins";
     char asc[256];
     QList<QString> allPaths;
 
@@ -66,7 +78,7 @@ bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKn
             } else {
                 sprintf(asc, "Controlsystem plugins will be loaded from application path=%s", currentPath.toLatin1().constData());
             }
-            messageWindow->postMsgEvent(QtWarningMsg, asc);
+            if(messageWindow != (MessageWindow *) 0) messageWindow->postMsgEvent(QtWarningMsg, asc);
 
             foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
                 //qDebug() << "load " << pluginsDir.absoluteFilePath(fileName);
@@ -85,7 +97,7 @@ bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKn
         }
     }
 #else
-    qDebug() << "load static plugins";
+    //qDebug() << "load static plugins";
     foreach (QObject *plugin, QPluginLoader::staticInstances())
     {
         if (plugin) {

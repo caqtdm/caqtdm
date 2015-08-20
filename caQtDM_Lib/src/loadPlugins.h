@@ -39,6 +39,7 @@ public:
    ~loadPlugins() {}
 
    bool loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKnobData *mutexKnobData = 0, MessageWindow *messageWindow = 0);
+   void printPlugins(const QMap<QString,ControlsInterface*> interfaces);
 
 private:
      ControlsInterface *controlsInterface;

@@ -109,7 +109,6 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
                      }
                  }
              }
-             //TerminateDeviceIO();
              TerminateAllInterfaces();
 
              break;
@@ -127,7 +126,6 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
                   }
                   if(pendio)  {
                       FlushAllInterfaces();
-                      //EpicsFlushIO();
                   }
               }
 
