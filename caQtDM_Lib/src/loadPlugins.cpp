@@ -31,7 +31,6 @@ loadPlugins::loadPlugins()
 
 void loadPlugins::printPlugins(const QMap<QString,ControlsInterface*> interfaces)
 {
-    qDebug() << "printPlugins" << interfaces;
     if(!interfaces.isEmpty()) {
         QMapIterator<QString, ControlsInterface *> i(interfaces);
         while (i.hasNext()) {
