@@ -66,7 +66,7 @@ bsread_Plugin {
                 INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
 		INCLUDEPATH += $$(EPICS_BASE)/include
                 win32-msvc* {
-                	CONFIG += Define_Build_epics_controls 
+                        CONFIG += Define_Build_epics_controls Define_ControlsysTargetDir
                         CONFIG += Define_Build_caQtDM_Lib Define_Symbols Define_ZMQ_Lib
                 }
 

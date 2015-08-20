@@ -24,12 +24,23 @@ public:
     void setKnobData(MutexKnobData *value);
     size_t getMessage_size() const;
 
+    QString getMainHeader() const;
+    void setMainHeader(char *value);
+
 private:
     void * zmqsocket;
     bool running_decode;
     QString ConnectionPoint;
     MutexKnobData * KnobData;
     size_t message_size;
+    QString MainHeader;
+    long global_timestamp_epoch;
+    long global_timestamp_ns;
+    double pulse_id;
+    QString htype;
+    QString hash;
+
+    QString Header;
 
 
 };
