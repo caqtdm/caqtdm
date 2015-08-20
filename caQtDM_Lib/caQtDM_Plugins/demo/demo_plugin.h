@@ -32,6 +32,12 @@
 #include <QTimer>
 #include "controlsinterface.h"
 
+//#define HARDWORK
+
+#ifdef HARDWORK
+#include <QtConcurrentRun>
+#endif
+
 class Q_DECL_EXPORT DemoPlugin : public QObject, ControlsInterface
 {
     Q_OBJECT
@@ -72,6 +78,9 @@ private:
     QList<int> listOfIndexes;
     double initValue;
     QTimer *timer, *timerValues;
+#ifdef HARDWORK
+    void updateHardwork();
+#endif
 };
 
 #endif

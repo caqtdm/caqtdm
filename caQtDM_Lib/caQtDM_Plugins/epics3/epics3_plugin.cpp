@@ -56,8 +56,7 @@ int Epics3Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
 
 int Epics3Plugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
     //qDebug() << "Epics3Plugin:pvAddMonitor" << kData->pv;
-    CreateAndConnect(index, kData, rate, skip);
-    return true;
+    return CreateAndConnect(index, kData, rate, skip);
 }
 
 int Epics3Plugin::pvClearMonitor(knobData *kData) {
@@ -69,26 +68,22 @@ int Epics3Plugin::pvClearMonitor(knobData *kData) {
 int Epics3Plugin::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType) {
 
     //qDebug() << "Epics3Plugin:pvSetValue";
-    EpicsSetValue(pv, rdata, idata, sdata, object, errmess, forceType);
-    return true;
+    return EpicsSetValue(pv, rdata, idata, sdata, object, errmess, forceType);
 }
 
 int Epics3Plugin::pvSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess) {
     //qDebug() << "Epics3Plugin:pvSetWave";
-    EpicsSetWave(pv, fdata, ddata, data16, data32, sdata, nelm, object, errmess);
-    return true;
+    return EpicsSetWave(pv, fdata, ddata, data16, data32, sdata, nelm, object, errmess);
 }
 
 int Epics3Plugin::pvGetTimeStamp(char *pv, char *timestamp) {
     //qDebug() << "Epics3Plugin:pvgetTimeStamp";
-    EpicsGetTimeStamp(pv, timestamp);
-    return true;
+    return EpicsGetTimeStamp(pv, timestamp);
 }
 
 int Epics3Plugin::pvGetDescription(char *pv, char *description) {
     //qDebug() << "Epics3Plugin:pvGetDescription";
-    EpicsGetDescription(pv, description);
-    return true;
+    return EpicsGetDescription(pv, description);
 }
 
 int Epics3Plugin::pvClearEvent(void * ptr) {

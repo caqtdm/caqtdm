@@ -23,6 +23,7 @@
  *    anton.mezger@psi.ch
  */
 #include <QDebug>
+#include <QThread>
 #include "demo_plugin.h"
 
 // as defined in knobDefines.h
@@ -80,14 +81,27 @@ void DemoPlugin::updateInterface()
 void DemoPlugin::updateValues()
 {
     QMutexLocker locker(&mutex);
+#ifndef HARDWORK
+    QMap<QString, double>::iterator i;
+    for (i = listOfDoubles.begin(); i != listOfDoubles.end(); ++i) i.value()++;
+#else
+    QtConcurrent::run(this, &DemoPlugin::updateHardwork);
+#endif
+}
+
+#ifdef HARDWORK
+void  DemoPlugin::updateHardwork()
+{
+    qDebug() << "hardwork";
     QMap<QString, double>::iterator i;
     for (i = listOfDoubles.begin(); i != listOfDoubles.end(); ++i) i.value()++;
 }
+#endif
 
 // initialize our communicationlayer with everything you need
 int DemoPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow)
 {
-    qDebug() << "DemoPlugin: InitCommunicationLayer" << data;
+    qDebug() << "DemoPlugin: InitCommunicationLayer";
 
     mutexknobdataP = data;
     messagewindowP = messageWindow;
@@ -99,6 +113,7 @@ int DemoPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messa
     connect(timerValues, SIGNAL(timeout()), this, SLOT(updateValues()));
     timerValues->start(1000);
 
+    // we want to update the interface every 2 seconds
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateInterface()));
     timer->start(2000);
