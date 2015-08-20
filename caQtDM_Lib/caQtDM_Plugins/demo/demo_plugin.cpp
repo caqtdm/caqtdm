@@ -166,7 +166,7 @@ int DemoPlugin::pvGetDescription(char *pv, char *description) {
     return true;
 }
 
-// next routines are used to stop and restart the dataacquisition (used in case of tabWidgets in the display)
+// next two routines are used to stop and restart the monitoring (used in case of tabWidgets in the display)
 int DemoPlugin::pvClearEvent(void * ptr) {
     qDebug() << "DemoPlugin:pvClearEvent";
     return true;
@@ -177,7 +177,7 @@ int DemoPlugin::pvAddEvent(void * ptr) {
     return true;
 }
 
-// next routines are used to Connect and disconnect monitors
+// next two routines are used to connect and disconnect monitors when the application gest suspended and reactivated
 int DemoPlugin::pvReconnect(knobData *kData) {
     qDebug() << "DemoPlugin:pvReconnect";
     return true;
@@ -188,13 +188,16 @@ int DemoPlugin::pvDisconnect(knobData *kData) {
     return true;
 }
 
-// flush any io
+// flush any io is periodically called (1s timer) in order to flush the disconnection and reconnection
+// used for pv's that will be hidden and shown in case of tabwidgets
 int DemoPlugin::FlushIO() {
     //qDebug() << "DemoPlugin:FlushIO";
     return true;
 }
 
-// termination
+// termination (in case of epics3, this is used to destroy the context when the application gest deactivated
+// otherwise probably no meaning; in this demo, we stop the simulation, however it will not be reactivated
+// any more (you may do that through pvReconnect)
 int DemoPlugin::TerminateIO() {
     //qDebug() << "DemoPlugin:TerminateIO";
     timerValues->stop();

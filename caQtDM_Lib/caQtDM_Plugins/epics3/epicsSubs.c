@@ -263,7 +263,8 @@ static void dataCallback(struct event_handler_args args)
             strcpy(ptr, myLimitedString(val_ptr[0]));
             for (i = 1; i < args.count; i++) {
                 len = len+ (int) strlen(myLimitedString(val_ptr[i-1]));
-                strcat(&ptr[len++], ";");
+                //strcat(&ptr[len++], ";");
+                strcat(&ptr[len++], "\033");
                 strcat(&ptr[len], myLimitedString(val_ptr[i]));
             }
             //kData.edata.actTime = now;
@@ -475,7 +476,8 @@ static void displayCallback(struct event_handler_args args) {
                 strcpy(ptr, myLimitedString(stsF->strs[0]));
                 for (i = 1; i < stsF->no_str; i++) {
                     len = len + (int) strlen(myLimitedString(stsF->strs[i-1]));
-                    strcat(&ptr[len++], ";");
+                    //strcat(&ptr[len++], ";");
+                    strcat(&ptr[len++], "\033");
                     strcat(&ptr[len], myLimitedString(stsF->strs[i]));
                 }
 

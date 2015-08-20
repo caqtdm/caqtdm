@@ -2313,7 +2313,8 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                         if(caFieldType == caENUM) {
                             QString String(dataString);
                             QStringList list;
-                            list = String.split(";");
+                            //list = String.split(";");
+                            list = String.split((QChar)27);
                             if((ptr->edata.fieldtype == caENUM)  && ((int) ptr->edata.ivalue < list.count() ) && (list.count() > 0)) {
                                 if(list.at((int) ptr->edata.ivalue).trimmed().size() != 0)  {  // string seems to empty, give value
                                     QString strng = list.at((int) ptr->edata.ivalue);
@@ -2731,7 +2732,8 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         //qDebug() << "we have a menu";
 
         if(data.edata.connected) {
-            QStringList stringlist = String.split( ";");
+            //QStringList stringlist = String.split( ";");
+            QStringList stringlist = String.split((QChar)27);
             // set enum strings
             if(data.edata.fieldtype == caENUM) {
                 menuWidget->populateCells(stringlist);
@@ -2755,7 +2757,8 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         //qDebug() << "we have a choiceButton" << String << value;
 
         if(data.edata.connected) {
-            QStringList stringlist = String.split( ";");
+            //QStringList stringlist = String.split( ";");
+            QStringList stringlist = String.split((QChar)27);
             // set enum strings
             if(data.edata.fieldtype == caENUM) {
                 choiceWidget->populateCells(stringlist, (int) data.edata.ivalue);
@@ -2974,7 +2977,9 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 } else {
                     lineeditWidget->setAlarmColors(data.edata.severity, (double) data.edata.ivalue, bg, fg);
                 }
-                list = String.split(";");
+                //list = String.split(";");
+                list = String.split((QChar)27);
+
                 //qDebug() << lineeditWidget << String << list << data.pv << (int) data.edata.ivalue << data.edata.valueCount;
 
                 if((data.edata.fieldtype == caENUM)  && (list.count() == 0)) {
@@ -3793,7 +3798,8 @@ void CaQtDM_Lib::getStatesToggleAndLed(QWidget *widget, const knobData &data, co
 
         QString str = "";
         QStringList list;
-        list = String.split(";");
+        //list = String.split(";");
+        list = String.split((QChar)27);
 
         if((int) data.edata.ivalue < list.count()  && (list.count() > 0))  str = list.at((int) data.edata.ivalue);
 
@@ -4820,7 +4826,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                                 info.append((char*)kPtr->edata.dataB);
                             } else {
                                 QString States((char*) kPtr->edata.dataB);
-                                QStringList list = States.split(";");
+                                //QStringList list = States.split(";");
+                                QStringList list = States.split((QChar)27);
                                 for(int j=0; j<list.count(); j++) {
                                     sprintf(asc, "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%d %s", j, qPrintable(list.at(j)));
                                     info.append(asc);
@@ -4836,7 +4843,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                             info.append("<br>States: ");
                             if(kPtr->edata.enumCount > 0) {
                                 QString States((char*) kPtr->edata.dataB);
-                                QStringList list = States.split(";");
+                                //QStringList list = States.split(";");
+                                QStringList list = States.split((QChar)27);
                                 for(int j=0; j<list.count(); j++) {
                                     sprintf(asc, "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%d %s", j, qPrintable(list.at(j)));
                                     info.append(asc);
@@ -5463,7 +5471,8 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
         match = false;
         if(kPtr->edata.dataB != (void*)0 && kPtr->edata.enumCount > 0) {
             QString strng((char*) kPtr->edata.dataB);
-            QStringList list = strng.split(";", QString::SkipEmptyParts);
+            //QStringList list = strng.split(";", QString::SkipEmptyParts);
+            QStringList list = strng.split((QChar)27, QString::SkipEmptyParts);
             for (int i=0; i<list.size(); i++) {
                 if(!text.compare(list.at(i).trimmed())) {
                     //qDebug() << "set enum text" << textValue;
