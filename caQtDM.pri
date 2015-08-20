@@ -33,6 +33,44 @@ demo_plugin {
                 }
         }
 }
+#==========================================================================================================
+bsread_Plugin {
+        message(“bsread_plugin configuration”)
+        CONFIG += Define_ControlsysTargetDir Define_Build_objDirs Define_ZMQ_Lib
+        
+        unix:!macx:!ios:!android {
+                message(“demo_plugin configuration unix:!macx:!ios:!android”)
+ 		INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
+ 		LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
+ 		CONFIG += release
+
+	}
+
+        macx {
+                message(“demo_plugin configuration macx”)
+                INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
+        	LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
+        	plugins.path = Contents/PlugIns/controlsystems
+        	plugins.files += $(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.dylib
+        	CONFIG += release
+
+        }
+
+        win32 {
+                message(“demo_plugin configuration win32”)
+                INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
+		INCLUDEPATH += $$(EPICS_BASE)/include
+                win32-msvc* {
+                	CONFIG += Define_Build_epics_controls 
+                        CONFIG += Define_Build_caQtDM_Lib Define_Symbols Define_ZMQ_Lib
+                }
+
+                win32-g++ {
+                        EPICS_LIBS=$$(EPICS_BASE)/lib/win32-x86-mingw
+                        LIBS += ../caQtDM_Lib/release/libcaQtDM_Lib.a
+                }
+        }
+}
 
 #==========================================================================================================
 epics3_plugin {
@@ -75,6 +113,7 @@ epics3_plugin {
   		INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
 
                 win32-msvc* {
+                        DEFINES +=_CRT_SECURE_NO_WARNINGS
                         CONFIG += Define_Build_epics_controls 
                         CONFIG += Define_Build_caQtDM_Lib Define_Symbols
                 }
@@ -379,8 +418,7 @@ caQtDM_Viewer {
 
 		TARGET = caQtDM
 		TEMPLATE = app
-		include (./caQtDM.pri)
-		MOC_DIR = moc
+                MOC_DIR = moc
 		VPATH += ./src
 		
 		INCLUDEPATH += .
@@ -444,6 +482,26 @@ caQtDM_adl2ui{
         }
 }
 #==========================================================================================================
+Define_ZMQ_Lib{
+	
+	
+	INCLUDEPATH += $$(ZMQINC)
+	unix:!macx!ios:!android {
+                LIBS += $$(ZMQLIB)/libzmq.lib
+	}
+        macx {
+                LIBS += $$(ZMQLIB)/libzmq.lib
+        }
+        win32 {
+	    DebugBuild {
+                LIBS += $$(ZMQLIB)/libzmq.lib
+	     }
+	    ReleaseBuild {
+                LIBS += $$(ZMQLIB)/libzmq.lib
+	    }
+	}
+}
+
 Define_Build_Python {
 	PYTHONCALC: {
 	  warning("for image and visibility calculation, python will be build in")
