@@ -5,7 +5,6 @@ contains(QT_VER_MAJ, 5) {
 }
 
 CONFIG += warn_on
-CONFIG += release
 CONFIG += bsread_Plugin
 include (../../../caQtDM.pri)
 
@@ -19,5 +18,5 @@ HEADERS         = bsread_Plugin.h bsreadExternals.h ../controlsinterface.h \
 SOURCES         = bsread_Plugin.cpp md5.cc \
     bsread_decode.cpp
 TARGET          = bsread_Plugin
-DESTDIR         = $(CAQTDM_COLLECT)/controlsystems
+
 
