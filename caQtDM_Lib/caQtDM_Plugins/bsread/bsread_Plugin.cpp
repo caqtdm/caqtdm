@@ -25,6 +25,7 @@
 #include <QDebug>
 #include "bsread_plugin.h"
 #include "zmq.h"
+#include "bsread_decode.h"
 
 // as defined in knobDefines.h
 //caType {caSTRING	= 0, caINT = 1, caFLOAT = 2, caENUM = 3, caCHAR = 4, caLONG = 5, caDOUBLE = 6};
@@ -106,18 +107,9 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
     QStringList BSREAD_ZMQ_ADDRS = ZMQ_ADDR_LIST.split(" ");
 #endif
     for (i=0;i<BSREAD_ZMQ_ADDRS.count();i++){
-        zmqsocket.append(zmq_socket (zmqcontex, ZMQ_PULL));
-        if (!zmqsocket.last()) {
-            printf ("error in zmq_socket: %s\n", zmq_strerror (errno));
-        }
-        rc = zmq_connect (zmqsocket.last(), BSREAD_ZMQ_ADDRS.toLatin1().constData());
-        if (rc != 0) {
-            printf ("error in zmq_bind: %s(%s)\n", zmq_strerror (errno),BSREAD_ZMQ_ADDRS.toLatin1().constData());
-
-        }
-
-
-
+        bsreadconnections.append(new bsread_Decode(zmqcontex,BSREAD_ZMQ_ADDRS.at(i)));
+        bsreadconnections.last()->setKnobData(data);
+        bsreadconnections.last()->start();
     }
 
 
