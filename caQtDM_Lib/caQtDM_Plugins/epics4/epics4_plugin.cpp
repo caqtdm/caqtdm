@@ -49,6 +49,9 @@ int Epics4Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
 }
 
 int Epics4Plugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
+    Q_UNUSED(index);
+    Q_UNUSED(rate);
+    Q_UNUSED(skip);
     qDebug() << "Epics4Plugin:pvAddMonitor" << kData->pv << kData->index;
 #ifdef EPICS4
     Epics4->CreateAndConnect4(index, kData->pv);
@@ -57,12 +60,15 @@ int Epics4Plugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
 }
 
 int Epics4Plugin::pvClearMonitor(knobData *kData) {
+    Q_UNUSED(kData);
     qDebug() << "Epics4Plugin:pvClearMonitor";
     return true;
 }
 
 int Epics4Plugin::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType) {
-
+    Q_UNUSED(object);
+    Q_UNUSED(errmess);
+    Q_UNUSED(forceType);
     qDebug() << "Epics4Plugin:pvSetValue" << pv << rdata << idata << sdata;
     QString from = QString::number(rdata);
 #ifdef EPICS4
@@ -72,36 +78,53 @@ int Epics4Plugin::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata,
 }
 
 int Epics4Plugin::pvSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess) {
+    Q_UNUSED(pv);
+    Q_UNUSED(fdata);
+    Q_UNUSED(ddata);
+    Q_UNUSED(data16);
+    Q_UNUSED(data32);
+    Q_UNUSED(sdata);
+    Q_UNUSED(nelm);
+    Q_UNUSED(object);
+    Q_UNUSED(errmess);
     qDebug() << "Epics4Plugin:pvSetWave";
     return true;
 }
 
 int Epics4Plugin::pvGetTimeStamp(char *pv, char *timestamp) {
+    Q_UNUSED(pv);
+    Q_UNUSED(timestamp);
     qDebug() << "Epics4Plugin:pvgetTimeStamp";
     return true;
 }
 
 int Epics4Plugin::pvGetDescription(char *pv, char *description) {
+    Q_UNUSED(pv);
+    Q_UNUSED(description);
     qDebug() << "Epics4Plugin:pvGetDescription";
     return true;
 }
 
 int Epics4Plugin::pvClearEvent(void * ptr) {
+    Q_UNUSED(ptr);
     qDebug() << "Epics4Plugin:pvClearEvent";
     return true;
 }
 
 int Epics4Plugin::pvAddEvent(void * ptr) {
+    Q_UNUSED(ptr);
     qDebug() << "Epics4Plugin:pvAddEvent";
     return true;
 }
 
 int Epics4Plugin::pvReconnect(knobData *kData) {
+    Q_UNUSED(kData);
     qDebug() << "Epics4Plugin:pvReconnect";
     return true;
 }
 
 int Epics4Plugin::pvDisconnect(knobData *kData) {
+    Q_UNUSED(kData);
     qDebug() << "Epics4Plugin:pvDisconnect";
     return true;
 }

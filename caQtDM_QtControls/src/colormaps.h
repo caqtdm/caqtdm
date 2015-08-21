@@ -156,11 +156,6 @@ public:
 
     void initColormap(int *colorIndexes, int nbColors, bool discrete) {
 
-        for ( int i = 0; i < nbColors; i++ ) {
-            if(colorIndexes[i] < 2) colorIndexes[i] = 2;
-            if(colorIndexes[i] > 18) colorIndexes[i] = 18;
-        }
-
         if(discrete) setMode( QwtLinearColorMap::FixedColors);
         setColorInterval( Qt::GlobalColor( colorIndexes[0] ), Qt::GlobalColor(colorIndexes[nbColors-1]) );
 

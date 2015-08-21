@@ -48,7 +48,7 @@ DemoPlugin::DemoPlugin()
 // take a look how monitors are treated in the epics3 plugin
 void DemoPlugin::updateInterface()
 {
-    double newValue;
+    double newValue = 0.0;
 
     QMutexLocker locker(&mutex);
 
@@ -123,12 +123,15 @@ int DemoPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messa
 
 // caQtDM_Lib will call this routine for defining a monitor
 int DemoPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
+    Q_UNUSED(index);
+    Q_UNUSED(rate);
+    Q_UNUSED(skip);
     QMutexLocker locker(&mutex);
     QString key = kData->pv;
 
     qDebug() << "DemoPlugin:pvAddMonitor" << kData->pv << kData->index;
     double value = initValue;
-    initValue =+ 10;
+    initValue += 10;
 
     // append device index to our internal list
     listOfIndexes.append(kData->index);
@@ -143,7 +146,7 @@ int DemoPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
 int DemoPlugin::pvClearMonitor(knobData *kData) {
     QMutexLocker locker(&mutex);
 
-    qDebug() << "DemoPlugin:pvClearMonitor" << kData << kData->pv << kData->index;
+    qDebug() << "DemoPlugin:pvClearMonitor" << kData->pv << kData->index;
     QString key = kData->pv;
     if(!listOfDoubles.contains(key)) listOfDoubles.remove(key);
     listOfIndexes.removeAll(kData->index);
@@ -153,6 +156,9 @@ int DemoPlugin::pvClearMonitor(knobData *kData) {
 
 // caQtDM_Lib will call this routine for setting data (see for more detail the epics3 plugin)
 int DemoPlugin::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType) {
+    Q_UNUSED(object);
+    Q_UNUSED(errmess);
+    Q_UNUSED(forceType);
     QMutexLocker locker(&mutex);
     qDebug() << "DemoPlugin:pvSetValue" << pv << rdata << idata << sdata;
     QString key = pv;
@@ -162,6 +168,15 @@ int DemoPlugin::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, c
 
 // caQtDM_Lib will call this routine for setting waveforms data (see for more detail the epics3 plugin)
 int DemoPlugin::pvSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess) {
+    Q_UNUSED(pv);
+    Q_UNUSED(fdata);
+    Q_UNUSED(ddata);
+    Q_UNUSED(data16);
+    Q_UNUSED(data32);
+    Q_UNUSED(sdata);
+    Q_UNUSED(nelm);
+    Q_UNUSED(object);
+    Q_UNUSED(errmess);
     QMutexLocker locker(&mutex);
     qDebug() << "DemoPlugin:pvSetWave";
     return true;
@@ -169,6 +184,8 @@ int DemoPlugin::pvSetWave(char *pv, float *fdata, double *ddata, int16_t *data16
 
 // caQtDM_Lib will call this routine for getting a description of the monitor
 int DemoPlugin::pvGetTimeStamp(char *pv, char *timestamp) {
+    Q_UNUSED(pv);
+    Q_UNUSED(timestamp);
     qDebug() << "DemoPlugin:pvgetTimeStamp";
     strcpy(timestamp, "timestamp in epics format");
     return true;
@@ -176,6 +193,8 @@ int DemoPlugin::pvGetTimeStamp(char *pv, char *timestamp) {
 
 // caQtDM_Lib will call this routine for getting the timestamp for this monitor
 int DemoPlugin::pvGetDescription(char *pv, char *description) {
+    Q_UNUSED(pv);
+    Q_UNUSED(description);
     qDebug() << "DemoPlugin:pvGetDescription";
     strcpy(description, "hello, I am a double");
     return true;
@@ -183,22 +202,26 @@ int DemoPlugin::pvGetDescription(char *pv, char *description) {
 
 // next two routines are used to stop and restart the monitoring (used in case of tabWidgets in the display)
 int DemoPlugin::pvClearEvent(void * ptr) {
+    Q_UNUSED(ptr);
     qDebug() << "DemoPlugin:pvClearEvent";
     return true;
 }
 
 int DemoPlugin::pvAddEvent(void * ptr) {
+    Q_UNUSED(ptr);
     qDebug() << "DemoPlugin:pvAddEvent";
     return true;
 }
 
 // next two routines are used to connect and disconnect monitors when the application gest suspended and reactivated
 int DemoPlugin::pvReconnect(knobData *kData) {
+    Q_UNUSED(kData);
     qDebug() << "DemoPlugin:pvReconnect";
     return true;
 }
 
 int DemoPlugin::pvDisconnect(knobData *kData) {
+    Q_UNUSED(kData);
     qDebug() << "DemoPlugin:pvDisconnect";
     return true;
 }

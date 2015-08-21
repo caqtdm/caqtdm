@@ -703,6 +703,8 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
 {
     int status;
     connectInfo *info = (connectInfo *) 0;
+    UNUSED(skip);
+    UNUSED(rate);
 
     PrepareDeviceIO();
 

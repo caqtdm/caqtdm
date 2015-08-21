@@ -52,4 +52,13 @@
  #endif
 #endif
 
+// in order to correctly define for c and c++ (no mismatched tags)
+#ifdef __cplusplus
+typedef class MessageWindow MessageWindow;
+typedef class MutexKnobData MutexKnobData;
+#else
+typedef struct MessageWindow MessageWindow;
+typedef struct MutexKnobData MutexKnobData;
+#endif
+
 #endif // CAQTDM_LIB_GLOBAL_H

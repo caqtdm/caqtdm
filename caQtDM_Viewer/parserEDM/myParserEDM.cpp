@@ -261,40 +261,47 @@ void myParserEDM::Qt_setColor(char *property, int r, int g, int b, int alpha)
 
 void myParserEDM::Qt_setColorForeground(char *widget, int r, int g, int b, int alpha)
 {
+    Q_UNUSED(widget);
     Qt_setColor("foreground", r, g, b, alpha);
 }
 
 void myParserEDM::Qt_setColorBackground(char *widget, int r, int g, int b, int alpha)
 {
+    Q_UNUSED(widget);
     Qt_setColor("background", r, g, b, alpha);
 }
 
 void myParserEDM::Qt_setColorLine(char *widget, int r, int g, int b, int alpha) {
-
+    Q_UNUSED(widget);
     Qt_setColor("lineColor", r, g, b, alpha);
 }
 
 void myParserEDM::Qt_setColorGrid(char *widget, int r, int g, int b, int alpha) {
+    Q_UNUSED(widget);
     Qt_setColor("gridColor", r, g, b, alpha);
 }
 
 void myParserEDM::Qt_setColorScale(char *widget, int r, int g, int b, int alpha) {
+    Q_UNUSED(widget);
     Qt_setColor("scaleColor", r, g, b, alpha);
 }
 
 void myParserEDM::Qt_setColorTrace(char *widget, int r, int g, int b, int alpha, int trace) {
+    Q_UNUSED(widget);
     QString prop = "color_%1";
     prop = prop.arg(trace+1);
     Qt_setColor((char*) prop.toLatin1().constData(), r, g, b, alpha);
 }
 
 void myParserEDM::Qt_setSymbolTrace(char *widget, char *symbol, int trace) {
+    Q_UNUSED(widget);
     QString prop = "symbol_%1";
     prop = prop.arg(trace+1);
     Qt_handleString((char*) prop.toLatin1().constData(), "enum", symbol);
 }
 
 void myParserEDM::Qt_setStyleTrace(char *widget, char *style, int trace) {
+    Q_UNUSED(widget);
     QString prop = "Style_%1";
     prop = prop.arg(trace+1);
     Qt_handleString((char*) prop.toLatin1().constData(), "enum", style);
@@ -302,6 +309,7 @@ void myParserEDM::Qt_setStyleTrace(char *widget, char *style, int trace) {
 
 
 void myParserEDM::Qt_ChannelsXY(char *widget, char *channels, int trace) {
+    Q_UNUSED(widget);
     QString prop = "channels_%1";
     prop = prop.arg(trace+1);
     Qt_handleString((char *)prop.toLatin1().constData(), "string", channels);
