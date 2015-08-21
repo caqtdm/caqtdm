@@ -32,7 +32,6 @@
 extern "C" {
 #endif
 
-typedef struct MutexKnobData MutexKnobData;
 extern CAQTDM_LIBSHARED_EXPORT void MutexKnobDataWrapperInit(MutexKnobData*);
 extern CAQTDM_LIBSHARED_EXPORT MutexKnobData* C_SetMutexKnobData(MutexKnobData* p, int indx, knobData data);
 extern CAQTDM_LIBSHARED_EXPORT MutexKnobData* C_GetMutexKnobData(MutexKnobData* p, int indx, knobData *data);

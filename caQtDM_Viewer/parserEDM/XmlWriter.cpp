@@ -35,6 +35,7 @@
 XmlWriter::XmlWriter( QIODevice *device, QTextCodec *codec )
     : indentSize( 4 ), autoNewLine( false ), atBeginningOfLine( true )
 {
+    Q_UNUSED(codec);
     out.setDevice( device );
     out.setCodec("UTF-8");
     out << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";

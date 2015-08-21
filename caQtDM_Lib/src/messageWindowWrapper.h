@@ -32,11 +32,11 @@
 extern "C" {
 #endif
 
-typedef struct MessageWindow MessageWindow;
 extern CAQTDM_LIBSHARED_EXPORT MessageWindow* C_postMsgEvent(MessageWindow* p, int type, char* msg);
 
 #ifdef __cplusplus
 }
 #endif
+
 
 #endif // MESSAGEWINDOWWRAPPER_H
