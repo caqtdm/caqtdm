@@ -5737,8 +5737,9 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             } else {
                 linewidth = (double) list.at(4).toInt() * factX;
             }
-            if(linewidth < 1.0) linewidth = 1.0;
-            line->setLineWidth((int) linewidth);
+            int width = (int) (linewidth+0.5);
+            if(width < 1.0) width = 1.0;
+            line->setLineWidth(width);
         }
     }
 
@@ -5875,8 +5876,6 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         QVariant Style=box->property("Stylesheet");
         if(!Style.isNull()) style = Style.toString();
         box->setStyleSheet(thisStyle + style);
-        qDebug()  << thisStyle << style;
-
     }
 }
 
@@ -6076,7 +6075,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 double y = (double) list.at(1).toInt() * factY;
                 double width = (double) list.at(2).toInt() *factX;
                 double height = (double) list.at(3).toInt() *factY;
-                QRect rectnew = QRect((int) x, (int) y, (int) width, (int) height);
+                QRect rectnew = QRect((int) (x+0.5), (int) (y+0.5), (int) (width+0.5), (int) (height+0.5));
                 w->setGeometry(rectnew);
                 w->updateGeometry();
 
@@ -6092,8 +6091,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                     double height = (double) list.at(3).toInt() * factY;
                     if(width < 1.0) width=1.0;
                     if(height < 1.0) height = 1.0;
-                    QRect rectnew = QRect((int) x, (int) y, (int) width, (int) height);
-
+                    QRect rectnew = QRect((int) (x+0.5), (int) (y+0.5), (int) (width+0.5), (int) (height+0.5));
                     widget->setGeometry(rectnew);
                     resizeSpecials(className, widget, list, factX, factY);
                     widget->updateGeometry();

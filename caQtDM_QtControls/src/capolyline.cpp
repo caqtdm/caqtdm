@@ -50,6 +50,10 @@ caPolyLine::caPolyLine(QWidget *parent): QWidget(parent)
 
     setAttribute(Qt::WA_TranslucentBackground, true );
     setWindowFlags(Qt::FramelessWindowHint);
+
+    // called form designer ?
+    QVariant source = qApp->property("APP_SOURCE").value<QVariant>();
+    if(source.isValid()) inDesigner = true; else inDesigner = false;
 }
 
 void caPolyLine::setLineSize(int size )
@@ -130,7 +134,7 @@ void caPolyLine::setPolyStyle(PolyStyle style)
 
 void caPolyLine::setPairs(const QString &newPairs)
 {
-    thisXYpairs = newPairs;
+    XYpairs = thisXYpairs = newPairs;
     update();
 }
 
@@ -141,7 +145,7 @@ QString caPolyLine::pairs() const
 
 void caPolyLine::clearPairs()
 {
-    thisXYpairs = "";
+    XYpairs = thisXYpairs = "";
     update();
 }
 
@@ -190,7 +194,7 @@ void caPolyLine::mousePressEvent(QMouseEvent *event)
         if(pos > 0) thisXYpairs.chop(len-pos);
         else thisXYpairs.clear();  // get rid of last point
     }
-
+    XYpairs = thisXYpairs;
     update();
 }
 
@@ -205,6 +209,7 @@ void caPolyLine::mouseReleaseEvent(QMouseEvent *event)
         thisXYpairs.append(",");
         thisXYpairs.append(QString::number(event->pos().y()));
     }
+    XYpairs = thisXYpairs;
 }
 
 void caPolyLine::setHide(bool hide)
@@ -215,7 +220,7 @@ void caPolyLine::setHide(bool hide)
 
 void caPolyLine::paintEvent(QPaintEvent * /* event */)
 {
-
+    QStringList pairs;
     if(thisHide) return;
 
     QPainter painter(this);
@@ -236,7 +241,11 @@ void caPolyLine::paintEvent(QPaintEvent * /* event */)
         painter.setPen( QPen( getLineColor(), getLineSize(), Qt::SolidLine, Qt::FlatCap));
     }
 
-    QStringList pairs = thisXYpairs.split(";", QString::SkipEmptyParts);
+    if(inDesigner) {
+        pairs = thisXYpairs.split(";", QString::SkipEmptyParts);
+    } else {
+        pairs = XYpairs.split(";", QString::SkipEmptyParts);
+    }
     QPolygon polygon(pairs.count());
 
     for(int i=0; i< pairs.count(); i++) {
@@ -287,20 +296,41 @@ void caPolyLine::resizeEvent(QResizeEvent *e)
     double resizeY = (double) e->size().height() / (double) actualHeight;
 
     QStringList pairs = thisXYpairs.split(";", QString::SkipEmptyParts);
-    thisXYpairs.clear();
 
-    for(int i=0; i< pairs.count(); i++) {
-        QStringList xy = pairs.at(i).split(",", QString::SkipEmptyParts);
-        if(xy.count() == 2) {
-             double x = atof(xy.at(0).toLatin1().constData()) * resizeX;
-             double y = atof(xy.at(1).toLatin1().constData()) * resizeY;
-             if(i!=0) thisXYpairs.append(";");
-             thisXYpairs.append(QString::number((int)(x+0.5)));
-             thisXYpairs.append(",");
-             thisXYpairs.append(QString::number((int)(y+0.5)));
+    if(inDesigner) {
+
+        thisXYpairs.clear();
+        for(int i=0; i< pairs.count(); i++) {
+            QStringList xy = pairs.at(i).split(",", QString::SkipEmptyParts);
+            if(xy.count() == 2) {
+                double x = atof(xy.at(0).toLatin1().constData()) * resizeX;
+                double y = atof(xy.at(1).toLatin1().constData()) * resizeY;
+                if(i!=0) thisXYpairs.append(";");
+                thisXYpairs.append(QString::number((int)(x+0.5)));
+                thisXYpairs.append(",");
+                thisXYpairs.append(QString::number((int)(y+0.5)));
+            }
+        }
+
+        actualWidth= e->size().width();
+        actualHeight = e->size().height();
+
+    } else {
+        // resize coordinates when not in designer, we do not resize the linewidth actually
+        // while we are not keeping the aspect ratio
+        XYpairs.clear();
+        for(int i=0; i< pairs.count(); i++) {
+            QStringList xy = pairs.at(i).split(",", QString::SkipEmptyParts);
+            if(xy.count() == 2) {
+                 double x = atof(xy.at(0).toLatin1().constData()) * resizeX;
+                 double y = atof(xy.at(1).toLatin1().constData()) * resizeY;
+                 if(i!=0) XYpairs.append(";");
+                 XYpairs.append(QString::number((int)(x+0.5)));
+                 XYpairs.append(",");
+                 XYpairs.append(QString::number((int)(y+0.5)));
+            }
         }
     }
 
-    actualWidth= e->size().width();
-    actualHeight = e->size().height();
 }
+
