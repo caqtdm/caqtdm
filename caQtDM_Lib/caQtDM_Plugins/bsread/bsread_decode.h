@@ -2,9 +2,10 @@
 #define BSREAD_DECODE_H
 
 #include <QThread>
+#include <QList>
 #include "knobData.h"
 #include "mutexKnobData.h"
-
+#include "bsread_channeldata.h"
 
 class bsread_Decode : public QThread
 {
@@ -25,8 +26,8 @@ public:
     size_t getMessage_size() const;
 
     QString getMainHeader() const;
-    void setMainHeader(char *value);
-
+    bool setMainHeader(char *value);
+    void setHeader(char *value);
 private:
     void * zmqsocket;
     bool running_decode;
@@ -37,10 +38,15 @@ private:
     long global_timestamp_epoch;
     long global_timestamp_ns;
     double pulse_id;
-    QString htype;
+    QString main_htype;
+    QString data_htype;
     QString hash;
-
-    QString Header;
+    QString ChannelHeader;
+    int channelcounter;
+    QList<bsread_channeldata*> Channels;
+    void bsread_SetChannelData(void *message);
+    void bsread_SetChannelTimeStamp(void * timestamp);
+    void bsread_EndofData();
 
 
 };
