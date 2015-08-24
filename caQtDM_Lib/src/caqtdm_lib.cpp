@@ -5798,6 +5798,16 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         label->setFont(f);
     }
 
+   else if (!className.compare("caLed")) {
+        caLed *ledWidget = (caLed *) widget;
+        double width = (double) list.at(5).toInt() * factX;
+        double height = (double) list.at(6).toInt() * factY;
+        if(width < 1.0) width=1.0;
+        if(height < 1.0) height = 1.0;
+        ledWidget->setLedHeight((int) (height+0.5));
+        ledWidget->setLedWidth((int) (width + 0.5));
+    }
+
     else if(!className.compare("caStripPlot") || !className.compare("caCartesianPlot")) {
         QwtPlot *plot = (QwtPlot *) widget;
 
@@ -5995,6 +6005,11 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 integerList.insert(8, plot->axisScaleDraw(QwtPlot::xBottom)->tickLength(QwtScaleDiv::MajorTick));
                 integerList.insert(9, plot->axisScaleDraw(QwtPlot::xBottom)->tickLength(QwtScaleDiv::MediumTick));
                 integerList.insert(10, plot->axisScaleDraw(QwtPlot::xBottom)->tickLength(QwtScaleDiv::MinorTick));
+                // take care of the led width and height inside its widget
+            } else if (caLed *ledWidget = qobject_cast<caLed *>(widget))  {
+                integerList.insert(4, widget->font().pointSize());
+                integerList.insert(5, ledWidget->ledWidth());
+                integerList.insert(6, ledWidget->ledHeight());
 
             } else if(!className.compare("QTabWidget")) {
                 QTabWidget *tabW = (QTabWidget *) widget;
@@ -6100,7 +6115,6 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                     widget->setGeometry(rectnew);
                     resizeSpecials(className, widget, list, factX, factY);
                     widget->updateGeometry();
-
                 }
             }
 
