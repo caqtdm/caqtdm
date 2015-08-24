@@ -7,6 +7,8 @@
 #include "JSONValue.h"
 #include "bsread_channeldata.h"
 
+//Q_DECLARE_METATYPE(bsread_channeldata)
+
 bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint)
 {
     int rc;
@@ -76,7 +78,7 @@ void bsread_Decode::run()
 
 
             }
-
+            bsread_EndofData();
 
         }
 
@@ -109,7 +111,7 @@ bool bsread_Decode::setMainHeader(char *value)
             jsonobj=MainMessageJ->AsObject();
             if (jsonobj.find(L"hash") != jsonobj.end() && jsonobj[L"hash"]->IsString()) {
                 hash=QString::fromWCharArray(jsonobj[L"hash"]->AsString().c_str());
-                printf("hType :%s\n",hash.toLatin1().constData());
+                //printf("hType :%s\n",hash.toLatin1().constData());
             }
 
             if (jsonobj.find(L"pulse_id") != jsonobj.end() && jsonobj[L"pulse_id"]->IsNumber()) {
@@ -139,7 +141,7 @@ void bsread_Decode::setHeader(char *value){
     ChannelHeader = QString(value);
 
     Channels.clear();
-
+    ChannelSearch.clear();
     JSONValue *HeaderMessageJ = JSON::Parse(value);
     if (HeaderMessageJ!=NULL){
         if(!HeaderMessageJ->IsObject()) {
@@ -176,6 +178,8 @@ void bsread_Decode::setHeader(char *value){
                     }
                     if (jsonobj3.find(L"name") != jsonobj3.end() && jsonobj3[L"name"]->IsString()) {
                         chdata->name=QString::fromWCharArray(jsonobj3[L"name"]->AsString().c_str());
+                        ChannelSearch.insert(chdata->name, chdata);
+                        // printf("Ch-Name :%s\n",chdata->name.toLatin1().constData());
                     }
                     if (jsonobj3.find(L"offset") != jsonobj3.end() && jsonobj3[L"offset"]->IsNumber()) {
                         chdata->offset=jsonobj3[L"offset"]->AsNumber();
@@ -228,42 +232,128 @@ void bsread_Decode::setHeader(char *value){
     }
 
 }
-bsread_Decode::bsread_SetChannelData(void *message)
+void bsread_Decode::bsread_SetChannelData(void *message)
 {
-
-    switch (Channels.at(channelcounter)->type)
-    case bs_double:{
-        Channels.at(channelcounter)->bsdata.bs_double=(double*) message;
+    if ((message)&&(Channels.size()>channelcounter)){
+        switch (Channels.at(channelcounter)->type){
+        case bs_double:{
+            Channels.at(channelcounter)->bsdata.bs_double=*(double*) message;
+            //printf("Data :%s %f\n",Channels.at(channelcounter)->name.toLatin1().constData(),Channels.at(channelcounter)->bsdata.bs_double);
+            break;
+        }
+        case bs_string:{
+            Channels.at(channelcounter)->bsdata.bs_string=QString((char*)message);
+            break;
+        }
+        case bs_integer:{
+            Channels.at(channelcounter)->bsdata.bs_double=*(int*) message;
+            break;
+        }
+        case bs_long:{
+            Channels.at(channelcounter)->bsdata.bs_double=*(long*) message;
+            break;
+        }
+        case bs_short:{
+            Channels.at(channelcounter)->bsdata.bs_double=*(short*) message;
+            break;
+        }
+        }
     }
-    case bs_string:{
-        Channels.at(channelcounter)->bsdata.bs_string=QString(message);
-    }
-    case bs_integer:{
-        Channels.at(channelcounter)->bsdata.bs_double=(int*) message;
-    }
-    case bs_long:{
-        Channels.at(channelcounter)->bsdata.bs_double=(long*) message;
-    }
-    case bs_short:{
-        Channels.at(channelcounter)->bsdata.bs_double=(short*) message;
-    }
-
 }
 
-bsread_Decode::bsread_SetChannelTimeStamp(void * timestamp)
+void bsread_Decode::bsread_SetChannelTimeStamp(void * timestamp)
 {
-    Channels.at(channelcounter)->timestamp=(double*) timestamp;
-    channelcounter++;
+    if ((timestamp)&&(Channels.size()>channelcounter)){
+        Channels.at(channelcounter)->timestamp=*(double*) timestamp;
+        channelcounter++;
+    }
 }
 
-bsread_Decode::bsread_EndofData(void *message,void * timestamp)
+void bsread_Decode::bsread_EndofData()
 {
+    bsread_channeldata * bsreadPV;
     channelcounter=0;
+    //Update Knobdata
+    foreach(int index, listOfIndexes) {
+        knobData* kData = KnobData->GetMutexKnobDataPtr(index);
+        if((kData != (knobData *) 0) && (kData->index != -1)) {
+            QString key = kData->pv;
+
+            // find this pv in our internal double values list (assume for now we are only treating doubles)
+            // and increment its value
+            QMap<QString,bsread_channeldata*>::iterator i = ChannelSearch.find(key);
+            while (i !=ChannelSearch.end() && i.key() == key) {
+                bsreadPV = i.value();
+                break;//?????
+            }
+            // update some data
+            switch (bsreadPV->type){
+            case bs_double:{
+                kData->edata.rvalue=bsreadPV->bsdata.bs_double;
+                kData->edata.fieldtype = caDOUBLE;
+                break;
+            }
+            case bs_string:{
+                kData->edata.fieldtype = caSTRING;
+                kData->edata.dataSize= bsreadPV->bsdata.bs_string.length();
+                if (!kData->edata.dataB){
+                  kData->edata.dataB = (void*) malloc((size_t) bsreadPV->bsdata.bs_string.length());
+                }
+                if (kData->edata.dataSize!= bsreadPV->bsdata.bs_string.length()){
+                 free(kData->edata.dataB);
+                 kData->edata.dataB = (void*) malloc((size_t) bsreadPV->bsdata.bs_string.length());
+                }
+
+                memcpy(kData->edata.dataB, (char*) bsreadPV->bsdata.bs_string.toLatin1().constData()
+                       ,(size_t) bsreadPV->bsdata.bs_string.length());
+
+                break;
+            }
+            case bs_integer:{
+                kData->edata.ivalue=bsreadPV->bsdata.bs_integer;
+                kData->edata.fieldtype = caINT;
+                break;
+            }
+            case bs_long:{
+                kData->edata.ivalue=bsreadPV->bsdata.bs_long;
+                kData->edata.fieldtype = caLONG;
+                break;
+            }
+            case bs_short:{
+
+                kData->edata.ivalue=bsreadPV->bsdata.bs_short;
+                kData->edata.fieldtype = caINT;
+                break;
+            }
+            }
+
+
+
+            kData->edata.connected = true;
+            kData->edata.accessR = true;
+            kData->edata.accessW = false;
+            kData->edata.monitorCount++;
+            KnobData->SetMutexKnobData(kData->index, *kData);
+            KnobData->SetMutexKnobDataReceived(kData);
+        }
+    }
+
+
+
 }
 
+bool bsread_Decode::bsread_DataMonitorConnection(knobData *kData){
+    QString key = kData->pv;
+    bool result=false;
 
-
-
+    QMap<QString,bsread_channeldata*>::const_iterator i=ChannelSearch.find(key);
+    while (i != ChannelSearch.end() && i.key() == key) {
+        listOfIndexes.append(kData->index);
+        result= true;
+        ++i;
+    }
+    return result;
+}
 
 void *bsread_Decode::getZmqsocket() const
 {

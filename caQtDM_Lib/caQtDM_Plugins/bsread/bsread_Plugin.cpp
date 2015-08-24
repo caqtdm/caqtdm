@@ -114,23 +114,33 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
 
 
     // we want to update our internal doubles every second
-    timerValues = new QTimer(this);
-    connect(timerValues, SIGNAL(timeout()), this, SLOT(updateValues()));
-    timerValues->start(1000);
+//    timerValues = new QTimer(this);
+//    connect(timerValues, SIGNAL(timeout()), this, SLOT(updateValues()));
+//    timerValues->start(1000);
 
-    timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(updateInterface()));
-    timer->start(2000);
+//    timer = new QTimer(this);
+//    connect(timer, SIGNAL(timeout()), this, SLOT(updateInterface()));
+//    timer->start(2000);
 
     return true;
 }
 
 // caQtDM_Lib will call this routine for defining a monitor
 int bsreadPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
+    bool result;
+    int i;
     QMutexLocker locker(&mutex);
     QString key = kData->pv;
 
     qDebug() << "bsreadPlugin:pvAddMonitor" << kData->pv << kData->index;
+    i=0;
+    result=false;
+    while ((i<bsreadconnections.size())&&(!result)){
+     result=bsreadconnections.at(i)->bsread_DataMonitorConnection(kData);
+     i++;
+    }
+
+
     double value = initValue;
     initValue =+ 10;
 
@@ -140,7 +150,7 @@ int bsreadPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
     // initial values into the doubles list
     if(!listOfDoubles.contains(key)) listOfDoubles.insert(key, value);
 
-    return true;
+    return result;
 }
 
 // caQtDM_Lib will call this routine for getting rid of a monitor

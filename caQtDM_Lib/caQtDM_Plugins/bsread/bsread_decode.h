@@ -28,6 +28,7 @@ public:
     QString getMainHeader() const;
     bool setMainHeader(char *value);
     void setHeader(char *value);
+    bool bsread_DataMonitorConnection(knobData *kData);
 private:
     void * zmqsocket;
     bool running_decode;
@@ -44,9 +45,12 @@ private:
     QString ChannelHeader;
     int channelcounter;
     QList<bsread_channeldata*> Channels;
+    QMap<QString,bsread_channeldata*> ChannelSearch;
+    QList<int> listOfIndexes;
     void bsread_SetChannelData(void *message);
     void bsread_SetChannelTimeStamp(void * timestamp);
     void bsread_EndofData();
+
 
 
 };

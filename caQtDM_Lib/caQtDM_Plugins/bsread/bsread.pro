@@ -13,7 +13,7 @@ CONFIG         += plugin
 INCLUDEPATH    += .
 INCLUDEPATH    += ../
 INCLUDEPATH    += ../../src
-HEADERS         = bsread_Plugin.h bsreadExternals.h ../controlsinterface.h \
+HEADERS         = bsread_Plugin.h ../controlsinterface.h \
     bsread_decode.h \
     bsread_channeldata.h
 SOURCES         = bsread_Plugin.cpp md5.cc \
