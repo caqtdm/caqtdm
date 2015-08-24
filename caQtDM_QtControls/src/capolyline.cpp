@@ -36,7 +36,9 @@ caPolyLine::caPolyLine(QWidget *parent): QWidget(parent)
     thisLineStyle = Solid;
     thisLineSize = 1;
     thisLineColor = Qt::black;
+    oldLineColor = Qt::white;
     thisForeColor = Qt::black;
+    oldForeColor = Qt::white;
     thisColorMode = Static;
     thisVisibility = StaticV;
 
@@ -72,13 +74,15 @@ void caPolyLine::setInEditor(bool in)
 void caPolyLine::setLineColor( QColor c )
 {
     thisLineColor = c;
-    update();
+    if(oldLineColor != thisLineColor) update();
+    oldLineColor = c;
 }
 
 void caPolyLine::setForeground(QColor c)
 {
     thisForeColor = c;
-    update();
+    if(oldForeColor != thisForeColor) update();
+    oldForeColor = thisForeColor;
 }
 
 void caPolyLine::setColorMode(colMode colormode)
@@ -285,13 +289,24 @@ void caPolyLine::paintEvent(QPaintEvent * /* event */)
     }
 }
 
+void caPolyLine::setActualSize(QSize size)
+{
+    actualWidth = size.width();
+    actualHeight = size.height();
+    //printf("set actual size %d %d\n", actualWidth, actualHeight);
+}
+
 void caPolyLine::resizeEvent(QResizeEvent *e)
  {
-    if(initialize) {
-        actualWidth= e->size().width();
-        actualHeight = e->size().height();
+    if(initialize && inDesigner) {
+        actualWidth= width();
+        actualHeight = height();
+        //printf("first resize of polyline %d %d\n", width(), height());
         initialize = false;
     }
+
+    //printf("next resize of polyline %d %d\n", e->size().width(), e->size().height());
+
     double resizeX = (double) e->size().width() / (double) actualWidth;
     double resizeY = (double) e->size().height() / (double) actualHeight;
 

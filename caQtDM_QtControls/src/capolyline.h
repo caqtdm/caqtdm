@@ -106,6 +106,8 @@ public:
 
     void setHide(bool hide);
 
+    void setActualSize(QSize size);
+
 protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
@@ -119,10 +121,9 @@ private:
 
     QString thisXYpairs;
     QString XYpairs;
-    QColor thisLineColor;
+    QColor thisLineColor, oldLineColor;
     int thisLineSize;
-    QColor thisForeColor;
-    QColor thisBackColor;
+    QColor thisForeColor, oldForeColor;
     colMode thisColorMode;
     LineStyle thisLineStyle;
     FillStyle thisFillStyle;
