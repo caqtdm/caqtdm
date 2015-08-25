@@ -5760,6 +5760,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         table->verticalHeader()->setDefaultSectionSize((int) (qMin(factX, factY)*20));
         table->setUpdatesEnabled(true);
     }
+
     else if(!className.compare("caWaveTable")) {
         caWaveTable *table = (caWaveTable *) widget;
         QFont f = table->font();
@@ -5777,6 +5778,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         table->verticalHeader()->setDefaultSectionSize((int) (qMin(factX, factY)*20));
         table->setUpdatesEnabled(true);
     }
+
     else if(!className.compare("QLabel")) {
         QLabel *label = (QLabel *) widget;
         className = label->parent()->metaObject()->className();
