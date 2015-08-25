@@ -5798,16 +5798,6 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         label->setFont(f);
     }
 
-   else if (!className.compare("caLed")) {
-        caLed *ledWidget = (caLed *) widget;
-        double width = (double) list.at(5).toInt() * factX;
-        double height = (double) list.at(6).toInt() * factY;
-        if(width < 1.0) width=1.0;
-        if(height < 1.0) height = 1.0;
-        ledWidget->setLedHeight((int) (height+0.5));
-        ledWidget->setLedWidth((int) (width + 0.5));
-    }
-
     else if(!className.compare("caStripPlot") || !className.compare("caCartesianPlot")) {
         QwtPlot *plot = (QwtPlot *) widget;
 
@@ -6112,6 +6102,22 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                     if(width < 1.0) width=1.0;
                     if(height < 1.0) height = 1.0;
                     QRect rectnew = QRect((int) (x+0.5), (int) (y+0.5), (int) (width+0.5), (int) (height+0.5));
+
+                    /* we have to correct first the led width and height before changing the geometry */
+                    if (!className.compare("caLed")) {
+                        caLed *ledWidget = (caLed *) widget;
+                        double width = (double) list.at(5).toInt() * factX;
+                        double height = (double) list.at(6).toInt() * factY;
+                        if(width < 1.0) width=1.0;
+                        if(height < 1.0) height = 1.0;
+                        ledWidget->setLedHeight((int) (height+0.5));
+                        ledWidget->setLedWidth((int) (width + 0.5));
+                    }
+
+
+
+
+
                     widget->setGeometry(rectnew);
                     resizeSpecials(className, widget, list, factX, factY);
                     widget->updateGeometry();
