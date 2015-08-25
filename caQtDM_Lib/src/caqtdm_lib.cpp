@@ -5789,13 +5789,15 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         }
     }
 
-    else if(!className.compare("caMenu")) {
-        caMenu *label = (caMenu *) widget;
+    else if((!className.compare("caMenu")) ||
+            (!className.compare("QPlainTextEdit")) ||
+            (!className.compare("QLineEdit")) ) {
+        //caMenu *label = (caMenu *) widget;
         qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
         if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
-        QFont f = label->font();
+        QFont f = widget->font();
         f.setPointSizeF(fontSize);
-        label->setFont(f);
+        widget->setFont(f);
     }
 
     else if(!className.compare("caStripPlot") || !className.compare("caCartesianPlot")) {
