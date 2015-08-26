@@ -26,14 +26,16 @@ public:
     size_t getMessage_size() const;
 
     QString getMainHeader() const;
-    bool setMainHeader(char *value);
-    void setHeader(char *value);
+    bool setMainHeader(char *value, size_t size);
+    void setHeader(char *value, size_t size);
     bool bsread_DataMonitorConnection(knobData *kData);
+    bool bsread_DataMonitorUnConnect(knobData *kData);
 private:
+    QMutex mutex;
     void * zmqsocket;
     bool running_decode;
     QString ConnectionPoint;
-    MutexKnobData * KnobData;
+    MutexKnobData * bsread_KnobDataP;
     size_t message_size;
     QString MainHeader;
     long global_timestamp_epoch;
@@ -53,6 +55,8 @@ private:
 
 
 
+    void bsread_DataTimeOut();
+    void bsread_Delay();
 };
 
 #endif // BSREAD_DECODE_H

@@ -1,6 +1,7 @@
 #include <QThread>
+#include <QDebug>
 #include "zmq.h"
-
+#include <exception>
 #include "bsread_decode.h"
 #include "knobData.h"
 #include "JSON.h"
@@ -12,6 +13,7 @@
 bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint)
 {
     int rc;
+    qDebug() << "bsreadPlugin: ConnectionPoint :"<< ConnectionPoint;
     zmqsocket=zmq_socket(Context, ZMQ_PULL);
     if (!zmqsocket) {
         printf ("error in zmq_socket: %s\n", zmq_strerror (errno));
@@ -19,6 +21,7 @@ bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint)
     rc = zmq_connect (zmqsocket, ConnectionPoint.toLatin1().constData());
     if (rc != 0) {
         printf ("error in zmq_bind: %s(%s)\n", zmq_strerror (errno),ConnectionPoint.toLatin1().constData());
+        qDebug() << "bsreadPlugin: ConnectionPoint faild";
         running_decode=false;
     }else{
         running_decode=true;
@@ -32,58 +35,66 @@ void bsread_Decode::run()
     int rc;
     zmq_msg_t msg;
     int64_t more;
+    int64_t notReceivedCounter=0;
+    QString last_hash="This will never be seen";
     size_t more_size = sizeof (more);
     rc = zmq_msg_init (&msg);
 
+
+
+
     while (1){
         //printf("Message\n");
-        rc = zmq_recvmsg (zmqsocket, &msg, 0);
-        if (rc < 0) {
-            printf ("error in zmq_recvmsg: %s\n", zmq_strerror (errno));
-
-        }
-        //        if (zmq_msg_size (&msg) != message_size) {
-        //            printf ("message of incorrect size received\n");
-
-        //        }
-        setMainHeader((char*)zmq_msg_data(&msg));
-
-        zmq_getsockopt (zmqsocket, ZMQ_RCVMORE, &more, &more_size);
-        if (more){
-
-            rc = zmq_recvmsg (zmqsocket, &msg, 0);
-            if (rc < 0) {
-                printf ("error in zmq_recvmsg(Header): %s\n", zmq_strerror (errno));
-            }
-            setHeader((char*)zmq_msg_data(&msg));
+        rc = zmq_msg_recv (&msg,zmqsocket,ZMQ_DONTWAIT);
+        if (rc > 0) {
+            notReceivedCounter=0;
+            setMainHeader((char*)zmq_msg_data(&msg),zmq_msg_size (&msg));
 
             zmq_getsockopt (zmqsocket, ZMQ_RCVMORE, &more, &more_size);
-            while(more){
-                rc = zmq_recvmsg (zmqsocket, &msg, 0);
+            if (more){
+
+                rc = zmq_msg_recv (&msg,zmqsocket,0);
                 if (rc < 0) {
-                    printf ("error in zmq_recvmsg(Data): %s\n", zmq_strerror (errno));
+                    printf ("error in zmq_recvmsg(Header): %s\n", zmq_strerror (errno));
                 }
-
-                bsread_SetChannelData(zmq_msg_data(&msg));
+                if (QString::compare(last_hash, hash, Qt::CaseInsensitive)){
+                    setHeader((char*)zmq_msg_data(&msg),zmq_msg_size (&msg));
+                    last_hash=hash;
+                }
                 zmq_getsockopt (zmqsocket, ZMQ_RCVMORE, &more, &more_size);
-                if (more){
-                    rc = zmq_recvmsg (zmqsocket, &msg, 0);
+                while(more){
+                    rc = zmq_msg_recv (&msg,zmqsocket,0);
                     if (rc < 0) {
-                        printf ("error in zmq_recvmsg(Timestamp): %s\n", zmq_strerror (errno));
+                        printf ("error in zmq_recvmsg(Data): %s\n", zmq_strerror (errno));
                     }
-                    bsread_SetChannelTimeStamp(zmq_msg_data(&msg));
+
+                     bsread_SetChannelData(zmq_msg_data(&msg));
+
                     zmq_getsockopt (zmqsocket, ZMQ_RCVMORE, &more, &more_size);
+                    if (more){
+                        rc = zmq_msg_recv (&msg,zmqsocket,0);
+                        if (rc < 0) {
+                            printf ("error in zmq_recvmsg(Timestamp): %s\n", zmq_strerror (errno));
+                        }
+                        bsread_SetChannelTimeStamp(zmq_msg_data(&msg));
+                        zmq_getsockopt (zmqsocket, ZMQ_RCVMORE, &more, &more_size);
+                    }
+
                 }
-
-
-
+                bsread_EndofData();
             }
-            bsread_EndofData();
+        }else{
+            if (zmq_errno()==EAGAIN){
+                //bsread_Delay();
+                notReceivedCounter++;
+                if (notReceivedCounter>10){
+                    bsread_DataTimeOut();
+                }
+            }
+				bsread_Delay();
+                //printf ("error in zmq_recvmsg(Main Massage): %s\n", zmq_strerror (errno));
 
         }
-
-
-
 
     }
 
@@ -98,12 +109,13 @@ QString bsread_Decode::getMainHeader() const
     return MainHeader;
 }
 
-bool bsread_Decode::setMainHeader(char *value)
+bool bsread_Decode::setMainHeader(char *value,size_t size)
 {
     JSONObject jsonobj;
-    MainHeader = QString(value);
+    QString RawData=QString(value);
+    MainHeader = RawData.left((int)size);
 
-    JSONValue *MainMessageJ = JSON::Parse(value);
+    JSONValue *MainMessageJ = JSON::Parse(MainHeader.toStdString().c_str());
     if (MainMessageJ!=NULL){
         if(!MainMessageJ->IsObject()) {
             delete(MainMessageJ);
@@ -111,7 +123,7 @@ bool bsread_Decode::setMainHeader(char *value)
             jsonobj=MainMessageJ->AsObject();
             if (jsonobj.find(L"hash") != jsonobj.end() && jsonobj[L"hash"]->IsString()) {
                 hash=QString::fromWCharArray(jsonobj[L"hash"]->AsString().c_str());
-                //printf("hType :%s\n",hash.toLatin1().constData());
+                //qDebug() << "hType :" << hash.toLatin1().constData();
             }
 
             if (jsonobj.find(L"pulse_id") != jsonobj.end() && jsonobj[L"pulse_id"]->IsNumber()) {
@@ -134,15 +146,29 @@ bool bsread_Decode::setMainHeader(char *value)
 
         }
     }
-
+    return true;
 }
-void bsread_Decode::setHeader(char *value){
+void bsread_Decode::setHeader(char *value,size_t size){
+    QMutexLocker locker(&mutex);
+    JSONValue *HeaderMessageJ;
+    QString RawData=QString(value);
+    ChannelHeader = RawData.left((int)size);
 
-    ChannelHeader = QString(value);
+    for (int i=0;i<Channels.size();i++){
+        delete(Channels.at(i));
+    }
+
 
     Channels.clear();
     ChannelSearch.clear();
-    JSONValue *HeaderMessageJ = JSON::Parse(value);
+    try{
+        HeaderMessageJ = JSON::Parse(ChannelHeader.toStdString().c_str());
+    }
+    catch (...) {
+        qDebug() << "bsreadPlugin: Header Error :"<< value;
+        HeaderMessageJ=NULL;
+    }
+
     if (HeaderMessageJ!=NULL){
         if(!HeaderMessageJ->IsObject()) {
             delete(HeaderMessageJ);
@@ -230,8 +256,9 @@ void bsread_Decode::setHeader(char *value){
 
 
     }
-
 }
+
+
 void bsread_Decode::bsread_SetChannelData(void *message)
 {
     if ((message)&&(Channels.size()>channelcounter)){
@@ -243,6 +270,7 @@ void bsread_Decode::bsread_SetChannelData(void *message)
         }
         case bs_string:{
             Channels.at(channelcounter)->bsdata.bs_string=QString((char*)message);
+            //qDebug() << "bsstring :" << message;
             break;
         }
         case bs_integer:{
@@ -271,11 +299,13 @@ void bsread_Decode::bsread_SetChannelTimeStamp(void * timestamp)
 
 void bsread_Decode::bsread_EndofData()
 {
+    QMutexLocker locker(&mutex);
     bsread_channeldata * bsreadPV;
     channelcounter=0;
     //Update Knobdata
+    //qDebug() << "bsreadPlugin:Update Knobdata";
     foreach(int index, listOfIndexes) {
-        knobData* kData = KnobData->GetMutexKnobDataPtr(index);
+        knobData* kData = bsread_KnobDataP->GetMutexKnobDataPtr(index);
         if((kData != (knobData *) 0) && (kData->index != -1)) {
             QString key = kData->pv;
 
@@ -287,54 +317,63 @@ void bsread_Decode::bsread_EndofData()
                 break;//?????
             }
             // update some data
-            switch (bsreadPV->type){
-            case bs_double:{
-                kData->edata.rvalue=bsreadPV->bsdata.bs_double;
-                kData->edata.fieldtype = caDOUBLE;
-                break;
-            }
-            case bs_string:{
-                kData->edata.fieldtype = caSTRING;
-                kData->edata.dataSize= bsreadPV->bsdata.bs_string.length();
-                if (!kData->edata.dataB){
-                  kData->edata.dataB = (void*) malloc((size_t) bsreadPV->bsdata.bs_string.length());
+            if (bsreadPV){
+                switch (bsreadPV->type){
+                case bs_double:{
+                    kData->edata.rvalue=bsreadPV->bsdata.bs_double;
+                    kData->edata.fieldtype = caDOUBLE;
+                    //qDebug() << "Double :"<< kData->edata.rvalue << key << index;
+                    break;
                 }
-                if (kData->edata.dataSize!= bsreadPV->bsdata.bs_string.length()){
-                 free(kData->edata.dataB);
-                 kData->edata.dataB = (void*) malloc((size_t) bsreadPV->bsdata.bs_string.length());
+                case bs_string:{
+                    kData->edata.fieldtype = caSTRING;
+                    
+                    //qDebug() << "String length :" << bsreadPV->bsdata.bs_string.length();
+                    if (bsreadPV->bsdata.bs_string.length()!=0){
+                        if (!kData->edata.dataB){
+                            kData->edata.dataSize = bsreadPV->bsdata.bs_string.length();
+                            kData->edata.dataB = (void*)malloc((size_t)kData->edata.dataSize);
+                        }
+                        if (kData->edata.dataSize!= bsreadPV->bsdata.bs_string.length()){
+                            free(kData->edata.dataB);
+                            kData->edata.dataSize = bsreadPV->bsdata.bs_string.length();
+                            kData->edata.dataB = (void*)malloc((size_t)kData->edata.dataSize);
+                        }
+
+                        memcpy(kData->edata.dataB, (char*) bsreadPV->bsdata.bs_string.toLatin1().constData()
+                               , (size_t)kData->edata.dataSize);
+
+                    }
+                    break;
+                }
+                case bs_integer:{
+                    kData->edata.ivalue=bsreadPV->bsdata.bs_integer;
+                    kData->edata.fieldtype = caINT;
+                    break;
+                }
+                case bs_long:{
+                    kData->edata.ivalue=bsreadPV->bsdata.bs_long;
+                    kData->edata.fieldtype = caLONG;
+                    break;
+                }
+                case bs_short:{
+
+                    kData->edata.ivalue=bsreadPV->bsdata.bs_short;
+                    kData->edata.fieldtype = caINT;
+                    break;
+                }
                 }
 
-                memcpy(kData->edata.dataB, (char*) bsreadPV->bsdata.bs_string.toLatin1().constData()
-                       ,(size_t) bsreadPV->bsdata.bs_string.length());
-
-                break;
-            }
-            case bs_integer:{
-                kData->edata.ivalue=bsreadPV->bsdata.bs_integer;
-                kData->edata.fieldtype = caINT;
-                break;
-            }
-            case bs_long:{
-                kData->edata.ivalue=bsreadPV->bsdata.bs_long;
-                kData->edata.fieldtype = caLONG;
-                break;
-            }
-            case bs_short:{
-
-                kData->edata.ivalue=bsreadPV->bsdata.bs_short;
-                kData->edata.fieldtype = caINT;
-                break;
-            }
+                kData->edata.connected = true;
+            }else{
+                kData->edata.connected = false;
             }
 
-
-
-            kData->edata.connected = true;
             kData->edata.accessR = true;
             kData->edata.accessW = false;
             kData->edata.monitorCount++;
-            KnobData->SetMutexKnobData(kData->index, *kData);
-            KnobData->SetMutexKnobDataReceived(kData);
+            bsread_KnobDataP->SetMutexKnobData(kData->index, *kData);
+            bsread_KnobDataP->SetMutexKnobDataReceived(kData);
         }
     }
 
@@ -342,17 +381,44 @@ void bsread_Decode::bsread_EndofData()
 
 }
 
-bool bsread_Decode::bsread_DataMonitorConnection(knobData *kData){
-    QString key = kData->pv;
-    bool result=false;
+void bsread_Decode::bsread_DataTimeOut(){
+    QMutexLocker locker(&mutex);
+    hash="Data Time Out";
+    channelcounter=0;
+    foreach(int index, listOfIndexes) {
+        knobData* kData = bsread_KnobDataP->GetMutexKnobDataPtr(index);
+        kData->edata.connected = false;
+        bsread_KnobDataP->SetMutexKnobData(kData->index, *kData);
+        bsread_KnobDataP->SetMutexKnobDataReceived(kData);
+    }
+}
+void bsread_Decode::bsread_Delay(){
+    QThread::msleep(5);
+}
 
-    QMap<QString,bsread_channeldata*>::const_iterator i=ChannelSearch.find(key);
+
+
+bool bsread_Decode::bsread_DataMonitorConnection(knobData *kData){
+    QMutexLocker locker(&mutex);
+    QString key = kData->pv;
+    bool result = false;
+
+    QMap<QString, bsread_channeldata*>::const_iterator i = ChannelSearch.find(key);
+
     while (i != ChannelSearch.end() && i.key() == key) {
         listOfIndexes.append(kData->index);
-        result= true;
+        qDebug() << "Index :" << kData->index << key;
+        result = true;
         ++i;
     }
     return result;
+}
+
+bool bsread_Decode::bsread_DataMonitorUnConnect(knobData *kData){
+    QMutexLocker locker(&mutex);
+    listOfIndexes.removeAll(kData->index);
+    hash="";
+    return true;
 }
 
 void *bsread_Decode::getZmqsocket() const
@@ -369,12 +435,12 @@ bool bsread_Decode::getRunning_decode() const
 }
 MutexKnobData *bsread_Decode::getKnobData() const
 {
-    return KnobData;
+    return bsread_KnobDataP;
 }
 
 void bsread_Decode::setKnobData(MutexKnobData *value)
 {
-    KnobData = value;
+    bsread_KnobDataP = value;
 }
 
 

@@ -130,7 +130,6 @@ int bsreadPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
     bool result;
     int i;
     QMutexLocker locker(&mutex);
-    QString key = kData->pv;
 
     qDebug() << "bsreadPlugin:pvAddMonitor" << kData->pv << kData->index;
     i=0;
@@ -141,27 +140,21 @@ int bsreadPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
     }
 
 
-    double value = initValue;
-    initValue =+ 10;
-
-    // append device index to our internal list
-    listOfIndexes.append(kData->index);
-
-    // initial values into the doubles list
-    if(!listOfDoubles.contains(key)) listOfDoubles.insert(key, value);
 
     return result;
 }
 
 // caQtDM_Lib will call this routine for getting rid of a monitor
 int bsreadPlugin::pvClearMonitor(knobData *kData) {
+    int i;
+
     QMutexLocker locker(&mutex);
 
     qDebug() << "bsreadPlugin:pvClearMonitor" << kData << kData->pv << kData->index;
-    QString key = kData->pv;
-    if(!listOfDoubles.contains(key)) listOfDoubles.remove(key);
-    listOfIndexes.removeAll(kData->index);
-
+    while (i<bsreadconnections.size()){
+     bsreadconnections.at(i)->bsread_DataMonitorUnConnect(kData);
+     i++;
+    }
     return true;
 }
 
