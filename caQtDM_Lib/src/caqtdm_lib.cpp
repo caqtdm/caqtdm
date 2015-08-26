@@ -5737,8 +5737,9 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             } else {
                 linewidth = (double) list.at(4).toInt() * factX;
             }
-            if(linewidth < 1.0) linewidth = 1.0;
-            line->setLineWidth((int) linewidth);
+            int width = (int) (linewidth+0.5);
+            if(width < 1.0) width = 1.0;
+            line->setLineWidth(width);
         }
     }
 
@@ -5759,6 +5760,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         table->verticalHeader()->setDefaultSectionSize((int) (qMin(factX, factY)*20));
         table->setUpdatesEnabled(true);
     }
+
     else if(!className.compare("caWaveTable")) {
         caWaveTable *table = (caWaveTable *) widget;
         QFont f = table->font();
@@ -5776,6 +5778,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         table->verticalHeader()->setDefaultSectionSize((int) (qMin(factX, factY)*20));
         table->setUpdatesEnabled(true);
     }
+
     else if(!className.compare("QLabel")) {
         QLabel *label = (QLabel *) widget;
         className = label->parent()->metaObject()->className();
@@ -5788,13 +5791,15 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         }
     }
 
-    else if(!className.compare("caMenu")) {
-        caMenu *label = (caMenu *) widget;
+    else if((!className.compare("caMenu")) ||
+            (!className.compare("QPlainTextEdit")) ||
+            (!className.compare("QLineEdit")) ) {
+        //caMenu *label = (caMenu *) widget;
         qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
         if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
-        QFont f = label->font();
+        QFont f = widget->font();
         f.setPointSizeF(fontSize);
-        label->setFont(f);
+        widget->setFont(f);
     }
 
     else if(!className.compare("caStripPlot") || !className.compare("caCartesianPlot")) {
@@ -5875,8 +5880,6 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         QVariant Style=box->property("Stylesheet");
         if(!Style.isNull()) style = Style.toString();
         box->setStyleSheet(thisStyle + style);
-        qDebug()  << thisStyle << style;
-
     }
 }
 
@@ -5966,6 +5969,11 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
             integerList.insert(2, widget->geometry().width());
             integerList.insert(3, widget->geometry().height());
 
+            // tell polylinewidget about its actual size for resizing its internals
+            if (caPolyLine *polylineWidget = qobject_cast<caPolyLine *>(widget))  {
+                polylineWidget->setActualSize(QSize(widget->geometry().width(), widget->geometry().height()));
+            }
+
             // for a horizontal or vertical line get the linewidth
             if(!className.compare("QFrame")) {
                 QFrame * line = (QFrame *) widget;
@@ -5991,6 +5999,11 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 integerList.insert(8, plot->axisScaleDraw(QwtPlot::xBottom)->tickLength(QwtScaleDiv::MajorTick));
                 integerList.insert(9, plot->axisScaleDraw(QwtPlot::xBottom)->tickLength(QwtScaleDiv::MediumTick));
                 integerList.insert(10, plot->axisScaleDraw(QwtPlot::xBottom)->tickLength(QwtScaleDiv::MinorTick));
+                // take care of the led width and height inside its widget
+            } else if (caLed *ledWidget = qobject_cast<caLed *>(widget))  {
+                integerList.insert(4, widget->font().pointSize());
+                integerList.insert(5, ledWidget->ledWidth());
+                integerList.insert(6, ledWidget->ledHeight());
 
             } else if(!className.compare("QTabWidget")) {
                 QTabWidget *tabW = (QTabWidget *) widget;
@@ -6076,7 +6089,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 double y = (double) list.at(1).toInt() * factY;
                 double width = (double) list.at(2).toInt() *factX;
                 double height = (double) list.at(3).toInt() *factY;
-                QRect rectnew = QRect((int) x, (int) y, (int) width, (int) height);
+                QRect rectnew = QRect((int) (x+0.5), (int) (y+0.5), (int) (width+0.5), (int) (height+0.5));
                 w->setGeometry(rectnew);
                 w->updateGeometry();
 
@@ -6092,7 +6105,22 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                     double height = (double) list.at(3).toInt() * factY;
                     if(width < 1.0) width=1.0;
                     if(height < 1.0) height = 1.0;
-                    QRect rectnew = QRect((int) x, (int) y, (int) width, (int) height);
+                    QRect rectnew = QRect((int) (x+0.5), (int) (y+0.5), (int) (width+0.5), (int) (height+0.5));
+
+                    /* we have to correct first the led width and height before changing the geometry */
+                    if (!className.compare("caLed")) {
+                        caLed *ledWidget = (caLed *) widget;
+                        double width = (double) list.at(5).toInt() * factX;
+                        double height = (double) list.at(6).toInt() * factY;
+                        if(width < 1.0) width=1.0;
+                        if(height < 1.0) height = 1.0;
+                        ledWidget->setLedHeight((int) (height+0.5));
+                        ledWidget->setLedWidth((int) (width + 0.5));
+                    }
+
+
+
+
 
                     widget->setGeometry(rectnew);
                     resizeSpecials(className, widget, list, factX, factY);

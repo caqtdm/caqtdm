@@ -66,7 +66,7 @@ public:
     enum PolyStyle {Polyline = 0, Polygon};
 
     QString getXYpairs() const {return thisXYpairs;}
-    void setXYpairs(QString const &pairs) {thisXYpairs = pairs; update();}
+    void setXYpairs(QString const &pairs) {thisXYpairs = XYpairs = pairs; update();}
 
     QColor getForeground() const {return thisForeColor;}
     void setForeground(QColor c);
@@ -106,6 +106,8 @@ public:
 
     void setHide(bool hide);
 
+    void setActualSize(QSize size);
+
 protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
@@ -118,10 +120,10 @@ private:
 #include "caVisibPrivate.h"
 
     QString thisXYpairs;
-    QColor thisLineColor;
+    QString XYpairs;
+    QColor thisLineColor, oldLineColor;
     int thisLineSize;
-    QColor thisForeColor;
-    QColor thisBackColor;
+    QColor thisForeColor, oldForeColor;
     colMode thisColorMode;
     LineStyle thisLineStyle;
     FillStyle thisFillStyle;
@@ -130,6 +132,7 @@ private:
     int actualWidth, actualHeight;
     bool initialize;
     bool inEditor;
+    bool inDesigner;
 
     QPointF actualPosition;
     QPointF lastPosition;

@@ -24,3 +24,8 @@ SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM_Project/caQtDM_Binar
 DESTINATION=$QTBASE/Qt-4.8.2/plugins/designer/
 cp -v $SOURCE/lib* $DESTINATION
 
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM_Project/caQtDM_Binaries/controlsystems
+DESTINATION=$QTBASE/Qt-4.8.2/plugins/controlsystems/
+cp -v $SOURCE/lib* $DESTINATION
+
+
