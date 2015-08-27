@@ -731,10 +731,13 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         if(reaffectText(map, &source))  browserWidget->setSource(source);
         QString fileName = browserWidget->source().path();
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
         bool success = watcher->addPath(fileName);
         if(!success) qDebug() << fileName << "can not be watched for changes";
         else qDebug() << fileName << "is watched for changes";
-
+#else
+        watcher->addPath(fileName);
+#endif
         browserWidget->setProperty("Taken", true);
 
         // the different widgets to be handled
@@ -1920,6 +1923,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
   */
 void CaQtDM_Lib::handleFileChanged(const QString &file)
 {
+    Q_UNUSED(file);
     // qDebug() << "update " << file;
     updateTextBrowser();
 }
