@@ -249,6 +249,9 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     firstResize = true;
     loopTimer = 0;
 
+    // file watcher for changes
+    watcher = new QFileSystemWatcher(this);
+    QObject::connect(watcher, SIGNAL(fileChanged(const QString&)), this, SLOT(handleFileChanged(const QString&)));
 
     if(parentAS != (QWidget*) 0) {
         fromAS = true;
@@ -381,9 +384,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
 
-    // initialize IO
-    //PrepareDeviceIO();
-
     level=0;
 
     // say for all widgets that they have to be treated, will be set to true when treated to avoid multiple use
@@ -440,6 +440,13 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
         splash->deleteLater();
     }
+
+    // we want to update  any TextBrowsers periodically, is actually done through file watching
+ /**
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(updateTextBrowser()));
+    timer->start(2000);
+   */
 }
 
 /**
@@ -722,6 +729,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         QString source = browserWidget->source().toString();
         if(reaffectText(map, &source))  browserWidget->setSource(source);
+        QString fileName = browserWidget->source().path();
+
+        bool success = watcher->addPath(fileName);
+        if(!success) qDebug() << fileName << "can not be watched for changes";
+        else qDebug() << fileName << "is watched for changes";
 
         browserWidget->setProperty("Taken", true);
 
@@ -1901,9 +1913,28 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         connect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
         w1->setProperty("Connect", false);
     }
-
-
 }
+
+/**
+  * this routine gest fired when a QTextBrowser source file changes
+  */
+void CaQtDM_Lib::handleFileChanged(const QString &file)
+{
+    // qDebug() << "update " << file;
+    updateTextBrowser();
+}
+
+/**
+  * this routine reloads periodically all QTextBrowsers
+  */
+void CaQtDM_Lib::updateTextBrowser()
+{
+    QList<QTextBrowser *> allBrowsers = myWidget->findChildren<QTextBrowser *>();
+    foreach(QTextBrowser* widget, allBrowsers) {
+        widget->reload();
+    }
+}
+
 /**
   * this routine uses macro table to replace inside the pv the macro part
   */

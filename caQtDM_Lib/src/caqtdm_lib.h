@@ -227,6 +227,7 @@ signals:
     void clicked();
     void Signal_NextWindow();
     void Signal_IosExit();
+    void fileChanged(const QString&);
 
 private:
     QTabWidget* getTabParent(QWidget *w1);
@@ -310,6 +311,8 @@ private:
     MutexKnobData *mutexKnobDataP;
     MessageWindow *messageWindowP;
 
+    QFileSystemWatcher *watcher;
+
 
 #ifdef epics4
     epics4Subs *Epics4;
@@ -341,9 +344,10 @@ private slots:
     void DisplayContextMenu(QWidget* w);
     void Callback_TextEntryChanged(const QString &);
     void Callback_WaveEntryChanged(const QString &, int index);
-
     void processTerminated();
     void closeWindow();
+    void updateTextBrowser();
+    void handleFileChanged(const QString&);
 };
 
 #endif // CaQtDM_Lib_H
