@@ -36,7 +36,6 @@
 #include <sys/timeb.h>
 #include <QObject>
 #include <QToolBar>
-#include <QPlainTextEdit>
 
 // we are using for calculations postfix of epics
 // therefore we need this include and also link with the epics libraries
@@ -192,6 +191,25 @@
 
 Q_DECLARE_METATYPE(QList<int>)
 Q_DECLARE_METATYPE(QTabWidget*)
+
+// this sleep will not block the GUI and QThread::msleep is protected in Qt4.8 (so do not use that)
+class Sleep
+{
+public:
+    static void msleep(unsigned long msecs)
+    {
+#ifndef MOBILE_ANDROID
+        QMutex mutex;
+        mutex.lock();
+        QWaitCondition waitCondition;
+        waitCondition.wait(&mutex, msecs);
+        mutex.unlock();
+#else
+        // not nice, but the above does not work on android now (does not wait)
+        usleep(msecs * 100);
+#endif
+    }
+};
 
 /**
  * CaQtDM_Lib destructor
@@ -416,7 +434,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     // due to crash in connection with the ssplash screen, changed
     // these instructions to the botton of this class
     if(nbIncludes > 0) {
-        QThread::msleep(200);
+        Sleep::msleep(200);
         // this seems to causes the crash and is not really needed here?
         //splash->finish(this);
 
@@ -4246,7 +4264,7 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
         }
     }
 
-    QThread::msleep(200);
+    Sleep::msleep(200);
 
     // get rid of memory, that was allocated before for this window.
     // it has not been done previously, while otherwise in the datacallback
