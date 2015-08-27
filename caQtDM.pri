@@ -331,6 +331,7 @@ caQtDM_Viewer {
 
 	android {
                 message("caQtDM_viewer configuration : android")
+                message($$PWD)
                 DESTDIR = $$(CAQTDM_COLLECT)
                 CONFIG += staticlib
    		LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_controllers_plugin.a
@@ -346,23 +347,24 @@ caQtDM_Viewer {
    		LIBS += $$(EPICSLIB)/libCom.a
    		LOCAL_LDLIBS += -llog
 
-   		ICON = ../src/caQtDM.icns$$PWD/src/caQtDM.png
-   		APP_ICON.files += $$PWD/src/caqtdm762x.png
-   		APP_ICON.path = /res/drawable
+                ICON = $$PWD/caQtDM_Viewer/src/caQtDM.icns
+                APP_ICON.files = $$PWD/caQtDM_Viewer/src/caqtdm762x.png
+                APP_ICON.path = /res/drawable
 
-   		APP1_ICON.files = $$PWD/src/caQtDM.icns
-   		APP_XML_FILES.files = $$PWD/caQtDM_IOS_Config.xml
-   		StartScreen.files += $$PWD/src/startscreenlandscape.png
+                APP1_ICON.files = $$PWD/caQtDM_Viewer/src/caQtDM.icns
+                APP_XML_FILES.files = $$PWD/caQtDM_Viewer/caQtDM_IOS_Config.xml
+                StartScreen.files += $$PWD/caQtDM_Viewer/src/startscreenlandscape.png
    		StartScreen.path = /res/drawable
-   		APP-FONTS.files = $$PWD/lucida-sans-typewriter.ttf
+                APP-FONTS.files = $$PWD/caQtDM_Viewer/lucida-sans-typewriter.ttf
    		APP-FONTS.path = /fonts
    		QMAKE_BUNDLE_DATA += APP_XML_FILES APP_ICON APP1_ICON StartScreen APP-FONTS
 
-   		deployment.files += $$PWD/caQtDM_IOS_Config.xml
+                deployment.files += $$PWD/caQtDM_Viewer/caQtDM_IOS_Config.xml
    		deployment.path = /assets
    		INSTALLS += deployment APP-FONTS APP_ICON StartScreen
 
                 DISTFILES += /Users/mezger/Documents/Entwicklung/qt/caqtdm_project/caQtDM_Viewer/src/Android/AndroidManifest.xml
+                DISTFILES += src/Android/res/values/libs.xml src/Android/build.gradle
                 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/caQtDM_Viewer/src/Android
 	}
 

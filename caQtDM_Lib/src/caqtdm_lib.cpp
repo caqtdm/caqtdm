@@ -36,6 +36,7 @@
 #include <sys/timeb.h>
 #include <QObject>
 #include <QToolBar>
+#include <QPlainTextEdit>
 
 // we are using for calculations postfix of epics
 // therefore we need this include and also link with the epics libraries
@@ -191,19 +192,6 @@
 
 Q_DECLARE_METATYPE(QList<int>)
 Q_DECLARE_METATYPE(QTabWidget*)
-
-class Sleep
-{
-public:
-    static void msleep(unsigned long msecs)
-    {
-        QMutex mutex;
-        mutex.lock();
-        QWaitCondition waitCondition;
-        waitCondition.wait(&mutex, msecs);
-        mutex.unlock();
-    }
-};
 
 /**
  * CaQtDM_Lib destructor
@@ -428,11 +416,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     // due to crash in connection with the ssplash screen, changed
     // these instructions to the botton of this class
     if(nbIncludes > 0) {
-#ifdef linux
-        usleep(200000);
-#else
-        Sleep::msleep(200);
-#endif
+        QThread::msleep(200);
         // this seems to causes the crash and is not really needed here?
         //splash->finish(this);
 
@@ -4262,11 +4246,7 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
         }
     }
 
-#ifdef linux
-    usleep(200000);
-#else
-    Sleep::msleep(200);
-#endif
+    QThread::msleep(200);
 
     // get rid of memory, that was allocated before for this window.
     // it has not been done previously, while otherwise in the datacallback
@@ -5783,6 +5763,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         QLabel *label = (QLabel *) widget;
         className = label->parent()->metaObject()->className();
         if(!className.contains("Numeric") ) {  // would otherwise interfere with our wheelswitch
+            if(list.at(4).toInt() < 0) return; // on android I got -1 for these fonts at initialization, i.e pixelsize
             qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
             if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
             QFont f = label->font();
@@ -5793,8 +5774,9 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
 
     else if((!className.compare("caMenu")) ||
             (!className.compare("QPlainTextEdit")) ||
+            (!className.compare("QTextEdit")) ||
             (!className.compare("QLineEdit")) ) {
-        //caMenu *label = (caMenu *) widget;
+        if(list.at(4).toInt() < 0) return; // on android I got -1 for these fonts at initialization, i.e pixelsize
         qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
         if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         QFont f = widget->font();
@@ -5848,9 +5830,8 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         plot->axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MinorTick, factX * (double) list.at(10).toInt());
         plot->axisScaleDraw(QwtPlot::xBottom)->setSpacing(0.0);
     }
-
-    // change fonts for next classes, when smaller needed
     else if(!className.compare("QGroupBox")) {
+        if(list.at(4).toInt() < 0) return; // on android I got -1 for these fonts at initialization, i.e pixelsize
         if(qMin(factX, factY) < 1.0) {
             QGroupBox *box = (QGroupBox *) widget;
             qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
@@ -5863,6 +5844,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
 
     // Tabbar adjustment
     else if(!className.compare("QTabWidget")) {
+        if(list.at(4).toInt() < 0) return; // on android I got -1 for these fonts at initialization, i.e pixelsize
         QString style= "";
         QTabWidget *box = (QTabWidget *) widget;
         qreal fontSize = (qMin(factX, factY) * (double) list.at(4).toInt());
@@ -5953,7 +5935,6 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
     }
 
     if(!allowResize) return;
-
     if(firstResize) {
         firstResize = false;
         // keep original width and height (first event on linux/windows was ui window size, on ios however now display size
@@ -6011,9 +5992,8 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 tabW->setProperty("Stylesheet", tabW->styleSheet());
 
             } else {
-                integerList.insert(4, widget->font().pointSize());
+                     integerList.insert(4, widget->font().pointSize());
             }
-
             widget->setProperty("GeometryList", integerList);
         }
         return;
@@ -6117,11 +6097,6 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                         ledWidget->setLedHeight((int) (height+0.5));
                         ledWidget->setLedWidth((int) (width + 0.5));
                     }
-
-
-
-
-
                     widget->setGeometry(rectnew);
                     resizeSpecials(className, widget, list, factX, factY);
                     widget->updateGeometry();

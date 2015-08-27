@@ -34,19 +34,6 @@
 #  include <unistd.h>
 #endif
 
-class Sleep
-{
-public:
-    static void msleep(unsigned long msecs)
-    {
-        QMutex mutex;
-        mutex.lock();
-        QWaitCondition waitCondition;
-        waitCondition.wait(&mutex, msecs);
-        mutex.unlock();
-    }
-};
-
 NetworkAccess::NetworkAccess()
 {
     finished = false;
@@ -67,11 +54,7 @@ bool NetworkAccess::requestUrl(const QUrl url, const QString &file)
     int looped = 0;
     for(int i=0; i<10; i++) {
         qApp->processEvents();
-#ifndef MOBILE_ANDROID
-        Sleep::msleep(300);
-#else // not nice, but the above does not work on android now (does not wait)
-        usleep(500000);
-#endif
+        QThread::msleep(300);
         qApp->processEvents();
         if(downloadFinished()) {
             return true;
