@@ -442,11 +442,11 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     }
 
     // we want to update  any TextBrowsers periodically, is actually done through file watching
- /**
+/*
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateTextBrowser()));
-    timer->start(2000);
-   */
+    timer->start(10000);
+*/
 }
 
 /**
@@ -731,13 +731,16 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         if(reaffectText(map, &source))  browserWidget->setSource(source);
         QString fileName = browserWidget->source().path();
 
+        if(!fileName.isEmpty()) {
+            qDebug() << "watch file" << source;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-        bool success = watcher->addPath(fileName);
-        if(!success) qDebug() << fileName << "can not be watched for changes";
-        else qDebug() << fileName << "is watched for changes";
+            bool success = watcher->addPath(fileName);
+            if(!success) qDebug() << fileName << "can not be watched for changes";
+            else qDebug() << fileName << "is watched for changes";
 #else
-        watcher->addPath(fileName);
+            watcher->addPath(fileName);
 #endif
+        }
         browserWidget->setProperty("Taken", true);
 
         // the different widgets to be handled
@@ -789,7 +792,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         connect(relatedWidget, SIGNAL(clicked(int)), this, SLOT(Callback_RelatedDisplayClicked(int)));
         connect(relatedWidget, SIGNAL(triggered(int)), this, SLOT(Callback_RelatedDisplayClicked(int)));
 
-        relatedWidget->raise();
+        if(relatedWidget->isElevated()) relatedWidget->raise();
 
         relatedWidget->setProperty("Taken", true);
 
@@ -815,7 +818,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         connect(shellWidget, SIGNAL(clicked(int)), this, SLOT(Callback_ShellCommandClicked(int)));
         connect(shellWidget, SIGNAL(triggered(int)), this, SLOT(Callback_ShellCommandClicked(int)));
 
-        shellWidget->raise();
+        if(shellWidget->isElevated()) shellWidget->raise();
 
         shellWidget->setProperty("Taken", true);
 
@@ -832,6 +835,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             connect(menuWidget, SIGNAL(activated(QString)), this, SLOT(Callback_MenuClicked(QString)));
             menuWidget->setPV(text);
         }
+
+        if(menuWidget->isElevated()) menuWidget->raise();
 
         menuWidget->setProperty("Taken", true);
 
@@ -930,6 +935,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             choiceWidget->setPV(text);
         }
 
+        if(choiceWidget->isElevated()) choiceWidget->raise();
+
         choiceWidget->setProperty("Taken", true);
 
         //==================================================================================================================
@@ -962,6 +969,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         // default format, format from ui file will be used normally except for channel precision
         textentryWidget->setFormat(1);
         textentryWidget->clearFocus();
+
+        if(textentryWidget->isElevated()) textentryWidget->raise();
 
         textentryWidget->setProperty("Taken", true);
 
@@ -1014,7 +1023,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             applynumericWidget->setPV(pv);
             connect(applynumericWidget, SIGNAL(clicked(double)), this, SLOT(Callback_EApplyNumeric(double)));
         }
-        applynumericWidget->raise();
+        if(applynumericWidget->isElevated()) applynumericWidget->raise();
 
         applynumericWidget->setProperty("Taken", true);
 
@@ -1029,7 +1038,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             numericWidget->setPV(pv);
             connect(numericWidget, SIGNAL(valueChanged(double)), this, SLOT(Callback_ENumeric(double)));
         }
-        numericWidget->raise();
+        if(numericWidget->isElevated()) numericWidget->raise();
 
         numericWidget->setProperty("Taken", true);
 
@@ -1045,7 +1054,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             spinboxWidget->setPV(pv);
             connect(spinboxWidget, SIGNAL(valueChanged(double)), this, SLOT(Callback_Spinbox(double)));
         }
-        spinboxWidget->raise();
+        if(spinboxWidget->isElevated()) spinboxWidget->raise();
 
         spinboxWidget->setProperty("Taken", true);
 
@@ -1074,7 +1083,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         text = messagebuttonWidget->getLabel();
         if(reaffectText(map, &text))  messagebuttonWidget->setLabel(text);
 
-        messagebuttonWidget->raise();
+        if(messagebuttonWidget->isElevated()) messagebuttonWidget->raise();
 
         messagebuttonWidget->setProperty("Taken", true);
 
@@ -1094,7 +1103,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         text.replace(QString::fromWCharArray(L"\u00A6"), " ");    // replace Â¦ with a blanc (was used in macros for creating blancs)
         togglebuttonWidget->setText(text);
 
-        togglebuttonWidget->raise();
+        if(togglebuttonWidget->isElevated()) togglebuttonWidget->raise();
 
         togglebuttonWidget->setProperty("Taken", true);
 
@@ -1110,9 +1119,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         text= scriptbuttonWidget->getScriptParam();
         if(reaffectText(map, &text))  scriptbuttonWidget->setScriptParam(text);
-
-        scriptbuttonWidget->raise();
         scriptbuttonWidget->setToolTip("process never started !");
+
+        if(scriptbuttonWidget->isElevated()) scriptbuttonWidget->raise();
+
         scriptbuttonWidget->setProperty("Taken", true);
 
         //==================================================================================================================
@@ -1154,6 +1164,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             sliderWidget->setPV(pv);
             connect(sliderWidget, SIGNAL(valueChanged(double)), this, SLOT(Callback_SliderValueChanged(double)));
         }
+
+        if(sliderWidget->isElevated())sliderWidget->raise();
 
         sliderWidget->setProperty("Taken", true);
 
@@ -4719,10 +4731,10 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 t->tryTerminate();
             }
 
-        } else  if(selectedItem->text().contains("Raise main window")) {
+        } else  if(selectedItem->text().contains("Raise message window")) {
             QMainWindow *mainWindow = (QMainWindow *) this->parentWidget();
             mainWindow->showNormal();
-             if(messageWindowP != (MessageWindow *) 0) messageWindowP->raise();
+            if(messageWindowP != (MessageWindow *) 0) messageWindowP->raise();
 
         } else  if(selectedItem->text().contains("Toggle fit to size")) {
             if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) {
