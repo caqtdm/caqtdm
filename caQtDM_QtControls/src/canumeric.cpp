@@ -37,6 +37,8 @@ caNumeric::caNumeric(QWidget *parent) : ENumeric(parent)
      setDigitsFontScaleEnabled(true);
      setForeground(Qt::black);
      setBackground(QColor(230,230,230));
+
+     setElevation(on_top);
 }
 
 QString caNumeric::getPV() const

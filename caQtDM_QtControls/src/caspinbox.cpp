@@ -36,6 +36,8 @@ caSpinbox::caSpinbox(QWidget *parent) : SNumeric(parent)
      setDigitsFontScaleEnabled(true);
      setForeground(Qt::black);
      setBackground(QColor(230,230,230));
+
+     setElevation(on_top);
 }
 
 QString caSpinbox::getPV() const

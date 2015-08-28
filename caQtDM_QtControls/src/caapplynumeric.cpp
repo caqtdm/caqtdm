@@ -39,6 +39,8 @@ caApplyNumeric::caApplyNumeric(QWidget *parent) : EApplyNumeric(parent)
     setBackground(QColor(230,230,230));
     thisFixedFormat = false;
     installEventFilter(this);
+
+    setElevation(on_top);
 }
 
 QString caApplyNumeric::getPV() const

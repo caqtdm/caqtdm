@@ -58,6 +58,8 @@ caChoice::caChoice(QWidget *parent) : QWidget(parent)
 
     populateCells(labels, -1);
     setColorMode(thisColorMode);
+
+    setElevation(on_top);
 }
 
 QString caChoice::getPV() const

@@ -51,6 +51,7 @@ class QTCON_EXPORT caScriptButton : public QWidget
     Q_PROPERTY(QString scriptCommand READ getScriptCommand WRITE setScriptCommand)
     Q_PROPERTY(QString scriptParameter READ getScriptParam WRITE setScriptParam)
 
+#include "caElevation.h"
 
 public:
 

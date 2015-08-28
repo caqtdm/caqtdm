@@ -23,27 +23,18 @@
  *    anton.mezger@psi.ch
  */
 
-    enum  Visibility { StaticV,
-      IfNotZero,
-      IfZero,
-      Calc
-    };
+    Q_PROPERTY(Elevation elevation READ getElevation WRITE setElevation)
+    Q_ENUMS(Elevation)
+    
+public:
+   
+    enum  Elevation {on_top, as_is};
 
-    Visibility getVisibility() const {return thisVisibility;}
-    void setVisibility(Visibility s) {thisVisibility = s;}
-
-    QString getVisibilityCalc() const {return thisVisibilityCalc;}
-    void setVisibilityCalc(QString const &calc) {thisVisibilityCalc = calc;}
-
-    QString getChannelA() const {return thisChannelA;}
-    void setChannelA(QString const &pv) {thisChannelA = pv;}
-
-    QString getChannelB() const {return thisChannelB;}
-    void setChannelB(QString const &pv) {thisChannelB = pv;}
-
-    QString getChannelC() const {return thisChannelC;}
-    void setChannelC(QString const &pv) {thisChannelC = pv;}
-
-    QString getChannelD() const {return thisChannelD;}
-    void setChannelD(QString const &pv) {thisChannelD = pv;}
-
+    Elevation getElevation() const {return thisElevation;}
+    void setElevation(Elevation s) {thisElevation = s;}
+    bool isElevated() { if(thisElevation == on_top) return true; else return false;}
+    
+ private:
+  
+    Elevation thisElevation;
+    

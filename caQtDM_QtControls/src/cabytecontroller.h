@@ -57,6 +57,8 @@ class QTCON_EXPORT caByteController : public QWidget
 
     Q_PROPERTY(EPushButton::ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleModeL)
 
+#include "caElevation.h"
+
 public:
 
     enum colMode {Static=0, Alarm};

@@ -42,7 +42,7 @@ class  QTCON_EXPORT caGraphics : public QWidget
     Q_PROPERTY(QColor lineColor READ getLineColor WRITE setLineColor )
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
 
-#include "caVisib.h"
+#include "caVisibProps.h"
 
     Q_PROPERTY(Form form READ getForm WRITE setForm)
 
@@ -59,9 +59,9 @@ class  QTCON_EXPORT caGraphics : public QWidget
     Q_ENUMS(FillStyle)
     Q_ENUMS(ArrowMode)
 
-public:
+#include "caVisibDefs.h"
 
-#include "caVisibPublic.h"
+public:
 
     enum LineStyle {Solid = 0, Dash, BigDash};
     enum FillStyle {Filled = 0, Outline};
@@ -133,8 +133,6 @@ protected:
     void paintEvent( QPaintEvent* );
 
 private:
-
-#include "caVisibPrivate.h"
 
     QPolygonF getHead( QPointF, QPointF );
     int thisLineSize;

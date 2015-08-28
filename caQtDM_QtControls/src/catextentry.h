@@ -44,6 +44,7 @@ class QTCON_EXPORT caTextEntry : public caLineEdit
     Q_PROPERTY(int frameLineWidth READ getLineWidth WRITE setLinewidth  DESIGNABLE false)
     Q_PROPERTY(alertHandling alarmHandling READ getAlarmHandling WRITE setAlarmHandling DESIGNABLE false )
 
+#include "caElevation.h"
 
 public:
 

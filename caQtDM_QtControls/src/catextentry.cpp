@@ -37,6 +37,8 @@ caTextEntry::caTextEntry(QWidget *parent) : caLineEdit(parent)
     newFocusPolicy(Qt::ClickFocus);
     this->setAcceptDrops(false);
     setFromTextEntry();
+
+    setElevation(on_top);
 }
 
 // routine not used any more
