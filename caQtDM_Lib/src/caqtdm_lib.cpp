@@ -431,7 +431,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     // all interfaces flush io
     FlushAllInterfaces();
 
-    // due to crash in connection with the ssplash screen, changed
+    // due to crash in connection with the splash screen, changed
     // these instructions to the botton of this class
     if(nbIncludes > 0) {
         Sleep::msleep(200);
@@ -3046,11 +3046,19 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     lineeditWidget->setTextLine(str);
                 } else if (data.edata.fieldtype == caENUM) {
                     lineeditWidget->setTextLine("???");
-                } else if(data.edata.fieldtype == caCHAR) {
-                    QString str= QString::number((int) data.edata.ivalue);
-                    lineeditWidget->setTextLine(str);
+
+                // just one char (display as character when string format is specified, otherwise as number in specified format
+                } else if((data.edata.fieldtype == caCHAR) && (data.edata.nelm == 1)) {
+                    if(lineeditWidget->getFormatType() == caLineEdit::string) {
+                       QString str = QString(QChar((int) data.edata.ivalue));
+                       lineeditWidget->setTextLine(str);
+                    } else {
+                        lineeditWidget->setValue(data.edata.ivalue, "");
+                    }
+
+                // one or more strings, or a char array
                 } else {
-                    if(data.edata.valueCount == 1) {
+                    if(data.edata.nelm == 1) {
                         lineeditWidget->setTextLine(String);
                     } else if(list.count() > 0) {
                         lineeditWidget->setTextLine(list.at(0));
@@ -4700,6 +4708,19 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         myMenu.addAction("Reset zoom");
     }
 
+    // for catextentry add filedialog
+    if(caTextEntry* catextentryWidget = qobject_cast<caTextEntry *>(w)) {
+        if(catextentryWidget->getAccessW()) {
+            knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv[0]);  // use pointer for getting all necessary information
+            if((kPtr != (knobData *) 0) && (pv[0].length() > 0)) {
+                myMenu.addAction("Input Dialog");
+                if((kPtr->edata.fieldtype == caSTRING) || (kPtr->edata.fieldtype == caCHAR)) {
+                    myMenu.addAction("File Dialog");
+                }
+            }
+        }
+    }
+
     // for some widgets one more action
     if(caSlider * widget = qobject_cast< caSlider *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
     if(caLineEdit* widget = qobject_cast<caLineEdit *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
@@ -4999,6 +5020,30 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             myMessageBox box(this);
             box.setText("<html>" + info + "</html>");
             box.exec();
+
+        // add a file dialog to simplify user path+file input
+        } else if(selectedItem->text().contains("File Dialog")) {
+            QFileDialog dialog(this);
+            dialog.setFileMode(QFileDialog::DirectoryOnly);
+            if (dialog.exec()) {
+                QStringList fileNames = dialog.selectedFiles();
+                if(!fileNames[0].isEmpty()) {
+                    if(caTextEntry* textentryWidget = qobject_cast<caTextEntry *>(w)) {
+                        caTextEntry::FormatType fType = textentryWidget->getFormatType();
+                        TreatRequestedValue(textentryWidget->getPV(), fileNames[0], fType, w);
+                    }
+                }
+            }
+
+        } else if(selectedItem->text().contains("Input Dialog")) {
+            bool ok;
+            QString text = QInputDialog::getText(this, tr("Input data"), tr("Input:"), QLineEdit::Normal,"", &ok);
+            if (ok && !text.isEmpty()) {
+                if(caTextEntry* textentryWidget = qobject_cast<caTextEntry *>(w)) {
+                   caTextEntry::FormatType fType = textentryWidget->getFormatType();
+                   TreatRequestedValue(textentryWidget->getPV(), text, fType, w);
+                }
+            }
 
         } else if(selectedItem->text().contains("Print")) {
             print();
@@ -5556,8 +5601,13 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
 
     case caCHAR:
         if(fType == caTextEntry::string) {
-            //qDebug() << "set string" << text;
-            plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, (char*) text.toLatin1().constData(), (char*) w->objectName().toLower().toLatin1().constData(), errmess, 0);
+            if(kPtr->edata.nelm > 1) {
+               //qDebug() << "set string" << text;
+               plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, (char*) text.toLatin1().constData(), (char*) w->objectName().toLower().toLatin1().constData(), errmess, 0);
+            } else {  // single char written through its ascii code while character entered
+               QChar c = text.at(0);
+               plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int)c.toLatin1(), (char*)  "", (char*) w->objectName().toLower().toLatin1().constData(), errmess, 2);
+            }
             break;
         }
         //qDebug() << "fall through default case";

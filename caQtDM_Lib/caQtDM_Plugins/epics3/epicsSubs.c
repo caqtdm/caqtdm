@@ -412,6 +412,7 @@ static void displayCallback(struct event_handler_args args) {
         kData.edata.monitorCount = kData.edata.displayCount = info->event;
         kData.edata.connected = info->connected;
         kData.edata.fieldtype = ca_field_type(args.chid);
+        kData.edata.nelm = ca_element_count(args.chid);
         ftime(&now);
 
         C_DataLock(mutexKnobdataPtr, &kData);

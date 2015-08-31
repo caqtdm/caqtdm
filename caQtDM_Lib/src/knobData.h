@@ -40,6 +40,7 @@ typedef struct _epicsData {
     int          monitorCountPrev;
     int          displayCount;          /* last displayed acquisition counter */
     int          unconnectCount;        /* counter for limiting the disconnected pv's */
+    int          nelm;                  /* number of record elements */
     int          valueCount;            /* number of values */
     int          enumCount;             /* number of values */
     short        fieldtype;             /* fieldtype */
