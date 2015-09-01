@@ -5970,8 +5970,8 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
 #else
         qreal height = 1.0;
 #endif
-        QString thisStyle = "QTabBar::tab {font: %1pt;  height:%2em;}";
-        thisStyle = thisStyle.arg((int)(fontSize+0.5)).arg(height);
+        QString thisStyle = "QTabBar::tab {font: %1pt;  height:%2em; padding: %3px;}";
+        thisStyle = thisStyle.arg((int)(fontSize+0.5)).arg(height).arg((int) (5.0*qMin(factX, factY)+0.5));
 
         // get eventual stylesheet from property set at start for addition
         QVariant Style=box->property("Stylesheet");
