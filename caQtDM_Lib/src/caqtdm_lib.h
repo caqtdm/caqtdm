@@ -53,6 +53,8 @@
 #include <QWidget>
 #include <QWaitCondition>
 #include <QMessageBox>
+#include <QInputDialog>
+#include <QFileDialog>
 #ifndef MOBILE
 #include <QPrinter>
 #include <QPrintDialog>
