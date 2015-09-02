@@ -38,6 +38,8 @@ class QTCON_EXPORT caMenu : public QComboBox
     Q_PROPERTY(bool labelDisplay READ getLabelDisplay WRITE setLabelDisplay)
     Q_OBJECT
 
+#include "caElevation.h"
+
 public:
 
     enum colMode {Default, Static, Alarm};

@@ -53,6 +53,8 @@ class QTCON_EXPORT caToggleButton : public QCheckBox, public FontScalingWidget
     Q_PROPERTY(QString trueValue READ getTrueValue WRITE setTrueValue)
     Q_PROPERTY(QString falseValue READ getFalseValue WRITE setFalseValue)
 
+#include "caElevation.h"
+
 public:
 
     caToggleButton(QWidget *parent);

@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
                    "  [-noStyles]      works only when not attaching\n"
                    "  [-macro \"xxx=aaa,yyy=bbb, ...\"]\n"
                    "  [-macrodefs filename] will load macro definitions from file\n"
-                   "  [-dg [xpos[xypos]][+xoffset[+yoffset]]\n"
+                   "  [-dg [<width>x<height>][+<xoffset>-<yoffset>]\n"
                    "  [-httpconfig] will display a network configuration screen at startup\n"
                    "  [-print] will print file and exit\n"
                    "  [-noResize] will prevent resizing, works only when not attaching\n"

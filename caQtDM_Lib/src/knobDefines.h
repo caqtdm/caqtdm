@@ -49,13 +49,7 @@
 typedef char pv_string[MAXPVLEN];  // temporary definition, I should allocate what we need
 typedef char pv_desc[MAXPVDESC];
 
-//#ifndef EPICS
 enum caType {caSTRING	= 0, caINT = 1, caFLOAT = 2, caENUM = 3, caCHAR = 4, caLONG = 5, caDOUBLE = 6};
-//#else
-//#include "cadef.h"
-//enum caType {caSTRING = DBF_STRING, caINT = DBF_INT, caSHORT = DBF_INT, caFLOAT = DBF_FLOAT, caENUM = DBF_ENUM, caCHAR = DBF_CHAR, caLONG = DBF_LONG, caDOUBLE = DBF_DOUBLE};
-//#endif
-
 
 // not really used, now just inserted as property in the widgets, not used elsewhere
 enum objectType {caCalc_Widget = 0,

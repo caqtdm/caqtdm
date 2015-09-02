@@ -47,6 +47,8 @@ Q_ENUMS(SourceMode)
 Q_PROPERTY(double maxValue READ getMaxValue WRITE setMaxValue)
 Q_PROPERTY(double minValue READ getMinValue WRITE setMinValue)
 
+#include "caElevation.h"
+
 public:
 
  caApplyNumeric(QWidget *parent);

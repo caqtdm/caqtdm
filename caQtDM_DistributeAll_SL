@@ -15,7 +15,11 @@ SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/QtTunes
 cp -v $SOURCE/QtTunes $DESTINATION
 
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/HFdispQt
-cp -v $SOURCE/caHFdispQt /home/ACS/Control/Bin/
+cp -v $SOURCE/caHFdispQt $DESTINATION
+
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/QtScan
+cp -v $SOURCE/scanQtProscan $DESTINATION
+cp -v $SOURCE/scanQtHipa $DESTINATION
 
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/probeQtProscan
 cp -v $SOURCE/probeQt $DESTINATION
@@ -25,7 +29,7 @@ DESTINATION=$QTBASE/Qt-4.8.2/plugins/designer/
 cp -v $SOURCE/lib* $DESTINATION
 
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM_Project/caQtDM_Binaries/controlsystems
-DESTINATION=$QTBASE/Qt-4.8.2/plugins/controlsystems/
+DESTINATION=$QTBASE/binQt/controlsystems
 cp -v $SOURCE/lib* $DESTINATION
 
 

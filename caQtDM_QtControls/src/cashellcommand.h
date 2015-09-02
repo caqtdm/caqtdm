@@ -33,6 +33,8 @@ class QTCON_EXPORT caShellCommand : public caRowColMenu
 {
     Q_OBJECT
 
+#include "caElevation.h"
+
 public:
 
     caShellCommand(QWidget *parent);

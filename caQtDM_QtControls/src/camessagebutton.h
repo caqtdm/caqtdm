@@ -52,6 +52,8 @@ class QTCON_EXPORT caMessageButton : public EPushButton
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
     Q_ENUMS(colMode)
 
+#include "caElevation.h"
+
 public:
 
     caMessageButton(QWidget *parent);

@@ -57,6 +57,7 @@ caScriptButton::caScriptButton(QWidget *parent) : QWidget(parent)
     installEventFilter(this);
     setAccessW(true);
 
+    setElevation(on_top);
 }
 
 void caScriptButton::buttonToggled()

@@ -44,11 +44,10 @@ class QTCON_EXPORT caImage : public QWidget
     Q_PROPERTY(int frame READ getFrame WRITE setFrame)
     Q_PROPERTY(int delayMilliseconds READ getDelay WRITE setDelay)
 
-#include "caVisib.h"
+#include "caVisibProps.h"
+#include "caVisibDefs.h"
 
 public:
-
-#include "caVisibPublic.h"
 
     caImage( QWidget *parent = 0 );
 
@@ -84,8 +83,6 @@ protected:
     virtual void timerEvent(QTimerEvent *e);
 
 private:
-
-#include "caVisibPrivate.h"
 
     void init(const QString& filename);
 

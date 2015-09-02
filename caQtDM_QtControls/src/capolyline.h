@@ -48,7 +48,8 @@ class QTCON_EXPORT caPolyLine : public QWidget
     Q_PROPERTY(FillStyle fillstyle READ getFillStyle WRITE setFillStyle)
     Q_PROPERTY(PolyStyle polystyle READ getPolyStyle WRITE setPolyStyle)
 
-#include "caVisib.h"
+#include "caVisibProps.h"
+#include "caVisibDefs.h"
 
     Q_ENUMS(colMode)
     Q_ENUMS(LineStyle)
@@ -56,8 +57,6 @@ class QTCON_EXPORT caPolyLine : public QWidget
     Q_ENUMS(PolyStyle)
 
 public:
-
-#include "caVisibPublic.h"
 
     enum LineStyle {Solid = 0, Dash, BigDash};
     enum colMode {Static=0, Alarm};
@@ -116,8 +115,6 @@ protected:
     void resizeEvent(QResizeEvent *event);
 
 private:
-
-#include "caVisibPrivate.h"
 
     QString thisXYpairs;
     QString XYpairs;

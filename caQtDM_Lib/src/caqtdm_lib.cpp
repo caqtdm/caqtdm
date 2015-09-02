@@ -192,16 +192,22 @@
 Q_DECLARE_METATYPE(QList<int>)
 Q_DECLARE_METATYPE(QTabWidget*)
 
+// this sleep will not block the GUI and QThread::msleep is protected in Qt4.8 (so do not use that)
 class Sleep
 {
 public:
     static void msleep(unsigned long msecs)
     {
+#ifndef MOBILE_ANDROID
         QMutex mutex;
         mutex.lock();
         QWaitCondition waitCondition;
         waitCondition.wait(&mutex, msecs);
         mutex.unlock();
+#else
+        // not nice, but the above does not work on android now (does not wait)
+        usleep(msecs * 100);
+#endif
     }
 };
 
@@ -243,6 +249,9 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     firstResize = true;
     loopTimer = 0;
 
+    // file watcher for changes
+    watcher = new QFileSystemWatcher(this);
+    QObject::connect(watcher, SIGNAL(fileChanged(const QString&)), this, SLOT(handleFileChanged(const QString&)));
 
     if(parentAS != (QWidget*) 0) {
         fromAS = true;
@@ -375,9 +384,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
 
-    // initialize IO
-    //PrepareDeviceIO();
-
     level=0;
 
     // say for all widgets that they have to be treated, will be set to true when treated to avoid multiple use
@@ -425,19 +431,22 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     // all interfaces flush io
     FlushAllInterfaces();
 
-    // due to crash in connection with the ssplash screen, changed
+    // due to crash in connection with the splash screen, changed
     // these instructions to the botton of this class
     if(nbIncludes > 0) {
-#ifdef linux
-        usleep(200000);
-#else
         Sleep::msleep(200);
-#endif
         // this seems to causes the crash and is not really needed here?
         //splash->finish(this);
 
         splash->deleteLater();
     }
+
+    // we want to update  any TextBrowsers periodically, is actually done through file watching
+/*
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(updateTextBrowser()));
+    timer->start(10000);
+*/
 }
 
 /**
@@ -720,7 +729,18 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         QString source = browserWidget->source().toString();
         if(reaffectText(map, &source))  browserWidget->setSource(source);
+        QString fileName = browserWidget->source().path();
 
+        if(!fileName.isEmpty()) {
+            qDebug() << "watch file" << source;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+            bool success = watcher->addPath(fileName);
+            if(!success) qDebug() << fileName << "can not be watched for changes";
+            else qDebug() << fileName << "is watched for changes";
+#else
+            watcher->addPath(fileName);
+#endif
+        }
         browserWidget->setProperty("Taken", true);
 
         // the different widgets to be handled
@@ -772,7 +792,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         connect(relatedWidget, SIGNAL(clicked(int)), this, SLOT(Callback_RelatedDisplayClicked(int)));
         connect(relatedWidget, SIGNAL(triggered(int)), this, SLOT(Callback_RelatedDisplayClicked(int)));
 
-        relatedWidget->raise();
+        if(relatedWidget->isElevated()) relatedWidget->raise();
 
         relatedWidget->setProperty("Taken", true);
 
@@ -798,7 +818,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         connect(shellWidget, SIGNAL(clicked(int)), this, SLOT(Callback_ShellCommandClicked(int)));
         connect(shellWidget, SIGNAL(triggered(int)), this, SLOT(Callback_ShellCommandClicked(int)));
 
-        shellWidget->raise();
+        if(shellWidget->isElevated()) shellWidget->raise();
 
         shellWidget->setProperty("Taken", true);
 
@@ -815,6 +835,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             connect(menuWidget, SIGNAL(activated(QString)), this, SLOT(Callback_MenuClicked(QString)));
             menuWidget->setPV(text);
         }
+
+        if(menuWidget->isElevated()) menuWidget->raise();
 
         menuWidget->setProperty("Taken", true);
 
@@ -913,6 +935,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             choiceWidget->setPV(text);
         }
 
+        if(choiceWidget->isElevated()) choiceWidget->raise();
+
         choiceWidget->setProperty("Taken", true);
 
         //==================================================================================================================
@@ -945,6 +969,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         // default format, format from ui file will be used normally except for channel precision
         textentryWidget->setFormat(1);
         textentryWidget->clearFocus();
+
+        if(textentryWidget->isElevated()) textentryWidget->raise();
 
         textentryWidget->setProperty("Taken", true);
 
@@ -997,7 +1023,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             applynumericWidget->setPV(pv);
             connect(applynumericWidget, SIGNAL(clicked(double)), this, SLOT(Callback_EApplyNumeric(double)));
         }
-        applynumericWidget->raise();
+        if(applynumericWidget->isElevated()) applynumericWidget->raise();
 
         applynumericWidget->setProperty("Taken", true);
 
@@ -1012,7 +1038,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             numericWidget->setPV(pv);
             connect(numericWidget, SIGNAL(valueChanged(double)), this, SLOT(Callback_ENumeric(double)));
         }
-        numericWidget->raise();
+        if(numericWidget->isElevated()) numericWidget->raise();
 
         numericWidget->setProperty("Taken", true);
 
@@ -1028,7 +1054,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             spinboxWidget->setPV(pv);
             connect(spinboxWidget, SIGNAL(valueChanged(double)), this, SLOT(Callback_Spinbox(double)));
         }
-        spinboxWidget->raise();
+        if(spinboxWidget->isElevated()) spinboxWidget->raise();
 
         spinboxWidget->setProperty("Taken", true);
 
@@ -1057,7 +1083,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         text = messagebuttonWidget->getLabel();
         if(reaffectText(map, &text))  messagebuttonWidget->setLabel(text);
 
-        messagebuttonWidget->raise();
+        if(messagebuttonWidget->isElevated()) messagebuttonWidget->raise();
 
         messagebuttonWidget->setProperty("Taken", true);
 
@@ -1077,7 +1103,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         text.replace(QString::fromWCharArray(L"\u00A6"), " ");    // replace Â¦ with a blanc (was used in macros for creating blancs)
         togglebuttonWidget->setText(text);
 
-        togglebuttonWidget->raise();
+        if(togglebuttonWidget->isElevated()) togglebuttonWidget->raise();
 
         togglebuttonWidget->setProperty("Taken", true);
 
@@ -1093,9 +1119,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         text= scriptbuttonWidget->getScriptParam();
         if(reaffectText(map, &text))  scriptbuttonWidget->setScriptParam(text);
-
-        scriptbuttonWidget->raise();
         scriptbuttonWidget->setToolTip("process never started !");
+
+        if(scriptbuttonWidget->isElevated()) scriptbuttonWidget->raise();
+
         scriptbuttonWidget->setProperty("Taken", true);
 
         //==================================================================================================================
@@ -1137,6 +1164,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             sliderWidget->setPV(pv);
             connect(sliderWidget, SIGNAL(valueChanged(double)), this, SLOT(Callback_SliderValueChanged(double)));
         }
+
+        if(sliderWidget->isElevated())sliderWidget->raise();
 
         sliderWidget->setProperty("Taken", true);
 
@@ -1899,9 +1928,29 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         connect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
         w1->setProperty("Connect", false);
     }
-
-
 }
+
+/**
+  * this routine gest fired when a QTextBrowser source file changes
+  */
+void CaQtDM_Lib::handleFileChanged(const QString &file)
+{
+    Q_UNUSED(file);
+    // qDebug() << "update " << file;
+    updateTextBrowser();
+}
+
+/**
+  * this routine reloads periodically all QTextBrowsers
+  */
+void CaQtDM_Lib::updateTextBrowser()
+{
+    QList<QTextBrowser *> allBrowsers = myWidget->findChildren<QTextBrowser *>();
+    foreach(QTextBrowser* widget, allBrowsers) {
+        widget->reload();
+    }
+}
+
 /**
   * this routine uses macro table to replace inside the pv the macro part
   */
@@ -2997,11 +3046,19 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     lineeditWidget->setTextLine(str);
                 } else if (data.edata.fieldtype == caENUM) {
                     lineeditWidget->setTextLine("???");
-                } else if(data.edata.fieldtype == caCHAR) {
-                    QString str= QString::number((int) data.edata.ivalue);
-                    lineeditWidget->setTextLine(str);
+
+                // just one char (display as character when string format is specified, otherwise as number in specified format
+                } else if((data.edata.fieldtype == caCHAR) && (data.edata.nelm == 1)) {
+                    if(lineeditWidget->getFormatType() == caLineEdit::string) {
+                       QString str = QString(QChar((int) data.edata.ivalue));
+                       lineeditWidget->setTextLine(str);
+                    } else {
+                        lineeditWidget->setValue(data.edata.ivalue, "");
+                    }
+
+                // one or more strings, or a char array
                 } else {
-                    if(data.edata.valueCount == 1) {
+                    if(data.edata.nelm == 1) {
                         lineeditWidget->setTextLine(String);
                     } else if(list.count() > 0) {
                         lineeditWidget->setTextLine(list.at(0));
@@ -4262,11 +4319,7 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
         }
     }
 
-#ifdef linux
-    usleep(200000);
-#else
     Sleep::msleep(200);
-#endif
 
     // get rid of memory, that was allocated before for this window.
     // it has not been done previously, while otherwise in the datacallback
@@ -4655,6 +4708,19 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         myMenu.addAction("Reset zoom");
     }
 
+    // for catextentry add filedialog
+    if(caTextEntry* catextentryWidget = qobject_cast<caTextEntry *>(w)) {
+        if(catextentryWidget->getAccessW()) {
+            knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv[0]);  // use pointer for getting all necessary information
+            if((kPtr != (knobData *) 0) && (pv[0].length() > 0)) {
+                myMenu.addAction("Input Dialog");
+                if((kPtr->edata.fieldtype == caSTRING) || (kPtr->edata.fieldtype == caCHAR)) {
+                    myMenu.addAction("File Dialog");
+                }
+            }
+        }
+    }
+
     // for some widgets one more action
     if(caSlider * widget = qobject_cast< caSlider *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
     if(caLineEdit* widget = qobject_cast<caLineEdit *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
@@ -4686,10 +4752,10 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 t->tryTerminate();
             }
 
-        } else  if(selectedItem->text().contains("Raise main window")) {
+        } else  if(selectedItem->text().contains("Raise message window")) {
             QMainWindow *mainWindow = (QMainWindow *) this->parentWidget();
             mainWindow->showNormal();
-             if(messageWindowP != (MessageWindow *) 0) messageWindowP->raise();
+            if(messageWindowP != (MessageWindow *) 0) messageWindowP->raise();
 
         } else  if(selectedItem->text().contains("Toggle fit to size")) {
             if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) {
@@ -4954,6 +5020,30 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             myMessageBox box(this);
             box.setText("<html>" + info + "</html>");
             box.exec();
+
+        // add a file dialog to simplify user path+file input
+        } else if(selectedItem->text().contains("File Dialog")) {
+            QFileDialog dialog(this);
+            dialog.setFileMode(QFileDialog::DirectoryOnly);
+            if (dialog.exec()) {
+                QStringList fileNames = dialog.selectedFiles();
+                if(!fileNames[0].isEmpty()) {
+                    if(caTextEntry* textentryWidget = qobject_cast<caTextEntry *>(w)) {
+                        caTextEntry::FormatType fType = textentryWidget->getFormatType();
+                        TreatRequestedValue(textentryWidget->getPV(), fileNames[0], fType, w);
+                    }
+                }
+            }
+
+        } else if(selectedItem->text().contains("Input Dialog")) {
+            bool ok;
+            QString text = QInputDialog::getText(this, tr("Input data"), tr("Input:"), QLineEdit::Normal,"", &ok);
+            if (ok && !text.isEmpty()) {
+                if(caTextEntry* textentryWidget = qobject_cast<caTextEntry *>(w)) {
+                   caTextEntry::FormatType fType = textentryWidget->getFormatType();
+                   TreatRequestedValue(textentryWidget->getPV(), text, fType, w);
+                }
+            }
 
         } else if(selectedItem->text().contains("Print")) {
             print();
@@ -5511,8 +5601,13 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
 
     case caCHAR:
         if(fType == caTextEntry::string) {
-            //qDebug() << "set string" << text;
-            plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, (char*) text.toLatin1().constData(), (char*) w->objectName().toLower().toLatin1().constData(), errmess, 0);
+            if(kPtr->edata.nelm > 1) {
+               //qDebug() << "set string" << text;
+               plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, (char*) text.toLatin1().constData(), (char*) w->objectName().toLower().toLatin1().constData(), errmess, 0);
+            } else {  // single char written through its ascii code while character entered
+               QChar c = text.at(0);
+               plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int)c.toLatin1(), (char*)  "", (char*) w->objectName().toLower().toLatin1().constData(), errmess, 2);
+            }
             break;
         }
         //qDebug() << "fall through default case";
@@ -5783,6 +5878,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         QLabel *label = (QLabel *) widget;
         className = label->parent()->metaObject()->className();
         if(!className.contains("Numeric") ) {  // would otherwise interfere with our wheelswitch
+            if(list.at(4).toInt() < 0) return; // on android I got -1 for these fonts at initialization, i.e pixelsize
             qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
             if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
             QFont f = label->font();
@@ -5793,8 +5889,9 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
 
     else if((!className.compare("caMenu")) ||
             (!className.compare("QPlainTextEdit")) ||
+            (!className.compare("QTextEdit")) ||
             (!className.compare("QLineEdit")) ) {
-        //caMenu *label = (caMenu *) widget;
+        if(list.at(4).toInt() < 0) return; // on android I got -1 for these fonts at initialization, i.e pixelsize
         qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
         if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         QFont f = widget->font();
@@ -5848,9 +5945,8 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         plot->axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MinorTick, factX * (double) list.at(10).toInt());
         plot->axisScaleDraw(QwtPlot::xBottom)->setSpacing(0.0);
     }
-
-    // change fonts for next classes, when smaller needed
     else if(!className.compare("QGroupBox")) {
+        if(list.at(4).toInt() < 0) return; // on android I got -1 for these fonts at initialization, i.e pixelsize
         if(qMin(factX, factY) < 1.0) {
             QGroupBox *box = (QGroupBox *) widget;
             qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
@@ -5863,6 +5959,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
 
     // Tabbar adjustment
     else if(!className.compare("QTabWidget")) {
+        if(list.at(4).toInt() < 0) return; // on android I got -1 for these fonts at initialization, i.e pixelsize
         QString style= "";
         QTabWidget *box = (QTabWidget *) widget;
         qreal fontSize = (qMin(factX, factY) * (double) list.at(4).toInt());
@@ -5873,8 +5970,8 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
 #else
         qreal height = 1.0;
 #endif
-        QString thisStyle = "QTabBar::tab {font: %1pt;  height:%2em;}";
-        thisStyle = thisStyle.arg((int)(fontSize+0.5)).arg(height);
+        QString thisStyle = "QTabBar::tab {font: %1pt;  height:%2em; padding: %3px;}";
+        thisStyle = thisStyle.arg((int)(fontSize+0.5)).arg(height).arg((int) (5.0*qMin(factX, factY)+0.5));
 
         // get eventual stylesheet from property set at start for addition
         QVariant Style=box->property("Stylesheet");
@@ -5953,7 +6050,6 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
     }
 
     if(!allowResize) return;
-
     if(firstResize) {
         firstResize = false;
         // keep original width and height (first event on linux/windows was ui window size, on ios however now display size
@@ -6011,9 +6107,8 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 tabW->setProperty("Stylesheet", tabW->styleSheet());
 
             } else {
-                integerList.insert(4, widget->font().pointSize());
+                     integerList.insert(4, widget->font().pointSize());
             }
-
             widget->setProperty("GeometryList", integerList);
         }
         return;
@@ -6117,11 +6212,6 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                         ledWidget->setLedHeight((int) (height+0.5));
                         ledWidget->setLedWidth((int) (width + 0.5));
                     }
-
-
-
-
-
                     widget->setGeometry(rectnew);
                     resizeSpecials(className, widget, list, factX, factY);
                     widget->updateGeometry();

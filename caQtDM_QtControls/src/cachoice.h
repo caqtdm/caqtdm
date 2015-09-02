@@ -57,6 +57,8 @@ class QTCON_EXPORT caChoice : public QWidget
 
     Q_PROPERTY(EPushButton::ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleModeL)
 
+#include "caElevation.h"
+
 public:
 
     enum alignmentHor {left, right, center};

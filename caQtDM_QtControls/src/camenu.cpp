@@ -40,6 +40,8 @@ caMenu::caMenu(QWidget *parent) : QComboBox(parent)
     setColorMode(Default);
     setBackground(QColor(230,230,230));
     setForeground(QColor(0,0,0));
+
+    setElevation(on_top);
 }
 
 QString caMenu::getPV() const

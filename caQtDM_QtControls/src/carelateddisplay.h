@@ -37,6 +37,8 @@ class QTCON_EXPORT caRelatedDisplay : public caRowColMenu
     Q_PROPERTY(Stacking stackingMode READ getStacking WRITE setStacking)
     Q_PROPERTY(QString removeParent READ getReplaceModes WRITE setReplaceModes)
 
+#include "caElevation.h"
+
 public:
 
     caRelatedDisplay(QWidget *parent);
