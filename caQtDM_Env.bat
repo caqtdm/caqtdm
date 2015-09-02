@@ -48,6 +48,11 @@ REM ============================================================================
   set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2010
   
+  set ZMQ=X:/Qt/ZMQ
+  set ZMQINC=%ZMQ%/include
+  set ZMQLIB=%ZMQ%/lib/%EPICS_HOST_ARCH%
+
+  
 GOTO PRINTOUT
 REM =============================================================================================
 REM SELECT2
@@ -76,6 +81,10 @@ REM ============================================================================
   
   set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
+  
+  set ZMQ=X:/Qt/ZMQ
+  set ZMQINC=%ZMQ%/include
+  set ZMQLIB=%ZMQ%/lib/%EPICS_HOST_ARCH%
 GOTO PRINTOUT
 
 REM =============================================================================================
@@ -105,6 +114,11 @@ REM ============================================================================
   
   set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
+
+  set ZMQ=X:/Qt/ZMQ
+  set ZMQINC=%ZMQ%/include
+  set ZMQLIB=%ZMQ%/lib/%EPICS_HOST_ARCH%
+
 GOTO PRINTOUT
 
 
