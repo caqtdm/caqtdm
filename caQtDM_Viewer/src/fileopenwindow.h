@@ -50,6 +50,7 @@
 #include "knobDefines.h"
 #include "knobData.h"
 #include "mutexKnobData.h"
+#include "caqtdm_lib.h"
 #include "ui_main.h"
 #include <stdio.h>
 
@@ -108,6 +109,8 @@ signals:
  private:
 
      void closeEvent(QCloseEvent* ce);
+     void FlushAllInterfaces();
+     void TerminateAllInterfaces();
      QMainWindow *lastWindow;
      QString lastMacro, lastFile, lastGeometry;
      Ui::MainWindow ui;
@@ -132,6 +135,9 @@ signals:
      int activWindow;
      bool debugWindow;
      bool fromIOS;
+
+     QMap<QString, ControlsInterface*> interfaces;
+
  };
 
  #endif

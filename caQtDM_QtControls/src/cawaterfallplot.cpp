@@ -438,6 +438,8 @@ void caWaterfallPlot::setColormap(colormap const &map)
                 bool ok;
                 int index = thisCustomMap.at(i).toInt(&ok);
                 if(ok) colorIndexes[i] = index; else colorIndexes[i] = 2; // black
+                if(colorIndexes[i] < 2) colorIndexes[i] = 2;
+                if(colorIndexes[i] > 18) colorIndexes[i] = 18;
             }
 
             // create colormap

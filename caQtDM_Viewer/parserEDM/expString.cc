@@ -16,6 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+#define UNUSED(x) (void)(x)
+
 #define __expString_cc 1
 
 #if defined(_MSC_VER)
@@ -112,7 +114,7 @@ static int expand (
   int numPossibleSymbols,
   int *numSymbolsFound )
 {
-
+UNUSED(inStringSize);
 char buf[MAX_EXPAND_SIZE+1];
 char execBuf[MAX_EXPAND_SIZE+1];
 char thisMacro[MAX_EXPAND_SIZE+1];

@@ -48,7 +48,8 @@ class QTCON_EXPORT caPolyLine : public QWidget
     Q_PROPERTY(FillStyle fillstyle READ getFillStyle WRITE setFillStyle)
     Q_PROPERTY(PolyStyle polystyle READ getPolyStyle WRITE setPolyStyle)
 
-#include "caVisib.h"
+#include "caVisibProps.h"
+#include "caVisibDefs.h"
 
     Q_ENUMS(colMode)
     Q_ENUMS(LineStyle)
@@ -57,8 +58,6 @@ class QTCON_EXPORT caPolyLine : public QWidget
 
 public:
 
-#include "caVisibPublic.h"
-
     enum LineStyle {Solid = 0, Dash, BigDash};
     enum colMode {Static=0, Alarm};
 
@@ -66,7 +65,7 @@ public:
     enum PolyStyle {Polyline = 0, Polygon};
 
     QString getXYpairs() const {return thisXYpairs;}
-    void setXYpairs(QString const &pairs) {thisXYpairs = pairs; update();}
+    void setXYpairs(QString const &pairs) {thisXYpairs = XYpairs = pairs; update();}
 
     QColor getForeground() const {return thisForeColor;}
     void setForeground(QColor c);
@@ -106,6 +105,8 @@ public:
 
     void setHide(bool hide);
 
+    void setActualSize(QSize size);
+
 protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
@@ -115,13 +116,11 @@ protected:
 
 private:
 
-#include "caVisibPrivate.h"
-
     QString thisXYpairs;
-    QColor thisLineColor;
+    QString XYpairs;
+    QColor thisLineColor, oldLineColor;
     int thisLineSize;
-    QColor thisForeColor;
-    QColor thisBackColor;
+    QColor thisForeColor, oldForeColor;
     colMode thisColorMode;
     LineStyle thisLineStyle;
     FillStyle thisFillStyle;
@@ -130,6 +129,7 @@ private:
     int actualWidth, actualHeight;
     bool initialize;
     bool inEditor;
+    bool inDesigner;
 
     QPointF actualPosition;
     QPointF lastPosition;

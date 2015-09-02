@@ -29,6 +29,8 @@ caShellCommand::caShellCommand(QWidget *parent) : caRowColMenu(parent)
 {
     setImage("exclamation.png");
     setStacking(Menu);
+
+    setElevation(on_top);
 }
 
 

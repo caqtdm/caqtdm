@@ -12,14 +12,15 @@ rm -rf ./caQtDM_Binaries/*
 fi
 
 echo ========== remove makefiles from directories ============
-rm -f Makefile
+rm -f ./Makefile
 rm -f ./caQtDM_Viewer/Makefile
-rm -f ./caQtDM_Viewer/caQtDM1/Makefile
-rm -f ./caQtDM_Viewer/caQtDM2/Makefile
 rm -f ./caQtDM_Viewer/parser/Makefile
+rm -f ./caQtDM_Viewer/parserEDM/Makefile
 rm -f ./caQtDM_Lib/Makefile
-rm -f ./caQtDM_Lib/caQtDM_Lib1/Makefile
-rm -f ./caQtDM_Lib/caQtDM_Lib2/Makefile
+rm -f ./caQtDM_Lib/caQtDM_Plugins/Makefile.csplugins
+rm -f ./caQtDM_Lib/caQtDM_Plugins/demo/Makefile.csplugins
+rm -f ./caQtDM_Lib/caQtDM_Plugins/epics3/Makefile.csplugins
+rm -f ./caQtDM_Lib/caQtDM_Plugins/epics4/Makefile.csplugins
 rm -f ./caQtDM_QtControls/Makefile
 rm -f ./caQtDM_QtControls/plugins/Makefile
 rm -f ./caQtDM_Lib/*.so
@@ -31,9 +32,17 @@ rm -f ./caQtDM_QtControls/plugins/moc/*
 rm -f ./caQtDM_QtControls/plugins/obj/*
 rm -f ./caQtDM_QtControls/moc/*
 rm -f ./caQtDM_QtControls/obj/*
-rm -f ./caQtDM_Lib/obj1/*
+rm -f ./caQtDM_Lib/obj/*
 rm -f ./caQtDM_Lib/moc/*
-rm -f ./caQtDM_Viewer/obj1/*
+
+rm -f ./caQtDM_Lib/caQtDM_Plugins/demo/obj/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/demo/moc/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/epics3/obj/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/epics3/moc/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/epics4/obj/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/epics4/moc/*
+
+rm -f ./caQtDM_Viewer/obj/*
 rm -f ./caQtDM_Viewer/moc/*
 rm -f ./caQtDM_Viewer/parser/moc/*
 rm -f ./caQtDM_Viewer/parser/obj/*

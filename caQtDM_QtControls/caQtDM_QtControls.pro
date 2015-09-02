@@ -1,4 +1,6 @@
 include(../caQtDM_Viewer/qtdefs.pri)
+CONFIG += caQtDM_QtControls
+include(../caQtDM.pri)
 
 DEFINES += QT_NO_DEBUG_OUTPUT
 
@@ -18,69 +20,21 @@ CONFIG += console
 
 TARGET = qtcontrols
 TEMPLATE = lib
-OBJECTS_DIR = obj
-DESTDIR = $$(CAQTDM_COLLECT)
 MOC_DIR = moc
 INCLUDEPATH += src
 RESOURCES = qtcontrols.qrc
 
-ios | android {
-   CONFIG += staticlib
-   INCLUDEPATH += $$(QWTINCLUDE)
-}
-
-!ios {
-!android {
-  unix {
-    INCLUDEPATH += $$(QWTINCLUDE)
-  }
-
-  unix:!macx {
-    LIBS += -L$$(QWTLIB) -Wl,-rpath,$(QWTLIB) -lqwt
-  }
-
-  macx: {
-    CONFIG += lib_bundle
-    LIBS += -F$$(QWTLIB) -framework qwt
-  }
-}
-}
-
-win32 {
-    win32-g++ {
-      INCLUDEPATH = $(QWTHOME)/src
-      LIBS += $$(QWTLIB)/libqwt.a
-      Q
-     }
-     win32-msvc* {
-        DEFINES += QTCON_MAKEDLL _CRT_SECURE_NO_WARNINGS
-        DebugBuild {
-                OBJECTS_DIR = debug/obj
-                DESTDIR = $$(CAQTDM_COLLECT)/debug
-                INCLUDEPATH += $$(QWTINCLUDE)
-                LIBS += $$(QWTHOME)/lib/qwtd.lib
-        }
-
-        ReleaseBuild {
-		QMAKE_CXXFLAGS += /Z7
-		QMAKE_CFLAGS   += /Z7
-		QMAKE_LFLAGS   += /DEBUG /OPT:REF /OPT:ICF
-                DESTDIR = $(CAQTDM_COLLECT)
-                OBJECTS_DIR = release/obj
-                INCLUDEPATH += $$(QWTINCLUDE)
-                LIBS += $$(QWTHOME)/lib/qwt.lib
-         }
-     }
-}
 PRE_TARGETDEPS += \
      moc/moc_caslider.cpp \
      moc/moc_cacartesianplot.cpp \
      moc/moc_castripplot.cpp \
      moc/moc_cameter.cpp \
      moc/moc_caclock.cpp
+
 contains(QT_VER_MAJ, 5) {
   PRE_TARGETDEPS += moc/moc_qwt_thermo_marker_61.cpp
 }
+
 SOURCES	+= \
     src/caframe.cpp \
     src/cainclude.cpp \

@@ -50,6 +50,8 @@ caByteController::caByteController(QWidget *parent) : QWidget(parent)
     setTextColor(Qt::black);
     arrangeCells();
 
+    setElevation(on_top);
+
     installEventFilter(this);
 }
 

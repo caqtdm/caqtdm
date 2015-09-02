@@ -119,7 +119,7 @@ void epics4Subs::CreateAndConnect4(int num, QString pv)
     }
 }
 
-void epics4Subs::Epics4SetValue(int num, QString const &pv, QString const & value)
+void epics4Subs::Epics4SetValue(QString const &pv, QString const & value)
 {
     bool allOK = true;
     // create channel
@@ -128,7 +128,8 @@ void epics4Subs::Epics4SetValue(int num, QString const &pv, QString const & valu
     Channel::shared_pointer channel = provider->createChannel(pv.toLatin1().data(), channelRequesterImpl);
 
     channelRequesterImpl = dynamic_pointer_cast<ChannelRequesterImpl>(channel->getChannelRequester());
-    channelRequesterImpl->setMyData(num, m_mutexKnobData);
+    // do not know if this was necessary, I can not test any more at PSI
+    //channelRequesterImpl->setMyData(num, m_mutexKnobData);
 
     if (channelRequesterImpl->waitUntilConnected(timeOut)) {
         shared_ptr<ChannelPutRequesterImpl> putRequesterImpl(new ChannelPutRequesterImpl(channel->getChannelName()));

@@ -37,6 +37,8 @@ caTextEntry::caTextEntry(QWidget *parent) : caLineEdit(parent)
     newFocusPolicy(Qt::ClickFocus);
     this->setAcceptDrops(false);
     setFromTextEntry();
+
+    setElevation(on_top);
 }
 
 // routine not used any more
@@ -65,8 +67,8 @@ bool caTextEntry::eventFilter(QObject *obj, QEvent *event)
 		if (ev != (QKeyEvent *)0) {
 			if (ev->key() == Qt::Key_Return || ev->key() == Qt::Key_Enter) {
 				if (ev->isAutoRepeat()) {
-					//printf("keyPressEvent ignore\n");
-					event->ignore();
+                    //printf("keyPressEvent ignore\n");
+                    event->ignore();
 				}
 				else {
 					event->accept();

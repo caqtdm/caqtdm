@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V3.9.5
+CAQTDM_VERSION = V4.0
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -28,12 +28,29 @@ DEFINES += XDR_LE
 CONFIG += XDR_HACK
 }
 
+# undefine this for epics4 plugin support (only preliminary version as example)
+#CONFIG += epics4
+
+# undefine this when you need to combine caQtDM with the australian epicsqt package
+#CONFIG += australian
+
 # we can add python for calculations cacalc & visibility
 # include definitions and libraries are defined in caQtDM_Lib.pri for linux and macos
 CONFIG += PYTHONCALC
 
+
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
+
+# 4.0
+# caQtDM has now a controlsystem plugin structure. CS can be added by writing a plugin (see demo plugin) that will automatically be loaded. By specifying the plugin in front
+# of the pv name (i.e epics3://somepv) that plugin will then be used.
+# fixed a small problem while writing a string to epics (could crash)
+# the build files have been simplified
+# edl2ui enhanced (by Lucas Carvalho)
+# several warnings (mainly on mac osx) solved
+# capolyline was not resizing correctly, this has been now corrected
+# a string containing a semicolumn was only displayed up to the semicolumn, this is corrected now.
 
 # 3.9.5
 # calinedit for DBF_CHAR was missing.

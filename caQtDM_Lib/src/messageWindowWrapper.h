@@ -26,16 +26,17 @@
 #ifndef MESSAGEWINDOWWRAPPER_H
 #define MESSAGEWINDOWWRAPPER_H
 
+#include "caQtDM_Lib_global.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct MessageWindow MessageWindow;
-/*extern*/ MessageWindow* messageWindow;
-MessageWindow* C_postMsgEvent(MessageWindow* p, int type, char* msg);
+extern CAQTDM_LIBSHARED_EXPORT MessageWindow* C_postMsgEvent(MessageWindow* p, int type, char* msg);
 
 #ifdef __cplusplus
 }
 #endif
+
 
 #endif // MESSAGEWINDOWWRAPPER_H

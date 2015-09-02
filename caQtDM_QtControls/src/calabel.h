@@ -38,13 +38,12 @@ class QTCON_EXPORT caLabel : public ESimpleLabel
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
     Q_ENUMS(colMode)
 
-#include "caVisib.h"
+#include "caVisibProps.h"
+#include "caVisibDefs.h"
 
     Q_OBJECT
 
 public:
-
-#include "caVisibPublic.h"
 
     caLabel( QWidget *parent = 0 );
 
@@ -74,8 +73,6 @@ protected:
 
 
 private:
-
-#include "caVisibPrivate.h"
 
     QColor thisForeColor, thisForeColorOld;
     QColor thisBackColor, thisBackColorOld;

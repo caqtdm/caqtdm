@@ -34,9 +34,9 @@ bool HTTPCONFIGURATOR = false;
 #include <QtGui>
 
 #include "fileopenwindow.h"
-#include "caqtdm_lib.h"
 #include "specialFunctions.h"
 #include "fileFunctions.h"
+#include "loadPlugins.h"
 
 #ifdef MOBILE
   #include "fingerswipegesture.h"
@@ -96,36 +96,37 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
              break;
          case Qt::ApplicationInactive:
              qDebug() << "application state changed to inactive";
-             PrepareDeviceIO();
              pendio = false;
              if (mutexKnobData != (MutexKnobData *) 0) {
                  for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
                      knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
                      if(kPtr->index != -1)  {
                        //qDebug() << "should disconnect" << kPtr->pv;
-                       EpicsDisconnect(kPtr);
+                       ControlsInterface * plugininterface = (ControlsInterface *) kPtr->pluginInterface;
+                       plugininterface->pvDisconnect(kPtr);
                        mutexKnobData->SetMutexKnobData(i, *kPtr);
                        pendio = true;
                      }
                  }
              }
-             TerminateDeviceIO();
+             TerminateAllInterfaces();
 
              break;
          case Qt::ApplicationActive:
              qDebug() << "application state changed to active";
-
-             PrepareDeviceIO();
              pendio = false;
               if (mutexKnobData != (MutexKnobData *) 0) {
                   for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
                       knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
                       if(kPtr->index != -1) {
-                        EpicsReconnect(kPtr);
+                        ControlsInterface * plugininterface = (ControlsInterface *) kPtr->pluginInterface;
+                        if(plugininterface != (ControlsInterface *) 0) plugininterface->pvReconnect(kPtr);
                         pendio = true;
                       }
                   }
-                  if(pendio)  EpicsFlushIO();
+                  if(pendio)  {
+                      FlushAllInterfaces();
+                  }
               }
 
              break;
@@ -135,6 +136,32 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
 #endif
 }
 #endif
+
+void FileOpenWindow::FlushAllInterfaces()
+{
+    // flush all plugins
+    if(!interfaces.isEmpty()) {
+        QMapIterator<QString, ControlsInterface *> i(interfaces);
+        while (i.hasNext()) {
+            i.next();
+            ControlsInterface *plugininterface = i.value();
+            if(plugininterface != (ControlsInterface *) 0) plugininterface->FlushIO();
+        }
+    }
+}
+
+void FileOpenWindow::TerminateAllInterfaces()
+{
+    // flush all plugins
+    if(!interfaces.isEmpty()) {
+        QMapIterator<QString, ControlsInterface *> i(interfaces);
+        while (i.hasNext()) {
+            i.next();
+            ControlsInterface *plugininterface = i.value();
+            if(plugininterface != (ControlsInterface *) 0) plugininterface->TerminateIO();
+        }
+    }
+}
 
 /**
  * our main window (form) constructor
@@ -170,19 +197,22 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     QString maxBytes = (QString)  qgetenv("EPICS_CA_MAX_ARRAY_BYTES");
     if(maxBytes.size() == 0) setenv("EPICS_CA_MAX_ARRAY_BYTES", "150000000", 1);
 
-    // for epics initialize a mutex
-    InitializeContextMutex();
-
     // in case of tablets, use static plugins linked in
 #ifdef MOBILE
     Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Controllers);
     Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Monitors);
     Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Graphics);
+    Q_IMPORT_PLUGIN(DemoPlugin);
+    Q_IMPORT_PLUGIN(Epics3Plugin);
+    Q_IMPORT_PLUGIN(Epics4Plugin);
 #endif
+
+    // message window used by library and here
+    QWidget *widget =new QWidget();
+    messageWindow = new MessageWindow(widget);
 
     // create a class for exchanging data
     mutexKnobData = new MutexKnobData();
-    MutexKnobDataWrapperInit(mutexKnobData);
 
     // create form
     ui.setupUi(this);
@@ -203,9 +233,6 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 
     setWindowTitle(title);
 
-    // message window used by library and here
-    QWidget *widget =new QWidget();
-    messageWindow = new MessageWindow(widget);
 #ifdef MOBILE
     specials.setNewStyleSheet(messageWindow, qApp->desktop()->size(), 16, 10);
 #endif
@@ -374,6 +401,22 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 
     // we do not want to reload, while when closing all files, the application will also exit
     this->ui.reloadAction->setEnabled(false);
+    }
+
+    // load the control plugins (must be done after setting the environment)
+    loadPlugins loadplugins;
+    if (!loadplugins.loadAll(interfaces, mutexKnobData, messageWindow )) {
+        QMessageBox::critical(this, "Error", "Could not load any plugin");
+    } else {
+        if(!interfaces.isEmpty()) {
+            QMapIterator<QString, ControlsInterface *> i(interfaces);
+            while (i.hasNext()) {
+                char asc[256];
+                i.next();
+                sprintf(asc, "Info: plugin %s loaded", i.key().toLatin1().constData());
+                messageWindow->postMsgEvent(QtWarningMsg, asc);
+            }
+        }
     }
 
     // in case of http support, we add the temporary directory name to the CAQTDM_DISPLAY_PATH if not already set
@@ -649,7 +692,7 @@ void FileOpenWindow::Callback_OpenButton()
         QFileInfo fi(fileName);
         lastFilePath = fi.absolutePath();
         if(fi.exists()) {
-            CaQtDM_Lib *newWindow = new CaQtDM_Lib(this, fileName, "", mutexKnobData, messageWindow);
+            CaQtDM_Lib *newWindow = new CaQtDM_Lib(this, fileName, "", mutexKnobData, interfaces, messageWindow);
             if (fileName.contains("prc")) {
                 allowResize = false;
             }
@@ -817,7 +860,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         //qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString;
 
         if(printandexit) willPrint = true;
-        CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, messageWindow, willPrint);
+        CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, interfaces, messageWindow, willPrint);
 #ifdef MOBILE
         newWindow->grabSwipeGesture(fingerSwipeGestureType);
 #endif
@@ -862,11 +905,10 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
 
         //qDebug() << "set properties in qmainwindow" << mainWindow << macroString;
 
-#ifdef Q_WS_X11
         if(geometry != "") {
             parse_and_set_Geometry(mainWindow, geometry);
         }
-#endif
+
         // for this kind of file we resize to a minimum while the size is not known
         if (FileName.contains("prc")) {
             mainWindow->resize(mainWindow->minimumSizeHint());
@@ -995,7 +1037,7 @@ void FileOpenWindow::Callback_ActionReload()
                 QString fileNameFound = s->findFile();
                 fileS = fileNameFound;
 
-                CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, messageWindow);
+                CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, interfaces, messageWindow);
                 newWindow->allowResizing(allowResize);
 #ifdef MOBILE
                 newWindow->grabSwipeGesture(fingerSwipeGestureType);
@@ -1171,7 +1213,6 @@ void FileOpenWindow::fillPVtable(int &countPV, int &countNotConnected, int &coun
     }
 }
 
-#ifdef Q_WS_X11
 /**
  *   in medm geometry is passed through XParseGeometry:
  *    XParseGeometry parses strings of the form
@@ -1318,7 +1359,6 @@ void FileOpenWindow::parse_and_set_Geometry(QMainWindow *widget, QString parsest
     //qDebug() << "set window" << w << "to" << x << y << w << h;
     widget->setGeometry(x, y, w, h);
 }
-#endif
 
 void FileOpenWindow::shellCommand(QString command) {
     command = command.trimmed();

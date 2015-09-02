@@ -53,6 +53,8 @@
 #include <QWidget>
 #include <QWaitCondition>
 #include <QMessageBox>
+#include <QInputDialog>
+#include <QFileDialog>
 #ifndef MOBILE
 #include <QPrinter>
 #include <QPrintDialog>
@@ -65,6 +67,7 @@
 #include "mutexKnobData.h"
 #include "mutexKnobDataWrapper.h"
 #include "MessageWindow.h"
+#include "messageWindowWrapper.h"
 #include "JSON.h"
 #include "limitsStripplotDialog.h"
 #include "limitsCartesianplotDialog.h"
@@ -73,6 +76,7 @@
 #include "processWindow.h"
 #include "splashscreen.h"
 #include "messageQueue.h"
+#include "controlsinterface.h"
 
 #include <QtControls>
 
@@ -94,13 +98,18 @@ class CAQTDM_LIBSHARED_EXPORT CaQtDM_Lib : public QMainWindow
 
 public:
 
-    explicit CaQtDM_Lib(QWidget *parent = 0, QString="", QString="", MutexKnobData *mutexKnobData = 0, MessageWindow *msgWindow = 0, bool willPrint = false, QWidget *parentAS = 0);
+    explicit CaQtDM_Lib(QWidget *parent = 0, QString="", QString="", MutexKnobData *mutexKnobData = 0,
+                                                                     QMap<QString, ControlsInterface *> interfaces = QMap<QString, ControlsInterface *>(),
+                                                                     MessageWindow *msgWindow = 0,
+                                                                     bool willPrint = false,
+                                                                     QWidget *parentAS = 0);
     ~CaQtDM_Lib();
 
     void allowResizing(bool allowresize);
     int addMonitor(QWidget *thisW, knobData *data, QString pv, QWidget *w, int *specData, QMap<QString, QString> map, QString *pvRep);
     void ComputeNumericMaxMinPrec(QWidget* widget, const knobData &data);
     void UpdateGauge(EAbstractGauge *w, const knobData &data);
+    ControlsInterface * getControlInterface(QString plugininterface);
 
 #ifdef MOBILE
     void grabSwipeGesture(Qt::GestureType fingerSwipeGestureTypeID);
@@ -220,6 +229,7 @@ signals:
     void clicked();
     void Signal_NextWindow();
     void Signal_IosExit();
+    void fileChanged(const QString&);
 
 private:
     QTabWidget* getTabParent(QWidget *w1);
@@ -252,6 +262,7 @@ private:
     bool PrimarySoftPV(QWidget* widget, QMap<QString, QString> map);
     void setCalcToNothing(QWidget* widget);
     bool Python_Error(QWidget *w, QString message);
+    void FlushAllInterfaces();
 
 #ifdef MOBILE
     bool eventFilter(QObject *obj, QEvent *event);
@@ -298,6 +309,13 @@ private:
     int loopTimer;
     int loopTimerID;
 
+    QMap<QString, ControlsInterface*> controlsInterfaces;
+    MutexKnobData *mutexKnobDataP;
+    MessageWindow *messageWindowP;
+
+    QFileSystemWatcher *watcher;
+
+
 #ifdef epics4
     epics4Subs *Epics4;
 #endif
@@ -328,9 +346,10 @@ private slots:
     void DisplayContextMenu(QWidget* w);
     void Callback_TextEntryChanged(const QString &);
     void Callback_WaveEntryChanged(const QString &, int index);
-
     void processTerminated();
     void closeWindow();
+    void updateTextBrowser();
+    void handleFileChanged(const QString&);
 };
 
 #endif // CaQtDM_Lib_H

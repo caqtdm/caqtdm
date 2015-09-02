@@ -23,7 +23,9 @@
  *    anton.mezger@psi.ch
  */
 
+
 #include "MessageWindow.h"
+#include "messageWindowWrapper.h"
 #include <QCoreApplication>
 #include <QMutexLocker>
 #include <stdio.h>
@@ -85,7 +87,7 @@ void MessageWindow::AppendMsgWrapper(QtMsgType type, char* msg)
 {
         static QMutex mutex;
         QMutexLocker locker(&mutex);
-        
+
         if (MessageWindow::MsgHandler != NULL)
                 return MessageWindow::MsgHandler->postMsgEvent(type, msg);
         else
@@ -93,7 +95,7 @@ void MessageWindow::AppendMsgWrapper(QtMsgType type, char* msg)
 }
 
 void MessageWindow::customEvent(QEvent* event)
-{    
+{
         if (static_cast<MessageWindow::EventType>(event->type()) == MessageWindow::MessageEvent) {
 #ifdef __MINGW32__
                 msgTextEdit.append(dynamic_cast<typename MessageEvent::MessageEvent* >(event)->msg);
@@ -129,7 +131,7 @@ void MessageWindow::postMsgEvent(QtMsgType type, char* msg)
                         qmsg.append("</FONT></B>");
                         break;
         }
-        //it's impossible to change GUI directly from thread other than the main thread 
+        //it's impossible to change GUI directly from thread other than the main thread
         //so post message encapsulated by MessageEvent to the main thread's event queue
 #ifdef __MINGW32__
         QCoreApplication::postEvent(this, new typename MessageEvent::MessageEvent(qmsg));

@@ -1,58 +1,88 @@
 include (../caQtDM_Viewer/qtdefs.pri)
+CONFIG += caQtDM_Lib
+include(../caQtDM.pri)
 
-unix {
-  TEMPLATE = subdirs
-  SUBDIRS = caQtDM_Lib1
-  exists("/home/ACS/Control/Lib/libDEV.so") {
-         SUBDIRS += caQtDM_Lib2
-  }
+QT += core gui
+
+contains(QT_VER_MAJ, 4) {
+   CONFIG   += qt thread uitools plugin
 }
 
-win32 {
-  win32-msvc* {
-        DEFINES +=_CRT_SECURE_NO_WARNINGS
-        DEFINES += CAQTDM_LIB_LIBRARY
-        TEMPLATE = lib
-        
-        DebugBuild {
-                EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
-                DESTDIR = $(CAQTDM_COLLECT)/debug
-                OBJECTS_DIR = debug/obj
-                LIBS += $$(QWTHOME)/lib/qwtd.lib
-                LIBS += $${EPICS_LIBS}/ca.lib
-                LIBS += $${EPICS_LIBS}/COM.lib
-                LIBS += $(CAQTDM_COLLECT)/debug/qtcontrols.lib
-        }
-        ReleaseBuild {
-                QMAKE_CXXFLAGS += /Z7
-                QMAKE_CFLAGS   += /Z7
-                QMAKE_LFLAGS   += /DEBUG /OPT:REF /OPT:ICF
-                EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
-                DESTDIR = $(CAQTDM_COLLECT)
-                OBJECTS_DIR = release/obj
-                LIBS += $$(QWTHOME)/lib/qwt.lib
-                LIBS += $${EPICS_LIBS}/ca.lib
-                LIBS += $${EPICS_LIBS}/COM.lib
-                LIBS += $(CAQTDM_COLLECT)/qtcontrols.lib
-                
-        }
-   }
-   win32-g++ {
-        EPICS_LIBS=$$(EPICS_BASE)/lib/win32-x86-mingw
-	LIBS += $$(QWTLIB)/libqwt.a
-	LIBS += $$(QTCONTROLS_LIBS)/release//libqtcontrols.a
-	LIBS += $${EPICS_LIBS}/ca.lib
-	LIBS += $${EPICS_LIBS}/COM.lib
-	QMAKE_POST_LINK = $${QMAKE_COPY} .\\release\\caQtDM_Lib.dll ..\caQtDM_Binaries
-   }
-
-   INCLUDEPATH += $$(EPICS_BASE)/include
-   INCLUDEPATH += $$(EPICS_BASE)/include/os/win32
+contains(QT_VER_MAJ, 5) {
+    QT     += widgets printsupport uitools
+    CONFIG += qt plugin thread
+    DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 }
 
+CONFIG   += warn_on
+
+TARGET = caQtDM_Lib
+
+TEMPLATE = lib
 MOC_DIR = ./moc
 VPATH += ./src
-INCLUDEPATH += ./src
 UI_DIR += ./
+
+INCLUDEPATH += .
+INCLUDEPATH += ./src
+INCLUDEPATH += ./caQtDM_Plugins
 INCLUDEPATH += ../caQtDM_QtControls/src
-include (./caQtDM_Lib.pri)
+INCLUDEPATH += $(QWTINCLUDE)
+INCLUDEPATH += $(EPICSINCLUDE)
+
+SOURCES += caqtdm_lib.cpp \
+    mutexKnobData.cpp \
+    MessageWindow.cpp \
+    vaPrintf.c \
+    myMessageBox.cpp \
+    limitsStripplotDialog.cpp \
+    limitsCartesianplotDialog.cpp \
+    limitsDialog.cpp \
+    sliderDialog.cpp \
+    processWindow.cpp \
+    splashscreen.cpp \
+    myQProcess.cpp \
+    loadPlugins.cpp
+    
+
+HEADERS += caqtdm_lib.h\
+        caQtDM_Lib_global.h \
+    mutexKnobDataWrapper.h \
+    mutexKnobData.h \
+    knobDefines.h \
+    knobData.h \
+    dbrString.h \
+    alarmstrings.h \
+    MessageWindow.h \
+    messageWindowWrapper.h \
+    vaPrintf.h \
+    myMessageBox.h \
+    limitsStripplotDialog.h \
+    limitsDialog.h \
+    limitsCartesianplotDialog.h \
+    sliderDialog.h \
+    processWindow.h \
+    splashscreen.h \
+    epicsExternals.h \
+    myQProcess.h \
+    inlines.h \
+    loadPlugins.h
+
+HEADERS += \
+    JSONValue.h \
+    JSON.h
+
+SOURCES += \
+    JSONValue.cpp \
+    JSON.cpp
+
+#if we want some info from the australian lightsource, define it above
+australian: {
+  DEFINES +=_AUSTRALIAN
+  INCLUDEPATH += ../../../epicsQt/2.8.1/framework/widgets/include
+  INCLUDEPATH += ../../../epicsQt/2.8.1/framework/data/include
+  INCLUDEPATH += ../../../epicsQt/2.8.1/framework/api/include
+  INCLUDEPATH += ../../../epicsQt/2.8.1/framework/common
+  LIBS += -L$(QTBASE)/designer -lQEPlugin
+}
+

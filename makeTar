@@ -1,4 +1,4 @@
 #!/bin/bash
 caQtDM_CleanAll
 
-tar cvf QtDM_Package.tar -X tarExcludes.txt all.pro COPYING caQtDM_README caQtDM_BuildAll caQtDM_CleanAll caQtDM_Env caQtDM_Install caQtDM_Viewer caQtDM_Lib caQtDM_QtControls caQtDM_Tests qtdesigner startDM startDM_Local proscan.epics
+tar cvf QtDM_Package.tar -X tarExcludes.txt all.pro caQtDM.pri COPYING caQtDM_README caQtDM_BuildAll caQtDM_CleanAll caQtDM_Env caQtDM_Install caQtDM_Viewer caQtDM_Lib caQtDM_QtControls caQtDM_Tests qtdesigner startDM startDM_Local proscan.epics

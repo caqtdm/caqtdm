@@ -200,7 +200,10 @@ void caLineEdit::setColors(QColor bg, QColor fg, QColor frame, int lineWidth)
                     arg(lc.red()).arg(lc.green()).arg(lc.blue()).arg(lc.alpha()).
                     arg(dc.red()).arg(dc.green()).arg(dc.blue()).arg(dc.alpha()).
                     arg(defSelectColor.red()).arg(defSelectColor.green()).arg(defSelectColor.blue()).arg(defSelectColor.alpha());
-            setStyleSheet(thisStyle);
+
+            if(thisStyle != oldStyle) {
+                setStyleSheet(thisStyle);
+            }
             oldStyle = thisStyle;
         }
     }

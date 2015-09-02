@@ -23,30 +23,40 @@
  *    anton.mezger@psi.ch
  */
 
-#if defined(_MSC_VER)
- #define NOMINMAX
-#endif
+#ifndef EPICSEXTERNALS_H
+#define EPICSEXTERNALS_H
 
-
-#include "dbrString.h"
-#include "knobDefines.h"
-
-#include "knobData.h"
-#include "mutexKnobData.h"
-#include "mutexKnobDataWrapper.h"
 #include "caQtDM_Lib_global.h"
+#include <stdint.h>
+#include "knobDefines.h"
+#include "knobData.h"
+
+
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
-MutexKnobData* KnobDataPtr;
+
+int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
+int EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess);
+int EpicsGetTimeStamp(char *pv, char *timestamp);
+int EpicsGetDescription(char *pv, char *description);
+void clearEvent(void * ptr);
+void addEvent(void * ptr);
+void EpicsReconnect(knobData *kData);
+void EpicsDisconnect(knobData *kData);
+void EpicsFlushIO();
+void DestroyContext();
+void PrepareDeviceIO();
+void TerminateDeviceIO();
+void InitializeContextMutex();
+int  CreateAndConnect(int index, knobData *kData, int rate, int skip);
+void ClearMonitor(knobData *kData);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
-CAQTDM_LIBSHARED_EXPORT void MutexKnobDataWrapperInit(MutexKnobData* KnobData)
-{
-    KnobDataPtr = KnobData;
-}
+
+#endif //EPICSEXTERNALS_H

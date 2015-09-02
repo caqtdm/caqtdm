@@ -46,6 +46,8 @@ Q_OBJECT
     Q_PROPERTY(double maxValue READ getMaxValue WRITE setMaxValue)
     Q_PROPERTY(double minValue READ getMinValue WRITE setMinValue)
 
+#include "caElevation.h"
+
 public:
 
      caNumeric(QWidget *parent);

@@ -67,7 +67,7 @@ public:
      ~epics4Subs();
     void CreateAndConnect4(int num, QString pv);
     void ParseScalar(PVScalarPtr const & pv);
-    void Epics4SetValue(int num, QString const &pv, QString const & value);
+    void Epics4SetValue(QString const &pv, QString const & value);
     void ParsePVStructure(PVStructurePtr const & pvStructure, QString const & value);
     void fromString(PVScalarPtr const & pvScalar, QString const & value);
 

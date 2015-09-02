@@ -317,7 +317,6 @@ void parserClass::readCommentsAndVersion (FILE *f)
 
 FILE *parserClass::openAny (char *name, char *mode )
 {
-    char buf[255+1];
     FILE *f;
 
     f = fopen( name, mode );

@@ -1,4 +1,4 @@
-/*
+ /*
  *  This file is part of the caQtDM Framework, developed at the Paul Scherrer Institut,
  *  Villigen, Switzerland
  *
@@ -22,8 +22,10 @@
  *  Contact details:
  *    anton.mezger@psi.ch
  */
-
-    enum  Visibility { StaticV,
+ 
+ public:
+   
+      enum  Visibility { StaticV,
       IfNotZero,
       IfZero,
       Calc
@@ -46,4 +48,9 @@
 
     QString getChannelD() const {return thisChannelD;}
     void setChannelD(QString const &pv) {thisChannelD = pv;}
-
+    
+ private:
+   
+    QString thisChannelA, thisChannelB, thisChannelC, thisChannelD;
+    Visibility thisVisibility;
+    QString thisVisibilityCalc;

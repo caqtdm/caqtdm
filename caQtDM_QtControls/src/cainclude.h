@@ -44,11 +44,10 @@ class  QTCON_EXPORT caInclude : public QWidget
     Q_PROPERTY(QString macro READ getMacro WRITE setMacro)
     Q_PROPERTY(QString filename READ getFileName WRITE setFileName)
 
-#include "caVisib.h"
+#include "caVisibProps.h"
+#include "caVisibDefs.h"
 
 public:
-
-#include "caVisibPublic.h"
 
     caInclude( QWidget *parent = 0 );
     ~caInclude();
@@ -75,8 +74,6 @@ protected:
       void paintEvent( QPaintEvent* );
 
 private:
-
-#include "caVisibPrivate.h"
 
     QString newFileName;
     QString prvFileName;

@@ -1,5 +1,7 @@
 #include "tag_pkg.h"
 
+#define UNUSED(x) (void)(x)
+
 static int g_genDocFlag = 0;
 
 #define MAXLEVEL 5
@@ -1171,7 +1173,7 @@ int tagClass::loadR (
         void *_ci,
         int *destination
         ) {
-
+    UNUSED(_ci);
     tagName[numTags] = tag;
     tagDestination[numTags] = (void *) destination;
     tagDestType[numTags] = tagClass::COLOR;
@@ -1205,7 +1207,7 @@ int tagClass::loadR (
   int *destination,
   int *numElements
 ) {
-
+    UNUSED(_ci);
   tagName[numTags] = tag;
   tagDestination[numTags] = (void *) destination;
   tagDestMaxSize[numTags] = maxLen;

@@ -36,7 +36,8 @@
 #include <math.h>
 #include <stdarg.h>
 #include <string.h>
+#include "caQtDM_Lib_global.h"
 
-char* vaPrintf(const char *fmt, ...);
+extern CAQTDM_LIBSHARED_EXPORT  char* vaPrintf(const char *fmt, ...);
 
 #endif // VAPRINTF_H

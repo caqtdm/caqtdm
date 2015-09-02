@@ -23,14 +23,18 @@
  *    anton.mezger@psi.ch
  */
 
-#ifndef __ACSSUBS_INC__
-#define __ACSSUBS_INC__
+    Q_PROPERTY(Elevation elevation READ getElevation WRITE setElevation)
+    Q_ENUMS(Elevation)
+    
+public:
+   
+    enum  Elevation {on_top, as_is};
 
-void StartPIOserver();
-int  AddValueCell(char *name, int indx, char *aux);
-int  RemoveValueCell(int indx);
-int  SetActivCell(char *name);
-int  SetDeviceFloatValue(char *name, float *value);
-int  SetDeviceStringValue(char *name, char *data);
-
-#endif
+    Elevation getElevation() const {return thisElevation;}
+    void setElevation(Elevation s) {thisElevation = s;}
+    bool isElevated() { if(thisElevation == on_top) return true; else return false;}
+    
+ private:
+  
+    Elevation thisElevation;
+    

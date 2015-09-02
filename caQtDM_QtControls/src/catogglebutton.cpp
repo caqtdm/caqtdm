@@ -53,6 +53,8 @@ caToggleButton::caToggleButton(QWidget *parent) : QCheckBox(parent), FontScaling
     setAccessW(true);
 
     setFontScaleModeL(WidthAndHeight);
+
+    setElevation(on_top);
 }
 
 void  caToggleButton::buttonToggled()

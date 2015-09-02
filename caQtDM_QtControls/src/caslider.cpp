@@ -101,6 +101,8 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
     repeatTimer = new QTimer(this);
     repeatTimer->setInterval(200);
     connect(repeatTimer, SIGNAL(timeout()), this, SLOT(repeater()));
+
+    setElevation(on_top);
 }
 
 QString caSlider::getPV() const

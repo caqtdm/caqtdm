@@ -1,0 +1,3 @@
+hello everybody, this is a text file read by Qt. <br>
+you may also use macro substitution in its filename <br>
+The file is normally watched for changes and reloaded if any <br>

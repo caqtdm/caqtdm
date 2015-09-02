@@ -35,7 +35,6 @@ echo
 echo ========== macdeployqt caQtDM ============
 echo
 
-
 macdeployqt ./caQtDM_Binaries/caQtDM.app -executable=./caQtDM_Binaries/caQtDM.app/Contents/MacOS/caQtDM
 
 echo
@@ -45,6 +44,38 @@ echo
 rm -rf ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/Headers
 rm -rf ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/QtOpenGL_debug
 rm -f ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/*.prl
+
+echo 
+echo ========== prepare controls plugin directories ==========
+echo
+mkdir ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/controlsystems
+
+echo 
+echo ========== copy constrolsystem plugins ==============
+echo 
+cp ./caQtDM_Binaries/controlsystems/*.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/controlsystems/
+
+echo
+echo ========== change plugin libs =============
+echo
+echo ++++++++++ demo controls lib ++++++++
+install_name_tool -change libcaQtDM_Lib.dylib @executable_path/../Frameworks/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libdemo_plugin.dylib
+install_name_tool -change $QTHOME/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libdemo_plugin.dylib
+install_name_tool -change $QTHOME/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libdemo_plugin.dylib
+
+echo ++++++++++ epics3 controls lib ++++++++
+install_name_tool -change libcaQtDM_Lib.dylib @executable_path/../Frameworks/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
+install_name_tool -change $QTHOME/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
+install_name_tool -change $QTHOME/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
+install_name_tool -change "${EPICSLIB}/libca.3.14.12.dylib" "@executable_path/../Frameworks/libca.3.14.12.dylib" ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
+install_name_tool -change "${EPICSLIB}/libCom.3.14.12.dylib" "@executable_path/../Frameworks/libCom.3.14.12.dylib" ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
+
+echo ++++++++++ epics4 controls lib ++++++++
+install_name_tool -change libcaQtDM_Lib.dylib @executable_path/../Frameworks/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics4_plugin.dylib
+install_name_tool -change $QTHOME/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics4_plugin.dylib
+install_name_tool -change $QTHOME/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore .//caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics4_plugin.dylib
+install_name_tool -change "${EPICSLIB}/libca.3.14.12.dylib" "@executable_path/../Frameworks/libca.3.14.12.dylib" ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
+install_name_tool -change "${EPICSLIB}/libCom.3.14.12.dylib" "@executable_path/../Frameworks/libCom.3.14.12.dylib" ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
 
 
 echo
@@ -132,7 +163,6 @@ echo
 cp -R ${QTHOME}/bin/Designer.app ./caQtDM_Binaries/
 mkdir ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
 
-
 cp ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libqtcontrols.dylib ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
 cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
 cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtSvg.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
@@ -141,7 +171,6 @@ cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtConcurrent.framework ./
 
 mkdir ./caQtDM_Binaries//Designer.app/Contents/PlugIns
 mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer
-
 cp ./caQtDM_Binaries/designer/*.dylib ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer/
 macdeployqt ./caQtDM_Binaries/Designer.app
 install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer/libqtcontrols_controllers_plugin.dylib 

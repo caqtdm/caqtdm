@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<manifest package="psi.qtproject.caQtDM" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.0" android:versionCode="1" android:installLocation="auto">
-    <application android:hardwareAccelerated="true" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:label="caQtDM" android:icon="@drawable/caqtdm762x">
-        <activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|locale|fontScale|keyboard|keyboardHidden|navigation" android:name="org.qtproject.qt5.android.bindings.QtActivity" android:label="caQtDM" android:screenOrientation="landscape" android:launchMode="singleTop">
+<manifest package="org.qtproject.caQtDM" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="4.0" android:versionCode="4" android:installLocation="auto">
+    <application android:hardwareAccelerated="true" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:label="caQtDM" android:icon="@drawable/icon">
+        <activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|locale|fontScale|keyboard|keyboardHidden|navigation" android:name="org.qtproject.qt5.android.bindings.QtActivity" android:label="-- %%INSERT_APP_NAME%% --" android:screenOrientation="landscape" android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -28,7 +28,10 @@
             <!--  Messages maps -->
 
             <!-- Splash screen -->
-            <meta-data android:name="android.app.splash_screen_drawable" android:resource="@drawable/startscreenlandscape"/>
+            <!--
+            <meta-data android:name="android.app.splash_screen_drawable" android:resource="@drawable/logo"/>
+            -->
+            <!-- Splash screen -->
 
             <!-- Background running -->
             <!-- Warning: changing this value to true may cause unexpected crashes if the
@@ -50,10 +53,6 @@
          Remove the comment if you do not require these default features. -->
     <!-- %%INSERT_FEATURES -->
 
-<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+<uses-permission android:name="android.permission.PERSISTENT_ACTIVITY"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 </manifest>

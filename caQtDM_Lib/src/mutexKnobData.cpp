@@ -633,7 +633,7 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
 
     // seems somebody did not know how to code mu in EGU
     StringUnits.replace("?A", uAs);
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(MOBILE_ANDROID)
     StringUnits.replace(0x00B5, "u");
 #endif
     // assume we have a mu on first position (not nice, but I do not know better)

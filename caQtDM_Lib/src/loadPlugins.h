@@ -23,7 +23,25 @@
  *    anton.mezger@psi.ch
  */
 
-    QString thisChannelA, thisChannelB, thisChannelC, thisChannelD;
-    Visibility thisVisibility;
-    QString thisVisibilityCalc;
+#include <QDir>
+#include <QDebug>
+#include <QApplication>
+#include <QPluginLoader>
+#include "caQtDM_Lib_global.h"
+#include "MessageWindow.h"
+#include "controlsinterface.h"
 
+class CAQTDM_LIBSHARED_EXPORT loadPlugins
+{
+
+public:
+   loadPlugins();
+   ~loadPlugins() {}
+
+   bool loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKnobData *mutexKnobData = 0, MessageWindow *messageWindow = 0);
+   void printPlugins(const QMap<QString,ControlsInterface*> interfaces);
+
+private:
+     ControlsInterface *controlsInterface;
+};   
+    
