@@ -376,7 +376,6 @@ caQtDM_Viewer {
 
 		TARGET = caQtDM
 		TEMPLATE = app
-		include (./caQtDM.pri)
 		MOC_DIR = moc
 		VPATH += ./src
 		

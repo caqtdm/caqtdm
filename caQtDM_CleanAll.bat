@@ -5,8 +5,8 @@ echo ===========================================================================
 if "%CAQTDM_GENERAL_COMPILATION%"=="1" GOTO :clean
 call caQtDM_Env.bat
 
-call "C:\Program files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
-set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
+rem call "C:\Program files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
+rem set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
 set PATH=%PATH%;%QTHOME%\bin
 
 echo package will be removed from .\caQtDM_Binaries and all directories will be cleaned up
@@ -27,6 +27,13 @@ del .\caQtDM_Viewer\parser\Makefile*
 del .\caQtDM_Viewer\parserEDM\Makefile*
 del .\caQtDM_Lib\Makefile*
 
+del .\caQtDM_Lib\caQtDM_Plugins\Makefile*
+del .\caQtDM_Lib\caQtDM_Plugins\demo\Makefile*
+del .\caQtDM_Lib\caQtDM_Plugins\epics3\Makefile*
+del .\caQtDM_Lib\caQtDM_Plugins\epics4\Makefile*
+
+
+
 del .\caQtDM_QtControls\Makefile*
 del .\caQtDM_QtControls\plugins\Makefile*
 
@@ -42,10 +49,22 @@ rmdir /S /Q .\caQtDM_Viewer\parserEDM\release
 rmdir /S /Q .\caQtDM_Viewer\parserEDM\debug
 rmdir /S /Q .\caQtDM_Viewer\parserEDM\moc
 
+
 rmdir /S /Q .\caQtDM_Lib\release
 rmdir /S /Q .\caQtDM_Lib\debug
 rmdir /S /Q .\caQtDM_Lib\moc
 
+rmdir /S /Q .\caQtDM_Lib\caQtDM_Plugins\demo\release
+rmdir /S /Q .\caQtDM_Lib\caQtDM_Plugins\demo\debug
+rmdir /S /Q .\caQtDM_Lib\caQtDM_Plugins\demo\moc
+
+rmdir /S /Q .\caQtDM_Lib\caQtDM_Plugins\epics3\release
+rmdir /S /Q .\caQtDM_Lib\caQtDM_Plugins\epics3\debug
+rmdir /S /Q .\caQtDM_Lib\caQtDM_Plugins\epics3\moc
+
+rmdir /S /Q .\caQtDM_Lib\caQtDM_Plugins\epics4\release
+rmdir /S /Q .\caQtDM_Lib\caQtDM_Plugins\epics4\debug
+rmdir /S /Q .\caQtDM_Lib\caQtDM_Plugins\epics4\moc
 
 rmdir /S /Q .\caQtDM_QtControls\release
 rmdir /S /Q .\caQtDM_QtControls\debug
