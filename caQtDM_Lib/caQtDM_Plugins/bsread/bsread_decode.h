@@ -3,6 +3,7 @@
 
 #include <QThread>
 #include <QList>
+#include <QAtomicInt>
 #include "knobData.h"
 #include "mutexKnobData.h"
 #include "bsread_channeldata.h"
@@ -48,7 +49,9 @@ private:
     int channelcounter;
     QList<bsread_channeldata*> Channels;
     QMap<QString,bsread_channeldata*> ChannelSearch;
+
     QList<int> listOfIndexes;
+    QList<QString> listOfRequestedChannels;
     void bsread_SetChannelData(void *message);
     void bsread_SetChannelTimeStamp(void * timestamp);
     void bsread_EndofData();

@@ -1,5 +1,6 @@
 #include <QThread>
 #include <QDebug>
+#include <QAtomicInt>
 #include "zmq.h"
 #include <exception>
 #include "bsread_decode.h"
@@ -8,7 +9,6 @@
 #include "JSONValue.h"
 #include "bsread_channeldata.h"
 
-//Q_DECLARE_METATYPE(bsread_channeldata)
 
 bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint)
 {
@@ -393,7 +393,14 @@ void bsread_Decode::bsread_DataTimeOut(){
     }
 }
 void bsread_Decode::bsread_Delay(){
-    QThread::msleep(5);
+ // This only works Qt5
+    //QThread::msleep(5);
+#ifdef linux
+    usleep(5000);
+#else
+    Sleep::msleep(5);
+#endif
+
 }
 
 
@@ -401,22 +408,24 @@ void bsread_Decode::bsread_Delay(){
 bool bsread_Decode::bsread_DataMonitorConnection(knobData *kData){
     QMutexLocker locker(&mutex);
     QString key = kData->pv;
-    bool result = false;
+    //bool result = false;
 
-    QMap<QString, bsread_channeldata*>::const_iterator i = ChannelSearch.find(key);
+    //QMap<QString, bsread_channeldata*>::const_iterator i = ChannelSearch.find(key);
 
-    while (i != ChannelSearch.end() && i.key() == key) {
+    //while (i != ChannelSearch.end() && i.key() == key) {
         listOfIndexes.append(kData->index);
-        qDebug() << "Index :" << kData->index << key;
-        result = true;
-        ++i;
-    }
-    return result;
+        listOfRequestedChannels.append(kData->pv);
+        qDebug() << "Index :" << kData->index << kData->pv;
+
+//        ++i;
+    //}
+    return true;
 }
 
 bool bsread_Decode::bsread_DataMonitorUnConnect(knobData *kData){
     QMutexLocker locker(&mutex);
     listOfIndexes.removeAll(kData->index);
+    listOfRequestedChannels.removeAll(kData->pv);
     hash="";
     return true;
 }
