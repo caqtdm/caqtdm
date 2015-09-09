@@ -36,9 +36,13 @@ ImageWidget::ImageWidget(QWidget *parent) : QWidget(parent)
     imageOffset.setX(0);
     imageOffset.setY(0);
     for(int i=0; i<4; i++) {
-        drawValues[i] =false;
-        geoValues[i] = 0;
+        readValuesPresentL[i] =false;
+        georeadValues[i] = 0;
+        geowriteValues[i] = 0;
     }
+    scaleFactorL = 1.0;
+    firstSelection = true;
+    selectionInProgress = false;
 }
 
 void ImageWidget::getImageDimensions(int &width, int &height)
@@ -53,8 +57,32 @@ void ImageWidget::updateDisconnected()
     update();
 }
 
+QPolygonF ImageWidget::getHead( QPointF p1, QPointF p2, int arrowSize ) {
+    qreal Pi = 3.14;
+    QPolygonF arrowHead;
+    QLineF m_line = QLineF( p1, p2 );
+    double angle = ::acos( m_line.dx() / m_line.length() );
+
+    if ( m_line.dy() >= 0 )  angle = ( Pi * 2 ) - angle;
+
+    QPointF arrowP1 = m_line.p1() + QPointF( sin( angle + Pi / 3 ) * arrowSize,
+                                             cos( angle + Pi / 3 ) * arrowSize );
+    QPointF arrowP2 = m_line.p1() + QPointF( sin( angle + Pi - Pi / 3 ) * arrowSize,
+                                             cos( angle + Pi - Pi / 3 ) * arrowSize );
+
+    arrowHead.clear();
+    arrowHead << m_line.p1() << arrowP1 << arrowP2 << m_line.p1();
+    return arrowHead;
+}
+
 void ImageWidget::paintEvent(QPaintEvent * event)
 {
+    int xnew, ynew, width , height;
+    QPolygonF lines, head1, head2;
+    QPointF p1, p2;
+    QRect selectionRect;
+    bool present[4];
+
     Q_UNUSED(event);
     QPainter painter(this);
 
@@ -72,41 +100,267 @@ void ImageWidget::paintEvent(QPaintEvent * event)
         return;
     }
 
-    painter.drawImage(imageOffset,imageNew);
+    //painter.drawImage(imageOffset,imageNew);
+    // this will only draw the image on the exposed rectangle
+     QRect exposedRect = painter.matrix().inverted()
+                         .mapRect(event->rect())
+                         .adjusted(-1, -1, 1, 1);
+     painter.drawImage(exposedRect, imageNew, exposedRect);
 
-    if(simpleView) return;
 
+    if(selectSimpleViewL) return;
+
+    // draw a rounded rectangle around the image
+    width = imageNew.size().width();
+    height = imageNew.size().height();
     painter.setPen(Qt::blue);
-
-    int width = imageNew.size().width();
-    int height = imageNew.size().height();
-
     painter.drawRoundedRect(0,0,width-1, height-1, 10.0, 10.0);
 
-    for(int i=0; i<2; i++) {
-        if(i==0) painter.setPen( QPen( Qt::white )); else painter.setPen( QPen( Qt::black ));
-        if(!drawValues[0]) return;
-        if(drawValues[0]) {
-            if(i==0)painter.drawLine(geoValues[0], 0, geoValues[0], this->height());
-            else painter.drawLine(geoValues[0]+1, 0, geoValues[0]+1, this->height());
-        }
-        if(geoValues[1] <= 0) return;
-        if(drawValues[1]) {
-            if(i==0) painter.drawLine(0, geoValues[1], this->width(), geoValues[1]);
-            else painter.drawLine(0, geoValues[1]+1, this->width(), geoValues[1]+1);
-        }
-        if((geoValues[0] -geoValues[2]/2) <= 1) return;
-        if((geoValues[1] -geoValues[3]/2) <= 1) return;
-        if(drawValues[0] && drawValues[1] && drawValues[2] && drawValues[3]) {
-            if(i==0)painter.drawRect(geoValues[0] -geoValues[2]/2, geoValues[1]-geoValues[3]/2, geoValues[2], geoValues[3]);
-            else painter.drawRect(geoValues[0] -geoValues[2]/2 - 1, geoValues[1]-geoValues[3]/2 - 1, geoValues[2] + 2, geoValues[3] + 2);
-        }
+    // grey selection area during mouse selection
+    if(selectionInProgress && ((writemarkerTypeL == box) || writemarkerTypeL == box_crosshairs)) {
+        painter.setPen(QPen(QBrush(QColor(0,0,0,180)),1,Qt::DashLine));
+        painter.setBrush(QBrush(QColor(255,255,255,120)));
+    } else {
+        painter.setPen(QPen(QBrush(QColor(0,0,0,0)),1,Qt::DashLine));
+        painter.setBrush(QBrush(QColor(255,255,255,0)));
     }
+    selectionRect.setCoords(selectionPointsL[0].x(), selectionPointsL[0].y(), selectionPointsL[1].x(), selectionPointsL[1].y());
+    painter.drawRect(selectionRect);
 
-    if(selectionStarted) {
-      painter.setPen(QPen(QBrush(QColor(0,0,0,180)),1,Qt::DashLine));
-      painter.setBrush(QBrush(QColor(255,255,255,120)));
-      painter.drawRect(selectionRect);
+    painter.setBrush(Qt::NoBrush);
+    painter.setCompositionMode(QPainter::RasterOp_SourceAndNotDestination);
+
+    // loop on readback values and selection rectangle
+    for(int j=0; j<2; j++) {
+        ROI_type TypeL;
+        ROI_markertype markerTypeL;
+        int values[4];
+
+        lines.clear();
+        head1.clear();
+        head2.clear();
+
+        // readback values display
+        if(j==0) {
+            if(!readValuesPresentL[0]) return;
+            if(georeadValues[1] <= 0) return;
+            if(georeadValues[0] <= 0) return;
+            TypeL = readTypeL;
+            markerTypeL = readmarkerTypeL;
+            for(int i=0; i<4; i++) {
+                present[i] = readValuesPresentL[i];
+                values[i] = georeadValues[i];
+            }
+           painter.setPen(QPen(Qt::red,2, Qt::SolidLine));
+
+        // selection rectangle display
+        } else {
+            TypeL = writeTypeL;
+            markerTypeL = writemarkerTypeL;
+            // selection is present
+            for(int i=0; i<4; i++) present[i] = true;
+            painter.setPen(QPen(Qt::green,2, Qt::SolidLine));
+
+            // prepare from the selection rectangle the requested values
+            switch (TypeL) {
+            case none:
+                return;
+            case xy_only:
+                values[0] = selectionRect.center().x();
+                values[1] = selectionRect.center().y();
+                break;
+            case xy1_xy2:
+                values[0] = selectionPointsL[0].x();
+                values[1] = selectionPointsL[0].y();
+                values[2] = selectionPointsL[1].x();
+                values[3] = selectionPointsL[1].y();
+                break;
+            case xyUpleft_xyLowright:
+                values[0] = selectionRect.topLeft().x();
+                values[1] = selectionRect.topLeft().y();
+                values[2] = selectionRect.bottomRight().x();
+                values[3] = selectionRect.bottomRight().y();
+                break;
+            case xycenter_width_height:
+                values[0] = selectionRect.center().x();
+                values[1] = selectionRect.center().y();
+                values[2] = selectionRect.width();
+                values[3] = selectionRect.height();
+                break;
+            default:
+                return;
+            }
+            for(int i=0; i<4; i++) values[i] = qRound(values[i] * scaleFactorL);
+        }
+
+
+        switch (TypeL) {
+
+        //-----------------------------------------------------------------------------------------------------------------
+        case none:
+            break;
+
+            //-----------------------------------------------------------------------------------------------------------------
+        case xy_only:
+            if(!present[0] || !present[1]) break;
+            // vertical and horizontal
+            painter.drawLine(values[0], 0, values[0], this->height());
+            painter.drawLine(0, values[1], this->width(), values[1]);
+
+            switch (markerTypeL) {
+            case box:
+            case box_crosshairs:
+            case line:
+            case arrow:
+                break;
+            default:
+                break;
+            }
+
+            break;
+
+            //-----------------------------------------------------------------------------------------------------------------
+        case xy1_xy2:
+
+            // vertical and horizontal
+            xnew = (values[0] + values[2]) / 2;
+            ynew = (values[1] + values[3]) / 2;
+            if(!present[0] || !present[1] || !present[2] || !present[3]) break;
+
+            switch (markerTypeL) {
+            case box_crosshairs:
+                // vertical and horizontal
+                painter.drawLine(xnew, 0, xnew, this->height());
+                painter.drawLine(0, ynew, this->width(), ynew);
+            case box:
+                selectionRect.setCoords(values[0], values[1], values[2], values[3]);
+                painter.drawRect(selectionRect);
+                break;
+
+            case line:
+                p1 = QPointF( values[0], values[1]);
+                p2 = QPointF( values[2], values[3]);
+                lines.append(p1);
+                lines.append(p2);
+                painter.drawPolygon(lines);
+                break;
+
+            case arrow:
+                p1 = QPointF( values[0], values[1]);
+                p2 = QPointF( values[2], values[3]);
+                lines.append(p1);
+                lines.append(p2);
+
+                head1 = getHead(p1,p2, qRound(sqrt(0.5 * qMin(width,  height))));
+                head2 = getHead(p2,p1, qRound(sqrt(0.5 * qMin(width,  height))));
+                for(int j=0; j<head1.count(); j++) lines.append(head1.at(j));
+                for(int j=0; j<head2.count(); j++) lines.append(head2.at(j));
+                painter.drawPolygon(lines);
+                break;
+
+            default:
+                // do nothing
+                break;
+            }
+            break;
+
+            //-----------------------------------------------------------------------------------------------------------------
+        case xyUpleft_xyLowright:
+
+            // vertical and horizontal
+            xnew = (values[0] + values[2]) / 2;
+            ynew = (values[1] + values[3]) / 2;
+            width = qAbs(values[0] - values[2]);
+            height =  qAbs(values[1] - values[3]);
+
+            if(!present[0] || !present[1] || !present[2] || !present[3]) break;
+
+            switch (markerTypeL) {
+            case box_crosshairs:
+                // vertical and horizontal
+                painter.drawLine(xnew, 0, xnew, this->height());
+                painter.drawLine(0, ynew, this->width(), ynew);
+            case box:
+                if(width <= 1) break;
+                if((height) <= 1) break;
+                painter.drawRect(values[0],  values[1], width, height);
+                break;
+
+            case line:
+                p1 = QPointF( values[0], values[1]);
+                p2 = QPointF( values[2], values[3]);
+                lines.append(p1);
+                lines.append(p2);
+                painter.drawPolygon(lines);
+                break;
+            case arrow:
+                p1 = QPointF( values[0], values[1]);
+                p2 = QPointF( values[2], values[3]);
+                lines.append(p1);
+                lines.append(p2);
+
+                head1 = getHead(p1,p2, qRound(sqrt(0.5 * qMin(width,  height))));
+                head2 = getHead(p2,p1, qRound(sqrt(0.5 * qMin(width,  height))));
+                for(int j=0; j<head1.count(); j++) lines.append(head1.at(j));
+                for(int j=0; j<head2.count(); j++) lines.append(head2.at(j));
+                painter.drawPolygon(lines);
+                break;
+            default:
+                // do nothing
+                break;
+            }
+            break;
+
+            //-----------------------------------------------------------------------------------------------------------------
+        case xycenter_width_height:
+
+            switch (markerTypeL) {
+            case box_crosshairs:
+                if(!present[0] || !present[1]) break;
+                // vertical and horizontal
+                painter.drawLine(values[0], 0, values[0], this->height());
+                painter.drawLine(0, values[1], this->width(), values[1]);
+            case box:
+                if(!present[0] || !present[1] || !present[2] || !present[3]) break;
+                if((values[0] - values[2]/2) <= 1) break;
+                if((values[1] - values[3]/2) <= 1) break;
+                painter.drawRect(values[0] - values[2]/2 ,  values[1]-values[3]/2,
+                        values[2], values[3]);
+                break;
+
+            case line:
+                if(!present[0] || !present[1] || !present[2] || !present[3]) break;
+                if((values[0] - values[2]/2) <= 1) break;
+                if((values[1] - values[3]/2) <= 1) break;
+                p1 = QPointF( values[0] - values[2]/2 ,  values[1]-values[3]/2);
+                p2 = QPointF( values[0] + values[2]/2 ,  values[1]+values[3]/2);
+                lines.append(p1);
+                lines.append(p2);
+                painter.drawPolygon(lines);
+                break;
+
+            case arrow:
+                if(!present[0] || !present[1] || !present[2] || !present[3]) break;
+                if((values[0] - values[2]/2) <= 1) break;
+                if((values[1] - values[3]/2) <= 1) break;
+                p1 = QPointF( values[0] - values[2]/2 ,  values[1]-values[3]/2);
+                p2 = QPointF( values[0] + values[2]/2 ,  values[1]+values[3]/2);
+                lines.append(p1);
+                lines.append(p2);
+
+                head1 = getHead(p1,p2, qRound(sqrt(0.5 * qMin(width,  height))));
+                head2 = getHead(p2,p1, qRound(sqrt(0.5 * qMin(width,  height))));
+                for(int j=0; j<head1.count(); j++) lines.append(head1.at(j));
+                for(int j=0; j<head2.count(); j++) lines.append(head2.at(j));
+                painter.drawPolygon(lines);
+                break;
+
+            default:
+                // do nothing
+                break;
+            }
+            break;
+        }
     }
 }
 
@@ -123,14 +377,61 @@ QImage ImageWidget::scaleImage(const QImage &image, const double &scaleFactor, c
     }
 }
 
-void ImageWidget::updateImage(bool FitToSize, const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor,
-                              bool selectStarted, QRect selectRect, bool selectSimpleView)
+void ImageWidget::rescaleReadValues(const bool &fitToSize, const QImage &image, const double &scaleFactor,
+                                    bool readvaluesPresent[], int readvalues[] )
+{
+    double factorX = (double) this->size().width() / (double) image.size().width();
+    double factorY = (double) this->size().height() /(double) image.size().height();
+    double factor = qMin(factorX, factorY);
+    for(int i=0; i<4; i++) {
+        readValuesPresentL[i] = readvaluesPresent[i];
+        if(!fitToSize) {
+            georeadValues[i] = qRound(readvalues[i] * scaleFactor);
+        } else {
+            georeadValues[i] = qRound(readvalues[i] * factor);
+        }
+        readValuesL[i] = georeadValues[i];
+    }
+    update();
+}
+
+void ImageWidget::initSelectionBox(const double &scaleFactor)
+{
+    selectionInProgress = true;
+    firstFactor = scaleFactor;
+    scaleFactorL = 1.0;
+}
+
+void ImageWidget::rescaleSelectionBox(const double &scaleFactor)
+{
+    if(firstSelection) {
+        firstSelection = false;
+        firstFactor = scaleFactor;
+    }
+    scaleFactorL = scaleFactor/firstFactor;
+    update();
+}
+
+void ImageWidget::updateSelectionBox(QPoint selectionPoints[], const bool &selectInProgress)
+{
+    selectionPointsL[0] = selectionPoints[0];
+    selectionPointsL[1] = selectionPoints[1];
+    selectionInProgress = selectInProgress;
+    update();
+}
+
+void  ImageWidget::updateImage(bool FitToSize, const QImage &image, bool readvaluesPresent[], int readvalues[],
+                               double scaleFactor, bool selectSimpleView,
+                               short readmarkerType, short readType, short writemarkerType, short writeType)
 {
     disconnected = false;
-    selectionRect = selectRect;
-    selectionStarted = selectStarted;
-    simpleView = selectSimpleView;
-    // in case of fit to parent widget, we calculate concurrently if possible
+    selectSimpleViewL = selectSimpleView;
+    readmarkerTypeL = (ROI_markertype) readmarkerType;
+    writemarkerTypeL = (ROI_markertype) writemarkerType;
+    readTypeL = (ROI_type) readType;
+    writeTypeL = (ROI_type) writeType;
+
+    // we calculate concurrently if possible
     if((FitToSize) || (qAbs(scaleFactor-1) > 0.01)) {
 #ifndef QT_NO_CONCURRENT
         QFuture<QImage> future = QtConcurrent::run(this, &ImageWidget::scaleImage, image, scaleFactor, FitToSize);
@@ -143,30 +444,12 @@ void ImageWidget::updateImage(bool FitToSize, const QImage &image, bool valuesPr
         imageNew = image;
     }
 
-    if(simpleView) {
+    if(selectSimpleViewL) {
         update();
         return;
     }
 
-    for(int i=0; i<4; i++) {
-        drawValues[i] = valuesPresent[i];
-        if(drawValues[i]) {
-            if(!FitToSize) {
-               geoValues[i] = values[i] * scaleFactor;
-            } else {
-                double factorX = (double) this->size().width() / (double) image.size().width();
-                double factorY = (double) this->size().height() /(double) image.size().height();
-                double factor = qMin(factorX, factorY);
-                //printf("(%d,%d) (%d,%d)  (%f,%f)\n", this->size().width(), this->size().height(),
-                //                                     image.size().width(), image.size().height(),
-                //                                    factorX, factorY);
-               geoValues[i] = (int) (((values[i]+0.5) * factor));
-               //printf("geovalues %d %f %d\n", values[i], factor, geoValues[i]);
-            }
-        }
-        else geoValues[i] = 0;
-    }
-    update();
+    rescaleReadValues(FitToSize, image, scaleFactor, readvaluesPresent, readvalues);
 }
 
 

@@ -51,6 +51,8 @@ DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 # several warnings (mainly on mac osx) solved
 # capolyline was not resizing correctly, this has been now corrected
 # a string containing a semicolumn was only displayed up to the semicolumn, this is corrected now.
+# cacamera and cascan2d got display of selected values and readback values with different representations
+# soft variable bug corrected (was not always found when wrting)
 
 # 3.9.5
 # calinedit for DBF_CHAR was missing.

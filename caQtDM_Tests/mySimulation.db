@@ -44,6 +44,12 @@ record(ao,"ACM:TEST:AO") {
     field(IVOV,"0.000000000000000e+00")
 }
 
+record(ao, "ACM:MOTOR") {
+    field(DESC,"motor output record")
+    field(SCAN,"Passive")
+}
+
+
 record(ao,"ACM:TEST:AO:AMP") {
     field(DESC,"analog output noise amplitude")
     field(SCAN,"Passive")
@@ -705,6 +711,16 @@ record (bo, "ACM:TEST:BO1")
 {
 field(ZNAM, "DONE")
 field(ONAM, "HOME")
+}
+
+record (bo, "ACM:TEST:BO2")
+{
+field(ZNAM, "ZERO")
+field(ONAM, "ONE")
+}
+
+record (bo, "ACM:TEST:BO3")
+{
 }
 
 record(waveform, "ACM:REG2D:X:1"){

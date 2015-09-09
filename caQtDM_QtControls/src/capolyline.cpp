@@ -321,9 +321,9 @@ void caPolyLine::resizeEvent(QResizeEvent *e)
                 double x = atof(xy.at(0).toLatin1().constData()) * resizeX;
                 double y = atof(xy.at(1).toLatin1().constData()) * resizeY;
                 if(i!=0) thisXYpairs.append(";");
-                thisXYpairs.append(QString::number((int)(x+0.5)));
+                thisXYpairs.append(QString::number(qRound(x)));
                 thisXYpairs.append(",");
-                thisXYpairs.append(QString::number((int)(y+0.5)));
+                thisXYpairs.append(QString::number(qRound(y)));
             }
         }
 
@@ -340,9 +340,9 @@ void caPolyLine::resizeEvent(QResizeEvent *e)
                  double x = atof(xy.at(0).toLatin1().constData()) * resizeX;
                  double y = atof(xy.at(1).toLatin1().constData()) * resizeY;
                  if(i!=0) XYpairs.append(";");
-                 XYpairs.append(QString::number((int)(x+0.5)));
+                 XYpairs.append(QString::number(qRound(x)));
                  XYpairs.append(",");
-                 XYpairs.append(QString::number((int)(y+0.5)));
+                 XYpairs.append(QString::number(qRound(y)));
             }
         }
     }

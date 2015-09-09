@@ -219,14 +219,14 @@ protected:
     virtual void timerEvent(QTimerEvent *e);
     void resizeEvent ( QResizeEvent * event );
     void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
 
 signals:
     void clicked(QString);
+    void clicked(int);
+    void clicked(double);
     void Signal_QLineEdit(const QString&, const QString&);
     void Signal_OpenNewWFile(const QString&, const QString&, const QString&);
     void Signal_ContextMenu(QWidget*);
-    void clicked();
     void Signal_NextWindow();
     void Signal_IosExit();
     void fileChanged(const QString&);
@@ -350,6 +350,8 @@ private slots:
     void closeWindow();
     void updateTextBrowser();
     void handleFileChanged(const QString&);
+
+    void Callback_WriteDetectedValues(QWidget* w);
 };
 
 #endif // CaQtDM_Lib_H

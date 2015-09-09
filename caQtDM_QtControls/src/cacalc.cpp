@@ -53,7 +53,6 @@ void caCalc::setValue(double value)
         if(!eventFired) emit emitSignal();
         eventFired = true;
     } else if(thisEventSignal == onAnyChange) {
-        printf("emitsignal\n");
         emit emitSignal();
     }
 }
