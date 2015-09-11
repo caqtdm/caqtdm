@@ -36,7 +36,9 @@ caCalc::caCalc( QWidget *parent ) :  ESimpleLabel(parent)
     thisValue = 0.0;
     keepText="";
 
+    setFontScaleMode(WidthAndHeight);
     setForeAndBackground(Qt::black, Qt::lightGray);
+    setPrecision(2);
 
     thisEventSignal = Never;
     eventFired = false;
@@ -44,9 +46,16 @@ caCalc::caCalc( QWidget *parent ) :  ESimpleLabel(parent)
 
 void caCalc::setValue(double value)
 {
-    QString strng;
-    strng.setNum(value);
-    setText(strng);
+    char asc[1024], format[20];
+    int precision;
+    if((precision = getPrecision()) >= 0) {
+       sprintf(format, "%s.%dlf", "%", precision);
+    } else {
+       sprintf(format, "%s.%dle", "%", -precision);
+    }
+    sprintf(asc, format, value);
+
+    setTextLine(QString(asc));
 
     // emit signal when requested
     if(thisEventSignal == onFirstChange) {
@@ -57,13 +66,13 @@ void caCalc::setValue(double value)
     }
 }
 
-void caCalc::setText(const QString &txt)
+void caCalc::setTextLine(const QString &txt)
 {
     if(keepText == txt) {  // accelerate things
         return;
     }
     //printf("set qstring=%s old=%s\n", txt.toLatin1().constData(), keepText.toLatin1().constData());
-    QLabel::setText(txt);
+    setText(txt);
     keepText = txt;
 }
 

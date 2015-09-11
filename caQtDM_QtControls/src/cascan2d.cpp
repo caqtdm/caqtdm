@@ -80,7 +80,6 @@ caScan2D::caScan2D(QWidget *parent) : QWidget(parent)
     installEventFilter(this);
 
     scaleFactor = 1.0;
-    displayRect = false;
 
     UpdatesPerSecond = 0;
     startTimer(1000);
@@ -166,7 +165,7 @@ void caScan2D::timerEvent(QTimerEvent *)
     UpdatesPerSecond = 0;
 }
 
-void caScan2D::getROI(QPoint &p1, QPoint &p2)
+void caScan2D::getROI(QPointF &p1, QPointF &p2)
 {
     p1 = P1;
     p2 = P2;
@@ -225,9 +224,9 @@ bool caScan2D::eventFilter(QObject *obj, QEvent *event)
             QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 	    
 	    Coordinates(Xpos, Ypos,  Xnew, Ynew, Xmax, Ymax);
-            P1 = QPoint(qRound(Xnew), qRound(Ynew));
-            P1_old = QPoint(-1, -1);
-            P2_old = QPoint(-1, -1);
+            P1 = QPointF(Xnew, Ynew);
+            P1_old = QPointF(-1, -1);
+            P2_old = QPointF(-1, -1);
 
             QPoint mouseOffset = mouseEvent->pos();
 	    x1 = mouseOffset.x() + scrollArea->horizontalScrollBar()->value();
@@ -262,7 +261,7 @@ bool caScan2D::eventFilter(QObject *obj, QEvent *event)
 	Coordinates(Xpos, Ypos,  Xnew, Ynew, Xmax, Ymax);
 	
 	if(getROIwriteType() != xy_only) {
-            P2 = QPoint(qRound(Xnew), qRound(Ynew));
+            P2 = QPointF(Xnew, Ynew);
 	    
 	    // for gray selection rectangle
             QPoint mouseOffset = mouseEvent->pos() ;
@@ -270,7 +269,7 @@ bool caScan2D::eventFilter(QObject *obj, QEvent *event)
             y1 = mouseOffset.y() - valuesWidget->height() + scrollArea->verticalScrollBar()->value();
             selectionPoints[1] = QPoint(x1, y1);
         } else {
-            P1 = P2 = QPoint(qRound(Xnew), qRound(Ynew));
+            P1 = P2 = QPointF(Xnew, Ynew);
         }  
         
         refreshImage();
@@ -294,7 +293,7 @@ bool caScan2D::eventFilter(QObject *obj, QEvent *event)
 
         QString strng = "%1, %2, %3";
         if(validIntensity) {
-            strng = strng.arg(qRound(Xnew)).arg(qRound(Ynew)).arg(Zvalue);
+            strng = strng.arg(int(Xnew)).arg(int(Ynew)).arg(Zvalue);
             updateIntensity(strng);
         } else {
             updateIntensity("invalid");
@@ -718,7 +717,7 @@ void caScan2D::refreshImage()
     }
 }
 
-void caScan2D::updateImage(const QImage &image, bool valuesPresent[], int values[], double scaleFactor)
+void caScan2D::updateImage(const QImage &image, bool valuesPresent[], double values[], double scaleFactor)
 {		
     imageW->updateImage(thisFitToSize, image, valuesPresent, values, scaleFactor, thisSimpleView,
                         (short) getROIreadmarkerType(), (short) getROIreadType(),
@@ -742,13 +741,13 @@ bool caScan2D::getAutomateChecked()
 
 void caScan2D::updateMax(int max)
 {
-    if(labelMax == (QLineEdit*) 0) return;
+    if(labelMax == (caLineEdit*) 0) return;
     labelMax->setText(QString::number(max));
 }
 
 void caScan2D::updateMin(int min)
 {
-    if(labelMin == (QLineEdit*) 0) return;
+    if(labelMin == (caLineEdit*) 0) return;
     labelMin->setText(QString::number(min));
 }
 
@@ -773,9 +772,8 @@ int caScan2D::getMax()
     return labelMax->text().toInt();
 }
 
-void caScan2D::dataProcessing(int value, int id)
+void caScan2D::dataProcessing(double value, int id)
 {
-
     if(id < 0 || id > 3) return;
     readvaluesPresent[id] = true;
     readvalues[id] = value;
@@ -877,7 +875,7 @@ void caScan2D::showImage(int numXDataValues, int numYDataValues)
         }
     }
 
-   if(image != (QImage *) 0)  updateImage(*image, readvaluesPresent, readvalues, scaleFactor);
+    if(image != (QImage *) 0)  updateImage(*image, readvaluesPresent, readvalues, scaleFactor);
 }
 
 void caScan2D::setAccessW(bool access)

@@ -1177,9 +1177,9 @@ void FileOpenWindow::fillPVtable(int &countPV, int &countNotConnected, int &coun
     int count = 0;
     if(pvTable != (QTableWidget*) 0) {
         pvTable->clear();
-        pvTable->setColumnCount(3);
+        pvTable->setColumnCount(4);
         pvTable->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-        pvTable->setHorizontalHeaderLabels(QString("unconnected PV;object;filename").split(";"));
+        pvTable->setHorizontalHeaderLabels(QString("unconnected PV;object;plugin;filename").split(";"));
         pvTable->setAlternatingRowColors(true);
     }
 
@@ -1204,7 +1204,8 @@ void FileOpenWindow::fillPVtable(int &countPV, int &countNotConnected, int &coun
                 if(!kPtr->edata.connected) {
                     pvTable->setItem(count,0, new QTableWidgetItem(kPtr->pv));
                     pvTable->setItem(count,1, new QTableWidgetItem(kPtr->dispName));
-                    pvTable->setItem(count,2, new QTableWidgetItem(kPtr->fileName));
+                    pvTable->setItem(count,2, new QTableWidgetItem(kPtr->pluginName));
+                    pvTable->setItem(count,3, new QTableWidgetItem(kPtr->fileName));
                     count++;
                 }
             }

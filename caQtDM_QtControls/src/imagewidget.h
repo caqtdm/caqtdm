@@ -41,14 +41,13 @@ public:
     ImageWidget(QWidget *parent = 0);
     ~ImageWidget(){}
 
-    void updateImage(bool FitToSize, const QImage &image, bool readvaluesPresent[], int readvalues[],
+    void updateImage(bool FitToSize, const QImage &image, bool readvaluesPresent[], double readvalues[],
                      double scaleFactor, bool selectSimpleView,
                      short readmarkerType, short readType, short writemarkerType, short writeType);
 
     void initSelectionBox(const double &scaleFactor);
     void rescaleSelectionBox(const double &scaleFactor);
     void updateSelectionBox(QPoint selectionPoints[], const bool &selectInProgress);
-    QImage scaleImage(const QImage &image, const double &scaleFactor, const bool &FitToSize);
     void getImageDimensions(int &width, int &height);
     void updateDisconnected();
 
@@ -64,7 +63,7 @@ private slots:
 
 private:
     void rescaleReadValues(const bool &fitToSize, const QImage &image, const double &scaleFactor,
-                           bool readvaluesPresent[], int readvalues[]);
+                           bool readvaluesPresent[], double readvalues[]);
 
     QPolygonF getHead( QPointF p1, QPointF p2, int arrowSize);
     QImage imageNew;
@@ -75,7 +74,7 @@ private:
     caLineEdit *labelMax;
     QWidget *imageW;
     bool readValuesPresentL[4];
-    int georeadValues[4];
+    double georeadValues[4];
     int geowriteValues[4];
     int readValuesL[4];
 
@@ -88,8 +87,9 @@ private:
     ROI_markertype writemarkerTypeL;
     ROI_type readTypeL;
     ROI_type writeTypeL;
-    double firstFactor, scaleFactorL;
+    double selectionFirstFactor, scaleFactorL, imageFirstFactor;
     bool firstSelection;
+    bool firstImage;
     bool selectionInProgress;
 };
 

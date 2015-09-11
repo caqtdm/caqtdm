@@ -163,7 +163,7 @@ void caCamera::timerEvent(QTimerEvent *)
     UpdatesPerSecond = 0;
 }
 
-void caCamera::getROI(QPoint &p1, QPoint &p2)
+void caCamera::getROI(QPointF &p1, QPointF &p2)
 {
     p1 = P1;
     p2 = P2;
@@ -222,9 +222,9 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
             QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 
             Coordinates(Xpos, Ypos,  Xnew, Ynew, Xmax, Ymax);
-            P1 = QPoint(qRound(Xnew), qRound(Ynew));
-            P1_old = QPoint(-1, -1);
-            P2_old = QPoint(-1, -1);
+            P1 = QPointF(Xnew, Ynew);
+            P1_old = QPointF(-1, -1);
+            P2_old = QPointF(-1, -1);
 
             // for gray selection rectangle on image
             QPoint mouseOffset = mouseEvent->pos() ;
@@ -257,7 +257,7 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
         Coordinates(Xpos, Ypos,  Xnew, Ynew, Xmax, Ymax);
 
         if(getROIwriteType() != xy_only) {
-            P2 = QPoint(qRound(Xnew), qRound(Ynew));
+            P2 = QPointF(Xnew, Ynew);
 
             // for gray selection rectangle
             QPoint mouseOffset = mouseEvent->pos() ;
@@ -265,7 +265,7 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
             y1 = mouseOffset.y() - valuesWidget->height() + scrollArea->verticalScrollBar()->value();
             selectionPoints[1] = QPoint(x1, y1);
         } else {
-            P1 = P2 = QPoint(qRound(Xnew), qRound(Ynew));
+            P1 = P2 = QPointF(Xnew, Ynew);
         }
     }
 
@@ -367,7 +367,7 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
 
         QString strng = "%1, %2, %3";
         if(validIntensity) {
-            strng = strng.arg(qRound(Xnew)).arg(qRound(Ynew)).arg(Zvalue);
+            strng = strng.arg(int(Xnew)).arg(int(Ynew)).arg(Zvalue);
             updateIntensity(strng);
         } else {
             updateIntensity("invalid");
@@ -549,7 +549,7 @@ void caCamera::setFitToSize(zoom const &z)
         scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
         scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     } else {
-        scaleFactor = 1.0;
+        //scaleFactor = 1.0;
         scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff );
         scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     }
@@ -702,7 +702,7 @@ void caCamera::resizeEvent(QResizeEvent *e)
     if(image != (QImage *) 0)  imageW->rescaleSelectionBox(scaleFactor);
 }
 
-void caCamera::updateImage(const QImage &image, bool valuesPresent[], int values[], double scaleFactor)
+void caCamera::updateImage(const QImage &image, bool valuesPresent[], double values[], double scaleFactor)
 {
     imageW->updateImage(thisFitToSize, image, valuesPresent, values, scaleFactor, thisSimpleView,
                         (short) getROIreadmarkerType(), (short) getROIreadType(),
@@ -756,7 +756,7 @@ int caCamera::getMax()
     return labelMax->text().toInt();
 }
 
-void caCamera::dataProcessing(int value, int id)
+void caCamera::dataProcessing(double value, int id)
 {
     if(id < 0 || id > 3) return;
     readvaluesPresent[id] = true;

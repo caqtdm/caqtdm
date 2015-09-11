@@ -621,14 +621,17 @@ QMap<QString, QString> CaQtDM_Lib::createMap(const QString& macro)
 void CaQtDM_Lib::scanWidgets(QList<QWidget*> list, QString macro)
 {
     // get first all primary softs (inorder that pv working on their own value will always be treated first
+    //qDebug() << " ------------ first pass treat softs being involved in itsself (incrementing)";
     foreach(QWidget *w1, list) {
         HandleWidget(w1, macro, true, true);
     }
+    //qDebug() << " ------------ first pass other softs";
     // other softpvs
     foreach(QWidget *w1, list) {
         HandleWidget(w1, macro, true, false);
     }
     // other pvs
+    //qDebug() << " ------------ no first pass other stuff";
     foreach(QWidget *w1, list) {
         HandleWidget(w1, macro, false, false);
     }
@@ -680,18 +683,26 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             bool doit;
             w1->setProperty("ObjectType", caCalc_Widget);
 
-            //qDebug() <<  "treatPrimary:" << treatPrimary << calcWidget->getVariable() << calcWidget << PrimarySoftPV(calcWidget, map);
-
-            // "primary" softchannels have to be done first
-            if(PrimarySoftPV(calcWidget, map) && treatPrimary) doit=true;
-            else if(!PrimarySoftPV(calcWidget, map) && !treatPrimary) doit=true;
-            else return;
-
-            // soft channel
             kData.soft = true;
-
-            // add soft channel
             addMonitor(myWidget, &kData, calcWidget->getVariable().toLatin1().constData(), w1, specData, map, &pv);
+
+            //qDebug() <<  "firstpass" << firstPass <<  "treatPrimary:" << treatPrimary << calcWidget->getVariable() << calcWidget << SoftPVusesItsself(calcWidget, map);
+
+            // softchannels calculating with themselves are done first
+            if(SoftPVusesItsself(calcWidget, map) && treatPrimary) {
+                doit=true;
+                //qDebug() << "softchannels calculating with themselves have to be done first: doit";
+
+            // softchannels not using themselves are done second
+            } else if(!SoftPVusesItsself(calcWidget, map) && !treatPrimary) {
+                doit=true;
+                //qDebug() << "softchannels not using themselves are done second: doit";
+
+            // softchannels not using themselves, but that just define themselves
+            } else {
+                //qDebug() << "softchannels that just define themselves: dont";
+                return;
+            }
 
             // other channels if any
             kData.soft = false;
@@ -3603,13 +3614,13 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             } else if(data.specData[0] == 6) { // maximum level channel if present
                 cameraWidget->updateMax((int) data.edata.rvalue);
             } else if(data.specData[0] == 7) { // value1 if present
-                cameraWidget->dataProcessing((int) data.edata.rvalue, 0);
+                cameraWidget->dataProcessing(data.edata.rvalue, 0);
             } else if(data.specData[0] == 8) { // value2 if present
-                cameraWidget->dataProcessing((int) data.edata.rvalue, 1);
+                cameraWidget->dataProcessing(data.edata.rvalue, 1);
             } else if(data.specData[0] == 9) { // value3 if present
-                cameraWidget->dataProcessing((int) data.edata.rvalue, 2);
+                cameraWidget->dataProcessing(data.edata.rvalue, 2);
             } else if(data.specData[0] == 10) { // value4 if present
-                cameraWidget->dataProcessing((int) data.edata.rvalue, 3);
+                cameraWidget->dataProcessing(data.edata.rvalue, 3);
             } else if(data.specData[0] == 0) { // data channel
                 QMutex *datamutex;
                 datamutex = (QMutex*) data.mutex;
@@ -3651,14 +3662,14 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 scan2dWidget->setSAVEDATA_SUBDIR(String); break;
             case 17: // SAVEDATA_FILENAME
                 scan2dWidget->setSAVEDATA_FILENAME(String); break;
-            case 18:  // x center of mass if present
-                scan2dWidget->dataProcessing((int) data.edata.rvalue, 0); break;
-            case 19: // y center of mass if present
-                scan2dWidget->dataProcessing((int) data.edata.rvalue, 1); break;
-            case 20: // width if present
-                scan2dWidget->dataProcessing((int) data.edata.rvalue, 2); break;
-            case 21: // height if present
-                scan2dWidget->dataProcessing((int) data.edata.rvalue, 3); break;
+            case 18:  // value1 if present
+                scan2dWidget->dataProcessing(data.edata.rvalue, 0); break;
+            case 19: // value 2 if present
+                scan2dWidget->dataProcessing(data.edata.rvalue, 1); break;
+            case 20: // value3 if present
+                scan2dWidget->dataProcessing(data.edata.rvalue, 2); break;
+            case 21: // value4 if present
+                scan2dWidget->dataProcessing(data.edata.rvalue, 3); break;
             case 0: // data channel
                 scan2dWidget->newArray(data.edata.dataSize, (float*) data.edata.dataB); break;
             default: // ?
@@ -5158,7 +5169,7 @@ void CaQtDM_Lib::ShowContextMenu(const QPoint& position) // this is a slot
 /**
   * this function will return true when a pv is doing something on its own (Ex: incrementing)
   */
-bool CaQtDM_Lib::PrimarySoftPV(QWidget* widget, QMap<QString, QString> map)
+bool CaQtDM_Lib::SoftPVusesItsself(QWidget* widget, QMap<QString, QString> map)
 {
     if (caCalc *calcWidget = qobject_cast<caCalc *>(widget)) {
         QString strng[5];
@@ -6253,76 +6264,78 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 void CaQtDM_Lib::Callback_WriteDetectedValues(QWidget* child)
 {
     int x,y,w,h,count=4;
-    int values[4];
+    double values[4];
 
-    bool ok = false;
     QStringList thisString;
     QWidget *widget = (QWidget *) 0;
-    QPoint P1, P2;
+    QPointF P1, P2;
 
     // must fit the definitions in cacamera and cascan2d
     enum ROI_type {none=0, xy_only, xy1_xy2, xyUpleft_xyLowright, xycenter_width_height};
     enum ROI_markertype {box=0, line, arrow};
 
+    ROI_type roiType;
+
     if (caCamera *cameraWidget = qobject_cast<caCamera *>(child)) {
-        ROI_type roiType = (ROI_type) cameraWidget->getROIwriteType();
+        roiType = (ROI_type) cameraWidget->getROIwriteType();
         if(!cameraWidget->getAccessW()) return;
         widget = (QWidget*) cameraWidget;
         cameraWidget->getROI(P1, P2);
+        thisString = cameraWidget->getROIChannelsWrite().split(";");
 
-        switch (roiType) {
-           case none:
-            return;
-        case xy_only:
-            count = 2;
-            values[0] = P1.x();
-            values[1] = P1.y();
-            break;
-        case xy1_xy2:
+    } else if (caScan2D *scan2dWidget = qobject_cast<caScan2D *>(child)) {
+        roiType = (ROI_type) scan2dWidget->getROIwriteType();
+        if(!scan2dWidget->getAccessW()) return;
+        widget = (QWidget*) scan2dWidget;
+        scan2dWidget->getROI(P1, P2);
+        thisString = scan2dWidget->getROIChannelsWrite().split(";");
+    } else {
+        return;
+    }
+
+    switch (roiType) {
+    case none:
+        return;
+    case xy_only:
+        count = 2;
+        values[0] = P1.x();
+        values[1] = P1.y();
+        break;
+    case xy1_xy2:
+        values[0] = P1.x();
+        values[1] = P1.y();
+        values[2] = P2.x();
+        values[3] = P2.y();
+        break;
+    case xyUpleft_xyLowright:
+        if((P2.x() < P1.x() ) || (P2.y() < P1.y())) {
+            values[0] = P2.x();
+            values[1] = P2.y();
+            values[2] = P1.x();
+            values[3] = P1.y();
+        } else {
             values[0] = P1.x();
             values[1] = P1.y();
             values[2] = P2.x();
             values[3] = P2.y();
-            break;
-        case xyUpleft_xyLowright:
-            if((P2.x() < P1.x() ) || (P2.y() < P1.y())) {
-                values[0] = P2.x();
-                values[1] = P2.y();
-                values[2] = P1.x();
-                values[3] = P1.y();
-            } else {
-                values[0] = P1.x();
-                values[1] = P1.y();
-                values[2] = P2.x();
-                values[3] = P2.y();
-            }
-            break;
-        case xycenter_width_height:
-            int ROIx = x = P1.x();
-            int ROIy = y = P1.y();
-            int ROIw = w = P2.x() - P1.x();
-            int ROIh = h = P2.y() - P1.y();
-            if(ROIw < 0) { x = ROIx + ROIw; w = -ROIw;}
-            if(ROIh < 0) { y = ROIy + ROIh; h = -ROIh;}
-            values[0] = x+qRound(w/2.0);
-            values[1] = y+qRound(h/2.0);
-            values[2]=w;
-            values[3]=h;
-            break;
         }
+        break;
+    case xycenter_width_height:
+    {
+        int ROIx = x = P1.x();
+        int ROIy = y = P1.y();
+        int ROIw = w = P2.x() - P1.x();
+        int ROIh = h = P2.y() - P1.y();
+        if(ROIw < 0) { x = ROIx + ROIw; w = -ROIw;}
+        if(ROIh < 0) { y = ROIy + ROIh; h = -ROIh;}
+        values[0] = x+qRound(w/2.0);
+        values[1] = y+qRound(h/2.0);
+        values[2]=w;
+        values[3]=h;
+    }
+        break;
 
-        cameraWidget->getROI(P1, P2);
-        thisString = cameraWidget->getROIChannelsWrite().split(";");
-    } else if (caScan2D *scan2dWidget = qobject_cast<caScan2D *>(child)) {
-/*
-        if((scan2dWidget->getROIwriteType() == caScan2D::none)) return;
-        if(!scan2dWidget->getAccessW()) return;
-        widget = (QWidget*) scan2dWidget;
-        roiWriteType = (caScan2D::ROI_type) scan2dWidget->getROIwriteType();
-        scan2dWidget->getROI(P1, P2);
-        thisString = scan2dWidget->getROIChannelsWrite().split(";");
-*/
-    } else {
+    default:
         return;
     }
 

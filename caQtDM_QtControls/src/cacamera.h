@@ -98,8 +98,8 @@ public:
     caCamera(QWidget *parent = 0);
     ~caCamera();
 
-    void updateImage(const QImage &image, bool valuesPresent[], int values[], double scaleFactor);
-    void getROI(QPoint &P1, QPoint &P2);
+    void updateImage(const QImage &image, bool valuesPresent[], double values[], double scaleFactor);
+    void getROI(QPointF &P1, QPointF &P2);
     QImage * showImageCalc(int datasize, char *data);
     void showImage(int datasize, char *data);
 
@@ -175,7 +175,7 @@ public:
     int getMax();
     bool getAutomateChecked();
     void setup();
-    void dataProcessing(int value, int id);
+    void dataProcessing(double value, int id);
     void showDisconnected();
 
 signals:
@@ -242,7 +242,7 @@ private:
     caLabel *checkAutoText;
     caLabel *nbUpdatesText;
     bool readvaluesPresent[4];
-    int  readvalues[4];
+    double  readvalues[4];
     int writevalues[4];
 
     QScrollArea *scrollArea;
@@ -264,7 +264,7 @@ private:
     bool designerVisible[10];
 
     QTimer *writeTimer;
-    QPoint P1, P2, P1_old, P2_old;
+    QPointF P1, P2, P1_old, P2_old;
     bool selectionInProgress;
 };
 

@@ -108,11 +108,12 @@ public:
     caScan2D(QWidget *parent = 0);
     ~caScan2D();
 
-    void updateImage(const QImage &image, bool valuesPresent[], int values[], double scaleFactor);
-    void getROI(QPoint &P1, QPoint &P2);
-    void newArray(int numDataBytes, float *data);
+    void updateImage(const QImage &image, bool valuesPresent[], double values[], double scaleFactor);
+    void getROI(QPointF &P1, QPointF &P2);
     void showImage(int numXDataValues, int numYDataValues);
+
     void refreshImage();
+    void newArray(int numDataBytes, float *data);
 
     bool getAccessW() const {return _AccessW;}
     void setAccessW(bool access);
@@ -189,6 +190,16 @@ public:
     void setWidth(int width);
     void setHeight(int height);
 
+    void updateMax(int max);
+    void updateMin(int min);
+    void updateIntensity(QString strng);
+    int getMin();
+    int getMax();
+    bool getAutomateChecked();
+    void setup();
+    void dataProcessing(double value, int id);
+    void showDisconnected();
+
     void setXCPT(int xcpt);
     void setYCPT(int ycpt);
     void setXNEWDATA(int xnewdata);
@@ -197,16 +208,6 @@ public:
     void setSAVEDATA_SUBDIR(const QString &savedata_subdir);
     void setSAVEDATA_FILENAME(const QString &savedata_filename);
     void attemptInitialPlot();
-
-    void updateMax(int max);
-    void updateMin(int min);
-    void updateIntensity(QString strng);
-    int getMin();
-    int getMax();
-    bool getAutomateChecked();
-    void setup();
-    void dataProcessing(int value, int id);
-    void showDisconnected();
     
 signals:
    void WriteDetectedValuesSignal(QWidget*);   
@@ -229,7 +230,6 @@ private:
     void initWidgets();
 
     bool buttonPressed, validIntensity;
-
     QString thisPV_Data, thisPV_Width, thisPV_Height;
     QStringList thisCustomMap;
     ROI_type thisROIreadtype, thisROIwritetype;
@@ -280,6 +280,10 @@ private:
     caLabel *intensityText;
     caLabel *checkAutoText;
     caLabel *nbUpdatesText;
+    bool readvaluesPresent[4];
+    double readvalues[4];
+    int writevalues[4];
+
     QScrollArea *scrollArea;
     QWidget *valuesWidget;
     QWidget *zoomWidget;
@@ -289,37 +293,22 @@ private:
     QToolButton *zoomOutIcon;
     QwtScaleWidget *colormapWidget;
 
-    bool readvaluesPresent[4];
-    int  readvalues[4];
-    int writevalues[4]; 
-
     double scaleFactor;
-    bool displayRect;
-
     int UpdatesPerSecond;
     QPoint selectionPoints[2];
-
-    bool selectionStarted;
-    QRect selectionRect;
+    bool _AccessW;
+    bool thisSimpleView;
+    bool thisInitialAutomatic;
+    bool thisDiscreteMap;
+    bool designerVisible[10];
+    
+    QTimer *writeTimer;
+    QPointF P1, P2, P1_old, P2_old;
+    bool selectionInProgress; 
 
     // tmm:later we'll do this right
     int haveY[YMAXPTS];
     float xdata[YMAXPTS*XMAXPTS];
-    int ROIx, ROIy, ROIw, ROIh;
-    bool ROIdetected;
-
-    bool _AccessW;
-
-    bool thisSimpleView;
-    bool thisInitialAutomatic;
-    bool thisDiscreteMap;
-
-    bool designerVisible[10];
-    
-    QTimer *writeTimer;
-    QPoint P1, P2, P1_old, P2_old;
-    bool selectionInProgress; 
-
 };
 
 #endif

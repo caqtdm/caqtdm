@@ -40,6 +40,7 @@ ImageWidget::ImageWidget(QWidget *parent) : QWidget(parent)
         georeadValues[i] = 0;
         geowriteValues[i] = 0;
     }
+    firstImage = true;
     scaleFactorL = 1.0;
     firstSelection = true;
     selectionInProgress = false;
@@ -47,8 +48,9 @@ ImageWidget::ImageWidget(QWidget *parent) : QWidget(parent)
 
 void ImageWidget::getImageDimensions(int &width, int &height)
 {
-    width = imageNew.size().width();
-    height = imageNew.size().height();
+    double correction = scaleFactorL;
+    width = imageNew.size().width() * correction;
+    height = imageNew.size().height() * correction;
 }
 
 void ImageWidget::updateDisconnected()
@@ -85,36 +87,46 @@ void ImageWidget::paintEvent(QPaintEvent * event)
 
     Q_UNUSED(event);
     QPainter painter(this);
+    painter.save();
 
     if (imageNew.isNull()) {
         painter.setPen(Qt::white);
         painter.setBrush(QBrush(QColor(100,100,100,255)));
         painter.drawRect(rect());
         painter.drawText(rect(), Qt::AlignCenter, tr("Rendering initial image, please wait..."));
+        painter.restore();
         return;
     }
     if(disconnected) {
         painter.setPen(Qt::white);
         painter.setBrush(QBrush(QColor(255,255,255,255)));
         painter.drawRect(rect());
+        painter.restore();
         return;
     }
 
-    //painter.drawImage(imageOffset,imageNew);
-    // this will only draw the image on the exposed rectangle
-     QRect exposedRect = painter.matrix().inverted()
-                         .mapRect(event->rect())
-                         .adjusted(-1, -1, 1, 1);
-     painter.drawImage(exposedRect, imageNew, exposedRect);
+    // rescale
+    painter.scale(scaleFactorL, scaleFactorL);
 
+    // exposed rectangle
+    QRect exposedRect = painter.matrix().inverted().mapRect(event->rect()).adjusted(-1, -1, 1, 1);
 
-    if(selectSimpleViewL) return;
+    // and draw
+
+    painter.drawImage(exposedRect, imageNew, exposedRect);
+
+    if(selectSimpleViewL) {
+        painter.restore();
+        return;
+    }
 
     // draw a rounded rectangle around the image
     width = imageNew.size().width();
     height = imageNew.size().height();
     painter.setPen(Qt::blue);
-    painter.drawRoundedRect(0,0,width-1, height-1, 10.0, 10.0);
+    painter.drawRoundedRect(0, 0, width, height, 10.0, 10.0);
+
+    painter.restore();
 
     // grey selection area during mouse selection
     if(selectionInProgress && ((writemarkerTypeL == box) || writemarkerTypeL == box_crosshairs)) {
@@ -151,9 +163,9 @@ void ImageWidget::paintEvent(QPaintEvent * event)
                 present[i] = readValuesPresentL[i];
                 values[i] = georeadValues[i];
             }
-           painter.setPen(QPen(Qt::red,2, Qt::SolidLine));
+            painter.setPen(QPen(Qt::red,2, Qt::SolidLine));
 
-        // selection rectangle display
+            // selection rectangle display
         } else {
             TypeL = writeTypeL;
             markerTypeL = writemarkerTypeL;
@@ -190,9 +202,10 @@ void ImageWidget::paintEvent(QPaintEvent * event)
             default:
                 return;
             }
-            for(int i=0; i<4; i++) values[i] = qRound(values[i] * scaleFactorL);
+            for(int i=0; i<4; i++) {
+                values[i] = qRound(values[i] * scaleFactorL / selectionFirstFactor);
+            }
         }
-
 
         switch (TypeL) {
 
@@ -204,8 +217,8 @@ void ImageWidget::paintEvent(QPaintEvent * event)
         case xy_only:
             if(!present[0] || !present[1]) break;
             // vertical and horizontal
-            painter.drawLine(values[0], 0, values[0], this->height());
-            painter.drawLine(0, values[1], this->width(), values[1]);
+            painter.drawLine(values[0], 0, values[0], this->height()*scaleFactorL);
+            painter.drawLine(0, values[1], this->width()*scaleFactorL, values[1]);
 
             switch (markerTypeL) {
             case box:
@@ -230,8 +243,8 @@ void ImageWidget::paintEvent(QPaintEvent * event)
             switch (markerTypeL) {
             case box_crosshairs:
                 // vertical and horizontal
-                painter.drawLine(xnew, 0, xnew, this->height());
-                painter.drawLine(0, ynew, this->width(), ynew);
+                painter.drawLine(xnew, 0, xnew, this->height()*scaleFactorL);
+                painter.drawLine(0, ynew, this->width()*scaleFactorL, ynew);
             case box:
                 selectionRect.setCoords(values[0], values[1], values[2], values[3]);
                 painter.drawRect(selectionRect);
@@ -278,8 +291,8 @@ void ImageWidget::paintEvent(QPaintEvent * event)
             switch (markerTypeL) {
             case box_crosshairs:
                 // vertical and horizontal
-                painter.drawLine(xnew, 0, xnew, this->height());
-                painter.drawLine(0, ynew, this->width(), ynew);
+                painter.drawLine(xnew, 0, xnew, this->height()*scaleFactorL);
+                painter.drawLine(0, ynew, this->width()*scaleFactorL, ynew);
             case box:
                 if(width <= 1) break;
                 if((height) <= 1) break;
@@ -318,8 +331,8 @@ void ImageWidget::paintEvent(QPaintEvent * event)
             case box_crosshairs:
                 if(!present[0] || !present[1]) break;
                 // vertical and horizontal
-                painter.drawLine(values[0], 0, values[0], this->height());
-                painter.drawLine(0, values[1], this->width(), values[1]);
+                painter.drawLine(values[0], 0, values[0], this->height()*scaleFactorL);
+                painter.drawLine(0, values[1], this->width()*scaleFactorL, values[1]);
             case box:
                 if(!present[0] || !present[1] || !present[2] || !present[3]) break;
                 if((values[0] - values[2]/2) <= 1) break;
@@ -362,6 +375,7 @@ void ImageWidget::paintEvent(QPaintEvent * event)
             break;
         }
     }
+
 }
 
 void ImageWidget::resizeEvent(QResizeEvent *e)
@@ -369,16 +383,8 @@ void ImageWidget::resizeEvent(QResizeEvent *e)
     Q_UNUSED(e);
 }
 
-QImage ImageWidget::scaleImage(const QImage &image, const double &scaleFactor, const bool &FitToSize) {
-    if(FitToSize) {
-        return image.scaled(this->size(), Qt::KeepAspectRatio, Qt::FastTransformation);
-    } else {
-        return image.scaled(image.size() * scaleFactor, Qt::KeepAspectRatio, Qt::FastTransformation);
-    }
-}
-
 void ImageWidget::rescaleReadValues(const bool &fitToSize, const QImage &image, const double &scaleFactor,
-                                    bool readvaluesPresent[], int readvalues[] )
+                                    bool readvaluesPresent[], double readvalues[] )
 {
     double factorX = (double) this->size().width() / (double) image.size().width();
     double factorY = (double) this->size().height() /(double) image.size().height();
@@ -386,9 +392,9 @@ void ImageWidget::rescaleReadValues(const bool &fitToSize, const QImage &image, 
     for(int i=0; i<4; i++) {
         readValuesPresentL[i] = readvaluesPresent[i];
         if(!fitToSize) {
-            georeadValues[i] = qRound(readvalues[i] * scaleFactor);
+            georeadValues[i] = readvalues[i] * scaleFactor;
         } else {
-            georeadValues[i] = qRound(readvalues[i] * factor);
+            georeadValues[i] = readvalues[i] * factor;
         }
         readValuesL[i] = georeadValues[i];
     }
@@ -398,17 +404,12 @@ void ImageWidget::rescaleReadValues(const bool &fitToSize, const QImage &image, 
 void ImageWidget::initSelectionBox(const double &scaleFactor)
 {
     selectionInProgress = true;
-    firstFactor = scaleFactor;
-    scaleFactorL = 1.0;
+    selectionFirstFactor = scaleFactor;
 }
 
 void ImageWidget::rescaleSelectionBox(const double &scaleFactor)
 {
-    if(firstSelection) {
-        firstSelection = false;
-        firstFactor = scaleFactor;
-    }
-    scaleFactorL = scaleFactor/firstFactor;
+    scaleFactorL = scaleFactor;
     update();
 }
 
@@ -420,7 +421,7 @@ void ImageWidget::updateSelectionBox(QPoint selectionPoints[], const bool &selec
     update();
 }
 
-void  ImageWidget::updateImage(bool FitToSize, const QImage &image, bool readvaluesPresent[], int readvalues[],
+void  ImageWidget::updateImage(bool FitToSize, const QImage &image, bool readvaluesPresent[], double readvalues[],
                                double scaleFactor, bool selectSimpleView,
                                short readmarkerType, short readType, short writemarkerType, short writeType)
 {
@@ -430,18 +431,19 @@ void  ImageWidget::updateImage(bool FitToSize, const QImage &image, bool readval
     writemarkerTypeL = (ROI_markertype) writemarkerType;
     readTypeL = (ROI_type) readType;
     writeTypeL = (ROI_type) writeType;
-
-    // we calculate concurrently if possible
-    if((FitToSize) || (qAbs(scaleFactor-1) > 0.01)) {
-#ifndef QT_NO_CONCURRENT
-        QFuture<QImage> future = QtConcurrent::run(this, &ImageWidget::scaleImage, image, scaleFactor, FitToSize);
-        imageNew = future.result();
-#else
-        imageNew = scaleImage(image, scalefactor, FitToSize);
-#endif
-        // no scaling, just take the pointer
+    if(FitToSize) {
+        double factorX = (double) this->size().width() / (double) image.size().width();
+        double factorY = (double) this->size().height() /(double) image.size().height();
+        scaleFactorL = qMin(factorX, factorY);
     } else {
-        imageNew = image;
+        scaleFactorL = scaleFactor;
+    }
+
+    imageNew = image;
+
+    if(firstImage) {
+        imageFirstFactor = scaleFactor;
+        firstImage = false;
     }
 
     if(selectSimpleViewL) {
@@ -450,6 +452,7 @@ void  ImageWidget::updateImage(bool FitToSize, const QImage &image, bool readval
     }
 
     rescaleReadValues(FitToSize, image, scaleFactor, readvaluesPresent, readvalues);
+    update();
 }
 
 

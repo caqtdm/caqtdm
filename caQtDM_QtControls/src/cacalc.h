@@ -43,6 +43,7 @@ class  QTCON_EXPORT caCalc : public  ESimpleLabel
     Q_PROPERTY(QString channelC READ getChannelC WRITE setChannelC)
     Q_PROPERTY(QString channelD READ getChannelD WRITE setChannelD)
     Q_PROPERTY(double initialValue READ getInitialValue WRITE setInitialValue)
+    Q_PROPERTY(int precision READ getPrecision WRITE setPrecision)
 
 #include "addevent.h"
 
@@ -72,14 +73,18 @@ public:
     caCalc( QWidget *parent = 0 );
 
     void setValue(double value);
-    void setText(const QString &txt);
+    void setTextLine(const QString &txt);
     void setForeAndBackground(QColor fg, QColor bg);
+
+    int getPrecision() const {return thisPrecision;}
+    void setPrecision(int prec) {thisPrecision = prec;}
 
 private:
     QString thisChannelA, thisChannelB, thisChannelC, thisChannelD, thisVariable;
     QString thisCalc;
     QString keepText;
     double thisValue;
+    int thisPrecision;
 };
 
 #endif // CACALC_H
