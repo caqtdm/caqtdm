@@ -154,9 +154,9 @@ void ImageWidget::paintEvent(QPaintEvent * event)
 
         // readback values display
         if(j==0) {
-            if(!readValuesPresentL[0]) return;
-            if(georeadValues[1] <= 0) return;
-            if(georeadValues[0] <= 0) return;
+            if(!readValuesPresentL[0]) continue;
+            if(georeadValues[1] <= 0) continue;
+            if(georeadValues[0] <= 0) continue;
             TypeL = readTypeL;
             markerTypeL = readmarkerTypeL;
             for(int i=0; i<4; i++) {
