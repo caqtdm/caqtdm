@@ -41,6 +41,7 @@
 // therefore we need this include and also link with the epics libraries
 // should probably be changed at some point.
 #include <postfix.h>
+#include <unistd.h>
 
 #ifdef linux
 #  include <sys/wait.h>
@@ -4178,6 +4179,7 @@ void CaQtDM_Lib::Callback_ByteControllerClicked(int bit)
  */
 void CaQtDM_Lib::Callback_ScriptButton()
 {
+#ifndef MOBILE
     QString command = "";
     bool displayWindow;
     caScriptButton *w = qobject_cast<caScriptButton *>(sender());
@@ -4198,10 +4200,12 @@ void CaQtDM_Lib::Callback_ScriptButton()
         w->setAccessW(false);
         w->setProcess(t);
     }
+#endif
 }
 
 void CaQtDM_Lib::processTerminated()
 {
+#ifndef MOBILE
     //qDebug() << "caQtDM -- process terminated callback";
     processWindow *t = qobject_cast<processWindow *>(sender());
     QWidget *w = t->getProcessCaller();
@@ -4213,6 +4217,7 @@ void CaQtDM_Lib::processTerminated()
     }
 
     if(t != (processWindow *) 0) t->deleteLater();
+#endif
 }
 
 /**
@@ -4288,6 +4293,7 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
 }
 
 void CaQtDM_Lib::shellCommand(QString command) {
+#ifndef MOBILE
     command.replace("&T", thisFileShort);
     command.replace("&A", thisFileFull);
 #ifdef linux
@@ -4309,6 +4315,9 @@ void CaQtDM_Lib::shellCommand(QString command) {
     if(status != 0) {
         QMessageBox::information(0,"FailedToStart or Error", command);
     }
+#endif
+#else
+    Q_UNUSED(command);
 #endif
 }
 
@@ -4777,10 +4786,14 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     QAction* selectedItem = myMenu.exec(cursorPos);
 
     if (selectedItem) {
-        if(selectedItem->text().contains("Kill Process")) {
+        if(selectedItem->text().contains("Kill Process")) {       
             if(caScriptButton* scriptbuttonWidget =  qobject_cast< caScriptButton *>(w)) {
+#ifndef MOBILE
                 processWindow *t= (processWindow *) scriptbuttonWidget->getProcess();
                 t->tryTerminate();
+#else
+                Q_UNUSED(scriptbuttonWidget);
+#endif
             }
 
         } else  if(selectedItem->text().contains("Raise message window")) {

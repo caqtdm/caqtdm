@@ -124,7 +124,8 @@ void ImageWidget::paintEvent(QPaintEvent * event)
     width = imageNew.size().width();
     height = imageNew.size().height();
     painter.setPen(Qt::blue);
-    painter.drawRoundedRect(0, 0, width, height, 10.0, 10.0);
+    painter.drawRoundedRect(0, 0, width, height, 2.0, 2.0);
+    //painter.drawRect(0, 0, width, height);
 
     painter.restore();
 

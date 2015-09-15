@@ -33,9 +33,6 @@
 #include <catogglebutton.h>
 #include <cascriptbutton.h>
 #include <cadoubletabwidget.h>
-#include <cadoubletabwidgetextension.h>
-#include <cadoubletabwidgetextensionfactory.h>
-#include <capolylinetaskmenu.h>
 #include <cawaterfallplot.h>
 #include <caspinbox.h>
 #include <cawavetable.h>
@@ -43,5 +40,12 @@
 #include <cameter.h>
 #include <cascan2d.h>
 #include <cabytecontroller.h>
+
+#ifndef MOBILE
+    #include <cadoubletabwidgetextension.h>
+    #include <cadoubletabwidgetextensionfactory.h>
+    #include <capolylinetaskmenu.h>
+#endif
+
 #endif
 

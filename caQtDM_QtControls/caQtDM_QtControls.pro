@@ -10,9 +10,17 @@ contains(QT_VER_MAJ, 4) {
 }
 contains(QT_VER_MAJ, 5) {
       QT += widgets concurrent uitools
-      QT += designer
       CONFIG  += qwt plugin
       DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
+      ios | android {
+         greaterThan(QT_MINOR_VERSION, 4) {
+            QT += uiplugin
+         } else {
+            QT += designer
+         }
+      } else {
+          QT += designer
+      }
 }
 
 CONFIG += warn_on debug
@@ -85,16 +93,12 @@ SOURCES	+= \
     src/catogglebutton.cpp \
     src/cascriptbutton.cpp \
     src/cadoubletabwidget.cpp \
-    src/cadoubletabwidgetextension.cpp \
     src/stripplotthread.cpp \
     src/cawaterfallplot.cpp \
     src/snumeric.cpp \
     src/caspinbox.cpp \
     src/qwtplotcurvenan.cpp \
     src/cawavetable.cpp \
-    src/capolylinetaskmenu.cpp \
-    src/capolylinedialog.cpp \
-    src/cadoubletabwidgetextensionfactory.cpp \
     src/specialFunctions.cpp \
     src/caclock.cpp \
     src/cameter.cpp \
@@ -110,14 +114,16 @@ XDR_HACK {
     HEADERS += src/xdr_hack.h
 }
 
-QT += network
-HEADERS += \
-    src/networkaccess.h \
-    src/fileFunctions.h
+!MOBILE {
+    SOURCES +=  src/cadoubletabwidgetextensionfactory.cpp  src/cadoubletabwidgetextension.cpp
+    SOURCES +=  src/capolylinetaskmenu.cpp src/capolylinedialog.cpp
+    HEADERS +=  src/cadoubletabwidgetextension.h
+    HEADERS +=  src/cadoubletabwidgetextensionfactory.h  src/capolylinetaskmenu.h
+}
 
-SOURCES +=  \
-    src/networkaccess.cpp \
-    src/fileFunctions.cpp
+QT += network
+HEADERS += src/networkaccess.h src/fileFunctions.h
+SOURCES += src/networkaccess.cpp src/fileFunctions.cpp
 
 # assume qwt6.0 was made with qt4
 contains(QT_VER_MAJ, 4) {
@@ -182,16 +188,13 @@ HEADERS	+= \
     src/catogglebutton.h \
     src/cascriptbutton.h \
     src/cadoubletabwidget.h \
-    src/cadoubletabwidgetextension.h \
     src/stripplotthread.h \
     src/cawaterfallplot.h \
     src/snumeric.h \
     src/caspinbox.h \
     src/qwtplotcurvenan.h \
     src/cawavetable.h \
-    src/capolylinetaskmenu.h \
     src/capolylinedialog.h \
-    src/cadoubletabwidgetextensionfactory.h \
     src/specialFunctions.h \
     src/caclock.h \
     src/cameter.h \

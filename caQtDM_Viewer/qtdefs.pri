@@ -13,6 +13,7 @@ unix {
 # enable specialized version, wehere files will be downloaded to a local directory (used specially for IOS)
 ios | android {
  DEFINES += MOBILE
+ CONFIG += MOBILE
 }
 ios {
   DEFINES += MOBILE_IOS

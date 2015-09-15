@@ -169,7 +169,7 @@ cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtSvg.framework ./caQtDM_
 cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
 cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtConcurrent.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
 
-mkdir ./caQtDM_Binaries//Designer.app/Contents/PlugIns
+mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns
 mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer
 cp ./caQtDM_Binaries/designer/*.dylib ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer/
 macdeployqt ./caQtDM_Binaries/Designer.app

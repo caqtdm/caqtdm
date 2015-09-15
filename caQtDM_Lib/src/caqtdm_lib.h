@@ -63,7 +63,10 @@
 
 #include <QUiLoader>
 
-#include "myQProcess.h"
+#ifndef MOBILE
+   #include "myQProcess.h"
+   #include "processWindow.h"
+#endif
 #include "mutexKnobData.h"
 #include "mutexKnobDataWrapper.h"
 #include "MessageWindow.h"
@@ -73,7 +76,6 @@
 #include "limitsCartesianplotDialog.h"
 #include "limitsDialog.h"
 #include "sliderDialog.h"
-#include "processWindow.h"
 #include "splashscreen.h"
 #include "messageQueue.h"
 #include "controlsinterface.h"
@@ -284,7 +286,10 @@ private:
     QString savedMacro[50];
     QString savedFile[50];
 
+#ifndef MOBILE
     myQProcess *proc;
+#endif
+
     QMap<QString, QString> createMap(const QString&);
 
     QString thisFileShort;
@@ -315,13 +320,11 @@ private:
 
     QFileSystemWatcher *watcher;
 
-
 #ifdef epics4
     epics4Subs *Epics4;
 #endif
 
 private slots:
-
     void Callback_EApplyNumeric(double value);
     void Callback_ENumeric(double value);
     void Callback_Spinbox(double value);

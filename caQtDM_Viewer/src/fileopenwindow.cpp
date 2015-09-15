@@ -291,6 +291,8 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
             timer->start(1000);
         }
     }
+#else
+    Q_UNUSED(attach);
 #endif
     // when file was specified, open it
     // when called from here on Windows, the actual size of the window
@@ -978,6 +980,7 @@ void FileOpenWindow::Callback_ActionExit()
         QList<QWidget *> all = this->findChildren<QWidget *>();
         foreach(QWidget* widget, all) {
             if(QMainWindow* w = qobject_cast<QMainWindow *>(widget)) {
+#ifndef MOBILE
                 if(processWindow *w1 =  qobject_cast<processWindow *>(widget)) {
                     Q_UNUSED(w1);
                    // do not close processes
@@ -985,6 +988,9 @@ void FileOpenWindow::Callback_ActionExit()
                   //qDebug() << "close window" << w;
                   w->close();
                 }
+#else
+                w->close();
+#endif
             }
         }
 
@@ -1232,7 +1238,7 @@ void FileOpenWindow::fillPVtable(int &countPV, int &countNotConnected, int &coun
 
 int FileOpenWindow::ReadInteger(char *string, char **NextString)
 {
-    register int Result = 0;
+    int Result = 0;
     int Sign = 1;
     if (*string == '+') string++;
     else if (*string == '-') {
@@ -1253,7 +1259,7 @@ int FileOpenWindow::ReadInteger(char *string, char **NextString)
 int FileOpenWindow::parseGeometry(const char* string, int* x, int* y, int* width, int* height)
 {
     int mask = NoValue;
-    register char *strind;
+    char *strind;
     unsigned int tempWidth=0, tempHeight=0;
     int tempX=0, tempY=0;
     char *nextCharacter;
@@ -1362,10 +1368,13 @@ void FileOpenWindow::parse_and_set_Geometry(QMainWindow *widget, QString parsest
 }
 
 void FileOpenWindow::shellCommand(QString command) {
+#ifndef MOBILE
     command = command.trimmed();
-
     myQProcess *proc = new myQProcess( this);
     proc->start(command.trimmed(), QIODevice::ReadWrite);
+#else
+    Q_UNUSED(command);
+#endif
 }
 
 void FileOpenWindow::closeEvent(QCloseEvent* ce)

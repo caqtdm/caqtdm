@@ -30,7 +30,9 @@
 #include <QtControls>
 #include <qtcontrols_graphics_plugin.h>
 #include <qglobal.h>
-#include <QtDesigner/QtDesigner>
+#ifndef MOBILE
+    #include <QtDesigner/QtDesigner>
+#endif
 #include <QtPlugin>
 
 typedef char strng[40];
@@ -127,6 +129,8 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
           manager->registerExtensions(new caDoubleTabWidgetExtensionFactory(manager),
                                       Q_TYPEID(QDesignerContainerExtension));
       }
+#else
+      Q_UNUSED(formEditor);
 #endif
 
       // set this property in order to find out later if we use our controls through the designer or otherwise

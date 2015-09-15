@@ -39,12 +39,9 @@ SOURCES += caqtdm_lib.cpp \
     limitsCartesianplotDialog.cpp \
     limitsDialog.cpp \
     sliderDialog.cpp \
-    processWindow.cpp \
     splashscreen.cpp \
-    myQProcess.cpp \
     loadPlugins.cpp
     
-
 HEADERS += caqtdm_lib.h\
         caQtDM_Lib_global.h \
     mutexKnobDataWrapper.h \
@@ -61,20 +58,18 @@ HEADERS += caqtdm_lib.h\
     limitsDialog.h \
     limitsCartesianplotDialog.h \
     sliderDialog.h \
-    processWindow.h \
     splashscreen.h \
     epicsExternals.h \
-    myQProcess.h \
     inlines.h \
     loadPlugins.h
 
-HEADERS += \
-    JSONValue.h \
-    JSON.h
+!MOBILE {
+    SOURCES += myQProcess.cpp  processWindow.cpp
+    HEADERS += myQProcess.h  processWindow.h
+}
 
-SOURCES += \
-    JSONValue.cpp \
-    JSON.cpp
+HEADERS += JSONValue.h JSON.h
+SOURCES += JSONValue.cpp JSON.cpp
 
 #if we want some info from the australian lightsource, define it above
 australian: {
