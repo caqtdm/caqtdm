@@ -41,7 +41,10 @@
 // therefore we need this include and also link with the epics libraries
 // should probably be changed at some point.
 #include <postfix.h>
-#include <unistd.h>
+
+#ifdef MOBILE_ANDROID
+#  include <unistd.h>
+#endif
 
 #ifdef linux
 #  include <sys/wait.h>
@@ -4786,7 +4789,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     QAction* selectedItem = myMenu.exec(cursorPos);
 
     if (selectedItem) {
-        if(selectedItem->text().contains("Kill Process")) {       
+        if(selectedItem->text().contains("Kill Process")) {
             if(caScriptButton* scriptbuttonWidget =  qobject_cast< caScriptButton *>(w)) {
 #ifndef MOBILE
                 processWindow *t= (processWindow *) scriptbuttonWidget->getProcess();
