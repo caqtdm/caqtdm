@@ -55,6 +55,7 @@ DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 # cacamera and cascan2d got display of selected values and readback values with different representations
 # soft variable bug corrected (was not always found when wrting)
 # catextentry got input dialogs (filedialog in case of strings, otherwise simple dialog)
+# preserve catextentry cursor position when enter key pressed
 
 # 3.9.5
 # calinedit for DBF_CHAR was missing.

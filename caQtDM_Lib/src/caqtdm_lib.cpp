@@ -3099,7 +3099,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                         lineeditWidget->setTextLine(list.at(0));
                     }
                 }
-                lineeditWidget->setCursorPosition(0);
+
                 // access control for textentry
                 if (caTextEntry *textentryWidget = qobject_cast<caTextEntry *>(w)) {
                     textentryWidget->setAccessW((bool) data.edata.accessW);
