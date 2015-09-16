@@ -37,6 +37,7 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     QFont font("Lucida Sans Typewriter");
     // if this font does not exist then try a next one
     QFontInfo info(font);
+    //font.setStyleStrategy(QFont::NoAntialias);
     QString family = info.family();
     //printf("got font %s\n", family.toLatin1().constData());
     if(!family.contains("Lucida Sans Typewriter")) {
