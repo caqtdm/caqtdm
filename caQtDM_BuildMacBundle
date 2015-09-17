@@ -162,12 +162,31 @@ echo
 
 cp -R ${QTHOME}/bin/Designer.app ./caQtDM_Binaries/
 mkdir ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
+mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns/
+mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns/platforms/
+
 
 cp ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libqtcontrols.dylib ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
 cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
 cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtSvg.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
 cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
 cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtConcurrent.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
+
+cp -R $QTHOME/lib/QtDesignerComponents.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
+cp -R $QTHOME/lib/QtDesigner.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
+cp -R $QTHOME/lib/QtWidgets.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
+cp -R $QTHOME/lib/QtGui.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
+cp -R $QTHOME/lib/QtCore.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
+cp -R $QTHOME/lib/QtXml.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
+cp -R $QTHOME/lib/QtPrintSupport.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
+cp -R $QTHOME/lib/QtNetwork.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
+cp -R $QTHOME/lib/QtDBus.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
+cp -R $QTHOME/lib/QtDeclarative.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
+cp -R $QTHOME/lib/QtQuickWidgets.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
+
+cp ./caQtDM_Binaries/caQtDM.app/Contents/Resources/qt.conf ./caQtDM_Binaries/Designer.app/Contents/Resources/
+cp $QTHOME/plugins/platforms/libqcocoa.dylib ./caQtDM_Binaries/Designer.app/Contents/PlugIns/platforms
+install_name_tool -rpath @loader_path/../../../../lib @loader_path/../Frameworks ./caQtDM_Binaries/Designer.app/Contents/MacOS/Designer 
 
 mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns
 mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer
@@ -176,6 +195,8 @@ macdeployqt ./caQtDM_Binaries/Designer.app
 install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer/libqtcontrols_controllers_plugin.dylib 
 install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer/libqtcontrols_graphics_plugin.dylib
 install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer/libqtcontrols_monitors_plugin.dylib
+
+
 
 
 echo
@@ -195,13 +216,14 @@ codesign --verbose=2 --deep --force -s "${CAQTDM_MAC_CODESIGN}" -vvvv ./caQtDM_B
 echo
 echo ========== modifiy dmg image ============
 echo
-hdiutil create -megabytes 120 -format UDRW ./caQtDM_Binaries/caqtdm.dmg -srcfolder ./caQtDM_Binaries/caQtDM.app
+hdiutil create -megabytes 280 -format UDRW ./caQtDM_Binaries/caqtdm.dmg -srcfolder ./caQtDM_Binaries/caQtDM.app
 hdiutil attach -readwrite ./caQtDM_Binaries/caQtDM.dmg
 
 ln -s /Applications /Volumes/caQtDM/Applications
 cp -R ./caQtDM_Binaries/Designer.app /Volumes/caQtDM/
 #cp -R ./caQtDM_Binaries/adl2ui.app /Volumes/caQtDM/
 hdiutil detach /Volumes/caQtDM/
+rm ./caQtDM_Binaries/caqtdm_package.dmg
 hdiutil convert ./caQtDM_Binaries/caqtdm.dmg -format UDZO -o ./caQtDM_Binaries/caqtdm_package.dmg
 rm ./caQtDM_Binaries/caqtdm.dmg
 
