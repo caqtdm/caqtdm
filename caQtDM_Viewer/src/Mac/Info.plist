@@ -17,9 +17,9 @@
 	<key>CFBundleExecutable</key>
 	<string>caQtDM</string>
 	<key>CFBundleIdentifier</key>
-	<string>ch.psi.caQtDM</string>
+	<string>ch.psi.caQtDM.osx</string>
 	<key>CFBundleVersion</key>
-	<string>3.9.5</string>
+	<string>4.0.0</string>
 	<key>CFBundleVersion</key>
 	<string>1.0.0</string>
 	<key>CFBundleInfoDictionaryVersion</key>
