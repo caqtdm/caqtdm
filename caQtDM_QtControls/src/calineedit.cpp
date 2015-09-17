@@ -37,6 +37,7 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     QFont font("Lucida Sans Typewriter");
     // if this font does not exist then try a next one
     QFontInfo info(font);
+    //font.setStyleStrategy(QFont::NoAntialias);
     QString family = info.family();
     //printf("got font %s\n", family.toLatin1().constData());
     if(!family.contains("Lucida Sans Typewriter")) {
@@ -369,7 +370,6 @@ void caLineEdit::setValue(double value, const QString& units)
 
     valueLast = value;
     setTextLine(asc);
-    setCursorPosition(0);
 }
 
 void caLineEdit::setAlarmColors(short status, double value, QColor bgAtInit, QColor fgAtInit)
@@ -470,11 +470,14 @@ void caLineEdit::updateAlarmColors()
 
 void caLineEdit::setTextLine(const QString &txt)
 {
+    int pos;
     if(keepText == txt) {  // accelerate things
         return;
     }
     //printf("settext: %s <%s> <%s>\n", thisPV.toLatin1().constData(),  txt.toLatin1().constData(), keepText.toLatin1().constData());
+    pos = cursorPosition();
     QLineEdit::setText(txt);
+    setCursorPosition(pos);
 
     if(keepText.size() != txt.size()) {
        FontScalingWidget::rescaleFont(text(), d_savedTextSpace);

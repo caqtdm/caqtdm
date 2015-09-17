@@ -63,7 +63,10 @@
 
 #include <QUiLoader>
 
-#include "myQProcess.h"
+#ifndef MOBILE
+   #include "myQProcess.h"
+   #include "processWindow.h"
+#endif
 #include "mutexKnobData.h"
 #include "mutexKnobDataWrapper.h"
 #include "MessageWindow.h"
@@ -73,7 +76,6 @@
 #include "limitsCartesianplotDialog.h"
 #include "limitsDialog.h"
 #include "sliderDialog.h"
-#include "processWindow.h"
 #include "splashscreen.h"
 #include "messageQueue.h"
 #include "controlsinterface.h"
@@ -219,14 +221,14 @@ protected:
     virtual void timerEvent(QTimerEvent *e);
     void resizeEvent ( QResizeEvent * event );
     void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
 
 signals:
     void clicked(QString);
+    void clicked(int);
+    void clicked(double);
     void Signal_QLineEdit(const QString&, const QString&);
     void Signal_OpenNewWFile(const QString&, const QString&, const QString&);
     void Signal_ContextMenu(QWidget*);
-    void clicked();
     void Signal_NextWindow();
     void Signal_IosExit();
     void fileChanged(const QString&);
@@ -259,7 +261,7 @@ private:
     void WaveTable(caWaveTable *widget, const knobData &data);
     void EnableDisableIO();
     void UpdateMeter(caMeter *widget, const knobData &data);
-    bool PrimarySoftPV(QWidget* widget, QMap<QString, QString> map);
+    bool SoftPVusesItsself(QWidget* widget, QMap<QString, QString> map);
     void setCalcToNothing(QWidget* widget);
     bool Python_Error(QWidget *w, QString message);
     void FlushAllInterfaces();
@@ -284,7 +286,10 @@ private:
     QString savedMacro[50];
     QString savedFile[50];
 
+#ifndef MOBILE
     myQProcess *proc;
+#endif
+
     QMap<QString, QString> createMap(const QString&);
 
     QString thisFileShort;
@@ -315,13 +320,11 @@ private:
 
     QFileSystemWatcher *watcher;
 
-
 #ifdef epics4
     epics4Subs *Epics4;
 #endif
 
 private slots:
-
     void Callback_EApplyNumeric(double value);
     void Callback_ENumeric(double value);
     void Callback_Spinbox(double value);
@@ -350,6 +353,8 @@ private slots:
     void closeWindow();
     void updateTextBrowser();
     void handleFileChanged(const QString&);
+
+    void Callback_WriteDetectedValues(QWidget* w);
 };
 
 #endif // CaQtDM_Lib_H

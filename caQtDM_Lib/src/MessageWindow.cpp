@@ -115,36 +115,40 @@ void MessageWindow::customEvent(QEvent* event)
 
 void MessageWindow::postMsgEvent(QtMsgType type, char* msg)
 {
-        QString qmsg = MessageWindow::QtMsgToQString(type, msg);
-        switch (type) {
-                case QtDebugMsg:
-                        qmsg.prepend("<FONT color=\"#000000\">");
-                        qmsg.append("</FONT>");
-                        break;
-                case QtWarningMsg:
-                        qmsg.prepend("<FONT color=\"#0000FF\">");
-                        qmsg.append("</FONT>");
-                        break;
-                case QtCriticalMsg:
-                case QtFatalMsg:
-                        qmsg.prepend("<B><FONT color=\"#FF0000\">");
-                        qmsg.append("</FONT></B>");
-                        break;
-        }
-        //it's impossible to change GUI directly from thread other than the main thread
-        //so post message encapsulated by MessageEvent to the main thread's event queue
+    QString qmsg = MessageWindow::QtMsgToQString(type, msg);
+    switch (type) {
+    case QtDebugMsg:
+        qmsg.prepend("<FONT color=\"#000000\">");
+        qmsg.append("</FONT>");
+        break;
+    case QtWarningMsg:
+        qmsg.prepend("<FONT color=\"#0000FF\">");
+        qmsg.append("</FONT>");
+        break;
+    case QtCriticalMsg:
+    case QtFatalMsg:
+        qmsg.prepend("<B><FONT color=\"#FF0000\">");
+        qmsg.append("</FONT></B>");
+        break;
+    default:
+        qmsg.prepend("<FONT color=\"#0000FF\">");
+        qmsg.append("</FONT>");
+        break;
+    }
+    //it's impossible to change GUI directly from thread other than the main thread
+    //so post message encapsulated by MessageEvent to the main thread's event queue
 #ifdef __MINGW32__
-        QCoreApplication::postEvent(this, new typename MessageEvent::MessageEvent(qmsg));
+    QCoreApplication::postEvent(this, new typename MessageEvent::MessageEvent(qmsg));
 #else
-        #ifdef _WIN32
-            QCoreApplication::postEvent(this, new ::MessageEvent(qmsg));
-        #else
-            #if GCC_VERSION > 40407
-                QCoreApplication::postEvent(this, new typename MessageEvent::MessageEvent(qmsg));
-            #else
-                QCoreApplication::postEvent(this, new MessageEvent::MessageEvent(qmsg));
-            #endif
-        #endif
+#ifdef _WIN32
+    QCoreApplication::postEvent(this, new ::MessageEvent(qmsg));
+#else
+#if GCC_VERSION > 40407
+    QCoreApplication::postEvent(this, new typename MessageEvent::MessageEvent(qmsg));
+#else
+    QCoreApplication::postEvent(this, new MessageEvent::MessageEvent(qmsg));
+#endif
+#endif
 #endif
 }
 

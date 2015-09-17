@@ -44,7 +44,9 @@
 #ifdef MOBILE
 #include <QGuiApplication>
 #endif
+#ifndef MOBILE
 #include "myQProcess.h"
+#endif
 #include "MessageWindow.h"
 #include "dbrString.h"
 #include "knobDefines.h"

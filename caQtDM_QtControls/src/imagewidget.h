@@ -37,13 +37,23 @@ class ImageWidget : public QWidget
     Q_OBJECT
 
 public:
+
     ImageWidget(QWidget *parent = 0);
     ~ImageWidget(){}
-    void updateImage(bool fitToSize, const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor,
-                     bool selectionStarted, QRect selectionRect, bool selectSimpleView);
-    QImage scaleImage(const QImage &image, const double &scaleFactor, bool const &FitToSize);
+
+    void updateImage(bool FitToSize, const QImage &image, bool readvaluesPresent[], double readvalues[],
+                     double scaleFactor, bool selectSimpleView,
+                     short readmarkerType, short readType, short writemarkerType, short writeType);
+
+    void initSelectionBox(const double &scaleFactor);
+    void rescaleSelectionBox(const double &scaleFactor);
+    void updateSelectionBox(QPoint selectionPoints[], const bool &selectInProgress);
     void getImageDimensions(int &width, int &height);
     void updateDisconnected();
+
+    // must match definitions in cacamera and cascan2d
+    enum ROI_type {none=0, xy_only, xy1_xy2, xyUpleft_xyLowright, xycenter_width_height};
+    enum ROI_markertype {box=0, box_crosshairs, line, arrow};
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -52,7 +62,10 @@ protected:
 private slots:
 
 private:
+    void rescaleReadValues(const bool &fitToSize, const QImage &image, const double &scaleFactor,
+                           bool readvaluesPresent[], double readvalues[]);
 
+    QPolygonF getHead( QPointF p1, QPointF p2, int arrowSize);
     QImage imageNew;
     QPoint imageOffset;
     bool m_zoom;
@@ -60,15 +73,24 @@ private:
     caLineEdit *labelMin;
     caLineEdit *labelMax;
     QWidget *imageW;
-    bool drawValues[4];
-    int geoValues[4];
+    bool readValuesPresentL[4];
+    double georeadValues[4];
+    int geowriteValues[4];
+    int readValuesL[4];
 
-    bool selectionStarted;
-    QRect selectionRect;
-    bool simpleView;
+    bool selectStartedL;
+    QPoint selectionPointsL[2];
+    bool selectSimpleViewL;
     bool disconnected;
-
-
+    short marker;
+    ROI_markertype readmarkerTypeL;
+    ROI_markertype writemarkerTypeL;
+    ROI_type readTypeL;
+    ROI_type writeTypeL;
+    double selectionFirstFactor, scaleFactorL, imageFirstFactor;
+    bool firstSelection;
+    bool firstImage;
+    bool selectionInProgress;
 };
 
 #endif

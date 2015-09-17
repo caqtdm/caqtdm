@@ -13,6 +13,7 @@ unix {
 # enable specialized version, wehere files will be downloaded to a local directory (used specially for IOS)
 ios | android {
  DEFINES += MOBILE
+ CONFIG += MOBILE
 }
 ios {
   DEFINES += MOBILE_IOS
@@ -51,6 +52,11 @@ DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 # several warnings (mainly on mac osx) solved
 # capolyline was not resizing correctly, this has been now corrected
 # a string containing a semicolumn was only displayed up to the semicolumn, this is corrected now.
+# cacamera and cascan2d got display of selected values and readback values with different representations
+# soft variable bug corrected (was not always found when wrting)
+# catextentry got input dialogs (filedialog in case of strings, otherwise simple dialog)
+# activ widgets were always brought in front. Now you can choose if you let the designer define the layer
+# QTextBrowser can be used with macro substitution. The file that will be read in, will be watched for changes and will automatically be reloaded
 
 # 3.9.5
 # calinedit for DBF_CHAR was missing.

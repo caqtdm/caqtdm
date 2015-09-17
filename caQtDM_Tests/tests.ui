@@ -153,7 +153,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: cornsilk;}</string>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -1380,8 +1380,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>431</width>
-           <height>191</height>
+           <width>100</width>
+           <height>30</height>
           </rect>
          </property>
          <attribute name="label">
@@ -2949,6 +2949,57 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="alarmHandling">
          <enum>caLineEdit::onForeground</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caLineEdit::User</enum>
+        </property>
+        <property name="maxValue">
+         <double>2.000000000000000</double>
+        </property>
+       </widget>
+       <widget class="caLineEdit" name="calineedit_23">
+        <property name="geometry">
+         <rect>
+          <x>710</x>
+          <y>380</y>
+          <width>56</width>
+          <height>26</height>
+         </rect>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:COUNT:1</string>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>170</red>
+          <green>0</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>170</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineEdit::Alarm_Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="alarmHandling">
+         <enum>caLineEdit::onBackground</enum>
+        </property>
+        <property name="precision">
+         <number>1</number>
+        </property>
+        <property name="precisionMode">
+         <enum>caLineEdit::User</enum>
         </property>
         <property name="limitsMode">
          <enum>caLineEdit::User</enum>
@@ -5407,6 +5458,24 @@ p, li { white-space: pre-wrap; }
         <property name="ColorMap" stdset="0">
          <enum>caCamera::grey</enum>
         </property>
+        <property name="ROI_readmarkerType" stdset="0">
+         <enum>caCamera::arrow</enum>
+        </property>
+        <property name="ROI_readType" stdset="0">
+         <enum>caCamera::xy1_xy2</enum>
+        </property>
+        <property name="ROI_readChannels" stdset="0">
+         <string>FIGX;FIGY;FIGW;FIGH</string>
+        </property>
+        <property name="ROI_writemarkerType" stdset="0">
+         <enum>caCamera::box_crosshairs</enum>
+        </property>
+        <property name="ROI_writeType" stdset="0">
+         <enum>caCamera::xy1_xy2</enum>
+        </property>
+        <property name="ROI_writeChannels" stdset="0">
+         <string notr="true">FIGX;FIGY;FIGW;FIGH</string>
+        </property>
        </widget>
        <widget class="QTextEdit" name="textEdit_23">
         <property name="geometry">
@@ -5429,7 +5498,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caCamera: &lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;channels for data, width, height, code and bpp&lt;/li&gt;&lt;/ul&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;zoom yes/no&lt;/li&gt;
-&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;colormap (default, grey, spectrum)&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;colormaps&lt;/li&gt;
 &lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;when spectrum then automaticlevels yes/no&lt;/li&gt;&lt;/ul&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;and minlevel/maxlevel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
@@ -5437,10 +5506,10 @@ p, li { white-space: pre-wrap; }
        <widget class="caCamera" name="cacamera_2">
         <property name="geometry">
          <rect>
-          <x>189</x>
-          <y>368</y>
-          <width>179</width>
-          <height>163</height>
+          <x>200</x>
+          <y>200</y>
+          <width>180</width>
+          <height>165</height>
          </rect>
         </property>
         <property name="channelData" stdset="0">
@@ -5476,14 +5545,17 @@ p, li { white-space: pre-wrap; }
         <property name="ColorMap" stdset="0">
          <enum>caCamera::spectrum_hot</enum>
         </property>
+        <property name="ROI_writeType" stdset="0">
+         <enum>caCamera::none</enum>
+        </property>
        </widget>
        <widget class="caCamera" name="cacamera_3">
         <property name="geometry">
          <rect>
           <x>11</x>
-          <y>206</y>
-          <width>179</width>
-          <height>163</height>
+          <y>200</y>
+          <width>180</width>
+          <height>165</height>
          </rect>
         </property>
         <property name="channelData" stdset="0">
@@ -5524,6 +5596,331 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="discreteCustomColorMap" stdset="0">
          <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_9">
+        <property name="geometry">
+         <rect>
+          <x>50</x>
+          <y>490</y>
+          <width>41</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">FIGX</string>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_10">
+        <property name="geometry">
+         <rect>
+          <x>50</x>
+          <y>510</y>
+          <width>41</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">FIGY</string>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_11">
+        <property name="geometry">
+         <rect>
+          <x>130</x>
+          <y>490</y>
+          <width>41</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">FIGW</string>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_12">
+        <property name="geometry">
+         <rect>
+          <x>130</x>
+          <y>510</y>
+          <width>41</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">FIGH</string>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_13">
+        <property name="geometry">
+         <rect>
+          <x>200</x>
+          <y>510</y>
+          <width>41</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">FIGXW</string>
+        </property>
+        <property name="calc">
+         <string notr="true">2*A</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">FIGX</string>
+        </property>
+       </widget>
+       <widget class="QTextEdit" name="textEdit_24">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>370</y>
+          <width>381</width>
+          <height>111</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">
+QWidget {background: white;} </string>
+        </property>
+        <property name="html">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Array of 4 values written by mouse action&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1. xy_only : (0)=x, (1)=y&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2. xy1_xy2 : (0)=x1, (1)=y1, (2)=x2, (3)=y2&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;3. xyUL_xyLR:  (0)=x1, (1)=y1, (2)=x2, (3)=y2&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;4. xyc_w_h: (0)=x, (1)=y, (2)=w, (3)=h&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_28">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>488</y>
+          <width>31</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>(0)</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>160</red>
+          <green>160</green>
+          <blue>164</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_29">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>510</y>
+          <width>31</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>(1)</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>160</red>
+          <green>160</green>
+          <blue>164</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_30">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>489</y>
+          <width>31</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>(2)</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>160</red>
+          <green>160</green>
+          <blue>164</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_31">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>510</y>
+          <width>31</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>(3)</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>160</red>
+          <green>160</green>
+          <blue>164</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_32">
+        <property name="geometry">
+         <rect>
+          <x>200</x>
+          <y>490</y>
+          <width>161</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>ex. of  world coordinates</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>160</red>
+          <green>160</green>
+          <blue>164</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_14">
+        <property name="geometry">
+         <rect>
+          <x>200</x>
+          <y>530</y>
+          <width>41</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">FIGYW</string>
+        </property>
+        <property name="calc">
+         <string notr="true">2*A</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">FIGY</string>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_33">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>540</y>
+          <width>61</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>distance</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>160</red>
+          <green>160</green>
+          <blue>164</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_16">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>541</y>
+          <width>91</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">myPython3</string>
+        </property>
+        <property name="calc">
+         <string notr="true">%P/
+#!/usr/bin/python
+def PythonCalc(a, b, c, d):
+	import decimal, math, sys
+	e = pow(int(c-a),2)
+	f =  pow(int(d-b),2)
+	try:
+		return  pow(e+f, 0.5)
+	except:
+		return float('NaN')
+/
+</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">FIGX</string>
+        </property>
+        <property name="channelB">
+         <string notr="true">FIGY</string>
+        </property>
+        <property name="channelC">
+         <string notr="true">FIGW</string>
+        </property>
+        <property name="channelD">
+         <string notr="true">FIGH</string>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_15">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>510</y>
+          <width>71</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">ACM:MOTOR</string>
+        </property>
+        <property name="calc">
+         <string notr="true">A</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">myPython3</string>
+        </property>
+       </widget>
+       <widget class="caLineEdit" name="calineedit_24">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>540</y>
+          <width>100</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:MOTOR</string>
         </property>
        </widget>
       </widget>
@@ -5658,10 +6055,10 @@ p, li { white-space: pre-wrap; }
         <property name="customColorMap" stdset="0">
          <string>2;3;4;5;7;8</string>
         </property>
-        <property name="dimensionMarking_Channels" stdset="0">
+        <property name="ROI_writeChannels" stdset="0">
          <string>roi:x;roi:y;roi:w;roi:h</string>
         </property>
-        <property name="ROI_writeChannels" stdset="0">
+        <property name="dimensionMarking_Channels" stdset="0">
          <string>roi:x;roi:y;roi:w;roi:h</string>
         </property>
        </widget>
@@ -8009,6 +8406,57 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="channelB">
          <string notr="true">epics3://ACM:TEST:AO</string>
+        </property>
+       </widget>
+       <widget class="caTextEntry" name="catextentry_13">
+        <property name="geometry">
+         <rect>
+          <x>920</x>
+          <y>340</y>
+          <width>61</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">BUSY</string>
+        </property>
+        <property name="formatType">
+         <enum>caLineEdit::hexadecimal</enum>
+        </property>
+       </widget>
+       <widget class="caTextEntry" name="catextentry_14">
+        <property name="geometry">
+         <rect>
+          <x>920</x>
+          <y>370</y>
+          <width>61</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">BUSY</string>
+        </property>
+        <property name="formatType">
+         <enum>caLineEdit::string</enum>
+        </property>
+       </widget>
+       <widget class="caTextEntry" name="catextentry_15">
+        <property name="geometry">
+         <rect>
+          <x>920</x>
+          <y>310</y>
+          <width>61</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">BUSY</string>
+        </property>
+        <property name="precisionMode">
+         <enum>caLineEdit::User</enum>
+        </property>
+        <property name="formatType">
+         <enum>caLineEdit::decimal</enum>
         </property>
        </widget>
       </widget>

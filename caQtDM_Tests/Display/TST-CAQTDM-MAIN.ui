@@ -14072,7 +14072,7 @@ LOPR - HOPR</string>
         <property name="endBit">
          <number>4</number>
         </property>
-        <property name="fontScaleMode">
+        <property name="fontScaleMode" stdset="0">
          <enum>EPushButton::None</enum>
         </property>
        </widget>
@@ -16529,7 +16529,7 @@ QPushButton:pressed {background-color: rgb(160, 160, 164);border-width: 3px;bord
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton { border-color: rgb(0, 0, 176); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(129, 178, 133, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgb(0, 0, 0); text-align: center; } QPushButton:hover {background-color: rgb(155, 255, 255);}  QPushButton:pressed {background-color: rgb(0, 0, 176)};QPushButton:checked {background-color: rgb(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgb(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(129, 178, 133, 255)); etch-disabled-text: true; color: grey;}</string>
+         <string notr="true">QPushButton { border-color: rgba(0, 0, 176, 255); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(196, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(130, 178, 134, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgba(0, 0, 0, 255); text-align: center; } QPushButton:hover {background-color: rgba(155, 255, 255, 255);}  QPushButton:pressed {background-color: rgba(0, 0, 176, 255)};QPushButton:checked {background-color: rgba(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgba(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(196, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(130, 178, 134, 255)); etch-disabled-text: true; color: grey;}</string>
         </property>
         <property name="channel" stdset="0">
          <string notr="true">$(DEVICE):TEST-LT-MODE</string>
@@ -16861,7 +16861,7 @@ QPushButton:pressed {background-color: rgb(160, 160, 164);border-width: 3px;bord
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton { border-color: rgb(0, 0, 176); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(129, 178, 133, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgb(0, 0, 0); text-align: center; } QPushButton:hover {background-color: rgb(155, 255, 255);}  QPushButton:pressed {background-color: rgb(0, 0, 176)};QPushButton:checked {background-color: rgb(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgb(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(129, 178, 133, 255)); etch-disabled-text: true; color: grey;}</string>
+         <string notr="true">QPushButton { border-color: rgba(0, 0, 176, 255); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(196, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(130, 178, 134, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgba(0, 0, 0, 255); text-align: center; } QPushButton:hover {background-color: rgba(155, 255, 255, 255);}  QPushButton:pressed {background-color: rgba(0, 0, 176, 255)};QPushButton:checked {background-color: rgba(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgba(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(196, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(130, 178, 134, 255)); etch-disabled-text: true; color: grey;}</string>
         </property>
         <property name="channel" stdset="0">
          <string notr="true">$(DEVICE):TEST-LT-MODE</string>
@@ -17269,7 +17269,7 @@ QPushButton:pressed {background-color: rgb(107, 107, 109)};</string>
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton { border-color: rgb(0, 0, 176); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(129, 178, 133, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgb(0, 0, 0); text-align: center; } QPushButton:hover {background-color: rgb(155, 255, 255);}  QPushButton:pressed {background-color: rgb(0, 0, 176)};QPushButton:checked {background-color: rgb(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgb(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(129, 178, 133, 255)); etch-disabled-text: true; color: grey;}</string>
+         <string notr="true">QPushButton { border-color: rgba(0, 0, 176, 255); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(196, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(130, 178, 134, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgba(0, 0, 0, 255); text-align: center; } QPushButton:hover {background-color: rgba(155, 255, 255, 255);}  QPushButton:pressed {background-color: rgba(0, 0, 176, 255)};QPushButton:checked {background-color: rgba(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgba(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(196, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(130, 178, 134, 255)); etch-disabled-text: true; color: grey;}</string>
         </property>
         <property name="channel" stdset="0">
          <string notr="true">$(DEVICE):TEST-LT-MODE</string>
@@ -17430,7 +17430,7 @@ QPushButton:pressed {background-color: rgb(160, 160, 164);border-width: 3px;bord
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton { border-color: rgb(0, 0, 176); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(129, 178, 133, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgb(0, 0, 0); text-align: center; } QPushButton:hover {background-color: rgb(155, 255, 255);}  QPushButton:pressed {background-color: rgb(0, 0, 176)};QPushButton:checked {background-color: rgb(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgb(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(129, 178, 133, 255)); etch-disabled-text: true; color: grey;}</string>
+         <string notr="true">QPushButton { border-color: rgba(0, 0, 176, 255); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(196, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(130, 178, 134, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgba(0, 0, 0, 255); text-align: center; } QPushButton:hover {background-color: rgba(155, 255, 255, 255);}  QPushButton:pressed {background-color: rgba(0, 0, 176, 255)};QPushButton:checked {background-color: rgba(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgba(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(196, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(130, 178, 134, 255)); etch-disabled-text: true; color: grey;}</string>
         </property>
         <property name="channel" stdset="0">
          <string notr="true">$(DEVICE):TEST-LT-MODE</string>
@@ -17744,7 +17744,7 @@ QPushButton:pressed {background-color: rgb(160, 160, 164);border-width: 3px;bord
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton { border-color: rgb(0, 0, 176); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(129, 178, 133, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgb(0, 0, 0); text-align: center; } QPushButton:hover {background-color: rgb(155, 255, 255);}  QPushButton:pressed {background-color: rgb(0, 0, 176)};QPushButton:checked {background-color: rgb(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgb(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(129, 178, 133, 255)); etch-disabled-text: true; color: grey;}</string>
+         <string notr="true">QPushButton { border-color: rgba(0, 0, 176, 255); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(196, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(130, 178, 134, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgba(0, 0, 0, 255); text-align: center; } QPushButton:hover {background-color: rgba(155, 255, 255, 255);}  QPushButton:pressed {background-color: rgba(0, 0, 176, 255)};QPushButton:checked {background-color: rgba(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgba(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(196, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(130, 178, 134, 255)); etch-disabled-text: true; color: grey;}</string>
         </property>
         <property name="channel" stdset="0">
          <string notr="true">$(DEVICE):TEST-LT-MODE</string>
@@ -17844,7 +17844,7 @@ QPushButton:pressed {background-color: rgb(160, 160, 164);border-width: 3px;bord
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton { border-color: rgb(0, 0, 176); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(129, 178, 133, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgb(0, 0, 0); text-align: center; } QPushButton:hover {background-color: rgb(155, 255, 255);}  QPushButton:pressed {background-color: rgb(0, 0, 176)};QPushButton:checked {background-color: rgb(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgb(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(129, 178, 133, 255)); etch-disabled-text: true; color: grey;}</string>
+         <string notr="true">QPushButton { border-color: rgba(0, 0, 176, 255); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(196, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(130, 178, 134, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgba(0, 0, 0, 255); text-align: center; } QPushButton:hover {background-color: rgba(155, 255, 255, 255);}  QPushButton:pressed {background-color: rgba(0, 0, 176, 255)};QPushButton:checked {background-color: rgba(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgba(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(196, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(130, 178, 134, 255)); etch-disabled-text: true; color: grey;}</string>
         </property>
         <property name="channel" stdset="0">
          <string notr="true">$(DEVICE):OP:demoBI</string>
@@ -18063,7 +18063,7 @@ QPushButton:pressed {background-color: rgb(160, 160, 164);border-width: 3px;bord
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton { border-color: rgb(0, 0, 176); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(129, 178, 133, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgb(0, 0, 0); text-align: center; } QPushButton:hover {background-color: rgb(155, 255, 255);}  QPushButton:pressed {background-color: rgb(0, 0, 176)};QPushButton:checked {background-color: rgb(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgb(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(129, 178, 133, 255)); etch-disabled-text: true; color: grey;}</string>
+         <string notr="true">QPushButton { border-color: rgba(0, 0, 176, 255); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(196, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(130, 178, 134, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgba(0, 0, 0, 255); text-align: center; } QPushButton:hover {background-color: rgba(155, 255, 255, 255);}  QPushButton:pressed {background-color: rgba(0, 0, 176, 255)};QPushButton:checked {background-color: rgba(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgba(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(196, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(130, 178, 134, 255)); etch-disabled-text: true; color: grey;}</string>
         </property>
         <property name="channel" stdset="0">
          <string notr="true">$(DEVICE):TEST-LT-MODE</string>
@@ -18212,7 +18212,7 @@ QPushButton:pressed {background-color: rgb(160, 160, 164);border-width: 3px;bord
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton { border-color: rgb(0, 0, 176); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(129, 178, 133, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgb(0, 0, 0); text-align: center; } QPushButton:hover {background-color: rgb(155, 255, 255);}  QPushButton:pressed {background-color: rgb(0, 0, 176)};QPushButton:checked {background-color: rgb(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgb(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(195, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(129, 178, 133, 255)); etch-disabled-text: true; color: grey;}</string>
+         <string notr="true">QPushButton { border-color: rgba(0, 0, 176, 255); background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(196, 255, 255, 255), stop:0.4 rgba(155, 255, 255, 255), stop:0.6 rgba(155, 255, 255, 255), stop:1   rgba(130, 178, 134, 255)); border-radius: 2px;padding: 3px; border-width: 1px;; color: rgba(0, 0, 0, 255); text-align: center; } QPushButton:hover {background-color: rgba(155, 255, 255, 255);}  QPushButton:pressed {background-color: rgba(0, 0, 176, 255)};QPushButton:checked {background-color: rgba(155, 255, 255, 255);} QPushButton:checked:hover {background-color: rgba(155, 255, 255, 255);} QPushButton:disabled {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0   rgba(196, 255, 255, 255), stop:0.4 rgba(124, 204, 204, 255), stop:0.6 rgba(124, 204, 204, 255), stop:1   rgba(130, 178, 134, 255)); etch-disabled-text: true; color: grey;}</string>
         </property>
         <property name="channel" stdset="0">
          <string notr="true">$(DEVICE):OP:demoBI</string>
@@ -18390,9 +18390,6 @@ QPushButton:pressed {background-color: rgb(160, 160, 164);border-width: 3px;bord
         <property name="toolTip">
          <string>this is a toolTip</string>
         </property>
-        <property name="toolTipDuration">
-         <number>5</number>
-        </property>
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
@@ -18419,6 +18416,9 @@ QPushButton:pressed {background-color: rgb(160, 160, 164);border-width: 3px;bord
           <blue>0</blue>
          </color>
         </property>
+        <property name="toolTipDuration" stdset="0">
+         <number>5</number>
+        </property>
        </widget>
        <widget class="QPushButton" name="pushButton">
         <property name="geometry">
@@ -18432,11 +18432,11 @@ QPushButton:pressed {background-color: rgb(160, 160, 164);border-width: 3px;bord
         <property name="toolTip">
          <string>tool tip Push Button</string>
         </property>
-        <property name="toolTipDuration">
-         <number>-1</number>
-        </property>
         <property name="text">
          <string>PushButton</string>
+        </property>
+        <property name="toolTipDuration" stdset="0">
+         <number>-1</number>
         </property>
        </widget>
       </widget>
@@ -19096,7 +19096,7 @@ QPushButton:pressed {background-color: rgb(160, 160, 164);border-width: 3px;bord
      <x>0</x>
      <y>0</y>
      <width>1102</width>
-     <height>18</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>

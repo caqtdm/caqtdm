@@ -71,25 +71,35 @@ class QTCON_EXPORT caCamera : public QWidget
     Q_PROPERTY(QString customColorMap READ getCustomMap WRITE setCustomMap  DESIGNABLE isPropertyVisible(customcolormap))
     Q_PROPERTY(bool discreteCustomColorMap READ getDiscreteCustomMap WRITE setDiscreteCustomMap DESIGNABLE isPropertyVisible(discretecolormap))
 
-    Q_PROPERTY(QString dimensionMarking_Channels READ getROIChannelsRead WRITE setROIChannelsRead)
+    Q_PROPERTY(ROI_markertype ROI_readmarkerType READ getROIreadmarkerType WRITE setROIreadmarkerType)
+    Q_PROPERTY(ROI_type ROI_readType READ getROIreadType WRITE setROIreadType)
+    Q_PROPERTY(QString ROI_readChannels READ getROIChannelsRead WRITE setROIChannelsRead)
+
+    Q_PROPERTY(ROI_markertype ROI_writemarkerType READ getROIwritemarkerType WRITE setROIwritemarkerType)
     Q_PROPERTY(ROI_type ROI_writeType READ getROIwriteType WRITE setROIwriteType)
     Q_PROPERTY(QString ROI_writeChannels READ getROIChannelsWrite WRITE setROIChannelsWrite)
 
     Q_ENUMS(zoom)
     Q_ENUMS(colormap)
     Q_ENUMS(ROI_type)
+    Q_ENUMS(ROI_markertype)
 
 public:
+
+    enum ROI_type {none=0, xy_only, xy1_xy2, xyUpleft_xyLowright, xycenter_width_height};
+    enum ROI_markertype {box=0, box_crosshairs, line, arrow};
+
     enum zoom {No=0, Yes};
+
     enum colormap {grey=0, spectrum_wavelength, spectrum_hot, spectrum_heat, spectrum_jet, spectrum_custom};
-    enum ROI_type {upperleftxy_width_height=0, upperleftxy_lowerleftxy, centerxy_width_height};
+
     enum Properties { customcolormap = 0, discretecolormap};
 
     caCamera(QWidget *parent = 0);
     ~caCamera();
 
-    void updateImage(const QImage &image, bool valuesPresent[], int values[], const double &scaleFactor);
-    bool getROI(int &x, int &y, int &w, int &h);
+    void updateImage(const QImage &image, bool valuesPresent[], double values[], double scaleFactor);
+    void getROI(QPointF &P1, QPointF &P2);
     QImage * showImageCalc(int datasize, char *data);
     void showImage(int datasize, char *data);
 
@@ -107,8 +117,18 @@ public:
     QString getPV_BPP() const {return thisPV_BPP;}
     void setPV_BPP(QString const &newPV) {thisPV_BPP = newPV;}
 
-    ROI_type getROIwriteType() const {return thisROItype;}
-    void setROIwriteType(ROI_type const &roitype) {thisROItype = roitype;}
+    ROI_markertype getROIreadmarkerType() const {return thisROIreadmarkertype;}
+    void setROIreadmarkerType(ROI_markertype const &roimarkertype) {thisROIreadmarkertype = roimarkertype;}
+
+    ROI_markertype getROIwritemarkerType() const {return thisROIwritemarkertype;}
+    void setROIwritemarkerType(ROI_markertype const &roimarkertype) {thisROIwritemarkertype = roimarkertype;}
+
+    ROI_type getROIreadType() const {return thisROIreadtype;}
+    void setROIreadType(ROI_type const &roireadtype) {thisROIreadtype = roireadtype;}
+
+    ROI_type getROIwriteType() const {return thisROIwritetype;}
+    void setROIwriteType(ROI_type const &roiwritetype) {thisROIwritetype = roiwritetype;}
+
     QString getROIChannelsWrite() const {return thisPV_ROI_Write.join(";");}
     void setROIChannelsWrite(QString const &newPV) {thisPV_ROI_Write = newPV.split(";");}
 
@@ -155,13 +175,17 @@ public:
     int getMax();
     bool getAutomateChecked();
     void setup();
-    void dataProcessing(int value, int id);
+    void dataProcessing(double value, int id);
     void showDisconnected();
+
+signals:
+   void WriteDetectedValuesSignal(QWidget*);
 
 private slots:
     void zoomIn(int level = 1);
     void zoomOut(int level = 1);
     void zoomNow();
+    void updateChannels();
 
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -177,7 +201,8 @@ private:
     bool buttonPressed, validIntensity;
     QString thisPV_Data, thisPV_Width, thisPV_Height, thisPV_Code, thisPV_BPP;
     QStringList thisCustomMap;
-    ROI_type thisROItype;
+    ROI_type thisROIreadtype, thisROIwritetype;
+    ROI_markertype thisROIreadmarkertype, thisROIwritemarkertype;
     QStringList thisPV_ROI_Read, thisPV_ROI_Write;
     QString thisMinLevel, thisMaxLevel;
     colormap thisColormap;
@@ -216,8 +241,9 @@ private:
     caLabel *intensityText;
     caLabel *checkAutoText;
     caLabel *nbUpdatesText;
-    bool valuesPresent[4];
-    int  values[4];
+    bool readvaluesPresent[4];
+    double  readvalues[4];
+    int writevalues[4];
 
     QScrollArea *scrollArea;
     QWidget *valuesWidget;
@@ -229,22 +255,17 @@ private:
     QwtScaleWidget *colormapWidget;
 
     double scaleFactor;
-
     int UpdatesPerSecond;
-
-    bool selectionStarted;
-    QRect selectionRect;
-
-    int ROIx, ROIy, ROIw, ROIh;
-    bool ROIdetected;
-
+    QPoint selectionPoints[2];
     bool _AccessW;
-
     bool thisSimpleView;
     bool thisInitialAutomatic;
     bool thisDiscreteMap;
-
     bool designerVisible[10];
+
+    QTimer *writeTimer;
+    QPointF P1, P2, P1_old, P2_old;
+    bool selectionInProgress;
 };
 
 #endif
