@@ -12,7 +12,7 @@ dbLoadDatabase "../../dbd/ioc.dbd"
 ioc_registerRecordDeviceDriver pdbbase
 
 ## Load record instances
-dbLoadRecords("C:/Qt/4.8.2/src/caQtDM/tests/mySimulation.db","user=brandsHost")
+dbLoadRecords("X:/qt/caqtdm_project/caQtDM_Tests/mySimulation.db","user=brandsHost")
 
 
 
