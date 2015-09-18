@@ -96,6 +96,13 @@
                         </Directory>
                     </Directory>
                     <Directory Id="PLUGINS" Name="plugins">
+                        <Directory Id="CONTROLSYSTEMS" Name="controlsystems">
+                            <Component Id="controlsystems" Guid="58EF7BB9-6938-481B-9EBD-2A11A770C479">
+                                <File Id="DEMO_PLUGIN.DLL" Name="demo_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\demo_plugin.dll" />
+                                <File Id="EPICS3_PLUGIN.DLL" Name="epics3_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics3_plugin.dll" />
+                                <File Id="EPICS4_PLUGIN.DLL" Name="epics4_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics4_plugin.dll" />
+                            </Component>
+                        </Directory>
                         <Directory Id="DESIGNER" Name="designer">
                             <Component Id="designer" Guid="1937926C-E3AE-4B13-831E-874B1A26AE76">
                                 <File Id="QTCONTROLS_CONTROLLERS_PLUGIN.DLL" Name="qtcontrols_controllers_plugin.dll" Source="$(env.CAQTDM_COLLECT)\designer\qtcontrols_controllers_plugin.dll" />
@@ -181,6 +188,7 @@
             <ComponentRef Id="caQtDMHelp" />
             <ComponentRef Id="sqldrivers_c" />
             <ComponentRef Id="qt_conf" />
+            <ComponentRef Id="controlsystems" />
         </Feature>
         <Feature Id="VCRedist" Level="1" Title="Visual C++ 12.0 Runtime" AllowAdvertise="no" Display="hidden">
             <MergeRef Id="VCRedist" />
