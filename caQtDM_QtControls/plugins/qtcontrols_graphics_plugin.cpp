@@ -163,6 +163,35 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
   {
       return new caLabel(parent);
   }
+  
+      QWidget *caLabelVerticalInterface::createWidget(QWidget* parent)
+  {
+      caLabelVertical *widget = new caLabelVertical(parent);
+      return widget;
+  }
+
+  caLabelVerticalInterface::caLabelVerticalInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
+  {
+      strng name[6], type[6];
+      strcpy(name[0], "channel");
+      strcpy(type[0], "multiline");
+      strcpy(name[1], "channelB");
+      strcpy(type[1], "multiline");
+      strcpy(name[2], "channelC");
+      strcpy(type[2], "multiline");
+      strcpy(name[3], "channelD");
+      strcpy(type[3], "multiline");
+      strcpy(name[4], "visibilityCalc");
+      strcpy(type[4], "multiline");     
+      strcpy(name[5], "text");
+      strcpy(type[5], "multiline");     
+      d_domXml = XmlFunc("caLabelVertical", "calabelvertical", 0, 0, 28, 90, name, type, 6);
+      d_name = "caLabelVertical";
+      d_include = "caLabelVertical";
+      QPixmap qpixmap = QPixmap(":pixmaps/elabelv.png");
+      d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+  }
+
 
   QWidget *caFrameInterface::createWidget(QWidget* parent)
   {
@@ -343,6 +372,7 @@ static char *XmlFunc(const char *clss, const char *name, int x, int y, int w, in
   {
       d_plugins.append(new caFrameInterface(this));
       d_plugins.append(new caLabelInterface(this) );
+      d_plugins.append(new caLabelVerticalInterface(this) );
       d_plugins.append(new caGraphicsInterface(this));
       d_plugins.append(new caPolyLineInterface(this));
       d_plugins.append(new caImageInterface(this));

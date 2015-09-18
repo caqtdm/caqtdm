@@ -63,15 +63,7 @@ public:
     void setColorMode(colMode colormode) {thisColorMode = colormode;
                                           setBackground(thisBackColor);
                                           setForeground(thisForeColor);
-                                          oldColorMode = thisColorMode;
-                                           }
-
-private slots:
-
-
-protected:
-
-
+                                          oldColorMode = thisColorMode;}
 private:
 
     QColor thisForeColor, thisForeColorOld;

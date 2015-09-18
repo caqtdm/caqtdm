@@ -98,6 +98,17 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
+class caLabelVerticalInterface : public CustomWidgetInterface_Graphics
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerCustomWidgetInterface)
+	
+public:
+    caLabelVerticalInterface(QObject* parent);
+    virtual QWidget* createWidget(QWidget* parent);
+};
+
+
 class caGraphicsInterface : public CustomWidgetInterface_Graphics
 {
     Q_OBJECT
@@ -167,6 +178,5 @@ public:
     caClockInterface(QObject* parent);
     virtual QWidget* createWidget(QWidget* parent);
 };
-
 
 #endif
