@@ -57,6 +57,7 @@ DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 # catextentry got input dialogs (filedialog in case of strings, otherwise simple dialog)
 # activ widgets were always brought in front. Now you can choose if you let the designer define the layer
 # QTextBrowser can be used with macro substitution. The file that will be read in, will be watched for changes and will automatically be reloaded
+# a vertical label has been implemented
 
 # 3.9.5
 # calinedit for DBF_CHAR was missing.
