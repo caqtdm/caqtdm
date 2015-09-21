@@ -101,7 +101,7 @@ class CAQTDM_LIBSHARED_EXPORT CaQtDM_Lib : public QMainWindow
 public:
 
     explicit CaQtDM_Lib(QWidget *parent = 0, QString="", QString="", MutexKnobData *mutexKnobData = 0,
-                                                                     QMap<QString, ControlsInterface *> interfaces = QMap<QString, ControlsInterface *>(),
+                                                                     QMap<QString, ControlsInterface *> interfaces = (QMap<QString, ControlsInterface *>()),
                                                                      MessageWindow *msgWindow = 0,
                                                                      bool willPrint = false,
                                                                      QWidget *parentAS = 0);
