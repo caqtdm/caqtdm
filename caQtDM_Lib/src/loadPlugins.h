@@ -27,6 +27,7 @@
 #include <QDebug>
 #include <QApplication>
 #include <QPluginLoader>
+#include <QLibraryInfo>
 #include "caQtDM_Lib_global.h"
 #include "MessageWindow.h"
 #include "controlsinterface.h"
@@ -43,5 +44,5 @@ public:
 
 private:
      ControlsInterface *controlsInterface;
-};   
-    
+};
+
