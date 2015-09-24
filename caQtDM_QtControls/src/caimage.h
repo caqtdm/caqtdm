@@ -39,8 +39,8 @@ class QTCON_EXPORT caImage : public QWidget
 
     Q_OBJECT
 
-    Q_PROPERTY(QString imageCalc READ getImageCalc WRITE setImageCalc)
     Q_PROPERTY(QString filename READ getFileName WRITE setFileName)
+    Q_PROPERTY(QString imageCalc READ getImageCalc WRITE setImageCalc)
     Q_PROPERTY(int frame READ getFrame WRITE setFrame)
     Q_PROPERTY(int delayMilliseconds READ getDelay WRITE setDelay)
 

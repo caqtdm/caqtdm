@@ -41,9 +41,9 @@ class QTCON_EXPORT caClock : public QwtAnalogClock
 {
     Q_OBJECT
 
-    Q_ENUMS(timeType)
+    Q_ENUMS(TimeType)
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
-    Q_PROPERTY(timeType TimeType READ getTimeType WRITE setTimeType)
+    Q_PROPERTY(TimeType timeType READ getTimeType WRITE setTimeType)
 
     Q_PROPERTY(QColor baseColor READ getBaseColor WRITE setBaseColor)
     Q_PROPERTY(bool scaleDefaultColor READ getScaleDefaultColor WRITE setScaleDefaultColor)
@@ -53,14 +53,14 @@ class QTCON_EXPORT caClock : public QwtAnalogClock
 
 public:
 
-    enum timeType {InternalTime = 0, ReceiveTime};
+    enum TimeType {InternalTime = 0, ReceiveTime};
 
     caClock(QWidget *parent);
 
     QString getPV() const {return thisPV;}
     void setPV(QString const &newPV) {thisPV = newPV;}
-    timeType getTimeType() { return thisTimeType; }
-    void setTimeType(timeType type) {thisTimeType = type;
+    TimeType getTimeType() { return thisTimeType; }
+    void setTimeType(TimeType type) {thisTimeType = type;
                                      if(type == InternalTime) {
                                          timer->start(1000);
                                      } else {
@@ -96,7 +96,7 @@ private:
     QPalette colorTheme( const QColor &base ) const;
 
     QString thisPV;
-    timeType thisTimeType;
+    TimeType thisTimeType;
     QTimer *timer;
     QTime prevTime;
     colMode thisColorMode;

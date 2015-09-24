@@ -198,7 +198,6 @@ QWidget *caLabelVerticalInterface::createWidget(QWidget* parent)
 
 caLabelVerticalInterface::caLabelVerticalInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
 {
-
     strng name[9], type[9];
     longtext text[9] = {COLORMODE, VISIBILITY, TEXTPVA, TEXTPVB, TEXTPVC, TEXTPVD, VISIBILITYCALC, DISPLAYTEXT, DIRECTIONTEXT};
 
@@ -235,26 +234,28 @@ QWidget *caFrameInterface::createWidget(QWidget* parent)
 
 caFrameInterface::caFrameInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
 {
-    longtext text[6] = {"",
-                        "",
-                        "",
-                        "",
-                        "",
-                        ""};
-    strng name[6], type[6];
-    strcpy(name[0], "channel");
+    strng name[9], type[9];
+    longtext text[9] = {MACRO, BCKMODE, VISIBILITY, VISIBILITYMODE, TEXTPVA, TEXTPVB, TEXTPVC, TEXTPVD, VISIBILITYCALC};
+
+    strcpy(name[0], "macro");
     strcpy(type[0], "multiline");
-    strcpy(name[1], "channelB");
-    strcpy(type[1], "multiline");
-    strcpy(name[2], "channelC");
-    strcpy(type[2], "multiline");
-    strcpy(name[3], "channelD");
-    strcpy(type[3], "multiline");
-    strcpy(name[4], "visibilityCalc");
+    strcpy(name[1], "backgroundMode");
+    strcpy(type[1], "");
+    strcpy(name[2], "visibility");
+    strcpy(type[2], "");
+    strcpy(name[3], "visibilityMode");
+    strcpy(type[3], "");
+    strcpy(name[4], "channel");
     strcpy(type[4], "multiline");
-    strcpy(name[5], "macro");
+    strcpy(name[5], "channelB");
     strcpy(type[5], "multiline");
-    d_domXml = XmlFunc("caFrame", "caframe", 0, 0, 120, 120, name, type, text, 6);
+    strcpy(name[6], "channelC");
+    strcpy(type[6], "multiline");
+    strcpy(name[7], "channelD");
+    strcpy(type[7], "multiline");
+    strcpy(name[8], "visibilityCalc");
+    strcpy(type[8], "multiline");
+    d_domXml = XmlFunc("caFrame", "caframe", 0, 0, 120, 120, name, type, text, 9);
     d_name = "caFrame";
     d_include = "caFrame";
     QPixmap qpixmap =  QPixmap(":pixmaps/frame.png");
@@ -263,29 +264,31 @@ caFrameInterface::caFrameInterface(QObject* parent) : CustomWidgetInterface_Grap
 
 caImageInterface::caImageInterface(QObject *parent): CustomWidgetInterface_Graphics(parent)
 {
-    longtext text[7] = {"",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        ""};
-    strng name[7], type[7];
-    strcpy(name[0], "channel");
+    strng name[10], type[10];
+    longtext text[10] = {IMAGEFILE, IMAGECALC, IMAGEFRAME, IMAGEDELAY, VISIBILITY, VISIBILITYCALC, TEXTPVA, TEXTPVB, TEXTPVC, TEXTPVD};
+
+    strcpy(name[0], "filename");
     strcpy(type[0], "multiline");
-    strcpy(name[1], "channelB");
+    strcpy(name[1], "imageCalc");
     strcpy(type[1], "multiline");
-    strcpy(name[2], "channelC");
-    strcpy(type[2], "multiline");
-    strcpy(name[3], "channelD");
-    strcpy(type[3], "multiline");
-    strcpy(name[4], "visibilityCalc");
-    strcpy(type[4], "multiline");
-    strcpy(name[5], "imageCalc");
+    strcpy(name[2], "frame");
+    strcpy(type[2], "");
+    strcpy(name[3], "delayMilliseconds");
+    strcpy(type[3], "");
+    strcpy(name[4], "visibility");
+    strcpy(type[4], "");
+    strcpy(name[5], "visibilityCalc");
     strcpy(type[5], "multiline");
-    strcpy(name[6], "filename");
+    strcpy(name[6], "channel");
     strcpy(type[6], "multiline");
-    d_domXml = XmlFunc("caImage", "caimage", 0, 0, 50, 50, name, type, text, 7);
+    strcpy(name[7], "channelB");
+    strcpy(type[7], "multiline");
+    strcpy(name[8], "channelC");
+    strcpy(type[8], "multiline");
+    strcpy(name[9], "channelD");
+    strcpy(type[9], "multiline");
+
+    d_domXml = XmlFunc("caImage", "caimage", 0, 0, 50, 50, name, type, text, 10);
     d_name = "caImage";
     d_include = "caImage";
     QPixmap qpixmap = QPixmap(":pixmaps/images.png");
@@ -297,39 +300,6 @@ QWidget *caImageInterface::createWidget(QWidget *parent)
     return new caImage(parent);
 }
 
-QWidget *caPolyLineInterface::createWidget(QWidget *parent)
-{
-    return new caPolyLine(parent);
-}
-
-caPolyLineInterface::caPolyLineInterface(QObject *parent): CustomWidgetInterface_Graphics(parent)
-{
-    longtext text[6] = {"",
-                        "",
-                        "",
-                        "",
-                        "",
-                        ""};
-    strng name[6], type[6];
-    strcpy(name[0], "channel");
-    strcpy(type[0], "multiline");
-    strcpy(name[1], "channelB");
-    strcpy(type[1], "multiline");
-    strcpy(name[2], "channelC");
-    strcpy(type[2], "multiline");
-    strcpy(name[3], "channelD");
-    strcpy(type[3], "multiline");
-    strcpy(name[4], "visibilityCalc");
-    strcpy(type[4], "multiline");
-    strcpy(name[5], "xyPairs");
-    strcpy(type[5], "multiline");
-    d_domXml = XmlFunc("caPolyLine", "capolyline", 0, 0, 150, 150, name, type, text, 6);
-    d_name = "caPolyLine";
-    d_include = "caPolyLine";
-    QPixmap qpixmap = QPixmap(":pixmaps/polyline.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
-}
-
 QWidget *caGraphicsInterface::createWidget(QWidget* parent)
 {
     return new caGraphics(parent);
@@ -337,28 +307,90 @@ QWidget *caGraphicsInterface::createWidget(QWidget* parent)
 
 caGraphicsInterface::caGraphicsInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
 {
-    longtext text[5] = {"",
-                        "",
-                        "",
-                        "",
-                        ""};
-    strng name[5], type[5];
-    strcpy(name[0], "channel");
-    strcpy(type[0], "multiline");
-    strcpy(name[1], "channelB");
-    strcpy(type[1], "multiline");
-    strcpy(name[2], "channelC");
-    strcpy(type[2], "multiline");
-    strcpy(name[3], "channelD");
-    strcpy(type[3], "multiline");
-    strcpy(name[4], "visibilityCalc");
-    strcpy(type[4], "multiline");
-    d_domXml = XmlFunc("caGraphics", "cagraphics", 0, 0, 100, 100, name, type, text, 5);
+    strng name[16], type[16];
+    longtext text[16] = {LINESTYLE, LINESIZE, FILLSTYLE, COLORMODE, VISIBILITY, VISIBILITYCALC, TEXTPVA, TEXTPVB, TEXTPVC, TEXTPVD, GRAPHICFORM,
+                         GRAPHICSPECIALS, GRAPHICSPECIALS, GRAPHICSPECIALS, GRAPHICSPECIALS, GRAPHICSPECIALS};
+
+    strcpy(name[0], "linestyle");
+    strcpy(type[0], "");
+    strcpy(name[1], "linesize");
+    strcpy(type[1], "");
+    strcpy(name[2], "fillstyle");
+    strcpy(type[2], "");
+    strcpy(name[3], "colorMode");
+    strcpy(type[3], "");
+    strcpy(name[4], "visibility");
+    strcpy(type[4], "");
+    strcpy(name[5], "visibilityCalc");
+    strcpy(type[5], "multiline");
+    strcpy(name[6], "channel");
+    strcpy(type[6], "multiline");
+    strcpy(name[7], "channelB");
+    strcpy(type[7], "multiline");
+    strcpy(name[8], "channelC");
+    strcpy(type[8], "multiline");
+    strcpy(name[9], "channelD");
+    strcpy(type[9], "multiline");
+    strcpy(name[10], "form");
+    strcpy(type[10], "");
+    strcpy(name[11], "arrowSize");
+    strcpy(type[11], "");
+    strcpy(name[12], "arrowMode");
+    strcpy(type[12], "");
+    strcpy(name[13], "tiltAngle");
+    strcpy(type[13], "");
+    strcpy(name[14], "startAngle");
+    strcpy(type[14], "");
+    strcpy(name[15], "spanAngle");
+    strcpy(type[15], "");
+
+    d_domXml = XmlFunc("caGraphics", "cagraphics", 0, 0, 100, 100, name, type, text, 16);
     d_name = "caGraphics";
     d_include = "caGraphics";
     QPixmap qpixmap = QPixmap(":pixmaps/gtool.png");
     d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
+
+QWidget *caPolyLineInterface::createWidget(QWidget *parent)
+{
+    return new caPolyLine(parent);
+}
+
+caPolyLineInterface::caPolyLineInterface(QObject *parent): CustomWidgetInterface_Graphics(parent)
+{
+    strng name[12], type[12];
+    longtext text[12] = {LINESTYLE, LINESIZE, FILLSTYLE, COLORMODE, POLYSTYLE, VISIBILITY, VISIBILITYCALC, TEXTPVA, TEXTPVB, TEXTPVC, TEXTPVD, XYPAIRS};
+    strcpy(name[0], "linestyle");
+    strcpy(type[0], "");
+    strcpy(name[1], "lineSize");
+    strcpy(type[1], "");
+    strcpy(name[2], "fillstyle");
+    strcpy(type[2], "");
+    strcpy(name[3], "colorMode");
+    strcpy(type[3], "");
+    strcpy(name[4], "polystyle");
+    strcpy(type[4], "");
+    strcpy(name[5], "visibility");
+    strcpy(type[5], "");
+    strcpy(name[6], "visibilityCalc");
+    strcpy(type[6], "multiline");
+    strcpy(name[7], "channel");
+    strcpy(type[7], "multiline");
+    strcpy(name[8], "channelB");
+    strcpy(type[8], "multiline");
+    strcpy(name[9], "channelC");
+    strcpy(type[9], "multiline");
+    strcpy(name[10], "channelD");
+    strcpy(type[10], "multiline");
+    strcpy(name[11], "xyPairs");
+    strcpy(type[11], "multiline");
+    d_domXml = XmlFunc("caPolyLine", "capolyline", 0, 0, 150, 150, name, type, text, 12);
+    d_name = "caPolyLine";
+    d_include = "caPolyLine";
+    QPixmap qpixmap = QPixmap(":pixmaps/polyline.png");
+    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+}
+
 
 QWidget *caIncludeInterface::createWidget(QWidget* parent)
 {
@@ -367,29 +399,27 @@ QWidget *caIncludeInterface::createWidget(QWidget* parent)
 
 caIncludeInterface::caIncludeInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
 {
-    longtext text[7] = {"",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        ""};
-    strng name[7], type[7];
-    strcpy(name[0], "channel");
+    strng name[8], type[8];
+    longtext text[8] = {MACRO, INCLUDEFILE, VISIBILITY, VISIBILITYCALC, TEXTPVA, TEXTPVB, TEXTPVC, TEXTPVD};
+
+    strcpy(name[0], "macro");
     strcpy(type[0], "multiline");
-    strcpy(name[1], "channelB");
+    strcpy(name[1], "filename");
     strcpy(type[1], "multiline");
-    strcpy(name[2], "channelC");
-    strcpy(type[2], "multiline");
-    strcpy(name[3], "channelD");
+    strcpy(name[2], "visibility");
+    strcpy(type[2], "");
+    strcpy(name[3], "visibilityCalc");
     strcpy(type[3], "multiline");
-    strcpy(name[4], "visibilityCalc");
+    strcpy(name[4], "channel");
     strcpy(type[4], "multiline");
-    strcpy(name[5], "macro");
+    strcpy(name[5], "channelB");
     strcpy(type[5], "multiline");
-    strcpy(name[6], "filename");
+    strcpy(name[6], "channelC");
     strcpy(type[6], "multiline");
-    d_domXml = XmlFunc("caInclude", "cainclude", 0, 0, 100, 100, name, type, text, 7);
+    strcpy(name[7], "channelD");
+    strcpy(type[7], "multiline");
+
+    d_domXml = XmlFunc("caInclude", "cainclude", 0, 0, 100, 100, name, type, text, 8);
     d_name = "caInclude";
     d_include = "caInclude";
     QPixmap qpixmap = QPixmap(":pixmaps/frame.png");
@@ -404,9 +434,9 @@ QWidget *caDoubleTabWidgetInterface::createWidget(QWidget* parent)
 
 caDoubleTabWidgetInterface::caDoubleTabWidgetInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
 {
-    longtext text[2] = {"",
-                        ""};
     strng name[2], type[2];
+    longtext text[2] = {"",""};
+
     strcpy(name[0], "itemsHorizontal");
     strcpy(type[0], "multiline");
     strcpy(name[1], "itemsVertical");
@@ -426,11 +456,16 @@ QWidget *caClockInterface::createWidget(QWidget* parent)
 
 caClockInterface::caClockInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
 {
-    longtext text[1] = {""};
-    strng name[2], type[2];
+    strng name[3], type[3];
+    longtext text[3] = {CHANNEL, TIMETYPE, COLORMODE};
+
     strcpy(name[0], "channel");
     strcpy(type[0], "multiline");
-    d_domXml = XmlFunc("caClock", "caclock", 0, 0, 125, 125, name, type, text, 1);
+    strcpy(name[1], "timeType");
+    strcpy(type[1], "");
+    strcpy(name[2], "colorMode");
+    strcpy(type[2], "");
+    d_domXml = XmlFunc("caClock", "caclock", 0, 0, 125, 125, name, type, text, 3);
     d_name = "caClock";
     d_include = "caClock";
     QPixmap qpixmap = QPixmap(":pixmaps/clock.png");
