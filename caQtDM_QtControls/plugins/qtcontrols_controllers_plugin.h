@@ -27,11 +27,7 @@
 #define QTCONTROLS_CONTROLLERS_PLUGIN_H
 
 #include <qglobal.h>
-#if QT_VERSION >= QT_VERSION_CHECK(5,5,0)
-#include <QtUiPlugin/QDesignerCustomWidgetInterface>
-#else
 #include <QDesignerCustomWidgetInterface>
-#endif
 
 class CustomWidgetInterface_Controllers: public QObject, public QDesignerCustomWidgetInterface
 {
@@ -41,16 +37,16 @@ class CustomWidgetInterface_Controllers: public QObject, public QDesignerCustomW
 public:
     CustomWidgetInterface_Controllers(QObject *parent);
 
-    virtual bool isContainer() const { if(d_name.contains("caFrame")) return true; else return false; };
-    virtual bool isInitialized() const { return d_isInitialized; };
-    virtual QIcon icon() const { return d_icon; };
-    virtual QString codeTemplate() const { return d_codeTemplate; };
-    virtual QString domXml() const { return d_domXml; };
-    virtual QString group() const { return "caQtDM Controllers - PSI"; };
-    virtual QString includeFile() const { return d_include; };
-    virtual QString name() const { return d_name; };
-    virtual QString toolTip() const { return d_toolTip; };
-    virtual QString whatsThis() const { return d_whatsThis; };
+    virtual bool isContainer() const { if(d_name.contains("caFrame")) return true; else return false; }
+    virtual bool isInitialized() const { return d_isInitialized; }
+    virtual QIcon icon() const { return d_icon; }
+    virtual QString codeTemplate() const { return d_codeTemplate; }
+    virtual QString domXml() const { return d_domXml; }
+    virtual QString group() const { return "caQtDM Controllers - PSI"; }
+    virtual QString includeFile() const { return d_include; }
+    virtual QString name() const { return d_name; }
+    virtual QString toolTip() const { return d_toolTip; }
+    virtual QString whatsThis() const { return d_whatsThis; }
     virtual void initialize(QDesignerFormEditorInterface *);
 
 protected:
