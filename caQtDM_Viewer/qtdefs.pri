@@ -53,7 +53,7 @@ DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 # capolyline was not resizing correctly, this has been now corrected
 # a string containing a semicolumn was only displayed up to the semicolumn, this is corrected now.
 # cacamera and cascan2d got display of selected values and readback values with different representations and may therefore write values to the CS
-# soft variable bug corrected (was not always found when wrting)
+# soft variable bug corrected (was not always found when writing)
 # catextentry got input dialogs (filedialog in case of strings, otherwise simple dialog)
 # activ widgets were always brought in front. Now you can choose if you let the designer define the layer
 # QTextBrowser can be used with macro substitution. The file that will be read in, will be watched for changes and will automatically be reloaded
