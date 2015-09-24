@@ -71,7 +71,9 @@
                                 <File Id="ADL2UI.EXE" Name="adl2ui.exe" Source="$(env.CAQTDM_COLLECT)\adl2ui.exe" />
                             </Component>
                             <Component Guid="DA389183-2F82-4D47-8039-FC53BF8E27E6" Id="qt_conf">
-                                <IniFile Id="qt_conf_file" Action="createLine" Key="Prefix" Name="qt.conf" Section="Paths" Value="[INSTALLDIR]bin\windows-x64\" Directory="INSTALLDIR_BIN" />
+                                <IniFile Id="qt_conf_file1" Action="createLine" Key="Prefix" Name="qt.conf" Section="Paths" Value="../.." Directory="INSTALLDIR_BIN" />
+                                <IniFile Id="qt_conf_file2" Action="createLine" Key="Plugins" Name="qt.conf" Section="Paths" Value="plugins" Directory="INSTALLDIR_BIN" />
+                                <IniFile Id="qt_conf_file3" Action="createLine" Key="Binaries" Name="qt.conf" Section="Paths" Value="bin/win32-x86/" Directory="INSTALLDIR_BIN" />
                                 <CreateFolder />
                             </Component>
                         </Directory>

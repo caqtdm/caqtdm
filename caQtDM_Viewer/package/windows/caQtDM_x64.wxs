@@ -90,7 +90,9 @@
                                 <File Id="ADL2UI.EXE" Name="adl2ui.exe" Source="$(env.CAQTDM_COLLECT)\adl2ui.exe" />
                             </Component>
                             <Component Guid="37AC3E87-ABC3-4543-8489-3FBD6F3DDC41" Id="qt_conf" Win64="yes">
-                                <IniFile Id="qt_conf_file" Action="createLine" Key="Prefix" Name="qt.conf" Section="Paths" Value="[INSTALLDIR]bin\windows-x64\" Directory="INSTALLDIR_BIN" />
+                                <IniFile Id="qt_conf_file1" Action="createLine" Key="Prefix" Name="qt.conf" Section="Paths" Value="../.." Directory="INSTALLDIR_BIN" />
+                                <IniFile Id="qt_conf_file2" Action="createLine" Key="Plugins" Name="qt.conf" Section="Paths" Value="plugins" Directory="INSTALLDIR_BIN" />
+                                <IniFile Id="qt_conf_file3" Action="createLine" Key="Binaries" Name="qt.conf" Section="Paths" Value="bin/windows-x64/" Directory="INSTALLDIR_BIN" />
                                 <CreateFolder />
                             </Component>
                         </Directory>
@@ -168,10 +170,8 @@
                 </Directory>
             </Directory>
             <Component Id="Environment" Guid="C071FF0B-D353-4DA0-9C0F-D07FC5FF2CFE">
-                <Environment Id="QT_PLUGIN_PATH" Action="set" Name="QT_PLUGIN_PATH" Part="last" Permanent="no" Value="[INSTALLDIR]plugins" System="yes" />
                 <Environment Id="PATH" Name="PATH" Part="last" Permanent="no" Action="set" Value="[INSTALLDIR]bin\windows-x64\" System="yes" Separator=";" />
                 <Environment Id="CAQTDM_DISPLAY_PATH" Name="CAQTDM_DISPLAY_PATH" Action="set" Permanent="no" System="yes" Value="[INSTALLDIR]StyleSheet" />
-                <Environment Id="QT_QPA_PLATFORM_PLUGIN_PATH" Name="QT_QPA_PLATFORM_PLUGIN_PATH" Action="set" Permanent="no" System="yes" Value="[INSTALLDIR]plugins\platforms" />
             </Component>
         </Directory>
         <Feature Id="DefaultFeature" Title="Main Feature" Level="1" ConfigurableDirectory="INSTALLDIR">
