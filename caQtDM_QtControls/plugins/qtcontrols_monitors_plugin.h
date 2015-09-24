@@ -27,8 +27,11 @@
 #define QTCONTROLS_MONITORS_PLUGIN_H
 
 #include <qglobal.h>
-
+#if QT_VERSION >= QT_VERSION_CHECK(5,5,0)
+#include <QtUiPlugin/QDesignerCustomWidgetInterface>
+#else
 #include <QDesignerCustomWidgetInterface>
+#endif
 
 class CustomWidgetInterface_Monitors: public QObject, public QDesignerCustomWidgetInterface
 {

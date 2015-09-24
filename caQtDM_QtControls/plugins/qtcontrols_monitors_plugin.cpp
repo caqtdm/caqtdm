@@ -43,13 +43,15 @@
 typedef char strng[40];
 typedef char longtext[300];
 
-QString XmlFunc(const char *clss, const char *name, int x, int y, int w, int h,
+static QString XmlFunc(const char *clss, const char *name, int x, int y, int w, int h,
                 strng *propertyname, strng* propertytype, longtext *propertytext, int nb)
 {
+#ifndef DESIGNER_TOOLTIP_DESCRIPTIONS
+    Q_UNUSED(propertytext);
+#endif
     QString mess = "";
     QString strng1 = "";
     QString strng2 = "";
-    QString strng3 = "";
 
     mess = "<ui language=\"c++\"><widget class=\"%1\" name=\"%2\">\
             <property name=\"geometry\">\
@@ -69,7 +71,7 @@ QString XmlFunc(const char *clss, const char *name, int x, int y, int w, int h,
         strng1 = strng1.arg(clss);
         for(int i=0; i<nb; i++) {
 #ifdef DESIGNER_TOOLTIP_DESCRIPTIONS
-            strng3 = "<tooltip name=\"%1\">%2</tooltip>";
+            QString strng3 = "<tooltip name=\"%1\">%2</tooltip>";
             strng3 = strng3.arg(propertyname[i]).arg(propertytext[i]);
             strng1.append(strng3);
 #endif

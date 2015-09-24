@@ -27,8 +27,11 @@
 #define QTCONTROLS_CONTROLLERS_PLUGIN_H
 
 #include <qglobal.h>
-
+#if QT_VERSION >= QT_VERSION_CHECK(5,5,0)
+#include <QtUiPlugin/QDesignerCustomWidgetInterface>
+#else
 #include <QDesignerCustomWidgetInterface>
+#endif
 
 class CustomWidgetInterface_Controllers: public QObject, public QDesignerCustomWidgetInterface
 {
