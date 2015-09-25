@@ -33,7 +33,7 @@ public:
     void setEventSignal(eventsignal signl) {thisEventSignal = signl;}
 
 signals:
-    void emitSignal();
+    void emitSignal(int);
 
 private:
     eventsignal thisEventSignal;

@@ -57,4 +57,7 @@
 
 # define CHANNEL        "Name of PV (processvariable) used for this object,\na PV can be prefixed with a plugin name (ex: epics3://)"
 # define TIMETYPE       "The clock can display the current (internalTime) time\nor the time (receiveTime) of the last update of the PV"
+
+#define TRUEVALUE       "LED will get its true color when the trueValue fits the given value\nin case the value does not match either the true or false value\nthe led will get the undefined color"
+#define FALSEVALUE      "LED will get its true color when the falseValue fits the given value\nin case the value does not match either the true or false value\nthe led will get the undefined color"
 #endif

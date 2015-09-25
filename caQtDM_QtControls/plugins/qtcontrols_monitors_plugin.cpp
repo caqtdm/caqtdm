@@ -133,12 +133,18 @@ QWidget *caBitnamesInterface::createWidget(QWidget *parent)
 
 caLedInterface::caLedInterface(QObject *parent): CustomWidgetInterface_Monitors(parent)
 {
-    strng name[1], type[1];
-    longtext text[1] = {""};
+    strng name[4], type[4];
+    longtext text[4] = {CHANNEL, COLORMODE, TRUEVALUE, FALSEVALUE};
 
     strcpy(name[0], "channel");
     strcpy(type[0], "multiline");
-    d_domXml = XmlFunc("caLed", "caled", 0, 0, 30, 30, name, type, text, 1);
+    strcpy(name[1], "colorMode");
+    strcpy(type[1], "");
+    strcpy(name[2], "trueValue");
+    strcpy(type[2], "");
+    strcpy(name[3], "falseValue");
+    strcpy(type[3], "");
+    d_domXml = XmlFunc("caLed", "caled", 0, 0, 30, 30, name, type, text, 4);
     d_toolTip = "[LED for true or false bitstate or for severity states]";
     d_name = "caLed";
     d_include = "caLed";
