@@ -88,6 +88,23 @@
     break;\
     }}
 
+// used for calculating visibility for several types of widgets
+#define GetDefinedCalcString(x, obj, strng)  {  \
+    switch(obj->getVisibility()) { \
+    case x::StaticV:\
+    strng = "static"; \
+    break; \
+    case x::IfNotZero: \
+    strng = "IfNotZero"; \
+    break;\
+    case x::IfZero:\
+    strng = "IfZero"; \
+    break;\
+    case x::Calc:\
+    strng = obj->getVisibilityCalc();\
+    break;\
+    }}
+
 
 // used for interfacing epics routines with (pv, text, ...)
 #define QStringsToChars(x,y,z) \
@@ -963,6 +980,20 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         labelWidget->setText(text);
 
         labelWidget->setProperty("Taken", true);
+
+        //==================================================================================================================
+    } else if(caLabelVertical* labelverticalWidget = qobject_cast<caLabelVertical *>(w1)) {
+
+        //qDebug() << "create caLabelVertical";
+        w1->setProperty("ObjectType", caLabelVertical_Widget);
+
+        nbMonitors = InitVisibility(w1, &kData, map, specData, "");
+
+        QString text =  treatMacro(map, labelverticalWidget->text(), &doNothing);
+        text.replace(QString::fromWCharArray(L"\u00A6"), " ");    // replace Â¦ with a blanc (was used in macros for creating blancs)
+        labelverticalWidget->setText(text);
+
+        labelverticalWidget->setProperty("Taken", true);
 
         //==================================================================================================================
     } else if(caTextEntry* textentryWidget = qobject_cast<caTextEntry *>(w1)) {
@@ -2221,7 +2252,7 @@ int CaQtDM_Lib::setObjectVisibility(QWidget *w, double value)
     if(caFrame *frameWidget = qobject_cast<caFrame *>(w)) {
         // treat visibility if defined
         ComputeVisibility(caFrame, frameWidget)
-                if(frameWidget->getVisibilityMode() == caFrame::Background) {
+        if(frameWidget->getVisibilityMode() == caFrame::Background) {
             if(visible) frameWidget->setAutoFillBackground(true);
             else frameWidget->setAutoFillBackground(false);
             return visible;
@@ -2241,6 +2272,9 @@ int CaQtDM_Lib::setObjectVisibility(QWidget *w, double value)
     } else if(caLabel *labelWidget = qobject_cast<caLabel *>(w)) {
         // treat visibility if defined
         ComputeVisibility(caLabel,labelWidget)
+    } else if(caLabelVertical *labelverticalWidget = qobject_cast<caLabelVertical *>(w)) {
+        // treat visibility if defined
+        ComputeVisibility(caLabelVertical,labelverticalWidget)
     }
 
     if(!visible) {
@@ -2273,6 +2307,9 @@ void CaQtDM_Lib::setCalcToNothing(QWidget* w) {
     }
     else if(caLabel *label = qobject_cast<caLabel *>(w)) {
         label->setVisibilityCalc("");
+    }
+    else if(caLabelVertical *labelvertical = qobject_cast<caLabelVertical *>(w)) {
+        labelvertical->setVisibilityCalc("");
     }
     else if(caCalc *calc = qobject_cast<caCalc *>(w)) {
         calc->setCalc("");
@@ -2351,6 +2388,9 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
     }
     else if(caLabel *label = qobject_cast<caLabel *>(w)) {
         calcQString = label->getVisibilityCalc();
+    }
+    else if(caLabelVertical *labelvertical = qobject_cast<caLabelVertical *>(w)) {
+        calcQString = labelvertical->getVisibilityCalc();
     }
     else if(caCalc *calc = qobject_cast<caCalc *>(w)) {
         calcQString = calc->getCalc();
@@ -2773,7 +2813,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             }
         }
 
-        // frame ==================================================================================================================
+        // caLabel ==================================================================================================================
     } else if(caLabel *labelWidget = qobject_cast<caLabel *>(w)) {
         //qDebug() << "we have a label";
 
@@ -2799,19 +2839,45 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             SetColorsNotConnected(labelWidget);
         }
 
-        // frame ==================================================================================================================
+        // caLabelVertical ==================================================================================================================
+    } else if(caLabelVertical *labelverticalWidget = qobject_cast<caLabelVertical *>(w)) {
+        //qDebug() << "we have a label";
+
+        if(data.edata.connected) {
+            int colorMode = labelverticalWidget->getColorMode();
+            if(colorMode == caLabel::Static) {
+                // done at initialisation, we have to set it back after no connect
+                if(!labelverticalWidget->property("Connect").value<bool>()) {
+                    QColor fg = labelverticalWidget->property("FColor").value<QColor>();
+                    QColor bg = labelverticalWidget->property("BColor").value<QColor>();
+                    labelverticalWidget->setForeground(fg);
+                    labelverticalWidget->setBackground(bg);
+                    labelverticalWidget->setProperty("Connect", true);
+                }
+            } else if(colorMode == caLabel::Alarm) {
+                short status = ComputeAlarm(w);
+                labelverticalWidget->setAlarmColors(status);
+            }
+
+            setObjectVisibility(labelverticalWidget, data.edata.rvalue);
+
+        } else {
+            SetColorsNotConnected(labelverticalWidget);
+        }
+
+        // caInclude ==================================================================================================================
     } else if(caInclude *includeWidget = qobject_cast<caInclude *>(w)) {
         //qDebug() << "we have an included frame";
 
         setObjectVisibility(includeWidget, data.edata.rvalue);
 
-        // frame ==================================================================================================================
+        // caFrame ==================================================================================================================
     } else if(caFrame *frameWidget = qobject_cast<caFrame *>(w)) {
         //qDebug() << "we have a frame";
 
         setObjectVisibility(frameWidget, data.edata.rvalue);
 
-        // menu ==================================================================================================================
+        // caMenu ==================================================================================================================
     } else if (caMenu *menuWidget = qobject_cast<caMenu *>(w)) {
         //qDebug() << "we have a menu";
 
@@ -2836,7 +2902,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         }
         menuWidget->setAccessW(data.edata.accessW);
 
-        // choice ==================================================================================================================
+        // caChoice ==================================================================================================================
     } else if (caChoice *choiceWidget = qobject_cast<caChoice *>(w)) {
         //qDebug() << "we have a choiceButton" << String << value;
 
@@ -2858,7 +2924,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         }
         choiceWidget->setAccessW(data.edata.accessW);
 
-        // thermometer ==================================================================================================================
+        // caThermo ==================================================================================================================
     } else if (caThermo *thermoWidget = qobject_cast<caThermo *>(w)) {
         //qDebug() << "we have a thermometer";
 
@@ -2898,7 +2964,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             SetColorsNotConnected(thermoWidget);
         }
 
-        // Slider ==================================================================================================================
+        // caSlider ==================================================================================================================
     } else if (caSlider *sliderWidget = qobject_cast<caSlider *>(w)) {
 
         bool channelLimitsEnabled = false;
@@ -2947,7 +3013,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             SetColorsNotConnected(sliderWidget);
         }
 
-        // Clock ==================================================================================================================
+        // caClock ==================================================================================================================
     } else if (caClock *clockWidget = qobject_cast<caClock *>(w)) {
         if(data.edata.connected) {
             if(clockWidget->getTimeType() == caClock::ReceiveTime) {
@@ -4454,25 +4520,27 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
     if(caImage* imageWidget = qobject_cast<caImage *>(w)) {
         getAllPVs(imageWidget);
-        calcString = imageWidget->getVisibilityCalc();
+        GetDefinedCalcString(caImage, imageWidget, calcString);
         imageString =imageWidget->getImageCalc();
     } else if(caFrame* frameWidget = qobject_cast<caFrame *>(w)) {
         getAllPVs(frameWidget);
-        calcString = frameWidget->getVisibilityCalc();
+        GetDefinedCalcString(caFrame, frameWidget, calcString);
     } else if(caInclude* includeWidget = qobject_cast<caInclude *>(w)) {
         getAllPVs(includeWidget);
-        calcString = includeWidget->getVisibilityCalc();
+        GetDefinedCalcString(caInclude, includeWidget, calcString);
     } else if(caLabel* labelWidget = qobject_cast<caLabel *>(w)) {
         getAllPVs(labelWidget);
-        calcString = labelWidget->getVisibilityCalc();
+        GetDefinedCalcString(caLabel, labelWidget, calcString);
+    } else if(caLabelVertical* labelverticalWidget = qobject_cast<caLabelVertical *>(w)) {
+        getAllPVs(labelverticalWidget);
+        GetDefinedCalcString(caLabelVertical, labelverticalWidget, calcString);
     } else if(caGraphics* graphicsWidget = qobject_cast<caGraphics *>(w)) {
-        getAllPVs(graphicsWidget);
-        calcString = graphicsWidget->getVisibilityCalc();
+        GetDefinedCalcString(caGraphics, graphicsWidget, calcString);
         if(graphicsWidget->getColorMode() == caGraphics::Alarm) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
     } else if(caPolyLine* polylineWidget = qobject_cast<caPolyLine *>(w)) {
         getAllPVs(polylineWidget);
-        calcString = polylineWidget->getVisibilityCalc();
+        GetDefinedCalcString(caPolyLine, polylineWidget, calcString);
         if(polylineWidget->getColorMode() == caPolyLine::Alarm) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
     } else if(caCalc* calcWidget = qobject_cast<caCalc *>(w)) {
@@ -4668,6 +4736,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 }
             }
         }
+
     } else if(caScriptButton* scriptbuttonWidget =  qobject_cast< caScriptButton *>(w)) {
         // add acion : kill associated process if running
         if(!scriptbuttonWidget->getAccessW()) myMenu.addAction("Kill Process");
@@ -4687,7 +4756,6 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
     } else if(className.contains("QE")) {
         qDebug() << "treat" << w;
-
 
         // must be mainwindow
     } else if(w==myWidget->parent()->parent()) {
@@ -4862,7 +4930,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             info.append("<br>");
             if(!calcString.isEmpty()) {
                 info.append("<br>");
-                info.append("VisibilityCalc: ");
+                info.append("VisibilityCalc: ");  
 #if QT_VERSION > 0x050000
                 info.append(QString(calcString).toHtmlEscaped());
 #else
@@ -4879,6 +4947,9 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 #endif
                 info.append("<br>");
             }
+
+            qDebug() << nbPV;
+
             for(int i=0; i< nbPV; i++) {
                 // is there a json string ?
                 int pos = pv[i].indexOf("{");
@@ -5286,6 +5357,10 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
         if(labelWidget->getVisibility() == caLabel::StaticV && labelWidget->getColorMode() == caLabel::Static) return 0;
         getVisibilityChannels(labelWidget);
         visibilityCalc = labelWidget->getVisibilityCalc();
+    } else if (caLabelVertical *labelverticalWidget = qobject_cast<caLabelVertical *>(widget)) {
+        if(labelverticalWidget->getVisibility() == caLabelVertical::StaticV && labelverticalWidget->getColorMode() == caLabelVertical::Static) return 0;
+        getVisibilityChannels(labelverticalWidget);
+        visibilityCalc = labelverticalWidget->getVisibilityCalc();
     } else {
         qDebug() << "widget has not been defined for visibility";
         return 0;
@@ -5308,6 +5383,8 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
                 replaceVisibilityChannels(frameWidget)
             } else if (caLabel *labelWidget = qobject_cast<caLabel *>(widget)) {
                 replaceVisibilityChannels(labelWidget)
+            } else if (caLabelVertical *labelverticalWidget = qobject_cast<caLabelVertical *>(widget)) {
+                replaceVisibilityChannels(labelverticalWidget)
             }
 
             tooltip.append(pv);
@@ -5361,6 +5438,10 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
         labelWidget->setVisibilityCalc(text);
         labelWidget->setProperty("MonitorList", monitorList);
         labelWidget->setProperty("IndexList", indexList);
+    } else if (caLabelVertical *labelverticalWidget = qobject_cast<caLabelVertical *>(widget)) {
+        labelverticalWidget->setVisibilityCalc(text);
+        labelverticalWidget->setProperty("MonitorList", monitorList);
+        labelverticalWidget->setProperty("IndexList", indexList);
     }
 
     return nbMon;
@@ -6014,17 +6095,14 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
 
     // Tabbar adjustment
     else if(!className.compare("QTabWidget")) {
+ #ifdef MOBILE
         if(list.at(4).toInt() < 0) return; // on android I got -1 for these fonts at initialization, i.e pixelsize
-        QString style= "";
-        QTabWidget *box = (QTabWidget *) widget;
         qreal fontSize = (qMin(factX, factY) * (double) list.at(4).toInt());
         if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         if(fontSize > (double) list.at(4).toInt()) fontSize = (double) list.at(4).toInt();
-#ifdef MOBILE
+        QString style= "";
+        QTabWidget *box = (QTabWidget *) widget;
         qreal height = 1.0;
-#else
-        qreal height = 1.0;
-#endif
         QString thisStyle = "QTabBar::tab {font: %1pt;  height:%2em; padding: %3px;}";
         thisStyle = thisStyle.arg(qRound(fontSize)).arg(height).arg(qRound(5.0*qMin(factX, factY)));
 
@@ -6032,6 +6110,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         QVariant Style=box->property("Stylesheet");
         if(!Style.isNull()) style = Style.toString();
         box->setStyleSheet(thisStyle + style);
+#endif
     }
 }
 
@@ -6433,6 +6512,8 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
         mimeData->setText(graphicsWidget->getChannelA());
     } else if (caLabel *labelWidget = qobject_cast<caLabel *>(w)) {
         mimeData->setText(labelWidget->getChannelA());
+    } else if (caLabelVertical *labelverticalWidget = qobject_cast<caLabelVertical *>(w)) {
+        mimeData->setText(labelverticalWidget->getChannelA());
     } else if (caPolyLine *polylineWidget = qobject_cast<caPolyLine *>(w)) {
         mimeData->setText(polylineWidget->getChannelA());
     } else if (caWaterfallPlot *waterfallplotWidget = qobject_cast<caWaterfallPlot *>(w->parent()->parent())) {

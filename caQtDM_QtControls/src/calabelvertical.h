@@ -23,29 +23,71 @@
  *    anton.mezger@psi.ch
  */
 
-#ifndef CALABEL_H
-#define CALABEL_H
+#ifndef caVertLabel_H
+#define caVertLabel_H
+
+#include <QWidget>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QGraphicsProxyWidget>
+#include <QPropertyAnimation>
+#include <qtcontrols_global.h>
+
+/*
+class QTCON_EXPORT caVertLabel : public QGraphicsView
+{
+    Q_OBJECT
+
+public:
+    caVertLabel( QWidget *parent = 0 );
+
+protected:
+  virtual bool event(QEvent *);
+  void timerEvent(QTimerEvent* event) ;
+
+private:
+    QLabel *label;
+    QGraphicsProxyWidget *proxy;
+    QGraphicsScene *scene;
+    qreal angle;
+*/
+
 
 #include <qtcontrols_global.h>
-#include <ELabel>
+#include "fontscalingwidget.h"
 
-class QTCON_EXPORT caLabel : public ESimpleLabel
+class QTCON_EXPORT caLabelVertical : public QWidget, public FontScalingWidget
 {
+    Q_OBJECT
 
+    Q_PROPERTY(QString text READ text WRITE setText)
+    Q_PROPERTY(Direction direction READ getDirection WRITE setDirection)
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
-
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
     Q_ENUMS(colMode)
+    Q_ENUMS(Direction)
 
 #include "caVisibProps.h"
 #include "caVisibDefs.h"
 
-    Q_OBJECT
-
 public:
+    enum ScaleMode { None, Height, WidthAndHeight};
+    enum Direction {Up, Down};
 
-    caLabel( QWidget *parent = 0 );
+    caLabelVertical(QWidget *parent = 0);
+    bool rotateText(float degrees);
+
+    void setText(const QString &text);
+    QString text() const {return thisText;}
+
+    void setDirection(const Direction &direction);
+    Direction getDirection() const {return thisDirection;}
+
+    QSize calculateTextSpace();
+
+    void setFontScaleMode(ScaleMode m) { FontScalingWidget::setScaleMode((int) m); }
+    ScaleMode fontScaleMode() { return (ScaleMode) FontScalingWidget::scaleMode();  }
 
     QColor getForeground() const {return thisForeColor;}
     void setForeground(QColor c);
@@ -62,15 +104,22 @@ public:
 
     void setColorMode(colMode colormode) {thisColorMode = colormode;
                                           setBackground(thisBackColor);
-                                          setForeground(thisForeColor);
-                                          oldColorMode = thisColorMode;}
+                                          setForeground(thisForeColor);}
+protected:
+    virtual bool event(QEvent *);
+    virtual QSize sizeHint() const;
+    virtual QSize minimumSizeHint() const;
+
 private:
-
-    QColor thisForeColor, thisForeColorOld;
-    QColor thisBackColor, thisBackColorOld;
+    float rotation;
+    QString thisText;
+    QColor thisForeColor;
+    QColor thisBackColor;
     colMode thisColorMode;
-    colMode oldColorMode;
-    QString thisStyle, oldStyle;
-};
+    Direction thisDirection;
 
+protected:
+    void paintEvent(QPaintEvent *);
+
+};
 #endif

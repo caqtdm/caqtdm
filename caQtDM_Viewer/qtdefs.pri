@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V4.0
+CAQTDM_VERSION = V4.0.1
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -10,7 +10,17 @@ unix {
     QMAKE_CFLAGS_RELEASE += "-g"
 }
 
-# enable specialized version, wehere files will be downloaded to a local directory (used specially for IOS)
+# when the designer in 4.8.2 is patched in order to display tooltip description or
+# when the qt version is higher then 5.5.0 then compile the plugins with description texts
+# be carefull with this, while when the designer does not recognize tooltip description, the widgets will not be shown
+#DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
+contains(QT_VER_MAJ, 5) {
+  greaterThan(QT_MINOR_VERSION, 5) {
+    DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
+  }
+}
+
+# enable specialized version, wehere files will be downloaded to a local directory (used specially for IOS and Android)
 ios | android {
  DEFINES += MOBILE
  CONFIG += MOBILE
@@ -52,11 +62,12 @@ DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 # several warnings (mainly on mac osx) solved
 # capolyline was not resizing correctly, this has been now corrected
 # a string containing a semicolumn was only displayed up to the semicolumn, this is corrected now.
-# cacamera and cascan2d got display of selected values and readback values with different representations
-# soft variable bug corrected (was not always found when wrting)
+# cacamera and cascan2d got display of selected values and readback values with different representations and may therefore write values to the CS
+# soft variable bug corrected (was not always found when writing)
 # catextentry got input dialogs (filedialog in case of strings, otherwise simple dialog)
 # activ widgets were always brought in front. Now you can choose if you let the designer define the layer
 # QTextBrowser can be used with macro substitution. The file that will be read in, will be watched for changes and will automatically be reloaded
+# a vertical label has been implemented
 
 # 3.9.5
 # calinedit for DBF_CHAR was missing.

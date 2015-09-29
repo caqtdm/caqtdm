@@ -3,33 +3,42 @@ QTBASE=/usr/local/Trolltech/$EPICS_HOST_ARCH
 DESTINATION=$QTBASE/binQt/
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM_Project/caQtDM_Binaries
 
-cp -v $SOURCE/caQtDM $DESTINATION
+# main caQtDM viewer
+install -v $SOURCE/caQtDM $DESTINATION
 
+# adl files to ui files converter
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM_Project/caQtDM_Binaries
-cp -v $SOURCE/adl2ui $DESTINATION
+install -v $SOURCE/adl2ui $DESTINATION
 
+# all caQtDM libraries
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM_Project/caQtDM_Binaries
-cp -v $SOURCE/lib* $DESTINATION
+install -v $SOURCE/lib* $DESTINATION
 
+# hipa/proscan tune (diskset) application
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/QtTunes
-cp -v $SOURCE/QtTunes $DESTINATION
+install -v $SOURCE/QtTunes $DESTINATION
 
+# hipa hf display application
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/HFdispQt
-cp -v $SOURCE/caHFdispQt $DESTINATION
+install -v $SOURCE/caHFdispQt $DESTINATION
 
+# general scan applicazion
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/QtScan
-cp -v $SOURCE/scanQtProscan $DESTINATION
-cp -v $SOURCE/scanQtHipa $DESTINATION
+install -v $SOURCE/scanQtProscan $DESTINATION
+install -v $SOURCE/scanQtHipa $DESTINATION
 
+# probe measurement application for proscan
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/probeQtProscan
-cp -v $SOURCE/probeQt $DESTINATION
+install -v $SOURCE/probeQt $DESTINATION
 
+# designer plugins
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM_Project/caQtDM_Binaries/designer
 DESTINATION=$QTBASE/Qt-4.8.2/plugins/designer/
-cp -v $SOURCE/lib* $DESTINATION
+install -v $SOURCE/lib* $DESTINATION
 
+# controlsystem plugins for caQtDM_LIB
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM_Project/caQtDM_Binaries/controlsystems
 DESTINATION=$QTBASE/binQt/controlsystems
-cp -v $SOURCE/lib* $DESTINATION
+install -v $SOURCE/lib* $DESTINATION
 
 

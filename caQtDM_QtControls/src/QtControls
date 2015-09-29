@@ -40,6 +40,7 @@
 #include <cameter.h>
 #include <cascan2d.h>
 #include <cabytecontroller.h>
+#include <calabelvertical.h>
 
 #ifndef MOBILE
     #include <cadoubletabwidgetextension.h>

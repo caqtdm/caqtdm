@@ -227,4 +227,16 @@ rm ./caQtDM_Binaries/caqtdm_package.dmg
 hdiutil convert ./caQtDM_Binaries/caqtdm.dmg -format UDZO -o ./caQtDM_Binaries/caqtdm_package.dmg
 rm ./caQtDM_Binaries/caqtdm.dmg
 
+echo
+echo ========== generate Mac Pkg for MacAppStore ============
+echo
+#pkgbuild --analyze --root ./caQtDM_Binaries/pkg ./caQtDM_Binaries/caQtDM.plist
+#productbuild --synthesize --package ./caQtDM_Binaries/caQtDM.pkg--package ./caQtDM_Binaries/Designer.pkg ./caQtDM_Binaries/Distribution.xml
+
+#pkgbuild --root './caQtDM_Binaries' --component-plist './caQtDM_Binaries/caQtDM.plist' './caQtDM_Binaries/caQtDM.pkg'
+#pkgbuild --root './caQtDM_Binaries' --component-plist './caQtDM_Binaries/Designer.plist' './caQtDM_Binaries/Designer.pkg'
+
+#productbuild --distribution ./caQtDM_Binaries/Distribution.xml --sign "${CAQTDM_MAC_INSTALLSIGN}" --resources ./caQtDM_Viewer/src  --package-path ./caQtDM_Binaries/ './caQtDM_Binaries/caqtdmdist.pkg'
+
+
 cd ..

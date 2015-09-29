@@ -90,12 +90,21 @@
                                 <File Id="ADL2UI.EXE" Name="adl2ui.exe" Source="$(env.CAQTDM_COLLECT)\adl2ui.exe" />
                             </Component>
                             <Component Guid="20B55404-03CD-429F-84FF-AA020B794FB6" Id="qt_conf">
-                                <IniFile Id="qt_conf_file" Action="createLine" Key="Prefix" Name="qt.conf" Section="Paths" Value="[INSTALLDIR]bin\windows-x64\" Directory="INSTALLDIR_BIN" />
+                                <IniFile Id="qt_conf_file1" Action="createLine" Key="Prefix" Name="qt.conf" Section="Paths" Value="../.." Directory="INSTALLDIR_BIN" />
+                                <IniFile Id="qt_conf_file2" Action="createLine" Key="Plugins" Name="qt.conf" Section="Paths" Value="plugins" Directory="INSTALLDIR_BIN" />
+                                <IniFile Id="qt_conf_file3" Action="createLine" Key="Binaries" Name="qt.conf" Section="Paths" Value="bin/win32-x86/" Directory="INSTALLDIR_BIN" />
                                 <CreateFolder />
                             </Component>
                         </Directory>
                     </Directory>
                     <Directory Id="PLUGINS" Name="plugins">
+                        <Directory Id="CONTROLSYSTEMS" Name="controlsystems">
+                            <Component Id="controlsystems" Guid="58EF7BB9-6938-481B-9EBD-2A11A770C479">
+                                <File Id="DEMO_PLUGIN.DLL" Name="demo_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\demo_plugin.dll" />
+                                <File Id="EPICS3_PLUGIN.DLL" Name="epics3_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics3_plugin.dll" />
+                                <File Id="EPICS4_PLUGIN.DLL" Name="epics4_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics4_plugin.dll" />
+                            </Component>
+                        </Directory>
                         <Directory Id="DESIGNER" Name="designer">
                             <Component Id="designer" Guid="1937926C-E3AE-4B13-831E-874B1A26AE76">
                                 <File Id="QTCONTROLS_CONTROLLERS_PLUGIN.DLL" Name="qtcontrols_controllers_plugin.dll" Source="$(env.CAQTDM_COLLECT)\designer\qtcontrols_controllers_plugin.dll" />
@@ -181,6 +190,7 @@
             <ComponentRef Id="caQtDMHelp" />
             <ComponentRef Id="sqldrivers_c" />
             <ComponentRef Id="qt_conf" />
+            <ComponentRef Id="controlsystems" />
         </Feature>
         <Feature Id="VCRedist" Level="1" Title="Visual C++ 12.0 Runtime" AllowAdvertise="no" Display="hidden">
             <MergeRef Id="VCRedist" />

@@ -62,6 +62,7 @@ bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKn
     QString alternativePath(qApp->applicationDirPath());
     alternativePath.append("/controlsystems");
     allPaths.append(alternativePath);
+    allPaths.append(QLibraryInfo::location(QLibraryInfo::PluginsPath).append("/controlsystems"));
 #endif
 
     for (int i = 0; i < allPaths.size(); ++i) {
