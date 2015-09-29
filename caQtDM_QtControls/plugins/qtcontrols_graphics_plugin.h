@@ -27,7 +27,6 @@
 #define QTCONTROLS_GRAPHICS_PLUGIN_H
 
 #include <qglobal.h>
-
 #include <QDesignerCustomWidgetInterface>
 
 class CustomWidgetInterface_Graphics: public QObject, public QDesignerCustomWidgetInterface
@@ -46,16 +45,16 @@ public:
       } else {
 	return false; 
     }
-    };
-    virtual bool isInitialized() const { return d_isInitialized; };
-    virtual QIcon icon() const { return d_icon; };
-    virtual QString codeTemplate() const { return d_codeTemplate; };
-    virtual QString domXml() const { return d_domXml; };
-    virtual QString group() const { return "caQtDM Graphics -PSI"; };
-    virtual QString includeFile() const { return d_include; };
-    virtual QString name() const { return d_name; };
-    virtual QString toolTip() const { return d_toolTip; };
-    virtual QString whatsThis() const { return d_whatsThis; };
+    }
+    virtual bool isInitialized() const { return d_isInitialized; }
+    virtual QIcon icon() const { return d_icon; }
+    virtual QString codeTemplate() const { return d_codeTemplate; }
+    virtual QString domXml() const { return d_domXml; }
+    virtual QString group() const { return "caQtDM Graphics -PSI"; }
+    virtual QString includeFile() const { return d_include; }
+    virtual QString name() const { return d_name; }
+    virtual QString toolTip() const { return d_toolTip; }
+    virtual QString whatsThis() const { return d_whatsThis; }
     virtual void initialize(QDesignerFormEditorInterface *);
 
 protected:

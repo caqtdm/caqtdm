@@ -178,25 +178,12 @@ border-radius: 2px;
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>6</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
         <string>caLabel</string>
        </attribute>
-       <widget class="caLabel" name="calabel">
-        <property name="geometry">
-         <rect>
-          <x>235</x>
-          <y>370</y>
-          <width>16</width>
-          <height>81</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;t&lt;br/&gt;e&lt;br/&gt;s&lt;br/&gt;t&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-       </widget>
        <widget class="caLabel" name="calabel_2">
         <property name="geometry">
          <rect>
@@ -338,6 +325,87 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="unitsEnabled">
          <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="caLabelVertical" name="calabelvertical">
+        <property name="geometry">
+         <rect>
+          <x>490</x>
+          <y>330</y>
+          <width>41</width>
+          <height>91</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string notr="true">test</string>
+        </property>
+       </widget>
+       <widget class="caLabelVertical" name="calabelvertical_2">
+        <property name="geometry">
+         <rect>
+          <x>550</x>
+          <y>330</y>
+          <width>41</width>
+          <height>91</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string notr="true">test</string>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>160</red>
+          <green>160</green>
+          <blue>164</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caLabelVertical" name="calabelvertical_3">
+        <property name="geometry">
+         <rect>
+          <x>610</x>
+          <y>330</y>
+          <width>41</width>
+          <height>91</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string notr="true">test</string>
+        </property>
+        <property name="direction">
+         <enum>caLabelVertical::Up</enum>
+        </property>
+       </widget>
+       <widget class="caLabelVertical" name="calabelvertical_4">
+        <property name="geometry">
+         <rect>
+          <x>670</x>
+          <y>330</y>
+          <width>41</width>
+          <height>91</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string notr="true">test</string>
+        </property>
+        <property name="direction">
+         <enum>caLabelVertical::Up</enum>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>160</red>
+          <green>160</green>
+          <blue>164</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLabelVertical::Alarm</enum>
+        </property>
+        <property name="visibility">
+         <enum>caLabelVertical::IfZero</enum>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:COUNT:1</string>
         </property>
        </widget>
       </widget>
@@ -861,11 +929,11 @@ p, li { white-space: pre-wrap; }
           <height>81</height>
          </rect>
         </property>
-        <property name="imageCalc">
-         <string notr="true"/>
-        </property>
         <property name="filename" stdset="0">
          <string notr="true">earth.gif</string>
+        </property>
+        <property name="imageCalc">
+         <string notr="true"/>
         </property>
        </widget>
        <widget class="caImage" name="caimage_5">
@@ -877,11 +945,11 @@ p, li { white-space: pre-wrap; }
           <height>81</height>
          </rect>
         </property>
-        <property name="imageCalc">
-         <string notr="true"/>
-        </property>
         <property name="filename" stdset="0">
          <string notr="true">earth.gif</string>
+        </property>
+        <property name="imageCalc">
+         <string notr="true"/>
         </property>
        </widget>
        <zorder>textEdit_3</zorder>
@@ -905,11 +973,11 @@ p, li { white-space: pre-wrap; }
           <height>40</height>
          </rect>
         </property>
-        <property name="imageCalc">
-         <string notr="true"/>
-        </property>
         <property name="filename" stdset="0">
          <string>turbo.gif</string>
+        </property>
+        <property name="imageCalc">
+         <string notr="true"/>
         </property>
         <property name="channel" stdset="0">
          <string notr="true"/>
@@ -949,11 +1017,11 @@ p, li { white-space: pre-wrap; }
           <height>40</height>
          </rect>
         </property>
-        <property name="imageCalc">
-         <string>A</string>
-        </property>
         <property name="filename" stdset="0">
          <string>turbo.gif</string>
+        </property>
+        <property name="imageCalc">
+         <string>A</string>
         </property>
         <property name="channel" stdset="0">
          <string notr="true">ACM:COUNT:1</string>
@@ -994,11 +1062,11 @@ p, li { white-space: pre-wrap; }
           <height>81</height>
          </rect>
         </property>
-        <property name="imageCalc">
-         <string notr="true"/>
-        </property>
         <property name="filename" stdset="0">
          <string notr="true">earth.gif</string>
+        </property>
+        <property name="imageCalc">
+         <string notr="true"/>
         </property>
        </widget>
       </widget>
@@ -1101,6 +1169,18 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="backgroundMode">
          <enum>caFrame::Outline</enum>
+        </property>
+        <property name="visibility">
+         <enum>caFrame::StaticV</enum>
+        </property>
+        <property name="visibilityMode">
+         <enum>caFrame::Background</enum>
+        </property>
+        <property name="visibilityCalc">
+         <string notr="true">A=0</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <widget class="caNumeric" name="caNumeric_6">
          <property name="geometry">
@@ -1358,6 +1438,53 @@ p, li { white-space: pre-wrap; }
          <string>QFrame can also be used for grouping</string>
         </property>
        </widget>
+       <widget class="caNumeric" name="caNumeric_12">
+        <property name="geometry">
+         <rect>
+          <x>470</x>
+          <y>270</y>
+          <width>96</width>
+          <height>56</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="integerDigits" stdset="0">
+         <number>3</number>
+        </property>
+        <property name="decimalDigits" stdset="0">
+         <number>0</number>
+        </property>
+        <property name="digitsFontScaleEnabled">
+         <bool>true</bool>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="background">
+         <color>
+          <red>170</red>
+          <green>170</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="precisionMode">
+         <enum>caNumeric::Channel</enum>
+        </property>
+        <property name="fixedFormat">
+         <bool>true</bool>
+        </property>
+        <property name="limitsMode">
+         <enum>caNumeric::Channel</enum>
+        </property>
+        <property name="maxValue">
+         <double>10.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>-10.000000000000000</double>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_31">
        <attribute name="title">
@@ -1455,11 +1582,11 @@ p, li { white-space: pre-wrap; }
             <height>81</height>
            </rect>
           </property>
-          <property name="imageCalc">
-           <string notr="true"/>
-          </property>
           <property name="filename" stdset="0">
            <string notr="true">earth.gif</string>
+          </property>
+          <property name="imageCalc">
+           <string notr="true"/>
           </property>
          </widget>
          <widget class="caPolyLine" name="capolyline_4">
@@ -1621,7 +1748,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>11</number>
+       <number>14</number>
       </property>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">
@@ -2974,9 +3101,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="foreground">
          <color>
-          <red>170</red>
+          <red>0</red>
           <green>0</green>
-          <blue>255</blue>
+          <blue>0</blue>
          </color>
         </property>
         <property name="background">
@@ -6393,7 +6520,7 @@ def PythonCalc(a, b, c, d):
           <string notr="true">mySoft2</string>
          </property>
          <property name="initialValue">
-          <double>500.000000000000000</double>
+          <double>1.000000000000000</double>
          </property>
          <property name="eventSignal">
           <enum>caCalc::onFirstChange</enum>
@@ -9386,6 +9513,11 @@ p, li { white-space: pre-wrap; }
    <header>caLabel</header>
   </customwidget>
   <customwidget>
+   <class>caLabelVertical</class>
+   <extends>QWidget</extends>
+   <header>caLabelVertical</header>
+  </customwidget>
+  <customwidget>
    <class>caGraphics</class>
    <extends>QWidget</extends>
    <header>caGraphics</header>
@@ -9494,22 +9626,6 @@ p, li { white-space: pre-wrap; }
  <resources/>
  <connections>
   <connection>
-   <sender>cacalc_4</sender>
-   <signal>emitSignal()</signal>
-   <receiver>radioButton</receiver>
-   <slot>toggle()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>340</x>
-     <y>300</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>788</x>
-     <y>374</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>caclock</sender>
    <signal>valueChanged(double)</signal>
    <receiver>radioButton_2</receiver>
@@ -9520,8 +9636,8 @@ p, li { white-space: pre-wrap; }
      <y>289</y>
     </hint>
     <hint type="destinationlabel">
-     <x>413</x>
-     <y>304</y>
+     <x>415</x>
+     <y>272</y>
     </hint>
    </hints>
   </connection>
@@ -9536,8 +9652,8 @@ p, li { white-space: pre-wrap; }
      <y>348</y>
     </hint>
     <hint type="destinationlabel">
-     <x>612</x>
-     <y>315</y>
+     <x>507</x>
+     <y>347</y>
     </hint>
    </hints>
   </connection>
@@ -9584,8 +9700,24 @@ p, li { white-space: pre-wrap; }
      <y>490</y>
     </hint>
     <hint type="destinationlabel">
-     <x>708</x>
-     <y>232</y>
+     <x>507</x>
+     <y>456</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_4</sender>
+   <signal>emitSignal(int)</signal>
+   <receiver>radioButton</receiver>
+   <slot>toggle()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>322</x>
+     <y>290</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>770</x>
+     <y>362</y>
     </hint>
    </hints>
   </connection>

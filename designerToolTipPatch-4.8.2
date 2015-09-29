@@ -1,0 +1,648 @@
+--- Qt-4.8.2/tools/designer/src/components/propertyeditor/propertyeditor.cpp	2015-09-22 12:01:58.725742173 +0200
++++ Qt-4.8.2/tools/designer/src/components/propertyeditor/propertyeditor.cpp	2015-09-22 11:42:31.814106746 +0200
+@@ -65,9 +65,7 @@
+ #include <qdesigner_propertycommand_p.h>
+ #include <metadatabase_p.h>
+ #include <iconloader_p.h>
+-#ifdef Q_OS_WIN
+-#  include <widgetfactory_p.h>
+-#endif
++#include <widgetfactory_p.h>
+ #include <QtGui/QAction>
+ #include <QtGui/QLineEdit>
+ #include <QtGui/QMenu>
+@@ -909,22 +907,38 @@
+     return className;
+ }
+ 
+-static QString msgUnsupportedType(const QString &propertyName, unsigned type)
++static const char *typeName(int type)	
++			{	
++			if (type == qMetaTypeId<PropertySheetStringValue>())
++			type = QVariant::String;
++			if (type < int(QVariant::UserType))
++			return QVariant::typeToName(static_cast<QVariant::Type>(type));
++			if (type == qMetaTypeId<PropertySheetIconValue>())	
++			return "QIcon";
++			if (type == qMetaTypeId<PropertySheetPixmapValue>())
++			return "QPixmap";
++			if (type == qMetaTypeId<PropertySheetKeySequenceValue>())
++			return "QKeySequence";
++			if (type == qMetaTypeId<PropertySheetFlagValue>())
++			return "QFlags";
++			if (type == qMetaTypeId<PropertySheetEnumValue>())
++			return "enum";
++			if (type == QVariant::Invalid)
++			return "invalid";
++			if (type == QVariant::UserType)
++			return "user type";
++			return NULL;
++			}	
++			
++
++static QString msgUnsupportedType(const QString &propertyName, int type)
+ {
+     QString rc;
+     QTextStream str(&rc);
+-    str << "The property \"" << propertyName << "\" of type " << type;
+-    if (type == QVariant::Invalid) {
+-        str << " (invalid) ";
+-    } else {
+-        if (type < QVariant::UserType) {
+-            if (const char *typeName = QVariant::typeToName(static_cast<QVariant::Type>(type)))
+-                str << " (" << typeName << ") ";
+-        } else {
+-            str << " (user type) ";
+-        }
+-    }
+-    str << " is not supported yet!";
++    const char *typeS = typeName(type);
++    str << "The property \"" << propertyName << "\" of type ("
++	 << (typeS ? typeS : "unknown") << ") is not supported yet!";
++    
+     return rc;
+ }
+ 
+@@ -998,6 +1012,9 @@
+     m_groups.clear();
+ 
+     if (m_propertySheet) {
++      	const QString className = WidgetFactory::classNameOf(formWindow->core(), m_object);
++	const QDesignerCustomWidgetData customData = formWindow->core()->pluginManager()->customWidgetData(className);
++
+         QtProperty *lastProperty = 0;
+         QtProperty *lastGroup = 0;
+         const int propertyCount = m_propertySheet->count();
+@@ -1048,6 +1065,18 @@
+             if (property != 0) {
+                 const bool dynamicProperty = (dynamicSheet && dynamicSheet->isDynamicProperty(i))
+                             || (sheet && sheet->isDefaultDynamicProperty(i));
++	                QString descriptionToolTip;
++			if (!dynamicProperty && !customData.isNull())
++			descriptionToolTip = customData.propertyToolTip(propertyName);
++			if (descriptionToolTip.isEmpty()) {
++			if (const char *typeS = typeName(type)) {
++			descriptionToolTip = propertyName + QLatin1String(" (")
++			+ QLatin1String(typeS) + QLatin1Char(')');
++			}
++			}
++			if (!descriptionToolTip.isEmpty()) {
++			property->setDescriptionToolTip(descriptionToolTip);	   
++			}
+                 switch (type) {
+                 case QVariant::Palette:
+                     setupPaletteProperty(property);
+--- Qt-4.8.2/tools/designer/src/components/propertyeditor/designerpropertymanager.cpp	2015-09-22 12:01:58.592748142 +0200
++++ Qt-4.8.2/tools/designer/src/components/propertyeditor/designerpropertymanager.cpp	2015-09-22 11:42:31.814106746 +0200
+@@ -1798,7 +1798,7 @@
+                     iconPaths.constFind(qMakePair(QIcon::Normal, QIcon::Off));
+         if (itNormalOff != iconPaths.constEnd())
+             toolTip = itNormalOff.value().path();
+-        property->setToolTip(toolTip);
++        property->setValueToolTip(toolTip);
+ 
+         return;
+     } else if (m_pixmapValues.contains(property)) {
+@@ -1816,7 +1816,7 @@
+         emit QtVariantPropertyManager::valueChanged(property, QVariant::fromValue(pixmap));
+         emit propertyChanged(property);
+ 
+-        property->setToolTip(pixmap.path());
++        property->setValueToolTip(pixmap.path());
+ 
+         return;
+     } else if (m_uintValues.contains(property)) {
+@@ -1929,13 +1929,13 @@
+     m_fontManager.setValue(this, property, value);
+     QtVariantPropertyManager::setValue(property, value);
+     if (QtVariantPropertyManager::valueType(property) == QVariant::String)
+-        property->setToolTip(DesignerPropertyManager::value(property).toString());
++        property->setValueToolTip(DesignerPropertyManager::value(property).toString());
+     else if (QtVariantPropertyManager::valueType(property) == designerStringTypeId())
+-        property->setToolTip(qvariant_cast<PropertySheetStringValue>(DesignerPropertyManager::value(property)).value());
++        property->setValueToolTip(qvariant_cast<PropertySheetStringValue>(DesignerPropertyManager::value(property)).value());
+     else if (QtVariantPropertyManager::valueType(property) == designerKeySequenceTypeId())
+-        property->setToolTip(qvariant_cast<PropertySheetKeySequenceValue>(DesignerPropertyManager::value(property)).value());
++        property->setValueToolTip(qvariant_cast<PropertySheetKeySequenceValue>(DesignerPropertyManager::value(property)).value());
+     else if (QtVariantPropertyManager::valueType(property) == QVariant::Bool)
+-        property->setToolTip(QtVariantPropertyManager::valueText(property));
++        property->setValueToolTip(QtVariantPropertyManager::valueText(property));
+ }
+ 
+ void DesignerPropertyManager::initializeProperty(QtProperty *property)
+--- Qt-4.8.2/tools/designer/src/lib/uilib/ui4.cpp	2015-09-22 12:01:59.895689667 +0200
++++ Qt-4.8.2/tools/designer/src/lib/uilib/ui4.cpp	2015-09-22 11:42:35.741930453 +0200
+@@ -136,7 +136,6 @@
+ 
+ void DomUI::read(QXmlStreamReader &reader)
+ {
+-
+     foreach (const QXmlStreamAttribute &attribute, reader.attributes()) {
+         QStringRef name = attribute.name();
+         if (name == QLatin1String("version")) {
+@@ -10949,6 +10948,8 @@
+ 
+ void DomPropertySpecifications::clear(bool clear_all)
+ {
++    qDeleteAll(m_tooltip);
++    m_tooltip.clear();
+     qDeleteAll(m_stringpropertyspecification);
+     m_stringpropertyspecification.clear();
+ 
+@@ -10966,17 +10967,24 @@
+ 
+ DomPropertySpecifications::~DomPropertySpecifications()
+ {
++    qDeleteAll(m_tooltip);
++    m_tooltip.clear();
+     qDeleteAll(m_stringpropertyspecification);
+     m_stringpropertyspecification.clear();
+ }
+ 
+ void DomPropertySpecifications::read(QXmlStreamReader &reader)
+ {
+-
+     for (bool finished = false; !finished && !reader.hasError();) {
+         switch (reader.readNext()) {
+         case QXmlStreamReader::StartElement : {
+             const QString tag = reader.name().toString().toLower();
++            if (tag == QLatin1String("tooltip")) {
++                DomPropertyToolTip *v = new DomPropertyToolTip();
++                v->read(reader);
++                m_tooltip.append(v);
++                continue;
++            }
+             if (tag == QLatin1String("stringpropertyspecification")) {
+                 DomStringPropertySpecification *v = new DomStringPropertySpecification();
+                 v->read(reader);
+@@ -11026,6 +11034,11 @@
+ {
+     writer.writeStartElement(tagName.isEmpty() ? QString::fromUtf8("propertyspecifications") : tagName.toLower());
+ 
++    for (int i = 0; i < m_tooltip.size(); ++i) {
++        DomPropertyToolTip* v = m_tooltip[i];
++        v->write(writer, QLatin1String("tooltip"));
++    }
++    
+     for (int i = 0; i < m_stringpropertyspecification.size(); ++i) {
+         DomStringPropertySpecification* v = m_stringpropertyspecification[i];
+         v->write(writer, QLatin1String("stringpropertyspecification"));
+@@ -11036,12 +11049,83 @@
+     writer.writeEndElement();
+ }
+ 
++void DomPropertySpecifications::setElementTooltip(const QList<DomPropertyToolTip*>& a)
++{
++    m_children |= Tooltip;
++    m_tooltip = a;
++}
++			
+ void DomPropertySpecifications::setElementStringpropertyspecification(const QList<DomStringPropertySpecification*>& a)
+ {
+     m_children |= Stringpropertyspecification;
+     m_stringpropertyspecification = a;
+ }
+ 
++void DomPropertyToolTip::clear(bool clear_all)
++{
++
++    if (clear_all) {
++        m_text.clear();
++        m_has_attr_name = false;
++    }
++
++    m_children = 0;
++}
++
++DomPropertyToolTip::DomPropertyToolTip()
++{
++    m_children = 0;
++    m_has_attr_name = false;
++}
++
++DomPropertyToolTip::~DomPropertyToolTip()
++{
++}
++
++void DomPropertyToolTip::read(QXmlStreamReader &reader)
++{
++    foreach (const QXmlStreamAttribute &attribute, reader.attributes()) {
++        QStringRef name = attribute.name();
++        if (name == QLatin1String("name")) {
++            setAttributeName(attribute.value().toString());
++            continue;
++        }
++        reader.raiseError(QLatin1String("Unexpected attribute ") + name.toString());
++    }
++
++    for (bool finished = false; !finished && !reader.hasError();) {
++        switch (reader.readNext()) {
++        case QXmlStreamReader::StartElement : {
++            const QString tag = reader.name().toString().toLower();
++            reader.raiseError(QLatin1String("Unexpected element ") + tag);
++        }
++            break;
++        case QXmlStreamReader::EndElement :
++            finished = true;
++            break;
++        case QXmlStreamReader::Characters :
++            if (!reader.isWhitespace())
++                m_text.append(reader.text().toString());
++            break;
++        default :
++            break;
++        }
++    }
++}
++
++void DomPropertyToolTip::write(QXmlStreamWriter &writer, const QString &tagName) const
++{
++    writer.writeStartElement(tagName.isEmpty() ? QString::fromUtf8("propertytooltip") : tagName.toLower());
++
++    if (hasAttributeName())
++        writer.writeAttribute(QLatin1String("name"), attributeName());
++
++    if (!m_text.isEmpty())
++        writer.writeCharacters(m_text);
++
++    writer.writeEndElement();
++}
++
+ void DomStringPropertySpecification::clear(bool clear_all)
+ {
+ 
+--- Qt-4.8.2/tools/designer/src/lib/uilib/ui4_p.h	2015-09-22 12:01:59.935687871 +0200
++++ Qt-4.8.2/tools/designer/src/lib/uilib/ui4_p.h	2015-09-22 11:42:35.853925424 +0200
+@@ -162,6 +162,7 @@
+ class DomDesignerData;
+ class DomSlots;
+ class DomPropertySpecifications;
++class DomPropertyToolTip;
+ class DomStringPropertySpecification;
+ 
+ /*******************************************************************************
+@@ -3727,6 +3728,9 @@
+ 
+     // attribute accessors
+     // child element accessors
++    
++    inline QList<DomPropertyToolTip*> elementTooltip() const { return m_tooltip; }
++    void setElementTooltip(const QList<DomPropertyToolTip*>& a);
+     inline QList<DomStringPropertySpecification*> elementStringpropertyspecification() const { return m_stringpropertyspecification; }
+     void setElementStringpropertyspecification(const QList<DomStringPropertySpecification*>& a);
+ 
+@@ -3737,15 +3741,48 @@
+     // attribute data
+     // child element data
+     uint m_children;
++    QList<DomPropertyToolTip*> m_tooltip;
+     QList<DomStringPropertySpecification*> m_stringpropertyspecification;
+     enum Child {
+-        Stringpropertyspecification = 1
++      	Tooltip = 1, Stringpropertyspecification = 2
+     };
+ 
+     DomPropertySpecifications(const DomPropertySpecifications &other);
+     void operator = (const DomPropertySpecifications&other);
+ };
+ 
++	class QDESIGNER_UILIB_EXPORT DomPropertyToolTip {
++			public:
++			DomPropertyToolTip();
++			~DomPropertyToolTip();
++			
++			void read(QXmlStreamReader &reader);
++			void write(QXmlStreamWriter &writer, const QString &tagName = QString()) const;
++			inline QString text() const { return m_text; }
++			inline void setText(const QString &s) { m_text = s; }
++			
++			// attribute accessors
++			inline bool hasAttributeName() const { return m_has_attr_name; }
++			inline QString attributeName() const { return m_attr_name; }
++			inline void setAttributeName(const QString& a) { m_attr_name = a; m_has_attr_name = true; }
++			inline void clearAttributeName() { m_has_attr_name = false; }
++				
++			// child element accessors
++			private:
++			QString m_text;
++			void clear(bool clear_all = true);
++			
++			// attribute data
++			QString m_attr_name;
++			bool m_has_attr_name;
++			
++			// child element data
++			uint m_children;
++			
++			DomPropertyToolTip(const DomPropertyToolTip &other);
++			void operator = (const DomPropertyToolTip&other);
++			};
++
+ class QDESIGNER_UILIB_EXPORT DomStringPropertySpecification {
+ public:
+     DomStringPropertySpecification();
+--- Qt-4.8.2/tools/designer/src/lib/shared/pluginmanager_p.h	2015-09-22 12:01:59.596703085 +0200
++++ Qt-4.8.2/tools/designer/src/lib/shared/pluginmanager_p.h	2015-09-22 11:42:39.918742978 +0200
+@@ -100,6 +100,8 @@
+     QString xmlDisplayName() const;
+     // Type of a string property
+     bool xmlStringPropertyType(const QString &name, StringPropertyType *type) const;
++    // Custom tool tip of property
++    QString propertyToolTip(const QString &name) const;
+ 
+ private:
+     QSharedDataPointer<QDesignerCustomWidgetSharedData> m_d;
+--- Qt-4.8.2/tools/designer/src/lib/shared/pluginmanager.cpp	2015-09-22 12:01:59.594703175 +0200
++++ Qt-4.8.2/tools/designer/src/lib/shared/pluginmanager.cpp	2015-09-22 11:42:39.948741633 +0200
+@@ -74,6 +74,7 @@
+ static const char *addPageMethodC = "addpagemethod";
+ static const char *propertySpecsC = "propertyspecifications";
+ static const char *stringPropertySpecC = "stringpropertyspecification";
++static const char propertyToolTipC[] = "tooltip";
+ static const char *stringPropertyNameAttrC = "name";
+ static const char *stringPropertyTypeAttrC = "type";
+ static const char *stringPropertyNoTrAttrC = "notr";
+@@ -149,6 +150,7 @@
+     // Type of a string property
+     typedef QPair<qdesigner_internal::TextPropertyValidationMode, bool> StringPropertyType;
+     typedef QHash<QString, StringPropertyType> StringPropertyTypeMap;
++    typedef QHash<QString, QString> PropertyToolTipMap;
+ 
+     explicit QDesignerCustomWidgetSharedData(const QString &thePluginPath) : pluginPath(thePluginPath) {}
+     void clearXML();
+@@ -162,6 +164,7 @@
+     QString xmlExtends;
+ 
+     StringPropertyTypeMap xmlStringPropertyTypeMap;
++    PropertyToolTipMap propertyToolTipMap; 
+ };
+ 
+ void QDesignerCustomWidgetSharedData::clearXML()
+@@ -242,6 +245,11 @@
+     return true;
+ }
+ 
++QString QDesignerCustomWidgetData::propertyToolTip(const QString &name) const
++			{
++			return m_d->propertyToolTipMap.value(name);
++			}
++
+ // Wind a QXmlStreamReader  until it finds an element. Returns index or one of FindResult
+ enum FindResult { FindError = -2, ElementNotFound = -1 };
+ 
+@@ -297,55 +305,67 @@
+     return qdesigner_internal::ValidationRichText;
+ }
+ 
+-static  bool parsePropertySpecs(QXmlStreamReader &sr,
+-                                   QDesignerCustomWidgetSharedData::StringPropertyTypeMap *rc,
+-                                   QString *errorMessage)
+-{
+-    const QString propertySpecs = QLatin1String(propertySpecsC);
+-    const QString stringPropertySpec = QLatin1String(stringPropertySpecC);
+-    const QString stringPropertyTypeAttr = QLatin1String(stringPropertyTypeAttrC);
+-    const QString stringPropertyNoTrAttr = QLatin1String(stringPropertyNoTrAttrC);
+-    const QString stringPropertyNameAttr = QLatin1String(stringPropertyNameAttrC);
+-
+-    while (!sr.atEnd()) {
+-        switch(sr.readNext()) {
+-        case QXmlStreamReader::StartElement: {
+-            if (sr.name() != stringPropertySpec) {
+-                *errorMessage = QDesignerPluginManager::tr("An invalid property specification ('%1') was encountered. Supported types: %2").arg(sr.name().toString(), stringPropertySpec);
+-                return false;
+-            }
+-            const QXmlStreamAttributes atts = sr.attributes();
+-            const QString name = atts.value(stringPropertyNameAttr).toString();
+-            const QString type = atts.value(stringPropertyTypeAttr).toString();
+-            const QString notrS = atts.value(stringPropertyNoTrAttr).toString(); //Optional
+-
+-            if (type.isEmpty()) {
+-                *errorMessage = msgAttributeMissing(stringPropertyTypeAttr);
+-                return false;
+-            }
+-            if (name.isEmpty()) {
+-                *errorMessage = msgAttributeMissing(stringPropertyNameAttr);
+-                return false;
+-            }
+-            bool typeOk;
+-            const bool noTr = notrS == QLatin1String("true") || notrS == QLatin1String("1");
+-            QDesignerCustomWidgetSharedData::StringPropertyType v(typeStringToType(type, &typeOk), !noTr);
+-            if (!typeOk) {
+-                *errorMessage = QDesignerPluginManager::tr("'%1' is not a valid string property specification.").arg(type);
+-                return false;
+-            }
+-            rc->insert(name, v);
+-        }
+-            break;
+-        case QXmlStreamReader::EndElement: // Outer </stringproperties>
+-            if (sr.name() == propertySpecs)
+-                return true;
+-        default:
+-            break;
+-        }
++    static  bool parsePropertySpecs(QXmlStreamReader &sr,
++				      QDesignerCustomWidgetSharedData *data,
++				      QString *errorMessage)
++    {
++	const QString propertySpecs = QLatin1String(propertySpecsC);
++	const QString stringPropertySpec = QLatin1String(stringPropertySpecC);
++	const QString propertyToolTip = QLatin1String(propertyToolTipC);
++	const QString stringPropertyTypeAttr = QLatin1String(stringPropertyTypeAttrC);
++	const QString stringPropertyNoTrAttr = QLatin1String(stringPropertyNoTrAttrC);
++	const QString stringPropertyNameAttr = QLatin1String(stringPropertyNameAttrC);
++
++	while (!sr.atEnd()) {
++    switch(sr.readNext()) {
++    case QXmlStreamReader::StartElement: {
++      
++      
++    if (sr.name() == stringPropertySpec) {
++    const QXmlStreamAttributes atts = sr.attributes();
++    const QString name = atts.value(stringPropertyNameAttr).toString();
++    const QString type = atts.value(stringPropertyTypeAttr).toString();
++    const QString notrS = atts.value(stringPropertyNoTrAttr).toString();
++    if (type.isEmpty()) {
++    *errorMessage = msgAttributeMissing(stringPropertyTypeAttr);
++    return false;
++    }
++    if (name.isEmpty()) {
++    *errorMessage = msgAttributeMissing(stringPropertyNameAttr);
++    return false;
++    }
++    bool typeOk;
++    const bool noTr = notrS == QLatin1String("true") || notrS == QLatin1String("1");
++    QDesignerCustomWidgetSharedData::StringPropertyType v(typeStringToType(type, &typeOk), !noTr);
++    if (!typeOk) {
++    *errorMessage = QDesignerPluginManager::tr("'%1' is not a valid string property specification.").arg(type);
++    return false;
++    }
++    data->xmlStringPropertyTypeMap.insert(name, v);
++    } else if (sr.name() == propertyToolTip) {
++    const QString name = sr.attributes().value(stringPropertyNameAttr).toString();
++    if (name.isEmpty()) {
++    *errorMessage = msgAttributeMissing(stringPropertyNameAttr);
++    return false;
++    }
++    data->propertyToolTipMap.insert(name, sr.readElementText().trimmed());
++    } else {  
++      
++    *errorMessage = QDesignerPluginManager::tr("An invalid property specification ('%1') was encountered. Supported types: %2").arg(sr.name().toString(), stringPropertySpec);
++    return false;
++      }
++      
++    }
++	break;
++    case QXmlStreamReader::EndElement: // Outer </stringproperties>
++	if (sr.name() == propertySpecs)
++	    return true;
++    default:
++	break;
+     }
+-    return true;
+-}
++      }
++      return true;
++  }
+ 
+ QDesignerCustomWidgetData::ParseResult
+                        QDesignerCustomWidgetData::parseXml(const QString &xml, const QString &name, QString *errorMessage)
+@@ -436,7 +456,7 @@
+             }
+             break;
+         case 2: // <stringproperties>
+-            if (!parsePropertySpecs(sr, &m_d->xmlStringPropertyTypeMap, errorMessage)) {
++            if (!parsePropertySpecs(sr, m_d.data(), errorMessage)) {
+                 *errorMessage = msgXmlError(name, *errorMessage);
+                 return ParseError;
+             }
+--- Qt-4.8.2/tools/shared/qtpropertybrowser/qtpropertybrowser.h	2015-09-22 12:02:03.317536089 +0200
++++ Qt-4.8.2/tools/shared/qtpropertybrowser/qtpropertybrowser.h	2015-09-22 11:42:40.091735215 +0200
+@@ -59,7 +59,9 @@
+ 
+     QtAbstractPropertyManager *propertyManager() const;
+ 
+-    QString toolTip() const;
++    QString toolTip() const {return valueToolTip();} // Compatibility
++    QString valueToolTip() const;
++    QString descriptionToolTip() const;
+     QString statusTip() const;
+     QString whatsThis() const;
+     QString propertyName() const;
+@@ -70,7 +72,9 @@
+     QIcon valueIcon() const;
+     QString valueText() const;
+ 
+-    void setToolTip(const QString &text);
++    void setToolTip(const QString &text) { setValueToolTip(text); } // Compatibility
++    void setValueToolTip(const QString &text);
++    void setDescriptionToolTip(const QString &text);
+     void setStatusTip(const QString &text);
+     void setWhatsThis(const QString &text);
+     void setPropertyName(const QString &text);
+--- Qt-4.8.2/tools/shared/qtpropertybrowser/qttreepropertybrowser.cpp	2015-09-22 12:02:03.350534609 +0200
++++ Qt-4.8.2/tools/shared/qtpropertybrowser/qttreepropertybrowser.cpp	2015-09-22 11:42:40.091735215 +0200
+@@ -596,7 +596,9 @@
+     }
+     item->setIcon(0, expandIcon);
+     item->setFirstColumnSpanned(!property->hasValue());
+-    item->setToolTip(0, property->propertyName());
++    const QString descriptionToolTip = property->descriptionToolTip();
++    const QString propertyName = property->propertyName();
++    item->setToolTip(0, descriptionToolTip.isEmpty() ? propertyName: descriptionToolTip);
+     item->setStatusTip(0, property->statusTip());
+     item->setWhatsThis(0, property->whatsThis());
+     item->setText(0, property->propertyName());
+--- Qt-4.8.2/tools/shared/qtpropertybrowser/qtgroupboxpropertybrowser.cpp	2015-09-22 12:02:03.312536314 +0200
++++ Qt-4.8.2/tools/shared/qtpropertybrowser/qtgroupboxpropertybrowser.cpp	2015-09-22 11:42:40.091735215 +0200
+@@ -409,7 +409,7 @@
+         font.setUnderline(property->isModified());
+         item->groupBox->setFont(font);
+         item->groupBox->setTitle(property->propertyName());
+-        item->groupBox->setToolTip(property->toolTip());
++        item->groupBox->setToolTip(property->descriptionToolTip());
+         item->groupBox->setStatusTip(property->statusTip());
+         item->groupBox->setWhatsThis(property->whatsThis());
+         item->groupBox->setEnabled(property->isEnabled());
+@@ -419,7 +419,7 @@
+         font.setUnderline(property->isModified());
+         item->label->setFont(font);
+         item->label->setText(property->propertyName());
+-        item->label->setToolTip(property->toolTip());
++        item->label->setToolTip(property->descriptionToolTip());
+         item->label->setStatusTip(property->statusTip());
+         item->label->setWhatsThis(property->whatsThis());
+         item->label->setEnabled(property->isEnabled());
+--- Qt-4.8.2/tools/shared/qtpropertybrowser/qtpropertybrowser.cpp	2015-09-22 12:02:03.315536179 +0200
++++ Qt-4.8.2/tools/shared/qtpropertybrowser/qtpropertybrowser.cpp	2015-09-22 11:42:40.096734992 +0200
+@@ -59,7 +59,8 @@
+     QSet<QtProperty *> m_parentItems;
+     QList<QtProperty *> m_subItems;
+ 
+-    QString m_toolTip;
++    QString m_valueToolTip;
++    QString m_descriptionToolTip;
+     QString m_statusTip;
+     QString m_whatsThis;
+     QString m_name;
+@@ -205,9 +206,14 @@
+ 
+     \sa setToolTip()
+ */
+-QString QtProperty::toolTip() const
++QString QtProperty::valueToolTip() const
+ {
+-    return d_ptr->m_toolTip;
++    return d_ptr->m_valueToolTip;
++}
++
++QString QtProperty::descriptionToolTip() const
++{
++    return d_ptr->m_descriptionToolTip;
+ }
+ 
+ /*!
+@@ -301,12 +307,21 @@
+ 
+     \sa toolTip()
+ */
+-void QtProperty::setToolTip(const QString &text)
++void QtProperty::setValueToolTip(const QString &text)
++{
++    if (d_ptr->m_valueToolTip == text)
++        return;
++
++    d_ptr->m_valueToolTip = text;
++    propertyChanged();
++}
++
++void QtProperty::setDescriptionToolTip(const QString &text)
+ {
+-    if (d_ptr->m_toolTip == text)
++    if (d_ptr->m_descriptionToolTip == text)
+         return;
+ 
+-    d_ptr->m_toolTip = text;
++    d_ptr->m_descriptionToolTip = text;
+     propertyChanged();
+ }
+ 
+--- Qt-4.8.2/tools/shared/qtpropertybrowser/qtbuttonpropertybrowser.cpp	2015-09-22 12:02:03.303536717 +0200
++++ Qt-4.8.2/tools/shared/qtpropertybrowser/qtbuttonpropertybrowser.cpp	2015-09-22 11:42:40.096734992 +0200
+@@ -464,7 +464,7 @@
+         font.setUnderline(property->isModified());
+         item->button->setFont(font);
+         item->button->setText(property->propertyName());
+-        item->button->setToolTip(property->toolTip());
++        item->button->setToolTip(property->descriptionToolTip());
+         item->button->setStatusTip(property->statusTip());
+         item->button->setWhatsThis(property->whatsThis());
+         item->button->setEnabled(property->isEnabled());
+@@ -474,7 +474,7 @@
+         font.setUnderline(property->isModified());
+         item->label->setFont(font);
+         item->label->setText(property->propertyName());
+-        item->label->setToolTip(property->toolTip());
++        item->label->setToolTip(property->descriptionToolTip());
+         item->label->setStatusTip(property->statusTip());
+         item->label->setWhatsThis(property->whatsThis());
+         item->label->setEnabled(property->isEnabled());
