@@ -2156,6 +2156,12 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     QString tooltip;
     tooltip.append(ToolTipPrefix);
     tooltip.append(trimmedPV);
+
+    if(!w->toolTip().isEmpty()) {
+        tooltip.append(": ");
+        tooltip.append(w->toolTip());
+    }
+
     tooltip.append(ToolTipPostfix);
     w->setToolTip(tooltip);
 

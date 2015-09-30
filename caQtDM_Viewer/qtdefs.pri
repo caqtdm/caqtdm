@@ -13,7 +13,7 @@ unix {
 # when the designer in 4.8.2 is patched in order to display tooltip description or
 # when the qt version is higher then 5.5.0 then compile the plugins with description texts
 # be carefull with this, while when the designer does not recognize tooltip description, the widgets will not be shown
-#DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
+DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
 contains(QT_VER_MAJ, 5) {
   greaterThan(QT_MINOR_VERSION, 5) {
     DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
@@ -53,6 +53,11 @@ CONFIG += PYTHONCALC
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 
+# 4.0.1
+# tooltip for properties are now present in psi patched version of Qt4.8.2 and for Qt5.6.0 and higher
+# tooltip for caQtDM objects will integrate the tooltip given by the designer
+# signal emit of cacalc has now also its integer value (this way you can for example switch the tabwidget pages with a cacalc that is updated by a soft/real channel)
+
 # 4.0
 # caQtDM has now a controlsystem plugin structure. CS can be added by writing a plugin (see demo plugin) that will automatically be loaded. By specifying the plugin in front
 # of the pv name (i.e epics3://somepv) that plugin will then be used.
@@ -65,6 +70,7 @@ DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 # cacamera and cascan2d got display of selected values and readback values with different representations and may therefore write values to the CS
 # soft variable bug corrected (was not always found when writing)
 # catextentry got input dialogs (filedialog in case of strings, otherwise simple dialog)
+# catextentry will keep its cursor position after pressing return to set the value
 # activ widgets were always brought in front. Now you can choose if you let the designer define the layer
 # QTextBrowser can be used with macro substitution. The file that will be read in, will be watched for changes and will automatically be reloaded
 # a vertical label has been implemented
