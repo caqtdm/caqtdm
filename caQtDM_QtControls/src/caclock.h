@@ -85,6 +85,14 @@ public:
 signals:
     void updateTime(QTime);
 
+public slots:
+    void runClock(bool run) {
+        if(thisTimeType == InternalTime) {
+            if(run) timer->start(1000);
+            else timer->stop();
+        }
+    }
+
 private slots:
     void setClockTime(QTime);
 

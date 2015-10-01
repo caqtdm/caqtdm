@@ -72,12 +72,14 @@ public:
 
     caCalc( QWidget *parent = 0 );
 
-    void setValue(double value);
     void setTextLine(const QString &txt);
     void setForeAndBackground(QColor fg, QColor bg);
 
     int getPrecision() const {return thisPrecision;}
     void setPrecision(int prec) {thisPrecision = prec;}
+
+public slots:
+    void setValue(double value);
 
 private:
     QString thisChannelA, thisChannelB, thisChannelC, thisChannelD, thisVariable;

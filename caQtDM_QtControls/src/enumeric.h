@@ -66,8 +66,6 @@ public:
 
     bool readAccessW() const {return _AccessW;}
     void writeAccessW(bool access);
-    
-    void setValue(double v);
 
     void silentSetValue(double v);
 
@@ -97,6 +95,7 @@ public:
 public slots:
     virtual void setEnabled(bool);
     virtual void setDisabled(bool);
+    void setValue(double v);
     
 signals:
     void valueChanged(double);

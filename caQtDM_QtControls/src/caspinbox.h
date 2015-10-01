@@ -85,10 +85,10 @@ public:
     void setConnectedColors(bool connected);
 
 
+public slots:
+    void setSpinValue(double v) {setValue(v);}
 
 private:
-
-
     QString thisPV;
     bool thisAccessW;
     double thisMaximum, thisMinimum;

@@ -59,10 +59,14 @@ void caCalc::setValue(double value)
 
     // emit signal when requested
     if(thisEventSignal == onFirstChange) {
-        if(!eventFired) emit emitSignal((int) value);
+        if(!eventFired) {
+            emit emitSignal((int) value);
+            emit emitSignal(value);
+        }
         eventFired = true;
     } else if(thisEventSignal == onAnyChange) {
         emit emitSignal((int) value);
+        emit emitSignal(value);
     }
 }
 

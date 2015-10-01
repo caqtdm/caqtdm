@@ -5623,7 +5623,7 @@ void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QW
             };
         }
     } else {
-        qDebug() << "internal error; return while pv not found";
+        qDebug() << "internal error; return while pv <" << pv << ">not found";
         return;
     }
 
