@@ -426,7 +426,12 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 #ifndef MOBILE
     QString displayPath = (QString)  qgetenv("CAQTDM_DISPLAY_PATH");
     if(!displayPath.contains(specials.getStdPath())) {
-       displayPath.append(":"); displayPath.append(specials.getStdPath());
+#ifdef _MSC_VER
+    displayPath.append(";");
+#else
+    displayPath.append(":");
+#endif
+       displayPath.append(specials.getStdPath());
        setenv("CAQTDM_DISPLAY_PATH", (char*) displayPath.toLatin1().constData(), 1);
     }
 #endif
