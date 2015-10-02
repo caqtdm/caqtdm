@@ -64,19 +64,17 @@ public:
     void setPV(QString const &newPV) {thisPV = newPV;}
     TimeType getTimeType() { return thisTimeType; }
     void setTimeType(TimeType type) {thisTimeType = type;
+                                     timer->stop();
                                      if(type == InternalTime) {
                                          if(thisUpdateRate == Fast) timer->start(200); else timer->start(1000);
-                                     } else {
-                                         timer->stop();
                                      }}
 
 
     UpdateRate getUpdateRate() { return thisUpdateRate; }
     void setUpdateRate(UpdateRate rate) {thisUpdateRate = rate;
+                                         timer->stop();
                                          if(thisTimeType == InternalTime) {
                                              if(thisUpdateRate == Fast) timer->start(200); else timer->start(1000);
-                                         } else {
-                                             timer->stop();
                                          }}
 
     void updateClock(QTime time);
@@ -102,6 +100,7 @@ public slots:
     void runClock(bool run) {
         if(thisTimeType == InternalTime) {
             if(run) {
+              timer->stop();
               if(thisUpdateRate == Fast) timer->start(200); else timer->start(1000);
             } else timer->stop();
         }
@@ -111,7 +110,7 @@ private slots:
     void setClockTime(QTime);
     void myCurrentTime() {
        QTime time = QTime::currentTime();
-       if ( time.isValid() ) {
+       if (time.isValid() ) {
            double value = ( time.hour() % 12 ) * 60.0 * 60.0+ time.minute() * 60.0 + time.second() + time.msec()/1000.0;
            setValue(value);
        }

@@ -75,7 +75,6 @@ caClock::caClock(QWidget *parent) : QwtAnalogClock(parent)
 
     setTimeType (InternalTime);
     setColorMode(Static);
-    setUpdateTime(100);
 }
 
 QPalette caClock::colorTheme( const QColor &base ) const
