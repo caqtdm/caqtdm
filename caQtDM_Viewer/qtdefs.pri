@@ -56,7 +56,9 @@ DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 # 4.0.1
 # tooltip for properties are now present in psi patched version of Qt4.8.2 and for Qt5.6.0 and higher
 # tooltip for caQtDM objects will integrate the tooltip given by the designer
-# signal emit of cacalc has now also its integer value (this way you can for example switch the tabwidget pages with a cacalc that is updated by a soft/real channel)
+# signal emit of cacalc has now also its integer and double value (this way you can for example switch the tabwidget pages with a cacalc that is updated by a soft/real channel)
+# pep emulation has been updated by cosylab
+# some slots have been added in order to link signals and slots in designer
 
 # 4.0
 # caQtDM has now a controlsystem plugin structure. CS can be added by writing a plugin (see demo plugin) that will automatically be loaded. By specifying the plugin in front

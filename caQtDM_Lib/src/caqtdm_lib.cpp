@@ -4954,8 +4954,6 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 info.append("<br>");
             }
 
-            qDebug() << nbPV;
-
             for(int i=0; i< nbPV; i++) {
                 // is there a json string ?
                 int pos = pv[i].indexOf("{");

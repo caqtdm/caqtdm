@@ -34,6 +34,7 @@ ParsePepFile::ParsePepFile(QString filename, bool willprint)
 
     QFile *file = new QFile;
     int nbRows, nbCols;
+    QColor bgColor;
 
     willPrint = willprint;
 
@@ -47,6 +48,7 @@ ParsePepFile::ParsePepFile(QString filename, bool willprint)
             gridLayout[i][j].command = "";
             gridLayout[i][j].nbElem = 0;
             gridLayout[i][j].span = 0;
+            gridLayout[i][j].widgetHeight = "";
         }
     }
     for (int j=0; j<MaxGrid; j++) {
@@ -54,13 +56,22 @@ ParsePepFile::ParsePepFile(QString filename, bool willprint)
         maxCols[j] = 0;
     }
 
+    buffer = new QBuffer();
+
+    // parese file
+    file->setFileName(filename);
+    bgColor = QColor(218, 218, 218, 255); // default bg color is gray, can be overwritten with !qtbg
+    TreatFile(nbRows, nbCols, bgColor, file);
+
+    PRINT(printf("nbRows=%d nbCols=%d\n", nbRows, nbCols));
+
     header = QString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
            "<ui version=\"4.0\">\n"
            "<class>MainWindow</class>\n"
            "<widget class=\"QMainWindow\" name=\"MainWindow\">\n"
            "<property name=\"styleSheet\">\n"
            "<string>\n"
-           "QWidget#centralWidget {background: rgba(255, 255, 255, 255); }\n"
+           "QWidget#centralWidget {background: " + bgColor.name() + "; }\n"
            "caLineEdit {border-radius: 1px;background: lightyellow; color: black;}\n"
            "</string>\n"
            "</property>\n"
@@ -68,29 +79,19 @@ ParsePepFile::ParsePepFile(QString filename, bool willprint)
            "<layout class=\"QGridLayout\" name=\"gridLayout\">\n"
            "<item row=\"0\" column=\"0\">\n"
            "<layout class=\"QGridLayout\" name=\"gridLayout\">\n"
-           " <property name=\"spacing\">\n"
+           "<property name=\"spacing\">\n"
            "<number>5</number>\n"
            "</property>\n");
-
-
-    footer = QString("</layout></item></layout></widget></widget></ui>");
 
     // copy first header to our byte array
     QByteArray *array= new QByteArray();
     array->append(header);
 
-    buffer = new QBuffer();
-
-    // parese file
-    file->setFileName(filename);
-    TreatFile(nbRows, nbCols, file);
-
-    PRINT(printf("nbRows=%d nbCols=%d\n", nbRows, nbCols));
-
     // fill array with the scanned data
     DisplayFile(nbRows, nbCols, array);
 
     // and finish with the footer
+    footer = QString("</layout></item></layout></widget></widget></ui>");
     array->append(footer);
 
     // fill buffer with the byte array data
@@ -103,7 +104,7 @@ ParsePepFile::ParsePepFile(QString filename, bool willprint)
     delete array;
 }
 
-void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
+void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QColor &bgColor, QFile *file)
 {
     int grid = 1;
     int ll;
@@ -116,6 +117,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
     QString widgetText ="";
     QString channel ="";
     QString separator((QChar)27);
+    QString widgetHeight ="2";
     QColor fg;
     QColor bg;
 
@@ -156,14 +158,15 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
         if(line.size() == 0) {
 
         }
-        // we have a grid definition at the beginning of the file
-        else if(line.contains("#!grid")) {
+        else if (line.contains("#!grid")) {
             grid = elements.at(1).toInt();
             if(grid > MaxGrid) {
                 printf("parse pep file -- grid value exceeds the maximum of %d\n", MaxGrid);
                 grid = MaxGrid;
             }
             PRINT(printf("grid=%d\n", grid));
+        } else if(line.contains("#!qtbg")) {
+            bgColor = QColor(elements.at(1));
         } else if(line.contains("channel")) {
         } else if(line.at(0) != QChar('#')) {
 
@@ -177,6 +180,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
 
                 ll = 2;
                 widgetText = "";
+                widgetHeight ="2";
                 formats[0] = formats[1] = "";
                 span = 1;
                 nbFormats = 0;
@@ -235,11 +239,18 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                         ll++;
                     }
 
-                    else if(elements.at(ll).contains("-fg")) {
+                    else if(elements.at(ll).contains("-height")) {
+                        ll++;
+
+                        PRINT(printf("height detected <%s>\n", elements.at(ll).toAscii().constData()));
+                        widgetHeight = elements.at(ll);
+                    }
+
+                    else if(elements.at(ll).contains("-fg") || elements.at(ll).contains("-comfg")) {
                         QString fgs;
                         ll++;
 
-                        PRINT(printf("fg detected <%s>\n", elements.at(ll).toLatin1().constData()));
+                        PRINT(printf("fg or comfg detected <%s>\n", elements.at(ll).toLatin1().constData()));
                         fgs = elements.at(ll);
                         fgs = fgs.replace("\"", "");
                         fg = QColor(fgs);
@@ -248,7 +259,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                     else if(elements.at(ll).contains("-bg")) {
                         QString bgs;
                         ll++;
-                        PRINT(printf("fg detected <%s>\n", elements.at(ll).toLatin1().constData()));
+                        PRINT(printf("bg detected <%s>\n", elements.at(ll).toLatin1().constData()));
                         bgs = elements.at(ll);
                         bgs = bgs.replace("\"", "");
                         bg = QColor(bgs);
@@ -264,8 +275,8 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                         // is this a format
                         if(item.at(0) == '%') ok = true;
                         if(item.right(1).contains("e") || item.right(1).contains("f") || item.right(1).contains("g") || item.right(1).contains("x") || item.right(1).contains("o"))   ok = true;
-                        widgetText.append(elements.at(ll));
                         widgetText.append(" ");
+                        widgetText.append(elements.at(ll));
                     }
 
                     if(ok && (widgetType.contains("setrdbk") ||
@@ -289,6 +300,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QFile *file)
                 gridLayout[actualLine][actualColumn].widgetType = widgetType;
                 gridLayout[actualLine][actualColumn].widgetText = widgetText;
                 gridLayout[actualLine][actualColumn].widgetChannel = channel;
+                gridLayout[actualLine][actualColumn].widgetHeight = widgetHeight;
                 gridLayout[actualLine][actualColumn].formats[0] = formats[0];
                 gridLayout[actualLine][actualColumn].formats[1] = formats[1];
                 gridLayout[actualLine][actualColumn].fg = fg;
@@ -511,6 +523,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
     int effectiveSpan;
     QColor fg = grid.fg;
     QColor bg = grid.bg;
+    QString widgetHeight = grid.widgetHeight;
 
     rgba[0] = 0; rgba[1] = 0; rgba[2] = 0; rgba[3] = 255;
 
@@ -533,7 +546,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
             writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
         }
 
-        writeChoice(grid.widgetChannel, array);
+        writeMenu(grid.widgetChannel, array);
         writeCloseTag("item", array);
 
         //////////////////////////////////////////////////////////////////////////////////
@@ -553,26 +566,61 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
             writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
         }
 
-        writeOpenTag("widget class=\"caGraphics\" name=\"cagraphics\"", array);
-
+        writeOpenTag("widget class=\"caFrame\" name=\"caframe\"", array);
         writeOpenProperty("maximumSize", array);
         writeOpenTag("size", array);
-        writeTaggedString("width", "15", array);
-        writeTaggedString("height", "15", array);
+        writeTaggedString("width", "24", array);
+        writeTaggedString("height", "24", array);
         writeCloseTag("size", array);
         writeCloseProperty(array);
         writeOpenProperty("minimumSize", array);
         writeOpenTag("size", array);
-        writeTaggedString("width", "15", array);
-        writeTaggedString("height", "15", array);
+        writeTaggedString("width", "24", array);
+        writeTaggedString("height", "24", array);
         writeCloseTag("size", array);
         writeCloseProperty(array);
 
+        writeOpenTag("widget class=\"caLed\" name=\"caled\"", array);
+        writeOpenProperty("maximumSize", array);
+        writeOpenTag("size", array);
+        writeTaggedString("width", "18", array);
+        writeTaggedString("height", "18", array);
+        writeCloseTag("size", array);
+        writeCloseProperty(array);
+        writeOpenProperty("minimumSize", array);
+        writeOpenTag("size", array);
+        writeTaggedString("width", "18", array);
+        writeTaggedString("height", "18", array);
+        writeCloseTag("size", array);
+        writeCloseProperty(array);
+        setGeometry(3, 3, 15, 15, array);
+        writeSimpleProperty("channel", "string", grid.widgetChannel, array);
+        writeSimpleProperty("colorMode", "enum", "caLed::Static", array);
+        setColor("trueColor", 0, 205, 0, 255, array);
+        setColor("falceColor", 160, 160, 164, 255, array);
+        writeCloseTag("widget", array);
+
+        writeOpenTag("widget class=\"caGraphics\" name=\"cagraphics\"", array);
+        writeOpenProperty("maximumSize", array);
+        writeOpenTag("size", array);
+        writeTaggedString("width", "24", array);
+        writeTaggedString("height", "24", array);
+        writeCloseTag("size", array);
+        writeCloseProperty(array);
+        writeOpenProperty("minimumSize", array);
+        writeOpenTag("size", array);
+        writeTaggedString("width", "24", array);
+        writeTaggedString("height", "24", array);
+        writeCloseTag("size", array);
+        writeCloseProperty(array);
         writeSimpleProperty("channel", "string", grid.widgetChannel, array);
         writeSimpleProperty("colorMode", "enum", "caGraphics::Alarm", array);
         writeSimpleProperty("form", "enum", "caGraphics::Circle", array);
         writeSimpleProperty("fillstyle", "enum", "caGraphics::Filled", array);
+        writeCloseTag("widget", array);
 
+        writeTaggedString("zorder", "cagraphics", array);
+        writeTaggedString("zorder", "caled", array);
         writeCloseTag("widget", array);
 
         writeCloseTag("item", array);
@@ -630,9 +678,23 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         writeItemRowCol(actualgridRow, effectiveColumn, spanColumns, array);
 
         writeOpenTag("widget class=\"Line\" name=\"line\"", array);
+        writeOpenProperty("minimumSize", array);
+        writeOpenTag("size", array);
+        writeTaggedString("height", widgetHeight, array);
+        writeTaggedString("width", "0", array);
+        writeCloseTag("size", array);
+        writeCloseProperty(array);
+        writeOpenProperty("maximumSize", array);
+        writeOpenTag("size", array);
+        writeTaggedString("width", "16777215", array);
+        writeTaggedString("height", widgetHeight, array);
+        writeCloseTag("size", array);
+        writeCloseProperty(array);
+        setGeometry(0, 0, 0, widgetHeight.toInt(), array);
         writeSimpleProperty("frameShadow", "enum", "QFrame::Plain", array);
-        writeSimpleProperty("lineWidth", "number", "2", array);
+        writeSimpleProperty("lineWidth", "number", widgetHeight, array);
         writeSimpleProperty("orientation", "enum", "Qt::Horizontal", array);
+        writeSimpleProperty("styleSheet", "string", "color: " + fg.name(), array);
         writeCloseTag("widget", array);
         writeCloseTag("item", array);
 
@@ -775,12 +837,27 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         writeLineEdit(grid.formats[0], newpv, "30", "30","30", "30", fontSize, "", "", "", "", "", rgba, array);
         writeCloseTag("item", array);
 
-        // 7. write now the led, but first hard code the new pv
+        // 7. write now the checkbox, but first hard code the new pv
         newpv = partialpv;
         newpv.append(":ONOFF");
         effectiveColumn = pos[count++];
         writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
         writeChoice(newpv, array);
+        writeOpenTag("widget class=\"caToggleButton\" name=\"catogglebutton\"", array);
+        writeSimpleProperty("channel", "string", newpv, array);
+        writeOpenProperty("minimumSize", array);
+        writeOpenTag("size", array);
+        writeTaggedString("height", "24", array);
+        writeTaggedString("width", "65", array);
+        writeCloseTag("size", array);
+        writeCloseProperty(array);
+        writeOpenProperty("maximumSize", array);
+        writeOpenTag("size", array);
+        writeTaggedString("width", "16777215", array);
+        writeTaggedString("height", "24", array);
+        writeCloseTag("size", array);
+        writeCloseProperty(array);
+        writeCloseTag("widget", array);
         writeCloseTag("item", array);
 
         // 8. write now the mode, but first hard code the new pv
@@ -864,7 +941,7 @@ void ParsePepFile::writeWheelswitch(QString format, QString pv, QByteArray *arra
     writeCloseTag("widget", array);
 }
 
-void ParsePepFile::writeChoice(QString pv, QByteArray *array)
+void ParsePepFile::writeMenu(QString pv, QByteArray *array)
 {
     writeOpenTag("widget class=\"caMenu\" name=\"caMenu\"", array);
     writeSimpleProperty("channel", "string", pv, array);
@@ -880,6 +957,28 @@ void ParsePepFile::writeChoice(QString pv, QByteArray *array)
     writeTaggedString("height", "24", array);
     writeCloseTag("size", array);
     writeCloseProperty(array);
+    writeCloseTag("widget", array);
+}
+
+void ParsePepFile::writeChoice(QString pv, QByteArray *array)
+{
+    writeOpenTag("widget class=\"caChoice\" name=\"cachoice\"", array);
+    writeSimpleProperty("channel", "string", pv, array);
+    writeOpenProperty("minimumSize", array);
+    writeOpenTag("size", array);
+    writeTaggedString("height", "24", array);
+    writeTaggedString("width", "120", array);
+    writeCloseTag("size", array);
+    writeCloseProperty(array);
+    writeOpenProperty("maximumSize", array);
+    writeOpenTag("size", array);
+    writeTaggedString("width", "16777215", array);
+    writeTaggedString("height", "24", array);
+    writeCloseTag("size", array);
+    writeCloseProperty(array);
+    writeSimpleProperty("stackingMode", "enum", "caChoice::Column", array);
+    writeSimpleProperty("colorMode", "enum", "caChoice::Alarm", array);
+    setColor("bordercolor", 0, 0, 0, 255, array);
     writeCloseTag("widget", array);
 }
 
@@ -1016,11 +1115,10 @@ void ParsePepFile::writeLineEdit(QString format, QString pv, QString minwidth, Q
     writeSimpleProperty("channel", "string", pv, array);
     if(!willPrint) {
        writeSimpleProperty("colorMode", "enum", "caLineEdit::Alarm_Static", array);
-       setColor("background", rgba[0], rgba[1], rgba[2], rgba[3], array);
+       writeSimpleProperty("alarmHandling", "enum", "caLineEdit::onBackground", array);
     } else {
        setColor("background", 255, 255, 255, 0, array);
     }
-    setColor("foreground", 128, 128, 128, 255, array);
 
     writeSimpleProperty("unitsEnabled", "bool", "true", array);
 
@@ -1181,6 +1279,24 @@ void ParsePepFile::setColor(QString property, int r, int g, int b, int alpha, QB
     writeTaggedString("blue", blue, array);
 
     writeCloseTag("color", array);
+    writeCloseProperty(array);
+}
+
+void ParsePepFile::setGeometry(int x, int y, int width, int height, QByteArray *array)
+{
+    writeOpenProperty("geometry", array);
+
+    QString axisX= QString("%1").arg(x);
+    QString axisY= QString("%1").arg(y);
+    QString w= QString("%1").arg(width);
+    QString h= QString("%1").arg(height);
+
+    writeOpenTag("rect", array);
+    writeTaggedString("x", axisX, array);
+    writeTaggedString("y", axisY, array);
+    writeTaggedString("width", w, array);
+    writeTaggedString("height", h, array);
+    writeCloseTag("rect", array);
     writeCloseProperty(array);
 }
 

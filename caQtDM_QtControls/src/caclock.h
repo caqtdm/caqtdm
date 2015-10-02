@@ -42,9 +42,11 @@ class QTCON_EXPORT caClock : public QwtAnalogClock
     Q_OBJECT
 
     Q_ENUMS(TimeType)
+    Q_ENUMS(UpdateRate)
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
-    Q_PROPERTY(TimeType timeType READ getTimeType WRITE setTimeType)
 
+    Q_PROPERTY(TimeType timeType READ getTimeType WRITE setTimeType)
+    Q_PROPERTY(UpdateRate updateRate READ getUpdateRate WRITE setUpdateRate)
     Q_PROPERTY(QColor baseColor READ getBaseColor WRITE setBaseColor)
     Q_PROPERTY(bool scaleDefaultColor READ getScaleDefaultColor WRITE setScaleDefaultColor)
     Q_PROPERTY(QColor scaleColor READ getScaleColor WRITE setScaleColor)
@@ -53,6 +55,7 @@ class QTCON_EXPORT caClock : public QwtAnalogClock
 
 public:
 
+    enum UpdateRate {Normal =0, Fast};
     enum TimeType {InternalTime = 0, ReceiveTime};
 
     caClock(QWidget *parent);
@@ -62,10 +65,20 @@ public:
     TimeType getTimeType() { return thisTimeType; }
     void setTimeType(TimeType type) {thisTimeType = type;
                                      if(type == InternalTime) {
-                                         timer->start(1000);
+                                         if(thisUpdateRate == Fast) timer->start(200); else timer->start(1000);
                                      } else {
                                          timer->stop();
                                      }}
+
+
+    UpdateRate getUpdateRate() { return thisUpdateRate; }
+    void setUpdateRate(UpdateRate rate) {thisUpdateRate = rate;
+                                         if(thisTimeType == InternalTime) {
+                                             if(thisUpdateRate == Fast) timer->start(200); else timer->start(1000);
+                                         } else {
+                                             timer->stop();
+                                         }}
+
     void updateClock(QTime time);
     void setAlarmColors(short status);
 
@@ -88,13 +101,21 @@ signals:
 public slots:
     void runClock(bool run) {
         if(thisTimeType == InternalTime) {
-            if(run) timer->start(1000);
-            else timer->stop();
+            if(run) {
+              if(thisUpdateRate == Fast) timer->start(200); else timer->start(1000);
+            } else timer->stop();
         }
     }
 
 private slots:
     void setClockTime(QTime);
+    void myCurrentTime() {
+       QTime time = QTime::currentTime();
+       if ( time.isValid() ) {
+           double value = ( time.hour() % 12 ) * 60.0 * 60.0+ time.minute() * 60.0 + time.second() + time.msec()/1000.0;
+           setValue(value);
+       }
+    }
 
 protected:
     void resizeEvent(QResizeEvent *e);
@@ -112,6 +133,7 @@ private:
     QColor thisBaseColor;
     QColor thisScaleColor, prevScaleColor;
     bool thisScaleDefaultColor, prevScaleDefaultColor;
+    UpdateRate thisUpdateRate;
 };
 
 #endif
