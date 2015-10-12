@@ -64,7 +64,7 @@ bool NetworkAccess::requestUrl(const QUrl url, const QString &file)
 {
     finished = false;
     thisFile = file;
-    //printf("caQtDM -- download %s\n", url.toString().toLatin1().constData());
+    //printf("caQtDM -- download %s\n", qasc(url.toString()));
     downloadUrl = url;
     QNetworkReply* reply = manager->get(QNetworkRequest(url));
     connect(reply, SIGNAL(finished()), this, SLOT(finishReply()));
@@ -93,7 +93,7 @@ int NetworkAccess::downloadFinished()
 
 void NetworkAccess::finishReply()
 {
-    //printf("newtwork reply completed! thisFile=%s\n",  thisFile.toLatin1().constData());
+    //printf("newtwork reply completed! thisFile=%s\n",  qasc(thisFile));
     QObject* obj = sender();
     QNetworkReply* reply = qobject_cast<QNetworkReply*>(obj);
 

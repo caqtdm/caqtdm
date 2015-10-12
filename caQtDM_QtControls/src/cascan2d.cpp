@@ -608,7 +608,7 @@ void caScan2D::setYNEWDATA(int ynewdata)
 
     // I get two calls per monitor event for some reason
     if (m_ynewdata == ynewdata) {
-        //printf("caScan2D::setYNEWDATA for pv %s %d (ignored)\n", getPV_Data().toLatin1().constData(), ynewdata);
+        //printf("caScan2D::setYNEWDATA for pv %s %d (ignored)\n", qasc(getPV_Data()), ynewdata);
         return;
     }
     m_ynewdata = ynewdata;
@@ -616,7 +616,7 @@ void caScan2D::setYNEWDATA(int ynewdata)
     if (!m_widthDefined || !m_heightDefined)
         return;
 
-    //printf("caScan2D::setYNEWDATA for pv %s %d\n", getPV_Data().toLatin1().constData(), ynewdata);
+    //printf("caScan2D::setYNEWDATA for pv %s %d\n", qasc(getPV_Data()), ynewdata);
     if (m_ynewdata == 0) {
         for (i=0; i<m_width*m_height; i++) xdata[i] = (float) 0.0;
         for (i=0; i<m_height; i++) haveY[i] = 0;

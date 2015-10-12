@@ -415,7 +415,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
             while (i.hasNext()) {
                 char asc[256];
                 i.next();
-                sprintf(asc, "Info: plugin %s loaded", i.key().toLatin1().constData());
+                sprintf(asc, "Info: plugin %s loaded", qasc(i.key()));
                 messageWindow->postMsgEvent(QtWarningMsg, asc);
             }
         }
@@ -432,7 +432,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     displayPath.append(":");
 #endif
        displayPath.append(specials.getStdPath());
-       setenv("CAQTDM_DISPLAY_PATH", (char*) displayPath.toLatin1().constData(), 1);
+       setenv("CAQTDM_DISPLAY_PATH", (char*) qasc(displayPath), 1);
     }
 #endif
 
@@ -567,17 +567,17 @@ void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
                 envString.append(fields.at(i));
                 if(i<fields.count() -1) envString.append(" ");
             }
-            setenv(fields.at(0).toLatin1().constData(), envString.toLatin1().constData(), 1);
-            //messageWindow->postMsgEvent(QtDebugMsg, (char*)envString.toLatin1().constData());
+            setenv(qasc(fields.at(0)), qasc(envString), 1);
+            //messageWindow->postMsgEvent(QtDebugMsg, (char*) qasc(envString));
         } else if(line.size() > 0) {
-            sprintf(asc, "environment variable could not be set from %s", line.toLatin1().constData());
+            sprintf(asc, "environment variable could not be set from %s", qasc(line));
             messageWindow->postMsgEvent(QtDebugMsg, asc);
         }
     }
     //Replacement for standard writable directory
-    setenv("CAQTDM_DISPLAY_PATH",stdpathdoc.toLatin1().constData(),1);
+    setenv("CAQTDM_DISPLAY_PATH", qasc(stdpathdoc), 1);
 
-    sprintf(asc, "epics configuration file loaded: %s", fileName.toLatin1().constData());
+    sprintf(asc, "epics configuration file loaded: %s", qasc(fileName));
     messageWindow->postMsgEvent(QtDebugMsg, asc);
     file.close();
 }
@@ -632,7 +632,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
         highCount = mutexKnobData->getHighestCountPV(highPV);
         if(highCount != 0.0) {
             sprintf(msg, "%s - PV=%d (%d NC), %d Monitors/s, %d Displays/s, highest=%s with %.1f Monitors/s ", asc, countPV, countNotConnected,
-                      mutexKnobData->getMonitorsPerSecond(), mutexKnobData->getDisplaysPerSecond(), highPV.toLatin1().constData(), highCount);
+                      mutexKnobData->getMonitorsPerSecond(), mutexKnobData->getDisplaysPerSecond(), qasc(highPV), highCount);
         } else {
             strcpy(msg, asc);
         }
@@ -728,7 +728,7 @@ void FileOpenWindow::Callback_OpenButton()
             mainWindow->setProperty("fileString", fileName);
             mainWindow->setProperty("macroString", "");
 
-            sprintf(asc, "last file: %s", fileName.toLatin1().constData());
+            sprintf(asc, "last file: %s", qasc(fileName));
             messageWindow->postMsgEvent(QtDebugMsg, asc);
 
             if (fileName.contains("prc")) {
@@ -850,8 +850,8 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     // this will check for file existence and when an url is defined, download the file from a http server
     fileFunctions filefunction;
     filefunction.checkFileAndDownload(FileName);
-    if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) filefunction.lastInfo().toLatin1().constData());
-    if(filefunction.lastError().length() > 0)  messageWindow->postMsgEvent(QtCriticalMsg, (char*)filefunction.lastError().toLatin1().constData());
+    if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(filefunction.lastInfo()));
+    if(filefunction.lastError().length() > 0)  messageWindow->postMsgEvent(QtCriticalMsg, (char*) qasc(filefunction.lastError()));
 
     // open file
     searchFile *s = new searchFile(FileName);
@@ -922,9 +922,9 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         }
 
         if(macroString.size() > 0) {
-          sprintf(asc, "last file: %s, macro: %s", fileNameFound.toLatin1().constData(), macroString.toLatin1().constData());
+          sprintf(asc, "last file: %s, macro: %s", qasc(fileNameFound), qasc(macroString));
         } else {
-          sprintf(asc, "last file: %s", fileNameFound.toLatin1().constData());
+          sprintf(asc, "last file: %s", qasc(fileNameFound));
         }
         messageWindow->postMsgEvent(QtDebugMsg, asc);
     }
@@ -1041,8 +1041,8 @@ void FileOpenWindow::Callback_ActionReload()
                 QFileInfo fi(FileName);
                 fileFunctions filefunction;
                 filefunction.checkFileAndDownload(fi.fileName());
-                if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) filefunction.lastInfo().toLatin1().constData());
-                if(filefunction.lastError().length() > 0) messageWindow->postMsgEvent(QtCriticalMsg, (char*)filefunction.lastError().toLatin1().constData());
+                if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(filefunction.lastInfo()));
+                if(filefunction.lastError().length() > 0) messageWindow->postMsgEvent(QtCriticalMsg, (char*) qasc(filefunction.lastError()));
 
                 searchFile *s = new searchFile(FileName);
                 QString fileNameFound = s->findFile();

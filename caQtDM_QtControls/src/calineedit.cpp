@@ -39,7 +39,7 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     QFontInfo info(font);
     //font.setStyleStrategy(QFont::NoAntialias);
     QString family = info.family();
-    //printf("got font %s\n", family.toLatin1().constData());
+    //printf("got font %s\n", qasc(family));
     if(!family.contains("Lucida Sans Typewriter")) {
         QFont  newfont("Monospace");   // not very nice, while a a dot inside the zero to distinguish from o
         newfont.setStyleHint(QFont::TypeWriter);
@@ -277,10 +277,10 @@ bool caLineEdit::event(QEvent *e)
           setStyleSheet("");
           QString c=  palette().color(QPalette::Base).name();
           defBackColor = QColor(c);
-          //printf("default back color %s %s\n", c.toLatin1().constData(), this->objectName().toLatin1().constData());
+          //printf("default back color %s %s\n", qasc(c), qasc(this->objectName()));
           c=  palette().color(QPalette::Text).name();
           defForeColor = QColor(c);
-      //printf("default fore color %s %s\n", c.toLatin1().constData(), this->objectName().toLatin1().constData());
+          //printf("default fore color %s %s\n", qasc(c), qasc(this->objectName()));
 
           if(!defBackColor.isValid()) defBackColor = QColor(255, 248, 220, 255);
           if(!defForeColor.isValid()) defForeColor = Qt::black;
@@ -364,7 +364,7 @@ void caLineEdit::setValue(double value, const QString& units)
     }
     if(thisUnitMode) {
         strcat(asc, " ");
-        strcat(asc, units.toLatin1().constData());
+        strcat(asc, qasc(units));
         unitsLast = units;
     }
 
@@ -474,7 +474,7 @@ void caLineEdit::setTextLine(const QString &txt)
     if(keepText == txt) {  // accelerate things
         return;
     }
-    //printf("settext: %s <%s> <%s>\n", thisPV.toLatin1().constData(),  txt.toLatin1().constData(), keepText.toLatin1().constData());
+    //printf("settext: %s <%s> <%s>\n", qasc(thisPV),  qasc(txt), qasc(keepText));
     pos = cursorPosition();
     QLineEdit::setText(txt);
     setCursorPosition(pos);
@@ -488,7 +488,7 @@ void caLineEdit::setTextLine(const QString &txt)
 
 void caLineEdit::forceText(const QString &txt)
 {
-    //printf("forcetext: <%s>\n", txt.toLatin1().constData());
+    //printf("forcetext: <%s>\n", qasc(txt));
     QLineEdit::setText(txt);
     FontScalingWidget::rescaleFont(text(), d_savedTextSpace);
 }

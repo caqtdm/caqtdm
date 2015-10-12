@@ -129,8 +129,6 @@ CustomWidgetInterface_Graphics::CustomWidgetInterface_Graphics(QObject *parent):
 
 void CustomWidgetInterface_Graphics::initialize(QDesignerFormEditorInterface *formEditor)
 {
-    //printf("initialize function for %s\n", d_name.toAscii().constData());
-
     if (d_isInitialized)
         return;
 

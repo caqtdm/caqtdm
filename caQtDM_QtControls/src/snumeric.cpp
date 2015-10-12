@@ -529,7 +529,7 @@ void SNumeric::resizeEvent(QResizeEvent *e)
         if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         labelFont.setPointSizeF(fontSize);
         signFont.setPointSizeF(fontSize);
-        //printf("digits=%d %s font size=%f\n", digits, l1->text().toLatin1().constData(), fontSize);
+        //printf("digits=%d %s font size=%f\n", digits, qasc(l1->text()), fontSize);
     }
     /* all fonts equal */
     if(d_fontScaleEnabled){

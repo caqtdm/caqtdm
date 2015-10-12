@@ -205,7 +205,8 @@ HEADERS	+= \
     src/mdaReader.h \
     src/mda-load.h \
     src/messageQueue.h \
-    src/cabytecontroller.h
+    src/cabytecontroller.h \
+    src/qtdefinitions.h
 
 # assume qwt6.0 was made with qt4
 contains(QT_VER_MAJ, 4) {

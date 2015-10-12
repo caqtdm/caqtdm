@@ -255,8 +255,8 @@ void caPolyLine::paintEvent(QPaintEvent * /* event */)
     for(int i=0; i< pairs.count(); i++) {
         QStringList xy = pairs.at(i).split(",", QString::SkipEmptyParts);
         if(xy.count() == 2) {
-            polygon.putPoints(i, 1, atoi(xy.at(0).toLatin1().constData()), atoi(xy.at(1).toLatin1().constData()));
-            lastPosition =  QPointF(atoi(xy.at(0).toLatin1().constData()), atoi(xy.at(1).toLatin1().constData()));
+            polygon.putPoints(i, 1, atoi(qasc(xy.at(0))), atoi(qasc(xy.at(1))));
+            lastPosition =  QPointF(atoi(qasc(xy.at(0))), atoi(qasc(xy.at(1))));
             nbPoints++;
         }
     }
@@ -265,7 +265,7 @@ void caPolyLine::paintEvent(QPaintEvent * /* event */)
     if((thisPolyStyle == Polygon) && (nbPoints > 2)) {
         QStringList xy = pairs.at(0).split(",", QString::SkipEmptyParts);
         if(xy.count() == 2) {
-            polygon.putPoints(nbPoints, 1, atoi(xy.at(0).toLatin1().constData()), atoi(xy.at(1).toLatin1().constData()));
+            polygon.putPoints(nbPoints, 1, atoi(qasc(xy.at(0))), atoi(qasc(xy.at(1))));
             nbPoints++;
         }
     }
@@ -318,8 +318,8 @@ void caPolyLine::resizeEvent(QResizeEvent *e)
         for(int i=0; i< pairs.count(); i++) {
             QStringList xy = pairs.at(i).split(",", QString::SkipEmptyParts);
             if(xy.count() == 2) {
-                double x = atof(xy.at(0).toLatin1().constData()) * resizeX;
-                double y = atof(xy.at(1).toLatin1().constData()) * resizeY;
+                double x = atof(qasc(xy.at(0))) * resizeX;
+                double y = atof(qasc(xy.at(1))) * resizeY;
                 if(i!=0) thisXYpairs.append(";");
                 thisXYpairs.append(QString::number(qRound(x)));
                 thisXYpairs.append(",");
@@ -337,8 +337,8 @@ void caPolyLine::resizeEvent(QResizeEvent *e)
         for(int i=0; i< pairs.count(); i++) {
             QStringList xy = pairs.at(i).split(",", QString::SkipEmptyParts);
             if(xy.count() == 2) {
-                 double x = atof(xy.at(0).toLatin1().constData()) * resizeX;
-                 double y = atof(xy.at(1).toLatin1().constData()) * resizeY;
+                 double x = atof(qasc(xy.at(0))) * resizeX;
+                 double y = atof(qasc(xy.at(1))) * resizeY;
                  if(i!=0) XYpairs.append(";");
                  XYpairs.append(QString::number(qRound(x)));
                  XYpairs.append(",");

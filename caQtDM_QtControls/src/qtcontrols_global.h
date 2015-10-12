@@ -26,6 +26,8 @@
 #ifndef QTCONGLOBAL_H
 #define QTCONGLOBAL_H
 
+#include "qtdefinitions.h"
+
 #define NOMINMAX
 
 #if defined(_MSC_VER)

@@ -86,7 +86,7 @@ void epics4Subs::CreateAndConnect4(int num, QString pv)
     // create channel
     qDebug() << "CreateAndConnect4" << pv;
     shared_ptr<ChannelRequesterImpl> channelRequesterImpl(new ChannelRequesterImpl());
-    Channel::shared_pointer channel = provider->createChannel(pv.toLatin1().data(), channelRequesterImpl);
+    Channel::shared_pointer channel = provider->createChannel(qasc(pv), channelRequesterImpl);
     channelArray.append(channel);
 
     channelRequesterImpl = dynamic_pointer_cast<ChannelRequesterImpl>(channel->getChannelRequester());
@@ -125,7 +125,7 @@ void epics4Subs::Epics4SetValue(QString const &pv, QString const & value)
     // create channel
     qDebug() << "Epics4SetValue " << pv;
     shared_ptr<ChannelRequesterImpl> channelRequesterImpl(new ChannelRequesterImpl());
-    Channel::shared_pointer channel = provider->createChannel(pv.toLatin1().data(), channelRequesterImpl);
+    Channel::shared_pointer channel = provider->createChannel(qasc(pv), channelRequesterImpl);
 
     channelRequesterImpl = dynamic_pointer_cast<ChannelRequesterImpl>(channel->getChannelRequester());
     // do not know if this was necessary, I can not test any more at PSI
@@ -174,16 +174,16 @@ void epics4Subs::fromString(PVScalarPtr const & pvScalar, QString const & from)
         bool isTrue  = (from.compare("true")==0  || from.compare("1")==0);
         bool isFalse = (from.compare("false")==0 || from.compare("0")==0);
         if (!(isTrue || isFalse))
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (boolean) from string value '" + from.toLatin1().data() + "'");
+            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (boolean) from string value '" + qasc(from) + "'");
         if(isTrue) pv->put(true); else pv->put(false);
         return;
     }
     case pvByte : {
         PVBytePtr pv = static_pointer_cast<PVByte>(pvScalar);
         int ival;
-        int result = sscanf(from.toLatin1().data(),"%d",&ival);
+        int result = sscanf(qasc(from), "%d", &ival);
         if (result != 1)
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (byte) from string value '" + from.toLatin1().data() + "'");
+            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (byte) from string value '" + qasc(from) + "'");
         int8 value = ival;
         pv->put(value);
         return;
@@ -191,9 +191,9 @@ void epics4Subs::fromString(PVScalarPtr const & pvScalar, QString const & from)
     case pvShort : {
         PVShortPtr pv = static_pointer_cast<PVShort>(pvScalar);
         int ival;
-        int result = sscanf(from.toLatin1().data(),"%d",&ival);
+        int result = sscanf(qasc(from), "%d", &ival);
         if (result != 1)
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (short) from string value '" + from.toLatin1().data() + "'");
+            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (short) from string value '" + qasc(from) + "'");
         int16 value = ival;
         pv->put(value);
         return;
@@ -201,9 +201,9 @@ void epics4Subs::fromString(PVScalarPtr const & pvScalar, QString const & from)
     case pvInt : {
         PVIntPtr pv = static_pointer_cast<PVInt>(pvScalar);
         int ival;
-        int result = sscanf(from.toLatin1().data(),"%d",&ival);
+        int result = sscanf(qasc(from), "%d", &ival);
         if (result != 1)
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (int) from string value '" + from.toLatin1().data() + "'");
+            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (int) from string value '" + qasc(from) + "'");
         int32 value = ival;
         pv->put(value);
         return;
@@ -211,9 +211,9 @@ void epics4Subs::fromString(PVScalarPtr const & pvScalar, QString const & from)
     case pvLong : {
         PVLongPtr pv = static_pointer_cast<PVLong>(pvScalar);
         int64 ival;
-        int result = sscanf(from.toLatin1().data(),"%lld",(long long *)&ival);
+        int result = sscanf(qasc(from), "%lld", (long long *)&ival);
         if (result != 1)
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (long) from string value '" + from.toLatin1().data() + "'");
+            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (long) from string value '" + qasc(from) + "'");
         int64 value = ival;
         pv->put(value);
         return;
@@ -221,9 +221,9 @@ void epics4Subs::fromString(PVScalarPtr const & pvScalar, QString const & from)
     case pvUByte : {
         PVUBytePtr pv = static_pointer_cast<PVUByte>(pvScalar);
         unsigned int ival;
-        int result = sscanf(from.toLatin1().data(),"%u",&ival);
+        int result = sscanf(qasc(from), "%u", &ival);
         if (result != 1)
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (ubyte) from string value '" + from.toLatin1().data() + "'");
+            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (ubyte) from string value '" + qasc(from) + "'");
         uint8 value = ival;
         pv->put(value);
         return;
@@ -231,9 +231,9 @@ void epics4Subs::fromString(PVScalarPtr const & pvScalar, QString const & from)
     case pvUShort : {
         PVUShortPtr pv = static_pointer_cast<PVUShort>(pvScalar);
         unsigned int ival;
-        int result = sscanf(from.toLatin1().data(),"%u",&ival);
+        int result = sscanf(qasc(from), "%u", &ival);
         if (result != 1)
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (ushort) from string value '" + from.toLatin1().data() + "'");
+            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (ushort) from string value '" + qasc(from) + "'");
         uint16 value = ival;
         pv->put(value);
         return;
@@ -241,9 +241,9 @@ void epics4Subs::fromString(PVScalarPtr const & pvScalar, QString const & from)
     case pvUInt : {
         PVUIntPtr pv = static_pointer_cast<PVUInt>(pvScalar);
         unsigned int ival;
-        int result = sscanf(from.toLatin1().data(),"%u",&ival);
+        int result = sscanf(qasc(from), "%u", &ival);
         if (result != 1)
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (uint) from string value '" + from.toLatin1().data() + "'");
+            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (uint) from string value '" + qasc(from) + "'");
         uint32 value = ival;
         pv->put(value);
         return;
@@ -251,9 +251,9 @@ void epics4Subs::fromString(PVScalarPtr const & pvScalar, QString const & from)
     case pvULong : {
         PVULongPtr pv = static_pointer_cast<PVULong>(pvScalar);
         unsigned long long ival;
-        int result = sscanf(from.toLatin1().data(),"%llu",(long long unsigned int *)&ival);
+        int result = sscanf(qasc(from), "%llu", (long long unsigned int *) &ival);
         if (result != 1)
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (ulong) from string value '" + from.toLatin1().data() + "'");
+            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (ulong) from string value '" + qasc(from) + "'");
         uint64 value = ival;
         pv->put(value);
         return;
@@ -261,24 +261,24 @@ void epics4Subs::fromString(PVScalarPtr const & pvScalar, QString const & from)
     case pvFloat : {
         PVFloatPtr pv = static_pointer_cast<PVFloat>(pvScalar);
         float value;
-        int result = sscanf(from.toLatin1().data(),"%f",&value);
+        int result = sscanf(qasc(from), "%f", &value);
         if (result != 1)
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (float) from string value '" + from.toLatin1().data() + "'");
+            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (float) from string value '" + qasc(from) + "'");
         pv->put(value);
         return;
     }
     case pvDouble : {
         PVDoublePtr pv = static_pointer_cast<PVDouble>(pvScalar);
         double value;
-        int result = sscanf(from.toLatin1().data(),"%lf",&value);
+        int result = sscanf(qasc(from),"%lf",&value);
         if (result != 1)
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (double) from string value '" + from.toLatin1().data() + "'");
+            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (double) from string value '" + qasc(from) + "'");
         pv->put(value);
         return;
     }
     case pvString: {
         PVStringPtr value = static_pointer_cast<PVString>(pvScalar);
-        value->put(from.toLatin1().data());
+        value->put(qasc(from);
         return;
     }
     }

@@ -24,6 +24,7 @@
  */
 
 #include "loadPlugins.h"
+#include "qtdefinitions.h"
 
 loadPlugins::loadPlugins()
 {
@@ -74,9 +75,9 @@ bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKn
         if( pluginsDir.entryList(QDir::Files).length() > 0) {
             QString currentPath = pluginsDir.absolutePath();
             if(i==0) {
-                sprintf(asc, "Controlsystem plugins will be loaded from QT_PLUGIN_PATH=%s", currentPath.toLatin1().constData());
+                sprintf(asc, "Controlsystem plugins will be loaded from QT_PLUGIN_PATH=%s", qasc(currentPath));
             } else {
-                sprintf(asc, "Controlsystem plugins will be loaded from application path=%s", currentPath.toLatin1().constData());
+                sprintf(asc, "Controlsystem plugins will be loaded from application path=%s", qasc(currentPath));
             }
             if(messageWindow != (MessageWindow *) 0) messageWindow->postMsgEvent(QtWarningMsg, asc);
 

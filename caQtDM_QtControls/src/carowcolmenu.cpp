@@ -213,7 +213,7 @@ void  caRowColMenu::setLabels(QString const &newL)
 
 void caRowColMenu::setArgs(QString const &newL)
 {
-    //printf("new arguments=<%s>\n", newL.toLatin1().constData());
+    //printf("new arguments=<%s>\n", qasc(newL));
     args = newL.split(";");
 }
 

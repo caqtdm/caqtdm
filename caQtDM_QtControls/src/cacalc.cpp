@@ -75,7 +75,7 @@ void caCalc::setTextLine(const QString &txt)
     if(keepText == txt) {  // accelerate things
         return;
     }
-    //printf("set qstring=%s old=%s\n", txt.toLatin1().constData(), keepText.toLatin1().constData());
+    //printf("set qstring=%s old=%s\n", qasc(txt), qasc(keepText));
     setText(txt);
     keepText = txt;
 }

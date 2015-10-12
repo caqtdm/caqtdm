@@ -59,7 +59,7 @@ public:
         double normalized = v - day * floor(v/day);
 
         QTime upTime = baseTime.addSecs((int) normalized);
-        //printf("label = addseconds=%d start plottime=%s labeltime=%s\n", seconds, baseTime.toString().toLatin1().constData(),  upTime.toString().toLatin1().constData());
+        //printf("label = addseconds=%d start plottime=%s labeltime=%s\n", seconds, qasc(baseTime.toString()),  qasc(upTime.toString()));
         return upTime.toString();
     }
 
@@ -773,7 +773,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 
 							QwtText text;
 							text.setText(legendText(i++));
-                            //printf("%s %s\n", b->plainText().toLatin1().constData(), legendText(i-1).toLatin1().constData());
+                            //printf("%s %s\n", qasc(b->plainText()), qasc(legendText(i-1)));
 							b->setText(text);
 							b->update();
 
@@ -782,7 +782,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 						break;
 
 					case FONT:
-                        //printf("%s %s\n", b->plainText().toLatin1().constData(), legendText(i-1).toLatin1().constData());
+                        //printf("%s %s\n", qasc(b->plainText()), qasc(legendText(i-1)));
 
 						b->setFont(f);
 						b->update();
@@ -791,7 +791,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 
 					case COLOR:
 
-                        //printf("%s %s\n", b->plainText().toLatin1().constData(), legendText(i-1).toLatin1().constData());
+                        //printf("%s %s\n", qasc(b->plainText()), qasc(legendText(i-1)));
 						QPalette palette = b->palette();
 						palette.setColor(QPalette::WindowText, c); // for ticks
 						palette.setColor(QPalette::Text, c);       // for ticks' labels
@@ -1036,7 +1036,7 @@ bool caStripPlot::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::MouseButtonPress) {
         int nButton = ((QMouseEvent*) event)->button();
         if(nButton==2) {
-            //printf("emit from %s\n", this->objectName().toLatin1().constData());
+            //printf("emit from %s\n", qasc(this->objectName()));
             QPoint p;
             emit ShowContextMenu(p);
         }

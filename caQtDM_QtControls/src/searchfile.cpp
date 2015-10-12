@@ -65,7 +65,7 @@ QString searchFile::findFile()
 
     // return filename or null
     if(fileFound) {
-        //printf("searchFile -- %s\n", FileName.toLatin1().constData());
+        //printf("searchFile -- %s\n", qasc(FileName));
         return FileName;
     }
     else return NULL;

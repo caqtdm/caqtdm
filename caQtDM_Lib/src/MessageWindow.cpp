@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <sys/timeb.h>
+#include "qtdefinitions.h"
 
 #define GCC_VERSION (__GNUC__ * 10000 \
                                + __GNUC_MINOR__ * 100 \
@@ -91,7 +92,7 @@ void MessageWindow::AppendMsgWrapper(QtMsgType type, char* msg)
         if (MessageWindow::MsgHandler != NULL)
                 return MessageWindow::MsgHandler->postMsgEvent(type, msg);
         else
-                fprintf(stderr, "%s\n", MessageWindow::QtMsgToQString(type, msg).toLatin1().constData());
+                fprintf(stderr, "%s\n", qasc(MessageWindow::QtMsgToQString(type, msg)));
 }
 
 void MessageWindow::customEvent(QEvent* event)

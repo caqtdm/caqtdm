@@ -113,7 +113,7 @@ void caInclude::setFileName(QString const &filename)
 #ifdef PRC
         if(newFileName.contains(".prc")) {
             // we have a pep file to scan
-            //printf("we have to scan pep file %s\n", newFileName.toLatin1().constData());
+            //printf("we have to scan pep file %s\n", qasc(newFileName));
 
             // this will check for file existence and when an url is defined, download the file from a http server
             filefunction.checkFileAndDownload(newFileName);
@@ -127,7 +127,7 @@ void caInclude::setFileName(QString const &filename)
                 removeIncludedWidget();
                 return;
             } else {
-                //printf("file %s has been found\n", fileNameFound.toLatin1().constData());
+                //printf("file %s has been found\n", qasc(fileNameFound));
             }
             delete s;
 
@@ -160,7 +160,7 @@ void caInclude::setFileName(QString const &filename)
             removeIncludedWidget();
             return;
         } else {
-            //printf("file %s has been found\n", fileNameFound.toLatin1().constData());
+            //printf("file %s has been found\n", qasc(fileNameFound));
         }
         delete s;
 

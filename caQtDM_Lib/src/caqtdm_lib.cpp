@@ -66,10 +66,10 @@
 #define min(x,y)   (((x) < (y)) ? (x) : (y))
 
 #define ToolTipPrefix "<p style='background-color:yellow'><font color='#000000'>"
-#define ToolTipPostfix "</font></font></p>"
+#define ToolTipPostfix "</font></p>"
 
 #define InfoPrefix "<p style='background-color:lightyellow'><font color='#000000'>"
-#define InfoPostfix "</font></font></p>"
+#define InfoPostfix "</font></p>"
 
 // used for calculating visibility for several types of widgets
 #define ComputeVisibility(x, obj)  {  \
@@ -705,7 +705,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             w1->setProperty("ObjectType", caCalc_Widget);
 
             kData.soft = true;
-            addMonitor(myWidget, &kData, calcWidget->getVariable().toLatin1().constData(), w1, specData, map, &pv);
+            addMonitor(myWidget, &kData, qasc(calcWidget->getVariable()), w1, specData, map, &pv);
 
             //qDebug() <<  "firstpass" << firstPass <<  "treatPrimary:" << treatPrimary << calcWidget->getVariable() << calcWidget << SoftPVusesItsself(calcWidget, map);
 
@@ -727,13 +727,13 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
             // other channels if any
             kData.soft = false;
-            nbMonitors = InitVisibility(w1, &kData, map, specData, calcWidget->getVariable().toLatin1().constData());
+            nbMonitors = InitVisibility(w1, &kData, map, specData, qasc(calcWidget->getVariable()));
 
             // when no monitors then inititalize value
             if(nbMonitors == 0) {
-                //qDebug() << "update " << calcWidget->getVariable().toLatin1().constData()<< "initial value" << calcWidget->getInitialValue();
+                //qDebug() << "update " << qasc(calcWidget->getVariable()) << "initial value" << calcWidget->getInitialValue();
                 calcWidget->setValue(calcWidget->getInitialValue());
-                mutexKnobDataP->UpdateSoftPV(calcWidget->getVariable().toLatin1().constData(), calcWidget->getInitialValue(), myWidget);
+                mutexKnobDataP->UpdateSoftPV(qasc(calcWidget->getVariable()), calcWidget->getInitialValue(), myWidget);
             }
 
             w1->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -779,8 +779,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         while(imageWidget->anyMessages()) {
             //qDebug() << imageWidget->getMessages();
             QString message = imageWidget->getMessages();
-            if(message.contains("Info:")) postMessage(QtWarningMsg, (char*)message.toLatin1().constData());
-            else postMessage(QtCriticalMsg, (char*) message.toLatin1().constData());
+            if(message.contains("Info:")) postMessage(QtWarningMsg, (char*) qasc(message));
+            else postMessage(QtCriticalMsg, (char*) qasc(message));
         }
 
         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
@@ -1371,8 +1371,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         fileFunctions filefunction;
         filefunction.checkFileAndDownload(fileName);
         if(messageWindowP != (MessageWindow *) 0) {
-            if(filefunction.lastInfo().length() > 0) messageWindowP->postMsgEvent(QtWarningMsg, (char*) filefunction.lastInfo().toLatin1().constData());
-            if(filefunction.lastError().length() > 0)  messageWindowP->postMsgEvent(QtCriticalMsg, (char*)filefunction.lastError().toLatin1().constData());
+            if(filefunction.lastInfo().length() > 0) messageWindowP->postMsgEvent(QtWarningMsg, (char*) qasc(filefunction.lastInfo()));
+            if(filefunction.lastError().length() > 0)  messageWindowP->postMsgEvent(QtCriticalMsg, (char*) qasc(filefunction.lastError()));
         }
 
         searchFile *s = new searchFile(fileName);
@@ -1412,7 +1412,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
             // some error with loading
             if (!thisW) {
-                postMessage(QtDebugMsg, (char*) tr("could not load include file %1").arg(fileName).toLatin1().constData());
+                postMessage(QtDebugMsg, (char*) qasc(tr("could not load include file %1").arg(fileName)));
                 if(!includeFiles.contains(fi.absoluteFilePath())) {
                     includeFiles.append(fi.absoluteFilePath());
                     includeFiles.append(" could not be loaded <br>");
@@ -1443,7 +1443,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             }
 
         } else {
-            postMessage(QtDebugMsg, (char*) tr("sorry, could not load include file %1").arg(fileName).toLatin1().constData());
+            postMessage(QtDebugMsg, (char*) qasc(tr("sorry, could not load include file %1").arg(fileName)));
             qDebug() << "sorry, file" << fileName << " does not exist";
         }
 
@@ -2080,10 +2080,9 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
         trimmedPV = trimmedPV.mid(0, pos);
         status = parseForDisplayRate(JSONString, rate);
         if(!status) {
-            sprintf(asc, "JSON parsing error on %s ,should be like {\"monitor\":{\"maxdisplayrate\":10}}",
-                    (char*) pv.trimmed().toLatin1().constData());
+            sprintf(asc, "JSON parsing error on %s ,should be like {\"monitor\":{\"maxdisplayrate\":10}}", (char*) qasc(pv.trimmed()));
         } else {
-            sprintf(asc, "pv %s display rate set to maximum %dHz", trimmedPV.toLatin1().constData(), rate);
+            sprintf(asc, "pv %s display rate set to maximum %dHz", qasc(trimmedPV), rate);
         }
         postMessage(QtDebugMsg, asc);
     }
@@ -2105,10 +2104,10 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     }
 
     *pvRep = trimmedPV;
-    strcpy(kData->pluginName, (char*) pluginName.toLatin1().constData());
+    strcpy(kData->pluginName, (char*) qasc(pluginName));
 
     cpylen = qMin(trimmedPV.length(), MAXPVLEN-1);
-    strncpy(kData->pv, (char*) trimmedPV.toLatin1().constData(), (size_t) cpylen);
+    strncpy(kData->pv, (char*) qasc(trimmedPV), (size_t) cpylen);
     kData->pv[cpylen] = '\0';
 
     // find the plugin we are going to use
@@ -2120,8 +2119,7 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
         w->setProperty("Interface", plugin);
         if(kData->pluginInterface == (void *) 0) {
             char asc[255];
-            sprintf(asc, "could not find a control plugin for %s with name %s\n",
-                    (char*) trimmedPV.toLatin1().constData(),  (char*) pluginName.trimmed().toLatin1().constData());
+            sprintf(asc, "could not find a control plugin for %s with name %s\n", (char*) qasc(trimmedPV), (char*) qasc(pluginName.trimmed()));
             postMessage(QtCriticalMsg, asc);
         } else {
             //qDebug() << "control interface for" << trimmedPV << "plugin:" << pluginName;
@@ -2136,7 +2134,7 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
 
     if(doNothing) {
         char asc[255];
-        sprintf(asc, "Info: malformed pv '%s' (due to macro?)", (char*) trimmedPV.toLatin1().constData());
+        sprintf(asc, "Info: malformed pv '%s' (due to macro?)", (char*) qasc(trimmedPV));
         postMessage(QtWarningMsg, asc);
     }
 
@@ -2174,17 +2172,17 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
 
     // keep actual object name
     cpylen = qMin(w->objectName().length(), MAXDISPLEN-1);
-    strncpy(kData->dispName, w->objectName().toLower().toLatin1().constData(), (size_t) cpylen);
+    strncpy(kData->dispName, qasc(w->objectName().toLower()), (size_t) cpylen);
     kData->dispName[cpylen] = '\0';
 
     QString classname = w->metaObject()->className();
     cpylen = qMin(classname.length(), MAXDISPLEN-1);
-    strncpy(kData->clasName, classname.toLower().toLatin1().constData(), (size_t) cpylen);
+    strncpy(kData->clasName, qasc(classname.toLower()), (size_t) cpylen);
     kData->clasName[cpylen] = '\0';
 
     // keep actual filename
     cpylen = qMin( savedFile[level].length(), MAXFILELEN-1);
-    strncpy(kData->fileName, (char*) savedFile[level].toLatin1().constData(), (size_t) cpylen);
+    strncpy(kData->fileName, (char*) qasc(savedFile[level]), (size_t) cpylen);
     kData->fileName[cpylen] = '\0';
 
     if (QLineEdit *lineedit = qobject_cast<QLineEdit *>(w)) {
@@ -2409,7 +2407,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
     }
 
     calcQString=calcQString.trimmed();
-    strcpy(calcString, calcQString.toLatin1().constData());
+    strcpy(calcString, qasc(calcQString));
 
     // any monitors ?
     QVariant monitorList=w->property("MonitorList");
@@ -2499,11 +2497,11 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
             calcQString = calcQString.mid(3, calcQString.length()-4);
 
             char newCalc[2048];
-            strcpy(newCalc, calcQString.toLatin1().constData());
+            strcpy(newCalc, qasc(calcQString));
 
             //Create a new module object
             QString myModule("myModule"+w->objectName());
-            PyObject *pNewMod = PyModule_New((char*)myModule.toLatin1().constData());
+            PyObject *pNewMod = PyModule_New((char*) qasc(myModule));
 
             PyModule_AddStringConstant(pNewMod, "__file__", "");
 
@@ -2511,7 +2509,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
             pLocal = PyModule_GetDict(pNewMod);
 
             //Define my function in the newly created module, when error then we get a null pointer back
-            pValue = PyRun_String(calcQString.toLatin1().constData(), Py_file_input, pGlobal, pLocal);
+            pValue = PyRun_String(qasc(calcQString), Py_file_input, pGlobal, pLocal);
             if(pValue == (PyObject *) 0) {
                 valid = false;
                 Py_DECREF(pNewMod);
@@ -3562,7 +3560,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
                 // get calc string
                 //printf("get calc string <%s>\n", qPrintable(imageWidget->getImageCalc()));
-                strcpy(calcString, (char*) imageWidget->getImageCalc().toLatin1().constData());
+                strcpy(calcString, (char*) qasc(imageWidget->getImageCalc()));
 
                 // scan and get the channels
                 for(int i=0; i < 4; i++) valueArray[i] = 0.0;
@@ -4386,7 +4384,7 @@ void CaQtDM_Lib::shellCommand(QString command) {
     // I had too many problems with QProcess start, use standard execl
     if(!command.endsWith("&")) command.append("&");
     //qDebug() << "execute:" << command;
-    int status = Execute((char*)command.toLatin1().constData());
+    int status = Execute((char*) qasc(command));
     if(status != 0) {
         QMessageBox::information(0,"FailedToStart or Error", command);
     }
@@ -4550,7 +4548,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         if(polylineWidget->getColorMode() == caPolyLine::Alarm) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
     } else if(caCalc* calcWidget = qobject_cast<caCalc *>(w)) {
-        pv[0] = calcWidget->getVariable().toLatin1().constData();
+        pv[0] = qasc(calcWidget->getVariable());
         nbPV++;
         getAllPVs(calcWidget);
         calcString = calcWidget->getCalc();
@@ -4991,9 +4989,9 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         if(!kPtr->soft) {
                             info.append("<br>");
                             info.append("Description: ");
-                            if(plugininterface != (ControlsInterface *) 0) plugininterface->pvGetDescription((char*) pv[i].toLatin1().constData(), description);
+                            if(plugininterface != (ControlsInterface *) 0) plugininterface->pvGetDescription((char*) qasc(pv[i]), description);
                             info.append(description);
-                            if(plugininterface != (ControlsInterface *) 0) plugininterface->pvGetTimeStamp((char*) pv[i].toLatin1().constData(), timestamp);
+                            if(plugininterface != (ControlsInterface *) 0) plugininterface->pvGetTimeStamp((char*) qasc(pv[i]), timestamp);
                             info.append("<br>");
                             info.append(timestamp);
                         }
@@ -5286,10 +5284,9 @@ bool CaQtDM_Lib::SoftPVusesItsself(QWidget* widget, QMap<QString, QString> map)
                 if(pos != -1) {
                     int status = parseForDisplayRate(JSONString, rate);
                     if(!status) {
-                        sprintf(asc, "JSON parsing error on %s ,should be like {\"monitor\":{\"maxdisplayrate\":10}}",
-                                (char*) pv.trimmed().toLatin1().constData());
+                        sprintf(asc, "JSON parsing error on %s ,should be like {\"monitor\":{\"maxdisplayrate\":10}}", (char*) qasc(pv.trimmed()));
                     } else {
-                        sprintf(asc, "pv %s display rate set to maximum %dHz", trimmedPV.toLatin1().constData(), rate);
+                        sprintf(asc, "pv %s display rate set to maximum %dHz", qasc(trimmedPV), rate);
                     }
                     postMessage(QtDebugMsg, asc);
                 }
@@ -5621,7 +5618,7 @@ void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QW
             };
         }
     } else {
-        qDebug() << "internal error; return while pv <" << pv << ">not found";
+        qDebug() << "internal error; return while pv <" << pv << "> not found";
         return;
     }
 
@@ -5690,13 +5687,13 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
     switch (kPtr->edata.fieldtype) {
     case caSTRING:
         //qDebug() << "set string" << text;
-        plugininterface->pvSetValue(kPtr->pv, 0.0, 0, (char*) text.toLatin1().constData(), (char*) w->objectName().toLower().toLatin1().constData(), errmess, 0);
+        plugininterface->pvSetValue(kPtr->pv, 0.0, 0, (char*) qasc(text), (char*) qasc(w->objectName()), errmess, 0);
         break;
 
     case caENUM:
     case caINT:
     case caLONG:
-        strcpy(textValue, text.toLatin1().constData());
+        strcpy(textValue, qasc(text));
         // Check for an enum text
         match = false;
         if(kPtr->edata.dataB != (void*)0 && kPtr->edata.enumCount > 0) {
@@ -5706,7 +5703,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
             for (int i=0; i<list.size(); i++) {
                 if(!text.compare(list.at(i).trimmed())) {
                     //qDebug() << "set enum text" << textValue;
-                    plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, textValue, (char*) w->objectName().toLower().toLatin1().constData(), errmess, 0);
+                    plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, textValue, (char*) qasc(w->objectName().toLower()), errmess, 0);
                     match = true;
                     break;
                 }
@@ -5722,7 +5719,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
             if(kPtr->edata.fieldtype == caENUM) {
                 if(*end == 0 && end != textValue && longValue >= 0 && longValue <= kPtr->edata.enumCount) {
                     //qDebug() << "decode value *end=0, set a longvalue to enum" << longValue;
-                    plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int32_t) longValue, textValue, (char*) w->objectName().toLower().toLatin1().constData(), errmess, 0);
+                    plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int32_t) longValue, textValue, (char*) qasc(w->objectName().toLower()), errmess, 0);
                 } else {
                     char asc[100];
                     sprintf(asc, "Invalid value: pv=%s value= \"%s\"\n", kPtr->pv, textValue);
@@ -5734,7 +5731,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
                 // normal int or long
             } else
                 //qDebug() << "set normal longvalue" << longValue;
-                plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int32_t) longValue, textValue, (char*) w->objectName().toLower().toLatin1().constData(), errmess, 0);
+                plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int32_t) longValue, textValue, (char*) qasc(w->objectName().toLower()), errmess, 0);
         }
 
         break;
@@ -5743,10 +5740,10 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
         if(fType == caTextEntry::string) {
             if(kPtr->edata.nelm > 1) {
                //qDebug() << "set string" << text;
-               plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, (char*) text.toLatin1().constData(), (char*) w->objectName().toLower().toLatin1().constData(), errmess, 0);
+               plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, (char*) qasc(text), (char*) qasc(w->objectName().toLower()), errmess, 0);
             } else {  // single char written through its ascii code while character entered
                QChar c = text.at(0);
-               plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int)c.toLatin1(), (char*)  "", (char*) w->objectName().toLower().toLatin1().constData(), errmess, 2);
+               plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int)c.toLatin1(), (char*)  "", (char*) qasc(w->objectName().toLower()), errmess, 2);
             }
             break;
         }
@@ -5755,7 +5752,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
     default:
         match = false;
         //qDebug() << "assume it is a double";
-        strcpy(textValue, text.toLatin1().constData());
+        strcpy(textValue, qasc(text));
         value = (double) getValueFromString(textValue, fTypeNew, &end);
         if(*end == '\0' && end != textValue) {        // decoded as long
             match = true;
@@ -5773,7 +5770,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
                 caCalc * ww = (caCalc*) kPtr->dispW;
                 ww->setValue(value);
             } else {
-                plugininterface->pvSetValue((char*) kPtr->pv, value, 0, textValue, (char*) w->objectName().toLower().toLatin1().constData(), errmess, 1);
+                plugininterface->pvSetValue((char*) kPtr->pv, value, 0, textValue, (char*) qasc(w->objectName().toLower()), errmess, 1);
             }
 
         } else {
@@ -5826,30 +5823,30 @@ void CaQtDM_Lib::TreatRequestedWave(QString pv, QString text, caWaveTable::Forma
     case caINT:
     case caLONG:
     case caCHAR:
-        strcpy(textValue, text.toLatin1().constData());
+        strcpy(textValue, qasc(text));
         longValue = getValueFromString(textValue, fTypeNew, &end);
 
         if(kPtr->edata.fieldtype == caLONG) {
             int32_t* P = (int32_t*) kPtr->edata.dataB;
             P[index] = (int32_t) longValue;
             plugininterface->pvSetWave((char*) kPtr->pv, fdata, ddata, data16, P, sdata, kPtr->edata.valueCount,
-                                 (char*) w->objectName().toLower().toLatin1().constData(), errmess);
+                                 (char*) qasc(w->objectName().toLower()), errmess);
         } else if(kPtr->edata.fieldtype == caINT) {
             int16_t* P = (int16_t*) kPtr->edata.dataB;
             P[index] = (int16_t) longValue;
             plugininterface->pvSetWave((char*) kPtr->pv, fdata, ddata, P, data32, sdata, kPtr->edata.valueCount,
-                                 (char*) w->objectName().toLower().toLatin1().constData(), errmess);
+                                 (char*) qasc(w->objectName().toLower()), errmess);
         } else {
             if(fTypeNew == string) {
                 char* P = (char*) kPtr->edata.dataB;
                 P[index] = textValue[0];
                 plugininterface->pvSetWave((char*) kPtr->pv, fdata, ddata, data16, data32, P, kPtr->edata.valueCount,
-                                     (char*) w->objectName().toLower().toLatin1().constData(), errmess);
+                                     (char*) qasc(w->objectName().toLower()), errmess);
             } else {
                 char* P = (char*) kPtr->edata.dataB;
                 P[index] = (char) ((int) longValue);
                 plugininterface->pvSetWave((char*) kPtr->pv, fdata, ddata, data16, data32, P, kPtr->edata.valueCount,
-                                     (char*) w->objectName().toLower().toLatin1().constData(), errmess);
+                                     (char*) qasc(w->objectName().toLower()), errmess);
             }
         }
 
@@ -5859,7 +5856,7 @@ void CaQtDM_Lib::TreatRequestedWave(QString pv, QString text, caWaveTable::Forma
     case caDOUBLE:
         match = false;
         // Treat as a double
-        strcpy(textValue, text.toLatin1().constData());
+        strcpy(textValue, qasc(text));
         value = (double) getValueFromString(textValue, fTypeNew, &end);
         if(*end == '\0' && end != textValue) {        // decoded as long
             match = true;
@@ -5874,12 +5871,12 @@ void CaQtDM_Lib::TreatRequestedWave(QString pv, QString text, caWaveTable::Forma
                 float* P = (float*) kPtr->edata.dataB;
                 P[index] = (float) value;
                 plugininterface->pvSetWave((char*) kPtr->pv, P, ddata, data16, data32, sdata, kPtr->edata.valueCount,
-                                     (char*) w->objectName().toLower().toLatin1().constData(), errmess);
+                                     (char*) qasc(w->objectName().toLower()), errmess);
             } else  {
                 double* P = (double*) kPtr->edata.dataB;
                 P[index] = value;
                 plugininterface->pvSetWave((char*) kPtr->pv, fdata, P, data16, data32, sdata, kPtr->edata.valueCount,
-                                     (char*) w->objectName().toLower().toLatin1().constData(), errmess);
+                                     (char*) qasc(w->objectName().toLower()), errmess);
             }
         } else {
             char asc[100];
@@ -5902,7 +5899,7 @@ int CaQtDM_Lib::parseForDisplayRate(QString inputc, int &rate)
     // Parse data
     char input[MAXPVLEN];
     int cpylen = qMin(inputc.length(), MAXPVLEN-1);
-    strncpy(input, (char*) inputc.toLatin1().constData(), (size_t) cpylen);
+    strncpy(input, (char*) qasc(inputc), (size_t) cpylen);
     input[cpylen] = '\0';
 
     JSONValue *value = JSON::Parse(input);
@@ -6528,7 +6525,7 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
     }
 
     // put it also to the clipboard (usefull for microsoft windows)
-    const QString text = mimeData->text().toLatin1().constData();
+    const QString text = qasc(mimeData->text());
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(text, QClipboard::Clipboard);
 

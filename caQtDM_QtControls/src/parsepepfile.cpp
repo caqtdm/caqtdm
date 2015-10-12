@@ -127,7 +127,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QColor &bgColor, QFile *f
     QString line = in.readLine();
     while (!line.isNull()) {
 
-        PRINT(printf("line : <%s>\n", line.toLatin1().constData()));
+        PRINT(printf("line : <%s>\n", qasc(line)));
 
         // replace all tabs by blancs
         line.replace("\t", " ");
@@ -149,9 +149,9 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QColor &bgColor, QFile *f
         // break the line down in their elements
         QStringList elements= line.split(separator,  QString::SkipEmptyParts);
 /*
-        printf("%d %s\n", elements.count(), line.toLatin1().constData());
+        printf("%d %s\n", elements.count(), qasc(line));
         for (int i=0; i< elements.count(); i++) {
-            printf("<%s>\n",  elements.at(i).toLatin1().constData());
+            printf("<%s>\n",  qasc(elements.at(i)));
         }
 */
         // empty line ?
@@ -190,14 +190,14 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QColor &bgColor, QFile *f
 
                 while (ll < elements.count()) {
                     bool ok = true;
-                    PRINT(printf("ll=%d elem=%s\n",ll, elements.at(ll).toLatin1().constData() ));
+                    PRINT(printf("ll=%d elem=%s\n",ll, qasc(elements.at(ll))));
                     float number = elements.at(ll).toFloat(&ok);
                     Q_UNUSED(number);
 
                     if(elements.at(ll).contains("-span")) {
                         ll++;
                         if(ll < elements.count()) {
-                            PRINT(printf("span detected, value=%s\n", elements.at(ll).toLatin1().constData()));
+                            PRINT(printf("span detected, value=%s\n", qasc(elements.at(ll))));
                             span = elements.at(ll).toInt();
                         }
                     }
@@ -211,20 +211,20 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QColor &bgColor, QFile *f
 
                     else if(elements.at(ll).contains("-comlab")) {
                         ll++;
-                        PRINT(printf("comlab detected <%s>\n", elements.at(ll).toLatin1().constData()));
-                        gridLayout[actualLine][actualColumn].comlab = elements.at(ll).toLatin1().constData();
+                        PRINT(printf("comlab detected <%s>\n", qasc(elements.at(ll))));
+                        gridLayout[actualLine][actualColumn].comlab = qasc(elements.at(ll));
                     }
 
                     else if(elements.at(ll).contains("-command")) {
                         ll++;
-                        PRINT(printf("commmand detected <%s>\n", elements.at(ll).toLatin1().constData()));
-                        gridLayout[actualLine][actualColumn].command = elements.at(ll).toLatin1().constData();
+                        PRINT(printf("commmand detected <%s>\n", qasc(elements.at(ll))));
+                        gridLayout[actualLine][actualColumn].command = qasc(elements.at(ll));
                         gridLayout[actualLine][actualColumn].command =  gridLayout[actualLine][actualColumn].command.replace("\"", "");
                     }
 
                     else if(elements.at(ll).contains("-text")) {
                         ll++;
-                        PRINT(printf("text detected <%s>\n", elements.at(ll).toLatin1().constData()));
+                        PRINT(printf("text detected <%s>\n", qasc(elements.at(ll))));
                         widgetText = elements.at(ll);
                         gridLayout[actualLine][actualColumn].textPresent = true;
                     }
@@ -241,16 +241,14 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QColor &bgColor, QFile *f
 
                     else if(elements.at(ll).contains("-height")) {
                         ll++;
-
-                        PRINT(printf("height detected <%s>\n", elements.at(ll).toAscii().constData()));
+                        PRINT(printf("height detected <%s>\n", qasc(elements.at(ll))));
                         widgetHeight = elements.at(ll);
                     }
 
                     else if(elements.at(ll).contains("-fg") || elements.at(ll).contains("-comfg")) {
                         QString fgs;
                         ll++;
-
-                        PRINT(printf("fg or comfg detected <%s>\n", elements.at(ll).toLatin1().constData()));
+                        PRINT(printf("fg or comfg detected <%s>\n", qasc(elements.at(ll))));
                         fgs = elements.at(ll);
                         fgs = fgs.replace("\"", "");
                         fg = QColor(fgs);
@@ -259,18 +257,18 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QColor &bgColor, QFile *f
                     else if(elements.at(ll).contains("-bg")) {
                         QString bgs;
                         ll++;
-                        PRINT(printf("bg detected <%s>\n", elements.at(ll).toLatin1().constData()));
+                        PRINT(printf("bg detected <%s>\n", qasc(elements.at(ll))));
                         bgs = elements.at(ll);
                         bgs = bgs.replace("\"", "");
                         bg = QColor(bgs);
 
                     } else if(elements.at(ll-1).contains("comment")) {
-                        PRINT(printf("comment  detected %s\n", elements.at(ll).toLatin1().constData()));
+                        PRINT(printf("comment  detected %s\n", qasc(elements.at(ll))));
                         widgetText = elements.at(ll);
                     }
 
                     else {
-                        PRINT(printf("something else  detected <%s>\n", elements.at(ll).toLatin1().constData()));
+                        PRINT(printf("something else  detected <%s>\n", qasc(elements.at(ll))));
                         QString item = elements.at(ll);
                         // is this a format
                         if(item.at(0) == '%') ok = true;
@@ -282,7 +280,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QColor &bgColor, QFile *f
                     if(ok && (widgetType.contains("setrdbk") ||
                               widgetType.contains("wheelswitch") ||
                               widgetType.contains("formread")) ) {
-                        PRINT(printf("format detected %s\n", elements.at(ll).toLatin1().constData()));
+                        PRINT(printf("format detected %s\n", qasc(elements.at(ll))));
                         formats[nbFormats++] =elements.at(ll);
                     }
                     ll++;
@@ -306,7 +304,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QColor &bgColor, QFile *f
                 gridLayout[actualLine][actualColumn].fg = fg;
                 gridLayout[actualLine][actualColumn].bg = bg;
 
-                PRINT(printf("%d %d %d <%s>\n", actualLine, actualColumn,  span, widgetType.toLatin1().constData()));
+                PRINT(printf("%d %d %d <%s>\n", actualLine, actualColumn,  span, qasc(widgetType)));
 
                 if(widgetType.contains("led") || widgetType.contains("formread") || widgetType.contains("wheelswitch") || widgetType.contains("choicebutton") ||
                   widgetType.contains("menubutton")) {
@@ -362,8 +360,8 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QColor &bgColor, QFile *f
 /*
         for(int i=0; i< actualLine; i++) {
             for (int j=0; j<grid; j++) {
-                printf("row=%d col=%d %20s text=%s nbelem=%d span=%d\n", i, j, gridLayout[i][j].widgetType.toLatin1().constData(),
-                       gridLayout[i][j].widgetText.toLatin1().constData(), gridLayout[i][j].nbElem, gridLayout[i][j].span);
+                printf("row=%d col=%d %20s text=%s nbelem=%d span=%d\n", i, j, qasc(gridLayout[i][j].widgetType),
+                       qasc(gridLayout[i][j].widgetText), gridLayout[i][j].nbElem, gridLayout[i][j].span);
             }
         }
 */
@@ -400,9 +398,8 @@ void ParsePepFile::DisplayFile(int nbRows, int nbCols, QByteArray *array)
 
             int spanColumns = 1;
 /*
-            printf("===== %d %d %20s text=%10s span=%d col=%d\n", i, j,  gridLayout[i][j].widgetType.toLatin1().constData(),
-                   gridLayout[i][j].widgetText.toLatin1().constData(),
-                   gridLayout[i][j].span, col);
+            printf("===== %d %d %20s text=%10s span=%d col=%d\n", i, j,  qasc(gridLayout[i][j].widgetType),
+                   qasc(gridLayout[i][j].widgetText), gridLayout[i][j].span, col);
 */
 
             // compute how many columns have to be spanned for our grid span
@@ -537,9 +534,9 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
         if(!grid.textPresent || grid.widgetText.size() != 0) {
             if(!grid.textPresent) {
-               writeLabel(grid.widgetChannel, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetChannel, "", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             } else {
-               writeLabel(grid.widgetText, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetText, "", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             }
             writeCloseTag("item", array);
             // write now the led
@@ -557,9 +554,9 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
         if(!grid.textPresent || grid.widgetText.size() != 0) {
             if(!grid.textPresent) {
-               writeLabel(grid.widgetChannel, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetChannel, "", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             } else {
-               writeLabel(grid.widgetText, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetText, "", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             }
             writeCloseTag("item", array);
             // write now the led
@@ -652,15 +649,15 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         //////////////////////////////////////////////////////////////////////////////////
     } else if (grid.widgetType.contains("choicebutton")) {
 
-        PRINT(printf("create choicebutton row=%d column=%d <%s>\n", actualgridRow, effectiveColumn,grid.widgetText.toLatin1().constData()));
+        PRINT(printf("create choicebutton row=%d column=%d <%s>\n", actualgridRow, effectiveColumn, qasc(grid.widgetText)));
 
         writeItemRowCol(actualgridRow, effectiveColumn, spanGrid, array);
 
         if(!grid.textPresent || grid.widgetText.size() != 0) {
             if(!grid.textPresent) {
-               writeLabel(grid.widgetChannel, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetChannel, "", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             } else {
-               writeLabel(grid.widgetText, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetText, "", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             }
             writeCloseTag("item", array);
             // write now the choicebutton
@@ -748,9 +745,9 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
         if(!grid.textPresent || grid.widgetText.size() != 0) {
             if(!grid.textPresent) {
-               writeLabel(grid.widgetChannel, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetChannel, "", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             } else {
-               writeLabel(grid.widgetText, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetText, "", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             }
             writeCloseTag("item", array);
             // write now the wheelswitch
@@ -767,9 +764,9 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
         if(!grid.textPresent || grid.widgetText.size() != 0) {
             if(!grid.textPresent) {
-               writeLabel(grid.widgetChannel, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetChannel, "", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             } else {
-               writeLabel(grid.widgetText, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetText, "", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             }
             writeCloseTag("item", array);
             // write now the next stuff
@@ -793,7 +790,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
 
         // 1. write first the label
-        writeLabel(grid.widgetChannel, "0", lineHeight, "16777215", lineHeight, fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "",  true, fg, bg, array);
+        writeLabel(grid.widgetChannel, "", lineHeight, "16777215", lineHeight, fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "",  true, fg, bg, array);
         writeCloseTag("item", array);
 
         // 2. write now the wheelswitch
@@ -879,9 +876,9 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
         if(!grid.textPresent || grid.widgetText.size() != 0) {
             if(!grid.textPresent) {
-               writeLabel(grid.widgetChannel, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetChannel, "", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             } else {
-               writeLabel(grid.widgetText, "150", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
+               writeLabel(grid.widgetText, "", lineHeight, "", "", fontSize, "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter", "", "", "", "", true, fg, bg, array);
             }
             writeCloseTag("item", array);
             // write now the lineedit
@@ -890,7 +887,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
         // write now the lineedit
         rgba[3] = 255;
-        writeLineEdit(grid.formats[0], grid.widgetChannel, "150", lineHeight, "", "", fontSize, "", "", "", "", "", rgba, array);
+        writeLineEdit(grid.formats[0], grid.widgetChannel, "100", lineHeight, "", "", fontSize, "", "", "", "", "", rgba, array);
         writeCloseTag("item", array);
 
         if(grid.command.size() > 0) {
@@ -900,7 +897,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         }
 
     } else {
-        printf("%s not treated\n", grid.widgetType.toLatin1().constData());
+        printf("%s not treated\n", qasc(grid.widgetType));
     }
 }
 
@@ -1215,7 +1212,7 @@ void ParsePepFile::writeLabel(QString text, QString minwidth, QString minheight,
         writeCloseProperty(array);
     }
 
-    writeSimpleProperty("text", "string",  text.toLatin1().constData(), array);
+    writeSimpleProperty("text", "string",  qasc(text), array);
     writeSimpleProperty("alignment", "set", alignment, array);
 
     if(transparent) setColor("background", 200, 200, 200, 0, array);
