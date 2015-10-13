@@ -72,7 +72,7 @@ ParsePepFile::ParsePepFile(QString filename, bool willprint)
            "<property name=\"styleSheet\">\n"
            "<string>\n"
            "QWidget#centralWidget {background: " + bgColor.name() + "; }\n"
-           "caLineEdit {border-radius: 1px;background: lightyellow; color: black;}\n"
+           "caLineEdit {border-radius: 1px;background: white; color: black;}\n"
            "</string>\n"
            "</property>\n"
            "<widget class=\"QWidget\" name=\"centralWidget\">\n"
@@ -1111,7 +1111,7 @@ void ParsePepFile::writeLineEdit(QString format, QString pv, QString minwidth, Q
     writeSimpleProperty("alignment", "set", "Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter", array);
     writeSimpleProperty("channel", "string", pv, array);
     if(!willPrint) {
-       writeSimpleProperty("colorMode", "enum", "caLineEdit::Alarm_Static", array);
+       writeSimpleProperty("colorMode", "enum", "caLineEdit::Alarm_Default", array);
        writeSimpleProperty("alarmHandling", "enum", "caLineEdit::onBackground", array);
     } else {
        setColor("background", 255, 255, 255, 0, array);

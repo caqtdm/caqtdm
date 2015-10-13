@@ -66,10 +66,10 @@
 #define min(x,y)   (((x) < (y)) ? (x) : (y))
 
 #define ToolTipPrefix "<p style='background-color:yellow'><font color='#000000'>"
-#define ToolTipPostfix "</font></p>"
+#define ToolTipPostfix "</font></font></p>"
 
 #define InfoPrefix "<p style='background-color:lightyellow'><font color='#000000'>"
-#define InfoPostfix "</font></p>"
+#define InfoPostfix "</font></font></p>"
 
 // used for calculating visibility for several types of widgets
 #define ComputeVisibility(x, obj)  {  \
@@ -212,6 +212,7 @@
 
 Q_DECLARE_METATYPE(QList<int>)
 Q_DECLARE_METATYPE(QTabWidget*)
+Q_DECLARE_METATYPE(QStackedWidget*)
 
 // this sleep will not block the GUI and QThread::msleep is protected in Qt4.8 (so do not use that)
 class Sleep
@@ -241,18 +242,12 @@ CaQtDM_Lib::~CaQtDM_Lib()
     disconnect(mutexKnobDataP,
                SIGNAL(Signal_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData)), this,
                SLOT(Callback_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData)));
-    /*
-    //qDebug() << "nb elements:" << includeWidgetList.count();
-    for (int i = includeWidgetList.count()-1; i >= 0; --i) {
-        QWidget *widget;
-        widget= includeWidgetList.at(i);
-        //qDebug() << "delete" << widget;
-        delete widget;
-    }
-*/
+
     if(!fromAS) delete myWidget;
     includeWidgetList.clear();
     topIncludesWidgetList.clear();
+    allTabs.clear();
+    allStacks.clear();
 }
 
 /**
@@ -412,6 +407,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     includeWidgetList.clear();
     topIncludesWidgetList.clear();
+    allTabs.clear();
+    allStacks.clear();
 
     nbIncludes = 0;
     splashCounter = 1;
@@ -441,8 +438,13 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     mutexKnobDataP->BuildSoftPVList(myWidget);
 
     // setup changeevent for QTabWidgets
-    QList<QTabWidget *> allTabs = myWidget->findChildren<QTabWidget *>();
+    allTabs = myWidget->findChildren<QTabWidget *>();
     foreach(QTabWidget* widget, allTabs) {
+        connect(widget, SIGNAL(currentChanged(int)), this, SLOT(Callback_TabChanged(int)));
+    }
+    // setup changeevent for QStackedWidgets
+    allStacks = myWidget->findChildren<QStackedWidget *>();
+    foreach(QStackedWidget* widget, allStacks) {
         connect(widget, SIGNAL(currentChanged(int)), this, SLOT(Callback_TabChanged(int)));
     }
 
@@ -477,92 +479,92 @@ void CaQtDM_Lib::Callback_TabChanged(int current)
 /**
  * find for a widget if it is contained in a parent QTabWidget
  */
-QTabWidget* CaQtDM_Lib::getTabParent(QWidget *w1)
+QWidget* CaQtDM_Lib::getTabParent(QWidget *w1)
 {
     QObject *Parent = w1->parent();
-    QTabWidget *tabWidget = (QTabWidget*) 0;
-    //qDebug() << w1->objectName() << i;
+    QWidget *tabWidget = (QTabWidget*) 0;
+    //qDebug() << w1->objectName();
 
     while(Parent != (QObject*) 0) {
         //qDebug() << "parent=" << Parent;
         Parent = Parent->parent();
         if(Parent != (QObject*) 0) {
             if(QTabWidget* widget = qobject_cast<QTabWidget *>(Parent)) {
-                tabWidget = widget;
+                tabWidget = (QWidget*) widget;
+                //qDebug() << "found" << widget;
                 return tabWidget;
             }
+            if(QStackedWidget* widget = qobject_cast<QStackedWidget *>(Parent)) {
+                tabWidget = (QWidget*) widget;
+                if(!widget->objectName().contains("qt_tabwidget_stackedwidget")) {
+                    //qDebug() << "found" << widget;
+                    return tabWidget;
+                }
+            }
         } else {
-            return (QTabWidget *) 0;
+            return (QWidget *) 0;
         }
     }
-    return (QTabWidget *) 0;
+    return (QWidget *) 0;
 }
 
 /**
- * this routine will go through all are ca objects, find their nearest QTabWidget if any and decides
+ * this routine will go through all are ca objects, find their nearest QTabWidget or  QStackedWidget if any and decides
  * to enable or disable their monitor
  */
-void CaQtDM_Lib::EnableDisableIO()
-{
-#ifdef IO_OPTIMIZED_FOR_TABWIDGETS
+void CaQtDM_Lib::scanChildren(QList<QWidget*> children, QWidget *tab, int indexTab) {
 
     void *ptr;
+    int currentIndex;
 
-    // any tabwidgets in this window ? when not do nothing
-    //qDebug() << "================================";
-    QList<QTabWidget *> all = myWidget->findChildren<QTabWidget *>();
-    if(all.count() == 0) return;
+    // go through our ca objects on this page (except for caStripplot and cawaterfallplot, needing history data)
+    foreach(QWidget* w1, children) {
+        QString className = w1->metaObject()->className();
+        if(className.contains("ca") &&
+                !className.contains("caStripPlot") &&
+                !className.contains("caWaterfallPlot")) {
 
-    // go through are QTabWidgets
-    foreach(QTabWidget* widget, all) {
+            // nearest parent tab
+            QWidget* tabstack = (QWidget*) w1->property("parentTab").value<QWidget*>();
 
-        // go through their pages
-        for(int i=0; i<widget->count(); i++) {
+            // no tab
+            if(tabstack != (QWidget*) 0) {
+                // the widget to be considered
+                if(tabstack == tab) {
+                    // get current tabindex
+                    if(QTabWidget* nearestTab = qobject_cast<QTabWidget *>(tabstack)) {
+                        currentIndex = nearestTab->currentIndex();
+                    } else if(QStackedWidget* nearestStack = qobject_cast<QStackedWidget *>(tabstack)) {
+                        currentIndex = nearestStack->currentIndex();
+                    } else {
+                        currentIndex = -1;
+                    }
+                    bool hidden = false;
+                    //qDebug() << w1->objectName() << "sitting in " << tabstack << "actual position is" << currentIndex;
 
-            //qDebug() << widget << widget->currentIndex() << widget->tabText(i);
-            QList<QWidget*> children = widget->widget(i)->findChildren<QWidget *>();
+                    if(!tabstack->isVisible()) {
+                        //qDebug() << "thus on hidden tab";
+                        hidden = true;
+                    } else if(indexTab == currentIndex) {
+                        //qDebug() << "thus on visible tab";
+                        hidden = false;
+                    } else {
+                        //qDebug() << "thus on hidden tab";
+                        hidden = true;
+                    }
 
-            // go through our ca objects on this page (except for caStripplot and cawaterfallplot, needing history data)
-            foreach(QWidget* w1, children) {
-                QString className = w1->metaObject()->className();
-                if(className.contains("ca") &&
-                        !className.contains("caStripPlot") &&
-                        !className.contains("caWaterfallPlot")) {
-
-                    // nearest parent tab
-                    QTabWidget* tabWidget = w1->property("parentTab").value<QTabWidget*>();
-
-                    // no tab
-                    if(tabWidget != (QTabWidget*)0) {
-                        // the widget to be considered
-                        if(tabWidget == widget) {
-                            bool hidden = false;
-                            //qDebug() << w1->objectName() << "sitting in " << tabWidget << "at position" << i << "actual position is" << tabWidget->currentIndex();
-
-                            if(!tabWidget->isVisible()) {
-                                hidden = true;
-                            } else if(i == tabWidget->currentIndex()) {
-                                //qDebug() << "thus on visible tab";
-                                hidden = false;
-                            } else {
-                                //qDebug() << "thus on hidden tab";
-                                hidden = true;
-                            }
-
-                            // get the associated monitor pointers and add or remove the event
-                            QVariant var=w1->property("InfoList");
-                            QVariantList infoList = var.toList();
-                            for(int j=0; j<infoList.count(); j++) {
-                                ptr = (void*) infoList.at(j).value<void *>();
-                                if(ptr != (void*) 0) {
-                                    ControlsInterface * plugininterface = (ControlsInterface *) w1->property("Interface").value<void *>();
-                                    if(plugininterface != (ControlsInterface *) 0) {
-                                        if(!hidden) {
-                                            plugininterface->pvAddEvent(ptr);
-                                        } else {
-                                            plugininterface->pvClearEvent(ptr);
-                                        }
-                                    }
+                    // get the associated monitor pointers and add or remove the event
+                    QVariant var=w1->property("InfoList");
+                    QVariantList infoList = var.toList();
+                    for(int j=0; j<infoList.count(); j++) {
+                        ptr = (void*) infoList.at(j).value<void *>();
+                        if(ptr != (void*) 0) {
+                            ControlsInterface * plugininterface = (ControlsInterface *) w1->property("Interface").value<void *>();
+                            if(plugininterface != (ControlsInterface *) 0) {
+                                if(!hidden) {
+                                    plugininterface->pvAddEvent(ptr);
+                                } else {
+                                    plugininterface->pvClearEvent(ptr);
                                 }
                             }
                         }
@@ -571,6 +573,42 @@ void CaQtDM_Lib::EnableDisableIO()
             }
         }
     }
+}
+
+/**
+ * go through all tab and stacked widgets
+ */
+void CaQtDM_Lib::EnableDisableIO()
+{
+#ifdef IO_OPTIMIZED_FOR_TABWIDGETS
+
+    // any tabwidgets in this window ? when not do nothing
+    //qDebug() << "================================" << allTabs.count() << allStacks.count();
+
+    if((allTabs.count() == 0) && (allStacks.count() == 0)) return;
+
+    // go through are QTabWidgets
+    foreach(QTabWidget* widget, allTabs) {
+        // go through their pages
+        for(int i=0; i<widget->count(); i++) {
+            //qDebug() << widget << widget->currentIndex() << widget->tabText(i);
+            QList<QWidget*> children = widget->widget(i)->findChildren<QWidget *>();
+            scanChildren(children, widget, i);
+        }
+    }
+
+    // go through are QStackedWidgets
+    foreach(QStackedWidget* widget, allStacks) {
+        // go through their pages
+        for(int i=0; i<widget->count(); i++) {
+            if(!widget->objectName().contains("qt_tabwidget_stackedwidget")) {
+                //qDebug() << widget << widget->currentIndex();
+                QList<QWidget*> children = widget->widget(i)->findChildren<QWidget *>();
+                scanChildren(children, widget, i);
+            }
+        }
+    }
+
     FlushAllInterfaces();
 #endif
 }
@@ -590,7 +628,6 @@ void CaQtDM_Lib::timerEvent(QTimerEvent *event)
         loopTimer = 0;
     }
     loopTimer++;
-
 }
 
 /**
@@ -1945,7 +1982,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
     // search for a QTabWidget as nearest parent and set it as property
     if(className.contains("ca")) {
-        QTabWidget *tabWidget = getTabParent(w1);
+        QWidget *tabWidget = getTabParent(w1);
         w1->setProperty("parentTab",QVariant::fromValue(tabWidget) );
     }
 

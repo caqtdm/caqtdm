@@ -146,9 +146,9 @@ void caLineEdit::setColors(QColor bg, QColor fg, QColor frame, int lineWidth)
         setBotTopBorderWidth((double) lineWidth+1);
         setLateralBorderWidth((double) lineWidth+1);
 
-        if(thisColorMode == Default || thisColorMode == Alarm_Default) {
-            if(Alarm != 2) {
-              thisStyle = thisStyle.arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
+        // alarm default = (colors from stylesheet)
+        if(thisColorMode == Default) {
+            thisStyle = thisStyle.arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
                     arg(defForeColor.red()).arg(defForeColor.green()).arg(defForeColor.blue()).arg(defForeColor.alpha()).
                     arg(lineWidth).
                     arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha()).
@@ -156,31 +156,70 @@ void caLineEdit::setColors(QColor bg, QColor fg, QColor frame, int lineWidth)
                     arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
                     arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha());
 
-              lc = defBackColor.lighter();
-              dc = defBackColor.darker();
+            lc = defBackColor.lighter();
+            dc = defBackColor.darker();
+
+          // alarm default = alarm colors on foreground or background (colors from alarms and stylesheet)
+          // when major alarm and background handling take the background from stylesheet (normally would be white)
+        } else if(thisColorMode == Alarm_Default) {
+            if(Alarm == MAJOR_ALARM && thisAlarmHandling == onBackground) {
+                thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
+                        arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
+                        arg(lineWidth).
+                        arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha()).
+                        arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
+                        arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
+                        arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha());
             } else {
                 if(thisAlarmHandling == onForeground) {
-                   thisStyle = thisStyle.
-                        arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
+                    thisStyle = thisStyle.
+                            arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
+                            arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha()).
+                            arg(lineWidth).
+                            arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha()).
+                            arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
+                            arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
+                            arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha());
+                } else {
+                    thisStyle = thisStyle.
+                            arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
+                            arg(defForeColor.red()).arg(defForeColor.green()).arg(defForeColor.blue()).arg(defForeColor.alpha()).
+                            arg(lineWidth).
+                            arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha()).
+                            arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
+                            arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
+                            arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha());
+                }
+            }
+
+            lc = defBackColor.lighter();
+            dc = defBackColor.darker();
+
+            // alarm static = alarm colors on foreground or background (colors from color properties)
+        } else if(thisColorMode == Alarm_Static) {
+            if(thisAlarmHandling == onForeground) {
+                thisStyle = thisStyle.
+                        arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
                         arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha()).
                         arg(lineWidth).
                         arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha()).
                         arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
                         arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
                         arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha());
-                } else {
-                    thisStyle = thisStyle.
-                         arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
-                         arg(defForeColor.red()).arg(defForeColor.green()).arg(defForeColor.blue()).arg(defForeColor.alpha()).
-                         arg(lineWidth).
-                         arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha()).
-                         arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
-                         arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
-                         arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha());
-                }
-                lc = defBackColor.lighter();
-                dc = defBackColor.darker();
+            } else {
+                thisStyle = thisStyle.
+                        arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
+                        arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha()).
+                        arg(lineWidth).
+                        arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha()).
+                        arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
+                        arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
+                        arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha());
             }
+            lc = defBackColor.lighter();
+            dc = defBackColor.darker();
+
+            // static (colors from color properties)
         } else {
             thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
                     arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha()).
@@ -212,6 +251,7 @@ void caLineEdit::setColors(QColor bg, QColor fg, QColor frame, int lineWidth)
     oldForeColor = fg;
     oldFrameColor = frame;
     oldFrameLineWidth = lineWidth;
+    oldColorMode = thisColorMode;
 }
 
 void caLineEdit::setColorMode(colMode colormode)

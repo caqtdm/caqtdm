@@ -234,7 +234,8 @@ signals:
     void fileChanged(const QString&);
 
 private:
-    QTabWidget* getTabParent(QWidget *w1);
+    void scanChildren(QList<QWidget*> children, QWidget *tab, int i);
+    QWidget* getTabParent(QWidget *w1);
     QString treatMacro(QMap<QString, QString> map, const QString& pv, bool *doNothing);
     void scanWidgets(QList<QWidget*> list, QString macro);
     void HandleWidget(QWidget *w, QString macro, bool firstPass, bool treatPrimaries);
@@ -280,6 +281,8 @@ private:
     QWidget *myWidget;
     QList<QWidget*> includeWidgetList;
     QList<QWidget*> topIncludesWidgetList;
+    QList<QTabWidget *> allTabs;
+    QList<QStackedWidget *> allStacks;
 
     int level;
     // 50 levels of includes should do it
