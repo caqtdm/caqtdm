@@ -6282,6 +6282,8 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                      integerList.insert(4, widget->font().pointSize());
             }
             widget->setProperty("GeometryList", integerList);
+
+            CartesianPlotsVerticalAlign();
         }
         return;
     }
@@ -6392,6 +6394,53 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 
         }
     }
+
+    CartesianPlotsVerticalAlign();
+
+}
+
+/**
+ *  align cartesian plots vertically when they belong to the same group
+ */
+void CaQtDM_Lib::CartesianPlotsVerticalAlign()
+{
+    // get largest extent of left scale
+    QMap<int, caCartesianPlot*> map;  // list of cartesianplots with key group
+    QList<int> groups;                // group numbers found
+
+    // scan cartesianplots and find groups != 0; compose a list with the groups, and a map with the group key
+    QList<caCartesianPlot *> allCarts = myWidget->findChildren<caCartesianPlot *>();
+    foreach(caCartesianPlot* widget, allCarts) {
+        if( widget->getXaxisSyncGroup() != 0) {
+            map.insertMulti(widget->getXaxisSyncGroup(), widget);
+            if(!groups.contains(widget->getXaxisSyncGroup())) groups.append(widget->getXaxisSyncGroup());
+        }
+    }
+
+    // go through our groups
+   foreach(int group, groups) {
+       int maxExtent = 0;
+
+       // get for this group the maximum extent of scale (probably does not work with autoscale)
+       QMap<int,caCartesianPlot* >::iterator i = map.find(group);
+       while (i != map.end() && i.key() == group) {
+           QwtScaleWidget *scaleWidget = i.value()->axisWidget(QwtPlot::yLeft);
+           QwtScaleDraw *sd = scaleWidget->scaleDraw();
+           sd->setMinimumExtent(0);
+           const int extent = sd->extent(scaleWidget->font() );
+           if ( extent > maxExtent ) maxExtent = extent;
+           ++i;
+       }
+
+       // now set the correct left scale extent to the group
+       i = map.find(group);
+       while (i != map.end() && i.key() == group) {
+           QwtScaleWidget *scaleWidget = i.value()->axisWidget(QwtPlot::yLeft);
+           scaleWidget->scaleDraw()->setMinimumExtent(maxExtent);
+           ++i;
+       }
+
+   }
 }
 
 void CaQtDM_Lib::Callback_WriteDetectedValues(QWidget* child)

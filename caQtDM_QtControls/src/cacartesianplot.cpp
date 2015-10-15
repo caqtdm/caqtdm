@@ -63,6 +63,7 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     thisToBeTriggered = false;
     thisTriggerNow = true;
     thisCountNumber = 0;
+    thisXaxisSyncGroup = 0;
 
     plotGrid = new QwtPlotGrid();
     plotGrid->attach(this);

@@ -303,9 +303,14 @@ void caPolyLine::resizeEvent(QResizeEvent *e)
         actualHeight = height();
         //printf("first resize of polyline %d %d\n", width(), height());
         initialize = false;
+    } else if(initialize) {
+        actualWidth= width();
+        actualHeight = height();
+        //printf("first resize of polyline %d %d\n", width(), height());
+        initialize = false;
     }
 
-    //printf("next resize of polyline %d %d\n", e->size().width(), e->size().height());
+    //printf("resize of polyline %d %d\n", e->size().width(), e->size().height());
 
     double resizeX = (double) e->size().width() / (double) actualWidth;
     double resizeY = (double) e->size().height() / (double) actualHeight;

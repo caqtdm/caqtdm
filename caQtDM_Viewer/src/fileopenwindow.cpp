@@ -178,7 +178,6 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     lastGeometry = geometry;
     userClose = false;
     printandexit = printscreen;
-    allowResize = resizing;
     minimizeMessageWindow = minimize;
     activWindow = 0;
     Specials specials;
@@ -701,9 +700,10 @@ void FileOpenWindow::Callback_OpenButton()
         if(fi.exists()) {
             CaQtDM_Lib *newWindow = new CaQtDM_Lib(this, fileName, "", mutexKnobData, interfaces, messageWindow);
             if (fileName.contains("prc")) {
-                allowResize = false;
+                newWindow->allowResizing(false);
+            } else {
+               newWindow->allowResizing(true);
             }
-            newWindow->allowResizing(allowResize);
  #ifdef MOBILE
             newWindow->grabSwipeGesture(fingerSwipeGestureType);
  #endif
@@ -872,9 +872,10 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         newWindow->grabSwipeGesture(fingerSwipeGestureType);
 #endif
         if (FileName.contains("prc")) {
-           allowResize = false;
+           newWindow->allowResizing(false);
+        } else {
+           newWindow->allowResizing(true);
         }
-        newWindow->allowResizing(allowResize);
         QMainWindow *mainWindow = newWindow;
 
 #if defined(WIN32) && !defined(__GNUC__)
@@ -1049,7 +1050,11 @@ void FileOpenWindow::Callback_ActionReload()
                 fileS = fileNameFound;
 
                 CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, interfaces, messageWindow);
-                newWindow->allowResizing(allowResize);
+                if (fileS.contains("prc")) {
+                    newWindow->allowResizing(false);
+                } else {
+                   newWindow->allowResizing(true);
+                }
 #ifdef MOBILE
                 newWindow->grabSwipeGesture(fingerSwipeGestureType);
 #endif

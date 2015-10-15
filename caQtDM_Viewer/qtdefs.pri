@@ -59,6 +59,10 @@ DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 # signal emit of cacalc has now also its integer and double value (this way you can for example switch the tabwidget pages with a cacalc that is updated by a soft/real channel)
 # pep emulation has been updated by cosylab
 # some slots have been added in order to link signals and slots in designer
+# QStackedWidget will also optimize its io for visible/hidden tabs
+# color handling for calineedit has been slightly changed in order to be able to get white on red in case of a major alarm (wanted for pep handling)
+# cartesianplots have now a group property in order to be able to align the horizontal scale (vertical label rectangle gets same width)
+# when a pep file and an ui file were displayed by caQtDM, some resize problems and a problem with capolyline was detected; is now solved
 
 # 4.0
 # caQtDM has now a controlsystem plugin structure. CS can be added by writing a plugin (see demo plugin) that will automatically be loaded. By specifying the plugin in front

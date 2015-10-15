@@ -266,6 +266,7 @@ private:
     void setCalcToNothing(QWidget* widget);
     bool Python_Error(QWidget *w, QString message);
     void FlushAllInterfaces();
+    void CartesianPlotsVerticalAlign();
 
 #ifdef MOBILE
     bool eventFilter(QObject *obj, QEvent *event);

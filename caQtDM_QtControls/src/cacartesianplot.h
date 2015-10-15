@@ -126,6 +126,8 @@ class QTCON_EXPORT caCartesianPlot : public QwtPlot
     Q_PROPERTY(axisType XaxisType READ getXaxisType WRITE setXaxisType)
     Q_PROPERTY(axisType YAxisType READ getYaxisType WRITE setYaxisType)
 
+    Q_PROPERTY(int XaxisSyncGroup READ getXaxisSyncGroup WRITE setXaxisSyncGroup)
+
 public:
 
     bool getXaxisEnabled() const { return thisXshow; }
@@ -310,6 +312,9 @@ public:
     axisType getYaxisType() const {return thisYtype;}
     void setYaxisType(axisType s);
 
+    void setXaxisSyncGroup( int group ) {thisXaxisSyncGroup = group;}
+    int getXaxisSyncGroup() {return thisXaxisSyncGroup;}
+
     caCartesianPlot(QWidget *parent);
 
     QwtSymbol::Style myMarker(curvSymbol m);
@@ -409,6 +414,8 @@ private:
     QwtPlotZoomer* zoomer;
 
     bool thisTriggerNow;
+
+    int thisXaxisSyncGroup;
 
 };
 
