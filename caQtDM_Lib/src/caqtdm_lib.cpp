@@ -409,6 +409,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     topIncludesWidgetList.clear();
     allTabs.clear();
     allStacks.clear();
+    cartesianGroupList.clear();
+    cartesianList.clear();
 
     nbIncludes = 0;
     splashCounter = 1;
@@ -446,6 +448,17 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     allStacks = myWidget->findChildren<QStackedWidget *>();
     foreach(QStackedWidget* widget, allStacks) {
         connect(widget, SIGNAL(currentChanged(int)), this, SLOT(Callback_TabChanged(int)));
+    }
+
+    // scan cartesianplots and find groups != 0; compose a list with the groups, and a map with the group key
+    QList<caCartesianPlot *> allCarts = myWidget->findChildren<caCartesianPlot *>();
+    if(allCarts.count() > 0) {
+        foreach(caCartesianPlot* widget, allCarts) {
+            if( widget->getXaxisSyncGroup() != 0) {
+                cartesianList.insertMulti(widget->getXaxisSyncGroup(), widget);
+                if(!cartesianGroupList.contains(widget->getXaxisSyncGroup())) cartesianGroupList.append(widget->getXaxisSyncGroup());
+            }
+        }
     }
 
     // start a timer
@@ -6279,12 +6292,11 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 tabW->setProperty("Stylesheet", tabW->styleSheet());
 
             } else {
-                     integerList.insert(4, widget->font().pointSize());
+                integerList.insert(4, widget->font().pointSize());
             }
             widget->setProperty("GeometryList", integerList);
-
-            CartesianPlotsVerticalAlign();
         }
+        CartesianPlotsVerticalAlign();
         return;
     }
 
@@ -6404,26 +6416,16 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
  */
 void CaQtDM_Lib::CartesianPlotsVerticalAlign()
 {
-    // get largest extent of left scale
-    QMap<int, caCartesianPlot*> map;  // list of cartesianplots with key group
-    QList<int> groups;                // group numbers found
-
-    // scan cartesianplots and find groups != 0; compose a list with the groups, and a map with the group key
-    QList<caCartesianPlot *> allCarts = myWidget->findChildren<caCartesianPlot *>();
-    foreach(caCartesianPlot* widget, allCarts) {
-        if( widget->getXaxisSyncGroup() != 0) {
-            map.insertMulti(widget->getXaxisSyncGroup(), widget);
-            if(!groups.contains(widget->getXaxisSyncGroup())) groups.append(widget->getXaxisSyncGroup());
-        }
-    }
+    //qDebug() << "cartesian groups nb=" << cartesianGroupList.count();
+    if(cartesianGroupList.count() < 1) return;
 
     // go through our groups
-   foreach(int group, groups) {
+   foreach(int group, cartesianGroupList) {
        int maxExtent = 0;
 
        // get for this group the maximum extent of scale (probably does not work with autoscale)
-       QMap<int,caCartesianPlot* >::iterator i = map.find(group);
-       while (i != map.end() && i.key() == group) {
+       QMap<int,caCartesianPlot* >::iterator i = cartesianList.find(group);
+       while (i != cartesianList.end() && i.key() == group) {
            QwtScaleWidget *scaleWidget = i.value()->axisWidget(QwtPlot::yLeft);
            QwtScaleDraw *sd = scaleWidget->scaleDraw();
            sd->setMinimumExtent(0);
@@ -6433,13 +6435,13 @@ void CaQtDM_Lib::CartesianPlotsVerticalAlign()
        }
 
        // now set the correct left scale extent to the group
-       i = map.find(group);
-       while (i != map.end() && i.key() == group) {
+       i = cartesianList.find(group);
+       while (i != cartesianList.end() && i.key() == group) {
            QwtScaleWidget *scaleWidget = i.value()->axisWidget(QwtPlot::yLeft);
+           //qDebug() << i.value() << maxExtent;
            scaleWidget->scaleDraw()->setMinimumExtent(maxExtent);
            ++i;
        }
-
    }
 }
 

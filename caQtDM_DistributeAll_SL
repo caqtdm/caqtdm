@@ -26,6 +26,11 @@ install -v $SOURCE/caHFdispQt $DESTINATION
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/QtScan
 install -v $SOURCE/scanQtProscan $DESTINATION
 install -v $SOURCE/scanQtHipa $DESTINATION
+install -v $SOURCE/scanQt $DESTINATION
+
+# general tendis applicazion
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caTendisQt
+install -v $SOURCE/caTendisQt $DESTINATION
 
 # probe measurement application for proscan
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/probeQtProscan

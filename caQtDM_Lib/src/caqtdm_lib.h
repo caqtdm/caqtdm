@@ -324,6 +324,9 @@ private:
 
     QFileSystemWatcher *watcher;
 
+    QMap<int, caCartesianPlot*> cartesianList;  // list of cartesianplots with key group
+    QList<int> cartesianGroupList;              // group numbers found
+
 #ifdef epics4
     epics4Subs *Epics4;
 #endif
