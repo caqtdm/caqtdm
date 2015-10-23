@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V4.0.1
+CAQTDM_VERSION = V4.0.2
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -50,9 +50,9 @@ CONFIG += XDR_HACK
 CONFIG += PYTHONCALC
 
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
-#DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
+DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 
-# 4.0.1
+# 4.0.2
 # tooltip for properties are now present in psi patched version of Qt4.8.2 and for Qt5.6.0 and higher
 # tooltip for caQtDM objects will integrate the tooltip given by the designer
 # signal emit of cacalc has now also its integer and double value (this way you can for example switch the tabwidget pages with a cacalc that is updated by a soft/real channel)
