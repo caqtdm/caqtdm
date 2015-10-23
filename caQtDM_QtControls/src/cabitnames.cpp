@@ -38,7 +38,12 @@ caBitnames::caBitnames(QWidget *parent) : EFlag(parent)
     numRows = 16;
     thisAlignment = EFlag::left;
     setFontScaleModeL(ESimpleLabel::WidthAndHeight);
-    setEnumStrings("1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16");
+    QString strng="";
+    for(int i=0; i<16; i++) {
+        strng.append(QString::number(i));
+        if(i!=15) strng.append((QChar)27);
+    }
+    setEnumStrings(strng);
     setValue(0);
 }
 

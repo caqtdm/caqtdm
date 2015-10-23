@@ -87,8 +87,8 @@ public:
 
     caFrame(QWidget * parent = 0);
 
-    QString getMacro() const {return thisMacro.join(";");}
-    void setMacro(QString const &newMacro) {thisMacro = newMacro.split(";");}
+    QString getMacro() const {return thisMacro;}
+    void setMacro(QString const &newMacro) {thisMacro = newMacro;}
     void setBackground(QColor c);
     QColor getBackground() const {return thisBackColor;}
 
@@ -105,7 +105,7 @@ private:
    BackgroundMode thisBackgroundMode;
    VisibilityMode thisVisibilityMode;
    QString thisVisibilityCalc;
-   QStringList thisMacro;
+   QString thisMacro;
    QColor thisBackColor;
 };
 

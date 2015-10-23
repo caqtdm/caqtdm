@@ -27,8 +27,7 @@
 #define CAINCLUDE_H
 
 #include <QWidget>
-//#include <QtUiTools/QUiLoader>
-#include <QVBoxLayout>
+#include <QGridLayout>
 #include <qtcontrols_global.h>
 
 #define PRC 1
@@ -43,11 +42,27 @@ class  QTCON_EXPORT caInclude : public QWidget
 
     Q_PROPERTY(QString macro READ getMacro WRITE setMacro)
     Q_PROPERTY(QString filename READ getFileName WRITE setFileName)
+    Q_PROPERTY(Stacking stacking READ getStacking WRITE setStacking)
+    Q_PROPERTY(int numberOfItems READ getItemCount WRITE setItemCount)
+    Q_PROPERTY(int maximumLines READ getMaxLines WRITE setMaxLines DESIGNABLE isPropertyVisible(maximumLines))
+    Q_ENUMS(Stacking)
 
 #include "caVisibProps.h"
 #include "caVisibDefs.h"
 
+
 public:
+
+    enum Properties { maximumLines = 0, numberofItems};
+    enum Stacking {Row=0, Column,RowColumn};
+    Stacking getStacking() const { return thisStacking; }
+    void setStacking(Stacking stacking);
+
+    int getItemCount() const { return thisItemCount;}
+    void setItemCount(int count) {if(count > 0) thisItemCount = count; else thisItemCount=1; setFileName(newFileName); prvItemCount = thisItemCount;}
+
+    int getMaxLines() const { return thisMaxLines;}
+    void setMaxLines(int count) {if(count > 0) thisMaxLines = count; else thisMaxLines=1; setFileName(newFileName); prvMaxLines = thisMaxLines;}
 
     caInclude( QWidget *parent = 0 );
     ~caInclude();
@@ -55,15 +70,18 @@ public:
     QString getFileName() const {return newFileName;}
     void setFileName(QString const &filename);
 
-    QString getMacro() const {return thisMacro.join(";");}
-    void setMacro(QString const &newMacro) {thisMacro = newMacro.split(";");}
+    QString getMacro() const {return thisMacro;}
+    void setMacro(QString const &newMacro) {thisMacro = newMacro;}
 
     QColor getBackground() const {return thisBackColor;}
     void setBackground(QColor c);
 
     void setLineSize( int size );
 
-    void removeIncludedWidget();
+    void removeIncludedWidgets();
+
+    bool isPropertyVisible(Properties property);
+    void setPropertyVisible(Properties property, bool visible);
 
 public slots:
 
@@ -75,15 +93,19 @@ protected:
 
 private:
 
+    bool designerVisible[10];
     QString newFileName;
     QString prvFileName;
-    QStringList thisMacro;
+    QString thisMacro;
     QColor thisBackColor;
     QWidget *thisParent;
     int thisLineSize;
-    QVBoxLayout *layout;
-    QWidget *thisLoadedWidget;
+    QGridLayout *gridLayout;
+    QList<QWidget *> thisLoadedWidgets;
     bool loadIncludes;
+    Stacking thisStacking, prvStacking;
+    int thisItemCount, prvItemCount;
+    int thisMaxLines, prvMaxLines;
 
 #ifdef PRC
     ParsePepFile *pepfile;

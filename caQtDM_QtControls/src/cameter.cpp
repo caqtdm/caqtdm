@@ -47,7 +47,7 @@ public:
     }
     virtual QwtText label(double v) const
     {
-        return QwtText(thisParent->setLabel(v,""));
+        return QwtText(thisParent->setScaleLabel(v));
     }
 
 private:
@@ -112,10 +112,6 @@ caMeter::caMeter(QWidget *parent) : QwtDial(parent)
     setScaleStepSize((thisMinValue - thisMaxValue)/10.0);
 #endif
 		
-	//setMinValue(0.0);
-	//setMaxValue(300.0);
-
-
     ScaleDraw->setPenWidth(1);
     setLineWidth(1);
     setFrameShadow(QwtDial::Sunken);
@@ -134,10 +130,6 @@ caMeter::caMeter(QWidget *parent) : QwtDial(parent)
     setPrecisionMode(Channel);
     setFormatType(decimal);
     setLimitsMode(Channel);
-
-
-
-
 }
 
 void caMeter::setMinValue(double v) {
@@ -186,9 +178,6 @@ void caMeter::drawScaleContents(QPainter *painter, const QPointF &center, double
 
     painter->setBrush(QColor(0,0,0,0));
     painter->setPen(QColor(0,0,0,0));
-    //painter->setBrush(Qt::gray);
-    //painter->setPen(Qt::gray);
-
     painter->drawRect(rect);
 
     if(thisScaleDefaultColor) {
@@ -196,8 +185,9 @@ void caMeter::drawScaleContents(QPainter *painter, const QPointF &center, double
     } else {
        painter->setPen(thisScaleColor);
     }
-    painter->drawText(fontBoundRect, Qt::AlignHCenter , thisLabel);
-
+    if(thisValueDisplayed) {
+       painter->drawText(fontBoundRect, Qt::AlignHCenter , thisLabel);
+    }
 }
 
 void caMeter::setFormat(int prec)
@@ -252,6 +242,30 @@ QString caMeter::setLabel(double value, const QString& units)
         strcat(asc, qasc(units));
     }
 
+    label = QString::fromAscii(asc);
+
+    return label;
+}
+
+// something that has to be thought over
+QString caMeter::setScaleLabel(double value)
+{
+    char asc[1024];
+    QString label;
+
+    if(!thisScaleEnabled) return "";
+
+    if(thisFormatType == compact) {
+      if ((value < 1.e4 && value > 1.e-4) || (value > -1.e4 && value < -1.e-4) || value == 0.0) {
+        sprintf(asc, thisFormatC, value);
+      } else {
+        sprintf(asc, thisFormat, value);
+      }
+    } else if(thisFormatType == truncated) {
+        sprintf(asc, thisFormat, (int) value);
+    } else {
+        sprintf(asc, thisFormat, value);
+    }
     label = QString::fromAscii(asc);
 
     return label;

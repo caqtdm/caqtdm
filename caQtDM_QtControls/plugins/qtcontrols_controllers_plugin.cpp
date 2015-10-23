@@ -38,7 +38,7 @@
 #include "designerPluginTexts.h"
 
 typedef char strng[40];
-typedef char longtext[300];
+typedef char longtext[500];
 
 static QString XmlFunc(const char *clss, const char *name, int x, int y, int w, int h,
                 strng *propertyname, strng* propertytype, longtext *propertytext, int nb)
@@ -109,7 +109,7 @@ void CustomWidgetInterface_Controllers::initialize(QDesignerFormEditorInterface 
 
 caNumericInterface::caNumericInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
 {
-    strng name[2], type[2];
+    strng name[2], type[2] = {"",""};
     longtext text[2] = {"",""};
 
     strcpy(name[0], "channel");
@@ -131,7 +131,7 @@ QWidget *caNumericInterface::createWidget(QWidget *parent)
 
 caApplyNumericInterface::caApplyNumericInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
 {
-    strng name[1], type[1];
+    strng name[1], type[1] = {""};
     longtext text[1] = {""};
 
     strcpy(name[0], "channel");
@@ -181,7 +181,7 @@ QWidget *caSliderInterface::createWidget(QWidget* parent)
 
 caSliderInterface::caSliderInterface(QObject* parent) : CustomWidgetInterface_Controllers(parent)
 {
-    strng name[1], type[1];
+    strng name[1], type[1] = {""};
     longtext text[1] = {""};
 
     strcpy(name[0], "channel");
@@ -202,7 +202,7 @@ QWidget *caMenuInterface::createWidget(QWidget *parent)
 
 caMenuInterface::caMenuInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
 {
-    strng name[1], type[1];
+    strng name[1], type[1] = {""};
     longtext text[1] = {""};
 
     strcpy(name[0], "channel");
@@ -223,7 +223,7 @@ QWidget *caChoiceInterface::createWidget(QWidget *parent)
 
 caChoiceInterface::caChoiceInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
 {
-    strng name[1], type[1];
+    strng name[1], type[1] = {""};
     longtext text[1] = {""};
     strcpy(name[0], "channel");
     strcpy(type[0], "multiline");
@@ -243,7 +243,7 @@ QWidget *caRelatedDisplayInterface::createWidget(QWidget *parent)
 
 caRelatedDisplayInterface::caRelatedDisplayInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
 {
-    strng name[5], type[5];
+    strng name[5], type[5] = {"","","","",""};
     longtext text[5] = {"","","","",""};
 
     strcpy(name[0], "label");
@@ -272,7 +272,7 @@ QWidget *caShellCommandInterface::createWidget(QWidget *parent)
 
 caShellCommandInterface::caShellCommandInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
 {
-    strng name[4], type[4];
+    strng name[4], type[4] = {"","","",""};
     longtext text[4] = {"","","",""};
 
     strcpy(name[0], "label");
@@ -299,7 +299,7 @@ QWidget *caTextEntryInterface::createWidget(QWidget* parent)
 
 caTextEntryInterface::caTextEntryInterface(QObject* parent) : CustomWidgetInterface_Controllers(parent)
 {
-    strng name[1], type[1];
+    strng name[1], type[1] = {""};
     longtext text[1] = {""};
 
     strcpy(name[0], "channel");
@@ -321,7 +321,7 @@ QWidget *caMessageButtonInterface::createWidget(QWidget* parent)
 
 caMessageButtonInterface::caMessageButtonInterface(QObject* parent) : CustomWidgetInterface_Controllers(parent)
 {
-    strng name[4], type[4];
+    strng name[4], type[4] = {"","","",""};
     longtext text[4] = {"","","",""};
     strcpy(name[0], "channel");
     strcpy(type[0], "multiline");
@@ -347,7 +347,7 @@ QWidget *caToggleButtonInterface::createWidget(QWidget* parent)
 
 caToggleButtonInterface::caToggleButtonInterface(QObject* parent) : CustomWidgetInterface_Controllers(parent)
 {
-    strng name[1], type[1];
+    strng name[1], type[1] = {""};
     longtext text[1] = {""};
 
     strcpy(name[0], "channel");
@@ -368,7 +368,7 @@ QWidget *caScriptButtonInterface::createWidget(QWidget* parent)
 
 caScriptButtonInterface::caScriptButtonInterface(QObject* parent) : CustomWidgetInterface_Controllers(parent)
 {
-    strng name[3], type[3];
+    strng name[3], type[3] = {"","",""};
     longtext text[3] = {"","",""};
 
     strcpy(name[0], "label");
@@ -389,7 +389,7 @@ caScriptButtonInterface::caScriptButtonInterface(QObject* parent) : CustomWidget
 
 caSpinboxInterface::caSpinboxInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
 {
-    strng name[1], type[1];
+    strng name[1], type[1] = {""};
     longtext text[1] = {""};
 
     strcpy(name[0], "channel");
@@ -410,7 +410,7 @@ QWidget *caSpinboxInterface::createWidget(QWidget *parent)
 
 caByteControllerInterface::caByteControllerInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
 {
-    strng name[1], type[1];
+    strng name[1], type[1] = {""};
     longtext text[1] = {""};
 
     strcpy(name[0], "channel");

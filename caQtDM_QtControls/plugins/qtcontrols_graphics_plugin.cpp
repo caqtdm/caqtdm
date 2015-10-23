@@ -38,7 +38,7 @@
 #include "designerPluginTexts.h"
 
 typedef char strng[40];
-typedef char longtext[300];
+typedef char longtext[500];
 
 static QString XmlFunc(const char *clss, const char *name, int x, int y, int w, int h,
                 strng *propertyname, strng* propertytype, longtext *propertytext, int nb)
@@ -158,13 +158,11 @@ void CustomWidgetInterface_Graphics::initialize(QDesignerFormEditorInterface *fo
 
 caLabelInterface::caLabelInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
 {
-    strng name[7], type[7];
+    strng name[7], type[7] = {"","","","","","",""};
     longtext text[7] = {COLORMODE, VISIBILITY, TEXTPVA, TEXTPVB, TEXTPVC, TEXTPVD, VISIBILITYCALC};
 
     strcpy(name[0], "colorMode");
-    strcpy(type[0], "");
     strcpy(name[1], "visibility");
-    strcpy(type[1], "");
     strcpy(name[2], "channel");
     strcpy(type[2], "multiline");
     strcpy(name[3], "channelB");
@@ -195,13 +193,11 @@ QWidget *caLabelVerticalInterface::createWidget(QWidget* parent)
 
 caLabelVerticalInterface::caLabelVerticalInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
 {
-    strng name[9], type[9];
+    strng name[9], type[9] = {"","","","","","","","",""};
     longtext text[9] = {COLORMODE, VISIBILITY, TEXTPVA, TEXTPVB, TEXTPVC, TEXTPVD, VISIBILITYCALC, DISPLAYTEXT, DIRECTIONTEXT};
 
     strcpy(name[0], "colorMode");
-    strcpy(type[0], "");
     strcpy(name[1], "visibility");
-    strcpy(type[1], "");
     strcpy(name[2], "channel");
     strcpy(type[2], "multiline");
     strcpy(name[3], "channelB");
@@ -215,7 +211,6 @@ caLabelVerticalInterface::caLabelVerticalInterface(QObject* parent) : CustomWidg
     strcpy(name[7], "text");
     strcpy(type[7], "multiline");
     strcpy(name[8], "direction");
-    strcpy(type[8], "");
     d_domXml = XmlFunc("caLabelVertical", "calabelvertical", 0, 0, 28, 90, name, type, text, 9);
     d_name = "caLabelVertical";
     d_include = "caLabelVertical";
@@ -231,17 +226,14 @@ QWidget *caFrameInterface::createWidget(QWidget* parent)
 
 caFrameInterface::caFrameInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
 {
-    strng name[9], type[9];
+    strng name[9], type[9] = {"","","","","","","","",""};
     longtext text[9] = {MACRO, BCKMODE, VISIBILITY, VISIBILITYMODE, TEXTPVA, TEXTPVB, TEXTPVC, TEXTPVD, VISIBILITYCALC};
 
     strcpy(name[0], "macro");
     strcpy(type[0], "multiline");
     strcpy(name[1], "backgroundMode");
-    strcpy(type[1], "");
     strcpy(name[2], "visibility");
-    strcpy(type[2], "");
     strcpy(name[3], "visibilityMode");
-    strcpy(type[3], "");
     strcpy(name[4], "channel");
     strcpy(type[4], "multiline");
     strcpy(name[5], "channelB");
@@ -261,7 +253,7 @@ caFrameInterface::caFrameInterface(QObject* parent) : CustomWidgetInterface_Grap
 
 caImageInterface::caImageInterface(QObject *parent): CustomWidgetInterface_Graphics(parent)
 {
-    strng name[10], type[10];
+    strng name[10], type[10] = {"","","","","","","","","",""};
     longtext text[10] = {IMAGEFILE, IMAGECALC, IMAGEFRAME, IMAGEDELAY, VISIBILITY, VISIBILITYCALC, TEXTPVA, TEXTPVB, TEXTPVC, TEXTPVD};
 
     strcpy(name[0], "filename");
@@ -269,11 +261,8 @@ caImageInterface::caImageInterface(QObject *parent): CustomWidgetInterface_Graph
     strcpy(name[1], "imageCalc");
     strcpy(type[1], "multiline");
     strcpy(name[2], "frame");
-    strcpy(type[2], "");
     strcpy(name[3], "delayMilliseconds");
-    strcpy(type[3], "");
     strcpy(name[4], "visibility");
-    strcpy(type[4], "");
     strcpy(name[5], "visibilityCalc");
     strcpy(type[5], "multiline");
     strcpy(name[6], "channel");
@@ -304,20 +293,15 @@ QWidget *caGraphicsInterface::createWidget(QWidget* parent)
 
 caGraphicsInterface::caGraphicsInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
 {
-    strng name[16], type[16];
+    strng name[16], type[16] = { "","","","","","","","","","","","","","","",""};
     longtext text[16] = {LINESTYLE, LINESIZE, FILLSTYLE, COLORMODE, VISIBILITY, VISIBILITYCALC, TEXTPVA, TEXTPVB, TEXTPVC, TEXTPVD, GRAPHICFORM,
                          GRAPHICSPECIALS, GRAPHICSPECIALS, GRAPHICSPECIALS, GRAPHICSPECIALS, GRAPHICSPECIALS};
 
     strcpy(name[0], "linestyle");
-    strcpy(type[0], "");
     strcpy(name[1], "linesize");
-    strcpy(type[1], "");
     strcpy(name[2], "fillstyle");
-    strcpy(type[2], "");
     strcpy(name[3], "colorMode");
-    strcpy(type[3], "");
     strcpy(name[4], "visibility");
-    strcpy(type[4], "");
     strcpy(name[5], "visibilityCalc");
     strcpy(type[5], "multiline");
     strcpy(name[6], "channel");
@@ -329,17 +313,11 @@ caGraphicsInterface::caGraphicsInterface(QObject* parent) : CustomWidgetInterfac
     strcpy(name[9], "channelD");
     strcpy(type[9], "multiline");
     strcpy(name[10], "form");
-    strcpy(type[10], "");
     strcpy(name[11], "arrowSize");
-    strcpy(type[11], "");
     strcpy(name[12], "arrowMode");
-    strcpy(type[12], "");
     strcpy(name[13], "tiltAngle");
-    strcpy(type[13], "");
     strcpy(name[14], "startAngle");
-    strcpy(type[14], "");
     strcpy(name[15], "spanAngle");
-    strcpy(type[15], "");
 
     d_domXml = XmlFunc("caGraphics", "cagraphics", 0, 0, 100, 100, name, type, text, 16);
     d_name = "caGraphics";
@@ -355,20 +333,14 @@ QWidget *caPolyLineInterface::createWidget(QWidget *parent)
 
 caPolyLineInterface::caPolyLineInterface(QObject *parent): CustomWidgetInterface_Graphics(parent)
 {
-    strng name[12], type[12];
+    strng name[12], type[12] = {"","","","","","","","","","","",""};
     longtext text[12] = {LINESTYLE, LINESIZE, FILLSTYLE, COLORMODE, POLYSTYLE, VISIBILITY, VISIBILITYCALC, TEXTPVA, TEXTPVB, TEXTPVC, TEXTPVD, XYPAIRS};
     strcpy(name[0], "linestyle");
-    strcpy(type[0], "");
     strcpy(name[1], "lineSize");
-    strcpy(type[1], "");
     strcpy(name[2], "fillstyle");
-    strcpy(type[2], "");
     strcpy(name[3], "colorMode");
-    strcpy(type[3], "");
     strcpy(name[4], "polystyle");
-    strcpy(type[4], "");
     strcpy(name[5], "visibility");
-    strcpy(type[5], "");
     strcpy(name[6], "visibilityCalc");
     strcpy(type[6], "multiline");
     strcpy(name[7], "channel");
@@ -396,15 +368,15 @@ QWidget *caIncludeInterface::createWidget(QWidget* parent)
 
 caIncludeInterface::caIncludeInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
 {
-    strng name[8], type[8];
-    longtext text[8] = {MACRO, INCLUDEFILE, VISIBILITY, VISIBILITYCALC, TEXTPVA, TEXTPVB, TEXTPVC, TEXTPVD};
+    strng name[11], type[11] = {"","","","","","","","","","",""};
+    longtext text[11] = {INCLUDEMACRO, INCLUDEFILE, VISIBILITY, VISIBILITYCALC, TEXTPVA, TEXTPVB, TEXTPVC, TEXTPVD, INCLUDESTACKING,
+                       INCLUDEMAXLINES, INCLUDENBITEMS};
 
     strcpy(name[0], "macro");
     strcpy(type[0], "multiline");
     strcpy(name[1], "filename");
     strcpy(type[1], "multiline");
     strcpy(name[2], "visibility");
-    strcpy(type[2], "");
     strcpy(name[3], "visibilityCalc");
     strcpy(type[3], "multiline");
     strcpy(name[4], "channel");
@@ -415,8 +387,11 @@ caIncludeInterface::caIncludeInterface(QObject* parent) : CustomWidgetInterface_
     strcpy(type[6], "multiline");
     strcpy(name[7], "channelD");
     strcpy(type[7], "multiline");
+    strcpy(name[8], "stacking");
+    strcpy(name[9], "maximumLines");
+    strcpy(name[10], "numberOfItems");
 
-    d_domXml = XmlFunc("caInclude", "cainclude", 0, 0, 100, 100, name, type, text, 8);
+    d_domXml = XmlFunc("caInclude", "cainclude", 0, 0, 100, 100, name, type, text, 11);
     d_name = "caInclude";
     d_include = "caInclude";
     QPixmap qpixmap = QPixmap(":pixmaps/frame.png");
@@ -431,7 +406,7 @@ QWidget *caDoubleTabWidgetInterface::createWidget(QWidget* parent)
 
 caDoubleTabWidgetInterface::caDoubleTabWidgetInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
 {
-    strng name[2], type[2];
+    strng name[2], type[2] = {"",""};
     longtext text[2] = {"",""};
 
     strcpy(name[0], "itemsHorizontal");
@@ -453,15 +428,13 @@ QWidget *caClockInterface::createWidget(QWidget* parent)
 
 caClockInterface::caClockInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
 {
-    strng name[3], type[3];
+    strng name[3], type[3] = {"","",""};
     longtext text[3] = {CHANNEL, TIMETYPE, COLORMODE};
 
     strcpy(name[0], "channel");
     strcpy(type[0], "multiline");
     strcpy(name[1], "timeType");
-    strcpy(type[1], "");
     strcpy(name[2], "colorMode");
-    strcpy(type[2], "");
     d_domXml = XmlFunc("caClock", "caclock", 0, 0, 125, 125, name, type, text, 3);
     d_name = "caClock";
     d_include = "caClock";

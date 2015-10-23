@@ -55,20 +55,24 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
   #ifdef MOBILE_IOS
     setGeometry(0,0, desktopSize.width(), desktopSize.height());
     if(qApp->desktop()->heightMM() > 100) { // probably an ipad
-        windowlayout->setContentsMargins(desktopSize.width() * 0.15, desktopSize.height() * 0.25, desktopSize.width() * 0.15, desktopSize.height() * 0.25);
+        windowlayout->setContentsMargins(qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.25),
+                                         qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.25));
     } else { // probably an iphone
-        windowlayout->setContentsMargins(desktopSize.width() * 0.1, desktopSize.height() * 0.05, desktopSize.width() * 0.1, desktopSize.height() * 0.07);
+        windowlayout->setContentsMargins(qRound(desktopSize.width() * 0.1), qRound(desktopSize.height() * 0.05),
+                                         qRound(desktopSize.width() * 0.1), qRound(desktopSize.height() * 0.07));
     }
   #else
     setGeometry(0,0, desktopSize.width(), desktopSize.height());
-    windowlayout->setContentsMargins(desktopSize.width() * 0.2, desktopSize.height() * 0.25, desktopSize.width() * 0.2, desktopSize.height() * 0.25);
+    windowlayout->setContentsMargins(qRound(desktopSize.width() * 0.2), qRound(desktopSize.height() * 0.25),
+                                     qRound(desktopSize.width() * 0.2), qRound(desktopSize.height() * 0.25));
   #endif
 #else
     QDesktopWidget * Desktop = QApplication::desktop();
     QRect defscreengeo = Desktop->availableGeometry(-1);
     setGeometry(0,0, defscreengeo.width(), defscreengeo.height());
     desktopSize=defscreengeo.size();
-    windowlayout->setContentsMargins(defscreengeo.width() * 0.2, defscreengeo.height() * 0.2, defscreengeo.width() * 0.2, defscreengeo.height() * 0.2);
+    windowlayout->setContentsMargins(qRound(defscreengeo.width() * 0.2), qRound(defscreengeo.height() * 0.2),
+                                     qRound(defscreengeo.width() * 0.2), qRound(defscreengeo.height() * 0.2));
 #endif
 
     setLayout(windowlayout);
@@ -131,7 +135,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
     // adjust height
     height = clearConfigButton->minimumSizeHint().height();
-    clearConfigButton->setMinimumHeight(height*COMBOHEIGHTFACTOR);
+    clearConfigButton->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR));
 
     // first group, clear ui button
     QPushButton* clearUiButton = new QPushButton("Clear ui files");
@@ -143,7 +147,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
     // adjust height
     height = clearUiButton->minimumSizeHint().height();
-    clearUiButton->setMinimumHeight(height*COMBOHEIGHTFACTOR);
+    clearUiButton->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR));
 
     // first group, messages label
     QLabel *debugLabel = new QLabel(" Messages:");
@@ -159,7 +163,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
     // adjust height
     height = debugComboBox->minimumSizeHint().height();
-    debugComboBox->setMinimumHeight(height*COMBOHEIGHTFACTOR);
+    debugComboBox->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR));
 
     // add it
     clearBox->setLayout(clearLayout);
@@ -190,9 +194,9 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     // adjust height
     height = urlComboBox->minimumSizeHint().height();
 #ifdef MOBILE_ANDROID
-    urlComboBox->setMinimumHeight(height*COMBOHEIGHTFACTOR*1.2);
+    urlComboBox->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR*1.2);
 #else
-    urlComboBox->setMinimumHeight(height*COMBOHEIGHTFACTOR);
+    urlComboBox->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR));
 #endif
 
     // add it
@@ -225,9 +229,9 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     // adjust height
     height = fileComboBox->minimumSizeHint().height();
 #ifdef MOBILE_ANDROID
-    fileComboBox->setMinimumHeight(height*COMBOHEIGHTFACTOR*1.2);
+    fileComboBox->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR*1.2));
 #else
-    fileComboBox->setMinimumHeight(height*COMBOHEIGHTFACTOR);
+    fileComboBox->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR));
 #endif
 
     // add it
@@ -246,7 +250,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
     // adjust height
     height = startButton->minimumSizeHint().height();
-    startButton->setMinimumHeight(height*COMBOHEIGHTFACTOR);
+    startButton->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR));
 
     // add message
     QString message = QString("Qt-based Epics Display Manager Version %1 (%2)  ");

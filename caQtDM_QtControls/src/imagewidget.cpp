@@ -49,8 +49,8 @@ ImageWidget::ImageWidget(QWidget *parent) : QWidget(parent)
 void ImageWidget::getImageDimensions(int &width, int &height)
 {
     double correction = scaleFactorL;
-    width = imageNew.size().width() * correction;
-    height = imageNew.size().height() * correction;
+    width = qRound(imageNew.size().width() * correction);
+    height = qRound(imageNew.size().height() * correction);
 }
 
 void ImageWidget::updateDisconnected()
@@ -162,7 +162,7 @@ void ImageWidget::paintEvent(QPaintEvent * event)
             markerTypeL = readmarkerTypeL;
             for(int i=0; i<4; i++) {
                 present[i] = readValuesPresentL[i];
-                values[i] = georeadValues[i];
+                values[i] = qRound(georeadValues[i]);
             }
             painter.setPen(QPen(Qt::red,2, Qt::SolidLine));
 
@@ -218,8 +218,8 @@ void ImageWidget::paintEvent(QPaintEvent * event)
         case xy_only:
             if(!present[0] || !present[1]) break;
             // vertical and horizontal
-            painter.drawLine(values[0], 0, values[0], this->height()*scaleFactorL);
-            painter.drawLine(0, values[1], this->width()*scaleFactorL, values[1]);
+            painter.drawLine(values[0], 0, values[0], qRound(this->height()*scaleFactorL));
+            painter.drawLine(0, values[1], qRound(this->width()*scaleFactorL), values[1]);
 
             switch (markerTypeL) {
             case box:
@@ -244,8 +244,8 @@ void ImageWidget::paintEvent(QPaintEvent * event)
             switch (markerTypeL) {
             case box_crosshairs:
                 // vertical and horizontal
-                painter.drawLine(xnew, 0, xnew, this->height()*scaleFactorL);
-                painter.drawLine(0, ynew, this->width()*scaleFactorL, ynew);
+                painter.drawLine(xnew, 0, xnew, qRound(this->height()*scaleFactorL));
+                painter.drawLine(0, ynew, qRound(this->width()*scaleFactorL), ynew);
             case box:
                 selectionRect.setCoords(values[0], values[1], values[2], values[3]);
                 painter.drawRect(selectionRect);
@@ -292,8 +292,8 @@ void ImageWidget::paintEvent(QPaintEvent * event)
             switch (markerTypeL) {
             case box_crosshairs:
                 // vertical and horizontal
-                painter.drawLine(xnew, 0, xnew, this->height()*scaleFactorL);
-                painter.drawLine(0, ynew, this->width()*scaleFactorL, ynew);
+                painter.drawLine(xnew, 0, xnew, qRound(this->height()*scaleFactorL));
+                painter.drawLine(0, ynew, qRound(this->width()*scaleFactorL), ynew);
             case box:
                 if(width <= 1) break;
                 if((height) <= 1) break;
@@ -332,8 +332,8 @@ void ImageWidget::paintEvent(QPaintEvent * event)
             case box_crosshairs:
                 if(!present[0] || !present[1]) break;
                 // vertical and horizontal
-                painter.drawLine(values[0], 0, values[0], this->height()*scaleFactorL);
-                painter.drawLine(0, values[1], this->width()*scaleFactorL, values[1]);
+                painter.drawLine(values[0], 0, values[0], qRound(this->height()*scaleFactorL));
+                painter.drawLine(0, values[1], qRound(this->width()*scaleFactorL), values[1]);
             case box:
                 if(!present[0] || !present[1] || !present[2] || !present[3]) break;
                 if((values[0] - values[2]/2) <= 1) break;
@@ -397,7 +397,7 @@ void ImageWidget::rescaleReadValues(const bool &fitToSize, const QImage &image, 
         } else {
             georeadValues[i] = readvalues[i] * factor;
         }
-        readValuesL[i] = georeadValues[i];
+        readValuesL[i] = qRound(georeadValues[i]);
     }
     update();
 }

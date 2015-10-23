@@ -1365,6 +1365,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
     } else if(caInclude* includeWidget = qobject_cast<caInclude *>(w1)) {
 
         //qDebug() << "create caInclude" << w1;
+        int row = 0;
+        int column = 0;
         w1->setProperty("ObjectType", caInclude_Widget);
 
         QWidget *thisW;
@@ -1374,28 +1376,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         // define a layout
         QGridLayout *layout = new QGridLayout;
         layout->setContentsMargins(0,0,0,0);
-
-        //qDebug() << "treat caInclude" << w1 << "level=" << level;
+        layout->setMargin(0);
+        layout->setSpacing(0);
 
         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
 
         includeWidget->setProperty("Taken", true);
-
-        QString macroS = includeWidget->getMacro();
-        if(macroS.size() < 1) {
-            if(level>0){
-                PRINT(printf("\n    %*c get last macro=%s", 15 * level, ' ', qPrintable(savedMacro[level-1])));
-                macroS = savedMacro[level-1];
-            } else {
-                macroS = savedMacro[level];
-            }
-        } else {
-            //printf("\n    %*c macro=%s", 15 * level, ' ',  qPrintable(macroS));
-            savedMacro[level] = macroS;
-        }
-
-        macroS = treatMacro(map, macroS, &doNothing);
-        savedMacro[level] = treatMacro(map, savedMacro[level], &doNothing);
 
         // define the file to use
         QString fileName = includeWidget->getFileName().trimmed();
@@ -1428,76 +1414,116 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         searchFile *s = new searchFile(fileName);
         QString fileNameFound = s->findFile();
         if(fileNameFound.isNull()) {
-            qDebug() << "file" << fileName << "does not exist";
             if(!includeFiles.contains(fileName)) {
                 includeFiles.append(fileName);
                 includeFiles.append(" does not exist <br>");
             }
         } else {
-            //qDebug() << "load file" << fileName << "with macro" << macroS;
+            //qDebug() << "use file" << fileName << "for" << includeWidget;
             fileName = fileNameFound;
         }
         delete s;
 
-        // sure file exists ?
-        QFileInfo fi(fileName);
-        if(fi.exists()) {
+        QString macros = includeWidget->getMacro();
+        QStringList macroList = macros.split(";", QString::SkipEmptyParts);
 
-            // load prc or ui file
-            if(prcFile) {
-                // load new file
-                ParsePepFile *parsefile = new ParsePepFile(fileName, pepPrint);
-                thisW = parsefile->load(this);
-                delete parsefile;
+        // loop on this include with different macro
+        for(int j=0; j<includeWidget->getItemCount(); j++) {
+            QString macroS;
+            if(j < macroList.count()) {
+                macroS = macroList.at(j);
             } else {
-                QFile *file = new QFile;
-                // open and load ui file
-                file->setFileName(fileName);
-                file->open(QFile::ReadOnly);
-                //ftime(&last);
-                thisW = loader.load(file, this);
-                file->close();
-                delete file;
+                macroS = "";
             }
 
-            // some error with loading
-            if (!thisW) {
-                postMessage(QtDebugMsg, (char*) qasc(tr("could not load include file %1").arg(fileName)));
-                if(!includeFiles.contains(fi.absoluteFilePath())) {
-                    includeFiles.append(fi.absoluteFilePath());
-                    includeFiles.append(" could not be loaded <br>");
+            if(macroS.size() < 1) {
+                if(level>0){
+                    //printf("\n    %*c get last macro=%s", 15 * level, ' ', qPrintable(savedMacro[level-1]));
+                    macroS = savedMacro[level-1];
+                } else {
+                    macroS = savedMacro[level];
                 }
-                // seems to be ok
             } else {
-                if(!includeFiles.contains(fi.absoluteFilePath())) {
-                    includeFiles.append(fi.absoluteFilePath());
-                    includeFiles.append(" is loaded <br>");
-                }
-                includeWidgetList.append(thisW);
-
-                // add includeWidget to the gui
-                layout->addWidget(thisW);
-                includeWidget->setLayout(layout);
-                includeWidget->setLineSize(0);
-
-                // go through its childs
-                //QList<QWidget *> childs = thisW->findChildren<QWidget *>();
-                level++;
-
-                // keep actual filename
-                savedFile[level] = fi.baseName();
-
-                scanWidgets(thisW->findChildren<QWidget *>(), macroS);
-
-                level--;
+                //printf("\n    %*c macro=%s", 15 * level, ' ',  qPrintable(macroS));
+                savedMacro[level] = macroS;
             }
 
-        } else {
-            postMessage(QtDebugMsg, (char*) qasc(tr("sorry, could not load include file %1").arg(fileName)));
-            qDebug() << "sorry, file" << fileName << " does not exist";
-        }
+            macroS = treatMacro(map, macroS, &doNothing);
+            savedMacro[level] = treatMacro(map, savedMacro[level], &doNothing);
 
-        macroS = savedMacro[level];
+            // sure file exists ?
+            QFileInfo fi(fileName);
+            if(fi.exists()) {
+
+                // load prc or ui file
+                if(prcFile) {
+                    // load new file
+                    ParsePepFile *parsefile = new ParsePepFile(fileName, pepPrint);
+                    thisW = parsefile->load(this);
+                    delete parsefile;
+                } else {
+                    QFile *file = new QFile;
+                    // open and load ui file
+                    file->setFileName(fileName);
+                    file->open(QFile::ReadOnly);
+                    //printf("effective load of file %s for widget %s\n", qasc(fileName), qasc(includeWidget->objectName()));
+                    thisW = loader.load(file, this);
+                    file->close();
+                    delete file;
+                }
+
+                // some error with loading
+                if (!thisW) {
+                    postMessage(QtDebugMsg, (char*) qasc(tr("could not load include file %1").arg(fileName)));
+                    if(!includeFiles.contains(fi.absoluteFilePath())) {
+                        includeFiles.append(fi.absoluteFilePath());
+                        includeFiles.append(" could not be loaded <br>");
+                        continue;
+                    }
+                    // seems to be ok
+                } else {
+                    if(!includeFiles.contains(fi.absoluteFilePath())) {
+                        includeFiles.append(fi.absoluteFilePath());
+                        includeFiles.append(" is loaded <br>");
+                    }
+                    includeWidgetList.append(thisW);
+
+                    // add includeWidget to the gui
+                    if(includeWidget->getStacking() == caInclude::Row) {
+                        layout->addWidget(thisW, j, 0);
+                    } else if(includeWidget->getStacking() == caInclude::Column) {
+                       layout->addWidget(thisW, 0, j);
+                    } else {
+                        if(row >= includeWidget->getMaxLines()) {
+                            row=0;
+                            column++;
+                        }
+                        layout->addWidget(thisW, row, column);
+                        row++;
+                    }
+
+                    includeWidget->setLayout(layout);
+                    includeWidget->setLineSize(0);
+
+                    level++;
+
+                    // keep actual filename
+                    savedFile[level] = fi.baseName();
+
+                    scanWidgets(thisW->findChildren<QWidget *>(), macroS);
+
+                    level--;
+                }
+
+            } else {
+                postMessage(QtDebugMsg, (char*) qasc(tr("sorry, could not load include file %1").arg(fileName)));
+                qDebug() << "sorry, file" << fileName << " does not exist";
+                break;
+            }
+
+            macroS = savedMacro[level];
+
+        } // end for
 
         // increment splascounter when include is in list
         if(nbIncludes > 0) {
@@ -4589,6 +4615,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         getAllPVs(labelverticalWidget);
         GetDefinedCalcString(caLabelVertical, labelverticalWidget, calcString);
     } else if(caGraphics* graphicsWidget = qobject_cast<caGraphics *>(w)) {
+        getAllPVs(graphicsWidget);
         GetDefinedCalcString(caGraphics, graphicsWidget, calcString);
         if(graphicsWidget->getColorMode() == caGraphics::Alarm) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
@@ -5792,8 +5819,11 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
                //qDebug() << "set string" << text;
                plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, (char*) qasc(text), (char*) qasc(w->objectName().toLower()), errmess, 0);
             } else {  // single char written through its ascii code while character entered
-               QChar c = text.at(0);
-               plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int)c.toLatin1(), (char*)  "", (char*) qasc(w->objectName().toLower()), errmess, 2);
+               text = text.trimmed();
+               if(text.size()> 0) {
+                 QChar c = text.at(0);
+                 plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int)c.toLatin1(), (char*)  "", (char*) qasc(w->objectName().toLower()), errmess, 2);
+               }
             }
             break;
         }
@@ -6429,7 +6459,7 @@ void CaQtDM_Lib::CartesianPlotsVerticalAlign()
            QwtScaleWidget *scaleWidget = i.value()->axisWidget(QwtPlot::yLeft);
            QwtScaleDraw *sd = scaleWidget->scaleDraw();
            sd->setMinimumExtent(0);
-           const int extent = sd->extent(scaleWidget->font() );
+           const int extent = qRound(sd->extent(scaleWidget->font()));
            if ( extent > maxExtent ) maxExtent = extent;
            ++i;
        }
@@ -6506,10 +6536,10 @@ void CaQtDM_Lib::Callback_WriteDetectedValues(QWidget* child)
         break;
     case xycenter_width_height:
     {
-        int ROIx = x = P1.x();
-        int ROIy = y = P1.y();
-        int ROIw = w = P2.x() - P1.x();
-        int ROIh = h = P2.y() - P1.y();
+        int ROIx = x = qRound(P1.x());
+        int ROIy = y = qRound(P1.y());
+        int ROIw = w = qRound(P2.x() - P1.x());
+        int ROIh = h = qRound(P2.y() - P1.y());
         if(ROIw < 0) { x = ROIx + ROIw; w = -ROIw;}
         if(ROIh < 0) { y = ROIy + ROIh; h = -ROIh;}
         values[0] = x+qRound(w/2.0);

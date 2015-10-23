@@ -147,7 +147,7 @@ border-radius: 2px;
      </rect>
     </property>
     <property name="autoFillBackground">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="styleSheet">
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: rgb(0,0,120);}</string>
@@ -1100,46 +1100,70 @@ p, li { white-space: pre-wrap; }
        <widget class="caInclude" name="caInclude_7">
         <property name="geometry">
          <rect>
-          <x>150</x>
-          <y>270</y>
-          <width>255</width>
-          <height>100</height>
+          <x>20</x>
+          <y>230</y>
+          <width>521</width>
+          <height>211</height>
          </rect>
         </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
         <property name="macro">
-         <string notr="true">A=QUAD</string>
+         <string notr="true">A=QUAD1;A=QUAD2;A=QUAD</string>
         </property>
         <property name="filename" stdset="0">
-         <string>object_quad.adl</string>
+         <string notr="true">object_quad.adl</string>
+        </property>
+        <property name="stacking">
+         <enum>caInclude::RowColumn</enum>
+        </property>
+        <property name="numberOfItems" stdset="0">
+         <number>3</number>
+        </property>
+        <property name="maximumLines" stdset="0">
+         <number>2</number>
         </property>
        </widget>
        <widget class="caInclude" name="caInclude_8">
         <property name="geometry">
          <rect>
-          <x>460</x>
-          <y>270</y>
+          <x>590</x>
+          <y>260</y>
           <width>441</width>
-          <height>101</height>
+          <height>211</height>
          </rect>
         </property>
         <property name="macro">
-         <string notr="true">A=QUAD</string>
+         <string notr="true">A=QUAD;A=QUAD1;A=QUAD2</string>
         </property>
         <property name="filename" stdset="0">
          <string notr="true">test.prc</string>
+        </property>
+        <property name="numberOfItems" stdset="0">
+         <number>3</number>
+        </property>
+        <property name="visibility">
+         <enum>caInclude::StaticV</enum>
+        </property>
+        <property name="visibilityCalc">
+         <string notr="true">A=10</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">QUAD:SOL:1</string>
         </property>
        </widget>
        <widget class="caLabel" name="calabel_40">
         <property name="geometry">
          <rect>
-          <x>190</x>
-          <y>230</y>
-          <width>141</width>
+          <x>180</x>
+          <y>200</y>
+          <width>211</width>
           <height>21</height>
          </rect>
         </property>
         <property name="text">
-         <string>include ui file</string>
+         <string>include ui file (n times)</string>
         </property>
        </widget>
        <widget class="caLabel" name="calabel_41">
@@ -1147,12 +1171,64 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>600</x>
           <y>230</y>
-          <width>141</width>
+          <width>201</width>
           <height>21</height>
          </rect>
         </property>
         <property name="text">
-         <string>include prc file</string>
+         <string>include prc file (n times)</string>
+        </property>
+       </widget>
+       <widget class="caFrame" name="caframe_2">
+        <property name="geometry">
+         <rect>
+          <x>650</x>
+          <y>50</y>
+          <width>321</width>
+          <height>120</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <property name="lineWidth">
+         <number>2</number>
+        </property>
+        <property name="macro">
+         <string notr="true">FILE=object_quad</string>
+        </property>
+        <widget class="caInclude" name="caInclude_9">
+         <property name="geometry">
+          <rect>
+           <x>40</x>
+           <y>10</y>
+           <width>255</width>
+           <height>100</height>
+          </rect>
+         </property>
+         <property name="macro">
+          <string notr="true">A=QUAD2</string>
+         </property>
+         <property name="filename" stdset="0">
+          <string notr="true">$(FILE).ui</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="caLabel" name="calabel_42">
+        <property name="geometry">
+         <rect>
+          <x>650</x>
+          <y>10</y>
+          <width>321</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>include ui file (filename given by macro of frame 
+(can only be loaded at runtime)</string>
         </property>
        </widget>
       </widget>
@@ -1549,8 +1625,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>431</width>
-           <height>191</height>
+           <width>100</width>
+           <height>30</height>
           </rect>
          </property>
          <attribute name="label">
@@ -1790,7 +1866,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>13</number>
       </property>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">
@@ -2216,8 +2292,8 @@ p, li { white-space: pre-wrap; }
        <widget class="caLineEdit" name="calineedit_2">
         <property name="geometry">
          <rect>
-          <x>325</x>
-          <y>435</y>
+          <x>670</x>
+          <y>340</y>
           <width>100</width>
           <height>20</height>
          </rect>
@@ -2245,8 +2321,8 @@ p, li { white-space: pre-wrap; }
        <widget class="caLinearGauge" name="calineargauge">
         <property name="geometry">
          <rect>
-          <x>75</x>
-          <y>215</y>
+          <x>80</x>
+          <y>220</y>
           <width>71</width>
           <height>261</height>
          </rect>
@@ -2263,17 +2339,23 @@ p, li { white-space: pre-wrap; }
         <property name="maxValue">
          <double>5.000000000000000</double>
         </property>
+        <property name="displayLimits">
+         <enum>EAbstractGauge::User_Limits</enum>
+        </property>
         <property name="highError">
-         <double>4.000000000000000</double>
+         <double>3.000000000000000</double>
         </property>
         <property name="lowError">
-         <double>1.000000000000000</double>
+         <double>0.000000000000000</double>
         </property>
         <property name="lowWarning">
-         <double>2.000000000000000</double>
+         <double>0.000000000000000</double>
         </property>
         <property name="highWarning">
-         <double>3.000000000000000</double>
+         <double>2.000000000000000</double>
+        </property>
+        <property name="alarmLimits">
+         <enum>EAbstractGauge::User_Alarms</enum>
         </property>
         <property name="referenceEnabled">
          <bool>false</bool>
@@ -2294,8 +2376,8 @@ p, li { white-space: pre-wrap; }
        <widget class="caLinearGauge" name="calineargauge_2">
         <property name="geometry">
          <rect>
-          <x>190</x>
-          <y>215</y>
+          <x>200</x>
+          <y>220</y>
           <width>71</width>
           <height>261</height>
          </rect>
@@ -2318,6 +2400,9 @@ p, li { white-space: pre-wrap; }
         <property name="highWarning">
          <double>3.000000000000000</double>
         </property>
+        <property name="alarmLimits">
+         <enum>EAbstractGauge::None</enum>
+        </property>
         <property name="referenceEnabled">
          <bool>false</bool>
         </property>
@@ -2328,26 +2413,23 @@ p, li { white-space: pre-wrap; }
          <bool>true</bool>
         </property>
         <property name="logarithmicScale">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="valueFormat">
          <string>%.0f</string>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">ACM:COUNT:1</string>
+         <string notr="true">ACM:TEST:AO</string>
         </property>
         <property name="fillMode">
          <enum>caLinearGauge::FROM_ZERO</enum>
-        </property>
-        <property name="externalLimitsEnabled" stdset="0">
-         <bool>true</bool>
         </property>
        </widget>
        <widget class="caLinearGauge" name="calineargauge_3">
         <property name="geometry">
          <rect>
-          <x>320</x>
-          <y>339</y>
+          <x>670</x>
+          <y>230</y>
           <width>186</width>
           <height>80</height>
          </rect>
@@ -2393,6 +2475,275 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="externalLimitsEnabled" stdset="0">
          <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="caLinearGauge" name="calineargauge_4">
+        <property name="geometry">
+         <rect>
+          <x>300</x>
+          <y>220</y>
+          <width>71</width>
+          <height>261</height>
+         </rect>
+        </property>
+        <property name="minValue">
+         <double>-500.000000000000000</double>
+        </property>
+        <property name="maxValue">
+         <double>1000.000000000000000</double>
+        </property>
+        <property name="displayLimits">
+         <enum>EAbstractGauge::User_Limits</enum>
+        </property>
+        <property name="highError">
+         <double>4.000000000000000</double>
+        </property>
+        <property name="lowError">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="lowWarning">
+         <double>2.000000000000000</double>
+        </property>
+        <property name="highWarning">
+         <double>3.000000000000000</double>
+        </property>
+        <property name="referenceEnabled">
+         <bool>false</bool>
+        </property>
+        <property name="colorMode">
+         <enum>EAbstractGauge::SINGLECOLOR</enum>
+        </property>
+        <property name="externalScale">
+         <bool>true</bool>
+        </property>
+        <property name="logarithmicScale">
+         <bool>false</bool>
+        </property>
+        <property name="valueFormat">
+         <string>%.0f</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="fillMode">
+         <enum>caLinearGauge::FROM_MIN</enum>
+        </property>
+       </widget>
+       <widget class="caLinearGauge" name="calineargauge_5">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>220</y>
+          <width>71</width>
+          <height>261</height>
+         </rect>
+        </property>
+        <property name="minValue">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="maxValue">
+         <double>1000.000000000000000</double>
+        </property>
+        <property name="highError">
+         <double>4.000000000000000</double>
+        </property>
+        <property name="lowError">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="lowWarning">
+         <double>2.000000000000000</double>
+        </property>
+        <property name="highWarning">
+         <double>3.000000000000000</double>
+        </property>
+        <property name="referenceEnabled">
+         <bool>false</bool>
+        </property>
+        <property name="colorMode">
+         <enum>EAbstractGauge::SINGLECOLOR</enum>
+        </property>
+        <property name="externalScale">
+         <bool>true</bool>
+        </property>
+        <property name="logarithmicScale">
+         <bool>false</bool>
+        </property>
+        <property name="valueFormat">
+         <string>%.0f</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="fillMode">
+         <enum>caLinearGauge::ALL</enum>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_43">
+        <property name="geometry">
+         <rect>
+          <x>170</x>
+          <y>490</y>
+          <width>101</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>FROMZERO</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_44">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>490</y>
+          <width>81</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>FROMMIN</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_45">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>490</y>
+          <width>81</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>ALL</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="caLinearGauge" name="calineargauge_6">
+        <property name="geometry">
+         <rect>
+          <x>500</x>
+          <y>220</y>
+          <width>71</width>
+          <height>261</height>
+         </rect>
+        </property>
+        <property name="minValue">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="maxValue">
+         <double>1000.000000000000000</double>
+        </property>
+        <property name="highError">
+         <double>4.000000000000000</double>
+        </property>
+        <property name="lowError">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="lowWarning">
+         <double>2.000000000000000</double>
+        </property>
+        <property name="highWarning">
+         <double>3.000000000000000</double>
+        </property>
+        <property name="reference">
+         <double>300.000000000000000</double>
+        </property>
+        <property name="referenceEnabled">
+         <bool>true</bool>
+        </property>
+        <property name="colorMode">
+         <enum>EAbstractGauge::SINGLECOLOR</enum>
+        </property>
+        <property name="externalScale">
+         <bool>true</bool>
+        </property>
+        <property name="logarithmicScale">
+         <bool>false</bool>
+        </property>
+        <property name="valueFormat">
+         <string>%.0f</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="fillMode">
+         <enum>caLinearGauge::FROM_REF</enum>
+        </property>
+       </widget>
+       <widget class="caNumeric" name="canumeric_9">
+        <property name="geometry">
+         <rect>
+          <x>660</x>
+          <y>380</y>
+          <width>141</width>
+          <height>71</height>
+         </rect>
+        </property>
+        <property name="integerDigits" stdset="0">
+         <number>3</number>
+        </property>
+        <property name="decimalDigits" stdset="0">
+         <number>0</number>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>0</red>
+          <green>85</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="precisionMode">
+         <enum>caNumeric::User</enum>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_46">
+        <property name="geometry">
+         <rect>
+          <x>480</x>
+          <y>490</y>
+          <width>91</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>FROMREF</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_47">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>490</y>
+          <width>101</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>FROMZERO</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </widget>
@@ -6347,8 +6698,8 @@ def PythonCalc(a, b, c, d):
          <string notr="true">ACM:TEST:AO:NOISE</string>
         </property>
         <property name="baseColor">
-         <color>
-          <red>85</red>
+         <color alpha="100">
+          <red>170</red>
           <green>255</green>
           <blue>255</blue>
          </color>
@@ -6364,7 +6715,7 @@ def PythonCalc(a, b, c, d):
          </color>
         </property>
         <property name="colorMode">
-         <enum>caMeter::Alarm</enum>
+         <enum>caMeter::Static</enum>
         </property>
         <property name="scaleEnabled">
          <bool>true</bool>
@@ -6415,7 +6766,7 @@ def PythonCalc(a, b, c, d):
          </color>
         </property>
         <property name="colorMode">
-         <enum>caMeter::Static</enum>
+         <enum>caMeter::Alarm</enum>
         </property>
         <property name="scaleEnabled">
          <bool>true</bool>
@@ -6439,8 +6790,8 @@ def PythonCalc(a, b, c, d):
        <widget class="caNumeric" name="canumeric_6">
         <property name="geometry">
          <rect>
-          <x>452</x>
-          <y>362</y>
+          <x>700</x>
+          <y>360</y>
           <width>186</width>
           <height>106</height>
          </rect>
@@ -6481,6 +6832,60 @@ def PythonCalc(a, b, c, d):
         </property>
         <property name="colorMode">
          <enum>caClock::Alarm</enum>
+        </property>
+       </widget>
+       <widget class="caMeter" name="cameter_3">
+        <property name="geometry">
+         <rect>
+          <x>330</x>
+          <y>300</y>
+          <width>301</width>
+          <height>221</height>
+         </rect>
+        </property>
+        <property name="readOnly">
+         <bool>false</bool>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO:NOISE</string>
+        </property>
+        <property name="baseColor">
+         <color alpha="100">
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="scaleDefaultColor">
+         <bool>false</bool>
+        </property>
+        <property name="scaleColor">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caMeter::Alarm</enum>
+        </property>
+        <property name="scaleEnabled">
+         <bool>true</bool>
+        </property>
+        <property name="valueDisplayed">
+         <bool>true</bool>
+        </property>
+        <property name="precision">
+         <number>0</number>
+        </property>
+        <property name="precisionMode">
+         <enum>caMeter::User</enum>
+        </property>
+        <property name="formatType">
+         <enum>caMeter::compact</enum>
+        </property>
+        <property name="unitsEnabled">
+         <bool>true</bool>
         </property>
        </widget>
       </widget>
@@ -9474,6 +9879,9 @@ p, li { white-space: pre-wrap; }
         <height>22</height>
        </rect>
       </property>
+      <property name="autoFillBackground">
+       <bool>true</bool>
+      </property>
       <property name="text">
        <string>CheckBox</string>
       </property>
@@ -9487,8 +9895,18 @@ p, li { white-space: pre-wrap; }
         <height>22</height>
        </rect>
       </property>
+      <property name="autoFillBackground">
+       <bool>true</bool>
+      </property>
       <property name="text">
        <string>caToggleButton</string>
+      </property>
+      <property name="background">
+       <color>
+        <red>200</red>
+        <green>200</green>
+        <blue>200</blue>
+       </color>
       </property>
      </widget>
      <widget class="QRadioButton" name="radioButton_4">
@@ -9499,6 +9917,9 @@ p, li { white-space: pre-wrap; }
         <width>102</width>
         <height>22</height>
        </rect>
+      </property>
+      <property name="autoFillBackground">
+       <bool>true</bool>
       </property>
       <property name="text">
        <string>RadioButton</string>
@@ -9523,8 +9944,18 @@ p, li { white-space: pre-wrap; }
         <height>22</height>
        </rect>
       </property>
+      <property name="autoFillBackground">
+       <bool>true</bool>
+      </property>
       <property name="text">
        <string>caToggleButton</string>
+      </property>
+      <property name="background">
+       <color>
+        <red>200</red>
+        <green>200</green>
+        <blue>200</blue>
+       </color>
       </property>
      </widget>
      <widget class="caGraphics" name="cagraphics_16">
@@ -9673,6 +10104,20 @@ p, li { white-space: pre-wrap; }
        <bool>false</bool>
       </property>
      </widget>
+     <zorder>caclock_3</zorder>
+     <zorder>caclock_4</zorder>
+     <zorder>cagraphics_16</zorder>
+     <zorder>cagraphics_18</zorder>
+     <zorder>cacalc_17</zorder>
+     <zorder>caclock_5</zorder>
+     <zorder>cacalc_18</zorder>
+     <zorder>canumeric_8</zorder>
+     <zorder>castripplot</zorder>
+     <zorder>radioButton_3</zorder>
+     <zorder>radioButton_4</zorder>
+     <zorder>checkBox_3</zorder>
+     <zorder>catogglebutton_5</zorder>
+     <zorder>catogglebutton_4</zorder>
     </widget>
     <widget class="QWidget" name="tab_35">
      <attribute name="title">

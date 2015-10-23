@@ -1,7 +1,5 @@
 #!grid 2
 #channel name                     type   args
-comment comment -span 1 -bg "#dddddd" " "
-mynow                           formRead
 comment comment -span 2 -fg "#ff00ff" some test devices
 $(A):SOL:1			formRead
 $(A):SOLRB:1			formRead
