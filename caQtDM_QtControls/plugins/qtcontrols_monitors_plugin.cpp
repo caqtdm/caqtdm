@@ -339,7 +339,7 @@ QWidget *caStripPlotInterface::createWidget(QWidget* parent)
 
 caStripPlotInterface::caStripPlotInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
-    strng name[4], type[4] {"","","",""};
+    strng name[4], type[4] = {"","","",""};
     longtext text[4] = {"","","",""};
 
     strcpy(name[0], "channels");
