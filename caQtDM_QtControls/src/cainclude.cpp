@@ -52,13 +52,35 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
     loadIncludes = false;
     QVariant source = qApp->property("APP_SOURCE").value<QVariant>();
 
+    // in the designer application through the command line we could have set this property to true or false
+    // in order to do that add following code to qdesigner.cpp
+/*
+    if (argument ==  QLatin1String("-includesOutlined")) {
+        if (++it == acend) {
+            qWarning("** WARNING The option -includesOutlined requires a value true or false");
+            return false;
+        } else {
+            QString boolValue = QString::fromLatin1(it->toLocal8Bit());
+            if(boolValue.toLower() == "true")
+               qApp->setProperty("includesOutlined", QVariant(QString("TRUE")));
+            else
+               qApp->setProperty("includesOutlined", QVariant(QString("FALSE")));
+        }
+        break;
+    }
+*/
+
+
+    QVariant includesOutlined = qApp->property("includesOutlined").value<QVariant>();
+
     // next code will only be executed when in designer
     // in other apps we load everything there while taking care of the macros
     if(source.isValid()) {
         if(!source.isNull()) {
             QString test = source.toString();
             if(test.contains("DESIGNER")) {
-                loadIncludes = true;
+                if(includesOutlined.toString() == "TRUE") loadIncludes = false;
+                else loadIncludes = true;
             }
         }
     }
