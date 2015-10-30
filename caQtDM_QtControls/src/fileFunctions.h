@@ -41,6 +41,7 @@ public:
    ~fileFunctions() {}
 
    int checkFileAndDownload(const QString &file, const QString &url = QString::null );
+   bool removeFilesInTree(const QString &dirName);
    const QString lastError();
    const QString lastInfo();
 

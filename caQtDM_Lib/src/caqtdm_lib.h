@@ -267,6 +267,7 @@ private:
     bool Python_Error(QWidget *w, QString message);
     void FlushAllInterfaces();
     void CartesianPlotsVerticalAlign();
+    void StripPlotsVerticalAlign();
 
 #ifdef MOBILE
     bool eventFilter(QObject *obj, QEvent *event);
@@ -326,6 +327,9 @@ private:
 
     QMap<int, caCartesianPlot*> cartesianList;  // list of cartesianplots with key group
     QList<int> cartesianGroupList;              // group numbers found
+
+    QMap<int, caStripPlot*> stripList;          // list of stripplots with key group
+    QList<int> stripGroupList;                  // group numbers found
 
 #ifdef epics4
     epics4Subs *Epics4;

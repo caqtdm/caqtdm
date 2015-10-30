@@ -411,6 +411,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     allStacks.clear();
     cartesianGroupList.clear();
     cartesianList.clear();
+    stripGroupList.clear();
+    stripList.clear();
 
     nbIncludes = 0;
     splashCounter = 1;
@@ -457,6 +459,17 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
             if( widget->getXaxisSyncGroup() != 0) {
                 cartesianList.insertMulti(widget->getXaxisSyncGroup(), widget);
                 if(!cartesianGroupList.contains(widget->getXaxisSyncGroup())) cartesianGroupList.append(widget->getXaxisSyncGroup());
+            }
+        }
+    }
+
+    // scan stripplots and find groups != 0; compose a list with the groups, and a map with the group key
+    QList<caStripPlot *> allStrips = myWidget->findChildren<caStripPlot *>();
+    if(allStrips.count() > 0) {
+        foreach(caStripPlot* widget, allStrips) {
+            if( widget->getXaxisSyncGroup() != 0) {
+                stripList.insertMulti(widget->getXaxisSyncGroup(), widget);
+                if(!stripGroupList.contains(widget->getXaxisSyncGroup())) stripGroupList.append(widget->getXaxisSyncGroup());
             }
         }
     }
@@ -3585,9 +3598,11 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 // do this for redisplaying legend with correct limits
                 if((stripplotWidget->getYscalingMin(actPlot) == caStripPlot::Channel) ||
                         (stripplotWidget->getYscalingMax(actPlot) == caStripPlot::Channel)) {
-                    stripplotWidget->resize(stripplotWidget->width()+1, stripplotWidget->height()+1);
-                    stripplotWidget->resize(stripplotWidget->width()-1, stripplotWidget->height()-1);
                 }
+                // force resize for repainting
+                QResizeEvent *re = new QResizeEvent(size(), size());
+                resizeEvent(re);
+                delete re;
             }
 
             stripplotWidget->setData(data.edata.actTime, data.edata.rvalue, actPlot);
@@ -6327,6 +6342,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
             widget->setProperty("GeometryList", integerList);
         }
         CartesianPlotsVerticalAlign();
+        StripPlotsVerticalAlign();
         return;
     }
 
@@ -6438,6 +6454,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
     }
 
     CartesianPlotsVerticalAlign();
+    StripPlotsVerticalAlign();
 
 }
 
@@ -6467,6 +6484,40 @@ void CaQtDM_Lib::CartesianPlotsVerticalAlign()
        // now set the correct left scale extent to the group
        i = cartesianList.find(group);
        while (i != cartesianList.end() && i.key() == group) {
+           QwtScaleWidget *scaleWidget = i.value()->axisWidget(QwtPlot::yLeft);
+           //qDebug() << i.value() << maxExtent;
+           scaleWidget->scaleDraw()->setMinimumExtent(maxExtent);
+           ++i;
+       }
+   }
+}
+
+/**
+ *  align strip plots vertically when they belong to the same group
+ */
+void CaQtDM_Lib::StripPlotsVerticalAlign()
+{
+    //qDebug() << "strip groups nb=" << cartesianGroupList.count();
+    if(stripGroupList.count() < 1) return;
+
+    // go through our groups
+   foreach(int group, stripGroupList) {
+       int maxExtent = 0;
+
+       // get for this group the maximum extent of scale (probably does not work with autoscale)
+       QMap<int,caStripPlot* >::iterator i = stripList.find(group);
+       while (i != stripList.end() && i.key() == group) {
+           QwtScaleWidget *scaleWidget = i.value()->axisWidget(QwtPlot::yLeft);
+           QwtScaleDraw *sd = scaleWidget->scaleDraw();
+           sd->setMinimumExtent(0);
+           const int extent = qRound(sd->extent(scaleWidget->font()));
+           if ( extent > maxExtent ) maxExtent = extent;
+           ++i;
+       }
+
+       // now set the correct left scale extent to the group
+       i = stripList.find(group);
+       while (i != stripList.end() && i.key() == group) {
            QwtScaleWidget *scaleWidget = i.value()->axisWidget(QwtPlot::yLeft);
            //qDebug() << i.value() << maxExtent;
            scaleWidget->scaleDraw()->setMinimumExtent(maxExtent);

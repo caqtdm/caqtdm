@@ -672,13 +672,15 @@ void FileOpenWindow::Callback_EmptyCache()
 #ifndef MOBILE
     Specials specials;
     QString path =  specials.getStdPath();
+    fileFunctions filefunction;
     path.append("/");
-    QDir dir(path);
-    dir.setNameFilters(QStringList() << "*.ui" << "*.prc" << "*.gif" << "*.jpg" << "*.png");
-    dir.setFilter(QDir::Files);
-    foreach(QString dirFile, dir.entryList()) dir.remove(dirFile);
+    filefunction.removeFilesInTree(path);
 #endif
 }
+
+
+
+
 
 /**
  * slot for opening file by button

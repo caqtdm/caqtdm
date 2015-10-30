@@ -107,8 +107,11 @@ void NetworkAccess::finishReply()
         Specials specials;
         QString filePath = specials.getStdPath();
 
+        // create directory if not exists
 #ifndef MOBILE
-        if(!QDir(filePath).exists()) QDir().mkdir(filePath);
+        QFileInfo fi(thisFile);
+        QString newPath = filePath + "/" + fi.path();
+        if(!QDir(newPath).exists()) QDir().mkpath(newPath);
 #endif
 
         filePath.append("/");
