@@ -66,6 +66,8 @@ void caImage::init(const QString& filename) {
     if(!success) {
         if(filefunction.lastError().length() > 0) messagequeue->enqueue(filefunction.lastError());
         messagequeue->enqueue(tr("Info: could not find or download file %1, however continue").arg(filename));
+        printf("caimage: %s\n", qasc(filefunction.lastInfo()));
+        printf("caimage: %s\n", qasc(tr("Info: could not find or download file %1, however continue").arg(filename)));
     }
 
     searchFile *s = new searchFile(filename);
