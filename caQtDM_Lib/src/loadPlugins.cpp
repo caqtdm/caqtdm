@@ -25,6 +25,7 @@
 
 #include "loadPlugins.h"
 #include "qtdefinitions.h"
+#include "pathdefinitions.h"
 
 loadPlugins::loadPlugins()
 {
@@ -48,15 +49,10 @@ bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKn
     //qDebug() << "load dynamic plugins";
     char asc[256];
     QList<QString> allPaths;
-#ifdef _MSC_VER
-     QString separator = ";";
-#else
-     QString separator = ":";
-#endif
 
     // get the controlsystem plugins from QT_PLUGIN_PATH
     QString pluginPath = (QString)  qgetenv("QT_PLUGIN_PATH");
-    QStringList paths = pluginPath.split(separator);
+    QStringList paths = pluginPath.split(pathSeparator);
 
     for(int i=0; i< paths.count(); i++) {
         QString path = paths[i] + "/controlsystems";

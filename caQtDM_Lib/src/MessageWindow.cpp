@@ -69,7 +69,8 @@ QString MessageWindow::QtMsgToQString(QtMsgType type, const char *msg)
     ftime(&timeA);
     time_val = timeA.time;
     timess = localtime(&time_val);
-    sprintf(prTime, "%02d-%02d-%04d %02d:%02d:%02d ", timess->tm_mday, timess->tm_mon, timess->tm_year+1900,  timess->tm_hour, timess->tm_min, timess->tm_sec);
+    if(timess != NULL) {
+        sprintf(prTime, "%02d-%02d-%04d %02d:%02d:%02d ", timess->tm_mday, timess->tm_mon, timess->tm_year+1900,  timess->tm_hour, timess->tm_min, timess->tm_sec);
         switch (type) {
                 case QtDebugMsg:
                         return QString(prTime) + QString(msg);
@@ -82,6 +83,9 @@ QString MessageWindow::QtMsgToQString(QtMsgType type, const char *msg)
                 default:
                         return QString(prTime) + QString(msg);
         }
+     } else {
+        return QString(msg);
+     }
 }
 
 void MessageWindow::AppendMsgWrapper(QtMsgType type, char* msg)

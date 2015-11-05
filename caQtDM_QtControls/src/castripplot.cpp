@@ -394,7 +394,6 @@ void caStripPlot::resizeEvent ( QResizeEvent * event )
 
 void caStripPlot:: UpdateScaling()
 {
-    printf("updatescaling\n");
     initCurves = true;
     RescaleCurves(canvas()->size().width(), thisUnits, thisPeriod);
     replot();
@@ -403,14 +402,15 @@ void caStripPlot:: UpdateScaling()
 
 QString caStripPlot::legendText(int i)
 {
-    char min[20], max[20];
+#define MAXLEN 21
+    char min[MAXLEN], max[MAXLEN];
     QString MinMax;
     QString titre(savedTitres.at(i));
 
     // in case of fixed scales, concatenate the limits that are used
     if(thisYaxisScaling == fixedScale) {
-        sprintf(min, "%.1f", thisYaxisLimitsMin[i]);
-        sprintf(max, "%.1f", thisYaxisLimitsMax[i]);
+        snprintf(min, MAXLEN - 1, "%.1f", thisYaxisLimitsMin[i]);
+        snprintf(max, MAXLEN - 1, "%.1f", thisYaxisLimitsMax[i]);
         ReplaceTrailingZerosByBlancs(min);
         ReplaceTrailingZerosByBlancs(max);
         MinMax.sprintf("[%s,%s]", min, max);

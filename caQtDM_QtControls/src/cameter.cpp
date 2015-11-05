@@ -274,7 +274,6 @@ QString caMeter::setScaleLabel(double value)
 void caMeter::updateMeter()
 {
     setValueUnits(lastValue, lastUnits);
-    update();
 }
 
 void caMeter::setValueUnits(double value, const QString &units)
@@ -284,7 +283,7 @@ void caMeter::setValueUnits(double value, const QString &units)
     thisLabel = setLabel(value, units);
     lastValue = value;
     lastUnits = units;
-    update();
+    invalidate();
 }
 
 QPalette caMeter::colorTheme( const QColor &base ) const
@@ -315,7 +314,7 @@ void caMeter::resizeEvent(QResizeEvent *e)
     f.setPointSizeF(size);
 
     setFont(f);
-    update();
+    invalidate();
 
 }
 

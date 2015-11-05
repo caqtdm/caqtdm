@@ -113,9 +113,9 @@
     QByteArray Parameter_1 = x.toLatin1().constData(); \
     QByteArray Parameter_2 = y.toLatin1().constData(); \
     QByteArray Parameter_3 = z.toLatin1().constData(); \
-    size1 = qMin(Parameter_1.size(), MAXPVLEN); \
-    size2 = qMin(Parameter_2.size(), 255); \
-    size3 = qMin(Parameter_3.size(), 80); \
+    size1 = qMin(Parameter_1.size(), MAXPVLEN-1); \
+    size2 = qMin(Parameter_2.size(), 255-1); \
+    size3 = qMin(Parameter_3.size(), 80-1); \
     strncpy(param1, Parameter_1.constData(), size1); \
     strncpy(param2, Parameter_2.constData(), size2); \
     strncpy(param3, Parameter_3.constData(), size3); \
@@ -728,7 +728,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 {
     QMap<QString, QString> map;
     knobData kData;
-    int specData[5];
+    int specData[5] = {0,0,0,0,0};
     memset(&kData, 0, sizeof (knobData));
     bool doNothing;
     QString pv;
@@ -3596,9 +3596,9 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     stripplotWidget->setYscale(ymin, ymax);
                 }
                 // do this for redisplaying legend with correct limits
-                if((stripplotWidget->getYscalingMin(actPlot) == caStripPlot::Channel) ||
-                        (stripplotWidget->getYscalingMax(actPlot) == caStripPlot::Channel)) {
-                }
+                //if((stripplotWidget->getYscalingMin(actPlot) == caStripPlot::Channel) ||
+                //        (stripplotWidget->getYscalingMax(actPlot) == caStripPlot::Channel)) {
+                //}
                 // force resize for repainting
                 QResizeEvent *re = new QResizeEvent(size(), size());
                 resizeEvent(re);
@@ -4566,7 +4566,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 {
     QMenu myMenu;
     QPoint cursorPos =QCursor::pos() ;
-
+    QString className;
     bool onMain = false;
     QString pv[20];
     int nbPV = 0;
@@ -4581,7 +4581,11 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     double limitsMax=0.0, limitsMin=0.0;
     bool validExecListItems = false;
     QStringList execListItems;
-    QString className = w->metaObject()->className();
+    if(w != (QWidget*) 0) {
+        className = w->metaObject()->className();
+    } else {
+        className = "?";
+    }
 
     // execution list for context menu defined ?
     QString execList = (QString)  qgetenv("CAQTDM_EXEC_LIST");
@@ -5779,7 +5783,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
     switch (kPtr->edata.fieldtype) {
     case caSTRING:
         //qDebug() << "set string" << text;
-        plugininterface->pvSetValue(kPtr->pv, 0.0, 0, (char*) qasc(text), (char*) qasc(w->objectName()), errmess, 0);
+        if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue(kPtr->pv, 0.0, 0, (char*) qasc(text), (char*) qasc(w->objectName()), errmess, 0);
         break;
 
     case caENUM:
@@ -5795,7 +5799,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
             for (int i=0; i<list.size(); i++) {
                 if(!text.compare(list.at(i).trimmed())) {
                     //qDebug() << "set enum text" << textValue;
-                    plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, textValue, (char*) qasc(w->objectName().toLower()), errmess, 0);
+                    if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, textValue, (char*) qasc(w->objectName().toLower()), errmess, 0);
                     match = true;
                     break;
                 }
@@ -5811,7 +5815,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
             if(kPtr->edata.fieldtype == caENUM) {
                 if(*end == 0 && end != textValue && longValue >= 0 && longValue <= kPtr->edata.enumCount) {
                     //qDebug() << "decode value *end=0, set a longvalue to enum" << longValue;
-                    plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int32_t) longValue, textValue, (char*) qasc(w->objectName().toLower()), errmess, 0);
+                    if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int32_t) longValue, textValue, (char*) qasc(w->objectName().toLower()), errmess, 0);
                 } else {
                     char asc[100];
                     sprintf(asc, "Invalid value: pv=%s value= \"%s\"\n", kPtr->pv, textValue);
@@ -5823,7 +5827,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
                 // normal int or long
             } else
                 //qDebug() << "set normal longvalue" << longValue;
-                plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int32_t) longValue, textValue, (char*) qasc(w->objectName().toLower()), errmess, 0);
+                if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int32_t) longValue, textValue, (char*) qasc(w->objectName().toLower()), errmess, 0);
         }
 
         break;
@@ -5832,12 +5836,12 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
         if(fType == caTextEntry::string) {
             if(kPtr->edata.nelm > 1) {
                //qDebug() << "set string" << text;
-               plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, (char*) qasc(text), (char*) qasc(w->objectName().toLower()), errmess, 0);
+               if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, (char*) qasc(text), (char*) qasc(w->objectName().toLower()), errmess, 0);
             } else {  // single char written through its ascii code while character entered
                text = text.trimmed();
                if(text.size()> 0) {
                  QChar c = text.at(0);
-                 plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int)c.toLatin1(), (char*)  "", (char*) qasc(w->objectName().toLower()), errmess, 2);
+                 if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int)c.toLatin1(), (char*)  "", (char*) qasc(w->objectName().toLower()), errmess, 2);
                }
             }
             break;
@@ -5865,7 +5869,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
                 caCalc * ww = (caCalc*) kPtr->dispW;
                 ww->setValue(value);
             } else {
-                plugininterface->pvSetValue((char*) kPtr->pv, value, 0, textValue, (char*) qasc(w->objectName().toLower()), errmess, 1);
+                if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue((char*) kPtr->pv, value, 0, textValue, (char*) qasc(w->objectName().toLower()), errmess, 1);
             }
 
         } else {

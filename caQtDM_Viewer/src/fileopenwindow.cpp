@@ -33,6 +33,7 @@ bool HTTPCONFIGURATOR = false;
 
 #include <QtGui>
 
+#include "pathdefinitions.h"
 #include "fileopenwindow.h"
 #include "specialFunctions.h"
 #include "fileFunctions.h"
@@ -425,11 +426,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 #ifndef MOBILE
     QString displayPath = (QString)  qgetenv("CAQTDM_DISPLAY_PATH");
     if(!displayPath.contains(specials.getStdPath())) {
-#ifdef _MSC_VER
-    displayPath.append(";");
-#else
-    displayPath.append(":");
-#endif
+       displayPath.append(pathSeparator);
        displayPath.append(specials.getStdPath());
        setenv("CAQTDM_DISPLAY_PATH", (char*) qasc(displayPath), 1);
     }
@@ -583,8 +580,9 @@ void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
 
 void FileOpenWindow::timerEvent(QTimerEvent *event)
 {
+#define MAXLEN 255
     Q_UNUSED(event);
-    char asc[255];
+    char asc[MAXLEN];
     int countPV=0;
     int countNotConnected=0;
     float highCount = 0.0;
@@ -630,7 +628,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
         fillPVtable(countPV, countNotConnected, countDisplayed);
         highCount = mutexKnobData->getHighestCountPV(highPV);
         if(highCount != 0.0) {
-            sprintf(msg, "%s - PV=%d (%d NC), %d Monitors/s, %d Displays/s, highest=%s with %.1f Monitors/s ", asc, countPV, countNotConnected,
+            snprintf(msg, MAXLEN - 1, "%s - PV=%d (%d NC), %d Monitors/s, %d Displays/s, highest=%s with %.1f Monitors/s ", asc, countPV, countNotConnected,
                       mutexKnobData->getMonitorsPerSecond(), mutexKnobData->getDisplaysPerSecond(), qasc(highPV), highCount);
         } else {
             strcpy(msg, asc);

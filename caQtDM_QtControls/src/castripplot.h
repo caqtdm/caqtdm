@@ -512,6 +512,5 @@ private:
 
     int thisXaxisSyncGroup;
     int thisXticks;
-    QwtLinearScaleEngine *defaultScaleEngineX;
 };
 #endif
