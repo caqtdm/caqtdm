@@ -6368,7 +6368,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
             mainlayoutPresent = true;
         }
     } else {
-        if( main->centralWidget()->layout() != (QObject*) 0) {
+        if( (main->centralWidget() != (QObject*) 0) && (main->centralWidget()->layout() != (QObject*) 0)) {
             classNam = main->centralWidget()->layout()->metaObject()->className();
             mainlayoutPresent = true;
         }
