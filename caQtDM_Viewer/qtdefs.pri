@@ -16,8 +16,11 @@ unix {
 #DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
 contains(QT_VER_MAJ, 5) {
   greaterThan(QT_MINOR_VERSION, 5) {
-    DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
+    DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS 
   }
+}
+contains(DEFINES, DESIGNER_TOOLTIP_DESCRIPTIONS ) {
+  message("Building with tooltip descriptions; if not supported by designer, turn it off in qtdefs.pri")
 }
 
 # enable specialized version, wehere files will be downloaded to a local directory (used specially for IOS and Android)
