@@ -4566,7 +4566,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 {
     QMenu myMenu;
     QPoint cursorPos =QCursor::pos() ;
-    QString className;
+    QString ClassName;
+    QString ObjectName;
     bool onMain = false;
     QString pv[20];
     int nbPV = 0;
@@ -4582,9 +4583,11 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     bool validExecListItems = false;
     QStringList execListItems;
     if(w != (QWidget*) 0) {
-        className = w->metaObject()->className();
+        ClassName = w->metaObject()->className();
+        ObjectName = w->objectName();
     } else {
-        className = "?";
+        ClassName = "?";
+        ObjectName = "?";
     }
 
     // execution list for context menu defined ?
@@ -4854,7 +4857,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             }
         }
 
-    } else if(className.contains("QE")) {
+    } else if(ClassName.contains("QE")) {
         qDebug() << "treat" << w;
 
         // must be mainwindow
@@ -5026,7 +5029,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             info.append("-----------------------------------------------------------------<br>");
 
             info.append("Object: ");
-            info.append(w->objectName());
+            info.append(ObjectName);
             info.append("<br>");
             if(!calcString.isEmpty()) {
                 info.append("<br>");
@@ -5189,7 +5192,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         }
 
                         info.append(asc);
-                        if(className.contains("Gauge")) {
+                        if(ClassName.contains("Gauge")) {
                             sprintf(asc, "not used for scale") ;
                             info.append(asc);
                         }

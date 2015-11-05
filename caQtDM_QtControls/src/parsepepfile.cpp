@@ -1040,6 +1040,7 @@ void ParsePepFile::writeLineEdit(QString format, QString pv, QString minwidth, Q
     Q_UNUSED(calcpv);
     Q_UNUSED(calc);
     Q_UNUSED(visibility);
+    Q_UNUSED(rgba);
 
     bool ok = true;
     int decimalDigits = 3;
