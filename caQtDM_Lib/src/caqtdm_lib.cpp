@@ -746,7 +746,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
     QString className(w1->metaObject()->className());
 
     if(className.contains("ca") || className.contains("QTextBrowser")) {
-        PRINT(printf("\n%*c %s macro=<%s>", 15 * level, '+', qPrintable(w1->objectName()), qPrintable(macro)));
+        PRINT(printf("\n%*c %s macro=<%s>", 15 * level, '+', qasc(w1->objectName()), qasc(macro)));
         map = createMap(macro);
     }
 
@@ -1451,13 +1451,13 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
             if(macroS.size() < 1) {
                 if(level>0){
-                    //printf("\n    %*c get last macro=%s", 15 * level, ' ', qPrintable(savedMacro[level-1]));
+                    //printf("\n    %*c get last macro=%s", 15 * level, ' ', qasc(savedMacro[level-1]));
                     macroS = savedMacro[level-1];
                 } else {
                     macroS = savedMacro[level];
                 }
             } else {
-                //printf("\n    %*c macro=%s", 15 * level, ' ',  qPrintable(macroS));
+                //printf("\n    %*c macro=%s", 15 * level, ' ',  qasc(macroS));
                 savedMacro[level] = macroS;
             }
 
@@ -1564,14 +1564,14 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         if(macroS.size() < 1) {
             if(level > 0){
-                //printf("\n    %*c get macro from previous level=%s w=<%s> ", 15 * level, ' ', qPrintable(savedMacro[level-1]), qPrintable(w1->objectName()));
+                //printf("\n    %*c get macro from previous level=%s w=<%s> ", 15 * level, ' ', qasc(savedMacro[level-1]), qasc(w1->objectName()));
                 macroS = savedMacro[level-1];
                 savedMacro[level] = macroS;
             } else {
                 macroS = savedMacro[level];
             }
         } else {
-            //printf("\n    %*c macro=%s <%s>", 15 * level, ' ', qPrintable(macroS), qPrintable(w1->objectName()));
+            //printf("\n    %*c macro=%s <%s>", 15 * level, ' ', qasc(macroS), qasc(w1->objectName()));
             savedMacro[level] = macroS;
         }
 
@@ -2435,7 +2435,7 @@ bool CaQtDM_Lib::Python_Error(QWidget *w, QString message)
     }
     Py_XDECREF(pystring);
 
-    sprintf(asc, "%s %s : %s %s", qPrintable(message), qPrintable(w->objectName()), errorType, errorInfo);
+    sprintf(asc, "%s %s : %s %s", qPrintable(message), qasc(w->objectName()), errorType, errorInfo);
 
     Py_XDECREF(errObj);
     Py_XDECREF(errData);
@@ -2543,7 +2543,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
 
                     } else  {
                         char asc[100];
-                        sprintf(asc, "Invalid channel data type %s", qPrintable(w->objectName()));
+                        sprintf(asc, "Invalid channel data type %s", qasc(w->objectName()));
                         postMessage(QtDebugMsg, asc);
                         valid = false;
                         return true;
@@ -2654,7 +2654,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
 #else
         } else if(calcQString.startsWith("%P/")) {
             char asc[100];
-            sprintf(asc, "python is not enabled in this caqtdm version(calc will be disabled) %s", qPrintable(w->objectName()));
+            sprintf(asc, "python is not enabled in this caqtdm version(calc will be disabled) %s", qasc(w->objectName()));
             postMessage(QtWarningMsg, asc);
             setCalcToNothing(w);
             valid = false;
@@ -2693,7 +2693,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
             status = postfix(calcString, post, &errnum);
             if(status) {
                 char asc[100];
-                sprintf(asc, "Invalid Calc %s for %s (calc will be disabled)", calcString, qPrintable(w->objectName()));
+                sprintf(asc, "Invalid Calc %s for %s (calc will be disabled)", calcString, qasc(w->objectName()));
                 setCalcToNothing(w);
                 postMessage(QtDebugMsg, asc);
                 //printf("%s\n", asc);
@@ -2709,7 +2709,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                 return visible;
             } else {
                 char asc[100];
-                sprintf(asc, "invalid calc %s for %s (calc will be disabled)", calcString, qPrintable(w->objectName()));
+                sprintf(asc, "invalid calc %s for %s (calc will be disabled)", calcString, qasc(w->objectName()));
                 setCalcToNothing(w);
                 postMessage(QtDebugMsg, asc);
                 valid = false;
@@ -3650,7 +3650,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             if(nbMonitors > 0)  {
 
                 // get calc string
-                //printf("get calc string <%s>\n", qPrintable(imageWidget->getImageCalc()));
+                //printf("get calc string <%s>\n", qasc(imageWidget->getImageCalc()));
                 strcpy(calcString, (char*) qasc(imageWidget->getImageCalc()));
 
                 // scan and get the channels
@@ -4465,7 +4465,7 @@ void CaQtDM_Lib::shellCommand(QString command) {
     command.replace("&X", QString::number(windid));
 #endif
     command = command.trimmed();
-    postMessage(QtDebugMsg, (char*) qPrintable(command.trimmed()));
+    postMessage(QtDebugMsg, (char*) qasc(command.trimmed()));
 #ifndef linux
     if(command.endsWith("&")) command.remove(command.size()-1, 1);
     //qDebug() << "execute:" << command;
@@ -5114,7 +5114,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                                 //QStringList list = States.split(";");
                                 QStringList list = States.split((QChar)27);
                                 for(int j=0; j<list.count(); j++) {
-                                    sprintf(asc, "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%d %s", j, qPrintable(list.at(j)));
+                                    sprintf(asc, "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%d %s", j, qasc(list.at(j)));
                                     info.append(asc);
                                 }
                             }
@@ -5131,7 +5131,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                                 //QStringList list = States.split(";");
                                 QStringList list = States.split((QChar)27);
                                 for(int j=0; j<list.count(); j++) {
-                                    sprintf(asc, "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%d %s", j, qPrintable(list.at(j)));
+                                    sprintf(asc, "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%d %s", j, qasc(list.at(j)));
                                     info.append(asc);
                                 }
                             }
