@@ -52,7 +52,6 @@ public:
     }
 };
 
-
 caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
 {
     const char *text =
@@ -641,7 +640,9 @@ void caCartesianPlot::setColor(QColor c, int indx)
 
     if(thisStyle[indx] != FillUnder) {
         if(thisStyle[indx] == ThinLines) {
-            curve[indx].setPen(QPen(c, 1));
+            curve[indx].setPen(QPen(c, 0));
+        } else if(thisStyle[indx] == Dots) {
+            curve[indx].setPen(QPen(c, 0));
         } else {
             curve[indx].setPen(QPen(c, 2));
         }
