@@ -28,6 +28,7 @@
 #include <windows.h>
 #include <float.h>
 #define isnan _isnan
+#define snprintf _snprintf
 #define QWT_DLL
 #if (_MSC_VER == 1600)
   #define INFINITY (DBL_MAX+DBL_MAX)

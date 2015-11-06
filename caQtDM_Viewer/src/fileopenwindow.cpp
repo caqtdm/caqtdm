@@ -28,6 +28,7 @@ bool HTTPCONFIGURATOR = false;
 #if defined(_MSC_VER)
   #define NOMINMAX
   #include <windows.h>
+  #define snprintf _snprintf
 #endif
 #include "searchfile.h"
 
@@ -337,7 +338,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     if(fi.exists()) {
        parseConfigFile(stdpathdoc, urls, files);
     } else{
-        QString defpathdoc;        
+        QString defpathdoc;
 #ifdef MOBILE_ANDROID
         defpathdoc ="assets:/caQtDM_IOS_Config.xml";
 #else
@@ -957,7 +958,7 @@ void FileOpenWindow::Callback_ActionHelp()
  * slots for exit signal
  */
 void FileOpenWindow::Callback_IosExit()
-{    
+{
     if(HTTPCONFIGURATOR) {
         fromIOS = true;
         Callback_ActionExit();
@@ -1038,7 +1039,7 @@ void FileOpenWindow::Callback_ActionReload()
             w->close();
             if(!fileName.isNull()) {
 
-                QString FileName = fileName.toString();  
+                QString FileName = fileName.toString();
 
                 // this will check for file existence and when an url is defined, download the file from a http server
                 QFileInfo fi(FileName);
