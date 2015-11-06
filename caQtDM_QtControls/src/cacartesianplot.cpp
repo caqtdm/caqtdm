@@ -115,6 +115,8 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
         curve[i].setStyle(QwtPlotCurve::Lines);
         curve[i].attach(this);
         curve[i].setOrientation(Qt::Vertical);
+        curve[i].setPaintAttribute( QwtPlotCurve::ClipPolygons, true );
+
     }
 
     setStyle_1(Lines);

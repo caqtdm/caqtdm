@@ -52,6 +52,7 @@ SNumeric::SNumeric(QWidget *parent, int id, int dd) : QFrame(parent), FloatDeleg
     decDig = dd;
     digits = id + dd;
     data = 0;
+    csValue = 0.0;
     minVal = (int) -pow(10.0, digits) + 1;
     maxVal = (int) pow(10.0, digits) - 1;
 #ifdef _MSC_VER
@@ -230,14 +231,13 @@ void SNumeric::setValue(double v)
     }
 }
 
+// written from CS
 void SNumeric::silentSetValue(double v)
 {
+    csValue = v;
     long long temp = (long long) round(v * pow(10.0, decDig));
-    //if ((temp >= minVal) && (temp <= maxVal))
-    {
-        data = temp;
-        showData();
-    }
+    data = temp;
+    showData();
 }
 
 void SNumeric::setMaximum(double v)
@@ -333,7 +333,6 @@ void SNumeric::downDataIndex(int id)
 void SNumeric::showData()
 {
     long long temp = data;
-
     double num = 0;
     if (data < 0)
         signLabel->setText(QString("-"));
@@ -362,35 +361,6 @@ void SNumeric::valueUpdated()
     delete re;
 }
 
-void SNumeric::dataInput()
-{
-    setFocus();
-    bool ok;
-    double val;
-    val = text->text().toDouble(&ok);
-    if (ok)
-        this->setValue(val);
-    text->hide();
-}
-
-void SNumeric::mouseDoubleClickEvent(QMouseEvent*)
-{
-    qDebug() << "mouse double clicked" << text;
-    if (text == NULL)
-    {
-        text = new QLineEdit(this);
-        connect(text, SIGNAL(returnPressed()), this, SLOT(dataInput()));
-        connect(text, SIGNAL(lostFocus()), text, SLOT(hide()));
-    }
-    text->setGeometry(QRect(box->cellRect(1, 0).topLeft(), box->cellRect(1, box->columnCount() - 1).bottomRight()));
-    text->setFont(signLabel->font());
-    text->setAlignment(Qt::AlignRight);
-    text->setMaxLength(digits+2);
-    text->setText("");
-    text->setFocus();
-    text->show();
-}
-
 bool SNumeric::eventFilter(QObject *obj, QEvent *event)
 {
     QSize aux = size();
@@ -402,12 +372,13 @@ bool SNumeric::eventFilter(QObject *obj, QEvent *event)
         }
     } else if(event->type() == QEvent::Leave) {
         lastLabel = -1;
+        long long temp = (long long) round(csValue * pow(10.0, decDig));
+        data = temp;
+        showData();
         QApplication::restoreOverrideCursor();
         resize(size()*0.99); // force a resize
         resize(aux);
         updateGeometry();
-    } else if(event->type() == QEvent::MouseButtonDblClick) {
-        if(!_AccessW) return true;
     } else if (event->type() == QEvent::MouseButtonPress) {
         QMouseEvent *ev = (QMouseEvent *) event;
         for (int i = 0; i < digits; i++) {
