@@ -5,8 +5,14 @@ QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
 
-# enable opengl in stripplot and cartesianplot (edo not use, xperimental only)
-#DEFINES += QWT_USE_OPENGL
+# enable opengl in stripplot and cartesianplot (edo not use, experimental only, for Qt5 and qwt6.1)
+packagesExist(QtOpenGL) {
+  contains(QT_VER_MAJ, 5) {
+     greaterThan(QT_MINOR_VERSION, 5) {
+       DEFINES += QWT_USE_OPENGL
+     }
+  }
+}
 
 unix {
     QMAKE_CXXFLAGS += "-g"
@@ -16,7 +22,7 @@ unix {
 # when the designer in 4.8.2 is patched in order to display tooltip description or
 # when the qt version is higher then 5.5.0 then compile the plugins with description texts
 # be carefull with this, while when the designer does not recognize tooltip description, the widgets will not be shown
-#DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
+DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
 contains(QT_VER_MAJ, 5) {
   greaterThan(QT_MINOR_VERSION, 5) {
     DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS 
