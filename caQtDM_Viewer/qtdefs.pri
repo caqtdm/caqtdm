@@ -6,13 +6,12 @@ QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
 
 # enable opengl in stripplot and cartesianplot (edo not use, experimental only, for Qt5 and qwt6.1)
-packagesExist(QtOpenGL) {
-  contains(QT_VER_MAJ, 5) {
-     greaterThan(QT_MINOR_VERSION, 5) {
-       DEFINES += QWT_USE_OPENGL
-     }
-  }
+
+contains(QT_VER_MAJ, 5) {
+#     message(opengl requested)
+#     DEFINES += QWT_USE_OPENGL
 }
+
 
 unix {
     QMAKE_CXXFLAGS += "-g"
