@@ -37,6 +37,12 @@
 #include <QVarLengthArray>
 #include <qtcontrols_global.h>
 
+#ifdef QWT_USE_OPENGL
+#include <qevent.h>
+#include <qgl.h>
+#include <qwt_plot_glcanvas.h>
+#endif
+
 #include <qwt_plot_zoomer.h>
 #include <qwt_plot_panner.h>
 

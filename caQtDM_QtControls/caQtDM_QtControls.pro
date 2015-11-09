@@ -9,7 +9,7 @@ contains(QT_VER_MAJ, 4) {
       CONFIG += designer
 }
 contains(QT_VER_MAJ, 5) {
-      QT += widgets concurrent uitools
+      QT += widgets concurrent uitools opengl
       CONFIG  += qwt plugin
       DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
       ios | android {

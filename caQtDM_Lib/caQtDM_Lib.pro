@@ -2,7 +2,7 @@ include (../caQtDM_Viewer/qtdefs.pri)
 CONFIG += caQtDM_Lib
 include(../caQtDM.pri)
 
-QT += core gui
+QT += core gui opengl
 
 contains(QT_VER_MAJ, 4) {
    CONFIG   += qt thread uitools plugin

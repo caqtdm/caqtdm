@@ -61,6 +61,11 @@ class QwtPlotCurve;
 
 #include "qwtplotcurvenan.h"
 
+#ifdef QWT_USE_OPENGL
+#include <qevent.h>
+#include <qgl.h>
+#include <qwt_plot_glcanvas.h>
+#endif
 
 class QTCON_EXPORT caStripPlot : public QwtPlot
 {

@@ -69,6 +69,33 @@ private:
 
 };
 
+#ifdef QWT_USE_OPENGL
+class GLCanvas: public QwtPlotGLCanvas
+{
+public:
+    GLCanvas( QwtPlot *parent = NULL ):
+        QwtPlotGLCanvas( parent )
+    {
+        setContentsMargins( 1, 1, 1, 1 );
+    }
+
+protected:
+    virtual void paintEvent( QPaintEvent *event )
+    {
+        QPainter painter( this );
+        painter.setClipRegion( event->region() );
+
+        QwtPlot *plot = qobject_cast< QwtPlot *>( parent() );
+        if ( plot )
+            plot->drawCanvas( &painter );
+
+        painter.setPen( palette().foreground().color() );
+        painter.drawRect( rect().adjusted( 0, 0, -1, -1 ) );
+    }
+
+};
+#endif
+
 class PlotScaleEngine: public QwtLinearScaleEngine
 {
 public:
@@ -126,6 +153,13 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     setAutoFillBackground(true);
     RestartPlot1 = true;
     RestartPlot2 = false;
+
+#ifdef QWT_USE_OPENGL
+    printf("caStripplot uses opengl ?\n");
+    GLCanvas *canvas = new GLCanvas();
+    canvas->setPalette( QColor( "khaki" ) );
+    setCanvas(canvas);
+#endif
 
     setUsageCPU(Medium);
 

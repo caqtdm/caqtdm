@@ -5,6 +5,9 @@ QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
 
+# enable opengl in stripplot and cartesianplot (edo not use, xperimental only)
+#DEFINES += QWT_USE_OPENGL
+
 unix {
     QMAKE_CXXFLAGS += "-g"
     QMAKE_CFLAGS_RELEASE += "-g"
