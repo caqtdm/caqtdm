@@ -505,7 +505,7 @@ void caStripPlot::defineCurves(QStringList titres, units unit, double period, in
 
             realMax[i] = maxVal[i] = -1000000;
             realMin[i] = minVal[i] =  1000000;
-            actVal[i] = realVal[i] = 0;
+            actVal[i] = realVal[i] = NAN;
         }
     }
 
