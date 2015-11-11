@@ -177,7 +177,7 @@ caLabelInterface::caLabelInterface(QObject* parent) : CustomWidgetInterface_Grap
     d_name = "caLabel";
     d_include = "caLabel";
     QPixmap qpixmap = QPixmap(":pixmaps/elabel.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget* caLabelInterface::createWidget(QWidget* parent)
@@ -215,7 +215,7 @@ caLabelVerticalInterface::caLabelVerticalInterface(QObject* parent) : CustomWidg
     d_name = "caLabelVertical";
     d_include = "caLabelVertical";
     QPixmap qpixmap = QPixmap(":pixmaps/elabelv.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 
@@ -248,7 +248,7 @@ caFrameInterface::caFrameInterface(QObject* parent) : CustomWidgetInterface_Grap
     d_name = "caFrame";
     d_include = "caFrame";
     QPixmap qpixmap =  QPixmap(":pixmaps/frame.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 caImageInterface::caImageInterface(QObject *parent): CustomWidgetInterface_Graphics(parent)
@@ -274,11 +274,11 @@ caImageInterface::caImageInterface(QObject *parent): CustomWidgetInterface_Graph
     strcpy(name[9], "channelD");
     strcpy(type[9], "multiline");
 
-    d_domXml = XmlFunc("caImage", "caimage", 0, 0, 50, 50, name, type, text, 10);
+    d_domXml = XmlFunc("caImage", "caimage", 0, 0, 70, 70, name, type, text, 10);
     d_name = "caImage";
     d_include = "caImage";
     QPixmap qpixmap = QPixmap(":pixmaps/images.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caImageInterface::createWidget(QWidget *parent)
@@ -323,7 +323,7 @@ caGraphicsInterface::caGraphicsInterface(QObject* parent) : CustomWidgetInterfac
     d_name = "caGraphics";
     d_include = "caGraphics";
     QPixmap qpixmap = QPixmap(":pixmaps/gtool.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caPolyLineInterface::createWidget(QWidget *parent)
@@ -357,7 +357,7 @@ caPolyLineInterface::caPolyLineInterface(QObject *parent): CustomWidgetInterface
     d_name = "caPolyLine";
     d_include = "caPolyLine";
     QPixmap qpixmap = QPixmap(":pixmaps/polyline.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 
@@ -395,7 +395,7 @@ caIncludeInterface::caIncludeInterface(QObject* parent) : CustomWidgetInterface_
     d_name = "caInclude";
     d_include = "caInclude";
     QPixmap qpixmap = QPixmap(":pixmaps/frame.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caDoubleTabWidgetInterface::createWidget(QWidget* parent)
@@ -417,7 +417,7 @@ caDoubleTabWidgetInterface::caDoubleTabWidgetInterface(QObject* parent) : Custom
     d_name = "caDoubleTabWidget";
     d_include = "caDoubleTabWidget";
     QPixmap qpixmap = QPixmap(":pixmaps/tabwidget.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caClockInterface::createWidget(QWidget* parent)
@@ -439,7 +439,7 @@ caClockInterface::caClockInterface(QObject* parent) : CustomWidgetInterface_Grap
     d_name = "caClock";
     d_include = "caClock";
     QPixmap qpixmap = QPixmap(":pixmaps/clock.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 CustomWidgetCollectionInterface_Graphics::CustomWidgetCollectionInterface_Graphics(QObject *parent): QObject(parent)

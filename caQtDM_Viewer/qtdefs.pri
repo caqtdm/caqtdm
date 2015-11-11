@@ -64,6 +64,7 @@ CONFIG += PYTHONCALC
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 
 # 4.0.2
+# camultilinestring has been implemented in order to mainly display char waveforms where carriage returns (ascii code 13) will produce a new line
 # cameter was not updating its label for Qt5; this has been corrected
 # some possible buffer overrun conditions corrected
 # one can choose now the number of divisions for x on castripplot

@@ -432,6 +432,9 @@ void MutexKnobData::SetMutexKnobDataReceived(knobData *kData) {
             if(kData->edata.dataSize < 1024) {
                 memcpy(dataString, (char*) kData->edata.dataB, (size_t) kData->edata.dataSize);
                 dataString[kData->edata.dataSize] = '\0';
+            } else {
+                memcpy(dataString, (char*) kData->edata.dataB, 1024);
+                dataString[1023] = '\0';
             }
         }
 

@@ -1099,6 +1099,25 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         lineeditWidget->setProperty("Taken", true);
 
+
+        //==================================================================================================================
+    } else if(caMultiLineString* multilinestringWidget = qobject_cast<caMultiLineString *>(w1)) {
+
+        //qDebug() << "create caLineEdit";
+        w1->setProperty("ObjectType", caMultiLineString_Widget);
+
+        if(multilinestringWidget->getPV().size() > 0) {
+            multilinestringWidget->setCursor(QCursor());
+            multilinestringWidget->setReadOnly(true);
+
+            //multilinestringWidget->setAlignment(lineeditWidget->alignment());
+            addMonitor(myWidget, &kData, multilinestringWidget->getPV(), w1, specData, map, &pv);
+            multilinestringWidget->setPV(pv);
+        }
+
+
+        multilinestringWidget->setProperty("Taken", true);
+
         //==================================================================================================================
     } else if(caGraphics* graphicsWidget = qobject_cast<caGraphics *>(w1)) {
 
@@ -2975,7 +2994,6 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         //qDebug() << "we have a menu";
 
         if(data.edata.connected) {
-            //QStringList stringlist = String.split( ";");
             QStringList stringlist = String.split((QChar)27);
             // set enum strings
             if(data.edata.fieldtype == caENUM) {
@@ -3000,7 +3018,6 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         //qDebug() << "we have a choiceButton" << String << value;
 
         if(data.edata.connected) {
-            //QStringList stringlist = String.split( ";");
             QStringList stringlist = String.split((QChar)27);
             // set enum strings
             if(data.edata.fieldtype == caENUM) {
@@ -3220,7 +3237,6 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 } else {
                     lineeditWidget->setAlarmColors(data.edata.severity, (double) data.edata.ivalue, bg, fg);
                 }
-                //list = String.split(";");
                 list = String.split((QChar)27);
 
                 //qDebug() << lineeditWidget << String << list << data.pv << (int) data.edata.ivalue << data.edata.valueCount;
@@ -3301,6 +3317,58 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             if (caTextEntry *textentryWidget = qobject_cast<caTextEntry *>(w)) {
                 textentryWidget->updateText(lineeditWidget->text());
             }
+        }
+
+        // multilinestring ====================================================================================================
+    } else if (caMultiLineString *multilinestringWidget = qobject_cast<caMultiLineString *>(w)) {
+
+        //qDebug() << "we have a multilinedit" << multilinestringWidget << data.edata.rvalue <<  data.edata.ivalue;
+
+        QColor bg = multilinestringWidget->property("BColor").value<QColor>();
+        QColor fg = multilinestringWidget->property("FColor").value<QColor>();
+
+        if(data.edata.connected) {
+            QString separator((QChar)27);
+            QString CR((QChar)13);
+
+            // enum string
+            if(data.edata.fieldtype == caENUM || data.edata.fieldtype == caSTRING || data.edata.fieldtype == caCHAR) {
+
+                int colorMode = multilinestringWidget->getColorMode();
+                if(colorMode == caMultiLineString::Static || colorMode == caMultiLineString::Default) { // done at initialisation
+                    if(!multilinestringWidget->property("Connect").value<bool>()) {                    // but was disconnected before
+                        multilinestringWidget->setAlarmColors(data.edata.severity, (double) data.edata.ivalue, bg, fg);
+                        multilinestringWidget->setProperty("Connect", true);
+                    }
+                } else {
+                    multilinestringWidget->setAlarmColors(data.edata.severity, (double) data.edata.ivalue, bg, fg);
+                }
+
+                //qDebug() << multilinestringWidget << String << list << data.pv << (int) data.edata.ivalue << data.edata.valueCount;
+
+                // an enum
+                if(data.edata.fieldtype == caENUM) {
+                    QString enumList = String;
+                    enumList.replace(separator, CR);
+                    multilinestringWidget->setTextLine(enumList);
+
+                // just one char
+                } else if((data.edata.fieldtype == caCHAR) && (data.edata.nelm == 1)) {
+                    QString str = QString(QChar((int) data.edata.ivalue));
+                    multilinestringWidget->setTextLine(str);
+
+                // one or more strings, or a char array
+                } else {
+                    multilinestringWidget->setTextLine(String);
+                }
+            } else {
+                multilinestringWidget->setTextLine("not supported");
+            }
+
+        } else {
+            multilinestringWidget->setTextLine("");
+            multilinestringWidget->setAlarmColors(NOTCONNECTED, 0.0, bg, fg);        \
+            multilinestringWidget->setProperty("Connect", false);
         }
 
         // Graphics ==================================================================================================================
@@ -4675,6 +4743,12 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         }
         if(lineeditWidget->getColorMode() == caLineEdit::Alarm_Default) strcpy(colMode, "Alarm");
         else if(lineeditWidget->getColorMode() == caLineEdit::Alarm_Static) strcpy(colMode, "Alarm");
+        else strcpy(colMode, "Static");
+        nbPV = 1;
+    } else if(caMultiLineString* multilinestringWidget = qobject_cast<caMultiLineString *>(w)) {
+        pv[0] = multilinestringWidget->getPV().trimmed();
+        if(multilinestringWidget->getColorMode() == caMultiLineString::Alarm_Default) strcpy(colMode, "Alarm");
+        else if(multilinestringWidget->getColorMode() == caMultiLineString::Alarm_Static) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
         nbPV = 1;
     } else if (caApplyNumeric* applynumericWidget = qobject_cast<caApplyNumeric *>(w)) {
@@ -6663,6 +6737,9 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
     } else if (caLineEdit *lineeditWidget = qobject_cast<caLineEdit *>(w)) {
         lineeditWidget->setEnabled(true);  // enable after initiating drag for context menu
         mimeData->setText(lineeditWidget->getPV());
+    } else if (caMultiLineString *multilinestringWidget = qobject_cast<caMultiLineString *>(w->parent())) {
+        multilinestringWidget->setEnabled(true);  // enable after initiating drag for context menu
+        mimeData->setText(multilinestringWidget->getPV());
     } else if (caLed *ledWidget = qobject_cast<caLed *>(w)) {
         mimeData->setText(ledWidget->getPV());
     } else if (caApplyNumeric *applynumeric1Widget = qobject_cast<caApplyNumeric *>(w)) {

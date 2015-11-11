@@ -49,7 +49,7 @@ class FontScalingWidget
     double calculateVertFontPointSizeF(const QString& text, const QSize & size);
 	
 	virtual QSize calculateTextSpace() = 0;
-	virtual QString text() const = 0;
+    virtual QString text() const = 0;
 	
 	int scaleMode() { return d_scaleMode; }
 	void setScaleMode(int m);

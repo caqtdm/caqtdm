@@ -147,7 +147,6 @@ private:
     int rowcount;
     bool dataPresent;
 
-    //QColor defaultBackColor;
     QColor defaultForeColor;
 
     int channelPrecision;

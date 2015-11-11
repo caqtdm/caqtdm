@@ -36,7 +36,6 @@
 #include "alarmdefs.h"
 
 caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
-
 {
     thisFormatC[0] = '\0';
     thisFormat[0] = '\0';

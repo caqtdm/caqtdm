@@ -123,7 +123,7 @@ caBitnamesInterface::caBitnamesInterface(QObject *parent): CustomWidgetInterface
     d_name = "caBitnames";
     d_include = "caBitnames";
     QPixmap qpixmap =  QPixmap(":pixmaps/eflag.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caBitnamesInterface::createWidget(QWidget *parent)
@@ -146,7 +146,7 @@ caLedInterface::caLedInterface(QObject *parent): CustomWidgetInterface_Monitors(
     d_name = "caLed";
     d_include = "caLed";
     QPixmap qpixmap =  QPixmap(":pixmaps/eled.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caLedInterface::createWidget(QWidget *parent)
@@ -168,7 +168,7 @@ caLinearGaugeInterface::caLinearGaugeInterface(QObject *parent): CustomWidgetInt
     d_name = "caLinearGauge";
     d_include = "caGauge";
     QPixmap qpixmap =  QPixmap(":pixmaps/elineargauge.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caLinearGaugeInterface::createWidget(QWidget *parent)
@@ -191,7 +191,7 @@ caCircularGaugeInterface::caCircularGaugeInterface(QObject *parent): CustomWidge
     d_name = "caCircularGauge";
     d_include = "caGauge";
     QPixmap qpixmap =  QPixmap(":pixmaps/ecirculargauge.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caCircularGaugeInterface::createWidget(QWidget *parent)
@@ -232,7 +232,33 @@ caLineEditInterface::caLineEditInterface(QObject* parent) : CustomWidgetInterfac
     d_name = "caLineEdit";
     d_include = "caLineEdit";
     QPixmap qpixmap =   QPixmap(":pixmaps/textmonitor.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+}
+
+QWidget *caMultiLineStringInterface::createWidget(QWidget* parent)
+{
+    return new caMultiLineString(parent);
+}
+
+caMultiLineStringInterface::caMultiLineStringInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
+{
+    strng name[6], type[6]={"","","","","",""};
+    longtext text[6] = {CHANNEL, LFOREGROUND, LBACKGROUND, LCOLORMODE, ALARMHANDLING, FONTSCALEMODE};
+
+    strcpy(name[0], "channel");
+    strcpy(type[0], "multiline");
+    strcpy(name[1], "foreground");
+    strcpy(name[2], "background");
+    strcpy(name[3], "colorMode");
+    strcpy(name[4], "alarmHandling");
+    strcpy(name[5], "fontScaleMode");
+
+    d_domXml = XmlFunc("caMultiLineString", "camultilinestring", 0, 0, 100, 20, name, type, text, 6);
+    d_toolTip = "[Multiline String Monitor]";
+    d_name = "caMultiLineString";
+    d_include = "caMultiLineString";
+    QPixmap qpixmap =   QPixmap(":pixmaps/multilinemonitor.png");
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caThermoInterface::createWidget(QWidget* parent)
@@ -252,7 +278,7 @@ caThermoInterface::caThermoInterface(QObject* parent) : CustomWidgetInterface_Mo
     d_name = "caThermo";
     d_include = "caThermo";
     QPixmap qpixmap =  QPixmap(":pixmaps/thermo.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caMeterInterface::createWidget(QWidget* parent)
@@ -286,7 +312,7 @@ caMeterInterface::caMeterInterface(QObject* parent) : CustomWidgetInterface_Moni
     d_name = "caMeter";
     d_include = "caMeter";
     QPixmap qpixmap =  QPixmap(":pixmaps/meter.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 
@@ -329,7 +355,7 @@ caCartesianPlotInterface::caCartesianPlotInterface(QObject* parent) : CustomWidg
     d_name = "caCartesianPlot";
     d_include = "caCartesianPlot";
     QPixmap qpixmap = QPixmap(":pixmaps/cartesian.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caStripPlotInterface::createWidget(QWidget* parent)
@@ -350,12 +376,12 @@ caStripPlotInterface::caStripPlotInterface(QObject* parent) : CustomWidgetInterf
     strcpy(type[2], "multiline");
     strcpy(name[3], "TitleY");
     strcpy(type[3], "multiline");
-    d_domXml = XmlFunc("caStripPlot", "castripplot", 0, 0, 150, 50, name, type, text, 4);
+    d_domXml = XmlFunc("caStripPlot", "castripplot", 0, 0, 170, 70, name, type, text, 4);
     d_toolTip = "[Strip Chart]";
     d_name = "caStripPlot";
     d_include = "caStripPlot";
     QPixmap qpixmap = QPixmap(":pixmaps/qwtplot.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 caByteInterface::caByteInterface(QObject *parent): CustomWidgetInterface_Monitors(parent)
@@ -370,7 +396,7 @@ caByteInterface::caByteInterface(QObject *parent): CustomWidgetInterface_Monitor
     d_name = "caByte";
     d_include = "caByte";
     QPixmap qpixmap = QPixmap(":pixmaps/eflag.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caByteInterface::createWidget(QWidget *parent)
@@ -396,7 +422,7 @@ caTableInterface::caTableInterface(QObject *parent): CustomWidgetInterface_Monit
     d_name = "caTable";
     d_include = "caTable";
     QPixmap qpixmap = QPixmap(":pixmaps/table.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caTableInterface::createWidget(QWidget *parent)
@@ -416,7 +442,7 @@ caWaveTableInterface::caWaveTableInterface(QObject *parent): CustomWidgetInterfa
     d_name = "caWaveTable";
     d_include = "caWaveTable";
     QPixmap qpixmap = QPixmap(":pixmaps/wavetable.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caWaveTableInterface::createWidget(QWidget *parent)
@@ -459,7 +485,7 @@ caCameraInterface::caCameraInterface(QObject* parent) : CustomWidgetInterface_Mo
     d_name = "caCamera";
     d_include = "caCamera";
     QPixmap qpixmap = QPixmap(":pixmaps/camera.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caCalcInterface::createWidget(QWidget* parent)
@@ -490,7 +516,7 @@ caCalcInterface::caCalcInterface(QObject* parent) : CustomWidgetInterface_Monito
     d_name = "caCalc";
     d_include = "caCalc";
     QPixmap qpixmap = QPixmap(":pixmaps/calc.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caWaterfallPlotInterface::createWidget(QWidget* parent)
@@ -518,7 +544,7 @@ caWaterfallPlotInterface::caWaterfallPlotInterface(QObject* parent) : CustomWidg
     d_name = "caWaterfallPlot";
     d_include = "caWaterfall";
     QPixmap qpixmap = QPixmap(":pixmaps/waterfall.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caScan2DInterface::createWidget(QWidget* parent)
@@ -582,6 +608,7 @@ CustomWidgetCollectionInterface_Monitors::CustomWidgetCollectionInterface_Monito
     d_plugins.append(new caCircularGaugeInterface(this));
     d_plugins.append(new caMeterInterface(this));
     d_plugins.append(new caLineEditInterface(this));
+    d_plugins.append(new caMultiLineStringInterface(this));
     d_plugins.append(new caThermoInterface(this));
     d_plugins.append(new caCartesianPlotInterface(this));
     d_plugins.append(new caStripPlotInterface(this));
