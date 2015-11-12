@@ -37,8 +37,10 @@
     <addaction name="reloadAction"/>
     <addaction name="exitAction"/>
     <addaction name="separator"/>
+    <addaction name="clearAction"/>
     <addaction name="separator"/>
     <addaction name="aboutAction"/>
+    <addaction name="separator"/>
     <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuPV">
@@ -139,6 +141,11 @@
   <action name="displayUrl">
    <property name="text">
     <string>url</string>
+   </property>
+  </action>
+  <action name="clearAction">
+   <property name="text">
+    <string>&amp;Clear Messages</string>
    </property>
   </action>
  </widget>
