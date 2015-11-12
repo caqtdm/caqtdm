@@ -56,6 +56,7 @@ public:
     MessageWindow(QWidget* parent = 0);
     static void AppendMsgWrapper(QtMsgType type, char *msg);
     void postMsgEvent(QtMsgType type, char *msg);
+    void clearText();
 };
 
 class CAQTDM_LIBSHARED_EXPORT MessageEvent: public QEvent

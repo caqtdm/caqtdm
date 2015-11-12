@@ -118,6 +118,11 @@ void MessageWindow::customEvent(QEvent* event)
         }
 }
 
+void  MessageWindow::clearText()
+{
+    msgTextEdit.setPlainText("");
+}
+
 void MessageWindow::postMsgEvent(QtMsgType type, char* msg)
 {
     QString qmsg = MessageWindow::QtMsgToQString(type, msg);

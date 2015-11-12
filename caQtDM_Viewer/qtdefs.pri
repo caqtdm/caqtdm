@@ -64,6 +64,9 @@ CONFIG += PYTHONCALC
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 
 # 4.0.2
+# initialisation of the first stripplot values with nan instead of zero. Value zero was confusing.
+# added the possibility to clear the messages through the file menu
+# in case of -attach with a huge macro, the shared memory was designed too small. now 2 kBytes can be transferred
 # camultilinestring has been implemented in order to mainly display char waveforms where carriage returns (ascii code 13) will produce a new line
 # cameter was not updating its label for Qt5; this has been corrected
 # some possible buffer overrun conditions corrected

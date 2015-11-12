@@ -232,6 +232,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     connect( this->ui.directAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionDirect()) );
     connect( this->ui.helpAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionHelp()) );
     connect( this->ui.emptycacheAction, SIGNAL( triggered() ), this, SLOT(Callback_EmptyCache()) );
+    connect( this->ui.clearAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionClear()) );
     this->ui.timedAction->setChecked(true);
 
     setWindowTitle(title);
@@ -279,7 +280,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         QByteArray byteArray("0");
         _isRunning = false;
         // create shared memory with a default value to note that no message is available.
-        if (!sharedMemory.create(255)) {
+        if (!sharedMemory.create(2048)) {
             qDebug("caQtDM -- Unable to create single instance.");
         } else {
             qDebug() << "caQtDM -- created shared memory";
@@ -914,7 +915,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         }
         activWindow = 0;
 
-        //qDebug() << "set properties in qmainwindow" << mainWindow << macroString;
+        //qDebug() << "set properties in qmainwindow" << mainWindow << macroString << geometry;
 
         if(geometry != "") {
             parse_and_set_Geometry(mainWindow, geometry);
@@ -952,6 +953,14 @@ void FileOpenWindow::Callback_ActionAbout()
 void FileOpenWindow::Callback_ActionHelp()
 {
     shellCommand("assistant");
+}
+
+/**
+ * slot for clear messages signal
+ */
+void FileOpenWindow::Callback_ActionClear()
+{
+    messageWindow->clearText();
 }
 
 /**
