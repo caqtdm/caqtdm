@@ -2,14 +2,14 @@ include (../caQtDM_Viewer/qtdefs.pri)
 CONFIG += caQtDM_Lib
 include(../caQtDM.pri)
 
-QT += core gui opengl
+QT += core gui
 
 contains(QT_VER_MAJ, 4) {
    CONFIG   += qt thread uitools plugin
 }
 
 contains(QT_VER_MAJ, 5) {
-    QT     += widgets printsupport uitools
+    QT     += widgets printsupport uitools opengl
     CONFIG += qt plugin thread
     DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 }
