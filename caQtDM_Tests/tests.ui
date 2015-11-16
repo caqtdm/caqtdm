@@ -3795,6 +3795,45 @@ p, li { white-space: pre-wrap; }
          <enum>caMultiLineString::None</enum>
         </property>
        </widget>
+       <widget class="caMultiLineString" name="camultilinestring_7">
+        <property name="geometry">
+         <rect>
+          <x>450</x>
+          <y>350</y>
+          <width>251</width>
+          <height>81</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:STRING_WAVE</string>
+        </property>
+        <property name="background">
+         <color>
+          <red>205</red>
+          <green>255</green>
+          <blue>254</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caMultiLineString::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameColor">
+         <color>
+          <red>0</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+        <property name="alarmHandling">
+         <enum>caMultiLineString::onForeground</enum>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_14">
        <attribute name="title">
@@ -5801,7 +5840,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="text">
-         <string>double</string>
+         <string>doubles</string>
         </property>
        </widget>
        <widget class="caLabel" name="calabel_22">
@@ -5814,7 +5853,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="text">
-         <string>long</string>
+         <string>longs</string>
         </property>
        </widget>
        <widget class="caLabel" name="calabel_23">
@@ -5827,7 +5866,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="text">
-         <string>char</string>
+         <string>chars</string>
         </property>
        </widget>
        <widget class="caLabel" name="calabel_24">
@@ -5840,7 +5879,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="text">
-         <string>short</string>
+         <string>shorts</string>
         </property>
        </widget>
        <widget class="caWaveTable" name="cawavetable_5">
@@ -6132,7 +6171,7 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>170</x>
           <y>360</y>
-          <width>71</width>
+          <width>821</width>
           <height>101</height>
          </rect>
         </property>
@@ -6146,7 +6185,7 @@ p, li { white-space: pre-wrap; }
          <enum>QAbstractItemView::NoSelection</enum>
         </property>
         <property name="showGrid">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="wordWrap">
          <bool>false</bool>
@@ -6155,7 +6194,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">ACM:TEST:CHAR_WAVE</string>
+         <string notr="true">ACM:TEST:STRING_WAVE</string>
         </property>
         <property name="numberOfRows">
          <number>5</number>
@@ -6329,75 +6368,17 @@ p, li { white-space: pre-wrap; }
          </property>
         </item>
        </widget>
-       <widget class="caLineEdit" name="calineedit_9">
+       <widget class="caLabel" name="calabel_48">
         <property name="geometry">
          <rect>
-          <x>260</x>
+          <x>40</x>
           <y>370</y>
-          <width>281</width>
-          <height>21</height>
+          <width>90</width>
+          <height>28</height>
          </rect>
         </property>
         <property name="text">
-         <string/>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-        </property>
-        <property name="channel" stdset="0">
-         <string notr="true">ACM:TEST:CHAR_WAVE</string>
-        </property>
-       </widget>
-       <widget class="caMultiLineString" name="camultilinestring">
-        <property name="geometry">
-         <rect>
-          <x>560</x>
-          <y>370</y>
-          <width>251</width>
-          <height>81</height>
-         </rect>
-        </property>
-        <property name="channel" stdset="0">
-         <string notr="true">ACM:TEST:CHAR_WAVE</string>
-        </property>
-        <property name="background">
-         <color>
-          <red>205</red>
-          <green>255</green>
-          <blue>254</blue>
-         </color>
-        </property>
-        <property name="colorMode">
-         <enum>caMultiLineString::Static</enum>
-        </property>
-        <property name="framePresent" stdset="0">
-         <bool>true</bool>
-        </property>
-        <property name="frameColor">
-         <color>
-          <red>0</red>
-          <green>255</green>
-          <blue>255</blue>
-         </color>
-        </property>
-        <property name="frameLineWidth" stdset="0">
-         <number>2</number>
-        </property>
-        <property name="alarmHandling">
-         <enum>caMultiLineString::onForeground</enum>
-        </property>
-       </widget>
-       <widget class="caMultiLineString" name="camultilinestring_2">
-        <property name="geometry">
-         <rect>
-          <x>840</x>
-          <y>370</y>
-          <width>100</width>
-          <height>81</height>
-         </rect>
-        </property>
-        <property name="channel" stdset="0">
-         <string notr="true">ACM:TEST:MBBO</string>
+         <string>strings</string>
         </property>
        </widget>
       </widget>
