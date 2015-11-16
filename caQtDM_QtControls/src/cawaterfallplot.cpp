@@ -55,7 +55,6 @@ caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent)
     d_spectrogram = new QwtPlotSpectrogram();
     d_spectrogram->setRenderThreadCount(0); // use system specific thread count
 
-    // set a colormap for it
     d_spectrogram->setColorMap(new ColorMap_Wavelength());
 
     // define data
@@ -69,7 +68,6 @@ caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent)
     memset(reducedArray, 0, ActualNumberOfColumns *sizeof(double));
 
     // initialize data
-
     m_data->initData(NumberOfColumns, getRows());
     thisIntensityMin = 0;
     thisIntensityMax = 1000;
@@ -96,8 +94,10 @@ caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent)
 
     setCustomMap("");
     setDiscreteCustomMap(false);
+    setColormap(spectrum_wavelength);
 
     updatePlot();
+
 
     firstMonitorPlot = firstDemoPlot = firstTimerPlot = true;
 
@@ -138,14 +138,17 @@ void caWaterfallPlot::setCols(int const &cols)
 void caWaterfallPlot::updatePlot()
 {
     // A color bar on the right axis
+/*
     QwtScaleWidget *rightAxis = plot->axisWidget(QwtPlot::yRight);
     rightAxis->setTitle("Intensity");
     rightAxis->setColorBarEnabled(true);
     rightAxis->setColorMap(QwtInterval(thisIntensityMin, thisIntensityMax), new ColorMap_Wavelength());
     plot->setAxisScale(QwtPlot::yRight, thisIntensityMin, thisIntensityMax);
     plot->enableAxis(QwtPlot::yRight);
+    thisColormap = spectrum_wavelength;
+*/
 
-    // disble labels of left axis
+    // disable labels of left axis
     plot->axisScaleDraw(QwtPlot::yLeft)->enableComponent(QwtAbstractScaleDraw::Labels, false);
     plot->setAxisFont(QwtPlot::xBottom, QFont("Arial", 10));
     plot->setAxisFont(QwtPlot::yLeft, QFont("Arial", 10));
@@ -407,22 +410,39 @@ void caWaterfallPlot::setColormap(colormap const &map)
     setPropertyVisible(customcolormap, false);
     setPropertyVisible(discretecolormap, false);
 
+    // A color bar on the right axis
+    QwtScaleWidget *rightAxis = plot->axisWidget(QwtPlot::yRight);
+    rightAxis->setTitle("Intensity");
+    rightAxis->setColorBarEnabled(true);
+    plot->setAxisScale(QwtPlot::yRight, thisIntensityMin, thisIntensityMax);
+    plot->enableAxis(QwtPlot::yRight);
+
     switch (map) {
 
     case grey:
         d_spectrogram->setColorMap(new ColorMap_Grey());
+        rightAxis->setColorMap(QwtInterval(thisIntensityMin, thisIntensityMax), new ColorMap_Grey());
+        thisColormap = grey;
         break;
     case spectrum_wavelength:
         d_spectrogram->setColorMap(new ColorMap_Wavelength());
+        rightAxis->setColorMap(QwtInterval(thisIntensityMin, thisIntensityMax), new ColorMap_Wavelength());
+        thisColormap = spectrum_wavelength;
         break;
     case spectrum_hot:
         d_spectrogram->setColorMap(new ColorMap_Hot());
+        rightAxis->setColorMap(QwtInterval(thisIntensityMin, thisIntensityMax), new ColorMap_Hot());
+        thisColormap = spectrum_hot;
         break;
     case spectrum_heat:
         d_spectrogram->setColorMap(new ColorMap_Heat());
+        rightAxis->setColorMap(QwtInterval(thisIntensityMin, thisIntensityMax), new ColorMap_Heat());
+        thisColormap = spectrum_heat;
         break;
     case spectrum_jet:
         d_spectrogram->setColorMap(new ColorMap_Jet());
+        rightAxis->setColorMap(QwtInterval(thisIntensityMin, thisIntensityMax), new ColorMap_Jet());
+        thisColormap = spectrum_jet;
         break;
     case spectrum_custom: {
         int *colorIndexes=NULL;
@@ -446,17 +466,23 @@ void caWaterfallPlot::setColormap(colormap const &map)
             ColorMap_Custom * colormap =  new ColorMap_Custom();
             colormap->initColormap(colorIndexes, thisCustomMap.count(), thisDiscreteMap);
             d_spectrogram->setColorMap(colormap);
+            rightAxis->setColorMap(QwtInterval(thisIntensityMin, thisIntensityMax), colormap);
             free(colorIndexes);
-
+            thisColormap = spectrum_custom;
         } else {
             d_spectrogram->setColorMap(new ColorMap_Wavelength());
+            rightAxis->setColorMap(QwtInterval(thisIntensityMin, thisIntensityMax), new ColorMap_Wavelength());
+            thisColormap = spectrum_wavelength;
         }
     }
         break;
     default:
         d_spectrogram->setColorMap(new ColorMap_Wavelength());
+        rightAxis->setColorMap(QwtInterval(thisIntensityMin, thisIntensityMax), new ColorMap_Wavelength());
+        thisColormap = spectrum_wavelength;
         break;
     }
+    myReplot();
 }
 
 
