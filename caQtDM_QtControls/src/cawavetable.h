@@ -58,7 +58,7 @@ class QTCON_EXPORT caWaveTable : public QTableWidget
     Q_ENUMS(SourceMode)
 
     Q_PROPERTY(FormatType formatType READ getFormatType WRITE setFormatType)
-     Q_ENUMS(FormatType)
+    Q_ENUMS(FormatType)
 
 public:
 
@@ -94,6 +94,7 @@ public:
     void setData(int16_t *vector, short status, int size);
     void setData(int32_t* vector, short status, int size);
     void setData(char* vector, short status, int size);
+    void setStringList(QStringList, short status, int size);
 
     bool getAccessW() const {return _AccessW;}
     void setAccessW(bool access);

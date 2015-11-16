@@ -86,7 +86,6 @@
      void Callback_ActionExit();
      void Callback_ActionHelp();
      void Callback_ActionReload();
-     void Callback_ActionClear();
      void Callback_ActionUnconnected();
      void Callback_EmptyCache();
      void Callback_OpenNewFile(const QString&, const QString&, const QString&);

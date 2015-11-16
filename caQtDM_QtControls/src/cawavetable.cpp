@@ -384,13 +384,21 @@ void caWaveTable::setPV(QString const &newPV)
     thisPV = newPV;
 }
 
+void caWaveTable::setStringList(QStringList list, short status, int size)
+{
+    int maxSize = rowcount * colcount;
+    for(int i=0; i< qMin(size, maxSize); i++) {
+        displayText(i, status, list.at(i));
+    }
+    dataPresent = true;
+}
+
 void caWaveTable::setData(double *array, short status, int size)
 {
 
     int maxSize = rowcount * colcount;
     setFormat(doubles);
     for(int i=0; i< qMin(size, maxSize); i++) {
-        //keepValue[i] = (double) array[i];
         displayText(i, status, setValue(array[i], doubles));
     }
     dataPresent = true;
@@ -402,7 +410,6 @@ void caWaveTable::setData(float *array, short status, int size)
     int maxSize = rowcount * colcount;
     setFormat(doubles);
     for(int i=0; i< qMin(size, maxSize); i++) {
-        //keepValue[i] = (double) array[i];
         displayText(i, status, setValue(array[i], doubles));
     }
     dataPresent = true;
@@ -414,7 +421,6 @@ void caWaveTable::setData(int16_t *array, short status, int size)
     int maxSize = rowcount * colcount;
     setFormat(longs);
     for(int i=0; i< qMin(size, maxSize); i++) {
-        //keepValue[i] = (double) array[i];
         displayText(i, status, setValue(array[i], longs));
     }
     dataPresent = true;
@@ -426,7 +432,6 @@ void caWaveTable::setData(int32_t *array, short status, int size)
     int maxSize = rowcount * colcount;
     setFormat(longs);
     for(int i=0; i< qMin(size, maxSize); i++) {
-        //keepValue[i] = (double) array[i];
         displayText(i, status, setValue(array[i], longs));
     }
     dataPresent = true;
@@ -437,7 +442,6 @@ void caWaveTable::setData(char *array, short status, int size)
     int maxSize = rowcount * colcount;
     setFormat(characters);
     for(int i=0; i< qMin(size, maxSize); i++) {
-        //keepValue[i] = (double) ((int) array[i]);
         displayText(i, status, setValue((double) ((int) array[i]), characters));
     }
     dataPresent = true;

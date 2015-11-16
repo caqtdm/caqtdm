@@ -37,9 +37,7 @@
     <addaction name="reloadAction"/>
     <addaction name="exitAction"/>
     <addaction name="separator"/>
-    <addaction name="clearAction"/>
     <addaction name="separator"/>
-    <addaction name="aboutAction"/>
     <addaction name="separator"/>
     <addaction name="separator"/>
    </widget>
@@ -61,6 +59,7 @@
      <string>Help</string>
     </property>
     <addaction name="helpAction"/>
+    <addaction name="aboutAction"/>
    </widget>
    <widget class="QMenu" name="menuHttp">
     <property name="title">

@@ -370,13 +370,15 @@ extern "C" MutexKnobData* C_DataUnlock(MutexKnobData* p, knobData *kData) {
     return p;
 }
 
+
+
 /**
  * update array with the received data
  */
 void MutexKnobData::SetMutexKnobDataReceived(knobData *kData) {
     char units[40];
     char fec[40];
-    char dataString[1024];
+    char dataString[STRING_EXCHANGE_SIZE];
     double diff;
     struct timeb now;
     QMutexLocker locker(&mutex);
@@ -429,12 +431,12 @@ void MutexKnobData::SetMutexKnobDataReceived(knobData *kData) {
         int caFieldType= kData->edata.fieldtype;
 
         if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kData->edata.dataB != (void*) 0) {
-            if(kData->edata.dataSize < 1024) {
+            if(kData->edata.dataSize < STRING_EXCHANGE_SIZE) {
                 memcpy(dataString, (char*) kData->edata.dataB, (size_t) kData->edata.dataSize);
                 dataString[kData->edata.dataSize] = '\0';
             } else {
-                memcpy(dataString, (char*) kData->edata.dataB, 1024);
-                dataString[1023] = '\0';
+                memcpy(dataString, (char*) kData->edata.dataB, STRING_EXCHANGE_SIZE);
+                dataString[STRING_EXCHANGE_SIZE-1] = '\0';
             }
         }
 
@@ -493,7 +495,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
     double diff=0.2, repRate=5.0;
     char units[40];
     char fec[40];
-    char dataString[1024];
+    char dataString[STRING_EXCHANGE_SIZE];
     struct timeb now;
 
     if(blockProcess) return;
@@ -566,12 +568,12 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 int caFieldType= kPtr->edata.fieldtype;
 
                 if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kPtr->edata.dataB != (void*) 0) {
-                    if(kPtr->edata.dataSize < 1024) {
+                    if(kPtr->edata.dataSize < STRING_EXCHANGE_SIZE) {
                         memcpy(dataString, (char*) kPtr->edata.dataB, (size_t) kPtr->edata.dataSize);
                         dataString[kPtr->edata.dataSize] = '\0';
                     } else {
-                        memcpy(dataString, (char*) kPtr->edata.dataB, 1024);
-                        dataString[1023] = '\0';
+                        memcpy(dataString, (char*) kPtr->edata.dataB, STRING_EXCHANGE_SIZE);
+                        dataString[STRING_EXCHANGE_SIZE-1] = '\0';
                     }
                 }
 

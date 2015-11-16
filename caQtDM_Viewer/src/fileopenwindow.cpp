@@ -232,7 +232,6 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     connect( this->ui.directAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionDirect()) );
     connect( this->ui.helpAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionHelp()) );
     connect( this->ui.emptycacheAction, SIGNAL( triggered() ), this, SLOT(Callback_EmptyCache()) );
-    connect( this->ui.clearAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionClear()) );
     this->ui.timedAction->setChecked(true);
 
     setWindowTitle(title);
@@ -953,14 +952,6 @@ void FileOpenWindow::Callback_ActionAbout()
 void FileOpenWindow::Callback_ActionHelp()
 {
     shellCommand("assistant");
-}
-
-/**
- * slot for clear messages signal
- */
-void FileOpenWindow::Callback_ActionClear()
-{
-    messageWindow->clearText();
 }
 
 /**

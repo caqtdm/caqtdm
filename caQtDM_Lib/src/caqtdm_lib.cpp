@@ -2537,11 +2537,11 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
         if (checkregexp.indexIn(calcString) != -1){
             knobData *ptr = mutexKnobDataP->GetMutexKnobDataPtr(MonitorList.at(1).toInt());
             if(ptr != (knobData *) 0) {
-                char dataString[1024];
+                char dataString[STRING_EXCHANGE_SIZE];
                 int caFieldType= ptr->edata.fieldtype;
                 QString captured_Calc = checkregexp.cap(1);
                 if((caFieldType == caSTRING || caFieldType == caENUM || caFieldType == caCHAR) && ptr->edata.dataB != (void*) 0) {
-                    if(ptr->edata.dataSize < 1024) {
+                    if(ptr->edata.dataSize < STRING_EXCHANGE_SIZE) {
                         memcpy(dataString, (char*) ptr->edata.dataB, (size_t) ptr->edata.dataSize);
                         dataString[ptr->edata.dataSize] = '\0';
 
@@ -3358,8 +3358,12 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     multilinestringWidget->setTextLine(str);
 
                 // one or more strings, or a char array
-                } else {
+                } else if(data.edata.fieldtype == caCHAR){
                     multilinestringWidget->setTextLine(String);
+                } else if(data.edata.fieldtype == caSTRING) {
+                    QString List = String;
+                    List.replace(separator, CR);
+                    multilinestringWidget->setTextLine(List);
                 }
             } else {
                 multilinestringWidget->setTextLine("not supported");
@@ -3790,7 +3794,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             tableWidget->displayText(row, 2, NOTCONNECTED, "NC");
         }
 
-        // table for vwaveform values==========================================================================
+        // table for waveform values==========================================================================
     } else if(caWaveTable *wavetableWidget = qobject_cast<caWaveTable *>(w)) {
 
         if(data.edata.connected) {
@@ -3799,7 +3803,13 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 if((wavetableWidget->getPrecisionMode() != caWaveTable::User) && (data.edata.initialize)) {
                     wavetableWidget->setActualPrecision(data.edata.precision);
                 }
-                WaveTable(wavetableWidget, data);
+                if(data.edata.fieldtype == caSTRING) {
+                    QStringList list;
+                    list = String.split((QChar)27);
+                    wavetableWidget->setStringList(list, data.edata.status, data.edata.valueCount);
+                } else {
+                    WaveTable(wavetableWidget, data);
+                }
             } else {
                 wavetableWidget->displayText(0, NOTCONNECTED, "????");
             }
@@ -3995,6 +4005,7 @@ void CaQtDM_Lib::WaveTable(caWaveTable *widget, const knobData &data)
     QMutex *datamutex;
     datamutex = (QMutex*) data.mutex;
     datamutex->lock();
+
     switch(data.edata.fieldtype) {
     case caFLOAT: {
         float* P = (float*) data.edata.dataB;
@@ -4119,7 +4130,6 @@ void CaQtDM_Lib::getStatesToggleAndLed(QWidget *widget, const knobData &data, co
 
         QString str = "";
         QStringList list;
-        //list = String.split(";");
         list = String.split((QChar)27);
 
         if((int) data.edata.ivalue < list.count()  && (list.count() > 0))  str = list.at((int) data.edata.ivalue);
@@ -5966,7 +5976,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
   */
 void CaQtDM_Lib::TreatRequestedWave(QString pv, QString text, caWaveTable::FormatType fType, int index, QWidget *w)
 {
-    char    errmess[255], sdata[40];
+    char    errmess[255], sdata[40], asc[100];
     int32_t data32[1];
     int16_t data16[1];
     float   fdata[1];
@@ -6028,6 +6038,11 @@ void CaQtDM_Lib::TreatRequestedWave(QString pv, QString text, caWaveTable::Forma
 
         break;
 
+    case caSTRING:
+        sprintf(asc, "writing of strings for treatRequestedWave is not yet supported\n");
+        postMessage(QtDebugMsg, asc);
+        break;
+
     case caFLOAT:
     case caDOUBLE:
         match = false;
@@ -6062,7 +6077,6 @@ void CaQtDM_Lib::TreatRequestedWave(QString pv, QString text, caWaveTable::Forma
         break;
 
     default:
-        char asc[100];
         sprintf(asc, "unhandled epics type (%d) in treatRequestedWave\n", kPtr->edata.fieldtype);
         postMessage(QtDebugMsg, asc);
     }

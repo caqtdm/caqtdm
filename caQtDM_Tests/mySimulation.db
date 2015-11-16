@@ -266,6 +266,7 @@ record(waveform, "ACM:TEST:WAVE"){
         field(NELM, "128")
 }
 
+
 record(waveform,"BUSY") {
         field(DESC, "busy")
         field(FTVL, "CHAR")
@@ -494,6 +495,12 @@ record(waveform, "ACM:TEST:CHAR_WAVE"){
         field(NELM, "100")
 	field(HOPR,"1200")
 	field(LOPR,"-200")
+}
+
+record(waveform, "ACM:TEST:STRING_WAVE"){
+        field(DESC, "string waveform")
+        field(FTVL, "STRING")
+        field(NELM, "100")
 }
 
 record(waveform,"ACM:TEST:SHORT_WAVE") {
