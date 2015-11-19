@@ -514,10 +514,10 @@ void caLineEdit::setTextLine(const QString &txt)
     if(keepText == txt) {  // accelerate things
         return;
     }
-    //printf("settext: %s <%s> <%s>\n", qasc(thisPV),  qasc(txt), qasc(keepText));
     pos = cursorPosition();
     QLineEdit::setText(txt);
     setCursorPosition(pos);
+    //printf("settext: %s <%s> <%s> cursor@%d\n", qasc(thisPV),  qasc(txt), qasc(keepText), pos);
 
     if(keepText.size() != txt.size()) {
        FontScalingWidget::rescaleFont(text(), d_savedTextSpace);
@@ -529,8 +529,10 @@ void caLineEdit::setTextLine(const QString &txt)
 void caLineEdit::forceText(const QString &txt)
 {
     //printf("forcetext: <%s>\n", qasc(txt));
+    int pos = cursorPosition();
     QLineEdit::setText(txt);
     FontScalingWidget::rescaleFont(text(), d_savedTextSpace);
+    setCursorPosition(pos);
 }
 
 QSize caLineEdit::calculateTextSpace()
