@@ -62,7 +62,7 @@ bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKn
     // alternative path
 #if defined(__OSX__) || defined(__APPLE__)
     QString alternativePath(qApp->applicationDirPath());
-    alternativePath.append("/../Plugins/controlsystems");
+    alternativePath.append("/../PlugIns/controlsystems");
     allPaths.append(alternativePath);
 #else
     QString alternativePath(qApp->applicationDirPath());
