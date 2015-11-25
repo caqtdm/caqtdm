@@ -11,31 +11,56 @@ echo
 echo ========== Collect Files for Mac Bundle ============
 echo
 
-chmod 755 ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libca.3.14.12.dylib
-chmod 755 ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libCom.3.14.12.dylib
-cp -R ${QWTHOME}/lib/qwt.framework ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/
-cp -R ${QTHOME}/lib/QtOpenGl.framework ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/
-
-
+chmod -R 777 ./caQtDM_Binaries/caQtDM.app
 
 echo
-echo ========== add libcoca ============
+echo ========== add plugin dirs ============
 echo
+
 
 mkdir ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/platforms/
 mkdir ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/imageformats/
 mkdir ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/printsupport/
-cp ${QTHOME}/plugins/platforms/libqcocoa.dylib  ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/platforms/
-cp ${QTHOME}/plugins/imageformats/libqgif.dylib  ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/imageformats/
-cp ${QTHOME}/plugins/imageformats/libqjpeg.dylib  ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/imageformats/
+echo
+echo ========== add libcoca ============
+echo
+
 cp ${QTHOME}/plugins/imageformats/libqico.dylib  ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/imageformats/
-cp ${QTHOME}/plugins/printsupport/libcocoaprintersupport.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/printsupport/
+cp ${QTHOME}/plugins/platforms/libqcocoa.dylib  ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/platforms/
 
 echo
 echo ========== macdeployqt caQtDM ============
 echo
 
 macdeployqt ./caQtDM_Binaries/caQtDM.app -executable=./caQtDM_Binaries/caQtDM.app/Contents/MacOS/caQtDM
+
+echo
+echo ========== change plugin libs =============
+echo
+echo ++++++++++ libepics3_plugin controls lib ++++++++
+install_name_tool -change @loader_path/../../Frameworks/libcaQtDM_Lib.dylib @rpath/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
+install_name_tool -change @loader_path/../../Frameworks/libca.3.14.12.dylib @rpath/libca.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
+install_name_tool -change @loader_path/../../Frameworks/libCom.3.14.12.dylib @rpath/libCom.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
+
+echo ++++++++++ libepics4_plugin controls lib ++++++++
+install_name_tool -change @loader_path/../../Frameworks/libcaQtDM_Lib.dylib @rpath/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics4_plugin.dylib
+install_name_tool -change @loader_path/../../Frameworks/libca.3.14.12.dylib @rpath/libca.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics4_plugin.dylib
+install_name_tool -change @loader_path/../../Frameworks/libCom.3.14.12.dylib @rpath/libCom.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics4_plugin.dylib
+
+echo ++++++++++ libdemo_plugin controls lib ++++++++
+install_name_tool -change @loader_path/../../Frameworks/libcaQtDM_Lib.dylib @rpath/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libdemo_plugin.dylib
+
+echo ++++++++++ libcaQtDM_Lib.dylib controls lib ++++++++
+install_name_tool -change @loader_path/qwt.framework/Versions/6/qwt @rpath/qwt.framework/Versions/6/qwt ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
+install_name_tool -change @loader_path/libqtcontrols.dylib @rpath/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
+install_name_tool -change @loader_path/libCom.3.14.12.dylib @rpath/libCom.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
+
+echo ++++++++++ libqtcontrols.dylib controls lib ++++++++
+install_name_tool -change @loader_path/qwt.framework/Versions/6/qwt @rpath/qwt.framework/Versions/6/qwt ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libqtcontrols.dylib
+
+echo ++++++++++ libca.3.14.12.dylib controls lib ++++++++
+install_name_tool -change @loader_path/libCom.3.14.12.dylib @rpath/libCom.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libca.3.14.12.dylib
+
 
 echo
 echo ========== fix for codesigning  ============
@@ -45,115 +70,19 @@ rm -rf ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/Heade
 rm -rf ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/QtOpenGL_debug
 rm -f ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/*.prl
 
-echo 
-echo ========== prepare controls plugin directories ==========
 echo
-mkdir ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/controlsystems
-
-echo 
-echo ========== copy constrolsystem plugins ==============
-echo 
-cp ./caQtDM_Binaries/controlsystems/*.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/controlsystems/
-
+echo ========== change case sensitive OpenGl =============
 echo
-echo ========== change plugin libs =============
-echo
-echo ++++++++++ demo controls lib ++++++++
-install_name_tool -change libcaQtDM_Lib.dylib @executable_path/../Frameworks/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libdemo_plugin.dylib
-install_name_tool -change $QTHOME/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libdemo_plugin.dylib
-install_name_tool -change $QTHOME/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libdemo_plugin.dylib
+echo ++++++++++ caQtDM ++++++++
+#install_name_tool -change @rpath/QtOpenGL.framework/Versions/5/QtOpenGL @rpath/QtOpenGl.framework/Versions/5/QtOpenGL ./caQtDM_Binaries/caQtDM.app/Contents/MacOS/caQtDM
 
-echo ++++++++++ epics3 controls lib ++++++++
-install_name_tool -change libcaQtDM_Lib.dylib @executable_path/../Frameworks/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
-install_name_tool -change $QTHOME/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
-install_name_tool -change $QTHOME/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
-install_name_tool -change "${EPICSLIB}/libca.3.14.12.dylib" "@executable_path/../Frameworks/libca.3.14.12.dylib" ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
-install_name_tool -change "${EPICSLIB}/libCom.3.14.12.dylib" "@executable_path/../Frameworks/libCom.3.14.12.dylib" ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
+echo ++++++++++ libcaQtDM_Lib.dylib ++++++++
+#install_name_tool -change @rpath/QtOpenGL.framework/Versions/5/QtOpenGL @rpath/QtOpenGl.framework/Versions/5/QtOpenGL ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
 
-echo ++++++++++ epics4 controls lib ++++++++
-install_name_tool -change libcaQtDM_Lib.dylib @executable_path/../Frameworks/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics4_plugin.dylib
-install_name_tool -change $QTHOME/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics4_plugin.dylib
-install_name_tool -change $QTHOME/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore .//caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics4_plugin.dylib
-install_name_tool -change "${EPICSLIB}/libca.3.14.12.dylib" "@executable_path/../Frameworks/libca.3.14.12.dylib" ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
-install_name_tool -change "${EPICSLIB}/libCom.3.14.12.dylib" "@executable_path/../Frameworks/libCom.3.14.12.dylib" ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
+echo ++++++++++ libqtcontrols.dylib ++++++++
+#install_name_tool -change @rpath/QtOpenGL.framework/Versions/5/QtOpenGL @rpath/QtOpenGl.framework/Versions/5/QtOpenGL ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libqtcontrols.dylib
 
-
-echo
-echo ========== change EPICS LIBS ============
-echo
-
-install_name_tool -id @executable_path/../Frameworks/libca.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libca.3.14.12.dylib
-install_name_tool -id @executable_path/../Frameworks/libCom.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libCom.3.14.12.dylib
-
-install_name_tool -change "${EPICSLIB}/libCom.3.14.12.dylib" @executable_path/../Frameworks/libCom.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libca.3.14.12.dylib
-install_name_tool -change libca.3.14.12.dylib @executable_path/../Frameworks/libca.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQTDM_Lib.dylib
-
-echo
-echo ========== change caqtdm ============
-echo
-
-install_name_tool -change libcaQtDM_Lib.dylib @executable_path/../Frameworks/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/MacOS/caQtDM
-
-echo
-echo ========== change libcaQtDM_Lib.dylib ============
-echo
-
-install_name_tool -change libqtcontrols.dylib @executable_path/../Frameworks/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
-
-install_name_tool -change "${EPICSLIB}/libCom.3.14.12.dylib" "@executable_path/../Frameworks/libCom.3.14.12.dylib" ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
-install_name_tool -change "${EPICSLIB}/libca.3.14.12.dylib" "@executable_path/../Frameworks/libca.3.14.12.dylib" ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
-
-install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
-
-echo
-echo ========== change libqtcontrols.dylib ============
-echo
-
-install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libqtcontrols.dylib
-
-
-echo
-echo ========== change libqtcontrols_controllers_plugin.dylib ============
-echo
-
-install_name_tool -change libqtcontrols.dylib @executable_path/../Frameworks/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_controllers_plugin.dylib  
-install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_controllers_plugin.dylib 
-
-
-echo
-echo ========== change libqtcontrols_graphics_plugin.dylib ============
-echo
-
-install_name_tool -change libqtcontrols.dylib @executable_path/../Frameworks/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_graphics_plugin.dylib
-install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_graphics_plugin.dylib
-
-echo
-echo ========== change libqtcontrols_monitors_plugin.dylib ============
-echo
-
-install_name_tool -change libqtcontrols.dylib @executable_path/../Frameworks/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_monitors_plugin.dylib
-install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_monitors_plugin.dylib
-
-echo
-echo ========== change QtOpenGL.framework ============
-echo
-
-install_name_tool -id  @executable_path/../Frameworks/QtOpenGL.framework/Versions/5/QtOpenGL ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/Versions/5/QtOpenGL
-install_name_tool -change $QTHOME/lib/QtWidgets.framework/Versions/5/QtWidgets @executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/Versions/5/QtOpenGL
-install_name_tool -change $QTHOME/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/Versions/5/QtOpenGL
-install_name_tool -change $QTHOME/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework/Versions/5/QtOpenGL
-
-echo
-echo ========== change qwt.framework ============
-echo
-
-install_name_tool -change $QTHOME/lib/QtOpenGL.framework/Versions/5/QtOpenGL @executable_path/../Frameworks/QtOpenGL.framework/Versions/5/QtOpenGL ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
-install_name_tool -change $QTHOME/lib/QtWidgets.framework/Versions/5/QtWidgets @executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
-install_name_tool -change $QTHOME/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
-install_name_tool -change $QTHOME/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
-install_name_tool -change $QTHOME/lib/QtPrintSupport.framework/Versions/5/QtPrintSupport @executable_path/../Frameworks/QtPrintSupport.framework/Versions/5/QtPrintSupport ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
-install_name_tool -change $QTHOME/lib/QtConcurrent.framework/Versions/5/QtConcurrent  @executable_path/../Frameworks/QtConcurrent.framework/Versions/5/QtConcurrent ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
-install_name_tool -change $QTHOME/lib/QtSvg.framework/Versions/5/QtSvg @executable_path/../Frameworks/QtSvg.framework/Versions/5/QtSvg ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework/Versions/6/qwt
+echo ++++++++++ caQtDM ++++++++
 
 
 echo
@@ -161,43 +90,25 @@ echo ========== add designer.app ============
 echo
 
 cp -R ${QTHOME}/bin/Designer.app ./caQtDM_Binaries/
+chmod -R 777 ./caQtDM_Binaries/Designer.app
 mkdir ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
 mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns/
 mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns/platforms/
 
 
-cp ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libqtcontrols.dylib ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
-cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
-cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtSvg.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
-cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtOpenGl.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
-cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/QtConcurrent.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
-
+cp    ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libqtcontrols.dylib ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
+cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/* ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
 cp -R $QTHOME/lib/QtDesignerComponents.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
-cp -R $QTHOME/lib/QtDesigner.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
-cp -R $QTHOME/lib/QtWidgets.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
-cp -R $QTHOME/lib/QtGui.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
-cp -R $QTHOME/lib/QtCore.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
-cp -R $QTHOME/lib/QtXml.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
-cp -R $QTHOME/lib/QtPrintSupport.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
-cp -R $QTHOME/lib/QtNetwork.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
-cp -R $QTHOME/lib/QtDBus.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
-cp -R $QTHOME/lib/QtDeclarative.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
-cp -R $QTHOME/lib/QtQuickWidgets.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
+
 
 cp ./caQtDM_Binaries/caQtDM.app/Contents/Resources/qt.conf ./caQtDM_Binaries/Designer.app/Contents/Resources/
 cp $QTHOME/plugins/platforms/libqcocoa.dylib ./caQtDM_Binaries/Designer.app/Contents/PlugIns/platforms
+
 install_name_tool -rpath @loader_path/../../../../lib @loader_path/../Frameworks ./caQtDM_Binaries/Designer.app/Contents/MacOS/Designer 
 
 mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns
 mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer
-cp ./caQtDM_Binaries/designer/*.dylib ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer/
-macdeployqt ./caQtDM_Binaries/Designer.app
-install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer/libqtcontrols_controllers_plugin.dylib 
-install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer/libqtcontrols_graphics_plugin.dylib
-install_name_tool -change "qwt.framework/Versions/6/qwt" "@executable_path/../Frameworks/qwt.framework/Versions/6/qwt" ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer/libqtcontrols_monitors_plugin.dylib
-
-
-
+cp ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/*.dylib ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer/
 
 echo
 echo ========== add adl2ui.app ============
@@ -217,7 +128,7 @@ echo
 echo ========== modifiy dmg image ============
 echo
 hdiutil create -megabytes 280 -format UDRW ./caQtDM_Binaries/caqtdm.dmg -srcfolder ./caQtDM_Binaries/caQtDM.app
-hdiutil attach -readwrite ./caQtDM_Binaries/caQtDM.dmg
+hdiutil attach -mountpoint /Volumes/caQtDM -readwrite ./caQtDM_Binaries/caQtDM.dmg
 
 ln -s /Applications /Volumes/caQtDM/Applications
 cp -R ./caQtDM_Binaries/Designer.app /Volumes/caQtDM/
