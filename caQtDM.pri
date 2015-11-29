@@ -72,8 +72,8 @@ epics3_plugin {
 
 	win32 {
                 message("epics3_plugin configuration win32")
-  		INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
-
+                INCLUDEPATH += $$(EPICS_BASE)/include/os/win32
+                INCLUDEPATH += $$(EPICS_BASE)/include/compiler/msvc
                 win32-msvc* {
                         CONFIG += Define_Build_epics_controls 
                         CONFIG += Define_Build_caQtDM_Lib Define_Symbols
@@ -226,6 +226,8 @@ caQtDM_Lib {
                 message("caQtDM_Lib configuration : win32")
    		INCLUDEPATH += $$(EPICS_BASE)/include
    		INCLUDEPATH += $$(EPICS_BASE)/include/os/win32
+                INCLUDEPATH += $$(EPICS_BASE)/include/compiler/msvc
+
 
   		win32-msvc* {
         		DEFINES +=_CRT_SECURE_NO_WARNINGS
@@ -388,6 +390,7 @@ caQtDM_Viewer {
 		INCLUDEPATH += $(QWTHOME)/src
 		INCLUDEPATH += $$(EPICS_BASE)/include
 		INCLUDEPATH += $$(EPICS_BASE)/include/os/win32
+                INCLUDEPATH += $$(EPICS_BASE)/include/compiler/msvc
 		INCLUDEPATH += ../caQtDM_Lib/src
 		INCLUDEPATH += ../caQtDM_QtControls/src
 		INCLUDEPATH += $(QWTINCLUDE)
