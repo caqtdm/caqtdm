@@ -119,7 +119,7 @@ public:
     void setPrecision(int prec) {thisPrecision = prec;}
 
     enum FormatType { decimal, exponential, engr_notation, compact, truncated,
-                      hexadecimal, octal, string, sexagesimal, sexagesimal_hms, sexagesimal_dms};
+                      hexadecimal, octal, string, sexagesimal, sexagesimal_hms, sexagesimal_dms, enumeric}; // enumeric = enum as number
 
     enum ScaleMode { None, Height, WidthAndHeight};
     void setTextLine(const QString&);

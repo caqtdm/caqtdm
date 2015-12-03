@@ -3243,13 +3243,18 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
                 if((data.edata.fieldtype == caENUM)  && (list.count() == 0)) {
                     QString str= QString::number((int) data.edata.ivalue);
-                    lineeditWidget->setTextLine(str);
+                    lineeditWidget->setTextLine(str);                              // no string, but number
                 } else if((data.edata.fieldtype == caENUM)  && ((int) data.edata.ivalue < list.count() ) && (list.count() > 0)) {
                     if(list.at((int) data.edata.ivalue).trimmed().size() == 0)  {  // string seems to empty, give value
                         QString str= QString::number((int) data.edata.ivalue);
                         lineeditWidget->setTextLine(str);
-                    } else {
-                        lineeditWidget->setTextLine(list.at((int) data.edata.ivalue));
+                    } else {                                                       // we have a string, we want as string
+                        if(lineeditWidget->getFormatType() != caLineEdit::enumeric) {
+                           lineeditWidget->setTextLine(list.at((int) data.edata.ivalue));
+                        } else {
+                            QString str= QString::number((int) data.edata.ivalue); // we have  astring, we want as number
+                            lineeditWidget->setTextLine(str);
+                        }
                     }
                 } else if((data.edata.fieldtype == caENUM)  && ((int) data.edata.ivalue >= list.count()) && (list.count() > 0)) {
                     QString str= QString::number((int) data.edata.ivalue);
@@ -3871,7 +3876,6 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 cameraWidget->showImage(data.edata.dataSize, (char*) data.edata.dataB);
                 datamutex->unlock();
             }
-            cameraWidget->setAccessW((bool) data.edata.accessW);
         } else {
             cameraWidget->showDisconnected();
             // todo
@@ -6638,14 +6642,11 @@ void CaQtDM_Lib::Callback_WriteDetectedValues(QWidget* child)
 
     if (caCamera *cameraWidget = qobject_cast<caCamera *>(child)) {
         roiType = (ROI_type) cameraWidget->getROIwriteType();
-        if(!cameraWidget->getAccessW()) return;
         widget = (QWidget*) cameraWidget;
         cameraWidget->getROI(P1, P2);
         thisString = cameraWidget->getROIChannelsWrite().split(";");
-
     } else if (caScan2D *scan2dWidget = qobject_cast<caScan2D *>(child)) {
         roiType = (ROI_type) scan2dWidget->getROIwriteType();
-        if(!scan2dWidget->getAccessW()) return;
         widget = (QWidget*) scan2dWidget;
         scan2dWidget->getROI(P1, P2);
         thisString = scan2dWidget->getROIChannelsWrite().split(";");

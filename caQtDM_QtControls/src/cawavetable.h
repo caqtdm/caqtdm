@@ -127,6 +127,7 @@ private:
     void fromIndex(int index, int &row, int &col);
     void setFormat(DataType dataType);
     QString setValue(double value, DataType dataType);
+    void RedefineRowColumns(int xsav, int ysav, int z, int &x, int &y);
 
     bool _AccessW;
 
@@ -152,6 +153,7 @@ private:
 
     int channelPrecision;
     int actualPrecision;
+    int colSaved, rowSaved, sizeSaved;
 };
 
 #endif
