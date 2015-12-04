@@ -101,12 +101,14 @@ void caWaveTable::RedefineRowColumns(int xsav, int ysav, int z, int &x, int &y)
 
 void caWaveTable::setNumberOfRows(int nbRows)
 {
-    rowSaved = rowcount = nbRows;
+    if(nbRows < 0) rowSaved = rowcount = 0;
+    else rowSaved = rowcount = nbRows;
     setupItems(rowcount, colcount);
 }
 
 void caWaveTable::setNumberOfColumns(int nbCols) {
-    colSaved = colcount = nbCols;
+    if(nbCols < 0) colSaved = colcount = 0;
+    else colSaved = colcount = nbCols;
     setupItems(rowcount, colcount);
 }
 
