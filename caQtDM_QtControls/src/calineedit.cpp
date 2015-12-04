@@ -369,6 +369,7 @@ void caLineEdit::setFormat(int prec)
         sprintf(thisFormat, "%s.%dle", "%", qAbs(precision));
         break;
     case truncated:
+    case enumeric:
         strcpy(thisFormat, "%d");
         break;
     case hexadecimal:
