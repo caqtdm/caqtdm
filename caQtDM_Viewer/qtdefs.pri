@@ -64,6 +64,9 @@ CONFIG += PYTHONCALC
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 
 # 4.0.2
+# cawavetable can now adapt its rows and columns automatically when zero is specified.
+# an enum can be display in calineedit as number when enumeric is specified as format (otherwise as string in all cases)
+# a multistring widget has been added to display waveforms with chars and strings (in case of chars a \n will make a new line)
 # initialisation of the first stripplot values with nan instead of zero. Value zero was confusing.
 # added the possibility to clear the messages through the file menu
 # in case of -attach with a huge macro, the shared memory was designed too small. now 2 kBytes can be transferred
