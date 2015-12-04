@@ -194,7 +194,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     // adjust height
     height = urlComboBox->minimumSizeHint().height();
 #ifdef MOBILE_ANDROID
-    urlComboBox->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR*1.2);
+    urlComboBox->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR*1.2));
 #else
     urlComboBox->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR));
 #endif
