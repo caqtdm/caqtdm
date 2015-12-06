@@ -10,6 +10,7 @@
 #include <caled.h>
 #include <ewidget.h>
 #include <calineedit.h>
+#include <camultilinestring.h>
 #include <caslider.h>
 #include <cathermo.h>
 #include <cagraphics.h>

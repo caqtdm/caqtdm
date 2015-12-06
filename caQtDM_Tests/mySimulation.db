@@ -63,6 +63,14 @@ record(calc, "ACM:TEST:AO:NOISE"){
 	field(EGU,  "Units")
 	field(PREC, "1")
         field(SCAN,".1 second")
+        field(HIHI,"900.0")
+	field(LOLO,"0.0")
+	field(HIGH,"450.0")
+	field(LOW,"0.0")
+	field(HHSV,"MAJOR")
+	field(LLSV,"NO_ALARM")
+	field(HSV,"MINOR")
+	field(LSV,"NO_ALARM")
 }
 
 record(bo,"ACM:TEST:BO") {
@@ -258,6 +266,7 @@ record(waveform, "ACM:TEST:WAVE"){
         field(NELM, "128")
 }
 
+
 record(waveform,"BUSY") {
         field(DESC, "busy")
         field(FTVL, "CHAR")
@@ -344,6 +353,130 @@ record(calc, "QUAD:IST:3"){
 }
 
 
+
+
+
+record(ao, "QUAD1:SOL:1"){
+	field(DESC, "Sollwert")
+	field(EGU,  "Units")
+	field(HOPR, "65535")
+	field(LOPR, "-65535")
+	field(DRVH, "65535")
+	field(DRVL, "-65535")
+	field(IVOA, "Don't drive outputs")
+	field(PREC, "0")
+}
+
+record(mbbi,"QUAD1:STA:2") {
+        field(INP, "QUAD1:COM:2 MS CP")
+        field(ZRVL, "0")
+        field(ONVL, "1")
+        field(TWVL, "2")
+        field(ZRST, "OFF")
+        field(ONST, "ON")
+        field(TWST, "RESET")
+}
+
+record(mbbo,"QUAD1:COM:2") {
+        field(ZRVL, "0")
+        field(ONVL, "1")
+        field(TWVL, "2")
+        field(ZRST, "OFF")
+        field(ONST, "ON")
+        field(TWST, "RESET")
+        field(IVOA, "Don't drive outputs")
+        field(OUT, "QUAD1:STA:2")
+}
+
+record(calc, "QUAD1:SOLRB:1"){
+	field(INPA, "QUAD1:SOL:1 MS CP")
+	field(CALC, "A")
+	field(EGU,  "Units")
+	field(PREC, "0")
+}
+
+record(calc, "QUAD1:IST:1"){
+	field(INPA, "QUAD1:SOL:1 MS CP")
+	field(CALC, "A")
+	field(EGU,  "Units")
+	field(PREC, "0")
+}
+
+record(calc, "QUAD1:IST:2"){
+	field(INPA, "QUAD1:SOL:1 MS CP")
+	field(CALC, "A")
+	field(EGU,  "A")
+	field(PREC, "3")
+}
+
+record(calc, "QUAD1:IST:3"){
+	field(INPA, "QUAD1:SOL:1 MS CP")
+	field(CALC, "A")
+	field(EGU,  "kG")
+	field(PREC, "3")
+}
+
+
+record(ao, "QUAD2:SOL:1"){
+	field(DESC, "Sollwert")
+	field(EGU,  "Units")
+	field(HOPR, "65535")
+	field(LOPR, "-65535")
+	field(DRVH, "65535")
+	field(DRVL, "-65535")
+	field(IVOA, "Don't drive outputs")
+	field(PREC, "0")
+}
+
+record(mbbi,"QUAD2:STA:2") {
+        field(INP, "QUAD2:COM:2 MS CP")
+        field(ZRVL, "0")
+        field(ONVL, "1")
+        field(TWVL, "2")
+        field(ZRST, "OFF")
+        field(ONST, "ON")
+        field(TWST, "RESET")
+}
+
+record(mbbo,"QUAD2:COM:2") {
+        field(ZRVL, "0")
+        field(ONVL, "1")
+        field(TWVL, "2")
+        field(ZRST, "OFF")
+        field(ONST, "ON")
+        field(TWST, "RESET")
+        field(IVOA, "Don't drive outputs")
+        field(OUT, "QUAD2:STA:2")
+}
+
+record(calc, "QUAD2:SOLRB:1"){
+	field(INPA, "QUAD2:SOL:1 MS CP")
+	field(CALC, "A")
+	field(EGU,  "Units")
+	field(PREC, "0")
+}
+
+record(calc, "QUAD2:IST:1"){
+	field(INPA, "QUAD2:SOL:1 MS CP")
+	field(CALC, "A")
+	field(EGU,  "Units")
+	field(PREC, "0")
+}
+
+record(calc, "QUAD2:IST:2"){
+	field(INPA, "QUAD2:SOL:1 MS CP")
+	field(CALC, "A")
+	field(EGU,  "A")
+	field(PREC, "3")
+}
+
+record(calc, "QUAD2:IST:3"){
+	field(INPA, "QUAD2:SOL:1 MS CP")
+	field(CALC, "A")
+	field(EGU,  "kG")
+	field(PREC, "3")
+}
+
 record(waveform, "ACM:TEST:DOUBLE_WAVE"){
         field(FTVL, "DOUBLE")
         field(NELM, "100")
@@ -362,6 +495,12 @@ record(waveform, "ACM:TEST:CHAR_WAVE"){
         field(NELM, "100")
 	field(HOPR,"1200")
 	field(LOPR,"-200")
+}
+
+record(waveform, "ACM:TEST:STRING_WAVE"){
+        field(DESC, "string waveform")
+        field(FTVL, "STRING")
+        field(NELM, "100")
 }
 
 record(waveform,"ACM:TEST:SHORT_WAVE") {

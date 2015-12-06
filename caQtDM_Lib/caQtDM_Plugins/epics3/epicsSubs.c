@@ -263,11 +263,9 @@ static void dataCallback(struct event_handler_args args)
             strcpy(ptr, myLimitedString(val_ptr[0]));
             for (i = 1; i < args.count; i++) {
                 len = len+ (int) strlen(myLimitedString(val_ptr[i-1]));
-                //strcat(&ptr[len++], ";");
                 strcat(&ptr[len++], "\033");
                 strcat(&ptr[len], myLimitedString(val_ptr[i]));
             }
-            //kData.edata.actTime = now;
 
             AssignEpicsValue((double) 0, (long) stsF->value, args.count);
 

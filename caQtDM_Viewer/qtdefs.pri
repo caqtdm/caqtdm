@@ -1,9 +1,17 @@
-CAQTDM_VERSION = V4.0.1
+CAQTDM_VERSION = V4.0.2
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+
+# enable opengl in stripplot and cartesianplot (edo not use, experimental only, for Qt5 and qwt6.1)
+
+contains(QT_VER_MAJ, 5) {
+#     message(opengl requested)
+#     DEFINES += QWT_USE_OPENGL
+}
+
 
 unix {
     QMAKE_CXXFLAGS += "-g"
@@ -16,8 +24,11 @@ unix {
 #DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
 contains(QT_VER_MAJ, 5) {
   greaterThan(QT_MINOR_VERSION, 5) {
-    DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
+    DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS 
   }
+}
+contains(DEFINES, DESIGNER_TOOLTIP_DESCRIPTIONS ) {
+  message("Building with tooltip descriptions; if not supported by designer, turn it off in qtdefs.pri")
 }
 
 # enable specialized version, wehere files will be downloaded to a local directory (used specially for IOS and Android)
@@ -49,9 +60,30 @@ CONFIG += XDR_HACK
 # include definitions and libraries are defined in caQtDM_Lib.pri for linux and macos
 CONFIG += PYTHONCALC
 
-
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
+
+# 4.0.2
+# cawavetable can now adapt its rows and columns automatically when zero is specified.
+# an enum can be display in calineedit as number when enumeric is specified as format (otherwise as string in all cases)
+# a multistring widget has been added to display waveforms with chars and strings (in case of chars a \n will make a new line)
+# initialisation of the first stripplot values with nan instead of zero. Value zero was confusing.
+# added the possibility to clear the messages through the file menu
+# in case of -attach with a huge macro, the shared memory was designed too small. now 2 kBytes can be transferred
+# camultilinestring has been implemented in order to mainly display char waveforms where carriage returns (ascii code 13) will produce a new line
+# cameter was not updating its label for Qt5; this has been corrected
+# some possible buffer overrun conditions corrected
+# one can choose now the number of divisions for x on castripplot
+# tooltip for properties are now present in psi patched version of Qt4.8.2 and for Qt5.6.0 and higher
+# tooltip for caQtDM objects will integrate the tooltip given by the designer
+# signal emit of cacalc has now also its integer and double value (this way you can for example switch the tabwidget pages with a cacalc that is updated by a soft/real channel)
+# pep emulation has been updated by cosylab
+# some slots have been added in order to link signals and slots in designer
+# QStackedWidget will also optimize its io for visible/hidden tabs
+# color handling for calineedit has been slightly changed in order to be able to get white on red in case of a major alarm (wanted for pep handling)
+# cartesianplots have now a group property in order to be able to align the horizontal scale (vertical label rectangle gets same width)
+# when a pep file and an ui file were displayed by caQtDM, some resize problems and a problem with capolyline was detected; is now solved
+# cainclude can handle now multiple instances of the same file in column, row or rowcolumn mode and use for each instance another macro
 
 # 4.0
 # caQtDM has now a controlsystem plugin structure. CS can be added by writing a plugin (see demo plugin) that will automatically be loaded. By specifying the plugin in front
@@ -65,6 +97,7 @@ DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 # cacamera and cascan2d got display of selected values and readback values with different representations and may therefore write values to the CS
 # soft variable bug corrected (was not always found when writing)
 # catextentry got input dialogs (filedialog in case of strings, otherwise simple dialog)
+# catextentry will keep its cursor position after pressing return to set the value
 # activ widgets were always brought in front. Now you can choose if you let the designer define the layer
 # QTextBrowser can be used with macro substitution. The file that will be read in, will be watched for changes and will automatically be reloaded
 # a vertical label has been implemented

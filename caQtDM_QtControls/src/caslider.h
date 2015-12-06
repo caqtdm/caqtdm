@@ -98,7 +98,6 @@ public:
     void setMinValue(double const &minim);
 
     double getSliderValue()  const {return thisValue;}
-    void setSliderValue(double const &value);
 
     double getIncrementValue()  const {return thisIncrement;}
     void setIncrementValue(double const &value);
@@ -111,6 +110,9 @@ public:
     void setNormalColors();
     bool timerActive();
     void stopUpdating();
+
+public slots:
+    void setSliderValue(double const &value);
 
 private slots:
     void repeater();

@@ -41,6 +41,7 @@ caClock::caClock(QWidget *parent) : QwtAnalogClock(parent)
     setReadOnly(true);
     setFocusPolicy(Qt::NoFocus);
 
+    thisUpdateRate = Normal;
     thisBaseColor = QColor( Qt::gray);
     thisScaleColor = thisBaseColor.darker( 200 ).lighter( 800 );
     setScaleDefaultColor(true);
@@ -67,10 +68,9 @@ caClock::caClock(QWidget *parent) : QwtAnalogClock(parent)
         setHand((QwtAnalogClock::Hand)i, hand);
     }
 
-    //setTime();
     // update the clock every second
     timer = new QTimer(this);
-    timer->connect(timer, SIGNAL(timeout()), this, SLOT(setCurrentTime()));
+    timer->connect(timer, SIGNAL(timeout()), this, SLOT(myCurrentTime()));
     connect(this, SIGNAL(updateTime(QTime)), this, SLOT(setClockTime(QTime)));
 
     setTimeType (InternalTime);

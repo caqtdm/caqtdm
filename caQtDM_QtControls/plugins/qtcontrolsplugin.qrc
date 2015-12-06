@@ -1,5 +1,5 @@
-<!DOCTYPE RCC><RCC version="1.0">
-    <qresource>
+<RCC>
+    <qresource prefix="/">
         <file>pixmaps/eled.png</file>
         <file>pixmaps/elineargauge.png</file>
         <file>pixmaps/ecirculargauge.png</file>
@@ -36,5 +36,6 @@
         <file>pixmaps/clock.png</file>
         <file>pixmaps/meter.png</file>
         <file>pixmaps/scan2d.png</file>
+        <file>pixmaps/multilinemonitor.png</file>
     </qresource>
 </RCC>

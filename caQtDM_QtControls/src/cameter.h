@@ -96,7 +96,7 @@ public:
     void setValueUnits(double value, const QString& units);
 
     enum FormatType { decimal, exponential, engr_notation, compact, truncated};
-    void setFormatType(FormatType m) { thisFormatType = m; }
+    void setFormatType(FormatType m) { thisFormatType = m;  setFormat(thisPrecision); invalidate();}
     FormatType getFormatType() { return thisFormatType; }
 
     void setMinValue(double v);
@@ -105,7 +105,7 @@ public:
     void setMaxValue(double v);
     double getMaxValue(){ return thisMaxValue; }
 
-    void setScaleEnabled(bool b) {thisScaleEnabled = b;}
+    void setScaleEnabled(bool b) {thisScaleEnabled = b; invalidate();}
     bool isScaleEnabled(){ return thisScaleEnabled; }
 
     SourceMode getLimitsMode() const { return thisLimitsMode; }
@@ -121,6 +121,7 @@ public:
     void setNormalColors();
 
     QString setLabel(double value, const QString& units);
+    QString setScaleLabel(double value);
     void updateMeter();
 
     colMode getColorMode() const { return thisColorMode; }

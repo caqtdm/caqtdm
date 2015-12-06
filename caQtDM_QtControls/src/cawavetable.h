@@ -58,7 +58,7 @@ class QTCON_EXPORT caWaveTable : public QTableWidget
     Q_ENUMS(SourceMode)
 
     Q_PROPERTY(FormatType formatType READ getFormatType WRITE setFormatType)
-     Q_ENUMS(FormatType)
+    Q_ENUMS(FormatType)
 
 public:
 
@@ -94,6 +94,7 @@ public:
     void setData(int16_t *vector, short status, int size);
     void setData(int32_t* vector, short status, int size);
     void setData(char* vector, short status, int size);
+    void setStringList(QStringList, short status, int size);
 
     bool getAccessW() const {return _AccessW;}
     void setAccessW(bool access);
@@ -126,6 +127,7 @@ private:
     void fromIndex(int index, int &row, int &col);
     void setFormat(DataType dataType);
     QString setValue(double value, DataType dataType);
+    void RedefineRowColumns(int xsav, int ysav, int z, int &x, int &y);
 
     bool _AccessW;
 
@@ -147,11 +149,11 @@ private:
     int rowcount;
     bool dataPresent;
 
-    //QColor defaultBackColor;
     QColor defaultForeColor;
 
     int channelPrecision;
     int actualPrecision;
+    int colSaved, rowSaved, sizeSaved;
 };
 
 #endif

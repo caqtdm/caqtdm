@@ -9,7 +9,7 @@ contains(QT_VER_MAJ, 4) {
 }
 
 contains(QT_VER_MAJ, 5) {
-    QT     += widgets printsupport uitools
+    QT     += widgets printsupport uitools opengl
     CONFIG += qt plugin thread
     DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 }

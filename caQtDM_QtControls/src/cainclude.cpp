@@ -23,28 +23,55 @@
  *    anton.mezger@psi.ch
  */
 
-#include <QDebug>
 #include <QPaintEvent>
 #include <QPainter>
 #include <QApplication>
+#include <math.h>
 #include "cainclude.h"
 #include "searchfile.h"
 #include "fileFunctions.h"
 
 caInclude::caInclude(QWidget *parent) : QWidget(parent)
 {
-    thisLoadedWidget = (QWidget*) 0;
+    thisLoadedWidgets.clear();
     thisParent = parent;
     newFileName="";
     thisLineSize = 1;
+    thisItemCount = 1;
+    thisMaxLines = 1;
+    thisStacking = Row;
     setBackground(Qt::black);
     setVisibility(StaticV);
-    layout = new QVBoxLayout;
-    layout->setMargin(0);
+    gridLayout = new QGridLayout;
+    gridLayout->setMargin(0);
+    gridLayout->setSpacing(0);
+
+    setPropertyVisible(maximumLines, false);
 
     // when called from designer, we would like to see the included widgets
     loadIncludes = false;
     QVariant source = qApp->property("APP_SOURCE").value<QVariant>();
+
+    // in the designer application through the command line we could have set this property to true or false
+    // in order to do that add following code to qdesigner.cpp
+/*
+    if (argument ==  QLatin1String("-includesOutlined")) {
+        if (++it == acend) {
+            qWarning("** WARNING The option -includesOutlined requires a value true or false");
+            return false;
+        } else {
+            QString boolValue = QString::fromLatin1(it->toLocal8Bit());
+            if(boolValue.toLower() == "true")
+               qApp->setProperty("includesOutlined", QVariant(QString("TRUE")));
+            else
+               qApp->setProperty("includesOutlined", QVariant(QString("FALSE")));
+        }
+        break;
+    }
+*/
+
+
+    QVariant includesOutlined = qApp->property("includesOutlined").value<QVariant>();
 
     // next code will only be executed when in designer
     // in other apps we load everything there while taking care of the macros
@@ -52,7 +79,8 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
         if(!source.isNull()) {
             QString test = source.toString();
             if(test.contains("DESIGNER")) {
-                loadIncludes = true;
+                if(includesOutlined.toString() == "TRUE") loadIncludes = false;
+                else loadIncludes = true;
             }
         }
     }
@@ -60,7 +88,17 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
 
 caInclude::~ caInclude()
 {
-   delete layout;
+    delete gridLayout;
+}
+
+bool caInclude::isPropertyVisible(Properties property)
+{
+    return designerVisible[property];
+}
+
+void caInclude::setPropertyVisible(Properties property, bool visible)
+{
+    designerVisible[property] = visible;
 }
 
 void caInclude::setBackground(QColor c)
@@ -69,38 +107,100 @@ void caInclude::setBackground(QColor c)
     update();
 }
 
-void caInclude::removeIncludedWidget()
+void caInclude::removeIncludedWidgets()
 {
-    if(thisLoadedWidget != (QWidget*) 0) {
-        printf("and destroy the loaded widget\n");
-        layout->removeWidget(thisLoadedWidget);
-        delete thisLoadedWidget;
-        thisLoadedWidget = (QWidget*) 0;
-        prvFileName = "";
+    if(thisLoadedWidgets.count() > 0) {
+        foreach(QWidget *l, thisLoadedWidgets) {
+            gridLayout->removeWidget(l);
+            l->hide();
+            l->deleteLater();
+        }
+        thisLoadedWidgets.clear();
+    }
+    prvFileName = "";
+}
+
+void caInclude::setStacking(Stacking stacking) {
+    thisStacking = stacking;
+    setFileName(newFileName);
+    prvStacking = thisStacking;
+    if(thisStacking == RowColumn) {
+        setPropertyVisible(maximumLines, true);
+    } else {
+        setPropertyVisible(maximumLines, false);
     }
 }
 
 void caInclude::setFileName(QString const &filename)
 {
     QUiLoader loader;
-
+    QString fileName;
+    QStringList openFile;
     fileFunctions filefunction;
+
+    int nbLines = thisMaxLines;
+    int column = 0;
+    int row = 0;
 
     newFileName = filename.trimmed();
 
     // load widgets from includes
     if(loadIncludes) {
+
+        //printf("cainclude -- setfilename %s for %s\n", qasc(filename), qasc(this->objectName()));
+
         if(newFileName.size() < 1) {
-            removeIncludedWidget();
+            removeIncludedWidgets();
             return;
         }
 
         if(!newFileName.contains(".")) {
-            removeIncludedWidget();
+            removeIncludedWidgets();
             return;
         }
 
-        if(!prvFileName.isNull() && !newFileName.isNull()) {
+        // modify stacking
+        if(thisStacking != prvStacking || thisMaxLines != prvMaxLines) {
+            if(thisLoadedWidgets.count() > 0) {
+                //printf("modify stacking with %d items\n", thisLoadedWidgets.count());
+                int j = 0;
+                foreach(QWidget *l, thisLoadedWidgets) {
+                    l->hide();
+                    layout()->removeWidget(l);
+                }
+                delete layout();
+                gridLayout = new QGridLayout;
+                setLayout(gridLayout);
+                gridLayout->setMargin(0);
+                gridLayout->setSpacing(0);
+                foreach(QWidget *l, thisLoadedWidgets) {
+                    // find the row, column to add this widget
+                    if(thisStacking == Row) {
+                        gridLayout->addWidget(l, j, 0);
+                    } else if(thisStacking == Column) {
+                        gridLayout->addWidget(l, 0, j);
+                    } else {
+                        if(row >= nbLines) {
+                            row=0;
+                            column++;
+                        }
+                        gridLayout->addWidget(l, row, column);
+                        row++;
+                    }
+                    j++;
+                    l->show();
+                }
+                prvStacking = thisStacking;
+                prvMaxLines = thisMaxLines;
+                return;
+            }
+        }
+
+        if(thisItemCount != prvItemCount) {
+            //printf("count modified\n");
+
+        } else if(!prvFileName.isNull() && !newFileName.isNull()) {
+            //printf("filename did not change->return\n");
             int indx1 = prvFileName.indexOf(".");
             int indx2 = newFileName.indexOf(".");
             if(indx1 != -1 && indx2 != -1) {
@@ -110,44 +210,14 @@ void caInclude::setFileName(QString const &filename)
             }
         }
 
-#ifdef PRC
+        setLayout(gridLayout);
+
         if(newFileName.contains(".prc")) {
-            // we have a pep file to scan
-            //printf("we have to scan pep file %s\n", newFileName.toLatin1().constData());
-
-            // this will check for file existence and when an url is defined, download the file from a http server
-            filefunction.checkFileAndDownload(newFileName);
-
-            searchFile *s = new searchFile(newFileName);
-            QString fileNameFound = s->findFile();
-
-            // file was not found, remove previous widget if any
-            if(fileNameFound.isNull()) {
-                //printf("file not found\n");
-                removeIncludedWidget();
-                return;
-            } else {
-                //printf("file %s has been found\n", fileNameFound.toLatin1().constData());
-            }
-            delete s;
-
-            // file was found, remove previous widget if any
-            removeIncludedWidget();
-
-            // load new file
-
-            ParsePepFile *parsefile = new ParsePepFile(fileNameFound);
-            thisLoadedWidget = parsefile->load(thisParent);
-            if(thisLoadedWidget == (QWidget*) 0) return;
-            layout->addWidget(thisLoadedWidget);
-            setLayout(layout);
-            thisLoadedWidget->show();
-            return;
+            fileName = newFileName;
+        } else {
+            openFile = newFileName.split(".", QString::SkipEmptyParts);
+            fileName = openFile[0].append(".ui");
         }
-#endif
-
-        QStringList openFile = newFileName.split(".", QString::SkipEmptyParts);
-        QString fileName = openFile[0].append(".ui");
 
         // this will check for file existence and when an url is defined, download the file from a http server
         filefunction.checkFileAndDownload(fileName);
@@ -156,28 +226,64 @@ void caInclude::setFileName(QString const &filename)
 
         // file was not found, remove previous widget if any
         if(fileNameFound.isNull()) {
-            //printf("file not found\n");
-            removeIncludedWidget();
+            removeIncludedWidgets();
+            delete s;
             return;
-        } else {
-            //printf("file %s has been found\n", fileNameFound.toLatin1().constData());
         }
         delete s;
 
         // file was found, remove previous widget if any
-        removeIncludedWidget();
+        removeIncludedWidgets();
 
-        // load new file
-        QFile *file = new QFile;
-        file->setFileName(fileNameFound);
-        file->open(QFile::ReadOnly);
-        thisLoadedWidget = loader.load(file, thisParent);
-        delete file;
-        if(thisLoadedWidget == (QWidget*) 0) return;
-        layout->addWidget(thisLoadedWidget);
-        setLayout(layout);
-        thisLoadedWidget->show();
+        // load file
+        for(int j=0; j<thisItemCount; j++) {
+            QWidget * loadedWidget = (QWidget *) 0;
+            if(!fileName.contains(".prc")) {
+                // load new file
+                QFile *file = new QFile;
+                file->setFileName(fileNameFound);
+                file->open(QFile::ReadOnly);
+
+                printf("effective load of file %s for widget %s\n", qasc(fileNameFound), qasc(this->objectName()));
+                QWidget *tmp = loader.load(file, thisParent);
+
+                file->close();
+                delete file;
+                if(tmp == (QWidget*) 0) return;
+                thisLoadedWidgets.append(tmp);
+                loadedWidget = tmp;
+                // pep file
+            } else {
+                ParsePepFile *parsefile = new ParsePepFile(fileNameFound);
+                printf("effective load of file %s for widget %s\n", qasc(fileNameFound), qasc(this->objectName()));
+                QWidget *tmp= parsefile->load(thisParent);
+                if(tmp == (QWidget*) 0) return;
+                thisLoadedWidgets.append(tmp);
+                loadedWidget = tmp;
+            }
+
+            // find the row, column to add this widget
+            if(thisStacking == Row) {
+                gridLayout->addWidget(loadedWidget, j, 0);
+            } else if(thisStacking == Column) {
+                gridLayout->addWidget(loadedWidget, 0, j);
+            } else {
+                if(row >= nbLines) {
+                    row=0;
+                    column++;
+                }
+                gridLayout->addWidget(loadedWidget, row, column);
+                row++;
+            }
+
+            // show it
+            loadedWidget->show();
+        }
+
         prvFileName = newFileName;
+        prvStacking = thisStacking;
+        prvItemCount = thisItemCount;
+        prvMaxLines = thisMaxLines;
     }
 }
 

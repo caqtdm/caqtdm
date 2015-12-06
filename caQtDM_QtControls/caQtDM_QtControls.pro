@@ -9,7 +9,7 @@ contains(QT_VER_MAJ, 4) {
       CONFIG += designer
 }
 contains(QT_VER_MAJ, 5) {
-      QT += widgets concurrent uitools
+      QT += widgets concurrent uitools opengl
       CONFIG  += qwt plugin
       DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
       ios | android {
@@ -108,7 +108,8 @@ SOURCES	+= \
     src/mda_loader.c \
     src/messageQueue.cpp \
     src/cabytecontroller.cpp \
-    src/calabelvertical.cpp
+    src/calabelvertical.cpp \
+    src/camultilinestring.cpp
 
 XDR_HACK {
     SOURCES += src/xdr_hack.c
@@ -205,7 +206,10 @@ HEADERS	+= \
     src/mdaReader.h \
     src/mda-load.h \
     src/messageQueue.h \
-    src/cabytecontroller.h
+    src/cabytecontroller.h \
+    src/qtdefinitions.h \
+    src/pathdefinitions.h \
+    src/camultilinestring.h
 
 # assume qwt6.0 was made with qt4
 contains(QT_VER_MAJ, 4) {

@@ -41,6 +41,10 @@ MutexKnobData::MutexKnobData()
 {
     KnobDataArraySize=500;
     KnobData = (knobData*) malloc(KnobDataArraySize * sizeof(knobData));
+    if (KnobData==NULL) {
+        printf("caQtDM -- could not allocate memory -> exit\n");
+        exit(1);
+    }
     for(int i=0; i < KnobDataArraySize; i++){
         KnobData[i].index  = -1;
         KnobData[i].thisW = (void*) 0;
@@ -79,6 +83,10 @@ void MutexKnobData::ReAllocate(int oldsize, int newsize, void **ptr)
     void *tmp;
     //printf("reallocate for %d size\n", newsize);
     tmp = (void *) malloc((size_t) newsize);
+    if (tmp==NULL) {
+        printf("caQtDM -- could not allocate any more memory -> exit\n");
+        exit (1);
+    }
     if(oldsize > 0) {
         memcpy(tmp, *ptr, (size_t) oldsize);
         free(*ptr);
@@ -103,7 +111,7 @@ void MutexKnobData::InsertSoftPV(QString pv, int num, QWidget *w)
     int indx;
     char asc[MAXPVLEN+20];
     QMutexLocker locker(&mutex);
-    sprintf(asc, "%s_%p", pv.toLatin1().constData(),  w);
+    sprintf(asc, "%s_%p", qasc(pv),  w);
     if(!getSoftPV(pv, &indx, (QWidget*) w)) {
         softPV_WidgetList.insert(asc, num);
         //qDebug() << "insert softpv_widgetList" << asc;
@@ -151,7 +159,7 @@ void MutexKnobData::RemoveSoftPV(QString pv, QWidget *w, int indx)
     char asc[MAXPVLEN+20];
     QMutexLocker locker(&mutex);
     // remove from the softpv list
-    sprintf(asc, "%s_%p", pv.toLatin1().constData(),  w);
+    sprintf(asc, "%s_%p", qasc(pv),  w);
     softPV_WidgetList.remove(asc);
 
     // and remove from the global list
@@ -179,7 +187,7 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w)
 
     // update the right data
 
-    sprintf(asc, "%s_%p", pv.toLatin1().constData(),  w);
+    sprintf(asc, "%s_%p", qasc(pv),  w);
     QMap<QString, int>::const_iterator name = softPV_WidgetList.find(asc);
     if(name != softPV_WidgetList.end()) {
         knobData *ptr = GetMutexKnobDataPtr(name.value());
@@ -220,7 +228,7 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w)
 bool MutexKnobData::getSoftPV(QString pv, int *indx, QWidget *w)
 {
     char asc[MAXPVLEN+20];
-    sprintf(asc, "%s_%p", pv.toLatin1().constData(),  w);
+    sprintf(asc, "%s_%p", qasc(pv),  w);
     QMap<QString, int>::const_iterator name = softPV_WidgetList.find(asc);
     if(name != softPV_WidgetList.end()) {
         *indx = name.value();
@@ -362,13 +370,15 @@ extern "C" MutexKnobData* C_DataUnlock(MutexKnobData* p, knobData *kData) {
     return p;
 }
 
+
+
 /**
  * update array with the received data
  */
 void MutexKnobData::SetMutexKnobDataReceived(knobData *kData) {
     char units[40];
     char fec[40];
-    char dataString[1024];
+    char dataString[STRING_EXCHANGE_SIZE];
     double diff;
     struct timeb now;
     QMutexLocker locker(&mutex);
@@ -421,9 +431,12 @@ void MutexKnobData::SetMutexKnobDataReceived(knobData *kData) {
         int caFieldType= kData->edata.fieldtype;
 
         if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kData->edata.dataB != (void*) 0) {
-            if(kData->edata.dataSize < 1024) {
+            if(kData->edata.dataSize < STRING_EXCHANGE_SIZE) {
                 memcpy(dataString, (char*) kData->edata.dataB, (size_t) kData->edata.dataSize);
                 dataString[kData->edata.dataSize] = '\0';
+            } else {
+                memcpy(dataString, (char*) kData->edata.dataB, STRING_EXCHANGE_SIZE);
+                dataString[STRING_EXCHANGE_SIZE-1] = '\0';
             }
         }
 
@@ -482,7 +495,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
     double diff=0.2, repRate=5.0;
     char units[40];
     char fec[40];
-    char dataString[1024];
+    char dataString[STRING_EXCHANGE_SIZE];
     struct timeb now;
 
     if(blockProcess) return;
@@ -555,12 +568,12 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 int caFieldType= kPtr->edata.fieldtype;
 
                 if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kPtr->edata.dataB != (void*) 0) {
-                    if(kPtr->edata.dataSize < 1024) {
+                    if(kPtr->edata.dataSize < STRING_EXCHANGE_SIZE) {
                         memcpy(dataString, (char*) kPtr->edata.dataB, (size_t) kPtr->edata.dataSize);
                         dataString[kPtr->edata.dataSize] = '\0';
                     } else {
-                        memcpy(dataString, (char*) kPtr->edata.dataB, 1024);
-                        dataString[1023] = '\0';
+                        memcpy(dataString, (char*) kPtr->edata.dataB, STRING_EXCHANGE_SIZE);
+                        dataString[STRING_EXCHANGE_SIZE-1] = '\0';
                     }
                 }
 

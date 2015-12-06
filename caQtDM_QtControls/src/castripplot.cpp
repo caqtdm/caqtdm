@@ -28,6 +28,7 @@
 #include <windows.h>
 #include <float.h>
 #define isnan _isnan
+#define snprintf _snprintf
 #define QWT_DLL
 #if (_MSC_VER == 1600)
   #define INFINITY (DBL_MAX+DBL_MAX)
@@ -59,13 +60,72 @@ public:
         double normalized = v - day * floor(v/day);
 
         QTime upTime = baseTime.addSecs((int) normalized);
-        //printf("label = addseconds=%d start plottime=%s labeltime=%s\n", seconds, baseTime.toString().toLatin1().constData(),  upTime.toString().toLatin1().constData());
+        //printf("label = addseconds=%d start plottime=%s labeltime=%s\n", seconds, qasc(baseTime.toString()),  qasc(upTime.toString()));
         return upTime.toString();
     }
 
 private:
     QTime baseTime;
 
+};
+
+#ifdef QWT_USE_OPENGL
+class GLCanvas: public QwtPlotGLCanvas
+{
+public:
+    GLCanvas( QwtPlot *parent = NULL ):
+        QwtPlotGLCanvas( parent )
+    {
+        setContentsMargins( 1, 1, 1, 1 );
+    }
+
+protected:
+    virtual void paintEvent( QPaintEvent *event )
+    {
+        QPainter painter( this );
+        painter.setClipRegion( event->region() );
+
+        QwtPlot *plot = qobject_cast< QwtPlot *>( parent() );
+        if ( plot )
+            plot->drawCanvas( &painter );
+
+        painter.setPen( palette().foreground().color() );
+        painter.drawRect( rect().adjusted( 0, 0, -1, -1 ) );
+    }
+
+};
+#endif
+
+class PlotScaleEngine: public QwtLinearScaleEngine
+{
+public:
+
+    PlotScaleEngine(const int &nb): QwtLinearScaleEngine()
+    {
+        nbTicks = nb;
+    }
+
+    virtual QwtScaleDiv divideScale( double x1, double x2, int , int , double) const
+    {
+        QList<double> Ticks[QwtScaleDiv::NTickTypes];
+        const QwtInterval interval = QwtInterval( x1, x2 ).normalized();
+
+        if (interval.width() <= 0 ) return QwtScaleDiv();
+
+        QwtScaleDiv scaleDiv;
+
+        for (int i=0; i<nbTicks+1; i++) {
+            Ticks[QwtScaleDiv::MajorTick] << x1 + ((x2-x1)*i / nbTicks);
+        }
+
+        scaleDiv = QwtScaleDiv(interval, Ticks);
+        if ( x1 > x2 ) scaleDiv.invert();
+
+        return scaleDiv;
+    }
+
+private:
+    int nbTicks;
 };
 
 caStripPlot::~caStripPlot() {
@@ -77,13 +137,15 @@ caStripPlot::~caStripPlot() {
 
 caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
 {
+    // initialisations
     initCurves = true;
     timerID = false;
     thisXaxisType = TimeScale;
     thisYaxisScaling = fixedScale;
-    HISTORY = 60;
+    thisXaxisSyncGroup = 0;
+    thisXticks = 6;
     thisUnits = Second;
-    thisPeriod = 60;
+    HISTORY = thisPeriod = 60;
     NumberOfCurves = MAXCURVES;
     onInit = true;
     timeInterval = 1.0;
@@ -91,6 +153,13 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     setAutoFillBackground(true);
     RestartPlot1 = true;
     RestartPlot2 = false;
+
+#ifdef QWT_USE_OPENGL
+    printf("caStripplot uses opengl ?\n");
+    GLCanvas *canvas = new GLCanvas();
+    canvas->setPalette( QColor( "khaki" ) );
+    setCanvas(canvas);
+#endif
 
     setUsageCPU(Medium);
 
@@ -100,25 +169,19 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
 
     plotLayout()->setAlignCanvasToScales(true);
 
-    // define our axis
-    if(thisXaxisType == TimeScale) {
-        setAxisScale(QwtPlot::xBottom, 0, HISTORY);
-    } else {
-        setAxisScale(QwtPlot::xBottom, -HISTORY, 0);
-    }
-
     setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignLeft | Qt::AlignBottom);
     setAxisScale(QwtPlot::yLeft, 0, 1000);
 
-    if(thisXaxisType == TimeScale) {
+    // we have to add some space to the xaxis
+    if(thisXaxisType != ValueScale) {
         // due to time scale we need some distance
         scaleWidget = axisWidget(QwtPlot::xBottom);
         const int fmh = QFontMetrics(scaleWidget->font()).height();
         scaleWidget->setMinBorderDist(fmh * 2, fmh * 2);
-        // define time axis
-        QTime timeNow= QTime::currentTime();
-        setAxisScaleDraw ( QwtPlot::xBottom, new TimeScaleDraw ( timeNow ) );
     }
+
+    // define xaxis
+    setXaxis(thisUnits,thisPeriod);
 
     // define our curves
     for(int i=0; i< MAXCURVES; i++) {
@@ -194,7 +257,7 @@ void caStripPlot::defineXaxis(units unit, double period)
         printf("\nunknown unit\n");
     }
 
-    // set axis and in case of a time scale define the time axis
+    // set xaxis
     setXaxis(interval, period);
     replot();
 }
@@ -202,15 +265,28 @@ void caStripPlot::defineXaxis(units unit, double period)
 void caStripPlot::setXaxis(double interval, double period)
 {
     // set axis and in case of a time scale define the time axis
-    if(thisXaxisType == TimeScale) {
+    int nbTicks;
+    if(thisXticks < 1) nbTicks = 1; else nbTicks =  thisXticks;
+
+    if(thisXaxisType != ValueScale) {
         QTime timeNow= QTime::currentTime();
         timeNow = timeNow.addSecs((int) -interval);
-        setAxisScale(QwtPlot::xBottom, 0, interval);
+        setAxisScale(QwtPlot::xBottom, 0, interval, interval/nbTicks);
         setAxisScaleDraw ( QwtPlot::xBottom, new TimeScaleDraw (timeNow) );
+
+        if(thisXaxisType == TimeScaleFix) {
+              PlotScaleEngine *scaleEngine = new PlotScaleEngine(nbTicks);
+              setAxisScaleEngine(QwtPlot::xBottom, scaleEngine);
+        } else {
+           QwtLinearScaleEngine *scaleEngine= new QwtLinearScaleEngine();
+           setAxisScaleEngine(QwtPlot::xBottom, scaleEngine);
+        }
+
     } else {
-        setAxisScale(QwtPlot::xBottom, -period, 0);
+        setAxisScale(QwtPlot::xBottom, -period, 0, period/nbTicks);
         setAxisScaleDraw(QwtPlot::xBottom, new QwtScaleDraw());
     }
+
 }
 
 void caStripPlot::setYaxisType(yAxisType s)
@@ -231,6 +307,9 @@ void caStripPlot::setYaxisType(yAxisType s)
 
 void caStripPlot::RescaleCurves(int width, units unit, double period)
 {
+
+    //printf("canvas width=%d\n",width);
+
     HISTORY = width; // equals canvas width
 
     // set the right interval
@@ -358,14 +437,15 @@ void caStripPlot:: UpdateScaling()
 
 QString caStripPlot::legendText(int i)
 {
-    char min[20], max[20];
+#define MAXLEN 21
+    char min[MAXLEN], max[MAXLEN];
     QString MinMax;
     QString titre(savedTitres.at(i));
 
     // in case of fixed scales, concatenate the limits that are used
     if(thisYaxisScaling == fixedScale) {
-        sprintf(min, "%.1f", thisYaxisLimitsMin[i]);
-        sprintf(max, "%.1f", thisYaxisLimitsMax[i]);
+        snprintf(min, MAXLEN - 1, "%.1f", thisYaxisLimitsMin[i]);
+        snprintf(max, MAXLEN - 1, "%.1f", thisYaxisLimitsMax[i]);
         ReplaceTrailingZerosByBlancs(min);
         ReplaceTrailingZerosByBlancs(max);
         MinMax.sprintf("[%s,%s]", min, max);
@@ -425,7 +505,7 @@ void caStripPlot::defineCurves(QStringList titres, units unit, double period, in
 
             realMax[i] = maxVal[i] = -1000000;
             realMin[i] = minVal[i] =  1000000;
-            actVal[i] = realVal[i] = 0;
+            actVal[i] = realVal[i] = NAN;
         }
     }
 
@@ -498,7 +578,7 @@ void caStripPlot::TimeOutThread()
            dataCountLimit, dataCount, HISTORY, interval, elapsedTime,  rangeData[0].size());
 */
     // correct value to fit again inside the interval (only for the fixed scale)
-    if(thisXaxisType != TimeScale) {
+    if(thisXaxisType == ValueScale) {
         if(thisUnits == Millisecond) {
             timeData = timeData * 1000.0;
             interval = INTERVAL * 1000.0;
@@ -525,7 +605,7 @@ void caStripPlot::TimeOutThread()
     if(dataCount > 1) {
 
         // shift data and our timebase for the fixed scale
-        if(thisXaxisType != TimeScale) {
+        if(thisXaxisType == ValueScale) {
             for (c = 0; c < NumberOfCurves; c++ ) {
                 // shift left and cur last
                 rangeData[c].prepend(tmp);
@@ -574,7 +654,7 @@ void caStripPlot::TimeOutThread()
         tmpr.setMinValue( valueMin);
 
         rangeData[c][0] = QwtIntervalSample( timeData, tmpr);
-        if(thisXaxisType != TimeScale) {
+        if(thisXaxisType == ValueScale) {
             base[0] = QwtIntervalSample(timeData, tmpr);
         }
         if(thisStyle[c] == FillUnder) {
@@ -585,7 +665,7 @@ void caStripPlot::TimeOutThread()
     // advance data points
     if (dataCount < 2 && dataCount < dataCountLimit) dataCount++;
     else if(dataCount < dataCountLimit) {
-        if(thisXaxisType != TimeScale) {
+        if(thisXaxisType == ValueScale) {
             if(fillData[0][dataCount-1].x() > -interval) dataCount++;
         } else {
             if(elapsedTime < interval) dataCount++;
@@ -632,9 +712,12 @@ void caStripPlot::TimeOutThread()
 // display the curves
 void caStripPlot::TimeOut()
 {
+    int nbTicks;
     double elapsedTime = 0.0;
 
     if(!timerID) return;
+
+    if(thisXticks < 1) nbTicks = 1; else nbTicks = thisXticks;
 
     //printf("timeout for numberofcurves=%d\n", NumberOfCurves);
 
@@ -644,10 +727,18 @@ void caStripPlot::TimeOut()
     if(RestartPlot2) {
         RestartPlot2 = false;
         ftime(&plotStart);
-        if(thisXaxisType == TimeScale) {
+        if(thisXaxisType != ValueScale) {
             QTime timeNow= QTime::currentTime();
             timeNow = timeNow.addSecs((int) -INTERVAL);
-            setAxisScale(QwtPlot::xBottom, 0, INTERVAL);
+            setAxisScale(QwtPlot::xBottom, 0, INTERVAL, INTERVAL/nbTicks);
+
+            if(thisXaxisType == TimeScaleFix) {
+                  PlotScaleEngine *scaleEngine = new PlotScaleEngine(nbTicks);
+                  setAxisScaleEngine(QwtPlot::xBottom, scaleEngine);
+            } else {
+                QwtLinearScaleEngine *scaleEngine= new QwtLinearScaleEngine();
+                setAxisScaleEngine(QwtPlot::xBottom, scaleEngine);
+            }
             setAxisScaleDraw (QwtPlot::xBottom, new TimeScaleDraw (timeNow));
         }
     }
@@ -660,9 +751,9 @@ void caStripPlot::TimeOut()
             ((double) plotStart.time + (double) plotStart.millitm / (double)1000);
 
     // change scale base in case of running time scale
-    if(thisXaxisType == TimeScale) {
+    if(thisXaxisType != ValueScale) {
         timeData = INTERVAL + elapsedTime;
-        setAxisScale(QwtPlot::xBottom, timeData - INTERVAL, timeData);
+        setAxisScale(QwtPlot::xBottom, timeData - INTERVAL, timeData, INTERVAL/nbTicks);
     }
 
     // set data into the curves
@@ -773,7 +864,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 
 							QwtText text;
 							text.setText(legendText(i++));
-                            //printf("%s %s\n", b->plainText().toLatin1().constData(), legendText(i-1).toLatin1().constData());
+                            //printf("%s %s\n", qasc(b->plainText()), qasc(legendText(i-1)));
 							b->setText(text);
 							b->update();
 
@@ -782,7 +873,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 						break;
 
 					case FONT:
-                        //printf("%s %s\n", b->plainText().toLatin1().constData(), legendText(i-1).toLatin1().constData());
+                        //printf("%s %s\n", qasc(b->plainText()), qasc(legendText(i-1)));
 
 						b->setFont(f);
 						b->update();
@@ -791,7 +882,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 
 					case COLOR:
 
-                        //printf("%s %s\n", b->plainText().toLatin1().constData(), legendText(i-1).toLatin1().constData());
+                        //printf("%s %s\n", qasc(b->plainText()), qasc(legendText(i-1)));
 						QPalette palette = b->palette();
 						palette.setColor(QPalette::WindowText, c); // for ticks
 						palette.setColor(QPalette::Text, c);       // for ticks' labels
@@ -1036,7 +1127,7 @@ bool caStripPlot::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::MouseButtonPress) {
         int nButton = ((QMouseEvent*) event)->button();
         if(nButton==2) {
-            //printf("emit from %s\n", this->objectName().toLatin1().constData());
+            //printf("emit from %s\n", qasc(this->objectName()));
             QPoint p;
             emit ShowContextMenu(p);
         }

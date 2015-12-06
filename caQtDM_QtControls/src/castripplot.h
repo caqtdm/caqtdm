@@ -61,6 +61,11 @@ class QwtPlotCurve;
 
 #include "qwtplotcurvenan.h"
 
+#ifdef QWT_USE_OPENGL
+#include <qevent.h>
+#include <qgl.h>
+#include <qwt_plot_glcanvas.h>
+#endif
 
 class QTCON_EXPORT caStripPlot : public QwtPlot
 {
@@ -89,6 +94,7 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
     Q_PROPERTY(double period READ getPeriod WRITE setPeriod)
     Q_PROPERTY(cpuUsage refreshRate READ getUsageCPU WRITE setUsageCPU)
     Q_PROPERTY(xAxisType XaxisType READ getXaxisType WRITE setXaxisType)
+    Q_PROPERTY( int numberOfXticks READ getXticks WRITE setXticks)
     Q_PROPERTY(yAxisType YAxisType READ getYaxisType WRITE setYaxisType)
     Q_PROPERTY(yAxisScaling YAxisScaling READ getYaxisScaling WRITE setYaxisScaling)
 
@@ -163,6 +169,8 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
     Q_PROPERTY(bool YaxisEnabled READ getYaxisEnabled WRITE setYaxisEnabled)
     Q_PROPERTY(bool LegendEnabled READ getLegendEnabled WRITE setLegendEnabled)
 
+    Q_PROPERTY(int XaxisSyncGroup READ getXaxisSyncGroup WRITE setXaxisSyncGroup)
+
 public:
 
     enum {MAXCURVES = 7};
@@ -172,12 +180,18 @@ public:
     enum axisScaling {Channel, User};
     enum  curvStyle {Lines = 1, FillUnder = 5};
     enum units { Millisecond = 0, Second, Minute};
-    enum xAxisType {TimeScale, ValueScale};
+    enum xAxisType {ValueScale, TimeScale, TimeScaleFix};
     enum yAxisType {linear=0, log10};
     enum yAxisScaling {fixedScale=0, autoScale};
 
 
     enum LegendAtttribute { COLOR, FONT, TEXT};
+
+    void setXaxisSyncGroup( int group ) {thisXaxisSyncGroup = group;}
+    int getXaxisSyncGroup() {return thisXaxisSyncGroup;}
+
+    void setXticks( int nb ) {thisXticks = nb; defineXaxis(thisUnits, thisPeriod);}
+    int getXticks() {return thisXticks;}
 
     caStripPlot(QWidget * = 0);
     ~caStripPlot();
@@ -500,5 +514,8 @@ private:
     QMutex mutex;
 
     bool initCurves;
+
+    int thisXaxisSyncGroup;
+    int thisXticks;
 };
 #endif

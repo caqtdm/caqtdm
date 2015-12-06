@@ -36,7 +36,6 @@
 #include "alarmdefs.h"
 
 caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
-
 {
     thisFormatC[0] = '\0';
     thisFormat[0] = '\0';
@@ -46,7 +45,8 @@ caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
     setPrecision(0);
     setActualPrecision(0);
 
-    colcount = rowcount = 1;
+    colSaved = rowSaved = colcount = rowcount = 1;
+    sizeSaved = -1;
     dataPresent = false;
     thisItemFont = this->font();
 
@@ -81,31 +81,52 @@ caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
     installEventFilter(this);
 }
 
+void caWaveTable::RedefineRowColumns(int xsav, int ysav, int z, int &x, int &y)
+{
+    /* expand to 1 column and size rows */
+    if((xsav == 0) && (ysav == 0)) {
+        y = 1;
+        x = z;
+        setupItems(x, y);
+        /* expand to (size/colcount) rows */
+    } else if((ysav > 0) && (xsav == 0)) {
+        x = qRound((float) z / (float) y);
+        setupItems(x, y);
+        /* expand to (size/rowcount) rows */
+    } else if((xsav > 0) && (ysav == 0)) {
+        y = qRound((float) z / (float) x);
+        setupItems(x, y);
+    }
+}
+
 void caWaveTable::setNumberOfRows(int nbRows)
 {
-    rowcount = nbRows;
-    setRowCount(nbRows);
+    if(nbRows < 0) rowSaved = rowcount = 0;
+    else rowSaved = rowcount = nbRows;
     setupItems(rowcount, colcount);
 }
 
 void caWaveTable::setNumberOfColumns(int nbCols) {
-    colcount = nbCols;
-    setColumnCount(nbCols);
+    if(nbCols < 0) colSaved = colcount = 0;
+    else colSaved = colcount = nbCols;
     setupItems(rowcount, colcount);
 }
 
 void caWaveTable::setupItems(int nbRows, int nbCols)
 {
-
+    setColumnCount(nbCols);
+    setRowCount(nbRows);
     for(int i=0; i<nbRows; i++) {
         for(int j=0; j<nbCols; j++) {
-            if(this->item(i,j) == 0) {
+            if(item(i,j) == 0) {
                 QTableWidgetItem *tableItem = new QTableWidgetItem();
                 tableItem->setFont(thisItemFont);
                 setItem(i, j, tableItem);
             }
+            item(i,j)->setText("");
         }
     }
+    keepText.clear();
     keepText.resize(rowcount*colcount+1);
 }
 
@@ -385,13 +406,26 @@ void caWaveTable::setPV(QString const &newPV)
     thisPV = newPV;
 }
 
+void caWaveTable::setStringList(QStringList list, short status, int size)
+{
+    if(size != sizeSaved) RedefineRowColumns(rowSaved, colSaved, size, rowcount, colcount);
+    int maxSize = rowcount * colcount;
+    sizeSaved = size;
+
+    for(int i=0; i< qMin(size, maxSize); i++) {
+        displayText(i, status, list.at(i));
+    }
+    dataPresent = true;
+}
+
 void caWaveTable::setData(double *array, short status, int size)
 {
-
+    if(size != sizeSaved) RedefineRowColumns(rowSaved, colSaved, size, rowcount, colcount);
     int maxSize = rowcount * colcount;
+    sizeSaved = size;
+
     setFormat(doubles);
     for(int i=0; i< qMin(size, maxSize); i++) {
-        //keepValue[i] = (double) array[i];
         displayText(i, status, setValue(array[i], doubles));
     }
     dataPresent = true;
@@ -399,11 +433,12 @@ void caWaveTable::setData(double *array, short status, int size)
 
 void caWaveTable::setData(float *array, short status, int size)
 {
-
+    if(size != sizeSaved) RedefineRowColumns(rowSaved, colSaved, size, rowcount, colcount);
     int maxSize = rowcount * colcount;
+    sizeSaved = size;
+
     setFormat(doubles);
     for(int i=0; i< qMin(size, maxSize); i++) {
-        //keepValue[i] = (double) array[i];
         displayText(i, status, setValue(array[i], doubles));
     }
     dataPresent = true;
@@ -411,11 +446,12 @@ void caWaveTable::setData(float *array, short status, int size)
 
 void caWaveTable::setData(int16_t *array, short status, int size)
 {
-
+    if(size != sizeSaved) RedefineRowColumns(rowSaved, colSaved, size, rowcount, colcount);
     int maxSize = rowcount * colcount;
+    sizeSaved = size;
+
     setFormat(longs);
     for(int i=0; i< qMin(size, maxSize); i++) {
-        //keepValue[i] = (double) array[i];
         displayText(i, status, setValue(array[i], longs));
     }
     dataPresent = true;
@@ -423,11 +459,12 @@ void caWaveTable::setData(int16_t *array, short status, int size)
 
 void caWaveTable::setData(int32_t *array, short status, int size)
 {
-
+    if(size != sizeSaved) RedefineRowColumns(rowSaved, colSaved, size, rowcount, colcount);
     int maxSize = rowcount * colcount;
+    sizeSaved = size;
+
     setFormat(longs);
     for(int i=0; i< qMin(size, maxSize); i++) {
-        //keepValue[i] = (double) array[i];
         displayText(i, status, setValue(array[i], longs));
     }
     dataPresent = true;
@@ -435,10 +472,12 @@ void caWaveTable::setData(int32_t *array, short status, int size)
 
 void caWaveTable::setData(char *array, short status, int size)
 {
+    if(size != sizeSaved) RedefineRowColumns(rowSaved, colSaved, size, rowcount, colcount);
     int maxSize = rowcount * colcount;
+    sizeSaved = size;
+
     setFormat(characters);
     for(int i=0; i< qMin(size, maxSize); i++) {
-        //keepValue[i] = (double) ((int) array[i]);
         displayText(i, status, setValue((double) ((int) array[i]), characters));
     }
     dataPresent = true;

@@ -23,26 +23,9 @@
  *    anton.mezger@psi.ch
  */
 
-#ifndef QTCONGLOBAL_H
-#define QTCONGLOBAL_H
+#ifndef QTDEFINITIONS_H
+#define QTDEFINITIONS_H
 
-#include "qtdefinitions.h"
+#define qasc(x) x.toLatin1().constData()
 
-#define NOMINMAX
-
-#if defined(_MSC_VER)
-		#if defined(QTCON_MAKEDLL)     // create a qtControls DLL library
-			#define QTCON_EXPORT  __declspec(dllexport)
-		#else                        // use a qtControls DLL library
-			#define QTCON_EXPORT  __declspec(dllimport)
-		#endif
-#else
-	#define QTCON_EXPORT
 #endif
-
-#if defined(__OSX__) || defined(__APPLE__)
-  #include <cmath>
-  #define isnan(x) std::isnan(x)
-#endif
-
-#endif //QTCONGLOBAL_H

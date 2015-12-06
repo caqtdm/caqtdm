@@ -28,11 +28,13 @@ bool HTTPCONFIGURATOR = false;
 #if defined(_MSC_VER)
   #define NOMINMAX
   #include <windows.h>
+  #define snprintf _snprintf
 #endif
 #include "searchfile.h"
 
 #include <QtGui>
 
+#include "pathdefinitions.h"
 #include "fileopenwindow.h"
 #include "specialFunctions.h"
 #include "fileFunctions.h"
@@ -178,10 +180,11 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     lastGeometry = geometry;
     userClose = false;
     printandexit = printscreen;
-    allowResize = resizing;
     minimizeMessageWindow = minimize;
     activWindow = 0;
     Specials specials;
+
+    Q_UNUSED(resizing);
 
     qDebug() <<  "caQtDM -- desktop size:" << qApp->desktop()->size();
 
@@ -276,7 +279,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         QByteArray byteArray("0");
         _isRunning = false;
         // create shared memory with a default value to note that no message is available.
-        if (!sharedMemory.create(255)) {
+        if (!sharedMemory.create(2048)) {
             qDebug("caQtDM -- Unable to create single instance.");
         } else {
             qDebug() << "caQtDM -- created shared memory";
@@ -335,7 +338,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     if(fi.exists()) {
        parseConfigFile(stdpathdoc, urls, files);
     } else{
-        QString defpathdoc;        
+        QString defpathdoc;
 #ifdef MOBILE_ANDROID
         defpathdoc ="assets:/caQtDM_IOS_Config.xml";
 #else
@@ -415,7 +418,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
             while (i.hasNext()) {
                 char asc[256];
                 i.next();
-                sprintf(asc, "Info: plugin %s loaded", i.key().toLatin1().constData());
+                sprintf(asc, "Info: plugin %s loaded", qasc(i.key()));
                 messageWindow->postMsgEvent(QtWarningMsg, asc);
             }
         }
@@ -426,8 +429,9 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 #ifndef MOBILE
     QString displayPath = (QString)  qgetenv("CAQTDM_DISPLAY_PATH");
     if(!displayPath.contains(specials.getStdPath())) {
-       displayPath.append(":"); displayPath.append(specials.getStdPath());
-       setenv("CAQTDM_DISPLAY_PATH", (char*) displayPath.toLatin1().constData(), 1);
+       displayPath.append(pathSeparator);
+       displayPath.append(specials.getStdPath());
+       setenv("CAQTDM_DISPLAY_PATH", (char*) qasc(displayPath), 1);
     }
 #endif
 
@@ -562,25 +566,26 @@ void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
                 envString.append(fields.at(i));
                 if(i<fields.count() -1) envString.append(" ");
             }
-            setenv(fields.at(0).toLatin1().constData(), envString.toLatin1().constData(), 1);
-            //messageWindow->postMsgEvent(QtDebugMsg, (char*)envString.toLatin1().constData());
+            setenv(qasc(fields.at(0)), qasc(envString), 1);
+            //messageWindow->postMsgEvent(QtDebugMsg, (char*) qasc(envString));
         } else if(line.size() > 0) {
-            sprintf(asc, "environment variable could not be set from %s", line.toLatin1().constData());
+            sprintf(asc, "environment variable could not be set from %s", qasc(line));
             messageWindow->postMsgEvent(QtDebugMsg, asc);
         }
     }
     //Replacement for standard writable directory
-    setenv("CAQTDM_DISPLAY_PATH",stdpathdoc.toLatin1().constData(),1);
+    setenv("CAQTDM_DISPLAY_PATH", qasc(stdpathdoc), 1);
 
-    sprintf(asc, "epics configuration file loaded: %s", fileName.toLatin1().constData());
+    sprintf(asc, "epics configuration file loaded: %s", qasc(fileName));
     messageWindow->postMsgEvent(QtDebugMsg, asc);
     file.close();
 }
 
 void FileOpenWindow::timerEvent(QTimerEvent *event)
 {
+#define MAXLEN 255
     Q_UNUSED(event);
-    char asc[255];
+    char asc[MAXLEN];
     int countPV=0;
     int countNotConnected=0;
     float highCount = 0.0;
@@ -626,8 +631,8 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
         fillPVtable(countPV, countNotConnected, countDisplayed);
         highCount = mutexKnobData->getHighestCountPV(highPV);
         if(highCount != 0.0) {
-            sprintf(msg, "%s - PV=%d (%d NC), %d Monitors/s, %d Displays/s, highest=%s with %.1f Monitors/s ", asc, countPV, countNotConnected,
-                      mutexKnobData->getMonitorsPerSecond(), mutexKnobData->getDisplaysPerSecond(), highPV.toLatin1().constData(), highCount);
+            snprintf(msg, MAXLEN - 1, "%s - PV=%d (%d NC), %d Monitors/s, %d Displays/s, highest=%s with %.1f Monitors/s ", asc, countPV, countNotConnected,
+                      mutexKnobData->getMonitorsPerSecond(), mutexKnobData->getDisplaysPerSecond(), qasc(highPV), highCount);
         } else {
             strcpy(msg, asc);
         }
@@ -668,13 +673,15 @@ void FileOpenWindow::Callback_EmptyCache()
 #ifndef MOBILE
     Specials specials;
     QString path =  specials.getStdPath();
+    fileFunctions filefunction;
     path.append("/");
-    QDir dir(path);
-    dir.setNameFilters(QStringList() << "*.ui" << "*.prc" << "*.gif" << "*.jpg" << "*.png");
-    dir.setFilter(QDir::Files);
-    foreach(QString dirFile, dir.entryList()) dir.remove(dirFile);
+    filefunction.removeFilesInTree(path);
 #endif
 }
+
+
+
+
 
 /**
  * slot for opening file by button
@@ -696,9 +703,10 @@ void FileOpenWindow::Callback_OpenButton()
         if(fi.exists()) {
             CaQtDM_Lib *newWindow = new CaQtDM_Lib(this, fileName, "", mutexKnobData, interfaces, messageWindow);
             if (fileName.contains("prc")) {
-                allowResize = false;
+                newWindow->allowResizing(false);
+            } else {
+               newWindow->allowResizing(true);
             }
-            newWindow->allowResizing(allowResize);
  #ifdef MOBILE
             newWindow->grabSwipeGesture(fingerSwipeGestureType);
  #endif
@@ -723,7 +731,7 @@ void FileOpenWindow::Callback_OpenButton()
             mainWindow->setProperty("fileString", fileName);
             mainWindow->setProperty("macroString", "");
 
-            sprintf(asc, "last file: %s", fileName.toLatin1().constData());
+            sprintf(asc, "last file: %s", qasc(fileName));
             messageWindow->postMsgEvent(QtDebugMsg, asc);
 
             if (fileName.contains("prc")) {
@@ -845,8 +853,8 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     // this will check for file existence and when an url is defined, download the file from a http server
     fileFunctions filefunction;
     filefunction.checkFileAndDownload(FileName);
-    if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) filefunction.lastInfo().toLatin1().constData());
-    if(filefunction.lastError().length() > 0)  messageWindow->postMsgEvent(QtCriticalMsg, (char*)filefunction.lastError().toLatin1().constData());
+    if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(filefunction.lastInfo()));
+    if(filefunction.lastError().length() > 0)  messageWindow->postMsgEvent(QtCriticalMsg, (char*) qasc(filefunction.lastError()));
 
     // open file
     searchFile *s = new searchFile(FileName);
@@ -867,9 +875,10 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         newWindow->grabSwipeGesture(fingerSwipeGestureType);
 #endif
         if (FileName.contains("prc")) {
-           allowResize = false;
+           newWindow->allowResizing(false);
+        } else {
+           newWindow->allowResizing(true);
         }
-        newWindow->allowResizing(allowResize);
         QMainWindow *mainWindow = newWindow;
 
 #if defined(WIN32) && !defined(__GNUC__)
@@ -905,7 +914,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         }
         activWindow = 0;
 
-        //qDebug() << "set properties in qmainwindow" << mainWindow << macroString;
+        //qDebug() << "set properties in qmainwindow" << mainWindow << macroString << geometry;
 
         if(geometry != "") {
             parse_and_set_Geometry(mainWindow, geometry);
@@ -917,9 +926,9 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         }
 
         if(macroString.size() > 0) {
-          sprintf(asc, "last file: %s, macro: %s", fileNameFound.toLatin1().constData(), macroString.toLatin1().constData());
+          sprintf(asc, "last file: %s, macro: %s", qasc(fileNameFound), qasc(macroString));
         } else {
-          sprintf(asc, "last file: %s", fileNameFound.toLatin1().constData());
+          sprintf(asc, "last file: %s", qasc(fileNameFound));
         }
         messageWindow->postMsgEvent(QtDebugMsg, asc);
     }
@@ -949,7 +958,7 @@ void FileOpenWindow::Callback_ActionHelp()
  * slots for exit signal
  */
 void FileOpenWindow::Callback_IosExit()
-{    
+{
     if(HTTPCONFIGURATOR) {
         fromIOS = true;
         Callback_ActionExit();
@@ -1030,21 +1039,25 @@ void FileOpenWindow::Callback_ActionReload()
             w->close();
             if(!fileName.isNull()) {
 
-                QString FileName = fileName.toString();  
+                QString FileName = fileName.toString();
 
                 // this will check for file existence and when an url is defined, download the file from a http server
                 QFileInfo fi(FileName);
                 fileFunctions filefunction;
                 filefunction.checkFileAndDownload(fi.fileName());
-                if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) filefunction.lastInfo().toLatin1().constData());
-                if(filefunction.lastError().length() > 0) messageWindow->postMsgEvent(QtCriticalMsg, (char*)filefunction.lastError().toLatin1().constData());
+                if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(filefunction.lastInfo()));
+                if(filefunction.lastError().length() > 0) messageWindow->postMsgEvent(QtCriticalMsg, (char*) qasc(filefunction.lastError()));
 
                 searchFile *s = new searchFile(FileName);
                 QString fileNameFound = s->findFile();
                 fileS = fileNameFound;
 
                 CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, interfaces, messageWindow);
-                newWindow->allowResizing(allowResize);
+                if (fileS.contains("prc")) {
+                    newWindow->allowResizing(false);
+                } else {
+                   newWindow->allowResizing(true);
+                }
 #ifdef MOBILE
                 newWindow->grabSwipeGesture(fingerSwipeGestureType);
 #endif

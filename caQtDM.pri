@@ -13,8 +13,6 @@ demo_plugin {
                 message("demo_plugin configuration macx")
                 INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
         	LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
-        	plugins.path = Contents/PlugIns/controlsystems
-        	plugins.files += $(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.dylib
         	CONFIG += release
         }
 
@@ -95,8 +93,6 @@ epics3_plugin {
  		LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
  		LIBS += $$(EPICSLIB)/libca.dylib
  		LIBS += $$(EPICSLIB)/libCom.dylib
- 		plugins.path = Contents/PlugIns/controlsystems
- 		plugins.files += $(CAQTDM_COLLECT)/controlsystems/libepics3_plugin.dylib
  		CONFIG += release
         }
 
@@ -114,8 +110,8 @@ epics3_plugin {
 
 	win32 {
                 message("epics3_plugin configuration win32")
-  		INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
-
+                INCLUDEPATH += $$(EPICS_BASE)/include/os/win32
+                INCLUDEPATH += $$(EPICS_BASE)/include/compiler/msvc
                 win32-msvc* {
                         DEFINES +=_CRT_SECURE_NO_WARNINGS
                         CONFIG += Define_Build_epics_controls 
@@ -149,8 +145,6 @@ epics4_plugin {
         	LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
         	LIBS += $$(EPICSLIB)/libca.dylib
         	LIBS += $$(EPICSLIB)/libCom.dylib
-        	plugins.path = Contents/PlugIns/controlsystems
-        	plugins.files += $(CAQTDM_COLLECT)/controlsystems/libepics4_plugin.dylib
         	CONFIG += release
         }
 
@@ -271,6 +265,8 @@ caQtDM_Lib {
                 message("caQtDM_Lib configuration : win32")
    		INCLUDEPATH += $$(EPICS_BASE)/include
    		INCLUDEPATH += $$(EPICS_BASE)/include/os/win32
+                INCLUDEPATH += $$(EPICS_BASE)/include/compiler/msvc
+
 
   		win32-msvc* {
         		DEFINES +=_CRT_SECURE_NO_WARNINGS
@@ -328,7 +324,18 @@ caQtDM_Viewer {
                 calib.files = $$(EPICS_BASE)/lib/darwin-x86/libca.3.14.12.dylib
                 comlib.path = Contents/Frameworks
                 comlib.files = $$(EPICS_BASE)/lib/darwin-x86/libCom.3.14.12.dylib
-                QMAKE_BUNDLE_DATA += calib comlib
+                qwtframework.path = Contents/Frameworks
+                qwtframework.files = $$(QWTHOME)/lib/qwt.framework
+                QMAKE_BUNDLE_DATA += calib comlib qwtframework
+                plugins_epics3.path = Contents/PlugIns/controlsystems
+                plugins_epics3.files += $(CAQTDM_COLLECT)/controlsystems/libepics3_plugin.dylib
+                QMAKE_BUNDLE_DATA += plugins_epics3
+                plugins_epics4.path = Contents/PlugIns/controlsystems
+                plugins_epics4.files += $(CAQTDM_COLLECT)/controlsystems/libepics4_plugin.dylib
+                QMAKE_BUNDLE_DATA += plugins_epics4
+                plugins_demo.path = Contents/PlugIns/controlsystems
+                plugins_demo.files += $(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.dylib
+                QMAKE_BUNDLE_DATA += plugins_demo
   	}
 
         ios {
@@ -422,6 +429,7 @@ caQtDM_Viewer {
 		INCLUDEPATH += $(QWTHOME)/src
 		INCLUDEPATH += $$(EPICS_BASE)/include
 		INCLUDEPATH += $$(EPICS_BASE)/include/os/win32
+                INCLUDEPATH += $$(EPICS_BASE)/include/compiler/msvc
 		INCLUDEPATH += ../caQtDM_Lib/src
 		INCLUDEPATH += ../caQtDM_QtControls/src
 		INCLUDEPATH += $(QWTINCLUDE)

@@ -653,7 +653,7 @@ void QwtThermoMarker::drawLiquid(
         else
             qSort( values.begin(), values.end(), qLess<double>() );
 
-        int from;
+        int from = 0;
         if ( !values.isEmpty() )
         {
             from = qRound( scaleMap.transform( values[0] ) );

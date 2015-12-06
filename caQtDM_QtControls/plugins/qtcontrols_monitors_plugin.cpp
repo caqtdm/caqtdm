@@ -41,7 +41,7 @@
 #include "designerPluginTexts.h"
 
 typedef char strng[40];
-typedef char longtext[300];
+typedef char longtext[500];
 
 static QString XmlFunc(const char *clss, const char *name, int x, int y, int w, int h,
                 strng *propertyname, strng* propertytype, longtext *propertytext, int nb)
@@ -111,7 +111,7 @@ void CustomWidgetInterface_Monitors::initialize(QDesignerFormEditorInterface *)
 
 caBitnamesInterface::caBitnamesInterface(QObject *parent): CustomWidgetInterface_Monitors(parent)
 {
-    strng name[2], type[2];
+    strng name[2], type[2] = {"", ""};
     longtext text[2] = {"", ""};
 
     strcpy(name[0], "channelEnum");
@@ -123,7 +123,7 @@ caBitnamesInterface::caBitnamesInterface(QObject *parent): CustomWidgetInterface
     d_name = "caBitnames";
     d_include = "caBitnames";
     QPixmap qpixmap =  QPixmap(":pixmaps/eflag.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caBitnamesInterface::createWidget(QWidget *parent)
@@ -133,23 +133,20 @@ QWidget *caBitnamesInterface::createWidget(QWidget *parent)
 
 caLedInterface::caLedInterface(QObject *parent): CustomWidgetInterface_Monitors(parent)
 {
-    strng name[4], type[4];
+    strng name[4], type[4] = {"","","",""};
     longtext text[4] = {CHANNEL, COLORMODE, TRUEVALUE, FALSEVALUE};
 
     strcpy(name[0], "channel");
     strcpy(type[0], "multiline");
     strcpy(name[1], "colorMode");
-    strcpy(type[1], "");
     strcpy(name[2], "trueValue");
-    strcpy(type[2], "");
     strcpy(name[3], "falseValue");
-    strcpy(type[3], "");
     d_domXml = XmlFunc("caLed", "caled", 0, 0, 30, 30, name, type, text, 4);
     d_toolTip = "[LED for true or false bitstate or for severity states]";
     d_name = "caLed";
     d_include = "caLed";
     QPixmap qpixmap =  QPixmap(":pixmaps/eled.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caLedInterface::createWidget(QWidget *parent)
@@ -159,17 +156,19 @@ QWidget *caLedInterface::createWidget(QWidget *parent)
 
 caLinearGaugeInterface::caLinearGaugeInterface(QObject *parent): CustomWidgetInterface_Monitors(parent)
 {
-    strng name[1], type[1];
-    longtext text[1] = {""};
+    strng name[3], type[3] = {"","",""};
+    longtext text[3] = {CHANNEL, ORIENTATION, FILLMODE};
 
     strcpy(name[0], "channel");
     strcpy(type[0], "multiline");
-    d_domXml = XmlFunc("caLinearGauge", "calineargauge", 0, 0, 40, 100, name, type, text, 1);
+    strcpy(name[1], "orientation");
+    strcpy(name[2], "fillMode");
+    d_domXml = XmlFunc("caLinearGauge", "calineargauge", 0, 0, 40, 100, name, type, text, 3);
     d_toolTip = "[Colorized bar monitor]";
     d_name = "caLinearGauge";
     d_include = "caGauge";
     QPixmap qpixmap =  QPixmap(":pixmaps/elineargauge.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caLinearGaugeInterface::createWidget(QWidget *parent)
@@ -179,17 +178,20 @@ QWidget *caLinearGaugeInterface::createWidget(QWidget *parent)
 
 caCircularGaugeInterface::caCircularGaugeInterface(QObject *parent): CustomWidgetInterface_Monitors(parent)
 {
-    strng name[1], type[1];
-    longtext text[1] = {""};
+    strng name[3], type[3] = {"","",""};
+    longtext text[3] = {CHANNEL, VALUEDISPLAY, GAUGELABEL};
 
     strcpy(name[0], "channel");
     strcpy(type[0], "multiline");
-    d_domXml = XmlFunc("caCircularGauge", "cacirculargauge", 0, 0, 100, 100, name, type, text, 1);
+    strcpy(name[1], "valueDisplayed");
+    strcpy(name[2], "label");
+    strcpy(type[2], "multiline");
+    d_domXml = XmlFunc("caCircularGauge", "cacirculargauge", 0, 0, 100, 100, name, type, text, 3);
     d_toolTip = "[Colorized meter]";
     d_name = "caCircularGauge";
     d_include = "caGauge";
     QPixmap qpixmap =  QPixmap(":pixmaps/ecirculargauge.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caCircularGaugeInterface::createWidget(QWidget *parent)
@@ -204,17 +206,59 @@ QWidget *caLineEditInterface::createWidget(QWidget* parent)
 
 caLineEditInterface::caLineEditInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
-    strng name[1], type[1];
-    longtext text[1] = {""};
+    strng name[16], type[16]={"","","","","","","","","","","","","","","",""};
+    longtext text[16] = {CHANNEL, LFOREGROUND, LBACKGROUND, LCOLORMODE, FRAMEPRESENT, FRAMECOLOR, FRAMELINEWIDTH, ALARMHANDLING, LPRECISION,
+                        PRECISIONMODE, LIMITSMODE, MAXVALUE, MINVALUE, FONTSCALEMODE, UNITSENABLED, FORMATTYPE};
 
     strcpy(name[0], "channel");
     strcpy(type[0], "multiline");
-    d_domXml = XmlFunc("caLineEdit", "calineedit", 0, 0, 100, 20, name, type, text, 1);
+    strcpy(name[1], "foreground");
+    strcpy(name[2], "background");
+    strcpy(name[3], "colorMode");
+    strcpy(name[4], "framePresent");
+    strcpy(name[5], "frameColor");
+    strcpy(name[6], "frameLineWidth");
+    strcpy(name[7], "alarmHandling");
+    strcpy(name[8], "precision");
+    strcpy(name[9], "precisionMode");
+    strcpy(name[10], "limitsMode");
+    strcpy(name[11], "maxValue");
+    strcpy(name[12], "minValue");
+    strcpy(name[13], "fontScaleMode");
+    strcpy(name[14], "unitsEnabled");
+    strcpy(name[15], "formatType");
+    d_domXml = XmlFunc("caLineEdit", "calineedit", 0, 0, 100, 20, name, type, text, 16);
     d_toolTip = "[Text Monitor]";
     d_name = "caLineEdit";
     d_include = "caLineEdit";
     QPixmap qpixmap =   QPixmap(":pixmaps/textmonitor.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+}
+
+QWidget *caMultiLineStringInterface::createWidget(QWidget* parent)
+{
+    return new caMultiLineString(parent);
+}
+
+caMultiLineStringInterface::caMultiLineStringInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
+{
+    strng name[6], type[6]={"","","","","",""};
+    longtext text[6] = {CHANNEL, LFOREGROUND, LBACKGROUND, LCOLORMODE, ALARMHANDLING, FONTSCALEMODE};
+
+    strcpy(name[0], "channel");
+    strcpy(type[0], "multiline");
+    strcpy(name[1], "foreground");
+    strcpy(name[2], "background");
+    strcpy(name[3], "colorMode");
+    strcpy(name[4], "alarmHandling");
+    strcpy(name[5], "fontScaleMode");
+
+    d_domXml = XmlFunc("caMultiLineString", "camultilinestring", 0, 0, 100, 20, name, type, text, 6);
+    d_toolTip = "[Multiline String Monitor]";
+    d_name = "caMultiLineString";
+    d_include = "caMultiLineString";
+    QPixmap qpixmap =   QPixmap(":pixmaps/multilinemonitor.png");
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caThermoInterface::createWidget(QWidget* parent)
@@ -224,7 +268,7 @@ QWidget *caThermoInterface::createWidget(QWidget* parent)
 
 caThermoInterface::caThermoInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
-    strng name[1], type[1];
+    strng name[1], type[1] = {""};
     longtext text[1] = {""};
 
     strcpy(name[0], "channel");
@@ -234,7 +278,7 @@ caThermoInterface::caThermoInterface(QObject* parent) : CustomWidgetInterface_Mo
     d_name = "caThermo";
     d_include = "caThermo";
     QPixmap qpixmap =  QPixmap(":pixmaps/thermo.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caMeterInterface::createWidget(QWidget* parent)
@@ -244,17 +288,31 @@ QWidget *caMeterInterface::createWidget(QWidget* parent)
 
 caMeterInterface::caMeterInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
-    strng name[1], type[1];
-    longtext text[1] = {""};
+    strng name[14], type[14] = {"","","","","","","","","","","","","",""};
+    longtext text[14] = {CHANNEL, MAXVALUE, MINVALUE, LIMITSMODE, BASECOLOR, SCALEDEFAULTCOLOR, SCALECOLOR, COLORMODE, SCALEENABLED,
+                        VALUEDISPLAYED, PRECISION, PRECISIONMODE, FORMATTYPE, UNITSENABLED};
 
     strcpy(name[0], "channel");
     strcpy(type[0], "multiline");
-    d_domXml = XmlFunc("caMeter", "cameter", 0, 0, 75, 75, name, type, text, 1);
+    strcpy(name[1], "maxValue");
+    strcpy(name[2], "minValue");
+    strcpy(name[3], "limitsMode");
+    strcpy(name[4], "baseColor");
+    strcpy(name[5], "scaleDefaultColor");
+    strcpy(name[6], "scaleColor");
+    strcpy(name[7], "colorMode");
+    strcpy(name[8], "scaleEnabled");
+    strcpy(name[9], "valueDisplayed");
+    strcpy(name[10], "precision");
+    strcpy(name[11], "precisionMode");
+    strcpy(name[12], "formatType");
+    strcpy(name[13], "unitsEnabled");
+    d_domXml = XmlFunc("caMeter", "cameter", 0, 0, 75, 75, name, type, text, 14);
     d_toolTip = "[simple Meter Monitor]";
     d_name = "caMeter";
     d_include = "caMeter";
     QPixmap qpixmap =  QPixmap(":pixmaps/meter.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 
@@ -265,7 +323,7 @@ QWidget *caCartesianPlotInterface::createWidget(QWidget* parent)
 
 caCartesianPlotInterface::caCartesianPlotInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
-    strng name[12], type[12];
+    strng name[12], type[12] = {"","","","","","","","","","","",""};
     longtext text[12]  = {"","","","","","","","","","","",""};
 
     strcpy(name[0], "channels_1");
@@ -297,7 +355,7 @@ caCartesianPlotInterface::caCartesianPlotInterface(QObject* parent) : CustomWidg
     d_name = "caCartesianPlot";
     d_include = "caCartesianPlot";
     QPixmap qpixmap = QPixmap(":pixmaps/cartesian.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caStripPlotInterface::createWidget(QWidget* parent)
@@ -307,7 +365,7 @@ QWidget *caStripPlotInterface::createWidget(QWidget* parent)
 
 caStripPlotInterface::caStripPlotInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
-    strng name[4], type[4];
+    strng name[4], type[4] = {"","","",""};
     longtext text[4] = {"","","",""};
 
     strcpy(name[0], "channels");
@@ -318,17 +376,17 @@ caStripPlotInterface::caStripPlotInterface(QObject* parent) : CustomWidgetInterf
     strcpy(type[2], "multiline");
     strcpy(name[3], "TitleY");
     strcpy(type[3], "multiline");
-    d_domXml = XmlFunc("caStripPlot", "castripplot", 0, 0, 150, 50, name, type, text, 4);
+    d_domXml = XmlFunc("caStripPlot", "castripplot", 0, 0, 170, 70, name, type, text, 4);
     d_toolTip = "[Strip Chart]";
     d_name = "caStripPlot";
     d_include = "caStripPlot";
     QPixmap qpixmap = QPixmap(":pixmaps/qwtplot.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 caByteInterface::caByteInterface(QObject *parent): CustomWidgetInterface_Monitors(parent)
 {
-    strng name[1], type[1];
+    strng name[1], type[1] = {""};
     longtext text[1] = {""};
 
     strcpy(name[0], "channel");
@@ -338,7 +396,7 @@ caByteInterface::caByteInterface(QObject *parent): CustomWidgetInterface_Monitor
     d_name = "caByte";
     d_include = "caByte";
     QPixmap qpixmap = QPixmap(":pixmaps/eflag.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caByteInterface::createWidget(QWidget *parent)
@@ -348,7 +406,7 @@ QWidget *caByteInterface::createWidget(QWidget *parent)
 
 caTableInterface::caTableInterface(QObject *parent): CustomWidgetInterface_Monitors(parent)
 {
-    strng name[4], type[4];
+    strng name[4], type[4] = {"","","",""};
     longtext text[4] = {"","","",""};
 
     strcpy(name[0], "channels");
@@ -364,7 +422,7 @@ caTableInterface::caTableInterface(QObject *parent): CustomWidgetInterface_Monit
     d_name = "caTable";
     d_include = "caTable";
     QPixmap qpixmap = QPixmap(":pixmaps/table.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caTableInterface::createWidget(QWidget *parent)
@@ -374,7 +432,7 @@ QWidget *caTableInterface::createWidget(QWidget *parent)
 
 caWaveTableInterface::caWaveTableInterface(QObject *parent): CustomWidgetInterface_Monitors(parent)
 {
-    strng name[1], type[1];
+    strng name[1], type[1] = {""};
     longtext text[1] = {""};
 
     strcpy(name[0], "channel");
@@ -384,7 +442,7 @@ caWaveTableInterface::caWaveTableInterface(QObject *parent): CustomWidgetInterfa
     d_name = "caWaveTable";
     d_include = "caWaveTable";
     QPixmap qpixmap = QPixmap(":pixmaps/wavetable.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caWaveTableInterface::createWidget(QWidget *parent)
@@ -399,7 +457,7 @@ QWidget *caCameraInterface::createWidget(QWidget* parent)
 
 caCameraInterface::caCameraInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
-    strng name[10], type[10];
+    strng name[10], type[10] = {"","","","","","","","","",""};
     longtext text[10] = {"","","","","","","","","",""};
 
     strcpy(name[0], "channelData");
@@ -427,7 +485,7 @@ caCameraInterface::caCameraInterface(QObject* parent) : CustomWidgetInterface_Mo
     d_name = "caCamera";
     d_include = "caCamera";
     QPixmap qpixmap = QPixmap(":pixmaps/camera.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caCalcInterface::createWidget(QWidget* parent)
@@ -437,7 +495,7 @@ QWidget *caCalcInterface::createWidget(QWidget* parent)
 
 caCalcInterface::caCalcInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
-    strng name[6], type[6];
+    strng name[6], type[6]  = {"","","","","",""};
     longtext text[6] = {"","","","","",""};
 
     strcpy(name[0], "channel");
@@ -458,7 +516,7 @@ caCalcInterface::caCalcInterface(QObject* parent) : CustomWidgetInterface_Monito
     d_name = "caCalc";
     d_include = "caCalc";
     QPixmap qpixmap = QPixmap(":pixmaps/calc.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caWaterfallPlotInterface::createWidget(QWidget* parent)
@@ -468,7 +526,7 @@ QWidget *caWaterfallPlotInterface::createWidget(QWidget* parent)
 
 caWaterfallPlotInterface::caWaterfallPlotInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
-    strng name[5], type[5];
+    strng name[5], type[5] = {"","","","",""};
     longtext text[5] = {"","","","",""};
 
     strcpy(name[0], "channel");
@@ -486,7 +544,7 @@ caWaterfallPlotInterface::caWaterfallPlotInterface(QObject* parent) : CustomWidg
     d_name = "caWaterfallPlot";
     d_include = "caWaterfall";
     QPixmap qpixmap = QPixmap(":pixmaps/waterfall.png");
-    d_icon = qpixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 
 QWidget *caScan2DInterface::createWidget(QWidget* parent)
@@ -497,7 +555,7 @@ QWidget *caScan2DInterface::createWidget(QWidget* parent)
 #define NUM_SCAN2D_PARAMS 17
 caScan2DInterface::caScan2DInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
-    strng name[NUM_SCAN2D_PARAMS], type[NUM_SCAN2D_PARAMS];
+    strng name[NUM_SCAN2D_PARAMS], type[NUM_SCAN2D_PARAMS]  = {"","","","","","","","","","","","","","","","",""};
     longtext text[NUM_SCAN2D_PARAMS] = {"","","","","","","","","","","","","","","","",""};
 
     strcpy(name[0], "channelData");
@@ -550,6 +608,7 @@ CustomWidgetCollectionInterface_Monitors::CustomWidgetCollectionInterface_Monito
     d_plugins.append(new caCircularGaugeInterface(this));
     d_plugins.append(new caMeterInterface(this));
     d_plugins.append(new caLineEditInterface(this));
+    d_plugins.append(new caMultiLineStringInterface(this));
     d_plugins.append(new caThermoInterface(this));
     d_plugins.append(new caCartesianPlotInterface(this));
     d_plugins.append(new caStripPlotInterface(this));

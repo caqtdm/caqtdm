@@ -147,7 +147,7 @@ void  caDoubleTabWidget::deleteArrayIndex(int pageIndex)
 // add page
 void caDoubleTabWidget::addPage(QWidget *page)
 {
-    PRINT(printf("add a new page %s\n", page->objectName().toLatin1().constData()));
+    PRINT(printf("add a new page %s\n", qasc(page->objectName())));
     QStringList stringlist = page->objectName().split( "_");
     if(stringlist.count() > 1 ) {
         row= stringlist[1].toInt();
@@ -173,7 +173,7 @@ void caDoubleTabWidget::removePage(int index)
         // delete this stackwidget page from the array
         deleteArrayIndex(pageIndex);
         QWidget *widget = viewPort->widget(index);
-        PRINT(printf("remove widget at stacked widget index=%d with name=%s\n", index, widget->objectName().toLatin1().constData()));
+        PRINT(printf("remove widget at stacked widget index=%d with name=%s\n", index, qasc(widget->objectName())));
         viewPort->removeWidget(widget);
         setRow(row);
         setCol(col);
@@ -220,7 +220,7 @@ void caDoubleTabWidget::insertPage(int index, QWidget *page)
         return;
     }
     QString title = tr("Page_%1_%2").arg(row).arg(col);
-    PRINT(printf("set page title to %s\n", title.toLatin1().constData()));
+    PRINT(printf("set page title to %s\n", qasc(title)));
     page->setObjectName(title);
     page->setAutoFillBackground(true);
     QString style = "QWidget#%1 { background-color : rgb(255,255,200); }";

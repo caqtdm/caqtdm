@@ -23,26 +23,14 @@
  *    anton.mezger@psi.ch
  */
 
-#ifndef QTCONGLOBAL_H
-#define QTCONGLOBAL_H
+#ifndef PATHDEFINITIONS_H
+#define PATHDEFINITIONS_H
 
-#include "qtdefinitions.h"
+#include <QString>
 
-#define NOMINMAX
-
-#if defined(_MSC_VER)
-		#if defined(QTCON_MAKEDLL)     // create a qtControls DLL library
-			#define QTCON_EXPORT  __declspec(dllexport)
-		#else                        // use a qtControls DLL library
-			#define QTCON_EXPORT  __declspec(dllimport)
-		#endif
+#ifdef _MSC_VER
+   const QString pathSeparator = ";";
 #else
-	#define QTCON_EXPORT
+   const QString pathSeparator = ":";
 #endif
-
-#if defined(__OSX__) || defined(__APPLE__)
-  #include <cmath>
-  #define isnan(x) std::isnan(x)
 #endif
-
-#endif //QTCONGLOBAL_H

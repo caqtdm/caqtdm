@@ -30,7 +30,35 @@
 #include <QDockWidget>
 #include <QTextEdit>
 #include <QEvent>
+#include <QMenu>
+#include <QAction>
+#include <QContextMenuEvent>
 #include "caQtDM_Lib_global.h"
+
+class MsgTextEdit : public  QTextEdit {
+public:
+    MsgTextEdit() {
+    }
+
+    void contextMenuEvent(QContextMenuEvent *event)
+    {
+        QMenu *menu = createStandardContextMenu();
+        menu->addAction(tr("Clear"));
+
+        QAction* selectedItem = menu->exec(event->globalPos());
+
+        if (selectedItem) {
+           if(selectedItem->text().contains("Clear")) {
+               setPlainText("");
+           }
+        }
+        delete menu;
+    }
+
+private:
+
+};
+
 
 /**
  * Message Window. Handling errors and other messages.
@@ -39,7 +67,7 @@ class CAQTDM_LIBSHARED_EXPORT MessageWindow: public QDockWidget
 {
     Q_OBJECT
 
-    QTextEdit msgTextEdit;                  // Main widget.
+    MsgTextEdit msgTextEdit;                  // Main widget.
     static MessageWindow* MsgHandler;       // Set in constructor.
     static const char* WINDOW_TITLE;        // Window title.
 
@@ -56,6 +84,7 @@ public:
     MessageWindow(QWidget* parent = 0);
     static void AppendMsgWrapper(QtMsgType type, char *msg);
     void postMsgEvent(QtMsgType type, char *msg);
+    void clearText();
 };
 
 class CAQTDM_LIBSHARED_EXPORT MessageEvent: public QEvent

@@ -27,7 +27,11 @@
 #define QTCONTROLS_MONITORS_PLUGIN_H
 
 #include <qglobal.h>
-#include <QDesignerCustomWidgetInterface>
+#if QT_VERSION > 0x050000
+    #include <QtUiPlugin/QDesignerCustomWidgetInterface>
+#else
+    #include <QDesignerCustomWidgetInterface>
+#endif
 
 class CustomWidgetInterface_Monitors: public QObject, public QDesignerCustomWidgetInterface
 {
@@ -129,6 +133,17 @@ public:
     caLineEditInterface(QObject* parent);
     virtual QWidget* createWidget(QWidget* parent);
 };
+
+class caMultiLineStringInterface : public CustomWidgetInterface_Monitors
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerCustomWidgetInterface)
+
+public:
+    caMultiLineStringInterface(QObject* parent);
+    virtual QWidget* createWidget(QWidget* parent);
+};
+
 
 class caThermoInterface : public CustomWidgetInterface_Monitors
 {

@@ -43,12 +43,12 @@
 
 #if (_MSC_VER == 1600)
 int round (double x) {
-  int i = (int) x;
-  if (x >= 0.0) {
-    return ((x-i) >= 0.5) ? (i + 1) : (i);
-  } else {
-    return (-x+i >= 0.5) ? (i - 1) : (i);
-  }
+    int i = (int) x;
+    if (x >= 0.0) {
+        return ((x-i) >= 0.5) ? (i + 1) : (i);
+    } else {
+        return (-x+i >= 0.5) ? (i - 1) : (i);
+    }
 }
 #endif
 
@@ -59,6 +59,7 @@ ENumeric::ENumeric(QWidget *parent, int id, int dd) : QFrame(parent), FloatDeleg
     decDig = dd;
     digits = id + dd;
     data = 0;
+    csValue = 0.0;
     minVal = (int) -pow(10.0, digits) + 1;
     maxVal = (int) pow(10.0, digits) - 1;
 
@@ -88,7 +89,7 @@ ENumeric::ENumeric(QWidget *parent, int id, int dd) : QFrame(parent), FloatDeleg
 
 void ENumeric::writeAccessW(bool access)
 {
-     _AccessW = access;
+    _AccessW = access;
 }
 
 QSize ENumeric::sizeHint() const
@@ -229,33 +230,28 @@ void ENumeric::init()
 void ENumeric::setValue(double v)
 {
     long long temp = (long long) round(v * pow(10.0, decDig));
-    if ((temp >= minVal) && (temp <= maxVal))
-    {
+    if ((temp >= minVal) && (temp <= maxVal)) {
         bool valChanged = data != temp;
         data = temp;
         /* call this before emitting value changed to be sure that the value is up to date
          * in the labels of the TNumeric.
          */
         showData();
-        if (valChanged)
-            emit valueChanged(temp*pow(10.0, -decDig));
+        if (valChanged) emit valueChanged(temp*pow(10.0, -decDig));
     }
 }
 
 void ENumeric::silentSetValue(double v)
 {
+    csValue = v;
     long long temp = (long long) round(v * pow(10.0, decDig));
-    //if ((temp >= minVal) && (temp <= maxVal))
-    {
-        data = temp;
-        showData();
-    }
+    data = temp;
+    showData();
 }
 
 void ENumeric::setMaximum(double v)
 {
-    if (v >= d_minAsDouble)
-    {
+    if (v >= d_minAsDouble) {
         d_maxAsDouble = v;
         maxVal = (long long) round(v* (long)pow(10.0, decDig));
     }
@@ -263,8 +259,7 @@ void ENumeric::setMaximum(double v)
 
 void ENumeric::setMinimum(double v)
 {
-    if (v <= d_maxAsDouble)
-    {
+    if (v <= d_maxAsDouble) {
         d_minAsDouble = v;
         minVal = (long long) round(v* (long)pow(10.0, decDig));
     }
@@ -289,8 +284,8 @@ void ENumeric::setDecDigits(int d)
     decDig = d;
     digits = intDig + decDig;
     /* when changing decimal digits, minimum and maximum need to be recalculated, to avoid
-	 * round issues. So, recalculating maximum and minimum is required  to obtain precision
-	 */
+     * round issues. So, recalculating maximum and minimum is required  to obtain precision
+     */
     setMinimum(d_minAsDouble);
     setMaximum(d_maxAsDouble);
     init();
@@ -345,21 +340,19 @@ void ENumeric::downDataIndex(int id)
 void ENumeric::showData()
 {
     long long temp = data;
-
     double num = 0;
     if (data < 0)
         signLabel->setText(QString("-"));
     else
         signLabel->setText(QString("+"));
 
-    for (int i = 0; i < digits; i++)
-    {
+    for (int i = 0; i < digits; i++) {
         double power =  pow(10.0, digits-i-1);
         double numd = (double) temp / power;
         if(numd >=0)
-          num = floor(numd);
+            num = floor(numd);
         else
-          num = ceil(numd);
+            num = ceil(numd);
         numd = num * power;
         temp = temp - (long long) numd;
         labels[i]->setText(QString().setNum(abs((int) num)));
@@ -387,8 +380,7 @@ void ENumeric::dataInput()
 
 void ENumeric::mouseDoubleClickEvent(QMouseEvent*)
 {
-    if (text == NULL)
-    {
+    if (text == NULL) {
         text = new QLineEdit(this);
         connect(text, SIGNAL(returnPressed()), this, SLOT(dataInput()));
         connect(text, SIGNAL(editingFinished() ), text, SLOT(hide()));
@@ -413,6 +405,9 @@ bool ENumeric::eventFilter(QObject *obj, QEvent *event)
         }
     } else if(event->type() == QEvent::Leave) {
         lastLabel = -1;
+        long long temp = (long long) round(csValue * pow(10.0, decDig));
+        data = temp;
+        showData();
         QApplication::restoreOverrideCursor();
         resize(size()*0.99); // force a resize
         resize(aux);
@@ -431,17 +426,20 @@ bool ENumeric::eventFilter(QObject *obj, QEvent *event)
             }
         }
     } else if(event->type() == QEvent::KeyRelease)   {
-       QKeyEvent *ev = (QKeyEvent *) event;
-       if(ev->key() == Qt::Key_Escape) text->hide();
-       if(ev->key() == Qt::Key_Up) upDataIndex(lastLabel);
-       if(ev->key() == Qt::Key_Down) downDataIndex(lastLabel);
+        QKeyEvent *ev = (QKeyEvent *) event;
+        if(ev->key() == Qt::Key_Escape) text->hide();
+        if(ev->key() == Qt::Key_Up) {
+            upDataIndex(lastLabel);
+        }
+        if(ev->key() == Qt::Key_Down) {
+            downDataIndex(lastLabel);
+        }
     }
-   return QObject::eventFilter(obj, event);
+    return QObject::eventFilter(obj, event);
 }
 
 void ENumeric::reconstructGeometry()
 {
-
 }
 
 void ENumeric::resizeEvent(QResizeEvent *e)
@@ -521,10 +519,10 @@ void ENumeric::resizeEvent(QResizeEvent *e)
     }
 
     /* rescale font if required. Take the only ESimpleLabel we have, then ask it to calculateFontPointSizeF
-	 * providing its text and its size as input parameters to the public method calculateFontPointSizeF of
-	 * the class FontScalingWidget, which ESimpleLabel inherits. We must provide text and size because the
-	 * method belongs to FontScalingWidget, not to ESimpleLabel.
-	 */
+     * providing its text and its size as input parameters to the public method calculateFontPointSizeF of
+     * the class FontScalingWidget, which ESimpleLabel inherits. We must provide text and size because the
+     * method belongs to FontScalingWidget, not to ESimpleLabel.
+     */
     QFont signFont("Monospace");  // + and - should have same size
     QFont labelFont;
     ESimpleLabel *l1 = findChild<ESimpleLabel *>();
@@ -540,7 +538,7 @@ void ENumeric::resizeEvent(QResizeEvent *e)
         if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         labelFont.setPointSizeF(fontSize);
         signFont.setPointSizeF(fontSize);
-        //printf("digits=%d %s font size=%f\n", digits, l1->text().toLatin1().constData(), fontSize);
+        //printf("digits=%d %s font size=%f\n", digits, qasc(l1->text()), fontSize);
     }
     /* all fonts equal */
     if(d_fontScaleEnabled){

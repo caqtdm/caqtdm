@@ -34,6 +34,7 @@ public:
 
 signals:
     void emitSignal(int);
+    void emitSignal(double);
 
 private:
     eventsignal thisEventSignal;

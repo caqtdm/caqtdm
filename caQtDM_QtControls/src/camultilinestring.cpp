@@ -23,15 +23,16 @@
  *    anton.mezger@psi.ch
  */
 
-#include "calineedit.h"
+#include "camultilinestring.h"
 #include "alarmdefs.h"
 #include <QEvent>
 #include <QStyleOptionFrame>
 #include <QStyle>
 #include <QtDebug>
 #include <QMouseEvent>
+#include <QScrollBar>
 
-caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(this)
+caMultiLineString::caMultiLineString(QWidget *parent) : QPlainTextEdit(parent), FontScalingWidget(this)
 {
     // we want this font, while nice and monospace
     QFont font("Lucida Sans Typewriter");
@@ -56,23 +57,12 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     setColorMode(Default);
     setAlarmHandling(onForeground);
 
-    thisFormatC[0] = '\0';
-
-    setUnitsEnabled(false);
-
     thisBackColor = Qt::gray;
     thisForeColor = Qt::black;
-
     oldBackColor = Qt::black;
     oldForeColor = Qt::gray;
-
-    thisFrameColor = Qt::black;
-    oldFrameColor = Qt::gray;
-
-    thisFramePresent = false;
-
-    thisFrameLineWidth = 0;
-    oldFrameLineWidth = 0;
+    thisFrameColor = Qt::gray;
+    oldFrameColor = Qt::black;
 
     Alarm = 0;
 
@@ -81,48 +71,30 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     //defForeColor = Qt::black;
     defSelectColor = Qt::red; // this does not appear in the palette
 
-    setPrecisionMode(Channel);
-    setLimitsMode(Channel);
-    setPrecision(0);
-    setFormatType(decimal);
-    setFormat(0);
-    setMinValue(0.0);
-    setMaxValue(1.0);
-    setFrame(false);
+    setLineWrapMode(NoWrap);
+    setWordWrapMode(QTextOption::NoWrap);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     keepText = "";
-    unitsLast = "";
     setTextLine(keepText);
-    setValueType(false);
 
     setFontScaleModeL(WidthAndHeight);
-    newFocusPolicy(Qt::NoFocus);
+    setFocusPolicy(Qt::NoFocus);
+    setLinewidth(0);
+    setFrame(false);
 
     d_rescaleFontOnTextChanged = true;
 
     installEventFilter(this);
 }
 
-void caLineEdit::setFromTextEntry()
-{
-    connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(rescaleFont(const QString&)));
-}
-
-void caLineEdit::setValueType(bool isvalue)
-{
-    isValue = isvalue;
-}
-
-void caLineEdit::newFocusPolicy(Qt::FocusPolicy f){
-    setFocusPolicy(f);
-}
-
-QString caLineEdit::getPV() const
+QString caMultiLineString::getPV() const
 {
     return thisPV;
 }
 
-void caLineEdit::setPV(QString const &newPV)
+void caMultiLineString::setPV(QString const &newPV)
 {
     thisPV = newPV;
 }
@@ -130,34 +102,21 @@ void caLineEdit::setPV(QString const &newPV)
 // this routine sets the correct styles for the calinedit and catextentry (inheriting from calinedit)
 // the styles are now defined here and not in the style sheet any more
 // while this gives a perfomance problem, limit the use of it by testing changes
-
-void caLineEdit::setColors(QColor bg, QColor fg, QColor frame, int lineWidth)
+void caMultiLineString::setColors(QColor bg, QColor fg, QColor frame, int lineWidth)
 {
     if(!defBackColor.isValid() || !defForeColor.isValid()) return;
 
     if((bg != oldBackColor) || (fg != oldForeColor) || (thisColorMode != oldColorMode) || (frame != oldFrameColor) || lineWidth != oldFrameLineWidth) {
-        QColor lc, dc;
-        QColor blc = frame.lighter();
-        QColor bdc = frame.darker();
 
-        thisStyle = "caTextEntry,caLineEdit {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-radius: 1px;} ";
-        thisStyle.append("caLineEdit {border: %9px; border-style:outset; padding: 0px 0px 0px 2px; border-color: rgba(%10, %11, %12, %13) rgba(%14, %15, %16, %17)  rgba(%18, %19, %20, %21) rgba(%22, %23, %24, %25);} caTextEntry { border: 2px; padding: 0px;}");
-
-        setBotTopBorderWidth((double) lineWidth+1);
-        setLateralBorderWidth((double) lineWidth+1);
+        thisStyle = "caMultiLineString {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-radius: 1px;} ";
+        thisStyle.append("caMultiLineString {border: %9px; border-style:solid; padding: 0px 0px 0px 2px; border-color: rgba(%10, %11, %12, %13);}");
 
         // alarm default = (colors from stylesheet)
         if(thisColorMode == Default) {
             thisStyle = thisStyle.arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
                     arg(defForeColor.red()).arg(defForeColor.green()).arg(defForeColor.blue()).arg(defForeColor.alpha()).
                     arg(lineWidth).
-                    arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha()).
-                    arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
-                    arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
-                    arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha());
-
-            lc = defBackColor.lighter();
-            dc = defBackColor.darker();
+                    arg(frame.red()).arg(frame.green()).arg(frame.blue()).arg(frame.alpha());
 
           // alarm default = alarm colors on foreground or background (colors from alarms and stylesheet)
           // when major alarm and background handling take the background from stylesheet (normally would be white)
@@ -166,34 +125,22 @@ void caLineEdit::setColors(QColor bg, QColor fg, QColor frame, int lineWidth)
                 thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
                         arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
                         arg(lineWidth).
-                        arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha()).
-                        arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
-                        arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
-                        arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha());
+                        arg(frame.red()).arg(frame.green()).arg(frame.blue()).arg(frame.alpha());
             } else {
                 if(thisAlarmHandling == onForeground) {
                     thisStyle = thisStyle.
                             arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
                             arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha()).
                             arg(lineWidth).
-                            arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha()).
-                            arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
-                            arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
-                            arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha());
+                            arg(frame.red()).arg(frame.green()).arg(frame.blue()).arg(frame.alpha());
                 } else {
                     thisStyle = thisStyle.
                             arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
                             arg(defForeColor.red()).arg(defForeColor.green()).arg(defForeColor.blue()).arg(defForeColor.alpha()).
                             arg(lineWidth).
-                            arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha()).
-                            arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
-                            arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
-                            arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha());
+                            arg(frame.red()).arg(frame.green()).arg(frame.blue()).arg(frame.alpha());
                 }
             }
-
-            lc = defBackColor.lighter();
-            dc = defBackColor.darker();
 
             // alarm static = alarm colors on foreground or background (colors from color properties)
         } else if(thisColorMode == Alarm_Static) {
@@ -202,50 +149,27 @@ void caLineEdit::setColors(QColor bg, QColor fg, QColor frame, int lineWidth)
                         arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
                         arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha()).
                         arg(lineWidth).
-                        arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha()).
-                        arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
-                        arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
-                        arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha());
+                        arg(frame.red()).arg(frame.green()).arg(frame.blue()).arg(frame.alpha());
             } else {
                 thisStyle = thisStyle.
                         arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
                         arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha()).
                         arg(lineWidth).
-                        arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha()).
-                        arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
-                        arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
-                        arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha());
+                        arg(frame.red()).arg(frame.green()).arg(frame.blue()).arg(frame.alpha());
             }
-            lc = defBackColor.lighter();
-            dc = defBackColor.darker();
 
             // static (colors from color properties)
         } else {
             thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
                     arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha()).
                     arg(lineWidth).
-                    arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha()).
-                    arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
-                    arg(blc.red()).arg(blc.green()).arg(blc.blue()).arg(blc.alpha()).
-                    arg(bdc.red()).arg(bdc.green()).arg(bdc.blue()).arg(bdc.alpha());
-
-            lc = bg.lighter();
-            dc = bg.darker();
+                    arg(frame.red()).arg(frame.green()).arg(frame.blue()).arg(frame.alpha());
         }
 
-        if(thisStyle != oldStyle || thisColorMode != oldColorMode) {
-            thisStyle.append(" caTextEntry {border-style:inset; border-color: rgba(%1, %2, %3, %4) rgba(%5, %6, %7, %8)  rgba(%9, %10, %11, %12) rgba(%13, %14, %15, %16);} caTextEntry:focus {padding: 0px; border: 2px groove rgba(%17, %18, %19, %20); border-radius: 1px;} ");
-            thisStyle = thisStyle.arg(dc.red()).arg(dc.green()).arg(dc.blue()).arg(dc.alpha()).
-                    arg(lc.red()).arg(lc.green()).arg(lc.blue()).arg(lc.alpha()).
-                    arg(lc.red()).arg(lc.green()).arg(lc.blue()).arg(lc.alpha()).
-                    arg(dc.red()).arg(dc.green()).arg(dc.blue()).arg(dc.alpha()).
-                    arg(defSelectColor.red()).arg(defSelectColor.green()).arg(defSelectColor.blue()).arg(defSelectColor.alpha());
-
-            if(thisStyle != oldStyle) {
+        if(thisStyle != oldStyle) {
                 setStyleSheet(thisStyle);
-            }
-            oldStyle = thisStyle;
         }
+        oldStyle = thisStyle;
     }
     oldBackColor = bg;
     oldForeColor = fg;
@@ -254,7 +178,7 @@ void caLineEdit::setColors(QColor bg, QColor fg, QColor frame, int lineWidth)
     oldColorMode = thisColorMode;
 }
 
-void caLineEdit::setColorMode(colMode colormode)
+void caMultiLineString::setColorMode(colMode colormode)
 {
     thisColorMode = colormode;
     setBackground(thisBackColor);
@@ -262,19 +186,19 @@ void caLineEdit::setColorMode(colMode colormode)
     oldColorMode = thisColorMode;
 }
 
-void caLineEdit::setBackground(QColor c)
+void caMultiLineString::setBackground(QColor c)
 {
     thisBackColor = c;
     setColors(thisBackColor, thisForeColor, thisFrameColor, thisFrameLineWidth);
 }
 
-void caLineEdit::setForeground(QColor c)
+void caMultiLineString::setForeground(QColor c)
 {
     thisForeColor = c;
     setColors(thisBackColor, thisForeColor, thisFrameColor, thisFrameLineWidth);
 }
 
-void caLineEdit::forceForeAndBackground(QColor fg, QColor bg, QColor fr)
+void caMultiLineString::forceForeAndBackground(QColor fg, QColor bg, QColor fr)
 {
     colMode aux = thisColorMode;
     thisColorMode = Alarm_Static;
@@ -282,7 +206,7 @@ void caLineEdit::forceForeAndBackground(QColor fg, QColor bg, QColor fr)
     thisColorMode = aux;
 }
 
-void caLineEdit::setForeAndBackground(QColor foreground, QColor background, QColor frame)
+void caMultiLineString::setForeAndBackground(QColor foreground, QColor background, QColor frame)
 {
     thisForeColor = foreground;
     thisBackColor = background;
@@ -290,24 +214,24 @@ void caLineEdit::setForeAndBackground(QColor foreground, QColor background, QCol
     setColors(thisBackColor, thisForeColor, thisFrameColor, thisFrameLineWidth);
 }
 
-void caLineEdit::setFrame(bool frame) {
+void caMultiLineString::setFrame(bool frame) {
     thisFramePresent = frame;
     if(!thisFramePresent) setLinewidth(0);
 }
 
-void caLineEdit::setFrameColor(QColor c) {
+void caMultiLineString::setFrameColor(QColor c) {
     thisFrameColor = c;
     setColors(thisBackColor, thisForeColor, thisFrameColor, thisFrameLineWidth);
 }
 
-void caLineEdit::setLinewidth(int width)
+void caMultiLineString::setLinewidth(int width)
 {
     if(width < 0) thisFrameLineWidth = 0;
     else thisFrameLineWidth = width;
     setColors(thisBackColor, thisForeColor, thisFrameColor, thisFrameLineWidth);
 }
 
-bool caLineEdit::event(QEvent *e)
+bool caMultiLineString::event(QEvent *e)
 {
     if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
         FontScalingWidget::rescaleFont(text(), calculateTextSpace());
@@ -341,98 +265,14 @@ bool caLineEdit::event(QEvent *e)
             setEnabled(false);
         }
     }
-    return QLineEdit::event(e);
+    return QPlainTextEdit::event(e);
 }
 
-void caLineEdit::setFormat(int prec)
-{
-    int precision = prec;
-    if(precision > 17) precision = 17;
-    if(thisPrecMode == User) {
-        precision = getPrecision();
-    }
-    switch (thisFormatType) {
-    case string:
-    case decimal:
-        if(precision >= 0) {
-           sprintf(thisFormat, "%s.%dlf", "%", precision);
-        } else {
-           sprintf(thisFormat, "%s.%dle", "%", -precision);
-        }
-        break;
-    case compact:
-        sprintf(thisFormat, "%s.%dle", "%", qAbs(precision));
-        sprintf(thisFormatC, "%s.%dlf", "%", qAbs(precision));
-        break;
-    case exponential:
-    case engr_notation:
-        sprintf(thisFormat, "%s.%dle", "%", qAbs(precision));
-        break;
-    case truncated:
-    case enumeric:
-        strcpy(thisFormat, "%d");
-        break;
-    case hexadecimal:
-        strcpy(thisFormat, "0x%x");
-        break;
-    case octal:
-        strcpy(thisFormat, "O%o");
-        break;
-    case sexagesimal:
-    case sexagesimal_hms:
-    case sexagesimal_dms:
-        break;
-    }
-}
-
-void caLineEdit::setValue(double value, const QString& units)
-{
-    char asc[1024];
-    isValue = true;
-
-    if(thisFormatType == compact) {
-      if ((value < 1.e4 && value > 1.e-4) || (value > -1.e4 && value < -1.e-4) || value == 0.0) {
-        sprintf(asc, thisFormatC, value);
-      } else {
-        sprintf(asc, thisFormat, value);
-      }
-    } else if(thisFormatType == hexadecimal || thisFormatType == octal)  {
-        sprintf(asc, thisFormat, (int) value);
-    } else if(thisFormatType == truncated) {
-        sprintf(asc, thisFormat, (int) value);
-    } else {
-        sprintf(asc, thisFormat, value);
-    }
-    if(thisUnitMode) {
-        strcat(asc, " ");
-        strcat(asc, qasc(units));
-        unitsLast = units;
-    }
-
-    valueLast = value;
-    setTextLine(asc);
-}
-
-void caLineEdit::setAlarmColors(short status, double value, QColor bgAtInit, QColor fgAtInit)
+void caMultiLineString::setAlarmColors(short status, double value, QColor bgAtInit, QColor fgAtInit)
 {
     QColor c;
-    Alarm = 0;
 
-    if(status != NOTCONNECTED) {
-        if(thisLimitsMode == Channel) {
-            Alarm = status;
-        } else if(thisLimitsMode == User) {
-            if(value > getMaxValue() || value < getMinValue()) {
-                Alarm = MAJOR_ALARM;
-            } else {
-                Alarm = NO_ALARM;
-            }
-        } else {
-             //return;
-        }
-    } else {
-       Alarm = status;
-    }
+    Alarm = status;
 
     switch (Alarm) {
 
@@ -504,22 +344,12 @@ void caLineEdit::setAlarmColors(short status, double value, QColor bgAtInit, QCo
     fgAtInitLast = fgAtInit;
 }
 
-void caLineEdit::updateAlarmColors()
+void caMultiLineString::setTextLine(const QString &txt)
 {
-    if (isValue) setValue(valueLast, unitsLast);
-}
-
-void caLineEdit::setTextLine(const QString &txt)
-{
-    int pos;
     if(keepText == txt) {  // accelerate things
         return;
     }
-    pos = cursorPosition();
-    QLineEdit::setText(txt);
-    setCursorPosition(pos);
-    //printf("settext: %s <%s> <%s> cursor@%d\n", qasc(thisPV),  qasc(txt), qasc(keepText), pos);
-
+    QPlainTextEdit::setPlainText(txt);
     if(keepText.size() != txt.size()) {
        FontScalingWidget::rescaleFont(text(), d_savedTextSpace);
     }
@@ -527,34 +357,30 @@ void caLineEdit::setTextLine(const QString &txt)
     keepText = txt;
 }
 
-void caLineEdit::forceText(const QString &txt)
-{
-    //printf("forcetext: <%s>\n", qasc(txt));
-    int pos = cursorPosition();
-    QLineEdit::setText(txt);
-    FontScalingWidget::rescaleFont(text(), d_savedTextSpace);
-    setCursorPosition(pos);
-}
 
-QSize caLineEdit::calculateTextSpace()
+QSize caMultiLineString::calculateTextSpace()
 {
-    QStyleOptionFrame labelStyleOption;
-    initStyleOption(&labelStyleOption);
-    d_savedTextSpace = style()->subElementRect(QStyle::SE_LineEditContents, &labelStyleOption, this).size();
+    int innerWidth = size().width();
+    int innerHeight = size().height();
+
+    if (verticalScrollBar()) innerWidth -= verticalScrollBar()->width();
+
+    d_savedTextSpace.setWidth(innerWidth - frameWidth() - 4);
+    d_savedTextSpace.setHeight(innerHeight - frameWidth() - 6);
     return d_savedTextSpace;
 }
 
 // will now be used only for catextentry (performance)
-void caLineEdit::rescaleFont(const QString& newText)
+void caMultiLineString::rescaleFont(const QString& newText)
 {
     if(d_rescaleFontOnTextChanged) {
         FontScalingWidget::rescaleFont(newText, d_savedTextSpace);
     }
 }
 
-QSize caLineEdit::sizeHint() const
+QSize caMultiLineString::sizeHint() const
 {
-    if(!fontScaleEnabled()) return QLineEdit::sizeHint();
+    if(!fontScaleEnabled()) return QPlainTextEdit::sizeHint();
     QFont f = font();
     f.setPointSize(10);
     QFontMetrics fm(f);
@@ -565,18 +391,14 @@ QSize caLineEdit::sizeHint() const
     return size;
 }
 
-QSize caLineEdit::minimumSizeHint() const
+QSize caMultiLineString::minimumSizeHint() const
 {
     QSize size;
     if(!fontScaleEnabled())
-        size = QLineEdit::minimumSizeHint();
+        size = QPlainTextEdit::minimumSizeHint();
     else
         size = sizeHint();
     //printf("ESimpleLabel \e[0;33mminimumSizeHint\e[0m \"%s\" returning size w %d h %d\n", objectName(), size.width(), size.height());
     return size;
 }
 
-void caLineEdit::setUnitsEnabled(bool check)
-{
-    thisUnitMode = check;
-}

@@ -155,6 +155,7 @@ public:
     }
 
     void initColormap(int *colorIndexes, int nbColors, bool discrete) {
+        if(nbColors < 2) return;
 
         if(discrete) setMode( QwtLinearColorMap::FixedColors);
         setColorInterval( Qt::GlobalColor( colorIndexes[0] ), Qt::GlobalColor(colorIndexes[nbColors-1]) );

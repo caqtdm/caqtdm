@@ -23,15 +23,34 @@
  *    anton.mezger@psi.ch
  */
 
-#ifndef CALINEEDIT_H
-#define CALINEEDIT_H
+#ifndef CAMULTILINESTRING_H
+#define CAMULTILINESTRING_H
 
-#include <QLineEdit>
+#include <QPlainTextEdit>
 #include <qtcontrols_global.h>
 #include <fontscalingwidget.h>
 
-class QTCON_EXPORT caLineEdit : public QLineEdit, public FontScalingWidget
+class QTCON_EXPORT caMultiLineString : public QPlainTextEdit, public FontScalingWidget
 {
+    // things to get rid off
+    Q_ENUMS(Shape Shadow WrapMode)
+    Q_PROPERTY(Shape frameShape READ getFrameShape  DESIGNABLE false)
+    Q_PROPERTY(Shadow frameShadow READ getFrameShadow  DESIGNABLE false)
+    Q_PROPERTY(int lineWidth READ getInt  DESIGNABLE false)
+    Q_PROPERTY(int midLineWidth READ getInt  DESIGNABLE false)
+    Q_PROPERTY(int tabStopWidth READ getInt  DESIGNABLE false)
+    Q_PROPERTY(int maximumBlockCount READ getInt  DESIGNABLE false)
+    Q_PROPERTY(int cursorWidth READ getInt  DESIGNABLE false)
+    Q_PROPERTY(WrapMode lineWrapMode READ getWrapMode  DESIGNABLE false)
+    Q_PROPERTY(bool backgroundVisible READ getBool DESIGNABLE false)
+    Q_PROPERTY(bool overwriteMode READ getBool DESIGNABLE false)
+    Q_PROPERTY(bool readOnly READ getBool DESIGNABLE false)
+    Q_PROPERTY(bool tabChangesFocus READ getBool DESIGNABLE false)
+    Q_PROPERTY(bool centerOnScroll READ getBool DESIGNABLE false)
+    Q_PROPERTY(bool undoRedoEnabled READ getBool DESIGNABLE false)
+    Q_PROPERTY(QString documentTitle READ getDocumentTitle DESIGNABLE false)
+
+    // our stuff
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
 
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
@@ -49,41 +68,29 @@ class QTCON_EXPORT caLineEdit : public QLineEdit, public FontScalingWidget
     Q_PROPERTY(alertHandling alarmHandling READ getAlarmHandling WRITE setAlarmHandling)
     Q_ENUMS(alertHandling)
 
-    Q_PROPERTY(int precision READ getPrecision WRITE setPrecision)
-    Q_PROPERTY(SourceMode precisionMode READ getPrecisionMode WRITE setPrecisionMode)
-
-    Q_PROPERTY(SourceMode limitsMode READ getLimitsMode WRITE setLimitsMode)
-    Q_ENUMS(SourceMode)
-
-    Q_PROPERTY(double maxValue READ getMaxValue WRITE setMaxValue)
-    Q_PROPERTY(double minValue READ getMinValue WRITE setMinValue)
-
     Q_PROPERTY(bool fontScaleEnabled READ fontScaleEnabled DESIGNABLE false)
     Q_PROPERTY(ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleModeL)
     Q_PROPERTY(double fontScaleFactor READ fontScaleFactor WRITE setFontScaleFactor DESIGNABLE false)
 
-    Q_PROPERTY(bool unitsEnabled READ getUnitsEnabled WRITE setUnitsEnabled)
-
-    Q_PROPERTY(FormatType formatType READ getFormatType WRITE setFormatType)
-
     Q_ENUMS(ScaleMode)
-    Q_ENUMS(FormatType)
 
     Q_OBJECT
 
 public:
 
-    caLineEdit( QWidget *parent = 0 );
-     ~caLineEdit(){}
+    enum Shape {NoFrame = 0};
+    enum Shadow {Plain = 0x0010};
+    enum WrapMode {noWrap = 0};
 
-    bool getUnitsEnabled() const { return thisUnitMode; }
-    void setUnitsEnabled(bool thisUnitMode);
+    caMultiLineString( QWidget *parent = 0 );
+     ~caMultiLineString(){}
 
-    double getMaxValue()  const {return thisMaximum;}
-    void setMaxValue(double const &maxim) {thisMaximum = maxim;}
-
-    double getMinValue()  const {return thisMinimum;}
-    void setMinValue(double const &minim) {thisMinimum = minim;}
+    QString getDocumentTitle() { return "";}
+    Shape getFrameShape() {return NoFrame;}
+    Shadow getFrameShadow() {return Plain;}
+    WrapMode getWrapMode() {return noWrap;}
+    bool getBool() {return false;}
+    int getInt() {return (int) 0;}
 
     QString getPV() const;
     void setPV(QString const &newPV);
@@ -109,41 +116,19 @@ public:
     alertHandling getAlarmHandling() const { return thisAlarmHandling;}
     void setAlarmHandling(alertHandling alarmHandling) {thisAlarmHandling = alarmHandling;}
 
-    enum SourceMode {Channel = 0, User};
-    SourceMode getPrecisionMode() const { return thisPrecMode; }
-    void setPrecisionMode(SourceMode precmode) {thisPrecMode = precmode;}
-    SourceMode getLimitsMode() const { return thisLimitsMode; }
-    void setLimitsMode(SourceMode limitsmode) { thisLimitsMode = limitsmode;}
-
-    int getPrecision() const {return thisPrecision;}
-    void setPrecision(int prec) {thisPrecision = prec;}
-
-    enum FormatType { decimal, exponential, engr_notation, compact, truncated,
-                      hexadecimal, octal, string, sexagesimal, sexagesimal_hms, sexagesimal_dms, enumeric}; // enumeric = enum as number
-
     enum ScaleMode { None, Height, WidthAndHeight};
     void setTextLine(const QString&);
-    void forceText(const QString&);
-    QString text() const { return QLineEdit::text(); }
+
+    QString text() const { return QPlainTextEdit::toPlainText(); }
 
     void setFontScaleModeL(ScaleMode m) { FontScalingWidget::setScaleMode((int) m);}
     ScaleMode fontScaleMode() { return (ScaleMode) FontScalingWidget::scaleMode(); }
-
-    void setFormat(int prec);
-    void setValue(double value, const QString& units);
-
-    void setFormatType(FormatType m) { thisFormatType = m; }
-    FormatType getFormatType() { return thisFormatType; }
 
     void setForeAndBackground(QColor foreground, QColor background, QColor frame);
     void forceForeAndBackground(QColor foreground, QColor background, QColor frame);
     void setAlarmColors(short status, double value, QColor bgAtInit, QColor fgAtInit);
     void updateAlarmColors();
     void setColors(QColor bg, QColor fg, QColor fr, int lineWidth);
-    void newFocusPolicy(Qt::FocusPolicy f);
-
-    void setValueType(bool isvalue);
-    void setFromTextEntry();
 
 private slots:
     void rescaleFont(const QString& newText);
@@ -156,6 +141,7 @@ protected:
 
 private:
     QString thisPV;
+    QString keepText;
 
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
@@ -164,25 +150,15 @@ private:
     colMode thisColorMode;
     colMode oldColorMode;
 
-    int thisPrecision;
-    SourceMode thisPrecMode;
-    SourceMode thisLimitsMode;
-
-    bool thisUnitMode;
-    QString keepText;
-    char thisFormat[20];
-    char thisFormatC[20];
     bool d_rescaleFontOnTextChanged;
-    double thisMaximum, thisMinimum;
-    FormatType thisFormatType;
     QString thisStyle, oldStyle;
 
     bool isShown;
-    bool isValue;
 
     bool thisFramePresent;
     QColor thisFrameColor, oldFrameColor;
     int thisFrameLineWidth, oldFrameLineWidth;
+
     alertHandling thisAlarmHandling;
     short Alarm;
 
@@ -190,7 +166,6 @@ private:
     double valueLast;
     QColor bgAtInitLast;
     QColor fgAtInitLast;
-    QString unitsLast;
 };
 
 #endif

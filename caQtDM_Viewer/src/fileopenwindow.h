@@ -131,7 +131,6 @@ signals:
      QString lastFilePath;
 
      bool printandexit;
-     bool allowResize;
      bool minimizeMessageWindow;
 
      int activWindow;

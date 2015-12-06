@@ -101,14 +101,14 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
         borderH2 = borderH1;
         if(txtHeight == (borderH1 + 1) || txtHeight == (borderH1)) {
             //printf("good: text for <%s> :text \"%s\" %.2f\e[0m | borderH1: %.2f borderH2: %.2f pointSizeF %.2f, h: %.2f\n",
-            //widget()->objectName().toLatin1().constData(), text.toLatin1().constData(), txtHeight, borderH1,borderH2, f.pointSizeF(), borderH1 );
+            //qasc(widget()->objectName()), qasc(text), txtHeight, borderH1,borderH2, f.pointSizeF(), borderH1 );
 
         } else {
             while((txtHeight > borderH1) && f.pointSizeF() > MIN_FONT_SIZE) {
                 if(f.pointSizeF() <= 0.0) f.setPointSizeF(1.0);
                 f.setPointSizeF(f.pointSizeF() - 0.5);
                 //printf(" \e[1;36m -- DECREASING font size for object \"%s\" :text \"%s\"  height %.1f - point size %.2f - h: %.2f\e[0m\n",
-                //         d_widget->objectName().toLatin1().constData(), text.toLatin1().constData(),  txtHeight, f.pointSizeF(), borderH1);
+                //         qasc(d_widget->objectName()), qasc(text),  txtHeight, f.pointSizeF(), borderH1);
                 QFontMetricsF tmpFm(f);
                 txtHeight = linecnt * tmpFm.lineSpacing();
             }
@@ -117,7 +117,7 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
                 if(f.pointSizeF() <= 0.0) f.setPointSizeF(0.5);
                 f.setPointSizeF(f.pointSizeF() + 0.5);
                 //printf(" \e[1;35m ++ INCREASING font size for object\"%s\" :text \"%s\" height %.1f - point size %.2f - h: %.2f\e[0m\n",
-                //         d_widget->objectName().toLatin1().constData(), text.toLatin1().constData(), txtHeight, f.pointSizeF(), borderH2);
+                //         qasc(d_widget->objectName()), qasc(text), txtHeight, f.pointSizeF(), borderH2);
                 QFontMetricsF tmpFm(f);
                 txtHeight = linecnt * tmpFm.lineSpacing();
             }
@@ -130,7 +130,7 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
             if(f.pointSizeF() <= 0.0) f.setPointSizeF(1.0);
             f.setPointSizeF(f.pointSizeF() - 0.5);
             //printf(" \e[1;36m -- next DECREASING font size \"%s\" :text \"%s\" width %.1f height %.1f - point size %.2f - w: %.2f\e[0m\n",
-            //         d_widget->objectName().toLatin1().constData(), text.toLatin1().constData(),  txtWidth, txtHeight, f.pointSizeF(), borderW2);
+            //         qasc(d_widget->objectName()), qasc(text),  txtWidth, txtHeight, f.pointSizeF(), borderW2);
             QFontMetricsF tmpFm(f);
             txtWidth = tmpFm.width(longestLine);
             //txtHeight = linecnt * tmpFm.lineSpacing();
@@ -150,7 +150,7 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
                 if(f.pointSizeF() <= 0.0) f.setPointSizeF(1.0);
                 f.setPointSizeF(f.pointSizeF() - 0.5);
                 //printf(" \e[1;36m -- DECREASING font size \"%s\" :text \"%s\"  height %.1f - point size %.2f - h: %.2f\e[0m\n",
-                //         widget()->objectName().toLatin1().constData(), text.toLatin1().constData(),  txtHeight, f.pointSizeF(), borderH1);
+                //         qasc(widget()->objectName()), qasc(text),  txtHeight, f.pointSizeF(), borderH1);
                 QFontMetricsF tmpFm(f);
                 txtHeight = linecnt * tmpFm.lineSpacing();
             }
@@ -159,7 +159,7 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
                 if(f.pointSizeF() <= 0.0) f.setPointSizeF(0.5);
                 f.setPointSizeF(f.pointSizeF() + 0.5);
                 //printf(" \e[1;35m ++ INCREASING font size \"%s\" :text \"%s\" height %.1f - point size %.2f - h: %.2f\e[0m\n",
-                //         widget()->objectName().toLatin1().constData(), text.toLatin1().constData(), txtHeight, f.pointSizeF(), borderH2);
+                //         qasc(widget()->objectName()), qasc(text), txtHeight, f.pointSizeF(), borderH2);
                 QFontMetricsF tmpFm(f);
                 txtHeight = linecnt * tmpFm.lineSpacing();
             }
@@ -200,14 +200,14 @@ double FontScalingWidget::calculateVertFontPointSizeF(const QString& text, const
          /* first scale according to height (same algorithme as below) and then verify width */
         if(txtHeight == (borderW1 + 1) || txtHeight == (borderW1)) {
             //printf("good: text for <%s> :text \"%s\" %.2f\e[0m | borderH1: %.2f borderH2: %.2f pointSizeF %.2f, h: %.2f\n",
-            //widget()->objectName().toLatin1().constData(), text.toLatin1().constData(), txtHeight, borderH1,borderH2, f.pointSizeF(), borderH1 );
+            //qasc(widget()->objectName()), qasc(text), txtHeight, borderH1,borderH2, f.pointSizeF(), borderH1 );
 
         } else {
             while((txtHeight > borderW1) && f.pointSizeF() > MIN_FONT_SIZE) {
                 if(f.pointSizeF() <= 0.0) f.setPointSizeF(1.0);
                 f.setPointSizeF(f.pointSizeF() - 0.5);
                 //printf(" \e[1;36m -- DECREASING font size for object \"%s\" :text \"%s\"  height %.1f - point size %.2f - h: %.2f\e[0m\n",
-                //         d_widget->objectName().toLatin1().constData(), text.toLatin1().constData(),  txtHeight, f.pointSizeF(), borderH1);
+                //         qasc(d_widget->objectName()), qasc(text),  txtHeight, f.pointSizeF(), borderH1);
                 QFontMetricsF tmpFm(f);
                 txtHeight = linecnt * tmpFm.lineSpacing();
             }
@@ -216,7 +216,7 @@ double FontScalingWidget::calculateVertFontPointSizeF(const QString& text, const
                 if(f.pointSizeF() <= 0.0) f.setPointSizeF(0.5);
                 f.setPointSizeF(f.pointSizeF() + 0.5);
                 //printf(" \e[1;35m ++ INCREASING font size for object\"%s\" :text \"%s\" height %.1f - point size %.2f - h: %.2f\e[0m\n",
-                //         d_widget->objectName().toLatin1().constData(), text.toLatin1().constData(), txtHeight, f.pointSizeF(), borderH2);
+                //         qasc(d_widget->objectName()), qasc(text), txtHeight, f.pointSizeF(), borderH2);
                 QFontMetricsF tmpFm(f);
                 txtHeight = linecnt * tmpFm.lineSpacing();
             }
@@ -229,7 +229,7 @@ double FontScalingWidget::calculateVertFontPointSizeF(const QString& text, const
             if(f.pointSizeF() <= 0.0) f.setPointSizeF(1.0);
             f.setPointSizeF(f.pointSizeF() - 0.5);
             //printf(" \e[1;36m -- next DECREASING font size \"%s\" :text \"%s\" width %.1f height %.1f - point size %.2f - w: %.2f\e[0m\n",
-            //         d_widget->objectName().toLatin1().constData(), text.toLatin1().constData(),  txtWidth, txtHeight, f.pointSizeF(), borderW2);
+            //         qasc(d_widget->objectName()), qasc(text),  txtWidth, txtHeight, f.pointSizeF(), borderW2);
             QFontMetricsF tmpFm(f);
             txtWidth = tmpFm.width(longestLine);
             //txtHeight = linecnt * tmpFm.lineSpacing();
@@ -247,7 +247,7 @@ double FontScalingWidget::calculateVertFontPointSizeF(const QString& text, const
                 if(f.pointSizeF() <= 0.0) f.setPointSizeF(1.0);
                 f.setPointSizeF(f.pointSizeF() - 0.5);
                 //printf(" \e[1;36m -- DECREASING font size \"%s\" :text \"%s\"  height %.1f - point size %.2f - h: %.2f\e[0m\n",
-                //         widget()->objectName().toLatin1().constData(), text.toLatin1().constData(),  txtHeight, f.pointSizeF(), borderH1);
+                //         qasc(widget()->objectName()), qasc(text),  txtHeight, f.pointSizeF(), borderH1);
                 QFontMetricsF tmpFm(f);
                 txtHeight = linecnt * tmpFm.lineSpacing();
             }
@@ -256,7 +256,7 @@ double FontScalingWidget::calculateVertFontPointSizeF(const QString& text, const
                 if(f.pointSizeF() <= 0.0) f.setPointSizeF(0.5);
                 f.setPointSizeF(f.pointSizeF() + 0.5);
                 //printf(" \e[1;35m ++ INCREASING font size \"%s\" :text \"%s\" height %.1f - point size %.2f - h: %.2f\e[0m\n",
-                //         widget()->objectName().toLatin1().constData(), text.toLatin1().constData(), txtHeight, f.pointSizeF(), borderH2);
+                //         qasc(widget()->objectName()), qasc(text), txtHeight, f.pointSizeF(), borderH2);
                 QFontMetricsF tmpFm(f);
                 txtHeight = linecnt * tmpFm.lineSpacing();
             }

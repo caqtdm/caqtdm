@@ -51,8 +51,8 @@ int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &
     infoString = "";
 
     //QString Path = (QString)  qgetenv("CAQTDM_DISPLAY_PATH");
-    //printf("<%s>\n", Path.toLatin1().constData());
-    //printf("checkFileAndDownload <%s>\n", fileName.toLatin1().constData());
+    //printf("<%s>\n", qasc(Path));
+    //printf("checkFileAndDownload <%s>\n", qasc(fileName));
 
     searchFile *s = new searchFile(fileName);
     QString fileNameFound = s->findFile();
@@ -68,7 +68,7 @@ int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &
 
     if(displayPath.length() < 1) return false;
 
-    //printf("filename to download %s\n", fileName.toLatin1().constData());
+    //printf("filename to download %s\n", qasc(fileName));
 
     displayPath.append("/");
     displayPath.append(fileName);
@@ -84,3 +84,33 @@ int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &
     displayGet->deleteLater();
     return true;
 }
+
+bool fileFunctions::removeFilesInTree(const QString &dirName)
+    {
+        QStringList fileFilter;
+        bool result = true;
+        fileFilter << "ui" << "prc" << "gif" << "jpg" << "png";
+        QDir dir(dirName);
+
+        if (dir.exists(dirName)) {
+            foreach(QFileInfo info, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst)) {
+                if (info.isDir()) {
+                    result = removeFilesInTree(info.absoluteFilePath());
+                }
+                else {
+                    QString suffix = info.suffix();
+                    if(fileFilter.contains(suffix)) {
+                        //printf("remove %s\n", qasc(info.absoluteFilePath()));
+                        QFile::remove(info.absoluteFilePath());
+                    }
+                }
+
+                if (!result) {
+                    return result;
+                }
+            }
+        }
+
+        return result;
+    }
+

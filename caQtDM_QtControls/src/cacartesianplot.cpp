@@ -52,6 +52,32 @@ public:
     }
 };
 
+#ifdef QWT_USE_OPENGL
+class GLCanvas: public QwtPlotGLCanvas
+{
+public:
+    GLCanvas( QwtPlot *parent = NULL ):
+        QwtPlotGLCanvas( parent )
+    {
+        setContentsMargins( 1, 1, 1, 1 );
+    }
+
+protected:
+    virtual void paintEvent( QPaintEvent *event )
+    {
+        QPainter painter( this );
+        painter.setClipRegion( event->region() );
+
+        QwtPlot *plot = qobject_cast< QwtPlot *>( parent() );
+        if ( plot )
+            plot->drawCanvas( &painter );
+
+        painter.setPen( palette().foreground().color() );
+        painter.drawRect( rect().adjusted( 0, 0, -1, -1 ) );
+    }
+
+};
+#endif
 
 caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
 {
@@ -63,6 +89,7 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     thisToBeTriggered = false;
     thisTriggerNow = true;
     thisCountNumber = 0;
+    thisXaxisSyncGroup = 0;
 
     plotGrid = new QwtPlotGrid();
     plotGrid->attach(this);
@@ -90,8 +117,16 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     zoomer = new MyZoomer(canvas());
     QwtPlotPanner *panner = new QwtPlotPanner(canvas());
 #else
+#ifdef QWT_USE_OPENGL
+    printf("caCartesianPlot uses opengl (zoomer works but no rubberband) ?\n");
+    GLCanvas *canvas = new GLCanvas();
+    canvas->setPalette( QColor( "khaki" ) );
+    setCanvas(canvas);
+    zoomer = new MyZoomer( (QwtPlotCanvas *) canvas);
+#else
     QwtPlotCanvas *canvas =  (QwtPlotCanvas *) this->canvas();
-    zoomer = new MyZoomer(canvas);
+    zoomer = new MyZoomer( (QwtPlotCanvas *) canvas);
+#endif
     QwtPlotPanner *panner = new QwtPlotPanner(canvas);
 #endif
 
@@ -115,6 +150,8 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
         curve[i].setStyle(QwtPlotCurve::Lines);
         curve[i].attach(this);
         curve[i].setOrientation(Qt::Vertical);
+        curve[i].setPaintAttribute( QwtPlotCurve::ClipPolygons, true );
+
     }
 
     setStyle_1(Lines);
@@ -152,10 +189,12 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     canvas()->setAttribute( Qt::WA_OpaquePaintEvent, false );
     canvas()->setAutoFillBackground( false );   // use in ui file this parameter for transparency
 #else
+    #ifndef QWT_USE_OPENGL
     canvas->setPaintAttribute(QwtPlotCanvas::BackingStore, false);
     canvas->setPaintAttribute(QwtPlotCanvas::Opaque, false);
     canvas->setAttribute( Qt::WA_OpaquePaintEvent, false );
     canvas->setAutoFillBackground( false );   // use in ui file this parameter for transparency
+#endif
 #endif
 
     installEventFilter(this);
@@ -414,15 +453,7 @@ void caCartesianPlot::displayData(int curvIndex, int curvType)
                     accumulX[curvIndex].append(dataX[0]);
                     accumulY[curvIndex].append(dataY[0]);
                 }
-/*
-                dataX = accumulX[curvIndex].data();
-                dataY = accumulY[curvIndex].data();
 
-                printf("array size=%d wanted count=%d\n", accumulX[curvIndex].size(), thisCountNumber);
-                for(int i=0; i< accumulX[curvIndex].size(); i++) {
-                    printf("%d %f %f\n", i, dataX[i], dataY[i]);
-                }
-*/
                 setSamplesData(curvIndex, accumulX[curvIndex].data(), accumulY[curvIndex].data(), accumulY[curvIndex].size(), true);
             }
 
@@ -640,7 +671,9 @@ void caCartesianPlot::setColor(QColor c, int indx)
 
     if(thisStyle[indx] != FillUnder) {
         if(thisStyle[indx] == ThinLines) {
-            curve[indx].setPen(QPen(c, 1));
+            curve[indx].setPen(QPen(c, 0));
+        } else if(thisStyle[indx] == Dots) {
+            curve[indx].setPen(QPen(c, 0));
         } else {
             curve[indx].setPen(QPen(c, 2));
         }

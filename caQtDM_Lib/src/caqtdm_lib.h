@@ -234,7 +234,8 @@ signals:
     void fileChanged(const QString&);
 
 private:
-    QTabWidget* getTabParent(QWidget *w1);
+    void scanChildren(QList<QWidget*> children, QWidget *tab, int i);
+    QWidget* getTabParent(QWidget *w1);
     QString treatMacro(QMap<QString, QString> map, const QString& pv, bool *doNothing);
     void scanWidgets(QList<QWidget*> list, QString macro);
     void HandleWidget(QWidget *w, QString macro, bool firstPass, bool treatPrimaries);
@@ -265,6 +266,8 @@ private:
     void setCalcToNothing(QWidget* widget);
     bool Python_Error(QWidget *w, QString message);
     void FlushAllInterfaces();
+    void CartesianPlotsVerticalAlign();
+    void StripPlotsVerticalAlign();
 
 #ifdef MOBILE
     bool eventFilter(QObject *obj, QEvent *event);
@@ -280,6 +283,8 @@ private:
     QWidget *myWidget;
     QList<QWidget*> includeWidgetList;
     QList<QWidget*> topIncludesWidgetList;
+    QList<QTabWidget *> allTabs;
+    QList<QStackedWidget *> allStacks;
 
     int level;
     // 50 levels of includes should do it
@@ -319,6 +324,12 @@ private:
     MessageWindow *messageWindowP;
 
     QFileSystemWatcher *watcher;
+
+    QMap<int, caCartesianPlot*> cartesianList;  // list of cartesianplots with key group
+    QList<int> cartesianGroupList;              // group numbers found
+
+    QMap<int, caStripPlot*> stripList;          // list of stripplots with key group
+    QList<int> stripGroupList;                  // group numbers found
 
 #ifdef epics4
     epics4Subs *Epics4;

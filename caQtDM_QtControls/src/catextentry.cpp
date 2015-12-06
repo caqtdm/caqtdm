@@ -44,7 +44,7 @@ caTextEntry::caTextEntry(QWidget *parent) : caLineEdit(parent)
 // routine not used any more
 void caTextEntry::dataInput()
 {
-    //printf("dataInput %s\n", text().toLatin1().constData());
+    //printf("dataInput %s\n", qasc(text()));
     emit TextEntryChanged(text());
 }
 
@@ -55,7 +55,7 @@ void caTextEntry::setAccessW(bool access)
 
 void caTextEntry::updateText(const QString &txt)
 {
-    //printf("text written by CS %s\n", txt.toLatin1().constData());
+    //printf("text written by CS %s\n", qasc(txt));
     startText = txt;
 }
 
@@ -72,8 +72,8 @@ bool caTextEntry::eventFilter(QObject *obj, QEvent *event)
 				}
 				else {
 					event->accept();
-                    //printf("keyPressEvent accept, set text to %s entered=%s ?\n", startText.toLatin1().constData(), text().toLatin1().constData());
-                    emit TextEntryChanged(text().toLatin1().constData());
+                    //printf("keyPressEvent accept, set text to %s entered=%s ?\n", qasc(startText), qasc(text()));
+                    emit TextEntryChanged(qasc(text()));
 				}
 			}
 		}
@@ -92,7 +92,7 @@ bool caTextEntry::eventFilter(QObject *obj, QEvent *event)
         setReadOnly(false);
         clearFocus();
     } else if(event->type() == QEvent::FocusOut) {
-        //printf("lost focus, set text to %s\n", startText.toLatin1().constData());
+        //printf("lost focus, set text to %s\n", qasc(startText));
         forceText(startText);
     } else if (event->type() == QEvent::FocusIn) {
         //printf("focus in\n");

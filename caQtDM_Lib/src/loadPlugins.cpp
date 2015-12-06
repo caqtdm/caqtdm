@@ -24,6 +24,8 @@
  */
 
 #include "loadPlugins.h"
+#include "qtdefinitions.h"
+#include "pathdefinitions.h"
 
 loadPlugins::loadPlugins()
 {
@@ -50,13 +52,17 @@ bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKn
 
     // get the controlsystem plugins from QT_PLUGIN_PATH
     QString pluginPath = (QString)  qgetenv("QT_PLUGIN_PATH");
-    pluginPath.append("/controlsystems");
-    allPaths.append(pluginPath);
+    QStringList paths = pluginPath.split(pathSeparator);
+
+    for(int i=0; i< paths.count(); i++) {
+        QString path = paths[i] + "/controlsystems";
+        allPaths.append(path);
+     }
 
     // alternative path
 #if defined(__OSX__) || defined(__APPLE__)
     QString alternativePath(qApp->applicationDirPath());
-    alternativePath.append("/../Plugins/controlsystems");
+    alternativePath.append("/../PlugIns/controlsystems");
     allPaths.append(alternativePath);
 #else
     QString alternativePath(qApp->applicationDirPath());
@@ -68,16 +74,12 @@ bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKn
     for (int i = 0; i < allPaths.size(); ++i) {
         QString path = allPaths.at(i);
         QDir pluginsDir(path);
-        qDebug() << pluginsDir << pluginsDir.entryList(QDir::Files).length();
+        qDebug() << "Controlsystem plugins: attempt to load from" << pluginsDir.absolutePath();
 
         // seems are plugins are located here
         if( pluginsDir.entryList(QDir::Files).length() > 0) {
             QString currentPath = pluginsDir.absolutePath();
-            if(i==0) {
-                sprintf(asc, "Controlsystem plugins will be loaded from QT_PLUGIN_PATH=%s", currentPath.toLatin1().constData());
-            } else {
-                sprintf(asc, "Controlsystem plugins will be loaded from application path=%s", currentPath.toLatin1().constData());
-            }
+            sprintf(asc, "Controlsystem plugins: attempt to load from %s", qasc(currentPath));
             if(messageWindow != (MessageWindow *) 0) messageWindow->postMsgEvent(QtWarningMsg, asc);
 
             foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
