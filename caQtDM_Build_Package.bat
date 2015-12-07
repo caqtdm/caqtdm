@@ -48,11 +48,3 @@ GOTO FINISHED
 :FINISHED
 cd ..\..\..\..
 
-
-echo .
-echo "and execute 'designer' for building GUI's, 'adl2ui' for converting medm files, 'startDM' to execute caQtDM"
-echo "you may try the test files located in caQtDM_Tests (set CAQTDM_DISPLAY_PATH accordingly)"
-echo "you may try also to execute the command 'softioc.bat' in caQtDM_Tests (will setup a softioc) to get the channels"
-echo "used by the test."
-echo .
-pause
