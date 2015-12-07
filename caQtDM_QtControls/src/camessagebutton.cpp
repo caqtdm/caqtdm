@@ -34,6 +34,7 @@ caMessageButton::caMessageButton(QWidget *parent) : EPushButton(parent)
     thisForeColor = Qt::black;
     thisDisabledForeColor = Qt::gray;
     setBackground(QColor(0xe8, 0xe8, 0xe8));
+    setFontScaleMode(EPushButton::WidthAndHeight);
     installEventFilter(this);
 
     setElevation(on_top);
