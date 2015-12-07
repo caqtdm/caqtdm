@@ -109,7 +109,8 @@ SOURCES	+= \
     src/messageQueue.cpp \
     src/cabytecontroller.cpp \
     src/calabelvertical.cpp \
-    src/camultilinestring.cpp
+    src/camultilinestring.cpp \
+    src/camimedisplay.cpp
 
 XDR_HACK {
     SOURCES += src/xdr_hack.c
@@ -125,7 +126,8 @@ XDR_HACK {
 
 QT += network
 HEADERS += src/networkaccess.h src/fileFunctions.h \
-    src/calabelvertical.h
+    src/calabelvertical.h \
+    src/camimedisplay.h
 SOURCES += src/networkaccess.cpp src/fileFunctions.cpp
 
 # assume qwt6.0 was made with qt4
