@@ -47,6 +47,9 @@ REM ============================================================================
   set QTDM_BININSTALL=X:\qt\4.8.5\bin
   set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2010
+  set TIMESTAPER="http://timestamp.verisign.com/scripts/timstamp.dll"
+  set CAQTDM_SIGNER="Paul Scherrer Institut"
+
   
 GOTO PRINTOUT
 REM =============================================================================================
@@ -57,9 +60,9 @@ REM ============================================================================
  
   call "C:\Program files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
  
-  set QTHOME=X:/qt/5.4.1_64bit/qtbase
+  set QTHOME=X:/qt/5.5.0_64bit/qtbase
   
-  set QWTHOME=X:/qt/qwt-6.1.2_64bit
+  set QWTHOME=X:/qt/qwt-6.1.2_55_64bit
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
   
@@ -76,6 +79,9 @@ REM ============================================================================
   
   set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
+  set TIMESTAPER="http://timestamp.verisign.com/scripts/timstamp.dll"
+  set CAQTDM_SIGNER="Paul Scherrer Institut"
+
 GOTO PRINTOUT
 
 REM =============================================================================================
@@ -86,9 +92,9 @@ REM ============================================================================
  
   call "C:\Program files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
  
-  set QTHOME=X:/qt/5.4.1_32bit/qtbase
+  set QTHOME=X:/qt/5.5.0_32bit/qtbase
   
-  set QWTHOME=X:/qt/qwt-6.1.2_32bit
+  set QWTHOME=X:/qt/qwt-6.1.2_55_32bit
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
   
@@ -105,6 +111,9 @@ REM ============================================================================
   
   set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
+  set TIMESTAPER="http://timestamp.verisign.com/scripts/timstamp.dll"
+  set CAQTDM_SIGNER="Paul Scherrer Institut"
+
 GOTO PRINTOUT
 
 
