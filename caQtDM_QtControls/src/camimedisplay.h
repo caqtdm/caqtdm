@@ -50,7 +50,6 @@ public:
     caMimeDisplay(QWidget *parent);
 
 private:
-    void buttonhandle();
     bool eventFilter(QObject *obj, QEvent *event);
 
 private slots:

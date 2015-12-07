@@ -33,17 +33,7 @@ caMimeDisplay::caMimeDisplay(QWidget *parent) : caRowColMenu(parent)
     setElevation(on_top);
     installEventFilter(this);
     connect(this, SIGNAL(clicked(int)), this, SLOT(Callback_Clicked(int)));
-}
-
-
-void caMimeDisplay::buttonhandle()
-{
-    QString Urls = getFiles();
-    printf("%s\n", qasc(Urls.split(";").at(0)));
-    /*
-    printf("%s\n", qasc(thisURL.toString()));
-    QDesktopServices::openUrl (thisURL);
-    */
+    connect(this, SIGNAL(triggered(int)), this, SLOT(Callback_Clicked(int)));
 }
 
 void caMimeDisplay::Callback_Clicked(int indx)
@@ -68,11 +58,12 @@ void caMimeDisplay::Callback_Clicked(int indx)
             printf("call file %s as specified\n;", qasc(Urls.at(indx)));
             bool success = QDesktopServices::openUrl (QUrl(Urls.at(indx)));
             if(!success) QMessageBox::critical(0, tr("caQtDM"), tr("could not start mime application with file '%1'").arg(Urls.at(indx)));
+            return;
 
             // must be a local file we have to search its location (application path, CAQTDM_DISPLAY_PATH, CAQTDM_MIME_PATH
         } else {
             QString fileName = Urls.at(indx);
-
+            printf("%s\n", qasc(fileName));
             // find from application path
             QFile filePath(fileName);
             if(filePath.exists()) {
@@ -107,8 +98,8 @@ void caMimeDisplay::Callback_Clicked(int indx)
                     return;
                 }
             }
+            QMessageBox::critical(0, tr("caQtDM"), tr("could not start mime application with file '%1'").arg(fileName));
         }
-
     }
 }
 

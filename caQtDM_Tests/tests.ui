@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1076</width>
+    <width>1119</width>
     <height>752</height>
    </rect>
   </property>
@@ -142,8 +142,8 @@ border-radius: 2px;
      <rect>
       <x>15</x>
       <y>30</y>
-      <width>1051</width>
-      <height>641</height>
+      <width>1071</width>
+      <height>661</height>
      </rect>
     </property>
     <property name="autoFillBackground">
@@ -3108,6 +3108,208 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </widget>
+      <widget class="QWidget" name="tab_23">
+       <attribute name="title">
+        <string>caByte</string>
+       </attribute>
+       <widget class="caByte" name="caByte_7">
+        <property name="geometry">
+         <rect>
+          <x>970</x>
+          <y>30</y>
+          <width>16</width>
+          <height>501</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:TEST:LO</string>
+        </property>
+        <property name="direction">
+         <enum>caByte::Down</enum>
+        </property>
+        <property name="startBit">
+         <number>0</number>
+        </property>
+        <property name="endBit">
+         <number>31</number>
+        </property>
+        <property name="colorMode">
+         <enum>caByte::Static</enum>
+        </property>
+        <property name="foreground" stdset="0">
+         <color>
+          <red>253</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background" stdset="0">
+         <color>
+          <red>60</red>
+          <green>180</green>
+          <blue>32</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caByte" name="caByte_8">
+        <property name="geometry">
+         <rect>
+          <x>370</x>
+          <y>350</y>
+          <width>521</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:TEST:LO</string>
+        </property>
+        <property name="direction">
+         <enum>caByte::Right</enum>
+        </property>
+        <property name="startBit">
+         <number>0</number>
+        </property>
+        <property name="endBit">
+         <number>31</number>
+        </property>
+        <property name="colorMode">
+         <enum>caByte::Alarm</enum>
+        </property>
+        <property name="foreground" stdset="0">
+         <color>
+          <red>253</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background" stdset="0">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>255</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="QTextEdit" name="textEdit_20">
+        <property name="geometry">
+         <rect>
+          <x>55</x>
+          <y>20</y>
+          <width>591</width>
+          <height>141</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">
+QWidget {background: white;} </string>
+        </property>
+        <property name="html">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caByte: &lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;foreground, background, direction&lt;/li&gt;&lt;/ul&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;startBit, endBit&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;colormode (static or alarm as in medm)&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+       <widget class="caTextEntry" name="catextentry_5">
+        <property name="geometry">
+         <rect>
+          <x>670</x>
+          <y>235</y>
+          <width>100</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:LO</string>
+        </property>
+       </widget>
+       <widget class="caTextEntry" name="catextentry_6">
+        <property name="geometry">
+         <rect>
+          <x>670</x>
+          <y>275</y>
+          <width>100</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:LO.HHSV </string>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_13">
+        <property name="geometry">
+         <rect>
+          <x>570</x>
+          <y>235</y>
+          <width>96</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>set value:</string>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::WidthAndHeight</enum>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>160</red>
+          <green>160</green>
+          <blue>164</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_14">
+        <property name="geometry">
+         <rect>
+          <x>570</x>
+          <y>270</y>
+          <width>96</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>set HHSV:</string>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::WidthAndHeight</enum>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>160</red>
+          <green>160</green>
+          <blue>164</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_15">
+        <property name="geometry">
+         <rect>
+          <x>665</x>
+          <y>305</y>
+          <width>211</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>(NO_ALARM, MINOR, MAJOR)</string>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::WidthAndHeight</enum>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>160</red>
+          <green>160</green>
+          <blue>164</blue>
+         </color>
+        </property>
+       </widget>
+      </widget>
       <widget class="QWidget" name="tab_13">
        <attribute name="title">
         <string>caLineEdit</string>
@@ -3618,6 +3820,61 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="precision">
          <number>1</number>
+        </property>
+       </widget>
+       <widget class="caLineEdit" name="calineedit_26">
+        <property name="geometry">
+         <rect>
+          <x>730</x>
+          <y>390</y>
+          <width>100</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:MBBO</string>
+        </property>
+        <property name="formatType">
+         <enum>caLineEdit::string</enum>
+        </property>
+       </widget>
+       <widget class="caChoice" name="caChoice_5">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>590</x>
+          <y>430</y>
+          <width>96</width>
+          <height>86</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:MBBO</string>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="alignment">
+         <enum>caChoice::center</enum>
+        </property>
+        <property name="colorMode">
+         <enum>caChoice::Static</enum>
+        </property>
+        <property name="fontScaleMode" stdset="0">
+         <enum>EPushButton::None</enum>
         </property>
        </widget>
       </widget>
@@ -4419,208 +4676,6 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="minValue">
          <double>-1000.000000000000000</double>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QWidget" name="tab_23">
-       <attribute name="title">
-        <string>caByte</string>
-       </attribute>
-       <widget class="caByte" name="caByte_7">
-        <property name="geometry">
-         <rect>
-          <x>970</x>
-          <y>30</y>
-          <width>16</width>
-          <height>501</height>
-         </rect>
-        </property>
-        <property name="channel" stdset="0">
-         <string>ACM:TEST:LO</string>
-        </property>
-        <property name="direction">
-         <enum>caByte::Down</enum>
-        </property>
-        <property name="startBit">
-         <number>0</number>
-        </property>
-        <property name="endBit">
-         <number>31</number>
-        </property>
-        <property name="colorMode">
-         <enum>caByte::Static</enum>
-        </property>
-        <property name="foreground" stdset="0">
-         <color>
-          <red>253</red>
-          <green>0</green>
-          <blue>0</blue>
-         </color>
-        </property>
-        <property name="background" stdset="0">
-         <color>
-          <red>60</red>
-          <green>180</green>
-          <blue>32</blue>
-         </color>
-        </property>
-       </widget>
-       <widget class="caByte" name="caByte_8">
-        <property name="geometry">
-         <rect>
-          <x>370</x>
-          <y>350</y>
-          <width>521</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="channel" stdset="0">
-         <string>ACM:TEST:LO</string>
-        </property>
-        <property name="direction">
-         <enum>caByte::Right</enum>
-        </property>
-        <property name="startBit">
-         <number>0</number>
-        </property>
-        <property name="endBit">
-         <number>31</number>
-        </property>
-        <property name="colorMode">
-         <enum>caByte::Alarm</enum>
-        </property>
-        <property name="foreground" stdset="0">
-         <color>
-          <red>253</red>
-          <green>0</green>
-          <blue>0</blue>
-         </color>
-        </property>
-        <property name="background" stdset="0">
-         <color>
-          <red>0</red>
-          <green>0</green>
-          <blue>255</blue>
-         </color>
-        </property>
-       </widget>
-       <widget class="QTextEdit" name="textEdit_20">
-        <property name="geometry">
-         <rect>
-          <x>55</x>
-          <y>20</y>
-          <width>591</width>
-          <height>141</height>
-         </rect>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">
-QWidget {background: white;} </string>
-        </property>
-        <property name="html">
-         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caByte: &lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;foreground, background, direction&lt;/li&gt;&lt;/ul&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;startBit, endBit&lt;/li&gt;
-&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;colormode (static or alarm as in medm)&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-       </widget>
-       <widget class="caTextEntry" name="catextentry_5">
-        <property name="geometry">
-         <rect>
-          <x>670</x>
-          <y>235</y>
-          <width>100</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="channel" stdset="0">
-         <string notr="true">ACM:TEST:LO</string>
-        </property>
-       </widget>
-       <widget class="caTextEntry" name="catextentry_6">
-        <property name="geometry">
-         <rect>
-          <x>670</x>
-          <y>275</y>
-          <width>100</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="channel" stdset="0">
-         <string notr="true">ACM:TEST:LO.HHSV </string>
-        </property>
-       </widget>
-       <widget class="caLabel" name="calabel_13">
-        <property name="geometry">
-         <rect>
-          <x>570</x>
-          <y>235</y>
-          <width>96</width>
-          <height>28</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>set value:</string>
-        </property>
-        <property name="fontScaleMode">
-         <enum>ESimpleLabel::WidthAndHeight</enum>
-        </property>
-        <property name="background">
-         <color alpha="0">
-          <red>160</red>
-          <green>160</green>
-          <blue>164</blue>
-         </color>
-        </property>
-       </widget>
-       <widget class="caLabel" name="calabel_14">
-        <property name="geometry">
-         <rect>
-          <x>570</x>
-          <y>270</y>
-          <width>96</width>
-          <height>28</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>set HHSV:</string>
-        </property>
-        <property name="fontScaleMode">
-         <enum>ESimpleLabel::WidthAndHeight</enum>
-        </property>
-        <property name="background">
-         <color alpha="0">
-          <red>160</red>
-          <green>160</green>
-          <blue>164</blue>
-         </color>
-        </property>
-       </widget>
-       <widget class="caLabel" name="calabel_15">
-        <property name="geometry">
-         <rect>
-          <x>665</x>
-          <y>305</y>
-          <width>211</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>(NO_ALARM, MINOR, MAJOR)</string>
-        </property>
-        <property name="fontScaleMode">
-         <enum>ESimpleLabel::WidthAndHeight</enum>
-        </property>
-        <property name="background">
-         <color alpha="0">
-          <red>160</red>
-          <green>160</green>
-          <blue>164</blue>
-         </color>
         </property>
        </widget>
       </widget>
@@ -6197,10 +6252,10 @@ p, li { white-space: pre-wrap; }
          <string notr="true">ACM:TEST:STRING_WAVE</string>
         </property>
         <property name="numberOfRows">
-         <number>5</number>
+         <number>2</number>
         </property>
         <property name="numberOfColumns">
-         <number>5</number>
+         <number>0</number>
         </property>
         <property name="columnSize">
          <number>10</number>
@@ -6234,139 +6289,6 @@ p, li { white-space: pre-wrap; }
         </attribute>
         <row/>
         <row/>
-        <row/>
-        <row/>
-        <row/>
-        <column/>
-        <column/>
-        <column/>
-        <column/>
-        <column/>
-        <item row="0" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
        </widget>
        <widget class="caLabel" name="calabel_48">
         <property name="geometry">
@@ -6503,22 +6425,22 @@ p, li { white-space: pre-wrap; }
          <enum>caCamera::grey</enum>
         </property>
         <property name="ROI_readmarkerType" stdset="0">
-         <enum>caCamera::arrow</enum>
-        </property>
-        <property name="ROI_readType" stdset="0">
-         <enum>caCamera::xy1_xy2</enum>
-        </property>
-        <property name="ROI_readChannels" stdset="0">
-         <string>FIGX;FIGY;FIGW;FIGH</string>
-        </property>
-        <property name="ROI_writemarkerType" stdset="0">
          <enum>caCamera::box_crosshairs</enum>
         </property>
+        <property name="ROI_readType" stdset="0">
+         <enum>caCamera::xycenter_width_height</enum>
+        </property>
+        <property name="ROI_readChannels" stdset="0">
+         <string>FIG:X;FIG:Y;FIG:W;FIG:H</string>
+        </property>
+        <property name="ROI_writemarkerType" stdset="0">
+         <enum>caCamera::box</enum>
+        </property>
         <property name="ROI_writeType" stdset="0">
-         <enum>caCamera::xy1_xy2</enum>
+         <enum>caCamera::xycenter_width_height</enum>
         </property>
         <property name="ROI_writeChannels" stdset="0">
-         <string notr="true">FIGX;FIGY;FIGW;FIGH</string>
+         <string notr="true">FIG:X;FIG:Y;FIG:W;FIG:H</string>
         </property>
        </widget>
        <widget class="QTextEdit" name="textEdit_23">
@@ -8040,12 +7962,15 @@ def PythonCalc(a, b, c, d):
         <property name="IntensityScalingMin">
          <enum>caWaterfallPlot::User</enum>
         </property>
+        <property name="ColorMap" stdset="0">
+         <enum>caWaterfallPlot::spectrum_heat</enum>
+        </property>
        </widget>
        <widget class="caNumeric" name="canumeric_7">
         <property name="geometry">
          <rect>
-          <x>570</x>
-          <y>450</y>
+          <x>600</x>
+          <y>410</y>
           <width>186</width>
           <height>106</height>
          </rect>
@@ -11036,14 +10961,62 @@ p, li { white-space: pre-wrap; }
    <widget class="caLineEdit" name="timeLineEdit">
     <property name="geometry">
      <rect>
-      <x>770</x>
-      <y>15</y>
+      <x>20</x>
+      <y>0</y>
       <width>191</width>
-      <height>21</height>
+      <height>25</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
      <string>mynow</string>
+    </property>
+   </widget>
+   <widget class="caMimeDisplay" name="camimedisplay">
+    <property name="geometry">
+     <rect>
+      <x>910</x>
+      <y>0</y>
+      <width>171</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="label">
+     <string notr="true">Help</string>
+    </property>
+    <property name="labels">
+     <string notr="true">Help1;Help2</string>
+    </property>
+    <property name="files">
+     <string notr="true">caQtDM.html;http://epics.web.psi.ch/software/caqtdm/qtDir/Help/MEDM.html</string>
+    </property>
+   </widget>
+   <widget class="caMimeDisplay" name="camimedisplay_2">
+    <property name="geometry">
+     <rect>
+      <x>720</x>
+      <y>0</y>
+      <width>171</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="label">
+     <string notr="true">Help</string>
+    </property>
+    <property name="background">
+     <color>
+      <red>170</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="labels">
+     <string notr="true">Help</string>
+    </property>
+    <property name="files">
+     <string notr="true">http://epics.web.psi.ch/software/caqtdm/qtDir/Help/MEDM.html</string>
+    </property>
+    <property name="stackingMode" stdset="0">
+     <enum>caRowColMenu::Row</enum>
     </property>
    </widget>
   </widget>
@@ -11052,8 +11025,8 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1076</width>
-     <height>24</height>
+     <width>1119</width>
+     <height>26</height>
     </rect>
    </property>
   </widget>
@@ -11250,6 +11223,11 @@ p, li { white-space: pre-wrap; }
    <class>caScan2D</class>
    <extends>QWidget</extends>
    <header>caScan2D</header>
+  </customwidget>
+  <customwidget>
+   <class>caMimeDisplay</class>
+   <extends>QWidget</extends>
+   <header>caMimeDisplay</header>
   </customwidget>
  </customwidgets>
  <resources/>
