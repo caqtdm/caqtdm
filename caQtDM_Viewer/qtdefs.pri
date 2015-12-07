@@ -64,6 +64,7 @@ CONFIG += PYTHONCALC
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 
 # 4.0.2
+# camimebutton added in order to start applications defined through the file extension
 # cawavetable can now adapt its rows and columns automatically when zero is specified.
 # an enum can be display in calineedit as number when enumeric is specified as format (otherwise as string in all cases)
 # a multistring widget has been added to display waveforms with chars and strings (in case of chars a \n will make a new line)
