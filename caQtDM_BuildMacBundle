@@ -147,10 +147,11 @@ echo ========== generate Mac Pkg for MacAppStore ============
 echo
 
 pkgbuild --install-location /Applications --component ./caQtDM_Binaries/caQtDM.app ./caQtDM_Binaries/caQtDMApp.pkg
-pkgbuild --install-location /Applications --component ./caQtDM_Binaries/Designer.app  ./caQtDM_Binaries/DesignerApp.pkg
 
+#pkgbuild --install-location /Applications --component ./caQtDM_Binaries/Designer.app  ./caQtDM_Binaries/DesignerApp.pkg
+#--package ./caQtDM_Binaries/DesignerApp.pkg
 
-productbuild --synthesize --package ./caQtDM_Binaries/caQtDMApp.pkg --package ./caQtDM_Binaries/DesignerApp.pkg ./caQtDM_Binaries/Distribution.xml
+productbuild --synthesize --package ./caQtDM_Binaries/caQtDMApp.pkg  ./caQtDM_Binaries/Distribution.xml
 productbuild --identifier ch.psi.caqtdm.osx --distribution ./caQtDM_Binaries/Distribution.xml --sign "${CAQTDM_MAC_INSTALLSIGN}" --resources ./caQtDM_Viewer/src  --package-path ./caQtDM_Binaries/ './caQtDM_Binaries/caqtdm.pkg'
 
 
