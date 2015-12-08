@@ -64,6 +64,7 @@ CONFIG += PYTHONCALC
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 
 # 4.0.2
+# cacartesianplot was not always well triggered when a trigger channel was specified, now corrected
 # camimebutton added in order to start applications defined through the file extension
 # cawavetable can now adapt its rows and columns automatically when zero is specified.
 # an enum can be display in calineedit as number when enumeric is specified as format (otherwise as string in all cases)
