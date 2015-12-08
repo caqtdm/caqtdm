@@ -145,6 +145,14 @@ rm ./caQtDM_Binaries/caqtdm.dmg
 echo
 echo ========== generate Mac Pkg for MacAppStore ============
 echo
+mkdir ./caQtDM_Binaries/caQtDM.app/Contents/Applications
+cp -R ./caQtDM_Binaries/Designer.app ./caQtDM_Binaries/caQtDM.app/Contents/Applications
+echo ========== codesigning  ============
+echo
+echo Identity = ${CAQTDM_MAC_CODESIGN}
+codesign --verbose=2 --deep --force --entitlements ./caQtDM_Viewer/src/Mac/Entitlements.plist  -s "${CAQTDM_MAC_CODESIGN}" -vvvv ./caQtDM_Binaries/caQtDM.app
+
+
 
 pkgbuild --install-location /Applications --component ./caQtDM_Binaries/caQtDM.app ./caQtDM_Binaries/caQtDMApp.pkg
 
