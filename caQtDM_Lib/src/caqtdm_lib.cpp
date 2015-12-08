@@ -3569,8 +3569,8 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             } else if(XorY == caCartesianPlot::CH_Trigger) {
                 for(int i=0; i < caCartesianPlot::curveCount; i++) {
                     double p;
-                    cartesianplotWidget->setData(&p, 1, curvNB, curvType, XorY);
-                    cartesianplotWidget->displayData(curvNB, curvType);
+                    cartesianplotWidget->setData(&p, 1, i, curvType, XorY);
+                    cartesianplotWidget->displayData(i, curvType);
                 }
 
                 // count channel

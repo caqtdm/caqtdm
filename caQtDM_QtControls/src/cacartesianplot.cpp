@@ -330,7 +330,7 @@ void caCartesianPlot::fillData(pureData *array, int size, int curvIndex, int cur
     } else if(curvXY == CH_Trigger) {
 /*
         int i = X[curvIndex].size();
-        int j = Y[curvIndex].size();    
+        int j = Y[curvIndex].size();
         if(i != 0 && j != 0)
          printf("trigger came for curvIndex=%d %d %d %f %f\n", curvIndex,
                 X[curvIndex].size(), Y[curvIndex].size(),
