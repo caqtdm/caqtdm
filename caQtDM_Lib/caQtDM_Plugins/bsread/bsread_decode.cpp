@@ -398,7 +398,8 @@ void bsread_Decode::bsread_Delay(){
 #ifdef linux
     usleep(5000);
 #else
-    Sleep::msleep(5);
+    //Sleep::msleep(5);
+   QThread::msleep(5);
 #endif
 
 }
