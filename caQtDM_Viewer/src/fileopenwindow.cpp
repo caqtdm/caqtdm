@@ -98,6 +98,7 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
              break;
          case Qt::ApplicationInactive:
              qDebug() << "application state changed to inactive";
+
              pendio = false;
              if (mutexKnobData != (MutexKnobData *) 0) {
                  for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
@@ -105,7 +106,7 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
                      if(kPtr->index != -1)  {
                        //qDebug() << "should disconnect" << kPtr->pv;
                        ControlsInterface * plugininterface = (ControlsInterface *) kPtr->pluginInterface;
-                       plugininterface->pvDisconnect(kPtr);
+                       if(plugininterface != (ControlsInterface *) 0) plugininterface->pvDisconnect(kPtr);
                        mutexKnobData->SetMutexKnobData(i, *kPtr);
                        pendio = true;
                      }

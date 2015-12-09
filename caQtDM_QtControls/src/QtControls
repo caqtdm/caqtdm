@@ -42,6 +42,7 @@
 #include <cascan2d.h>
 #include <cabytecontroller.h>
 #include <calabelvertical.h>
+#include <camimedisplay.h>
 
 #ifndef MOBILE
     #include <cadoubletabwidgetextension.h>

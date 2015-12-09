@@ -429,6 +429,33 @@ QWidget *caByteControllerInterface::createWidget(QWidget *parent)
 }
 
 
+caMimeDisplayInterface::caMimeDisplayInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
+{
+    strng name[3], type[3] = {"","",""};
+    longtext text[3] = {"","","mime file will be looked up through absolute path or caQtDM_DISPLAY_PATH\nor caQTDM_MIME_PATH. Separate files with a semicolumn\n"};
+
+    strcpy(name[0], "label");
+    strcpy(type[0], "multiline");
+    strcpy(name[1], "labels");
+    strcpy(type[1], "multiline");
+    strcpy(name[2], "files");
+    strcpy(type[2], "multiline");
+
+    d_domXml = XmlFunc("caMimeDisplay", "camimedisplay", 0, 0, 100, 22, name, type, text, 3);
+    d_toolTip = "[Mime display]";
+    d_name = "caMimeDisplay";
+    d_include = "caMimeDisplay";
+    QPixmap qpixmap =  QPixmap(":pixmaps/mime.png");
+    d_icon = qpixmap.scaled(90, 90, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    d_toolTip = "[calls a mime application for file]";
+}
+
+QWidget *caMimeDisplayInterface::createWidget(QWidget *parent)
+{
+    return new caMimeDisplay(parent);
+}
+
+
 CustomWidgetCollectionInterface_Controllers::CustomWidgetCollectionInterface_Controllers(QObject *parent): QObject(parent)
 {
     d_plugins.append(new caNumericInterface(this));
@@ -444,6 +471,7 @@ CustomWidgetCollectionInterface_Controllers::CustomWidgetCollectionInterface_Con
     d_plugins.append(new caScriptButtonInterface(this));
     d_plugins.append(new caSpinboxInterface(this));
     d_plugins.append(new caByteControllerInterface(this));
+    d_plugins.append(new caMimeDisplayInterface(this));
 }
 
 QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface_Controllers::customWidgets(void) const

@@ -223,5 +223,16 @@ public:
     virtual QWidget *createWidget(QWidget *parent);
 };
 
+class caMimeDisplayInterface: public CustomWidgetInterface_Controllers
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerCustomWidgetInterface)
+
+public:
+    caMimeDisplayInterface(QObject *parent);
+    virtual QWidget *createWidget(QWidget *parent);
+};
+
+
 
 #endif

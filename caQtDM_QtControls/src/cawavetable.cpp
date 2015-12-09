@@ -101,13 +101,13 @@ void caWaveTable::RedefineRowColumns(int xsav, int ysav, int z, int &x, int &y)
 
 void caWaveTable::setNumberOfRows(int nbRows)
 {
-    if(nbRows < 0) rowSaved = rowcount = 0;
+    if(nbRows <=0) rowSaved = rowcount = 0;
     else rowSaved = rowcount = nbRows;
     setupItems(rowcount, colcount);
 }
 
 void caWaveTable::setNumberOfColumns(int nbCols) {
-    if(nbCols < 0) colSaved = colcount = 0;
+    if(nbCols <=0) colSaved = colcount = 0;
     else colSaved = colcount = nbCols;
     setupItems(rowcount, colcount);
 }
@@ -356,8 +356,11 @@ void caWaveTable::displayText(int index, short status, QString const &text)
 
     if(index == blockIndex) return;
 
-    row = index / colcount;
+    if(colcount == 0) row = 0;
+    else row = index / colcount;
     column = index - row * colcount;
+    if(column < 0) column=0;
+
     if(this->item(row, column) != 0)  {
 
         this->item(row,column)->setText(text);

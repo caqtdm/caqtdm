@@ -36,6 +36,7 @@
         <file>pixmaps/clock.png</file>
         <file>pixmaps/meter.png</file>
         <file>pixmaps/scan2d.png</file>
+        <file>pixmaps/mime.png</file>
         <file>pixmaps/multilinemonitor.png</file>
     </qresource>
 </RCC>
