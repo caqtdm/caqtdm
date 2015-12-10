@@ -278,8 +278,8 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
 void configDialog::getChoice(QString &url, QString &file, QList<QString> &urls, QList<QString> &files, bool &debugWindow)
 {
-    int urlIndx;
-    int fileIndx;
+    int urlIndx = -1;
+    int fileIndx = -1;
     urls.clear();
     files.clear();
 
