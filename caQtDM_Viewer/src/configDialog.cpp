@@ -278,25 +278,32 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
 void configDialog::getChoice(QString &url, QString &file, QList<QString> &urls, QList<QString> &files, bool &debugWindow)
 {
-    int indx;
+    int urlIndx;
+    int fileIndx;
     urls.clear();
     files.clear();
 
     if(fileComboBox->currentText().length() > 1) {
-        indx = fileComboBox->currentIndex();
+        fileIndx = fileComboBox->currentIndex();
         file = fileComboBox->currentText();
-        fileComboBox->setItemText(indx, file);
+        fileComboBox->setItemText(fileIndx, file);
     }
 
     if(urlComboBox->currentText().length() > 1) {
-        indx = urlComboBox->currentIndex();
+        urlIndx = urlComboBox->currentIndex();
         url = urlComboBox->currentText();
-        urlComboBox->setItemText(indx, url);
+        urlComboBox->setItemText(urlIndx, url);
     }
 
+    // last used file on first position
+    urls.append(url);
+    files.append(file);
+
     for(int i=0; i< 5; i++) {
-        if(urlComboBox->itemText(i).length() > 1) urls.append(urlComboBox->itemText(i));
-        if(fileComboBox->itemText(i).length() > 1) files.append(fileComboBox->itemText(i));
+        if((urlComboBox->itemText(i).length() > 1) && (i != urlIndx)) urls.append(urlComboBox->itemText(i));
+        else if(urlIndx != i) urls.append(QString::number(i+1));
+        if((fileComboBox->itemText(i).length() > 1) && (i != fileIndx)) files.append(fileComboBox->itemText(i));
+        else if(fileIndx != i) files.append(QString::number(i+1));
     }
 
     if(debugComboBox->currentIndex() == 1) debugWindow = true;
