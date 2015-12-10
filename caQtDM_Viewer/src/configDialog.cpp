@@ -278,16 +278,27 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
 void configDialog::getChoice(QString &url, QString &file, QList<QString> &urls, QList<QString> &files, bool &debugWindow)
 {
+    int indx;
     urls.clear();
     files.clear();
+
+    if(fileComboBox->currentText().length() > 1) {
+        indx = fileComboBox->currentIndex();
+        file = fileComboBox->currentText();
+        fileComboBox->setItemText(indx, file);
+    }
+
+    if(urlComboBox->currentText().length() > 1) {
+        indx = urlComboBox->currentIndex();
+        url = urlComboBox->currentText();
+        urlComboBox->setItemText(indx, url);
+    }
+
     for(int i=0; i< 5; i++) {
         if(urlComboBox->itemText(i).length() > 1) urls.append(urlComboBox->itemText(i));
-        url = urlComboBox->currentText();
-    }
-    for(int i=0; i< 5; i++) {
         if(fileComboBox->itemText(i).length() > 1) files.append(fileComboBox->itemText(i));
-        file = fileComboBox->currentText();
     }
+
     if(debugComboBox->currentIndex() == 1) debugWindow = true;
     else debugWindow = false;
 }
@@ -361,6 +372,7 @@ int configDialog::NumberOfFiles()
 
 void configDialog::exec()
 {
+    loop.processEvents();
     loop.exec();
     close();
 }
@@ -375,10 +387,10 @@ bool configDialog::eventFilter(QObject *obj, QEvent *event)
 {
    if(event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
       QKeyEvent *me = static_cast<QKeyEvent *>(event);
-      if(me->key() == Qt::Key_Return) {
+      if((me->key() == Qt::Key_Return) && (loop.isRunning())) {
            StartButtonClicked = true;
            close();
-      } else  if(me->key() == Qt::Key_Escape) {
+      } else  if((me->key() == Qt::Key_Escape)  && (loop.isRunning())) {
           EscapeButtonClicked = true;
           close();
       }
