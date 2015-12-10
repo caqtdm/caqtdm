@@ -268,6 +268,7 @@ private:
     void FlushAllInterfaces();
     void CartesianPlotsVerticalAlign();
     void StripPlotsVerticalAlign();
+    qreal fontResize(double factX, double factY, QVariantList list, int usedIndex);
 
 #ifdef MOBILE
     bool eventFilter(QObject *obj, QEvent *event);
