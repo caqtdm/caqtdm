@@ -32,7 +32,7 @@ public:
     int loadHeader (myParserEDM *myParser, FILE *f);
     void readCommentsAndVersion (FILE *f);
     void incLine ( void );
-    void addVisibilityCalc(myParserEDM *myParser, char *visPvExpStr, char *minVisString, char *maxVisString);
+    void addVisibilityCalc(myParserEDM *myParser, char *visPvExpStr, char *minVisString, char *maxVisString, int visInverted=0);
     void addAlarmPV(myParserEDM *myParser, char *alarmPvExpStr);
 
 private:
@@ -133,7 +133,7 @@ private:
     int fillMode;
 
     // reading activeBarClass
-    int barColor, barColorMode, labelType, showScale, horizontal;
+    int barColor, barColorMode, labelType, buttonType, showScale, horizontal;
     expStringClass readPvExpStr,  readMinExpStr, readMaxExpStr, nullPvExpStr, label, precisionExpStr ;
     expStringClass labelTicksExpStr, majorTicksExpStr, minorTicksExpStr, barOriginValExpStr;
     char scaleFormat[15+1];

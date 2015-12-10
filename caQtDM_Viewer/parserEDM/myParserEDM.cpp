@@ -147,6 +147,14 @@ void myParserEDM::writeTaggedString(const QString& type, const QString& value )
     xw->writeTaggedString( type, value );
 }
 
+void myParserEDM::writeTaggedString(const QString& type, const QString& value, bool notr) {
+	if (notr) {
+		xw->writeTaggedString( type, value, AttrMap("notr", "true"));
+	} else {
+		xw->writeTaggedString( type, value  );
+	}
+}
+
 void myParserEDM::writeCloseProperty()
 {
     xw->writeCloseTag( "property" );

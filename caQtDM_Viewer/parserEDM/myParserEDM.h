@@ -50,6 +50,7 @@ public:
     void writeProperty(const QString& name, const QString& type, const QString& value );
     void writeOpenProperty(const QString& name);
     void writeTaggedString(const QString& type, const QString& value );
+	void writeTaggedString(const QString& type, const QString& value, const bool notr);
     void writeCloseProperty();
     void writeStyleSheet(int r, int g, int b);
 
