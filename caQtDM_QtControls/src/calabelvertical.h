@@ -62,17 +62,20 @@ class QTCON_EXPORT caLabelVertical : public QWidget, public FontScalingWidget
 
     Q_PROPERTY(QString text READ text WRITE setText)
     Q_PROPERTY(Direction direction READ getDirection WRITE setDirection)
+    Q_PROPERTY(Alignment alignment READ getAlignment WRITE setAlignment)
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
     Q_ENUMS(colMode)
     Q_ENUMS(Direction)
+    Q_ENUMS(Alignment)
 
 #include "caVisibProps.h"
 #include "caVisibDefs.h"
 
 public:
     enum ScaleMode { None, Height, WidthAndHeight};
+    enum Alignment { Center, Left, Right};
     enum Direction {Up, Down};
 
     caLabelVertical(QWidget *parent = 0);
@@ -83,6 +86,9 @@ public:
 
     void setDirection(const Direction &direction);
     Direction getDirection() const {return thisDirection;}
+
+    void setAlignment(const Alignment &alignment);
+    Alignment getAlignment() const {return thisAlignment;}
 
     QSize calculateTextSpace();
 
@@ -117,6 +123,7 @@ private:
     QColor thisBackColor;
     colMode thisColorMode;
     Direction thisDirection;
+    Alignment thisAlignment;
 
 protected:
     void paintEvent(QPaintEvent *);
