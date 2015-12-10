@@ -6326,14 +6326,6 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
 
     // Tabbar adjustment
     else if(!className.compare("QTabWidget")) {
- /*
-        QTabWidget *box = (QTabWidget *) widget;
-        box->tabBar()->setTabTextColor(0, Qt::blue);
-        QFont f = box->font();
-        qreal fontSize = fontResize(factX, factY, list, 4);
-        f.setPointSize(qRound(fontSize));
-        box->tabBar()->setFont(f);
- */
 #ifdef MOBILE
         if(list.at(4).toInt() < 0) return; // on android I got -1 for these fonts at initialization, i.e pixelsize
         qreal fontSize = (qMin(factX, factY) * (double) list.at(4).toInt());
