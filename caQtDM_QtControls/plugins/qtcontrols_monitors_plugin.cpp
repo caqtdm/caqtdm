@@ -476,7 +476,7 @@ caCameraInterface::caCameraInterface(QObject* parent) : CustomWidgetInterface_Mo
     strcpy(type[6], "multiline");
     strcpy(name[7], "customColorMap");
     strcpy(type[7], "multiline");
-    strcpy(name[8], "dimensionMarking_Channels");
+    strcpy(name[8], "ROI_readChannels");
     strcpy(type[8], "multiline");
     strcpy(name[9], "ROI_writeChannels");
     strcpy(type[9], "multiline");

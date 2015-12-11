@@ -31,13 +31,13 @@
 caLabelVertical::caLabelVertical(QWidget *parent) : QWidget(parent), FontScalingWidget(this)
 {
     setFontScaleMode(WidthAndHeight);
-    setFontScaleMode(WidthAndHeight);
     thisBackColor = Qt::gray;
     thisForeColor = Qt::black;
     thisColorMode=Static;
     setColorMode(Static);
     thisVisibility = StaticV;
     setDirection(Down);
+    setAlignment(Center);
     setVerticalLabel(true);
     setText("");
 }
@@ -54,6 +54,12 @@ void caLabelVertical::setDirection(const Direction &direction)
             break;
     }
     thisDirection = direction;
+    update();
+}
+
+void caLabelVertical::setAlignment(const Alignment &alignment)
+{
+    thisAlignment = alignment;
     update();
 }
 
@@ -124,12 +130,33 @@ void caLabelVertical::paintEvent(QPaintEvent *)
     painter.rotate(rotation);
     switch (thisDirection) {
     case Up:
-         painter.drawText(QPoint(-height()/2-w/2,width()/2+h/2-fm.descent()), text());
+        switch (thisAlignment) {
+        case Left:
+            painter.drawText(QPoint(-height(), width()/2 +h/2-fm.descent()), text());             // left align
+            break;
+        case Right:
+            painter.drawText(QPoint(-w, width()/2 +h/2-fm.descent()), text());                    // right align
+            break;
+        case Center:
+        default:
+            painter.drawText(QPoint(-height()/2-w/2, width()/2 +h/2-fm.descent()), text());       // center align
+            break;
+        }
         break;
     case Down:
     default:
-        painter.drawText(QPoint(height()/2-w/2,-width()/2 +h/2-fm.descent()), text());
-        break;
+        switch (thisAlignment) {
+        case Left:
+            painter.drawText(QPoint(0, -width()/2 +h/2-fm.descent()), text());                    // left align
+            break;
+        case Right:
+            painter.drawText(QPoint(height()-w, -width()/2 +h/2-fm.descent()), text());           // right align
+            break;
+        case Center:
+        default:
+            painter.drawText(QPoint(height()/2-w/2, -width()/2 +h/2-fm.descent()), text());       // center align
+            break;
+        }
     }
 }
 
@@ -184,68 +211,3 @@ QSize caLabelVertical::minimumSizeHint() const
     return size;
 }
 
-
-/*
-caVertLabel::caVertLabel(QWidget *parent) : QGraphicsView(parent)
-{
-    label = new caLabel();
-    label->setText("this is a test");
-    label->setAlignment(Qt::AlignHCenter);
-    label->setGeometry(0,0, 300, 40);
-    scene = new QGraphicsScene();
-    proxy = scene->addWidget(label);
-    //proxy->resize(width(), height());
-    //proxy->setRotation(-90);
-    proxy->setTransformOriginPoint(proxy->boundingRect().center());
-    setScene(scene);
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-
-    //proxy->setRotation(-90);
-
-    startTimer(200);
-    angle = 0.0;
-}
-
-void caVertLabel::timerEvent(QTimerEvent* event) {
-    //proxy->setRotation(proxy->rotation() + 1);
-
-
-    //QRect viewrect = QRect(width()/2, height()/2, width(), height());
-    //QPointF center = viewrect.center();
-    //printf("center of viewport=%f %f\n", center.x(), center.y());
-
-   // QRect viewrect(0, 0, 200, 200);
-   // setSceneRect(viewrect);
-
-    QTransform t;
-    printf("set width and height %d %d\n", width(), height());
-    QPointF xlate = proxy->boundingRect().center();
-    t.translate(xlate.x(), xlate.y());
-    printf("translate by %f %f\n", xlate.x(), xlate.y());
-    t.rotate(angle);
-    angle = angle + 2.0;
-    t.translate(-xlate.x(), -xlate.y());
-
-    proxy->setTransform(t);
-
-}
-
-bool caVertLabel::event(QEvent *e)
-{
-  if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
-
-      QPoint center = geometry().center();
-      mapToScene(center);
-
-      //proxy->resize(width(), height());
-      //label->setGeometry(0,0, width(), height());
-      //proxy->setRotation(-90);
-
-    //printf("geometry: %d %d\n", width(), height());
-    //label->setGeometry(0,0, height(), width());
-  }
-  return QGraphicsView::event(e);
-}
-*/
