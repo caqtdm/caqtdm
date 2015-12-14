@@ -476,9 +476,9 @@ caCameraInterface::caCameraInterface(QObject* parent) : CustomWidgetInterface_Mo
     strcpy(type[6], "multiline");
     strcpy(name[7], "customColorMap");
     strcpy(type[7], "multiline");
-    strcpy(name[8], "ROI_readChannels");
+    strcpy(name[8], "ROI_readChannelsList");
     strcpy(type[8], "multiline");
-    strcpy(name[9], "ROI_writeChannels");
+    strcpy(name[9], "ROI_writeChannelsList");
     strcpy(type[9], "multiline");
     d_domXml = XmlFunc("caCamera", "cacamera", 0, 0, 200, 200, name, type, text, 10);
     d_toolTip = "[Image from camera]";
