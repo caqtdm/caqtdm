@@ -73,11 +73,13 @@ class QTCON_EXPORT caCamera : public QWidget
 
     Q_PROPERTY(ROI_markertype ROI_readmarkerType READ getROIreadmarkerType WRITE setROIreadmarkerType)
     Q_PROPERTY(ROI_type ROI_readType READ getROIreadType WRITE setROIreadType)
-    Q_PROPERTY(QString ROI_readChannels READ getROIChannelsRead WRITE setROIChannelsRead)
+    Q_PROPERTY(QString ROI_readChannels READ getROIChannelsRead WRITE setROIChannelsRead DESIGNABLE false)
+    Q_PROPERTY(QStringList ROI_readChannelsList READ getROIChannelsReadList WRITE setROIChannelsReadList STORED false)
 
     Q_PROPERTY(ROI_markertype ROI_writemarkerType READ getROIwritemarkerType WRITE setROIwritemarkerType)
     Q_PROPERTY(ROI_type ROI_writeType READ getROIwriteType WRITE setROIwriteType)
-    Q_PROPERTY(QString ROI_writeChannels READ getROIChannelsWrite WRITE setROIChannelsWrite)
+    Q_PROPERTY(QString ROI_writeChannels READ getROIChannelsWrite WRITE setROIChannelsWrite DESIGNABLE false)
+    Q_PROPERTY(QStringList ROI_writeChannelsList READ getROIChannelsWriteList WRITE setROIChannelsWriteList STORED false)
 
     Q_ENUMS(zoom)
     Q_ENUMS(colormap)
@@ -129,11 +131,35 @@ public:
     ROI_type getROIwriteType() const {return thisROIwritetype;}
     void setROIwriteType(ROI_type const &roiwritetype) {thisROIwritetype = roiwritetype;}
 
+    // we want to use now the QStringList in designer, but use the old property in the ui file
+    // property not designable but read/written from/to ui file
     QString getROIChannelsWrite() const {return thisPV_ROI_Write.join(";");}
     void setROIChannelsWrite(QString const &newPV) {thisPV_ROI_Write = newPV.split(";");}
 
+    // property designable but not read/written from/to ui file
+    QStringList getROIChannelsWriteList() const {return thisPV_ROI_Write;}
+    void setROIChannelsWriteList(QStringList list) {
+        QString strng("");
+        for(int i=0; i<list.count(); i++) {
+            strng.append(list.at(i));
+            if(i != list.count() -1) strng.append(";");
+        }
+        thisPV_ROI_Write = list;
+    }
+
+    // property not designable but read/written from/to ui file
     QString getROIChannelsRead() const {return thisPV_ROI_Read.join(";");}
     void setROIChannelsRead(QString const &newPV) {thisPV_ROI_Read = newPV.split(";");}
+
+    QStringList getROIChannelsReadList() const {return thisPV_ROI_Read;}
+    void setROIChannelsReadList(QStringList list) {
+        QString strng("");
+        for(int i=0; i<list.count(); i++) {
+            strng.append(list.at(i));
+            if(i != list.count() -1) strng.append(";");
+        }
+        thisPV_ROI_Read = list;
+    }
 
     colormap getColormap() const {return thisColormap;}
     void setColormap(colormap const &map);
@@ -266,6 +292,9 @@ private:
     QTimer *writeTimer;
     QPointF P1, P2, P1_old, P2_old;
     bool selectionInProgress;
+
+    QStringList thisList;
+
 };
 
 #endif
