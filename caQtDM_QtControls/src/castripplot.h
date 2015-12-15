@@ -89,7 +89,10 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
     Q_PROPERTY(QString Title READ getTitlePlot WRITE setTitlePlot)
     Q_PROPERTY(QString TitleX READ getTitleX WRITE setTitleX)
     Q_PROPERTY(QString TitleY READ getTitleY WRITE setTitleY)
-    Q_PROPERTY(QString channels READ getPVS WRITE setPVS)
+
+    Q_PROPERTY(QString channels READ getPVS WRITE setPVS DESIGNABLE false)
+    Q_PROPERTY(QStringList channelsList READ getPVSList WRITE setPVSList STORED false)
+
     Q_PROPERTY(units units READ getUnits WRITE setUnits)
     Q_PROPERTY(double period READ getPeriod WRITE setPeriod)
     Q_PROPERTY(cpuUsage refreshRate READ getUsageCPU WRITE setUsageCPU)
@@ -217,6 +220,8 @@ public:
 
     QString getPVS() const {return thisPVS.join(";");}
     void setPVS(QString const &newPV) {thisPVS = newPV.split(";");}
+    QStringList getPVSList() const {return thisPVS;}
+    void setPVSList(QStringList list) {thisPVS = list;}
 
     units getUnits() const {return thisUnits;}
     void setUnits(units const &newU) {thisUnits = newU; defineXaxis(thisUnits, thisPeriod);}

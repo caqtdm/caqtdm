@@ -46,7 +46,11 @@ void caMimeDisplay::Callback_Clicked(int indx)
         // file contains things like http:// or file:// or ...
         if(Urls.at(indx).contains("://")) {
             // test if local file exists
+#if QT_VERSION >= QT_VERSION_CHECK(4, 8, 0)
             if(url.isLocalFile()) {
+#else
+            if (url.toString().compare(QLatin1String("file"), Qt::CaseInsensitive) != 0) {
+#endif
                 QString filePath = url.toLocalFile();
                 QFile file(filePath);
                 if (!file.exists()) {

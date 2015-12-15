@@ -84,11 +84,13 @@ class QTCON_EXPORT caScan2D : public QWidget
 
     Q_PROPERTY(ROI_markertype ROI_readmarkerType READ getROIreadmarkerType WRITE setROIreadmarkerType)
     Q_PROPERTY(ROI_type ROI_readType READ getROIreadType WRITE setROIreadType)
-    Q_PROPERTY(QString ROI_readChannels READ getROIChannelsRead WRITE setROIChannelsRead)
-    
+    Q_PROPERTY(QString ROI_readChannels READ getROIChannelsRead WRITE setROIChannelsRead DESIGNABLE false)
+    Q_PROPERTY(QStringList ROI_readChannelsList READ getROIChannelsReadList WRITE setROIChannelsReadList STORED false)
+
     Q_PROPERTY(ROI_markertype ROI_writemarkerType READ getROIwritemarkerType WRITE setROIwritemarkerType)
     Q_PROPERTY(ROI_type ROI_writeType READ getROIwriteType WRITE setROIwriteType)
-    Q_PROPERTY(QString ROI_writeChannels READ getROIChannelsWrite WRITE setROIChannelsWrite)
+    Q_PROPERTY(QString ROI_writeChannels READ getROIChannelsWrite WRITE setROIChannelsWrite DESIGNABLE false)
+    Q_PROPERTY(QStringList ROI_writeChannelsList READ getROIChannelsWriteList WRITE setROIChannelsWriteList STORED false)
 
     Q_ENUMS(zoom)
     Q_ENUMS(colormap)
@@ -139,9 +141,13 @@ public:
 
     QString getROIChannelsWrite() const {return thisPV_ROI_Write.join(";");}
     void setROIChannelsWrite(QString const &newPV) {thisPV_ROI_Write = newPV.split(";");}
+    QStringList getROIChannelsWriteList() const {return thisPV_ROI_Write;}
+    void setROIChannelsWriteList(QStringList list) {thisPV_ROI_Write = list;}
 
     QString getROIChannelsRead() const {return thisPV_ROI_Read.join(";");}
     void setROIChannelsRead(QString const &newPV) {thisPV_ROI_Read = newPV.split(";");}
+    QStringList getROIChannelsReadList() const {return thisPV_ROI_Read;}
+    void setROIChannelsReadList(QStringList list) { thisPV_ROI_Read = list;}
 
     //sscanRecord PVs
     QString getPV_XCPT() const {return thisPV_XCPT;}

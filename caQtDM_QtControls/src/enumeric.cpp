@@ -534,7 +534,7 @@ void ENumeric::resizeEvent(QResizeEvent *e)
         //double fontSize = l1->calculateFontPointSizeF(l1->text(), l1->size());
         double fontSize = 80;
         fontSize = qMin((int) fontSize, size().height() / 4 - 2);
-        fontSize = qMin((int) fontSize, size().width() / (digits+1));
+        fontSize = qMin((int) fontSize, size().width() / (digits+2));
         if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         labelFont.setPointSizeF(fontSize);
         signFont.setPointSizeF(fontSize);

@@ -208,7 +208,7 @@
 
 //===============================================================================================
 
-#define MIN_FONT_SIZE 4
+#define MIN_FONT_SIZE 3
 
 Q_DECLARE_METATYPE(QList<int>)
 Q_DECLARE_METATYPE(QTabWidget*)

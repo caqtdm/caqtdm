@@ -43,9 +43,13 @@ class QTCON_EXPORT caRowColMenu : public QWidget
     Q_PROPERTY(QString label READ getLabel WRITE setLabel)
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
-    Q_PROPERTY(QString labels READ getLabels WRITE setLabels)
-    Q_PROPERTY(QString files READ getFiles WRITE setFiles)
-    Q_PROPERTY(QString args READ getArgs WRITE setArgs)
+    Q_PROPERTY(QString labels READ getLabels WRITE setLabels DESIGNABLE false)
+    Q_PROPERTY(QString files READ getFiles WRITE setFiles DESIGNABLE false)
+    Q_PROPERTY(QString args READ getArgs WRITE setArgs DESIGNABLE false)
+    Q_PROPERTY(QStringList labelsList READ getLabelsList WRITE setLabelsList STORED false)
+    Q_PROPERTY(QStringList filesList READ getFilesList WRITE setFilesList STORED false)
+    Q_PROPERTY(QStringList argsList READ getArgsList WRITE setArgsList STORED false)
+
     Q_PROPERTY(EPushButton::ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleModeL)
 
 public:
@@ -64,12 +68,18 @@ public:
 
     QString getLabels() const {return labels.join(";");}
     void setLabels(QString const &newL);
+    QStringList getLabelsList() const {return labels;}
+    void setLabelsList(QStringList list) {labels = list; setLabels(labels.join(";"));}
 
     QString getFiles() const {return files.join(";");}
     void setFiles(QString const &newL);
+    QStringList getFilesList() const {return files;}
+    void setFilesList(QStringList list) {files = list;}
 
     QString getArgs() const {return args.join(";");}
     void setArgs(QString const &newL) ;
+    QStringList getArgsList() const {return args;}
+    void setArgsList(QStringList list) {args = list;}
 
     QString getLabel() const {return thisLabel;}
     void setLabel(QString const &label);
