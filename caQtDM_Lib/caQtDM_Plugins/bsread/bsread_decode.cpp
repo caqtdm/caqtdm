@@ -30,6 +30,13 @@ bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint)
 
 
 }
+bsread_Decode::~bsread_Decode()
+{
+	QMutexLocker locker(&mutex);
+}
+
+
+
 void bsread_Decode::run()
 {
     int rc;
@@ -303,26 +310,30 @@ void bsread_Decode::bsread_EndofData()
     bsread_channeldata * bsreadPV;
     channelcounter=0;
     //Update Knobdata
-    //qDebug() << "bsreadPlugin:Update Knobdata";
-    foreach(int index, listOfIndexes) {
+    qDebug() << "bsreadPlugin:Update Knobdata";
+    if (listOfIndexes.size()>0){
+        foreach(int index, listOfIndexes) {
         knobData* kData = bsread_KnobDataP->GetMutexKnobDataPtr(index);
         if((kData != (knobData *) 0) && (kData->index != -1)) {
             QString key = kData->pv;
 
-            // find this pv in our internal double values list (assume for now we are only treating doubles)
-            // and increment its value
+            // find this pv in our internal values list 
+            // and update its value
+            bsreadPV=NULL;
             QMap<QString,bsread_channeldata*>::iterator i = ChannelSearch.find(key);
             while (i !=ChannelSearch.end() && i.key() == key) {
                 bsreadPV = i.value();
                 break;//?????
             }
             // update some data
+
             if (bsreadPV){
                 switch (bsreadPV->type){
                 case bs_double:{
                     kData->edata.rvalue=bsreadPV->bsdata.bs_double;
                     kData->edata.fieldtype = caDOUBLE;
                     //qDebug() << "Double :"<< kData->edata.rvalue << key << index;
+                    kData->edata.connected = true;
                     break;
                 }
                 case bs_string:{
@@ -344,27 +355,37 @@ void bsread_Decode::bsread_EndofData()
                                , (size_t)kData->edata.dataSize);
 
                     }
+                    kData->edata.connected = true;
                     break;
                 }
                 case bs_integer:{
                     kData->edata.ivalue=bsreadPV->bsdata.bs_integer;
                     kData->edata.fieldtype = caINT;
+                    kData->edata.connected = true;
                     break;
                 }
                 case bs_long:{
                     kData->edata.ivalue=bsreadPV->bsdata.bs_long;
                     kData->edata.fieldtype = caLONG;
+                    kData->edata.connected = true;
                     break;
                 }
                 case bs_short:{
 
                     kData->edata.ivalue=bsreadPV->bsdata.bs_short;
                     kData->edata.fieldtype = caINT;
+                    kData->edata.connected = true;
                     break;
                 }
+                default:{
+                    kData->edata.connected = false;
+
+                    break;
                 }
 
-                kData->edata.connected = true;
+                }
+
+
             }else{
                 kData->edata.connected = false;
             }
@@ -376,7 +397,7 @@ void bsread_Decode::bsread_EndofData()
             bsread_KnobDataP->SetMutexKnobDataReceived(kData);
         }
     }
-
+}
 
 
 }

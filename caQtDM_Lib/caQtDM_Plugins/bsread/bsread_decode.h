@@ -12,7 +12,7 @@ class bsread_Decode : public QThread
 {
 public:
     bsread_Decode(void * Context,QString ConnectionPoint);
-
+    ~bsread_Decode();
     void run();
 
 

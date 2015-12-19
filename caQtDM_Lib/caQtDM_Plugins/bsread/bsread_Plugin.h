@@ -32,6 +32,7 @@
 #include <QTimer>
 #include "controlsinterface.h"
 #include "bsread_decode.h"
+#include "bsread_dispatchercontrol.h"
 
 class Q_DECL_EXPORT bsreadPlugin : public QObject, ControlsInterface
 {
@@ -75,6 +76,7 @@ private:
     QTimer *timer, *timerValues;
 
     void * zmqcontex;
+    bsread_dispatchercontrol Dispatcher;
     QList<bsread_Decode*> bsreadconnections;
 
 };

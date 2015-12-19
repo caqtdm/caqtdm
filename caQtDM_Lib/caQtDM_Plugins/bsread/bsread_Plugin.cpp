@@ -26,6 +26,7 @@
 #include "bsread_plugin.h"
 #include "zmq.h"
 #include "bsread_decode.h"
+#include "bsread_dispatchercontrol.h"
 
 // as defined in knobDefines.h
 //caType {caSTRING	= 0, caINT = 1, caFLOAT = 2, caENUM = 3, caCHAR = 4, caLONG = 5, caDOUBLE = 6};
@@ -97,6 +98,8 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
     messagewindowP = messageWindow;
 
     initValue = 0.0;
+    QString DispacherConfig = (QString)  qgetenv("BSREAD_DISPATCHER");
+    Dispatcher.set_Dispatcher(&DispacherConfig);
 
     // INIT ZMQ Layer
     zmqcontex = zmq_init (1);
@@ -139,14 +142,16 @@ int bsreadPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
 
 // caQtDM_Lib will call this routine for getting rid of a monitor
 int bsreadPlugin::pvClearMonitor(knobData *kData) {
-    int i;
+    int i=0;
 
     QMutexLocker locker(&mutex);
 
     qDebug() << "bsreadPlugin:pvClearMonitor" << kData << kData->pv << kData->index;
     while (i<bsreadconnections.size()){
-     bsreadconnections.at(i)->bsread_DataMonitorUnConnect(kData);
-     i++;
+		if (!bsreadconnections.at(i)){
+			bsreadconnections.at(i)->bsread_DataMonitorUnConnect(kData);
+		}
+		i++;
     }
     return true;
 }
