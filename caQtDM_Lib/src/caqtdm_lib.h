@@ -367,6 +367,8 @@ private slots:
     void handleFileChanged(const QString&);
 
     void Callback_WriteDetectedValues(QWidget* w);
+
+    void updateResize();
 };
 
 #endif // CaQtDM_Lib_H
