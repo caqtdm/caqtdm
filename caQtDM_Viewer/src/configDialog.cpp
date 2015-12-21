@@ -63,8 +63,8 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     }
   #else
     setGeometry(0,0, desktopSize.width(), desktopSize.height());
-    windowlayout->setContentsMargins(qRound(desktopSize.width() * 0.2), qRound(desktopSize.height() * 0.25),
-                                     qRound(desktopSize.width() * 0.2), qRound(desktopSize.height() * 0.25));
+    windowlayout->setContentsMargins(qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.15),
+                                     qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.25));
   #endif
 #else
     QDesktopWidget * Desktop = QApplication::desktop();
@@ -194,7 +194,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     // adjust height
     height = urlComboBox->minimumSizeHint().height();
 #ifdef MOBILE_ANDROID
-    urlComboBox->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR*1.2));
+    urlComboBox->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR*1.1));
 #else
     urlComboBox->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR));
 #endif
@@ -229,7 +229,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     // adjust height
     height = fileComboBox->minimumSizeHint().height();
 #ifdef MOBILE_ANDROID
-    fileComboBox->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR*1.2));
+    fileComboBox->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR*1.1));
 #else
     fileComboBox->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR));
 #endif
