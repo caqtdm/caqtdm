@@ -429,6 +429,8 @@ public:
 
     void setLegendAttribute(QColor c, QFont f, LegendAtttribute sw);
 
+    void setTicksResizeFactor(float factX, float factY);
+
 protected:
     void resizeEvent ( QResizeEvent * event);
 
@@ -522,5 +524,7 @@ private:
 
     int thisXaxisSyncGroup;
     int thisXticks;
+    float ResizeFactorX, ResizeFactorY;
+    float oldResizeFactorX, oldResizeFactorY;
 };
 #endif
