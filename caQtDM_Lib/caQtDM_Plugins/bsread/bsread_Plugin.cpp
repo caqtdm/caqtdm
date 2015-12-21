@@ -100,6 +100,7 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
     initValue = 0.0;
     QString DispacherConfig = (QString)  qgetenv("BSREAD_DISPATCHER");
     Dispatcher.set_Dispatcher(&DispacherConfig);
+    Dispatcher.start();
 
     // INIT ZMQ Layer
     zmqcontex = zmq_init (1);
@@ -126,7 +127,7 @@ int bsreadPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
     bool result;
     int i;
     QMutexLocker locker(&mutex);
-
+    Dispatcher.add_Channel(&QString(kData->pv));
     qDebug() << "bsreadPlugin:pvAddMonitor" << kData->pv << kData->index;
     i=0;
     result=false;
@@ -145,7 +146,7 @@ int bsreadPlugin::pvClearMonitor(knobData *kData) {
     int i=0;
 
     QMutexLocker locker(&mutex);
-
+    Dispatcher.rem_Channel(&QString(kData->pv));
     qDebug() << "bsreadPlugin:pvClearMonitor" << kData << kData->pv << kData->index;
     while (i<bsreadconnections.size()){
 		if (!bsreadconnections.at(i)){

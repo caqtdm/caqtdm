@@ -310,7 +310,7 @@ void bsread_Decode::bsread_EndofData()
     bsread_channeldata * bsreadPV;
     channelcounter=0;
     //Update Knobdata
-    qDebug() << "bsreadPlugin:Update Knobdata";
+    //qDebug() << "bsreadPlugin:Update Knobdata";
     if (listOfIndexes.size()>0){
         foreach(int index, listOfIndexes) {
         knobData* kData = bsread_KnobDataP->GetMutexKnobDataPtr(index);

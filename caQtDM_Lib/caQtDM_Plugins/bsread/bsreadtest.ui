@@ -25,6 +25,12 @@
    <property name="channel" stdset="0">
     <string notr="true">bsread://CHANNEL-1</string>
    </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
   </widget>
   <widget class="caLineEdit" name="calineedit_2">
    <property name="geometry">
@@ -37,6 +43,12 @@
    </property>
    <property name="channel" stdset="0">
     <string notr="true">bsread://CHANNEL-2</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
    </property>
   </widget>
   <widget class="caLineEdit" name="calineedit_3">
@@ -51,6 +63,12 @@
    <property name="channel" stdset="0">
     <string notr="true">bsread://CHANNEL-3</string>
    </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
   </widget>
   <widget class="caLineEdit" name="calineedit_4">
    <property name="geometry">
@@ -63,6 +81,12 @@
    </property>
    <property name="channel" stdset="0">
     <string notr="true">bsread://CHANNEL-4</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
    </property>
   </widget>
   <widget class="caStripPlot" name="castripplot">
@@ -78,7 +102,10 @@
     <string notr="true">bsread://CHANNEL-1;bsread://CHANNEL-2;bsread://CHANNEL-3;bsread://CHANNEL-4</string>
    </property>
    <property name="period">
-    <double>30.000000000000000</double>
+    <double>10.000000000000000</double>
+   </property>
+   <property name="refreshRate" stdset="0">
+    <enum>caStripPlot::High</enum>
    </property>
    <property name="YAxisScaling" stdset="0">
     <enum>caStripPlot::autoScale</enum>
