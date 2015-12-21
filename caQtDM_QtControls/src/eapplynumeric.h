@@ -47,8 +47,6 @@ Q_OBJECT
 
 
 Q_PROPERTY(double value READ value WRITE setValue)
-//Q_PROPERTY(double maximum READ maximum WRITE setMaximum)
-//Q_PROPERTY(double minimum READ minimum WRITE setMinimum)
 Q_PROPERTY(int integerDigits READ intDigits WRITE setIntDigits)
 Q_PROPERTY(int decimalDigits READ decDigits WRITE setDecDigits)
 Q_PROPERTY(Qt::Orientation buttonPos READ buttonPosition WRITE setButtonPosition)
