@@ -108,11 +108,14 @@ void caClock::updateClock(QTime time) {
 
 void caClock::resizeEvent(QResizeEvent *e)
 {
-
     Q_UNUSED(e);
     int Width = width();
     QFont f = font();
+#ifdef MOBILE_IOS
+    f.setPointSizeF(Width/12.0);
+#else
     f.setPointSizeF(Width/20.0);
+#endif
     setFont(f);
     update();
 }

@@ -159,7 +159,7 @@ void caMeter::drawScaleContents(QPainter *painter, const QPointF &center, double
 {
     Q_UNUSED(center);
     Q_UNUSED(radius);
-    QRectF rect( 2./10.*width(), 0.0, 6.0/10.0*width(), 9.0/10.0*height());
+    QRectF rect( 2./10.*width(), 8.5/10.0*height(), 6.0/10.0*width(), 1.0/10.0*height());
 
     const QColor color = palette().color(QPalette::Text);
     painter->setPen(color);
@@ -168,13 +168,16 @@ void caMeter::drawScaleContents(QPainter *painter, const QPointF &center, double
     QFont f;
 
     f.setPointSizeF(80.0);
-    QRect fontBoundRect = painter->fontMetrics().boundingRect(rect.toRect(),flags, thisLabel);
-    while(rect.width() < (fontBoundRect.width()) || rect.height() < (fontBoundRect.height())) {
+    painter->setFont(f);
+    QRect fontBoundRect = painter->fontMetrics().boundingRect(rect.toRect(), flags, thisLabel);
+    while(rect.width() < fontBoundRect.width() || rect.height() < fontBoundRect.height()) {
         if(f.pointSizeF() < 3) break;
         f.setPointSizeF(f.pointSizeF()*0.95);
         painter->setFont(f);
-        fontBoundRect = painter->fontMetrics().boundingRect(rect.toRect(),flags, thisLabel);
+        fontBoundRect = painter->fontMetrics().boundingRect(rect.toRect(), flags, thisLabel);
     }
+
+    CorrectFontIfAndroid(f);
 
     painter->setBrush(QColor(0,0,0,0));
     painter->setPen(QColor(0,0,0,0));
@@ -313,9 +316,10 @@ void caMeter::resizeEvent(QResizeEvent *e)
     if(size < 3.0) size = 3.0;
     f.setPointSizeF(size);
 
+    CorrectFontIfAndroid(f);
+
     setFont(f);
     invalidate();
-
 }
 
 void caMeter::invalidate()

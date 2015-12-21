@@ -876,7 +876,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
                         //printf("%s %s\n", qasc(b->plainText()), qasc(legendText(i-1)));
 
 						b->setFont(f);
-						b->update();
+                        b->update();
 
 						break;
 
