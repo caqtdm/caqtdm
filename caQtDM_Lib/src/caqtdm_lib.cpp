@@ -3673,13 +3673,11 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     stripplotWidget->setYscale(ymin, ymax);
                 }
                 // do this for redisplaying legend with correct limits
-                //if((stripplotWidget->getYscalingMin(actPlot) == caStripPlot::Channel) ||
-                //        (stripplotWidget->getYscalingMax(actPlot) == caStripPlot::Channel)) {
-                //}
-                // force resize for repainting
-                QResizeEvent *re = new QResizeEvent(size(), size());
-                resizeEvent(re);
-                delete re;
+                if((stripplotWidget->getYscalingMin(actPlot) == caStripPlot::Channel) ||
+                        (stripplotWidget->getYscalingMax(actPlot) == caStripPlot::Channel)) {
+                    stripplotWidget->resize(stripplotWidget->geometry().width()+1, stripplotWidget->geometry().height());
+                    stripplotWidget->resize(stripplotWidget->geometry().width()-1, stripplotWidget->geometry().height());
+                }
             }
 
             stripplotWidget->setData(data.edata.actTime, data.edata.rvalue, actPlot);
@@ -6149,6 +6147,18 @@ int CaQtDM_Lib::parseForDisplayRate(QString inputc, int &rate)
 void CaQtDM_Lib::allowResizing(bool allowresize)
 {
     allowResize = allowresize;
+    QTimer::singleShot(50, this, SLOT(updateResize()));
+}
+
+// android does not resize correctly (it does not report its size), doing it a little bit later works
+void CaQtDM_Lib::updateResize()
+{
+#ifdef MOBILE_ANDROID
+    QApplication::processEvents();
+    QResizeEvent *re = new QResizeEvent(size(), size());
+    resizeEvent(re);
+    delete re;
+#endif
 }
 
 // this will probably not work for all kind of mobiles
@@ -6258,9 +6268,9 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             (!className.compare("QTextEdit")) ||
             (!className.compare("QLineEdit")) ||
             (!className.compare("QRadioButton")) ||
+            (!className.compare("QComboBox")) ||
             (!className.compare("QCheckBox"))
             ) {
-
         QFont f = widget->font();
         qreal fontSize = fontResize(factX, factY, list, 4);
         f.setPointSize(qRound(fontSize));
@@ -6292,13 +6302,13 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         plot->setAxisTitle(QwtPlot::xBottom, titleX);
         plot->setAxisTitle(QwtPlot::yLeft, titleY);
 
-        // font size of legends with qwt 6.0
         if(!className.compare("caStripPlot")) {
             caStripPlot * stripplotWidget = (caStripPlot *) widget;
             fontSize = fontResize(factX, factY, list, 7);
             f.setPointSizeF(fontSize);
             if(stripplotWidget->getLegendEnabled()) {
                 stripplotWidget->setLegendAttribute(stripplotWidget->getScaleColor(), f, caStripPlot::FONT);
+                stripplotWidget->updateLayout();
             }
         }
         // resize ticks (will not do for the timescale of the castripplot, while new every time)
@@ -6408,6 +6418,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 {
     double factX, factY;
 
+    //qDebug() << "resize" << event->size();
     QMainWindow *main = this->findChild<QMainWindow *>();
     // it seems that when mainwindow was fixed by user, then the window stays empty ?
     if(main != (QObject*) 0) {
@@ -6513,7 +6524,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 
         // if our window is using a layout, then Qt has to do the resizing
     } else {
-        //qDebug() << "main layout present, Qt should do the work" << className;
+        //qDebug() << "main layout present, Qt should do the work" << classNam;
 
         // centralwidget should manage the layout itsself, we do nothing except changing font for some classes
         if(classNam.contains("Layout")) {
