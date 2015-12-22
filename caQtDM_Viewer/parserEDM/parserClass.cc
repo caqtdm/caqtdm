@@ -64,7 +64,7 @@ static char *labelEnumStr[3] = {"literal","pvLabel","pvName"};
 static int labelEnum[3] = {0,1,2};
 
 static int formatTypeFfloat = 0;
-static char *formatTypeEnumStrM[3] = {"ffloat","exponential","gfloat"};
+static char *formatTypeEnumStrM[3] = {"FFloat","Exponential","GFloat"};
 static int formatTypeEnumM[3] = {0,1,2};
 
 static int setPosOriginal = 0;
@@ -225,6 +225,10 @@ parserClass::parserClass (char *filename)
     openGroups = 0;
 }
 
+parserClass::~parserClass ()
+{
+}
+
 void parserClass::adjustGeometry(int *x, int *y)
 {
 	int i;
@@ -357,9 +361,9 @@ void parserClass::addVisibilityCalc(myParserEDM *myParser, char *visPvExpStr, ch
 		start = end + 2;
 		end = strstr(start, ",");
 		while (end) {
+			*end = '\0';
 			sprintf(newStr, "channel%c", chnl == 'A' ? '\0' : chnl);
 			chnl++;
-			*end = '\0';
 			myParser->Qt_handleString(newStr, "string", start);
 			if (chnl > 'D') {
 				*start = '\0';
@@ -388,11 +392,11 @@ void parserClass::addVisibilityCalc(myParserEDM *myParser, char *visPvExpStr, ch
 			strcpy(visibilityCalc, "!(");
 		}
 		if (strlen(minVisString) > 0) {
-			sprintf(newStr, "(%s)>%s", calcStr, minVisString);
+			sprintf(newStr, "(%s)>=%s", calcStr, minVisString);
 			strcat(visibilityCalc, newStr);
 		}
 		if ((strlen(maxVisString) > 0) && (strlen(minVisString) > 0)) {
-			sprintf(newStr, "&&(%s)<=", calcStr);
+			sprintf(newStr, "&&(%s)<", calcStr);
 			strcat(visibilityCalc, newStr);
 		}
 		if(strlen(maxVisString) > 0) strcat(visibilityCalc, maxVisString);
@@ -403,7 +407,7 @@ void parserClass::addVisibilityCalc(myParserEDM *myParser, char *visPvExpStr, ch
     if(strlen(visibilityCalc) > 0) myParser->Qt_handleString("visibilityCalc", "string", visibilityCalc);
 }
 
-void parserClass::addAlarmPV(myParserEDM *myParser, char *alarmPvExpStr) {
+void parserClass::addAlarmPV(myParserEDM *myParser, char *alarmPvExpStr, int lineColorMode, int fillColorMode) {
 	int status;
 	char alarmCalc[100];
 	char newStr[80];
@@ -415,6 +419,8 @@ void parserClass::addAlarmPV(myParserEDM *myParser, char *alarmPvExpStr) {
 		} else {
 			myParser->Qt_handleString("channel", "string", alarmPvExpStr);
 		}
+	}
+	if (lineColorMode || fillColorMode) {
 		myParser->Qt_handleString("colorMode", "string", "Alarm");
 	}
 }
@@ -534,6 +540,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
             else if ( strcmp( objName, "activeMeterClass" ) == 0 ) activeClass = activeMeter;
             else if ( strcmp( objName, "activeBarClass" ) == 0 ) activeClass = activeBar;
             else if ( strcmp( objName, "activeMessageBoxClass" ) == 0 ) activeClass = activeMessageBox;
+            else if ( strcmp( objName, "activeSliderClass" ) == 0 ) activeClass = activeSlider;
             else if ( strcmp( objName, "activeMotifSliderClass" ) == 0 ) activeClass = activeMotifSlider;
             else if ( strcmp( objName, "activeButtonClass" ) == 0 ) activeClass = activeButton;
             else if ( strcmp( objName, "activeMenuButtonClass" ) == 0 ) activeClass = activeMenuButton;
@@ -569,7 +576,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
             case xyGraph:
 
             {
-                int n, count;
+                int n;
+				expStringClass nPtsExpStr;
                 tagClass tag;
 
                 tag.init();
@@ -604,7 +612,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
 
                 //tag.loadR( "# Operating Modes" );
                 tag.loadR( "plotMode", 2, plotModeEnumStr, plotModeEnum, &plotMode, &plotModePlotNPtsAndStop );
-                tag.loadR( "nPts", &count );
+                tag.loadR( "nPts", &nPtsExpStr, emptyStr );
                 tag.loadR( "updateTimerMs", &updateTimerValue, &zero );
                 tag.loadR( "traceCtlPv", &traceCtlPvExpStr, emptyStr );
                 tag.loadR( "triggerPv", &trigPvExpStr, emptyStr );
@@ -770,6 +778,9 @@ int parserClass::loadFile (myParserEDM *myParser) {
                     } else {
                         myParser->Qt_handleString("XaxisScaling", "enum", "Auto");
                     }
+					if (strlen(nPtsExpStr.getRaw()) > 0) {
+						myParser->Qt_handleString("countNumOrChannel", "string", nPtsExpStr.getRaw());
+					}
 
                     if(xAxisStyle == 1) myParser-> Qt_handleString("XaxisType", "enum", "log10");
                     if(y1AxisStyle[0] == 1) myParser-> Qt_handleString("YaxisType", "enum", "log10");
@@ -889,8 +900,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 if(fill) myParser->Qt_handleString("fillstyle", "string", "Filled");
                 else myParser->Qt_handleString("fillstyle", "string", "Outline");
 
-                addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
-				addAlarmPV(myParser, alarmPvExpStr.getRaw());
+                addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString, visInverted);
+				addAlarmPV(myParser, alarmPvExpStr.getRaw(), lineColorMode, fillColorMode);
 
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
             }
@@ -967,8 +978,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
 
                 myParser->Qt_handleString("channel", "string", visPvExpStr.getRaw());
 
-                addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
-				addAlarmPV(myParser, alarmPvExpStr.getRaw());
+                addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString, visInverted);
+				addAlarmPV(myParser, alarmPvExpStr.getRaw(), lineColorMode, fillColorMode);
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
 
             }
@@ -1036,8 +1047,8 @@ int parserClass::loadFile (myParserEDM *myParser) {
 
                 myParser->Qt_handleString("channel", "string", visPvExpStr.getRaw());
 
-                addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
-				addAlarmPV(myParser, alarmPvExpStr.getRaw());
+                addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString, visInverted);
+				addAlarmPV(myParser, alarmPvExpStr.getRaw(), lineColorMode, fillColorMode);
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
 
             }
@@ -1097,7 +1108,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
 
 
                 addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString, visInverted);
-				addAlarmPV(myParser, alarmPvExpStr.getRaw());
+				addAlarmPV(myParser, alarmPvExpStr.getRaw(), lineColorMode, fillColorMode);
 
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
 
@@ -1154,6 +1165,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_handleString("channel", "string", pvExpStr.getRaw());
 
                 setFont(myParser, fontTag); // Zai added
+				myParser->Qt_handleString("fontScaleMode", "enum",  "None");
 // Zai                myParser->Qt_handleString("fontScaleMode", "enum",  "WidthAndHeight");
                 if(alignment==0) {
                     myParser->Qt_handleString("alignment", "set", "Qt::AlignAbsolute|Qt::AlignLeft|Qt::AlignVCenter");
@@ -1166,7 +1178,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_setColorForeground("", rgb[fgColor].r/256, rgb[fgColor].g/256, rgb[fgColor].b/256, 255);
                 myParser->Qt_setColorBackground("", rgb[bgColor].r/256, rgb[bgColor].g/256, rgb[bgColor].b/256, alpha);
 
-				addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
+				addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString, visInverted);
 				addAlarmPV(myParser, alarmPvExpStr.getRaw());
 
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
@@ -1298,11 +1310,25 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 } else {
                     sprintf(widgetName, "caTextEntry_%d", widgetNumber++);
                     myParser->Qt_writeOpenTag("widget", "caTextEntry", widgetName);
+					// Turn off useDisplayBg for caTextEntry
+					useDisplayBg = 0;
                 }
                 myParser->writeRectangleDimensions(x, y, w, h);
                 myParser->Qt_handleString("channel", "string", pvExpStr.getRaw());
+				// edm uses limitsFromDb for precision
+				if (limitsFromDb) {
+					myParser->Qt_handleString("precisionMode", "string", "Channel");
+				} else {
+					myParser->Qt_handleString("precisionMode", "string", "User");
+				}
+				if (!efPrecision.isNull()) {
+					char sTmp[100];
+					sprintf(sTmp, "%d", efPrecision.value());
+					myParser->Qt_handleString("precision", "string", sTmp);
+				}
 
                 setFont(myParser, fontTag); // Zai added
+				myParser->Qt_handleString("fontScaleMode", "enum",  "None");
 // Zai                myParser->Qt_handleString("fontScaleMode", "enum",  "WidthAndHeight");
                 if(alignment==0) {
                     myParser->Qt_handleString("alignment", "set", "Qt::AlignAbsolute|Qt::AlignLeft|Qt::AlignVCenter");
@@ -1312,10 +1338,12 @@ int parserClass::loadFile (myParserEDM *myParser) {
                     myParser->Qt_handleString("alignment", "set", "Qt::AlignAbsolute|Qt::AlignRight|Qt::AlignVCenter");
                 }
                 myParser->Qt_setColorForeground("", rgb[fgColor].r/256, rgb[fgColor].g/256, rgb[fgColor].b/256, 255);
-                myParser->Qt_setColorBackground("", rgb[bgColor].r/256, rgb[bgColor].g/256, rgb[bgColor].b/256, 255);
+                myParser->Qt_setColorBackground("", rgb[bgColor].r/256, rgb[bgColor].g/256, rgb[bgColor].b/256, useDisplayBg ? 0 : 255);
                 if(showUnits) myParser->Qt_handleString("unitsEnabled", "bool", "false");
 
-				if (bgColorMode || useAlarmBorder) {
+				if (useDisplayBg) {
+					myParser->Qt_handleString("colorMode", "enum", "caLineEdit::Static");
+				} else if (bgColorMode || useAlarmBorder) {
 					myParser->Qt_handleString("colorMode", "enum", "caLineEdit::Alarm_Default");
 					myParser->Qt_handleString("alarmHandling", "enum", "caLineEdit::onBackground");
 				} else if (colorMode) {
@@ -1493,6 +1521,74 @@ int parserClass::loadFile (myParserEDM *myParser) {
 
                 //***************************************************************************************************************
             case activeMessageBox :
+                break;
+
+                //***************************************************************************************************************
+            case activeSlider :
+            {
+                char asc[10];
+                tagClass tag;
+				double incMultiplier;
+                tag.init();
+                tag.loadR( "beginObjectProperties" );
+                tag.loadR( unknownTags );
+                tag.loadR( "major", &major );
+                tag.loadR( "minor", &minor );
+                tag.loadR( "release", &release );
+                tag.loadR( "x", &x );
+                tag.loadR( "y", &y );
+                tag.loadR( "w", &w );
+                tag.loadR( "h", &h );
+                tag.loadR( "fgColor", ci, &fgColor );
+                tag.loadR( "bgColor", ci, &bgColor );
+                tag.loadR( "2ndBgColor", ci, &shadeColor );
+                tag.loadR( "increment", &dincrement, &dzero );
+                tag.loadR( "incMultiplier", &incMultiplier, &dzero );
+				tag.loadR( "controlColor", ci, &ctrlColor );
+				tag.loadR( "offsetColor", ci, &offsetColor );
+                tag.loadR( "indicatorColor", ci, &barColor );
+                tag.loadR( "controlPv", &controlPvExpStr, emptyStr );
+                tag.loadR( "controlLabel", &controlLabelName, emptyStr );
+                tag.loadR( "controlLabelType", 3, labelEnumStr, labelEnum,&controlLabelType, &labelTypeLiteral );
+				tag.loadR( "controlAlarm", &fgColorMode, &zero );
+                tag.loadR( "indicatorPv", &readPvExpStr, emptyStr );
+                tag.loadR( "indicatorLabel", &indicatorLabelName, emptyStr );
+                tag.loadR( "readLabelType", 3, labelEnumStr, labelEnum,&indicatorLabelType, &labelTypeLiteral );
+                tag.loadR( "font", 63, fontTag );
+                tag.loadR( "displayFormat", 3, formatTypeEnumStrM, formatTypeEnumM, &formatType, &formatTypeFfloat );
+                tag.loadR( "limitsFromDb", &limitsFromDb, &zero );
+                tag.loadR( "precision", &efPrecision );
+                tag.loadR( "scaleMin", &efScaleMin );
+                tag.loadR( "scaleMax", &efScaleMax );
+                tag.loadR( "savedValuePv", &savedValuePvName, emptyStr );
+                tag.loadR( "endObjectProperties" );
+
+                stat = tag.readTags( f, "endObjectProperties" );
+                if ( !( stat & 1 ) ) {
+                    printf("%s\n", tag.errMsg() );
+                }
+
+		adjustGeometry(&x, &y);
+
+                // ----------------- write the properties to the ui file
+                sprintf(widgetName, "caSlider_%d", widgetNumber++);
+                myParser->Qt_writeOpenTag("widget", "caSlider", widgetName);
+                myParser->writeRectangleDimensions(x, y, w, h);
+                myParser->Qt_handleString("channel", "string", controlPvExpStr.getRaw());
+                myParser->Qt_handleString("direction", "enum", "Right");
+                myParser->Qt_handleString("scalePosition", "enum", "BottomScale");
+                setFont(myParser, fontTag);
+                if(fgColorMode) {
+                    myParser->Qt_handleString("colorMode", "enum", "Alarm");
+                } else {
+                    myParser->Qt_handleString("colorMode", "enum", "Default");
+                }
+                if(dincrement <= 0.0000000001) dincrement = 0.1;
+                sprintf(asc, "%f\n", dincrement);
+                myParser->Qt_handleString("incrementValue", "double", asc);
+
+                myParser->Qt_writeCloseTag("widget", widgetName, 0);
+            }
                 break;
 
                 //***************************************************************************************************************
@@ -1707,6 +1803,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_setColorBackground("", rgb[bgColor].r/256, rgb[bgColor].g/256, rgb[bgColor].b/256, 255);
                 myParser->Qt_handleString("channel", "string", controlPvExpStr.getRaw());
                 setFont(myParser, fontTag); // Zai added
+				myParser->Qt_handleString("fontScaleMode", "enum",  "None");
                 // Zai added
                 if (activeClass == activeChoiceButton){
                     if(horizontal == 0) {
@@ -1737,6 +1834,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 tag.loadR( "w", &w );
                 tag.loadR( "h", &h );
                 tag.loadR( "fgColor", ci, &fgColor );
+				tag.loadR( "fgAlarm", &fgAlarm, &zero );
                 tag.loadR( "onColor", ci, &onColor );
                 tag.loadR( "offColor", ci, &offColor );
                 tag.loadR( "topShadowColor", ci, &topShadowColor );
@@ -1772,10 +1870,11 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_writeOpenTag("widget", "caMessageButton", widgetName);
                 myParser->writeRectangleDimensions(x, y, w, h);
                 setFont(myParser, fontTag); // Zai added
+				myParser->Qt_handleString("fontScaleMode", "enum",  "None");
                 myParser->Qt_setColorForeground("", rgb[fgColor].r/256, rgb[fgColor].g/256, rgb[fgColor].b/256, 255);
                 myParser->Qt_setColorBackground("", rgb[onColor].r/256, rgb[onColor].g/256, rgb[onColor].b/256, 255);
                 myParser->Qt_handleString("channel", "string", destPvExpStringM.getRaw());
-				if (strlen(readPvExpStr.getRaw()) > 0) {
+				if (fgAlarm) {
 					myParser->Qt_handleString("colorMode", "enum", "caMessageButton::Alarm");
 				}
                 myParser->Qt_handleString("pressMessage", "string", "1");
@@ -1793,7 +1892,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
 					myParser->Qt_handleString("checkable", "bool", "true");
 				}
 
-                addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
+                addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString, visInverted);
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
 
             }
@@ -1843,12 +1942,13 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_writeOpenTag("widget", "caMenu", widgetName);
                 myParser->writeRectangleDimensions(x, y, w, h);
                 setFont(myParser, fontTag); // Zai added
+				myParser->Qt_handleString("fontScaleMode", "enum",  "None");
                 myParser->Qt_setColorForeground("", rgb[fgColor].r/256, rgb[fgColor].g/256, rgb[fgColor].b/256, 255);
                 myParser->Qt_setColorBackground("", rgb[bgColor].r/256, rgb[bgColor].g/256, rgb[bgColor].b/256, 255);
                 myParser->Qt_handleString("channel", "string", controlPvExpStr.getRaw());
                 myParser->Qt_handleString("colorMode", "string", "Static");
 
-                addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
+                addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString, visInverted);
 				addAlarmPV(myParser, alarmPvExpStr.getRaw());
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
             }
@@ -1909,15 +2009,20 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_writeOpenTag("widget", "caMessageButton", widgetName);
                 myParser->writeRectangleDimensions(x, y, w, h);
                 setFont(myParser, fontTag); // Zai added
+				myParser->Qt_handleString("fontScaleMode", "enum",  "None");
                 myParser->Qt_setColorForeground("", rgb[fgColor].r/256, rgb[fgColor].g/256, rgb[fgColor].b/256, 255);
                 myParser->Qt_setColorBackground("", rgb[onColor].r/256, rgb[onColor].g/256, rgb[onColor].b/256, 255);
                 myParser->Qt_handleString("channel", "string", destPvExpStringM.getRaw());
                 myParser->Qt_handleString("pressMessage", "string", sourcePressPvExpString.getRaw());
                 myParser->Qt_handleString("releaseMessage", "string", sourceReleasePvExpString.getRaw());
-                sprintf(label, "%s / %s", onLabel.getRaw(), offLabel.getRaw());
-                myParser->Qt_handleString("label", "string", label);
+                if (strcmp(onLabel.getRaw(), offLabel.getRaw()) == 0) {
+					myParser->Qt_handleString("label", "string", onLabel.getRaw());
+				} else {
+					sprintf(label, "%s / %s", onLabel.getRaw(), offLabel.getRaw());
+					myParser->Qt_handleString("label", "string", label);
+				}
 
-                addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
+                addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString, visInverted);
 				addAlarmPV(myParser, alarmPvExpStr.getRaw());
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
 
@@ -1975,7 +2080,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
             case relatedDisplay :
             {
 
-                char args[1024], files[1024], labels[1024], remove[1024];
+                char args[1024], files[1024], labels[1024], remove[1024], *p;
                 args[0] = files[0] = labels[0] = remove[0] = '\0';
                 tagClass tag;
                 tag.init();
@@ -2032,23 +2137,31 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_writeOpenTag("widget", "caRelatedDisplay", widgetName);
                 myParser->writeRectangleDimensions(x, y, w, h);
                 setFont(myParser, fontTag); // Zai added
+				myParser->Qt_handleString("fontScaleMode", "enum",  "None");
                 myParser->Qt_setColorForeground("", rgb[fgColor].r/256, rgb[fgColor].g/256, rgb[fgColor].b/256, 255);
                 myParser->Qt_setColorBackground("", rgb[bgColor].r/256, rgb[bgColor].g/256, rgb[bgColor].b/256, 255);
 
-                for(int i=0; i<numDsps; i++) {
-                    strcat(files, displayFileName[i].getRaw());
-                    strcat(files, ";");
-                    strcat(labels, relLabel[i].getRaw());
-                    strcat(labels, ";");
-                    strcat(args, symbolsExpStr[i].getRaw());
-                    strcat(args, ";");
-                    if(replaceSymbols[i] == 0) strcat(remove, "false"); else strcat(remove, "true");
-                    strcat(remove, ";");
-                }
-                if(strlen(files) > 0) files[strlen(files) -1] = '\0';
-                if(strlen(labels) > 0) labels[strlen(labels) -1] = '\0';
-                if(strlen(args) > 0) args[strlen(args) -1] = '\0';
-                if(strlen(remove) > 0) remove[strlen(remove) -1] = '\0';
+				for(int i=0; i<numDsps; i++) {
+					strcat(files, displayFileName[i].getRaw());
+					p = strcasestr(files, ".edl");
+				    if (p != NULL) {
+						*p = '\0';
+					}
+					strcat(files, ";");
+					strcat(labels, relLabel[i].getRaw());
+					strcat(labels, ";");
+					strcat(args, symbolsExpStr[i].getRaw());
+					strcat(args, ";");
+					if(replaceSymbols[i] == 0) strcat(remove, "false"); else strcat(remove, "true");
+					strcat(remove, ";");
+				}
+				if (numDsps == 1 && strlen(buttonLabel.getRaw()) > 0) {
+					sprintf(labels, "%s;", buttonLabel.getRaw());
+				}
+				if(strlen(files) > 0) files[strlen(files) -1] = '\0';
+				if(strlen(labels) > 0) labels[strlen(labels) -1] = '\0';
+				if(strlen(args) > 0) args[strlen(args) -1] = '\0';
+				if(strlen(remove) > 0) remove[strlen(remove) -1] = '\0';
                 myParser->Qt_handleString("files", "string", files);
                 myParser->Qt_handleString("labels", "string", labels);
                 myParser->Qt_handleString("args", "string", args);
@@ -2080,7 +2193,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
 
                 stat = tag.readTags( f, "endObjectProperties" );
 
-		addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
+		addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString, visInverted);
 
                 if ( !( stat & 1 ) ) {
                     printf("error message = %s\n", tag.errMsg() );
@@ -2122,7 +2235,6 @@ void parserClass::setFont(myParserEDM *myParser, char fontTag[80]){
 //        qDebug() << "Set  Font Size: " << fontSize;
     }
     myParser->writeFontProperties(fontSize, bold);
-    myParser->Qt_handleString("fontScaleMode", "enum",  "None");
 }
 
 

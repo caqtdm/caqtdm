@@ -16,6 +16,7 @@ enum classType {activeLine, activeRectangle, activeCircle, activeArc ,
                 activeMeter, activeBar, activeMessageBox,
                 activeMotifSlider, activeButton, activeMenuButton, activeRadioButton, activeChoiceButton, // Zai added one item
                 activeMessageButton, activeExitButton, relatedDisplay, shellCmdButton, activeGroup,
+				activeSlider,
                unknown};
 
 struct RGB {
@@ -33,7 +34,7 @@ public:
     void readCommentsAndVersion (FILE *f);
     void incLine ( void );
     void addVisibilityCalc(myParserEDM *myParser, char *visPvExpStr, char *minVisString, char *maxVisString, int visInverted=0);
-    void addAlarmPV(myParserEDM *myParser, char *alarmPvExpStr);
+    void addAlarmPV(myParserEDM *myParser, char *alarmPvExpStr, int lineColorMode=0, int fillColorMode=0);
 
 private:
 
@@ -154,6 +155,10 @@ private:
     expStringClass controlPvName, controlLabelName, savedValuePvName;
     efDouble efScaleMin, efScaleMax;
 
+	// reading activeSliderClass
+	int ctrlColor, offsetColor, indicatorColor, indicatorLabelType;
+	expStringClass indicatorLabelName;
+
     // reading relatedDisplayClass
     int topShadowColor, botShadowColor, icon, swapButtons;
     int noEdit, ofsX, ofsY, useFocus, button3Popup, numPvs, n1, n2, numDsps;
@@ -210,7 +215,7 @@ private:
    int buttonColor, selectColor;
 
    // reading activeMessageButtonClass
-   int onColor, offColor, toggle,  pressAction, releaseAction, _3D;
+   int onColor, offColor, toggle, fgAlarm, pressAction, releaseAction, _3D;
    int useEnumNumeric, usePassword,lock ;
    expStringClass sourcePressPvExpString, sourceReleasePvExpString, destPvExpStringM, visPvExpString;
    expStringClass onLabel, offLabel;
