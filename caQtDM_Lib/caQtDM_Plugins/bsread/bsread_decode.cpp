@@ -13,7 +13,7 @@
 bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint)
 {
     int rc;
-    qDebug() << "bsreadPlugin: ConnectionPoint :"<< ConnectionPoint;
+    //qDebug() << "bsreadPlugin: ConnectionPoint :"<< ConnectionPoint;
     zmqsocket=zmq_socket(Context, ZMQ_PULL);
     if (!zmqsocket) {
         printf ("error in zmq_socket: %s\n", zmq_strerror (errno));
@@ -21,7 +21,7 @@ bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint)
     rc = zmq_connect (zmqsocket, ConnectionPoint.toLatin1().constData());
     if (rc != 0) {
         printf ("error in zmq_bind: %s(%s)\n", zmq_strerror (errno),ConnectionPoint.toLatin1().constData());
-        qDebug() << "bsreadPlugin: ConnectionPoint faild";
+        //qDebug() << "bsreadPlugin: ConnectionPoint faild";
         running_decode=false;
     }else{
         running_decode=true;
@@ -33,6 +33,7 @@ bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint)
 bsread_Decode::~bsread_Decode()
 {
 	QMutexLocker locker(&mutex);
+    zmq_close(zmqsocket);
 }
 
 
@@ -46,11 +47,11 @@ void bsread_Decode::run()
     QString last_hash="This will never be seen";
     size_t more_size = sizeof (more);
     rc = zmq_msg_init (&msg);
+    terminate=false;
 
 
 
-
-    while (1){
+    while (!terminate){
         //printf("Message\n");
         rc = zmq_msg_recv (&msg,zmqsocket,ZMQ_DONTWAIT);
         if (rc > 0) {
@@ -104,7 +105,7 @@ void bsread_Decode::run()
         }
 
     }
-
+    qDebug() << "bsread ZMQ Receiver terminate";
 
 }
 size_t bsread_Decode::getMessage_size() const
@@ -402,6 +403,11 @@ void bsread_Decode::bsread_EndofData()
 
 }
 
+void bsread_Decode::setTerminate()
+{
+    terminate = true;
+}
+
 void bsread_Decode::bsread_DataTimeOut(){
     QMutexLocker locker(&mutex);
     hash="Data Time Out";
@@ -424,24 +430,19 @@ void bsread_Decode::bsread_Delay(){
 #endif
 
 }
+bool bsread_Decode::bsread_DataMonitorConnection(QString channel,int index){
+    QMutexLocker locker(&mutex);
 
+    listOfIndexes.append(index);
+    listOfRequestedChannels.append(channel);
+    //qDebug() << "Index :" << channel << index;
+
+    return true;
+}
 
 
 bool bsread_Decode::bsread_DataMonitorConnection(knobData *kData){
-    QMutexLocker locker(&mutex);
-    QString key = kData->pv;
-    //bool result = false;
-
-    //QMap<QString, bsread_channeldata*>::const_iterator i = ChannelSearch.find(key);
-
-    //while (i != ChannelSearch.end() && i.key() == key) {
-        listOfIndexes.append(kData->index);
-        listOfRequestedChannels.append(kData->pv);
-        qDebug() << "Index :" << kData->index << kData->pv;
-
-//        ++i;
-    //}
-    return true;
+    return bsread_DataMonitorConnection(kData->pv,kData->index);
 }
 
 bool bsread_Decode::bsread_DataMonitorUnConnect(knobData *kData){

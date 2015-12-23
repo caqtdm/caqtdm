@@ -96,26 +96,35 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
     qDebug() << "bsreadPlugin: InitCommunicationLayer" << data;
     mutexknobdataP = data;
     messagewindowP = messageWindow;
+    // INIT ZMQ Layer
+    zmqcontex = zmq_init (1);
 
     initValue = 0.0;
     QString DispacherConfig = (QString)  qgetenv("BSREAD_DISPATCHER");
-    Dispatcher.set_Dispatcher(&DispacherConfig);
-    Dispatcher.start();
+    if (DispacherConfig.length()>0){
 
-    // INIT ZMQ Layer
-    zmqcontex = zmq_init (1);
-    QString ZMQ_ADDR_LIST = (QString)  qgetenv("BSREAD_ZMQ_ADDR_LIST");
+
+        Dispatcher.set_Dispatcher(&DispacherConfig);
+        Dispatcher.setZmqcontex(zmqcontex);
+        Dispatcher.setMutexknobdataP(data);
+        Dispatcher.moveToThread(&DispatcherThread);
+        connect(&DispatcherThread, SIGNAL(started()), &Dispatcher, SLOT(process()));
+        DispatcherThread.start();
+    }else{
+
+        QString ZMQ_ADDR_LIST = (QString)  qgetenv("BSREAD_ZMQ_ADDR_LIST");
+
 #ifdef _MSC_VER
-    QStringList BSREAD_ZMQ_ADDRS = ZMQ_ADDR_LIST.split(";");
+        QStringList BSREAD_ZMQ_ADDRS = ZMQ_ADDR_LIST.split(";");
 #else
-    QStringList BSREAD_ZMQ_ADDRS = ZMQ_ADDR_LIST.split(" ");
+        QStringList BSREAD_ZMQ_ADDRS = ZMQ_ADDR_LIST.split(" ");
 #endif
-    for (i=0;i<BSREAD_ZMQ_ADDRS.count();i++){
-        bsreadconnections.append(new bsread_Decode(zmqcontex,BSREAD_ZMQ_ADDRS.at(i)));
-        bsreadconnections.last()->setKnobData(data);
-        bsreadconnections.last()->start();
+        for (i=0;i<BSREAD_ZMQ_ADDRS.count();i++){
+            bsreadconnections.append(new bsread_Decode(zmqcontex,BSREAD_ZMQ_ADDRS.at(i)));
+            bsreadconnections.last()->setKnobData(data);
+            bsreadconnections.last()->start();
+        }
     }
-
 
 
 
@@ -127,8 +136,8 @@ int bsreadPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
     bool result;
     int i;
     QMutexLocker locker(&mutex);
-    Dispatcher.add_Channel(&QString(kData->pv));
-    qDebug() << "bsreadPlugin:pvAddMonitor" << kData->pv << kData->index;
+    Dispatcher.add_Channel(kData->pv,kData->index);
+    qDebug() << "bsreadPlugin:pvAddMonitor" << kData->pv << kData->index << kData;
     i=0;
     result=false;
     while ((i<bsreadconnections.size())&&(!result)){
@@ -146,7 +155,7 @@ int bsreadPlugin::pvClearMonitor(knobData *kData) {
     int i=0;
 
     QMutexLocker locker(&mutex);
-    Dispatcher.rem_Channel(&QString(kData->pv));
+    Dispatcher.rem_Channel(QString(kData->pv));
     qDebug() << "bsreadPlugin:pvClearMonitor" << kData << kData->pv << kData->index;
     while (i<bsreadconnections.size()){
 		if (!bsreadconnections.at(i)){

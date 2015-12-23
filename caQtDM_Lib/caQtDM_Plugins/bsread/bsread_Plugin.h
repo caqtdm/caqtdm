@@ -76,6 +76,7 @@ private:
     QTimer *timer, *timerValues;
 
     void * zmqcontex;
+    QThread DispatcherThread;
     bsread_dispatchercontrol Dispatcher;
     QList<bsread_Decode*> bsreadconnections;
 

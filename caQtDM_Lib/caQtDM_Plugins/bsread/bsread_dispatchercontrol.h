@@ -9,45 +9,58 @@
 #include <QNetworkReply>
 #include <QEventLoop>
 #include <QUrl>
+#include "bsread_decode.h"
+#include "controlsinterface.h"
+
+typedef struct{
+ QString channel;
+ int     index;
+}channelstruct;
+
+
 
 class QNetworkAccessManager;
 
-class bsread_dispatchercontrol : public QThread
+class bsread_dispatchercontrol : public QObject
 {
 Q_OBJECT
 
 public:
-    explicit bsread_dispatchercontrol(QObject *parent=0);
+    bsread_dispatchercontrol();
     int set_Dispatcher(QString *dispatcher);
-    void run();
-    int add_Channel(QString *channel);
-    int rem_Channel(QString *channel);
+
+    int add_Channel(QString channel,int index);
+    int rem_Channel(QString channel);
 
 
+
+    void setZmqcontex(void *value);
+    void setMutexknobdataP(MutexKnobData *value);
 
 signals:
-   void requestFinished();
+    //void requestFinished();
 
-private slots:
+public slots:
    void finishReply();
-   void httpReadyRead();
+   void process();
+   //void httpReadyRead();
 
 protected:
 
   QString Dispatcher;
   QList<QString> streams;
-  QList<QString> Channels;
-  QList<QString> ChannelsPipeline;
+  QMultiMap<QString,int> Channels;
+  QList<channelstruct> ChannelsPipeline;
   QNetworkRequest request;
   QNetworkReply* reply;
   QMutex ProcessLocker;
   QMutex ChannelLocker;
   QWaitCondition startReconnection;
 
-  QString get_Channel();
-
-
-
+  channelstruct get_Channel();
+  void * zmqcontex;
+  MutexKnobData *mutexknobdataP;
+  QList<bsread_Decode*> bsreadconnections;
 
 };
 

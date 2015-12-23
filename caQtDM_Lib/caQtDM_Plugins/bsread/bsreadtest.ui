@@ -93,19 +93,19 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>90</y>
+     <y>120</y>
      <width>771</width>
      <height>421</height>
     </rect>
    </property>
    <property name="channels" stdset="0">
-    <string notr="true">bsread://CHANNEL-1;bsread://CHANNEL-2;bsread://CHANNEL-3;bsread://CHANNEL-4</string>
+    <string notr="true">SUB1;SUB2</string>
    </property>
    <property name="period">
-    <double>10.000000000000000</double>
+    <double>30.000000000000000</double>
    </property>
    <property name="refreshRate" stdset="0">
-    <enum>caStripPlot::High</enum>
+    <enum>caStripPlot::Medium</enum>
    </property>
    <property name="YAxisScaling" stdset="0">
     <enum>caStripPlot::autoScale</enum>
@@ -116,6 +116,50 @@
      <green>190</green>
      <blue>232</blue>
     </color>
+   </property>
+  </widget>
+  <widget class="caCalc" name="cacalc">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>70</y>
+     <width>51</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="variable">
+    <string notr="true">SUB1</string>
+   </property>
+   <property name="calc">
+    <string notr="true">B-A</string>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-1</string>
+   </property>
+   <property name="channelB">
+    <string notr="true">bsread://CHANNEL-2</string>
+   </property>
+  </widget>
+  <widget class="caCalc" name="cacalc_2">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>70</y>
+     <width>51</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="variable">
+    <string notr="true">SUB2</string>
+   </property>
+   <property name="calc">
+    <string notr="true">B-A</string>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-2</string>
+   </property>
+   <property name="channelB">
+    <string notr="true">bsread://CHANNEL-3</string>
    </property>
   </widget>
  </widget>
@@ -129,6 +173,11 @@
    <class>caStripPlot</class>
    <extends>QFrame</extends>
    <header>caStripPlot</header>
+  </customwidget>
+  <customwidget>
+   <class>caCalc</class>
+   <extends>QLabel</extends>
+   <header>caCalc</header>
   </customwidget>
  </customwidgets>
  <resources/>

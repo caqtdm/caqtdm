@@ -29,8 +29,11 @@ public:
     QString getMainHeader() const;
     bool setMainHeader(char *value, size_t size);
     void setHeader(char *value, size_t size);
+    bool bsread_DataMonitorConnection(QString channel,int index);
     bool bsread_DataMonitorConnection(knobData *kData);
     bool bsread_DataMonitorUnConnect(knobData *kData);
+    void setTerminate();
+
 private:
     QMutex mutex;
     void * zmqsocket;
@@ -55,7 +58,7 @@ private:
     void bsread_SetChannelData(void *message);
     void bsread_SetChannelTimeStamp(void * timestamp);
     void bsread_EndofData();
-
+    bool terminate;
 
 
     void bsread_DataTimeOut();
