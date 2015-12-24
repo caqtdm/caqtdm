@@ -34,6 +34,8 @@ public:
     void setTerminate();
 public slots:
     void process();
+signals:
+    void finished();
 private:
     QMutex mutex;
     void * zmqsocket;

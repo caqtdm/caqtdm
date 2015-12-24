@@ -122,6 +122,7 @@ void bsread_Decode::process()
         }
 
     }
+    emit finished();
     qDebug() << "bsread ZMQ Receiver terminate";
 
 }

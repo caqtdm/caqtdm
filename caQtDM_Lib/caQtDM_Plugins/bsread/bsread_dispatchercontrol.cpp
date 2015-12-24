@@ -134,8 +134,8 @@ void bsread_dispatchercontrol::setZmqcontex(void *value)
 
 int bsread_dispatchercontrol::rem_Channel(QString channel,int index)
 {
+   QMutexLocker lock(&ChannelLocker);
     if ((Channels.contains(channel))){
-        QMutexLocker lock(&ChannelLocker);
         Channels.remove(channel,index);
         //qDebug()<<"REMOVEChannel";
         startReconnection.wakeAll();
@@ -190,15 +190,19 @@ void bsread_dispatchercontrol::finishReply()
 
                 bsreadconnections.last()->moveToThread(bsreadThreads.last());
                 connect(bsreadThreads.last(), SIGNAL(started()), bsreadconnections.last(), SLOT(process()));
+                connect(bsreadThreads.last(), SIGNAL(finished()), bsreadThreads.last(), SLOT(deleteLater()));
+                connect(bsreadconnections.last(), SIGNAL(finished()), bsreadconnections.last(), SLOT(deleteLater()));
+
+
                 bsreadThreads.last()->start();
 
 
 
                 while (bsreadconnections.count()>1){
                   bsreadconnections.first()->setTerminate();
-                  bsreadconnections.first()->deleteLater();
+
                   bsreadconnections.removeFirst();
-                  bsreadThreads.first()->deleteLater();
+
                   bsreadThreads.removeFirst();
                 }
 
