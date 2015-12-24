@@ -120,9 +120,9 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
         QStringList BSREAD_ZMQ_ADDRS = ZMQ_ADDR_LIST.split(" ");
 #endif
         for (i=0;i<BSREAD_ZMQ_ADDRS.count();i++){
-            bsreadconnections.append(new bsread_Decode(zmqcontex,BSREAD_ZMQ_ADDRS.at(i)));
-            bsreadconnections.last()->setKnobData(data);
-            bsreadconnections.last()->start();
+//            bsreadconnections.append(new bsread_Decode(zmqcontex,BSREAD_ZMQ_ADDRS.at(i)));
+            //bsreadconnections.last()->setKnobData(data);
+           // bsreadconnections.last()->start();
         }
     }
 
@@ -155,7 +155,7 @@ int bsreadPlugin::pvClearMonitor(knobData *kData) {
     int i=0;
 
     QMutexLocker locker(&mutex);
-    Dispatcher.rem_Channel(QString(kData->pv));
+    Dispatcher.rem_Channel(QString(kData->pv),kData->index);
     qDebug() << "bsreadPlugin:pvClearMonitor" << kData << kData->pv << kData->index;
     while (i<bsreadconnections.size()){
 		if (!bsreadconnections.at(i)){

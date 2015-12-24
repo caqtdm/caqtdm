@@ -30,7 +30,7 @@ public:
     int set_Dispatcher(QString *dispatcher);
 
     int add_Channel(QString channel,int index);
-    int rem_Channel(QString channel);
+    int rem_Channel(QString channel,int index);
 
 
 
@@ -54,6 +54,7 @@ protected:
   QNetworkRequest request;
   QNetworkReply* reply;
   QMutex ProcessLocker;
+  QMutex ChannelPipelineLocker;
   QMutex ChannelLocker;
   QWaitCondition startReconnection;
 
@@ -61,7 +62,7 @@ protected:
   void * zmqcontex;
   MutexKnobData *mutexknobdataP;
   QList<bsread_Decode*> bsreadconnections;
-
+  QList<QThread*> bsreadThreads;
 };
 
 

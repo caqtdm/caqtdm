@@ -22,11 +22,17 @@ void bsread_dispatchercontrol::process()
 
 
         ProcessLocker.lock();
-        startReconnection.wait(&ProcessLocker,200);
+        startReconnection.wait(&ProcessLocker,400);
 
 
         QString StreamDispatcher=Dispatcher;
-        StreamDispatcher.append("stream");
+        if (!StreamDispatcher.endsWith("/")){
+          StreamDispatcher.append("/");
+        }
+        if (StreamDispatcher.endsWith("/")){
+          StreamDispatcher.append("stream");
+        }
+
         QUrl url(StreamDispatcher);
         request=QNetworkRequest(url);
 
@@ -36,15 +42,15 @@ void bsread_dispatchercontrol::process()
         while(!ChannelsPipeline.isEmpty()){
             channelstruct candidate=get_Channel();
             //qDebug()<<"ADDChannel Pipeline :"<< candidate.channel<<candidate.index;
-            //if (!(Channels.contains(candidate.channel))){
-                Channels.insert(candidate.channel,candidate.index);
-                //()<<"Channel Moved";
-                channelsadded=true;
-            //}
+             QMutexLocker lock(&ChannelLocker);
+             Channels.insert(candidate.channel,candidate.index);
+
+             channelsadded=true;
         }
 
         if(Channels.count()!=requestedchannels){
             QString data="{\"channel:\"[";
+            QMutexLocker lock(&ChannelLocker);
             QSet<QString> keys=QSet<QString>::fromList(Channels.keys());
             foreach( QString key,keys){
                 data.append("{\"name\":\"");
@@ -84,23 +90,24 @@ int bsread_dispatchercontrol::set_Dispatcher(QString *dispatcher)
 {
 
     Dispatcher=*dispatcher;
+
     startReconnection.wakeAll();
     return 0;
 }
 int bsread_dispatchercontrol::add_Channel(QString channel,int index)
 {
-    QMutexLocker lock(&ChannelLocker);
+    QMutexLocker lock(&ChannelPipelineLocker);
     channelstruct channeldata;
     channeldata.channel=channel;
     channeldata.index=index;
     ChannelsPipeline.append(channeldata);
-    startReconnection.wakeAll();
+    //startReconnection.wakeAll();
     //qDebug()<<"ADDChannel"<< channel << index;
     return 0;
 }
 
 channelstruct bsread_dispatchercontrol::get_Channel(){
-    QMutexLocker lock(&ChannelLocker);
+    QMutexLocker lock(&ChannelPipelineLocker);
     channelstruct result;
     if (!ChannelsPipeline.isEmpty()){
         result =ChannelsPipeline.front();
@@ -125,10 +132,11 @@ void bsread_dispatchercontrol::setZmqcontex(void *value)
 }
 
 
-int bsread_dispatchercontrol::rem_Channel(QString channel)
+int bsread_dispatchercontrol::rem_Channel(QString channel,int index)
 {
     if ((Channels.contains(channel))){
-        Channels.remove(channel);
+        QMutexLocker lock(&ChannelLocker);
+        Channels.remove(channel,index);
         //qDebug()<<"REMOVEChannel";
         startReconnection.wakeAll();
         return 0;
@@ -147,7 +155,7 @@ void bsread_dispatchercontrol::finishReply()
     QString stream;
     QObject* obj = sender();
     QNetworkReply* reply_local = qobject_cast<QNetworkReply*>(obj);
-
+    QMutexLocker lock(&ChannelLocker);
 
     QByteArray httpdata;
     streams.clear();
@@ -166,6 +174,8 @@ void bsread_dispatchercontrol::finishReply()
                 stream=QString::fromWCharArray(jsonobj[L"stream"]->AsString().c_str());
                 streams.append(stream);
                 bsreadconnections.append(new bsread_Decode(zmqcontex,stream));
+                bsreadThreads.append(new QThread(this));
+
                 bsreadconnections.last()->setKnobData(mutexknobdataP);
 
 
@@ -178,11 +188,18 @@ void bsread_dispatchercontrol::finishReply()
                     }
 
 
-                bsreadconnections.last()->start();
+                bsreadconnections.last()->moveToThread(bsreadThreads.last());
+                connect(bsreadThreads.last(), SIGNAL(started()), bsreadconnections.last(), SLOT(process()));
+                bsreadThreads.last()->start();
+
+
+
                 while (bsreadconnections.count()>1){
                   bsreadconnections.first()->setTerminate();
                   bsreadconnections.first()->deleteLater();
                   bsreadconnections.removeFirst();
+                  bsreadThreads.first()->deleteLater();
+                  bsreadThreads.removeFirst();
                 }
 
                 qDebug() << "stream :" << stream.toLatin1().constData();

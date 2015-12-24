@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>808</width>
-    <height>613</height>
+    <width>1005</width>
+    <height>621</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -80,7 +80,7 @@
     </rect>
    </property>
    <property name="channel" stdset="0">
-    <string notr="true">bsread://CHANNEL-4</string>
+    <string notr="true">bsread://CHANNEL-STRING</string>
    </property>
    <property name="precision">
     <number>1</number>
@@ -162,6 +162,35 @@
     <string notr="true">bsread://CHANNEL-3</string>
    </property>
   </widget>
+  <widget class="caTable" name="catable">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>100</y>
+     <width>191</width>
+     <height>301</height>
+    </rect>
+   </property>
+   <property name="channels" stdset="0">
+    <string notr="true">bsread://CHANNEL-ARRAY_1</string>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_5">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>440</y>
+     <width>181</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-ARRAY_1</string>
+   </property>
+   <property name="formatType">
+    <enum>caLineEdit::string</enum>
+   </property>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
@@ -173,6 +202,11 @@
    <class>caStripPlot</class>
    <extends>QFrame</extends>
    <header>caStripPlot</header>
+  </customwidget>
+  <customwidget>
+   <class>caTable</class>
+   <extends>QTableWidget</extends>
+   <header>caTable</header>
   </customwidget>
   <customwidget>
    <class>caCalc</class>

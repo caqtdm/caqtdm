@@ -13,14 +13,21 @@
 bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint)
 {
     int rc;
+    int value;
     //qDebug() << "bsreadPlugin: ConnectionPoint :"<< ConnectionPoint;
     zmqsocket=zmq_socket(Context, ZMQ_PULL);
     if (!zmqsocket) {
         printf ("error in zmq_socket: %s\n", zmq_strerror (errno));
     }
+    value=0;
+    rc=zmq_setsockopt(zmqsocket,ZMQ_LINGER,&value,sizeof(value));
+    if (rc != 0) {
+        printf ("error in zmq_setsockopt: %s(%s)\n", zmq_strerror (errno),ConnectionPoint.toLatin1().constData());
+
+    }
     rc = zmq_connect (zmqsocket, ConnectionPoint.toLatin1().constData());
     if (rc != 0) {
-        printf ("error in zmq_bind: %s(%s)\n", zmq_strerror (errno),ConnectionPoint.toLatin1().constData());
+        printf ("error in zmq_connect: %s(%s)\n", zmq_strerror (errno),ConnectionPoint.toLatin1().constData());
         //qDebug() << "bsreadPlugin: ConnectionPoint faild";
         running_decode=false;
     }else{
@@ -33,12 +40,22 @@ bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint)
 bsread_Decode::~bsread_Decode()
 {
 	QMutexLocker locker(&mutex);
+
+    while (zmq_term(zmqsocket)==-1){
+       if(zmq_errno()==EFAULT) {
+           break;
+       }else{
+         qDebug() << "bsreadPlugin: Terminaion ZMQ failed";
+       }
+    }
+
+
     zmq_close(zmqsocket);
 }
 
 
 
-void bsread_Decode::run()
+void bsread_Decode::process()
 {
     int rc;
     zmq_msg_t msg;

@@ -8,13 +8,12 @@
 #include "mutexKnobData.h"
 #include "bsread_channeldata.h"
 
-class bsread_Decode : public QThread
+class bsread_Decode : public QObject
 {
+    Q_OBJECT
 public:
     bsread_Decode(void * Context,QString ConnectionPoint);
     ~bsread_Decode();
-    void run();
-
 
     void *getZmqsocket() const;
 
@@ -33,7 +32,8 @@ public:
     bool bsread_DataMonitorConnection(knobData *kData);
     bool bsread_DataMonitorUnConnect(knobData *kData);
     void setTerminate();
-
+public slots:
+    void process();
 private:
     QMutex mutex;
     void * zmqsocket;
