@@ -109,6 +109,9 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
         Dispatcher.setMutexknobdataP(data);
         Dispatcher.moveToThread(&DispatcherThread);
         connect(&DispatcherThread, SIGNAL(started()), &Dispatcher, SLOT(process()));
+        connect(&Dispatcher, SIGNAL(finished()), &DispatcherThread, SLOT(quit()));
+        connect(&DispatcherThread, SIGNAL(finished()), &DispatcherThread, SLOT(deleteLater()));
+        connect(&Dispatcher, SIGNAL(finished()), &Dispatcher, SLOT(deleteLater()));
         DispatcherThread.start();
     }else{
 

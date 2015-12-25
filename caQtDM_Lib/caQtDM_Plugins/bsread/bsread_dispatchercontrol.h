@@ -27,6 +27,7 @@ Q_OBJECT
 
 public:
     bsread_dispatchercontrol();
+    ~bsread_dispatchercontrol();
     int set_Dispatcher(QString *dispatcher);
 
     int add_Channel(QString channel,int index);
@@ -37,9 +38,11 @@ public:
     void setZmqcontex(void *value);
     void setMutexknobdataP(MutexKnobData *value);
 
+    void setTerminate();
+
 signals:
     //void requestFinished();
-
+    void finished();
 public slots:
    void finishReply();
    void process();
@@ -48,6 +51,7 @@ public slots:
 protected:
 
   QString Dispatcher;
+  bool terminate;
   QList<QString> streams;
   QMultiMap<QString,int> Channels;
   QList<channelstruct> ChannelsPipeline;

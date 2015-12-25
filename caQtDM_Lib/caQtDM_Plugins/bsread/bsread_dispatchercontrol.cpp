@@ -7,17 +7,22 @@ bsread_dispatchercontrol::bsread_dispatchercontrol()
 {
 
 }
+bsread_dispatchercontrol::~bsread_dispatchercontrol()
+{
+  this->setTerminate();
+  startReconnection.wakeAll();
+}
 
 void bsread_dispatchercontrol::process()
 {
     QNetworkAccessManager manager;
     QEventLoop loop;
     int requestedchannels=0;
-
+    terminate=false;
 
 
     //Update and reconection handling
-    while (1){
+    while (!terminate){
         //QThread::sleep(200);
 
 
@@ -78,10 +83,16 @@ void bsread_dispatchercontrol::process()
 
 
     }
+    emit finished();
 
 
 
+}
 
+void bsread_dispatchercontrol::setTerminate()
+{
+    terminate = true;
+    startReconnection.wakeAll();
 }
 
 

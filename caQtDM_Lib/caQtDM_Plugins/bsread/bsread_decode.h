@@ -59,6 +59,8 @@ private:
     QList<QString> listOfRequestedChannels;
     void bsread_SetChannelData(void *message);
     void bsread_SetChannelTimeStamp(void * timestamp);
+    void bsread_InitHeaderChannels();
+    void bsread_TransferHeaderData();
     void bsread_EndofData();
     bool terminate;
 
