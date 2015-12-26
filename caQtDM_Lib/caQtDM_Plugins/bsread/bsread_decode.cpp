@@ -66,16 +66,16 @@ bsread_Decode::~bsread_Decode()
 {
     QMutexLocker locker(&mutex);
     setTerminate();
-    while (zmq_term(zmqsocket)==-1){
-        if(zmq_errno()==EFAULT) {
-            break;
-        }else{
-            qDebug() << "bsreadPlugin: Terminaion ZMQ failed";
-        }
-    }
+//    while (zmq_term(zmqsocket)==-1){
+//        if(zmq_errno()==EFAULT) {
+//            break;
+//        }else{
+//            qDebug() << "bsreadPlugin: Terminaion ZMQ failed";
+//        }
+//    }
     bsread_Delay();
 
-    zmq_close(zmqsocket);
+
 }
 
 
@@ -90,7 +90,6 @@ void bsread_Decode::process()
     size_t more_size = sizeof (more);
     rc = zmq_msg_init (&msg);
     terminate=false;
-
 
 
     while (!terminate){
@@ -138,6 +137,8 @@ void bsread_Decode::process()
         }else{
             if (terminate){
                 break;
+            }else{
+              bsread_Delay();
             }
             if (zmq_errno()==EAGAIN){
                 //bsread_Delay();
@@ -146,12 +147,14 @@ void bsread_Decode::process()
                     bsread_DataTimeOut();
                 }
             }
-            bsread_Delay();
+
             //printf ("error in zmq_recvmsg(Main Massage): %s\n", zmq_strerror (errno));
 
         }
 
     }
+    zmq_msg_close(&msg);
+    zmq_close(zmqsocket);
     emit finished();
     qDebug() << "bsread ZMQ Receiver terminate";
 
@@ -317,72 +320,108 @@ void bsread_Decode::setHeader(char *value,size_t size){
         }
     }
 }
+void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message){
 
+    switch(Data->shape.count()){
+    case 0:{
+        switch (Data->type){
+            case bs_double:{
+                Data->bsdata.bs_double=*(double*) message;
+            }
+            case bs_string:{
+                Data->bsdata.bs_string=QString((char*)message);
+                break;
+            }
+            case bs_integer:{
+                Data->bsdata.bs_integer=*(int*) message;
+                break;
+            }
+            case bs_long:{
+                Data->bsdata.bs_long=*(long*) message;
+                break;
+            }
+            case bs_short:{
+                Data->bsdata.bs_short=*(short*) message;
+                break;
+            }
+        }
+
+        break;
+    }
+    case 1:{
+        int datasize=Data->shape.at(0);
+        if (datasize==1){
+            switch (Data->type){
+                case bs_double:{
+                    Data->bsdata.bs_double=*(double*) message;
+                }
+                case bs_string:{
+                    Data->bsdata.bs_string=QString((char*)message);
+                    break;
+                }
+                case bs_integer:{
+                    Data->bsdata.bs_integer=*(int*) message;
+                    break;
+                }
+                case bs_long:{
+                    Data->bsdata.bs_long=*(long*) message;
+                    break;
+                }
+                case bs_short:{
+                    Data->bsdata.bs_short=*(short*) message;
+                    break;
+                }
+            }
+        }else{
+            int datatypesize;
+            switch (Data->type){
+                case bs_double:{
+                    datatypesize=sizeof(double);
+                    break;
+                }
+                case bs_integer:{
+                    datatypesize=sizeof(int);
+                    break;
+                }
+                case bs_long:{
+                    datatypesize=sizeof(long);
+                    break;
+                }
+                case bs_short:{
+                    datatypesize=sizeof(short);
+                    break;
+                }
+            }
+
+             if(Data->bsdata.wf_data_size!=(datasize*datatypesize)){
+                if (Data->bsdata.wf_data!=NULL){
+                    free(Data->bsdata.wf_data);
+                }
+                Data->bsdata.wf_data=malloc(datasize*datatypesize);
+                //qDebug()<< "Datasize:" << Channels.at(channelcounter)->shape.at(0);
+            }
+            memcpy(Data->bsdata.wf_data,message,datasize*datatypesize);
+            Data->bsdata.wf_data_size=(datasize*datatypesize);
+        }
+        break;
+    }
+    case 2:{
+
+        break;
+    }
+    default:{
+
+        break;
+    }
+    }
+
+}
 
 void bsread_Decode::bsread_SetChannelData(void *message)
 {
     long datasize;
     if ((message)&&(Channels.size()>channelcounter)){
-        switch (Channels.at(channelcounter)->type){
-        case bs_double:{
-            if (Channels.at(channelcounter)->shape.count()==0){
-                Channels.at(channelcounter)->bsdata.bs_double=*(double*) message;
-            }else{
-                switch(Channels.at(channelcounter)->shape.count()){
-                case 1:{
-                    datasize=Channels.at(channelcounter)->shape.at(0);
-
-                    if (datasize==1){
-                        Channels.at(channelcounter)->bsdata.bs_double=*(double*) message;
-                    }else{
-                        if(Channels.at(channelcounter)->bsdata.wf_data_size!=(datasize*sizeof(double))){
-                            if (Channels.at(channelcounter)->bsdata.wf_data!=NULL){
-                                free(Channels.at(channelcounter)->bsdata.wf_data);
-                            }
-                            Channels.at(channelcounter)->bsdata.wf_data=malloc(datasize*sizeof(double));
-                            qDebug()<< "Datasize:" << Channels.at(channelcounter)->shape.at(0);
-                        }
-                        memcpy(Channels.at(channelcounter)->bsdata.wf_data,message,datasize*sizeof(double));
-                        Channels.at(channelcounter)->bsdata.wf_data_size=(datasize*sizeof(double));
-                    }
-                    break;
-                }
-                case 2:{
-
-                    break;
-                }
-                default:{
-
-                    break;
-                }
-
-
-                }
-
-
-            }
-
-            //printf("Data :%s %f\n",Channels.at(channelcounter)->name.toLatin1().constData(),Channels.at(channelcounter)->bsdata.bs_double);
-            break;
-        }
-        case bs_string:{
-            Channels.at(channelcounter)->bsdata.bs_string=QString((char*)message);
-            //qDebug() << "bsstring :" << message;
-            break;
-        }
-        case bs_integer:{
-            Channels.at(channelcounter)->bsdata.bs_double=*(int*) message;
-            break;
-        }
-        case bs_long:{
-            Channels.at(channelcounter)->bsdata.bs_double=*(long*) message;
-            break;
-        }
-        case bs_short:{
-            Channels.at(channelcounter)->bsdata.bs_double=*(short*) message;
-            break;
-        }
-        }
+      bsread_SetData(Channels.at(channelcounter),message);
     }
 }
 
@@ -593,7 +632,7 @@ void bsread_Decode::bsread_Delay(){
     usleep(5000);
 #else
     //Sleep::msleep(1);
-    QThread::msleep(1);
+    QThread::msleep(5);
 #endif
 
 }
