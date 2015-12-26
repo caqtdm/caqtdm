@@ -39,6 +39,7 @@ signals:
 private:
     QMutex mutex;
     void * zmqsocket;
+    QString StreamConnectionPoint;
     bool running_decode;
     QString ConnectionPoint;
     MutexKnobData * bsread_KnobDataP;

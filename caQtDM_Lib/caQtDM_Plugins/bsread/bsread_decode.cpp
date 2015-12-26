@@ -1,3 +1,27 @@
+/*
+ *  This file is part of the caQtDM Framework, developed at the Paul Scherrer Institut,
+ *  Villigen, Switzerland
+ *
+ *  The caQtDM Framework is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  The caQtDM Framework is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with the caQtDM Framework.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Copyright (c) 2010 - 2015
+ *
+ *  Author:
+ *    Helge Brands
+ *  Contact details:
+ *    helge.brands@psi.ch
+ */
 #include <QThread>
 #include <QDebug>
 #include <QAtomicInt>
@@ -31,6 +55,7 @@ bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint)
         //qDebug() << "bsreadPlugin: ConnectionPoint faild";
         running_decode=false;
     }else{
+        StreamConnectionPoint=ConnectionPoint;
         running_decode=true;
         channelcounter=0;
     }
@@ -48,7 +73,7 @@ bsread_Decode::~bsread_Decode()
             qDebug() << "bsreadPlugin: Terminaion ZMQ failed";
         }
     }
-
+    bsread_Delay();
 
     zmq_close(zmqsocket);
 }
@@ -117,7 +142,7 @@ void bsread_Decode::process()
             if (zmq_errno()==EAGAIN){
                 //bsread_Delay();
                 notReceivedCounter++;
-                if (notReceivedCounter>10){
+                if (notReceivedCounter>20){
                     bsread_DataTimeOut();
                 }
             }
@@ -262,6 +287,7 @@ void bsread_Decode::setHeader(char *value,size_t size){
                             for (unsigned int j = 0; j < jsonobj4.size(); j++){
                                 int value=(int)jsonobj4[j]->AsNumber();
                                 chdata->shape.append(value);
+                                //qDebug()<< "shape:" << value;
                             }
 
                         }
@@ -295,10 +321,47 @@ void bsread_Decode::setHeader(char *value,size_t size){
 
 void bsread_Decode::bsread_SetChannelData(void *message)
 {
+    long datasize;
     if ((message)&&(Channels.size()>channelcounter)){
         switch (Channels.at(channelcounter)->type){
         case bs_double:{
-            Channels.at(channelcounter)->bsdata.bs_double=*(double*) message;
+            if (Channels.at(channelcounter)->shape.count()==0){
+                Channels.at(channelcounter)->bsdata.bs_double=*(double*) message;
+            }else{
+                switch(Channels.at(channelcounter)->shape.count()){
+                case 1:{
+                    datasize=Channels.at(channelcounter)->shape.at(0);
+
+                    if (datasize==1){
+                        Channels.at(channelcounter)->bsdata.bs_double=*(double*) message;
+                    }else{
+                        if(Channels.at(channelcounter)->bsdata.wf_data_size!=(datasize*sizeof(double))){
+                            if (Channels.at(channelcounter)->bsdata.wf_data!=NULL){
+                                free(Channels.at(channelcounter)->bsdata.wf_data);
+                            }
+                            Channels.at(channelcounter)->bsdata.wf_data=malloc(datasize*sizeof(double));
+                            qDebug()<< "Datasize:" << Channels.at(channelcounter)->shape.at(0);
+                        }
+                        memcpy(Channels.at(channelcounter)->bsdata.wf_data,message,datasize*sizeof(double));
+                        Channels.at(channelcounter)->bsdata.wf_data_size=(datasize*sizeof(double));
+                    }
+                    break;
+                }
+                case 2:{
+
+                    break;
+                }
+                default:{
+
+                    break;
+                }
+
+
+                }
+
+
+            }
+
             //printf("Data :%s %f\n",Channels.at(channelcounter)->name.toLatin1().constData(),Channels.at(channelcounter)->bsdata.bs_double);
             break;
         }
@@ -397,7 +460,8 @@ void bsread_Decode::bsread_EndofData()
             knobData* kData = bsread_KnobDataP->GetMutexKnobDataPtr(index);
             if((kData != (knobData *) 0) && (kData->index != -1)) {
                 QString key = kData->pv;
-
+                QString ioc_string=StreamConnectionPoint.leftJustified(39, ' ');
+                strcpy(kData->edata.fec,ioc_string.toLatin1().constData());
                 // find this pv in our internal values list
                 // and update its value
                 bsreadPV=NULL;
@@ -411,7 +475,30 @@ void bsread_Decode::bsread_EndofData()
                 if (bsreadPV){
                     switch (bsreadPV->type){
                     case bs_double:{
-                        kData->edata.rvalue=bsreadPV->bsdata.bs_double;
+                        if(bsreadPV->bsdata.wf_data_size!=0){
+
+                            if (kData->edata.dataSize!=bsreadPV->bsdata.wf_data_size){
+                                QMutex *datamutex;
+                                datamutex = (QMutex*) kData->mutex;
+                                datamutex->lock();
+                                if (kData->edata.dataB==NULL){
+                                    free(kData->edata.dataB);
+                                }
+
+                                kData->edata.dataB=malloc(bsreadPV->bsdata.wf_data_size);
+                                kData->edata.dataSize=bsreadPV->bsdata.wf_data_size;
+                                datamutex->unlock();
+                            }
+
+                            memcpy(kData->edata.dataB,bsreadPV->bsdata.wf_data,bsreadPV->bsdata.wf_data_size);
+
+                            kData->edata.valueCount=bsreadPV->bsdata.wf_data_size/sizeof(double);
+
+                        }else{
+
+
+                            kData->edata.rvalue=bsreadPV->bsdata.bs_double;
+                        }
                         kData->edata.fieldtype = caDOUBLE;
                         //qDebug() << "Double :"<< kData->edata.rvalue << key << index;
                         kData->edata.connected = true;
@@ -527,6 +614,14 @@ bool bsread_Decode::bsread_DataMonitorConnection(knobData *kData){
 
 bool bsread_Decode::bsread_DataMonitorUnConnect(knobData *kData){
     QMutexLocker locker(&mutex);
+    QMutex *datamutex;
+    datamutex = (QMutex*) kData->mutex;
+    datamutex->lock();
+    kData->edata.dataB=NULL;
+    kData->edata.dataSize=0;
+    kData->edata.valueCount=0;
+    datamutex->unlock();
+
     listOfIndexes.removeAll(kData->index);
     listOfRequestedChannels.removeAll(kData->pv);
     hash="";
