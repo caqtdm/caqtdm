@@ -77,15 +77,18 @@ protected:
   bool terminate;
   QList<QString> streams;
   QMultiMap<QString,int> Channels;
-  QList<channelstruct> ChannelsPipeline;
+  QList<channelstruct> ChannelsAddPipeline;
+  QList<channelstruct> ChannelsRemPipeline;
   QNetworkRequest request;
   QNetworkReply* reply;
   QMutex ProcessLocker;
-  QMutex ChannelPipelineLocker;
+  QMutex ChannelAddPipelineLocker;
+  QMutex ChannelRemPipelineLocker;
   QMutex ChannelLocker;
   QWaitCondition startReconnection;
 
-  channelstruct get_Channel();
+  channelstruct get_AddChannel();
+  channelstruct get_RemChannel();
   void * zmqcontex;
   MutexKnobData *mutexknobdataP;
   QList<bsread_Decode*> bsreadconnections;

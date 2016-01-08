@@ -34,8 +34,8 @@ bsread_dispatchercontrol::bsread_dispatchercontrol()
 }
 bsread_dispatchercontrol::~bsread_dispatchercontrol()
 {
-  this->setTerminate();
-  startReconnection.wakeAll();
+    this->setTerminate();
+    startReconnection.wakeAll();
 }
 
 void bsread_dispatchercontrol::process()
@@ -52,15 +52,15 @@ void bsread_dispatchercontrol::process()
 
 
         ProcessLocker.lock();
-        startReconnection.wait(&ProcessLocker,400);
+        startReconnection.wait(&ProcessLocker,600);
 
 
         QString StreamDispatcher=Dispatcher;
         if (!StreamDispatcher.endsWith("/")){
-          StreamDispatcher.append("/");
+            StreamDispatcher.append("/");
         }
         if (StreamDispatcher.endsWith("/")){
-          StreamDispatcher.append("stream");
+            StreamDispatcher.append("stream");
         }
 
         QUrl url(StreamDispatcher);
@@ -68,15 +68,26 @@ void bsread_dispatchercontrol::process()
 
 
         // Check Pipeline
-        bool channelsadded=false;
-        while(!ChannelsPipeline.isEmpty()){
-            channelstruct candidate=get_Channel();
+        while(!ChannelsAddPipeline.isEmpty()){
+            channelstruct candidate=get_AddChannel();
             //qDebug()<<"ADDChannel Pipeline :"<< candidate.channel<<candidate.index;
-             QMutexLocker lock(&ChannelLocker);
-             Channels.insert(candidate.channel,candidate.index);
+            //QMutexLocker lock(&ChannelLocker);
+            Channels.insert(candidate.channel,candidate.index);
 
-             channelsadded=true;
         }
+        while(!ChannelsRemPipeline.isEmpty()){
+            channelstruct candidate=get_RemChannel();
+            //qDebug()<<"REMChannel Pipeline :"<< candidate.channel<<candidate.index;
+            if ((Channels.contains(candidate.channel))){
+                //QMutexLocker lock(&ChannelLocker);
+                Channels.remove(candidate.channel,candidate.index);
+            }
+        }
+
+
+
+
+
 
         if(Channels.count()!=requestedchannels){
             QString data="{\"channel:\"[";
@@ -132,22 +143,22 @@ int bsread_dispatchercontrol::set_Dispatcher(QString *dispatcher)
 }
 int bsread_dispatchercontrol::add_Channel(QString channel,int index)
 {
-    QMutexLocker lock(&ChannelPipelineLocker);
+    QMutexLocker lock(&ChannelAddPipelineLocker);
     channelstruct channeldata;
     channeldata.channel=channel;
     channeldata.index=index;
-    ChannelsPipeline.append(channeldata);
+    ChannelsAddPipeline.append(channeldata);
     //startReconnection.wakeAll();
     //qDebug()<<"ADDChannel"<< channel << index;
     return 0;
 }
 
-channelstruct bsread_dispatchercontrol::get_Channel(){
-    QMutexLocker lock(&ChannelPipelineLocker);
+channelstruct bsread_dispatchercontrol::get_AddChannel(){
+    QMutexLocker lock(&ChannelAddPipelineLocker);
     channelstruct result;
-    if (!ChannelsPipeline.isEmpty()){
-        result =ChannelsPipeline.front();
-        ChannelsPipeline.removeFirst();
+    if (!ChannelsAddPipeline.isEmpty()){
+        result =ChannelsAddPipeline.front();
+        ChannelsAddPipeline.removeFirst();
 
     }else{
         result.channel="";
@@ -156,6 +167,22 @@ channelstruct bsread_dispatchercontrol::get_Channel(){
     }
     return result;
 }
+
+channelstruct bsread_dispatchercontrol::get_RemChannel(){
+    QMutexLocker lock(&ChannelRemPipelineLocker);
+    channelstruct result;
+    if (!ChannelsRemPipeline.isEmpty()){
+        result =ChannelsRemPipeline.front();
+        ChannelsRemPipeline.removeFirst();
+
+    }else{
+        result.channel="";
+        result.index=-1;
+
+    }
+    return result;
+}
+
 
 void bsread_dispatchercontrol::setMutexknobdataP(MutexKnobData *value)
 {
@@ -170,15 +197,14 @@ void bsread_dispatchercontrol::setZmqcontex(void *value)
 
 int bsread_dispatchercontrol::rem_Channel(QString channel,int index)
 {
-   QMutexLocker lock(&ChannelLocker);
-    if ((Channels.contains(channel))){
-        Channels.remove(channel,index);
-        //qDebug()<<"REMOVEChannel";
-        startReconnection.wakeAll();
-        return 0;
-    }else{
-        return -1;
-    }
+    QMutexLocker lock(&ChannelRemPipelineLocker);
+    channelstruct channeldata;
+    channeldata.channel=channel;
+    channeldata.index=index;
+    ChannelsRemPipeline.append(channeldata);
+    //qDebug()<<"REMChannel"<< channel << index;
+    return 0;
+
 }
 
 
@@ -236,11 +262,11 @@ void bsread_dispatchercontrol::finishReply()
 
 
                 while (bsreadconnections.count()>1){
-                  bsreadconnections.first()->setTerminate();
+                    bsreadconnections.first()->setTerminate();
 
-                  bsreadconnections.removeFirst();
+                    bsreadconnections.removeFirst();
 
-                  bsreadThreads.removeFirst();
+                    bsreadThreads.removeFirst();
                 }
 
                 qDebug() << "stream :" << stream.toLatin1().constData();
