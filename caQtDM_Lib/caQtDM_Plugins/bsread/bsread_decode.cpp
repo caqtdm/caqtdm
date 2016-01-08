@@ -36,30 +36,8 @@
 
 bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint)
 {
-    int rc;
-    int value;
-    //qDebug() << "bsreadPlugin: ConnectionPoint :"<< ConnectionPoint;
-    zmqsocket=zmq_socket(Context, ZMQ_PULL);
-    if (!zmqsocket) {
-        printf ("error in zmq_socket: %s\n", zmq_strerror (errno));
-    }
-    value=0;
-    rc=zmq_setsockopt(zmqsocket,ZMQ_LINGER,&value,sizeof(value));
-    if (rc != 0) {
-        printf ("error in zmq_setsockopt: %s(%s)\n", zmq_strerror (errno),ConnectionPoint.toLatin1().constData());
-
-    }
-    rc = zmq_connect (zmqsocket, ConnectionPoint.toLatin1().constData());
-    if (rc != 0) {
-        printf ("error in zmq_connect: %s(%s)\n", zmq_strerror (errno),ConnectionPoint.toLatin1().constData());
-        //qDebug() << "bsreadPlugin: ConnectionPoint faild";
-        running_decode=false;
-    }else{
-        StreamConnectionPoint=ConnectionPoint;
-        running_decode=true;
-        channelcounter=0;
-    }
-
+   StreamConnectionPoint=ConnectionPoint;
+   context=Context;
 
 }
 bsread_Decode::~bsread_Decode()
@@ -88,70 +66,94 @@ void bsread_Decode::process()
     int64_t notReceivedCounter=0;
     QString last_hash="This will never be seen";
     size_t more_size = sizeof (more);
+    int value;
+
     rc = zmq_msg_init (&msg);
     terminate=false;
 
 
-    while (!terminate){
-        //printf("Message\n");
-        rc = zmq_msg_recv (&msg,zmqsocket,ZMQ_DONTWAIT);
-        if (rc > 0) {
-            notReceivedCounter=0;
-            setMainHeader((char*)zmq_msg_data(&msg),zmq_msg_size (&msg));
+    //qDebug() << "bsreadPlugin: ConnectionPoint :"<< ConnectionPoint;
+    zmqsocket=zmq_socket(context, ZMQ_PULL);
+    if (!zmqsocket) {
+        printf ("error in zmq_socket: %s\n", zmq_strerror (errno));
+    }
+    value=0;
+    rc=zmq_setsockopt(zmqsocket,ZMQ_LINGER,&value,sizeof(value));
+    if (rc != 0) {
+        printf ("error in zmq_setsockopt: %s(%s)\n", zmq_strerror (errno),StreamConnectionPoint.toLatin1().constData());
 
-            zmq_getsockopt (zmqsocket, ZMQ_RCVMORE, &more, &more_size);
-            if (more){
+    }
+    rc = zmq_connect (zmqsocket, StreamConnectionPoint.toLatin1().constData());
+    if (rc != 0) {
+        printf ("error in zmq_connect: %s(%s)\n", zmq_strerror (errno),StreamConnectionPoint.toLatin1().constData());
+        //qDebug() << "bsreadPlugin: ConnectionPoint faild";
+        running_decode=false;
+    }else{
 
-                rc = zmq_msg_recv (&msg,zmqsocket,0);
-                if (rc < 0) {
-                    printf ("error in zmq_recvmsg(Header): %s\n", zmq_strerror (errno));
-                }
-                if (QString::compare(last_hash, hash, Qt::CaseInsensitive)){
-                    setHeader((char*)zmq_msg_data(&msg),zmq_msg_size (&msg));
-                    last_hash=hash;
-                }
-                bsread_TransferHeaderData();
+        running_decode=true;
+        channelcounter=0;
+
+        while (!terminate){
+            //printf("Message\n");
+            rc = zmq_msg_recv (&msg,zmqsocket,ZMQ_DONTWAIT);
+            if (rc > 0) {
+                notReceivedCounter=0;
+                setMainHeader((char*)zmq_msg_data(&msg),zmq_msg_size (&msg));
+
                 zmq_getsockopt (zmqsocket, ZMQ_RCVMORE, &more, &more_size);
-                while(more){
+                if (more){
+
                     rc = zmq_msg_recv (&msg,zmqsocket,0);
                     if (rc < 0) {
-                        printf ("error in zmq_recvmsg(Data): %s\n", zmq_strerror (errno));
+                        printf ("error in zmq_recvmsg(Header): %s\n", zmq_strerror (errno));
                     }
-
-                    bsread_SetChannelData(zmq_msg_data(&msg));
-
+                    if (QString::compare(last_hash, hash, Qt::CaseInsensitive)){
+                        setHeader((char*)zmq_msg_data(&msg),zmq_msg_size (&msg));
+                        last_hash=hash;
+                    }
+                    bsread_TransferHeaderData();
                     zmq_getsockopt (zmqsocket, ZMQ_RCVMORE, &more, &more_size);
-                    if (more){
+                    while(more){
                         rc = zmq_msg_recv (&msg,zmqsocket,0);
                         if (rc < 0) {
-                            printf ("error in zmq_recvmsg(Timestamp): %s\n", zmq_strerror (errno));
+                            printf ("error in zmq_recvmsg(Data): %s\n", zmq_strerror (errno));
                         }
-                        bsread_SetChannelTimeStamp(zmq_msg_data(&msg));
+
+                        bsread_SetChannelData(zmq_msg_data(&msg));
+
                         zmq_getsockopt (zmqsocket, ZMQ_RCVMORE, &more, &more_size);
+                        if (more){
+                            rc = zmq_msg_recv (&msg,zmqsocket,0);
+                            if (rc < 0) {
+                                printf ("error in zmq_recvmsg(Timestamp): %s\n", zmq_strerror (errno));
+                            }
+                            bsread_SetChannelTimeStamp(zmq_msg_data(&msg));
+                            zmq_getsockopt (zmqsocket, ZMQ_RCVMORE, &more, &more_size);
+                        }
+
                     }
+                    bsread_EndofData();
 
                 }
-                bsread_EndofData();
-
-            }
-        }else{
-            if (terminate){
-                break;
             }else{
-              bsread_Delay();
-            }
-            if (zmq_errno()==EAGAIN){
-                //bsread_Delay();
-                notReceivedCounter++;
-                if (notReceivedCounter>20){
-                    bsread_DataTimeOut();
+                if (terminate){
+                    break;
+                }else{
+                    bsread_Delay();
                 }
-            }
+                if (zmq_errno()==EAGAIN){
+                    //bsread_Delay();
+                    notReceivedCounter++;
+                    if (notReceivedCounter>20){
+                        bsread_DataTimeOut();
+                    }
+                }
 
-            //printf ("error in zmq_recvmsg(Main Massage): %s\n", zmq_strerror (errno));
+                //printf ("error in zmq_recvmsg(Main Massage): %s\n", zmq_strerror (errno));
+
+            }
 
         }
-
     }
     zmq_msg_close(&msg);
     zmq_close(zmqsocket);

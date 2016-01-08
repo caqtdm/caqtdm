@@ -62,6 +62,7 @@ signals:
     void finished();
 private:
     QMutex mutex;
+    void * context;
     void * zmqsocket;
     QString StreamConnectionPoint;
     bool running_decode;
