@@ -123,9 +123,18 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
         QStringList BSREAD_ZMQ_ADDRS = ZMQ_ADDR_LIST.split(" ");
 #endif
         for (i=0;i<BSREAD_ZMQ_ADDRS.count();i++){
-//            bsreadconnections.append(new bsread_Decode(zmqcontex,BSREAD_ZMQ_ADDRS.at(i)));
-            //bsreadconnections.last()->setKnobData(data);
-           // bsreadconnections.last()->start();
+
+            bsreadconnections.append(new bsread_Decode(zmqcontex,BSREAD_ZMQ_ADDRS.at(i)));
+            bsreadThreads.append(new QThread(this));
+            bsreadconnections.last()->setKnobData(mutexknobdataP);
+            bsreadconnections.last()->moveToThread(bsreadThreads.last());
+            connect(bsreadThreads.last(), SIGNAL(started()), bsreadconnections.last(), SLOT(process()));
+            connect(bsreadconnections.last(), SIGNAL(finished()), bsreadThreads.last(), SLOT(quit()));
+            connect(bsreadThreads.last(), SIGNAL(finished()), bsreadThreads.last(), SLOT(deleteLater()));
+            connect(bsreadconnections.last(), SIGNAL(finished()), bsreadconnections.last(), SLOT(deleteLater()));
+            bsreadThreads.last()->start();
+
+
         }
     }
 
@@ -136,21 +145,21 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
 
 // caQtDM_Lib will call this routine for defining a monitor
 int bsreadPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
-    bool result;
+
     int i;
     QMutexLocker locker(&mutex);
     Dispatcher.add_Channel(kData->pv,kData->index);
     qDebug() << "bsreadPlugin:pvAddMonitor" << kData->pv << kData->index << kData;
     i=0;
-    result=false;
-    while ((i<bsreadconnections.size())&&(!result)){
-     result=bsreadconnections.at(i)->bsread_DataMonitorConnection(kData);
+
+    while ((i<bsreadconnections.size())){
+     bsreadconnections.at(i)->bsread_DataMonitorConnection(kData);
      i++;
     }
 
 
 
-    return result;
+    return 0;
 }
 
 // caQtDM_Lib will call this routine for getting rid of a monitor
@@ -159,11 +168,9 @@ int bsreadPlugin::pvClearMonitor(knobData *kData) {
 
     QMutexLocker locker(&mutex);
     Dispatcher.rem_Channel(QString(kData->pv),kData->index);
-    qDebug() << "bsreadPlugin:pvClearMonitor" << kData << kData->pv << kData->index;
+    qDebug() << "bsreadPlugin:pvClearMonitor" << kData << kData->pv << kData->index <<bsreadconnections.size();
     while (i<bsreadconnections.size()){
-		if (!bsreadconnections.at(i)){
-			bsreadconnections.at(i)->bsread_DataMonitorUnConnect(kData);
-		}
+        bsreadconnections.at(i)->bsread_DataMonitorUnConnect(kData);
 		i++;
     }
     return true;

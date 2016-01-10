@@ -79,7 +79,7 @@ private:
     QThread DispatcherThread;
     bsread_dispatchercontrol Dispatcher;
     QList<bsread_Decode*> bsreadconnections;
-
+    QList<QThread*> bsreadThreads;
 };
 
 #endif
