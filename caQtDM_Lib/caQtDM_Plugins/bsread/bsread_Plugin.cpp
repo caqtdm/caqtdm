@@ -180,16 +180,14 @@ int bsreadPlugin::pvClearMonitor(knobData *kData) {
 int bsreadPlugin::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType) {
     QMutexLocker locker(&mutex);
     qDebug() << "bsreadPlugin:pvSetValue" << pv << rdata << idata << sdata;
-    QString key = pv;
-    if(listOfDoubles.contains(key)) listOfDoubles.insert(pv, rdata);
-    return true;
+    return false;
 }
 
 // caQtDM_Lib will call this routine for setting waveforms data (see for more detail the epics3 plugin)
 int bsreadPlugin::pvSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess) {
     QMutexLocker locker(&mutex);
     qDebug() << "bsreadPlugin:pvSetWave";
-    return true;
+    return false;
 }
 
 // caQtDM_Lib will call this routine for getting a description of the monitor
@@ -202,7 +200,7 @@ int bsreadPlugin::pvGetTimeStamp(char *pv, char *timestamp) {
 // caQtDM_Lib will call this routine for getting the timestamp for this monitor
 int bsreadPlugin::pvGetDescription(char *pv, char *description) {
     qDebug() << "bsreadPlugin:pvGetDescription";
-    strcpy(description, "hello, I am a double");
+    strcpy(description, "no Description available BSREAD data transfer");
     return true;
 }
 
