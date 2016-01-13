@@ -9,6 +9,18 @@
 	<key>com.apple.security.network.client</key>
 	<true/>
 	<key>com.apple.developer.ubiquity-container-identifiers</key>
-	<string>ch.psi.caQtDM.osx</string>
+	<array>
+		<string>psi.ch.qwt</string>
+		<string>org.qt-project.QtSvg</string>
+		<string>org.qt-project.QtWidgets</string>
+		<string>org.qt-project.QtSvg</string>
+		<string>org.qt-project.QtNetwork</string>
+		<string>org.qt-project.QtGui</string>
+		<string>org.qt-project.QtDesigner</string>
+		<string>org.qt-project.QtDBus</string>
+		<string>org.qt-project.QtCore</string>
+		<string>org.qt-project.QtConcurrent</string>
+		<string>org.qt-project.QtPrintSupport</string>
+	</array>
 </dict>
 </plist>
