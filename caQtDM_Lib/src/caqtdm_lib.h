@@ -268,6 +268,7 @@ private:
     void FlushAllInterfaces();
     void CartesianPlotsVerticalAlign();
     void StripPlotsVerticalAlign();
+    qreal fontResize(double factX, double factY, QVariantList list, int usedIndex);
 
 #ifdef MOBILE
     bool eventFilter(QObject *obj, QEvent *event);
@@ -366,6 +367,8 @@ private slots:
     void handleFileChanged(const QString&);
 
     void Callback_WriteDetectedValues(QWidget* w);
+
+    void updateResize();
 };
 
 #endif // CaQtDM_Lib_H

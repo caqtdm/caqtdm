@@ -208,7 +208,7 @@
 
 //===============================================================================================
 
-#define MIN_FONT_SIZE 4
+#define MIN_FONT_SIZE 3
 
 Q_DECLARE_METATYPE(QList<int>)
 Q_DECLARE_METATYPE(QTabWidget*)
@@ -3673,13 +3673,11 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     stripplotWidget->setYscale(ymin, ymax);
                 }
                 // do this for redisplaying legend with correct limits
-                //if((stripplotWidget->getYscalingMin(actPlot) == caStripPlot::Channel) ||
-                //        (stripplotWidget->getYscalingMax(actPlot) == caStripPlot::Channel)) {
-                //}
-                // force resize for repainting
-                QResizeEvent *re = new QResizeEvent(size(), size());
-                resizeEvent(re);
-                delete re;
+                if((stripplotWidget->getYscalingMin(actPlot) == caStripPlot::Channel) ||
+                        (stripplotWidget->getYscalingMax(actPlot) == caStripPlot::Channel)) {
+                    stripplotWidget->resize(stripplotWidget->geometry().width()+1, stripplotWidget->geometry().height());
+                    stripplotWidget->resize(stripplotWidget->geometry().width()-1, stripplotWidget->geometry().height());
+                }
             }
 
             stripplotWidget->setData(data.edata.actTime, data.edata.rvalue, actPlot);
@@ -6149,6 +6147,40 @@ int CaQtDM_Lib::parseForDisplayRate(QString inputc, int &rate)
 void CaQtDM_Lib::allowResizing(bool allowresize)
 {
     allowResize = allowresize;
+    QTimer::singleShot(50, this, SLOT(updateResize()));
+}
+
+// android does not resize correctly (it does not report its size), doing it a little bit later works
+void CaQtDM_Lib::updateResize()
+{
+#ifdef MOBILE_ANDROID
+    QApplication::processEvents();
+    QResizeEvent *re = new QResizeEvent(size(), size());
+    resizeEvent(re);
+    delete re;
+#endif
+}
+
+// this will probably not work for all kind of mobiles
+qreal CaQtDM_Lib::fontResize(double factX, double factY, QVariantList list, int usedIndex)
+{
+    qreal fontSize;
+    if(list.at(usedIndex).toInt() < 0) {
+        fontSize = qMin(factX, factY) * (float) list.at(5).toInt();
+    } else {
+        fontSize = qMin(factX, factY) * (float) list.at(usedIndex).toInt();
+    }
+/*
+    qDebug() << "-----------------------------------------------";
+    qDebug() << "font sizes" << list.at(4).toInt() << list.at(5).toInt() << "dpi" << qApp->primaryScreen()->physicalDotsPerInch();
+    qDebug() << "caTable fontsize=" << qMin(factX, factY) << qMin(factX, factY) * (double) list.at(4).toInt();
+    qDebug() << "logical dots per inch" << qApp->primaryScreen()->logicalDotsPerInch()  << "pixel ratio" << qApp->primaryScreen()->devicePixelRatio();
+*/
+#ifdef MOBILE_ANDROID
+    fontSize = fontSize * (float) qApp->primaryScreen()->logicalDotsPerInch() / (float) qApp->primaryScreen()->physicalDotsPerInch();
+#endif
+    if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
+    return fontSize;
 }
 
 void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList list, double factX, double factY)
@@ -6171,10 +6203,11 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
 
     else if(!className.compare("caTable")) {
         caTable *table = (caTable *) widget;
+
         QFont f = table->font();
-        qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
-        if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
-        f.setPointSizeF(fontSize);
+        qreal fontSize = fontResize(factX, factY, list, 4);
+        f.setPointSize(qRound(fontSize));
+
         table->setUpdatesEnabled(false);
         for(int i = 0; i < table->rowCount(); ++i) {
             for(int j = 0; j < table->columnCount(); ++j) {
@@ -6184,15 +6217,21 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         }
         table->setValueFont(f);
         table->verticalHeader()->setDefaultSectionSize((int) (qMin(factX, factY)*20));
+
+        QString styleSheet("QHeaderView { font-size: %1pt; }");
+        styleSheet = styleSheet.arg( qRound(fontSize));
+        table->horizontalHeader()->setStyleSheet(styleSheet);
+        table->verticalHeader()->setStyleSheet(styleSheet);
         table->setUpdatesEnabled(true);
     }
 
     else if(!className.compare("caWaveTable")) {
         caWaveTable *table = (caWaveTable *) widget;
+
         QFont f = table->font();
-        qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
-        if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
-        f.setPointSizeF(fontSize);
+        qreal fontSize = fontResize(factX, factY, list, 4);
+        f.setPointSize(qRound(fontSize));
+
         table->setUpdatesEnabled(false);
         for(int i = 0; i < table->rowCount(); ++i) {
             for(int j = 0; j < table->columnCount(); ++j) {
@@ -6202,6 +6241,12 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         }
         table->setValueFont(f);
         table->verticalHeader()->setDefaultSectionSize((int) (qMin(factX, factY)*20));
+
+        QString styleSheet("QHeaderView { font-size: %1pt; }");
+        styleSheet = styleSheet.arg( qRound(fontSize));
+        table->horizontalHeader()->setStyleSheet(styleSheet);
+        table->verticalHeader()->setStyleSheet(styleSheet);
+
         table->setUpdatesEnabled(true);
     }
 
@@ -6209,11 +6254,11 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         QLabel *label = (QLabel *) widget;
         className = label->parent()->metaObject()->className();
         if(!className.contains("Numeric") ) {  // would otherwise interfere with our wheelswitch
-            if(list.at(4).toInt() < 0) return; // on android I got -1 for these fonts at initialization, i.e pixelsize
-            qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
-            if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
+
             QFont f = label->font();
-            f.setPointSizeF(fontSize);
+            qreal fontSize = fontResize(factX, factY, list, 4);
+            f.setPointSize(qRound(fontSize));
+
             label->setFont(f);
         }
     }
@@ -6221,21 +6266,23 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
     else if((!className.compare("caMenu")) ||
             (!className.compare("QPlainTextEdit")) ||
             (!className.compare("QTextEdit")) ||
-            (!className.compare("QLineEdit")) ) {
-        if(list.at(4).toInt() < 0) return; // on android I got -1 for these fonts at initialization, i.e pixelsize
-        qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
-        if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
+            (!className.compare("QLineEdit")) ||
+            (!className.compare("QRadioButton")) ||
+            (!className.compare("QComboBox")) ||
+            (!className.compare("QCheckBox"))
+            ) {
         QFont f = widget->font();
-        f.setPointSizeF(fontSize);
+        qreal fontSize = fontResize(factX, factY, list, 4);
+        f.setPointSize(qRound(fontSize));
+
         widget->setFont(f);
     }
 
     else if(!className.compare("caStripPlot") || !className.compare("caCartesianPlot")) {
         QwtPlot *plot = (QwtPlot *) widget;
+        qreal fontSize = fontResize(factX, factY, list, 4);
 
         // change font of axis ticks
-        qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
-        if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         QFont f = plot->axisFont(QwtPlot::xBottom);
         f.setPointSizeF(fontSize);
         plot->setAxisFont(QwtPlot::xBottom, f);
@@ -6246,8 +6293,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         QwtText title = plot->title().text();
         QwtText titleX = plot->axisTitle(QwtPlot::xBottom).text();
         QwtText titleY = plot->axisTitle(QwtPlot::yLeft).text();
-        fontSize = qMin(factX, factY) * (double) list.at(6).toInt();
-        if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
+        fontSize = fontResize(factX, factY, list, 6);
         f.setPointSizeF(fontSize);
         title.setFont(f);
         titleX.setFont(f);
@@ -6256,26 +6302,27 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         plot->setAxisTitle(QwtPlot::xBottom, titleX);
         plot->setAxisTitle(QwtPlot::yLeft, titleY);
 
-        // font size of legends with qwt 6.0
         if(!className.compare("caStripPlot")) {
             caStripPlot * stripplotWidget = (caStripPlot *) widget;
-            fontSize = qMin(factX, factY) * (double) list.at(7).toInt();
-            if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
+            fontSize = fontResize(factX, factY, list, 7);
             f.setPointSizeF(fontSize);
             if(stripplotWidget->getLegendEnabled()) {
                 stripplotWidget->setLegendAttribute(stripplotWidget->getScaleColor(), f, caStripPlot::FONT);
+                stripplotWidget->updateLayout();
             }
+            stripplotWidget->setTicksResizeFactor(factX, factY);
+        } else {
+            plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MajorTick, factY * (double) list.at(8).toInt());
+            plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MediumTick, factY * (double) list.at(9).toInt());
+            plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MinorTick, factY * (double) list.at(10).toInt());
+            plot->axisScaleDraw(QwtPlot::xBottom)->setSpacing(0.0);
+            plot->axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MajorTick, factX * (double) list.at(8).toInt());
+            plot->axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MediumTick, factX * (double) list.at(9).toInt());
+            plot->axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MinorTick, factX * (double) list.at(10).toInt());
+            plot->axisScaleDraw(QwtPlot::xBottom)->setSpacing(0.0);
         }
-        // resize ticks (will not do for the timescale of the castripplot, while new every time)
-        plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MajorTick, factY * (double) list.at(8).toInt());
-        plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MediumTick, factY * (double) list.at(9).toInt());
-        plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MinorTick, factY * (double) list.at(10).toInt());
-        plot->axisScaleDraw(QwtPlot::xBottom)->setSpacing(0.0);
-        plot->axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MajorTick, factX * (double) list.at(8).toInt());
-        plot->axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MediumTick, factX * (double) list.at(9).toInt());
-        plot->axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MinorTick, factX * (double) list.at(10).toInt());
-        plot->axisScaleDraw(QwtPlot::xBottom)->setSpacing(0.0);
     }
+
     else if(!className.compare("QGroupBox")) {
         if(list.at(4).toInt() < 0) return; // on android I got -1 for these fonts at initialization, i.e pixelsize
         if(qMin(factX, factY) < 1.0) {
@@ -6290,7 +6337,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
 
     // Tabbar adjustment
     else if(!className.compare("QTabWidget")) {
- #ifdef MOBILE
+#ifdef MOBILE
         if(list.at(4).toInt() < 0) return; // on android I got -1 for these fonts at initialization, i.e pixelsize
         qreal fontSize = (qMin(factX, factY) * (double) list.at(4).toInt());
         if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
@@ -6372,6 +6419,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 {
     double factX, factY;
 
+    //qDebug() << "resize" << event->size();
     QMainWindow *main = this->findChild<QMainWindow *>();
     // it seems that when mainwindow was fixed by user, then the window stays empty ?
     if(main != (QObject*) 0) {
@@ -6409,7 +6457,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
             } else if(!className.compare("caStripPlot") || !className.compare("caCartesianPlot")) {
                 QwtPlot * plot = (QwtPlot *) widget;
                 integerList.insert(4, plot->axisFont(QwtPlot::xBottom).pointSize());         // label of ticks
-                integerList.insert(5, 0);                                                    // empty
+                integerList.insert(5, 9);                                                   // empty
                 integerList.insert(6, plot->axisTitle(QwtPlot::xBottom).font().pointSize()); // titles have the same font
 
                 if(!className.compare("caStripPlot")) {
@@ -6437,6 +6485,9 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 
             } else {
                 integerList.insert(4, widget->font().pointSize());
+                // on android the above does not work always, the instruction below works, but then the fontscaling
+                // may not work at all, due to the pixelratio
+                integerList.insert(5, QFontInfo(widget->font()).pointSize());
             }
             widget->setProperty("GeometryList", integerList);
         }
@@ -6474,7 +6525,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 
         // if our window is using a layout, then Qt has to do the resizing
     } else {
-        //qDebug() << "main layout present, Qt should do the work" << className;
+        //qDebug() << "main layout present, Qt should do the work" << classNam;
 
         // centralwidget should manage the layout itsself, we do nothing except changing font for some classes
         if(classNam.contains("Layout")) {

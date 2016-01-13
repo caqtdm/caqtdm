@@ -27,7 +27,7 @@
 #define QTCONTROLS_GRAPHICS_PLUGIN_H
 
 #include <qglobal.h>
-#if QT_VERSION > 0x050000
+#if QT_VERSION > 0x050400
     #include <QtUiPlugin/QDesignerCustomWidgetInterface>
 #else
     #include <QDesignerCustomWidgetInterface>

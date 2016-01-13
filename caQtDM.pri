@@ -247,7 +247,7 @@ caQtDM_Lib {
 
 	ios | android {
                 message("caQtDM_Lib configuration : !os or android")
-   		CONFIG += staticlib
+                CONFIG += staticlib console
                 SOURCES +=     fingerswipegesture.cpp
       		HEADERS +=     fingerswipegesture.h
 		DESTDIR = $(CAQTDM_COLLECT)
@@ -380,6 +380,7 @@ caQtDM_Viewer {
                 message($$PWD)
                 DESTDIR = $$(CAQTDM_COLLECT)
                 CONFIG += staticlib
+                CONFIG += console
    		LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_controllers_plugin.a
    		LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_monitors_plugin.a
                 LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_graphics_plugin.a

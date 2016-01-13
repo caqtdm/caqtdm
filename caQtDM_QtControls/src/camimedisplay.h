@@ -42,7 +42,7 @@ class QTCON_EXPORT caMimeDisplay : public caRowColMenu
     Q_OBJECT
 
     Q_PROPERTY(Stacking stackingMode READ getStacking WRITE setStacking)
-    Q_PROPERTY(QString args READ getArgs WRITE setArgs  DESIGNABLE false)
+    Q_PROPERTY(QString args READ getArgs WRITE setArgs DESIGNABLE false)
 
 #include "caElevation.h"
 

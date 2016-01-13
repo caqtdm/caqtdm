@@ -32,28 +32,6 @@
 #include <QGraphicsProxyWidget>
 #include <QPropertyAnimation>
 #include <qtcontrols_global.h>
-
-/*
-class QTCON_EXPORT caVertLabel : public QGraphicsView
-{
-    Q_OBJECT
-
-public:
-    caVertLabel( QWidget *parent = 0 );
-
-protected:
-  virtual bool event(QEvent *);
-  void timerEvent(QTimerEvent* event) ;
-
-private:
-    QLabel *label;
-    QGraphicsProxyWidget *proxy;
-    QGraphicsScene *scene;
-    qreal angle;
-*/
-
-
-#include <qtcontrols_global.h>
 #include "fontscalingwidget.h"
 
 class QTCON_EXPORT caLabelVertical : public QWidget, public FontScalingWidget
@@ -62,17 +40,20 @@ class QTCON_EXPORT caLabelVertical : public QWidget, public FontScalingWidget
 
     Q_PROPERTY(QString text READ text WRITE setText)
     Q_PROPERTY(Direction direction READ getDirection WRITE setDirection)
+    Q_PROPERTY(Alignment alignment READ getAlignment WRITE setAlignment)
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
     Q_ENUMS(colMode)
     Q_ENUMS(Direction)
+    Q_ENUMS(Alignment)
 
 #include "caVisibProps.h"
 #include "caVisibDefs.h"
 
 public:
     enum ScaleMode { None, Height, WidthAndHeight};
+    enum Alignment { Center, Left, Right};
     enum Direction {Up, Down};
 
     caLabelVertical(QWidget *parent = 0);
@@ -83,6 +64,9 @@ public:
 
     void setDirection(const Direction &direction);
     Direction getDirection() const {return thisDirection;}
+
+    void setAlignment(const Alignment &alignment);
+    Alignment getAlignment() const {return thisAlignment;}
 
     QSize calculateTextSpace();
 
@@ -117,6 +101,7 @@ private:
     QColor thisBackColor;
     colMode thisColorMode;
     Direction thisDirection;
+    Alignment thisAlignment;
 
 protected:
     void paintEvent(QPaintEvent *);

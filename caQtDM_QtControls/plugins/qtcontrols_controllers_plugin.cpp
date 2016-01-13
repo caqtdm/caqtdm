@@ -248,14 +248,10 @@ caRelatedDisplayInterface::caRelatedDisplayInterface(QObject *parent): CustomWid
 
     strcpy(name[0], "label");
     strcpy(type[0], "multiline");
-    strcpy(name[1], "labels");
-    strcpy(type[1], "multiline");
-    strcpy(name[2], "files");
-    strcpy(type[2], "multiline");
-    strcpy(name[3], "args");
-    strcpy(type[3], "multiline");
-    strcpy(name[4], "replaceModes");
-    strcpy(type[4], "multiline");
+    strcpy(name[1], "labelsList");
+    strcpy(name[2], "filesList");
+    strcpy(name[3], "argsList");
+    strcpy(name[4], "replaceModesList");
     d_domXml = XmlFunc("caRelatedDisplay", "carelateddisplay", 0, 0, 170, 70, name, type, text, 5);
     d_name = "caRelatedDisplay";
     d_include = "caRelatedDisplay";
@@ -277,11 +273,9 @@ caShellCommandInterface::caShellCommandInterface(QObject *parent): CustomWidgetI
 
     strcpy(name[0], "label");
     strcpy(type[0], "multiline");
-    strcpy(name[1], "labels");
-    strcpy(type[1], "multiline");
-    strcpy(name[2], "files");
-    strcpy(type[2], "multiline");
-    strcpy(name[3], "args");
+    strcpy(name[1], "labelsList");
+    strcpy(name[2], "filesList");
+    strcpy(name[3], "argsList");
     strcpy(type[3], "multiline");
     d_domXml = XmlFunc("caShellCommand", "cashellcommand", 0, 0, 170, 70, name, type, text, 4);
     d_name = "caShellCommand";
@@ -436,9 +430,8 @@ caMimeDisplayInterface::caMimeDisplayInterface(QObject *parent): CustomWidgetInt
 
     strcpy(name[0], "label");
     strcpy(type[0], "multiline");
-    strcpy(name[1], "labels");
-    strcpy(type[1], "multiline");
-    strcpy(name[2], "files");
+    strcpy(name[1], "labelsList");
+    strcpy(name[2], "filesList");
     strcpy(type[2], "multiline");
 
     d_domXml = XmlFunc("caMimeDisplay", "camimedisplay", 0, 0, 100, 22, name, type, text, 3);

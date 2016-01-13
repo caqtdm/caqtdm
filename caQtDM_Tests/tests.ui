@@ -1619,8 +1619,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>431</width>
-           <height>191</height>
+           <width>100</width>
+           <height>30</height>
           </rect>
          </property>
          <attribute name="label">
@@ -1860,7 +1860,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>10</number>
       </property>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">
@@ -4338,34 +4338,8 @@ p, li { white-space: pre-wrap; }
         <property name="channels_2" stdset="0">
          <string notr="true"/>
         </property>
-        <property name="Style_2">
-         <enum>caCartesianPlot::Lines</enum>
-        </property>
-        <property name="symbol_2">
-         <enum>caCartesianPlot::Rect</enum>
-        </property>
-        <property name="color_2">
-         <color>
-          <red>78</red>
-          <green>165</green>
-          <blue>249</blue>
-         </color>
-        </property>
         <property name="channels_3" stdset="0">
          <string notr="true"/>
-        </property>
-        <property name="Style_3">
-         <enum>caCartesianPlot::Lines</enum>
-        </property>
-        <property name="symbol_3">
-         <enum>caCartesianPlot::Triangle</enum>
-        </property>
-        <property name="color_3">
-         <color>
-          <red>253</red>
-          <green>0</green>
-          <blue>0</blue>
-         </color>
         </property>
         <property name="foreground">
          <color>
@@ -4693,7 +4667,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channels" stdset="0">
-         <string notr="true">ACM:TEST:AO;  QUAD:SOL:1;  QUAD:IST:2; ACM:COUNT:1</string>
+         <string notr="true">ACM:TEST:AO;QUAD:SOL:1;QUAD:IST:2;ACM:COUNT:1</string>
         </property>
         <property name="columnSizes">
          <string>200;100;50</string>
@@ -4743,11 +4717,20 @@ p, li { white-space: pre-wrap; }
           <height>84</height>
          </rect>
         </property>
+        <property name="wordWrap">
+         <bool>false</bool>
+        </property>
         <property name="channel" stdset="0">
          <string notr="true">ACM:TEST:DOUBLE_WAVE</string>
         </property>
         <property name="numberOfRows">
-         <number>5</number>
+         <number>0</number>
+        </property>
+        <property name="numberOfColumns">
+         <number>10</number>
+        </property>
+        <property name="alignment">
+         <enum>caWaveTable::Right</enum>
         </property>
         <property name="colorMode">
          <enum>caWaveTable::Alarm</enum>
@@ -4761,11 +4744,6 @@ p, li { white-space: pre-wrap; }
         <property name="formatType">
          <enum>caWaveTable::decimal</enum>
         </property>
-        <row/>
-        <row/>
-        <row/>
-        <row/>
-        <row/>
         <column/>
         <column/>
         <column/>
@@ -4776,256 +4754,6 @@ p, li { white-space: pre-wrap; }
         <column/>
         <column/>
         <column/>
-        <item row="0" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
        </widget>
        <widget class="caWaveTable" name="cawavetable_2">
         <property name="geometry">
@@ -5036,11 +4764,20 @@ p, li { white-space: pre-wrap; }
           <height>86</height>
          </rect>
         </property>
+        <property name="wordWrap">
+         <bool>false</bool>
+        </property>
         <property name="channel" stdset="0">
          <string notr="true">ACM:TEST:LONG_WAVE</string>
         </property>
         <property name="numberOfRows">
-         <number>5</number>
+         <number>0</number>
+        </property>
+        <property name="numberOfColumns">
+         <number>10</number>
+        </property>
+        <property name="alignment">
+         <enum>caWaveTable::Right</enum>
         </property>
         <property name="precision">
          <number>1</number>
@@ -5051,11 +4788,6 @@ p, li { white-space: pre-wrap; }
         <property name="formatType">
          <enum>caWaveTable::hexadecimal</enum>
         </property>
-        <row/>
-        <row/>
-        <row/>
-        <row/>
-        <row/>
         <column/>
         <column/>
         <column/>
@@ -5066,256 +4798,6 @@ p, li { white-space: pre-wrap; }
         <column/>
         <column/>
         <column/>
-        <item row="0" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
        </widget>
        <widget class="caWaveTable" name="cawavetable_3">
         <property name="geometry">
@@ -5326,20 +4808,21 @@ p, li { white-space: pre-wrap; }
           <height>91</height>
          </rect>
         </property>
+        <property name="wordWrap">
+         <bool>false</bool>
+        </property>
         <property name="channel" stdset="0">
          <string notr="true">ACM:TEST:CHAR_WAVE</string>
         </property>
         <property name="numberOfRows">
-         <number>5</number>
+         <number>0</number>
+        </property>
+        <property name="numberOfColumns">
+         <number>10</number>
         </property>
         <property name="formatType">
          <enum>caWaveTable::string</enum>
         </property>
-        <row/>
-        <row/>
-        <row/>
-        <row/>
-        <row/>
         <column/>
         <column/>
         <column/>
@@ -5350,256 +4833,6 @@ p, li { white-space: pre-wrap; }
         <column/>
         <column/>
         <column/>
-        <item row="0" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
        </widget>
        <widget class="caWaveTable" name="cawavetable_4">
         <property name="geometry">
@@ -5610,20 +4843,24 @@ p, li { white-space: pre-wrap; }
           <height>91</height>
          </rect>
         </property>
+        <property name="wordWrap">
+         <bool>false</bool>
+        </property>
         <property name="channel" stdset="0">
          <string notr="true">ACM:TEST:SHORT_WAVE</string>
         </property>
         <property name="numberOfRows">
-         <number>5</number>
+         <number>0</number>
+        </property>
+        <property name="numberOfColumns">
+         <number>10</number>
+        </property>
+        <property name="alignment">
+         <enum>caWaveTable::Center</enum>
         </property>
         <property name="formatType">
          <enum>caWaveTable::octal</enum>
         </property>
-        <row/>
-        <row/>
-        <row/>
-        <row/>
-        <row/>
         <column/>
         <column/>
         <column/>
@@ -5634,256 +4871,6 @@ p, li { white-space: pre-wrap; }
         <column/>
         <column/>
         <column/>
-        <item row="0" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
        </widget>
        <widget class="caLabel" name="calabel_21">
         <property name="geometry">
@@ -5946,20 +4933,24 @@ p, li { white-space: pre-wrap; }
           <height>91</height>
          </rect>
         </property>
+        <property name="wordWrap">
+         <bool>false</bool>
+        </property>
         <property name="channel" stdset="0">
          <string notr="true">ACM:TEST:CHAR_WAVE</string>
         </property>
         <property name="numberOfRows">
-         <number>5</number>
+         <number>0</number>
+        </property>
+        <property name="numberOfColumns">
+         <number>10</number>
+        </property>
+        <property name="alignment">
+         <enum>caWaveTable::Right</enum>
         </property>
         <property name="formatType">
          <enum>caWaveTable::decimal</enum>
         </property>
-        <row/>
-        <row/>
-        <row/>
-        <row/>
-        <row/>
         <column/>
         <column/>
         <column/>
@@ -5970,263 +4961,13 @@ p, li { white-space: pre-wrap; }
         <column/>
         <column/>
         <column/>
-        <item row="0" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="0" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="1" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="2" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="3" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="0">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="1">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="2">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="3">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="4">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="5">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="6">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="7">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="8">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
-        <item row="4" column="9">
-         <property name="font">
-          <font/>
-         </property>
-        </item>
        </widget>
        <widget class="caWaveTable" name="cawavetable_6">
         <property name="geometry">
          <rect>
           <x>170</x>
           <y>360</y>
-          <width>821</width>
+          <width>291</width>
           <height>101</height>
          </rect>
         </property>
@@ -6252,43 +4993,23 @@ p, li { white-space: pre-wrap; }
          <string notr="true">ACM:TEST:STRING_WAVE</string>
         </property>
         <property name="numberOfRows">
-         <number>2</number>
+         <number>0</number>
         </property>
         <property name="numberOfColumns">
-         <number>0</number>
+         <number>3</number>
         </property>
         <property name="columnSize">
          <number>10</number>
         </property>
+        <property name="alignment">
+         <enum>caWaveTable::Center</enum>
+        </property>
         <property name="formatType">
          <enum>caWaveTable::string</enum>
         </property>
-        <attribute name="horizontalHeaderVisible">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="horizontalHeaderDefaultSectionSize">
-         <number>10</number>
-        </attribute>
-        <attribute name="horizontalHeaderHighlightSections">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="horizontalHeaderMinimumSectionSize">
-         <number>5</number>
-        </attribute>
-        <attribute name="verticalHeaderVisible">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="verticalHeaderDefaultSectionSize">
-         <number>17</number>
-        </attribute>
-        <attribute name="verticalHeaderHighlightSections">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="verticalHeaderShowSortIndicator" stdset="0">
-         <bool>false</bool>
-        </attribute>
-        <row/>
-        <row/>
+        <column/>
+        <column/>
+        <column/>
        </widget>
        <widget class="caLabel" name="calabel_48">
         <property name="geometry">
@@ -6301,6 +5022,52 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="text">
          <string>strings</string>
+        </property>
+       </widget>
+       <widget class="caWaveTable" name="cawavetable_7">
+        <property name="geometry">
+         <rect>
+          <x>480</x>
+          <y>360</y>
+          <width>291</width>
+          <height>101</height>
+         </rect>
+        </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::NoSelection</enum>
+        </property>
+        <property name="showGrid">
+         <bool>true</bool>
+        </property>
+        <property name="wordWrap">
+         <bool>false</bool>
+        </property>
+        <property name="cornerButtonEnabled">
+         <bool>false</bool>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:STRING_WAVE</string>
+        </property>
+        <property name="numberOfRows">
+         <number>0</number>
+        </property>
+        <property name="numberOfColumns">
+         <number>0</number>
+        </property>
+        <property name="columnSize">
+         <number>10</number>
+        </property>
+        <property name="alignment">
+         <enum>caWaveTable::Center</enum>
+        </property>
+        <property name="formatType">
+         <enum>caWaveTable::string</enum>
         </property>
        </widget>
       </widget>
@@ -6431,7 +5198,7 @@ p, li { white-space: pre-wrap; }
          <enum>caCamera::xycenter_width_height</enum>
         </property>
         <property name="ROI_readChannels" stdset="0">
-         <string>FIG:X;FIG:Y;FIG:W;FIG:H</string>
+         <string>FIGX;FIGY;FIGW;FIGH</string>
         </property>
         <property name="ROI_writemarkerType" stdset="0">
          <enum>caCamera::box</enum>
@@ -6440,7 +5207,7 @@ p, li { white-space: pre-wrap; }
          <enum>caCamera::xycenter_width_height</enum>
         </property>
         <property name="ROI_writeChannels" stdset="0">
-         <string notr="true">FIG:X;FIG:Y;FIG:W;FIG:H</string>
+         <string notr="true">FIGX;FIGY;FIGW;FIGH</string>
         </property>
        </widget>
        <widget class="QTextEdit" name="textEdit_23">
@@ -11015,9 +9782,6 @@ p, li { white-space: pre-wrap; }
     <property name="files">
      <string notr="true">http://epics.web.psi.ch/software/caqtdm/qtDir/Help/MEDM.html</string>
     </property>
-    <property name="stackingMode" stdset="0">
-     <enum>caRowColMenu::Row</enum>
-    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -11026,7 +9790,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1119</width>
-     <height>26</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>
@@ -11097,6 +9861,11 @@ p, li { white-space: pre-wrap; }
    <class>caByteController</class>
    <extends>QWidget</extends>
    <header>caByteController</header>
+  </customwidget>
+  <customwidget>
+   <class>caMimeDisplay</class>
+   <extends>QWidget</extends>
+   <header>caMimeDisplay</header>
   </customwidget>
   <customwidget>
    <class>caFrame</class>
@@ -11223,11 +9992,6 @@ p, li { white-space: pre-wrap; }
    <class>caScan2D</class>
    <extends>QWidget</extends>
    <header>caScan2D</header>
-  </customwidget>
-  <customwidget>
-   <class>caMimeDisplay</class>
-   <extends>QWidget</extends>
-   <header>caMimeDisplay</header>
   </customwidget>
  </customwidgets>
  <resources/>

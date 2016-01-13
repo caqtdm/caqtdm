@@ -55,6 +55,9 @@ caLinearGauge::caLinearGauge(QWidget *parent, Qt::Orientation o) : caAbstractGau
     QFont f = this->font();
     f.setPointSize(10);
     this->setFont(f);
+#ifdef MOBILE_ANDROID
+    setAttribute(Qt::WA_TranslucentBackground, true);
+#endif
 }
 
 void caLinearGauge::configure()
@@ -303,7 +306,7 @@ void caLinearGauge::drawMarker(QPainter *p, bool drawValue)
     f = old = p->font();
     f.setPointSize(3);
     p->setFont(f);
-    p->setPen(Qt::red);//p->setPen(EColor(Elettra::red));
+    p->setPen(Qt::red);
 
     if (m_orientation == Qt::Horizontal)
     {
@@ -369,6 +372,9 @@ void caLinearGauge::drawLabels(QPainter *p)
                 check = false;
         }
 
+        CorrectFontIfAndroid(f);
+        p->setFont(f);
+
         for (int i = 0; i < m_numMajorTicks; i++)
         {
             QRectF br(i*100.0/(m_numMajorTicks-1)-w*.5, y, w, h);
@@ -415,6 +421,9 @@ caCircularGauge::caCircularGauge(QWidget *parent) : caAbstractGauge(parent),
     f.setFamily("FreeSans"); /* Free sans scales ugly */
     // 	printf("Circular gauge font family %s\n", qstoc(f.family()));
     setFont(f);
+#ifdef MOBILE_ANDROID
+    setAttribute(Qt::WA_TranslucentBackground, true);
+#endif
 }
 
 void caCircularGauge::configure()
@@ -618,6 +627,9 @@ void caCircularGauge::drawLabels(QPainter *p)
         f.setPointSizeF(5.5);
     else
         f.setPointSizeF(5.4);
+
+    CorrectFontIfAndroid(f);
+
     p->setFont(f);
     for (int i = 0; i < m_numMajorTicks; i++)
     {
@@ -666,6 +678,10 @@ void caCircularGauge::drawValue(QPainter *p)
         else
             check = false;
     }
+
+    CorrectFontIfAndroid(f);
+    p->setFont(f);
+
     QRect textRect(x,y+2,w,h);
     p->setBrush(QColor(255,255,255,100));
     p->drawRect(textRect);
@@ -684,5 +700,9 @@ void caCircularGauge::drawValue(QPainter *p)
         else
             check = false;
     }
+
+    CorrectFontIfAndroid(f);
+    p->setFont(f);
+
     p->drawText(-20,35,40,10, Qt::AlignCenter|Qt::TextDontClip, m_label);
 }

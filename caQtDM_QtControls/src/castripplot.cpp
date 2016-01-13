@@ -153,6 +153,8 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     setAutoFillBackground(true);
     RestartPlot1 = true;
     RestartPlot2 = false;
+    ResizeFactorX = ResizeFactorY = 1.0;
+    oldResizeFactorX = oldResizeFactorY = 1.0;
 
 #ifdef QWT_USE_OPENGL
     printf("caStripplot uses opengl ?\n");
@@ -287,6 +289,12 @@ void caStripPlot::setXaxis(double interval, double period)
         setAxisScaleDraw(QwtPlot::xBottom, new QwtScaleDraw());
     }
 
+}
+
+void caStripPlot::setTicksResizeFactor(float factX, float factY)
+{
+    ResizeFactorX = factX;
+    ResizeFactorY = factY;
 }
 
 void caStripPlot::setYaxisType(yAxisType s)
@@ -778,6 +786,19 @@ void caStripPlot::TimeOut()
     // in case of autoscale adjust the vertical scale
     if(thisYaxisScaling == autoScale) setAxisScale(QwtPlot::yLeft, AutoscaleMinY, AutoscaleMaxY);
 
+    if((ResizeFactorX != oldResizeFactorX) || ResizeFactorY != oldResizeFactorY) {
+        axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MajorTick, ResizeFactorX * 8.0);
+        axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MediumTick, ResizeFactorX * 6.0);
+        axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MinorTick, ResizeFactorX * 4.0);
+        axisScaleDraw(QwtPlot::xBottom)->setSpacing(1.0);
+        axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MajorTick, ResizeFactorY * 8.0);
+        axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MediumTick, ResizeFactorY * 6.0);
+        axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MinorTick, ResizeFactorY * 4.0);
+        axisScaleDraw(QwtPlot::yLeft)->setSpacing(1.0);
+        oldResizeFactorX = ResizeFactorX;
+        oldResizeFactorY = ResizeFactorY;
+    }
+
     // replot
     replot();
 
@@ -876,7 +897,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
                         //printf("%s %s\n", qasc(b->plainText()), qasc(legendText(i-1)));
 
 						b->setFont(f);
-						b->update();
+                        b->update();
 
 						break;
 

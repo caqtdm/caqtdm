@@ -38,7 +38,9 @@ class QTCON_EXPORT caTable : public QTableWidget
 
     Q_OBJECT
 
-    Q_PROPERTY(QString channels READ getPVS WRITE setPVS)
+    Q_PROPERTY(QString channels READ getPVS WRITE setPVS DESIGNABLE false)
+    Q_PROPERTY(QStringList channelsList READ getPVSList WRITE setPVSList STORED false)
+
     Q_PROPERTY(QString columnSizes READ getColumnSizes WRITE setColumnSizes)
 
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
@@ -73,8 +75,10 @@ public:
     int getPrecision() const {return thisPrecision;}
     void setPrecision(int prec) {thisPrecision = prec;}
 
-    QString getPVS() const {return thisPV.join(";");}
-    void setPVS(QString const &newPV) {thisPV = newPV.split(";");}
+    QString getPVS() const {return thisPVS.join(";");}
+    void setPVS(QString const &newPV) {thisPVS = newPV.split(";");}
+    QStringList getPVSList() const {return thisPVS;}
+    void setPVSList(QStringList list) {thisPVS = list;}
 
     QString getColumnSizes() const {return thisColumnSizes.join(";");}
     void setColumnSizes(QString const &newSizes);
@@ -115,7 +119,7 @@ private:
 
     enum { MaxRows = 500 };
     enum { MaxCols = 5  };
-    QStringList	thisPV;
+    QStringList	thisPVS;
     QStringList	thisColumnSizes;
     double thisMaximum, thisMinimum;
     QString thisStyle;
