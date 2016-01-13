@@ -497,8 +497,8 @@ void caStripPlot::defineCurves(QStringList titres, units unit, double period, in
             QString titre = legendText(i);
 
             curve[i] = new QwtPlotCurve(titre);
-            errorcurve[i] = new QwtPlotIntervalCurveNaN(titre);
-            fillcurve[i] = new QwtPlotCurveNaN(titre);
+            errorcurve[i] = new QwtPlotIntervalCurveNaN(titre+"?error?");
+            fillcurve[i] = new QwtPlotCurveNaN(titre+"?fill?");
             setStyle(s, i);
 
             curve[i]->setZ(i);
@@ -838,7 +838,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
             curve[i]->setItemAttribute(QwtPlotItem::Legend, false);
             continue;
         } else {
-            curve[i]->setItemAttribute(QwtPlotItem::Legend, true);
+            if(!curve->title().text().contains("?fill?")) curve[i]->setItemAttribute(QwtPlotItem::Legend, true);
         }
 
         switch (SW) {
@@ -886,12 +886,14 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
         if (plt_item->rtti() == QwtPlotItem::Rtti_PlotCurve) {
 
             QwtPlotCurve *curve = static_cast<QwtPlotCurve *>(plt_item);
+
             if(f.pointSizeF() <= 4.0) {
                 curve->setItemAttribute(QwtPlotItem::Legend, false);
                 continue;
             } else {
-                curve->setItemAttribute(QwtPlotItem::Legend, true);
+                if(!curve->title().text().contains("?fill?")) curve->setItemAttribute(QwtPlotItem::Legend, true);
             }
+
 
 			QwtLegend *lgd = qobject_cast<QwtLegend *>(legend());
 			if (lgd != (QwtLegend *) 0){
