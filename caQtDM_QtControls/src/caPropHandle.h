@@ -58,6 +58,8 @@ bool updatePropertyEditorItem(QWidget *w, QString propertyToChange)
 #else
 bool updatePropertyEditorItem(QWidget *w, QString propertyToChange)
 {
+    Q_UNUSED(w);
+    Q_UNUSED(propertyToChange);
     return false;
 }
 

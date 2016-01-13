@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
     if(displayPath.length() > 0) {
          printf("caQtDM -- files will be downloaded from <%s> when not locally found\n", qasc(displayPath));
     } else {
-        printf("caQtDM -- files will not download files when not locally found\n");
+        printf("caQtDM -- files will not be downloaded from an url when not locally found, while CAQTDM_URL_DISPLAY_PATH is not defined\n");
     }
 #endif
 
