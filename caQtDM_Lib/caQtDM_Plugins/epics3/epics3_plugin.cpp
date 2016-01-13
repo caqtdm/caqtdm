@@ -41,9 +41,9 @@ Epics3Plugin::Epics3Plugin()
     qDebug() << "Epics3Plugin: Create";
 }
 
-int Epics3Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow)
+int Epics3Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow, QMap<QString, QString> options)
 {
-    qDebug() << "Epics3Plugin: InitCommunicationLayer";
+    qDebug() << "Epics3Plugin: InitCommunicationLayer with options" << options;
 
     mutexknobdataP = data;
     messagewindowP = messageWindow;
@@ -62,6 +62,21 @@ int Epics3Plugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
 int Epics3Plugin::pvClearMonitor(knobData *kData) {
     //qDebug() << "Epics3Plugin:pvClearMonitor" << kData->pv;
     ClearMonitor(kData);
+    return true;
+}
+
+int Epics3Plugin::pvFreeAllocatedData(knobData *kData)
+{
+    //qDebug() << "Epics3Plugin:pvFreeAllocatedData";
+    if (kData->edata.info != (void *) 0) {
+        free(kData->edata.info);
+        kData->edata.info = (void*) 0;
+    }
+    if(kData->edata.dataB != (void*) 0) {
+        free(kData->edata.dataB);
+        kData->edata.dataB = (void*) 0;
+    }
+
     return true;
 }
 

@@ -64,7 +64,8 @@
 
  public:
      FileOpenWindow(QMainWindow *parent = 0,  QString filename = "", QString macroString = "",
-                    bool attach = false, bool minimize = false, QString geometry = "", bool printscreen = false, bool resizing = true);
+                    bool attach = false, bool minimize = false, QString geometry = "", bool printscreen = false, bool resizing = true,
+                    QMap<QString, QString> options = (QMap<QString, QString>()));
      bool isRunning();
      bool sendMessage(const QString &message);
      void fillPVtable(int &countPV, int &countnotConnected, int &countDisplayed);
@@ -138,6 +139,7 @@ signals:
      bool fromIOS;
 
      QMap<QString, ControlsInterface*> interfaces;
+     QMap<QString, QString> OptionList;
 
  };
 

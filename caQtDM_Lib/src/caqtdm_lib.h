@@ -104,7 +104,8 @@ public:
                                                                      QMap<QString, ControlsInterface *> interfaces = (QMap<QString, ControlsInterface *>()),
                                                                      MessageWindow *msgWindow = 0,
                                                                      bool willPrint = false,
-                                                                     QWidget *parentAS = 0);
+                                                                     QWidget *parentAS = 0,
+                                                                     QMap<QString, QString> options = (QMap<QString, QString>()));
     ~CaQtDM_Lib();
 
     void allowResizing(bool allowresize);
@@ -335,6 +336,8 @@ private:
 #ifdef epics4
     epics4Subs *Epics4;
 #endif
+
+    QString defaultPlugin;
 
 private slots:
     void Callback_EApplyNumeric(double value);

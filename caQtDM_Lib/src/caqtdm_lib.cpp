@@ -253,7 +253,9 @@ CaQtDM_Lib::~CaQtDM_Lib()
 /**
  * CaQtDM_Lib constructor
  */
-CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKnobData *mKnobData, QMap<QString, ControlsInterface *> interfaces, MessageWindow *msgWindow, bool pepprint, QWidget *parentAS) : QMainWindow(parent)
+CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKnobData *mKnobData, QMap<QString,
+                       ControlsInterface *> interfaces, MessageWindow *msgWindow, bool pepprint, QWidget *parentAS,
+                       QMap<QString,QString> options) : QMainWindow(parent)
 {
     QUiLoader loader;
     fromAS = false;
@@ -264,6 +266,18 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     pepPrint = pepprint;
     firstResize = true;
     loopTimer = 0;
+
+    // is a default plugin specified (normally nothing means epics3)
+    QString option = options["defaultPlugin"];
+    if(!option.isEmpty()) {
+        if(getControlInterface(option) == (ControlsInterface *) 0) {
+            postMessage(QtCriticalMsg, (char*) qasc(tr("sorry -- specified default plugin %1 is not loaded, fallback to epics3").arg(option)));
+            qDebug() << "caQtDM -- specified default plugin" << option << "is not loaded, fallback to epics3";
+            defaultPlugin = "";
+        } else {
+            defaultPlugin = option;
+        }
+    }
 
     // file watcher for changes
     watcher = new QFileSystemWatcher(this);
@@ -681,12 +695,6 @@ QMap<QString, QString> CaQtDM_Lib::createMap(const QString& macro)
     if(macro != NULL) {
         QStringList vars = macro.split(",", QString::SkipEmptyParts);
         for(int i=0; i< vars.count(); i++) {
-            /*          this would be ok if medm did not allow also an equal sign after the equal sign
-            QStringList keyvalue = vars.at(i).split("=", QString::SkipEmptyParts);
-            if(keyvalue.count() == 2) {
-                map.insert(keyvalue.at(0).trimmed(), keyvalue.at(1));
-            }
-*/
             int pos = vars.at(i).indexOf("=");
             if(pos != -1) {
                 QString key = vars.at(i).mid(0, pos);
@@ -820,7 +828,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         QString fileName = browserWidget->source().path();
 
         if(!fileName.isEmpty()) {
-            qDebug() << "watch file" << source;
+            qDebug() << "caQtDM -- watch file" << source;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
             bool success = watcher->addPath(fileName);
             if(!success) qDebug() << fileName << "can not be watched for changes";
@@ -2133,7 +2141,7 @@ ControlsInterface * CaQtDM_Lib::getControlInterface(QString plugininterface)
         QMapIterator<QString, ControlsInterface *> i(controlsInterfaces);
         while (i.hasNext()) {
             i.next();
-            if(i.key().contains(plugininterface)) {
+            if(i.key() == plugininterface) {
                 //qDebug() << "interface returned for requested" << plugininterface ;
                 return  i.value();
             }
@@ -2199,13 +2207,17 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     QString newPV = treatMacro(map, trimmedPV, &doNothing);
     *pvRep = newPV;
 
-    // find out what kind of interface has to be used for this pv, default is epics3
+    // find out what kind of interface has to be used for this pv, default is epics3 or whatever is specified on the command line with -cs
     pos = newPV.indexOf("://");
     if(pos != -1) {
         pluginName = newPV.mid(0, pos);
         trimmedPV = newPV.mid(pos+3);
     } else {
-        pluginName = "epics3";
+        if(defaultPlugin.isEmpty()) {
+           pluginName = "epics3";
+        } else {
+           pluginName = defaultPlugin;
+        }
         trimmedPV = newPV;
         if(kData->soft) pluginName = "intern";
         if(mutexKnobDataP->getSoftPV(trimmedPV, &indx, thisW)) pluginName = "intern";
@@ -4598,29 +4610,23 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
                if(plugininterface != (ControlsInterface *) 0) plugininterface->pvClearMonitor(&kData);
             }
             kData.index = -1;
-            kData.pv[0] = '\0';
+            //kData.pv[0] = '\0';
             mutexKnobDataP->SetMutexKnobData(i, kData);
         }
     }
 
     Sleep::msleep(200);
 
-    // get rid of memory, that was allocated before for this window.
+    // get rid of memory that was allocated before for this window.
     // it has not been done previously, while otherwise in the datacallback
-    // you will run into trouble
+    // you can run into trouble
     for(int i=0; i < mutexKnobDataP->GetMutexKnobDataSize(); i++) {
         knobData *kPtr = mutexKnobDataP->GetMutexKnobDataPtr(i);
         if(kPtr != (knobData *) 0) {
             if(myWidget == (QWidget*) kPtr->thisW) {
-                if (kPtr->edata.info != (void *) 0) {
-                    free(kPtr->edata.info);
-                    kPtr->edata.info = (void*) 0;
-                    kPtr->thisW = (void*) 0;
-                }
-                if(kPtr->edata.dataB != (void*) 0) {
-                    free(kPtr->edata.dataB);
-                    kPtr->edata.dataB = (void*) 0;
-                }
+                ControlsInterface * plugininterface = getControlInterface(kPtr->pluginName);
+                if(plugininterface != (ControlsInterface *) 0) plugininterface->pvFreeAllocatedData(kPtr);
+                kPtr->thisW = (void*) 0;
                 if(kPtr->mutex != (QMutex *) 0) {
                     QMutex *mutex = (QMutex *) kPtr->mutex;
                     delete mutex;
