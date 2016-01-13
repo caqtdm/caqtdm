@@ -23,11 +23,6 @@
  *    anton.mezger@psi.ch
  */
 
-#ifndef caPropHandleDefs_H
-#define caProphandleDefs_H
-
-#include <QDebug>
-
 #ifndef MOBILE
 #include <QtDesigner/abstractformwindow.h>
 #include <QtDesigner/QExtensionManager>
@@ -35,5 +30,5 @@
 #include <QtDesigner/QDesignerPropertySheetExtension>
 #endif
 
-#endif
+
 

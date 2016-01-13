@@ -34,7 +34,7 @@ bool inactiveButVisible() { return false;}
 
 bool updatePropertyEditorItem(QWidget *w, QString propertyToChange)
 {
-    printf("class=%s propertyToChange=%s\n", qasc(this->objectName()), qasc(propertyToChange));
+    //printf("class=%s propertyToChange=%s\n", qasc(this->objectName()), qasc(propertyToChange));
     bool retVal = false;
     int propertyIndex;
     QDesignerFormWindowInterface *formWindow = 0;
