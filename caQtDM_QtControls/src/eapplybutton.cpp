@@ -36,8 +36,8 @@ EApplyButton::EApplyButton(QWidget *parent) : EPushButton(parent)
 	defaultTextColor = palette().color(QPalette::ButtonText);	
 	connect(this, SIGNAL(clicked()), this, SLOT(clearModified()), Qt::QueuedConnection);
 	defaultTextColor = palette().color(QPalette::ButtonText);
-	LeftClickWithModifiersEater *leftClickWithModifiersEater = new LeftClickWithModifiersEater(this);
-	installEventFilter(leftClickWithModifiersEater);
+    LeftClickWithModifiersEater *leftClickWithModifiersEater = new LeftClickWithModifiersEater(this);
+    installEventFilter(leftClickWithModifiersEater);
 }
 
 void EApplyButton::valueModified(double)

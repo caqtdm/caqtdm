@@ -67,13 +67,14 @@ class QwtPlotCurve;
 #include <qwt_plot_glcanvas.h>
 #endif
 
+#include "caPropHandleDefs.h"
+
 class QTCON_EXPORT caStripPlot : public QwtPlot
 {
-
     Q_OBJECT
 
 #if QWT_VERSION >= 0x060100
-    // suppress theese properties for the designer
+    // suppress these properties for the designer
     Q_PROPERTY( QBrush canvasBackground READ canvasBackground WRITE setCanvasBackground DESIGNABLE false)
     Q_PROPERTY( bool autoReplot READ autoReplot WRITE setAutoReplot DESIGNABLE false)
 #endif
@@ -90,8 +91,9 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
     Q_PROPERTY(QString TitleX READ getTitleX WRITE setTitleX)
     Q_PROPERTY(QString TitleY READ getTitleY WRITE setTitleY)
 
-    Q_PROPERTY(QString channels READ getPVS WRITE setPVS DESIGNABLE false)
+    // for compatibility either one can be used, both will be updated
     Q_PROPERTY(QStringList channelsList READ getPVSList WRITE setPVSList STORED false)
+    Q_PROPERTY(QString channels READ getPVS WRITE setPVS DESIGNABLE inactiveButVisible())
 
     Q_PROPERTY(units units READ getUnits WRITE setUnits)
     Q_PROPERTY(double period READ getPeriod WRITE setPeriod)
@@ -176,6 +178,8 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
 
 public:
 
+#include "caPropHandle.h"
+
     enum {MAXCURVES = 7};
 
     enum cpuUsage {Low, Medium, High};
@@ -221,7 +225,7 @@ public:
     QString getPVS() const {return thisPVS.join(";");}
     void setPVS(QString const &newPV) {thisPVS = newPV.split(";");}
     QStringList getPVSList() const {return thisPVS;}
-    void setPVSList(QStringList list) {thisPVS = list;}
+    void setPVSList(QStringList list) {thisPVS = list; updatePropertyEditorItem(this, "channels");}
 
     units getUnits() const {return thisUnits;}
     void setUnits(units const &newU) {thisUnits = newU; defineXaxis(thisUnits, thisPeriod);}

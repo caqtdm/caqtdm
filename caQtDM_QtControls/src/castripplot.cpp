@@ -40,6 +40,7 @@
 #include <qlayout.h>
 #include <qlabel.h>
 #include <qpainter.h>
+#include <QMetaProperty>
 #include "castripplot.h"
 
 // increase the array size given by the canvas width to be sure that the whole range is covered
@@ -819,15 +820,26 @@ void caStripPlot::RescaleAxis()
     }
 
     // redraw legend if any
-    setLegendAttribute(thisScaleColor, QFont("arial", 9), TEXT);
+    //setLegendAttribute(thisScaleColor, QFont("arial", 9), TEXT);
 }
 
 void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 {
     int i;
 
+    //printf("fontsize=%.1f %s\n", f.pointSizeF(), qasc(this->objectName()));
+    // when legend text gets to small, hide it (will give then space for plot)
+
+
 #if QWT_VERSION < 0x060100
     for(i=0; i < NumberOfCurves; i++) {
+
+        if(f.pointSizeF() <= 4.0) {
+            curve[i]->setItemAttribute(QwtPlotItem::Legend, false);
+            continue;
+        } else {
+            curve[i]->setItemAttribute(QwtPlotItem::Legend, true);
+        }
 
         switch (SW) {
         case TEXT:
@@ -871,7 +883,16 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 #else
     i=0;
     foreach (QwtPlotItem *plt_item, itemList()) {
-		if (plt_item->rtti() == QwtPlotItem::Rtti_PlotCurve) {
+        if (plt_item->rtti() == QwtPlotItem::Rtti_PlotCurve) {
+
+            QwtPlotCurve *curve = static_cast<QwtPlotCurve *>(plt_item);
+            if(f.pointSizeF() <= 4.0) {
+                curve->setItemAttribute(QwtPlotItem::Legend, false);
+                continue;
+            } else {
+                curve->setItemAttribute(QwtPlotItem::Legend, true);
+            }
+
 			QwtLegend *lgd = qobject_cast<QwtLegend *>(legend());
 			if (lgd != (QwtLegend *) 0){
 				QList<QWidget *> legendWidgets = lgd->legendWidgets(itemToInfo(plt_item));
@@ -885,16 +906,13 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 
 							QwtText text;
 							text.setText(legendText(i++));
-                            //printf("%s %s\n", qasc(b->plainText()), qasc(legendText(i-1)));
 							b->setText(text);
 							b->update();
-
 
 						}
 						break;
 
 					case FONT:
-                        //printf("%s %s\n", qasc(b->plainText()), qasc(legendText(i-1)));
 
 						b->setFont(f);
                         b->update();
@@ -903,7 +921,6 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 
 					case COLOR:
 
-                        //printf("%s %s\n", qasc(b->plainText()), qasc(legendText(i-1)));
 						QPalette palette = b->palette();
 						palette.setColor(QPalette::WindowText, c); // for ticks
 						palette.setColor(QPalette::Text, c);       // for ticks' labels
@@ -918,6 +935,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 				}
 			}
         }
+        updateLegend();
     }
 #endif
 

@@ -42,7 +42,8 @@ void loadPlugins::printPlugins(const QMap<QString,ControlsInterface*> interfaces
     }
 }
 
-bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKnobData *mutexKnobData, MessageWindow *messageWindow)
+bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKnobData *mutexKnobData, MessageWindow *messageWindow,
+                          QMap<QString, QString> options)
 {
     int nbInterfaces = 0;
 #ifndef MOBILE
@@ -89,7 +90,7 @@ bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKn
                 if (plugin) {
                     controlsInterface = qobject_cast<ControlsInterface *>(plugin);
                     if (controlsInterface) {
-                        controlsInterface->initCommunicationLayer(mutexKnobData, messageWindow);
+                        controlsInterface->initCommunicationLayer(mutexKnobData, messageWindow, options);
                         interfaces.insert(controlsInterface->pluginName(), controlsInterface);
                         nbInterfaces++;
                     }
@@ -105,7 +106,7 @@ bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKn
         if (plugin) {
             controlsInterface = qobject_cast<ControlsInterface *>(plugin);
             if (controlsInterface) {
-                controlsInterface->initCommunicationLayer(mutexKnobData, messageWindow);
+                controlsInterface->initCommunicationLayer(mutexKnobData, messageWindow, options);
                 interfaces.insert(controlsInterface->pluginName(), controlsInterface);
                 nbInterfaces++;
             }

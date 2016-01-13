@@ -28,6 +28,7 @@
 
 #include <qtcontrols_global.h>
 #include <carowcolmenu.h>
+#include "caPropHandleDefs.h"
 
 class QTCON_EXPORT caRelatedDisplay : public caRowColMenu
 {
@@ -35,19 +36,21 @@ class QTCON_EXPORT caRelatedDisplay : public caRowColMenu
     Q_OBJECT
 
     Q_PROPERTY(Stacking stackingMode READ getStacking WRITE setStacking)
-    Q_PROPERTY(QString removeParent READ getReplaceModes WRITE setReplaceModes DESIGNABLE false)
     Q_PROPERTY(QStringList removeParentList READ getRemoveList WRITE setRemoveList STORED false)
+    Q_PROPERTY(QString removeParent READ getReplaceModes WRITE setReplaceModes DESIGNABLE inactiveButVisible())
 
 #include "caElevation.h"
 
 public:
+
+#include "caPropHandle.h"
 
     caRelatedDisplay(QWidget *parent);
 
     QString getReplaceModes() const {return replacemodes.join(";");}
     void setReplaceModes(QString const &newL) {replacemodes = newL.split(";");}
     QStringList getRemoveList() const {return replacemodes;}
-    void setRemoveList(QStringList list) {replacemodes = list;}
+    void setRemoveList(QStringList list) {replacemodes = list; updatePropertyEditorItem(this, "removeParent");}
 
 private:
 

@@ -23,27 +23,12 @@
  *    anton.mezger@psi.ch
  */
 
-#include <QDir>
-#include <QDebug>
-#include <QApplication>
-#include <QPluginLoader>
-#include <QLibraryInfo>
-#include "caQtDM_Lib_global.h"
-#include "MessageWindow.h"
-#include "controlsinterface.h"
+#ifndef MOBILE
+#include <QtDesigner/abstractformwindow.h>
+#include <QtDesigner/QExtensionManager>
+#include <QtDesigner/QDesignerFormEditorInterface>
+#include <QtDesigner/QDesignerPropertySheetExtension>
+#endif
 
-class CAQTDM_LIBSHARED_EXPORT loadPlugins
-{
 
-public:
-   loadPlugins();
-   ~loadPlugins() {}
-
-   bool loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKnobData *mutexKnobData = 0, MessageWindow *messageWindow = 0,
-                QMap<QString, QString> options = (QMap<QString, QString>()));
-   void printPlugins(const QMap<QString,ControlsInterface*> interfaces);
-
-private:
-     ControlsInterface *controlsInterface;
-};
 

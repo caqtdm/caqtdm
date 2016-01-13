@@ -79,7 +79,7 @@ void EApplyNumeric::init()
         box = new QHBoxLayout(this);
 
 	box->setMargin(0);
-	box->setSpacing(3);
+    box->setSpacing(0);
 
 	if (!data)
 		data = new ENumeric(this, intDig, decDig);

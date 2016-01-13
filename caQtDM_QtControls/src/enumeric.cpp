@@ -404,14 +404,19 @@ bool ENumeric::eventFilter(QObject *obj, QEvent *event)
             QApplication::restoreOverrideCursor();
         }
     } else if(event->type() == QEvent::Leave) {
-        lastLabel = -1;
-        long long temp = (long long) round(csValue * pow(10.0, decDig));
-        data = temp;
-        showData();
-        QApplication::restoreOverrideCursor();
-        resize(size()*0.99); // force a resize
-        resize(aux);
-        updateGeometry();
+        QString ParentClassName = parent()->metaObject()->className();
+        if(ParentClassName.contains("caApplyNumeric")) {
+            //printf("do nothing\n");
+        } else {
+            lastLabel = -1;
+            long long temp = (long long) round(csValue * pow(10.0, decDig));
+            data = temp;
+            showData();
+            QApplication::restoreOverrideCursor();
+            resize(size()*0.99); // force a resize
+            resize(aux);
+            updateGeometry();
+        }
     } else if(event->type() == QEvent::MouseButtonDblClick) {
         if(!_AccessW) return true;
     } else if (event->type() == QEvent::MouseButtonPress) {
