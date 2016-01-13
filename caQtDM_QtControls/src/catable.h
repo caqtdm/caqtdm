@@ -31,6 +31,8 @@
 #include <QFont>
 #include <qtcontrols_global.h>
 
+#include "caPropHandleDefs.h"
+
 typedef char string40[40];
 
 class QTCON_EXPORT caTable : public QTableWidget
@@ -38,8 +40,8 @@ class QTCON_EXPORT caTable : public QTableWidget
 
     Q_OBJECT
 
-    Q_PROPERTY(QString channels READ getPVS WRITE setPVS DESIGNABLE false)
     Q_PROPERTY(QStringList channelsList READ getPVSList WRITE setPVSList STORED false)
+    Q_PROPERTY(QString channels READ getPVS WRITE setPVS DESIGNABLE inactiveButVisible())
 
     Q_PROPERTY(QString columnSizes READ getColumnSizes WRITE setColumnSizes)
 
@@ -60,6 +62,8 @@ class QTCON_EXPORT caTable : public QTableWidget
 
 public:
 
+#include "caPropHandle.h"
+
     caTable(QWidget *parent);
 
     enum colMode {Static=0, Alarm};
@@ -78,7 +82,7 @@ public:
     QString getPVS() const {return thisPVS.join(";");}
     void setPVS(QString const &newPV) {thisPVS = newPV.split(";");}
     QStringList getPVSList() const {return thisPVS;}
-    void setPVSList(QStringList list) {thisPVS = list;}
+    void setPVSList(QStringList list) {thisPVS = list; updatePropertyEditorItem(this, "channels");}
 
     QString getColumnSizes() const {return thisColumnSizes.join(";");}
     void setColumnSizes(QString const &newSizes);

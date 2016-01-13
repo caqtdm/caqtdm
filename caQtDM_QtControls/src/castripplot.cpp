@@ -40,6 +40,7 @@
 #include <qlayout.h>
 #include <qlabel.h>
 #include <qpainter.h>
+#include <QMetaProperty>
 #include "castripplot.h"
 
 // increase the array size given by the canvas width to be sure that the whole range is covered
@@ -819,15 +820,26 @@ void caStripPlot::RescaleAxis()
     }
 
     // redraw legend if any
-    setLegendAttribute(thisScaleColor, QFont("arial", 9), TEXT);
+    //setLegendAttribute(thisScaleColor, QFont("arial", 9), TEXT);
 }
 
 void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 {
     int i;
 
+    printf("fontsize=%.1f %s\n", f.pointSizeF(), qasc(this->objectName()));
+    // when legend text gets to small, hide it (will give then space for plot)
+
+
 #if QWT_VERSION < 0x060100
     for(i=0; i < NumberOfCurves; i++) {
+
+        if(f.pointSizeF() < 4.0) {
+            curve[i]->setItemAttribute(QwtPlotItem::Legend, false);
+            continue;
+        } else {
+            curve[i]->setItemAttribute(QwtPlotItem::Legend, true);
+        }
 
         switch (SW) {
         case TEXT:
