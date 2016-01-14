@@ -88,7 +88,7 @@ void bsreadPlugin::updateValues()
 }
 
 // initialize our communicationlayer with everything you need
-int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow)
+int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow,QMap<QString, QString> options)
 {
     int i;
     int rc;
@@ -173,6 +173,20 @@ int bsreadPlugin::pvClearMonitor(knobData *kData) {
         bsreadconnections.at(i)->bsread_DataMonitorUnConnect(kData);
 		i++;
     }
+    return true;
+}
+int bsreadPlugin::pvFreeAllocatedData(knobData *kData)
+{
+    //qDebug() << "DemoPlugin:pvFreeAllocatedData";
+    if (kData->edata.info != (void *) 0) {
+        free(kData->edata.info);
+        kData->edata.info = (void*) 0;
+    }
+    if(kData->edata.dataB != (void*) 0) {
+        free(kData->edata.dataB);
+        kData->edata.dataB = (void*) 0;
+    }
+
     return true;
 }
 
