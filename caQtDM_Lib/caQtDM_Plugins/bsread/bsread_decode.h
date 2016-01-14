@@ -83,7 +83,7 @@ private:
 
     QList<int> listOfIndexes;
     QList<QString> listOfRequestedChannels;
-    void bsread_SetChannelData(void *message);
+    void bsread_SetChannelData(void *message, size_t size);
     void bsread_SetChannelTimeStamp(void * timestamp);
     void bsread_InitHeaderChannels();
     void bsread_TransferHeaderData();
@@ -93,7 +93,7 @@ private:
 
     void bsread_DataTimeOut();
     void bsread_Delay();
-    void bsread_SetData(bsread_channeldata *Data, void *message);
+    void bsread_SetData(bsread_channeldata *Data, void *message, size_t size);
 };
 
 #endif // BSREAD_DECODE_H

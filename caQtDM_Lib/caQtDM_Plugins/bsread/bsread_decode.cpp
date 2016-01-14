@@ -119,7 +119,7 @@ void bsread_Decode::process()
                             printf ("error in zmq_recvmsg(Data): %s\n", zmq_strerror (errno));
                         }
 
-                        bsread_SetChannelData(zmq_msg_data(&msg));
+                        bsread_SetChannelData(zmq_msg_data(&msg),more_size);
 
                         zmq_getsockopt (zmqsocket, ZMQ_RCVMORE, &more, &more_size);
                         if (more){
@@ -322,7 +322,8 @@ void bsread_Decode::setHeader(char *value,size_t size){
         }
     }
 }
-void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message){
+
+void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message,size_t size){
 
     switch(Data->shape.count()){
     case 0:{
@@ -352,6 +353,7 @@ void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message){
     }
     case 1:{
         int datasize=Data->shape.at(0);
+        //qDebug()<< "Datasize:" << datasize << "ZMQ Size:" << size <<" "<<Data->name ;
         if (datasize==1){
             switch (Data->type){
                 case bs_double:{
@@ -375,8 +377,9 @@ void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message){
                 }
             }
         }else{
-            int datatypesize;
-            switch (Data->type){
+            if (datasize>0){
+                int datatypesize;
+                switch (Data->type){
                 case bs_double:{
                     datatypesize=sizeof(double);
                     break;
@@ -393,17 +396,23 @@ void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message){
                     datatypesize=sizeof(short);
                     break;
                 }
-            }
-
-             if(Data->bsdata.wf_data_size!=(datasize*datatypesize)){
-                if (Data->bsdata.wf_data!=NULL){
-                    free(Data->bsdata.wf_data);
                 }
-                Data->bsdata.wf_data=malloc(datasize*datatypesize);
-                //qDebug()<< "Datasize:" << Channels.at(channelcounter)->shape.at(0);
+
+                if(Data->bsdata.wf_data_size!=(datasize*datatypesize)){
+                    if (Data->bsdata.wf_data!=NULL){
+                        free(Data->bsdata.wf_data);
+                    }
+                    Data->bsdata.wf_data=malloc(datasize*datatypesize);
+
+                }
+                if (size<(datasize*datatypesize)){
+                    memcpy(Data->bsdata.wf_data,message,size);
+                    Data->bsdata.wf_data_size=(size/datatypesize);
+                }else{
+                    memcpy(Data->bsdata.wf_data,message,datasize*datatypesize);
+                    Data->bsdata.wf_data_size=datasize;
+                }
             }
-            memcpy(Data->bsdata.wf_data,message,datasize*datatypesize);
-            Data->bsdata.wf_data_size=(datasize*datatypesize);
         }
         break;
     }
@@ -419,11 +428,10 @@ void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message){
 
 }
 
-void bsread_Decode::bsread_SetChannelData(void *message)
+void bsread_Decode::bsread_SetChannelData(void *message,size_t size)
 {
-    long datasize;
     if ((message)&&(Channels.size()>channelcounter)){
-      bsread_SetData(Channels.at(channelcounter),message);
+      bsread_SetData(Channels.at(channelcounter),message,size);
     }
 }
 
