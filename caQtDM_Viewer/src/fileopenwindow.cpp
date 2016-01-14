@@ -385,7 +385,8 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 
     fileFunctions filefunction;
 
-    // download the choosen configurations file from the choosen url
+    // download the choosen configurations file from the choosen url, but find it first locally
+    setenv("CAQTDM_DISPLAY_PATH", qasc(specials.getStdPath()), 1);
     int success = filefunction.checkFileAndDownload(file, url);
     if(!success) {
         QMessageBox::critical(0, tr("caQtDM"), tr("could not download file %1 from %2").arg(file).arg(url));
