@@ -78,7 +78,7 @@ public:
                                          }}
 
     void updateClock(QTime time);
-    void setAlarmColors(short status);
+    void setAlarmColors(short status, bool force = false);
 
     enum colMode {Static, Alarm};
     colMode getColorMode() const { return thisColorMode; }

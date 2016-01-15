@@ -120,7 +120,7 @@ void caClock::resizeEvent(QResizeEvent *e)
     update();
 }
 
-void caClock::setAlarmColors(short status)
+void caClock::setAlarmColors(short status, bool force)
 {
     QColor c;
     switch (status) {
@@ -148,7 +148,7 @@ void caClock::setAlarmColors(short status)
         c= thisBaseColor.darker( 150 );
         break;
     }
-    if((prevColor != c) || (thisScaleDefaultColor != prevScaleDefaultColor) || (thisScaleColor != prevScaleColor)){
+    if((prevColor != c) || (thisScaleDefaultColor != prevScaleDefaultColor) || (thisScaleColor != prevScaleColor) || force){
       prevColor = c;
       prevScaleDefaultColor = thisScaleDefaultColor;
       prevScaleColor = thisScaleColor;

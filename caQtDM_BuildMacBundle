@@ -24,8 +24,9 @@ mkdir ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/printsupport/
 echo
 echo ========== add libcoca ============
 echo
-
-cp ${QTHOME}/plugins/imageformats/libqico.dylib  ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/imageformats/
+shopt -s extglob
+cp ${QTHOME}/plugins/imageformats/*.dylib!(*_debug.dylib)  ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/imageformats/
+shopt -u extglob
 cp ${QTHOME}/plugins/platforms/libqcocoa.dylib  ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/platforms/
 
 echo

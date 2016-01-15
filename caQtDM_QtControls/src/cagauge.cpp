@@ -55,9 +55,6 @@ caLinearGauge::caLinearGauge(QWidget *parent, Qt::Orientation o) : caAbstractGau
     QFont f = this->font();
     f.setPointSize(10);
     this->setFont(f);
-#ifdef MOBILE_ANDROID
-    setAttribute(Qt::WA_TranslucentBackground, true);
-#endif
 }
 
 void caLinearGauge::configure()
@@ -421,9 +418,6 @@ caCircularGauge::caCircularGauge(QWidget *parent) : caAbstractGauge(parent),
     f.setFamily("FreeSans"); /* Free sans scales ugly */
     // 	printf("Circular gauge font family %s\n", qstoc(f.family()));
     setFont(f);
-#ifdef MOBILE_ANDROID
-    setAttribute(Qt::WA_TranslucentBackground, true);
-#endif
 }
 
 void caCircularGauge::configure()

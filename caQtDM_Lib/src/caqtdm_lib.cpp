@@ -1312,6 +1312,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             clockWidget->setPV(pv);
         }
 
+        clockWidget->setAlarmColors(NO_ALARM, true);
         clockWidget->setProperty("Taken", true);
 
         //==================================================================================================================
@@ -1372,6 +1373,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             meterWidget->setPV(pv);
         }
 
+        meterWidget->setAlarmColors(NO_ALARM, true);
         meterWidget->setProperty("Taken", true);
 
         //==================================================================================================================

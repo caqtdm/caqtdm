@@ -340,7 +340,7 @@ void caMeter::setNormalColors()
     setAlarmColors(NO_ALARM);
 }
 
-void caMeter::setAlarmColors(short status)
+void caMeter::setAlarmColors(short status, bool force)
 {
     QColor c;
 
@@ -370,7 +370,7 @@ void caMeter::setAlarmColors(short status)
         break;
     }
 
-    if((prevColor != c) || (thisScaleDefaultColor != prevScaleDefaultColor) || (thisScaleColor != prevScaleColor)){
+    if((prevColor != c) || (thisScaleDefaultColor != prevScaleDefaultColor) || (thisScaleColor != prevScaleColor) || force){
       prevColor = c;
       prevScaleDefaultColor = thisScaleDefaultColor;
       prevScaleColor = thisScaleColor;
