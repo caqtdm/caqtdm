@@ -117,7 +117,7 @@ public:
     bool getUnitsEnabled() const { return thisUnitMode; }
     void setUnitsEnabled(bool check) { thisUnitMode = check;}
 
-    void setAlarmColors(short status);
+    void setAlarmColors(short status, bool force = false);
     void setNormalColors();
 
     QString setLabel(double value, const QString& units);

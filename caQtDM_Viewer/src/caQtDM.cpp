@@ -92,6 +92,10 @@ int main(int argc, char *argv[])
     QApplication::setOrganizationName("Paul Scherrer Institut");
     QApplication::setApplicationName("caQtDM");
 
+#ifdef MOBILE_ANDROID
+    app.setStyle(QStyleFactory::create("fusion"));
+#endif
+
     // we do not want numbers with a group separators
     QLocale loc = QLocale::system();
     loc.setNumberOptions(QLocale::OmitGroupSeparator);

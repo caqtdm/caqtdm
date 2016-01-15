@@ -39,9 +39,6 @@ EApplyNumeric::EApplyNumeric(QWidget *parent, int i, int d, Qt::Orientation pos)
 	decDig = d;
 	d_applyButtonActive = true;
     d_fontScaleEnabled = true;
-#ifdef MOBILE_ANDROID    // otherwise apply button will have above and below a white surface`
-    setAttribute(Qt::WA_TranslucentBackground, true);
-#endif
 	init();
 }
 
