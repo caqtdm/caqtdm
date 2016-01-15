@@ -22,7 +22,7 @@
  *  Contact details:
  *    helge.brands@psi.ch
  */
-
+#include <QNetworkAccessManager>
 #include <QDebug>
 #include "bsread_dispatchercontrol.h"
 #include "JSON.h"

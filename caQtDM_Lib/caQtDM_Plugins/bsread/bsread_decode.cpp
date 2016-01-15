@@ -642,7 +642,13 @@ void bsread_Decode::bsread_Delay(){
     usleep(5000);
 #else
     //Sleep::msleep(1);
-    QThread::msleep(5);
+
+    QMutex LocalLocker;
+    QWaitCondition LocalDelay;
+    LocalLocker.lock();
+    LocalDelay.wait(&LocalLocker,5);
+    LocalLocker.unlock();
+
 #endif
 
 }

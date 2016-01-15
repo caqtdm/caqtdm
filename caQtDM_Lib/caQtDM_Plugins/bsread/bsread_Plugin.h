@@ -25,6 +25,10 @@
 #ifndef BSREADPLUGIN_H
 #define BSREADPLUGIN_H
 
+#ifdef _MSC_VER
+  #define WIN32_LEAN_AND_MEAN
+  #include <windows.h>
+#endif
 #include <QObject>
 #include <QMap>
 #include <QMutex>

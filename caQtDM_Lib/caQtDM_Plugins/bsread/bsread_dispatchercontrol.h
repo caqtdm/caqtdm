@@ -29,7 +29,6 @@
 #include <QThread>
 #include <QMutex>
 #include <QWaitCondition>
-#include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QEventLoop>
 #include <QUrl>
