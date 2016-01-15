@@ -211,6 +211,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     Q_IMPORT_PLUGIN(DemoPlugin);
     Q_IMPORT_PLUGIN(Epics3Plugin);
     Q_IMPORT_PLUGIN(Epics4Plugin);
+    Q_INIT_RESOURCE(qtcontrolsplugin);  // load resources from resource file
 #endif
 
     // message window used by library and here
