@@ -21,8 +21,7 @@
  *    Anton Mezger
  *  Contact details:
  *    anton.mezger@psi.ch
- */
-
+*/
 
 // this function allows to let a non designable property to be visible
 bool inactiveButVisible() { return false;}

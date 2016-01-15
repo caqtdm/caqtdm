@@ -838,7 +838,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
             curve[i]->setItemAttribute(QwtPlotItem::Legend, false);
             continue;
         } else {
-            if(!curve->title().text().contains("?fill?")) curve[i]->setItemAttribute(QwtPlotItem::Legend, true);
+            if(!curve[i]->title().text().contains("?fill?")) curve[i]->setItemAttribute(QwtPlotItem::Legend, true);
         }
 
         switch (SW) {

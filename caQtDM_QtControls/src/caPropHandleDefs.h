@@ -28,6 +28,7 @@
 #include <QtDesigner/QExtensionManager>
 #include <QtDesigner/QDesignerFormEditorInterface>
 #include <QtDesigner/QDesignerPropertySheetExtension>
+#include <QDebug>
 #endif
 
 
