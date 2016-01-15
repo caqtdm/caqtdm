@@ -5,4 +5,8 @@ error("Use at least Qt 4.6.")
 }
 
 TEMPLATE = subdirs
-SUBDIRS = demo epics3 epics4 bsread
+SUBDIRS = demo epics3 epics4
+
+!MOBILE {
+SUBDIRS += bsread
+}
