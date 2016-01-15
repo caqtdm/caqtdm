@@ -64,6 +64,12 @@ CONFIG += PYTHONCALC
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 
 # 4.0.2
+# new options on command line available for caQtDM: -cs for specifiying default plugin to be used, -options for passing options (key, value pairs) to plugins
+# use now the QStringlList editor in Designer for semicolumn separated strings
+# mobile handling of config files slightly modified
+# adjustment of fonts for android modified / apply button of caapplynumeric is now resizable
+# resizing was perturbed by a resize forced by incoming channel data.
+# the vertical label has now an alignment property
 # cacartesianplot was not always well triggered when a trigger channel was specified, now corrected
 # camimebutton added in order to start applications defined through the file extension
 # cawavetable can now adapt its rows and columns automatically when zero is specified.
