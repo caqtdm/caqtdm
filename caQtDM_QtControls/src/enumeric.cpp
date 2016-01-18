@@ -539,7 +539,13 @@ void ENumeric::resizeEvent(QResizeEvent *e)
         //double fontSize = l1->calculateFontPointSizeF(l1->text(), l1->size());
         double fontSize = 80;
         fontSize = qMin((int) fontSize, size().height() / 4 - 2);
-        fontSize = qMin((int) fontSize, size().width() / (digits+2));
+        //printf("h %f digits=%d %d %d\n", fontSize, digits, intDig, decDig);
+        if(decDig > 0) {
+           fontSize = qMin((int) fontSize, size().width() / (digits+2));
+        } else {
+           fontSize = qMin((int) fontSize, size().width() / (digits+1));
+        }
+        //printf("w %f\n", fontSize);
         if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         labelFont.setPointSizeF(fontSize);
         signFont.setPointSizeF(fontSize);
