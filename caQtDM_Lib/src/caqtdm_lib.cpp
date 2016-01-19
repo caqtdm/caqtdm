@@ -266,6 +266,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     pepPrint = pepprint;
     firstResize = true;
     loopTimer = 0;
+    prcFile = false;
 
     // is a default plugin specified (normally nothing means epics3)
     QString option = options["defaultPlugin"];
@@ -325,6 +326,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
             // treat prc file and load designer description from internal buffer
         } else if(filename.lastIndexOf(".prc") != -1) {
 
+            prcFile = true;
             QString uiString = QString(uiIntern);
             uiString= uiString.arg(filename);
             QByteArray *array= new QByteArray();
@@ -407,8 +409,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
             SLOT(Callback_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData)));
 
     if(!fromAS) {
-        connect(this, SIGNAL(Signal_OpenNewWFile(const QString&, const QString&, const QString&)), parent,
-                SLOT(Callback_OpenNewFile(const QString&, const QString&, const QString&)));
+        connect(this, SIGNAL(Signal_OpenNewWFile(const QString&, const QString&, const QString&, const QString&)), parent,
+                SLOT(Callback_OpenNewFile(const QString&, const QString&, const QString&, const QString&)));
     }
 
     setContextMenuPolicy(Qt::CustomContextMenu);
@@ -4382,9 +4384,9 @@ void CaQtDM_Lib::Callback_RelatedDisplayClicked(int indx)
 
     // open new file and
     if(indx < files.count() && indx < args.count()) {
-        emit Signal_OpenNewWFile(files[indx].trimmed(), args[indx].trimmed(), geometry);
+        emit Signal_OpenNewWFile(files[indx].trimmed(), args[indx].trimmed(), geometry, "true");
     } else if(indx < files.count()) {
-        emit Signal_OpenNewWFile(files[indx].trimmed(), "", geometry);
+        emit Signal_OpenNewWFile(files[indx].trimmed(), "", geometry, "true");
     }
 
 }
@@ -6193,19 +6195,23 @@ qreal CaQtDM_Lib::fontResize(double factX, double factY, QVariantList list, int 
 
 void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList list, double factX, double factY)
 {
-    // for horizontal or vertical line we still have to set the linewidth
-    if(!className.compare("QFrame")) {
+    // for horizontal or vertical line we still have to set the linewidth and for a frame the border framewidth
+    if(!className.compare("caFrame") || !className.compare("QFrame")) {
         double linewidth;
         QFrame * line = (QFrame *) widget;
         if(line->frameShape() == QFrame::HLine || line->frameShape() == QFrame::VLine) {
             if(line->frameShape() != QFrame::HLine) {
-                linewidth = (double) list.at(4).toInt() * factY;
-            } else {
+                //qDebug() << "resize vertical line" << widget << (double) list.at(4).toInt() * factX;
                 linewidth = (double) list.at(4).toInt() * factX;
+            } else {
+                //qDebug() << "resize horizontal line" << widget << (double) list.at(4).toInt() * factY;
+                linewidth = (double) list.at(4).toInt() * factY;
             }
-            int width = qRound(linewidth);
-            if(width < 1) width = 1;
-            line->setLineWidth(width);
+            line->setLineWidth(qRound(linewidth));
+        } else {
+            //qDebug() << "resize frame" << widget << (double) list.at(5).toInt() * qMin(factX, factY);
+            linewidth = (double) list.at(5).toInt() * qMin(factX, factY);
+            line->setLineWidth(qRound(linewidth));
         }
     }
 
@@ -6282,7 +6288,14 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         QFont f = widget->font();
         qreal fontSize = fontResize(factX, factY, list, 4);
         f.setPointSize(qRound(fontSize));
-
+        //in case of a textedit widget, one has to selct the text to change the font (if somebody mixes fonts, he has bad luck)
+        if(!className.compare("QTextEdit")) {
+            QTextEdit *textEdit = (QTextEdit *) widget;
+            QTextCursor cursor = textEdit->textCursor();
+            textEdit->selectAll();
+            textEdit->setFontPointSize(fontSize);
+            textEdit->setTextCursor( cursor );
+        }
         widget->setFont(f);
     }
 
@@ -6434,7 +6447,12 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
         main->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     }
 
-    if(!allowResize) return;
+    // when noresizing then fix the size, however for prc files, we will later shrink the display to a minimumsize, so do not fix then
+    if(!allowResize) {
+        if(!prcFile) main->setFixedSize(myWidget->size());
+        return;
+    }
+
     if(firstResize) {
         firstResize = false;
         // keep original width and height (first event on linux/windows was ui window size, on ios however now display size
@@ -6455,12 +6473,11 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 polylineWidget->setActualSize(QSize(widget->geometry().width(), widget->geometry().height()));
             }
 
-            // for a horizontal or vertical line get the linewidth
-            if(!className.compare("QFrame")) {
+            // for a horizontal or vertical line get the linewidth and for box the framewidth
+            if(!className.compare("caFrame") || !className.compare("QFrame") ) {
                 QFrame * line = (QFrame *) widget;
-                if(line->frameShape() == QFrame::HLine || line->frameShape() == QFrame::VLine) {
                     integerList.insert(4, line->lineWidth());
-                }
+                    integerList.insert(5, line->frameWidth());
                 // for plots get the linewidth
             } else if(!className.compare("caStripPlot") || !className.compare("caCartesianPlot")) {
                 QwtPlot * plot = (QwtPlot *) widget;

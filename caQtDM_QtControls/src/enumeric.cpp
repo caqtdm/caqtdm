@@ -39,7 +39,7 @@
 #include <QtDebug>
 #include <QApplication>
 
-#define MIN_FONT_SIZE 3
+#define MIN_FONT_SIZE 5
 
 #if (_MSC_VER == 1600)
 int round (double x) {
