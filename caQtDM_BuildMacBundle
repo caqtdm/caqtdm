@@ -24,9 +24,8 @@ mkdir ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/printsupport/
 echo
 echo ========== add libcoca ============
 echo
-shopt -s extglob
-cp ${QTHOME}/plugins/imageformats/*.dylib!(*_debug.dylib)  ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/imageformats/
-shopt -u extglob
+cp ${QTHOME}/plugins/imageformats/*.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/imageformats/
+rm ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/imageformats/*_debug.dylib
 cp ${QTHOME}/plugins/platforms/libqcocoa.dylib  ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/platforms/
 
 echo
@@ -96,7 +95,6 @@ mkdir ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
 mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns/
 mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns/platforms/
 
-
 cp    ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libqtcontrols.dylib ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
 cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/* ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
 cp -R $QTHOME/lib/QtDesignerComponents.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
@@ -109,7 +107,9 @@ install_name_tool -rpath @loader_path/../../../../lib @loader_path/../Frameworks
 
 mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns
 mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer
+mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns/imageformats
 cp ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/*.dylib ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer/
+cp ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/imageformats/*.dylib ./caQtDM_Binaries/Designer.app/Contents/PlugIns/imageformats/
 
 echo
 echo ========== add adl2ui.app ============
