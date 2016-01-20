@@ -1409,7 +1409,9 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
     } else if(caInclude* includeWidget = qobject_cast<caInclude *>(w1)) {
 
         //qDebug() << "create caInclude" << w1;
+        int maxRows = 0;
         int row = 0;
+        int maxColumns=0;
         int column = 0;
         w1->setProperty("ObjectType", caInclude_Widget);
 
@@ -1469,10 +1471,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         delete s;
 
         QString macros = includeWidget->getMacro();
+        //in case the macro $(B) has to be replaced by another macro  (ex: "B=NAME=ARIMA-CV-02ME;NAME=ARIMA-CV-03ME")
+        macros = treatMacro(map, macros, &doNothing);
         QStringList macroList = macros.split(";", QString::SkipEmptyParts);
 
         // loop on this include with different macro
-        for(int j=0; j<includeWidget->getItemCount(); j++) {
+        for(int j=0; j<qMax(macroList.count(), includeWidget->getItemCount()); j++) {
             QString macroS;
             if(j < macroList.count()) {
                 macroS = macroList.at(j);
@@ -1535,15 +1539,21 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     // add includeWidget to the gui
                     if(includeWidget->getStacking() == caInclude::Row) {
                         layout->addWidget(thisW, j, 0);
+                        if(row > maxRows) maxRows = row;
+                        row++;
                     } else if(includeWidget->getStacking() == caInclude::Column) {
                        layout->addWidget(thisW, 0, j);
+                       if(column > maxColumns) maxColumns = column;
+                       column++;
                     } else {
                         if(row >= includeWidget->getMaxLines()) {
                             row=0;
                             column++;
+                            if(column > maxColumns) maxColumns = column;
                         }
                         layout->addWidget(thisW, row, column);
                         row++;
+                        if(row > maxRows) maxRows = row;
                     }
 
                     includeWidget->setLayout(layout);
@@ -1569,7 +1579,19 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         } // end for
 
-        // increment splascounter when include is in list
+        // in case of row stacking adjust our include widget height
+        maxColumns++;
+        maxRows++;
+        includeWidget->resize(maxColumns * thisW->width(), maxRows * thisW->height());
+
+        // when the include is packed into a scroll area, set the minimumsize to; however when resizing, the scroll area does not adapt
+        if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
+            Q_UNUSED(scrollWidget);
+            QWidget *contents = (QWidget*) includeWidget->parent();
+            contents->setMinimumSize(maxColumns * thisW->width(), maxRows * thisW->height());
+        }
+
+        // increment splashcounter when include is in list
         if(nbIncludes > 0) {
             for (int i = topIncludesWidgetList.count()-1; i >= 0; --i) {
                 if(w1 ==  topIncludesWidgetList.at(i)) {
