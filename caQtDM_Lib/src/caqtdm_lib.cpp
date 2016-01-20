@@ -3683,17 +3683,17 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 if(stripplotWidget->getYscalingMax(actPlot) == caStripPlot::Channel) {
                     stripplotWidget->setYaxisLimitsMax(actPlot, data.edata.upper_disp_limit);
                 }
+                if(stripplotWidget->getYaxisLimitsMin(actPlot) == stripplotWidget->getYaxisLimitsMax(actPlot)) {
+                    stripplotWidget->setYaxisLimitsMin(actPlot, 0.0);
+                    stripplotWidget->setYaxisLimitsMax(actPlot, 10.0);
+                }
                 if(actPlot == 0) {
-                    double ymin = stripplotWidget->getYaxisLimitsMin(0);
-                    double ymax = stripplotWidget->getYaxisLimitsMax(0);
-                    stripplotWidget->setYscale(ymin, ymax);
+                    stripplotWidget->setYscale(stripplotWidget->getYaxisLimitsMin(0), stripplotWidget->getYaxisLimitsMax(0));
                 }
                 // do this for redisplaying legend with correct limits
-                if((stripplotWidget->getYscalingMin(actPlot) == caStripPlot::Channel) ||
-                        (stripplotWidget->getYscalingMax(actPlot) == caStripPlot::Channel)) {
-                    stripplotWidget->resize(stripplotWidget->geometry().width()+1, stripplotWidget->geometry().height());
-                    stripplotWidget->resize(stripplotWidget->geometry().width()-1, stripplotWidget->geometry().height());
-                }
+
+                stripplotWidget->resize(stripplotWidget->geometry().width()+1, stripplotWidget->geometry().height());
+                stripplotWidget->resize(stripplotWidget->geometry().width()-1, stripplotWidget->geometry().height());
             }
 
             stripplotWidget->setData(data.edata.actTime, data.edata.rvalue, actPlot);
