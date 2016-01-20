@@ -1584,7 +1584,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         maxRows++;
         includeWidget->resize(maxColumns * thisW->width(), maxRows * thisW->height());
 
-        // when the include is packed into a scroll area, set the minimumsize to; however when resizing, the scroll area does not adapt
+        // when the include is packed into a scroll area, set the minimumsize too
         if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
             Q_UNUSED(scrollWidget);
             QWidget *contents = (QWidget*) includeWidget->parent();
@@ -6376,6 +6376,17 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             f.setPointSizeF(fontSize);
             box->setFont(f);
         }
+    }
+
+    else if(!className.compare("caInclude")) {
+        caInclude *includeWidget = (caInclude *) widget;
+        // when the include is packed into a scroll area, set the minimumsize too
+        if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
+            Q_UNUSED(scrollWidget);
+            QWidget *contents = (QWidget*) includeWidget->parent();
+            contents->setMinimumSize(factX * list.at(2).toInt(), factY * list.at(3).toInt());
+        }
+
     }
 
     // Tabbar adjustment
