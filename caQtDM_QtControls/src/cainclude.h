@@ -30,6 +30,8 @@
 #include <QGridLayout>
 #include <qtcontrols_global.h>
 
+#include "caPropHandleDefs.h"
+
 #define PRC 1
 
 #ifdef PRC
@@ -40,7 +42,9 @@ class  QTCON_EXPORT caInclude : public QWidget
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString macro READ getMacro WRITE setMacro)
+    Q_PROPERTY(QString macro READ getMacro WRITE setMacro  DESIGNABLE inactiveButVisible())
+    Q_PROPERTY(QStringList macroList READ getMacroList WRITE setMacroList STORED false)
+
     Q_PROPERTY(QString filename READ getFileName WRITE setFileName)
     Q_PROPERTY(Stacking stacking READ getStacking WRITE setStacking)
     Q_PROPERTY(int numberOfItems READ getItemCount WRITE setItemCount)
@@ -52,6 +56,8 @@ class  QTCON_EXPORT caInclude : public QWidget
 
 
 public:
+
+#include "caPropHandle.h"
 
     enum Properties { maximumLines = 0, numberofItems};
     enum Stacking {Row=0, Column,RowColumn};
@@ -70,8 +76,10 @@ public:
     QString getFileName() const {return newFileName;}
     void setFileName(QString const &filename);
 
-    QString getMacro() const {return thisMacro;}
-    void setMacro(QString const &newMacro) {thisMacro = newMacro;}
+    QString getMacro() const {return thisMacro.join(";");}
+    void setMacro(QString const &newMacro) {thisMacro = newMacro.split(";");}
+    QStringList getMacroList() const {return thisMacro;}
+    void setMacroList(QStringList list) {thisMacro = list; updatePropertyEditorItem(this, "macro");}
 
     QColor getBackground() const {return thisBackColor;}
     void setBackground(QColor c);
@@ -96,7 +104,7 @@ private:
     bool designerVisible[10];
     QString newFileName;
     QString prvFileName;
-    QString thisMacro;
+    QStringList thisMacro;
     QColor thisBackColor;
     QWidget *thisParent;
     int thisLineSize;

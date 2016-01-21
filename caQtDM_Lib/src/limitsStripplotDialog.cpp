@@ -164,7 +164,6 @@ void limitsStripplotDialog::applyClicked()
                         StripPlot->setYaxisLimitsMin(i, minY);
                         StripPlot->setYscalingMin(i, caStripPlot::User);
                 } else {
-
                         StripPlot->setYscalingMin(i, caStripPlot::Channel);
                         StripPlot->setYaxisLimitsMin(i, ptr->edata.lower_disp_limit);
                 }
@@ -182,6 +181,10 @@ void limitsStripplotDialog::applyClicked()
                         StripPlot->setYscalingMax(i, caStripPlot::Channel);
                         StripPlot->setYaxisLimitsMax(i, ptr->edata.upper_disp_limit);
                 }
+            }
+            if(StripPlot->getYaxisLimitsMin(i) == StripPlot->getYaxisLimitsMax(i)) {
+                StripPlot->setYaxisLimitsMin(i, 0.0);
+                StripPlot->setYaxisLimitsMax(i, 10.0);
             }
             if(i==0) {
                 double ymin = StripPlot->getYaxisLimitsMin(0);

@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
                    "  [-dg [<width>x<height>][+<xoffset>-<yoffset>]\n"
                    "  [-httpconfig] will display a network configuration screen at startup\n"
                    "  [-print] will print file and exit\n"
-                   "  [-noResize] will prevent resizing, works only when not attaching\n"
+                   "  [-noResize] will prevent resizing\n"
                    "  [-cs defaultcontrolsystempluginname]\n"
                    "  [-option \"xxx=aaa,yyy=bbb, ...\"] options for cs plugins\n"
                    "  [file]\n"
@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
             createMap(options, QString(argv[in]));
         } else if (strncmp (argv[in], "-" , 1) == 0) {
             /* unknown application argument */
-            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -noStyles -dg -x -print -httpconfig\n",in,argv[in]);
+            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -noStyles -dg -x -print -httpconfig -noResize\n",in,argv[in]);
         } else {
             printf("caQtDM -- file = <%s>\n", argv[in]);
             fileName = QString(argv[in]);

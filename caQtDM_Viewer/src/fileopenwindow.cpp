@@ -179,6 +179,9 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     lastWindow = (QMainWindow*) 0;
     lastMacro ="";
     lastFile = "";
+    if(resizing) lastResizing="true";
+    else lastResizing="false";
+
     lastGeometry = geometry;
     userClose = false;
     printandexit = printscreen;
@@ -186,8 +189,6 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     activWindow = 0;
     Specials specials;
     OptionList = options;
-
-    Q_UNUSED(resizing);
 
     qDebug() <<  "caQtDM -- desktop size:" << qApp->desktop()->size();
 
@@ -271,6 +272,8 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
             message.append(macroString);
             message.append(";");
             message.append(geometry);
+            message.append(";");
+            message.append(lastResizing);
             //qDebug() << "send a message with file, macro and geometry to it and exit "<< message;
             sendMessage(message);
             sharedMemory.detach();
@@ -601,7 +604,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 
     if(mustOpenFile) {
         mustOpenFile = false;
-        Callback_OpenNewFile(lastFile, lastMacro, lastGeometry);
+        Callback_OpenNewFile(lastFile, lastMacro, lastGeometry, lastResizing);
     }
 
     if(minimizeMessageWindow) {
@@ -706,7 +709,11 @@ void FileOpenWindow::Callback_OpenButton()
             if (fileName.contains("prc")) {
                 newWindow->allowResizing(false);
             } else {
-               newWindow->allowResizing(true);
+                if(lastResizing.contains("false")) {
+                   newWindow->allowResizing(false);
+                } else {
+                   newWindow->allowResizing(true);
+                }
             }
  #ifdef MOBILE
             newWindow->grabSwipeGesture(fingerSwipeGestureType);
@@ -730,6 +737,7 @@ void FileOpenWindow::Callback_OpenButton()
             mainWindow->setWindowFlags(mainWindow->windowFlags() );
             mainWindow->setProperty("fileString", fileName);
             mainWindow->setProperty("macroString", "");
+            mainWindow->setProperty("resizeString", "true");
 
             sprintf(asc, "last file: %s", qasc(fileName));
             messageWindow->postMsgEvent(QtDebugMsg, asc);
@@ -770,7 +778,7 @@ void FileOpenWindow::nextWindow()
 /**
  * slot for opening file by signal
  */
-void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QString& macroString, const QString& geometry)
+void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QString& macroString, const QString& geometry, const QString& resizeString)
 {
     //qDebug() << "*************************************************************************";
     //qDebug() << "callback open new file" << inputFile << "with macro string" << macroString;
@@ -877,7 +885,11 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         if (FileName.contains("prc")) {
            newWindow->allowResizing(false);
         } else {
-           newWindow->allowResizing(true);
+          if(resizeString.contains("false")) {
+             newWindow->allowResizing(false);
+          } else {
+             newWindow->allowResizing(true);
+          }
         }
         QMainWindow *mainWindow = newWindow;
 
@@ -908,6 +920,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         // get the filename
         mainWindow->setProperty("fileString", fileNameFound);
         mainWindow->setProperty("macroString", macroString);
+        mainWindow->setProperty("resizeString", resizeString);
 
         if (FileName.contains("prc")) {
             mainWindow->resize(mainWindow->minimumSizeHint());
@@ -1015,6 +1028,7 @@ void FileOpenWindow::Callback_ActionReload()
     QPoint position;
     QString macroS = "";
     QString fileS = "";
+    QString resizeS = "true";
 
     // block reload button
    this->ui.reloadAction->blockSignals(true);
@@ -1032,7 +1046,10 @@ void FileOpenWindow::Callback_ActionReload()
             if(!macroString.isNull()) {
                 macroS = macroString.toString();
             }
-            //qDebug() << fileName;
+            QVariant resizeString= w->property("resizeString");
+            if(!resizeString.isNull()) {
+                resizeS = resizeString.toString();
+            }
 
             position = w->pos();
 
@@ -1056,7 +1073,11 @@ void FileOpenWindow::Callback_ActionReload()
                 if (fileS.contains("prc")) {
                     newWindow->allowResizing(false);
                 } else {
-                   newWindow->allowResizing(true);
+                    if(resizeS.contains("false")) {
+                       newWindow->allowResizing(false);
+                    } else {
+                       newWindow->allowResizing(true);
+                    }
                 }
 #ifdef MOBILE
                 newWindow->grabSwipeGesture(fingerSwipeGestureType);
@@ -1071,6 +1092,7 @@ void FileOpenWindow::Callback_ActionReload()
                 mainWindow->setWindowFlags( mainWindow->windowFlags() );
                 mainWindow->setProperty("fileString", fileS);
                 mainWindow->setProperty("macroString", macroS);
+                mainWindow->setProperty("resizeString", resizeS);
                 if (FileName.contains("prc")) {
                     mainWindow->resize(mainWindow->minimumSizeHint());
                 }
@@ -1105,13 +1127,13 @@ void FileOpenWindow::checkForMessage()
 
     if (byteArray.left(1) == "0") return;  // no message, quit
     byteArray.remove(0, 1);                // remove first character
-    QString message = QString::fromUtf8(byteArray.constData()); // get and split message in filename and macro
+    QString message = QString::fromUtf8(byteArray.constData()); // get and split message
     QStringList vars = message.split(";");
 
     //qDebug() << "received message=" << message;
     //qDebug() << "vars" << vars.count() <<  vars;
 
-    emit Callback_OpenNewFile(vars.at(0), vars.at(1), vars.at(2));
+    emit Callback_OpenNewFile(vars.at(0), vars.at(1), vars.at(2), vars.at(3));
 
     // remove message from shared memory.
     byteArray = "0";

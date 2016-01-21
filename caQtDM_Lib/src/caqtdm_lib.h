@@ -228,7 +228,7 @@ signals:
     void clicked(int);
     void clicked(double);
     void Signal_QLineEdit(const QString&, const QString&);
-    void Signal_OpenNewWFile(const QString&, const QString&, const QString&);
+    void Signal_OpenNewWFile(const QString&, const QString&, const QString&, const QString&);
     void Signal_ContextMenu(QWidget*);
     void Signal_NextWindow();
     void Signal_IosExit();
@@ -305,6 +305,7 @@ private:
     bool firstResize;
     bool allowResize;
     bool pepPrint;
+    bool prcFile;
 
     int origWidth, origHeight;
 

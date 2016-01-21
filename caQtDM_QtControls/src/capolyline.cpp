@@ -293,6 +293,7 @@ void caPolyLine::setActualSize(QSize size)
 {
     actualWidth = size.width();
     actualHeight = size.height();
+    initialize = false;
     //printf("set actual size %d %d\n", actualWidth, actualHeight);
 }
 

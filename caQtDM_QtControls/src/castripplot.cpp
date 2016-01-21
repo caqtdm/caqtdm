@@ -817,10 +817,9 @@ void caStripPlot::RescaleAxis()
     // rescale axis
     for(i=0; i < NumberOfCurves; i++) {
         setData(realTim[i], realVal[i], i);
+        // redraw legend if any
+        curve[i]->setTitle(legendText(i));
     }
-
-    // redraw legend if any
-    //setLegendAttribute(thisScaleColor, QFont("arial", 9), TEXT);
 }
 
 void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
@@ -828,7 +827,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
     int i;
 
     //printf("fontsize=%.1f %s\n", f.pointSizeF(), qasc(this->objectName()));
-    // when legend text gets to small, hide it (will give then space for plot)
+    //when legend text gets to small, hide it (will give then space for plot)
 
 
 #if QWT_VERSION < 0x060100
@@ -843,15 +842,10 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 
         switch (SW) {
         case TEXT:
-            if(thisLegendshow) {
-                QwtText text;
-                text.setText(legendText(i));
-                qobject_cast<QwtLegendItem*>(this->legend()->find(curve[i]))->setText(text);
-            }
+            // done now through curve title
             break;
 
         case FONT:
-
             if(getLegendEnabled()) {
                 if(legend() != (QwtLegend*) 0) {
                     QList<QWidget *> list =  legend()->legendItems();
@@ -875,12 +869,12 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
                     w->setFont(f);
                 }
             }
-
             break;
         }
 
     }
 #else
+
     i=0;
     foreach (QwtPlotItem *plt_item, itemList()) {
         if (plt_item->rtti() == QwtPlotItem::Rtti_PlotCurve) {
@@ -894,7 +888,6 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
                 if(!curve->title().text().contains("?fill?")) curve->setItemAttribute(QwtPlotItem::Legend, true);
             }
 
-
 			QwtLegend *lgd = qobject_cast<QwtLegend *>(legend());
 			if (lgd != (QwtLegend *) 0){
 				QList<QWidget *> legendWidgets = lgd->legendWidgets(itemToInfo(plt_item));
@@ -903,42 +896,28 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 					switch (SW) {
 
 					case TEXT:
-
-						if (thisLegendshow) {
-
-							QwtText text;
-							text.setText(legendText(i++));
-							b->setText(text);
-							b->update();
-
-						}
+                        // done now through curve title
 						break;
 
 					case FONT:
-
 						b->setFont(f);
                         b->update();
-
 						break;
 
 					case COLOR:
-
 						QPalette palette = b->palette();
 						palette.setColor(QPalette::WindowText, c); // for ticks
 						palette.setColor(QPalette::Text, c);       // for ticks' labels
 						b->setPalette(palette);
 						b->update();
-
 						break;
 
-					}
-
-
-				}
-			}
+                    }
+                }
+            }
         }
-        updateLegend();
     }
+    updateLegend();
 #endif
 
 }
