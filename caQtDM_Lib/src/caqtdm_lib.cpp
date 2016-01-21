@@ -6289,8 +6289,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
     else if(!className.compare("QLabel")) {
         QLabel *label = (QLabel *) widget;
         className = label->parent()->metaObject()->className();
-        if(!className.contains("Numeric") ) {  // would otherwise interfere with our wheelswitch
-
+        if(!className.contains("Numeric") && !className.contains("caSpinbox")) {  // would otherwise interfere with our wheelswitch or spinbox
             QFont f = label->font();
             qreal fontSize = fontResize(factX, factY, list, 4);
             f.setPointSize(qRound(fontSize));
@@ -6652,6 +6651,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                         ledWidget->setLedHeight(qRound(height));
                         ledWidget->setLedWidth(qRound(width));
                     }
+
                     widget->setGeometry(rectnew);
                     resizeSpecials(className, widget, list, factX, factY);
                     widget->updateGeometry();
