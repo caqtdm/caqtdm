@@ -1579,11 +1579,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         } // end for
 
-        // in case of row stacking adjust our include widget height
         maxColumns++;
-        maxRows++;
+        if(includeWidget->getStacking() != caInclude::RowColumn)  maxRows++;
 
-        if(thisW != (QWidget *) 0 ) {
+        if((thisW != (QWidget *) 0 ) && (!prcFile)) {
             includeWidget->resize(maxColumns * thisW->width(), maxRows * thisW->height());
             // when the include is packed into a scroll area, set the minimumsize too
             if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
