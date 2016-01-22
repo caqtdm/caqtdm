@@ -1415,7 +1415,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         int column = 0;
         w1->setProperty("ObjectType", caInclude_Widget);
 
-        QWidget *thisW;
+        QWidget *thisW = (QWidget *) 0;
         QUiLoader loader;
         bool prcFile = false;
 
@@ -1582,13 +1582,15 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         // in case of row stacking adjust our include widget height
         maxColumns++;
         maxRows++;
-        includeWidget->resize(maxColumns * thisW->width(), maxRows * thisW->height());
 
-        // when the include is packed into a scroll area, set the minimumsize too
-        if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
-            Q_UNUSED(scrollWidget);
-            QWidget *contents = (QWidget*) includeWidget->parent();
-            contents->setMinimumSize(maxColumns * thisW->width(), maxRows * thisW->height());
+        if(thisW != (QWidget *) 0 ) {
+            includeWidget->resize(maxColumns * thisW->width(), maxRows * thisW->height());
+            // when the include is packed into a scroll area, set the minimumsize too
+            if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
+                Q_UNUSED(scrollWidget);
+                QWidget *contents = (QWidget*) includeWidget->parent();
+                contents->setMinimumSize(maxColumns * thisW->width(), maxRows * thisW->height());
+            }
         }
 
         // increment splashcounter when include is in list
