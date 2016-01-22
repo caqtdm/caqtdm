@@ -104,7 +104,8 @@ public:
                                                                      QMap<QString, ControlsInterface *> interfaces = (QMap<QString, ControlsInterface *>()),
                                                                      MessageWindow *msgWindow = 0,
                                                                      bool willPrint = false,
-                                                                     QWidget *parentAS = 0);
+                                                                     QWidget *parentAS = 0,
+                                                                     QMap<QString, QString> options = (QMap<QString, QString>()));
     ~CaQtDM_Lib();
 
     void allowResizing(bool allowresize);
@@ -227,7 +228,7 @@ signals:
     void clicked(int);
     void clicked(double);
     void Signal_QLineEdit(const QString&, const QString&);
-    void Signal_OpenNewWFile(const QString&, const QString&, const QString&);
+    void Signal_OpenNewWFile(const QString&, const QString&, const QString&, const QString&);
     void Signal_ContextMenu(QWidget*);
     void Signal_NextWindow();
     void Signal_IosExit();
@@ -304,6 +305,7 @@ private:
     bool firstResize;
     bool allowResize;
     bool pepPrint;
+    bool prcFile;
 
     int origWidth, origHeight;
 
@@ -336,6 +338,8 @@ private:
     epics4Subs *Epics4;
 #endif
 
+    QString defaultPlugin;
+
 private slots:
     void Callback_EApplyNumeric(double value);
     void Callback_ENumeric(double value);
@@ -367,6 +371,8 @@ private slots:
     void handleFileChanged(const QString&);
 
     void Callback_WriteDetectedValues(QWidget* w);
+
+    void updateResize();
 };
 
 #endif // CaQtDM_Lib_H

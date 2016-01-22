@@ -170,7 +170,8 @@ void FileOpenWindow::TerminateAllInterfaces()
  * our main window (form) constructor
  */
 FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString macroString,
-                               bool attach, bool minimize, QString geometry, bool printscreen, bool resizing): QMainWindow(parent)
+                               bool attach, bool minimize, QString geometry, bool printscreen, bool resizing,
+                               QMap<QString, QString> options): QMainWindow(parent)
 {
     // definitions for last opened file
     debugWindow = true;
@@ -178,14 +179,16 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     lastWindow = (QMainWindow*) 0;
     lastMacro ="";
     lastFile = "";
+    if(resizing) lastResizing="true";
+    else lastResizing="false";
+
     lastGeometry = geometry;
     userClose = false;
     printandexit = printscreen;
     minimizeMessageWindow = minimize;
     activWindow = 0;
     Specials specials;
-
-    Q_UNUSED(resizing);
+    OptionList = options;
 
     qDebug() <<  "caQtDM -- desktop size:" << qApp->desktop()->size();
 
@@ -209,6 +212,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     Q_IMPORT_PLUGIN(DemoPlugin);
     Q_IMPORT_PLUGIN(Epics3Plugin);
     Q_IMPORT_PLUGIN(Epics4Plugin);
+    Q_INIT_RESOURCE(qtcontrolsplugin);  // load resources from resource file
 #endif
 
     // message window used by library and here
@@ -268,6 +272,8 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
             message.append(macroString);
             message.append(";");
             message.append(geometry);
+            message.append(";");
+            message.append(lastResizing);
             //qDebug() << "send a message with file, macro and geometry to it and exit "<< message;
             sendMessage(message);
             sharedMemory.detach();
@@ -383,7 +389,8 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 
     fileFunctions filefunction;
 
-    // download the choosen configurations file from the choosen url
+    // download the choosen configurations file from the choosen url, but find it first locally
+    setenv("CAQTDM_DISPLAY_PATH", qasc(specials.getStdPath()), 1);
     int success = filefunction.checkFileAndDownload(file, url);
     if(!success) {
         QMessageBox::critical(0, tr("caQtDM"), tr("could not download file %1 from %2").arg(file).arg(url));
@@ -411,7 +418,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 
     // load the control plugins (must be done after setting the environment)
     loadPlugins loadplugins;
-    if (!loadplugins.loadAll(interfaces, mutexKnobData, messageWindow )) {
+    if (!loadplugins.loadAll(interfaces, mutexKnobData, messageWindow, OptionList )) {
         QMessageBox::critical(this, "Error", "Could not load any plugin");
     } else {
         if(!interfaces.isEmpty()) {
@@ -597,7 +604,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 
     if(mustOpenFile) {
         mustOpenFile = false;
-        Callback_OpenNewFile(lastFile, lastMacro, lastGeometry);
+        Callback_OpenNewFile(lastFile, lastMacro, lastGeometry, lastResizing);
     }
 
     if(minimizeMessageWindow) {
@@ -680,10 +687,6 @@ void FileOpenWindow::Callback_EmptyCache()
 #endif
 }
 
-
-
-
-
 /**
  * slot for opening file by button
  */
@@ -702,16 +705,19 @@ void FileOpenWindow::Callback_OpenButton()
         QFileInfo fi(fileName);
         lastFilePath = fi.absolutePath();
         if(fi.exists()) {
-            CaQtDM_Lib *newWindow = new CaQtDM_Lib(this, fileName, "", mutexKnobData, interfaces, messageWindow);
+            CaQtDM_Lib *newWindow = new CaQtDM_Lib(this, fileName, "", mutexKnobData, interfaces, messageWindow, false, 0, OptionList);
             if (fileName.contains("prc")) {
                 newWindow->allowResizing(false);
             } else {
-               newWindow->allowResizing(true);
+                if(lastResizing.contains("false")) {
+                   newWindow->allowResizing(false);
+                } else {
+                   newWindow->allowResizing(true);
+                }
             }
  #ifdef MOBILE
             newWindow->grabSwipeGesture(fingerSwipeGestureType);
  #endif
-
             QMainWindow *mainWindow = newWindow;
 
 #if defined(WIN32) && !defined(__GNUC__)
@@ -731,6 +737,7 @@ void FileOpenWindow::Callback_OpenButton()
             mainWindow->setWindowFlags(mainWindow->windowFlags() );
             mainWindow->setProperty("fileString", fileName);
             mainWindow->setProperty("macroString", "");
+            mainWindow->setProperty("resizeString", "true");
 
             sprintf(asc, "last file: %s", qasc(fileName));
             messageWindow->postMsgEvent(QtDebugMsg, asc);
@@ -771,7 +778,7 @@ void FileOpenWindow::nextWindow()
 /**
  * slot for opening file by signal
  */
-void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QString& macroString, const QString& geometry)
+void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QString& macroString, const QString& geometry, const QString& resizeString)
 {
     //qDebug() << "*************************************************************************";
     //qDebug() << "callback open new file" << inputFile << "with macro string" << macroString;
@@ -871,14 +878,18 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         //qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString;
 
         if(printandexit) willPrint = true;
-        CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, interfaces, messageWindow, willPrint);
+        CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileNameFound, macroString, mutexKnobData, interfaces, messageWindow, willPrint, 0, OptionList);
 #ifdef MOBILE
         newWindow->grabSwipeGesture(fingerSwipeGestureType);
 #endif
         if (FileName.contains("prc")) {
            newWindow->allowResizing(false);
         } else {
-           newWindow->allowResizing(true);
+          if(resizeString.contains("false")) {
+             newWindow->allowResizing(false);
+          } else {
+             newWindow->allowResizing(true);
+          }
         }
         QMainWindow *mainWindow = newWindow;
 
@@ -909,6 +920,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         // get the filename
         mainWindow->setProperty("fileString", fileNameFound);
         mainWindow->setProperty("macroString", macroString);
+        mainWindow->setProperty("resizeString", resizeString);
 
         if (FileName.contains("prc")) {
             mainWindow->resize(mainWindow->minimumSizeHint());
@@ -1016,6 +1028,7 @@ void FileOpenWindow::Callback_ActionReload()
     QPoint position;
     QString macroS = "";
     QString fileS = "";
+    QString resizeS = "true";
 
     // block reload button
    this->ui.reloadAction->blockSignals(true);
@@ -1033,7 +1046,10 @@ void FileOpenWindow::Callback_ActionReload()
             if(!macroString.isNull()) {
                 macroS = macroString.toString();
             }
-            //qDebug() << fileName;
+            QVariant resizeString= w->property("resizeString");
+            if(!resizeString.isNull()) {
+                resizeS = resizeString.toString();
+            }
 
             position = w->pos();
 
@@ -1053,11 +1069,15 @@ void FileOpenWindow::Callback_ActionReload()
                 QString fileNameFound = s->findFile();
                 fileS = fileNameFound;
 
-                CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, interfaces, messageWindow);
+                CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, interfaces, messageWindow, false, 0, OptionList);
                 if (fileS.contains("prc")) {
                     newWindow->allowResizing(false);
                 } else {
-                   newWindow->allowResizing(true);
+                    if(resizeS.contains("false")) {
+                       newWindow->allowResizing(false);
+                    } else {
+                       newWindow->allowResizing(true);
+                    }
                 }
 #ifdef MOBILE
                 newWindow->grabSwipeGesture(fingerSwipeGestureType);
@@ -1072,6 +1092,7 @@ void FileOpenWindow::Callback_ActionReload()
                 mainWindow->setWindowFlags( mainWindow->windowFlags() );
                 mainWindow->setProperty("fileString", fileS);
                 mainWindow->setProperty("macroString", macroS);
+                mainWindow->setProperty("resizeString", resizeS);
                 if (FileName.contains("prc")) {
                     mainWindow->resize(mainWindow->minimumSizeHint());
                 }
@@ -1106,13 +1127,13 @@ void FileOpenWindow::checkForMessage()
 
     if (byteArray.left(1) == "0") return;  // no message, quit
     byteArray.remove(0, 1);                // remove first character
-    QString message = QString::fromUtf8(byteArray.constData()); // get and split message in filename and macro
+    QString message = QString::fromUtf8(byteArray.constData()); // get and split message
     QStringList vars = message.split(";");
 
     //qDebug() << "received message=" << message;
     //qDebug() << "vars" << vars.count() <<  vars;
 
-    emit Callback_OpenNewFile(vars.at(0), vars.at(1), vars.at(2));
+    emit Callback_OpenNewFile(vars.at(0), vars.at(1), vars.at(2), vars.at(3));
 
     // remove message from shared memory.
     byteArray = "0";

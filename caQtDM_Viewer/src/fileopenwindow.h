@@ -64,7 +64,8 @@
 
  public:
      FileOpenWindow(QMainWindow *parent = 0,  QString filename = "", QString macroString = "",
-                    bool attach = false, bool minimize = false, QString geometry = "", bool printscreen = false, bool resizing = true);
+                    bool attach = false, bool minimize = false, QString geometry = "", bool printscreen = false, bool resizing = true,
+                    QMap<QString, QString> options = (QMap<QString, QString>()));
      bool isRunning();
      bool sendMessage(const QString &message);
      void fillPVtable(int &countPV, int &countnotConnected, int &countDisplayed);
@@ -88,7 +89,7 @@
      void Callback_ActionReload();
      void Callback_ActionUnconnected();
      void Callback_EmptyCache();
-     void Callback_OpenNewFile(const QString&, const QString&, const QString&);
+     void Callback_OpenNewFile(const QString&, const QString&, const QString&, const QString&);
      void checkForMessage();
      void Callback_PVwindowExit();
 
@@ -114,7 +115,7 @@ signals:
      void FlushAllInterfaces();
      void TerminateAllInterfaces();
      QMainWindow *lastWindow;
-     QString lastMacro, lastFile, lastGeometry;
+     QString lastMacro, lastFile, lastGeometry, lastResizing;
      Ui::MainWindow ui;
      QSharedMemory sharedMemory;
      bool _isRunning;
@@ -138,6 +139,7 @@ signals:
      bool fromIOS;
 
      QMap<QString, ControlsInterface*> interfaces;
+     QMap<QString, QString> OptionList;
 
  };
 

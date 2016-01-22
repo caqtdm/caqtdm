@@ -53,6 +53,7 @@
 #endif
 
 #include <stdint.h>
+#include "caPropHandleDefs.h"
 
 class QTCON_EXPORT caCartesianPlot : public QwtPlot
 {
@@ -75,32 +76,44 @@ class QTCON_EXPORT caCartesianPlot : public QwtPlot
     Q_PROPERTY(QString TitleX READ getTitleX WRITE setTitleX)
     Q_PROPERTY(QString TitleY READ getTitleY WRITE setTitleY)
 
-    Q_PROPERTY(QString channels_1 READ getPV_1 WRITE setPV_1)
+    Q_PROPERTY(QStringList channelList_1 READ getPV1List WRITE setPV1List STORED false)
+    Q_PROPERTY(QString channels_1 READ getPV_1 WRITE setPV_1 DESIGNABLE inactiveButVisible())
+
     Q_PROPERTY(curvStyle Style_1 READ getStyle_1 WRITE setStyle_1)
     Q_PROPERTY(curvSymbol symbol_1 READ getSymbol_1 WRITE setSymbol_1)
     Q_PROPERTY(QColor color_1 READ getColor_1 WRITE setColor_1)
 
-    Q_PROPERTY(QString channels_2 READ getPV_2 WRITE setPV_2)
+    Q_PROPERTY(QStringList channelList_2 READ getPV2List WRITE setPV2List STORED false)
+    Q_PROPERTY(QString channels_2 READ getPV_2 WRITE setPV_2  DESIGNABLE inactiveButVisible())
+
     Q_PROPERTY(curvStyle Style_2 READ getStyle_2 WRITE setStyle_2)
     Q_PROPERTY(curvSymbol symbol_2 READ getSymbol_2 WRITE setSymbol_2)
     Q_PROPERTY(QColor color_2 READ getColor_2 WRITE setColor_2)
 
-    Q_PROPERTY(QString channels_3 READ getPV_3 WRITE setPV_3)
+    Q_PROPERTY(QStringList channelList_3 READ getPV3List WRITE setPV3List STORED false)
+    Q_PROPERTY(QString channels_3 READ getPV_3 WRITE setPV_3 DESIGNABLE inactiveButVisible())
+
     Q_PROPERTY(curvStyle Style_3 READ getStyle_3 WRITE setStyle_3)
     Q_PROPERTY(curvSymbol symbol_3 READ getSymbol_3 WRITE setSymbol_3)
     Q_PROPERTY(QColor color_3 READ getColor_3 WRITE setColor_3)
 
-    Q_PROPERTY(QString channels_4 READ getPV_4 WRITE setPV_4)
+    Q_PROPERTY(QStringList channelList_4 READ getPV4List WRITE setPV4List STORED false)
+    Q_PROPERTY(QString channels_4 READ getPV_4 WRITE setPV_4  DESIGNABLE inactiveButVisible())
+
     Q_PROPERTY(curvStyle Style_4 READ getStyle_4 WRITE setStyle_4)
     Q_PROPERTY(curvSymbol symbol_4 READ getSymbol_4 WRITE setSymbol_4)
     Q_PROPERTY(QColor color_4 READ getColor_4 WRITE setColor_4)
 
-    Q_PROPERTY(QString channels_5 READ getPV_5 WRITE setPV_5)
+    Q_PROPERTY(QStringList channelList_5 READ getPV5List WRITE setPV5List STORED false)
+    Q_PROPERTY(QString channels_5 READ getPV_5 WRITE setPV_5  DESIGNABLE inactiveButVisible())
+
     Q_PROPERTY(curvStyle Style_5 READ getStyle_5 WRITE setStyle_5)
     Q_PROPERTY(curvSymbol symbol_5 READ getSymbol_5 WRITE setSymbol_5)
     Q_PROPERTY(QColor color_5 READ getColor_5 WRITE setColor_5)
 
-    Q_PROPERTY(QString channels_6 READ getPV_6 WRITE setPV_6)
+    Q_PROPERTY(QStringList channelList_6 READ getPV6List WRITE setPV6List STORED false)
+    Q_PROPERTY(QString channels_6 READ getPV_6 WRITE setPV_6  DESIGNABLE inactiveButVisible())
+
     Q_PROPERTY(curvStyle Style_6 READ getStyle_6 WRITE setStyle_6)
     Q_PROPERTY(curvSymbol symbol_6 READ getSymbol_6 WRITE setSymbol_6)
     Q_PROPERTY(QColor color_6 READ getColor_6 WRITE setColor_6)
@@ -135,6 +148,8 @@ class QTCON_EXPORT caCartesianPlot : public QwtPlot
     Q_PROPERTY(int XaxisSyncGroup READ getXaxisSyncGroup WRITE setXaxisSyncGroup)
 
 public:
+
+#include "caPropHandle.h"
 
     bool getXaxisEnabled() const { return thisXshow; }
     void setXaxisEnabled(bool thisXshow);
@@ -205,21 +220,33 @@ public:
 
     QString getPV_1() const {return thisPV[0].join(";");}
     void setPV_1(QString const &newPV) {thisPV[0] = newPV.split(";");}
+    QStringList getPV1List() const {return thisPV[0];}
+    void setPV1List(QStringList list) {thisPV[0] = list; updatePropertyEditorItem(this, "channels_1");}
 
     QString getPV_2() const {return thisPV[1].join(";");}
     void setPV_2(QString const &newPV) {thisPV[1] = newPV.split(";");}
+    QStringList getPV2List() const {return thisPV[1];}
+    void setPV2List(QStringList list) {thisPV[1] = list; updatePropertyEditorItem(this, "channels_2");}
 
     QString getPV_3() const {return thisPV[2].join(";");}
     void setPV_3(QString const &newPV)  {thisPV[2] = newPV.split(";");}
+    QStringList getPV3List() const {return thisPV[2];}
+    void setPV3List(QStringList list) {thisPV[2] = list; updatePropertyEditorItem(this, "channels_3");}
 
     QString getPV_4() const {return thisPV[3].join(";");}
     void setPV_4(QString const &newPV)  {thisPV[3] = newPV.split(";");}
+    QStringList getPV4List() const {return thisPV[3];}
+    void setPV4List(QStringList list) {thisPV[3] = list; updatePropertyEditorItem(this, "channels_4");}
 
     QString getPV_5() const {return thisPV[4].join(";");}
     void setPV_5(QString const &newPV)  {thisPV[4] = newPV.split(";");}
+    QStringList getPV5List() const {return thisPV[4];}
+    void setPV5List(QStringList list) {thisPV[4] = list; updatePropertyEditorItem(this, "channels_5");}
 
     QString getPV_6() const {return thisPV[5].join(";");}
     void setPV_6(QString const &newPV)  {thisPV[5] = newPV.split(";");}
+    QStringList getPV6List() const {return thisPV[5];}
+    void setPV6List(QStringList list) {thisPV[5] = list; updatePropertyEditorItem(this, "channels_6");}
 
     QString getTriggerPV() const {return thisTriggerPV;}
     void setTriggerPV(QString const &newPV);

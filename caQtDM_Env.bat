@@ -9,8 +9,8 @@ IF "%1"=="3" GOTO SELECT3
 echo =============================================================================================
 echo Select Build Environment
 echo 1) QT 4.8.5 QWT6.0.1  32 Bit VS2010  
-echo 2) QT 5.4.1 QWT6.1.2  64 Bit VS2013  
-echo 3) QT 5.4.1 QWT6.1.2  32 Bit VS2013  
+echo 2) QT 5.5.0 QWT6.1.2  64 Bit VS2013  
+echo 3) QT 5.5.0 QWT6.1.2  32 Bit VS2013  
 set /P SELCTION=Select: 
 echo =============================================================================================
  

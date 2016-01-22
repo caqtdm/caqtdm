@@ -500,6 +500,9 @@ void SNumeric::resizeEvent(QResizeEvent *e)
         if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         labelFont.setPointSizeF(fontSize);
         signFont.setPointSizeF(fontSize);
+
+        CorrectFontIfAndroid(labelFont);
+        CorrectFontIfAndroid(signFont);
         //printf("digits=%d %s font size=%f\n", digits, qasc(l1->text()), fontSize);
     }
     /* all fonts equal */

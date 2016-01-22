@@ -36,12 +36,12 @@ Epics4Plugin::Epics4Plugin()
     qDebug() << "Epics4Plugin: Create";
 }
 
-int Epics4Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow)
+int Epics4Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow, QMap<QString, QString> options)
 {
     mutexknobdataP = data;
     messagewindowP = messageWindow;
 
-    qDebug() << "Epics4Plugin: InitCommunicationLayer";
+    qDebug() << "Epics4Plugin: InitCommunicationLayer with options" << options;
 #ifdef EPICS4
     Epics4 = new epics4Subs(data);
 #endif
@@ -62,6 +62,21 @@ int Epics4Plugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
 int Epics4Plugin::pvClearMonitor(knobData *kData) {
     Q_UNUSED(kData);
     qDebug() << "Epics4Plugin:pvClearMonitor";
+    return true;
+}
+
+int Epics4Plugin::pvFreeAllocatedData(knobData *kData)
+{
+    //qDebug() << "Epics4Plugin:pvFreeAllocatedData";
+    if (kData->edata.info != (void *) 0) {
+        free(kData->edata.info);
+        kData->edata.info = (void*) 0;
+    }
+    if(kData->edata.dataB != (void*) 0) {
+        free(kData->edata.dataB);
+        kData->edata.dataB = (void*) 0;
+    }
+
     return true;
 }
 

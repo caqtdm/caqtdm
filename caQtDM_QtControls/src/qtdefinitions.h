@@ -26,6 +26,17 @@
 #ifndef QTDEFINITIONS_H
 #define QTDEFINITIONS_H
 
+#ifdef MOBILE_ANDROID
+#include <QScreen>
+#endif
+
 #define qasc(x) x.toLatin1().constData()
+
+#ifdef MOBILE_ANDROID
+#define CorrectFontIfAndroid(x) \
+    x.setPointSize(x.pointSize() * (float) qApp->primaryScreen()->logicalDotsPerInch() / (float) qApp->primaryScreen()->physicalDotsPerInch());
+#else
+#define CorrectFontIfAndroid(x)
+#endif
 
 #endif

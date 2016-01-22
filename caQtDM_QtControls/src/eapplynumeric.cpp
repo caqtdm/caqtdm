@@ -39,7 +39,6 @@ EApplyNumeric::EApplyNumeric(QWidget *parent, int i, int d, Qt::Orientation pos)
 	decDig = d;
 	d_applyButtonActive = true;
     d_fontScaleEnabled = true;
-
 	init();
 }
 
@@ -77,17 +76,18 @@ void EApplyNumeric::init()
         box = new QHBoxLayout(this);
 
 	box->setMargin(0);
-	box->setSpacing(3);
+    box->setSpacing(0);
 
 	if (!data)
 		data = new ENumeric(this, intDig, decDig);
 	if (!button)
-		button = new EApplyButton(this);
+        button = new EApplyButton(this);
 	box->addWidget(data, 3);
-	box->addWidget(button, 1);
+    box->addWidget(button, 1);
 
 	setMinimumWidth(data->minimumWidth() + button->minimumWidth());
 	data->setDigitsFontScaleEnabled(d_fontScaleEnabled ? ESimpleLabel::Height : ESimpleLabel::None);
+    button->setFontScaleMode(EPushButton::WidthAndHeight);
 	connect(data, SIGNAL(valueChanged(double)), this, SLOT(numericValueChanged(double)));
         /* map ENumeric valueChanged() signal into EApplyNumeric omonimous signal */
         connect(data, SIGNAL(valueChanged(double)), this, SIGNAL(valueChanged(double)));
@@ -123,6 +123,7 @@ void EApplyNumeric::resizeEvent(QResizeEvent *e)
 {
     QWidget::resizeEvent(e);
     data->resize(size());
+    button->setMaximumSize(size().width()/3, size().height()/3);
 }
 
 

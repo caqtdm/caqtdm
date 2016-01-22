@@ -39,7 +39,7 @@
 #include <QtDebug>
 #include <QApplication>
 
-#define MIN_FONT_SIZE 3
+#define MIN_FONT_SIZE 5
 
 #if (_MSC_VER == 1600)
 int round (double x) {
@@ -404,14 +404,19 @@ bool ENumeric::eventFilter(QObject *obj, QEvent *event)
             QApplication::restoreOverrideCursor();
         }
     } else if(event->type() == QEvent::Leave) {
-        lastLabel = -1;
-        long long temp = (long long) round(csValue * pow(10.0, decDig));
-        data = temp;
-        showData();
-        QApplication::restoreOverrideCursor();
-        resize(size()*0.99); // force a resize
-        resize(aux);
-        updateGeometry();
+        QString ParentClassName = parent()->metaObject()->className();
+        if(ParentClassName.contains("caApplyNumeric")) {
+            //printf("do nothing\n");
+        } else {
+            lastLabel = -1;
+            long long temp = (long long) round(csValue * pow(10.0, decDig));
+            data = temp;
+            showData();
+            QApplication::restoreOverrideCursor();
+            resize(size()*0.99); // force a resize
+            resize(aux);
+            updateGeometry();
+        }
     } else if(event->type() == QEvent::MouseButtonDblClick) {
         if(!_AccessW) return true;
     } else if (event->type() == QEvent::MouseButtonPress) {
@@ -534,10 +539,19 @@ void ENumeric::resizeEvent(QResizeEvent *e)
         //double fontSize = l1->calculateFontPointSizeF(l1->text(), l1->size());
         double fontSize = 80;
         fontSize = qMin((int) fontSize, size().height() / 4 - 2);
-        fontSize = qMin((int) fontSize, size().width() / (digits+1));
+        //printf("h %f digits=%d %d %d\n", fontSize, digits, intDig, decDig);
+        if(decDig > 0) {
+           fontSize = qMin((int) fontSize, size().width() / (digits+2));
+        } else {
+           fontSize = qMin((int) fontSize, size().width() / (digits+1));
+        }
+        //printf("w %f\n", fontSize);
         if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         labelFont.setPointSizeF(fontSize);
         signFont.setPointSizeF(fontSize);
+
+         CorrectFontIfAndroid(labelFont);
+         CorrectFontIfAndroid(signFont);
         //printf("digits=%d %s font size=%f\n", digits, qasc(l1->text()), fontSize);
     }
     /* all fonts equal */

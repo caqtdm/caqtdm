@@ -32,28 +32,6 @@
 #include <QGraphicsProxyWidget>
 #include <QPropertyAnimation>
 #include <qtcontrols_global.h>
-
-/*
-class QTCON_EXPORT caVertLabel : public QGraphicsView
-{
-    Q_OBJECT
-
-public:
-    caVertLabel( QWidget *parent = 0 );
-
-protected:
-  virtual bool event(QEvent *);
-  void timerEvent(QTimerEvent* event) ;
-
-private:
-    QLabel *label;
-    QGraphicsProxyWidget *proxy;
-    QGraphicsScene *scene;
-    qreal angle;
-*/
-
-
-#include <qtcontrols_global.h>
 #include "fontscalingwidget.h"
 
 class QTCON_EXPORT caLabelVertical : public QWidget, public FontScalingWidget

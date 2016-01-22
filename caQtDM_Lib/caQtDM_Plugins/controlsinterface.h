@@ -37,9 +37,10 @@ class ControlsInterface
 public:
     virtual ~ControlsInterface() {}
     virtual QString pluginName() = 0;
-    virtual int initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow) = 0;
+    virtual int initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow, QMap<QString, QString> options) = 0;
     virtual int pvAddMonitor(int index, knobData *kData, int rate, int skip) = 0;  // skip is not used
     virtual int pvClearMonitor(knobData *kData) = 0;
+    virtual int pvFreeAllocatedData(knobData *kData) = 0;
     virtual int pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType) = 0;
     virtual int pvSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess) = 0;
     virtual int pvGetTimeStamp(char *pv, char *timestamp) = 0;
@@ -50,9 +51,6 @@ public:
     virtual int pvDisconnect(knobData *kData) = 0;
     virtual int FlushIO() = 0;
     virtual int TerminateIO() = 0;
-
-
-
 };
 
 QT_BEGIN_NAMESPACE

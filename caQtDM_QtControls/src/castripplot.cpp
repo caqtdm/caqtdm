@@ -40,6 +40,7 @@
 #include <qlayout.h>
 #include <qlabel.h>
 #include <qpainter.h>
+#include <QMetaProperty>
 #include "castripplot.h"
 
 // increase the array size given by the canvas width to be sure that the whole range is covered
@@ -153,6 +154,8 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     setAutoFillBackground(true);
     RestartPlot1 = true;
     RestartPlot2 = false;
+    ResizeFactorX = ResizeFactorY = 1.0;
+    oldResizeFactorX = oldResizeFactorY = 1.0;
 
 #ifdef QWT_USE_OPENGL
     printf("caStripplot uses opengl ?\n");
@@ -287,6 +290,12 @@ void caStripPlot::setXaxis(double interval, double period)
         setAxisScaleDraw(QwtPlot::xBottom, new QwtScaleDraw());
     }
 
+}
+
+void caStripPlot::setTicksResizeFactor(float factX, float factY)
+{
+    ResizeFactorX = factX;
+    ResizeFactorY = factY;
 }
 
 void caStripPlot::setYaxisType(yAxisType s)
@@ -488,8 +497,8 @@ void caStripPlot::defineCurves(QStringList titres, units unit, double period, in
             QString titre = legendText(i);
 
             curve[i] = new QwtPlotCurve(titre);
-            errorcurve[i] = new QwtPlotIntervalCurveNaN(titre);
-            fillcurve[i] = new QwtPlotCurveNaN(titre);
+            errorcurve[i] = new QwtPlotIntervalCurveNaN(titre+"?error?");
+            fillcurve[i] = new QwtPlotCurveNaN(titre+"?fill?");
             setStyle(s, i);
 
             curve[i]->setZ(i);
@@ -778,6 +787,19 @@ void caStripPlot::TimeOut()
     // in case of autoscale adjust the vertical scale
     if(thisYaxisScaling == autoScale) setAxisScale(QwtPlot::yLeft, AutoscaleMinY, AutoscaleMaxY);
 
+    if((ResizeFactorX != oldResizeFactorX) || ResizeFactorY != oldResizeFactorY) {
+        axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MajorTick, ResizeFactorX * 8.0);
+        axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MediumTick, ResizeFactorX * 6.0);
+        axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MinorTick, ResizeFactorX * 4.0);
+        axisScaleDraw(QwtPlot::xBottom)->setSpacing(1.0);
+        axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MajorTick, ResizeFactorY * 8.0);
+        axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MediumTick, ResizeFactorY * 6.0);
+        axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MinorTick, ResizeFactorY * 4.0);
+        axisScaleDraw(QwtPlot::yLeft)->setSpacing(1.0);
+        oldResizeFactorX = ResizeFactorX;
+        oldResizeFactorY = ResizeFactorY;
+    }
+
     // replot
     replot();
 
@@ -795,30 +817,35 @@ void caStripPlot::RescaleAxis()
     // rescale axis
     for(i=0; i < NumberOfCurves; i++) {
         setData(realTim[i], realVal[i], i);
+        // redraw legend if any
+        curve[i]->setTitle(legendText(i));
     }
-
-    // redraw legend if any
-    setLegendAttribute(thisScaleColor, QFont("arial", 9), TEXT);
 }
 
 void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 {
     int i;
 
+    //printf("fontsize=%.1f %s\n", f.pointSizeF(), qasc(this->objectName()));
+    //when legend text gets to small, hide it (will give then space for plot)
+
+
 #if QWT_VERSION < 0x060100
     for(i=0; i < NumberOfCurves; i++) {
 
+        if(f.pointSizeF() <= 4.0) {
+            curve[i]->setItemAttribute(QwtPlotItem::Legend, false);
+            continue;
+        } else {
+            if(!curve[i]->title().text().contains("?fill?")) curve[i]->setItemAttribute(QwtPlotItem::Legend, true);
+        }
+
         switch (SW) {
         case TEXT:
-            if(thisLegendshow) {
-                QwtText text;
-                text.setText(legendText(i));
-                qobject_cast<QwtLegendItem*>(this->legend()->find(curve[i]))->setText(text);
-            }
+            // done now through curve title
             break;
 
         case FONT:
-
             if(getLegendEnabled()) {
                 if(legend() != (QwtLegend*) 0) {
                     QList<QWidget *> list =  legend()->legendItems();
@@ -842,15 +869,25 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
                     w->setFont(f);
                 }
             }
-
             break;
         }
 
     }
 #else
+
     i=0;
     foreach (QwtPlotItem *plt_item, itemList()) {
-		if (plt_item->rtti() == QwtPlotItem::Rtti_PlotCurve) {
+        if (plt_item->rtti() == QwtPlotItem::Rtti_PlotCurve) {
+
+            QwtPlotCurve *curve = static_cast<QwtPlotCurve *>(plt_item);
+
+            if(f.pointSizeF() <= 4.0) {
+                curve->setItemAttribute(QwtPlotItem::Legend, false);
+                continue;
+            } else {
+                if(!curve->title().text().contains("?fill?")) curve->setItemAttribute(QwtPlotItem::Legend, true);
+            }
+
 			QwtLegend *lgd = qobject_cast<QwtLegend *>(legend());
 			if (lgd != (QwtLegend *) 0){
 				QList<QWidget *> legendWidgets = lgd->legendWidgets(itemToInfo(plt_item));
@@ -859,45 +896,28 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 					switch (SW) {
 
 					case TEXT:
-
-						if (thisLegendshow) {
-
-							QwtText text;
-							text.setText(legendText(i++));
-                            //printf("%s %s\n", qasc(b->plainText()), qasc(legendText(i-1)));
-							b->setText(text);
-							b->update();
-
-
-						}
+                        // done now through curve title
 						break;
 
 					case FONT:
-                        //printf("%s %s\n", qasc(b->plainText()), qasc(legendText(i-1)));
-
 						b->setFont(f);
-						b->update();
-
+                        b->update();
 						break;
 
 					case COLOR:
-
-                        //printf("%s %s\n", qasc(b->plainText()), qasc(legendText(i-1)));
 						QPalette palette = b->palette();
 						palette.setColor(QPalette::WindowText, c); // for ticks
 						palette.setColor(QPalette::Text, c);       // for ticks' labels
 						b->setPalette(palette);
 						b->update();
-
 						break;
 
-					}
-
-
-				}
-			}
+                    }
+                }
+            }
         }
     }
+    updateLegend();
 #endif
 
 }

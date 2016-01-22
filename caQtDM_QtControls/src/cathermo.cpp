@@ -35,7 +35,7 @@
 #include "qwt_scale_map.h"
 #include "cathermo.h"
 
-#define MIN_FONT_SIZE 5
+#define MIN_FONT_SIZE 3
 #define MAX_FONT_SIZE 20
 
 

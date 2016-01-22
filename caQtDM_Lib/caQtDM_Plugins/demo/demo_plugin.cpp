@@ -99,9 +99,9 @@ void  DemoPlugin::updateHardwork()
 #endif
 
 // initialize our communicationlayer with everything you need
-int DemoPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow)
+int DemoPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow, QMap<QString, QString> options)
 {
-    qDebug() << "DemoPlugin: InitCommunicationLayer";
+    qDebug() << "DemoPlugin: InitCommunicationLayer with options" << options;
 
     mutexknobdataP = data;
     messagewindowP = messageWindow;
@@ -150,6 +150,21 @@ int DemoPlugin::pvClearMonitor(knobData *kData) {
     QString key = kData->pv;
     if(!listOfDoubles.contains(key)) listOfDoubles.remove(key);
     listOfIndexes.removeAll(kData->index);
+
+    return true;
+}
+
+int DemoPlugin::pvFreeAllocatedData(knobData *kData)
+{
+    //qDebug() << "DemoPlugin:pvFreeAllocatedData";
+    if (kData->edata.info != (void *) 0) {
+        free(kData->edata.info);
+        kData->edata.info = (void*) 0;
+    }
+    if(kData->edata.dataB != (void*) 0) {
+        free(kData->edata.dataB);
+        kData->edata.dataB = (void*) 0;
+    }
 
     return true;
 }

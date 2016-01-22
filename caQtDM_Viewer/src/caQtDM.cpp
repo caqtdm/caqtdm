@@ -61,6 +61,27 @@ static void unixSignalHandler(int signum) {
 
 extern bool HTTPCONFIGURATOR;
 
+static void createMap(QMap<QString, QString> &map, const QString& option)
+{
+    //qDebug() << "treat option" << option;
+    // option of type KEY1=VALUE1,KEY2=VALUE2,KEY3=VALUE3
+    if(option != NULL) {
+        QStringList vars = option.split(",", QString::SkipEmptyParts);
+        for(int i=0; i< vars.count(); i++) {
+            int pos = vars.at(i).indexOf("=");
+            if(pos != -1) {
+                QString key = vars.at(i).mid(0, pos);
+                QString value = vars.at(i).mid(pos+1);
+                map.insert(key.trimmed(), value);
+            } else {
+                qDebug() <<"option" <<  option << "could not be parsed";
+            }
+        }
+    }
+    //qDebug() << "inserted int map from option:" << option;
+    //qDebug() << "resulting map=" << map;
+}
+
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(caQtDM);
@@ -71,6 +92,10 @@ int main(int argc, char *argv[])
     QApplication::setOrganizationName("Paul Scherrer Institut");
     QApplication::setApplicationName("caQtDM");
 
+#ifdef MOBILE_ANDROID
+    app.setStyle(QStyleFactory::create("fusion"));
+#endif
+
     // we do not want numbers with a group separators
     QLocale loc = QLocale::system();
     loc.setNumberOptions(QLocale::OmitGroupSeparator);
@@ -80,6 +105,8 @@ int main(int argc, char *argv[])
     QString macroString = "";
     QString geometry = "";
     QString macroFile = "";
+    QMap<QString, QString> options;
+    options.clear();
 
     searchFile *s = new searchFile("caQtDM_stylesheet.qss");
     QString fileNameFound = s->findFile();
@@ -141,7 +168,9 @@ int main(int argc, char *argv[])
                    "  [-dg [<width>x<height>][+<xoffset>-<yoffset>]\n"
                    "  [-httpconfig] will display a network configuration screen at startup\n"
                    "  [-print] will print file and exit\n"
-                   "  [-noResize] will prevent resizing, works only when not attaching\n"
+                   "  [-noResize] will prevent resizing\n"
+                   "  [-cs defaultcontrolsystempluginname]\n"
+                   "  [-option \"xxx=aaa,yyy=bbb, ...\"] options for cs plugins\n"
                    "  [file]\n"
                    "  [&]\n"
                    "\n"
@@ -159,9 +188,16 @@ int main(int argc, char *argv[])
             resizing = false;
         } else if(!strcmp(argv[in], "-httpconfig")) {
             HTTPCONFIGURATOR = true;
+        } else if(!strcmp(argv[in], "-cs")) {
+            in++;
+            options.insert("defaultPlugin", QString(argv[in]));
+        } else if ( strcmp (argv[in], "-option" ) == 0 ) {
+            in++;
+            printf("caQtDM -- option <%s>\n", argv[in]);
+            createMap(options, QString(argv[in]));
         } else if (strncmp (argv[in], "-" , 1) == 0) {
             /* unknown application argument */
-            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -noStyles -dg -x -print -httpconfig\n",in,argv[in]);
+            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -noStyles -dg -x -print -httpconfig -noResize\n",in,argv[in]);
         } else {
             printf("caQtDM -- file = <%s>\n", argv[in]);
             fileName = QString(argv[in]);
@@ -216,11 +252,11 @@ int main(int argc, char *argv[])
     if(displayPath.length() > 0) {
          printf("caQtDM -- files will be downloaded from <%s> when not locally found\n", qasc(displayPath));
     } else {
-        printf("caQtDM -- files will not download files when not locally found\n");
+        printf("caQtDM -- files will not be downloaded from an url when not locally found, while CAQTDM_URL_DISPLAY_PATH is not defined\n");
     }
 #endif
 
-    FileOpenWindow window (0, fileName, macroString, attach, minimize, geometry, printscreen, resizing);
+    FileOpenWindow window (0, fileName, macroString, attach, minimize, geometry, printscreen, resizing, options);
     window.setWindowIcon (QIcon(":/caQtDM.ico"));
     window.show();
     window.move(0,0);
