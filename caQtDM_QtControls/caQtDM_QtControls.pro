@@ -1,3 +1,6 @@
+TARGET_PRODUCT = "Widgets for Display Manager"
+TARGET_FILENAME = "qtcontrols.dll"
+
 include(../caQtDM_Viewer/qtdefs.pri)
 CONFIG += caQtDM_QtControls
 include(../caQtDM.pri)
@@ -31,6 +34,7 @@ TEMPLATE = lib
 MOC_DIR = moc
 INCLUDEPATH += src
 RESOURCES = qtcontrols.qrc
+RC_FILE = ./src/qtcontrols.rc
 
 PRE_TARGETDEPS += \
      moc/moc_caslider.cpp \
