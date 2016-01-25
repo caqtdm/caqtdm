@@ -5,6 +5,11 @@ QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
 
+TARGET_COMPANY = "Paul Scherrer Institut"
+TARGET_DESCRIPTION = "Channel Access Qt Display Manager"
+TARGET_COPYRIGHT = "Copyright (C) 2016 Paul Scherrer Institut"
+TARGET_INTERNALNAME = "caqtdm"
+
 # enable opengl in stripplot and cartesianplot (edo not use, experimental only, for Qt5 and qwt6.1)
 
 contains(QT_VER_MAJ, 5) {
@@ -62,6 +67,23 @@ CONFIG += PYTHONCALC
 
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
+
+# Defines for Windows file Information
+DEFINES += TARGET_PRODUCT=\"\\\"$${TARGET_PRODUCT}\\\"\"
+DEFINES += TARGET_FILENAME=\"\\\"$${TARGET_FILENAME}\\\"\"
+
+_TARGET_VERSION = $$replace(CAQTDM_VERSION, V, '')
+_TARGET_VERSION = $$split(_TARGET_VERSION, ".")
+DEFINES += TARGET_VER_MAJ=$$member(_TARGET_VERSION, 0)
+DEFINES += TARGET_VER_MIN=$$member(_TARGET_VERSION, 1)
+DEFINES += TARGET_VER_BUILD=$$member(_TARGET_VERSION, 2)
+
+DEFINES += TARGET_COMPANY=\"\\\"$${TARGET_COMPANY}\\\"\"
+DEFINES += TARGET_DESCRIPTION=\"\\\"$${TARGET_DESCRIPTION}\\\"\"
+DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
+DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
+DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
+
 
 # 4.0.2
 # new options on command line available for caQtDM: -cs for specifiying default plugin to be used, -options for passing options (key, value pairs) to plugins

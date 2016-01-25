@@ -1,3 +1,6 @@
+TARGET_PRODUCT = "Display Manager"
+TARGET_FILENAME = "caqtdm.exe"
+
 include(qtdefs.pri)
 CONFIG += caQtDM_Viewer
 include(../caQtDM.pri)

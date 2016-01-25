@@ -226,27 +226,27 @@ public:
     QString getPV_2() const {return thisPV[1].join(";");}
     void setPV_2(QString const &newPV) {thisPV[1] = newPV.split(";");}
     QStringList getPV2List() const {return thisPV[1];}
-    void setPV2List(QStringList list) {thisPV[1] = list; updatePropertyEditorItem(this, "channels_1");}
+    void setPV2List(QStringList list) {thisPV[1] = list; updatePropertyEditorItem(this, "channels_2");}
 
     QString getPV_3() const {return thisPV[2].join(";");}
     void setPV_3(QString const &newPV)  {thisPV[2] = newPV.split(";");}
     QStringList getPV3List() const {return thisPV[2];}
-    void setPV3List(QStringList list) {thisPV[2] = list; updatePropertyEditorItem(this, "channels_1");}
+    void setPV3List(QStringList list) {thisPV[2] = list; updatePropertyEditorItem(this, "channels_3");}
 
     QString getPV_4() const {return thisPV[3].join(";");}
     void setPV_4(QString const &newPV)  {thisPV[3] = newPV.split(";");}
     QStringList getPV4List() const {return thisPV[3];}
-    void setPV4List(QStringList list) {thisPV[3] = list; updatePropertyEditorItem(this, "channels_1");}
+    void setPV4List(QStringList list) {thisPV[3] = list; updatePropertyEditorItem(this, "channels_4");}
 
     QString getPV_5() const {return thisPV[4].join(";");}
     void setPV_5(QString const &newPV)  {thisPV[4] = newPV.split(";");}
     QStringList getPV5List() const {return thisPV[4];}
-    void setPV5List(QStringList list) {thisPV[4] = list; updatePropertyEditorItem(this, "channels_1");}
+    void setPV5List(QStringList list) {thisPV[4] = list; updatePropertyEditorItem(this, "channels_5");}
 
     QString getPV_6() const {return thisPV[5].join(";");}
     void setPV_6(QString const &newPV)  {thisPV[5] = newPV.split(";");}
     QStringList getPV6List() const {return thisPV[5];}
-    void setPV6List(QStringList list) {thisPV[5] = list; updatePropertyEditorItem(this, "channels_1");}
+    void setPV6List(QStringList list) {thisPV[5] = list; updatePropertyEditorItem(this, "channels_6");}
 
     QString getTriggerPV() const {return thisTriggerPV;}
     void setTriggerPV(QString const &newPV);

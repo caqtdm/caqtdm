@@ -47,6 +47,9 @@ REM ============================================================================
   set QTDM_BININSTALL=X:\qt\4.8.5\bin
   set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2010
+  set TIMESTAPER="http://timestamp.verisign.com/scripts/timstamp.dll"
+  set CAQTDM_SIGNER="Paul Scherrer Institut"
+
   
   set ZMQ=X:/Qt/ZMQ
   set ZMQINC=%ZMQ%/include
@@ -81,6 +84,9 @@ REM ============================================================================
   
   set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
+  set TIMESTAPER="http://timestamp.verisign.com/scripts/timstamp.dll"
+  set CAQTDM_SIGNER="Paul Scherrer Institut"
+
   
   set ZMQ=X:/Qt/ZMQ
   set ZMQINC=%ZMQ%/include
@@ -114,6 +120,8 @@ REM ============================================================================
   
   set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
+  set TIMESTAPER="http://timestamp.verisign.com/scripts/timstamp.dll"
+  set CAQTDM_SIGNER="Paul Scherrer Institut"
 
   set ZMQ=X:/Qt/ZMQ
   set ZMQINC=%ZMQ%/include

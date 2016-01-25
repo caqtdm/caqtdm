@@ -1415,7 +1415,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         int column = 0;
         w1->setProperty("ObjectType", caInclude_Widget);
 
-        QWidget *thisW;
+        QWidget *thisW = (QWidget *) 0;
         QUiLoader loader;
         bool prcFile = false;
 
@@ -1579,16 +1579,17 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         } // end for
 
-        // in case of row stacking adjust our include widget height
         maxColumns++;
-        maxRows++;
-        includeWidget->resize(maxColumns * thisW->width(), maxRows * thisW->height());
+        if(includeWidget->getStacking() != caInclude::RowColumn)  maxRows++;
 
-        // when the include is packed into a scroll area, set the minimumsize too
-        if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
-            Q_UNUSED(scrollWidget);
-            QWidget *contents = (QWidget*) includeWidget->parent();
-            contents->setMinimumSize(maxColumns * thisW->width(), maxRows * thisW->height());
+        if((thisW != (QWidget *) 0 ) && (!prcFile)) {
+            includeWidget->resize(maxColumns * thisW->width(), maxRows * thisW->height());
+            // when the include is packed into a scroll area, set the minimumsize too
+            if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
+                Q_UNUSED(scrollWidget);
+                QWidget *contents = (QWidget*) includeWidget->parent();
+                contents->setMinimumSize(maxColumns * thisW->width(), maxRows * thisW->height());
+            }
         }
 
         // increment splashcounter when include is in list
@@ -6289,8 +6290,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
     else if(!className.compare("QLabel")) {
         QLabel *label = (QLabel *) widget;
         className = label->parent()->metaObject()->className();
-        if(!className.contains("Numeric") ) {  // would otherwise interfere with our wheelswitch
-
+        if(!className.contains("Numeric") && !className.contains("caSpinbox")) {  // would otherwise interfere with our wheelswitch or spinbox
             QFont f = label->font();
             qreal fontSize = fontResize(factX, factY, list, 4);
             f.setPointSize(qRound(fontSize));
@@ -6652,6 +6652,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                         ledWidget->setLedHeight(qRound(height));
                         ledWidget->setLedWidth(qRound(width));
                     }
+
                     widget->setGeometry(rectnew);
                     resizeSpecials(className, widget, list, factX, factY);
                     widget->updateGeometry();
