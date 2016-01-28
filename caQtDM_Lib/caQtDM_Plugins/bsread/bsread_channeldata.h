@@ -30,7 +30,7 @@
 
 
 enum bsread_types{
-    bs_double,bs_string,bs_integer,bs_long,bs_short
+    bs_string,bs_float64,bs_float32,bs_int64,bs_int32,bs_uint64,bs_uint32,bs_int16,bs_uint16,bs_int8,bs_uint8
 };
 
 enum bsread_endian{

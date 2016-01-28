@@ -27,7 +27,7 @@
 bsread_channeldata::bsread_channeldata(QObject *parent) : QObject(parent)
 {
     name="";
-    type=bs_double;
+    type=bs_float64;
     shape.append(1);
     offset=0;
     modulo=1;

@@ -142,10 +142,12 @@ void bsread_Decode::process()
                     bsread_Delay();
                 }
                 if (zmq_errno()==EAGAIN){
-                    //bsread_Delay();
+                    bsread_Delay();
                     notReceivedCounter++;
-                    if (notReceivedCounter>20){
+                    if (notReceivedCounter>200){
+                       qDebug() << "bsread ZMQ Data Timeout";
                         bsread_DataTimeOut();
+                        notReceivedCounter=0;
                     }
                 }
 
@@ -227,7 +229,7 @@ void bsread_Decode::setHeader(char *value,size_t size){
     ChannelSearch.clear();
     //Header Channel
     bsread_InitHeaderChannels();
-
+    qDebug() << "Integer :" << ChannelHeader.toStdString().c_str();
     try{
         HeaderMessageJ = JSON::Parse(ChannelHeader.toStdString().c_str());
     }
@@ -255,16 +257,27 @@ void bsread_Decode::setHeader(char *value,size_t size){
                     if (jsonobj3.find(L"type") != jsonobj3.end() && jsonobj3[L"type"]->IsString()) {
 
                         QString value=QString::fromWCharArray(jsonobj3[L"type"]->AsString().c_str());
-                        if (value=="double"){
-                            chdata->type=bs_double;
+
+                        if (value=="float64"){
+                            chdata->type=bs_float64;
+                        }else if(value=="float32"){
+                            chdata->type=bs_float32;
+                        }else if(value=="int64"){
+                            chdata->type=bs_int64;
+                        }else if(value=="int32"){
+                            chdata->type=bs_int32;
+                        }else if(value=="uint64"){
+                            chdata->type=bs_uint64;
+                        }else if(value=="uint32"){
+                            chdata->type=bs_uint32;
+                        }else if(value=="int16"){
+                            chdata->type=bs_int16;
+                        }else if(value=="int8"){
+                            chdata->type=bs_int8;
+                        }else if(value=="uint8"){
+                            chdata->type=bs_uint8;
                         }else if(value=="string"){
                             chdata->type=bs_string;
-                        }else if(value=="integer"){
-                            chdata->type=bs_integer;
-                        }else if(value=="long"){
-                            chdata->type=bs_long;
-                        }else if(value=="short"){
-                            chdata->type=bs_short;
                         }
 
 
@@ -325,29 +338,62 @@ void bsread_Decode::setHeader(char *value,size_t size){
 
 void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message,size_t size){
 
+
     switch(Data->shape.count()){
     case 0:{
         switch (Data->type){
-            case bs_double:{
+            case bs_float64:{
                 Data->bsdata.bs_double=*(double*) message;
+                break;
             }
+            case bs_float32:{
+                Data->bsdata.bs_double=*(float*) message;
+                break;
+            }
+            case bs_int64:{
+                Data->bsdata.bs_long=*(qint64*) message;
+                break;
+            }
+            case bs_int32:{
+                Data->bsdata.bs_long=*(qint32*) message;
+                break;
+            }
+            case bs_uint64:{
+                Data->bsdata.bs_long=*(quint64*) message;
+                break;
+            }
+            case bs_uint32:{
+                Data->bsdata.bs_long=*(quint32*) message;
+                break;
+            }
+            case bs_int16:{
+                Data->bsdata.bs_integer=*(qint16*) message;
+                break;
+            }
+
+            case bs_uint16:{
+                Data->bsdata.bs_integer=*(quint16*) message;
+                break;
+            }
+            case bs_int8:{
+                Data->bsdata.bs_short=*(qint8*) message;
+                break;
+            }
+            case bs_uint8:{
+                Data->bsdata.bs_short=*(quint8*) message;
+                break;
+            }
+
             case bs_string:{
                 Data->bsdata.bs_string=QString((char*)message);
                 break;
             }
-            case bs_integer:{
-                Data->bsdata.bs_integer=*(int*) message;
-                break;
-            }
-            case bs_long:{
-                Data->bsdata.bs_long=*(long*) message;
-                break;
-            }
-            case bs_short:{
-                Data->bsdata.bs_short=*(short*) message;
-                break;
-            }
         }
+
+
+
+
+
 
         break;
     }
@@ -356,23 +402,51 @@ void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message,size_t
         //qDebug()<< "Datasize:" << datasize << "ZMQ Size:" << size <<" "<<Data->name ;
         if (datasize==1){
             switch (Data->type){
-                case bs_double:{
+                case bs_float64:{
                     Data->bsdata.bs_double=*(double*) message;
+                    break;
                 }
+                case bs_float32:{
+                    Data->bsdata.bs_double=*(float*) message;
+                    break;
+                }
+                case bs_int64:{
+                    Data->bsdata.bs_long=*(qint64*) message;
+                    break;
+                }
+                case bs_int32:{
+                    Data->bsdata.bs_long=*(qint32*) message;
+                    break;
+                }
+                case bs_uint64:{
+                    Data->bsdata.bs_long=*(quint64*) message;
+                    //qDebug() << "Integer :"<< Data->bsdata.bs_long;
+                    break;
+                }
+                case bs_uint32:{
+                    Data->bsdata.bs_long=*(quint32*) message;
+                    break;
+                }
+                case bs_int16:{
+                    Data->bsdata.bs_integer=*(qint16*) message;
+                    break;
+                }
+
+                case bs_uint16:{
+                    Data->bsdata.bs_integer=*(quint16*) message;
+                    break;
+                }
+                case bs_int8:{
+                    Data->bsdata.bs_short=*(qint8*) message;
+                    break;
+                }
+                case bs_uint8:{
+                    Data->bsdata.bs_short=*(quint8*) message;
+                    break;
+                }
+
                 case bs_string:{
                     Data->bsdata.bs_string=QString((char*)message);
-                    break;
-                }
-                case bs_integer:{
-                    Data->bsdata.bs_integer=*(int*) message;
-                    break;
-                }
-                case bs_long:{
-                    Data->bsdata.bs_long=*(long*) message;
-                    break;
-                }
-                case bs_short:{
-                    Data->bsdata.bs_short=*(short*) message;
                     break;
                 }
             }
@@ -380,22 +454,51 @@ void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message,size_t
             if (datasize>0){
                 int datatypesize;
                 switch (Data->type){
-                case bs_double:{
-                    datatypesize=sizeof(double);
-                    break;
-                }
-                case bs_integer:{
-                    datatypesize=sizeof(int);
-                    break;
-                }
-                case bs_long:{
-                    datatypesize=sizeof(long);
-                    break;
-                }
-                case bs_short:{
-                    datatypesize=sizeof(short);
-                    break;
-                }
+                    case bs_float64:{
+                        datatypesize=sizeof(double);
+                        break;
+                    }
+                    case bs_float32:{
+                        datatypesize=sizeof(float);
+                        break;
+                    }
+                    case bs_int64:{
+                        datatypesize=sizeof(qint64);
+                        break;
+                    }
+                    case bs_uint64:{
+                        datatypesize=sizeof(quint64);
+                        break;
+                    }
+                    case bs_int32:{
+                        datatypesize=sizeof(qint32);
+                        break;
+                    }
+                    case bs_uint32:{
+                        datatypesize=sizeof(quint32);
+                        break;
+                    }
+                    case bs_int16:{
+                        datatypesize=sizeof(qint16);
+                        break;
+                    }
+                    case bs_uint16:{
+                        datatypesize=sizeof(quint16);
+                        break;
+                    }
+                    case bs_int8:{
+                        datatypesize=sizeof(qint8);
+                        break;
+                    }
+                    case bs_uint8:{
+                        datatypesize=sizeof(quint8);
+                        break;
+                    }
+                    case bs_string:{
+                        Data->bsdata.bs_string=QString((char*)message);
+                        break;
+                    }
+
                 }
 
                 if(Data->bsdata.wf_data_size!=(datasize*datatypesize)){
@@ -455,7 +558,7 @@ void bsread_Decode::bsread_InitHeaderChannels()
 
     chdata=new bsread_channeldata();
     Channels.append(chdata);
-    chdata->type=bs_double;
+    chdata->type=bs_float64;
     chdata->name="pulse_id";
     ChannelSearch.insert(chdata->name, chdata);
 
@@ -467,13 +570,13 @@ void bsread_Decode::bsread_InitHeaderChannels()
 
     chdata=new bsread_channeldata();
     Channels.append(chdata);
-    chdata->type=bs_double;
+    chdata->type=bs_float64;
     chdata->name="global_timestamp_epoch";
     ChannelSearch.insert(chdata->name, chdata);
 
     chdata=new bsread_channeldata();
     Channels.append(chdata);
-    chdata->type=bs_double;
+    chdata->type=bs_float64;
     chdata->name="global_timestamp_ns";
     ChannelSearch.insert(chdata->name, chdata);
 
@@ -520,10 +623,12 @@ void bsread_Decode::bsread_EndofData()
                     break;//?????
                 }
                 // update some data
+                // bs_string,bs_float64,bs_float32,bs_int64,bs_int32,bs_uint64,bs_uint32,bs_int16,bs_uint16,bs_int8,bs_uint8
 
                 if (bsreadPV){
                     switch (bsreadPV->type){
-                    case bs_double:{
+                    case bs_float64:
+                    case bs_float32:{
                         if(bsreadPV->bsdata.wf_data_size!=0){
 
                             if (kData->edata.dataSize!=bsreadPV->bsdata.wf_data_size){
@@ -575,19 +680,29 @@ void bsread_Decode::bsread_EndofData()
                         kData->edata.connected = true;
                         break;
                     }
-                    case bs_integer:{
-                        kData->edata.ivalue=bsreadPV->bsdata.bs_integer;
-                        kData->edata.fieldtype = caINT;
-                        kData->edata.connected = true;
-                        break;
-                    }
-                    case bs_long:{
+                    case bs_int64:
+                    case bs_int32:{
                         kData->edata.ivalue=bsreadPV->bsdata.bs_long;
                         kData->edata.fieldtype = caLONG;
                         kData->edata.connected = true;
                         break;
                     }
-                    case bs_short:{
+                    case bs_uint64:
+                    case bs_uint32:{
+                        kData->edata.ivalue=bsreadPV->bsdata.bs_long;
+                        kData->edata.fieldtype = caLONG;
+                        kData->edata.connected = true;
+                        break;
+                    }
+                    case bs_int16:
+                    case bs_uint16:{
+                        kData->edata.ivalue=bsreadPV->bsdata.bs_integer;
+                        kData->edata.fieldtype = caINT;
+                        kData->edata.connected = true;
+                        break;
+                    }
+                    case bs_int8:
+                    case bs_uint8:{
 
                         kData->edata.ivalue=bsreadPV->bsdata.bs_short;
                         kData->edata.fieldtype = caINT;
