@@ -90,16 +90,16 @@ void bsread_dispatchercontrol::process()
 
 
         if(Channels.count()!=requestedchannels){
-            QString data="{\"channel:\"[";
+            QString data="{\"channels\":[";
             QMutexLocker lock(&ChannelLocker);
             QSet<QString> keys=QSet<QString>::fromList(Channels.keys());
             foreach( QString key,keys){
                 data.append("{\"name\":\"");
                 data.append(key);
-                data.append("\",\"modulo\":1,\"offset\":0}");
+                data.append("\",\"modulo\":1,\"offset\":0},");
             }
-
-            data.append("]},\"sendIncompleteMessages\":true,}");
+            data.remove(data.length()-1,1);
+            data.append("],\"sendIncompleteMessages\":true,\"compression\":\"none\"}");
 
             QByteArray transferdata;
             transferdata.append(data);
