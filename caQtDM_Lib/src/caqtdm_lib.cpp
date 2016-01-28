@@ -3332,18 +3332,45 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
                 if(colorMode == caLineEdit::Static || colorMode == caLineEdit::Default) { // done at initialisation
                     if(!lineeditWidget->property("Connect").value<bool>()) {                      // but was disconnected before
-                        lineeditWidget->setAlarmColors(data.edata.severity, data.edata.rvalue, bg, fg);
+                        switch (data.edata.fieldtype){
+                            case caINT:
+                            case caLONG:{
+                                lineeditWidget->setAlarmColors(data.edata.severity, data.edata.ivalue, bg, fg);
+                                break;
+                            }
+                            default:{
+                                lineeditWidget->setAlarmColors(data.edata.severity, data.edata.rvalue, bg, fg);
+                            }
+                        }
                         lineeditWidget->setProperty("Connect", true);
                     }
                 } else {
-                    lineeditWidget->setAlarmColors(data.edata.severity, data.edata.rvalue, bg, fg);
+                    switch (data.edata.fieldtype){
+                        case caINT:
+                        case caLONG:{
+                            lineeditWidget->setAlarmColors(data.edata.severity, data.edata.ivalue, bg, fg);
+                            break;
+                        }
+                        default:{
+                            lineeditWidget->setAlarmColors(data.edata.severity, data.edata.rvalue, bg, fg);
+                        }
+                    }
                 }
 
                 if((precMode != caLineEdit::User) && (data.edata.initialize)) {
                     lineeditWidget->setFormat(data.edata.precision);
                 }
+                switch (data.edata.fieldtype){
+                    case caINT:
+                    case caLONG:{
+                        lineeditWidget->setValue(data.edata.ivalue, units);
+                        break;
+                    }
+                    default:{
+                        lineeditWidget->setValue(data.edata.rvalue, units);
+                    }
+                }
 
-                lineeditWidget->setValue(data.edata.rvalue, units);
                 // access control for textentry
                 if (caTextEntry *textentryWidget = qobject_cast<caTextEntry *>(w)) {
                     textentryWidget->setAccessW((bool)data.edata.accessW);
