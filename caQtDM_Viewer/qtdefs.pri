@@ -26,7 +26,7 @@ unix {
 # when the designer in 4.8.2 is patched in order to display tooltip description or
 # when the qt version is higher then 5.5.0 then compile the plugins with description texts
 # be carefull with this, while when the designer does not recognize tooltip description, the widgets will not be shown
-#DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
+@DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
 contains(QT_VER_MAJ, 5) {
   greaterThan(QT_MINOR_VERSION, 5) {
     DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS 
@@ -86,6 +86,9 @@ DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
 
 # 4.0.2
+# caQtDM can now be told to load a specific stylesheet file by the option -stylefile filename
+# option -noResize has been implemented now
+# capolyline initialisation was missing for proper resize
 # new options on command line available for caQtDM: -cs for specifiying default plugin to be used, -options for passing options (key, value pairs) to plugins
 # use now the QStringlList editor in Designer for semicolumn separated strings
 # mobile handling of config files slightly modified
