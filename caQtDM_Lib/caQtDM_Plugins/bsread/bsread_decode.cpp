@@ -25,6 +25,9 @@
 #include <QThread>
 #include <QDebug>
 #include <QAtomicInt>
+#include <QBuffer>
+#include <QByteArray>
+#include <QDataStream>
 #include "zmq.h"
 #include <exception>
 #include "bsread_decode.h"
@@ -649,6 +652,43 @@ void bsread_Decode::bsread_TransferHeaderData()
     }
 }
 
+
+void bsread_Decode::WaveformManagment(knobData* kData,bsread_channeldata * bsreadPV,int typesize){
+    if (kData->edata.dataSize!=bsreadPV->bsdata.wf_data_size){
+        QMutex *datamutex;
+        datamutex = (QMutex*) kData->mutex;
+        datamutex->lock();
+        if (kData->edata.dataB==NULL){
+            free(kData->edata.dataB);
+        }
+
+        kData->edata.dataB=malloc(bsreadPV->bsdata.wf_data_size);
+        kData->edata.dataSize=bsreadPV->bsdata.wf_data_size;
+        datamutex->unlock();
+    }
+
+
+    //memcpy(kData->edata.dataB,bsreadPV->bsdata.wf_data,bsreadPV->bsdata.wf_data_size);
+
+    QByteArray data = QByteArray::fromRawData((const char *)bsreadPV->bsdata.wf_data, bsreadPV->bsdata.wf_data_size);
+    QDataStream stream(data);
+    QVector<double> data_double;
+    stream.setByteOrder(QDataStream::LittleEndian);
+    while ( !stream.atEnd() ) {
+     double temp;
+     stream >> temp;
+     data_double.append(temp);
+    }
+
+
+    memcpy(kData->edata.dataB,data_double.data(),data_double.count()*sizeof(double));
+
+
+    kData->edata.valueCount=bsreadPV->bsdata.wf_data_size/typesize;
+}
+
+
+
 void bsread_Decode::bsread_EndofData()
 {
     QMutexLocker locker(&mutex);
@@ -677,52 +717,22 @@ void bsread_Decode::bsread_EndofData()
                 if (bsreadPV){
                     switch (bsreadPV->type){
                     case bs_float64:{
+                        kData->edata.fieldtype = caDOUBLE;
                         if(bsreadPV->bsdata.wf_data_size!=0){
-
-                            if (kData->edata.dataSize!=bsreadPV->bsdata.wf_data_size){
-                                QMutex *datamutex;
-                                datamutex = (QMutex*) kData->mutex;
-                                datamutex->lock();
-                                if (kData->edata.dataB==NULL){
-                                    free(kData->edata.dataB);
-                                }
-
-                                kData->edata.dataB=malloc(bsreadPV->bsdata.wf_data_size);
-                                kData->edata.dataSize=bsreadPV->bsdata.wf_data_size;
-                                datamutex->unlock();
-                            }
-                            memcpy(kData->edata.dataB,bsreadPV->bsdata.wf_data,bsreadPV->bsdata.wf_data_size);
-                            kData->edata.valueCount=bsreadPV->bsdata.wf_data_size/sizeof(double);
-
+                             WaveformManagment(kData,bsreadPV,sizeof(double));
                         }else{
                             kData->edata.rvalue=bsreadPV->bsdata.bs_float64;
                         }
-                        kData->edata.fieldtype = caDOUBLE;
                         kData->edata.connected = true;
                         break;
                     }
                     case bs_float32:{
+                        kData->edata.fieldtype = caDOUBLE;
                         if(bsreadPV->bsdata.wf_data_size!=0){
-
-                            if (kData->edata.dataSize!=bsreadPV->bsdata.wf_data_size){
-                                QMutex *datamutex;
-                                datamutex = (QMutex*) kData->mutex;
-                                datamutex->lock();
-                                if (kData->edata.dataB==NULL){
-                                    free(kData->edata.dataB);
-                                }
-
-                                kData->edata.dataB=malloc(bsreadPV->bsdata.wf_data_size);
-                                kData->edata.dataSize=bsreadPV->bsdata.wf_data_size;
-                                datamutex->unlock();
-                            }
-                            memcpy(kData->edata.dataB,bsreadPV->bsdata.wf_data,bsreadPV->bsdata.wf_data_size);
-                            kData->edata.valueCount=bsreadPV->bsdata.wf_data_size/sizeof(float);
-
+                            WaveformManagment(kData,bsreadPV,sizeof(float));
                         }else{
                             kData->edata.rvalue=bsreadPV->bsdata.bs_float32;
                         }
-                        kData->edata.fieldtype = caDOUBLE;
                         kData->edata.connected = true;
                         break;
                     }
@@ -773,8 +783,12 @@ void bsread_Decode::bsread_EndofData()
                         break;
                     }
                     case bs_int16:{
-                        kData->edata.ivalue=bsreadPV->bsdata.bs_int16;
                         kData->edata.fieldtype = caINT;
+                        if(bsreadPV->bsdata.wf_data_size!=0){
+                            WaveformManagment(kData,bsreadPV,sizeof(quint16));
+                        }else{
+                            kData->edata.ivalue=bsreadPV->bsdata.bs_int16;
+                        }
                         kData->edata.connected = true;
                         break;
                     }
@@ -791,8 +805,14 @@ void bsread_Decode::bsread_EndofData()
                         break;
                     }
                     case bs_uint8:{
-                        kData->edata.ivalue=bsreadPV->bsdata.bs_uint8;
+
                         kData->edata.fieldtype = caINT;
+                        if(bsreadPV->bsdata.wf_data_size!=0){
+                            WaveformManagment(kData,bsreadPV,sizeof(quint8));
+                        }else{
+                            kData->edata.ivalue=bsreadPV->bsdata.bs_uint8;
+                        }
+
                         kData->edata.connected = true;
                         break;
                     }
