@@ -97,19 +97,28 @@
      void onApplicationStateChange(Qt::ApplicationState state);
 #endif
 
- public slots:
-     void doSomething() { printf("About to quit!\n"); sharedMemory.detach();}
+public slots:
+     void doSomething() {
+         printf("About to quit!\n");
+#ifdef linux
+         // remove temporary file created by caQtDM for pipe reading
+         if(lastFile.contains("qt_temp")) {
+             QFile::remove(lastFile);
+         }
+#endif
+         sharedMemory.detach();
+     }
      void nextWindow();
      void Callback_IosExit();
 
- protected:
+protected:
      virtual void timerEvent(QTimerEvent *e);
      Qt::GestureType fingerSwipeGestureType;
 
 signals:
    void messageAvailable(QString message);
 
- private:
+private:
 
      void closeEvent(QCloseEvent* ce);
      void FlushAllInterfaces();

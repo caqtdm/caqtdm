@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V4.0.2
+CAQTDM_VERSION = V4.0.3
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -84,8 +84,14 @@ DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
+# 4.0.3
+# it is now possible to pipe ui data to caQtDM
+
 
 # 4.0.2
+# caQtDM can now be told to load a specific stylesheet file by the option -stylefile filename
+# option -noResize has been implemented now
+# capolyline initialisation was missing for proper resize
 # new options on command line available for caQtDM: -cs for specifiying default plugin to be used, -options for passing options (key, value pairs) to plugins
 # use now the QStringlList editor in Designer for semicolumn separated strings
 # mobile handling of config files slightly modified

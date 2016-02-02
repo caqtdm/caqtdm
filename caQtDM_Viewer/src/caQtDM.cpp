@@ -37,6 +37,8 @@
 #include <QFileDialog>
 #include <QLocale>
 #include <signal.h>
+#include <iostream>
+#include "pipereader.h"
 
 #if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
 #include <QApplication>
@@ -101,6 +103,7 @@ int main(int argc, char *argv[])
     loc.setNumberOptions(QLocale::OmitGroupSeparator);
     loc.setDefault(loc);
 
+    QString fileNameStylesheet = "";
     QString fileName = "";
     QString macroString = "";
     QString geometry = "";
@@ -124,12 +127,11 @@ int main(int argc, char *argv[])
     int	in, numargs;
     bool attach = false;
     bool minimize= false;
-    bool nostyles = false;
     bool printscreen = false;
     bool resizing = true;
 
     for (numargs = argc, in = 1; in < numargs; in++) {
-        //qDebug() << argv[in];
+        qDebug() << argv[in];
         if ( strcmp (argv[in], "-display" ) == 0 ) {
             in++;
             printf("caQtDM -- display <%s>\n", argv[in]);
@@ -147,9 +149,10 @@ int main(int argc, char *argv[])
             in++;
             printf("caQtDM -- will load macro string from file <%s>\n", argv[in]);
             macroFile = QString(argv[in]);
-        } else if ( strcmp (argv[in], "-noStyles" ) == 0 ) {
-            printf("caQtDM -- will not replace the default application stylesheet caQtDM_stylesheet.qss\n");
-            nostyles = true;
+        } else if ( strcmp (argv[in], "-stylefile" ) == 0 ) {
+            in++;
+            printf("caQtDM -- will replace the default stylesheet with stylesheet <%s>\n", argv[in]);
+            fileNameStylesheet = QString(argv[in]);
         } else if ( strcmp (argv[in], "-x" ) == 0 ) {
 
         } else if ( strcmp (argv[in], "-displayFont" ) == 0 ) {
@@ -162,7 +165,7 @@ int main(int argc, char *argv[])
                    "  [-x]\n"
                    "  [-attach]\n"
                    "  [-noMsg]\n"
-                   "  [-noStyles]      works only when not attaching\n"
+                   "  [-stylefile filename] will replace the default stylesheet with the specified file (works only when not attaching)\n"
                    "  [-macro \"xxx=aaa,yyy=bbb, ...\"]\n"
                    "  [-macrodefs filename] will load macro definitions from file\n"
                    "  [-dg [<width>x<height>][+<xoffset>-<yoffset>]\n"
@@ -174,7 +177,8 @@ int main(int argc, char *argv[])
                    "  [file]\n"
                    "  [&]\n"
                    "\n"
-                   "  -x -displayFont -display are ignored !\n\n");
+                   "  -x -displayFont -display are ignored !\n\n"
+                   "  on linux plattforms, ui data can be piped to caQtDM, but then -httpconfig & -attach will not work\n\n");
                  exit(1);
         } else if((!strcmp(argv[in],"-displayGeometry")) || (!strcmp(argv[in],"-dg"))) {
             // [-dg [xpos[xypos]][+xoffset[+yoffset]]
@@ -197,7 +201,7 @@ int main(int argc, char *argv[])
             createMap(options, QString(argv[in]));
         } else if (strncmp (argv[in], "-" , 1) == 0) {
             /* unknown application argument */
-            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -noStyles -dg -x -print -httpconfig -noResize\n",in,argv[in]);
+            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -stylefile -dg -x -print -httpconfig -noResize\n",in,argv[in]);
         } else {
             printf("caQtDM -- file = <%s>\n", argv[in]);
             fileName = QString(argv[in]);
@@ -205,13 +209,34 @@ int main(int argc, char *argv[])
         }
     }
 
+    // get data from pipe if any (ui data can be piped to this application, for linux at this time)
+    // only when no file is given, attaching is not allowed, in order to get rid of the temporary file when exit
+#ifdef linux
+    if(fileName.length() <= 0) {
+
+        QEventLoop *loop = new QEventLoop();
+        PipeReader *reader = new PipeReader(loop);
+        loop->exec();
+
+        QString newFilename = reader->getTemporaryFilename();
+        if(newFilename.size() > 0) {
+            fileName = newFilename;
+            attach = false;
+            HTTPCONFIGURATOR = false;
+        }
+        delete reader;
+        delete loop;
+        //qDebug() << "use now file" << fileName;
+    }
+#endif
+
     // must be always true for mobile plattforms
 #ifdef MOBILE
      HTTPCONFIGURATOR = true;
 #endif
 
-    if(!nostyles) {
-        s = new searchFile("stylesheet.qss");
+     if(fileNameStylesheet.length() > 0) {
+        s = new searchFile(fileNameStylesheet);
         fileNameFound = s->findFile();
         if(fileNameFound.isNull()) {
             printf("caQtDM -- file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", qasc(s->displayPath()));
@@ -219,7 +244,7 @@ int main(int argc, char *argv[])
             QFile file(fileNameFound);
             file.open(QFile::ReadOnly);
             QString StyleSheet = QLatin1String(file.readAll());
-            printf("caQtDM -- file <stylesheet.qss> replaced the default stylesheet\n");
+            printf("caQtDM -- file <%s> replaced the default stylesheet\n", qasc(fileNameStylesheet));
             app.setStyleSheet(StyleSheet);
             file.close();
         }
