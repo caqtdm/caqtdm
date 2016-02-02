@@ -105,6 +105,7 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
 
 
         Dispatcher.set_Dispatcher(&DispacherConfig);
+        Dispatcher.setMessagewindow(messagewindowP);
         Dispatcher.setZmqcontex(zmqcontex);
         Dispatcher.setMutexknobdataP(data);
         Dispatcher.moveToThread(&DispatcherThread);

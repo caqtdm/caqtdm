@@ -56,6 +56,7 @@ public:
     bool bsread_DataMonitorConnection(knobData *kData);
     bool bsread_DataMonitorUnConnect(knobData *kData);
     void setTerminate();
+    void bsread_createConnection(int rc);
 public slots:
     void process();
 signals:
@@ -74,6 +75,7 @@ private:
     long global_timestamp_ns;
     double pulse_id;
     QString main_htype;
+    QString main_reconnect_adress;
     QString data_htype;
     QString hash;
     QString ChannelHeader;

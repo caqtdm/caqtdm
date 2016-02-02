@@ -63,6 +63,8 @@ public:
 
     void setTerminate();
 
+    void setMessagewindow(MessageWindow *value);
+
 signals:
     //void requestFinished();
     void finished();
@@ -73,6 +75,7 @@ public slots:
 protected:
 
   QString Dispatcher;
+  MessageWindow *messagewindowP;
   bool terminate;
   QList<QString> streams;
   QMultiMap<QString,int> Channels;

@@ -27,21 +27,28 @@
 
 #include <QObject>
 #include <QList>
-
+#include <QAtomicInt>
 
 enum bsread_types{
-    bs_string,bs_float64,bs_float32,bs_int64,bs_int32,bs_uint64,bs_uint32,bs_int16,bs_uint16,bs_int8,bs_uint8
+    bs_string,bs_float64,bs_float32,bs_int64,bs_int32,bs_uint64,bs_uint32,bs_int16,bs_uint16,bs_int8,bs_uint8,bs_bool
 };
 
 enum bsread_endian{
     bs_little,bs_big
 };
 typedef struct _bs_data{
-   double bs_double;
    QString bs_string;
-   int bs_integer;
-   long bs_long;
-   short bs_short;
+   double bs_float64;
+   float bs_float32;
+   qint64 bs_int64;
+   qint32 bs_int32;
+   quint64 bs_uint64;
+   quint32 bs_uint32;
+   qint16 bs_int16;
+   quint16 bs_uint16;
+   qint8 bs_int8;
+   quint8 bs_uint8;
+   bool bs_bool;
    ulong wf_data_size;
    void* wf_data;
 }bs_data;

@@ -28,6 +28,7 @@
 #include "JSON.h"
 #include "JSONValue.h"
 
+
 bsread_dispatchercontrol::bsread_dispatchercontrol()
 {
 
@@ -44,7 +45,10 @@ void bsread_dispatchercontrol::process()
     QEventLoop loop;
     int requestedchannels=0;
     terminate=false;
+    QString msg="bsread Dispatcher started: ";
+    msg.append(Dispatcher);
 
+    messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
 
     //Update and reconection handling
     while (!terminate){
@@ -119,11 +123,19 @@ void bsread_dispatchercontrol::process()
 
 
     }
+    msg="bsread Dispatcher finished";
+
+    messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
     emit finished();
 
 
 
 }
+void bsread_dispatchercontrol::setMessagewindow(MessageWindow *value)
+{
+    messagewindowP = value;
+}
+
 
 void bsread_dispatchercontrol::setTerminate()
 {
