@@ -2730,7 +2730,16 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                     // when connected
                     int j = IndexList.at(i+1).toInt(); // input a,b,c,d
                     if(ptr->edata.connected) {
-                        valueArray[j] = ptr->edata.rvalue;
+                        switch (ptr->edata.fieldtype){
+                            case caINT:
+                            case caLONG:{
+                                valueArray[j] = ptr->edata.ivalue;
+                                break;
+                            }
+                            default:{
+                                valueArray[j] = ptr->edata.rvalue;
+                            }
+                        }
                     } else {
                         valueArray[j] = 0.0;
                     }
@@ -2952,7 +2961,17 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
     // calc ==================================================================================================================
     if(caCalc *calcWidget = qobject_cast<caCalc *>(w)) {
         bool valid;
-        double result = data.edata.rvalue;
+        double result;
+        switch (data.edata.fieldtype){
+            case caINT:
+            case caLONG:{
+                result = data.edata.ivalue;
+                break;
+            }
+            default:{
+                result = data.edata.rvalue;
+            }
+        }
         //qDebug() << "we have a caCalc" << calcWidget->getVariable() << "  " <<  data.pv;
 
         CalcVisibility(w, result, valid);  // visibility not used, but calculation yes
