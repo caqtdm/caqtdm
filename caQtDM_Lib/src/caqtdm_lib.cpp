@@ -3746,7 +3746,17 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 stripplotWidget->resize(stripplotWidget->geometry().width()-1, stripplotWidget->geometry().height());
             }
 
-            stripplotWidget->setData(data.edata.actTime, data.edata.rvalue, actPlot);
+
+            switch (data.edata.fieldtype){
+                case caINT:
+                case caLONG:{
+                    stripplotWidget->setData(data.edata.actTime, data.edata.ivalue, actPlot);
+                    break;
+                }
+                default:{
+                    stripplotWidget->setData(data.edata.actTime, data.edata.rvalue, actPlot);
+                }
+            }
 
             if(data.edata.initialize) {
                 stripplotWidget->startPlot();
