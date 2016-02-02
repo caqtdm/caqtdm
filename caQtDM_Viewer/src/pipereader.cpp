@@ -28,8 +28,8 @@
 PipeReader::PipeReader(QEventLoop *loop, QObject *parent) : QObject(parent)
 {
     evLoop = loop;
-    stdin = new QFile();
-    stdin->open(0,QIODevice::ReadOnly);
+    std_in = new QFile();
+    std_in->open(0,QIODevice::ReadOnly);
     notifier = new QSocketNotifier(0, QSocketNotifier::Read);
     connect(notifier,SIGNAL(activated(int)),this,SLOT(DataReadyOnStdin()));
 
@@ -56,8 +56,8 @@ void PipeReader:: Quit()
 void PipeReader::DataReadyOnStdin() {
 
     timer->stop();
-    QByteArray newData = stdin->readAll();
-    stdin->close();
+    QByteArray newData = std_in->readAll();
+    std_in->close();
     //qDebug() << data << data.size();
     if(newData.size() == 0) {
 

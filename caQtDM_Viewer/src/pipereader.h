@@ -46,7 +46,7 @@ public:
 
 private:
     QByteArray data;
-    QFile* stdin;
+    QFile* std_in;
     QSocketNotifier* notifier;
     QTimer *timer;
     QEventLoop *evLoop;
