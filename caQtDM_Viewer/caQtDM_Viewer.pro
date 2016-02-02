@@ -37,12 +37,14 @@ SOURCES +=\
     caQtDM.cpp \
     fileopenwindow.cpp \
     messagebox.cpp \
-    configDialog.cpp
+    configDialog.cpp \
+    pipereader.cpp
 
 HEADERS  +=  \
     messagebox.h \
     fileopenwindow.h \
-    configDialog.h
+    configDialog.h \
+    pipereader.h
 
 FORMS += main.ui
 

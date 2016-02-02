@@ -37,6 +37,8 @@
 #include <QFileDialog>
 #include <QLocale>
 #include <signal.h>
+#include <iostream>
+#include "pipereader.h"
 
 #if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
 #include <QApplication>
@@ -129,7 +131,7 @@ int main(int argc, char *argv[])
     bool resizing = true;
 
     for (numargs = argc, in = 1; in < numargs; in++) {
-        //qDebug() << argv[in];
+        qDebug() << argv[in];
         if ( strcmp (argv[in], "-display" ) == 0 ) {
             in++;
             printf("caQtDM -- display <%s>\n", argv[in]);
@@ -175,7 +177,8 @@ int main(int argc, char *argv[])
                    "  [file]\n"
                    "  [&]\n"
                    "\n"
-                   "  -x -displayFont -display are ignored !\n\n");
+                   "  -x -displayFont -display are ignored !\n\n"
+                   "  on linux plattforms, ui data can be piped to caQtDM, but then -httpconfig & -attach will not work\n\n");
                  exit(1);
         } else if((!strcmp(argv[in],"-displayGeometry")) || (!strcmp(argv[in],"-dg"))) {
             // [-dg [xpos[xypos]][+xoffset[+yoffset]]
@@ -205,6 +208,27 @@ int main(int argc, char *argv[])
             break;
         }
     }
+
+    // get data from pipe if any (ui data can be piped to this application, for linux at this time)
+    // only when no file is given, attaching is not allowed, in order to get rid of the temporary file when exit
+#ifdef linux
+    if(fileName.length() <= 0) {
+
+        QEventLoop *loop = new QEventLoop();
+        PipeReader *reader = new PipeReader(loop);
+        loop->exec();
+
+        QString newFilename = reader->getTemporaryFilename();
+        if(newFilename.size() > 0) {
+            fileName = newFilename;
+            attach = false;
+            HTTPCONFIGURATOR = false;
+        }
+        delete reader;
+        delete loop;
+        //qDebug() << "use now file" << fileName;
+    }
+#endif
 
     // must be always true for mobile plattforms
 #ifdef MOBILE
