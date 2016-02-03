@@ -34,6 +34,7 @@
 #include <QEventLoop>
 #include <QTemporaryFile>
 #include <QDebug>
+#include <QDir>
 
 class PipeReader : public QObject
 {
