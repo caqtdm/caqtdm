@@ -98,6 +98,8 @@ private:
     void bsread_Delay();
     void bsread_SetData(bsread_channeldata *Data, void *message, size_t size);
     void WaveformManagment(knobData *kData, bsread_channeldata *bsreadPV);
+    void bsdata_assign_single(void *message, bsread_channeldata* Data);
+    void bsdata_assign_single(bsread_channeldata* Data, void *message, int *datatypesize);
 };
 
 #endif // BSREAD_DECODE_H

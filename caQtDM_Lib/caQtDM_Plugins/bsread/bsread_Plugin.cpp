@@ -91,7 +91,6 @@ void bsreadPlugin::updateValues()
 int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow,QMap<QString, QString> options)
 {
     int i;
-    int rc;
 
     qDebug() << "bsreadPlugin: InitCommunicationLayer" << data;
     mutexknobdataP = data;

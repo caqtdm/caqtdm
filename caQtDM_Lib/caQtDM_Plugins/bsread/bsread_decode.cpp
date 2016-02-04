@@ -374,183 +374,92 @@ void bsread_Decode::setHeader(char *value,size_t size){
     }
 }
 
-void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message,size_t size){
-
-
-    switch(Data->shape.count()){
-    case 0:{
-        switch (Data->type){
-            case bs_float64:{
-                Data->bsdata.bs_float64=*(double*) message;
-                break;
-            }
-            case bs_float32:{
-                Data->bsdata.bs_float32=*(float*) message;
-                break;
-            }
-            case bs_int64:{
-                Data->bsdata.bs_int64=*(qint64*) message;
-                break;
-            }
-            case bs_int32:{
-                Data->bsdata.bs_int32=*(qint32*) message;
-                break;
-            }
-            case bs_uint64:{
-                Data->bsdata.bs_uint64=*(quint64*) message;
-                break;
-            }
-            case bs_uint32:{
-                Data->bsdata.bs_uint32=*(quint32*) message;
-                break;
-            }
-            case bs_int16:{
-                Data->bsdata.bs_int16=*(qint16*) message;
-                break;
-            }
-
-            case bs_uint16:{
-                Data->bsdata.bs_uint16=*(quint16*) message;
-                break;
-            }
-            case bs_int8:{
-                Data->bsdata.bs_int8=*(qint8*) message;
-                break;
-            }
-            case bs_uint8:{
-                Data->bsdata.bs_uint8=*(quint8*) message;
-                break;
-            }
-            case bs_bool:{
-                Data->bsdata.bs_bool=*(bool*) message;
-                break;
-            }
-
-            case bs_string:{
-                Data->bsdata.bs_string=QString((char*)message);
-                break;
-            }
+void bsread_Decode::bsdata_assign_single(bsread_channeldata* Data, void *message,int * datatypesize)
+{
+    switch (Data->type){
+        case bs_float64:{
+            Data->bsdata.bs_float64=*(double*) message;
+            *datatypesize=sizeof(double);
+            break;
+        }
+        case bs_float32:{
+            Data->bsdata.bs_float32=*(float*) message;
+            *datatypesize=sizeof(float);
+            break;
+        }
+        case bs_int64:{
+            Data->bsdata.bs_int64=*(qint64*) message;
+            *datatypesize=sizeof(qint64);
+            break;
+        }
+        case bs_int32:{
+            Data->bsdata.bs_int32=*(qint32*) message;
+            *datatypesize=sizeof(qint32);
+            break;
+        }
+        case bs_uint64:{
+            Data->bsdata.bs_uint64=*(quint64*) message;
+            *datatypesize=sizeof(quint64);
+            break;
+        }
+        case bs_uint32:{
+            Data->bsdata.bs_uint32=*(quint32*) message;
+            *datatypesize=sizeof(quint32);
+            break;
+        }
+        case bs_int16:{
+            Data->bsdata.bs_int16=*(qint16*) message;
+            *datatypesize=sizeof(qint16);
+            break;
         }
 
+        case bs_uint16:{
+            Data->bsdata.bs_uint16=*(quint16*) message;
+            *datatypesize=sizeof(qint16);
+            break;
+        }
+        case bs_int8:{
+            Data->bsdata.bs_int8=*(qint8*) message;
+            *datatypesize=sizeof(qint16);
+            break;
+        }
+        case bs_uint8:{
+            Data->bsdata.bs_uint8=*(quint8*) message;
+            *datatypesize=sizeof(qint16);
+            break;
+        }
+        case bs_bool:{
+            Data->bsdata.bs_bool=*(bool*) message;
+            *datatypesize=sizeof(qint16);
+            break;
+        }
 
+        case bs_string:{
+            Data->bsdata.bs_string=QString((char*)message);
+            *datatypesize=sizeof(char);
+            break;
+        }
+    }
+}
 
+void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message,size_t size){
 
-
+    int datatypesize;
+    switch(Data->shape.count()){
+    case 0:{
+        bsdata_assign_single(Data, message,&datatypesize);
         break;
     }
     case 1:{
         int datasize=Data->shape.at(0);
         //qDebug()<< "Datasize:" << datasize << "ZMQ Size:" << size <<" "<<Data->name ;
         if (datasize==1){
-            switch (Data->type){
-                case bs_float64:{
-                    Data->bsdata.bs_float64=*(double*) message;
-                    break;
-                }
-                case bs_float32:{
-                    Data->bsdata.bs_float32=*(float*) message;
-                    break;
-                }
-                case bs_int64:{
-                    Data->bsdata.bs_int64=*(qint64*) message;
-                    break;
-                }
-                case bs_int32:{
-                    Data->bsdata.bs_int32=*(qint32*) message;
-                    break;
-                }
-                case bs_uint64:{
-                    Data->bsdata.bs_uint64=*(quint64*) message;
-                    //qDebug() << "Integer :"<< Data->bsdata.bs_long;
-                    break;
-                }
-                case bs_uint32:{
-                    Data->bsdata.bs_uint32=*(quint32*) message;
-                    break;
-                }
-                case bs_int16:{
-                    Data->bsdata.bs_int16=*(qint16*) message;
-                    break;
-                }
+            bsdata_assign_single(Data, message,&datatypesize);
 
-                case bs_uint16:{
-                    Data->bsdata.bs_uint16=*(quint16*) message;
-                    break;
-                }
-                case bs_int8:{
-                    Data->bsdata.bs_int8=*(qint8*) message;
-                    break;
-                }
-                case bs_uint8:{
-                    Data->bsdata.bs_uint8=*(quint8*) message;
-                    break;
-                }
-                case bs_bool:{
-                    Data->bsdata.bs_bool=*(bool*) message;
-                    break;
-                }
-
-                case bs_string:{
-                    Data->bsdata.bs_string=QString((char*)message);
-                    break;
-                }
-            }
         }else{
             if (datasize>1){
-                int datatypesize;
-                switch (Data->type){
-                    case bs_float64:{
-                        datatypesize=sizeof(double);
-                        break;
-                    }
-                    case bs_float32:{
-                        datatypesize=sizeof(float);
-                        break;
-                    }
-                    case bs_int64:{
-                        datatypesize=sizeof(qint64);
-                        break;
-                    }
-                    case bs_uint64:{
-                        datatypesize=sizeof(quint64);
-                        break;
-                    }
-                    case bs_int32:{
-                        datatypesize=sizeof(qint32);
-                        break;
-                    }
-                    case bs_uint32:{
-                        datatypesize=sizeof(quint32);
-                        break;
-                    }
-                    case bs_int16:{
-                        datatypesize=sizeof(qint16);
-                        break;
-                    }
-                    case bs_uint16:{
-                        datatypesize=sizeof(quint16);
-                        break;
-                    }
-                    case bs_int8:{
-                        datatypesize=sizeof(qint8);
-                        break;
-                    }
-                    case bs_uint8:{
-                        datatypesize=sizeof(quint8);
-                        break;
-                    }
-                    case bs_bool:{
-                         datatypesize=sizeof(bool);
-                        break;
-                    }
 
-                    case bs_string:{
-                        Data->bsdata.bs_string=QString((char*)message);
-                        break;
-                    }
-
-                }
-
+                bsdata_assign_single(Data, message,&datatypesize);
                 if(Data->bsdata.wf_data_size!=(datasize*datatypesize)){
                     if (Data->bsdata.wf_data!=NULL){
                         free(Data->bsdata.wf_data);
