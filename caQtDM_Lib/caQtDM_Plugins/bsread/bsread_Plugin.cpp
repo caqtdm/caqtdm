@@ -115,7 +115,8 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
         connect(&Dispatcher, SIGNAL(finished()), &Dispatcher, SLOT(deleteLater()));
         DispatcherThread.start();
     }else{
-
+        QString msg="Using Manual BSREAD Connection";
+        messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
         QString ZMQ_ADDR_LIST = (QString)  qgetenv("BSREAD_ZMQ_ADDR_LIST");
 
 #ifdef _MSC_VER
@@ -134,8 +135,9 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
             connect(bsreadThreads.last(), SIGNAL(finished()), bsreadThreads.last(), SLOT(deleteLater()));
             connect(bsreadconnections.last(), SIGNAL(finished()), bsreadconnections.last(), SLOT(deleteLater()));
             bsreadThreads.last()->start();
-
-
+            msg="Connection started: ";
+            msg.append(BSREAD_ZMQ_ADDRS.at(i));
+            messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
         }
     }
 
