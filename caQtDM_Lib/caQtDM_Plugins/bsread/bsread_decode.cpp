@@ -790,7 +790,7 @@ void bsread_Decode::bsread_EndofData()
                     }
                     case bs_uint16:{
                         MonitorList->append(kData);
-                        kData->edata.fieldtype = caINT;
+                        kData->edata.fieldtype = caLONG;
                         if(bsreadPV->bsdata.wf_data_size!=0){
                             WaveformManagment(kData,bsreadPV);
                         }else{
