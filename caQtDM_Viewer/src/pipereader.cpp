@@ -34,7 +34,7 @@ PipeReader::PipeReader(QEventLoop *loop, QObject *parent) : QObject(parent)
     connect(notifier,SIGNAL(activated(int)),this,SLOT(DataReadyOnStdin()));
 
     timer = new QTimer(this);
-    timer->setInterval(2000);
+    timer->setInterval(1000);
     connect(timer, SIGNAL(timeout()), this, SLOT(Quit()));
     timer->start();
 }
@@ -62,7 +62,7 @@ void PipeReader::DataReadyOnStdin() {
     if(newData.size() == 0) {
 
     } else {
-        QTemporaryFile file;
+        QTemporaryFile file(QDir::tempPath()+"/qt-tempFile");
         file.setAutoRemove(false);
         if(file.open()) {
             qDebug() << file.fileName();

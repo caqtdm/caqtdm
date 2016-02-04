@@ -100,9 +100,9 @@
 public slots:
      void doSomething() {
          printf("About to quit!\n");
-#ifdef linux
+#if defined linux || defined TARGET_OS_MAC
          // remove temporary file created by caQtDM for pipe reading
-         if(lastFile.contains("qt_temp")) {
+         if(lastFile.contains("qt-tempFile")) {
              QFile::remove(lastFile);
          }
 #endif

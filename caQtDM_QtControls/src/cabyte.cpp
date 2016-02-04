@@ -39,10 +39,19 @@ caByte::caByte(QWidget *parent) : QWidget(parent)
     thisStartBit = 0;
     thisEndBit = 31;
     thisColorMode=Static;
+    thisValue = 0;
+
+    // for performance reasons create already 32 rectangles
+
+    for (int i = 0; i < 32; i++) {
+        rectangle* temp = new rectangle(this);
+        temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        cells.push_back(temp);
+    }
+
     setDirection(Down);
     setTrueColor(Qt::blue);
     setFalseColor(Qt::gray);
-    arrangeCells();
 
     installEventFilter(this);
 }
@@ -59,23 +68,21 @@ void caByte::setPV(QString const &newPV)
 
 void caByte::arrangeCells()
 {
+
+    // remove cells from grid
     foreach(rectangle *l, cells) {
         grid->removeWidget(l);
         l->hide();
-        l->deleteLater();
     }
-    cells.clear();
 
+    // add requested cells to grid
     for (int i = 0; i < numRows; i++) {
-        rectangle* temp = new rectangle(this);
-        temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         if(thisDirection == Up || thisDirection == Down) {
-          grid->addWidget(temp, i, 0);
+            grid->addWidget(cells[i], i, 0);
         } else {
-          grid->addWidget(temp, 0, i);
+            grid->addWidget(cells[i], 0, i);
         }
-        cells.push_back(temp);
-        temp->show();
+        cells[i]->show();
     }
     setValue(0);
 }
@@ -117,13 +124,13 @@ void caByte::drawByte(long lvalue, QColor trueColor, QColor falseColor)
 void caByte::setTrueColor(QColor c)
 {
     thisTrueColor = c;
-    arrangeCells();
+    setValue(thisValue);
 }
 
 void caByte::setFalseColor(QColor c)
 {
     thisFalseColor = c;
-    arrangeCells();
+    setValue(thisValue);
 }
 
 void caByte::setAlarmColors(short status)
