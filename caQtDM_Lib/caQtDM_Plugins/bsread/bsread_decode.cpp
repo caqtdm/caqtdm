@@ -41,7 +41,6 @@ bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint)
 {
    StreamConnectionPoint=ConnectionPoint;
    context=Context;
-   QThreadPool::globalInstance()->setMaxThreadCount(QThread::idealThreadCount());
 }
 bsread_Decode::~bsread_Decode()
 {
@@ -566,7 +565,7 @@ void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message,size_t
                     memcpy(Data->bsdata.wf_data,message,datasize*datatypesize);
                     Data->bsdata.wf_data_size=datasize;
                 }
-                qDebug() << "Data->bsdata.wf_data_size :" << Data->bsdata.wf_data_size << "  " <<size <<"  " <<datasize <<"  " << datatypesize;
+                //qDebug() << "Data->bsdata.wf_data_size :" << Data->bsdata.wf_data_size << "  " <<size <<"  " <<datasize <<"  " << datatypesize;
             }
         }
         break;
@@ -665,6 +664,7 @@ void bsread_Decode::bsread_EndofData()
 {
     QMutexLocker locker(&mutex);
     bsread_channeldata * bsreadPV;
+    QList<knobData*> * MonitorList=new QList<knobData*>;
 
     //Update Knobdata
     //qDebug() << "bsreadPlugin:Update Knobdata";
@@ -689,6 +689,7 @@ void bsread_Decode::bsread_EndofData()
                 if (bsreadPV){
                     switch (bsreadPV->type){
                     case bs_float64:{
+                        MonitorList->append(kData);
                         kData->edata.fieldtype = caDOUBLE;
                         if(bsreadPV->bsdata.wf_data_size!=0){
                              WaveformManagment(kData,bsreadPV);
@@ -699,6 +700,7 @@ void bsread_Decode::bsread_EndofData()
                         break;
                     }
                     case bs_float32:{
+                        MonitorList->append(kData);
                         kData->edata.fieldtype = caDOUBLE;
                         if(bsreadPV->bsdata.wf_data_size!=0){
                             WaveformManagment(kData,bsreadPV);
@@ -709,6 +711,7 @@ void bsread_Decode::bsread_EndofData()
                         break;
                     }
                     case bs_string:{
+                        MonitorList->append(kData);
                         kData->edata.fieldtype = caSTRING;
 
                         //qDebug() << "String length :" << bsreadPV->bsdata.bs_string.length();
@@ -731,30 +734,51 @@ void bsread_Decode::bsread_EndofData()
                         break;
                     }
                     case bs_int64:{
-                        kData->edata.rvalue=bsreadPV->bsdata.bs_int64;
+                        MonitorList->append(kData);
                         kData->edata.fieldtype = caDOUBLE;
+                        if(bsreadPV->bsdata.wf_data_size!=0){
+                            WaveformManagment(kData,bsreadPV);
+                        }else{
+                            kData->edata.rvalue=bsreadPV->bsdata.bs_int64;
+                        }
                         kData->edata.connected = true;
                         break;
                     }
                     case bs_int32:{
-                        kData->edata.ivalue=bsreadPV->bsdata.bs_int32;
+                        MonitorList->append(kData);
                         kData->edata.fieldtype = caLONG;
+                        if(bsreadPV->bsdata.wf_data_size!=0){
+                            WaveformManagment(kData,bsreadPV);
+                        }else{
+                            kData->edata.ivalue=bsreadPV->bsdata.bs_int32;
+                        }
                         kData->edata.connected = true;
                         break;
                     }
                     case bs_uint64:{
-                        kData->edata.rvalue=bsreadPV->bsdata.bs_uint64;
+                        MonitorList->append(kData);
                         kData->edata.fieldtype = caDOUBLE;
+                        if(bsreadPV->bsdata.wf_data_size!=0){
+                            WaveformManagment(kData,bsreadPV);
+                        }else{
+                            kData->edata.rvalue=bsreadPV->bsdata.bs_uint64;
+                        }
                         kData->edata.connected = true;
                         break;
                     }
                     case bs_uint32:{
-                        kData->edata.rvalue=bsreadPV->bsdata.bs_uint32;
+                        MonitorList->append(kData);
                         kData->edata.fieldtype = caDOUBLE;
+                        if(bsreadPV->bsdata.wf_data_size!=0){
+                            WaveformManagment(kData,bsreadPV);
+                        }else{
+                            kData->edata.ivalue=bsreadPV->bsdata.bs_uint32;
+                        }
                         kData->edata.connected = true;
                         break;
                     }
                     case bs_int16:{
+                        MonitorList->append(kData);
                         kData->edata.fieldtype = caINT;
                         if(bsreadPV->bsdata.wf_data_size!=0){
                             WaveformManagment(kData,bsreadPV);
@@ -765,19 +789,30 @@ void bsread_Decode::bsread_EndofData()
                         break;
                     }
                     case bs_uint16:{
-                        kData->edata.ivalue=bsreadPV->bsdata.bs_uint16;
+                        MonitorList->append(kData);
                         kData->edata.fieldtype = caINT;
+                        if(bsreadPV->bsdata.wf_data_size!=0){
+                            WaveformManagment(kData,bsreadPV);
+                        }else{
+                            kData->edata.ivalue=bsreadPV->bsdata.bs_uint16;
+                        }
+
                         kData->edata.connected = true;
                         break;
                     }
                     case bs_int8:{
-                        kData->edata.ivalue=bsreadPV->bsdata.bs_int8;
+                        MonitorList->append(kData);
+                        if(bsreadPV->bsdata.wf_data_size!=0){
+                            WaveformManagment(kData,bsreadPV);
+                        }else{
+                            kData->edata.ivalue=bsreadPV->bsdata.bs_int8;
+                        }
                         kData->edata.fieldtype = caINT;
                         kData->edata.connected = true;
                         break;
                     }
                     case bs_uint8:{
-
+                        MonitorList->append(kData);
                         kData->edata.fieldtype = caINT;
                         if(bsreadPV->bsdata.wf_data_size!=0){
                             WaveformManagment(kData,bsreadPV);
@@ -789,6 +824,7 @@ void bsread_Decode::bsread_EndofData()
                         break;
                     }
                     case bs_bool:{
+                        MonitorList->append(kData);
                         kData->edata.ivalue=bsreadPV->bsdata.bs_bool;
                         kData->edata.fieldtype = caINT;
                         kData->edata.connected = true;
@@ -813,8 +849,9 @@ void bsread_Decode::bsread_EndofData()
         }
 
         QThreadPool::globalInstance()->waitForDone(2);
-        foreach(int index, listOfIndexes) {
-            knobData* kData = bsread_KnobDataP->GetMutexKnobDataPtr(index);
+//        foreach(int index, listOfIndexes) {
+          for (int i=0;i<MonitorList->count();i++){
+            knobData* kData = MonitorList->at(i);
             if((kData != (knobData *) 0) && (kData->index != -1)) {
                 kData->edata.monitorCount++;
                 bsread_KnobDataP->SetMutexKnobData(kData->index, *kData);
@@ -822,7 +859,7 @@ void bsread_Decode::bsread_EndofData()
 
             }
         }
-
+        delete MonitorList;
 
 
     }
