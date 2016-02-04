@@ -22,21 +22,23 @@ public:
         kDataP=kData;
         bsreadPVP=bsreadPV;
     }
+
     void wfconvert()
     {
-        if (kDataP->edata.dataSize/sizeof(T_CAQTDM)!=bsreadPVP->bsdata.wf_data_size/sizeof(T_BSREAD)){
+        if (kDataP->edata.valueCount!=bsreadPVP->bsdata.wf_data_size){
             QMutex *datamutex;
             datamutex = (QMutex*) kDataP->mutex;
             datamutex->lock();
             if (kDataP->edata.dataB==NULL){
+                qDebug() << "Realloc";
                 free(kDataP->edata.dataB);
             }
 
-            kDataP->edata.dataB=malloc((bsreadPVP->bsdata.wf_data_size*sizeof(T_BSREAD))/sizeof(T_CAQTDM));
-            kDataP->edata.dataSize=(bsreadPVP->bsdata.wf_data_size*sizeof(T_BSREAD))/sizeof(T_CAQTDM);
+            kDataP->edata.dataB=malloc(bsreadPVP->bsdata.wf_data_size*sizeof(T_CAQTDM));
+            kDataP->edata.dataSize=bsreadPVP->bsdata.wf_data_size*sizeof(T_CAQTDM);
             datamutex->unlock();
         }
-
+        kDataP->edata.valueCount=bsreadPVP->bsdata.wf_data_size;
         QByteArray data = QByteArray::fromRawData((const char *)bsreadPVP->bsdata.wf_data, bsreadPVP->bsdata.wf_data_size*sizeof(T_BSREAD));
         QDataStream stream(data);
         QVector<T_CAQTDM> data_stream(bsreadPVP->bsdata.wf_data_size);
@@ -46,17 +48,18 @@ public:
              T_BSREAD datatemp;
              stream >> datatemp;
              data_stream.replace(counter,datatemp);
+
+             ((T_CAQTDM*)kDataP->edata.dataB)[counter]=datatemp;
              counter++;
         }
 
 
-        memcpy(kDataP->edata.dataB,data_stream.data(),data_stream.count()*sizeof(T_CAQTDM));
-        kDataP->edata.valueCount=data_stream.count()-100;
-        qDebug() << "counts :" << bsreadPVP->bsdata.wf_data_size << sizeof(T_BSREAD)<< sizeof(T_CAQTDM) << data_stream.count() << kDataP->edata.dataSize ;
+        //memcpy(kDataP->edata.dataB,data_stream.data(),data_stream.count()*sizeof(T_CAQTDM));
+//        kDataP->edata.valueCount=data_stream.count()-100;
+        //qDebug() << "counts :" << bsreadPVP->bsdata.wf_data_size << sizeof(T_BSREAD)<< sizeof(T_CAQTDM) << data_stream.count() << kDataP->edata.dataSize ;
     }
 
 };
-
 
 
 
