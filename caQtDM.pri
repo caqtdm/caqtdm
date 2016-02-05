@@ -494,11 +494,11 @@ Define_ZMQ_Lib{
 	
 	
 	INCLUDEPATH += $$(ZMQINC)
-	unix:!macx!ios:!android {
+        unix:!macx {
                 LIBS += $$(ZMQLIB)/libzmq.lib
 	}
         macx {
-                LIBS += $$(ZMQLIB)/libzmq.lib
+                LIBS += $$(ZMQLIB)/libzmq.dylib
         }
         win32 {
 	    DebugBuild {
