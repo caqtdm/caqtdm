@@ -66,6 +66,9 @@
      FileOpenWindow(QMainWindow *parent = 0,  QString filename = "", QString macroString = "",
                     bool attach = false, bool minimize = false, QString geometry = "", bool printscreen = false, bool resizing = true,
                     QMap<QString, QString> options = (QMap<QString, QString>()));
+
+     QMainWindow *loadMainWindow(const QPoint &position, const QString &fileS, const QString &macroS, const QString &resizeS,
+                                         const bool &printexit, const bool &moveit, const bool &centerwindow);
      bool isRunning();
      bool sendMessage(const QString &message);
      void fillPVtable(int &countPV, int &countnotConnected, int &countDisplayed);
@@ -149,6 +152,10 @@ private:
 
      QMap<QString, ControlsInterface*> interfaces;
      QMap<QString, QString> OptionList;
+
+     struct Row {QPoint position; QString file; QString macro; QString resize;};
+
+     QList<Row> reloadList;
 
  };
 
