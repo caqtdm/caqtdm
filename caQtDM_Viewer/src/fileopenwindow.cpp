@@ -618,17 +618,6 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
     sprintf(asc, "memory: %ld kB", usage.ru_maxrss);
 #endif
 
-    // any open windows ?
-    // we want to ask with timeout if the application has to be closed. 23-jan-2013 no yust exit (in case of tablet do not exit)
-#ifndef MOBILE
-    if(this->findChildren<CaQtDM_Lib *>().count() <= 0 && userClose) {
-        if (sharedMemory.isAttached()) sharedMemory.detach();
-        qApp->exit(0);
-    } else if(this->findChildren<CaQtDM_Lib *>().count() > 0) {
-        userClose = true;
-    }
-#endif
-
     // any non connected pv's to display ?
     if (mutexKnobData != (MutexKnobData *) 0) {
         char msg[255];
@@ -682,6 +671,17 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
         }
         reloadList.clear();
     }
+
+    // any open windows ?
+    // we want to ask with timeout if the application has to be closed. 23-jan-2013 no yust exit (in case of tablet do not exit)
+#ifndef MOBILE
+    if(this->findChildren<CaQtDM_Lib *>().count() <= 0 && userClose) {
+        if (sharedMemory.isAttached()) sharedMemory.detach();
+        qApp->exit(0);
+    } else if(this->findChildren<CaQtDM_Lib *>().count() > 0) {
+        userClose = true;
+    }
+#endif
 }
 
 /**
