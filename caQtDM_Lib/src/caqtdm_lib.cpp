@@ -490,6 +490,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         }
     }
 
+    setContextMenuPolicy(Qt::CustomContextMenu);
+
     // start a timer
     loopTimerID = startTimer(1000);
 
@@ -3904,7 +3906,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 if(data.edata.fieldtype == caSTRING) {
                     QStringList list;
                     list = String.split((QChar)27);
-                    wavetableWidget->setStringList(list, data.edata.status, data.edata.valueCount);
+                    wavetableWidget->setStringList(list, data.edata.status, list.size());
                 } else {
                     WaveTable(wavetableWidget, data);
                 }

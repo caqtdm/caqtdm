@@ -33,7 +33,7 @@
 #include <QMessageBox>
 #include <qtcontrols_global.h>
 
-class QTCON_EXPORT fileFunctions
+class QTCON_EXPORT fileFunctions:public QObject
 {
 
 public:
