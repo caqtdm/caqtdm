@@ -73,6 +73,13 @@ void bsread_Decode::bsread_createConnection(int rc)
         printf ("error in zmq_setsockopt: %s(%s)\n", zmq_strerror (errno),StreamConnectionPoint.toLatin1().constData());
 
     }
+    value=1;
+    rc=zmq_setsockopt(zmqsocket,ZMQ_RCVHWM,&value,sizeof(value));
+    if (rc != 0) {
+        printf ("error in zmq_setsockopt: %s(%s)\n", zmq_strerror (errno),StreamConnectionPoint.toLatin1().constData());
+
+    }
+
     rc = zmq_connect (zmqsocket, StreamConnectionPoint.toLatin1().constData());
 }
 
@@ -238,6 +245,13 @@ bool bsread_Decode::setMainHeader(char *value,size_t size)
                 if (jsonobj2.find(L"ns") != jsonobj2.end() && jsonobj2[L"ns"]->IsNumber()) {
                     global_timestamp_ns=jsonobj2[L"ns"]->AsNumber();
                 }
+                if (jsonobj2.find(L"ms") != jsonobj2.end() && jsonobj2[L"epoch"]->IsNumber()) {
+                    global_timestamp_ms=jsonobj2[L"epoch"]->AsNumber();
+                }
+                if (jsonobj2.find(L"ns_offset") != jsonobj2.end() && jsonobj2[L"ns"]->IsNumber()) {
+                    global_timestamp_ns_offset=jsonobj2[L"ns"]->AsNumber();
+                }
+
             }
             delete(MainMessageJ);
 
@@ -540,7 +554,18 @@ void bsread_Decode::bsread_InitHeaderChannels()
     chdata->name="global_timestamp_ns";
     ChannelSearch.insert(chdata->name, chdata);
 
+    chdata=new bsread_channeldata();
+    Channels.append(chdata);
+    chdata->type=bs_float64;
+    chdata->name="global_timestamp_ms";
+    ChannelSearch.insert(chdata->name, chdata);
 
+
+    chdata=new bsread_channeldata();
+    Channels.append(chdata);
+    chdata->type=bs_float64;
+    chdata->name="global_timestamp_ns_offset";
+    ChannelSearch.insert(chdata->name, chdata);
 }
 
 void bsread_Decode::bsread_TransferHeaderData()
@@ -555,6 +580,10 @@ void bsread_Decode::bsread_TransferHeaderData()
         Channels.at(channelcounter)->bsdata.bs_float64=global_timestamp_epoch;
         channelcounter++;
         Channels.at(channelcounter)->bsdata.bs_float64=global_timestamp_ns;
+        channelcounter++;
+        Channels.at(channelcounter)->bsdata.bs_float64=global_timestamp_ms;
+        channelcounter++;
+        Channels.at(channelcounter)->bsdata.bs_float64=global_timestamp_ns_offset;
         channelcounter++;
 
     }
@@ -704,7 +733,7 @@ void bsread_Decode::bsread_EndofData()
                         break;
                     }
                     case bs_uint16:{
-                        kData->edata.fieldtype = caLONG;
+                        kData->edata.fieldtype = caINT;
                         if(bsreadPV->bsdata.wf_data_size!=0){
                             WaveformManagment(kData,bsreadPV);
                             MonitorList->append(kData);
@@ -766,7 +795,7 @@ void bsread_Decode::bsread_EndofData()
             }
         }
 
-        QThreadPool::globalInstance()->waitForDone(2);
+        QThreadPool::globalInstance()->waitForDone(-1);
 
 //        foreach(int index, listOfIndexes) {
           for (int i=0;i<MonitorList->count();i++){

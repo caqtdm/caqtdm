@@ -74,6 +74,8 @@ private:
     QString MainHeader;
     long global_timestamp_epoch;
     long global_timestamp_ns;
+    long global_timestamp_ms;
+    long global_timestamp_ns_offset;
     double pulse_id;
     QString main_htype;
     QString main_reconnect_adress;
