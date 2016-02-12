@@ -490,6 +490,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         }
     }
 
+    setContextMenuPolicy(Qt::CustomContextMenu);
+
     // start a timer
     loopTimerID = startTimer(1000);
 
