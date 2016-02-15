@@ -86,7 +86,11 @@ DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
 # 4.0.3
 # it is now possible to pipe ui data to caQtDM
-
+# reload management had to be changed due to some Qt memory management problem
+# eliminated some memory leaks
+# corrected wavetable string crash
+# one can now define if the size of an included ui file will be size adjusted or not
+# cabyte performance was bad and has been corrected
 
 # 4.0.2
 # caQtDM can now be told to load a specific stylesheet file by the option -stylefile filename

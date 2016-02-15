@@ -1516,9 +1516,18 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     // open and load ui file
                     file->setFileName(fileName);
                     file->open(QFile::ReadOnly);
-                    //printf("effective load of file %s for widget %s\n", qasc(fileName), qasc(includeWidget->objectName()));
+                    //struct timeb now, last;
+                    //ftime(&last);
                     thisW = loader.load(file, this);
                     file->close();
+                    /* for performance measurement
+                    ftime(&now);
+
+                    double diff = ((double) now.time + (double) now.millitm / (double)1000) -
+                            ((double) last.time + (double) last.millitm / (double)1000);
+                    if(diff > 0.01) printf("effective load of file %s for widget %s %f\n", qasc(fileName),
+                                                                           qasc(includeWidget->objectName()), diff);
+                    */
                     delete file;
                 }
 
@@ -1541,21 +1550,23 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     // add includeWidget to the gui
                     if(includeWidget->getStacking() == caInclude::Row) {
                         layout->addWidget(thisW, j, 0);
-                        if(row > maxRows) maxRows = row;
                         row++;
+                        maxRows = row;
+                        maxColumns = 1;
                     } else if(includeWidget->getStacking() == caInclude::Column) {
                        layout->addWidget(thisW, 0, j);
-                       if(column > maxColumns) maxColumns = column;
                        column++;
+                       maxColumns = column;
+                       maxRows = 1;
                     } else {
                         if(row >= includeWidget->getMaxLines()) {
                             row=0;
                             column++;
-                            if(column > maxColumns) maxColumns = column;
                         }
                         layout->addWidget(thisW, row, column);
                         row++;
                         if(row > maxRows) maxRows = row;
+                        maxColumns = column + 1;
                     }
 
                     includeWidget->setLayout(layout);
@@ -1581,10 +1592,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         } // end for
 
-        maxColumns++;
-        if(includeWidget->getStacking() != caInclude::RowColumn)  maxRows++;
-
-        if((thisW != (QWidget *) 0 ) && (!prcFile)) {
+        if((thisW != (QWidget *) 0 ) && (!prcFile) && includeWidget->getAdjustSize()) {
             includeWidget->resize(maxColumns * thisW->width(), maxRows * thisW->height());
             // when the include is packed into a scroll area, set the minimumsize too
             if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
