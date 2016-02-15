@@ -661,7 +661,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
     // reload windows that were closed to be reloaded (had to be deferrred, due to memory problems)
     if(!reloadList.isEmpty()) {
         foreach( Row row, reloadList ) {
-           //qDebug() << "reload" << row.file << row.macro << row.resize;
+           qDebug() << "caQtDM -- reload file" << row.file << "with macro" << row.macro << "can be resized=" << row.resize;
            QPoint position = row.position;
            QString fileS = row.file;
            QString macroS = row.macro;
