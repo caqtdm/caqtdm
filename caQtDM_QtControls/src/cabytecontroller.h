@@ -114,7 +114,7 @@ protected:
     void resizeEvent(QResizeEvent *e);
 
 private:
-    void   setColor(EPushButton *button, QColor c, QColor text);
+    void   setColor(int indx, QColor c, QColor text);
     bool   eventFilter(QObject *obj, QEvent *event);
     int                 numRows;
     QSignalMapper      *signalMapper;
@@ -130,6 +130,8 @@ private:
     long                thisValue;
     bool               _AccessW;
     EPushButton::ScaleMode thisScaleMode;
+    QColor              prvColor[32], prvTextcolor[32];
+    int                 prvEndBit, prvStartBit;
 };
 
 #endif  /* CABYTECONTROLLER */

@@ -1504,7 +1504,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             // sure file exists ?
             QFileInfo fi(fileName);
             if(fi.exists()) {
-
+                double diff=0.0;
                 // load prc or ui file
                 if(prcFile) {
                     // load new file
@@ -1516,18 +1516,16 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     // open and load ui file
                     file->setFileName(fileName);
                     file->open(QFile::ReadOnly);
-                    //struct timeb now, last;
-                    //ftime(&last);
+                    struct timeb now, last;
+                    ftime(&last);
                     thisW = loader.load(file, this);
                     file->close();
-                    /* for performance measurement
+                    // for performance measurement
                     ftime(&now);
 
-                    double diff = ((double) now.time + (double) now.millitm / (double)1000) -
+                    diff = ((double) now.time + (double) now.millitm / (double)1000) -
                             ((double) last.time + (double) last.millitm / (double)1000);
-                    if(diff > 0.01) printf("effective load of file %s for widget %s %f\n", qasc(fileName),
-                                                                           qasc(includeWidget->objectName()), diff);
-                    */
+                    //if(diff > 0.01) printf("effective load of file %s for widget %s %f\n", qasc(fileName), qasc(includeWidget->objectName()), diff);
                     delete file;
                 }
 
@@ -1542,8 +1540,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     // seems to be ok
                 } else {
                     if(!includeFiles.contains(fi.absoluteFilePath())) {
+                        char asc[100];
+                        sprintf(asc, " (last load time=%d ms)<br>", (int)(diff*1000.0));
                         includeFiles.append(fi.absoluteFilePath());
-                        includeFiles.append(" is loaded <br>");
+                        includeFiles.append(" is loaded");
+                        includeFiles.append(asc);
                     }
                     includeWidgetList.append(thisW);
 

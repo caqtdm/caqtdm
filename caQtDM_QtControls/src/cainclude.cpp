@@ -269,7 +269,6 @@ void caInclude::setFileName(QString const &filename)
                 thisLoadedWidgets.append(tmp);
                 loadedWidget = tmp;
                 effectiveSize= tmp->size();
-                printf("size=%d %d\n", tmp->width(), tmp->height());
                 // pep file
             } else {
                 ParsePepFile *parsefile = new ParsePepFile(fileNameFound);
