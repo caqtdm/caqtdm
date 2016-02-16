@@ -22,12 +22,14 @@
  *  Contact details:
  *    helge.brands@psi.ch
  */
+#include <QtCore>
 #include <QThread>
 #include <QDebug>
 #include <QAtomicInt>
 #include <QBuffer>
 #include <QByteArray>
 #include <QDataStream>
+
 #include "zmq.h"
 #include <exception>
 #include "bsread_decode.h"
@@ -245,11 +247,11 @@ bool bsread_Decode::setMainHeader(char *value,size_t size)
                 if (jsonobj2.find(L"ns") != jsonobj2.end() && jsonobj2[L"ns"]->IsNumber()) {
                     global_timestamp_ns=jsonobj2[L"ns"]->AsNumber();
                 }
-                if (jsonobj2.find(L"ms") != jsonobj2.end() && jsonobj2[L"epoch"]->IsNumber()) {
-                    global_timestamp_ms=jsonobj2[L"epoch"]->AsNumber();
+                if (jsonobj2.find(L"ms") != jsonobj2.end() && jsonobj2[L"ms"]->IsNumber()) {
+                    global_timestamp_ms=jsonobj2[L"ms"]->AsNumber();
                 }
-                if (jsonobj2.find(L"ns_offset") != jsonobj2.end() && jsonobj2[L"ns"]->IsNumber()) {
-                    global_timestamp_ns_offset=jsonobj2[L"ns"]->AsNumber();
+                if (jsonobj2.find(L"ns_offset") != jsonobj2.end() && jsonobj2[L"ns_offset"]->IsNumber()) {
+                    global_timestamp_ns_offset=jsonobj2[L"ns_offset"]->AsNumber();
                 }
 
             }
@@ -392,12 +394,38 @@ void bsread_Decode::bsdata_assign_single(bsread_channeldata* Data, void *message
 {
     switch (Data->type){
         case bs_float64:{
-            Data->bsdata.bs_float64=*(double*) message;
+            switch (Data->endianess){
+             case bs_big:{
+                QByteArray data = QByteArray::fromRawData((const char *)message,sizeof(double));
+                QDataStream stream(data);
+                stream.setFloatingPointPrecision(QDataStream::DoublePrecision);
+                stream.setByteOrder(QDataStream::BigEndian);
+                stream>>Data->bsdata.bs_float64;
+
+                break;
+             }
+             default:Data->bsdata.bs_float64=*(double*) message;
+            }
+            //qDebug() << "Double :" << Data->bsdata.bs_float64 << *(double*) message ;
             *datatypesize=sizeof(double);
             break;
         }
         case bs_float32:{
-            Data->bsdata.bs_float32=*(float*) message;
+            switch (Data->endianess){
+             case bs_big:{
+                QByteArray data = QByteArray::fromRawData((const char *)message,sizeof(float));
+                QDataStream stream(data);
+                stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+                stream.setByteOrder(QDataStream::BigEndian);
+                stream>>Data->bsdata.bs_float32;
+
+                break;
+             }
+             default:Data->bsdata.bs_float32=*(float*) message;
+            }
+//            if (Data->name.endsWith("MINSB04-RACC200-PUP20:SIG-AMPLT-AVG")){
+//              qDebug() << "Float :" << Data->bsdata.bs_float32 << *(float*) message<< *(long*) message;
+//            }
             *datatypesize=sizeof(float);
             break;
         }
@@ -407,7 +435,19 @@ void bsread_Decode::bsdata_assign_single(bsread_channeldata* Data, void *message
             break;
         }
         case bs_int32:{
-            Data->bsdata.bs_int32=*(qint32*) message;
+            switch (Data->endianess){
+             case bs_big:{
+                QByteArray data = QByteArray::fromRawData((const char *)message,sizeof(qint32));
+                QDataStream stream(data);
+                stream.setByteOrder(QDataStream::BigEndian);
+                stream>>Data->bsdata.bs_int32;
+                break;
+             }
+             default:Data->bsdata.bs_int32=*(qint32*) message;
+            }
+
+
+
             *datatypesize=sizeof(qint32);
             break;
         }
@@ -417,7 +457,18 @@ void bsread_Decode::bsdata_assign_single(bsread_channeldata* Data, void *message
             break;
         }
         case bs_uint32:{
-            Data->bsdata.bs_uint32=*(quint32*) message;
+            switch (Data->endianess){
+             case bs_big:{
+                QByteArray data = QByteArray::fromRawData((const char *)message,sizeof(quint32));
+                QDataStream stream(data);
+                stream.setByteOrder(QDataStream::BigEndian);
+                stream>>Data->bsdata.bs_uint32;
+                break;
+             }
+             default:Data->bsdata.bs_uint32=*(quint32*) message;
+            }
+
+
             *datatypesize=sizeof(quint32);
             break;
         }
@@ -592,7 +643,11 @@ void bsread_Decode::bsread_TransferHeaderData()
 
 void bsread_Decode::WaveformManagment(knobData* kData,bsread_channeldata * bsreadPV){
 
+
+
     bsread_wfhandling *transfer=new bsread_wfhandling(kData,bsreadPV);
+
+
     QThreadPool::globalInstance()->start(transfer);
 }
 
@@ -633,6 +688,8 @@ void bsread_Decode::bsread_EndofData()
                              MonitorList->append(kData);
                         }else{
                             kData->edata.rvalue=bsreadPV->bsdata.bs_float64;
+                            kData->edata.precision=bsreadPV->precision;
+                            //qDebug() << "double: "<< kData->edata.rvalue;
                             MonitorList->insert(0,kData);
                         }
                         kData->edata.connected = true;
@@ -645,6 +702,9 @@ void bsread_Decode::bsread_EndofData()
                             MonitorList->append(kData);
                         }else{
                             kData->edata.rvalue=bsreadPV->bsdata.bs_float32;
+                            kData->edata.precision=bsreadPV->precision;
+                            //qDebug() << "float: "<< kData->edata.rvalue;
+                            MonitorList->insert(0,kData);
                         }
                         kData->edata.connected = true;
                         break;

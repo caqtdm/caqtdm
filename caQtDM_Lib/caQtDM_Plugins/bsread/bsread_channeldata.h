@@ -63,6 +63,8 @@ public:
     QList<int> shape;
     int offset;
     int modulo;
+    int precision;
+    QString units;
     bsread_endian endianess;
     double timestamp;
     bs_data bsdata;

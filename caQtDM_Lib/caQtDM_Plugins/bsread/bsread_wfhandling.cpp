@@ -53,7 +53,8 @@ void bsread_wfhandling::wfconvert()
             break;
         }
         case bs_uint16:{
-            bsread_wfConverter<quint16,long> *converter=new bsread_wfConverter<quint16,long>(kDataP,bsreadPVP);
+            //qDebug() << "<quint16,int>";
+            bsread_wfConverter<quint16,unsigned short> *converter=new bsread_wfConverter<quint16,unsigned short>(kDataP,bsreadPVP);
             converter->wfconvert();
             delete converter;
             break;

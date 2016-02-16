@@ -5,6 +5,7 @@
 #include <QBuffer>
 #include <QByteArray>
 #include <QDataStream>
+#include <QElapsedTimer>
 
 #include "knobData.h"
 #include "mutexKnobData.h"
@@ -25,6 +26,11 @@ public:
 
     void wfconvert()
     {
+
+        QElapsedTimer timer;
+        timer.start();
+
+
         if (kDataP->edata.valueCount!=bsreadPVP->bsdata.wf_data_size){
             QMutex *datamutex;
             datamutex = (QMutex*) kDataP->mutex;
@@ -39,25 +45,26 @@ public:
             datamutex->unlock();
         }
         kDataP->edata.valueCount=bsreadPVP->bsdata.wf_data_size;
+
         QByteArray data = QByteArray::fromRawData((const char *)bsreadPVP->bsdata.wf_data, bsreadPVP->bsdata.wf_data_size*sizeof(T_BSREAD));
         QDataStream stream(data);
-        QVector<T_CAQTDM> data_stream(bsreadPVP->bsdata.wf_data_size);
+        //QVector<T_CAQTDM> data_stream(bsreadPVP->bsdata.wf_data_size);
         stream.setByteOrder(QDataStream::LittleEndian);
-        long counter=0;
+        ulong counter=0;
+
+
         while ( !stream.atEnd() ) {
              T_BSREAD datatemp;
              stream >> datatemp;
-             data_stream.replace(counter,datatemp);
 
-             ((T_CAQTDM*)kDataP->edata.dataB)[counter]=datatemp;
+             ((T_CAQTDM*)kDataP->edata.dataB)[counter]=(T_CAQTDM)datatemp;
              counter++;
         }
 
 
-        //memcpy(kDataP->edata.dataB,data_stream.data(),data_stream.count()*sizeof(T_CAQTDM));
-//        kDataP->edata.valueCount=data_stream.count()-100;
-        //qDebug() << "counts :" << bsreadPVP->bsdata.wf_data_size << sizeof(T_BSREAD)<< sizeof(T_CAQTDM) << data_stream.count() << kDataP->edata.dataSize ;
-    }
+        qDebug() << "convert timer :" <<  timer.elapsed() << "milliseconds";
+
+      }
 
 };
 
