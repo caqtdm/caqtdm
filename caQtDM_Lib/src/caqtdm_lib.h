@@ -235,6 +235,7 @@ signals:
     void fileChanged(const QString&);
 
 private:
+    double rTime();
     void scanChildren(QList<QWidget*> children, QWidget *tab, int i);
     QWidget* getTabParent(QWidget *w1);
     QString treatMacro(QMap<QString, QString> map, const QString& pv, bool *doNothing);
@@ -309,7 +310,8 @@ private:
 
     int origWidth, origHeight;
 
-    QString includeFiles;
+    struct includeData {int count; int ms; QString text;};
+    QMap<QString, includeData> includeFilesList;
 
     SplashScreen *splash;
 

@@ -45,6 +45,8 @@ class  QTCON_EXPORT caCalc : public  ESimpleLabel
     Q_PROPERTY(double initialValue READ getInitialValue WRITE setInitialValue)
     Q_PROPERTY(int precision READ getPrecision WRITE setPrecision)
 
+    Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
+
 #include "addevent.h"
 
 public:

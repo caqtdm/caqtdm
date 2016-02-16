@@ -233,6 +233,14 @@ public:
     }
 };
 
+
+double CaQtDM_Lib::rTime()
+{
+    struct timeval tt;
+    gettimeofday(&tt, (struct timezone *) 0);
+    return (double) 1000000.0 * (double) tt.tv_sec + (double) tt.tv_usec;
+}
+
 /**
  * CaQtDM_Lib destructor
  */
@@ -243,9 +251,10 @@ CaQtDM_Lib::~CaQtDM_Lib()
                SIGNAL(Signal_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData)), this,
                SLOT(Callback_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData)));
 
-    if(!fromAS) delete myWidget;
+    //if(!fromAS) delete myWidget;
     includeWidgetList.clear();
     topIncludesWidgetList.clear();
+    includeFilesList.clear();
     allTabs.clear();
     allStacks.clear();
 }
@@ -292,8 +301,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     //qDebug() << "open file" << filename << "with macro" << macro;
     setAttribute(Qt::WA_DeleteOnClose);
 
-    includeFiles = "";
-
     // define a layout
     QGridLayout *layout = new QGridLayout;
 
@@ -303,9 +310,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     // treat ui file */
     QFileInfo fi(filename);
-
-    includeFiles.append(fi.absoluteFilePath());
-    includeFiles.append("<br>");
 
     if(!fromAS) {
         if(filename.lastIndexOf(".ui") != -1) {
@@ -422,6 +426,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     // by findChildren, and get the list of all the includes at this level
 
     includeWidgetList.clear();
+    includeFilesList.clear();
     topIncludesWidgetList.clear();
     allTabs.clear();
     allStacks.clear();
@@ -1462,10 +1467,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         searchFile *s = new searchFile(fileName);
         QString fileNameFound = s->findFile();
         if(fileNameFound.isNull()) {
-            if(!includeFiles.contains(fileName)) {
-                includeFiles.append(fileName);
-                includeFiles.append(" does not exist <br>");
-            }
+            includeData value;
+            value.count = 0;
+            value.ms = 0;
+            value.text="does not exist";
+            includeFilesList.insert(fileName, value);
         } else {
             //qDebug() << "use file" << fileName << "for" << includeWidget;
             fileName = fileNameFound;
@@ -1512,40 +1518,38 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     thisW = parsefile->load(this);
                     delete parsefile;
                 } else {
+                    double last = rTime();
                     QFile *file = new QFile;
                     // open and load ui file
                     file->setFileName(fileName);
                     file->open(QFile::ReadOnly);
-                    struct timeb now, last;
-                    ftime(&last);
                     thisW = loader.load(file, this);
                     file->close();
-                    // for performance measurement
-                    ftime(&now);
-
-                    diff = ((double) now.time + (double) now.millitm / (double)1000) -
-                            ((double) last.time + (double) last.millitm / (double)1000);
-                    //if(diff > 0.01) printf("effective load of file %s for widget %s %f\n", qasc(fileName), qasc(includeWidget->objectName()), diff);
+                    double now = rTime();
+                    diff = now - last;
                     delete file;
+                }
+
+                QMap<QString, includeData>::const_iterator name = includeFilesList.find(fi.absoluteFilePath());
+                if(name != includeFilesList.end()) {
+                    includeData value = name.value();
+                    value.count++;
+                    value.ms = qRound((diff/1000.0));
+                    if(!thisW) value.text = "not loaded"; else value.text="loaded";
+                    includeFilesList.insert(fi.absoluteFilePath(), value);
+                } else {
+                    includeData value;
+                    value.count = 1;
+                    value.ms = qRound(diff/1000.0);
+                    if(!thisW) value.text = "not loaded"; else value.text="loaded";
+                    includeFilesList.insert(fi.absoluteFilePath(), value);
                 }
 
                 // some error with loading
                 if (!thisW) {
                     postMessage(QtDebugMsg, (char*) qasc(tr("could not load include file %1").arg(fileName)));
-                    if(!includeFiles.contains(fi.absoluteFilePath())) {
-                        includeFiles.append(fi.absoluteFilePath());
-                        includeFiles.append(" could not be loaded <br>");
-                        continue;
-                    }
                     // seems to be ok
                 } else {
-                    if(!includeFiles.contains(fi.absoluteFilePath())) {
-                        char asc[100];
-                        sprintf(asc, " (last load time=%d ms)<br>", (int)(diff*1000.0));
-                        includeFiles.append(fi.absoluteFilePath());
-                        includeFiles.append(" is loaded");
-                        includeFiles.append(asc);
-                    }
                     includeWidgetList.append(thisW);
 
                     // add includeWidget to the gui
@@ -5148,7 +5152,17 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         } else  if(selectedItem->text().contains("Include files")) {
             QString info;
             info.append(InfoPrefix);
-            info.append(includeFiles);
+            int totalTime=0;
+            info.append("<strong>the indicated times are approxative</strong><br><br>");
+            QMap<QString, includeData>::const_iterator data = includeFilesList.constBegin();
+            while (data != includeFilesList.constEnd()) {
+                includeData value = data.value();
+                info.append(tr("%1 %2 <strong>%3</strong> times, last load time=<strong>%4ms</strong><br>").arg(data.key()).arg(value.text).arg(value.count).arg(value.ms));
+                totalTime = totalTime + value.count * value.ms;
+                ++data;
+            }
+            //qDebug() << totalTime;
+
             info.append(InfoPostfix);
             myMessageBox box(this);
             box.setText("<html>" + info + "</html>");

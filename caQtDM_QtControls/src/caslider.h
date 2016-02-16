@@ -58,6 +58,8 @@ class QTCON_EXPORT caSlider : public QwtSlider
     Q_PROPERTY(double incrementValue READ getIncrementValue WRITE setIncrementValue)
     Q_PROPERTY(double value READ getSliderValue WRITE setSliderValue)
 
+    Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
+
 #include "caElevation.h"
 
 public:

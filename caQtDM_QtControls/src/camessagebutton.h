@@ -48,8 +48,8 @@ class QTCON_EXPORT caMessageButton : public EPushButton
     Q_PROPERTY(QString disableChannel READ getDisablePV WRITE setDisablePV)
     Q_PROPERTY(QString releaseMessage READ getReleaseMessage WRITE setReleaseMessage)
     Q_PROPERTY(QString pressMessage READ getPressMessage WRITE setPressMessage)
-
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
+    Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
     Q_ENUMS(colMode)
 
 #include "caElevation.h"
