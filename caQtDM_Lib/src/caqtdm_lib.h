@@ -90,6 +90,11 @@
 
 #include <QMenuBar>
 
+#if defined(_MSC_VER)
+#define useElapsedTimer
+#else
+#endif
+
 namespace Ui {
 class CaQtDM_Lib;
 }
@@ -235,7 +240,9 @@ signals:
     void fileChanged(const QString&);
 
 private:
+#if !defined(useElapsedTimer)
     double rTime();
+#endif
     void scanChildren(QList<QWidget*> children, QWidget *tab, int i);
     QWidget* getTabParent(QWidget *w1);
     QString treatMacro(QMap<QString, QString> map, const QString& pv, bool *doNothing);

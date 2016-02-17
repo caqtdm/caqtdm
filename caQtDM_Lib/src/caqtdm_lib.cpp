@@ -233,13 +233,14 @@ public:
     }
 };
 
-
+#if !defined(useElapsedTimer)
 double CaQtDM_Lib::rTime()
 {
     struct timeval tt;
     gettimeofday(&tt, (struct timezone *) 0);
     return (double) 1000000.0 * (double) tt.tv_sec + (double) tt.tv_usec;
 }
+#endif
 
 /**
  * CaQtDM_Lib destructor
@@ -1510,7 +1511,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             // sure file exists ?
             QFileInfo fi(fileName);
             if(fi.exists()) {
-                double diff=0.0;
+                qint64 diff=0;
                 // load prc or ui file
                 if(prcFile) {
                     // load new file
@@ -1518,29 +1519,40 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     thisW = parsefile->load(this);
                     delete parsefile;
                 } else {
+#if !defined(useElapsedTimer)
                     double last = rTime();
+#else
+                    QElapsedTimer timer;
+                    timer.start();
+#endif
                     QFile *file = new QFile;
                     // open and load ui file
                     file->setFileName(fileName);
                     file->open(QFile::ReadOnly);
                     thisW = loader.load(file, this);
                     file->close();
-                    double now = rTime();
-                    diff = now - last;
                     delete file;
+
+#if !defined(useElapsedTimer)
+                    double now = rTime();
+                    diff = qRound ((now - last) /1000.0);
+#else
+                    diff = timer.elapsed();
+#endif
+                    if(diff < 1) diff=1; // you really do not believe that smaller is possible, do you?
                 }
 
                 QMap<QString, includeData>::const_iterator name = includeFilesList.find(fi.absoluteFilePath());
                 if(name != includeFilesList.end()) {
                     includeData value = name.value();
                     value.count++;
-                    value.ms = qRound((diff/1000.0));
+                    value.ms = value.ms + ((int) diff - value.ms) / value.count;
                     if(!thisW) value.text = "not loaded"; else value.text="loaded";
                     includeFilesList.insert(fi.absoluteFilePath(), value);
                 } else {
                     includeData value;
                     value.count = 1;
-                    value.ms = qRound(diff/1000.0);
+                    value.ms = (int) diff;
                     if(!thisW) value.text = "not loaded"; else value.text="loaded";
                     includeFilesList.insert(fi.absoluteFilePath(), value);
                 }
@@ -5157,7 +5169,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             QMap<QString, includeData>::const_iterator data = includeFilesList.constBegin();
             while (data != includeFilesList.constEnd()) {
                 includeData value = data.value();
-                info.append(tr("%1 %2 <strong>%3</strong> times, last load time=<strong>%4ms</strong><br>").arg(data.key()).arg(value.text).arg(value.count).arg(value.ms));
+                info.append(tr("%1 %2 <strong>%3</strong> times, average load time=<strong>%4ms</strong><br>").arg(data.key()).arg(value.text).arg(value.count).arg(value.ms));
                 totalTime = totalTime + value.count * value.ms;
                 ++data;
             }
