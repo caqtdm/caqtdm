@@ -72,7 +72,7 @@ class QTCON_EXPORT caMultiLineString : public QPlainTextEdit, public FontScaling
     Q_PROPERTY(ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleModeL)
     Q_PROPERTY(double fontScaleFactor READ fontScaleFactor WRITE setFontScaleFactor DESIGNABLE false)
 
-    Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
+    //Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
 
     Q_ENUMS(ScaleMode)
 

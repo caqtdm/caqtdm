@@ -47,7 +47,7 @@ Q_ENUMS(SourceMode)
 Q_PROPERTY(double maxValue READ getMaxValue WRITE setMaxValue)
 Q_PROPERTY(double minValue READ getMinValue WRITE setMinValue)
 
-Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
+//Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
 
 #include "caElevation.h"
 

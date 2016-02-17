@@ -96,4 +96,3 @@ void caLabel::setAlarmColors(short status)
     setColors(thisBackColor, c);
 }
 
-

@@ -37,7 +37,7 @@ class QTCON_EXPORT caLabel : public ESimpleLabel
 
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
 
-    Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
+    //Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
     Q_ENUMS(colMode)
 
 #include "caVisibProps.h"

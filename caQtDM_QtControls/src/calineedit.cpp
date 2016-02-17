@@ -77,8 +77,6 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     Alarm = 0;
 
     // default colors will be defined in my event handler by taking them from the palette defined by stylesheet definitions
-    //defBackColor = QColor(255, 248, 220, 255);
-    //defForeColor = Qt::black;
     defSelectColor = Qt::red; // this does not appear in the palette
 
     setPrecisionMode(Channel);
@@ -129,7 +127,7 @@ void caLineEdit::setPV(QString const &newPV)
 
 // this routine sets the correct styles for the calinedit and catextentry (inheriting from calinedit)
 // the styles are now defined here and not in the style sheet any more
-// while this gives a perfomance problem, limit the use of it by testing changes
+// while this gives a performance problem, limit the use of it by testing changes
 
 void caLineEdit::setColors(QColor bg, QColor fg, QColor frame, int lineWidth)
 {

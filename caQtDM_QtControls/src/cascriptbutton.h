@@ -51,7 +51,7 @@ class QTCON_EXPORT caScriptButton : public QWidget
     Q_PROPERTY(QString scriptCommand READ getScriptCommand WRITE setScriptCommand)
     Q_PROPERTY(QString scriptParameter READ getScriptParam WRITE setScriptParam)
 
-    Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
+    //Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
 
 #include "caElevation.h"
 

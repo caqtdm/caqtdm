@@ -1121,7 +1121,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         //==================================================================================================================
     } else if(caMultiLineString* multilinestringWidget = qobject_cast<caMultiLineString *>(w1)) {
 
-        //qDebug() << "create caLineEdit";
+        //qDebug() << "create caMultilineString";
         w1->setProperty("ObjectType", caMultiLineString_Widget);
 
         if(multilinestringWidget->getPV().size() > 0) {
@@ -3023,7 +3023,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         if(data.edata.connected) {
             int colorMode = labelverticalWidget->getColorMode();
-            if(colorMode == caLabel::Static) {
+            if(colorMode == caLabelVertical::Static) {
                 // done at initialisation, we have to set it back after no connect
                 if(!labelverticalWidget->property("Connect").value<bool>()) {
                     QColor fg = labelverticalWidget->property("FColor").value<QColor>();
@@ -3032,7 +3032,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     labelverticalWidget->setBackground(bg);
                     labelverticalWidget->setProperty("Connect", true);
                 }
-            } else if(colorMode == caLabel::Alarm) {
+            } else if(colorMode == caLabelVertical::Alarm) {
                 short status = ComputeAlarm(w);
                 labelverticalWidget->setAlarmColors(status);
             }

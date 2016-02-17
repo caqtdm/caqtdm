@@ -66,7 +66,7 @@ class QTCON_EXPORT caLineEdit : public QLineEdit, public FontScalingWidget
 
     Q_PROPERTY(FormatType formatType READ getFormatType WRITE setFormatType)
 
-    Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
+    //Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
 
     Q_ENUMS(ScaleMode)
     Q_ENUMS(FormatType)
