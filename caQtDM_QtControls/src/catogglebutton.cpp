@@ -101,7 +101,7 @@ void caToggleButton::setColors(QColor bg, QColor fg)
 
         } else {
             thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
-            thisStyle = thisStyle.arg(bg.red()).arg(thisBackColor.green()).arg(bg.blue()).arg(bg.alpha()).
+            thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
                     arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
             oldBackColor = bg;
             oldForeColor = fg;
@@ -113,6 +113,7 @@ void caToggleButton::setColors(QColor bg, QColor fg)
         oldStyle = thisStyle;
         update();
     }
+    oldColorMode = thisColorMode;
 }
 
 void caToggleButton::setBackground(QColor c)
