@@ -57,7 +57,7 @@ public:
     void setLabelDisplay(bool thisLabelDisplay);
 
     colMode getColorMode() const { return thisColorMode; }
-    void setColorMode(colMode colormode) {thisColorMode = colormode; setColors(thisBackColor, thisForeColor, true);}
+    void setColorMode(colMode colormode) {thisColorMode = colormode; setColors(thisBackColor, thisForeColor);}
 
     QString getLabel() const;
 
@@ -68,25 +68,28 @@ public:
     int getAccessW() const {return thisAccessW;}
     void setAccessW(int access);
 
-    void setColors(QColor bg, QColor fg, bool force);
+    void setColors(QColor bg, QColor fg);
     void setAlarmColors(short status);
     void setNormalColors();
 
 private slots:
 
-
 protected:
+     virtual bool event(QEvent *);
 
 private:
     QString thisPV;
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
+    QColor defBackColor, defForeColor, defSelectColor;
     QPalette thisPalette;
     bool thisLabelDisplay;
     int thisAccessW;
-    colMode  thisColorMode;
+    colMode  thisColorMode, oldColorMode;
     QPalette defaultPalette;
+    QString thisStyle, oldStyle;
 
+    bool isShown;
     bool eventFilter(QObject *obj, QEvent *event);
 };
 

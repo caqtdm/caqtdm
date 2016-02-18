@@ -50,6 +50,7 @@ class  QTCON_EXPORT caInclude : public QWidget
     Q_PROPERTY(int numberOfItems READ getItemCount WRITE setItemCount)
     Q_PROPERTY(int maximumLines READ getMaxLines WRITE setMaxLines DESIGNABLE isPropertyVisible(maximumLines))
     Q_ENUMS(Stacking)
+    Q_PROPERTY(bool adjustSizeToContents READ getAdjustSize WRITE setAdjustSize)
 
 #include "caVisibProps.h"
 #include "caVisibDefs.h"
@@ -63,6 +64,9 @@ public:
     enum Stacking {Row=0, Column,RowColumn};
     Stacking getStacking() const { return thisStacking; }
     void setStacking(Stacking stacking);
+
+    bool getAdjustSize() { return thisAdjust; }
+    void setAdjustSize(bool adjust) { thisAdjust = adjust; setFileName(newFileName);}
 
     int getItemCount() const { return thisItemCount;}
     void setItemCount(int count) {if(count > 0) thisItemCount = count; else thisItemCount=1; setFileName(newFileName); prvItemCount = thisItemCount;}
@@ -114,6 +118,8 @@ private:
     Stacking thisStacking, prvStacking;
     int thisItemCount, prvItemCount;
     int thisMaxLines, prvMaxLines;
+    QSize effectiveSize;
+    bool thisAdjust, prvAdjust;
 
 #ifdef PRC
     ParsePepFile *pepfile;

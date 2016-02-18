@@ -86,7 +86,14 @@ DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
 # 4.0.3
 # it is now possible to pipe ui data to caQtDM
-
+# reload management had to be changed due to some Qt memory management problem
+# eliminated some memory leaks
+# corrected wavetable string crash
+# one can now define if the size of an included ui file will be size adjusted or not
+# cabyte, cabytecontroller performance were bad and has to be be corrected
+# camenu and catogglebutton color handling is now done by stylesheet and not with palette colors. This in order to prevent cascading stylesheets, that have precedence over palette colors, to interfere.
+# default property for label set to transparent color
+# window for included filenames shows now the number of times and average loadtime for loading.
 
 # 4.0.2
 # caQtDM can now be told to load a specific stylesheet file by the option -stylefile filename

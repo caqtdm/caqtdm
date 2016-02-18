@@ -233,6 +233,15 @@ public:
     }
 };
 
+#if !defined(useElapsedTimer)
+double CaQtDM_Lib::rTime()
+{
+    struct timeval tt;
+    gettimeofday(&tt, (struct timezone *) 0);
+    return (double) 1000000.0 * (double) tt.tv_sec + (double) tt.tv_usec;
+}
+#endif
+
 /**
  * CaQtDM_Lib destructor
  */
@@ -243,9 +252,10 @@ CaQtDM_Lib::~CaQtDM_Lib()
                SIGNAL(Signal_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData)), this,
                SLOT(Callback_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData)));
 
-    if(!fromAS) delete myWidget;
+    //if(!fromAS) delete myWidget;
     includeWidgetList.clear();
     topIncludesWidgetList.clear();
+    includeFilesList.clear();
     allTabs.clear();
     allStacks.clear();
 }
@@ -292,8 +302,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     //qDebug() << "open file" << filename << "with macro" << macro;
     setAttribute(Qt::WA_DeleteOnClose);
 
-    includeFiles = "";
-
     // define a layout
     QGridLayout *layout = new QGridLayout;
 
@@ -303,9 +311,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     // treat ui file */
     QFileInfo fi(filename);
-
-    includeFiles.append(fi.absoluteFilePath());
-    includeFiles.append("<br>");
 
     if(!fromAS) {
         if(filename.lastIndexOf(".ui") != -1) {
@@ -422,6 +427,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     // by findChildren, and get the list of all the includes at this level
 
     includeWidgetList.clear();
+    includeFilesList.clear();
     topIncludesWidgetList.clear();
     allTabs.clear();
     allStacks.clear();
@@ -1115,7 +1121,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         //==================================================================================================================
     } else if(caMultiLineString* multilinestringWidget = qobject_cast<caMultiLineString *>(w1)) {
 
-        //qDebug() << "create caLineEdit";
+        //qDebug() << "create caMultilineString";
         w1->setProperty("ObjectType", caMultiLineString_Widget);
 
         if(multilinestringWidget->getPV().size() > 0) {
@@ -1462,10 +1468,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         searchFile *s = new searchFile(fileName);
         QString fileNameFound = s->findFile();
         if(fileNameFound.isNull()) {
-            if(!includeFiles.contains(fileName)) {
-                includeFiles.append(fileName);
-                includeFiles.append(" does not exist <br>");
-            }
+            includeData value;
+            value.count = 0;
+            value.ms = 0;
+            value.text="does not exist";
+            includeFilesList.insert(fileName, value);
         } else {
             //qDebug() << "use file" << fileName << "for" << includeWidget;
             fileName = fileNameFound;
@@ -1504,7 +1511,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             // sure file exists ?
             QFileInfo fi(fileName);
             if(fi.exists()) {
-
+                qint64 diff=0;
                 // load prc or ui file
                 if(prcFile) {
                     // load new file
@@ -1512,50 +1519,71 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     thisW = parsefile->load(this);
                     delete parsefile;
                 } else {
+#if !defined(useElapsedTimer)
+                    double last = rTime();
+#else
+                    QElapsedTimer timer;
+                    timer.start();
+#endif
                     QFile *file = new QFile;
                     // open and load ui file
                     file->setFileName(fileName);
                     file->open(QFile::ReadOnly);
-                    //printf("effective load of file %s for widget %s\n", qasc(fileName), qasc(includeWidget->objectName()));
                     thisW = loader.load(file, this);
                     file->close();
                     delete file;
+
+#if !defined(useElapsedTimer)
+                    double now = rTime();
+                    diff = qRound ((now - last) /1000.0);
+#else
+                    diff = timer.elapsed();
+#endif
+                    if(diff < 1) diff=1; // you really do not believe that smaller is possible, do you?
+                }
+
+                QMap<QString, includeData>::const_iterator name = includeFilesList.find(fi.absoluteFilePath());
+                if(name != includeFilesList.end()) {
+                    includeData value = name.value();
+                    value.count++;
+                    value.ms = value.ms + ((int) diff - value.ms) / value.count;
+                    if(!thisW) value.text = "not loaded"; else value.text="loaded";
+                    includeFilesList.insert(fi.absoluteFilePath(), value);
+                } else {
+                    includeData value;
+                    value.count = 1;
+                    value.ms = (int) diff;
+                    if(!thisW) value.text = "not loaded"; else value.text="loaded";
+                    includeFilesList.insert(fi.absoluteFilePath(), value);
                 }
 
                 // some error with loading
                 if (!thisW) {
                     postMessage(QtDebugMsg, (char*) qasc(tr("could not load include file %1").arg(fileName)));
-                    if(!includeFiles.contains(fi.absoluteFilePath())) {
-                        includeFiles.append(fi.absoluteFilePath());
-                        includeFiles.append(" could not be loaded <br>");
-                        continue;
-                    }
                     // seems to be ok
                 } else {
-                    if(!includeFiles.contains(fi.absoluteFilePath())) {
-                        includeFiles.append(fi.absoluteFilePath());
-                        includeFiles.append(" is loaded <br>");
-                    }
                     includeWidgetList.append(thisW);
 
                     // add includeWidget to the gui
                     if(includeWidget->getStacking() == caInclude::Row) {
                         layout->addWidget(thisW, j, 0);
-                        if(row > maxRows) maxRows = row;
                         row++;
+                        maxRows = row;
+                        maxColumns = 1;
                     } else if(includeWidget->getStacking() == caInclude::Column) {
                        layout->addWidget(thisW, 0, j);
-                       if(column > maxColumns) maxColumns = column;
                        column++;
+                       maxColumns = column;
+                       maxRows = 1;
                     } else {
                         if(row >= includeWidget->getMaxLines()) {
                             row=0;
                             column++;
-                            if(column > maxColumns) maxColumns = column;
                         }
                         layout->addWidget(thisW, row, column);
                         row++;
                         if(row > maxRows) maxRows = row;
+                        maxColumns = column + 1;
                     }
 
                     includeWidget->setLayout(layout);
@@ -1581,10 +1609,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         } // end for
 
-        maxColumns++;
-        if(includeWidget->getStacking() != caInclude::RowColumn)  maxRows++;
-
-        if((thisW != (QWidget *) 0 ) && (!prcFile)) {
+        if((thisW != (QWidget *) 0 ) && (!prcFile) && includeWidget->getAdjustSize()) {
             includeWidget->resize(maxColumns * thisW->width(), maxRows * thisW->height());
             // when the include is packed into a scroll area, set the minimumsize too
             if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
@@ -3017,7 +3042,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         if(data.edata.connected) {
             int colorMode = labelverticalWidget->getColorMode();
-            if(colorMode == caLabel::Static) {
+            if(colorMode == caLabelVertical::Static) {
                 // done at initialisation, we have to set it back after no connect
                 if(!labelverticalWidget->property("Connect").value<bool>()) {
                     QColor fg = labelverticalWidget->property("FColor").value<QColor>();
@@ -3026,7 +3051,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     labelverticalWidget->setBackground(bg);
                     labelverticalWidget->setProperty("Connect", true);
                 }
-            } else if(colorMode == caLabel::Alarm) {
+            } else if(colorMode == caLabelVertical::Alarm) {
                 short status = ComputeAlarm(w);
                 labelverticalWidget->setAlarmColors(status);
             }
@@ -5195,7 +5220,17 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         } else  if(selectedItem->text().contains("Include files")) {
             QString info;
             info.append(InfoPrefix);
-            info.append(includeFiles);
+            int totalTime=0;
+            info.append("<strong>the indicated times are approxative</strong><br><br>");
+            QMap<QString, includeData>::const_iterator data = includeFilesList.constBegin();
+            while (data != includeFilesList.constEnd()) {
+                includeData value = data.value();
+                info.append(tr("%1 %2 <strong>%3</strong> times, average load time=<strong>%4ms</strong><br>").arg(data.key()).arg(value.text).arg(value.count).arg(value.ms));
+                totalTime = totalTime + value.count * value.ms;
+                ++data;
+            }
+            //qDebug() << totalTime;
+
             info.append(InfoPostfix);
             myMessageBox box(this);
             box.setText("<html>" + info + "</html>");

@@ -32,14 +32,20 @@
 caMenu::caMenu(QWidget *parent) : QComboBox(parent)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    isShown = false;
     defaultPalette = palette();
     setLabelDisplay(false);
+
+    thisBackColor = QColor(230,230,230);
+    thisForeColor = Qt::black;
+    oldBackColor = QColor(230,230,230);
+    oldForeColor = Qt::black;
+    thisColorMode=Default;
+    oldColorMode =Default;
+    setColorMode(Default);
+
     setAccessW(true);
     installEventFilter(this);
-
-    setColorMode(Default);
-    setBackground(QColor(230,230,230));
-    setForeground(QColor(0,0,0));
 
     setElevation(on_top);
 }
@@ -60,18 +66,21 @@ void caMenu::setPV(QString const &newPV)
 void caMenu::setBackground(QColor c)
 {
     thisBackColor = c;
-    setColors(thisBackColor, thisForeColor, false);
+    setColors(thisBackColor, thisForeColor);
 }
 
 void caMenu::setForeground(QColor c)
 {
     thisForeColor = c;
-    setColors(thisBackColor, thisForeColor, false);
+    setColors(thisBackColor, thisForeColor);
 }
 
-void caMenu::setColors(QColor bg, QColor fg, bool force)
+void caMenu::setColors(QColor bg, QColor fg)
 {
-    if((bg != oldBackColor) || (fg != oldForeColor) || force) {
+    if(!defBackColor.isValid() || !defForeColor.isValid()) return;
+    if((bg != oldBackColor) || (fg != oldForeColor) || (thisColorMode != oldColorMode)) {
+        /* stylesheets will always supersede palette, so palette can not be used */
+        /*
         thisPalette = palette();
         thisPalette.setColor(QPalette::ButtonText, fg);
         thisPalette.setColor(QPalette::Button, bg);
@@ -81,9 +90,29 @@ void caMenu::setColors(QColor bg, QColor fg, bool force)
         } else {
            setPalette(defaultPalette);
         }
-        oldBackColor = bg;
-        oldForeColor = fg;
+        */
+
+        if(thisColorMode == Default) {
+            thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
+            thisStyle = thisStyle.arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
+                    arg(defForeColor.red()).arg(defForeColor.green()).arg(defForeColor.blue()).arg(defForeColor.alpha());
+
+        } else {
+            thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
+            thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
+                    arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
+            oldBackColor = bg;
+            oldForeColor = fg;
+        }
+
     }
+
+    if(thisStyle != oldStyle || thisColorMode != oldColorMode) {
+        setStyleSheet(thisStyle);
+        oldStyle = thisStyle;
+        update();
+    }
+    oldColorMode = thisColorMode;
 }
 
 void caMenu::setAlarmColors(short status)
@@ -104,19 +133,19 @@ void caMenu::setAlarmColors(short status)
     case INVALID_ALARM:
     case NOTCONNECTED:
         bg = AL_WHITE;
-        fg = bg;
+        fg = AL_WHITE;
         break;
     default:
         bg = AL_DEFAULT;
         fg = thisForeColor;
         break;
     }
-    setColors(bg, fg, false);
+    setColors(bg, fg);
 }
 
 void caMenu::setNormalColors()
 {
-    setColors(thisBackColor, thisForeColor, false);
+    setColors(thisBackColor, thisForeColor);
 }
 
 QString caMenu::getLabel() const
@@ -196,5 +225,29 @@ bool caMenu::eventFilter(QObject *obj, QEvent *event)
         return true;
     }
     return QObject::eventFilter(obj, event);
+}
+
+
+bool caMenu::event(QEvent *e)
+{
+    if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
+        // we try to get the default color for the background set through the external stylesheets
+        if(!isShown) {
+          setStyleSheet("");
+          QString c=  palette().color(QPalette::Base).name();
+          defBackColor = QColor(c);
+          //printf("default back color %s %s\n", qasc(c), qasc(this->objectName()));
+          c=  palette().color(QPalette::Text).name();
+          defForeColor = QColor(c);
+          //printf("default fore color %s %s\n", qasc(c), qasc(this->objectName()));
+
+          if(!defBackColor.isValid()) defBackColor = QColor(255, 248, 220, 255);
+          if(!defForeColor.isValid()) defForeColor = Qt::black;
+
+          setColors(thisBackColor, thisForeColor);
+          isShown = true;
+        }
+    }
+    return QComboBox::event(e);
 }
 

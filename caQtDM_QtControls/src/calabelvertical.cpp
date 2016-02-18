@@ -31,7 +31,7 @@
 caLabelVertical::caLabelVertical(QWidget *parent) : QWidget(parent), FontScalingWidget(this)
 {
     setFontScaleMode(WidthAndHeight);
-    thisBackColor = Qt::gray;
+    thisBackColor = QColor(255,255,255,0);
     thisForeColor = Qt::black;
     thisColorMode=Static;
     setColorMode(Static);

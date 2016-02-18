@@ -57,6 +57,8 @@ class QTCON_EXPORT caChoice : public QWidget
 
     Q_PROPERTY(EPushButton::ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleModeL)
 
+    //Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
+
 #include "caElevation.h"
 
 public:

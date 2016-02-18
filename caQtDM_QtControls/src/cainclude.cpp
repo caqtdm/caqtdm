@@ -40,11 +40,13 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
     thisItemCount = 1;
     thisMaxLines = 1;
     thisStacking = Row;
+    thisAdjust = prvAdjust= true;
     setBackground(Qt::black);
     setVisibility(StaticV);
     gridLayout = new QGridLayout;
     gridLayout->setMargin(0);
     gridLayout->setSpacing(0);
+    effectiveSize = QSize(100,100);
 
     setPropertyVisible(maximumLines, false);
 
@@ -141,6 +143,8 @@ void caInclude::setFileName(QString const &filename)
     int nbLines = thisMaxLines;
     int column = 0;
     int row = 0;
+    int maxRows = 0;
+    int maxColumns=0;
 
     newFileName = filename.trimmed();
 
@@ -160,7 +164,7 @@ void caInclude::setFileName(QString const &filename)
         }
 
         // modify stacking
-        if(thisStacking != prvStacking || thisMaxLines != prvMaxLines) {
+        if(thisStacking != prvStacking || thisMaxLines != prvMaxLines || thisAdjust != prvAdjust) {
             if(thisLoadedWidgets.count() > 0) {
                 //printf("modify stacking with %d items\n", thisLoadedWidgets.count());
                 int j = 0;
@@ -177,8 +181,14 @@ void caInclude::setFileName(QString const &filename)
                     // find the row, column to add this widget
                     if(thisStacking == Row) {
                         gridLayout->addWidget(l, j, 0);
+                        row++;
+                        maxRows = row;
+                        maxColumns = 1;
                     } else if(thisStacking == Column) {
                         gridLayout->addWidget(l, 0, j);
+                        column++;
+                        maxColumns = column;
+                        maxRows = 1;
                     } else {
                         if(row >= nbLines) {
                             row=0;
@@ -186,12 +196,17 @@ void caInclude::setFileName(QString const &filename)
                         }
                         gridLayout->addWidget(l, row, column);
                         row++;
+                        if(row > maxRows) maxRows = row;
+                        maxColumns = column + 1;
                     }
                     j++;
                     l->show();
                 }
                 prvStacking = thisStacking;
                 prvMaxLines = thisMaxLines;
+                //printf("resize 1 for row=%d column=%d\n", maxRows, maxColumns);
+                if(thisAdjust) resize(maxColumns * effectiveSize.width(), maxRows * effectiveSize.height());
+                prvAdjust = thisAdjust;
                 return;
             }
         }
@@ -214,6 +229,7 @@ void caInclude::setFileName(QString const &filename)
 
         if(newFileName.contains(".prc")) {
             fileName = newFileName;
+            thisAdjust = false;
         } else {
             openFile = newFileName.split(".", QString::SkipEmptyParts);
             fileName = openFile[0].append(".ui");
@@ -252,6 +268,7 @@ void caInclude::setFileName(QString const &filename)
                 if(tmp == (QWidget*) 0) return;
                 thisLoadedWidgets.append(tmp);
                 loadedWidget = tmp;
+                effectiveSize= tmp->size();
                 // pep file
             } else {
                 ParsePepFile *parsefile = new ParsePepFile(fileNameFound);
@@ -260,13 +277,20 @@ void caInclude::setFileName(QString const &filename)
                 if(tmp == (QWidget*) 0) return;
                 thisLoadedWidgets.append(tmp);
                 loadedWidget = tmp;
+                effectiveSize= tmp->size();
             }
 
             // find the row, column to add this widget
             if(thisStacking == Row) {
                 gridLayout->addWidget(loadedWidget, j, 0);
+                row++;
+                maxRows = row;
+                maxColumns = 1;
             } else if(thisStacking == Column) {
                 gridLayout->addWidget(loadedWidget, 0, j);
+                column++;
+                maxColumns = column;
+                maxRows = 1;
             } else {
                 if(row >= nbLines) {
                     row=0;
@@ -274,11 +298,17 @@ void caInclude::setFileName(QString const &filename)
                 }
                 gridLayout->addWidget(loadedWidget, row, column);
                 row++;
+                if(row > maxRows) maxRows = row;
+                maxColumns = column + 1;
             }
 
             // show it
             loadedWidget->show();
         }
+
+        //printf("resize 2 for row=%d column=%d\n", maxRows, maxColumns);
+        if(thisAdjust) resize(maxColumns * effectiveSize.width(), maxRows * effectiveSize.height());
+        prvAdjust = thisAdjust;
 
         prvFileName = newFileName;
         prvStacking = thisStacking;
