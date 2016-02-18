@@ -20,9 +20,10 @@ class bsread_wfhandling :public QObject, public QRunnable
 private:
     knobData* kDataP;
     bsread_channeldata * bsreadPVP;
+    QThreadPool *BlockPoolP;
     void wfconvert();
 public:
-    bsread_wfhandling(knobData* kData,bsread_channeldata * bsreadPV);
+    bsread_wfhandling(knobData* kData,bsread_channeldata * bsreadPV,QThreadPool* BlockPool);
 };
 
 #endif // BSREAD_WFHANDLING_H

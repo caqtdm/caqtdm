@@ -43,21 +43,20 @@ bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint)
 {
    StreamConnectionPoint=ConnectionPoint;
    context=Context;
+
+   UpdaterPool=new QThreadPool(this);
+   UpdaterPool->setExpiryTimeout(-1);
+   BlockPool=new QThreadPool(this);
+   BlockPool->setExpiryTimeout(-1);
+
 }
 bsread_Decode::~bsread_Decode()
 {
     QMutexLocker locker(&mutex);
     setTerminate();
-//    while (zmq_term(zmqsocket)==-1){
-//        if(zmq_errno()==EFAULT) {
-//            break;
-//        }else{
-//            qDebug() << "bsreadPlugin: Terminaion ZMQ failed";
-//        }
-//    }
     bsread_Delay();
-
-
+    UpdaterPool->deleteLater();
+    BlockPool->deleteLater();
 }
 
 
@@ -189,7 +188,7 @@ void bsread_Decode::process()
                     notReceivedCounter++;
                     if (notReceivedCounter>200){
                        qDebug() << "bsread ZMQ Data Timeout";
-                        bsread_DataTimeOut();
+                        //bsread_DataTimeOut();
                         notReceivedCounter=0;
                     }
                 }
@@ -642,13 +641,9 @@ void bsread_Decode::bsread_TransferHeaderData()
 
 
 void bsread_Decode::WaveformManagment(knobData* kData,bsread_channeldata * bsreadPV){
-
-
-
-    bsread_wfhandling *transfer=new bsread_wfhandling(kData,bsreadPV);
-
-
-    QThreadPool::globalInstance()->start(transfer);
+    bsread_wfhandling *transfer=new bsread_wfhandling(kData,bsreadPV,BlockPool);
+    transfer->setAutoDelete(true);
+    UpdaterPool->start(transfer);
 }
 
 
@@ -854,8 +849,8 @@ void bsread_Decode::bsread_EndofData()
                 kData->edata.accessW = false;
             }
         }
-
-        QThreadPool::globalInstance()->waitForDone(-1);
+       qDebug() << "ActiveThreads: "<< QThreadPool::globalInstance()->activeThreadCount();
+        UpdaterPool->waitForDone(-1);
 
 //        foreach(int index, listOfIndexes) {
           for (int i=0;i<MonitorList->count();i++){

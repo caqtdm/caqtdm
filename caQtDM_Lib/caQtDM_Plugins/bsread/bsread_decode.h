@@ -85,7 +85,8 @@ private:
     int channelcounter;
     QList<bsread_channeldata*> Channels;
     QMap<QString,bsread_channeldata*> ChannelSearch;
-
+    QThreadPool* UpdaterPool;
+    QThreadPool* BlockPool;
     QList<int> listOfIndexes;
     QList<QString> listOfRequestedChannels;
     void bsread_SetChannelData(void *message, size_t size);
