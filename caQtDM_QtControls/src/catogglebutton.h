@@ -106,20 +106,20 @@ signals:
 
 protected:
     QSize calculateTextSpace();
+    virtual bool event(QEvent *);
 
 private:
-
     QString thisTrueValue, thisFalseValue;
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
+    QColor defBackColor, defForeColor;
     QPalette thisPalette;
-    colMode thisColorMode;
-    QColor defaultBackColor;
-    QColor defaultForeColor;
-
+    colMode thisColorMode, oldColorMode;
+    QString thisStyle, oldStyle;
     QString     thisPV;
     bool eventFilter(QObject *obj, QEvent *event);
     bool _AccessW;
+    bool isShown;
 };
 
 #endif  /* CATOGGLEBUTTON */
