@@ -5241,7 +5241,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 info.append(QString::number(i+1));
                 info.append(": ");
 #if QT_VERSION > 0x050000
-                info.append(QString(urlStrings.at(i).toHtmlEscaped());
+                info.append(urlStrings.at(i).toHtmlEscaped());
 #else
                 info.append(Qt::escape(urlStrings.at(i)));
 #endif
