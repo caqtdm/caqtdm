@@ -4755,9 +4755,13 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     char colMode[20] = {""};
     QString calcString = "";
     QString imageString = "";
+    QStringList urlStrings;
     double limitsMax=0.0, limitsMin=0.0;
     bool validExecListItems = false;
     QStringList execListItems;
+
+    urlStrings.clear();
+
     if(w != (QWidget*) 0) {
         ClassName = w->metaObject()->className();
         ObjectName = w->objectName();
@@ -5041,6 +5045,9 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             }
         }
 
+    } else if(caMimeDisplay* mimeWidget = qobject_cast<caMimeDisplay *>(w)) {
+        urlStrings = mimeWidget->getFilesList();
+
     } else if(ClassName.contains("QE")) {
         qDebug() << "treat" << w;
 
@@ -5227,6 +5234,21 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             info.append("Object: ");
             info.append(ObjectName);
             info.append("<br>");
+
+            if(!urlStrings.isEmpty()) {
+                info.append("<br>Commands:<br>");
+                for(int i=0; i<urlStrings.count(); i++) {
+                info.append(QString::number(i+1));
+                info.append(": ");
+#if QT_VERSION > 0x050000
+                info.append(QString(urlStrings.at(i).toHtmlEscaped());
+#else
+                info.append(Qt::escape(urlStrings.at(i)));
+#endif
+                info.append("<br>");
+                }
+            }
+
             if(!calcString.isEmpty()) {
                 info.append("<br>");
                 info.append("VisibilityCalc: ");  
