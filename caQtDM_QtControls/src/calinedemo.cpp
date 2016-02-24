@@ -524,16 +524,16 @@ void caLineDemo::caDataUpdate(const QString& units, const QString& String, const
 
 }
 
-void caLineDemo::caActivate(CaQtDM_Lib_Interface* interface, QMap<QString, QString> map, knobData* kData, int* specData, QWidget* parent)
+void caLineDemo::caActivate(CaQtDM_Lib_Interface* lib_interface, QMap<QString, QString> map, knobData* kData, int* specData, QWidget* parent)
 {
     if(getPV().size() > 0) {
         QString pv;
-        interface->addMonitor(parent, kData, getPV(), (QWidget *) this, specData, map, &pv);
+        lib_interface->addMonitor(parent, kData, getPV(), (QWidget *) this, specData, map, &pv);
         setPV(pv);
     }
     setFormat(1);
     setProperty("Taken", true);
-    caDataInterface = interface;
+    caDataInterface = lib_interface;
 }
 
 void caLineDemo::createContextMenu(QMenu& menu){

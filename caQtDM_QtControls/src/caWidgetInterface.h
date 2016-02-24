@@ -27,7 +27,9 @@
 #define CAWIDGET_INTERFACE_H
 
 #include <QWidget>
+#include <QString>
 #include <QMenu>
+#include <QMap>
 #include "caqtdm_lib_interface.h"
 
 class caWidgetInterface
@@ -37,7 +39,7 @@ public:
     // publush ca data
     virtual void caDataUpdate(const QString& units, const QString& String, const knobData& data) = 0;
     // subscribe ca data
-    virtual void caActivate(CaQtDM_Lib_Interface* interface, QMap<QString, QString> map, knobData* kData, int* specData, QWidget* parent) = 0;
+    virtual void caActivate(CaQtDM_Lib_Interface* lib_interface, QMap<QString, QString> map, knobData* kData, int* specData, QWidget* parent) = 0;
     // info for context menu
     virtual void getWidgetInfo(QString* pv, int& nbPV, int& limitsDefault, int& precMode, int& limitsMode,
                                int& Precision, char* colMode, double& limitsMax, double& limitsMin) = 0;

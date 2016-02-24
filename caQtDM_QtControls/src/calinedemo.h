@@ -82,7 +82,7 @@ public:
 
     // caWidgetInterface implementation
     void caDataUpdate(const QString& units, const QString& String, const knobData& data);
-    void caActivate(CaQtDM_Lib_Interface* interface, QMap<QString, QString> map, knobData* kData, int* specData, QWidget* parent);
+    void caActivate(CaQtDM_Lib_Interface* lib_interface, QMap<QString, QString> map, knobData* kData, int* specData, QWidget* parent);
     void getWidgetInfo(QString* pv, int& nbPV, int& limitsDefault, int& precMode, int& limitsMode,
                                     int& Precision, char* colMode, double& limitsMax, double& limitsMin);
     void createContextMenu(QMenu& menu);
