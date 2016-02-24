@@ -88,7 +88,7 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     setMaxValue(1.0);
     setFrame(false);
 
-    keepText = "";
+    keepText = " ";
     unitsLast = "";
     setTextLine(keepText);
     setValueType(false);
@@ -305,7 +305,8 @@ void caLineEdit::setLinewidth(int width)
     setColors(thisBackColor, thisForeColor, thisFrameColor, thisFrameLineWidth);
 }
 
-/* attempt to improve performance
+// attempt to improve performance
+/*
 void caLineEdit::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
@@ -570,7 +571,6 @@ void caLineEdit::setTextLine(const QString &txt)
 void caLineEdit::setTextLine(const QString &txt)
 {
     if(keepText == txt) return;
-    setUpdatesEnabled(false);
     if(keepText.size() != txt.size()) {
         FontScalingWidget::rescaleFont(txt, d_savedTextSpace);
     }

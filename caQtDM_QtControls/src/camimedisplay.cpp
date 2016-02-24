@@ -43,14 +43,12 @@ void caMimeDisplay::Callback_Clicked(int indx)
     if(indx <  Urls.count()) {
         QUrl url(Urls.at(indx));
 
+        printf("call mime <%s>\n", qasc(url.toString()));
+
         // file contains things like http:// or file:// or ...
         if(Urls.at(indx).contains("://")) {
             // test if local file exists
-#if QT_VERSION >= QT_VERSION_CHECK(4, 8, 0)
-            if(url.isLocalFile()) {
-#else
-            if (url.toString().compare(QLatin1String("file"), Qt::CaseInsensitive) != 0) {
-#endif
+            if (url.toString().contains(QLatin1String("file://"), Qt::CaseInsensitive)) {
                 QString filePath = url.toLocalFile();
                 QFile file(filePath);
                 if (!file.exists()) {
@@ -59,7 +57,7 @@ void caMimeDisplay::Callback_Clicked(int indx)
                 }
                 // call file as specified
             }
-            printf("call file %s as specified\n;", qasc(Urls.at(indx)));
+            //printf("call file %s as specified\n;", qasc(Urls.at(indx)));
             bool success = QDesktopServices::openUrl (QUrl(Urls.at(indx)));
             if(!success) QMessageBox::critical(0, tr("caQtDM"), tr("could not start mime application with file '%1'").arg(Urls.at(indx)));
             return;
