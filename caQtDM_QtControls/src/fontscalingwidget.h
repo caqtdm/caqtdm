@@ -27,6 +27,7 @@
 #define FONTSCALING_WIDGET_H
 
 #include <QWidget>
+#include <qtcontrols_global.h>
 
 class FontScalingWidget
 { 

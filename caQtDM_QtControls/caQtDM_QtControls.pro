@@ -33,6 +33,7 @@ TARGET = qtcontrols
 TEMPLATE = lib
 MOC_DIR = moc
 INCLUDEPATH += src
+INCLUDEPATH += ../caQtDM_Lib/src
 RESOURCES = qtcontrols.qrc
 RC_FILE = ./src/qtcontrols.rc
 
@@ -114,7 +115,8 @@ SOURCES	+= \
     src/cabytecontroller.cpp \
     src/calabelvertical.cpp \
     src/camultilinestring.cpp \
-    src/camimedisplay.cpp
+    src/camimedisplay.cpp \
+    src/calinedemo.cpp
 
 XDR_HACK {
     SOURCES += src/xdr_hack.c
@@ -129,9 +131,7 @@ XDR_HACK {
 }
 
 QT += network
-HEADERS += src/networkaccess.h src/fileFunctions.h \
-    src/calabelvertical.h \
-    src/camimedisplay.h
+HEADERS += src/networkaccess.h src/fileFunctions.h
 SOURCES += src/networkaccess.cpp src/fileFunctions.cpp
 
 # assume qwt6.0 was made with qt4
@@ -215,7 +215,12 @@ HEADERS	+= \
     src/cabytecontroller.h \
     src/qtdefinitions.h \
     src/pathdefinitions.h \
-    src/camultilinestring.h
+    src/camultilinestring.h \
+    src/formattype.h \
+    src/calabelvertical.h \
+    src/camimedisplay.h \
+    src/caWidgetInterface.h \
+    src/calinedemo.h
 
 # assume qwt6.0 was made with qt4
 contains(QT_VER_MAJ, 4) {

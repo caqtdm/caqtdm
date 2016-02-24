@@ -55,7 +55,7 @@ epics3_plugin {
  		LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
  		LIBS += $$(EPICSLIB)/libca.dylib
  		LIBS += $$(EPICSLIB)/libCom.dylib
- 		CONFIG += release
+                CONFIG += release
         }
 
         ios | android {
@@ -106,7 +106,7 @@ epics4_plugin {
         	LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
         	LIBS += $$(EPICSLIB)/libca.dylib
         	LIBS += $$(EPICSLIB)/libCom.dylib
-        	CONFIG += release
+                CONFIG += release
         }
 
         ios | android {
@@ -154,7 +154,7 @@ caQtDM_QtControls {
     		OBJECTS_DIR = obj
 		DESTDIR = $$(CAQTDM_COLLECT)
     		CONFIG += lib_bundle
-    		LIBS += -F$$(QWTLIB) -framework qwt
+                LIBS += -F$$(QWTLIB) -framework qwt
   	}
 
 	ios | android {
@@ -162,7 +162,7 @@ caQtDM_QtControls {
 		OBJECTS_DIR = obj
 		DESTDIR = $$(CAQTDM_COLLECT)
 		INCLUDEPATH += $$(QWTINCLUDE)
-   		CONFIG += staticlib
+                CONFIG += staticlib
 	}
 
 	win32 {
@@ -188,8 +188,8 @@ caQtDM_Lib {
       		INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
       		OBJECTS_DIR = ./obj
       		DESTDIR = $(CAQTDM_COLLECT)
-		QMAKE_CXXFLAGS += "-g"
-		QMAKE_CFLAGS_RELEASE += "-g"
+                QMAKE_CXXFLAGS += "-g"
+                QMAKE_CFLAGS_RELEASE += "-g"
 		CONFIG += Define_Build_Python
    	}
 
@@ -302,7 +302,7 @@ caQtDM_Viewer {
         ios {
                 message("caQtDM_viewer configuration : ios")
                 DESTDIR = $(CAQTDM_COLLECT)
-   		CONFIG += staticlib
+                CONFIG += staticlib
    		LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.a
    		LIBS += $(CAQTDM_COLLECT)/libqtcontrols.a
    		LIBS += $$(QWTHOME)/lib/libqwt.a
@@ -333,7 +333,7 @@ caQtDM_Viewer {
    		APP-FONTS.path = fonts
    		QMAKE_BUNDLE_DATA += APP_XML_FILES APP_ICON APP1_ICON StartScreen APP-FONTS
    		QMAKE_CFLAGS += -gdwarf-2
-   		QMAKE_CXXFLAGS += -gdwarf-2
+                QMAKE_CXXFLAGS += -gdwarf-2
 	}
 
 	android {

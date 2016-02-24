@@ -66,7 +66,8 @@ HEADERS += caqtdm_lib.h\
     splashscreen.h \
     epicsExternals.h \
     inlines.h \
-    loadPlugins.h
+    loadPlugins.h \
+    caqtdm_lib_interface.h
 
 !MOBILE {
     SOURCES += myQProcess.cpp  processWindow.cpp

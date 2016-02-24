@@ -78,7 +78,12 @@
 #include "sliderDialog.h"
 #include "splashscreen.h"
 #include "messageQueue.h"
+
+// interface to different controlsystems
 #include "controlsinterface.h"
+
+// interface used enabling some widgets doing their own acquisition by calling caQtDM_Lib routines
+#include "caqtdm_lib_interface.h"
 
 #include <QtControls>
 
@@ -99,7 +104,7 @@ namespace Ui {
 class CaQtDM_Lib;
 }
 
-class CAQTDM_LIBSHARED_EXPORT CaQtDM_Lib : public QMainWindow
+class CAQTDM_LIBSHARED_EXPORT CaQtDM_Lib : public QMainWindow, public CaQtDM_Lib_Interface
 {
     Q_OBJECT
 
@@ -114,10 +119,16 @@ public:
     ~CaQtDM_Lib();
 
     void allowResizing(bool allowresize);
-    int addMonitor(QWidget *thisW, knobData *data, QString pv, QWidget *w, int *specData, QMap<QString, QString> map, QString *pvRep);
     void ComputeNumericMaxMinPrec(QWidget* widget, const knobData &data);
     void UpdateGauge(EAbstractGauge *w, const knobData &data);
     ControlsInterface * getControlInterface(QString plugininterface);
+
+    // interface implementation
+    int addMonitor(QWidget *thisW, knobData *data, QString pv, QWidget *w, int *specData, QMap<QString, QString> map, QString *pvRep);
+    knobData* GetMutexKnobDataPtr(int index);
+    knobData* GetMutexKnobDataPV(QWidget *widget, QString pv);
+    void TreatRequestedValue(QString pv, QString text, FormatType fType, QWidget *w);
+    // interface finish (perhaps we need more)
 
 #ifdef MOBILE
     void grabSwipeGesture(Qt::GestureType fingerSwipeGestureTypeID);
@@ -256,7 +267,7 @@ private:
     int InitVisibility(QWidget* widget, knobData *kData, QMap<QString, QString> map,  int *specData, QString info);
     void postMessage(QtMsgType type, char *msg);
     int Execute(char *command);
-    void TreatRequestedValue(QString pv, QString text, caTextEntry::FormatType fType, QWidget *w);
+
     void TreatRequestedWave(QString pv, QString text, caWaveTable::FormatType fType, int index, QWidget *w);
     void TreatOrdinaryValue(QString pv, double value, int32_t idata, QWidget *w);
     bool getSoftChannel(QString pv, knobData &data);
@@ -287,8 +298,7 @@ private:
     Qt::GestureType fingerSwipeGestureType;
 #endif
 
-    enum formatsType {decimal, hexadecimal, octal, string};
-    long getValueFromString(char *textValue, formatsType fType, char **end);
+    long getValueFromString(char *textValue, FormatType fType, char **end);
 
     QWidget *myWidget;
     QList<QWidget*> includeWidgetList;

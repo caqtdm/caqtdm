@@ -80,5 +80,6 @@ unix {
    }
 }
 
+INCLUDEPATH += ../../caQtDM_Lib/src
 INCLUDEPATH += ../src
 INCLUDEPATH += .

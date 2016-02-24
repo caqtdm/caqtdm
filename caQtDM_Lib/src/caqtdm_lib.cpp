@@ -37,6 +37,9 @@
 #include <QObject>
 #include <QToolBar>
 
+// interfacing widgets, handling their own data acquisition ... (thanks zai)
+#include "caWidgetInterface.h"
+
 // we are using for calculations postfix of epics
 // therefore we need this include and also link with the epics libraries
 // should probably be changed at some point.
@@ -827,6 +830,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         return;
     }
 
+    // any caWidget with caWidgetInterface - actually caInoutDemo (new monitor displaying values/string)
+    if(caWidgetInterface* wif = dynamic_cast<caWidgetInterface *>(w1)) {
+        wif->caActivate(this, map, &kData, specData, myWidget);
+    }
+
     // not a ca widget, but offer the possibility to load files into the text browser by using macros
     //==================================================================================================================
     if(QTextBrowser* browserWidget = qobject_cast<QTextBrowser *>(w1)) {
@@ -927,6 +935,29 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         if(shellWidget->isElevated()) shellWidget->raise();
 
         shellWidget->setProperty("Taken", true);
+
+        //==================================================================================================================
+    } else if(caMimeDisplay* mimeWidget = qobject_cast<caMimeDisplay *>(w1)) {
+
+        //qDebug() << "create caMimeDisplay";
+        w1->setProperty("ObjectType", caShellCommand_Widget);
+
+        QString text;
+        text= mimeWidget->getLabels();
+        if(reaffectText(map, &text))  mimeWidget->setLabels(text);
+
+        text = mimeWidget->getArgs();
+        if(reaffectText(map, &text))  mimeWidget->setArgs(text);
+
+        text = mimeWidget->getFiles();
+        if(reaffectText(map, &text)) mimeWidget->setFiles(text);
+
+        text = mimeWidget->getLabel();
+        if(reaffectText(map, &text))  mimeWidget->setLabel(text);
+
+        if(mimeWidget->isElevated()) mimeWidget->raise();
+
+        mimeWidget->setProperty("Taken", true);
 
         //==================================================================================================================
     } else if(caMenu* menuWidget = qobject_cast<caMenu *>(w1)) {
@@ -2976,8 +3007,13 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         return;
     }
 
+    // any caWidget with caWidgetInterface
+    if (caWidgetInterface* wif = dynamic_cast<caWidgetInterface *>(w)) {
+        wif->caDataUpdate(units, String, data);
+    }
+
     // calc ==================================================================================================================
-    if(caCalc *calcWidget = qobject_cast<caCalc *>(w)) {
+    else if(caCalc *calcWidget = qobject_cast<caCalc *>(w)) {
         bool valid;
         double result = data.edata.rvalue;
         //qDebug() << "we have a caCalc" << calcWidget->getVariable() << "  " <<  data.pv;
@@ -4378,13 +4414,13 @@ void CaQtDM_Lib::Callback_MenuClicked(const QString& text)
  */
 void CaQtDM_Lib::Callback_TextEntryChanged(const QString& text)
 {
-    caTextEntry::FormatType fType;
+    FormatType fType;
     QWidget *w1 = qobject_cast<QWidget *>(sender());
     caTextEntry *w = qobject_cast<caTextEntry *>(sender());
 
     if(!w->getAccessW()) return;
 
-    fType = w->getFormatType();
+    fType = (FormatType) w->getFormatType();
     TreatRequestedValue(w->getPV(), text, fType, w1);
 }
 
@@ -4454,10 +4490,10 @@ void CaQtDM_Lib::Callback_MessageButton(int type)
 
     if(type == 0) {         // pressed
         if(w->getPressMessage().size() > 0)
-            TreatRequestedValue(w->getPV(), w->getPressMessage(), caTextEntry::decimal, w1);
+            TreatRequestedValue(w->getPV(), w->getPressMessage(), decimal, w1);
     } else if(type == 1) {  // released
         if(w->getReleaseMessage().size() > 0)
-            TreatRequestedValue(w->getPV(), w->getReleaseMessage(), caTextEntry::decimal, w1);
+            TreatRequestedValue(w->getPV(), w->getReleaseMessage(), decimal, w1);
     }
 }
 
@@ -4760,7 +4796,9 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         }
     }
 
-    if(caImage* imageWidget = qobject_cast<caImage *>(w)) {
+    if(caWidgetInterface* wif = dynamic_cast<caWidgetInterface *>(w)) {   // any caWidget with caWidgetInterface
+        wif->getWidgetInfo(pv, nbPV, limitsDefault, precMode, limitsMode, Precision, colMode, limitsMax, limitsMin);
+    } else if(caImage* imageWidget = qobject_cast<caImage *>(w)) {
         getAllPVs(imageWidget);
         GetDefinedCalcString(caImage, imageWidget, calcString);
         imageString =imageWidget->getImageCalc();
@@ -5016,7 +5054,9 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     }
 
     // add some more actions
-    if(caScriptButton* scriptbuttonWidget =  qobject_cast< caScriptButton *>(w)) {
+    if(caWidgetInterface* wif = dynamic_cast<caWidgetInterface *>(w)) { // any caWidget with caWidgetInterface
+        wif->createContextMenu(myMenu);
+    } else if(caScriptButton* scriptbuttonWidget =  qobject_cast< caScriptButton *>(w)) {
         Q_UNUSED(scriptbuttonWidget);
 
         // for the camera cameraWidget
@@ -5404,7 +5444,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 QStringList fileNames = dialog.selectedFiles();
                 if(!fileNames[0].isEmpty()) {
                     if(caTextEntry* textentryWidget = qobject_cast<caTextEntry *>(w)) {
-                        caTextEntry::FormatType fType = textentryWidget->getFormatType();
+                        FormatType fType = (FormatType) textentryWidget->getFormatType();
                         TreatRequestedValue(textentryWidget->getPV(), fileNames[0], fType, w);
                     }
                 }
@@ -5415,7 +5455,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             QString text = QInputDialog::getText(this, tr("Input data"), tr("Input:"), QLineEdit::Normal,"", &ok);
             if (ok && !text.isEmpty()) {
                 if(caTextEntry* textentryWidget = qobject_cast<caTextEntry *>(w)) {
-                   caTextEntry::FormatType fType = textentryWidget->getFormatType();
+                   FormatType fType = (FormatType) textentryWidget->getFormatType();
                    TreatRequestedValue(textentryWidget->getPV(), text, fType, w);
                 }
             }
@@ -5886,7 +5926,7 @@ void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QW
 /**
   * this routine will get a value from a string with hex and octal representation
   */
-long CaQtDM_Lib::getValueFromString(char *textValue, formatsType fType, char **end)
+long CaQtDM_Lib::getValueFromString(char *textValue, FormatType fType, char **end)
 {
     if(fType == octal) {
         return strtoul(textValue, end, 8);
@@ -5904,7 +5944,7 @@ long CaQtDM_Lib::getValueFromString(char *textValue, formatsType fType, char **e
 /**
   * this routine will treat the string, command, value to write to the pv
   */
-void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::FormatType fType, QWidget *w)
+void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, FormatType fType, QWidget *w)
 {
     char errmess[255];
     double value;
@@ -5914,11 +5954,11 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
     int indx;
     ControlsInterface * plugininterface = (ControlsInterface *) 0;
 
-    formatsType fTypeNew;
+    FormatType fTypeNew;
 
-    if(fType == caTextEntry::octal) fTypeNew = octal;
-    else if(fType == caTextEntry::hexadecimal) fTypeNew = hexadecimal;
-    else if(fType == caTextEntry::string) fTypeNew = string;
+    if(fType == octal) fTypeNew = octal;
+    else if(fType == hexadecimal) fTypeNew = hexadecimal;
+    else if(fType == string) fTypeNew = string;
     else fTypeNew = decimal;
 
     knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv);
@@ -5992,7 +6032,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
         break;
 
     case caCHAR:
-        if(fType == caTextEntry::string) {
+        if(fType == string) {
             if(kPtr->edata.nelm > 1) {
                //qDebug() << "set string" << text;
                if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, (char*) qasc(text), (char*) qasc(w->objectName().toLower()), errmess, 0);
@@ -6060,7 +6100,7 @@ void CaQtDM_Lib::TreatRequestedWave(QString pv, QString text, caWaveTable::Forma
     ControlsInterface * plugininterface = (ControlsInterface *) w->property("Interface").value<void *>();
     if(plugininterface == (ControlsInterface *) 0) return;
 
-    formatsType fTypeNew;
+    FormatType fTypeNew;
 
     if(fType == caWaveTable::octal) fTypeNew = octal;
     else if(fType == caWaveTable::hexadecimal) fTypeNew = hexadecimal;
@@ -6510,7 +6550,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 {
     double factX, factY;
 
-    //qDebug() << "resize" << event->size();
+    qDebug() << "resize" << event->size();
     QMainWindow *main = this->findChild<QMainWindow *>();
     // it seems that when mainwindow was fixed by user, then the window stays empty ?
     if(main != (QObject*) 0) {
@@ -6522,6 +6562,8 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
         if(!prcFile) main->setFixedSize(myWidget->size());
         return;
     }
+
+    if(myWidget == (QWidget*) 0) return;
 
     if(firstResize) {
         firstResize = false;
@@ -6856,6 +6898,14 @@ void CaQtDM_Lib::Callback_WriteDetectedValues(QWidget* child)
     }
 }
 
+// wrappers for any caWidget with caWidgetInterface (perhaps more needed)
+knobData* CaQtDM_Lib::GetMutexKnobDataPtr(int index){
+    return mutexKnobDataP->GetMutexKnobDataPtr(index);
+}
+knobData* CaQtDM_Lib::GetMutexKnobDataPV(QWidget *widget, QString pv){
+    return mutexKnobDataP->getMutexKnobDataPV(widget, pv);
+}
+
 // initiate drag, one will be able to drop to another Qt-application
 void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
 {
@@ -6870,7 +6920,10 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
     QMimeData *mimeData = new QMimeData;
     mimeData->setData("application/x-hotspot", QByteArray::number(hotSpot.x()) + " " + QByteArray::number(hotSpot.y()));
 
-    if(caCalc *calcWidget = qobject_cast<caCalc *>(w)) {
+
+    if(caWidgetInterface* wif = dynamic_cast<caWidgetInterface *>(w)) {  // any caWidget with caWidgetInterface
+        mimeData->setText(wif->getDragText());
+    } else if(caCalc *calcWidget = qobject_cast<caCalc *>(w)) {
         mimeData->setText(calcWidget->getVariable());
     } else if (caMenu *menu1Widget = qobject_cast<caMenu *>(w)) {
         mimeData->setText(menu1Widget->getPV());

@@ -27,6 +27,7 @@
 #define CALINEEDIT_H
 
 #include <QLineEdit>
+#include <QPainter>
 #include <qtcontrols_global.h>
 #include <fontscalingwidget.h>
 
@@ -155,6 +156,8 @@ protected:
       virtual QSize sizeHint() const;
       virtual QSize minimumSizeHint() const;
       QSize calculateTextSpace();
+      // attempt to improve performance
+      //void paintEvent(QPaintEvent *);
 
 private:
     QString thisPV;

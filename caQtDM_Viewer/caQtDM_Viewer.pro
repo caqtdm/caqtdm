@@ -12,8 +12,8 @@ contains(QT_VER_MAJ, 4) {
 contains(QT_VER_MAJ, 5) {
    QT     += core gui svg uitools  printsupport network opengl
    CONFIG += qt warn_on thread widgets
-   DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000 
-} 
+   DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
+}
 
 TARGET = caQtDM
 TEMPLATE = app
