@@ -822,8 +822,8 @@ void caCamera::CameraDataConvert_16bit(int sector,int sectorcount,SyncMinMax* Mi
         }
     }
     MinMax->MinMaxLock->lock();
-    MinMax->Max[(indx > MinMax->Max[1])] = Max[1];
-    MinMax->Min[(indx < MinMax->Min[1])] = Min[1];
+    MinMax->Max[(Max[1] > MinMax->Max[1])] = Max[1];
+    MinMax->Min[(Min[1] < MinMax->Min[1])] = Min[1];
     MinMax->MinMaxLock->unlock();
 
 }
