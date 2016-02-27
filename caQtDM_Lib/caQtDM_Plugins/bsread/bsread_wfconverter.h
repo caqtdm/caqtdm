@@ -29,12 +29,17 @@ private:
     knobData* kDataP;
     bsread_channeldata * bsreadPVP;
     QThreadPool *BlockPoolP;
+    bool usememcpyP;
 public:
     bsread_wfConverter(knobData* kData,bsread_channeldata * bsreadPV,QThreadPool *BlockPool)
     {
         kDataP=kData;
         bsreadPVP=bsreadPV;
         BlockPoolP=BlockPool;
+        usememcpyP=false;
+    }
+    void usememcpy(){
+      usememcpyP=true;
     }
 
     void ConProcess(int sectorP,int fullP,T_BSREAD* SourceP,size_t sourcecountP ,T_CAQTDM * targetP){
@@ -83,49 +88,54 @@ public:
             datamutex->unlock();
         }
         kDataP->edata.valueCount=bsreadPVP->bsdata.wf_data_size;
-        if (kDataP->edata.valueCount<100000){
-            QByteArray data = QByteArray::fromRawData((const char *)bsreadPVP->bsdata.wf_data, bsreadPVP->bsdata.wf_data_size*sizeof(T_BSREAD));
-            QDataStream stream(data);
-            ulong counter=0;
 
-            switch(bsreadPVP->endianess){
-               case bs_big : stream.setByteOrder(QDataStream::BigEndian);
-               default     : stream.setByteOrder(QDataStream::LittleEndian);
-            }
-
-            while ( !stream.atEnd() ) {
-                 T_BSREAD datatemp;
-                 stream >> datatemp;
-
-                 ((T_CAQTDM*)kDataP->edata.dataB)[counter]=(T_CAQTDM)datatemp;
-                 counter++;
-            }
+        if (usememcpyP){
+            memcpy(kDataP->edata.dataB,(const char *)bsreadPVP->bsdata.wf_data,kDataP->edata.dataSize);
         }else{
-            int threadcounter=QThread::idealThreadCount()+2;
-            size_t elementcount= (bsreadPVP->bsdata.wf_data_size);
+            if (kDataP->edata.valueCount<100000){
+                QByteArray data = QByteArray::fromRawData((const char *)bsreadPVP->bsdata.wf_data, bsreadPVP->bsdata.wf_data_size*sizeof(T_BSREAD));
+                QDataStream stream(data);
+                ulong counter=0;
 
-#ifndef QT_NO_CONCURRENT
-            QFutureSynchronizer<void> Sectors;
-            for (int sector=0;sector<threadcounter;sector++){
-              T_BSREAD* ptr=(T_BSREAD *)(bsreadPVP->bsdata.wf_data);
-              T_CAQTDM* target=(T_CAQTDM*)(kDataP->edata.dataB);
+                switch(bsreadPVP->endianess){
+                   case bs_big : stream.setByteOrder(QDataStream::BigEndian);
+                   default     : stream.setByteOrder(QDataStream::LittleEndian);
+                }
 
-              Sectors.addFuture(QtConcurrent::run(this,&bsread_wfConverter::ConProcess,sector,threadcounter,ptr,elementcount,target));
+                while ( !stream.atEnd() ) {
+                     T_BSREAD datatemp;
+                     stream >> datatemp;
+
+                     ((T_CAQTDM*)kDataP->edata.dataB)[counter]=(T_CAQTDM)datatemp;
+                     counter++;
+                }
+            }else{
+                int threadcounter=QThread::idealThreadCount();
+                size_t elementcount= (bsreadPVP->bsdata.wf_data_size);
+
+    #ifndef QT_NO_CONCURRENT
+                QFutureSynchronizer<void> Sectors;
+                for (int sector=0;sector<threadcounter;sector++){
+                  T_BSREAD* ptr=(T_BSREAD *)(bsreadPVP->bsdata.wf_data);
+                  T_CAQTDM* target=(T_CAQTDM*)(kDataP->edata.dataB);
+
+                  Sectors.addFuture(QtConcurrent::run(this,&bsread_wfConverter::ConProcess,sector,threadcounter,ptr,elementcount,target));
+                }
+                Sectors.waitForFinished();
+                //printf("Image timer : %d milliseconds \n",timer.elapsed());
+
+
+    #else
+                ConProcess(1,1,ptr,elementcount,target);
+    #endif
+
+
+
             }
-            Sectors.waitForFinished();
-            //printf("Image timer : %d milliseconds \n",timer.elapsed());
 
+            qDebug() << "convert timer :" <<  timer.elapsed() << "milliseconds";
 
-#else
-            ConProcess(1,1,ptr,elementcount,target);
-#endif
-
-
-
-        }
-
-        qDebug() << "convert timer :" <<  timer.elapsed() << "milliseconds";
-
+          }
       }
 
 };

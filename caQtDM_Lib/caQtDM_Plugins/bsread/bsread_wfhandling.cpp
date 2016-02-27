@@ -1,3 +1,4 @@
+#include <QSysInfo>
 #include "bsread_wfhandling.h"
 #include "bsread_wfconverter.h"
 
@@ -60,6 +61,9 @@ void bsread_wfhandling::wfconvert()
         case bs_uint16:{
             //qDebug() << "<quint16,int>";
             bsread_wfConverter<quint16,unsigned short> *converter=new bsread_wfConverter<quint16,unsigned short>(kDataP,bsreadPVP,BlockPoolP);
+            if ((bsreadPVP->endianess==bs_little)&&(QSysInfo::ByteOrder==QSysInfo::LittleEndian)){
+                converter->usememcpy();
+            }
             converter->wfconvert();
             delete converter;
             break;
