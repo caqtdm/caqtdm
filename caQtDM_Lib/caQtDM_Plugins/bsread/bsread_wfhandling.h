@@ -17,13 +17,20 @@ class bsread_wfhandling :public QObject, public QRunnable
          //qDebug() << "Thread:" << QThread::currentThread();
          wfconvert();
      }
+public slots:
+    void process();
+
 private:
     knobData* kDataP;
     bsread_channeldata * bsreadPVP;
     QThreadPool *BlockPoolP;
-    void wfconvert();
+
+
+
+
 public:
     bsread_wfhandling(knobData* kData,bsread_channeldata * bsreadPV,QThreadPool* BlockPool);
+    void wfconvert();
 };
 
 #endif // BSREAD_WFHANDLING_H

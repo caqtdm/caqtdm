@@ -19,12 +19,14 @@ HEADERS         = bsread_Plugin.h ../controlsinterface.h \
     bsread_dispatchercontrol.h \
     bsread_wfhandling.h \
     bsread_wfconverter.h \
-    bsread_wfblockconverter.h
+    bsread_wfblockconverter.h \
+    bsread_wfconverterthread.h
 SOURCES         = bsread_Plugin.cpp md5.cc \
     bsread_decode.cpp \
     bsread_channeldata.cpp \
     bsread_dispatchercontrol.cpp \
-    bsread_wfhandling.cpp
+    bsread_wfhandling.cpp \
+    bsread_wfconverterthread.cpp
 TARGET          = bsread_Plugin
 
 

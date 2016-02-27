@@ -10,6 +10,25 @@ class bsread_wfblockconverter :public QObject, public QRunnable
 {
     void run()
      {
+        Process();
+     }
+private:
+    int sectorP,fullP;
+    T_BSREAD* SourceP;
+    size_t sourcecountP;
+    T_CAQTDM * targetP;
+    bsread_endian EndianessP;
+
+public:
+    bsread_wfblockconverter(int sector,int full,T_BSREAD* Source,size_t sourcecount ,T_CAQTDM * target,bsread_endian Endianess){
+      sectorP=sector;
+      fullP=full;
+      SourceP=Source;
+      sourcecountP=sourcecount;
+      targetP=target;
+      EndianessP=Endianess;
+    }
+    void Process(int dummy){
         //QElapsedTimer timer;
         //timer.start();
 
@@ -30,23 +49,6 @@ class bsread_wfblockconverter :public QObject, public QRunnable
         }
         //qDebug() <<"Sec2:" << sectorP <<  "convert timer :" <<  timer.elapsed() << "milliseconds";
 
-
-     }
-private:
-    int sectorP,fullP;
-    T_BSREAD* SourceP;
-    size_t sourcecountP;
-    T_CAQTDM * targetP;
-    bsread_endian EndianessP;
-
-public:
-    bsread_wfblockconverter(int sector,int full,T_BSREAD* Source,size_t sourcecount ,T_CAQTDM * target,bsread_endian Endianess){
-      sectorP=sector;
-      fullP=full;
-      SourceP=Source;
-      sourcecountP=sourcecount;
-      targetP=target;
-      EndianessP=Endianess;
     }
 };
 #endif // BSREAD_WFBLOCKCONVERTER

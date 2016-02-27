@@ -49,6 +49,8 @@ bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint)
    BlockPool=new QThreadPool(this);
    BlockPool->setExpiryTimeout(-1);
 
+
+
 }
 bsread_Decode::~bsread_Decode()
 {
@@ -642,8 +644,13 @@ void bsread_Decode::bsread_TransferHeaderData()
 
 void bsread_Decode::WaveformManagment(knobData* kData,bsread_channeldata * bsreadPV){
     bsread_wfhandling *transfer=new bsread_wfhandling(kData,bsreadPV,BlockPool);
-    transfer->setAutoDelete(true);
-    UpdaterPool->start(transfer);
+    //transfer->setAutoDelete(true);
+    //UpdaterPool->start(transfer);
+   //QMutexLocker lock(&WfDataHandlerLocker);
+   //WfDataHandlerQueue.append(transfer);
+    transfer->process();
+
+
 }
 
 
@@ -850,7 +857,13 @@ void bsread_Decode::bsread_EndofData()
             }
         }
        qDebug() << "ActiveThreads: "<< QThreadPool::globalInstance()->activeThreadCount();
-        UpdaterPool->waitForDone(-1);
+       // UpdaterPool->waitForDone(-1);
+      // while(WfDataHandlerQueue.count()!=0){
+       //    qDebug() << "WfDataHandlerQueue Wait ";
+
+      // }
+
+
 
 //        foreach(int index, listOfIndexes) {
           for (int i=0;i<MonitorList->count();i++){

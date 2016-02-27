@@ -1,6 +1,11 @@
 #include "bsread_wfhandling.h"
 #include "bsread_wfconverter.h"
 
+void bsread_wfhandling::process()
+{
+    wfconvert();
+}
+
 void bsread_wfhandling::wfconvert()
 {
     switch (bsreadPVP->type){

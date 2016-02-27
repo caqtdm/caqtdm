@@ -32,6 +32,7 @@
 #include "knobData.h"
 #include "mutexKnobData.h"
 #include "bsread_channeldata.h"
+#include "bsread_wfhandling.h"
 
 class bsread_Decode : public QObject
 {
@@ -85,8 +86,14 @@ private:
     int channelcounter;
     QList<bsread_channeldata*> Channels;
     QMap<QString,bsread_channeldata*> ChannelSearch;
+
     QThreadPool* UpdaterPool;
     QThreadPool* BlockPool;
+
+    QList<QThread> WfDataHandlerHandler;
+    QList<bsread_wfhandling*> WfDataHandlerQueue;
+    QMutex WfDataHandlerLocker;
+
     QList<int> listOfIndexes;
     QList<QString> listOfRequestedChannels;
     void bsread_SetChannelData(void *message, size_t size);

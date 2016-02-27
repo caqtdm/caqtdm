@@ -15,6 +15,13 @@
 #include "bsread_channeldata.h"
 #include "bsread_wfblockconverter.h"
 
+#ifndef QT_NO_CONCURRENT
+#include <QtConcurrent/QtConcurrent>
+#include <QFutureSynchronizer>
+#endif
+
+
+
 template <class T_BSREAD,class T_CAQTDM>
 class bsread_wfConverter
 {
@@ -29,6 +36,30 @@ public:
         bsreadPVP=bsreadPV;
         BlockPoolP=BlockPool;
     }
+
+    void ConProcess(int sectorP,int fullP,T_BSREAD* SourceP,size_t sourcecountP ,T_CAQTDM * targetP){
+        //QElapsedTimer timer;
+        //timer.start();
+
+        QByteArray data = QByteArray::fromRawData((const char *)SourceP,(int) sourcecountP*sizeof(T_BSREAD));
+        QDataStream stream(data);
+        stream.skipRawData((int)(sectorP*(sourcecountP*sizeof(T_BSREAD)/fullP)));
+        switch(bsreadPVP->endianess){
+           case bs_big : stream.setByteOrder(QDataStream::BigEndian);
+           default     : stream.setByteOrder(QDataStream::LittleEndian);
+        }
+        size_t counter=sectorP*sourcecountP/fullP;
+        size_t counterEnd=counter+sourcecountP/fullP;
+        while ( !stream.atEnd()&& (counter<counterEnd) ) {
+             T_BSREAD datatemp;
+             stream >> datatemp;
+             (targetP)[counter]=(T_CAQTDM)datatemp;
+             counter++;
+        }
+        //qDebug() <<"Sec2:" << sectorP <<  "convert timer :" <<  timer.elapsed() << "milliseconds";
+
+    }
+
 
     void wfconvert()
     {
@@ -70,19 +101,26 @@ public:
                  counter++;
             }
         }else{
-            int threadcounter=QThread::idealThreadCount();
+            int threadcounter=QThread::idealThreadCount()+2;
             size_t elementcount= (bsreadPVP->bsdata.wf_data_size);
+
+#ifndef QT_NO_CONCURRENT
+            QFutureSynchronizer<void> Sectors;
             for (int sector=0;sector<threadcounter;sector++){
               T_BSREAD* ptr=(T_BSREAD *)(bsreadPVP->bsdata.wf_data);
               T_CAQTDM* target=(T_CAQTDM*)(kDataP->edata.dataB);
-              bsread_wfblockconverter<T_BSREAD,T_CAQTDM> *blockconverter=new bsread_wfblockconverter<T_BSREAD,T_CAQTDM>(sector,threadcounter,
-                                                                                                                        ptr
-                                                                                                                   ,elementcount
-                                                                                                                 ,target,bsreadPVP->endianess);
-              blockconverter->setAutoDelete(true);
-              BlockPoolP->start(blockconverter);
+
+              Sectors.addFuture(QtConcurrent::run(this,&bsread_wfConverter::ConProcess,sector,threadcounter,ptr,elementcount,target));
             }
-            BlockPoolP->waitForDone();
+            Sectors.waitForFinished();
+            //printf("Image timer : %d milliseconds \n",timer.elapsed());
+
+
+#else
+            ConProcess(1,1,ptr,elementcount,target);
+#endif
+
+
 
         }
 
