@@ -185,5 +185,6 @@ private:
     QColor m_FrameColor, m_FrameColorOld;
     int m_FrameLineWidth, m_FrameLineWidthOld;
     QColor m_FrameColorTop, m_FrameColorBottom;
+    QBrush brush;
 };
 #endif

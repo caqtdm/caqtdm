@@ -78,7 +78,10 @@ caLineDemo::caLineDemo(QWidget *parent) : QWidget(parent), FontScalingWidget(thi
 
     m_AlarmState = 0;
 
+    brush = QBrush(m_BackColor);
     setText(" ");
+
+    setAttribute(Qt::WA_OpaquePaintEvent);
 }
 
 void caLineDemo::setFrame(bool frame) {
@@ -157,6 +160,7 @@ void caLineDemo::setColors(QColor bg, QColor fg, QColor frame)
             m_BackColor = bg;
             m_ForeColor = fg;
         }
+        brush = QBrush(m_BackColor);
         update();
     }
     m_BackColorOld = bg;
@@ -271,9 +275,6 @@ void caLineDemo::setAlarmColors(short status, double value, QColor bgAtInit, QCo
 void caLineDemo::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    QBrush brush = QBrush(m_BackColor);
     painter.setPen(m_ForeColor);
     painter.setBackground(brush);
     painter.setBackgroundMode(Qt::OpaqueMode);
@@ -300,6 +301,7 @@ void caLineDemo::paintEvent(QPaintEvent *)
         painter.drawLine(QPoint(0, m_FrameLineWidth/2), QPoint(width(), m_FrameLineWidth/2));
         painter.drawLine(QPoint(m_FrameLineWidth/2, m_FrameLineWidth/2), QPoint(m_FrameLineWidth/2, height() - m_FrameLineWidth/2));
     }
+
 }
 
 bool caLineDemo::event(QEvent *e)
@@ -370,8 +372,7 @@ void caLineDemo::setText(const QString &txt)
         FontScalingWidget::rescaleFont(txt, d_savedTextSpace);
     }
     m_Text = txt;
-    //update();
-    repaint();
+    update();
 }
 
 void caLineDemo::setFormat(int prec)
