@@ -54,6 +54,7 @@ caLineDemo::caLineDemo(QWidget *parent) : QWidget(parent), FontScalingWidget(thi
     m_ForeColorOld = Qt::gray;
     m_FrameColor=Qt::black;
     m_FrameLineWidth = 0;
+    m_FramePresent = false;
 
     m_ColorMode=Default;
     m_AlarmHandling = onForeground;
