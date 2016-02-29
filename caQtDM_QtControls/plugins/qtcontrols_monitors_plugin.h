@@ -255,4 +255,16 @@ public:
     caScan2DInterface(QObject* parent);
     virtual QWidget* createWidget(QWidget* parent);
 };
+
+
+class caLineDemoInterface : public CustomWidgetInterface_Monitors
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerCustomWidgetInterface)
+
+public:
+    caLineDemoInterface(QObject* parent);
+    virtual QWidget* createWidget(QWidget* parent);
+};
+
 #endif

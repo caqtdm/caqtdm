@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V4.0.3
+CAQTDM_VERSION = V4.1.0
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -83,6 +83,11 @@ DEFINES += TARGET_DESCRIPTION=\"\\\"$${TARGET_DESCRIPTION}\\\"\"
 DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
+
+# 4.1.0
+# now a widget can be added (see caLineDemo) without having to change caQtDM_lib. An interface has been defined in order to perform the datacuisition inside the widget class.
+# caLineDemo widget is an example for a fast on QWidget based line monitor
+# caMimeDisplay will now take macros into account
 
 # 4.0.3
 # it is now possible to pipe ui data to caQtDM

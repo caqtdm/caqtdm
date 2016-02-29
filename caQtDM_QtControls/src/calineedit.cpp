@@ -88,7 +88,7 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     setMaxValue(1.0);
     setFrame(false);
 
-    keepText = "";
+    keepText = " ";
     unitsLast = "";
     setTextLine(keepText);
     setValueType(false);
@@ -305,6 +305,48 @@ void caLineEdit::setLinewidth(int width)
     setColors(thisBackColor, thisForeColor, thisFrameColor, thisFrameLineWidth);
 }
 
+// attempt to improve performance
+/*
+void caLineEdit::paintEvent(QPaintEvent *)
+{
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    QColor m_BackColor = defBackColor;
+    QColor m_ForeColor = defForeColor;
+
+    QBrush brush = QBrush(m_BackColor);
+    painter.setPen(m_ForeColor);
+    painter.setBackground(brush);
+    painter.setBackgroundMode(Qt::OpaqueMode);
+    painter.fillRect(0,0, width(), height(), brush);
+
+    int m_FrameLineWidth = 0;
+    Qt::Alignment m_Alignment = QLineEdit::alignment();
+    QRect newRect(rect().top() + m_FrameLineWidth + 1, rect().left() + m_FrameLineWidth+1, rect().width() - 2 * m_FrameLineWidth - 2, rect().height() - 2 * m_FrameLineWidth - 2);
+    switch (m_Alignment) {
+    case Qt::AlignLeft:
+        painter.drawText(newRect, Qt::AlignLeft | Qt::AlignVCenter, keepText);
+        break;
+    case Qt::AlignRight:
+        painter.drawText(newRect, Qt::AlignRight | Qt::AlignVCenter, keepText);
+        break;
+    case Qt::AlignCenter:
+    default:
+        painter.drawText(newRect, Qt::AlignCenter | Qt::AlignVCenter, keepText);
+        break;
+    }
+
+    //if(m_FramePresent) {
+    //    painter.setPen(QPen(m_FrameColorBottom, m_FrameLineWidth));
+    //    painter.drawLine(QPoint(0, height() - m_FrameLineWidth/2), QPoint(width(), height() - m_FrameLineWidth/2));
+    //    painter.drawLine(QPoint(width() -  m_FrameLineWidth/2, m_FrameLineWidth/2), QPoint(width() -  m_FrameLineWidth/2, height() - m_FrameLineWidth/2));
+    //    painter.setPen(QPen(m_FrameColorTop, m_FrameLineWidth));
+    //    painter.drawLine(QPoint(0, m_FrameLineWidth/2), QPoint(width(), m_FrameLineWidth/2));
+    //    painter.drawLine(QPoint(m_FrameLineWidth/2, m_FrameLineWidth/2), QPoint(m_FrameLineWidth/2, height() - m_FrameLineWidth/2));
+    //}
+}
+*/
 bool caLineEdit::event(QEvent *e)
 {
     if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
@@ -525,9 +567,20 @@ void caLineEdit::setTextLine(const QString &txt)
     keepText = txt;
 }
 
+/* attempt to improve performance
+void caLineEdit::setTextLine(const QString &txt)
+{
+    if(keepText == txt) return;
+    if(keepText.size() != txt.size()) {
+        FontScalingWidget::rescaleFont(txt, d_savedTextSpace);
+    }
+    keepText = txt;
+    repaint();
+}
+*/
+
 void caLineEdit::forceText(const QString &txt)
 {
-    //printf("forcetext: <%s>\n", qasc(txt));
     int pos = cursorPosition();
     QLineEdit::setText(txt);
     FontScalingWidget::rescaleFont(text(), d_savedTextSpace);
