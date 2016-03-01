@@ -504,7 +504,7 @@ void caLineDemo::caDataUpdate(const QString& units, const QString& String, const
         } else {
 
             if(m_ColorMode == Static || m_ColorMode == Default) { // done at initialisation
-                if(property("Connect").value<bool>()) {                      // but was disconnected before
+                if(!property("Connect").value<bool>()) {                      // but was disconnected before
                     setAlarmColors(data.edata.severity, data.edata.rvalue, bg, fg);
                     setProperty("Connect", true);
                 }
