@@ -940,7 +940,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
     } else if(caMimeDisplay* mimeWidget = qobject_cast<caMimeDisplay *>(w1)) {
 
         //qDebug() << "create caMimeDisplay";
-        w1->setProperty("ObjectType", caShellCommand_Widget);
+        w1->setProperty("ObjectType", caMimeDisplay_Widget);
 
         QString text;
         text= mimeWidget->getLabels();

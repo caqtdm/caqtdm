@@ -33,8 +33,6 @@ caByteController::caByteController(QWidget *parent) : QWidget(parent)
 
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    signalMapper = new QSignalMapper(this);
-
     setAccessW(true);
 
     grid = new QGridLayout(this);

@@ -88,7 +88,8 @@ enum objectType {caCalc_Widget = 0,
                  caMeter_Widget,
                  caByteController_Widget,
                  caLabelVertical_Widget,
-                 caMultiLineString_Widget
+                 caMultiLineString_Widget,
+                 caMimeDisplay_Widget
                 };
 
 #endif
