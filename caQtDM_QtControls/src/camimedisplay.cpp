@@ -43,7 +43,7 @@ void caMimeDisplay::Callback_Clicked(int indx)
     if(indx <  Urls.count()) {
         QUrl url(Urls.at(indx));
 
-        printf("call mime <%s>\n", qasc(url.toString()));
+        //printf("call mime <%s>\n", qasc(url.toString()));
 
         // file contains things like http:// or file:// or ...
         if(Urls.at(indx).contains("://")) {
@@ -65,7 +65,7 @@ void caMimeDisplay::Callback_Clicked(int indx)
             // must be a local file we have to search its location (application path, CAQTDM_DISPLAY_PATH, CAQTDM_MIME_PATH
         } else {
             QString fileName = Urls.at(indx);
-            printf("%s\n", qasc(fileName));
+            //printf("%s\n", qasc(fileName));
             // find from application path
             QFile filePath(fileName);
             if(filePath.exists()) {

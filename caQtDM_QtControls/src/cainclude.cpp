@@ -135,21 +135,21 @@ void caInclude::setStacking(Stacking stacking) {
 
 void caInclude::setFileName(QString const &filename)
 {
-    QUiLoader loader;
-    QString fileName;
-    QStringList openFile;
-    fileFunctions filefunction;
-
-    int nbLines = thisMaxLines;
-    int column = 0;
-    int row = 0;
-    int maxRows = 0;
-    int maxColumns=0;
-
     newFileName = filename.trimmed();
 
     // load widgets from includes
     if(loadIncludes) {
+
+        QUiLoader loader;
+        QString fileName;
+        QStringList openFile;
+        fileFunctions filefunction;
+
+        int nbLines = thisMaxLines;
+        int column = 0;
+        int row = 0;
+        int maxRows = 0;
+        int maxColumns=0;
 
         //printf("cainclude -- setfilename %s for %s\n", qasc(filename), qasc(this->objectName()));
 

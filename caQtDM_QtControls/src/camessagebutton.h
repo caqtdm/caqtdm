@@ -39,7 +39,6 @@ class QTCON_EXPORT caMessageButton : public EPushButton
 
     Q_OBJECT
 
-    Q_ENUMS(Stacking)
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
     Q_PROPERTY(QString label READ getLabel WRITE setLabel)
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)

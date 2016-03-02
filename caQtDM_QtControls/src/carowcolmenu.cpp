@@ -36,8 +36,6 @@ caRowColMenu::caRowColMenu(QWidget *parent) : QWidget(parent)
     files << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";
     args  << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";
     labels<< "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";
-    texts << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";
-    signalMapper = new QSignalMapper(this);
 
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     grid = new QGridLayout(this);
@@ -46,8 +44,29 @@ caRowColMenu::caRowColMenu(QWidget *parent) : QWidget(parent)
 
     thisStacking = Row;
     thisForeColor = Qt::black;
+
+    thisBackColor = Qt::gray;
+    thisBackColorHover = thisBackColor.lighter(120);
+    thisBorderColor =thisBackColor .darker(150);
+
     thisScaleMode = EPushButton::WidthAndHeight;
-    setBackground(Qt::gray);
+
+    // for performance reasons prepare the buttons we will need later
+    cellsP.clear();
+    cellsI.clear();
+    signalMapper = new QSignalMapper(this);
+    for (int i = 0; i < 16; i++) {
+        EPushButton* temp =  new EPushButton(labels[i], this);
+        temp->setFontScaleMode(thisScaleMode);
+        temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        temp->setMinimumSize(2,2); //important for resizing as small as possible
+        connect(temp, SIGNAL(clicked()), signalMapper, SLOT(map()));
+        cellsP.append(temp);
+    }
+
+    connect(signalMapper, SIGNAL(mapped(int)),this, SIGNAL(clicked(int)));
+
+    populateCells();
 
     alpha = 255;
 
@@ -69,24 +88,18 @@ void caRowColMenu::populateCells()
 
     if(thisStacking == Hidden) numCells = 1;
 
-    // signalmapper will map signals from all buttons to one signal
-    delete signalMapper;
-    signalMapper = new QSignalMapper(this);
-
     foreach(ImagePushButton *l, cellsI) {
         grid->removeWidget(l);
         l->hide();
-        l->deleteLater();
+        l->setMenu(NULL);
+        signalMapper->removeMappings(l);
     }
 
     foreach(EPushButton *l, cellsP) {
         grid->removeWidget(l);
         l->hide();
-        l->deleteLater();
+        signalMapper->removeMappings(l);
     }
-
-    cellsP.clear();
-    cellsI.clear();
 
     // we want a menu
     if(thisStacking == Menu || thisStacking == Hidden) {
@@ -95,13 +108,13 @@ void caRowColMenu::populateCells()
         if(numCells > 1) {
 
             // class for painting with a pixmap and text
-            ImagePushButton* temp = new ImagePushButton("", thisImage);
+            cellsI.clear();
+            ImagePushButton* temp =  new ImagePushButton("", thisImage);
             temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
             temp->setMinimumSize(2,2); //important for resizing as small as possible
-            temp->setObjectName(texts[0]);
+            cellsI.append(temp);
             grid->addWidget(temp, 0, 0);
 
-            cellsP.append(temp);
             QMenu* menu = new QMenu();
             for (int i = 0; i < numCells; i++) {
                 QAction *action = new QAction(labels[i], this);
@@ -112,15 +125,16 @@ void caRowColMenu::populateCells()
             temp->setMenu(menu);
             temp->show();
 
-            connect(signalMapper, SIGNAL(mapped(int)), this, SIGNAL(triggered(int)));
-
             // menu with one command --> pushbutton
         } else {
 
             // class for painting with a pixmap and text
-            ImagePushButton* temp = new ImagePushButton("", thisImage);
+            cellsI.clear();
+            ImagePushButton* temp =  new ImagePushButton("", thisImage);
             temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
             temp->setMinimumSize(2,2); //important for resizing as small as possible
+            connect(temp, SIGNAL(clicked()), signalMapper, SLOT(map()));
+            cellsI.append(temp);
 
             if(thisStacking == Hidden) {
                 temp->setInVisible(thisBackColor, thisForeColor, thisBorderColor);
@@ -131,27 +145,16 @@ void caRowColMenu::populateCells()
                 borderSize = 3;
             }
 
-            temp->setObjectName(texts[0]);
             grid->addWidget(temp, 0, 0);
-
             temp->show();
-
-            cellsI.append(temp);
-
             signalMapper->setMapping(temp, 0);
-            connect(temp, SIGNAL(clicked()), signalMapper, SLOT(map()));
-            connect(signalMapper, SIGNAL(mapped(int)), this, SIGNAL(clicked(int)));
         }
     } else {
+
         // we want only pusbuttons
-
         for (int i = 0; i < numCells; i++) {
-            EPushButton* temp = new EPushButton(labels[i], this);
-            temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-            temp->setMinimumSize(2,2); //important for resizing as small as possible
-
-            temp->setObjectName(texts[i]);
-
+            EPushButton* temp = cellsP[i];
+            temp->setText(labels[i]);
             // take care of stacking
             if(thisStacking == Row) {
                 grid->addWidget(temp, i, 0);
@@ -165,14 +168,9 @@ void caRowColMenu::populateCells()
                 grid->addWidget(temp, row, column);
                 row++;
             }
-            cellsP.append(temp);
-            temp->show();
-
             signalMapper->setMapping(temp, i);
-            connect(temp, SIGNAL(clicked()), signalMapper, SLOT(map()));
         }
-
-        connect(signalMapper, SIGNAL(mapped(int)), this, SIGNAL(clicked(int)));
+        for (int i = 0; i < numCells; i++) cellsP[i]->show();
     }
 
     updateLabel();
@@ -192,28 +190,25 @@ void caRowColMenu::setImage(QString const &image) {
 
 void caRowColMenu::setStacking(Stacking stacking)
 {
-    QSize newSize;
     thisStacking = stacking;
-    newSize.setHeight( this->size().height()+1);
-    newSize.setWidth(this->size().width()+1);
-    resize(newSize);          // schedule a new resize event
-    QApplication::processEvents(); // process pending events
-    newSize.setHeight( this->size().height()-1);
-    newSize.setWidth(this->size().width()-1);
-    QApplication::processEvents(); // process pending events
-    resize(newSize);          // schedule a new resize event
+
+    // force resize for repainting
+    QResizeEvent *re = new QResizeEvent(size(), size());
+    resizeEvent(re);
+    delete re;
+
     populateCells();
 }
 
 void  caRowColMenu::setLabels(QString const &newL)
 {
+    if(getLabels() == newL) return;
     labels= newL.split(";");
     populateCells();
 }
 
 void caRowColMenu::setArgs(QString const &newL)
 {
-    //printf("new arguments=<%s>\n", qasc(newL));
     args = newL.split(";");
 }
 
@@ -243,26 +238,25 @@ void caRowColMenu::resizeEvent(QResizeEvent *e)
 
 void caRowColMenu::setFontScaleModeL(EPushButton::ScaleMode m)
 {
-   thisScaleMode = m;
-   updateFontScaleMode();
+    thisScaleMode = m;
+    updateFontScaleMode();
 }
 
 EPushButton::ScaleMode caRowColMenu::fontScaleMode()
 {
-    populateCells();
     return thisScaleMode;
 }
 
-void caRowColMenu::updateLabel() {
-
+void caRowColMenu::updateLabel()
+{
     if(thisStacking == Menu || thisStacking == Hidden) {
 
         // more than one command, make menu
         if(numCells > 1 ) {
 
-            if(cellsP.isEmpty() || cellsP.count() < 1) return;
+            if(cellsI.isEmpty() || cellsI.count() < 1) return;
 
-            ImagePushButton *temp = (ImagePushButton *) cellsP[0];
+            ImagePushButton *temp = (ImagePushButton *) cellsI[0];
 
             QString newLabel= thisLabel;
             QString pixLabel = thisLabel;
@@ -316,9 +310,9 @@ void caRowColMenu::updateColors()
         // more than one command, make menu
         if(numCells > 1) {
 
-            if(cellsP.isEmpty() || cellsP.count() < 1) return;
+            if(cellsI.isEmpty() || cellsI.count() < 1) return;
 
-            ImagePushButton *temp = (ImagePushButton *) cellsP[0];
+            ImagePushButton *temp = (ImagePushButton *) cellsI[0];
 
             //set colors and style
 
@@ -332,7 +326,9 @@ void caRowColMenu::updateColors()
                     arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
 
             style.append(hover);
-            temp->setStyleSheet(style);
+            if(temp->styleSheet() != style) {
+                temp->setStyleSheet(style);
+            }
 
             // menu with one command --> pushbutton
         } else {
@@ -340,7 +336,7 @@ void caRowColMenu::updateColors()
 
             ImagePushButton *temp = cellsI[0];
 
-           //set colors and style filled
+            //set colors and style filled
             QString style = "QPushButton{ background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-color: rgba(%9, %10, %11, %12);";
             style = style.arg(thisBackColor.red()).arg(thisBackColor.green()).arg(thisBackColor.blue()).arg(thisBackColor.alpha()).
                     arg(thisForeColor.red()).arg(thisForeColor.green()).arg(thisForeColor.blue()).arg(thisForeColor.alpha()).
@@ -350,9 +346,11 @@ void caRowColMenu::updateColors()
             style.append(border);
             QString hover = "QPushButton:hover {background-color: rgba(%1, %2, %3, %4);}  QPushButton:pressed {background-color: rgba(%5, %6, %7, %8)};";
             hover = hover.arg(thisBackColorHover.red()).arg(thisBackColorHover.green()).arg(thisBackColorHover.blue()).arg(thisBackColorHover.alpha()).
-                          arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
+                    arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
             style.append(hover);
-            temp->setStyleSheet(style);
+            if(temp->styleSheet() != style) {
+                temp->setStyleSheet(style);
+            }
 
         }
     } else {
@@ -372,7 +370,9 @@ void caRowColMenu::updateColors()
             hover= hover.arg(thisBackColorHover.red()).arg(thisBackColorHover.green()).arg(thisBackColorHover.blue()).arg(thisBackColorHover.alpha()).
                     arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
             style.append(hover);
-            temp->setStyleSheet(style);
+            if(temp->styleSheet() != style) {
+                temp->setStyleSheet(style);
+            }
         }
 
     }
@@ -387,15 +387,14 @@ void caRowColMenu::updateFontScaleMode()
         // more than one command, make menu
         if(numCells > 1) {
 
-            if(cellsP.isEmpty() || cellsP.count() < 1) return;
+            if(cellsI.isEmpty() || cellsI.count() < 1) return;
 
-            ImagePushButton *temp = (ImagePushButton *) cellsP[0];
+            ImagePushButton *temp = (ImagePushButton *) cellsI[0];
 
             if(thisScaleMode == EPushButton::None) {  // in this case we may use font
                 temp->setFont(this->font());
-            } else {
-                temp->setFontScaleMode(thisScaleMode);
             }
+            temp->setFontScaleMode(thisScaleMode);
 
             // menu with one command --> pushbutton
         } else {
@@ -405,10 +404,8 @@ void caRowColMenu::updateFontScaleMode()
 
             if(thisScaleMode == EPushButton::None) {  // in this case we may use font
                 temp->setFont(this->font());
-            } else {
-                temp->setFontScaleMode(thisScaleMode);
             }
-
+            temp->setFontScaleMode(thisScaleMode);
         }
     } else {
         // we want only pusbuttons
@@ -418,9 +415,8 @@ void caRowColMenu::updateFontScaleMode()
             EPushButton * temp = (EPushButton *) cellsP[i];
             if(thisScaleMode == EPushButton::None) {  // in this case we may use font
                 temp->setFont(this->font());
-            } else {
-                temp->setFontScaleMode(thisScaleMode);
             }
+            temp->setFontScaleMode(thisScaleMode);
         }
 
     }
