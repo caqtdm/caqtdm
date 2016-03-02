@@ -5216,7 +5216,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             QMap<QString, includeData>::const_iterator data = includeFilesList.constBegin();
             while (data != includeFilesList.constEnd()) {
                 includeData value = data.value();
-                info.append(tr("%1 %2 <strong>%3</strong> times, average load time=<strong>%4ms</strong><br>").arg(data.key()).arg(value.text).arg(value.count).arg(value.ms));
+                info.append(tr("%1 %2 <strong>%3</strong> times, average load time=<strong>%4ms</strong> total load time=<strong>%5ms</strong><br>").
+                            arg(data.key()).arg(value.text).arg(value.count).arg(value.ms).arg(value.ms * value.count));
                 totalTime = totalTime + value.count * value.ms;
                 ++data;
             }
