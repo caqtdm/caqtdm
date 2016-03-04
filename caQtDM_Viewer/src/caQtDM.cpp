@@ -111,6 +111,15 @@ int main(int argc, char *argv[])
     QMap<QString, QString> options;
     options.clear();
 
+#if defined(_MSC_VER)
+    if (AttachConsole(ATTACH_PARENT_PROCESS)){
+        SetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE),ENABLE_QUICK_EDIT_MODE| ENABLE_EXTENDED_FLAGS);
+        freopen("CON", "w", stdout);
+        freopen("CON", "w", stderr);
+        freopen("CON", "r", stdin);
+    }
+#endif
+
     searchFile *s = new searchFile("caQtDM_stylesheet.qss");
     QString fileNameFound = s->findFile();
     if(fileNameFound.isNull()) {
