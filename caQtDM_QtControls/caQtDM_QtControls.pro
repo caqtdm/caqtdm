@@ -134,16 +134,26 @@ QT += network
 HEADERS += src/networkaccess.h src/fileFunctions.h
 SOURCES += src/networkaccess.cpp src/fileFunctions.cpp
 
-# assume qwt6.0 was made with qt4
+
 contains(QT_VER_MAJ, 4) {
-    warning("Qt $$[QT_VERSION] was detected, so compile qwt_thermo_marker")
-    SOURCES	+= src/qwt_thermo_marker.cpp
+    contains(QT_VER_MIN, 6) {
+       warning("Qt $$[QT_VERSION] was detected (use qwt6.0.1), so compile qwt_thermo_marker")
+       HEADERS	+= src/qwt_thermo_marker.h
+       SOURCES	+= src/qwt_thermo_marker.cpp
+    }
+    contains(QT_VER_MIN, 8) {
+       warning("Qt $$[QT_VERSION] was detected (use qwt6.1.1), so compile qwt_thermo_marker_61")
+       HEADERS	+= src/qwt_thermo_marker_61.h
+       SOURCES	+= src/qwt_thermo_marker_61.cpp
+    }
 }
-#assume qwt6.1 was made with qt5
+
 contains(QT_VER_MAJ, 5) {
-    warning("Qt $$[QT_VERSION] was detected, so compile qwt_thermo_marker_61")
+    warning("Qt $$[QT_VERSION] was detected (use qwt6.1.1 or higher), so compile qwt_thermo_marker_61")
+    HEADERS	+= src/qwt_thermo_marker_61.h
     SOURCES	+= src/qwt_thermo_marker_61.cpp
 }
+
 
 HEADERS	+= \
     src/caframe.h \
@@ -221,16 +231,5 @@ HEADERS	+= \
     src/camimedisplay.h \
     src/caWidgetInterface.h \
     src/calinedemo.h
-
-# assume qwt6.0 was made with qt4
-contains(QT_VER_MAJ, 4) {
-    warning("Qt $$[QT_VERSION] was detected, so compile qwt_thermo_marker")
-    HEADERS	+= src/qwt_thermo_marker.h
-}
-#assume qwt6.1 was made with qt5
-contains(QT_VER_MAJ, 5) {
-    warning("Qt $$[QT_VERSION] was detected, so compile qwt_thermo_marker_61")
-    HEADERS	+= src/qwt_thermo_marker_61.h
-}
 
 OTHER_FILES += README
