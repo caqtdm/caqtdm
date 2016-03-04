@@ -925,7 +925,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     } else {
         //qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString;
         QPoint position(0,0);
-        QMainWindow *mainWindow = loadMainWindow(position, fileNameFound, macroString, resizeString, printandexit, false, false);
+        QMainWindow *mainWindow = loadMainWindow(position, fileNameFound, macroString, resizeString, printandexit, false, (geometry == ""));//if geometry is empty center window (for windows)
         if(geometry != "") {
             parse_and_set_Geometry(mainWindow, geometry);
         }
