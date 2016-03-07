@@ -336,6 +336,13 @@ caQtDM_Viewer {
                 plugins_demo.path = Contents/PlugIns/controlsystems
                 plugins_demo.files += $(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.dylib
                 QMAKE_BUNDLE_DATA += plugins_demo
+                plugins_bsread.path = Contents/PlugIns/controlsystems
+                plugins_bsread.files += $(CAQTDM_COLLECT)/controlsystems/libbsread_plugin.dylib
+                QMAKE_BUNDLE_DATA += plugins_bsread
+                zmqlibrary.path = Contents/Frameworks
+                zmqlibrary.files += $$(ZMQLIB)/libzmq.5.dylib
+                QMAKE_BUNDLE_DATA += zmqlibrary
+
   	}
 
         ios {
@@ -498,7 +505,7 @@ Define_ZMQ_Lib{
                 LIBS += $$(ZMQLIB)/libzmq.lib
 	}
         macx {
-                LIBS += $$(ZMQLIB)/libzmq.dylib
+                LIBS += $$(ZMQLIB)/libzmq.5.dylib
         }
         win32 {
 	    DebugBuild {
