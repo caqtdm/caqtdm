@@ -2788,7 +2788,16 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                     // when connected
                     int j = IndexList.at(i+1).toInt(); // input a,b,c,d
                     if(ptr->edata.connected) {
-                        valueArray[j] = ptr->edata.rvalue;
+                        switch (ptr->edata.fieldtype){
+                            case caINT:
+                            case caLONG:{
+                                valueArray[j] = ptr->edata.ivalue;
+                                break;
+                            }
+                            default:{
+                                valueArray[j] = ptr->edata.rvalue;
+                            }
+                        }
                     } else {
                         valueArray[j] = 0.0;
                     }
@@ -3015,7 +3024,17 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
     // calc ==================================================================================================================
     else if(caCalc *calcWidget = qobject_cast<caCalc *>(w)) {
         bool valid;
-        double result = data.edata.rvalue;
+        double result;
+        switch (data.edata.fieldtype){
+            case caINT:
+            case caLONG:{
+                result = data.edata.ivalue;
+                break;
+            }
+            default:{
+                result = data.edata.rvalue;
+            }
+        }
         //qDebug() << "we have a caCalc" << calcWidget->getVariable() << "  " <<  data.pv;
 
         CalcVisibility(w, result, valid);  // visibility not used, but calculation yes
@@ -3395,18 +3414,45 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
                 if(colorMode == caLineEdit::Static || colorMode == caLineEdit::Default) { // done at initialisation
                     if(!lineeditWidget->property("Connect").value<bool>()) {                      // but was disconnected before
-                        lineeditWidget->setAlarmColors(data.edata.severity, data.edata.rvalue, bg, fg);
+                        switch (data.edata.fieldtype){
+                            case caINT:
+                            case caLONG:{
+                                lineeditWidget->setAlarmColors(data.edata.severity, data.edata.ivalue, bg, fg);
+                                break;
+                            }
+                            default:{
+                                lineeditWidget->setAlarmColors(data.edata.severity, data.edata.rvalue, bg, fg);
+                            }
+                        }
                         lineeditWidget->setProperty("Connect", true);
                     }
                 } else {
-                    lineeditWidget->setAlarmColors(data.edata.severity, data.edata.rvalue, bg, fg);
+                    switch (data.edata.fieldtype){
+                        case caINT:
+                        case caLONG:{
+                            lineeditWidget->setAlarmColors(data.edata.severity, data.edata.ivalue, bg, fg);
+                            break;
+                        }
+                        default:{
+                            lineeditWidget->setAlarmColors(data.edata.severity, data.edata.rvalue, bg, fg);
+                        }
+                    }
                 }
 
                 if((precMode != caLineEdit::User) && (data.edata.initialize)) {
                     lineeditWidget->setFormat(data.edata.precision);
                 }
+                switch (data.edata.fieldtype){
+                    case caINT:
+                    case caLONG:{
+                        lineeditWidget->setValue(data.edata.ivalue, units);
+                        break;
+                    }
+                    default:{
+                        lineeditWidget->setValue(data.edata.rvalue, units);
+                    }
+                }
 
-                lineeditWidget->setValue(data.edata.rvalue, units);
                 // access control for textentry
                 if (caTextEntry *textentryWidget = qobject_cast<caTextEntry *>(w)) {
                     textentryWidget->setAccessW((bool)data.edata.accessW);
@@ -3782,7 +3828,17 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 stripplotWidget->resize(stripplotWidget->geometry().width()-1, stripplotWidget->geometry().height());
             }
 
-            stripplotWidget->setData(data.edata.actTime, data.edata.rvalue, actPlot);
+
+            switch (data.edata.fieldtype){
+                case caINT:
+                case caLONG:{
+                    stripplotWidget->setData(data.edata.actTime, data.edata.ivalue, actPlot);
+                    break;
+                }
+                default:{
+                    stripplotWidget->setData(data.edata.actTime, data.edata.rvalue, actPlot);
+                }
+            }
 
             if(data.edata.initialize) {
                 stripplotWidget->startPlot();

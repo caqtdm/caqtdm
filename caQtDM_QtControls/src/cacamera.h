@@ -52,6 +52,15 @@
 #include "colormaps.h"
 #include "caPropHandleDefs.h"
 
+struct SyncMinMax{
+    uint Max[2];
+    uint Min[2];
+    QMutex * MinMaxLock;
+    QMutex * imageLock;
+};
+
+
+
 class QTCON_EXPORT caCamera : public QWidget
 {
     Q_OBJECT
@@ -187,6 +196,7 @@ public:
     void dataProcessing(double value, int id);
     void showDisconnected();
 
+    void CameraDataConvert_16bit(int sector, int sectorcount, SyncMinMax *MinMax, QSize resultSize, int datasize);
 signals:
    void WriteDetectedValuesSignal(QWidget*);
 

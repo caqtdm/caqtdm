@@ -51,6 +51,11 @@ REM ============================================================================
   set CAQTDM_SIGNER="Paul Scherrer Institut"
 
   
+  set ZMQ=X:/Qt/ZMQ
+  set ZMQINC=%ZMQ%/include
+  set ZMQLIB=%ZMQ%/lib/%EPICS_HOST_ARCH%
+
+  
 GOTO PRINTOUT
 REM =============================================================================================
 REM SELECT2
@@ -82,6 +87,10 @@ REM ============================================================================
   set TIMESTAPER="http://timestamp.verisign.com/scripts/timstamp.dll"
   set CAQTDM_SIGNER="Paul Scherrer Institut"
 
+  
+  set ZMQ=X:/Qt/ZMQ
+  set ZMQINC=%ZMQ%/include
+  set ZMQLIB=%ZMQ%/lib/%EPICS_HOST_ARCH%
 GOTO PRINTOUT
 
 REM =============================================================================================
@@ -113,6 +122,10 @@ REM ============================================================================
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
   set TIMESTAPER="http://timestamp.verisign.com/scripts/timstamp.dll"
   set CAQTDM_SIGNER="Paul Scherrer Institut"
+
+  set ZMQ=X:/Qt/ZMQ
+  set ZMQINC=%ZMQ%/include
+  set ZMQLIB=%ZMQ%/lib/%EPICS_HOST_ARCH%
 
 GOTO PRINTOUT
 

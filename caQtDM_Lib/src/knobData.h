@@ -27,6 +27,8 @@
 #define KNOBDATA_H
 
 #include <sys/timeb.h>
+#include "dbrString.h"
+#include "knobDefines.h"
 
 #ifdef __cplusplus
 extern "C" {

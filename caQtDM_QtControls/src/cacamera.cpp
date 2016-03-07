@@ -28,6 +28,7 @@
 #include <math.h>
 #ifndef QT_NO_CONCURRENT
 #include <qtconcurrentrun.h>
+#include <QFutureSynchronizer>
 #endif
 #include "cacamera.h"
 
@@ -763,6 +764,70 @@ void caCamera::dataProcessing(double value, int id)
     readvalues[id] = value;
 }
 
+void caCamera::CameraDataConvert_16bit(int sector,int sectorcount,SyncMinMax* MinMax , QSize resultSize, int datasize)
+{
+    uint indx, indx1;
+    uint Max[2], Min[2];
+    ushort *ptr = (ushort*) savedData;
+    QVector<uint> LineData;
+    LineData.reserve(resultSize.width());
+
+    Max[1] = 0;
+    Min[1] = 65535;
+
+    int ystart=sector*resultSize.height()/sectorcount;
+    int yend=sector*resultSize.height()/sectorcount+resultSize.height()/sectorcount;
+    long i=resultSize.width()*ystart;
+
+    if(thisColormap != grey) {
+
+        for (int y = ystart; y < yend; ++y) {
+            for (int x = 0; x < resultSize.width(); ++x) {
+                indx = ptr[i++];
+                indx1 = (indx - minvalue) * (ColormapSize-1) / (maxvalue - minvalue);
+                if(indx1 >= ColormapSize) indx1=ColormapSize -1;
+
+                //*scanLine++ = ColorMap[indx1];
+                LineData.replace(x,ColorMap[indx1]);
+                Max[(indx > Max[1])] = indx;
+                Min[(indx < Min[1])] = indx;
+                if ((i * 2) >= datasize) break;
+            }
+            if((i*2) >= datasize) break;
+            MinMax->imageLock->lock();
+            uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
+            memcpy(scanLine,LineData.constData(),resultSize.width()*sizeof(uint));
+            MinMax->imageLock->unlock();
+
+        }
+    } else {
+        for (int y = ystart; y < yend; ++y) {
+            for (int x = 0; x < resultSize.width(); ++x) {
+
+                indx=ptr[i++];
+                Max[(indx > Max[1])] = indx;
+                Min[(indx < Min[1])] = indx;
+
+                indx1=indx * 255 /(maxvalue - minvalue);
+
+                if(indx1 > 255) indx1 = 255;
+                LineData.replace(x,qRgb(indx1,indx1,indx1));
+                if((i*2) >= datasize) break;
+            }
+            if ((i * 2) >= datasize) break;
+            MinMax->imageLock->lock();
+            uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
+            memcpy(scanLine,LineData.constData(),resultSize.width()*sizeof(uint));
+            MinMax->imageLock->unlock();
+        }
+    }
+    MinMax->MinMaxLock->lock();
+    MinMax->Max[(Max[1] > MinMax->Max[1])] = Max[1];
+    MinMax->Min[(Min[1] < MinMax->Min[1])] = Min[1];
+    MinMax->MinMaxLock->unlock();
+
+}
+
 QImage *caCamera::showImageCalc(int datasize, char *data)
 {
     uint indx, indx1;
@@ -898,49 +963,33 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
         case 3: {   // monochrome 2 bpp, but used only 12 bits  (Helge cameras)
 
             ushort *ptr = (ushort*) data;
+            //QElapsedTimer timer;
+           // timer.start();
 
             if(ptr == (void*) 0) return (QImage *) 0;
-
-            if(thisColormap != grey) {
-
-                for (int y = 0; y < resultSize.height(); ++y) {
-                    uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
-
-                    for (int x = 0; x < resultSize.width(); ++x) {
-                        indx = ptr[i++];
-                        indx1 = (indx - minvalue) * (ColormapSize-1) / (maxvalue - minvalue);
-                        if(indx1 >= ColormapSize) indx1=ColormapSize -1;
-
-                        *scanLine++ = ColorMap[indx1];
-
-                        Max[(indx > Max[1])] = indx;
-                        Min[(indx < Min[1])] = indx;
-						if ((i * 2) >= datasize) break;
-                    }
-                    if((i*2) >= datasize) break;
-                }
-
-
-            } else {
-
-                for (int y = 0; y < resultSize.height(); ++y) {
-                    uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
-
-                    for (int x = 0; x < resultSize.width(); ++x) {
-
-                        indx=ptr[i++];
-                        Max[(indx > Max[1])] = indx;
-                        Min[(indx < Min[1])] = indx;
-
-                        indx1=indx * 255 /(maxvalue - minvalue);
-
-                        if(indx1 > 255) indx1 = 255;
-                        *scanLine++ = qRgb(indx1,indx1,indx1);
-						if((i*2) >= datasize) break;
-                    }
-					if ((i * 2) >= datasize) break;
-                }
+            SyncMinMax MinMax;
+            MinMax.Max[1] = 0;
+            MinMax.Min[1] = 65535;
+            MinMax.MinMaxLock=new QMutex();
+            MinMax.imageLock=new QMutex();
+#ifndef QT_NO_CONCURRENT
+            int threadcounter=QThread::idealThreadCount();
+            QFutureSynchronizer<void> Sectors;
+            for (int x=0;x<threadcounter;x++){
+                Sectors.addFuture(QtConcurrent::run(this, &caCamera::CameraDataConvert_16bit,x,threadcounter,&MinMax , resultSize, datasize));
             }
+            Sectors.waitForFinished();
+            //printf("Image timer : %d milliseconds \n",timer.elapsed());
+
+
+#else
+            CameraDataConvert_16bit(0,1,&MinMax,resultSize, datasize);
+#endif
+            delete MinMax.MinMaxLock;
+            delete MinMax.imageLock;
+            Max[1]=MinMax.Max[1];
+            Min[1]=MinMax.Min[1];
+
         }
             break;
 

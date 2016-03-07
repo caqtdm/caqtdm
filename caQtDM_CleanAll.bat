@@ -29,6 +29,7 @@ del .\caQtDM_Lib\Makefile*
 
 del .\caQtDM_Lib\caQtDM_Plugins\Makefile*
 del .\caQtDM_Lib\caQtDM_Plugins\demo\Makefile*
+del .\caQtDM_Lib\caQtDM_Plugins\bsread\Makefile*
 del .\caQtDM_Lib\caQtDM_Plugins\epics3\Makefile*
 del .\caQtDM_Lib\caQtDM_Plugins\epics4\Makefile*
 

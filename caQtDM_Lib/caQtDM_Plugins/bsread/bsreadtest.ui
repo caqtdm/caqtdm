@@ -1,0 +1,1087 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1280</width>
+    <height>990</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="caLineEdit" name="calineedit">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>30</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-1</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_2">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>30</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-2</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_3">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>30</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-3</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_4">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>30</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-STRING</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caStripPlot" name="castripplot">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>120</y>
+     <width>771</width>
+     <height>421</height>
+    </rect>
+   </property>
+   <property name="channels" stdset="0">
+    <string notr="true">SUB1;SUB2</string>
+   </property>
+   <property name="period">
+    <double>30.000000000000000</double>
+   </property>
+   <property name="refreshRate" stdset="0">
+    <enum>caStripPlot::Medium</enum>
+   </property>
+   <property name="YAxisScaling" stdset="0">
+    <enum>caStripPlot::autoScale</enum>
+   </property>
+   <property name="foreground">
+    <color alpha="0">
+     <red>133</red>
+     <green>190</green>
+     <blue>232</blue>
+    </color>
+   </property>
+  </widget>
+  <widget class="caCalc" name="cacalc">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>70</y>
+     <width>51</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="variable">
+    <string notr="true">SUB1</string>
+   </property>
+   <property name="calc">
+    <string notr="true">B-A</string>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-1</string>
+   </property>
+   <property name="channelB">
+    <string notr="true">bsread://CHANNEL-2</string>
+   </property>
+  </widget>
+  <widget class="caCalc" name="cacalc_2">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>70</y>
+     <width>51</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="variable">
+    <string notr="true">SUB2</string>
+   </property>
+   <property name="calc">
+    <string notr="true">B-A</string>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-2</string>
+   </property>
+   <property name="channelB">
+    <string notr="true">bsread://CHANNEL-3</string>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_5">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>70</y>
+     <width>181</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-ARRAY_1</string>
+   </property>
+   <property name="formatType">
+    <enum>caLineEdit::string</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_6">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>120</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-1</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_7">
+   <property name="geometry">
+    <rect>
+     <x>920</x>
+     <y>120</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-2</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_8">
+   <property name="geometry">
+    <rect>
+     <x>1030</x>
+     <y>120</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-3</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_9">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>160</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-1</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_10">
+   <property name="geometry">
+    <rect>
+     <x>920</x>
+     <y>160</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-2</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_11">
+   <property name="geometry">
+    <rect>
+     <x>1030</x>
+     <y>160</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-3</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_12">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>200</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-1</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_13">
+   <property name="geometry">
+    <rect>
+     <x>920</x>
+     <y>200</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-2</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_14">
+   <property name="geometry">
+    <rect>
+     <x>1030</x>
+     <y>200</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-3</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_15">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>240</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-1</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_16">
+   <property name="geometry">
+    <rect>
+     <x>920</x>
+     <y>240</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-2</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_17">
+   <property name="geometry">
+    <rect>
+     <x>1030</x>
+     <y>240</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-3</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_18">
+   <property name="geometry">
+    <rect>
+     <x>1030</x>
+     <y>320</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-3</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_19">
+   <property name="geometry">
+    <rect>
+     <x>1030</x>
+     <y>280</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-3</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_20">
+   <property name="geometry">
+    <rect>
+     <x>1030</x>
+     <y>360</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-3</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_21">
+   <property name="geometry">
+    <rect>
+     <x>920</x>
+     <y>320</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-2</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_22">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>280</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-1</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_23">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>400</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-1</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_24">
+   <property name="geometry">
+    <rect>
+     <x>920</x>
+     <y>280</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-2</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_25">
+   <property name="geometry">
+    <rect>
+     <x>920</x>
+     <y>400</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-2</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_26">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>360</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-1</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_27">
+   <property name="geometry">
+    <rect>
+     <x>920</x>
+     <y>360</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-2</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_28">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>320</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-1</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_29">
+   <property name="geometry">
+    <rect>
+     <x>1030</x>
+     <y>400</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-3</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_30">
+   <property name="geometry">
+    <rect>
+     <x>1030</x>
+     <y>480</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-3</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_31">
+   <property name="geometry">
+    <rect>
+     <x>1030</x>
+     <y>440</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-3</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_32">
+   <property name="geometry">
+    <rect>
+     <x>1030</x>
+     <y>520</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-3</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_33">
+   <property name="geometry">
+    <rect>
+     <x>920</x>
+     <y>480</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-2</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_34">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>440</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-1</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_35">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>560</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-1</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_36">
+   <property name="geometry">
+    <rect>
+     <x>920</x>
+     <y>440</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-2</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_37">
+   <property name="geometry">
+    <rect>
+     <x>920</x>
+     <y>560</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-2</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_38">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>520</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-1</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_39">
+   <property name="geometry">
+    <rect>
+     <x>920</x>
+     <y>520</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-2</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_40">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>480</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-1</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_41">
+   <property name="geometry">
+    <rect>
+     <x>1030</x>
+     <y>560</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-3</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_42">
+   <property name="geometry">
+    <rect>
+     <x>890</x>
+     <y>10</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://pulse_id</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_43">
+   <property name="geometry">
+    <rect>
+     <x>890</x>
+     <y>40</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://global_timestamp_epoch</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_44">
+   <property name="geometry">
+    <rect>
+     <x>890</x>
+     <y>70</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://global_timestamp_ns</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_45">
+   <property name="geometry">
+    <rect>
+     <x>659</x>
+     <y>30</y>
+     <width>201</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://htype</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_46">
+   <property name="geometry">
+    <rect>
+     <x>659</x>
+     <y>70</y>
+     <width>201</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::WheelFocus</enum>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://hash</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
+   </property>
+  </widget>
+  <widget class="caCartesianPlot" name="cacartesianplot">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>580</y>
+     <width>701</width>
+     <height>361</height>
+    </rect>
+   </property>
+   <property name="channels_1" stdset="0">
+    <string notr="true">;bsread://CHANNEL-ARRAY_1</string>
+   </property>
+   <property name="color_1">
+    <color>
+     <red>85</red>
+     <green>0</green>
+     <blue>0</blue>
+    </color>
+   </property>
+  </widget>
+  <widget class="caWaveTable" name="cawavetable">
+   <property name="geometry">
+    <rect>
+     <x>780</x>
+     <y>600</y>
+     <width>351</width>
+     <height>331</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://CHANNEL-ARRAY_1</string>
+   </property>
+   <row/>
+   <column/>
+   <column/>
+   <column/>
+   <column/>
+   <column/>
+   <column/>
+   <column/>
+   <column/>
+   <column/>
+   <column/>
+   <item row="0" column="0">
+    <property name="font">
+     <font/>
+    </property>
+   </item>
+   <item row="0" column="1">
+    <property name="font">
+     <font/>
+    </property>
+   </item>
+   <item row="0" column="2">
+    <property name="font">
+     <font/>
+    </property>
+   </item>
+   <item row="0" column="3">
+    <property name="font">
+     <font/>
+    </property>
+   </item>
+   <item row="0" column="4">
+    <property name="font">
+     <font/>
+    </property>
+   </item>
+   <item row="0" column="5">
+    <property name="font">
+     <font/>
+    </property>
+   </item>
+   <item row="0" column="6">
+    <property name="font">
+     <font/>
+    </property>
+   </item>
+   <item row="0" column="7">
+    <property name="font">
+     <font/>
+    </property>
+   </item>
+   <item row="0" column="8">
+    <property name="font">
+     <font/>
+    </property>
+   </item>
+   <item row="0" column="9">
+    <property name="font">
+     <font/>
+    </property>
+   </item>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>caLineEdit</header>
+  </customwidget>
+  <customwidget>
+   <class>caCartesianPlot</class>
+   <extends>QFrame</extends>
+   <header>caCartesianPlot</header>
+  </customwidget>
+  <customwidget>
+   <class>caStripPlot</class>
+   <extends>QFrame</extends>
+   <header>caStripPlot</header>
+  </customwidget>
+  <customwidget>
+   <class>caWaveTable</class>
+   <extends>QTableWidget</extends>
+   <header>caWaveTable</header>
+  </customwidget>
+  <customwidget>
+   <class>caCalc</class>
+   <extends>QLabel</extends>
+   <header>caCalc</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
