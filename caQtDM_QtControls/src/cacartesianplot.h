@@ -184,7 +184,8 @@ public:
       Dots,
       FillUnder,
       ThinLines,
-      HorSticks
+      HorSticks,
+      FatDots
     };
 
     enum axisType { linear=0, log10};

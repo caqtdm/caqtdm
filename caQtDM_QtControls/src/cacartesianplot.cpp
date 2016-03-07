@@ -615,6 +615,7 @@ QwtPlotCurve::CurveStyle caCartesianPlot::myStyle(curvStyle s)
     case Steps:
         ms = QwtPlotCurve::Steps;  break;
     case Dots:
+    case FatDots:
         ms = QwtPlotCurve::Dots;  break;
     case FillUnder:
         ms = QwtPlotCurve::Lines;  break;
