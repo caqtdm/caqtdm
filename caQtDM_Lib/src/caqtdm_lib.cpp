@@ -4350,9 +4350,7 @@ void CaQtDM_Lib::Callback_ToggleButton(bool type)
     }
 
     if(w->getPV().length() > 0) {
-        QStringsToChars(w->getPV(), svalue,  w->objectName().toLower());
-        ControlsInterface * plugininterface = (ControlsInterface *) w->property("Interface").value<void *>();
-        if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue(param1, rvalue, ivalue, param2, param3, errmess, 0);
+        TreatOrdinaryValue(w->getPV(), rvalue, ivalue,  (QWidget*) w);
     }
 }
 
