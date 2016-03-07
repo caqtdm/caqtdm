@@ -195,6 +195,15 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
         fillcurve[i]->setZ(i);
         errorcurve[i]->setZ(i+10);
 
+#if QWT_VERSION >= 0x060100
+        curve[i]->setRenderThreadCount( 0 ); // 0: use QThread::idealThreadCount()
+        fillcurve[i]->setRenderThreadCount( 0 );
+        errorcurve[i]->setRenderThreadCount( 0 );
+#endif
+        curve[i]->setPaintAttribute(QwtPlotCurve::ClipPolygons, true);
+        fillcurve[i]->setPaintAttribute(QwtPlotCurve::ClipPolygons, true);
+        errorcurve[i]->setPaintAttribute(QwtPlotIntervalCurve::ClipPolygons, true);
+
         curve[i]->attach(this);
         errorcurve[i]->attach(this);
         fillcurve[i]->attach(this);
