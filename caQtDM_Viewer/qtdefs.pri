@@ -58,6 +58,9 @@ CONFIG += XDR_HACK
 # undefine this for epics4 plugin support (only preliminary version as example)
 #CONFIG += epics4
 
+# undefine this for bsread (zeromq) plugin support
+CONFIG += bsread
+
 # undefine this when you need to combine caQtDM with the australian epicsqt package
 #CONFIG += australian
 
@@ -88,6 +91,7 @@ DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 # now a widget can be added (see caLineDemo) without having to change caQtDM_lib. An interface has been defined in order to perform the datacuisition inside the widget class.
 # caLineDemo widget is an example for a fast on QWidget based line monitor
 # caMimeDisplay will now take macros into account
+# fatDots implemented in cartesian plot
 
 # 4.0.3
 # it is now possible to pipe ui data to caQtDM
