@@ -2,6 +2,7 @@
 #define BSREAD_WFCONVERTER_H
 #include <QtCore>
 #include <QThread>
+#include <QThreadPool>
 
 #include <QAtomicInt>
 #include <QBuffer>

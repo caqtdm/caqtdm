@@ -4,6 +4,7 @@
 #include <QThread>
 #include <QDebug>
 #include <QRunnable>
+#include <QThreadPool>
 #include "knobData.h"
 #include "mutexKnobData.h"
 #include "bsread_channeldata.h"
