@@ -901,21 +901,11 @@ void bsread_Decode::bsread_DataTimeOut(){
     }
 }
 void bsread_Decode::bsread_Delay(){
-    // This only works Qt5
-    //QThread::msleep(5);
-#ifdef linux
-    usleep(5000);
-#else
-    //Sleep::msleep(1);
-
     QMutex LocalLocker;
     QWaitCondition LocalDelay;
     LocalLocker.lock();
     LocalDelay.wait(&LocalLocker,5);
     LocalLocker.unlock();
-
-#endif
-
 }
 bool bsread_Decode::bsread_DataMonitorConnection(QString channel,int index){
     QMutexLocker locker(&mutex);
