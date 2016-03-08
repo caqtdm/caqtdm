@@ -86,7 +86,8 @@ public:
     void setColors(QColor bg, QColor fg);
     void setConnectedColors(bool connected);
 
-
+protected:
+   void paintEvent(QPaintEvent *event);
 
 private:
 

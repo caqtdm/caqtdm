@@ -25,6 +25,8 @@
 
 #include "caspinbox.h"
 #include <QResizeEvent>
+#include <QPainter>
+#include <QPen>
 
 caSpinbox::caSpinbox(QWidget *parent) : SNumeric(parent)
 {
@@ -90,6 +92,16 @@ void caSpinbox::setConnectedColors(bool connected)
        setColors(QColor(Qt::white), QColor(Qt::white));
     } else {
        setColors(thisBackColor, thisForeColor);
+    }
+}
+
+void caSpinbox::paintEvent(QPaintEvent *event) {
+    QPen	pen;
+    QPainter p(this);
+    if(hasFocus()) {
+      pen.setColor(palette().color(QPalette::Foreground));
+      p.setPen(pen);
+      p.drawRect(rect());
     }
 }
 

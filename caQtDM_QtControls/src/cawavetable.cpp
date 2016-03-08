@@ -80,6 +80,7 @@ caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
     thisAlignment = Left;
     setNumberOfRows(1);
     setNumberOfColumns(1);
+    setFocusPolicy(Qt::ClickFocus);
 }
 
 void caWaveTable::RedefineRowColumns(int xsav, int ysav, int z, int &x, int &y)

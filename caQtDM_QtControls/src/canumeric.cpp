@@ -25,6 +25,8 @@
 
 #include "canumeric.h"
 #include <QResizeEvent>
+#include <QPainter>
+#include <QPen>
 
 caNumeric::caNumeric(QWidget *parent) : ENumeric(parent)
 {
@@ -37,7 +39,6 @@ caNumeric::caNumeric(QWidget *parent) : ENumeric(parent)
      setDigitsFontScaleEnabled(true);
      setForeground(Qt::black);
      setBackground(QColor(230,230,230));
-
      setElevation(on_top);
 }
 
@@ -91,6 +92,17 @@ void caNumeric::setConnectedColors(bool connected)
        setColors(QColor(Qt::white), QColor(Qt::white));
     } else {
        setColors(thisBackColor, thisForeColor);
+    }
+}
+
+
+void caNumeric::paintEvent(QPaintEvent *event) {
+    QPen	pen;
+    QPainter p(this);
+    if(hasFocus()) {
+      pen.setColor(Qt::red);
+      p.setPen(pen);
+      p.drawRect(rect());
     }
 }
 

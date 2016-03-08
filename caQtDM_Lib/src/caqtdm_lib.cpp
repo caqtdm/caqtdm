@@ -4710,7 +4710,6 @@ void CaQtDM_Lib::shellCommand(QString command) {
 #else
     // I had too many problems with QProcess start, use standard execl
     if(!command.endsWith("&")) command.append("&");
-    //qDebug() << "execute:" << command;
     int status = Execute((char*) qasc(command));
     if(status != 0) {
         QMessageBox::information(0,"FailedToStart or Error", command);

@@ -219,7 +219,17 @@ bool caMenu::eventFilter(QObject *obj, QEvent *event)
           QVariant v(1 | 32);  // enable flag
           model()->setData(index, v, Qt::UserRole - 1);
         }
-
+    // move cursor with tab focus
+    } else if(event->type() == QEvent::KeyRelease) {
+        QKeyEvent *ev = static_cast<QKeyEvent *>(event);
+        if (ev != (QKeyEvent *)0) {
+            if(ev->key() == Qt::Key_Tab) {
+                QCursor *cur = new QCursor;
+                QPoint p = QWidget::mapToGlobal(QPoint(this->width()/2, this->height()/2));
+                cur->setPos( p.x(), p.y());
+                setFocus();
+            }
+        }
     } else if(event->type() == QEvent::Wheel) {
         event->ignore();
         return true;

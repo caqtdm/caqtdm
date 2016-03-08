@@ -54,7 +54,7 @@ int round (double x) {
 
 ENumeric::ENumeric(QWidget *parent, int id, int dd) : QFrame(parent), FloatDelegate()
 {
-    lastLabel = -1;
+    lastLabelOnTab = lastLabel = -1;
     intDig = id;
     decDig = dd;
     digits = id + dd;
@@ -339,6 +339,8 @@ void ENumeric::downDataIndex(int id)
 
 void ENumeric::showData()
 {
+    int thisDigit, prvDigit;
+    bool suppress = true;
     long long temp = data;
     double num = 0;
     if (data < 0)
@@ -355,7 +357,13 @@ void ENumeric::showData()
             num = ceil(numd);
         numd = num * power;
         temp = temp - (long long) numd;
+
+        thisDigit = abs((int) num);
+        if(i>0 && prvDigit == 0 && suppress) labels[i-1]->setText(" ");
         labels[i]->setText(QString().setNum(abs((int) num)));
+        prvDigit = thisDigit;
+        if(thisDigit != 0) suppress = false;
+        if(i >= intDig-1)  suppress = false;
     }
     QTimer::singleShot(1000, this, SLOT(valueUpdated()));
 }
@@ -396,7 +404,6 @@ void ENumeric::mouseDoubleClickEvent(QMouseEvent*)
 
 bool ENumeric::eventFilter(QObject *obj, QEvent *event)
 {
-    QSize aux = size();
     if (event->type() == QEvent::Enter) {
         if(!_AccessW) {
             QApplication::setOverrideCursor(QCursor(Qt::ForbiddenCursor));
@@ -408,13 +415,13 @@ bool ENumeric::eventFilter(QObject *obj, QEvent *event)
         if(ParentClassName.contains("caApplyNumeric")) {
             //printf("do nothing\n");
         } else {
+            lastLabelOnTab = lastLabel;
             lastLabel = -1;
             long long temp = (long long) round(csValue * pow(10.0, decDig));
             data = temp;
             showData();
             QApplication::restoreOverrideCursor();
-            resize(size()*0.99); // force a resize
-            resize(aux);
+            valueUpdated();
             updateGeometry();
         }
     } else if(event->type() == QEvent::MouseButtonDblClick) {
@@ -425,19 +432,33 @@ bool ENumeric::eventFilter(QObject *obj, QEvent *event)
             QRect widgetRect = labels[i]->geometry();
             if(widgetRect.contains(ev->pos())) {
                 lastLabel = i;
-                resize(size()*0.99); // force a resize
-                resize(aux);
+                valueUpdated();
                 break;
             }
         }
     } else if(event->type() == QEvent::KeyRelease)   {
         QKeyEvent *ev = (QKeyEvent *) event;
-        if(ev->key() == Qt::Key_Escape) text->hide();
-        if(ev->key() == Qt::Key_Up) {
-            upDataIndex(lastLabel);
+        if(ev->key() == Qt::Key_Escape) if (text != NULL) text->hide();
+        if(ev->key() == Qt::Key_Up) upDataIndex(lastLabel);
+        if(ev->key() == Qt::Key_Down) downDataIndex(lastLabel);
+        if(ev->key() == Qt::Key_Left) {
+            lastLabel--;
+            if(lastLabel < 0) lastLabel = 0;
+            valueUpdated();
         }
-        if(ev->key() == Qt::Key_Down) {
-            downDataIndex(lastLabel);
+        if(ev->key() == Qt::Key_Right) {
+            lastLabel++;
+            if(lastLabel > (digits-1)) lastLabel = digits-1;
+            valueUpdated();
+        }
+        // move cursor with tab focus
+        if(ev->key() == Qt::Key_Tab) {
+            QCursor *cur = new QCursor;
+            QPoint p = QWidget::mapToGlobal(QPoint(this->width()/2, this->height()/2));
+            lastLabel = lastLabelOnTab;
+            cur->setPos( p.x(), p.y());
+            setFocus();
+            valueUpdated();
         }
     }
     return QObject::eventFilter(obj, event);

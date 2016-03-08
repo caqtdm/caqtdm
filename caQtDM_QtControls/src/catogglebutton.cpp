@@ -29,6 +29,7 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QStyleOptionFrame>
+#include <QKeyEvent>
 #include <QStyle>
 
 caToggleButton::caToggleButton(QWidget *parent) : QCheckBox(parent), FontScalingWidget(this)
@@ -56,6 +57,8 @@ caToggleButton::caToggleButton(QWidget *parent) : QCheckBox(parent), FontScaling
     setFontScaleModeL(WidthAndHeight);
 
     setElevation(on_top);
+
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 void  caToggleButton::buttonToggled()
@@ -194,6 +197,15 @@ bool caToggleButton::eventFilter(QObject *obj, QEvent *event)
     } else if(event->type() == QEvent::Leave) {
         QApplication::restoreOverrideCursor();
         setEnabled(true);
+    }  else if(event->type() == QEvent::KeyRelease) {
+        QKeyEvent *me = static_cast<QKeyEvent *>(event);
+         // move cursor with tab focus
+        if(me->key() == Qt::Key_Tab) {
+            QCursor *cur = new QCursor;
+            QPoint p = QWidget::mapToGlobal(QPoint(this->width()/2, this->height()/2));
+            cur->setPos( p.x(), p.y());
+            setFocus();
+        }
     }
     return QObject::eventFilter(obj, event);
 }

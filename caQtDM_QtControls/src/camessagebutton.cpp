@@ -36,6 +36,7 @@ caMessageButton::caMessageButton(QWidget *parent) : EPushButton(parent)
     setBackground(QColor(0xe8, 0xe8, 0xe8));
     setFontScaleMode(EPushButton::WidthAndHeight);
     installEventFilter(this);
+    setFocusPolicy((Qt::StrongFocus));
 
     setElevation(on_top);
 }
@@ -153,21 +154,27 @@ bool caMessageButton::eventFilter(QObject *obj, QEvent *event)
     } else if(event->type() == QEvent::Leave) {
         QApplication::restoreOverrideCursor();
     } else if(event->type() == QEvent::MouseButtonPress) {
-         QMouseEvent *me = static_cast<QMouseEvent *>(event);
+        QMouseEvent *me = static_cast<QMouseEvent *>(event);
         if (me->button()==Qt::LeftButton) {
-          if(_AccessW) buttonhandle(0);
+            if(_AccessW) buttonhandle(0);
         }
     } else if(event->type() == QEvent::MouseButtonRelease) {
         QMouseEvent *me = static_cast<QMouseEvent *>(event);
         if (me->button()==Qt::LeftButton) {
-           if(_AccessW) buttonhandle(1);
+            if(_AccessW) buttonhandle(1);
         }
-    // intercept space key, so that no keyboard spacebar will trigger when button has focus
+        // intercept space key, so that no keyboard spacebar will trigger when button has focus
     }  else if(event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
-      QKeyEvent *me = static_cast<QKeyEvent *>(event);
-      if(me->key() == Qt::Key_Space) {
-        return true;
-      }
+        QKeyEvent *me = static_cast<QKeyEvent *>(event);
+        if(me->key() == Qt::Key_Space) {
+            return true;
+            // move cursor with tab focus
+        } else if(me->key() == Qt::Key_Tab) {
+            QCursor *cur = new QCursor;
+            QPoint p = QWidget::mapToGlobal(QPoint(this->width()/2, this->height()/2));
+            cur->setPos( p.x(), p.y());
+            setFocus();
+        }
     }
 
     return QObject::eventFilter(obj, event);

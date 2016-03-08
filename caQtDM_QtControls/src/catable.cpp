@@ -58,7 +58,7 @@ caTable::caTable(QWidget *parent) : QTableWidget(parent)
     addAction(copyAct);
 
     connect(this, SIGNAL( cellDoubleClicked (int, int) ), this, SLOT(celldoubleclicked( int, int ) ) );
-    //connect(this, SIGNAL( cellClicked (int, int) ), this, SLOT(cellclicked( int, int ) ) );
+    setFocusPolicy(Qt::ClickFocus);
 }
 
 void caTable::cellclicked(int row, int col)
@@ -70,7 +70,7 @@ void caTable::cellclicked(int row, int col)
 void caTable::celldoubleclicked(int row, int col)
 {
      if(col==1) emit TableDoubleClickedSignal(this->item(row, 0)->text());
-     this->item(row,col)->setSelected(false);
+     if(tableItem[row][col] != (QTableWidgetItem*) 0)  this->item(row,col)->setSelected(false);
 }
 
 void caTable::createActions() {
