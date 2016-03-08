@@ -330,19 +330,22 @@ caQtDM_Viewer {
                 plugins_epics3.path = Contents/PlugIns/controlsystems
                 plugins_epics3.files += $(CAQTDM_COLLECT)/controlsystems/libepics3_plugin.dylib
                 QMAKE_BUNDLE_DATA += plugins_epics3
-                plugins_epics4.path = Contents/PlugIns/controlsystems
-                plugins_epics4.files += $(CAQTDM_COLLECT)/controlsystems/libepics4_plugin.dylib
-                QMAKE_BUNDLE_DATA += plugins_epics4
                 plugins_demo.path = Contents/PlugIns/controlsystems
                 plugins_demo.files += $(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.dylib
                 QMAKE_BUNDLE_DATA += plugins_demo
-                plugins_bsread.path = Contents/PlugIns/controlsystems
-                plugins_bsread.files += $(CAQTDM_COLLECT)/controlsystems/libbsread_plugin.dylib
-                QMAKE_BUNDLE_DATA += plugins_bsread
-                zmqlibrary.path = Contents/Frameworks
-                zmqlibrary.files += $$(ZMQLIB)/libzmq.5.dylib
-                QMAKE_BUNDLE_DATA += zmqlibrary
-
+                epics4: {
+                    plugins_epics4.path = Contents/PlugIns/controlsystems
+                    plugins_epics4.files += $(CAQTDM_COLLECT)/controlsystems/libepics4_plugin.dylib
+                    QMAKE_BUNDLE_DATA += plugins_epics4
+                }
+                bsread:{
+                    plugins_bsread.path = Contents/PlugIns/controlsystems
+                    plugins_bsread.files += $(CAQTDM_COLLECT)/controlsystems/libbsread_plugin.dylib
+                    QMAKE_BUNDLE_DATA += plugins_bsread
+                    zmqlibrary.path = Contents/Frameworks
+                    zmqlibrary.files += $$(ZMQLIB)/libzmq.5.dylib
+                    QMAKE_BUNDLE_DATA += zmqlibrary
+                }
   	}
 
         ios {
