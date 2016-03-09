@@ -23,7 +23,7 @@
  *    anton.mezger@psi.ch
  */
 #include <QDebug>
-#include "bsread_plugin.h"
+#include "bsread_Plugin.h"
 #include "zmq.h"
 #include "bsread_decode.h"
 #include "bsread_dispatchercontrol.h"
