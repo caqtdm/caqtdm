@@ -3,7 +3,7 @@
 #include <QThread>
 #include <QDebug>
 #include <QRunnable>
-#include <qsysinfo.h>
+#include <QSysInfo>
 
 template <class T_BSREAD,class T_CAQTDM>
 class bsread_wfblockconverter :public QObject, public QRunnable
