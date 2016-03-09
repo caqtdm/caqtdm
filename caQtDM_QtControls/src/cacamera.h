@@ -196,7 +196,8 @@ public:
     void dataProcessing(double value, int id);
     void showDisconnected();
 
-    void CameraDataConvert_16bit(int sector, int sectorcount, SyncMinMax *MinMax, QSize resultSize, int datasize);
+
+
 signals:
    void WriteDetectedValuesSignal(QWidget*);
 
@@ -216,6 +217,15 @@ private:
     void Coordinates(int posX, int posY, double &newX, double &newY, double &maxX, double &maxY);
     void deleteWidgets();
     void initWidgets();
+
+    void CameraDataConvert_8bit(int sector,int sectorcount,SyncMinMax* MinMax , QSize resultSize, int datasize);
+    void CameraDataConvert_16bit(int sector, int sectorcount, SyncMinMax *MinMax, QSize resultSize, int datasize);
+    void CameraDataConvert_24bit(int sector,int sectorcount,SyncMinMax* MinMax , QSize resultSize, int datasize);
+    void CameraDataConvert_16bitD(int sector, int sectorcount, SyncMinMax* MinMax, QSize resultSize, int datasize);
+    void MinMaxLock(SyncMinMax* MinMax, uint Max[2], uint Min[2]);
+    void MinMaxImageLock(QVector<uint> LineData, int y, QSize resultSize, SyncMinMax* MinMax);
+    void InitLoopdata(int &ystart, int &yend, long &i, QVector<uint> &LineData, int increment, int sector, int sectorcount,
+                      QSize resultSize, uint Max[2], uint Min[2]);
 
     bool buttonPressed, validIntensity;
     QString thisPV_Data, thisPV_Width, thisPV_Height, thisPV_Code, thisPV_BPP;
@@ -287,7 +297,6 @@ private:
     bool selectionInProgress;
 
     QStringList thisList;
-
 };
 
 #endif
