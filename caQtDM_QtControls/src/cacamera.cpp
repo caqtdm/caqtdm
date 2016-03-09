@@ -806,6 +806,8 @@ void caCamera::CameraDataConvert_8bit(int sector, int sectorcount, SyncMinMax* M
 
     InitLoopdata(ystart, yend, i, LineData, 1, sector, sectorcount, resultSize, Max, Min);
 
+    if(i >= datasize) return;
+
     if(thisColormap != grey) {
 
         for (int y = ystart; y < yend; ++y) {
@@ -817,6 +819,7 @@ void caCamera::CameraDataConvert_8bit(int sector, int sectorcount, SyncMinMax* M
                 LineData.replace(x, ColorMap[indx1]);
                 Max[(indx > Max[1])] = indx;
                 Min[(indx < Min[1])] = indx;
+
                 if(i >= datasize) break;
             }
             if(i >= datasize) break;
@@ -858,6 +861,8 @@ void caCamera::CameraDataConvert_16bit(int sector, int sectorcount, SyncMinMax* 
     ushort *ptr = (ushort*) savedData;
 
     InitLoopdata(ystart, yend, i, LineData, 1, sector, sectorcount, resultSize, Max, Min);
+
+    if(i >= datasize) return;
 
     if(thisColormap != grey) {
 
@@ -912,6 +917,8 @@ void caCamera::CameraDataConvert_16bitD(int sector, int sectorcount, SyncMinMax*
 
     InitLoopdata(ystart, yend, i, LineData, m_bpp, sector, sectorcount, resultSize, Max, Min);
 
+    if(i >= datasize) return;
+
     if(thisColormap != grey) {
 
         for (int y = ystart; y < yend; ++y) {
@@ -961,6 +968,8 @@ void caCamera::CameraDataConvert_24bit(int sector, int sectorcount, SyncMinMax* 
     uchar *ptr = (uchar*) savedData;
 
     InitLoopdata(ystart, yend, i, LineData, 3, sector, sectorcount, resultSize, Max, Min);
+
+    if(i >= datasize) return;
 
     if(thisColormap != grey) {
         uint intensity;
@@ -1061,6 +1070,8 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
     } else if((m_code == 3) && (m_bpp == 3)) {  //color rgb image, 3 bpp, each byte with r,g,b
         CameraDataConvert = &caCamera::CameraDataConvert_24bit;
         //printf("CameraDataConvert_24bit\n");
+    } else {
+        printf("caQtDM -- Camera data conversion not supported yet\n");
     }
 
 #ifndef QT_NO_CONCURRENT
@@ -1100,9 +1111,10 @@ void caCamera::showImage(int datasize, char *data)
 #else
     image = showImageCalc(datasize, data);
 #endif
-    //printf("Image timer : %d milliseconds \n", (int) timer.elapsed());
+    //printf("Image timer 1 : %d milliseconds \n", (int) timer.elapsed());
 
     if(image != (QImage *) 0) updateImage(*image, readvaluesPresent, readvalues, scaleFactor);
+     //printf("Image timer 2 : %d milliseconds \n", (int) timer.elapsed());
 
     if(getAutomateChecked()) {
         updateMax(maxvalue);
