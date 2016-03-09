@@ -30,14 +30,29 @@
    #define strdup _strdup
 #endif
 
+#if defined(_MSC_VER)
+int setenv(const char *name, const char *value, int overwrite)
+{
+    int errcode = 0;
+    if(!overwrite) {
+        size_t envsize = 0;
+        errcode = getenv_s(&envsize, NULL, 0, name);
+        if(errcode || envsize) return errcode;
+    }
+    return _putenv_s(name, value);
+}
+#endif
+
 #include "searchfile.h"
 
 #include "fileopenwindow.h"
+#include "fileFunctions.h"
 #include "QDebug"
 #include <QFileDialog>
 #include <QLocale>
 #include <signal.h>
 #include <iostream>
+#include <stdlib.h>
 #include "pipereader.h"
 
 #if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
@@ -183,6 +198,8 @@ int main(int argc, char *argv[])
                    "  [-noResize] will prevent resizing\n"
                    "  [-cs defaultcontrolsystempluginname]\n"
                    "  [-option \"xxx=aaa,yyy=bbb, ...\"] options for cs plugins\n"
+                   "  [-url url] will look for files on the specified url and download them to a local directory\n"
+                   "  [-emptycache] will empty the local cache used for downloading"
                    "  [file]\n"
                    "  [&]\n"
                    "\n"
@@ -201,6 +218,16 @@ int main(int argc, char *argv[])
             resizing = false;
         } else if(!strcmp(argv[in], "-httpconfig")) {
             HTTPCONFIGURATOR = true;
+        } else if(!strcmp(argv[in], "-url")) {
+            in++;
+            setenv("CAQTDM_URL_DISPLAY_PATH", argv[in], 1);
+        } else if(!strcmp(argv[in], "-emptycache")) {
+            Specials specials;
+            QString path =  specials.getStdPath();
+            fileFunctions filefunction;
+            path.append("/");
+            filefunction.removeFilesInTree(path);
+            printf("caQtDM -- cache @ %s with ui & graphic files has been emptied\n", qasc(path));
         } else if(!strcmp(argv[in], "-cs")) {
             in++;
             options.insert("defaultPlugin", QString(argv[in]));
