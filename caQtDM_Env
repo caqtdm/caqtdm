@@ -34,7 +34,7 @@
   if [ -z "$PYTHONLIB" ];   then  export  PYTHONLIB=/usr/lib/;
   fi 
 
-  if [ -z "$ZMQ" ];   then  export  ZMQ=/usr/local/;
+  if [ -z "$ZMQ" ];   then  export  ZMQ=/usr/local;
   fi 
   if [ -z "$ZMQINC" ];   then  export  ZMQINC=$ZMQ/include;
   fi 
