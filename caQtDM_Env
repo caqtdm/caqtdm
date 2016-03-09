@@ -33,6 +33,15 @@
   fi
   if [ -z "$PYTHONLIB" ];   then  export  PYTHONLIB=/usr/lib/;
   fi 
+
+  if [ -z "$ZMQ" ];   then  export  PYTHONLIB=/usr/local/;
+  fi 
+  if [ -z "$ZMQINC" ];   then  export  PYTHONLIB=$ZMQ/include;
+  fi 
+  if [ -z "$ZMQLIB" ];   then  export  PYTHONLIB=$ZMQ/lib;
+  fi 
+
+
   
   if [ -z "$TROLLTECH" ]; then
     echo
