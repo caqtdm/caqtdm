@@ -505,7 +505,7 @@ Define_ZMQ_Lib{
 	
 	INCLUDEPATH += $$(ZMQINC)
         unix:!macx {
-                LIBS += $$(ZMQLIB)/libzmq.a
+                LIBS += $$(ZMQLIB)/libzmq.so
 	}
         macx {
                 LIBS += $$(ZMQLIB)/libzmq.5.dylib
