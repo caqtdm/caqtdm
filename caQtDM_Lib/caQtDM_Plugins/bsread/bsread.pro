@@ -1,7 +1,7 @@
 include (../../../caQtDM_Viewer/qtdefs.pri)
 QT += core gui network
 contains(QT_VER_MAJ, 5) {
-    QT     += widgets
+    QT     += widgets concurrent
 }
 
 CONFIG += warn_on

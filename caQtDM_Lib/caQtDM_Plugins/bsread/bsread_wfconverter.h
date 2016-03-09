@@ -17,7 +17,7 @@
 #include "bsread_wfblockconverter.h"
 
 #ifndef QT_NO_CONCURRENT
-#include <QtConcurrent/QtConcurrent>
+#include <QtConcurrentRun>
 #include <QFutureSynchronizer>
 #endif
 
