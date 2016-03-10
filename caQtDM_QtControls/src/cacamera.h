@@ -297,6 +297,8 @@ private:
     bool selectionInProgress;
 
     QStringList thisList;
+
+    QImage *imageMessage;
 };
 
 #endif

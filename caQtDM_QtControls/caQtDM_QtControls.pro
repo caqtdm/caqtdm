@@ -37,6 +37,11 @@ INCLUDEPATH += ../caQtDM_Lib/src
 RESOURCES = qtcontrols.qrc
 RC_FILE = ./src/qtcontrols.rc
 
+#vtune study
+#INCLUDEPATH += /opt/intel/parallel/vtune_amplifier_xe_2013/include
+#LIBS += /opt/intel/parallel/vtune_amplifier_xe_2013/lib32/libittnotify.a
+
+
 PRE_TARGETDEPS += \
      moc/moc_caslider.cpp \
      moc/moc_cacartesianplot.cpp \

@@ -32,6 +32,8 @@
 #endif
 #include "cacamera.h"
 
+//#include "ittnotify.h"
+
 caCamera::caCamera(QWidget *parent) : QWidget(parent)
 {
     m_init = true;
@@ -48,6 +50,8 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     selectionInProgress = false;
 
     savedData = (char*) 0;
+
+    imageMessage = new QImage(size(), QImage::Format_RGB32);
 
     initWidgets();
 
@@ -80,7 +84,10 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     scaleFactor = 1.0;
 
     UpdatesPerSecond = 0;
+
     startTimer(1000);
+
+    // __itt_thread_set_name("My worker thread");
 
     writeTimer = new QTimer(this);
     connect(writeTimer, SIGNAL(timeout()), this, SLOT(updateChannels()));
@@ -681,6 +688,9 @@ void caCamera::setHeight(int height)
 
 void caCamera::resizeEvent(QResizeEvent *e)
 {
+    if(imageMessage != (QImage *)0) delete imageMessage;
+    imageMessage =  new QImage(size(), QImage::Format_RGB32);
+
     if(thisSimpleView) return;
 
     if(m_widthDefined && m_heightDefined) {
@@ -782,7 +792,7 @@ void caCamera::MinMaxImageLock(QVector<uint> LineData, int y, QSize resultSize, 
 
 void caCamera::InitLoopdata(int &ystart, int &yend, long &i, QVector<uint> &LineData, int increment, int sector, int sectorcount, QSize resultSize, uint Max[2], uint Min[2])
 {
-    LineData.reserve(resultSize.width());
+    //LineData.reserve(resultSize.width());
     LineData.resize(resultSize.width());
 
     Max[1] = 0;
@@ -816,7 +826,8 @@ void caCamera::CameraDataConvert_8bit(int sector, int sectorcount, SyncMinMax* M
                 indx1 = (indx - minvalue) * (ColormapSize-1) / (maxvalue - minvalue);
                 if(indx1 >= ColormapSize) indx1=ColormapSize -1;
 
-                LineData.replace(x, ColorMap[indx1]);
+                //LineData.replace(x, ColorMap[indx1]);
+                LineData[x] =  ColorMap[indx1];
                 Max[(indx > Max[1])] = indx;
                 Min[(indx < Min[1])] = indx;
 
@@ -837,7 +848,8 @@ void caCamera::CameraDataConvert_8bit(int sector, int sectorcount, SyncMinMax* M
                 indx1=indx * 255 /(maxvalue - minvalue);
                 if(indx1 > 255) indx1 = 255;
 
-                LineData.replace(x,qRgb(indx1,indx1,indx1));
+                //LineData.replace(x,qRgb(indx1,indx1,indx1));
+                LineData[x] =  qRgb(indx1,indx1,indx1);
                 if(i >= datasize) break;
             }
             if(i >= datasize) break;
@@ -872,7 +884,8 @@ void caCamera::CameraDataConvert_16bit(int sector, int sectorcount, SyncMinMax* 
                 indx1 = (indx - minvalue) * (ColormapSize-1) / (maxvalue - minvalue);
                 if(indx1 >= ColormapSize) indx1=ColormapSize -1;
 
-                LineData.replace(x,ColorMap[indx1]);
+                //LineData.replace(x,ColorMap[indx1]);
+                LineData[x] =  ColorMap[indx1];
                 Max[(indx > Max[1])] = indx;
                 Min[(indx < Min[1])] = indx;
                 if ((i * 2) >= datasize) break;
@@ -892,7 +905,8 @@ void caCamera::CameraDataConvert_16bit(int sector, int sectorcount, SyncMinMax* 
                 indx1=indx * 255 /(maxvalue - minvalue);
                 if(indx1 > 255) indx1 = 255;
 
-                LineData.replace(x,qRgb(indx1,indx1,indx1));
+                //LineData.replace(x,qRgb(indx1,indx1,indx1));
+                LineData[x] =  qRgb(indx1,indx1,indx1);
                 if((i*2) >= datasize) break;
             }
             if ((i * 2) >= datasize) break;
@@ -928,7 +942,8 @@ void caCamera::CameraDataConvert_16bitD(int sector, int sectorcount, SyncMinMax*
                 indx1 = (indx - minvalue) * (ColormapSize-1) / (maxvalue - minvalue);
                 if(indx1 >= ColormapSize) indx1=ColormapSize -1;
 
-                LineData.replace(x, ColorMap[indx1]);
+                //LineData.replace(x, ColorMap[indx1]);
+                LineData[x] =  ColorMap[indx1];
                 Max[(indx > Max[1])] = indx;
                 Min[(indx < Min[1])] = indx;
                 if(i >= datasize) break;
@@ -945,7 +960,8 @@ void caCamera::CameraDataConvert_16bitD(int sector, int sectorcount, SyncMinMax*
                 Max[(indx > Max[1])] = indx;
                 Min[(indx < Min[1])] = indx;
 
-                LineData.replace(x,qRgb(indx,indx,indx));
+                //LineData.replace(x,qRgb(indx,indx,indx));
+                LineData[x] = qRgb(indx,indx,indx);
                 if(i >= datasize) break;
             }
             if(i >= datasize) break;
@@ -977,7 +993,8 @@ void caCamera::CameraDataConvert_24bit(int sector, int sectorcount, SyncMinMax* 
         for (int y = ystart; y < yend; ++y) {
             for (int x = 0; x < resultSize.width(); ++x) {
                 intensity = (int) (2.2 * (0.2989 * ptr[i] +  0.5870 * ptr[i+1] + 0.1140 * ptr[i+2]));
-                LineData.replace(x, qRgb(ptr[i], ptr[i+1], ptr[i+2]));
+                //LineData.replace(x, qRgb(ptr[i], ptr[i+1], ptr[i+2]));
+                LineData[x] =  qRgb(ptr[i], ptr[i+1], ptr[i+2]);
                 i+=3;
                 Max[(intensity > Max[1])] = intensity;
                 Min[(intensity < Min[1])] = intensity;
@@ -993,7 +1010,8 @@ void caCamera::CameraDataConvert_24bit(int sector, int sectorcount, SyncMinMax* 
         for (int y = ystart; y < yend; ++y) {
             for (int x = 0; x < resultSize.width(); ++x) {
                 average =(int) (0.2989 * ptr[i] + 0.5870 * ptr[i+1] +  + 0.1140 * ptr[i+2]);
-                LineData.replace(x, qRgb(average, average, average));
+                //LineData.replace(x, qRgb(average, average, average));
+                LineData[x] =  qRgb(average, average, average);
                 i+=3;
                 Max[(average > Max[1])] = average;
                 Min[(average < Min[1])] = average;
@@ -1013,6 +1031,8 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
 {
     QSize resultSize;
     uint Max[2], Min[2];
+
+    //__itt_event mark_event;
 
     if(!m_bppDefined) return (QImage *) 0;
     if(!m_widthDefined) return (QImage *) 0;
@@ -1071,18 +1091,40 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
         CameraDataConvert = &caCamera::CameraDataConvert_24bit;
         //printf("CameraDataConvert_24bit\n");
     } else {
-        printf("caQtDM -- Camera data conversion not supported yet\n");
+        QPainter painter(imageMessage);
+        QBrush brush(QColor(200,200,200,255), Qt::SolidPattern);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setPen(Qt::black);
+        painter.fillRect(rect(), brush);
+        painter.setFont(QFont("Arial", width() / 30));
+        int lineHeight = 1.2 * painter.fontMetrics().height();
+        painter.drawText(5, 10 + lineHeight, "specified camera data conversion not supported");
+        painter.drawText(5, 10 + 2 * lineHeight, "only supported now:");
+        painter.drawText(5, 10 + 3 * lineHeight, "code=1 bpp=1: monocrome 1bpp");
+        painter.drawText(5, 10 + 4 * lineHeight, "code=1 bpp=2: monocrome 2bpp");
+        painter.drawText(5, 10 + 5 * lineHeight, "code=1 bpp=3: monocrome 2bpp (used only 12bits)");
+        painter.drawText(5, 10 + 6 * lineHeight, "code=3 bpp=3: color rgb 3bpp (r,g,b)");
+        return imageMessage ;
     }
 
 #ifndef QT_NO_CONCURRENT
-    int threadcounter=QThread::idealThreadCount();
+
+    //mark_event = __itt_event_create( "User Mark", 9 );
+   //__itt_event_start( mark_event );
+
+    int threadcounter=QThread::idealThreadCount()*2/3;  // seems to be a magic number
+    if(threadcounter < 1) threadcounter = 1;
+    //printf("threadcounter=%d\n", threadcounter);
+
     QFutureSynchronizer<void> Sectors;
     for (int x=0;x<threadcounter;x++){
         Sectors.addFuture(QtConcurrent::run(this, CameraDataConvert, x, threadcounter, &MinMax, resultSize, datasize));
     }
     Sectors.waitForFinished();
+    //__itt_event_end( mark_event );
+
 #else
-    CameraDataConvert(0, 1, &MinMax, resultSize, datasize);
+    (this->*CameraDataConvert)(0, 1, &MinMax, resultSize, datasize);
 #endif
     delete MinMax.MinMaxLock;
     delete MinMax.imageLock;
@@ -1105,16 +1147,10 @@ void caCamera::showImage(int datasize, char *data)
 {
     //QElapsedTimer timer;
     //timer.start();
-#ifndef QT_NO_CONCURRENT
-    QFuture<QImage *> future = QtConcurrent::run(this, &caCamera::showImageCalc, datasize, data);
-    image = future.result();
-#else
     image = showImageCalc(datasize, data);
-#endif
     //printf("Image timer 1 : %d milliseconds \n", (int) timer.elapsed());
 
     if(image != (QImage *) 0) updateImage(*image, readvaluesPresent, readvalues, scaleFactor);
-     //printf("Image timer 2 : %d milliseconds \n", (int) timer.elapsed());
 
     if(getAutomateChecked()) {
         updateMax(maxvalue);
