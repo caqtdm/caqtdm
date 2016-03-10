@@ -57,6 +57,10 @@
 #include <stdio.h>
 
 #include "epicsExternals.h"
+#if defined(_MSC_VER)
+    int setenv(const char *name, const char *value, int overwrite);
+#endif
+
 
  class FileOpenWindow : public QMainWindow
  {
