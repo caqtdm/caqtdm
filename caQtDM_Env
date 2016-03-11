@@ -82,6 +82,12 @@ echo PYTHONVERSION        now defined as ${PYTHONVERSION}        for locating py
 echo PYTHONINCLUDE        now defined as ${PYTHONINCLUDE}        for locating python include files
 echo PYTHONLIB            now defined as ${PYTHONLIB}            for locating python libraries
 echo
+echo for zmq:
+echo
+echo ZMQINC               now defined as ${ZMQINC}               for locating zmq include files
+echo ZMQLIB               now defined as ${ZMQLIB}               for locating zmq libraries
+
+echo
 echo for install:
 echo
 echo EPICSEXTENSIONS      now defined as ${EPICSEXTENSIONS}      for locating epics extensions
