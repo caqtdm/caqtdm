@@ -189,7 +189,7 @@ void bsread_Decode::process()
                     bsread_Delay();
                     notReceivedCounter++;
                     if (notReceivedCounter>200){
-                       qDebug() << "bsread ZMQ Data Timeout";
+                       //qDebug() << "bsread ZMQ Data Timeout";
                         //bsread_DataTimeOut();
                         notReceivedCounter=0;
                     }
@@ -579,44 +579,44 @@ void bsread_Decode::bsread_InitHeaderChannels()
     chdata=new bsread_channeldata();
     Channels.append(chdata);
     chdata->type=bs_string;
-    chdata->name="hash";
+    chdata->name="bsread:hash";
     ChannelSearch.insert(chdata->name, chdata);
 
     chdata=new bsread_channeldata();
     Channels.append(chdata);
     chdata->type=bs_float64;
-    chdata->name="pulse_id";
+    chdata->name="bsread:pulse_id";
     ChannelSearch.insert(chdata->name, chdata);
 
     chdata=new bsread_channeldata();
     Channels.append(chdata);
     chdata->type=bs_string;
-    chdata->name="htype";
+    chdata->name="bsread:htype";
     ChannelSearch.insert(chdata->name, chdata);
 
     chdata=new bsread_channeldata();
     Channels.append(chdata);
     chdata->type=bs_float64;
-    chdata->name="global_timestamp_epoch";
+    chdata->name="bsread:global_timestamp_epoch";
     ChannelSearch.insert(chdata->name, chdata);
 
     chdata=new bsread_channeldata();
     Channels.append(chdata);
     chdata->type=bs_float64;
-    chdata->name="global_timestamp_ns";
+    chdata->name="bsread:global_timestamp_ns";
     ChannelSearch.insert(chdata->name, chdata);
 
     chdata=new bsread_channeldata();
     Channels.append(chdata);
     chdata->type=bs_float64;
-    chdata->name="global_timestamp_ms";
+    chdata->name="bsread:global_timestamp_ms";
     ChannelSearch.insert(chdata->name, chdata);
 
 
     chdata=new bsread_channeldata();
     Channels.append(chdata);
     chdata->type=bs_float64;
-    chdata->name="global_timestamp_ns_offset";
+    chdata->name="bsread:global_timestamp_ns_offset";
     ChannelSearch.insert(chdata->name, chdata);
 }
 
@@ -856,7 +856,7 @@ void bsread_Decode::bsread_EndofData()
                 kData->edata.accessW = false;
             }
         }
-       qDebug() << "ActiveThreads: "<< QThreadPool::globalInstance()->activeThreadCount();
+       //qDebug() << "ActiveThreads: "<< QThreadPool::globalInstance()->activeThreadCount();
        // UpdaterPool->waitForDone(-1);
       // while(WfDataHandlerQueue.count()!=0){
        //    qDebug() << "WfDataHandlerQueue Wait ";
