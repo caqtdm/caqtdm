@@ -4327,7 +4327,7 @@ void CaQtDM_Lib::Callback_EApplyNumeric(double value)
     caApplyNumeric *numeric = qobject_cast<caApplyNumeric *>(sender());
     if(!numeric->getAccessW()) return;
     if(numeric->getPV().length() > 0) {
-        TreatOrdinaryValue(numeric->getPV(), rdata,  idata, (QWidget*) numeric);
+        TreatOrdinaryValue(numeric->getPV(), rdata,  idata, "", (QWidget*) numeric);
     }
 }
 /**
@@ -4341,7 +4341,7 @@ void CaQtDM_Lib::Callback_ENumeric(double value)
     caNumeric *numeric = qobject_cast<caNumeric *>(sender());
     if(!numeric->getAccessW()) return;
     if(numeric->getPV().length() > 0) {
-        TreatOrdinaryValue(numeric->getPV(), rdata,  idata, (QWidget*) numeric);
+        TreatOrdinaryValue(numeric->getPV(), rdata,  idata, "", (QWidget*) numeric);
     }
 }
 
@@ -4356,7 +4356,7 @@ void CaQtDM_Lib::Callback_Spinbox(double value)
     caSpinbox *numeric = qobject_cast<caSpinbox *>(sender());
     if(!numeric->getAccessW()) return;
     if(numeric->getPV().length() > 0) {
-        TreatOrdinaryValue(numeric->getPV(), rdata,  idata, (QWidget*) numeric);
+        TreatOrdinaryValue(numeric->getPV(), rdata,  idata, "", (QWidget*) numeric);
     }
 }
 
@@ -4368,7 +4368,7 @@ void CaQtDM_Lib::Callback_SliderValueChanged(double value)
     caSlider *numeric = qobject_cast<caSlider *>(sender());
     if(!numeric->getAccessW()) return;
     if(numeric->getPV().length() > 0) {
-        TreatOrdinaryValue(numeric->getPV(), rdata, idata,  (QWidget*) numeric);
+        TreatOrdinaryValue(numeric->getPV(), rdata, idata,  "", (QWidget*) numeric);
     }
 }
 
@@ -4381,7 +4381,6 @@ void CaQtDM_Lib::Callback_ToggleButton(bool type)
     double rvalue = 0.0;
     int32_t ivalue = 0;
     QString svalue ="";
-    char errmess[255];
     caToggleButton *w = qobject_cast<caToggleButton *>(sender());
     if(!w->getAccessW()) return;
 
@@ -4406,7 +4405,7 @@ void CaQtDM_Lib::Callback_ToggleButton(bool type)
     }
 
     if(w->getPV().length() > 0) {
-        TreatOrdinaryValue(w->getPV(), rvalue, ivalue,  (QWidget*) w);
+        TreatOrdinaryValue(w->getPV(), rvalue, ivalue, svalue, (QWidget*) w);
     }
 }
 
@@ -4566,11 +4565,11 @@ void CaQtDM_Lib::Callback_ByteControllerClicked(int bit)
     // bit set
     if(w->bitState(w->getValue(), bit)) {
         number &= ~(1 << bit);
-        TreatOrdinaryValue(w->getPV(), (double) number, (int32_t) number,  w1);
+        TreatOrdinaryValue(w->getPV(), (double) number, (int32_t) number, "",  w1);
         // bit not set
     } else {
         number |= 1 << bit;
-        TreatOrdinaryValue(w->getPV(), (double) number, (int32_t) number,  w1);
+        TreatOrdinaryValue(w->getPV(), (double) number, (int32_t) number, "",  w1);
     }
 }
 
@@ -5967,12 +5966,12 @@ int CaQtDM_Lib::Execute(char *command)
 }
 #endif
 
-void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QWidget *w)
+void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QString svalue, QWidget *w)
 {
     char errmess[255];
     int indx;
 
-    //qDebug() << "treatordinary value" << pv << w;
+    //qDebug() << "treatordinary value " << pv << w;
     knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv);
     if(kPtr != (knobData *) 0) {
         //qDebug() << "try to find out if this is a soft pv" << pv;
@@ -5993,8 +5992,7 @@ void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QW
         return;
     }
 
-    QString text(" ");
-    QStringsToChars(pv, text, w->objectName().toLower());
+    QStringsToChars(pv, svalue, w->objectName().toLower());
     ControlsInterface * plugininterface = getControlInterface(kPtr->pluginName);
     if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue(param1, value, idata, param2, param3, errmess, 0);
 }
@@ -6969,7 +6967,7 @@ void CaQtDM_Lib::Callback_WriteDetectedValues(QWidget* child)
         int32_t idata = (int32_t) values[i];
         double rdata = (double) values[i];
         if(thisString.at(i).trimmed().length() > 0) {
-            TreatOrdinaryValue(thisString.at(i), rdata,  idata, widget);
+            TreatOrdinaryValue(thisString.at(i), rdata,  idata, "", widget);
         }
     }
 }
