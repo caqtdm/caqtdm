@@ -48,5 +48,14 @@ HEADERS  +=  \
 
 FORMS += main.ui
 
+# when epics4 not build, then do not import statically in fileopenwindow.cpp
+epics4 {
+ DEFINES +=  EPICS4
+}
+
+# had to take the image formats out for building ios now. However images still work?!!
+ios {
+QTPLUGIN.imageformats=-
+}
 
 

@@ -211,7 +211,9 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Graphics);
     Q_IMPORT_PLUGIN(DemoPlugin);
     Q_IMPORT_PLUGIN(Epics3Plugin);
+#ifdef EPICS4
     Q_IMPORT_PLUGIN(Epics4Plugin);
+#endif
     Q_INIT_RESOURCE(qtcontrolsplugin);  // load resources from resource file
 #endif
 

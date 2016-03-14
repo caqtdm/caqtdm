@@ -59,7 +59,7 @@ CONFIG += XDR_HACK
 #CONFIG += epics4
 
 # undefine this for bsread (zeromq) plugin support
-CONFIG += bsread
+#CONFIG += bsread
 
 # undefine this when you need to combine caQtDM with the australian epicsqt package
 #CONFIG += australian
@@ -92,6 +92,14 @@ DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 # caLineDemo widget is an example for a fast on QWidget based line monitor
 # caMimeDisplay will now take macros into account
 # fatDots implemented in cartesian plot
+# more optimized image display
+# caCartesianplot optimized more
+# caQtDM uses now per deafult qwt6.1.1 when Qt version higher then Qt4.8
+# leading zeros of wheelswitch and spinbox suppressed
+# some controller widgets will now consider tab order
+# toggle button for a soft pv was not working
+# carowcolmenu performance enhancement
+# options -url and -emptycache added
 
 # 4.0.3
 # it is now possible to pipe ui data to caQtDM

@@ -360,8 +360,9 @@ caQtDM_Viewer {
    		LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_graphics_plugin.a
                 LIBS += $(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.a
                 LIBS += $(CAQTDM_COLLECT)/controlsystems/libepics3_plugin.a
+epics4: {
                 LIBS += $(CAQTDM_COLLECT)/controlsystems/libepics4_plugin.a
-
+}
    		LIBS += $$(EPICSLIB)/libca.a
    		LIBS += $$(EPICSLIB)/libCom.a
 
@@ -396,7 +397,9 @@ caQtDM_Viewer {
                 LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_graphics_plugin.a
                 LIBS += $(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.a
                 LIBS += $(CAQTDM_COLLECT)/controlsystems/libepics3_plugin.a
+ epics4: {
                 LIBS += $(CAQTDM_COLLECT)/controlsystems/libepics4_plugin.a
+}
    		LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.a
    		LIBS += $(CAQTDM_COLLECT)/libqtcontrols.a
    		LIBS += $$(QWTHOME)/lib/libqwt.a
