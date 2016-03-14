@@ -95,7 +95,7 @@
 
 #include <QMenuBar>
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(MOBILE_IOS)
 #define useElapsedTimer
 #else
 #endif
