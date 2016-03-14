@@ -93,11 +93,10 @@ DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 # caMimeDisplay will now take macros into account
 # fatDots implemented in cartesian plot
 # more optimized image display
-# caCartesianplot optimized more
-# caQtDM uses now per deafult qwt6.1.1 when Qt version higher then Qt4.8
-# leading zeros of wheelswitch and spinbox suppressed
-# some controller widgets will now consider tab order
+# tab order and focus considered
+# trailing zeros of caspinbox and cawheelswitch suppressed
 # toggle button for a soft pv was not working
+# caQtDM uses now qwt6.1.1 in order to take advantage of multicore processing
 # carowcolmenu performance enhancement
 # options -url and -emptycache added
 
