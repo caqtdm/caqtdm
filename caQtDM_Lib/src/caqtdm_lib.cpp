@@ -5264,7 +5264,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) scan2dWidget->setColormap(caScan2D::grey);
             else if(caWaterfallPlot * waterfallplotWidget = qobject_cast< caWaterfallPlot *>(w)) waterfallplotWidget->setColormap(caWaterfallPlot::grey);
 
-        } else  if(selectedItem->text().contains("Include files")) {
+        } else  if(selectedItem->text().contains("Include &Files")) {
             QString info;
             info.append(InfoPrefix);
             int totalTime=0;
@@ -5283,7 +5283,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             myMessageBox box(this);
             box.setText("<html>" + info + "</html>");
             box.exec();
-        } else  if(selectedItem->text().contains("Get Info")) {
+        } else  if(selectedItem->text().contains("Get &Info")) {
             QString info;
             info.append(InfoPrefix);
             info.append("-----------------------------------------------------------------<br>");
@@ -5545,7 +5545,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         } else if(selectedItem->text().contains("Reload")) {
             emit Signal_ReloadWindow(this);
 
-        } else if(selectedItem->text().contains("Change Axis")) {
+        } else if(selectedItem->text().contains("Change &Axis")) {
             if(caStripPlot* stripplotWidget = qobject_cast<caStripPlot *>(w)) {
                 limitsStripplotDialog dialog(stripplotWidget, mutexKnobDataP, "stripplot modifications", this);
                 dialog.exec();
@@ -5554,7 +5554,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 dialog.exec();
             }
 
-        } else if(selectedItem->text().contains("Reset zoom")) {
+        } else if(selectedItem->text().contains("Reset &Zoom")) {
             if(caCartesianPlot* cartesianplotWidget = qobject_cast<caCartesianPlot *>(w)) {
                 cartesianplotWidget->resetZoom();
 
@@ -5600,7 +5600,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 sliderDialog dialog(sliderWidget, mutexKnobDataP, "slider Increment/Value change", this);
                 dialog.exec();
             }
-        } else if(selectedItem->text().contains("Change Limits/Precision")) {
+        } else if(selectedItem->text().contains("Change &Limits/Precision")) {
             limitsDialog dialog(w, mutexKnobDataP, "Limits/Precision change", this);
             dialog.exec();
         } else {
