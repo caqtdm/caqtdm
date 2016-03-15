@@ -74,6 +74,27 @@
 #define InfoPrefix "<p style='background-color:lightyellow'><font color='#000000'>"
 #define InfoPostfix "</font></font></p>"
 
+// context texts
+#define GETINFO         "Get &Info"
+#define SETGREY         "Set Greyscale"
+#define SETWAVELEN      "Set Spectrum Wavelength"
+#define SETHOT          "Set Spectrum Hot"
+#define SETHEAT         "Set Spectrum Heat"
+#define SETJET          "Set Spectrum Jet"
+#define SETCUSTOM       "Set Spectrum Custom"
+#define KILLPROCESS 	"&Kill Process"
+#define PRINTWINDOW 	"&Print"
+#define RELOADWINDOW 	"&Reload"
+#define RAISEWINDOW 	"Raise main window"
+#define INCLUDES        "Include &Files"
+#define TOGGLESIZE      "&Toggle fit to size"
+#define CHANGEVALUE 	"&Change Increment/Value"
+#define CHANGEAXIS      "Change &Axis"
+#define RESETZOOM       "Reset &Zoom"
+#define INPUTDIALOG 	"Input Dialog"
+#define FILEDIALOG      "File Dialog"
+#define CHANGELIMITS 	"Change &Limits/Precision"
+
 // used for calculating visibility for several types of widgets
 #define ComputeVisibility(x, obj)  {  \
     switch(obj->getVisibility()) { \
@@ -201,13 +222,13 @@
     "</ui>"
 
 #define addColorTableActions \
-    myMenu.addAction("Get &Info"); \
-    myMenu.addAction("Set Greyscale"); \
-    myMenu.addAction("Set Spectrum Wavelength"); \
-    myMenu.addAction("Set Spectrum Hot"); \
-    myMenu.addAction("Set Spectrum Heat"); \
-    myMenu.addAction("Set Spectrum Jet"); \
-    myMenu.addAction("Set Spectrum Custom"); \
+    myMenu.addAction(GETINFO); \
+    myMenu.addAction(SETGREY); \
+    myMenu.addAction(SETWAVELEN); \
+    myMenu.addAction(SETHOT); \
+    myMenu.addAction(SETHEAT); \
+    myMenu.addAction(SETJET); \
+    myMenu.addAction(SETCUSTOM); \
 
 //===============================================================================================
 
@@ -5085,7 +5106,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
     } else if(caScriptButton* scriptbuttonWidget =  qobject_cast< caScriptButton *>(w)) {
         // add acion : kill associated process if running
-        if(!scriptbuttonWidget->getAccessW()) myMenu.addAction("&Kill Process");
+        if(!scriptbuttonWidget->getAccessW()) myMenu.addAction(KILLPROCESS);
 
     } else if(caScan2D* scan2dWidget = qobject_cast<caScan2D *>(w)) {
         nbPV=0;
@@ -5110,10 +5131,10 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     } else if(w==myWidget->parent()->parent()) {
         //qDebug() << "must be mainwindow?" << w << myWidget->parent()->parent();
         onMain = true;
-        myMenu.addAction("&Print");
-        myMenu.addAction("&Reload");
-        myMenu.addAction("Raise main window");
-        myMenu.addAction("Include &Files");
+        myMenu.addAction(PRINTWINDOW);
+        myMenu.addAction(RELOADWINDOW);
+        myMenu.addAction(RAISEWINDOW);
+        myMenu.addAction(INCLUDES);
     }
 
     // add some more actions
@@ -5125,7 +5146,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         // for the camera cameraWidget
     } else if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) {
         QAction *menuAction;
-        menuAction = myMenu.addAction("&Toggle fit to size");
+        menuAction = myMenu.addAction(TOGGLESIZE);
         menuAction->setCheckable(true);
         if(cameraWidget->getFitToSize() == caCamera::Yes) menuAction->setChecked(true);
         else  menuAction->setChecked(false);
@@ -5134,7 +5155,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         // for the scan2d scan2dWidget
     } else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) {
         QAction *menuAction;
-        menuAction = myMenu.addAction("&Toggle fit to size");
+        menuAction = myMenu.addAction(TOGGLESIZE);
         menuAction->setCheckable(true);
         if(scan2dWidget->getFitToSize() == caScan2D::Yes) menuAction->setChecked(true);
         else  menuAction->setChecked(false);
@@ -5148,27 +5169,27 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         // for the slider
     } else if(caSlider * sliderWidget = qobject_cast< caSlider *>(w)) {
         Q_UNUSED(sliderWidget);
-        myMenu.addAction("Get &Info");
-        myMenu.addAction("&Change Increment/Value");
+        myMenu.addAction(GETINFO);
+        myMenu.addAction(CHANGEVALUE);
 
         // all other widgets
     } else if(!onMain){
         // construct info for the pv we are pointing at
-        myMenu.addAction("Get &Info");
+        myMenu.addAction(GETINFO);
     }
 
     // for stripplot add one more action
     if(caStripPlot* stripplotWidget = qobject_cast<caStripPlot *>(w)) {
         Q_UNUSED(stripplotWidget);
-        myMenu.addAction("Change &Axis");
+        myMenu.addAction(CHANGEAXIS);
     }
 
     // for cartesian plot add more actions
     if(caCartesianPlot* cartesianplotWidget = qobject_cast<caCartesianPlot *>(w)) {
         Q_UNUSED(cartesianplotWidget);
-        myMenu.addAction("Change &Axis");
+        myMenu.addAction(CHANGEAXIS);
         myMenu.addAction(QWhatsThis::createAction());
-        myMenu.addAction("Reset &Zoom");
+        myMenu.addAction(RESETZOOM);
     }
 
     // for catextentry add filedialog
@@ -5176,24 +5197,24 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         if(catextentryWidget->getAccessW()) {
             knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv[0]);  // use pointer for getting all necessary information
             if((kPtr != (knobData *) 0) && (pv[0].length() > 0)) {
-                myMenu.addAction("Input Dialog");
+                myMenu.addAction(INPUTDIALOG);
                 if((kPtr->edata.fieldtype == caSTRING) || (kPtr->edata.fieldtype == caCHAR)) {
-                    myMenu.addAction("File Dialog");
+                    myMenu.addAction(FILEDIALOG);
                 }
             }
         }
     }
 
     // for some widgets one more action
-    if(caSlider * widget = qobject_cast< caSlider *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change &Limits/Precision");}
-    if(caLineEdit* widget = qobject_cast<caLineEdit *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change &Limits/Precision");}
-    if(caThermo* widget = qobject_cast<caThermo *>(w)){Q_UNUSED(widget);  myMenu.addAction("Change &Limits/Precision");}
-    if(caNumeric* widget = qobject_cast<caNumeric *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change &Limits/Precision");}
-    if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change &Limits/Precision");}
-    if(caSpinbox* widget = qobject_cast<caSpinbox *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change &Limits/Precision");}
-    if(caLinearGauge* widget = qobject_cast<caLinearGauge *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change &Limits/Precision");}
-    if(caCircularGauge* widget = qobject_cast<caCircularGauge *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change &Limits/Precision");}
-    if(caMeter* widget = qobject_cast<caMeter *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change &Limits/Precision");}
+    if(caSlider * widget = qobject_cast< caSlider *>(w)) {Q_UNUSED(widget); myMenu.addAction(CHANGELIMITS);}
+    if(caLineEdit* widget = qobject_cast<caLineEdit *>(w)) {Q_UNUSED(widget); myMenu.addAction(CHANGELIMITS);}
+    if(caThermo* widget = qobject_cast<caThermo *>(w)){Q_UNUSED(widget);  myMenu.addAction(CHANGELIMITS);}
+    if(caNumeric* widget = qobject_cast<caNumeric *>(w)) {Q_UNUSED(widget); myMenu.addAction(CHANGELIMITS);}
+    if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w)) {Q_UNUSED(widget); myMenu.addAction(CHANGELIMITS);}
+    if(caSpinbox* widget = qobject_cast<caSpinbox *>(w)) {Q_UNUSED(widget); myMenu.addAction(CHANGELIMITS);}
+    if(caLinearGauge* widget = qobject_cast<caLinearGauge *>(w)) {Q_UNUSED(widget); myMenu.addAction(CHANGELIMITS);}
+    if(caCircularGauge* widget = qobject_cast<caCircularGauge *>(w)) {Q_UNUSED(widget); myMenu.addAction(CHANGELIMITS);}
+    if(caMeter* widget = qobject_cast<caMeter *>(w)) {Q_UNUSED(widget); myMenu.addAction(CHANGELIMITS);}
 
     // add to context menu, the actions requested by the environment variable caQtDM_EXEC_LIST
     if(validExecListItems) {
@@ -5209,7 +5230,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     QAction* selectedItem = myMenu.exec(cursorPos);
 
     if (selectedItem) {
-        if(selectedItem->text().contains("Kill Process")) {
+        if(selectedItem->text().contains(KILLPROCESS)) {
             if(caScriptButton* scriptbuttonWidget =  qobject_cast< caScriptButton *>(w)) {
 #ifndef MOBILE
                 processWindow *t= (processWindow *) scriptbuttonWidget->getProcess();
@@ -5219,12 +5240,12 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 #endif
             }
 
-        } else  if(selectedItem->text().contains("Raise message window")) {
+        } else  if(selectedItem->text().contains(RAISEWINDOW)) {
             QMainWindow *mainWindow = (QMainWindow *) this->parentWidget();
             mainWindow->showNormal();
             if(messageWindowP != (MessageWindow *) 0) messageWindowP->raise();
 
-        } else  if(selectedItem->text().contains("Toggle fit to size")) {
+        } else  if(selectedItem->text().contains(TOGGLESIZE)) {
             if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) {
                 if(cameraWidget->getFitToSize() == caCamera::Yes) cameraWidget->setFitToSize(caCamera::No);
                 else cameraWidget->setFitToSize(caCamera::Yes);
@@ -5234,37 +5255,37 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 else scan2dWidget->setFitToSize(caScan2D::Yes);
             }
 
-        } else  if(selectedItem->text().contains("Set Spectrum Wavelength")) {
+        } else  if(selectedItem->text().contains(SETWAVELEN)) {
             if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::spectrum_wavelength);
             else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) scan2dWidget->setColormap(caScan2D::spectrum_wavelength);
             else if(caWaterfallPlot * waterfallplotWidget = qobject_cast< caWaterfallPlot *>(w)) waterfallplotWidget->setColormap(caWaterfallPlot::spectrum_wavelength);
 
-        } else  if(selectedItem->text().contains("Set Spectrum Hot")) {
+        } else  if(selectedItem->text().contains(SETHOT)) {
             if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::spectrum_hot);
             else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) scan2dWidget->setColormap(caScan2D::spectrum_hot);
             else if(caWaterfallPlot * waterfallplotWidget = qobject_cast< caWaterfallPlot *>(w)) waterfallplotWidget->setColormap(caWaterfallPlot::spectrum_hot);
 
-        } else  if(selectedItem->text().contains("Set Spectrum Heat")) {
+        } else  if(selectedItem->text().contains(SETHEAT)) {
             if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::spectrum_heat);
             else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) scan2dWidget->setColormap(caScan2D::spectrum_heat);
             else if(caWaterfallPlot * waterfallplotWidget = qobject_cast< caWaterfallPlot *>(w)) waterfallplotWidget->setColormap(caWaterfallPlot::spectrum_heat);
 
-        } else  if(selectedItem->text().contains("Set Spectrum Jet")) {
+        } else  if(selectedItem->text().contains(SETJET)) {
             if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::spectrum_jet);
             else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) scan2dWidget->setColormap(caScan2D::spectrum_jet);
             else if(caWaterfallPlot * waterfallplotWidget = qobject_cast< caWaterfallPlot *>(w)) waterfallplotWidget->setColormap(caWaterfallPlot::spectrum_jet);
 
-        } else  if(selectedItem->text().contains("Set Spectrum Custom")) {
+        } else  if(selectedItem->text().contains(SETCUSTOM)) {
             if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::spectrum_custom);
             else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) scan2dWidget->setColormap(caScan2D::spectrum_custom);
             else if(caWaterfallPlot * waterfallplotWidget = qobject_cast< caWaterfallPlot *>(w)) waterfallplotWidget->setColormap(caWaterfallPlot::spectrum_custom);
 
-        } else  if(selectedItem->text().contains("Set Greyscale")) {
+        } else  if(selectedItem->text().contains(SETGREY)) {
             if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::grey);
             else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) scan2dWidget->setColormap(caScan2D::grey);
             else if(caWaterfallPlot * waterfallplotWidget = qobject_cast< caWaterfallPlot *>(w)) waterfallplotWidget->setColormap(caWaterfallPlot::grey);
 
-        } else  if(selectedItem->text().contains("Include &Files")) {
+        } else  if(selectedItem->text().contains(INCLUDES)) {
             QString info;
             info.append(InfoPrefix);
             int totalTime=0;
@@ -5283,7 +5304,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             myMessageBox box(this);
             box.setText("<html>" + info + "</html>");
             box.exec();
-        } else  if(selectedItem->text().contains("Get &Info")) {
+
+        } else  if(selectedItem->text().contains(GETINFO)) {
             QString info;
             info.append(InfoPrefix);
             info.append("-----------------------------------------------------------------<br>");
@@ -5516,7 +5538,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             box.exec();
 
         // add a file dialog to simplify user path+file input
-        } else if(selectedItem->text().contains("File Dialog")) {
+        } else if(selectedItem->text().contains(FILEDIALOG)) {
             QFileDialog dialog(this);
             dialog.setFileMode(QFileDialog::DirectoryOnly);
             if (dialog.exec()) {
@@ -5529,7 +5551,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 }
             }
 
-        } else if(selectedItem->text().contains("Input Dialog")) {
+        } else if(selectedItem->text().contains(INPUTDIALOG)) {
             bool ok;
             QString text = QInputDialog::getText(this, tr("Input data"), tr("Input:"), QLineEdit::Normal,"", &ok);
             if (ok && !text.isEmpty()) {
@@ -5539,13 +5561,13 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 }
             }
 
-        } else if(selectedItem->text().contains("Print")) {
+        } else if(selectedItem->text().contains(PRINTWINDOW)) {
             print();
 
-        } else if(selectedItem->text().contains("Reload")) {
+        } else if(selectedItem->text().contains(RELOADWINDOW)) {
             emit Signal_ReloadWindow(this);
 
-        } else if(selectedItem->text().contains("Change &Axis")) {
+        } else if(selectedItem->text().contains(CHANGEAXIS)) {
             if(caStripPlot* stripplotWidget = qobject_cast<caStripPlot *>(w)) {
                 limitsStripplotDialog dialog(stripplotWidget, mutexKnobDataP, "stripplot modifications", this);
                 dialog.exec();
@@ -5553,8 +5575,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 limitsCartesianplotDialog dialog(cartesianplotWidget, mutexKnobDataP, "cartesianplot modifications", this);
                 dialog.exec();
             }
-
-        } else if(selectedItem->text().contains("Reset &Zoom")) {
+        } else if(selectedItem->text().contains(RESETZOOM)) {
             if(caCartesianPlot* cartesianplotWidget = qobject_cast<caCartesianPlot *>(w)) {
                 cartesianplotWidget->resetZoom();
 
@@ -5595,14 +5616,16 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 /*************************************************/
             }
 
-        } else if(selectedItem->text().contains("Change Increment/Value")) {
+        } else if(selectedItem->text().contains(CHANGEVALUE)) {
             if(caSlider* sliderWidget = qobject_cast<caSlider *>(w)) {
                 sliderDialog dialog(sliderWidget, mutexKnobDataP, "slider Increment/Value change", this);
                 dialog.exec();
             }
-        } else if(selectedItem->text().contains("Change &Limits/Precision")) {
+
+        } else if(selectedItem->text().contains(CHANGELIMITS)) {
             limitsDialog dialog(w, mutexKnobDataP, "Limits/Precision change", this);
             dialog.exec();
+
         } else {
             // any action from environment ?
             if(validExecListItems) {
