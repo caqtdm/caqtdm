@@ -966,6 +966,11 @@ void FileOpenWindow::Callback_IosExit()
     }
 }
 
+void FileOpenWindow::Callback_ReloadWindow(QWidget* w)
+{
+    reload(w);
+}
+
 void FileOpenWindow::Callback_ActionExit()
 {
     int selected;
@@ -1010,12 +1015,55 @@ void FileOpenWindow::Callback_ActionExit()
     }
 }
 
-void FileOpenWindow::Callback_ActionReload()
+void FileOpenWindow::reload(QWidget *w)
 {
     QPoint position;
     QString macroS = "";
     QString resizeS = "true";
 
+    QVariant fileName = w->property("fileString");
+    QVariant macroString = w->property("macroString");
+    if(!macroString.isNull()) {
+        macroS = macroString.toString();
+    }
+    QVariant resizeString= w->property("resizeString");
+    if(!resizeString.isNull()) {
+        resizeS = resizeString.toString();
+    }
+
+    // get rif of old window
+    position = w->pos();
+    w->close();
+    w->disconnect();
+    w->deleteLater();
+
+    if(!fileName.isNull()) {
+
+        QString FileName = fileName.toString();
+
+        // this will check for file existence and when an url is defined, download the file from a http server
+        QFileInfo fi(FileName);
+        fileFunctions filefunction;
+        filefunction.checkFileAndDownload(fi.fileName());
+        if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(filefunction.lastInfo()));
+        if(filefunction.lastError().length() > 0) messageWindow->postMsgEvent(QtCriticalMsg, (char*) qasc(filefunction.lastError()));
+
+        // we were loading here before a new instance of caQtDM_Lib,; however the deferred delete of the previous instance
+        // seemed to have a major memory leak, so that now we queue the reloading
+        searchFile *s = new searchFile(FileName);
+        QString fileNameFound = s->findFile();
+        Row row;
+        row.position = position;
+        row.file = fileNameFound;
+        row.macro = macroS;
+        row.resize = resizeS;
+        reloadList.append(row);
+        s->deleteLater();
+    }
+}
+
+void FileOpenWindow::Callback_ActionReload()
+{
     // block reload button
    this->ui.reloadAction->blockSignals(true);
 
@@ -1027,45 +1075,7 @@ void FileOpenWindow::Callback_ActionReload()
     QList<QWidget *> all = this->findChildren<QWidget *>();
     foreach(QWidget* widget, all) {
         if(CaQtDM_Lib* w = qobject_cast<CaQtDM_Lib *>(widget)) {
-            QVariant fileName = w->property("fileString");
-            QVariant macroString = w->property("macroString");
-            if(!macroString.isNull()) {
-                macroS = macroString.toString();
-            }
-            QVariant resizeString= w->property("resizeString");
-            if(!resizeString.isNull()) {
-                resizeS = resizeString.toString();
-            }
-
-            // get rif of old window
-            position = w->pos();
-            w->close();
-            w->disconnect();
-            w->deleteLater();
-
-            if(!fileName.isNull()) {
-
-                QString FileName = fileName.toString();
-
-                // this will check for file existence and when an url is defined, download the file from a http server
-                QFileInfo fi(FileName);
-                fileFunctions filefunction;
-                filefunction.checkFileAndDownload(fi.fileName());
-                if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(filefunction.lastInfo()));
-                if(filefunction.lastError().length() > 0) messageWindow->postMsgEvent(QtCriticalMsg, (char*) qasc(filefunction.lastError()));
-
-                // we were loading here before a new instance of caQtDM_Lib,; however the deferred delete of the previous instance
-                // seemed to have a major memory leak, so that now we queue the reloading
-                searchFile *s = new searchFile(FileName);
-                QString fileNameFound = s->findFile();
-                Row row;
-                row.position = position;
-                row.file = fileNameFound;
-                row.macro = macroS;
-                row.resize = resizeS;
-                reloadList.append(row);
-                s->deleteLater();
-            }
+           reload(w);
         }
     }
 

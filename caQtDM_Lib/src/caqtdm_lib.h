@@ -248,6 +248,7 @@ signals:
     void Signal_ContextMenu(QWidget*);
     void Signal_NextWindow();
     void Signal_IosExit();
+    void Signal_ReloadWindow(QWidget*);
     void fileChanged(const QString&);
 
 private:

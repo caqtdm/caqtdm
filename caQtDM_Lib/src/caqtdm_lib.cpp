@@ -406,6 +406,9 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     // connect close launchfile action to parent
     connect(this, SIGNAL(Signal_IosExit()), parent, SLOT(Callback_IosExit()));
 
+    // connect reload window action to parent
+    connect(this, SIGNAL(Signal_ReloadWindow(QWidget*)), parent, SLOT(Callback_ReloadWindow(QWidget*)));
+
     qRegisterMetaType<knobData>("knobData");
 
     // connect signals to slots for exchanging data
@@ -5108,6 +5111,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         //qDebug() << "must be mainwindow?" << w << myWidget->parent()->parent();
         onMain = true;
         myMenu.addAction("Print");
+        myMenu.addAction("Reload");
         myMenu.addAction("Raise main window");
         myMenu.addAction("Include files");
     }
@@ -5537,6 +5541,10 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
         } else if(selectedItem->text().contains("Print")) {
             print();
+
+        } else if(selectedItem->text().contains("Reload")) {
+            emit Signal_ReloadWindow(this);
+
         } else if(selectedItem->text().contains("Change Axis")) {
             if(caStripPlot* stripplotWidget = qobject_cast<caStripPlot *>(w)) {
                 limitsStripplotDialog dialog(stripplotWidget, mutexKnobDataP, "stripplot modifications", this);

@@ -117,6 +117,7 @@ public slots:
      }
      void nextWindow();
      void Callback_IosExit();
+     void Callback_ReloadWindow(QWidget*);
 
 protected:
      virtual void timerEvent(QTimerEvent *e);
@@ -130,6 +131,7 @@ private:
      void closeEvent(QCloseEvent* ce);
      void FlushAllInterfaces();
      void TerminateAllInterfaces();
+     void reload(QWidget *w);
      QMainWindow *lastWindow;
      QString lastMacro, lastFile, lastGeometry, lastResizing;
      Ui::MainWindow ui;
