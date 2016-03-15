@@ -201,7 +201,7 @@
     "</ui>"
 
 #define addColorTableActions \
-    myMenu.addAction("Get Info"); \
+    myMenu.addAction("Get &Info"); \
     myMenu.addAction("Set Greyscale"); \
     myMenu.addAction("Set Spectrum Wavelength"); \
     myMenu.addAction("Set Spectrum Hot"); \
@@ -5085,7 +5085,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
     } else if(caScriptButton* scriptbuttonWidget =  qobject_cast< caScriptButton *>(w)) {
         // add acion : kill associated process if running
-        if(!scriptbuttonWidget->getAccessW()) myMenu.addAction("Kill Process");
+        if(!scriptbuttonWidget->getAccessW()) myMenu.addAction("&Kill Process");
 
     } else if(caScan2D* scan2dWidget = qobject_cast<caScan2D *>(w)) {
         nbPV=0;
@@ -5110,10 +5110,10 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     } else if(w==myWidget->parent()->parent()) {
         //qDebug() << "must be mainwindow?" << w << myWidget->parent()->parent();
         onMain = true;
-        myMenu.addAction("Print");
-        myMenu.addAction("Reload");
+        myMenu.addAction("&Print");
+        myMenu.addAction("&Reload");
         myMenu.addAction("Raise main window");
-        myMenu.addAction("Include files");
+        myMenu.addAction("Include &Files");
     }
 
     // add some more actions
@@ -5125,7 +5125,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         // for the camera cameraWidget
     } else if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) {
         QAction *menuAction;
-        menuAction = myMenu.addAction("Toggle fit to size");
+        menuAction = myMenu.addAction("&Toggle fit to size");
         menuAction->setCheckable(true);
         if(cameraWidget->getFitToSize() == caCamera::Yes) menuAction->setChecked(true);
         else  menuAction->setChecked(false);
@@ -5134,7 +5134,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         // for the scan2d scan2dWidget
     } else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) {
         QAction *menuAction;
-        menuAction = myMenu.addAction("Toggle fit to size");
+        menuAction = myMenu.addAction("&Toggle fit to size");
         menuAction->setCheckable(true);
         if(scan2dWidget->getFitToSize() == caScan2D::Yes) menuAction->setChecked(true);
         else  menuAction->setChecked(false);
@@ -5148,27 +5148,27 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         // for the slider
     } else if(caSlider * sliderWidget = qobject_cast< caSlider *>(w)) {
         Q_UNUSED(sliderWidget);
-        myMenu.addAction("Get Info");
-        myMenu.addAction("Change Increment/Value");
+        myMenu.addAction("Get &Info");
+        myMenu.addAction("&Change Increment/Value");
 
         // all other widgets
     } else if(!onMain){
         // construct info for the pv we are pointing at
-        myMenu.addAction("Get Info");
+        myMenu.addAction("Get &Info");
     }
 
     // for stripplot add one more action
     if(caStripPlot* stripplotWidget = qobject_cast<caStripPlot *>(w)) {
         Q_UNUSED(stripplotWidget);
-        myMenu.addAction("Change Axis");
+        myMenu.addAction("Change &Axis");
     }
 
     // for cartesian plot add more actions
     if(caCartesianPlot* cartesianplotWidget = qobject_cast<caCartesianPlot *>(w)) {
         Q_UNUSED(cartesianplotWidget);
-        myMenu.addAction("Change Axis");
+        myMenu.addAction("Change &Axis");
         myMenu.addAction(QWhatsThis::createAction());
-        myMenu.addAction("Reset zoom");
+        myMenu.addAction("Reset &Zoom");
     }
 
     // for catextentry add filedialog
@@ -5185,15 +5185,15 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     }
 
     // for some widgets one more action
-    if(caSlider * widget = qobject_cast< caSlider *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
-    if(caLineEdit* widget = qobject_cast<caLineEdit *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
-    if(caThermo* widget = qobject_cast<caThermo *>(w)){Q_UNUSED(widget);  myMenu.addAction("Change Limits/Precision");}
-    if(caNumeric* widget = qobject_cast<caNumeric *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
-    if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
-    if(caSpinbox* widget = qobject_cast<caSpinbox *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
-    if(caLinearGauge* widget = qobject_cast<caLinearGauge *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
-    if(caCircularGauge* widget = qobject_cast<caCircularGauge *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
-    if(caMeter* widget = qobject_cast<caMeter *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
+    if(caSlider * widget = qobject_cast< caSlider *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change &Limits/Precision");}
+    if(caLineEdit* widget = qobject_cast<caLineEdit *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change &Limits/Precision");}
+    if(caThermo* widget = qobject_cast<caThermo *>(w)){Q_UNUSED(widget);  myMenu.addAction("Change &Limits/Precision");}
+    if(caNumeric* widget = qobject_cast<caNumeric *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change &Limits/Precision");}
+    if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change &Limits/Precision");}
+    if(caSpinbox* widget = qobject_cast<caSpinbox *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change &Limits/Precision");}
+    if(caLinearGauge* widget = qobject_cast<caLinearGauge *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change &Limits/Precision");}
+    if(caCircularGauge* widget = qobject_cast<caCircularGauge *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change &Limits/Precision");}
+    if(caMeter* widget = qobject_cast<caMeter *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change &Limits/Precision");}
 
     // add to context menu, the actions requested by the environment variable caQtDM_EXEC_LIST
     if(validExecListItems) {
