@@ -246,6 +246,7 @@ signals:
     void Signal_NextWindow();
     void Signal_IosExit();
     void Signal_ReloadWindow(QWidget*);
+    void Signal_ReloadAllWindows();
     void fileChanged(const QString&);
 
 private:
@@ -391,6 +392,10 @@ private slots:
 
     void Callback_reloadWindow() {
         emit Signal_ReloadWindow(this);
+    }
+
+    void Callback_reloadAllWindows() {
+        emit Signal_ReloadAllWindows();
     }
 
     void Callback_printWindow() {

@@ -972,6 +972,11 @@ void FileOpenWindow::Callback_ReloadWindow(QWidget *w)
     reload(w);
 }
 
+void FileOpenWindow::Callback_ReloadAllWindows()
+{
+    Callback_ActionReload();
+}
+
 void FileOpenWindow::Callback_ActionExit()
 {
     int selected;

@@ -429,6 +429,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     // connect reload window action to parent
     connect(this, SIGNAL(Signal_ReloadWindow(QWidget*)), parent, SLOT(Callback_ReloadWindow(QWidget*)));
+    connect(this, SIGNAL(Signal_ReloadAllWindows()), parent, SLOT(Callback_ReloadAllWindows()));
 
     qRegisterMetaType<knobData>("knobData");
 
@@ -546,6 +547,12 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     ReloadWindowAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+R", 0, QApplication::UnicodeUTF8));
     connect(ReloadWindowAction, SIGNAL(triggered()), this, SLOT(Callback_reloadWindow()));
     this->addAction(ReloadWindowAction);
+
+    // add also a global reload action
+    QAction *ReloadAllWindowsAction = new QAction(this);
+    ReloadAllWindowsAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+Alt+R", 0, QApplication::UnicodeUTF8));
+    connect(ReloadAllWindowsAction, SIGNAL(triggered()), this, SLOT(Callback_reloadAllWindows()));
+    this->addAction(ReloadAllWindowsAction);
 
     // add a print action
     QAction *PrintWindowAction = new QAction(this);

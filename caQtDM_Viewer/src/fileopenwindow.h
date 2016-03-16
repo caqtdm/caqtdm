@@ -118,6 +118,7 @@ public slots:
      void nextWindow();
      void Callback_IosExit();
      void Callback_ReloadWindow(QWidget*);
+     void Callback_ReloadAllWindows();
 
 protected:
      virtual void timerEvent(QTimerEvent *e);
