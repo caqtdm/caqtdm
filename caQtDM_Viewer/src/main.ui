@@ -24,41 +24,39 @@
      <x>0</x>
      <y>0</y>
      <width>493</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuMenu">
     <property name="title">
-     <string>Menu</string>
+     <string>&amp;Menu</string>
     </property>
     <addaction name="fileAction"/>
     <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="reloadAction"/>
-    <addaction name="ReloadWindowAction"/>
     <addaction name="exitAction"/>
     <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="separator"/>
-    <addaction name="PrintWindowAction"/>
    </widget>
    <widget class="QMenu" name="menuPV">
     <property name="title">
-     <string>PV</string>
+     <string>&amp;PV</string>
     </property>
     <addaction name="unconnectedAction"/>
    </widget>
    <widget class="QMenu" name="menuUpdateType">
     <property name="title">
-     <string>UpdateType</string>
+     <string>&amp;UpdateType</string>
     </property>
     <addaction name="directAction"/>
     <addaction name="timedAction"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>&amp;Help</string>
     </property>
     <addaction name="helpAction"/>
     <addaction name="aboutAction"/>
@@ -79,6 +77,9 @@
   <action name="exitAction">
    <property name="text">
     <string>&amp;Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
   <action name="reloadAction">
