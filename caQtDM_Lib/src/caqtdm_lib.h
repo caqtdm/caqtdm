@@ -173,13 +173,10 @@ public:
         printer->setPrinterName(defaultPrinter);
         printer->setOutputFileName(0);
         printer->setPrintProgram("lpr");
+#endif
         printer->setOrientation(QPrinter::Landscape);
         printer->setResolution(300);
         printer->setOutputFormat(QPrinter::NativeFormat);
-#else
-        printer->setOrientation(QPrinter::Landscape);
-        printer->setResolution(300);
-#endif
         QPrintDialog *printDialog = new QPrintDialog(printer, this);
 
 #ifdef linux
