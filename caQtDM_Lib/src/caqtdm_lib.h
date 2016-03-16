@@ -392,6 +392,14 @@ private slots:
 
     void Callback_WriteDetectedValues(QWidget* w);
 
+    void Callback_reloadWindow() {
+        emit Signal_ReloadWindow(this);
+    }
+
+    void Callback_printWindow() {
+        print();
+    }
+
     void updateResize();
 };
 

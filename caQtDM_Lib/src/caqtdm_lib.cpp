@@ -86,7 +86,7 @@
 #define PRINTWINDOW 	"Print"
 #define RELOADWINDOW 	"Reload"
 #define RAISEWINDOW 	"Raise main window"
-#define INCLUDES        "Include &Files"
+#define INCLUDES        "Include Files"
 #define TOGGLESIZE      "Toggle fit to size"
 #define CHANGEVALUE 	"Change Increment/Value"
 #define CHANGEAXIS      "Change Axis"
@@ -540,6 +540,18 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
         splash->deleteLater();
     }
+
+    // add a reload action
+    QAction *ReloadWindowAction = new QAction(this);
+    ReloadWindowAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+R", 0, QApplication::UnicodeUTF8));
+    connect(ReloadWindowAction, SIGNAL(triggered()), this, SLOT(Callback_reloadWindow()));
+    this->addAction(ReloadWindowAction);
+
+    // add a print action
+    QAction *PrintWindowAction = new QAction(this);
+    PrintWindowAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+P", 0, QApplication::UnicodeUTF8));
+    connect(PrintWindowAction, SIGNAL(triggered()), this, SLOT(Callback_printWindow()));
+    this->addAction(PrintWindowAction);
 }
 
 /**

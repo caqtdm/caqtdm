@@ -234,8 +234,6 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     connect( this->ui.aboutAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionAbout()) );
     connect( this->ui.exitAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionExit()) );
     connect( this->ui.reloadAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionReload()) );
-    connect( this->ui.ReloadWindowAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionReloadWindow()) );
-    connect( this->ui.PrintWindowAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionPrintWindow()) );
     connect( this->ui.unconnectedAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionUnconnected()) );
     connect( this->ui.timedAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionTimed()) );
     connect( this->ui.directAction, SIGNAL( triggered() ), this, SLOT(Callback_ActionDirect()) );
@@ -714,6 +712,7 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
 #endif
 
     QMainWindow *mainWindow = newWindow;
+    lastWindow = mainWindow;
 
     // center the window if requested (only for windows)
 #if defined(WIN32) && !defined(__GNUC__)
@@ -972,20 +971,6 @@ void FileOpenWindow::Callback_ReloadWindow(QWidget *w)
 {
     reload(w);
 }
-
-void FileOpenWindow::Callback_ActionReloadWindow()
-{
-    reload(QApplication::activeWindow());
-}
-
-void FileOpenWindow::Callback_ActionPrintWindow()
-{
-   QWidget *activeWidget = QApplication::activeWindow();
-   if(CaQtDM_Lib* w = qobject_cast<CaQtDM_Lib *>(activeWidget)) {
-       w->print();
-   }
-}
-
 
 void FileOpenWindow::Callback_ActionExit()
 {
