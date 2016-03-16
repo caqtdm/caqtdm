@@ -24,7 +24,7 @@
      <x>0</x>
      <y>0</y>
      <width>493</width>
-     <height>24</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuMenu">
@@ -35,11 +35,13 @@
     <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="reloadAction"/>
+    <addaction name="ReloadWindowAction"/>
     <addaction name="exitAction"/>
     <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="separator"/>
+    <addaction name="PrintWindowAction"/>
    </widget>
    <widget class="QMenu" name="menuPV">
     <property name="title">
@@ -81,7 +83,10 @@
   </action>
   <action name="reloadAction">
    <property name="text">
-    <string>&amp;Reload</string>
+    <string>&amp;Reload All</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+R</string>
    </property>
   </action>
   <action name="unconnectedAction">
@@ -102,10 +107,16 @@
    <property name="toolTip">
     <string>Open File</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="aboutAction">
    <property name="text">
     <string>&amp;About</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
    </property>
   </action>
   <action name="directAction">
@@ -145,6 +156,22 @@
   <action name="clearAction">
    <property name="text">
     <string>&amp;Clear Messages</string>
+   </property>
+  </action>
+  <action name="ReloadWindowAction">
+   <property name="text">
+    <string>Reload Activ &amp;Window</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="PrintWindowAction">
+   <property name="text">
+    <string>&amp;Print Activ Window</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
    </property>
   </action>
  </widget>
