@@ -118,28 +118,33 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
         messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
         QString ZMQ_ADDR_LIST = (QString)  qgetenv("BSREAD_ZMQ_ADDR_LIST");
 
-#ifdef _MSC_VER
-        QStringList BSREAD_ZMQ_ADDRS = ZMQ_ADDR_LIST.split(";");
-#else
-        QStringList BSREAD_ZMQ_ADDRS = ZMQ_ADDR_LIST.split(" ");
-#endif
-        for (i=0;i<BSREAD_ZMQ_ADDRS.count();i++){
+        if (!ZMQ_ADDR_LIST.isEmpty()){
+    #ifdef _MSC_VER
+            QStringList BSREAD_ZMQ_ADDRS = ZMQ_ADDR_LIST.split(";");
+    #else
+            QStringList BSREAD_ZMQ_ADDRS = ZMQ_ADDR_LIST.split(" ");
+    #endif
+            for (i=0;i<BSREAD_ZMQ_ADDRS.count();i++){
 
-            bsreadconnections.append(new bsread_Decode(zmqcontex,BSREAD_ZMQ_ADDRS.at(i)));
-            bsreadThreads.append(new QThread(this));
-            bsreadconnections.last()->setKnobData(mutexknobdataP);
-            bsreadconnections.last()->moveToThread(bsreadThreads.last());
-            connect(bsreadThreads.last(), SIGNAL(started()), bsreadconnections.last(), SLOT(process()));
-            connect(bsreadconnections.last(), SIGNAL(finished()), bsreadThreads.last(), SLOT(quit()));
-            connect(bsreadThreads.last(), SIGNAL(finished()), bsreadThreads.last(), SLOT(deleteLater()));
-            connect(bsreadconnections.last(), SIGNAL(finished()), bsreadconnections.last(), SLOT(deleteLater()));
-            bsreadThreads.last()->start();
-            msg="Connection started: ";
-            msg.append(BSREAD_ZMQ_ADDRS.at(i));
+                bsreadconnections.append(new bsread_Decode(zmqcontex,BSREAD_ZMQ_ADDRS.at(i)));
+                bsreadThreads.append(new QThread(this));
+                bsreadconnections.last()->setKnobData(mutexknobdataP);
+                bsreadconnections.last()->moveToThread(bsreadThreads.last());
+                connect(bsreadThreads.last(), SIGNAL(started()), bsreadconnections.last(), SLOT(process()));
+                connect(bsreadconnections.last(), SIGNAL(finished()), bsreadThreads.last(), SLOT(quit()));
+                connect(bsreadThreads.last(), SIGNAL(finished()), bsreadThreads.last(), SLOT(deleteLater()));
+                connect(bsreadconnections.last(), SIGNAL(finished()), bsreadconnections.last(), SLOT(deleteLater()));
+                bsreadThreads.last()->start();
+                msg="Connection started: ";
+                msg.append(BSREAD_ZMQ_ADDRS.at(i));
+                messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
+            }
+        }else{
+            QString msg="no BSREAD Connection";
             messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
+
         }
     }
-
 
 
     return true;
