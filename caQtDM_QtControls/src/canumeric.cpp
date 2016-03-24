@@ -117,10 +117,12 @@ void caNumeric::setConnectedColors(bool connected)
 void caNumeric::paintEvent(QPaintEvent *event) {
     QPen	pen;
     QPainter p(this);
+    Q_UNUSED(event);
     if(hasFocus()) {
       pen.setColor(Qt::red);
       p.setPen(pen);
-      p.drawRect(rect());
+      //p.drawRect(rect());
+      p.drawRect(0,0,rect().width()-1, rect().height()-1);
     }
 }
 

@@ -117,10 +117,12 @@ void caSpinbox::setConnectedColors(bool connected)
 void caSpinbox::paintEvent(QPaintEvent *event) {
     QPen	pen;
     QPainter p(this);
+    Q_UNUSED(event);
     if(hasFocus()) {
-      pen.setColor(palette().color(QPalette::Foreground));
+      //pen.setColor(palette().color(QPalette::Foreground));
+      pen.setColor(Qt::red);
       p.setPen(pen);
-      p.drawRect(rect());
+      p.drawRect(0,0,rect().width()-1, rect().height()-1);
     }
 }
 
