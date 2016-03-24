@@ -176,9 +176,14 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
 
     Q_PROPERTY(int XaxisSyncGroup READ getXaxisSyncGroup WRITE setXaxisSyncGroup)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
 public:
 
 #include "caPropHandle.h"
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     enum {MAXCURVES = 7};
 

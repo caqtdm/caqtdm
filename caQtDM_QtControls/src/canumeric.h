@@ -38,6 +38,7 @@ Q_OBJECT
 
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
+    Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
     Q_PROPERTY(SourceMode precisionMode READ getPrecisionMode WRITE setPrecisionMode)
     Q_PROPERTY(bool fixedFormat READ getFixedFormat WRITE setFixedFormat)
 
@@ -46,11 +47,18 @@ Q_OBJECT
     Q_PROPERTY(double maxValue READ getMaxValue WRITE setMaxValue)
     Q_PROPERTY(double minValue READ getMinValue WRITE setMinValue)
 
-    //Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
+    Q_ENUMS(colMode)
 
 #include "caElevation.h"
 
 public:
+
+    enum colMode {Static=0, Default};
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
      caNumeric(QWidget *parent);
     ~caNumeric(){}
@@ -60,6 +68,14 @@ public:
 
     bool getAccessW() const {return thisAccessW;}
     void setAccessW(bool access);
+
+    colMode getColorMode() const { return thisColorMode; }
+
+    void setColorMode(colMode colormode) {thisColorMode = colormode;
+                                          setBackground(thisBackColor);
+                                          setForeground(thisForeColor);
+                                          oldColorMode = thisColorMode;
+                                           }
 
     enum SourceMode {Channel = 0, User};
     SourceMode getPrecisionMode() const { return thisPrecMode; }
@@ -97,7 +113,10 @@ private:
     SourceMode thisPrecMode;
     SourceMode thisLimitsMode;
     bool thisFixedFormat;
+    colMode thisColorMode;
+    colMode oldColorMode;
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
+    bool renewStyleSheet;
 };
 #endif

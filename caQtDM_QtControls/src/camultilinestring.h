@@ -72,13 +72,16 @@ class QTCON_EXPORT caMultiLineString : public QPlainTextEdit, public FontScaling
     Q_PROPERTY(ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleModeL)
     Q_PROPERTY(double fontScaleFactor READ fontScaleFactor WRITE setFontScaleFactor DESIGNABLE false)
 
-    //Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
     Q_ENUMS(ScaleMode)
 
     Q_OBJECT
 
 public:
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     enum Shape {NoFrame = 0};
     enum Shadow {Plain = 0x0010};

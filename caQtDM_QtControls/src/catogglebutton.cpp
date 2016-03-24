@@ -34,6 +34,10 @@
 
 caToggleButton::caToggleButton(QWidget *parent) : QCheckBox(parent), FontScalingWidget(this)
 {
+    // to start with, clear the stylesheet, so that playing around
+    // is not possible.
+    setStyleSheet("");
+
     setCheckable(true);
     setTristate(true);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -88,15 +92,6 @@ void caToggleButton::setColors(QColor bg, QColor fg)
 
     if(!defBackColor.isValid() || !defForeColor.isValid()) return;
     if((bg != oldBackColor) || (fg != oldForeColor) || (thisColorMode != oldColorMode)) {
-        /* stylesheets will always supersede palette, so palette can not be used */
-        /*
-        QPalette thisPalette = palette();
-        thisPalette.setColor(QPalette::WindowText, fg);
-        //thisPalette.setColor(QPalette::Text, fg); // causes problem with tristate
-        thisPalette.setColor(QPalette::Button, bg);
-        setPalette(thisPalette);
-        */
-
         if(thisColorMode == Default) {
             thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
             thisStyle = thisStyle.arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).

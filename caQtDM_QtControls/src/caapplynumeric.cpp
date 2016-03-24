@@ -29,6 +29,10 @@
 
 caApplyNumeric::caApplyNumeric(QWidget *parent) : EApplyNumeric(parent)
 {
+    // to start with, clear the stylesheet, so that playing around
+    // is not possible.
+    setStyleSheet("");
+
     setAccessW(true);
     setPrecisionMode(Channel);
     setLimitsMode(Channel);
@@ -36,6 +40,8 @@ caApplyNumeric::caApplyNumeric(QWidget *parent) : EApplyNumeric(parent)
     thisMinimum = -100000.0;
     setDigitsFontScaleEnabled(true);
     setForeground(Qt::black);
+
+    renewStyleSheet = true;
     setBackground(QColor(230,230,230));
     thisFixedFormat = false;
     installEventFilter(this);
@@ -90,7 +96,20 @@ void caApplyNumeric::setForeground(QColor c)
 
 void caApplyNumeric::setColors(QColor bg, QColor fg)
 {
-    if((oldBackColor != bg) || (oldForeColor != fg)) {
+    if(thisColorMode == Default) {
+        if(!styleSheet().isEmpty()) {
+            setStyleSheet("");
+            renewStyleSheet = true;
+            // force resize for repainting
+            QResizeEvent *re = new QResizeEvent(size(), size());
+            resizeEvent(re);
+            delete re;
+        }
+        return;
+    }
+
+    if((oldBackColor != bg) || (oldForeColor != fg)   || renewStyleSheet || styleSheet().isEmpty()) {
+        renewStyleSheet = false;
         QString style = "QFrame { background: rgb(%1, %2, %3, %4); color: rgb(%5, %6, %7, %8);}";
         style = style.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
                       arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());

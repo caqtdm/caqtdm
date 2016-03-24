@@ -61,6 +61,9 @@ class QTCON_EXPORT caLineDemo : public QWidget, public FontScalingWidget, public
     Q_PROPERTY(bool unitsEnabled READ getUnitsEnabled WRITE setUnitsEnabled)
     Q_PROPERTY(FormatType formatType READ getFormatType WRITE setFormatType)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
     Q_ENUMS(colMode)
     Q_ENUMS(Alignment)
     Q_ENUMS(SourceMode)
@@ -69,6 +72,9 @@ class QTCON_EXPORT caLineDemo : public QWidget, public FontScalingWidget, public
     Q_ENUMS(FormatType)
 
 public:
+
+    void noStyle(QString style) {Q_UNUSED(style);}
+
     enum FormatType { decimal, exponential, engr_notation, compact, truncated,
                       hexadecimal, octal, string, sexagesimal, sexagesimal_hms, sexagesimal_dms, enumeric}; // enumeric = enum as number
     enum ScaleMode { None, Height, WidthAndHeight};

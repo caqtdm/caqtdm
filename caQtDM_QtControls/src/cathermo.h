@@ -58,8 +58,13 @@ class QTCON_EXPORT caThermo : public QwtThermoMarker
     Q_PROPERTY(SourceMode limitsMode READ getLimitsMode WRITE setLimitsMode)
     Q_ENUMS(SourceMode)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
 
 public:
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     QString getPV() const;
     void setPV(QString const &newPV);

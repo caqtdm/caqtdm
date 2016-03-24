@@ -56,9 +56,14 @@ class QTCON_EXPORT caRowColMenu : public QWidget
 
     Q_PROPERTY(EPushButton::ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleModeL)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
 public:
 
 #include "caPropHandle.h"
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     enum Stacking {Menu, Row, Column, RowColumn, Hidden};
     Stacking getStacking() const { return thisStacking; }

@@ -60,9 +60,14 @@ class QTCON_EXPORT caTable : public QTableWidget
     Q_PROPERTY(QString scriptCommand READ getScriptCommand WRITE setScriptCommand)
     Q_PROPERTY(QString scriptParameter READ getScriptParam WRITE setScriptParam)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
 public:
 
 #include "caPropHandle.h"
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     caTable(QWidget *parent);
 

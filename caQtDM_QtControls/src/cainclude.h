@@ -52,6 +52,9 @@ class  QTCON_EXPORT caInclude : public QWidget
     Q_ENUMS(Stacking)
     Q_PROPERTY(bool adjustSizeToContents READ getAdjustSize WRITE setAdjustSize)
 
+    // this will prevent user interference
+     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
 #include "caVisibProps.h"
 #include "caVisibDefs.h"
 
@@ -59,6 +62,8 @@ class  QTCON_EXPORT caInclude : public QWidget
 public:
 
 #include "caPropHandle.h"
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     enum Properties { maximumLines = 0, numberofItems};
     enum Stacking {Row=0, Column,RowColumn};

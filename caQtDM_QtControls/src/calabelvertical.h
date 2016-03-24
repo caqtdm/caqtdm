@@ -44,6 +44,10 @@ class QTCON_EXPORT caLabelVertical : public QWidget, public FontScalingWidget
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
+
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
     Q_ENUMS(colMode)
     Q_ENUMS(Direction)
     Q_ENUMS(Alignment)
@@ -52,6 +56,9 @@ class QTCON_EXPORT caLabelVertical : public QWidget, public FontScalingWidget
 #include "caVisibDefs.h"
 
 public:
+
+    void noStyle(QString style) {Q_UNUSED(style);}
+
     enum ScaleMode { None, Height, WidthAndHeight};
     enum Alignment { Center, Left, Right};
     enum Direction {Up, Down};

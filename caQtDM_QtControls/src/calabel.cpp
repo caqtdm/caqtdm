@@ -29,6 +29,10 @@
 
 caLabel::caLabel(QWidget *parent) : ESimpleLabel(parent)
 {
+    // to start with, clear the stylesheet, so that playing around
+    // is not possible.
+    setStyleSheet("");
+
     setFontScaleMode(WidthAndHeight);
     thisBackColor = QColor(255,255,255,0);
     thisForeColor = Qt::black;
@@ -36,21 +40,25 @@ caLabel::caLabel(QWidget *parent) : ESimpleLabel(parent)
     thisForeColorOld = Qt::black;
     thisColorMode=Static;
     oldColorMode =Static;
+
+    renewStyleSheet = true;
+
     setColorMode(Static);
     thisVisibility = StaticV;
 }
 
 void caLabel::setColors(QColor bg, QColor fg)
 {
-    if((bg != thisBackColorOld) || (fg != thisForeColorOld)) {
-        /* stylesheets will always supersede palette, so palette can not be used */
-        /*
-        QPalette pal = palette();
-        pal.setColor(QPalette::WindowText, fg);
-        pal.setColor(QPalette::Window, bg);
-        setAutoFillBackground(true);
-        setPalette(pal);
-        */
+    if(thisColorMode == Default) {
+        if(!styleSheet().isEmpty()) {
+            setStyleSheet("");
+            renewStyleSheet = true;
+        }
+        return;
+    }
+
+    if((bg != thisBackColorOld) || (fg != thisForeColorOld) || renewStyleSheet || styleSheet().isEmpty()) {
+        //renewStyleSheet = false;
         thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
         thisStyle = thisStyle.arg(bg.red()).arg(thisBackColor.green()).arg(bg.blue()).arg(bg.alpha()).
                 arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());

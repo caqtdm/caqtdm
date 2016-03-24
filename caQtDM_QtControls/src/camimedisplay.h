@@ -44,9 +44,15 @@ class QTCON_EXPORT caMimeDisplay : public caRowColMenu
     Q_PROPERTY(Stacking stackingMode READ getStacking WRITE setStacking)
     Q_PROPERTY(QString args READ getArgs WRITE setArgs DESIGNABLE false)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
 #include "caElevation.h"
 
 public:
+
+    void noStyle(QString style) {Q_UNUSED(style);}
+
     caMimeDisplay(QWidget *parent);
 
 private:

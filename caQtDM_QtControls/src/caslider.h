@@ -58,11 +58,14 @@ class QTCON_EXPORT caSlider : public QwtSlider
     Q_PROPERTY(double incrementValue READ getIncrementValue WRITE setIncrementValue)
     Q_PROPERTY(double value READ getSliderValue WRITE setSliderValue)
 
-    //Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
 #include "caElevation.h"
 
 public:
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     QString getPV() const;
     void setPV(QString const &newPV);

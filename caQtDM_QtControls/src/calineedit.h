@@ -67,7 +67,8 @@ class QTCON_EXPORT caLineEdit : public QLineEdit, public FontScalingWidget
 
     Q_PROPERTY(FormatType formatType READ getFormatType WRITE setFormatType)
 
-    //Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
     Q_ENUMS(ScaleMode)
     Q_ENUMS(FormatType)
@@ -75,6 +76,8 @@ class QTCON_EXPORT caLineEdit : public QLineEdit, public FontScalingWidget
     Q_OBJECT
 
 public:
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     caLineEdit( QWidget *parent = 0 );
      ~caLineEdit(){}

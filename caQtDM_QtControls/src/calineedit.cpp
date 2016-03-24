@@ -33,6 +33,10 @@
 
 caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(this)
 {
+    // to start with, clear the stylesheet, so that playing around
+    // is not possible.
+    setStyleSheet("");
+
     // we want this font, while nice and monospace
     QFont font("Lucida Sans Typewriter");
     // if this font does not exist then try a next one

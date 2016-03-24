@@ -44,10 +44,15 @@ class QTCON_EXPORT caImage : public QWidget
     Q_PROPERTY(int frame READ getFrame WRITE setFrame)
     Q_PROPERTY(int delayMilliseconds READ getDelay WRITE setDelay)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
 #include "caVisibProps.h"
 #include "caVisibDefs.h"
 
 public:
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     caImage( QWidget *parent = 0 );
 

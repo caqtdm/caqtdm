@@ -229,8 +229,12 @@ class QTCON_EXPORT caWaterfallPlot: public QWidget
     Q_PROPERTY(bool XaxisEnabled READ getXaxisEnabled WRITE setXaxisEnabled)
     Q_PROPERTY(bool YaxisEnabled READ getYaxisEnabled WRITE setYaxisEnabled)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
 public:
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     enum units {Monitor=0,  Millisecond, Second, Minute};
     enum intensityScaling {Channel, User};

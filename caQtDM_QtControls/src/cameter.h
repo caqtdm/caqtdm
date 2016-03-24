@@ -69,6 +69,9 @@ class QTCON_EXPORT caMeter : public QwtDial
     Q_PROPERTY(FormatType formatType READ getFormatType WRITE setFormatType)
     Q_PROPERTY(bool unitsEnabled READ getUnitsEnabled WRITE setUnitsEnabled)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
     Q_ENUMS(FormatType)
     Q_ENUMS(colMode)
     Q_ENUMS(SourceMode)
@@ -76,6 +79,8 @@ class QTCON_EXPORT caMeter : public QwtDial
     Q_ENUMS(displayLims)
 
 public:
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     caMeter( QWidget *parent = 0 );
     ~caMeter();

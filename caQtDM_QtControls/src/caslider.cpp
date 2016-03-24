@@ -62,6 +62,10 @@ class myScaleEngine: public QwtLinearScaleEngine
 
 caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
 {
+    // to start with, clear the stylesheet, so that playing around
+    // is not possible.
+    setStyleSheet("");
+
     thisIncrement = 1.0;
     thisDirection = Up;
     thisMinimum = -50;

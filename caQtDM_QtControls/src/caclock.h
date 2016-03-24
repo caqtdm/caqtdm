@@ -51,9 +51,15 @@ class QTCON_EXPORT caClock : public QwtAnalogClock
     Q_PROPERTY(bool scaleDefaultColor READ getScaleDefaultColor WRITE setScaleDefaultColor)
     Q_PROPERTY(QColor scaleColor READ getScaleColor WRITE setScaleColor)
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
+
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
     Q_ENUMS(colMode)
 
 public:
+
+   void noStyle(QString style) {Q_UNUSED(style);}
 
     enum UpdateRate {Normal =0, Fast};
     enum TimeType {InternalTime = 0, ReceiveTime};

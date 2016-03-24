@@ -58,6 +58,9 @@ class myScaleEngine: public QwtLinearScaleEngine
 
 caThermo::caThermo(QWidget *parent) : QwtThermoMarker(parent), m_externalEnabled(false)
 {
+    // to start with, clear the stylesheet, so that playing around
+    // is not possible.
+    setStyleSheet("");
 
     thisDirection = Up;
     defaultBackColor = QWidget::palette().background().color();

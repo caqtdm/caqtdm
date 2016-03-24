@@ -57,7 +57,8 @@ class QTCON_EXPORT caChoice : public QWidget
 
     Q_PROPERTY(EPushButton::ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleModeL)
 
-    //Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
 #include "caElevation.h"
 
@@ -66,6 +67,8 @@ public:
     enum alignmentHor {left, right, center};
     enum colMode {Default, Static, Alarm};
     enum Stacking {Row, Column, RowColumn};
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     Stacking getStacking() const { return thisStacking; }
     void setStacking(Stacking stacking);

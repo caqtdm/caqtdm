@@ -73,10 +73,14 @@ class QTCON_EXPORT caDoubleTabWidget : public QWidget
     Q_PROPERTY(QString itemsVerticalPadding READ getItemsPadding WRITE setItemsPadding)
     Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
 public:
 
-    caDoubleTabWidget(QWidget *parent);
+    void noStyle(QString style) {Q_UNUSED(style);}
 
+    caDoubleTabWidget(QWidget *parent);
 
     QString getItemsHor() const {return thisHorItems.join(";");}
     void setItemsHor(QString const &items) {thisHorItems = items.split(";"); removeTabs(0); addSampleWidget(0);}

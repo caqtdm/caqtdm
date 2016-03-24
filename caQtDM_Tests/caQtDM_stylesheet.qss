@@ -8,6 +8,12 @@ caLineEdit {
      background: lightyellow;
      color: black;
  }
+ 
+ caLabel {
+     border-radius: 1px;
+     background: lightyellow;
+     color: black;
+ }
 
 caTextEntry {
     color: rgb(127, 0, 63);

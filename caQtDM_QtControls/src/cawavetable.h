@@ -60,9 +60,15 @@ class QTCON_EXPORT caWaveTable : public QTableWidget
     Q_ENUMS(SourceMode)
 
     Q_PROPERTY(FormatType formatType READ getFormatType WRITE setFormatType)
+
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
     Q_ENUMS(FormatType)
 
 public:
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     caWaveTable(QWidget *parent);
 

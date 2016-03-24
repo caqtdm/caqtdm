@@ -29,14 +29,23 @@
 
 caMessageButton::caMessageButton(QWidget *parent) : EPushButton(parent)
 {
+    // to start with, clear the stylesheet, so that playing around
+    // is not possible.
+    setStyleSheet("");
+
     setAccessW(true);
     thisColorMode = Static;
     thisForeColor = Qt::black;
+    thisBackColor = Qt::white;
     thisDisabledForeColor = Qt::gray;
-    setBackground(QColor(0xe8, 0xe8, 0xe8));
+
     setFontScaleMode(EPushButton::WidthAndHeight);
+
     installEventFilter(this);
     setFocusPolicy((Qt::StrongFocus));
+
+    renewStyleSheet = true;
+    setBackground(QColor(0xe8, 0xe8, 0xe8));
 
     setElevation(on_top);
 }
@@ -56,8 +65,17 @@ void caMessageButton::setLabel(QString const &label)
 
 void caMessageButton::setColors(QColor bg, QColor fg, QColor hover, QColor border, QColor disabledfg)
 {
+    if(thisColorMode == Default) {
+        if(!styleSheet().isEmpty()) {
+            setStyleSheet("");
+            renewStyleSheet = true;
+        }
+        return;
+    }
+
     //set colors and style filled
-    if((bg != oldBackColor) || (fg != oldForeColor) || (hover != oldHoverColor) || disabledfg != oldDisabledForeColor) {
+    if((bg != oldBackColor) || (fg != oldForeColor) || (hover != oldHoverColor) || disabledfg != oldDisabledForeColor || renewStyleSheet || styleSheet().isEmpty()) {
+       renewStyleSheet = false;
        QString style = "QPushButton{ background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-color: rgba(%9, %10, %11, %12);";
        style = style.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
              arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha()).
@@ -73,7 +91,6 @@ void caMessageButton::setColors(QColor bg, QColor fg, QColor hover, QColor borde
        hoverC = hoverC.arg(hover.red()).arg(hover.green()).arg(hover.blue()).arg(hover.alpha()).
                arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
        style.append(hoverC);
-
 
        setStyleSheet(style);
 

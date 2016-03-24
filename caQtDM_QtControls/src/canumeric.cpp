@@ -30,14 +30,19 @@
 
 caNumeric::caNumeric(QWidget *parent) : ENumeric(parent)
 {
+     setStyleSheet("");
+
      setAccessW(true);
      setPrecisionMode(Channel);
      setLimitsMode(Channel);
      thisMaximum = 100000.0;
      thisMinimum = -100000.0;
      thisFixedFormat = false;
+     thisColorMode = Static;
      setDigitsFontScaleEnabled(true);
      setForeground(Qt::black);
+
+     renewStyleSheet = true;
      setBackground(QColor(230,230,230));
      setElevation(on_top);
 }
@@ -72,7 +77,20 @@ void caNumeric::setForeground(QColor c)
 
 void caNumeric::setColors(QColor bg, QColor fg)
 {
-    if((bg != oldBackColor) || (fg != oldForeColor)) {
+    if(thisColorMode == Default) {
+        if(!styleSheet().isEmpty()) {
+            setStyleSheet("");
+            renewStyleSheet = true;
+            // force resize for repainting
+            QResizeEvent *re = new QResizeEvent(size(), size());
+            resizeEvent(re);
+            delete re;
+        }
+        return;
+    }
+
+    if((bg != oldBackColor) || (fg != oldForeColor)  || renewStyleSheet || styleSheet().isEmpty()) {
+        renewStyleSheet = false;
         QString style = "background: rgb(%1, %2, %3, %4); color: rgb(%5, %6, %7, %8);";
         style = style.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
                 arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());

@@ -53,9 +53,14 @@ class QTCON_EXPORT caToggleButton : public QCheckBox, public FontScalingWidget
     Q_PROPERTY(QString trueValue READ getTrueValue WRITE setTrueValue)
     Q_PROPERTY(QString falseValue READ getFalseValue WRITE setFalseValue)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
 #include "caElevation.h"
 
 public:
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     caToggleButton(QWidget *parent);
 

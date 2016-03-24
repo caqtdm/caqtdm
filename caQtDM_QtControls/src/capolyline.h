@@ -48,6 +48,9 @@ class QTCON_EXPORT caPolyLine : public QWidget
     Q_PROPERTY(FillStyle fillstyle READ getFillStyle WRITE setFillStyle)
     Q_PROPERTY(PolyStyle polystyle READ getPolyStyle WRITE setPolyStyle)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
 #include "caVisibProps.h"
 #include "caVisibDefs.h"
 
@@ -57,6 +60,8 @@ class QTCON_EXPORT caPolyLine : public QWidget
     Q_ENUMS(PolyStyle)
 
 public:
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     enum LineStyle {Solid = 0, Dash, BigDash};
     enum colMode {Static=0, Alarm};

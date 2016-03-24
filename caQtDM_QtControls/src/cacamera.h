@@ -91,6 +91,9 @@ class QTCON_EXPORT caCamera : public QWidget
     Q_PROPERTY(ROI_markertype ROI_writemarkerType READ getROIwritemarkerType WRITE setROIwritemarkerType)
     Q_PROPERTY(ROI_type ROI_writeType READ getROIwriteType WRITE setROIwriteType)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
     Q_ENUMS(zoom)
     Q_ENUMS(colormap)
     Q_ENUMS(ROI_type)
@@ -99,6 +102,8 @@ class QTCON_EXPORT caCamera : public QWidget
 public:
 
 #include "caPropHandle.h"
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     enum ROI_type {none=0, xy_only, xy1_xy2, xyUpleft_xyLowright, xycenter_width_height};
     enum ROI_markertype {box=0, box_crosshairs, line, arrow};

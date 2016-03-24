@@ -483,17 +483,17 @@ void ENumeric::resizeEvent(QResizeEvent *e)
     QList<QAbstractButton *> list  = bup->buttons();
     temp =  qobject_cast<QPushButton *>(list.front());
     if (temp) {
-        QPixmap pix(temp->size() * 0.9);
-        pix.fill(palette().color(QPalette::Background));
-        QPainter p(&pix);
+        QPixmap pix1(temp->size() * 0.9);
+        pix1.fill(palette().color(QPalette::Background));
+        QPainter p(&pix1);
         p.setRenderHint(QPainter::Antialiasing);
-        hmargin = (int) (pix.width() * MARGIN);
-        vmargin = (int) (pix.height() * MARGIN);
+        hmargin = (int) (pix1.width() * MARGIN);
+        vmargin = (int) (pix1.height() * MARGIN);
         if (hmargin < MIN_MARGIN)
             hmargin = MIN_MARGIN;
         if (vmargin < MIN_MARGIN)
             vmargin = MIN_MARGIN;
-        int h = pix.height(), w = pix.width();
+        int h = pix1.height(), w = pix1.width();
         QPolygon poly(3);
         poly.setPoint(0, (int) (w * .5), vmargin);
         poly.setPoint(1, w - hmargin, h - vmargin);
@@ -508,32 +508,54 @@ void ENumeric::resizeEvent(QResizeEvent *e)
         p.drawConvexPolygon(poly);
         p.end();
 
+        // down pixmap
+        QPixmap pix2 = pix1.transformed(QMatrix().rotate(-180));
+
+        // pixmap up with red border
+        QPixmap pix1Red = pix1;
+        QPainter paint1R(&pix1Red);
+        pen.setColor(Qt::red);
+        paint1R.setBrush(Qt::NoBrush);
+        paint1R.setPen(pen);
+        paint1R.drawRect(0, 0, pix1Red.width() -1, pix1Red.height() -1);
+        paint1R.end();
+
+        // pixmap down with red border
+        QPixmap pix2Red = pix2;
+        QPainter paint2R(&pix2Red);
+        pen.setColor(Qt::red);
+        paint2R.setBrush(Qt::NoBrush);
+        paint2R.setPen(pen);
+        paint2R.drawRect(0, 0, pix2Red.width() -1, pix2Red.height() -1);
+        paint2R.end();
+
         int i=0;
         foreach (QAbstractButton* but, bup->buttons()) {
             temp = qobject_cast<QPushButton *>(but);
             if (temp) {
-                temp->setIconSize(pix.size());
-                temp->setIcon(pix);
                 if(lastLabel == i) {
-                    temp->setStyleSheet("background: rgb(255, 0, 0); color: rgb(255, 0, 0, 0);");
+                    temp->setIconSize(pix1Red.size());
+                    temp->setIcon(pix1Red);
                 } else {
-                    temp->setStyleSheet("");
+                    temp->setIconSize(pix1.size());
+                    temp->setIcon(pix1);
                 }
             }
             i++;
         }
 
         i = 0;
-        QPixmap pix2 = pix.transformed(QMatrix().rotate(-180));
         foreach (QAbstractButton* but, bdown->buttons()) {
             temp = qobject_cast<QPushButton *>(but);
             if (temp) {
                 temp->setIconSize(pix2.size());
                 temp->setIcon(pix2);
                 if(lastLabel == i) {
-                    temp->setStyleSheet("background: rgb(255, 0, 0); color: rgb(255, 0, 0, 0);");
+                    temp->setIconSize(pix2Red.size());
+                    temp->setIcon(pix2Red);
                 } else {
-                    temp->setStyleSheet("");
+                    temp->setIconSize(pix2.size());
+                    temp->setIcon(pix2);
                 }
             }
             i++;

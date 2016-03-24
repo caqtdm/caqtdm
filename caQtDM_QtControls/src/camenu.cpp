@@ -31,6 +31,10 @@
 
 caMenu::caMenu(QWidget *parent) : QComboBox(parent)
 {
+    // to start with, clear the stylesheet, so that playing around
+    // is not possible.
+    setStyleSheet("");
+
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     isShown = false;
     defaultPalette = palette();
@@ -79,19 +83,6 @@ void caMenu::setColors(QColor bg, QColor fg)
 {
     if(!defBackColor.isValid() || !defForeColor.isValid()) return;
     if((bg != oldBackColor) || (fg != oldForeColor) || (thisColorMode != oldColorMode)) {
-        /* stylesheets will always supersede palette, so palette can not be used */
-        /*
-        thisPalette = palette();
-        thisPalette.setColor(QPalette::ButtonText, fg);
-        thisPalette.setColor(QPalette::Button, bg);
-        if(thisColorMode != Default) {
-           setPalette(defaultPalette);
-           setPalette(thisPalette);
-        } else {
-           setPalette(defaultPalette);
-        }
-        */
-
         if(thisColorMode == Default) {
             thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
             thisStyle = thisStyle.arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
@@ -104,7 +95,6 @@ void caMenu::setColors(QColor bg, QColor fg)
             oldBackColor = bg;
             oldForeColor = fg;
         }
-
     }
 
     if(thisStyle != oldStyle || thisColorMode != oldColorMode) {

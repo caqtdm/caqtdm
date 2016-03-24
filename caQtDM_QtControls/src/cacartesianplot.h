@@ -147,9 +147,14 @@ class QTCON_EXPORT caCartesianPlot : public QwtPlot
 
     Q_PROPERTY(int XaxisSyncGroup READ getXaxisSyncGroup WRITE setXaxisSyncGroup)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
 public:
 
 #include "caPropHandle.h"
+
+     void noStyle(QString style) {Q_UNUSED(style);}
 
     bool getXaxisEnabled() const { return thisXshow; }
     void setXaxisEnabled(bool thisXshow);

@@ -39,11 +39,16 @@ class QTCON_EXPORT caRelatedDisplay : public caRowColMenu
     Q_PROPERTY(QStringList removeParentList READ getRemoveList WRITE setRemoveList STORED false)
     Q_PROPERTY(QString removeParent READ getReplaceModes WRITE setReplaceModes DESIGNABLE inactiveButVisible())
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
 #include "caElevation.h"
 
 public:
 
 #include "caPropHandle.h"
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     caRelatedDisplay(QWidget *parent);
 

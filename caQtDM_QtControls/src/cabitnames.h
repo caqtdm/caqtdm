@@ -55,7 +55,12 @@ class QTCON_EXPORT caBitnames : public EFlag
     Q_PROPERTY(QString falseStrings READ falseStrings   WRITE setFalseStrings DESIGNABLE false)
     Q_PROPERTY(QString displayMask  READ getDisplayMask WRITE setDisplayMask  DESIGNABLE false)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
 public:
+
+     void noStyle(QString style) {Q_UNUSED(style);}
 
     caBitnames(QWidget *parent);
 

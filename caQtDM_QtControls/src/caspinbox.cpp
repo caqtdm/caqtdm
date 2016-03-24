@@ -30,6 +30,10 @@
 
 caSpinbox::caSpinbox(QWidget *parent) : SNumeric(parent)
 {
+     // to start with, clear the stylesheet, so that playing around
+     // is not possible.
+     setStyleSheet("");
+
      setAccessW(true);
      setPrecisionMode(Channel);
      setLimitsMode(Channel);
@@ -37,6 +41,8 @@ caSpinbox::caSpinbox(QWidget *parent) : SNumeric(parent)
      thisMinimum = -100000.0;
      setDigitsFontScaleEnabled(true);
      setForeground(Qt::black);
+
+     renewStyleSheet = true;
      setBackground(QColor(230,230,230));
 
      setElevation(on_top);
@@ -72,7 +78,20 @@ void caSpinbox::setForeground(QColor c)
 
 void caSpinbox::setColors(QColor bg, QColor fg)
 {
-    if((bg != oldBackColor) || (fg != oldForeColor)) {
+    if(thisColorMode == Default) {
+        if(!styleSheet().isEmpty()) {
+            setStyleSheet("");
+            renewStyleSheet = true;
+            // force resize for repainting
+            QResizeEvent *re = new QResizeEvent(size(), size());
+            resizeEvent(re);
+            delete re;
+        }
+        return;
+    }
+
+    if((bg != oldBackColor) || (fg != oldForeColor)  || renewStyleSheet || styleSheet().isEmpty()) {
+        renewStyleSheet = false;
         QString style = "background: rgb(%1, %2, %3, %4); color: rgb(%5, %6, %7, %8);";
         style = style.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
                 arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());

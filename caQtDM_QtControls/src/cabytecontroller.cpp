@@ -29,6 +29,10 @@
 
 caByteController::caByteController(QWidget *parent) : QWidget(parent)
 {
+    // to start with, clear the stylesheet, so that playing around
+    // is not possible.
+    setStyleSheet("");
+
     numRows = 32;
 
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
