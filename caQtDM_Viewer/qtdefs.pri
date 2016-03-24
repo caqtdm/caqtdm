@@ -26,7 +26,7 @@ unix {
 # when the designer in 4.8.2 is patched in order to display tooltip description or
 # when the qt version is higher then 5.5.0 then compile the plugins with description texts
 # be carefull with this, while when the designer does not recognize tooltip description, the widgets will not be shown
-DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
+#DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
 contains(QT_VER_MAJ, 5) {
   greaterThan(QT_MINOR_VERSION, 5) {
     DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS 
@@ -99,6 +99,8 @@ DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 # caQtDM uses now qwt6.1.1 in order to take advantage of multicore processing
 # carowcolmenu performance enhancement
 # options -url and -emptycache added
+# shortcuts defined (Ex: Ctrl+R = reload window; Ctrl+Alt+R = reload all windows; Ctrl+O = Open File; Ctrl+P = Print)
+# stylesheet entry for most of the cawidgets has been suppressed and for many cawidgets the influence of an external stylesheet can only be changed when setting default colormode
 
 # 4.0.3
 # it is now possible to pipe ui data to caQtDM
