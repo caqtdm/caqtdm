@@ -41,6 +41,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include "pipereader.h"
+#include "screensaver_dialog.h"
 
 #if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
 #include <QApplication>
@@ -139,11 +140,20 @@ int main(int argc, char *argv[])
     bool attach = false;
     bool minimize= false;
     bool printscreen = false;
+    bool showScreenSaverConfig=false;
+    bool startasScreenSaver=false;
     bool resizing = true;
 
     for (numargs = argc, in = 1; in < numargs; in++) {
         qDebug() << argv[in];
-        if ( strcmp (argv[in], "-display" ) == 0 ) {
+        if ( strcmp (argv[in], "/s" ) == 0 ) {
+            in++;
+            printf("caQtDM -- start Screensaver\n", argv[in]);
+        } else if ( strcmp (argv[in], "/c" ) == 0 ) {
+            in++;
+            showScreenSaverConfig=true;
+            printf("caQtDM -- Screensaver Configuration\n", argv[in]);
+        } else if ( strcmp (argv[in], "-display" ) == 0 ) {
             in++;
             printf("caQtDM -- display <%s>\n", argv[in]);
         } else if ( strcmp (argv[in], "-macro" ) == 0 ) {
@@ -286,6 +296,22 @@ int main(int argc, char *argv[])
             file.close();
         }
     }
+// ScreenSaver Routines
+    if (showScreenSaverConfig){
+       QString lmacro,luifile;//,lmacro,luifile
+
+        screensaver_dialog scsa=screensaver_dialog(NULL);
+        scsa.setWindowIcon(QIcon(":/caQtDM.ico"));
+        scsa.setParameter(lmacro,luifile);
+        if (scsa.exec()){
+            scsa.getParameter(&lmacro,&luifile);
+            qDebug() << "Save Screensaver Values"<< lmacro<<luifile;
+        }
+
+
+        return 0;
+    }
+
 
 #ifdef IO_OPTIMIZED_FOR_TABWIDGETS
     printf("caQtDM -- viewer will disable monitors for hidden pages of QTabWidgets, in case of problems\n");

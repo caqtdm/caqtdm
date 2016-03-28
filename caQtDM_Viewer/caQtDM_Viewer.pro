@@ -38,15 +38,18 @@ SOURCES +=\
     fileopenwindow.cpp \
     messagebox.cpp \
     configDialog.cpp \
-    pipereader.cpp
+    pipereader.cpp \
+    src/screensaver_dialog.cpp
 
 HEADERS  +=  \
     messagebox.h \
     fileopenwindow.h \
     configDialog.h \
-    pipereader.h
+    pipereader.h \
+    src/screensaver_dialog.h
 
-FORMS += main.ui
+FORMS += main.ui \
+    src/screensaver_dialog.ui
 
 # when epics4 not build, then do not import statically in fileopenwindow.cpp
 epics4 {
