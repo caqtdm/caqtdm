@@ -149,6 +149,7 @@ int main(int argc, char *argv[])
         if ( strcmp (argv[in], "/s" ) == 0 ) {
             in++;
             printf("caQtDM -- start Screensaver\n", argv[in]);
+            startasScreenSaver=true;
         } else if ( strcmp (argv[in], "/c" ) == 0 ) {
             in++;
             showScreenSaverConfig=true;
@@ -311,7 +312,22 @@ int main(int argc, char *argv[])
 
         return 0;
     }
+    if (startasScreenSaver){
+        fileName ="C://epics//caqtdm//caQtDM_Tests//tests.ui";
+        macroString="";
+        // [-dg [xpos[xypos]][+xoffset[+yoffset]]
+        geometry="";
+        QDesktopWidget * Desktop = QApplication::desktop();
+        QRect defscreengeo = Desktop->availableGeometry(-1);//Defaultscreen=-1
 
+        geometry.append(QString::number(defscreengeo.width()));
+
+        geometry.append("x");
+        geometry.append(QString::number(defscreengeo.height()));
+        geometry.append("+0+0");
+
+
+    }
 
 #ifdef IO_OPTIMIZED_FOR_TABWIDGETS
     printf("caQtDM -- viewer will disable monitors for hidden pages of QTabWidgets, in case of problems\n");
