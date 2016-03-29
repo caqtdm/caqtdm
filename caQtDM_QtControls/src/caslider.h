@@ -69,9 +69,6 @@ class QTCON_EXPORT caSlider : public QwtSlider
     Q_ENUMS(SourceMode)
     Q_ENUMS(FormatType)
 
-    // this will prevent user interference
-    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
-
 #include "caElevation.h"
 
 public:
