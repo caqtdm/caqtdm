@@ -3241,22 +3241,43 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         // caSlider ==================================================================================================================
     } else if (caSlider *sliderWidget = qobject_cast<caSlider *>(w)) {
 
+        bool highChannelLimitEnabled = false;
+        bool lowChannelLimitEnabled = false;
         bool channelLimitsEnabled = false;
 
         if(data.edata.connected) {
-            if(sliderWidget->getLimitsMode() == caSlider::Channel) channelLimitsEnabled= true;
+            if(sliderWidget->getHighLimitMode() == caSlider::Channel)
+		highChannelLimitEnabled= true;
+            if(sliderWidget->getLowLimitMode() == caSlider::Channel)
+		lowChannelLimitEnabled= true;
             // take limits from channel, in case of user limits these should already been set
-            if((channelLimitsEnabled) && (data.edata.initialize) ) {
+            if((highChannelLimitEnabled || lowChannelLimitEnabled) && data.edata.initialize ) 
+            {
+                if(highChannelLimitEnabled && lowChannelLimitEnabled)
+                {
+                    channelLimitsEnabled = true;
+                }
+
                 // when limits are the same, do nothing
-                if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
+                if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) 
+                {
                     disconnect(w, SIGNAL(valueChanged (double)), 0, 0);
-                    if(sliderWidget->getDirection() == caSlider::Down  || sliderWidget->getDirection() == caSlider::Left) {
-                        sliderWidget->setMinValue(data.edata.upper_disp_limit);
-                        sliderWidget->setMaxValue(data.edata.lower_disp_limit);
-                    } else {
-                        sliderWidget->setMaxValue(data.edata.upper_disp_limit);
-                        sliderWidget->setMinValue(data.edata.lower_disp_limit);
+
+                    if(sliderWidget->getDirection() == caSlider::Down  || sliderWidget->getDirection() == caSlider::Left) 
+                    {
+                        if((lowChannelLimitEnabled))
+                            sliderWidget->setMinValue(data.edata.upper_disp_limit);
+                        if((highChannelLimitEnabled))
+                            sliderWidget->setMaxValue(data.edata.lower_disp_limit);
+                    } 
+                    else 
+                    {
+                        if((lowChannelLimitEnabled))
+                            sliderWidget->setMaxValue(data.edata.upper_disp_limit);
+                        if((highChannelLimitEnabled))
+                            sliderWidget->setMinValue(data.edata.lower_disp_limit);
                     }
+
                     connect(w, SIGNAL(valueChanged(double)), this, SLOT(Callback_SliderValueChanged(double)));
                 }
             }
@@ -3285,6 +3306,12 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             // set no connection color
         } else {
             SetColorsNotConnected(sliderWidget);
+        }
+
+        int precMode = sliderWidget->getPrecisionMode();
+        if((precMode != caSlider::User) && (data.edata.initialize)) 
+        {
+            sliderWidget->setPrecision(data.edata.precision);
         }
 
         // caClock ==================================================================================================================
@@ -4845,6 +4872,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     int limitsDefault = false;
     int precMode = false;
     int limitsMode = false;
+    int highLimit = false;
+    int lowLimit = false;
     int Precision = 0;
     const char *caTypeStr[] = {"DBF_STRING", "DBF_INT", "DBF_FLOAT", "DBF_ENUM", "DBF_CHAR", "DBF_LONG", "DBF_DOUBLE"};
     char colMode[20] = {""};
@@ -5006,10 +5035,20 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         nbPV = 2;
     } else if(caSlider* sliderWidget = qobject_cast<caSlider *>(w)) {
         pv[0] = sliderWidget->getPV().trimmed();
-        if(sliderWidget->getLimitsMode() == caSlider::User) {
-            limitsMode = true;
+        if(sliderWidget->getHighLimitMode() == caSlider::User) {
+            highLimit = true;
             limitsMax = sliderWidget->getMaxValue();
+        }
+        if(sliderWidget->getLowLimitMode() == caSlider::User) {
+            lowLimit = true;
             limitsMin = sliderWidget->getMinValue();
+        }
+        if(sliderWidget->getPrecisionMode() == caSlider::User) {
+            precMode = true;
+            Precision = sliderWidget->getPrecision();
+        } else {
+            knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv[0]);
+            if(kPtr != (knobData *) 0) Precision =  kPtr->edata.precision;
         }
         if(sliderWidget->getColorMode() == caSlider::Alarm) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
@@ -5516,6 +5555,14 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         // limits
                         if(limitsMode) {
                             sprintf(asc,"<br>User alarm: MIN:%g  MAX:%g ", limitsMin, limitsMax);
+                            info.append(asc);
+                        }
+                        if(highLimit){
+                            sprintf(asc,"<br>User alarm MAX:%g ", limitsMax);
+                            info.append(asc);
+                        }
+                        if(lowLimit) {
+                            sprintf(asc,"<br>User alarm MIN:%g ", limitsMin);
                             info.append(asc);
                         }
                         if(limitsDefault) {
