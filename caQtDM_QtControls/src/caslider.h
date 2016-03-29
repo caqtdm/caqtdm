@@ -61,8 +61,6 @@ class QTCON_EXPORT caSlider : public QwtSlider
     Q_PROPERTY(double incrementValue READ getIncrementValue WRITE setIncrementValue)
     Q_PROPERTY(double value READ getSliderValue WRITE setSliderValue)
 
-<<<<<<< HEAD
-=======
     Q_PROPERTY(FormatType formatType READ getFormatType WRITE setFormatType)
     Q_PROPERTY(bool scaleValueEnabled READ isScaleValueEnabled WRITE setScaleValueEnabled)
 
@@ -70,7 +68,7 @@ class QTCON_EXPORT caSlider : public QwtSlider
 
     Q_ENUMS(SourceMode)
     Q_ENUMS(FormatType)
->>>>>>> Initial Argonne caSlider Enhancements
+
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
