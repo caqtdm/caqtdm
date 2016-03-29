@@ -2389,6 +2389,15 @@ void *parseValuator(DisplayInfo *displayInfo, FrameOffset * offset)
         Qt_handleString("scalePosition", "enum", "BottomScale");
     }
 
+    if(!strcmp(look,"noLabel") || !strcmp(look,"noDeco") || !strcmp(look,"Outline")) 
+    {
+        Qt_handleString("scaleValueEnabled", "bool", "false");
+    }
+    else
+    {
+        Qt_handleString("scaleValueEnabled", "bool", "true");
+    }
+
     Qt_setColorMode("caSlider", COLORMODE);
 
     Qt_writeCloseTag("widget", widgetName, visibilityStatic);
