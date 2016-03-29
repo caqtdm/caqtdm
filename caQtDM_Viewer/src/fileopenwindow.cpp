@@ -1369,10 +1369,10 @@ void FileOpenWindow::parse_and_set_Geometry(QMainWindow *widget, QString parsest
     h = qMin(h,maxSize.height());
     w = qMax(w,minSize.width());
     h = qMax(h,minSize.height());
-
+    qDebug() << "preset window" << w << "to" << x << y << w << h << "desktop:"<< qApp->desktop()->width()<<qApp->desktop()->height();
     if ((m & XNegative)) {
         x = qApp->desktop()->width()  + x - w;
-        x -= (widget->frameGeometry().width() - widget->width()) / 2;
+        //x -= (widget->frameGeometry().width() - widget->width()) / 2;
     } else {
         x += (widget->geometry().x() - widget->x());
     }
@@ -1382,7 +1382,7 @@ void FileOpenWindow::parse_and_set_Geometry(QMainWindow *widget, QString parsest
     } else {
         y += (widget->geometry().y() - widget->y());
     }
-    //qDebug() << "set window" << w << "to" << x << y << w << h;
+    qDebug() << "set window" << w << "to" << x << y << w << h;
     widget->setGeometry(x, y, w, h);
 }
 

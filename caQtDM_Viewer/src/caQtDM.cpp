@@ -320,11 +320,11 @@ int main(int argc, char *argv[])
         QDesktopWidget * Desktop = QApplication::desktop();
         QRect defscreengeo = Desktop->availableGeometry(-1);//Defaultscreen=-1
 
-        geometry.append(QString::number(defscreengeo.width()));
+        geometry.append(QString::number(qApp->desktop()->width()));
 
         geometry.append("x");
-        geometry.append(QString::number(defscreengeo.height()));
-        geometry.append("+0+0");
+        geometry.append(QString::number(qApp->desktop()->height()));
+        geometry.append("-0-0");
 
 
     }
