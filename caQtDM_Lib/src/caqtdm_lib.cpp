@@ -6681,6 +6681,8 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
         main->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     }
 
+
+    //qDebug() << "allowResize=" << allowResize;
     // when noresizing then fix the size, however for prc files, we will later shrink the display to a minimumsize, so do not fix then
     if(!allowResize) {
         if(!prcFile) main->setFixedSize(myWidget->size());
