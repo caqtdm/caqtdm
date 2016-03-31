@@ -8,7 +8,7 @@ IF "%1"=="3" GOTO SELECT3
 
 echo =============================================================================================
 echo Select Build Environment
-echo 1) QT 4.8.5 QWT6.0.1  32 Bit VS2010  
+echo 1) QT 4.8.5 QWT6.1.2  32 Bit VS2010  
 echo 2) QT 5.5.0 QWT6.1.2  64 Bit VS2013  
 echo 3) QT 5.5.0 QWT6.1.2  32 Bit VS2013  
 set /P SELCTION=Select: 
@@ -28,7 +28,7 @@ REM ============================================================================
   call "C:\Program files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" x86
  
   set QTHOME=X:/qt/4.8.5
-  set QWTHOME=X:/qt/qwt-6.0.1
+  set QWTHOME=X:/qt/qwt-6.1.2_32bit
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
   
