@@ -556,6 +556,7 @@ bool caSlider::eventFilter(QObject *obj, QEvent *event)
             QApplication::setOverrideCursor(QCursor(Qt::ForbiddenCursor));
             setReadOnly(true);
         } else {
+            QWidget::setFocus();
             QApplication::restoreOverrideCursor();
         }
     } else if(event->type() == QEvent::Leave) {
@@ -703,23 +704,18 @@ bool caSlider::event(QEvent *e)
     return QwtSlider::event(e);
 }
 
-//Overridden from QWidget to get focus on hover
-void caSlider::enterEvent(QEvent * event)
-{
-    QWidget::setFocus();
-    QWidget::enterEvent(event);
-}
-
 //Overridden from QwtSlider to add the display of the current value
 void caSlider::drawSlider(QPainter *painter, const QRect &sliderRect ) const
 {
+
+
+    QwtSlider::drawSlider(painter, sliderRect);
+
     if(this->scalePosition() != NoScale && thisScaleValueEnabled)
     {    
         QRect valueRect = createValueRect(sliderRect);
         paintValue (painter,  valueRect);
     }
-
-    QwtSlider::drawSlider(painter, sliderRect);
 }
 
 //Created to calculate where the QRect for the value should be placed
@@ -744,12 +740,15 @@ QRect caSlider::createValueRect(QRect sliderRect) const
         //Horizontal and scale on bottom
 #if QWT_VERSION < 0x060100
         case  BottomScale:
+            valueRect.setRect(sliderRect.x(), sliderRect.height() + 12 , sliderRect.width(), valHeight);
+            break;
 #else
         case LeadingScale:
+            valueRect.setRect(sliderRect.x(), sliderRect.height() + 12 , sliderRect.width(), valHeight);
+            break;
 #endif
             //Code
-            valueRect.setRect(sliderRect.x(), sliderRect.height() + 12 , sliderRect.width(), valHeight);
-        break;
+            
 
         default:
             break;
@@ -794,6 +793,7 @@ void caSlider::paintValue(QPainter *painter, QRect valueRect) const
 {
     if(orientation() == Qt::Horizontal)
     {
+        
         painter->drawText( valueRect, Qt::AlignCenter, setScaleLabel(thisValue) );
     }
     else
