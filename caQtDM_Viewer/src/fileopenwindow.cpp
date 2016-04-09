@@ -311,10 +311,24 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     // is not found => defer opening
     mustOpenFile = false;
     if(filename.size() > 0) {
-        lastMacro = macroString;
-        lastFile = filename;
-        lastGeometry = geometry;
-        mustOpenFile = true;
+        if (filename.endsWith(".config")) {
+            //set all the environment variables that we need
+            qDebug()<<"Commandline config file:"<<filename;
+            setAllEnvironmentVariables(filename);
+
+            // now check if file exists and download it. (file is specified by the environment variables CAQTDM_LAUNCHFILE and CAQTDM_URL_DISPLAY)
+            lastFile = (QString)  qgetenv("CAQTDM_LAUNCHFILE");
+            fileFunctions filefunction;
+            filefunction.checkFileAndDownload(lastFile);
+            lastGeometry = geometry;
+            mustOpenFile = true;
+
+        }else{
+            lastMacro = macroString;
+            lastFile = filename;
+            lastGeometry = geometry;
+            mustOpenFile = true;
+        }
     }
 
     setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint);
@@ -554,10 +568,20 @@ void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
     Specials specials;
     QString stdpathdoc =  specials.getStdPath();
 
+#ifndef MOBILE
+    QFile file(fileName);
+    if (!file.exists()){
+        QString EnvFile=stdpathdoc;
+        EnvFile.append("/");
+        EnvFile.append(fileName);
+        file.setFileName(EnvFile);
+    }
+#else
     QString EnvFile=stdpathdoc;
     EnvFile.append("/");
     EnvFile.append(fileName);
     QFile file(EnvFile);
+#endif
     if(!file.open(QIODevice::ReadOnly)) {
         QMessageBox::information(0, "open file error setAllEnviromentVariables", file.errorString());
         return;
@@ -581,9 +605,15 @@ void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
             messageWindow->postMsgEvent(QtDebugMsg, asc);
         }
     }
+#ifndef MOBILE
+    QString envvar=getenv("CAQTDM_DISPLAY_PATH");
+    if (envvar.size()<1){
+        setenv("CAQTDM_DISPLAY_PATH", qasc(stdpathdoc), 1);
+    }
+#else
     //Replacement for standard writable directory
     setenv("CAQTDM_DISPLAY_PATH", qasc(stdpathdoc), 1);
-
+#endif
     sprintf(asc, "epics configuration file loaded: %s", qasc(fileName));
     messageWindow->postMsgEvent(QtDebugMsg, asc);
     file.close();

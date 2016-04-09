@@ -318,7 +318,7 @@ int main(int argc, char *argv[])
         return 0;
     }
     if (startasScreenSaver){
-        fileName ="C://epics//caqtdm//caQtDM_Tests//tests.ui";
+        fileName ="C:/epics/caqtdm/caQtDM_Tests/screensaver.config";
         macroString="";
         // [-dg [xpos[xypos]][+xoffset[+yoffset]]
         geometry="";
