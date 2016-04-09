@@ -1382,8 +1382,13 @@ void FileOpenWindow::parse_and_set_Geometry(QMainWindow *widget, QString parsest
     } else {
         y += (widget->geometry().y() - widget->y());
     }
-    qDebug() << "set window" << w << "to" << x << y << w << h;
-    widget->setGeometry(x, y, w, h);
+    if ((x==0) &&(x==0) &&(w==qApp->desktop()->width()) &&(h==qApp->desktop()->height())){
+        qDebug() << "fullscreen";
+        widget->showFullScreen();
+    }else{
+        qDebug() << "set window" << w << "to" << x << y << w << h;
+        widget->setGeometry(x, y, w, h);
+    }
 }
 
 void FileOpenWindow::shellCommand(QString command) {
