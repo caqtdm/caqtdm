@@ -154,6 +154,11 @@ int main(int argc, char *argv[])
             in++;
             showScreenSaverConfig=true;
             printf("caQtDM -- Screensaver Configuration\n", argv[in]);
+        } else if ( strcmp (argv[in], "/p" ) == 0 ) {
+            in++;
+
+            printf("caQtDM -- Screensaver Preview\n", argv[in]);
+
         } else if ( strcmp (argv[in], "-display" ) == 0 ) {
             in++;
             printf("caQtDM -- display <%s>\n", argv[in]);
@@ -299,14 +304,14 @@ int main(int argc, char *argv[])
     }
 // ScreenSaver Routines
     if (showScreenSaverConfig){
-       QString lmacro,luifile;//,lmacro,luifile
+       QString lconfigfile;
 
         screensaver_dialog scsa=screensaver_dialog(NULL);
         scsa.setWindowIcon(QIcon(":/caQtDM.ico"));
-        scsa.setParameter(lmacro,luifile);
+        scsa.setParameter(lconfigfile);
         if (scsa.exec()){
-            scsa.getParameter(&lmacro,&luifile);
-            qDebug() << "Save Screensaver Values"<< lmacro<<luifile;
+            scsa.getParameter(&lconfigfile);
+            qDebug() << "Save Screensaver Values"<<lconfigfile;
         }
 
 
@@ -320,10 +325,14 @@ int main(int argc, char *argv[])
         QDesktopWidget * Desktop = QApplication::desktop();
         QRect defscreengeo = Desktop->availableGeometry(-1);//Defaultscreen=-1
 
-        geometry.append(QString::number(qApp->desktop()->width()));
+
+
+        geometry.append(QString::number(qApp->desktop()->screenGeometry().width()));
+        //geometry.append(QString::number(qApp->desktop()->width()));
 
         geometry.append("x");
-        geometry.append(QString::number(qApp->desktop()->height()));
+        geometry.append(QString::number(qApp->desktop()->screenGeometry().height()));
+        //geometry.append(QString::number(qApp->desktop()->height()));
         geometry.append("-0-0");
 
 
