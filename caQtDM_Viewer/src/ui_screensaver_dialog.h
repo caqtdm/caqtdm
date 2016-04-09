@@ -26,10 +26,9 @@ class Ui_screensaver_dialog
 {
 public:
     QDialogButtonBox *buttonBox;
-    QLineEdit *macro_edit;
     QLabel *label;
     QLabel *label_2;
-    QLineEdit *uifile_edit;
+    QLineEdit *configfile_edit;
     QPushButton *pushButton;
 
     void setupUi(QDialog *screensaver_dialog)
@@ -42,21 +41,18 @@ public:
         buttonBox->setGeometry(QRect(20, 220, 441, 32));
         buttonBox->setOrientation(Qt::Horizontal);
         buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
-        macro_edit = new QLineEdit(screensaver_dialog);
-        macro_edit->setObjectName(QStringLiteral("macro_edit"));
-        macro_edit->setGeometry(QRect(90, 70, 331, 25));
         label = new QLabel(screensaver_dialog);
         label->setObjectName(QStringLiteral("label"));
-        label->setGeometry(QRect(40, 72, 51, 19));
+        label->setGeometry(QRect(30, 80, 381, 19));
         label_2 = new QLabel(screensaver_dialog);
         label_2->setObjectName(QStringLiteral("label_2"));
-        label_2->setGeometry(QRect(37, 122, 51, 19));
-        uifile_edit = new QLineEdit(screensaver_dialog);
-        uifile_edit->setObjectName(QStringLiteral("uifile_edit"));
-        uifile_edit->setGeometry(QRect(90, 120, 331, 25));
+        label_2->setGeometry(QRect(37, 122, 81, 19));
+        configfile_edit = new QLineEdit(screensaver_dialog);
+        configfile_edit->setObjectName(QStringLiteral("configfile_edit"));
+        configfile_edit->setGeometry(QRect(130, 120, 331, 25));
         pushButton = new QPushButton(screensaver_dialog);
         pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setGeometry(QRect(300, 160, 112, 34));
+        pushButton->setGeometry(QRect(231, 160, 231, 34));
 
         retranslateUi(screensaver_dialog);
         QObject::connect(buttonBox, SIGNAL(accepted()), screensaver_dialog, SLOT(accept()));
@@ -68,8 +64,8 @@ public:
     void retranslateUi(QDialog *screensaver_dialog)
     {
         screensaver_dialog->setWindowTitle(QApplication::translate("screensaver_dialog", "caQtDM Saver Settings", 0));
-        label->setText(QApplication::translate("screensaver_dialog", "macro", 0));
-        label_2->setText(QApplication::translate("screensaver_dialog", "UI file", 0));
+        label->setText(QApplication::translate("screensaver_dialog", "configuration with config file ", 0));
+        label_2->setText(QApplication::translate("screensaver_dialog", "config file", 0));
         pushButton->setText(QApplication::translate("screensaver_dialog", "File", 0));
     } // retranslateUi
 

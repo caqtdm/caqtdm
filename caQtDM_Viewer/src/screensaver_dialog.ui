@@ -29,27 +29,17 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="macro_edit">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>70</y>
-     <width>331</width>
-     <height>25</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>72</y>
-     <width>51</width>
+     <x>30</x>
+     <y>80</y>
+     <width>381</width>
      <height>19</height>
     </rect>
    </property>
    <property name="text">
-    <string>macro</string>
+    <string>configuration with config file </string>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
@@ -57,18 +47,18 @@
     <rect>
      <x>37</x>
      <y>122</y>
-     <width>51</width>
+     <width>81</width>
      <height>19</height>
     </rect>
    </property>
    <property name="text">
-    <string>UI file</string>
+    <string>config file</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="uifile_edit">
+  <widget class="QLineEdit" name="configfile_edit">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>130</x>
      <y>120</y>
      <width>331</width>
      <height>25</height>
@@ -78,9 +68,9 @@
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
-     <x>300</x>
+     <x>231</x>
      <y>160</y>
-     <width>112</width>
+     <width>231</width>
      <height>34</height>
     </rect>
    </property>
