@@ -426,6 +426,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         if (screensaver){
          this->setMouseTracking(true);
          centralWidget->setAttribute(Qt::WA_TransparentForMouseEvents);
+         centralWidget->setAttribute(Qt::WA_DeleteOnClose);
          centralWidget->setMouseTracking(true);
         }
 
@@ -7175,5 +7176,13 @@ void CaQtDM_Lib::mouseMoveEvent(QMouseEvent *event){
          firstcall_mousemove=false;
        }
    }
+}
+
+void CaQtDM_Lib::keyPressEvent(QKeyEvent *event)
+{
+    if(screensaver) {
+        qDebug() << "exit in keypressed caqtdm_lib";
+        qApp->exit(0);
+    }
 }
 

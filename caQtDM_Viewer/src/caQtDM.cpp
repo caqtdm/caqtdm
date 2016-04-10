@@ -313,6 +313,13 @@ int main(int argc, char *argv[])
         if (scsa.exec()){
             scsa.getParameter(&lconfigfile);
             qDebug() << "Save Screensaver Values"<<lconfigfile;
+
+            // User registry
+            // HKEY_CURRENT_USER\Software\Microsoft\Windows\Current Version\Screensavers\
+            // logon screensaver
+            // HKEY_USERS\.DEFAULT\Control Panel\Desktop
+            // https://support.microsoft.com/en-us/kb/185348
+
         }
 
 
