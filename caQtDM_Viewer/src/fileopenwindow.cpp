@@ -39,6 +39,8 @@ bool HTTPCONFIGURATOR = false;
 #include "specialFunctions.h"
 #include "fileFunctions.h"
 #include "loadPlugins.h"
+#include "screensaver_dialog.h"
+
 
 #ifdef MOBILE
   #include "fingerswipegesture.h"
@@ -248,6 +250,31 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     this->ui.timedAction->setChecked(true);
 
     setWindowTitle(title);
+
+    // add screensaver menue for installation and configuration
+#ifdef _WIN32
+    QMenu* scsa_menue = new QMenu("Screensaver");
+    this->ui.menuBar->addMenu(scsa_menue);
+    QSettings settings("HKEY_CURRENT_USER\\Control Panel\\Desktop", QSettings::NativeFormat);
+
+    bool allready_installed=settings.value("SCRNSAVE.EXE","").toString().isEmpty();
+
+
+    QAction* Installaction = new QAction("Install",this);
+    connect(Installaction,SIGNAL(triggered()),this,SLOT(Callback_SCSA_Install()));
+    scsa_menue->addAction(Installaction);
+    Installaction->setDisabled(!allready_installed);
+
+    QAction* UnInstallaction = new QAction("Uninstall",this);
+    connect(UnInstallaction,SIGNAL(triggered()),this,SLOT(Callback_SCSA_Uninstall()));
+    scsa_menue->addAction(UnInstallaction);
+    UnInstallaction->setDisabled(allready_installed);
+
+    QAction* Configaction = new QAction("Configure",this);
+    connect(Configaction,SIGNAL(triggered()),this,SLOT(Callback_SCSA_Configure()));
+    scsa_menue->addAction(Configaction);
+    Configaction->setDisabled(allready_installed);
+#endif
 
 #ifdef MOBILE
     specials.setNewStyleSheet(messageWindow, qApp->desktop()->size(), 16, 10);
@@ -1234,6 +1261,54 @@ void FileOpenWindow::Callback_ActionUnconnected()
 void FileOpenWindow::Callback_PVwindowExit()
 {
     pvWindow->hide();
+}
+
+void FileOpenWindow::Callback_SCSA_Install()
+{
+#ifdef _WIN32
+  // for Logonscreen : HKEY_USERS\.DEFAULT\Control Panel\Desktop
+  // for hard default : HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Control Panel\Desktop
+  // for normal User setting: HKEY_CURRENT_USER\\Control Panel\\Desktop
+    QSettings settings("HKEY_CURRENT_USER\\Control Panel\\Desktop", QSettings::NativeFormat);
+    if (settings.isWritable()){
+        settings.setValue("SCRNSAVE.EXE", QCoreApplication::applicationFilePath());
+        settings.sync();
+        QString message="Screensaver set to :";
+        message.append(QCoreApplication::applicationFilePath());
+        QMessageBox::information(this,"Info",message,QMessageBox::Ok);
+    }else{
+        QMessageBox::information(this,"Info","The User didn't have enough rights for Screensaver settings",QMessageBox::Ok);
+    }
+
+#endif
+
+}
+
+void FileOpenWindow::Callback_SCSA_Uninstall()
+{
+#ifdef _WIN32
+    QSettings settings("HKEY_CURRENT_USER\\Control Panel\\Desktop", QSettings::NativeFormat);
+     if (settings.isWritable()){
+        settings.remove("SCRNSAVE.EXE");
+        settings.sync();
+     }else{
+         QMessageBox::information(this,"Info","The User didn't have enough rights for remove",QMessageBox::Ok);
+     }
+
+
+#endif
+}
+
+void FileOpenWindow::Callback_SCSA_Configure()
+{
+    QString lconfigfile;
+    screensaver_dialog scsa=screensaver_dialog(NULL);
+    scsa.setWindowIcon(QIcon(":/caQtDM.ico"));
+    scsa.setParameter(lconfigfile);
+    if (scsa.exec()){
+        scsa.getParameter(&lconfigfile);
+        qDebug() << "Save Screensaver Values"<<lconfigfile;
+    }
 }
 
 void FileOpenWindow::fillPVtable(int &countPV, int &countNotConnected, int &countDisplayed)

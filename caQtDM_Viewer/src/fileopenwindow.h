@@ -100,6 +100,11 @@
      void checkForMessage();
      void Callback_PVwindowExit();
 
+     void Callback_SCSA_Install();
+     void Callback_SCSA_Uninstall();
+     void Callback_SCSA_Configure();
+
+
 #if QT_VERSION > 0x050000
      void onApplicationStateChange(Qt::ApplicationState state);
 #endif
