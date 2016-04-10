@@ -236,6 +236,7 @@ protected:
     void resizeEvent ( QResizeEvent * event );
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+    void keyPressEvent(QKeyEvent* event);
 
 signals:
     void clicked(QString);
