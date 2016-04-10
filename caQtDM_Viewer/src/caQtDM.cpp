@@ -150,6 +150,7 @@ int main(int argc, char *argv[])
             in++;
             printf("caQtDM -- start Screensaver\n", argv[in]);
             startasScreenSaver=true;
+            options.insert("screensaver", "true");
         } else if ( strcmp (argv[in], "/c" ) == 0 ) {
             in++;
             showScreenSaverConfig=true;

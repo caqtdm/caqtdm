@@ -156,6 +156,7 @@ private:
      int activWindow;
      bool debugWindow;
      bool fromIOS;
+     bool screensaver;
 
      QMap<QString, ControlsInterface*> interfaces;
      QMap<QString, QString> OptionList;

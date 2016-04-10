@@ -301,6 +301,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     firstResize = true;
     loopTimer = 0;
     prcFile = false;
+    screensaver=false;
+    firstcall_mousemove=true;
 
     // is a default plugin specified (normally nothing means epics3)
     QString option = options["defaultPlugin"];
@@ -313,6 +315,11 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
             defaultPlugin = option;
         }
     }
+    // check if caqtdm is started as a screensaver
+    if (options["screensaver"].contains("true")){
+        screensaver=true;
+    }
+
 
     // file watcher for changes
     watcher = new QFileSystemWatcher(this);
@@ -416,6 +423,11 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         centralWidget->setLayout(layout);
         centralWidget->layout()->setContentsMargins(0,0,0,0);
         setCentralWidget(centralWidget);
+        if (screensaver){
+         this->setMouseTracking(true);
+         centralWidget->setAttribute(Qt::WA_TransparentForMouseEvents);
+         centralWidget->setMouseTracking(true);
+        }
 
 #ifdef MOBILE
         // info can be called with tapandhold
@@ -7033,6 +7045,9 @@ knobData* CaQtDM_Lib::GetMutexKnobDataPV(QWidget *widget, QString pv){
 // initiate drag, one will be able to drop to another Qt-application
 void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
 {
+    if(screensaver) {
+        //qApp->exit(0);
+    }
     if((event->button() == Qt::LeftButton) ||  (event->button() == Qt::RightButton)) {
         return;
     }
@@ -7151,5 +7166,14 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
     Qt::DropAction dropAction = drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
     if (dropAction == Qt::MoveAction)w->close();
 }
-
+void CaQtDM_Lib::mouseMoveEvent(QMouseEvent *event){
+   if(screensaver) {
+       if(!firstcall_mousemove){
+           //qDebug() << "exit in mousemove caqtdm_lib";
+           qApp->exit(0);
+       }else{
+         firstcall_mousemove=false;
+       }
+   }
+}
 

@@ -235,6 +235,7 @@ protected:
     virtual void timerEvent(QTimerEvent *e);
     void resizeEvent ( QResizeEvent * event );
     void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
 
 signals:
     void clicked(QString);
@@ -323,6 +324,8 @@ private:
     bool allowResize;
     bool pepPrint;
     bool prcFile;
+    bool screensaver;
+    bool firstcall_mousemove;
 
     int origWidth, origHeight;
 

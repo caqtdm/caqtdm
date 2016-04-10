@@ -175,6 +175,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     // definitions for last opened file
     debugWindow = true;
     fromIOS = false;
+    screensaver=false;
     lastWindow = (QMainWindow*) 0;
     lastMacro ="";
     lastFile = "";
@@ -203,6 +204,11 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     // set for epics longer waveforms
     QString maxBytes = (QString)  qgetenv("EPICS_CA_MAX_ARRAY_BYTES");
     if(maxBytes.size() == 0) setenv("EPICS_CA_MAX_ARRAY_BYTES", "150000000", 1);
+    // check if caqtdm is started as a screensaver
+    if (options["screensaver"].contains("true")){
+        screensaver=true;
+
+    }
 
     // in case of tablets, use static plugins linked in
 #ifdef MOBILE
@@ -1012,17 +1018,20 @@ void FileOpenWindow::Callback_ActionExit()
     int selected;
 
     // launch window close
-    if(!fromIOS) {
-        QString message = QString("Are you sure to want to exit?");
-        QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "Exit", message, ":/caQtDM-logos.png", QMessageBox::Yes | QMessageBox::No, this, Qt::Dialog, false);
-        m->show();
-        selected = m->exec();
-    // normal close
-    } else {
-        if(debugWindow) selected = QMessageBox::No;
-        else selected = QMessageBox::Yes;
+    if (!screensaver){
+        if(!fromIOS) {
+            QString message = QString("Are you sure to want to exit?");
+            QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "Exit", message, ":/caQtDM-logos.png", QMessageBox::Yes | QMessageBox::No, this, Qt::Dialog, false);
+            m->show();
+            selected = m->exec();
+        // normal close
+        } else {
+            if(debugWindow) selected = QMessageBox::No;
+            else selected = QMessageBox::Yes;
+        }
+    }else{
+      selected = QMessageBox::Yes;
     }
-
     if(selected == QMessageBox::Yes) {
 
 // we are first going to close all open process windows
