@@ -87,13 +87,14 @@ public:
     QColor getBackground() const {return thisBackColor;}
     void setBackground(QColor c);
 
-    enum colMode {Default, Static, Alarm};
+    enum colMode {Default, Static, Alarm_Default, Alarm_Static};
     colMode getColorMode() const { return thisColorMode; }
+
     void setColorMode(colMode colormode) {thisColorMode = colormode;
                                           setBackground(thisBackColor);
                                           setForeground(thisForeColor);
-                                           }
-
+                                          oldColorMode = thisColorMode;
+                                         }
 
     enum SourceMode {Channel = 0, User};
     SourceMode getLimitsMode() const { return thisLimitsMode; }
@@ -114,10 +115,12 @@ private:
     QString thisPV;
     bool    m_externalEnabled;
 
+    QString thisStyle, oldStyle;
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
-    //QPalette thisPalette;
+
     colMode thisColorMode;
+    colMode oldColorMode;
     SourceMode thisLimitsMode;
     Direction      thisDirection;
     Look thisLook;
@@ -127,6 +130,7 @@ private:
     QColor defaultBackColor;
     QColor defaultForeColor;
     float  pointSizePrv;
+    bool isShown;
 };
 
 #endif

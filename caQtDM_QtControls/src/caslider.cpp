@@ -66,6 +66,10 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
     // is not possible.
     setStyleSheet("");
 
+    isShown = false;
+    oldStyle = "";
+    thisStyle = "";
+
     thisIncrement = 1.0;
     thisDirection = Up;
     thisMinimum = -50;
@@ -86,8 +90,7 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
 
     thisColorMode = Static;
     thisLimitsMode = Channel;
-    defaultBackColor = palette().background().color();
-    defaultForeColor = palette().foreground().color();
+
     oldBackColor = QColor(Qt::white);
     oldForeColor = QColor(Qt::white);
 
@@ -121,60 +124,73 @@ void caSlider::setPV(QString const &newPV)
 
 void caSlider::setBackground(QColor c)
 {
-    QColor color = c;
-    if(thisColorMode == Default) {
-        thisBackColor = defaultBackColor;
-    } else {
-        thisBackColor = color;
-    }
+    thisBackColor = c;
     setColors(thisBackColor, thisForeColor);
 }
 
 QColor caSlider::getForeground() {
-    if(thisColorMode == Default) {
-        return defaultForeColor;
-    } else {
-        return thisForeColor;
-    }
+    return thisForeColor;
 }
 
 QColor caSlider::getBackground() {
-    if(thisColorMode == Default) {
-        return defaultBackColor;
-    } else {
-        return thisBackColor;
-    }
+    return thisBackColor;
 }
 
 void caSlider::setForeground(QColor c)
 {
-    QColor color = c;
-    if(thisColorMode == Default) {
-        thisForeColor= defaultForeColor;
-    } else {
-        thisForeColor = color;
-    }
+    thisForeColor = c;
     setColors(thisBackColor, thisForeColor);
 }
 
 void caSlider::setColors(QColor bg, QColor fg)
 {
-    if((oldBackColor == bg) && (oldForeColor == fg)) return;
-    QPalette thisPalette = palette();
+    if(!defaultBackColor.isValid() || !defaultForeColor.isValid()) return;
 
-    QColor bgs = bg.darker(125);
-    bgs.setAlpha(255);
+    if((bg != oldBackColor) || (fg != oldForeColor) || (thisColorMode != oldColorMode)) {
 
-    QString style = "caSlider {background-color: rgba(%1, %2, %3, %4); } caSlider:focus  {border: 1px solid #f00;}; ";
-    style = style.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha());
-    setStyleSheet(style);
+        QString thisStyle = "caSlider {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);} caSlider:focus  {border: 1px solid #f00;};";
 
-    thisPalette.setColor(QPalette::Mid, bgs);
-    thisPalette.setColor(QPalette::Text, thisForeColor);
-    thisPalette.setColor(QPalette::Button, bg);
-    setPalette(thisPalette);
+        if(thisColorMode == Default) {
+            thisStyle = thisStyle.arg(defaultBackColor.red()).arg(defaultBackColor.green()).arg(defaultBackColor.blue()).arg(defaultBackColor.alpha()).
+                    arg(defaultForeColor.red()).arg(defaultForeColor.green()).arg(defaultForeColor.blue()).arg(defaultForeColor.alpha());
+            if(thisStyle != oldStyle) setStyleSheet(thisStyle);
+            oldStyle = thisStyle;
+        } else if(thisColorMode == Static) {
+            thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
+            if(thisStyle != oldStyle) setStyleSheet(thisStyle);
+            oldStyle = thisStyle;
+        } else  if(thisColorMode == Alarm_Static) {
+            thisStyle = thisStyle.arg(thisBackColor.red()).arg(thisBackColor.green()).arg(thisBackColor.blue()).arg(thisBackColor.alpha()).
+                    arg(thisForeColor.red()).arg(thisForeColor.green()).arg(thisForeColor.blue()).arg(thisForeColor.alpha());
+            if(thisStyle != oldStyle) setStyleSheet(thisStyle);
+            printf("Alarm_Static %s %s\n", qasc(this->objectName()), qasc(thisStyle));
+            oldStyle = thisStyle;
+            // will give the alarm colors for the handle and slider background (must be done after style sheet setting
+            QColor bgs = bg.darker(125);
+            bgs.setAlpha(255);
+            QPalette thisPalette = palette();
+            thisPalette.setColor(QPalette::Button, bg);
+            thisPalette.setColor(QPalette::Mid, bgs);
+            setPalette(thisPalette);
+        } else  if(thisColorMode == Alarm_Default) {
+            thisStyle = thisStyle.arg(defaultBackColor.red()).arg(defaultBackColor.green()).arg(defaultBackColor.blue()).arg(defaultBackColor.alpha()).
+                    arg(defaultForeColor.red()).arg(defaultForeColor.green()).arg(defaultForeColor.blue()).arg(defaultForeColor.alpha());
+            if(thisStyle != oldStyle) setStyleSheet(thisStyle);
+             printf("Alarm_Default %s %s\n",  qasc(this->objectName()),qasc(thisStyle));
+            oldStyle = thisStyle;
+            // will give the alarm colors for the handle and slider background (must be done after style sheet setting
+            QColor bgs = bg.darker(125);
+            bgs.setAlpha(255);
+            QPalette thisPalette = palette();
+            thisPalette.setColor(QPalette::Button, bg);
+            thisPalette.setColor(QPalette::Mid, bgs);
+            setPalette(thisPalette);
+        }
+    }
+
     oldBackColor = bg;
     oldForeColor = fg;
+    oldColorMode = thisColorMode;
 }
 
 void caSlider::setMaxValue(double const &maxim){
@@ -434,7 +450,7 @@ bool caSlider::timerActive()
 
 void caSlider::stopUpdating()
 {
-  repeatTimer->stop();
+    repeatTimer->stop();
 }
 
 void caSlider::mouseMoveEvent( QMouseEvent *e )
@@ -507,9 +523,9 @@ void caSlider::setAlarmColors(short status)
 void caSlider::setUserAlarmColors(double val)
 {
     if((val< thisMinimum) || (val > thisMaximum)) {
-        setColors(thisBackColor, QColor(Qt::red));
+        setAlarmColors(MAJOR_ALARM);
     } else {
-        setColors(thisBackColor, QColor(Qt::green));
+        setAlarmColors(NO_ALARM);
     }
 }
 
@@ -522,6 +538,19 @@ void caSlider::setNormalColors()
 bool caSlider::event(QEvent *e)
 {
     if(e->type() == QEvent::Resize || e->type() == QEvent::Show || e->type() == QEvent::Paint) {
+
+        if(!isShown) {
+            QString c=  palette().color(QPalette::Base).name();
+            defaultBackColor = QColor(c);
+            c =  palette().color(QPalette::Text).name();
+            defaultForeColor = QColor(c);
+
+            if(!defaultBackColor.isValid()) defaultBackColor = QColor(255, 248, 220, 255);
+            if(!defaultForeColor.isValid()) defaultForeColor = Qt::black;
+
+            setColors(thisBackColor, thisForeColor);
+            isShown = true;
+        }
 
         const caSlider* that = this;
 

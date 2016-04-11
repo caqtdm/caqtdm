@@ -62,16 +62,21 @@ caThermo::caThermo(QWidget *parent) : QwtThermoMarker(parent), m_externalEnabled
     // is not possible.
     setStyleSheet("");
 
+    isShown = false;
+    oldStyle = "";
+    thisStyle = "";
+
     thisDirection = Up;
-    defaultBackColor = QWidget::palette().background().color();
-    defaultForeColor = palette().foreground().color();
     thisColorMode = Static;
     thisLimitsMode = Channel;
 
-    pointSizePrv = 0.0;
+    oldBackColor = QColor(Qt::white);
+    oldForeColor = QColor(Qt::white);
 
     setBackground(QColor(224,224,224));
     setForeground(Qt::black);
+
+    pointSizePrv = 0.0;
 
     setSpacing(0);
     setBorderWidth(1);
@@ -98,6 +103,67 @@ void caThermo::setPV(QString const &newPV)
 void caThermo::setColors(QColor bg, QColor fg)
 {
 
+
+    if(!defaultBackColor.isValid() || !defaultForeColor.isValid()) return;
+
+    if((bg != oldBackColor) || (fg != oldForeColor) || (thisColorMode != oldColorMode)) {
+
+        QPalette thisPalette = palette();
+
+        QString thisStyle = "caThermo {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8)};";
+
+        if(thisColorMode == Default) {
+            thisStyle = thisStyle.arg(defaultBackColor.red()).arg(defaultBackColor.green()).arg(defaultBackColor.blue()).arg(defaultBackColor.alpha()).
+                    arg(defaultForeColor.red()).arg(defaultForeColor.green()).arg(defaultForeColor.blue()).arg(defaultForeColor.alpha());
+            if(thisStyle != oldStyle) setStyleSheet(thisStyle);
+            oldStyle = thisStyle;
+            QColor bgs = defaultBackColor.darker(125);
+            bgs.setAlpha(255);
+            thisPalette.setColor(QPalette::ButtonText, fg);
+            thisPalette.setColor(QPalette::Text, defaultForeColor);
+            thisPalette.setColor(QPalette::Base, bgs);
+            setPalette(thisPalette);
+        } else if(thisColorMode == Static) {
+            thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
+            if(thisStyle != oldStyle) setStyleSheet(thisStyle);
+            oldStyle = thisStyle;
+            QColor bgs = bg.darker(125);
+            bgs.setAlpha(255);
+            thisPalette.setColor(QPalette::Text, fg);
+            thisPalette.setColor(QPalette::ButtonText, fg);
+            thisPalette.setColor(QPalette::Base, bgs);
+            setPalette(thisPalette);
+        } else if(thisColorMode == Alarm_Static) {
+            thisStyle = thisStyle.arg(thisBackColor.red()).arg(thisBackColor.green()).arg(thisBackColor.blue()).arg(thisBackColor.alpha()).
+                    arg(thisForeColor.red()).arg(thisForeColor.green()).arg(thisForeColor.blue()).arg(thisForeColor.alpha());
+            if(thisStyle != oldStyle) setStyleSheet(thisStyle);
+            oldStyle = thisStyle;
+            QColor bgs = bg.darker(125);
+            bgs.setAlpha(255);
+            thisPalette.setColor(QPalette::ButtonText, fg);
+            thisPalette.setColor(QPalette::Text, thisForeColor);
+            thisPalette.setColor(QPalette::Base, bgs);
+            setPalette(thisPalette);
+        } else  if(thisColorMode == Alarm_Default) {
+            thisStyle = thisStyle.arg(defaultBackColor.red()).arg(defaultBackColor.green()).arg(defaultBackColor.blue()).arg(defaultBackColor.alpha()).
+                    arg(defaultForeColor.red()).arg(defaultForeColor.green()).arg(defaultForeColor.blue()).arg(defaultForeColor.alpha());
+            if(thisStyle != oldStyle) setStyleSheet(thisStyle);
+            oldStyle = thisStyle;
+            // will give the alarm colors for the handle and slider background (must be done after style sheet setting
+            QColor bgs = defaultBackColor.darker(125);
+            bgs.setAlpha(255);
+            thisPalette.setColor(QPalette::ButtonText, fg);
+            thisPalette.setColor(QPalette::Text, defaultForeColor);
+            thisPalette.setColor(QPalette::Base, bgs);
+            setPalette(thisPalette);
+        }
+    }
+
+    oldBackColor = bg;
+    oldForeColor = fg;
+    oldColorMode = thisColorMode;
+
+/*
     if((oldBackColor == bg) && (oldForeColor == fg)) return;
 
     QPalette thisPalette = palette();
@@ -110,27 +176,18 @@ void caThermo::setColors(QColor bg, QColor fg)
     setPalette(thisPalette);
     oldBackColor = bg;
     oldForeColor = fg;
+*/
 }
 
 void caThermo::setBackground(QColor c)
 {
-    QColor color = c;
-    if(thisColorMode == Default) {
-        thisBackColor = defaultBackColor;
-    } else {
-      thisBackColor = color;
-    }
+    thisBackColor = c;
     setColors(thisBackColor, thisForeColor);
 }
 
 void caThermo::setForeground(QColor c)
 {
-    QColor color = c;
-    if(thisColorMode == Default) {
-       thisForeColor= defaultForeColor;
-    } else {
-      thisForeColor = color;
-    }
+    thisForeColor = c;
     setColors(thisBackColor, thisForeColor);
 }
 
@@ -286,6 +343,19 @@ void caThermo::setUserAlarmColors(double val)
 bool caThermo::event(QEvent *e)
 {
     if(e->type() == QEvent::Resize || e->type() == QEvent::Show || e->type() == QEvent::Paint) {
+
+        if(!isShown) {
+            QString c=  palette().color(QPalette::Base).name();
+            defaultBackColor = QColor(c);
+            c =  palette().color(QPalette::Text).name();
+            defaultForeColor = QColor(c);
+
+            if(!defaultBackColor.isValid()) defaultBackColor = QColor(255, 248, 220, 255);
+            if(!defaultForeColor.isValid()) defaultForeColor = Qt::black;
+
+            setColors(thisBackColor, thisForeColor);
+            isShown = true;
+        }
 
         const caThermo* that = this;
 

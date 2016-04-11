@@ -79,7 +79,7 @@ public:
     QColor getBackground();
     void setBackground(QColor c);
 
-    enum colMode {Default, Static, Alarm};
+    enum colMode {Default, Static, Alarm_Default, Alarm_Static};
     colMode getColorMode() const { return thisColorMode; }
 
     void setColorMode(colMode colormode) {thisColorMode = colormode;
@@ -140,10 +140,10 @@ private:
     Direction thisDirection;
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
-    QPalette thisPalette;
     colMode thisColorMode;
     colMode oldColorMode;
     SourceMode thisLimitsMode;
+    QString thisStyle, oldStyle;
 
     QColor defaultBackColor;
     QColor defaultForeColor;
@@ -157,6 +157,7 @@ private:
     int direction;
     bool isMoving;
     bool isScrolling;
+    bool isShown;
 };
 
 #endif

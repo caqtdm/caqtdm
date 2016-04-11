@@ -354,6 +354,8 @@ int Qt_setColorMode(char *widget, char *token)
         strcpy(aux, "Alarm");
         if(!strcmp(widget, "caTextEntry")) strcpy(aux, "Alarm_Static");
         if(!strcmp(widget, "caLineEdit")) strcpy(aux, "Alarm_Static");
+        if(!strcmp(widget, "caThermo")) strcpy(aux, "Alarm_Static");
+        if(!strcmp(widget, "caSlider")) strcpy(aux, "Alarm_Static");
         sprintf(asc, "%s::%s", widget, aux);
         Qt_handleString("colorMode", "enum", asc);
         return 1;
