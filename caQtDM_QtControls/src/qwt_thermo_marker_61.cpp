@@ -1001,20 +1001,21 @@ QRect QwtThermoMarker::fillRect( const QRect &pipeRect ) const
     int from = qRound( scaleMap.transform( d_data->value ) );
     int to = qRound( scaleMap.transform( origin ) );
 
-    if ( to < from )
-        qSwap( from, to );
+    if ( to < from ) qSwap( from, to );
 
     QRect fillRect = pipeRect;
     if ( d_data->orientation == Qt::Horizontal )
     {
         if(thisType == Marker) {
+            if(lowerBound() < upperBound()) qSwap( from, to );
             fillRect.setLeft( from + 2 );
             fillRect.setRight(from - 2 );
         } else if(thisType == PipeFromCenter) {
             const float center = lowerBound() + (upperBound()-lowerBound())/2;
             const int cval = qRound(scaleMap.transform(center));
-                fillRect.setLeft(cval);
-                fillRect.setRight(to);
+            if(lowerBound() > upperBound()) qSwap( from, to );
+            fillRect.setLeft(cval);
+            fillRect.setRight(to);
         } else {
            fillRect.setLeft( from );
            fillRect.setRight( to );
@@ -1023,13 +1024,15 @@ QRect QwtThermoMarker::fillRect( const QRect &pipeRect ) const
     else // Qt::Vertical
     {
         if(thisType == Marker) {
+            if(lowerBound() > upperBound()) qSwap( from, to );
             fillRect.setBottom( from + 2);
             fillRect.setTop( from - 2);
         } else if(thisType == PipeFromCenter) {
             const float center = lowerBound() + (upperBound()-lowerBound())/2;
             const int cval = qRound(scaleMap.transform(center));
-                fillRect.setTop(from);
-                fillRect.setBottom(cval);
+            if(lowerBound() > upperBound()) qSwap( from, to );
+            fillRect.setTop(from);
+            fillRect.setBottom(cval);
         } else {
            fillRect.setTop( from );
            fillRect.setBottom( to );
@@ -1107,6 +1110,7 @@ QRect QwtThermoMarker::alarmRect( const QRect &fillRect ) const
             v2 = alarmPos - 1;
             v2 = qMin( v2, increasing ? fillRect.bottom() : valuePos );
         }
+
         alarmRect.setRect( fillRect.left(), v1, fillRect.width(), v2 - v1 + 1 );
     }
 
