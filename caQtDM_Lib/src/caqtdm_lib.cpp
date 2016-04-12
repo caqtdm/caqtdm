@@ -3222,7 +3222,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
             // set colors when connected
             // case of alarm mode
-            if (thermoWidget->getColorMode() == caThermo::Alarm) {
+            if ((thermoWidget->getColorMode() == caThermo::Alarm_Default) || (thermoWidget->getColorMode() == caThermo::Alarm_Static)) {
                 if(channelLimitsEnabled) {
                     thermoWidget->setAlarmColors(data.edata.severity);
                 } else {
@@ -3292,7 +3292,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
             // set colors when connected
             // case of alarm mode
-            if (sliderWidget->getColorMode() == caSlider::Alarm) {
+            if ((sliderWidget->getColorMode() == caSlider::Alarm_Default) || (sliderWidget->getColorMode() == caSlider::Alarm_Static)) {
                 if(channelLimitsEnabled) {
                     sliderWidget->setAlarmColors(data.edata.severity);
                 } else {
@@ -5050,7 +5050,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv[0]);
             if(kPtr != (knobData *) 0) Precision =  kPtr->edata.precision;
         }
-        if(sliderWidget->getColorMode() == caSlider::Alarm) strcpy(colMode, "Alarm");
+        if((sliderWidget->getColorMode() == caSlider::Alarm_Default) || (sliderWidget->getColorMode() == caSlider::Alarm_Static)) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
         nbPV = 1;
     } else if (caClock* clockWidget = qobject_cast<caClock *>(w)) {
@@ -5074,7 +5074,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 limitsMin = thermoWidget->minValue();
             }
         }
-        if(thermoWidget->getColorMode() == caThermo::Alarm) strcpy(colMode, "Alarm");
+        if((thermoWidget->getColorMode() == caThermo::Alarm_Default) || (thermoWidget->getColorMode() == caThermo::Alarm_Static)) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
         nbPV = 1;
     } else if(caLinearGauge* lineargaugeWidget = qobject_cast<caLinearGauge *>(w)) {
@@ -6728,6 +6728,8 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
         main->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     }
 
+
+    //qDebug() << "allowResize=" << allowResize;
     // when noresizing then fix the size, however for prc files, we will later shrink the display to a minimumsize, so do not fix then
     if(!allowResize) {
         if(!prcFile) main->setFixedSize(myWidget->size());

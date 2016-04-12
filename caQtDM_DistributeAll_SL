@@ -22,15 +22,19 @@ install -v $SOURCE/QtTunes $DESTINATION
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/HFdispQt
 install -v $SOURCE/caHFdispQt $DESTINATION
 
-# general scan applicazion
+# general scan application
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/QtScan
 install -v $SOURCE/scanQtProscan $DESTINATION
 install -v $SOURCE/scanQtHipa $DESTINATION
 install -v $SOURCE/scanQt $DESTINATION
 
-# general tendis applicazion
+# general tendis application
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caTendisQt
 install -v $SOURCE/caTendisQt $DESTINATION
+
+# general analog application
+SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/AnalogQt
+install -v $SOURCE/caAnalogQt $DESTINATION
 
 # probe measurement application for proscan
 SOURCE=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/probeQtProscan
