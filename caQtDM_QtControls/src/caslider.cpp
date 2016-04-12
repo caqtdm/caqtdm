@@ -143,7 +143,7 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
     setBackground(QColor(224,224,224));
     setForeground(Qt::black);
 
-    setDirection(Up);
+    setDirection(thisDirection);
     setAccessW(true);
 
     setFocusPolicy(Qt::ClickFocus);
@@ -332,7 +332,9 @@ void caSlider::setDirection(Direction dir)
 #endif
         break;
     }
-    setScalePosition(scalepos);
+
+    if(scalepos == NoScale)
+        setScalePosition(scalepos);
     update();
 }
 
@@ -481,7 +483,6 @@ void caSlider::repeater( )
 #if QWT_VERSION >= 0x060100
     double step = thisIncrement;
     thisValue = thisValue + double(direction) * step;
-
 #else
     thisValue = thisValue + double(direction) * step();
 #endif
@@ -707,8 +708,6 @@ bool caSlider::event(QEvent *e)
 //Overridden from QwtSlider to add the display of the current value
 void caSlider::drawSlider(QPainter *painter, const QRect &sliderRect ) const
 {
-
-
     QwtSlider::drawSlider(painter, sliderRect);
 
     if(this->scalePosition() != NoScale && thisScaleValueEnabled)
@@ -723,7 +722,7 @@ QRect caSlider::createValueRect(QRect sliderRect) const
 {
     QRect valueRect;
     int valHeight = pointSizePrv + 5;
-    
+
     if(orientation() == Qt::Horizontal)
     { 
         switch (this->scalePosition()) {
@@ -739,16 +738,13 @@ QRect caSlider::createValueRect(QRect sliderRect) const
 
         //Horizontal and scale on bottom
 #if QWT_VERSION < 0x060100
-        case  BottomScale:
-            valueRect.setRect(sliderRect.x(), sliderRect.height() + 12 , sliderRect.width(), valHeight);
-            break;
+        case BottomScale:
 #else
-        case LeadingScale:
-            valueRect.setRect(sliderRect.x(), sliderRect.height() + 12 , sliderRect.width(), valHeight);
-            break;
+        case LeadingScale:    
 #endif
             //Code
-            
+            valueRect.setRect(sliderRect.x(), sliderRect.height() + 12 , sliderRect.width(), valHeight);
+        break;
 
         default:
             break;
@@ -793,7 +789,6 @@ void caSlider::paintValue(QPainter *painter, QRect valueRect) const
 {
     if(orientation() == Qt::Horizontal)
     {
-        
         painter->drawText( valueRect, Qt::AlignCenter, setScaleLabel(thisValue) );
     }
     else

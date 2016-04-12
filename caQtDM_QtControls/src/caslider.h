@@ -41,8 +41,6 @@ class QTCON_EXPORT caSlider : public QwtSlider
                    READ orientation WRITE setOrientation  DESIGNABLE false)
 
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
-    Q_PROPERTY(Direction direction READ getDirection WRITE setDirection)
-    Q_ENUMS(Direction)
 
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
@@ -65,6 +63,9 @@ class QTCON_EXPORT caSlider : public QwtSlider
     Q_PROPERTY(bool scaleValueEnabled READ isScaleValueEnabled WRITE setScaleValueEnabled)
 
     Q_PROPERTY(SourceMode limitsMode READ getLegacyLimit WRITE setLegacyLimit DESIGNABLE false)
+
+    Q_PROPERTY(Direction direction READ getDirection WRITE setDirection)
+    Q_ENUMS(Direction)
 
     Q_ENUMS(SourceMode)
     Q_ENUMS(FormatType)
@@ -163,7 +164,6 @@ protected:
     virtual void keyPressEvent(QKeyEvent *e);
     virtual void keyReleaseEvent(QKeyEvent *e);
     virtual bool event(QEvent *);
-    virtual void enterEvent(QEvent * event);
     virtual void drawSlider ( QPainter *, const QRect & ) const;
 
 private:
