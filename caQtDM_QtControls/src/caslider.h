@@ -79,7 +79,7 @@ public:
     QColor getBackground();
     void setBackground(QColor c);
 
-    enum colMode {Default, Static, Alarm_Default, Alarm_Static};
+    enum colMode {Default, Static, Alarm_Default, Alarm_Static, Alarm=Alarm_Default};
     colMode getColorMode() const { return thisColorMode; }
 
     void setColorMode(colMode colormode) {thisColorMode = colormode;

@@ -176,7 +176,6 @@ void caSlider::setColors(QColor bg, QColor fg)
             thisStyle = thisStyle.arg(defaultBackColor.red()).arg(defaultBackColor.green()).arg(defaultBackColor.blue()).arg(defaultBackColor.alpha()).
                     arg(defaultForeColor.red()).arg(defaultForeColor.green()).arg(defaultForeColor.blue()).arg(defaultForeColor.alpha());
             if(thisStyle != oldStyle) setStyleSheet(thisStyle);
-             printf("Alarm_Default %s %s\n",  qasc(this->objectName()),qasc(thisStyle));
             oldStyle = thisStyle;
             // will give the alarm colors for the handle and slider background (must be done after style sheet setting
             QColor bgs = bg.darker(125);

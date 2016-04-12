@@ -51,6 +51,7 @@ class QTCON_EXPORT caThermo : public QwtThermoMarker
 
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
+    Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor)
 
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
     Q_ENUMS(colMode)
@@ -86,8 +87,10 @@ public:
     void setForeground(QColor c);
     QColor getBackground() const {return thisBackColor;}
     void setBackground(QColor c);
+    QColor getTextColor() const {return thisTextColor;}
+    void setTextColor(QColor c);
 
-    enum colMode {Default, Static, Alarm_Default, Alarm_Static};
+    enum colMode {Default, Static, Alarm_Default, Alarm_Static, Alarm=Alarm_Default};
     colMode getColorMode() const { return thisColorMode; }
 
     void setColorMode(colMode colormode) {thisColorMode = colormode;
@@ -102,7 +105,7 @@ public:
 
     void setAlarmColors(short status);
     void setUserAlarmColors(double val);
-    void setColors(QColor bg, QColor fg);
+    void setColors(QColor bg, QColor fg, QColor barColor);
     void setNormalColors();
 
     caThermo(QWidget *parent);
@@ -118,6 +121,7 @@ private:
     QString thisStyle, oldStyle;
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
+    QColor thisTextColor, oldTextColor;
 
     colMode thisColorMode;
     colMode oldColorMode;
