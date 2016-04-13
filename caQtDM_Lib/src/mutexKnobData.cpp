@@ -645,18 +645,31 @@ extern "C" MutexKnobData* C_SetMutexKnobDataConnected(MutexKnobData* p, int inde
 void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, char *dataString, knobData knb)
 {
     // special characters handling
-    static const QChar egrad = {0x00b0};              // º coming from epics
+#ifdef linux
+    static const QChar egrad = 0x00b0;              // º coming from epics
+    QString Egrad(egrad);
+    static const QChar grad = 0x00b0;   // will be replaced by this utf-8 code
+    QString Grad(grad);
+#else
+    static const QChar egrad = 0x00b0;              // º coming from epics
     QString Egrad(egrad);
     static const QChar grad[2] = { 0x00c2, 0x00b0};   // will be replaced by this utf-8 code
     QString Grad(grad, 2);
+#endif
 
-    static const QChar emu =  {0x00b5};               // mu coming from epics
+    static const QChar emu =  0x00b5;               // mu coming from epics
     QString Emu(emu);
+#ifdef linux
+    static const QChar mu =  0x00b5;
+    QString Mu(mu);
+    static const QChar uA[2] = { 0x00b5, 0x0041};
+    QString uAs(uA, 2);
+#else
     static const QChar mu[2] = { 0x00ce, 0x00bc};
     QString Mu(mu, 2);
-
     static const QChar uA[3] = { 0x00ce, 0x00bc, 0x0041}; // muA code for replacing ?A coming from epics
     QString uAs(uA, 3);
+#endif
 
     //qDebug() << "========== update widget by emitting signal" << w;
 
@@ -669,6 +682,7 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
     // seems people did not know how to code mu in EGU
     StringUnits.replace("?A", uAs);
     StringUnits.replace("muA", uAs);
+    StringUnits.replace("uA", uAs);
 
     // send data to main thread
     emit Signal_UpdateWidget(index, w, StringUnits, fec, dataString, knb);
