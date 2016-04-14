@@ -2389,12 +2389,9 @@ void *parseValuator(DisplayInfo *displayInfo, FrameOffset * offset)
         Qt_handleString("scalePosition", "enum", "BottomScale");
     }
 
-    if(!strcmp(look,"noLabel") || !strcmp(look,"noDeco") || !strcmp(look,"Outline")) 
-    {
+    if(!strcmp(look,"noLabel") || !strcmp(look,"noDeco") || !strcmp(look,"Outline")) {
         Qt_handleString("scaleValueEnabled", "bool", "false");
-    }
-    else
-    {
+    } else {
         Qt_handleString("scaleValueEnabled", "bool", "true");
     }
 

@@ -162,6 +162,7 @@ public:
     virtual ~QwtThermoMarker();
 
     void setOrientation( Qt::Orientation, ScalePos );
+    Qt::Orientation orientation() const;
 
     void setScalePosition( ScalePos s );
     ScalePos scalePosition() const;
