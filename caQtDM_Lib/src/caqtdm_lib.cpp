@@ -5020,11 +5020,6 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         nbPV = 2;
     } else if(caSlider* sliderWidget = qobject_cast<caSlider *>(w)) {
         pv[0] = sliderWidget->getPV().trimmed();
-        //if(sliderWidget->getLimitsMode() == caSlider::User) {
-        //    limitsMode = true;
-        //    limitsMax = sliderWidget->getMaxValue();
-        //    limitsMin = sliderWidget->getMinValue();
-        //}
         if(sliderWidget->getHighLimitMode() == caSlider::User) {
             highLimit = true;
             limitsMax = sliderWidget->getMaxValue();

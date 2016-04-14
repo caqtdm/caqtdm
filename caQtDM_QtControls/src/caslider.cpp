@@ -128,7 +128,7 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
 
     oldBackColor = QColor(Qt::white);
     oldForeColor = QColor(Qt::white);
-    setScaleValueColor(Qt::white);
+    setScaleValueColor(Qt::black);
 
     setBackground(QColor(224,224,224));
     setForeground(Qt::black);
@@ -269,6 +269,22 @@ void caSlider::setDirection(Direction dir)
 
 #if QWT_VERSION < 0x060100
     ScalePos scalepos = this->scalePosition();
+
+    // when ui file was made with version Qwt6.1.1 and here we use Qwt6.0.1 then
+    // we are in trouble, so make some defaults in this case
+    if(scalepos == -1) {
+        switch (dir) {
+            case Up:
+            case Down:
+               scalepos = QwtSlider::LeftScale;
+               break;
+            case Left:
+            case Right:
+               scalepos = QwtSlider::BottomScale;
+               break;
+         }
+    }
+
 #else
     ScalePosition scalepos = this->scalePosition();
 #endif
