@@ -287,6 +287,18 @@ void caSlider::setDirection(Direction dir)
 
 #else
     ScalePosition scalepos = this->scalePosition();
+    if(scalepos == -1) {
+        switch (dir) {
+            case Up:
+            case Left:
+               scalepos = QwtSlider::TrailingScale;
+               break;
+            case Down:
+            case Right:
+               scalepos = QwtSlider::LeadingScale;
+               break;
+         }
+    }
 #endif
 
     thisDirection = dir;
