@@ -69,6 +69,7 @@ inline void setLimitsModeChannel(QWidget *w) {
     if(caApplyNumeric* caapplynumericWidget = qobject_cast<caApplyNumeric *>(w))  caapplynumericWidget->setLimitsMode(caApplyNumeric::Channel);
     else if(caNumeric* canumericWidget = qobject_cast<caNumeric *>(w))  canumericWidget->setLimitsMode(caNumeric::Channel);
     else if(caSpinbox* caspinboxWidget = qobject_cast<caSpinbox *>(w)) caspinboxWidget->setLimitsMode(caSpinbox::Channel);
+    //else if(caSlider* casliderWidget = qobject_cast<caSlider *>(w)) casliderWidget->setLimitsMode(caSlider::Channel);
     else if(caSlider* casliderWidget = qobject_cast<caSlider *>(w)) {
         casliderWidget->setHighLimitMode(caSlider::Channel);
         casliderWidget->setLowLimitMode(caSlider::Channel);
@@ -82,6 +83,7 @@ inline void setLimitsModeUser(QWidget *w) {
     if(caApplyNumeric* caapplynumericWidget = qobject_cast<caApplyNumeric *>(w))  caapplynumericWidget->setLimitsMode(caApplyNumeric::User);
     else if(caNumeric* canumericWidget = qobject_cast<caNumeric *>(w))  canumericWidget->setLimitsMode(caNumeric::User);
     else if(caSpinbox* caspinboxWidget = qobject_cast<caSpinbox *>(w)) caspinboxWidget->setLimitsMode(caSpinbox::User);
+    //else if(caSlider* casliderWidget = qobject_cast<caSlider *>(w)) casliderWidget->setLimitsMode(caSlider::User);
     else if(caSlider* casliderWidget = qobject_cast<caSlider *>(w)) {
         casliderWidget->setHighLimitMode(caSlider::User);
         casliderWidget->setLowLimitMode(caSlider::User);

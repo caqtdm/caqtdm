@@ -41,6 +41,7 @@ class QTCON_EXPORT caSlider : public QwtSlider
                    READ orientation WRITE setOrientation  DESIGNABLE false)
 
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
+    Q_PROPERTY(Direction direction READ getDirection WRITE setDirection)
 
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
@@ -59,14 +60,18 @@ class QTCON_EXPORT caSlider : public QwtSlider
     Q_PROPERTY(double incrementValue READ getIncrementValue WRITE setIncrementValue)
     Q_PROPERTY(double value READ getSliderValue WRITE setSliderValue)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
     Q_PROPERTY(FormatType formatType READ getFormatType WRITE setFormatType)
     Q_PROPERTY(bool scaleValueEnabled READ isScaleValueEnabled WRITE setScaleValueEnabled)
+    Q_PROPERTY(QColor scaleValueColor READ getScaleValueColor WRITE setScaleValueColor)
 
     Q_PROPERTY(SourceMode limitsMode READ getLegacyLimit WRITE setLegacyLimit DESIGNABLE false)
 
-    Q_PROPERTY(Direction direction READ getDirection WRITE setDirection)
-    Q_ENUMS(Direction)
+    Q_PROPERTY(bool autoFocus READ getAutoFocus WRITE setAutoFocus)
 
+    Q_ENUMS(Direction)
     Q_ENUMS(SourceMode)
     Q_ENUMS(FormatType)
 
@@ -99,9 +104,11 @@ public:
 
     enum SourceMode {Channel = 0, User};
 
+    SourceMode getLimitsMode() const { return thisLimitsMode; }
+    void setLimitsMode(SourceMode limitsmode) { thisLimitsMode = limitsmode;}
+
     SourceMode getHighLimitMode() const { return thisHighLimitMode; }
     void setHighLimitMode(SourceMode limit) { thisHighLimitMode = limit;}
-
     SourceMode getLowLimitMode() const { return thisLowLimitMode; }
     void setLowLimitMode(SourceMode limit) { thisLowLimitMode = limit;}
 
@@ -111,7 +118,7 @@ public:
     SourceMode getPrecisionMode() const { return thisPrecMode; }
     void setPrecisionMode(SourceMode precmode) { thisPrecMode = precmode; }
     int getPrecision() const { return thisPrecision; }
-    void setPrecision(int prec) { thisPrecision = prec; setFormat(prec); }
+    void setPrecision(int prec) { thisPrecision = prec; setFormat(prec); configureScale();}
 
     void setFormat(int prec);
 
@@ -124,8 +131,14 @@ public:
     void setScaleValueEnabled(bool b);
     bool isScaleValueEnabled(){ return thisScaleValueEnabled; }
 
+    QColor getScaleValueColor() {return thisScaleValueColor;}
+    void setScaleValueColor(QColor c) {thisScaleValueColor = c; configureScale();}
+
     bool getAccessW() const {return thisAccessW;}
     void setAccessW(bool access);
+
+    bool getAutoFocus() const {return thisAutoFocus;}
+    void setAutoFocus(bool autofocus) {thisAutoFocus = autofocus;}
 
     double getMaxValue()  const {return thisMaximum;}
     void setMaxValue(double const &maxim);
@@ -148,7 +161,6 @@ public:
     void stopUpdating();
     void setPosition (const QPoint &);
     void setValue( double val );
-
 
 public slots:
     void setSliderValue(double const &value);
@@ -175,11 +187,13 @@ private:
     Direction thisDirection;
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
+    QColor thisScaleValueColor;
     colMode thisColorMode;
     colMode oldColorMode;
+
+    SourceMode thisLimitsMode;
     SourceMode thisHighLimitMode;
     SourceMode thisLowLimitMode;
-    SourceMode legacyMode;
 
     int thisPrecision;
     SourceMode thisPrecMode;
@@ -199,13 +213,14 @@ private:
     float  pointSizePrv;
     QTimer *repeatTimer;
     int direction;
+    bool thisAutoFocus;
     bool sliderSelected;
 
     void configureScale();
-
     QRect createValueRect(QRect sliderRect) const ;
     void paintValue ( QPainter *painter, QRect valueRect) const;
     bool isShown;
 };
 
 #endif
+

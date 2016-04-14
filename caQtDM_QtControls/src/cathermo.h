@@ -44,6 +44,9 @@ class QTCON_EXPORT caThermo : public QwtThermoMarker
 
     Q_ENUMS(Direction)
     Q_ENUMS(Look)
+    Q_ENUMS(FormatType)
+    Q_ENUMS(SourceMode)
+
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
     Q_PROPERTY(Direction direction READ getDirection WRITE setDirection)
     Q_PROPERTY(Look look READ getLook WRITE setLook)
@@ -57,13 +60,16 @@ class QTCON_EXPORT caThermo : public QwtThermoMarker
     Q_ENUMS(colMode)
 
     Q_PROPERTY(SourceMode limitsMode READ getLimitsMode WRITE setLimitsMode)
-    Q_ENUMS(SourceMode)
 
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
+    Q_PROPERTY(FormatType formatType READ getFormatType WRITE setFormatType)
+    Q_PROPERTY(bool scaleValueEnabled READ isScaleValueEnabled WRITE setScaleValueEnabled)
 
 public:
+
+    enum FormatType { decimal, exponential, engr_notation, compact, truncated};
 
     void noStyle(QString style) {Q_UNUSED(style);}
 
@@ -103,6 +109,14 @@ public:
     SourceMode getLimitsMode() const { return thisLimitsMode; }
     void setLimitsMode(SourceMode limitsmode) {thisLimitsMode = limitsmode;}
 
+    SourceMode getPrecisionMode() const { return thisPrecMode; }
+    void setPrecisionMode(SourceMode precmode) { thisPrecMode = precmode; }
+    int getPrecision() const { return thisPrecision; }
+    void setPrecision(int prec) { thisPrecision = prec; setFormat(prec); }
+
+    void setFormatType(FormatType m) { thisFormatType = m; setFormat(thisPrecision); }
+    FormatType getFormatType() { return thisFormatType; }
+
     void setAlarmColors(short status);
     void setUserAlarmColors(double val);
     void setColors(QColor bg, QColor fg, QColor barColor);
@@ -110,9 +124,16 @@ public:
 
     caThermo(QWidget *parent);
 
+    QString setScaleLabel (double value) const;
+    void setFormat(int prec);
+
+    void setScaleValueEnabled(bool b);
+    bool isScaleValueEnabled(){ return thisScaleValueEnabled; }
+
 protected:
 
     virtual bool event(QEvent *);
+    virtual void drawLiquid ( QPainter *, const QRect & ) const;
 
 private:
     QString thisPV;
@@ -135,6 +156,18 @@ private:
     QColor defaultForeColor;
     float  pointSizePrv;
     bool isShown;
+
+    int thisPrecision;
+    SourceMode thisPrecMode;
+    FormatType thisFormatType;
+    char thisFormat[20];
+    char thisFormatC[20];
+    double thisMaximum;
+    double thisMinimum;
+    double thisValue;
+    bool thisScaleValueEnabled;
+
+    void paintValue ( QPainter *painter, QRect valueRect) const;
 };
 
 #endif

@@ -597,6 +597,11 @@ void QwtThermoMarker::setOrientation( Qt::Orientation o, ScalePos s )
     layoutThermo( true );
 }
 
+Qt::Orientation QwtThermoMarker::orientation() const
+{
+    return d_data->orientation;
+}
+
 /*!
   \brief Change the scale position (and thermometer orientation).
 

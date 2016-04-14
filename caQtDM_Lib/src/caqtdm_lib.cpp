@@ -3233,6 +3233,9 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             } else {
                 SetColorsBack(thermoWidget);
             }
+            int precMode = thermoWidget->getPrecisionMode();
+            if((precMode != caThermo::User) && (data.edata.initialize)) thermoWidget->setPrecision(data.edata.precision);
+
             // set no connection color
         } else {
             SetColorsNotConnected(thermoWidget);
@@ -3241,41 +3244,26 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         // caSlider ==================================================================================================================
     } else if (caSlider *sliderWidget = qobject_cast<caSlider *>(w)) {
 
-        bool highChannelLimitEnabled = false;
-        bool lowChannelLimitEnabled = false;
-        bool channelLimitsEnabled = false;
-
         if(data.edata.connected) {
-            if(sliderWidget->getHighLimitMode() == caSlider::Channel)
-		highChannelLimitEnabled= true;
-            if(sliderWidget->getLowLimitMode() == caSlider::Channel)
-		lowChannelLimitEnabled= true;
-            // take limits from channel, in case of user limits these should already been set
-            if((highChannelLimitEnabled || lowChannelLimitEnabled) && data.edata.initialize ) 
-            {
-                if(highChannelLimitEnabled && lowChannelLimitEnabled)
-                {
-                    channelLimitsEnabled = true;
-                }
+            bool highChannelLimitEnabled = false;
+            bool lowChannelLimitEnabled = false;
+            bool channelLimitsEnabled = false;
+            if(sliderWidget->getHighLimitMode() == caSlider::Channel) highChannelLimitEnabled= true;
+            if(sliderWidget->getLowLimitMode()  == caSlider::Channel) lowChannelLimitEnabled= true;
+            if(highChannelLimitEnabled && lowChannelLimitEnabled) channelLimitsEnabled = true;
 
+            // take limits from channel, in case of user limits these should already been set
+            if((highChannelLimitEnabled || lowChannelLimitEnabled) && data.edata.initialize ) {
                 // when limits are the same, do nothing
                 if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) 
                 {
                     disconnect(w, SIGNAL(valueChanged (double)), 0, 0);
-
-                    if(sliderWidget->getDirection() == caSlider::Down  || sliderWidget->getDirection() == caSlider::Left) 
-                    {
-                        if((lowChannelLimitEnabled))
-                            sliderWidget->setMinValue(data.edata.upper_disp_limit);
-                        if((highChannelLimitEnabled))
-                            sliderWidget->setMaxValue(data.edata.lower_disp_limit);
-                    } 
-                    else 
-                    {
-                        if((lowChannelLimitEnabled))
-                            sliderWidget->setMaxValue(data.edata.upper_disp_limit);
-                        if((highChannelLimitEnabled))
-                            sliderWidget->setMinValue(data.edata.lower_disp_limit);
+                    if(sliderWidget->getDirection() == caSlider::Down  || sliderWidget->getDirection() == caSlider::Left) {
+                       if((lowChannelLimitEnabled))  sliderWidget->setMinValue(data.edata.upper_disp_limit);
+                       if((highChannelLimitEnabled)) sliderWidget->setMaxValue(data.edata.lower_disp_limit);
+                    } else {
+                       if((lowChannelLimitEnabled))  sliderWidget->setMaxValue(data.edata.upper_disp_limit);
+                       if((highChannelLimitEnabled)) sliderWidget->setMinValue(data.edata.lower_disp_limit);
                     }
 
                     connect(w, SIGNAL(valueChanged(double)), this, SLOT(Callback_SliderValueChanged(double)));
@@ -3303,6 +3291,10 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             } else {
                 SetColorsBack(sliderWidget);
             }
+
+            int precMode = sliderWidget->getPrecisionMode();
+            if((precMode != caSlider::User) && (data.edata.initialize)) sliderWidget->setPrecision(data.edata.precision);
+
             // set no connection color
         } else {
             SetColorsNotConnected(sliderWidget);

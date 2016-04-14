@@ -34,8 +34,11 @@
 
 #include "caslider.h"
 #include <QEvent>
+#include <QDebug>
 #include <QMouseEvent>
 #include <QApplication>
+#include <QPainter>
+#include "qwt_scale_draw.h"
 #include "alarmdefs.h"
 #include <QPainter>
 #include "qwt_scale_draw.h"
@@ -46,7 +49,7 @@
 #endif
 
 // I need to overload the scaleengine of qwt in order to get the upper and lower scale ticks drawn
-class myScaleEngine: public QwtLinearScaleEngine
+class mySliderScaleEngine: public QwtLinearScaleEngine
 {
     virtual QwtScaleDiv divideScale(double x1, double x2, int maxMajorSteps, 
         int maxMinorSteps, double stepSize  ) const 
@@ -66,42 +69,42 @@ class myScaleEngine: public QwtLinearScaleEngine
                     ticks.prepend(sd.lowerBound());
                 sd.setTicks( QwtScaleDiv::MajorTick, ticks );
             }
+
+            if ( ticks.last() > sd.upperBound() || ticks.first() < sd.lowerBound()){
+                if(ticks.last() > sd.upperBound()) ticks.append(sd.upperBound());
+                if(ticks.first() < sd.lowerBound()) ticks.prepend(sd.lowerBound());
+                sd.setTicks( QwtScaleDiv::MajorTick, ticks );
+            }
         }
         return sd;
     }
 };
 
 //Overloaded to have the scale only draw the upper and lower values
-class myScaleDraw: public QwtScaleDraw
-{
-    public:
-        double left;
-        double right;
-        bool scaleValueEnabled;
+class myScaleDraw: public QwtScaleDraw {
 
-    void setLeft(double val)
-    {
+public:
+    double left;
+    double right;
+    bool scaleValueEnabled;
+
+    void setLeft(double val) {
         left = val;
     }
 
-    void setRight(double val)
-    {
+    void setRight(double val) {
         right = val;
     }
 
-    void setScaleValueEnabled(bool b)
-    {
+    void setScaleValueEnabled(bool b) {
         scaleValueEnabled = b;
     }
 
-    virtual void drawLabel (QPainter *painter, double value) const
-    {
+    virtual void drawLabel (QPainter *painter, double value) const {
         if(value == left || value == right || !scaleValueEnabled)
             QwtScaleDraw::drawLabel(painter, value);
     }
-
 };
-
 
 
 caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
@@ -126,6 +129,7 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
     setSpacing(0);
     setBorderWidth(1);
     setSliderValue(0.0);
+    setAutoFocus(false);
 
     installEventFilter(this);
 
@@ -139,6 +143,7 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
 
     oldBackColor = QColor(Qt::white);
     oldForeColor = QColor(Qt::white);
+    setScaleValueColor(Qt::black);
 
     setPrecision(2);
     setPrecisionMode(Channel);
@@ -148,12 +153,17 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
     setBackground(QColor(224,224,224));
     setForeground(Qt::black);
 
+    setPrecision(1);
+    setPrecisionMode(Channel);
+    setFormatType(decimal);
+    setScaleValueEnabled(false);
+
     setDirection(thisDirection);
     setAccessW(true);
 
     setFocusPolicy(Qt::ClickFocus);
 
-    QwtLinearScaleEngine *scaleEngine = new myScaleEngine();
+    QwtLinearScaleEngine *scaleEngine = new mySliderScaleEngine();
     setScaleEngine( scaleEngine );
 
     repeatTimer = new QTimer(this);
@@ -216,7 +226,6 @@ void caSlider::setColors(QColor bg, QColor fg)
             thisStyle = thisStyle.arg(thisBackColor.red()).arg(thisBackColor.green()).arg(thisBackColor.blue()).arg(thisBackColor.alpha()).
                     arg(thisForeColor.red()).arg(thisForeColor.green()).arg(thisForeColor.blue()).arg(thisForeColor.alpha());
             if(thisStyle != oldStyle) setStyleSheet(thisStyle);
-            printf("Alarm_Static %s %s\n", qasc(this->objectName()), qasc(thisStyle));
             oldStyle = thisStyle;
             // will give the alarm colors for the handle and slider background (must be done after style sheet setting
             QColor bgs = bg.darker(125);
@@ -280,6 +289,22 @@ void caSlider::setDirection(Direction dir)
 
 #if QWT_VERSION < 0x060100
     ScalePos scalepos = this->scalePosition();
+
+    // when ui file was made with version Qwt6.1.1 and here we use Qwt6.0.1 then
+    // we are in trouble, so make some defaults in this case
+    if(scalepos == -1) {
+        switch (dir) {
+            case Up:
+            case Down:
+               scalepos = QwtSlider::LeftScale;
+               break;
+            case Left:
+            case Right:
+               scalepos = QwtSlider::BottomScale;
+               break;
+         }
+    }
+
 #else
     ScalePosition scalepos = this->scalePosition();
 #endif
@@ -350,8 +375,7 @@ void caSlider::setDirection(Direction dir)
         break;
     }
 
-    if(scalepos == NoScale)
-        setScalePosition(scalepos);
+    if(scalepos == NoScale) setScalePosition(scalepos);
     update();
 }
 
@@ -375,7 +399,6 @@ void caSlider::keyPressEvent(QKeyEvent *e) {
 
         if(orientation() == Qt::Vertical) {
             if(e->modifiers() & Qt::ControlModifier) increment = 10; else increment = 1;
-
         }
         doIt = true;
         break;
@@ -433,7 +456,7 @@ void caSlider::mousePressEvent(QMouseEvent *e)
         }
 
         const QPoint &p = e->pos();
-        
+
         // I have to do the work myself due to the unwanted snapping
 #if QWT_VERSION >= 0x060100
         const int markerPos = transform( value() );
@@ -444,13 +467,11 @@ void caSlider::mousePressEvent(QMouseEvent *e)
         } else {
             if ( p.y() > markerPos ) direction = -1;
         }
-        if(isScrollPosition(e->pos()))
-        {
-            //printf("%d %d\n", handleRect().width(), handleRect().height());
+        if(isScrollPosition(e->pos())) {
             QwtSlider::mousePressEvent(e);
             sliderSelected = true;
-        }
-        else if(sliderRect().contains(e->pos())) {
+        } else if(sliderRect().contains(e->pos())) {
+
             thisValue = thisValue + double(direction) * step;
             Q_EMIT sliderMoved( thisValue );
             Q_EMIT valueChanged( thisValue );
@@ -462,13 +483,15 @@ void caSlider::mousePressEvent(QMouseEvent *e)
 #else
         QwtAbstractSlider::ScrollMode scrollMode;
         getScrollMode(p,  scrollMode, direction);
-        if(scrollMode == QwtAbstractSlider::ScrMouse)
-        {
+        //thisValue = thisValue + double(direction) * step();
+        //Q_EMIT sliderMoved( thisValue );
+        //Q_EMIT valueChanged( thisValue );
+        //e->ignore();
+        //repeatTimer->start();
+        if(scrollMode == QwtAbstractSlider::ScrMouse) {
             QwtSlider::mousePressEvent(e);
             sliderSelected = true;
-        }
-        else
-        {
+        } else {
             thisValue = thisValue + double(direction) * step();
             Q_EMIT sliderMoved( thisValue );
             Q_EMIT valueChanged( thisValue );
@@ -481,6 +504,8 @@ void caSlider::mousePressEvent(QMouseEvent *e)
 
 void caSlider::mouseReleaseEvent( QMouseEvent *e )
 {
+    //isMoving = false;
+    //isScrolling = false;
     sliderSelected = false;
     if( e->button() == Qt::LeftButton) {
 #if QWT_VERSION < 0x060100
@@ -495,6 +520,7 @@ void caSlider::mouseReleaseEvent( QMouseEvent *e )
 
 void caSlider::repeater( )
 {
+    //if(isMoving) return;
     if(!thisAccessW) return;
     double oldVal = thisValue;
 #if QWT_VERSION >= 0x060100
@@ -504,29 +530,21 @@ void caSlider::repeater( )
     thisValue = thisValue + double(direction) * step();
 #endif
 
-    if(oldVal < thisMinimum || oldVal > thisMaximum) 
-    {
+    if(oldVal < thisMinimum || oldVal > thisMaximum) {
         Q_EMIT sliderMoved( thisValue );
         Q_EMIT valueChanged( thisValue );
-    }    
-    else if(thisValue < thisMinimum)
-    {
+    } else if(thisValue < thisMinimum) {
         thisValue = thisMinimum;
         Q_EMIT sliderMoved( thisValue );
         Q_EMIT valueChanged( thisValue );
-    }
-    else if (thisValue > thisMaximum)
-    {
+    } else if (thisValue > thisMaximum) {
         thisValue = thisMaximum;
         Q_EMIT sliderMoved( thisValue );
         Q_EMIT valueChanged( thisValue );
-    }
-    else
-    {
+    } else {
         Q_EMIT sliderMoved( thisValue );
         Q_EMIT valueChanged( thisValue );
     }
-
 }
 
 bool caSlider::timerActive()
@@ -545,17 +563,22 @@ void caSlider::mouseMoveEvent( QMouseEvent *e )
         e->ignore();
         return;
     }
-
-    if(sliderSelected) setPosition( e->pos() );
+    if(sliderSelected) setPosition(e->pos());
     e->ignore();
 }
 
-void caSlider::setPosition( const QPoint &p )
+void caSlider::setPosition(const QPoint &p)
 {
 #if QWT_VERSION >= 0x060100
-    QwtAbstractSlider::setValue( scrolledTo( p ));
+       QwtAbstractSlider::setValue( scrolledTo( p ));
 #else
     QwtDoubleRange::setValue( getValue( p ));
+    //QwtAbstractSlider::ScrollMode scrollMode;
+    //int direction;
+    //const QPoint &p = e->pos();
+    //getScrollMode(p,  scrollMode, direction);
+    //if(scrollMode == QwtAbstractSlider::ScrMouse) setPosition( e->pos());
+    //e->ignore();
 #endif
 }
 
@@ -574,7 +597,7 @@ bool caSlider::eventFilter(QObject *obj, QEvent *event)
             QApplication::setOverrideCursor(QCursor(Qt::ForbiddenCursor));
             setReadOnly(true);
         } else {
-            QWidget::setFocus();
+            if(thisAutoFocus) QWidget::setFocus();
             QApplication::restoreOverrideCursor();
         }
     } else if(event->type() == QEvent::Leave) {
@@ -740,8 +763,7 @@ void caSlider::drawSlider(QPainter *painter, const QRect &sliderRect ) const
 {
     QwtSlider::drawSlider(painter, sliderRect);
 
-    if(this->scalePosition() != NoScale && thisScaleValueEnabled)
-    {    
+    if(this->scalePosition() != NoScale && thisScaleValueEnabled) {
         QRect valueRect = createValueRect(sliderRect);
         paintValue (painter,  valueRect);
     }
@@ -753,8 +775,7 @@ QRect caSlider::createValueRect(QRect sliderRect) const
     QRect valueRect;
     int valHeight = pointSizePrv + 5;
 
-    if(orientation() == Qt::Horizontal)
-    { 
+    if(orientation() == Qt::Horizontal) {
         switch (this->scalePosition()) {
         //Horizontal and scale on top
 #if QWT_VERSION < 0x060100
@@ -762,38 +783,31 @@ QRect caSlider::createValueRect(QRect sliderRect) const
 #else
         case TrailingScale:
 #endif
-            //Code
             valueRect.setRect(sliderRect.x(), sliderRect.y() - 12 - (valHeight), sliderRect.width(), valHeight);
-        break;
-
+            break;
         //Horizontal and scale on bottom
 #if QWT_VERSION < 0x060100
         case BottomScale:
 #else
-        case LeadingScale:    
+        case LeadingScale:
 #endif
-            //Code
             valueRect.setRect(sliderRect.x(), sliderRect.height() + 12 , sliderRect.width(), valHeight);
-        break;
+            break;
 
         default:
             break;
 
         }
-    }
-    else
-    {
+    } else {
         switch (this->scalePosition()) {
 
-        //Verticle and scale on left
+        //Vertical and scale on left
 #if QWT_VERSION < 0x060100
         case  LeftScale:
 #else
         case TrailingScale:
 #endif
-            //Code
             valueRect.setRect(0, height() * .5 - valHeight / 2, width() - sliderRect.width(), valHeight);
-        break;
 
         //Verticle and scale on right
 #if QWT_VERSION < 0x060100
@@ -801,28 +815,24 @@ QRect caSlider::createValueRect(QRect sliderRect) const
 #else
         case LeadingScale:
 #endif
-            //Code
             valueRect.setRect(sliderRect.width() + 6, height() * .5 - valHeight / 2, width() - sliderRect.width() - 6, valHeight);
-        break;            
+            break;
 
         default:
             break;
 
         }
     }
-
     return valueRect;
 }
 
 // Draws the label with the value on the widget
 void caSlider::paintValue(QPainter *painter, QRect valueRect) const
 {
-    if(orientation() == Qt::Horizontal)
-    {
+    painter->setPen(thisScaleValueColor);
+    if(orientation() == Qt::Horizontal) {
         painter->drawText( valueRect, Qt::AlignCenter, setScaleLabel(thisValue) );
-    }
-    else
-    {
+    } else {
         painter->drawText( valueRect, Qt::AlignLeft , setScaleLabel(thisValue) );
     }
 }
@@ -848,9 +858,9 @@ void caSlider::setFormat(int prec)
     switch (thisFormatType) {
     case decimal:
         if(precision >= 0) {
-           sprintf(thisFormat, "%s.%dlf", "%", precision);
+            sprintf(thisFormat, "%s.%dlf", "%", precision);
         } else {
-           sprintf(thisFormat, "%s.%dle", "%", -precision);
+            sprintf(thisFormat, "%s.%dle", "%", -precision);
         }
         break;
     case compact:
@@ -867,7 +877,6 @@ void caSlider::setFormat(int prec)
     default:
         sprintf(thisFormat, "%s.%dlf", "%", precision);
     }
-
 }
 
 // Creates the QString that will be displayed for the value label
@@ -877,11 +886,11 @@ QString caSlider::setScaleLabel(double value) const
     QString label;
 
     if(thisFormatType == compact) {
-      if ((value < 1.e4 && value > 1.e-4) || (value > -1.e4 && value < -1.e-4) || value == 0.0) {
-        sprintf(asc, thisFormatC, value);
-      } else {
-        sprintf(asc, thisFormat, value);
-      }
+        if ((value < 1.e4 && value > 1.e-4) || (value > -1.e4 && value < -1.e-4) || value == 0.0) {
+            sprintf(asc, thisFormatC, value);
+        } else {
+            sprintf(asc, thisFormat, value);
+        }
     } else if(thisFormatType == truncated) {
         sprintf(asc, thisFormat, (int) value);
     } else {
