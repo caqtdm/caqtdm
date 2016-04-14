@@ -69,7 +69,11 @@ inline void setLimitsModeChannel(QWidget *w) {
     if(caApplyNumeric* caapplynumericWidget = qobject_cast<caApplyNumeric *>(w))  caapplynumericWidget->setLimitsMode(caApplyNumeric::Channel);
     else if(caNumeric* canumericWidget = qobject_cast<caNumeric *>(w))  canumericWidget->setLimitsMode(caNumeric::Channel);
     else if(caSpinbox* caspinboxWidget = qobject_cast<caSpinbox *>(w)) caspinboxWidget->setLimitsMode(caSpinbox::Channel);
-    else if(caSlider* casliderWidget = qobject_cast<caSlider *>(w)) casliderWidget->setLimitsMode(caSlider::Channel);
+    //else if(caSlider* casliderWidget = qobject_cast<caSlider *>(w)) casliderWidget->setLimitsMode(caSlider::Channel);
+    else if(caSlider* casliderWidget = qobject_cast<caSlider *>(w)) {
+        casliderWidget->setHighLimitMode(caSlider::Channel);
+        casliderWidget->setLowLimitMode(caSlider::Channel);
+    }
     else if(caThermo* cathermoWidget = qobject_cast<caThermo *>(w)) cathermoWidget->setLimitsMode(caThermo::Channel);
     else if(caLineEdit* calineeditWidget = qobject_cast<caLineEdit *>(w)) calineeditWidget->setLimitsMode(caLineEdit::Channel);
     else if(caTable* tableWidget = qobject_cast<caTable *>(w)) tableWidget->setLimitsMode(caTable::Channel);
@@ -79,7 +83,11 @@ inline void setLimitsModeUser(QWidget *w) {
     if(caApplyNumeric* caapplynumericWidget = qobject_cast<caApplyNumeric *>(w))  caapplynumericWidget->setLimitsMode(caApplyNumeric::User);
     else if(caNumeric* canumericWidget = qobject_cast<caNumeric *>(w))  canumericWidget->setLimitsMode(caNumeric::User);
     else if(caSpinbox* caspinboxWidget = qobject_cast<caSpinbox *>(w)) caspinboxWidget->setLimitsMode(caSpinbox::User);
-    else if(caSlider* casliderWidget = qobject_cast<caSlider *>(w)) casliderWidget->setLimitsMode(caSlider::User);
+    //else if(caSlider* casliderWidget = qobject_cast<caSlider *>(w)) casliderWidget->setLimitsMode(caSlider::User);
+    else if(caSlider* casliderWidget = qobject_cast<caSlider *>(w)) {
+        casliderWidget->setHighLimitMode(caSlider::User);
+        casliderWidget->setLowLimitMode(caSlider::User);
+    }
     else if(caThermo* cathermoWidget = qobject_cast<caThermo *>(w)) cathermoWidget->setLimitsMode(caThermo::User);
     else if(caLineEdit* calineeditWidget = qobject_cast<caLineEdit *>(w)) calineeditWidget->setLimitsMode(caLineEdit::User);
     else if(caTable* catableWidget = qobject_cast<caTable *>(w)) catableWidget->setLimitsMode(caTable::User);
@@ -91,6 +99,7 @@ inline void setPrecisionModeChannel(QWidget *w) {
     if(caApplyNumeric* caapplynumericWidget = qobject_cast<caApplyNumeric *>(w))  caapplynumericWidget->setPrecisionMode(caApplyNumeric::Channel);
     else if(caNumeric* canumericWidget = qobject_cast<caNumeric *>(w))  canumericWidget->setPrecisionMode(caNumeric::Channel);
     else if(caSpinbox* caspinboxWidget = qobject_cast<caSpinbox *>(w)) caspinboxWidget->setPrecisionMode(caSpinbox::Channel);
+    else if(caSlider* casliderWidget = qobject_cast<caSlider *>(w)) casliderWidget->setPrecisionMode(caSlider::Channel);
     else if(caLineEdit* calineeditWidget = qobject_cast<caLineEdit *>(w)) calineeditWidget->setPrecisionMode(caLineEdit::Channel);
     else if(caTable* catableWidget = qobject_cast<caTable *>(w)) catableWidget->setPrecisionMode(caTable::Channel);
     else printf("caQtDM -- setPrecisionModeChannel not implemented\n");
@@ -99,6 +108,7 @@ inline void setPrecisionModeUser(QWidget *w) {
     if(caApplyNumeric* caapplynumericWidget = qobject_cast<caApplyNumeric *>(w))  caapplynumericWidget->setPrecisionMode(caApplyNumeric::User);
     else if(caNumeric* canumericWidget = qobject_cast<caNumeric *>(w))  canumericWidget->setPrecisionMode(caNumeric::User);
     else if(caSpinbox* caspinboxWidget = qobject_cast<caSpinbox *>(w)) caspinboxWidget->setPrecisionMode(caSpinbox::User);
+    else if(caSlider* casliderWidget = qobject_cast<caSlider *>(w)) casliderWidget->setPrecisionMode(caSlider::User);
     else if(caLineEdit* calineeditWidget = qobject_cast<caLineEdit *>(w)) calineeditWidget->setPrecisionMode(caLineEdit::User);
     else if(caTable* catableWidget = qobject_cast<caTable *>(w)) catableWidget->setPrecisionMode(caTable::User);
     else printf("caQtDM -- setPrecisionModeUser not implemented\n");

@@ -222,7 +222,7 @@ void Qt_setPrecision(char *widget, int pen, char *token) {
 
     if(!strcmp(widget, "caStripPlot")) return;
     if(!strcmp(widget, "caThermo")) return;
-    if(!strcmp(widget, "caSlider")) return;
+    //if(!strcmp(widget, "caSlider")) return;
     if(strstr(widget, "caNumeric") != (char*) 0) {
         int prec;
         char asc[10];
@@ -285,6 +285,8 @@ void Qt_setMinimumLimitSource(char *widget, int pen, char *token)
         char asc[30];
         sprintf(asc, "YaxisScalingMin_%d", pen+1);
         Qt_handleString(asc, "enum", strng);
+    } else if(!strcmp(widget, "caSlider")) {
+        Qt_handleString("lowLimitMode", "enum", strng);
     } else {
         Qt_handleString("limitsMode", "enum", strng);
     }
@@ -306,6 +308,8 @@ void Qt_setMaximumLimitSource(char *widget, int pen, char *token)
         char asc[30];
         sprintf(asc, "YaxisScalingMax_%d", pen+1);
         Qt_handleString(asc, "enum", strng);
+    } else if(!strcmp(widget, "caSlider")) {
+        Qt_handleString("highLimitMode", "enum", strng);
     } else {
         Qt_handleString("limitsMode", "enum", strng);
     }
@@ -319,7 +323,7 @@ void Qt_setPrecisionSource(char *widget, int pen, char *token)
 
     if(!strcmp(widget, "caStripPlot")) return;
     if(!strcmp(widget, "caThermo")) return;
-    if(!strcmp(widget, "caSlider")) return;
+    //if(!strcmp(widget, "caSlider")) return;
     if(strstr(widget, "Gauge") != (char*) 0) return;
     strcpy(aux, token);
 

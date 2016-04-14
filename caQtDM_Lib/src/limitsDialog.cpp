@@ -101,6 +101,17 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
     QVBoxLayout *mainLayout = new QVBoxLayout;
     QGroupBox *groupBox = new QGroupBox("Limits and precision change");
 
+    QLabel *highLimitLabel = new QLabel("high limit");
+    QLabel *lowLimitLabel = new QLabel("low limit");
+
+    highLimitComboBox = new QComboBox();
+    highLimitComboBox->addItem("channel");
+    highLimitComboBox->addItem("user");
+
+    lowLimitComboBox = new QComboBox();
+    lowLimitComboBox->addItem("channel");
+    lowLimitComboBox->addItem("user");
+
     // treat limits
     QLabel *limitsLabel = new QLabel("Limits ");
 
@@ -112,12 +123,29 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
     minimumLineEdit = new QLineEdit("");
     maximumLineEdit = new QLineEdit("");
 
-    // add all to layout
     int row = 1;
-    Layout->addWidget(limitsLabel, row, 0);
-    Layout->addWidget(limitsComboBox, row, 1);
-    Layout->addWidget(minimumLineEdit, row, 2);
-    Layout->addWidget(maximumLineEdit, row, 3);
+    QString className = w->metaObject()->className();
+
+    if(className.contains("caSlider")) {
+
+        Layout->addWidget(highLimitLabel, row, 0);
+        Layout->addWidget(highLimitComboBox, row, 1);
+        Layout->addWidget(maximumLineEdit, row, 2);
+
+        row++;
+        Layout->addWidget(lowLimitLabel, row, 0);
+        Layout->addWidget(lowLimitComboBox, row, 1);
+        Layout->addWidget(minimumLineEdit, row, 2);
+
+    }
+    else
+    {
+        // add all to layout
+        Layout->addWidget(limitsLabel, row, 0);
+        Layout->addWidget(limitsComboBox, row, 1);
+        Layout->addWidget(minimumLineEdit, row, 2);
+        Layout->addWidget(maximumLineEdit, row, 3);
+    }
 
     // precision
     QLabel *precisionLabel = new QLabel("Precision ");
@@ -149,10 +177,15 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
     buttonBox->addButton(button, QDialogButtonBox::ApplyRole );
 
 
-    QString className = w->metaObject()->className();
+
     if(className.contains("caNumeric") || className.contains("caApplyNumeric") || className.contains("caSpinbox")) {
          Layout->addWidget(buttonBox, 5, 0, 1, -1);
-    } else {
+    }
+    else if(className.contains("caSlider"))
+    {
+        Layout->addWidget(buttonBox, 4, 0, 1, -1);
+    }
+    else {
          Layout->addWidget(buttonBox, 3, 0, 1, -1);
     }
 
@@ -204,14 +237,33 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
 
     // fill fields
     if(caSlider* sliderWidget = qobject_cast<caSlider *>(w)) {
-        caSlider::SourceMode mode = sliderWidget->getLimitsMode();
-        if(mode == caSlider::Channel) limitsComboBox->setCurrentIndex(0); else limitsComboBox->setCurrentIndex(1);
+        caSlider::SourceMode high = sliderWidget->getHighLimitMode();
+        caSlider::SourceMode low = sliderWidget->getLowLimitMode();
+
+        if(high == caSlider::Channel)
+            highLimitComboBox->setCurrentIndex(0);
+        else
+            highLimitComboBox->setCurrentIndex(1);
+
+        if(low == caSlider::Channel)
+            lowLimitComboBox->setCurrentIndex(0);
+        else
+            lowLimitComboBox->setCurrentIndex(1);
+
         initMin = sliderWidget->getMinValue();
         initMax = sliderWidget->getMaxValue();
+
         minimumLineEdit->setText(QString::number(initMin, 'g'));
         maximumLineEdit->setText(QString::number(initMax, 'g'));
-        precisionComboBox->setDisabled(true);
-        precisionLineEdit->setDisabled(true);
+
+        if(sliderWidget->getPrecisionMode() == caSlider::Channel) {
+            initPrecision =  channelPrecision;
+            precisionComboBox->setCurrentIndex(0);
+        } else {
+            initPrecision = sliderWidget->getPrecision();
+            precisionComboBox->setCurrentIndex(1);
+        }
+        if(initPrecision >=0) precisionLineEdit->setValue(initPrecision);
 
         // fill fields
      } else if(caMeter* meterWidget = qobject_cast<caMeter *>(w)) {
@@ -330,8 +382,6 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
         initMax = thermoWidget->maxValue();
         minimumLineEdit->setText(QString::number(initMin, 'g'));
         maximumLineEdit->setText(QString::number(initMax, 'g'));
-        precisionComboBox->setDisabled(true);
-        precisionLineEdit->setDisabled(true);
 
     } else if(caLineEdit* lineeditWidget  = qobject_cast<caLineEdit *>(w)) {
         caLineEdit::SourceMode mode = lineeditWidget->getLimitsMode();
@@ -405,16 +455,51 @@ void limitsDialog::applyClicked()
     min = minimum.toDouble(&ok1);
     maximum = maximumLineEdit->text().trimmed();
     max = maximum.toDouble(&ok2);
+
     if(!ok1) min = initMin;
     if(!ok2) max = initMax;
     if(min == max) {
         min = initMin;
         max = initMax;
     }
+
     prec= precisionLineEdit->value();
 
     // set already something to the dialog
-    if(limitsMode == Channel && !doNothing) {
+    QString highS;
+    QString lowS;
+    if(className.contains("caSlider"))
+    {
+        highS = highLimitComboBox->currentText();
+        lowS = lowLimitComboBox->currentText();
+
+        if(highS == "channel")
+        {
+            maximumLineEdit->setText(QString::number(channelUpperLimit, 'g'));
+        }
+        else if(highS == "user" && ok2)
+        {
+            maximumLineEdit->setText(QString::number(max, 'g'));
+        }
+        else
+        {
+            maximumLineEdit->setText(QString::number(initMax, 'g'));
+        }
+
+        if(lowS == "channel")
+        {
+            minimumLineEdit->setText(QString::number(channelLowerLimit, 'g'));
+        }
+        else  if(lowS == "user" && ok1)
+        {
+            minimumLineEdit->setText(QString::number(min, 'g'));
+        }
+        else
+        {
+            minimumLineEdit->setText(QString::number(initMin, 'g'));
+        }
+    }
+    else if(limitsMode == Channel && !doNothing) {
         minimumLineEdit->setText(QString::number(channelLowerLimit, 'g'));
         maximumLineEdit->setText(QString::number(channelUpperLimit, 'g'));
     } else if(limitsMode == User && ok1 && ok2) {
@@ -439,17 +524,35 @@ void limitsDialog::applyClicked()
         // do this to prevent qwtslider to set the value when changing bounds
         // however we could miss a value coming from the monitor (is this really true?)
         sliderWidget->blockSignals(true);
-        if(limitsMode == Channel) {
-            sliderWidget->setLimitsMode(caSlider::Channel);
+
+        if(highS == "channel") {
+            sliderWidget->setHighLimitMode(caSlider::Channel);
             if(!doNothing) {
                 sliderWidget->setMaxValue(channelUpperLimit);
+            }
+        } else if(highS == "user"){
+            sliderWidget->setHighLimitMode(caSlider::User);
+            sliderWidget->setMaxValue(max);
+        }
+
+        if(lowS == "channel") {
+            sliderWidget->setLowLimitMode(caSlider::Channel);
+            if(!doNothing) {
                 sliderWidget->setMinValue(channelLowerLimit);
             }
-        } else if(limitsMode == User){
-            sliderWidget->setLimitsMode(caSlider::User);
-            sliderWidget->setMaxValue(max);
+        } else if(lowS == "user"){
+            sliderWidget->setLowLimitMode(caSlider::User);
             sliderWidget->setMinValue(min);
         }
+
+        if(precisionMode == Channel) {
+            sliderWidget->setPrecisionMode(caSlider::Channel);
+            sliderWidget->setPrecision(channelPrecision);
+        } else if(precisionMode == User){
+            sliderWidget->setPrecisionMode(caSlider::User);
+            sliderWidget->setPrecision(prec);
+        }
+
         sliderWidget->blockSignals(false);
         // set eventual missed value
         knobData *kPtr = monData->getMutexKnobDataPV(sliderWidget, thisPV);
@@ -484,13 +587,31 @@ void limitsDialog::applyClicked()
         if(limitsMode == Channel) {
             thermoWidget->setLimitsMode(caThermo::Channel);
             if(!doNothing) {
-                thermoWidget->setMaxValue(channelUpperLimit);
-                thermoWidget->setMinValue(channelLowerLimit);
+                if(thermoWidget->getDirection() == caThermo::Down  || thermoWidget->getDirection() == caThermo::Left) {
+                    thermoWidget->setMinValue(channelUpperLimit);
+                    thermoWidget->setMaxValue(channelLowerLimit);
+                } else {
+                    thermoWidget->setMaxValue(channelUpperLimit);
+                    thermoWidget->setMinValue(channelLowerLimit);
+                }
             }
         } else if(limitsMode == User){
             thermoWidget->setLimitsMode(caThermo::User);
-            thermoWidget->setMaxValue(max);
-            thermoWidget->setMinValue(min);
+            if(thermoWidget->getDirection() == caThermo::Down  || thermoWidget->getDirection() == caThermo::Left) {
+                thermoWidget->setMinValue(max);
+                thermoWidget->setMaxValue(min);
+            } else {
+                thermoWidget->setMaxValue(max);
+                thermoWidget->setMinValue(min);
+            }
+        }
+
+        if(precisionMode == Channel) {
+            thermoWidget->setPrecisionMode(caThermo::Channel);
+            thermoWidget->setPrecision(channelPrecision);
+        } else if(precisionMode == User){
+            thermoWidget->setPrecisionMode(caThermo::User);
+            thermoWidget->setPrecision(prec);
         }
 
         // ************* we have a calineedit or catextentry
@@ -604,5 +725,4 @@ void limitsDialog::paintEvent(QPaintEvent *e)
 
     QWidget::paintEvent(e);
 }
-
 
