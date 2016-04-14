@@ -356,7 +356,6 @@ void caSlider::setDirection(Direction dir)
 }
 
 void caSlider::keyPressEvent(QKeyEvent *e) {
-    
     int increment = 0;
     bool doIt = false;
 
@@ -398,7 +397,7 @@ void caSlider::keyPressEvent(QKeyEvent *e) {
         break;
 
     }
-    
+
     if(doIt) {
 #if QWT_VERSION >= 0x060100
         setStepAlignment(false);
