@@ -70,7 +70,7 @@ class mySliderScaleEngine: public QwtLinearScaleEngine
 };
 
 //Overloaded to have the scale only draw the upper and lower values
-class myScaleDraw: public QwtScaleDraw {
+class mySliderScaleDraw: public QwtScaleDraw {
 
 public:
     double left;
@@ -829,7 +829,7 @@ void caSlider::paintValue(QPainter *painter, QRect valueRect) const
 // Configures the scale for the widget
 void caSlider::configureScale()
 {
-    myScaleDraw *scaleDraw = new myScaleDraw();
+    mySliderScaleDraw *scaleDraw = new mySliderScaleDraw();
     scaleDraw->setLeft(thisMinimum);
     scaleDraw->setRight(thisMaximum);
     scaleDraw->setScaleValueEnabled(thisScaleValueEnabled);
