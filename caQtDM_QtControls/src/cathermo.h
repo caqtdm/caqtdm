@@ -64,6 +64,9 @@ class QTCON_EXPORT caThermo : public QwtThermoMarker
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
+    Q_PROPERTY(SourceMode precisionMode READ getPrecisionMode WRITE setPrecisionMode)
+    Q_PROPERTY(int precision READ getPrecision WRITE setPrecision)
+
     Q_PROPERTY(FormatType formatType READ getFormatType WRITE setFormatType)
     Q_PROPERTY(bool scaleValueEnabled READ isScaleValueEnabled WRITE setScaleValueEnabled)
 
@@ -112,9 +115,9 @@ public:
     SourceMode getPrecisionMode() const { return thisPrecMode; }
     void setPrecisionMode(SourceMode precmode) { thisPrecMode = precmode; }
     int getPrecision() const { return thisPrecision; }
-    void setPrecision(int prec) { thisPrecision = prec; setFormat(prec); }
+    void setPrecision(int prec) { thisPrecision = prec; setFormat(prec); update();}
 
-    void setFormatType(FormatType m) { thisFormatType = m; setFormat(thisPrecision); }
+    void setFormatType(FormatType m) { thisFormatType = m; setFormat(thisPrecision);}
     FormatType getFormatType() { return thisFormatType; }
 
     void setAlarmColors(short status);
@@ -150,7 +153,6 @@ private:
     Direction      thisDirection;
     Look thisLook;
     int thisScale;
-    int valPixOld;
     bool thisLogScale;
     QColor defaultBackColor;
     QColor defaultForeColor;
