@@ -367,6 +367,7 @@ void caSlider::setDirection(Direction dir)
         break;
     }
     if(scalepos != NoScale) setScalePosition(scalepos);
+    setValue(thisValue);
     update();
 }
 
@@ -473,11 +474,6 @@ void caSlider::mousePressEvent(QMouseEvent *e)
 #else
         QwtAbstractSlider::ScrollMode scrollMode;
         getScrollMode(p,  scrollMode, direction);
-        //thisValue = thisValue + double(direction) * step();
-        //Q_EMIT sliderMoved( thisValue );
-        //Q_EMIT valueChanged( thisValue );
-        //e->ignore();
-        //repeatTimer->start();
         if(scrollMode == QwtAbstractSlider::ScrMouse) {
             QwtSlider::mousePressEvent(e);
             sliderSelected = true;
@@ -494,8 +490,6 @@ void caSlider::mousePressEvent(QMouseEvent *e)
 
 void caSlider::mouseReleaseEvent( QMouseEvent *e )
 {
-    //isMoving = false;
-    //isScrolling = false;
     sliderSelected = false;
     if( e->button() == Qt::LeftButton) {
 #if QWT_VERSION < 0x060100
@@ -510,7 +504,6 @@ void caSlider::mouseReleaseEvent( QMouseEvent *e )
 
 void caSlider::repeater( )
 {
-    //if(isMoving) return;
     if(!thisAccessW) return;
     double oldVal = thisValue;
 #if QWT_VERSION >= 0x060100
@@ -563,12 +556,6 @@ void caSlider::setPosition(const QPoint &p)
        QwtAbstractSlider::setValue( scrolledTo( p ));
 #else
     QwtDoubleRange::setValue( getValue( p ));
-    //QwtAbstractSlider::ScrollMode scrollMode;
-    //int direction;
-    //const QPoint &p = e->pos();
-    //getScrollMode(p,  scrollMode, direction);
-    //if(scrollMode == QwtAbstractSlider::ScrMouse) setPosition( e->pos());
-    //e->ignore();
 #endif
 }
 
@@ -894,6 +881,7 @@ void caSlider::setScaleValueEnabled(bool b)
 {
     thisScaleValueEnabled = b;
     configureScale();
+    setDirection(thisDirection);
 }
 
 #include "moc_caslider.cpp"
