@@ -366,7 +366,7 @@ void caSlider::setDirection(Direction dir)
 #endif
         break;
     }
-    if(scalepos != NoScale) setScalePosition(scalepos);
+    setScalePosition(scalepos);
     setValue(thisValue);
     update();
 }
@@ -784,6 +784,7 @@ QRect caSlider::createValueRect(QRect sliderRect) const
         case TrailingScale:
 #endif
             valueRect.setRect(0, height() * .5 - valHeight / 2, width() - sliderRect.width(), valHeight);
+            break;
 
         //Verticle and scale on right
 #if QWT_VERSION < 0x060100
