@@ -85,7 +85,6 @@ caThermo::caThermo(QWidget *parent) : QwtThermoMarker(parent), m_externalEnabled
 
     thisLogScale = false;
 
-    valPixOld = -999999;
     setLook(noLabel);
 
     QwtLinearScaleEngine *scaleEngine = new myThermoScaleEngine();
@@ -213,7 +212,6 @@ void caThermo::setLook(Look look)
 
 void caThermo::setValue(double val)
 {
-    int valPix;
     double thisValue;
     if(thisLogScale && val > 0.0) {
        thisValue = log10(val);
@@ -221,10 +219,7 @@ void caThermo::setValue(double val)
        thisValue = val;
     }
 
-    valPix = qRound(scaleMap().transform(thisValue));
-    if(valPixOld != valPix) {
-      QwtThermoMarker::setValue(thisValue);
-    }
+    QwtThermoMarker::setValue(thisValue);
 }
 
 void caThermo::setDirection(Direction dir)
@@ -457,7 +452,6 @@ bool caThermo::event(QEvent *e)
 void caThermo::drawLiquid(QPainter *painter, const QRect &sliderRect ) const
 {
     QwtThermoMarker::drawLiquid(painter, sliderRect);
-
     if(this->scalePosition() != NoScale && thisScaleValueEnabled) {
         paintValue (painter,  sliderRect);
     }
@@ -466,11 +460,11 @@ void caThermo::drawLiquid(QPainter *painter, const QRect &sliderRect ) const
 // Draws the label with the value on the widget
 void caThermo::paintValue(QPainter *painter, QRect valueRect) const
 {
+    QString label = setScaleLabel(value());
     if(orientation() == Qt::Horizontal) {
-        painter->drawText( valueRect, Qt::AlignCenter, setScaleLabel(value()) );
+        painter->drawText( valueRect, Qt::AlignCenter, label );
     } else {
         QFontMetrics fm(font());
-        QString label = setScaleLabel(value());
         int w = fm.width(label);
         int h = fm.height();
         switch (this->scalePosition()) {
