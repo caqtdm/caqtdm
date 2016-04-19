@@ -387,6 +387,7 @@ void caSlider::setDirection(Direction dir)
         break;
     }
 
+    //if(scalepos != NoScale) 
     setScalePosition(scalepos);
     setValue(thisValue);
     update();
