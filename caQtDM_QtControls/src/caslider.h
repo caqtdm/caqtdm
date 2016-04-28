@@ -161,6 +161,7 @@ public:
     void stopUpdating();
     void setPosition (const QPoint &);
     void setValue( double val );
+    void moveSlider();
 
 public slots:
     void setSliderValue(double const &value);

@@ -286,7 +286,6 @@ void caSlider::setAccessW(bool access)
 
 void caSlider::setDirection(Direction dir)
 {
-
 #if QWT_VERSION < 0x060100
     ScalePos scalepos = this->scalePosition();
 
@@ -387,7 +386,6 @@ void caSlider::setDirection(Direction dir)
         break;
     }
 
-    //if(scalepos != NoScale) 
     setScalePosition(scalepos);
     setValue(thisValue);
     update();
@@ -470,25 +468,34 @@ void caSlider::mousePressEvent(QMouseEvent *e)
         }
 
         const QPoint &p = e->pos();
+        const int markerPos = transform( value() );
 
         // I have to do the work myself due to the unwanted snapping
 #if QWT_VERSION >= 0x060100
-        const int markerPos = transform( value() );
-        double step = thisIncrement;
-        direction = 1;
-        if (orientation() == Qt::Horizontal ) {
-            if ( p.x() < markerPos ) direction = -1;
-        } else {
-            if ( p.y() > markerPos ) direction = -1;
-        }
+
         if(isScrollPosition(e->pos())) {
             QwtSlider::mousePressEvent(e);
             sliderSelected = true;
         } else if(sliderRect().contains(e->pos())) {
+            if (orientation() == Qt::Horizontal ) {
+                if(thisDirection == Right) {
+                    if ( p.x() < markerPos ) direction = -1;
+                    else direction = 1;
+                } else {
+                    if ( p.x() < markerPos ) direction = 1;
+                    else direction = -1;
+                }
+            } else {
+                if(thisDirection == Up) {
+                    if ( p.y() < markerPos ) direction = 1;
+                    else direction = -1;
+                } else {
+                    if ( p.y() < markerPos ) direction = -1;
+                    else direction = 1;
+                }
+            }
 
-            thisValue = thisValue + double(direction) * step;
-            Q_EMIT sliderMoved( thisValue );
-            Q_EMIT valueChanged( thisValue );
+            moveSlider();
             repeatTimer->start();
         }
 
@@ -501,11 +508,27 @@ void caSlider::mousePressEvent(QMouseEvent *e)
             QwtSlider::mousePressEvent(e);
             sliderSelected = true;
         } else {
-            thisValue = thisValue + double(direction) * step();
-            Q_EMIT sliderMoved( thisValue );
-            Q_EMIT valueChanged( thisValue );
-            e->ignore();
+            if (orientation() == Qt::Horizontal ) {
+                if(thisDirection == Right) {
+                    if ( p.x() < markerPos ) direction = -1;
+                    else direction = 1;
+                } else {
+                    if ( p.x() < markerPos ) direction = 1;
+                    else direction = -1;
+                }
+            } else {
+                if(thisDirection == Up) {
+                    if ( p.y() < markerPos ) direction = 1;
+                    else direction = -1;
+                } else {
+                    if ( p.y() < markerPos ) direction = -1;
+                    else direction = 1;
+                }
+            }
+
+            moveSlider();
             repeatTimer->start();
+            e->ignore();
         }
 #endif
     }
@@ -527,8 +550,14 @@ void caSlider::mouseReleaseEvent( QMouseEvent *e )
 
 void caSlider::repeater( )
 {
+    moveSlider();
+}
+
+void caSlider::moveSlider()
+{
     if(!thisAccessW) return;
     double oldVal = thisValue;
+
 #if QWT_VERSION >= 0x060100
     double step = thisIncrement;
     thisValue = thisValue + double(direction) * step;

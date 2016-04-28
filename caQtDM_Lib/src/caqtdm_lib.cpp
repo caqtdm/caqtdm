@@ -3258,13 +3258,8 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) 
                 {
                     disconnect(w, SIGNAL(valueChanged (double)), 0, 0);
-                    if(sliderWidget->getDirection() == caSlider::Down  || sliderWidget->getDirection() == caSlider::Left) {
-                       if((lowChannelLimitEnabled))  sliderWidget->setMinValue(data.edata.upper_disp_limit);
-                       if((highChannelLimitEnabled)) sliderWidget->setMaxValue(data.edata.lower_disp_limit);
-                    } else {
-                       if((lowChannelLimitEnabled))  sliderWidget->setMaxValue(data.edata.upper_disp_limit);
-                       if((highChannelLimitEnabled)) sliderWidget->setMinValue(data.edata.lower_disp_limit);
-                    }
+                    if((lowChannelLimitEnabled))  sliderWidget->setMaxValue(data.edata.upper_disp_limit);
+                    if((highChannelLimitEnabled)) sliderWidget->setMinValue(data.edata.lower_disp_limit);
 
                     connect(w, SIGNAL(valueChanged(double)), this, SLOT(Callback_SliderValueChanged(double)));
                 }
