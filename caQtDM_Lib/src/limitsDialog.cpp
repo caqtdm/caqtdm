@@ -176,8 +176,6 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
     connect( button, SIGNAL(clicked()), this, SLOT(applyClicked()) );
     buttonBox->addButton(button, QDialogButtonBox::ApplyRole );
 
-
-
     if(className.contains("caNumeric") || className.contains("caApplyNumeric") || className.contains("caSpinbox")) {
          Layout->addWidget(buttonBox, 5, 0, 1, -1);
     }
