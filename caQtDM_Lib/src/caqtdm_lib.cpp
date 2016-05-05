@@ -3235,7 +3235,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
             // set colors when connected
             // case of alarm mode
-            if (thermoWidget->getColorMode() == caThermo::Alarm) {
+            if ((thermoWidget->getColorMode() == caThermo::Alarm_Default) || (thermoWidget->getColorMode() == caThermo::Alarm_Static)) {
                 if(channelLimitsEnabled) {
                     thermoWidget->setAlarmColors(data.edata.severity);
                 } else {
@@ -3246,6 +3246,9 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             } else {
                 SetColorsBack(thermoWidget);
             }
+            int precMode = thermoWidget->getPrecisionMode();
+            if((precMode != caThermo::User) && (data.edata.initialize)) thermoWidget->setPrecision(data.edata.precision);
+
             // set no connection color
         } else {
             SetColorsNotConnected(thermoWidget);
@@ -3254,22 +3257,31 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         // caSlider ==================================================================================================================
     } else if (caSlider *sliderWidget = qobject_cast<caSlider *>(w)) {
 
-        bool channelLimitsEnabled = false;
-
         if(data.edata.connected) {
-            if(sliderWidget->getLimitsMode() == caSlider::Channel) channelLimitsEnabled= true;
+            bool highChannelLimitEnabled = false;
+            bool lowChannelLimitEnabled = false;
+            bool channelLimitsEnabled = false;
+            if(sliderWidget->getHighLimitMode() == caSlider::Channel) highChannelLimitEnabled= true;
+            if(sliderWidget->getLowLimitMode()  == caSlider::Channel) lowChannelLimitEnabled= true;
+            if(highChannelLimitEnabled && lowChannelLimitEnabled) channelLimitsEnabled = true;
+
             // take limits from channel, in case of user limits these should already been set
-            if((channelLimitsEnabled) && (data.edata.initialize) ) {
+            if((highChannelLimitEnabled || lowChannelLimitEnabled) && data.edata.initialize ) {
+
                 // when limits are the same, do nothing
                 if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
                     disconnect(w, SIGNAL(valueChanged (double)), 0, 0);
+                    /*
                     if(sliderWidget->getDirection() == caSlider::Down  || sliderWidget->getDirection() == caSlider::Left) {
-                        sliderWidget->setMinValue(data.edata.upper_disp_limit);
-                        sliderWidget->setMaxValue(data.edata.lower_disp_limit);
+                       if((lowChannelLimitEnabled))  sliderWidget->setMinValue(data.edata.upper_disp_limit);
+                       if((highChannelLimitEnabled)) sliderWidget->setMaxValue(data.edata.lower_disp_limit);
                     } else {
-                        sliderWidget->setMaxValue(data.edata.upper_disp_limit);
-                        sliderWidget->setMinValue(data.edata.lower_disp_limit);
+                       if((lowChannelLimitEnabled))  sliderWidget->setMaxValue(data.edata.upper_disp_limit);
+                       if((highChannelLimitEnabled)) sliderWidget->setMinValue(data.edata.lower_disp_limit);
                     }
+                    */
+                    if((highChannelLimitEnabled)) sliderWidget->setMaxValue(data.edata.upper_disp_limit);
+                    if((lowChannelLimitEnabled))  sliderWidget->setMinValue(data.edata.lower_disp_limit);
                     connect(w, SIGNAL(valueChanged(double)), this, SLOT(Callback_SliderValueChanged(double)));
                 }
             }
@@ -3284,7 +3296,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
             // set colors when connected
             // case of alarm mode
-            if (sliderWidget->getColorMode() == caSlider::Alarm) {
+            if ((sliderWidget->getColorMode() == caSlider::Alarm_Default) || (sliderWidget->getColorMode() == caSlider::Alarm_Static)) {
                 if(channelLimitsEnabled) {
                     sliderWidget->setAlarmColors(data.edata.severity);
                 } else {
@@ -3295,6 +3307,10 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             } else {
                 SetColorsBack(sliderWidget);
             }
+
+            int precMode = sliderWidget->getPrecisionMode();
+            if((precMode != caSlider::User) && (data.edata.initialize)) sliderWidget->setPrecision(data.edata.precision);
+
             // set no connection color
         } else {
             SetColorsNotConnected(sliderWidget);
@@ -4858,6 +4874,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     int limitsDefault = false;
     int precMode = false;
     int limitsMode = false;
+    int highLimit = false;
+    int lowLimit = false;
     int Precision = 0;
     const char *caTypeStr[] = {"DBF_STRING", "DBF_INT", "DBF_FLOAT", "DBF_ENUM", "DBF_CHAR", "DBF_LONG", "DBF_DOUBLE"};
     char colMode[20] = {""};
@@ -5019,12 +5037,22 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         nbPV = 2;
     } else if(caSlider* sliderWidget = qobject_cast<caSlider *>(w)) {
         pv[0] = sliderWidget->getPV().trimmed();
-        if(sliderWidget->getLimitsMode() == caSlider::User) {
-            limitsMode = true;
+        if(sliderWidget->getHighLimitMode() == caSlider::User) {
+            highLimit = true;
             limitsMax = sliderWidget->getMaxValue();
+        }
+        if(sliderWidget->getLowLimitMode() == caSlider::User) {
+            lowLimit = true;
             limitsMin = sliderWidget->getMinValue();
         }
-        if(sliderWidget->getColorMode() == caSlider::Alarm) strcpy(colMode, "Alarm");
+        if(sliderWidget->getPrecisionMode() == caSlider::User) {
+            precMode = true;
+            Precision = sliderWidget->getPrecision();
+        } else {
+            knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv[0]);
+            if(kPtr != (knobData *) 0) Precision =  kPtr->edata.precision;
+        }
+        if((sliderWidget->getColorMode() == caSlider::Alarm_Default) || (sliderWidget->getColorMode() == caSlider::Alarm_Static)) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
         nbPV = 1;
     } else if (caClock* clockWidget = qobject_cast<caClock *>(w)) {
@@ -5048,7 +5076,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 limitsMin = thermoWidget->minValue();
             }
         }
-        if(thermoWidget->getColorMode() == caThermo::Alarm) strcpy(colMode, "Alarm");
+        if((thermoWidget->getColorMode() == caThermo::Alarm_Default) || (thermoWidget->getColorMode() == caThermo::Alarm_Static)) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
         nbPV = 1;
     } else if(caLinearGauge* lineargaugeWidget = qobject_cast<caLinearGauge *>(w)) {
@@ -5529,6 +5557,14 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         // limits
                         if(limitsMode) {
                             sprintf(asc,"<br>User alarm: MIN:%g  MAX:%g ", limitsMin, limitsMax);
+                            info.append(asc);
+                        }
+                        if(highLimit){
+                            sprintf(asc,"<br>User alarm MAX:%g ", limitsMax);
+                            info.append(asc);
+                        }
+                        if(lowLimit) {
+                            sprintf(asc,"<br>User alarm MIN:%g ", limitsMin);
                             info.append(asc);
                         }
                         if(limitsDefault) {
@@ -6694,6 +6730,8 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
         main->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     }
 
+
+    //qDebug() << "allowResize=" << allowResize;
     // when noresizing then fix the size, however for prc files, we will later shrink the display to a minimumsize, so do not fix then
     if(!allowResize) {
         if(!prcFile) main->setFixedSize(myWidget->size());

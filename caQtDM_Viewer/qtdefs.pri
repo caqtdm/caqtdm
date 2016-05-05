@@ -88,6 +88,9 @@ DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
 # 4.1.0
+# caslider and cathermo can now display also a value; caslider got also the possibility to set distinctly the lower and upper limit
+# caQtDM will now display mu and grad on all platforms
+# adapted cathermo and caslider so that it can take ito account a default style with fore and background colors; now Alarm is modified in Alarm_Default or Alarm_static
 # now a widget can be added (see caLineDemo) without having to change caQtDM_lib. An interface has been defined in order to perform the datacuisition inside the widget class.
 # caLineDemo widget is an example for a fast on QWidget based line monitor
 # caMimeDisplay will now take macros into account

@@ -321,10 +321,10 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         QByteArray byteArray("0");
         _isRunning = false;
         // create shared memory with a default value to note that no message is available.
-        if (!sharedMemory.create(2048)) {
+        if (!sharedMemory.create(4096)) {
             qDebug("caQtDM -- Unable to create single instance.");
         } else {
-            qDebug() << "caQtDM -- created shared memory";
+            qDebug() << "caQtDM -- created shared memory with 4096 bytes";
             sharedMemory.lock();
             char *to = (char*)sharedMemory.data();
             const char *from = byteArray.data();
@@ -755,7 +755,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QString &fileS, const QString &macroS, const QString &resizeS,
                                     const bool &printexit, const bool &moveit, const bool &centerwindow)
 {
-    char asc[3000];
+    char *asc;
     bool willprint = printexit;
     CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, interfaces, messageWindow, willprint, 0, OptionList);
 
@@ -821,12 +821,15 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
     }
     activWindow = 0;
 
+    //qDebug() << "allocate" << fileS.size()+macroS.size()+100;
+    asc = (char*) malloc((fileS.size()+macroS.size()+100) * sizeof(char));
     if(macroS.size() > 0) {
       sprintf(asc, "last file: %s, macro: %s", qasc(fileS), qasc(macroS));
     } else {
       sprintf(asc, "last file: %s", qasc(fileS));
     }
     messageWindow->postMsgEvent(QtDebugMsg, asc);
+    free(asc);
     return mainWindow;
 }
 

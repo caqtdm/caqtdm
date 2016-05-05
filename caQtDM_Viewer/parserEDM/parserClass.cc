@@ -1404,7 +1404,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                     myParser->Qt_handleString("look", "enum", "Outline");
                 }
                 if(fgColorMode) {
-                    myParser->Qt_handleString("colorMode", "enum", "Alarm");
+                    myParser->Qt_handleString("colorMode", "enum", "Alarm_Static");
                 }
 
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
@@ -1480,7 +1480,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                     }
                 }
                 if(fgColorMode) {
-                    myParser->Qt_handleString("colorMode", "enum", "Alarm");
+                    myParser->Qt_handleString("colorMode", "enum", "Alarm_Static");
                 } else {
                     myParser->Qt_handleString("colorMode", "enum", "Default");
                 }

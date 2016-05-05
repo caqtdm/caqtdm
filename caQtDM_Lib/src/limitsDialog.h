@@ -86,6 +86,8 @@
      QWidget *thisWidget;
      QString thisPV;
      QComboBox *limitsComboBox;
+     QComboBox *highLimitComboBox;
+     QComboBox *lowLimitComboBox;
      QComboBox *precisionComboBox;
      QComboBox *formatComboBox;
      QLineEdit *minimumLineEdit;
