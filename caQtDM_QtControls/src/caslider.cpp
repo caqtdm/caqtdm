@@ -548,6 +548,22 @@ void caSlider::mouseReleaseEvent( QMouseEvent *e )
     repeatTimer->stop();
 }
 
+void caSlider::wheelEvent(QWheelEvent *e)
+{
+    int delta = e->delta();
+
+    if(thisDirection == Right) {
+        if ( delta > 0 ) direction = 1;
+        else direction = -1;
+    } else {
+        if ( delta > 0 ) direction = 1;
+        else direction = -1;
+    }
+
+    moveSlider();
+    e->ignore();
+}
+
 void caSlider::repeater( )
 {
     moveSlider();
@@ -565,21 +581,14 @@ void caSlider::moveSlider()
     thisValue = thisValue + double(direction) * step();
 #endif
 
-    if(oldVal < thisMinimum || oldVal > thisMaximum) {
-        Q_EMIT sliderMoved( thisValue );
-        Q_EMIT valueChanged( thisValue );
-    } else if(thisValue < thisMinimum) {
+    if(thisValue < thisMinimum && oldVal >= thisMinimum) {
         thisValue = thisMinimum;
-        Q_EMIT sliderMoved( thisValue );
-        Q_EMIT valueChanged( thisValue );
-    } else if (thisValue > thisMaximum) {
+    } else if(thisValue > thisMaximum && oldVal <= thisMaximum) {
         thisValue = thisMaximum;
-        Q_EMIT sliderMoved( thisValue );
-        Q_EMIT valueChanged( thisValue );
-    } else {
-        Q_EMIT sliderMoved( thisValue );
-        Q_EMIT valueChanged( thisValue );
     }
+
+    Q_EMIT sliderMoved( thisValue );
+    Q_EMIT valueChanged( thisValue );
 }
 
 bool caSlider::timerActive()

@@ -170,12 +170,12 @@ private slots:
     void repeater();
 
 protected:
-
     virtual void mousePressEvent(QMouseEvent *e);
     virtual void mouseReleaseEvent(QMouseEvent *e);
     virtual void mouseMoveEvent(QMouseEvent *e);
     virtual void keyPressEvent(QKeyEvent *e);
     virtual void keyReleaseEvent(QKeyEvent *e);
+    virtual void wheelEvent(QWheelEvent *e);
     virtual bool event(QEvent *);
     virtual void drawSlider ( QPainter *, const QRect & ) const;
 
