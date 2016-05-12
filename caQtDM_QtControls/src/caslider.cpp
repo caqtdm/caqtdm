@@ -472,35 +472,10 @@ void caSlider::mousePressEvent(QMouseEvent *e)
 
         // I have to do the work myself due to the unwanted snapping
 #if QWT_VERSION >= 0x060100
-
         if(isScrollPosition(e->pos())) {
             QwtSlider::mousePressEvent(e);
             sliderSelected = true;
         } else if(sliderRect().contains(e->pos())) {
-            if (orientation() == Qt::Horizontal ) {
-                if(thisDirection == Right) {
-                    if ( p.x() < markerPos ) direction = -1;
-                    else direction = 1;
-                } else {
-                    if ( p.x() < markerPos ) direction = 1;
-                    else direction = -1;
-                }
-            } else {
-                if(thisDirection == Up) {
-                    if ( p.y() < markerPos ) direction = 1;
-                    else direction = -1;
-                } else {
-                    if ( p.y() < markerPos ) direction = -1;
-                    else direction = 1;
-                }
-            }
-
-            moveSlider();
-            repeatTimer->start();
-        }
-
-        e->ignore();
-
 #else
         QwtAbstractSlider::ScrollMode scrollMode;
         getScrollMode(p,  scrollMode, direction);
@@ -508,6 +483,7 @@ void caSlider::mousePressEvent(QMouseEvent *e)
             QwtSlider::mousePressEvent(e);
             sliderSelected = true;
         } else {
+ #endif
             if (orientation() == Qt::Horizontal ) {
                 if(thisDirection == Right) {
                     if ( p.x() < markerPos ) direction = -1;
@@ -530,7 +506,6 @@ void caSlider::mousePressEvent(QMouseEvent *e)
             repeatTimer->start();
             e->ignore();
         }
-#endif
     }
 }
 
