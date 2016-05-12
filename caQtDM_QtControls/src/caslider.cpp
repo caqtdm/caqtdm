@@ -552,8 +552,13 @@ void caSlider::wheelEvent(QWheelEvent *e)
 {
     int delta = e->delta();
 
-    if ( delta > 0 ) direction = 1;
-    else direction = -1;
+    if(thisDirection == Right || thisDirection == Up) {
+        if ( delta > 0 ) direction = 1;
+        else direction = -1;
+    } else {
+        if ( delta > 0 ) direction = -1;
+        else direction = 1;
+    }
 
     moveSlider();
     e->ignore();
