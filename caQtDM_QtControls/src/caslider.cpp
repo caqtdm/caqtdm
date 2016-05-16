@@ -563,8 +563,6 @@ void caSlider::moveSlider()
     thisValue = thisValue + double(direction) * step();
 #endif
 
-    printf("Val: %f Min: %f Max: %f\n", thisValue, thisCtrlMinimum, thisCtrlMaximum);
-
     if(thisValue > thisCtrlMaximum) thisValue = thisCtrlMaximum;
     else if (thisValue <thisCtrlMinimum) thisValue = thisCtrlMinimum;
     else if(thisValue < thisMinimum && oldVal >= thisMinimum) thisValue = thisMinimum;
