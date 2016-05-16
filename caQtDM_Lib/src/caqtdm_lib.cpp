@@ -3273,6 +3273,9 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 }
             }
 
+            sliderWidget->setCtrlMaximum(data.edata.upper_ctrl_limit);
+            sliderWidget->setCtrlMinimum(data.edata.lower_ctrl_limit);
+
             // disconnect signal to prevent from firing again
             disconnect(w, SIGNAL(valueChanged (double)), 0, 0);
             sliderWidget->setSliderValue(data.edata.rvalue);
@@ -3280,6 +3283,8 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             connect(w, SIGNAL(valueChanged(double)), this, SLOT(Callback_SliderValueChanged(double)));
 
             sliderWidget->setAccessW((bool) data.edata.accessW);
+
+            if(sliderWidget->getSliderValue() > data.edata.upper_ctrl_limit) sliderWidget->setValue(data.edata.upper_ctrl_limit);
 
             // set colors when connected
             // case of alarm mode

@@ -121,6 +121,8 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
     thisDirection = Up;
     thisMinimum = -50;
     thisMaximum = 50;
+    thisCtrlMinimum = -50;
+    thisCtrlMaximum = -50;
     pointSizePrv = 0.0;
     direction = 0;
     sliderSelected = false;
@@ -525,6 +527,11 @@ void caSlider::mouseReleaseEvent( QMouseEvent *e )
 
 void caSlider::wheelEvent(QWheelEvent *e)
 {
+    if(!thisAccessW) {
+        e->ignore();
+        return;
+    }
+
     int delta = e->delta();
 
     if(thisDirection == Right || thisDirection == Up) {
@@ -556,12 +563,14 @@ void caSlider::moveSlider()
     thisValue = thisValue + double(direction) * step();
 #endif
 
-    if(thisValue < thisMinimum && oldVal >= thisMinimum) {
-        thisValue = thisMinimum;
-    } else if(thisValue > thisMaximum && oldVal <= thisMaximum) {
-        thisValue = thisMaximum;
-    }
+    printf("Val: %f Min: %f Max: %f\n", thisValue, thisCtrlMinimum, thisCtrlMaximum);
 
+    if(thisValue > thisCtrlMaximum) thisValue = thisCtrlMaximum;
+    else if (thisValue <thisCtrlMinimum) thisValue = thisCtrlMinimum;
+    else if(thisValue < thisMinimum && oldVal >= thisMinimum) thisValue = thisMinimum;
+    else if(thisValue > thisMaximum && oldVal <= thisMaximum) thisValue = thisMaximum;
+
+    setValue(thisValue);
     Q_EMIT sliderMoved( thisValue );
     Q_EMIT valueChanged( thisValue );
 }

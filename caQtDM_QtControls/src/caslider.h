@@ -151,6 +151,12 @@ public:
     double getIncrementValue()  const {return thisIncrement;}
     void setIncrementValue(double const &value);
 
+    double getCtrlMaximum() const {return thisCtrlMaximum;}
+    void setCtrlMaximum(double max) {thisCtrlMaximum = max;}
+
+    double getCtrlMinimum() const {return thisCtrlMinimum;}
+    void setCtrlMinimum(double max) {thisCtrlMinimum = max;}
+
     caSlider(QWidget *parent);
 
     void setAlarmColors(short status);
@@ -209,6 +215,8 @@ private:
 
     double thisMaximum;
     double thisMinimum;
+    double thisCtrlMinimum;
+    double thisCtrlMaximum;
     double thisValue;
     double thisIncrement;
     float  pointSizePrv;
