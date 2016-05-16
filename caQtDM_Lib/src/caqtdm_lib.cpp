@@ -3284,8 +3284,6 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
             sliderWidget->setAccessW((bool) data.edata.accessW);
 
-            if(sliderWidget->getSliderValue() > data.edata.upper_ctrl_limit) sliderWidget->setValue(data.edata.upper_ctrl_limit);
-
             // set colors when connected
             // case of alarm mode
             if ((sliderWidget->getColorMode() == caSlider::Alarm_Default) || (sliderWidget->getColorMode() == caSlider::Alarm_Static)) {
