@@ -122,7 +122,11 @@ echo ========== codesigning  ============
 echo
 echo Identity = ${CAQTDM_MAC_CODESIGN}
 
-codesign --verbose=2 --deep --force --entitlements ./caQtDM_Viewer/src/Mac/Entitlements.plist  -s "${CAQTDM_MAC_CODESIGN}" -vvvv ./caQtDM_Binaries/caQtDM.app
+codesign --verbose=2 --force -s "${CAQTDM_MAC_CODESIGN}" -vvvv ./caQtDM_Binaries/caQtDM.app/Contents/MacOS/caQtDM
+codesign --verbose=2 --force -s "${CAQTDM_MAC_CODESIGN}" -vvvv ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/*
+codesign --verbose=2 --force -s "${CAQTDM_MAC_CODESIGN}" -vvvv ./caQtDM_Binaries/caQtDM.app
+
+
 echo
 echo ========== check codesigning  ============
 echo
@@ -151,7 +155,7 @@ cp -R ./caQtDM_Binaries/Designer.app ./caQtDM_Binaries/caQtDM.app/Contents/Appli
 echo ========== codesigning  ============
 echo
 echo Identity = ${CAQTDM_MAC_CODESIGN}
-codesign --verbose=2 --deep --force --entitlements ./caQtDM_Viewer/src/Mac/Entitlements.plist  -s "${CAQTDM_MAC_CODESIGN}" -vvvv ./caQtDM_Binaries/caQtDM.app
+#codesign --verbose=2 --deep --force --entitlements ./caQtDM_Viewer/src/Mac/Entitlements.plist  -s "${CAQTDM_MAC_CODESIGN}" -vvvv ./caQtDM_Binaries/caQtDM.app
 
 
 
