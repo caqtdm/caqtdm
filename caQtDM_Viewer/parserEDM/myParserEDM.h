@@ -50,7 +50,7 @@ public:
     void writeProperty(const QString& name, const QString& type, const QString& value );
     void writeOpenProperty(const QString& name);
     void writeTaggedString(const QString& type, const QString& value );
-	void writeTaggedString(const QString& type, const QString& value, const bool notr);
+    void writeTaggedString(const QString& type, const QString& value, const bool notr);
     void writeCloseProperty();
     void writeStyleSheet(int r, int g, int b);
 
@@ -71,6 +71,7 @@ public:
     void Qt_setStyleTrace(char *widget, char *style, int trace);
     void Qt_ChannelsXY(char *widget, char *channels, int trace);
     void Qt_extractString(char *str, char*retStr, int *status);
+	void Qt_extractCalcString(char *str, char *calcStr, char *pvStr, int *status);
 
     void writeRectangleDimensions(int x, int y, int w, int h);
     // Zai added

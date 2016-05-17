@@ -151,7 +151,7 @@ void myParserEDM::writeTaggedString(const QString& type, const QString& value, b
 	if (notr) {
 		xw->writeTaggedString( type, value, AttrMap("notr", "true"));
 	} else {
-		xw->writeTaggedString( type, value  );
+		xw->writeTaggedString( type, value );
 	}
 }
 
@@ -237,7 +237,7 @@ void myParserEDM::writeFontProperties(int size, bool bold)
     writeOpenProperty("font");
     writeOpenTag("font", "", "");
 
-    sprintf(asc, "%d", (int)(((double)size*0.7)+0.5));
+    sprintf(asc, "%d", size);
     writeTaggedString("pointsize", asc);
 
     if (bold && size > 14){
@@ -323,6 +323,29 @@ void myParserEDM::Qt_ChannelsXY(char *widget, char *channels, int trace) {
     Qt_handleString((char *)prop.toLatin1().constData(), "string", channels);
 }
 
+void myParserEDM::Qt_extractCalcString(char *str, char *calcStr, char *pvStr, int *status) {
+
+    int startPos = 0, endPos = 0;
+    pvStr[0] = '\0';
+    QString newStr(str);
+	QString calc("A");
+    startPos =newStr.indexOf("{");
+    if(startPos > -1) {
+		endPos = newStr.indexOf("}(");
+		++startPos;
+		calc = newStr.mid(startPos, endPos-startPos);
+        newStr.remove(0,endPos+2);
+    } else {
+		strcpy(calcStr, (char*)calc.toLatin1().constData());
+        *status = false;
+        return;
+    }
+    if(newStr.endsWith(")")) newStr.remove(newStr.size()-1,1);
+	strcpy(calcStr, (char*)calc.toLatin1().constData());
+	strcpy(pvStr, (char*)newStr.toLatin1().constData());
+    *status = true;
+}
+
 void myParserEDM::Qt_extractString(char *str, char *retStr, int *status) {
 
     int startPos = 0;
@@ -345,7 +368,7 @@ void myParserEDM::Qt_extractString(char *str, char *retStr, int *status) {
  */
 class myParserEDM;
 
-int processFile(char * inFile) { 
+int processFile(char * inFile) {
 
     // input and out files
     QString inputFile = inFile;
@@ -391,7 +414,7 @@ int processFile(char * inFile) {
     // open input file
     //FILE *filePtr = fopen(inputFile.toLatin1().data(), "r");
     parserClass parser(inputFile.toLatin1().data());
-    parser.loadFile(&edlParser);
+    parser.loadFile(edlParser);
 
 
     // close output file
