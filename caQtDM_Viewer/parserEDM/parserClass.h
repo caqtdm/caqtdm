@@ -34,7 +34,7 @@ public:
     void readCommentsAndVersion (FILE *f);
     void incLine ( void );
     void addVisibilityCalc(myParserEDM *myParser, char *visPvExpStr, char *minVisString, char *maxVisString, int visInverted=0);
-    void addAlarmPV(myParserEDM *myParser, char *alarmPvExpStr, int lineColorMode=0, int fillColorMode=0);
+	void addAlarmPV(myParserEDM *myParser, char *alarmPvExpStr, int lineColorMode=0, int fillColorMode=0);
 
 private:
 
