@@ -31,6 +31,8 @@
 #include <QFont>
 #include <qtcontrols_global.h>
 
+#include "caPropHandleDefs.h"
+
 typedef char string40[40];
 
 class QTCON_EXPORT caTable : public QTableWidget
@@ -38,7 +40,9 @@ class QTCON_EXPORT caTable : public QTableWidget
 
     Q_OBJECT
 
-    Q_PROPERTY(QString channels READ getPVS WRITE setPVS)
+    Q_PROPERTY(QStringList channelsList READ getPVSList WRITE setPVSList STORED false)
+    Q_PROPERTY(QString channels READ getPVS WRITE setPVS DESIGNABLE inactiveButVisible())
+
     Q_PROPERTY(QString columnSizes READ getColumnSizes WRITE setColumnSizes)
 
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
@@ -56,7 +60,14 @@ class QTCON_EXPORT caTable : public QTableWidget
     Q_PROPERTY(QString scriptCommand READ getScriptCommand WRITE setScriptCommand)
     Q_PROPERTY(QString scriptParameter READ getScriptParam WRITE setScriptParam)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
 public:
+
+#include "caPropHandle.h"
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     caTable(QWidget *parent);
 
@@ -73,8 +84,10 @@ public:
     int getPrecision() const {return thisPrecision;}
     void setPrecision(int prec) {thisPrecision = prec;}
 
-    QString getPVS() const {return thisPV.join(";");}
-    void setPVS(QString const &newPV) {thisPV = newPV.split(";");}
+    QString getPVS() const {return thisPVS.join(";");}
+    void setPVS(QString const &newPV) {thisPVS = newPV.split(";");}
+    QStringList getPVSList() const {return thisPVS;}
+    void setPVSList(QStringList list) {thisPVS = list; updatePropertyEditorItem(this, "channels");}
 
     QString getColumnSizes() const {return thisColumnSizes.join(";");}
     void setColumnSizes(QString const &newSizes);
@@ -115,7 +128,7 @@ private:
 
     enum { MaxRows = 500 };
     enum { MaxCols = 5  };
-    QStringList	thisPV;
+    QStringList	thisPVS;
     QStringList	thisColumnSizes;
     double thisMaximum, thisMinimum;
     QString thisStyle;

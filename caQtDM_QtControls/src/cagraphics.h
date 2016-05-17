@@ -53,6 +53,9 @@ class  QTCON_EXPORT caGraphics : public QWidget
     Q_PROPERTY( int startAngle READ getStartAngle WRITE setStartAngle DESIGNABLE isPropertyVisible(startangle))
     Q_PROPERTY( int spanAngle READ getSpanAngle WRITE setSpanAngle DESIGNABLE isPropertyVisible(spanangle))
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
     Q_ENUMS(Form)
     Q_ENUMS(colMode)
     Q_ENUMS(LineStyle)
@@ -62,6 +65,8 @@ class  QTCON_EXPORT caGraphics : public QWidget
 #include "caVisibDefs.h"
 
 public:
+
+   void noStyle(QString style) {Q_UNUSED(style);}
 
     enum LineStyle {Solid = 0, Dash, BigDash};
     enum FillStyle {Filled = 0, Outline};

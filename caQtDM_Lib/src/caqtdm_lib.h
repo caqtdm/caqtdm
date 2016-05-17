@@ -78,7 +78,12 @@
 #include "sliderDialog.h"
 #include "splashscreen.h"
 #include "messageQueue.h"
+
+// interface to different controlsystems
 #include "controlsinterface.h"
+
+// interface used enabling some widgets doing their own acquisition by calling caQtDM_Lib routines
+#include "caqtdm_lib_interface.h"
 
 #include <QtControls>
 
@@ -90,11 +95,16 @@
 
 #include <QMenuBar>
 
+#if defined(_MSC_VER) || defined(MOBILE_IOS)
+#define useElapsedTimer
+#else
+#endif
+
 namespace Ui {
 class CaQtDM_Lib;
 }
 
-class CAQTDM_LIBSHARED_EXPORT CaQtDM_Lib : public QMainWindow
+class CAQTDM_LIBSHARED_EXPORT CaQtDM_Lib : public QMainWindow, public CaQtDM_Lib_Interface
 {
     Q_OBJECT
 
@@ -104,14 +114,21 @@ public:
                                                                      QMap<QString, ControlsInterface *> interfaces = (QMap<QString, ControlsInterface *>()),
                                                                      MessageWindow *msgWindow = 0,
                                                                      bool willPrint = false,
-                                                                     QWidget *parentAS = 0);
+                                                                     QWidget *parentAS = 0,
+                                                                     QMap<QString, QString> options = (QMap<QString, QString>()));
     ~CaQtDM_Lib();
 
     void allowResizing(bool allowresize);
-    int addMonitor(QWidget *thisW, knobData *data, QString pv, QWidget *w, int *specData, QMap<QString, QString> map, QString *pvRep);
     void ComputeNumericMaxMinPrec(QWidget* widget, const knobData &data);
     void UpdateGauge(EAbstractGauge *w, const knobData &data);
     ControlsInterface * getControlInterface(QString plugininterface);
+
+    // interface implementation
+    int addMonitor(QWidget *thisW, knobData *data, QString pv, QWidget *w, int *specData, QMap<QString, QString> map, QString *pvRep);
+    knobData* GetMutexKnobDataPtr(int index);
+    knobData* GetMutexKnobDataPV(QWidget *widget, QString pv);
+    void TreatRequestedValue(QString pv, QString text, FormatType fType, QWidget *w);
+    // interface finish (perhaps we need more)
 
 #ifdef MOBILE
     void grabSwipeGesture(Qt::GestureType fingerSwipeGestureTypeID);
@@ -156,13 +173,10 @@ public:
         printer->setPrinterName(defaultPrinter);
         printer->setOutputFileName(0);
         printer->setPrintProgram("lpr");
+#endif
         printer->setOrientation(QPrinter::Landscape);
         printer->setResolution(300);
         printer->setOutputFormat(QPrinter::NativeFormat);
-#else
-        printer->setOrientation(QPrinter::Landscape);
-        printer->setResolution(300);
-#endif
         QPrintDialog *printDialog = new QPrintDialog(printer, this);
 
 #ifdef linux
@@ -227,13 +241,18 @@ signals:
     void clicked(int);
     void clicked(double);
     void Signal_QLineEdit(const QString&, const QString&);
-    void Signal_OpenNewWFile(const QString&, const QString&, const QString&);
+    void Signal_OpenNewWFile(const QString&, const QString&, const QString&, const QString&);
     void Signal_ContextMenu(QWidget*);
     void Signal_NextWindow();
     void Signal_IosExit();
+    void Signal_ReloadWindow(QWidget*);
+    void Signal_ReloadAllWindows();
     void fileChanged(const QString&);
 
 private:
+#if !defined(useElapsedTimer)
+    double rTime();
+#endif
     void scanChildren(QList<QWidget*> children, QWidget *tab, int i);
     QWidget* getTabParent(QWidget *w1);
     QString treatMacro(QMap<QString, QString> map, const QString& pv, bool *doNothing);
@@ -247,9 +266,9 @@ private:
     int InitVisibility(QWidget* widget, knobData *kData, QMap<QString, QString> map,  int *specData, QString info);
     void postMessage(QtMsgType type, char *msg);
     int Execute(char *command);
-    void TreatRequestedValue(QString pv, QString text, caTextEntry::FormatType fType, QWidget *w);
+
     void TreatRequestedWave(QString pv, QString text, caWaveTable::FormatType fType, int index, QWidget *w);
-    void TreatOrdinaryValue(QString pv, double value, int32_t idata, QWidget *w);
+    void TreatOrdinaryValue(QString pv, double value, int32_t idata, QString svalue, QWidget *w);
     bool getSoftChannel(QString pv, knobData &data);
     int parseForDisplayRate(QString input, int &rate);
     void getStatesToggleAndLed(QWidget *widget, const knobData &data, const QString &String, Qt::CheckState &state);
@@ -268,6 +287,7 @@ private:
     void FlushAllInterfaces();
     void CartesianPlotsVerticalAlign();
     void StripPlotsVerticalAlign();
+    qreal fontResize(double factX, double factY, QVariantList list, int usedIndex);
 
 #ifdef MOBILE
     bool eventFilter(QObject *obj, QEvent *event);
@@ -277,8 +297,7 @@ private:
     Qt::GestureType fingerSwipeGestureType;
 #endif
 
-    enum formatsType {decimal, hexadecimal, octal, string};
-    long getValueFromString(char *textValue, formatsType fType, char **end);
+    long getValueFromString(char *textValue, FormatType fType, char **end);
 
     QWidget *myWidget;
     QList<QWidget*> includeWidgetList;
@@ -303,10 +322,12 @@ private:
     bool firstResize;
     bool allowResize;
     bool pepPrint;
+    bool prcFile;
 
     int origWidth, origHeight;
 
-    QString includeFiles;
+    struct includeData {int count; int ms; QString text;};
+    QMap<QString, includeData> includeFilesList;
 
     SplashScreen *splash;
 
@@ -334,6 +355,8 @@ private:
 #ifdef epics4
     epics4Subs *Epics4;
 #endif
+
+    QString defaultPlugin;
 
 private slots:
     void Callback_EApplyNumeric(double value);
@@ -366,6 +389,20 @@ private slots:
     void handleFileChanged(const QString&);
 
     void Callback_WriteDetectedValues(QWidget* w);
+
+    void Callback_reloadWindow() {
+        emit Signal_ReloadWindow(this);
+    }
+
+    void Callback_reloadAllWindows() {
+        emit Signal_ReloadAllWindows();
+    }
+
+    void Callback_printWindow() {
+        print();
+    }
+
+    void updateResize();
 };
 
 #endif // CaQtDM_Lib_H

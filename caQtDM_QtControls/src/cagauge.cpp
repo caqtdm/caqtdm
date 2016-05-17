@@ -303,7 +303,7 @@ void caLinearGauge::drawMarker(QPainter *p, bool drawValue)
     f = old = p->font();
     f.setPointSize(3);
     p->setFont(f);
-    p->setPen(Qt::red);//p->setPen(EColor(Elettra::red));
+    p->setPen(Qt::red);
 
     if (m_orientation == Qt::Horizontal)
     {
@@ -368,6 +368,9 @@ void caLinearGauge::drawLabels(QPainter *p)
             else
                 check = false;
         }
+
+        CorrectFontIfAndroid(f);
+        p->setFont(f);
 
         for (int i = 0; i < m_numMajorTicks; i++)
         {
@@ -618,6 +621,9 @@ void caCircularGauge::drawLabels(QPainter *p)
         f.setPointSizeF(5.5);
     else
         f.setPointSizeF(5.4);
+
+    CorrectFontIfAndroid(f);
+
     p->setFont(f);
     for (int i = 0; i < m_numMajorTicks; i++)
     {
@@ -666,6 +672,10 @@ void caCircularGauge::drawValue(QPainter *p)
         else
             check = false;
     }
+
+    CorrectFontIfAndroid(f);
+    p->setFont(f);
+
     QRect textRect(x,y+2,w,h);
     p->setBrush(QColor(255,255,255,100));
     p->drawRect(textRect);
@@ -684,5 +694,9 @@ void caCircularGauge::drawValue(QPainter *p)
         else
             check = false;
     }
+
+    CorrectFontIfAndroid(f);
+    p->setFont(f);
+
     p->drawText(-20,35,40,10, Qt::AlignCenter|Qt::TextDontClip, m_label);
 }

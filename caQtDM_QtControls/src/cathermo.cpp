@@ -33,24 +33,25 @@
 #include <QPaintEvent>
 #include "alarmdefs.h"
 #include "qwt_scale_map.h"
+#include "qwt_scale_draw.h"
 #include "cathermo.h"
 
-#define MIN_FONT_SIZE 5
+#define MIN_FONT_SIZE 3
 #define MAX_FONT_SIZE 20
 
 
 // I need to overload the scaleengine of qwt in order to get the upper and lower scale ticks drawn
-class myScaleEngine: public QwtLinearScaleEngine
+class myThermoScaleEngine: public QwtLinearScaleEngine
 {
     virtual QwtScaleDiv divideScale(double x1, double x2, int maxMajorSteps, int maxMinorSteps, double stepSize  ) const {
         QwtScaleDiv sd = QwtLinearScaleEngine::divideScale(x1, x2, maxMajorSteps, maxMinorSteps, stepSize );
         QList<double> ticks = sd.ticks( QwtScaleDiv::MajorTick );
         if(ticks.count() > 0) {
-            if ( ticks.last() < sd.upperBound() || ticks.first() > sd.lowerBound()){
+            if ( ticks.last() < sd.upperBound() || ticks.first() > sd.lowerBound()) {
                 if(ticks.last() < sd.upperBound()) ticks.append(sd.upperBound());
                 if(ticks.first() > sd.lowerBound()) ticks.prepend(sd.lowerBound());
                 sd.setTicks( QwtScaleDiv::MajorTick, ticks );
-            } 
+            }
         }
         return sd;
     }
@@ -58,28 +59,41 @@ class myScaleEngine: public QwtLinearScaleEngine
 
 caThermo::caThermo(QWidget *parent) : QwtThermoMarker(parent), m_externalEnabled(false)
 {
+    // to start with, clear the stylesheet, so that playing around
+    // is not possible.
+    setStyleSheet("");
+
+    isShown = false;
+    oldStyle = "";
+    thisStyle = "";
 
     thisDirection = Up;
-    defaultBackColor = QWidget::palette().background().color();
-    defaultForeColor = palette().foreground().color();
     thisColorMode = Static;
     thisLimitsMode = Channel;
 
-    pointSizePrv = 0.0;
+    oldBackColor = QColor(Qt::white);
+    oldForeColor = QColor(Qt::white);
 
     setBackground(QColor(224,224,224));
     setForeground(Qt::black);
+    setTextColor(Qt::black);
+
+    pointSizePrv = 0.0;
 
     setSpacing(0);
     setBorderWidth(1);
 
     thisLogScale = false;
 
-    valPixOld = -999999;
     setLook(noLabel);
 
-    QwtLinearScaleEngine *scaleEngine = new myScaleEngine();
+    QwtLinearScaleEngine *scaleEngine = new myThermoScaleEngine();
     setScaleEngine( scaleEngine );
+
+    setPrecision(1);
+    setPrecisionMode(Channel);
+    setFormatType(decimal);
+    setScaleValueEnabled(false);
 }
 
 QString caThermo::getPV() const
@@ -92,43 +106,87 @@ void caThermo::setPV(QString const &newPV)
     thisPV = newPV;
 }
 
-void caThermo::setColors(QColor bg, QColor fg)
+void caThermo::setColors(QColor bg, QColor fg, QColor textColor)
 {
+    if(!defaultBackColor.isValid() || !defaultForeColor.isValid()) return;
 
-    if((oldBackColor == bg) && (oldForeColor == fg)) return;
+    if((bg != oldBackColor) || (fg != oldForeColor)  || (textColor != oldTextColor) || (thisColorMode != oldColorMode)) {
 
-    QPalette thisPalette = palette();
-    QColor bgs = bg.darker(125);
-    bgs.setAlpha(255);
-    setAutoFillBackground(true);
-    thisPalette.setColor(QPalette::Background, bg);
-    thisPalette.setColor(QPalette::Base, bgs);
-    thisPalette.setColor(QPalette::ButtonText, fg);
-    setPalette(thisPalette);
+        QPalette thisPalette = palette();
+
+        QString thisStyle = "caThermo {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8)};";
+
+        if(thisColorMode == Default) {
+            thisStyle = thisStyle.arg(defaultBackColor.red()).arg(defaultBackColor.green()).arg(defaultBackColor.blue()).arg(defaultBackColor.alpha()).
+                    arg(defaultForeColor.red()).arg(defaultForeColor.green()).arg(defaultForeColor.blue()).arg(defaultForeColor.alpha());
+            if(thisStyle != oldStyle) setStyleSheet(thisStyle);
+            oldStyle = thisStyle;
+            QColor bgs = defaultBackColor.darker(125);
+            bgs.setAlpha(255);
+            thisPalette.setColor(QPalette::ButtonText, defaultForeColor);
+            thisPalette.setColor(QPalette::Text, textColor);
+            thisPalette.setColor(QPalette::Base, bgs);
+
+            setPalette(thisPalette);
+        } else if(thisColorMode == Static) {
+            thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
+            if(thisStyle != oldStyle) setStyleSheet(thisStyle);
+            oldStyle = thisStyle;
+            QColor bgs = bg.darker(125);
+            bgs.setAlpha(255);
+            thisPalette.setColor(QPalette::ButtonText, fg);
+            thisPalette.setColor(QPalette::Text, textColor);
+            thisPalette.setColor(QPalette::Base, bgs);
+            setPalette(thisPalette);
+
+        } else if(thisColorMode == Alarm_Static) {
+            thisStyle = thisStyle.arg(thisBackColor.red()).arg(thisBackColor.green()).arg(thisBackColor.blue()).arg(thisBackColor.alpha()).
+                    arg(thisForeColor.red()).arg(thisForeColor.green()).arg(thisForeColor.blue()).arg(thisForeColor.alpha());
+            if(thisStyle != oldStyle) setStyleSheet(thisStyle);
+            oldStyle = thisStyle;
+            QColor bgs = bg.darker(125);
+            bgs.setAlpha(255);
+            thisPalette.setColor(QPalette::ButtonText, fg);
+            thisPalette.setColor(QPalette::Text, textColor);
+            thisPalette.setColor(QPalette::Base, bgs);
+            setPalette(thisPalette);
+
+        } else  if(thisColorMode == Alarm_Default) {
+            thisStyle = thisStyle.arg(defaultBackColor.red()).arg(defaultBackColor.green()).arg(defaultBackColor.blue()).arg(defaultBackColor.alpha()).
+                    arg(defaultForeColor.red()).arg(defaultForeColor.green()).arg(defaultForeColor.blue()).arg(defaultForeColor.alpha());
+            if(thisStyle != oldStyle) setStyleSheet(thisStyle);
+            oldStyle = thisStyle;
+            QColor bgs = defaultBackColor.darker(125);
+            bgs.setAlpha(255);
+            thisPalette.setColor(QPalette::ButtonText, fg);
+            thisPalette.setColor(QPalette::Text, textColor);
+            thisPalette.setColor(QPalette::Base, bgs);
+            setPalette(thisPalette);
+        }
+    }
+
     oldBackColor = bg;
     oldForeColor = fg;
+    oldTextColor = textColor;
+    oldColorMode = thisColorMode;
 }
 
 void caThermo::setBackground(QColor c)
 {
-    QColor color = c;
-    if(thisColorMode == Default) {
-        thisBackColor = defaultBackColor;
-    } else {
-      thisBackColor = color;
-    }
-    setColors(thisBackColor, thisForeColor);
+    thisBackColor = c;
+    setColors(thisBackColor, thisForeColor, thisTextColor);
 }
 
 void caThermo::setForeground(QColor c)
 {
-    QColor color = c;
-    if(thisColorMode == Default) {
-       thisForeColor= defaultForeColor;
-    } else {
-      thisForeColor = color;
-    }
-    setColors(thisBackColor, thisForeColor);
+    thisForeColor = c;
+    setColors(thisBackColor, thisForeColor, thisTextColor);
+}
+
+void caThermo::setTextColor(QColor c)
+{
+    thisTextColor = c;
+    setColors(thisBackColor, thisForeColor, thisTextColor);
 }
 
 void caThermo::setLook(Look look)
@@ -154,7 +212,6 @@ void caThermo::setLook(Look look)
 
 void caThermo::setValue(double val)
 {
-    int valPix;
     double thisValue;
     if(thisLogScale && val > 0.0) {
        thisValue = log10(val);
@@ -162,14 +219,18 @@ void caThermo::setValue(double val)
        thisValue = val;
     }
 
-    valPix = qRound(scaleMap().transform(thisValue));
-    if(valPixOld != valPix) {
-      QwtThermoMarker::setValue(thisValue);
-    }
+    QwtThermoMarker::setValue(thisValue);
 }
 
 void caThermo::setDirection(Direction dir)
 {
+
+#if QWT_VERSION < 0x060100
+    ScalePos scalepos = this->scalePosition();
+#else
+    ScalePosition scalepos = this->scalePosition();
+#endif
+
     thisDirection = dir;
 
     switch (dir) {
@@ -211,6 +272,8 @@ void caThermo::setDirection(Direction dir)
         }
         break;
     }
+
+    if(scalepos != NoScale) setScalePosition(scalepos);
     update();
 }
 
@@ -237,15 +300,15 @@ void caThermo::setAlarmColors(short status)
         break;
     }
     if(status == NOTCONNECTED) {
-       setColors(c, c);
+       setColors(c, c, c);
     } else {
-       setColors(thisBackColor, c);
+       setColors(thisBackColor, c, thisTextColor);
     }
 }
 
 void caThermo::setNormalColors()
 {
-    setColors(thisBackColor, thisForeColor);
+    setColors(thisBackColor, thisForeColor, thisTextColor);
 }
 
 void caThermo::setUserAlarmColors(double val)
@@ -262,17 +325,17 @@ void caThermo::setUserAlarmColors(double val)
     case Up:
     case Right:
         if((thisValue < this->minValue()) || (thisValue > this->maxValue())) {
-           setColors(thisBackColor, AL_RED);
+           setColors(thisBackColor, AL_RED, thisTextColor);
         } else {
-           setColors(thisBackColor, AL_GREEN);
+           setColors(thisBackColor, AL_GREEN, thisTextColor);
         }
         break;
     case Down:
     case Left:
         if((thisValue < this->maxValue()) || (thisValue > this->minValue())) {
-           setColors(thisBackColor, AL_RED);
+           setColors(thisBackColor, AL_RED, thisTextColor);
         } else {
-           setColors(thisBackColor, AL_GREEN);
+           setColors(thisBackColor, AL_GREEN, thisTextColor);
         }
         break;
     }
@@ -283,6 +346,19 @@ void caThermo::setUserAlarmColors(double val)
 bool caThermo::event(QEvent *e)
 {
     if(e->type() == QEvent::Resize || e->type() == QEvent::Show || e->type() == QEvent::Paint) {
+
+        if(!isShown) {
+            QString c=  palette().color(QPalette::Base).name();
+            defaultBackColor = QColor(c);
+            c =  palette().color(QPalette::Text).name();
+            defaultForeColor = QColor(c);
+
+            if(!defaultBackColor.isValid()) defaultBackColor = QColor(255, 248, 220, 255);
+            if(!defaultForeColor.isValid()) defaultForeColor = Qt::black;
+
+            setColors(thisBackColor, thisForeColor, thisTextColor);
+            isShown = true;
+        }
 
         const caThermo* that = this;
 
@@ -369,6 +445,102 @@ bool caThermo::event(QEvent *e)
         }
 
     }
-
     return QwtThermoMarker::event(e);
+}
+
+//Overridden from QwtSlider to add the display of the current value
+void caThermo::drawLiquid(QPainter *painter, const QRect &sliderRect ) const
+{
+    QwtThermoMarker::drawLiquid(painter, sliderRect);
+    if(this->scalePosition() != NoScale && thisScaleValueEnabled) {
+        paintValue (painter,  sliderRect);
+    }
+}
+
+// Draws the label with the value on the widget
+void caThermo::paintValue(QPainter *painter, QRect valueRect) const
+{
+    QString label = setScaleLabel(value());
+    if(orientation() == Qt::Horizontal) {
+        painter->drawText( valueRect, Qt::AlignCenter, label );
+    } else {
+        QFontMetrics fm(font());
+        int w = fm.width(label);
+        int h = fm.height();
+        switch (this->scalePosition()) {
+        case LeftScale:
+            painter->rotate(270);
+            painter->drawText(QPoint(-valueRect.height()/2-w/2, width() - valueRect.width() + h - fm.descent()), label);
+            break;
+        case RightScale:
+            painter->rotate(270);
+            painter->drawText(QPoint(-valueRect.height()/2-w/2, valueRect.width()/2 + h/2 - fm.descent()), label);
+            break;
+        case TopScale:
+        case BottomScale:
+        case NoScale:
+            break;
+        }
+    }
+}
+
+// Creates the precision format the value label will use
+void caThermo::setFormat(int prec)
+{
+    int precision = prec;
+    if(precision > 17) precision = 17;
+    if(thisPrecMode == User) {
+        precision = getPrecision();
+    }
+    switch (thisFormatType) {
+    case decimal:
+        if(precision >= 0) {
+            sprintf(thisFormat, "%s.%dlf", "%", precision);
+        } else {
+            sprintf(thisFormat, "%s.%dle", "%", -precision);
+        }
+        break;
+    case compact:
+        sprintf(thisFormat, "%s.%dle", "%", qAbs(precision));
+        sprintf(thisFormatC, "%s.%dlf", "%", qAbs(precision));
+        break;
+    case exponential:
+    case engr_notation:
+        sprintf(thisFormat, "%s.%dle", "%", qAbs(precision));
+        break;
+    case truncated:
+        strcpy(thisFormat, "%d");
+        break;
+    default:
+        sprintf(thisFormat, "%s.%dlf", "%", precision);
+    }
+
+}
+
+// Creates the QString that will be displayed for the value label
+QString caThermo::setScaleLabel(double value) const
+{
+    char asc[1024];
+    QString label;
+
+    if(thisFormatType == compact) {
+        if ((value < 1.e4 && value > 1.e-4) || (value > -1.e4 && value < -1.e-4) || value == 0.0) {
+            sprintf(asc, thisFormatC, value);
+        } else {
+            sprintf(asc, thisFormat, value);
+        }
+    } else if(thisFormatType == truncated) {
+        sprintf(asc, thisFormat, (int) value);
+    } else {
+        sprintf(asc, thisFormat, value);
+    }
+    label = QString::fromAscii(asc);
+
+    return label;
+}
+
+void caThermo::setScaleValueEnabled(bool b)
+{
+    thisScaleValueEnabled = b;
+    update();
 }

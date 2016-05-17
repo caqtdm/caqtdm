@@ -67,13 +67,14 @@ class QwtPlotCurve;
 #include <qwt_plot_glcanvas.h>
 #endif
 
+#include "caPropHandleDefs.h"
+
 class QTCON_EXPORT caStripPlot : public QwtPlot
 {
-
     Q_OBJECT
 
 #if QWT_VERSION >= 0x060100
-    // suppress theese properties for the designer
+    // suppress these properties for the designer
     Q_PROPERTY( QBrush canvasBackground READ canvasBackground WRITE setCanvasBackground DESIGNABLE false)
     Q_PROPERTY( bool autoReplot READ autoReplot WRITE setAutoReplot DESIGNABLE false)
 #endif
@@ -89,7 +90,11 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
     Q_PROPERTY(QString Title READ getTitlePlot WRITE setTitlePlot)
     Q_PROPERTY(QString TitleX READ getTitleX WRITE setTitleX)
     Q_PROPERTY(QString TitleY READ getTitleY WRITE setTitleY)
-    Q_PROPERTY(QString channels READ getPVS WRITE setPVS)
+
+    // for compatibility either one can be used, both will be updated
+    Q_PROPERTY(QStringList channelsList READ getPVSList WRITE setPVSList STORED false)
+    Q_PROPERTY(QString channels READ getPVS WRITE setPVS DESIGNABLE inactiveButVisible())
+
     Q_PROPERTY(units units READ getUnits WRITE setUnits)
     Q_PROPERTY(double period READ getPeriod WRITE setPeriod)
     Q_PROPERTY(cpuUsage refreshRate READ getUsageCPU WRITE setUsageCPU)
@@ -171,7 +176,14 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
 
     Q_PROPERTY(int XaxisSyncGroup READ getXaxisSyncGroup WRITE setXaxisSyncGroup)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
 public:
+
+#include "caPropHandle.h"
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     enum {MAXCURVES = 7};
 
@@ -217,6 +229,8 @@ public:
 
     QString getPVS() const {return thisPVS.join(";");}
     void setPVS(QString const &newPV) {thisPVS = newPV.split(";");}
+    QStringList getPVSList() const {return thisPVS;}
+    void setPVSList(QStringList list) {thisPVS = list; updatePropertyEditorItem(this, "channels");}
 
     units getUnits() const {return thisUnits;}
     void setUnits(units const &newU) {thisUnits = newU; defineXaxis(thisUnits, thisPeriod);}
@@ -424,6 +438,8 @@ public:
 
     void setLegendAttribute(QColor c, QFont f, LegendAtttribute sw);
 
+    void setTicksResizeFactor(float factX, float factY);
+
 protected:
     void resizeEvent ( QResizeEvent * event);
 
@@ -517,5 +533,7 @@ private:
 
     int thisXaxisSyncGroup;
     int thisXticks;
+    float ResizeFactorX, ResizeFactorY;
+    float oldResizeFactorX, oldResizeFactorY;
 };
 #endif

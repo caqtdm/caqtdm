@@ -150,8 +150,10 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
         curve[i].setStyle(QwtPlotCurve::Lines);
         curve[i].attach(this);
         curve[i].setOrientation(Qt::Vertical);
-        curve[i].setPaintAttribute( QwtPlotCurve::ClipPolygons, true );
-
+        curve[i].setPaintAttribute(QwtPlotCurve::ClipPolygons, true);
+#if QWT_VERSION >= 0x060100
+        curve[i].setRenderThreadCount( 0 ); // 0: use QThread::idealThreadCount()
+#endif
     }
 
     setStyle_1(Lines);
@@ -194,7 +196,7 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     canvas->setPaintAttribute(QwtPlotCanvas::Opaque, false);
     canvas->setAttribute( Qt::WA_OpaquePaintEvent, false );
     canvas->setAutoFillBackground( false );   // use in ui file this parameter for transparency
-#endif
+    #endif
 #endif
 
     installEventFilter(this);
@@ -304,22 +306,28 @@ void caCartesianPlot::fillData(pureData *array, int size, int curvIndex, int cur
         // keep data points
         if(curvXY == CH_X) {                       // X
             X[curvIndex].resize(size);
-            X[curvIndex].clear();
-            for(int i=0; i< size; i++) X[curvIndex].append(array[i]);
+            double *data = X[curvIndex].data();
+            for(int i=0; i< size; i++) data[i] = array[i];
         } else {                                   // Y
             Y[curvIndex].resize(size);
-            Y[curvIndex].clear();
-            for(int i=0; i< size; i++) Y[curvIndex].append(array[i]);
+            double *data = Y[curvIndex].data();
+            for(int i=0; i< size; i++) data[i] = array[i];
         }
 
         // only x channel was specified, use index as y
         if(curvType == X_only) {
-            Y[curvIndex].clear();
-            for(int i=0; i< size; i++) Y[curvIndex].append(i);
+            if(size !=  Y[curvIndex].size()) {
+            Y[curvIndex].resize(size);
+            double *data = Y[curvIndex].data();
+            for(int i=0; i< size; i++) data[i] = i;
+            }
             // only y channel was specified, use index as x
         } else if(curvType == Y_only) {
-            X[curvIndex].clear();
-            for(int i=0; i< size; i++) X[curvIndex].append(i);
+            if(size !=  X[curvIndex].size()) {
+            X[curvIndex].resize(size);
+            double *data = X[curvIndex].data();
+            for(int i=0; i< size; i++) data[i] = i;
+            }
         }
 
         // when triggering is specified, we will return here
@@ -330,7 +338,7 @@ void caCartesianPlot::fillData(pureData *array, int size, int curvIndex, int cur
     } else if(curvXY == CH_Trigger) {
 /*
         int i = X[curvIndex].size();
-        int j = Y[curvIndex].size();    
+        int j = Y[curvIndex].size();
         if(i != 0 && j != 0)
          printf("trigger came for curvIndex=%d %d %d %f %f\n", curvIndex,
                 X[curvIndex].size(), Y[curvIndex].size(),
@@ -501,10 +509,10 @@ void caCartesianPlot::setSamplesData(int index, double *x, double *y, int size, 
                 if(y[i] < 1.e-20) YAUX[i] = 1.e-20;
             }
         }
-        curve[index].setSamples(XAUX.data(), YAUX.data(), size);
+        curve[index].setRawSamples(XAUX.data(), YAUX.data(), size);
     }
     else {
-        curve[index].setSamples(x, y, size);
+        curve[index].setRawSamples(x, y, size);
     }
 }
 
@@ -607,6 +615,7 @@ QwtPlotCurve::CurveStyle caCartesianPlot::myStyle(curvStyle s)
     case Steps:
         ms = QwtPlotCurve::Steps;  break;
     case Dots:
+    case FatDots:
         ms = QwtPlotCurve::Dots;  break;
     case FillUnder:
         ms = QwtPlotCurve::Lines;  break;

@@ -51,11 +51,16 @@ class QTCON_EXPORT caScriptButton : public QWidget
     Q_PROPERTY(QString scriptCommand READ getScriptCommand WRITE setScriptCommand)
     Q_PROPERTY(QString scriptParameter READ getScriptParam WRITE setScriptParam)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
 #include "caElevation.h"
 
 public:
 
-     enum defaultDisplay {Invisible, Visible};
+    void noStyle(QString style) {Q_UNUSED(style);}
+
+    enum defaultDisplay {Invisible, Visible};
 
     caScriptButton(QWidget *parent);
 

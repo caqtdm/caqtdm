@@ -63,8 +63,8 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     }
   #else
     setGeometry(0,0, desktopSize.width(), desktopSize.height());
-    windowlayout->setContentsMargins(qRound(desktopSize.width() * 0.2), qRound(desktopSize.height() * 0.25),
-                                     qRound(desktopSize.width() * 0.2), qRound(desktopSize.height() * 0.25));
+    windowlayout->setContentsMargins(qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.15),
+                                     qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.25));
   #endif
 #else
     QDesktopWidget * Desktop = QApplication::desktop();
@@ -115,7 +115,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     clearLayout->setContentsMargins(3, 3, 3, 3);
 
     // first group
-    QGroupBox* clearBox = new QGroupBox("Local ui/prc/graphic files");
+    QGroupBox* clearBox = new QGroupBox("Local ui/prc/graphic/config files");
     specials.setNewStyleSheet(clearBox, desktopSize, 22, 13, 0);
 
     // first group, labels
@@ -126,7 +126,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     clearLayout->addWidget(fileCountLabel, 0, 1);
 
     // first group, clear config button
-    QPushButton* clearConfigButton = new QPushButton("Clear config files");
+    QPushButton* clearConfigButton = new QPushButton("Reset configuration");
 #ifdef MOBILE_ANDROID
     specials.setNewStyleSheet(clearConfigButton, desktopSize, 22, 15, buttonStyle, 2);
 #endif
@@ -138,7 +138,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     clearConfigButton->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR));
 
     // first group, clear ui button
-    QPushButton* clearUiButton = new QPushButton("Clear ui files");
+    QPushButton* clearUiButton = new QPushButton("Clear files");
 #ifdef MOBILE_ANDROID
     specials.setNewStyleSheet(clearUiButton, desktopSize, 22, 15, buttonStyle, 2);
 #endif
@@ -194,7 +194,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     // adjust height
     height = urlComboBox->minimumSizeHint().height();
 #ifdef MOBILE_ANDROID
-    urlComboBox->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR*1.2));
+    urlComboBox->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR*1.1));
 #else
     urlComboBox->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR));
 #endif
@@ -229,7 +229,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     // adjust height
     height = fileComboBox->minimumSizeHint().height();
 #ifdef MOBILE_ANDROID
-    fileComboBox->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR*1.2));
+    fileComboBox->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR*1.1));
 #else
     fileComboBox->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR));
 #endif
@@ -278,16 +278,34 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
 void configDialog::getChoice(QString &url, QString &file, QList<QString> &urls, QList<QString> &files, bool &debugWindow)
 {
+    int urlIndx = -1;
+    int fileIndx = -1;
     urls.clear();
     files.clear();
-    for(int i=0; i< 5; i++) {
-        if(urlComboBox->itemText(i).length() > 1) urls.append(urlComboBox->itemText(i));
-        url = urlComboBox->currentText();
-    }
-    for(int i=0; i< 5; i++) {
-        if(fileComboBox->itemText(i).length() > 1) files.append(fileComboBox->itemText(i));
+
+    if(fileComboBox->currentText().length() > 1) {
+        fileIndx = fileComboBox->currentIndex();
         file = fileComboBox->currentText();
+        fileComboBox->setItemText(fileIndx, file);
     }
+
+    if(urlComboBox->currentText().length() > 1) {
+        urlIndx = urlComboBox->currentIndex();
+        url = urlComboBox->currentText();
+        urlComboBox->setItemText(urlIndx, url);
+    }
+
+    // last used file on first position
+    urls.append(url);
+    files.append(file);
+
+    for(int i=0; i< 5; i++) {
+        if((urlComboBox->itemText(i).length() > 1) && (i != urlIndx)) urls.append(urlComboBox->itemText(i));
+        else if(urlIndx != i) urls.append(QString::number(i+1));
+        if((fileComboBox->itemText(i).length() > 1) && (i != fileIndx)) files.append(fileComboBox->itemText(i));
+        else if(fileIndx != i) files.append(QString::number(i+1));
+    }
+
     if(debugComboBox->currentIndex() == 1) debugWindow = true;
     else debugWindow = false;
 }
@@ -300,7 +318,7 @@ void configDialog::clearUiClicked()
 
     path.append("/");
     QDir dir(path);
-    dir.setNameFilters(QStringList() << "*.ui" << "*.prc" << "*.gif" << "*.jpg" << "*.png");
+    dir.setNameFilters(QStringList() << "*.ui" << "*.prc" << "*.gif" << "*.jpg" << "*.png" << "*.config");
     dir.setFilter(QDir::Files);
     foreach(QString dirFile, dir.entryList()) dir.remove(dirFile);
 
@@ -316,7 +334,7 @@ void configDialog::clearConfigClicked()
 
     path.append("/");
     QDir dir(path);
-    dir.setNameFilters(QStringList() << "*.config" << "*.xml");
+    dir.setNameFilters(QStringList() << "*.xml");
     dir.setFilter(QDir::Files);
     foreach(QString dirFile, dir.entryList()) dir.remove(dirFile);
     ClearConfigButtonClicked = true;
@@ -353,7 +371,7 @@ int configDialog::NumberOfFiles()
 
     path.append("/");
     QDir dir(path);
-    dir.setNameFilters(QStringList() << "*.ui" << "*.prc" << "*.gif" << "*.jpg" << "*.png");
+    dir.setNameFilters(QStringList() << "*.ui" << "*.prc" << "*.gif" << "*.jpg" << "*.png" << "*.config");
     dir.setFilter(QDir::Files);
     foreach(QString dirFile, dir.entryList()) count++;
     return count;
@@ -361,6 +379,7 @@ int configDialog::NumberOfFiles()
 
 void configDialog::exec()
 {
+    loop.processEvents();
     loop.exec();
     close();
 }
@@ -375,10 +394,10 @@ bool configDialog::eventFilter(QObject *obj, QEvent *event)
 {
    if(event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
       QKeyEvent *me = static_cast<QKeyEvent *>(event);
-      if(me->key() == Qt::Key_Return) {
+      if((me->key() == Qt::Key_Return) && (loop.isRunning())) {
            StartButtonClicked = true;
            close();
-      } else  if(me->key() == Qt::Key_Escape) {
+      } else  if((me->key() == Qt::Key_Escape)  && (loop.isRunning())) {
           EscapeButtonClicked = true;
           close();
       }

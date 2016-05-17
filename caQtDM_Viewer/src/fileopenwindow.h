@@ -57,6 +57,10 @@
 #include <stdio.h>
 
 #include "epicsExternals.h"
+#if defined(_MSC_VER)
+    int setenv(const char *name, const char *value, int overwrite);
+#endif
+
 
  class FileOpenWindow : public QMainWindow
  {
@@ -64,7 +68,11 @@
 
  public:
      FileOpenWindow(QMainWindow *parent = 0,  QString filename = "", QString macroString = "",
-                    bool attach = false, bool minimize = false, QString geometry = "", bool printscreen = false, bool resizing = true);
+                    bool attach = false, bool minimize = false, QString geometry = "", bool printscreen = false, bool resizing = true,
+                    QMap<QString, QString> options = (QMap<QString, QString>()));
+
+     QMainWindow *loadMainWindow(const QPoint &position, const QString &fileS, const QString &macroS, const QString &resizeS,
+                                         const bool &printexit, const bool &moveit, const bool &centerwindow);
      bool isRunning();
      bool sendMessage(const QString &message);
      void fillPVtable(int &countPV, int &countnotConnected, int &countDisplayed);
@@ -88,7 +96,7 @@
      void Callback_ActionReload();
      void Callback_ActionUnconnected();
      void Callback_EmptyCache();
-     void Callback_OpenNewFile(const QString&, const QString&, const QString&);
+     void Callback_OpenNewFile(const QString&, const QString&, const QString&, const QString&);
      void checkForMessage();
      void Callback_PVwindowExit();
 
@@ -96,25 +104,37 @@
      void onApplicationStateChange(Qt::ApplicationState state);
 #endif
 
- public slots:
-     void doSomething() { printf("About to quit!\n"); sharedMemory.detach();}
+public slots:
+     void doSomething() {
+         printf("About to quit!\n");
+#if defined linux || defined TARGET_OS_MAC
+         // remove temporary file created by caQtDM for pipe reading
+         if(lastFile.contains("qt-tempFile")) {
+             QFile::remove(lastFile);
+         }
+#endif
+         sharedMemory.detach();
+     }
      void nextWindow();
      void Callback_IosExit();
+     void Callback_ReloadWindow(QWidget*);
+     void Callback_ReloadAllWindows();
 
- protected:
+protected:
      virtual void timerEvent(QTimerEvent *e);
      Qt::GestureType fingerSwipeGestureType;
 
 signals:
    void messageAvailable(QString message);
 
- private:
+private:
 
      void closeEvent(QCloseEvent* ce);
      void FlushAllInterfaces();
      void TerminateAllInterfaces();
+     void reload(QWidget *w);
      QMainWindow *lastWindow;
-     QString lastMacro, lastFile, lastGeometry;
+     QString lastMacro, lastFile, lastGeometry, lastResizing;
      Ui::MainWindow ui;
      QSharedMemory sharedMemory;
      bool _isRunning;
@@ -138,6 +158,11 @@ signals:
      bool fromIOS;
 
      QMap<QString, ControlsInterface*> interfaces;
+     QMap<QString, QString> OptionList;
+
+     struct Row {QPoint position; QString file; QString macro; QString resize;};
+
+     QList<Row> reloadList;
 
  };
 

@@ -29,25 +29,45 @@
 
 caByteController::caByteController(QWidget *parent) : QWidget(parent)
 {
+    // to start with, clear the stylesheet, so that playing around
+    // is not possible.
+    setStyleSheet("");
+
     numRows = 32;
 
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-    signalMapper = new QSignalMapper(this);
 
     setAccessW(true);
 
     grid = new QGridLayout(this);
     grid->setMargin(0);
     grid->setSpacing(0);
-    thisStartBit = 0;
-    thisEndBit = 31;
+    prvStartBit = thisStartBit = 0;
+    prvEndBit = thisEndBit = 31;
     thisColorMode=Static;
     thisScaleMode = EPushButton::WidthAndHeight;
-    setDirection(Down);
-    setTrueColor(Qt::blue);
-    setFalseColor(Qt::gray);
-    setTextColor(Qt::black);
+    thisDirection = Down;
+    thisTrueColor = Qt::blue;
+    thisFalseColor = Qt::gray;
+    thisTextColor = Qt::black;
+    thisValue = 0;
+
+    // for performance reasons create 32 pushbuttons
+    signalMapper = new QSignalMapper(this);
+    for (int i = 0; i < 32; i++) {
+        EPushButton* temp =  new EPushButton(QString::number(i + thisStartBit), this);
+        temp->setFontScaleMode(thisScaleMode);
+        temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        temp->setMinimumSize(2,2); //important for resizing as small as possible
+        temp->setBotTopBorderWidth(0);
+        connect(temp, SIGNAL(clicked()), signalMapper, SLOT(map()));
+        cells.push_back(temp);
+        prvColor[i] = Qt::white;
+        prvTextcolor[i] = Qt::white;
+    }
+
+    connect(signalMapper, SIGNAL(mapped(int)),this, SIGNAL(clicked(int)));
+
     arrangeCells();
 
     setElevation(on_top);
@@ -70,49 +90,26 @@ void caByteController::arrangeCells()
     foreach(EPushButton *l, cells) {
         grid->removeWidget(l);
         l->hide();
-        l->deleteLater();
+        signalMapper->removeMappings(l);
     }
-    cells.clear();
-
-    // signalmapper will map signals from all buttons to one signal
-    delete signalMapper;
-    signalMapper = new QSignalMapper(this);
 
     for (int i = 0; i < numRows; i++) {
-        EPushButton* temp;
-
         if(thisDirection == Down || thisDirection == Right)  {
-           temp = new EPushButton(QString::number(i + thisStartBit), this);
+            cells[i]->setText(QString::number(i + thisStartBit));
+            signalMapper->setMapping(cells[i], i + thisStartBit);
         } else {
-           temp = new EPushButton(QString::number(thisEndBit - i), this);
+           cells[i]->setText(QString::number(thisEndBit - i));
+           signalMapper->setMapping(cells[i], thisEndBit - thisStartBit  - i);
         }
-
-        temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        if(thisScaleMode == EPushButton::None) {  // in this case we may use font
-            temp->setFont(this->font());
-        } else {
-            temp->setFontScaleMode(thisScaleMode);
-        }
-        temp->setMinimumSize(2,2); //important for resizing as small as possible
-        temp->setBotTopBorderWidth(0);
 
         if(thisDirection == Up || thisDirection == Down) {
-          grid->addWidget(temp, i, 0);
+           grid->addWidget(cells[i], i, 0);
         } else {
-          grid->addWidget(temp, 0, i);
+           grid->addWidget(cells[i], 0, i);
         }
-        cells.push_back(temp);
-        temp->show();
-
-        if(thisDirection == Down || thisDirection == Right) {
-            signalMapper->setMapping(temp, i + thisStartBit);
-        } else {
-            signalMapper->setMapping(temp, thisEndBit - thisStartBit  - i);
-        }
-        connect(temp, SIGNAL(clicked()), signalMapper, SLOT(map()));
+        setColor(i, thisFalseColor, thisTextColor);
+        cells[i]->show();
     }
-    setValue(0);
-    connect(signalMapper, SIGNAL(mapped(int)),this, SIGNAL(clicked(int)));
 }
 
 bool caByteController::bitState(long value, int bitNr)
@@ -136,24 +133,32 @@ void caByteController::drawByte(long lvalue, QColor trueColor, QColor falseColor
     if(thisDirection == Down || thisDirection == Right)  {
         for(int i=0; i<= thisEndBit - thisStartBit; i++) {
             if(bitState(lvalue, i + thisStartBit)) {
-                setColor(cells[i], trueColor, thisTextColor);
+                setColor(i, trueColor, thisTextColor);
             } else {
-                setColor(cells[i], falseColor, thisTextColor);
+                setColor(i, falseColor, thisTextColor);
             }
         }
     } else {
         for(int i=0; i<= thisEndBit - thisStartBit; i++) {
             if(bitState(lvalue, i + thisStartBit)) {
-                setColor(cells[thisEndBit - thisStartBit  - i], trueColor, thisTextColor);
+                setColor(thisEndBit - thisStartBit  - i, trueColor, thisTextColor);
             } else {
-                setColor(cells[thisEndBit - thisStartBit  - i], falseColor, thisTextColor);
+                setColor(thisEndBit - thisStartBit  - i, falseColor, thisTextColor);
             }
         }
     }
 }
 
-void caByteController::setColor(EPushButton *button, QColor c, QColor text)
+void caByteController::setColor(int indx, QColor c, QColor text)
 {
+    if(prvColor[indx] == c && prvTextcolor[indx] == text) return;
+    //printf("setcolors indx=%d c=%d %d %d prv=%d %d %d text=%d %d %d prv=%d %d %d\n", indx, c.red(), c.green(), c.blue(),
+    //                                                                       prvColor[indx].red(), prvColor[indx].green(), prvColor[indx].blue(),
+    //                                                                       text.red(), text.green(), text.blue(),
+    //                                                                       prvTextcolor[indx].red(), prvTextcolor[indx].green(), prvTextcolor[indx].blue());
+    prvColor[indx] = c;
+    prvTextcolor[indx] = text;
+
     QColor  highlightColor = c.lighter(120);
     QColor  pressedColor = c.darker(120);
 
@@ -167,25 +172,24 @@ void caByteController::setColor(EPushButton *button, QColor c, QColor text)
             .arg(pressedColor.red()).arg(pressedColor.green()).arg(pressedColor.blue()).arg(pressedColor.alpha());
     style.append(hover);
 
-    button->setStyleSheet(style);
+    cells[indx]->setStyleSheet(style);
 }
 
 void caByteController::setTrueColor(QColor c)
 {
     thisTrueColor = c;
-    arrangeCells();
 }
 
 void caByteController::setFalseColor(QColor c)
 {
     thisFalseColor = c;
-    arrangeCells();
+    drawByte(thisValue, thisTrueColor, thisFalseColor);
 }
 
 void caByteController::setTextColor(QColor c)
 {
     thisTextColor = c;
-    arrangeCells();
+    drawByte(thisValue, thisTrueColor, thisFalseColor);
 }
 
 void caByteController::setAlarmColors(short status)
@@ -212,15 +216,15 @@ void caByteController::setAlarmColors(short status)
     }
 
     if(status == NOTCONNECTED) {
-      for(int i=0; i<= thisEndBit - thisStartBit; i++)  setColor(cells[i], c, thisTextColor);
+      for(int i=0; i<= thisEndBit - thisStartBit; i++)  setColor(i, c, thisTextColor);
     } else {
         drawByte(thisValue, c, thisFalseColor);
     }
-
 }
 
 void caByteController::setStartBit(int const &bit) {
-    thisStartBit = bit;
+    if(prvStartBit == bit) return;
+    prvStartBit = thisStartBit = bit;
     numRows = thisEndBit - thisStartBit + 1;
     if(numRows < 1) {
         thisStartBit=0;
@@ -235,7 +239,8 @@ void caByteController::setStartBit(int const &bit) {
 }
 
 void caByteController::setEndBit(int const &bit) {
-    thisEndBit = bit;
+    if(prvEndBit == bit) return;
+    prvEndBit = thisEndBit = bit;
     numRows = thisEndBit - thisStartBit + 1;
     if(numRows < 1) {
         thisStartBit=0;
@@ -264,16 +269,20 @@ void caByteController::resizeEvent(QResizeEvent *e)
 
 void caByteController::setFontScaleModeL(EPushButton::ScaleMode m)
 {
-   thisScaleMode = m;
-   arrangeCells();
+    thisScaleMode = m;
+
+    for (int i = 0; i < numRows; i++) {
+        cells[i]->setFontScaleMode(thisScaleMode);
+        if(thisScaleMode == EPushButton::None) {  // in this case we may use font
+            cells[i]->setFont(this->font());
+        }
+    }
 }
 
 EPushButton::ScaleMode caByteController::fontScaleMode()
 {
-    arrangeCells();
     return thisScaleMode;
 }
-
 
 void caByteController::setAccessW(bool access)
 {

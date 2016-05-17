@@ -29,20 +29,26 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QStyleOptionFrame>
+#include <QKeyEvent>
 #include <QStyle>
 
 caToggleButton::caToggleButton(QWidget *parent) : QCheckBox(parent), FontScalingWidget(this)
 {
+    // to start with, clear the stylesheet, so that playing around
+    // is not possible.
+    setStyleSheet("");
+
     setCheckable(true);
     setTristate(true);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+    isShown = false;
     thisPalette = palette();
-    thisBackColor = defaultBackColor = QColor(200,200,200,0);
-    thisForeColor = defaultForeColor = Qt::black;
-    thisColorMode=Static;
-    setBackground(defaultBackColor);
-    setForeground(defaultForeColor);
+    thisBackColor = oldBackColor = QColor(200,200,200,0);
+    thisForeColor = oldForeColor = Qt::black;
+    thisColorMode=Default;
+    oldColorMode =Default;
+    setColorMode(Default);
 
     installEventFilter(this);
     connect(this, SIGNAL(clicked()), this, SLOT(buttonToggled()) );
@@ -55,6 +61,8 @@ caToggleButton::caToggleButton(QWidget *parent) : QCheckBox(parent), FontScaling
     setFontScaleModeL(WidthAndHeight);
 
     setElevation(on_top);
+
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 void  caToggleButton::buttonToggled()
@@ -81,35 +89,40 @@ void caToggleButton::setState(Qt::CheckState state)
 void caToggleButton::setColors(QColor bg, QColor fg)
 {
     if((oldBackColor == bg) && (oldForeColor == fg)) return;
-    QPalette thisPalette = palette();
-    thisPalette.setColor(QPalette::WindowText, fg);
-    //thisPalette.setColor(QPalette::Text, fg); // causes problem with tristate
 
-    thisPalette.setColor(QPalette::Button, bg);
-    setPalette(thisPalette);
-    oldBackColor = bg;
-    oldForeColor = fg;
+    if(!defBackColor.isValid() || !defForeColor.isValid()) return;
+    if((bg != oldBackColor) || (fg != oldForeColor) || (thisColorMode != oldColorMode)) {
+        if(thisColorMode == Default) {
+            thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
+            thisStyle = thisStyle.arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
+                    arg(defForeColor.red()).arg(defForeColor.green()).arg(defForeColor.blue()).arg(defForeColor.alpha());
+
+        } else {
+            thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
+            thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
+                    arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
+            oldBackColor = bg;
+            oldForeColor = fg;
+        }
+    }
+
+    if(thisStyle != oldStyle || thisColorMode != oldColorMode) {
+        setStyleSheet(thisStyle);
+        oldStyle = thisStyle;
+        update();
+    }
+    oldColorMode = thisColorMode;
 }
 
 void caToggleButton::setBackground(QColor c)
 {
-    QColor color = c;
-    if(thisColorMode == Default) {
-        thisBackColor = defaultBackColor;
-    } else {
-      thisBackColor = color;
-    }
+    thisBackColor = c;
     setColors(thisBackColor, thisForeColor);
 }
 
 void caToggleButton::setForeground(QColor c)
 {
-    QColor color = c;
-    if(thisColorMode == Default) {
-       thisForeColor= defaultForeColor;
-    } else {
-      thisForeColor = color;
-    }
+    thisForeColor = c;
     setColors(thisBackColor, thisForeColor);
 }
 
@@ -179,11 +192,42 @@ bool caToggleButton::eventFilter(QObject *obj, QEvent *event)
     } else if(event->type() == QEvent::Leave) {
         QApplication::restoreOverrideCursor();
         setEnabled(true);
+    }  else if(event->type() == QEvent::KeyRelease) {
+        QKeyEvent *me = static_cast<QKeyEvent *>(event);
+         // move cursor with tab focus
+        if(me->key() == Qt::Key_Tab) {
+            QCursor *cur = new QCursor;
+            QPoint p = QWidget::mapToGlobal(QPoint(this->width()/2, this->height()/2));
+            cur->setPos( p.x(), p.y());
+            setFocus();
+        }
     }
     return QObject::eventFilter(obj, event);
 }
 
 
+bool caToggleButton::event(QEvent *e)
+{
+    if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
+        // we try to get the default color for the background set through the external stylesheets
+        if(!isShown) {
+          setStyleSheet("");
+          QString c=  palette().color(QPalette::Base).name();
+          defBackColor = QColor(c);
+          //printf("default back color %s %s\n", qasc(c), qasc(this->objectName()));
+          c=  palette().color(QPalette::Text).name();
+          defForeColor = QColor(c);
+          //printf("default fore color %s %s\n", qasc(c), qasc(this->objectName()));
+
+          if(!defBackColor.isValid()) defBackColor = QColor(255, 248, 220, 255);
+          if(!defForeColor.isValid()) defForeColor = Qt::black;
+
+          setColors(thisBackColor, thisForeColor);
+          isShown = true;
+        }
+    }
+    return QCheckBox::event(e);
+}
 
 
 

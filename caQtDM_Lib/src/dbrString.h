@@ -26,6 +26,6 @@
 #ifndef DBRSTRING_H
 #define DBRSTRING_H
 
-typedef char dbr_string_t[40];
+typedef char caqtdm_string_t[40];
 
 #endif // DBRSTRING_H

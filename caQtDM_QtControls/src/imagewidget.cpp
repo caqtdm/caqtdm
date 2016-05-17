@@ -89,6 +89,8 @@ void ImageWidget::paintEvent(QPaintEvent * event)
     QPainter painter(this);
     painter.save();
 
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
+
     if (imageNew.isNull()) {
         painter.setPen(Qt::white);
         painter.setBrush(QBrush(QColor(100,100,100,255)));

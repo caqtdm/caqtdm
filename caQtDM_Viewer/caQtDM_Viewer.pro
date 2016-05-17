@@ -1,3 +1,6 @@
+TARGET_PRODUCT = "Display Manager"
+TARGET_FILENAME = "caqtdm.exe"
+
 include(qtdefs.pri)
 CONFIG += caQtDM_Viewer
 include(../caQtDM.pri)
@@ -9,8 +12,8 @@ contains(QT_VER_MAJ, 4) {
 contains(QT_VER_MAJ, 5) {
    QT     += core gui svg uitools  printsupport network opengl
    CONFIG += qt warn_on thread widgets
-   DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000 
-} 
+   DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
+}
 
 TARGET = caQtDM
 TEMPLATE = app
@@ -34,14 +37,25 @@ SOURCES +=\
     caQtDM.cpp \
     fileopenwindow.cpp \
     messagebox.cpp \
-    configDialog.cpp
+    configDialog.cpp \
+    pipereader.cpp
 
 HEADERS  +=  \
     messagebox.h \
     fileopenwindow.h \
-    configDialog.h
+    configDialog.h \
+    pipereader.h
 
 FORMS += main.ui
 
+# when epics4 not build, then do not import statically in fileopenwindow.cpp
+epics4 {
+ DEFINES +=  EPICS4
+}
+
+# had to take the image formats out for building ios now. However images still work?!!
+ios {
+QTPLUGIN.imageformats=-
+}
 
 

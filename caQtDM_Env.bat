@@ -8,9 +8,9 @@ IF "%1"=="3" GOTO SELECT3
 
 echo =============================================================================================
 echo Select Build Environment
-echo 1) QT 4.8.5 QWT6.0.1  32 Bit VS2010  
-echo 2) QT 5.4.1 QWT6.1.2  64 Bit VS2013  
-echo 3) QT 5.4.1 QWT6.1.2  32 Bit VS2013  
+echo 1) QT 4.8.5 QWT6.1.2  32 Bit VS2010  
+echo 2) QT 5.5.0 QWT6.1.2  64 Bit VS2013  
+echo 3) QT 5.5.0 QWT6.1.2  32 Bit VS2013  
 set /P SELCTION=Select: 
 echo =============================================================================================
  
@@ -28,7 +28,7 @@ REM ============================================================================
   call "C:\Program files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" x86
  
   set QTHOME=X:/qt/4.8.5
-  set QWTHOME=X:/qt/qwt-6.0.1
+  set QWTHOME=X:/qt/qwt-6.1.2_32bit
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
   
@@ -47,6 +47,14 @@ REM ============================================================================
   set QTDM_BININSTALL=X:\qt\4.8.5\bin
   set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2010
+  set TIMESTAPER="http://timestamp.verisign.com/scripts/timstamp.dll"
+  set CAQTDM_SIGNER="Paul Scherrer Institut"
+
+  
+  set ZMQ=X:/Qt/ZMQ
+  set ZMQINC=%ZMQ%/include
+  set ZMQLIB=%ZMQ%/lib/%EPICS_HOST_ARCH%
+
   
 GOTO PRINTOUT
 REM =============================================================================================
@@ -57,9 +65,9 @@ REM ============================================================================
  
   call "C:\Program files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
  
-  set QTHOME=X:/qt/5.4.1_64bit/qtbase
+  set QTHOME=X:/qt/5.5.0_64bit/qtbase
   
-  set QWTHOME=X:/qt/qwt-6.1.2_64bit
+  set QWTHOME=X:/qt/qwt-6.1.2_55_64bit
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
   
@@ -76,6 +84,13 @@ REM ============================================================================
   
   set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
+  set TIMESTAPER="http://timestamp.verisign.com/scripts/timstamp.dll"
+  set CAQTDM_SIGNER="Paul Scherrer Institut"
+
+  
+  set ZMQ=X:/Qt/ZMQ
+  set ZMQINC=%ZMQ%/include
+  set ZMQLIB=%ZMQ%/lib/%EPICS_HOST_ARCH%
 GOTO PRINTOUT
 
 REM =============================================================================================
@@ -86,9 +101,9 @@ REM ============================================================================
  
   call "C:\Program files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
  
-  set QTHOME=X:/qt/5.4.1_32bit/qtbase
+  set QTHOME=X:/qt/5.5.0_32bit/qtbase
   
-  set QWTHOME=X:/qt/qwt-6.1.2_32bit
+  set QWTHOME=X:/qt/qwt-6.1.2_55_32bit
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
   
@@ -105,6 +120,13 @@ REM ============================================================================
   
   set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
+  set TIMESTAPER="http://timestamp.verisign.com/scripts/timstamp.dll"
+  set CAQTDM_SIGNER="Paul Scherrer Institut"
+
+  set ZMQ=X:/Qt/ZMQ
+  set ZMQINC=%ZMQ%/include
+  set ZMQLIB=%ZMQ%/lib/%EPICS_HOST_ARCH%
+
 GOTO PRINTOUT
 
 

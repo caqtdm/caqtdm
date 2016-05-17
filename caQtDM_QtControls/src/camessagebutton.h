@@ -39,7 +39,6 @@ class QTCON_EXPORT caMessageButton : public EPushButton
 
     Q_OBJECT
 
-    Q_ENUMS(Stacking)
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
     Q_PROPERTY(QString label READ getLabel WRITE setLabel)
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
@@ -48,17 +47,22 @@ class QTCON_EXPORT caMessageButton : public EPushButton
     Q_PROPERTY(QString disableChannel READ getDisablePV WRITE setDisablePV)
     Q_PROPERTY(QString releaseMessage READ getReleaseMessage WRITE setReleaseMessage)
     Q_PROPERTY(QString pressMessage READ getPressMessage WRITE setPressMessage)
-
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
+
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
     Q_ENUMS(colMode)
 
 #include "caElevation.h"
 
 public:
 
+    void noStyle(QString style) {Q_UNUSED(style);}
+
     caMessageButton(QWidget *parent);
 
-    enum colMode {Static=0, Alarm};
+    enum colMode {Static=0, Alarm, Default};
 
     void setColors(QColor bg, QColor fg,  QColor hover, QColor border, QColor disabledFg);
     void setNormalColors();
@@ -129,6 +133,7 @@ private:
     QString thisReleaseMessage, thisPressMessage;
     bool eventFilter(QObject *obj, QEvent *event);
     bool _AccessW;
+    bool renewStyleSheet;
 };
 
 #endif

@@ -53,7 +53,7 @@ caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
     setAlternatingRowColors(true);
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     verticalHeader()->setDefaultSectionSize(20);
-    verticalHeader()->setSortIndicatorShown(true);
+    verticalHeader()->setSortIndicatorShown(false);
     horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 
     setColumnSize(80);
@@ -66,9 +66,6 @@ caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
     connect(this, SIGNAL(cellChanged(int, int)), this, SLOT(dataInput(int, int)));
     connect(this, SIGNAL(cellClicked(int, int)), this, SLOT(cellClicked(int, int)));
 
-    setNumberOfRows(1);
-    setNumberOfColumns(10);
-
     connect(this, SIGNAL(currentCellChanged(int, int, int, int)), this,  SLOT(cellChange(int,int, int, int)));
 
     createActions();
@@ -79,6 +76,11 @@ caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
     blockIndex = -1;
 
     installEventFilter(this);
+
+    thisAlignment = Left;
+    setNumberOfRows(1);
+    setNumberOfColumns(1);
+    setFocusPolicy(Qt::ClickFocus);
 }
 
 void caWaveTable::RedefineRowColumns(int xsav, int ysav, int z, int &x, int &y)
@@ -96,36 +98,60 @@ void caWaveTable::RedefineRowColumns(int xsav, int ysav, int z, int &x, int &y)
     } else if((xsav > 0) && (ysav == 0)) {
         y = qRound((float) z / (float) x);
         setupItems(x, y);
+    } else {
+       setupItems(x, y);
     }
 }
 
 void caWaveTable::setNumberOfRows(int nbRows)
 {
-    if(nbRows < 0) rowSaved = rowcount = 0;
+    if(nbRows <=0) rowSaved = rowcount = 0;
     else rowSaved = rowcount = nbRows;
     setupItems(rowcount, colcount);
 }
 
 void caWaveTable::setNumberOfColumns(int nbCols) {
-    if(nbCols < 0) colSaved = colcount = 0;
+    if(nbCols <=0) colSaved = colcount = 0;
     else colSaved = colcount = nbCols;
     setupItems(rowcount, colcount);
 }
 
 void caWaveTable::setupItems(int nbRows, int nbCols)
 {
+    // get rid of old items and clear table
+    for(int i=0; i<rowCount(); i++) {
+        for(int j=0; j<columnCount(); j++) {
+            QTableWidgetItem *Item = item(i,j);
+            if(Item != (QTableWidgetItem *) 0) {
+                delete Item;
+            }
+        }
+    }
+    clear();
+
+    // setup table with alignment of items
     setColumnCount(nbCols);
     setRowCount(nbRows);
     for(int i=0; i<nbRows; i++) {
         for(int j=0; j<nbCols; j++) {
-            if(item(i,j) == 0) {
-                QTableWidgetItem *tableItem = new QTableWidgetItem();
-                tableItem->setFont(thisItemFont);
-                setItem(i, j, tableItem);
+
+            setItem(i,j, new QTableWidgetItem());
+            item(i,j)->setFont(thisItemFont);
+            switch (thisAlignment) {
+            case Left:
+                item(i,j)->setTextAlignment(Qt::AlignLeft);
+                break;
+            case Center:
+                item(i,j)->setTextAlignment(Qt::AlignCenter);
+                break;
+            case Right:
+            default:
+                item(i,j)->setTextAlignment(Qt::AlignRight);
+                break;
             }
-            item(i,j)->setText("");
         }
     }
+
     keepText.clear();
     keepText.resize(rowcount*colcount+1);
 }
@@ -193,22 +219,22 @@ bool caWaveTable::eventFilter(QObject *obj, QEvent *event)
 {
 
     // repeat enter or return key are not really wanted
-	if (event->type() == QEvent::KeyPress)
-	{
-		QKeyEvent *ev = static_cast<QKeyEvent *>(event);
-		if (ev != (QKeyEvent *)0) {
-			if (ev->key() == Qt::Key_Return || ev->key() == Qt::Key_Enter) {
-				if (ev->isAutoRepeat()) {
-					//printf("keyPressEvent ignore\n");
-					event->ignore();
-				}
-				else {
-					//printf("keyPressEvent accept\n");
-					event->accept();
-				}
-			}
-		}
-	}
+    if (event->type() == QEvent::KeyPress)
+    {
+        QKeyEvent *ev = static_cast<QKeyEvent *>(event);
+        if (ev != (QKeyEvent *)0) {
+            if (ev->key() == Qt::Key_Return || ev->key() == Qt::Key_Enter) {
+                if (ev->isAutoRepeat()) {
+                    //printf("keyPressEvent ignore\n");
+                    event->ignore();
+                }
+                else {
+                    //printf("keyPressEvent accept\n");
+                    event->accept();
+                }
+            }
+        }
+    }
     // treat mouse enter and leave as well as focus out
     if (event->type() == QEvent::Enter) {
         if(!_AccessW) {
@@ -313,6 +339,7 @@ void caWaveTable::setFormat(DataType dataType)
 QString caWaveTable::setValue(double value, DataType dataType)
 {
     char asc[40];
+
     if(dataType == doubles) {
         if(thisFormatType == compact) {
             if ((value < 1.e4 && value > 1.e-4) || (value > -1.e4 && value < -1.e-4) || value == 0.0) {
@@ -356,8 +383,11 @@ void caWaveTable::displayText(int index, short status, QString const &text)
 
     if(index == blockIndex) return;
 
-    row = index / colcount;
+    if(colcount == 0) row = 0;
+    else row = index / colcount;
     column = index - row * colcount;
+    if(column < 0) column=0;
+
     if(this->item(row, column) != 0)  {
 
         this->item(row,column)->setText(text);
@@ -388,7 +418,6 @@ void caWaveTable::displayText(int index, short status, QString const &text)
             this->item(row, column)->setForeground(defaultForeColor);
         }
     }
-
 }
 
 void caWaveTable::setValueFont(QFont font)

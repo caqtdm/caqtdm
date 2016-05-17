@@ -60,7 +60,7 @@ caGraphics::caGraphics( QWidget *parent) :  QWidget(parent)
     setLineStyle(Solid);
     setHide(false);
 
-    setAttribute(Qt::WA_TranslucentBackground );
+    setAttribute(Qt::WA_TranslucentBackground, true);
     setWindowFlags(Qt::FramelessWindowHint);
 }
 

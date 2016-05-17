@@ -32,6 +32,11 @@
 
 caChoice::caChoice(QWidget *parent) : QWidget(parent)
 {
+
+    // to start with, clear the stylesheet, so that playing around
+    // is not possible.
+    setStyleSheet("");
+
     numCells = 2;
     labels << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";
     texts << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";

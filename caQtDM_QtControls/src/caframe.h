@@ -42,6 +42,10 @@ class QTCON_EXPORT caFrame : public QFrame
     Q_PROPERTY(QString channelB READ getChannelB WRITE setChannelB)
     Q_PROPERTY(QString channelC READ getChannelC WRITE setChannelC)
     Q_PROPERTY(QString channelD READ getChannelD WRITE setChannelD)
+
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
     Q_ENUMS(Visibility)
     Q_ENUMS(VisibilityMode)
     Q_ENUMS(BackgroundMode)
@@ -49,6 +53,8 @@ class QTCON_EXPORT caFrame : public QFrame
     Q_OBJECT
 
 public:
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     enum  Visibility { StaticV,
          IfNotZero,

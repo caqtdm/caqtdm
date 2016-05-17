@@ -269,7 +269,7 @@ double FontScalingWidget::calculateVertFontPointSizeF(const QString& text, const
 void FontScalingWidget::rescaleFont(const QString& text, const QSize &size)
 {
     double fontSize;
-    if((d_scaleMode != 1 && d_scaleMode != 2)  || size.width() < 8  || size.height() < 4) return;
+    if((d_scaleMode != 1 && d_scaleMode != 2)) return;
     if(d_vertical) {
         fontSize = calculateVertFontPointSizeF(text, size);
     } else {

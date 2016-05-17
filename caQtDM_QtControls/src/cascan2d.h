@@ -51,7 +51,8 @@
 #include <sys/timeb.h>
 #include "mdaReader.h"
 
-#include "cacamera.h"
+#include "colormaps.h"
+#include "caPropHandleDefs.h"
 
 #define XMAXPTS 1000
 #define YMAXPTS 1000
@@ -82,13 +83,18 @@ class QTCON_EXPORT caScan2D : public QWidget
     Q_PROPERTY(QString customColorMap READ getCustomMap WRITE setCustomMap  DESIGNABLE isPropertyVisible(customcolormap))
     Q_PROPERTY(bool discreteCustomColorMap READ getDiscreteCustomMap WRITE setDiscreteCustomMap DESIGNABLE isPropertyVisible(discretecolormap))
 
+    Q_PROPERTY(QStringList ROI_readChannelsList READ getROIChannelsReadList WRITE setROIChannelsReadList STORED false)
+    Q_PROPERTY(QString ROI_readChannels READ getROIChannelsRead WRITE setROIChannelsRead DESIGNABLE inactiveButVisible())
     Q_PROPERTY(ROI_markertype ROI_readmarkerType READ getROIreadmarkerType WRITE setROIreadmarkerType)
     Q_PROPERTY(ROI_type ROI_readType READ getROIreadType WRITE setROIreadType)
-    Q_PROPERTY(QString ROI_readChannels READ getROIChannelsRead WRITE setROIChannelsRead)
-    
+
+    Q_PROPERTY(QStringList ROI_writeChannelsList READ getROIChannelsWriteList WRITE setROIChannelsWriteList STORED false)
+    Q_PROPERTY(QString ROI_writeChannels READ getROIChannelsWrite WRITE setROIChannelsWrite DESIGNABLE inactiveButVisible())
     Q_PROPERTY(ROI_markertype ROI_writemarkerType READ getROIwritemarkerType WRITE setROIwritemarkerType)
     Q_PROPERTY(ROI_type ROI_writeType READ getROIwriteType WRITE setROIwriteType)
-    Q_PROPERTY(QString ROI_writeChannels READ getROIChannelsWrite WRITE setROIChannelsWrite)
+
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
     Q_ENUMS(zoom)
     Q_ENUMS(colormap)
@@ -96,7 +102,11 @@ class QTCON_EXPORT caScan2D : public QWidget
     Q_ENUMS(ROI_markertype)
 
 public:
-  
+
+#include "caPropHandle.h"
+
+    void noStyle(QString style) {Q_UNUSED(style);}
+
     enum ROI_type {none=0, xy_only, xy1_xy2, xyUpleft_xyLowright, xycenter_width_height};
     enum ROI_markertype {box=0, box_crosshairs, line, arrow};
     
@@ -139,9 +149,13 @@ public:
 
     QString getROIChannelsWrite() const {return thisPV_ROI_Write.join(";");}
     void setROIChannelsWrite(QString const &newPV) {thisPV_ROI_Write = newPV.split(";");}
+    QStringList getROIChannelsWriteList() const {return thisPV_ROI_Write;}
+    void setROIChannelsWriteList(QStringList list) {thisPV_ROI_Write = list; updatePropertyEditorItem(this, "ROI_writeChannels");}
 
     QString getROIChannelsRead() const {return thisPV_ROI_Read.join(";");}
     void setROIChannelsRead(QString const &newPV) {thisPV_ROI_Read = newPV.split(";");}
+    QStringList getROIChannelsReadList() const {return thisPV_ROI_Read;}
+    void setROIChannelsReadList(QStringList list) { thisPV_ROI_Read = list; updatePropertyEditorItem(this, "ROI_readChannels");}
 
     //sscanRecord PVs
     QString getPV_XCPT() const {return thisPV_XCPT;}

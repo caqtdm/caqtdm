@@ -52,7 +52,12 @@ class QTCON_EXPORT caByte : public QWidget
     Q_PROPERTY(QColor foreground   READ getTrueColor     WRITE setTrueColor)
     Q_PROPERTY(QColor background  READ getFalseColor    WRITE setFalseColor)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
 public:
+
+     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum colMode {Static=0, Alarm};
     enum Direction {Up, Down, Left, Right};

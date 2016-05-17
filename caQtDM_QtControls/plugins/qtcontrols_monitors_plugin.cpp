@@ -323,20 +323,16 @@ QWidget *caCartesianPlotInterface::createWidget(QWidget* parent)
 
 caCartesianPlotInterface::caCartesianPlotInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
-    strng name[12], type[12] = {"","","","","","","","","","","",""};
-    longtext text[12]  = {"","","","","","","","","","","",""};
+    strng name[18], type[18] = {"","","","","","","","","","","","","","","","","",""};
+    longtext text[18]  = {CHANNELLISTC,CHANNELLISTC,CHANNELLISTC,CHANNELLISTC,CHANNELLISTC,CHANNELLISTC,"","","","","","",
+                         STRINGFROMLIST, STRINGFROMLIST, STRINGFROMLIST, STRINGFROMLIST, STRINGFROMLIST, STRINGFROMLIST};
 
-    strcpy(name[0], "channels_1");
-    strcpy(type[0], "multiline");
-    strcpy(name[1], "channels_2");
-    strcpy(type[1], "multiline");
-    strcpy(name[2], "channels_3");
-    strcpy(type[2], "multiline");
-    strcpy(name[3], "channels_4");
-    strcpy(type[3], "multiline");
-    strcpy(name[4], "channels_5");
-    strcpy(type[4], "multiline");
-    strcpy(name[5], "channels_6");
+    strcpy(name[0], "channelList_1");
+    strcpy(name[1], "channelList_2");
+    strcpy(name[2], "channelList_3");
+    strcpy(name[3], "channelList_4");
+    strcpy(name[4], "channelList_5");
+    strcpy(name[5], "channelList_6");
     strcpy(type[5], "multiline");
     strcpy(name[6], "countNumOrChannel");
     strcpy(type[6], "multiline");
@@ -350,7 +346,19 @@ caCartesianPlotInterface::caCartesianPlotInterface(QObject* parent) : CustomWidg
     strcpy(type[10], "multiline");
     strcpy(name[11], "TitleY");
     strcpy(type[11], "multiline");
-    d_domXml = XmlFunc("caCartesianPlot", "cacartesianplot", 0, 0, 200, 50, name, type, text, 12);
+    strcpy(name[12], "channels_1");
+    strcpy(type[12], "multiline");
+    strcpy(name[13], "channels_2");
+    strcpy(type[13], "multiline");
+    strcpy(name[14], "channels_3");
+    strcpy(type[14], "multiline");
+    strcpy(name[15], "channels_4");
+    strcpy(type[15], "multiline");
+    strcpy(name[16], "channels_5");
+    strcpy(type[16], "multiline");
+    strcpy(name[17], "channels_6");
+    strcpy(type[17], "multiline");
+    d_domXml = XmlFunc("caCartesianPlot", "cacartesianplot", 0, 0, 200, 50, name, type, text, 18);
     d_toolTip = "[Cartesian Plot]";
     d_name = "caCartesianPlot";
     d_include = "caCartesianPlot";
@@ -365,18 +373,19 @@ QWidget *caStripPlotInterface::createWidget(QWidget* parent)
 
 caStripPlotInterface::caStripPlotInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
-    strng name[4], type[4] = {"","","",""};
-    longtext text[4] = {"","","",""};
+    strng name[5], type[5] = {"","","","",""};
+    longtext text[5] = {CHANNELLIST,"","","",STRINGFROMLIST};
 
-    strcpy(name[0], "channels");
-    strcpy(type[0], "multiline");
+    strcpy(name[0], "channelsList");
     strcpy(name[1], "Title");
     strcpy(type[1], "multiline");
     strcpy(name[2], "TitleX");
     strcpy(type[2], "multiline");
     strcpy(name[3], "TitleY");
     strcpy(type[3], "multiline");
-    d_domXml = XmlFunc("caStripPlot", "castripplot", 0, 0, 170, 70, name, type, text, 4);
+    strcpy(name[4], "channels");
+    strcpy(type[4], "multiline");
+    d_domXml = XmlFunc("caStripPlot", "castripplot", 0, 0, 170, 70, name, type, text, 5);
     d_toolTip = "[Strip Chart]";
     d_name = "caStripPlot";
     d_include = "caStripPlot";
@@ -406,18 +415,19 @@ QWidget *caByteInterface::createWidget(QWidget *parent)
 
 caTableInterface::caTableInterface(QObject *parent): CustomWidgetInterface_Monitors(parent)
 {
-    strng name[4], type[4] = {"","","",""};
-    longtext text[4] = {"","","",""};
+    strng name[5], type[5] = {"","","","",""};
+    longtext text[5] = {CHANNELLIST,"","","",STRINGFROMLIST};
 
-    strcpy(name[0], "channels");
-    strcpy(type[0], "multiline");
+    strcpy(name[0], "channelsList");
     strcpy(name[1], "scriptCommand");
     strcpy(type[1], "multiline");
     strcpy(name[2], "scriptParameter");
     strcpy(type[2], "multiline");
     strcpy(name[3], "columnSizes");
     strcpy(type[3], "multiline");
-    d_domXml = XmlFunc("caTable", "catable", 0, 0, 120, 120, name, type, text, 4);
+    strcpy(name[4], "channels");
+    strcpy(type[4], "multiline");
+    d_domXml = XmlFunc("caTable", "catable", 0, 0, 120, 120, name, type, text, 5);
     d_toolTip = "[Table Monitor for a list of channels]";
     d_name = "caTable";
     d_include = "caTable";
@@ -457,8 +467,8 @@ QWidget *caCameraInterface::createWidget(QWidget* parent)
 
 caCameraInterface::caCameraInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
-    strng name[10], type[10] = {"","","","","","","","","",""};
-    longtext text[10] = {"","","","","","","","","",""};
+    strng name[12], type[12] = {"","","","","","","","","","","",""};
+    longtext text[12] = {"","","","","","","","",CHANNELLIST,CHANNELLIST,STRINGFROMLIST,STRINGFROMLIST};
 
     strcpy(name[0], "channelData");
     strcpy(type[0], "multiline");
@@ -476,11 +486,13 @@ caCameraInterface::caCameraInterface(QObject* parent) : CustomWidgetInterface_Mo
     strcpy(type[6], "multiline");
     strcpy(name[7], "customColorMap");
     strcpy(type[7], "multiline");
-    strcpy(name[8], "dimensionMarking_Channels");
-    strcpy(type[8], "multiline");
-    strcpy(name[9], "ROI_writeChannels");
-    strcpy(type[9], "multiline");
-    d_domXml = XmlFunc("caCamera", "cacamera", 0, 0, 200, 200, name, type, text, 10);
+    strcpy(name[8], "ROI_readChannelsList");
+    strcpy(name[9], "ROI_writeChannelsList");
+    strcpy(name[10], "ROI_readChannels");
+    strcpy(type[10], "multiline");
+    strcpy(name[11], "ROI_writeChannels");
+    strcpy(type[11], "multiline");
+    d_domXml = XmlFunc("caCamera", "cacamera", 0, 0, 200, 200, name, type, text, 12);
     d_toolTip = "[Image from camera]";
     d_name = "caCamera";
     d_include = "caCamera";
@@ -552,11 +564,11 @@ QWidget *caScan2DInterface::createWidget(QWidget* parent)
     return new caScan2D(parent);
 }
 
-#define NUM_SCAN2D_PARAMS 17
+#define NUM_SCAN2D_PARAMS 19
 caScan2DInterface::caScan2DInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
-    strng name[NUM_SCAN2D_PARAMS], type[NUM_SCAN2D_PARAMS]  = {"","","","","","","","","","","","","","","","",""};
-    longtext text[NUM_SCAN2D_PARAMS] = {"","","","","","","","","","","","","","","","",""};
+    strng name[NUM_SCAN2D_PARAMS], type[NUM_SCAN2D_PARAMS]  = {"","","","","","","","","","","","","","","","","","",""};
+    longtext text[NUM_SCAN2D_PARAMS] = {"","","","","","","","","","","","","","","",CHANNELLIST,CHANNELLIST,STRINGFROMLIST,STRINGFROMLIST};
 
     strcpy(name[0], "channelData");
     strcpy(type[0], "multiline");
@@ -589,10 +601,12 @@ caScan2DInterface::caScan2DInterface(QObject* parent) : CustomWidgetInterface_Mo
     strcpy(type[13], "multiline");
     strcpy(name[14], "channelSAVEDATA_FILENAME");
     strcpy(type[14], "multiline");
-    strcpy(name[15], "dimensionMarking_Channels");
-    strcpy(type[15], "multiline");
-    strcpy(name[16], "ROI_writeChannels");
-    strcpy(type[16], "multiline");
+    strcpy(name[15], "ROI_readChannelsList");
+    strcpy(name[16], "ROI_writeChannelsList");
+    strcpy(name[17], "ROI_readChannels");
+    strcpy(type[17], "multiline");
+    strcpy(name[18], "ROI_writeChannels");
+    strcpy(type[18], "multiline");
 
     d_domXml = XmlFunc("caScan2D", "cascan2d", 0, 0, 200, 200, name, type, text, NUM_SCAN2D_PARAMS);
     d_toolTip = "[Image from Scan2D]";
@@ -600,6 +614,24 @@ caScan2DInterface::caScan2DInterface(QObject* parent) : CustomWidgetInterface_Mo
     d_include = "caScan2D";
     d_icon = QPixmap(":pixmaps/scan2d.png");
 }
+
+QWidget *caLineDemoInterface::createWidget(QWidget* parent)
+{
+    return new caLineDemo(parent);
+}
+
+caLineDemoInterface::caLineDemoInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
+{
+    strng name[1], type[1]  = {""};
+    longtext text[1] = {""};
+    d_domXml = XmlFunc("caLineDemo", "calinedemo", 0, 0, 100, 20, name, type, text, 0);
+    d_toolTip = "[Text Demo Monitor (faster then caLineEdit)]";
+    d_name = "caLineDemo";
+    d_include = "caLineDemo";
+    QPixmap qpixmap =   QPixmap(":pixmaps/textmonitor.png");
+    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+}
+
 
 CustomWidgetCollectionInterface_Monitors::CustomWidgetCollectionInterface_Monitors(QObject *parent): QObject(parent)
 {
@@ -620,6 +652,7 @@ CustomWidgetCollectionInterface_Monitors::CustomWidgetCollectionInterface_Monito
     d_plugins.append(new caCalcInterface(this));
     d_plugins.append(new caWaterfallPlotInterface(this));
     d_plugins.append(new caScan2DInterface(this));
+    d_plugins.append(new caLineDemoInterface(this));
 }
 
 QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface_Monitors::customWidgets(void) const

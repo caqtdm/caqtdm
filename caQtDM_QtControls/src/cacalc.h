@@ -45,9 +45,14 @@ class  QTCON_EXPORT caCalc : public  ESimpleLabel
     Q_PROPERTY(double initialValue READ getInitialValue WRITE setInitialValue)
     Q_PROPERTY(int precision READ getPrecision WRITE setPrecision)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
 #include "addevent.h"
 
 public:
+
+     void noStyle(QString style) {Q_UNUSED(style);}
 
     QString getVariable() const {return thisVariable;}
     void setVariable(QString const &var) {thisVariable = var;}

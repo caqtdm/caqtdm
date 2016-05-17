@@ -49,6 +49,8 @@ class QTCON_EXPORT caWaveTable : public QTableWidget
     Q_PROPERTY(int numberOfColumns READ getNumberOfColumns WRITE setNumberOfColumns)
     Q_PROPERTY(int columnSize READ getColumnSize WRITE setColumnSize)
 
+    Q_PROPERTY(Alignment alignment READ getAlignment WRITE setAlignment)
+    Q_ENUMS(Alignment)
 
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
     Q_ENUMS(colMode)
@@ -58,14 +60,21 @@ class QTCON_EXPORT caWaveTable : public QTableWidget
     Q_ENUMS(SourceMode)
 
     Q_PROPERTY(FormatType formatType READ getFormatType WRITE setFormatType)
+
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
     Q_ENUMS(FormatType)
 
 public:
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     caWaveTable(QWidget *parent);
 
     enum FormatType {decimal, exponential, compact, hexadecimal, octal, string};
     enum DataType {doubles, longs, characters};
+    enum Alignment {Center, Left, Right};
 
     enum SourceMode {Channel = 0, User};
     SourceMode getPrecisionMode() const { return thisPrecMode; }
@@ -107,6 +116,11 @@ public:
     void setFormatType(FormatType m) { thisFormatType = m;}
     FormatType getFormatType() { return thisFormatType; }
 
+    void setAlignment(const Alignment &alignment) { thisAlignment = alignment;
+                                                    if(colcount > 0 && rowcount > 0) setupItems(rowcount, colcount);
+                                                  }
+    Alignment getAlignment() const {return thisAlignment;}
+
 private slots:
     void copy();
     void dataInput(int, int);
@@ -136,6 +150,7 @@ private:
     char thisFormat[20];
     char thisFormatC[20];
     FormatType thisFormatType;
+    Alignment thisAlignment;
     int thisPrecision;
     SourceMode thisPrecMode;
     colMode thisColorMode;

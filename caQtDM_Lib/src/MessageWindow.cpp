@@ -54,6 +54,7 @@ MessageWindow::MessageWindow(QWidget* parent) : QDockWidget(parent)
     MessageWindow::MsgHandler = this;
     setMinimumSize(600, 150);
     setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowMinMaxButtonsHint);
+    setContextMenuPolicy(Qt::CustomContextMenu);
     show();
 
     move(x(), 0);

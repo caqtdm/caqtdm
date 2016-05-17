@@ -39,7 +39,7 @@
 #include <QtDebug>
 #include <QApplication>
 
-#define MIN_FONT_SIZE 3
+#define MIN_FONT_SIZE 5
 
 #if (_MSC_VER == 1600)
 int round (double x) {
@@ -54,7 +54,7 @@ int round (double x) {
 
 ENumeric::ENumeric(QWidget *parent, int id, int dd) : QFrame(parent), FloatDelegate()
 {
-    lastLabel = -1;
+    lastLabelOnTab = lastLabel = -1;
     intDig = id;
     decDig = dd;
     digits = id + dd;
@@ -339,6 +339,8 @@ void ENumeric::downDataIndex(int id)
 
 void ENumeric::showData()
 {
+    int thisDigit, prvDigit;
+    bool suppress = true;
     long long temp = data;
     double num = 0;
     if (data < 0)
@@ -355,7 +357,13 @@ void ENumeric::showData()
             num = ceil(numd);
         numd = num * power;
         temp = temp - (long long) numd;
+
+        thisDigit = abs((int) num);
+        if(i>0 && prvDigit == 0 && suppress) labels[i-1]->setText(" ");
         labels[i]->setText(QString().setNum(abs((int) num)));
+        prvDigit = thisDigit;
+        if(thisDigit != 0) suppress = false;
+        if(i >= intDig-1)  suppress = false;
     }
     QTimer::singleShot(1000, this, SLOT(valueUpdated()));
 }
@@ -396,7 +404,6 @@ void ENumeric::mouseDoubleClickEvent(QMouseEvent*)
 
 bool ENumeric::eventFilter(QObject *obj, QEvent *event)
 {
-    QSize aux = size();
     if (event->type() == QEvent::Enter) {
         if(!_AccessW) {
             QApplication::setOverrideCursor(QCursor(Qt::ForbiddenCursor));
@@ -404,14 +411,19 @@ bool ENumeric::eventFilter(QObject *obj, QEvent *event)
             QApplication::restoreOverrideCursor();
         }
     } else if(event->type() == QEvent::Leave) {
-        lastLabel = -1;
-        long long temp = (long long) round(csValue * pow(10.0, decDig));
-        data = temp;
-        showData();
-        QApplication::restoreOverrideCursor();
-        resize(size()*0.99); // force a resize
-        resize(aux);
-        updateGeometry();
+        QString ParentClassName = parent()->metaObject()->className();
+        if(ParentClassName.contains("caApplyNumeric")) {
+            //printf("do nothing\n");
+        } else {
+            lastLabelOnTab = lastLabel;
+            lastLabel = -1;
+            long long temp = (long long) round(csValue * pow(10.0, decDig));
+            data = temp;
+            showData();
+            QApplication::restoreOverrideCursor();
+            valueUpdated();
+            updateGeometry();
+        }
     } else if(event->type() == QEvent::MouseButtonDblClick) {
         if(!_AccessW) return true;
     } else if (event->type() == QEvent::MouseButtonPress) {
@@ -420,19 +432,33 @@ bool ENumeric::eventFilter(QObject *obj, QEvent *event)
             QRect widgetRect = labels[i]->geometry();
             if(widgetRect.contains(ev->pos())) {
                 lastLabel = i;
-                resize(size()*0.99); // force a resize
-                resize(aux);
+                valueUpdated();
                 break;
             }
         }
     } else if(event->type() == QEvent::KeyRelease)   {
         QKeyEvent *ev = (QKeyEvent *) event;
-        if(ev->key() == Qt::Key_Escape) text->hide();
-        if(ev->key() == Qt::Key_Up) {
-            upDataIndex(lastLabel);
+        if(ev->key() == Qt::Key_Escape) if (text != NULL) text->hide();
+        if(ev->key() == Qt::Key_Up) upDataIndex(lastLabel);
+        if(ev->key() == Qt::Key_Down) downDataIndex(lastLabel);
+        if(ev->key() == Qt::Key_Left) {
+            lastLabel--;
+            if(lastLabel < 0) lastLabel = 0;
+            valueUpdated();
         }
-        if(ev->key() == Qt::Key_Down) {
-            downDataIndex(lastLabel);
+        if(ev->key() == Qt::Key_Right) {
+            lastLabel++;
+            if(lastLabel > (digits-1)) lastLabel = digits-1;
+            valueUpdated();
+        }
+        // move cursor with tab focus
+        if(ev->key() == Qt::Key_Tab) {
+            QCursor *cur = new QCursor;
+            QPoint p = QWidget::mapToGlobal(QPoint(this->width()/2, this->height()/2));
+            lastLabel = lastLabelOnTab;
+            cur->setPos( p.x(), p.y());
+            setFocus();
+            valueUpdated();
         }
     }
     return QObject::eventFilter(obj, event);
@@ -457,17 +483,17 @@ void ENumeric::resizeEvent(QResizeEvent *e)
     QList<QAbstractButton *> list  = bup->buttons();
     temp =  qobject_cast<QPushButton *>(list.front());
     if (temp) {
-        QPixmap pix(temp->size() * 0.9);
-        pix.fill(palette().color(QPalette::Background));
-        QPainter p(&pix);
+        QPixmap pix1(temp->size() * 0.9);
+        pix1.fill(palette().color(QPalette::Background));
+        QPainter p(&pix1);
         p.setRenderHint(QPainter::Antialiasing);
-        hmargin = (int) (pix.width() * MARGIN);
-        vmargin = (int) (pix.height() * MARGIN);
+        hmargin = (int) (pix1.width() * MARGIN);
+        vmargin = (int) (pix1.height() * MARGIN);
         if (hmargin < MIN_MARGIN)
             hmargin = MIN_MARGIN;
         if (vmargin < MIN_MARGIN)
             vmargin = MIN_MARGIN;
-        int h = pix.height(), w = pix.width();
+        int h = pix1.height(), w = pix1.width();
         QPolygon poly(3);
         poly.setPoint(0, (int) (w * .5), vmargin);
         poly.setPoint(1, w - hmargin, h - vmargin);
@@ -482,32 +508,54 @@ void ENumeric::resizeEvent(QResizeEvent *e)
         p.drawConvexPolygon(poly);
         p.end();
 
+        // down pixmap
+        QPixmap pix2 = pix1.transformed(QMatrix().rotate(-180));
+
+        // pixmap up with red border
+        QPixmap pix1Red = pix1;
+        QPainter paint1R(&pix1Red);
+        pen.setColor(Qt::red);
+        paint1R.setBrush(Qt::NoBrush);
+        paint1R.setPen(pen);
+        paint1R.drawRect(0, 0, pix1Red.width() -1, pix1Red.height() -1);
+        paint1R.end();
+
+        // pixmap down with red border
+        QPixmap pix2Red = pix2;
+        QPainter paint2R(&pix2Red);
+        pen.setColor(Qt::red);
+        paint2R.setBrush(Qt::NoBrush);
+        paint2R.setPen(pen);
+        paint2R.drawRect(0, 0, pix2Red.width() -1, pix2Red.height() -1);
+        paint2R.end();
+
         int i=0;
         foreach (QAbstractButton* but, bup->buttons()) {
             temp = qobject_cast<QPushButton *>(but);
             if (temp) {
-                temp->setIconSize(pix.size());
-                temp->setIcon(pix);
                 if(lastLabel == i) {
-                    temp->setStyleSheet("background: rgb(255, 0, 0); color: rgb(255, 0, 0, 0);");
+                    temp->setIconSize(pix1Red.size());
+                    temp->setIcon(pix1Red);
                 } else {
-                    temp->setStyleSheet("");
+                    temp->setIconSize(pix1.size());
+                    temp->setIcon(pix1);
                 }
             }
             i++;
         }
 
         i = 0;
-        QPixmap pix2 = pix.transformed(QMatrix().rotate(-180));
         foreach (QAbstractButton* but, bdown->buttons()) {
             temp = qobject_cast<QPushButton *>(but);
             if (temp) {
                 temp->setIconSize(pix2.size());
                 temp->setIcon(pix2);
                 if(lastLabel == i) {
-                    temp->setStyleSheet("background: rgb(255, 0, 0); color: rgb(255, 0, 0, 0);");
+                    temp->setIconSize(pix2Red.size());
+                    temp->setIcon(pix2Red);
                 } else {
-                    temp->setStyleSheet("");
+                    temp->setIconSize(pix2.size());
+                    temp->setIcon(pix2);
                 }
             }
             i++;
@@ -534,10 +582,19 @@ void ENumeric::resizeEvent(QResizeEvent *e)
         //double fontSize = l1->calculateFontPointSizeF(l1->text(), l1->size());
         double fontSize = 80;
         fontSize = qMin((int) fontSize, size().height() / 4 - 2);
-        fontSize = qMin((int) fontSize, size().width() / (digits+1));
+        //printf("h %f digits=%d %d %d\n", fontSize, digits, intDig, decDig);
+        if(decDig > 0) {
+           fontSize = qMin((int) fontSize, size().width() / (digits+2));
+        } else {
+           fontSize = qMin((int) fontSize, size().width() / (digits+1));
+        }
+        //printf("w %f\n", fontSize);
         if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         labelFont.setPointSizeF(fontSize);
         signFont.setPointSizeF(fontSize);
+
+         CorrectFontIfAndroid(labelFont);
+         CorrectFontIfAndroid(signFont);
         //printf("digits=%d %s font size=%f\n", digits, qasc(l1->text()), fontSize);
     }
     /* all fonts equal */

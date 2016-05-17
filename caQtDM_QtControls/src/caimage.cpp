@@ -41,6 +41,7 @@ caImage::caImage(QWidget* parent) : QWidget(parent)
 caImage::~caImage() {
 
    delete _animation;
+   delete messagequeue;
 }
 
 QString caImage::getMessages()

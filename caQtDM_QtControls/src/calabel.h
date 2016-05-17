@@ -36,6 +36,12 @@ class QTCON_EXPORT caLabel : public ESimpleLabel
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
 
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
+
+    //Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
+
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
     Q_ENUMS(colMode)
 
 #include "caVisibProps.h"
@@ -45,6 +51,8 @@ class QTCON_EXPORT caLabel : public ESimpleLabel
 
 public:
 
+    void noStyle(QString style) {Q_UNUSED(style);}
+
     caLabel( QWidget *parent = 0 );
 
     QColor getForeground() const {return thisForeColor;}
@@ -53,7 +61,7 @@ public:
     QColor getBackground() const {return thisBackColor;}
     void setBackground(QColor c);
 
-    enum colMode {Static, Alarm};
+    enum colMode {Static, Alarm, Default};
     colMode getColorMode() const { return thisColorMode; }
 
     void setColors(QColor bg, QColor fg);
@@ -71,6 +79,7 @@ private:
     colMode thisColorMode;
     colMode oldColorMode;
     QString thisStyle, oldStyle;
+    bool renewStyleSheet;
 };
 
 #endif

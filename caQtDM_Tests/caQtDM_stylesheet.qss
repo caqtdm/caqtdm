@@ -8,6 +8,12 @@ caLineEdit {
      background: lightyellow;
      color: black;
  }
+ 
+ caLabel {
+     border-radius: 1px;
+     background: lightyellow;
+     color: black;
+ }
 
 caTextEntry {
     color: rgb(127, 0, 63);
@@ -63,7 +69,14 @@ caChoice {
                                   stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);
 }
 
+caChoice > QPushButton {
+      text-align: left;
+      padding: 1px;
+}
 
 
+caMenu{
+    background: lightyellow;
+}
 
 

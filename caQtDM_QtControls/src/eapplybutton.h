@@ -28,6 +28,7 @@
 
 #include <qtcontrols_global.h>
 #include <econstants.h>
+#include "epushbutton.h"
 #include <QPushButton>
 
 /**
@@ -38,7 +39,7 @@
  * valueModified sets the color to red and clearModified reverts to
  * the original setting
  */
-class QTCON_EXPORT EApplyButton : public QPushButton
+class QTCON_EXPORT EApplyButton : public EPushButton
 {
 	Q_OBJECT
 public:

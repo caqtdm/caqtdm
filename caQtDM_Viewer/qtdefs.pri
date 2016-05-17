@@ -1,9 +1,14 @@
-CAQTDM_VERSION = V4.0.2
+CAQTDM_VERSION = V4.1.0
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+
+TARGET_COMPANY = "Paul Scherrer Institut"
+TARGET_DESCRIPTION = "Channel Access Qt Display Manager"
+TARGET_COPYRIGHT = "Copyright (C) 2016 Paul Scherrer Institut"
+TARGET_INTERNALNAME = "caqtdm"
 
 # enable opengl in stripplot and cartesianplot (edo not use, experimental only, for Qt5 and qwt6.1)
 
@@ -53,6 +58,9 @@ CONFIG += XDR_HACK
 # undefine this for epics4 plugin support (only preliminary version as example)
 #CONFIG += epics4
 
+# undefine this for bsread (zeromq) plugin support
+#CONFIG += bsread
+
 # undefine this when you need to combine caQtDM with the australian epicsqt package
 #CONFIG += australian
 
@@ -63,7 +71,63 @@ CONFIG += PYTHONCALC
 # undefine this in order not to disable monitors for hidden pages of QTabWidgets
 DEFINES += IO_OPTIMIZED_FOR_TABWIDGETS
 
+# Defines for Windows file Information
+DEFINES += TARGET_PRODUCT=\"\\\"$${TARGET_PRODUCT}\\\"\"
+DEFINES += TARGET_FILENAME=\"\\\"$${TARGET_FILENAME}\\\"\"
+
+_TARGET_VERSION = $$replace(CAQTDM_VERSION, V, '')
+_TARGET_VERSION = $$split(_TARGET_VERSION, ".")
+DEFINES += TARGET_VER_MAJ=$$member(_TARGET_VERSION, 0)
+DEFINES += TARGET_VER_MIN=$$member(_TARGET_VERSION, 1)
+DEFINES += TARGET_VER_BUILD=$$member(_TARGET_VERSION, 2)
+
+DEFINES += TARGET_COMPANY=\"\\\"$${TARGET_COMPANY}\\\"\"
+DEFINES += TARGET_DESCRIPTION=\"\\\"$${TARGET_DESCRIPTION}\\\"\"
+DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
+DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
+DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
+
+# 4.1.0
+# caslider and cathermo can now display also a value; caslider got also the possibility to set distinctly the lower and upper limit
+# caQtDM will now display mu and grad on all platforms
+# adapted cathermo and caslider so that it can take ito account a default style with fore and background colors; now Alarm is modified in Alarm_Default or Alarm_static
+# now a widget can be added (see caLineDemo) without having to change caQtDM_lib. An interface has been defined in order to perform the datacuisition inside the widget class.
+# caLineDemo widget is an example for a fast on QWidget based line monitor
+# caMimeDisplay will now take macros into account
+# fatDots implemented in cartesian plot
+# more optimized image display
+# tab order and focus considered
+# trailing zeros of caspinbox and cawheelswitch suppressed
+# toggle button for a soft pv was not working
+# caQtDM uses now qwt6.1.1 in order to take advantage of multicore processing
+# carowcolmenu performance enhancement
+# options -url and -emptycache added
+# shortcuts defined (Ex: Ctrl+R = reload window; Ctrl+Alt+R = reload all windows; Ctrl+O = Open File; Ctrl+P = Print)
+# stylesheet entry for most of the cawidgets has been suppressed and for many cawidgets the influence of an external stylesheet can only be changed when setting default colormode
+
+# 4.0.3
+# it is now possible to pipe ui data to caQtDM
+# reload management had to be changed due to some Qt memory management problem
+# eliminated some memory leaks
+# corrected wavetable string crash
+# one can now define if the size of an included ui file will be size adjusted or not
+# cabyte, cabytecontroller performance were bad and has to be be corrected
+# camenu and catogglebutton color handling is now done by stylesheet and not with palette colors. This in order to prevent cascading stylesheets, that have precedence over palette colors, to interfere.
+# default property for label set to transparent color
+# window for included filenames shows now the number of times and average loadtime for loading.
+
 # 4.0.2
+# caQtDM can now be told to load a specific stylesheet file by the option -stylefile filename
+# option -noResize has been implemented now
+# capolyline initialisation was missing for proper resize
+# new options on command line available for caQtDM: -cs for specifiying default plugin to be used, -options for passing options (key, value pairs) to plugins
+# use now the QStringlList editor in Designer for semicolumn separated strings
+# mobile handling of config files slightly modified
+# adjustment of fonts for android modified / apply button of caapplynumeric is now resizable
+# resizing was perturbed by a resize forced by incoming channel data.
+# the vertical label has now an alignment property
+# cacartesianplot was not always well triggered when a trigger channel was specified, now corrected
+# camimebutton added in order to start applications defined through the file extension
 # cawavetable can now adapt its rows and columns automatically when zero is specified.
 # an enum can be display in calineedit as number when enumeric is specified as format (otherwise as string in all cases)
 # a multistring widget has been added to display waveforms with chars and strings (in case of chars a \n will make a new line)

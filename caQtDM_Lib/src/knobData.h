@@ -27,16 +27,18 @@
 #define KNOBDATA_H
 
 #include <sys/timeb.h>
+#include "dbrString.h"
+#include "knobDefines.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define STRING_EXCHANGE_SIZE 2048
+#define STRING_EXCHANGE_SIZE 8192
 
 typedef struct _epicsData {
     int          connected;             /* connection flag */
-    dbr_string_t fec;                   /* ioc */
+    caqtdm_string_t fec;                   /* ioc */
     int          monitorCount;          /* acquisition counter */
     int          monitorCountPrev;
     int          displayCount;          /* last displayed acquisition counter */
@@ -48,7 +50,7 @@ typedef struct _epicsData {
     short	     status;	            /* status of value */
     short	     severity;		        /* severity of alarm */
     short	     precision;		        /* number of decimal places */
-    dbr_string_t units;	                /* units of value */
+    caqtdm_string_t units;	                /* units of value */
     double	     upper_disp_limit;	    /* upper limit of graph */
     double	     lower_disp_limit;	    /* lower limit of graph */
     double	     upper_alarm_limit;
@@ -87,7 +89,7 @@ typedef struct _knobData {
     char dispName[MAXDISPLEN];          /* name of widget type */
     char fileName[MAXFILELEN];
     void *pluginInterface;                    /* plugin pointer */
-    dbr_string_t pluginName;            /* plugin name */
+    caqtdm_string_t pluginName;            /* plugin name */
 } knobData;
 
 #ifdef __cplusplus

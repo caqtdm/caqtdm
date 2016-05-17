@@ -27,7 +27,7 @@
 #define QTCONTROLS_MONITORS_PLUGIN_H
 
 #include <qglobal.h>
-#if QT_VERSION > 0x050000
+#if QT_VERSION > 0x050400
     #include <QtUiPlugin/QDesignerCustomWidgetInterface>
 #else
     #include <QDesignerCustomWidgetInterface>
@@ -255,4 +255,16 @@ public:
     caScan2DInterface(QObject* parent);
     virtual QWidget* createWidget(QWidget* parent);
 };
+
+
+class caLineDemoInterface : public CustomWidgetInterface_Monitors
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerCustomWidgetInterface)
+
+public:
+    caLineDemoInterface(QObject* parent);
+    virtual QWidget* createWidget(QWidget* parent);
+};
+
 #endif

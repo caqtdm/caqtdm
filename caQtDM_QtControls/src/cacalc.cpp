@@ -28,6 +28,10 @@
 
 caCalc::caCalc( QWidget *parent ) :  ESimpleLabel(parent)
 {
+    // to start with, clear the stylesheet, so that playing around
+    // is not possible.
+    setStyleSheet("");
+
     thisChannelA="";
     thisChannelB="";
     thisChannelC="";

@@ -21,25 +21,22 @@ SOURCES         = epics4_plugin.cpp
 TARGET          = epics4_plugin
 
 
-#if we want to use epics4, define it above
-epics4: {
-  warning("epics4 was specified in qtdefs.pri, so build plugin with epics4 (however old incompete version)")
-  SOURCES +=  epics4Subs.cpp pvAccessImpl.cpp
-  HEADERS +=  epics4Subs.h pvAccessImpl.h
-  EPICS4LIB = /usr/local/epics/base-4.2.0/lib/SL6-x86/
-  LIBS += -L$${EPICS4LIB} -Wl,-rpath,$${EPICS4LIB}  -lpvAccess -lpvData
-  INCLUDEPATH += /usr/local/epics/base-4.2.0/include
-  INCLUDEPATH += $(EPICSINCLUDE)
+warning("epics4 was specified in qtdefs.pri, so build plugin with epics4 (however old incompete version)")
+SOURCES +=  epics4Subs.cpp pvAccessImpl.cpp
+HEADERS +=  epics4Subs.h pvAccessImpl.h
+EPICS4LIB = /usr/local/epics/base-4.2.0/lib/SL6-x86/
+LIBS += -L$${EPICS4LIB} -Wl,-rpath,$${EPICS4LIB}  -lpvAccess -lpvData
+INCLUDEPATH += /usr/local/epics/base-4.2.0/include
+INCLUDEPATH += $(EPICSINCLUDE)
 
-  !ios {
-      unix:!macx {
-      INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
-      }
-      macx {
-          INCLUDEPATH += $(EPICSINCLUDE)/os/Darwin
-      }
+!ios {
+  unix:!macx {
+  INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
   }
-
-  DEFINES += EPICS4
+  macx {
+      INCLUDEPATH += $(EPICSINCLUDE)/os/Darwin
+  }
 }
+
+DEFINES += EPICS4
 

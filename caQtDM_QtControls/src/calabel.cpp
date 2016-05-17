@@ -29,25 +29,39 @@
 
 caLabel::caLabel(QWidget *parent) : ESimpleLabel(parent)
 {
+    // to start with, clear the stylesheet, so that playing around
+    // is not possible.
+    setStyleSheet("");
+
     setFontScaleMode(WidthAndHeight);
-    thisBackColor = Qt::gray;
+    thisBackColor = QColor(255,255,255,0);
     thisForeColor = Qt::black;
-    thisBackColorOld = Qt::black;
+    thisBackColorOld = QColor(255,255,255,0);
     thisForeColorOld = Qt::black;
     thisColorMode=Static;
     oldColorMode =Static;
+
+    renewStyleSheet = true;
+
     setColorMode(Static);
     thisVisibility = StaticV;
 }
 
 void caLabel::setColors(QColor bg, QColor fg)
 {
-    if((bg != thisBackColorOld) || (fg != thisForeColorOld)) {
+    if(thisColorMode == Default) {
+        if(!styleSheet().isEmpty()) {
+            setStyleSheet("");
+            renewStyleSheet = true;
+        }
+        return;
+    }
+
+    if((bg != thisBackColorOld) || (fg != thisForeColorOld) || renewStyleSheet || styleSheet().isEmpty()) {
+        //renewStyleSheet = false;
         thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
         thisStyle = thisStyle.arg(bg.red()).arg(thisBackColor.green()).arg(bg.blue()).arg(bg.alpha()).
                 arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
-        setStyleSheet(thisStyle);
-        // oups, was forgotten
         thisBackColorOld = bg;
         thisForeColorOld = fg;
     }
@@ -95,5 +109,4 @@ void caLabel::setAlarmColors(short status)
     }
     setColors(thisBackColor, c);
 }
-
 

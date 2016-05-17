@@ -57,9 +57,14 @@ class QTCON_EXPORT caByteController : public QWidget
 
     Q_PROPERTY(EPushButton::ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleModeL)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
 #include "caElevation.h"
 
 public:
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     enum colMode {Static=0, Alarm};
     enum Direction {Up, Down, Left, Right};
@@ -114,7 +119,7 @@ protected:
     void resizeEvent(QResizeEvent *e);
 
 private:
-    void   setColor(EPushButton *button, QColor c, QColor text);
+    void   setColor(int indx, QColor c, QColor text);
     bool   eventFilter(QObject *obj, QEvent *event);
     int                 numRows;
     QSignalMapper      *signalMapper;
@@ -130,6 +135,8 @@ private:
     long                thisValue;
     bool               _AccessW;
     EPushButton::ScaleMode thisScaleMode;
+    QColor              prvColor[32], prvTextcolor[32];
+    int                 prvEndBit, prvStartBit;
 };
 
 #endif  /* CABYTECONTROLLER */

@@ -35,13 +35,13 @@ ESimpleLabel::ESimpleLabel(QWidget *parent) : QLabel(parent), FontScalingWidget(
   if(fontScaleMode() != None)
 	setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
   else
-	setAlignment(Qt::AlignRight|Qt::AlignVCenter);
+    setAlignment(Qt::AlignRight|Qt::AlignVCenter);
 }
 
 ESimpleLabel::ESimpleLabel(const QString& text, QWidget *parent) : QLabel(text, parent), FontScalingWidget(this)
 {
   if(fontScaleMode() != None)
-	setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
+    setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
 }
 
 void ESimpleLabel::setText(const QString &txt)

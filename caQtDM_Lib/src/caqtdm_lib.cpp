@@ -37,6 +37,9 @@
 #include <QObject>
 #include <QToolBar>
 
+// interfacing widgets, handling their own data acquisition ... (thanks zai)
+#include "caWidgetInterface.h"
+
 // we are using for calculations postfix of epics
 // therefore we need this include and also link with the epics libraries
 // should probably be changed at some point.
@@ -70,6 +73,27 @@
 
 #define InfoPrefix "<p style='background-color:lightyellow'><font color='#000000'>"
 #define InfoPostfix "</font></font></p>"
+
+// context texts
+#define GETINFO         "Get Info"
+#define SETGREY         "Set Greyscale"
+#define SETWAVELEN      "Set Spectrum Wavelength"
+#define SETHOT          "Set Spectrum Hot"
+#define SETHEAT         "Set Spectrum Heat"
+#define SETJET          "Set Spectrum Jet"
+#define SETCUSTOM       "Set Spectrum Custom"
+#define KILLPROCESS 	"Kill Process"
+#define PRINTWINDOW 	"Print"
+#define RELOADWINDOW 	"Reload"
+#define RAISEWINDOW 	"Raise main window"
+#define INCLUDES        "Include Files"
+#define TOGGLESIZE      "Toggle fit to size"
+#define CHANGEVALUE 	"Change Increment/Value"
+#define CHANGEAXIS      "Change Axis"
+#define RESETZOOM       "Reset Zoom"
+#define INPUTDIALOG 	"Input Dialog"
+#define FILEDIALOG      "File Dialog"
+#define CHANGELIMITS 	"Change Limits/Precision"
 
 // used for calculating visibility for several types of widgets
 #define ComputeVisibility(x, obj)  {  \
@@ -198,17 +222,17 @@
     "</ui>"
 
 #define addColorTableActions \
-    myMenu.addAction("Get Info"); \
-    myMenu.addAction("Set Greyscale"); \
-    myMenu.addAction("Set Spectrum Wavelength"); \
-    myMenu.addAction("Set Spectrum Hot"); \
-    myMenu.addAction("Set Spectrum Heat"); \
-    myMenu.addAction("Set Spectrum Jet"); \
-    myMenu.addAction("Set Spectrum Custom"); \
+    myMenu.addAction(GETINFO); \
+    myMenu.addAction(SETGREY); \
+    myMenu.addAction(SETWAVELEN); \
+    myMenu.addAction(SETHOT); \
+    myMenu.addAction(SETHEAT); \
+    myMenu.addAction(SETJET); \
+    myMenu.addAction(SETCUSTOM); \
 
 //===============================================================================================
 
-#define MIN_FONT_SIZE 4
+#define MIN_FONT_SIZE 3
 
 Q_DECLARE_METATYPE(QList<int>)
 Q_DECLARE_METATYPE(QTabWidget*)
@@ -233,6 +257,15 @@ public:
     }
 };
 
+#if !defined(useElapsedTimer)
+double CaQtDM_Lib::rTime()
+{
+    struct timeval tt;
+    gettimeofday(&tt, (struct timezone *) 0);
+    return (double) 1000000.0 * (double) tt.tv_sec + (double) tt.tv_usec;
+}
+#endif
+
 /**
  * CaQtDM_Lib destructor
  */
@@ -243,9 +276,10 @@ CaQtDM_Lib::~CaQtDM_Lib()
                SIGNAL(Signal_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData)), this,
                SLOT(Callback_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData)));
 
-    if(!fromAS) delete myWidget;
+    //if(!fromAS) delete myWidget;
     includeWidgetList.clear();
     topIncludesWidgetList.clear();
+    includeFilesList.clear();
     allTabs.clear();
     allStacks.clear();
 }
@@ -253,7 +287,9 @@ CaQtDM_Lib::~CaQtDM_Lib()
 /**
  * CaQtDM_Lib constructor
  */
-CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKnobData *mKnobData, QMap<QString, ControlsInterface *> interfaces, MessageWindow *msgWindow, bool pepprint, QWidget *parentAS) : QMainWindow(parent)
+CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKnobData *mKnobData, QMap<QString,
+                       ControlsInterface *> interfaces, MessageWindow *msgWindow, bool pepprint, QWidget *parentAS,
+                       QMap<QString,QString> options) : QMainWindow(parent)
 {
     QUiLoader loader;
     fromAS = false;
@@ -264,6 +300,19 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     pepPrint = pepprint;
     firstResize = true;
     loopTimer = 0;
+    prcFile = false;
+
+    // is a default plugin specified (normally nothing means epics3)
+    QString option = options["defaultPlugin"];
+    if(!option.isEmpty()) {
+        if(getControlInterface(option) == (ControlsInterface *) 0) {
+            postMessage(QtCriticalMsg, (char*) qasc(tr("sorry -- specified default plugin %1 is not loaded, fallback to epics3").arg(option)));
+            qDebug() << "caQtDM -- specified default plugin" << option << "is not loaded, fallback to epics3";
+            defaultPlugin = "";
+        } else {
+            defaultPlugin = option;
+        }
+    }
 
     // file watcher for changes
     watcher = new QFileSystemWatcher(this);
@@ -277,8 +326,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     //qDebug() << "open file" << filename << "with macro" << macro;
     setAttribute(Qt::WA_DeleteOnClose);
 
-    includeFiles = "";
-
     // define a layout
     QGridLayout *layout = new QGridLayout;
 
@@ -288,9 +335,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     // treat ui file */
     QFileInfo fi(filename);
-
-    includeFiles.append(fi.absoluteFilePath());
-    includeFiles.append("<br>");
 
     if(!fromAS) {
         if(filename.lastIndexOf(".ui") != -1) {
@@ -311,6 +355,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
             // treat prc file and load designer description from internal buffer
         } else if(filename.lastIndexOf(".prc") != -1) {
 
+            prcFile = true;
             QString uiString = QString(uiIntern);
             uiString= uiString.arg(filename);
             QByteArray *array= new QByteArray();
@@ -382,6 +427,10 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     // connect close launchfile action to parent
     connect(this, SIGNAL(Signal_IosExit()), parent, SLOT(Callback_IosExit()));
 
+    // connect reload window action to parent
+    connect(this, SIGNAL(Signal_ReloadWindow(QWidget*)), parent, SLOT(Callback_ReloadWindow(QWidget*)));
+    connect(this, SIGNAL(Signal_ReloadAllWindows()), parent, SLOT(Callback_ReloadAllWindows()));
+
     qRegisterMetaType<knobData>("knobData");
 
     // connect signals to slots for exchanging data
@@ -393,8 +442,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
             SLOT(Callback_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, knobData)));
 
     if(!fromAS) {
-        connect(this, SIGNAL(Signal_OpenNewWFile(const QString&, const QString&, const QString&)), parent,
-                SLOT(Callback_OpenNewFile(const QString&, const QString&, const QString&)));
+        connect(this, SIGNAL(Signal_OpenNewWFile(const QString&, const QString&, const QString&, const QString&)), parent,
+                SLOT(Callback_OpenNewFile(const QString&, const QString&, const QString&, const QString&)));
     }
 
     setContextMenuPolicy(Qt::CustomContextMenu);
@@ -406,6 +455,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     // by findChildren, and get the list of all the includes at this level
 
     includeWidgetList.clear();
+    includeFilesList.clear();
     topIncludesWidgetList.clear();
     allTabs.clear();
     allStacks.clear();
@@ -474,6 +524,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         }
     }
 
+    setContextMenuPolicy(Qt::CustomContextMenu);
+
     // start a timer
     loopTimerID = startTimer(1000);
 
@@ -489,6 +541,24 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
         splash->deleteLater();
     }
+
+    // add a reload action
+    QAction *ReloadWindowAction = new QAction(this);
+    ReloadWindowAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+R", 0, QApplication::UnicodeUTF8));
+    connect(ReloadWindowAction, SIGNAL(triggered()), this, SLOT(Callback_reloadWindow()));
+    this->addAction(ReloadWindowAction);
+
+    // add also a global reload action
+    QAction *ReloadAllWindowsAction = new QAction(this);
+    ReloadAllWindowsAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+Alt+R", 0, QApplication::UnicodeUTF8));
+    connect(ReloadAllWindowsAction, SIGNAL(triggered()), this, SLOT(Callback_reloadAllWindows()));
+    this->addAction(ReloadAllWindowsAction);
+
+    // add a print action
+    QAction *PrintWindowAction = new QAction(this);
+    PrintWindowAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+P", 0, QApplication::UnicodeUTF8));
+    connect(PrintWindowAction, SIGNAL(triggered()), this, SLOT(Callback_printWindow()));
+    this->addAction(PrintWindowAction);
 }
 
 /**
@@ -681,12 +751,6 @@ QMap<QString, QString> CaQtDM_Lib::createMap(const QString& macro)
     if(macro != NULL) {
         QStringList vars = macro.split(",", QString::SkipEmptyParts);
         for(int i=0; i< vars.count(); i++) {
-            /*          this would be ok if medm did not allow also an equal sign after the equal sign
-            QStringList keyvalue = vars.at(i).split("=", QString::SkipEmptyParts);
-            if(keyvalue.count() == 2) {
-                map.insert(keyvalue.at(0).trimmed(), keyvalue.at(1));
-            }
-*/
             int pos = vars.at(i).indexOf("=");
             if(pos != -1) {
                 QString key = vars.at(i).mid(0, pos);
@@ -809,6 +873,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         return;
     }
 
+    // any caWidget with caWidgetInterface - actually caInoutDemo (new monitor displaying values/string)
+    if(caWidgetInterface* wif = dynamic_cast<caWidgetInterface *>(w1)) {
+        wif->caActivate(this, map, &kData, specData, myWidget);
+    }
+
     // not a ca widget, but offer the possibility to load files into the text browser by using macros
     //==================================================================================================================
     if(QTextBrowser* browserWidget = qobject_cast<QTextBrowser *>(w1)) {
@@ -820,7 +889,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         QString fileName = browserWidget->source().path();
 
         if(!fileName.isEmpty()) {
-            qDebug() << "watch file" << source;
+            qDebug() << "caQtDM -- watch file" << source;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
             bool success = watcher->addPath(fileName);
             if(!success) qDebug() << fileName << "can not be watched for changes";
@@ -909,6 +978,29 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         if(shellWidget->isElevated()) shellWidget->raise();
 
         shellWidget->setProperty("Taken", true);
+
+        //==================================================================================================================
+    } else if(caMimeDisplay* mimeWidget = qobject_cast<caMimeDisplay *>(w1)) {
+
+        //qDebug() << "create caMimeDisplay";
+        w1->setProperty("ObjectType", caMimeDisplay_Widget);
+
+        QString text;
+        text= mimeWidget->getLabels();
+        if(reaffectText(map, &text))  mimeWidget->setLabels(text);
+
+        text = mimeWidget->getArgs();
+        if(reaffectText(map, &text))  mimeWidget->setArgs(text);
+
+        text = mimeWidget->getFiles();
+        if(reaffectText(map, &text)) mimeWidget->setFiles(text);
+
+        text = mimeWidget->getLabel();
+        if(reaffectText(map, &text))  mimeWidget->setLabel(text);
+
+        if(mimeWidget->isElevated()) mimeWidget->raise();
+
+        mimeWidget->setProperty("Taken", true);
 
         //==================================================================================================================
     } else if(caMenu* menuWidget = qobject_cast<caMenu *>(w1)) {
@@ -1103,7 +1195,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         //==================================================================================================================
     } else if(caMultiLineString* multilinestringWidget = qobject_cast<caMultiLineString *>(w1)) {
 
-        //qDebug() << "create caLineEdit";
+        //qDebug() << "create caMultilineString";
         w1->setProperty("ObjectType", caMultiLineString_Widget);
 
         if(multilinestringWidget->getPV().size() > 0) {
@@ -1304,6 +1396,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             clockWidget->setPV(pv);
         }
 
+        clockWidget->setAlarmColors(NO_ALARM, true);
         clockWidget->setProperty("Taken", true);
 
         //==================================================================================================================
@@ -1364,6 +1457,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             meterWidget->setPV(pv);
         }
 
+        meterWidget->setAlarmColors(NO_ALARM, true);
         meterWidget->setProperty("Taken", true);
 
         //==================================================================================================================
@@ -1397,11 +1491,13 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
     } else if(caInclude* includeWidget = qobject_cast<caInclude *>(w1)) {
 
         //qDebug() << "create caInclude" << w1;
+        int maxRows = 0;
         int row = 0;
+        int maxColumns=0;
         int column = 0;
         w1->setProperty("ObjectType", caInclude_Widget);
 
-        QWidget *thisW;
+        QWidget *thisW = (QWidget *) 0;
         QUiLoader loader;
         bool prcFile = false;
 
@@ -1446,10 +1542,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         searchFile *s = new searchFile(fileName);
         QString fileNameFound = s->findFile();
         if(fileNameFound.isNull()) {
-            if(!includeFiles.contains(fileName)) {
-                includeFiles.append(fileName);
-                includeFiles.append(" does not exist <br>");
-            }
+            includeData value;
+            value.count = 0;
+            value.ms = 0;
+            value.text="does not exist";
+            includeFilesList.insert(fileName, value);
         } else {
             //qDebug() << "use file" << fileName << "for" << includeWidget;
             fileName = fileNameFound;
@@ -1457,10 +1554,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         delete s;
 
         QString macros = includeWidget->getMacro();
+        //in case the macro $(B) has to be replaced by another macro  (ex: "B=NAME=ARIMA-CV-02ME;NAME=ARIMA-CV-03ME")
+        macros = treatMacro(map, macros, &doNothing);
         QStringList macroList = macros.split(";", QString::SkipEmptyParts);
 
         // loop on this include with different macro
-        for(int j=0; j<includeWidget->getItemCount(); j++) {
+        for(int j=0; j<qMax(macroList.count(), includeWidget->getItemCount()); j++) {
             QString macroS;
             if(j < macroList.count()) {
                 macroS = macroList.at(j);
@@ -1486,7 +1585,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             // sure file exists ?
             QFileInfo fi(fileName);
             if(fi.exists()) {
-
+                qint64 diff=0;
                 // load prc or ui file
                 if(prcFile) {
                     // load new file
@@ -1494,37 +1593,62 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     thisW = parsefile->load(this);
                     delete parsefile;
                 } else {
+#if !defined(useElapsedTimer)
+                    double last = rTime();
+#else
+                    QElapsedTimer timer;
+                    timer.start();
+#endif
                     QFile *file = new QFile;
                     // open and load ui file
                     file->setFileName(fileName);
                     file->open(QFile::ReadOnly);
-                    //printf("effective load of file %s for widget %s\n", qasc(fileName), qasc(includeWidget->objectName()));
                     thisW = loader.load(file, this);
                     file->close();
                     delete file;
+
+#if !defined(useElapsedTimer)
+                    double now = rTime();
+                    diff = qRound ((now - last) /1000.0);
+#else
+                    diff = timer.elapsed();
+#endif
+                    if(diff < 1) diff=1; // you really do not believe that smaller is possible, do you?
+                }
+
+                QMap<QString, includeData>::const_iterator name = includeFilesList.find(fi.absoluteFilePath());
+                if(name != includeFilesList.end()) {
+                    includeData value = name.value();
+                    value.count++;
+                    value.ms = value.ms + ((int) diff - value.ms) / value.count;
+                    if(!thisW) value.text = "not loaded"; else value.text="loaded";
+                    includeFilesList.insert(fi.absoluteFilePath(), value);
+                } else {
+                    includeData value;
+                    value.count = 1;
+                    value.ms = (int) diff;
+                    if(!thisW) value.text = "not loaded"; else value.text="loaded";
+                    includeFilesList.insert(fi.absoluteFilePath(), value);
                 }
 
                 // some error with loading
                 if (!thisW) {
                     postMessage(QtDebugMsg, (char*) qasc(tr("could not load include file %1").arg(fileName)));
-                    if(!includeFiles.contains(fi.absoluteFilePath())) {
-                        includeFiles.append(fi.absoluteFilePath());
-                        includeFiles.append(" could not be loaded <br>");
-                        continue;
-                    }
                     // seems to be ok
                 } else {
-                    if(!includeFiles.contains(fi.absoluteFilePath())) {
-                        includeFiles.append(fi.absoluteFilePath());
-                        includeFiles.append(" is loaded <br>");
-                    }
                     includeWidgetList.append(thisW);
 
                     // add includeWidget to the gui
                     if(includeWidget->getStacking() == caInclude::Row) {
                         layout->addWidget(thisW, j, 0);
+                        row++;
+                        maxRows = row;
+                        maxColumns = 1;
                     } else if(includeWidget->getStacking() == caInclude::Column) {
                        layout->addWidget(thisW, 0, j);
+                       column++;
+                       maxColumns = column;
+                       maxRows = 1;
                     } else {
                         if(row >= includeWidget->getMaxLines()) {
                             row=0;
@@ -1532,6 +1656,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                         }
                         layout->addWidget(thisW, row, column);
                         row++;
+                        if(row > maxRows) maxRows = row;
+                        maxColumns = column + 1;
                     }
 
                     includeWidget->setLayout(layout);
@@ -1557,7 +1683,17 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         } // end for
 
-        // increment splascounter when include is in list
+        if((thisW != (QWidget *) 0 ) && (!prcFile) && includeWidget->getAdjustSize()) {
+            includeWidget->resize(maxColumns * thisW->width(), maxRows * thisW->height());
+            // when the include is packed into a scroll area, set the minimumsize too
+            if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
+                Q_UNUSED(scrollWidget);
+                QWidget *contents = (QWidget*) includeWidget->parent();
+                contents->setMinimumSize(maxColumns * thisW->width(), maxRows * thisW->height());
+            }
+        }
+
+        // increment splashcounter when include is in list
         if(nbIncludes > 0) {
             for (int i = topIncludesWidgetList.count()-1; i >= 0; --i) {
                 if(w1 ==  topIncludesWidgetList.at(i)) {
@@ -2133,7 +2269,7 @@ ControlsInterface * CaQtDM_Lib::getControlInterface(QString plugininterface)
         QMapIterator<QString, ControlsInterface *> i(controlsInterfaces);
         while (i.hasNext()) {
             i.next();
-            if(i.key().contains(plugininterface)) {
+            if(i.key() == plugininterface) {
                 //qDebug() << "interface returned for requested" << plugininterface ;
                 return  i.value();
             }
@@ -2199,13 +2335,17 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     QString newPV = treatMacro(map, trimmedPV, &doNothing);
     *pvRep = newPV;
 
-    // find out what kind of interface has to be used for this pv, default is epics3
+    // find out what kind of interface has to be used for this pv, default is epics3 or whatever is specified on the command line with -cs
     pos = newPV.indexOf("://");
     if(pos != -1) {
         pluginName = newPV.mid(0, pos);
         trimmedPV = newPV.mid(pos+3);
     } else {
-        pluginName = "epics3";
+        if(defaultPlugin.isEmpty()) {
+           pluginName = "epics3";
+        } else {
+           pluginName = defaultPlugin;
+        }
         trimmedPV = newPV;
         if(kData->soft) pluginName = "intern";
         if(mutexKnobDataP->getSoftPV(trimmedPV, &indx, thisW)) pluginName = "intern";
@@ -2691,7 +2831,16 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                     // when connected
                     int j = IndexList.at(i+1).toInt(); // input a,b,c,d
                     if(ptr->edata.connected) {
-                        valueArray[j] = ptr->edata.rvalue;
+                        switch (ptr->edata.fieldtype){
+                            case caINT:
+                            case caLONG:{
+                                valueArray[j] = ptr->edata.ivalue;
+                                break;
+                            }
+                            default:{
+                                valueArray[j] = ptr->edata.rvalue;
+                            }
+                        }
                     } else {
                         valueArray[j] = 0.0;
                     }
@@ -2910,10 +3059,25 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         return;
     }
 
+    // any caWidget with caWidgetInterface
+    if (caWidgetInterface* wif = dynamic_cast<caWidgetInterface *>(w)) {
+        wif->caDataUpdate(units, String, data);
+    }
+
     // calc ==================================================================================================================
-    if(caCalc *calcWidget = qobject_cast<caCalc *>(w)) {
+    else if(caCalc *calcWidget = qobject_cast<caCalc *>(w)) {
         bool valid;
-        double result = data.edata.rvalue;
+        double result;
+        switch (data.edata.fieldtype){
+            case caINT:
+            case caLONG:{
+                result = data.edata.ivalue;
+                break;
+            }
+            default:{
+                result = data.edata.rvalue;
+            }
+        }
         //qDebug() << "we have a caCalc" << calcWidget->getVariable() << "  " <<  data.pv;
 
         CalcVisibility(w, result, valid);  // visibility not used, but calculation yes
@@ -2957,7 +3121,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         if(data.edata.connected) {
             int colorMode = labelverticalWidget->getColorMode();
-            if(colorMode == caLabel::Static) {
+            if(colorMode == caLabelVertical::Static) {
                 // done at initialisation, we have to set it back after no connect
                 if(!labelverticalWidget->property("Connect").value<bool>()) {
                     QColor fg = labelverticalWidget->property("FColor").value<QColor>();
@@ -2966,7 +3130,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     labelverticalWidget->setBackground(bg);
                     labelverticalWidget->setProperty("Connect", true);
                 }
-            } else if(colorMode == caLabel::Alarm) {
+            } else if(colorMode == caLabelVertical::Alarm) {
                 short status = ComputeAlarm(w);
                 labelverticalWidget->setAlarmColors(status);
             }
@@ -3058,7 +3222,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
             // set colors when connected
             // case of alarm mode
-            if (thermoWidget->getColorMode() == caThermo::Alarm) {
+            if ((thermoWidget->getColorMode() == caThermo::Alarm_Default) || (thermoWidget->getColorMode() == caThermo::Alarm_Static)) {
                 if(channelLimitsEnabled) {
                     thermoWidget->setAlarmColors(data.edata.severity);
                 } else {
@@ -3069,6 +3233,9 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             } else {
                 SetColorsBack(thermoWidget);
             }
+            int precMode = thermoWidget->getPrecisionMode();
+            if((precMode != caThermo::User) && (data.edata.initialize)) thermoWidget->setPrecision(data.edata.precision);
+
             // set no connection color
         } else {
             SetColorsNotConnected(thermoWidget);
@@ -3077,22 +3244,31 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         // caSlider ==================================================================================================================
     } else if (caSlider *sliderWidget = qobject_cast<caSlider *>(w)) {
 
-        bool channelLimitsEnabled = false;
-
         if(data.edata.connected) {
-            if(sliderWidget->getLimitsMode() == caSlider::Channel) channelLimitsEnabled= true;
+            bool highChannelLimitEnabled = false;
+            bool lowChannelLimitEnabled = false;
+            bool channelLimitsEnabled = false;
+            if(sliderWidget->getHighLimitMode() == caSlider::Channel) highChannelLimitEnabled= true;
+            if(sliderWidget->getLowLimitMode()  == caSlider::Channel) lowChannelLimitEnabled= true;
+            if(highChannelLimitEnabled && lowChannelLimitEnabled) channelLimitsEnabled = true;
+
             // take limits from channel, in case of user limits these should already been set
-            if((channelLimitsEnabled) && (data.edata.initialize) ) {
+            if((highChannelLimitEnabled || lowChannelLimitEnabled) && data.edata.initialize ) {
+
                 // when limits are the same, do nothing
                 if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
                     disconnect(w, SIGNAL(valueChanged (double)), 0, 0);
+                    /*
                     if(sliderWidget->getDirection() == caSlider::Down  || sliderWidget->getDirection() == caSlider::Left) {
-                        sliderWidget->setMinValue(data.edata.upper_disp_limit);
-                        sliderWidget->setMaxValue(data.edata.lower_disp_limit);
+                       if((lowChannelLimitEnabled))  sliderWidget->setMinValue(data.edata.upper_disp_limit);
+                       if((highChannelLimitEnabled)) sliderWidget->setMaxValue(data.edata.lower_disp_limit);
                     } else {
-                        sliderWidget->setMaxValue(data.edata.upper_disp_limit);
-                        sliderWidget->setMinValue(data.edata.lower_disp_limit);
+                       if((lowChannelLimitEnabled))  sliderWidget->setMaxValue(data.edata.upper_disp_limit);
+                       if((highChannelLimitEnabled)) sliderWidget->setMinValue(data.edata.lower_disp_limit);
                     }
+                    */
+                    if((highChannelLimitEnabled)) sliderWidget->setMaxValue(data.edata.upper_disp_limit);
+                    if((lowChannelLimitEnabled))  sliderWidget->setMinValue(data.edata.lower_disp_limit);
                     connect(w, SIGNAL(valueChanged(double)), this, SLOT(Callback_SliderValueChanged(double)));
                 }
             }
@@ -3107,7 +3283,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
             // set colors when connected
             // case of alarm mode
-            if (sliderWidget->getColorMode() == caSlider::Alarm) {
+            if ((sliderWidget->getColorMode() == caSlider::Alarm_Default) || (sliderWidget->getColorMode() == caSlider::Alarm_Static)) {
                 if(channelLimitsEnabled) {
                     sliderWidget->setAlarmColors(data.edata.severity);
                 } else {
@@ -3118,6 +3294,10 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             } else {
                 SetColorsBack(sliderWidget);
             }
+
+            int precMode = sliderWidget->getPrecisionMode();
+            if((precMode != caSlider::User) && (data.edata.initialize)) sliderWidget->setPrecision(data.edata.precision);
+
             // set no connection color
         } else {
             SetColorsNotConnected(sliderWidget);
@@ -3293,18 +3473,45 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
                 if(colorMode == caLineEdit::Static || colorMode == caLineEdit::Default) { // done at initialisation
                     if(!lineeditWidget->property("Connect").value<bool>()) {                      // but was disconnected before
-                        lineeditWidget->setAlarmColors(data.edata.severity, data.edata.rvalue, bg, fg);
+                        switch (data.edata.fieldtype){
+                            case caINT:
+                            case caLONG:{
+                                lineeditWidget->setAlarmColors(data.edata.severity, data.edata.ivalue, bg, fg);
+                                break;
+                            }
+                            default:{
+                                lineeditWidget->setAlarmColors(data.edata.severity, data.edata.rvalue, bg, fg);
+                            }
+                        }
                         lineeditWidget->setProperty("Connect", true);
                     }
                 } else {
-                    lineeditWidget->setAlarmColors(data.edata.severity, data.edata.rvalue, bg, fg);
+                    switch (data.edata.fieldtype){
+                        case caINT:
+                        case caLONG:{
+                            lineeditWidget->setAlarmColors(data.edata.severity, data.edata.ivalue, bg, fg);
+                            break;
+                        }
+                        default:{
+                            lineeditWidget->setAlarmColors(data.edata.severity, data.edata.rvalue, bg, fg);
+                        }
+                    }
                 }
 
                 if((precMode != caLineEdit::User) && (data.edata.initialize)) {
                     lineeditWidget->setFormat(data.edata.precision);
                 }
+                switch (data.edata.fieldtype){
+                    case caINT:
+                    case caLONG:{
+                        lineeditWidget->setValue(data.edata.ivalue, units);
+                        break;
+                    }
+                    default:{
+                        lineeditWidget->setValue(data.edata.rvalue, units);
+                    }
+                }
 
-                lineeditWidget->setValue(data.edata.rvalue, units);
                 // access control for textentry
                 if (caTextEntry *textentryWidget = qobject_cast<caTextEntry *>(w)) {
                     textentryWidget->setAccessW((bool)data.edata.accessW);
@@ -3569,8 +3776,8 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             } else if(XorY == caCartesianPlot::CH_Trigger) {
                 for(int i=0; i < caCartesianPlot::curveCount; i++) {
                     double p;
-                    cartesianplotWidget->setData(&p, 1, curvNB, curvType, XorY);
-                    cartesianplotWidget->displayData(curvNB, curvType);
+                    cartesianplotWidget->setData(&p, 1, i, curvType, XorY);
+                    cartesianplotWidget->displayData(i, curvType);
                 }
 
                 // count channel
@@ -3667,22 +3874,30 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 if(stripplotWidget->getYscalingMax(actPlot) == caStripPlot::Channel) {
                     stripplotWidget->setYaxisLimitsMax(actPlot, data.edata.upper_disp_limit);
                 }
+                if(stripplotWidget->getYaxisLimitsMin(actPlot) == stripplotWidget->getYaxisLimitsMax(actPlot)) {
+                    stripplotWidget->setYaxisLimitsMin(actPlot, 0.0);
+                    stripplotWidget->setYaxisLimitsMax(actPlot, 10.0);
+                }
                 if(actPlot == 0) {
-                    double ymin = stripplotWidget->getYaxisLimitsMin(0);
-                    double ymax = stripplotWidget->getYaxisLimitsMax(0);
-                    stripplotWidget->setYscale(ymin, ymax);
+                    stripplotWidget->setYscale(stripplotWidget->getYaxisLimitsMin(0), stripplotWidget->getYaxisLimitsMax(0));
                 }
                 // do this for redisplaying legend with correct limits
-                //if((stripplotWidget->getYscalingMin(actPlot) == caStripPlot::Channel) ||
-                //        (stripplotWidget->getYscalingMax(actPlot) == caStripPlot::Channel)) {
-                //}
-                // force resize for repainting
-                QResizeEvent *re = new QResizeEvent(size(), size());
-                resizeEvent(re);
-                delete re;
+
+                stripplotWidget->resize(stripplotWidget->geometry().width()+1, stripplotWidget->geometry().height());
+                stripplotWidget->resize(stripplotWidget->geometry().width()-1, stripplotWidget->geometry().height());
             }
 
-            stripplotWidget->setData(data.edata.actTime, data.edata.rvalue, actPlot);
+
+            switch (data.edata.fieldtype){
+                case caINT:
+                case caLONG:{
+                    stripplotWidget->setData(data.edata.actTime, data.edata.ivalue, actPlot);
+                    break;
+                }
+                default:{
+                    stripplotWidget->setData(data.edata.actTime, data.edata.rvalue, actPlot);
+                }
+            }
 
             if(data.edata.initialize) {
                 stripplotWidget->startPlot();
@@ -3811,7 +4026,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 if(data.edata.fieldtype == caSTRING) {
                     QStringList list;
                     list = String.split((QChar)27);
-                    wavetableWidget->setStringList(list, data.edata.status, data.edata.valueCount);
+                    wavetableWidget->setStringList(list, data.edata.status, list.size());
                 } else {
                     WaveTable(wavetableWidget, data);
                 }
@@ -4171,7 +4386,7 @@ void CaQtDM_Lib::Callback_EApplyNumeric(double value)
     caApplyNumeric *numeric = qobject_cast<caApplyNumeric *>(sender());
     if(!numeric->getAccessW()) return;
     if(numeric->getPV().length() > 0) {
-        TreatOrdinaryValue(numeric->getPV(), rdata,  idata, (QWidget*) numeric);
+        TreatOrdinaryValue(numeric->getPV(), rdata,  idata, "", (QWidget*) numeric);
     }
 }
 /**
@@ -4185,7 +4400,7 @@ void CaQtDM_Lib::Callback_ENumeric(double value)
     caNumeric *numeric = qobject_cast<caNumeric *>(sender());
     if(!numeric->getAccessW()) return;
     if(numeric->getPV().length() > 0) {
-        TreatOrdinaryValue(numeric->getPV(), rdata,  idata, (QWidget*) numeric);
+        TreatOrdinaryValue(numeric->getPV(), rdata,  idata, "", (QWidget*) numeric);
     }
 }
 
@@ -4200,7 +4415,7 @@ void CaQtDM_Lib::Callback_Spinbox(double value)
     caSpinbox *numeric = qobject_cast<caSpinbox *>(sender());
     if(!numeric->getAccessW()) return;
     if(numeric->getPV().length() > 0) {
-        TreatOrdinaryValue(numeric->getPV(), rdata,  idata, (QWidget*) numeric);
+        TreatOrdinaryValue(numeric->getPV(), rdata,  idata, "", (QWidget*) numeric);
     }
 }
 
@@ -4212,7 +4427,7 @@ void CaQtDM_Lib::Callback_SliderValueChanged(double value)
     caSlider *numeric = qobject_cast<caSlider *>(sender());
     if(!numeric->getAccessW()) return;
     if(numeric->getPV().length() > 0) {
-        TreatOrdinaryValue(numeric->getPV(), rdata, idata,  (QWidget*) numeric);
+        TreatOrdinaryValue(numeric->getPV(), rdata, idata,  "", (QWidget*) numeric);
     }
 }
 
@@ -4225,7 +4440,6 @@ void CaQtDM_Lib::Callback_ToggleButton(bool type)
     double rvalue = 0.0;
     int32_t ivalue = 0;
     QString svalue ="";
-    char errmess[255];
     caToggleButton *w = qobject_cast<caToggleButton *>(sender());
     if(!w->getAccessW()) return;
 
@@ -4250,9 +4464,7 @@ void CaQtDM_Lib::Callback_ToggleButton(bool type)
     }
 
     if(w->getPV().length() > 0) {
-        QStringsToChars(w->getPV(), svalue,  w->objectName().toLower());
-        ControlsInterface * plugininterface = (ControlsInterface *) w->property("Interface").value<void *>();
-        if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue(param1, rvalue, ivalue, param2, param3, errmess, 0);
+        TreatOrdinaryValue(w->getPV(), rvalue, ivalue, svalue, (QWidget*) w);
     }
 }
 
@@ -4314,13 +4526,13 @@ void CaQtDM_Lib::Callback_MenuClicked(const QString& text)
  */
 void CaQtDM_Lib::Callback_TextEntryChanged(const QString& text)
 {
-    caTextEntry::FormatType fType;
+    FormatType fType;
     QWidget *w1 = qobject_cast<QWidget *>(sender());
     caTextEntry *w = qobject_cast<caTextEntry *>(sender());
 
     if(!w->getAccessW()) return;
 
-    fType = w->getFormatType();
+    fType = (FormatType) w->getFormatType();
     TreatRequestedValue(w->getPV(), text, fType, w1);
 }
 
@@ -4370,9 +4582,9 @@ void CaQtDM_Lib::Callback_RelatedDisplayClicked(int indx)
 
     // open new file and
     if(indx < files.count() && indx < args.count()) {
-        emit Signal_OpenNewWFile(files[indx].trimmed(), args[indx].trimmed(), geometry);
+        emit Signal_OpenNewWFile(files[indx].trimmed(), args[indx].trimmed(), geometry, "true");
     } else if(indx < files.count()) {
-        emit Signal_OpenNewWFile(files[indx].trimmed(), "", geometry);
+        emit Signal_OpenNewWFile(files[indx].trimmed(), "", geometry, "true");
     }
 
 }
@@ -4390,10 +4602,10 @@ void CaQtDM_Lib::Callback_MessageButton(int type)
 
     if(type == 0) {         // pressed
         if(w->getPressMessage().size() > 0)
-            TreatRequestedValue(w->getPV(), w->getPressMessage(), caTextEntry::decimal, w1);
+            TreatRequestedValue(w->getPV(), w->getPressMessage(), decimal, w1);
     } else if(type == 1) {  // released
         if(w->getReleaseMessage().size() > 0)
-            TreatRequestedValue(w->getPV(), w->getReleaseMessage(), caTextEntry::decimal, w1);
+            TreatRequestedValue(w->getPV(), w->getReleaseMessage(), decimal, w1);
     }
 }
 
@@ -4412,11 +4624,11 @@ void CaQtDM_Lib::Callback_ByteControllerClicked(int bit)
     // bit set
     if(w->bitState(w->getValue(), bit)) {
         number &= ~(1 << bit);
-        TreatOrdinaryValue(w->getPV(), (double) number, (int32_t) number,  w1);
+        TreatOrdinaryValue(w->getPV(), (double) number, (int32_t) number, "",  w1);
         // bit not set
     } else {
         number |= 1 << bit;
-        TreatOrdinaryValue(w->getPV(), (double) number, (int32_t) number,  w1);
+        TreatOrdinaryValue(w->getPV(), (double) number, (int32_t) number, "",  w1);
     }
 }
 
@@ -4556,7 +4768,6 @@ void CaQtDM_Lib::shellCommand(QString command) {
 #else
     // I had too many problems with QProcess start, use standard execl
     if(!command.endsWith("&")) command.append("&");
-    //qDebug() << "execute:" << command;
     int status = Execute((char*) qasc(command));
     if(status != 0) {
         QMessageBox::information(0,"FailedToStart or Error", command);
@@ -4600,29 +4811,23 @@ void CaQtDM_Lib::closeEvent(QCloseEvent* ce)
                if(plugininterface != (ControlsInterface *) 0) plugininterface->pvClearMonitor(&kData);
             }
             kData.index = -1;
-            kData.pv[0] = '\0';
+            //kData.pv[0] = '\0';
             mutexKnobDataP->SetMutexKnobData(i, kData);
         }
     }
 
     Sleep::msleep(200);
 
-    // get rid of memory, that was allocated before for this window.
+    // get rid of memory that was allocated before for this window.
     // it has not been done previously, while otherwise in the datacallback
-    // you will run into trouble
+    // you can run into trouble
     for(int i=0; i < mutexKnobDataP->GetMutexKnobDataSize(); i++) {
         knobData *kPtr = mutexKnobDataP->GetMutexKnobDataPtr(i);
         if(kPtr != (knobData *) 0) {
             if(myWidget == (QWidget*) kPtr->thisW) {
-                if (kPtr->edata.info != (void *) 0) {
-                    free(kPtr->edata.info);
-                    kPtr->edata.info = (void*) 0;
-                    kPtr->thisW = (void*) 0;
-                }
-                if(kPtr->edata.dataB != (void*) 0) {
-                    free(kPtr->edata.dataB);
-                    kPtr->edata.dataB = (void*) 0;
-                }
+                ControlsInterface * plugininterface = getControlInterface(kPtr->pluginName);
+                if(plugininterface != (ControlsInterface *) 0) plugininterface->pvFreeAllocatedData(kPtr);
+                kPtr->thisW = (void*) 0;
                 if(kPtr->mutex != (QMutex *) 0) {
                     QMutex *mutex = (QMutex *) kPtr->mutex;
                     delete mutex;
@@ -4656,14 +4861,20 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     int limitsDefault = false;
     int precMode = false;
     int limitsMode = false;
+    int highLimit = false;
+    int lowLimit = false;
     int Precision = 0;
     const char *caTypeStr[] = {"DBF_STRING", "DBF_INT", "DBF_FLOAT", "DBF_ENUM", "DBF_CHAR", "DBF_LONG", "DBF_DOUBLE"};
     char colMode[20] = {""};
     QString calcString = "";
     QString imageString = "";
+    QStringList urlStrings;
     double limitsMax=0.0, limitsMin=0.0;
     bool validExecListItems = false;
     QStringList execListItems;
+
+    urlStrings.clear();
+
     if(w != (QWidget*) 0) {
         ClassName = w->metaObject()->className();
         ObjectName = w->objectName();
@@ -4702,7 +4913,9 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         }
     }
 
-    if(caImage* imageWidget = qobject_cast<caImage *>(w)) {
+    if(caWidgetInterface* wif = dynamic_cast<caWidgetInterface *>(w)) {   // any caWidget with caWidgetInterface
+        wif->getWidgetInfo(pv, nbPV, limitsDefault, precMode, limitsMode, Precision, colMode, limitsMax, limitsMin);
+    } else if(caImage* imageWidget = qobject_cast<caImage *>(w)) {
         getAllPVs(imageWidget);
         GetDefinedCalcString(caImage, imageWidget, calcString);
         imageString =imageWidget->getImageCalc();
@@ -4811,12 +5024,22 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         nbPV = 2;
     } else if(caSlider* sliderWidget = qobject_cast<caSlider *>(w)) {
         pv[0] = sliderWidget->getPV().trimmed();
-        if(sliderWidget->getLimitsMode() == caSlider::User) {
-            limitsMode = true;
+        if(sliderWidget->getHighLimitMode() == caSlider::User) {
+            highLimit = true;
             limitsMax = sliderWidget->getMaxValue();
+        }
+        if(sliderWidget->getLowLimitMode() == caSlider::User) {
+            lowLimit = true;
             limitsMin = sliderWidget->getMinValue();
         }
-        if(sliderWidget->getColorMode() == caSlider::Alarm) strcpy(colMode, "Alarm");
+        if(sliderWidget->getPrecisionMode() == caSlider::User) {
+            precMode = true;
+            Precision = sliderWidget->getPrecision();
+        } else {
+            knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv[0]);
+            if(kPtr != (knobData *) 0) Precision =  kPtr->edata.precision;
+        }
+        if((sliderWidget->getColorMode() == caSlider::Alarm_Default) || (sliderWidget->getColorMode() == caSlider::Alarm_Static)) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
         nbPV = 1;
     } else if (caClock* clockWidget = qobject_cast<caClock *>(w)) {
@@ -4840,7 +5063,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 limitsMin = thermoWidget->minValue();
             }
         }
-        if(thermoWidget->getColorMode() == caThermo::Alarm) strcpy(colMode, "Alarm");
+        if((thermoWidget->getColorMode() == caThermo::Alarm_Default) || (thermoWidget->getColorMode() == caThermo::Alarm_Static)) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
         nbPV = 1;
     } else if(caLinearGauge* lineargaugeWidget = qobject_cast<caLinearGauge *>(w)) {
@@ -4930,7 +5153,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
     } else if(caScriptButton* scriptbuttonWidget =  qobject_cast< caScriptButton *>(w)) {
         // add acion : kill associated process if running
-        if(!scriptbuttonWidget->getAccessW()) myMenu.addAction("Kill Process");
+        if(!scriptbuttonWidget->getAccessW()) myMenu.addAction(KILLPROCESS);
 
     } else if(caScan2D* scan2dWidget = qobject_cast<caScan2D *>(w)) {
         nbPV=0;
@@ -4945,6 +5168,9 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             }
         }
 
+    } else if(caMimeDisplay* mimeWidget = qobject_cast<caMimeDisplay *>(w)) {
+        urlStrings = mimeWidget->getFilesList();
+
     } else if(ClassName.contains("QE")) {
         qDebug() << "treat" << w;
 
@@ -4952,19 +5178,22 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     } else if(w==myWidget->parent()->parent()) {
         //qDebug() << "must be mainwindow?" << w << myWidget->parent()->parent();
         onMain = true;
-        myMenu.addAction("Print");
-        myMenu.addAction("Raise main window");
-        myMenu.addAction("Include files");
+        myMenu.addAction(PRINTWINDOW);
+        myMenu.addAction(RELOADWINDOW);
+        myMenu.addAction(RAISEWINDOW);
+        myMenu.addAction(INCLUDES);
     }
 
     // add some more actions
-    if(caScriptButton* scriptbuttonWidget =  qobject_cast< caScriptButton *>(w)) {
+    if(caWidgetInterface* wif = dynamic_cast<caWidgetInterface *>(w)) { // any caWidget with caWidgetInterface
+        wif->createContextMenu(myMenu);
+    } else if(caScriptButton* scriptbuttonWidget =  qobject_cast< caScriptButton *>(w)) {
         Q_UNUSED(scriptbuttonWidget);
 
         // for the camera cameraWidget
     } else if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) {
         QAction *menuAction;
-        menuAction = myMenu.addAction("Toggle fit to size");
+        menuAction = myMenu.addAction(TOGGLESIZE);
         menuAction->setCheckable(true);
         if(cameraWidget->getFitToSize() == caCamera::Yes) menuAction->setChecked(true);
         else  menuAction->setChecked(false);
@@ -4973,7 +5202,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         // for the scan2d scan2dWidget
     } else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) {
         QAction *menuAction;
-        menuAction = myMenu.addAction("Toggle fit to size");
+        menuAction = myMenu.addAction(TOGGLESIZE);
         menuAction->setCheckable(true);
         if(scan2dWidget->getFitToSize() == caScan2D::Yes) menuAction->setChecked(true);
         else  menuAction->setChecked(false);
@@ -4987,27 +5216,27 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         // for the slider
     } else if(caSlider * sliderWidget = qobject_cast< caSlider *>(w)) {
         Q_UNUSED(sliderWidget);
-        myMenu.addAction("Get Info");
-        myMenu.addAction("Change Increment/Value");
+        myMenu.addAction(GETINFO);
+        myMenu.addAction(CHANGEVALUE);
 
         // all other widgets
     } else if(!onMain){
         // construct info for the pv we are pointing at
-        myMenu.addAction("Get Info");
+        myMenu.addAction(GETINFO);
     }
 
     // for stripplot add one more action
     if(caStripPlot* stripplotWidget = qobject_cast<caStripPlot *>(w)) {
         Q_UNUSED(stripplotWidget);
-        myMenu.addAction("Change Axis");
+        myMenu.addAction(CHANGEAXIS);
     }
 
     // for cartesian plot add more actions
     if(caCartesianPlot* cartesianplotWidget = qobject_cast<caCartesianPlot *>(w)) {
         Q_UNUSED(cartesianplotWidget);
-        myMenu.addAction("Change Axis");
+        myMenu.addAction(CHANGEAXIS);
         myMenu.addAction(QWhatsThis::createAction());
-        myMenu.addAction("Reset zoom");
+        myMenu.addAction(RESETZOOM);
     }
 
     // for catextentry add filedialog
@@ -5015,24 +5244,24 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         if(catextentryWidget->getAccessW()) {
             knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv[0]);  // use pointer for getting all necessary information
             if((kPtr != (knobData *) 0) && (pv[0].length() > 0)) {
-                myMenu.addAction("Input Dialog");
+                myMenu.addAction(INPUTDIALOG);
                 if((kPtr->edata.fieldtype == caSTRING) || (kPtr->edata.fieldtype == caCHAR)) {
-                    myMenu.addAction("File Dialog");
+                    myMenu.addAction(FILEDIALOG);
                 }
             }
         }
     }
 
     // for some widgets one more action
-    if(caSlider * widget = qobject_cast< caSlider *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
-    if(caLineEdit* widget = qobject_cast<caLineEdit *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
-    if(caThermo* widget = qobject_cast<caThermo *>(w)){Q_UNUSED(widget);  myMenu.addAction("Change Limits/Precision");}
-    if(caNumeric* widget = qobject_cast<caNumeric *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
-    if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
-    if(caSpinbox* widget = qobject_cast<caSpinbox *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
-    if(caLinearGauge* widget = qobject_cast<caLinearGauge *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
-    if(caCircularGauge* widget = qobject_cast<caCircularGauge *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
-    if(caMeter* widget = qobject_cast<caMeter *>(w)) {Q_UNUSED(widget); myMenu.addAction("Change Limits/Precision");}
+    if(caSlider * widget = qobject_cast< caSlider *>(w)) {Q_UNUSED(widget); myMenu.addAction(CHANGELIMITS);}
+    if(caLineEdit* widget = qobject_cast<caLineEdit *>(w)) {Q_UNUSED(widget); myMenu.addAction(CHANGELIMITS);}
+    if(caThermo* widget = qobject_cast<caThermo *>(w)){Q_UNUSED(widget);  myMenu.addAction(CHANGELIMITS);}
+    if(caNumeric* widget = qobject_cast<caNumeric *>(w)) {Q_UNUSED(widget); myMenu.addAction(CHANGELIMITS);}
+    if(caApplyNumeric* widget = qobject_cast<caApplyNumeric *>(w)) {Q_UNUSED(widget); myMenu.addAction(CHANGELIMITS);}
+    if(caSpinbox* widget = qobject_cast<caSpinbox *>(w)) {Q_UNUSED(widget); myMenu.addAction(CHANGELIMITS);}
+    if(caLinearGauge* widget = qobject_cast<caLinearGauge *>(w)) {Q_UNUSED(widget); myMenu.addAction(CHANGELIMITS);}
+    if(caCircularGauge* widget = qobject_cast<caCircularGauge *>(w)) {Q_UNUSED(widget); myMenu.addAction(CHANGELIMITS);}
+    if(caMeter* widget = qobject_cast<caMeter *>(w)) {Q_UNUSED(widget); myMenu.addAction(CHANGELIMITS);}
 
     // add to context menu, the actions requested by the environment variable caQtDM_EXEC_LIST
     if(validExecListItems) {
@@ -5048,7 +5277,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     QAction* selectedItem = myMenu.exec(cursorPos);
 
     if (selectedItem) {
-        if(selectedItem->text().contains("Kill Process")) {
+        if(selectedItem->text().contains(KILLPROCESS)) {
             if(caScriptButton* scriptbuttonWidget =  qobject_cast< caScriptButton *>(w)) {
 #ifndef MOBILE
                 processWindow *t= (processWindow *) scriptbuttonWidget->getProcess();
@@ -5058,12 +5287,12 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 #endif
             }
 
-        } else  if(selectedItem->text().contains("Raise message window")) {
+        } else  if(selectedItem->text().contains(RAISEWINDOW)) {
             QMainWindow *mainWindow = (QMainWindow *) this->parentWidget();
             mainWindow->showNormal();
             if(messageWindowP != (MessageWindow *) 0) messageWindowP->raise();
 
-        } else  if(selectedItem->text().contains("Toggle fit to size")) {
+        } else  if(selectedItem->text().contains(TOGGLESIZE)) {
             if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) {
                 if(cameraWidget->getFitToSize() == caCamera::Yes) cameraWidget->setFitToSize(caCamera::No);
                 else cameraWidget->setFitToSize(caCamera::Yes);
@@ -5073,45 +5302,57 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 else scan2dWidget->setFitToSize(caScan2D::Yes);
             }
 
-        } else  if(selectedItem->text().contains("Set Spectrum Wavelength")) {
+        } else  if(selectedItem->text().contains(SETWAVELEN)) {
             if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::spectrum_wavelength);
             else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) scan2dWidget->setColormap(caScan2D::spectrum_wavelength);
             else if(caWaterfallPlot * waterfallplotWidget = qobject_cast< caWaterfallPlot *>(w)) waterfallplotWidget->setColormap(caWaterfallPlot::spectrum_wavelength);
 
-        } else  if(selectedItem->text().contains("Set Spectrum Hot")) {
+        } else  if(selectedItem->text().contains(SETHOT)) {
             if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::spectrum_hot);
             else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) scan2dWidget->setColormap(caScan2D::spectrum_hot);
             else if(caWaterfallPlot * waterfallplotWidget = qobject_cast< caWaterfallPlot *>(w)) waterfallplotWidget->setColormap(caWaterfallPlot::spectrum_hot);
 
-        } else  if(selectedItem->text().contains("Set Spectrum Heat")) {
+        } else  if(selectedItem->text().contains(SETHEAT)) {
             if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::spectrum_heat);
             else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) scan2dWidget->setColormap(caScan2D::spectrum_heat);
             else if(caWaterfallPlot * waterfallplotWidget = qobject_cast< caWaterfallPlot *>(w)) waterfallplotWidget->setColormap(caWaterfallPlot::spectrum_heat);
 
-        } else  if(selectedItem->text().contains("Set Spectrum Jet")) {
+        } else  if(selectedItem->text().contains(SETJET)) {
             if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::spectrum_jet);
             else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) scan2dWidget->setColormap(caScan2D::spectrum_jet);
             else if(caWaterfallPlot * waterfallplotWidget = qobject_cast< caWaterfallPlot *>(w)) waterfallplotWidget->setColormap(caWaterfallPlot::spectrum_jet);
 
-        } else  if(selectedItem->text().contains("Set Spectrum Custom")) {
+        } else  if(selectedItem->text().contains(SETCUSTOM)) {
             if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::spectrum_custom);
             else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) scan2dWidget->setColormap(caScan2D::spectrum_custom);
             else if(caWaterfallPlot * waterfallplotWidget = qobject_cast< caWaterfallPlot *>(w)) waterfallplotWidget->setColormap(caWaterfallPlot::spectrum_custom);
 
-        } else  if(selectedItem->text().contains("Set Greyscale")) {
+        } else  if(selectedItem->text().contains(SETGREY)) {
             if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::grey);
             else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) scan2dWidget->setColormap(caScan2D::grey);
             else if(caWaterfallPlot * waterfallplotWidget = qobject_cast< caWaterfallPlot *>(w)) waterfallplotWidget->setColormap(caWaterfallPlot::grey);
 
-        } else  if(selectedItem->text().contains("Include files")) {
+        } else  if(selectedItem->text().contains(INCLUDES)) {
             QString info;
             info.append(InfoPrefix);
-            info.append(includeFiles);
+            int totalTime=0;
+            info.append("<strong>the indicated times are approxative</strong><br><br>");
+            QMap<QString, includeData>::const_iterator data = includeFilesList.constBegin();
+            while (data != includeFilesList.constEnd()) {
+                includeData value = data.value();
+                info.append(tr("%1 %2 <strong>%3</strong> times, average load time=<strong>%4ms</strong> total load time=<strong>%5ms</strong><br>").
+                            arg(data.key()).arg(value.text).arg(value.count).arg(value.ms).arg(value.ms * value.count));
+                totalTime = totalTime + value.count * value.ms;
+                ++data;
+            }
+            //qDebug() << totalTime;
+
             info.append(InfoPostfix);
             myMessageBox box(this);
             box.setText("<html>" + info + "</html>");
             box.exec();
-        } else  if(selectedItem->text().contains("Get Info")) {
+
+        } else  if(selectedItem->text().contains(GETINFO)) {
             QString info;
             info.append(InfoPrefix);
             info.append("-----------------------------------------------------------------<br>");
@@ -5119,6 +5360,21 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             info.append("Object: ");
             info.append(ObjectName);
             info.append("<br>");
+
+            if(!urlStrings.isEmpty()) {
+                info.append("<br>Commands:<br>");
+                for(int i=0; i<urlStrings.count(); i++) {
+                info.append(QString::number(i+1));
+                info.append(": ");
+#if QT_VERSION > 0x050000
+                info.append(urlStrings.at(i).toHtmlEscaped());
+#else
+                info.append(Qt::escape(urlStrings.at(i)));
+#endif
+                info.append("<br>");
+                }
+            }
+
             if(!calcString.isEmpty()) {
                 info.append("<br>");
                 info.append("VisibilityCalc: ");  
@@ -5290,6 +5546,14 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                             sprintf(asc,"<br>User alarm: MIN:%g  MAX:%g ", limitsMin, limitsMax);
                             info.append(asc);
                         }
+                        if(highLimit){
+                            sprintf(asc,"<br>User alarm MAX:%g ", limitsMax);
+                            info.append(asc);
+                        }
+                        if(lowLimit) {
+                            sprintf(asc,"<br>User alarm MIN:%g ", limitsMin);
+                            info.append(asc);
+                        }
                         if(limitsDefault) {
                             sprintf(asc,"<br>Default limits: MIN:%g  MAX:%g ",limitsMin, limitsMax);
                             info.append(asc);
@@ -5329,32 +5593,36 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             box.exec();
 
         // add a file dialog to simplify user path+file input
-        } else if(selectedItem->text().contains("File Dialog")) {
+        } else if(selectedItem->text().contains(FILEDIALOG)) {
             QFileDialog dialog(this);
             dialog.setFileMode(QFileDialog::DirectoryOnly);
             if (dialog.exec()) {
                 QStringList fileNames = dialog.selectedFiles();
                 if(!fileNames[0].isEmpty()) {
                     if(caTextEntry* textentryWidget = qobject_cast<caTextEntry *>(w)) {
-                        caTextEntry::FormatType fType = textentryWidget->getFormatType();
+                        FormatType fType = (FormatType) textentryWidget->getFormatType();
                         TreatRequestedValue(textentryWidget->getPV(), fileNames[0], fType, w);
                     }
                 }
             }
 
-        } else if(selectedItem->text().contains("Input Dialog")) {
+        } else if(selectedItem->text().contains(INPUTDIALOG)) {
             bool ok;
             QString text = QInputDialog::getText(this, tr("Input data"), tr("Input:"), QLineEdit::Normal,"", &ok);
             if (ok && !text.isEmpty()) {
                 if(caTextEntry* textentryWidget = qobject_cast<caTextEntry *>(w)) {
-                   caTextEntry::FormatType fType = textentryWidget->getFormatType();
+                   FormatType fType = (FormatType) textentryWidget->getFormatType();
                    TreatRequestedValue(textentryWidget->getPV(), text, fType, w);
                 }
             }
 
-        } else if(selectedItem->text().contains("Print")) {
+        } else if(selectedItem->text().contains(PRINTWINDOW)) {
             print();
-        } else if(selectedItem->text().contains("Change Axis")) {
+
+        } else if(selectedItem->text().contains(RELOADWINDOW)) {
+            emit Signal_ReloadWindow(this);
+
+        } else if(selectedItem->text().contains(CHANGEAXIS)) {
             if(caStripPlot* stripplotWidget = qobject_cast<caStripPlot *>(w)) {
                 limitsStripplotDialog dialog(stripplotWidget, mutexKnobDataP, "stripplot modifications", this);
                 dialog.exec();
@@ -5362,8 +5630,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 limitsCartesianplotDialog dialog(cartesianplotWidget, mutexKnobDataP, "cartesianplot modifications", this);
                 dialog.exec();
             }
-
-        } else if(selectedItem->text().contains("Reset zoom")) {
+        } else if(selectedItem->text().contains(RESETZOOM)) {
             if(caCartesianPlot* cartesianplotWidget = qobject_cast<caCartesianPlot *>(w)) {
                 cartesianplotWidget->resetZoom();
 
@@ -5404,14 +5671,16 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 /*************************************************/
             }
 
-        } else if(selectedItem->text().contains("Change Increment/Value")) {
+        } else if(selectedItem->text().contains(CHANGEVALUE)) {
             if(caSlider* sliderWidget = qobject_cast<caSlider *>(w)) {
                 sliderDialog dialog(sliderWidget, mutexKnobDataP, "slider Increment/Value change", this);
                 dialog.exec();
             }
-        } else if(selectedItem->text().contains("Change Limits/Precision")) {
+
+        } else if(selectedItem->text().contains(CHANGELIMITS)) {
             limitsDialog dialog(w, mutexKnobDataP, "Limits/Precision change", this);
             dialog.exec();
+
         } else {
             // any action from environment ?
             if(validExecListItems) {
@@ -5783,12 +6052,12 @@ int CaQtDM_Lib::Execute(char *command)
 }
 #endif
 
-void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QWidget *w)
+void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QString svalue, QWidget *w)
 {
     char errmess[255];
     int indx;
 
-    //qDebug() << "treatordinary value" << pv << w;
+    //qDebug() << "treatordinary value " << pv << w;
     knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv);
     if(kPtr != (knobData *) 0) {
         //qDebug() << "try to find out if this is a soft pv" << pv;
@@ -5809,8 +6078,7 @@ void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QW
         return;
     }
 
-    QString text(" ");
-    QStringsToChars(pv, text, w->objectName().toLower());
+    QStringsToChars(pv, svalue, w->objectName().toLower());
     ControlsInterface * plugininterface = getControlInterface(kPtr->pluginName);
     if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue(param1, value, idata, param2, param3, errmess, 0);
 }
@@ -5818,7 +6086,7 @@ void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QW
 /**
   * this routine will get a value from a string with hex and octal representation
   */
-long CaQtDM_Lib::getValueFromString(char *textValue, formatsType fType, char **end)
+long CaQtDM_Lib::getValueFromString(char *textValue, FormatType fType, char **end)
 {
     if(fType == octal) {
         return strtoul(textValue, end, 8);
@@ -5836,7 +6104,7 @@ long CaQtDM_Lib::getValueFromString(char *textValue, formatsType fType, char **e
 /**
   * this routine will treat the string, command, value to write to the pv
   */
-void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::FormatType fType, QWidget *w)
+void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, FormatType fType, QWidget *w)
 {
     char errmess[255];
     double value;
@@ -5846,11 +6114,11 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
     int indx;
     ControlsInterface * plugininterface = (ControlsInterface *) 0;
 
-    formatsType fTypeNew;
+    FormatType fTypeNew;
 
-    if(fType == caTextEntry::octal) fTypeNew = octal;
-    else if(fType == caTextEntry::hexadecimal) fTypeNew = hexadecimal;
-    else if(fType == caTextEntry::string) fTypeNew = string;
+    if(fType == octal) fTypeNew = octal;
+    else if(fType == hexadecimal) fTypeNew = hexadecimal;
+    else if(fType == string) fTypeNew = string;
     else fTypeNew = decimal;
 
     knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv);
@@ -5924,7 +6192,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, caTextEntry::Form
         break;
 
     case caCHAR:
-        if(fType == caTextEntry::string) {
+        if(fType == string) {
             if(kPtr->edata.nelm > 1) {
                //qDebug() << "set string" << text;
                if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, (char*) qasc(text), (char*) qasc(w->objectName().toLower()), errmess, 0);
@@ -5992,7 +6260,7 @@ void CaQtDM_Lib::TreatRequestedWave(QString pv, QString text, caWaveTable::Forma
     ControlsInterface * plugininterface = (ControlsInterface *) w->property("Interface").value<void *>();
     if(plugininterface == (ControlsInterface *) 0) return;
 
-    formatsType fTypeNew;
+    FormatType fTypeNew;
 
     if(fType == caWaveTable::octal) fTypeNew = octal;
     else if(fType == caWaveTable::hexadecimal) fTypeNew = hexadecimal;
@@ -6149,32 +6417,71 @@ int CaQtDM_Lib::parseForDisplayRate(QString inputc, int &rate)
 void CaQtDM_Lib::allowResizing(bool allowresize)
 {
     allowResize = allowresize;
+    QTimer::singleShot(50, this, SLOT(updateResize()));
+}
+
+// android does not resize correctly (it does not report its size), doing it a little bit later works
+void CaQtDM_Lib::updateResize()
+{
+#ifdef MOBILE_ANDROID
+    QApplication::processEvents();
+    QResizeEvent *re = new QResizeEvent(size(), size());
+    resizeEvent(re);
+    delete re;
+#endif
+}
+
+// this will probably not work for all kind of mobiles
+qreal CaQtDM_Lib::fontResize(double factX, double factY, QVariantList list, int usedIndex)
+{
+    qreal fontSize;
+    if(list.at(usedIndex).toInt() < 0) {
+        fontSize = qMin(factX, factY) * (float) list.at(5).toInt();
+    } else {
+        fontSize = qMin(factX, factY) * (float) list.at(usedIndex).toInt();
+    }
+/*
+    qDebug() << "-----------------------------------------------";
+    qDebug() << "font sizes" << list.at(4).toInt() << list.at(5).toInt() << "dpi" << qApp->primaryScreen()->physicalDotsPerInch();
+    qDebug() << "caTable fontsize=" << qMin(factX, factY) << qMin(factX, factY) * (double) list.at(4).toInt();
+    qDebug() << "logical dots per inch" << qApp->primaryScreen()->logicalDotsPerInch()  << "pixel ratio" << qApp->primaryScreen()->devicePixelRatio();
+*/
+#ifdef MOBILE_ANDROID
+    fontSize = fontSize * (float) qApp->primaryScreen()->logicalDotsPerInch() / (float) qApp->primaryScreen()->physicalDotsPerInch();
+#endif
+    if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
+    return fontSize;
 }
 
 void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList list, double factX, double factY)
 {
-    // for horizontal or vertical line we still have to set the linewidth
-    if(!className.compare("QFrame")) {
+    // for horizontal or vertical line we still have to set the linewidth and for a frame the border framewidth
+    if(!className.compare("caFrame") || !className.compare("QFrame")) {
         double linewidth;
         QFrame * line = (QFrame *) widget;
         if(line->frameShape() == QFrame::HLine || line->frameShape() == QFrame::VLine) {
             if(line->frameShape() != QFrame::HLine) {
-                linewidth = (double) list.at(4).toInt() * factY;
-            } else {
+                //qDebug() << "resize vertical line" << widget << (double) list.at(4).toInt() * factX;
                 linewidth = (double) list.at(4).toInt() * factX;
+            } else {
+                //qDebug() << "resize horizontal line" << widget << (double) list.at(4).toInt() * factY;
+                linewidth = (double) list.at(4).toInt() * factY;
             }
-            int width = qRound(linewidth);
-            if(width < 1) width = 1;
-            line->setLineWidth(width);
+            line->setLineWidth(qRound(linewidth));
+        } else {
+            //qDebug() << "resize frame" << widget << (double) list.at(5).toInt() * qMin(factX, factY);
+            linewidth = (double) list.at(5).toInt() * qMin(factX, factY);
+            line->setLineWidth(qRound(linewidth));
         }
     }
 
     else if(!className.compare("caTable")) {
         caTable *table = (caTable *) widget;
+
         QFont f = table->font();
-        qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
-        if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
-        f.setPointSizeF(fontSize);
+        qreal fontSize = fontResize(factX, factY, list, 4);
+        f.setPointSize(qRound(fontSize));
+
         table->setUpdatesEnabled(false);
         for(int i = 0; i < table->rowCount(); ++i) {
             for(int j = 0; j < table->columnCount(); ++j) {
@@ -6184,15 +6491,21 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         }
         table->setValueFont(f);
         table->verticalHeader()->setDefaultSectionSize((int) (qMin(factX, factY)*20));
+
+        QString styleSheet("QHeaderView { font-size: %1pt; }");
+        styleSheet = styleSheet.arg( qRound(fontSize));
+        table->horizontalHeader()->setStyleSheet(styleSheet);
+        table->verticalHeader()->setStyleSheet(styleSheet);
         table->setUpdatesEnabled(true);
     }
 
     else if(!className.compare("caWaveTable")) {
         caWaveTable *table = (caWaveTable *) widget;
+
         QFont f = table->font();
-        qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
-        if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
-        f.setPointSizeF(fontSize);
+        qreal fontSize = fontResize(factX, factY, list, 4);
+        f.setPointSize(qRound(fontSize));
+
         table->setUpdatesEnabled(false);
         for(int i = 0; i < table->rowCount(); ++i) {
             for(int j = 0; j < table->columnCount(); ++j) {
@@ -6202,18 +6515,23 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         }
         table->setValueFont(f);
         table->verticalHeader()->setDefaultSectionSize((int) (qMin(factX, factY)*20));
+
+        QString styleSheet("QHeaderView { font-size: %1pt; }");
+        styleSheet = styleSheet.arg( qRound(fontSize));
+        table->horizontalHeader()->setStyleSheet(styleSheet);
+        table->verticalHeader()->setStyleSheet(styleSheet);
+
         table->setUpdatesEnabled(true);
     }
 
     else if(!className.compare("QLabel")) {
         QLabel *label = (QLabel *) widget;
         className = label->parent()->metaObject()->className();
-        if(!className.contains("Numeric") ) {  // would otherwise interfere with our wheelswitch
-            if(list.at(4).toInt() < 0) return; // on android I got -1 for these fonts at initialization, i.e pixelsize
-            qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
-            if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
+        if(!className.contains("Numeric") && !className.contains("caSpinbox")) {  // would otherwise interfere with our wheelswitch or spinbox
             QFont f = label->font();
-            f.setPointSizeF(fontSize);
+            qreal fontSize = fontResize(factX, factY, list, 4);
+            f.setPointSize(qRound(fontSize));
+
             label->setFont(f);
         }
     }
@@ -6221,21 +6539,30 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
     else if((!className.compare("caMenu")) ||
             (!className.compare("QPlainTextEdit")) ||
             (!className.compare("QTextEdit")) ||
-            (!className.compare("QLineEdit")) ) {
-        if(list.at(4).toInt() < 0) return; // on android I got -1 for these fonts at initialization, i.e pixelsize
-        qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
-        if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
+            (!className.compare("QLineEdit")) ||
+            (!className.compare("QRadioButton")) ||
+            (!className.compare("QComboBox")) ||
+            (!className.compare("QCheckBox"))
+            ) {
         QFont f = widget->font();
-        f.setPointSizeF(fontSize);
+        qreal fontSize = fontResize(factX, factY, list, 4);
+        f.setPointSize(qRound(fontSize));
+        //in case of a textedit widget, one has to selct the text to change the font (if somebody mixes fonts, he has bad luck)
+        if(!className.compare("QTextEdit")) {
+            QTextEdit *textEdit = (QTextEdit *) widget;
+            QTextCursor cursor = textEdit->textCursor();
+            textEdit->selectAll();
+            textEdit->setFontPointSize(fontSize);
+            textEdit->setTextCursor( cursor );
+        }
         widget->setFont(f);
     }
 
     else if(!className.compare("caStripPlot") || !className.compare("caCartesianPlot")) {
         QwtPlot *plot = (QwtPlot *) widget;
+        qreal fontSize = fontResize(factX, factY, list, 4);
 
         // change font of axis ticks
-        qreal fontSize = qMin(factX, factY) * (double) list.at(4).toInt();
-        if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
         QFont f = plot->axisFont(QwtPlot::xBottom);
         f.setPointSizeF(fontSize);
         plot->setAxisFont(QwtPlot::xBottom, f);
@@ -6246,8 +6573,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         QwtText title = plot->title().text();
         QwtText titleX = plot->axisTitle(QwtPlot::xBottom).text();
         QwtText titleY = plot->axisTitle(QwtPlot::yLeft).text();
-        fontSize = qMin(factX, factY) * (double) list.at(6).toInt();
-        if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
+        fontSize = fontResize(factX, factY, list, 6);
         f.setPointSizeF(fontSize);
         title.setFont(f);
         titleX.setFont(f);
@@ -6256,26 +6582,27 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         plot->setAxisTitle(QwtPlot::xBottom, titleX);
         plot->setAxisTitle(QwtPlot::yLeft, titleY);
 
-        // font size of legends with qwt 6.0
         if(!className.compare("caStripPlot")) {
             caStripPlot * stripplotWidget = (caStripPlot *) widget;
-            fontSize = qMin(factX, factY) * (double) list.at(7).toInt();
-            if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
+            fontSize = fontResize(factX, factY, list, 7);
             f.setPointSizeF(fontSize);
             if(stripplotWidget->getLegendEnabled()) {
                 stripplotWidget->setLegendAttribute(stripplotWidget->getScaleColor(), f, caStripPlot::FONT);
+                stripplotWidget->updateLayout();
             }
+            stripplotWidget->setTicksResizeFactor(factX, factY);
+        } else {
+            plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MajorTick, factY * (double) list.at(8).toInt());
+            plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MediumTick, factY * (double) list.at(9).toInt());
+            plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MinorTick, factY * (double) list.at(10).toInt());
+            plot->axisScaleDraw(QwtPlot::xBottom)->setSpacing(0.0);
+            plot->axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MajorTick, factX * (double) list.at(8).toInt());
+            plot->axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MediumTick, factX * (double) list.at(9).toInt());
+            plot->axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MinorTick, factX * (double) list.at(10).toInt());
+            plot->axisScaleDraw(QwtPlot::xBottom)->setSpacing(0.0);
         }
-        // resize ticks (will not do for the timescale of the castripplot, while new every time)
-        plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MajorTick, factY * (double) list.at(8).toInt());
-        plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MediumTick, factY * (double) list.at(9).toInt());
-        plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MinorTick, factY * (double) list.at(10).toInt());
-        plot->axisScaleDraw(QwtPlot::xBottom)->setSpacing(0.0);
-        plot->axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MajorTick, factX * (double) list.at(8).toInt());
-        plot->axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MediumTick, factX * (double) list.at(9).toInt());
-        plot->axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MinorTick, factX * (double) list.at(10).toInt());
-        plot->axisScaleDraw(QwtPlot::xBottom)->setSpacing(0.0);
     }
+
     else if(!className.compare("QGroupBox")) {
         if(list.at(4).toInt() < 0) return; // on android I got -1 for these fonts at initialization, i.e pixelsize
         if(qMin(factX, factY) < 1.0) {
@@ -6288,9 +6615,20 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         }
     }
 
+    else if(!className.compare("caInclude")) {
+        caInclude *includeWidget = (caInclude *) widget;
+        // when the include is packed into a scroll area, set the minimumsize too
+        if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
+            Q_UNUSED(scrollWidget);
+            QWidget *contents = (QWidget*) includeWidget->parent();
+            contents->setMinimumSize(factX * list.at(2).toInt(), factY * list.at(3).toInt());
+        }
+
+    }
+
     // Tabbar adjustment
     else if(!className.compare("QTabWidget")) {
- #ifdef MOBILE
+#ifdef MOBILE
         if(list.at(4).toInt() < 0) return; // on android I got -1 for these fonts at initialization, i.e pixelsize
         qreal fontSize = (qMin(factX, factY) * (double) list.at(4).toInt());
         if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
@@ -6372,13 +6710,23 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 {
     double factX, factY;
 
+    //qDebug() << "resize" << event->size();
     QMainWindow *main = this->findChild<QMainWindow *>();
     // it seems that when mainwindow was fixed by user, then the window stays empty ?
     if(main != (QObject*) 0) {
         main->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     }
 
-    if(!allowResize) return;
+
+    //qDebug() << "allowResize=" << allowResize;
+    // when noresizing then fix the size, however for prc files, we will later shrink the display to a minimumsize, so do not fix then
+    if(!allowResize) {
+        if(!prcFile) main->setFixedSize(myWidget->size());
+        return;
+    }
+
+    if(myWidget == (QWidget*) 0) return;
+
     if(firstResize) {
         firstResize = false;
         // keep original width and height (first event on linux/windows was ui window size, on ios however now display size
@@ -6399,17 +6747,16 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 polylineWidget->setActualSize(QSize(widget->geometry().width(), widget->geometry().height()));
             }
 
-            // for a horizontal or vertical line get the linewidth
-            if(!className.compare("QFrame")) {
+            // for a horizontal or vertical line get the linewidth and for box the framewidth
+            if(!className.compare("caFrame") || !className.compare("QFrame") ) {
                 QFrame * line = (QFrame *) widget;
-                if(line->frameShape() == QFrame::HLine || line->frameShape() == QFrame::VLine) {
                     integerList.insert(4, line->lineWidth());
-                }
+                    integerList.insert(5, line->frameWidth());
                 // for plots get the linewidth
             } else if(!className.compare("caStripPlot") || !className.compare("caCartesianPlot")) {
                 QwtPlot * plot = (QwtPlot *) widget;
                 integerList.insert(4, plot->axisFont(QwtPlot::xBottom).pointSize());         // label of ticks
-                integerList.insert(5, 0);                                                    // empty
+                integerList.insert(5, 9);                                                   // empty
                 integerList.insert(6, plot->axisTitle(QwtPlot::xBottom).font().pointSize()); // titles have the same font
 
                 if(!className.compare("caStripPlot")) {
@@ -6437,6 +6784,9 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 
             } else {
                 integerList.insert(4, widget->font().pointSize());
+                // on android the above does not work always, the instruction below works, but then the fontscaling
+                // may not work at all, due to the pixelratio
+                integerList.insert(5, QFontInfo(widget->font()).pointSize());
             }
             widget->setProperty("GeometryList", integerList);
         }
@@ -6474,7 +6824,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 
         // if our window is using a layout, then Qt has to do the resizing
     } else {
-        //qDebug() << "main layout present, Qt should do the work" << className;
+        //qDebug() << "main layout present, Qt should do the work" << classNam;
 
         // centralwidget should manage the layout itsself, we do nothing except changing font for some classes
         if(classNam.contains("Layout")) {
@@ -6543,6 +6893,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                         ledWidget->setLedHeight(qRound(height));
                         ledWidget->setLedWidth(qRound(width));
                     }
+
                     widget->setGeometry(rectnew);
                     resizeSpecials(className, widget, list, factX, factY);
                     widget->updateGeometry();
@@ -6704,9 +7055,17 @@ void CaQtDM_Lib::Callback_WriteDetectedValues(QWidget* child)
         int32_t idata = (int32_t) values[i];
         double rdata = (double) values[i];
         if(thisString.at(i).trimmed().length() > 0) {
-            TreatOrdinaryValue(thisString.at(i), rdata,  idata, widget);
+            TreatOrdinaryValue(thisString.at(i), rdata,  idata, "", widget);
         }
     }
+}
+
+// wrappers for any caWidget with caWidgetInterface (perhaps more needed)
+knobData* CaQtDM_Lib::GetMutexKnobDataPtr(int index){
+    return mutexKnobDataP->GetMutexKnobDataPtr(index);
+}
+knobData* CaQtDM_Lib::GetMutexKnobDataPV(QWidget *widget, QString pv){
+    return mutexKnobDataP->getMutexKnobDataPV(widget, pv);
 }
 
 // initiate drag, one will be able to drop to another Qt-application
@@ -6723,7 +7082,10 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
     QMimeData *mimeData = new QMimeData;
     mimeData->setData("application/x-hotspot", QByteArray::number(hotSpot.x()) + " " + QByteArray::number(hotSpot.y()));
 
-    if(caCalc *calcWidget = qobject_cast<caCalc *>(w)) {
+
+    if(caWidgetInterface* wif = dynamic_cast<caWidgetInterface *>(w)) {  // any caWidget with caWidgetInterface
+        mimeData->setText(wif->getDragText());
+    } else if(caCalc *calcWidget = qobject_cast<caCalc *>(w)) {
         mimeData->setText(calcWidget->getVariable());
     } else if (caMenu *menu1Widget = qobject_cast<caMenu *>(w)) {
         mimeData->setText(menu1Widget->getPV());

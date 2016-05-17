@@ -11,9 +11,9 @@
    </rect>
   </property>
   <property name="styleSheet">
-   <string>
+   <string notr="true">
 
-QWidget#centralWidget {background: rgb(187, 187, 187);}
+QWidget#centralWidget {background: rgba(187, 187, 187, 0);}
 
 caTable {
        font: 10pt;
@@ -195,7 +195,7 @@ border-radius: 2px;
     <property name="minValue">
      <double>0.000000000000000</double>
     </property>
-    <property name="fontScaleMode">
+    <property name="fontScaleMode" stdset="0">
      <enum>caLineEdit::Height</enum>
     </property>
     <property name="formatType">
@@ -246,7 +246,7 @@ border-radius: 2px;
     <property name="minValue">
      <double>0.000000000000000</double>
     </property>
-    <property name="fontScaleMode">
+    <property name="fontScaleMode" stdset="0">
      <enum>caLineEdit::Height</enum>
     </property>
     <property name="formatType">
@@ -300,7 +300,7 @@ border-radius: 2px;
     <property name="minValue">
      <double>0.000000000000000</double>
     </property>
-    <property name="fontScaleMode">
+    <property name="fontScaleMode" stdset="0">
      <enum>caLineEdit::Height</enum>
     </property>
     <property name="formatType">
@@ -351,7 +351,7 @@ border-radius: 2px;
     <property name="minValue">
      <double>0.000000000000000</double>
     </property>
-    <property name="fontScaleMode">
+    <property name="fontScaleMode" stdset="0">
      <enum>caLineEdit::Height</enum>
     </property>
     <property name="formatType">
@@ -405,7 +405,7 @@ border-radius: 2px;
     <property name="minValue">
      <double>0.000000000000000</double>
     </property>
-    <property name="fontScaleMode">
+    <property name="fontScaleMode" stdset="0">
      <enum>caLineEdit::Height</enum>
     </property>
     <property name="formatType">
@@ -456,7 +456,7 @@ border-radius: 2px;
     <property name="minValue">
      <double>0.000000000000000</double>
     </property>
-    <property name="fontScaleMode">
+    <property name="fontScaleMode" stdset="0">
      <enum>caLineEdit::Height</enum>
     </property>
     <property name="formatType">
@@ -492,7 +492,7 @@ border-radius: 2px;
      </rect>
     </property>
     <property name="autoFillBackground">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="integerDigits" stdset="0">
      <number>5</number>
@@ -575,7 +575,7 @@ border-radius: 2px;
      <property name="minValue">
       <double>0.000000000000000</double>
      </property>
-     <property name="fontScaleMode">
+     <property name="fontScaleMode" stdset="0">
       <enum>caLineEdit::Height</enum>
      </property>
      <property name="formatType">

@@ -43,9 +43,14 @@ Q_OBJECT
   Q_PROPERTY(QString trueValue READ getTrueValue WRITE setTrueValue)
   Q_PROPERTY(QString falseValue READ getFalseValue WRITE setFalseValue)
 
+   // this will prevent user interference
+   Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+
   Q_ENUMS(colMode)
 
 public:
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     enum colMode {Static=0, Alarm};
 

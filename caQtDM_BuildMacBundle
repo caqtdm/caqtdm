@@ -24,8 +24,8 @@ mkdir ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/printsupport/
 echo
 echo ========== add libcoca ============
 echo
-
-cp ${QTHOME}/plugins/imageformats/libqico.dylib  ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/imageformats/
+cp ${QTHOME}/plugins/imageformats/*.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/imageformats/
+rm ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/imageformats/*_debug.dylib
 cp ${QTHOME}/plugins/platforms/libqcocoa.dylib  ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/platforms/
 
 echo
@@ -95,7 +95,6 @@ mkdir ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
 mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns/
 mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns/platforms/
 
-
 cp    ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libqtcontrols.dylib ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
 cp -R ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/* ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
 cp -R $QTHOME/lib/QtDesignerComponents.framework ./caQtDM_Binaries/Designer.app/Contents/Frameworks/
@@ -108,7 +107,9 @@ install_name_tool -rpath @loader_path/../../../../lib @loader_path/../Frameworks
 
 mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns
 mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer
+mkdir ./caQtDM_Binaries/Designer.app/Contents/PlugIns/imageformats
 cp ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/*.dylib ./caQtDM_Binaries/Designer.app/Contents/PlugIns/designer/
+cp ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/imageformats/*.dylib ./caQtDM_Binaries/Designer.app/Contents/PlugIns/imageformats/
 
 echo
 echo ========== add adl2ui.app ============
@@ -121,8 +122,12 @@ echo ========== codesigning  ============
 echo
 echo Identity = ${CAQTDM_MAC_CODESIGN}
 
-codesign --verbose=2 --deep --force -s "${CAQTDM_MAC_CODESIGN}" -vvvv ./caQtDM_Binaries/caQtDM.app
+codesign --verbose=2 --deep --force --entitlements ./caQtDM_Viewer/src/Mac/Entitlements.plist  -s "${CAQTDM_MAC_CODESIGN}" -vvvv ./caQtDM_Binaries/caQtDM.app
+echo
+echo ========== check codesigning  ============
+echo
 
+codesign -dvvv ./caQtDM_Binaries/caQtDM.app
 
 echo
 echo ========== modifiy dmg image ============
@@ -141,8 +146,40 @@ rm ./caQtDM_Binaries/caqtdm.dmg
 echo
 echo ========== generate Mac Pkg for MacAppStore ============
 echo
+mkdir ./caQtDM_Binaries/caQtDM.app/Contents/Applications
+cp -R ./caQtDM_Binaries/Designer.app ./caQtDM_Binaries/caQtDM.app/Contents/Applications
+echo ========== codesigning  ============
+echo
+echo Identity = ${CAQTDM_MAC_CODESIGN}
+codesign --verbose=2 --deep --force --entitlements ./caQtDM_Viewer/src/Mac/Entitlements.plist  -s "${CAQTDM_MAC_CODESIGN}" -vvvv ./caQtDM_Binaries/caQtDM.app
+
+
+
+pkgbuild --install-location /Applications --component ./caQtDM_Binaries/caQtDM.app ./caQtDM_Binaries/caQtDMApp.pkg
+
+#pkgbuild --install-location /Applications --component ./caQtDM_Binaries/Designer.app  ./caQtDM_Binaries/DesignerApp.pkg
+#--package ./caQtDM_Binaries/DesignerApp.pkg
+
+productbuild --synthesize --package ./caQtDM_Binaries/caQtDMApp.pkg  ./caQtDM_Binaries/Distribution.xml
+productbuild --identifier ch.psi.caqtdm.osx --distribution ./caQtDM_Binaries/Distribution.xml --sign "${CAQTDM_MAC_INSTALLSIGN}" --resources ./caQtDM_Viewer/src  --package-path ./caQtDM_Binaries/ './caQtDM_Binaries/caqtdm.pkg'
+
+
+
+
+
+
+#mkdir ./caQtDM_Binaries/pkg 
+#cp -R ./caQtDM_Binaries/caQtDM.app ./caQtDM_Binaries/pkg
+#cp -R ./caQtDM_Binaries/Designer.app ./caQtDM_Binaries/pkg
+
+#productbuild --component ./caQtDM_Binaries/caQtDM.app /Applications ./caQtDM_Binaries/caQtDMApp.pkg
+#productbuild --component ./caQtDM_Binaries/Designer.app /Applications ./caQtDM_Binaries/DesignerApp.pkg
+
 #pkgbuild --analyze --root ./caQtDM_Binaries/pkg ./caQtDM_Binaries/caQtDM.plist
-#productbuild --synthesize --package ./caQtDM_Binaries/caQtDM.pkg--package ./caQtDM_Binaries/Designer.pkg ./caQtDM_Binaries/Distribution.xml
+
+#pkgbuild --root './caQtDM_Binaries' --identifier ch.psi.caqtdm.osx --component-plist './caQtDM_Binaries/caQtDM.plist' './caQtDM_Binaries/caQtDM.pkg' --install-location /Applications
+
+#productbuild --synthesize --package ./caQtDM_Binaries/caQtDM.pkg --package ./caQtDM_Binaries/Designer.pkg ./caQtDM_Binaries/Distribution.xml
 
 #pkgbuild --root './caQtDM_Binaries' --component-plist './caQtDM_Binaries/caQtDM.plist' './caQtDM_Binaries/caQtDM.pkg'
 #pkgbuild --root './caQtDM_Binaries' --component-plist './caQtDM_Binaries/Designer.plist' './caQtDM_Binaries/Designer.pkg'

@@ -56,7 +56,14 @@ int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &
 
     searchFile *s = new searchFile(fileName);
     QString fileNameFound = s->findFile();
-    if(!fileNameFound.isNull()) return true;
+    if(!fileNameFound.isNull()) {
+        //printf("checkFileAndDownload file <%s> locally found\n", qasc(fileName));
+        s->deleteLater();
+        return true;
+    } else {
+        //printf("checkFileAndDownload file <%s> not locally found\n", qasc(fileName));
+    }
+    s->deleteLater();
 
     // use specified url
     if(url.size() > 0) {

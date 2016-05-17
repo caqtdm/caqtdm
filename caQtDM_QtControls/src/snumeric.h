@@ -131,7 +131,7 @@ private:
     int idUpPoint, idDownPoint;
     bool d_fontScaleEnabled;
     bool _AccessW;
-    int lastLabel;
+    int lastLabel, lastLabelOnTab;
     double csValue;
 };
 #endif // EDIGIT_H

@@ -27,7 +27,7 @@
 #define QTCONTROLS_CONTROLLERS_PLUGIN_H
 
 #include <qglobal.h>
-#if QT_VERSION > 0x050000
+#if QT_VERSION > 0x050400
     #include <QtUiPlugin/QDesignerCustomWidgetInterface>
 #else
     #include <QDesignerCustomWidgetInterface>
@@ -222,6 +222,17 @@ public:
     caByteControllerInterface(QObject *parent);
     virtual QWidget *createWidget(QWidget *parent);
 };
+
+class caMimeDisplayInterface: public CustomWidgetInterface_Controllers
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerCustomWidgetInterface)
+
+public:
+    caMimeDisplayInterface(QObject *parent);
+    virtual QWidget *createWidget(QWidget *parent);
+};
+
 
 
 #endif

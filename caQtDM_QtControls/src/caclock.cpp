@@ -108,16 +108,19 @@ void caClock::updateClock(QTime time) {
 
 void caClock::resizeEvent(QResizeEvent *e)
 {
-
     Q_UNUSED(e);
     int Width = width();
     QFont f = font();
+#ifdef MOBILE_IOS
+    f.setPointSizeF(Width/12.0);
+#else
     f.setPointSizeF(Width/20.0);
+#endif
     setFont(f);
     update();
 }
 
-void caClock::setAlarmColors(short status)
+void caClock::setAlarmColors(short status, bool force)
 {
     QColor c;
     switch (status) {
@@ -145,7 +148,7 @@ void caClock::setAlarmColors(short status)
         c= thisBaseColor.darker( 150 );
         break;
     }
-    if((prevColor != c) || (thisScaleDefaultColor != prevScaleDefaultColor) || (thisScaleColor != prevScaleColor)){
+    if((prevColor != c) || (thisScaleDefaultColor != prevScaleDefaultColor) || (thisScaleColor != prevScaleColor) || force){
       prevColor = c;
       prevScaleDefaultColor = thisScaleDefaultColor;
       prevScaleColor = thisScaleColor;

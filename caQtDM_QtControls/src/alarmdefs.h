@@ -32,6 +32,7 @@ enum Alarms {NO_ALARM=0, MINOR_ALARM, MAJOR_ALARM, INVALID_ALARM, NOTCONNECTED=9
 #define AL_YELLOW QColor(0xff, 0xff, 0x00)
 #define AL_RED QColor(0xff, 0x00, 0x00)
 #define AL_WHITE QColor(0xff, 0xff, 0xff)
+#define AL_BLACK QColor(0, 0, 0)
 #define AL_DEFAULT QColor(0x88, 0x88, 0x88)
 
 #endif

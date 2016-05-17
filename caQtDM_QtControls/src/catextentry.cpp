@@ -34,7 +34,7 @@ caTextEntry::caTextEntry(QWidget *parent) : caLineEdit(parent)
     clearFocus();
     setAccessW(true);
     installEventFilter(this);
-    newFocusPolicy(Qt::ClickFocus);
+    newFocusPolicy(Qt::StrongFocus);
     this->setAcceptDrops(false);
     setFromTextEntry();
 
@@ -77,7 +77,19 @@ bool caTextEntry::eventFilter(QObject *obj, QEvent *event)
 				}
 			}
 		}
-	}
+    // move cursor with tab focus
+    } else if(event->type() == QEvent::KeyRelease) {
+        QKeyEvent *ev = static_cast<QKeyEvent *>(event);
+        if (ev != (QKeyEvent *)0) {
+            if(ev->key() == Qt::Key_Tab) {
+                QCursor *cur = new QCursor;
+                QPoint p = QWidget::mapToGlobal(QPoint(this->width()/2, this->height()/2));
+                cur->setPos( p.x(), p.y());
+                setFocus();
+            }
+        }
+    }
+
     // treat mouse enter and leave as well as focus out
     if (event->type() == QEvent::Enter) {
         if(!_AccessW) {

@@ -50,9 +50,10 @@ public:
     QString pluginName();
     DemoPlugin();
 
-    int initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow);
+    int initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow, QMap<QString, QString> options);
     int pvAddMonitor(int index, knobData *kData, int rate, int skip);
     int pvClearMonitor(knobData *kData);
+    int pvFreeAllocatedData(knobData *kData);
     int pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
     int pvSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess);
     int pvGetTimeStamp(char *pv, char *timestamp);

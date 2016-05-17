@@ -33,6 +33,15 @@
   fi
   if [ -z "$PYTHONLIB" ];   then  export  PYTHONLIB=/usr/lib/;
   fi 
+
+  if [ -z "$ZMQ" ];   then  export  ZMQ=/usr/local;
+  fi 
+  if [ -z "$ZMQINC" ];   then  export  ZMQINC=$ZMQ/include;
+  fi 
+  if [ -z "$ZMQLIB" ];   then  export  ZMQLIB=$ZMQ/lib;
+  fi 
+
+
   
   if [ -z "$TROLLTECH" ]; then
     echo
@@ -72,6 +81,12 @@ echo
 echo PYTHONVERSION        now defined as ${PYTHONVERSION}        for locating python
 echo PYTHONINCLUDE        now defined as ${PYTHONINCLUDE}        for locating python include files
 echo PYTHONLIB            now defined as ${PYTHONLIB}            for locating python libraries
+echo
+echo for zmq:
+echo
+echo ZMQINC               now defined as ${ZMQINC}               for locating zmq include files
+echo ZMQLIB               now defined as ${ZMQLIB}               for locating zmq libraries
+
 echo
 echo for install:
 echo

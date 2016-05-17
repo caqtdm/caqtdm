@@ -33,10 +33,14 @@
 #include "searchfile.h"
 
 #include "fileopenwindow.h"
+#include "fileFunctions.h"
 #include "QDebug"
 #include <QFileDialog>
 #include <QLocale>
 #include <signal.h>
+#include <iostream>
+#include <stdlib.h>
+#include "pipereader.h"
 
 #if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
 #include <QApplication>
@@ -61,6 +65,27 @@ static void unixSignalHandler(int signum) {
 
 extern bool HTTPCONFIGURATOR;
 
+static void createMap(QMap<QString, QString> &map, const QString& option)
+{
+    //qDebug() << "treat option" << option;
+    // option of type KEY1=VALUE1,KEY2=VALUE2,KEY3=VALUE3
+    if(option != NULL) {
+        QStringList vars = option.split(",", QString::SkipEmptyParts);
+        for(int i=0; i< vars.count(); i++) {
+            int pos = vars.at(i).indexOf("=");
+            if(pos != -1) {
+                QString key = vars.at(i).mid(0, pos);
+                QString value = vars.at(i).mid(pos+1);
+                map.insert(key.trimmed(), value);
+            } else {
+                qDebug() <<"option" <<  option << "could not be parsed";
+            }
+        }
+    }
+    //qDebug() << "inserted int map from option:" << option;
+    //qDebug() << "resulting map=" << map;
+}
+
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(caQtDM);
@@ -71,15 +96,31 @@ int main(int argc, char *argv[])
     QApplication::setOrganizationName("Paul Scherrer Institut");
     QApplication::setApplicationName("caQtDM");
 
+#ifdef MOBILE_ANDROID
+    app.setStyle(QStyleFactory::create("fusion"));
+#endif
+
     // we do not want numbers with a group separators
     QLocale loc = QLocale::system();
     loc.setNumberOptions(QLocale::OmitGroupSeparator);
     loc.setDefault(loc);
 
+    QString fileNameStylesheet = "";
     QString fileName = "";
     QString macroString = "";
     QString geometry = "";
     QString macroFile = "";
+    QMap<QString, QString> options;
+    options.clear();
+
+#if defined(_MSC_VER)
+    if (AttachConsole(ATTACH_PARENT_PROCESS)){
+        SetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE),ENABLE_QUICK_EDIT_MODE| ENABLE_EXTENDED_FLAGS);
+        freopen("CON", "w", stdout);
+        freopen("CON", "w", stderr);
+        freopen("CON", "r", stdin);
+    }
+#endif
 
     searchFile *s = new searchFile("caQtDM_stylesheet.qss");
     QString fileNameFound = s->findFile();
@@ -97,12 +138,11 @@ int main(int argc, char *argv[])
     int	in, numargs;
     bool attach = false;
     bool minimize= false;
-    bool nostyles = false;
     bool printscreen = false;
     bool resizing = true;
 
     for (numargs = argc, in = 1; in < numargs; in++) {
-        //qDebug() << argv[in];
+        qDebug() << argv[in];
         if ( strcmp (argv[in], "-display" ) == 0 ) {
             in++;
             printf("caQtDM -- display <%s>\n", argv[in]);
@@ -120,9 +160,10 @@ int main(int argc, char *argv[])
             in++;
             printf("caQtDM -- will load macro string from file <%s>\n", argv[in]);
             macroFile = QString(argv[in]);
-        } else if ( strcmp (argv[in], "-noStyles" ) == 0 ) {
-            printf("caQtDM -- will not replace the default application stylesheet caQtDM_stylesheet.qss\n");
-            nostyles = true;
+        } else if ( strcmp (argv[in], "-stylefile" ) == 0 ) {
+            in++;
+            printf("caQtDM -- will replace the default stylesheet with stylesheet <%s>\n", argv[in]);
+            fileNameStylesheet = QString(argv[in]);
         } else if ( strcmp (argv[in], "-x" ) == 0 ) {
 
         } else if ( strcmp (argv[in], "-displayFont" ) == 0 ) {
@@ -135,17 +176,22 @@ int main(int argc, char *argv[])
                    "  [-x]\n"
                    "  [-attach]\n"
                    "  [-noMsg]\n"
-                   "  [-noStyles]      works only when not attaching\n"
+                   "  [-stylefile filename] will replace the default stylesheet with the specified file (works only when not attaching)\n"
                    "  [-macro \"xxx=aaa,yyy=bbb, ...\"]\n"
                    "  [-macrodefs filename] will load macro definitions from file\n"
                    "  [-dg [<width>x<height>][+<xoffset>-<yoffset>]\n"
                    "  [-httpconfig] will display a network configuration screen at startup\n"
                    "  [-print] will print file and exit\n"
-                   "  [-noResize] will prevent resizing, works only when not attaching\n"
+                   "  [-noResize] will prevent resizing\n"
+                   "  [-cs defaultcontrolsystempluginname]\n"
+                   "  [-option \"xxx=aaa,yyy=bbb, ...\"] options for cs plugins\n"
+                   "  [-url url] will look for files on the specified url and download them to a local directory\n"
+                   "  [-emptycache] will empty the local cache used for downloading"
                    "  [file]\n"
                    "  [&]\n"
                    "\n"
-                   "  -x -displayFont -display are ignored !\n\n");
+                   "  -x -displayFont -display are ignored !\n\n"
+                   "  on linux plattforms, ui data can be piped to caQtDM, but then -httpconfig & -attach will not work\n\n");
                  exit(1);
         } else if((!strcmp(argv[in],"-displayGeometry")) || (!strcmp(argv[in],"-dg"))) {
             // [-dg [xpos[xypos]][+xoffset[+yoffset]]
@@ -159,9 +205,26 @@ int main(int argc, char *argv[])
             resizing = false;
         } else if(!strcmp(argv[in], "-httpconfig")) {
             HTTPCONFIGURATOR = true;
+        } else if(!strcmp(argv[in], "-url")) {
+            in++;
+            setenv("CAQTDM_URL_DISPLAY_PATH", argv[in], 1);
+        } else if(!strcmp(argv[in], "-emptycache")) {
+            Specials specials;
+            QString path =  specials.getStdPath();
+            fileFunctions filefunction;
+            path.append("/");
+            filefunction.removeFilesInTree(path);
+            printf("caQtDM -- cache @ %s with ui & graphic files has been emptied\n", qasc(path));
+        } else if(!strcmp(argv[in], "-cs")) {
+            in++;
+            options.insert("defaultPlugin", QString(argv[in]));
+        } else if ( strcmp (argv[in], "-option" ) == 0 ) {
+            in++;
+            printf("caQtDM -- option <%s>\n", argv[in]);
+            createMap(options, QString(argv[in]));
         } else if (strncmp (argv[in], "-" , 1) == 0) {
             /* unknown application argument */
-            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -noStyles -dg -x -print -httpconfig\n",in,argv[in]);
+            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -stylefile -dg -x -print -httpconfig -noResize\n",in,argv[in]);
         } else {
             printf("caQtDM -- file = <%s>\n", argv[in]);
             fileName = QString(argv[in]);
@@ -169,13 +232,34 @@ int main(int argc, char *argv[])
         }
     }
 
+    // get data from pipe if any (ui data can be piped to this application, for linux at this time)
+    // only when no file is given, attaching is not allowed, in order to get rid of the temporary file when exit
+#if defined linux || defined TARGET_OS_MAC
+    if(fileName.length() <= 0) {
+
+        QEventLoop *loop = new QEventLoop();
+        PipeReader *reader = new PipeReader(loop);
+        loop->exec();
+
+        QString newFilename = reader->getTemporaryFilename();
+        if(newFilename.size() > 0) {
+            fileName = newFilename;
+            attach = false;
+            HTTPCONFIGURATOR = false;
+        }
+        delete reader;
+        delete loop;
+        //qDebug() << "use now file" << fileName;
+    }
+#endif
+
     // must be always true for mobile plattforms
 #ifdef MOBILE
      HTTPCONFIGURATOR = true;
 #endif
 
-    if(!nostyles) {
-        s = new searchFile("stylesheet.qss");
+     if(fileNameStylesheet.length() > 0) {
+        s = new searchFile(fileNameStylesheet);
         fileNameFound = s->findFile();
         if(fileNameFound.isNull()) {
             printf("caQtDM -- file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", qasc(s->displayPath()));
@@ -183,7 +267,7 @@ int main(int argc, char *argv[])
             QFile file(fileNameFound);
             file.open(QFile::ReadOnly);
             QString StyleSheet = QLatin1String(file.readAll());
-            printf("caQtDM -- file <stylesheet.qss> replaced the default stylesheet\n");
+            printf("caQtDM -- file <%s> replaced the default stylesheet\n", qasc(fileNameStylesheet));
             app.setStyleSheet(StyleSheet);
             file.close();
         }
@@ -216,11 +300,11 @@ int main(int argc, char *argv[])
     if(displayPath.length() > 0) {
          printf("caQtDM -- files will be downloaded from <%s> when not locally found\n", qasc(displayPath));
     } else {
-        printf("caQtDM -- files will not download files when not locally found\n");
+        printf("caQtDM -- files will not be downloaded from an url when not locally found, while CAQTDM_URL_DISPLAY_PATH is not defined\n");
     }
 #endif
 
-    FileOpenWindow window (0, fileName, macroString, attach, minimize, geometry, printscreen, resizing);
+    FileOpenWindow window (0, fileName, macroString, attach, minimize, geometry, printscreen, resizing, options);
     window.setWindowIcon (QIcon(":/caQtDM.ico"));
     window.show();
     window.move(0,0);

@@ -30,8 +30,9 @@
 #include <QFileDialog>
 #include <qtcontrols_global.h>
 
-class QTCON_EXPORT searchFile
+class QTCON_EXPORT searchFile:public QObject
 {
+
 public:
     searchFile(QString FileName);
     QString findFile();

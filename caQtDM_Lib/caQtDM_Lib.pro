@@ -1,3 +1,6 @@
+TARGET_PRODUCT = "Library for Display Manager"
+TARGET_FILENAME = "caQtDM_Lib.dll"
+
 include (../caQtDM_Viewer/qtdefs.pri)
 CONFIG += caQtDM_Lib
 include(../caQtDM.pri)
@@ -30,6 +33,8 @@ INCLUDEPATH += ../caQtDM_QtControls/src
 INCLUDEPATH += $(QWTINCLUDE)
 INCLUDEPATH += $(EPICSINCLUDE)
 
+RC_FILE = ./src/caQtDM_Lib.rc
+
 SOURCES += caqtdm_lib.cpp \
     mutexKnobData.cpp \
     MessageWindow.cpp \
@@ -61,7 +66,8 @@ HEADERS += caqtdm_lib.h\
     splashscreen.h \
     epicsExternals.h \
     inlines.h \
-    loadPlugins.h
+    loadPlugins.h \
+    caqtdm_lib_interface.h
 
 !MOBILE {
     SOURCES += myQProcess.cpp  processWindow.cpp

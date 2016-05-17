@@ -1,3 +1,6 @@
+TARGET_PRODUCT = "Widgets for Display Manager"
+TARGET_FILENAME = "qtcontrols.dll"
+
 include(../caQtDM_Viewer/qtdefs.pri)
 CONFIG += caQtDM_QtControls
 include(../caQtDM.pri)
@@ -30,7 +33,14 @@ TARGET = qtcontrols
 TEMPLATE = lib
 MOC_DIR = moc
 INCLUDEPATH += src
+INCLUDEPATH += ../caQtDM_Lib/src
 RESOURCES = qtcontrols.qrc
+RC_FILE = ./src/qtcontrols.rc
+
+#vtune study
+#INCLUDEPATH += /opt/intel/parallel/vtune_amplifier_xe_2013/include
+#LIBS += /opt/intel/parallel/vtune_amplifier_xe_2013/lib32/libittnotify.a
+
 
 PRE_TARGETDEPS += \
      moc/moc_caslider.cpp \
@@ -109,7 +119,9 @@ SOURCES	+= \
     src/messageQueue.cpp \
     src/cabytecontroller.cpp \
     src/calabelvertical.cpp \
-    src/camultilinestring.cpp
+    src/camultilinestring.cpp \
+    src/camimedisplay.cpp \
+    src/calinedemo.cpp
 
 XDR_HACK {
     SOURCES += src/xdr_hack.c
@@ -124,20 +136,29 @@ XDR_HACK {
 }
 
 QT += network
-HEADERS += src/networkaccess.h src/fileFunctions.h \
-    src/calabelvertical.h
+HEADERS += src/networkaccess.h src/fileFunctions.h
 SOURCES += src/networkaccess.cpp src/fileFunctions.cpp
 
-# assume qwt6.0 was made with qt4
+
 contains(QT_VER_MAJ, 4) {
-    warning("Qt $$[QT_VERSION] was detected, so compile qwt_thermo_marker")
-    SOURCES	+= src/qwt_thermo_marker.cpp
+    contains(QT_VER_MIN, 6) {
+       warning("Qt $$[QT_VERSION] was detected (use qwt6.0.1), so compile qwt_thermo_marker")
+       HEADERS	+= src/qwt_thermo_marker.h
+       SOURCES	+= src/qwt_thermo_marker.cpp
+    }
+    contains(QT_VER_MIN, 8) {
+       warning("Qt $$[QT_VERSION] was detected (use qwt6.1.1), so compile qwt_thermo_marker_61")
+       HEADERS	+= src/qwt_thermo_marker_61.h
+       SOURCES	+= src/qwt_thermo_marker_61.cpp
+    }
 }
-#assume qwt6.1 was made with qt5
+
 contains(QT_VER_MAJ, 5) {
-    warning("Qt $$[QT_VERSION] was detected, so compile qwt_thermo_marker_61")
+    warning("Qt $$[QT_VERSION] was detected (use qwt6.1.1 or higher), so compile qwt_thermo_marker_61")
+    HEADERS	+= src/qwt_thermo_marker_61.h
     SOURCES	+= src/qwt_thermo_marker_61.cpp
 }
+
 
 HEADERS	+= \
     src/caframe.h \
@@ -209,17 +230,11 @@ HEADERS	+= \
     src/cabytecontroller.h \
     src/qtdefinitions.h \
     src/pathdefinitions.h \
-    src/camultilinestring.h
-
-# assume qwt6.0 was made with qt4
-contains(QT_VER_MAJ, 4) {
-    warning("Qt $$[QT_VERSION] was detected, so compile qwt_thermo_marker")
-    HEADERS	+= src/qwt_thermo_marker.h
-}
-#assume qwt6.1 was made with qt5
-contains(QT_VER_MAJ, 5) {
-    warning("Qt $$[QT_VERSION] was detected, so compile qwt_thermo_marker_61")
-    HEADERS	+= src/qwt_thermo_marker_61.h
-}
+    src/camultilinestring.h \
+    src/formattype.h \
+    src/calabelvertical.h \
+    src/camimedisplay.h \
+    src/caWidgetInterface.h \
+    src/calinedemo.h
 
 OTHER_FILES += README
