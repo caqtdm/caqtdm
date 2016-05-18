@@ -3254,9 +3254,9 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
             // take limits from channel, in case of user limits these should already been set
             if((highChannelLimitEnabled || lowChannelLimitEnabled) && data.edata.initialize ) {
-
                 // when limits are the same, do nothing
-                if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
+                if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) 
+                {
                     disconnect(w, SIGNAL(valueChanged (double)), 0, 0);
                     /*
                     if(sliderWidget->getDirection() == caSlider::Down  || sliderWidget->getDirection() == caSlider::Left) {
@@ -3272,6 +3272,9 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     connect(w, SIGNAL(valueChanged(double)), this, SLOT(Callback_SliderValueChanged(double)));
                 }
             }
+
+            sliderWidget->setCtrlMaximum(data.edata.upper_ctrl_limit);
+            sliderWidget->setCtrlMinimum(data.edata.lower_ctrl_limit);
 
             // disconnect signal to prevent from firing again
             disconnect(w, SIGNAL(valueChanged (double)), 0, 0);
@@ -3301,6 +3304,12 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             // set no connection color
         } else {
             SetColorsNotConnected(sliderWidget);
+        }
+
+        int precMode = sliderWidget->getPrecisionMode();
+        if((precMode != caSlider::User) && (data.edata.initialize)) 
+        {
+            sliderWidget->setPrecision(data.edata.precision);
         }
 
         // caClock ==================================================================================================================

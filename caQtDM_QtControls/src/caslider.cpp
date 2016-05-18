@@ -40,6 +40,8 @@
 #include <QPainter>
 #include "qwt_scale_draw.h"
 #include "alarmdefs.h"
+#include <QPainter>
+#include "qwt_scale_draw.h"
 
 #if defined(_MSC_VER)
 #define fmax max
@@ -49,13 +51,22 @@
 // I need to overload the scaleengine of qwt in order to get the upper and lower scale ticks drawn
 class mySliderScaleEngine: public QwtLinearScaleEngine
 {
-    virtual QwtScaleDiv divideScale(double x1, double x2, int maxMajorSteps, int maxMinorSteps, double stepSize  ) const {
-        QwtScaleDiv sd = QwtLinearScaleEngine::divideScale(x1, x2, maxMajorSteps, maxMinorSteps, stepSize );
+    virtual QwtScaleDiv divideScale(double x1, double x2, int maxMajorSteps, 
+        int maxMinorSteps, double stepSize  ) const 
+        {
+
+        QwtScaleDiv sd = QwtLinearScaleEngine::divideScale(x1, x2, maxMajorSteps,   
+            maxMinorSteps, stepSize );
+
         QList<double> ticks = sd.ticks( QwtScaleDiv::MajorTick );
-        if(ticks.count() > 0) {
-            if ( ticks.last() < sd.upperBound() || ticks.first() > sd.lowerBound()){
-                if(ticks.last() < sd.upperBound()) ticks.append(sd.upperBound());
-                if(ticks.first() > sd.lowerBound()) ticks.prepend(sd.lowerBound());
+        if(ticks.count() > 0) 
+        {
+            if ( ticks.last() < sd.upperBound() || ticks.first() > sd.lowerBound())
+            {
+                if(ticks.last() < sd.upperBound()) 
+                    ticks.append(sd.upperBound());
+                if(ticks.first() > sd.lowerBound()) 
+                    ticks.prepend(sd.lowerBound());
                 sd.setTicks( QwtScaleDiv::MajorTick, ticks );
             }
 
@@ -110,6 +121,8 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
     thisDirection = Up;
     thisMinimum = -50;
     thisMaximum = 50;
+    thisCtrlMinimum = -50;
+    thisCtrlMaximum = -50;
     pointSizePrv = 0.0;
     direction = 0;
     sliderSelected = false;
@@ -125,10 +138,19 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
     setHandleSize(QSize(10,20));
 
     thisColorMode = Static;
+    thisHighLimitMode = Channel;
+    thisLowLimitMode = Channel;
+    defaultBackColor = palette().background().color();
+    defaultForeColor = palette().foreground().color();
 
     oldBackColor = QColor(Qt::white);
     oldForeColor = QColor(Qt::white);
     setScaleValueColor(Qt::black);
+
+    setPrecision(2);
+    setPrecisionMode(Channel);
+    setFormatType(decimal);
+    setScaleValueEnabled(true);
 
     setBackground(QColor(224,224,224));
     setForeground(Qt::black);
@@ -452,35 +474,10 @@ void caSlider::mousePressEvent(QMouseEvent *e)
 
         // I have to do the work myself due to the unwanted snapping
 #if QWT_VERSION >= 0x060100
-
         if(isScrollPosition(e->pos())) {
             QwtSlider::mousePressEvent(e);
             sliderSelected = true;
         } else if(sliderRect().contains(e->pos())) {
-            if (orientation() == Qt::Horizontal ) {
-                if(thisDirection == Right) {
-                    if ( p.x() < markerPos ) direction = -1;
-                    else direction = 1;
-                } else {
-                    if ( p.x() < markerPos ) direction = 1;
-                    else direction = -1;
-                }
-            } else {
-                if(thisDirection == Up) {
-                    if ( p.y() < markerPos ) direction = 1;
-                    else direction = -1;
-                } else {
-                    if ( p.y() < markerPos ) direction = -1;
-                    else direction = 1;
-                }
-            }
-
-            moveSlider();
-            repeatTimer->start();
-        }
-
-        e->ignore();
-
 #else
         QwtAbstractSlider::ScrollMode scrollMode;
         getScrollMode(p,  scrollMode, direction);
@@ -488,6 +485,7 @@ void caSlider::mousePressEvent(QMouseEvent *e)
             QwtSlider::mousePressEvent(e);
             sliderSelected = true;
         } else {
+ #endif
             if (orientation() == Qt::Horizontal ) {
                 if(thisDirection == Right) {
                     if ( p.x() < markerPos ) direction = -1;
@@ -510,7 +508,6 @@ void caSlider::mousePressEvent(QMouseEvent *e)
             repeatTimer->start();
             e->ignore();
         }
-#endif
     }
 }
 
@@ -526,6 +523,27 @@ void caSlider::mouseReleaseEvent( QMouseEvent *e )
 #endif
     }
     repeatTimer->stop();
+}
+
+void caSlider::wheelEvent(QWheelEvent *e)
+{
+    if(!thisAccessW) {
+        e->ignore();
+        return;
+    }
+
+    int delta = e->delta();
+
+    if(thisDirection == Right || thisDirection == Up) {
+        if ( delta > 0 ) direction = 1;
+        else direction = -1;
+    } else {
+        if ( delta > 0 ) direction = -1;
+        else direction = 1;
+    }
+
+    moveSlider();
+    e->ignore();
 }
 
 void caSlider::repeater( )
@@ -545,21 +563,14 @@ void caSlider::moveSlider()
     thisValue = thisValue + double(direction) * step();
 #endif
 
-    if(oldVal < thisMinimum || oldVal > thisMaximum) {
-        Q_EMIT sliderMoved( thisValue );
-        Q_EMIT valueChanged( thisValue );
-    } else if(thisValue < thisMinimum) {
-        thisValue = thisMinimum;
-        Q_EMIT sliderMoved( thisValue );
-        Q_EMIT valueChanged( thisValue );
-    } else if (thisValue > thisMaximum) {
-        thisValue = thisMaximum;
-        Q_EMIT sliderMoved( thisValue );
-        Q_EMIT valueChanged( thisValue );
-    } else {
-        Q_EMIT sliderMoved( thisValue );
-        Q_EMIT valueChanged( thisValue );
-    }
+    if(thisValue > thisCtrlMaximum) thisValue = thisCtrlMaximum;
+    else if (thisValue <thisCtrlMinimum) thisValue = thisCtrlMinimum;
+    else if(thisValue < thisMinimum && oldVal >= thisMinimum) thisValue = thisMinimum;
+    else if(thisValue > thisMaximum && oldVal <= thisMaximum) thisValue = thisMaximum;
+
+    setValue(thisValue);
+    Q_EMIT sliderMoved( thisValue );
+    Q_EMIT valueChanged( thisValue );
 }
 
 bool caSlider::timerActive()
@@ -722,7 +733,7 @@ bool caSlider::event(QEvent *e)
                 if(xFactor < 0.1) break;
 
                 float pointSize = f.pointSizeF() / xFactor;
-
+                    
                 if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
                 if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;
 
@@ -736,16 +747,16 @@ bool caSlider::event(QEvent *e)
                 break;
 
             case Qt::Horizontal: {
-                QSize handlesize = QSize(width()/10, height()*2/5-4);
+                QSize handlesize = QSize((width()/10), height()*2/5-4);
                 if(handlesize != this->handleSize()) {
                     this->setHandleSize(handlesize);
                 }
                 QFont f = font();
                 int size = that->scaleDraw()->maxLabelWidth(f);
                 float yFactor = (float) size  / ((float) height()*3.0/5.0 -10.0);
-
+                
                 if(yFactor < 0.1) break;
-
+                
                 float pointSize = f.pointSizeF() / yFactor;
                 if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
                 if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;

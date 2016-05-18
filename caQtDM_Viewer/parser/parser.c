@@ -2395,6 +2395,8 @@ void *parseValuator(DisplayInfo *displayInfo, FrameOffset * offset)
         Qt_handleString("scaleValueEnabled", "bool", "true");
     }
 
+    Qt_handleString("autoFocus", "bool", "true");
+
     Qt_setColorMode("caSlider", COLORMODE);
 
     Qt_writeCloseTag("widget", widgetName, visibilityStatic);

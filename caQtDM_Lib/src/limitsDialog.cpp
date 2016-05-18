@@ -249,7 +249,7 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
             lowLimitComboBox->setCurrentIndex(1);
 
         initMin = sliderWidget->getMinValue();
-        initMax = sliderWidget->getMaxValue();
+        initMax = sliderWidget->getMaxValue();        
 
         minimumLineEdit->setText(QString::number(initMin, 'g'));
         maximumLineEdit->setText(QString::number(initMax, 'g'));
