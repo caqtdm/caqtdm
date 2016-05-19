@@ -3254,24 +3254,17 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
             // take limits from channel, in case of user limits these should already been set
             if((highChannelLimitEnabled || lowChannelLimitEnabled) && data.edata.initialize ) {
-
                 // when limits are the same, do nothing
                 if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
                     disconnect(w, SIGNAL(valueChanged (double)), 0, 0);
-                    /*
-                    if(sliderWidget->getDirection() == caSlider::Down  || sliderWidget->getDirection() == caSlider::Left) {
-                       if((lowChannelLimitEnabled))  sliderWidget->setMinValue(data.edata.upper_disp_limit);
-                       if((highChannelLimitEnabled)) sliderWidget->setMaxValue(data.edata.lower_disp_limit);
-                    } else {
-                       if((lowChannelLimitEnabled))  sliderWidget->setMaxValue(data.edata.upper_disp_limit);
-                       if((highChannelLimitEnabled)) sliderWidget->setMinValue(data.edata.lower_disp_limit);
-                    }
-                    */
                     if((highChannelLimitEnabled)) sliderWidget->setMaxValue(data.edata.upper_disp_limit);
                     if((lowChannelLimitEnabled))  sliderWidget->setMinValue(data.edata.lower_disp_limit);
                     connect(w, SIGNAL(valueChanged(double)), this, SLOT(Callback_SliderValueChanged(double)));
                 }
             }
+
+            sliderWidget->setCtrlMaximum(data.edata.upper_ctrl_limit);
+            sliderWidget->setCtrlMinimum(data.edata.lower_ctrl_limit);
 
             // disconnect signal to prevent from firing again
             disconnect(w, SIGNAL(valueChanged (double)), 0, 0);

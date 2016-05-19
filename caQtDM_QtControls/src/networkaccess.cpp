@@ -162,6 +162,7 @@ const QString NetworkAccess::parseError(QNetworkReply::NetworkError error)
         errstr = tr("ContentNotFoundError");
         break;
     default:
+        errstr = tr("unknownError");
         break;
     }
     return errstr;
