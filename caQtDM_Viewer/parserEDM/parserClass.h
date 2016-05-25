@@ -16,6 +16,7 @@ enum classType {activeLine, activeRectangle, activeCircle, activeArc ,
                 activeMeter, activeBar, activeMessageBox,
                 activeMotifSlider, activeButton, activeMenuButton, activeRadioButton, activeChoiceButton, // Zai added one item
                 activeMessageButton, activeExitButton, relatedDisplay, shellCmdButton, activeGroup,
+				activeSlider,
                unknown};
 
 struct RGB {
@@ -32,7 +33,8 @@ public:
     int loadHeader (myParserEDM *myParser, FILE *f);
     void readCommentsAndVersion (FILE *f);
     void incLine ( void );
-    void addVisibilityCalc(myParserEDM *myParser, char *visPvExpStr, char *minVisString, char *maxVisString);
+    void addVisibilityCalc(myParserEDM *myParser, char *visPvExpStr, char *minVisString, char *maxVisString, int visInverted=0);
+	void addAlarmPV(myParserEDM *myParser, char *alarmPvExpStr, int lineColorMode=0, int fillColorMode=0);
 
 private:
 
@@ -132,7 +134,7 @@ private:
     int fillMode;
 
     // reading activeBarClass
-    int barColor, barColorMode, labelType, showScale, horizontal;
+    int barColor, barColorMode, labelType, buttonType, showScale, horizontal;
     expStringClass readPvExpStr,  readMinExpStr, readMaxExpStr, nullPvExpStr, label, precisionExpStr ;
     expStringClass labelTicksExpStr, majorTicksExpStr, minorTicksExpStr, barOriginValExpStr;
     char scaleFormat[15+1];
@@ -152,6 +154,10 @@ private:
     double dincrement;
     expStringClass controlPvName, controlLabelName, savedValuePvName;
     efDouble efScaleMin, efScaleMax;
+
+	// reading activeSliderClass
+	int ctrlColor, offsetColor, indicatorColor, indicatorLabelType;
+	expStringClass indicatorLabelName;
 
     // reading relatedDisplayClass
     int topShadowColor, botShadowColor, icon, swapButtons;
@@ -209,7 +215,7 @@ private:
    int buttonColor, selectColor;
 
    // reading activeMessageButtonClass
-   int onColor, offColor, toggle,  pressAction, releaseAction, _3D;
+   int onColor, offColor, toggle, fgAlarm, pressAction, releaseAction, _3D;
    int useEnumNumeric, usePassword,lock ;
    expStringClass sourcePressPvExpString, sourceReleasePvExpString, destPvExpStringM, visPvExpString;
    expStringClass onLabel, offLabel;

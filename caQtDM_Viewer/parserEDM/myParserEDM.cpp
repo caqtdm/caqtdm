@@ -147,6 +147,14 @@ void myParserEDM::writeTaggedString(const QString& type, const QString& value )
     xw->writeTaggedString( type, value );
 }
 
+void myParserEDM::writeTaggedString(const QString& type, const QString& value, bool notr) {
+	if (notr) {
+		xw->writeTaggedString( type, value, AttrMap("notr", "true"));
+	} else {
+		xw->writeTaggedString( type, value );
+	}
+}
+
 void myParserEDM::writeCloseProperty()
 {
     xw->writeCloseTag( "property" );
@@ -212,10 +220,10 @@ void myParserEDM::writeRectangleDimensions(int x, int y, int w, int h)
     sprintf(asc, "%d", y);
     writeTaggedString("y", asc);
 
-    sprintf(asc, "%d", w);
+    sprintf(asc, "%d", w ? w : 1);
     writeTaggedString("width", asc);
 
-    sprintf(asc, "%d", h);
+    sprintf(asc, "%d", h ? h : 1);
     writeTaggedString("height", asc);
 
     writeCloseTag("rect");
@@ -229,7 +237,7 @@ void myParserEDM::writeFontProperties(int size, bool bold)
     writeOpenProperty("font");
     writeOpenTag("font", "", "");
 
-    sprintf(asc, "%d", size - 4);
+    sprintf(asc, "%d", size);
     writeTaggedString("pointsize", asc);
 
     if (bold && size > 14){
@@ -315,6 +323,29 @@ void myParserEDM::Qt_ChannelsXY(char *widget, char *channels, int trace) {
     Qt_handleString((char *)prop.toLatin1().constData(), "string", channels);
 }
 
+void myParserEDM::Qt_extractCalcString(char *str, char *calcStr, char *pvStr, int *status) {
+
+    int startPos = 0, endPos = 0;
+    pvStr[0] = '\0';
+    QString newStr(str);
+	QString calc("A");
+    startPos =newStr.indexOf("{");
+    if(startPos > -1) {
+		endPos = newStr.indexOf("}(");
+		++startPos;
+		calc = newStr.mid(startPos, endPos-startPos);
+        newStr.remove(0,endPos+2);
+    } else {
+		strcpy(calcStr, (char*)calc.toLatin1().constData());
+        *status = false;
+        return;
+    }
+    if(newStr.endsWith(")")) newStr.remove(newStr.size()-1,1);
+	strcpy(calcStr, (char*)calc.toLatin1().constData());
+	strcpy(pvStr, (char*)newStr.toLatin1().constData());
+    *status = true;
+}
+
 void myParserEDM::Qt_extractString(char *str, char *retStr, int *status) {
 
     int startPos = 0;
@@ -337,42 +368,13 @@ void myParserEDM::Qt_extractString(char *str, char *retStr, int *status) {
  */
 class myParserEDM;
 
-int main(int argc, char *argv[])
-{
-    int	in, numargs;
-    char inFile[80] = "";
-
-    for (numargs = argc, in = 1; in < numargs; in++) {
-
-        if ( strcmp (argv[in], "-v" ) == 0 ) {
-            printf("edl2ui version %s for %s\n", BUILDVERSION, BUILDARCH);
-            exit(0);
-        }
-        if(!strcmp(argv[in],"-help") || !strcmp(argv[in],"-h") || !strcmp(argv[in],"-?")) {
-            in++;
-            printf("Usage:\n edl2ui [options] file\n");
-            printf("[-flat] :        flat file will be generated, includes are integrated\n");
-            printf("[-nolegends] :   no legends will be generated for the stripplots\n");
-            printf("[-deviceonmenu] : part of pv will be used for the label of menu\n");
-            printf("[-expandtext] : when textlabels do not fit, try this option\n");
-            exit(1);
-        }
-        if (strncmp (argv[in], "-" , 1) == 0) {
-            /* unknown application argument */
-            printf("edl2ui -- Argument %d = [%s] is unknown! ",in,argv[in]);
-            printf("possible are: '-flat and '-deviceonmenu' and '-nolegends' and '-v'\n");
-            exit(-1);
-        } else {
-            printf("edl2ui -- file = <%s>\n", argv[in]);
-            strcpy(inFile, argv[in]);
-        }
-    }
+int processFile(char * inFile) {
 
     // input and out files
     QString inputFile = inFile;
     if(inputFile.size() < 1) {
         qDebug() << "edl2ui -- sorry: no input file";
-        exit(-1);
+        return -1;
     }
 
     QString openFile1, openFile2;
@@ -394,7 +396,7 @@ int main(int argc, char *argv[])
     QFileInfo fi(inputFile);
     if(!fi.exists()) {
         qDebug() << "edl2ui -- sorry, file" << inFile << "does not exist";
-        exit(-1);
+        return -1;
     }
 
     // get path for composite file parsing
@@ -402,22 +404,64 @@ int main(int argc, char *argv[])
     //strcpy(filePrefix, fi.absolutePath().toLatin1().data());
 
     // init edlParser
-    myParserEDM *edlParser = new myParserEDM;
-    edlParser->Init(edlParser);
+    myParserEDM edlParser;
+    edlParser.Init(&edlParser);
 
     //get rid of path, we want to generate where we are
     outputFile = outputFile.section('/',-1);
-    edlParser->openFile(outputFile.toLatin1().data());
+    edlParser.openFile(outputFile.toLatin1().data());
 
     // open input file
     //FILE *filePtr = fopen(inputFile.toLatin1().data(), "r");
-    parserClass *parser = new parserClass(inputFile.toLatin1().data());
-    parser->loadFile(edlParser);
+    parserClass parser(inputFile.toLatin1().data());
+    parser.loadFile(&edlParser);
 
 
     // close output file
-    edlParser->closeFile();
+    edlParser.closeFile();
 
     return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    int	in, numargs, fin;
+    char inFiles[80][80] = {""};
+
+    for (numargs = argc, in = 1, fin = 0; in < numargs; in++) {
+
+        if ( strcmp (argv[in], "-v" ) == 0 ) {
+            printf("edl2ui version %s for %s\n", BUILDVERSION, BUILDARCH);
+            exit(0);
+        }
+        if(!strcmp(argv[in],"-help") || !strcmp(argv[in],"-h") || !strcmp(argv[in],"-?")) {
+            in++;
+            printf("Usage:\n edl2ui [options] file\n");
+            printf("[-flat] :        flat file will be generated, includes are integrated\n");
+            printf("[-nolegends] :   no legends will be generated for the stripplots\n");
+            printf("[-deviceonmenu] : part of pv will be used for the label of menu\n");
+            printf("[-expandtext] : when textlabels do not fit, try this option\n");
+            exit(1);
+        }
+        if (strncmp (argv[in], "-" , 1) == 0) {
+            /* unknown application argument */
+            printf("edl2ui -- Argument %d = [%s] is unknown! ",in,argv[in]);
+            printf("possible are: '-flat and '-deviceonmenu' and '-nolegends' and '-v'\n");
+            exit(-1);
+        } else {
+			if (fin < 80) {
+				printf("edl2ui -- file = <%s>\n", argv[in]);
+				strcpy(inFiles[fin], argv[in]);
+				++fin;
+			} else {
+				printf("edl2ui -- too many files, discarding <%s>\n", argv[in]);
+			}
+        }
+    }
+
+	for (in = 0; in < fin; ++in) {
+		processFile(inFiles[in]);
+	}
+	return 0;
 }
 
