@@ -414,7 +414,7 @@ int processFile(char * inFile) {
     // open input file
     //FILE *filePtr = fopen(inputFile.toLatin1().data(), "r");
     parserClass parser(inputFile.toLatin1().data());
-    parser.loadFile(edlParser);
+    parser.loadFile(&edlParser);
 
 
     // close output file
