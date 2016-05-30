@@ -353,6 +353,21 @@ void parserClass::addVisibilityCalc(myParserEDM *myParser, char *visPvExpStr, ch
     if(strlen(visibilityCalc) > 0) myParser->Qt_handleString("visibilityCalc", "string", visibilityCalc);
 }
 
+void parserClass::addAlarmPV(myParserEDM *myParser, char *alarmPvExpStr) {
+	int status;
+	char alarmCalc[100];
+	char newStr[80];
+	alarmCalc[0] = '\0';
+	if (strlen(alarmPvExpStr) > 0) {
+		myParser->Qt_extractString(alarmPvExpStr, newStr, &status);
+		if (status) {
+			myParser->Qt_handleString("channel", "string", newStr);
+		} else {
+			myParser->Qt_handleString("channel", "string", alarmPvExpStr);
+		}
+		myParser->Qt_handleString("colorMode", "string", "Alarm");
+	}
+}
 
 int parserClass::loadHeader (myParserEDM *myParser, FILE *f)  {
 
@@ -445,6 +460,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
         if ( strcmp( tagName, "object" ) == 0 ) {
 
             memset(emptyStr, ' ', 79); emptyStr[79] = '\0';
+			emptyStr[0] = '\0';
             alignment = 0;
             left = 0;
 
@@ -824,6 +840,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 else myParser->Qt_handleString("fillstyle", "string", "Outline");
 
                 addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
+				addAlarmPV(myParser, alarmPvExpStr.getRaw());
 
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
             }
@@ -901,6 +918,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_handleString("channel", "string", visPvExpStr.getRaw());
 
                 addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
+				addAlarmPV(myParser, alarmPvExpStr.getRaw());
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
 
             }
@@ -969,6 +987,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_handleString("channel", "string", visPvExpStr.getRaw());
 
                 addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
+				addAlarmPV(myParser, alarmPvExpStr.getRaw());
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
 
             }
@@ -1030,6 +1049,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
 
 
                 addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
+				addAlarmPV(myParser, alarmPvExpStr.getRaw());
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
 
             }
@@ -1097,7 +1117,9 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_setColorForeground("", rgb[fgColor].r/256, rgb[fgColor].g/256, rgb[fgColor].b/256, 255);
                 myParser->Qt_setColorBackground("", rgb[bgColor].r/256, rgb[bgColor].g/256, rgb[bgColor].b/256, alpha);
 
-                addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
+				addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
+				addAlarmPV(myParser, alarmPvExpStr.getRaw());
+
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
             }
                 break;
@@ -1243,6 +1265,14 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_setColorForeground("", rgb[fgColor].r/256, rgb[fgColor].g/256, rgb[fgColor].b/256, 255);
                 myParser->Qt_setColorBackground("", rgb[bgColor].r/256, rgb[bgColor].g/256, rgb[bgColor].b/256, 255);
                 if(showUnits) myParser->Qt_handleString("unitsEnabled", "bool", "false");
+
+				if (bgColorMode || useAlarmBorder) {
+					myParser->Qt_handleString("colorMode", "enum", "caLineEdit::Alarm_Default");
+					myParser->Qt_handleString("alarmHandling", "enum", "caLineEdit::onBackground");
+				} else if (colorMode) {
+					myParser->Qt_handleString("colorMode", "enum", "caLineEdit::Alarm_Default");
+					myParser->Qt_handleString("alarmHandling", "enum", "caLineEdit::onForeground");
+				}
 
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
 
@@ -1404,7 +1434,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                     myParser->Qt_handleString("look", "enum", "Outline");
                 }
                 if(fgColorMode) {
-                    myParser->Qt_handleString("colorMode", "enum", "Alarm_Static");
+                    myParser->Qt_handleString("colorMode", "enum", "Alarm");
                 }
 
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
@@ -1480,7 +1510,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                     }
                 }
                 if(fgColorMode) {
-                    myParser->Qt_handleString("colorMode", "enum", "Alarm_Static");
+                    myParser->Qt_handleString("colorMode", "enum", "Alarm");
                 } else {
                     myParser->Qt_handleString("colorMode", "enum", "Default");
                 }
@@ -1675,6 +1705,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_handleString("colorMode", "string", "Static");
 
                 addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
+				addAlarmPV(myParser, alarmPvExpStr.getRaw());
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
             }
 
@@ -1743,6 +1774,7 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 myParser->Qt_handleString("label", "string", label);
 
                 addVisibilityCalc(myParser, visPvExpStr.getRaw(), minVisString, maxVisString);
+				addAlarmPV(myParser, alarmPvExpStr.getRaw());
                 myParser->Qt_writeCloseTag("widget", widgetName, 0);
 
             }
