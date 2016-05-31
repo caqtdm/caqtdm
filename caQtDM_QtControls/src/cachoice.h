@@ -74,6 +74,7 @@ public:
     void setStacking(Stacking stacking);
 
     caChoice(QWidget *parent);
+    caChoice(QWidget *parent, bool calledFromDesigner);
 
     QString getPV() const;
     void setPV(QString const &newPV);
@@ -115,13 +116,15 @@ public:
 
 protected:
     void arrangeCells(QStringList list, int indx);
-    void resizeEvent(QResizeEvent *e);
+    void resizeEvent(QResizeEvent *e);    
 
 signals:
 
     void clicked(QString text);
 
 private:
+
+    void         init(bool calledFromDesigner);
 
     QGridLayout  *grid;
     QString      thisPV;
@@ -134,6 +137,7 @@ private:
     QList<EPushButton*> cells;
     int         thisStartBit;
     int         thisEndBit;
+    bool        designer;
 
     colMode     thisColorMode, oldColorMode;
     QColor      thisForeColor, oldForeColor;

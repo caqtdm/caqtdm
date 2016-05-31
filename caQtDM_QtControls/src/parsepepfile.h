@@ -58,7 +58,7 @@ private:
     typedef struct _gridInfo {
         QString widgetType, widgetText, widgetHeight, widgetChannel, command, comlab;
         QString formats[2];
-        int nbElem,span;
+        int nbElem,span,comsize;
         bool textPresent;
         QColor fg, bg;
     } gridInfo;

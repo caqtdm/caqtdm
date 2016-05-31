@@ -218,7 +218,7 @@ caMenuInterface::caMenuInterface(QObject *parent): CustomWidgetInterface_Control
 
 QWidget *caChoiceInterface::createWidget(QWidget *parent)
 {
-    return new caChoice(parent);
+    return new caChoice(parent, isInitialized());
 }
 
 caChoiceInterface::caChoiceInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)

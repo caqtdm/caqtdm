@@ -32,17 +32,36 @@
 
 caChoice::caChoice(QWidget *parent) : QWidget(parent)
 {
+    init(false);
+}
 
+caChoice::caChoice(QWidget *parent, bool calledFromDesigner) : QWidget(parent)
+{
+    init(calledFromDesigner);
+}
+
+
+void caChoice::init(bool calledFromDesigner){
     // to start with, clear the stylesheet, so that playing around
     // is not possible.
     setStyleSheet("");
 
+    designer = calledFromDesigner;
+
     numCells = 2;
-    labels << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";
+
     texts << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";
+
+    if(designer){
+        labels << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";
+    }
+    else{
+        // if not designer, show only one empty button at first,
+        // so that we do not enlarge the window unnecesairily
+        labels << "";
+    }
     signalMapper = new QSignalMapper(this);
 
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     grid = new QGridLayout(this);
     grid->setMargin(0);
     grid->setSpacing(2);
@@ -83,6 +102,7 @@ void caChoice::arrangeCells(QStringList list, int indx)
     int nbLines = qMax(2, (int) dSqrt);
     int column = 0;
     int row = 0;
+
 
     foreach(EPushButton *l, cells) {
         grid->removeWidget(l);
