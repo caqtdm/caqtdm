@@ -114,7 +114,6 @@ public:
      void updateChoice();
 
 protected:
-
     void arrangeCells(QStringList list, int indx);
     void resizeEvent(QResizeEvent *e);
 
@@ -145,6 +144,7 @@ private:
     EPushButton::ScaleMode thisScaleMode;
 
     int lastValue;
+
 };
 
 #endif  /* CACHOICE */

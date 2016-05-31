@@ -124,14 +124,19 @@ void caChoice::arrangeCells(QStringList list, int indx)
         temp->setCheckable(true);
         // mark activ button
         if(i==indx) {
-            style.append("* {border-style: solid; border-width: 1px 3px 1px 3px; padding:0px 1px 0px 1px; margin:0px;}");
-            temp->setStyleSheet(style);
+            if(thisColorMode != Default) {
+                style.append("* {border-style: solid; border-width: 1px 3px 1px 3px; padding:0px 1px 0px 1px; margin:0px;}");
+                temp->setStyleSheet(style);
+            }
             temp->setChecked(true);
         } else {
-            style.append("* {border-style: solid; border-width: 0px; padding:1px 4px 1px 4px; margin:0px;}");
-            temp->setStyleSheet(style);
+            if(thisColorMode != Default) {
+                style.append("* {border-style: solid; border-width: 0px; padding:1px 4px 1px 4px; margin:0px;}");
+                temp->setStyleSheet(style);
+            }
             temp->setChecked(false);
         }
+
         // take care of stacking
         if(thisStacking == Row) {
           grid->addWidget(temp, i, 0);
@@ -166,36 +171,39 @@ void caChoice::setColors(QColor back, QColor fore, QColor border, alignmentHor a
 {
     //set colors and styles
 
-    // default get it from external or internal stylesheet or nothing, do not bother about alignment
-
+    // default get it from external or internal stylesheet or nothing
     if(thisColorMode == Default) {
         oldColorMode = thisColorMode;
-
-        if(border != oldBorderColor) {
-            QString bordercolor = "border-color: rgba(%1, %2, %3, %4); ";
-            bordercolor = bordercolor.arg(border.red()).arg(border.green()).arg(border.blue()).arg(border.alpha());
-            QString style ="QPushButton { ";
-            style.append(bordercolor);
-            style.append("} ");
-            setStyleSheet(style);
-        } else {
-           setStyleSheet("");
+        QString style ="QPushButton { border-radius: 2px; padding: 3px; border-width: 3px; border-style: outset; ";
+        switch(alignment) {
+        case left:
+            style.append("text-align: left; ");
+            break;
+        case right:
+            style.append("text-align: right; ");
+            break;
+        case center:
+            style.append("text-align: center; ");
+            break;
         }
+        style.append("} ");
+        style.append("QPushButton:checked {border-width: 3px; border-style: inset;} QPushButton:default {border: 3px; border-style: outset;}");
+        setStyleSheet(style);
         return;
     }
 
-    if((back != oldBackColor) || fore != oldForeColor || border != oldBorderColor || alignment != oldAlignment || oldColorMode != thisColorMode)
-    {
+    // in case of static
+    if((back != oldBackColor) || fore != oldForeColor || border != oldBorderColor || alignment != oldAlignment || oldColorMode != thisColorMode) {
         QColor baseColor(back);
         QColor highlightColor(back);
         QColor shadowColor1(back);
         QColor shadowColor2(back);
         QColor activColor(baseColor);
+
         highlightColor.setHsv(baseColor.hue(), baseColor.saturation(), baseColor.value());
+        activColor.setHsv(baseColor.hue(), baseColor.saturation(), (int) qMin((int)(baseColor.value() * 1.1), 255) );
         shadowColor1.setHsv(baseColor.hue(), (int) (baseColor.saturation() * 0.6), baseColor.value());
         shadowColor2.setHsv((int) (baseColor.hue()*0.7), (int) (baseColor.saturation() * 0.7), (int) (baseColor.value() * 0.7));
-
-        activColor.setHsv(baseColor.hue(), baseColor.saturation(), (int) qMin((int)(baseColor.value() * 1.1), 255) );
 
         QString background =  "";
         background.append("background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, ");
@@ -209,7 +217,11 @@ void caChoice::setColors(QColor back, QColor fore, QColor border, alignmentHor a
                 .arg(baseColor.red()).arg(baseColor.green()).arg(baseColor.blue()).arg(baseColor.alpha())
                 .arg(shadowColor2.red()).arg(shadowColor2.green()).arg(shadowColor2.blue()).arg(shadowColor2.alpha());
 
-        background.append("border-radius: 2px;padding: 3px; border-width: 1px;");
+        if(thisColorMode == Default) {
+           background = "border-radius: 2px;padding: 3px; border-width: 3px;";
+        } else {
+           background.append("border-radius: 2px;padding: 3px; border-width: 1px;");
+        }
 
         QString foreground = "; color: rgba(%1, %2, %3, %4); ";
         foreground = foreground.arg(fore.red()).arg(fore.green()).arg(fore.blue()).arg(fore.alpha());
@@ -234,7 +246,7 @@ void caChoice::setColors(QColor back, QColor fore, QColor border, alignmentHor a
         }
 
         style.append("} ");
-        QString hover = "QPushButton:hover {background-color: rgba(%1, %2, %3, %4);}  QPushButton:pressed {background-color: rgba(%5, %6, %7, %8)};";
+        QString hover = "QPushButton:hover {background-color: rgba(%1, %2, %3, %4);}  QPushButton:pressed {background-color: rgba(%5, %6, %7, %8);}";
         hover = hover.arg(highlightColor.red()).arg(highlightColor.green()).arg(highlightColor.blue()).arg(highlightColor.alpha())
                 .arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
         style.append(hover);
@@ -340,16 +352,19 @@ void caChoice::updateChoice()
         QString style("");
         // mark activ button
         if(i==lastValue) {
-            style.append("* {border-style: inset; border-width: 1px 3px 1px 3px; padding:0px 1px 0px 1px; margin:0px;}");
-            temp->setStyleSheet(style);
+            if(thisColorMode != Default) {
+                style.append("* {border-style: inset; border-width: 1px 3px 1px 3px; padding:0px 1px 0px 1px; margin:0px;}");
+                temp->setStyleSheet(style);
+            }
             temp->setChecked(true);
         } else {
-            style.append("* {border-style: solid; border-width: 0px; padding:1px 4px 1px 4px; margin:0px;}");
-            temp->setStyleSheet(style);
-            temp->setChecked(false);
+            if(thisColorMode != Default) {
+                style.append("* {border-style: solid; border-width: 0px; padding:1px 4px 1px 4px; margin:0px;}");
+                temp->setStyleSheet(style);
+            }
         }
         i++;
-     }
+    }
 }
 
 void caChoice::populateCells(QStringList list, int indx)
@@ -395,17 +410,14 @@ bool caChoice::eventFilter(QObject *obj, QEvent *event)
         if (event->type() == QEvent::Enter) {
             if(!thisAccessW) {
                 QApplication::setOverrideCursor(QCursor(Qt::ForbiddenCursor));
-                //setEnabled(false);
             } else {
                 QApplication::restoreOverrideCursor();
             }
         } else if(event->type() == QEvent::Leave) {
             QApplication::restoreOverrideCursor();
-            //setEnabled(true);
         }
         return QObject::eventFilter(obj, event);
 }
-
 
 void caChoice::resizeEvent(QResizeEvent *e)
 {
