@@ -33,16 +33,32 @@
 caChoice::caChoice(QWidget *parent) : QWidget(parent)
 {
 
+    // when called from designer, we would like to know it
+    bool inDesigner = false;
+    QVariant source = qApp->property("APP_SOURCE").value<QVariant>();
+    if(source.isValid()) {
+        if(!source.isNull()) {
+            QString test = source.toString();
+            if(test.contains("DESIGNER")) inDesigner = true;
+        }
+    }
+
     // to start with, clear the stylesheet, so that playing around
     // is not possible.
     setStyleSheet("");
 
     numCells = 2;
-    labels << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";
+
+    // if not designer, show only one empty button at first, so that we do not enlarge the window unnecesairily
+    if(inDesigner) {
+        labels << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";
+    } else {
+        labels << "";
+    }
     texts << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";
     signalMapper = new QSignalMapper(this);
 
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    //setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     grid = new QGridLayout(this);
     grid->setMargin(0);
     grid->setSpacing(2);
