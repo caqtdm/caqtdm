@@ -1039,6 +1039,8 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
     if(!m_heightDefined) return (QImage *) 0;
     if(!m_codeDefined) return (QImage *) 0;
 
+    if(!m_width<=0) return (QImage *) 0;
+    if(!m_height<=0) return (QImage *) 0;
     resultSize.setWidth(m_width);
     resultSize.setHeight(m_height);
 
