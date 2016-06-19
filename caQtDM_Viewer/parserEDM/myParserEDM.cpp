@@ -229,7 +229,7 @@ void myParserEDM::writeFontProperties(int size, bool bold)
     writeOpenProperty("font");
     writeOpenTag("font", "", "");
 
-    sprintf(asc, "%d", size - 4);
+    sprintf(asc, "%d", (int)(((double)size*0.7)+0.5));
     writeTaggedString("pointsize", asc);
 
     if (bold && size > 14){

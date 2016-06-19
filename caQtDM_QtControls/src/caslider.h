@@ -151,6 +151,12 @@ public:
     double getIncrementValue()  const {return thisIncrement;}
     void setIncrementValue(double const &value);
 
+    double getCtrlMaximum() const {return thisCtrlMaximum;}
+    void setCtrlMaximum(double max) {thisCtrlMaximum = max;}
+
+    double getCtrlMinimum() const {return thisCtrlMinimum;}
+    void setCtrlMinimum(double max) {thisCtrlMinimum = max;}
+
     caSlider(QWidget *parent);
 
     void setAlarmColors(short status);
@@ -161,7 +167,7 @@ public:
     void stopUpdating();
     void setPosition (const QPoint &);
     void setValue( double val );
-     void moveSlider();
+    void moveSlider();
 
 public slots:
     void setSliderValue(double const &value);
@@ -176,6 +182,7 @@ protected:
     virtual void mouseMoveEvent(QMouseEvent *e);
     virtual void keyPressEvent(QKeyEvent *e);
     virtual void keyReleaseEvent(QKeyEvent *e);
+    virtual void wheelEvent(QWheelEvent *e);
     virtual bool event(QEvent *);
     virtual void drawSlider ( QPainter *, const QRect & ) const;
 
@@ -209,6 +216,8 @@ private:
 
     double thisMaximum;
     double thisMinimum;
+    double thisCtrlMinimum;
+    double thisCtrlMaximum;
     double thisValue;
     double thisIncrement;
     float  pointSizePrv;
@@ -224,3 +233,4 @@ private:
 };
 
 #endif
+

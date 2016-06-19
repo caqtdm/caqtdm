@@ -110,6 +110,8 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
     thisDirection = Up;
     thisMinimum = -50;
     thisMaximum = 50;
+    thisCtrlMinimum = -50;
+    thisCtrlMaximum = -50;
     pointSizePrv = 0.0;
     direction = 0;
     sliderSelected = false;
@@ -125,6 +127,8 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
     setHandleSize(QSize(10,20));
 
     thisColorMode = Static;
+    thisHighLimitMode = Channel;
+    thisLowLimitMode = Channel;
 
     oldBackColor = QColor(Qt::white);
     oldForeColor = QColor(Qt::white);
@@ -452,35 +456,10 @@ void caSlider::mousePressEvent(QMouseEvent *e)
 
         // I have to do the work myself due to the unwanted snapping
 #if QWT_VERSION >= 0x060100
-
         if(isScrollPosition(e->pos())) {
             QwtSlider::mousePressEvent(e);
             sliderSelected = true;
         } else if(sliderRect().contains(e->pos())) {
-            if (orientation() == Qt::Horizontal ) {
-                if(thisDirection == Right) {
-                    if ( p.x() < markerPos ) direction = -1;
-                    else direction = 1;
-                } else {
-                    if ( p.x() < markerPos ) direction = 1;
-                    else direction = -1;
-                }
-            } else {
-                if(thisDirection == Up) {
-                    if ( p.y() < markerPos ) direction = 1;
-                    else direction = -1;
-                } else {
-                    if ( p.y() < markerPos ) direction = -1;
-                    else direction = 1;
-                }
-            }
-
-            moveSlider();
-            repeatTimer->start();
-        }
-
-        e->ignore();
-
 #else
         QwtAbstractSlider::ScrollMode scrollMode;
         getScrollMode(p,  scrollMode, direction);
@@ -488,6 +467,7 @@ void caSlider::mousePressEvent(QMouseEvent *e)
             QwtSlider::mousePressEvent(e);
             sliderSelected = true;
         } else {
+#endif
             if (orientation() == Qt::Horizontal ) {
                 if(thisDirection == Right) {
                     if ( p.x() < markerPos ) direction = -1;
@@ -510,7 +490,6 @@ void caSlider::mousePressEvent(QMouseEvent *e)
             repeatTimer->start();
             e->ignore();
         }
-#endif
     }
 }
 
@@ -526,6 +505,27 @@ void caSlider::mouseReleaseEvent( QMouseEvent *e )
 #endif
     }
     repeatTimer->stop();
+}
+
+void caSlider::wheelEvent(QWheelEvent *e)
+{
+    if(!thisAccessW) {
+        e->ignore();
+        return;
+    }
+
+    int delta = e->delta();
+
+    if(thisDirection == Right || thisDirection == Up) {
+        if ( delta > 0 ) direction = 1;
+        else direction = -1;
+    } else {
+        if ( delta > 0 ) direction = -1;
+        else direction = 1;
+    }
+
+    moveSlider();
+    e->ignore();
 }
 
 void caSlider::repeater( )
@@ -545,21 +545,14 @@ void caSlider::moveSlider()
     thisValue = thisValue + double(direction) * step();
 #endif
 
-    if(oldVal < thisMinimum || oldVal > thisMaximum) {
-        Q_EMIT sliderMoved( thisValue );
-        Q_EMIT valueChanged( thisValue );
-    } else if(thisValue < thisMinimum) {
-        thisValue = thisMinimum;
-        Q_EMIT sliderMoved( thisValue );
-        Q_EMIT valueChanged( thisValue );
-    } else if (thisValue > thisMaximum) {
-        thisValue = thisMaximum;
-        Q_EMIT sliderMoved( thisValue );
-        Q_EMIT valueChanged( thisValue );
-    } else {
-        Q_EMIT sliderMoved( thisValue );
-        Q_EMIT valueChanged( thisValue );
-    }
+    if(thisValue > thisCtrlMaximum) thisValue = thisCtrlMaximum;
+    else if (thisValue <thisCtrlMinimum) thisValue = thisCtrlMinimum;
+    else if(thisValue < thisMinimum && oldVal >= thisMinimum) thisValue = thisMinimum;
+    else if(thisValue > thisMaximum && oldVal <= thisMaximum) thisValue = thisMaximum;
+
+    setValue(thisValue);
+    Q_EMIT sliderMoved( thisValue );
+    Q_EMIT valueChanged( thisValue );
 }
 
 bool caSlider::timerActive()

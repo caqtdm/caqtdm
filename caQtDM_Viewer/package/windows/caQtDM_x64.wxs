@@ -35,7 +35,7 @@
                 <Directory Id="INSTALLDIR" Name="caQTDM">
                     <Directory Name="bin" Id="BIN">
                         <Directory Name="windows-x64" Id="WINDOWS_X64">
-                            <Component Id="Qt_5.4.0" Guid="30F3975A-A151-4A59-9C05-658F0319F3F7" Win64="yes">
+                            <Component Id="Qt_5.5.0" Guid="30F3975A-A151-4A59-9C05-658F0319F3F7" Win64="yes">
                                 <File Id="DESIGNER.EXE" Name="designer.exe" Source="$(env.QTHOME)\bin\designer.exe" />
                                 <File Id="ASSISTANT.EXE" Name="assistant.exe" Source="$(env.QTHOME)\bin\assistant.exe" />
                                 <File Id="QT5QUICKPARTICLES.DLL" Name="Qt5QuickParticles.dll" Source="$(env.QTHOME)\bin\Qt5QuickParticles.dll" />
@@ -80,7 +80,10 @@
                                 <File Id="CA.DLL" Name="ca.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\ca.dll" />
                                 <File Id="COM.DLL" Name="Com.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\Com.dll" />
                             </Component>
-                            <Component Id="qwt_6.1.1" Guid="A6CEE0D5-9524-4F6E-A04A-0BA4A5116B35" Win64="yes">
+                            <Component Id="ZMQ" Guid="6F1967A1-84CA-4BE4-85DC-8D1B75338BB7" Win64="yes">
+                                <File Id="LIBZMQ.DLL" Name="libzmq.dll" Source="$(env.ZMQ)\bin\windows-x64\libzmq.dll" />
+                            </Component>
+                            <Component Id="qwt_6.1.2" Guid="A6CEE0D5-9524-4F6E-A04A-0BA4A5116B35" Win64="yes">
                                 <File Id="QWT.DLL" Name="qwt.dll" Source="$(env.QWTHOME)\lib\qwt.dll" />
                             </Component>
                             <Component Id="CaQtDM" Guid="ECDE0227-4100-43B8-B817-88D6BCD7FF49" Win64="yes">
@@ -102,7 +105,7 @@
                             <Component Id="controlsystems" Guid="02E16D39-2C06-43FB-9DBF-22DA6A416313" Win64="yes">
                                 <File Id="DEMO_PLUGIN.DLL" Name="demo_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\demo_plugin.dll" />
                                 <File Id="EPICS3_PLUGIN.DLL" Name="epics3_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics3_plugin.dll" />
-                                <File Id="EPICS4_PLUGIN.DLL" Name="epics4_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics4_plugin.dll" />
+                                <File Id="BSREAD_PLUGIN.DLL" Name="bsread_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\bsread_plugin.dll" />
                             </Component>
                         </Directory>
                         <Directory Id="DESIGNER" Name="designer">
@@ -175,9 +178,9 @@
             </Component>
         </Directory>
         <Feature Id="DefaultFeature" Title="Main Feature" Level="1" ConfigurableDirectory="INSTALLDIR">
-            <ComponentRef Id="Qt_5.4.0" />
+            <ComponentRef Id="Qt_5.5.0" />
             <ComponentRef Id="Epics_3.14.12.4" />
-            <ComponentRef Id="qwt_6.1.1" />
+            <ComponentRef Id="qwt_6.1.2" />
             <ComponentRef Id="CaQtDM" />
             <ComponentRef Id="designer" />
             <ComponentRef Id="Stylesheet" />
@@ -189,6 +192,7 @@
             <ComponentRef Id="sqldrivers_c" />
             <ComponentRef Id="qt_conf" />
             <ComponentRef Id="controlsystems" />
+            <ComponentRef Id="ZMQ" />
         </Feature>
         <Feature Id="VCRedist" Level="1" Title="Visual C++ 12.0 Runtime" AllowAdvertise="no" Display="hidden">
             <MergeRef Id="VCRedist" />

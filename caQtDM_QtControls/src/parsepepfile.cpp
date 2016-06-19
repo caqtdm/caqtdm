@@ -109,6 +109,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QColor &bgColor, QFile *f
     int grid = 1;
     int ll;
     int span =0;
+    int comsize = 0;
     int nbFormats = 0;
     int actualLine = 0;
     int actualColumn = 0;
@@ -118,6 +119,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QColor &bgColor, QFile *f
     QString channel ="";
     QString separator((QChar)27);
     QString widgetHeight ="2";
+    int lineWidth = 0;
     QColor fg;
     QColor bg;
 
@@ -179,8 +181,10 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QColor &bgColor, QFile *f
                 }
 
                 ll = 2;
+                comsize = 0;
                 widgetText = "";
                 widgetHeight ="2";
+                lineWidth = 0;
                 formats[0] = formats[1] = "";
                 span = 1;
                 nbFormats = 0;
@@ -201,6 +205,15 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QColor &bgColor, QFile *f
                             span = elements.at(ll).toInt();
                         }
                     }
+
+                    else if(elements.at(ll).contains("-comsize")) {
+                        ll++;
+                        if(ll < elements.count()) {
+                            PRINT(printf("comsize detected, value=%s\n", qasc(elements.at(ll))));
+                            comsize = elements.at(ll).toInt();
+                        }
+                    }
+
                     else if(elements.at(ll).contains("-confirm")) {
                         PRINT(printf("confirm detected\n"));
                     }
@@ -243,6 +256,12 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QColor &bgColor, QFile *f
                         ll++;
                         PRINT(printf("height detected <%s>\n", qasc(elements.at(ll))));
                         widgetHeight = elements.at(ll);
+                    }
+
+                    else if(elements.at(ll).contains("-minwidth")) {
+                        ll++;
+                        PRINT(printf("minwidth detected <%s>\n", qasc(elements.at(ll))));
+                        lineWidth = elements.at(ll).toInt();
                     }
 
                     else if(elements.at(ll).contains("-fg") || elements.at(ll).contains("-comfg")) {
@@ -295,10 +314,12 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QColor &bgColor, QFile *f
                 if(aux.size() < 1) widgetText = "";
 
                 gridLayout[actualLine][actualColumn].span = span;
+                gridLayout[actualLine][actualColumn].comsize = comsize;
                 gridLayout[actualLine][actualColumn].widgetType = widgetType;
                 gridLayout[actualLine][actualColumn].widgetText = widgetText;
                 gridLayout[actualLine][actualColumn].widgetChannel = channel;
                 gridLayout[actualLine][actualColumn].widgetHeight = widgetHeight;
+                gridLayout[actualLine][actualColumn].lineWidth = lineWidth;
                 gridLayout[actualLine][actualColumn].formats[0] = formats[0];
                 gridLayout[actualLine][actualColumn].formats[1] = formats[1];
                 gridLayout[actualLine][actualColumn].fg = fg;
@@ -509,8 +530,9 @@ void ParsePepFile::replaceStrings(gridInfo &grid)
 void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo grid, int spanGrid, int spanColumns, int nbColumns, QByteArray *array)
 {
     Q_UNUSED(nbColumns);
-    QString fontSize = "12";
+    QString fontSize = "12";  // default
     QString lineHeight = "20";
+    QString lineWidth = "100";
     QString newpv = "";
     QString partialpv = "";
     int rgba[4];
@@ -521,6 +543,12 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
     QColor fg = grid.fg;
     QColor bg = grid.bg;
     QString widgetHeight = grid.widgetHeight;
+
+    // overwrite default fontsize with comsize
+    if(grid.comsize) fontSize = QString::number(grid.comsize);
+
+    // overwrite default minimum linewidth with linewidth
+    if(grid.lineWidth) lineWidth = QString::number(grid.lineWidth);
 
     rgba[0] = 0; rgba[1] = 0; rgba[2] = 0; rgba[3] = 255;
 
@@ -634,7 +662,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
         // write now the lineedit in next column
         writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
-        writeLineEdit(grid.formats[0], grid.widgetChannel, "100", lineHeight, "", "", fontSize, "", "", "", "", "", rgba, array);
+        writeLineEdit(grid.formats[0], grid.widgetChannel,  lineWidth, lineHeight, "", "", fontSize, "", "", "", "", "", rgba, array);
         writeCloseTag("item", array);
 
         writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
@@ -772,7 +800,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
             // write now the next stuff
             writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
         }
-        writeLineEdit(grid.formats[0], grid.widgetChannel, "100", lineHeight, "", "", fontSize, "", "", "", "", "", rgba, array);
+        writeLineEdit(grid.formats[0], grid.widgetChannel, lineWidth, lineHeight, "", "", fontSize, "", "", "", "", "", rgba, array);
         writeCloseTag("item", array);
         writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
         writeTogglebutton(grid.widgetChannel, array);
@@ -822,7 +850,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         effectiveColumn = pos[count++];
         writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
         rgba[3] = 255;
-        writeLineEdit(grid.formats[0], newpv, "100", lineHeight, "16777215", lineHeight, fontSize, "", "", "", "", "", rgba, array);
+        writeLineEdit(grid.formats[0], newpv, lineWidth, lineHeight, "16777215", lineHeight, fontSize, "", "", "", "", "", rgba, array);
         writeCloseTag("item", array);
 
         // 6. write now the label for cycle direction, but first hardcode the new pv
@@ -864,7 +892,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
         effectiveColumn = pos[count++];
         writeItemRowCol(actualgridRow, effectiveColumn, 1, array);
         rgba[3] = 255;
-        writeLineEdit(grid.formats[0], newpv, "100", lineHeight, "", "", fontSize, "", "", "", "", "", rgba, array);
+        writeLineEdit(grid.formats[0], newpv, lineWidth, lineHeight, "", "", fontSize, "", "", "", "", "", rgba, array);
         writeCloseTag("item", array);
 
         //////////////////////////////////////////////////////////////////////////////////
@@ -887,7 +915,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
         // write now the lineedit
         rgba[3] = 255;
-        writeLineEdit(grid.formats[0], grid.widgetChannel, "100", lineHeight, "", "", fontSize, "", "", "", "", "", rgba, array);
+        writeLineEdit(grid.formats[0], grid.widgetChannel, lineWidth, lineHeight, "", "", fontSize, "", "", "", "", "", rgba, array);
         writeCloseTag("item", array);
 
         if(grid.command.size() > 0) {
