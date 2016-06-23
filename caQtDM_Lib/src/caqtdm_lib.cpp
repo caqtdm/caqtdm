@@ -1058,19 +1058,24 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                 if(i==7) thisString = cameraWidget->getROIChannelsRead().split(";");
                 if(i==8) thisString = cameraWidget->getROIChannelsWrite().split(";");
 
-                if(thisString.count() == 4 &&
-                        thisString.at(0).trimmed().length() > 0 &&
-                        thisString.at(1).trimmed().length() > 0  &&
-                        thisString.at(2).trimmed().length() > 0 &&
-                        thisString.at(3).trimmed().length() > 0) {
-                    for(int j=0; j<4; j++) {
-                        if(i==7)specData[0] = i+j;   // x,y,w,h
-                        text = treatMacro(map, thisString.at(j), &doNothing);
-                        if(i==7)addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
-                        if(i==7)pvs1.append(pv);
-                        if(i==8)pvs2.append(text);
-                        if((j<3) && (i==7))pvs1.append(";");
-                        if((j<3) && (i==8))pvs2.append(";");
+                if(thisString.count() >= 4) {
+                    if(thisString.at(0).trimmed().length() > 0 && thisString.at(1).trimmed().length() > 0  &&
+                       thisString.at(2).trimmed().length() > 0 &&thisString.at(3).trimmed().length() > 0) {
+
+                        for(int j=0; j<4; j++) {
+                            text = treatMacro(map, thisString.at(j), &doNothing);
+                            if(i==7) {
+                                specData[0] = i+j;   // x,y,w,h
+                                addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
+                                pvs1.append(pv);
+                                if( j<3) pvs1.append(";");
+                            } else if(i==8) {
+                                specData[0] = i+j+4; // x,y,w,h
+                                addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
+                                pvs2.append(text);
+                                if(j<3) pvs2.append(";");
+                            }
+                        }
                     }
                 }
             }
@@ -6971,8 +6976,9 @@ void CaQtDM_Lib::StripPlotsVerticalAlign()
 
 void CaQtDM_Lib::Callback_WriteDetectedValues(QWidget* child)
 {
-    int x,y,w,h,count=4;
-    double values[4];
+    double x,y,w,h;
+    int count=4;
+    double values[4] = {0,0,0,0};
 
     QStringList thisString;
     QWidget *widget = (QWidget *) 0;
@@ -6998,6 +7004,9 @@ void CaQtDM_Lib::Callback_WriteDetectedValues(QWidget* child)
         return;
     }
 
+    double deltax = -(P1.x() - P2.x());
+    double deltay = -(P1.y() - P2.y());
+
     switch (roiType) {
     case none:
         return;
@@ -7013,12 +7022,22 @@ void CaQtDM_Lib::Callback_WriteDetectedValues(QWidget* child)
         values[3] = P2.y();
         break;
     case xyUpleft_xyLowright:
-        if((P2.x() < P1.x() ) || (P2.y() < P1.y())) {
+        if(deltax < 0 && deltay > 0) {
+            values[0] = P2.x();
+            values[1] = P1.y();
+            values[2] = P1.x();
+            values[3] = P2.y();
+        } else if(deltax < 0 && deltay < 0) {
             values[0] = P2.x();
             values[1] = P2.y();
             values[2] = P1.x();
             values[3] = P1.y();
-        } else {
+        } else if(deltax > 0 && deltay < 0) {
+            values[0] = P1.x();
+            values[1] = P2.y();
+            values[2] = P2.x();
+            values[3] = P1.y();
+        } else if(deltax > 0 && deltay > 0) {
             values[0] = P1.x();
             values[1] = P1.y();
             values[2] = P2.x();
@@ -7027,14 +7046,14 @@ void CaQtDM_Lib::Callback_WriteDetectedValues(QWidget* child)
         break;
     case xycenter_width_height:
     {
-        int ROIx = x = qRound(P1.x());
-        int ROIy = y = qRound(P1.y());
-        int ROIw = w = qRound(P2.x() - P1.x());
-        int ROIh = h = qRound(P2.y() - P1.y());
+        double ROIx = x = P1.x();
+        double ROIy = y = P1.y();
+        double ROIw = w = P2.x() - P1.x();
+        double ROIh = h = P2.y() - P1.y();
         if(ROIw < 0) { x = ROIx + ROIw; w = -ROIw;}
         if(ROIh < 0) { y = ROIy + ROIh; h = -ROIh;}
-        values[0] = x+qRound(w/2.0);
-        values[1] = y+qRound(h/2.0);
+        values[0] = x+w/2.0;
+        values[1] = y+h/2.0;
         values[2]=w;
         values[3]=h;
     }

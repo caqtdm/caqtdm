@@ -792,14 +792,13 @@ void caCamera::MinMaxImageLock(QVector<uint> LineData, int y, QSize resultSize, 
 
 void caCamera::InitLoopdata(int &ystart, int &yend, long &i, QVector<uint> &LineData, int increment, int sector, int sectorcount, QSize resultSize, uint Max[2], uint Min[2])
 {
-    //LineData.reserve(resultSize.width());
     LineData.resize(resultSize.width());
 
     Max[1] = 0;
     Min[1] = 65535;
 
     ystart = sector * resultSize.height() / sectorcount;
-    yend = sector * resultSize.height() / sectorcount + resultSize.height() / sectorcount;
+    yend = ((sector + 1) * resultSize.height()) / sectorcount; //     sector * resultSize.height() / sectorcount + resultSize.height() / sectorcount;
     i = resultSize.width() * ystart * increment;
 }
 
@@ -1116,7 +1115,6 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
 
     int threadcounter=QThread::idealThreadCount()*2/3;  // seems to be a magic number
     if(threadcounter < 1) threadcounter = 1;
-    //printf("threadcounter=%d\n", threadcounter);
 
     QFutureSynchronizer<void> Sectors;
     for (int x=0;x<threadcounter;x++){

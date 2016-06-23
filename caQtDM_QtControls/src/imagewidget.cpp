@@ -84,6 +84,7 @@ void ImageWidget::paintEvent(QPaintEvent * event)
     QPointF p1, p2;
     QRect selectionRect;
     bool present[4];
+    double deltax, deltay;
 
     Q_UNUSED(event);
     QPainter painter(this);
@@ -127,7 +128,6 @@ void ImageWidget::paintEvent(QPaintEvent * event)
     height = imageNew.size().height();
     painter.setPen(Qt::blue);
     painter.drawRoundedRect(0, 0, width, height, 2.0, 2.0);
-    //painter.drawRect(0, 0, width, height);
 
     painter.restore();
 
@@ -191,10 +191,29 @@ void ImageWidget::paintEvent(QPaintEvent * event)
                 values[3] = selectionPointsL[1].y();
                 break;
             case xyUpleft_xyLowright:
-                values[0] = selectionRect.topLeft().x();
-                values[1] = selectionRect.topLeft().y();
-                values[2] = selectionRect.bottomRight().x();
-                values[3] = selectionRect.bottomRight().y();
+                deltax = -(selectionRect.topLeft().x() - selectionRect.bottomRight().x());
+                deltay = -(selectionRect.topLeft().y() - selectionRect.bottomRight().y());
+                if(deltax < 0 && deltay > 0) {
+                    values[0] = selectionRect.bottomRight().x();
+                    values[1] = selectionRect.topLeft().y();
+                    values[2] = selectionRect.topLeft().x();
+                    values[3] = selectionRect.bottomRight().y();
+                } else if(deltax < 0 && deltay < 0) {
+                    values[0] = selectionRect.bottomRight().x();
+                    values[1] = selectionRect.bottomRight().y();
+                    values[2] = selectionRect.topLeft().x();
+                    values[3] = selectionRect.topLeft().y();
+                } else if(deltax > 0 && deltay < 0) {
+                    values[0] = selectionRect.topLeft().x();
+                    values[1] = selectionRect.bottomRight().y();
+                    values[2] = selectionRect.bottomRight().x();
+                    values[3] = selectionRect.topLeft().y();
+                } else if(deltax > 0 && deltay > 0) {
+                    values[0] = selectionRect.topLeft().x();
+                    values[1] = selectionRect.topLeft().y();
+                    values[2] = selectionRect.bottomRight().x();
+                    values[3] = selectionRect.bottomRight().y();
+                }
                 break;
             case xycenter_width_height:
                 values[0] = selectionRect.center().x();
@@ -220,8 +239,8 @@ void ImageWidget::paintEvent(QPaintEvent * event)
         case xy_only:
             if(!present[0] || !present[1]) break;
             // vertical and horizontal
-            painter.drawLine(values[0], 0, values[0], qRound(this->height()*scaleFactorL));
-            painter.drawLine(0, values[1], qRound(this->width()*scaleFactorL), values[1]);
+            painter.drawLine(values[0], 0, values[0], qRound(imageNew.size().height()*scaleFactorL));
+            painter.drawLine(0, values[1], qRound(imageNew.size().width()*scaleFactorL), values[1]);
 
             switch (markerTypeL) {
             case box:
@@ -246,8 +265,8 @@ void ImageWidget::paintEvent(QPaintEvent * event)
             switch (markerTypeL) {
             case box_crosshairs:
                 // vertical and horizontal
-                painter.drawLine(xnew, 0, xnew, qRound(this->height()*scaleFactorL));
-                painter.drawLine(0, ynew, qRound(this->width()*scaleFactorL), ynew);
+                painter.drawLine(xnew, 0, xnew, qRound(imageNew.size().height()*scaleFactorL));
+                painter.drawLine(0, ynew, qRound(imageNew.size().width()*scaleFactorL), ynew);
             case box:
                 selectionRect.setCoords(values[0], values[1], values[2], values[3]);
                 painter.drawRect(selectionRect);
@@ -294,8 +313,8 @@ void ImageWidget::paintEvent(QPaintEvent * event)
             switch (markerTypeL) {
             case box_crosshairs:
                 // vertical and horizontal
-                painter.drawLine(xnew, 0, xnew, qRound(this->height()*scaleFactorL));
-                painter.drawLine(0, ynew, qRound(this->width()*scaleFactorL), ynew);
+                painter.drawLine(xnew, 0, xnew, qRound(imageNew.size().height()*scaleFactorL));
+                painter.drawLine(0, ynew, qRound(imageNew.size().width()*scaleFactorL), ynew);
             case box:
                 if(width <= 1) break;
                 if((height) <= 1) break;
@@ -334,8 +353,8 @@ void ImageWidget::paintEvent(QPaintEvent * event)
             case box_crosshairs:
                 if(!present[0] || !present[1]) break;
                 // vertical and horizontal
-                painter.drawLine(values[0], 0, values[0], qRound(this->height()*scaleFactorL));
-                painter.drawLine(0, values[1], qRound(this->width()*scaleFactorL), values[1]);
+                painter.drawLine(values[0], 0, values[0], qRound(imageNew.size().height()*scaleFactorL));
+                painter.drawLine(0, values[1], qRound(imageNew.size().width()*scaleFactorL), values[1]);
             case box:
                 if(!present[0] || !present[1] || !present[2] || !present[3]) break;
                 if((values[0] - values[2]/2) <= 1) break;
