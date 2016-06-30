@@ -4491,7 +4491,7 @@ void CaQtDM_Lib::Callback_ChoiceClicked(const QString& text)
 
     if(choice->getPV().length() > 0) {
         //qDebug() << "choice_clicked" << text << choice->getPV();
-        QStringsToChars(choice->getPV(), text,  choice->objectName().toLower());
+        QStringsToChars(choice->getPV().trimmed(), text,  choice->objectName().toLower());
         ControlsInterface * plugininterface = (ControlsInterface *) choice->property("Interface").value<void *>();
         if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue(param1, 0.0, 0, param2, param3, errmess, 0);
     }
@@ -4509,7 +4509,7 @@ void CaQtDM_Lib::Callback_MenuClicked(const QString& text)
 
     if(menu->getPV().length() > 0) {
         //qDebug() << "menu_clicked" << text << menu->getPV();
-        QStringsToChars(menu->getPV(), text,  menu->objectName().toLower());
+        QStringsToChars(menu->getPV().trimmed(), text,  menu->objectName().toLower());
         ControlsInterface * plugininterface = (ControlsInterface *) menu->property("Interface").value<void *>();
         if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue(param1, 0.0, 0, param2, param3, errmess, 0);
     }
@@ -6050,10 +6050,12 @@ int CaQtDM_Lib::Execute(char *command)
 }
 #endif
 
-void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QString svalue, QWidget *w)
+void CaQtDM_Lib::TreatOrdinaryValue(QString pvo, double value, int32_t idata,  QString svalue, QWidget *w)
 {
     char errmess[255];
     int indx;
+
+    QString pv = pvo.trimmed();
 
     //qDebug() << "treatordinary value " << pv << w;
     knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv);
@@ -6102,7 +6104,7 @@ long CaQtDM_Lib::getValueFromString(char *textValue, FormatType fType, char **en
 /**
   * this routine will treat the string, command, value to write to the pv
   */
-void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, FormatType fType, QWidget *w)
+void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType, QWidget *w)
 {
     char errmess[255];
     double value;
@@ -6111,6 +6113,8 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, FormatType fType,
     bool match;
     int indx;
     ControlsInterface * plugininterface = (ControlsInterface *) 0;
+
+    QString pv = pvo.trimmed();
 
     FormatType fTypeNew;
 
@@ -6244,7 +6248,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, FormatType fType,
 /**
   * this routine will treat the values to write to the pv
   */
-void CaQtDM_Lib::TreatRequestedWave(QString pv, QString text, caWaveTable::FormatType fType, int index, QWidget *w)
+void CaQtDM_Lib::TreatRequestedWave(QString pvo, QString text, caWaveTable::FormatType fType, int index, QWidget *w)
 {
     char    errmess[255], sdata[40], asc[100];
     int32_t data32[1];
@@ -6254,6 +6258,8 @@ void CaQtDM_Lib::TreatRequestedWave(QString pv, QString text, caWaveTable::Forma
     long    longValue;
     char    *end = NULL, textValue[255];
     bool    match;
+
+    QString pv = pvo.trimmed();
 
     ControlsInterface * plugininterface = (ControlsInterface *) w->property("Interface").value<void *>();
     if(plugininterface == (ControlsInterface *) 0) return;
