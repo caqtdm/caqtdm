@@ -785,9 +785,15 @@ void caCamera::MinMaxLock(SyncMinMax* MinMax, uint Max[2], uint Min[2])
 void caCamera::MinMaxImageLock(QVector<uint> LineData, int y, QSize resultSize, SyncMinMax* MinMax)
 {
     MinMax->imageLock->lock();
-    uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
-    memcpy(scanLine, LineData.constData(), resultSize.width() * sizeof(uint));
-    MinMax->imageLock->unlock();
+    if(image != (QImage *) 0) {
+        if (image->height()>y){
+            uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
+            if (scanLine){
+                memcpy(scanLine, LineData.constData(), resultSize.width() * sizeof(uint));
+            }
+        }
+    }
+	MinMax->imageLock->unlock();
 }
 
 void caCamera::InitLoopdata(int &ystart, int &yend, long &i, QVector<uint> &LineData, int increment, int sector, int sectorcount, QSize resultSize, uint Max[2], uint Min[2])
