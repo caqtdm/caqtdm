@@ -1038,13 +1038,15 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
     uint Max[2], Min[2];
 
     //__itt_event mark_event;
-
     if(!m_bppDefined) return (QImage *) 0;
     if(!m_widthDefined) return (QImage *) 0;
     if(!m_heightDefined) return (QImage *) 0;
     if(!m_codeDefined) return (QImage *) 0;
-    if(!(m_width>0)) return (QImage *) 0;
-    if(!(m_height>0)) return (QImage *) 0;
+    if(!(m_width>0)||!(m_height>0)) {
+        savedWidth = m_width;
+        savedHeight = m_height;
+        return (QImage *) 0;
+    }
 
     resultSize.setWidth(m_width);
     resultSize.setHeight(m_height);
@@ -1154,8 +1156,9 @@ void caCamera::showImage(int datasize, char *data)
     //QElapsedTimer timer;
     //timer.start();
     image = showImageCalc(datasize, data);
-    //printf("Image timer 1 : %d milliseconds \n", (int) timer.elapsed());
+    //printf("Image timer 1 : %d (%x) milliseconds \n", (int) timer.elapsed(),image);
 
+    //fflush(stdout);
     if(image != (QImage *) 0) updateImage(*image, readvaluesPresent, readvalues, scaleFactor);
 
     if(getAutomateChecked()) {
