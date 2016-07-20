@@ -1212,7 +1212,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             multilinestringWidget->setPV(pv);
         }
 
-
         multilinestringWidget->setProperty("Taken", true);
 
         //==================================================================================================================
@@ -2081,10 +2080,16 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         w1->setProperty("ObjectType", caWaveTable_Widget);
 
         if(wavetableWidget->getPV().size() > 0) {
-            addMonitor(myWidget, &kData, wavetableWidget->getPV(), w1, specData, map, &pv);
+
+            // add also the FTVL field in order to know if we have signed or unsigned data
+            specData[0] = 1;
+            addMonitor(myWidget, &kData, wavetableWidget->getPV().trimmed() + ".FTVL", w1, specData, map, &pv);
+
+            specData[0] = 0;
+            addMonitor(myWidget, &kData, wavetableWidget->getPV().trimmed(), w1, specData, map, &pv);
             wavetableWidget->setPV(pv);
-            connect(wavetableWidget, SIGNAL(WaveEntryChanged(QString, int)), this,
-                    SLOT(Callback_WaveEntryChanged(QString, int)));
+
+            connect(wavetableWidget, SIGNAL(WaveEntryChanged(QString, int)), this, SLOT(Callback_WaveEntryChanged(QString, int)));
         }
         wavetableWidget->setProperty("Taken", true);
         wavetableWidget->setToolTip("select row or columns, then with Ctrl+C you can copy to the clipboard\ninside X11 you can then do shft+ins\nwhen doubleclicking on a value, you can change the value");
@@ -4017,29 +4022,37 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         if(data.edata.connected) {
             // data from vector
-            if(data.edata.valueCount > 0 && data.edata.dataB != (void*) 0) {
-                if((wavetableWidget->getPrecisionMode() != caWaveTable::User) && (data.edata.initialize)) {
-                    wavetableWidget->setActualPrecision(data.edata.precision);
-                }
-                if(data.edata.fieldtype == caSTRING) {
-                    QStringList list;
-                    list = String.split((QChar)27);
-                    wavetableWidget->setStringList(list, data.edata.status, list.size());
+            if(data.specData[0] == 0) {
+                if(data.edata.valueCount > 0 && data.edata.dataB != (void*) 0) {
+                    if((wavetableWidget->getPrecisionMode() != caWaveTable::User) && (data.edata.initialize)) {
+                        wavetableWidget->setActualPrecision(data.edata.precision);
+                    }
+                    if(data.edata.fieldtype == caSTRING) {
+                        QStringList list;
+                        list = String.split((QChar)27);
+                        wavetableWidget->setStringList(list, data.edata.status, list.size());
+                    } else {
+                        WaveTable(wavetableWidget, data);
+                    }
                 } else {
-                    WaveTable(wavetableWidget, data);
+                    QStringList list;
+                    for(int i=0; i<qMax(1,wavetableWidget->getNumberOfRows()); i++) {
+                        for(int j=0; j<wavetableWidget->getNumberOfColumns(); j++) list.append("????");
+                    }
+                    wavetableWidget->setStringList(list, NOTCONNECTED, list.size());
                 }
-            } else {
-                wavetableWidget->displayText(0, NOTCONNECTED, "????");
+            } else if(data.specData[0] == 1) {
+                QStringList list;
+                list = String.split((QChar)27);
+                wavetableWidget->setDataType(list.at( data.edata.ivalue));
             }
 
         } else {
-            for(int i=0; i<wavetableWidget->getNumberOfRows(); i++) {
-                int nbCol = wavetableWidget->getNumberOfColumns();
-                int nbRow = i*nbCol;
-                for(int j=0; j<nbCol; j++) {
-                    wavetableWidget->displayText(nbRow+j, NOTCONNECTED, "NC");
-                }
+            QStringList list;
+            for(int i=0; i<qMax(1,wavetableWidget->getNumberOfRows()); i++) {
+                for(int j=0; j<wavetableWidget->getNumberOfColumns(); j++) list.append("NC");
             }
+            wavetableWidget->setStringList(list, NOTCONNECTED, list.size());
         }
 
         // bitnames table with text and coloring according the value=========================================================

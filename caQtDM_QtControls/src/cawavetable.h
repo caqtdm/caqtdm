@@ -73,7 +73,7 @@ public:
     caWaveTable(QWidget *parent);
 
     enum FormatType {decimal, exponential, compact, hexadecimal, octal, string};
-    enum DataType {doubles, longs, characters};
+    enum DataType {doubles, longs, characters, strings};
     enum Alignment {Center, Left, Right};
 
     enum SourceMode {Channel = 0, User};
@@ -92,6 +92,8 @@ public:
 
     QString getPV() const;
     void setPV(QString const &newPV);
+
+    void setDataType(QString const &datatype);
 
     void setActualPrecision(int prec);
     void displayText(int index, short status, QString const &text);
@@ -150,6 +152,7 @@ private:
     char thisFormat[20];
     char thisFormatC[20];
     FormatType thisFormatType;
+    bool thisUnsigned;
     Alignment thisAlignment;
     int thisPrecision;
     SourceMode thisPrecMode;
@@ -158,6 +161,11 @@ private:
     QAction *copyAct;
 
     QVector<QString> keepText;
+    QVector<double> keepData;
+    DataType keepDatatype;
+    int keepDatasize;
+    short keepStatus;
+
     int blockIndex;
 
     int colcount;
