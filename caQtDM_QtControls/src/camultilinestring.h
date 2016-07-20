@@ -137,6 +137,7 @@ public:
 
 private slots:
     void rescaleFont(const QString& newText);
+    void copy();
 
 protected:
       virtual bool event(QEvent *);

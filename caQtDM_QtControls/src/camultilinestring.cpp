@@ -32,6 +32,9 @@
 #include <QMouseEvent>
 #include <QScrollBar>
 
+#include <QApplication>
+#include <QClipboard>
+
 caMultiLineString::caMultiLineString(QWidget *parent) : QPlainTextEdit(parent), FontScalingWidget(this)
 {
     // to start with, clear the stylesheet, so that playing around
@@ -91,6 +94,8 @@ caMultiLineString::caMultiLineString(QWidget *parent) : QPlainTextEdit(parent), 
     d_rescaleFontOnTextChanged = true;
 
     installEventFilter(this);
+
+    setFocusPolicy(Qt::ClickFocus);
 }
 
 QString caMultiLineString::getPV() const
@@ -268,6 +273,14 @@ bool caMultiLineString::event(QEvent *e)
 #endif
             setEnabled(false);
         }
+
+    } else if(e->type() == QEvent::KeyPress) {
+
+        QKeyEvent *key_event = static_cast<QKeyEvent*>(e);
+        if (key_event->matches(QKeySequence::Copy)) {
+            emit copy();
+        }
+
     }
     return QPlainTextEdit::event(e);
 }
@@ -404,5 +417,12 @@ QSize caMultiLineString::minimumSizeHint() const
         size = sizeHint();
     //printf("ESimpleLabel \e[0;33mminimumSizeHint\e[0m \"%s\" returning size w %d h %d\n", objectName(), size.width(), size.height());
     return size;
+}
+
+void caMultiLineString::copy()
+{
+    QString s = textCursor().selectedText();
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(s);
 }
 
