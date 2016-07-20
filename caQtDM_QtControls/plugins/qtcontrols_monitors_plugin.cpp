@@ -615,19 +615,19 @@ caScan2DInterface::caScan2DInterface(QObject* parent) : CustomWidgetInterface_Mo
     d_icon = QPixmap(":pixmaps/scan2d.png");
 }
 
-QWidget *caLineDemoInterface::createWidget(QWidget* parent)
+QWidget *caLineDrawInterface::createWidget(QWidget* parent)
 {
-    return new caLineDemo(parent);
+    return new caLineDraw(parent);
 }
 
-caLineDemoInterface::caLineDemoInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
+caLineDrawInterface::caLineDrawInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
     strng name[1], type[1]  = {""};
     longtext text[1] = {""};
-    d_domXml = XmlFunc("caLineDemo", "calinedemo", 0, 0, 100, 20, name, type, text, 0);
-    d_toolTip = "[Text Demo Monitor (faster then caLineEdit)]";
-    d_name = "caLineDemo";
-    d_include = "caLineDemo";
+    d_domXml = XmlFunc("caLineDraw", "calinedraw", 0, 0, 100, 20, name, type, text, 0);
+    d_toolTip = "[Text Draw Monitor (faster then caLineEdit + vertical display)]";
+    d_name = "caLineDraw";
+    d_include = "caLineDraw";
     QPixmap qpixmap =   QPixmap(":pixmaps/textmonitor.png");
     d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
@@ -652,7 +652,7 @@ CustomWidgetCollectionInterface_Monitors::CustomWidgetCollectionInterface_Monito
     d_plugins.append(new caCalcInterface(this));
     d_plugins.append(new caWaterfallPlotInterface(this));
     d_plugins.append(new caScan2DInterface(this));
-    d_plugins.append(new caLineDemoInterface(this));
+    d_plugins.append(new caLineDrawInterface(this));
 }
 
 QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface_Monitors::customWidgets(void) const

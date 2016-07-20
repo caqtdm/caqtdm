@@ -23,19 +23,18 @@
  *    anton.mezger@psi.ch
  */
 
-#include "calinedemo.h"
+#include "calinedraw.h"
 #include "alarmdefs.h"
 
 #include <QPainter>
 #include <QDebug>
 
-caLineDemo::caLineDemo(QWidget *parent) : QWidget(parent), FontScalingWidget(this), caWidgetInterface()
+caLineDraw::caLineDraw(QWidget *parent) : QWidget(parent), FontScalingWidget(this), caWidgetInterface()
 {
     // we want this font, while nice and monospace
     QFont font("Lucida Sans Typewriter");
     // if this font does not exist then try a next one
     QFontInfo info(font);
-    //font.setStyleStrategy(QFont::NoAntialias);
     QString family = info.family();
     //printf("got font %s\n", qasc(family));
     if(!family.contains("Lucida Sans Typewriter")) {
@@ -71,56 +70,54 @@ caLineDemo::caLineDemo(QWidget *parent) : QWidget(parent), FontScalingWidget(thi
 
     m_Format[0] = '\0';
     m_FormatC[0] = '\0';
+
     setFormat(0);
-
     setFontScaleModeL(WidthAndHeight);
-
     setFocusPolicy(Qt::NoFocus);
+    setDirection(Horizontal);
 
     m_AlarmState = 0;
 
     brush = QBrush(m_BackColor);
     setText(" ");
-
-    setAttribute(Qt::WA_OpaquePaintEvent);
 }
 
-void caLineDemo::setFrame(bool frame) {
+void caLineDraw::setFrame(bool frame) {
     m_FramePresent = frame;
     if(!m_FramePresent) setLinewidth(0);
 }
 
-void caLineDemo::setFrameColor(QColor c) {
+void caLineDraw::setFrameColor(QColor c) {
     m_FrameColor = c;
     setColors(m_BackColor, m_ForeColor, m_FrameColor);
 }
 
-void caLineDemo::setLinewidth(int width)
+void caLineDraw::setLinewidth(int width)
 {
     if(width < 0) m_FrameLineWidth = 0;
     else m_FrameLineWidth = width;
     update();
 }
 
-void caLineDemo::setAlignment(const Alignment &alignment)
+void caLineDraw::setAlignment(const Alignment &alignment)
 {
     m_Alignment = alignment;
     update();
 }
 
-void caLineDemo::setBackground(QColor c)
+void caLineDraw::setBackground(QColor c)
 {
     m_BackColor = c;
     setColors(m_BackColor, m_ForeColor, m_FrameColor);
 }
 
-void caLineDemo::setForeground(QColor c)
+void caLineDraw::setForeground(QColor c)
 {
     m_ForeColor = c;
     setColors(m_BackColor, m_ForeColor, m_FrameColor);
 }
 
-void caLineDemo::setColors(QColor bg, QColor fg, QColor frame)
+void caLineDraw::setColors(QColor bg, QColor fg, QColor frame)
 {
     if(!m_BackColorDefault.isValid() || !m_ForeColorDefault.isValid()) return;
 
@@ -169,7 +166,7 @@ void caLineDemo::setColors(QColor bg, QColor fg, QColor frame)
     m_ColorModeOld = m_ColorMode;
 }
 
-void caLineDemo::forceForeAndBackground(QColor fg, QColor bg)
+void caLineDraw::forceForeAndBackground(QColor fg, QColor bg)
 {
     colMode aux = m_ColorMode;
     m_ColorMode = Alarm_Static;
@@ -177,14 +174,14 @@ void caLineDemo::forceForeAndBackground(QColor fg, QColor bg)
     m_ColorMode = aux;
 }
 
-void caLineDemo::setForeAndBackground(QColor foreground, QColor background)
+void caLineDraw::setForeAndBackground(QColor foreground, QColor background)
 {
     m_ForeColor = foreground;
     m_BackColor = background;
     setColors(m_BackColor, m_ForeColor, m_FrameColor);
 }
 
-void caLineDemo::setAlarmColors(short status, double value, QColor bgAtInit, QColor fgAtInit)
+void caLineDraw::setAlarmColors(short status, double value, QColor bgAtInit, QColor fgAtInit)
 {
     QColor c;
     m_AlarmState = 0;
@@ -273,26 +270,103 @@ void caLineDemo::setAlarmColors(short status, double value, QColor bgAtInit, QCo
     m_fgAtInitLast = fgAtInit;
 }
 
-void caLineDemo::paintEvent(QPaintEvent *)
+void caLineDraw::setDirection(const Direction &direction)
 {
+    switch (direction) {
+    case Horizontal:
+        rotateText(0.0);
+        setVerticalLabel(false);
+        break;
+    case Up:
+        rotateText(270.0);
+        setVerticalLabel(true);
+        break;
+    case Down:
+    default:
+        rotateText(90.0);
+        setVerticalLabel(true);
+        break;
+    }
+    m_Direction = direction;
+    update();
+}
+
+bool caLineDraw::rotateText(float degrees)
+{
+    if (degrees >=0 && degrees <= 360) {
+        rotation=degrees;
+        update();
+        return true;
+    }
+    return false;
+}
+
+void caLineDraw::paintEvent(QPaintEvent *)
+{
+    QFontMetrics fm(font());
+    int h = fm.height();
+    int w = fm.width(m_Text);
     QPainter painter(this);
+    //painter.setRenderHint(QPainter::Antialiasing);
     painter.setPen(m_ForeColor);
     painter.setBackground(brush);
     painter.setBackgroundMode(Qt::OpaqueMode);
+
     painter.fillRect(0,0, width(), height(), brush);
-    QRect newRect(rect().top() + m_FrameLineWidth + 1, rect().left() + m_FrameLineWidth+1, rect().width() - 2 * m_FrameLineWidth - 2, rect().height() - 2 * m_FrameLineWidth - 2);
-    switch (m_Alignment) {
-    case Left:
-        painter.drawText(newRect, Qt::AlignLeft | Qt::AlignVCenter, m_Text);
+    painter.save();
+    painter.rotate(rotation);
+
+    switch (m_Direction) {
+
+    case Horizontal: {
+        QRect newRect(rect().top() + m_FrameLineWidth + 1, rect().left() + m_FrameLineWidth+1, rect().width() - 2 * m_FrameLineWidth - 2, rect().height() - 2 * m_FrameLineWidth - 2);
+        switch (m_Alignment) {
+        case Left:
+            painter.drawText(newRect, Qt::AlignLeft | Qt::AlignVCenter, m_Text);
+            break;
+        case Right:
+            painter.drawText(newRect, Qt::AlignRight | Qt::AlignVCenter, m_Text);
+            break;
+        case Center:
+        default:
+            painter.drawText(newRect, Qt::AlignCenter | Qt::AlignVCenter, m_Text);
+            break;
+        }
+    }
         break;
-    case Right:
-        painter.drawText(newRect, Qt::AlignRight | Qt::AlignVCenter, m_Text);
+
+    case Up:
+        switch (m_Alignment) {
+        case Left:
+            painter.drawText(QPoint(-height()  + 2 * m_FrameLineWidth, width()/2 + h/2 -fm.descent()), m_Text);
+            break;
+        case Right:
+            painter.drawText(QPoint(-w - 2 * m_FrameLineWidth, width()/2 + h/2 -fm.descent()), m_Text);
+            break;
+        case Center:
+        default:
+            painter.drawText(QPoint(-height()/2 - w/2, width()/2 + h/2 -fm.descent()), m_Text);
+            break;
+        }
         break;
-    case Center:
-    default:
-        painter.drawText(newRect, Qt::AlignCenter | Qt::AlignVCenter, m_Text);
+
+    case Down:
+        switch (m_Alignment) {
+        case Left:
+            painter.drawText(QPoint(0 + 2 * m_FrameLineWidth , -width()/2 + h/2 -fm.descent()), m_Text);
+            break;
+        case Right:
+            painter.drawText(QPoint(height() -w - 2 * m_FrameLineWidth, -width()/2 + h/2 -fm.descent()), m_Text);
+            break;
+        case Center:
+        default:
+            painter.drawText(QPoint(height()/2 - w/2, -width()/2 + h/2 -fm.descent()), m_Text);
+            break;
+        }
         break;
     }
+
+    painter.restore();
 
     if(m_FramePresent) {
         painter.setPen(QPen(m_FrameColorBottom, m_FrameLineWidth));
@@ -302,10 +376,9 @@ void caLineDemo::paintEvent(QPaintEvent *)
         painter.drawLine(QPoint(0, m_FrameLineWidth/2), QPoint(width(), m_FrameLineWidth/2));
         painter.drawLine(QPoint(m_FrameLineWidth/2, m_FrameLineWidth/2), QPoint(m_FrameLineWidth/2, height() - m_FrameLineWidth/2));
     }
-
 }
 
-bool caLineDemo::event(QEvent *e)
+bool caLineDraw::event(QEvent *e)
 {
     if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
         FontScalingWidget::rescaleFont(m_Text, calculateTextSpace());
@@ -329,15 +402,15 @@ bool caLineDemo::event(QEvent *e)
     return QWidget::event(e);
 }
 
-QSize caLineDemo::calculateTextSpace()
+QSize caLineDraw::calculateTextSpace()
 {
     d_savedTextSpace = contentsRect().size();
-    d_savedTextSpace.setWidth(d_savedTextSpace.width() - 2*m_FrameLineWidth);
-    d_savedTextSpace.setHeight(d_savedTextSpace.height() - 2*m_FrameLineWidth);
+    d_savedTextSpace.setWidth(d_savedTextSpace.width() - 2 * m_FrameLineWidth);
+    d_savedTextSpace.setHeight(d_savedTextSpace.height() - 2 * m_FrameLineWidth);
     return d_savedTextSpace;
 }
 
-QSize caLineDemo::sizeHint() const
+QSize caLineDraw::sizeHint() const
 {
     if(!fontScaleEnabled())
     {
@@ -355,7 +428,7 @@ QSize caLineDemo::sizeHint() const
     return size;
 }
 
-QSize caLineDemo::minimumSizeHint() const
+QSize caLineDraw::minimumSizeHint() const
 {
     QSize size;
     if(!fontScaleEnabled())
@@ -366,7 +439,7 @@ QSize caLineDemo::minimumSizeHint() const
     return size;
 }
 
-void caLineDemo::setText(const QString &txt)
+void caLineDraw::setText(const QString &txt)
 {
     if(m_Text == txt) return;
     if(m_Text.size() != txt.size()) {
@@ -376,7 +449,7 @@ void caLineDemo::setText(const QString &txt)
     update();
 }
 
-void caLineDemo::setFormat(int prec)
+void caLineDraw::setFormat(int prec)
 {
     int precision = prec;
     if(precision > 17) precision = 17;
@@ -417,7 +490,7 @@ void caLineDemo::setFormat(int prec)
     }
 }
 
-void caLineDemo::setValue(double value, const QString& units)
+void caLineDraw::setValue(double value, const QString& units)
 {
     char asc[1024];
     if(m_FormatType == compact) {
@@ -442,7 +515,7 @@ void caLineDemo::setValue(double value, const QString& units)
 
 
 // caWidgetInterface implementation
-void caLineDemo::caDataUpdate(const QString& units, const QString& String, const knobData& data)
+void caLineDraw::caDataUpdate(const QString& units, const QString& String, const knobData& data)
 {
     QColor bg = property("BColor").value<QColor>();
     QColor fg = property("FColor").value<QColor>();
@@ -526,7 +599,7 @@ void caLineDemo::caDataUpdate(const QString& units, const QString& String, const
 
 }
 
-void caLineDemo::caActivate(CaQtDM_Lib_Interface* lib_interface, QMap<QString, QString> map, knobData* kData, int* specData, QWidget* parent)
+void caLineDraw::caActivate(CaQtDM_Lib_Interface* lib_interface, QMap<QString, QString> map, knobData* kData, int* specData, QWidget* parent)
 {
     if(getPV().size() > 0) {
         QString pv;
@@ -538,12 +611,12 @@ void caLineDemo::caActivate(CaQtDM_Lib_Interface* lib_interface, QMap<QString, Q
     caDataInterface = lib_interface;
 }
 
-void caLineDemo::createContextMenu(QMenu& menu){
+void caLineDraw::createContextMenu(QMenu& menu){
     // construct info for the pv we are pointing at
     menu.addAction("Get Info");
 }
 
-void caLineDemo::getWidgetInfo(QString* pv, int& nbPV, int& limitsDefault, int& precMode, int& limitsMode,
+void caLineDraw::getWidgetInfo(QString* pv, int& nbPV, int& limitsDefault, int& precMode, int& limitsMode,
                                int& Precision, char* colMode, double& limitsMax, double& limitsMin){
     Q_UNUSED(limitsDefault);
 

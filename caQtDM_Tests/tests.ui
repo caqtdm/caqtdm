@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1119</width>
-    <height>752</height>
+    <height>753</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -74,39 +74,6 @@ caTextEntry:focus {
     border-radius: 1px;
 }
 
-QPushButton {
-      border-color: #00b;
-      border-radius: 2px;
-      padding: 3px;
-      border-width: 1px;
-
-	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
-						   stop:0   rgba(224, 239, 255, 255),
-						   stop:0.5 rgba(199, 215, 230, 255),
-						   stop:1   rgba(184, 214, 236, 255));
-}
-QPushButton:hover {
-	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
-						stop:0   rgba(201, 226, 255, 255),
-						stop:0.5 rgba(177, 204, 230, 255),
-						stop:1   rgba(163, 205, 236, 255));
-}
-QPushButton:pressed {
-	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
-						stop:0   rgba(174, 219, 255, 255),
-						stop:0.5 rgba(165, 199, 230, 255),
-						stop:1   rgba(134, 188, 236, 255));
-}
-
-QPushButton:disabled {
-	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
-						stop:0   rgba(174, 219, 255, 255),
-						stop:0.5 rgba(165, 199, 230, 255),
-						stop:1   rgba(134, 188, 236, 255));
-}
-
-
-
 caSlider::groove:horizontal {
 border: 1px solid #bbb;
 background: lightgrey;
@@ -147,13 +114,13 @@ border-radius: 2px;
      </rect>
     </property>
     <property name="autoFillBackground">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="styleSheet">
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: rgb(0,0,120);}</string>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>1</number>
     </property>
     <property name="usesScrollButtons">
      <bool>true</bool>
@@ -235,16 +202,16 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caLabel: &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;fontscalemode (none, width, width and height)&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;horizontal or vertical text (use shift carriage return)&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;in case of vertical text  font should be fixed&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;centered or justified&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;understands html&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;visibility depending on channels and calculation (like medm)&lt;/li&gt;&lt;/ul&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caLabel: &lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;fontscalemode (none, width, width and height)&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;horizontal or vertical text (use shift carriage return)&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;in case of vertical text  font should be fixed&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;centered or justified&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;understands html&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;visibility depending on channels and calculation (like medm)&lt;/li&gt;&lt;/ul&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
        <widget class="caLabel" name="calabel_4">
@@ -456,16 +423,16 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caGraphics: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;different graphic entities:  rectangle, circle, arc, triangle, line, arrow&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;can be rotated&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;outlined or filled&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;visibility depending on channels and calculation (like medm)&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;colomode static or alarm (like medm)&lt;/li&gt;&lt;/ul&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;  &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caGraphics: &lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;different graphic entities:  rectangle, circle, arc, triangle, line, arrow&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;can be rotated&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;outlined or filled&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;visibility depending on channels and calculation (like medm)&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;colomode static or alarm (like medm)&lt;/li&gt;&lt;/ul&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;  &lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
        <widget class="caGraphics" name="cagraphics_2">
@@ -801,15 +768,15 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caPolyline: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;dedicated editor&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;polyline and polygone (outlined or filled)&lt;/li&gt;&lt;/ul&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;visibility depending on channels and calculation (like medm)&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;colomode static or alarm (like medm)&lt;/li&gt;&lt;/ul&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;  &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caPolyline: &lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;dedicated editor&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;polyline and polygone (outlined or filled)&lt;/li&gt;&lt;/ul&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;visibility depending on channels and calculation (like medm)&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;colomode static or alarm (like medm)&lt;/li&gt;&lt;/ul&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;  &lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
        <widget class="caPolyLine" name="capolyline_2">
@@ -1003,12 +970,12 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caImage: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;animated gif, when no frame specification through calc then goes through frames.&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;animated gif, frame specification through channel.&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;can display jpg, png (and eventually others)&lt;/li&gt;&lt;/ul&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;visibility depending on channels and calculation (like medm)&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caImage: &lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;animated gif, when no frame specification through calc then goes through frames.&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;animated gif, frame specification through channel.&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;can display jpg, png (and eventually others)&lt;/li&gt;&lt;/ul&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;visibility depending on channels and calculation (like medm)&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
        <widget class="caImage" name="caImage_24">
@@ -1113,10 +1080,10 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caInclude: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;include of ui files with macro expansion&lt;/li&gt;&lt;/ul&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;visibility depending on channels and calculation (like medm)&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caInclude: &lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;include of ui files with macro expansion&lt;/li&gt;&lt;/ul&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;visibility depending on channels and calculation (like medm)&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
        <widget class="caInclude" name="caInclude_7">
@@ -1124,8 +1091,8 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>20</x>
           <y>230</y>
-          <width>521</width>
-          <height>221</height>
+          <width>510</width>
+          <height>200</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -1275,11 +1242,11 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caFrame: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;can contain any widgets&lt;/li&gt;&lt;/ul&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;visibility depending on channels and calculation (like medm)&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;when visibility is not needed, you can use QFrame&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caFrame: &lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;can contain any widgets&lt;/li&gt;&lt;/ul&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;visibility depending on channels and calculation (like medm)&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;when visibility is not needed, you can use QFrame&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
        <widget class="caFrame" name="caframe">
@@ -1356,7 +1323,7 @@ p, li { white-space: pre-wrap; }
           <enum>QFrame::StyledPanel</enum>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
+          <enum>QFrame::Plain</enum>
          </property>
          <property name="lineWidth">
           <number>3</number>
@@ -1488,7 +1455,7 @@ p, li { white-space: pre-wrap; }
           <enum>QFrame::StyledPanel</enum>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
+          <enum>QFrame::Plain</enum>
          </property>
          <property name="lineWidth">
           <number>3</number>
@@ -1872,8 +1839,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QTabWidget" name="tabWidget_3">
       <property name="geometry">
        <rect>
-        <x>15</x>
-        <y>35</y>
+        <x>1</x>
+        <y>4</y>
         <width>1046</width>
         <height>596</height>
        </rect>
@@ -1888,7 +1855,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>8</number>
+       <number>11</number>
       </property>
       <property name="usesScrollButtons">
        <bool>true</bool>
@@ -1914,15 +1881,15 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caLed: &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;led is used for bits display with two states or for alarm display with the usual alarm colors&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;one can specify the truevalue and falsevalue for display.&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;colors can be chosen in case of true false scheme&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;circular or rectangular&lt;/li&gt;&lt;/ul&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caLed: &lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;led is used for bits display with two states or for alarm display with the usual alarm colors&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;one can specify the truevalue and falsevalue for display.&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;colors can be chosen in case of true false scheme&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;circular or rectangular&lt;/li&gt;&lt;/ul&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
        <widget class="caLed" name="caled">
@@ -2304,14 +2271,14 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caLinearGauge: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;alarm colors given by values here (not convenient)&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;limits can be given through hopr, lopr&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;linear and logarithmique scale&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;horizontal and vertical&lt;/li&gt;&lt;/ul&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;  &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caLinearGauge: &lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;alarm colors given by values here (not convenient)&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;limits can be given through hopr, lopr&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;linear and logarithmique scale&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;horizontal and vertical&lt;/li&gt;&lt;/ul&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;  &lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
        <widget class="caLineEdit" name="calineedit_2">
@@ -2793,15 +2760,15 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caCircularGauge: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;alarm colors given by values here (not convenient)&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;limits can be given through hopr, lopr&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;linear and logarithmique scale&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;inner or outer scale&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;display or do not display value&lt;/li&gt;&lt;/ul&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;  &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caCircularGauge: &lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;alarm colors given by values here (not convenient)&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;limits can be given through hopr, lopr&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;linear and logarithmique scale&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;inner or outer scale&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;display or do not display value&lt;/li&gt;&lt;/ul&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;  &lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
        <widget class="caCircularGauge" name="cacirculargauge">
@@ -3238,11 +3205,11 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caByte: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;foreground, background, direction&lt;/li&gt;&lt;/ul&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;startBit, endBit&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;colormode (static or alarm as in medm)&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caByte: &lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;foreground, background, direction&lt;/li&gt;&lt;/ul&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;startBit, endBit&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;colormode (static or alarm as in medm)&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
        <widget class="caTextEntry" name="catextentry_5">
@@ -3362,15 +3329,15 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caLineEdit: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;values display with or without unit&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;alignment left, right, center justified&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;foreground, background color, colormode default, static, alarm_default, alarm_static &lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;precision, precisionmode (channel or user)&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;minimum maximum limits, limitsmode (channel or user)&lt;/li&gt;&lt;/ul&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;formattype (decimal, string, hex, octal, ...)&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;fontScaleMode (none, height, width and height)&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caLineEdit: &lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;values display with or without unit&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;alignment left, right, center justified&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;foreground, background color, colormode default, static, alarm_default, alarm_static &lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;precision, precisionmode (channel or user)&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;minimum maximum limits, limitsmode (channel or user)&lt;/li&gt;&lt;/ul&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;formattype (decimal, string, hex, octal, ...)&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;fontScaleMode (none, height, width and height)&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
        <widget class="caLineEdit" name="calineedit_7">
@@ -3909,6 +3876,1094 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </widget>
+      <widget class="QWidget" name="tab_38">
+       <attribute name="title">
+        <string>caLineDraw</string>
+       </attribute>
+       <widget class="caLineDraw" name="caLineDraw_7">
+        <property name="geometry">
+         <rect>
+          <x>299</x>
+          <y>391</y>
+          <width>25</width>
+          <height>100</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:COUNT:1</string>
+        </property>
+        <property name="alignment">
+         <enum>caLineDraw::Left</enum>
+        </property>
+        <property name="direction">
+         <enum>caLineDraw::Down</enum>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDrawnew_27">
+        <property name="geometry">
+         <rect>
+          <x>863</x>
+          <y>50</y>
+          <width>101</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:COUNT:1</string>
+        </property>
+        <property name="background">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Alarm_Static</enum>
+        </property>
+        <property name="precision">
+         <number>1</number>
+        </property>
+        <property name="precisionMode">
+         <enum>caLineDraw::User</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caLineDraw::User</enum>
+        </property>
+        <property name="maxValue">
+         <double>2.000000000000000</double>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDrawnew_9">
+        <property name="geometry">
+         <rect>
+          <x>238</x>
+          <y>310</y>
+          <width>86</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:COUNT:1</string>
+        </property>
+        <property name="alignment">
+         <enum>caLineDraw::Left</enum>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Default</enum>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDrawnew_28">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>863</x>
+          <y>90</y>
+          <width>100</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:COUNT:1</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Alarm_Default</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>1</number>
+        </property>
+        <property name="alarmHandling">
+         <enum>caLineDraw::onBackground</enum>
+        </property>
+        <property name="precision">
+         <number>1</number>
+        </property>
+        <property name="limitsMode">
+         <enum>caLineDraw::User</enum>
+        </property>
+        <property name="maxValue">
+         <double>2.000000000000000</double>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_49">
+        <property name="geometry">
+         <rect>
+          <x>663</x>
+          <y>210</y>
+          <width>171</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>static(dark red on blue)</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_8">
+        <property name="geometry">
+         <rect>
+          <x>167</x>
+          <y>391</y>
+          <width>25</width>
+          <height>100</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:COUNT:1</string>
+        </property>
+        <property name="alignment">
+         <enum>caLineDraw::Left</enum>
+        </property>
+        <property name="direction">
+         <enum>caLineDraw::Up</enum>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDrawnew_29">
+        <property name="geometry">
+         <rect>
+          <x>38</x>
+          <y>310</y>
+          <width>176</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:COUNT:1</string>
+        </property>
+        <property name="alignment">
+         <enum>caLineDraw::Left</enum>
+        </property>
+        <property name="background">
+         <color>
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="fontScaleMode" stdset="0">
+         <enum>caLineDraw::WidthAndHeight</enum>
+        </property>
+        <property name="unitsEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_50">
+        <property name="geometry">
+         <rect>
+          <x>663</x>
+          <y>90</y>
+          <width>191</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>alrmdefault/onbackground</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_9">
+        <property name="geometry">
+         <rect>
+          <x>701</x>
+          <y>387</y>
+          <width>25</width>
+          <height>100</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:COUNT:1</string>
+        </property>
+        <property name="alignment">
+         <enum>caLineDraw::Left</enum>
+        </property>
+        <property name="direction">
+         <enum>caLineDraw::Down</enum>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDrawnew_30">
+        <property name="geometry">
+         <rect>
+          <x>358</x>
+          <y>310</y>
+          <width>98</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:COUNT:1</string>
+        </property>
+        <property name="alignment">
+         <enum>caLineDraw::Left</enum>
+        </property>
+        <property name="background">
+         <color>
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="frameColor">
+         <color>
+          <red>255</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="formatType">
+         <enum>caLineDraw::hexadecimal</enum>
+        </property>
+       </widget>
+       <widget class="QTextEdit" name="textEdit_15">
+        <property name="geometry">
+         <rect>
+          <x>28</x>
+          <y>20</y>
+          <width>591</width>
+          <height>261</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">
+QWidget {background: white;} </string>
+        </property>
+        <property name="html">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caLineDraw: &lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;values display with or without unit&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;alignment left, right, center justified&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;foreground, background color, colormode default, static, alarm_default, alarm_static &lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;precision, precisionmode (channel or user)&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;minimum maximum limits, limitsmode (channel or user)&lt;/li&gt;&lt;/ul&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;formattype (decimal, string, hex, octal, ...)&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;fontScaleMode (none, height, width and height)&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDrawnew_31">
+        <property name="geometry">
+         <rect>
+          <x>863</x>
+          <y>10</y>
+          <width>101</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:COUNT:1</string>
+        </property>
+        <property name="background">
+         <color alpha="100">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Alarm_Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameColor">
+         <color>
+          <red>85</red>
+          <green>0</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+        <property name="alarmHandling">
+         <enum>caLineDraw::onBackground</enum>
+        </property>
+        <property name="precision">
+         <number>1</number>
+        </property>
+        <property name="precisionMode">
+         <enum>caLineDraw::Channel</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caLineDraw::User</enum>
+        </property>
+        <property name="maxValue">
+         <double>2.000000000000000</double>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_51">
+        <property name="geometry">
+         <rect>
+          <x>663</x>
+          <y>130</y>
+          <width>191</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>alrmdefault/onforeground</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_10">
+        <property name="geometry">
+         <rect>
+          <x>423</x>
+          <y>389</y>
+          <width>100</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:COUNT:1</string>
+        </property>
+        <property name="alignment">
+         <enum>caLineDraw::Left</enum>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>false</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>0</number>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_52">
+        <property name="geometry">
+         <rect>
+          <x>663</x>
+          <y>170</y>
+          <width>171</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>static(blue on cyan)</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDrawnew_32">
+        <property name="geometry">
+         <rect>
+          <x>863</x>
+          <y>170</y>
+          <width>101</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameColor">
+         <color>
+          <red>255</red>
+          <green>170</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+        <property name="alarmHandling">
+         <enum>caLineDraw::onForeground</enum>
+        </property>
+        <property name="precision">
+         <number>1</number>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_11">
+        <property name="geometry">
+         <rect>
+          <x>559</x>
+          <y>389</y>
+          <width>25</width>
+          <height>100</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:COUNT:1</string>
+        </property>
+        <property name="alignment">
+         <enum>caLineDraw::Left</enum>
+        </property>
+        <property name="direction">
+         <enum>caLineDraw::Up</enum>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>false</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>0</number>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDrawnew_33">
+        <property name="geometry">
+         <rect>
+          <x>863</x>
+          <y>130</y>
+          <width>100</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:COUNT:1</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Alarm_Default</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>1</number>
+        </property>
+        <property name="alarmHandling">
+         <enum>caLineDraw::onForeground</enum>
+        </property>
+        <property name="precision">
+         <number>1</number>
+        </property>
+        <property name="limitsMode">
+         <enum>caLineDraw::User</enum>
+        </property>
+        <property name="maxValue">
+         <double>2.000000000000000</double>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDrawnew_34">
+        <property name="geometry">
+         <rect>
+          <x>863</x>
+          <y>210</y>
+          <width>101</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>170</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>0</red>
+          <green>170</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameColor">
+         <color>
+          <red>255</red>
+          <green>170</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+        <property name="alarmHandling">
+         <enum>caLineDraw::onBackground</enum>
+        </property>
+        <property name="precision">
+         <number>1</number>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_12">
+        <property name="geometry">
+         <rect>
+          <x>33</x>
+          <y>389</y>
+          <width>100</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:COUNT:1</string>
+        </property>
+        <property name="alignment">
+         <enum>caLineDraw::Left</enum>
+        </property>
+        <property name="background">
+         <color alpha="50">
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_53">
+        <property name="geometry">
+         <rect>
+          <x>663</x>
+          <y>10</y>
+          <width>191</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>alrmstatic/onbackground</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_54">
+        <property name="geometry">
+         <rect>
+          <x>663</x>
+          <y>50</y>
+          <width>191</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>alrmstatic/onforeground</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw">
+        <property name="geometry">
+         <rect>
+          <x>652</x>
+          <y>346</y>
+          <width>100</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:COUNT:1</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_13">
+        <property name="geometry">
+         <rect>
+          <x>35</x>
+          <y>429</y>
+          <width>100</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:COUNT:1</string>
+        </property>
+        <property name="alignment">
+         <enum>caLineDraw::Right</enum>
+        </property>
+        <property name="background">
+         <color alpha="50">
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_14">
+        <property name="geometry">
+         <rect>
+          <x>36</x>
+          <y>467</y>
+          <width>100</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:COUNT:1</string>
+        </property>
+        <property name="background">
+         <color alpha="50">
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_15">
+        <property name="geometry">
+         <rect>
+          <x>209</x>
+          <y>391</y>
+          <width>25</width>
+          <height>100</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:COUNT:1</string>
+        </property>
+        <property name="alignment">
+         <enum>caLineDraw::Right</enum>
+        </property>
+        <property name="direction">
+         <enum>caLineDraw::Up</enum>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_16">
+        <property name="geometry">
+         <rect>
+          <x>252</x>
+          <y>391</y>
+          <width>25</width>
+          <height>100</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:COUNT:1</string>
+        </property>
+        <property name="direction">
+         <enum>caLineDraw::Up</enum>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_17">
+        <property name="geometry">
+         <rect>
+          <x>339</x>
+          <y>392</y>
+          <width>25</width>
+          <height>100</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:COUNT:1</string>
+        </property>
+        <property name="alignment">
+         <enum>caLineDraw::Right</enum>
+        </property>
+        <property name="direction">
+         <enum>caLineDraw::Down</enum>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_18">
+        <property name="geometry">
+         <rect>
+          <x>383</x>
+          <y>391</y>
+          <width>25</width>
+          <height>100</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:COUNT:1</string>
+        </property>
+        <property name="direction">
+         <enum>caLineDraw::Down</enum>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_19">
+        <property name="geometry">
+         <rect>
+          <x>425</x>
+          <y>424</y>
+          <width>100</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:COUNT:1</string>
+        </property>
+        <property name="alignment">
+         <enum>caLineDraw::Right</enum>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>false</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>0</number>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_20">
+        <property name="geometry">
+         <rect>
+          <x>428</x>
+          <y>462</y>
+          <width>100</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:COUNT:1</string>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>false</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>0</number>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_21">
+        <property name="geometry">
+         <rect>
+          <x>603</x>
+          <y>389</y>
+          <width>25</width>
+          <height>100</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:COUNT:1</string>
+        </property>
+        <property name="alignment">
+         <enum>caLineDraw::Right</enum>
+        </property>
+        <property name="direction">
+         <enum>caLineDraw::Up</enum>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>false</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>0</number>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_22">
+        <property name="geometry">
+         <rect>
+          <x>645</x>
+          <y>389</y>
+          <width>25</width>
+          <height>100</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:COUNT:1</string>
+        </property>
+        <property name="direction">
+         <enum>caLineDraw::Up</enum>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>false</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>0</number>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_23">
+        <property name="geometry">
+         <rect>
+          <x>743</x>
+          <y>387</y>
+          <width>25</width>
+          <height>100</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:COUNT:1</string>
+        </property>
+        <property name="alignment">
+         <enum>caLineDraw::Right</enum>
+        </property>
+        <property name="direction">
+         <enum>caLineDraw::Down</enum>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_24">
+        <property name="geometry">
+         <rect>
+          <x>786</x>
+          <y>385</y>
+          <width>25</width>
+          <height>100</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:COUNT:1</string>
+        </property>
+        <property name="direction">
+         <enum>caLineDraw::Down</enum>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+       </widget>
+      </widget>
       <widget class="QWidget" name="tab_37">
        <attribute name="title">
         <string>caMultiLineString</string>
@@ -3988,12 +5043,12 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caMultiLineString: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;display of char waveforms, enums and strings&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;new line will be produced when carriage return (ascii code 13) is detected&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;foreground, background color, colormode default, static, alarm_default, alarm_static &lt;/li&gt;&lt;/ul&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;fontScaleMode (none, height, width and height), for scrolling use none&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caMultiLineString: &lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;display of char waveforms, enums and strings&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;new line will be produced when carriage return (ascii code 13) is detected&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;foreground, background color, colormode default, static, alarm_default, alarm_static &lt;/li&gt;&lt;/ul&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;fontScaleMode (none, height, width and height), for scrolling use none&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
        <widget class="caMultiLineString" name="camultilinestring_5">
@@ -4092,6 +5147,9 @@ p, li { white-space: pre-wrap; }
           <height>81</height>
          </rect>
         </property>
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByKeyboard|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+        </property>
         <property name="channel" stdset="0">
          <string notr="true">ACM:TEST:STRING_WAVE</string>
         </property>
@@ -4144,30 +5202,36 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caThermo: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;bar monitor up, down, left, right&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;with or without scale&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;alarm and limits mode as in medm&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caThermo: &lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;bar monitor up, down, left, right&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;with or without scale&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;alarm and limits mode as in medm&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
        <widget class="caThermo" name="caThermo_0">
         <property name="geometry">
          <rect>
-          <x>545</x>
-          <y>230</y>
-          <width>40</width>
-          <height>250</height>
+          <x>20</x>
+          <y>185</y>
+          <width>65</width>
+          <height>330</height>
          </rect>
+        </property>
+        <property name="lowerBound">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="upperBound">
+         <double>900.000000000000000</double>
         </property>
         <property name="scalePosition">
          <enum>QwtThermoMarker::LeftScale</enum>
         </property>
         <property name="maxValue">
-         <double>3.000000000000000</double>
+         <double>900.000000000000000</double>
         </property>
         <property name="minValue">
-         <double>-2.000000000000000</double>
+         <double>-100.000000000000000</double>
         </property>
         <property name="channel" stdset="0">
          <string notr="true">ACM:TEST:AO</string>
@@ -4193,29 +5257,35 @@ p, li { white-space: pre-wrap; }
          </color>
         </property>
         <property name="colorMode">
-         <enum>caThermo::Static</enum>
+         <enum>caThermo::Default</enum>
         </property>
         <property name="limitsMode">
-         <enum>caThermo::User</enum>
+         <enum>caThermo::Channel</enum>
         </property>
        </widget>
        <widget class="caThermo" name="caThermo_1">
         <property name="geometry">
          <rect>
-          <x>715</x>
-          <y>80</y>
-          <width>216</width>
-          <height>36</height>
+          <x>485</x>
+          <y>230</y>
+          <width>330</width>
+          <height>45</height>
          </rect>
+        </property>
+        <property name="lowerBound">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="upperBound">
+         <double>900.000000000000000</double>
         </property>
         <property name="scalePosition">
          <enum>QwtThermoMarker::BottomScale</enum>
         </property>
         <property name="maxValue">
-         <double>3.000000000000000</double>
+         <double>900.000000000000000</double>
         </property>
         <property name="minValue">
-         <double>-2.000000000000000</double>
+         <double>-100.000000000000000</double>
         </property>
         <property name="channel" stdset="0">
          <string notr="true">ACM:TEST:AO</string>
@@ -4241,29 +5311,35 @@ p, li { white-space: pre-wrap; }
          </color>
         </property>
         <property name="colorMode">
-         <enum>caThermo::Static</enum>
+         <enum>caThermo::Default</enum>
         </property>
         <property name="limitsMode">
-         <enum>caThermo::User</enum>
+         <enum>caThermo::Channel</enum>
         </property>
        </widget>
        <widget class="caThermo" name="caThermo_2">
         <property name="geometry">
          <rect>
-          <x>724</x>
-          <y>195</y>
-          <width>56</width>
-          <height>250</height>
+          <x>939</x>
+          <y>40</y>
+          <width>65</width>
+          <height>330</height>
          </rect>
+        </property>
+        <property name="lowerBound">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="upperBound">
+         <double>900.000000000000000</double>
         </property>
         <property name="scalePosition">
          <enum>QwtThermoMarker::LeftScale</enum>
         </property>
         <property name="maxValue">
-         <double>50.000000000000000</double>
+         <double>900.000000000000000</double>
         </property>
         <property name="minValue">
-         <double>0.000000000000000</double>
+         <double>-100.000000000000000</double>
         </property>
         <property name="channel" stdset="0">
          <string notr="true">ACM:TEST:AO</string>
@@ -4289,7 +5365,665 @@ p, li { white-space: pre-wrap; }
          </color>
         </property>
         <property name="colorMode">
-         <enum>caThermo::Alarm</enum>
+         <enum>caThermo::Static</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caThermo::Channel</enum>
+        </property>
+       </widget>
+       <widget class="caThermo" name="caThermo_7">
+        <property name="geometry">
+         <rect>
+          <x>97</x>
+          <y>185</y>
+          <width>65</width>
+          <height>330</height>
+         </rect>
+        </property>
+        <property name="lowerBound">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="upperBound">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="scalePosition">
+         <enum>QwtThermoMarker::LeftScale</enum>
+        </property>
+        <property name="maxValue">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="type">
+         <enum>QwtThermoMarker::Marker</enum>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="direction">
+         <enum>caThermo::Up</enum>
+        </property>
+        <property name="look">
+         <enum>caThermo::Outline</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>253</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>200</red>
+          <green>200</green>
+          <blue>200</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caThermo::Default</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caThermo::Channel</enum>
+        </property>
+       </widget>
+       <widget class="caThermo" name="caThermo_8">
+        <property name="geometry">
+         <rect>
+          <x>485</x>
+          <y>327</y>
+          <width>330</width>
+          <height>45</height>
+         </rect>
+        </property>
+        <property name="lowerBound">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="upperBound">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="scalePosition">
+         <enum>QwtThermoMarker::BottomScale</enum>
+        </property>
+        <property name="maxValue">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="type">
+         <enum>QwtThermoMarker::Marker</enum>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="direction">
+         <enum>caThermo::Right</enum>
+        </property>
+        <property name="look">
+         <enum>caThermo::Outline</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>253</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>200</red>
+          <green>200</green>
+          <blue>200</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caThermo::Default</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caThermo::Channel</enum>
+        </property>
+       </widget>
+       <widget class="caThermo" name="caThermo_9">
+        <property name="geometry">
+         <rect>
+          <x>173</x>
+          <y>185</y>
+          <width>65</width>
+          <height>330</height>
+         </rect>
+        </property>
+        <property name="lowerBound">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="upperBound">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="scalePosition">
+         <enum>QwtThermoMarker::LeftScale</enum>
+        </property>
+        <property name="maxValue">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="type">
+         <enum>QwtThermoMarker::PipeFromCenter</enum>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="direction">
+         <enum>caThermo::Up</enum>
+        </property>
+        <property name="look">
+         <enum>caThermo::Outline</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>253</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>200</red>
+          <green>200</green>
+          <blue>200</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caThermo::Default</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caThermo::Channel</enum>
+        </property>
+       </widget>
+       <widget class="caThermo" name="caThermo_10">
+        <property name="geometry">
+         <rect>
+          <x>485</x>
+          <y>380</y>
+          <width>330</width>
+          <height>45</height>
+         </rect>
+        </property>
+        <property name="lowerBound">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="upperBound">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="scalePosition">
+         <enum>QwtThermoMarker::BottomScale</enum>
+        </property>
+        <property name="maxValue">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="type">
+         <enum>QwtThermoMarker::PipeFromCenter</enum>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="direction">
+         <enum>caThermo::Right</enum>
+        </property>
+        <property name="look">
+         <enum>caThermo::Outline</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>253</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>200</red>
+          <green>200</green>
+          <blue>200</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caThermo::Default</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caThermo::Channel</enum>
+        </property>
+       </widget>
+       <widget class="caNumeric" name="caNumeric_7">
+        <property name="geometry">
+         <rect>
+          <x>492</x>
+          <y>494</y>
+          <width>93</width>
+          <height>52</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="integerDigits" stdset="0">
+         <number>4</number>
+        </property>
+        <property name="decimalDigits" stdset="0">
+         <number>0</number>
+        </property>
+        <property name="digitsFontScaleEnabled">
+         <bool>true</bool>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:TEST:AO</string>
+        </property>
+        <property name="precisionMode">
+         <enum>caNumeric::User</enum>
+        </property>
+        <property name="fixedFormat">
+         <bool>false</bool>
+        </property>
+        <property name="limitsMode">
+         <enum>caNumeric::Channel</enum>
+        </property>
+        <property name="maxValue">
+         <double>10.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>-10.000000000000000</double>
+        </property>
+       </widget>
+       <widget class="caThermo" name="caThermo_11">
+        <property name="geometry">
+         <rect>
+          <x>485</x>
+          <y>179</y>
+          <width>330</width>
+          <height>45</height>
+         </rect>
+        </property>
+        <property name="lowerBound">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="upperBound">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="scalePosition">
+         <enum>QwtThermoMarker::BottomScale</enum>
+        </property>
+        <property name="maxValue">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="direction">
+         <enum>caThermo::Left</enum>
+        </property>
+        <property name="look">
+         <enum>caThermo::Outline</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>253</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>200</red>
+          <green>200</green>
+          <blue>200</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caThermo::Default</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caThermo::Channel</enum>
+        </property>
+       </widget>
+       <widget class="caThermo" name="caThermo_12">
+        <property name="geometry">
+         <rect>
+          <x>485</x>
+          <y>279</y>
+          <width>330</width>
+          <height>45</height>
+         </rect>
+        </property>
+        <property name="lowerBound">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="upperBound">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="scalePosition">
+         <enum>QwtThermoMarker::BottomScale</enum>
+        </property>
+        <property name="maxValue">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="type">
+         <enum>QwtThermoMarker::Marker</enum>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="direction">
+         <enum>caThermo::Left</enum>
+        </property>
+        <property name="look">
+         <enum>caThermo::Outline</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>253</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>200</red>
+          <green>200</green>
+          <blue>200</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caThermo::Default</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caThermo::Channel</enum>
+        </property>
+       </widget>
+       <widget class="caThermo" name="caThermo_13">
+        <property name="geometry">
+         <rect>
+          <x>485</x>
+          <y>431</y>
+          <width>330</width>
+          <height>45</height>
+         </rect>
+        </property>
+        <property name="lowerBound">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="upperBound">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="scalePosition">
+         <enum>QwtThermoMarker::BottomScale</enum>
+        </property>
+        <property name="maxValue">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="type">
+         <enum>QwtThermoMarker::PipeFromCenter</enum>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="direction">
+         <enum>caThermo::Left</enum>
+        </property>
+        <property name="look">
+         <enum>caThermo::Outline</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>253</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>200</red>
+          <green>200</green>
+          <blue>200</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caThermo::Default</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caThermo::Channel</enum>
+        </property>
+       </widget>
+       <widget class="caThermo" name="caThermo_14">
+        <property name="geometry">
+         <rect>
+          <x>396</x>
+          <y>185</y>
+          <width>65</width>
+          <height>330</height>
+         </rect>
+        </property>
+        <property name="lowerBound">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="upperBound">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="scalePosition">
+         <enum>QwtThermoMarker::LeftScale</enum>
+        </property>
+        <property name="maxValue">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="type">
+         <enum>QwtThermoMarker::PipeFromCenter</enum>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="direction">
+         <enum>caThermo::Down</enum>
+        </property>
+        <property name="look">
+         <enum>caThermo::Outline</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>253</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>200</red>
+          <green>200</green>
+          <blue>200</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caThermo::Default</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caThermo::Channel</enum>
+        </property>
+       </widget>
+       <widget class="caThermo" name="caThermo_15">
+        <property name="geometry">
+         <rect>
+          <x>244</x>
+          <y>185</y>
+          <width>65</width>
+          <height>330</height>
+         </rect>
+        </property>
+        <property name="lowerBound">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="upperBound">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="scalePosition">
+         <enum>QwtThermoMarker::LeftScale</enum>
+        </property>
+        <property name="maxValue">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="direction">
+         <enum>caThermo::Down</enum>
+        </property>
+        <property name="look">
+         <enum>caThermo::Outline</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>253</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>200</red>
+          <green>200</green>
+          <blue>200</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caThermo::Default</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caThermo::Channel</enum>
+        </property>
+       </widget>
+       <widget class="caThermo" name="caThermo_16">
+        <property name="geometry">
+         <rect>
+          <x>318</x>
+          <y>185</y>
+          <width>65</width>
+          <height>330</height>
+         </rect>
+        </property>
+        <property name="lowerBound">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="upperBound">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="scalePosition">
+         <enum>QwtThermoMarker::LeftScale</enum>
+        </property>
+        <property name="maxValue">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="type">
+         <enum>QwtThermoMarker::Marker</enum>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="direction">
+         <enum>caThermo::Down</enum>
+        </property>
+        <property name="look">
+         <enum>caThermo::Outline</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>253</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>200</red>
+          <green>200</green>
+          <blue>200</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caThermo::Default</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caThermo::Channel</enum>
+        </property>
+       </widget>
+       <widget class="caThermo" name="caThermo_17">
+        <property name="geometry">
+         <rect>
+          <x>849</x>
+          <y>40</y>
+          <width>65</width>
+          <height>330</height>
+         </rect>
+        </property>
+        <property name="lowerBound">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="upperBound">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="scalePosition">
+         <enum>QwtThermoMarker::LeftScale</enum>
+        </property>
+        <property name="maxValue">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="direction">
+         <enum>caThermo::Up</enum>
+        </property>
+        <property name="look">
+         <enum>caThermo::Outline</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>20</red>
+          <green>19</green>
+          <blue>18</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>224</red>
+          <green>223</green>
+          <blue>222</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caThermo::Default</enum>
         </property>
         <property name="limitsMode">
          <enum>caThermo::Channel</enum>
@@ -4317,13 +6051,13 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caCartesianPlot: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;foreground, background, scale and grid colors&lt;/li&gt;&lt;/ul&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;up to 6 curves with styles / colors / symbols / filled&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;scale annotation can be disabled&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;axis defined by user, channel or automatic&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;trigger, erase, count channels and plotmode as in medm&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caCartesianPlot: &lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;foreground, background, scale and grid colors&lt;/li&gt;&lt;/ul&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;up to 6 curves with styles / colors / symbols / filled&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;scale annotation can be disabled&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;axis defined by user, channel or automatic&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;trigger, erase, count channels and plotmode as in medm&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
        <widget class="caCartesianPlot" name="caCartesianPlot_0">
@@ -4374,16 +6108,16 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="foreground">
          <color>
-          <red>236</red>
-          <green>236</green>
-          <blue>236</blue>
+          <red>218</red>
+          <green>218</green>
+          <blue>218</blue>
          </color>
         </property>
         <property name="background">
          <color>
-          <red>236</red>
-          <green>236</green>
-          <blue>236</blue>
+          <red>255</red>
+          <green>255</green>
+          <blue>255</blue>
          </color>
         </property>
         <property name="scaleColor">
@@ -4559,16 +6293,16 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="foreground">
          <color>
-          <red>236</red>
-          <green>236</green>
-          <blue>236</blue>
+          <red>218</red>
+          <green>218</green>
+          <blue>218</blue>
          </color>
         </property>
         <property name="background">
          <color>
-          <red>236</red>
-          <green>236</green>
-          <blue>236</blue>
+          <red>255</red>
+          <green>255</green>
+          <blue>255</blue>
          </color>
         </property>
         <property name="scaleColor">
@@ -4605,13 +6339,13 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caStripPlot: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;foreground, background, scale and grid colors&lt;/li&gt;&lt;/ul&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;up to 5 curves with styles / colors / filled&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;scale annotation and legends can be disabled&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;time or value axis&lt;/li&gt;&lt;/ul&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caStripPlot: &lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;foreground, background, scale and grid colors&lt;/li&gt;&lt;/ul&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;up to 5 curves with styles / colors / filled&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;scale annotation and legends can be disabled&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;time or value axis&lt;/li&gt;&lt;/ul&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
        <widget class="caNumeric" name="canumeric_3">
@@ -4727,11 +6461,11 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caTable: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; string with channelnames&lt;/li&gt;&lt;/ul&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;colormode, precisionmode, limitsmode&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;precision, maxvalue, minvalue, columnsizes&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caTable: &lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; string with channelnames&lt;/li&gt;&lt;/ul&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;colormode, precisionmode, limitsmode&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;precision, maxvalue, minvalue, columnsizes&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </widget>
@@ -4745,7 +6479,7 @@ p, li { white-space: pre-wrap; }
           <x>170</x>
           <y>5</y>
           <width>826</width>
-          <height>84</height>
+          <height>70</height>
          </rect>
         </property>
         <property name="wordWrap">
@@ -4789,10 +6523,10 @@ p, li { white-space: pre-wrap; }
        <widget class="caWaveTable" name="cawavetable_2">
         <property name="geometry">
          <rect>
-          <x>171</x>
-          <y>92</y>
+          <x>169</x>
+          <y>78</y>
           <width>826</width>
-          <height>86</height>
+          <height>70</height>
          </rect>
         </property>
         <property name="wordWrap">
@@ -4833,10 +6567,10 @@ p, li { white-space: pre-wrap; }
        <widget class="caWaveTable" name="cawavetable_3">
         <property name="geometry">
          <rect>
-          <x>170</x>
-          <y>180</y>
+          <x>169</x>
+          <y>232</y>
           <width>826</width>
-          <height>91</height>
+          <height>70</height>
          </rect>
         </property>
         <property name="wordWrap">
@@ -4868,10 +6602,10 @@ p, li { white-space: pre-wrap; }
        <widget class="caWaveTable" name="cawavetable_4">
         <property name="geometry">
          <rect>
-          <x>170</x>
-          <y>470</y>
+          <x>167</x>
+          <y>154</y>
           <width>826</width>
-          <height>91</height>
+          <height>70</height>
          </rect>
         </property>
         <property name="wordWrap">
@@ -4906,8 +6640,8 @@ p, li { white-space: pre-wrap; }
        <widget class="caLabel" name="calabel_21">
         <property name="geometry">
          <rect>
-          <x>38</x>
-          <y>58</y>
+          <x>63</x>
+          <y>6</y>
           <width>90</width>
           <height>28</height>
          </rect>
@@ -4919,8 +6653,8 @@ p, li { white-space: pre-wrap; }
        <widget class="caLabel" name="calabel_22">
         <property name="geometry">
          <rect>
-          <x>37</x>
-          <y>128</y>
+          <x>40</x>
+          <y>77</y>
           <width>90</width>
           <height>28</height>
          </rect>
@@ -4932,8 +6666,8 @@ p, li { white-space: pre-wrap; }
        <widget class="caLabel" name="calabel_23">
         <property name="geometry">
          <rect>
-          <x>41</x>
-          <y>198</y>
+          <x>40</x>
+          <y>231</y>
           <width>90</width>
           <height>28</height>
          </rect>
@@ -4945,8 +6679,8 @@ p, li { white-space: pre-wrap; }
        <widget class="caLabel" name="calabel_24">
         <property name="geometry">
          <rect>
-          <x>50</x>
-          <y>470</y>
+          <x>46</x>
+          <y>158</y>
           <width>90</width>
           <height>28</height>
          </rect>
@@ -4958,10 +6692,10 @@ p, li { white-space: pre-wrap; }
        <widget class="caWaveTable" name="cawavetable_5">
         <property name="geometry">
          <rect>
-          <x>170</x>
-          <y>270</y>
+          <x>168</x>
+          <y>307</y>
           <width>826</width>
-          <height>91</height>
+          <height>70</height>
          </rect>
         </property>
         <property name="wordWrap">
@@ -4996,8 +6730,8 @@ p, li { white-space: pre-wrap; }
        <widget class="caWaveTable" name="cawavetable_6">
         <property name="geometry">
          <rect>
-          <x>170</x>
-          <y>360</y>
+          <x>178</x>
+          <y>460</y>
           <width>291</width>
           <height>101</height>
          </rect>
@@ -5045,8 +6779,8 @@ p, li { white-space: pre-wrap; }
        <widget class="caLabel" name="calabel_48">
         <property name="geometry">
          <rect>
-          <x>40</x>
-          <y>370</y>
+          <x>67</x>
+          <y>460</y>
           <width>90</width>
           <height>28</height>
          </rect>
@@ -5058,8 +6792,8 @@ p, li { white-space: pre-wrap; }
        <widget class="caWaveTable" name="cawavetable_7">
         <property name="geometry">
          <rect>
-          <x>480</x>
-          <y>360</y>
+          <x>479</x>
+          <y>459</y>
           <width>291</width>
           <height>101</height>
          </rect>
@@ -5099,6 +6833,57 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="formatType">
          <enum>caWaveTable::string</enum>
+        </property>
+       </widget>
+       <widget class="caWaveTable" name="cawavetable_8">
+        <property name="geometry">
+         <rect>
+          <x>169</x>
+          <y>382</y>
+          <width>826</width>
+          <height>70</height>
+         </rect>
+        </property>
+        <property name="wordWrap">
+         <bool>false</bool>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:UCHAR_WAVE</string>
+        </property>
+        <property name="numberOfRows">
+         <number>0</number>
+        </property>
+        <property name="numberOfColumns">
+         <number>10</number>
+        </property>
+        <property name="alignment">
+         <enum>caWaveTable::Right</enum>
+        </property>
+        <property name="formatType">
+         <enum>caWaveTable::hexadecimal</enum>
+        </property>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+        <column/>
+       </widget>
+       <widget class="caLabel" name="calabel_55">
+        <property name="geometry">
+         <rect>
+          <x>47</x>
+          <y>379</y>
+          <width>90</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>uchars</string>
         </property>
        </widget>
       </widget>
@@ -5167,12 +6952,12 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caBitNames: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; 2 channels (one for enum string, one for value)&lt;/li&gt;&lt;/ul&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;startBit, endBit&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;fontScaleMode&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;foreground, background colors&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caBitNames: &lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; 2 channels (one for enum string, one for value)&lt;/li&gt;&lt;/ul&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;startBit, endBit&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;fontScaleMode&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;foreground, background colors&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </widget>
@@ -5232,7 +7017,7 @@ p, li { white-space: pre-wrap; }
          <enum>caCamera::xycenter_width_height</enum>
         </property>
         <property name="ROI_writeChannels" stdset="0">
-         <string notr="true">FIGX;FIGY;FIGW;FIGH</string>
+         <string notr="true">FIGX;FIGY;FIGW;FIGH;</string>
         </property>
         <property name="ROI_writemarkerType" stdset="0">
          <enum>caCamera::box</enum>
@@ -5258,13 +7043,13 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caCamera: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;channels for data, width, height, code and bpp&lt;/li&gt;&lt;/ul&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;zoom yes/no&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;colormaps&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;when spectrum then automaticlevels yes/no&lt;/li&gt;&lt;/ul&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;and minlevel/maxlevel&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caCamera: &lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;channels for data, width, height, code and bpp&lt;/li&gt;&lt;/ul&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;zoom yes/no&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;colormaps&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;when spectrum then automaticlevels yes/no&lt;/li&gt;&lt;/ul&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;and minlevel/maxlevel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
        <widget class="caCamera" name="cacamera_2">
@@ -5450,13 +7235,13 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;Array of 4 values written by mouse action&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;1. xy_only : (0)=x, (1)=y&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;2. xy1_xy2 : (0)=x1, (1)=y1, (2)=x2, (3)=y2&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;3. xyUL_xyLR:  (0)=x1, (1)=y1, (2)=x2, (3)=y2&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;4. xyc_w_h: (0)=x, (1)=y, (2)=w, (3)=h&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Array of 4 values written by mouse action&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1. xy_only : (0)=x, (1)=y&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2. xy1_xy2 : (0)=x1, (1)=y1, (2)=x2, (3)=y2&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;3. xyUL_xyLR:  (0)=x1, (1)=y1, (2)=x2, (3)=y2&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;4. xyc_w_h: (0)=x, (1)=y, (2)=w, (3)=h&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
        <widget class="caLabel" name="calabel_28">
@@ -6866,13 +8651,16 @@ def PythonCalc(a, b, c, d):
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
         <string>caNumeric/caApplyNumeric</string>
        </attribute>
        <widget class="QTextEdit" name="textEdit_13">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>20</x>
@@ -6885,15 +8673,15 @@ def PythonCalc(a, b, c, d):
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caNumeric &amp;amp; caApplyNumeric: &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;font can adapt to widget size&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;precisionMode (user or channel)&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;limitsMode (user or channel)&lt;/li&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;when fixed format use that format&lt;/li&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;when not fixed format and channel, calculate integer and decimal digits, when not fixed format and user,  calculate only integer digits with hopr, lopr, use precision from user&lt;/span&gt;&lt;/p&gt;
-&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;minvalue, maxvalue when user otherwise hopr, lopr&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;caNumeric &amp;amp; caApplyNumeric: &lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;font can adapt to widget size&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;precisionMode (user or channel)&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;limitsMode (user or channel)&lt;/li&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;when fixed format use that format&lt;/li&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;when not fixed format and channel, calculate integer and decimal digits, when not fixed format and user,  calculate only integer digits with hopr, lopr, use precision from user&lt;/p&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;minvalue, maxvalue when user otherwise hopr, lopr&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
        <widget class="caApplyNumeric" name="endValueSet">
@@ -6904,9 +8692,6 @@ p, li { white-space: pre-wrap; }
           <width>181</width>
           <height>66</height>
          </rect>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QFrame { background: rgb(255, 85, 0, 255); color: rgb(0, 170, 0, 255);}</string>
         </property>
         <property name="integerDigits" stdset="0">
          <number>4</number>
@@ -6936,6 +8721,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="fixedFormat">
          <bool>false</bool>
+        </property>
+        <property name="styleSheet" stdset="0">
+         <string notr="true">QFrame { background: rgb(255, 85, 0, 255); color: rgb(0, 170, 0, 255);}</string>
         </property>
        </widget>
        <widget class="caNumeric" name="caNumeric_0">
@@ -7187,6 +8975,52 @@ p, li { white-space: pre-wrap; }
          </color>
         </property>
        </widget>
+       <widget class="caNumeric" name="caNumeric_4">
+        <property name="geometry">
+         <rect>
+          <x>630</x>
+          <y>456</y>
+          <width>118</width>
+          <height>66</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="integerDigits" stdset="0">
+         <number>5</number>
+        </property>
+        <property name="decimalDigits" stdset="0">
+         <number>2</number>
+        </property>
+        <property name="digitsFontScaleEnabled">
+         <bool>true</bool>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:TEST:AO</string>
+        </property>
+        <property name="colorMode">
+         <enum>caNumeric::Default</enum>
+        </property>
+        <property name="precisionMode">
+         <enum>caNumeric::User</enum>
+        </property>
+        <property name="fixedFormat">
+         <bool>false</bool>
+        </property>
+        <property name="limitsMode">
+         <enum>caNumeric::Channel</enum>
+        </property>
+        <property name="maxValue">
+         <double>1000.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="actOnBeam" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_18">
        <attribute name="title">
@@ -7237,7 +9071,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="scalePosition">
-         <enum>QwtSlider::NoScale</enum>
+         <enum>QwtSlider::TrailingScale</enum>
         </property>
         <property name="channel" stdset="0">
          <string notr="true">ACM:TEST:AO</string>
@@ -7250,13 +9084,13 @@ p, li { white-space: pre-wrap; }
          </color>
         </property>
         <property name="colorMode">
-         <enum>caSlider::Alarm</enum>
-        </property>
-        <property name="limitsMode">
-         <enum>caSlider::User</enum>
+         <enum>caSlider::Static</enum>
         </property>
         <property name="incrementValue">
          <double>0.100000000000000</double>
+        </property>
+        <property name="limitsMode" stdset="0">
+         <enum>caSlider::User</enum>
         </property>
        </widget>
        <widget class="caTextEntry" name="catextentry_2">
@@ -7405,9 +9239,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="background">
          <color>
-          <red>249</red>
-          <green>218</green>
-          <blue>60</blue>
+          <red>160</red>
+          <green>160</green>
+          <blue>160</blue>
          </color>
         </property>
         <property name="labels">
@@ -7819,7 +9653,7 @@ p, li { white-space: pre-wrap; }
          </color>
         </property>
         <property name="colorMode">
-         <enum>caThermo::Alarm</enum>
+         <enum>caThermo::Alarm_Static</enum>
         </property>
         <property name="limitsMode">
          <enum>caThermo::Channel</enum>
@@ -8517,7 +10351,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channel" stdset="0">
-         <string notr="true">ACM:TEST:MBBO</string>
+         <string notr="true">ACM:TEST:MBBO </string>
         </property>
         <property name="background">
          <color>
@@ -8609,6 +10443,78 @@ p, li { white-space: pre-wrap; }
          <enum>caChoice::RowColumn</enum>
         </property>
        </widget>
+       <widget class="caChoice" name="caChoice_6">
+        <property name="geometry">
+         <rect>
+          <x>496</x>
+          <y>74</y>
+          <width>166</width>
+          <height>166</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:MBBO</string>
+        </property>
+        <property name="background">
+         <color>
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="bordercolor">
+         <color>
+          <red>255</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="alignment">
+         <enum>caChoice::center</enum>
+        </property>
+        <property name="colorMode">
+         <enum>caChoice::Default</enum>
+        </property>
+        <property name="fontScaleMode" stdset="0">
+         <enum>EPushButton::WidthAndHeight</enum>
+        </property>
+       </widget>
+       <widget class="caChoice" name="caChoice_7">
+        <property name="geometry">
+         <rect>
+          <x>748</x>
+          <y>73</y>
+          <width>166</width>
+          <height>166</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:MBBO</string>
+        </property>
+        <property name="background">
+         <color>
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="bordercolor">
+         <color>
+          <red>255</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="alignment">
+         <enum>caChoice::center</enum>
+        </property>
+        <property name="colorMode">
+         <enum>caChoice::Alarm</enum>
+        </property>
+        <property name="fontScaleMode" stdset="0">
+         <enum>EPushButton::WidthAndHeight</enum>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_21">
        <attribute name="title">
@@ -8660,9 +10566,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="background">
          <color>
-          <red>187</red>
-          <green>193</green>
-          <blue>135</blue>
+          <red>183</red>
+          <green>157</green>
+          <blue>92</blue>
          </color>
         </property>
         <property name="labels">
@@ -8687,9 +10593,6 @@ p, li { white-space: pre-wrap; }
           <height>32</height>
          </rect>
         </property>
-        <property name="styleSheet">
-         <string notr="true">QPushButton::menu-indicator {image: url(none.png); width: 0}</string>
-        </property>
         <property name="label">
          <string notr="true">choice</string>
         </property>
@@ -8704,6 +10607,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="stackingMode" stdset="0">
          <enum>caRowColMenu::Menu</enum>
+        </property>
+        <property name="styleSheet" stdset="0">
+         <string notr="true"/>
         </property>
        </widget>
       </widget>
@@ -8789,7 +10695,7 @@ p, li { white-space: pre-wrap; }
          <string notr="true">caQtDM</string>
         </property>
         <property name="args">
-         <string notr="true">untitled.ui&amp;</string>
+         <string notr="true">-x -macro DEVICE=TEST untitled.ui&amp;</string>
         </property>
        </widget>
        <widget class="caShellCommand" name="cashellcommand_3">
@@ -8812,6 +10718,42 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="args">
          <string notr="true">&quot;cd /home/mezger;ls&quot;</string>
+        </property>
+       </widget>
+       <widget class="caShellCommand" name="caShellCommand_53">
+        <property name="geometry">
+         <rect>
+          <x>367</x>
+          <y>406</y>
+          <width>153</width>
+          <height>51</height>
+         </rect>
+        </property>
+        <property name="label">
+         <string notr="true">help</string>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>160</red>
+          <green>160</green>
+          <blue>160</blue>
+         </color>
+        </property>
+        <property name="labels">
+         <string>Expert</string>
+        </property>
+        <property name="files">
+         <string>startDM</string>
+        </property>
+        <property name="args">
+         <string>-x -macro DEV=SLG-LSCP1-LAS0042,IOC=SIN-CVME-LAS0042 IFC1210SCOPE_generic.pvpic&amp;</string>
         </property>
        </widget>
       </widget>
@@ -9045,7 +10987,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="autoFillBackground">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
       <property name="text">
        <string>caToggleButton</string>
@@ -9094,7 +11036,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="autoFillBackground">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
       <property name="text">
        <string>caToggleButton</string>
@@ -9589,16 +11531,16 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="foreground">
          <color>
-          <red>236</red>
-          <green>236</green>
-          <blue>236</blue>
+          <red>218</red>
+          <green>218</green>
+          <blue>218</blue>
          </color>
         </property>
         <property name="background">
          <color>
-          <red>236</red>
-          <green>236</green>
-          <blue>236</blue>
+          <red>255</red>
+          <green>255</green>
+          <blue>255</blue>
          </color>
         </property>
         <property name="scaleColor">
@@ -9709,7 +11651,7 @@ p, li { white-space: pre-wrap; }
          </color>
         </property>
         <property name="colorMode">
-         <enum>caThermo::Alarm</enum>
+         <enum>caThermo::Default</enum>
         </property>
         <property name="limitsMode">
          <enum>caThermo::Channel</enum>
@@ -9802,9 +11744,9 @@ p, li { white-space: pre-wrap; }
     </property>
     <property name="background">
      <color>
-      <red>170</red>
-      <green>255</green>
-      <blue>255</blue>
+      <red>160</red>
+      <green>160</green>
+      <blue>160</blue>
      </color>
     </property>
     <property name="labels">
@@ -9821,7 +11763,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1119</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>
@@ -10023,6 +11965,11 @@ p, li { white-space: pre-wrap; }
    <class>caScan2D</class>
    <extends>QWidget</extends>
    <header>caScan2D</header>
+  </customwidget>
+  <customwidget>
+   <class>caLineDraw</class>
+   <extends>QWidget</extends>
+   <header>caLineDraw</header>
   </customwidget>
  </customwidgets>
  <resources/>
