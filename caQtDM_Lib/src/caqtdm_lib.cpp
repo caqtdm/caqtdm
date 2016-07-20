@@ -2102,6 +2102,9 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         QString text;
 
+        // if we need to write channels from the camera widget, we do it by timer and slot
+        connect(scan2dWidget, SIGNAL(WriteDetectedValuesSignal(QWidget*)), this, SLOT(Callback_WriteDetectedValues(QWidget*)));
+
         // addmonitor normally will add a tooltip to show the pv; however here we have more than one pv
         QString tooltip;
         QString pvs1= "";
