@@ -121,7 +121,7 @@ SOURCES	+= \
     src/calabelvertical.cpp \
     src/camultilinestring.cpp \
     src/camimedisplay.cpp \
-    src/calinedemo.cpp
+    src/calinedraw.cpp
 
 XDR_HACK {
     SOURCES += src/xdr_hack.c
@@ -136,7 +136,8 @@ XDR_HACK {
 }
 
 QT += network
-HEADERS += src/networkaccess.h src/fileFunctions.h
+HEADERS += src/networkaccess.h src/fileFunctions.h \
+    src/calinedraw.h
 SOURCES += src/networkaccess.cpp src/fileFunctions.cpp
 
 
@@ -234,7 +235,6 @@ HEADERS	+= \
     src/formattype.h \
     src/calabelvertical.h \
     src/camimedisplay.h \
-    src/caWidgetInterface.h \
-    src/calinedemo.h
+    src/caWidgetInterface.h
 
 OTHER_FILES += README

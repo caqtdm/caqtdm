@@ -257,13 +257,13 @@ public:
 };
 
 
-class caLineDemoInterface : public CustomWidgetInterface_Monitors
+class caLineDrawInterface : public CustomWidgetInterface_Monitors
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
 
 public:
-    caLineDemoInterface(QObject* parent);
+    caLineDrawInterface(QObject* parent);
     virtual QWidget* createWidget(QWidget* parent);
 };
 

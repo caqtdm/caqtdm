@@ -19,7 +19,7 @@ record(ao,"ACM:TEST:AO") {
     field(LINR,"NO CONVERSION")
     field(EGUF,"0.0000000e+00")
     field(EGUL,"0.0000000e+00")
-    field(EGU,"volts")
+    field(EGU,"V")
     field(DRVH,"1000.0")
     field(DRVL,"-1000.0")
     field(HOPR,"900.0")
@@ -259,6 +259,18 @@ record(mbbo,"ACM:TEST1:MBBO") {
         field(TWST, " ")        
 }
 
+record(mbbo,"ACM:TEST2:MBBO") {
+        field(ZRVL, "0")
+        field(ONVL, "1")
+        field(ZRST, "LOW")
+        field(ONST, "HIGH")      
+}
+
+record(bo,"ACM:TEST3:BO") {
+        field(ZNAM,"LOW")
+        field(ONAM,"HIGH")
+}
+
 
 record(waveform, "ACM:TEST:WAVE"){
         field(DESC, "char waveform")
@@ -492,6 +504,13 @@ record(waveform, "ACM:TEST:LONG_WAVE"){
 
 record(waveform, "ACM:TEST:CHAR_WAVE"){
         field(FTVL, "CHAR")
+        field(NELM, "100")
+	field(HOPR,"1200")
+	field(LOPR,"-200")
+}
+
+record(waveform, "ACM:TEST:UCHAR_WAVE"){
+        field(FTVL, "UCHAR")
         field(NELM, "100")
 	field(HOPR,"1200")
 	field(LOPR,"-200")
@@ -895,19 +914,19 @@ record(waveform, "ACM:REG2D:Y"){
 
 record(ao, "roi:x"){
 	field(DESC, "Sollwert")
-	field(PREC, "0")
+	field(PREC, "3")
 }
 record(ao, "roi:y"){
 	field(DESC, "Sollwert")
-	field(PREC, "0")
+	field(PREC, "3")
 }
 record(ao, "roi:w"){
 	field(DESC, "Sollwert")
-	field(PREC, "0")
+	field(PREC, "3")
 }
 record(ao, "roi:h"){
 	field(DESC, "Sollwert")
-	field(PREC, "0")
+	field(PREC, "3")
 }
 record(ao, "99:SliderAO") {
   field(DTYP, "Soft Channel")
@@ -946,6 +965,55 @@ record(mbbiDirect, "MBBIDIECT" )
  field(DTYP, "Soft Channel")
 }
 
+
+record(ao, "SX")
+{
+  field(DTYP, "Soft Channel")
+  field(PREC, "1")
+  field(DRVH, "1000")
+  field(DRVL, "-1000")
+  field(HOPR, "900")
+  field(LOPR, "100")
+  field(FLNK, "SZ")
+  field(OUT, "SZ PP")
+}
+
+
+record(ao, "SY")
+{
+  field(DTYP, "Soft Channel")
+  field(PREC, "1")
+  field(FLNK, "SZ")
+  field(OUT, "SYC PP")
+}
+
+
+record(ao, "SX")
+{
+  field(DTYP, "Soft Channel")
+  field(PREC, "1")
+  field(FLNK, "SZ")
+  field(OUT, "SXC PP")
+}
+
+record(calc, "SXC")
+{
+  field(INPA, "SX MS")
+  field(CALC, "0.07*(A-25)")
+}
+
+record(calc, "SYC")
+{
+  field(INPA, "SY MS")
+  field(CALC, "0.07*(A-25)")
+}
+
+record(calc, "SZ")
+{
+	field(INPA, "SXC MS")
+	field(INPB, "SYC MS")
+	field(CALC,"(0.25*A*A*A*A-0.5*A*A) -0.12*A + (0.25*B*B*B*B-0.5*B*B) +1.0 -0.05*B")
+}
 
 
 

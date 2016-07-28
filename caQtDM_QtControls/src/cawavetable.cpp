@@ -39,6 +39,7 @@ caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
 {
     thisFormatC[0] = '\0';
     thisFormat[0] = '\0';
+    thisUnsigned = false;
 
     setPrecisionMode(Channel);
     setFormatType(decimal);
@@ -153,7 +154,9 @@ void caWaveTable::setupItems(int nbRows, int nbCols)
     }
 
     keepText.clear();
+    keepData.clear();
     keepText.resize(rowcount*colcount+1);
+    keepData.resize(rowcount*colcount+1);
 }
 
 void caWaveTable::cellChange(int currentRow, int currentColumn, int previousRow, int previousColumn) {
@@ -351,9 +354,11 @@ QString caWaveTable::setValue(double value, DataType dataType)
             sprintf(asc, thisFormat, value);
         }
     } else if(dataType == longs) {
-        sprintf(asc, thisFormat, (int) value);
+        if(thisUnsigned) sprintf(asc, thisFormat, (uint) value);
+        else sprintf(asc, thisFormat, (int) value);
     } else if(dataType == characters) {
-        sprintf(asc, thisFormat, (int) value);
+        if(thisUnsigned) sprintf(asc, thisFormat, (uchar) value);
+        else sprintf(asc, thisFormat, (char) value);
     }
 
     return QString(asc);
@@ -445,6 +450,9 @@ void caWaveTable::setStringList(QStringList list, short status, int size)
         displayText(i, status, list.at(i));
     }
     dataPresent = true;
+    keepDatatype = strings;
+    keepDatasize = qMin(size, maxSize);
+    keepStatus = status;
 }
 
 void caWaveTable::setData(double *array, short status, int size)
@@ -456,8 +464,12 @@ void caWaveTable::setData(double *array, short status, int size)
     setFormat(doubles);
     for(int i=0; i< qMin(size, maxSize); i++) {
         displayText(i, status, setValue(array[i], doubles));
+        keepData[i] = array[i];
     }
     dataPresent = true;
+    keepDatatype = doubles;
+    keepDatasize = qMin(size, maxSize);
+    keepStatus = status;
 }
 
 void caWaveTable::setData(float *array, short status, int size)
@@ -469,8 +481,12 @@ void caWaveTable::setData(float *array, short status, int size)
     setFormat(doubles);
     for(int i=0; i< qMin(size, maxSize); i++) {
         displayText(i, status, setValue(array[i], doubles));
+        keepData[i] = (double) array[i];
     }
     dataPresent = true;
+    keepDatatype = doubles;
+    keepDatasize = qMin(size, maxSize);
+    keepStatus = status;
 }
 
 void caWaveTable::setData(int16_t *array, short status, int size)
@@ -482,8 +498,12 @@ void caWaveTable::setData(int16_t *array, short status, int size)
     setFormat(longs);
     for(int i=0; i< qMin(size, maxSize); i++) {
         displayText(i, status, setValue(array[i], longs));
+        keepData[i] = (double) array[i];
     }
     dataPresent = true;
+    keepDatatype = longs;
+    keepDatasize = qMin(size, maxSize);
+    keepStatus = status;
 }
 
 void caWaveTable::setData(int32_t *array, short status, int size)
@@ -495,8 +515,12 @@ void caWaveTable::setData(int32_t *array, short status, int size)
     setFormat(longs);
     for(int i=0; i< qMin(size, maxSize); i++) {
         displayText(i, status, setValue(array[i], longs));
+        keepData[i] = (double) array[i];
     }
     dataPresent = true;
+    keepDatatype = longs;
+    keepDatasize = qMin(size, maxSize);
+    keepStatus = status;
 }
 
 void caWaveTable::setData(char *array, short status, int size)
@@ -508,9 +532,27 @@ void caWaveTable::setData(char *array, short status, int size)
     setFormat(characters);
     for(int i=0; i< qMin(size, maxSize); i++) {
         displayText(i, status, setValue((double) ((int) array[i]), characters));
+        keepData[i] =  (double) ((int) array[i]);
     }
     dataPresent = true;
+    keepDatatype = characters;
+    keepDatasize = qMin(size, maxSize);
+    keepStatus = status;
 }
+
+void caWaveTable::setDataType(QString const &datatype)
+{
+    if(datatype.contains("U")) thisUnsigned = true;
+    else thisUnsigned = false;
+
+    if(keepDatatype == strings) return;
+    if(dataPresent) {
+        for(int i=0; i< keepDatasize; i++) {
+            displayText(i, keepStatus, setValue(keepData[i], keepDatatype));
+        }
+    }
+}
+
 
 void caWaveTable::setAccessW(bool access)
 {

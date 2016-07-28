@@ -1071,19 +1071,24 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                 if(i==7) thisString = cameraWidget->getROIChannelsRead().split(";");
                 if(i==8) thisString = cameraWidget->getROIChannelsWrite().split(";");
 
-                if(thisString.count() == 4 &&
-                        thisString.at(0).trimmed().length() > 0 &&
-                        thisString.at(1).trimmed().length() > 0  &&
-                        thisString.at(2).trimmed().length() > 0 &&
-                        thisString.at(3).trimmed().length() > 0) {
-                    for(int j=0; j<4; j++) {
-                        if(i==7)specData[0] = i+j;   // x,y,w,h
-                        text = treatMacro(map, thisString.at(j), &doNothing);
-                        if(i==7)addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
-                        if(i==7)pvs1.append(pv);
-                        if(i==8)pvs2.append(text);
-                        if((j<3) && (i==7))pvs1.append(";");
-                        if((j<3) && (i==8))pvs2.append(";");
+                if(thisString.count() >= 4) {
+                    if(thisString.at(0).trimmed().length() > 0 && thisString.at(1).trimmed().length() > 0  &&
+                       thisString.at(2).trimmed().length() > 0 &&thisString.at(3).trimmed().length() > 0) {
+
+                        for(int j=0; j<4; j++) {
+                            text = treatMacro(map, thisString.at(j), &doNothing);
+                            if(i==7) {
+                                specData[0] = i+j;   // x,y,w,h
+                                addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
+                                pvs1.append(pv);
+                                if( j<3) pvs1.append(";");
+                            } else if(i==8) {
+                                specData[0] = i+j+4; // x,y,w,h
+                                addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
+                                pvs2.append(text);
+                                if(j<3) pvs2.append(";");
+                            }
+                        }
                     }
                 }
             }
@@ -1219,7 +1224,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             addMonitor(myWidget, &kData, multilinestringWidget->getPV(), w1, specData, map, &pv);
             multilinestringWidget->setPV(pv);
         }
-
 
         multilinestringWidget->setProperty("Taken", true);
 
@@ -2089,10 +2093,16 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         w1->setProperty("ObjectType", caWaveTable_Widget);
 
         if(wavetableWidget->getPV().size() > 0) {
-            addMonitor(myWidget, &kData, wavetableWidget->getPV(), w1, specData, map, &pv);
+
+            // add also the FTVL field in order to know if we have signed or unsigned data
+            specData[0] = 1;
+            addMonitor(myWidget, &kData, wavetableWidget->getPV().trimmed() + ".FTVL", w1, specData, map, &pv);
+
+            specData[0] = 0;
+            addMonitor(myWidget, &kData, wavetableWidget->getPV().trimmed(), w1, specData, map, &pv);
             wavetableWidget->setPV(pv);
-            connect(wavetableWidget, SIGNAL(WaveEntryChanged(QString, int)), this,
-                    SLOT(Callback_WaveEntryChanged(QString, int)));
+
+            connect(wavetableWidget, SIGNAL(WaveEntryChanged(QString, int)), this, SLOT(Callback_WaveEntryChanged(QString, int)));
         }
         wavetableWidget->setProperty("Taken", true);
         wavetableWidget->setToolTip("select row or columns, then with Ctrl+C you can copy to the clipboard\ninside X11 you can then do shft+ins\nwhen doubleclicking on a value, you can change the value");
@@ -2104,6 +2114,9 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         //qDebug() << "create caScan2D";
 
         QString text;
+
+        // if we need to write channels from the camera widget, we do it by timer and slot
+        connect(scan2dWidget, SIGNAL(WriteDetectedValuesSignal(QWidget*)), this, SLOT(Callback_WriteDetectedValues(QWidget*)));
 
         // addmonitor normally will add a tooltip to show the pv; however here we have more than one pv
         QString tooltip;
@@ -4025,29 +4038,37 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         if(data.edata.connected) {
             // data from vector
-            if(data.edata.valueCount > 0 && data.edata.dataB != (void*) 0) {
-                if((wavetableWidget->getPrecisionMode() != caWaveTable::User) && (data.edata.initialize)) {
-                    wavetableWidget->setActualPrecision(data.edata.precision);
-                }
-                if(data.edata.fieldtype == caSTRING) {
-                    QStringList list;
-                    list = String.split((QChar)27);
-                    wavetableWidget->setStringList(list, data.edata.status, list.size());
+            if(data.specData[0] == 0) {
+                if(data.edata.valueCount > 0 && data.edata.dataB != (void*) 0) {
+                    if((wavetableWidget->getPrecisionMode() != caWaveTable::User) && (data.edata.initialize)) {
+                        wavetableWidget->setActualPrecision(data.edata.precision);
+                    }
+                    if(data.edata.fieldtype == caSTRING) {
+                        QStringList list;
+                        list = String.split((QChar)27);
+                        wavetableWidget->setStringList(list, data.edata.status, list.size());
+                    } else {
+                        WaveTable(wavetableWidget, data);
+                    }
                 } else {
-                    WaveTable(wavetableWidget, data);
+                    QStringList list;
+                    for(int i=0; i<qMax(1,wavetableWidget->getNumberOfRows()); i++) {
+                        for(int j=0; j<wavetableWidget->getNumberOfColumns(); j++) list.append("????");
+                    }
+                    wavetableWidget->setStringList(list, NOTCONNECTED, list.size());
                 }
-            } else {
-                wavetableWidget->displayText(0, NOTCONNECTED, "????");
+            } else if(data.specData[0] == 1) {
+                QStringList list;
+                list = String.split((QChar)27);
+                wavetableWidget->setDataType(list.at( data.edata.ivalue));
             }
 
         } else {
-            for(int i=0; i<wavetableWidget->getNumberOfRows(); i++) {
-                int nbCol = wavetableWidget->getNumberOfColumns();
-                int nbRow = i*nbCol;
-                for(int j=0; j<nbCol; j++) {
-                    wavetableWidget->displayText(nbRow+j, NOTCONNECTED, "NC");
-                }
+            QStringList list;
+            for(int i=0; i<qMax(1,wavetableWidget->getNumberOfRows()); i++) {
+                for(int j=0; j<wavetableWidget->getNumberOfColumns(); j++) list.append("NC");
             }
+            wavetableWidget->setStringList(list, NOTCONNECTED, list.size());
         }
 
         // bitnames table with text and coloring according the value=========================================================
@@ -4499,7 +4520,7 @@ void CaQtDM_Lib::Callback_ChoiceClicked(const QString& text)
 
     if(choice->getPV().length() > 0) {
         //qDebug() << "choice_clicked" << text << choice->getPV();
-        QStringsToChars(choice->getPV(), text,  choice->objectName().toLower());
+        QStringsToChars(choice->getPV().trimmed(), text,  choice->objectName().toLower());
         ControlsInterface * plugininterface = (ControlsInterface *) choice->property("Interface").value<void *>();
         if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue(param1, 0.0, 0, param2, param3, errmess, 0);
     }
@@ -4517,7 +4538,7 @@ void CaQtDM_Lib::Callback_MenuClicked(const QString& text)
 
     if(menu->getPV().length() > 0) {
         //qDebug() << "menu_clicked" << text << menu->getPV();
-        QStringsToChars(menu->getPV(), text,  menu->objectName().toLower());
+        QStringsToChars(menu->getPV().trimmed(), text,  menu->objectName().toLower());
         ControlsInterface * plugininterface = (ControlsInterface *) menu->property("Interface").value<void *>();
         if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue(param1, 0.0, 0, param2, param3, errmess, 0);
     }
@@ -6058,10 +6079,12 @@ int CaQtDM_Lib::Execute(char *command)
 }
 #endif
 
-void CaQtDM_Lib::TreatOrdinaryValue(QString pv, double value, int32_t idata,  QString svalue, QWidget *w)
+void CaQtDM_Lib::TreatOrdinaryValue(QString pvo, double value, int32_t idata,  QString svalue, QWidget *w)
 {
     char errmess[255];
     int indx;
+
+    QString pv = pvo.trimmed();
 
     //qDebug() << "treatordinary value " << pv << w;
     knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv);
@@ -6110,7 +6133,7 @@ long CaQtDM_Lib::getValueFromString(char *textValue, FormatType fType, char **en
 /**
   * this routine will treat the string, command, value to write to the pv
   */
-void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, FormatType fType, QWidget *w)
+void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType, QWidget *w)
 {
     char errmess[255];
     double value;
@@ -6119,6 +6142,8 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, FormatType fType,
     bool match;
     int indx;
     ControlsInterface * plugininterface = (ControlsInterface *) 0;
+
+    QString pv = pvo.trimmed();
 
     FormatType fTypeNew;
 
@@ -6252,7 +6277,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pv, QString text, FormatType fType,
 /**
   * this routine will treat the values to write to the pv
   */
-void CaQtDM_Lib::TreatRequestedWave(QString pv, QString text, caWaveTable::FormatType fType, int index, QWidget *w)
+void CaQtDM_Lib::TreatRequestedWave(QString pvo, QString text, caWaveTable::FormatType fType, int index, QWidget *w)
 {
     char    errmess[255], sdata[40], asc[100];
     int32_t data32[1];
@@ -6262,6 +6287,8 @@ void CaQtDM_Lib::TreatRequestedWave(QString pv, QString text, caWaveTable::Forma
     long    longValue;
     char    *end = NULL, textValue[255];
     bool    match;
+
+    QString pv = pvo.trimmed();
 
     ControlsInterface * plugininterface = (ControlsInterface *) w->property("Interface").value<void *>();
     if(plugininterface == (ControlsInterface *) 0) return;
@@ -6984,8 +7011,9 @@ void CaQtDM_Lib::StripPlotsVerticalAlign()
 
 void CaQtDM_Lib::Callback_WriteDetectedValues(QWidget* child)
 {
-    int x,y,w,h,count=4;
-    double values[4];
+    double x,y,w,h;
+    int count=4;
+    double values[4] = {0,0,0,0};
 
     QStringList thisString;
     QWidget *widget = (QWidget *) 0;
@@ -7011,6 +7039,9 @@ void CaQtDM_Lib::Callback_WriteDetectedValues(QWidget* child)
         return;
     }
 
+    double deltax = -(P1.x() - P2.x());
+    double deltay = -(P1.y() - P2.y());
+
     switch (roiType) {
     case none:
         return;
@@ -7026,12 +7057,22 @@ void CaQtDM_Lib::Callback_WriteDetectedValues(QWidget* child)
         values[3] = P2.y();
         break;
     case xyUpleft_xyLowright:
-        if((P2.x() < P1.x() ) || (P2.y() < P1.y())) {
+        if(deltax < 0 && deltay > 0) {
+            values[0] = P2.x();
+            values[1] = P1.y();
+            values[2] = P1.x();
+            values[3] = P2.y();
+        } else if(deltax < 0 && deltay < 0) {
             values[0] = P2.x();
             values[1] = P2.y();
             values[2] = P1.x();
             values[3] = P1.y();
-        } else {
+        } else if(deltax > 0 && deltay < 0) {
+            values[0] = P1.x();
+            values[1] = P2.y();
+            values[2] = P2.x();
+            values[3] = P1.y();
+        } else if(deltax > 0 && deltay > 0) {
             values[0] = P1.x();
             values[1] = P1.y();
             values[2] = P2.x();
@@ -7040,14 +7081,14 @@ void CaQtDM_Lib::Callback_WriteDetectedValues(QWidget* child)
         break;
     case xycenter_width_height:
     {
-        int ROIx = x = qRound(P1.x());
-        int ROIy = y = qRound(P1.y());
-        int ROIw = w = qRound(P2.x() - P1.x());
-        int ROIh = h = qRound(P2.y() - P1.y());
+        double ROIx = x = P1.x();
+        double ROIy = y = P1.y();
+        double ROIw = w = P2.x() - P1.x();
+        double ROIh = h = P2.y() - P1.y();
         if(ROIw < 0) { x = ROIx + ROIw; w = -ROIw;}
         if(ROIh < 0) { y = ROIy + ROIh; h = -ROIh;}
-        values[0] = x+qRound(w/2.0);
-        values[1] = y+qRound(h/2.0);
+        values[0] = x+w/2.0;
+        values[1] = y+h/2.0;
         values[2]=w;
         values[3]=h;
     }

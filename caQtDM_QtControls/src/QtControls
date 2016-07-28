@@ -43,7 +43,7 @@
 #include <cabytecontroller.h>
 #include <calabelvertical.h>
 #include <camimedisplay.h>
-#include <calinedemo.h>
+#include <calinedraw.h>
 
 #ifndef MOBILE
     #include <cadoubletabwidgetextension.h>

@@ -785,21 +785,26 @@ void caCamera::MinMaxLock(SyncMinMax* MinMax, uint Max[2], uint Min[2])
 void caCamera::MinMaxImageLock(QVector<uint> LineData, int y, QSize resultSize, SyncMinMax* MinMax)
 {
     MinMax->imageLock->lock();
-    uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
-    memcpy(scanLine, LineData.constData(), resultSize.width() * sizeof(uint));
-    MinMax->imageLock->unlock();
+    if(image != (QImage *) 0) {
+        if (image->height()>y){
+            uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
+            if (scanLine){
+                memcpy(scanLine, LineData.constData(), resultSize.width() * sizeof(uint));
+            }
+        }
+    }
+	MinMax->imageLock->unlock();
 }
 
 void caCamera::InitLoopdata(int &ystart, int &yend, long &i, QVector<uint> &LineData, int increment, int sector, int sectorcount, QSize resultSize, uint Max[2], uint Min[2])
 {
-    //LineData.reserve(resultSize.width());
     LineData.resize(resultSize.width());
 
     Max[1] = 0;
     Min[1] = 65535;
 
     ystart = sector * resultSize.height() / sectorcount;
-    yend = sector * resultSize.height() / sectorcount + resultSize.height() / sectorcount;
+    yend = ((sector + 1) * resultSize.height()) / sectorcount; //     sector * resultSize.height() / sectorcount + resultSize.height() / sectorcount;
     i = resultSize.width() * ystart * increment;
 }
 
@@ -1033,13 +1038,15 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
     uint Max[2], Min[2];
 
     //__itt_event mark_event;
-
     if(!m_bppDefined) return (QImage *) 0;
     if(!m_widthDefined) return (QImage *) 0;
     if(!m_heightDefined) return (QImage *) 0;
     if(!m_codeDefined) return (QImage *) 0;
-    if(!(m_width>0)) return (QImage *) 0;
-    if(!(m_height>0)) return (QImage *) 0;
+    if(!(m_width>0)||!(m_height>0)) {
+        savedWidth = m_width;
+        savedHeight = m_height;
+        return (QImage *) 0;
+    }
 
     resultSize.setWidth(m_width);
     resultSize.setHeight(m_height);
@@ -1116,7 +1123,6 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
 
     int threadcounter=QThread::idealThreadCount()*2/3;  // seems to be a magic number
     if(threadcounter < 1) threadcounter = 1;
-    //printf("threadcounter=%d\n", threadcounter);
 
     QFutureSynchronizer<void> Sectors;
     for (int x=0;x<threadcounter;x++){
@@ -1150,8 +1156,9 @@ void caCamera::showImage(int datasize, char *data)
     //QElapsedTimer timer;
     //timer.start();
     image = showImageCalc(datasize, data);
-    //printf("Image timer 1 : %d milliseconds \n", (int) timer.elapsed());
+    //printf("Image timer 1 : %d (%x) milliseconds \n", (int) timer.elapsed(),image);
 
+    //fflush(stdout);
     if(image != (QImage *) 0) updateImage(*image, readvaluesPresent, readvalues, scaleFactor);
 
     if(getAutomateChecked()) {

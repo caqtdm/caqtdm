@@ -31,12 +31,13 @@
 #include "fontscalingwidget.h"
 #include "caWidgetInterface.h"
 
-class QTCON_EXPORT caLineDemo : public QWidget, public FontScalingWidget, public caWidgetInterface
+class QTCON_EXPORT caLineDraw : public QWidget, public FontScalingWidget, public caWidgetInterface
 {
     Q_OBJECT
 
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
     Q_PROPERTY(Alignment alignment READ getAlignment WRITE setAlignment)
+    Q_PROPERTY(Direction direction READ getDirection WRITE setDirection)
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
@@ -70,6 +71,7 @@ class QTCON_EXPORT caLineDemo : public QWidget, public FontScalingWidget, public
     Q_ENUMS(ScaleMode)
     Q_ENUMS(alertHandling)
     Q_ENUMS(FormatType)
+    Q_ENUMS(Direction)
 
 public:
 
@@ -82,9 +84,10 @@ public:
     enum alertHandling { onForeground = 0, onBackground };
     enum colMode {Default=0, Static, Alarm_Default, Alarm_Static};
     enum SourceMode {Channel = 0, User};
+    enum Direction {Horizontal = 0, Up, Down};
 
-    caLineDemo(QWidget *parent = 0);
-    ~caLineDemo() {}
+    caLineDraw(QWidget *parent = 0);
+    ~caLineDraw() {}
 
     // caWidgetInterface implementation
     void caDataUpdate(const QString& units, const QString& String, const knobData& data);
@@ -157,6 +160,11 @@ public:
     void setFormat(int prec);
     void setValue(double value, const QString& units);
 
+    void setDirection(const Direction &direction);
+    Direction getDirection() const {return m_Direction;}
+
+    bool rotateText(float degrees);
+
 protected:
     virtual bool event(QEvent *);
     virtual QSize sizeHint() const;
@@ -173,6 +181,7 @@ private:
     QColor m_BackColorDefault, m_ForeColorDefault;
     colMode m_ColorMode, m_ColorModeOld;
     Alignment m_Alignment;
+    Direction m_Direction;
     alertHandling m_AlarmHandling;
     bool m_UnitMode;
     double m_Maximum, m_Minimum;
