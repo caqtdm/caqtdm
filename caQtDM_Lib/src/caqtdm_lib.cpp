@@ -2084,6 +2084,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             // add also the FTVL field in order to know if we have signed or unsigned data
             specData[0] = 1;
             addMonitor(myWidget, &kData, wavetableWidget->getPV().trimmed() + ".FTVL", w1, specData, map, &pv);
+            wavetableWidget->setPV(pv);
 
             specData[0] = 0;
             addMonitor(myWidget, &kData, wavetableWidget->getPV().trimmed(), w1, specData, map, &pv);
@@ -4047,7 +4048,10 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             } else if(data.specData[0] == 1) {
                 QStringList list;
                 list = String.split((QChar)27);
-                wavetableWidget->setDataType(list.at( data.edata.ivalue));
+                // here we have to be carefull, while a waveform will give you an index to
+                // a list ("STRING", "CHAR", "UCHAR", "SHORT", "USHORT", "LONG", "ULONG", "FLOAT", "DOUBLE", "ENUM")
+                // however it could be something else
+                if(data.edata.ivalue < list.count()) wavetableWidget->setDataType(list.at(data.edata.ivalue));
             }
 
         } else {
