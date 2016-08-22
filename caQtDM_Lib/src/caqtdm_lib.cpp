@@ -2084,7 +2084,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             // add also the FTVL field in order to know if we have signed or unsigned data
             specData[0] = 1;
             addMonitor(myWidget, &kData, wavetableWidget->getPV().trimmed() + ".FTVL", w1, specData, map, &pv);
-            wavetableWidget->setPV(pv);
 
             specData[0] = 0;
             addMonitor(myWidget, &kData, wavetableWidget->getPV().trimmed(), w1, specData, map, &pv);
