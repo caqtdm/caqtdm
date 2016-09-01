@@ -63,8 +63,9 @@ MutexKnobData::MutexKnobData()
     ftime(&last);
     ftime(&monitorTiming);
 
-    // start a timer with 50Hz
-    timerId = startTimer(20);
+    // start a timer with 10Hz
+    prvRepetitionRate = DEFAULTRATE;
+    timerId = startTimer(1000/DEFAULTRATE);
 
     myUpdateType = UpdateTimed;
 
@@ -488,7 +489,7 @@ extern "C" MutexKnobData* C_SetMutexKnobDataReceived(MutexKnobData* p, knobData 
 //*********************************************************************************************************************
 
 /**
-  * timer is running with 50 ms speed
+  * timer is running with default (5 Hz) speed
   */
 void MutexKnobData::timerEvent(QTimerEvent *)
 {
@@ -497,10 +498,26 @@ void MutexKnobData::timerEvent(QTimerEvent *)
     char fec[40];
     char dataString[STRING_EXCHANGE_SIZE];
     struct timeb now;
+    int repetitionRate = DEFAULTRATE;
 
     if(blockProcess) return;
 
     ftime(&now);
+
+    // do we have something that should go faster then 5 Hz, then change timer, but change back when nothing fast requested
+    for(int i=0; i < GetMutexKnobDataSize(); i++) {
+        knobData *kPtr = (knobData*) &KnobData[i];
+        if(kPtr->index != -1) {
+          if(kPtr->edata.repRate > repetitionRate) repetitionRate = kPtr->edata.repRate;
+          if(repetitionRate > 50) repetitionRate = 50;  // not more than 50Hz
+        }
+    }
+    if(repetitionRate != prvRepetitionRate) {
+        killTimer(timerId);
+        timerId = startTimer(1000/repetitionRate);
+        //qDebug() << repetitionRate << prvRepetitionRate << 1000/repetitionRate << "ms";
+        prvRepetitionRate = repetitionRate;
+    }
 
     //qDebug() << "============================================";
     for(int i=0; i < GetMutexKnobDataSize(); i++) {

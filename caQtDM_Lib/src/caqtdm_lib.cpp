@@ -2320,7 +2320,7 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
 
     ftime(&now);
     w->setProperty("Connect", false);
-    int rate = 5;  // default will be 5Hz
+    int rate = DEFAULTRATE;  // default will be 5Hz
 
     if(pv.size() == 0) return -1;
 

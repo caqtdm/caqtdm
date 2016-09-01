@@ -39,7 +39,7 @@
 #include "knobData.h"
 #include "mutexKnobDataWrapper.h"
 
-
+#define DEFAULTRATE 5
 
 class CAQTDM_LIBSHARED_EXPORT MutexKnobData: public QObject {
     Q_OBJECT
@@ -97,7 +97,7 @@ private:
     QMutex mutex;
     knobData *KnobData;
     int KnobDataArraySize;
-    int timerId;
+    int timerId, prvRepetitionRate;
     QMap<QString, int> softPV_WidgetList;
     QMap<QString, int> softPV_List;
 
