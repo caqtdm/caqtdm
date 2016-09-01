@@ -39,7 +39,7 @@
 #include "knobData.h"
 #include "mutexKnobDataWrapper.h"
 
-#define DEFAULTRATE 5
+#define DEFAULTRATE 10
 
 class CAQTDM_LIBSHARED_EXPORT MutexKnobData: public QObject {
     Q_OBJECT
