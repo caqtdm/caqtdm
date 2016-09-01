@@ -170,7 +170,7 @@ void ENumeric::init()
         temp->setObjectName(QString("layoutmember") + QString().setNum(i));
         temp->installEventFilter(lCWME);
 #ifndef MOBILE
-        temp->setAutoRepeat(true);
+        temp->setAutoRepeat(false);
         temp->setAutoRepeatInterval(200);
         temp->setAutoRepeatDelay(500);
 #endif
@@ -190,7 +190,7 @@ void ENumeric::init()
         temp2->setObjectName(QString("layoutmember") + QString().setNum(i));
         temp2->installEventFilter(lCWME);
 #ifndef MOBILE
-        temp2->setAutoRepeat(true);
+        temp2->setAutoRepeat(false);
         temp2->setAutoRepeatInterval(200);
         temp2->setAutoRepeatDelay(500);
 #endif
