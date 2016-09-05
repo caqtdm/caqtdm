@@ -230,7 +230,7 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
             QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 
             Coordinates(Xpos, Ypos,  Xnew, Ynew, Xmax, Ymax);
-            P1 = QPointF(Xnew, Ynew);
+            P3 = P1 = QPointF(Xnew, Ynew);
             P1_old = QPointF(-1, -1);
             P2_old = QPointF(-1, -1);
 
@@ -266,6 +266,7 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
 
         if(getROIwriteType() != xy_only) {
             P2 = QPointF(Xnew, Ynew);
+            P3 = (P1 + P2)/2;
 
             // for gray selection rectangle
             QPoint mouseOffset = mouseEvent->pos() ;
@@ -273,7 +274,7 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
             y1 = mouseOffset.y() - valuesWidget->height() + scrollArea->verticalScrollBar()->value();
             selectionPoints[1] = QPoint(x1, y1);
         } else {
-            P1 = P2 = QPointF(Xnew, Ynew);
+            P3 = P1 = P2 = QPointF(Xnew, Ynew);
         }
     }
 
@@ -536,6 +537,12 @@ void caCamera::zoomNow()
     zoomValue->setText(QString::number(scale, 'f', 3));
     scaleFactor = scale;
     setFitToSize(No);
+
+    // keep centered on last pick
+    int posX =  P3.x() * scaleFactor;
+    int posY =  P3.y() * scaleFactor;
+    scrollArea->horizontalScrollBar()->setValue(posX - scrollArea->horizontalScrollBar()->pageStep()/2);
+    scrollArea->verticalScrollBar()->setValue(posY - scrollArea->verticalScrollBar()->pageStep()/2);
 }
 
 void caCamera::zoomIn(int level)
@@ -696,6 +703,7 @@ void caCamera::resizeEvent(QResizeEvent *e)
     if(m_widthDefined && m_heightDefined) {
         if(!thisFitToSize) {
             imageW->setMinimumSize((int) (m_width * scaleFactor), (int) (m_height * scaleFactor));
+
         } else if((zoomWidget != (QWidget*) 0) && (valuesWidget != (QWidget*) 0)) {
             double Xcorr = (double) (e->size().width() - zoomWidget->width()-4) / (double) savedWidth;
             double Ycorr = (double) (e->size().height()- valuesWidget->height()-4) / (double) savedHeight;
@@ -708,6 +716,11 @@ void caCamera::resizeEvent(QResizeEvent *e)
             imageW->setFixedWidth(e->size().width() - zoomWidget->width()-4);
             imageW->setFixedHeight(e->size().height()- valuesWidget->height()-4);
             scaleFactor = scale;
+
+            // define the middle of the image for zooming on center of the image
+            double Xnew, Ynew, Xmax, Ymax;
+            Coordinates((int) (m_width * scaleFactor)/2,  (int) (m_height * scaleFactor)/2,  Xnew, Ynew, Xmax, Ymax);
+            P3 = QPointF(Xnew, Ynew);
         }
     }
     if(image != (QImage *) 0)  imageW->rescaleSelectionBox(scaleFactor);

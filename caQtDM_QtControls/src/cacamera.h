@@ -298,7 +298,7 @@ private:
     bool designerVisible[10];
 
     QTimer *writeTimer;
-    QPointF P1, P2, P1_old, P2_old;
+    QPointF P1, P2, P1_old, P2_old, P3;
     bool selectionInProgress;
 
     QStringList thisList;

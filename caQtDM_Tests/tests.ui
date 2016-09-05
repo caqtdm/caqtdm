@@ -120,7 +120,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: rgb(0,0,120);}</string>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <property name="usesScrollButtons">
      <bool>true</bool>
@@ -1614,8 +1614,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>100</width>
-           <height>30</height>
+           <width>431</width>
+           <height>191</height>
           </rect>
          </property>
          <attribute name="label">
@@ -8651,7 +8651,7 @@ def PythonCalc(a, b, c, d):
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
@@ -8687,8 +8687,8 @@ p, li { white-space: pre-wrap; }
        <widget class="caApplyNumeric" name="endValueSet">
         <property name="geometry">
          <rect>
-          <x>110</x>
-          <y>405</y>
+          <x>251</x>
+          <y>311</y>
           <width>181</width>
           <height>66</height>
          </rect>
@@ -9020,6 +9020,113 @@ p, li { white-space: pre-wrap; }
         <property name="actOnBeam" stdset="0">
          <bool>true</bool>
         </property>
+       </widget>
+       <widget class="QScrollArea" name="scrollArea_2">
+        <property name="geometry">
+         <rect>
+          <x>45</x>
+          <y>296</y>
+          <width>179</width>
+          <height>119</height>
+         </rect>
+        </property>
+        <property name="widgetResizable">
+         <bool>false</bool>
+        </property>
+        <widget class="QWidget" name="scrollAreaWidgetContents_2">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>155</width>
+           <height>172</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="caNumeric" name="caNumeric_14">
+            <property name="autoFillBackground">
+             <bool>false</bool>
+            </property>
+            <property name="integerDigits" stdset="0">
+             <number>4</number>
+            </property>
+            <property name="decimalDigits" stdset="0">
+             <number>1</number>
+            </property>
+            <property name="digitsFontScaleEnabled">
+             <bool>true</bool>
+            </property>
+            <property name="channel" stdset="0">
+             <string>ACM:TEST:AO</string>
+            </property>
+            <property name="background">
+             <color>
+              <red>170</red>
+              <green>255</green>
+              <blue>255</blue>
+             </color>
+            </property>
+            <property name="precisionMode">
+             <enum>caNumeric::User</enum>
+            </property>
+            <property name="fixedFormat">
+             <bool>true</bool>
+            </property>
+            <property name="limitsMode">
+             <enum>caNumeric::Channel</enum>
+            </property>
+            <property name="maxValue">
+             <double>100.000000000000000</double>
+            </property>
+            <property name="minValue">
+             <double>0.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="caNumeric" name="caNumeric_15">
+            <property name="autoFillBackground">
+             <bool>false</bool>
+            </property>
+            <property name="integerDigits" stdset="0">
+             <number>4</number>
+            </property>
+            <property name="decimalDigits" stdset="0">
+             <number>1</number>
+            </property>
+            <property name="digitsFontScaleEnabled">
+             <bool>true</bool>
+            </property>
+            <property name="channel" stdset="0">
+             <string>ACM:TEST:AO</string>
+            </property>
+            <property name="background">
+             <color>
+              <red>85</red>
+              <green>170</green>
+              <blue>255</blue>
+             </color>
+            </property>
+            <property name="precisionMode">
+             <enum>caNumeric::Channel</enum>
+            </property>
+            <property name="fixedFormat">
+             <bool>true</bool>
+            </property>
+            <property name="limitsMode">
+             <enum>caNumeric::Channel</enum>
+            </property>
+            <property name="maxValue">
+             <double>100.000000000000000</double>
+            </property>
+            <property name="minValue">
+             <double>0.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </widget>
       <widget class="QWidget" name="tab_18">
