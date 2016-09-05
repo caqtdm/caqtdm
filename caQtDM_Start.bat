@@ -34,8 +34,8 @@ echo ===========================================================================
 
 echo ============ start caqtdm =================
 set PATH=%PATH%;%JOM%
-set PATH=%PATH%;%QTHOME%\bin
-set PATH=%PATH%;%QWTLIB%
+set PATH=%QTHOME%\bin;%PATH%
+set PATH=%QWTLIB%;%PATH%
 
 
 
