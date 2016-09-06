@@ -1677,21 +1677,23 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
                     //qDebug() << "cainclude ++"<< cainclude_path << level;
 
+                    // take into account recursive use of directories (bug fix of 6.9.2016)
                     if(includeWidget->getFileName().trimmed().contains("/")) {
-                     QStringList pathcomponents=includeWidget->getFileName().trimmed().split("/");
-                     pathcomponents.erase(pathcomponents.end()-1);
-                     cainclude_path=cainclude_path+pathcomponents.join("/")+"/";
+                        QStringList pathcomponents=includeWidget->getFileName().trimmed().split("/");
+                        pathcomponents.erase(pathcomponents.end()-1);
+                        cainclude_path=cainclude_path+pathcomponents.join("/")+"/";
                     }
 
                     scanWidgets(thisW->findChildren<QWidget *>(), macroS);
 
+                    // take into account recursive use of directories
                     if(cainclude_path.contains("/")) {
-                      QStringList pathcomponents=cainclude_path.split("/");
-                      pathcomponents.erase(pathcomponents.end()-1);// last added slash have to be deleted too
-                      pathcomponents.erase(pathcomponents.end()-1);
-                     if(pathcomponents.count()==0) {
-                        cainclude_path="";
-                      }else cainclude_path=pathcomponents.join("/")+"/";
+                        QStringList pathcomponents=cainclude_path.split("/");
+                        pathcomponents.erase(pathcomponents.end()-1);// last added slash have to be deleted too
+                        pathcomponents.erase(pathcomponents.end()-1);
+                        if(pathcomponents.count()==0) {
+                            cainclude_path="";
+                        }else cainclude_path=pathcomponents.join("/")+"/";
 
                     }
 
