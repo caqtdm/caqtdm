@@ -450,7 +450,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
 
     level=0;
-
+    cainclude_path="";
     // say for all widgets that they have to be treated, will be set to true when treated to avoid multiple use
     // by findChildren, and get the list of all the includes at this level
 
@@ -1517,6 +1517,9 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         // define the file to use
         QString fileName = includeWidget->getFileName().trimmed();
+        if (level>0){
+          fileName = cainclude_path + fileName;
+        }
         reaffectText(map, &fileName);
 
         QString openFile = "";
@@ -1672,9 +1675,28 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     // keep actual filename
                     savedFile[level] = fi.baseName();
 
+                    //qDebug() << "cainclude ++"<< cainclude_path << level;
+
+                    if(includeWidget->getFileName().trimmed().contains("/")) {
+                     QStringList pathcomponents=includeWidget->getFileName().trimmed().split("/");
+                     pathcomponents.erase(pathcomponents.end()-1);
+                     cainclude_path=cainclude_path+pathcomponents.join("/")+"/";
+                    }
+
                     scanWidgets(thisW->findChildren<QWidget *>(), macroS);
 
+                    if(cainclude_path.contains("/")) {
+                      QStringList pathcomponents=cainclude_path.split("/");
+                      pathcomponents.erase(pathcomponents.end()-1);// last added slash have to be deleted too
+                      pathcomponents.erase(pathcomponents.end()-1);
+                     if(pathcomponents.count()==0) {
+                        cainclude_path="";
+                      }else cainclude_path=pathcomponents.join("/")+"/";
+
+                    }
+
                     level--;
+                    //qDebug() << "cainclude --"<< cainclude_path << level;
                 }
 
             } else {

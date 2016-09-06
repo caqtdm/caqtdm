@@ -306,6 +306,7 @@ private:
     QList<QStackedWidget *> allStacks;
 
     int level;
+    QString cainclude_path;
     // 50 levels of includes should do it
     QString savedMacro[50];
     QString savedFile[50];
