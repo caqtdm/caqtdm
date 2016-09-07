@@ -47,6 +47,28 @@
 #else
 #include <QtGui/QApplication>
 #endif
+/*
+class MyApplication: public QApplication
+{
+
+public:
+    MyApplication (int &argc, char ** argv ): QApplication ( argc, argv ) {}
+    ~MyApplication() {}
+
+private:
+    virtual bool notify(QObject* receiver, QEvent* e)  {
+
+        try {
+            //qDebug() << "## trying to notify application..";
+            return QApplication::notify(receiver, e);
+        } catch (std::exception& e) {
+            qDebug() << "## !!FATAL!! Exception thrown: " << e.what();
+        }
+
+        return false;
+    }
+};
+*/
 
 static void unixSignalHandler(int signum) {
 
@@ -92,6 +114,9 @@ int main(int argc, char *argv[])
 #ifdef MOBILE
     Q_INIT_RESOURCE(qtcontrols);
 #endif
+
+    //MyApplication app(argc, argv);
+
     QApplication app(argc, argv);
     QApplication::setOrganizationName("Paul Scherrer Institut");
     QApplication::setApplicationName("caQtDM");

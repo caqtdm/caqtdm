@@ -1675,7 +1675,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     // keep actual filename
                     savedFile[level] = fi.baseName();
 
-                    //qDebug() << "cainclude ++"<< cainclude_path << level;
+                    //qDebug() << "cainclude ++"<< cainclude_path << level << fi.baseName();
 
                     // take into account recursive use of directories (bug fix of 6.9.2016)
                     if(includeWidget->getFileName().trimmed().contains("/")) {
@@ -1689,7 +1689,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     // take into account recursive use of directories
                     if(cainclude_path.contains("/")) {
                         QStringList pathcomponents=cainclude_path.split("/");
-                        pathcomponents.erase(pathcomponents.end()-1);// last added slash have to be deleted too
+                        pathcomponents.erase(pathcomponents.end()-1);// last added slash has to be deleted too
                         pathcomponents.erase(pathcomponents.end()-1);
                         if(pathcomponents.count()==0) {
                             cainclude_path="";

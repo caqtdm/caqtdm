@@ -479,12 +479,39 @@ void caCartesianPlot::displayData(int curvIndex, int curvType)
     }
 }
 
+#define SMALLEST -1.e20
+#define BIGGEST 1.e20
 // this routine will prevent that we have problems with negative values when logarithmic scale
 // and will keep the values in order to switch between log and linear scale
 void caCartesianPlot::setSamplesData(int index, double *x, double *y, int size, bool saveFlag)
 {
-    // saving the data allows to switch between log and lin when no new monitor is coming
+    // in case of autoscaling and you have infinite values, things will go wrong
+    if(thisXscaling == Auto) {
+        for(int i=0; i< size; i++) {
+            if(x[i] < SMALLEST || x[i] > BIGGEST) {
+                setXscaling(User); setAxisScale(xBottom, -10.0, 10.0);
+                if(x[i] < SMALLEST) x[i] = SMALLEST;
+                if(x[i] > BIGGEST) x[i] = BIGGEST;
+                printf("caCartesianPlot::setSamplesData: ininite x value detected, scale set to -10 to 10\n");
+                fflush(stdout);
+                break;
+            }
+        }
+    }
+    if(thisYscaling == Auto) {
+        for(int i=0; i< size; i++) {
+            if(y[i] < SMALLEST || y[i] > BIGGEST) {
+                setYscaling(User); setAxisScale(yLeft, -10.0, 10.0);
+                if(y[i] < SMALLEST) y[i] = SMALLEST;
+                if(y[i] > BIGGEST) y[i] = BIGGEST;
+                printf("caCartesianPlot::setSamplesData: ininite y value detected, scale set to -10 to 10\n");
+                fflush(stdout);
+                break;
+            }
+        }
+    }
 
+    // saving the data allows to switch between log and lin when no new monitor is coming
     if(saveFlag) {
         XSAVE[index].resize(size);
         YSAVE[index].resize(size);
