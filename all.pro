@@ -28,7 +28,7 @@ isEmpty(_EPICSHOSTARCH){
  message("EPICS_HOST_ARCH must be defined in order to use EPICS")
  error(please define EPICS_HOST_ARCH.)
 }else{
- message("EPICS located in $$_EPICSHOSTARCH")
+ message("EPICS_HOST_ARCH located in $$_EPICSHOSTARCH")
 }
 
 #version check qt
