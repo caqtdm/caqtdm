@@ -63,7 +63,7 @@ epics4Subs::epics4Subs(MutexKnobData* mutexKnobData)
 
     qDebug() << "client factory start and get provider";
     ClientFactory::start();
-    provider = getChannelAccess()->getProvider("pvAccess");
+    provider = getChannelAccess()->getProvider("pva");
 
     m_mutexKnobData = mutexKnobData;
 }
