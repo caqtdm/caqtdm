@@ -481,10 +481,14 @@ void caCartesianPlot::displayData(int curvIndex, int curvType)
 
 #define SMALLEST -1.e20
 #define BIGGEST 1.e20
+
 // this routine will prevent that we have problems with negative values when logarithmic scale
 // and will keep the values in order to switch between log and linear scale
 void caCartesianPlot::setSamplesData(int index, double *x, double *y, int size, bool saveFlag)
 {
+    double lowX = BIGGEST;
+    double lowY = BIGGEST;
+
     // in case of autoscaling and you have infinite values, things will go wrong
     if(thisXscaling == Auto) {
         for(int i=0; i< size; i++) {
@@ -492,11 +496,18 @@ void caCartesianPlot::setSamplesData(int index, double *x, double *y, int size, 
                 setXscaling(User); setAxisScale(xBottom, -10.0, 10.0);
                 if(x[i] < SMALLEST) x[i] = SMALLEST;
                 if(x[i] > BIGGEST) x[i] = BIGGEST;
-                printf("caCartesianPlot::setSamplesData: ininite x value detected, scale set to -10 to 10\n");
+                printf("caCartesianPlot::setSamplesData: infinite x value detected, scale set to -10 to 10\n");
                 fflush(stdout);
                 break;
             }
+            if((x[i] < lowX) && (x[i] > 0.0)) lowX = x[i];
         }
+
+        if(lowX == BIGGEST) {
+            lowX = 1.0;
+        }
+    } else {
+        lowX = 1.e-20;
     }
     if(thisYscaling == Auto) {
         for(int i=0; i< size; i++) {
@@ -508,7 +519,14 @@ void caCartesianPlot::setSamplesData(int index, double *x, double *y, int size, 
                 fflush(stdout);
                 break;
             }
+            if((y[i] < lowY) && (y[i] > 0.0)) lowY = y[i];
         }
+
+        if(lowY == BIGGEST) {
+            lowY = 1.0;
+        }
+    } else {
+        lowY = 1.e-20;
     }
 
     // saving the data allows to switch between log and lin when no new monitor is coming
@@ -528,12 +546,12 @@ void caCartesianPlot::setSamplesData(int index, double *x, double *y, int size, 
 
         if(thisXtype == log10) {
             for(int i=0; i< size; i++) {
-                if(x[i] < 1.e-20) XAUX[i] = 1.e-20;
+                if(x[i] <= lowX)  XAUX[i] = lowX;
             }
         }
         if(thisYtype == log10) {
             for(int i=0; i< size; i++) {
-                if(y[i] < 1.e-20) YAUX[i] = 1.e-20;
+                if(y[i] < lowY) YAUX[i] = lowY;
             }
         }
         curve[index].setRawSamples(XAUX.data(), YAUX.data(), size);
