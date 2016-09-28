@@ -120,7 +120,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: rgb(0,0,120);}</string>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <property name="usesScrollButtons">
      <bool>true</bool>
@@ -148,7 +148,7 @@ border-radius: 2px;
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>5</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -553,6 +553,12 @@ p, li { white-space: pre-wrap; }
         <property name="tiltAngle">
          <number>45</number>
         </property>
+        <property name="startAngle">
+         <number>90</number>
+        </property>
+        <property name="spanAngle">
+         <number>-10</number>
+        </property>
        </widget>
        <widget class="caGraphics" name="cagraphics_6">
         <property name="geometry">
@@ -709,6 +715,277 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="unitsEnabled">
          <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_21">
+        <property name="geometry">
+         <rect>
+          <x>384</x>
+          <y>514</y>
+          <width>76</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">angleVar</string>
+        </property>
+        <property name="calc">
+         <string notr="true">A&gt;=360?A=0:A+5</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">angleVar</string>
+        </property>
+        <property name="channelB">
+         <string notr="true"/>
+        </property>
+        <property name="channelC">
+         <string notr="true"/>
+        </property>
+        <property name="eventSignal">
+         <enum>caCalc::onAnyChange</enum>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_22">
+        <property name="geometry">
+         <rect>
+          <x>569</x>
+          <y>493</y>
+          <width>76</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">calcVarX</string>
+        </property>
+        <property name="calc">
+         <string notr="true">SIN(A*3.1416/180)</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">angleVar</string>
+        </property>
+        <property name="channelB">
+         <string notr="true"/>
+        </property>
+        <property name="channelC">
+         <string notr="true"/>
+        </property>
+        <property name="channelD">
+         <string notr="true"/>
+        </property>
+       </widget>
+       <widget class="caTextEntry" name="catextentry_37">
+        <property name="geometry">
+         <rect>
+          <x>704</x>
+          <y>493</y>
+          <width>71</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">calcVarX</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLineEdit::Alarm_Default</enum>
+        </property>
+        <property name="precision">
+         <number>3</number>
+        </property>
+        <property name="precisionMode">
+         <enum>caLineEdit::User</enum>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_23">
+        <property name="geometry">
+         <rect>
+          <x>824</x>
+          <y>493</y>
+          <width>76</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">calcVarYa</string>
+        </property>
+        <property name="calc">
+         <string notr="true">SIN(A*3.1416/180)</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">angleVar</string>
+        </property>
+        <property name="channelB">
+         <string notr="true"/>
+        </property>
+        <property name="channelC">
+         <string notr="true"/>
+        </property>
+        <property name="channelD">
+         <string notr="true"/>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_24">
+        <property name="geometry">
+         <rect>
+          <x>569</x>
+          <y>518</y>
+          <width>76</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">calcVarY</string>
+        </property>
+        <property name="calc">
+         <string notr="true">SIN(A*3.1416/180)</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">angleVar</string>
+        </property>
+        <property name="channelB">
+         <string notr="true"/>
+        </property>
+        <property name="channelC">
+         <string notr="true"/>
+        </property>
+        <property name="channelD">
+         <string notr="true"/>
+        </property>
+       </widget>
+       <widget class="caStripPlot" name="castripplot_2">
+        <property name="geometry">
+         <rect>
+          <x>569</x>
+          <y>363</y>
+          <width>386</width>
+          <height>126</height>
+         </rect>
+        </property>
+        <property name="TitleY">
+         <string notr="true">calcVarY</string>
+        </property>
+        <property name="channels" stdset="0">
+         <string notr="true">calcVarX;calcVarY</string>
+        </property>
+        <property name="period">
+         <double>10.000000000000000</double>
+        </property>
+        <property name="XaxisType">
+         <enum>caStripPlot::TimeScale</enum>
+        </property>
+        <property name="YaxisLimitsMax_1">
+         <double>1.100000000000000</double>
+        </property>
+        <property name="YaxisLimitsMin_1">
+         <double>-1.100000000000000</double>
+        </property>
+        <property name="YaxisScalingMax_1" stdset="0">
+         <enum>caStripPlot::User</enum>
+        </property>
+        <property name="YaxisScalingMin_1" stdset="0">
+         <enum>caStripPlot::User</enum>
+        </property>
+        <property name="YaxisLimitsMax_2">
+         <double>1.100000000000000</double>
+        </property>
+        <property name="YaxisLimitsMin_2">
+         <double>-1.100000000000000</double>
+        </property>
+        <property name="YaxisScalingMax_2" stdset="0">
+         <enum>caStripPlot::User</enum>
+        </property>
+        <property name="YaxisScalingMin_2" stdset="0">
+         <enum>caStripPlot::User</enum>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_25">
+        <property name="geometry">
+         <rect>
+          <x>824</x>
+          <y>533</y>
+          <width>76</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">calcVarYc</string>
+        </property>
+        <property name="calc">
+         <string notr="true">SIN(A*3.1416/180)</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">angleVar</string>
+        </property>
+        <property name="channelB">
+         <string notr="true"/>
+        </property>
+        <property name="channelC">
+         <string notr="true"/>
+        </property>
+        <property name="channelD">
+         <string notr="true"/>
+        </property>
+       </widget>
+       <widget class="caTextEntry" name="catextentry_38">
+        <property name="geometry">
+         <rect>
+          <x>704</x>
+          <y>518</y>
+          <width>71</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">calcVarY</string>
+        </property>
+        <property name="colorMode">
+         <enum>caLineEdit::Alarm_Default</enum>
+        </property>
+        <property name="precision">
+         <number>3</number>
+        </property>
+        <property name="precisionMode">
+         <enum>caLineEdit::User</enum>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_26">
+        <property name="geometry">
+         <rect>
+          <x>824</x>
+          <y>513</y>
+          <width>76</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">calcVarYb</string>
+        </property>
+        <property name="calc">
+         <string notr="true">SIN(A*3.1416/180)</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">angleVar</string>
+        </property>
+        <property name="channelB">
+         <string notr="true"/>
+        </property>
+        <property name="channelC">
+         <string notr="true"/>
+        </property>
+        <property name="channelD">
+         <string notr="true"/>
+        </property>
+       </widget>
+       <widget class="caGraphics" name="cagraphics_20">
+        <property name="geometry">
+         <rect>
+          <x>675</x>
+          <y>115</y>
+          <width>100</width>
+          <height>100</height>
+         </rect>
+        </property>
+        <property name="form">
+         <enum>caGraphics::Arrow</enum>
         </property>
        </widget>
       </widget>
@@ -1230,7 +1507,7 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>43</x>
           <y>33</y>
-          <width>272</width>
+          <width>249</width>
           <height>129</height>
          </rect>
         </property>
@@ -8730,7 +9007,7 @@ def PythonCalc(a, b, c, d):
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
@@ -12161,22 +12438,6 @@ p, li { white-space: pre-wrap; }
  <resources/>
  <connections>
   <connection>
-   <sender>caclock</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>radioButton_2</receiver>
-   <slot>toggle()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>204</x>
-     <y>289</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>421</x>
-     <y>272</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>caclock_3</sender>
    <signal>valueChanged(double)</signal>
    <receiver>catogglebutton_4</receiver>
@@ -12247,12 +12508,12 @@ p, li { white-space: pre-wrap; }
    <slot>toggle()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>324</x>
-     <y>268</y>
+     <x>330</x>
+     <y>269</y>
     </hint>
     <hint type="destinationlabel">
-     <x>772</x>
-     <y>342</y>
+     <x>778</x>
+     <y>343</y>
     </hint>
    </hints>
   </connection>
@@ -12317,6 +12578,70 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>649</x>
      <y>268</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_21</sender>
+   <signal>emitSignal(int)</signal>
+   <receiver>cagraphics_4</receiver>
+   <slot>slotTiltAngle(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>461</x>
+     <y>639</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>461</x>
+     <y>414</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_21</sender>
+   <signal>emitSignal(int)</signal>
+   <receiver>cagraphics_5</receiver>
+   <slot>slotSpanAngle(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>476</x>
+     <y>640</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>597</x>
+     <y>383</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_21</sender>
+   <signal>emitSignal(int)</signal>
+   <receiver>cagraphics_2</receiver>
+   <slot>slotTiltAngle(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>424</x>
+     <y>647</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>258</x>
+     <y>403</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_21</sender>
+   <signal>emitSignal(int)</signal>
+   <receiver>cagraphics_20</receiver>
+   <slot>slotTiltAngle(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>476</x>
+     <y>651</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>761</x>
+     <y>296</y>
     </hint>
    </hints>
   </connection>
