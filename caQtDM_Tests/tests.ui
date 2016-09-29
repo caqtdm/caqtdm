@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1119</width>
-    <height>753</height>
+    <height>715</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -2211,7 +2211,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>15</number>
       </property>
       <property name="usesScrollButtons">
        <bool>true</bool>
@@ -8600,6 +8600,25 @@ def PythonCalc(a, b, c, d):
          <string>RadioButton</string>
         </property>
        </widget>
+       <widget class="caCalc" name="cacalc_20">
+        <property name="geometry">
+         <rect>
+          <x>837</x>
+          <y>110</y>
+          <width>116</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">countTest</string>
+        </property>
+        <property name="calc">
+         <string notr="true">A</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:COUNT:1</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_30">
        <attribute name="title">
@@ -12508,12 +12527,12 @@ p, li { white-space: pre-wrap; }
    <slot>toggle()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>330</x>
-     <y>269</y>
+     <x>332</x>
+     <y>237</y>
     </hint>
     <hint type="destinationlabel">
-     <x>778</x>
-     <y>343</y>
+     <x>780</x>
+     <y>311</y>
     </hint>
    </hints>
   </connection>
@@ -12616,22 +12635,6 @@ p, li { white-space: pre-wrap; }
   <connection>
    <sender>cacalc_21</sender>
    <signal>emitSignal(int)</signal>
-   <receiver>cagraphics_2</receiver>
-   <slot>slotTiltAngle(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>424</x>
-     <y>647</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>258</x>
-     <y>403</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cacalc_21</sender>
-   <signal>emitSignal(int)</signal>
    <receiver>cagraphics_20</receiver>
    <slot>slotTiltAngle(int)</slot>
    <hints>
@@ -12642,6 +12645,22 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>761</x>
      <y>296</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_21</sender>
+   <signal>emitSignal(int)</signal>
+   <receiver>cagraphics_2</receiver>
+   <slot>slotTiltAngle(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>455</x>
+     <y>646</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>264</x>
+     <y>414</y>
     </hint>
    </hints>
   </connection>
