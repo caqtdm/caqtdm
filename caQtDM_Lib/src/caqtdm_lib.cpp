@@ -826,9 +826,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             w1->setProperty("ObjectType", caCalc_Widget);
 
             kData.soft = true;
-            addMonitor(myWidget, &kData, qasc(calcWidget->getVariable()), w1, specData, map, &pv);
 
-            //qDebug() <<  "firstpass" << firstPass <<  "treatPrimary:" << treatPrimary << calcWidget->getVariable() << calcWidget << SoftPVusesItsself(calcWidget, map);
+            QString pv = calcWidget->getVariable();
+            if(reaffectText(map, &pv))  calcWidget->setVariable(pv);
+            addMonitor(myWidget, &kData, qasc(pv), w1, specData, map, &pv);
+
+            //qDebug() <<  "firstpass" << firstPass <<  "treatPrimary:" << treatPrimary << pv << calcWidget << SoftPVusesItsself(calcWidget, map);
 
             // softchannels calculating with themselves are done first
             if(SoftPVusesItsself(calcWidget, map) && treatPrimary) {
@@ -5485,6 +5488,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
             info.append("Object: ");
             info.append(ObjectName);
+            if(caCalc* widget = qobject_cast<caCalc *>(w)) {info.append(", Variable: " + widget->getVariable());}
             info.append("<br>");
 
             if(!urlStrings.isEmpty()) {
@@ -5503,7 +5507,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
             if(!calcString.isEmpty()) {
                 info.append("<br>");
-                info.append("VisibilityCalc: ");  
+                if(caCalc* widget = qobject_cast<caCalc *>(w)) {Q_UNUSED(widget); info.append("Calc: "); } else info.append("VisibilityCalc: ");
 #if QT_VERSION > 0x050000
                 info.append(QString(calcString).toHtmlEscaped());
 #else
