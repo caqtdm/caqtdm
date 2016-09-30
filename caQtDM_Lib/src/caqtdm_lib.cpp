@@ -828,7 +828,13 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             kData.soft = true;
 
             QString pv = calcWidget->getVariable();
-            if(reaffectText(map, &pv))  calcWidget->setVariable(pv);
+            if(pv.size() == 0) {
+                pv =  QUuid::createUuid();
+                pv = pv.replace("{", "");  // otherwise a json string, that would be taken out
+                pv = pv.replace("}", "");
+            }
+            reaffectText(map, &pv);
+            calcWidget->setVariable(pv);
             addMonitor(myWidget, &kData, qasc(pv), w1, specData, map, &pv);
 
             //qDebug() <<  "firstpass" << firstPass <<  "treatPrimary:" << treatPrimary << pv << calcWidget << SoftPVusesItsself(calcWidget, map);
