@@ -39,6 +39,8 @@
 #include <pv/rpcClient.h>
 #include <pv/event.h>
 #include <pv/pvAccess.h>
+#include <pv/pvaClient.h>
+#include <testMain.h>
 
 #include "dbrString.h"
 #include "knobDefines.h"
@@ -47,14 +49,13 @@
 #include "mutexKnobData.h"
 #include "mutexKnobDataWrapper.h"
 
+#define qasc(x) x.toLatin1().constData()
+
 using namespace std;
 using namespace std::tr1;
 using namespace epics::pvData;
 using namespace epics::pvAccess;
-
-
-#define DEFAULT_TIMEOUT 3.0
-#define DEFAULT_REQUEST "field()"
+using namespace epics::pvaClient;
 
 #include <caQtDM_Lib_global.h>
 
@@ -67,19 +68,20 @@ public:
      ~epics4Subs();
     void CreateAndConnect4(int num, QString pv);
     void ParseScalar(PVScalarPtr const & pv);
-    void Epics4SetValue(QString const &pv, QString const & value);
-    void ParsePVStructure(PVStructurePtr const & pvStructure, QString const & value);
-    void fromString(PVScalarPtr const & pvScalar, QString const & value);
+    void Epics4SetValue(char* pv, double rdata, int32_t idata, char *sdata, int forceType);
+    void ParsePVStructure(PVStructurePtr const & pvStructure, double rdata, int32_t idata, char *sdata, int forceType);
+    void setScalarData(PVScalarPtr const & pvScalar, double rdata, int32_t idata, char *sdata, int forceType);
+
 
 private:
 
-    PVStructure::shared_pointer pvRequestG;
-    PVStructure::shared_pointer pvRequestP;
-
+    PVStructure::shared_pointer pvRequest;
     ChannelProvider::shared_pointer provider;
     MutexKnobData* m_mutexKnobData;
     QVector<Monitor::shared_pointer> monitorArray;
     QVector<Channel::shared_pointer> channelArray;
+
+     PvaClientPtr pvaClient;
 };
 
 #endif

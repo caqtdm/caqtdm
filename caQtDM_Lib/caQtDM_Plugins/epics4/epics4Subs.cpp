@@ -31,41 +31,55 @@
 #include "epics4Subs.h"
 #include "pvAccessImpl.h"
 
+
+
 #include <epicsStdlib.h>
 #include <epicsGetopt.h>
 #include <epicsThread.h>
 #include <epicsExit.h>
 
 
+#define DEFAULT_TIMEOUT 3.0
+#define DEFAULT_REQUEST "field(value)"
+#define DEFAULT_PROVIDER "pva"
+
 string request(DEFAULT_REQUEST);
 double timeOut = DEFAULT_TIMEOUT;
 
+class RequesterImpl : public Requester
+{
+public:
+    RequesterImpl(){}
+    string getRequesterName()
+    {
+        static string name("RequesterImpl");
+        return name;
+    }
+    void message(
+            string const & message,
+            MessageType messageType)
+    {
+        qDebug("message: '%s'", message.c_str());
+    }
+    void destroy() {}
+};
+
+
 epics4Subs::epics4Subs(MutexKnobData* mutexKnobData)
 {
-    /*
-    In order to connect to a channel a client must:
-
-    Call ChannelAccessFactory.getChannelAccess() to get the ChannelAccess interface.
-    Call ChannelAccess.getProvider(String providerName) to get a ChannelProvider.
-    Call ChannelProvider.createChannel(String channelName, ...) to create a Channel.
-    A client must know the channel name and the name of the channel provider.
-    */
-
-    Requester::shared_pointer requesterG(new RequesterImpl("pvget"));
-    Requester::shared_pointer requesterP(new RequesterImpl("pvput"));
-
-    pvRequestG = getCreateRequest()->createRequest(request, requesterG);
-    if(pvRequestG.get()==NULL) printf("failed to parse request string\n");
-
-    pvRequestP = getCreateRequest()->createRequest(request, requesterP);
-    if(pvRequestP.get()==NULL) printf("failed to parse request string\n");
-
+    pvRequest =  CreateRequest::create()->createRequest(request);
+    if(pvRequest.get()==NULL) printf("failed to parse request string\n");
 
     qDebug() << "client factory start and get provider";
     ClientFactory::start();
-    provider = getChannelAccess()->getProvider("pvAccess");
-
+    provider = getChannelProviderRegistry()->getProvider("pva");
     m_mutexKnobData = mutexKnobData;
+
+    pvaClient = PvaClient::get("pva ca");
+    RequesterPtr requester(new RequesterImpl());
+    pvaClient->setRequester(requester);
+    pvaClient->message(" epics4Subs::this is a test",infoMessage);
+
 }
 
 epics4Subs:: ~epics4Subs()
@@ -84,13 +98,13 @@ void epics4Subs::CreateAndConnect4(int num, QString pv)
 {
     bool allOK = true;
     // create channel
-    qDebug() << "CreateAndConnect4" << pv;
-    shared_ptr<ChannelRequesterImpl> channelRequesterImpl(new ChannelRequesterImpl());
+    qDebug() << "epics4Subs::CreateAndConnect4" << pv;
+    shared_ptr<MonitorPVRequesterImpl> channelRequesterImpl(new MonitorPVRequesterImpl());
     Channel::shared_pointer channel = provider->createChannel(qasc(pv), channelRequesterImpl);
     channelArray.append(channel);
 
-    channelRequesterImpl = dynamic_pointer_cast<ChannelRequesterImpl>(channel->getChannelRequester());
-    channelRequesterImpl->setMyData(num, m_mutexKnobData);
+    channelRequesterImpl = dynamic_pointer_cast<MonitorPVRequesterImpl>(channel->getChannelRequester());
+    channelRequesterImpl->defineIndexForKnobData(num, m_mutexKnobData);
 
     if (channelRequesterImpl->waitUntilConnected(timeOut)) {
         shared_ptr<GetFieldRequesterImpl> getFieldRequesterImpl;
@@ -99,11 +113,9 @@ void epics4Subs::CreateAndConnect4(int num, QString pv)
         channel->getField(getFieldRequesterImpl, "");
 
         if (getFieldRequesterImpl.get() == 0 || getFieldRequesterImpl->waitUntilFieldGet(timeOut)) {
-            qDebug() << "monitorrequest";
-
-            shared_ptr<MonitorRequesterImpl> monitorRequesterImpl(new MonitorRequesterImpl(channel->getChannelName()));
-            monitorRequesterImpl->setMyData(num, m_mutexKnobData);
-            Monitor::shared_pointer monitorGet = channel->createMonitor(monitorRequesterImpl, pvRequestG);
+            shared_ptr<DataMonitorRequesterImpl> monitorRequesterImpl(new DataMonitorRequesterImpl(channel->getChannelName()));
+            monitorRequesterImpl->defineIndexForKnobData(num, m_mutexKnobData);
+            Monitor::shared_pointer monitorGet = channel->createMonitor(monitorRequesterImpl, pvRequest);
             monitorArray.append(monitorGet);
             allOK &= true;
         } else {
@@ -119,33 +131,29 @@ void epics4Subs::CreateAndConnect4(int num, QString pv)
     }
 }
 
-void epics4Subs::Epics4SetValue(QString const &pv, QString const & value)
+void  epics4Subs::Epics4SetValue(char* pv, double rdata, int32_t idata, char *sdata, int forceType)
 {
-    bool allOK = true;
-    // create channel
-    qDebug() << "Epics4SetValue " << pv;
-    shared_ptr<ChannelRequesterImpl> channelRequesterImpl(new ChannelRequesterImpl());
-    Channel::shared_pointer channel = provider->createChannel(qasc(pv), channelRequesterImpl);
+    qDebug() << " epics4Subs::Epics4SetValue " << pv << " with values" << rdata << idata << sdata << forceType;
+    try {
+        PvaClientChannelPtr pvaChannel = pvaClient->createChannel(pv);
+        pvaChannel->connect();
+        PvaClientPutPtr pvaPut = pvaChannel->createPut();
+        pvaPut->connect();
+        PvaClientPutDataPtr pvaPutData = pvaPut->getData();
+        PVStructurePtr arg = pvaPutData->getPVStructure();
+        ParsePVStructure(arg, rdata, idata, sdata, forceType);
+        pvaPut->put();
+        pvaPut->destroy();
+        pvaChannel->destroy();
 
-    channelRequesterImpl = dynamic_pointer_cast<ChannelRequesterImpl>(channel->getChannelRequester());
-    // do not know if this was necessary, I can not test any more at PSI
-    //channelRequesterImpl->setMyData(num, m_mutexKnobData);
-
-    if (channelRequesterImpl->waitUntilConnected(timeOut)) {
-        shared_ptr<ChannelPutRequesterImpl> putRequesterImpl(new ChannelPutRequesterImpl(channel->getChannelName()));
-
-        ChannelPut::shared_pointer channelPut = channel->createChannelPut(putRequesterImpl, pvRequestP);
-        allOK &= putRequesterImpl->waitUntilDone(timeOut);
-        if (allOK) {
-            ParsePVStructure(putRequesterImpl->getStructure(), value);
-            channelPut->put(false);
-            allOK &= putRequesterImpl->waitUntilDone(timeOut);
-        }
+    } catch (std::runtime_error e) {
+        qDebug() << "channel example exception" << e.what();
     }
 }
 
-void epics4Subs::ParsePVStructure(PVStructurePtr const & pvStructure, QString const & value)
+void epics4Subs::ParsePVStructure(PVStructurePtr const & pvStructure, double rdata, int32_t idata, char *sdata, int forceType)
 {
+    qDebug() << "epics4Subs::parse structure";
     PVFieldPtrArray const & fieldsData = pvStructure->getPVFields();
     if (fieldsData.size() != 0) {
         size_t length = pvStructure->getStructure()->getNumberFields();
@@ -153,10 +161,10 @@ void epics4Subs::ParsePVStructure(PVStructurePtr const & pvStructure, QString co
             PVFieldPtr fieldField = fieldsData[i];
             Type type = fieldField->getField()->getType();
             if(type==scalar) {
-                PVScalarPtr pv = static_pointer_cast<PVScalar>(fieldField);
-                QString thisFieldName  = QString::fromStdString(pv->getFieldName());
+                PVScalarPtr pvScalar = static_pointer_cast<PVScalar>(fieldField);
+                QString thisFieldName  = QString::fromStdString(pvScalar->getFieldName());
                 if(thisFieldName.contains("value")) {
-                    fromString(pv, value);
+                    setScalarData(pvScalar, rdata, idata, sdata, forceType);
                     break;
                 }
             }
@@ -164,125 +172,92 @@ void epics4Subs::ParsePVStructure(PVStructurePtr const & pvStructure, QString co
     }
 }
 
-void epics4Subs::fromString(PVScalarPtr const & pvScalar, QString const & from)
+void epics4Subs::setScalarData(PVScalarPtr const & pvScalar, double rdata, int32_t idata, char *sdata, int forceType)
 {
+    qDebug() << "epics4Subs::fromstring";
     ScalarConstPtr scalar = pvScalar->getScalar();
     ScalarType scalarType = scalar->getScalarType();
     switch(scalarType) {
     case pvBoolean: {
+        qDebug() << "pvboolean" << idata;
         PVBooleanPtr pv = static_pointer_cast<PVBoolean>(pvScalar);
-        bool isTrue  = (from.compare("true")==0  || from.compare("1")==0);
-        bool isFalse = (from.compare("false")==0 || from.compare("0")==0);
-        if (!(isTrue || isFalse))
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (boolean) from string value '" + qasc(from) + "'");
-        if(isTrue) pv->put(true); else pv->put(false);
+        pv->put(idata);
         return;
     }
     case pvByte : {
+        qDebug() << "pvbyte" << idata;
         PVBytePtr pv = static_pointer_cast<PVByte>(pvScalar);
-        int ival;
-        int result = sscanf(qasc(from), "%d", &ival);
-        if (result != 1)
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (byte) from string value '" + qasc(from) + "'");
-        int8 value = ival;
+        int8 value = idata;
         pv->put(value);
         return;
     }
     case pvShort : {
+        qDebug() << "pvshort" << idata;
         PVShortPtr pv = static_pointer_cast<PVShort>(pvScalar);
-        int ival;
-        int result = sscanf(qasc(from), "%d", &ival);
-        if (result != 1)
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (short) from string value '" + qasc(from) + "'");
-        int16 value = ival;
+        int16 value = idata;
         pv->put(value);
         return;
     }
     case pvInt : {
+        qDebug() << "pvint" << idata;
         PVIntPtr pv = static_pointer_cast<PVInt>(pvScalar);
-        int ival;
-        int result = sscanf(qasc(from), "%d", &ival);
-        if (result != 1)
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (int) from string value '" + qasc(from) + "'");
-        int32 value = ival;
-        pv->put(value);
+        pv->put(idata);
         return;
     }
     case pvLong : {
+        qDebug() << "pvlong" << idata;
         PVLongPtr pv = static_pointer_cast<PVLong>(pvScalar);
-        int64 ival;
-        int result = sscanf(qasc(from), "%lld", (long long *)&ival);
-        if (result != 1)
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (long) from string value '" + qasc(from) + "'");
-        int64 value = ival;
+        int64 value = idata;
         pv->put(value);
         return;
     }
     case pvUByte : {
+        qDebug() << "pvubyte" << idata;
         PVUBytePtr pv = static_pointer_cast<PVUByte>(pvScalar);
-        unsigned int ival;
-        int result = sscanf(qasc(from), "%u", &ival);
-        if (result != 1)
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (ubyte) from string value '" + qasc(from) + "'");
-        uint8 value = ival;
+        uint8 value = idata;
         pv->put(value);
         return;
     }
     case pvUShort : {
+        qDebug() << "pvushort" << idata;
         PVUShortPtr pv = static_pointer_cast<PVUShort>(pvScalar);
-        unsigned int ival;
-        int result = sscanf(qasc(from), "%u", &ival);
-        if (result != 1)
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (ushort) from string value '" + qasc(from) + "'");
-        uint16 value = ival;
+        uint16 value = idata;
         pv->put(value);
         return;
     }
     case pvUInt : {
+        qDebug() << "pvuint" << idata;
         PVUIntPtr pv = static_pointer_cast<PVUInt>(pvScalar);
-        unsigned int ival;
-        int result = sscanf(qasc(from), "%u", &ival);
-        if (result != 1)
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (uint) from string value '" + qasc(from) + "'");
-        uint32 value = ival;
+        uint32 value = idata;
         pv->put(value);
         return;
     }
     case pvULong : {
+        qDebug() << "pvulong" << idata;
         PVULongPtr pv = static_pointer_cast<PVULong>(pvScalar);
-        unsigned long long ival;
-        int result = sscanf(qasc(from), "%llu", (long long unsigned int *) &ival);
-        if (result != 1)
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (ulong) from string value '" + qasc(from) + "'");
-        uint64 value = ival;
+        uint64 value = idata;
         pv->put(value);
         return;
     }
     case pvFloat : {
+        qDebug() << "pvfloat" << rdata;
         PVFloatPtr pv = static_pointer_cast<PVFloat>(pvScalar);
-        float value;
-        int result = sscanf(qasc(from), "%f", &value);
-        if (result != 1)
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (float) from string value '" + qasc(from) + "'");
-        pv->put(value);
+        pv->put((float)rdata);
         return;
     }
     case pvDouble : {
+        qDebug() << "pvdouble" << rdata;
         PVDoublePtr pv = static_pointer_cast<PVDouble>(pvScalar);
-        double value;
-        int result = sscanf(qasc(from),"%lf",&value);
-        if (result != 1)
-            throw runtime_error("failed to parse field " + pvScalar->getFieldName() + " (double) from string value '" + qasc(from) + "'");
-        pv->put(value);
+        pv->put((double)rdata);
         return;
     }
     case pvString: {
+        qDebug() << "pvstring" << sdata;
         PVStringPtr value = static_pointer_cast<PVString>(pvScalar);
-        value->put(qasc(from);
+        value->put(sdata);
         return;
     }
     }
-    String message("fromString unknown scalarType ");
-    ScalarTypeFunc::toString(&message,scalarType);
+    string message("fromString unknown scalarType ");
     throw std::logic_error(message);
 }

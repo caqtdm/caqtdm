@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1119</width>
-    <height>715</height>
+    <height>750</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -120,7 +120,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: rgb(0,0,120);}</string>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <property name="usesScrollButtons">
      <bool>true</bool>
@@ -978,14 +978,149 @@ p, li { white-space: pre-wrap; }
        <widget class="caGraphics" name="cagraphics_20">
         <property name="geometry">
          <rect>
-          <x>675</x>
-          <y>115</y>
+          <x>724</x>
+          <y>28</y>
           <width>100</width>
           <height>100</height>
          </rect>
         </property>
         <property name="form">
          <enum>caGraphics::Arrow</enum>
+        </property>
+       </widget>
+       <widget class="caNumeric" name="canumeric_10">
+        <property name="geometry">
+         <rect>
+          <x>731</x>
+          <y>292</y>
+          <width>100</width>
+          <height>50</height>
+         </rect>
+        </property>
+        <property name="integerDigits" stdset="0">
+         <number>4</number>
+        </property>
+        <property name="decimalDigits" stdset="0">
+         <number>0</number>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">changeStart</string>
+        </property>
+        <property name="precisionMode">
+         <enum>caNumeric::User</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caNumeric::User</enum>
+        </property>
+        <property name="maxValue">
+         <double>360.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>0.000000000000000</double>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_27">
+        <property name="geometry">
+         <rect>
+          <x>747</x>
+          <y>251</y>
+          <width>69</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">changeStart</string>
+        </property>
+        <property name="precision">
+         <number>0</number>
+        </property>
+        <property name="eventSignal">
+         <enum>caCalc::onAnyChange</enum>
+        </property>
+       </widget>
+       <widget class="caGraphics" name="cagraphics_21">
+        <property name="geometry">
+         <rect>
+          <x>893</x>
+          <y>134</y>
+          <width>101</width>
+          <height>86</height>
+         </rect>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>255</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="fillstyle" stdset="0">
+         <enum>caGraphics::Filled</enum>
+        </property>
+        <property name="lineSize">
+         <number>1</number>
+        </property>
+        <property name="form">
+         <enum>caGraphics::Arc</enum>
+        </property>
+        <property name="tiltAngle">
+         <number>45</number>
+        </property>
+        <property name="startAngle">
+         <number>90</number>
+        </property>
+        <property name="spanAngle">
+         <number>-10</number>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_28">
+        <property name="geometry">
+         <rect>
+          <x>873</x>
+          <y>251</y>
+          <width>69</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">changeSpan</string>
+        </property>
+        <property name="precision">
+         <number>0</number>
+        </property>
+        <property name="eventSignal">
+         <enum>caCalc::onAnyChange</enum>
+        </property>
+       </widget>
+       <widget class="caNumeric" name="canumeric_11">
+        <property name="geometry">
+         <rect>
+          <x>866</x>
+          <y>293</y>
+          <width>100</width>
+          <height>50</height>
+         </rect>
+        </property>
+        <property name="integerDigits" stdset="0">
+         <number>4</number>
+        </property>
+        <property name="decimalDigits" stdset="0">
+         <number>0</number>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">changeSpan</string>
+        </property>
+        <property name="precisionMode">
+         <enum>caNumeric::User</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caNumeric::User</enum>
+        </property>
+        <property name="maxValue">
+         <double>360.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>-360.000000000000000</double>
         </property>
        </widget>
       </widget>
@@ -8619,6 +8754,31 @@ def PythonCalc(a, b, c, d):
          <string notr="true">ACM:COUNT:1</string>
         </property>
        </widget>
+       <widget class="caCalc" name="cacalc_29">
+        <property name="geometry">
+         <rect>
+          <x>270</x>
+          <y>452</y>
+          <width>71</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true"/>
+        </property>
+        <property name="calc">
+         <string notr="true">%P/def PythonCalc(a, b, c, d):
+	return (a*b)
+/
+</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">mySoft1</string>
+        </property>
+        <property name="channelB">
+         <string notr="true">mySoft2</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_30">
        <attribute name="title">
@@ -9026,7 +9186,7 @@ def PythonCalc(a, b, c, d):
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>7</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
@@ -9098,7 +9258,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="styleSheet" stdset="0">
-         <string notr="true">QFrame { background: rgb(255, 85, 0, 255); color: rgb(0, 170, 0, 255);}</string>
+         <string notr="true"/>
         </property>
        </widget>
        <widget class="caNumeric" name="caNumeric_0">
@@ -10346,205 +10506,6 @@ p, li { white-space: pre-wrap; }
          <string>send 5</string>
         </property>
        </widget>
-       <widget class="caNumeric" name="caNumeric_10">
-        <property name="geometry">
-         <rect>
-          <x>306</x>
-          <y>495</y>
-          <width>96</width>
-          <height>56</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>false</bool>
-        </property>
-        <property name="integerDigits" stdset="0">
-         <number>3</number>
-        </property>
-        <property name="decimalDigits" stdset="0">
-         <number>0</number>
-        </property>
-        <property name="digitsFontScaleEnabled">
-         <bool>true</bool>
-        </property>
-        <property name="channel" stdset="0">
-         <string notr="true"/>
-        </property>
-        <property name="background">
-         <color>
-          <red>170</red>
-          <green>170</green>
-          <blue>0</blue>
-         </color>
-        </property>
-        <property name="precisionMode">
-         <enum>caNumeric::Channel</enum>
-        </property>
-        <property name="fixedFormat">
-         <bool>true</bool>
-        </property>
-        <property name="limitsMode">
-         <enum>caNumeric::Channel</enum>
-        </property>
-        <property name="maxValue">
-         <double>10.000000000000000</double>
-        </property>
-        <property name="minValue">
-         <double>-10.000000000000000</double>
-        </property>
-       </widget>
-       <widget class="caTextEntry" name="catextentry_8">
-        <property name="geometry">
-         <rect>
-          <x>665</x>
-          <y>500</y>
-          <width>100</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="channel" stdset="0">
-         <string notr="true">demo://BIDON2</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_17">
-        <property name="geometry">
-         <rect>
-          <x>430</x>
-          <y>530</y>
-          <width>76</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>text entry :</string>
-        </property>
-       </widget>
-       <widget class="caTextEntry" name="catextentry_9">
-        <property name="geometry">
-         <rect>
-          <x>790</x>
-          <y>500</y>
-          <width>100</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="channel" stdset="0">
-         <string notr="true">epics3://ACM:TEST:AO</string>
-        </property>
-       </widget>
-       <widget class="caTextEntry" name="catextentry_10">
-        <property name="geometry">
-         <rect>
-          <x>920</x>
-          <y>500</y>
-          <width>100</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="channel" stdset="0">
-         <string notr="true">epics4://ACM:TEST:AO</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_18">
-        <property name="geometry">
-         <rect>
-          <x>670</x>
-          <y>480</y>
-          <width>81</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>demo plugin</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_19">
-        <property name="geometry">
-         <rect>
-          <x>790</x>
-          <y>480</y>
-          <width>101</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>epics 3 plugin</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_20">
-        <property name="geometry">
-         <rect>
-          <x>930</x>
-          <y>480</y>
-          <width>101</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>epics 4 plugin</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_21">
-        <property name="geometry">
-         <rect>
-          <x>550</x>
-          <y>480</y>
-          <width>81</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>demo plugin</string>
-        </property>
-       </widget>
-       <widget class="caTextEntry" name="catextentry_11">
-        <property name="geometry">
-         <rect>
-          <x>550</x>
-          <y>530</y>
-          <width>100</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="channel" stdset="0">
-         <string notr="true">demo://BIDON1</string>
-        </property>
-       </widget>
-       <widget class="caTextEntry" name="catextentry_12">
-        <property name="geometry">
-         <rect>
-          <x>550</x>
-          <y>500</y>
-          <width>100</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="channel" stdset="0">
-         <string notr="true">demo://BIDON1</string>
-        </property>
-       </widget>
-       <widget class="caCalc" name="cacalc_8">
-        <property name="geometry">
-         <rect>
-          <x>670</x>
-          <y>530</y>
-          <width>91</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="variable">
-         <string notr="true">divide</string>
-        </property>
-        <property name="calc">
-         <string notr="true">A*B</string>
-        </property>
-        <property name="channel" stdset="0">
-         <string notr="true">demo://BIDON1</string>
-        </property>
-        <property name="channelB">
-         <string notr="true">epics3://ACM:TEST:AO</string>
-        </property>
-       </widget>
        <widget class="caTextEntry" name="catextentry_13">
         <property name="geometry">
          <rect>
@@ -11425,6 +11386,357 @@ p, li { white-space: pre-wrap; }
         <property name="endBit">
          <number>10</number>
         </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_40">
+       <attribute name="title">
+        <string>Plugin Tests</string>
+       </attribute>
+       <widget class="QGroupBox" name="groupBox">
+        <property name="geometry">
+         <rect>
+          <x>15</x>
+          <y>29</y>
+          <width>229</width>
+          <height>87</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="title">
+         <string>demo plugin</string>
+        </property>
+        <widget class="caTextEntry" name="catextentry_11">
+         <property name="geometry">
+          <rect>
+           <x>8</x>
+           <y>54</y>
+           <width>100</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">demo://BIDON1</string>
+         </property>
+        </widget>
+        <widget class="caTextEntry" name="catextentry_12">
+         <property name="geometry">
+          <rect>
+           <x>8</x>
+           <y>24</y>
+           <width>100</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">demo://BIDON1</string>
+         </property>
+        </widget>
+        <widget class="caTextEntry" name="catextentry_8">
+         <property name="geometry">
+          <rect>
+           <x>123</x>
+           <y>24</y>
+           <width>100</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">demo://BIDON2</string>
+         </property>
+        </widget>
+        <widget class="caCalc" name="cacalc_8">
+         <property name="geometry">
+          <rect>
+           <x>124</x>
+           <y>55</y>
+           <width>99</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="variable">
+          <string notr="true">divide</string>
+         </property>
+         <property name="calc">
+          <string notr="true">A*B</string>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">demo://BIDON1</string>
+         </property>
+         <property name="channelB">
+          <string notr="true">epics3://ACM:TEST:AO</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_2">
+        <property name="geometry">
+         <rect>
+          <x>16</x>
+          <y>133</y>
+          <width>162</width>
+          <height>67</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="title">
+         <string>epics3://ACM:TEST:AO</string>
+        </property>
+        <widget class="caTextEntry" name="catextentry_9">
+         <property name="geometry">
+          <rect>
+           <x>12</x>
+           <y>29</y>
+           <width>100</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">epics3://ACM:TEST:AO</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_3">
+        <property name="geometry">
+         <rect>
+          <x>14</x>
+          <y>217</y>
+          <width>162</width>
+          <height>67</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="title">
+         <string>epics4://ACM:TEST:AO</string>
+        </property>
+        <widget class="caTextEntry" name="catextentry_16">
+         <property name="geometry">
+          <rect>
+           <x>12</x>
+           <y>29</y>
+           <width>100</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">epics4://ACM:TEST:AO</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_4">
+        <property name="geometry">
+         <rect>
+          <x>13</x>
+          <y>308</y>
+          <width>162</width>
+          <height>67</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="title">
+         <string>epics4://float03</string>
+        </property>
+        <widget class="caTextEntry" name="catextentry_10">
+         <property name="geometry">
+          <rect>
+           <x>11</x>
+           <y>27</y>
+           <width>100</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">epics4://float03</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_5">
+        <property name="geometry">
+         <rect>
+          <x>271</x>
+          <y>30</y>
+          <width>162</width>
+          <height>67</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="title">
+         <string>epics4://enum01</string>
+        </property>
+        <widget class="caTextEntry" name="catextentry_17">
+         <property name="geometry">
+          <rect>
+           <x>11</x>
+           <y>27</y>
+           <width>100</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">epics4://enum01</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_6">
+        <property name="geometry">
+         <rect>
+          <x>266</x>
+          <y>152</y>
+          <width>162</width>
+          <height>193</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="title">
+         <string>epics4://enum01</string>
+        </property>
+        <widget class="caChoice" name="cachoice">
+         <property name="geometry">
+          <rect>
+           <x>7</x>
+           <y>70</y>
+           <width>125</width>
+           <height>114</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">epics4://enum01</string>
+         </property>
+         <property name="endBit">
+          <number>3</number>
+         </property>
+        </widget>
+        <widget class="caMenu" name="camenu">
+         <property name="geometry">
+          <rect>
+           <x>9</x>
+           <y>25</y>
+           <width>122</width>
+           <height>30</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">epics4://enum01</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_7">
+        <property name="geometry">
+         <rect>
+          <x>15</x>
+          <y>397</y>
+          <width>162</width>
+          <height>88</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="title">
+         <string>epics4://float03</string>
+        </property>
+        <widget class="caNumeric" name="canumeric_12">
+         <property name="geometry">
+          <rect>
+           <x>24</x>
+           <y>27</y>
+           <width>100</width>
+           <height>50</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">epics4://float03</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_8">
+        <property name="geometry">
+         <rect>
+          <x>216</x>
+          <y>398</y>
+          <width>162</width>
+          <height>88</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="title">
+         <string>epics4://uint01</string>
+        </property>
+        <widget class="caNumeric" name="canumeric_13">
+         <property name="geometry">
+          <rect>
+           <x>11</x>
+           <y>27</y>
+           <width>145</width>
+           <height>50</height>
+          </rect>
+         </property>
+         <property name="integerDigits" stdset="0">
+          <number>10</number>
+         </property>
+         <property name="decimalDigits" stdset="0">
+          <number>0</number>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">epics4://int01</string>
+         </property>
+         <property name="precisionMode">
+          <enum>caNumeric::User</enum>
+         </property>
+         <property name="limitsMode">
+          <enum>caNumeric::User</enum>
+         </property>
+         <property name="maxValue">
+          <double>999999999.000000000000000</double>
+         </property>
+         <property name="minValue">
+          <double>-999999999.000000000000000</double>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_9">
+        <property name="geometry">
+         <rect>
+          <x>458</x>
+          <y>31</y>
+          <width>162</width>
+          <height>67</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="title">
+         <string>epics4://bigstring01</string>
+        </property>
+        <widget class="caTextEntry" name="catextentry_18">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>26</y>
+           <width>100</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">epics4://bigstring01</string>
+         </property>
+         <property name="formatType">
+          <enum>caLineEdit::string</enum>
+         </property>
+        </widget>
        </widget>
       </widget>
      </widget>
@@ -12527,12 +12839,12 @@ p, li { white-space: pre-wrap; }
    <slot>toggle()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>332</x>
-     <y>237</y>
+     <x>334</x>
+     <y>269</y>
     </hint>
     <hint type="destinationlabel">
-     <x>780</x>
-     <y>311</y>
+     <x>782</x>
+     <y>343</y>
     </hint>
    </hints>
   </connection>
@@ -12643,24 +12955,56 @@ p, li { white-space: pre-wrap; }
      <y>651</y>
     </hint>
     <hint type="destinationlabel">
-     <x>761</x>
-     <y>296</y>
+     <x>810</x>
+     <y>209</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>cacalc_21</sender>
-   <signal>emitSignal(int)</signal>
-   <receiver>cagraphics_2</receiver>
-   <slot>slotTiltAngle(int)</slot>
+   <sender>canumeric_10</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>cagraphics_3</receiver>
+   <slot>slotTiltAngle(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>455</x>
-     <y>646</y>
+     <x>822</x>
+     <y>431</y>
     </hint>
     <hint type="destinationlabel">
-     <x>264</x>
-     <y>414</y>
+     <x>251</x>
+     <y>565</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_27</sender>
+   <signal>emitSignal(int)</signal>
+   <receiver>cagraphics_21</receiver>
+   <slot>slotStartAngle(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>797</x>
+     <y>379</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>950</x>
+     <y>286</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_28</sender>
+   <signal>emitSignal(int)</signal>
+   <receiver>cagraphics_21</receiver>
+   <slot>slotSpanAngle(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>948</x>
+     <y>384</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>956</x>
+     <y>333</y>
     </hint>
    </hints>
   </connection>

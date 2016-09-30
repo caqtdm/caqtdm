@@ -35,51 +35,36 @@ using namespace epics::pvAccess;
 
 #define DEFAULT_TIMEOUT 3.0
 
-// Requester.
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-RequesterImpl::RequesterImpl(String const & requesterName) : m_requesterName(requesterName)
-{
-}
-
-String RequesterImpl::getRequesterName()
-{
-    return "RequesterImpl";
-}
-
-void RequesterImpl::message(String const & message, MessageType messageType)
-{
-    std::cerr << "[" << getRequesterName() << "] message(" << message << ", " << getMessageTypeName(messageType) << ")" << std::endl;
-}
-
 // ChannelRequester.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-String ChannelRequesterImpl::getRequesterName()
+std::string MonitorPVRequesterImpl::getRequesterName()
 {
-    return "ChannelRequesterImpl";
+    qDebug() << "MonitorPVRequesterImpl::getRequesterName";
+    return "MonitorPVRequesterImpl";
 }
 
-void ChannelRequesterImpl::message(String const & message, MessageType messageType)
+void MonitorPVRequesterImpl::message(std::string const & message, MessageType messageType)
 {
     std::cout << "[" << getRequesterName() << "] message(" << message << ", " << getMessageTypeName[messageType] << ")"  << std::endl;
 }
 
-void ChannelRequesterImpl::channelCreated(const epics::pvData::Status& status, Channel::shared_pointer const & channel)
+void MonitorPVRequesterImpl::channelCreated(const epics::pvData::Status& status, Channel::shared_pointer const & channel)
 {
-    qDebug() << "ChannelRequesterImpl channelCreated";
+    qDebug() << "MonitorPVRequesterImpl::channelCreated";
     if (status.isSuccess()) {
         // show warning
         if (!status.isOK()) {
-             std::cout << "[" << channel->getChannelName() << "] channel create: " << status.toString()  << std::endl;
+             std::cout << "[" << channel->getChannelName() << "] channel create: " << status.getMessage()  << std::endl;
         }
     } else {
-         std::cout << "[" << channel->getChannelName() << "] failed to create a channel: " << status.toString()  << std::endl;
+         std::cout << "[" << channel->getChannelName() << "] failed to create a channel: " << status.getMessage()  << std::endl;
     }
 }
 
-void ChannelRequesterImpl::channelStateChange(Channel::shared_pointer const & channel, Channel::ConnectionState connectionState)
+void MonitorPVRequesterImpl::channelStateChange(Channel::shared_pointer const & channel, Channel::ConnectionState connectionState)
 {
     Q_UNUSED(channel);
-    qDebug() << "ChannelRequesterImpl channelStateChange " << m_channelIndex;
+    qDebug() << "MonitorPVRequesterImpl::channelStateChange " << m_channelIndex;
     if (connectionState == Channel::CONNECTED) {
          std::cout << channel->getChannelName() << " CONNECTED: " << std::endl;
         m_event.signal();
@@ -93,13 +78,15 @@ void ChannelRequesterImpl::channelStateChange(Channel::shared_pointer const & ch
     }
 }
 
-bool ChannelRequesterImpl::waitUntilConnected(double timeOut)
+bool MonitorPVRequesterImpl::waitUntilConnected(double timeOut)
 {
+     qDebug() << "MonitorPVRequesterImpl::waitUntilConnected";
     return m_event.wait(timeOut);
 }
 
-void  ChannelRequesterImpl::setMyData(int num, MutexKnobData* mutexKnobData)
+void  MonitorPVRequesterImpl::defineIndexForKnobData(int num, MutexKnobData* mutexKnobData)
 {
+    qDebug() << "MonitorPVRequesterImpl::defineIndexForKnobData";
     m_channelIndex = num;
     m_mutexData =  mutexKnobData;
 }
@@ -107,14 +94,15 @@ void  ChannelRequesterImpl::setMyData(int num, MutexKnobData* mutexKnobData)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 GetFieldRequesterImpl::GetFieldRequesterImpl(epics::pvAccess::Channel::shared_pointer channel) : m_channel(channel)
 {
+    qDebug() << "GetFieldRequesterImpl::GetFieldRequesterImpl";
 }
 
-String GetFieldRequesterImpl::getRequesterName()
+string GetFieldRequesterImpl::getRequesterName()
 {
     return "GetFieldRequesterImpl";
 }
 
-void GetFieldRequesterImpl::message(String const & message, MessageType messageType)
+void GetFieldRequesterImpl::message(string const & message, MessageType messageType)
 {
     std::cerr << "[" << getRequesterName() << "] message(" << message << ", " << getMessageTypeName(messageType) << ")" << std::endl;
 }
@@ -125,7 +113,7 @@ void GetFieldRequesterImpl::getDone(const epics::pvData::Status& status, epics::
     if (status.isSuccess()) {
         // show warning
         if (!status.isOK()) {
-            std::cerr << "[" << m_channel->getChannelName() << "] getField create: " << status.toString() << std::endl;
+            std::cerr << "[" << m_channel->getChannelName() << "] getField create: " << status.getMessage() << std::endl;
         }
         // assign smart pointers
         {
@@ -134,7 +122,7 @@ void GetFieldRequesterImpl::getDone(const epics::pvData::Status& status, epics::
         }
     } else {
         // do not complain about missing field
-        //std::cerr << "[" << m_channel->getChannelName() << "] failed to get channel introspection data: " << status.toString() << std::endl;
+        std::cerr << "[" << m_channel->getChannelName() << "] failed to get channel introspection data: " << status.getMessage() << std::endl;
     }
     m_event.signal();
 }
@@ -151,210 +139,172 @@ epics::pvData::FieldConstPtr GetFieldRequesterImpl::getField()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ChannelPutRequesterImpl::ChannelPutRequesterImpl(String channelName) : m_channelName(channelName)
+DataMonitorRequesterImpl::DataMonitorRequesterImpl(string channelName) : m_channelName(QString::fromStdString(channelName))
 {
-    resetEvent();
+    qDebug() << "DataMonitorRequesterImpl::MonitorRequesterImpl";
 }
 
-String ChannelPutRequesterImpl::getRequesterName()
+string  DataMonitorRequesterImpl::getRequesterName()
 {
-    return "ChannelPutRequesterImpl";
+    return "DataMonitorRequesterImpl";
 }
 
-void ChannelPutRequesterImpl::message(String const & message, MessageType messageType)
+void  DataMonitorRequesterImpl::message(string const & message, MessageType messageType)
 {
     std::cerr << "[" << getRequesterName() << "] message(" << message << ", " << getMessageTypeName(messageType) << ")" << std::endl;
 }
 
-void ChannelPutRequesterImpl::channelPutConnect(const epics::pvData::Status& status,
-                                                        ChannelPut::shared_pointer const & channelPut,
-                                                        epics::pvData::PVStructure::shared_pointer const & pvStructure,
-                                                        epics::pvData::BitSet::shared_pointer const & bitSet)
+void  DataMonitorRequesterImpl::monitorConnect(const epics::pvData::Status& status, Monitor::shared_pointer const & monitor, StructureConstPtr const & /*structure*/)
 {
-    if (status.isSuccess()) {
-        // show warning
-        if (!status.isOK()) {
-            std::cerr << "[" << m_channelName << "] channel put create: " << status.toString() << std::endl;
-        }
-
-        // assign smart pointers
-        {
-            Lock lock(m_pointerMutex);
-            m_channelPut = channelPut;
-            m_pvStructure = pvStructure;
-            m_bitSet = bitSet;
-        }
-
-        // we always put all
-        m_bitSet->set(0);
-
-        // get immediately old value
-        channelPut->get();
-    } else {
-        std::cerr << "[" << m_channelName << "] failed to create channel put: " << status.toString() << std::endl;
-    }
-}
-
-void ChannelPutRequesterImpl::getDone(const epics::pvData::Status& status)
-{
-     qDebug() << "ChannelPutRequesterImpl getDone";
-    if (status.isSuccess()) {
-        // show warning
-        if (!status.isOK()) {
-            std::cerr << "[" << m_channelName << "] channel get: " << status.toString() << std::endl;
-        }
-
-        // access smart pointers
-        Lock lock(m_pointerMutex);
-        {
-            PVField::shared_pointer value = m_pvStructure->getSubField("value");
-        }
-        m_event->signal();
-    } else {
-        std::cerr << "[" << m_channelName << "] failed to get: " << status.toString() << std::endl;
-    }
-
-}
-
-void ChannelPutRequesterImpl::putDone(const epics::pvData::Status& status)
-{
-    if (status.isSuccess()) {
-        // show warning
-        if (!status.isOK()) {
-            std::cerr << "[" << m_channelName << "] channel put: " << status.toString() << std::endl;
-        }
-        m_event->signal();
-    } else {
-        std::cerr << "[" << m_channelName << "] failed to get: " << status.toString() << std::endl;
-    }
-}
-
-PVStructure::shared_pointer ChannelPutRequesterImpl::getStructure()
-{
-    Lock lock(m_pointerMutex);
-    return m_pvStructure;
-}
-
-void ChannelPutRequesterImpl::resetEvent()
-{
-    Lock lock(m_eventMutex);
-    m_event.reset(new Event());
-}
-
-bool ChannelPutRequesterImpl::waitUntilDone(double timeOut)
-{
-    Event* event;
-    {
-        Lock lock(m_eventMutex);
-        event = m_event.get();
-    }
-    return event->wait(timeOut);
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-MonitorRequesterImpl::MonitorRequesterImpl(String channelName) : m_channelName(channelName)
-{
-    qDebug() << "MonitorRequesterImpl";
-}
-
-String  MonitorRequesterImpl::getRequesterName()
-{
-    return "MonitorRequesterImpl";
-}
-
-void  MonitorRequesterImpl::message(String const & message,MessageType messageType)
-{
-    std::cerr << "[" << getRequesterName() << "] message(" << message << ", " << getMessageTypeName(messageType) << ")" << std::endl;
-}
-
-void  MonitorRequesterImpl::monitorConnect(const epics::pvData::Status& status, Monitor::shared_pointer const & monitor, StructureConstPtr const & /*structure*/)
-{
-    qDebug() << "monitorConnect";
+    qDebug() <<  "DataMonitorRequesterImpl::monitorConnect : monitorConnect";
     if (status.isSuccess()) {
         Status startStatus = monitor->start();
         // show error
         if (!startStatus.isSuccess()) {
-            std::cerr << "[" << m_channelName << "] channel monitor start: " << startStatus.toString() << std::endl;
+            std::cerr << "[" << qasc(m_channelName) << "] channel monitor start: " << startStatus.getMessage() << std::endl;
         }
 
     } else {
-        std::cerr << "monitorConnect(" << status.toString() << ")" << std::endl;
+        std::cerr << "DataMonitorRequesterImpl::monitorConnect : monitorConnect(" << status.getMessage() << ")" << std::endl;
     }
 }
 
-void  MonitorRequesterImpl::monitorEvent(Monitor::shared_pointer const & monitor)
+void  DataMonitorRequesterImpl::monitorEvent(Monitor::shared_pointer const & monitor)
 {
-    qDebug() << "monitorEvent " << m_channelIndex;
+    qDebug() << "DataMonitorRequesterImpl::monitorEvent" << m_channelIndex;
     MonitorElement::shared_pointer element;
 
     knobData *kPtr = m_mutexData->GetMutexKnobDataPtr(m_channelIndex);  // use pointer
     if(kPtr->index == -1) return;
-    qDebug() << "connection state" << kPtr->edata.connected;
+    qDebug() << "DataMonitorRequesterImpl::monitorEvent : connection state" << kPtr->edata.connected;
 
     while (element = monitor->poll()) {
 
         PVField::shared_pointer value = element->pvStructurePtr->getSubField("value");
         if (value.get() == 0) {
-             std::cout <<  "no 'value' field" << m_channelName  << std::endl;
-             std::cout << *(element->pvStructurePtr.get())  << std::endl;
+             std::cout << "DataMonitorRequesterImpl::monitorEvent : no 'value' field" << qasc(m_channelName)  << std::endl;
+             std::cout << "DataMonitorRequesterImpl::monitorEvent : " << *(element->pvStructurePtr.get())  << std::endl;
         } else {
             Type valueType = value->getField()->getType();
 
             // we have a structure
             if (valueType != scalar && valueType != scalarArray) {
-                 std::cout << "structure " <<  m_channelName << std::endl;
-                 std::cout << *(element->pvStructurePtr.get()) << std::endl;
+                 std::cout << "DataMonitorRequesterImpl::monitorEvent : structure " <<  qasc(m_channelName) << std::endl;
+                 std::cout << "DataMonitorRequesterImpl::monitorEvent : " << *(element->pvStructurePtr.get()) << std::endl;
+
+                 // a structure, can be an enum
+                 if (valueType == structure) {
+                     string id = TR1::static_pointer_cast<PVStructure>(value)->getStructure()->getID();
+                     qDebug() << QString::fromStdString(id);
+
+                     if (id == "enum_t") {
+                         qDebug() << "I am an enum";
+
+                         PVInt::shared_pointer pvIndex = TR1::static_pointer_cast<PVStructure>(value)->getSubField<PVInt>("index");
+                         if (!pvIndex) throw std::runtime_error("enum_t structure does not have 'int index' field");
+
+                         PVStringArray::shared_pointer pvChoices = TR1::static_pointer_cast<PVStructure>(value)->getSubField<PVStringArray>("choices");
+                         if (!pvChoices) throw std::runtime_error("enum_t structure does not have 'string choices[]' field");
+
+                         int32 ix = pvIndex->get();
+                         int32 len = static_cast<int32>(pvChoices->getLength());
+
+                         if ((ix < 0) || (ix >= len)) {
+                             kPtr->edata.rvalue = ix;
+                             kPtr->edata.ivalue = ix;
+
+                         } else {
+                             // copy the enum value and strings to our array
+                             const PVStringArray::const_svector& data(pvChoices->view());
+                             QString enumArray;
+                             for (int i = 0; i < len; i++) {
+                                 QString strng = QString::fromStdString(data[i]);
+                                 enumArray.append(strng);
+                                 if(i < len-1) enumArray.append( "\033");
+                             }
+
+                             int dataSize = enumArray.size();
+                             if(dataSize != kPtr->edata.dataSize) {
+                                 free(kPtr->edata.dataB);
+                                 kPtr->edata.dataB = (void*) malloc((size_t) dataSize);
+                                 kPtr->edata.dataSize = dataSize;
+                             }
+                             strcpy( (char*) kPtr->edata.dataB, qasc(enumArray));
+                             kPtr->edata.rvalue = ix;
+                             kPtr->edata.ivalue = ix;
+                             kPtr->edata.precision = 0;
+                             kPtr->edata.units[0] = '\0';
+                             kPtr->edata.valueCount = len;
+                             kPtr->edata.fieldtype = caENUM;
+
+                         }
+                     } else {
+                         qDebug() << "epics4 -- only enum_t yet treated";
+                     }
+
+
+                 } else {
+                     std::cout << "DataMonitorRequesterImpl::monitorEvent : "  << *(element->pvStructurePtr.get());
+                 }
+
+
+
 
                 // we have a scalar value or scalar array
             } else {
                 if (value->getField()->getType() == scalar) {
-                     std::cout << "scalar "<<  m_channelName << std::endl;
+                     std::cout << "DataMonitorRequesterImpl::monitorEvent : scalar "<<  qasc(m_channelName) << std::endl;
 
                     ParseScalar("", static_pointer_cast<PVScalar>(value), kPtr);
+                    qDebug() << "DataMonitorRequesterImpl::monitorEvent : after parsing";
 
                     PVField::shared_pointer alarm = element->pvStructurePtr->getSubField("alarm");
-                    if (alarm.get() != 0) ParsePVStructure(static_pointer_cast<PVStructure>(alarm), kPtr, false);
+                    if (alarm.get() != 0) ParsePVStructure(m_channelName, static_pointer_cast<PVStructure>(alarm), kPtr, false);
 
                     PVField::shared_pointer display = element->pvStructurePtr->getSubField("display");
-                    if (display.get() != 0) ParsePVStructure(static_pointer_cast<PVStructure>(display), kPtr, false);
+                    if (display.get() != 0) ParsePVStructure(m_channelName, static_pointer_cast<PVStructure>(display), kPtr, false);
 
                     PVField::shared_pointer control = element->pvStructurePtr->getSubField("control");
-                    if (control.get() != 0) ParsePVStructure(static_pointer_cast<PVStructure>(control), kPtr, false);
+                    if (control.get() != 0) ParsePVStructure(m_channelName, static_pointer_cast<PVStructure>(control), kPtr, false);
 
                     PVField::shared_pointer valueAlarm = element->pvStructurePtr->getSubField("valueAlarm");
-                    if (valueAlarm.get() != 0) ParsePVStructure(static_pointer_cast<PVStructure>(valueAlarm), kPtr, false);
+                    if (valueAlarm.get() != 0) ParsePVStructure(m_channelName, static_pointer_cast<PVStructure>(valueAlarm), kPtr, false);
 
                 } else {
-                     std::cout <<  "scalar array " << m_channelName << " values: "  << std::endl;
+                     std::cout <<  "DataMonitorRequesterImpl::monitorEvent :scalar array " << qasc(m_channelName) << " values: "  << std::endl;
                     ParseScalarArray(static_pointer_cast<PVScalarArray>(value), kPtr);
                 }
             }
         }
+        monitor->release(element);
     }
 
+    struct timeb now;
+    ftime(&now);
     kPtr->edata.accessW = true;
     kPtr->edata.accessR = true;
+    kPtr->edata.actTime = now;
+    kPtr->edata.status = 0;
     kPtr->edata.monitorCount++;
-    strcpy(kPtr->edata.fec, "EPICS4");
     m_mutexData->SetMutexKnobDataReceived(kPtr);
-
-    monitor->release(element);
 }
 
-void  MonitorRequesterImpl::unlisten(Monitor::shared_pointer const & /*monitor*/)
+void  DataMonitorRequesterImpl::unlisten(Monitor::shared_pointer const & /*monitor*/)
 {
+    qDebug() << "DataMonitorRequesterImpl::unlisten";
     std::cerr << "unlisten" << std::endl;
 }
 
-void  MonitorRequesterImpl::setMyData(int num, MutexKnobData* mutexKnobData)
+void  DataMonitorRequesterImpl::defineIndexForKnobData(int num, MutexKnobData* mutexKnobData)
 {
+    qDebug() << "DataMonitorRequesterImpl::defineIndexForKnobData" << num;
     m_channelIndex = num;
     m_mutexData =  mutexKnobData;
 }
 
-void MonitorRequesterImpl::ParsePVStructure(epics::pvData::PVStructure::shared_pointer const & pv, knobData* kPtr, int notFirst)
+void DataMonitorRequesterImpl::ParsePVStructure(QString fieldName, PVStructure::shared_pointer const & pv, knobData* kPtr, int notFirst)
 {
+    qDebug() << "DataMonitorRequesterImpl::ParsePVStructure" << fieldName;
     Type type = pv->getField()->getType();
     QString tstr = QString(pv->getField()->getID().c_str());
 
@@ -368,28 +318,28 @@ void MonitorRequesterImpl::ParsePVStructure(epics::pvData::PVStructure::shared_p
             int length = pv->getStructure()->getNumberFields();
             StringArray const & fieldNames = pv->getStructure()->getFieldNames();
             for(int i=0; i<length; i++) {
-                //qDebug() << "ParsePVStructure (" << notFirst << ") field " << i << " name " << fieldNames[i];
+                qDebug() << "ParsePVStructure (" << notFirst << ") field " << i << " name " << QString::fromStdString(fieldNames[i]);
                 epics::pvData::Type subtype =pv->getStructure()->getField(fieldNames[i])->getType();
 
                 if(subtype==structure) {
-                    //qDebug() << " type structure";
-                    PVStructurePtr subpv = pv->getStructureField(fieldNames[i]);
-                    ParsePVStructure(subpv, kPtr, notFirst + 1);
+                    qDebug() << "DataMonitorRequesterImpl::ParsePVStructure type structure";
+                    //todoPVStructurePtr subpv = pv->getStructureField(fieldNames[i]);
+                    //todoParsePVStructure(subpv, kPtr, notFirst + 1);
                 }
 
                 if(subtype==structureArray) {
-                    //qDebug() << " type structureArray";
+                    qDebug() << "DataMonitorRequesterImpl::ParsePVStructure type structureArray";
                     //PVStructureArrayPtr subpv = pv->getStructureArrayField(fieldNames[i]);
                     //ParsePVStructure(subpv, kPtr, notFirst + 1);
                 }
 
                 if(subtype==scalar) {
-                    //qDebug() << " type scalar";
+                    qDebug() << "DataMonitorRequesterImpl::ParsePVStructure type scalar";
                     PVScalarPtr pvs = static_pointer_cast<PVScalar>(fieldsArr[i]);
                     ParseScalar(fieldName, pvs, kPtr);
                 }
                 if(subtype==scalarArray) {
-                    //qDebug() << " type scalarArray";
+                    qDebug() << "DataMonitorRequesterImpl::ParsePVStructure type scalarArray";
                     //PVScalarArrayPtr subpv = pv->getScalarArrayField(fieldNames[i]);
                     //subpv->getField()->getType();
                     //ParsePVStructure(subpv, kPtr ,notFirst + 1);
@@ -399,23 +349,26 @@ void MonitorRequesterImpl::ParsePVStructure(epics::pvData::PVStructure::shared_p
         return;
     }
     if(type==scalarArray) {
-        qDebug() << "scalarArray";
+        qDebug() << "DataMonitorRequesterImpl::ParsePVStructure scalarArray";
         //convertArray(static_cast<PVScalarArray *>(pv),notFirst);
         return;
     }
     if(type==structureArray) {
-        qDebug() << "structureArray";
+        qDebug() << "DataMonitorRequesterImpl::ParsePVStructure structureArray";
         //convertStructureArray(static_cast<PVStructureArray*>(pv),notFirst);
         return;
     }
 }
 
-void MonitorRequesterImpl::ParseScalarArray(PVScalarArray::shared_pointer const & pvArray,  knobData* kPtr)
+void DataMonitorRequesterImpl::ParseScalarArray(PVScalarArray::shared_pointer const & pvArray,  knobData* kPtr)
 {
+    qDebug() << "DataMonitorRequesterImpl::ParseScalarArray";
+    /*
     size_t length = pvArray->getLength();
     qDebug() << "lenght of array " << length;
     PVDoubleArrayPtr ArrayData = static_pointer_cast<epics::pvData::PVDoubleArray> (pvArray);
-    DoubleArrayData valuesArrayData;
+    //DoubleArrayData valuesArrayData;
+    PVValueArray<double> valuesArrayData;
     int valuesLength = ArrayData->get(0, ArrayData->getLength(), valuesArrayData);
 
     if((double) (valuesLength * sizeof(double)) != kPtr->edata.dataSize) {
@@ -427,18 +380,21 @@ void MonitorRequesterImpl::ParseScalarArray(PVScalarArray::shared_pointer const 
     kPtr->edata.precision = 3;  // for the time beeing, set to 3
     kPtr->edata.fieldtype = caDOUBLE;
     memcpy(kPtr->edata.dataB, &valuesArrayData.data[0],  valuesLength * sizeof(double));
-
+*/
 }
 
-void MonitorRequesterImpl::ParseScalar(QString fieldName, PVScalarPtr const & pvs, knobData* kPtr)
+void DataMonitorRequesterImpl::ParseScalar(QString fieldName, PVScalarPtr const & pvs, knobData* kPtr)
 {
     QString thisFieldName  = QString::fromStdString(pvs->getFieldName());
-    //qDebug() << "ParseScalar -- field/subfield" << fieldName << thisFieldName;
+    qDebug() << " DataMonitorRequesterImpl::ParseScalar -- field/subfield" << fieldName << thisFieldName;
     ScalarConstPtr scalar = pvs->getScalar();
     ScalarType scalarType = scalar->getScalarType();
 
+    qDebug() << " DataMonitorRequesterImpl::ParseScalar -- value" << scalar;
+
     switch(scalarType) {
     case pvBoolean: {
+        qDebug() << "DataMonitorRequesterImpl::ParseScalar -- is pvBoolean";
         PVBooleanPtr data = static_pointer_cast<PVBoolean>(pvs);
 
         if(thisFieldName.contains("value")) {
@@ -448,6 +404,7 @@ void MonitorRequesterImpl::ParseScalar(QString fieldName, PVScalarPtr const & pv
     }
         break;
     case pvByte: {
+        qDebug() << "DataMonitorRequesterImpl::ParseScalar -- is pvByte";
         PVBytePtr data = static_pointer_cast<PVByte>(pvs);
 
         if(thisFieldName.contains("value")) {
@@ -456,7 +413,9 @@ void MonitorRequesterImpl::ParseScalar(QString fieldName, PVScalarPtr const & pv
         }
     }
         break;
-    case pvShort: {
+    case pvShort:
+    case pvUShort: {
+        qDebug() << "DataMonitorRequesterImpl::ParseScalar -- is pvShort";
         PVShortPtr data = static_pointer_cast<PVShort>(pvs);
 
         if(thisFieldName.contains("value")) {
@@ -466,23 +425,44 @@ void MonitorRequesterImpl::ParseScalar(QString fieldName, PVScalarPtr const & pv
         }
     }
         break;
+
     case pvInt: {
+        qDebug() << "DataMonitorRequesterImpl::ParseScalar -- is pvInt";
         PVIntPtr data = static_pointer_cast<PVInt>(pvs);
 
         if(fieldName.contains("alarm") && thisFieldName.contains("severity")) {
             kPtr->edata.severity =(int) data->get();
         } else if(fieldName.contains("alarm") && thisFieldName.contains("status")) {
             kPtr->edata.status =  (int) data->get();
+        }
 
-
-        } if(thisFieldName.contains("value")) {
+        if(thisFieldName.contains("value")) {
             kPtr->edata.fieldtype = caINT;
             kPtr->edata.rvalue = data->get();
             kPtr->edata.ivalue = (int)data->get();
         }
     }
         break;
-    case pvLong: {
+    case pvUInt: {
+        qDebug() << "DataMonitorRequesterImpl::ParseScalar -- is pvInt";
+        PVUIntPtr data = static_pointer_cast<PVUInt>(pvs);
+
+        if(fieldName.contains("alarm") && thisFieldName.contains("severity")) {
+            kPtr->edata.severity =(int) data->get();
+        } else if(fieldName.contains("alarm") && thisFieldName.contains("status")) {
+            kPtr->edata.status =  (int) data->get();
+        }
+
+        if(thisFieldName.contains("value")) {
+            kPtr->edata.fieldtype = caINT;
+            kPtr->edata.rvalue = data->get();
+            kPtr->edata.ivalue = (int)data->get();
+        }
+    }
+        break;
+    case pvLong:
+    case pvULong: {
+        qDebug() << "DataMonitorRequesterImpl::ParseScalar -- is pvLong";
         PVLongPtr data = static_pointer_cast<PVLong>(pvs);
 
         if(thisFieldName.contains("value")) {
@@ -493,6 +473,7 @@ void MonitorRequesterImpl::ParseScalar(QString fieldName, PVScalarPtr const & pv
     }
         break;
     case pvFloat: {
+        qDebug() << "DataMonitorRequesterImpl::ParseScalar -- is pvFloat";
         PVFloatPtr data = static_pointer_cast<PVFloat>(pvs);
 
         if(thisFieldName.contains("value")) {
@@ -502,6 +483,7 @@ void MonitorRequesterImpl::ParseScalar(QString fieldName, PVScalarPtr const & pv
     }
         break;
     case pvDouble: {
+        qDebug() << "DataMonitorRequesterImpl::ParseScalar -- is pvDouble" << fieldName;
         PVDoublePtr data = static_pointer_cast<PVDouble>(pvs);
 
         if(fieldName.contains("display") && thisFieldName.contains("limitLow")) {
@@ -526,13 +508,17 @@ void MonitorRequesterImpl::ParseScalar(QString fieldName, PVScalarPtr const & pv
 
             // fill value and type
         } else if(thisFieldName.contains("value")) {
+            qDebug() << "DataMonitorRequesterImpl::ParseScalar -- is pvDouble with fieldname=" << thisFieldName << data;
             kPtr->edata.precision = 3;  // for the time beeing, set to 3
             kPtr->edata.fieldtype = caDOUBLE;
             kPtr->edata.rvalue = data->get();
+        } else {
+           qDebug() << "DataMonitorRequesterImpl::ParseScalar -- is pvDouble but fielname is empty";
         }
     }
         break;
     case pvString: {
+        qDebug() << "DataMonitorRequesterImpl::ParseScalar -- is pvString";
         PVStringPtr data = static_pointer_cast<PVString>(pvs);
 
         // fill units
@@ -543,12 +529,12 @@ void MonitorRequesterImpl::ParseScalar(QString fieldName, PVScalarPtr const & pv
 
             // fill value and type
         } else if(thisFieldName.contains("value")) {
-            qDebug() << "String :" << data->get().c_str();
+            qDebug() << "DataMonitorRequesterImpl::ParseScalar String :" << data->get().c_str();
         }
     }
         break;
     default:
-        qDebug() << "(unknown ScalarType)" << endl;
+        qDebug() << "DataMonitorRequesterImpl::ParseScalar (unknown ScalarType)" << endl;
     }
 
 

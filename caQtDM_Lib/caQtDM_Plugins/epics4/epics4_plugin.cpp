@@ -80,14 +80,11 @@ int Epics4Plugin::pvFreeAllocatedData(knobData *kData)
     return true;
 }
 
-int Epics4Plugin::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType) {
-    Q_UNUSED(object);
-    Q_UNUSED(errmess);
-    Q_UNUSED(forceType);
-    qDebug() << "Epics4Plugin:pvSetValue" << pv << rdata << idata << sdata;
-    QString from = QString::number(rdata);
+int Epics4Plugin::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType)
+{
 #ifdef EPICS4
-    Epics4->Epics4SetValue(QString(pv), from);
+    qDebug() << "Epics4Plugin:pvSetValue";
+    Epics4->Epics4SetValue(pv, rdata, idata, sdata, forceType);
 #endif
     return true;
 }
