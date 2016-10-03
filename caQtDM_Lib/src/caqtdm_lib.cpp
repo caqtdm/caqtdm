@@ -36,6 +36,7 @@
 #include <sys/timeb.h>
 #include <QObject>
 #include <QToolBar>
+#include <QUuid>
 
 // interfacing widgets, handling their own data acquisition ... (thanks zai)
 #include "caWidgetInterface.h"
@@ -829,7 +830,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
             QString pv = calcWidget->getVariable();
             if(pv.size() == 0) {
-                pv =  QUuid::createUuid();
+                pv =  QUuid::createUuid().toString();
                 pv = pv.replace("{", "");  // otherwise a json string, that would be taken out
                 pv = pv.replace("}", "");
             }
