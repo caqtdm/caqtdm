@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V4.1.2
+CAQTDM_VERSION = V4.1.3
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -86,6 +86,21 @@ DEFINES += TARGET_DESCRIPTION=\"\\\"$${TARGET_DESCRIPTION}\\\"\"
 DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
+
+# 4.1.3
+# caChoice has now the possibility to display a row from the bottom to the top (rowInverse)
+# soft pv's without a name were not working, now automatically a name is generated
+# in order to have cacalc's working correctly in includes, a macro can be used in order to individialize them
+# zero values in cartesian plot are now replaced by the lowest non-zero value when logarithmic scale is used
+# for infinite values, cartseian plot was taken unlimited resources for display, this should be corrected nw
+# slots are added to cagraphics for animation of these objects (tilt angle, span angle, arc, .. can be set now through signals
+# caCamera will now zoom by default on the middle of the image and otherwise around the last clicked point
+# autorepeat on canumeric has been take out on request of the users
+# default timing of the timed update loop has now a lower internal rate, may still be changed by a json string
+# .ftvl field of epics is now used to distingues signed anand unsigned display in cawavetable
+# in pep file you may add now the keyword -minwidth to an item in order to define the minimum width of it (default value=100).
+#      you can steer column width like that. also -comsize has been added for the comment to steer the fontsize.
+# cachoice has been slightly modified in order to grow instead of shrink (for pep files this was an issue)
 
 # 4.1.2
 # caLineDemo has been renamed in caLineDraw and is now able to draw vertically

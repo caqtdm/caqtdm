@@ -156,6 +156,8 @@ void caChoice::arrangeCells(QStringList list, int indx)
         // take care of stacking
         if(thisStacking == Row) {
           grid->addWidget(temp, i, 0);
+        } else if(thisStacking == RowInverse) {
+          grid->addWidget(temp, numCells-i-1, 0);
         } else if(thisStacking == Column) {
           grid->addWidget(temp, 0, i);
         } else {

@@ -66,7 +66,7 @@ public:
 
     enum alignmentHor {left, right, center};
     enum colMode {Default, Static, Alarm};
-    enum Stacking {Row, Column, RowColumn};
+    enum Stacking {Row, Column, RowColumn, RowInverse};
 
     void noStyle(QString style) {Q_UNUSED(style);}
 
