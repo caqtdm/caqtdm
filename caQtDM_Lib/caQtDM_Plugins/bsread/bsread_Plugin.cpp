@@ -156,7 +156,7 @@ int bsreadPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
     int i;
     QMutexLocker locker(&mutex);
     Dispatcher.add_Channel(kData->pv,kData->index);
-    qDebug() << "bsreadPlugin:pvAddMonitor" << kData->pv << kData->index << kData;
+    //qDebug() << "bsreadPlugin:pvAddMonitor" << kData->pv << kData->index << kData;
     i=0;
 
     while ((i<bsreadconnections.size())){
@@ -175,7 +175,7 @@ int bsreadPlugin::pvClearMonitor(knobData *kData) {
 
     QMutexLocker locker(&mutex);
     Dispatcher.rem_Channel(QString(kData->pv),kData->index);
-    qDebug() << "bsreadPlugin:pvClearMonitor" << kData << kData->pv << kData->index <<bsreadconnections.size();
+    //qDebug() << "bsreadPlugin:pvClearMonitor" << kData << kData->pv << kData->index <<bsreadconnections.size();
     while (i<bsreadconnections.size()){
         bsreadconnections.at(i)->bsread_DataMonitorUnConnect(kData);
 		i++;

@@ -29,7 +29,6 @@
 #include <QBuffer>
 #include <QByteArray>
 #include <QDataStream>
-
 #include "zmq.h"
 #include <exception>
 #include "bsread_decode.h"
@@ -42,16 +41,28 @@
 bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint)
 {
    StreamConnectionPoint=ConnectionPoint;
+   StreamConnectionType="push_pull";
    context=Context;
-
    UpdaterPool=new QThreadPool(this);
    UpdaterPool->setExpiryTimeout(-1);
    BlockPool=new QThreadPool(this);
    BlockPool->setExpiryTimeout(-1);
-
-
-
 }
+bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint,QString ConnectionType)
+{
+   StreamConnectionPoint=ConnectionPoint;
+   StreamConnectionType=ConnectionType;
+   context=Context;
+   UpdaterPool=new QThreadPool(this);
+   UpdaterPool->setExpiryTimeout(-1);
+   BlockPool=new QThreadPool(this);
+   BlockPool->setExpiryTimeout(-1);
+}
+
+
+
+
+
 bsread_Decode::~bsread_Decode()
 {
     QMutexLocker locker(&mutex);
@@ -66,17 +77,24 @@ bsread_Decode::~bsread_Decode()
 void bsread_Decode::bsread_createConnection(int rc)
 {
     int value;
-    zmqsocket=zmq_socket(context, ZMQ_PULL);
+    qDebug()<< "StreamConnectionType: "<<StreamConnectionType;
+    if (QString::compare(StreamConnectionType,"pub_sub",Qt::CaseInsensitive)==0){
+        zmqsocket=zmq_socket(context, ZMQ_SUB);
+    }else{
+        zmqsocket=zmq_socket(context, ZMQ_PULL);
+    }
+
+
     if (!zmqsocket) {
         printf ("error in zmq_socket: %s\n", zmq_strerror (errno));
     }
-    value=0;
+    value=1;
     rc=zmq_setsockopt(zmqsocket,ZMQ_LINGER,&value,sizeof(value));
     if (rc != 0) {
         printf ("error in zmq_setsockopt: %s(%s)\n", zmq_strerror (errno),StreamConnectionPoint.toLatin1().constData());
 
     }
-    value=1;
+    value=2;
     rc=zmq_setsockopt(zmqsocket,ZMQ_RCVHWM,&value,sizeof(value));
     if (rc != 0) {
         printf ("error in zmq_setsockopt: %s(%s)\n", zmq_strerror (errno),StreamConnectionPoint.toLatin1().constData());
@@ -84,6 +102,15 @@ void bsread_Decode::bsread_createConnection(int rc)
     }
 
     rc = zmq_connect (zmqsocket, StreamConnectionPoint.toLatin1().constData());
+
+    if (QString::compare(StreamConnectionType,"pub_sub",Qt::CaseInsensitive)==0){
+        rc=zmq_setsockopt( zmqsocket, ZMQ_SUBSCRIBE, "", 0 );
+        if (rc != 0) {
+            printf ("error in zmq_setsockopt: %s(%s)\n", zmq_strerror (errno),StreamConnectionPoint.toLatin1().constData());
+
+        }
+    }
+
 }
 
 void bsread_Decode::process()
@@ -100,11 +127,11 @@ void bsread_Decode::process()
     terminate=false;
 
 
-    //qDebug() << "bsreadPlugin: ConnectionPoint :"<< ConnectionPoint;
+    qDebug() << "bsreadPlugin: ConnectionPoint :"<< StreamConnectionPoint << StreamConnectionType ;
     bsread_createConnection(rc);
     if (rc != 0) {
         printf ("error in zmq_connect: %s(%s)\n", zmq_strerror (errno),StreamConnectionPoint.toLatin1().constData());
-        //qDebug() << "bsreadPlugin: ConnectionPoint faild";
+        qDebug() << "bsreadPlugin: ConnectionPoint faild";
         running_decode=false;
     }else{
 
@@ -112,7 +139,6 @@ void bsread_Decode::process()
         channelcounter=0;
 
         while (!terminate){
-            //printf("Message\n");
             rc = zmq_msg_recv (&msg,zmqsocket,ZMQ_DONTWAIT);
             if (rc > 0) {
                 notReceivedCounter=0;
@@ -155,11 +181,11 @@ void bsread_Decode::process()
                             }
 
                         }
-                        // qDebug() <<"---------------------------";
+                        //qDebug() <<"---------------------------";
                         bsread_EndofData();
                     }else{
                      if (main_htype.contains("bsr_reconnect")){
-                         StreamConnectionPoint=main_reconnect_adress;
+                         //StreamConnectionPoint=main_reconnect_adress;
                          bsread_createConnection(rc);
                          if (rc != 0) {
                              printf ("error in bsr_reconnect: %s(%s)\n", zmq_strerror (errno),StreamConnectionPoint.toLatin1().constData());
@@ -189,7 +215,7 @@ void bsread_Decode::process()
                     bsread_Delay();
                     notReceivedCounter++;
                     if (notReceivedCounter>200){
-                       //qDebug() << "bsread ZMQ Data Timeout";
+                        //qDebug() << "bsread ZMQ Data Timeout";
                         //bsread_DataTimeOut();
                         notReceivedCounter=0;
                     }
@@ -207,6 +233,11 @@ void bsread_Decode::process()
     qDebug() << "bsread ZMQ Receiver terminate";
 
 }
+QString bsread_Decode::getStreamConnectionPoint() const
+{
+    return StreamConnectionPoint;
+}
+
 size_t bsread_Decode::getMessage_size() const
 {
     return message_size;
@@ -235,6 +266,7 @@ bool bsread_Decode::setMainHeader(char *value,size_t size)
 
             if (jsonobj.find(L"pulse_id") != jsonobj.end() && jsonobj[L"pulse_id"]->IsNumber()) {
                 pulse_id=jsonobj[L"pulse_id"]->AsNumber();
+                //qDebug() << "pulse_id :" << pulse_id;
             }
             if (jsonobj.find(L"htype") != jsonobj.end() && jsonobj[L"htype"]->IsString()) {
                 main_htype=QString::fromWCharArray(jsonobj[L"htype"]->AsString().c_str());
@@ -340,7 +372,7 @@ void bsread_Decode::setHeader(char *value,size_t size){
                     if (jsonobj3.find(L"name") != jsonobj3.end() && jsonobj3[L"name"]->IsString()) {
                         chdata->name=QString::fromWCharArray(jsonobj3[L"name"]->AsString().c_str());
                         ChannelSearch.insert(chdata->name, chdata);
-                        // printf("Ch-Name :%s\n",chdata->name.toLatin1().constData());
+                        printf("Ch-Name :%s\n",chdata->name.toLatin1().constData());
                     }
                     if (jsonobj3.find(L"offset") != jsonobj3.end() && jsonobj3[L"offset"]->IsNumber()) {
                         chdata->offset=jsonobj3[L"offset"]->AsNumber();
@@ -944,7 +976,8 @@ void *bsread_Decode::getZmqsocket() const
 }
 QString bsread_Decode::getConnectionPoint() const
 {
-    return ConnectionPoint;
+    qDebug() << "StreamConnectionPoint:" <<StreamConnectionPoint;
+    return StreamConnectionPoint;
 }
 bool bsread_Decode::getRunning_decode() const
 {

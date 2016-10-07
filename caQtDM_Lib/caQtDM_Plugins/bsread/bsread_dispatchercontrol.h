@@ -27,6 +27,7 @@
 
 #include <QObject>
 #include <QThread>
+#include <QBuffer>
 #include <QMutex>
 #include <QWaitCondition>
 #include <QNetworkReply>
@@ -65,11 +66,13 @@ public:
 
     void setMessagewindow(MessageWindow *value);
 
+
 signals:
     //void requestFinished();
     void finished();
 public slots:
-   void finishReply();
+   void finishReplyConnect();
+   void finishReplyDelete();
    void process();
 
 protected:
@@ -81,20 +84,31 @@ protected:
   QMultiMap<QString,int> Channels;
   QList<channelstruct> ChannelsAddPipeline;
   QList<channelstruct> ChannelsRemPipeline;
-  QNetworkRequest request;
-  QNetworkReply* reply;
+  QList<QString> ConnectionDeletePipeline;
+  //QEventLoop eventloop;
+  QNetworkRequest requestChannel;
+  QNetworkRequest requestDelete;
+  QNetworkReply* replyConnect;
+  QNetworkReply* replydelete;
+  QBuffer buff_delete_data;
+
   QMutex ProcessLocker;
   QMutex ChannelAddPipelineLocker;
   QMutex ChannelRemPipelineLocker;
+  QMutex ConnectionDeleteLocker;
   QMutex ChannelLocker;
   QWaitCondition startReconnection;
 
   channelstruct get_AddChannel();
   channelstruct get_RemChannel();
+  void deleteStream(QString *value);
+  QString get_DeleteConnection();
   void * zmqcontex;
   MutexKnobData *mutexknobdataP;
   QList<bsread_Decode*> bsreadconnections;
   QList<QThread*> bsreadThreads;
+
+
 };
 
 
