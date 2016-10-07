@@ -1019,7 +1019,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             int num = addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
             integerList.append(num);
             connect(menuWidget, SIGNAL(activated(QString)), this, SLOT(Callback_MenuClicked(QString)));
-            menuWidget->setPV(text);
+            menuWidget->setPV(pv);
             nbMonitors++;
         }
 
@@ -1145,7 +1145,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             int num = addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
             integerList.append(num);
             connect(choiceWidget, SIGNAL(clicked(QString)), this, SLOT(Callback_ChoiceClicked(QString)));
-            choiceWidget->setPV(text);
+            choiceWidget->setPV(pv);
             nbMonitors++;
         }
 

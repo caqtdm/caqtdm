@@ -66,11 +66,12 @@ class CAQTDM_LIBSHARED_EXPORT epics4Subs {
 public:
     epics4Subs(MutexKnobData* mutexKnobData);
      ~epics4Subs();
-    void CreateAndConnect4(int num, QString pv);
+    void CreateAndConnect4(int num, char *pv);
     void ParseScalar(PVScalarPtr const & pv);
     void Epics4SetValue(char* pv, double rdata, int32_t idata, char *sdata, int forceType);
-    void ParsePVStructure(PVStructurePtr const & pvStructure, double rdata, int32_t idata, char *sdata, int forceType);
+    void Epics4SetData(PVStructurePtr const & pvStructure, double rdata, int32_t idata, char *sdata, int forceType);
     void setScalarData(PVScalarPtr const & pvScalar, double rdata, int32_t idata, char *sdata, int forceType);
+    int EpicsGetDescription(char *pv, char *description);
 
 
 private:

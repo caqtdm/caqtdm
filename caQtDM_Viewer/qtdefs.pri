@@ -56,7 +56,7 @@ CONFIG += XDR_HACK
 }
 
 # undefine this for epics4 plugin support (only preliminary version as example)
-#CONFIG += epics4
+CONFIG += epics4
 
 # undefine this for bsread (zeromq) plugin support
 #CONFIG += bsread
@@ -101,6 +101,7 @@ DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 # in pep file you may add now the keyword -minwidth to an item in order to define the minimum width of it (default value=100).
 #      you can steer column width like that. also -comsize has been added for the comment to steer the fontsize.
 # cachoice has been slightly modified in order to grow instead of shrink (for pep files this was an issue)
+# searching of a pv for the infobox would find the pv independently of the associated plugin, giving therefore confusion
 
 # 4.1.2
 # caLineDemo has been renamed in caLineDraw and is now able to draw vertically

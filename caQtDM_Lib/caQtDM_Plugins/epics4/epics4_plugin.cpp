@@ -114,7 +114,7 @@ int Epics4Plugin::pvGetDescription(char *pv, char *description) {
     Q_UNUSED(pv);
     Q_UNUSED(description);
     qDebug() << "Epics4Plugin:pvGetDescription";
-    return true;
+    return Epics4->EpicsGetDescription(pv, description);
 }
 
 int Epics4Plugin::pvClearEvent(void * ptr) {
