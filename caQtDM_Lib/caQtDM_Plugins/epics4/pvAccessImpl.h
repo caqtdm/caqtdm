@@ -26,6 +26,8 @@
 #ifndef PVACCESSIMPL_H
 #define  PVACCESSIMPL_H
 
+#include <QString>
+#include <QStringList>
 #include <iostream>
 #include <stdio.h>
 #include <vector>
@@ -40,6 +42,7 @@
 #include <pv/logger.h>
 #include <pv/monitor.h>
 #include <pv/event.h>
+#include <pv/standardPVField.h>
 #include <epicsExit.h>
 
 #include "knobDefines.h"
@@ -51,6 +54,7 @@ using namespace epics::pvData;
 using namespace epics::pvAccess;
 
 #define qasc(x) x.toLatin1().constData()
+
 
 class MonitorPVRequesterImpl : public ChannelRequester
 {
@@ -94,20 +98,22 @@ public:
 class DataMonitorRequesterImpl : public MonitorRequester
 {
 private:
-    QString m_channelName;
+    string m_channelName;
     int m_channelIndex;
     MutexKnobData* m_mutexData;
 
 public:
+    enum limitsType {_display, _control, _alarm, _valuealarm};
     DataMonitorRequesterImpl(std::string channelName);
     virtual std::string getRequesterName();
     virtual void message(std::string const & message, MessageType messageType);
     virtual void monitorConnect(const epics::pvData::Status& status, Monitor::shared_pointer const & monitor, StructureConstPtr const & );
     virtual void monitorEvent(Monitor::shared_pointer const & monitor);
     virtual void unlisten(Monitor::shared_pointer const & );
-    void ParsePVStructure(QString fieldName, epics::pvData::PVStructure::shared_pointer const & pv, knobData* kData, int notFirst);
-    void ParseScalar(QString fieldName, PVScalarPtr const & pvs, knobData* kData);
+    void ParsePVStructure(std::string fieldName, epics::pvData::PVStructure::shared_pointer const & pv, knobData* kData, int notFirst, limitsType lim);
+    void ParseScalar(std::string fieldName, PVScalarPtr const & pvs, knobData* kData, limitsType limits);
     void ParseScalarArray(PVScalarArrayPtr const & pvs, knobData* kData);
     void defineIndexForKnobData(int num, MutexKnobData* mutexKnobData);
+    int scanFormat(const QString &fmt, int &precision);
 };
 #endif
