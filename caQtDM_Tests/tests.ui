@@ -2105,8 +2105,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>431</width>
-           <height>191</height>
+           <width>100</width>
+           <height>30</height>
           </rect>
          </property>
          <attribute name="label">
@@ -2346,7 +2346,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>15</number>
+       <number>8</number>
       </property>
       <property name="usesScrollButtons">
        <bool>true</bool>
@@ -9205,7 +9205,7 @@ def PythonCalc(a, b, c, d):
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>7</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
@@ -11795,6 +11795,127 @@ p, li { white-space: pre-wrap; }
           <enum>caLineEdit::string</enum>
          </property>
         </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_10">
+        <property name="geometry">
+         <rect>
+          <x>448</x>
+          <y>109</y>
+          <width>111</width>
+          <height>353</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="title">
+         <string>epics4://float03</string>
+        </property>
+        <widget class="caSlider" name="caslider_2">
+         <property name="geometry">
+          <rect>
+           <x>15</x>
+           <y>32</y>
+           <width>69</width>
+           <height>306</height>
+          </rect>
+         </property>
+         <property name="scalePosition">
+          <enum>QwtSlider::TrailingScale</enum>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">epics4://float03</string>
+         </property>
+         <property name="scaleValueEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </widget>
+       <widget class="caCartesianPlot" name="caCartesianPlot_1">
+        <property name="geometry">
+         <rect>
+          <x>615</x>
+          <y>127</y>
+          <width>359</width>
+          <height>228</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="Title" stdset="0">
+         <string notr="true">Test Curve</string>
+        </property>
+        <property name="TitleX">
+         <string>[kv]</string>
+        </property>
+        <property name="TitleY">
+         <string>uA</string>
+        </property>
+        <property name="channels_1" stdset="0">
+         <string notr="true">;epics4://floatArray01</string>
+        </property>
+        <property name="Style_1">
+         <enum>caCartesianPlot::FillUnder</enum>
+        </property>
+        <property name="symbol_1">
+         <enum>caCartesianPlot::NoSymbol</enum>
+        </property>
+        <property name="color_1">
+         <color>
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="channels_2" stdset="0">
+         <string notr="true"/>
+        </property>
+        <property name="channels_3" stdset="0">
+         <string notr="true"/>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>218</red>
+          <green>218</green>
+          <blue>218</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="scaleColor">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="XaxisScaling" stdset="0">
+         <enum>caCartesianPlot::User</enum>
+        </property>
+        <property name="YaxisScaling" stdset="0">
+         <enum>caCartesianPlot::User</enum>
+        </property>
+        <property name="XaxisLimits">
+         <string>0.0;10</string>
+        </property>
+        <property name="YaxisLimits">
+         <string>0.01;10</string>
+        </property>
+        <property name="XaxisType">
+         <enum>caCartesianPlot::linear</enum>
+        </property>
+        <property name="YAxisType" stdset="0">
+         <enum>caCartesianPlot::log10</enum>
+        </property>
        </widget>
       </widget>
      </widget>

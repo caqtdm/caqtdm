@@ -48,6 +48,7 @@
 #include "knobData.h"
 #include "mutexKnobData.h"
 #include "mutexKnobDataWrapper.h"
+#include "pvAccessImpl.h"
 
 #define qasc(x) x.toLatin1().constData()
 
@@ -81,8 +82,9 @@ private:
     MutexKnobData* m_mutexKnobData;
     QVector<Monitor::shared_pointer> monitorArray;
     QVector<Channel::shared_pointer> channelArray;
-
-     PvaClientPtr pvaClient;
+    QString lastWrittenPV;
+    PvaClientChannelPtr pvaChannel;
+    PvaClientPtr pvaClient;
 };
 
 #endif

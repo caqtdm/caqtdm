@@ -50,7 +50,7 @@ void MonitorPVRequesterImpl::message(std::string const & message, MessageType me
 
 void MonitorPVRequesterImpl::channelCreated(const epics::pvData::Status& status, Channel::shared_pointer const & channel)
 {
-    std::cout << "MonitorPVRequesterImpl::channelCreated" << std::endl;
+    std::cout << "MonitorPVRequesterImpl::channelCreated ============================================" <<  std::endl;
     if (status.isSuccess()) {
         // show warning
         if (!status.isOK()) {
@@ -64,11 +64,13 @@ void MonitorPVRequesterImpl::channelCreated(const epics::pvData::Status& status,
 void MonitorPVRequesterImpl::channelStateChange(Channel::shared_pointer const & channel, Channel::ConnectionState connectionState)
 {
     Q_UNUSED(channel);
+    connected = false;
     std::cout << "MonitorPVRequesterImpl::channelStateChange " << m_channelIndex <<  std::endl;
     if (connectionState == Channel::CONNECTED) {
         std::cout << channel->getChannelName() << " CONNECTED: " << std::endl;
         m_event.signal();
         m_mutexData->SetMutexKnobDataConnected(m_channelIndex, true);
+        connected = true;
     } else if (connectionState == Channel::DISCONNECTED) {
         std::cout << channel->getChannelName() << " DISCONNECTED: " <<  std::endl;
         m_event.signal();
@@ -171,18 +173,18 @@ void  DataMonitorRequesterImpl::monitorConnect(const epics::pvData::Status& stat
 
 void  DataMonitorRequesterImpl::monitorEvent(Monitor::shared_pointer const & monitor)
 {
-    std::cout << "DataMonitorRequesterImpl::monitorEvent" << m_channelIndex <<  std::endl;
+    //std::cout << "DataMonitorRequesterImpl::monitorEvent " << m_channelIndex <<  std::endl;
     MonitorElement::shared_pointer element;
 
     knobData *kPtr = m_mutexData->GetMutexKnobDataPtr(m_channelIndex);  // use pointer
     if(kPtr->index == -1) return;
-    std::cout << "DataMonitorRequesterImpl::monitorEvent : connection state" << kPtr->edata.connected <<  std::endl;
+    //std::cout << "DataMonitorRequesterImpl::monitorEvent : connection state " << kPtr->edata.connected <<  std::endl;
 
     while (element = monitor->poll()) {
 
         PVField::shared_pointer value = element->pvStructurePtr->getSubField("value");
         if (value.get() == 0) {
-            //std::cout << "DataMonitorRequesterImpl::monitorEvent : no 'value' field" << m_channelName  << std::endl;
+            //std::cout << "DataMonitorRequesterImpl::monitorEvent : no 'value' field " << m_channelName  << std::endl;
             //std::cout << "DataMonitorRequesterImpl::monitorEvent : " << *(element->pvStructurePtr.get())  << std::endl;
         } else {
             Type valueType = value->getField()->getType();
@@ -355,27 +357,79 @@ void DataMonitorRequesterImpl::ParsePVStructure(string fieldName, PVStructure::s
     }
 }
 
-void DataMonitorRequesterImpl::ParseScalarArray(PVScalarArray::shared_pointer const & pvArray,  knobData* kPtr)
+void DataMonitorRequesterImpl::ParseScalarArray(PVScalarArray::shared_pointer const & pvs,  knobData* kPtr)
 {
     std::cout << "DataMonitorRequesterImpl::ParseScalarArray" <<  std::endl;
-    /*
-    size_t length = pvArray->getLength();
-    qDebug() << "lenght of array " << length;
-    PVDoubleArrayPtr ArrayData = static_pointer_cast<epics::pvData::PVDoubleArray> (pvArray);
-    //DoubleArrayData valuesArrayData;
-    PVValueArray<double> valuesArrayData;
-    int valuesLength = ArrayData->get(0, ArrayData->getLength(), valuesArrayData);
 
-    if((double) (valuesLength * sizeof(double)) != kPtr->edata.dataSize) {
-        free(kPtr->edata.dataB);
-        kPtr->edata.dataB = (void*) malloc(valuesLength * sizeof(double));
-        kPtr->edata.dataSize = valuesLength * sizeof(double);
+    ScalarArrayConstPtr scalar = pvs->getScalarArray();
+    ScalarType scalarType = scalar->getElementType();
+    size_t length = pvs->getLength();
+    qDebug() << "lenght of array " << length;
+
+    switch(scalarType) {
+    case pvByte: {
+
+        break;
     }
-    kPtr->edata.valueCount = valuesLength;
+    case pvUByte: {
+
+        break;
+    }
+    case pvShort: {
+
+        break;
+    }
+    case pvUShort: {
+
+        break;
+    }
+    case pvInt: {
+
+        break;
+    }
+    case pvUInt: {
+
+        break;
+    }
+
+    case pvFloat: {
+
+        cout << "i am float array\n";
+
+        PVFloatArrayPtr ArrayData = static_pointer_cast<epics::pvData::PVFloatArray> (pvs);
+        shared_vector<const float> xxx(ArrayData->view());
+        for (size_t i = 0; i < length; i++) {
+            cout << xxx[i] << " ";
+        }
+        cout  << std::endl;
+
+        if((double) (length * sizeof(float)) != kPtr->edata.dataSize) {
+            free(kPtr->edata.dataB);
+            kPtr->edata.dataB = (void*) malloc(length * sizeof(float));
+            kPtr->edata.dataSize = length * sizeof(float);
+        }
+
+        kPtr->edata.fieldtype = caFLOAT;
+        memcpy(kPtr->edata.dataB, &xxx[0],  length * sizeof(float));
+        break;
+    }
+    case pvDouble: {
+
+        break;
+    }
+    case pvString: {
+
+        break;
+    }
+    default:
+        throw std::logic_error("Should never get here");
+    }
+
+
+    kPtr->edata.valueCount = length;
     kPtr->edata.precision = 3;  // for the time beeing, set to 3
-    kPtr->edata.fieldtype = caDOUBLE;
-    memcpy(kPtr->edata.dataB, &valuesArrayData.data[0],  valuesLength * sizeof(double));
-*/
+    kPtr->edata.fieldtype = caFLOAT;
+
 }
 
 void DataMonitorRequesterImpl::ParseScalar(string fieldName, PVScalarPtr const & pvs, knobData* kPtr, limitsType limits)
@@ -389,7 +443,7 @@ void DataMonitorRequesterImpl::ParseScalar(string fieldName, PVScalarPtr const &
         PVBooleanPtr data = static_pointer_cast<PVBoolean>(pvs);
 
         if (limits == _valuealarm &&  pvFieldName.find("active") != string::npos) {
-            cout << "found active for status " << data->get() << std::endl;
+            //cout << "DataMonitorRequesterImpl::ParseScalar : found active for status " << data->get() << std::endl;
         }
 
         if (pvFieldName.find("value") != string::npos) {
@@ -467,7 +521,6 @@ void DataMonitorRequesterImpl::ParseScalar(string fieldName, PVScalarPtr const &
             kPtr->edata.fieldtype = caFLOAT;
             kPtr->edata.rvalue = data->get();
             kPtr->edata.ivalue = (long) data->get();
-            cout << data->get() <<  std::endl;
         }
 
     }
@@ -486,7 +539,6 @@ void DataMonitorRequesterImpl::ParseScalar(string fieldName, PVScalarPtr const &
 
         // fill value and type
         else if(pvFieldName.find("value") != string::npos) {
-            std::cout << "DataMonitorRequesterImpl::ParseScalar -- is pvDouble with pvFieldName=" << pvFieldName << data <<  std::endl;
             kPtr->edata.precision = 3;  // for the time beeing, set to 3
             kPtr->edata.fieldtype = caDOUBLE;
             kPtr->edata.rvalue = data->get();
@@ -526,8 +578,6 @@ void DataMonitorRequesterImpl::ParseScalar(string fieldName, PVScalarPtr const &
     default:
         std::cout << "DataMonitorRequesterImpl::ParseScalar (unknown ScalarType)" <<  std::endl;
     }
-
-
 }
 
 int DataMonitorRequesterImpl::scanFormat(const QString &fmt, int &precision)

@@ -43,6 +43,7 @@
 #include <pv/monitor.h>
 #include <pv/event.h>
 #include <pv/standardPVField.h>
+#include <pv/pvaClient.h>
 #include <epicsExit.h>
 
 #include "knobDefines.h"
@@ -52,6 +53,7 @@ using namespace std;
 namespace TR1 = std::tr1;
 using namespace epics::pvData;
 using namespace epics::pvAccess;
+using namespace epics::pvaClient;
 
 #define qasc(x) x.toLatin1().constData()
 
@@ -62,6 +64,7 @@ private:
     epics::pvData::Event m_event;
     int m_channelIndex;
     MutexKnobData* m_mutexData;
+    bool connected;
 
 public:
     virtual string getRequesterName();
@@ -70,6 +73,7 @@ public:
     virtual void channelStateChange(epics::pvAccess::Channel::shared_pointer const & channel, epics::pvAccess::Channel::ConnectionState connectionState);
     bool waitUntilConnected(double timeOut);
     void defineIndexForKnobData(int num, MutexKnobData* mutexKnobData);
+    bool isConnected() {return connected;}
 };
 
 /*

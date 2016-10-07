@@ -24,50 +24,24 @@
  */
 
 #include "epics4Subs.h"
-#include "pvAccessImpl.h"
-
 #include <epicsStdlib.h>
 #include <epicsGetopt.h>
 #include <epicsThread.h>
 #include <epicsExit.h>
 
-#define DEFAULT_TIMEOUT 3.0
+#define DEFAULT_TIMEOUT 1.0
 double timeOut = DEFAULT_TIMEOUT;
-
-class RequesterImpl : public Requester
-{
-public:
-    RequesterImpl(){}
-    string getRequesterName()
-    {
-        static string name("RequesterImpl");
-        return name;
-    }
-    void message(
-            string const & message,
-            MessageType messageType)
-    {
-        qDebug("message: '%s'", message.c_str());
-    }
-    void destroy() {}
-};
-
 
 epics4Subs::epics4Subs(MutexKnobData* mutexKnobData)
 {
     pvRequest =  CreateRequest::create()->createRequest("field(value,alarm.timestamp,display,control,valueAlarm)");
     if(pvRequest.get()==NULL) printf("failed to parse request string\n");
 
-    std::cout << "client factory start and get provider" << std::endl;
     ClientFactory::start();
     provider = getChannelProviderRegistry()->getProvider("pva");
     m_mutexKnobData = mutexKnobData;
 
-    pvaClient = PvaClient::get("pva ca");
-    RequesterPtr requester(new RequesterImpl());
-    pvaClient->setRequester(requester);
-    pvaClient->message(" epics4Subs::this is a test",infoMessage);
-
+    pvaClient = PvaClient::get("pva");
 }
 
 epics4Subs:: ~epics4Subs()
@@ -86,7 +60,7 @@ void epics4Subs::CreateAndConnect4(int num, char *pv)
 {
     bool allOK = true;
     // create channel
-    std::cout << "epics4Subs::CreateAndConnect4" << pv << std::endl;
+    //std::cout << "epics4Subs::CreateAndConnect4 " << pv << std::endl;
     shared_ptr<MonitorPVRequesterImpl> channelRequesterImpl(new MonitorPVRequesterImpl());
     Channel::shared_pointer channel = provider->createChannel(pv, channelRequesterImpl);
     channelArray.append(channel);
@@ -153,25 +127,38 @@ int  epics4Subs::EpicsGetDescription(char *pv, char *description)
 
 void  epics4Subs::Epics4SetValue(char* pv, double rdata, int32_t idata, char *sdata, int forceType)
 {
-    std::cout << " epics4Subs::Epics4SetValue " << pv << " with values" << rdata << idata << sdata << forceType << std::endl;
+    PvaClientPutPtr pvaPut;
+    PVStructurePtr arg;
     try {
-        PvaClientChannelPtr pvaChannel = pvaClient->createChannel(pv);
-        pvaChannel->connect();
-        PvaClientPutPtr pvaPut = pvaChannel->createPut();
-        pvaPut->connect();
-        pvaPut->get();
-        PvaClientPutDataPtr pvaPutData = pvaPut->getData();
-        PVStructurePtr arg = pvaPutData->getPVStructure();
+
+        if(QString(pv) != lastWrittenPV) {
+            //std::cout << " epics4Subs::Epics4SetValue 1 " << pv << " with value " << rdata << " " << idata << " " << sdata << " " << forceType << std::endl;
+            pvaChannel = pvaClient->createChannel(pv);
+            pvaPut = pvaChannel->createPut();
+            pvaPut->get();
+            PvaClientPutDataPtr pvaPutData = pvaPut->getData();
+            arg = pvaPutData->getPVStructure();
+        } else {
+            pvaChannel->waitConnect(timeOut);
+            //std::cout << " epics4Subs::Epics4SetValue 2 " << pv << " with value " << rdata << " " << idata << " " << sdata << " " << forceType << std::endl;
+            pvaPut = pvaChannel->createPut();
+            pvaPut->get();
+            PvaClientPutDataPtr pvaPutData = pvaPut->getData();
+            arg = pvaPutData->getPVStructure();
+        }
+
         Epics4SetData(arg, rdata, idata, sdata, forceType);
         pvaPut->put();
+
     } catch (std::runtime_error e) {
-        std::cout << "channel example exception" << e.what() << std::endl;
+        std::cout << "channel example exception " << e.what() << std::endl;
     }
+    lastWrittenPV = QString(pv);
 }
 
 void epics4Subs::Epics4SetData(PVStructurePtr const & pvStructure, double rdata, int32_t idata, char *sdata, int forceType)
 {   
-    std::cout << "epics4Subs::parse structure"  << std::endl;
+    //std::cout << "epics4Subs::Epics4SetData " << std::endl;
 
     PVFieldPtrArray const & fieldsData = pvStructure->getPVFields();
     if (fieldsData.size() != 0) {
@@ -224,85 +211,86 @@ void epics4Subs::Epics4SetData(PVStructurePtr const & pvStructure, double rdata,
 
 void epics4Subs::setScalarData(PVScalarPtr const & pvScalar, double rdata, int32_t idata, char *sdata, int forceType)
 {
-    std::cout << "epics4Subs::fromstring" << std::endl;
+    //std::cout << "epics4Subs::setScalarData " << std::endl;
     ScalarConstPtr scalar = pvScalar->getScalar();
     ScalarType scalarType = scalar->getScalarType();
     switch(scalarType) {
     case pvBoolean: {
-        std::cout << "pvboolean" << idata << std::endl;
+        //std::cout << "pvboolean " << idata << std::endl;
         PVBooleanPtr pv = static_pointer_cast<PVBoolean>(pvScalar);
         pv->put(idata);
         return;
     }
     case pvByte : {
-        std::cout << "pvbyte" << idata << std::endl;
+        //std::cout << "pvbyte " << idata << std::endl;
         PVBytePtr pv = static_pointer_cast<PVByte>(pvScalar);
         int8 value = idata;
         pv->put(value);
         return;
     }
     case pvShort : {
-        std::cout << "pvshort" << idata << std::endl;
+        //std::cout << "pvshort " << idata << std::endl;
         PVShortPtr pv = static_pointer_cast<PVShort>(pvScalar);
         int16 value = idata;
         pv->put(value);
         return;
     }
     case pvInt : {
-        std::cout << "pvint" << idata << std::endl;
+        //std::cout << "pvint " << idata << std::endl;
         PVIntPtr pv = static_pointer_cast<PVInt>(pvScalar);
-        pv->put(idata);
+        int32 value = idata;
+        pv->put(value);
         return;
     }
     case pvLong : {
-        std::cout << "pvlong" << idata << std::endl;
+        //std::cout << "pvlong " << idata << std::endl;
         PVLongPtr pv = static_pointer_cast<PVLong>(pvScalar);
         int64 value = idata;
         pv->put(value);
         return;
     }
     case pvUByte : {
-        std::cout << "pvubyte" << idata << std::endl;
+        //std::cout << "pvubyte " << idata << std::endl;
         PVUBytePtr pv = static_pointer_cast<PVUByte>(pvScalar);
         uint8 value = idata;
         pv->put(value);
         return;
     }
     case pvUShort : {
-        std::cout << "pvushort" << idata << std::endl;
+        //std::cout << "pvushort " << idata << std::endl;
         PVUShortPtr pv = static_pointer_cast<PVUShort>(pvScalar);
         uint16 value = idata;
         pv->put(value);
         return;
     }
     case pvUInt : {
-        std::cout << "pvuint" << idata << std::endl;
+        //std::cout << "pvuint " << idata << std::endl;
         PVUIntPtr pv = static_pointer_cast<PVUInt>(pvScalar);
         uint32 value = idata;
         pv->put(value);
         return;
     }
     case pvULong : {
-        std::cout << "pvulong" << idata << std::endl;
+        //std::cout << "pvulong " << idata << std::endl;
         PVULongPtr pv = static_pointer_cast<PVULong>(pvScalar);
         uint64 value = idata;
         pv->put(value);
         return;
     }
     case pvFloat : {
-        std::cout << "pvfloat" << rdata << std::endl;
+        //std::cout << "pvfloat " << rdata << std::endl;
         PVFloatPtr pv = static_pointer_cast<PVFloat>(pvScalar);
         pv->put((float)rdata);
         return;
     }
     case pvDouble : {
-        std::cout << "pvdouble" << rdata << std::endl;
+        //std::cout << "pvdouble " << rdata << std::endl;
         PVDoublePtr pv = static_pointer_cast<PVDouble>(pvScalar);
         pv->put((double)rdata);
         return;
     }
     case pvString: {
-        std::cout << "pvstring" << sdata << std::endl;
+        //std::cout << "pvstring " << sdata << std::endl;
         PVStringPtr value = static_pointer_cast<PVString>(pvScalar);
         value->put(sdata);
         return;
