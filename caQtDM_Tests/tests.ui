@@ -8779,6 +8779,25 @@ def PythonCalc(a, b, c, d):
          <string notr="true">mySoft2</string>
         </property>
        </widget>
+       <widget class="caCalc" name="cacalc_30">
+        <property name="geometry">
+         <rect>
+          <x>838</x>
+          <y>161</y>
+          <width>116</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true"/>
+        </property>
+        <property name="calc">
+         <string notr="true">A</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:COUNT:1</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_30">
        <attribute name="title">
@@ -9186,7 +9205,7 @@ def PythonCalc(a, b, c, d):
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>7</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
@@ -9258,7 +9277,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="styleSheet" stdset="0">
-         <string notr="true"/>
+         <string notr="true">QFrame { background: rgb(255, 85, 0, 255); color: rgb(0, 170, 0, 255);}</string>
         </property>
        </widget>
        <widget class="caNumeric" name="caNumeric_0">
@@ -10953,6 +10972,45 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="colorMode">
          <enum>caChoice::Alarm</enum>
+        </property>
+        <property name="fontScaleMode" stdset="0">
+         <enum>EPushButton::WidthAndHeight</enum>
+        </property>
+       </widget>
+       <widget class="caChoice" name="caChoice_8">
+        <property name="geometry">
+         <rect>
+          <x>748</x>
+          <y>264</y>
+          <width>166</width>
+          <height>166</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:MBBO</string>
+        </property>
+        <property name="background">
+         <color>
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="bordercolor">
+         <color>
+          <red>255</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="alignment">
+         <enum>caChoice::center</enum>
+        </property>
+        <property name="colorMode">
+         <enum>caChoice::Alarm</enum>
+        </property>
+        <property name="stackingMode" stdset="0">
+         <enum>caChoice::RowInverse</enum>
         </property>
         <property name="fontScaleMode" stdset="0">
          <enum>EPushButton::WidthAndHeight</enum>
