@@ -56,7 +56,7 @@ CONFIG += XDR_HACK
 }
 
 # undefine this for epics4 plugin support (only preliminary version as example)
-CONFIG += epics4
+#CONFIG += epics4
 
 # undefine this for bsread (zeromq) plugin support
 #CONFIG += bsread
