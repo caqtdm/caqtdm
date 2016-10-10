@@ -3414,7 +3414,13 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             QStringList stringlist = String.split((QChar)27);
             // set enum strings
             if(data.edata.fieldtype == caENUM) {
-                choiceWidget->populateCells(stringlist, (int) data.edata.ivalue);
+                // at initialisatioon or when list changes
+                if((data.edata.initialize) || (stringlist != choiceWidget->getList())) {
+                    choiceWidget->populateCells(stringlist, (int) data.edata.ivalue);
+                    // otherwise just set value
+                } else {
+                    choiceWidget->setValue((int) data.edata.ivalue);
+                }
                 if (choiceWidget->getColorMode() == caChoice::Alarm) {
                     choiceWidget->setAlarmColors(data.edata.severity);
                     // case of static mode

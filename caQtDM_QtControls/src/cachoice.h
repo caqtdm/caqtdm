@@ -112,6 +112,8 @@ public:
      EPushButton::ScaleMode fontScaleMode();
 
      void updateChoice();
+     void setValue(int value);
+     QStringList getList() {return savedList;}
 
 protected:
     void arrangeCells(QStringList list, int indx);
@@ -130,7 +132,7 @@ private:
     bool         thisAccessW;
     bool eventFilter(QObject *obj, QEvent *event);
     QSignalMapper *signalMapper;
-    QStringList   texts, labels;
+    QStringList   texts, labels, savedList;
     QList<EPushButton*> cells;
     int         thisStartBit;
     int         thisEndBit;

@@ -132,7 +132,8 @@ void  epics4Subs::Epics4SetValue(char* pv, double rdata, int32_t idata, char *sd
     try {
 
         if(QString(pv) != lastWrittenPV) {
-            //std::cout << " epics4Subs::Epics4SetValue 1 " << pv << " with value " << rdata << " " << idata << " " << sdata << " " << forceType << std::endl;
+            lastWrittenPV = QString(pv);
+            std::cout << " epics4Subs::Epics4SetValue 1 " << pv << " with value " << rdata << " " << idata << " " << sdata << " " << forceType << std::endl;
             pvaChannel = pvaClient->createChannel(pv);
             pvaPut = pvaChannel->createPut();
             pvaPut->get();
@@ -140,7 +141,7 @@ void  epics4Subs::Epics4SetValue(char* pv, double rdata, int32_t idata, char *sd
             arg = pvaPutData->getPVStructure();
         } else {
             pvaChannel->waitConnect(timeOut);
-            //std::cout << " epics4Subs::Epics4SetValue 2 " << pv << " with value " << rdata << " " << idata << " " << sdata << " " << forceType << std::endl;
+            std::cout << " epics4Subs::Epics4SetValue 2 " << pv << " with value " << rdata << " " << idata << " " << sdata << " " << forceType << std::endl;
             pvaPut = pvaChannel->createPut();
             pvaPut->get();
             PvaClientPutDataPtr pvaPutData = pvaPut->getData();
@@ -153,7 +154,6 @@ void  epics4Subs::Epics4SetValue(char* pv, double rdata, int32_t idata, char *sd
     } catch (std::runtime_error e) {
         std::cout << "channel example exception " << e.what() << std::endl;
     }
-    lastWrittenPV = QString(pv);
 }
 
 void epics4Subs::Epics4SetData(PVStructurePtr const & pvStructure, double rdata, int32_t idata, char *sdata, int forceType)

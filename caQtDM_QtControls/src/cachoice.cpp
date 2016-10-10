@@ -48,6 +48,7 @@ caChoice::caChoice(QWidget *parent) : QWidget(parent)
     setStyleSheet("");
 
     numCells = 2;
+    savedList << "";
 
     // if not designer, show only one empty button at first, so that we do not enlarge the window unnecesairily
     if(inDesigner) {
@@ -364,7 +365,6 @@ void caChoice::setStacking(Stacking stacking)
 
 void caChoice::updateChoice()
 {
-
     int i = 0;
     foreach(EPushButton *temp, cells) {
         QString style("");
@@ -380,6 +380,32 @@ void caChoice::updateChoice()
                 style.append("* {border-style: solid; border-width: 0px; padding:1px 4px 1px 4px; margin:0px;}");
                 temp->setStyleSheet(style);
             }
+            temp->setChecked(false);
+        }
+        i++;
+    }
+}
+
+void caChoice::setValue(int value)
+{
+    int i = 0;
+    lastValue = value;
+    foreach(EPushButton *temp, cells) {
+        QString style("");
+        // mark activ button
+        if(i==lastValue) {
+            if(thisColorMode != Default) {
+                style.append("* {border-style: solid; border-width: 1px 3px 1px 3px; padding:0px 1px 0px 1px; margin:0px;}");
+                temp->setStyleSheet(style);
+
+            }
+            temp->setChecked(true);
+        } else {
+            if(thisColorMode != Default) {
+                style.append("* {border-style: solid; border-width: 0px; padding:1px 4px 1px 4px; margin:0px;}");
+                temp->setStyleSheet(style);
+            }
+            temp->setChecked(false);
         }
         i++;
     }
@@ -390,6 +416,7 @@ void caChoice::populateCells(QStringList list, int indx)
     numCells = list.size();
     if(numCells > 16) numCells=16;
     arrangeCells(list, indx);
+    savedList = list;
 }
 
 void caChoice::setStartBit(int const &bit) {
