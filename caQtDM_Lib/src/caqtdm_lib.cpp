@@ -4445,6 +4445,13 @@ void CaQtDM_Lib::Cartesian(caCartesianPlot *widget, int curvNB, int curvType, in
         widget->displayData(curvNB, curvType);
     }
         break;
+    case caCHAR: {
+        int8_t* P = (int8_t*) data.edata.dataB;
+        widget->setData(P, data.edata.valueCount, curvNB, curvType, XorY);
+        datamutex->unlock();
+        widget->displayData(curvNB, curvType);
+    }
+        break;
     case caENUM: {
         int16_t* P = ( int16_t*) data.edata.dataB;
         widget->setData(P ,data.edata.valueCount, curvNB, curvType, XorY);

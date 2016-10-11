@@ -299,6 +299,11 @@ void caCartesianPlot::setData(int32_t *array, int size, int curvIndex, int curvT
     fillData(array, size, curvIndex, curvType, curvXY);
 }
 
+void caCartesianPlot::setData(int8_t *array, int size, int curvIndex, int curvType, int curvXY)
+{
+    fillData(array, size, curvIndex, curvType, curvXY);
+}
+
 template <typename pureData>
 void caCartesianPlot::fillData(pureData *array, int size, int curvIndex, int curvType, int curvXY)
 {

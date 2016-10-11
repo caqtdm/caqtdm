@@ -357,6 +357,20 @@ void DataMonitorRequesterImpl::ParsePVStructure(string fieldName, PVStructure::s
     }
 }
 
+
+template <typename pureData>
+void DataMonitorRequesterImpl::fillData(pureData const &array, size_t length, knobData* kPtr) {
+    int size = sizeof(array[0]);
+    printf("size=%d\n", size);
+    if(length < 1) return;
+    if((length * size) != (size_t) kPtr->edata.dataSize) {
+        free(kPtr->edata.dataB);
+        kPtr->edata.dataB = (void*) malloc(length * size);
+        kPtr->edata.dataSize = length * size;
+    }
+    memcpy(kPtr->edata.dataB, &array[0],  length * size);
+}
+
 void DataMonitorRequesterImpl::ParseScalarArray(PVScalarArray::shared_pointer const & pvs,  knobData* kPtr)
 {
     std::cout << "DataMonitorRequesterImpl::ParseScalarArray" <<  std::endl;
@@ -364,59 +378,74 @@ void DataMonitorRequesterImpl::ParseScalarArray(PVScalarArray::shared_pointer co
     ScalarArrayConstPtr scalar = pvs->getScalarArray();
     ScalarType scalarType = scalar->getElementType();
     size_t length = pvs->getLength();
-    qDebug() << "lenght of array " << length;
 
     switch(scalarType) {
     case pvByte: {
-
+        PVByteArrayPtr ArrayData = static_pointer_cast<epics::pvData::PVByteArray> (pvs);
+        shared_vector<const int8> xxx(ArrayData->view());
+        for(int i=0; i<length; i++) printf("%d\n", xxx[i]);
+        kPtr->edata.fieldtype = caCHAR;
+        fillData(xxx, length, kPtr);
         break;
     }
+
     case pvUByte: {
-
+        PVUByteArrayPtr ArrayData = static_pointer_cast<epics::pvData::PVUByteArray> (pvs);
+        shared_vector<const uint8> xxx(ArrayData->view());
+        for(int i=0; i<length; i++) printf("%d\n", xxx[i]);
+        kPtr->edata.fieldtype = caCHAR;
+        fillData(xxx, length, kPtr);
+        break;
         break;
     }
+
     case pvShort: {
-
+        PVShortArrayPtr ArrayData = static_pointer_cast<epics::pvData::PVShortArray> (pvs);
+        shared_vector<const int16> xxx(ArrayData->view());
+        kPtr->edata.fieldtype = caINT;
+        fillData(xxx, length, kPtr);
         break;
     }
+
     case pvUShort: {
-
+        PVUShortArrayPtr ArrayData = static_pointer_cast<epics::pvData::PVUShortArray> (pvs);
+        shared_vector<const uint16> xxx(ArrayData->view());
+        kPtr->edata.fieldtype = caINT;
+        fillData(xxx, length, kPtr);
         break;
     }
+
     case pvInt: {
-
-        break;
+        PVIntArrayPtr ArrayData = static_pointer_cast<epics::pvData::PVIntArray> (pvs);
+        shared_vector<const int32> xxx(ArrayData->view());
+        kPtr->edata.fieldtype = caLONG;
+        fillData(xxx, length, kPtr);
     }
-    case pvUInt: {
 
+    case pvUInt: {
+        PVUIntArrayPtr ArrayData = static_pointer_cast<epics::pvData::PVUIntArray> (pvs);
+        shared_vector<const uint32> xxx(ArrayData->view());
+        kPtr->edata.fieldtype = caLONG;
+        fillData(xxx, length, kPtr);
         break;
     }
 
     case pvFloat: {
-
-        cout << "i am float array\n";
-
         PVFloatArrayPtr ArrayData = static_pointer_cast<epics::pvData::PVFloatArray> (pvs);
         shared_vector<const float> xxx(ArrayData->view());
-        for (size_t i = 0; i < length; i++) {
-            cout << xxx[i] << " ";
-        }
-        cout  << std::endl;
-
-        if((double) (length * sizeof(float)) != kPtr->edata.dataSize) {
-            free(kPtr->edata.dataB);
-            kPtr->edata.dataB = (void*) malloc(length * sizeof(float));
-            kPtr->edata.dataSize = length * sizeof(float);
-        }
-
         kPtr->edata.fieldtype = caFLOAT;
-        memcpy(kPtr->edata.dataB, &xxx[0],  length * sizeof(float));
+        fillData(xxx, length, kPtr);
         break;
     }
-    case pvDouble: {
 
+    case pvDouble: {
+        PVDoubleArrayPtr ArrayData = static_pointer_cast<epics::pvData::PVDoubleArray> (pvs);
+        shared_vector<const double> xxx(ArrayData->view());
+        kPtr->edata.fieldtype = caDOUBLE;
+        fillData(xxx, length, kPtr);
         break;
     }
+
     case pvString: {
 
         break;
@@ -425,11 +454,8 @@ void DataMonitorRequesterImpl::ParseScalarArray(PVScalarArray::shared_pointer co
         throw std::logic_error("Should never get here");
     }
 
-
     kPtr->edata.valueCount = length;
     kPtr->edata.precision = 3;  // for the time beeing, set to 3
-    kPtr->edata.fieldtype = caFLOAT;
-
 }
 
 void DataMonitorRequesterImpl::ParseScalar(string fieldName, PVScalarPtr const & pvs, knobData* kPtr, limitsType limits)
@@ -558,7 +584,7 @@ void DataMonitorRequesterImpl::ParseScalar(string fieldName, PVScalarPtr const &
             QString format(data->get().c_str());
             scanFormat(format, precision);
             kPtr->edata.precision = precision;
-        // fill value and type
+            // fill value and type
         } else if(pvFieldName.find("value") != string::npos) {
             int dataSize = strlen(data->get().c_str());
             if(dataSize != kPtr->edata.dataSize) {

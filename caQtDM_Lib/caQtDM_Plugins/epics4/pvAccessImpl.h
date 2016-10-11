@@ -102,6 +102,7 @@ public:
 class DataMonitorRequesterImpl : public MonitorRequester
 {
 private:
+    template <typename pureData> void fillData(pureData const &array, size_t size, knobData* kPtr);
     string m_channelName;
     int m_channelIndex;
     MutexKnobData* m_mutexData;
