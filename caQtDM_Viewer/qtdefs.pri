@@ -4,6 +4,7 @@ QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+QT_VER_PAT = $$member(QT_VERSION, 2)
 
 TARGET_COMPANY = "Paul Scherrer Institut"
 TARGET_DESCRIPTION = "Channel Access Qt Display Manager"
@@ -23,15 +24,26 @@ unix {
     QMAKE_CFLAGS_RELEASE += "-g"
 }
 
-# when the designer in 4.8.2 is patched in order to display tooltip description or
-# when the qt version is higher then 5.5.0 then compile the plugins with description texts
-# be carefull with this, while when the designer does not recognize tooltip description, the widgets will not be shown
-DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
+# at psi the designer in 4.8.2 is patched in order to display tooltip description (not a nice test, but for now ok)
+# when the qt version is higher then 5.5.0 then we can also compile the plugins with description texts
+# be carefull with this, while when the designer does not recognize tooltip descriptions, the widgets will not be shown
+
+contains(QT_VER_MAJ, 4) {
+    contains(QT_VER_MIN, 8) {
+       contains(QT_VER_PAT, 2) {
+          message("caQtDM building with Qt4.8.2, therefore enabling designer tooltip description, this works only for the patched version of Qt4.8.2 at PSI")
+          DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS         
+       }
+    }
+}
+
+
 contains(QT_VER_MAJ, 5) {
   greaterThan(QT_MINOR_VERSION, 5) {
     DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS 
   }
 }
+
 contains(DEFINES, DESIGNER_TOOLTIP_DESCRIPTIONS ) {
   message("Building with tooltip descriptions; if not supported by designer, turn it off in qtdefs.pri")
 }
@@ -56,7 +68,7 @@ CONFIG += XDR_HACK
 }
 
 # undefine this for epics4 plugin support (only preliminary version as example)
-#CONFIG += epics4
+CONFIG += epics4
 
 # undefine this for bsread (zeromq) plugin support
 #CONFIG += bsread

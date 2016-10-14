@@ -132,9 +132,23 @@ epics4_plugin {
 
         unix:!macx:!ios:!android {
                 message("epics4_plugin configuration unix:!macx:!ios:!android")
- 		INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
- 		LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
+                
+                INCLUDEPATH   += $(EPICS4LOCATION)/pvDataCPP/include
+                INCLUDEPATH   += $(EPICS4LOCATION)/pvAccessCPP/include
+                INCLUDEPATH   += $(EPICS4LOCATION)/pvaClientCPP/include
+                INCLUDEPATH   += $(EPICS4LOCATION)/normativeTypesCPP/src
+                INCLUDEPATH   += $(EPICSINCLUDE)
+                INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
+                
+                EPICS4LOC1 = $(EPICS4LOCATION)/pvAccessCPP/lib/$(EPICS_HOST_ARCH)
+                EPICS4LOC2 = $(EPICS4LOCATION)/pvDataCPP/lib/$(EPICS_HOST_ARCH)
+                EPICS4LOC3 = $(EPICS4LOCATION)/pvaClientCPP/lib/$(EPICS_HOST_ARCH)
+                
+                LIBS += -L$${EPICS4LOC1} -Wl,-rpath,$${EPICS4LOC1} -lpvAccess
+                LIBS += -L$${EPICS4LOC2} -Wl,-rpath,$${EPICS4LOC2} -lpvData
+                LIBS += -L$${EPICS4LOC3} -Wl,-rpath,$${EPICS4LOC3} -lpvaClient
  		LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
+ 		
  		CONFIG += release
 	}
 	
