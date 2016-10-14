@@ -52,6 +52,7 @@
 
 #ifdef linux
 #  include <sys/wait.h>
+#  include <sys/time.h>
 #  include <unistd.h>
 #endif
 
