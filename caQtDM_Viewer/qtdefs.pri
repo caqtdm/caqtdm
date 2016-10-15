@@ -32,7 +32,7 @@ contains(QT_VER_MAJ, 4) {
     contains(QT_VER_MIN, 8) {
        contains(QT_VER_PAT, 2) {
           message("caQtDM building with Qt4.8.2, therefore enabling designer tooltip description, this works only for the patched version of Qt4.8.2 at PSI")
-          DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS         
+#          DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
        }
     }
 }
@@ -68,7 +68,7 @@ CONFIG += XDR_HACK
 }
 
 # undefine this for epics4 plugin support (only preliminary version as example)
-CONFIG += epics4
+#CONFIG += epics4
 
 # undefine this for bsread (zeromq) plugin support
 #CONFIG += bsread
