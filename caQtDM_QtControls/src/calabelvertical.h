@@ -43,6 +43,8 @@ class QTCON_EXPORT caLabelVertical : public QWidget, public FontScalingWidget
     Q_PROPERTY(Alignment alignment READ getAlignment WRITE setAlignment)
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
+    Q_PROPERTY(QColor borderColor READ getBorderColor WRITE setBorderColor)
+    Q_PROPERTY(int borderWidth READ getBorderWidth WRITE setBorderWidth)
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
 
     // this will prevent user interference
@@ -86,6 +88,12 @@ public:
     QColor getBackground() const {return thisBackColor;}
     void setBackground(QColor c);
 
+    QColor getBorderColor() const {return thisBorderColor;}
+    void setBorderColor(QColor c);
+
+    void setBorderWidth(int width) {thisBorderWidth = width;  update();}
+    bool getBorderWidth() const {return thisBorderWidth;}
+
     enum colMode {Static, Alarm};
     colMode getColorMode() const { return thisColorMode; }
 
@@ -106,6 +114,8 @@ private:
     QString thisText;
     QColor thisForeColor;
     QColor thisBackColor;
+    QColor thisBorderColor;
+    int thisBorderWidth;
     colMode thisColorMode;
     Direction thisDirection;
     Alignment thisAlignment;

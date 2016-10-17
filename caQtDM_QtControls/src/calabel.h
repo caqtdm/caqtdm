@@ -34,13 +34,18 @@ class QTCON_EXPORT caLabel : public ESimpleLabel
 
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
+    Q_PROPERTY(QColor borderColor READ getBorderColor WRITE setBorderColor)
+    Q_PROPERTY(int borderWidth READ getBorderWidth WRITE setBorderWidth)
 
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
 
-    //Q_PROPERTY(QString styleSheet READ styleSheet DESIGNABLE false)
-
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
+    Q_PROPERTY(Shape frameShape READ frameShape WRITE setFrameShape DESIGNABLE false)
+    Q_PROPERTY(Shadow frameShadow READ frameShadow WRITE setFrameShadow DESIGNABLE false)
+    Q_PROPERTY(int lineWidth READ lineWidth WRITE setLineWidth DESIGNABLE false)
+    Q_PROPERTY(int midLineWidth READ midLineWidth WRITE setMidLineWidth DESIGNABLE false)
+    Q_PROPERTY(int frameWidth READ frameWidth DESIGNABLE false)
 
     Q_ENUMS(colMode)
 
@@ -61,10 +66,16 @@ public:
     QColor getBackground() const {return thisBackColor;}
     void setBackground(QColor c);
 
+    QColor getBorderColor() const {return thisBorderColor;}
+    void setBorderColor(QColor c);
+
     enum colMode {Static, Alarm, Default};
     colMode getColorMode() const { return thisColorMode; }
 
     void setColors(QColor bg, QColor fg);
+
+    void setBorderWidth(int width) {thisBorderWidth = width; setColors(thisBackColor, thisForeColor);}
+    bool getBorderWidth() const {return thisBorderWidth;}
 
     void setAlarmColors(short status);
 
@@ -76,6 +87,8 @@ private:
 
     QColor thisForeColor, thisForeColorOld;
     QColor thisBackColor, thisBackColorOld;
+    QColor thisBorderColor, thisBorderColorOld;
+    int thisBorderWidth, thisBorderWidthOld;
     colMode thisColorMode;
     colMode oldColorMode;
     QString thisStyle, oldStyle;

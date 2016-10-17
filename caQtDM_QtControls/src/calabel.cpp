@@ -38,6 +38,8 @@ caLabel::caLabel(QWidget *parent) : ESimpleLabel(parent)
     thisForeColor = Qt::black;
     thisBackColorOld = QColor(255,255,255,0);
     thisForeColorOld = Qt::black;
+    setBorderWidth (0);
+    thisBorderWidthOld = 0;
     thisColorMode=Static;
     oldColorMode =Static;
 
@@ -46,6 +48,13 @@ caLabel::caLabel(QWidget *parent) : ESimpleLabel(parent)
     setColorMode(Static);
     thisVisibility = StaticV;
 }
+
+void caLabel::setBorderColor(QColor c)
+{
+    thisBorderColor = c;
+    setColors(thisBackColor, thisForeColor);
+}
+
 
 void caLabel::setColors(QColor bg, QColor fg)
 {
@@ -57,13 +66,16 @@ void caLabel::setColors(QColor bg, QColor fg)
         return;
     }
 
-    if((bg != thisBackColorOld) || (fg != thisForeColorOld) || renewStyleSheet || styleSheet().isEmpty()) {
-        //renewStyleSheet = false;
-        thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
-        thisStyle = thisStyle.arg(bg.red()).arg(thisBackColor.green()).arg(bg.blue()).arg(bg.alpha()).
-                arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
+    if((bg != thisBackColorOld) || (fg != thisForeColorOld) || renewStyleSheet || styleSheet().isEmpty() || thisBorderWidth != thisBorderWidthOld ||
+        thisBorderColor != thisBorderColorOld) {
+        thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border: %9px solid rgba(%10, %11, %12, %13)";
+        thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
+                arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha()).arg(thisBorderWidth).
+                arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
         thisBackColorOld = bg;
         thisForeColorOld = fg;
+        thisBorderColorOld = thisBorderColor;
+        thisBorderWidthOld = thisBorderWidth;
     }
 
     if(thisStyle != oldStyle || thisColorMode != oldColorMode) {
