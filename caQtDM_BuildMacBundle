@@ -60,6 +60,22 @@ echo ++++++++++ libca.3.14.12.dylib controls lib ++++++++
 install_name_tool -change @loader_path/libCom.3.14.12.dylib @rpath/libCom.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libca.3.14.12.dylib
 
 
+
+
+echo ++++++++++ libqtcontrols_controllers_plugin.dylib ++++++++
+install_name_tool -change qwt.framework/Versions/6/qwt @rpath/qwt.framework/Versions/6/qwt ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_controllers_plugin.dylib
+install_name_tool -change libqtcontrols.dylib @rpath/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_controllers_plugin.dylib
+
+
+echo ++++++++++ libqtcontrols_graphics_plugin.dylib ++++++++
+install_name_tool -change qwt.framework/Versions/6/qwt @rpath/qwt.framework/Versions/6/qwt ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_graphics_plugin.dylib
+install_name_tool -change libqtcontrols.dylib @rpath/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_graphics_plugin.dylib
+
+echo ++++++++++ libqtcontrols_monitors_plugin.dylib ++++++++
+install_name_tool -change qwt.framework/Versions/6/qwt @rpath/qwt.framework/Versions/6/qwt ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_monitors_plugin.dylib
+install_name_tool -change libqtcontrols.dylib @rpath/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_monitors_plugin.dylib
+
+
 echo
 echo ========== fix for codesigning  ============
 echo
