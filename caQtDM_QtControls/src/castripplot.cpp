@@ -704,8 +704,8 @@ void caStripPlot::TimeOutThread()
         for (c = 0; c < NumberOfCurves; c++ ) {
             for (int counter = 0; counter < dataCount; counter++) {
                 QwtIntervalSample P = rangeData[c].at(counter);
-                if(!isnan(P.interval.maxValue()) && P.interval.maxValue() > AutoscaleMaxY) AutoscaleMaxY = P.interval.maxValue();
-                if(!isnan(P.interval.minValue()) && P.interval.minValue() < AutoscaleMinY) AutoscaleMinY = P.interval.minValue();
+                if(!qIsNaN(P.interval.maxValue()) && P.interval.maxValue() > AutoscaleMaxY) AutoscaleMaxY = P.interval.maxValue();
+                if(!qIsNaN(P.interval.minValue()) && P.interval.minValue() < AutoscaleMinY) AutoscaleMinY = P.interval.minValue();
             }
         }
 
@@ -787,7 +787,7 @@ void caStripPlot::TimeOut()
             printf("-----------------------\n");
             for(int j=0; j!=rangeData[c].size();j++) {
                 printf("%d %f %f\n", j, rangeData[c][j].value, rangeData[c][j].interval.maxValue());
-                if(isnan(rangeData[c][j].interval.maxValue())) break;
+                if(qIsNaN(rangeData[c][j].interval.maxValue())) break;
             }
         }
 */

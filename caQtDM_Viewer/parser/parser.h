@@ -119,7 +119,7 @@ typedef enum
 #define MAX_SHELL_COMMANDS      16
 #define SC_DEFAULT_UNITS    SECONDS
 
-#define True 1==1
+#define True (1==1)
 #define False !True
 #define Boolean unsigned int
 

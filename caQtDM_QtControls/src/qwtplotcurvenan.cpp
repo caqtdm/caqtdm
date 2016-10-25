@@ -54,7 +54,7 @@ void QwtPlotCurveNaN::drawSeries(QPainter *painter, const QwtScaleMap &xMap,cons
     {
         P = samples.at(counter);
 
-        if(isnan(P.y())) continue;  // continue = skip next instruction in loop
+        if(qIsNaN(P.y())) continue;  // continue = skip next instruction in loop
         if((CurvType == ValueCurv) && (P.x() < -Interval)) break;
         else if((CurvType == TimeCurv) && ((P.x() - Pstart.x()) < -Interval)) break;
 
@@ -97,7 +97,7 @@ void QwtPlotIntervalCurveNaN::drawSeries(QPainter *painter, const QwtScaleMap &x
     {
         P = samples.at(counter);
 
-        if(isnan(P.interval.minValue()) || isnan(P.interval.maxValue())) continue; // continue = skip next instruction in loop
+        if(qIsNaN(P.interval.minValue()) || qIsNaN(P.interval.maxValue())) continue; // continue = skip next instruction in loop
         if((CurvType == ValueCurv) && (P.value < -Interval)) break;
         else if((CurvType == TimeCurv)  && ((P.value - Pstart.value) < -Interval)) break;
 

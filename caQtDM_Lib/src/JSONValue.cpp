@@ -682,7 +682,7 @@ std::wstring JSONValue::Stringify() const
 		
 		case JSONType_Number:
 		{
-			if (isinf(number_value) || isnan(number_value))
+            if (qIsInf(number_value) || qIsNaN(number_value))
 				ret_string = L"null";
 			else
 			{

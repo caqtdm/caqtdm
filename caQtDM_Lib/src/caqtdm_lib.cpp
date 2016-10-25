@@ -3166,14 +3166,14 @@ void CaQtDM_Lib::UpdateGauge(EAbstractGauge *widget, const knobData &data)
                 maxval = 1000.0;
                 minval = 0.0;
             } else {
-                if(!isnan(data.edata.lower_disp_limit)) {
+                if(!qIsNaN(data.edata.lower_disp_limit)) {
                     widget->setMinValue(data.edata.lower_disp_limit);
                     minval = data.edata.lower_disp_limit;
                 } else {
                     widget->setMinValue(0.0);
                     minval = 0.0;
                 }
-                if(!isnan(data.edata.upper_disp_limit)) {
+                if(!qIsNaN(data.edata.upper_disp_limit)) {
                     widget->setMaxValue(data.edata.upper_disp_limit);
                     maxval = data.edata.upper_disp_limit;
                 } else {
@@ -3195,8 +3195,8 @@ void CaQtDM_Lib::UpdateGauge(EAbstractGauge *widget, const knobData &data)
                 widget->setLowError(minval);
                 widget->setHighError(maxval);
             } else {
-                if(!isnan(data.edata.lower_alarm_limit)) widget->setLowError(data.edata.lower_alarm_limit); else  widget->setLowError(minval);
-                if(!isnan(data.edata.upper_alarm_limit)) widget->setHighError(data.edata.upper_alarm_limit); else widget->setHighError(maxval);
+                if(!qIsNaN(data.edata.lower_alarm_limit)) widget->setLowError(data.edata.lower_alarm_limit); else  widget->setLowError(minval);
+                if(!qIsNaN(data.edata.upper_alarm_limit)) widget->setHighError(data.edata.upper_alarm_limit); else widget->setHighError(maxval);
             }
 
             if(data.edata.lower_warning_limit == data.edata.upper_warning_limit) {
@@ -3204,8 +3204,8 @@ void CaQtDM_Lib::UpdateGauge(EAbstractGauge *widget, const knobData &data)
                 widget->setLowWarning(minval);
                 widget->setHighWarning(maxval);
             } else {
-                if(!isnan(data.edata.lower_warning_limit)) widget->setLowWarning(data.edata.lower_warning_limit); else  widget->setLowWarning(minval);
-                if(!isnan(data.edata.upper_warning_limit)) widget->setHighWarning(data.edata.upper_warning_limit); else  widget->setHighWarning(maxval);
+                if(!qIsNaN(data.edata.lower_warning_limit)) widget->setLowWarning(data.edata.lower_warning_limit); else  widget->setLowWarning(minval);
+                if(!qIsNaN(data.edata.upper_warning_limit)) widget->setHighWarning(data.edata.upper_warning_limit); else  widget->setHighWarning(maxval);
             }
         } else if((widget->getAlarmLimits() == EAbstractGauge::None) && (data.edata.initialize)) {
 
@@ -3235,12 +3235,12 @@ void CaQtDM_Lib::UpdateMeter(caMeter *widget, const knobData &data)
                 widget->setMaxValue(1000.0);
                 widget->setMinValue(0.0);
             } else {
-                if(!isnan(data.edata.lower_disp_limit)) {
+                if(!qIsNaN(data.edata.lower_disp_limit)) {
                     widget->setMinValue(data.edata.lower_disp_limit);
                 } else {
                     widget->setMinValue(0.0);
                 }
-                if(!isnan(data.edata.upper_disp_limit)) {
+                if(!qIsNaN(data.edata.upper_disp_limit)) {
                     widget->setMaxValue(data.edata.upper_disp_limit);
                 } else {
                     widget->setMaxValue(1000.0);
