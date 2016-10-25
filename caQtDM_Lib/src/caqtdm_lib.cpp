@@ -793,6 +793,9 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
     bool doNothing;
     QString pv;
 
+    QString className(w1->metaObject()->className());
+    if(!className.contains("ca") && !className.contains("QTextBrowser") && !className.contains("QE")) return;
+
     int nbMonitors = 0;
 
     integerList.clear();
@@ -803,7 +806,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
     }
 
     //qDebug() << w1->metaObject()->className() << w1->objectName();
-    QString className(w1->metaObject()->className());
 
     if(className.contains("ca") || className.contains("QTextBrowser")) {
         PRINT(printf("\n%*c %s macro=<%s>", 15 * level, '+', qasc(w1->objectName()), qasc(macro)));
@@ -3409,7 +3411,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         // caChoice ==================================================================================================================
     } else if (caChoice *choiceWidget = qobject_cast<caChoice *>(w)) {
-        //qDebug() << "we have a choiceButton" << String << value;
+        //qDebug() << "we have a choiceButton" << String << (int) data.edata.ivalue << choiceWidget;
 
         if(data.edata.connected) {
             QStringList stringlist = String.split((QChar)27);

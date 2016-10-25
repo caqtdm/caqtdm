@@ -34,12 +34,13 @@ caRowColMenu::caRowColMenu(QWidget *parent) : QWidget(parent)
 {
     // to start with, clear the stylesheet, so that playing around
     // is not possible.
+
     setStyleSheet("");
 
     numCells = 2;
-    files << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";
-    args  << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";
-    labels<< "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";
+    labels << "1" << "2";
+    files << "1" << "2";
+    args  << "1" << "2";
 
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     grid = new QGridLayout(this);
@@ -60,7 +61,7 @@ caRowColMenu::caRowColMenu(QWidget *parent) : QWidget(parent)
     cellsI.clear();
     signalMapper = new QSignalMapper(this);
     for (int i = 0; i < 16; i++) {
-        EPushButton* temp =  new EPushButton(labels[i], this);
+        EPushButton* temp =  new EPushButton(QString::number(i), this);
         temp->setFontScaleMode(thisScaleMode);
         temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         temp->setMinimumSize(2,2); //important for resizing as small as possible
@@ -79,11 +80,6 @@ caRowColMenu::caRowColMenu(QWidget *parent) : QWidget(parent)
 
 void caRowColMenu::populateCells()
 {
-    double dSqrt = ceil(sqrt((double) numCells)); // preferentially vertical orientation
-    int nbLines = qMax(2, (int) dSqrt);
-    int column = 0;
-    int row = 0;
-
     numCells = qMin(files.size(), args.size());
     numCells = qMin(numCells, labels.size());
 
@@ -91,6 +87,11 @@ void caRowColMenu::populateCells()
     if(numCells > MAXITEMS) numCells=MAXITEMS;
 
     if(thisStacking == Hidden) numCells = 1;
+
+    double dSqrt = ceil(sqrt((double) numCells)); // preferentially vertical orientation
+    int nbLines = qMax(2, (int) dSqrt);
+    int column = 0;
+    int row = 0;
 
     foreach(ImagePushButton *l, cellsI) {
         grid->removeWidget(l);
@@ -206,7 +207,6 @@ void caRowColMenu::setStacking(Stacking stacking)
 
 void  caRowColMenu::setLabels(QString const &newL)
 {
-    if(getLabels() == newL) return;
     labels= newL.split(";");
     populateCells();
 }

@@ -198,7 +198,7 @@ caQtDM_QtControls {
  		OBJECTS_DIR = obj
 		DESTDIR = $$(CAQTDM_COLLECT)
  		INCLUDEPATH += $$(QWTINCLUDE)
-    		LIBS += -L$$(QWTLIB) -Wl,-rpath,$(QWTLIB) -lqwt
+                LIBS += -L$$(QWTLIB) -Wl,-rpath,$(QWTLIB) -lqwt
   	}
 
         macx {
@@ -243,7 +243,7 @@ caQtDM_Lib {
       		DESTDIR = $(CAQTDM_COLLECT)
                 QMAKE_CXXFLAGS += "-g"
                 QMAKE_CFLAGS_RELEASE += "-g"
-		CONFIG += Define_Build_Python
+                CONFIG += Define_Build_Python
    	}
 
         macx {
@@ -309,14 +309,14 @@ caQtDM_Viewer {
                 DESTDIR = $(CAQTDM_COLLECT)
   		CONFIG += x11
 		DEFINES += BUILDTIME=\\\"$$system(date '+%H:%M')\\\"
-		DEFINES += BUILDDATE=\\\"$$system(date '+%d-%m-%Y')\\\"
+                DEFINES += BUILDDATE=\\\"$$system(date '+%d-%m-%Y')\\\"
 
 		!ios:!android {
 			message("caQtDM_viewer configuration : !ios!android (all unixes + mac)")
 			LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
 			LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
 			LIBS += -L$(CAQTDM_COLLECT) -L$(CAQTDM_COLLECT)/designer
-		}
+                }
 	}
  	macx {
                 message("caQtDM_viewer configuration : macx (only mac)")

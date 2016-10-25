@@ -32,6 +32,7 @@
 #include <math.h>
 
 #include "JSONValue.h"
+#include <qnumeric.h>
 
 // Macros to free an array/object
 #define FREE_ARRAY(x) { JSONArray::iterator iter; for (iter = x.begin(); iter != x.end(); iter++) { delete *iter; } }

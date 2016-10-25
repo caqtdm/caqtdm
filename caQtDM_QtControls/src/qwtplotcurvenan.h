@@ -31,6 +31,7 @@ enum curvType {TimeCurv=0, ValueCurv};
 #include <qtcontrols_global.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_intervalcurve.h>
+#include <qnumeric.h>
 #include <stdio.h>
 
 // this class allows to skip NaN numbers when drawing curves
