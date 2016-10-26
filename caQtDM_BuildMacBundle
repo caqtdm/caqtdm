@@ -43,6 +43,9 @@ install_name_tool -change @loader_path/../../Frameworks/libca.3.14.12.dylib @rpa
 install_name_tool -change @loader_path/../../Frameworks/libCom.3.14.12.dylib @rpath/libCom.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
 
 echo ++++++++++ libbsread_plugin controls lib ++++++++
+install_name_tool -change libcaQtDM_Lib.dylib @rpath/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics4_plugin.dylib
+
+echo ++++++++++ libepics4_plugin controls lib ++++++++
 install_name_tool -change libcaQtDM_Lib.dylib @rpath/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libbsread_plugin.dylib
 
 echo ++++++++++ libdemo_plugin controls lib ++++++++

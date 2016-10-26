@@ -154,7 +154,22 @@ epics4_plugin {
 	
         macx {
                 message("epics4_plugin configuration macx")
+                INCLUDEPATH   += $(EPICSINCLUDE)
 		INCLUDEPATH += $(EPICSINCLUDE)/os/Darwin
+
+                INCLUDEPATH   += $(EPICS4LOCATION)/pvDataCPP/include
+                INCLUDEPATH   += $(EPICS4LOCATION)/pvAccessCPP/include
+                INCLUDEPATH   += $(EPICS4LOCATION)/pvaClientCPP/include
+                INCLUDEPATH   += $(EPICS4LOCATION)/normativeTypesCPP/src
+
+                EPICS4LOC1 = $(EPICS4LOCATION)/pvAccessCPP/lib/$(EPICS_HOST_ARCH)
+                EPICS4LOC2 = $(EPICS4LOCATION)/pvDataCPP/lib/$(EPICS_HOST_ARCH)
+                EPICS4LOC3 = $(EPICS4LOCATION)/pvaClientCPP/lib/$(EPICS_HOST_ARCH)
+
+                LIBS += $${EPICS4LOC1}/libpvAccess.a
+                LIBS += $${EPICS4LOC2}/libpvData.a
+                LIBS += $${EPICS4LOC3}/libpvaClient.a
+
         	LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
         	LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
         	LIBS += $$(EPICSLIB)/libca.dylib

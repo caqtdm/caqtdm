@@ -45,7 +45,7 @@ std::string MonitorPVRequesterImpl::getRequesterName()
 
 void MonitorPVRequesterImpl::message(std::string const & message, MessageType messageType)
 {
-    std::cout << "[" << getRequesterName() << "] message(" << message << ", " << getMessageTypeName[messageType] << ")"  << std::endl;
+    //std::cout << "[" << getRequesterName() << "] message(" << message << ", " << getMessageTypeName[messageType] << ")"  << std::endl;
 }
 
 void MonitorPVRequesterImpl::channelCreated(const epics::pvData::Status& status, Channel::shared_pointer const & channel)
