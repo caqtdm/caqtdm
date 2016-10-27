@@ -82,6 +82,9 @@ epics3_plugin {
         unix:!macx:!ios:!android  {
                 message("epics3_plugin configuration unix:!macx:!ios:!android ")
  		INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
+#for epics 3.15 and gcc we need this
+                INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
+
  		LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
  		LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
  		CONFIG += release
@@ -254,6 +257,9 @@ caQtDM_Lib {
                 LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lCom
       		LIBS += -L$(CAQTDM_COLLECT) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
       		INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
+#for epics 3.15 and gcc we need this
+                INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
+
       		OBJECTS_DIR = ./obj
       		DESTDIR = $(CAQTDM_COLLECT)
                 QMAKE_CXXFLAGS += "-g"
