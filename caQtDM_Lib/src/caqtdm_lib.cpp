@@ -605,7 +605,7 @@ QWidget* CaQtDM_Lib::getTabParent(QWidget *w1)
  */
 void CaQtDM_Lib::scanChildren(QList<QWidget*> children, QWidget *tab, int indexTab) {
 
-    void *ptr;
+    void *ptr1, *ptr2;
     int currentIndex;
 
     // go through our ca objects on this page (except for caStripplot and cawaterfallplot, needing history data)
@@ -645,17 +645,20 @@ void CaQtDM_Lib::scanChildren(QList<QWidget*> children, QWidget *tab, int indexT
                     }
 
                     // get the associated monitor pointers and add or remove the event
-                    QVariant var=w1->property("InfoList");
-                    QVariantList infoList = var.toList();
-                    for(int j=0; j<infoList.count(); j++) {
-                        ptr = (void*) infoList.at(j).value<void *>();
-                        if(ptr != (void*) 0) {
-                            ControlsInterface * plugininterface = (ControlsInterface *) w1->property("Interface").value<void *>();
+                    QVariant var1=w1->property("InfoList");
+                    QVariant var2=w1->property("Interface");
+                    QVariantList infoList1 = var1.toList();
+                    QVariantList infoList2 = var2.toList();
+                    for(int j=0; j< qMin(infoList1.count(), infoList2.count()); j++) {
+                        ptr1 = (void*) infoList1.at(j).value<void *>();
+                        ptr2 = (void*) infoList2.at(j).value<void *>();
+                        if((ptr1 != (void*) 0) && (ptr2 != (void*) 0)) {
+                            ControlsInterface * plugininterface = (ControlsInterface *) ptr2;
                             if(plugininterface != (ControlsInterface *) 0) {
                                 if(!hidden) {
-                                    plugininterface->pvAddEvent(ptr);
+                                    plugininterface->pvAddEvent(ptr1);
                                 } else {
-                                    plugininterface->pvClearEvent(ptr);
+                                    plugininterface->pvClearEvent(ptr1);
                                 }
                             }
                         }
@@ -2595,8 +2598,6 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
         plugininterface = getControlInterface(pluginName);
         // and set it to the widget and the pointer to the data
         kData->pluginInterface = (void *) plugininterface;
-        QVariant plugin = qVariantFromValue(kData->pluginInterface);
-        w->setProperty("Interface", plugin);
         if(kData->pluginInterface == (void *) 0) {
             char asc[255];
             sprintf(asc, "could not find a control plugin for %s with name %s\n", (char*) qasc(trimmedPV), (char*) qasc(pluginName.trimmed()));
@@ -2713,10 +2714,16 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
 
     // add for this widget the io info
     QVariant v = qVariantFromValue(kData->edata.info);
-    QVariant var=w->property("InfoList");
-    QVariantList infoList = var.toList();
-    infoList.append(v);
-    w->setProperty("InfoList", infoList);
+    QVariant var1=w->property("InfoList");
+    QVariantList infoList1 = var1.toList();
+    infoList1.append(v);
+    w->setProperty("InfoList", infoList1);
+
+    QVariant plugin = qVariantFromValue(kData->pluginInterface);
+    QVariant var2=w->property("Interface");
+    QVariantList infoList2 = var2.toList();
+    infoList2.append(plugin);
+    w->setProperty("Interface", infoList2);
 
     // clear data
     memset(kData, 0, sizeof (knobData));
@@ -4743,7 +4750,8 @@ void CaQtDM_Lib::Callback_ChoiceClicked(const QString& text)
     if(choice->getPV().length() > 0) {
         //qDebug() << "choice_clicked" << text << choice->getPV();
         QStringsToChars(choice->getPV().trimmed(), text,  choice->objectName().toLower());
-        ControlsInterface * plugininterface = (ControlsInterface *) choice->property("Interface").value<void *>();
+        //ControlsInterface * plugininterface = (ControlsInterface *) choice->property("Interface").value<void *>();
+        ControlsInterface *plugininterface = getPluginInterface((QWidget*) choice);
         if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue(param1, 0.0, 0, param2, param3, errmess, 0);
     }
 }
@@ -4761,7 +4769,8 @@ void CaQtDM_Lib::Callback_MenuClicked(const QString& text)
     if(menu->getPV().length() > 0) {
         //qDebug() << "menu_clicked" << text << menu->getPV();
         QStringsToChars(menu->getPV().trimmed(), text,  menu->objectName().toLower());
-        ControlsInterface * plugininterface = (ControlsInterface *) menu->property("Interface").value<void *>();
+        //ControlsInterface * plugininterface = (ControlsInterface *) menu->property("Interface").value<void *>();
+        ControlsInterface *plugininterface = getPluginInterface((QWidget*) menu);
         if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue(param1, 0.0, 0, param2, param3, errmess, 0);
     }
     // display label again when configured with it
@@ -6289,7 +6298,8 @@ void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType
         kPtr = mutexKnobDataP->GetMutexKnobDataPtr(indx);  // use pointer
         if(kPtr == (knobData *) 0) return;
     } else {
-        plugininterface = (ControlsInterface *) w->property("Interface").value<void *>();
+        //plugininterface = (ControlsInterface *) w->property("Interface").value<void *>();
+        plugininterface = getPluginInterface((QWidget*) w);
         if(plugininterface == (ControlsInterface *) 0) return;
     }
 
@@ -6418,7 +6428,8 @@ void CaQtDM_Lib::TreatRequestedWave(QString pvo, QString text, caWaveTable::Form
 
     QString pv = pvo.trimmed();
 
-    ControlsInterface * plugininterface = (ControlsInterface *) w->property("Interface").value<void *>();
+    //ControlsInterface * plugininterface = (ControlsInterface *) w->property("Interface").value<void *>();
+    ControlsInterface *plugininterface = getPluginInterface((QWidget*) w);
     if(plugininterface == (ControlsInterface *) 0) return;
 
     FormatType fTypeNew;
@@ -7365,4 +7376,16 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
     if (dropAction == Qt::MoveAction)w->close();
 }
 
+
+ControlsInterface * CaQtDM_Lib::getPluginInterface(QWidget *w)
+{
+    QVariant var = w->property("Interface");
+    QVariantList list = var.toList();
+    if(list.count() > 0) {
+        void *ptr = (void*) list.at(0).value<void *>();
+        return  (ControlsInterface *) ptr;
+    } else {
+        return (ControlsInterface *) 0;
+    }
+}
 
