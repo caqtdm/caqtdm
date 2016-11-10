@@ -25,13 +25,34 @@
 #ifndef EPICS4PLUGIN_H
 #define EPICS4PLUGIN_H
 
+#include <map>
+#include <caerr.h>
+#include <pv/pvData.h>
+#include <pv/pvaClient.h>
+#include <pv/convert.h>
+#include <pv/standardField.h>
+#include <pv/standardPVField.h>
+#include <pv/alarm.h>
+#include <pv/timeStamp.h>
+
 #include <QObject>
 #include "controlsinterface.h"
-#ifdef EPICS4
-  #include "epics4Subs.h"
-#endif
+#include "callbackThread.h"
+#include "epics4Requester.h"
 
-class Q_DECL_EXPORT Epics4Plugin : public QObject, ControlsInterface
+namespace epics { namespace caqtdm { namespace epics4 {
+
+
+class PvaInterface;
+typedef std::tr1::shared_ptr<PvaInterface> PvaInterfacePtr;
+typedef std::tr1::weak_ptr<PvaInterface> PvaInterfaceWPtr;
+
+
+}}}
+
+
+class Q_DECL_EXPORT Epics4Plugin : public QObject, ControlsInterface,
+     public std::tr1::enable_shared_from_this<Epics4Plugin>
 {
     Q_OBJECT
     Q_INTERFACES(ControlsInterface)
@@ -42,8 +63,8 @@ class Q_DECL_EXPORT Epics4Plugin : public QObject, ControlsInterface
 public:
     QString pluginName();
     Epics4Plugin();
+    ~Epics4Plugin();
 
-    int setOptions(QMap<QString, QString> options);
     int initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow, QMap<QString, QString> options);
     int pvAddMonitor(int index, knobData *kData, int rate, int skip);
     int pvClearMonitor(knobData *kData);
@@ -60,11 +81,11 @@ public:
     int TerminateIO();
 
   private:
-    MutexKnobData *mutexknobdataP;
-    MessageWindow *messagewindowP;
-#ifdef EPICS4
-    epics4Subs *Epics4;
-#endif
+    epics::pvaClient::PvaClientPtr pvaClient;
+    epics::caqtdm::epics4::Epics4RequesterPtr requester;
+    epics::pvData::CallbackThreadPtr callbackThread;
+    MutexKnobData * mutexKnobData;
+    std::map<std::string,epics::caqtdm::epics4::PvaInterfacePtr> pvaInterfaceMap;
 };
 
 #endif

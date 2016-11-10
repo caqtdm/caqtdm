@@ -21,10 +21,13 @@ HEADERS         = epics4_plugin.h ../controlsinterface.h
 SOURCES         = epics4_plugin.cpp 
 TARGET          = epics4_plugin
 
+SOURCES += callbackThread.cpp epics4Requester.cpp
+HEADERS += callbackThread.h epics4Requester.
+
 warning("epics4 was specified in qtdefs.pri, so build plugin with epics4, not yet finished")
 
-SOURCES +=  epics4Subs.cpp pvAccessImpl.cpp
-HEADERS +=  epics4Subs.h pvAccessImpl.h
+#SOURCES +=  epics4Subs.cpp pvAccessImpl.cpp
+#HEADERS +=  epics4Subs.h pvAccessImpl.h
 
 
 DEFINES += EPICS4
