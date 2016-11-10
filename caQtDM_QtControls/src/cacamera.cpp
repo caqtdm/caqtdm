@@ -809,10 +809,36 @@ void caCamera::MinMaxImageLock(QVector<uint> LineData, int y, QSize resultSize, 
 	MinMax->imageLock->unlock();
 }
 
+void caCamera::MinMaxImageLockNew(uint *LineData, int ystart, int yend, QSize resultSize, SyncMinMax* MinMax)
+{
+    MinMax->imageLock->lock();
+    if(image != (QImage *) 0) {
+        for(int i=ystart; i<yend; ++i) {
+            if (i<image->height()){
+                uint *scanLine = reinterpret_cast<uint *>(image->scanLine(i));
+                if (scanLine) {
+                    memcpy(scanLine, &LineData[(i-ystart) * resultSize.width()], resultSize.width() * sizeof(uint));
+                }
+            }
+        }
+    }
+    MinMax->imageLock->unlock();
+}
+
 void caCamera::InitLoopdata(int &ystart, int &yend, long &i, QVector<uint> &LineData, int increment, int sector, int sectorcount, QSize resultSize, uint Max[2], uint Min[2])
 {
     LineData.resize(resultSize.width());
 
+    Max[1] = 0;
+    Min[1] = 65535;
+
+    ystart = sector * resultSize.height() / sectorcount;
+    yend = ((sector + 1) * resultSize.height()) / sectorcount; //     sector * resultSize.height() / sectorcount + resultSize.height() / sectorcount;
+    i = resultSize.width() * ystart * increment;
+}
+
+void caCamera::InitLoopdataNew(int &ystart, int &yend, long &i, int increment, int sector, int sectorcount, QSize resultSize, uint Max[2], uint Min[2])
+{
     Max[1] = 0;
     Min[1] = 65535;
 
@@ -882,58 +908,65 @@ void caCamera::CameraDataConvert_8bit(int sector, int sectorcount, SyncMinMax* M
 // monochrome 2 bpp, but used only 12 bits  (Helge cameras)
 void caCamera::CameraDataConvert_16bit(int sector, int sectorcount, SyncMinMax* MinMax, QSize resultSize, int datasize)
 {
-    uint indx, indx1;
+    uint indx1;
     uint Max[2], Min[2];
     int ystart, yend;
     long i;
-    QVector<uint> LineData;
+    uint *LineData;
 
     ushort *ptr = (ushort*) savedData;
 
-    InitLoopdata(ystart, yend, i, LineData, 1, sector, sectorcount, resultSize, Max, Min);
+    InitLoopdataNew(ystart, yend, i, 1, sector, sectorcount, resultSize, Max, Min);
 
     if(i >= datasize) return;
 
-    if(thisColormap != grey) {
+    // allocate the whole block
+    LineData = (uint *) malloc(resultSize.width() * sizeof(uint) * (yend-ystart));
 
-        for (int y = ystart; y < yend; ++y) {
-            for (int x = 0; x < resultSize.width(); ++x) {
-                indx = ptr[i++];
-                indx1 = (indx - minvalue) * (ColormapSize-1) / (maxvalue - minvalue);
-                if(indx1 >= ColormapSize) indx1=ColormapSize -1;
-
-                //LineData.replace(x,ColorMap[indx1]);
-                LineData[x] =  ColorMap[indx1];
-                Max[(indx > Max[1])] = indx;
-                Min[(indx < Min[1])] = indx;
-                if ((i * 2) >= datasize) break;
+    // instead of testing in the big loop, subtract a line when sizes do not fit
+    bool notOK = true;
+    while (notOK) {
+        long SizeToTreat = (yend-ystart)*resultSize.width()*2;
+        if(SizeToTreat > datasize) {
+            yend -= 1;
+            if(yend < ystart) {
+                printf("something really wrong between datasize and image width and height\n");
+                free (LineData);
+                return;
             }
-            if((i*2) >= datasize) break;
-
-            MinMaxImageLock(LineData, y, resultSize, MinMax);
-        }
-    } else {
-        for (int y = ystart; y < yend; ++y) {
-            for (int x = 0; x < resultSize.width(); ++x) {
-
-                indx=ptr[i++];
-                Max[(indx > Max[1])] = indx;
-                Min[(indx < Min[1])] = indx;
-
-                indx1=indx * 255 /(maxvalue - minvalue);
-                if(indx1 > 255) indx1 = 255;
-
-                //LineData.replace(x,qRgb(indx1,indx1,indx1));
-                LineData[x] =  qRgb(indx1,indx1,indx1);
-                if((i*2) >= datasize) break;
-            }
-            if ((i * 2) >= datasize) break;
-
-            MinMaxImageLock(LineData, y, resultSize, MinMax);
+            printf("datasize=%d ystart=%d yend=%d width=%d\n", datasize, ystart, yend, resultSize.width());
+        } else {
+            notOK = false;
         }
     }
 
+    if(thisColormap != grey) {
+        int correctColor1 =  qRound((ColormapSize-1) / (maxvalue - minvalue));
+        for(int k=0; k<(yend-ystart)*resultSize.width(); ++k) {
+            Max[(ptr[i] > Max[1])] = ptr[i];
+            Min[(ptr[i] < Min[1])] = ptr[i];
+            indx1 = (ptr[i] - minvalue) * correctColor1;
+            if(indx1 >= ColormapSize) indx1=ColormapSize -1;
+            LineData[k] =  ColorMap[indx1];
+            ++i;
+        }
+    } else {
+        int correctColor2 =  qRound(255 / (maxvalue - minvalue));
+        for(int k=0; k<(yend-ystart)*resultSize.width(); ++k) {
+            Max[(ptr[i] > Max[1])] = ptr[i];
+            Min[(ptr[i] < Min[1])] = ptr[i];
+
+            indx1=ptr[i] * correctColor2;
+            if(indx1 > 255) indx1 = 255;
+
+            LineData[k] =   (indx1 << 16) | (indx1 << 8) | indx1;
+            ++i;
+        }
+    }
+
+    MinMaxImageLockNew(LineData, ystart, yend, resultSize, MinMax);
     MinMaxLock(MinMax, Max, Min);
+    free(LineData);
 }
 
 // monochrome 2 bpp, but used only first byte  (Damir cameras)
