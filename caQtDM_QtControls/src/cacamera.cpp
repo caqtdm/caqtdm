@@ -941,7 +941,7 @@ void caCamera::CameraDataConvert_16bit(int sector, int sectorcount, SyncMinMax* 
     }
 
     if(thisColormap != grey) {
-        int correctColor1 =  qRound((ColormapSize-1) / (maxvalue - minvalue));
+        int correctColor1 =  qRound((float)((ColormapSize-1) / (maxvalue - minvalue)));
         for(int k=0; k<(yend-ystart)*resultSize.width(); ++k) {
             Max[(ptr[i] > Max[1])] = ptr[i];
             Min[(ptr[i] < Min[1])] = ptr[i];
@@ -951,7 +951,7 @@ void caCamera::CameraDataConvert_16bit(int sector, int sectorcount, SyncMinMax* 
             ++i;
         }
     } else {
-        int correctColor2 =  qRound(255 / (maxvalue - minvalue));
+        int correctColor2 =  qRound((float)(255 / (maxvalue - minvalue)));
         for(int k=0; k<(yend-ystart)*resultSize.width(); ++k) {
             Max[(ptr[i] > Max[1])] = ptr[i];
             Min[(ptr[i] < Min[1])] = ptr[i];
