@@ -734,7 +734,8 @@ void caCartesianPlot::setColor(QColor c, int indx)
         } else if(thisStyle[indx] == Dots) {
             curve[indx].setPen(QPen(c, 0));
         } else {
-            curve[indx].setPen(QPen(c, 2));
+            int size=qMax(2, (int) qRound(this->geometry().height()/70.0));
+            curve[indx].setPen(QPen(c, size));
         }
     } else {
         curve[indx].setPen(QPen(thisScaleColor, 2));  // normally black
@@ -781,6 +782,10 @@ void caCartesianPlot::resizeEvent ( QResizeEvent * event )
     QwtPlot::resizeEvent(event);
     for(int i=0; i<6; i++) {
         setSymbol(thisSymbol[i], i);
+        if((thisStyle[i] != FillUnder) &&  (thisStyle[i] == FatDots)) {
+            int size=qMax(2, (int) qRound(this->geometry().height()/70.0));
+            curve[i].setPen(QPen(thisLineColor[i], size));
+        }
     }
 }
 
@@ -791,7 +796,7 @@ void caCartesianPlot::setSymbol(curvSymbol s, int indx)
     QwtSymbol::Style ms = myMarker(s);
     brush.setColor(thisLineColor[indx]);
     brush.setStyle(Qt::SolidPattern);
-    size=qMax(5, (int) (this->geometry().height()/70.0));
+    size=qMax(2, (int) qRound(this->geometry().height()/50.0));
     curve[indx].setSymbol(new QwtSymbol(ms, brush, QPen(thisLineColor[indx]), QSize(size, size)));
     replot();
 }
