@@ -809,7 +809,7 @@ void caCamera::MinMaxImageLock(QVector<uint> LineData, int y, QSize resultSize, 
 	MinMax->imageLock->unlock();
 }
 
-void caCamera::MinMaxImageLockNew(uint *LineData, int ystart, int yend, QSize resultSize, SyncMinMax* MinMax)
+void caCamera::MinMaxImageLockBlock(uint *LineData, int ystart, int yend, QSize resultSize, SyncMinMax* MinMax)
 {
     MinMax->imageLock->lock();
     if(image != (QImage *) 0) {
@@ -941,22 +941,25 @@ void caCamera::CameraDataConvert_16bit(int sector, int sectorcount, SyncMinMax* 
     }
 
     if(thisColormap != grey) {
-        int correctColor1 =  qRound((float)(ColormapSize-1) / (float) (maxvalue - minvalue));
-        for(int k=0; k<(yend-ystart)*resultSize.width(); ++k) {
-            Max[(ptr[i] > Max[1])] = ptr[i];
-            Min[(ptr[i] < Min[1])] = ptr[i];
-            indx1 = (ptr[i] - minvalue) * correctColor1;
-            if(indx1 >= ColormapSize) indx1=ColormapSize -1;
-            LineData[k] =  ColorMap[indx1];
-            ++i;
-        }
-    } else {
-        int correctColor2 =  qRound((float) 255 / (float) (maxvalue - minvalue));
+        float correctColor1 =  (float)(ColormapSize-1) / (float) (maxvalue - minvalue);
         for(int k=0; k<(yend-ystart)*resultSize.width(); ++k) {
             Max[(ptr[i] > Max[1])] = ptr[i];
             Min[(ptr[i] < Min[1])] = ptr[i];
 
-            indx1=ptr[i] * correctColor2;
+            indx1 = (ptr[i] - minvalue) * correctColor1;
+            if(indx1 >= ColormapSize) indx1=ColormapSize -1;
+
+            LineData[k] =  ColorMap[indx1];
+            ++i;
+
+        }
+    } else {
+        float correctColor2 =  (float) 255 / (float) (maxvalue - minvalue);
+        for(int k=0; k<(yend-ystart)*resultSize.width(); ++k) {
+            Max[(ptr[i] > Max[1])] = ptr[i];
+            Min[(ptr[i] < Min[1])] = ptr[i];
+
+            indx1 = ptr[i] * correctColor2;
             if(indx1 > 255) indx1 = 255;
 
             LineData[k] =   (indx1 << 16) | (indx1 << 8) | indx1;
@@ -964,7 +967,7 @@ void caCamera::CameraDataConvert_16bit(int sector, int sectorcount, SyncMinMax* 
         }
     }
 
-    MinMaxImageLockNew(LineData, ystart, yend, resultSize, MinMax);
+    MinMaxImageLockBlock(LineData, ystart, yend, resultSize, MinMax);
     MinMaxLock(MinMax, Max, Min);
     free(LineData);
 }
