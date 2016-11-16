@@ -26,7 +26,7 @@ contains(QT_VER_MAJ, 5) {
       }
 }
 
-CONFIG += warn_on debug
+CONFIG += warn_on
 CONFIG += console
 
 TARGET = qtcontrols

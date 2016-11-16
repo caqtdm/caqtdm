@@ -93,6 +93,7 @@ epics3_plugin {
         macx {
                 message("epics3_plugin configuration macx")
  		INCLUDEPATH   += $(EPICSINCLUDE)/os/Darwin
+                INCLUDEPATH   += $(EPICSINCLUDE)/compiler/clang
  		LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
  		LIBS += $$(EPICSLIB)/libca.dylib
  		LIBS += $$(EPICSLIB)/libCom.dylib
@@ -105,6 +106,7 @@ epics3_plugin {
                 LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.a
                 ios {
                         INCLUDEPATH += $(EPICSINCLUDE)/os/iOS
+                        INCLUDEPATH   += $(EPICSINCLUDE)/compiler/clang
                 }
                 android {
                         INCLUDEPATH += $(EPICSINCLUDE)/os/android
@@ -234,7 +236,10 @@ caQtDM_QtControls {
 		DESTDIR = $$(CAQTDM_COLLECT)
 		INCLUDEPATH += $$(QWTINCLUDE)
                 CONFIG += staticlib
-	}
+                CONFIG += release
+                CONFIG -= debug
+                CONFIG -= debug_and_release
+        }
 
 	win32 {
                 message("caQtDM_QtControls sconfiguration : win32")
@@ -270,6 +275,7 @@ caQtDM_Lib {
         macx {
                 message("caQtDM_Lib configuration : macx")
       		INCLUDEPATH += $(EPICSINCLUDE)/os/Darwin
+                INCLUDEPATH   += $(EPICSINCLUDE)/compiler/clang
       		QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
       		LIBS += -F$(QWTLIB) -framework qwt
                 LIBS += -L$(CAQTDM_COLLECT) -lqtcontrols
@@ -283,12 +289,14 @@ caQtDM_Lib {
 	ios | android {
                 message("caQtDM_Lib configuration : !os or android")
                 CONFIG += staticlib console
+                CONFIG += release
                 SOURCES +=     fingerswipegesture.cpp
       		HEADERS +=     fingerswipegesture.h
 		DESTDIR = $(CAQTDM_COLLECT)
                 INCLUDEPATH += ./caQtDM_Plugins
 		ios {
       			INCLUDEPATH += $(EPICSINCLUDE)/os/iOS
+                        INCLUDEPATH   += $(EPICSINCLUDE)/compiler/clang
 		}
 
 		android {
@@ -387,6 +395,7 @@ caQtDM_Viewer {
                 message("caQtDM_viewer configuration : ios")
                 DESTDIR = $(CAQTDM_COLLECT)
                 CONFIG += staticlib
+                CONFIG += release
    		LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.a
    		LIBS += $(CAQTDM_COLLECT)/libqtcontrols.a
    		LIBS += $$(QWTHOME)/lib/libqwt.a
@@ -416,9 +425,11 @@ epics4: {
                 StartScreen.files += $$PWD/caQtDM_Viewer/src/StartScreen-568h@2x.png
                 APP-FONTS.files = $$PWD/caQtDM_Viewer/lucida-sans-typewriter.ttf
    		APP-FONTS.path = fonts
-   		QMAKE_BUNDLE_DATA += APP_XML_FILES APP_ICON APP1_ICON StartScreen APP-FONTS
+                QMAKE_BUNDLE_DATA += APP_XML_FILES APP_ICON APP1_ICON StartScreen APP-FONTS
    		QMAKE_CFLAGS += -gdwarf-2
                 QMAKE_CXXFLAGS += -gdwarf-2
+                QMAKE_BUNDLE_NAME = ch.psi.caqtdm
+message( $$QMAKESPEC )
 	}
 
 	android {
