@@ -126,6 +126,7 @@ void  MutexKnobData::BuildSoftPVList(QWidget *w)
 {
     char asc[MAXPVLEN+20];
     QMutexLocker locker(&mutex);
+    softPV_List.clear();
     // go through all our monitors
     for(int i=0; i < KnobDataArraySize; i++) {
         if(KnobData[i].index != -1 && KnobData[i].soft) {
@@ -150,6 +151,16 @@ void  MutexKnobData::BuildSoftPVList(QWidget *w)
             }
         }
     }
+
+/*
+    QMapIterator<QString, int> i(softPV_List);
+    int number = 0;
+    while (i.hasNext()) {
+        i.next();
+        number++;
+    }
+    qDebug() << "buildsoftpvlist=" << number;
+*/
 }
 
 /**
@@ -570,9 +581,9 @@ void MutexKnobData::timerEvent(QTimerEvent *)
 
         // use specified repetition rate (normally 5Hz)
         if( ((kPtr->index != -1) && (kPtr->edata.monitorCount > kPtr->edata.displayCount) && (diff >= (1.0/(double)repRate)))){
-            /*
-            printf("<%s> index=%d mcount=%d dcount=%d value=%f datasize=%d valuecount=%d\n", kPtr->pv, kPtr->index, kPtr->edata.monitorCount,
-                                                                      kPtr->edata.displayCount, kPtr->edata.rvalue,
+/*
+            printf("<%s> index=%d mcount=%d dcount=%d value=%f ivalue=%d datasize=%d valuecount=%d\n", kPtr->pv, kPtr->index, kPtr->edata.monitorCount,
+                                                                      kPtr->edata.displayCount, kPtr->edata.rvalue, kPtr->edata.ivalue,
                                                                       kPtr->edata.dataSize, kPtr->edata.valueCount);
 */
             if((myUpdateType == UpdateTimed) || kPtr->soft) {
