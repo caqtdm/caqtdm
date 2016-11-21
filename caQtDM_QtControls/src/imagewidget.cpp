@@ -474,7 +474,7 @@ void  ImageWidget::updateImage(bool FitToSize, const QImage &image, bool readval
     }
 
     rescaleReadValues(FitToSize, image, scaleFactor, readvaluesPresent, readvalues);
-    update();
+    //update();  done already in rescalereadvalues
 }
 
 
