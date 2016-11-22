@@ -32,7 +32,7 @@ contains(QT_VER_MAJ, 4) {
     contains(QT_VER_MIN, 8) {
        contains(QT_VER_PAT, 2) {
           message("caQtDM building with Qt4.8.2, therefore enabling designer tooltip description, this works only for the patched version of Qt4.8.2 at PSI")
-#          DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
+#         DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
        }
     }
 }
@@ -100,7 +100,11 @@ DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
 # 4.1.3
-# caChoice has now the possibility to display a row from the bottom to the top (rowInverse)
+# added for the cartesianplot resize of the fatdots plot
+# softpv treatment was slowing done caQtDM and is corrected now
+# camera has been more optimized for 16bit waveforms (the other types not yet, due to a lack of waveforms types)
+# label and vertical label can gave a border now
+# caChoice has now the possibility to display a row from the bottom to the top (rowInverse) and is optimized
 # soft pv's without a name were not working, now automatically a name is generated
 # in order to have cacalc's working correctly in includes, a macro can be used in order to individialize them
 # zero values in cartesian plot are now replaced by the lowest non-zero value when logarithmic scale is used
