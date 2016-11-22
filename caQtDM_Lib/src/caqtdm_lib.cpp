@@ -620,6 +620,7 @@ void CaQtDM_Lib::scanChildren(QList<QWidget*> children, QWidget *tab, int indexT
 
             // no tab
             if(tabstack != (QWidget*) 0) {
+
                 // the widget to be considered
                 if(tabstack == tab) {
                     // get current tabindex
@@ -631,18 +632,22 @@ void CaQtDM_Lib::scanChildren(QList<QWidget*> children, QWidget *tab, int indexT
                         currentIndex = -1;
                     }
                     bool hidden = false;
-                    //qDebug() << w1->objectName() << "sitting in " << tabstack << "actual position is" << currentIndex;
 
                     if(!tabstack->isVisible()) {
                         //qDebug() << "thus on hidden tab";
                         hidden = true;
+                        w1->setProperty("hidden", true);
                     } else if(indexTab == currentIndex) {
                         //qDebug() << "thus on visible tab";
                         hidden = false;
+                        w1->setProperty("hidden", false);
                     } else {
                         //qDebug() << "thus on hidden tab";
                         hidden = true;
+                        w1->setProperty("hidden", true);
                     }
+
+                    //qDebug() << w1->objectName() << "sitting in " << tabstack << "actual position is" << currentIndex << hidden;
 
                     // get the associated monitor pointers and add or remove the event
                     QVariant var1=w1->property("InfoList");
@@ -824,6 +829,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
     w1->setProperty("FColor", fg);
     w1->setProperty("LColor", lg);
 
+    // say not hideen
+
+    w1->setProperty("hidden", false);
+
     // when first pass specified, treat only caCalc
     //==================================================================================================================
     if(firstPass) {
@@ -831,6 +840,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
             bool doit;
             w1->setProperty("ObjectType", caCalc_Widget);
+            QWidget *tabWidget = getTabParent(w1);
+            w1->setProperty("parentTab",QVariant::fromValue(tabWidget) );
 
             kData.soft = true;
 

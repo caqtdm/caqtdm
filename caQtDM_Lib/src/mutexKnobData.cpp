@@ -530,6 +530,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
         prvRepetitionRate = repetitionRate;
     }
 
+    //int number = 0;
     //qDebug() << "============================================";
     for(int i=0; i < GetMutexKnobDataSize(); i++) {
         knobData *kPtr = (knobData*) &KnobData[i];
@@ -542,7 +543,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
         }
 
         // update all graphical items for this soft pv when a value changes
-        if(kPtr->index != -1 && kPtr->soft && (diff >= (1.0/(double)repRate))) {
+        if(kPtr->index != -1 && kPtr->soft && (diff >= (2.0/(double)repRate))) {
             int indx;
             //qDebug() << "I am a soft channel" << kPtr->pv << kPtr->dispName << kPtr->edata.rvalue << kPtr->index;
             // get for this soft pv the index of the corresponding caCalc into the knobData array where the data were updated
@@ -567,7 +568,11 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 if(list.size() > 0) {
                     int nbMonitors = list.at(0).toInt();
                     if(nbMonitors > 0) {
-                        kPtr->edata.monitorCount++;
+                        QWidget *w2 = (QWidget*) kPtr->dispW;
+                        if(!w2->property("hidden").value<bool>()) {
+                           kPtr->edata.monitorCount++;
+                           //qDebug() << "increase associated" << kPtr->pv << w2->objectName() <<  w2->property("hidden").value<bool>() << number1++;
+                        }
                     }
                 }
 
