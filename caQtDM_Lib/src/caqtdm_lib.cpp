@@ -1071,6 +1071,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             if(i==2) text = cameraWidget->getPV_Height();
             if(i==3) text = cameraWidget->getPV_Code();
             if(i==4) text = cameraWidget->getPV_BPP();
+
             // for spectrum pseudo levels
             if(i==5) {
                 alpha = cameraWidget->isAlphaMinLevel();
@@ -1120,6 +1121,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     integerList.append(num);
                     nbMonitors++;
                 }
+
                 if(i==0) cameraWidget->setPV_Data(pv);
                 if(i==1) cameraWidget->setPV_Width(pv);
                 if(i==2) cameraWidget->setPV_Height(pv);
@@ -1137,6 +1139,27 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                 cameraWidget->setCode(1);
             } else if (i==4) {  // bpp missing (assume 3 for Helge)
                 cameraWidget->setBPP(3);
+            }
+        }
+
+        QString text = cameraWidget->getPV_Xaverage();
+        if(text.size() > 0) {
+            text =  treatMacro(map, text, &doNothing);
+            if(text.size() > 0) {
+                specData[0] =15;   // pv type. x waveform
+                int num = addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
+                integerList.append(num);
+                nbMonitors++;
+            }
+        }
+        text = cameraWidget->getPV_Yaverage();
+        if(text.size() > 0) {
+            text =  treatMacro(map, text, &doNothing);
+            if(text.size() > 0) {
+                specData[0] = 16;   // pv type. x waveform
+                int num = addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
+                integerList.append(num);
+                nbMonitors++;
             }
         }
 
@@ -4350,6 +4373,14 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 datamutex->lock();
                 cameraWidget->showImage(data.edata.dataSize, (char*) data.edata.dataB);
                 datamutex->unlock();
+            } else if(data.specData[0] == 15) {
+                if(data.edata.valueCount > 0 && data.edata.dataB != (void*) 0) {
+                    CameraWaveform(cameraWidget, 0, 0, 1, data);
+                }
+            } else if(data.specData[0] == 16) {
+                if(data.edata.valueCount > 0 && data.edata.dataB != (void*) 0) {
+                    CameraWaveform(cameraWidget, 0, 0, 0, data);
+                }
             }
         } else {
             cameraWidget->showDisconnected();
@@ -4478,6 +4509,54 @@ void CaQtDM_Lib::Cartesian(caCartesianPlot *widget, int curvNB, int curvType, in
         widget->setData(P ,data.edata.valueCount, curvNB, curvType, XorY);
         datamutex->unlock();
         widget->displayData(curvNB, curvType);
+    }
+        break;
+    default:
+        datamutex->unlock();
+        break;
+    }
+}
+
+void CaQtDM_Lib::CameraWaveform(caCamera *widget, int curvNB, int curvType, int XorY, const knobData &data)
+{
+    QMutex *datamutex;
+    datamutex = (QMutex*) data.mutex;
+    datamutex->lock();
+    switch(data.edata.fieldtype) {
+    case caFLOAT: {
+        float* P = (float*) data.edata.dataB;
+        widget->setData(P, data.edata.valueCount, curvNB, curvType, XorY);
+        datamutex->unlock();
+    }
+        break;
+    case caDOUBLE: {
+        double* P = (double*) data.edata.dataB;
+        widget->setData(P, data.edata.valueCount, curvNB, curvType, XorY);
+        datamutex->unlock();
+    }
+        break;
+    case caLONG: {
+        int32_t* P = (int32_t*) data.edata.dataB;
+        widget->setData(P, data.edata.valueCount,curvNB, curvType, XorY);
+        datamutex->unlock();
+    }
+        break;
+    case caINT: {
+        int16_t* P = (int16_t*) data.edata.dataB;
+        widget->setData(P, data.edata.valueCount, curvNB, curvType, XorY);
+        datamutex->unlock();
+    }
+        break;
+    case caCHAR: {
+        int8_t* P = (int8_t*) data.edata.dataB;
+        widget->setData(P, data.edata.valueCount, curvNB, curvType, XorY);
+        datamutex->unlock();
+    }
+        break;
+    case caENUM: {
+        int16_t* P = ( int16_t*) data.edata.dataB;
+        widget->setData(P, data.edata.valueCount, curvNB, curvType, XorY);
+        datamutex->unlock();
     }
         break;
     default:

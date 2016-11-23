@@ -718,10 +718,14 @@ void caScan2D::refreshImage()
 }
 
 void caScan2D::updateImage(const QImage &image, bool valuesPresent[], double values[], double scaleFactor)
-{		
+{
+    QVarLengthArray<double> X;
+    QVarLengthArray<double> Y;
+    X.clear(); Y.clear();
     imageW->updateImage(thisFitToSize, image, valuesPresent, values, scaleFactor, thisSimpleView,
                         (short) getROIreadmarkerType(), (short) getROIreadType(),
-                        (short) getROIwritemarkerType(), (short) getROIwriteType());			
+                        (short) getROIwritemarkerType(), (short) getROIwriteType(),
+                         X, Y);
 }
 
 void caScan2D::showDisconnected()

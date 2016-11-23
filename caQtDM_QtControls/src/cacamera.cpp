@@ -44,10 +44,14 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     m_heightDefined = false;
 
     thisSimpleView = false;
+    thisFitToSize = No;
     savedSize = 0;
     savedWidth = 0;
     savedHeight = 0;
     selectionInProgress = false;
+
+    thisPV_Xaverage = "";
+    thisPV_Yaverage = "";
 
     savedData = (char*) 0;
 
@@ -467,6 +471,10 @@ void caCamera::setup()
         scrollArea->setWidget(imageW);
         scrollArea->setWidgetResizable(true);
 
+        connect (scrollArea->verticalScrollBar(), SIGNAL(valueChanged (int)), this, SLOT(scrollAreaMoved(int)));
+        connect (scrollArea->horizontalScrollBar(), SIGNAL(valueChanged (int)), this, SLOT(scrollAreaMoved(int)));
+
+
         // add some zoom utilities to our widget
         int iconsize = style()->pixelMetric(QStyle::PM_ToolBarIconSize);
         QSize iconSize(iconsize, iconsize);
@@ -528,6 +536,11 @@ void caCamera::setup()
         mainLayout->addWidget(imageW, 0, 0);
         thisFitToSize = Yes;
     }
+}
+
+void caCamera::scrollAreaMoved(int)
+{
+    if(image != (QImage *) 0)  imageW->update();
 }
 
 void caCamera::zoomNow()
@@ -726,11 +739,12 @@ void caCamera::resizeEvent(QResizeEvent *e)
     if(image != (QImage *) 0)  imageW->rescaleSelectionBox(scaleFactor);
 }
 
-void caCamera::updateImage(const QImage &image, bool valuesPresent[], double values[], double scaleFactor)
+void caCamera::updateImage(const QImage &image, bool valuesPresent[], double values[], double scaleFactor,
+                           QVarLengthArray<double> X,  QVarLengthArray<double> Y)
 {
     imageW->updateImage(thisFitToSize, image, valuesPresent, values, scaleFactor, thisSimpleView,
                         (short) getROIreadmarkerType(), (short) getROIreadType(),
-                        (short) getROIwritemarkerType(), (short) getROIwriteType());
+                        (short) getROIwritemarkerType(), (short) getROIwriteType(), X, Y);
 }
 
 void caCamera::showDisconnected()
@@ -1208,7 +1222,7 @@ void caCamera::showImage(int datasize, char *data)
     //printf("Image timer 1 : %d (%x) milliseconds \n", (int) timer.elapsed(),image);
 
     //fflush(stdout);
-    if(image != (QImage *) 0) updateImage(*image, readvaluesPresent, readvalues, scaleFactor);
+    if(image != (QImage *) 0) updateImage(*image, readvaluesPresent, readvalues, scaleFactor, X, Y);
 
     if(getAutomateChecked()) {
         updateMax(maxvalue);
@@ -1228,6 +1242,47 @@ void caCamera::showImage(int datasize, char *data)
     UpdatesPerSecond++;
 }
 
+void caCamera::setData(double *array, int size, int curvIndex, int curvType, int curvXY)
+{
+    fillData(array, size, curvIndex, curvType, curvXY);
+}
+
+void caCamera::setData(float *array, int size, int curvIndex, int curvType, int curvXY)
+{
+    fillData(array, size, curvIndex, curvType, curvXY);
+}
+
+void caCamera::setData(int16_t *array, int size, int curvIndex, int curvType, int curvXY)
+{
+    fillData(array, size, curvIndex, curvType, curvXY);
+}
+
+void caCamera::setData(int32_t *array, int size, int curvIndex, int curvType, int curvXY)
+{
+    fillData(array, size, curvIndex, curvType, curvXY);
+}
+
+void caCamera::setData(int8_t *array, int size, int curvIndex, int curvType, int curvXY)
+{
+    fillData(array, size, curvIndex, curvType, curvXY);
+}
+
+template <typename pureData>
+void caCamera::fillData(pureData *array, int size, int curvIndex, int curvType, int curvXY)
+{
+    Q_UNUSED(curvIndex);
+    Q_UNUSED(curvType);
+        // keep data points
+        if(curvXY == CH_X) {                       // X
+            X.resize(size);
+            double *data = X.data();
+            for(int i=0; i<  size; i++) data[i] = array[i];
+        } else {                                   // Y
+            Y.resize(size);
+            double *data = Y.data();
+            for(int i=0; i<  size; i++) data[i] = array[i];
+        }
+}
 
 void caCamera::setAccessW(bool access)
 {

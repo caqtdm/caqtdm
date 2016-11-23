@@ -77,6 +77,9 @@ QPolygonF ImageWidget::getHead( QPointF p1, QPointF p2, int arrowSize ) {
     return arrowHead;
 }
 
+#define SMALLEST -1.e20
+#define BIGGEST 1.e20
+
 void ImageWidget::paintEvent(QPaintEvent * event)
 {
     int xnew, ynew, width , height;
@@ -88,6 +91,7 @@ void ImageWidget::paintEvent(QPaintEvent * event)
 
     Q_UNUSED(event);
     QPainter painter(this);
+
     painter.save();
 
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
@@ -128,6 +132,62 @@ void ImageWidget::paintEvent(QPaintEvent * event)
     height = imageNew.size().height();
     painter.setPen(Qt::blue);
     painter.drawRoundedRect(0, 0, width, height, 2.0, 2.0);
+
+    if(XL.size() > 0) {
+        float Max[2];
+        float Min[2];
+        Max[1] = SMALLEST;
+        Min[1] = BIGGEST;
+
+        // get max and min from waveform
+        for(int i=qMax(exposedRect.y(), 0); i< qMin(XL.size(),exposedRect.height() + exposedRect.y()) ; ++i) {
+             Max[(XL[i] > Max[1])] =  XL[i];
+             Min[(XL[i] < Min[1])] =  XL[i];
+         }
+
+        // calculate world values to positions
+        painter.setCompositionMode(QPainter::RasterOp_SourceAndNotDestination);
+        painter.setPen(QPen(Qt::white, 0, Qt::SolidLine));
+        double range = Max[1] - Min[1];
+        double correction = qAbs(exposedRect.height() * 0.2 / range);
+
+        //printf("exposedRect= %d %d %d %d\n", exposedRect.x(), exposedRect.y(), exposedRect.width(), exposedRect.height());
+        //printf("from=%d to=%d min=%.1f max=%.1f range=%.1f correction=%.4f\n",  qMax(exposedRect.x(), 0),
+        //       qMin(XL.size(),exposedRect.width() + exposedRect.x()), Min[1], Max[1], range, correction);
+
+        QPointF points[XL.size()];
+        for(int i=0; i< XL.size(); i++) {
+            points[i].setY(i);
+            points[i].setX((XL[i] - Min[1]) * correction + exposedRect.x());
+        }
+        painter.drawPolyline(points, XL.size());
+    }
+
+    if(YL.size() > 0) {
+        float Max[2];
+        float Min[2];
+        Max[1] = SMALLEST;
+        Min[1] = BIGGEST;
+
+        // get max and min from waveform
+        //for(int i=0; i< YL.size(); i++) {
+        for(int i=qMax(exposedRect.x(), 0); i< qMin(YL.size(),exposedRect.width() + exposedRect.x()) ; ++i) {
+             Max[(YL[i] > Max[1])] =  YL[i];
+             Min[(YL[i] < Min[1])] =  YL[i];
+         }
+        //printf("%d %d %d %d\n", exposedRect.x(), exposedRect.y(), exposedRect.width(), exposedRect.height());
+        painter.setCompositionMode(QPainter::RasterOp_SourceAndNotDestination);
+        painter.setPen(QPen(Qt::white, 0, Qt::SolidLine));
+        double range = Max[1] - Min[1];
+        double correction = qAbs(exposedRect.width() * 0.2 / range);
+
+        QPointF points[YL.size()];
+        for(int i=0; i< YL.size(); i++) {
+            points[i].setX(i);
+            points[i].setY((YL[i] -  Min[1]) * correction + exposedRect.y());
+        }
+        painter.drawPolyline(points, YL.size());
+    }
 
     painter.restore();
 
@@ -406,7 +466,8 @@ void ImageWidget::resizeEvent(QResizeEvent *e)
 }
 
 void ImageWidget::rescaleReadValues(const bool &fitToSize, const QImage &image, const double &scaleFactor,
-                                    bool readvaluesPresent[], double readvalues[] )
+                                    bool readvaluesPresent[], double readvalues[],
+                                    QVarLengthArray<double> X,  QVarLengthArray<double> Y)
 {
     double factorX = (double) this->size().width() / (double) image.size().width();
     double factorY = (double) this->size().height() /(double) image.size().height();
@@ -420,6 +481,8 @@ void ImageWidget::rescaleReadValues(const bool &fitToSize, const QImage &image, 
         }
         readValuesL[i] = qRound(georeadValues[i]);
     }
+    XL = X;
+    YL = Y;
     update();
 }
 
@@ -445,7 +508,8 @@ void ImageWidget::updateSelectionBox(QPoint selectionPoints[], const bool &selec
 
 void  ImageWidget::updateImage(bool FitToSize, const QImage &image, bool readvaluesPresent[], double readvalues[],
                                double scaleFactor, bool selectSimpleView,
-                               short readmarkerType, short readType, short writemarkerType, short writeType)
+                               short readmarkerType, short readType, short writemarkerType, short writeType,
+                               QVarLengthArray<double> X,  QVarLengthArray<double> Y)
 {
     disconnected = false;
     selectSimpleViewL = selectSimpleView;
@@ -473,7 +537,7 @@ void  ImageWidget::updateImage(bool FitToSize, const QImage &image, bool readval
         return;
     }
 
-    rescaleReadValues(FitToSize, image, scaleFactor, readvaluesPresent, readvalues);
+    rescaleReadValues(FitToSize, image, scaleFactor, readvaluesPresent, readvalues, X, Y);
     //update();  done already in rescalereadvalues
 }
 
