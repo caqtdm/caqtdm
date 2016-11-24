@@ -23,6 +23,7 @@
  *    anton.mezger@psi.ch
  */
 #define QWT_DLL
+#include <stdint.h>
 #include <QtGui>
 #include<QApplication>
 #include <math.h>

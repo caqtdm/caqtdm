@@ -48,6 +48,7 @@
 #endif
 #include <time.h>
 #include <sys/timeb.h>
+#include <stdint.h>
 
 #include "colormaps.h"
 #include "caPropHandleDefs.h"
