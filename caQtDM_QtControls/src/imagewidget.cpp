@@ -134,16 +134,18 @@ void ImageWidget::paintEvent(QPaintEvent * event)
     painter.drawRoundedRect(0, 0, width, height, 2.0, 2.0);
 
     if(XL.size() > 0) {
+        pointsX.resize(XL.size());
         float Max[2];
         float Min[2];
-        Max[1] = SMALLEST;
-        Min[1] = BIGGEST;
+        Max[1] = (float) SMALLEST;
+        Min[1] = (float) BIGGEST;
 
         // get max and min from waveform
         for(int i=qMax(exposedRect.y(), 0); i< qMin(XL.size(),exposedRect.height() + exposedRect.y()) ; ++i) {
-             Max[(XL[i] > Max[1])] =  XL[i];
-             Min[(XL[i] < Min[1])] =  XL[i];
+             Max[(XL[i] > Max[1])] =  (float) XL[i];
+             Min[(XL[i] < Min[1])] =  (float) XL[i];
          }
+        //printf("%d %d %d %d\n", exposedRect.x(), exposedRect.y(), exposedRect.width(), exposedRect.height());
 
         // calculate world values to positions
         painter.setCompositionMode(QPainter::RasterOp_SourceAndNotDestination);
@@ -151,42 +153,40 @@ void ImageWidget::paintEvent(QPaintEvent * event)
         double range = Max[1] - Min[1];
         double correction = qAbs(exposedRect.height() * 0.2 / range);
 
-        //printf("exposedRect= %d %d %d %d\n", exposedRect.x(), exposedRect.y(), exposedRect.width(), exposedRect.height());
-        //printf("from=%d to=%d min=%.1f max=%.1f range=%.1f correction=%.4f\n",  qMax(exposedRect.x(), 0),
-        //       qMin(XL.size(),exposedRect.width() + exposedRect.x()), Min[1], Max[1], range, correction);
+        //printf("%d %d %d %d\n", exposedRect.x(), exposedRect.y(), exposedRect.width(), exposedRect.height());
 
-        QPointF points[XL.size()];
         for(int i=0; i< XL.size(); i++) {
-            points[i].setY(i);
-            points[i].setX((XL[i] - Min[1]) * correction + exposedRect.x());
+            pointsX[i].setY(i);
+            pointsX[i].setX((XL[i] - Min[1]) * correction + exposedRect.x());
         }
-        painter.drawPolyline(points, XL.size());
+        painter.drawPolyline(pointsX.data(), XL.size());
     }
 
     if(YL.size() > 0) {
+        pointsY.resize(YL.size());
         float Max[2];
         float Min[2];
         Max[1] = SMALLEST;
         Min[1] = BIGGEST;
 
         // get max and min from waveform
-        //for(int i=0; i< YL.size(); i++) {
         for(int i=qMax(exposedRect.x(), 0); i< qMin(YL.size(),exposedRect.width() + exposedRect.x()) ; ++i) {
-             Max[(YL[i] > Max[1])] =  YL[i];
-             Min[(YL[i] < Min[1])] =  YL[i];
+             Max[(YL[i] > Max[1])] =  (float) YL[i];
+             Min[(YL[i] < Min[1])] =  (float) YL[i];
          }
         //printf("%d %d %d %d\n", exposedRect.x(), exposedRect.y(), exposedRect.width(), exposedRect.height());
+
+        // calculate world values to positions
         painter.setCompositionMode(QPainter::RasterOp_SourceAndNotDestination);
         painter.setPen(QPen(Qt::white, 0, Qt::SolidLine));
         double range = Max[1] - Min[1];
         double correction = qAbs(exposedRect.width() * 0.2 / range);
 
-        QPointF points[YL.size()];
         for(int i=0; i< YL.size(); i++) {
-            points[i].setX(i);
-            points[i].setY((YL[i] -  Min[1]) * correction + exposedRect.y());
+            pointsY[i].setX(i);
+            pointsY[i].setY((YL[i] -  Min[1]) * correction + exposedRect.y());
         }
-        painter.drawPolyline(points, YL.size());
+        painter.drawPolyline(pointsY.data(), YL.size());
     }
 
     painter.restore();

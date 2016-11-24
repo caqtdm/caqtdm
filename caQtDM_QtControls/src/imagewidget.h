@@ -95,6 +95,7 @@ private:
     bool firstImage;
     bool selectionInProgress;
     QVarLengthArray<double> XL, YL;
+    QVector<QPointF> pointsX, pointsY;
 };
 
 #endif

@@ -4382,7 +4382,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     CameraWaveform(cameraWidget, 0, 0, 0, data);
                 }
             }
-        } else {
+        } else if(data.specData[0] < 15){
             cameraWidget->showDisconnected();
             // todo
         }
