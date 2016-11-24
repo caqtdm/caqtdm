@@ -59,7 +59,6 @@
                                 <File Id="QT5CLUCENE.DLL" Name="Qt5CLucene.dll" Source="$(env.QTHOME)\bin\Qt5CLucene.dll" />
                                 <File Id="QT5CONCURRENT.DLL" Name="Qt5Concurrent.dll" Source="$(env.QTHOME)\bin\Qt5Concurrent.dll" />
                                 <File Id="QT5CORE.DLL" Name="Qt5Core.dll" Source="$(env.QTHOME)\bin\Qt5Core.dll" />
-                                <File Id="QT5DECLARATIVE.DLL" Name="Qt5Declarative.dll" Source="$(env.QTHOME)\bin\Qt5Declarative.dll" />
                                 <File Id="QT5DESIGNER.DLL" Name="Qt5Designer.dll" Source="$(env.QTHOME)\bin\Qt5Designer.dll" />
                                 <File Id="QT5DESIGNERCOMPONENTS.DLL" Name="Qt5DesignerComponents.dll" Source="$(env.QTHOME)\bin\Qt5DesignerComponents.dll" />
                                 <File Id="QT5GUI.DLL" Name="Qt5Gui.dll" Source="$(env.QTHOME)\bin\Qt5Gui.dll" />
@@ -125,7 +124,6 @@
                         <Directory Id="IMAGEFORMATS" Name="imageformats">
                             <Component Id="imageformats" Guid="0A3CA574-DBF6-4EA9-9F30-FAC83DBD725D">
                                 <File Id="QJPEG.DLL" Name="qjpeg.dll" Source="$(env.QTHOME)\plugins\imageformats\qjpeg.dll" />
-                                <File Id="QMNG.DLL" Name="qmng.dll" Source="$(env.QTHOME)\plugins\imageformats\qmng.dll" />
                                 <File Id="QSVG.DLL" Name="qsvg.dll" Source="$(env.QTHOME)\plugins\imageformats\qsvg.dll" />
                                 <File Id="QTGA.DLL" Name="qtga.dll" Source="$(env.QTHOME)\plugins\imageformats\qtga.dll" />
                                 <File Id="QTIFF.DLL" Name="qtiff.dll" Source="$(env.QTHOME)\plugins\imageformats\qtiff.dll" />
@@ -135,7 +133,6 @@
                                 <File Id="QGIF.DLL" Name="qgif.dll" Source="$(env.QTHOME)\plugins\imageformats\qgif.dll" />
                                 <File Id="QICNS.DLL" Name="qicns.dll" Source="$(env.QTHOME)\plugins\imageformats\qicns.dll" />
                                 <File Id="QICO.DLL" Name="qico.dll" Source="$(env.QTHOME)\plugins\imageformats\qico.dll" />
-                                <File Id="QJP2.DLL" Name="qjp2.dll" Source="$(env.QTHOME)\plugins\imageformats\qjp2.dll" />
                             </Component>
                         </Directory>
                         <Directory Id="SQLDRIVERS" Name="sqldrivers">
