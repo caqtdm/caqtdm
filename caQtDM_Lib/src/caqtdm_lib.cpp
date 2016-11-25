@@ -4842,7 +4842,14 @@ void CaQtDM_Lib::Callback_ChoiceClicked(const QString& text)
         QStringsToChars(choice->getPV().trimmed(), text,  choice->objectName().toLower());
         //ControlsInterface * plugininterface = (ControlsInterface *) choice->property("Interface").value<void *>();
         ControlsInterface *plugininterface = getPluginInterface((QWidget*) choice);
-        if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue(param1, 0.0, 0, param2, param3, errmess, 0);
+        if(plugininterface != (ControlsInterface *) 0) {
+            knobData *kPtr;
+            if((kPtr = GetMutexKnobDataPV((QWidget*) choice, param1)) != (knobData *) 0) {
+                if(!plugininterface->pvSetValue(kPtr, 0.0, 0, param2, param3, errmess, 0)) {
+                    plugininterface->pvSetValue(param1, 0.0, 0, param2, param3, errmess, 0);
+                }
+            }
+        }
     }
 }
 
@@ -4861,7 +4868,14 @@ void CaQtDM_Lib::Callback_MenuClicked(const QString& text)
         QStringsToChars(menu->getPV().trimmed(), text,  menu->objectName().toLower());
         //ControlsInterface * plugininterface = (ControlsInterface *) menu->property("Interface").value<void *>();
         ControlsInterface *plugininterface = getPluginInterface((QWidget*) menu);
-        if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue(param1, 0.0, 0, param2, param3, errmess, 0);
+        if(plugininterface != (ControlsInterface *) 0) {
+            knobData *kPtr;
+            if((kPtr = GetMutexKnobDataPV((QWidget*) menu, param1)) != (knobData *) 0) {
+                if(!plugininterface->pvSetValue(kPtr, 0.0, 0, param2, param3, errmess, 0)) {
+                    plugininterface->pvSetValue(param1, 0.0, 0, param2, param3, errmess, 0);
+                }
+            }
+        }
     }
     // display label again when configured with it
     if(menu->getLabelDisplay()) {
@@ -6336,7 +6350,14 @@ void CaQtDM_Lib::TreatOrdinaryValue(QString pvo, double value, int32_t idata,  Q
 
     QStringsToChars(pv, svalue, w->objectName().toLower());
     ControlsInterface * plugininterface = getControlInterface(kPtr->pluginName);
-    if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue(param1, value, idata, param2, param3, errmess, 0);
+    if(plugininterface != (ControlsInterface *) 0) {
+        knobData *kPtr;
+        if((kPtr = GetMutexKnobDataPV(w, param1)) != (knobData *) 0) {
+            if(!plugininterface->pvSetValue(kPtr, value, idata, param2, param3, errmess, 0)) {
+               plugininterface->pvSetValue(param1, value, idata, param2, param3, errmess, 0);
+            }
+        }
+    }
 }
 
 /**
@@ -6400,8 +6421,12 @@ void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType
     //qDebug() << "fieldtype:" << kPtr->edata.fieldtype;
     switch (kPtr->edata.fieldtype) {
     case caSTRING:
-        //qDebug() << "set string" << text;
-        if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue(kPtr->pv, 0.0, 0, (char*) qasc(text), (char*) qasc(w->objectName()), errmess, 0);
+        //qDebug() << "set string" << text << plugininterface->pluginName();
+        if(plugininterface != (ControlsInterface *) 0) {
+           if(!plugininterface->pvSetValue(kPtr,  0.0, 0, (char*) qasc(text), (char*) qasc(w->objectName()), errmess, 0)) {
+              plugininterface->pvSetValue(kPtr->pv, 0.0, 0, (char*) qasc(text), (char*) qasc(w->objectName()), errmess, 0);
+           }
+        }
         break;
 
     case caENUM:
@@ -6417,7 +6442,11 @@ void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType
             for (int i=0; i<list.size(); i++) {
                 if(!text.compare(list.at(i).trimmed())) {
                     //qDebug() << "set enum text" << textValue;
-                    if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, textValue, (char*) qasc(w->objectName().toLower()), errmess, 0);
+                    if(plugininterface != (ControlsInterface *) 0) {
+                        if(!plugininterface->pvSetValue(kPtr, 0.0, 0, textValue, (char*) qasc(w->objectName().toLower()), errmess, 0)) {
+                            plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, textValue, (char*) qasc(w->objectName().toLower()), errmess, 0);
+                        }
+                    }
                     match = true;
                     break;
                 }
@@ -6433,7 +6462,11 @@ void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType
             if(kPtr->edata.fieldtype == caENUM) {
                 if(*end == 0 && end != textValue && longValue >= 0 && longValue <= kPtr->edata.enumCount) {
                     //qDebug() << "decode value *end=0, set a longvalue to enum" << longValue;
-                    if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int32_t) longValue, textValue, (char*) qasc(w->objectName().toLower()), errmess, 0);
+                    if(plugininterface != (ControlsInterface *) 0) {
+                        if(!plugininterface->pvSetValue(kPtr,  0.0, (int32_t) longValue, textValue, (char*) qasc(w->objectName().toLower()), errmess, 0)) {
+                           plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int32_t) longValue, textValue, (char*) qasc(w->objectName().toLower()), errmess, 0);
+                        }
+                    }
                 } else {
                     char asc[100];
                     sprintf(asc, "Invalid value: pv=%s value= \"%s\"\n", kPtr->pv, textValue);
@@ -6445,7 +6478,11 @@ void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType
                 // normal int or long
             } else
                 //qDebug() << "set normal longvalue" << longValue;
-                if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int32_t) longValue, textValue, (char*) qasc(w->objectName().toLower()), errmess, 0);
+                if(plugininterface != (ControlsInterface *) 0) {
+                    if(!plugininterface->pvSetValue(kPtr, 0.0, (int32_t) longValue, textValue, (char*) qasc(w->objectName().toLower()), errmess, 0)) {
+                       plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int32_t) longValue, textValue, (char*) qasc(w->objectName().toLower()), errmess, 0);
+                    }
+                }
         }
 
         break;
@@ -6454,12 +6491,20 @@ void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType
         if(fType == string) {
             if(kPtr->edata.nelm > 1) {
                //qDebug() << "set string" << text;
-               if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, (char*) qasc(text), (char*) qasc(w->objectName().toLower()), errmess, 0);
+               if(plugininterface != (ControlsInterface *) 0) {
+                   if(!plugininterface->pvSetValue(kPtr,  0.0, 0, (char*) qasc(text), (char*) qasc(w->objectName().toLower()), errmess, 0)) {
+                      plugininterface->pvSetValue((char*) kPtr->pv, 0.0, 0, (char*) qasc(text), (char*) qasc(w->objectName().toLower()), errmess, 0);
+                   }
+               }
             } else {  // single char written through its ascii code while character entered
                text = text.trimmed();
                if(text.size()> 0) {
                  QChar c = text.at(0);
-                 if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int)c.toLatin1(), (char*)  "", (char*) qasc(w->objectName().toLower()), errmess, 2);
+                 if(plugininterface != (ControlsInterface *) 0) {
+                     if(!plugininterface->pvSetValue(kPtr,  0.0, (int)c.toLatin1(), (char*)  "", (char*) qasc(w->objectName().toLower()), errmess, 2)) {
+                         plugininterface->pvSetValue((char*) kPtr->pv, 0.0, (int)c.toLatin1(), (char*)  "", (char*) qasc(w->objectName().toLower()), errmess, 2);
+                     }
+                 }
                }
             }
             break;
@@ -6487,7 +6532,11 @@ void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType
                 caCalc * ww = (caCalc*) kPtr->dispW;
                 ww->setValue(value);
             } else {
-                if(plugininterface != (ControlsInterface *) 0) plugininterface->pvSetValue((char*) kPtr->pv, value, 0, textValue, (char*) qasc(w->objectName().toLower()), errmess, 1);
+                if(plugininterface != (ControlsInterface *) 0) {
+                    if(!plugininterface->pvSetValue(kPtr,  value, 0, textValue, (char*) qasc(w->objectName().toLower()), errmess, 1)) {
+                       plugininterface->pvSetValue((char*) kPtr->pv, value, 0, textValue, (char*) qasc(w->objectName().toLower()), errmess, 1);
+                    }
+                 }
             }
 
         } else {

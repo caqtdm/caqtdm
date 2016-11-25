@@ -332,18 +332,23 @@ knobData* MutexKnobData::getMutexKnobDataPV(QWidget *widget, QString pv)
             if(kPtr->index != -1) {
                 QWidget *w = (QWidget *) kPtr->dispW;
                 QString kpv(kPtr->pv);
-                // exact match
-                if(loop == 0) {
-                    if(kpv == pv) return kPtr;
-                    // relaxed match
+
+                if(loop == 1) {
+                    if(kpv == pv) {
+                         //qDebug() << pv << "not exact match for" << widget;
+                        return kPtr;
+                    }
+
                 } else {
-                    if(kpv == pv && widget == w) return kPtr;
+                    if(kpv == pv && widget == w) {
+                        //qDebug() << pv << "exact match for" << widget;
+                        return kPtr;
+                    }
                 }
             }
         }
     loop++;
     }
-
     return (knobData*) 0;
 }
 

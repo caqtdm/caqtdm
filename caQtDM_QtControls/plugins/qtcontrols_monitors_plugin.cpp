@@ -467,8 +467,8 @@ QWidget *caCameraInterface::createWidget(QWidget* parent)
 
 caCameraInterface::caCameraInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
-    strng name[12], type[12] = {"","","","","","","","","","","",""};
-    longtext text[12] = {"","","","","","","","",CHANNELLIST,CHANNELLIST,STRINGFROMLIST,STRINGFROMLIST};
+    strng name[14], type[14] = {"","","","","","","","","","","","","",""};
+    longtext text[14] = {"","","","","","","","",CHANNELLIST,CHANNELLIST,STRINGFROMLIST,STRINGFROMLIST, "",""};
 
     strcpy(name[0], "channelData");
     strcpy(type[0], "multiline");
@@ -492,7 +492,11 @@ caCameraInterface::caCameraInterface(QObject* parent) : CustomWidgetInterface_Mo
     strcpy(type[10], "multiline");
     strcpy(name[11], "ROI_writeChannels");
     strcpy(type[11], "multiline");
-    d_domXml = XmlFunc("caCamera", "cacamera", 0, 0, 200, 200, name, type, text, 12);
+    strcpy(name[12], "channelXaverage");
+    strcpy(type[12], "multiline");
+    strcpy(name[13], "channelYaverage");
+    strcpy(type[13], "multiline");
+    d_domXml = XmlFunc("caCamera", "cacamera", 0, 0, 200, 200, name, type, text, 14);
     d_toolTip = "[Image from camera]";
     d_name = "caCamera";
     d_include = "caCamera";

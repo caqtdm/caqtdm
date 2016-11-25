@@ -60,6 +60,7 @@ class epicsShareClass  CallbackThread :
     epics::pvData::Event runReturn;
 public:
     POINTER_DEFINITIONS(CallbackThread);
+    ~CallbackThread();
     virtual void run();
     void startThread()
     {

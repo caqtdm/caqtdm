@@ -25,12 +25,14 @@
 #include <QDebug>
 #include <QString>
 #include <db_access.h>
-
+#include <cadef.h>
 
 #include <pv/nt.h>
 
 
 #include "epics4_plugin.h"
+
+#include <epicsThread.h>
 
 
 using namespace std;
@@ -58,9 +60,9 @@ public:
         int index,
         Epics4RequesterPtr const & requester,
         CallbackThreadPtr const & callbackThread,
-        std::string const & channelName);
-    virtual ~PvaInterface() {}
-
+        string const & channelName,
+        string const & providerName);
+    virtual ~PvaInterface();
     virtual void channelStateChange(
         PvaClientChannelPtr const & channel, bool isConnected);
     virtual void event(PvaClientMonitorPtr const & monitor);
@@ -82,6 +84,11 @@ public:
         BitSet::shared_pointer const & bitSet);
 
     virtual void callback();
+
+    int reconnect();
+    int disconnect();
+    int terminateIO();
+
 
     void connect();
     void getInterface();
@@ -113,7 +120,7 @@ public:
          enum_t,
          createMonitor_t
     };
-
+        
     PvaClientPtr pvaClient;
     bool gotFirstConnection;
     bool unlistenCalled;
@@ -141,10 +148,21 @@ public:
 
 
 
-class epicsShareClass PvaInterfaceGlue {
+class epicsShareClass PvaInterfaceGlue
+{
+private:
+     PvaInterfacePtr pvaInterface;
 public:
-    PvaInterfaceGlue() {}
-    PvaInterfacePtr pvaInterface;
+    PvaInterfaceGlue(const PvaInterfacePtr & pvaInterface)
+    :pvaInterface(pvaInterface)
+    {}
+    ~PvaInterfaceGlue()
+    {
+    }
+    PvaInterfacePtr getPvaInterface()
+    {
+         return pvaInterface;
+    }
 };
 
 
@@ -154,7 +172,8 @@ PvaInterface::PvaInterface(
         int index,
         Epics4RequesterPtr const & requester,
         CallbackThreadPtr const & callbackThread,
-        string const & channelName)
+        string const & channelName,
+        string const & providerName)
 : pvaClient(pvaClient),
   gotFirstConnection(false),
   unlistenCalled(false),
@@ -166,14 +185,41 @@ PvaInterface::PvaInterface(
   gotFirstConnect(false),
   normativeType(ntunknown_t),
   callbackType(unknown_t),
-  pvaClientChannel(pvaClient->createChannel(channelName)),
+  pvaClientChannel(pvaClient->createChannel(channelName,providerName)),
   convert(getConvert())
 {
 }
 
+PvaInterface::~PvaInterface()
+{
+}
+
+int PvaInterface::reconnect()
+{
+cout << "PvaInterface::reconnect() not implemented\n";
+    return false;
+}
+   
+int PvaInterface::disconnect()
+{
+cout << "PvaInterface::disconnect()  not implemented\n";
+    return false;
+}
+
+int PvaInterface::terminateIO()
+{
+cout << "PvaInterface::terminateIO()  not implemented\n";
+    return false;
+}
+
+ int disconnect() {return false;}
+    int terminateIO() {return false;}
+
+
 void PvaInterface::channelStateChange(
        PvaClientChannelPtr const & channel, bool isConnected)
 {
+    Q_UNUSED(channel);
     if(gotFirstConnect) mutexKnobData->SetMutexKnobDataConnected(index,isConnected);
     if(!isConnected || gotFirstConnect) return;
     callbackType = interface_t;
@@ -222,7 +268,7 @@ void PvaInterface::event(PvaClientMonitorPtr const & monitor)
 
 void PvaInterface::unlisten()
 {
-         std::cout << "ClientMonitorRequester::unlisten\n";
+std::cout << "ClientMonitorRequester::unlisten\n";
          unlistenCalled = true;
 }
 
@@ -238,23 +284,28 @@ void PvaInterface::message(std::string const & message,MessageType messageType)
 
 void PvaInterface::getDone(
         const Status& status,
-        FieldConstPtr const & field)
+        FieldConstPtr const & yyy)
 {
-     structure =  std::tr1::dynamic_pointer_cast<const Structure>(field);
+     structure =  std::tr1::dynamic_pointer_cast<const Structure>(yyy);
      if(!status.isOK()) {
           message(" getField failed",errorMessage);
           return;
+     }
+     FieldConstPtr field = structure->getField<Field>(string("value"));
+     if(!field) {
+          message(" no value field",errorMessage);
+          return;
+     }
+     Type type = field->getType();
+     if(type==scalar) {
+        normativeType = ntscalar_t;
+     } else if(type==scalarArray) {
+        normativeType = ntscalararray_t;
+     } else if(NTEnum::is_a(structure)) {
+        normativeType = ntenum_t;
      } else {
-          if(NTScalar::is_a(structure)) {
-               normativeType = ntscalar_t;
-          } else if(NTScalarArray::is_a(structure)) {
-               normativeType = ntscalararray_t;
-          } else if(NTEnum::is_a(structure)) {
-               normativeType = ntenum_t;
-          } else {
-                message(" value is not a valid nttype",errorMessage);
-                return;
-          }
+         message(" value is not a valid nttype",errorMessage);
+         return;
      }
      gotInterface();
 }
@@ -266,6 +317,8 @@ void PvaInterface::channelGetConnect(
     ChannelGet::shared_pointer const & channelGet,
     Structure::const_shared_pointer const & structure)
 {
+    Q_UNUSED(channelGet);
+    Q_UNUSED(structure);
     if(!status.isOK()) {
           message("channelGetConnect failed",errorMessage);
           return;
@@ -279,6 +332,8 @@ void PvaInterface::getDone(
     PVStructurePtr const & pvStructure,
     BitSet::shared_pointer const & bitSet)
 {
+    Q_UNUSED(channelGet);
+    Q_UNUSED(bitSet);
     if(!status.isOK()) {
           message("channelGetDone failed",errorMessage);
           return;
@@ -289,6 +344,7 @@ void PvaInterface::getDone(
        case ntenum_t : gotEnum(pvStructure); break;
        default: throw std::runtime_error("PvaInterface::getDone logic error");
      }
+     this->channelGet.reset();
 }
 
 void PvaInterface::callback()
@@ -301,7 +357,6 @@ void PvaInterface::callback()
        case createMonitor_t : createMonitor(); break;
        default: throw std::runtime_error("PvaInterface::callback logic error");
        }
-       callbackType = unknown_t;
     } catch (std::runtime_error e) {
         cerr << "exception " << e.what() << endl;
         return;
@@ -416,6 +471,7 @@ void PvaInterface::gotDisplayControl(PVStructurePtr const & pvStructure)
     mutexKnobData->DataUnlock(&kData);
     callbackType = createMonitor_t;
     callbackThread->queueRequest(shared_from_this());
+    channelGet.reset();
 }
 
 void PvaInterface::getEnum()
@@ -454,7 +510,7 @@ void PvaInterface::gotEnum(PVStructurePtr const & pvStructure)
         kData.edata.dataSize = dataSize;
     }
     char * ptr = static_cast<char*>(kData.edata.dataB);
-    for(size_t ind = 0; ind < enumCount; ++ind) {
+    for(int ind = 0; ind < enumCount; ++ind) {
        const string val = choices[ind];
        int len = val.length();
        memcpy(ptr, val.data(),len);
@@ -473,6 +529,7 @@ void PvaInterface::gotEnum(PVStructurePtr const & pvStructure)
     mutexKnobData->DataUnlock(&kData);
     callbackType = createMonitor_t;
     callbackThread->queueRequest(shared_from_this());
+    channelGet.reset();
 }
 
 void PvaInterface::createMonitor()
@@ -498,12 +555,33 @@ void PvaInterface::gotMonitor()
 void PvaInterface::getScalarData(PVStructurePtr const & pvStructure)
 {
 
+    //qDebug() << "getScalarData" << kData.pv;
+    //if(strstr(kData.pv, "BUSY") != (char*) 0) return;
     PVScalarPtr pvScalar = pvStructure->getSubField<PVScalar>("value");
+    if(!pvScalar) {
+        cout << "PvaInterface::getScalarData pvStructure \n" << pvStructure << endl; return;
+    }
+    
+    PVFieldPtr pvAlarmField = pvStructure->getSubField<PVStructure>("alarm");
+    if(pvAlarmField) {
+       Alarm alarm;
+       PVAlarm pvAlarm; 
+       bool result;
+       result = pvAlarm.attach(pvAlarmField);
+       if(result) {
+            pvAlarm.get(alarm);
+            int sev = alarm.getSeverity();
+            kData.edata.severity = sev;
+            kData.edata.status = (sev==0 ? 0 : 17);
+       }
+    }
     ScalarType scalarType = pvScalar->getScalar()->getScalarType();
 
+    qDebug() << kData.pv << scalarType;
     switch (scalarType) {
     case pvBoolean:
     {
+        //qDebug() << "boolean";
          PVBooleanPtr pvBoolean = std::tr1::dynamic_pointer_cast<PVBoolean>(pvScalar);
          bool value  = pvBoolean->get();
          kData.edata.ivalue = (value ? 1 : 0);
@@ -513,6 +591,16 @@ void PvaInterface::getScalarData(PVStructurePtr const & pvStructure)
     }
          break;
     case pvByte:
+    {
+        //qDebug() << "byte";
+         char value = convert->toByte(pvScalar);
+         kData.edata.ivalue = value;
+         kData.edata.rvalue = value;
+         kData.edata.fieldtype  = DBF_CHAR;
+         kData.edata.valueCount = 1;
+         kData.edata.monitorCount++;
+    }
+        break;
     case pvShort:
     case pvInt:
     case pvLong:
@@ -521,6 +609,7 @@ void PvaInterface::getScalarData(PVStructurePtr const & pvStructure)
     case pvUInt:
     case pvULong:
     {
+        //qDebug() << "all others";
          int32 value = convert->toInt(pvScalar);
          kData.edata.ivalue = value;
          kData.edata.rvalue = value;
@@ -532,6 +621,7 @@ void PvaInterface::getScalarData(PVStructurePtr const & pvStructure)
     case pvFloat:
     case pvDouble:
     {
+        //qDebug() << "float & double";
          double value = convert->toDouble(pvScalar);
          kData.edata.rvalue = value;
          kData.edata.ivalue = value;
@@ -542,6 +632,7 @@ void PvaInterface::getScalarData(PVStructurePtr const & pvStructure)
          break;
     case pvString:
     {
+        //qDebug() << "string";
          PVStringPtr pvString = std::tr1::dynamic_pointer_cast<PVString>(pvScalar);
          string value = pvString->get();
          int len = value.length();
@@ -567,6 +658,19 @@ void PvaInterface::getScalarData(PVStructurePtr const & pvStructure)
 
 void PvaInterface::getEnumData(PVStructurePtr const & pvStructure)
 {
+    PVFieldPtr pvAlarmField = pvStructure->getSubField<PVStructure>("alarm");
+    if(pvAlarmField) {
+       Alarm alarm;
+       PVAlarm pvAlarm; 
+       bool result;
+       result = pvAlarm.attach(pvAlarmField);
+       if(result) {
+            pvAlarm.get(alarm);
+            int sev = alarm.getSeverity();
+            kData.edata.severity = sev;
+            kData.edata.status = (sev==0 ? 0 : 17);
+       }
+    }
      int32 index = pvStructure->getSubField<PVInt>("value.index")->get();
      kData.edata.ivalue = index;
      kData.edata.valueCount = 1;
@@ -576,9 +680,8 @@ void PvaInterface::getEnumData(PVStructurePtr const & pvStructure)
 template <typename pureData>
 void PvaInterface::fillData(pureData const &array, size_t length, knobData* kPtr) {
     int size = sizeof(array[0]);
-    if(length < 1) return;
     if((length * size) != (size_t) kPtr->edata.dataSize) {
-        if(kData.edata.dataB != (void*) 0) free(kPtr->edata.dataB);
+        if(kPtr->edata.dataB != (void*) 0) free(kPtr->edata.dataB);
         kPtr->edata.dataB = (void*) malloc(length * size);
         kPtr->edata.dataSize = length * size;
     }
@@ -591,10 +694,10 @@ void PvaInterface::fillData(pureData const &array, size_t length, knobData* kPtr
 
 void PvaInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
 {
-    PVScalarArrayPtr pvs = pvStructure->getSubField<PVScalarArray>("value");
-    ScalarArrayConstPtr scalar = pvs->getScalarArray();
+    PVScalarArrayPtr pva = pvStructure->getSubField<PVScalarArray>("value");
+    ScalarArrayConstPtr scalar = pva->getScalarArray();
     ScalarType scalarType = scalar->getElementType();
-    size_t length = pvs->getLength();
+    int length = pva->getLength();
 
     switch(scalarType) {
 
@@ -602,73 +705,144 @@ void PvaInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
         pvaClient->message("array of pvString not yet supported", errorMessage);
         break;
 
-    case pvString:
-        pvaClient->message("array of pvString not yet supported", errorMessage);
-        break;
-
+    case pvString: {
+        if(length<1) {
+            kData.edata.fieldtype = DBF_STRING;
+            kData.edata.valueCount = 0;
+            return;
+        }
+        PVStringArrayPtr ArrayData = std::tr1::static_pointer_cast<PVStringArray> (pva);
+        shared_vector<const string> array(ArrayData->view());
+        kData.edata.fieldtype = DBF_STRING;
+        int numBytes = 0;
+        for(int i=0; i<length; ++i)
+        {
+             numBytes += array[i].length() + 1;
+        }
+        if(numBytes>kData.edata.dataSize) {
+             if(kData.edata.dataB != (void*) 0) free(kData.edata.dataB);
+             kData.edata.dataB = (void*) malloc(numBytes);
+             kData.edata.dataSize = numBytes;
+        }
+        char * ptr = static_cast<char*>(kData.edata.dataB);
+        for(int i=0; i<length; ++i)
+        {
+             const string value = array[i];
+             int len = value.length();
+             memcpy(ptr,value.data(),len);
+             ptr += len;
+             ptr[0] = '\033';
+             ++ptr;
+        }
+        ptr--;
+        ptr[0] = '\0';
+        kData.edata.valueCount = length;
+        kData.edata.monitorCount++;
+        return;
+    }    
     case pvByte: {
-        PVByteArrayPtr ArrayData = std::tr1::static_pointer_cast<PVByteArray> (pvs);
+        if(length<1) {
+            kData.edata.fieldtype = DBF_CHAR;
+            kData.edata.valueCount = 0;
+            return;
+        }
+        PVByteArrayPtr ArrayData = std::tr1::static_pointer_cast<PVByteArray> (pva);
         shared_vector<const int8> xxx(ArrayData->view());
         kData.edata.fieldtype = DBF_CHAR;
         fillData(xxx, length, &kData);
-        break;
+        return;
     }
 
     case pvUByte: {
-        PVUByteArrayPtr ArrayData = std::tr1::static_pointer_cast<PVUByteArray> (pvs);
+        if(length<1) {
+            kData.edata.fieldtype = DBF_CHAR;
+            kData.edata.valueCount = 0;
+            return;
+        }
+        PVUByteArrayPtr ArrayData = std::tr1::static_pointer_cast<PVUByteArray> (pva);
         shared_vector<const uint8> xxx(ArrayData->view());
         kData.edata.fieldtype = DBF_CHAR;
         fillData(xxx, length, &kData);
-        break;
+        return;
     }
 
     case pvShort: {
-        PVShortArrayPtr ArrayData = std::tr1::static_pointer_cast<PVShortArray> (pvs);
+        if(length<1) {
+            kData.edata.fieldtype = DBF_INT;
+            kData.edata.valueCount = 0;
+            return;
+        }
+        PVShortArrayPtr ArrayData = std::tr1::static_pointer_cast<PVShortArray> (pva);
         shared_vector<const int16> xxx(ArrayData->view());
         kData.edata.fieldtype = DBF_INT;
         fillData(xxx, length, &kData);
-        break;
+        return;
     }
 
     case pvUShort: {
-        PVUShortArrayPtr ArrayData = std::tr1::static_pointer_cast<PVUShortArray> (pvs);
+        if(length<1) {
+            kData.edata.fieldtype = DBF_INT;
+            kData.edata.valueCount = 0;
+            return;
+        }
+        PVUShortArrayPtr ArrayData = std::tr1::static_pointer_cast<PVUShortArray> (pva);
         shared_vector<const uint16> xxx(ArrayData->view());
         kData.edata.fieldtype = DBF_INT;
         fillData(xxx, length, &kData);
-        break;
+        return;
     }
 
     case pvInt: {
-        PVIntArrayPtr ArrayData = std::tr1::static_pointer_cast<PVIntArray> (pvs);
+        if(length<1) {
+            kData.edata.fieldtype = DBF_LONG;
+            kData.edata.valueCount = 0;
+            return;
+        }
+        PVIntArrayPtr ArrayData = std::tr1::static_pointer_cast<PVIntArray> (pva);
         shared_vector<const int32> xxx(ArrayData->view());
         kData.edata.fieldtype = DBF_LONG;
         fillData(xxx, length, &kData);
     }
 
     case pvUInt: {
-        PVUIntArrayPtr ArrayData = std::tr1::static_pointer_cast<PVUIntArray> (pvs);
+        if(length<1) {
+            kData.edata.fieldtype = DBF_LONG;
+            kData.edata.valueCount = 0;
+            return;
+        }
+        PVUIntArrayPtr ArrayData = std::tr1::static_pointer_cast<PVUIntArray> (pva);
         shared_vector<const uint32> xxx(ArrayData->view());
         kData.edata.fieldtype = DBF_LONG;
         fillData(xxx, length, &kData);
-        break;
+        return;
     }
 
     case pvLong:
     case pvULong:
         pvaClient->message("array of pvLong not yet supported", errorMessage);
-        break;
+        return;
 
     case pvFloat: {
-        PVFloatArrayPtr ArrayData = std::tr1::static_pointer_cast<PVFloatArray> (pvs);
+        if(length<1) {
+            kData.edata.fieldtype = DBF_FLOAT;
+            kData.edata.valueCount = 0;
+            return;
+        }
+        PVFloatArrayPtr ArrayData = std::tr1::static_pointer_cast<PVFloatArray> (pva);
         shared_vector<const float> xxx(ArrayData->view());
         kData.edata.fieldtype = DBF_FLOAT;
         fillData(xxx, length, &kData);
-        break;
+        return;
     }
 
 
     case pvDouble: {
-        PVDoubleArrayPtr ArrayData = std::tr1::static_pointer_cast<PVDoubleArray> (pvs);
+        if(length<1) {
+            kData.edata.fieldtype = DBF_DOUBLE;
+            kData.edata.valueCount = 0;
+            return;
+        }
+        PVDoubleArrayPtr ArrayData = std::tr1::static_pointer_cast<PVDoubleArray> (pva);
         shared_vector<const double> xxx(ArrayData->view());
         kData.edata.fieldtype = DBF_DOUBLE;
         fillData(xxx, length, &kData);
@@ -678,6 +852,9 @@ void PvaInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
 
 bool PvaInterface::setValue(double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType)
 {
+    Q_UNUSED(object);
+    Q_UNUSED(errmess);
+    Q_UNUSED(forceType);
     if(!pvaClientChannel->getChannel()) {
          pvaClient->message("setValue called for unconnected channel",errorMessage);
          return false;
@@ -752,7 +929,7 @@ bool PvaInterface::getTimeStamp(char *buf)
     memcpy(&ctm,localtime(&tt),sizeof(struct tm));
     strftime(buf,40,"%G.%m.%d %H.%M.%S%n",&ctm);
     int len = strlen(buf);
-    sprintf(buf + len,"TimeStamp .%09d tag %d\n",timeStamp.getNanoseconds(),timeStamp.getUserTag());
+    sprintf(buf + len,".%09d tag %d\n",timeStamp.getNanoseconds(),timeStamp.getUserTag());
     return true;
 }
 
@@ -767,46 +944,63 @@ QString Epics4Plugin::pluginName()
 }
 
 Epics4Plugin::Epics4Plugin()
-: pvaClient(PvaClient::get("pva")),
-  callbackThread(CallbackThread::create())
 {
 //PvaClient::setDebug(true);
+    if(PvaClient::getDebug()) cout << "Epics4Plugin::Epics4Plugin()\n";
     qDebug() << "Epics4Plugin::Epics4Plugin";
-
 }
 
 Epics4Plugin::~Epics4Plugin()
 {
-cout << "Epics4Plugin::~Epics4Plugin()\n";
-    callbackThread->stop();
+    qDebug() << "Epics4Plugin:~Epics4Plugin";
+    if(PvaClient::getDebug()) cout << "Epics4Plugin::~~Epics4Plugin()\n";
 }
+
 
 int Epics4Plugin::initCommunicationLayer(MutexKnobData *mutexKnobDataP, MessageWindow *messageWindow, QMap<QString, QString> options)
 {
+    if(PvaClient::getDebug()) cout << "Epics4Plugin::initCommunicationLayer\n";
     qDebug() << "Epics4Plugin: InitCommunicationLayer with options" << options;
     mutexKnobData = mutexKnobDataP;
+    pvaClient = PvaClient::get("pva ca");
+    callbackThread = CallbackThread::create();
     requester = Epics4RequesterPtr(new Epics4Requester(messageWindow));
     pvaClient->setRequester(requester);
+    qDebug() << "Epics4Plugin::Epics4Plugin";
+    if(PvaClient::getDebug()) {
+        long pvaClientuseCount = pvaClient.use_count();
+        long callbackUseCount = callbackThread.use_count();
+        long requesterUseCount = requester.use_count();
+         cout << "Epics4Plugin::initCommunicationLayer"
+         << " pvaClientuseCount " << pvaClientuseCount
+         << " callbackUseCount " << callbackUseCount
+         << " requesterUseCount " << requesterUseCount
+         << endl;
+     }
     return true;
 }
 
-
-int Epics4Plugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
+int Epics4Plugin::pvAddMonitor(int index, knobData *kData, int rate, int skip)
+{
+    if(PvaClient::getDebug()) cout << "Epics4Plugin::pvAddMonitor\n";
     Q_UNUSED(rate);
     Q_UNUSED(skip);
     qDebug() << "Epics4Plugin:pvAddMonitor" << kData->pv << kData->index;
     PvaInterfaceGlue *pvaInterfaceGlue = static_cast<PvaInterfaceGlue *>(kData->edata.info);
-    if(pvaInterfaceGlue) return true;
+    if(pvaInterfaceGlue) throw std::runtime_error("Epics4Plugin::pvAddMonitor alreadt added");
     string name(kData->pv);
+//    size_t pos = name.find("://");
+//    if (pos==std::string::npos) {
+//         pvaClient->message(name + " invalid prefix",errorMessage);
+//         return false;
+//    }
+//    string providerName(name.substr(0,pos));
+//    string channelName(name.substr(pos+3));
+    string providerName("pva");
+    string channelName(name);
     PvaInterfacePtr pvaInterface(
-         new PvaInterface(pvaClient, mutexKnobData,index,requester,callbackThread,name));
-    map<string,PvaInterfacePtr>::iterator iter = pvaInterfaceMap.find(name);
-    if(iter==pvaInterfaceMap.end()) {
-        pvaInterfaceMap.insert(std::pair<string,PvaInterfacePtr>(
-         name,pvaInterface));
-    }
-    pvaInterfaceGlue = new PvaInterfaceGlue();
-    pvaInterfaceGlue->pvaInterface = pvaInterface;
+         new PvaInterface(pvaClient, mutexKnobData,index,requester,callbackThread,channelName,providerName));
+    pvaInterfaceGlue = new PvaInterfaceGlue(pvaInterface);
     kData->edata.info = pvaInterfaceGlue;
     C_SetMutexKnobData(mutexKnobData, index, *kData);
     pvaInterface->connect();
@@ -815,6 +1009,7 @@ int Epics4Plugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
 
 
 int Epics4Plugin::pvClearMonitor(knobData *kData) {
+    if(PvaClient::getDebug()) cout << "Epics4Plugin::pvClearMonitor\n";
     qDebug() << "Epics4Plugin:pvClearMonitor";
     kData->index = -1;
     kData->pv[0] = '\0';
@@ -823,12 +1018,15 @@ int Epics4Plugin::pvClearMonitor(knobData *kData) {
 
 int Epics4Plugin::pvFreeAllocatedData(knobData *kData)
 {
+    if(PvaClient::getDebug()) cout << "Epics4Plugin::pvFreeAllocatedData\n";
     qDebug() << "Epics4Plugin:pvFreeAllocatedData";
-    if (kData->edata.info != (void *) 0) {
-      PvaInterfaceGlue *pvaInterfaceGlue  = static_cast<PvaInterfaceGlue *>(kData->edata.info);
-        kData->edata.info = NULL;
-        delete pvaInterfaceGlue;
-    }
+    if (kData->edata.info == (void *) 0) std::runtime_error("Epics4Plugin::pvFreeAllocatedData kData->edata.info  is null");
+    PvaInterfaceGlue *pvaInterfaceGlue  = static_cast<PvaInterfaceGlue *>(kData->edata.info);
+    PvaInterfacePtr pvaInterface = pvaInterfaceGlue->getPvaInterface();
+    if(!pvaInterface) std::runtime_error("Epics4Plugin::pvFreeAllocatedData pvaInterface is null");
+
+    kData->edata.info = NULL;
+    delete pvaInterfaceGlue;
     if(kData->edata.dataB != (void*) 0) {
         if(kData->edata.dataB != (void*) 0) free(kData->edata.dataB);
         kData->edata.dataB = (void*) 0;
@@ -836,20 +1034,20 @@ int Epics4Plugin::pvFreeAllocatedData(knobData *kData)
     return true;
 }
 
-int Epics4Plugin::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType)
+bool Epics4Plugin::pvSetValue(knobData *kData, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType)
 {
+    if(PvaClient::getDebug()) cout << "Epics4Plugin::pvSetValue\n";
     qDebug() << "Epics4Plugin:pvSetValue";
-    map<string,PvaInterfacePtr>::iterator iter = pvaInterfaceMap.find(pv);
-    if(iter!=pvaInterfaceMap.end()){
-         PvaInterfacePtr pvaInterface(iter->second);
-         return pvaInterface->setValue(rdata,idata,sdata,object,errmess,forceType);
-    }
-cout << "did not find pvaInterface\n";
-    return false;
+    if (kData->edata.info == (void *) 0) std::runtime_error("Epics4Plugin::pvSetValue kData->edata.info  is null");
+    PvaInterfaceGlue *pvaInterfaceGlue  = static_cast<PvaInterfaceGlue *>(kData->edata.info);
+    PvaInterfacePtr pvaInterface = pvaInterfaceGlue->getPvaInterface();
+    if(!pvaInterface) std::runtime_error("Epics4Plugin::pvSetValue pvaInterface is null");
+    pvaInterface->setValue(rdata,idata,sdata,object,errmess,forceType);
+    return true;
 }
 
-int Epics4Plugin::pvSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess) {
-    Q_UNUSED(pv);
+bool Epics4Plugin::pvSetWave(knobData *kData, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess) {
+    Q_UNUSED(kData);
     Q_UNUSED(fdata);
     Q_UNUSED(ddata);
     Q_UNUSED(data16);
@@ -858,64 +1056,87 @@ int Epics4Plugin::pvSetWave(char *pv, float *fdata, double *ddata, int16_t *data
     Q_UNUSED(nelm);
     Q_UNUSED(object);
     Q_UNUSED(errmess);
+    if(PvaClient::getDebug()) cout << "Epics4Plugin::pvSetWave\n";
     qDebug() << "Epics4Plugin:pvSetWave";
     return false;
 }
 
-int Epics4Plugin::pvGetTimeStamp(char *pv, char *timestamp) {
-    Q_UNUSED(pv);
-    Q_UNUSED(timestamp);
-    qDebug() << "Epics4Plugin:pvgetTimeStamp";
-    map<string,PvaInterfacePtr>::iterator iter = pvaInterfaceMap.find(pv);
-    if(iter!=pvaInterfaceMap.end()){
-         PvaInterfacePtr pvaInterface(iter->second);
-         return pvaInterface->getTimeStamp(timestamp);
-    }
-    return false;
+bool Epics4Plugin::pvGetTimeStamp(knobData *kData, char *timestamp) {
+    if(PvaClient::getDebug()) cout << "Epics4Plugin::pvGetTimeStamp\n";
+    qDebug() << "Epics4Plugin:pvGetTimeStamp";
+    if (kData->edata.info == (void *) 0) std::runtime_error("Epics4Plugin::pvGetTimeStamp kData->edata.info  is null");
+    PvaInterfaceGlue *pvaInterfaceGlue  = static_cast<PvaInterfaceGlue *>(kData->edata.info);
+    PvaInterfacePtr pvaInterface = pvaInterfaceGlue->getPvaInterface();
+    if(!pvaInterface) std::runtime_error("Epics4Plugin::pvGetTimeStamp pvaInterface is null");
+    pvaInterface->getTimeStamp(timestamp);
+    return true;
 }
 
-int Epics4Plugin::pvGetDescription(char *pv, char *description) {
-    Q_UNUSED(pv);
+bool Epics4Plugin::pvGetDescription(knobData *kData, char *description) {
+    if(PvaClient::getDebug()) cout << "Epics4Plugin::pvGetDescription\n";
+    Q_UNUSED(kData);
     Q_UNUSED(description);
     qDebug() << "Epics4Plugin:pvGetDescription";
     return false;
 }
 
 int Epics4Plugin::pvClearEvent(void * ptr) {
+    //qDebug() << "Epics4Plugin:pvClearEvent not implemented";
     Q_UNUSED(ptr);
-    qDebug() << "Epics4Plugin:pvClearEvent";
     return false;
 }
 
 int Epics4Plugin::pvAddEvent(void * ptr) {
+    //if(PvaClient::getDebug()) cout << "Epics4Plugin::pvAddEvent not implemented\n";
     Q_UNUSED(ptr);
-    qDebug() << "Epics4Plugin:pvAddEvent";
     return false;
 }
 
 int Epics4Plugin::pvReconnect(knobData *kData) {
-    Q_UNUSED(kData);
+    if(PvaClient::getDebug()) cout << "Epics4Plugin::pvReconnect\n";
     qDebug() << "Epics4Plugin:pvReconnect";
-    return false;
+    if (kData->edata.info == (void *) 0) std::runtime_error("Epics4Plugin::pvReconnect kData->edata.info  is null");
+    PvaInterfaceGlue *pvaInterfaceGlue  = static_cast<PvaInterfaceGlue *>(kData->edata.info);
+    PvaInterfacePtr pvaInterface = pvaInterfaceGlue->getPvaInterface();
+    if(!pvaInterface) std::runtime_error("Epics4Plugin::pvReconnect pvaInterface is null");
+    return pvaInterface->reconnect();
 }
 
 int Epics4Plugin::pvDisconnect(knobData *kData) {
-    Q_UNUSED(kData);
+    if(PvaClient::getDebug()) cout << "Epics4Plugin::pvDisconnect\n";
     qDebug() << "Epics4Plugin:pvDisconnect";
-    return false;
+    if (kData->edata.info == (void *) 0) std::runtime_error("Epics4Plugin::pvDisconnect kData->edata.info  is null");
+    PvaInterfaceGlue *pvaInterfaceGlue  = static_cast<PvaInterfaceGlue *>(kData->edata.info);
+    PvaInterfacePtr pvaInterface = pvaInterfaceGlue->getPvaInterface();
+    if(!pvaInterface) std::runtime_error("Epics4Plugin::pvDisconnect pvaInterface is null");
+    return pvaInterface->disconnect();
 }
 
 int Epics4Plugin::FlushIO() {
-
-    qDebug() << "Epics4Plugin:FlushIO";
+   // qDebug() << "Epics4Plugin:FlushIO";
+    ca_flush_io();
     return true;
 }
 
 
-
 int Epics4Plugin::TerminateIO() {
+cout << "Epics4Plugin::TerminateIO\n";
     qDebug() << "Epics4Plugin:TerminateIO";
-    return false;
+    if(PvaClient::getDebug()) {
+        long pvaClientuseCount = pvaClient.use_count();
+        long callbackUseCount = callbackThread.use_count();
+        long requesterUseCount = requester.use_count();
+        cout << "Epics4Plugin::~Epics4Plugin()"
+        << " pvaClientuseCount " << pvaClientuseCount
+        << " callbackUseCount " << callbackUseCount
+        << " requesterUseCount " << requesterUseCount
+        << endl;
+    }
+    pvaClient.reset();
+    callbackThread.reset();
+    requester.reset();
+    if(PvaClient::getDebug()) cout << "Epics4Plugin::TerminateIO returning\n";
+    return true;
 }
 
 

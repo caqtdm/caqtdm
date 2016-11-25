@@ -23,9 +23,20 @@
  *    anton.mezger@psi.ch
  */
 
+#include <iostream>
+using namespace std;
+
+
 #include "callbackThread.h"
 
 namespace epics { namespace pvData {
+
+CallbackThread::~CallbackThread()
+{
+cout << "CallbackThread::~CallbackThread()\n";
+    stop();
+cout << "CallbackThread::~CallbackThread() returning\n";
+}
 
 void CallbackThread::run()
 {
@@ -40,7 +51,6 @@ void CallbackThread::run()
         {
              epics::pvData::Lock xx(mutex);
              if(monitorQueue.empty()) continue;
-//std::cout << "monitorQueue.size " << monitorQueue.size() << std::endl;
              callbackRequester = monitorQueue.front();
              monitorQueue.pop();
         }
