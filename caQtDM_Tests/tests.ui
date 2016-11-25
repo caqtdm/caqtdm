@@ -120,7 +120,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: rgb(0,0,120);}</string>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <property name="usesScrollButtons">
      <bool>true</bool>
@@ -169,8 +169,14 @@ border-radius: 2px;
         <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>
+        <property name="botTopBorderWidth">
+         <double>0.000000000000000</double>
+        </property>
         <property name="fontScaleMode">
          <enum>ESimpleLabel::WidthAndHeight</enum>
+        </property>
+        <property name="borderWidth">
+         <number>1</number>
         </property>
         <property name="colorMode">
          <enum>caLabel::Alarm</enum>
@@ -368,6 +374,9 @@ p, li { white-space: pre-wrap; }
           <blue>164</blue>
          </color>
         </property>
+        <property name="borderWidth">
+         <number>1</number>
+        </property>
         <property name="colorMode">
          <enum>caLabelVertical::Alarm</enum>
         </property>
@@ -376,6 +385,100 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="channel" stdset="0">
          <string notr="true">ACM:COUNT:1</string>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_56">
+        <property name="geometry">
+         <rect>
+          <x>679</x>
+          <y>128</y>
+          <width>83</width>
+          <height>33</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Test</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="botTopBorderWidth">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="lateralBorderWidth">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="fontScaleMode">
+         <enum>ESimpleLabel::WidthAndHeight</enum>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>160</red>
+          <green>160</green>
+          <blue>164</blue>
+         </color>
+        </property>
+        <property name="borderColor">
+         <color>
+          <red>255</red>
+          <green>170</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="borderWidth">
+         <number>1</number>
+        </property>
+       </widget>
+       <widget class="caLabelVertical" name="calabelvertical_5">
+        <property name="geometry">
+         <rect>
+          <x>849</x>
+          <y>203</y>
+          <width>41</width>
+          <height>91</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string notr="true">test</string>
+        </property>
+        <property name="direction">
+         <enum>caLabelVertical::Up</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>85</red>
+          <green>170</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="borderColor">
+         <color>
+          <red>170</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="borderWidth">
+         <number>1</number>
+        </property>
+        <property name="colorMode">
+         <enum>caLabelVertical::Alarm</enum>
+        </property>
+        <property name="visibility">
+         <enum>caLabelVertical::IfZero</enum>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:COUNT:1</string>
+        </property>
+        <property name="borderVisible" stdset="0">
+         <bool>true</bool>
         </property>
        </widget>
       </widget>
@@ -2346,7 +2449,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>8</number>
+       <number>13</number>
       </property>
       <property name="usesScrollButtons">
        <bool>true</bool>
@@ -6597,6 +6700,12 @@ p, li { white-space: pre-wrap; }
         <property name="channels_3" stdset="0">
          <string notr="true"/>
         </property>
+        <property name="eraseChannel" stdset="0">
+         <string notr="true">ACM:TEST:MBBO</string>
+        </property>
+        <property name="eraseMode">
+         <enum>caCartesianPlot::ifzero</enum>
+        </property>
         <property name="foreground">
          <color>
           <red>218</red>
@@ -6635,6 +6744,45 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="YAxisType" stdset="0">
          <enum>caCartesianPlot::log10</enum>
+        </property>
+       </widget>
+       <widget class="caChoice" name="caChoice_9">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>771</x>
+          <y>91</y>
+          <width>96</width>
+          <height>86</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:MBBO</string>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="alignment">
+         <enum>caChoice::center</enum>
+        </property>
+        <property name="colorMode">
+         <enum>caChoice::Static</enum>
+        </property>
+        <property name="fontScaleMode" stdset="0">
+         <enum>EPushButton::None</enum>
         </property>
        </widget>
       </widget>
@@ -7466,19 +7614,19 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channelData" stdset="0">
-         <string notr="true">pc7818-1:data{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:FPICTURE{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
         </property>
         <property name="channelWidth" stdset="0">
-         <string notr="true">pc7818-1:width{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
         <property name="channelHeight" stdset="0">
-         <string notr="true">pc7818-1:height{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
         <property name="channelCode" stdset="0">
-         <string notr="true">pc7818-1:code{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">code</string>
         </property>
         <property name="channelBPP" stdset="0">
-         <string notr="true">pc7818-1:bpp{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">bpp</string>
         </property>
         <property name="simpleZoomedView" stdset="0">
          <bool>false</bool>
@@ -7553,19 +7701,19 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channelData" stdset="0">
-         <string notr="true">pc7818-1:data{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:FPICTURE{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
         </property>
         <property name="channelWidth" stdset="0">
-         <string notr="true">pc7818-1:width{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
         <property name="channelHeight" stdset="0">
-         <string notr="true">pc7818-1:height{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
         <property name="channelCode" stdset="0">
-         <string notr="true">pc7818-1:code{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">code</string>
         </property>
         <property name="channelBPP" stdset="0">
-         <string notr="true">pc7818-1:bpp{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">bpp</string>
         </property>
         <property name="simpleZoomedView" stdset="0">
          <bool>true</bool>
@@ -7599,19 +7747,19 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channelData" stdset="0">
-         <string notr="true">pc7818-1:data{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:FPICTURE{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
         </property>
         <property name="channelWidth" stdset="0">
-         <string notr="true">pc7818-1:width{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
         <property name="channelHeight" stdset="0">
-         <string notr="true">pc7818-1:height{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
         <property name="channelCode" stdset="0">
-         <string notr="true">pc7818-1:code{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">code</string>
         </property>
         <property name="channelBPP" stdset="0">
-         <string notr="true">pc7818-1:bpp{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">bpp</string>
         </property>
         <property name="simpleZoomedView" stdset="0">
          <bool>true</bool>
@@ -7961,6 +8109,102 @@ def PythonCalc(a, b, c, d):
         </property>
         <property name="channel" stdset="0">
          <string notr="true">ACM:MOTOR</string>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_31">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>424</x>
+          <y>555</y>
+          <width>52</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">bpp</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true"/>
+        </property>
+        <property name="initialValue">
+         <double>3.000000000000000</double>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_32">
+        <property name="geometry">
+         <rect>
+          <x>488</x>
+          <y>554</y>
+          <width>58</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">code</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true"/>
+        </property>
+        <property name="initialValue">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_57">
+        <property name="geometry">
+         <rect>
+          <x>611</x>
+          <y>547</y>
+          <width>141</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Camera:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::PlainText</enum>
+        </property>
+        <property name="background">
+         <color alpha="0">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+       </widget>
+       <widget class="caChoice" name="cachoice_14">
+        <property name="geometry">
+         <rect>
+          <x>764</x>
+          <y>545</y>
+          <width>191</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">MTEST-CAQTDM-CAMERA:CAMERA</string>
+        </property>
+        <property name="background">
+         <color>
+          <red>176</red>
+          <green>176</green>
+          <blue>176</blue>
+         </color>
+        </property>
+        <property name="alignment">
+         <enum>caChoice::center</enum>
+        </property>
+        <property name="colorMode">
+         <enum>caChoice::Static</enum>
+        </property>
+        <property name="stackingMode" stdset="0">
+         <enum>caChoice::Column</enum>
+        </property>
+        <property name="endBit">
+         <number>1</number>
         </property>
        </widget>
       </widget>
@@ -9205,7 +9449,7 @@ def PythonCalc(a, b, c, d):
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>7</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
@@ -9676,6 +9920,99 @@ p, li { white-space: pre-wrap; }
             </property>
             <property name="minValue">
              <double>0.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+       <widget class="QScrollArea" name="scrollArea_3">
+        <property name="geometry">
+         <rect>
+          <x>773</x>
+          <y>30</y>
+          <width>179</width>
+          <height>86</height>
+         </rect>
+        </property>
+        <property name="widgetResizable">
+         <bool>false</bool>
+        </property>
+        <widget class="QWidget" name="scrollAreaWidgetContents_3">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>155</width>
+           <height>172</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="caSpinbox" name="caspinbox_2">
+            <property name="integerDigits" stdset="0">
+             <number>4</number>
+            </property>
+            <property name="channel" stdset="0">
+             <string notr="true">ACM:TEST:AO</string>
+            </property>
+            <property name="background">
+             <color>
+              <red>170</red>
+              <green>255</green>
+              <blue>255</blue>
+             </color>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="caSpinbox" name="caspinbox_4">
+            <property name="integerDigits" stdset="0">
+             <number>4</number>
+            </property>
+            <property name="channel" stdset="0">
+             <string notr="true">ACM:TEST:AO</string>
+            </property>
+            <property name="background">
+             <color>
+              <red>170</red>
+              <green>255</green>
+              <blue>255</blue>
+             </color>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="caSpinbox" name="caspinbox_3">
+            <property name="integerDigits" stdset="0">
+             <number>4</number>
+            </property>
+            <property name="channel" stdset="0">
+             <string notr="true">ACM:TEST:AO</string>
+            </property>
+            <property name="background">
+             <color>
+              <red>170</red>
+              <green>255</green>
+              <blue>255</blue>
+             </color>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="caSpinbox" name="caspinbox_5">
+            <property name="integerDigits" stdset="0">
+             <number>4</number>
+            </property>
+            <property name="channel" stdset="0">
+             <string notr="true">ACM:TEST:AO</string>
+            </property>
+            <property name="background">
+             <color>
+              <red>170</red>
+              <green>255</green>
+              <blue>255</blue>
+             </color>
             </property>
            </widget>
           </item>
@@ -11588,8 +11925,8 @@ p, li { white-space: pre-wrap; }
        <widget class="QGroupBox" name="groupBox_4">
         <property name="geometry">
          <rect>
-          <x>13</x>
-          <y>308</y>
+          <x>14</x>
+          <y>287</y>
           <width>162</width>
           <height>67</height>
          </rect>
@@ -11646,8 +11983,8 @@ p, li { white-space: pre-wrap; }
        <widget class="QGroupBox" name="groupBox_6">
         <property name="geometry">
          <rect>
-          <x>266</x>
-          <y>152</y>
+          <x>455</x>
+          <y>111</y>
           <width>162</width>
           <height>193</height>
          </rect>
@@ -11691,8 +12028,8 @@ p, li { white-space: pre-wrap; }
        <widget class="QGroupBox" name="groupBox_7">
         <property name="geometry">
          <rect>
-          <x>15</x>
-          <y>397</y>
+          <x>12</x>
+          <y>359</y>
           <width>162</width>
           <height>88</height>
          </rect>
@@ -11720,8 +12057,8 @@ p, li { white-space: pre-wrap; }
        <widget class="QGroupBox" name="groupBox_8">
         <property name="geometry">
          <rect>
-          <x>216</x>
-          <y>398</y>
+          <x>12</x>
+          <y>454</y>
           <width>162</width>
           <height>88</height>
          </rect>
@@ -11799,10 +12136,10 @@ p, li { white-space: pre-wrap; }
        <widget class="QGroupBox" name="groupBox_10">
         <property name="geometry">
          <rect>
-          <x>448</x>
-          <y>109</y>
-          <width>111</width>
-          <height>353</height>
+          <x>191</x>
+          <y>120</y>
+          <width>243</width>
+          <height>97</height>
          </rect>
         </property>
         <property name="autoFillBackground">
@@ -11815,9 +12152,9 @@ p, li { white-space: pre-wrap; }
          <property name="geometry">
           <rect>
            <x>15</x>
-           <y>32</y>
-           <width>69</width>
-           <height>306</height>
+           <y>29</y>
+           <width>211</width>
+           <height>53</height>
           </rect>
          </property>
          <property name="scalePosition">
@@ -11825,6 +12162,9 @@ p, li { white-space: pre-wrap; }
          </property>
          <property name="channel" stdset="0">
           <string notr="true">epics4://float03</string>
+         </property>
+         <property name="direction">
+          <enum>caSlider::Right</enum>
          </property>
          <property name="scaleValueEnabled">
           <bool>true</bool>
@@ -11834,10 +12174,10 @@ p, li { white-space: pre-wrap; }
        <widget class="caCartesianPlot" name="caCartesianPlot_1">
         <property name="geometry">
          <rect>
-          <x>615</x>
-          <y>127</y>
-          <width>359</width>
-          <height>228</height>
+          <x>627</x>
+          <y>4</y>
+          <width>358</width>
+          <height>130</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -11847,7 +12187,7 @@ p, li { white-space: pre-wrap; }
          </sizepolicy>
         </property>
         <property name="Title" stdset="0">
-         <string notr="true">Test Curve</string>
+         <string notr="true">Test Curve float</string>
         </property>
         <property name="TitleX">
          <string>[kv]</string>
@@ -11902,19 +12242,363 @@ p, li { white-space: pre-wrap; }
          <enum>caCartesianPlot::User</enum>
         </property>
         <property name="YaxisScaling" stdset="0">
-         <enum>caCartesianPlot::User</enum>
+         <enum>caCartesianPlot::Auto</enum>
         </property>
         <property name="XaxisLimits">
          <string>0.0;10</string>
         </property>
         <property name="YaxisLimits">
-         <string>0.01;10</string>
+         <string>0;100</string>
         </property>
         <property name="XaxisType">
          <enum>caCartesianPlot::linear</enum>
         </property>
         <property name="YAxisType" stdset="0">
-         <enum>caCartesianPlot::log10</enum>
+         <enum>caCartesianPlot::linear</enum>
+        </property>
+       </widget>
+       <widget class="caCartesianPlot" name="caCartesianPlot_2">
+        <property name="geometry">
+         <rect>
+          <x>624</x>
+          <y>136</y>
+          <width>365</width>
+          <height>130</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="Title" stdset="0">
+         <string notr="true">Test Curve double</string>
+        </property>
+        <property name="TitleX">
+         <string>[kv]</string>
+        </property>
+        <property name="TitleY">
+         <string>uA</string>
+        </property>
+        <property name="channels_1" stdset="0">
+         <string notr="true">;epics4://doubleArray01</string>
+        </property>
+        <property name="Style_1">
+         <enum>caCartesianPlot::FillUnder</enum>
+        </property>
+        <property name="symbol_1">
+         <enum>caCartesianPlot::NoSymbol</enum>
+        </property>
+        <property name="color_1">
+         <color>
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="channels_2" stdset="0">
+         <string notr="true"/>
+        </property>
+        <property name="channels_3" stdset="0">
+         <string notr="true"/>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>218</red>
+          <green>218</green>
+          <blue>218</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="scaleColor">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="XaxisScaling" stdset="0">
+         <enum>caCartesianPlot::User</enum>
+        </property>
+        <property name="YaxisScaling" stdset="0">
+         <enum>caCartesianPlot::Auto</enum>
+        </property>
+        <property name="XaxisLimits">
+         <string>0.0;10</string>
+        </property>
+        <property name="YaxisLimits">
+         <string>0;100</string>
+        </property>
+        <property name="XaxisType">
+         <enum>caCartesianPlot::linear</enum>
+        </property>
+        <property name="YAxisType" stdset="0">
+         <enum>caCartesianPlot::linear</enum>
+        </property>
+       </widget>
+       <widget class="caCartesianPlot" name="caCartesianPlot_3">
+        <property name="geometry">
+         <rect>
+          <x>624</x>
+          <y>269</y>
+          <width>366</width>
+          <height>130</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="Title" stdset="0">
+         <string notr="true">Test Curve int</string>
+        </property>
+        <property name="TitleX">
+         <string>[kv]</string>
+        </property>
+        <property name="TitleY">
+         <string>uA</string>
+        </property>
+        <property name="channels_1" stdset="0">
+         <string notr="true">;epics4://intArray01</string>
+        </property>
+        <property name="Style_1">
+         <enum>caCartesianPlot::FillUnder</enum>
+        </property>
+        <property name="symbol_1">
+         <enum>caCartesianPlot::NoSymbol</enum>
+        </property>
+        <property name="color_1">
+         <color>
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="channels_2" stdset="0">
+         <string notr="true"/>
+        </property>
+        <property name="channels_3" stdset="0">
+         <string notr="true"/>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>218</red>
+          <green>218</green>
+          <blue>218</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="scaleColor">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="XaxisScaling" stdset="0">
+         <enum>caCartesianPlot::User</enum>
+        </property>
+        <property name="YaxisScaling" stdset="0">
+         <enum>caCartesianPlot::Auto</enum>
+        </property>
+        <property name="XaxisLimits">
+         <string>0.0;10</string>
+        </property>
+        <property name="YaxisLimits">
+         <string>0;100</string>
+        </property>
+        <property name="XaxisType">
+         <enum>caCartesianPlot::linear</enum>
+        </property>
+        <property name="YAxisType" stdset="0">
+         <enum>caCartesianPlot::linear</enum>
+        </property>
+       </widget>
+       <widget class="caCartesianPlot" name="caCartesianPlot_4">
+        <property name="geometry">
+         <rect>
+          <x>626</x>
+          <y>402</y>
+          <width>360</width>
+          <height>130</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="Title" stdset="0">
+         <string notr="true">Test Curve short</string>
+        </property>
+        <property name="TitleX">
+         <string>[kv]</string>
+        </property>
+        <property name="TitleY">
+         <string>uA</string>
+        </property>
+        <property name="channels_1" stdset="0">
+         <string notr="true">;epics4://shortArray01</string>
+        </property>
+        <property name="Style_1">
+         <enum>caCartesianPlot::FillUnder</enum>
+        </property>
+        <property name="symbol_1">
+         <enum>caCartesianPlot::NoSymbol</enum>
+        </property>
+        <property name="color_1">
+         <color>
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="channels_2" stdset="0">
+         <string notr="true"/>
+        </property>
+        <property name="channels_3" stdset="0">
+         <string notr="true"/>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>218</red>
+          <green>218</green>
+          <blue>218</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="scaleColor">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="XaxisScaling" stdset="0">
+         <enum>caCartesianPlot::User</enum>
+        </property>
+        <property name="YaxisScaling" stdset="0">
+         <enum>caCartesianPlot::Auto</enum>
+        </property>
+        <property name="XaxisLimits">
+         <string>0.0;10</string>
+        </property>
+        <property name="YaxisLimits">
+         <string>0;100</string>
+        </property>
+        <property name="XaxisType">
+         <enum>caCartesianPlot::linear</enum>
+        </property>
+        <property name="YAxisType" stdset="0">
+         <enum>caCartesianPlot::linear</enum>
+        </property>
+       </widget>
+       <widget class="caCartesianPlot" name="caCartesianPlot_5">
+        <property name="geometry">
+         <rect>
+          <x>250</x>
+          <y>400</y>
+          <width>360</width>
+          <height>130</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="Title" stdset="0">
+         <string notr="true">Test Curve byte</string>
+        </property>
+        <property name="TitleX">
+         <string>[kv]</string>
+        </property>
+        <property name="TitleY">
+         <string>uA</string>
+        </property>
+        <property name="channels_1" stdset="0">
+         <string notr="true">;epics4://byteArray01</string>
+        </property>
+        <property name="Style_1">
+         <enum>caCartesianPlot::FillUnder</enum>
+        </property>
+        <property name="symbol_1">
+         <enum>caCartesianPlot::NoSymbol</enum>
+        </property>
+        <property name="color_1">
+         <color>
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="channels_2" stdset="0">
+         <string notr="true"/>
+        </property>
+        <property name="channels_3" stdset="0">
+         <string notr="true"/>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>218</red>
+          <green>218</green>
+          <blue>218</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>255</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="scaleColor">
+         <color>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="XaxisScaling" stdset="0">
+         <enum>caCartesianPlot::User</enum>
+        </property>
+        <property name="YaxisScaling" stdset="0">
+         <enum>caCartesianPlot::Auto</enum>
+        </property>
+        <property name="XaxisLimits">
+         <string>0.0;10</string>
+        </property>
+        <property name="YaxisLimits">
+         <string>0;100</string>
+        </property>
+        <property name="XaxisType">
+         <enum>caCartesianPlot::linear</enum>
+        </property>
+        <property name="YAxisType" stdset="0">
+         <enum>caCartesianPlot::linear</enum>
         </property>
        </widget>
       </widget>
