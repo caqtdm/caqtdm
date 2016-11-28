@@ -77,7 +77,7 @@ public:
 
     void noStyle(QString style) {Q_UNUSED(style);}
 
-    enum FormatType { decimal, exponential, engr_notation, compact, truncated,
+    enum FormatType { decimal, exponential, engr_notation, compact, truncated, utruncated,
                       hexadecimal, octal, string, sexagesimal, sexagesimal_hms, sexagesimal_dms, enumeric}; // enumeric = enum as number
     enum ScaleMode { None, Height, WidthAndHeight};
     enum Alignment { Center, Left, Right};
