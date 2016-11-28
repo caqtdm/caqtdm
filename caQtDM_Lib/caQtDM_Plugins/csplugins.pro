@@ -9,12 +9,11 @@ include (../../caQtDM_Viewer/qtdefs.pri)
 TEMPLATE = subdirs
 SUBDIRS = demo epics3
 
-epics4: {
- SUBDIRS += epics4
-}
-
 !MOBILE {
- bsread: {
-  SUBDIRS += bsread
- }
+    epics4: {
+     SUBDIRS += epics4
+    }
+    bsread: {
+      SUBDIRS += bsread
+     }
 }
