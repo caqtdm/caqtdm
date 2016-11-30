@@ -47,7 +47,6 @@ caRowColMenu::caRowColMenu(QWidget *parent) : QWidget(parent)
     grid->setMargin(0);
     grid->setSpacing(2);
 
-    thisStacking = Row;
     thisForeColor = Qt::black;
 
     thisBackColor = Qt::gray;
@@ -71,7 +70,7 @@ caRowColMenu::caRowColMenu(QWidget *parent) : QWidget(parent)
 
     connect(signalMapper, SIGNAL(mapped(int)),this, SIGNAL(clicked(int)));
 
-    populateCells();
+    setStacking(Row);
 
     alpha = 255;
 
@@ -201,8 +200,6 @@ void caRowColMenu::setStacking(Stacking stacking)
     QResizeEvent *re = new QResizeEvent(size(), size());
     resizeEvent(re);
     delete re;
-
-    populateCells();
 }
 
 void  caRowColMenu::setLabels(QString const &newL)
@@ -238,6 +235,7 @@ void caRowColMenu::setForeground(QColor c)
 void caRowColMenu::resizeEvent(QResizeEvent *e)
 {
     Q_UNUSED(e);
+    populateCells();
 }
 
 void caRowColMenu::setFontScaleModeL(EPushButton::ScaleMode m)

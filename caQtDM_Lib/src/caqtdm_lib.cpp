@@ -38,6 +38,8 @@
 #include <QToolBar>
 #include <QUuid>
 
+//#include "archiveTest.h"
+
 // interfacing widgets, handling their own data acquisition ... (thanks zai)
 #include "caWidgetInterface.h"
 
@@ -554,6 +556,20 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     PrintWindowAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+P", 0, QApplication::UnicodeUTF8));
     connect(PrintWindowAction, SIGNAL(triggered()), this, SLOT(Callback_printWindow()));
     this->addAction(PrintWindowAction);
+/*
+
+    qDebug() << "archivetest";
+    ArchiveTest *fromArchive = new ArchiveTest();
+    QString response ="'response':{'format':'csv'}";
+    QString channels = "'channels': [ 'SINSB01-RSYS:GET-KLY-POWER' ]";
+    QString range = "'range': { 'startDate' : '2016-11-29T00:00:00.000',  'endDate' : '2016-11-30T08:00:00.000'}";
+    QString fields = "'fields':['channel','iocSeconds','value']}";
+    QString agg = "";
+    QString total = "{" + response + "," + range + "," + channels + "," + fields + "," + agg + "}";
+    total = total.replace("'", "\"");
+    QByteArray json_str = total.toUtf8();
+    fromArchive->requestUrl(QUrl("http://data-api.psi.ch/sf/query"), json_str);
+    */
 }
 
 /**

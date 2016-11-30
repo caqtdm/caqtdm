@@ -23,6 +23,6 @@
  *    anton.mezger@psi.ch
  */
 
-enum FormatType { decimal, exponential, engr_notation, compact, truncated,
+enum FormatType { decimal, exponential, engr_notation, compact, truncated, utruncated,
                       hexadecimal, octal, string, sexagesimal, sexagesimal_hms, sexagesimal_dms, enumeric}; // enumeric = enum as number
 
