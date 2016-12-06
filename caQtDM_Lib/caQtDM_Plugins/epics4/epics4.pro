@@ -33,4 +33,4 @@ warning("epics4 was specified in qtdefs.pri, so build plugin with epics4, not ye
 DEFINES += EPICS4
 
 
-#DEFINES += QT_NO_WARNING_OUTPUT QT_NO_DEBUG_OUTPUT
+DEFINES += QT_NO_WARNING_OUTPUT QT_NO_DEBUG_OUTPUT

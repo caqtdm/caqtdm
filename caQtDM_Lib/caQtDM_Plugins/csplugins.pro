@@ -16,4 +16,7 @@ SUBDIRS = demo epics3
     bsread: {
       SUBDIRS += bsread
      }
+    archive: {
+      SUBDIRS += archive
+    }
 }

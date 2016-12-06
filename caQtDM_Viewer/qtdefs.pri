@@ -73,6 +73,9 @@ CONFIG += XDR_HACK
 # undefine this for bsread (zeromq) plugin support
 #CONFIG += bsread
 
+# undefine this for archive retrieval plugin support
+#CONFIG += archive
+
 # undefine this when you need to combine caQtDM with the australian epicsqt package
 #CONFIG += australian
 
