@@ -38,73 +38,122 @@
 using namespace std;
 using namespace epics::pvData;
 using namespace epics::pvAccess;
-using namespace epics::pvaClient;
+using namespace epics::pvAccess::ca;
 using namespace epics::nt;
 
 
 namespace epics { namespace caqtdm { namespace epics4 {
 
-class epicsShareClass PvaInterface :
-    public PvaClientChannelStateChangeRequester,
-    public CallbackRequester,
-    public PvaClientMonitorRequester,
-    public GetFieldRequester,
-    public ChannelGetRequester,
-    public std::tr1::enable_shared_from_this<PvaInterface>
+class PVAInterface;
+typedef std::tr1::shared_ptr<PVAInterface> PVAInterfacePtr;
+typedef std::tr1::weak_ptr<PVAInterface> PVAInterfaceWPtr;
+
+class PVAChannelRequester;
+typedef std::tr1::shared_ptr<PVAChannelRequester> PVAChannelRequesterPtr;
+typedef std::tr1::weak_ptr<PVAChannelRequester> PVAChannelRequesterWPtr;
+
+
+class epicsShareClass PVAChannel :
+    public std::tr1::enable_shared_from_this<PVAChannel>
 {
+private:
+    std::vector<PVAInterfaceWPtr> pvaInterfaceList;
+    Channel::shared_pointer channel;
+    Mutex mutex;
+    string fullName;
+    Epics4RequesterPtr requester;
+    CallbackThreadPtr callbackThread;
+    PVAChannelRequesterPtr pvaChannelRequester;
+
 public:
-    POINTER_DEFINITIONS(PvaInterface);
-    PvaInterface(
-        PvaClientPtr const & pvaClient,
-        MutexKnobData *mutexKnobData,
-        int index,
-        Epics4RequesterPtr const & requester,
-        CallbackThreadPtr const & callbackThread,
-        string const & channelName,
-        string const & providerName);
-    virtual ~PvaInterface();
+    POINTER_DEFINITIONS(PVAChannel);
+    PVAChannel(const string & fullName,
+         const Epics4RequesterPtr & requester,
+         const CallbackThreadPtr & callbackThread);
+    ~PVAChannel();
+    void destroy();
+    std::string getRequesterName();
+    void message(string const & message,MessageType messageType);
+    void channelCreated(const Status & status, Channel::shared_pointer const & channel);
+    void channelStateChange(
+        Channel::shared_pointer const & channel,Channel::ConnectionState connectionState);
+
+    Channel::shared_pointer getChannel() {return channel;}
+    string getFullName() { return fullName;}
+    void connect(const string & channelName,const string &providerName);
+    void addInterface(const PVAInterfacePtr & pvaInterface);
+    // following returns (true,false) if no more interfaces
+    bool removeInterface(const PVAInterfacePtr & pvaInterface);
+
+};
+    
+class epicsShareClass PVAChannelRequester : public ChannelRequester
+{
+    PVAChannelWPtr pvaChannel;
+public:
+    PVAChannelRequester(
+        PVAChannelPtr const & pvaChannel)
+    : pvaChannel(pvaChannel)
+    {}
+    virtual ~PVAChannelRequester() {
+        if(Epics4Plugin::getDebug()) std::cout << "~PVAChannelRequester" << std::endl;
+    }
+
+    virtual std::string getRequesterName()
+    {
+        PVAChannelPtr chan(pvaChannel.lock());
+        if(!chan) return string("pvaChannel is null");
+        return chan->getRequesterName();
+    }
+
+    virtual void message(std::string const & message, epics::pvData::MessageType messageType)
+    {
+        PVAChannelPtr chan(pvaChannel.lock());
+        if(!chan) return;
+        chan->message(message,messageType);
+    }
+
+    virtual void channelCreated(
+         const epics::pvData::Status& status,
+         Channel::shared_pointer const & channel)
+    {
+        PVAChannelPtr chan(pvaChannel.lock());
+        if(!chan) return;
+        chan->channelCreated(status,channel);
+    }
+
     virtual void channelStateChange(
-        PvaClientChannelPtr const & channel, bool isConnected);
-    virtual void event(PvaClientMonitorPtr const & monitor);
-    virtual void unlisten();
+          Channel::shared_pointer const & channel,
+          Channel::ConnectionState connectionState)
+    {
+        PVAChannelPtr chan(pvaChannel.lock());
+        if(!chan) return;
+        chan->channelStateChange(channel,connectionState);
+    }
+};
 
-    virtual std::string getRequesterName();
-    virtual void message(std::string const & message,MessageType messageType);
-    virtual void getDone(
-        const Status& status,
-        FieldConstPtr const & field);
-    virtual void channelGetConnect(
-        const Status& status,
-        ChannelGet::shared_pointer const & channelGet,
-        Structure::const_shared_pointer const & structure);
-    virtual void getDone(
-        const Status& status,
-        ChannelGet::shared_pointer const & channelGet,
-        PVStructurePtr const & pvStructure,
-        BitSet::shared_pointer const & bitSet);
+class PVAGetFieldRequester;
+typedef std::tr1::shared_ptr<PVAGetFieldRequester> PVAGetFieldRequesterPtr;
+typedef std::tr1::weak_ptr<PVAGetFieldRequester> PVAGetFieldRequesterWPtr;
 
-    virtual void callback();
+class PVAChannelGetRequester;
+typedef std::tr1::shared_ptr<PVAChannelGetRequester> PVAChannelGetRequesterPtr;
+typedef std::tr1::weak_ptr<PVAChannelGetRequester> PVAChannelGetRequesterWPtr;
 
-    int reconnect();
-    int disconnect();
-    int terminateIO();
+class PVAChannelPutRequester;
+typedef std::tr1::shared_ptr<PVAChannelPutRequester> PVAChannelPutRequesterPtr;
+typedef std::tr1::weak_ptr<PVAChannelPutRequester> PVAChannelPutRequesterWPtr;
 
+class PVAMonitorRequester;
+typedef std::tr1::shared_ptr<PVAMonitorRequester> PVAMonitorRequesterPtr;
+typedef std::tr1::weak_ptr<PVAMonitorRequester> PVAMonitorRequesterWPtr;
 
-    void connect();
-    void getInterface();
-    void gotInterface();
-    void getDisplayControl();
-    void gotDisplayControl(PVStructurePtr const & pvStructure);
-    void getEnum();
-    void gotEnum(PVStructurePtr const & pvStructure);
-    void createMonitor();
-    void gotMonitor();
-    void getScalarData(PVStructurePtr const & pvStructure);
-    void getEnumData(PVStructurePtr const & pvStructure);
-    void getScalarArrayData(PVStructurePtr const & pvStructure);
-    bool setValue(double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
-    bool getTimeStamp(char *timestamp);
-    template <typename pureData> void fillData(pureData const &array, size_t size, knobData* kPtr);
+class epicsShareClass PVAInterface :
+    public CallbackRequester,
+    public std::tr1::enable_shared_from_this<PVAInterface>
+{
+private:
+   template <typename pureData> void fillData(pureData const &array, size_t size, knobData* kPtr);
 
     enum NormativeType {
         ntunknown_t,
@@ -120,9 +169,9 @@ public:
          enum_t,
          createMonitor_t
     };
-        
-    PvaClientPtr pvaClient;
+    PVAChannelPtr pvaChannel;
     bool gotFirstConnection;
+    bool putFinished;
     bool unlistenCalled;
     CreateRequest::shared_pointer createRequest;
     MutexKnobData *mutexKnobData;
@@ -132,50 +181,452 @@ public:
     bool gotFirstConnect;
     NormativeType normativeType;
     CallbackType callbackType;
-    PvaClientChannelPtr pvaClientChannel;
-    ChannelGet::shared_pointer channelGet;
-    ConvertPtr convert;
-
-    knobData kData;
-    PvaClientMonitorPtr pvaMonitor;
     StructureConstPtr structure;
+    ChannelGet::shared_pointer pvaChannelGet;
+    ChannelPut::shared_pointer pvaChannelPut;
+    PVStructurePtr putPVStructure;
+    Event waitForPutConnect;
+    Monitor::shared_pointer monitor;
+    ConvertPtr convert;
+    knobData kData;
     shared_vector<const string> choices;
     TimeStamp timeStamp;
-
     Mutex mutex;
+    PVAGetFieldRequesterPtr pvaGetFieldRequester;
+    PVAChannelGetRequesterPtr pvaChannelGetRequester;
+    PVAChannelPutRequesterPtr pvaChannelPutRequester;
+    BitSetPtr putBitSet;
+    PVAMonitorRequesterPtr pvaMonitorRequester;
+public:
+    POINTER_DEFINITIONS(PVAInterface);
+    PVAInterface(
+        PVAChannelPtr const & pvaChannel,
+        MutexKnobData *mutexKnobData,
+        int index,
+        Epics4RequesterPtr const & requester,
+        CallbackThreadPtr const & callbackThread);
+    virtual ~PVAInterface();
+    void destroy();
+    void clearMonitor();
+
+    std::string getRequesterName();
+    void message(std::string const & message,MessageType messageType);
+    // for getField
+    void getDone(
+        const Status& status,
+        FieldConstPtr const & field);
+    // for pvaChannelGet
+    void channelGetConnect(
+        const Status& status,
+        ChannelGet::shared_pointer const & channelGet,
+        Structure::const_shared_pointer const & structure);
+    void getDone(
+        const Status& status,
+        ChannelGet::shared_pointer const & channelGet,
+        PVStructurePtr const & pvStructure,
+        BitSet::shared_pointer const & bitSet);
+
+    // for monitor
+    void monitorConnect(
+        const Status & status,
+        Monitor::shared_pointer const & monitor,
+        Structure::const_shared_pointer const & structure);
+    void unlisten(MonitorPtr const & monitor);
+    void monitorEvent(MonitorPtr const & monitor);
+    // for pvaChannelPut
+    void channelPutConnect(
+        const Status& status,
+        ChannelPut::shared_pointer const & channelPut,
+        Structure::const_shared_pointer const & structure);
+    void getDone(
+        const Status& status,
+        ChannelPut::shared_pointer const & channelPut,
+        PVStructurePtr const & pvStructure,
+        BitSet::shared_pointer const & bitSet);
+    void putDone(
+        const Status& status,
+        ChannelPut::shared_pointer const & channelPut);
+    
+   
+    virtual void callback();
+
+    void channelStateChange(bool isConnected);
+
+    PVAChannelPtr getPVAChannel();
+    int reconnect();
+    int disconnect();
+    int terminateIO();
+
+    void getInterface();
+    void gotInterface();
+    void getDisplayControl();
+    void gotDisplayControl(PVStructurePtr const & pvStructure);
+    void getEnum();
+    void gotEnum(PVStructurePtr const & pvStructure);
+    void createMonitor();
+    void gotMonitor();
+    void getScalarData(PVStructurePtr const & pvStructure);
+    void getEnumData(PVStructurePtr const & pvStructure);
+    void getScalarArrayData(PVStructurePtr const & pvStructure);
+    bool setValue(double rdata, int32_t idata, char *sdata, int forceType);
+    bool setArrayValue(
+        float *fdata, double *ddata,
+        int16_t *data16, int32_t *data32,
+        char *sdata, int nelm);
+    bool getTimeStamp(char *timestamp);
+};
+
+class epicsShareClass PVAGetFieldRequester : public GetFieldRequester
+{
+    PVAInterfaceWPtr pvaInterface;
+public:
+    PVAGetFieldRequester(
+        PVAInterfacePtr const & pvaInterface)
+    : pvaInterface(pvaInterface)
+    {}
+    virtual ~PVAGetFieldRequester() {
+        if(Epics4Plugin::getDebug()) std::cout << "~PVAGetFieldRequester" << std::endl;
+    }
+
+    virtual std::string getRequesterName()
+    {
+        PVAInterfacePtr interface(pvaInterface.lock());
+        if(!interface) return string("pvaInterface is null");
+         return interface->getRequesterName();
+    }
+
+    virtual void message(std::string const & message, epics::pvData::MessageType messageType)
+    {
+        PVAInterfacePtr interface(pvaInterface.lock());
+        if(!interface) return;
+        interface->message(message,messageType);
+    }
+
+    virtual void getDone(
+        const Status& status,
+        FieldConstPtr const & field) 
+    {
+        PVAInterfacePtr interface(pvaInterface.lock());
+        if(!interface) return;
+        interface->getDone(status,field);  
+    }
+};
+
+class epicsShareClass PVAChannelGetRequester : public ChannelGetRequester
+{
+    PVAInterfaceWPtr pvaInterface;
+public:
+    PVAChannelGetRequester(
+        PVAInterfacePtr const & pvaInterface)
+    : pvaInterface(pvaInterface)
+    {}
+    virtual ~PVAChannelGetRequester() {
+        if(Epics4Plugin::getDebug()) std::cout << "~PVAChannelGetRequester" << std::endl;
+    }
+
+    virtual std::string getRequesterName()
+    {
+        PVAInterfacePtr interface(pvaInterface.lock());
+        if(!interface) return string("pvaInterface is null");
+         return interface->getRequesterName();
+    }
+
+    virtual void message(std::string const & message, epics::pvData::MessageType messageType)
+    {
+        PVAInterfacePtr interface(pvaInterface.lock());
+        if(!interface) return;
+        interface->message(message,messageType);
+    }
+
+    virtual void channelGetConnect(
+        const Status& status,
+        ChannelGet::shared_pointer const & channelGet,
+        Structure::const_shared_pointer const & structure)
+    {
+        PVAInterfacePtr interface(pvaInterface.lock());
+        if(!interface) return;
+        interface->channelGetConnect(status,channelGet,structure);  
+    }
+
+    virtual void getDone(
+        const Status& status,
+        ChannelGet::shared_pointer const & channelGet,
+        PVStructurePtr const & pvStructure,
+        BitSet::shared_pointer const & bitSet)
+    {
+        PVAInterfacePtr interface(pvaInterface.lock());
+        if(!interface) return;
+        interface->getDone(status,channelGet,pvStructure,bitSet);
+    }
+};
+
+class epicsShareClass PVAChannelPutRequester : public ChannelPutRequester
+{
+    PVAInterfaceWPtr pvaInterface;
+public:
+    PVAChannelPutRequester(
+        PVAInterfacePtr const & pvaInterface)
+    : pvaInterface(pvaInterface)
+    {}
+    virtual ~PVAChannelPutRequester() {
+        if(Epics4Plugin::getDebug()) std::cout << "~PVAChannelPutRequester" << std::endl;
+    }
+
+    virtual std::string getRequesterName()
+    {
+        PVAInterfacePtr interface(pvaInterface.lock());
+        if(!interface) return string("pvaInterface is null");
+         return interface->getRequesterName();
+    }
+
+    virtual void message(std::string const & message, epics::pvData::MessageType messageType)
+    {
+        PVAInterfacePtr interface(pvaInterface.lock());
+        if(!interface) return;
+        interface->message(message,messageType);
+    }
+
+    virtual void channelPutConnect(
+        const Status& status,
+        ChannelPut::shared_pointer const & channelPut,
+        Structure::const_shared_pointer const & structure)
+    {
+        PVAInterfacePtr interface(pvaInterface.lock());
+        if(!interface) return;
+        interface->channelPutConnect(status,channelPut,structure);  
+    }
+
+    virtual void getDone(
+        const Status& status,
+        ChannelPut::shared_pointer const & channelPut,
+        PVStructurePtr const & pvStructure,
+        BitSet::shared_pointer const & bitSet)
+    {
+        PVAInterfacePtr interface(pvaInterface.lock());
+        if(!interface) return;
+        interface->getDone(status,channelPut,pvStructure,bitSet);
+    }
+
+    virtual void putDone(
+        const Status& status,
+        ChannelPut::shared_pointer const & channelPut)
+    {
+        PVAInterfacePtr interface(pvaInterface.lock());
+        if(!interface) return;
+        interface->putDone(status,channelPut);
+    }
+};
+
+class epicsShareClass PVAMonitorRequester : public MonitorRequester
+{
+    PVAInterfaceWPtr pvaInterface;
+public:
+    PVAMonitorRequester(
+        PVAInterfacePtr const & pvaInterface)
+    : pvaInterface(pvaInterface)
+    {}
+    virtual ~PVAMonitorRequester() {
+        if(Epics4Plugin::getDebug()) std::cout << "~PVAMonitorRequester" << std::endl;
+    }
+
+    virtual std::string getRequesterName()
+    {
+        PVAInterfacePtr interface(pvaInterface.lock());
+        if(!interface) return string("pvaInterface is null");
+         return interface->getRequesterName();
+    }
+
+    virtual void message(std::string const & message, epics::pvData::MessageType messageType)
+    {
+        PVAInterfacePtr interface(pvaInterface.lock());
+        if(!interface) return;
+        interface->message(message,messageType);
+    }
+
+    virtual void monitorConnect(
+        const Status& status,
+        Monitor::shared_pointer const & monitor,
+        Structure::const_shared_pointer const & structure)
+    {
+        PVAInterfacePtr interface(pvaInterface.lock());
+        if(!interface) return;
+        interface->monitorConnect(status,monitor,structure);  
+    }
+
+    virtual void unlisten(MonitorPtr const & monitor)
+    {
+        PVAInterfacePtr interface(pvaInterface.lock());
+        if(!interface) return;
+        interface->unlisten(monitor);  
+    }
+
+    virtual void monitorEvent(MonitorPtr const & monitor)
+    {
+        PVAInterfacePtr interface(pvaInterface.lock());
+        if(!interface) return;
+        interface->monitorEvent(monitor);  
+    }
 };
 
 
+PVAChannel::PVAChannel(
+         const string & fullName,
+         const Epics4RequesterPtr & requester,
+         const CallbackThreadPtr & callbackThread)
+    : fullName(fullName),
+      requester(requester),
+      callbackThread(callbackThread)
+{
+    if(Epics4Plugin::getDebug()) cout << "PVAChannel::PVAChannel() fullName " << fullName << endl;
+}
+
+PVAChannel::~PVAChannel()
+{
+    if(Epics4Plugin::getDebug()) cout << "PVAChannel::~PVAChannel()\n";
+}
+
+void PVAChannel::destroy()
+{
+   pvaChannelRequester.reset();
+   channel->destroy();
+}
+
+std::string PVAChannel::getRequesterName()
+{
+    return requester->getRequesterName();
+}
+
+void PVAChannel::message(string const & message,MessageType messageType)
+{
+    requester->message(fullName + " " + message,messageType);
+}
+
+void PVAChannel::channelCreated(const Status & status, Channel::shared_pointer const & channel)
+{
+     if(Epics4Plugin::getDebug()) {
+         cout << "PVAChannel::channelCreated"
+         << " fullName " << getFullName()
+         << " status.isOK() " << ( status.isOK() ? "true" : "false")
+         << " channel->isConnected())  " << ( channel->isConnected() ? "true" : "false")
+         << endl;
+    }
+    if(!status.isOK()) {
+         requester->message(channel->getChannelName() + " " + status.getMessage(),errorMessage);
+         return;
+    }
+    if(channel->isConnected()) channelStateChange(channel,Channel::CONNECTED);
+}
+
+void PVAChannel::channelStateChange(
+        Channel::shared_pointer const & channel,Channel::ConnectionState connectionState)
+{
+    Q_UNUSED(channel);
+    if(Epics4Plugin::getDebug()) cout << "PVAChannel::channelStateChange\n";
+    Lock xx(mutex);
+    if(pvaInterfaceList.empty()) return;
+    size_t num = pvaInterfaceList.size();
+    bool value = (connectionState==Channel::CONNECTED ? true :  false);
+    if(Epics4Plugin::getDebug()) {
+         cout << "isConnected " << ( value ? "true" : "false")
+         << " fullName " << getFullName()
+         << " num " << num
+         << endl;
+    }
+    for(size_t ind = 0; ind<num; ++ind) {
+        PVAInterfacePtr interface = pvaInterfaceList[ind].lock();
+        if(interface) interface->channelStateChange(value);
+    }
+}
+
+void PVAChannel::connect(const string & channelName,const string & providerName)
+{
+    if(Epics4Plugin::getDebug()) cout << "PVAChannel::connect\n";
+    ChannelProviderRegistry::shared_pointer reg = getChannelProviderRegistry();
+    ChannelProvider::shared_pointer provider = reg->getProvider(providerName);
+    if(!provider) {
+        requester->message(channelName + " provider " + providerName + " not registered",errorMessage);
+    }
+    pvaChannelRequester = PVAChannelRequesterPtr(new PVAChannelRequester(shared_from_this()));
+    channel = provider->createChannel(
+        channelName,
+        pvaChannelRequester,
+        ChannelProvider::PRIORITY_DEFAULT);
+    if(!channel) {
+         requester->message(channelName + " channelCreate failed ",errorMessage);
+    }
+}
+
+void PVAChannel::addInterface(const PVAInterfacePtr & pvaInterface)
+{
+   if(Epics4Plugin::getDebug()) {
+        cout << "PVAChannel::addInterface"
+        << " fullName " << getFullName()
+        << " channel->isConnected())  " << ( channel->isConnected() ? "true" : "false")
+        << endl;
+   }
+   Lock xx(mutex);
+   pvaInterfaceList.push_back(PVAInterfaceWPtr(pvaInterface));
+   if(channel->isConnected()) pvaInterface->channelStateChange(true);
+   
+}
+
+bool PVAChannel::removeInterface(const PVAInterfacePtr & pvaInterface)
+{
+    Lock xx(mutex);
+    size_t num = pvaInterfaceList.size();
+    if(Epics4Plugin::getDebug()) {
+        cout << "PVAChannel::removeInterface"
+        << " fullName " << getFullName()
+        << " num " << num
+        << endl;
+    }
+    for(size_t ind = 0; ind<num; ++ind) {
+        PVAInterfacePtr interface = pvaInterfaceList[ind].lock();
+        if(interface==pvaInterface) {
+            pvaInterfaceList.erase(pvaInterfaceList.begin() + ind);
+            break;
+        }
+    }
+    num = pvaInterfaceList.size();
+    if(Epics4Plugin::getDebug()) {     
+         cout << "after remove num " << pvaInterfaceList.size() << endl;
+    }
+    return ((num==0) ? true : false);
+}
 
 
-class epicsShareClass PvaInterfaceGlue
+class epicsShareClass PVAInterfaceGlue
 {
 private:
-     PvaInterfacePtr pvaInterface;
+     PVAInterfacePtr pvaInterface;
 public:
-    PvaInterfaceGlue(const PvaInterfacePtr & pvaInterface)
+    PVAInterfaceGlue(const PVAInterfacePtr & pvaInterface)
     :pvaInterface(pvaInterface)
     {}
-    ~PvaInterfaceGlue()
+    ~PVAInterfaceGlue()
     {
+        if(Epics4Plugin::getDebug()) {
+         cout << "~PVAInterfaceGlue()"
+         << "pvaInterface use count " << pvaInterface.use_count()
+         << endl;
+    } 
     }
-    PvaInterfacePtr getPvaInterface()
+    PVAInterfacePtr getPVAInterface()
     {
          return pvaInterface;
     }
 };
 
 
-PvaInterface::PvaInterface(
-        PvaClientPtr const & pvaClient,
+PVAInterface::PVAInterface(
+        PVAChannelPtr const & pvaChannel,
         MutexKnobData *mutexKnobData,
         int index,
         Epics4RequesterPtr const & requester,
-        CallbackThreadPtr const & callbackThread,
-        string const & channelName,
-        string const & providerName)
-: pvaClient(pvaClient),
+        CallbackThreadPtr const & callbackThread)
+: pvaChannel(pvaChannel),
   gotFirstConnection(false),
+  putFinished(true),
   unlistenCalled(false),
   createRequest(CreateRequest::create()),
   mutexKnobData(mutexKnobData),
@@ -185,52 +636,158 @@ PvaInterface::PvaInterface(
   gotFirstConnect(false),
   normativeType(ntunknown_t),
   callbackType(unknown_t),
-  pvaClientChannel(pvaClient->createChannel(channelName,providerName)),
   convert(getConvert())
 {
+     if(Epics4Plugin::getDebug()) cout << "PVAInterface::PVAInterface()\n";
 }
 
-PvaInterface::~PvaInterface()
+PVAInterface::~PVAInterface()
 {
+    if(Epics4Plugin::getDebug()) cout << "PVAInterface::!PVAInterface()\n";
 }
 
-int PvaInterface::reconnect()
+void PVAInterface::clearMonitor()
 {
-cout << "PvaInterface::reconnect() not implemented\n";
-    return false;
-}
-   
-int PvaInterface::disconnect()
-{
-cout << "PvaInterface::disconnect()  not implemented\n";
-    return false;
+    monitor->stop();
+    monitor->destroy();
 }
 
-int PvaInterface::terminateIO()
+void PVAInterface::destroy()
 {
-cout << "PvaInterface::terminateIO()  not implemented\n";
-    return false;
+    if(Epics4Plugin::getDebug()) cout << "PVAInterface::destroy calling pvaChannelGet->destroy\n";
+    if(pvaChannelGet) pvaChannelGet->destroy();
+    if(Epics4Plugin::getDebug()) cout << "PVAInterface::destroy calling pvaChannelPut->destroy\n";
+    if(pvaChannelPut) pvaChannelPut->destroy();
+    if(Epics4Plugin::getDebug()) cout << "PVAInterface::destroy calling pvaChannel.reset\n";
+    pvaChannel.reset();
+    if(Epics4Plugin::getDebug()) cout << "PVAInterface::destroy return\n";
 }
 
- int disconnect() {return false;}
-    int terminateIO() {return false;}
-
-
-void PvaInterface::channelStateChange(
-       PvaClientChannelPtr const & channel, bool isConnected)
+void PVAInterface::channelStateChange(bool isConnected)
 {
-    Q_UNUSED(channel);
+    if(Epics4Plugin::getDebug()) {
+        cout << "PVAInterface::channelStateChange"
+        << " fullName " << pvaChannel->getFullName()
+        << " isConnected " << (isConnected ? "true" : "false")
+        << endl; 
+    }
     if(gotFirstConnect) mutexKnobData->SetMutexKnobDataConnected(index,isConnected);
     if(!isConnected || gotFirstConnect) return;
     callbackType = interface_t;
     callbackThread->queueRequest(shared_from_this());
 }
 
-void PvaInterface::event(PvaClientMonitorPtr const & monitor)
+
+string PVAInterface::getRequesterName()
 {
-    while(monitor->poll()) {
-        PvaClientMonitorDataPtr monitorData = monitor->getData();
-        PVStructurePtr pvStructure = monitorData->getPVStructure();
+    return requester->getRequesterName();
+}
+
+void PVAInterface::message(std::string const & message,MessageType messageType)
+{
+    requester->message(pvaChannel->getFullName() + " " + message,messageType);
+}
+
+void PVAInterface::getDone(
+        const Status& status,
+        FieldConstPtr const & yyy)
+{
+     structure =  std::tr1::dynamic_pointer_cast<const Structure>(yyy);
+     if(!status.isOK()) {
+          string mess(status.getMessage());
+          mess += " getField failed";
+          message(mess,errorMessage);
+          return;
+     }
+     FieldConstPtr field = structure->getField<Field>(string("value"));
+     if(!field) {
+          message(" no value field",errorMessage);
+          return;
+     }
+     Type type = field->getType();
+     if(type==scalar) {
+        normativeType = ntscalar_t;
+     } else if(type==scalarArray) {
+        normativeType = ntscalararray_t;
+     } else if(NTEnum::is_a(structure)) {
+        normativeType = ntenum_t;
+     } else {
+         message(" value is not a valid nttype",errorMessage);
+         return;
+     }
+     gotInterface();
+}
+
+
+
+void PVAInterface::channelGetConnect(
+    const Status& status,
+    ChannelGet::shared_pointer const & channelGet,
+    Structure::const_shared_pointer const & structure)
+{
+    Q_UNUSED(channelGet);
+    Q_UNUSED(structure);
+    if(!status.isOK()) {
+          string mess(status.getMessage());
+          mess += " channelGetConnect failed";
+          message(mess,errorMessage);
+          return;
+     }
+     channelGet->get();
+}
+
+void PVAInterface::getDone(
+    const Status& status,
+    ChannelGet::shared_pointer const & channelGet,
+    PVStructurePtr const & pvStructure,
+    BitSet::shared_pointer const & bitSet)
+{
+    Q_UNUSED(channelGet);
+    Q_UNUSED(bitSet);
+    if(!status.isOK()) {
+          string mess(status.getMessage());
+          mess += " channelGetDone failed";
+          message(mess,errorMessage);
+          return;
+     }
+     switch(normativeType) {
+       case ntscalar_t : gotDisplayControl(pvStructure); break;
+       case ntscalararray_t : gotDisplayControl(pvStructure); break;
+       case ntenum_t : gotEnum(pvStructure); break;
+       default: throw std::runtime_error("PVAInterface::getDone logic error");
+     }
+}
+
+void PVAInterface::monitorConnect(
+        const Status & status,
+        Monitor::shared_pointer const & monitor,
+        Structure::const_shared_pointer const & structure)
+{
+    Q_UNUSED(structure);
+    if(Epics4Plugin::getDebug()) cout << " PVAInterface::monitorConnect\n";
+    if(status.isOK()) {
+         monitor->start();
+    } else {
+          string mess(status.getMessage());
+          mess += " monitorConnect failed";
+          message(mess,errorMessage);
+    }
+}
+
+void PVAInterface::unlisten(MonitorPtr const & monitor)
+{
+    Q_UNUSED(monitor);
+    std::cout << "PVAInterface::unlisten\n";
+    unlistenCalled = true;
+}
+
+void PVAInterface::monitorEvent(MonitorPtr const & monitor)
+{
+    if(Epics4Plugin::getDebug()) cout << " PVAInterface::monitorEvent\n";
+    while(true) {
+        MonitorElementPtr monitorElement(monitor->poll());
+        if(!monitorElement) break;
+        PVStructurePtr pvStructure = monitorElement->pvStructurePtr;
         kData = mutexKnobData->GetMutexKnobData(index);
         if(kData.index == -1) return;
         mutexKnobData->DataLock(&kData);
@@ -256,106 +813,71 @@ void PvaInterface::event(PvaClientMonitorPtr const & monitor)
             case ntscalar_t : getScalarData(pvStructure); break;
             case ntenum_t : getEnumData(pvStructure); break;
             case ntscalararray_t : getScalarArrayData(pvStructure); break;
-            default: throw std::runtime_error("PvaInterface::event logic error");
+            default: throw std::runtime_error("PVAInterface::event logic error");
         }
-        mutexKnobData->SetMutexKnobData(kData.index, kData);
+        //mutexKnobData->SetMutexKnobData(kData.index, kData);
+        mutexKnobData->SetMutexKnobDataReceived(&kData);
+
         mutexKnobData->DataUnlock(&kData);
-        monitor->releaseEvent();
+        monitor->release(monitorElement);
     }
 }
 
-
-
-void PvaInterface::unlisten()
-{
-std::cout << "ClientMonitorRequester::unlisten\n";
-         unlistenCalled = true;
-}
-
-string PvaInterface::getRequesterName()
-{
-    return pvaClient->getRequesterName();
-}
-
-void PvaInterface::message(std::string const & message,MessageType messageType)
-{
-    pvaClient->message(pvaClientChannel->getChannelName() + " " + message,messageType);
-}
-
-void PvaInterface::getDone(
+void PVAInterface::channelPutConnect(
         const Status& status,
-        FieldConstPtr const & yyy)
+        ChannelPut::shared_pointer const & channelPut,
+        Structure::const_shared_pointer const & structure)
 {
-     structure =  std::tr1::dynamic_pointer_cast<const Structure>(yyy);
-     if(!status.isOK()) {
-          message(" getField failed",errorMessage);
-          return;
-     }
-     FieldConstPtr field = structure->getField<Field>(string("value"));
-     if(!field) {
-          message(" no value field",errorMessage);
-          return;
-     }
-     Type type = field->getType();
-     if(type==scalar) {
-        normativeType = ntscalar_t;
-     } else if(type==scalarArray) {
-        normativeType = ntscalararray_t;
-     } else if(NTEnum::is_a(structure)) {
-        normativeType = ntenum_t;
-     } else {
-         message(" value is not a valid nttype",errorMessage);
-         return;
-     }
-     gotInterface();
-}
-
-
-
-void PvaInterface::channelGetConnect(
-    const Status& status,
-    ChannelGet::shared_pointer const & channelGet,
-    Structure::const_shared_pointer const & structure)
-{
-    Q_UNUSED(channelGet);
-    Q_UNUSED(structure);
+    Q_UNUSED(channelPut);
     if(!status.isOK()) {
-          message("channelGetConnect failed",errorMessage);
-          return;
-     }
-     channelGet->get();
+         requester->message(pvaChannel->getFullName() + " " + status.getMessage(),errorMessage);
+         return;
+    }
+    putPVStructure = getPVDataCreate()->createPVStructure(structure);
+    putBitSet = BitSetPtr(new BitSet(putPVStructure->getNumberFields()));
+    waitForPutConnect.signal();
 }
 
-void PvaInterface::getDone(
-    const Status& status,
-    ChannelGet::shared_pointer const & channelGet,
-    PVStructurePtr const & pvStructure,
-    BitSet::shared_pointer const & bitSet)
+void PVAInterface::getDone(
+        const Status& status,
+        ChannelPut::shared_pointer const & channelPut,
+        PVStructurePtr const & pvStructure,
+        BitSet::shared_pointer const & bitSet)
 {
-    Q_UNUSED(channelGet);
+    Q_UNUSED(channelPut);
+    Q_UNUSED(pvStructure);
     Q_UNUSED(bitSet);
     if(!status.isOK()) {
-          message("channelGetDone failed",errorMessage);
-          return;
-     }
-     switch(normativeType) {
-       case ntscalar_t : gotDisplayControl(pvStructure); break;
-       case ntscalararray_t : gotDisplayControl(pvStructure); break;
-       case ntenum_t : gotEnum(pvStructure); break;
-       default: throw std::runtime_error("PvaInterface::getDone logic error");
-     }
-     this->channelGet.reset();
+         requester->message(pvaChannel->getFullName() + " " + status.getMessage(),errorMessage);
+         return;
+    }
 }
 
-void PvaInterface::callback()
+void PVAInterface::putDone(
+        const Status& status,
+        ChannelPut::shared_pointer const & channelPut)
 {
+    Q_UNUSED(channelPut);
+    if(!status.isOK()) {
+         requester->message(pvaChannel->getFullName() + " " + status.getMessage(),errorMessage);
+         return;
+    }
+    Lock lock(mutex);
+    putFinished = true;
+    if(Epics4Plugin::getDebug()) cout << "PVAInterface::putDone set putFinished = true\n";
+}
+
+
+void PVAInterface::callback()
+{
+    if(Epics4Plugin::getDebug()) cout << "PVAInterface::callback()\n";
     try {
        switch(callbackType) {
        case interface_t : getInterface(); break;
        case displayControl_t : getDisplayControl(); break;
        case enum_t : getEnum(); break;
        case createMonitor_t : createMonitor(); break;
-       default: throw std::runtime_error("PvaInterface::callback logic error");
+       default: throw std::runtime_error("PVAInterface::callback logic error");
        }
     } catch (std::runtime_error e) {
         cerr << "exception " << e.what() << endl;
@@ -363,19 +885,39 @@ void PvaInterface::callback()
     }
 }
 
-void PvaInterface::connect()
+PVAChannelPtr PVAInterface::getPVAChannel()
 {
-     pvaClientChannel->setStateChangeRequester(shared_from_this());
-     pvaClientChannel->issueConnect();
+     return pvaChannel;
 }
 
-void PvaInterface::getInterface()
+int PVAInterface::reconnect()
 {
-      pvaClientChannel->getChannel()->getField(shared_from_this(),"");
+    if(Epics4Plugin::getDebug()) cout << "PVAInterface::reconnect() not implemented\n";
+    return false;
+}
+   
+int PVAInterface::disconnect()
+{
+    if(Epics4Plugin::getDebug()) cout << "PVAInterface::disconnect()  not implemented\n";
+    return false;
 }
 
-void PvaInterface::gotInterface()
+int PVAInterface::terminateIO()
 {
+    if(Epics4Plugin::getDebug()) cout << "PVAInterface::terminateIO()  not implemented\n";
+    return false;
+}
+
+
+void PVAInterface::getInterface()
+{
+      pvaGetFieldRequester = PVAGetFieldRequesterPtr(new PVAGetFieldRequester(shared_from_this()));
+      pvaChannel->getChannel()->getField(pvaGetFieldRequester ,"");
+}
+
+void PVAInterface::gotInterface()
+{
+    if(Epics4Plugin::getDebug()) cout << "PVAInterface::gotInterface()\n";
     if(normativeType==ntenum_t) {
          callbackType = enum_t;
          callbackThread->queueRequest(shared_from_this());
@@ -398,7 +940,10 @@ void PvaInterface::gotInterface()
            kData.edata.initialize = true;
            kData.edata.accessR = 1;
            kData.edata.accessW = 1;
-           mutexKnobData->SetMutexKnobData(kData.index, kData);
+
+           //mutexKnobData->SetMutexKnobData(kData.index, kData);
+           mutexKnobData->SetMutexKnobDataReceived(&kData);
+
            mutexKnobData->DataUnlock(&kData);
            callbackType = createMonitor_t;
            callbackThread->queueRequest(shared_from_this());
@@ -409,14 +954,15 @@ void PvaInterface::gotInterface()
 }
 
 
-void PvaInterface::getDisplayControl()
+void PVAInterface::getDisplayControl()
 {
 
     PVStructurePtr pvRequest = createRequest->createRequest("display,control");
-    channelGet = pvaClientChannel->getChannel()->createChannelGet(shared_from_this(),pvRequest);
+    pvaChannelGetRequester = PVAChannelGetRequesterPtr(new PVAChannelGetRequester(shared_from_this()));
+    pvaChannelGet = pvaChannel->getChannel()->createChannelGet(pvaChannelGetRequester,pvRequest);
 }
 
-void PvaInterface::gotDisplayControl(PVStructurePtr const & pvStructure)
+void PVAInterface::gotDisplayControl(PVStructurePtr const & pvStructure)
 {
     double controlLow = 0;
     double controlHigh = 0;
@@ -466,21 +1012,25 @@ void PvaInterface::gotDisplayControl(PVStructurePtr const & pvStructure)
     kData.edata.lower_ctrl_limit = controlLow;
     kData.edata.precision = precision;
     kData.edata.accessR = 1;
-    if(controlHigh>controlLow) kData.edata.accessW = 1;
-    mutexKnobData->SetMutexKnobData(kData.index, kData);
+    kData.edata.accessW = 1;
+
+    //mutexKnobData->SetMutexKnobData(kData.index, kData);
+    mutexKnobData->SetMutexKnobDataReceived(&kData);
+
     mutexKnobData->DataUnlock(&kData);
     callbackType = createMonitor_t;
     callbackThread->queueRequest(shared_from_this());
-    channelGet.reset();
+    pvaChannelGet.reset();
 }
 
-void PvaInterface::getEnum()
+void PVAInterface::getEnum()
 {
     PVStructurePtr pvRequest = createRequest->createRequest("value.choices");
-    channelGet = pvaClientChannel->getChannel()->createChannelGet(shared_from_this(),pvRequest);
+    pvaChannelGetRequester = PVAChannelGetRequesterPtr(new PVAChannelGetRequester(shared_from_this()));
+    pvaChannelGet = pvaChannel->getChannel()->createChannelGet(pvaChannelGetRequester,pvRequest);
 }
 
-void PvaInterface::gotEnum(PVStructurePtr const & pvStructure)
+void PVAInterface::gotEnum(PVStructurePtr const & pvStructure)
 {
     PVStringArrayPtr pvChoices = pvStructure->getSubField<PVStringArray>(string("value.choices"));
     choices = pvChoices->view();
@@ -525,20 +1075,26 @@ void PvaInterface::gotEnum(PVStructurePtr const & pvStructure)
     kData.edata.fieldtype  = DBF_ENUM;
     kData.edata.accessR = 1;
     kData.edata.accessW = 1;
-    mutexKnobData->SetMutexKnobData(kData.index, kData);
+
+    //mutexKnobData->SetMutexKnobData(kData.index, kData);
+    mutexKnobData->SetMutexKnobDataReceived(&kData);
+
     mutexKnobData->DataUnlock(&kData);
     callbackType = createMonitor_t;
     callbackThread->queueRequest(shared_from_this());
-    channelGet.reset();
+    pvaChannelGet.reset();
 }
 
-void PvaInterface::createMonitor()
+void PVAInterface::createMonitor()
 {
+    if(Epics4Plugin::getDebug()) cout << "PVAInterface::createMonitor()\n";
     try {
        if(normativeType==ntunknown_t) return;
        string request("value,alarm,timeStamp");
        if(normativeType==ntenum_t) request = "alarm,timeStamp,value.index";
-       pvaMonitor = pvaClientChannel->monitor(request,shared_from_this());
+       PVStructurePtr pvRequest = createRequest->createRequest(request);
+       pvaMonitorRequester = PVAMonitorRequesterPtr(new PVAMonitorRequester(shared_from_this()));
+       monitor = pvaChannel->getChannel()->createMonitor(pvaMonitorRequester,pvRequest);
        gotFirstConnect = true;
        mutexKnobData->SetMutexKnobDataConnected(index,true);
     } catch (std::runtime_error e) {
@@ -547,19 +1103,18 @@ void PvaInterface::createMonitor()
     }
 }
 
-void PvaInterface::gotMonitor()
+void PVAInterface::gotMonitor()
 {
+    if(Epics4Plugin::getDebug()) cout << "PVAInterface::gotMonitor()\n";
 }
+ 
 
-
-void PvaInterface::getScalarData(PVStructurePtr const & pvStructure)
+void PVAInterface::getScalarData(PVStructurePtr const & pvStructure)
 {
-
-    //qDebug() << "getScalarData" << kData.pv;
-    //if(strstr(kData.pv, "BUSY") != (char*) 0) return;
+    if(Epics4Plugin::getDebug()) cout << "getScalarData " << kData.pv << endl;
     PVScalarPtr pvScalar = pvStructure->getSubField<PVScalar>("value");
     if(!pvScalar) {
-        cout << "PvaInterface::getScalarData pvStructure \n" << pvStructure << endl; return;
+        cout << "PVAInterface::getScalarData pvStructure \n" << pvStructure << endl; return;
     }
     
     PVFieldPtr pvAlarmField = pvStructure->getSubField<PVStructure>("alarm");
@@ -656,7 +1211,7 @@ void PvaInterface::getScalarData(PVStructurePtr const & pvStructure)
 
 }
 
-void PvaInterface::getEnumData(PVStructurePtr const & pvStructure)
+void PVAInterface::getEnumData(PVStructurePtr const & pvStructure)
 {
     PVFieldPtr pvAlarmField = pvStructure->getSubField<PVStructure>("alarm");
     if(pvAlarmField) {
@@ -678,31 +1233,32 @@ void PvaInterface::getEnumData(PVStructurePtr const & pvStructure)
 }
 
 template <typename pureData>
-void PvaInterface::fillData(pureData const &array, size_t length, knobData* kPtr) {
-    int size = sizeof(array[0]);
-    if((length * size) != (size_t) kPtr->edata.dataSize) {
-        if(kPtr->edata.dataB != (void*) 0) free(kPtr->edata.dataB);
-        kPtr->edata.dataB = (void*) malloc(length * size);
-        kPtr->edata.dataSize = length * size;
+void PVAInterface::fillData(pureData const &array, size_t length, knobData* kPtr) {
+    if(length>0) {
+        int size = sizeof(array[0]);
+        if((length * size) > (size_t) kPtr->edata.dataSize) {
+            if(kPtr->edata.dataB != (void*) 0) free(kPtr->edata.dataB);
+            kPtr->edata.dataB = (void*) malloc(length * size);
+            kPtr->edata.dataSize = length * size;
+        }
+        memcpy(kPtr->edata.dataB, &array[0],  length * size);
     }
-    memcpy(kPtr->edata.dataB, &array[0],  length * size);
     kData.edata.valueCount = length;
-
     kData.edata.monitorCount++;
 }
 
 
-void PvaInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
+void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
 {
+
     PVScalarArrayPtr pva = pvStructure->getSubField<PVScalarArray>("value");
     ScalarArrayConstPtr scalar = pva->getScalarArray();
     ScalarType scalarType = scalar->getElementType();
     int length = pva->getLength();
-
     switch(scalarType) {
 
     case pvBoolean:
-        pvaClient->message("array of pvString not yet supported", errorMessage);
+        message("array of pvString not yet supported", errorMessage);
         break;
 
     case pvString: {
@@ -717,8 +1273,9 @@ void PvaInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
         int numBytes = 0;
         for(int i=0; i<length; ++i)
         {
-             numBytes += array[i].length() + 1;
+             numBytes += array[i].length();
         }
+        numBytes += length*3 + 1;
         if(numBytes>kData.edata.dataSize) {
              if(kData.edata.dataB != (void*) 0) free(kData.edata.dataB);
              kData.edata.dataB = (void*) malloc(numBytes);
@@ -729,10 +1286,11 @@ void PvaInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
         {
              const string value = array[i];
              int len = value.length();
+             ptr[0] = '"'; ++ptr;
              memcpy(ptr,value.data(),len);
              ptr += len;
-             ptr[0] = '\033';
-             ++ptr;
+             ptr[0] = '"'; ++ptr;
+             ptr[0] = ','; ++ptr;
         }
         ptr--;
         ptr[0] = '\0';
@@ -819,7 +1377,7 @@ void PvaInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
 
     case pvLong:
     case pvULong:
-        pvaClient->message("array of pvLong not yet supported", errorMessage);
+        requester->message("array of pvLong not yet supported", errorMessage);
         return;
 
     case pvFloat: {
@@ -850,34 +1408,50 @@ void PvaInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
     }
 }
 
-bool PvaInterface::setValue(double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType)
+bool PVAInterface::setValue(double rdata, int32_t idata, char *sdata, int forceType)
 {
-    Q_UNUSED(object);
-    Q_UNUSED(errmess);
-    Q_UNUSED(forceType);
-    if(!pvaClientChannel->getChannel()) {
-         pvaClient->message("setValue called for unconnected channel",errorMessage);
-         return false;
+    string request("value");
+    if(normativeType==ntenum_t) request= "value.index";
+    if(!pvaChannelPut) {
+        PVStructurePtr pvRequest = createRequest->createRequest(request);
+        pvaChannelPutRequester = PVAChannelPutRequesterPtr(new PVAChannelPutRequester(shared_from_this()));
+        pvaChannelPut =
+            pvaChannel->getChannel()->createChannelPut(pvaChannelPutRequester,pvRequest);
+        bool signaled = waitForPutConnect.wait(5.0);
+        if (!signaled)
+        {
+            requester->message("timeout on createChannelPut", errorMessage);
+            return false;
+        }
     }
+    {
+        Lock lock(mutex);
+        if(Epics4Plugin::getDebug())
+             cout << "PVAInterface::setValue putFinished " << (putFinished ? "true" : "false") << endl;
+        if(!putFinished) {
+             requester->message("previous put did not complete", errorMessage);
+             return false;
+        }
+        putFinished = false;
+    }
+    size_t index = putPVStructure->getStructure()->getFieldIndex("value");
+    putBitSet->set(index);
+
     if(normativeType==ntenum_t){
        int enumCount = choices.size();
        for(int32 ind = 0; ind < enumCount; ++ind) {
            const string val = choices[ind];
            if(val.compare(sdata)==0) {
-               PvaClientPutPtr put = pvaClientChannel->put("value.index");
-               PvaClientPutDataPtr putData = put->getData();
-               PVIntPtr pvInt = putData->getPVStructure()->getSubField<PVInt>("value.index");
+               PVIntPtr pvInt = putPVStructure->getSubField<PVInt>(request);
                pvInt->put(ind);
-               put->put();
+               pvaChannelPut->put(putPVStructure,putBitSet);
                return true;
            }
        }
        return false;
     }
-    PvaClientPutPtr put = pvaClientChannel->put();
-    PvaClientPutDataPtr putData = put->getData();
-    PVStructurePtr pvStructure = putData->getPVStructure();
-    PVScalarPtr pvScalar = pvStructure->getSubField<PVScalar>("value");
+
+    PVScalarPtr pvScalar = putPVStructure->getSubField<PVScalar>("value");
     ScalarType scalarType = pvScalar->getScalar()->getScalarType();
 
     if(forceType == 1) scalarType = pvDouble;
@@ -916,11 +1490,132 @@ bool PvaInterface::setValue(double rdata, int32_t idata, char *sdata, char *obje
     }
          break;
     }
-    put->put();
+    pvaChannelPut->put(putPVStructure,putBitSet);
     return true;
 }
 
-bool PvaInterface::getTimeStamp(char *buf)
+bool PVAInterface::setArrayValue(
+    float *fdata, double *ddata,
+    int16_t *data16, int32_t *data32,
+    char *sdata, int nelm)
+{
+    if(!pvaChannelPut) {
+        PVStructurePtr pvRequest = createRequest->createRequest("value");
+        pvaChannelPutRequester = PVAChannelPutRequesterPtr(new PVAChannelPutRequester(shared_from_this()));
+        pvaChannelPut =
+            pvaChannel->getChannel()->createChannelPut(pvaChannelPutRequester,pvRequest);
+        bool signaled = waitForPutConnect.wait(5.0);
+        if (!signaled)
+        {
+            requester->message("timeout on createChannelPut", errorMessage);
+            return false;
+        }
+    }
+    {
+        Lock lock(mutex);
+        if(Epics4Plugin::getDebug())
+            cout<< "PVAInterface::setArrayValue putFinished " << (putFinished ? "true" : "false") << endl;
+        if(!putFinished) {
+             requester->message("previous put did not complete", errorMessage);
+             return false;
+        }
+        putFinished = false;
+    }
+    size_t index = putPVStructure->getStructure()->getFieldIndex("value");
+    putBitSet->set(index);
+    PVScalarArrayPtr pvScalarArray = putPVStructure->getSubField<PVScalarArray>("value");
+    ScalarType scalarType = pvScalarArray->getScalarArray()->getElementType();
+    
+    switch (scalarType) {
+    case pvBoolean:
+    {
+         requester->message("setArrayValue not supported for elementType pvBoolean",errorMessage);
+         return false;
+    }
+         break;
+    case pvByte:
+    {
+        shared_vector<int8> values(nelm);
+        for(int i=0; i<nelm; ++i) values[i] = sdata[i];
+        pvScalarArray->putFrom(freeze(values));
+    }
+        break;
+    case pvShort:
+    {
+        shared_vector<int16> values(nelm);
+        for(int i=0; i<nelm; ++i) values[i] = data16[i];
+        pvScalarArray->putFrom(freeze(values));
+    }
+        break;
+    case pvInt:
+    {
+        shared_vector<int32> values(nelm);
+        for(int i=0; i<nelm; ++i) values[i] = data32[i];
+        pvScalarArray->putFrom(freeze(values));
+    }
+        break;
+    case pvLong:
+    {
+        shared_vector<int64> values(nelm);
+        for(int i=0; i<nelm; ++i) values[i] = data32[i];
+        pvScalarArray->putFrom(freeze(values));
+    }
+        break;
+    case pvUByte:
+    {
+        shared_vector<uint8> values(nelm);
+        for(int i=0; i<nelm; ++i) values[i] = sdata[i];
+        pvScalarArray->putFrom(freeze(values));
+    }
+        break;
+    case pvUShort:
+    {
+        shared_vector<uint16> values(nelm);
+        for(int i=0; i<nelm; ++i) values[i] = data16[i];
+        pvScalarArray->putFrom(freeze(values));
+    }
+        break;
+    case pvUInt:
+    {
+        shared_vector<uint32> values(nelm);
+        for(int i=0; i<nelm; ++i) values[i] = data32[i];
+        pvScalarArray->putFrom(freeze(values));
+    }
+        break;
+    case pvULong:
+    {
+        shared_vector<uint64> values(nelm);
+        for(int i=0; i<nelm; ++i) values[i] = data32[i];
+        pvScalarArray->putFrom(freeze(values));
+    }
+        break;
+    case pvFloat:
+    {
+        shared_vector<float> values(nelm);
+        for(int i=0; i<nelm; ++i) values[i] = fdata[i];
+        pvScalarArray->putFrom(freeze(values));
+    }
+        break;
+    case pvDouble:
+    {
+        shared_vector<double> values(nelm);
+        for(int i=0; i<nelm; ++i) values[i] = ddata[i];
+        pvScalarArray->putFrom(freeze(values));
+    }
+         break;
+    case pvString:
+    {
+         requester->message("setArrayValue not supported for elementType pvString",errorMessage);
+         return false;
+    }
+         break;
+    }
+    pvaChannelPut->put(putPVStructure,putBitSet);
+    return true;
+}
+
+
+bool PVAInterface::getTimeStamp(char *buf)
 {
     if(!structure->getField("timeStamp")) return false;
     time_t tt;
@@ -938,6 +1633,8 @@ bool PvaInterface::getTimeStamp(char *buf)
 
 using namespace epics::caqtdm::epics4;
 
+bool Epics4Plugin::debug = false;
+
 QString Epics4Plugin::pluginName()
 {
     return "epics4";
@@ -945,86 +1642,114 @@ QString Epics4Plugin::pluginName()
 
 Epics4Plugin::Epics4Plugin()
 {
-//PvaClient::setDebug(true);
-    if(PvaClient::getDebug()) cout << "Epics4Plugin::Epics4Plugin()\n";
-    qDebug() << "Epics4Plugin::Epics4Plugin";
+    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::Epics4Plugin\n";
 }
 
 Epics4Plugin::~Epics4Plugin()
 {
-    qDebug() << "Epics4Plugin:~Epics4Plugin";
-    if(PvaClient::getDebug()) cout << "Epics4Plugin::~~Epics4Plugin()\n";
+    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin:~Epics4Plugin\n";
 }
 
 
 int Epics4Plugin::initCommunicationLayer(MutexKnobData *mutexKnobDataP, MessageWindow *messageWindow, QMap<QString, QString> options)
 {
-    if(PvaClient::getDebug()) cout << "Epics4Plugin::initCommunicationLayer\n";
-    qDebug() << "Epics4Plugin: InitCommunicationLayer with options" << options;
+    Q_UNUSED(options);
+    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::initCommunicationLayer\n";
     mutexKnobData = mutexKnobDataP;
-    pvaClient = PvaClient::get("pva ca");
+    ClientFactory::start();
+    CAClientFactory::start();
     callbackThread = CallbackThread::create();
     requester = Epics4RequesterPtr(new Epics4Requester(messageWindow));
-    pvaClient->setRequester(requester);
-    qDebug() << "Epics4Plugin::Epics4Plugin";
-    if(PvaClient::getDebug()) {
-        long pvaClientuseCount = pvaClient.use_count();
-        long callbackUseCount = callbackThread.use_count();
-        long requesterUseCount = requester.use_count();
-         cout << "Epics4Plugin::initCommunicationLayer"
-         << " pvaClientuseCount " << pvaClientuseCount
-         << " callbackUseCount " << callbackUseCount
-         << " requesterUseCount " << requesterUseCount
-         << endl;
-     }
+    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::initCommunicationLayer return true\n";
     return true;
 }
 
 int Epics4Plugin::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 {
-    if(PvaClient::getDebug()) cout << "Epics4Plugin::pvAddMonitor\n";
     Q_UNUSED(rate);
     Q_UNUSED(skip);
-    qDebug() << "Epics4Plugin:pvAddMonitor" << kData->pv << kData->index;
-    PvaInterfaceGlue *pvaInterfaceGlue = static_cast<PvaInterfaceGlue *>(kData->edata.info);
-    if(pvaInterfaceGlue) throw std::runtime_error("Epics4Plugin::pvAddMonitor alreadt added");
-    string name(kData->pv);
-//    size_t pos = name.find("://");
-//    if (pos==std::string::npos) {
-//         pvaClient->message(name + " invalid prefix",errorMessage);
-//         return false;
-//    }
-//    string providerName(name.substr(0,pos));
-//    string channelName(name.substr(pos+3));
-    string providerName("pva");
-    string channelName(name);
-    PvaInterfacePtr pvaInterface(
-         new PvaInterface(pvaClient, mutexKnobData,index,requester,callbackThread,channelName,providerName));
-    pvaInterfaceGlue = new PvaInterfaceGlue(pvaInterface);
+    
+    if(Epics4Plugin::getDebug()) {
+        cout << "Epics4Plugin::pvAddMonitor"
+        << " pv " << kData->pv
+        << " index " << kData->index
+        << endl;
+    }
+    PVAInterfaceGlue *pvaInterfaceGlue = static_cast<PVAInterfaceGlue *>(kData->edata.info);
+    if(pvaInterfaceGlue) throw std::runtime_error("Epics4Plugin::pvAddMonitor already added");
+    string channelName(kData->pv);
+    string providerName(kData->pluginFlavor);
+    string fullname(providerName+"://"+channelName);
+
+    if(Epics4Plugin::getDebug()) {
+        cout << "providerName " << providerName
+        << " channelName " << channelName
+        << " fullname " << fullname
+        << endl;
+    }
+
+    PVAChannelPtr pvaChannel;
+    bool foundit(false);
+    std::map<string,PVAChannelWPtr>::iterator it = pvaChannelMap.find(fullname);
+    if(it != pvaChannelMap.end()) {
+        pvaChannel = it->second.lock();
+        if(pvaChannel) {
+            foundit = true;
+            if(Epics4Plugin::getDebug()) cout << "found it\n";
+        } else {
+             pvaChannelMap.erase(it);
+             if(Epics4Plugin::getDebug()) cout << "erase it\n";
+        }
+    }
+    if(!foundit) {
+        pvaChannel = PVAChannelPtr(new PVAChannel(fullname,requester,callbackThread));
+        pvaChannel->connect(channelName,providerName);
+        pvaChannelMap.insert(std::pair<string,PVAChannelWPtr>(fullname,pvaChannel));
+        if(Epics4Plugin::getDebug())cout << "created new and called connect\n";
+    }
+    PVAInterfacePtr pvaInterface(
+         new PVAInterface(pvaChannel, mutexKnobData,index,requester,callbackThread));
+    pvaInterfaceGlue = new PVAInterfaceGlue(pvaInterface);
     kData->edata.info = pvaInterfaceGlue;
     C_SetMutexKnobData(mutexKnobData, index, *kData);
-    pvaInterface->connect();
+    if(Epics4Plugin::getDebug()) cout << "calling addInterface\n";
+    pvaChannel->addInterface(pvaInterface);
     return true;
 }
 
 
 int Epics4Plugin::pvClearMonitor(knobData *kData) {
-    if(PvaClient::getDebug()) cout << "Epics4Plugin::pvClearMonitor\n";
-    qDebug() << "Epics4Plugin:pvClearMonitor";
-    kData->index = -1;
-    kData->pv[0] = '\0';
+    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin:pvClearMonitor\n";
+    if (kData->edata.info == (void *) 0)
+        throw std::runtime_error(
+            "Epics4Plugin::pvClearMonitor kData->edata.info  is null");
+    PVAInterfaceGlue *pvaInterfaceGlue  = static_cast<PVAInterfaceGlue *>(kData->edata.info);
+    PVAInterfacePtr pvaInterface = pvaInterfaceGlue->getPVAInterface();
+    if(!pvaInterface)
+         throw std::runtime_error("Epics4Plugin::pvClearMonitor pvaInterface is null");
+    pvaInterface->clearMonitor();
     return true;
 }
 
 int Epics4Plugin::pvFreeAllocatedData(knobData *kData)
 {
-    if(PvaClient::getDebug()) cout << "Epics4Plugin::pvFreeAllocatedData\n";
-    qDebug() << "Epics4Plugin:pvFreeAllocatedData";
-    if (kData->edata.info == (void *) 0) std::runtime_error("Epics4Plugin::pvFreeAllocatedData kData->edata.info  is null");
-    PvaInterfaceGlue *pvaInterfaceGlue  = static_cast<PvaInterfaceGlue *>(kData->edata.info);
-    PvaInterfacePtr pvaInterface = pvaInterfaceGlue->getPvaInterface();
-    if(!pvaInterface) std::runtime_error("Epics4Plugin::pvFreeAllocatedData pvaInterface is null");
-
+    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin:pvFreeAllocatedData\n";
+    if (kData->edata.info == (void *) 0)
+        throw std::runtime_error(
+            "Epics4Plugin::pvFreeAllocatedData kData->edata.info  is null");
+    PVAInterfaceGlue *pvaInterfaceGlue  = static_cast<PVAInterfaceGlue *>(kData->edata.info);
+    PVAInterfacePtr pvaInterface = pvaInterfaceGlue->getPVAInterface();
+    if(!pvaInterface)
+         throw std::runtime_error("Epics4Plugin::pvFreeAllocatedData pvaInterface is null");
+    PVAChannelPtr pvaChannel(pvaInterface->getPVAChannel());
+    bool isLast = pvaChannel->removeInterface(pvaInterface);
+    if(isLast) {
+         string fullName = pvaChannel->getFullName();
+         std::map<string,PVAChannelWPtr>::iterator it = pvaChannelMap.find(fullName);
+         pvaChannelMap.erase(it);
+         pvaChannel->destroy();
+    }
+    pvaInterface->destroy();
     kData->edata.info = NULL;
     delete pvaInterfaceGlue;
     if(kData->edata.dataB != (void*) 0) {
@@ -1034,108 +1759,97 @@ int Epics4Plugin::pvFreeAllocatedData(knobData *kData)
     return true;
 }
 
-bool Epics4Plugin::pvSetValue(knobData *kData, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType)
+bool Epics4Plugin::pvSetValue(knobData *kData,
+     double rdata, int32_t idata,
+     char *sdata, char *object, char *errmess, int forceType)
 {
-    if(PvaClient::getDebug()) cout << "Epics4Plugin::pvSetValue\n";
-    qDebug() << "Epics4Plugin:pvSetValue";
-    if (kData->edata.info == (void *) 0) std::runtime_error("Epics4Plugin::pvSetValue kData->edata.info  is null");
-    PvaInterfaceGlue *pvaInterfaceGlue  = static_cast<PvaInterfaceGlue *>(kData->edata.info);
-    PvaInterfacePtr pvaInterface = pvaInterfaceGlue->getPvaInterface();
-    if(!pvaInterface) std::runtime_error("Epics4Plugin::pvSetValue pvaInterface is null");
-    pvaInterface->setValue(rdata,idata,sdata,object,errmess,forceType);
-    return true;
-}
-
-bool Epics4Plugin::pvSetWave(knobData *kData, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess) {
-    Q_UNUSED(kData);
-    Q_UNUSED(fdata);
-    Q_UNUSED(ddata);
-    Q_UNUSED(data16);
-    Q_UNUSED(data32);
-    Q_UNUSED(sdata);
-    Q_UNUSED(nelm);
     Q_UNUSED(object);
     Q_UNUSED(errmess);
-    if(PvaClient::getDebug()) cout << "Epics4Plugin::pvSetWave\n";
-    qDebug() << "Epics4Plugin:pvSetWave";
-    return false;
+    Q_UNUSED(forceType);
+    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin:pvSetValue\n";
+    if (kData->edata.info == (void *) 0) throw std::runtime_error("Epics4Plugin::pvSetValue kData->edata.info  is null");
+    PVAInterfaceGlue *pvaInterfaceGlue  = static_cast<PVAInterfaceGlue *>(kData->edata.info);
+    PVAInterfacePtr pvaInterface = pvaInterfaceGlue->getPVAInterface();
+    if(!pvaInterface) throw std::runtime_error("Epics4Plugin::pvSetValue pvaInterface is null");
+    return pvaInterface->setValue(rdata,idata,sdata,forceType);
+}
+
+bool Epics4Plugin::pvSetWave(knobData *kData,
+    float *fdata, double *ddata,
+    int16_t *data16, int32_t *data32, char *sdata, int nelm,
+    char *object, char *errmess)
+{
+    Q_UNUSED(object);
+    Q_UNUSED(errmess);
+    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin:pvSetWave\n";
+     if (kData->edata.info == (void *) 0) throw std::runtime_error("Epics4Plugin::pvSetWave kData->edata.info  is null");
+    PVAInterfaceGlue *pvaInterfaceGlue  = static_cast<PVAInterfaceGlue *>(kData->edata.info);
+    PVAInterfacePtr pvaInterface = pvaInterfaceGlue->getPVAInterface();
+    if(!pvaInterface) throw std::runtime_error("Epics4Plugin::pvSetWave pvaInterface is null");
+    return pvaInterface->setArrayValue(fdata,ddata,data16,data32,sdata,nelm);
 }
 
 bool Epics4Plugin::pvGetTimeStamp(knobData *kData, char *timestamp) {
-    if(PvaClient::getDebug()) cout << "Epics4Plugin::pvGetTimeStamp\n";
-    qDebug() << "Epics4Plugin:pvGetTimeStamp";
-    if (kData->edata.info == (void *) 0) std::runtime_error("Epics4Plugin::pvGetTimeStamp kData->edata.info  is null");
-    PvaInterfaceGlue *pvaInterfaceGlue  = static_cast<PvaInterfaceGlue *>(kData->edata.info);
-    PvaInterfacePtr pvaInterface = pvaInterfaceGlue->getPvaInterface();
-    if(!pvaInterface) std::runtime_error("Epics4Plugin::pvGetTimeStamp pvaInterface is null");
+    if(Epics4Plugin::getDebug()) cout  << "Epics4Plugin:pvGetTimeStamp\n";
+    if (kData->edata.info == (void *) 0) throw std::runtime_error("Epics4Plugin::pvSetWave kData->edata.info  is null");
+    PVAInterfaceGlue *pvaInterfaceGlue  = static_cast<PVAInterfaceGlue *>(kData->edata.info);
+    PVAInterfacePtr pvaInterface = pvaInterfaceGlue->getPVAInterface();
+    if(!pvaInterface) throw std::runtime_error("Epics4Plugin::pvSetWave pvaInterface is null");
     pvaInterface->getTimeStamp(timestamp);
     return true;
 }
 
 bool Epics4Plugin::pvGetDescription(knobData *kData, char *description) {
-    if(PvaClient::getDebug()) cout << "Epics4Plugin::pvGetDescription\n";
     Q_UNUSED(kData);
     Q_UNUSED(description);
-    qDebug() << "Epics4Plugin:pvGetDescription";
+    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin:pvGetDescription\n";
     return false;
 }
 
 int Epics4Plugin::pvClearEvent(void * ptr) {
-    //qDebug() << "Epics4Plugin:pvClearEvent not implemented";
+    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin:pvClearEvent not implemented\n";
     Q_UNUSED(ptr);
     return false;
 }
 
 int Epics4Plugin::pvAddEvent(void * ptr) {
-    //if(PvaClient::getDebug()) cout << "Epics4Plugin::pvAddEvent not implemented\n";
+    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin:pvAddEvent not implemented\n";
     Q_UNUSED(ptr);
     return false;
 }
 
 int Epics4Plugin::pvReconnect(knobData *kData) {
-    if(PvaClient::getDebug()) cout << "Epics4Plugin::pvReconnect\n";
-    qDebug() << "Epics4Plugin:pvReconnect";
-    if (kData->edata.info == (void *) 0) std::runtime_error("Epics4Plugin::pvReconnect kData->edata.info  is null");
-    PvaInterfaceGlue *pvaInterfaceGlue  = static_cast<PvaInterfaceGlue *>(kData->edata.info);
-    PvaInterfacePtr pvaInterface = pvaInterfaceGlue->getPvaInterface();
-    if(!pvaInterface) std::runtime_error("Epics4Plugin::pvReconnect pvaInterface is null");
+    if(Epics4Plugin::getDebug()) cout  << "Epics4Plugin:pvReconnect\n";
+    if (kData->edata.info == (void *) 0) throw std::runtime_error("Epics4Plugin::pvReconnect kData->edata.info  is null");
+    PVAInterfaceGlue *pvaInterfaceGlue  = static_cast<PVAInterfaceGlue *>(kData->edata.info);
+    PVAInterfacePtr pvaInterface = pvaInterfaceGlue->getPVAInterface();
+    if(!pvaInterface) throw std::runtime_error("Epics4Plugin::pvReconnect pvaInterface is null");
     return pvaInterface->reconnect();
 }
 
 int Epics4Plugin::pvDisconnect(knobData *kData) {
-    if(PvaClient::getDebug()) cout << "Epics4Plugin::pvDisconnect\n";
-    qDebug() << "Epics4Plugin:pvDisconnect";
-    if (kData->edata.info == (void *) 0) std::runtime_error("Epics4Plugin::pvDisconnect kData->edata.info  is null");
-    PvaInterfaceGlue *pvaInterfaceGlue  = static_cast<PvaInterfaceGlue *>(kData->edata.info);
-    PvaInterfacePtr pvaInterface = pvaInterfaceGlue->getPvaInterface();
-    if(!pvaInterface) std::runtime_error("Epics4Plugin::pvDisconnect pvaInterface is null");
+    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin:pvDisconnect\n";
+    if (kData->edata.info == (void *) 0) throw std::runtime_error("Epics4Plugin::pvDisconnect kData->edata.info  is null");
+    PVAInterfaceGlue *pvaInterfaceGlue  = static_cast<PVAInterfaceGlue *>(kData->edata.info);
+    PVAInterfacePtr pvaInterface = pvaInterfaceGlue->getPVAInterface();
+    if(!pvaInterface) throw std::runtime_error("Epics4Plugin::pvDisconnect pvaInterface is null");
     return pvaInterface->disconnect();
 }
 
 int Epics4Plugin::FlushIO() {
-   // qDebug() << "Epics4Plugin:FlushIO";
+//    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin:FlushIO\n";
     ca_flush_io();
     return true;
 }
 
 
 int Epics4Plugin::TerminateIO() {
-cout << "Epics4Plugin::TerminateIO\n";
-    qDebug() << "Epics4Plugin:TerminateIO";
-    if(PvaClient::getDebug()) {
-        long pvaClientuseCount = pvaClient.use_count();
-        long callbackUseCount = callbackThread.use_count();
-        long requesterUseCount = requester.use_count();
-        cout << "Epics4Plugin::~Epics4Plugin()"
-        << " pvaClientuseCount " << pvaClientuseCount
-        << " callbackUseCount " << callbackUseCount
-        << " requesterUseCount " << requesterUseCount
-        << endl;
-    }
-    pvaClient.reset();
-    callbackThread.reset();
-    requester.reset();
-    if(PvaClient::getDebug()) cout << "Epics4Plugin::TerminateIO returning\n";
+Epics4Plugin::setDebug(true);
+    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::TerminateIO calling ClientFactory::stop();\n";
+    ClientFactory::stop();
+    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::TerminateIO calling CAClientFactory::stop();\n";
+    CAClientFactory::stop();
+    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::TerminateIO returning true;\n";
     return true;
 }
 

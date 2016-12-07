@@ -2572,7 +2572,8 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     bool doNothing = false;
     int cpylen;
     int indx;
-    QString pluginName;
+    QString pluginName="";
+    QString pluginFlavor="";
     ControlsInterface *plugininterface = (ControlsInterface *) 0;
 
 
@@ -2611,9 +2612,25 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     if(pos != -1) {
         pluginName = newPV.mid(0, pos);
         trimmedPV = newPV.mid(pos+3);
+
+        // take care of some specialties epics4 (one can specify epics4://, pva:// or ca://
+        if(pluginName.contains("epics4")) pluginFlavor = "pva";  // default when epics4 is specified
+        else if(pluginName.contains("ca")) {
+            pluginName = "epics4";
+            pluginFlavor = "ca";
+        } else if(pluginName.contains("pva")) {
+            pluginName = "epics4";
+            pluginFlavor = "pva";
+        }
+
     } else {
         if(defaultPlugin.isEmpty()) {
+#ifdef PVAISDEFAULTPROVIDER
+           pluginName = "epics4";
+           pluginFlavor = "ca";
+#else
            pluginName = "epics3";
+#endif
         } else {
            pluginName = defaultPlugin;
         }
@@ -2624,6 +2641,7 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
 
     *pvRep = trimmedPV;
     strcpy(kData->pluginName, (char*) qasc(pluginName));
+    strcpy(kData->pluginFlavor, (char*) qasc(pluginFlavor));
 
     cpylen = qMin(trimmedPV.length(), MAXPVLEN-1);
     strncpy(kData->pv, (char*) qasc(trimmedPV), (size_t) cpylen);

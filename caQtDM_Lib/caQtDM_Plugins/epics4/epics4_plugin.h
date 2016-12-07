@@ -27,17 +27,28 @@
 
 #include <map>
 #include <caerr.h>
-//#include <queue>
-//#include <epicsThread.h>
-//#include <pv/event.h>
+
+#include <list>
+#include <iostream>
+#include <compilerDependencies.h>
+#include <pv/requester.h>
+#include <pv/status.h>
+#include <pv/event.h>
+#include <pv/lock.h>
 #include <pv/pvData.h>
-#include <pv/pvaClient.h>
-#include <pv/convert.h>
+#include <pv/pvCopy.h>
+#include <pv/pvTimeStamp.h>
+#include <pv/timeStamp.h>
+#include <pv/pvAlarm.h>
+#include <pv/alarm.h>
+#include <pv/pvAccess.h>
+#include <pv/clientFactory.h>
+#include <pv/caProvider.h>
 #include <pv/standardField.h>
 #include <pv/standardPVField.h>
-#include <pv/alarm.h>
-#include <pv/pvAlarm.h>
-#include <pv/timeStamp.h>
+#include <pv/createRequest.h>
+#include <pv/nt.h>
+#include <pv/convert.h>
 
 
 #include <QObject>
@@ -50,9 +61,10 @@
 namespace epics { namespace caqtdm { namespace epics4 {
 
 
-class PvaInterface;
-typedef std::tr1::shared_ptr<PvaInterface> PvaInterfacePtr;
-typedef std::tr1::weak_ptr<PvaInterface> PvaInterfaceWPtr;
+
+class PVAChannel;
+typedef std::tr1::shared_ptr<PVAChannel> PVAChannelPtr;
+typedef std::tr1::weak_ptr<PVAChannel> PVAChannelWPtr;
 
 
 }}}
@@ -107,9 +119,13 @@ public:
     int pvDisconnect(knobData *kData);
     int FlushIO();
     int TerminateIO();
+    static void setDebug(bool value) {debug = value;}
+    static bool getDebug() {return debug;}
+
 
   private:
-    epics::pvaClient::PvaClientPtr pvaClient;
+    static bool debug;
+    std::map<std::string,epics::caqtdm::epics4::PVAChannelWPtr> pvaChannelMap;
     epics::caqtdm::epics4::Epics4RequesterPtr requester;
     epics::pvData::CallbackThreadPtr callbackThread;
     MutexKnobData * mutexKnobData;

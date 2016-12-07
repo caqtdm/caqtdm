@@ -68,7 +68,11 @@ CONFIG += XDR_HACK
 }
 
 # undefine this for epics4 plugin support (only preliminary version as example)
+# one can specify channel access with ca:// and pv access with pvs:// (both use the epics4 plugin)
 #CONFIG += epics4
+# undefine this to make the ca provider from pvAccess (epics4) the default provider
+# otherwise the ca provider from epics3 base is the default provider
+#DEFINES += PVAISDEFAULTPROVIDER
 
 # undefine this for bsread (zeromq) plugin support
 #CONFIG += bsread
