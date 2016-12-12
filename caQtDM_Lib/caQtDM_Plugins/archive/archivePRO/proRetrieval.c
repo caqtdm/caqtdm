@@ -59,7 +59,7 @@ int GetLogShift(int startSeconds, char *dev, int *nbVal, float *Timer, float *Yv
 
     now = yearday + ((double) hourn + (double) minn/ 60.0 + (double) secn / 3600.0) / 24.0;
 
-    printf("now=%f dev=%s\n", now, dev);
+    //printf("now=%f dev=%s\n", now, dev);
 
     int startHours = startSeconds/3600;
     if((hourn - startHours) > 0) {
@@ -68,7 +68,7 @@ int GetLogShift(int startSeconds, char *dev, int *nbVal, float *Timer, float *Yv
         day =  startHours/24 + 1;
     }
 
-    printf("day=%d Maxval=%d\n", day, 3600/5 * 24 * (day+1));
+    //printf("day=%d Maxval=%d\n", day, 3600/5 * 24 * (day+1));
 
     Numdev = 1;
     Maxval = Numval = 3600/5 * 24 * (day+1);  // anyhow too big, while in principle every 5 seconds
@@ -94,14 +94,14 @@ int GetLogShift(int startSeconds, char *dev, int *nbVal, float *Timer, float *Yv
 
     // loggingserver is set by environment variable
     gmv("hipa-lgexp.psi.ch", Numdev, &Numval, logid, annee, retr_time, Device, Valdev, Timef, Valerr, Numdev, Maxval, &Tau);
-    printf("Numval=%d Numdev=%d\n", Numval, Numdev);
+    //printf("Numval=%d Numdev=%d\n", Numval, Numdev);
 
     for (j = 0; j < Numdev; j++) {
         int indx = j + Numdev * (Maxval - 1);
         nbVal[j] = Timef[indx]-2;
     }
     if (Numval < 5) {
-        printf("no data\n");
+        //printf("no data\n");
         return 0;
     }
 

@@ -34,7 +34,6 @@ ArchiverCommon::ArchiverCommon()
 
 void ArchiverCommon::updateInterface()
 {
-    emit Signal_UpdateInterface(listOfIndexes);
     QMutexLocker locker(&mutex);
 
     // after first start, set timer to wanted period
@@ -51,7 +50,7 @@ void ArchiverCommon::updateInterface()
 // initialize our communicationlayer with everything you need
 int ArchiverCommon::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow, QMap<QString, QString> options)
 {
-    qDebug() << "ArchivePlugin: InitCommunicationLayer with options" << options;
+    //qDebug() << "ArchivePlugin: InitCommunicationLayer with options" << options;
     mutexknobdataP = data;
     messagewindowP = messageWindow;
     timerRunning = false;
@@ -75,7 +74,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
     QMutexLocker locker(&mutex);
 
-    qDebug() << "ArchivePlugin:pvAddMonitor" << kData->pv << kData->index << kData->dispName;
+    //qDebug() << "ArchivePlugin:pvAddMonitor" << kData->pv << kData->index << kData->dispName;
 
     if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) kData->dispW)) {
         char asc[50];
@@ -98,9 +97,9 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
         index.pv = index.pv.replace(".X", "");
         index.pv = index.pv.replace(".Y", "");
         index.indexX = index.indexY = 0;
-        if(kData->specData[2] == 0) index.indexX = kData->index;
-        else if(kData->specData[2] == 1) index.indexY = kData->index;
-        //index.archive = archive;
+        if(kData->specData[2] == caCartesianPlot::CH_X) index.indexX = kData->index;        // x
+        else if(kData->specData[2] == caCartesianPlot::CH_Y) index.indexY = kData->index;   // y
+
         index.secondspast = secondsPast;
         if(!listOfIndexes.contains(key)) {
             listOfIndexes.insert(key, index);
@@ -108,9 +107,9 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
             QMap<QString, indexes>::iterator i = listOfIndexes.find(key);
             while (i !=listOfIndexes.end() && i.key() == key) {
                 indexes indexNew = i.value();
-                if(kData->specData[2] == 0) indexNew.indexX = kData->index;
-                else if(kData->specData[2] == 1) indexNew.indexY = kData->index;
-                qDebug() << indexNew.indexX << indexNew.indexY;
+                if(kData->specData[2] == caCartesianPlot::CH_X) indexNew.indexX = kData->index;
+                else if(kData->specData[2] == caCartesianPlot::CH_Y) indexNew.indexY = kData->index;
+                //qDebug() << indexNew.indexX << indexNew.indexY;
                 listOfIndexes.insert(key, indexNew);
                 break;
             }
@@ -126,7 +125,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double> TimerN, QVector<double> YValsN)
 {
     if(nbVal > 0) {
-        qDebug() << "update plot" << indexNew.indexX <<indexNew.indexY << mutexknobdataP;
+        //qDebug() << "update plot" << indexNew.indexX <<indexNew.indexY << mutexknobdataP;
         knobData* kData = mutexknobdataP->GetMutexKnobDataPtr(indexNew.indexX);
         //qDebug() << indexNew.indexX;
         if((kData != (knobData *) 0) && (kData->index != -1)) {
@@ -136,17 +135,16 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double
             kData->edata.accessR = kData->edata.accessW = true;
             kData->edata.monitorCount++;
 
-            if(nbVal>0) {
-                if((nbVal * sizeof(double)) > (size_t) kData->edata.dataSize) {
-                    if(kData->edata.dataB != (void*) 0) free(kData->edata.dataB);
-                    kData->edata.dataB = (void*) malloc(nbVal * sizeof(double));
-                    kData->edata.dataSize = nbVal * sizeof(double);
-                }
+            if((nbVal * sizeof(double)) > (size_t) kData->edata.dataSize) {
+                if(kData->edata.dataB != (void*) 0) free(kData->edata.dataB);
+                kData->edata.dataB = (void*) malloc(nbVal * sizeof(double));
+                kData->edata.dataSize = nbVal * sizeof(double);
+
                 memcpy(kData->edata.dataB, &TimerN[0],  nbVal * sizeof(double));
             }
             kData->edata.valueCount = nbVal;
 
-            mutexknobdataP->SetMutexKnobDataReceived(kData);
+            mutexknobdataP->SetMutexKnobData(kData->index, *kData);
             mutexknobdataP->DataUnlock(kData);
         }
 
@@ -159,14 +157,14 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double
             kData->edata.accessR = kData->edata.accessW = true;
             kData->edata.monitorCount++;
 
-            if(nbVal>0) {
-                if((nbVal * sizeof(double)) > (size_t) kData->edata.dataSize) {
-                    if(kData->edata.dataB != (void*) 0) free(kData->edata.dataB);
-                    kData->edata.dataB = (void*) malloc(nbVal * sizeof(double));
-                    kData->edata.dataSize = nbVal * sizeof(double);
-                }
-                memcpy(kData->edata.dataB, &YValsN[0],  nbVal * sizeof(double));
+
+            if((nbVal * sizeof(double)) > (size_t) kData->edata.dataSize) {
+                if(kData->edata.dataB != (void*) 0) free(kData->edata.dataB);
+                kData->edata.dataB = (void*) malloc(nbVal * sizeof(double));
+                kData->edata.dataSize = nbVal * sizeof(double);
             }
+            memcpy(kData->edata.dataB, &YValsN[0],  nbVal * sizeof(double));
+
             kData->edata.valueCount = nbVal;
 
             mutexknobdataP->SetMutexKnobDataReceived(kData);
@@ -182,18 +180,19 @@ int ArchiverCommon::pvClearMonitor(knobData *kData) {
     if (kData->index == -1) return true;
 
     if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) kData->dispW)) {
+        Q_UNUSED(w);
         char asc[50];
         sprintf(asc, "%s_%p", kData->pv, kData->dispW);
         QString key = QString(asc);
         key = key.replace(".X", "");
         key = key.replace(".Y", "");
 
-        qDebug() << "ArchivePlugin:pvClearMonitor" << key;
+        //qDebug() << "ArchivePlugin:pvClearMonitor" << key;
 
         QMap<QString, indexes>::iterator i = listOfIndexes.find(key);
         while (i !=listOfIndexes.end() && i.key() == key) {
-            indexes indexNew = i.value();
-            qDebug() << indexNew.indexX << indexNew.indexY;
+            //indexes indexNew = i.value();
+            //qDebug() << indexNew.indexX << indexNew.indexY;
             listOfIndexes.remove(key);
             ++i;
         }

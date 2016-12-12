@@ -56,7 +56,7 @@ void ArchivePRO_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfI
 {
     QMutexLocker locker(&mutex);
 
-    qDebug() << "============================================================================";
+    //qDebug() << "ArchivePRO_Plugin::Callback_UpdateInterface";
 
     QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
     while (i != listOfIndexes.constEnd()) {
@@ -64,7 +64,7 @@ void ArchivePRO_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfI
         QVector<double> YValsN;
 
         indexes indexNew = i.value();
-        qDebug() << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << endl;
+        //qDebug() << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << endl;
 
         QString key = indexNew.pv;
 
@@ -75,7 +75,7 @@ void ArchivePRO_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfI
 
         setenv("LOGGINGSERVER", "proscan-lgexp.psi.ch", 1);
 
-        qDebug() << "get from archive at " << "proscan-lgexp.psi.ch";
+        //qDebug() << "get from archive at " << "proscan-lgexp.psi.ch";
         int startHours = indexNew.secondspast / 3600;
         int day =  startHours/24 + 1;
         int arraySize =  3600/5 * 24 * (day+1);
@@ -101,13 +101,13 @@ void ArchivePRO_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfI
         free(Timer);
         free(YVals);
 
-        qDebug() << "nbval=" << nbVal;
+        //qDebug() << "nbval=" << nbVal;
 
         archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN);
 
         ++i;
     }
-    qDebug() << "update finished";
+    //qDebug() << "ArchivePRO_Plugin::update finished";
 }
 
 // define data to be called

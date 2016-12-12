@@ -49,7 +49,7 @@ public:
     int pvAddMonitor(int index, knobData *kData, int rate, int skip);
     int pvClearMonitor(knobData *kData);
     int pvFreeAllocatedData(knobData *kData);
-    int TerminateIO() {}
+    int TerminateIO() {return true;}
     //struct indexes {int indexX; int indexY; QString archive; int secondspast; QString pv;};
     void updateCartesian(int nbVal, indexes indexNew, QVector<double> TimerN, QVector<double> YValsN);
 

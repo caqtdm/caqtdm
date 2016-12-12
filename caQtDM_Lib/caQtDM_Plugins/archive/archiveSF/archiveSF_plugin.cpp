@@ -57,13 +57,15 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
 {
     QMutexLocker locker(&mutex);
 
+    //qDebug() << "ArchiveSF_Plugin::Callback_UpdateInterface";
+
     QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
     while (i != listOfIndexes.constEnd()) {
         QVector<double> TimerN;
         QVector<double> YValsN;
 
         indexes indexNew = i.value();
-        qDebug() << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << endl;
+        //qDebug() << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << endl;
 
         QString key = indexNew.pv;
 
@@ -72,7 +74,7 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
         // archive sf
         struct timeb now;
         ftime(&now);
-        qDebug() << "get from sf archive";
+        //qDebug() << "get from sf archive";
         double endSeconds = (double) now.time + (double) now.millitm / (double)1000;
         double startSeconds = endSeconds - indexNew.secondspast;
         QString response ="'response':{'format':'csv'}";
@@ -98,7 +100,7 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
         ++i;
 
     }
-    //qDebug() << "update finished";
+    //qDebug() << "ArchiveSF_Plugin::update finished";
 }
 
 // define data to be called

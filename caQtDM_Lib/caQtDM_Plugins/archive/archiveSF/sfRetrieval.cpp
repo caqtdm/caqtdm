@@ -73,7 +73,7 @@ bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int seconds
     totalCount = 0;
     secndsPast = secondsPast;
     QString out = QString(json);
-    printf("caQtDM -- request from %s with %s\n", qasc(url.toString()), qasc(out));
+    //printf("caQtDM -- request from %s with %s\n", qasc(url.toString()), qasc(out));
     downloadUrl = url;
 
     QNetworkRequest request(url);
@@ -128,7 +128,7 @@ void sfRetrieval::finishReply()
 
     QString out = QString(reply->readAll());
     QStringList result = out.split("\n", QString::SkipEmptyParts);
-    printf("number of values received = %d\n",  result.count());
+    //printf("number of values received = %d\n",  result.count());
     X.resize(result.count()-1);
     Y.resize(result.count()-1);
 
