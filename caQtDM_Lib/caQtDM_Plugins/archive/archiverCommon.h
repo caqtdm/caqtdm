@@ -40,10 +40,6 @@ struct indexes {int indexX; int indexY; QString archive; int secondspast; QStrin
 class Q_DECL_EXPORT ArchiverCommon : public QObject //, ControlsInterface
 {
     Q_OBJECT
-    //    Q_INTERFACES(ControlsInterface)
-#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
-    Q_PLUGIN_METADATA(IID "ch.psi.caqtdm.Plugin.ControlsInterface/1.0.democontrols")
-#endif
 
 public:
     //QString pluginName();
@@ -53,7 +49,7 @@ public:
     int pvAddMonitor(int index, knobData *kData, int rate, int skip);
     int pvClearMonitor(knobData *kData);
     int pvFreeAllocatedData(knobData *kData);
-    int TerminateIO();
+    int TerminateIO() {}
     //struct indexes {int indexX; int indexY; QString archive; int secondspast; QString pv;};
     void updateCartesian(int nbVal, indexes indexNew, QVector<double> TimerN, QVector<double> YValsN);
 
@@ -63,7 +59,6 @@ signals:
     void Signal_UpdateInterface(QMap<QString, indexes> listOfIndexes);
 
 private slots:
-    void updateValues();
     void updateInterface();
 
 private:

@@ -67,7 +67,6 @@ public:
  protected:
 
 private slots:
-    void updateValues();
     void Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes);
 
 private:

@@ -11,6 +11,7 @@ archive_plugin {
         macx {
                 message("archive_plugin configuration macx")
                 LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
+                LIBS += $(CAQTDM_COLLECT)/libqtcontrols.dylib
                 CONFIG += release
         }
 
