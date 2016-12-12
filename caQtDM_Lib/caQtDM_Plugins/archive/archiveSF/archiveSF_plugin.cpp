@@ -29,25 +29,6 @@
 
 #define qasc(x) x.toLatin1().constData()
 
-// this sleep will not block the GUI and QThread::msleep is protected in Qt4.8 (so do not use that)
-class Sleep
-{
-public:
-    static void msleep(unsigned long msecs)
-    {
-#ifndef MOBILE_ANDROID
-        QMutex mutex;
-        mutex.lock();
-        QWaitCondition waitCondition;
-        waitCondition.wait(&mutex, msecs);
-        mutex.unlock();
-#else
-        // not nice, but the above does not work on android now (does not wait)
-        usleep(msecs * 100);
-#endif
-    }
-};
-
 // gives the plugin name back
 QString ArchiveSF_Plugin::pluginName()
 {
@@ -98,7 +79,7 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
         QString channels = "'channels': [ '" + key + "' ]";
         QString range = "'range': { 'startSeconds' : '" + QString::number(startSeconds, 'g', 10) + "', 'endSeconds' : '" + QString::number(endSeconds, 'g', 10) + "'}";
         QString fields = "'fields':['channel','iocSeconds','value']}";
-        QString agg = "";
+        QString agg = "'aggregation': {'aggregationType':'value', 'aggregations':['min','mean','max'], 'nrOfBins' : 10}";
         QString total = "{" + response + "," + range + "," + channels + "," + fields + "," + agg + "}";
         total = total.replace("'", "\"");
         QByteArray json_str = total.toUtf8();
@@ -110,14 +91,14 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
             }
         }
 
-        qDebug() << "nbval=" << nbVal;
+        //qDebug() << "nbval=" << nbVal;
 
         archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN);
 
         ++i;
 
     }
-    qDebug() << "update finished";
+    //qDebug() << "update finished";
 }
 
 // define data to be called

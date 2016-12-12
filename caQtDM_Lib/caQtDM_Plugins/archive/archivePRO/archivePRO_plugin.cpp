@@ -29,25 +29,6 @@
 
 #define qasc(x) x.toLatin1().constData()
 
-// this sleep will not block the GUI and QThread::msleep is protected in Qt4.8 (so do not use that)
-class Sleep
-{
-public:
-    static void msleep(unsigned long msecs)
-    {
-#ifndef MOBILE_ANDROID
-        QMutex mutex;
-        mutex.lock();
-        QWaitCondition waitCondition;
-        waitCondition.wait(&mutex, msecs);
-        mutex.unlock();
-#else
-        // not nice, but the above does not work on android now (does not wait)
-        usleep(msecs * 100);
-#endif
-    }
-};
-
 // gives the plugin name back
 QString ArchivePRO_Plugin::pluginName()
 {

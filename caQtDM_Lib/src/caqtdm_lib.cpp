@@ -2608,6 +2608,8 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     *pvRep = newPV;
 
     // find out what kind of interface has to be used for this pv, default is epics3 or whatever is specified on the command line with -cs
+
+    // specified with the channel
     pos = newPV.indexOf("://");
     if(pos != -1) {
         pluginName = newPV.mid(0, pos);
@@ -2623,7 +2625,10 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
             pluginFlavor = "pva";
         }
 
+    // not specified with the channel
     } else {
+
+        // no default plugin specified on command line
         if(defaultPlugin.isEmpty()) {
 #ifdef PVAISDEFAULTPROVIDER
            pluginName = "epics4";
@@ -2631,8 +2636,10 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
 #else
            pluginName = "epics3";
 #endif
+        // a default plugin is specied on the command line
         } else {
            pluginName = defaultPlugin;
+           if(pluginName.contains("epics4")) pluginFlavor = "pva";  // default when epics4 is specified
         }
         trimmedPV = newPV;
         if(kData->soft) pluginName = "intern";
@@ -5696,6 +5703,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                     info.append("<br>");
                     info.append("Plugin: ");
                     info.append(kPtr->pluginName);
+                    info.append(" ");
+                    info.append(kPtr->pluginFlavor);
                     ControlsInterface * plugininterface = getControlInterface(kPtr->pluginName);
                     if(plugininterface == (ControlsInterface *) 0) {
                          if(!kPtr->soft)info.append(" : not loaded");
@@ -6615,29 +6624,47 @@ void CaQtDM_Lib::TreatRequestedWave(QString pvo, QString text, caWaveTable::Form
         strcpy(textValue, qasc(text));
         longValue = getValueFromString(textValue, fTypeNew, &end);
 
+        
         if(kPtr->edata.fieldtype == caLONG) {
             int32_t* P = (int32_t*) kPtr->edata.dataB;
             P[index] = (int32_t) longValue;
-            plugininterface->pvSetWave((char*) kPtr->pv, fdata, ddata, data16, P, sdata, kPtr->edata.valueCount,
-                                 (char*) qasc(w->objectName().toLower()), errmess);
+            if(!plugininterface->pvSetWave(kPtr,  fdata, ddata, data16, P, sdata, kPtr->edata.valueCount,
+                                  (char*) qasc(w->objectName().toLower()), errmess))
+            {
+                plugininterface->pvSetWave((char*) kPtr->pv,  fdata, ddata, data16, P, sdata, kPtr->edata.valueCount,
+                                  (char*) qasc(w->objectName().toLower()), errmess);
+            }
         } else if(kPtr->edata.fieldtype == caINT) {
             int16_t* P = (int16_t*) kPtr->edata.dataB;
             P[index] = (int16_t) longValue;
-            plugininterface->pvSetWave((char*) kPtr->pv, fdata, ddata, P, data32, sdata, kPtr->edata.valueCount,
-                                 (char*) qasc(w->objectName().toLower()), errmess);
+            if(!plugininterface->pvSetWave(kPtr, fdata, ddata, P, data32, sdata, kPtr->edata.valueCount,
+                                  (char*) qasc(w->objectName().toLower()), errmess))
+            {
+                plugininterface->pvSetWave((char*) kPtr->pv, fdata, ddata, P, data32, sdata, kPtr->edata.valueCount,
+                                  (char*) qasc(w->objectName().toLower()), errmess);
+            }
         } else {
             if(fTypeNew == string) {
                 char* P = (char*) kPtr->edata.dataB;
                 P[index] = textValue[0];
-                plugininterface->pvSetWave((char*) kPtr->pv, fdata, ddata, data16, data32, P, kPtr->edata.valueCount,
+                if(!plugininterface->pvSetWave(kPtr,  fdata, ddata, data16, data32, P, kPtr->edata.valueCount,
+                                     (char*) qasc(w->objectName().toLower()), errmess))
+                {
+                    plugininterface->pvSetWave((char*) kPtr->pv,  fdata, ddata, data16, data32, P, kPtr->edata.valueCount,
                                      (char*) qasc(w->objectName().toLower()), errmess);
+                }
             } else {
                 char* P = (char*) kPtr->edata.dataB;
                 P[index] = (char) ((int) longValue);
-                plugininterface->pvSetWave((char*) kPtr->pv, fdata, ddata, data16, data32, P, kPtr->edata.valueCount,
+                if(!plugininterface->pvSetWave(kPtr, fdata, ddata, data16, data32, P, kPtr->edata.valueCount,
+                                     (char*) qasc(w->objectName().toLower()), errmess))
+                {
+                    plugininterface->pvSetWave((char*) kPtr->pv, fdata, ddata, data16, data32, P, kPtr->edata.valueCount,
                                      (char*) qasc(w->objectName().toLower()), errmess);
+                }
             }
         }
+
 
         break;
 
@@ -6664,13 +6691,21 @@ void CaQtDM_Lib::TreatRequestedWave(QString pvo, QString text, caWaveTable::Form
             if(kPtr->edata.fieldtype == caFLOAT) {
                 float* P = (float*) kPtr->edata.dataB;
                 P[index] = (float) value;
-                plugininterface->pvSetWave((char*) kPtr->pv, P, ddata, data16, data32, sdata, kPtr->edata.valueCount,
+                if(!plugininterface->pvSetWave(kPtr,  P, ddata, data16, data32, sdata, kPtr->edata.valueCount,
+                                     (char*) qasc(w->objectName().toLower()), errmess))
+                {
+                    plugininterface->pvSetWave((char*) kPtr->pv,  P, ddata, data16, data32, sdata, kPtr->edata.valueCount,
                                      (char*) qasc(w->objectName().toLower()), errmess);
+                }
             } else  {
                 double* P = (double*) kPtr->edata.dataB;
                 P[index] = value;
-                plugininterface->pvSetWave((char*) kPtr->pv, fdata, P, data16, data32, sdata, kPtr->edata.valueCount,
+                if(!plugininterface->pvSetWave(kPtr, fdata, P, data16, data32, sdata, kPtr->edata.valueCount,
+                                     (char*) qasc(w->objectName().toLower()), errmess))
+                {
+                    plugininterface->pvSetWave((char*) kPtr->pv, fdata, P, data16, data32, sdata, kPtr->edata.valueCount,
                                      (char*) qasc(w->objectName().toLower()), errmess);
+                }
             }
         } else {
             char asc[100];

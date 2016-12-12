@@ -77,8 +77,14 @@ CONFIG += XDR_HACK
 # undefine this for bsread (zeromq) plugin support
 #CONFIG += bsread
 
-# undefine this for archive retrieval plugin support
-#CONFIG += archive
+# undefine this for archive retrieval plugin support (these plugins are only valid at psi)
+# take a look at the archiveSF in order to do something similar
+CONFIG += archive
+archive: {
+   CONFIG += archiveSF
+#   CONFIG += archiveHIPA
+#   CONFIG += archivePRO
+}
 
 # undefine this when you need to combine caQtDM with the australian epicsqt package
 #CONFIG += australian

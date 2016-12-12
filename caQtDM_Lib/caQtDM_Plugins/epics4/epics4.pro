@@ -17,20 +17,14 @@ INCLUDEPATH    += .
 INCLUDEPATH    += ../
 INCLUDEPATH    += ../../src
 
-HEADERS         = epics4_plugin.h ../controlsinterface.h
-SOURCES         = epics4_plugin.cpp 
+HEADERS         = epics4_plugin.h ../controlsinterface.h 
+SOURCES         = epics4_plugin.cpp
 TARGET          = epics4_plugin
 
 SOURCES += callbackThread.cpp epics4Requester.cpp
-HEADERS += callbackThread.h epics4Requester.
+HEADERS += callbackThread.h epics4Requester.h
 
 warning("epics4 was specified in qtdefs.pri, so build plugin with epics4, not yet finished")
-
-#SOURCES +=  epics4Subs.cpp pvAccessImpl.cpp
-#HEADERS +=  epics4Subs.h pvAccessImpl.h
-
-
-DEFINES += EPICS4
 
 
 DEFINES += QT_NO_WARNING_OUTPUT QT_NO_DEBUG_OUTPUT
