@@ -7,7 +7,7 @@ include (../../caQtDM_Viewer/qtdefs.pri)
 
 
 TEMPLATE = subdirs
-SUBDIRS = demo epics3
+SUBDIRS = demo epics3 archive
 
 !MOBILE {
     epics4: {
@@ -16,7 +16,4 @@ SUBDIRS = demo epics3
     bsread: {
       SUBDIRS += bsread
      }
-    archive: {
-      SUBDIRS += archive
-    }
 }

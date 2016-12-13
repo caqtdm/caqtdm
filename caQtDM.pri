@@ -415,12 +415,12 @@ caQtDM_Viewer {
                 plugins_demo.path = Contents/PlugIns/controlsystems
                 plugins_demo.files += $(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.dylib
                 QMAKE_BUNDLE_DATA += plugins_demo
-                epics4: {
+epics4: {
                     plugins_epics4.path = Contents/PlugIns/controlsystems
                     plugins_epics4.files += $(CAQTDM_COLLECT)/controlsystems/libepics4_plugin.dylib
                     QMAKE_BUNDLE_DATA += plugins_epics4
                 }
-                bsread:{
+bsread:{
                     plugins_bsread.path = Contents/PlugIns/controlsystems
                     plugins_bsread.files += $(CAQTDM_COLLECT)/controlsystems/libbsread_plugin.dylib
                     QMAKE_BUNDLE_DATA += plugins_bsread
@@ -428,7 +428,7 @@ caQtDM_Viewer {
                     zmqlibrary.files += $$(ZMQLIB)/libzmq.5.dylib
                     QMAKE_BUNDLE_DATA += zmqlibrary
                 }
-                archiveSF:{
+archiveSF:{
                     plugins_archiveSF.path = Contents/PlugIns/controlsystems
                     plugins_archiveSF.files += $(CAQTDM_COLLECT)/controlsystems/libarchiveSF_plugin.dylib
                     QMAKE_BUNDLE_DATA += plugins_archiveSF
@@ -487,9 +487,12 @@ message( $$QMAKESPEC )
                 LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_graphics_plugin.a
                 LIBS += $(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.a
                 LIBS += $(CAQTDM_COLLECT)/controlsystems/libepics3_plugin.a
- epics4: {
+epics4: {
                 LIBS += $(CAQTDM_COLLECT)/controlsystems/libepics4_plugin.a
-}
+                }
+archiveSF: {
+                LIBS += $(CAQTDM_COLLECT)/controlsystems/libarchiveSF_plugin.a
+                }
    		LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.a
    		LIBS += $(CAQTDM_COLLECT)/libqtcontrols.a
    		LIBS += $$(QWTHOME)/lib/libqwt.a

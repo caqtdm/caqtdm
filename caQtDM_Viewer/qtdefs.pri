@@ -82,8 +82,17 @@ CONFIG += XDR_HACK
 CONFIG += archive
 archive: {
    CONFIG += archiveSF
-#   CONFIG += archiveHIPA
-#   CONFIG += archivePRO
+#  CONFIG += archiveHIPA
+#  CONFIG += archivePRO
+}
+
+# in fileopenwindow we need to import these plugins for ios and android, so define them
+ios | android {
+bsread: { DEFINES += BSREAD }
+epics4: { DEFINES += EPICS4 }
+archiveSF: { DEFINES += ARCHIVESF }
+archiveHIPA: { DEFINES += ARCHIVEHIPA }
+archivePRO: { DEFINES += ARCHIVEPRO }
 }
 
 # undefine this when you need to combine caQtDM with the australian epicsqt package
