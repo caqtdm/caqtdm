@@ -17,10 +17,10 @@
  *
  *  Copyright (c) 2010 - 2014
  *
- *  Author:
- *    Anton Mezger
+ *  Authors:
+ *    Marty Kraimer, Anton Mezger
  *  Contact details:
- *    anton.mezger@psi.ch
+ *    anton.mezger@psi.ch, mrkraimer@comcast.net
  */
 #ifndef EPICS4REQUESTER_H
 #define EPICS4REQUESTER_H
