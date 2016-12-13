@@ -40,7 +40,10 @@ ArchiveSF_Plugin::ArchiveSF_Plugin()
 {
     qDebug() << "ArchivePlugin: Create";
     archiverCommon = new ArchiverCommon();
-    fromArchive = new sfRetrieval();
+
+    url = QUrl("http://data-api.psi.ch/sf/query");
+
+    //fromArchive = new sfRetrieval();
 
     connect(archiverCommon, SIGNAL(Signal_UpdateInterface(QMap<QString, indexes>)), this,SLOT(Callback_UpdateInterface(QMap<QString, indexes>)));
 }
@@ -55,9 +58,10 @@ int ArchiveSF_Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindow 
 // this routine will be called now every 10 seconds to update the cartesianplot
 void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes)
 {
+    struct timeb now;
     QMutexLocker locker(&mutex);
 
-    //qDebug() << "ArchiveSF_Plugin::Callback_UpdateInterface";
+    //qDebug() << "====================== ArchiveSF_Plugin::Callback_UpdateInterface";
 
     QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
     while (i != listOfIndexes.constEnd()) {
@@ -68,34 +72,34 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
         //qDebug() << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << endl;
 
         QString key = indexNew.pv;
-
         int nbVal = 0;
 
-        // archive sf
-        struct timeb now;
         ftime(&now);
-        //qDebug() << "get from sf archive";
+        //qDebug() << "get from sf archive" << key;
         double endSeconds = (double) now.time + (double) now.millitm / (double)1000;
-        double startSeconds = endSeconds - indexNew.secondspast;
+        double startSeconds = endSeconds - indexNew.secondsPast;
         QString response ="'response':{'format':'csv'}";
         QString channels = "'channels': [ '" + key + "' ]";
         QString range = "'range': { 'startSeconds' : '" + QString::number(startSeconds, 'g', 10) + "', 'endSeconds' : '" + QString::number(endSeconds, 'g', 10) + "'}";
         QString fields = "'fields':['channel','iocSeconds','value']}";
-        QString agg = "'aggregation': {'aggregationType':'value', 'aggregations':['min','mean','max'], 'nrOfBins' : 10}";
-        QString total = "{" + response + "," + range + "," + channels + "," + fields + "," + agg + "}";
+        //QString agg = "'aggregation': {'aggregationType':'value', 'aggregations':['min','mean','max'], 'nrOfBins' : 2000}";
+        QString total = "{" + response + "," + range + "," + channels + "," + fields + "}";
         total = total.replace("'", "\"");
         QByteArray json_str = total.toUtf8();
-        if(fromArchive->requestUrl(QUrl("http://data-api.psi.ch/sf/query"), json_str, indexNew.secondspast)) {
+        fromArchive = new sfRetrieval();
+
+        if(fromArchive->requestUrl(url, json_str, indexNew.secondsPast)) {
+
             if((nbVal = fromArchive->getCount()) > 0) {
+                //qDebug() << nbVal << total;
                 TimerN.resize(fromArchive->getCount());
                 YValsN.resize(fromArchive->getCount());
                 fromArchive->getData(TimerN, YValsN);
+                archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN);
             }
+
         }
-
-        //qDebug() << "nbval=" << nbVal;
-
-        archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN);
+        fromArchive->deleteLater();
 
         ++i;
 

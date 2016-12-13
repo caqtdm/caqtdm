@@ -26,10 +26,12 @@
 #ifndef SFRETRIEVAL_H
 #define SFRETRIEVAL_H
 
+#include <QDebug>
 #include <QObject>
 #include <QNetworkReply>
 #include <QTableWidget>
 #include <QMessageBox>
+#include <QEventLoop>
 
 class QNetworkAccessManager;
 
@@ -39,9 +41,8 @@ class sfRetrieval:public QObject
 
 public:
     sfRetrieval();
-    ~sfRetrieval(){}
+    ~sfRetrieval() {X.clear(); Y.clear();}
     bool requestUrl(const QUrl url, const QByteArray &json, int secondsPast);
-    int downloadFinished();
     const QString lastError();
     int getCount();
     void getData(QVector<double> &x, QVector<double> &y);
@@ -51,8 +52,10 @@ signals:
     void requestFinished();
 
 protected slots:
-    void finishReply();
+    void finishReply(QNetworkReply*);
     const QString parseError(QNetworkReply::NetworkError error);
+    int downloadFinished();
+    void timeoutL();
 
 private:
     QNetworkAccessManager *manager;
@@ -64,6 +67,7 @@ private:
     QVector<double> X,Y;
     int totalCount;
     int secndsPast;
+    QEventLoop *eventLoop;
 };
 
 #endif

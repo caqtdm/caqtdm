@@ -31,6 +31,7 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include <QEventLoop>
+#include <QTimer>
 #include <time.h>
 #include <sys/timeb.h>
 #include "sfRetrieval.h"
@@ -41,30 +42,20 @@
 #  include <unistd.h>
 #endif
 
-// this sleep will not block the GUI and QThread::msleep is protected in Qt4.8 (so do not use that)
-class Sleep
-{
-public:
-    static void msleep(unsigned long msecs)
-    {
-#ifndef MOBILE_ANDROID
-        QMutex mutex;
-        mutex.lock();
-        QWaitCondition waitCondition;
-        waitCondition.wait(&mutex, msecs);
-        mutex.unlock();
-#else
-        // not nice, but the above does not work on android now (does not wait)
-        usleep(msecs * 100);
-#endif
-    }
-};
 
 sfRetrieval::sfRetrieval()
 {
     finished = false;
-    manager = new QNetworkAccessManager;
+    manager = new QNetworkAccessManager(this);
+    eventLoop = new QEventLoop(this);
     errorString = "";
+
+    connect(this, SIGNAL(requestFinished()), this, SLOT(downloadFinished()) );
+}
+
+void sfRetrieval::timeoutL()
+{
+     eventLoop->quit();
 }
 
 bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int secondsPast)
@@ -76,59 +67,51 @@ bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int seconds
     //printf("caQtDM -- request from %s with %s\n", qasc(url.toString()), qasc(out));
     downloadUrl = url;
 
-    QNetworkRequest request(url);
-    request.setRawHeader("Content-Type", "application/json");
-    request.setRawHeader("Timeout", "86400");
+    QNetworkRequest *request = new QNetworkRequest(url);
 
-    QNetworkReply* reply = manager->post(request, json);
-    connect(reply, SIGNAL(finished()), this, SLOT(finishReply()));
+    request->setRawHeader("Content-Type", "application/json");
+    request->setRawHeader("Timeout", "86400");
 
-    //printf("go on wait for finish\n");
-    //wait until download was done (up to 3 seconds)
-    int looped = 0;
-    for(int i=0; i<10; i++) {
-        qApp->processEvents();
-        Sleep::msleep(300);
-        qApp->processEvents();
-        if(downloadFinished()) {
-            //printf("download finished\n");
-            return true;
-        }
-        //printf("loop\n");
-        looped++;
-    }
-    if(!downloadFinished()) {
-        printf("download not finished\n");
-        return false;
-    }
-    printf("download not finished\n");
-    return false;
+    manager->post(*request, json);
+
+    connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(finishReply(QNetworkReply*)));
+
+    finished = false;
+    QTimer *timeoutHelper = new QTimer(this);
+    timeoutHelper->setInterval(10000);
+    timeoutHelper->start();
+    connect(timeoutHelper, SIGNAL(timeout()), this, SLOT(timeoutL()));
+    eventLoop->exec();
+
+    //downloadfinished will continue
+    if(finished) return true;
+    else return false;
 }
 
 int sfRetrieval::downloadFinished()
 {
+    eventLoop->quit();
     return finished;
 }
 
-#include <ctime>
-
-void sfRetrieval::finishReply()
+void sfRetrieval::finishReply(QNetworkReply *reply)
 {
     struct timeb now;
-
-    //printf("network reply completed\n");
-    QObject* obj = sender();
-    QNetworkReply* reply = qobject_cast<QNetworkReply*>(obj);
 
     if(reply->error()) {
         errorString = tr("%1: %2").arg(parseError(reply->error())).arg(downloadUrl.toString());
         printf("%s\n", qasc(errorString));
+        emit requestFinished();
+        reply->deleteLater();
         return;
     }
 
     QString out = QString(reply->readAll());
+    reply->deleteLater();
+
     QStringList result = out.split("\n", QString::SkipEmptyParts);
     //printf("number of values received = %d\n",  result.count());
+
     X.resize(result.count()-1);
     Y.resize(result.count()-1);
 
@@ -136,20 +119,17 @@ void sfRetrieval::finishReply()
     int count = 0;
     for(int i=1; i< result.count(); ++i) {
          QStringList line = result[i].split(";", QString::SkipEmptyParts);
-         QString time = line[1];
-         double timed = time.toDouble();
-         unsigned long epoch32 = (unsigned long) timed;
-         time_t t = epoch32;
          double seconds = (double) now.time + (double) now.millitm / (double)1000;
          if((seconds - line[1].toDouble()) < secndsPast) {
             X[count] = -(seconds - line[1].toDouble()) / 3600.0;
-            Y[count++] = line[2].toDouble();
+            Y[count++] = line[2].toDouble();             //qDebug() << line[3] << line[4] << line[5]; in case of aggragation
             //if(count < 10) printf("%f channel=%s seconds=%s value=%s  values=%f %f time=%s", seconds - line[1].toDouble(), qasc(line[0]),  qasc(line[1]), qasc(line[2]), X[i-1],Y[i-1], ctime(&t));
          }
     }
     totalCount = count;
 
     finished = true;
+    emit requestFinished();
 }
 
 int sfRetrieval::getCount()

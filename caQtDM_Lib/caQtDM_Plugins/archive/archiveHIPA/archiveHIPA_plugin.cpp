@@ -56,7 +56,7 @@ void ArchiveHIPA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOf
 {
     QMutexLocker locker(&mutex);
 
-    //qDebug() << "ArchiveHIPA_Plugin::Callback_UpdateInterface";
+    //qDebug() << "------------------------ ArchiveHIPA_Plugin::Callback_UpdateInterface";
 
     QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
     while (i != listOfIndexes.constEnd()) {
@@ -76,7 +76,7 @@ void ArchiveHIPA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOf
         setenv("LOGGINGSERVER", "hipa-lgexp.psi.ch", 1);
 
         //qDebug() << "get from archive at " << "hipa-lgexp.psi.ch";
-        int startHours = indexNew.secondspast / 3600;
+        int startHours = indexNew.secondsPast / 3600;
         int day =  startHours/24 + 1;
         int arraySize =  3600/5 * 24 * (day+1);
 
@@ -84,7 +84,7 @@ void ArchiveHIPA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOf
         YVals = (float*) malloc(arraySize * sizeof(float));
 
         strcpy(dev, qasc(key));
-        GetLogShift(indexNew.secondspast, dev, &nbVal, Timer, YVals);
+        GetLogShift(indexNew.secondsPast, dev, &nbVal, Timer, YVals);
 
         // resize arrays
         TimerN.resize(nbVal);

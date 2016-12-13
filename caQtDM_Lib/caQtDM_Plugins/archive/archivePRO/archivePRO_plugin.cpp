@@ -56,7 +56,7 @@ void ArchivePRO_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfI
 {
     QMutexLocker locker(&mutex);
 
-    //qDebug() << "ArchivePRO_Plugin::Callback_UpdateInterface";
+    //qDebug() << "-------------------- ArchivePRO_Plugin::Callback_UpdateInterface";
 
     QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
     while (i != listOfIndexes.constEnd()) {
@@ -76,7 +76,7 @@ void ArchivePRO_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfI
         setenv("LOGGINGSERVER", "proscan-lgexp.psi.ch", 1);
 
         //qDebug() << "get from archive at " << "proscan-lgexp.psi.ch";
-        int startHours = indexNew.secondspast / 3600;
+        int startHours = indexNew.secondsPast / 3600;
         int day =  startHours/24 + 1;
         int arraySize =  3600/5 * 24 * (day+1);
 
@@ -84,7 +84,7 @@ void ArchivePRO_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfI
         YVals = (float*) malloc(arraySize * sizeof(float));
 
         strcpy(dev, qasc(key));
-        GetLogShift(indexNew.secondspast, dev, &nbVal, Timer, YVals);
+        GetLogShift(indexNew.secondsPast, dev, &nbVal, Timer, YVals);
 
         // resize arrays
         TimerN.resize(nbVal);

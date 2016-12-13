@@ -48,6 +48,7 @@ class Q_DECL_EXPORT ArchiveSF_Plugin : public QObject, ControlsInterface
 public:
     QString pluginName();
     ArchiveSF_Plugin();
+    ~ArchiveSF_Plugin(){printf("plugin destroyed\n");}
 
     int initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow, QMap<QString, QString> options);
     int pvAddMonitor(int index, knobData *kData, int rate, int skip);
@@ -72,6 +73,7 @@ private slots:
 private:
 
     QMutex mutex;
+    QUrl url;
     MutexKnobData *mutexknobdataP;
     MessageWindow *messagewindowP;
     QMap<QString, indexes> listOfIndexes;

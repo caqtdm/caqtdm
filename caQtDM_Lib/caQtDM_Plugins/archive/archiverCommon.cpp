@@ -34,32 +34,57 @@ ArchiverCommon::ArchiverCommon()
 
 void ArchiverCommon::updateInterface()
 {
+    double diff;
+    struct timeb now;
+    QMap<QString, indexes> listOfIndexesToBeExecuted;
+
     QMutexLocker locker(&mutex);
+
 
     // after first start, set timer to wanted period
     if(!timerRunning) {
         timer->stop();
-        timer->start(10000);
+        timer->start(200);
         timerRunning = true;
     }
 
+    // copy indexes to be executed when it is time
+    ftime(&now);
+
+    QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
+    while (i != listOfIndexes.constEnd()) {
+        indexes indexNew = i.value();
+
+        diff = ((double) now.time + (double) now.millitm / (double)1000) -
+               ((double) indexNew.lastUpdateTime.time + (double) indexNew.lastUpdateTime.millitm / (double)1000);
+        // is it time to update ?
+        if(diff >= indexNew.updateSeconds) {
+            ftime(&indexNew.lastUpdateTime);
+            listOfIndexes.insert(i.key(), indexNew);
+            listOfIndexesToBeExecuted.insert(i.key(), indexNew);
+        }
+
+        ++i;
+    }
+
     // call user routine for updating data
-    emit Signal_UpdateInterface(listOfIndexes);
+    if(listOfIndexesToBeExecuted.count() > 0) emit Signal_UpdateInterface(listOfIndexesToBeExecuted);
 }
 
 // initialize our communicationlayer with everything you need
 int ArchiverCommon::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow, QMap<QString, QString> options)
 {
+    Q_UNUSED(options);
     //qDebug() << "ArchivePlugin: InitCommunicationLayer with options" << options;
     mutexknobdataP = data;
     messagewindowP = messageWindow;
     timerRunning = false;
 
-    // we want to update the interface every 10 seconds
+    // start a timer in order to update the interface at the specified rate
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateInterface()));
 
-    timer->start(1000);
+    timer->start(100);
 
     return true;
 }
@@ -69,8 +94,6 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
     Q_UNUSED(index);
     Q_UNUSED(rate);
     Q_UNUSED(skip);
-    //QString archive;
-    int secondsPast;
 
     QMutexLocker locker(&mutex);
 
@@ -78,21 +101,32 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
     if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) kData->dispW)) {
         char asc[50];
+        indexes index;
+
         sprintf(asc, "%s_%p", kData->pv, kData->dispW);
         QString key = QString(asc);
         key = key.replace(".X", "");
         key = key.replace(".Y", "");
 
-        QVariant var = w->property("secondspast");
-
+        QVariant var = w->property("secondsPast");
         if(!var.isNull()) {
-            secondsPast = var.toInt();
+            index.secondsPast = var.toInt();
         } else {
-            messagewindowP->postMsgEvent(QtDebugMsg, (char*) "no secondspast defined as dynamic property in widget, default to 1 hour");
-            secondsPast = 3600;
+            QString mess("no secondsPast defined as dynamic property in widget, default to 1 hour back");
+            messagewindowP->postMsgEvent(QtDebugMsg, (char*) qasc(mess));
+            index.secondsPast = 3600;
         }
 
-        indexes index;
+        var = w->property("secondsUpdate");
+        if(!var.isNull()) {
+            index.updateSeconds = var.toInt();
+        } else {
+            QString mess("no secondsUpdate defined as dynamic property in widget, default to 10 seconds update");
+            messagewindowP->postMsgEvent(QtDebugMsg, (char*) qasc(mess));
+            index.updateSeconds = 10;
+        }
+
+
         index.pv = QString(kData->pv);
         index.pv = index.pv.replace(".X", "");
         index.pv = index.pv.replace(".Y", "");
@@ -100,7 +134,6 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
         if(kData->specData[2] == caCartesianPlot::CH_X) index.indexX = kData->index;        // x
         else if(kData->specData[2] == caCartesianPlot::CH_Y) index.indexY = kData->index;   // y
 
-        index.secondspast = secondsPast;
         if(!listOfIndexes.contains(key)) {
             listOfIndexes.insert(key, index);
         } else {
@@ -116,7 +149,8 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
         }
 
     } else {
-        messagewindowP->postMsgEvent(QtDebugMsg, "archivedata can only be used in a cartesianplot");
+        QString mess("archivedata can only be used in a cartesianplot");
+        messagewindowP->postMsgEvent(QtDebugMsg, (char*) qasc(mess));
     }
 
     return true;
@@ -125,7 +159,6 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double> TimerN, QVector<double> YValsN)
 {
     if(nbVal > 0) {
-        //qDebug() << "update plot" << indexNew.indexX <<indexNew.indexY << mutexknobdataP;
         knobData* kData = mutexknobdataP->GetMutexKnobDataPtr(indexNew.indexX);
         //qDebug() << indexNew.indexX;
         if((kData != (knobData *) 0) && (kData->index != -1)) {
@@ -191,8 +224,6 @@ int ArchiverCommon::pvClearMonitor(knobData *kData) {
 
         QMap<QString, indexes>::iterator i = listOfIndexes.find(key);
         while (i !=listOfIndexes.end() && i.key() == key) {
-            //indexes indexNew = i.value();
-            //qDebug() << indexNew.indexX << indexNew.indexY;
             listOfIndexes.remove(key);
             ++i;
         }

@@ -35,14 +35,13 @@
 #include "mutexKnobData.h"
 #include "MessageWindow.h"
 
-struct indexes {int indexX; int indexY; QString archive; int secondspast; QString pv;};
+struct indexes {int indexX; int indexY; int secondsPast; QString pv; int updateSeconds; struct timeb lastUpdateTime;};
 
-class Q_DECL_EXPORT ArchiverCommon : public QObject //, ControlsInterface
+class Q_DECL_EXPORT ArchiverCommon : public QObject
 {
     Q_OBJECT
 
 public:
-    //QString pluginName();
     ArchiverCommon();
 
     int initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow, QMap<QString, QString> options);
