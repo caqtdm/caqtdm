@@ -143,6 +143,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
                 if(kData->specData[2] == caCartesianPlot::CH_X) indexNew.indexX = kData->index;
                 else if(kData->specData[2] == caCartesianPlot::CH_Y) indexNew.indexY = kData->index;
                 //qDebug() << indexNew.indexX << indexNew.indexY;
+                indexNew.lastUpdateTime.time = 0;
                 listOfIndexes.insert(key, indexNew);
                 break;
             }
