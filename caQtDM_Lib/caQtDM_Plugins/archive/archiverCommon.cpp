@@ -209,7 +209,6 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double
 
 // caQtDM_Lib will call this routine for getting rid of a monitor
 int ArchiverCommon::pvClearMonitor(knobData *kData) {
-    QMutexLocker locker(&mutex);
 
     if (kData->index == -1) return true;
 
@@ -220,8 +219,6 @@ int ArchiverCommon::pvClearMonitor(knobData *kData) {
         QString key = QString(asc);
         key = key.replace(".X", "");
         key = key.replace(".Y", "");
-
-        //qDebug() << "ArchivePlugin:pvClearMonitor" << key;
 
         QMap<QString, indexes>::iterator i = listOfIndexes.find(key);
         while (i !=listOfIndexes.end() && i.key() == key) {

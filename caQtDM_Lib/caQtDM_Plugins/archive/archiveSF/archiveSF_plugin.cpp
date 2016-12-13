@@ -43,8 +43,6 @@ ArchiveSF_Plugin::ArchiveSF_Plugin()
 
     url = QUrl("http://data-api.psi.ch/sf/query");
 
-    //fromArchive = new sfRetrieval();
-
     connect(archiverCommon, SIGNAL(Signal_UpdateInterface(QMap<QString, indexes>)), this,SLOT(Callback_UpdateInterface(QMap<QString, indexes>)));
 }
 

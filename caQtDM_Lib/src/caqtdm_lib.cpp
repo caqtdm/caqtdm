@@ -5703,8 +5703,10 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                     info.append("<br>");
                     info.append("Plugin: ");
                     info.append(kPtr->pluginName);
-                    info.append(" ");
-                    info.append(kPtr->pluginFlavor);
+                    if(strlen(kPtr->pluginFlavor) > 0) {
+                        info.append(" Flavor: ");
+                        info.append(kPtr->pluginFlavor);
+                    }
                     ControlsInterface * plugininterface = getControlInterface(kPtr->pluginName);
                     if(plugininterface == (ControlsInterface *) 0) {
                          if(!kPtr->soft)info.append(" : not loaded");

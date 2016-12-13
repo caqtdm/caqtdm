@@ -173,6 +173,7 @@ private:
     bool gotFirstConnection;
     bool putFinished;
     bool unlistenCalled;
+    bool monitorStarted;
     CreateRequest::shared_pointer createRequest;
     MutexKnobData *mutexKnobData;
     int index;
@@ -630,6 +631,7 @@ PVAInterface::PVAInterface(
   gotFirstConnection(false),
   putFinished(true),
   unlistenCalled(false),
+  monitorStarted(false),
   createRequest(CreateRequest::create()),
   mutexKnobData(mutexKnobData),
   index(index),
@@ -650,23 +652,35 @@ PVAInterface::~PVAInterface()
 
 void PVAInterface::clearMonitor()
 {
+    Lock lock(mutex);
     if(monitor) {
-       monitor->stop();
+       if(monitorStarted) {
+           monitor->stop();
+           monitorStarted = false;
+       }
        monitor->destroy();
     }
 }
 
 void PVAInterface::stopMonitor()
 {
+    Lock lock(mutex);
     if(monitor) {
-       monitor->stop();
+       if(monitorStarted) {
+           monitor->stop();
+           monitorStarted = false;
+       }
     }
 }
 
 void PVAInterface::startMonitor()
 {
+    Lock lock(mutex);
     if(monitor) {
-       monitor->start();
+       if(!monitorStarted) {
+           monitor->start();
+           monitorStarted = true;
+       }
     }
 }
 
@@ -784,7 +798,11 @@ void PVAInterface::monitorConnect(
     Q_UNUSED(structure);
     if(Epics4Plugin::getDebug()) cout << " PVAInterface::monitorConnect\n";
     if(status.isOK()) {
-         monitor->start();
+       Lock lock(mutex);
+       if(!monitorStarted) {
+           monitor->start();
+           monitorStarted = true;
+       }
     } else {
           string mess(status.getMessage());
           mess += " monitorConnect failed";
@@ -1848,7 +1866,6 @@ int Epics4Plugin::pvClearEvent(void * ptr) {
     PVAInterfaceGlue *pvaInterfaceGlue  = static_cast<PVAInterfaceGlue *>(ptr);
     PVAInterfacePtr pvaInterface = pvaInterfaceGlue->getPVAInterface();
     if(!pvaInterface) throw std::runtime_error("Epics4Plugin::pvSetWave pvaInterface is null");
-    //pvaInterface->clearMonitor();
     pvaInterface->stopMonitor();
 
     return true;
@@ -1859,7 +1876,6 @@ int Epics4Plugin::pvAddEvent(void * ptr) {
     PVAInterfaceGlue *pvaInterfaceGlue  = static_cast<PVAInterfaceGlue *>(ptr);
     PVAInterfacePtr pvaInterface = pvaInterfaceGlue->getPVAInterface();
     if(!pvaInterface) throw std::runtime_error("Epics4Plugin::pvSetWave pvaInterface is null");
-    //pvaInterface->createMonitor();
     pvaInterface->startMonitor();
     return true;
 }
