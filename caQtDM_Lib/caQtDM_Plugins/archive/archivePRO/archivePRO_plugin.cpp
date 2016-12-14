@@ -73,7 +73,9 @@ void ArchivePRO_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfI
         char dev[40];
         float *Timer, *YVals;
 
-        setenv("LOGGINGSERVER", "proscan-lgexp.psi.ch", 1);
+        QString loggingServer = (QString)  qgetenv("LOGGINGSERVER");
+        loggingServer = loggingServer.toUpper();
+        if(loggingServer.isEmpty() || !loggingServer.contains("PRO")) setenv("LOGGINGSERVER", "proscan-lgexp.psi.ch", 1);
 
         //qDebug() << "get from archive at " << "proscan-lgexp.psi.ch";
         int startHours = indexNew.secondsPast / 3600;

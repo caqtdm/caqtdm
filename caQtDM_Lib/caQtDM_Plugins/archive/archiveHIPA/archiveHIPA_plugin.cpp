@@ -73,7 +73,9 @@ void ArchiveHIPA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOf
         char dev[40];
         float *Timer, *YVals;
 
-        setenv("LOGGINGSERVER", "hipa-lgexp.psi.ch", 1);
+        QString loggingServer = (QString)  qgetenv("LOGGINGSERVER");
+        loggingServer = loggingServer.toUpper();
+        if(loggingServer.isEmpty() || !loggingServer.contains("HIPA")) setenv("LOGGINGSERVER", "hipa-lgexp.psi.ch", 1);
 
         //qDebug() << "get from archive at " << "hipa-lgexp.psi.ch";
         int startHours = indexNew.secondsPast / 3600;
