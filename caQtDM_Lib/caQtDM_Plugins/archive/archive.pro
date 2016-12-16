@@ -10,9 +10,11 @@ TEMPLATE = subdirs
 archiveSF: {
    SUBDIRS += archiveSF
 }
-archiveHIPA: {
+!MOBILE {
+  archiveHIPA: {
    SUBDIRS += archiveHIPA
-}
-archivePRO: {
+  }
+  archivePRO: {
    SUBDIRS += archivePRO
+  }
 }

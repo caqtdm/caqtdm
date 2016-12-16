@@ -25,7 +25,4 @@ HEADERS         = ../../controlsinterface.h archiveSF_plugin.h sfRetrieval.h ../
 SOURCES         =  archiveSF_plugin.cpp sfRetrieval.cpp ../archiverCommon.cpp
 TARGET          = archiveSF_plugin
 
-#INCLUDEPATH    += ../../../../../Include
-
-#LIBS += /afs/psi.ch/user/m/mezger/workarea/ACS/mezger/Libs/libNewLogRPC.a
 

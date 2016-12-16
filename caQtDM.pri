@@ -448,12 +448,26 @@ archiveSF:{
    		LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_graphics_plugin.a
                 LIBS += $(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.a
                 LIBS += $(CAQTDM_COLLECT)/controlsystems/libepics3_plugin.a
+                iphonesimulator {
+                     message("caQtDM_viewer configuration : iphonesimulator")
+                     # when .dylib and .a in same directory, macos takes .dylib, so separate the libraries
+                     LIBS += $$(EPICSLIB)/static/libca.a
+                     LIBS += $$(EPICSLIB)/static/libCom.a
+                     # build simulator only for 32 bit
+                     QMAKE_IOS_SIMULATOR_ARCHS = i386
+                     INCLUDEPATH += /Users/mezger/Documents/Entwicklung/qt/qwt-6.1.1_sim/src
+                }
+                iphoneos {
+                    message("caQtDM_viewer configuration : iphonesimulator")
+                     LIBS += $$(EPICSLIB)/libca.a
+                     LIBS += $$(EPICSLIB)/libCom.a
+                }
 epics4: {
                 LIBS += $(CAQTDM_COLLECT)/controlsystems/libepics4_plugin.a
 }
-   		LIBS += $$(EPICSLIB)/libca.a
-   		LIBS += $$(EPICSLIB)/libCom.a
-
+archiveSF:{
+                LIBS += $(CAQTDM_COLLECT)/controlsystems/libarchiveSF_plugin.a
+                }
                 QMAKE_INFO_PLIST = $$PWD/caQtDM_Viewer/src/IOS/Info.plist
                 ICON = $$PWD/caQtDM_Viewer/src/caQtDM.icns
                 APP_ICON.files = $$PWD/caQtDM_Viewer/src/caQtDM.png
@@ -470,12 +484,11 @@ epics4: {
                 APP-FONTS.files = $$PWD/caQtDM_Viewer/lucida-sans-typewriter.ttf
    		APP-FONTS.path = fonts
                 QMAKE_BUNDLE_DATA += APP_XML_FILES APP_ICON APP1_ICON StartScreen APP-FONTS
-   		QMAKE_CFLAGS += -gdwarf-2
+                QMAKE_CFLAGS += -gdwarf-2
                 QMAKE_CXXFLAGS += -gdwarf-2
                 QMAKE_BUNDLE_NAME = ch.psi.caqtdm
 message( $$QMAKESPEC )
 	}
-
 	android {
                 message("caQtDM_viewer configuration : android")
                 message($$PWD)
