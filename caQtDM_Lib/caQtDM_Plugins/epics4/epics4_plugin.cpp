@@ -1299,10 +1299,11 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
     ScalarArrayConstPtr scalar = pva->getScalarArray();
     ScalarType scalarType = scalar->getElementType();
     int length = pva->getLength();
+
     switch(scalarType) {
 
     case pvBoolean:
-        message("array of pvString not yet supported", errorMessage);
+        message("array of pvBoolean not yet supported", errorMessage);
         break;
 
     case pvString: {
@@ -1319,7 +1320,7 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
         {
              numBytes += array[i].length();
         }
-        numBytes += length*3 + 1;
+        numBytes += length + 1;
         if(numBytes>kData.edata.dataSize) {
              if(kData.edata.dataB != (void*) 0) free(kData.edata.dataB);
              kData.edata.dataB = (void*) malloc(numBytes);
@@ -1330,11 +1331,9 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
         {
              const string value = array[i];
              int len = value.length();
-             ptr[0] = '"'; ++ptr;
              memcpy(ptr,value.data(),len);
              ptr += len;
-             ptr[0] = '"'; ++ptr;
-             ptr[0] = ','; ++ptr;
+             ptr[0] = '\033'; ++ptr;
         }
         ptr--;
         ptr[0] = '\0';
