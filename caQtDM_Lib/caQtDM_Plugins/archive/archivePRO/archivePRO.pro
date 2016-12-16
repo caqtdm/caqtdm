@@ -28,5 +28,14 @@ SOURCES         =  archivePRO_plugin.cpp ../archiverCommon.cpp \
 TARGET          = archivePRO_plugin
 
 INCLUDEPATH    += ../../../../../Include
-LIBS += /afs/psi.ch/user/m/mezger/workarea/ACS/mezger/Libs/libNewLogRPC.a
 
+QMAKESPEC = $$(QMAKESPEC)
+X64 = $$find(QMAKESPEC, 64)
+
+isEmpty(X64) {
+  message( "Building for 32 bit")
+  LIBS += /afs/psi.ch/user/m/mezger/workarea/ACS/mezger/Libs/libNewLogRPC.a
+} else {
+  message( "Building for 64 bit")
+  LIBS += /afs/psi.ch/user/m/mezger/workarea/ACS/mezger/Libs/libNewLogRPC_64.a
+}
