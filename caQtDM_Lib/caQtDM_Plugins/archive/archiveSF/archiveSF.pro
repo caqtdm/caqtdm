@@ -4,8 +4,6 @@ contains(QT_VER_MAJ, 5) {
     QT     += widgets
 }
 
-CONFIG += warn_on
-CONFIG += release
 CONFIG += archive_plugin
 
 include (../../../../caQtDM.pri)
