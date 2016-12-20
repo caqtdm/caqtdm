@@ -38,7 +38,7 @@ QString ArchiveHIPA_Plugin::pluginName()
 // constructor
 ArchiveHIPA_Plugin::ArchiveHIPA_Plugin()
 {
-    qDebug() << "ArchivePlugin: Create";
+    qDebug() << "ArchiveHIPA_Plugin: Create (logging retrieval)";
     archiverCommon = new ArchiverCommon();
 
     connect(archiverCommon, SIGNAL(Signal_UpdateInterface(QMap<QString, indexes>)), this,SLOT(Callback_UpdateInterface(QMap<QString, indexes>)));

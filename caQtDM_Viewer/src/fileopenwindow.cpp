@@ -300,7 +300,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         _isRunning = false;
         // create shared memory with a default value to note that no message is available.
         if (!sharedMemory.create(4096)) {
-            qDebug("caQtDM -- Unable to create single instance.");
+            qDebug("caQtDM -- Unable to create single instance of shared memory.");
         } else {
             qDebug() << "caQtDM -- created shared memory with 4096 bytes";
             sharedMemory.lock();

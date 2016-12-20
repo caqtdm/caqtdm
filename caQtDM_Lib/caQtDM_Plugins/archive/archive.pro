@@ -17,4 +17,7 @@ archiveSF: {
   archivePRO: {
    SUBDIRS += archivePRO
   }
+  archiveCA: {
+   SUBDIRS += archiveCA
+  }
 }

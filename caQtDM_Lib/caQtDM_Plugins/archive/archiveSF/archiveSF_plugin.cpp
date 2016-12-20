@@ -38,7 +38,7 @@ QString ArchiveSF_Plugin::pluginName()
 // constructor
 ArchiveSF_Plugin::ArchiveSF_Plugin()
 {
-    qDebug() << "ArchivePlugin: Create";
+    qDebug() << "ArchiveSF_Plugin: Create (SwissFel http-retrieval)";
     archiverCommon = new ArchiverCommon();
 
     url = QUrl("http://data-api.psi.ch/sf/query");

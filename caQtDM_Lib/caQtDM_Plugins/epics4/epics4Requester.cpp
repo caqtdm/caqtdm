@@ -36,16 +36,16 @@ void Epics4Requester::message(std::string const & message,epics::pvData::Message
 
     switch (messageType) {
     case epics::pvData::infoMessage:
-          messageWindow->postMsgEvent(QtDebugMsg, mes);
+          if(messageWindow != (MessageWindow *) 0) messageWindow->postMsgEvent(QtDebugMsg, mes);
           break;
     case epics::pvData::warningMessage:
-          messageWindow->postMsgEvent(QtWarningMsg, mes);
+          if(messageWindow != (MessageWindow *) 0) messageWindow->postMsgEvent(QtWarningMsg, mes);
           break;
     case epics::pvData::errorMessage:
-          messageWindow->postMsgEvent(QtCriticalMsg, mes);
+          if(messageWindow != (MessageWindow *) 0) messageWindow->postMsgEvent(QtCriticalMsg, mes);
           break;
     case epics::pvData::fatalErrorMessage:
-          messageWindow->postMsgEvent(QtCriticalMsg, mes);
+          if(messageWindow != (MessageWindow *) 0) messageWindow->postMsgEvent(QtCriticalMsg, mes);
           break;
     }
 }

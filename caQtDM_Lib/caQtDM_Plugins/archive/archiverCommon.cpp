@@ -103,7 +103,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
         char asc[50];
         indexes index;
 
-        sprintf(asc, "%s_%p", kData->pv, kData->dispW);
+        sprintf(asc, "%d_%s_%p",kData->specData[0], kData->pv, kData->dispW);
         QString key = QString(asc);
         key = key.replace(".X", "");
         key = key.replace(".Y", "");
@@ -112,8 +112,8 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
         if(!var.isNull()) {
             index.secondsPast = var.toInt();
         } else {
-            QString mess("no secondsPast defined as dynamic property in widget, default to 1 hour back");
-            messagewindowP->postMsgEvent(QtDebugMsg, (char*) qasc(mess));
+            QString mess("Archive plugin -- no secondsPast defined as dynamic property in widget, default to 1 hour back");
+            if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
             index.secondsPast = 3600;
         }
 
@@ -121,15 +121,15 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
         if(!var.isNull()) {
             index.updateSeconds = var.toInt();
         } else {
-            QString mess("no secondsUpdate defined as dynamic property in widget, default to 10 seconds update");
-            messagewindowP->postMsgEvent(QtDebugMsg, (char*) qasc(mess));
+            QString mess("Archive plugin -- no secondsUpdate defined as dynamic property in widget, default to 10 seconds update");
+            if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
             index.updateSeconds = 10;
         }
-
 
         index.pv = QString(kData->pv);
         index.pv = index.pv.replace(".X", "");
         index.pv = index.pv.replace(".Y", "");
+        index.w = (QWidget*) kData->dispW;
         index.indexX = index.indexY = 0;
         if(kData->specData[2] == caCartesianPlot::CH_X) index.indexX = kData->index;        // x
         else if(kData->specData[2] == caCartesianPlot::CH_Y) index.indexY = kData->index;   // y
@@ -151,7 +151,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
     } else {
         QString mess("archivedata can only be used in a cartesianplot");
-        messagewindowP->postMsgEvent(QtDebugMsg, (char*) qasc(mess));
+        if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtDebugMsg, (char*) qasc(mess));
     }
 
     return true;
@@ -190,7 +190,6 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double
             kData->edata.connected = true;
             kData->edata.accessR = kData->edata.accessW = true;
             kData->edata.monitorCount++;
-
 
             if((nbVal * sizeof(double)) > (size_t) kData->edata.dataSize) {
                 if(kData->edata.dataB != (void*) 0) free(kData->edata.dataB);

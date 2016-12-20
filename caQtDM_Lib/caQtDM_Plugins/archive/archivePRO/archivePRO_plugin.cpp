@@ -38,7 +38,7 @@ QString ArchivePRO_Plugin::pluginName()
 // constructor
 ArchivePRO_Plugin::ArchivePRO_Plugin()
 {
-    qDebug() << "ArchivePlugin: Create";
+    qDebug() << "ArchivePro_Plugin: Create (logging retrieval)";
     archiverCommon = new ArchiverCommon();
 
     connect(archiverCommon, SIGNAL(Signal_UpdateInterface(QMap<QString, indexes>)), this,SLOT(Callback_UpdateInterface(QMap<QString, indexes>)));

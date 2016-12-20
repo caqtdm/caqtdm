@@ -127,7 +127,7 @@
      </color>
     </property>
     <property name="channels_2" stdset="0">
-     <string/>
+     <string>archiveHIPA://MHC5:IST:2.X;archiveHIPA://MHC5:IST:2.Y</string>
     </property>
     <property name="Style_2">
      <enum>caCartesianPlot::ThinLines</enum>
