@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE indexconfig SYSTEM "../IndexTool/indexconfig.dtd">
+<indexconfig>
+	<archive>
+		<index>../DemoData/index</index>
+	</archive>
+	<archive>
+		<index>../DemoData/index</index>
+	</archive>
+</indexconfig>
