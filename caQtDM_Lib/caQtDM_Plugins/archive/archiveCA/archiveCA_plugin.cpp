@@ -27,9 +27,6 @@
 #include "archiveCA_plugin.h"
 #include "archiverCommon.h"
 
-static int precision;
-static RawValue::NumberFormat format = RawValue::DEFAULT;
-
 #define qasc(x) x.toLatin1().constData()
 
 // gives the plugin name back
@@ -41,6 +38,10 @@ QString ArchiveCA_Plugin::pluginName()
 // constructor
 ArchiveCA_Plugin::ArchiveCA_Plugin()
 {
+    qRegisterMetaType<indexes>("indexes");
+    qRegisterMetaType<stdString>("stdString");
+    qRegisterMetaType<QVector<double> >("QVector<double>");
+
     qDebug() << "ArchiveCA_Plugin: Create (epics channel archiver retrieval)";
     archiverCommon = new ArchiverCommon();
 
@@ -55,128 +56,74 @@ int ArchiveCA_Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindow 
     return archiverCommon->initCommunicationLayer(data, messageWindow, options);
 }
 
-void ArchiveCA_Plugin::format_time(const epicsTime &time, stdString &text,  time_t &timeStamp)
-{
-    epicsTimeStamp stamp = time;
-    stamp.nsec = ((stamp.nsec + 500000) / 1000000) * 1000000;
-    epicsTimeToTime_t(&timeStamp, &stamp);
-    epicsTime2string(epicsTime(stamp), text);
-    text = text.substr(0, 23);
-    return;
-}
-
 // this routine will be called now every 10 seconds to update the cartesianplot
+// however when many data it may take much longer, then  suppress any new request
 void ArchiveCA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes)
 {
-    struct timeb now;
+    int nbVal;
+
     QMutexLocker locker(&mutex);
-    struct tm  *timess_end, *timess_start;
-    time_t timeStamp;
-    char  startTime[200], endTime[200];
-    AutoPtr<epicsTime> start, end;
+
     precision = 5;
-    format = RawValue::DECIMAL;
+
+    // Index name
+    stdString index_name =  "/gfa/archiver-data/archive_PRO_ST/index";
 
     //qDebug() << "====================== ArchiveCA_Plugin::Callback_UpdateInterface";
 
-    QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
+    if(!workerThread.isRunning()) {
 
-    while (i != listOfIndexes.constEnd()) {
-        QVector<double> TimerN;
-        QVector<double> YValsN;
+        QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
 
-        indexes indexNew = i.value();
-        //qDebug() << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << endl;
+        while (i != listOfIndexes.constEnd()) {
 
-        int nbVal = 0;
+            indexes indexNew = i.value();
+            //qDebug() << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << indexNew.w << endl;
 
-        ftime(&now);
-        //qDebug() << "get from sf archive" << key;
-        time_t endSeconds = (time_t) ((double) now.time + (double) now.millitm / (double)1000);
-        time_t startSeconds = (time_t) (endSeconds - indexNew.secondsPast);
+            nbVal = 0;
 
-        timess_end = localtime(&endSeconds);
-        sprintf(endTime,   "%02d/%02d/%04d %02d:%02d:%02d ", timess_end->tm_mon+1, timess_end->tm_mday, timess_end->tm_year+1900,
-                timess_end->tm_hour, timess_end->tm_min, timess_end->tm_sec);
-        timess_start = localtime(&startSeconds);
-        sprintf(startTime,   "%02d/%02d/%04d %02d:%02d:%02d ", timess_start->tm_mon+1, timess_start->tm_mday, timess_start->tm_year+1900,
-                timess_start->tm_hour, timess_start->tm_min, timess_start->tm_sec);
-        //qDebug() << startTime << endTime;
-
-        end = new epicsTime();
-        start = new epicsTime();
-        string2epicsTime(endTime, *end);
-        string2epicsTime(startTime, *start);
-
-        // Index name
-        stdString index_name =  "/gfa/archiver-data/archive_PRO_ST/index";
-
-        if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) indexNew.w)) {
-            QVariant var = w->property("archiverIndex");
-            if(!var.isNull()) {
-                QString indexName = var.toString();
-                index_name = qasc(indexName);
-            } else {
-                QString mess("Archive plugin -- no archiverIndex defined as dynamic property in widget, defaulting to /gfa/archiver-data/archive_PRO_ST/index");
-                if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
-            }
-        }
-
-        // Channel names
-        stdVector<stdString> names;
-        names.push_back(qasc(indexNew.pv));
-
-        // How?
-        ReaderFactory::How how = ReaderFactory::Raw;
-        double delta = 0.0;
-
-        // Open index
-        AutoIndex index;
-        char error[1000];
-        if(!index.open(index_name.c_str(), error, true)) {
-           if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtCriticalMsg, error);
-           return;
-        }
-
-        // get data
-        SpreadsheetReader sheet(index, how, delta);
-        bool ok = sheet.find(names, start);
-        stdString time, stat, val;
-        const RawValue::Data *value;
-
-        // resize arrays
-        TimerN.resize(10*indexNew.secondsPast);
-        YValsN.resize(10*indexNew.secondsPast);
-
-        nbVal = 0;
-        while (ok) {
-            if (end && sheet.getTime() >= *end) break;
-            format_time(sheet.getTime(), time, timeStamp);
-
-            value = sheet.get(0);
-            if (value) {
-                RawValue::getStatus(value, stat);
-                if (RawValue::isInfo(value)) {
-                    qDebug() << "no data";
+            // Get Index name if specified for this widget
+            if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) indexNew.w)) {
+                QVariant var = w->property("archiverIndex");
+                if(!var.isNull()) {
+                    QString indexName = var.toString();
+                    index_name = qasc(indexName);
                 } else {
-                    RawValue::getValueString( val, sheet.getType(0), sheet.getCount(0), value, &sheet.getInfo(0), format, precision);
-                    QString value(val.c_str());
-                    if((timeStamp - endSeconds) >= -indexNew.secondsPast) {
-                       TimerN[nbVal] = (timeStamp - endSeconds) / 3600.0;
-                       YValsN[nbVal++] = value.toDouble();
-                    }
+                    QString mess("Archive plugin -- no archiverIndex defined as dynamic property in widget, defaulting to /gfa/archiver-data/archive_PRO_ST/index");
+                    if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
                 }
-            } else {
-                qDebug() << "no data";
             }
-            ok = sheet.next();
+
+            WorkerCA *worker = new WorkerCA;
+            worker->moveToThread(&workerThread);
+            connect(&workerThread, SIGNAL(finished()), worker, SLOT(workerFinish()));
+            connect(this, SIGNAL(operate( QWidget *, indexes, const stdString)), worker,
+                    SLOT(getFromArchive(QWidget *, indexes, stdString)));
+            connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>)), this,
+                    SLOT(handleResults(indexes, int, QVector<double>, QVector<double>)));
+            workerThread.start();
+
+            //qDebug() << "CA emit operate";
+
+            emit operate((QWidget *) messagewindowP ,indexNew, index_name);
+            ++i;
         }
 
-        //close index
-        index.close();
-        if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN);
-        ++i;
+    } else {
+        //qDebug() << "workerthread is running" << workerThread.isRunning();
     }
+}
+
+void ArchiveCA_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN)
+{
+    //qDebug() << "in CA handle results" << nbVal << TimerN.count();
+    if(nbVal > 0 && nbVal < TimerN.count()) {
+      TimerN.resize(nbVal);
+      YValsN.resize(nbVal);
+    }
+
+    if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN);
+    workerThread.quit();
 }
 
 

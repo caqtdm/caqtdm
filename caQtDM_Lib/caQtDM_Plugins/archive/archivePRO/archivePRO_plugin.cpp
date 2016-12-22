@@ -38,6 +38,9 @@ QString ArchivePRO_Plugin::pluginName()
 // constructor
 ArchivePRO_Plugin::ArchivePRO_Plugin()
 {
+    qRegisterMetaType<indexes>("indexes");
+    qRegisterMetaType<QVector<double> >("QVector<double>");
+
     qDebug() << "ArchivePro_Plugin: Create (logging retrieval)";
     archiverCommon = new ArchiverCommon();
 
@@ -52,64 +55,50 @@ int ArchivePRO_Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindow
 }
 
 // this routine will be called now every 10 seconds to update the cartesianplot
+// however when many data it may take much longer, then  suppress any new request
 void ArchivePRO_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes)
 {
     QMutexLocker locker(&mutex);
 
     //qDebug() << "-------------------- ArchivePRO_Plugin::Callback_UpdateInterface";
 
-    QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
-    while (i != listOfIndexes.constEnd()) {
-        QVector<double> TimerN;
-        QVector<double> YValsN;
+    if(!workerThread.isRunning()) {
 
-        indexes indexNew = i.value();
-        //qDebug() << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << endl;
+        QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
+        while (i != listOfIndexes.constEnd()) {
 
-        QString key = indexNew.pv;
+            indexes indexNew = i.value();
+            //qDebug() << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << endl;
 
-        int nbVal = 0;
+            WorkerPRO *worker = new WorkerPRO;
+            worker->moveToThread(&workerThread);
+            connect(&workerThread, SIGNAL(finished()), worker, SLOT(workerFinish()));
+            connect(this, SIGNAL(operate( QWidget *, indexes)), worker,
+                    SLOT(getFromArchive(QWidget *, indexes)));
+            connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>)), this,
+                    SLOT(handleResults(indexes, int, QVector<double>, QVector<double>)));
+            workerThread.start();
 
-        char dev[40];
-        float *Timer, *YVals;
-
-        QString loggingServer = (QString)  qgetenv("LOGGINGSERVER");
-        loggingServer = loggingServer.toUpper();
-        if(loggingServer.isEmpty() || !loggingServer.contains("PRO")) setenv("LOGGINGSERVER", "proscan-lgexp.psi.ch", 1);
-
-        //qDebug() << "get from archive at " << "proscan-lgexp.psi.ch";
-        int startHours = indexNew.secondsPast / 3600;
-        int day =  startHours/24 + 1;
-        int arraySize =  3600/5 * 24 * (day+1);
-
-        Timer = (float*) malloc(arraySize * sizeof(float));
-        YVals = (float*) malloc(arraySize * sizeof(float));
-
-        strcpy(dev, qasc(key));
-        GetLogShift(indexNew.secondsPast, dev, &nbVal, Timer, YVals);
-
-        // resize arrays
-        TimerN.resize(nbVal);
-        YValsN.resize(nbVal);
-        int k=0;
-        for(int j=0; j<nbVal; j++) {
-            if(Timer[j] >= -startHours) {
-                TimerN[k] = Timer[j];
-                YValsN[k] = YVals[j];
-                ++k;
-            }
+            //qDebug() << "SF emit operate";
+            emit operate((QWidget *) messagewindowP, indexNew);
+            ++i;
         }
-        nbVal = k;
-        free(Timer);
-        free(YVals);
 
-        //qDebug() << "nbval=" << nbVal;
-
-        archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN);
-
-        ++i;
+    } else {
+        //qDebug() << "workerthread is running" << workerThread.isRunning();
     }
     //qDebug() << "ArchivePRO_Plugin::update finished";
+}
+
+void ArchivePRO_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN)
+{
+    //qDebug() << "in pro handle results" << nbVal << TimerN.count();
+    if(nbVal > 0 && nbVal < TimerN.count()) {
+      TimerN.resize(nbVal);
+      YValsN.resize(nbVal);
+    }
+    if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN);
+    workerThread.quit();
 }
 
 // define data to be called

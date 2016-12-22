@@ -37,6 +37,7 @@ void ArchiverCommon::updateInterface()
     double diff;
     struct timeb now;
     QMap<QString, indexes> listOfIndexesToBeExecuted;
+    listOfIndexesToBeExecuted.clear();
 
     QMutexLocker locker(&mutex);
 
@@ -44,7 +45,7 @@ void ArchiverCommon::updateInterface()
     // after first start, set timer to wanted period
     if(!timerRunning) {
         timer->stop();
-        timer->start(200);
+        timer->start(500);
         timerRunning = true;
     }
 
@@ -66,6 +67,8 @@ void ArchiverCommon::updateInterface()
 
         ++i;
     }
+    //qDebug() << "number of indexes to execute" << listOfIndexesToBeExecuted.count();
+
 
     // call user routine for updating data
     if(listOfIndexesToBeExecuted.count() > 0) emit Signal_UpdateInterface(listOfIndexesToBeExecuted);
@@ -142,7 +145,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
                 indexes indexNew = i.value();
                 if(kData->specData[2] == caCartesianPlot::CH_X) indexNew.indexX = kData->index;
                 else if(kData->specData[2] == caCartesianPlot::CH_Y) indexNew.indexY = kData->index;
-                //qDebug() << indexNew.indexX << indexNew.indexY;
+                //qDebug() << "indexes x and y" << indexNew.indexX << indexNew.indexY;
                 indexNew.lastUpdateTime.time = 0;
                 listOfIndexes.insert(key, indexNew);
                 break;
@@ -209,12 +212,14 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double
 // caQtDM_Lib will call this routine for getting rid of a monitor
 int ArchiverCommon::pvClearMonitor(knobData *kData) {
 
+
     if (kData->index == -1) return true;
+    //qDebug() << "clearmonitor" << kData->index << kData->pv;
 
     if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) kData->dispW)) {
         Q_UNUSED(w);
         char asc[50];
-        sprintf(asc, "%s_%p", kData->pv, kData->dispW);
+        sprintf(asc, "%d_%s_%p",kData->specData[0], kData->pv, kData->dispW);
         QString key = QString(asc);
         key = key.replace(".X", "");
         key = key.replace(".Y", "");

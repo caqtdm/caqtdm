@@ -38,10 +38,11 @@ QString ArchiveSF_Plugin::pluginName()
 // constructor
 ArchiveSF_Plugin::ArchiveSF_Plugin()
 {
+    qRegisterMetaType<indexes>("indexes");
+    qRegisterMetaType<QVector<double> >("QVector<double>");
+
     qDebug() << "ArchiveSF_Plugin: Create (SwissFel http-retrieval)";
     archiverCommon = new ArchiverCommon();
-
-    url = QUrl("http://data-api.psi.ch/sf/query");
 
     connect(archiverCommon, SIGNAL(Signal_UpdateInterface(QMap<QString, indexes>)), this,SLOT(Callback_UpdateInterface(QMap<QString, indexes>)));
 }
@@ -50,59 +51,55 @@ ArchiveSF_Plugin::ArchiveSF_Plugin()
 int ArchiveSF_Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow, QMap<QString, QString> options)
 {
     mutexknobdataP = data;
+    messagewindowP = messageWindow;
     return archiverCommon->initCommunicationLayer(data, messageWindow, options);
 }
 
 // this routine will be called now every 10 seconds to update the cartesianplot
+// however when many data it may take much longer, then  suppress any new request
 void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes)
 {
-    struct timeb now;
     QMutexLocker locker(&mutex);
 
     //qDebug() << "====================== ArchiveSF_Plugin::Callback_UpdateInterface";
 
-    QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
-    while (i != listOfIndexes.constEnd()) {
-        QVector<double> TimerN;
-        QVector<double> YValsN;
+    if(!workerThread.isRunning()) {
 
-        indexes indexNew = i.value();
-        //qDebug() << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << endl;
+        QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
 
-        QString key = indexNew.pv;
-        int nbVal = 0;
+        while (i != listOfIndexes.constEnd()) {
 
-        ftime(&now);
-        //qDebug() << "get from sf archive" << key;
-        double endSeconds = (double) now.time + (double) now.millitm / (double)1000;
-        double startSeconds = endSeconds - indexNew.secondsPast;
-        QString response ="'response':{'format':'csv'}";
-        QString channels = "'channels': [ '" + key + "' ]";
-        QString range = "'range': { 'startSeconds' : '" + QString::number(startSeconds, 'g', 10) + "', 'endSeconds' : '" + QString::number(endSeconds, 'g', 10) + "'}";
-        QString fields = "'fields':['channel','iocSeconds','value']}";
-        //QString agg = "'aggregation': {'aggregationType':'value', 'aggregations':['min','mean','max'], 'nrOfBins' : 2000}";
-        QString total = "{" + response + "," + range + "," + channels + "," + fields + "}";
-        total = total.replace("'", "\"");
-        QByteArray json_str = total.toUtf8();
-        fromArchive = new sfRetrieval();
+            indexes indexNew = i.value();
+            //qDebug() << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << endl;
 
-        if(fromArchive->requestUrl(url, json_str, indexNew.secondsPast)) {
+            WorkerSF *worker = new WorkerSF;
+            worker->moveToThread(&workerThread);
+            connect(&workerThread, SIGNAL(finished()), worker, SLOT(workerFinish()));
+            connect(this, SIGNAL(operate( QWidget *, indexes)), worker,
+                    SLOT(getFromArchive(QWidget *, indexes)));
+            connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>)), this,
+                    SLOT(handleResults(indexes, int, QVector<double>, QVector<double>)));
+            workerThread.start();
 
-            if((nbVal = fromArchive->getCount()) > 0) {
-                //qDebug() << nbVal << total;
-                TimerN.resize(fromArchive->getCount());
-                YValsN.resize(fromArchive->getCount());
-                fromArchive->getData(TimerN, YValsN);
-                archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN);
-            }
-
+            emit operate((QWidget *) messagewindowP, indexNew);
+            ++i;
         }
-        fromArchive->deleteLater();
 
-        ++i;
-
+    } else {
+        //qDebug() << "workerthread is running" << workerThread.isRunning();
     }
     //qDebug() << "ArchiveSF_Plugin::update finished";
+}
+
+void ArchiveSF_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN)
+{
+    //qDebug() << "in sf handle results" << nbVal << TimerN.count();
+    if(nbVal > 0 && nbVal < TimerN.count()) {
+      TimerN.resize(nbVal);
+      YValsN.resize(nbVal);
+    }
+    if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN);
+    workerThread.quit();
 }
 
 // define data to be called

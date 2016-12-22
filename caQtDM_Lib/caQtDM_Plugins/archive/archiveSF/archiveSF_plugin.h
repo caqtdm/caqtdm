@@ -30,6 +30,7 @@
 #include <QMutex>
 #include <QList>
 #include <QTimer>
+#include <QThread>
 #include <qwt.h>
 #include "cacartesianplot.h"
 #include "controlsinterface.h"
@@ -37,9 +38,76 @@
 #include "archiverCommon.h"
 #include "sfRetrieval.h"
 
+class Q_DECL_EXPORT WorkerSF : public QObject
+{
+    Q_OBJECT
+    QThread workerThread;
+
+public:
+    WorkerSF() {
+        qRegisterMetaType<indexes>("indexes");
+        qRegisterMetaType<QVector<double> >("QVector<double>");
+    }
+
+private:
+    QVector<double>  TimerN, YValsN;
+
+public slots:
+
+    void workerFinish() {
+        deleteLater();
+    }
+
+    void getFromArchive(QWidget *w, indexes indexNew) {
+        Q_UNUSED(w);
+        struct timeb now;
+        QUrl url = QUrl("http://data-api.psi.ch/sf/query");
+
+        QString key = indexNew.pv;
+        int nbVal = 0;
+
+        ftime(&now);
+        //qDebug() << "get from sf archive" << key;
+        double endSeconds = (double) now.time + (double) now.millitm / (double)1000;
+        double startSeconds = endSeconds - indexNew.secondsPast;
+        QString response ="'response':{'format':'csv'}";
+        QString channels = "'channels': [ '" + key + "' ]";
+        QString range = "'range': { 'startSeconds' : '" + QString::number(startSeconds, 'g', 10) + "', 'endSeconds' : '" + QString::number(endSeconds, 'g', 10) + "'}";
+        QString fields = "'fields':['channel','iocSeconds','value']}";
+        //QString agg = "'aggregation': {'aggregationType':'value', 'aggregations':['min','mean','max'], 'nrOfBins' : 2000}";
+        QString total = "{" + response + "," + range + "," + channels + "," + fields + "}";
+        total = total.replace("'", "\"");
+        QByteArray json_str = total.toUtf8();
+
+        sfRetrieval *fromArchive = new sfRetrieval();
+
+        if(fromArchive->requestUrl(url, json_str, indexNew.secondsPast)) {
+
+            if((nbVal = fromArchive->getCount()) > 0) {
+                //qDebug() << nbVal << total;
+                TimerN.resize(fromArchive->getCount());
+                YValsN.resize(fromArchive->getCount());
+                fromArchive->getData(TimerN, YValsN);
+            }
+
+        }
+        fromArchive->deleteLater();
+
+        emit resultReady(indexNew, nbVal, TimerN, YValsN);
+    }
+
+signals:
+    void resultReady(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN);
+
+public:
+
+};
+
 class Q_DECL_EXPORT ArchiveSF_Plugin : public QObject, ControlsInterface
 {
     Q_OBJECT
+    QThread workerThread;
+
     Q_INTERFACES(ControlsInterface)
 #if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
     Q_PLUGIN_METADATA(IID "ch.psi.caqtdm.Plugin.ControlsInterface/1.0.democontrols")
@@ -65,28 +133,19 @@ public:
     int FlushIO();
     int TerminateIO();
 
- protected:
+public slots:
+    void handleResults(indexes, int, QVector<double>, QVector<double>);
+signals:
+    void operate(QWidget*, const indexes);
 
 private slots:
     void Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes);
 
 private:
-
     QMutex mutex;
-    QUrl url;
     MutexKnobData *mutexknobdataP;
     MessageWindow *messagewindowP;
-    QMap<QString, indexes> listOfIndexes;
-
-    QTimer *timer;
-    bool timerRunning;
-
-
-    sfRetrieval *fromArchive;
-
-
     ArchiverCommon *archiverCommon;
-
 };
 
 #endif

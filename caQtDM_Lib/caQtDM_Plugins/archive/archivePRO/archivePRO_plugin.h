@@ -30,6 +30,7 @@
 #include <QMutex>
 #include <QList>
 #include <QTimer>
+#include <QThread>
 #include <qwt.h>
 #include "cacartesianplot.h"
 #include "controlsinterface.h"
@@ -37,9 +38,86 @@
 #include "archiverCommon.h"
 #include "proRetrieval.h"
 
+class Q_DECL_EXPORT WorkerPRO : public QObject
+{
+    Q_OBJECT
+    QThread workerThread;
+
+public:
+    WorkerPRO() {
+        qRegisterMetaType<indexes>("indexes");
+        qRegisterMetaType<QVector<double> >("QVector<double>");
+    }
+
+private:
+    QVector<double>  TimerN, YValsN;
+
+public slots:
+
+    void workerFinish() {
+        deleteLater();
+    }
+
+    void getFromArchive(QWidget *w, indexes indexNew) {
+
+        Q_UNUSED(w);
+        QString key = indexNew.pv;
+
+        int nbVal = 0;
+
+        char dev[40];
+        float *Timer, *YVals;
+
+        QString loggingServer = (QString)  qgetenv("LOGGINGSERVER");
+        loggingServer = loggingServer.toUpper();
+        if(loggingServer.isEmpty() || !loggingServer.contains("PRO")) setenv("LOGGINGSERVER", "proscan-lgexp.psi.ch", 1);
+
+        //qDebug() << "get from archive at " << "proscan-lgexp.psi.ch";
+        int startHours = indexNew.secondsPast / 3600;
+        int day =  startHours/24 + 1;
+        int arraySize =  3600/5 * 24 * (day+1);
+
+        Timer = (float*) malloc(arraySize * sizeof(float));
+        YVals = (float*) malloc(arraySize * sizeof(float));
+
+        strcpy(dev, qasc(key));
+        GetLogShift(indexNew.secondsPast, dev, &nbVal, Timer, YVals);
+
+        // resize arrays
+        TimerN.clear();
+        YValsN.clear();
+        TimerN.resize(nbVal);
+        YValsN.resize(nbVal);
+        int k=0;
+        for(int j=0; j<nbVal; j++) {
+            if(Timer[j] >= -startHours) {
+                TimerN[k] = Timer[j];
+                YValsN[k] = YVals[j];
+                ++k;
+            }
+        }
+        nbVal = k;
+        free(Timer);
+        free(YVals);
+
+        //qDebug() << "nbval=" << nbVal;
+
+        emit resultReady(indexNew, nbVal, TimerN, YValsN);
+    }
+
+signals:
+    void resultReady(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN);
+
+public:
+
+};
+
+
 class Q_DECL_EXPORT ArchivePRO_Plugin : public QObject, ControlsInterface
 {
     Q_OBJECT
+    QThread workerThread;
+
     Q_INTERFACES(ControlsInterface)
 #if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
     Q_PLUGIN_METADATA(IID "ch.psi.caqtdm.Plugin.ControlsInterface/1.0.democontrols")
@@ -64,24 +142,21 @@ public:
     int FlushIO();
     int TerminateIO();
 
-protected:
+public slots:
+    void handleResults(indexes, int, QVector<double>, QVector<double>);
+
+signals:
+    void operate(QWidget*, const indexes);
 
 private slots:
     void updateValues();
     void Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes);
 
 private:
-
     QMutex mutex;
     MutexKnobData *mutexknobdataP;
     MessageWindow *messagewindowP;
-    QMap<QString, indexes> listOfIndexes;
-
-    QTimer *timer;
-    bool timerRunning;
-
     ArchiverCommon *archiverCommon;
-
 };
 
 #endif

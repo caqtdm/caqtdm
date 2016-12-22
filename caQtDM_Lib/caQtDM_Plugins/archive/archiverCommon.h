@@ -37,6 +37,7 @@
 
 struct indexes {int indexX; int indexY; int secondsPast; QString pv; int updateSeconds; struct timeb lastUpdateTime; QWidget *w;};
 
+
 class Q_DECL_EXPORT ArchiverCommon : public QObject
 {
     Q_OBJECT
@@ -71,5 +72,7 @@ private:
     QTimer *timer;
     bool timerRunning;
 };
+
+
 
 #endif
