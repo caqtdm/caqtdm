@@ -34,6 +34,8 @@ rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archivePRO/Makefile.csplugins
 rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archivePRO/Makefile
 rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveHIPA/Makefile.csplugins
 rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveHIPA/Makefile
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveCA/Makefile.csplugins
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveCA/Makefile
 rm -f ./caQtDM_QtControls/Makefile
 rm -f ./caQtDM_QtControls/plugins/Makefile
 rm -f ./caQtDM_Lib/*.so
@@ -65,6 +67,8 @@ rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveHIPA/obj/*
 rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveHIPA/moc/*
 rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archivePRO/obj/*
 rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archivePRO/moc/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveCA/obj/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveCA/moc/*
 
 rm -f ./caQtDM_Viewer/obj/*
 rm -f ./caQtDM_Viewer/moc/*

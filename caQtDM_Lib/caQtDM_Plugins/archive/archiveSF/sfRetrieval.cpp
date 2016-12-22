@@ -123,7 +123,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
          if((seconds - line[1].toDouble()) < secndsPast) {
             X[count] = -(seconds - line[1].toDouble()) / 3600.0;
             Y[count++] = line[2].toDouble();             //qDebug() << line[3] << line[4] << line[5]; in case of aggragation
-            //if(count < 10) printf("%f channel=%s seconds=%s value=%s  values=%f %f time=%s", seconds - line[1].toDouble(), qasc(line[0]),  qasc(line[1]), qasc(line[2]), X[i-1],Y[i-1], ctime(&t));
+            //if(count < 10) printf("%f channel=%s seconds=%s value=%s  values=%f %f\n", seconds - line[1].toDouble(), qasc(line[0]),  qasc(line[1]), qasc(line[2]), X[i-1],Y[i-1]);
          }
     }
     totalCount = count;
