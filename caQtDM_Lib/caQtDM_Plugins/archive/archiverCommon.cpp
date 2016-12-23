@@ -30,6 +30,7 @@
 ArchiverCommon::ArchiverCommon()
 {
     qDebug() << "ArchivePlugin: Create";
+    mutexP = new QMutex;
 }
 
 void ArchiverCommon::updateInterface()
@@ -64,10 +65,9 @@ void ArchiverCommon::updateInterface()
             listOfIndexes.insert(i.key(), indexNew);
             listOfIndexesToBeExecuted.insert(i.key(), indexNew);
         }
-
         ++i;
     }
-    //qDebug() << "number of indexes to execute" << listOfIndexesToBeExecuted.count();
+   // qDebug() << "number of indexes to execute" << listOfIndexesToBeExecuted.count();
 
 
     // call user routine for updating data
@@ -129,6 +129,8 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
             index.updateSeconds = 10;
         }
 
+        index.key = key;
+        index.mutexP = mutexP;
         index.pv = QString(kData->pv);
         index.pv = index.pv.replace(".X", "");
         index.pv = index.pv.replace(".Y", "");

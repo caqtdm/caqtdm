@@ -71,16 +71,26 @@ void ArchiveCA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
 
     //qDebug() << "====================== ArchiveCA_Plugin::Callback_UpdateInterface";
 
-    if(!workerThread.isRunning()) {
+    QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
 
-        QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
+    while (i != listOfIndexes.constEnd()) {
+        QThread *tmpThread = (QThread *) 0;
+        indexes indexNew = i.value();
+        //qDebug() << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << indexNew.w << endl;
 
-        while (i != listOfIndexes.constEnd()) {
+        nbVal = 0;
 
-            indexes indexNew = i.value();
-            //qDebug() << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << indexNew.w << endl;
+        QMap<QString, QThread *>::iterator j = listOfThreads.find(indexNew.key);
+        while (j !=listOfThreads.end() && j.key() == indexNew.key) {
+            tmpThread = (QThread *) j.value();
+            ++j;
+        }
 
-            nbVal = 0;
+        //qDebug() << "tmpThread" << tmpThread;
+
+        if((tmpThread != (QThread *) 0) && tmpThread->isRunning()) {
+            //qDebug() << "workerthread is running" << tmpThread->isRunning();
+        } else {
 
             // Get Index name if specified for this widget
             if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) indexNew.w)) {
@@ -95,22 +105,21 @@ void ArchiveCA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
             }
 
             WorkerCA *worker = new WorkerCA;
-            worker->moveToThread(&workerThread);
-            connect(&workerThread, SIGNAL(finished()), worker, SLOT(workerFinish()));
+            QThread *tmpThread = new QThread;
+            listOfThreads.insert(i.key(), tmpThread);
+            worker->moveToThread(tmpThread);
+            connect(tmpThread, SIGNAL(finished()), worker, SLOT(workerFinish()));
+            connect(tmpThread, SIGNAL(finished()), tmpThread, SLOT(deleteLater()) );
             connect(this, SIGNAL(operate( QWidget *, indexes, const stdString)), worker,
                     SLOT(getFromArchive(QWidget *, indexes, stdString)));
             connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>)), this,
                     SLOT(handleResults(indexes, int, QVector<double>, QVector<double>)));
-            workerThread.start();
+            tmpThread->start();
 
             //qDebug() << "CA emit operate";
-
             emit operate((QWidget *) messagewindowP ,indexNew, index_name);
-            ++i;
         }
-
-    } else {
-        //qDebug() << "workerthread is running" << workerThread.isRunning();
+        ++i;
     }
 }
 
@@ -123,9 +132,16 @@ void ArchiveCA_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double
     }
 
     if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN);
-    workerThread.quit();
-}
 
+    QMap<QString, QThread *>::iterator j = listOfThreads.find(indexNew.key);
+    while (j !=listOfThreads.end() && j.key() == indexNew.key) {
+        QThread *tmpThread = (QThread*) j.value();
+        tmpThread->quit();
+        //qDebug() << tmpThread << "ca quit";
+        listOfThreads.remove(indexNew.key);
+        ++j;
+    }
+}
 
 // define data to be called
 int ArchiveCA_Plugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {

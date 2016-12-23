@@ -62,43 +62,60 @@ void ArchivePRO_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfI
 
     //qDebug() << "-------------------- ArchivePRO_Plugin::Callback_UpdateInterface";
 
-    if(!workerThread.isRunning()) {
+    QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
 
-        QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
-        while (i != listOfIndexes.constEnd()) {
+    while (i != listOfIndexes.constEnd()) {
+        QThread *tmpThread = (QThread *) 0;
+        indexes indexNew = i.value();
+        //qDebug() << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << indexNew.w << endl;
 
-            indexes indexNew = i.value();
-            //qDebug() << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << endl;
-
-            WorkerPRO *worker = new WorkerPRO;
-            worker->moveToThread(&workerThread);
-            connect(&workerThread, SIGNAL(finished()), worker, SLOT(workerFinish()));
-            connect(this, SIGNAL(operate( QWidget *, indexes)), worker,
-                    SLOT(getFromArchive(QWidget *, indexes)));
-            connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>)), this,
-                    SLOT(handleResults(indexes, int, QVector<double>, QVector<double>)));
-            workerThread.start();
-
-            //qDebug() << "SF emit operate";
-            emit operate((QWidget *) messagewindowP, indexNew);
-            ++i;
+        QMap<QString, QThread *>::iterator j = listOfThreads.find(indexNew.key);
+        while (j !=listOfThreads.end() && j.key() == indexNew.key) {
+            tmpThread = (QThread *) j.value();
+            ++j;
         }
 
-    } else {
-        //qDebug() << "workerthread is running" << workerThread.isRunning();
+        //qDebug() << "tmpThread" << tmpThread;
+
+        if((tmpThread != (QThread *) 0) && tmpThread->isRunning()) {
+            qDebug() << "workerthread is running" << tmpThread->isRunning();
+        } else {
+            WorkerPRO *worker = new WorkerPRO;
+            QThread *tmpThread = new QThread;
+            listOfThreads.insert(i.key(), tmpThread);
+            worker->moveToThread(tmpThread);
+            connect(tmpThread, SIGNAL(finished()), worker, SLOT(workerFinish()));
+            connect(tmpThread, SIGNAL(finished()), tmpThread, SLOT(deleteLater()) );
+            connect(this, SIGNAL(operate( QWidget *, indexes)), worker,
+                          SLOT(getFromArchive(QWidget *, indexes)));
+            connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>)), this,
+                            SLOT(handleResults(indexes, int, QVector<double>, QVector<double>)));
+            tmpThread->start();
+
+            //qDebug() << "PRO emit operate";
+            emit operate((QWidget *) messagewindowP ,indexNew);
+        }
+        ++i;
     }
-    //qDebug() << "ArchivePRO_Plugin::update finished";
 }
 
 void ArchivePRO_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN)
 {
-    //qDebug() << "in pro handle results" << nbVal << TimerN.count();
+    //qDebug() << "in PRO handle results" << nbVal << TimerN.count();
     if(nbVal > 0 && nbVal < TimerN.count()) {
       TimerN.resize(nbVal);
       YValsN.resize(nbVal);
     }
     if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN);
-    workerThread.quit();
+
+    QMap<QString, QThread *>::iterator j = listOfThreads.find(indexNew.key);
+    while (j !=listOfThreads.end() && j.key() == indexNew.key) {
+        QThread *tmpThread = (QThread*) j.value();
+        tmpThread->quit();
+        //qDebug() << tmpThread << "pro quit";
+        listOfThreads.remove(indexNew.key);
+        ++j;
+    }
 }
 
 // define data to be called

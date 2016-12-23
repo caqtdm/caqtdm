@@ -30,12 +30,13 @@
 #include <QMutex>
 #include <QList>
 #include <QTimer>
+#include <QThread>
 #include <qwt.h>
 #include "cacartesianplot.h"
 #include "mutexKnobData.h"
 #include "MessageWindow.h"
 
-struct indexes {int indexX; int indexY; int secondsPast; QString pv; int updateSeconds; struct timeb lastUpdateTime; QWidget *w;};
+struct indexes {QString key; int indexX; int indexY; int secondsPast; QString pv; int updateSeconds; struct timeb lastUpdateTime; QWidget *w; int nrOfBins; QMutex *mutexP;};
 
 
 class Q_DECL_EXPORT ArchiverCommon : public QObject
@@ -64,6 +65,7 @@ private slots:
 private:
     typedef struct  {char Dev[40];} device;
     QMutex mutex;
+    QMutex *mutexP;
     MutexKnobData *mutexknobdataP;
     MessageWindow *messagewindowP;
 

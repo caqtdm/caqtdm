@@ -58,7 +58,6 @@ static RawValue::NumberFormat format = RawValue::DEFAULT;
 class Q_DECL_EXPORT WorkerCA : public QObject
 {
     Q_OBJECT
-    QThread workerThread;
 
 public:
     WorkerCA() {
@@ -83,6 +82,7 @@ private:
 public slots:
 
     void workerFinish() {
+        //qDebug() << "worker finish";
         deleteLater();
     }
 
@@ -97,8 +97,10 @@ public slots:
         time_t endSeconds, startSeconds;
         MessageWindow *messagewindowP = (MessageWindow *) w;
 
+        QMutex *mutex = indexNew.mutexP;
+        mutex->lock();
+
         ftime(&now);
-        //qDebug() << "get from sf archive" << indexNew.pv;
         endSeconds = (time_t) ((double) now.time + (double) now.millitm / (double)1000);
         startSeconds = (time_t) (endSeconds - indexNew.secondsPast);
 
@@ -170,6 +172,8 @@ public slots:
             ok = sheet.next();
         }
         emit resultReady(indexNew, nbVal, TimerN, YValsN);
+
+        mutex->unlock();
     }
 
 signals:
@@ -182,7 +186,6 @@ public:
 class Q_DECL_EXPORT ArchiveCA_Plugin : public QObject, ControlsInterface
 {
     Q_OBJECT
-    QThread workerThread;
 
     Q_INTERFACES(ControlsInterface)
 #if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
@@ -224,6 +227,7 @@ private:
     MutexKnobData *mutexknobdataP;
     MessageWindow *messagewindowP;
     ArchiverCommon *archiverCommon;
+    QMap<QString, QThread*> listOfThreads;
 };
 
 #endif

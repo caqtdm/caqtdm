@@ -41,7 +41,6 @@
 class Q_DECL_EXPORT WorkerPRO : public QObject
 {
     Q_OBJECT
-    QThread workerThread;
 
 public:
     WorkerPRO() {
@@ -61,6 +60,10 @@ public slots:
     void getFromArchive(QWidget *w, indexes indexNew) {
 
         Q_UNUSED(w);
+
+        QMutex *mutex = indexNew.mutexP;
+        mutex->lock();
+
         QString key = indexNew.pv;
 
         int nbVal = 0;
@@ -81,7 +84,8 @@ public slots:
         YVals = (float*) malloc(arraySize * sizeof(float));
 
         strcpy(dev, qasc(key));
-        GetLogShift(indexNew.secondsPast, dev, &nbVal, Timer, YVals);
+        int ret = GetLogShift(indexNew.secondsPast, dev, &nbVal, Timer, YVals);
+        if(!ret) nbVal = 0;
 
         // resize arrays
         TimerN.clear();
@@ -100,9 +104,11 @@ public slots:
         free(Timer);
         free(YVals);
 
-        //qDebug() << "nbval=" << nbVal;
+        //qDebug() << "pro nbval=" << nbVal;
 
         emit resultReady(indexNew, nbVal, TimerN, YValsN);
+
+        mutex->unlock();
     }
 
 signals:
@@ -116,7 +122,6 @@ public:
 class Q_DECL_EXPORT ArchivePRO_Plugin : public QObject, ControlsInterface
 {
     Q_OBJECT
-    QThread workerThread;
 
     Q_INTERFACES(ControlsInterface)
 #if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
@@ -157,6 +162,7 @@ private:
     MutexKnobData *mutexknobdataP;
     MessageWindow *messagewindowP;
     ArchiverCommon *archiverCommon;
+    QMap<QString, QThread*> listOfThreads;
 };
 
 #endif

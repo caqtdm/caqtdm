@@ -41,7 +41,6 @@
 class Q_DECL_EXPORT WorkerSF : public QObject
 {
     Q_OBJECT
-    QThread workerThread;
 
 public:
     WorkerSF() {
@@ -60,28 +59,41 @@ public slots:
 
     void getFromArchive(QWidget *w, indexes indexNew) {
         Q_UNUSED(w);
+
+        QMutex *mutex = indexNew.mutexP;
+        mutex->lock();
+
         struct timeb now;
         QUrl url = QUrl("http://data-api.psi.ch/sf/query");
+        QString fields, agg;
+        bool isBinned;
 
         QString key = indexNew.pv;
         int nbVal = 0;
 
         ftime(&now);
-        //qDebug() << "get from sf archive" << key;
         double endSeconds = (double) now.time + (double) now.millitm / (double)1000;
         double startSeconds = endSeconds - indexNew.secondsPast;
         QString response ="'response':{'format':'csv'}";
         QString channels = "'channels': [ '" + key + "' ]";
         QString range = "'range': { 'startSeconds' : '" + QString::number(startSeconds, 'g', 10) + "', 'endSeconds' : '" + QString::number(endSeconds, 'g', 10) + "'}";
-        QString fields = "'fields':['channel','iocSeconds','value']}";
-        //QString agg = "'aggregation': {'aggregationType':'value', 'aggregations':['min','mean','max'], 'nrOfBins' : 2000}";
-        QString total = "{" + response + "," + range + "," + channels + "," + fields + "}";
+
+        if(indexNew.nrOfBins != -1) {
+            isBinned = true;
+            fields = "'fields':['channel','iocSeconds','value']";
+            agg = tr(", 'aggregation': {'aggregationType':'value', 'aggregations':['min','mean','max'], 'nrOfBins' : %1}").arg(indexNew.nrOfBins);
+        } else {
+            isBinned = false;
+            fields = "'fields':['channel','iocSeconds','value']}";
+            agg = "";
+        }
+        QString total = "{" + response + "," + range + "," + channels + "," + fields + agg + "}";
         total = total.replace("'", "\"");
         QByteArray json_str = total.toUtf8();
 
         sfRetrieval *fromArchive = new sfRetrieval();
 
-        if(fromArchive->requestUrl(url, json_str, indexNew.secondsPast)) {
+        if(fromArchive->requestUrl(url, json_str, indexNew.secondsPast, isBinned)) {
 
             if((nbVal = fromArchive->getCount()) > 0) {
                 //qDebug() << nbVal << total;
@@ -89,11 +101,14 @@ public slots:
                 YValsN.resize(fromArchive->getCount());
                 fromArchive->getData(TimerN, YValsN);
             }
-
         }
         fromArchive->deleteLater();
 
+        //qDebug() << "number of values received" << nbVal;
+
         emit resultReady(indexNew, nbVal, TimerN, YValsN);
+
+        mutex->unlock();
     }
 
 signals:
@@ -106,7 +121,6 @@ public:
 class Q_DECL_EXPORT ArchiveSF_Plugin : public QObject, ControlsInterface
 {
     Q_OBJECT
-    QThread workerThread;
 
     Q_INTERFACES(ControlsInterface)
 #if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
@@ -146,6 +160,7 @@ private:
     MutexKnobData *mutexknobdataP;
     MessageWindow *messagewindowP;
     ArchiverCommon *archiverCommon;
+    QMap<QString, QThread*> listOfThreads;
 };
 
 #endif

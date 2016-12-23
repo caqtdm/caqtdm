@@ -58,7 +58,7 @@ void sfRetrieval::timeoutL()
      eventLoop->quit();
 }
 
-bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int secondsPast)
+bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int secondsPast, bool binned)
 {
     finished = false;
     totalCount = 0;
@@ -66,6 +66,7 @@ bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int seconds
     QString out = QString(json);
     //printf("caQtDM -- request from %s with %s\n", qasc(url.toString()), qasc(out));
     downloadUrl = url;
+    isBinned = binned;
 
     QNetworkRequest *request = new QNetworkRequest(url);
 
@@ -97,6 +98,8 @@ int sfRetrieval::downloadFinished()
 void sfRetrieval::finishReply(QNetworkReply *reply)
 {
     struct timeb now;
+    int valueIndex = 2;
+    if(isBinned) valueIndex = 3;
 
     if(reply->error()) {
         errorString = tr("%1: %2").arg(parseError(reply->error())).arg(downloadUrl.toString());
@@ -118,11 +121,12 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
     ftime(&now);
     int count = 0;
     for(int i=1; i< result.count(); ++i) {
+        //qDebug() << result[i];
          QStringList line = result[i].split(";", QString::SkipEmptyParts);
          double seconds = (double) now.time + (double) now.millitm / (double)1000;
          if((seconds - line[1].toDouble()) < secndsPast) {
             X[count] = -(seconds - line[1].toDouble()) / 3600.0;
-            Y[count++] = line[2].toDouble();             //qDebug() << line[3] << line[4] << line[5]; in case of aggragation
+            Y[count++] = line[valueIndex].toDouble();             //qDebug() << line[3] << line[4] << line[5]; in case of aggragation
             //if(count < 10) printf("%f channel=%s seconds=%s value=%s  values=%f %f\n", seconds - line[1].toDouble(), qasc(line[0]),  qasc(line[1]), qasc(line[2]), X[i-1],Y[i-1]);
          }
     }

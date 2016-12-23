@@ -42,7 +42,7 @@ class sfRetrieval:public QObject
 public:
     sfRetrieval();
     ~sfRetrieval() {X.clear(); Y.clear();}
-    bool requestUrl(const QUrl url, const QByteArray &json, int secondsPast);
+    bool requestUrl(const QUrl url, const QByteArray &json, int secondsPast, bool binned);
     const QString lastError();
     int getCount();
     void getData(QVector<double> &x, QVector<double> &y);
@@ -68,6 +68,7 @@ private:
     int totalCount;
     int secndsPast;
     QEventLoop *eventLoop;
+    bool isBinned;
 };
 
 #endif

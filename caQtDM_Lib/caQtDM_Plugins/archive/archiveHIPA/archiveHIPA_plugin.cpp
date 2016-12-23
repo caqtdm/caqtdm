@@ -54,51 +54,73 @@ int ArchiveHIPA_Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindo
     return archiverCommon->initCommunicationLayer(data, messageWindow, options);
 }
 
+
 // this routine will be called now every 10 seconds to update the cartesianplot
 // however when many data it may take much longer, then  suppress any new request
 void ArchiveHIPA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes)
 {
     QMutexLocker locker(&mutex);
 
-    //qDebug() << "-------------------- ArchivePRO_Plugin::Callback_UpdateInterface";
+    //qDebug() << "-------------------- ArchiveHIPA_Plugin::Callback_UpdateInterface";
 
-    if(!workerThread.isRunning()) {
+    QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
 
-        QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
-        while (i != listOfIndexes.constEnd()) {
+    while (i != listOfIndexes.constEnd()) {
+        QThread *tmpThread = (QThread *) 0;
+        indexes indexNew = i.value();
+        //qDebug() <<" -------------" << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << indexNew.w;
 
-            indexes indexNew = i.value();
-            //qDebug() << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << endl;
-
-            WorkerHIPA *worker = new WorkerHIPA;
-            worker->moveToThread(&workerThread);
-            connect(&workerThread, SIGNAL(finished()), worker, SLOT(workerFinish()));
-            connect(this, SIGNAL(operate( QWidget *, indexes)), worker,
-                    SLOT(getFromArchive(QWidget *, indexes)));
-            connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>)), this,
-                    SLOT(handleResults(indexes, int, QVector<double>, QVector<double>)));
-            workerThread.start();
-
-            //qDebug() << "SF emit operate";
-            emit operate((QWidget *) messagewindowP, indexNew);
-            ++i;
+        QMap<QString, QThread *>::iterator j = listOfThreads.find(indexNew.key);
+        while (j !=listOfThreads.end() && j.key() == indexNew.key) {
+            tmpThread = (QThread *) j.value();
+            ++j;
         }
-    } else {
-        //qDebug() << "workerthread is running" << workerThread.isRunning();
-    }
 
-    //qDebug() << "ArchivePRO_Plugin::update finished";
+        //qDebug() << "tmpThread" << tmpThread;
+
+        if((tmpThread != (QThread *) 0) && tmpThread->isRunning()) {
+            qDebug() << "workerthread is running" << tmpThread->isRunning();
+        } else {
+            WorkerHIPA *worker = new WorkerHIPA;
+            QThread *tmpThread = new QThread;
+            listOfThreads.insert(i.key(), tmpThread);
+            worker->moveToThread(tmpThread);
+            connect(tmpThread, SIGNAL(finished()), worker, SLOT(workerFinish()));
+            connect(tmpThread, SIGNAL(finished()), tmpThread, SLOT(deleteLater()) );
+            connect(this, SIGNAL(operate( QWidget *, indexes)), worker,
+                          SLOT(getFromArchive(QWidget *, indexes)));
+            connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>)), this,
+                            SLOT(handleResults(indexes, int, QVector<double>, QVector<double>)));
+            tmpThread->start();
+
+            //qDebug() << "HIPA emit operate";
+            emit operate((QWidget *) messagewindowP ,indexNew);
+            disconnect(worker);
+        }
+
+        ++i;
+    }
+   // qDebug() << "-------------------- ArchiveHIPA_Plugin::Callback_UpdateInterface finish";
 }
 
 void ArchiveHIPA_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN)
 {
-    //qDebug() << "in hipa handle results" << nbVal << TimerN.count();
+    //qDebug() << "in HIPA handle results" << nbVal << TimerN.count();
     if(nbVal > 0 && nbVal < TimerN.count()) {
       TimerN.resize(nbVal);
       YValsN.resize(nbVal);
     }
+
     if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN);
-    workerThread.quit();
+
+    QMap<QString, QThread *>::iterator j = listOfThreads.find(indexNew.key);
+    while (j !=listOfThreads.end() && j.key() == indexNew.key) {
+        QThread *tmpThread = (QThread*) j.value();
+        tmpThread->quit();
+        //qDebug() << tmpThread << "hipa quit";
+        listOfThreads.remove(indexNew.key);
+        ++j;
+    }
 }
 
 // define data to be called
