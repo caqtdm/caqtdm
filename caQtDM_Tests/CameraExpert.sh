@@ -1,0 +1,1 @@
+caQtDM -macro NAME=MTEST-CAQTDM-CAMERA CameraExpert.ui
