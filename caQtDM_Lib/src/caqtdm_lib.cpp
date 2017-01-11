@@ -422,7 +422,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     // connect all signals of our propagators
     QList<wmSignalPropagator *> allM = this->findChildren<wmSignalPropagator *>();
     foreach(wmSignalPropagator* widget, allM) {
-        qDebug() << "found" << widget;
         connect(widget, SIGNAL(wmCloseWindow()), this, SLOT(closeWindow()));
         connect(widget, SIGNAL(wmShowNormal()), this, SLOT(closeWindow()));
         connect(widget, SIGNAL(wmShowMaximized()), this, SLOT(closeWindow()));
@@ -808,10 +807,10 @@ QMap<QString, QString> CaQtDM_Lib::actualizeMacroMap()
                 // go through all the children of type caReplaceMacro
                 QList<replaceMacro *> all = myWidget->findChildren<replaceMacro *>();
                 foreach(replaceMacro* widget, all) {
-                    qDebug() << widget;
+                    //qDebug() << widget;
                     QString key =  widget->getKey();
                     QString value = widget->getNewValue();
-                    qDebug() << widget << key << value << macroName;
+                    //qDebug() << widget << key << value << macroName;
                     if(macroName == key && value.length() > 0) {
                         //qDebug() << i.key() << i.value();
                         map.insert(macroName, value);
