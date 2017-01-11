@@ -8,7 +8,7 @@ include(../caQtDM.pri)
 QT += core gui
 
 contains(QT_VER_MAJ, 4) {
-   CONFIG   += qt thread uitools plugin
+   CONFIG   += qt thread uitools plugin  qtestlib
 }
 
 contains(QT_VER_MAJ, 5) {
@@ -86,4 +86,6 @@ australian: {
   INCLUDEPATH += ../../../epicsQt/2.8.1/framework/common
   LIBS += -L$(QTBASE)/designer -lQEPlugin
 }
+
+FORMS +=
 

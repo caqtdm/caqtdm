@@ -400,6 +400,7 @@ caQtDM_Viewer {
                 plugins.files = $(CAQTDM_COLLECT)/designer/libqtcontrols_controllers_plugin.dylib
                 plugins.files += $(CAQTDM_COLLECT)/designer/libqtcontrols_graphics_plugin.dylib
                 plugins.files += $(CAQTDM_COLLECT)/designer/libqtcontrols_monitors_plugin.dylib
+                plugins.files += $(CAQTDM_COLLECT)/designer/libqtcontrols_utilities_plugin.dylib
                 caqtdmlibs.path = Contents/Frameworks/
                 caqtdmlibs.files = $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib $(CAQTDM_COLLECT)/libqtcontrols.dylib
                 QMAKE_BUNDLE_DATA += plugins caqtdmlibs
@@ -449,6 +450,7 @@ caQtDM_Viewer {
                     LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_controllers_plugin.a
                     LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_monitors_plugin.a
                     LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_graphics_plugin.a
+                    LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_utilities_plugin.a
                     LIBS += $(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.a
                     LIBS += $(CAQTDM_COLLECT)/controlsystems/libepics3_plugin.a
 
@@ -504,6 +506,7 @@ caQtDM_Viewer {
                         LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_controllers_plugin.a
                         LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_monitors_plugin.a
                         LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_graphics_plugin.a
+                        LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_utilities_plugin.a
                         LIBS += $(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.a
                         LIBS += $(CAQTDM_COLLECT)/controlsystems/libepics3_plugin.a
                 epics4: {

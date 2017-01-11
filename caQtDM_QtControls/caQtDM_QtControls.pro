@@ -121,7 +121,9 @@ SOURCES	+= \
     src/calabelvertical.cpp \
     src/camultilinestring.cpp \
     src/camimedisplay.cpp \
-    src/calinedraw.cpp
+    src/calinedraw.cpp \
+    src/wmsignalpropagator.cpp \
+    src/replacemacro.cpp
 
 XDR_HACK {
     SOURCES += src/xdr_hack.c
@@ -137,7 +139,9 @@ XDR_HACK {
 
 QT += network
 HEADERS += src/networkaccess.h src/fileFunctions.h \
-    src/calinedraw.h
+    src/calinedraw.h \
+    src/wmsignalpropagator.h \
+    src/replacemacro.h
 SOURCES += src/networkaccess.cpp src/fileFunctions.cpp
 
 

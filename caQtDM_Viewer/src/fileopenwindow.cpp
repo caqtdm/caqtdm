@@ -209,6 +209,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Controllers);
     Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Monitors);
     Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Graphics);
+    Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Utilities);
     Q_IMPORT_PLUGIN(DemoPlugin);
     Q_IMPORT_PLUGIN(Epics3Plugin);
 //*************************************

@@ -39,7 +39,7 @@ error("Use at least Qt 4.6.")
 
 TEMPLATE = subdirs
 SUBDIRS = caQtDM_QtControls caQtDM_Lib caQtDM_Viewer
-SUBDIRS += qtcontrols_controllers qtcontrols_graphics qtcontrols_monitors 
+SUBDIRS += qtcontrols_controllers qtcontrols_graphics qtcontrols_monitors qtcontrols_utilities
 SUBDIRS += caQtDM_Plugins
 
 qtcontrols_controllers.file = caQtDM_QtControls/plugins/qtcontrols_controllers.pro 
@@ -50,6 +50,9 @@ qtcontrols_graphics.depends = caQtDM_QtControls caQtDM_Lib
 
 qtcontrols_monitors.file = caQtDM_QtControls/plugins/qtcontrols_monitors.pro 
 qtcontrols_monitors.depends = caQtDM_QtControls caQtDM_Lib
+
+qtcontrols_utilities.file = caQtDM_QtControls/plugins/qtcontrols_utilities.pro
+qtcontrols_utilities.depends = caQtDM_QtControls caQtDM_Lib
 
 caQtDM_Plugins.file = caQtDM_Lib/caQtDM_Plugins/csplugins.pro 
 caQtDM_Plugins.depends = caQtDM_Lib
@@ -70,7 +73,7 @@ unix {
 }
 }
 
-caQtDM_Viewer.depends = caQtDM_QtControls caQtDM_Lib qtcontrols_controllers qtcontrols_graphics qtcontrols_monitors caQtDM_Plugins
+caQtDM_Viewer.depends = caQtDM_QtControls caQtDM_Lib qtcontrols_controllers qtcontrols_graphics qtcontrols_utilities qtcontrols_monitors caQtDM_Plugins
 caQtDM_Lib.depends = caQtDM_QtControls
 
 
