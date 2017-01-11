@@ -44,6 +44,8 @@
 #include <calabelvertical.h>
 #include <camimedisplay.h>
 #include <calinedraw.h>
+#include <replacemacro.h>
+#include "wmsignalpropagator.h"
 
 #ifndef MOBILE
     #include <cadoubletabwidgetextension.h>
