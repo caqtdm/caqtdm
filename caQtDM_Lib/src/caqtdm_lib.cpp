@@ -37,6 +37,7 @@
 #include <QObject>
 #include <QToolBar>
 #include <QUuid>
+#include <QSignalSpy>
 
 //#include "archiveTest.h"
 
@@ -320,7 +321,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         myWidget = parentAS;
     }
 
-    //qDebug() << "open file" << filename << "with macro" << macro;
+    qDebug() << "open file" << filename << "with macro" << macro;
     setAttribute(Qt::WA_DeleteOnClose);
 
     // define a layout
@@ -421,10 +422,22 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 #endif
     }
 
+    // connect all signals of our propagators
+    QList<wmSignalPropagator *> allM = this->findChildren<wmSignalPropagator *>();
+    foreach(wmSignalPropagator* widget, allM) {
+        qDebug() << "found" << widget;
+        connect(widget, SIGNAL(wmCloseWindow()), this, SLOT(closeWindow()));
+        connect(widget, SIGNAL(wmShowNormal()), this, SLOT(closeWindow()));
+        connect(widget, SIGNAL(wmShowMaximized()), this, SLOT(closeWindow()));
+        connect(widget, SIGNAL(wmShowMinimized()), this, SLOT(closeWindow()));
+        connect(widget, SIGNAL(wmShowFullScreen()), this, SLOT(closeWindow()));
+    }
+
     // connect close launchfile action to parent
     connect(this, SIGNAL(Signal_IosExit()), parent, SLOT(Callback_IosExit()));
 
     // connect reload window action to parent
+    connect(this, SIGNAL(Signal_ReloadWindowL()), this, SLOT(Callback_ReloadWindowL()));
     connect(this, SIGNAL(Signal_ReloadWindow(QWidget*)), parent, SLOT(Callback_ReloadWindow(QWidget*)));
     connect(this, SIGNAL(Signal_ReloadAllWindows()), parent, SLOT(Callback_ReloadAllWindows()));
 
@@ -542,7 +555,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     // add a reload action
     QAction *ReloadWindowAction = new QAction(this);
     ReloadWindowAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+R", 0, QApplication::UnicodeUTF8));
-    connect(ReloadWindowAction, SIGNAL(triggered()), this, SLOT(Callback_reloadWindow()));
+    connect(ReloadWindowAction, SIGNAL(triggered()), this, SLOT(Callback_ReloadWindowL()));
     this->addAction(ReloadWindowAction);
 
     // add also a global reload action
@@ -746,6 +759,95 @@ bool CaQtDM_Lib::reaffectText(QMap<QString, QString> map, QString *text) {
 }
 
 /**
+ * this routine will replace inside a macro string a value for a macro name when found
+ */
+QString CaQtDM_Lib::actualizeMacroString(QMap<QString, QString> map, QString argument)
+{
+    QString newMacro = "";
+    QMap<QString, QString> mapArgs = createMap(argument);
+    if(!mapArgs.isEmpty()) {
+        // go through macro string and replace the value when this key equals a key in the map
+        QMapIterator<QString, QString> i(mapArgs);
+        while (i.hasNext()) {
+            i.next();
+            QMap<QString, QString>::const_iterator k = map.find(i.key());
+            while (k != map.end() && k.key() == i.key()) {
+                //qDebug() << "found and replace " << i.key() <<  "with " << k.value();
+                mapArgs.insert(i.key(), k.value());
+                ++k;
+            }
+        }
+        // flatten the macro (from map to string) macro will be of type A=MMAC3,B=STR,C=RMJ:POSA:2
+        QMapIterator<QString, QString> k(mapArgs);
+        while (k.hasNext()) {
+            k.next();
+            newMacro.append(k.key()+"="+k.value()+",");
+        }
+        newMacro = newMacro.left(newMacro.length() - 1);
+        //qDebug() << "newmacro" << newMacro;
+    }
+   return newMacro;
+}
+
+/**
+ * this routine replaces in this macro map when exists, a value from caReplaceMacro for a specified macro name
+ */
+QMap<QString, QString> CaQtDM_Lib::actualizeMacroMap()
+{
+    QMap<QString, QString> map;
+    QVariant macroString = this->property("macroString");
+
+    //qDebug() << "actualizeMacroMap macrostring" << macroString;
+
+    if(!macroString.isNull()) {
+        map = createMap(macroString.toString());
+        if(!map.isEmpty()) {
+            QMapIterator<QString, QString> i(map);
+            while (i.hasNext()) {
+                i.next();
+                QString macroName = i.key();
+                //qDebug() << "macroName" << macroName;
+
+                // go through all the children of type caReplaceMacro
+                QList<replaceMacro *> all = myWidget->findChildren<replaceMacro *>();
+                foreach(replaceMacro* widget, all) {
+                    qDebug() << widget;
+                    QString key =  widget->getKey();
+                    QString value = widget->getNewValue();
+                    qDebug() << widget << key << value << macroName;
+                    if(macroName == key && value.length() > 0) {
+                        //qDebug() << i.key() << i.value();
+                        map.insert(macroName, value);
+                        qDebug() << "map replace done for key" << macroName;
+                    } else if(!i.key().contains(key) && value.length() && widget->getDefineMacro()) {
+                        map.insert(key, value);
+                        //qDebug() << "map insert done for key" << key;
+                    }
+                }
+            }
+        }
+    }
+    //qDebug() << "actualizeMacroMap" << map;
+    return map;
+}
+
+/**
+ * this routine will create a macro string from a QMap
+ */
+QString CaQtDM_Lib::createMacroStringFromMap(QMap<QString, QString> map)
+{
+    QString newMacro = "";
+    // flatten the macro (from map to string) macro will be of type A=MMAC3,B=STR,C=RMJ:POSA:2
+    QMapIterator<QString, QString> k(map);
+    while (k.hasNext()) {
+        k.next();
+        newMacro.append(k.key()+"="+k.value()+",");
+    }
+    newMacro = newMacro.left(newMacro.length() - 1);
+    return newMacro;
+}
+
+/**
  * this routine creates a QMap from a macro string
  */
 QMap<QString, QString> CaQtDM_Lib::createMap(const QString& macro)
@@ -804,7 +906,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
     QString pv;
 
     QString className(w1->metaObject()->className());
-    if(!className.contains("ca") && !className.contains("QTextBrowser") && !className.contains("QE")) return;
+    if(!className.contains("ca") && !className.contains("QTextBrowser") && !className.contains("replaceMacro") && !className.contains("QE")) return;
 
     int nbMonitors = 0;
 
@@ -817,7 +919,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
     //qDebug() << w1->metaObject()->className() << w1->objectName();
 
-    if(className.contains("ca") || className.contains("QTextBrowser")) {
+    if(className.contains("ca") || className.contains("QTextBrowser") || className.contains("replaceMacro")) {
         PRINT(printf("\n%*c %s macro=<%s>", 15 * level, '+', qasc(w1->objectName()), qasc(macro)));
         map = createMap(macro);
     }
@@ -1226,6 +1328,28 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         labelverticalWidget->setText(text);
 
         labelverticalWidget->setProperty("Taken", true);
+
+        //==================================================================================================================
+    } else if(replaceMacro* replaceMacroWidget = qobject_cast<replaceMacro *>(w1)) {
+
+        //qDebug() << "create replaceMacro";
+        w1->setProperty("ObjectType", replaceMacro_Widget);
+
+        if(!map.isEmpty()) {
+            QStringList keys;
+            QStringList values;
+            QMapIterator<QString, QString> i(map);
+            while (i.hasNext()) {
+                i.next();
+                keys.append(i.key());
+                values.append(i.value());
+            }
+            replaceMacroWidget->updateCombo(keys, values);
+
+            connect(replaceMacroWidget, SIGNAL(reloadDisplay()), this, SLOT(Callback_ReloadWindowL()));
+        }
+
+        replaceMacroWidget->setProperty("Taken", true);
 
         //==================================================================================================================
     } else if(caTextEntry* textentryWidget = qobject_cast<caTextEntry *>(w1)) {
@@ -1836,7 +1960,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                        column++;
                        maxColumns = column;
                        maxRows = 1;
-                    } else {
+                    } else if(includeWidget->getStacking() == caInclude::RowColumn) {
                         if(row >= includeWidget->getMaxLines()) {
                             row=0;
                             column++;
@@ -1845,6 +1969,15 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                         row++;
                         if(row > maxRows) maxRows = row;
                         maxColumns = column + 1;
+                    } else if(includeWidget->getStacking() == caInclude::ColumnRow) {
+                        if(column >= includeWidget->getMaxColumns()) {
+                            row++;
+                            column=0;
+                        }
+                        layout->addWidget(thisW, row, column);
+                        column++;
+                        if(column > maxColumns) maxColumns = column;
+                        maxRows = row + 1;
                     }
 
                     includeWidget->setLayout(layout);
@@ -4944,12 +5077,25 @@ void CaQtDM_Lib::Callback_WaveEntryChanged(const QString& text, int index)
 void CaQtDM_Lib::Callback_RelatedDisplayClicked(int indx)
 {
     caRelatedDisplay *w = qobject_cast<caRelatedDisplay *>(sender());
-    //qDebug() << "relateddisplaycallback" << indx << w;
     QStringList files = w->getFiles().split(";");
     QStringList args = w->getArgs().split(";");
     QStringList removeParents = w->getReplaceModes().split(";");
+
     //qDebug() << "files:" << files;
     //qDebug() << "args" <<  w->getArgs() << args;
+
+    // get global macro, replace specified keys and build the macro string of caRelatedDisplay
+    QVariant macroString = this->property("macroString");
+    if(!macroString.isNull()) {
+        QMap<QString, QString> mapActualized = actualizeMacroMap();
+        //qDebug() << "actualized macro map" << mapActualized;
+        if(!mapActualized.isEmpty()) {
+            // go now through our arguments and replace the value of the specified macro name
+            for(int j=0; j< args.count(); j++) {
+                args[j] = actualizeMacroString(mapActualized, args[j]);
+            }
+        }
+    }
 
     // find position of this window
     int xpos = this->pos().x();
@@ -5915,7 +6061,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             print();
 
         } else if(selectedItem->text().contains(RELOADWINDOW)) {
-            emit Signal_ReloadWindow(this);
+            emit Signal_ReloadWindowL();
 
         } else if(selectedItem->text().contains(CHANGEAXIS)) {
             if(caStripPlot* stripplotWidget = qobject_cast<caStripPlot *>(w)) {

@@ -246,6 +246,7 @@ signals:
     void Signal_NextWindow();
     void Signal_IosExit();
     void Signal_ReloadWindow(QWidget*);
+    void Signal_ReloadWindowL();
     void Signal_ReloadAllWindows();
     void fileChanged(const QString&);
 
@@ -318,6 +319,9 @@ private:
 #endif
 
     QMap<QString, QString> createMap(const QString&);
+    QString createMacroStringFromMap(QMap<QString, QString> map);
+    QMap<QString, QString> actualizeMacroMap();
+    QString actualizeMacroString(QMap<QString, QString> map, QString argument);
 
     QString thisFileShort;
     QString thisFileFull;
@@ -393,7 +397,19 @@ private slots:
 
     void Callback_WriteDetectedValues(QWidget* w);
 
-    void Callback_reloadWindow() {
+    void Callback_ReloadWindowL() {
+
+        //qDebug() << "================== in caQtDM_Lib::Callback_reloadWindowL";
+
+        // get global macro, replace specified keys from caReplaceMacros
+        QVariant macroString = this->property("macroString");
+        if(!macroString.isNull()) {
+            QMap<QString, QString> map = actualizeMacroMap();
+            QString macro = createMacroStringFromMap(map);
+            this->setProperty("macroString", macro);
+        }
+        //qDebug() << "new macrostring" << macroString;
+
         emit Signal_ReloadWindow(this);
     }
 
