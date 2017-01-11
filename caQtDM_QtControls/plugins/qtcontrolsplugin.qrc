@@ -38,5 +38,8 @@
         <file>pixmaps/scan2d.png</file>
         <file>pixmaps/mime.png</file>
         <file>pixmaps/multilinemonitor.png</file>
+        <file>pixmaps/include.png</file>
+        <file>pixmaps/wmsignal.png</file>
+        <file>pixmaps/replacemacro.png</file>
     </qresource>
 </RCC>

@@ -395,7 +395,7 @@ caIncludeInterface::caIncludeInterface(QObject* parent) : CustomWidgetInterface_
     d_domXml = XmlFunc("caInclude", "cainclude", 0, 0, 100, 100, name, type, text, 12);
     d_name = "caInclude";
     d_include = "caInclude";
-    QPixmap qpixmap = QPixmap(":pixmaps/frame.png");
+    QPixmap qpixmap = QPixmap(":pixmaps/include.png");
     d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 }
 

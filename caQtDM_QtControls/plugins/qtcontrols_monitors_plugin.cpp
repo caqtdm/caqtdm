@@ -527,7 +527,7 @@ caCalcInterface::caCalcInterface(QObject* parent) : CustomWidgetInterface_Monito
     strcpy(name[5], "variable");
     strcpy(type[5], "multiline");
 
-    d_domXml = XmlFunc("caCalc", "cacalc", 0, 0, 5, 5, name, type, text, 6);
+    d_domXml = XmlFunc("caCalc", "cacalc", 0, 0, 70, 20, name, type, text, 6);
     d_toolTip = "[define internal process variable]";
     d_name = "caCalc";
     d_include = "caCalc";
