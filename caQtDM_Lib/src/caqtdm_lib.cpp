@@ -37,9 +37,6 @@
 #include <QObject>
 #include <QToolBar>
 #include <QUuid>
-#include <QSignalSpy>
-
-//#include "archiveTest.h"
 
 // interfacing widgets, handling their own data acquisition ... (thanks zai)
 #include "caWidgetInterface.h"
