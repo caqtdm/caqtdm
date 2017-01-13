@@ -166,8 +166,8 @@
     <property name="YAxisType" stdset="0">
      <enum>caCartesianPlot::linear</enum>
     </property>
-    <property name="secondspast" stdset="0">
-     <string>7200</string>
+    <property name="secondsPast" stdset="0">
+     <string>30000</string>
     </property>
    </widget>
    <widget class="caCartesianPlot" name="cacartesianplot_3">
@@ -241,7 +241,7 @@
     <property name="YAxisType" stdset="0">
      <enum>caCartesianPlot::linear</enum>
     </property>
-    <property name="secondspast" stdset="0">
+    <property name="secondsPast" stdset="0">
      <string>7200</string>
     </property>
    </widget>

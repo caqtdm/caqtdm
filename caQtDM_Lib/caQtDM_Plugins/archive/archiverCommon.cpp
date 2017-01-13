@@ -71,7 +71,18 @@ void ArchiverCommon::updateInterface()
 
 
     // call user routine for updating data
-    if(listOfIndexesToBeExecuted.count() > 0) emit Signal_UpdateInterface(listOfIndexesToBeExecuted);
+    if(listOfIndexesToBeExecuted.count() > 0) {
+        emit Signal_UpdateInterface(listOfIndexesToBeExecuted);
+
+        // and set the init field of index to false
+        QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
+        while (i != listOfIndexes.constEnd()) {
+            indexes indexNew = i.value();
+            indexNew.init = false;
+            listOfIndexes.insert(i.key(), indexNew);
+             ++i;
+        }
+    }
 }
 
 // initialize our communicationlayer with everything you need
@@ -129,6 +140,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
             index.updateSeconds = 10;
         }
 
+        index.init = true;
         index.key = key;
         index.mutexP = mutexP;
         index.pv = QString(kData->pv);

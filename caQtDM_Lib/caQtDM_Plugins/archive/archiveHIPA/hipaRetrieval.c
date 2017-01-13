@@ -99,7 +99,7 @@ int GetLogShift(int startSeconds, char *dev, int *nbVal, float *Timer, float *Yv
         nbVal[j] = Timef[indx]-2;
     }
     if (Numval < 5) {
-        printf("no data\n");
+        //printf("no data\n");
         return 0;
     }
 

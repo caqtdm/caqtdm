@@ -36,7 +36,7 @@
 #include "mutexKnobData.h"
 #include "MessageWindow.h"
 
-struct indexes {QString key; int indexX; int indexY; int secondsPast; QString pv; int updateSeconds; struct timeb lastUpdateTime; QWidget *w; int nrOfBins; QMutex *mutexP;};
+struct indexes {QString key; int indexX; int indexY; int secondsPast; QString pv; int updateSeconds; struct timeb lastUpdateTime; QWidget *w; int nrOfBins; QMutex *mutexP; bool init;};
 
 
 class Q_DECL_EXPORT ArchiverCommon : public QObject

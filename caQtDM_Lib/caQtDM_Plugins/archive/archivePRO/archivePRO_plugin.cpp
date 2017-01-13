@@ -78,7 +78,7 @@ void ArchivePRO_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfI
         //qDebug() << "tmpThread" << tmpThread;
 
         if((tmpThread != (QThread *) 0) && tmpThread->isRunning()) {
-            qDebug() << "workerthread is running" << tmpThread->isRunning();
+            //qDebug() << "workerthread is running" << tmpThread->isRunning();
         } else {
             WorkerPRO *worker = new WorkerPRO;
             QThread *tmpThread = new QThread;

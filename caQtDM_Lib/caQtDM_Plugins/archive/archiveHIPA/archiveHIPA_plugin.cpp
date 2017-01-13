@@ -79,7 +79,7 @@ void ArchiveHIPA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOf
         //qDebug() << "tmpThread" << tmpThread;
 
         if((tmpThread != (QThread *) 0) && tmpThread->isRunning()) {
-            qDebug() << "workerthread is running" << tmpThread->isRunning();
+            //qDebug() << "workerthread is running" << tmpThread->isRunning();
         } else {
             WorkerHIPA *worker = new WorkerHIPA;
             QThread *tmpThread = new QThread;

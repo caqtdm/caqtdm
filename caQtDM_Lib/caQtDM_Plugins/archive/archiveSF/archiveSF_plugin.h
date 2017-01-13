@@ -57,14 +57,17 @@ public slots:
         deleteLater();
     }
 
-    void getFromArchive(QWidget *w, indexes indexNew) {
+
+    void getFromArchive(QWidget *w, indexes indexNew,  QString index_name) {
+
+
         Q_UNUSED(w);
 
         QMutex *mutex = indexNew.mutexP;
         mutex->lock();
 
         struct timeb now;
-        QUrl url = QUrl("http://data-api.psi.ch/sf/query");
+        QUrl url = QUrl(index_name);
         QString fields, agg;
         bool isBinned;
 
@@ -150,7 +153,7 @@ public:
 public slots:
     void handleResults(indexes, int, QVector<double>, QVector<double>);
 signals:
-    void operate(QWidget*, const indexes);
+    void operate(QWidget*, const indexes, const QString);
 
 private slots:
     void Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes);

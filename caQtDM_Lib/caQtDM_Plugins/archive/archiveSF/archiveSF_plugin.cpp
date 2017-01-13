@@ -41,7 +41,7 @@ ArchiveSF_Plugin::ArchiveSF_Plugin()
     qRegisterMetaType<indexes>("indexes");
     qRegisterMetaType<QVector<double> >("QVector<double>");
 
-    qDebug() << "ArchiveSF_Plugin: Create (SwissFel http-retrieval)";
+    qDebug() << "ArchiveSF_Plugin: Create (http-retrieval)";
     archiverCommon = new ArchiverCommon();
 
     connect(archiverCommon, SIGNAL(Signal_UpdateInterface(QMap<QString, indexes>)), this,SLOT(Callback_UpdateInterface(QMap<QString, indexes>)));
@@ -60,6 +60,9 @@ int ArchiveSF_Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindow 
 void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes)
 {
     QMutexLocker locker(&mutex);
+
+    // Index name (url)
+    QString index_name =  "http://data-api.psi.ch/sf/query";
 
     //qDebug() << "====================== ArchiveSF_Plugin::Callback_UpdateInterface";
 
@@ -93,10 +96,18 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
                 QVariant var = w->property("nrOfBins");
                 if(!var.isNull()) {
                     indexNew.nrOfBins = var.toInt();
-                } else {
-                    QString mess("Archive plugin -- no nrOfBins defined as dynamic property in widget, defaulting to maximum number of points");
+                } else if(indexNew.init){
+                    QString mess("ArchiveSF plugin -- no nrOfBins defined as dynamic property in widget, defaulting to maximum number of points");
                     if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
                 }
+                var = w->property("archiverIndex");
+                 if(!var.isNull()) {
+                     QString indexName = var.toString();
+                     index_name = qasc(indexName);
+                 } else  if(indexNew.init){
+                     QString mess("ArchiveSF plugin -- no archiverIndex defined as dynamic property in widget, defaulting to http://data-api.psi.ch/sf/query");
+                     if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
+                 }
             }
 
             WorkerSF *worker = new WorkerSF;
@@ -106,13 +117,13 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
             worker->moveToThread(tmpThread);
             connect(tmpThread, SIGNAL(finished()), worker, SLOT(workerFinish()));
             connect(tmpThread, SIGNAL(finished()), tmpThread, SLOT(deleteLater()) );
-            connect(this, SIGNAL(operate( QWidget *, indexes)), worker,
-                          SLOT(getFromArchive(QWidget *, indexes)));
+            connect(this, SIGNAL(operate( QWidget *, indexes, QString)), worker,
+                          SLOT(getFromArchive(QWidget *, indexes,  QString)));
             connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>)), this,
                            SLOT(handleResults(indexes, int, QVector<double>, QVector<double>)));
             tmpThread->start();
 
-            emit operate((QWidget *) messagewindowP, indexNew);
+            emit operate((QWidget *) messagewindowP, indexNew, index_name);
 
 
             disconnect(worker);

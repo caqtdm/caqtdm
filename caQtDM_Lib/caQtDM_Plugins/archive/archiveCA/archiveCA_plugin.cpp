@@ -98,8 +98,8 @@ void ArchiveCA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
                 if(!var.isNull()) {
                     QString indexName = var.toString();
                     index_name = qasc(indexName);
-                } else {
-                    QString mess("Archive plugin -- no archiverIndex defined as dynamic property in widget, defaulting to /gfa/archiver-data/archive_PRO_ST/index");
+                } else if(indexNew.init){
+                    QString mess("ArchiveCA plugin -- no archiverIndex defined as dynamic property in widget, defaulting to /gfa/archiver-data/archive_PRO_ST/index");
                     if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
                 }
             }
