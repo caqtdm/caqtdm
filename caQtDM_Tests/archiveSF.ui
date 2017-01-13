@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1249</width>
+    <height>911</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="caCartesianPlot" name="cacartesianplot">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>11</y>
+      <width>501</width>
+      <height>345</height>
+     </rect>
+    </property>
+    <property name="Title" stdset="0">
+     <string notr="true">archiveSF://SINSB01-RSYS:GET-KLY-POWER</string>
+    </property>
+    <property name="TitleX">
+     <string notr="true">(past hours)</string>
+    </property>
+    <property name="TitleY">
+     <string notr="true"/>
+    </property>
+    <property name="channels_1" stdset="0">
+     <string>archiveSF://SINSB01-RSYS:GET-KLY-POWER.X;archiveSF://SINSB01-RSYS:GET-KLY-POWER.Y</string>
+    </property>
+    <property name="Style_1">
+     <enum>caCartesianPlot::ThinLines</enum>
+    </property>
+    <property name="symbol_1">
+     <enum>caCartesianPlot::NoSymbol</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="channels_2" stdset="0">
+     <string/>
+    </property>
+    <property name="Style_2">
+     <enum>caCartesianPlot::ThinLines</enum>
+    </property>
+    <property name="channels_3" stdset="0">
+     <string/>
+    </property>
+    <property name="color_3">
+     <color>
+      <red>170</red>
+      <green>85</green>
+      <blue>127</blue>
+     </color>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="background">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="scaleColor">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="YAxisType" stdset="0">
+     <enum>caCartesianPlot::linear</enum>
+    </property>
+    <property name="secondsPast" stdset="0">
+     <string>7200</string>
+    </property>
+    <property name="secondsUpdate" stdset="0">
+     <string>5</string>
+    </property>
+   </widget>
+   <widget class="caCartesianPlot" name="cacartesianplot_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>381</y>
+      <width>502</width>
+      <height>314</height>
+     </rect>
+    </property>
+    <property name="Title" stdset="0">
+     <string notr="true">archiveHIPA://MXC1:IST:2</string>
+    </property>
+    <property name="TitleX">
+     <string notr="true">(past hours)</string>
+    </property>
+    <property name="channels_1" stdset="0">
+     <string>archiveHIPA://MXC1:IST:2.X;archiveHIPA://MXC1:IST:2.Y</string>
+    </property>
+    <property name="Style_1">
+     <enum>caCartesianPlot::ThinLines</enum>
+    </property>
+    <property name="symbol_1">
+     <enum>caCartesianPlot::NoSymbol</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="channels_2" stdset="0">
+     <string/>
+    </property>
+    <property name="Style_2">
+     <enum>caCartesianPlot::ThinLines</enum>
+    </property>
+    <property name="channels_3" stdset="0">
+     <string/>
+    </property>
+    <property name="color_3">
+     <color>
+      <red>170</red>
+      <green>85</green>
+      <blue>127</blue>
+     </color>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="background">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="scaleColor">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="YAxisType" stdset="0">
+     <enum>caCartesianPlot::linear</enum>
+    </property>
+    <property name="secondspast" stdset="0">
+     <string>7200</string>
+    </property>
+   </widget>
+   <widget class="caCartesianPlot" name="cacartesianplot_3">
+    <property name="geometry">
+     <rect>
+      <x>535</x>
+      <y>383</y>
+      <width>502</width>
+      <height>314</height>
+     </rect>
+    </property>
+    <property name="Title" stdset="0">
+     <string notr="true">archivePRO://MMAC3:STR:2</string>
+    </property>
+    <property name="TitleX">
+     <string notr="true">(past hours)</string>
+    </property>
+    <property name="channels_1" stdset="0">
+     <string>archivePRO://MMAC3:STR:2.X;archivePRO://MMAC3:STR:2.Y</string>
+    </property>
+    <property name="Style_1">
+     <enum>caCartesianPlot::ThinLines</enum>
+    </property>
+    <property name="symbol_1">
+     <enum>caCartesianPlot::NoSymbol</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="channels_2" stdset="0">
+     <string/>
+    </property>
+    <property name="Style_2">
+     <enum>caCartesianPlot::ThinLines</enum>
+    </property>
+    <property name="channels_3" stdset="0">
+     <string/>
+    </property>
+    <property name="color_3">
+     <color>
+      <red>170</red>
+      <green>85</green>
+      <blue>127</blue>
+     </color>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="background">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="scaleColor">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="YAxisType" stdset="0">
+     <enum>caCartesianPlot::linear</enum>
+    </property>
+    <property name="secondspast" stdset="0">
+     <string>7200</string>
+    </property>
+   </widget>
+   <widget class="caCartesianPlot" name="cacartesianplot_4">
+    <property name="geometry">
+     <rect>
+      <x>531</x>
+      <y>14</y>
+      <width>501</width>
+      <height>345</height>
+     </rect>
+    </property>
+    <property name="Title" stdset="0">
+     <string notr="true">archiveSF://SINSB01-RSYS:GET-KLY-POWER</string>
+    </property>
+    <property name="TitleX">
+     <string notr="true">(past hours)</string>
+    </property>
+    <property name="TitleY">
+     <string notr="true"/>
+    </property>
+    <property name="channels_1" stdset="0">
+     <string>archiveSF://SINSB02-RSYS:GET-KLY-POWER.X;archiveSF://SINSB02-RSYS:GET-KLY-POWER.Y</string>
+    </property>
+    <property name="Style_1">
+     <enum>caCartesianPlot::ThinLines</enum>
+    </property>
+    <property name="symbol_1">
+     <enum>caCartesianPlot::NoSymbol</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="channels_2" stdset="0">
+     <string/>
+    </property>
+    <property name="Style_2">
+     <enum>caCartesianPlot::ThinLines</enum>
+    </property>
+    <property name="channels_3" stdset="0">
+     <string/>
+    </property>
+    <property name="color_3">
+     <color>
+      <red>170</red>
+      <green>85</green>
+      <blue>127</blue>
+     </color>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="background">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="scaleColor">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="YAxisType" stdset="0">
+     <enum>caCartesianPlot::linear</enum>
+    </property>
+    <property name="secondsPast" stdset="0">
+     <string>3600</string>
+    </property>
+    <property name="secondsUpdate" stdset="0">
+     <string>10</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1249</width>
+     <height>24</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caCartesianPlot</class>
+   <extends>QFrame</extends>
+   <header>caCartesianPlot</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
