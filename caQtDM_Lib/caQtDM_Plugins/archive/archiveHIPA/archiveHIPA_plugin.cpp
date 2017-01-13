@@ -113,13 +113,20 @@ void ArchiveHIPA_Plugin::handleResults(indexes indexNew, int nbVal, QVector<doub
 
     if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN);
 
+    QList<QString> removeKeys;
+    removeKeys.clear();
+
     QMap<QString, QThread *>::iterator j = listOfThreads.find(indexNew.key);
     while (j !=listOfThreads.end() && j.key() == indexNew.key) {
         QThread *tmpThread = (QThread*) j.value();
         tmpThread->quit();
+        removeKeys.append(indexNew.key);
         //qDebug() << tmpThread << "hipa quit";
-        listOfThreads.remove(indexNew.key);
         ++j;
+    }
+
+    for(int i=0; i< removeKeys.count(); i++) {
+        listOfThreads.remove(removeKeys.at(i));
     }
 }
 

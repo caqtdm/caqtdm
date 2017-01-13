@@ -226,10 +226,18 @@ int ArchiverCommon::pvClearMonitor(knobData *kData) {
         key = key.replace(".X", "");
         key = key.replace(".Y", "");
 
+        QList<QString> removeKeys;
+        removeKeys.clear();
+
         QMap<QString, indexes>::iterator i = listOfIndexes.find(key);
         while (i !=listOfIndexes.end() && i.key() == key) {
-            listOfIndexes.remove(key);
+            //listOfIndexes.remove(key);
+            removeKeys.append(key);
             ++i;
+        }
+
+        for(int i=0; i< removeKeys.count(); i++) {
+            listOfIndexes.remove(removeKeys.at(i));
         }
     }
 

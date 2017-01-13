@@ -133,13 +133,20 @@ void ArchiveCA_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double
 
     if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN);
 
+    QList<QString> removeKeys;
+    removeKeys.clear();
+
     QMap<QString, QThread *>::iterator j = listOfThreads.find(indexNew.key);
     while (j !=listOfThreads.end() && j.key() == indexNew.key) {
         QThread *tmpThread = (QThread*) j.value();
         tmpThread->quit();
+        removeKeys.append(indexNew.key);
         //qDebug() << tmpThread << "ca quit";
-        listOfThreads.remove(indexNew.key);
         ++j;
+    }
+
+    for(int i=0; i< removeKeys.count(); i++) {
+        listOfThreads.remove(removeKeys.at(i));
     }
 }
 
