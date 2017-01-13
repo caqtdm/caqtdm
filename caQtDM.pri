@@ -474,21 +474,21 @@ caQtDM_Viewer {
                     QMAKE_CXXFLAGS += -gdwarf-2
                     QMAKE_BUNDLE_NAME = ch.psi.caqtdm
 
-
-
                     iphonesimulator {
                          message("caQtDM_viewer configuration : iphonesimulator")
                          # when .dylib and .a in same directory, macos takes .dylib, so separate the libraries
                          LIBS += $$(EPICSLIB)/static/libca.a
                          LIBS += $$(EPICSLIB)/static/libCom.a
                          # build simulator only for 32 bit
-                         QMAKE_IOS_SIMULATOR_ARCHS = i386
                          INCLUDEPATH += /Users/mezger/Documents/Entwicklung/qt/qwt-6.1.1_sim/src
                     }
                     iphoneos {
                         message("caQtDM_viewer configuration : iphoneos")
-                         LIBS += $$(EPICSLIB)/libca.a
-                         LIBS += $$(EPICSLIB)/libCom.a
+                         LIBS += $$(EPICSLIB)/static/libca.a
+                         LIBS += $$(EPICSLIB)/static/libCom.a
+                         setting.name = DEVELOPMENT_TEAM
+                         setting.value = $(CERTIFICATNUMBER)
+                         QMAKE_MAC_XCODE_SETTINGS += setting
                     }
                     epics4: {
                                     LIBS += $(CAQTDM_COLLECT)/controlsystems/libepics4_plugin.a

@@ -1,7 +1,12 @@
 include (../../../../caQtDM_Viewer/qtdefs.pri)
+
 QT += core gui network
+
+contains(QT_VER_MAJ, 4) {
+      CONFIG += designer
+}
 contains(QT_VER_MAJ, 5) {
-    QT     += widgets
+      QT += uitools
 }
 
 CONFIG += archive_plugin
