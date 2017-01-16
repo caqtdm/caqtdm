@@ -105,6 +105,7 @@
                                 <File Id="DEMO_PLUGIN.DLL" Name="demo_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\demo_plugin.dll" />
                                 <File Id="EPICS3_PLUGIN.DLL" Name="epics3_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics3_plugin.dll" />
                                 <File Id="BSREAD_PLUGIN.DLL" Name="bsread_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\bsread_plugin.dll" />
+                                <File Id="ARCHIVESF_PLUGIN.DLL" Name="archiveSF_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\archiveSF_plugin.dll" />
                             </Component>
                         </Directory>
                         <Directory Id="DESIGNER" Name="designer">
@@ -112,6 +113,7 @@
                                 <File Id="QTCONTROLS_CONTROLLERS_PLUGIN.DLL" Name="qtcontrols_controllers_plugin.dll" Source="$(env.CAQTDM_COLLECT)\designer\qtcontrols_controllers_plugin.dll" />
                                 <File Id="QTCONTROLS_MONITORS_PLUGIN.DLL" Name="qtcontrols_monitors_plugin.dll" Source="$(env.CAQTDM_COLLECT)\designer\qtcontrols_monitors_plugin.dll" />
                                 <File Id="QTCONTROLS_GRAPHICS_PLUGIN.DLL" Name="qtcontrols_graphics_plugin.dll" Source="$(env.CAQTDM_COLLECT)\designer\qtcontrols_graphics_plugin.dll" />
+                                <File Id="QTCONTROLS_UTILITIES_PLUGIN.DLL" Name="qtcontrols_utilities_plugin.dll" Source="$(env.CAQTDM_COLLECT)\designer\qtcontrols_utilities_plugin.dll" />
                             </Component>
                         </Directory>
                         <Directory Id="PLATFORMS" Name="platforms">
