@@ -78,8 +78,10 @@ void ArchiverCommon::updateInterface()
         QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
         while (i != listOfIndexes.constEnd()) {
             indexes indexNew = i.value();
-            indexNew.init = false;
-            listOfIndexes.insert(i.key(), indexNew);
+            if(indexNew.init) {
+               indexNew.init = false;
+               listOfIndexes.insert(i.key(), indexNew);
+            }
              ++i;
         }
     }
@@ -126,17 +128,17 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
         if(!var.isNull()) {
             index.secondsPast = var.toInt();
         } else {
-            QString mess("Archive plugin -- no secondsPast defined as dynamic property in widget, default to 1 hour back");
-            if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
+            QString mess("Archive plugin -- no secondsPast defined as dynamic property in widget " + QString(kData->dispName) + ", default to 1 hour back");
+            if(messagewindowP != (MessageWindow *) 0 && !QString(kData->pv).contains(".Y")) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
             index.secondsPast = 3600;
         }
 
         var = w->property("secondsUpdate");
         if(!var.isNull()) {
             index.updateSeconds = var.toInt();
-        } else {
-            QString mess("Archive plugin -- no secondsUpdate defined as dynamic property in widget, default to 10 seconds update");
-            if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
+        } else{
+            QString mess("Archive plugin -- no secondsUpdate defined as dynamic property in widget " + QString(kData->dispName) + ", default to 10 seconds update");
+            if(messagewindowP != (MessageWindow *) 0 && !QString(kData->pv).contains(".Y")) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
             index.updateSeconds = 10;
         }
 
