@@ -768,8 +768,23 @@ QString CaQtDM_Lib::actualizeMacroString(QMap<QString, QString> map, QString arg
             i.next();
             QMap<QString, QString>::const_iterator k = map.find(i.key());
             while (k != map.end() && k.key() == i.key()) {
-                //qDebug() << "found and replace " << i.key() <<  "with " << k.value();
-                mapArgs.insert(i.key(), k.value());
+
+                // only when a replacemacro uses this key with a value > 0
+                bool replace = false;
+                QList<replaceMacro *> all = myWidget->findChildren<replaceMacro *>();
+                foreach(replaceMacro* widget, all) {
+                    //qDebug() << widget;
+                    QString key =  widget->getKey();
+                    QString value = widget->getNewValue();
+                    if(key == i.key() && value > 0) {
+                        replace = true;
+                        //qDebug() << key << value << replace;
+                        break;
+                    }
+                }
+
+                //qDebug() << "found and replace " << i.key() <<  "with " << k.value() << "when replace=true : " << replace;
+                if(replace) mapArgs.insert(i.key(), k.value());
                 ++k;
             }
         }
@@ -780,7 +795,7 @@ QString CaQtDM_Lib::actualizeMacroString(QMap<QString, QString> map, QString arg
             newMacro.append(k.key()+"="+k.value()+",");
         }
         newMacro = newMacro.left(newMacro.length() - 1);
-        qDebug() << "newmacro" << newMacro;
+        //qDebug() << "newmacro" << newMacro;
     }
    return newMacro;
 }
@@ -793,7 +808,7 @@ QMap<QString, QString> CaQtDM_Lib::actualizeMacroMap()
     QMap<QString, QString> map;
     QVariant macroString = this->property("macroString");
 
-    qDebug() << "actualizeMacroMap macrostring" << macroString;
+    //qDebug() << "actualizeMacroMap macrostring" << macroString;
 
     if(!macroString.isNull()) {
         map = createMap(macroString.toString());
@@ -814,7 +829,7 @@ QMap<QString, QString> CaQtDM_Lib::actualizeMacroMap()
                     if(macroName == key && value.length() > 0) {
                         //qDebug() << i.key() << i.value();
                         map.insert(macroName, value);
-                        qDebug() << "map replace done for key" << macroName;
+                        //qDebug() << "map replace done for key" << macroName;
                     } else if(!i.key().contains(key) && value.length() && widget->getDefineMacro()) {
                         map.insert(key, value);
                         //qDebug() << "map insert done for key" << key;
@@ -5077,8 +5092,8 @@ void CaQtDM_Lib::Callback_RelatedDisplayClicked(int indx)
     QStringList args = w->getArgs().split(";");
     QStringList removeParents = w->getReplaceModes().split(";");
 
-    qDebug() << "files:" << files;
-    qDebug() << "args" <<  w->getArgs() << args;
+    //qDebug() << "files:" << files;
+    //qDebug() << "args" <<  w->getArgs() << args;
 
     // get global macro, replace specified keys and build the macro string of caRelatedDisplay, but
     // only when some replacement is requested; otherwise we may get a clash when a macrokey is used with other value
@@ -5087,7 +5102,7 @@ void CaQtDM_Lib::Callback_RelatedDisplayClicked(int indx)
         QVariant macroString = this->property("macroString");
         if(!macroString.isNull()) {
             QMap<QString, QString> mapActualized = actualizeMacroMap();
-            qDebug() << "actualized macro map" << mapActualized;
+            //qDebug() << "actualized macro map" << mapActualized;
             if(!mapActualized.isEmpty()) {
                 // go now through our arguments and replace the value of the specified macro name
                 for(int j=0; j< args.count(); j++) {
