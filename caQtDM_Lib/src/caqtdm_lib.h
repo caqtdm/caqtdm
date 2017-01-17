@@ -392,6 +392,11 @@ private slots:
     void Callback_WaveEntryChanged(const QString &, int index);
     void processTerminated();
     void closeWindow();
+    void showNormalWindow();
+    void showMaxWindow();
+    void showMinWindow();
+    void showFullWindow();
+
     void updateTextBrowser();
     void handleFileChanged(const QString&);
 

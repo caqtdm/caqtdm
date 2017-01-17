@@ -423,10 +423,10 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     QList<wmSignalPropagator *> allM = this->findChildren<wmSignalPropagator *>();
     foreach(wmSignalPropagator* widget, allM) {
         connect(widget, SIGNAL(wmCloseWindow()), this, SLOT(closeWindow()));
-        connect(widget, SIGNAL(wmShowNormal()), this, SLOT(closeWindow()));
-        connect(widget, SIGNAL(wmShowMaximized()), this, SLOT(closeWindow()));
-        connect(widget, SIGNAL(wmShowMinimized()), this, SLOT(closeWindow()));
-        connect(widget, SIGNAL(wmShowFullScreen()), this, SLOT(closeWindow()));
+        connect(widget, SIGNAL(wmShowNormal()), this, SLOT(showNormalWindow()));
+        connect(widget, SIGNAL(wmShowMaximized()), this, SLOT(showMaxWindow()));
+        connect(widget, SIGNAL(wmShowMinimized()), this, SLOT(showMinWindow()));
+        connect(widget, SIGNAL(wmShowFullScreen()), this, SLOT(showFullWindow()));
     }
 
     // connect close launchfile action to parent
@@ -5312,7 +5312,27 @@ void CaQtDM_Lib::shellCommand(QString command) {
 
 void CaQtDM_Lib::closeWindow()
 {
-    close();
+    this->close();
+}
+
+void CaQtDM_Lib::showNormalWindow()
+{
+    this->showNormal();
+}
+
+void CaQtDM_Lib::showMaxWindow()
+{
+    this->showMaximized();
+}
+
+void CaQtDM_Lib::showMinWindow()
+{
+    this->showMinimized();
+}
+
+void CaQtDM_Lib::showFullWindow()
+{
+    this->showFullScreen();
 }
 
 /**
