@@ -405,15 +405,20 @@ private slots:
     void Callback_ReloadWindowL() {
 
         //qDebug() << "================== in caQtDM_Lib::Callback_reloadWindowL";
-
-        // get global macro, replace specified keys from caReplaceMacros
-        QVariant macroString = this->property("macroString");
-        if(!macroString.isNull()) {
-            QMap<QString, QString> map = actualizeMacroMap();
-            QString macro = createMacroStringFromMap(map);
-            this->setProperty("macroString", macro);
+        // get global macro, replace specified keys from caReplaceMacros, but
+        // only when some replacement is requested; otherwise we may get a clash
+        // when a macrokey is used with other value
+        QList<replaceMacro *> all = myWidget->findChildren<replaceMacro *>();
+        if(all.count() > 0) {
+            // get global macro, replace specified keys from caReplaceMacros
+            QVariant macroString = this->property("macroString");
+            if(!macroString.isNull()) {
+                QMap<QString, QString> map = actualizeMacroMap();
+                QString macro = createMacroStringFromMap(map);
+                this->setProperty("macroString", macro);
+            }
+            //qDebug() << "new macrostring" << macroString;
         }
-        //qDebug() << "new macrostring" << macroString;
 
         emit Signal_ReloadWindow(this);
     }

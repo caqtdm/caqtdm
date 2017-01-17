@@ -780,7 +780,7 @@ QString CaQtDM_Lib::actualizeMacroString(QMap<QString, QString> map, QString arg
             newMacro.append(k.key()+"="+k.value()+",");
         }
         newMacro = newMacro.left(newMacro.length() - 1);
-        //qDebug() << "newmacro" << newMacro;
+        qDebug() << "newmacro" << newMacro;
     }
    return newMacro;
 }
@@ -793,7 +793,7 @@ QMap<QString, QString> CaQtDM_Lib::actualizeMacroMap()
     QMap<QString, QString> map;
     QVariant macroString = this->property("macroString");
 
-    //qDebug() << "actualizeMacroMap macrostring" << macroString;
+    qDebug() << "actualizeMacroMap macrostring" << macroString;
 
     if(!macroString.isNull()) {
         map = createMap(macroString.toString());
@@ -5077,18 +5077,22 @@ void CaQtDM_Lib::Callback_RelatedDisplayClicked(int indx)
     QStringList args = w->getArgs().split(";");
     QStringList removeParents = w->getReplaceModes().split(";");
 
-    //qDebug() << "files:" << files;
-    //qDebug() << "args" <<  w->getArgs() << args;
+    qDebug() << "files:" << files;
+    qDebug() << "args" <<  w->getArgs() << args;
 
-    // get global macro, replace specified keys and build the macro string of caRelatedDisplay
-    QVariant macroString = this->property("macroString");
-    if(!macroString.isNull()) {
-        QMap<QString, QString> mapActualized = actualizeMacroMap();
-        //qDebug() << "actualized macro map" << mapActualized;
-        if(!mapActualized.isEmpty()) {
-            // go now through our arguments and replace the value of the specified macro name
-            for(int j=0; j< args.count(); j++) {
-                args[j] = actualizeMacroString(mapActualized, args[j]);
+    // get global macro, replace specified keys and build the macro string of caRelatedDisplay, but
+    // only when some replacement is requested; otherwise we may get a clash when a macrokey is used with other value
+    QList<replaceMacro *> all = myWidget->findChildren<replaceMacro *>();
+    if(all.count() > 0) {
+        QVariant macroString = this->property("macroString");
+        if(!macroString.isNull()) {
+            QMap<QString, QString> mapActualized = actualizeMacroMap();
+            qDebug() << "actualized macro map" << mapActualized;
+            if(!mapActualized.isEmpty()) {
+                // go now through our arguments and replace the value of the specified macro name
+                for(int j=0; j< args.count(); j++) {
+                    args[j] = actualizeMacroString(mapActualized, args[j]);
+                }
             }
         }
     }
