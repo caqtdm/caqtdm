@@ -80,9 +80,11 @@ exists($(EPICS4LOCATION)/pvAccessCPP/include/pv/pvAccess.h) {
 # undefine this for bsread (zeromq) plugin support
 # the main work for this plugin was done by Helge Brands
 exists($(ZMQINC)/zmq.h) {
-   message( "Configuring build for bsread" )
+   message( "Configuring controlsystem plugin for bsread" )
    CONFIG += bsread
 }
+
+#message("$$PWD")
 
 # undefine this for archive retrieval plugin support (these plugins are only valid at psi)
 # take a look at the archiveSF in order to do something similar
@@ -91,9 +93,27 @@ archive: {
 # html retrieval, can always be build
    CONFIG += archiveSF
 # next ones are only buildable at psi
-   CONFIG += archiveHIPA
-   CONFIG += archivePRO
-   CONFIG += archiveCA
+   isEmpty(X64) {
+       exists(../../Libs/libNewLogRPC.a) {
+          message( "Configuring archive plugin build for logging (32)" )
+          CONFIG += archiveHIPA
+          CONFIG += archivePRO
+       }
+       exists(../caQtDM_Lib/caQtDM_Plugins/archive/archiveCA/Storage/libStorage_32.a) {
+          message( "Configuring archive plugin for CA (32)" )
+          CONFIG += archiveCA
+       }
+    } else {
+       exists(../../Libs/libNewLogRPC_64.a) {
+           message( "Configuring archive plugin for logging (64)" )
+          CONFIG += archiveHIPA
+          CONFIG += archivePRO
+       }
+       exists(../caQtDM_Lib/caQtDM_Plugins/archive/archiveCA/Storage/libStorage_64.a) {
+          message( "Configuring archive pluging for CA (64)" )
+          CONFIG += archiveCA
+       }
+    }
 }
 
 # in fileopenwindow we need to import these plugins for ios and android, so define them
