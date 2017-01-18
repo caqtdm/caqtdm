@@ -103,4 +103,35 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
+class caMimeDisplayInterface: public CustomWidgetInterface_Utilities
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerCustomWidgetInterface)
+
+public:
+    caMimeDisplayInterface(QObject *parent);
+    virtual QWidget *createWidget(QWidget *parent);
+};
+
+class caScriptButtonInterface : public CustomWidgetInterface_Utilities
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerCustomWidgetInterface)
+
+public:
+    caScriptButtonInterface(QObject* parent);
+    virtual QWidget* createWidget(QWidget* parent);
+};
+
+class caShellCommandInterface : public CustomWidgetInterface_Utilities
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerCustomWidgetInterface)
+
+public:
+    caShellCommandInterface(QObject* parent);
+    virtual QWidget* createWidget(QWidget* parent);
+};
+
+
 #endif

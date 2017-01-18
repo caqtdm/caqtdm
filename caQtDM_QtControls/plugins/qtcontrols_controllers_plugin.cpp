@@ -272,31 +272,6 @@ caRelatedDisplayInterface::caRelatedDisplayInterface(QObject *parent): CustomWid
     d_whatsThis = "hello, i am a whatsthis string";
 }
 
-QWidget *caShellCommandInterface::createWidget(QWidget *parent)
-{
-    return new caShellCommand(parent);
-}
-
-caShellCommandInterface::caShellCommandInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
-{
-    strng name[4], type[4] = {"","","",""};
-    longtext text[4] = {"","","",""};
-
-    strcpy(name[0], "label");
-    strcpy(type[0], "multiline");
-    strcpy(name[1], "labelsList");
-    strcpy(name[2], "filesList");
-    strcpy(name[3], "argsList");
-    strcpy(type[3], "multiline");
-    d_domXml = XmlFunc("caShellCommand", "cashellcommand", 0, 0, 170, 70, name, type, text, 4);
-    d_name = "caShellCommand";
-    d_include = "caShellCommand";
-    QPixmap qpixmap =   QPixmap(":pixmaps/exclamation.png");
-    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
-    d_toolTip = "[menu or button for detached processes]";
-    d_whatsThis = "hello, i am a whatsthis string";
-}
-
 QWidget *caTextEntryInterface::createWidget(QWidget* parent)
 {
     return new caTextEntry(parent);
@@ -366,32 +341,6 @@ caToggleButtonInterface::caToggleButtonInterface(QObject* parent) : CustomWidget
     d_whatsThis = "hello, i am a whatsthis string";
 }
 
-QWidget *caScriptButtonInterface::createWidget(QWidget* parent)
-{
-    return new caScriptButton(parent);
-}
-
-caScriptButtonInterface::caScriptButtonInterface(QObject* parent) : CustomWidgetInterface_Controllers(parent)
-{
-    strng name[3], type[3] = {"","",""};
-    longtext text[3] = {"","",""};
-
-    strcpy(name[0], "label");
-    strcpy(type[0], "multiline");
-    strcpy(name[1], "scriptCommand");
-    strcpy(type[1], "multiline");
-    strcpy(name[2], "scriptParameter");
-    strcpy(type[2], "multiline");
-
-    d_domXml = XmlFunc("caScriptButton", "cascriptbutton", 0, 0, 100, 22, name, type, text, 3);
-    d_name = "caScriptButton";
-    d_include = "caScriptButton";
-    QPixmap qpixmap = QPixmap(":pixmaps/process.png");
-    d_icon = qpixmap.scaled(70, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation);
-    d_toolTip = "[execute a script or image as detached process]";
-    d_whatsThis = "hello, i am a whatsthis string";
-}
-
 caSpinboxInterface::caSpinboxInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
 {
     strng name[1], type[1] = {""};
@@ -433,33 +382,6 @@ QWidget *caByteControllerInterface::createWidget(QWidget *parent)
     return new caByteController(parent);
 }
 
-
-caMimeDisplayInterface::caMimeDisplayInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
-{
-    strng name[3], type[3] = {"","",""};
-    longtext text[3] = {"","","mime file will be looked up through absolute path or caQtDM_DISPLAY_PATH\nor caQTDM_MIME_PATH. Separate files with a semicolumn\n"};
-
-    strcpy(name[0], "label");
-    strcpy(type[0], "multiline");
-    strcpy(name[1], "labelsList");
-    strcpy(name[2], "filesList");
-    strcpy(type[2], "multiline");
-
-    d_domXml = XmlFunc("caMimeDisplay", "camimedisplay", 0, 0, 100, 22, name, type, text, 3);
-    d_toolTip = "[Mime display]";
-    d_name = "caMimeDisplay";
-    d_include = "caMimeDisplay";
-    QPixmap qpixmap =  QPixmap(":pixmaps/mime.png");
-    d_icon = qpixmap.scaled(90, 90, Qt::IgnoreAspectRatio, Qt::FastTransformation);
-    d_toolTip = "[calls a mime application for file]";
-}
-
-QWidget *caMimeDisplayInterface::createWidget(QWidget *parent)
-{
-    return new caMimeDisplay(parent);
-}
-
-
 CustomWidgetCollectionInterface_Controllers::CustomWidgetCollectionInterface_Controllers(QObject *parent): QObject(parent)
 {
     d_plugins.append(new caNumericInterface(this));
@@ -468,14 +390,11 @@ CustomWidgetCollectionInterface_Controllers::CustomWidgetCollectionInterface_Con
     d_plugins.append(new caMenuInterface(this));
     d_plugins.append(new caChoiceInterface(this));
     d_plugins.append(new caRelatedDisplayInterface(this));
-    d_plugins.append(new caShellCommandInterface(this));
     d_plugins.append(new caTextEntryInterface(this));
     d_plugins.append(new caMessageButtonInterface(this));
     d_plugins.append(new caToggleButtonInterface(this));
-    d_plugins.append(new caScriptButtonInterface(this));
     d_plugins.append(new caSpinboxInterface(this));
     d_plugins.append(new caByteControllerInterface(this));
-    d_plugins.append(new caMimeDisplayInterface(this));
 }
 
 QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface_Controllers::customWidgets(void) const
