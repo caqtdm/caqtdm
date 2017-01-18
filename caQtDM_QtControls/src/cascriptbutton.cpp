@@ -47,7 +47,7 @@ caScriptButton::caScriptButton(QWidget *parent) : QWidget(parent)
     setLayout(l);
 
     thisForeColor = Qt::black;
-    setBackground(Qt::gray);
+    thisBackColor = Qt::gray;
 
     thisShowExecution = false;
 

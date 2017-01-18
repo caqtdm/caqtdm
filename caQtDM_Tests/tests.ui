@@ -120,7 +120,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: rgb(0,0,120);}</string>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <property name="usesScrollButtons">
      <bool>true</bool>
@@ -1606,8 +1606,8 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>20</x>
           <y>230</y>
-          <width>514</width>
-          <height>208</height>
+          <width>510</width>
+          <height>200</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -11552,13 +11552,13 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="defineInexistentMacro" stdset="0">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="displayMode" stdset="0">
          <enum>replaceMacro::List</enum>
         </property>
         <property name="macroKey">
-         <string notr="true">NAME3</string>
+         <string notr="true">NAME</string>
         </property>
         <property name="macroValues">
          <string>hello;hello again;hello once more</string>
@@ -11580,10 +11580,10 @@ p, li { white-space: pre-wrap; }
          <enum>replaceMacro::Value</enum>
         </property>
         <property name="macroKey">
-         <string notr="true">NAME2</string>
+         <string notr="true">NAME</string>
         </property>
         <property name="macroValue">
-         <string notr="true">ffffff</string>
+         <string notr="true"/>
         </property>
        </widget>
        <widget class="caNumeric" name="canumeric_14">
@@ -11626,56 +11626,6 @@ p, li { white-space: pre-wrap; }
           <width>113</width>
           <height>26</height>
          </rect>
-        </property>
-       </widget>
-       <widget class="replaceMacro" name="careplacemacro_3">
-        <property name="geometry">
-         <rect>
-          <x>528</x>
-          <y>480</y>
-          <width>188</width>
-          <height>53</height>
-         </rect>
-        </property>
-        <property name="reloadOnChange">
-         <bool>true</bool>
-        </property>
-        <property name="defineInexistentMacro" stdset="0">
-         <bool>true</bool>
-        </property>
-        <property name="displayMode" stdset="0">
-         <enum>replaceMacro::Value</enum>
-        </property>
-        <property name="macroKey">
-         <string notr="true">NAME2</string>
-        </property>
-        <property name="macroValue">
-         <string notr="true">ffffff</string>
-        </property>
-       </widget>
-       <widget class="replaceMacro" name="replacemacro_4">
-        <property name="geometry">
-         <rect>
-          <x>528</x>
-          <y>440</y>
-          <width>181</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="reloadOnChange">
-         <bool>false</bool>
-        </property>
-        <property name="defineInexistentMacro" stdset="0">
-         <bool>false</bool>
-        </property>
-        <property name="displayMode" stdset="0">
-         <enum>replaceMacro::List</enum>
-        </property>
-        <property name="macroKey">
-         <string notr="true">NAME</string>
-        </property>
-        <property name="macroValues">
-         <string>hello;hello again;hello once more</string>
         </property>
        </widget>
        <widget class="wmSignalPropagator" name="wmsignalpropagator">
@@ -13103,6 +13053,29 @@ p, li { white-space: pre-wrap; }
        <bool>false</bool>
       </property>
      </widget>
+     <widget class="wmSignalPropagator" name="wmsignalpropagator_2">
+      <property name="geometry">
+       <rect>
+        <x>215</x>
+        <y>555</y>
+        <width>70</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_2">
+      <property name="geometry">
+       <rect>
+        <x>102</x>
+        <y>553</y>
+        <width>84</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Exit</string>
+      </property>
+     </widget>
      <zorder>caclock_3</zorder>
      <zorder>caclock_4</zorder>
      <zorder>cagraphics_16</zorder>
@@ -13117,6 +13090,8 @@ p, li { white-space: pre-wrap; }
      <zorder>checkBox_3</zorder>
      <zorder>catogglebutton_5</zorder>
      <zorder>catogglebutton_4</zorder>
+     <zorder>wmsignalpropagator_2</zorder>
+     <zorder>pushButton_2</zorder>
     </widget>
     <widget class="QWidget" name="tab_35">
      <attribute name="title">
@@ -13671,7 +13646,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1119</width>
-     <height>26</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>
@@ -13709,11 +13684,6 @@ p, li { white-space: pre-wrap; }
    <header>caRelatedDisplay</header>
   </customwidget>
   <customwidget>
-   <class>caShellCommand</class>
-   <extends>QWidget</extends>
-   <header>caShellCommand</header>
-  </customwidget>
-  <customwidget>
    <class>caTextEntry</class>
    <extends>caLineEdit</extends>
    <header>caTextEntry</header>
@@ -13729,11 +13699,6 @@ p, li { white-space: pre-wrap; }
    <header>caToggleButton</header>
   </customwidget>
   <customwidget>
-   <class>caScriptButton</class>
-   <extends>QWidget</extends>
-   <header>caScriptButton</header>
-  </customwidget>
-  <customwidget>
    <class>caSpinbox</class>
    <extends>QFrame</extends>
    <header>caSpinbox</header>
@@ -13742,11 +13707,6 @@ p, li { white-space: pre-wrap; }
    <class>caByteController</class>
    <extends>QWidget</extends>
    <header>caByteController</header>
-  </customwidget>
-  <customwidget>
-   <class>caMimeDisplay</class>
-   <extends>QWidget</extends>
-   <header>caMimeDisplay</header>
   </customwidget>
   <customwidget>
    <class>caFrame</class>
@@ -13889,6 +13849,21 @@ p, li { white-space: pre-wrap; }
    <extends>QLabel</extends>
    <header>wmSignalPropagator</header>
   </customwidget>
+  <customwidget>
+   <class>caShellCommand</class>
+   <extends>QWidget</extends>
+   <header>caShellCommand</header>
+  </customwidget>
+  <customwidget>
+   <class>caScriptButton</class>
+   <extends>QWidget</extends>
+   <header>caScriptButton</header>
+  </customwidget>
+  <customwidget>
+   <class>caMimeDisplay</class>
+   <extends>QWidget</extends>
+   <header>caMimeDisplay</header>
+  </customwidget>
  </customwidgets>
  <resources/>
  <connections>
@@ -13964,11 +13939,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>335</x>
-     <y>239</y>
+     <y>237</y>
     </hint>
     <hint type="destinationlabel">
-     <x>788</x>
-     <y>313</y>
+     <x>789</x>
+     <y>311</y>
     </hint>
    </hints>
   </connection>
@@ -14043,8 +14018,8 @@ p, li { white-space: pre-wrap; }
    <slot>slotTiltAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>467</x>
-     <y>626</y>
+     <x>469</x>
+     <y>624</y>
     </hint>
     <hint type="destinationlabel">
      <x>463</x>
@@ -14060,7 +14035,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>480</x>
-     <y>626</y>
+     <y>624</y>
     </hint>
     <hint type="destinationlabel">
      <x>597</x>
@@ -14076,7 +14051,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>480</x>
-     <y>626</y>
+     <y>624</y>
     </hint>
     <hint type="destinationlabel">
      <x>810</x>
@@ -14107,8 +14082,8 @@ p, li { white-space: pre-wrap; }
    <slot>slotStartAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>803</x>
-     <y>367</y>
+     <x>805</x>
+     <y>365</y>
     </hint>
     <hint type="destinationlabel">
      <x>950</x>
@@ -14123,8 +14098,8 @@ p, li { white-space: pre-wrap; }
    <slot>slotSpanAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>954</x>
-     <y>367</y>
+     <x>956</x>
+     <y>365</y>
     </hint>
     <hint type="destinationlabel">
      <x>958</x>
@@ -14193,6 +14168,22 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>701</x>
      <y>381</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>wmsignalpropagator_2</receiver>
+   <slot>closewindow()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>181</x>
+     <y>655</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>258</x>
+     <y>655</y>
     </hint>
    </hints>
   </connection>
