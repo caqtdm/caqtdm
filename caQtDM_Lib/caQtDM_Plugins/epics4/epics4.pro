@@ -24,7 +24,7 @@ TARGET          = epics4_plugin
 SOURCES += callbackThread.cpp epics4Requester.cpp
 HEADERS += callbackThread.h epics4Requester.h
 
-warning("epics4 was specified in qtdefs.pri, so build plugin with epics4, not yet finished")
+warning("epics4 was specified in qtdefs.pri, so build plugin with epics4 which will support all normative data types")
 
 
 DEFINES += QT_NO_WARNING_OUTPUT QT_NO_DEBUG_OUTPUT

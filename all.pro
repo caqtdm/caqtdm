@@ -76,4 +76,10 @@ unix {
 caQtDM_Viewer.depends = caQtDM_QtControls caQtDM_Lib qtcontrols_controllers qtcontrols_graphics qtcontrols_utilities qtcontrols_monitors caQtDM_Plugins
 caQtDM_Lib.depends = caQtDM_QtControls
 
+archiveCA.depends = caQtDM_QtControls caQtDM_Lib
+archivePRO.depends = caQtDM_QtControls caQtDM_Lib
+archiveSF.depends = caQtDM_QtControls caQtDM_Lib
+archiveHIPA.depends = caQtDM_QtControls caQtDM_Lib
+
+
 

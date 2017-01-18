@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V4.1.4
+CAQTDM_VERSION = V4.1.5
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -18,7 +18,6 @@ contains(QT_VER_MAJ, 5) {
 #     DEFINES += QWT_USE_OPENGL
 }
 
-
 unix {
     QMAKE_CXXFLAGS += "-g"
     QMAKE_CFLAGS_RELEASE += "-g"
@@ -36,7 +35,6 @@ contains(QT_VER_MAJ, 4) {
        }
     }
 }
-
 
 contains(QT_VER_MAJ, 5) {
   greaterThan(QT_MINOR_VERSION, 5) {
@@ -69,21 +67,33 @@ CONFIG += XDR_HACK
 
 # undefine this for epics4 plugin support (only preliminary version as example)
 # one can specify channel access with ca:// and pv access with pvs:// (both use the epics4 plugin)
-#CONFIG += epics4
+# the main work for this plugin was done by Marty Kraimer
+
+exists($(EPICS4LOCATION)/pvAccessCPP/include/pv/pvAccess.h) {
+   message( "Configuring build for epics4" )
+   CONFIG += epics4
+}
 # undefine this to make the ca provider from pvAccess (epics4) the default provider
 # otherwise the ca provider from epics3 base is the default provider
 #DEFINES += PVAISDEFAULTPROVIDER
 
 # undefine this for bsread (zeromq) plugin support
-#CONFIG += bsread
+# the main work for this plugin was done by Helge Brands
+exists($(ZMQINC)/zmq.h) {
+   message( "Configuring build for bsread" )
+   CONFIG += bsread
+}
 
 # undefine this for archive retrieval plugin support (these plugins are only valid at psi)
 # take a look at the archiveSF in order to do something similar
 CONFIG += archive
 archive: {
+# html retrieval, can always be build
    CONFIG += archiveSF
-#  CONFIG += archiveHIPA
-#  CONFIG += archivePRO
+# next ones are only buildable at psi
+   CONFIG += archiveHIPA
+   CONFIG += archivePRO
+   CONFIG += archiveCA
 }
 
 # in fileopenwindow we need to import these plugins for ios and android, so define them
@@ -93,6 +103,7 @@ epics4: { DEFINES += EPICS4 }
 archiveSF: { DEFINES += ARCHIVESF }
 archiveHIPA: { DEFINES += ARCHIVEHIPA }
 archivePRO: { DEFINES += ARCHIVEPRO }
+archiveCA: { DEFINES += ARCHIVECA }
 }
 
 # undefine this when you need to combine caQtDM with the australian epicsqt package
@@ -120,6 +131,15 @@ DEFINES += TARGET_DESCRIPTION=\"\\\"$${TARGET_DESCRIPTION}\\\"\"
 DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
+
+# 4.1.5
+# archive plugins added
+# epics4 plugin finalized for normative types, thanks to Marty Kraimer
+# window management widget implemented (close window, ...)
+# careplacemacro widget implemented; allows to redefine macros during runtime
+# utilities designer plugin added for widgets not directly related to the control system
+# X/Y waveforms implemented in camera view
+# bsread plugin developed by Helge Brands finalized
 
 # 4.1.3
 # added for the cartesianplot resize of the fatdots plot
