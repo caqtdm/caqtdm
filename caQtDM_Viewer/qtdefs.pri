@@ -70,9 +70,12 @@ CONFIG += XDR_HACK
 # the main work for this plugin was done by Marty Kraimer
 
 exists($(EPICS4LOCATION)/pvAccessCPP/include/pv/pvAccess.h) {
+!MOBILE {
    message( "Configuring build for epics4" )
    CONFIG += epics4
 }
+}
+
 # undefine this to make the ca provider from pvAccess (epics4) the default provider
 # otherwise the ca provider from epics3 base is the default provider
 #DEFINES += PVAISDEFAULTPROVIDER
@@ -80,8 +83,10 @@ exists($(EPICS4LOCATION)/pvAccessCPP/include/pv/pvAccess.h) {
 # undefine this for bsread (zeromq) plugin support
 # the main work for this plugin was done by Helge Brands
 exists($(ZMQINC)/zmq.h) {
+!MOBILE {
    message( "Configuring controlsystem plugin for bsread" )
    CONFIG += bsread
+}
 }
 
 #message("$$PWD")
