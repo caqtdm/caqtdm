@@ -977,7 +977,7 @@ void caCamera::CameraDataConvert_16bit(int sector, int sectorcount, SyncMinMax* 
             indx1 = ptr[i] * correctColor2;
             if(indx1 > 255) indx1 = 255;
 
-            LineData[k] =   (indx1 << 16) | (indx1 << 8) | indx1;
+            LineData[k] =  qRgb(indx1,indx1,indx1);
             ++i;
         }
     }
