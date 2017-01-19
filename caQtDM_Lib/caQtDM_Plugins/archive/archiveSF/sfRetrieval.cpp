@@ -25,6 +25,7 @@
 
 #include <QApplication>
 #include <QNetworkAccessManager>
+#include <QSslConfiguration>
 #include <iostream>
 #include <QFile>
 #include <QDir>
@@ -69,6 +70,13 @@ bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int seconds
     isBinned = binned;
 
     QNetworkRequest *request = new QNetworkRequest(url);
+
+    //for https we need some configuration (ignore certificate)
+    if(url.toString().toUpper().contains("HTTPS")) {
+       QSslConfiguration config = request->sslConfiguration();
+       config.setPeerVerifyMode(QSslSocket::VerifyNone);
+       request->setSslConfiguration(config);
+    }
 
     request->setRawHeader("Content-Type", "application/json");
     request->setRawHeader("Timeout", "86400");
@@ -166,26 +174,71 @@ const QString sfRetrieval::parseError(QNetworkReply::NetworkError error)
     case QNetworkReply::ConnectionRefusedError:
         errstr = tr("ConnectionRefusedError");
         break;
-    case QNetworkReply::HostNotFoundError:
-        errstr = tr("HostNotFoundError");
-        break;
     case QNetworkReply::RemoteHostClosedError:
         errstr = tr("RemoteHostClosedError");
+        break;
+    case QNetworkReply::HostNotFoundError:
+        errstr = tr("HostNotFoundError");
         break;
     case QNetworkReply::TimeoutError:
         errstr = tr("TimeoutError");
         break;
+    case QNetworkReply::OperationCanceledError:
+        errstr = tr("OperationCanceledError");
+        break;
+    case QNetworkReply::SslHandshakeFailedError:
+        errstr = tr("SslHandshakeFailedError");
+        break;
+    case QNetworkReply::TemporaryNetworkFailureError:
+        errstr = tr("TemporaryNetworkFailureError");
+        break;
+    case QNetworkReply::ProxyConnectionRefusedError:
+        errstr = tr("ProxyConnectionRefusedError");
+        break;
+    case QNetworkReply::ProxyConnectionClosedError:
+        errstr = tr("ProxyConnectionClosedError");
+        break;
+    case QNetworkReply::ProxyNotFoundError:
+        errstr = tr("ProxyNotFoundError");
+        break;
+    case QNetworkReply::ProxyTimeoutError:
+        errstr = tr("ProxyTimeoutError");
+        break;
+    case QNetworkReply::ProxyAuthenticationRequiredError:
+        errstr = tr("ProxyAuthenticationRequiredError");
+        break;
     case QNetworkReply::ContentAccessDenied:
         errstr = tr("ContentAccessDenied");
         break;
-    case QNetworkReply::ProtocolFailure:
-        errstr = tr("ProtocolFailure");
+    case QNetworkReply::ContentOperationNotPermittedError:
+        errstr = tr("ContentOperationNotPermittedError");
         break;
     case QNetworkReply::ContentNotFoundError:
         errstr = tr("ContentNotFoundError");
         break;
+    case QNetworkReply::AuthenticationRequiredError:
+        errstr = tr("AuthenticationRequiredError");
+        break;
+    case QNetworkReply::ProtocolUnknownError:
+        errstr = tr("ProtocolUnknownError");
+        break;
+    case QNetworkReply::ProtocolInvalidOperationError:
+        errstr = tr("ProtocolInvalidOperationError");
+        break;
+    case QNetworkReply::UnknownNetworkError:
+        errstr = tr("UnknownNetworkError");
+        break;
+    case QNetworkReply::UnknownProxyError:
+        errstr = tr("UnknownProxyError");
+        break;
+    case QNetworkReply::UnknownContentError:
+        errstr = tr("UnknownContentError");
+        break;
+    case QNetworkReply::ProtocolFailure:
+        errstr = tr("ProtocolFailure");
+        break;
     default:
-        errstr = tr("unknownError");
+        errstr = tr("unknownError %1").arg(error);
         break;
     }
     return errstr;
