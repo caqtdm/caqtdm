@@ -58,7 +58,7 @@ public slots:
     }
 
 
-    void getFromArchive(QWidget *w, indexes indexNew,  QString index_name) {
+    void getFromArchive(QWidget *w, indexes indexNew,  QString index_name, MessageWindow * messageWindow) {
 
 
         Q_UNUSED(w);
@@ -97,12 +97,22 @@ public slots:
         sfRetrieval *fromArchive = new sfRetrieval();
 
         if(fromArchive->requestUrl(url, json_str, indexNew.secondsPast, isBinned)) {
-
             if((nbVal = fromArchive->getCount()) > 0) {
                 //qDebug() << nbVal << total;
                 TimerN.resize(fromArchive->getCount());
                 YValsN.resize(fromArchive->getCount());
                 fromArchive->getData(TimerN, YValsN);
+            }
+        } else {
+            if(messageWindow != (MessageWindow *) 0) {
+                QString mess("ArchiveSF plugin -- lastError= ");
+                mess.append(fromArchive->lastError());
+#if QT_VERSION > 0x050000
+                mess=QString(mess.toHtmlEscaped());
+#else
+                mess = (Qt::escape(mess));
+#endif
+                messageWindow->postMsgEvent(QtFatalMsg, (char*) qasc(mess));
             }
         }
         fromArchive->deleteLater();
@@ -153,7 +163,7 @@ public:
 public slots:
     void handleResults(indexes, int, QVector<double>, QVector<double>);
 signals:
-    void operate(QWidget*, const indexes, const QString);
+    void operate(QWidget*, const indexes, const QString, MessageWindow *);
 
 private slots:
     void Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes);

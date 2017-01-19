@@ -62,7 +62,7 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
     QMutexLocker locker(&mutex);
 
     // Index name (url)
-    QString index_name =  "http://data-api.psi.ch/sf/query";
+    QString index_name =  "https://data-api.psi.ch/sf/query";
 
     //qDebug() << "====================== ArchiveSF_Plugin::Callback_UpdateInterface";
 
@@ -117,13 +117,13 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
             worker->moveToThread(tmpThread);
             connect(tmpThread, SIGNAL(finished()), worker, SLOT(workerFinish()));
             connect(tmpThread, SIGNAL(finished()), tmpThread, SLOT(deleteLater()) );
-            connect(this, SIGNAL(operate( QWidget *, indexes, QString)), worker,
-                          SLOT(getFromArchive(QWidget *, indexes,  QString)));
+            connect(this, SIGNAL(operate( QWidget *, indexes, QString, MessageWindow *)), worker,
+                          SLOT(getFromArchive(QWidget *, indexes,  QString, MessageWindow *)));
             connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>)), this,
                            SLOT(handleResults(indexes, int, QVector<double>, QVector<double>)));
             tmpThread->start();
 
-            emit operate((QWidget *) messagewindowP, indexNew, index_name);
+            emit operate((QWidget *) messagewindowP, indexNew, index_name, messagewindowP);
 
 
             disconnect(worker);

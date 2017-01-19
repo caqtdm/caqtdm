@@ -103,7 +103,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
 
     if(reply->error()) {
         errorString = tr("%1: %2").arg(parseError(reply->error())).arg(downloadUrl.toString());
-        printf("%s\n", qasc(errorString));
+        //printf("%s\n", qasc(errorString));
         emit requestFinished();
         reply->deleteLater();
         return;
@@ -114,6 +114,12 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
 
     QStringList result = out.split("\n", QString::SkipEmptyParts);
     //printf("number of values received = %d\n",  result.count());
+    if(result.count() < 20) {
+        if(result.count() > 1) errorString = result[1]; else errorString = "?????";
+        emit requestFinished();
+        reply->deleteLater();
+        return;
+    }
 
     X.resize(result.count()-1);
     Y.resize(result.count()-1);
