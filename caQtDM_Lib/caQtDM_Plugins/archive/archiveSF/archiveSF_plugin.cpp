@@ -105,7 +105,7 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
                      QString indexName = var.toString();
                      index_name = qasc(indexName);
                  } else  if(indexNew.init){
-                     QString mess("ArchiveSF plugin -- no archiverIndex defined as dynamic property in widget "  + w->objectName() + ", defaulting to http://data-api.psi.ch/sf/query");
+                     QString mess("ArchiveSF plugin -- no archiverIndex defined as dynamic property in widget "  + w->objectName() + ", defaulting to " + index_name);
                      if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
                  }
             }
