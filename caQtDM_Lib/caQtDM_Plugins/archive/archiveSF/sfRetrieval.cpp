@@ -73,9 +73,17 @@ bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int seconds
 
     //for https we need some configuration (ignore certificate)
     if(url.toString().toUpper().contains("HTTPS")) {
-       QSslConfiguration config = request->sslConfiguration();
-       config.setPeerVerifyMode(QSslSocket::VerifyNone);
-       request->setSslConfiguration(config);
+#ifdef MOBILE_ANDROID  // normally ssl not build in for android, could be done later
+#ifndef QT_NO_SSL
+        QSslConfiguration config = request->sslConfiguration();
+        config.setPeerVerifyMode(QSslSocket::VerifyNone);
+        request->setSslConfiguration(config);
+#endif
+#else
+        QSslConfiguration config = request->sslConfiguration();
+        config.setPeerVerifyMode(QSslSocket::VerifyNone);
+        request->setSslConfiguration(config);
+#endif
     }
 
     request->setRawHeader("Content-Type", "application/json");
