@@ -176,7 +176,9 @@ void replaceMacro::setForm(Form form)
         valueToChange->setVisible(false);
         macroValueListCombo->setVisible(true);
 
-        thisMacroValues.prepend("");
+        if(thisMacroValues.count() > 0) {
+            if(thisMacroValues.at(0).size() != 0) thisMacroValues.prepend("");
+        }
         macroValueListCombo->clear();
         macroValueListCombo->addItems(thisMacroValues);
         break;
@@ -216,6 +218,8 @@ void replaceMacro::updateCombo(QStringList keys, QStringList values)
             macroValueListCombo->setCurrentIndex(macroValueListCombo->count()-1);
             thisMacroValues.append(values.at(i));
             thisMacroValuesListCount = macroValueListCombo->count();
+        } else if((indx = thisMacroValues.indexOf(values.at(i))) != 0 && keys.at(i) == getMacroKey()) {
+            if(indx < macroValueListCombo->count()) macroValueListCombo->setCurrentIndex(indx);
         }
 
     }
