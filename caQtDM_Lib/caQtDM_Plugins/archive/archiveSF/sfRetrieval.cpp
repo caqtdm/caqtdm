@@ -71,21 +71,14 @@ bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int seconds
 
     QNetworkRequest *request = new QNetworkRequest(url);
 
-    //for https we need some configuration (ignore certificate)
-    if(url.toString().toUpper().contains("HTTPS")) {
-#ifdef MOBILE_ANDROID  // normally ssl not build in for android, could be done later
+    //for https we need some configuration (with no verify socket)
 #ifndef QT_NO_SSL
+    if(url.toString().toUpper().contains("HTTPS")) {
         QSslConfiguration config = request->sslConfiguration();
         config.setPeerVerifyMode(QSslSocket::VerifyNone);
         request->setSslConfiguration(config);
-#endif
-#else
-        QSslConfiguration config = request->sslConfiguration();
-        config.setPeerVerifyMode(QSslSocket::VerifyNone);
-        request->setSslConfiguration(config);
-#endif
     }
-
+#endif
     request->setRawHeader("Content-Type", "application/json");
     request->setRawHeader("Timeout", "86400");
 
