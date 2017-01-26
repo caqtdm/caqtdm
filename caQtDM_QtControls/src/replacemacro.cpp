@@ -24,11 +24,27 @@
  */
 
 #include "replacemacro.h"
+#include "alarmdefs.h"
 #include <QApplication>
 #include <QMouseEvent>
+#include <QToolTip>
 
 replaceMacro::replaceMacro(QWidget *parent) : QWidget(parent)
 {
+    setStyleSheet("");
+
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    isShown = false;
+    defaultPalette = palette();
+
+    thisBackColor = QColor(230,230,230);
+    thisForeColor = Qt::black;
+    oldBackColor = Qt::black;
+    oldForeColor = QColor(230,230,230);
+    thisColorMode=Default;
+    oldColorMode =Default;
+    setColorMode(Default);
+    thisStyle = oldStyle="";
 
     installEventFilter(this);
     this->setAcceptDrops(false);
@@ -36,6 +52,7 @@ replaceMacro::replaceMacro(QWidget *parent) : QWidget(parent)
     setElevation(on_top);
     setReloadOnChange(false);
     setDefineMacro(false);
+    thisPV = "";
     localText = "";
     thisMacroValuesListCount = 0;
 
@@ -63,7 +80,7 @@ replaceMacro::replaceMacro(QWidget *parent) : QWidget(parent)
 QString replaceMacro::getKey() const {
     if(thisForm == Value) {
         return comboKeys.at(macroKeyListCombo->currentIndex());
-    } else if(thisForm == List) {
+    } else if(thisForm == List || thisForm == Channel) {
         return getMacroKey();
     } else {
         return "";
@@ -73,7 +90,7 @@ QString replaceMacro::getKey() const {
 QString replaceMacro::getNewValue() const {
     if(thisForm == Value) {
         return localText;
-    } else if(thisForm == List) {
+    } else if(thisForm == List || thisForm == Channel) {
         return macroValueListCombo->currentText();
     } else {
         return "";
@@ -93,7 +110,7 @@ void replaceMacro::setPropertyVisible(Properties property, bool visible)
 
 // slots
 void replaceMacro::setIndex(double value) {
-    if(thisForm == List) {
+    if(thisForm == List || thisForm == Channel) {
         if(((int) value < macroValueListCombo->count()) && ((int) value >= 0)) macroValueListCombo->setCurrentIndex((int) value);
     } else if(thisForm == Value) {
         if(((int) value < macroKeyListCombo->count()) && ((int) value >= 0)) macroKeyListCombo->setCurrentIndex((int) value);
@@ -137,11 +154,11 @@ void replaceMacro::setMacroKey(QString const &MacroKey) {
     //for(int i=0; i< comboKeys.count(); i++) printf("comboKey=%s\n", qasc(comboKeys.at(i)));
     //for(int i=0; i< comboValues.count(); i++) printf("value=%s\n",  qasc(comboValues.at(i)));
     if((indx = comboKeys.indexOf(MacroKey)) != -1) {
-        macroValueListCombo->setToolTip("macro=" + MacroKey + " will get value from this combobox");
+        macroValueListCombo->setToolTip("<p style=\"color:#000000; background-color:#ffff00; white-space:pre;\">macro=" + MacroKey + " will get value from this combobox</p>");
     } else if(getDefineMacro()) {
-        macroValueListCombo->setToolTip("macro=" + MacroKey + " will be defined with the value from this combobox");
+        macroValueListCombo->setToolTip("<p style=\"color:#000000; background-color:#ffff00; white-space:pre;\" macro=" + MacroKey + " will be defined with the value from this combobox</p>");
     } else {
-        macroValueListCombo->setToolTip("macro=" + MacroKey + " will not be defined while not specified");
+        macroValueListCombo->setToolTip("<p style=\"color:#000000; background-color:#ffff00; white-space:pre;\" macro=" + MacroKey + " will not be defined while not specified</p>");
     }
 }
 
@@ -155,6 +172,7 @@ void replaceMacro::setForm(Form form)
     setPropertyVisible(macroValuesList, false);
     setPropertyVisible(macroValue, false);
     setPropertyVisible(macroKey, true);
+    setPropertyVisible(channel, false);
 
     switch (form) {
     case Value:
@@ -182,10 +200,42 @@ void replaceMacro::setForm(Form form)
         macroValueListCombo->clear();
         macroValueListCombo->addItems(thisMacroValues);
         break;
+
+    case Channel:
+        setPropertyVisible(channel, true);
+        macroKeyListCombo->setVisible(false);
+        valueToChange->setVisible(false);
+        macroValueListCombo->setVisible(true);
+        break;
     }
 
     thisMacroValuesListCount = macroValueListCombo->count();
     update();
+}
+
+void replaceMacro::updateValueList(QStringList values) {
+    int indx;
+    disconnect(macroValueListCombo, SIGNAL(currentIndexChanged(int)), 0, 0);
+    thisMacroValues = values;
+    if(thisMacroValues.count() > 0) {
+        if(thisMacroValues.at(0).size() != 0) thisMacroValues.prepend("");
+    }
+    macroValueListCombo->clear();
+    macroValueListCombo->addItems(thisMacroValues);
+
+    //set index correctly
+    for(int i=0; i<qMin(comboKeys.count(), comboValues.count()); ++i) {
+        if((indx = thisMacroValues.indexOf(comboValues.at(i))) != 0 && comboKeys.at(i) == getMacroKey()) {
+            if(indx < macroValueListCombo->count()) macroValueListCombo->setCurrentIndex(indx);
+        }
+    }
+    connect(macroValueListCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(reloadIt(int)));
+}
+
+QStringList replaceMacro::getValueList() const {
+    QStringList values = thisMacroValues;
+    values.removeAt(0); // take of blanc line
+    return values;
 }
 
 void replaceMacro::updateCombo(QStringList keys, QStringList values)
@@ -282,4 +332,102 @@ bool replaceMacro::eventFilter(QObject *obj, QEvent *event)
     } else if (event->type() == QEvent::FocusIn) {
     }
     return QObject::eventFilter(obj, event);
+}
+
+void replaceMacro::setBackground(QColor c)
+{
+    thisBackColor = c;
+    setColors(thisBackColor, thisForeColor);
+}
+
+void replaceMacro::setForeground(QColor c)
+{
+    thisForeColor = c;
+    setColors(thisBackColor, thisForeColor);
+}
+
+void replaceMacro::setColors(QColor bg, QColor fg)
+{
+    if(!defBackColor.isValid() || !defForeColor.isValid()) return;
+    if((bg != oldBackColor) || (fg != oldForeColor) || (thisColorMode != oldColorMode)) {
+        if(thisColorMode == Default) {
+            thisStyle = "QComboBox {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);}";
+            thisStyle = thisStyle.arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
+                    arg(defForeColor.red()).arg(defForeColor.green()).arg(defForeColor.blue()).arg(defForeColor.alpha());
+
+        } else {
+            thisStyle = "QComboBox {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);}";
+            thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
+                    arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
+            oldBackColor = bg;
+            oldForeColor = fg;
+        }
+    }
+
+    if(thisStyle != oldStyle || thisColorMode != oldColorMode) {
+        macroValueListCombo->setStyleSheet(thisStyle);
+        macroKeyListCombo->setStyleSheet(thisStyle);
+        oldStyle = thisStyle;
+        update();
+    }
+    oldColorMode = thisColorMode;
+}
+
+void replaceMacro::setAlarmColors(short status)
+{
+    QColor bg, fg;
+    fg = thisForeColor;
+    switch (status) {
+
+    case NO_ALARM:
+        bg = AL_GREEN;
+        break;
+    case MINOR_ALARM:
+        bg = AL_YELLOW;
+        break;
+    case MAJOR_ALARM:
+        bg = AL_RED;
+        break;
+    case INVALID_ALARM:
+    case NOTCONNECTED:
+        bg = AL_WHITE;
+        fg = AL_WHITE;
+        break;
+    default:
+        bg = AL_DEFAULT;
+        fg = thisForeColor;
+        break;
+    }
+    colMode aux = thisColorMode;
+    thisColorMode = Static;
+    setColors(bg, fg);
+    thisColorMode = aux;
+}
+
+void replaceMacro::setNormalColors()
+{
+    setColors(thisBackColor, thisForeColor);
+}
+
+bool replaceMacro::event(QEvent *e)
+{
+    if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
+        // we try to get the default color for the background set through the external stylesheets
+        if(!isShown) {
+          setStyleSheet("");
+          QString c=  palette().color(QPalette::Base).name();
+          defBackColor = QColor(c);
+          //printf("default back color %s %s\n", qasc(c), qasc(this->objectName()));
+          c=  palette().color(QPalette::Text).name();
+          defForeColor = QColor(c);
+          //printf("default fore color %s %s\n", qasc(c), qasc(this->objectName()));
+
+          if(!defBackColor.isValid()) defBackColor = QColor(255, 248, 220, 255);
+          if(!defForeColor.isValid()) defForeColor = Qt::black;
+
+          setColors(thisBackColor, thisForeColor);
+          isShown = true;
+        }
+    }
+    return QWidget::event(e);
 }

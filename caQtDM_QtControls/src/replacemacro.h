@@ -42,6 +42,9 @@ class QTCON_EXPORT replaceMacro : public QWidget
     Q_OBJECT
     Q_PROPERTY(bool reloadOnChange READ getReloadOnChange WRITE setReloadOnChange)
     Q_PROPERTY(bool defineInexistentMacro READ getDefineMacro WRITE setDefineMacro)
+    Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
+    Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
+    Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
 
     Q_PROPERTY(Form displayMode READ getForm WRITE setForm)
 
@@ -50,18 +53,31 @@ class QTCON_EXPORT replaceMacro : public QWidget
     Q_PROPERTY(QStringList macroValuesList READ getMacroValuesList WRITE setMacroValuesList DESIGNABLE isPropertyVisible(macroValuesList)  STORED false)
     Q_PROPERTY(QString macroValues READ getMacroValues WRITE setMacroValues  DESIGNABLE inactiveButVisible())
 
+    Q_PROPERTY(QString enumChannel READ getPV WRITE setPV DESIGNABLE isPropertyVisible(channel))
+
     Q_PROPERTY(QString macroValue READ getMacroValue WRITE setMacroValue DESIGNABLE isPropertyVisible(macroValue))
     Q_ENUMS(Form)
+    Q_ENUMS(colMode)
 
 #include "caElevation.h"
 
 public:
 #include "caPropHandle.h"
 
-    enum Form {Value = 0, List};
-    enum Properties { macroValue = 0, macroValuesList, macroKey};
+    enum Form {Value = 0, List, Channel};
+    enum Properties { macroValue = 0, macroValuesList, macroKey, channel};
+    enum colMode {Default, Static};
 
     replaceMacro( QWidget *parent = 0 );
+
+    colMode getColorMode() const { return thisColorMode; }
+    void setColorMode(colMode colormode) {thisColorMode = colormode; setColors(thisBackColor, thisForeColor);}
+
+    QColor getForeground() const {return thisForeColor;}
+    void setForeground(QColor c);
+
+    QColor getBackground() const {return thisBackColor;}
+    void setBackground(QColor c);
 
     bool getReloadOnChange() const { return thisReload;}
     void setReloadOnChange(bool reload) {thisReload = reload;}
@@ -71,6 +87,9 @@ public:
 
     Form getForm() const { return thisForm; }
     void setForm(Form mode);
+
+    QString getPV() const {return thisPV;}
+    void setPV(QString const &newPV) {thisPV = newPV;}
 
     QString getMacroValues() const {return thisMacroValues.join(";");}
     void setMacroValues(QString const &newMacro) {thisMacroValues = newMacro.split(";");
@@ -95,6 +114,13 @@ public:
     bool isPropertyVisible(Properties property);
     void setPropertyVisible(Properties property, bool visible);
 
+    void updateValueList(QStringList values);
+    QStringList getValueList() const;
+
+    void setColors(QColor bg, QColor fg);
+    void setAlarmColors(short status);
+    void setNormalColors();
+
 
 public slots:
     void setIndex(double value);
@@ -113,6 +139,9 @@ private slots:
         }
     }
 
+protected:
+     virtual bool event(QEvent *);
+
 private:
     bool eventFilter(QObject *obj, QEvent *event);
     void reload() {emit reloadDisplay();}
@@ -130,8 +159,20 @@ private:
     QComboBox *macroValueListCombo;
     int thisMacroValuesListCount;
 
+    QColor thisForeColor, oldForeColor;
+    QColor thisBackColor, oldBackColor;
+    QColor defBackColor, defForeColor, defSelectColor;
+    QPalette thisPalette;
+    bool thisLabelDisplay;
+    int thisAccessW;
+    colMode  thisColorMode, oldColorMode;
+    QPalette defaultPalette;
+    QString thisStyle, oldStyle;
+
     caLineEdit *valueToChange;
     QString localText;
     bool designerVisible[10];
+    QString thisPV;
+    bool isShown;
 };
 #endif

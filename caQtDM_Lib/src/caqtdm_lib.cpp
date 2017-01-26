@@ -801,7 +801,7 @@ QString CaQtDM_Lib::actualizeMacroString(QMap<QString, QString> map, QString arg
 }
 
 /**
- * this routine replaces in this macro map when exists, a value from caReplaceMacro for a specified macro name
+ * this routine replaces in this macro map when exists, a value from replaceMacro for a specified macro name
  */
 QMap<QString, QString> CaQtDM_Lib::actualizeMacroMap()
 {
@@ -819,20 +819,22 @@ QMap<QString, QString> CaQtDM_Lib::actualizeMacroMap()
                 QString macroName = i.key();
                 //qDebug() << "macroName" << macroName;
 
-                // go through all the children of type caReplaceMacro
+                // go through all the children of type replaceMacro
                 QList<replaceMacro *> all = myWidget->findChildren<replaceMacro *>();
                 foreach(replaceMacro* widget, all) {
-                    //qDebug() << widget;
-                    QString key =  widget->getKey();
-                    QString value = widget->getNewValue();
-                    //qDebug() << widget << key << value << macroName;
-                    if(macroName == key && value.length() > 0) {
-                        //qDebug() << i.key() << i.value();
-                        map.insert(macroName, value);
-                        //qDebug() << "map replace done for key" << macroName;
-                    } else if(!i.key().contains(key) && value.length() && widget->getDefineMacro()) {
-                        map.insert(key, value);
-                        //qDebug() << "map insert done for key" << key;
+                    if(widget->isEnabled()) {
+                        //qDebug() << widget;
+                        QString key =  widget->getKey();
+                        QString value = widget->getNewValue();
+                        //qDebug() << widget << key << value << macroName;
+                        if(macroName == key && value.length() > 0) {
+                            //qDebug() << i.key() << i.value();
+                            map.insert(macroName, value);
+                            //qDebug() << "map replace done for key" << macroName;
+                        } else if(!i.key().contains(key) && value.length() && widget->getDefineMacro()) {
+                            map.insert(key, value);
+                            //qDebug() << "map insert done for key" << key;
+                        }
                     }
                 }
             }
@@ -1356,6 +1358,14 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                 values.append(i.value());
             }
             replaceMacroWidget->updateCombo(keys, values);
+
+            // macrovalueslist will be populated by a channel giving a list
+            if(replaceMacroWidget->getForm() == replaceMacro::Channel) {
+                int num = addMonitor(myWidget, &kData, replaceMacroWidget->getPV(), w1, specData, map, &pv);
+                integerList.append(num);
+                replaceMacroWidget->setPV(pv);
+                nbMonitors++;
+            }
 
             connect(replaceMacroWidget, SIGNAL(reloadDisplay()), this, SLOT(Callback_ReloadWindowL()));
         }
@@ -3837,6 +3847,22 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             SetColorsNotConnected(bytecontrollerWidget);
         }
 
+       // replacemacro ==================================================================================================================
+     } else if(replaceMacro* replaceMacroWidget = qobject_cast<replaceMacro *>(w)) {
+
+        if(data.edata.connected) {
+            QStringList stringlist = String.split((QChar)27);
+            // set enum strings
+            if(data.edata.fieldtype == caENUM) {
+                // at initialisation or when list changes
+                if((data.edata.initialize) || (stringlist != replaceMacroWidget->getValueList())) {
+                    replaceMacroWidget->updateValueList(stringlist);
+                }
+                SetColorsBack(replaceMacroWidget);
+            }
+        } else {
+            SetColorsNotConnected(replaceMacroWidget);
+        }
 
         // lineEdit and textEntry ====================================================================================================
     } else if (caLineEdit *lineeditWidget = qobject_cast<caLineEdit *>(w)) {
