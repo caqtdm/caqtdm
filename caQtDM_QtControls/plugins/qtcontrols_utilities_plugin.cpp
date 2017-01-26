@@ -138,10 +138,11 @@ QWidget *replaceMacroInterface::createWidget(QWidget* parent)
 
 replaceMacroInterface::replaceMacroInterface(QObject* parent) : CustomWidgetInterface_Utilities(parent)
 {
-    strng name[4], type[4] = {"", "", "", ""};
-    longtext text[4] = {"a list of values where the value for the specified macroKey can be defined during run-time", STRINGFROMLIST,
+    strng name[5], type[5] = {"", "", "", "",""};
+    longtext text[5] = {"a list of values where the value for the specified macroKey can be defined during run-time", STRINGFROMLIST,
                         "name of macro for which value chosen at run-time will be replaced, in case of an unknown macro it will be added and initialized with macroValue",
-                        "value that will be replaced for the key choosen in the associated combobox (filled during run-time)"};
+                        "value that will be replaced for the key choosen in the associated combobox (filled during run-time)",
+                        "channel that should provide a list of values for the specified macroKey for displayMode=Channel (instead of a fixed list when displayMode=List"};
 
     strcpy(name[0], "macroValuesList");
     strcpy(name[1], "macroValues");
@@ -150,7 +151,9 @@ replaceMacroInterface::replaceMacroInterface(QObject* parent) : CustomWidgetInte
     strcpy(type[2], "multiline");
     strcpy(name[3], "macroValue");
     strcpy(type[3], "multiline");
-    d_domXml = XmlFunc("replaceMacro", "replacemacro", 0, 0, 150, 50, name, type, text, 4);
+    strcpy(name[4], "enumChannel");
+    strcpy(type[4], "multiline");
+    d_domXml = XmlFunc("replaceMacro", "replacemacro", 0, 0, 150, 50, name, type, text, 5);
     d_name = "replaceMacro";
     d_include = "replaceMacro";
 
