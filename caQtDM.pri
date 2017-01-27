@@ -185,13 +185,23 @@ epics4_plugin {
                 EPICS4LOC2 = $(EPICS4LOCATION)/pvDataCPP/lib/$(EPICS_HOST_ARCH)
                 EPICS4LOC3 = $(EPICS4LOCATION)/pvaClientCPP/lib/$(EPICS_HOST_ARCH)
                 EPICS4LOC4 = $(EPICS4LOCATION)/normativeTypesCPP/lib/$(EPICS_HOST_ARCH)
-                
-                LIBS += -L$${EPICS4LOC1} -Wl,-rpath,$${EPICS4LOC1} -lpvAccess
-                LIBS += -L$${EPICS4LOC2} -Wl,-rpath,$${EPICS4LOC2} -lpvData
-                LIBS += -L$${EPICS4LOC3} -Wl,-rpath,$${EPICS4LOC3} -lpvaClient
-                LIBS += -L$${EPICS4LOC4} -Wl,-rpath,$${EPICS4LOC4} -lnt
- 		LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
- 		
+
+                !EPICS4_STATICBUILD {
+                   message( "epics4_plugin build with shared object libraries of epics4" )
+                   LIBS += -L$${EPICS4LOC1} -Wl,-rpath,$${EPICS4LOC1} -lpvAccess
+                   LIBS += -L$${EPICS4LOC2} -Wl,-rpath,$${EPICS4LOC2} -lpvData
+                   LIBS += -L$${EPICS4LOC3} -Wl,-rpath,$${EPICS4LOC3} -lpvaClient
+                   LIBS += -L$${EPICS4LOC4} -Wl,-rpath,$${EPICS4LOC4} -lnt
+                   LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
+                }
+                EPICS4_STATICBUILD  {
+                   message( "epics4_plugin build with static libraries of epics4" )
+                   LIBS += $${EPICS4LOC1}/libpvAccess.a
+                   LIBS += $${EPICS4LOC2}/libpvData.a
+                   LIBS += $${EPICS4LOC3}/libpvaClient.a
+                   LIBS += $${EPICS4LOC4}/libnt.a
+                   LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
+                }
  		CONFIG += release
 	}
 	

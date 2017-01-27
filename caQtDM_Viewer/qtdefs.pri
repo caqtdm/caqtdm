@@ -74,6 +74,7 @@ exists($(EPICS4LOCATION)/pvAccessCPP/include/pv/pvAccess.h) {
    message( "Configuring build for epics4" )
    CONFIG += epics4
 }
+   CONFIG += EPICS4_STATICBUILD
 }
 
 # undefine this to make the ca provider from pvAccess (epics4) the default provider
@@ -98,6 +99,8 @@ archive: {
 # html retrieval, can always be build
    CONFIG += archiveSF
 # next ones are only buildable at psi
+   QMAKESPEC = $$(QMAKESPEC)
+   X64 = $$find(QMAKESPEC, 64)
    isEmpty(X64) {
        exists(../../Libs/libNewLogRPC.a) {
           message( "Configuring archive plugin build for logging (32)" )
