@@ -31,10 +31,6 @@
 #define _MATH_DEFINES_DEFINED
 #endif
 
-#ifdef epics4
-#include "epics4Subs.h"
-#endif
-
 #include "dbrString.h"
 #include <stdint.h>
 #include <QMainWindow>
@@ -358,10 +354,6 @@ private:
 
     QMap<int, caStripPlot*> stripList;          // list of stripplots with key group
     QList<int> stripGroupList;                  // group numbers found
-
-#ifdef epics4
-    epics4Subs *Epics4;
-#endif
 
     QString defaultPlugin;
 

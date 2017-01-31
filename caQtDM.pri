@@ -180,6 +180,8 @@ epics4_plugin {
                 INCLUDEPATH   += $(EPICS4LOCATION)/normativeTypesCPP/include
                 INCLUDEPATH   += $(EPICSINCLUDE)
                 INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
+#for epics 3.15 and gcc we need this
+                INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
                 
                 EPICS4LOC1 = $(EPICS4LOCATION)/pvAccessCPP/lib/$(EPICS_HOST_ARCH)
                 EPICS4LOC2 = $(EPICS4LOCATION)/pvDataCPP/lib/$(EPICS_HOST_ARCH)
