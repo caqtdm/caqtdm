@@ -7,12 +7,15 @@ echo
 echo binaries will be installed in ${QTDM_BININSTALL}
 echo libraries will be installed in ${QTDM_LIBINSTALL}
 echo plugins will be installed in ${QTDM_LIBINSTALL}/designer
+echo Qt plugins will be installed in ${QTDM_LIBINSTALL}/designer
+echo Control system plugins will be installed in ${QTDM_LIBINSTALL}/controlsystems
 
 echo " "
 read -p "Press [Enter] key to start build "
 echo " "
 
 mkdir -p ${QTDM_LIBINSTALL}/designer
+mkdir -p ${QTDM_LIBINSTALL}/controlsystems
 
 cp -v caQtDM_Binaries/caQtDM  ${QTDM_BININSTALL}/
 cp -v caQtDM_Binaries/adl2ui  ${QTDM_BININSTALL}/
@@ -21,6 +24,7 @@ cp -v caQtDM_Binaries/edl2ui  ${QTDM_BININSTALL}/
 cp -v caQtDM_Binaries/libcaQtDM_Lib.so  ${QTDM_LIBINSTALL}/
 cp -v caQtDM_Binaries/libqtcontrols.so  ${QTDM_LIBINSTALL}/
 cp -v caQtDM_Binaries/designer/libqtcontrols_*_plugin.so  ${QTDM_LIBINSTALL}/designer/
+cp -v caQtDM_Binaries/controlsystems/lib*_plugin.so  ${QTDM_LIBINSTALL}/controlsystems/
 
 cp -v startDM      ${QTDM_BININSTALL}/ 
 
