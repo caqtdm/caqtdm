@@ -27,6 +27,7 @@
 #define CAGRAPHICS_H
 
 #include <QWidget>
+#include <QDebug>
 #include <qtcontrols_global.h>
 
 // would be so nice to get rid of my includes, however it would break the compatibility with former ui files, so I leave it like that
@@ -128,10 +129,16 @@ public:
     void setPropertyVisible(Properties property, bool visible);
 
 public slots:
-
+    void slotTiltAngle(int);
+    void slotTiltAngle(double);
+    void slotStartAngle(int);
+    void slotStartAngle(double);
+    void slotSpanAngle(int);
+    void slotSpanAngle(double);
+    void slotArraySize(int);
+    void slotArraySize(double);
 
 signals:
-
 
 protected:
 

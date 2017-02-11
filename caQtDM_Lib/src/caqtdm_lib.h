@@ -31,10 +31,6 @@
 #define _MATH_DEFINES_DEFINED
 #endif
 
-#ifdef epics4
-#include "epics4Subs.h"
-#endif
-
 #include "dbrString.h"
 #include <stdint.h>
 #include <QMainWindow>
@@ -248,6 +244,7 @@ signals:
     void Signal_NextWindow();
     void Signal_IosExit();
     void Signal_ReloadWindow(QWidget*);
+    void Signal_ReloadWindowL();
     void Signal_ReloadAllWindows();
     void fileChanged(const QString&);
 
@@ -280,6 +277,7 @@ private:
 
     void WaterFall(caWaterfallPlot *widget, const knobData &data);
     void Cartesian(caCartesianPlot *widget, int curvNB, int curvType, int XorY, const knobData &data);
+    void CameraWaveform(caCamera *widget, int curvNB, int curvType, int XorY, const knobData &data);
     void WaveTable(caWaveTable *widget, const knobData &data);
     void EnableDisableIO();
     void UpdateMeter(caMeter *widget, const knobData &data);
@@ -290,6 +288,7 @@ private:
     void CartesianPlotsVerticalAlign();
     void StripPlotsVerticalAlign();
     qreal fontResize(double factX, double factY, QVariantList list, int usedIndex);
+    ControlsInterface *getPluginInterface(QWidget *w);
 
 #ifdef MOBILE
     bool eventFilter(QObject *obj, QEvent *event);
@@ -308,6 +307,7 @@ private:
     QList<QStackedWidget *> allStacks;
 
     int level;
+    QString cainclude_path;
     // 50 levels of includes should do it
     QString savedMacro[50];
     QString savedFile[50];
@@ -317,6 +317,9 @@ private:
 #endif
 
     QMap<QString, QString> createMap(const QString&);
+    QString createMacroStringFromMap(QMap<QString, QString> map);
+    QMap<QString, QString> actualizeMacroMap();
+    QString actualizeMacroString(QMap<QString, QString> map, QString argument);
 
     QString thisFileShort;
     QString thisFileFull;
@@ -356,10 +359,6 @@ private:
     QMap<int, caStripPlot*> stripList;          // list of stripplots with key group
     QList<int> stripGroupList;                  // group numbers found
 
-#ifdef epics4
-    epics4Subs *Epics4;
-#endif
-
     QString defaultPlugin;
 
 private slots:
@@ -389,12 +388,31 @@ private slots:
     void Callback_WaveEntryChanged(const QString &, int index);
     void processTerminated();
     void closeWindow();
+    void showNormalWindow();
+    void showMaxWindow();
+    void showMinWindow();
+    void showFullWindow();
+
     void updateTextBrowser();
     void handleFileChanged(const QString&);
 
     void Callback_WriteDetectedValues(QWidget* w);
 
-    void Callback_reloadWindow() {
+    void Callback_ReloadWindowL() {
+
+        //qDebug() << "================== in caQtDM_Lib::Callback_reloadWindowL";
+        // get global macro, replace specified keys from caReplaceMacros when present
+        QList<replaceMacro *> all = myWidget->findChildren<replaceMacro *>();
+        if(all.count() > 0) {
+            QVariant macroString = this->property("macroString");
+            if(!macroString.isNull()) {
+                QMap<QString, QString> map = actualizeMacroMap();
+                QString macro = createMacroStringFromMap(map);
+                this->setProperty("macroString", macro);
+            }
+            //qDebug() << "new macrostring" << macroString;
+        }
+
         emit Signal_ReloadWindow(this);
     }
 

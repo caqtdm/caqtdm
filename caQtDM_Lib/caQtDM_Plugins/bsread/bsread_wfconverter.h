@@ -134,7 +134,7 @@ public:
 
             }
 
-            qDebug() << "convert timer :" <<  timer.elapsed() << "milliseconds";
+            //qDebug() << "convert timer :" <<  timer.elapsed() << "milliseconds";
 
           }
       }

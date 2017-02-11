@@ -63,8 +63,9 @@ MutexKnobData::MutexKnobData()
     ftime(&last);
     ftime(&monitorTiming);
 
-    // start a timer with 50Hz
-    timerId = startTimer(20);
+    // start a timer with 10Hz
+    prvRepetitionRate = DEFAULTRATE;
+    timerId = startTimer(1000/DEFAULTRATE);
 
     myUpdateType = UpdateTimed;
 
@@ -125,6 +126,7 @@ void  MutexKnobData::BuildSoftPVList(QWidget *w)
 {
     char asc[MAXPVLEN+20];
     QMutexLocker locker(&mutex);
+    softPV_List.clear();
     // go through all our monitors
     for(int i=0; i < KnobDataArraySize; i++) {
         if(KnobData[i].index != -1 && KnobData[i].soft) {
@@ -149,6 +151,16 @@ void  MutexKnobData::BuildSoftPVList(QWidget *w)
             }
         }
     }
+
+/*
+    QMapIterator<QString, int> i(softPV_List);
+    int number = 0;
+    while (i.hasNext()) {
+        i.next();
+        number++;
+    }
+    qDebug() << "buildsoftpvlist=" << number;
+*/
 }
 
 /**
@@ -320,18 +332,23 @@ knobData* MutexKnobData::getMutexKnobDataPV(QWidget *widget, QString pv)
             if(kPtr->index != -1) {
                 QWidget *w = (QWidget *) kPtr->dispW;
                 QString kpv(kPtr->pv);
-                // exact match
-                if(loop == 0) {
-                    if(kpv == pv) return kPtr;
-                    // relaxed match
+
+                if(loop == 1) {
+                    if(kpv == pv) {
+                         //qDebug() << pv << "not exact match for" << widget;
+                        return kPtr;
+                    }
+
                 } else {
-                    if(kpv == pv && widget == w) return kPtr;
+                    if(kpv == pv && widget == w) {
+                        //qDebug() << pv << "exact match for" << widget;
+                        return kPtr;
+                    }
                 }
             }
         }
     loop++;
     }
-
     return (knobData*) 0;
 }
 
@@ -488,7 +505,7 @@ extern "C" MutexKnobData* C_SetMutexKnobDataReceived(MutexKnobData* p, knobData 
 //*********************************************************************************************************************
 
 /**
-  * timer is running with 50 ms speed
+  * timer is running with default (5 Hz) speed
   */
 void MutexKnobData::timerEvent(QTimerEvent *)
 {
@@ -497,11 +514,28 @@ void MutexKnobData::timerEvent(QTimerEvent *)
     char fec[40];
     char dataString[STRING_EXCHANGE_SIZE];
     struct timeb now;
+    int repetitionRate = DEFAULTRATE;
 
     if(blockProcess) return;
 
     ftime(&now);
 
+    // do we have something that should go faster then 5 Hz, then change timer, but change back when nothing fast requested
+    for(int i=0; i < GetMutexKnobDataSize(); i++) {
+        knobData *kPtr = (knobData*) &KnobData[i];
+        if(kPtr->index != -1) {
+          if(kPtr->edata.repRate > repetitionRate) repetitionRate = kPtr->edata.repRate;
+          if(repetitionRate > 50) repetitionRate = 50;  // not more than 50Hz
+        }
+    }
+    if(repetitionRate != prvRepetitionRate) {
+        killTimer(timerId);
+        timerId = startTimer(1000/repetitionRate);
+        //qDebug() << repetitionRate << prvRepetitionRate << 1000/repetitionRate << "ms";
+        prvRepetitionRate = repetitionRate;
+    }
+
+    //int number = 0;
     //qDebug() << "============================================";
     for(int i=0; i < GetMutexKnobDataSize(); i++) {
         knobData *kPtr = (knobData*) &KnobData[i];
@@ -514,7 +548,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
         }
 
         // update all graphical items for this soft pv when a value changes
-        if(kPtr->index != -1 && kPtr->soft && (diff >= (1.0/(double)repRate))) {
+        if(kPtr->index != -1 && kPtr->soft && (diff >= (2.0/(double)repRate))) {
             int indx;
             //qDebug() << "I am a soft channel" << kPtr->pv << kPtr->dispName << kPtr->edata.rvalue << kPtr->index;
             // get for this soft pv the index of the corresponding caCalc into the knobData array where the data were updated
@@ -539,7 +573,11 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 if(list.size() > 0) {
                     int nbMonitors = list.at(0).toInt();
                     if(nbMonitors > 0) {
-                        kPtr->edata.monitorCount++;
+                        QWidget *w2 = (QWidget*) kPtr->dispW;
+                        if(!w2->property("hidden").value<bool>()) {
+                           kPtr->edata.monitorCount++;
+                           //qDebug() << "increase associated" << kPtr->pv << w2->objectName() <<  w2->property("hidden").value<bool>() << number1++;
+                        }
                     }
                 }
 
@@ -553,9 +591,9 @@ void MutexKnobData::timerEvent(QTimerEvent *)
 
         // use specified repetition rate (normally 5Hz)
         if( ((kPtr->index != -1) && (kPtr->edata.monitorCount > kPtr->edata.displayCount) && (diff >= (1.0/(double)repRate)))){
-            /*
-            printf("<%s> index=%d mcount=%d dcount=%d value=%f datasize=%d valuecount=%d\n", kPtr->pv, kPtr->index, kPtr->edata.monitorCount,
-                                                                      kPtr->edata.displayCount, kPtr->edata.rvalue,
+/*
+            printf("<%s> index=%d mcount=%d dcount=%d value=%f ivalue=%d datasize=%d valuecount=%d\n", kPtr->pv, kPtr->index, kPtr->edata.monitorCount,
+                                                                      kPtr->edata.displayCount, kPtr->edata.rvalue, kPtr->edata.ivalue,
                                                                       kPtr->edata.dataSize, kPtr->edata.valueCount);
 */
             if((myUpdateType == UpdateTimed) || kPtr->soft) {
@@ -644,46 +682,51 @@ extern "C" MutexKnobData* C_SetMutexKnobDataConnected(MutexKnobData* p, int inde
 
 void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, char *dataString, knobData knb)
 {
-    // special characters handling
-#ifdef linux
-    static const QChar egrad = 0x00b0;              // º coming from epics
-    QString Egrad(egrad);
-    static const QChar grad = 0x00b0;   // will be replaced by this utf-8 code
-    QString Grad(grad);
-#else
-    static const QChar egrad = 0x00b0;              // º coming from epics
-    QString Egrad(egrad);
-    static const QChar grad[2] = { 0x00c2, 0x00b0};   // will be replaced by this utf-8 code
-    QString Grad(grad, 2);
-#endif
 
-    static const QChar emu =  0x00b5;               // mu coming from epics
-    QString Emu(emu);
-#ifdef linux
-    static const QChar mu =  0x00b5;
-    QString Mu(mu);
-    static const QChar uA[2] = { 0x00b5, 0x0041};
-    QString uAs(uA, 2);
-#else
-    static const QChar mu[2] = { 0x00ce, 0x00bc};
-    QString Mu(mu, 2);
-    static const QChar uA[3] = { 0x00ce, 0x00bc, 0x0041}; // muA code for replacing ?A coming from epics
-    QString uAs(uA, 3);
-#endif
-
-    //qDebug() << "========== update widget by emitting signal" << w;
 
     QString StringUnits = QString::fromLatin1(units);
+    if(StringUnits.size() > 0) {
+        // special characters handling
+#ifdef linux
+        static const QChar egrad = 0x00b0;              // º coming from epics
+        QString Egrad(egrad);
+        static const QChar grad = 0x00b0;   // will be replaced by this utf-8 code
+        QString Grad(grad);
+#else
+        static const QChar egrad = 0x00b0;              // º coming from epics
+        QString Egrad(egrad);
+        static const QChar grad[2] = { 0x00c2, 0x00b0};   // will be replaced by this utf-8 code
+        QString Grad(grad, 2);
+#endif
 
-    // replace special characters
-    StringUnits.replace(Egrad, Grad);
-    StringUnits.replace(Emu, Mu);
+        static const QChar emu =  0x00b5;               // mu coming from epics
+        QString Emu(emu);
+#ifdef linux
+        static const QChar mu =  0x00b5;
+        QString Mu(mu);
+        static const QChar uA[2] = { 0x00b5, 0x0041};
+        QString uAs(uA, 2);
+#else
+        static const QChar mu[2] = { 0x00ce, 0x00bc};
+        QString Mu(mu, 2);
+        static const QChar uA[3] = { 0x00ce, 0x00bc, 0x0041}; // muA code for replacing ?A coming from epics
+        QString uAs(uA, 3);
+#endif
 
-    // seems people did not know how to code mu in EGU
-    StringUnits.replace("?A", uAs);
-    StringUnits.replace("muA", uAs);
-    StringUnits.replace("uA", uAs);
+        // replace special characters
+        StringUnits.replace(Egrad, Grad);
+        StringUnits.replace(Emu, Mu);
 
+        // seems people did not know how to code mu in EGU
+        StringUnits.replace("?A", uAs);
+        StringUnits.replace("muA", uAs);
+        StringUnits.replace("uA", uAs);
+
+        // neither grad
+        static const QChar spec =  0x00c2;
+        QString special(spec);
+        if(StringUnits.contains("°C")) StringUnits.replace(special, "");
+    }
     // send data to main thread
     emit Signal_UpdateWidget(index, w, StringUnits, fec, dataString, knb);
 }

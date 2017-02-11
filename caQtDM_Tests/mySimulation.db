@@ -1,3 +1,34 @@
+record(mbbo, "88:MultipleBitMBBO") {
+  field(DTYP, "Soft Channel")
+  field(FLNK, "88:MultipleBitMBBI")
+  field(OUT, "88:MultipleBitMBBI PP")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+  field(THVL, "3")
+  field(SCAN, "Passive")
+  field(FRVL, "4")
+  field(FVVL, "5")
+  field(SXVL, "6")
+  field(SVVL, "7")
+  field(EIVL, "8")
+  field(ZRST, "0")
+  field(ONST, "1")
+  field(TWST, "2")
+  field(THST, "3")
+  field(FRST, "4")
+  field(FVST, "5")
+  field(SXST, "6")
+  field(SVST, "7")
+  field(EIST, "8")
+}
+
+record(mbbi, "88:MultipleBitMBBI") {
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+}
+
+
 record(ao,"ACM:TEST:AO") {
     field(DESC,"analog output record")
     field(SCAN,"Passive")
@@ -245,9 +276,30 @@ record(mbbo,"ACM:TEST:MBBO") {
         field(ZRVL, "0")
         field(ONVL, "1")
         field(TWVL, "2")
-        field(ZRST, "OFF")
-        field(ONST, "")
-        field(TWST, "RESET")
+        field(THVL, "3")
+        field(FRVL, "4")
+        field(FVVL, "5")
+        field(SXVL, "6")
+        field(SVVL, "7")
+        field(EIVL, "8")
+        field(NIVL, "9")
+        field(TEVL, "10")
+        field(ELVL, "11")
+        field(TVVL, "12")
+        field(TTVL, "13")
+        field(FTVL, "14")
+        field(FFVL, "15")
+        
+        field(ZRST, "100.00 Hz")
+        field(ONST, "50.00 Hz")
+        field(TWST, "33.33 Hz")
+        field(THST, "25.00 Hz")
+        field(FRST, "16.66 Hz")
+        field(FVST, "10.00 Hz")
+        field(SXST, "8.33 Hz")
+        field(SVST, "5.00 Hz")
+        field(EIST, "2.50 Hz")
+        field(NIST, "1.00 Hz")      
 }
 
 record(mbbo,"ACM:TEST1:MBBO") {
@@ -1015,6 +1067,21 @@ record(calc, "SZ")
 	field(CALC,"(0.25*A*A*A*A-0.5*A*A) -0.12*A + (0.25*B*B*B*B-0.5*B*B) +1.0 -0.05*B")
 }
 
+#record(waveform, "ACM:PICTURE"){
+#        field(DESC, "16bit waveform")
+#        field(FTVL, "SHORT")
+#        field(NELM, "16000000")
+#        field(INP, "MTEST-CAQTDM-CAMERA:FPICTURE CP")
+#}
 
-
+#record(calc, "ACM:PICTURE:WIDTH"){
+#        field(CALC, "A")
+#        field(DESC, "width")
+#        field(INPA, "MTEST-CAQTDM-CAMERA:WIDTH CP")
+#}
+#record(calc, "ACM:PICTURE:HEIGHT"){
+#        field(CALC, "A")
+#        field(DESC, "height")
+#        field(INPA, "MTEST-CAQTDM-CAMERA:HEIGHT CP")
+#}
 

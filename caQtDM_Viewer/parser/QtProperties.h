@@ -36,7 +36,7 @@ typedef struct _zOrder {
     string40 z;
 } zOrder;
 
-#define True 1==1
+#define True (1==1)
 #define False !True
 
 #define UNUSED(x) (void)(x)

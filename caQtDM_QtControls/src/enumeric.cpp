@@ -170,7 +170,7 @@ void ENumeric::init()
         temp->setObjectName(QString("layoutmember") + QString().setNum(i));
         temp->installEventFilter(lCWME);
 #ifndef MOBILE
-        temp->setAutoRepeat(true);
+        temp->setAutoRepeat(false);
         temp->setAutoRepeatInterval(200);
         temp->setAutoRepeatDelay(500);
 #endif
@@ -190,7 +190,7 @@ void ENumeric::init()
         temp2->setObjectName(QString("layoutmember") + QString().setNum(i));
         temp2->installEventFilter(lCWME);
 #ifndef MOBILE
-        temp2->setAutoRepeat(true);
+        temp2->setAutoRepeat(false);
         temp2->setAutoRepeatInterval(200);
         temp2->setAutoRepeatDelay(500);
 #endif
@@ -436,7 +436,12 @@ bool ENumeric::eventFilter(QObject *obj, QEvent *event)
                 break;
             }
         }
-    } else if(event->type() == QEvent::KeyRelease)   {
+    // this prevents a parent scrollbar to react to the up/down keys
+    } else if (event->type() == QEvent::KeyPress) {
+         QKeyEvent *ev = (QKeyEvent*) event;
+         if(ev->key() ==Qt::Key_Down || ev->key() ==Qt::Key_Up) return true;
+
+    } else if(event->type() == QEvent::KeyRelease)    {
         QKeyEvent *ev = (QKeyEvent *) event;
         if(ev->key() == Qt::Key_Escape) if (text != NULL) text->hide();
         if(ev->key() == Qt::Key_Up) upDataIndex(lastLabel);

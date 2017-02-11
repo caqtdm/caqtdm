@@ -115,7 +115,7 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
         DispatcherThread.start();
     }else{
         QString msg="Using Manual BSREAD Connection";
-        messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
+        if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
         QString ZMQ_ADDR_LIST = (QString)  qgetenv("BSREAD_ZMQ_ADDR_LIST");
 
         if (!ZMQ_ADDR_LIST.isEmpty()){
@@ -137,11 +137,11 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
                 bsreadThreads.last()->start();
                 msg="Connection started: ";
                 msg.append(BSREAD_ZMQ_ADDRS.at(i));
-                messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
+                if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
             }
         }else{
             QString msg="no BSREAD Connection";
-            messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
+            if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
 
         }
     }
@@ -156,7 +156,7 @@ int bsreadPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
     int i;
     QMutexLocker locker(&mutex);
     Dispatcher.add_Channel(kData->pv,kData->index);
-    qDebug() << "bsreadPlugin:pvAddMonitor" << kData->pv << kData->index << kData;
+    //qDebug() << "bsreadPlugin:pvAddMonitor" << kData->pv << kData->index << kData;
     i=0;
 
     while ((i<bsreadconnections.size())){
@@ -175,7 +175,7 @@ int bsreadPlugin::pvClearMonitor(knobData *kData) {
 
     QMutexLocker locker(&mutex);
     Dispatcher.rem_Channel(QString(kData->pv),kData->index);
-    qDebug() << "bsreadPlugin:pvClearMonitor" << kData << kData->pv << kData->index <<bsreadconnections.size();
+    //qDebug() << "bsreadPlugin:pvClearMonitor" << kData << kData->pv << kData->index <<bsreadconnections.size();
     while (i<bsreadconnections.size()){
         bsreadconnections.at(i)->bsread_DataMonitorUnConnect(kData);
 		i++;

@@ -217,11 +217,23 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Controllers);
     Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Monitors);
     Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Graphics);
+    Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Utilities);
     Q_IMPORT_PLUGIN(DemoPlugin);
     Q_IMPORT_PLUGIN(Epics3Plugin);
+//*************************************
 #ifdef EPICS4
     Q_IMPORT_PLUGIN(Epics4Plugin);
 #endif
+#ifdef ARCHIVESF
+    Q_IMPORT_PLUGIN(ArchiveSF_Plugin);
+#endif
+#ifdef ARCHIVEHIPA
+    Q_IMPORT_PLUGIN(ArchiveHIPA_Plugin);
+#endif
+#ifdef ARCHIVEPRO
+    Q_IMPORT_PLUGIN(ArchivePRO_Plugin);
+#endif
+//*************************************
     Q_INIT_RESOURCE(qtcontrolsplugin);  // load resources from resource file
 #endif
 
@@ -322,7 +334,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         _isRunning = false;
         // create shared memory with a default value to note that no message is available.
         if (!sharedMemory.create(4096)) {
-            qDebug("caQtDM -- Unable to create single instance.");
+            qDebug("caQtDM -- Unable to create single instance of shared memory.");
         } else {
             qDebug() << "caQtDM -- created shared memory with 4096 bytes";
             sharedMemory.lock();

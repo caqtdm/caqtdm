@@ -59,7 +59,6 @@
                                 <File Id="QT5CLUCENE.DLL" Name="Qt5CLucene.dll" Source="$(env.QTHOME)\bin\Qt5CLucene.dll" />
                                 <File Id="QT5CONCURRENT.DLL" Name="Qt5Concurrent.dll" Source="$(env.QTHOME)\bin\Qt5Concurrent.dll" />
                                 <File Id="QT5CORE.DLL" Name="Qt5Core.dll" Source="$(env.QTHOME)\bin\Qt5Core.dll" />
-                                <File Id="QT5DECLARATIVE.DLL" Name="Qt5Declarative.dll" Source="$(env.QTHOME)\bin\Qt5Declarative.dll" />
                                 <File Id="QT5DESIGNER.DLL" Name="Qt5Designer.dll" Source="$(env.QTHOME)\bin\Qt5Designer.dll" />
                                 <File Id="QT5DESIGNERCOMPONENTS.DLL" Name="Qt5DesignerComponents.dll" Source="$(env.QTHOME)\bin\Qt5DesignerComponents.dll" />
                                 <File Id="QT5GUI.DLL" Name="Qt5Gui.dll" Source="$(env.QTHOME)\bin\Qt5Gui.dll" />
@@ -106,6 +105,7 @@
                                 <File Id="DEMO_PLUGIN.DLL" Name="demo_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\demo_plugin.dll" />
                                 <File Id="EPICS3_PLUGIN.DLL" Name="epics3_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics3_plugin.dll" />
                                 <File Id="BSREAD_PLUGIN.DLL" Name="bsread_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\bsread_plugin.dll" />
+                                <File Id="ARCHIVESF_PLUGIN.DLL" Name="archiveSF_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\archiveSF_plugin.dll" />
                             </Component>
                         </Directory>
                         <Directory Id="DESIGNER" Name="designer">
@@ -113,6 +113,7 @@
                                 <File Id="QTCONTROLS_CONTROLLERS_PLUGIN.DLL" Name="qtcontrols_controllers_plugin.dll" Source="$(env.CAQTDM_COLLECT)\designer\qtcontrols_controllers_plugin.dll" />
                                 <File Id="QTCONTROLS_MONITORS_PLUGIN.DLL" Name="qtcontrols_monitors_plugin.dll" Source="$(env.CAQTDM_COLLECT)\designer\qtcontrols_monitors_plugin.dll" />
                                 <File Id="QTCONTROLS_GRAPHICS_PLUGIN.DLL" Name="qtcontrols_graphics_plugin.dll" Source="$(env.CAQTDM_COLLECT)\designer\qtcontrols_graphics_plugin.dll" />
+                                <File Id="QTCONTROLS_UTILITIES_PLUGIN.DLL" Name="qtcontrols_utilities_plugin.dll" Source="$(env.CAQTDM_COLLECT)\designer\qtcontrols_utilities_plugin.dll" />
                             </Component>
                         </Directory>
                         <Directory Id="PLATFORMS" Name="platforms">
@@ -125,7 +126,6 @@
                         <Directory Id="IMAGEFORMATS" Name="imageformats">
                             <Component Id="imageformats" Win64="yes" Guid="3FB66204-032F-4F63-9AD0-7DC531F8769D">
                                 <File Id="QJPEG.DLL" Name="qjpeg.dll" Source="$(env.QTHOME)\plugins\imageformats\qjpeg.dll" />
-                                <File Id="QMNG.DLL" Name="qmng.dll" Source="$(env.QTHOME)\plugins\imageformats\qmng.dll" />
                                 <File Id="QSVG.DLL" Name="qsvg.dll" Source="$(env.QTHOME)\plugins\imageformats\qsvg.dll" />
                                 <File Id="QTGA.DLL" Name="qtga.dll" Source="$(env.QTHOME)\plugins\imageformats\qtga.dll" />
                                 <File Id="QTIFF.DLL" Name="qtiff.dll" Source="$(env.QTHOME)\plugins\imageformats\qtiff.dll" />
@@ -135,7 +135,6 @@
                                 <File Id="QGIF.DLL" Name="qgif.dll" Source="$(env.QTHOME)\plugins\imageformats\qgif.dll" />
                                 <File Id="QICNS.DLL" Name="qicns.dll" Source="$(env.QTHOME)\plugins\imageformats\qicns.dll" />
                                 <File Id="QICO.DLL" Name="qico.dll" Source="$(env.QTHOME)\plugins\imageformats\qico.dll" />
-                                <File Id="QJP2.DLL" Name="qjp2.dll" Source="$(env.QTHOME)\plugins\imageformats\qjp2.dll" />
                             </Component>
                         </Directory>
                         <Directory Id="SQLDRIVERS" Name="sqldrivers">

@@ -33,6 +33,11 @@ del .\caQtDM_Lib\caQtDM_Plugins\bsread\Makefile*
 del .\caQtDM_Lib\caQtDM_Plugins\epics3\Makefile*
 del .\caQtDM_Lib\caQtDM_Plugins\epics4\Makefile*
 
+del .\caQtDM_Lib\caQtDM_Plugins\archive\Makefile*
+del .\caQtDM_Lib\caQtDM_Plugins\archive\archiveSF\Makefile*
+del .\caQtDM_Lib\caQtDM_Plugins\archive\archiveHIPA\Makefile*
+del .\caQtDM_Lib\caQtDM_Plugins\archive\archivePro\Makefile*
+
 
 
 del .\caQtDM_QtControls\Makefile*

@@ -39,6 +39,7 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
     thisLineSize = 1;
     thisItemCount = 1;
     thisMaxLines = 1;
+    thisMaxColumns = 1;
     thisStacking = Row;
     thisAdjust = prvAdjust= true;
     setBackground(Qt::black);
@@ -128,8 +129,13 @@ void caInclude::setStacking(Stacking stacking) {
     prvStacking = thisStacking;
     if(thisStacking == RowColumn) {
         setPropertyVisible(maximumLines, true);
+        setPropertyVisible(maximumColumns, false);
+    } else if(thisStacking == ColumnRow) {
+        setPropertyVisible(maximumColumns, true);
+        setPropertyVisible(maximumLines, false);
     } else {
         setPropertyVisible(maximumLines, false);
+        setPropertyVisible(maximumColumns, false);
     }
 }
 
@@ -146,6 +152,7 @@ void caInclude::setFileName(QString const &filename)
         fileFunctions filefunction;
 
         int nbLines = thisMaxLines;
+        int nbColumns = thisMaxColumns;
         int column = 0;
         int row = 0;
         int maxRows = 0;
@@ -164,7 +171,7 @@ void caInclude::setFileName(QString const &filename)
         }
 
         // modify stacking
-        if(thisStacking != prvStacking || thisMaxLines != prvMaxLines || thisAdjust != prvAdjust) {
+        if(thisStacking != prvStacking || thisMaxLines != prvMaxLines || thisMaxColumns != prvMaxColumns || thisAdjust != prvAdjust) {
             if(thisLoadedWidgets.count() > 0) {
                 //printf("modify stacking with %d items\n", thisLoadedWidgets.count());
                 int j = 0;
@@ -189,7 +196,7 @@ void caInclude::setFileName(QString const &filename)
                         column++;
                         maxColumns = column;
                         maxRows = 1;
-                    } else {
+                    } else if(thisStacking == RowColumn){
                         if(row >= nbLines) {
                             row=0;
                             column++;
@@ -198,12 +205,23 @@ void caInclude::setFileName(QString const &filename)
                         row++;
                         if(row > maxRows) maxRows = row;
                         maxColumns = column + 1;
+                    } else if(thisStacking == ColumnRow){
+                        if(column >= nbColumns) {
+                            row++;
+                            column=0;
+                        }
+                        gridLayout->addWidget(l, row, column);
+                        column++;
+                        if(column > maxColumns) maxColumns = column;
+                        maxRows = row + 1;
                     }
+
                     j++;
                     l->show();
                 }
                 prvStacking = thisStacking;
                 prvMaxLines = thisMaxLines;
+                prvMaxColumns = thisMaxColumns;
                 //printf("resize 1 for row=%d column=%d\n", maxRows, maxColumns);
                 if(thisAdjust) resize(maxColumns * effectiveSize.width(), maxRows * effectiveSize.height());
                 prvAdjust = thisAdjust;
@@ -291,7 +309,7 @@ void caInclude::setFileName(QString const &filename)
                 column++;
                 maxColumns = column;
                 maxRows = 1;
-            } else {
+            } else if(thisStacking == RowColumn){
                 if(row >= nbLines) {
                     row=0;
                     column++;
@@ -300,6 +318,16 @@ void caInclude::setFileName(QString const &filename)
                 row++;
                 if(row > maxRows) maxRows = row;
                 maxColumns = column + 1;
+
+            } else if(thisStacking == ColumnRow){
+                if(column >= nbColumns) {
+                    row++;
+                    column=0;
+                }
+                gridLayout->addWidget(loadedWidget, row, column);
+                column++;
+                if(column > maxColumns) maxColumns = column;
+                maxRows = row + 1;
             }
 
             // show it

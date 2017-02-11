@@ -363,6 +363,7 @@ public:
     void setData(float *vector, int size, int curvIndex, int curvType, int curvXY);
     void setData(int16_t *vector, int size, int curvIndex, int curvType, int curvXY);
     void setData(int32_t* vector, int size, int curvIndex, int curvType, int curvXY);
+    void setData(int8_t* vector, int size, int curvIndex, int curvType, int curvXY);
     void displayData(int curvIndex, int curvType);
 
     void setScaleX(double minX, double maxX);

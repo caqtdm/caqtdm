@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>457</width>
+    <height>253</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+QWidget#centralWidget {background: rgba(187, 187, 187, 0);}</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="caClock" name="caclock">
+    <property name="geometry">
+     <rect>
+      <x>18</x>
+      <y>58</y>
+      <width>125</width>
+      <height>125</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="caInclude" name="cainclude">
+    <property name="geometry">
+     <rect>
+      <x>197</x>
+      <y>52</y>
+      <width>227</width>
+      <height>174</height>
+     </rect>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">testB.ui</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>192</x>
+      <y>7</y>
+      <width>243</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>include testB no directory specified
+(but get it from includeTest/testB.ui)</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>111</x>
+      <y>7</y>
+      <width>157</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>I am TestA</string>
+    </property>
+   </widget>
+   <widget class="caGraphics" name="cagraphics">
+    <property name="geometry">
+     <rect>
+      <x>181</x>
+      <y>42</y>
+      <width>257</width>
+      <height>203</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="caGraphics" name="cagraphics_2">
+    <property name="geometry">
+     <rect>
+      <x>2</x>
+      <y>3</y>
+      <width>450</width>
+      <height>247</height>
+     </rect>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>170</red>
+      <green>255</green>
+      <blue>127</blue>
+     </color>
+    </property>
+    <property name="fillstyle" stdset="0">
+     <enum>caGraphics::Filled</enum>
+    </property>
+   </widget>
+   <zorder>cagraphics_2</zorder>
+   <zorder>cagraphics</zorder>
+   <zorder>caclock</zorder>
+   <zorder>cainclude</zorder>
+   <zorder>label</zorder>
+   <zorder>label_2</zorder>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caGraphics</class>
+   <extends>QWidget</extends>
+   <header>caGraphics</header>
+  </customwidget>
+  <customwidget>
+   <class>caInclude</class>
+   <extends>QWidget</extends>
+   <header>caInclude</header>
+  </customwidget>
+  <customwidget>
+   <class>caClock</class>
+   <extends>QWidget</extends>
+   <header>caClock</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

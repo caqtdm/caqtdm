@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="channel" stdset="0">
-    <string notr="true">bsread://CHANNEL-1</string>
+    <string notr="true">bsread://Int8Scalar</string>
    </property>
    <property name="precision">
     <number>1</number>
@@ -42,7 +42,7 @@
     </rect>
    </property>
    <property name="channel" stdset="0">
-    <string notr="true">bsread://CHANNEL-2</string>
+    <string notr="true">bsread://UInt8Scalar</string>
    </property>
    <property name="precision">
     <number>1</number>
@@ -61,7 +61,7 @@
     </rect>
    </property>
    <property name="channel" stdset="0">
-    <string notr="true">bsread://CHANNEL-3</string>
+    <string notr="true">bsread://Int16Scalar</string>
    </property>
    <property name="precision">
     <number>1</number>
@@ -84,6 +84,25 @@
    </property>
    <property name="formatType">
     <enum>caLineEdit::string</enum>
+   </property>
+  </widget>
+  <widget class="caLineEdit" name="calineedit_4">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>70</y>
+     <width>100</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">bsread://UInt8Scalar</string>
+   </property>
+   <property name="precision">
+    <number>1</number>
+   </property>
+   <property name="precisionMode">
+    <enum>caLineEdit::User</enum>
    </property>
   </widget>
  </widget>

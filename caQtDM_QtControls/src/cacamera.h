@@ -48,6 +48,7 @@
 #endif
 #include <time.h>
 #include <sys/timeb.h>
+#include <stdint.h>
 
 #include "colormaps.h"
 #include "caPropHandleDefs.h"
@@ -91,6 +92,9 @@ class QTCON_EXPORT caCamera : public QWidget
     Q_PROPERTY(ROI_markertype ROI_writemarkerType READ getROIwritemarkerType WRITE setROIwritemarkerType)
     Q_PROPERTY(ROI_type ROI_writeType READ getROIwriteType WRITE setROIwriteType)
 
+    Q_PROPERTY(QString channelXaverage  READ getPV_Xaverage WRITE setPV_Xaverage)
+    Q_PROPERTY(QString channelYaverage  READ getPV_Yaverage WRITE setPV_Yaverage)
+
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
@@ -105,6 +109,8 @@ public:
 
     void noStyle(QString style) {Q_UNUSED(style);}
 
+    enum  ChannelType { CH_X=0, CH_Y};
+
     enum ROI_type {none=0, xy_only, xy1_xy2, xyUpleft_xyLowright, xycenter_width_height};
     enum ROI_markertype {box=0, box_crosshairs, line, arrow};
 
@@ -117,10 +123,17 @@ public:
     caCamera(QWidget *parent = 0);
     ~caCamera();
 
-    void updateImage(const QImage &image, bool valuesPresent[], double values[], double scaleFactor);
+    void updateImage(const QImage &image, bool valuesPresent[], double values[], double scaleFactor,
+                     QVarLengthArray<double> X, QVarLengthArray<double> Y);
     void getROI(QPointF &P1, QPointF &P2);
     QImage * showImageCalc(int datasize, char *data);
     void showImage(int datasize, char *data);
+
+    void setData(double *vector, int size, int curvIndex, int curvType, int curvXY);
+    void setData(float *vector, int size, int curvIndex, int curvType, int curvXY);
+    void setData(int16_t *vector, int size, int curvIndex, int curvType, int curvXY);
+    void setData(int32_t* vector, int size, int curvIndex, int curvType, int curvXY);
+    void setData(int8_t* vector, int size, int curvIndex, int curvType, int curvXY);
 
     bool getAccessW() const {return _AccessW;}
     void setAccessW(bool access);
@@ -135,6 +148,12 @@ public:
     void setPV_Code(QString const &newPV) {thisPV_Code = newPV;}
     QString getPV_BPP() const {return thisPV_BPP;}
     void setPV_BPP(QString const &newPV) {thisPV_BPP = newPV;}
+
+    QString getPV_Xaverage() const {return thisPV_Xaverage;}
+    void setPV_Xaverage(QString const &newPV) {thisPV_Xaverage = newPV;}
+
+    QString getPV_Yaverage() const {return thisPV_Yaverage;}
+    void setPV_Yaverage(QString const &newPV) {thisPV_Yaverage = newPV;}
 
     ROI_markertype getROIreadmarkerType() const {return thisROIreadmarkertype;}
     void setROIreadmarkerType(ROI_markertype const &roimarkertype) {thisROIreadmarkertype = roimarkertype;}
@@ -201,8 +220,6 @@ public:
     void dataProcessing(double value, int id);
     void showDisconnected();
 
-
-
 signals:
    void WriteDetectedValuesSignal(QWidget*);
 
@@ -211,12 +228,18 @@ private slots:
     void zoomOut(int level = 1);
     void zoomNow();
     void updateChannels();
+    void scrollAreaMoved(int);
 
 protected:
     void resizeEvent(QResizeEvent *event);
     void timerEvent(QTimerEvent *);
 
 private:
+
+    template <typename pureData>
+    void fillData(pureData *array, int size, int curvIndex, int curvType, int curvXY);
+    QVarLengthArray<double> X;
+    QVarLengthArray<double> Y;
 
     bool eventFilter(QObject *obj, QEvent *event);
     void Coordinates(int posX, int posY, double &newX, double &newY, double &maxX, double &maxY);
@@ -229,11 +252,15 @@ private:
     void CameraDataConvert_16bitD(int sector, int sectorcount, SyncMinMax* MinMax, QSize resultSize, int datasize);
     void MinMaxLock(SyncMinMax* MinMax, uint Max[2], uint Min[2]);
     void MinMaxImageLock(QVector<uint> LineData, int y, QSize resultSize, SyncMinMax* MinMax);
+    void MinMaxImageLockBlock(uint *LineData, int ystart, int yend, QSize resultSize, SyncMinMax* MinMax);
     void InitLoopdata(int &ystart, int &yend, long &i, QVector<uint> &LineData, int increment, int sector, int sectorcount,
                       QSize resultSize, uint Max[2], uint Min[2]);
+    void InitLoopdataNew(int &ystart, int &yend, long &i, int increment, int sector, int sectorcount,
+                         QSize resultSize, uint Max[2], uint Min[2]);
 
     bool buttonPressed, validIntensity;
     QString thisPV_Data, thisPV_Width, thisPV_Height, thisPV_Code, thisPV_BPP;
+    QString thisPV_Xaverage, thisPV_Yaverage;
     QStringList thisCustomMap;
     ROI_type thisROIreadtype, thisROIwritetype;
     ROI_markertype thisROIreadmarkertype, thisROIwritemarkertype;
@@ -298,7 +325,7 @@ private:
     bool designerVisible[10];
 
     QTimer *writeTimer;
-    QPointF P1, P2, P1_old, P2_old;
+    QPointF P1, P2, P1_old, P2_old, P3;
     bool selectionInProgress;
 
     QStringList thisList;

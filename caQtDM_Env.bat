@@ -5,18 +5,21 @@ REM ============================================================================
 IF "%1"=="1" GOTO SELECT1
 IF "%1"=="2" GOTO SELECT2
 IF "%1"=="3" GOTO SELECT3
+IF "%1"=="4" GOTO SELECT4
 
 echo =============================================================================================
 echo Select Build Environment
-echo 1) QT 4.8.5 QWT6.1.2  32 Bit VS2010  
-echo 2) QT 5.5.0 QWT6.1.2  64 Bit VS2013  
-echo 3) QT 5.5.0 QWT6.1.2  32 Bit VS2013  
+echo 1) QT 4.8.5 QWT6.1.3  32 Bit VS2010  
+echo 2) QT 5.7.0 QWT6.1.3  64 Bit VS2013  
+echo 3) QT 5.7.0 QWT6.1.3  32 Bit VS2013
+echo 4) QT 5.7.0 QWT6.1.3  RT VS2013
 set /P SELCTION=Select: 
 echo =============================================================================================
  
 IF %SELCTION%==1 GOTO :SELECT1
 IF %SELCTION%==2 GOTO :SELECT2
 IF %SELCTION%==3 GOTO :SELECT3
+IF %SELCTION%==4 GOTO :SELECT4
 IF %SELCTION%==A GOTO :SELECTA
 
 REM =============================================================================================
@@ -28,7 +31,7 @@ REM ============================================================================
   call "C:\Program files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" x86
  
   set QTHOME=X:/qt/4.8.5
-  set QWTHOME=X:/qt/qwt-6.1.2_32bit
+  set QWTHOME=X:/qt/qwt-6.1.3
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
   
@@ -65,9 +68,9 @@ REM ============================================================================
  
   call "C:\Program files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
  
-  set QTHOME=X:/qt/5.5.0_64bit/qtbase
+  set QTHOME=X:/qt/5.7.0_64bit/qtbase
   
-  set QWTHOME=X:/qt/qwt-6.1.2_55_64bit
+  set QWTHOME=X:/qt/qwt-6.1.3_64bit
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
   
@@ -101,9 +104,9 @@ REM ============================================================================
  
   call "C:\Program files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
  
-  set QTHOME=X:/qt/5.5.0_32bit/qtbase
+  set QTHOME=X:/qt/5.7.0_32bit/qtbase
   
-  set QWTHOME=X:/qt/qwt-6.1.2_55_32bit
+  set QWTHOME=X:/qt/qwt-6.1.3_32bit
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
   
@@ -120,6 +123,42 @@ REM ============================================================================
   
   set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
+  set TIMESTAPER="http://timestamp.verisign.com/scripts/timstamp.dll"
+  set CAQTDM_SIGNER="Paul Scherrer Institut"
+
+  set ZMQ=X:/Qt/ZMQ
+  set ZMQINC=%ZMQ%/include
+  set ZMQLIB=%ZMQ%/lib/%EPICS_HOST_ARCH%
+
+GOTO PRINTOUT
+
+REM =============================================================================================
+REM SELECT4
+REM =============================================================================================
+
+:SELECT4 
+ 
+  call "C:\Program files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
+ 
+  set QTHOME=X:/qt/5.7.0_RT/qtbase
+  
+  set QWTHOME=X:/qt/qwt-6.1.3_RT
+  set QWTINCLUDE=%QWTHOME%/src
+  set QWTLIB=%QWTHOME%/lib
+  
+  
+  set EPICS_BASE=X:/epics/Package/base
+  set EPICS_HOST_ARCH=win32-x86
+
+  set EPICSINCLUDE=%EPICS_BASE%/include
+  set QTCONTROLS_LIBS=X:/Qt/caqtdm_project/caQtDM_QtControls_RT
+  set CAQTDM_COLLECT=X:/Qt/caqtdm_project/caQtDM_Binaries_RT
+  set JOM=X:\qt\jom
+ 
+  set QTBASE=%QTCONTROLS_LIBS%
+  
+  set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
+  rem set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
   set TIMESTAPER="http://timestamp.verisign.com/scripts/timstamp.dll"
   set CAQTDM_SIGNER="Paul Scherrer Institut"
 

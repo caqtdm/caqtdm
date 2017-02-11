@@ -152,6 +152,15 @@ void caGraphics::setTiltAngle( int angle)
     }
 }
 
+void caGraphics::slotTiltAngle(int angle)
+{
+    setTiltAngle(angle);
+}
+
+void caGraphics::slotTiltAngle(double angle)
+{
+    setTiltAngle(qRound(angle));
+}
 
 void caGraphics::setStartAngle( int angle)
 {
@@ -161,12 +170,32 @@ void caGraphics::setStartAngle( int angle)
     }
 }
 
+void caGraphics::slotStartAngle(int angle)
+{
+    setStartAngle(angle);
+}
+
+void caGraphics::slotStartAngle(double angle)
+{
+    setStartAngle(qRound(angle));
+}
+
 void caGraphics::setSpanAngle( int angle)
 {
-    if (angle >= 0 && angle <= 360) {
+    if (angle >= -360 && angle <= 360) {
         thisSpanAngle = angle;
         update();
     }
+}
+
+void caGraphics::slotSpanAngle(int angle)
+{
+    setSpanAngle(angle);
+}
+
+void caGraphics::slotSpanAngle(double angle)
+{
+    setSpanAngle(qRound(angle));
 }
 
 void caGraphics::setArrowSize( int size )
@@ -175,6 +204,16 @@ void caGraphics::setArrowSize( int size )
         thisArrowSize = size;
         update();
     }
+}
+
+void caGraphics::slotArraySize(int size)
+{
+    setArrowSize(size);
+}
+
+void caGraphics::slotArraySize(double size)
+{
+    setArrowSize(qRound(size));
 }
 
 void caGraphics::setArrowMode( ArrowMode mode )

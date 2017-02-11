@@ -34,6 +34,8 @@ caLabelVertical::caLabelVertical(QWidget *parent) : QWidget(parent), FontScaling
     thisBackColor = QColor(255,255,255,0);
     thisForeColor = Qt::black;
     thisColorMode=Static;
+    thisBorderWidth = 0;
+    thisBorderColor = Qt::black;
     setColorMode(Static);
     thisVisibility = StaticV;
     setDirection(Down);
@@ -75,10 +77,17 @@ void caLabelVertical::setForeground(QColor c)
     update();
 }
 
+void caLabelVertical::setBorderColor(QColor c)
+{
+    thisBorderColor = c;
+    update();
+}
+
 void caLabelVertical::setColors(QColor bg, QColor fg)
 {
     thisBackColor = bg;
     thisForeColor = fg;
+    update();
 }
 
 void caLabelVertical::setAlarmColors(short status)
@@ -123,10 +132,14 @@ void caLabelVertical::paintEvent(QPaintEvent *)
     int h = fm.height();
     QPainter painter(this);
     QBrush brush = QBrush(thisBackColor);
-    painter.setPen(thisForeColor);
     painter.setBackground(brush);
     painter.setBackgroundMode(Qt::OpaqueMode);
     painter.fillRect(0,0, width(), height(), brush);
+    if(thisBorderWidth > 0) {
+        painter.setPen( QPen( thisBorderColor, thisBorderWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ) );
+        painter.drawRect(thisBorderWidth, thisBorderWidth, width()- 2*thisBorderWidth, height() - 2*thisBorderWidth);
+    }
+    painter.setPen(thisForeColor);
     painter.rotate(rotation);
     switch (thisDirection) {
     case Up:

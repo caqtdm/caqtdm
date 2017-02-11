@@ -23,6 +23,7 @@
  *    anton.mezger@psi.ch
  */
 #define QWT_DLL
+#include <stdint.h>
 #include <QtGui>
 #include<QApplication>
 #include <math.h>
@@ -44,10 +45,14 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     m_heightDefined = false;
 
     thisSimpleView = false;
+    thisFitToSize = No;
     savedSize = 0;
     savedWidth = 0;
     savedHeight = 0;
     selectionInProgress = false;
+
+    thisPV_Xaverage = "";
+    thisPV_Yaverage = "";
 
     savedData = (char*) 0;
 
@@ -230,7 +235,7 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
             QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 
             Coordinates(Xpos, Ypos,  Xnew, Ynew, Xmax, Ymax);
-            P1 = QPointF(Xnew, Ynew);
+            P3 = P1 = QPointF(Xnew, Ynew);
             P1_old = QPointF(-1, -1);
             P2_old = QPointF(-1, -1);
 
@@ -266,6 +271,7 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
 
         if(getROIwriteType() != xy_only) {
             P2 = QPointF(Xnew, Ynew);
+            P3 = (P1 + P2)/2;
 
             // for gray selection rectangle
             QPoint mouseOffset = mouseEvent->pos() ;
@@ -273,7 +279,7 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
             y1 = mouseOffset.y() - valuesWidget->height() + scrollArea->verticalScrollBar()->value();
             selectionPoints[1] = QPoint(x1, y1);
         } else {
-            P1 = P2 = QPointF(Xnew, Ynew);
+            P3 = P1 = P2 = QPointF(Xnew, Ynew);
         }
     }
 
@@ -466,6 +472,10 @@ void caCamera::setup()
         scrollArea->setWidget(imageW);
         scrollArea->setWidgetResizable(true);
 
+        connect (scrollArea->verticalScrollBar(), SIGNAL(valueChanged (int)), this, SLOT(scrollAreaMoved(int)));
+        connect (scrollArea->horizontalScrollBar(), SIGNAL(valueChanged (int)), this, SLOT(scrollAreaMoved(int)));
+
+
         // add some zoom utilities to our widget
         int iconsize = style()->pixelMetric(QStyle::PM_ToolBarIconSize);
         QSize iconSize(iconsize, iconsize);
@@ -529,6 +539,11 @@ void caCamera::setup()
     }
 }
 
+void caCamera::scrollAreaMoved(int)
+{
+    if(image != (QImage *) 0)  imageW->update();
+}
+
 void caCamera::zoomNow()
 {
     double scale = qPow(2.0, ((double) zoomSlider->value() - 52.0) / 13.0);
@@ -536,6 +551,12 @@ void caCamera::zoomNow()
     zoomValue->setText(QString::number(scale, 'f', 3));
     scaleFactor = scale;
     setFitToSize(No);
+
+    // keep centered on last pick
+    int posX =  P3.x() * scaleFactor;
+    int posY =  P3.y() * scaleFactor;
+    scrollArea->horizontalScrollBar()->setValue(posX - scrollArea->horizontalScrollBar()->pageStep()/2);
+    scrollArea->verticalScrollBar()->setValue(posY - scrollArea->verticalScrollBar()->pageStep()/2);
 }
 
 void caCamera::zoomIn(int level)
@@ -696,6 +717,7 @@ void caCamera::resizeEvent(QResizeEvent *e)
     if(m_widthDefined && m_heightDefined) {
         if(!thisFitToSize) {
             imageW->setMinimumSize((int) (m_width * scaleFactor), (int) (m_height * scaleFactor));
+
         } else if((zoomWidget != (QWidget*) 0) && (valuesWidget != (QWidget*) 0)) {
             double Xcorr = (double) (e->size().width() - zoomWidget->width()-4) / (double) savedWidth;
             double Ycorr = (double) (e->size().height()- valuesWidget->height()-4) / (double) savedHeight;
@@ -708,16 +730,22 @@ void caCamera::resizeEvent(QResizeEvent *e)
             imageW->setFixedWidth(e->size().width() - zoomWidget->width()-4);
             imageW->setFixedHeight(e->size().height()- valuesWidget->height()-4);
             scaleFactor = scale;
+
+            // define the middle of the image for zooming on center of the image
+            double Xnew, Ynew, Xmax, Ymax;
+            Coordinates((int) (m_width * scaleFactor)/2,  (int) (m_height * scaleFactor)/2,  Xnew, Ynew, Xmax, Ymax);
+            P3 = QPointF(Xnew, Ynew);
         }
     }
     if(image != (QImage *) 0)  imageW->rescaleSelectionBox(scaleFactor);
 }
 
-void caCamera::updateImage(const QImage &image, bool valuesPresent[], double values[], double scaleFactor)
+void caCamera::updateImage(const QImage &image, bool valuesPresent[], double values[], double scaleFactor,
+                           QVarLengthArray<double> X,  QVarLengthArray<double> Y)
 {
     imageW->updateImage(thisFitToSize, image, valuesPresent, values, scaleFactor, thisSimpleView,
                         (short) getROIreadmarkerType(), (short) getROIreadType(),
-                        (short) getROIwritemarkerType(), (short) getROIwriteType());
+                        (short) getROIwritemarkerType(), (short) getROIwriteType(), X, Y);
 }
 
 void caCamera::showDisconnected()
@@ -796,10 +824,36 @@ void caCamera::MinMaxImageLock(QVector<uint> LineData, int y, QSize resultSize, 
 	MinMax->imageLock->unlock();
 }
 
+void caCamera::MinMaxImageLockBlock(uint *LineData, int ystart, int yend, QSize resultSize, SyncMinMax* MinMax)
+{
+    MinMax->imageLock->lock();
+    if(image != (QImage *) 0) {
+        for(int i=ystart; i<yend; ++i) {
+            if (i<image->height()){
+                uint *scanLine = reinterpret_cast<uint *>(image->scanLine(i));
+                if (scanLine) {
+                    memcpy(scanLine, &LineData[(i-ystart) * resultSize.width()], resultSize.width() * sizeof(uint));
+                }
+            }
+        }
+    }
+    MinMax->imageLock->unlock();
+}
+
 void caCamera::InitLoopdata(int &ystart, int &yend, long &i, QVector<uint> &LineData, int increment, int sector, int sectorcount, QSize resultSize, uint Max[2], uint Min[2])
 {
     LineData.resize(resultSize.width());
 
+    Max[1] = 0;
+    Min[1] = 65535;
+
+    ystart = sector * resultSize.height() / sectorcount;
+    yend = ((sector + 1) * resultSize.height()) / sectorcount; //     sector * resultSize.height() / sectorcount + resultSize.height() / sectorcount;
+    i = resultSize.width() * ystart * increment;
+}
+
+void caCamera::InitLoopdataNew(int &ystart, int &yend, long &i, int increment, int sector, int sectorcount, QSize resultSize, uint Max[2], uint Min[2])
+{
     Max[1] = 0;
     Min[1] = 65535;
 
@@ -869,58 +923,68 @@ void caCamera::CameraDataConvert_8bit(int sector, int sectorcount, SyncMinMax* M
 // monochrome 2 bpp, but used only 12 bits  (Helge cameras)
 void caCamera::CameraDataConvert_16bit(int sector, int sectorcount, SyncMinMax* MinMax, QSize resultSize, int datasize)
 {
-    uint indx, indx1;
+    uint indx1;
     uint Max[2], Min[2];
     int ystart, yend;
     long i;
-    QVector<uint> LineData;
+    uint *LineData;
 
     ushort *ptr = (ushort*) savedData;
 
-    InitLoopdata(ystart, yend, i, LineData, 1, sector, sectorcount, resultSize, Max, Min);
+    InitLoopdataNew(ystart, yend, i, 1, sector, sectorcount, resultSize, Max, Min);
 
     if(i >= datasize) return;
 
-    if(thisColormap != grey) {
+    // allocate the whole block
+    LineData = (uint *) malloc(resultSize.width() * sizeof(uint) * (yend-ystart));
 
-        for (int y = ystart; y < yend; ++y) {
-            for (int x = 0; x < resultSize.width(); ++x) {
-                indx = ptr[i++];
-                indx1 = (indx - minvalue) * (ColormapSize-1) / (maxvalue - minvalue);
-                if(indx1 >= ColormapSize) indx1=ColormapSize -1;
-
-                //LineData.replace(x,ColorMap[indx1]);
-                LineData[x] =  ColorMap[indx1];
-                Max[(indx > Max[1])] = indx;
-                Min[(indx < Min[1])] = indx;
-                if ((i * 2) >= datasize) break;
+    // instead of testing in the big loop, subtract a line when sizes do not fit
+    bool notOK = true;
+    while (notOK) {
+        long SizeToTreat = (yend-ystart)*resultSize.width()*2;
+        if(SizeToTreat > datasize) {
+            yend -= 1;
+            if(yend < ystart) {
+                printf("something really wrong between datasize and image width and height\n");
+                free (LineData);
+                return;
             }
-            if((i*2) >= datasize) break;
-
-            MinMaxImageLock(LineData, y, resultSize, MinMax);
-        }
-    } else {
-        for (int y = ystart; y < yend; ++y) {
-            for (int x = 0; x < resultSize.width(); ++x) {
-
-                indx=ptr[i++];
-                Max[(indx > Max[1])] = indx;
-                Min[(indx < Min[1])] = indx;
-
-                indx1=indx * 255 /(maxvalue - minvalue);
-                if(indx1 > 255) indx1 = 255;
-
-                //LineData.replace(x,qRgb(indx1,indx1,indx1));
-                LineData[x] =  qRgb(indx1,indx1,indx1);
-                if((i*2) >= datasize) break;
-            }
-            if ((i * 2) >= datasize) break;
-
-            MinMaxImageLock(LineData, y, resultSize, MinMax);
+            printf("datasize=%d ystart=%d yend=%d width=%d\n", datasize, ystart, yend, resultSize.width());
+        } else {
+            notOK = false;
         }
     }
 
+    if(thisColormap != grey) {
+        float correctColor1 =  (float)(ColormapSize-1) / (float) (maxvalue - minvalue);
+        for(int k=0; k<(yend-ystart)*resultSize.width(); ++k) {
+            Max[(ptr[i] > Max[1])] = ptr[i];
+            Min[(ptr[i] < Min[1])] = ptr[i];
+
+            indx1 = (ptr[i] - minvalue) * correctColor1;
+            if(indx1 >= ColormapSize) indx1=ColormapSize -1;
+
+            LineData[k] =  ColorMap[indx1];
+            ++i;
+
+        }
+    } else {
+        float correctColor2 =  (float) 255 / (float) (maxvalue - minvalue);
+        for(int k=0; k<(yend-ystart)*resultSize.width(); ++k) {
+            Max[(ptr[i] > Max[1])] = ptr[i];
+            Min[(ptr[i] < Min[1])] = ptr[i];
+
+            indx1 = ptr[i] * correctColor2;
+            if(indx1 > 255) indx1 = 255;
+
+            LineData[k] =  qRgb(indx1,indx1,indx1);
+            ++i;
+        }
+    }
+
+    MinMaxImageLockBlock(LineData, ystart, yend, resultSize, MinMax);
     MinMaxLock(MinMax, Max, Min);
+    free(LineData);
 }
 
 // monochrome 2 bpp, but used only first byte  (Damir cameras)
@@ -1159,7 +1223,7 @@ void caCamera::showImage(int datasize, char *data)
     //printf("Image timer 1 : %d (%x) milliseconds \n", (int) timer.elapsed(),image);
 
     //fflush(stdout);
-    if(image != (QImage *) 0) updateImage(*image, readvaluesPresent, readvalues, scaleFactor);
+    if(image != (QImage *) 0) updateImage(*image, readvaluesPresent, readvalues, scaleFactor, X, Y);
 
     if(getAutomateChecked()) {
         updateMax(maxvalue);
@@ -1179,6 +1243,47 @@ void caCamera::showImage(int datasize, char *data)
     UpdatesPerSecond++;
 }
 
+void caCamera::setData(double *array, int size, int curvIndex, int curvType, int curvXY)
+{
+    fillData(array, size, curvIndex, curvType, curvXY);
+}
+
+void caCamera::setData(float *array, int size, int curvIndex, int curvType, int curvXY)
+{
+    fillData(array, size, curvIndex, curvType, curvXY);
+}
+
+void caCamera::setData(int16_t *array, int size, int curvIndex, int curvType, int curvXY)
+{
+    fillData(array, size, curvIndex, curvType, curvXY);
+}
+
+void caCamera::setData(int32_t *array, int size, int curvIndex, int curvType, int curvXY)
+{
+    fillData(array, size, curvIndex, curvType, curvXY);
+}
+
+void caCamera::setData(int8_t *array, int size, int curvIndex, int curvType, int curvXY)
+{
+    fillData(array, size, curvIndex, curvType, curvXY);
+}
+
+template <typename pureData>
+void caCamera::fillData(pureData *array, int size, int curvIndex, int curvType, int curvXY)
+{
+    Q_UNUSED(curvIndex);
+    Q_UNUSED(curvType);
+        // keep data points
+        if(curvXY == CH_X) {                       // X
+            X.resize(size);
+            double *data = X.data();
+            for(int i=0; i<  size; i++) data[i] = array[i];
+        } else {                                   // Y
+            Y.resize(size);
+            double *data = Y.data();
+            for(int i=0; i<  size; i++) data[i] = array[i];
+        }
+}
 
 void caCamera::setAccessW(bool access)
 {

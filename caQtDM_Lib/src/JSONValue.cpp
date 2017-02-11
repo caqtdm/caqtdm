@@ -32,6 +32,7 @@
 #include <math.h>
 
 #include "JSONValue.h"
+#include <qnumeric.h>
 
 // Macros to free an array/object
 #define FREE_ARRAY(x) { JSONArray::iterator iter; for (iter = x.begin(); iter != x.end(); iter++) { delete *iter; } }
@@ -682,7 +683,7 @@ std::wstring JSONValue::Stringify() const
 		
 		case JSONType_Number:
 		{
-			if (isinf(number_value) || isnan(number_value))
+            if (qIsInf(number_value) || qIsNaN(number_value))
 				ret_string = L"null";
 			else
 			{

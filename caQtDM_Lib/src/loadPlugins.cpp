@@ -48,7 +48,7 @@ bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKn
     int nbInterfaces = 0;
 #ifndef MOBILE
     //qDebug() << "load dynamic plugins";
-    char asc[256];
+    char asc[1024];
     QList<QString> allPaths;
 
     // get the controlsystem plugins from QT_PLUGIN_PATH
@@ -75,7 +75,7 @@ bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKn
     for (int i = 0; i < allPaths.size(); ++i) {
         QString path = allPaths.at(i);
         QDir pluginsDir(path);
-        qDebug() << "Controlsystem plugins: attempt to load from" << pluginsDir.absolutePath();
+        qDebug() << "caQtDM -- Controlsystem plugins: attempt to load from" << pluginsDir.absolutePath();
 
         // seems are plugins are located here
         if( pluginsDir.entryList(QDir::Files).length() > 0) {
@@ -94,6 +94,9 @@ bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKn
                         interfaces.insert(controlsInterface->pluginName(), controlsInterface);
                         nbInterfaces++;
                     }
+                } else {
+                    sprintf(asc, "%s", qasc(pluginLoader.errorString()));
+                    if(messageWindow != (MessageWindow *) 0) messageWindow->postMsgEvent(QtWarningMsg, asc);
                 }
             }
             break;

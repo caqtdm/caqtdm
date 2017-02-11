@@ -17,21 +17,61 @@
  *
  *  Copyright (c) 2010 - 2014
  *
- *  Author:
- *    Anton Mezger
+ *  Authors:
+ *    Marty Kraimer, Anton Mezger
  *  Contact details:
- *    anton.mezger@psi.ch
+ *    anton.mezger@psi.ch, mrkraimer@comcast.net
  */
 #ifndef EPICS4PLUGIN_H
 #define EPICS4PLUGIN_H
 
+#include <map>
+#include <caerr.h>
+
+#include <list>
+#include <iostream>
+#include <compilerDependencies.h>
+#include <pv/requester.h>
+#include <pv/status.h>
+#include <pv/event.h>
+#include <pv/lock.h>
+#include <pv/pvData.h>
+#include <pv/pvCopy.h>
+#include <pv/pvTimeStamp.h>
+#include <pv/timeStamp.h>
+#include <pv/pvAlarm.h>
+#include <pv/alarm.h>
+#include <pv/pvAccess.h>
+#include <pv/clientFactory.h>
+#include <pv/caProvider.h>
+#include <pv/standardField.h>
+#include <pv/standardPVField.h>
+#include <pv/createRequest.h>
+#include <pv/nt.h>
+#include <pv/convert.h>
+
+
 #include <QObject>
 #include "controlsinterface.h"
-#ifdef EPICS4
-  #include "epics4Subs.h"
-#endif
+#include "callbackThread.h"
+#include "epics4Requester.h"
 
-class Q_DECL_EXPORT Epics4Plugin : public QObject, ControlsInterface
+
+
+namespace epics { namespace caqtdm { namespace epics4 {
+
+
+
+class PVAChannel;
+typedef std::tr1::shared_ptr<PVAChannel> PVAChannelPtr;
+typedef std::tr1::weak_ptr<PVAChannel> PVAChannelWPtr;
+
+
+}}}
+
+
+class Q_DECL_EXPORT Epics4Plugin : public QObject, ControlsInterface, 
+     public std::tr1::enable_shared_from_this<Epics4Plugin>
 {
     Q_OBJECT
     Q_INTERFACES(ControlsInterface)
@@ -42,29 +82,53 @@ class Q_DECL_EXPORT Epics4Plugin : public QObject, ControlsInterface
 public:
     QString pluginName();
     Epics4Plugin();
+    ~Epics4Plugin();
 
-    int setOptions(QMap<QString, QString> options);
     int initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow, QMap<QString, QString> options);
     int pvAddMonitor(int index, knobData *kData, int rate, int skip);
     int pvClearMonitor(knobData *kData);
     int pvFreeAllocatedData(knobData *kData);
-    int pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
-    int pvSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess);
-    int pvGetTimeStamp(char *pv, char *timestamp);
-    int pvGetDescription(char *pv, char *description);
+    int pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType)
+    {
+        Q_UNUSED(pv); Q_UNUSED(rdata); Q_UNUSED(idata); Q_UNUSED(sdata); Q_UNUSED(object); Q_UNUSED(errmess); Q_UNUSED(forceType);
+        return false;
+    }
+    int pvSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess)
+    {
+        Q_UNUSED(pv); Q_UNUSED(fdata); Q_UNUSED(ddata); Q_UNUSED(data16); Q_UNUSED(data32); Q_UNUSED(sdata);
+        Q_UNUSED(nelm); Q_UNUSED(object); Q_UNUSED(errmess);
+        return false;
+    }
+    int pvGetTimeStamp(char *pv, char *timestamp)
+    {
+        Q_UNUSED(pv); Q_UNUSED(timestamp);
+        return false;
+    }
+    int pvGetDescription(char *pv, char *description)
+    {
+        Q_UNUSED(pv); Q_UNUSED(description);
+        return false;
+    }
+    bool pvSetValue(knobData *kData, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
+    bool pvSetWave(knobData *kData, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess);
+    bool pvGetTimeStamp(knobData *kData, char *timestamp);
+    bool pvGetDescription(knobData *kData, char *description);
     int pvClearEvent(void * ptr);
     int pvAddEvent(void * ptr);
     int pvReconnect(knobData *kData);
     int pvDisconnect(knobData *kData);
     int FlushIO();
     int TerminateIO();
+    static void setDebug(bool value) {debug = value;}
+    static bool getDebug() {return debug;}
+
 
   private:
-    MutexKnobData *mutexknobdataP;
-    MessageWindow *messagewindowP;
-#ifdef EPICS4
-    epics4Subs *Epics4;
-#endif
+    static bool debug;
+    std::map<std::string,epics::caqtdm::epics4::PVAChannelWPtr> pvaChannelMap;
+    epics::caqtdm::epics4::Epics4RequesterPtr requester;
+    epics::pvData::CallbackThreadPtr callbackThread;
+    MutexKnobData * mutexKnobData;
 };
 
 #endif

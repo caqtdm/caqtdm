@@ -121,6 +121,7 @@
                                 <File Id="QTCONTROLS_CONTROLLERS_PLUGIN.DLL" Name="qtcontrols_controllers_plugin.dll" Source="$(env.CAQTDM_COLLECT)\designer\qtcontrols_controllers_plugin.dll" />
                                 <File Id="QTCONTROLS_MONITORS_PLUGIN.DLL" Name="qtcontrols_monitors_plugin.dll" Source="$(env.CAQTDM_COLLECT)\designer\qtcontrols_monitors_plugin.dll" />
                                 <File Id="QTCONTROLS_GRAPHICS_PLUGIN.DLL" Name="qtcontrols_graphics_plugin.dll" Source="$(env.CAQTDM_COLLECT)\designer\qtcontrols_graphics_plugin.dll" />
+                                <File Id="QTCONTROLS_UTILITIES_PLUGIN.DLL" Name="qtcontrols_utilities_plugin.dll" Source="$(env.CAQTDM_COLLECT)\designer\qtcontrols_utilities_plugin.dll" />
                             </Component>
                         </Directory>
                         <Directory Id="GRAPHICSSYSTEMS" Name="graphicssystems">

@@ -38,29 +38,53 @@ echo
 echo ========== change plugin libs =============
 echo
 echo ++++++++++ libepics3_plugin controls lib ++++++++
-install_name_tool -change @loader_path/../../Frameworks/libcaQtDM_Lib.dylib @rpath/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
+install_name_tool -change libcaQtDM_Lib.dylib @rpath/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
 install_name_tool -change @loader_path/../../Frameworks/libca.3.14.12.dylib @rpath/libca.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
 install_name_tool -change @loader_path/../../Frameworks/libCom.3.14.12.dylib @rpath/libCom.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
 
 echo ++++++++++ libepics4_plugin controls lib ++++++++
-install_name_tool -change @loader_path/../../Frameworks/libcaQtDM_Lib.dylib @rpath/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics4_plugin.dylib
-install_name_tool -change @loader_path/../../Frameworks/libca.3.14.12.dylib @rpath/libca.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics4_plugin.dylib
-install_name_tool -change @loader_path/../../Frameworks/libCom.3.14.12.dylib @rpath/libCom.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics4_plugin.dylib
+install_name_tool -change libcaQtDM_Lib.dylib @rpath/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics4_plugin.dylib
+
+echo ++++++++++ libbsread_plugin controls lib ++++++++
+install_name_tool -change libcaQtDM_Lib.dylib @rpath/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libbsread_plugin.dylib
+
+echo ++++++++++ libarchiveSF_plugin controls lib ++++++++
+install_name_tool -change libcaQtDM_Lib.dylib @rpath/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libarchiveSF_plugin.dylib
+install_name_tool -change libqtcontrols.dylib @rpath/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libarchiveSF_plugin.dylib
 
 echo ++++++++++ libdemo_plugin controls lib ++++++++
-install_name_tool -change @loader_path/../../Frameworks/libcaQtDM_Lib.dylib @rpath/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libdemo_plugin.dylib
+install_name_tool -change libcaQtDM_Lib.dylib @rpath/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libdemo_plugin.dylib
 
 echo ++++++++++ libcaQtDM_Lib.dylib controls lib ++++++++
-install_name_tool -change @loader_path/qwt.framework/Versions/6/qwt @rpath/qwt.framework/Versions/6/qwt ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
-install_name_tool -change @loader_path/libqtcontrols.dylib @rpath/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
+install_name_tool -change qwt.framework/Versions/6/qwt @rpath/qwt.framework/Versions/6/qwt ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
+install_name_tool -change libqtcontrols.dylib @rpath/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
 install_name_tool -change @loader_path/libCom.3.14.12.dylib @rpath/libCom.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
 
 echo ++++++++++ libqtcontrols.dylib controls lib ++++++++
-install_name_tool -change @loader_path/qwt.framework/Versions/6/qwt @rpath/qwt.framework/Versions/6/qwt ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libqtcontrols.dylib
+install_name_tool -change qwt.framework/Versions/6/qwt @rpath/qwt.framework/Versions/6/qwt ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libqtcontrols.dylib
 
 echo ++++++++++ libca.3.14.12.dylib controls lib ++++++++
 install_name_tool -change @loader_path/libCom.3.14.12.dylib @rpath/libCom.3.14.12.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libca.3.14.12.dylib
 
+
+
+
+echo ++++++++++ libqtcontrols_controllers_plugin.dylib ++++++++
+install_name_tool -change qwt.framework/Versions/6/qwt @rpath/qwt.framework/Versions/6/qwt ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_controllers_plugin.dylib
+install_name_tool -change libqtcontrols.dylib @rpath/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_controllers_plugin.dylib
+
+
+echo ++++++++++ libqtcontrols_graphics_plugin.dylib ++++++++
+install_name_tool -change qwt.framework/Versions/6/qwt @rpath/qwt.framework/Versions/6/qwt ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_graphics_plugin.dylib
+install_name_tool -change libqtcontrols.dylib @rpath/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_graphics_plugin.dylib
+
+echo ++++++++++ libqtcontrols_monitors_plugin.dylib ++++++++
+install_name_tool -change qwt.framework/Versions/6/qwt @rpath/qwt.framework/Versions/6/qwt ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_monitors_plugin.dylib
+install_name_tool -change libqtcontrols.dylib @rpath/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_monitors_plugin.dylib
+
+echo ++++++++++ libqtcontrols_utilities_plugin.dylib ++++++++
+install_name_tool -change qwt.framework/Versions/6/qwt @rpath/qwt.framework/Versions/6/qwt ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_utilities_plugin.dylib
+install_name_tool -change libqtcontrols.dylib @rpath/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/PlugIns/designer/libqtcontrols_utilities_plugin.dylib
 
 echo
 echo ========== fix for codesigning  ============
@@ -83,7 +107,8 @@ echo ++++++++++ libqtcontrols.dylib ++++++++
 #install_name_tool -change @rpath/QtOpenGL.framework/Versions/5/QtOpenGL @rpath/QtOpenGl.framework/Versions/5/QtOpenGL ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libqtcontrols.dylib
 
 echo ++++++++++ caQtDM ++++++++
-
+install_name_tool -change libcaQtDM_Lib.dylib @loader_path/../Frameworks/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/MacOS/caQtDM
+install_name_tool -change libqtcontrols.dylib @loader_path/../Frameworks/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/MacOS/caQtDM
 
 echo
 echo ========== add designer.app ============

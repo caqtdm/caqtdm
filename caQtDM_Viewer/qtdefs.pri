@@ -1,9 +1,10 @@
-CAQTDM_VERSION = V4.1.2
+CAQTDM_VERSION = V4.1.5
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
+QT_VER_PAT = $$member(QT_VERSION, 2)
 
 TARGET_COMPANY = "Paul Scherrer Institut"
 TARGET_DESCRIPTION = "Channel Access Qt Display Manager"
@@ -17,21 +18,30 @@ contains(QT_VER_MAJ, 5) {
 #     DEFINES += QWT_USE_OPENGL
 }
 
-
 unix {
     QMAKE_CXXFLAGS += "-g"
     QMAKE_CFLAGS_RELEASE += "-g"
 }
 
-# when the designer in 4.8.2 is patched in order to display tooltip description or
-# when the qt version is higher then 5.5.0 then compile the plugins with description texts
-# be carefull with this, while when the designer does not recognize tooltip description, the widgets will not be shown
-DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
+# at psi the designer in 4.8.2 is patched in order to display tooltip description (not a nice test, but for now ok)
+# when the qt version is higher then 5.5.0 then we can also compile the plugins with description texts
+# be carefull with this, while when the designer does not recognize tooltip descriptions, the widgets will not be shown
+
+contains(QT_VER_MAJ, 4) {
+    contains(QT_VER_MIN, 8) {
+       contains(QT_VER_PAT, 2) {
+          message("caQtDM building with Qt4.8.2, therefore enabling designer tooltip description, this works only for the patched version of Qt4.8.2 at PSI")
+          DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS
+       }
+    }
+}
+
 contains(QT_VER_MAJ, 5) {
   greaterThan(QT_MINOR_VERSION, 5) {
     DEFINES += DESIGNER_TOOLTIP_DESCRIPTIONS 
   }
 }
+
 contains(DEFINES, DESIGNER_TOOLTIP_DESCRIPTIONS ) {
   message("Building with tooltip descriptions; if not supported by designer, turn it off in qtdefs.pri")
 }
@@ -56,10 +66,73 @@ CONFIG += XDR_HACK
 }
 
 # undefine this for epics4 plugin support (only preliminary version as example)
-#CONFIG += epics4
+# one can specify channel access with ca:// and pv access with pvs:// (both use the epics4 plugin)
+# the main work for this plugin was done by Marty Kraimer
+
+exists($(EPICS4LOCATION)/pvAccessCPP/include/pv/pvAccess.h) {
+!MOBILE {
+   message( "Configuring build for epics4" )
+   CONFIG += epics4
+}
+   CONFIG += EPICS4_STATICBUILD
+}
+
+# undefine this to make the ca provider from pvAccess (epics4) the default provider
+# otherwise the ca provider from epics3 base is the default provider
+#DEFINES += PVAISDEFAULTPROVIDER
 
 # undefine this for bsread (zeromq) plugin support
-#CONFIG += bsread
+# the main work for this plugin was done by Helge Brands
+exists($(ZMQINC)/zmq.h) {
+!MOBILE {
+   message( "Configuring controlsystem plugin for bsread" )
+   CONFIG += bsread
+}
+}
+
+#message("$$PWD")
+
+# undefine this for archive retrieval plugin support (these plugins are only valid at psi)
+# take a look at the archiveSF in order to do something similar
+CONFIG += archive
+archive: {
+# html retrieval, can always be build
+   CONFIG += archiveSF
+# next ones are only buildable at psi
+   QMAKESPEC = $$(QMAKESPEC)
+   X64 = $$find(QMAKESPEC, 64)
+   isEmpty(X64) {
+       exists(../../Libs/libNewLogRPC.a) {
+          message( "Configuring archive plugin build for logging (32)" )
+          CONFIG += archiveHIPA
+          CONFIG += archivePRO
+       }
+       exists(../caQtDM_Lib/caQtDM_Plugins/archive/archiveCA/Storage/libStorage_32.a) {
+          message( "Configuring archive plugin for CA (32)" )
+          CONFIG += archiveCA
+       }
+    } else {
+       exists(../../Libs/libNewLogRPC_64.a) {
+           message( "Configuring archive plugin for logging (64)" )
+          CONFIG += archiveHIPA
+          CONFIG += archivePRO
+       }
+       exists(../caQtDM_Lib/caQtDM_Plugins/archive/archiveCA/Storage/libStorage_64.a) {
+          message( "Configuring archive pluging for CA (64)" )
+          CONFIG += archiveCA
+       }
+    }
+}
+
+# in fileopenwindow we need to import these plugins for ios and android, so define them
+ios | android {
+bsread: { DEFINES += BSREAD }
+epics4: { DEFINES += EPICS4 }
+archiveSF: { DEFINES += ARCHIVESF }
+archiveHIPA: { DEFINES += ARCHIVEHIPA }
+archivePRO: { DEFINES += ARCHIVEPRO }
+archiveCA: { DEFINES += ARCHIVECA }
+}
 
 # undefine this when you need to combine caQtDM with the australian epicsqt package
 #CONFIG += australian
@@ -86,6 +159,35 @@ DEFINES += TARGET_DESCRIPTION=\"\\\"$${TARGET_DESCRIPTION}\\\"\"
 DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
+
+# 4.1.5
+# archive plugins added
+# epics4 plugin finalized for normative types, thanks to Marty Kraimer
+# window management widget implemented (close window, ...)
+# careplacemacro widget implemented; allows to redefine macros during runtime
+# utilities designer plugin added for widgets not directly related to the control system
+# X/Y waveforms implemented in camera view
+# bsread plugin developed by Helge Brands finalized
+
+# 4.1.3
+# added for the cartesianplot resize of the fatdots plot
+# softpv treatment was slowing done caQtDM and is corrected now
+# camera has been more optimized for 16bit waveforms (the other types not yet, due to a lack of waveforms types)
+# label and vertical label can gave a border now
+# caChoice has now the possibility to display a row from the bottom to the top (rowInverse) and is optimized
+# soft pv's without a name were not working, now automatically a name is generated
+# in order to have cacalc's working correctly in includes, a macro can be used in order to individialize them
+# zero values in cartesian plot are now replaced by the lowest non-zero value when logarithmic scale is used
+# for infinite values, cartseian plot was taken unlimited resources for display, this should be corrected nw
+# slots are added to cagraphics for animation of these objects (tilt angle, span angle, arc, .. can be set now through signals
+# caCamera will now zoom by default on the middle of the image and otherwise around the last clicked point
+# autorepeat on canumeric has been take out on request of the users
+# default timing of the timed update loop has now a lower internal rate, may still be changed by a json string
+# .ftvl field of epics is now used to distingues signed anand unsigned display in cawavetable
+# in pep file you may add now the keyword -minwidth to an item in order to define the minimum width of it (default value=100).
+#      you can steer column width like that. also -comsize has been added for the comment to steer the fontsize.
+# cachoice has been slightly modified in order to grow instead of shrink (for pep files this was an issue)
+# searching of a pv for the infobox would find the pv independently of the associated plugin, giving therefore confusion
 
 # 4.1.2
 # caLineDemo has been renamed in caLineDraw and is now able to draw vertically

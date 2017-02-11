@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>249</width>
+    <height>129</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="caInclude" name="cainclude">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>188</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">Level0/Level1A.ui</string>
+    </property>
+   </widget>
+   <widget class="caInclude" name="cainclude_2">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>10</y>
+      <width>93</width>
+      <height>88</height>
+     </rect>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">Level0/Level1B.ui</string>
+    </property>
+   </widget>
+   <widget class="caGraphics" name="cagraphics">
+    <property name="geometry">
+     <rect>
+      <x>-2</x>
+      <y>1</y>
+      <width>249</width>
+      <height>128</height>
+     </rect>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>170</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="fillstyle" stdset="0">
+     <enum>caGraphics::Filled</enum>
+    </property>
+   </widget>
+   <zorder>cagraphics</zorder>
+   <zorder>cainclude</zorder>
+   <zorder>cainclude_2</zorder>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caGraphics</class>
+   <extends>QWidget</extends>
+   <header>caGraphics</header>
+  </customwidget>
+  <customwidget>
+   <class>caInclude</class>
+   <extends>QWidget</extends>
+   <header>caInclude</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

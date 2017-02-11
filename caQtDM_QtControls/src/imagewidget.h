@@ -31,6 +31,7 @@
 #include <QWidget>
 #include <QGridLayout>
 #include <caLineEdit>
+#include <QVarLengthArray>
 
 class ImageWidget : public QWidget
 {
@@ -43,7 +44,8 @@ public:
 
     void updateImage(bool FitToSize, const QImage &image, bool readvaluesPresent[], double readvalues[],
                      double scaleFactor, bool selectSimpleView,
-                     short readmarkerType, short readType, short writemarkerType, short writeType);
+                     short readmarkerType, short readType, short writemarkerType, short writeType,
+                     QVarLengthArray<double> X,  QVarLengthArray<double> Y);
 
     void initSelectionBox(const double &scaleFactor);
     void rescaleSelectionBox(const double &scaleFactor);
@@ -63,7 +65,8 @@ private slots:
 
 private:
     void rescaleReadValues(const bool &fitToSize, const QImage &image, const double &scaleFactor,
-                           bool readvaluesPresent[], double readvalues[]);
+                           bool readvaluesPresent[], double readvalues[],
+                           QVarLengthArray<double> X,  QVarLengthArray<double> Y);
 
     QPolygonF getHead( QPointF p1, QPointF p2, int arrowSize);
     QImage imageNew;
@@ -91,6 +94,8 @@ private:
     bool firstSelection;
     bool firstImage;
     bool selectionInProgress;
+    QVarLengthArray<double> XL, YL;
+    QVector<QPointF> pointsX, pointsY;
 };
 
 #endif

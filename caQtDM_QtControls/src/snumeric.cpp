@@ -397,6 +397,12 @@ bool SNumeric::eventFilter(QObject *obj, QEvent *event)
                 break;
             }
         }
+
+    // this prevents a parent scrollbar to react to the up/down keys
+    } else if (event->type() == QEvent::KeyPress) {
+         QKeyEvent *ev = (QKeyEvent*) event;
+         if(ev->key() ==Qt::Key_Down || ev->key() ==Qt::Key_Up) return true;
+
     } else if(event->type() == QEvent::KeyRelease)   {
         QKeyEvent *ev = (QKeyEvent *) event;
         if(ev->key() == Qt::Key_Escape) if (text != NULL) text->hide();

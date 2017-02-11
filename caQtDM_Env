@@ -14,6 +14,8 @@
   fi
   if [ -z "$EPICSLIB" ];              then  export  EPICSLIB=${EPICS_BASE}/lib/$EPICS_HOST_ARCH;
   fi
+  if [ -z "$EPICS4LOCATION" ];         then  export  EPICS4LOCATION=/home/mezger/EPICS-CPP-4.6.0/
+  fi
   if [ -z "$EPICSEXTENSIONS" ];     then  export  EPICSEXTENSIONS=/usr/local/epics/extensions;
   fi
   if [ -z "$QTCONTROLS_LIBS" ];       then export  QTCONTROLS_LIBS=`pwd`/caQtDM_Binaries;

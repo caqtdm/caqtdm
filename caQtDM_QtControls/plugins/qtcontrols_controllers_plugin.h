@@ -153,16 +153,6 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caShellCommandInterface : public CustomWidgetInterface_Controllers
-{
-    Q_OBJECT
-    Q_INTERFACES(QDesignerCustomWidgetInterface)
-	
-public:
-    caShellCommandInterface(QObject* parent);
-    virtual QWidget* createWidget(QWidget* parent);
-};
-
 class caTextEntryInterface : public CustomWidgetInterface_Controllers
 {
     Q_OBJECT
@@ -193,16 +183,6 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
-class caScriptButtonInterface : public CustomWidgetInterface_Controllers
-{
-    Q_OBJECT
-    Q_INTERFACES(QDesignerCustomWidgetInterface)
-	
-public:
-    caScriptButtonInterface(QObject* parent);
-    virtual QWidget* createWidget(QWidget* parent);
-};
-
 class caSpinboxInterface: public CustomWidgetInterface_Controllers
 {
     Q_OBJECT
@@ -222,17 +202,5 @@ public:
     caByteControllerInterface(QObject *parent);
     virtual QWidget *createWidget(QWidget *parent);
 };
-
-class caMimeDisplayInterface: public CustomWidgetInterface_Controllers
-{
-    Q_OBJECT
-    Q_INTERFACES(QDesignerCustomWidgetInterface)
-
-public:
-    caMimeDisplayInterface(QObject *parent);
-    virtual QWidget *createWidget(QWidget *parent);
-};
-
-
 
 #endif

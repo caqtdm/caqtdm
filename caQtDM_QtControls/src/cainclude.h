@@ -49,6 +49,7 @@ class  QTCON_EXPORT caInclude : public QWidget
     Q_PROPERTY(Stacking stacking READ getStacking WRITE setStacking)
     Q_PROPERTY(int numberOfItems READ getItemCount WRITE setItemCount)
     Q_PROPERTY(int maximumLines READ getMaxLines WRITE setMaxLines DESIGNABLE isPropertyVisible(maximumLines))
+    Q_PROPERTY(int maximumColumns READ getMaxColumns WRITE setMaxColumns DESIGNABLE isPropertyVisible(maximumColumns))
     Q_ENUMS(Stacking)
     Q_PROPERTY(bool adjustSizeToContents READ getAdjustSize WRITE setAdjustSize)
 
@@ -65,8 +66,8 @@ public:
 
     void noStyle(QString style) {Q_UNUSED(style);}
 
-    enum Properties { maximumLines = 0, numberofItems};
-    enum Stacking {Row=0, Column,RowColumn};
+    enum Properties { maximumLines = 0, numberofItems, maximumColumns};
+    enum Stacking {Row=0, Column, RowColumn, ColumnRow};
     Stacking getStacking() const { return thisStacking; }
     void setStacking(Stacking stacking);
 
@@ -78,6 +79,9 @@ public:
 
     int getMaxLines() const { return thisMaxLines;}
     void setMaxLines(int count) {if(count > 0) thisMaxLines = count; else thisMaxLines=1; setFileName(newFileName); prvMaxLines = thisMaxLines;}
+
+    int getMaxColumns() const { return thisMaxColumns;}
+    void setMaxColumns(int count) {if(count > 0) thisMaxColumns = count; else thisMaxColumns=1; setFileName(newFileName); prvMaxColumns = thisMaxColumns;}
 
     caInclude( QWidget *parent = 0 );
     ~caInclude();
@@ -123,6 +127,7 @@ private:
     Stacking thisStacking, prvStacking;
     int thisItemCount, prvItemCount;
     int thisMaxLines, prvMaxLines;
+    int thisMaxColumns, prvMaxColumns;
     QSize effectiveSize;
     bool thisAdjust, prvAdjust;
 

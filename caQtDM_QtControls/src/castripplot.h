@@ -54,6 +54,7 @@
 #include <qwt_plot_marker.h>
 #include <QMouseEvent>
 #include <qtcontrols_global.h>
+#include <qnumeric.h>
 
 #include <stripplotthread.h>
 

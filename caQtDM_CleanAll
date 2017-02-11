@@ -19,8 +19,23 @@ rm -f ./caQtDM_Viewer/parserEDM/Makefile
 rm -f ./caQtDM_Lib/Makefile
 rm -f ./caQtDM_Lib/caQtDM_Plugins/Makefile.csplugins
 rm -f ./caQtDM_Lib/caQtDM_Plugins/demo/Makefile.csplugins
+rm -f ./caQtDM_Lib/caQtDM_Plugins/demo/Makefile
 rm -f ./caQtDM_Lib/caQtDM_Plugins/epics3/Makefile.csplugins
+rm -f ./caQtDM_Lib/caQtDM_Plugins/epics3/Makefile
 rm -f ./caQtDM_Lib/caQtDM_Plugins/epics4/Makefile.csplugins
+rm -f ./caQtDM_Lib/caQtDM_Plugins/epics4/Makefile
+rm -f ./caQtDM_Lib/caQtDM_Plugins/bsread/Makefile.csplugins
+rm -f ./caQtDM_Lib/caQtDM_Plugins/bsread/Makefile
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/Makefile.csplugins
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/Makefile
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveSF/Makefile.csplugins
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveSF/Makefile
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archivePRO/Makefile.csplugins
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archivePRO/Makefile
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveHIPA/Makefile.csplugins
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveHIPA/Makefile
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveCA/Makefile.csplugins
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveCA/Makefile
 rm -f ./caQtDM_QtControls/Makefile
 rm -f ./caQtDM_QtControls/plugins/Makefile
 rm -f ./caQtDM_Lib/*.so
@@ -41,6 +56,19 @@ rm -f ./caQtDM_Lib/caQtDM_Plugins/epics3/obj/*
 rm -f ./caQtDM_Lib/caQtDM_Plugins/epics3/moc/*
 rm -f ./caQtDM_Lib/caQtDM_Plugins/epics4/obj/*
 rm -f ./caQtDM_Lib/caQtDM_Plugins/epics4/moc/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/bsread/obj/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/bsread/moc/*
+
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/obj/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/moc/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveSF/obj/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveSF/moc/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveHIPA/obj/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveHIPA/moc/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archivePRO/obj/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archivePRO/moc/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveCA/obj/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveCA/moc/*
 
 rm -f ./caQtDM_Viewer/obj/*
 rm -f ./caQtDM_Viewer/moc/*

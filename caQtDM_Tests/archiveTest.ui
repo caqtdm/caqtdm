@@ -1,0 +1,731 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1488</width>
+    <height>752</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="caCartesianPlot" name="cacartesianplot">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>11</y>
+      <width>501</width>
+      <height>345</height>
+     </rect>
+    </property>
+    <property name="Title" stdset="0">
+     <string notr="true">archiveSF://SINSB01-RSYS:GET-KLY-POWER</string>
+    </property>
+    <property name="TitleX">
+     <string notr="true">(past hours)</string>
+    </property>
+    <property name="TitleY">
+     <string notr="true"/>
+    </property>
+    <property name="channels_1" stdset="0">
+     <string>archiveSF://SINSB01-RSYS:GET-KLY-POWER.X;archiveSF://SINSB01-RSYS:GET-KLY-POWER.Y</string>
+    </property>
+    <property name="Style_1">
+     <enum>caCartesianPlot::ThinLines</enum>
+    </property>
+    <property name="symbol_1">
+     <enum>caCartesianPlot::NoSymbol</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="channels_2" stdset="0">
+     <string/>
+    </property>
+    <property name="Style_2">
+     <enum>caCartesianPlot::ThinLines</enum>
+    </property>
+    <property name="channels_3" stdset="0">
+     <string/>
+    </property>
+    <property name="color_3">
+     <color>
+      <red>170</red>
+      <green>85</green>
+      <blue>127</blue>
+     </color>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="background">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="scaleColor">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="YAxisType" stdset="0">
+     <enum>caCartesianPlot::linear</enum>
+    </property>
+    <property name="secondsPast" stdset="0">
+     <string>7200</string>
+    </property>
+    <property name="secondsUpdate" stdset="0">
+     <string>5</string>
+    </property>
+   </widget>
+   <widget class="caCartesianPlot" name="cacartesianplot_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>381</y>
+      <width>502</width>
+      <height>314</height>
+     </rect>
+    </property>
+    <property name="Title" stdset="0">
+     <string notr="true">archiveHIPA://MXC1:IST:2</string>
+    </property>
+    <property name="TitleX">
+     <string notr="true">(past hours)</string>
+    </property>
+    <property name="channels_1" stdset="0">
+     <string>archiveHIPA://MXC1:IST:2.X;archiveHIPA://MXC1:IST:2.Y</string>
+    </property>
+    <property name="Style_1">
+     <enum>caCartesianPlot::ThinLines</enum>
+    </property>
+    <property name="symbol_1">
+     <enum>caCartesianPlot::NoSymbol</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="channels_2" stdset="0">
+     <string>archiveHIPA://MHC5:IST:2.X;archiveHIPA://MHC5:IST:2.Y</string>
+    </property>
+    <property name="Style_2">
+     <enum>caCartesianPlot::ThinLines</enum>
+    </property>
+    <property name="channels_3" stdset="0">
+     <string/>
+    </property>
+    <property name="color_3">
+     <color>
+      <red>170</red>
+      <green>85</green>
+      <blue>127</blue>
+     </color>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="background">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="scaleColor">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="YAxisType" stdset="0">
+     <enum>caCartesianPlot::linear</enum>
+    </property>
+    <property name="secondsPast" stdset="0">
+     <string>30000</string>
+    </property>
+   </widget>
+   <widget class="caCartesianPlot" name="cacartesianplot_3">
+    <property name="geometry">
+     <rect>
+      <x>535</x>
+      <y>383</y>
+      <width>502</width>
+      <height>314</height>
+     </rect>
+    </property>
+    <property name="Title" stdset="0">
+     <string notr="true">archivePRO://MMAC3:STR:2</string>
+    </property>
+    <property name="TitleX">
+     <string notr="true">(past hours)</string>
+    </property>
+    <property name="channels_1" stdset="0">
+     <string>archivePRO://MMAC3:STR:2.X;archivePRO://MMAC3:STR:2.Y</string>
+    </property>
+    <property name="Style_1">
+     <enum>caCartesianPlot::ThinLines</enum>
+    </property>
+    <property name="symbol_1">
+     <enum>caCartesianPlot::NoSymbol</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="channels_2" stdset="0">
+     <string/>
+    </property>
+    <property name="Style_2">
+     <enum>caCartesianPlot::ThinLines</enum>
+    </property>
+    <property name="channels_3" stdset="0">
+     <string/>
+    </property>
+    <property name="color_3">
+     <color>
+      <red>170</red>
+      <green>85</green>
+      <blue>127</blue>
+     </color>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="background">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="scaleColor">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="YAxisType" stdset="0">
+     <enum>caCartesianPlot::linear</enum>
+    </property>
+    <property name="secondsPast" stdset="0">
+     <string>7200</string>
+    </property>
+   </widget>
+   <widget class="caCartesianPlot" name="cacartesianplot_4">
+    <property name="geometry">
+     <rect>
+      <x>534</x>
+      <y>15</y>
+      <width>503</width>
+      <height>345</height>
+     </rect>
+    </property>
+    <property name="Title" stdset="0">
+     <string notr="true">archiveCA://MMAC3:STR:2</string>
+    </property>
+    <property name="TitleX">
+     <string notr="true">(past hours)</string>
+    </property>
+    <property name="TitleY">
+     <string notr="true"/>
+    </property>
+    <property name="channels_1" stdset="0">
+     <string>archiveCA://MMAC3:STR:2.X;archiveCA://MMAC3:STR:2.Y</string>
+    </property>
+    <property name="Style_1">
+     <enum>caCartesianPlot::ThinLines</enum>
+    </property>
+    <property name="symbol_1">
+     <enum>caCartesianPlot::NoSymbol</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="channels_2" stdset="0">
+     <string/>
+    </property>
+    <property name="Style_2">
+     <enum>caCartesianPlot::ThinLines</enum>
+    </property>
+    <property name="channels_3" stdset="0">
+     <string/>
+    </property>
+    <property name="color_3">
+     <color>
+      <red>170</red>
+      <green>85</green>
+      <blue>127</blue>
+     </color>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="background">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="scaleColor">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="YAxisType" stdset="0">
+     <enum>caCartesianPlot::linear</enum>
+    </property>
+    <property name="archiverIndex" stdset="0">
+     <string>/gfa/archiver-data/archive_PRO_ST/index</string>
+    </property>
+    <property name="secondsPast" stdset="0">
+     <string>18000</string>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_21">
+    <property name="geometry">
+     <rect>
+      <x>1154</x>
+      <y>314</y>
+      <width>76</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">angleVar</string>
+    </property>
+    <property name="calc">
+     <string notr="true">A&gt;=360?A=0:A+5</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">angleVar</string>
+    </property>
+    <property name="channelB">
+     <string notr="true"/>
+    </property>
+    <property name="channelC">
+     <string notr="true"/>
+    </property>
+    <property name="eventSignal">
+     <enum>caCalc::onAnyChange</enum>
+    </property>
+   </widget>
+   <widget class="caGraphics" name="cagraphics_5">
+    <property name="geometry">
+     <rect>
+      <x>1254</x>
+      <y>184</y>
+      <width>101</width>
+      <height>86</height>
+     </rect>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>255</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="fillstyle" stdset="0">
+     <enum>caGraphics::Filled</enum>
+    </property>
+    <property name="lineSize">
+     <number>1</number>
+    </property>
+    <property name="form">
+     <enum>caGraphics::Arc</enum>
+    </property>
+    <property name="tiltAngle">
+     <number>45</number>
+    </property>
+    <property name="startAngle">
+     <number>90</number>
+    </property>
+    <property name="spanAngle">
+     <number>-10</number>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_26">
+    <property name="geometry">
+     <rect>
+      <x>1330</x>
+      <y>540</y>
+      <width>76</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">calcVarYb</string>
+    </property>
+    <property name="calc">
+     <string notr="true">SIN(A*3.1416/180)</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">angleVar</string>
+    </property>
+    <property name="channelB">
+     <string notr="true"/>
+    </property>
+    <property name="channelC">
+     <string notr="true"/>
+    </property>
+    <property name="channelD">
+     <string notr="true"/>
+    </property>
+   </widget>
+   <widget class="caStripPlot" name="castripplot_2">
+    <property name="geometry">
+     <rect>
+      <x>1075</x>
+      <y>390</y>
+      <width>386</width>
+      <height>126</height>
+     </rect>
+    </property>
+    <property name="TitleY">
+     <string notr="true">calcVarY</string>
+    </property>
+    <property name="channels" stdset="0">
+     <string notr="true">calcVarX;calcVarY</string>
+    </property>
+    <property name="period">
+     <double>10.000000000000000</double>
+    </property>
+    <property name="XaxisType">
+     <enum>caStripPlot::TimeScale</enum>
+    </property>
+    <property name="YaxisLimitsMax_1">
+     <double>1.100000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_1">
+     <double>-1.100000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_1" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_1" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisLimitsMax_2">
+     <double>1.100000000000000</double>
+    </property>
+    <property name="YaxisLimitsMin_2">
+     <double>-1.100000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_2" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+    <property name="YaxisScalingMin_2" stdset="0">
+     <enum>caStripPlot::User</enum>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_25">
+    <property name="geometry">
+     <rect>
+      <x>1330</x>
+      <y>560</y>
+      <width>76</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">calcVarYc</string>
+    </property>
+    <property name="calc">
+     <string notr="true">SIN(A*3.1416/180)</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">angleVar</string>
+    </property>
+    <property name="channelB">
+     <string notr="true"/>
+    </property>
+    <property name="channelC">
+     <string notr="true"/>
+    </property>
+    <property name="channelD">
+     <string notr="true"/>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_24">
+    <property name="geometry">
+     <rect>
+      <x>1075</x>
+      <y>545</y>
+      <width>76</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">calcVarY</string>
+    </property>
+    <property name="calc">
+     <string notr="true">SIN(A*3.1416/180)</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">angleVar</string>
+    </property>
+    <property name="channelB">
+     <string notr="true"/>
+    </property>
+    <property name="channelC">
+     <string notr="true"/>
+    </property>
+    <property name="channelD">
+     <string notr="true"/>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_22">
+    <property name="geometry">
+     <rect>
+      <x>1075</x>
+      <y>520</y>
+      <width>76</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">calcVarX</string>
+    </property>
+    <property name="calc">
+     <string notr="true">SIN(A*3.1416/180)</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">angleVar</string>
+    </property>
+    <property name="channelB">
+     <string notr="true"/>
+    </property>
+    <property name="channelC">
+     <string notr="true"/>
+    </property>
+    <property name="channelD">
+     <string notr="true"/>
+    </property>
+   </widget>
+   <widget class="caTextEntry" name="catextentry_37">
+    <property name="geometry">
+     <rect>
+      <x>1210</x>
+      <y>520</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">calcVarX</string>
+    </property>
+    <property name="colorMode">
+     <enum>caLineEdit::Alarm_Default</enum>
+    </property>
+    <property name="precision">
+     <number>3</number>
+    </property>
+    <property name="precisionMode">
+     <enum>caLineEdit::User</enum>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_23">
+    <property name="geometry">
+     <rect>
+      <x>1330</x>
+      <y>520</y>
+      <width>76</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">calcVarYa</string>
+    </property>
+    <property name="calc">
+     <string notr="true">SIN(A*3.1416/180)</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">angleVar</string>
+    </property>
+    <property name="channelB">
+     <string notr="true"/>
+    </property>
+    <property name="channelC">
+     <string notr="true"/>
+    </property>
+    <property name="channelD">
+     <string notr="true"/>
+    </property>
+   </widget>
+   <widget class="caGraphics" name="cagraphics_4">
+    <property name="geometry">
+     <rect>
+      <x>1149</x>
+      <y>209</y>
+      <width>100</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>255</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="fillstyle" stdset="0">
+     <enum>caGraphics::Filled</enum>
+    </property>
+    <property name="lineSize">
+     <number>6</number>
+    </property>
+    <property name="form">
+     <enum>caGraphics::Circle</enum>
+    </property>
+    <property name="tiltAngle">
+     <number>45</number>
+    </property>
+   </widget>
+   <widget class="caTextEntry" name="catextentry_38">
+    <property name="geometry">
+     <rect>
+      <x>1210</x>
+      <y>545</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">calcVarY</string>
+    </property>
+    <property name="colorMode">
+     <enum>caLineEdit::Alarm_Default</enum>
+    </property>
+    <property name="precision">
+     <number>3</number>
+    </property>
+    <property name="precisionMode">
+     <enum>caLineEdit::User</enum>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1488</width>
+     <height>24</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caTextEntry</class>
+   <extends>caLineEdit</extends>
+   <header>caTextEntry</header>
+  </customwidget>
+  <customwidget>
+   <class>caGraphics</class>
+   <extends>QWidget</extends>
+   <header>caGraphics</header>
+  </customwidget>
+  <customwidget>
+   <class>caLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>caLineEdit</header>
+  </customwidget>
+  <customwidget>
+   <class>caCartesianPlot</class>
+   <extends>QFrame</extends>
+   <header>caCartesianPlot</header>
+  </customwidget>
+  <customwidget>
+   <class>caStripPlot</class>
+   <extends>QFrame</extends>
+   <header>caStripPlot</header>
+  </customwidget>
+  <customwidget>
+   <class>caCalc</class>
+   <extends>QLabel</extends>
+   <header>caCalc</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>cacalc_21</sender>
+   <signal>emitSignal(double)</signal>
+   <receiver>cagraphics_4</receiver>
+   <slot>slotTiltAngle(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1194</x>
+     <y>339</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1225</x>
+     <y>121</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_21</sender>
+   <signal>emitSignal(double)</signal>
+   <receiver>cagraphics_5</receiver>
+   <slot>slotSpanAngle(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1199</x>
+     <y>351</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1333</x>
+     <y>92</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

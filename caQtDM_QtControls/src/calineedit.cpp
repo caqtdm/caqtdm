@@ -416,6 +416,9 @@ void caLineEdit::setFormat(int prec)
     case enumeric:
         strcpy(thisFormat, "%d");
         break;
+    case utruncated:
+        strcpy(thisFormat, "%u");
+        break;
     case hexadecimal:
         strcpy(thisFormat, "0x%x");
         break;
@@ -444,6 +447,10 @@ void caLineEdit::setValue(double value, const QString& units)
         sprintf(asc, thisFormat, (int) value);
     } else if(thisFormatType == truncated) {
         sprintf(asc, thisFormat, (int) value);
+    } else if(thisFormatType == enumeric) {
+        sprintf(asc, thisFormat, (int) value);
+    } else if(thisFormatType == utruncated) {
+        sprintf(asc, thisFormat, (uint) value);
     } else {
         sprintf(asc, thisFormat, value);
     }

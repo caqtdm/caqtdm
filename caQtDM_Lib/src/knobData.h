@@ -88,8 +88,9 @@ typedef struct _knobData {
     char clasName[MAXDISPLEN];          /* class of widget type */
     char dispName[MAXDISPLEN];          /* name of widget type */
     char fileName[MAXFILELEN];
-    void *pluginInterface;                    /* plugin pointer */
-    caqtdm_string_t pluginName;            /* plugin name */
+    void *pluginInterface;              /* plugin pointer */
+    caqtdm_string_t pluginName;         /* plugin name */
+    caqtdm_string_t pluginFlavor;       /* plugin additional data */
 } knobData;
 
 #ifdef __cplusplus

@@ -1,0 +1,40 @@
+04/12/2006 18:09:48 Hi
+04/12/2006 18:09:48 Test went OK
+04/12/2006 18:09:48 You should see this message in the log file,
+not on the screen
+04/28/2006 16:52:45 Hi
+04/28/2006 16:52:45 Test went OK
+04/28/2006 16:52:45 You should see this message in the log file,
+not on the screen
+05/01/2006 11:25:46 Hi
+05/01/2006 11:25:46 Test went OK
+05/01/2006 11:25:46 You should see this message in the log file,
+not on the screen
+05/01/2006 11:31:13 Hi
+05/01/2006 11:31:13 Test went OK
+05/01/2006 11:31:13 You should see this message in the log file,
+not on the screen
+05/01/2006 11:36:28 Hi
+05/01/2006 11:36:28 Test went OK
+05/01/2006 11:36:28 You should see this message in the log file,
+not on the screen
+05/01/2006 11:36:59 Hi
+05/01/2006 11:36:59 Test went OK
+05/01/2006 11:36:59 You should see this message in the log file,
+not on the screen
+05/01/2006 15:32:22 Hi
+05/01/2006 15:32:22 Test went OK
+05/01/2006 15:32:22 You should see this message in the log file,
+not on the screen
+05/02/2006 14:07:25 Hi
+05/02/2006 14:07:25 Test went OK
+05/02/2006 14:07:25 You should see this message in the log file,
+not on the screen
+05/03/2006 14:37:50 Hi
+05/03/2006 14:37:50 Test went OK
+05/03/2006 14:37:50 You should see this message in the log file,
+not on the screen
+05/03/2006 15:09:01 Hi
+05/03/2006 15:09:01 Test went OK
+05/03/2006 15:09:01 You should see this message in the log file,
+not on the screen
