@@ -124,8 +124,9 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
     QStringList result = out.split("\n", QString::SkipEmptyParts);
     //printf("number of values received = %d\n",  result.count());
     if(result.count() < 20) {
-        if(result.count() > 1) errorString = result[1]; else errorString = "?????";
-        emit requestFinished();
+        if(result.count() > 1) errorString = tr("result small %1:[%2]").arg(QString::number(result.count())).arg(result[1]);
+          else errorString = tr("????? (result to small %1)").arg(QString::number(result.count()));
+	     emit requestFinished();
         reply->deleteLater();
         return;
     }
