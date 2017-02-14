@@ -28,7 +28,7 @@
     Q_ENUMS(eventsignal)
 
 public:
-    enum eventsignal {Never = 0, onFirstChange, onAnyChange};
+    enum eventsignal {Never = 0, onFirstChange, onAnyChange, TriggerZeroToOne, TriggerOneToZero};
     eventsignal getEventSignal() const {return thisEventSignal;}
     void setEventSignal(eventsignal signl) {thisEventSignal = signl;}
 
