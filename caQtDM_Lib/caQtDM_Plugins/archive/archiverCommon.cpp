@@ -182,7 +182,6 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double
         knobData* kData = mutexknobdataP->GetMutexKnobDataPtr(indexNew.indexX);
         //qDebug() << indexNew.indexX;
         if((kData != (knobData *) 0) && (kData->index != -1)) {
-            mutexknobdataP->DataLock(kData);
             kData->edata.fieldtype = caDOUBLE;
             kData->edata.connected = true;
             kData->edata.accessR = kData->edata.accessW = true;
@@ -198,13 +197,11 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double
             kData->edata.valueCount = nbVal;
 
             mutexknobdataP->SetMutexKnobData(kData->index, *kData);
-            mutexknobdataP->DataUnlock(kData);
         }
 
         kData = mutexknobdataP->GetMutexKnobDataPtr(indexNew.indexY);
         //qDebug() << indexNew.indexY;
         if((kData != (knobData *) 0) && (kData->index != -1)) {
-            mutexknobdataP->DataLock(kData);
             kData->edata.fieldtype = caDOUBLE;
             kData->edata.connected = true;
             kData->edata.accessR = kData->edata.accessW = true;
@@ -220,7 +217,6 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double
             kData->edata.valueCount = nbVal;
 
             mutexknobdataP->SetMutexKnobDataReceived(kData);
-            mutexknobdataP->DataUnlock(kData);
         }
     }
 }
