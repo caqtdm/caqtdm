@@ -56,6 +56,7 @@ sfRetrieval::sfRetrieval()
 
 void sfRetrieval::timeoutL()
 {
+     errorString = "http request timeout";
      eventLoop->quit();
 }
 
@@ -68,6 +69,7 @@ bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int seconds
     //printf("caQtDM -- request from %s with %s\n", qasc(url.toString()), qasc(out));
     downloadUrl = url;
     isBinned = binned;
+    errorString = "";
 
     QNetworkRequest *request = new QNetworkRequest(url);
 
@@ -108,11 +110,15 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
 {
     struct timeb now;
     int valueIndex = 2;
-    if(isBinned) valueIndex = 3;
+    int expected = 4;
+    if(isBinned) {
+       valueIndex = 3;
+       expected = 6;
+    }
 
     QVariant status =  reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
     if(status.toInt() != 200) {
-        errorString = tr("unexpected http status code %1 from %2").arg(status.toInt()).arg(downloadUrl.toString());
+        errorString = tr("unexpected http status code %1 [%2] from %3").arg(status.toInt()).arg(reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString()).arg(downloadUrl.toString());
         emit requestFinished();
         reply->deleteLater();
         return;
@@ -131,30 +137,48 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
 
     QStringList result = out.split("\n", QString::SkipEmptyParts);
     //printf("number of values received = %d\n",  result.count());
-    /*
-    if(result.count() < 20) {
-        if(result.count() > 1) errorString = tr("result small %1:[%2]").arg(QString::number(result.count())).arg(result[1]);
-          else errorString = tr("????? (result to small %1)").arg(QString::number(result.count()));
-	     emit requestFinished();
+
+    if(result.count() < 2) {
+        errorString = tr("result too small %1:[%2]").arg(QString::number(result.count())).arg(result[1]);
+        emit requestFinished();
         reply->deleteLater();
         return;
     }
-    */
 
     X.resize(result.count()-1);
     Y.resize(result.count()-1);
 
     ftime(&now);
     int count = 0;
+    bool ok1, ok2;
+    errorString = "";
     for(int i=1; i< result.count(); ++i) {
-        //qDebug() << result[i];
-         QStringList line = result[i].split(";", QString::SkipEmptyParts);
-         double seconds = (double) now.time + (double) now.millitm / (double)1000;
-         if((seconds - line[1].toDouble()) < secndsPast) {
-            X[count] = -(seconds - line[1].toDouble()) / 3600.0;
-            Y[count++] = line[valueIndex].toDouble();             //qDebug() << line[3] << line[4] << line[5]; in case of aggragation
-            //if(count < 10) printf("%f channel=%s seconds=%s value=%s  values=%f %f\n", seconds - line[1].toDouble(), qasc(line[0]),  qasc(line[1]), qasc(line[2]), X[i-1],Y[i-1]);
-         }
+        QStringList line = result[i].split(";", QString::SkipEmptyParts);
+        //qDebug() << line.count() << valueIndex;
+        if(line.count() != expected) {
+            errorString = tr("dataline has not the expected number of items %1:[%2]").arg(QString::number(line.count())).arg(expected);
+            qDebug() << "------------------------------- i=" << i << "result" << result[i] << "linecount" << line.count();
+            break;
+        } else {
+            //qDebug() << "i=" << i <<  "linecount" << line.count();
+            double seconds = (double) now.time + (double) now.millitm / (double)1000;
+            double archiveTime = line[1].toDouble(&ok1);
+            if(ok1) {
+                if((seconds - archiveTime) < secndsPast) {
+                    X[count] = -(seconds - archiveTime) / 3600.0;
+                    Y[count] = line[valueIndex].toDouble(&ok2);             //qDebug() << line[3] << line[4] << line[5]; in case of aggragation
+                    //if(count < 10) printf("%f channel=%s seconds=%s value=%s  values=%f %f\n", seconds - line[1].toDouble(), qasc(line[0]),  qasc(line[1]), qasc(line[2]), X[i-1],Y[i-1]);
+                    if(ok2) count++;
+                    else {
+                        errorString = tr("could not decode value %1 at position %2").arg(line[valueIndex].arg(valueIndex));
+                        break;
+                    }
+                }
+            } else {
+                errorString = tr("could not decode time %1 at position").arg(line[1].arg(1));
+                break;
+            }
+        }
     }
     totalCount = count;
 

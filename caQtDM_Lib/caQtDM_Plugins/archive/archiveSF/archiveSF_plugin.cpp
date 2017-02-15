@@ -80,10 +80,8 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
             ++j;
         }
 
-        //qDebug() << "tmpThread new" << tmpThread;
-
         if((tmpThread != (QThread *) 0) && tmpThread->isRunning()) {
-            //qDebug() << "workerthread is running" << tmpThread->isRunning();
+            //qDebug() << "workerthread is running" << tmpThread << tmpThread->isRunning();
 
         } else {
 
@@ -124,6 +122,7 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
 
             WorkerSF *worker = new WorkerSF;
             QThread *tmpThread = new QThread();
+            //qDebug() << "tmpThread new" << tmpThread;
             listOfThreads.insert(i.key(), tmpThread);
 
             worker->moveToThread(tmpThread);

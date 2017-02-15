@@ -105,7 +105,7 @@ public slots:
             }
         } else {
             if(messageWindow != (MessageWindow *) 0) {
-                QString mess("ArchiveSF plugin -- lastError= ");
+                QString mess("ArchiveSF plugin -- lastError: ");
                 mess.append(fromArchive->lastError());
 #if QT_VERSION > 0x050000
                 mess=QString(mess.toHtmlEscaped());
