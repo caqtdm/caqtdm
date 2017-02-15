@@ -110,6 +110,14 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
     int valueIndex = 2;
     if(isBinned) valueIndex = 3;
 
+    QVariant status =  reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+    if(status.toInt() != 200) {
+        errorString = tr("unexpected http status code %1 from %2").arg(status.toInt()).arg(downloadUrl.toString());
+        emit requestFinished();
+        reply->deleteLater();
+        return;
+    }
+
     if(reply->error()) {
         errorString = tr("%1: %2").arg(parseError(reply->error())).arg(downloadUrl.toString());
         //printf("%s\n", qasc(errorString));
@@ -123,6 +131,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
 
     QStringList result = out.split("\n", QString::SkipEmptyParts);
     //printf("number of values received = %d\n",  result.count());
+    /*
     if(result.count() < 20) {
         if(result.count() > 1) errorString = tr("result small %1:[%2]").arg(QString::number(result.count())).arg(result[1]);
           else errorString = tr("????? (result to small %1)").arg(QString::number(result.count()));
@@ -130,6 +139,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
         reply->deleteLater();
         return;
     }
+    */
 
     X.resize(result.count()-1);
     Y.resize(result.count()-1);
