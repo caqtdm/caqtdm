@@ -10,9 +10,8 @@ IF "%1"=="4" GOTO SELECT4
 echo =============================================================================================
 echo Select Build Environment
 echo 1) QT 4.8.5 QWT6.1.3  32 Bit VS2010  
-echo 2) QT 5.7.0 QWT6.1.3  64 Bit VS2013  
+echo 2) QT 5.8.0 QWT6.1.3  64 Bit VS2013  
 echo 3) QT 5.7.0 QWT6.1.3  32 Bit VS2013
-echo 4) QT 5.7.0 QWT6.1.3  RT VS2013
 set /P SELCTION=Select: 
 echo =============================================================================================
  
@@ -68,9 +67,9 @@ REM ============================================================================
  
   call "C:\Program files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
  
-  set QTHOME=X:/qt/5.7.0_64bit/qtbase
+  set QTHOME=X:/qt/5.8.0_64bit_SSL/qtbase
   
-  set QWTHOME=X:/qt/qwt-6.1.3_64bit
+  set QWTHOME=X:/qt/qwt-6.1.3_5_8_64bit
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
   
@@ -94,6 +93,13 @@ REM ============================================================================
   set ZMQ=X:/Qt/ZMQ
   set ZMQINC=%ZMQ%/include
   set ZMQLIB=%ZMQ%/lib/%EPICS_HOST_ARCH%
+  
+  set SSL=X:\qt\openssl-1.0.2j_64bit
+  set SSLINC=%SSL%\inc32
+  set SSLLIB=%SSL%\out32dll
+  
+  
+  
 GOTO PRINTOUT
 
 REM =============================================================================================

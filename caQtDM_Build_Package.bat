@@ -47,4 +47,4 @@ GOTO FINISHED
 
 :FINISHED
 cd ..\..\..\..
-
+pause
