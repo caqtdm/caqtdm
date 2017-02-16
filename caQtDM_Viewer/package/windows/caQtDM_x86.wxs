@@ -35,7 +35,7 @@
                 <Directory Id="INSTALLDIR" Name="caQTDM">
                     <Directory Name="bin" Id="BIN">
                         <Directory Name="win32-x86" Id="WINDOWS_X32">
-                            <Component Id="Qt_5.5.0" Guid="AB6F6013-EF64-4FAB-8F10-BE78192BE413">
+                            <Component Id="Qt_5.8.0" Guid="AB6F6013-EF64-4FAB-8F10-BE78192BE413">
                                 <File Id="DESIGNER.EXE" Name="designer.exe" Source="$(env.QTHOME)\bin\designer.exe" />
                                 <File Id="ASSISTANT.EXE" Name="assistant.exe" Source="$(env.QTHOME)\bin\assistant.exe" />
                                 <File Id="QT5QUICKPARTICLES.DLL" Name="Qt5QuickParticles.dll" Source="$(env.QTHOME)\bin\Qt5QuickParticles.dll" />
@@ -82,7 +82,7 @@
                             <Component Id="ZMQ" Guid="DE3ABF16-AE16-461F-B0C2-8264F1E40CF8">
                                 <File Id="LIBZMQ.DLL" Name="libzmq.dll" Source="$(env.ZMQ)\bin\$(env.EPICS_HOST_ARCH)\libzmq.dll" />
                             </Component>
-                            <Component Id="qwt_6.1.2" Guid="BE452C38-1E9E-4678-90BC-D03E1F347987">
+                            <Component Id="qwt_6.1.3" Guid="BE452C38-1E9E-4678-90BC-D03E1F347987">
                                 <File Id="QWT.DLL" Name="qwt.dll" Source="$(env.QWTHOME)\lib\qwt.dll" />
                             </Component>
                             <Component Id="CaQtDM" Guid="BF8DC119-A14E-401D-B136-B486FEF41683">
@@ -91,6 +91,10 @@
                                 <File Id="CAQTDM_LIB.DLL" Name="caQtDM_Lib.dll" Source="$(env.CAQTDM_COLLECT)\caQtDM_Lib.dll" />
                                 <File Id="ADL2UI.EXE" Name="adl2ui.exe" Source="$(env.CAQTDM_COLLECT)\adl2ui.exe" />
                             </Component>
+			    <Component Id="openssl" Guid="D1EEC8C0-7B65-4ECA-B6AF-DC6389C2E365">
+			        <File Id="LIBEAY32.DLL" Name="libeay32.dll" Source="$(env.SSLLIB)\libeay32.dll" />
+			        <File Id="SSLEAY32.DLL" Name="ssleay32.dll" Source="$(env.SSLLIB)\ssleay32.dll" />
+			    </Component>
                             <Component Guid="20B55404-03CD-429F-84FF-AA020B794FB6" Id="qt_conf">
                                 <IniFile Id="qt_conf_file1" Action="createLine" Key="Prefix" Name="qt.conf" Section="Paths" Value="../.." Directory="INSTALLDIR_BIN" />
                                 <IniFile Id="qt_conf_file2" Action="createLine" Key="Plugins" Name="qt.conf" Section="Paths" Value="plugins" Directory="INSTALLDIR_BIN" />
@@ -179,9 +183,9 @@
             </Component>
         </Directory>
         <Feature Id="DefaultFeature" Title="Main Feature" Level="1" ConfigurableDirectory="INSTALLDIR">
-            <ComponentRef Id="Qt_5.5.0" />
+            <ComponentRef Id="Qt_5.8.0" />
             <ComponentRef Id="Epics_3.14.12.4" />
-            <ComponentRef Id="qwt_6.1.2" />
+            <ComponentRef Id="qwt_6.1.3" />
             <ComponentRef Id="CaQtDM" />
             <ComponentRef Id="designer" />
             <ComponentRef Id="Stylesheet" />
@@ -192,6 +196,7 @@
             <ComponentRef Id="caQtDMHelp" />
             <ComponentRef Id="sqldrivers_c" />
             <ComponentRef Id="qt_conf" />
+            <ComponentRef Id="openssl" />
             <ComponentRef Id="controlsystems" />
             <ComponentRef Id="ZMQ" />
         </Feature>

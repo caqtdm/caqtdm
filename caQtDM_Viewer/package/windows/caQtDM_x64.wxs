@@ -35,7 +35,7 @@
                 <Directory Id="INSTALLDIR" Name="caQTDM">
                     <Directory Name="bin" Id="BIN">
                         <Directory Name="windows-x64" Id="WINDOWS_X64">
-                            <Component Id="Qt_5.5.0" Guid="30F3975A-A151-4A59-9C05-658F0319F3F7" Win64="yes">
+                            <Component Id="Qt_5.8.0" Guid="FC03E65E-7757-4CAE-8BB5-F3FEAF29E12B" Win64="yes">
                                 <File Id="DESIGNER.EXE" Name="designer.exe" Source="$(env.QTHOME)\bin\designer.exe" />
                                 <File Id="ASSISTANT.EXE" Name="assistant.exe" Source="$(env.QTHOME)\bin\assistant.exe" />
                                 <File Id="QT5QUICKPARTICLES.DLL" Name="Qt5QuickParticles.dll" Source="$(env.QTHOME)\bin\Qt5QuickParticles.dll" />
@@ -82,7 +82,7 @@
                             <Component Id="ZMQ" Guid="6F1967A1-84CA-4BE4-85DC-8D1B75338BB7" Win64="yes">
                                 <File Id="LIBZMQ.DLL" Name="libzmq.dll" Source="$(env.ZMQ)\bin\windows-x64\libzmq.dll" />
                             </Component>
-                            <Component Id="qwt_6.1.2" Guid="A6CEE0D5-9524-4F6E-A04A-0BA4A5116B35" Win64="yes">
+                            <Component Id="qwt_6.1.3" Guid="80321EF0-DC70-4D0A-8E0C-269502A0EACB" Win64="yes">
                                 <File Id="QWT.DLL" Name="qwt.dll" Source="$(env.QWTHOME)\lib\qwt.dll" />
                             </Component>
                             <Component Id="CaQtDM" Guid="ECDE0227-4100-43B8-B817-88D6BCD7FF49" Win64="yes">
@@ -96,6 +96,10 @@
                                 <IniFile Id="qt_conf_file2" Action="createLine" Key="Plugins" Name="qt.conf" Section="Paths" Value="plugins" Directory="INSTALLDIR_BIN" />
                                 <IniFile Id="qt_conf_file3" Action="createLine" Key="Binaries" Name="qt.conf" Section="Paths" Value="bin/windows-x64/" Directory="INSTALLDIR_BIN" />
                                 <CreateFolder />
+                            </Component>
+                            <Component Id="openssl" Guid="5BA25D42-D318-4410-84EE-153C9EEE1F66" Win64="yes">
+                                <File Id="LIBEAY32.DLL" Name="libeay32.dll" Source="$(env.SSLLIB)\libeay32.dll" />
+                                <File Id="SSLEAY32.DLL" Name="ssleay32.dll" Source="$(env.SSLLIB)\ssleay32.dll" />
                             </Component>
                         </Directory>
                     </Directory>
@@ -131,7 +135,6 @@
                                 <File Id="QTIFF.DLL" Name="qtiff.dll" Source="$(env.QTHOME)\plugins\imageformats\qtiff.dll" />
                                 <File Id="QWBMP.DLL" Name="qwbmp.dll" Source="$(env.QTHOME)\plugins\imageformats\qwbmp.dll" />
                                 <File Id="QWEBP.DLL" Name="qwebp.dll" Source="$(env.QTHOME)\plugins\imageformats\qwebp.dll" />
-                                <File Id="QDDS.DLL" Name="qdds.dll" Source="$(env.QTHOME)\plugins\imageformats\qdds.dll" />
                                 <File Id="QGIF.DLL" Name="qgif.dll" Source="$(env.QTHOME)\plugins\imageformats\qgif.dll" />
                                 <File Id="QICNS.DLL" Name="qicns.dll" Source="$(env.QTHOME)\plugins\imageformats\qicns.dll" />
                                 <File Id="QICO.DLL" Name="qico.dll" Source="$(env.QTHOME)\plugins\imageformats\qico.dll" />
@@ -177,9 +180,9 @@
             </Component>
         </Directory>
         <Feature Id="DefaultFeature" Title="Main Feature" Level="1" ConfigurableDirectory="INSTALLDIR">
-            <ComponentRef Id="Qt_5.5.0" />
+            <ComponentRef Id="Qt_5.8.0" />
             <ComponentRef Id="Epics_3.14.12.4" />
-            <ComponentRef Id="qwt_6.1.2" />
+            <ComponentRef Id="qwt_6.1.3" />
             <ComponentRef Id="CaQtDM" />
             <ComponentRef Id="designer" />
             <ComponentRef Id="Stylesheet" />
@@ -190,6 +193,7 @@
             <ComponentRef Id="caQtDMHelp" />
             <ComponentRef Id="sqldrivers_c" />
             <ComponentRef Id="qt_conf" />
+            <ComponentRef Id="openssl" />
             <ComponentRef Id="controlsystems" />
             <ComponentRef Id="ZMQ" />
         </Feature>
