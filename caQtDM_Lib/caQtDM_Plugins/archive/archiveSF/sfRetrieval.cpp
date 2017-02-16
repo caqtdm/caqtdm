@@ -126,7 +126,6 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
 
     if(reply->error()) {
         errorString = tr("%1: %2").arg(parseError(reply->error())).arg(downloadUrl.toString());
-        //printf("%s\n", qasc(errorString));
         emit requestFinished();
         reply->deleteLater();
         return;
@@ -139,7 +138,8 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
     //printf("number of values received = %d\n",  result.count());
 
     if(result.count() < 2) {
-        errorString = tr("result too small %1:[%2]").arg(QString::number(result.count())).arg(result[1]);
+        if(result.count() == 1) errorString = tr("result too small %1:[%2]").arg(QString::number(result.count())).arg(result[0]);
+        else errorString = tr("result too small %1").arg(QString::number(result.count()));
         emit requestFinished();
         reply->deleteLater();
         return;
@@ -156,8 +156,8 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
         QStringList line = result[i].split(";", QString::SkipEmptyParts);
         //qDebug() << line.count() << valueIndex;
         if(line.count() != expected) {
-            errorString = tr("dataline has not the expected number of items %1:[%2]").arg(QString::number(line.count())).arg(expected);
-            qDebug() << "------------------------------- i=" << i << "result" << result[i] << "linecount" << line.count();
+            errorString = tr("dataline has not the expected number of items %1: [%2]").arg(QString::number(line.count())).arg(expected);
+            //qDebug() << "------------------------------- i=" << i << "result" << result[i] << "linecount" << line.count();
             break;
         } else {
             //qDebug() << "i=" << i <<  "linecount" << line.count();
