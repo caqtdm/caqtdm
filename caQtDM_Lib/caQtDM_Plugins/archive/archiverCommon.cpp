@@ -116,7 +116,8 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
     //qDebug() << "ArchivePlugin:pvAddMonitor" << kData->pv << kData->index << kData->dispName;
 
     if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) kData->dispW)) {
-        char asc[50];
+
+        char asc[150];
         indexes index;
 
         sprintf(asc, "%d_%s_%p",kData->specData[0], kData->pv, kData->dispW);
