@@ -177,7 +177,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
     return true;
 }
 
-void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double> TimerN, QVector<double> YValsN)
+void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double> TimerN, QVector<double> YValsN, QString backend)
 {
     if(nbVal > 0) {
         knobData* kData = mutexknobdataP->GetMutexKnobDataPtr(indexNew.indexX);
@@ -187,6 +187,7 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double
             kData->edata.connected = true;
             kData->edata.accessR = kData->edata.accessW = true;
             kData->edata.monitorCount++;
+            strcpy(kData->edata.fec, qasc(backend));
 
             if((nbVal * sizeof(double)) > (size_t) kData->edata.dataSize) {
                 if(kData->edata.dataB != (void*) 0) free(kData->edata.dataB);
@@ -207,6 +208,7 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double
             kData->edata.connected = true;
             kData->edata.accessR = kData->edata.accessW = true;
             kData->edata.monitorCount++;
+            strcpy(kData->edata.fec, qasc(backend));
 
             if((nbVal * sizeof(double)) > (size_t) kData->edata.dataSize) {
                 if(kData->edata.dataB != (void*) 0) free(kData->edata.dataB);

@@ -130,8 +130,8 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
             connect(tmpThread, SIGNAL(finished()), tmpThread, SLOT(deleteLater()) );
             connect(this, SIGNAL(operate( QWidget *, indexes, QString, MessageWindow *)), worker,
                           SLOT(getFromArchive(QWidget *, indexes,  QString, MessageWindow *)));
-            connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>)), this,
-                           SLOT(handleResults(indexes, int, QVector<double>, QVector<double>)));
+            connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>, QString)), this,
+                           SLOT(handleResults(indexes, int, QVector<double>, QVector<double>, QString)));
             tmpThread->start();
 
             emit operate((QWidget *) messagewindowP, indexNew, index_name, messagewindowP);
@@ -144,14 +144,14 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
     }
 }
 
-void ArchiveSF_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN)
+void ArchiveSF_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend)
 {
     //qDebug() << "in sf handle results" << nbVal << TimerN.count() << indexNew.indexX << indexNew.indexY;
     if(nbVal > 0 && nbVal < TimerN.count()) {
       TimerN.resize(nbVal);
       YValsN.resize(nbVal);
     }
-    if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN);
+    if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN, backend);
 
     QList<QString> removeKeys;
     removeKeys.clear();

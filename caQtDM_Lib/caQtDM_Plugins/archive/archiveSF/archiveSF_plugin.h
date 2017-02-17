@@ -57,7 +57,6 @@ public slots:
         deleteLater();
     }
 
-
     void getFromArchive(QWidget *w, indexes indexNew,  QString index_name, MessageWindow * messageWindow) {
 
 
@@ -77,8 +76,13 @@ public slots:
         ftime(&now);
         double endSeconds = (double) now.time + (double) now.millitm / (double)1000;
         double startSeconds = endSeconds - indexNew.secondsPast;
+#ifdef CSV
         QString response ="'response':{'format':'csv'}";
-        QString channels = "'channels': [ '" + key + "' ]";
+#else
+        QString response ="'response':{'format':'json'}";
+#endif
+        QString channels = "'channels': [ {'name':'" + key + "', 'backend' : 'sf-archiverappliance' }]";
+        //QString channels = "'channels': [ '" + key + "' ]";
         QString range = "'range': { 'startSeconds' : '" + QString::number(startSeconds, 'g', 10) + "', 'endSeconds' : '" + QString::number(endSeconds, 'g', 10) + "'}";
 
         if(indexNew.nrOfBins != -1) {
@@ -119,13 +123,13 @@ public slots:
 
         //qDebug() << "number of values received" << nbVal;
 
-        emit resultReady(indexNew, nbVal, TimerN, YValsN);
+        emit resultReady(indexNew, nbVal, TimerN, YValsN, fromArchive->getBackend());
 
         mutex->unlock();
     }
 
 signals:
-    void resultReady(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN);
+    void resultReady(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend);
 
 public:
 
@@ -161,7 +165,7 @@ public:
     int TerminateIO();
 
 public slots:
-    void handleResults(indexes, int, QVector<double>, QVector<double>);
+    void handleResults(indexes, int, QVector<double>, QVector<double>, QString);
 signals:
     void operate(QWidget*, const indexes, const QString, MessageWindow *);
 

@@ -36,6 +36,9 @@
 #include <time.h>
 #include <sys/timeb.h>
 #include "sfRetrieval.h"
+#include <QDebug>
+#include <iostream>
+#include <sstream>
 
 #define qasc(x) x.toLatin1().constData()
 
@@ -56,8 +59,8 @@ sfRetrieval::sfRetrieval()
 
 void sfRetrieval::timeoutL()
 {
-     errorString = "http request timeout";
-     eventLoop->quit();
+    errorString = "http request timeout";
+    eventLoop->quit();
 }
 
 bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int secondsPast, bool binned)
@@ -108,12 +111,14 @@ int sfRetrieval::downloadFinished()
 
 void sfRetrieval::finishReply(QNetworkReply *reply)
 {
+    int count = 0;
     struct timeb now;
     int valueIndex = 2;
     int expected = 4;
+    double seconds;
     if(isBinned) {
-       valueIndex = 3;
-       expected = 6;
+        valueIndex = 3;
+        expected = 6;
     }
 
     QVariant status =  reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
@@ -134,6 +139,13 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
     QString out = QString(reply->readAll());
     reply->deleteLater();
 
+    errorString = "";
+    ftime(&now);
+    seconds = (double) now.time + (double) now.millitm / (double)1000;
+
+
+#ifdef CSV
+    qDebug() << "CSV";
     QStringList result = out.split("\n", QString::SkipEmptyParts);
     //printf("number of values received = %d\n",  result.count());
 
@@ -141,17 +153,13 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
         if(result.count() == 1) errorString = tr("result too small %1:[%2]").arg(QString::number(result.count())).arg(result[0]);
         else errorString = tr("result too small %1").arg(QString::number(result.count()));
         emit requestFinished();
-        reply->deleteLater();
         return;
     }
 
     X.resize(result.count()-1);
     Y.resize(result.count()-1);
 
-    ftime(&now);
-    int count = 0;
     bool ok1, ok2;
-    errorString = "";
     for(int i=1; i< result.count(); ++i) {
         QStringList line = result[i].split(";", QString::SkipEmptyParts);
         //qDebug() << line.count() << valueIndex;
@@ -161,7 +169,6 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
             break;
         } else {
             //qDebug() << "i=" << i <<  "linecount" << line.count();
-            double seconds = (double) now.time + (double) now.millitm / (double)1000;
             double archiveTime = line[1].toDouble(&ok1);
             if(ok1) {
                 if((seconds - archiveTime) < secndsPast) {
@@ -182,13 +189,189 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
     }
     totalCount = count;
 
+#else
+
+    totalCount = 0;
+    int stat;
+    Backend = "";
+
+    JSONValue *value = JSON::Parse(qasc(out));
+    //printf("\n\nout: %s\n\n", qasc(out));
+
+    // Did it go wrong?
+    if (value == NULL) {
+        errorString = tr("could not parse json string %1").arg(out);
+        emit requestFinished();
+        return;
+    } else {
+
+        if(!value->IsArray()) {
+            qDebug() << "the json root element is not an array, something has changed";
+        }
+
+        if(value->IsArray()) {
+            JSONArray array = value->AsArray();
+
+            for (unsigned int i = 0; i < array.size(); i++) {
+                JSONValue *value = JSON::Parse(array[i]->Stringify().c_str());
+
+                if(value->IsObject()) {
+
+                    JSONObject root;
+                    root = value->AsObject();
+
+                    // find channel data inside this part of array
+                    if (root.find(L"channel") != root.end() && root[L"channel"]->IsObject()) {
+                        //qDebug() << "\nchannel part found as object";
+                        JSONValue *value = JSON::Parse(root[L"channel"]->Stringify().c_str());
+                        JSONObject root0 = value->AsObject();
+
+                        // get channel name
+                        if (root0.find(L"name") != root0.end() && root0[L"name"]->IsString()) {
+                            char channel[80];
+                            stat = swscanf(root0[L"name"]->Stringify().c_str(), L"%s", channel);
+                            //qDebug()<< "channel name found" << root0[L"name"]->AsString().c_str(); << backend
+                        }
+
+                        // get backend name
+                        if (root0.find(L"backend") != root0.end() && root0[L"backend"]->IsString()) {
+                            char backend[80];
+                            stat = swscanf(root0[L"backend"]->Stringify().c_str(), L"%s", backend);
+                            Backend = QString(backend);
+                            Backend = Backend.replace("\"", "");
+                            //qDebug()<< "backend name found" << root0[L"backend"]->AsString().c_str() << backend;
+                        }
+
+                    }
+
+                    // find data array inside this part of array
+                    if (root.find(L"data") != root.end() && root[L"data"]->IsArray()) {
+                        JSONArray array = root[L"data"]->AsArray();
+                        //qDebug() << "\ndata part found as array";
+
+                        // scan the data part (big array)
+                        if(array.size() < 1) {
+                            errorString = tr("no data");
+                            emit requestFinished();
+                            return;
+                        }
+
+                        // set array size
+                        X.resize(array.size());
+                        Y.resize(array.size());
+
+                        // binned data
+                        if(isBinned) {
+
+                            for (unsigned int i = 0; i < array.size(); i++) {
+                                bool valueFound = false;
+                                bool timeFound = false;
+                                double mean;
+                                double archiveTime;
+
+                                // find value part now
+                                JSONObject root1 = array[i]->AsObject();
+                                if (root1.find(L"value") != root1.end() && root1[L"value"]->IsObject()) {
+                                    JSONValue *value = JSON::Parse(root1[L"value"]->Stringify().c_str());
+                                    JSONObject root2 = value->AsObject();
+
+                                    // look for mean
+                                    if (root2.find(L"mean") != root2.end() && root2[L"mean"]->IsNumber()) {
+                                        //qDebug() << "mean part found";
+                                        stat = swscanf(root2[L"mean"]->Stringify().c_str(), L"%lf", &mean);
+                                        valueFound = true;
+                                    }
+                                }
+
+                                // look for iocseconds
+                                if (root1.find(L"iocSeconds") != root1.end() && root1[L"iocSeconds"]->IsString()) {
+                                    //qDebug()<< "iocSeconds part found";
+                                    if(getDoubleFromString(root1[L"iocSeconds"]->Stringify().c_str(), archiveTime)){
+                                       timeFound = true;
+                                    } else {
+                                        qDebug() << tr("could not decode iocSeconds ????");
+                                        break;
+                                    }
+                                }
+
+                                // fill in our data
+                                if(timeFound && valueFound && (seconds - archiveTime) < secndsPast) {
+                                    X[count] = -(seconds - archiveTime) / 3600.0;
+                                    Y[count] = mean;
+                                    count++;
+                                }
+
+                            }
+
+                            // non binned data
+                        } else {
+
+                            bool valueFound = false;
+                            bool timeFound = false;
+                            double mean;
+                            double archiveTime;
+                            for (unsigned int i = 0; i < array.size(); i++) {
+                                JSONObject root1 = array[i]->AsObject();
+                                if (root1.find(L"value") != root1.end() && root1[L"value"]->IsNumber()) {
+                                    //qDebug() << "value found";
+                                    stat = swscanf(root1[L"value"]->Stringify().c_str(), L"%lf", &mean);
+                                    valueFound = true;
+                                }
+                                if (root1.find(L"iocSeconds") != root1.end() && root1[L"iocSeconds"]->IsString()) {
+                                   // qDebug() << "iocSeconds found";
+                                    if(getDoubleFromString(root1[L"iocSeconds"]->Stringify().c_str(), archiveTime)){
+                                       timeFound = true;
+                                    } else {
+                                        qDebug() << tr("could not decode iocSeconds ????");
+                                        break;
+                                    }
+                                }
+
+                                // fill in our data
+                                if(timeFound && valueFound && (seconds - archiveTime) < secndsPast) {
+                                    X[count] = -(seconds - archiveTime) / 3600.0;
+                                    Y[count] = mean;
+                                    count++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    totalCount = count;
+    //qDebug() << "totalcount =" << count;
+
+#endif
+
     finished = true;
     emit requestFinished();
+}
+
+bool sfRetrieval::getDoubleFromString(const wchar_t* input, double &value) {
+    char strng[80];
+    bool ok;
+    swscanf(input, L"%s", &strng);
+    QString Value(strng);
+    Value = Value.replace("\"", "");
+    value = Value.toDouble(&ok);
+    if(ok) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 int sfRetrieval::getCount()
 {
     return totalCount;
+}
+
+const QString sfRetrieval::getBackend()
+{
+    return Backend;
 }
 
 void sfRetrieval::getData(QVector<double> &x, QVector<double> &y)

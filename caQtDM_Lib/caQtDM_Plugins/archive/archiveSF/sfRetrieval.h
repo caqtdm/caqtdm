@@ -33,6 +33,12 @@
 #include <QMessageBox>
 #include <QEventLoop>
 
+//#define CSV 1
+
+#ifndef CSV
+#include "JSON.h"
+#endif
+
 class QNetworkAccessManager;
 
 class sfRetrieval:public QObject
@@ -46,6 +52,7 @@ public:
     const QString lastError();
     int getCount();
     void getData(QVector<double> &x, QVector<double> &y);
+    const QString getBackend();
 
 signals:
     void networkError(const QString);
@@ -58,6 +65,8 @@ protected slots:
     void timeoutL();
 
 private:
+
+    bool getDoubleFromString(const wchar_t* input, double &value);
     QNetworkAccessManager *manager;
     QTableWidget *thisTable;
     QString thisFile;
@@ -69,6 +78,7 @@ private:
     int secndsPast;
     QEventLoop *eventLoop;
     bool isBinned;
+    QString Backend;
 };
 
 #endif
