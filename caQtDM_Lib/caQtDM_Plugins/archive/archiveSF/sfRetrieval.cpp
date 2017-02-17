@@ -286,7 +286,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
                                 // look for iocseconds
                                 if (root1.find(L"iocSeconds") != root1.end() && root1[L"iocSeconds"]->IsString()) {
                                     //qDebug()<< "iocSeconds part found";
-                                    if(getDoubleFromString(root1[L"iocSeconds"]->Stringify().c_str(), archiveTime)){
+                                    if(getDoubleFromString(QString::fromWCharArray(root1[L"iocSeconds"]->AsString().c_str()), archiveTime)){
                                        timeFound = true;
                                     } else {
                                         qDebug() << tr("could not decode iocSeconds ????");
@@ -318,8 +318,8 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
                                     valueFound = true;
                                 }
                                 if (root1.find(L"iocSeconds") != root1.end() && root1[L"iocSeconds"]->IsString()) {
-                                   // qDebug() << "iocSeconds found";
-                                    if(getDoubleFromString(root1[L"iocSeconds"]->Stringify().c_str(), archiveTime)){
+                                    //qDebug() << "iocSeconds found"<<QString::fromWCharArray(root1[L"iocSeconds"]->AsString().c_str());
+                                    if(getDoubleFromString(QString::fromWCharArray(root1[L"iocSeconds"]->AsString().c_str()), archiveTime)){
                                        timeFound = true;
                                     } else {
                                         qDebug() << tr("could not decode iocSeconds ????");
@@ -350,13 +350,9 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
     emit requestFinished();
 }
 
-bool sfRetrieval::getDoubleFromString(const wchar_t* input, double &value) {
-    char strng[80];
+bool sfRetrieval::getDoubleFromString(QString input, double &value) {
     bool ok;
-    swscanf(input, L"%s", &strng);
-    QString Value(strng);
-    Value = Value.replace("\"", "");
-    value = Value.toDouble(&ok);
+    value = input.toDouble(&ok);
     if(ok) {
         return true;
     } else {

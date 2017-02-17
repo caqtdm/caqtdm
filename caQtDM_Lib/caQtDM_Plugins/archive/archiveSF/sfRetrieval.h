@@ -66,7 +66,7 @@ protected slots:
 
 private:
 
-    bool getDoubleFromString(const wchar_t* input, double &value);
+    bool getDoubleFromString(QString input, double &value);
     QNetworkAccessManager *manager;
     QTableWidget *thisTable;
     QString thisFile;
