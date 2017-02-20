@@ -106,13 +106,13 @@ public slots:
 
         //qDebug() << "pro nbval=" << nbVal;
 
-        emit resultReady(indexNew, nbVal, TimerN, YValsN);
+        emit resultReady(indexNew, nbVal, TimerN, YValsN, "");
 
         mutex->unlock();
     }
 
 signals:
-    void resultReady(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN);
+    void resultReady(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend);
 
 public:
 
@@ -148,7 +148,7 @@ public:
     int TerminateIO();
 
 public slots:
-    void handleResults(indexes, int, QVector<double>, QVector<double>);
+    void handleResults(indexes, int, QVector<double>, QVector<double>, QString backend);
 
 signals:
     void operate(QWidget*, const indexes);

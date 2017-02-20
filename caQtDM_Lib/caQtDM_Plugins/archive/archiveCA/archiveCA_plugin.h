@@ -132,7 +132,7 @@ public slots:
         char error[1000];
         if(!index.open(index_name.c_str(), error, true)) {
             if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtCriticalMsg, error);
-            emit resultReady(indexNew, 0, TimerN, YValsN);
+            emit resultReady(indexNew, 0, TimerN, YValsN , "");
         }
 
         // get data
@@ -171,13 +171,13 @@ public slots:
             }
             ok = sheet.next();
         }
-        emit resultReady(indexNew, nbVal, TimerN, YValsN);
+        emit resultReady(indexNew, nbVal, TimerN, YValsN, "");
 
         mutex->unlock();
     }
 
 signals:
-    void resultReady(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN);
+    void resultReady(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend);
 
 public:
 
@@ -218,7 +218,7 @@ private slots:
     void Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes);
 
 public slots:
-    void handleResults(indexes, int, QVector<double>, QVector<double>);
+    void handleResults(indexes, int, QVector<double>, QVector<double>, QString backend);
 signals:
     void operate(QWidget*, const indexes, const stdString);
 

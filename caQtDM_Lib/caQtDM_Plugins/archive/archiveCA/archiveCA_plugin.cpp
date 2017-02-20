@@ -112,8 +112,8 @@ void ArchiveCA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
             connect(tmpThread, SIGNAL(finished()), tmpThread, SLOT(deleteLater()) );
             connect(this, SIGNAL(operate( QWidget *, indexes, const stdString)), worker,
                     SLOT(getFromArchive(QWidget *, indexes, stdString)));
-            connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>)), this,
-                    SLOT(handleResults(indexes, int, QVector<double>, QVector<double>)));
+            connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>, QString)), this,
+                    SLOT(handleResults(indexes, int, QVector<double>, QVector<double>, QString)));
             tmpThread->start();
 
             //qDebug() << "CA emit operate";
@@ -123,7 +123,7 @@ void ArchiveCA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
     }
 }
 
-void ArchiveCA_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN)
+void ArchiveCA_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend)
 {
     //qDebug() << "in CA handle results" << nbVal << TimerN.count();
     if(nbVal > 0 && nbVal < TimerN.count()) {
@@ -131,7 +131,7 @@ void ArchiveCA_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double
       YValsN.resize(nbVal);
     }
 
-    if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN);
+    if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN, backend);
 
     QList<QString> removeKeys;
     removeKeys.clear();

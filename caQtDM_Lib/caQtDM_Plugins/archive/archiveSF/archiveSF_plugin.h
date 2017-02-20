@@ -82,16 +82,14 @@ public slots:
         QString response ="'response':{'format':'json'}";
 #endif
         QString channels = "'channels': [ {'name':'" + key + "', 'backend' : 'sf-archiverappliance' }]";
-        //QString channels = "'channels': [ '" + key + "' ]";
         QString range = "'range': { 'startSeconds' : '" + QString::number(startSeconds, 'g', 10) + "', 'endSeconds' : '" + QString::number(endSeconds, 'g', 10) + "'}";
+        fields = "'fields':['channel','globalSeconds','value']";
 
         if(indexNew.nrOfBins != -1) {
             isBinned = true;
-            fields = "'fields':['channel','iocSeconds','value']";
             agg = tr(", 'aggregation': {'aggregationType':'value', 'aggregations':['min','mean','max'], 'nrOfBins' : %1}").arg(indexNew.nrOfBins);
         } else {
             isBinned = false;
-            fields = "'fields':['channel','iocSeconds','value']}";
             agg = "";
         }
         QString total = "{" + response + "," + range + "," + channels + "," + fields + agg + "}";
