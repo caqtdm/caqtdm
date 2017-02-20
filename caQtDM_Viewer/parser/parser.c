@@ -40,7 +40,7 @@ int expandText;
 int legendsForStripplot;
 
 char filePrefix[128] = "";
-static  string40 formatTable[] = { "decimal", "exponential", "engr. notation", "compact", "truncated",
+static  string40 formatTable[] = { "decimal", "exponential", "engr_notation", "compact", "truncated",
                                    "hexadecimal", "octal", "string",
                                    "sexagesimal", "sexagesimal-hms", "sexagesimal-dms"};
 static int nbFormats = 11;
@@ -2016,7 +2016,7 @@ void *parseTextUpdate(DisplayInfo *displayInfo, FrameOffset * offset)
                         format = 4;
                     } else if(!strcmp(token,"decimal- truncated ")) {
                         format = 4;
-                    } else if(!strcmp(token,"hexidecimal")) {
+                    } else if(!strcmp(token,"hexadecimal")) {
                         format = 5;
                     }
                 }
@@ -2264,12 +2264,32 @@ void *parseTextEntry(DisplayInfo *displayInfo, FrameOffset * offset)
                 getToken(displayInfo,token);
                 strcpy(COLORMODE, token);
             } else if(!strcmp(token,"format")) {
+                int found=0;
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 for(i=0;i<nbFormats; i++) {
                     if(!strcmp(token, formatTable[i])) {
                         format = i;
+                        found = 1;
                         break;
+                    }
+                }
+                // Backward compatibility
+                if(!found) {
+                    if(!strcmp(token,"decimal")) {
+                        format = 0;
+                    } else if(!strcmp(token,"decimal- exponential notation")) {
+                        format = 1;
+                    } else if(!strcmp(token,"engr. notation")) {
+                        format = 2;
+                    } else if(!strcmp(token,"decimal- compact")) {
+                        format = 3;
+                    } else if(!strcmp(token,"decimal- truncated")) {
+                        format = 4;
+                    } else if(!strcmp(token,"decimal- truncated ")) {
+                        format = 4;
+                    } else if(!strcmp(token,"hexadecimal")) {
+                        format = 5;
                     }
                 }
             } else if(!strcmp(token,"limits")) {
