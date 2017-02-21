@@ -193,9 +193,8 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double
                 if(kData->edata.dataB != (void*) 0) free(kData->edata.dataB);
                 kData->edata.dataB = (void*) malloc(nbVal * sizeof(double));
                 kData->edata.dataSize = nbVal * sizeof(double);
-
-                memcpy(kData->edata.dataB, &TimerN[0],  nbVal * sizeof(double));
             }
+            memcpy(kData->edata.dataB, &TimerN[0],  nbVal * sizeof(double));
             kData->edata.valueCount = nbVal;
 
             mutexknobdataP->SetMutexKnobData(kData->index, *kData);
