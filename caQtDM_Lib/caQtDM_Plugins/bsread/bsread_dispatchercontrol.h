@@ -70,6 +70,8 @@ public:
 signals:
     //void requestFinished();
     void finished();
+private slots:
+    void closeEvent();
 public slots:
    void finishReplyConnect();
    void finishReplyDelete();
@@ -86,6 +88,7 @@ protected:
   QList<channelstruct> ChannelsRemPipeline;
   QList<QString> ConnectionDeletePipeline;
   //QEventLoop eventloop;
+  QEventLoop *loop;
   QNetworkRequest requestChannel;
   QNetworkRequest requestDelete;
   QNetworkReply* replyConnect;

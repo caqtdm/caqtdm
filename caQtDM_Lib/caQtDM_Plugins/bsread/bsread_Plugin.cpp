@@ -23,6 +23,7 @@
  *    anton.mezger@psi.ch
  */
 #include <QDebug>
+#include <QApplication>
 #include "bsread_Plugin.h"
 #include "zmq.h"
 #include "bsread_decode.h"
@@ -43,7 +44,33 @@ QString bsreadPlugin::pluginName()
 // constructor
 bsreadPlugin::bsreadPlugin()
 {
-    qDebug() << "bsreadPlugin: Create";
+    //qDebug() << "bsreadPlugin: Create";
+    DispatcherThread=new QThread(this);
+    Dispatcher=new bsread_dispatchercontrol();
+    connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closeEvent()));
+
+}
+bsreadPlugin:: ~bsreadPlugin()
+{
+    //qDebug() << "bsreadPlugin: Start Destroy";
+    //qDebug() << "WaitPre:" <<DispatcherThread->isFinished();
+    //qDebug() << "bsreadPlugin: ThreadID" << QThread::currentThreadId();
+    Dispatcher->setTerminate();
+    //Dispatcher->deleteLater();
+
+    //qDebug() << "bsreadPlugin: DispatcherThread Inter:"<<DispatcherThread->isInterruptionRequested();
+    //qDebug() << "bsreadPlugin: DispatcherThread Runni:"<<DispatcherThread->isRunning();
+    //qDebug() << "bsreadPlugin: DispatcherThread FINI :"<<DispatcherThread->isFinished();
+
+    delete(DispatcherThread);
+    delete(Dispatcher);
+/*
+    while (!DispatcherThread.isFinished()){
+      qDebug() << "Wait:" <<DispatcherThread.isFinished();
+       QThread::sleep(5);
+    }
+*/
+    qDebug() << "bsreadPlugin: Destroy";
 }
 
 // in this demo we update our interface here; normally you should update in from your controlsystem
@@ -103,16 +130,18 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
     if (DispacherConfig.length()>0){
 
 
-        Dispatcher.set_Dispatcher(&DispacherConfig);
-        Dispatcher.setMessagewindow(messagewindowP);
-        Dispatcher.setZmqcontex(zmqcontex);
-        Dispatcher.setMutexknobdataP(data);
-        Dispatcher.moveToThread(&DispatcherThread);
-        connect(&DispatcherThread, SIGNAL(started()), &Dispatcher, SLOT(process()));
-        connect(&Dispatcher, SIGNAL(finished()), &DispatcherThread, SLOT(quit()));
-        connect(&DispatcherThread, SIGNAL(finished()), &DispatcherThread, SLOT(deleteLater()));
-        connect(&Dispatcher, SIGNAL(finished()), &Dispatcher, SLOT(deleteLater()));
-        DispatcherThread.start();
+
+        Dispatcher->set_Dispatcher(&DispacherConfig);
+        Dispatcher->setMessagewindow(messagewindowP);
+        Dispatcher->setZmqcontex(zmqcontex);
+        Dispatcher->setMutexknobdataP(data);
+        Dispatcher->moveToThread(DispatcherThread);
+        connect(DispatcherThread, SIGNAL(started()), Dispatcher, SLOT(process()));
+        connect(Dispatcher, SIGNAL(finished()), DispatcherThread, SLOT(quit()));
+        DispatcherThread->start();
+
+        //qDebug() << "Start Status:" <<DispatcherThread->isFinished();
+
     }else{
         QString msg="Using Manual BSREAD Connection";
         if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
@@ -136,6 +165,7 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
                 connect(bsreadconnections.last(), SIGNAL(finished()), bsreadconnections.last(), SLOT(deleteLater()));
                 bsreadThreads.last()->start();
                 msg="Connection started: ";
+                disconnect(bsreadconnections.last());
                 msg.append(BSREAD_ZMQ_ADDRS.at(i));
                 if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
             }
@@ -155,7 +185,7 @@ int bsreadPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
 
     int i;
     QMutexLocker locker(&mutex);
-    Dispatcher.add_Channel(kData->pv,kData->index);
+    Dispatcher->add_Channel(kData->pv,kData->index);
     //qDebug() << "bsreadPlugin:pvAddMonitor" << kData->pv << kData->index << kData;
     i=0;
 
@@ -174,7 +204,7 @@ int bsreadPlugin::pvClearMonitor(knobData *kData) {
     int i=0;
 
     QMutexLocker locker(&mutex);
-    Dispatcher.rem_Channel(QString(kData->pv),kData->index);
+    Dispatcher->rem_Channel(QString(kData->pv),kData->index);
     //qDebug() << "bsreadPlugin:pvClearMonitor" << kData << kData->pv << kData->index <<bsreadconnections.size();
     while (i<bsreadconnections.size()){
         bsreadconnections.at(i)->bsread_DataMonitorUnConnect(kData);
@@ -260,6 +290,15 @@ int bsreadPlugin::TerminateIO() {
     timer->stop();
     return true;
 }
+
+void bsreadPlugin::closeEvent(){
+   //qDebug() << "bsreadPlugin:closeEvent ";
+   emit closeSignal();
+   Dispatcher->setTerminate();
+   DispatcherThread->quit();
+   DispatcherThread->wait();
+}
+
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 #else

@@ -49,6 +49,8 @@ class Q_DECL_EXPORT bsreadPlugin : public QObject, ControlsInterface
 public:
     QString pluginName();
     bsreadPlugin();
+    ~bsreadPlugin();
+
 
     int initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow,QMap<QString, QString> options);
     int pvAddMonitor(int index, knobData *kData, int rate, int skip);
@@ -65,11 +67,12 @@ public:
     int FlushIO();
     int TerminateIO();
 
- protected:
-
 private slots:
+    void closeEvent();
     void updateValues();
     void updateInterface();
+signals:
+    void closeSignal();
 
 private:
     QMutex mutex;
@@ -81,8 +84,8 @@ private:
     QTimer *timer, *timerValues;
 
     void * zmqcontex;
-    QThread DispatcherThread;
-    bsread_dispatchercontrol Dispatcher;
+    QThread *DispatcherThread;
+    bsread_dispatchercontrol *Dispatcher;
     QList<bsread_Decode*> bsreadconnections;
     QList<QThread*> bsreadThreads;
 };

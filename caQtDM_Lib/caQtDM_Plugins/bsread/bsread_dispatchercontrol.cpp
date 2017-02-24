@@ -23,6 +23,8 @@
  *    helge.brands@psi.ch
  */
 #include <QNetworkAccessManager>
+#include <QApplication>
+#include <QSslConfiguration>
 #include <QDebug>
 #include <QBuffer>
 #include "bsread_dispatchercontrol.h"
@@ -32,32 +34,36 @@
 
 bsread_dispatchercontrol::bsread_dispatchercontrol()
 {
-
+    loop = new QEventLoop(this);
+    connect(qApp, SIGNAL(aboutToQuit()),this, SLOT(closeEvent()));
 }
 bsread_dispatchercontrol::~bsread_dispatchercontrol()
 {
     this->setTerminate();
-    startReconnection.wakeAll();
+    loop->processEvents();
+    loop->quit();
+    //qDebug()<<"Dispatcher stop";
 }
 
 void bsread_dispatchercontrol::process()
 {
+
     QNetworkAccessManager manager;
-    QEventLoop loop;
+    //QEventLoop loop;
     int requestedchannels=0;
     terminate=false;
     QString msg="bsread Dispatcher started: ";
     msg.append(Dispatcher);
 
+
     messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
-    qDebug()<<"From Dispatcher thread: "<<QThread::currentThreadId();
+    //qDebug()<<"bsread Dispatcher: Start ThreadID: "<<QThread::currentThreadId();
     //Update and reconection handling
     while (!terminate){
-        //QThread::sleep(200);
-
+        //QThread::msleep(200);
 
         ProcessLocker.lock();
-        startReconnection.wait(&ProcessLocker,600);
+        startReconnection.wait(&ProcessLocker,400);
 
 
         QString StreamDispatcher=Dispatcher;
@@ -71,11 +77,23 @@ void bsread_dispatchercontrol::process()
         QUrl url(StreamDispatcher);
         requestChannel = QNetworkRequest(url);
         requestDelete  = QNetworkRequest(url);
+#ifndef QT_NO_SSL
+    if(url.toString().toUpper().contains("HTTPS")) {
+        QSslConfiguration configChannel = requestChannel.sslConfiguration();
+        configChannel.setPeerVerifyMode(QSslSocket::VerifyNone);
+        requestChannel.setSslConfiguration(configChannel);
+
+        QSslConfiguration configDelete = requestDelete.sslConfiguration();
+        configDelete.setPeerVerifyMode(QSslSocket::VerifyNone);
+        requestDelete.setSslConfiguration(configDelete);
+    }
+
+#endif
 
         // qDebug()<<"Check Pipeline";
         while(!ChannelsAddPipeline.isEmpty()){
             channelstruct candidate=get_AddChannel();
-            qDebug()<<"ADDChannel Pipeline :"<< candidate.channel<<candidate.index;
+            //qDebug()<<"ADDChannel Pipeline :"<< candidate.channel<<candidate.index;
             //QMutexLocker lock(&ChannelLocker);
             Channels.insert(candidate.channel,candidate.index);
 
@@ -90,7 +108,7 @@ void bsread_dispatchercontrol::process()
         }
        //  qDebug()<<"Check Connection Pipeline";
         while(!ConnectionDeletePipeline.isEmpty()){
-            qDebug()<<"Delete Connection Pipeline";
+            //qDebug()<<"Delete Connection Pipeline";
             QByteArray data_delete="";
             QString data="";
             data_delete.append("\"");
@@ -102,6 +120,7 @@ void bsread_dispatchercontrol::process()
             requestDelete.setRawHeader("Content-Type", "application/json");
             requestDelete.setRawHeader("Content-Length", postDataSize);
             replydelete =manager.sendCustomRequest(requestDelete,"DELETE",&buff_delete_data);
+            //connect(replydelete, SIGNAL(finished()),this, SLOT(finishReplyDelete()));
             connect(replydelete, SIGNAL(finished()),this, SLOT(finishReplyDelete()));
             //qDebug()<<"Remove Connection :"<< data << postDataSize;
         }
@@ -111,16 +130,17 @@ void bsread_dispatchercontrol::process()
 
 
         if(Channels.count()!=requestedchannels){
-            qDebug()<<"Checking Channels";
+            //qDebug()<<"Checking Channels";
             QString data="{\"channels\":[ ";
             QMutexLocker lock(&ChannelLocker);
             QSet<QString> keys=QSet<QString>::fromList(Channels.keys());
             foreach( QString key,keys){
-               if (!key.startsWith("bsread:")){ //removes all header channels
-                data.append("{\"name\":\"");
-                data.append(key);
-                data.append("\",\"modulo\":1,\"offset\":0},");
-               }
+                if (!key.startsWith("bsread:")){ //removes all header channels
+                        data.append("{\"name\":\"");
+                        data.append(key);
+                        data.append("\",\"modulo\":1,\"offset\":0},");
+
+                }
             }
             data.remove(data.length()-1,1);
             data.append("],\"sendIncompleteMessages\":true,\"compression\":\"none\"}");
@@ -134,24 +154,21 @@ void bsread_dispatchercontrol::process()
 
                 requestChannel.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
                 replyConnect = manager.post(requestChannel,transferdata);
-                qDebug() <<transferdata;
+                //qDebug() <<transferdata;
                 connect(replyConnect, SIGNAL(readyRead()),this, SLOT(finishReplyConnect()));
+
                 requestedchannels=Channels.count();
             }
             //qDebug() <<"Rec  finished: "<<requestedchannels;
         }
-
         ProcessLocker.unlock();
- //       qDebug()<<"Prozess Exents";
-        loop.processEvents();
-
+        loop->processEvents();
     }
+    //qDebug()<<"bsread Dispatcher: finished ThreadID (" << QThread::currentThreadId()<< ")";
     msg="bsread Dispatcher finished";
 
     messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
     emit finished();
-
-
 
 }
 /*
@@ -322,12 +339,12 @@ void bsread_dispatchercontrol::finishReplyConnect()
 
     QByteArray httpdata;
     streams.clear();
-    qDebug()<<"From finishReplyConnect thread: "<<QThread::currentThreadId();
+    //qDebug()<<"From finishReplyConnect thread: ("<<QThread::currentThreadId()<<")";
 
     httpdata=reply_local->readAll();
     reply_local->deleteLater();
     JSONValue *MainMessageJ = JSON::Parse(httpdata);
-    qDebug() << "DATA:" <<httpdata;
+    //qDebug() << "DATA:" <<httpdata;
 
     if (MainMessageJ!=NULL){
         if(!MainMessageJ->IsObject()) {
@@ -361,35 +378,42 @@ void bsread_dispatchercontrol::finishReplyConnect()
 
 
                 bsreadconnections.last()->moveToThread(bsreadThreads.last());
-                qDebug() << "Create bsread_Decode:" <<bsreadconnections.last();
+                //qDebug() << "Create bsread_Decode:" <<bsreadconnections.last();
                 connect(bsreadThreads.last(), SIGNAL(started()), bsreadconnections.last(), SLOT(process()));
                 connect(bsreadconnections.last(), SIGNAL(finished()), bsreadThreads.last(), SLOT(quit()));
-                connect(bsreadThreads.last(), SIGNAL(finished()), bsreadThreads.last(), SLOT(deleteLater()));
-                connect(bsreadconnections.last(), SIGNAL(finished()), bsreadconnections.last(), SLOT(deleteLater()));
-
+                //connect(bsreadThreads.last(), SIGNAL(finished()), bsreadThreads.last(), SLOT(deleteLater()));
+                //connect(bsreadconnections.last(), SIGNAL(finished()), bsreadconnections.last(), SLOT(deleteLater()));
 
                 bsreadThreads.last()->start();
 
 
 
                 while (bsreadconnections.count()>1){
+                    //qDebug() << "Delete bsread_Decode:" <<bsreadconnections.first();
                     QString connection=QString(bsreadconnections.first()->getConnectionPoint());
                     deleteStream(&connection);
                     bsreadconnections.first()->setTerminate();
+                    bsreadThreads.first()->quit();
+                    bsreadThreads.first()->wait();
+                    delete(bsreadThreads.first());
+                    delete(bsreadconnections.first());
 
                     bsreadconnections.removeFirst();
+
+
+
 
                     bsreadThreads.removeFirst();
                 }
 
-                qDebug() << "bsreadPlugin:" << stream.toLatin1().constData();
+                //qDebug() << "bsreadPlugin:" << stream.toLatin1().constData();
             }
 
         }
     }
 
-
-  qDebug()<<"END: finishReplyConnect";
+  //qDebug()<<"finishReplyConnect: finished ThreadID (" << QThread::currentThreadId()<< ")";
+  //qDebug()<<"END: finishReplyConnect";
 }
 
 void bsread_dispatchercontrol::finishReplyDelete()
@@ -398,6 +422,22 @@ void bsread_dispatchercontrol::finishReplyDelete()
     QNetworkReply* reply_local = qobject_cast<QNetworkReply*>(obj);
     QMutexLocker lock(&ChannelLocker);
     QByteArray httpdata=reply_local->readAll();
-    qDebug() << "DeleteReply:" <<httpdata;
-    qDebug()<<"From finishReplyDelete thread: "<<QThread::currentThreadId();
+    //qDebug() << "DeleteReply:" <<httpdata;
+    //qDebug()<<"From finishReplyDelete thread: ("<<QThread::currentThreadId()<<")";
 }
+
+void bsread_dispatchercontrol::closeEvent(){
+   //qDebug() << "bsread_dispatchercontrol:closeEvent ";
+   this->setTerminate();
+    while (bsreadconnections.count()!=0){
+       //qDebug() << "closeEvent Delete bsread_Decode:" <<bsreadconnections.first();
+        bsreadconnections.first()->setTerminate();
+       bsreadThreads.first()->quit();
+       bsreadThreads.first()->wait();
+       delete(bsreadThreads.first());
+       delete(bsreadconnections.first());
+       bsreadconnections.removeFirst();
+       bsreadThreads.removeFirst();
+   }
+}
+

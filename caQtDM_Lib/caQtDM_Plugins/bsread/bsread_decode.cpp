@@ -43,20 +43,16 @@ bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint)
    StreamConnectionPoint=ConnectionPoint;
    StreamConnectionType="push_pull";
    context=Context;
-   UpdaterPool=new QThreadPool(this);
-   UpdaterPool->setExpiryTimeout(-1);
-   BlockPool=new QThreadPool(this);
-   BlockPool->setExpiryTimeout(-1);
+   UpdaterPool=NULL;
+   BlockPool=NULL;
 }
 bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint,QString ConnectionType)
 {
    StreamConnectionPoint=ConnectionPoint;
    StreamConnectionType=ConnectionType;
    context=Context;
-   UpdaterPool=new QThreadPool(this);
-   UpdaterPool->setExpiryTimeout(-1);
-   BlockPool=new QThreadPool(this);
-   BlockPool->setExpiryTimeout(-1);
+   UpdaterPool=NULL;
+   BlockPool=NULL;
 }
 
 
@@ -68,8 +64,8 @@ bsread_Decode::~bsread_Decode()
     QMutexLocker locker(&mutex);
     setTerminate();
     bsread_Delay();
-    UpdaterPool->deleteLater();
-    BlockPool->deleteLater();
+    //delete(UpdaterPool);
+    //delete(BlockPool);
 }
 
 
@@ -127,11 +123,13 @@ void bsread_Decode::process()
     terminate=false;
 
 
-    qDebug() << "bsreadPlugin: ConnectionPoint :"<< StreamConnectionPoint << StreamConnectionType ;
+    //qDebug() << "bsreadDecode: ConnectionPoint :"<< StreamConnectionPoint << StreamConnectionType ;
+    //qDebug() << "bsreadDecode: start ThreadID" << QThread::currentThreadId();
+
     bsread_createConnection(rc);
     if (rc != 0) {
         printf ("error in zmq_connect: %s(%s)\n", zmq_strerror (errno),StreamConnectionPoint.toLatin1().constData());
-        qDebug() << "bsreadPlugin: ConnectionPoint faild";
+        //qDebug() << "bsreadPlugin: ConnectionPoint faild";
         running_decode=false;
     }else{
 
@@ -230,6 +228,7 @@ void bsread_Decode::process()
     zmq_msg_close(&msg);
     zmq_close(zmqsocket);
     emit finished();
+    //qDebug() << "bsreadDecode: finished ThreadID" << QThread::currentThreadId();
     qDebug() << "bsread ZMQ Receiver terminate";
 
 }
@@ -312,7 +311,7 @@ void bsread_Decode::setHeader(char *value,size_t size){
     ChannelSearch.clear();
     //Header Channel
     bsread_InitHeaderChannels();
-    qDebug() << "Integer :" << ChannelHeader.toStdString().c_str();
+    //qDebug() << "Integer :" << ChannelHeader.toStdString().c_str();
     try{
         HeaderMessageJ = JSON::Parse(ChannelHeader.toStdString().c_str());
     }
@@ -372,7 +371,7 @@ void bsread_Decode::setHeader(char *value,size_t size){
                     if (jsonobj3.find(L"name") != jsonobj3.end() && jsonobj3[L"name"]->IsString()) {
                         chdata->name=QString::fromWCharArray(jsonobj3[L"name"]->AsString().c_str());
                         ChannelSearch.insert(chdata->name, chdata);
-                        printf("Ch-Name :%s\n",chdata->name.toLatin1().constData());
+                        //printf("Ch-Name :%s\n",chdata->name.toLatin1().constData());
                     }
                     if (jsonobj3.find(L"offset") != jsonobj3.end() && jsonobj3[L"offset"]->IsNumber()) {
                         chdata->offset=jsonobj3[L"offset"]->AsNumber();
@@ -676,13 +675,8 @@ void bsread_Decode::bsread_TransferHeaderData()
 
 void bsread_Decode::WaveformManagment(knobData* kData,bsread_channeldata * bsreadPV){
     bsread_wfhandling *transfer=new bsread_wfhandling(kData,bsreadPV,BlockPool);
-    //transfer->setAutoDelete(true);
-    //UpdaterPool->start(transfer);
-   //QMutexLocker lock(&WfDataHandlerLocker);
-   //WfDataHandlerQueue.append(transfer);
     transfer->process();
-
-
+    delete(transfer);
 }
 
 
