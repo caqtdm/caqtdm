@@ -81,7 +81,13 @@ public slots:
 #else
         QString response ="'response':{'format':'json'}";
 #endif
-        QString channels = "'channels': [ {'name':'" + key + "', 'backend' : 'sf-archiverappliance' }]";
+        QString channels;
+        if(indexNew.backend.size() > 0) {
+           channels = "'channels': [ {'name':'" + key + "', 'backend' : '" + indexNew.backend + "' }]";
+        } else {
+           channels = "'channels': [ {'name':'" + key + "' }]";
+        }
+
         QString range = "'range': { 'startSeconds' : '" + QString::number(startSeconds, 'g', 10) + "', 'endSeconds' : '" + QString::number(endSeconds, 'g', 10) + "'}";
         fields = "'fields':['channel','globalSeconds','value']";
 

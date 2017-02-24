@@ -87,12 +87,29 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
 
             // Get Index name if specified for this widget
             indexNew.nrOfBins = -1;
+            indexNew.backend = "";
             if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) indexNew.w)) {
                 QVariant var = w->property("nrOfBins");
                 if(!var.isNull()) {
                     indexNew.nrOfBins = var.toInt();
                 } else if(indexNew.init){
                     QString mess("ArchiveSF plugin -- no nrOfBins defined as dynamic property in widget "  + w->objectName() + ", defaulting to maximum number of points");
+                    if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
+                }
+
+                var = w->property("backend");
+                if(!var.isNull()) {
+                    QString backend = var.toString().trimmed().toLower();
+                    if(QString::compare(backend, "sf-archiverappliance") == 0) {
+                        indexNew.backend = var.toString();
+                    } else if(QString::compare(backend, "sf-databuffer") == 0) {
+                       indexNew.backend = var.toString();
+                    } else {
+                        QString mess("ArchiveSF plugin -- backend defined as dynamic property in widget but not spelled correctly (use sf-archiverappliance or sf-databuffer) in widget "  + w->objectName() + ", defaulting now to sf-archiverappliance");
+                        if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtFatalMsg, (char*) qasc(mess));
+                    }
+                } else if(indexNew.init){
+                    QString mess("ArchiveSF plugin -- no backend defined as dynamic property in widget "  + w->objectName() + ", can be sf-archiverappliance or sf-databuffer)");
                     if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
                 }
 

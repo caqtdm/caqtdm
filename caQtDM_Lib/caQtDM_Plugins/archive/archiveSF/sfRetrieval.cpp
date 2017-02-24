@@ -251,7 +251,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
 
                         // scan the data part (big array)
                         if(array.size() < 1) {
-                            errorString = tr("no data");
+                            errorString = tr("no data from %1 : %2").arg(downloadUrl.toString()).arg(Backend);
                             emit requestFinished();
                             delete value;
                             delete value1;

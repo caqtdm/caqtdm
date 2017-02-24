@@ -270,7 +270,7 @@
      </rect>
     </property>
     <property name="Title" stdset="0">
-     <string notr="true">archiveSF://SINSB01-RSYS:GET-KLY-POWER</string>
+     <string notr="true">archiveSF://SINSB01-RLOD100-PUP10:SIG-AMPLT-AVG</string>
     </property>
     <property name="TitleX">
      <string notr="true">(past hours)</string>
@@ -279,7 +279,7 @@
      <string notr="true"/>
     </property>
     <property name="channels_1" stdset="0">
-     <string>archiveSF://SINSB01-RSYS:GET-KLY-POWER.X;archiveSF://SINSB01-RSYS:GET-KLY-POWER.Y</string>
+     <string>archiveSF://SINSB01-RLOD100-PUP10:SIG-AMPLT-AVG.X;archiveSF://SINSB01-RLOD100-PUP10:SIG-AMPLT-AVG.Y</string>
     </property>
     <property name="Style_1">
      <enum>caCartesianPlot::ThinLines</enum>
