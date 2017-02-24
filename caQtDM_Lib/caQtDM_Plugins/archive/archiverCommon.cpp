@@ -117,7 +117,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
     if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) kData->dispW)) {
 
-        char asc[150];
+        char asc[CHAR_ARRAY_LENGTH];
         indexes index;
 
         sprintf(asc, "%d_%s_%p",kData->specData[0], kData->pv, kData->dispW);
@@ -232,7 +232,7 @@ int ArchiverCommon::pvClearMonitor(knobData *kData) {
 
     if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) kData->dispW)) {
         Q_UNUSED(w);
-        char asc[50];
+        char asc[CHAR_ARRAY_LENGTH];
         sprintf(asc, "%d_%s_%p",kData->specData[0], kData->pv, kData->dispW);
         QString key = QString(asc);
         key = key.replace(".X", "");
