@@ -247,7 +247,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
                     // find data array inside this part of array
                     if (root.find(L"data") != root.end() && root[L"data"]->IsArray()) {
                         JSONArray array = root[L"data"]->AsArray();
-                        //qDebug() << "\ndata part found as array";
+                        //qDebug() << "\ndata part found as array" << array.size();
 
                         // scan the data part (big array)
                         if(array.size() < 1) {
@@ -286,7 +286,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
                                     delete value2;
                                 }
 
-                                 // look for globalSeconds
+                                // look for globalSeconds
                                 if (root1.find(L"globalSeconds") != root1.end() && root1[L"globalSeconds"]->IsString()) {
                                     //qDebug()<< "globalSeconds part found";
                                     if(getDoubleFromString(QString::fromWCharArray(root1[L"globalSeconds"]->AsString().c_str()), archiveTime)){
@@ -315,22 +315,33 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
                             double archiveTime;
                             for (unsigned int i = 0; i < array.size(); i++) {
 
+                                // simple value
                                 JSONObject root1 = array[i]->AsObject();
                                 if (root1.find(L"value") != root1.end() && root1[L"value"]->IsNumber()) {
-                                    //qDebug() << "value found";
+                                    // qDebug() << "value found";
                                     stat = swscanf(root1[L"value"]->Stringify().c_str(), L"%lf", &mean);
                                     valueFound = true;
-                                }
+                                } else
+
+                                    // an array
+                                    if (root1.find(L"value") != root1.end() && root1[L"value"]->IsArray()) {
+                                        JSONArray array = root1[L"value"]->AsArray();
+                                        //qDebug() << "\nvalue part found as array, not yet supported" << array.size();
+                                        errorString = tr("waveforms not supported");
+                                        emit requestFinished();
+                                        return;
+                                    }
+
                                 // look for globalSeconds
-                               if (root1.find(L"globalSeconds") != root1.end() && root1[L"globalSeconds"]->IsString()) {
-                                   //qDebug()<< "globalSeconds part found";
-                                   if(getDoubleFromString(QString::fromWCharArray(root1[L"globalSeconds"]->AsString().c_str()), archiveTime)){
-                                       timeFound = true;
-                                   } else {
-                                       qDebug() << tr("could not decode globalSeconds ????");
-                                       break;
-                                   }
-                               }
+                                if (root1.find(L"globalSeconds") != root1.end() && root1[L"globalSeconds"]->IsString()) {
+                                    //qDebug()<< "globalSeconds part found";
+                                    if(getDoubleFromString(QString::fromWCharArray(root1[L"globalSeconds"]->AsString().c_str()), archiveTime)){
+                                        timeFound = true;
+                                    } else {
+                                        qDebug() << tr("could not decode globalSeconds ????");
+                                        break;
+                                    }
+                                }
 
                                 // fill in our data
                                 if(timeFound && valueFound && (seconds - archiveTime) < secndsPast) {
