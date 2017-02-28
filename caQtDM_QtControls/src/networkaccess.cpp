@@ -78,7 +78,7 @@ bool NetworkAccess::requestUrl(const QUrl url, const QString &file)
 
     finished = false;
     QTimer *timeoutHelper = new QTimer(this);
-    timeoutHelper->setInterval(10000);
+    timeoutHelper->setInterval(3000);
     timeoutHelper->start();
     connect(timeoutHelper, SIGNAL(timeout()), this, SLOT(timeoutL()));
     eventLoop->exec();
