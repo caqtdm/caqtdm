@@ -1557,6 +1557,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         text = messagebuttonWidget->getLabel();
         if(reaffectText(map, &text))  messagebuttonWidget->setLabel(text);
 
+        text = messagebuttonWidget->getPressMessage();
+        if(reaffectText(map, &text))  messagebuttonWidget->setPressMessage(text);
+
+        text = messagebuttonWidget->getReleaseMessage();
+        if(reaffectText(map, &text))  messagebuttonWidget->setReleaseMessage(text);
+
         if(messagebuttonWidget->isElevated()) messagebuttonWidget->raise();
 
         // insert dataindex list

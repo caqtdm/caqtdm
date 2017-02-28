@@ -23,41 +23,33 @@
  *    anton.mezger@psi.ch
  */
 
+#include <QApplication>
 #include <QNetworkAccessManager>
-#include <QDebug>
+#include <QSslConfiguration>
 #include <QFile>
 #include <QDir>
-#include <QEventLoop>
+#include <QTimer>
+#include <QDebug>
 #include "specialFunctions.h"
 #include "networkaccess.h"
+
 #ifdef MOBILE_ANDROID
 #  include <unistd.h>
 #endif
-
-// this sleep will not block the GUI and QThread::msleep is protected in Qt4.8 (so do not use that)
-class Sleep
-{
-public:
-    static void msleep(unsigned long msecs)
-    {
-#ifndef MOBILE_ANDROID
-        QMutex mutex;
-        mutex.lock();
-        QWaitCondition waitCondition;
-        waitCondition.wait(&mutex, msecs);
-        mutex.unlock();
-#else
-        // not nice, but the above does not work on android now (does not wait)
-        usleep(msecs * 100);
-#endif
-    }
-};
 
 NetworkAccess::NetworkAccess()
 {
     finished = false;
     manager = new QNetworkAccessManager;
+    eventLoop = new QEventLoop(this);
     errorString = "";
+    connect(this, SIGNAL(requestFinished()), this, SLOT(downloadFinished()) );
+}
+
+void NetworkAccess::timeoutL()
+{
+    errorString = tr("networkaccess: http request timeout for %1").arg(downloadUrl.toString());
+    eventLoop->quit();
 }
 
 bool NetworkAccess::requestUrl(const QUrl url, const QString &file)
@@ -66,39 +58,50 @@ bool NetworkAccess::requestUrl(const QUrl url, const QString &file)
     thisFile = file;
     //printf("caQtDM -- download %s\n", qasc(url.toString()));
     downloadUrl = url;
-    QNetworkReply* reply = manager->get(QNetworkRequest(url));
-    connect(reply, SIGNAL(finished()), this, SLOT(finishReply()));
 
-    //wait until download was done (up to 3 seconds)
-    int looped = 0;
-    for(int i=0; i<10; i++) {
-        qApp->processEvents();
-        Sleep::msleep(300);
-        qApp->processEvents();
-        if(downloadFinished()) {
-            return true;
-        }
-        looped++;
+    QNetworkRequest *request = new QNetworkRequest(url);
+
+    //for https we need some configuration (with no verify socket)
+#ifndef QT_NO_SSL
+    if(url.toString().toUpper().contains("HTTPS")) {
+        QSslConfiguration config = request->sslConfiguration();
+        config.setPeerVerifyMode(QSslSocket::VerifyNone);
+        request->setSslConfiguration(config);
     }
-    if(!downloadFinished()) {
-        return false;
-    }
-    return false;
+#endif
+    //request->setRawHeader("Content-Type", "application/json");
+    //request->setRawHeader("Timeout", "86400");
+
+    manager->get(*request);
+
+    connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(finishReply(QNetworkReply*)));
+
+    finished = false;
+    QTimer *timeoutHelper = new QTimer(this);
+    timeoutHelper->setInterval(10000);
+    timeoutHelper->start();
+    connect(timeoutHelper, SIGNAL(timeout()), this, SLOT(timeoutL()));
+    eventLoop->exec();
+
+    if(finished) return true;
+    else return false;
 }
 
 int NetworkAccess::downloadFinished()
 {
+    eventLoop->quit();
     return finished;
 }
 
-void NetworkAccess::finishReply()
+void NetworkAccess::finishReply(QNetworkReply *reply)
 {
-    //printf("newtwork reply completed! thisFile=%s\n",  qasc(thisFile));
-    QObject* obj = sender();
-    QNetworkReply* reply = qobject_cast<QNetworkReply*>(obj);
+    //printf("network reply completed! thisFile=%s\n",  qasc(thisFile));
 
+    QVariant status =  reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
     if(reply->error()) {
-        errorString = tr("%1: %2").arg(parseError(reply->error())).arg(downloadUrl.toString());
+        errorString = tr("networkaccess: http status code %1 [%2] for %3").arg(status.toInt()).arg(reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString()).arg(downloadUrl.toString());
+        emit requestFinished();
+        reply->deleteLater();
         return;
     }
 
@@ -108,18 +111,18 @@ void NetworkAccess::finishReply()
         QString filePath = specials.getStdPath();
 
         // create directory if not exists
-
         QFileInfo fi(thisFile);
         QString newPath = filePath + "/" + fi.path();
         if(!QDir(newPath).exists()) QDir().mkpath(newPath);
-
 
         filePath.append("/");
         filePath.append(thisFile);
 
         QFile file(filePath);
         if(!file.open(QIODevice::ReadWrite)) {
-            errorString = tr("network error: %1 could not be opened for write").arg(filePath);
+            errorString = tr("networkaccess: %1 could not be opened for write").arg(filePath);
+            emit requestFinished();
+            reply->deleteLater();
             return;
         } else {
             file.write(reply->readAll());
@@ -128,6 +131,8 @@ void NetworkAccess::finishReply()
 
     }
     finished = true;
+    reply->deleteLater();
+    emit requestFinished();
 }
 
 const QString NetworkAccess::lastError()
@@ -137,32 +142,77 @@ const QString NetworkAccess::lastError()
 
 const QString NetworkAccess::parseError(QNetworkReply::NetworkError error)
 {
+
     QString errstr = "";
-    switch(error)
-    {
+    switch(error) {
     case QNetworkReply::ConnectionRefusedError:
         errstr = tr("ConnectionRefusedError");
-        break;
-    case QNetworkReply::HostNotFoundError:
-        errstr = tr("HostNotFoundError");
         break;
     case QNetworkReply::RemoteHostClosedError:
         errstr = tr("RemoteHostClosedError");
         break;
+    case QNetworkReply::HostNotFoundError:
+        errstr = tr("HostNotFoundError");
+        break;
     case QNetworkReply::TimeoutError:
         errstr = tr("TimeoutError");
+        break;
+    case QNetworkReply::OperationCanceledError:
+        errstr = tr("OperationCanceledError");
+        break;
+    case QNetworkReply::SslHandshakeFailedError:
+        errstr = tr("SslHandshakeFailedError");
+        break;
+    case QNetworkReply::TemporaryNetworkFailureError:
+        errstr = tr("TemporaryNetworkFailureError");
+        break;
+    case QNetworkReply::ProxyConnectionRefusedError:
+        errstr = tr("ProxyConnectionRefusedError");
+        break;
+    case QNetworkReply::ProxyConnectionClosedError:
+        errstr = tr("ProxyConnectionClosedError");
+        break;
+    case QNetworkReply::ProxyNotFoundError:
+        errstr = tr("ProxyNotFoundError");
+        break;
+    case QNetworkReply::ProxyTimeoutError:
+        errstr = tr("ProxyTimeoutError");
+        break;
+    case QNetworkReply::ProxyAuthenticationRequiredError:
+        errstr = tr("ProxyAuthenticationRequiredError");
         break;
     case QNetworkReply::ContentAccessDenied:
         errstr = tr("ContentAccessDenied");
         break;
-    case QNetworkReply::ProtocolFailure:
-        errstr = tr("ProtocolFailure");
+    case QNetworkReply::ContentOperationNotPermittedError:
+        errstr = tr("ContentOperationNotPermittedError");
         break;
     case QNetworkReply::ContentNotFoundError:
         errstr = tr("ContentNotFoundError");
         break;
+    case QNetworkReply::AuthenticationRequiredError:
+        errstr = tr("AuthenticationRequiredError");
+        break;
+    case QNetworkReply::ProtocolUnknownError:
+        errstr = tr("ProtocolUnknownError");
+        break;
+    case QNetworkReply::ProtocolInvalidOperationError:
+        errstr = tr("ProtocolInvalidOperationError");
+        break;
+    case QNetworkReply::UnknownNetworkError:
+        errstr = tr("UnknownNetworkError");
+        break;
+    case QNetworkReply::UnknownProxyError:
+        errstr = tr("UnknownProxyError");
+        break;
+    case QNetworkReply::UnknownContentError:
+        errstr = tr("UnknownContentError");
+        break;
+    case QNetworkReply::ProtocolFailure:
+        errstr = tr("ProtocolFailure");
+        break;
     default:
-        errstr = tr("unknownError");
+        errstr = tr("unknownError %1").arg(error);
         break;
     }
     return errstr;
