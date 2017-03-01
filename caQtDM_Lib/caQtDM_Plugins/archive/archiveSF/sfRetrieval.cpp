@@ -422,9 +422,11 @@ const QString sfRetrieval::parseError(QNetworkReply::NetworkError error)
     case QNetworkReply::SslHandshakeFailedError:
         errstr = tr("SslHandshakeFailedError");
         break;
+#if QT_VERSION > QT_VERSION_CHECK(4, 8, 0)
     case QNetworkReply::TemporaryNetworkFailureError:
         errstr = tr("TemporaryNetworkFailureError");
         break;
+#endif
     case QNetworkReply::ProxyConnectionRefusedError:
         errstr = tr("ProxyConnectionRefusedError");
         break;
