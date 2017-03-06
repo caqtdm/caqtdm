@@ -137,7 +137,7 @@ private:
     int         thisStartBit;
     int         thisEndBit;
 
-    colMode     thisColorMode;
+    colMode     thisColorMode, oldColorMode;
     QColor      thisForeColor;
     QColor      thisBackColor;
     QColor      thisBorderColor;

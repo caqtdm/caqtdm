@@ -101,8 +101,6 @@ void caChoice::arrangeCells(QStringList list, int indx)
     int column = 0;
     int row = 0;
 
-    setStyleSheet("");
-
     foreach(EPushButton *l, cells) {
         grid->removeWidget(l);
         l->hide();
@@ -310,9 +308,10 @@ void caChoice::setColors(QColor back, QColor fore, QColor border, alignmentHor a
 
         disabled.append("; etch-disabled-text: true; color: grey;}");
         style.append(disabled);
-        if((QString::compare(style, styleSheet()) != 0)  || (styleSheet().size() < 1)) {
+        if((QString::compare(style, styleSheet()) != 0)  || (thisColorMode != oldColorMode)) {
             //printf("%s setcolors set style %s\n", qasc(this->objectName()), qasc(style));
             setStyleSheet(style);
+            oldColorMode = thisColorMode;
         }
     }
 }
