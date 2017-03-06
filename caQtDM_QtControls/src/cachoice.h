@@ -137,12 +137,12 @@ private:
     int         thisStartBit;
     int         thisEndBit;
 
-    colMode     thisColorMode, oldColorMode;
-    QColor      thisForeColor, oldForeColor;
-    QColor      thisBackColor, oldBackColor;
-    QColor      thisBorderColor, oldBorderColor;
+    colMode     thisColorMode;
+    QColor      thisForeColor;
+    QColor      thisBackColor;
+    QColor      thisBorderColor;
 
-    alignmentHor thisAlignment, oldAlignment;
+    alignmentHor thisAlignment;
     EPushButton::ScaleMode thisScaleMode;
 
     int lastValue;
