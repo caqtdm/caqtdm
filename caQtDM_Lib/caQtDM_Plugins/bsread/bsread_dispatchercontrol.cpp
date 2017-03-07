@@ -98,6 +98,26 @@ void bsread_dispatchercontrol::process()
             Channels.insert(candidate.channel,candidate.index);
 
         }
+
+
+        if (tobeRemoved.count()>0){
+          requestedchannels=0;
+          //qDebug()<<"tobeRemoved Pipeline :" << tobeRemoved.count() << Channels.count() <<tobeRemoved.at(0).trimmed()<< Channels.first();
+          //qDebug()<<  tobeRemoved;
+          for (int x=0;x<=tobeRemoved.count()-1;x++){
+                QString chan=tobeRemoved.at(x).trimmed();
+                //qDebug()<<"search :"<< chan;
+                QMultiMap<QString, int>::iterator i = Channels.find(chan);
+                 while (i != Channels.end() && i.key() == chan) {
+                     qDebug()<<"found :"<< chan << i.value();
+                     rem_Channel(chan,i.value());
+                     ++i;
+                 }
+           }
+          tobeRemoved.clear();
+        }
+
+
         while(!ChannelsRemPipeline.isEmpty()){
             channelstruct candidate=get_RemChannel();
             //qDebug()<<"REMChannel Pipeline :"<< candidate.channel<<candidate.index;
@@ -106,6 +126,7 @@ void bsread_dispatchercontrol::process()
                 Channels.remove(candidate.channel,candidate.index);
             }
         }
+
        //  qDebug()<<"Check Connection Pipeline";
         while(!ConnectionDeletePipeline.isEmpty()){
             //qDebug()<<"Delete Connection Pipeline";
@@ -123,14 +144,15 @@ void bsread_dispatchercontrol::process()
             //connect(replydelete, SIGNAL(finished()),this, SLOT(finishReplyDelete()));
             connect(replydelete, SIGNAL(finished()),this, SLOT(finishReplyDelete()));
             //qDebug()<<"Remove Connection :"<< data << postDataSize;
+
         }
 
 
 
 
 
-        if(Channels.count()!=requestedchannels){
-            //qDebug()<<"Checking Channels";
+        if((Channels.count()!=requestedchannels)){
+            //qDebug()<<"Checking Channels: "<< Channels.count();
             QString data="{\"channels\":[ ";
             QMutexLocker lock(&ChannelLocker);
             QSet<QString> keys=QSet<QString>::fromList(Channels.keys());
@@ -139,7 +161,6 @@ void bsread_dispatchercontrol::process()
                         data.append("{\"name\":\"");
                         data.append(key);
                         data.append("\",\"modulo\":1,\"offset\":0},");
-
                 }
             }
             data.remove(data.length()-1,1);
@@ -345,7 +366,15 @@ void bsread_dispatchercontrol::finishReplyConnect()
     reply_local->deleteLater();
     JSONValue *MainMessageJ = JSON::Parse(httpdata);
     //qDebug() << "DATA:" <<httpdata;
+    QString msg="bsread: ";
+    msg.append(httpdata);
 
+    if (msg.contains("exception")){
+        messagewindowP->postMsgEvent(QtWarningMsg,(char*) msg.toLatin1().constData());
+    }else{
+
+        messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
+    }
     if (MainMessageJ!=NULL){
         if(!MainMessageJ->IsObject()) {
             delete(MainMessageJ);
@@ -409,11 +438,47 @@ void bsread_dispatchercontrol::finishReplyConnect()
                 //qDebug() << "bsreadPlugin:" << stream.toLatin1().constData();
             }
 
+            if (jsonobj.find(L"exception") != jsonobj.end() && jsonobj[L"exception"]->IsString()) {
+                qDebug()<< "Check exception:";
+                tobeRemoved.clear();
+                QString ExceptionError=QString::fromWCharArray(jsonobj[L"exception"]->AsString().c_str());
+                if (ExceptionError.startsWith("java.lang.IllegalArgumentException")){
+                    if (jsonobj.find(L"message") != jsonobj.end() && jsonobj[L"message"]->IsString()) {
+                        QString ErrorString=QString::fromWCharArray(jsonobj[L"message"]->AsString().c_str());
+                        QStringList ErrorChannels = ErrorString.split(",", QString::SkipEmptyParts);
+                        if (ErrorChannels.count()>0){
+
+                            qDebug()<< "ErrorChannels.count():" << ErrorChannels.count();
+
+                            if (ErrorChannels.at(0).contains("recorded:")){
+                                tobeRemoved.append(ErrorChannels.at(0).split(": ", QString::SkipEmptyParts).at(1).split(" - ",QString::SkipEmptyParts).at(0));
+                                if (ErrorChannels.count()>1){
+                                    for (int x=1;x<ErrorChannels.count()-1;x++){
+                                        tobeRemoved.append(ErrorChannels.at(x).split(" - ",QString::SkipEmptyParts).at(0));
+                                    }
+                                }
+
+
+
+                            }
+
+                            qDebug()<< "tobeRemoved:" <<tobeRemoved;
+
+                        }
+
+
+
+                    }
+
+                }
+            }//if jsonobj
+            //qDebug()<< tobeRemoved;
+
         }
     }
 
-  //qDebug()<<"finishReplyConnect: finished ThreadID (" << QThread::currentThreadId()<< ")";
-  //qDebug()<<"END: finishReplyConnect";
+    //qDebug()<<"finishReplyConnect: finished ThreadID (" << QThread::currentThreadId()<< ")";
+    //qDebug()<<"END: finishReplyConnect";
 }
 
 void bsread_dispatchercontrol::finishReplyDelete()

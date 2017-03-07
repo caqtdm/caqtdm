@@ -85,8 +85,10 @@ protected:
   QList<QString> streams;
   QMultiMap<QString,int> Channels;
   QList<channelstruct> ChannelsAddPipeline;
+  QList<channelstruct> ChannelsApprovePipeline;
   QList<channelstruct> ChannelsRemPipeline;
   QList<QString> ConnectionDeletePipeline;
+  QStringList tobeRemoved;
   //QEventLoop eventloop;
   QEventLoop *loop;
   QNetworkRequest requestChannel;
