@@ -2190,6 +2190,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             cartesianplotWidget->setPV(pvs, i);
         }
 
+        cartesianplotWidget->updateLegendsPV();
+
         // handle trigger channel if any
         triggerChannel = cartesianplotWidget->getTriggerPV();
         if(triggerChannel.trimmed().length() > 0) {
@@ -7173,6 +7175,13 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             }
             stripplotWidget->setTicksResizeFactor(factX, factY);
         } else {
+            caCartesianPlot * cartesianplotWidget = (caCartesianPlot *) widget;
+            fontSize = fontResize(factX, factY, list, 7);
+            f.setPointSizeF(fontSize);
+            if(cartesianplotWidget->getLegendEnabled()) {
+                cartesianplotWidget->setLegendAttribute(cartesianplotWidget->getScaleColor(), f, caCartesianPlot::FONT);
+                cartesianplotWidget->updateLayout();
+            }
             plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MajorTick, factY * (double) list.at(8).toInt());
             plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MediumTick, factY * (double) list.at(9).toInt());
             plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MinorTick, factY * (double) list.at(10).toInt());
@@ -7347,7 +7356,11 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                         stripplotWidget->setLegendAttribute(stripplotWidget->getScaleColor(), QFont("arial", 9), caStripPlot::FONT);
                     }
                 } else {
+                    caCartesianPlot * cartesianplotWidget = (caCartesianPlot *) widget;
                     integerList.insert(7, 9);
+                    if( cartesianplotWidget->getLegendEnabled()) {
+                         cartesianplotWidget->setLegendAttribute(cartesianplotWidget->getScaleColor(), QFont("arial", 9), caCartesianPlot::FONT);
+                    }
                 }
                 integerList.insert(8, plot->axisScaleDraw(QwtPlot::xBottom)->tickLength(QwtScaleDiv::MajorTick));
                 integerList.insert(9, plot->axisScaleDraw(QwtPlot::xBottom)->tickLength(QwtScaleDiv::MediumTick));
