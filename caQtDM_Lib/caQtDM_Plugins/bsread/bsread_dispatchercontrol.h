@@ -65,7 +65,7 @@ public:
     void setTerminate();
 
     void setMessagewindow(MessageWindow *value);
-
+    void ChannelVerification(QNetworkAccessManager* manager);
 
 signals:
     //void requestFinished();
@@ -75,7 +75,9 @@ private slots:
 public slots:
    void finishReplyConnect();
    void finishReplyDelete();
+   void finishVerification();
    void process();
+
 
 protected:
 
@@ -84,8 +86,10 @@ protected:
   bool terminate;
   QList<QString> streams;
   QMultiMap<QString,int> Channels;
+  QList<QString> bsreadChannels;
   QList<channelstruct> ChannelsAddPipeline;
-  QList<channelstruct> ChannelsApprovePipeline;
+  QMultiMap<QString,int> ChannelsToBeApprovePipeline;
+  QMultiMap<QString,int> ChannelsApprovePipeline;
   QList<channelstruct> ChannelsRemPipeline;
   QList<QString> ConnectionDeletePipeline;
   QStringList tobeRemoved;
@@ -93,7 +97,9 @@ protected:
   QEventLoop *loop;
   QNetworkRequest requestChannel;
   QNetworkRequest requestDelete;
+  QNetworkRequest requestVerification;
   QNetworkReply* replyConnect;
+  QNetworkReply* replyVerification;
   QNetworkReply* replydelete;
   QBuffer buff_delete_data;
 

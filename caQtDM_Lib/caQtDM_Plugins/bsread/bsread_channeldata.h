@@ -61,6 +61,7 @@ public:
     QString name;
     bsread_types type;
     QList<int> shape;
+    bool valid;
     int offset;
     int modulo;
     int precision;

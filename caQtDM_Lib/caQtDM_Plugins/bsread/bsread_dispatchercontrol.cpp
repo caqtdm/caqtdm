@@ -36,6 +36,13 @@ bsread_dispatchercontrol::bsread_dispatchercontrol()
 {
     loop = new QEventLoop(this);
     connect(qApp, SIGNAL(aboutToQuit()),this, SLOT(closeEvent()));
+    //Special Channels
+    bsreadChannels.append("bsread:hash");
+    bsreadChannels.append("bsread:pulse_id");
+    bsreadChannels.append("bsread:htype");
+    bsreadChannels.append("bsread:global_timestamp_ns");
+    bsreadChannels.append("bsread:global_timestamp_sec");
+
 }
 bsread_dispatchercontrol::~bsread_dispatchercontrol()
 {
@@ -90,20 +97,21 @@ void bsread_dispatchercontrol::process()
 
 #endif
 
-        // qDebug()<<"Check Pipeline";
-        while(!ChannelsAddPipeline.isEmpty()){
-            channelstruct candidate=get_AddChannel();
-            //qDebug()<<"ADDChannel Pipeline :"<< candidate.channel<<candidate.index;
-            //QMutexLocker lock(&ChannelLocker);
-            Channels.insert(candidate.channel,candidate.index);
 
+    if (!ChannelsAddPipeline.isEmpty()){
+        ChannelVerification(&manager);
+    }
+
+        // qDebug()<<"Check Pipeline";
+        while(!ChannelsApprovePipeline.isEmpty()){
+            Channels+=ChannelsApprovePipeline;
+            ChannelsApprovePipeline.clear();
         }
 
 
         if (tobeRemoved.count()>0){
           requestedchannels=0;
           //qDebug()<<"tobeRemoved Pipeline :" << tobeRemoved.count() << Channels.count() <<tobeRemoved.at(0).trimmed()<< Channels.first();
-          //qDebug()<<  tobeRemoved;
           for (int x=0;x<=tobeRemoved.count()-1;x++){
                 QString chan=tobeRemoved.at(x).trimmed();
                 //qDebug()<<"search :"<< chan;
@@ -160,11 +168,15 @@ void bsread_dispatchercontrol::process()
                 if (!key.startsWith("bsread:")){ //removes all header channels
                         data.append("{\"name\":\"");
                         data.append(key);
-                        data.append("\",\"modulo\":1,\"offset\":0},");
+                        //data.append("\",\"modulo\":1,\"offset\":0},");
+                        data.append("\"},");
                 }
             }
             data.remove(data.length()-1,1);
-            data.append("],\"sendIncompleteMessages\":true,\"compression\":\"none\"}");
+            data.append("],\"sendIncompleteMessages\":true,\"compression\":\"none\",");
+            data.append("\"mapping\":{\"incomplete\":\"fill-null\"},");
+            data.append("\"channelValidation\":{\"inconsistency\":\"keep-as-is\"}}");
+
 
             if (!data.contains("channels\":[]")){
                 QByteArray transferdata;
@@ -370,7 +382,7 @@ void bsread_dispatchercontrol::finishReplyConnect()
     msg.append(httpdata);
 
     if (msg.contains("exception")){
-        messagewindowP->postMsgEvent(QtWarningMsg,(char*) msg.toLatin1().constData());
+        messagewindowP->postMsgEvent(QtCriticalMsg,(char*) msg.toLatin1().constData());
     }else{
 
         messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
@@ -506,3 +518,125 @@ void bsread_dispatchercontrol::closeEvent(){
    }
 }
 
+void bsread_dispatchercontrol::ChannelVerification(QNetworkAccessManager* manager){
+
+    QMultiMap<QString,int> CheckChannels;
+    QString ChannelQueryVerification=Dispatcher;
+    if (!ChannelQueryVerification.endsWith("/")){
+        ChannelQueryVerification.append("/");
+    }
+    if (ChannelQueryVerification.endsWith("/")){
+        ChannelQueryVerification.append("channels/state");
+    }
+
+    QUrl url(ChannelQueryVerification);
+    requestVerification = QNetworkRequest(url);
+#ifndef QT_NO_SSL
+    if(url.toString().toUpper().contains("HTTPS")) {
+        QSslConfiguration configChannel = requestVerification.sslConfiguration();
+        configChannel.setPeerVerifyMode(QSslSocket::VerifyNone);
+        requestVerification.setSslConfiguration(configChannel);
+    }
+#endif
+
+    QString data="{\"channels\":[ ";
+    while(!ChannelsAddPipeline.isEmpty()){
+        channelstruct candidate=get_AddChannel();
+        ChannelsToBeApprovePipeline.insert(candidate.channel,candidate.index);
+    }
+
+    QSet<QString> keys=QSet<QString>::fromList(ChannelsToBeApprovePipeline.keys());
+    foreach( QString key,keys){
+        if (!key.startsWith("bsread:")){ //removes all header channels
+            data.append("\"");
+            data.append(key);
+            data.append("\",");
+        }
+    }
+    data.remove(data.length()-1,1);
+    data.append("]}");
+    if (!data.contains("channels\":[]")){
+        QByteArray transferdata;
+        transferdata.append(data);
+        requestVerification.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
+        replyVerification = manager->post(requestVerification,transferdata);
+        //qDebug()<<"ChannelVerification() :"<<url.toString() <<" : "<<transferdata;
+        connect(replyVerification, SIGNAL(readyRead()),this, SLOT(finishVerification()));
+    }
+    //qDebug()<<"ChannelVerification() :"<< data;
+}
+void bsread_dispatchercontrol::finishVerification()
+{
+
+    JSONArray jsonobj;
+    QObject* obj = sender();
+    QNetworkReply* reply_local = qobject_cast<QNetworkReply*>(obj);
+
+    QByteArray httpdata;
+
+    httpdata=reply_local->readAll();
+    reply_local->deleteLater();
+    JSONValue *MainMessageJ = JSON::Parse(httpdata);
+
+    QString msg="bsread: ";
+    msg.append(httpdata);
+    if (MainMessageJ!=NULL){
+        if(!MainMessageJ->IsArray()) {
+            qDebug()<<"finishVerification() : MainMessageJ=NULL";
+            delete(MainMessageJ);
+        } else {
+            jsonobj=MainMessageJ->AsArray();
+            //qDebug()<<"finishVerification() : Step array :"<< jsonobj.size();
+
+            for (unsigned int i = 0; i < jsonobj.size(); i++)
+            {
+                JSONObject jsonobj2=jsonobj[i]->AsObject();
+                if (jsonobj2.find(L"recording") != jsonobj2.end() && jsonobj2[L"recording"]->IsBool())
+                {
+                    if (jsonobj2[L"recording"]->AsBool()){
+                        //qDebug()<<"finishVerification() : Recording ok";
+                        QString name="";
+                        if (jsonobj2.find(L"channel") != jsonobj2.end() && jsonobj2[L"channel"]->IsObject())
+                        {
+                            JSONObject jsonobj3=jsonobj2[L"channel"]->AsObject();
+
+
+                            if (jsonobj3.find(L"name") != jsonobj3.end() && jsonobj3[L"name"]->IsString()) {
+                                name=QString::fromWCharArray(jsonobj3[L"name"]->AsString().c_str());
+                            }
+
+                        }
+
+                        QList<int> values = ChannelsToBeApprovePipeline.values(name);
+                        for (int i = 0; i < values.size(); ++i){
+                            channelstruct candidate;
+                            candidate.channel=name;
+                            candidate.index=values.at(i);
+                            ChannelsApprovePipeline.insert(candidate.channel,candidate.index);
+                            ChannelsToBeApprovePipeline.remove(name);
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+    // for special bsread channels
+    for (int j = 0; j < bsreadChannels.size(); ++j){
+        QList<int> values = ChannelsToBeApprovePipeline.values(bsreadChannels.at(j));
+        for (int i = 0; i < values.size(); ++i){
+            channelstruct candidate;
+            candidate.channel=bsreadChannels.at(j);
+            candidate.index=values.at(i);
+            ChannelsApprovePipeline.insert(candidate.channel,candidate.index);
+            ChannelsToBeApprovePipeline.remove(bsreadChannels.at(j));
+        }
+    }
+
+    qDebug()<<"finishVerification() :"<< ChannelsApprovePipeline.count();// httpdata;
+
+    if (msg.contains("exception")){
+        messagewindowP->postMsgEvent(QtCriticalMsg,(char*) msg.toLatin1().constData());
+    }
+}
