@@ -57,7 +57,6 @@ class QTCON_EXPORT caMessageButton : public EPushButton
 #include "caElevation.h"
 
 public:
-
     void noStyle(QString style) {Q_UNUSED(style);}
 
     caMessageButton(QWidget *parent);
@@ -106,14 +105,12 @@ public:
     void buttonhandle(int type);
 
 
-private slots:
-
-
-protected:
-
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
 signals:
-
     void messageButtonSignal(int type);
 
 private:

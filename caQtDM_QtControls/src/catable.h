@@ -37,7 +37,6 @@ typedef char string40[40];
 
 class QTCON_EXPORT caTable : public QTableWidget
 {
-
     Q_OBJECT
 
     Q_PROPERTY(QStringList channelsList READ getPVSList WRITE setPVSList STORED false)
@@ -64,7 +63,6 @@ class QTCON_EXPORT caTable : public QTableWidget
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
 public:
-
 #include "caPropHandle.h"
 
     void noStyle(QString style) {Q_UNUSED(style);}
@@ -112,20 +110,20 @@ public:
 
     void setValueFont(QFont font);
 
-signals:
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
+signals:
    void TableDoubleClickedSignal(QString pv);
 
 private slots:
-
     void copy();
     void celldoubleclicked(int, int);
     void cellclicked(int, int);
 
-protected:
-
 private:
-
     enum { MaxRows = 500 };
     enum { MaxCols = 5  };
     QStringList	thisPVS;

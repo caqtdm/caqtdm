@@ -52,11 +52,9 @@ Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
 Q_ENUMS(colMode)
 
-
 #include "caElevation.h"
 
 public:
-
 enum colMode {Static=0, Default};
 
 void noStyle(QString style) {Q_UNUSED(style);}
@@ -103,8 +101,12 @@ void setBackground(QColor c);
 void setColors(QColor bg, QColor fg);
 void setConnectedColors(bool connected);
 
-private:
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
+private:
 bool eventFilter(QObject *obj, QEvent *event);
 
 QString thisPV;

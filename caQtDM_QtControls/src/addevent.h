@@ -23,7 +23,7 @@
  *    anton.mezger@psi.ch
  */
 
-
+#include <QRect>
     Q_PROPERTY(eventsignal eventSignal READ getEventSignal WRITE setEventSignal)
     Q_ENUMS(eventsignal)
 
@@ -35,8 +35,10 @@ public:
 signals:
     void emitSignal(int);
     void emitSignal(double);
+    void emitSignal(QRect);
 
 private:
     eventsignal thisEventSignal;
     bool eventFired;
+
 

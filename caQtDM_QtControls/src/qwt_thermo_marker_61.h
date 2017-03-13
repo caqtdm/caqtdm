@@ -214,6 +214,11 @@ public:
     void setScaleDraw( QwtScaleDraw * );
     const QwtScaleDraw *scaleDraw() const;
 
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
+
 public Q_SLOTS:
     virtual void setValue( double val );
 

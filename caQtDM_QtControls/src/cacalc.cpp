@@ -85,6 +85,22 @@ void caCalc::setValue(double value)
     thisValue =value;
 }
 
+void caCalc::setValue(QRect value)
+{
+    setTextLine("position");
+
+    // emit signal when requested
+    if(thisEventSignal == onFirstChange) {
+        if(!eventFired) {
+            emit emitSignal(value);
+        }
+        eventFired = true;
+    } else if(thisEventSignal == onAnyChange) {
+        emit emitSignal(value);
+    }
+    thisValue =0;
+}
+
 void caCalc::setTextLine(const QString &txt)
 {
     if(keepText == txt) {  // accelerate things

@@ -3182,6 +3182,53 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                     return false;
                 }
             }
+
+            // special function used for animation purposes through cacalc
+        } else if(calcQString.startsWith("%QRect")) {
+            if(caCalc *calc = qobject_cast<caCalc *>(w)) {
+                //qDebug() << "qrect for cacalc detected";
+                for(int i=0; i<4; i++) valueArray[i] = -1;  //say default value will not do anything
+                for(int i=0; i<nbMonitors;i++) {
+                    knobData *ptr = mutexKnobDataP->GetMutexKnobDataPtr(MonitorList.at(i+1).toInt());
+                    if(ptr != (knobData*) 0) {
+                        //qDebug() << "calculate from index" << i << ptr->index << ptr->pv << ptr->edata.connected << ptr->edata.rvalue << IndexList.at(i+1).toInt();
+                        // when connected
+                        int j = IndexList.at(i+1).toInt(); // input a,b,c,d
+                        if(ptr->edata.connected) {
+                            switch (ptr->edata.fieldtype){
+                            case caINT:
+                            case caLONG:{
+                                valueArray[j] = ptr->edata.ivalue;
+                                break;
+                            }
+                            default:{
+                                valueArray[j] = ptr->edata.rvalue;
+                            }
+                            }
+                        } else {
+                            valueArray[j] = -1;
+                        }
+                    }
+                }
+                bool somethingToSend = false;
+                for(int i=0; i<4; i++) {
+                    if(valueArray[i] != -1) {
+                        somethingToSend = true;
+                        break;
+                    }
+                }
+                if(somethingToSend) {
+                    valid = false;
+                    QRect rect(valueArray[0], valueArray[1], valueArray[2], valueArray[3]);
+                    calc->setValue(rect);
+                    result = 1;
+                    return true;
+                }
+            }
+            valid = false;
+            result = 0;
+            return true;
+
 #ifdef PYTHON
             // python function
         } else if(calcQString.startsWith("%P/")) {

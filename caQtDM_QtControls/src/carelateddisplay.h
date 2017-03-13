@@ -45,7 +45,6 @@ class QTCON_EXPORT caRelatedDisplay : public caRowColMenu
 #include "caElevation.h"
 
 public:
-
 #include "caPropHandle.h"
 
     void noStyle(QString style) {Q_UNUSED(style);}
@@ -57,8 +56,12 @@ public:
     QStringList getRemoveList() const {return replacemodes;}
     void setRemoveList(QStringList list) {replacemodes = list; updatePropertyEditorItem(this, "removeParent");}
 
-private:
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
+private:
     QStringList  replacemodes;
 
 };

@@ -55,7 +55,6 @@ Q_OBJECT
 #include "caElevation.h"
 
 public:
-
     enum colMode {Static=0, Default};
 
     void noStyle(QString style) {Q_UNUSED(style);}
@@ -102,11 +101,15 @@ public:
     void setColors(QColor bg, QColor fg);
     void setConnectedColors(bool connected);
 
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
+
 protected:
    void paintEvent(QPaintEvent *event);
 
 private:
-
     QString thisPV;
     bool thisAccessW;
     double thisMaximum, thisMinimum;

@@ -63,7 +63,6 @@ class QTCON_EXPORT caChoice : public QWidget
 #include "caElevation.h"
 
 public:
-
     enum alignmentHor {left, right, center};
     enum colMode {Default, Static, Alarm};
     enum Stacking {Row, Column, RowColumn, RowInverse};
@@ -115,16 +114,19 @@ public:
      void setValue(int value);
      QStringList getList() {return savedList;}
 
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
+
 protected:
     void arrangeCells(QStringList list, int indx);
     void resizeEvent(QResizeEvent *e);
 
 signals:
-
     void clicked(QString text);
 
 private:
-
     QGridLayout  *grid;
     QString      thisPV;
     Stacking     thisStacking;

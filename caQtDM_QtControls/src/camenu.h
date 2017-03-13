@@ -45,7 +45,6 @@ class QTCON_EXPORT caMenu : public QComboBox
 #include "caElevation.h"
 
 public:
-
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum colMode {Default, Static, Alarm};
@@ -78,7 +77,10 @@ public:
     void setAlarmColors(short status);
     void setNormalColors();
 
-private slots:
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
 protected:
      virtual bool event(QEvent *);

@@ -60,7 +60,6 @@ class QTCON_EXPORT caPolyLine : public QWidget
     Q_ENUMS(PolyStyle)
 
 public:
-
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum LineStyle {Solid = 0, Dash, BigDash};
@@ -112,6 +111,11 @@ public:
 
     void setActualSize(QSize size);
 
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
+
 protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
@@ -120,7 +124,6 @@ protected:
     void resizeEvent(QResizeEvent *event);
 
 private:
-
     QString thisXYpairs;
     QString XYpairs;
     QColor thisLineColor, oldLineColor;

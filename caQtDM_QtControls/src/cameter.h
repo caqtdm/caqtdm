@@ -79,7 +79,6 @@ class QTCON_EXPORT caMeter : public QwtDial
     Q_ENUMS(displayLims)
 
 public:
-
     void noStyle(QString style) {Q_UNUSED(style);}
 
     caMeter( QWidget *parent = 0 );
@@ -143,16 +142,16 @@ public:
 
     void invalidate();
 
-signals:
-
-private slots:
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
 protected:
     virtual void drawScaleContents(QPainter *painter, const QPointF &center, double radius) const;
     void resizeEvent(QResizeEvent *e);
 
 private:
-
    QPalette colorTheme( const QColor &base ) const;
    QString thisLabel;
    QString thisPV;

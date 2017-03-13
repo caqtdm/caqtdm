@@ -59,7 +59,6 @@ class QTCON_EXPORT caToggleButton : public QCheckBox, public FontScalingWidget
 #include "caElevation.h"
 
 public:
-
     void noStyle(QString style) {Q_UNUSED(style);}
 
     caToggleButton(QWidget *parent);
@@ -99,15 +98,17 @@ public:
     void setFontScaleModeL(ScaleMode m) { FontScalingWidget::setScaleMode((int) m);}
     ScaleMode fontScaleMode() { return (ScaleMode) FontScalingWidget::scaleMode(); }
 
-private slots:
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
+private slots:
     void buttonToggled();
     void rescaleFont(const QString& newText);
 
 signals:
-
     void toggleButtonSignal(bool checked);
-
 
 protected:
     QSize calculateTextSpace();

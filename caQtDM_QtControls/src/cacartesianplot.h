@@ -153,7 +153,6 @@ class QTCON_EXPORT caCartesianPlot : public QwtPlot
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
 public:
-
 #include "caPropHandle.h"
 
      void noStyle(QString style) {Q_UNUSED(style);}
@@ -400,8 +399,12 @@ public:
 
     void setLegendAttribute(QColor c, QFont f, LegendAtttribute sw);
 
-signals:
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
+signals:
     void ShowContextMenu(const QPoint&);
 
 protected:
@@ -409,7 +412,6 @@ protected:
     void resizeEvent ( QResizeEvent * event);
 
 private:
-
     template <typename pureData>
     void fillData(pureData *array, int size, int curvIndex, int curvType, int curvXY);
     void AverageData(double *array, double *avg, int size, int ratio);

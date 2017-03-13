@@ -102,7 +102,6 @@ class QTCON_EXPORT caScan2D : public QWidget
     Q_ENUMS(ROI_markertype)
 
 public:
-
 #include "caPropHandle.h"
 
     void noStyle(QString style) {Q_UNUSED(style);}
@@ -222,6 +221,11 @@ public:
     void setSAVEDATA_SUBDIR(const QString &savedata_subdir);
     void setSAVEDATA_FILENAME(const QString &savedata_filename);
     void attemptInitialPlot();
+
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
     
 signals:
    void WriteDetectedValuesSignal(QWidget*);   
@@ -237,7 +241,6 @@ protected:
     void timerEvent(QTimerEvent *);
 
 private:
-
     bool eventFilter(QObject *obj, QEvent *event);
     void Coordinates(int posX, int posY, double &newX, double &newY, double &maxX, double &maxY);
     void deleteWidgets();

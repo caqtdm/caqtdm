@@ -104,7 +104,6 @@ class QTCON_EXPORT caCamera : public QWidget
     Q_ENUMS(ROI_markertype)
 
 public:
-
 #include "caPropHandle.h"
 
     void noStyle(QString style) {Q_UNUSED(style);}
@@ -220,6 +219,11 @@ public:
     void dataProcessing(double value, int id);
     void showDisconnected();
 
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
+
 signals:
    void WriteDetectedValuesSignal(QWidget*);
 
@@ -235,7 +239,6 @@ protected:
     void timerEvent(QTimerEvent *);
 
 private:
-
     template <typename pureData>
     void fillData(pureData *array, int size, int curvIndex, int curvType, int curvXY);
     QVarLengthArray<double> X;

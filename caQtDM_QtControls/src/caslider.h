@@ -78,7 +78,6 @@ class QTCON_EXPORT caSlider : public QwtSlider
 #include "caElevation.h"
 
 public:
-
     void noStyle(QString style) {Q_UNUSED(style);}
 
     QString getPV() const;
@@ -170,13 +169,17 @@ public:
     void moveSlider();
 
 public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
+
+public slots:
     void setSliderValue(double const &value);
 
 private slots:
     void repeater();
 
 protected:
-
     virtual void mousePressEvent(QMouseEvent *e);
     virtual void mouseReleaseEvent(QMouseEvent *e);
     virtual void mouseMoveEvent(QMouseEvent *e);

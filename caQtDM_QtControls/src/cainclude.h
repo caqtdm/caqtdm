@@ -61,7 +61,6 @@ class  QTCON_EXPORT caInclude : public QWidget
 
 
 public:
-
 #include "caPropHandle.h"
 
     void noStyle(QString style) {Q_UNUSED(style);}
@@ -105,11 +104,11 @@ public:
     void setPropertyVisible(Properties property, bool visible);
 
 public slots:
-
-signals:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
 protected:
-
       void paintEvent( QPaintEvent* );
 
 private:

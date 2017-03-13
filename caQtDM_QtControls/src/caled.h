@@ -49,7 +49,6 @@ Q_OBJECT
   Q_ENUMS(colMode)
 
 public:
-
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum colMode {Static=0, Alarm};
@@ -83,6 +82,11 @@ public:
         void setTrueValue(QString const &trueValue) {thisTrueValue = trueValue;}
         QString getFalseValue() const {return thisFalseValue;}
         void setFalseValue(QString const &falseValue) {thisFalseValue = falseValue;}
+
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
 private:
         QString thisPV;

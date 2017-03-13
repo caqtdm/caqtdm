@@ -59,8 +59,7 @@ class QTCON_EXPORT caBitnames : public EFlag
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
 public:
-
-     void noStyle(QString style) {Q_UNUSED(style);}
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     caBitnames(QWidget *parent);
 
@@ -92,8 +91,12 @@ public:
     EFlag::alignmentHor getAlignment() const {return thisAlignment;}
     void setAlignment(EFlag::alignmentHor alignment);
 
-protected:
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
+protected:
     virtual void fontChange(const QFont & oldFont);
 
 private:

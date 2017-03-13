@@ -50,10 +50,14 @@ class QTCON_EXPORT caMimeDisplay : public caRowColMenu
 #include "caElevation.h"
 
 public:
-
     void noStyle(QString style) {Q_UNUSED(style);}
 
     caMimeDisplay(QWidget *parent);
+
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
 private:
     bool eventFilter(QObject *obj, QEvent *event);

@@ -111,6 +111,11 @@ public:
      bool getAccessW() const {return _AccessW;}
      void setAccessW(bool access);
 
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
+
 signals:
     void clicked(int bit);
 

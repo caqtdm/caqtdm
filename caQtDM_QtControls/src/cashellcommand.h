@@ -36,8 +36,12 @@ class QTCON_EXPORT caShellCommand : public caRowColMenu
 #include "caElevation.h"
 
 public:
-
     caShellCommand(QWidget *parent);
+
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
 };
 

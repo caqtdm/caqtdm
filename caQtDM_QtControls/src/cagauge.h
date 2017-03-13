@@ -80,6 +80,11 @@ public:
         void setFillMode(FillMode m){ m_fillMode = m; configure(); update(); }
         FillMode fillMode(){ return m_fillMode; }
 
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
+
 protected:
 	void paintEvent(QPaintEvent *);
 	void drawColorBar(QPainter *);
@@ -125,6 +130,11 @@ protected:
 	void drawLabels(QPainter *);
 	void drawValue(QPainter *);
 	virtual void configure();
+
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 	
 private:
 	double m_startAngle, m_stopAngle, m_arcLength;

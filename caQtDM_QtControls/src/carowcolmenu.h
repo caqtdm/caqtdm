@@ -37,7 +37,6 @@ class QGridLayout;
 
 class QTCON_EXPORT caRowColMenu : public QWidget
 {
-
     Q_OBJECT
 
     Q_ENUMS(Stacking)
@@ -60,7 +59,6 @@ class QTCON_EXPORT caRowColMenu : public QWidget
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
 public:
-
 #include "caPropHandle.h"
 
     void noStyle(QString style) {Q_UNUSED(style);}
@@ -102,20 +100,17 @@ public:
 
     void updateLabel();
     void updateColors();
-    void updateFontScaleMode();
+    void updateFontScaleMode(); 
 
 protected:
-
        void populateCells();
        void resizeEvent(QResizeEvent *e);
 
 signals:
-
     void clicked(int indx);
     void triggered(int indx);
 
 private:
-
     enum {MAXITEMS = 16};
     QList<EPushButton*> cellsP;
     QList<ImagePushButton*> cellsI;

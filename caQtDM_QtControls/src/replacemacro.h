@@ -121,6 +121,10 @@ public:
     void setAlarmColors(short status);
     void setNormalColors();
 
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
 public slots:
     void setIndex(double value);

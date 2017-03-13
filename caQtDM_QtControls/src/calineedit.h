@@ -76,7 +76,6 @@ class QTCON_EXPORT caLineEdit : public QLineEdit, public FontScalingWidget
     Q_OBJECT
 
 public:
-
     void noStyle(QString style) {Q_UNUSED(style);}
 
     caLineEdit( QWidget *parent = 0 );
@@ -150,6 +149,11 @@ public:
 
     void setValueType(bool isvalue);
     void setFromTextEntry();
+
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
 private slots:
     void rescaleFont(const QString& newText);

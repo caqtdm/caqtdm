@@ -84,7 +84,13 @@ public:
     void setPrecision(int prec) {thisPrecision = prec;}
 
 public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
+
+public slots:
     void setValue(double value);
+    void setValue(QRect value);
 
 private:
     QString thisChannelA, thisChannelB, thisChannelC, thisChannelD, thisVariable;
