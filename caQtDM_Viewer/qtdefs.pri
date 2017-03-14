@@ -172,6 +172,16 @@ DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
+# 4.1.5 of 14.3.17
+# added possibility to modify position and size of a control object by the function %QREct in caCalc using 1 to 4 channels
+# loading of files through internet now also over https
+# again compatible with Qt4.6
+# cachoice bug when using bit offset corrected
+# legend added to cacartesianplot
+# calineargauge and cacirculargauge modifier in indor to be smaller and changed font algorithme.
+# added possibility to have another http address for archiveSF
+# added test to indicate that waveforms are not supported by the archive plugins.
+
 # 4.1.5
 # archive plugins added
 # epics4 plugin finalized for normative types, thanks to Marty Kraimer
