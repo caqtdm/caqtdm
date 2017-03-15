@@ -172,8 +172,9 @@ DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
-# 4.1.5 of 14.3.17
-# added possibility to modify position and size of a control object by the function %QREct in caCalc using 1 to 4 channels
+# 4.1.5 of 15.3.17
+# added horizontal and vertical spacing properties to caInclude
+# added possibility to modify position and size of a control object by the function %QRect in caCalc using 1 to 4 channels
 # loading of files through internet now also over https
 # again compatible with Qt4.6
 # cachoice bug when using bit offset corrected
