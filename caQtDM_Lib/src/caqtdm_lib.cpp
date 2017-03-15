@@ -1830,6 +1830,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         int row = 0;
         int maxColumns=0;
         int column = 0;
+        int spacingHorizontal = includeWidget->getSpacingHorizontal();
+        int spacingVertical = includeWidget->getSpacingVertical();
         w1->setProperty("ObjectType", caInclude_Widget);
 
         QWidget *thisW = (QWidget *) 0;
@@ -1840,7 +1842,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         QGridLayout *layout = new QGridLayout;
         layout->setContentsMargins(0,0,0,0);
         layout->setMargin(0);
-        layout->setSpacing(0);
+        layout->setVerticalSpacing(spacingVertical);
+        layout->setHorizontalSpacing(spacingHorizontal);
 
         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
 
@@ -2052,12 +2055,18 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         } // end for
 
         if((thisW != (QWidget *) 0 ) && (!prcFile) && includeWidget->getAdjustSize()) {
-            includeWidget->resize(maxColumns * thisW->width(), maxRows * thisW->height());
+            //includeWidget->resize(maxColumns * (thisW->width()+spacingHorizontal), maxRows * (thisW->height()+spacingVertical));
+
+            includeWidget->resize(maxColumns * thisW->width() + (maxColumns-1) * spacingHorizontal,
+                                  maxRows * thisW->height() + (maxRows-1) * spacingVertical);
+
             // when the include is packed into a scroll area, set the minimumsize too
             if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
                 Q_UNUSED(scrollWidget);
                 QWidget *contents = (QWidget*) includeWidget->parent();
-                contents->setMinimumSize(maxColumns * thisW->width(), maxRows * thisW->height());
+                //contents->setMinimumSize(maxColumns * (thisW->width()+spacingHorizontal), maxRows * (thisW->height()+spacingVertical));
+                contents->setMinimumSize(maxColumns * thisW->width() + (maxColumns-1) * spacingHorizontal,
+                                      maxRows * thisW->height() + (maxRows-1) * spacingVertical);
             }
         }
 

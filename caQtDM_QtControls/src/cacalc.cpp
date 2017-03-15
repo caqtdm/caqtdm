@@ -87,7 +87,7 @@ void caCalc::setValue(double value)
 
 void caCalc::setValue(QRect value)
 {
-    setTextLine("position");
+    setTextLine("QRect=ok");
 
     // emit signal when requested
     if(thisEventSignal == onFirstChange) {

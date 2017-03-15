@@ -42,6 +42,7 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
     thisMaxColumns = 1;
     thisStacking = Row;
     thisAdjust = prvAdjust= true;
+    thisSpacingVertical = thisSpacingHorizontal=0;
     setBackground(Qt::black);
     setVisibility(StaticV);
     gridLayout = new QGridLayout;
@@ -171,7 +172,8 @@ void caInclude::setFileName(QString const &filename)
         }
 
         // modify stacking
-        if(thisStacking != prvStacking || thisMaxLines != prvMaxLines || thisMaxColumns != prvMaxColumns || thisAdjust != prvAdjust) {
+        if(thisStacking != prvStacking || thisMaxLines != prvMaxLines || thisMaxColumns != prvMaxColumns || thisAdjust != prvAdjust ||
+           thisSpacingHorizontal != prvSpacingHorizontal || thisSpacingVertical != prvSpacingVertical) {
             if(thisLoadedWidgets.count() > 0) {
                 //printf("modify stacking with %d items\n", thisLoadedWidgets.count());
                 int j = 0;
@@ -183,7 +185,8 @@ void caInclude::setFileName(QString const &filename)
                 gridLayout = new QGridLayout;
                 setLayout(gridLayout);
                 gridLayout->setMargin(0);
-                gridLayout->setSpacing(0);
+                gridLayout->setVerticalSpacing(thisSpacingVertical);
+                gridLayout->setHorizontalSpacing(thisSpacingHorizontal);
                 foreach(QWidget *l, thisLoadedWidgets) {
                     // find the row, column to add this widget
                     if(thisStacking == Row) {
@@ -222,8 +225,11 @@ void caInclude::setFileName(QString const &filename)
                 prvStacking = thisStacking;
                 prvMaxLines = thisMaxLines;
                 prvMaxColumns = thisMaxColumns;
+                prvSpacingHorizontal = thisSpacingHorizontal;
+                prvSpacingVertical = thisSpacingVertical;
                 //printf("resize 1 for row=%d column=%d\n", maxRows, maxColumns);
-                if(thisAdjust) resize(maxColumns * effectiveSize.width(), maxRows * effectiveSize.height());
+                if(thisAdjust) resize(maxColumns * effectiveSize.width() + (maxColumns-1) * thisSpacingHorizontal,
+                                      maxRows * effectiveSize.height() + (maxRows-1) * thisSpacingVertical);
                 prvAdjust = thisAdjust;
                 return;
             }
@@ -335,13 +341,16 @@ void caInclude::setFileName(QString const &filename)
         }
 
         //printf("resize 2 for row=%d column=%d\n", maxRows, maxColumns);
-        if(thisAdjust) resize(maxColumns * effectiveSize.width(), maxRows * effectiveSize.height());
+        if(thisAdjust) resize(maxColumns * effectiveSize.width() + (maxColumns-1) * thisSpacingHorizontal,
+                              maxRows * effectiveSize.height() + (maxRows-1) * thisSpacingVertical);
         prvAdjust = thisAdjust;
 
         prvFileName = newFileName;
         prvStacking = thisStacking;
         prvItemCount = thisItemCount;
         prvMaxLines = thisMaxLines;
+        prvSpacingHorizontal = thisSpacingHorizontal;
+        prvSpacingVertical = thisSpacingVertical;
     }
 }
 

@@ -52,6 +52,8 @@ class  QTCON_EXPORT caInclude : public QWidget
     Q_PROPERTY(int maximumColumns READ getMaxColumns WRITE setMaxColumns DESIGNABLE isPropertyVisible(maximumColumns))
     Q_ENUMS(Stacking)
     Q_PROPERTY(bool adjustSizeToContents READ getAdjustSize WRITE setAdjustSize)
+    Q_PROPERTY(int verticalSpacing READ getSpacingVertical WRITE setSpacingVertical)
+    Q_PROPERTY(int horizontalSpacing READ getSpacingHorizontal WRITE setSpacingHorizontal)
 
     // this will prevent user interference
      Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
@@ -81,6 +83,11 @@ public:
 
     int getMaxColumns() const { return thisMaxColumns;}
     void setMaxColumns(int count) {if(count > 0) thisMaxColumns = count; else thisMaxColumns=1; setFileName(newFileName); prvMaxColumns = thisMaxColumns;}
+
+    int getSpacingVertical() const {return thisSpacingVertical;}
+    int getSpacingHorizontal() const {return thisSpacingHorizontal;}
+    void setSpacingVertical(int spacing) {thisSpacingVertical = spacing; setAdjustSize(thisAdjust); prvSpacingVertical = thisSpacingVertical;}
+    void setSpacingHorizontal(int spacing) {thisSpacingHorizontal = spacing; setAdjustSize(thisAdjust); prvSpacingHorizontal = thisSpacingHorizontal;}
 
     caInclude( QWidget *parent = 0 );
     ~caInclude();
@@ -129,6 +136,8 @@ private:
     int thisMaxColumns, prvMaxColumns;
     QSize effectiveSize;
     bool thisAdjust, prvAdjust;
+    int thisSpacingVertical, thisSpacingHorizontal;
+    int prvSpacingVertical, prvSpacingHorizontal;
 
 #ifdef PRC
     ParsePepFile *pepfile;
