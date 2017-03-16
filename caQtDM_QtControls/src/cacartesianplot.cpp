@@ -571,22 +571,22 @@ void caCartesianPlot::setSamplesData(int index, double *x, double *y, int size, 
 
     // use auxiliary arrays, in order not to overwrite the original data
     if((thisXtype == log10) || (thisYtype == log10)) {
-        XAUX.resize(size);
-        YAUX.resize(size);
-        memcpy(XAUX.data(), x, size*sizeof(double));
-        memcpy(YAUX.data(), y, size*sizeof(double));
+        XAUX[index].resize(size);
+        YAUX[index].resize(size);
+        memcpy(XAUX[index].data(), x, size*sizeof(double));
+        memcpy(YAUX[index].data(), y, size*sizeof(double));
 
         if(thisXtype == log10) {
             for(int i=0; i< size; i++) {
-                if(x[i] <= lowX)  XAUX[i] = lowX;
+                if(x[i] <= lowX)  XAUX[index][i] = lowX;
             }
         }
         if(thisYtype == log10) {
             for(int i=0; i< size; i++) {
-                if(y[i] < lowY) YAUX[i] = lowY;
+                if(y[i] < lowY) YAUX[index][i] = lowY;
             }
         }
-        curve[index].setRawSamples(XAUX.data(), YAUX.data(), size);
+        curve[index].setRawSamples(XAUX[index].data(), YAUX[index].data(), size);
     }
     else {
         curve[index].setRawSamples(x, y, size);

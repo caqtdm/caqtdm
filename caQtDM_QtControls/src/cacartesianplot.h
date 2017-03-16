@@ -437,7 +437,7 @@ private:
 
     QVarLengthArray<double> X[curveCount], XSAVE[curveCount];
     QVarLengthArray<double> Y[curveCount], YSAVE[curveCount];
-    QVarLengthArray<double> XAUX, YAUX;
+    QVarLengthArray<double> XAUX[curveCount], YAUX[curveCount];
 
     QVarLengthArray<double> accumulX[curveCount];
     QVarLengthArray<double> accumulY[curveCount];
