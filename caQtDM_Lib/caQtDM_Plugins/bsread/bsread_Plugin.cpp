@@ -182,6 +182,9 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
 
 // caQtDM_Lib will call this routine for defining a monitor
 int bsreadPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
+    Q_UNUSED(index);
+    Q_UNUSED(rate);
+    Q_UNUSED(skip);
 
     int i;
     QMutexLocker locker(&mutex);
@@ -229,6 +232,10 @@ int bsreadPlugin::pvFreeAllocatedData(knobData *kData)
 
 // caQtDM_Lib will call this routine for setting data (see for more detail the epics3 plugin)
 int bsreadPlugin::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType) {
+    Q_UNUSED(forceType);
+    Q_UNUSED(errmess);
+    Q_UNUSED(object);
+
     QMutexLocker locker(&mutex);
     qDebug() << "bsreadPlugin:pvSetValue" << pv << rdata << idata << sdata;
     return false;
@@ -236,6 +243,16 @@ int bsreadPlugin::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata,
 
 // caQtDM_Lib will call this routine for setting waveforms data (see for more detail the epics3 plugin)
 int bsreadPlugin::pvSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess) {
+    Q_UNUSED(pv);
+    Q_UNUSED(fdata);
+    Q_UNUSED(ddata);
+    Q_UNUSED(data16);
+    Q_UNUSED(data32);
+    Q_UNUSED(sdata);
+    Q_UNUSED(nelm);
+    Q_UNUSED(object);
+    Q_UNUSED(errmess);
+
     QMutexLocker locker(&mutex);
     qDebug() << "bsreadPlugin:pvSetWave";
     return false;
@@ -243,6 +260,7 @@ int bsreadPlugin::pvSetWave(char *pv, float *fdata, double *ddata, int16_t *data
 
 // caQtDM_Lib will call this routine for getting a description of the monitor
 int bsreadPlugin::pvGetTimeStamp(char *pv, char *timestamp) {
+    Q_UNUSED(pv);
     qDebug() << "bsreadPlugin:pvgetTimeStamp";
     strcpy(timestamp, "timestamp in epics format");
     return true;
@@ -250,6 +268,7 @@ int bsreadPlugin::pvGetTimeStamp(char *pv, char *timestamp) {
 
 // caQtDM_Lib will call this routine for getting the timestamp for this monitor
 int bsreadPlugin::pvGetDescription(char *pv, char *description) {
+    Q_UNUSED(pv);
     qDebug() << "bsreadPlugin:pvGetDescription";
     strcpy(description, "no Description available BSREAD data transfer");
     return true;
@@ -257,22 +276,26 @@ int bsreadPlugin::pvGetDescription(char *pv, char *description) {
 
 // next routines are used to stop and restart the dataacquisition (used in case of tabWidgets in the display)
 int bsreadPlugin::pvClearEvent(void * ptr) {
+    Q_UNUSED(ptr);
     qDebug() << "bsreadPlugin:pvClearEvent";
     return true;
 }
 
 int bsreadPlugin::pvAddEvent(void * ptr) {
+    Q_UNUSED(ptr);
     qDebug() << "bsreadPlugin:pvAddEvent";
     return true;
 }
 
 // next routines are used to Connect and disconnect monitors
 int bsreadPlugin::pvReconnect(knobData *kData) {
+     Q_UNUSED(kData);
     qDebug() << "bsreadPlugin:pvReconnect";
     return true;
 }
 
 int bsreadPlugin::pvDisconnect(knobData *kData) {
+    Q_UNUSED(kData);
     qDebug() << "bsreadPlugin:pvDisconnect";
     return true;
 }

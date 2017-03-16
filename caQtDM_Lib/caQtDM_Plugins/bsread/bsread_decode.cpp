@@ -573,7 +573,7 @@ void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message,size_t
                 }
                 if (size<(datasize*datatypesize)){
                     memcpy(Data->bsdata.wf_data,message,size);
-                    Data->bsdata.wf_data_size=(size/datatypesize);
+                    Data->bsdata.wf_data_size=(ulong)(size/datatypesize);
                 }else{
                     memcpy(Data->bsdata.wf_data,message,datasize*datatypesize);
                     Data->bsdata.wf_data_size=datasize;
