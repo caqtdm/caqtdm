@@ -59,8 +59,8 @@ caLinearGauge::caLinearGauge(QWidget *parent, Qt::Orientation o) : caAbstractGau
 
 void caLinearGauge::configure()
 {
-    int longSide = 15;
-    int shortSide = 15;
+    int longSide = 10;
+    int shortSide = 10;
 
     if (m_orientation == Qt::Horizontal) {
         if (m_scaleEnabled)
@@ -95,8 +95,12 @@ void caLinearGauge::paintEvent(QPaintEvent *)
     int size, w, h;
     QFontMetrics fm(painter.font());
 
-    h = fm.height()+2;
-    w = fm.width(labels[longestLabelIndex])+2;
+    if (m_scaleEnabled) {
+        h = fm.height()+2;
+        w = fm.width(labels[longestLabelIndex])+2;
+    } else {
+        h=w=10;
+    }
 
     if (m_orientation == Qt::Horizontal) {
         size = qMin((int)(width()*totalSize/100.0), height());
@@ -108,11 +112,12 @@ void caLinearGauge::paintEvent(QPaintEvent *)
 
     if (m_orientation == Qt::Horizontal) {
         painter.setViewport((int)((width()-size*100.0/totalSize)*.5),(int)((height()-size)*.5), (int)(size*100.0/totalSize), size);
-        painter.setWindow((int)(-w*.5), 0, 100+w, totalSize+2); /* border */
+        painter.setWindow((int)(-w*.5), 0, 100+w, totalSize+2); // border
     } else {
         painter.setViewport((int)((width()-size)*.5),(int)((height()-size*100.0/totalSize)*.5), size, (int)(size*100.0/totalSize));
-        painter.setWindow(-2, (int)(-h*.5), totalSize+2, 100+h); /* border */
+        painter.setWindow(-2, (int)(-h*.5), totalSize+2, 100+h); // border
     }
+
     painter.setViewport(0,0, width(), height()); // A.Mezger I do not like above behaviour when resizing
 
     drawColorBar(&painter);
