@@ -1061,13 +1061,13 @@ void caCartesianPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 
 
 #if QWT_VERSION < 0x060100
-    for(i=0; i < NumberOfCurves; i++) {
+    for(i=0; i < curveCount; i++) {
 
         if(f.pointSizeF() <= 4.0) {
-            curve[i]->setItemAttribute(QwtPlotItem::Legend, false);
+            curve[i].setItemAttribute(QwtPlotItem::Legend, false);
             continue;
         } else {
-            curve[i]->setItemAttribute(QwtPlotItem::Legend, true);
+            curve[i].setItemAttribute(QwtPlotItem::Legend, true);
         }
 
         switch (SW) {
