@@ -638,5 +638,8 @@ void bsread_dispatchercontrol::finishVerification()
 
     if (msg.contains("exception")){
         messagewindowP->postMsgEvent(QtCriticalMsg,(char*) msg.toLatin1().constData());
+        // Request all channels we have, and see what will come
+        ChannelsApprovePipeline+=ChannelsToBeApprovePipeline;
+        ChannelsToBeApprovePipeline.clear();
     }
 }
