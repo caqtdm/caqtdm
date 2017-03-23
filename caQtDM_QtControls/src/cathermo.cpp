@@ -122,7 +122,7 @@ void caThermo::setColors(QColor bg, QColor fg, QColor textColor)
             if(thisStyle != oldStyle) setStyleSheet(thisStyle);
             oldStyle = thisStyle;
             QColor bgs = defaultBackColor.darker(125);
-            bgs.setAlpha(255);
+            bgs.setAlpha(bg.alpha());
             thisPalette.setColor(QPalette::ButtonText, defaultForeColor);
             thisPalette.setColor(QPalette::Text, textColor);
             thisPalette.setColor(QPalette::Base, bgs);
@@ -133,7 +133,7 @@ void caThermo::setColors(QColor bg, QColor fg, QColor textColor)
             if(thisStyle != oldStyle) setStyleSheet(thisStyle);
             oldStyle = thisStyle;
             QColor bgs = bg.darker(125);
-            bgs.setAlpha(255);
+            bgs.setAlpha(bg.alpha());
             thisPalette.setColor(QPalette::ButtonText, fg);
             thisPalette.setColor(QPalette::Text, textColor);
             thisPalette.setColor(QPalette::Base, bgs);
@@ -145,7 +145,7 @@ void caThermo::setColors(QColor bg, QColor fg, QColor textColor)
             if(thisStyle != oldStyle) setStyleSheet(thisStyle);
             oldStyle = thisStyle;
             QColor bgs = bg.darker(125);
-            bgs.setAlpha(255);
+            bgs.setAlpha(bg.alpha());
             thisPalette.setColor(QPalette::ButtonText, fg);
             thisPalette.setColor(QPalette::Text, textColor);
             thisPalette.setColor(QPalette::Base, bgs);
@@ -157,7 +157,7 @@ void caThermo::setColors(QColor bg, QColor fg, QColor textColor)
             if(thisStyle != oldStyle) setStyleSheet(thisStyle);
             oldStyle = thisStyle;
             QColor bgs = defaultBackColor.darker(125);
-            bgs.setAlpha(255);
+            bgs.setAlpha(bg.alpha());
             thisPalette.setColor(QPalette::ButtonText, fg);
             thisPalette.setColor(QPalette::Text, textColor);
             thisPalette.setColor(QPalette::Base, bgs);
@@ -299,6 +299,8 @@ void caThermo::setAlarmColors(short status)
         c=AL_DEFAULT;
         break;
     }
+
+    thisForeColor=c;
     if(status == NOTCONNECTED) {
        setColors(c, c, c);
     } else {
@@ -368,7 +370,7 @@ bool caThermo::event(QEvent *e)
             switch (thisDirection) {
             case Up:
             case Down: {
-                int pipewidth = width()-4;
+                int pipewidth = width();
                 if(pipewidth != this->pipeWidth()) {
                     this->setPipeWidth(pipewidth);
                 }
@@ -377,7 +379,7 @@ bool caThermo::event(QEvent *e)
 
             case Right:
             case Left: {
-                int pipewidth = height() -4;
+                int pipewidth = height();
                 if(pipewidth != this->pipeWidth()) {
                     this->setPipeWidth(pipewidth);
                 }

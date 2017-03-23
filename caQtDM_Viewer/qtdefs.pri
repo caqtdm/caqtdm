@@ -172,6 +172,12 @@ DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
+# 4.1.5 of 23.3.17
+# calineargauge made correct size when no scale (in order to make all sizes the same)
+# for caRelatedDisplay one can now set the position for the called window
+# for caThermo a problem solved in case of alarm colors (not always refreshed with right color) and transparency added for background
+# for caThermo offset of 4 pixels modified in case of noscale
+
 # 4.1.5 of 15.3.17
 # added horizontal and vertical spacing properties to caInclude
 # added possibility to modify position and size of a control object by the function %QRect in caCalc using 1 to 4 channels

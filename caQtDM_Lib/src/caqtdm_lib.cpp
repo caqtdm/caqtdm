@@ -2055,8 +2055,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         } // end for
 
         if((thisW != (QWidget *) 0 ) && (!prcFile) && includeWidget->getAdjustSize()) {
-            //includeWidget->resize(maxColumns * (thisW->width()+spacingHorizontal), maxRows * (thisW->height()+spacingVertical));
-
             includeWidget->resize(maxColumns * thisW->width() + (maxColumns-1) * spacingHorizontal,
                                   maxRows * thisW->height() + (maxRows-1) * spacingVertical);
 
@@ -2656,6 +2654,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         connect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
         w1->setProperty("Connect", false);
     }
+
 }
 
 /**
@@ -5217,6 +5216,13 @@ void CaQtDM_Lib::Callback_RelatedDisplayClicked(int indx)
         } else {
             // in case we do not remove the parent let the window manager position the new window
             geometry = "";
+            // however it is possible that the user wanted a fixed position
+            if((w->getPosition().x() != -1) || w->getPosition().y() != -1) {
+                if(w->getPosition().x() < 0) xpos = 0; else xpos= w->getPosition().x();
+                if(w->getPosition().y() < 0) ypos = 0; else ypos = w->getPosition().y();
+                geometry = "+%1+%2";
+                geometry = geometry.arg(xpos).arg(ypos);
+            }
         }
     }
 
