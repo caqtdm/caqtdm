@@ -35,6 +35,7 @@
 #include "qwt_scale_map.h"
 #include "qwt_scale_draw.h"
 #include "cathermo.h"
+//#include <QMetaEnum>
 
 #define MIN_FONT_SIZE 3
 #define MAX_FONT_SIZE 20
@@ -64,8 +65,6 @@ caThermo::caThermo(QWidget *parent) : QwtThermoMarker(parent), m_externalEnabled
     setStyleSheet("");
 
     isShown = false;
-    oldStyle = "";
-    thisStyle = "";
 
     thisDirection = Up;
     thisColorMode = Static;
@@ -73,7 +72,13 @@ caThermo::caThermo(QWidget *parent) : QwtThermoMarker(parent), m_externalEnabled
 
     oldBackColor = QColor(Qt::white);
     oldForeColor = QColor(Qt::white);
+    oldColorMode = Default;
 
+    // these default could be changed by a stylesheet
+    defaultForeColor = QColor(Qt::darkRed);
+    defaultBackColor = QColor(Qt::lightGray);
+
+    setAutoFillBackground( true );
     setBackground(QColor(224,224,224));
     setForeground(Qt::black);
     setTextColor(Qt::black);
@@ -106,87 +111,84 @@ void caThermo::setPV(QString const &newPV)
     thisPV = newPV;
 }
 
-void caThermo::setColors(QColor bg, QColor fg, QColor textColor)
+void caThermo::setColors(QColor bg, QColor fg, QColor textColor, colMode mode)
 {
-    if(!defaultBackColor.isValid() || !defaultForeColor.isValid()) return;
 
-    if((bg != oldBackColor) || (fg != oldForeColor)  || (textColor != oldTextColor) || (thisColorMode != oldColorMode)) {
+    if((bg != oldBackColor) || (fg != oldForeColor)  || (textColor != oldTextColor) || (mode != oldColorMode)) {
 
         QPalette thisPalette = palette();
 
-        QString thisStyle = "caThermo {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8)};";
-
         if(thisColorMode == Default) {
-            thisStyle = thisStyle.arg(defaultBackColor.red()).arg(defaultBackColor.green()).arg(defaultBackColor.blue()).arg(defaultBackColor.alpha()).
-                    arg(defaultForeColor.red()).arg(defaultForeColor.green()).arg(defaultForeColor.blue()).arg(defaultForeColor.alpha());
-            if(thisStyle != oldStyle) setStyleSheet(thisStyle);
-            oldStyle = thisStyle;
+            if(!defaultBackColor.isValid() || !defaultForeColor.isValid()) return;
             QColor bgs = defaultBackColor.darker(125);
             bgs.setAlpha(bg.alpha());
+            //printf("default palette %d %d %d\n", fg.red(), fg.green(), fg.blue());
             thisPalette.setColor(QPalette::ButtonText, defaultForeColor);
             thisPalette.setColor(QPalette::Text, textColor);
+            thisPalette.setColor(QPalette::WindowText, textColor);
+            thisPalette.setColor(QPalette::Window, bg);
             thisPalette.setColor(QPalette::Base, bgs);
 
             setPalette(thisPalette);
         } else if(thisColorMode == Static) {
-            thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
-            if(thisStyle != oldStyle) setStyleSheet(thisStyle);
-            oldStyle = thisStyle;
             QColor bgs = bg.darker(125);
             bgs.setAlpha(bg.alpha());
+            //printf("static set palette fg  %d %d %d\n", fg.red(), fg.green(), fg.blue());
+            //printf("static set palette bg  %d %d %d\n", bgs.red(), bgs.green(), bgs.blue());
+            //printf("static set palette txt %d %d %d\n", textColor.red(), textColor.green(), textColor.blue());
             thisPalette.setColor(QPalette::ButtonText, fg);
             thisPalette.setColor(QPalette::Text, textColor);
+            thisPalette.setColor(QPalette::WindowText, textColor);
+            thisPalette.setColor(QPalette::Window, bg);
             thisPalette.setColor(QPalette::Base, bgs);
             setPalette(thisPalette);
 
         } else if(thisColorMode == Alarm_Static) {
-            thisStyle = thisStyle.arg(thisBackColor.red()).arg(thisBackColor.green()).arg(thisBackColor.blue()).arg(thisBackColor.alpha()).
-                    arg(thisForeColor.red()).arg(thisForeColor.green()).arg(thisForeColor.blue()).arg(thisForeColor.alpha());
-            if(thisStyle != oldStyle) setStyleSheet(thisStyle);
-            oldStyle = thisStyle;
             QColor bgs = bg.darker(125);
             bgs.setAlpha(bg.alpha());
+            //printf("alarm_static set palette %d %d %d\n", fg.red(), fg.green(), fg.blue());
             thisPalette.setColor(QPalette::ButtonText, fg);
             thisPalette.setColor(QPalette::Text, textColor);
+            thisPalette.setColor(QPalette::WindowText, textColor);
+            thisPalette.setColor(QPalette::Window, bg);
             thisPalette.setColor(QPalette::Base, bgs);
             setPalette(thisPalette);
 
         } else  if(thisColorMode == Alarm_Default) {
-            thisStyle = thisStyle.arg(defaultBackColor.red()).arg(defaultBackColor.green()).arg(defaultBackColor.blue()).arg(defaultBackColor.alpha()).
-                    arg(defaultForeColor.red()).arg(defaultForeColor.green()).arg(defaultForeColor.blue()).arg(defaultForeColor.alpha());
-            if(thisStyle != oldStyle) setStyleSheet(thisStyle);
-            oldStyle = thisStyle;
+            if(!defaultBackColor.isValid() || !defaultForeColor.isValid()) return;
             QColor bgs = defaultBackColor.darker(125);
             bgs.setAlpha(bg.alpha());
+            //printf("default palette %d %d %d\n", fg.red(), fg.green(), fg.blue());
             thisPalette.setColor(QPalette::ButtonText, fg);
             thisPalette.setColor(QPalette::Text, textColor);
+            thisPalette.setColor(QPalette::WindowText, textColor);
+            thisPalette.setColor(QPalette::Window, bg);
             thisPalette.setColor(QPalette::Base, bgs);
-            setPalette(thisPalette);
         }
     }
 
     oldBackColor = bg;
     oldForeColor = fg;
     oldTextColor = textColor;
-    oldColorMode = thisColorMode;
+    oldColorMode = mode;
 }
 
 void caThermo::setBackground(QColor c)
 {
     thisBackColor = c;
-    setColors(thisBackColor, thisForeColor, thisTextColor);
+    setColors(thisBackColor, thisForeColor, thisTextColor, thisColorMode);
 }
 
 void caThermo::setForeground(QColor c)
 {
     thisForeColor = c;
-    setColors(thisBackColor, thisForeColor, thisTextColor);
+    setColors(thisBackColor, thisForeColor, thisTextColor, thisColorMode);
 }
 
 void caThermo::setTextColor(QColor c)
 {
     thisTextColor = c;
-    setColors(thisBackColor, thisForeColor, thisTextColor);
+    setColors(thisBackColor, thisForeColor, thisTextColor, thisColorMode);
 }
 
 void caThermo::setLook(Look look)
@@ -300,17 +302,16 @@ void caThermo::setAlarmColors(short status)
         break;
     }
 
-    thisForeColor=c;
     if(status == NOTCONNECTED) {
-       setColors(c, c, c);
+       setColors(c, c, c, thisColorMode);
     } else {
-       setColors(thisBackColor, c, thisTextColor);
+       setColors(thisBackColor, c, thisTextColor, thisColorMode);
     }
 }
 
 void caThermo::setNormalColors()
 {
-    setColors(thisBackColor, thisForeColor, thisTextColor);
+    setColors(thisBackColor, thisForeColor, thisTextColor, thisColorMode);
 }
 
 void caThermo::setUserAlarmColors(double val)
@@ -327,27 +328,26 @@ void caThermo::setUserAlarmColors(double val)
     case Up:
     case Right:
         if((thisValue < this->minValue()) || (thisValue > this->maxValue())) {
-           setColors(thisBackColor, AL_RED, thisTextColor);
+           setColors(thisBackColor, AL_RED, thisTextColor, thisColorMode);
         } else {
-           setColors(thisBackColor, AL_GREEN, thisTextColor);
+           setColors(thisBackColor, AL_GREEN, thisTextColor, thisColorMode);
         }
         break;
     case Down:
     case Left:
         if((thisValue < this->maxValue()) || (thisValue > this->minValue())) {
-           setColors(thisBackColor, AL_RED, thisTextColor);
+           setColors(thisBackColor, AL_RED, thisTextColor, thisColorMode);
         } else {
-           setColors(thisBackColor, AL_GREEN, thisTextColor);
+           setColors(thisBackColor, AL_GREEN, thisTextColor, thisColorMode);
         }
         break;
     }
 }
 
-
 // here we adapt the scale font size and the handle size to the size of the widget
 bool caThermo::event(QEvent *e)
 {
-    if(e->type() == QEvent::Resize || e->type() == QEvent::Show || e->type() == QEvent::Paint) {
+    if (e->type() == QEvent::StyleChange) {
 
         if(!isShown) {
             QString c=  palette().color(QPalette::Base).name();
@@ -355,12 +355,17 @@ bool caThermo::event(QEvent *e)
             c =  palette().color(QPalette::Text).name();
             defaultForeColor = QColor(c);
 
+            //printf("default fore color %d %d %d valid=%d\n", defaultForeColor.red(), defaultForeColor.green(), defaultForeColor.blue(), defaultForeColor.isValid());
+            //printf("default back color %d %d %d valid=%d\n", defaultBackColor.red(), defaultBackColor.green(), defaultBackColor.blue(), defaultBackColor.isValid());
+
             if(!defaultBackColor.isValid()) defaultBackColor = QColor(255, 248, 220, 255);
             if(!defaultForeColor.isValid()) defaultForeColor = Qt::black;
 
-            setColors(thisBackColor, thisForeColor, thisTextColor);
+            setColors(thisBackColor, thisForeColor, thisTextColor, thisColorMode);
             isShown = true;
         }
+
+    } else if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
 
         const caThermo* that = this;
 
@@ -393,54 +398,54 @@ bool caThermo::event(QEvent *e)
         case  true:
             switch (thisDirection) {
 
-                case Up:
-                case Down: {
-                    int pipewidth = width()*2/5-4;
-                    if(pipewidth != this->pipeWidth()) {
-                        this->setPipeWidth(pipewidth);
-                    }
-                    QFont f = font();
-                    int size = that->scaleDraw()->maxLabelWidth(f);
-                    float xFactor = (float) size  / ((float) width() * 3.0/5.0 - 15.0);
-
-                    if(xFactor < 0.1) break;
-
-                    float pointSize = f.pointSizeF() / xFactor;
-                    if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
-                    if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;
-
-                    if(qAbs(pointSize - pointSizePrv) >= 2.0) {
-                        f.setPointSizeF(pointSize);
-                        pointSizePrv = pointSize;
-                        setFont(f);
-                        update();
-                    }
+            case Up:
+            case Down: {
+                int pipewidth = width()*2/5-4;
+                if(pipewidth != this->pipeWidth()) {
+                    this->setPipeWidth(pipewidth);
                 }
+                QFont f = font();
+                int size = that->scaleDraw()->maxLabelWidth(f);
+                float xFactor = (float) size  / ((float) width() * 3.0/5.0 - 15.0);
+
+                if(xFactor < 0.1) break;
+
+                float pointSize = f.pointSizeF() / xFactor;
+                if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
+                if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;
+
+                if(qAbs(pointSize - pointSizePrv) >= 2.0) {
+                    f.setPointSizeF(pointSize);
+                    pointSizePrv = pointSize;
+                    setFont(f);
+                    update();
+                }
+            }
                 break;
 
-                case Right:
-                case Left: {
-                   int pipewidth = height()*2/5-4;
-                   if(pipewidth != this->pipeWidth()) {
-                       this->setPipeWidth(pipewidth);
-                   }
-                   QFont f = font();
-                   int size = that->scaleDraw()->maxLabelWidth(f);
-                   float yFactor = (float) size  / ((float) height()*3.0/5.0 - 10.0);
-
-                   if(yFactor < 0.1) break;
-
-                   float pointSize = f.pointSizeF() / yFactor;
-                   if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
-                   if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;
-
-                   if(qAbs(pointSize - pointSizePrv) >= 2.0) {
-                       f.setPointSizeF(pointSize);
-                       pointSizePrv = pointSize;
-                       setFont(f);
-                       update();
-                   }
+            case Right:
+            case Left: {
+                int pipewidth = height()*2/5-4;
+                if(pipewidth != this->pipeWidth()) {
+                    this->setPipeWidth(pipewidth);
                 }
+                QFont f = font();
+                int size = that->scaleDraw()->maxLabelWidth(f);
+                float yFactor = (float) size  / ((float) height()*3.0/5.0 - 10.0);
+
+                if(yFactor < 0.1) break;
+
+                float pointSize = f.pointSizeF() / yFactor;
+                if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
+                if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;
+
+                if(qAbs(pointSize - pointSizePrv) >= 2.0) {
+                    f.setPointSizeF(pointSize);
+                    pointSizePrv = pointSize;
+                    setFont(f);
+                    update();
+                }
+            }
                 break;
             }
 
