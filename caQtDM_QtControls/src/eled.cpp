@@ -42,6 +42,11 @@ ELed::ELed(QWidget *parent) : QWidget(parent), ledColor(Qt::gray)
     d_gradientStart = 0.10;
     d_gradientStop = 0.95;
     d_alphaChannel = 255;
+
+    QSizePolicy p(sizePolicy());
+    p.setHeightForWidth(true);
+    setSizePolicy(p);
+    setBorderColor(Qt::black);
     return;
 }
 
@@ -55,64 +60,93 @@ void ELed::setColor(const QColor &c, bool up)
     ledColor.setAlpha(d_alphaChannel);
     if (up)
         update();
-};
+}
+
+void ELed::setBorderColor(const QColor &c)
+{
+    borderColor = c;
+    update();
+}
 
 void ELed::paintEvent(QPaintEvent *)
 {
     QPainter	painter(this);
     QMatrix m;
     int ledWidth, ledHeight;
-    d_scaleContents ? ledWidth = width() - 2 : ledWidth = d_width;
-    d_scaleContents ? ledHeight = height() - 2: ledHeight = d_height;
-    // 	painter.rotate(d_angleDeg);
+    int w, h, w1, h1;
+
+    // in case of a gradient, we will have to keep the correct aspect ratio
+    if(d_gradientEnabled) {
+        w = h = qMin(d_width, d_height);
+        w1 = h1 = qMin(width() - 2, height() - 2);
+    } else {
+        w = d_width;
+        h = d_height;
+        w1 = width() - 2;
+        h1 = height() - 2;
+    }
+
+    d_scaleContents ? ledWidth = w1: ledWidth = w;
+    d_scaleContents ? ledHeight = h1: ledHeight = h;
+
+    //painter.rotate(d_angleDeg);
     qreal		radius  = .45 * qMin(ledWidth, ledHeight);
     qreal x1, y1;
     x1 = width()/2.0 - ledWidth/2.0;
     y1 = height()/2.0 - ledHeight/2.0;
 
-    QPointF  topLeft(x1, y1);
+    //QPointF  topLeft(x1, y1);
     QRect rect((int)x1, (int)y1, ledWidth, ledHeight);
-    QPointF center(rect.center());
+    //QPointF center(rect.center());
 
     if(!d_linearGradient && d_gradientEnabled)
     {
         QRadialGradient	gradient(.5 * width(), .5 * height(), radius, .5 * (width() - radius), .5 * (height() - radius));
         gradient.setColorAt(d_gradientStart, QColor(Qt::white));
-        if (isEnabled())
+        if (isEnabled()) {
             gradient.setColorAt(d_gradientStop, ledColor);
-        else
+        } else {
             gradient.setColorAt(d_gradientStop, QColor(Qt::gray));
-        gradient.setColorAt(1, QColor(Qt::black));
+        }
+
+        QColor color( 200,200,200,50);
+        gradient.setColorAt(1, borderColor); //QColor(Qt::black));
+        painter.setPen(borderColor);
         painter.setBrush(gradient);
     }
     else if(d_gradientEnabled && d_linearGradient)
     {
         QLinearGradient	gradient(rect.topLeft(), rect.bottomRight());
         gradient.setColorAt(d_gradientStart, QColor(Qt::white));
-        if (isEnabled())
+        if (isEnabled()) {
             gradient.setColorAt(d_gradientStop, ledColor);
-        else
+        } else {
             gradient.setColorAt(d_gradientStop, QColor(Qt::gray));
-        gradient.setColorAt(1, QColor(Qt::black));
+        }
+        gradient.setColorAt(1, borderColor); //QColor(Qt::black));
+        painter.setPen(borderColor);
         painter.setBrush(gradient);
     }
     else if(!d_gradientEnabled)
     {
         QBrush b(ledColor);
         painter.setBrush(b);
+        painter.setPen(borderColor);
     }
     painter.setRenderHint(QPainter::Antialiasing);
 
+    // we do not use angle any more
+    /*
     m.translate(center.x(), center.y());
     m.rotate(d_angleDeg);
     m.translate(-center.x(), -center.y());
     painter.setWorldMatrix(m, true);
-
-    if(d_rectangular)
+    */
+    if(d_rectangular) {
         painter.drawRect(rect);
-    else
+    } else {
         painter.drawEllipse(rect);
-
+    }
 }
 
 void ELed::setAlphaChannel(int a)
