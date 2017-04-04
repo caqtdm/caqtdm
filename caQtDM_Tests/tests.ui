@@ -120,7 +120,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: rgb(0,0,120);}</string>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>1</number>
     </property>
     <property name="usesScrollButtons">
      <bool>true</bool>
@@ -2208,8 +2208,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>431</width>
-           <height>183</height>
+           <width>100</width>
+           <height>30</height>
           </rect>
          </property>
          <attribute name="label">
@@ -2449,7 +2449,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>13</number>
+       <number>7</number>
       </property>
       <property name="usesScrollButtons">
        <bool>true</bool>
@@ -5853,6 +5853,9 @@ p, li { white-space: pre-wrap; }
         <property name="minValue">
          <double>-100.000000000000000</double>
         </property>
+        <property name="decayOption">
+         <bool>true</bool>
+        </property>
         <property name="channel" stdset="0">
          <string notr="true">ACM:TEST:AO</string>
         </property>
@@ -5960,6 +5963,12 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="minValue">
          <double>-100.000000000000000</double>
+        </property>
+        <property name="decayOption">
+         <bool>true</bool>
+        </property>
+        <property name="decayTime">
+         <double>0.500000000000000</double>
         </property>
         <property name="channel" stdset="0">
          <string notr="true">ACM:TEST:AO</string>
@@ -6605,19 +6614,22 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="lowerBound">
-         <double>-100.000000000000000</double>
+         <double>900.000000000000000</double>
         </property>
         <property name="upperBound">
-         <double>900.000000000000000</double>
+         <double>-100.000000000000000</double>
         </property>
         <property name="scalePosition">
          <enum>QwtThermoMarker::LeftScale</enum>
         </property>
         <property name="maxValue">
-         <double>900.000000000000000</double>
+         <double>-100.000000000000000</double>
         </property>
         <property name="minValue">
-         <double>-100.000000000000000</double>
+         <double>900.000000000000000</double>
+        </property>
+        <property name="decayOption">
+         <bool>true</bool>
         </property>
         <property name="channel" stdset="0">
          <string notr="true">ACM:TEST:AO</string>
