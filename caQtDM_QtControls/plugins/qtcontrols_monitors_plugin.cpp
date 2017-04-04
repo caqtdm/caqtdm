@@ -268,12 +268,14 @@ QWidget *caThermoInterface::createWidget(QWidget* parent)
 
 caThermoInterface::caThermoInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
-    strng name[1], type[1] = {""};
-    longtext text[1] = {""};
+    strng name[3], type[3] = {""};
+    longtext text[3] = {CHANNEL, DECAYOPTION, DECAYTIME};
 
     strcpy(name[0], "channel");
     strcpy(type[0], "multiline");
-    d_domXml = XmlFunc("caThermo", "cathermo", 0, 0, 100, 30, name, type, text, 1);
+    strcpy(name[1], "decayOption");
+    strcpy(name[2], "decayTime");
+    d_domXml = XmlFunc("caThermo", "cathermo", 0, 0, 100, 30, name, type, text, 3);
     d_toolTip = "[Scale & Bar Monitor]";
     d_name = "caThermo";
     d_include = "caThermo";
