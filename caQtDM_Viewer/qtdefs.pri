@@ -172,6 +172,10 @@ DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
+# 4.1.5 of 5.4.2017
+# caled circle will stay a circle when resizing with another aspect ration; border color can be customized
+# add vumeter simulation to caThermo
+
 # 4.1.5 of 23.3.17
 # calineargauge made correct size when no scale (in order to make all sizes the same)
 # for caRelatedDisplay one can now set the position for the called window
