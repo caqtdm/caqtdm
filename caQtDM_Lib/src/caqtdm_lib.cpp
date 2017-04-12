@@ -1838,12 +1838,49 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         QUiLoader loader;
         bool prcFile = false;
 
-        // define a layout
-        QGridLayout *layout = new QGridLayout;
-        layout->setContentsMargins(0,0,0,0);
-        layout->setMargin(0);
-        layout->setVerticalSpacing(spacingVertical);
-        layout->setHorizontalSpacing(spacingHorizontal);
+        QHBoxLayout *boxLayout = new QHBoxLayout;
+        boxLayout->setMargin(0);
+        boxLayout->setSpacing(0);
+        QFrame *frame = new QFrame();
+        QColor thisFrameColor= includeWidget->getFrameColor();
+        QColor thisLightColor = thisFrameColor.lighter();
+        QColor thisDarkColor = thisFrameColor.darker();
+
+        QPalette thisPalette = includeWidget->palette();
+        thisPalette.setColor(QPalette::WindowText, thisFrameColor);
+        thisPalette.setColor(QPalette::Light, thisLightColor);
+        thisPalette.setColor(QPalette::Dark, thisDarkColor);
+        thisPalette.setColor(QPalette::Window, thisFrameColor);
+
+        frame->setFrameShadow(includeWidget->getFrameShadow());
+        frame->setLineWidth(includeWidget->getFrameLineWidth());
+        frame->setPalette(thisPalette);
+
+        boxLayout->addWidget(frame);
+        includeWidget->setLayout(boxLayout);
+
+        // define a layout for adding the includes
+        QGridLayout *gridLayout = new QGridLayout;
+        gridLayout->setContentsMargins(0,0,0,0);
+        gridLayout->setMargin(0);
+        gridLayout->setVerticalSpacing(spacingVertical);
+        gridLayout->setHorizontalSpacing(spacingHorizontal);
+
+        //  we set the shape and in case of box, we have to set margins correctly
+        switch(includeWidget->getFrameShape()) {
+            case caInclude::NoFrame:
+                  frame->setFrameShape(QFrame::NoFrame);
+                  break;
+            case caInclude::Box:
+                  frame->setFrameShape(QFrame::Box);
+                  gridLayout->setMargin(includeWidget->getFrameLineWidth());
+                  break;
+            case caInclude::Panel:
+                  frame->setFrameShape(QFrame::Panel);
+                  break;
+            default:
+                 frame->setFrameShape(QFrame::Panel);
+        }
 
         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
 
@@ -1981,12 +2018,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
                     // add includeWidget to the gui
                     if(includeWidget->getStacking() == caInclude::Row) {
-                        layout->addWidget(thisW, j, 0);
+                        gridLayout->addWidget(thisW, j, 0);
                         row++;
                         maxRows = row;
                         maxColumns = 1;
                     } else if(includeWidget->getStacking() == caInclude::Column) {
-                       layout->addWidget(thisW, 0, j);
+                       gridLayout->addWidget(thisW, 0, j);
                        column++;
                        maxColumns = column;
                        maxRows = 1;
@@ -1995,7 +2032,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                             row=0;
                             column++;
                         }
-                        layout->addWidget(thisW, row, column);
+                        gridLayout->addWidget(thisW, row, column);
                         row++;
                         if(row > maxRows) maxRows = row;
                         maxColumns = column + 1;
@@ -2004,13 +2041,13 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                             row++;
                             column=0;
                         }
-                        layout->addWidget(thisW, row, column);
+                        gridLayout->addWidget(thisW, row, column);
                         column++;
                         if(column > maxColumns) maxColumns = column;
                         maxRows = row + 1;
                     }
 
-                    includeWidget->setLayout(layout);
+                    frame->setLayout(gridLayout);
                     includeWidget->setLineSize(0);
 
                     level++;
@@ -2036,7 +2073,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                         pathcomponents.erase(pathcomponents.end()-1);
                         if(pathcomponents.count()==0) {
                             cainclude_path="";
-                        }else cainclude_path=pathcomponents.join("/")+"/";
+                        } else cainclude_path=pathcomponents.join("/")+"/";
 
                     }
 
@@ -2054,17 +2091,21 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         } // end for
 
+        int adjustMargin = 0;
+        if(includeWidget->getFrameShape() == caInclude::Box) adjustMargin = 4*includeWidget->getFrameLineWidth();
+        else if(includeWidget->getFrameShape() == caInclude::NoFrame) adjustMargin = 0;
+        else adjustMargin = 2*includeWidget->getFrameLineWidth();
+
         if((thisW != (QWidget *) 0 ) && (!prcFile) && includeWidget->getAdjustSize()) {
-            includeWidget->resize(maxColumns * thisW->width() + (maxColumns-1) * spacingHorizontal,
-                                  maxRows * thisW->height() + (maxRows-1) * spacingVertical);
+            includeWidget->resize(maxColumns * thisW->width() + (maxColumns-1) * spacingHorizontal + adjustMargin,
+                                  maxRows * thisW->height() + (maxRows-1) * spacingVertical + adjustMargin);
 
             // when the include is packed into a scroll area, set the minimumsize too
             if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
                 Q_UNUSED(scrollWidget);
                 QWidget *contents = (QWidget*) includeWidget->parent();
-                //contents->setMinimumSize(maxColumns * (thisW->width()+spacingHorizontal), maxRows * (thisW->height()+spacingVertical));
-                contents->setMinimumSize(maxColumns * thisW->width() + (maxColumns-1) * spacingHorizontal,
-                                      maxRows * thisW->height() + (maxRows-1) * spacingVertical);
+                contents->setMinimumSize(maxColumns * thisW->width() + (maxColumns-1) * spacingHorizontal + adjustMargin,
+                                      maxRows * thisW->height() + (maxRows-1) * spacingVertical + adjustMargin);
             }
         }
 

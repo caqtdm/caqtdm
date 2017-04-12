@@ -27,6 +27,7 @@
 #define CAINCLUDE_H
 
 #include <QWidget>
+#include <QFrame>
 #include <QGridLayout>
 #include <qtcontrols_global.h>
 
@@ -55,17 +56,24 @@ class  QTCON_EXPORT caInclude : public QWidget
     Q_PROPERTY(int verticalSpacing READ getSpacingVertical WRITE setSpacingVertical)
     Q_PROPERTY(int horizontalSpacing READ getSpacingHorizontal WRITE setSpacingHorizontal)
 
+    Q_ENUMS(myShapes)
+    Q_PROPERTY(myShapes frameShape READ getFrameShape WRITE setFrameShape)
+    Q_PROPERTY(QFrame::Shadow frameShadow READ getFrameShadow WRITE setFrameShadow)
+    Q_PROPERTY(int frameLineWidth READ getFrameLineWidth WRITE setFrameLineWidth)
+    Q_PROPERTY(QColor frameColor READ getFrameColor WRITE setFrameColor)
+
     // this will prevent user interference
      Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
 #include "caVisibProps.h"
 #include "caVisibDefs.h"
 
-
 public:
 #include "caPropHandle.h"
 
     void noStyle(QString style) {Q_UNUSED(style);}
+
+    enum myShapes {NoFrame=0, Box, Panel};
 
     enum Properties { maximumLines = 0, numberofItems, maximumColumns};
     enum Stacking {Row=0, Column, RowColumn, ColumnRow};
@@ -89,6 +97,15 @@ public:
     void setSpacingVertical(int spacing) {thisSpacingVertical = spacing; setAdjustSize(thisAdjust); prvSpacingVertical = thisSpacingVertical;}
     void setSpacingHorizontal(int spacing) {thisSpacingHorizontal = spacing; setAdjustSize(thisAdjust); prvSpacingHorizontal = thisSpacingHorizontal;}
 
+    myShapes getFrameShape() const {return thisFrameShape;}
+    void setFrameShape(myShapes shape) {thisFrameShape = shape; thisFrameUpdate = true; setFileName(newFileName);}
+    QFrame::Shadow getFrameShadow() const {return thisFrameShadow;}
+    void setFrameShadow(QFrame::Shadow shadow) {thisFrameShadow = shadow; thisFrameUpdate = true; setFileName(newFileName);}
+    int getFrameLineWidth() const {return thisFrameLineWidth;}
+    void setFrameLineWidth(int lineWidth) {thisFrameLineWidth = lineWidth; thisFrameUpdate = true; setFileName(newFileName);}
+    void setFrameColor(QColor c) {thisFrameColor = c; thisFrameUpdate = true; setFileName(newFileName);}
+    QColor getFrameColor() const {return thisFrameColor;}
+
     caInclude( QWidget *parent = 0 );
     ~caInclude();
 
@@ -99,9 +116,6 @@ public:
     void setMacro(QString const &newMacro) {thisMacro = newMacro.split(";");}
     QStringList getMacroList() const {return thisMacro;}
     void setMacroList(QStringList list) {thisMacro = list; updatePropertyEditorItem(this, "macro");}
-
-    QColor getBackground() const {return thisBackColor;}
-    void setBackground(QColor c);
 
     void setLineSize( int size );
 
@@ -138,6 +152,14 @@ private:
     bool thisAdjust, prvAdjust;
     int thisSpacingVertical, thisSpacingHorizontal;
     int prvSpacingVertical, prvSpacingHorizontal;
+    QFrame *frame;
+    QHBoxLayout *boxLayout;
+    myShapes thisFrameShape;
+    QFrame::Shadow thisFrameShadow;
+    QColor thisFrameColor;
+    int thisFrameLineWidth;
+    bool thisFrameUpdate;
+    QPalette thisPalette;
 
 #ifdef PRC
     ParsePepFile *pepfile;

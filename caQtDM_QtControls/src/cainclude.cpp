@@ -26,6 +26,7 @@
 #include <QPaintEvent>
 #include <QPainter>
 #include <QApplication>
+#include <QFrame>
 #include <math.h>
 #include "cainclude.h"
 #include "searchfile.h"
@@ -43,12 +44,25 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
     thisStacking = Row;
     thisAdjust = prvAdjust= true;
     thisSpacingVertical = thisSpacingHorizontal=0;
-    setBackground(Qt::black);
+    thisFrameColor = Qt::gray;
     setVisibility(StaticV);
-    gridLayout = new QGridLayout;
+
+    thisPalette = palette();
+
+    boxLayout = new QHBoxLayout();
+    boxLayout->setMargin(0);
+    boxLayout->setSpacing(0);
+    frame = new QFrame();
+    thisFrameShape = NoFrame;
+    thisFrameShadow = QFrame::Plain;
+    thisFrameLineWidth = 1;
+    boxLayout->addWidget(frame);
+
+    gridLayout = new QGridLayout();
     gridLayout->setMargin(0);
     gridLayout->setSpacing(0);
     effectiveSize = QSize(100,100);
+    frame->setLayout(gridLayout);
 
     setPropertyVisible(maximumLines, false);
 
@@ -56,35 +70,13 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
     loadIncludes = false;
     QVariant source = qApp->property("APP_SOURCE").value<QVariant>();
 
-    // in the designer application through the command line we could have set this property to true or false
-    // in order to do that add following code to qdesigner.cpp
-/*
-    if (argument ==  QLatin1String("-includesOutlined")) {
-        if (++it == acend) {
-            qWarning("** WARNING The option -includesOutlined requires a value true or false");
-            return false;
-        } else {
-            QString boolValue = QString::fromLatin1(it->toLocal8Bit());
-            if(boolValue.toLower() == "true")
-               qApp->setProperty("includesOutlined", QVariant(QString("TRUE")));
-            else
-               qApp->setProperty("includesOutlined", QVariant(QString("FALSE")));
-        }
-        break;
-    }
-*/
-
-
-    QVariant includesOutlined = qApp->property("includesOutlined").value<QVariant>();
-
     // next code will only be executed when in designer
     // in other apps we load everything there while taking care of the macros
     if(source.isValid()) {
         if(!source.isNull()) {
             QString test = source.toString();
             if(test.contains("DESIGNER")) {
-                if(includesOutlined.toString() == "TRUE") loadIncludes = false;
-                else loadIncludes = true;
+                loadIncludes = true;
             }
         }
     }
@@ -103,12 +95,6 @@ bool caInclude::isPropertyVisible(Properties property)
 void caInclude::setPropertyVisible(Properties property, bool visible)
 {
     designerVisible[property] = visible;
-}
-
-void caInclude::setBackground(QColor c)
-{
-    thisBackColor = c;
-    update();
 }
 
 void caInclude::removeIncludedWidgets()
@@ -173,20 +159,50 @@ void caInclude::setFileName(QString const &filename)
 
         // modify stacking
         if(thisStacking != prvStacking || thisMaxLines != prvMaxLines || thisMaxColumns != prvMaxColumns || thisAdjust != prvAdjust ||
-           thisSpacingHorizontal != prvSpacingHorizontal || thisSpacingVertical != prvSpacingVertical) {
+           thisSpacingHorizontal != prvSpacingHorizontal || thisSpacingVertical != prvSpacingVertical || thisFrameUpdate) {
+            thisFrameUpdate = false;
+            int adjustMargin = 0;
+
+            setLayout(boxLayout);
+            gridLayout->setMargin(0);
+            switch(thisFrameShape) {
+                case NoFrame:
+                      frame->setFrameShape(QFrame::NoFrame);
+                      break;
+                case Box:
+                      frame->setFrameShape(QFrame::Box);
+                      gridLayout->setMargin(thisFrameLineWidth);
+                      break;
+                case Panel:
+                      frame->setFrameShape(QFrame::Panel);
+                      break;
+                default:
+                     frame->setFrameShape(QFrame::Panel);
+            }
+
+            frame->setFrameShadow(thisFrameShadow);
+            frame->setLineWidth(thisFrameLineWidth);
+
+            QColor thisLightColor = thisFrameColor.lighter();
+            QColor thisDarkColor = thisFrameColor.darker();
+
+            thisPalette.setColor(QPalette::WindowText, thisFrameColor);
+            thisPalette.setColor(QPalette::Light, thisLightColor);
+            thisPalette.setColor(QPalette::Dark, thisDarkColor);
+            thisPalette.setColor(QPalette::Window, thisFrameColor);
+            frame->setPalette(thisPalette);
+
+            gridLayout->setVerticalSpacing(thisSpacingVertical);
+            gridLayout->setHorizontalSpacing(thisSpacingHorizontal);
+
             if(thisLoadedWidgets.count() > 0) {
                 //printf("modify stacking with %d items\n", thisLoadedWidgets.count());
                 int j = 0;
                 foreach(QWidget *l, thisLoadedWidgets) {
                     l->hide();
-                    layout()->removeWidget(l);
+                    gridLayout->removeWidget(l);
                 }
-                delete layout();
-                gridLayout = new QGridLayout;
-                setLayout(gridLayout);
-                gridLayout->setMargin(0);
-                gridLayout->setVerticalSpacing(thisSpacingVertical);
-                gridLayout->setHorizontalSpacing(thisSpacingHorizontal);
+
                 foreach(QWidget *l, thisLoadedWidgets) {
                     // find the row, column to add this widget
                     if(thisStacking == Row) {
@@ -228,8 +244,11 @@ void caInclude::setFileName(QString const &filename)
                 prvSpacingHorizontal = thisSpacingHorizontal;
                 prvSpacingVertical = thisSpacingVertical;
                 //printf("resize 1 for row=%d column=%d\n", maxRows, maxColumns);
-                if(thisAdjust) resize(maxColumns * effectiveSize.width() + (maxColumns-1) * thisSpacingHorizontal,
-                                      maxRows * effectiveSize.height() + (maxRows-1) * thisSpacingVertical);
+                if(thisFrameShape == Box) adjustMargin = 4*thisFrameLineWidth;
+                else if(thisFrameShape == NoFrame) adjustMargin = 0;
+                else adjustMargin = 2*thisFrameLineWidth;
+                if(thisAdjust) resize(maxColumns * effectiveSize.width() + (maxColumns-1) * thisSpacingHorizontal + adjustMargin,
+                                      maxRows * effectiveSize.height() + (maxRows-1) * thisSpacingVertical + adjustMargin);
                 prvAdjust = thisAdjust;
                 return;
             }
@@ -249,7 +268,7 @@ void caInclude::setFileName(QString const &filename)
             }
         }
 
-        setLayout(gridLayout);
+        frame->setLayout(gridLayout);
 
         if(newFileName.contains(".prc")) {
             fileName = newFileName;
@@ -365,7 +384,7 @@ void caInclude::paintEvent( QPaintEvent *event )
     Q_UNUSED(event);
     if(thisLineSize > 0) {
         QPainter painter( this );
-        painter.setPen( QPen( getBackground(), thisLineSize, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ) );
+        painter.setPen( QPen(thisFrameColor, thisLineSize, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ) );
         painter.drawRect(0, 0, width() - 1, height() -1);
     }
 }
