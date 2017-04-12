@@ -365,7 +365,6 @@ static void dataCallback(struct event_handler_args args)
                          stsF->value, info->index, ca_host_name(args.chid),
                          stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
 
-
             AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
 
             if(args.count > 1) {
@@ -558,18 +557,36 @@ static void displayCallback(struct event_handler_args args) {
 
         // when specifying zero as number of requested elements, we will get variable length arrays (zero lenght is then also considered)
         // probably will not work with older channel access gateways
+
+#if EPICS_REVISION < 15
         status = ca_add_array_event(dbf_type_to_DBR_STS(ca_field_type(args.chid)), 0, //ca_element_count(args.chid),
-                                     args.chid, dataCallback, info, 0.0,0.0,0.0, &info->evID);
+                                           args.chid, dataCallback, info, 0.0,0.0,0.0, &info->evID);
         info->evAdded = true;
         PRINT(printf("ca_add_array_event added for %s with chid=%d index=%d info->evAdded=%d\n", ca_name(args.chid), args.chid, kData.index, info->evAdded));
         if (status != ECA_NORMAL) {
             PRINT(printf("ca_add_array_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
         }
-
         C_SetMutexKnobData(mutexKnobdataPtr, kData.index, kData);
-
-        C_DataUnlock(mutexKnobdataPtr, &kData);
         info->event++;
+#else
+        if(!info->evAdded) {
+            status = ca_add_array_event(dbf_type_to_DBR_STS(ca_field_type(args.chid)), 0, //ca_element_count(args.chid),
+                                               args.chid, dataCallback, info, 0.0,0.0,0.0, &info->evID);
+            info->evAdded = true;
+            PRINT(printf("ca_add_array_event added for %s with chid=%d index=%d info->evAdded=%d\n", ca_name(args.chid), args.chid, kData.index, info->evAdded));
+            if (status != ECA_NORMAL) {
+                PRINT(printf("ca_add_array_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+            }
+            C_SetMutexKnobData(mutexKnobdataPtr, kData.index, kData);
+            info->event++;
+        } else {
+            printf("display info event nr=%d\n", info->event);
+            kData.edata.displayCount = info->event-2;
+            kData.edata.monitorCount = info->event-1;
+            C_SetMutexKnobDataReceived(mutexKnobdataPtr, &kData);
+        }
+#endif
+        C_DataUnlock(mutexKnobdataPtr, &kData);
     }
 }
 
@@ -668,7 +685,13 @@ void connectCallback(struct connection_handler_args args)
         info->evAdded = false;
         if (info->event == 0) {
             info->event++;
+
+#if EPICS_REVISION < 15
             status = ca_array_get_callback(dbf_type_to_DBR_CTRL(ca_field_type(args.chid)), 1, args.chid, displayCallback, NULL);
+#else
+            status = ca_add_masked_array_event(dbf_type_to_DBR_CTRL(ca_field_type(args.chid)), 0, //ca_element_count(args.chid),
+                                         args.chid, displayCallback, info, 0.0,0.0,0.0, &info->evID, DBE_PROPERTY);
+#endif
             if (status != ECA_NORMAL) {
                 PRINT(printf("ca_array_get_callback:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
             }
