@@ -122,7 +122,7 @@ void caThermo::setColors(QColor bg, QColor fg, QColor textColor, colMode mode)
             if(!defaultBackColor.isValid() || !defaultForeColor.isValid()) return;
             QColor bgs = defaultBackColor.darker(125);
             bgs.setAlpha(bg.alpha());
-            printf("default palette %d %d %d\n", fg.red(), fg.green(), fg.blue());
+            //printf("default palette %d %d %d\n", fg.red(), fg.green(), fg.blue());
             thisPalette.setColor(QPalette::ButtonText, defaultForeColor);
             thisPalette.setColor(QPalette::Text, textColor);
             thisPalette.setColor(QPalette::WindowText, textColor);

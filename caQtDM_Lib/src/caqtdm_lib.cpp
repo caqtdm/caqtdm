@@ -1873,7 +1873,9 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                   break;
             case caInclude::Box:
                   frame->setFrameShape(QFrame::Box);
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
                   gridLayout->setMargin(includeWidget->getFrameLineWidth());
+#endif
                   break;
             case caInclude::Panel:
                   frame->setFrameShape(QFrame::Panel);

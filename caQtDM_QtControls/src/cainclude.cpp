@@ -170,8 +170,10 @@ void caInclude::setFileName(QString const &filename)
                       frame->setFrameShape(QFrame::NoFrame);
                       break;
                 case Box:
-                      frame->setFrameShape(QFrame::Box);
+                      frame->setFrameShape(QFrame::Box);    
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
                       gridLayout->setMargin(thisFrameLineWidth);
+#endif
                       break;
                 case Panel:
                       frame->setFrameShape(QFrame::Panel);

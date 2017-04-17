@@ -328,6 +328,9 @@ caQtDM_Lib {
                 message("caQtDM_Lib configuration : macx")
       		INCLUDEPATH += $(EPICSINCLUDE)/os/Darwin
                 INCLUDEPATH   += $(EPICSINCLUDE)/compiler/clang
+#for epics 3.15 and gcc we need this
+                INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
+
       		QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
       		LIBS += -F$(QWTLIB) -framework qwt
                 LIBS += -L$(CAQTDM_COLLECT) -lqtcontrols
@@ -401,6 +404,10 @@ caQtDM_Viewer {
         }
         macx {
                 message("caQtDM_viewer configuration : macx (only mac)")
+
+#for epics 3.15 and gcc we need this
+                INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
+
                 DESTDIR = $(CAQTDM_COLLECT)
                 QMAKE_INFO_PLIST = ./src/Mac/Info.plist
                 APP-FONTS.files = lucida-sans-typewriter.ttf
@@ -417,9 +424,26 @@ caQtDM_Viewer {
                 caqtdmlibs.files = $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib $(CAQTDM_COLLECT)/libqtcontrols.dylib
                 QMAKE_BUNDLE_DATA += plugins caqtdmlibs
                 calib.path = Contents/Frameworks
-                calib.files = $$(EPICS_BASE)/lib/darwin-x86/libca.3.14.12.dylib
+#                calib.files = $$(EPICS_BASE)/lib/darwin-x86/libca.3.14.12.dylib
                 comlib.path = Contents/Frameworks
-                comlib.files = $$(EPICS_BASE)/lib/darwin-x86/libCom.3.14.12.dylib
+#                comlib.files = $$(EPICS_BASE)/lib/darwin-x86/libCom.3.14.12.dylib
+
+#compute dylib library from epicsinclude
+                EPICS = $$(EPICSINCLUDE)
+                EPICSPATH1=$$(EPICS_BASE)/lib/darwin-x86/libca.
+                EPICSPATH2=$$(EPICS_BASE)/lib/darwin-x86/libCom.
+                EPICSVERSION = $$split(EPICS, "/")
+                $$take_last(EPICSVERSION)
+                EPICSVERSION = $$split(EPICSVERSION, "-")
+                EPICSVERSION=$$last(EPICSVERSION)
+
+                EPICSDYLIB1 = $$join(EPICSVERSION,"", $$EPICSPATH1, ."dylib")
+                EPICSDYLIB2 = $$join(EPICSVERSION,"", $$EPICSPATH2, ."dylib")
+                message($$EPICSDYLIB1)
+                message($$EPICSDYLIB2)
+                calib.files  = $$(EPICSDYLIB1)
+                comlib.files = $$(EPICSDYLIB2)
+
                 qwtframework.path = Contents/Frameworks
                 qwtframework.files = $$(QWTHOME)/lib/qwt.framework
                 QMAKE_BUNDLE_DATA += calib comlib qwtframework
