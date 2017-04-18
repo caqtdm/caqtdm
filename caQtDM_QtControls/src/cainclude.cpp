@@ -144,6 +144,7 @@ void caInclude::setFileName(QString const &filename)
         int row = 0;
         int maxRows = 0;
         int maxColumns=0;
+        int adjustMargin = 0;
 
         //printf("cainclude -- setfilename %s for %s\n", qasc(filename), qasc(this->objectName()));
 
@@ -161,7 +162,6 @@ void caInclude::setFileName(QString const &filename)
         if(thisStacking != prvStacking || thisMaxLines != prvMaxLines || thisMaxColumns != prvMaxColumns || thisAdjust != prvAdjust ||
            thisSpacingHorizontal != prvSpacingHorizontal || thisSpacingVertical != prvSpacingVertical || thisFrameUpdate) {
             thisFrameUpdate = false;
-            int adjustMargin = 0;
 
             setLayout(boxLayout);
             gridLayout->setMargin(0);
@@ -240,11 +240,6 @@ void caInclude::setFileName(QString const &filename)
                     j++;
                     l->show();
                 }
-                prvStacking = thisStacking;
-                prvMaxLines = thisMaxLines;
-                prvMaxColumns = thisMaxColumns;
-                prvSpacingHorizontal = thisSpacingHorizontal;
-                prvSpacingVertical = thisSpacingVertical;
                 //printf("resize 1 for row=%d column=%d\n", maxRows, maxColumns);
                 if(thisFrameShape == Box) adjustMargin = 4*thisFrameLineWidth;
                 else if(thisFrameShape == NoFrame) adjustMargin = 0;
@@ -252,7 +247,6 @@ void caInclude::setFileName(QString const &filename)
                 if(thisAdjust) resize(maxColumns * effectiveSize.width() + (maxColumns-1) * thisSpacingHorizontal + adjustMargin,
                                       maxRows * effectiveSize.height() + (maxRows-1) * thisSpacingVertical + adjustMargin);
                 prvAdjust = thisAdjust;
-                return;
             }
         }
 
@@ -362,16 +356,19 @@ void caInclude::setFileName(QString const &filename)
         }
 
         //printf("resize 2 for row=%d column=%d\n", maxRows, maxColumns);
-        if(thisAdjust) resize(maxColumns * effectiveSize.width() + (maxColumns-1) * thisSpacingHorizontal,
-                              maxRows * effectiveSize.height() + (maxRows-1) * thisSpacingVertical);
-        prvAdjust = thisAdjust;
-
+        if(thisFrameShape == Box) adjustMargin = 4*thisFrameLineWidth;
+        else if(thisFrameShape == NoFrame) adjustMargin = 0;
+        else adjustMargin = 2*thisFrameLineWidth;
+        if(thisAdjust) resize(maxColumns * effectiveSize.width() + (maxColumns-1) * thisSpacingHorizontal + adjustMargin,
+                              maxRows * effectiveSize.height() + (maxRows-1) * thisSpacingVertical + adjustMargin);
         prvFileName = newFileName;
         prvStacking = thisStacking;
         prvItemCount = thisItemCount;
         prvMaxLines = thisMaxLines;
+        prvMaxColumns = thisMaxColumns;
         prvSpacingHorizontal = thisSpacingHorizontal;
         prvSpacingVertical = thisSpacingVertical;
+        prvAdjust = thisAdjust;
     }
 }
 
