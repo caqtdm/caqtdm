@@ -414,16 +414,16 @@ void caLineEdit::setFormat(int prec)
         break;
     case truncated:
     case enumeric:
-        strcpy(thisFormat, "%d");
+        strcpy(thisFormat, "%lld");
         break;
     case utruncated:
-        strcpy(thisFormat, "%u");
+        strcpy(thisFormat, "%llu");
         break;
     case hexadecimal:
-        strcpy(thisFormat, "0x%x");
+        strcpy(thisFormat, "0x%llx");
         break;
     case octal:
-        strcpy(thisFormat, "O%o");
+        strcpy(thisFormat, "O%llo");
         break;
     case sexagesimal:
     case sexagesimal_hms:
@@ -444,13 +444,13 @@ void caLineEdit::setValue(double value, const QString& units)
         sprintf(asc, thisFormat, value);
       }
     } else if(thisFormatType == hexadecimal || thisFormatType == octal)  {
-        sprintf(asc, thisFormat, (int) value);
+        sprintf(asc, thisFormat, (long long) value);
     } else if(thisFormatType == truncated) {
-        sprintf(asc, thisFormat, (int) value);
+        sprintf(asc, thisFormat, (long long) value);
     } else if(thisFormatType == enumeric) {
-        sprintf(asc, thisFormat, (int) value);
+        sprintf(asc, thisFormat, (long long) value);
     } else if(thisFormatType == utruncated) {
-        sprintf(asc, thisFormat, (uint) value);
+        sprintf(asc, thisFormat, (unsigned long long) value);
     } else {
         sprintf(asc, thisFormat, value);
     }
