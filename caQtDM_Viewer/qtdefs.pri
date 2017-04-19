@@ -111,8 +111,8 @@ archive: {
 # html retrieval, can always be build
    CONFIG += archiveSF
 # next ones are only buildable at psi
-   QMAKESPEC = $$(QMAKESPEC)
-   X64 = $$find(QMAKESPEC, 64)
+
+   X64 = $$find($$(QMAKESPEC), 64)
    isEmpty(X64) {
        exists(../../Libs/libNewLogRPC.a) {
           message( "Configuring archive plugin build for logging (32)" )
