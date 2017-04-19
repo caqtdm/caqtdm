@@ -57,7 +57,7 @@ win32 {
      }  
 }
 
-unix {
+unix:!ios {
    DESTDIR = $(CAQTDM_COLLECT)/designer
    unix {
      INCLUDEPATH += $(QWTINCLUDE)
