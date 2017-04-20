@@ -52,7 +52,7 @@
 	<key>UIInterfaceOrientation</key>
 	<string>UIInterfaceOrientationLandscapeLeft</string>
 	<key>UILaunchImageFile~iphone</key>
-	<string>StartScreen-568h@2x.png</string>
+        <string>LaunchImage-iOS7-568h@2.png</string>
 	<key>UIRequiresFullScreen</key>
 	<true/>
 	<key>UISupportedInterfaceOrientations</key>
