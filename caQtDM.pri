@@ -487,14 +487,13 @@ caQtDM_Viewer {
                     CONFIG += release
                     LIBS += $$OUT_PWD/../caQtDM_Lib/libcaQtDM_Lib.a
                     LIBS += $$OUT_PWD/../caQtDM_QtControls/libqtcontrols.a
-                    LIBS += $$(QWTHOME)/lib/libqwt.a
+
                     LIBS += $$OUT_PWD/../caQtDM_QtControls/plugins/libqtcontrols_controllers_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_QtControls/plugins/libqtcontrols_monitors_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_QtControls/plugins/libqtcontrols_graphics_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_QtControls/plugins/libqtcontrols_utilities_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/demo/libdemo_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/epics3/libepics3_plugin.a
-
 
 
 
@@ -535,8 +534,12 @@ caQtDM_Viewer {
                          # when .dylib and .a in same directory, macos takes .dylib, so separate the libraries
                          LIBS += $$(EPICSLIB)/static/libca.a
                          LIBS += $$(EPICSLIB)/static/libCom.a
+
+                         LIBS += $$(QWTHOME)/lib/libqwt_iphonesimulator.a
+
+
                          # build simulator only for 32 bit
-                         INCLUDEPATH += /Users/mezger/Documents/Entwicklung/qt/qwt-6.1.1_sim/src
+                         INCLUDEPATH += $$(QWTHOME)/src
                     }
                     iphoneos {
                         message("caQtDM_viewer configuration : iphoneos")
@@ -544,6 +547,8 @@ caQtDM_Viewer {
 
                          LIBS += $$(EPICSLIB)/static/libca.a
                          LIBS += $$(EPICSLIB)/static/libCom.a
+                         LIBS += $$(QWTHOME)/lib/libqwt.a
+
                          setting.name = DEVELOPMENT_TEAM
                          setting.value = $$(CERTIFICATNUMBER)
                          QMAKE_MAC_XCODE_SETTINGS += setting
