@@ -535,7 +535,7 @@ caQtDM_Viewer {
                          LIBS += $$(EPICSLIB)/static/libca.a
                          LIBS += $$(EPICSLIB)/static/libCom.a
 
-                         LIBS += $$(QWTHOME)/lib/libqwt_iphonesimulator.a
+                         LIBS += $$(QWTHOME)/lib/libqwt.a
 
 
                          # build simulator only for 32 bit
