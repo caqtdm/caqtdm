@@ -2677,7 +2677,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
     }
 
     // make a context menu for object having a monitor
-    if(className.contains("ca") && !className.contains("caRel") && !className.contains("caTable") && !className.contains("caShellCommand") && nbMonitors > 0) {
+    //if(className.contains("ca") && !className.contains("caRel") && !className.contains("caTable") && !className.contains("caShellCommand") && nbMonitors > 0) {
+    if((className.contains("ca") && !className.contains("caTable") && !className.contains("caShellCommand") && nbMonitors > 0) || className.contains("caRel")) {
 
         w1->setContextMenuPolicy(Qt::CustomContextMenu);
         connect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
@@ -6329,6 +6330,31 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 void CaQtDM_Lib::ShowContextMenu(const QPoint& position) // this is a slot
 {
     Q_UNUSED(position);
+    QWidget *w = qobject_cast<QWidget *>(sender());
+    //qDebug() << "showcontextmenu" << qobject_cast<QWidget *>(sender());
+
+    // very special case, where caRelatedDisplay is on top and recovers other ca objects, so that context has to be found
+    if (caRelatedDisplay *w1 = qobject_cast<caRelatedDisplay *>(w)) {
+        QList<QWidget*> wList;
+        QPoint globalPos = qobject_cast< QWidget* >( sender() )->mapToGlobal( position );
+        QWidget *widgetAt = qApp->widgetAt(globalPos);
+        while (widgetAt != (QWidget *) 0) {
+            QString className = widgetAt->metaObject()->className();
+            if((className.contains("ca")) && (widgetAt != w1) && (!className.contains("caInclude")) && (!className.contains("caRel"))) {
+                DisplayContextMenu(widgetAt);
+                break;
+            }
+            wList.append(widgetAt);
+            widgetAt->setAttribute(Qt::WA_TransparentForMouseEvents);
+            widgetAt = qApp->widgetAt(globalPos);
+        }
+        foreach(QWidget* widget, wList) {
+            widget->setAttribute(Qt::WA_TransparentForMouseEvents, false);
+        }
+        return;
+    }
+
+    // normal case
     DisplayContextMenu(qobject_cast<QWidget *>(sender()));
 }
 
