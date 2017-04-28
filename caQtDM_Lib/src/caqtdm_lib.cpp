@@ -6064,7 +6064,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         info.append("<br>Value: ");
                         switch (kPtr->edata.fieldtype) {
                         case caCHAR:
-                            sprintf(asc,"%ld (0x%lx)", kPtr->edata.ivalue, kPtr->edata.ivalue);
+                            sprintf(asc,"%ld (0x%x)", kPtr->edata.ivalue, kPtr->edata.ivalue);
                             info.append(asc);
                             break;
                         case caSTRING:
@@ -6099,7 +6099,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         }
                         case caINT:
                         case caLONG:
-                            sprintf(asc,"%ld (0x%lx) %s", kPtr->edata.ivalue, kPtr->edata.ivalue, kPtr->edata.units);
+                            sprintf(asc,"%ld (0x%x) %s", kPtr->edata.ivalue, kPtr->edata.ivalue, kPtr->edata.units);
                             info.append(asc);
                             break;
                         case caFLOAT:
