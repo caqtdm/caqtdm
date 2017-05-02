@@ -158,6 +158,7 @@ public:
     QString text() const { return m_Text; }
     void setFormat(int prec);
     void setValue(double value, const QString& units);
+    void setDatatype(int datatype);
 
     void setDirection(const Direction &direction);
     Direction getDirection() const {return m_Direction;}
@@ -205,5 +206,6 @@ private:
     int m_FrameLineWidth, m_FrameLineWidthOld;
     QColor m_FrameColorTop, m_FrameColorBottom;
     QBrush brush;
+    int thisDatatype;
 };
 #endif

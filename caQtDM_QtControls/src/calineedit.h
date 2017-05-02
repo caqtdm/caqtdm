@@ -136,6 +136,7 @@ public:
 
     void setFormat(int prec);
     void setValue(double value, const QString& units);
+    void setDatatype(int datatype);
 
     void setFormatType(FormatType m) { thisFormatType = m; }
     FormatType getFormatType() { return thisFormatType; }
@@ -203,6 +204,7 @@ private:
     QColor bgAtInitLast;
     QColor fgAtInitLast;
     QString unitsLast;
+    int thisDatatype;
 };
 
 #endif
