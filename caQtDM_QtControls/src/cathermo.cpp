@@ -277,7 +277,11 @@ void caThermo::setDirection(Direction dir)
     }
 
     if(scalepos != NoScale) setScalePosition(scalepos);
-    update();
+
+    // update() did not really do what was expected here
+    resize(width()+1, height());
+    resize(width()-1, height());
+
 }
 
 void caThermo::setAlarmColors(short status)
@@ -369,31 +373,42 @@ bool caThermo::event(QEvent *e)
     } else if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
 
         const caThermo* that = this;
+        int pipeWidth;
 
         switch (thisScale) {
 
         case false:
-            switch (thisDirection) {
-            case Up:
-            case Down: {
-                int pipewidth = width();
-                if(pipewidth != this->pipeWidth()) {
-                    this->setPipeWidth(pipewidth);
-                }
-                break;
+        {
+            int pipewidth;
+            if(thisDirection == Up || thisDirection == Down) {
+                pipewidth = width();
+            } else {
+                pipewidth = height();
             }
+            if(pipewidth != this->pipeWidth()) this->setPipeWidth(pipewidth);
 
-            case Right:
-            case Left: {
-                int pipewidth = height();
-                if(pipewidth != this->pipeWidth()) {
-                    this->setPipeWidth(pipewidth);
-                }
-                break;
+            QFont f = font();
+            f.setPointSizeF(MAX_FONT_SIZE);
+            QFontMetricsF tmpFm(f);
+            float txtHeight = tmpFm.height();
+            while((txtHeight > pipewidth-1.0) && f.pointSizeF() > MIN_FONT_SIZE) {
+                if(f.pointSizeF() <= 0.0) f.setPointSizeF(1.0);
+                f.setPointSizeF(f.pointSizeF() - 0.5);
+                QFontMetricsF tmpFm(f);
+                txtHeight = tmpFm.height();
             }
-            default:
-                break;
+            float pointSize = f.pointSizeF();
+            if(pointSize < MIN_FONT_SIZE) pointSize = MIN_FONT_SIZE;
+            if(pointSize > MAX_FONT_SIZE) pointSize = MAX_FONT_SIZE;
+
+            if(qAbs(pointSize - pointSizePrv) >= 0.1) {
+                f.setPointSizeF(pointSize);
+                pointSizePrv = pointSize;
+                setFont(f);
+                update();
             }
+        }
+
             break;
 
         case  true:
@@ -460,9 +475,7 @@ bool caThermo::event(QEvent *e)
 void caThermo::drawLiquid(QPainter *painter, const QRect &sliderRect ) const
 {
     QwtThermoMarker::drawLiquid(painter, sliderRect);
-    if(this->scalePosition() != NoScale && thisScaleValueEnabled) {
-        paintValue (painter,  sliderRect);
-    }
+    if(thisScaleValueEnabled) paintValue (painter,  sliderRect);
 }
 
 // Draws the label with the value on the widget
@@ -486,7 +499,10 @@ void caThermo::paintValue(QPainter *painter, QRect valueRect) const
             break;
         case TopScale:
         case BottomScale:
+            break;
         case NoScale:
+            painter->rotate(270);
+            painter->drawText(QPoint(-valueRect.height()/2-w/2, width() - valueRect.width() + h - fm.descent()), label);
             break;
         }
     }
