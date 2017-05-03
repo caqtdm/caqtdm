@@ -15,6 +15,7 @@ void mdaReaderThread(const char *dataFile, int y_cpy);
 struct mda_file *mdaData = NULL;
 
 void mdaReader_RegisterPV(QString pvName) {
+    Q_UNUSED(pvName); // not clean but not well solvable with preprocessor
     PRINT(printf("Somebody registered %s\n", qasc(pvName)));
 	return;
 }

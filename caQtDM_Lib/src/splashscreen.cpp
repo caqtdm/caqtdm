@@ -98,7 +98,11 @@ void SplashScreen::setMaximum(int max)
 void SplashScreen::drawContents(QPainter *painter)
 {
       QSplashScreen::drawContents(painter);
+#if QT_VERSION < QT_VERSION_CHECK(5, 7, 0)
       QStyleOptionProgressBarV2 pbstyle;
+#else
+      QStyleOptionProgressBar pbstyle;
+#endif
       pbstyle.initFrom(this);
       pbstyle.state = QStyle::State_Enabled;
       pbstyle.textVisible = false;
