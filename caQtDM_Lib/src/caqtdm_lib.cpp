@@ -3980,6 +3980,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         QColor fg = lineeditWidget->property("FColor").value<QColor>();
 
         if(data.edata.connected) {
+            lineeditWidget->setDatatype(data.edata.fieldtype);
             // enum string
             if(data.edata.fieldtype == caENUM || data.edata.fieldtype == caSTRING || data.edata.fieldtype == caCHAR) {
                 QStringList list;

@@ -20,10 +20,10 @@ SETLOCAL
 REM =============================================================================================
 REM GENERAL_COMPILATION SELECT1
 REM =============================================================================================
-call caQtDM_Env.bat 1
+call caQtDM_Env.bat 2
 call caQtDM_CleanAll.bat
-call :compile
-call caQtDM_CleanAll.bat
+REM call :compile
+REM call caQtDM_CleanAll.bat
 ENDLOCAL
 SETLOCAL
 REM =============================================================================================
@@ -47,6 +47,7 @@ GOTO:eof
 echo ============ make all =================
 set PATH=%PATH%;%JOM%
 set PATH=%PATH%;%QTHOME%\bin
+set PATH=%PATH%;%GITPATH%
 qmake all.pro
 where /q jom.exe 
 IF %ERRORLEVEL% NEQ 0 (nmake all) ELSE (jom all)
