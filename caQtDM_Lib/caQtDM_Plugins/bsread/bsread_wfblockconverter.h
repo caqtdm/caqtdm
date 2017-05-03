@@ -31,7 +31,7 @@ public:
     void Process(int dummy){
         //QElapsedTimer timer;
         //timer.start();
-
+        Q_UNUSED(dummy);
         QByteArray data = QByteArray::fromRawData((const char *)SourceP,(int) sourcecountP*sizeof(T_BSREAD));
         QDataStream stream(data);
         stream.skipRawData((int)(sectorP*(sourcecountP*sizeof(T_BSREAD)/fullP)));

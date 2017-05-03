@@ -564,14 +564,14 @@ void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message,size_t
             if (datasize>1){
 
                 bsdata_assign_single(Data, message,&datatypesize);
-                if(Data->bsdata.wf_data_size!=(datasize*datatypesize)){
+                if(Data->bsdata.wf_data_size!=(ulong)(datasize*datatypesize)){
                     if (Data->bsdata.wf_data!=NULL){
                         free(Data->bsdata.wf_data);
                     }
                     Data->bsdata.wf_data=malloc(datasize*datatypesize);
 
                 }
-                if (size<(datasize*datatypesize)){
+                if (size<((ulong)(datasize*datatypesize))){
                     memcpy(Data->bsdata.wf_data,message,size);
                     Data->bsdata.wf_data_size=(ulong)(size/datatypesize);
                 }else{
