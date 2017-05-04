@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V4.1.5
+CAQTDM_VERSION = V4.1.6
 
 CAQTDM_GIT_VERSION = $$system(git rev-parse --abbrev-ref HEAD)
 CAQTDM_GIT_COMMAND = $$sprintf("git rev-parse --short=8 origin/%1", $$CAQTDM_GIT_VERSION)
