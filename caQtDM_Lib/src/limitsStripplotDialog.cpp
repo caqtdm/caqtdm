@@ -66,7 +66,8 @@ limitsStripplotDialog::limitsStripplotDialog(caStripPlot *w, MutexKnobData *data
     move(parent->x() + parent->width() / 2 - thisWidth / 2 , parent->y() + parent->height() /2 -thisHeight/2);
 #endif
 
-    for(int i=0; i< vars.size(); i++) {
+    int MAXCURVES = caStripPlot::MAXCURVES;
+    for(int i=0; i< qMin(vars.size(), MAXCURVES); i++) {
         QString pv = vars.at(i).trimmed();
         if(pv.size() > 0) {
             QLabel *channelLabel = new QLabel(pv);
