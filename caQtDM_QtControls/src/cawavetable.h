@@ -39,7 +39,6 @@ typedef char string40[40];
 
 class QTCON_EXPORT caWaveTable : public QTableWidget
 {
-
     Q_OBJECT
     Q_PROPERTY(int rowCount READ rowCount WRITE setRowCount DESIGNABLE false)
     Q_PROPERTY(int columnCount READ columnCount WRITE setColumnCount DESIGNABLE false)
@@ -67,7 +66,6 @@ class QTCON_EXPORT caWaveTable : public QTableWidget
     Q_ENUMS(FormatType)
 
 public:
-
     void noStyle(QString style) {Q_UNUSED(style);}
 
     caWaveTable(QWidget *parent);
@@ -122,6 +120,11 @@ public:
                                                     if(colcount > 0 && rowcount > 0) setupItems(rowcount, colcount);
                                                   }
     Alignment getAlignment() const {return thisAlignment;}
+
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
 private slots:
     void copy();

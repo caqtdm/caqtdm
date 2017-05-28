@@ -53,7 +53,6 @@ class QTCON_EXPORT caFrame : public QFrame
     Q_OBJECT
 
 public:
-
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum  Visibility { StaticV,
@@ -98,14 +97,12 @@ public:
     void setBackground(QColor c);
     QColor getBackground() const {return thisBackColor;}
 
-protected:
-
 public slots:
-
-signals:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
 private:
-
    QString thisChannelA, thisChannelB, thisChannelC, thisChannelD;
    Visibility thisVisibility;
    BackgroundMode thisBackgroundMode;

@@ -28,8 +28,8 @@
 
 #include <QObject>
 #include <QNetworkReply>
-#include <QTableWidget>
 #include <QMessageBox>
+#include <QEventLoop>
 
 class QNetworkAccessManager;
 
@@ -41,7 +41,6 @@ public:
     NetworkAccess();
     ~NetworkAccess(){}
     bool requestUrl(const QUrl url, const QString &file = QString::null);
-    int downloadFinished();
     const QString lastError();
 
 signals:
@@ -49,12 +48,14 @@ signals:
     void requestFinished();
 
 protected slots:
-    void finishReply();
+    void finishReply(QNetworkReply*);
     const QString parseError(QNetworkReply::NetworkError error);
+    int downloadFinished();
+    void timeoutL();
 
 private:
     QNetworkAccessManager *manager;
-    QTableWidget *thisTable;
+    QEventLoop *eventLoop;
     QString thisFile;
     int finished;
     QUrl downloadUrl;

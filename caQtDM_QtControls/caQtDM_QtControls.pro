@@ -239,6 +239,8 @@ HEADERS	+= \
     src/formattype.h \
     src/calabelvertical.h \
     src/camimedisplay.h \
-    src/caWidgetInterface.h
+    src/caWidgetInterface.h \
+    src/addevent.h \
+    src/animationcode.h
 
 OTHER_FILES += README

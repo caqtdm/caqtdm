@@ -1570,6 +1570,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         text = messagebuttonWidget->getLabel();
         if(reaffectText(map, &text))  messagebuttonWidget->setLabel(text);
 
+        text = messagebuttonWidget->getPressMessage();
+        if(reaffectText(map, &text))  messagebuttonWidget->setPressMessage(text);
+
+        text = messagebuttonWidget->getReleaseMessage();
+        if(reaffectText(map, &text))  messagebuttonWidget->setReleaseMessage(text);
+
         if(messagebuttonWidget->isElevated()) messagebuttonWidget->raise();
 
         // insert dataindex list
@@ -1837,17 +1843,59 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         int row = 0;
         int maxColumns=0;
         int column = 0;
+        int spacingHorizontal = includeWidget->getSpacingHorizontal();
+        int spacingVertical = includeWidget->getSpacingVertical();
         w1->setProperty("ObjectType", caInclude_Widget);
 
         QWidget *thisW = (QWidget *) 0;
         QUiLoader loader;
         bool prcFile = false;
 
-        // define a layout
-        QGridLayout *layout = new QGridLayout;
-        layout->setContentsMargins(0,0,0,0);
-        layout->setMargin(0);
-        layout->setSpacing(0);
+        QHBoxLayout *boxLayout = new QHBoxLayout;
+        boxLayout->setMargin(0);
+        boxLayout->setSpacing(0);
+        QFrame *frame = new QFrame();
+        QColor thisFrameColor= includeWidget->getFrameColor();
+        QColor thisLightColor = thisFrameColor.lighter();
+        QColor thisDarkColor = thisFrameColor.darker();
+
+        QPalette thisPalette = includeWidget->palette();
+        thisPalette.setColor(QPalette::WindowText, thisFrameColor);
+        thisPalette.setColor(QPalette::Light, thisLightColor);
+        thisPalette.setColor(QPalette::Dark, thisDarkColor);
+        thisPalette.setColor(QPalette::Window, thisFrameColor);
+
+        frame->setFrameShadow(includeWidget->getFrameShadow());
+        frame->setLineWidth(includeWidget->getFrameLineWidth());
+        frame->setPalette(thisPalette);
+
+        boxLayout->addWidget(frame);
+        includeWidget->setLayout(boxLayout);
+
+        // define a layout for adding the includes
+        QGridLayout *gridLayout = new QGridLayout;
+        gridLayout->setContentsMargins(0,0,0,0);
+        gridLayout->setMargin(0);
+        gridLayout->setVerticalSpacing(spacingVertical);
+        gridLayout->setHorizontalSpacing(spacingHorizontal);
+
+        //  we set the shape and in case of box, we have to set margins correctly
+        switch(includeWidget->getFrameShape()) {
+            case caInclude::NoFrame:
+                  frame->setFrameShape(QFrame::NoFrame);
+                  break;
+            case caInclude::Box:
+                  frame->setFrameShape(QFrame::Box);
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+                  gridLayout->setMargin(includeWidget->getFrameLineWidth());
+#endif
+                  break;
+            case caInclude::Panel:
+                  frame->setFrameShape(QFrame::Panel);
+                  break;
+            default:
+                 frame->setFrameShape(QFrame::Panel);
+        }
 
         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
 
@@ -1985,12 +2033,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
                     // add includeWidget to the gui
                     if(includeWidget->getStacking() == caInclude::Row) {
-                        layout->addWidget(thisW, j, 0);
+                        gridLayout->addWidget(thisW, j, 0);
                         row++;
                         maxRows = row;
                         maxColumns = 1;
                     } else if(includeWidget->getStacking() == caInclude::Column) {
-                       layout->addWidget(thisW, 0, j);
+                       gridLayout->addWidget(thisW, 0, j);
                        column++;
                        maxColumns = column;
                        maxRows = 1;
@@ -1999,7 +2047,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                             row=0;
                             column++;
                         }
-                        layout->addWidget(thisW, row, column);
+                        gridLayout->addWidget(thisW, row, column);
                         row++;
                         if(row > maxRows) maxRows = row;
                         maxColumns = column + 1;
@@ -2008,13 +2056,13 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                             row++;
                             column=0;
                         }
-                        layout->addWidget(thisW, row, column);
+                        gridLayout->addWidget(thisW, row, column);
                         column++;
                         if(column > maxColumns) maxColumns = column;
                         maxRows = row + 1;
                     }
 
-                    includeWidget->setLayout(layout);
+                    frame->setLayout(gridLayout);
                     includeWidget->setLineSize(0);
 
                     level++;
@@ -2040,7 +2088,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                         pathcomponents.erase(pathcomponents.end()-1);
                         if(pathcomponents.count()==0) {
                             cainclude_path="";
-                        }else cainclude_path=pathcomponents.join("/")+"/";
+                        } else cainclude_path=pathcomponents.join("/")+"/";
 
                     }
 
@@ -2058,13 +2106,21 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         } // end for
 
+        int adjustMargin = 0;
+        if(includeWidget->getFrameShape() == caInclude::Box) adjustMargin = 4*includeWidget->getFrameLineWidth();
+        else if(includeWidget->getFrameShape() == caInclude::NoFrame) adjustMargin = 0;
+        else adjustMargin = 2*includeWidget->getFrameLineWidth();
+
         if((thisW != (QWidget *) 0 ) && (!prcFile) && includeWidget->getAdjustSize()) {
-            includeWidget->resize(maxColumns * thisW->width(), maxRows * thisW->height());
+            includeWidget->resize(maxColumns * thisW->width() + (maxColumns-1) * spacingHorizontal + adjustMargin,
+                                  maxRows * thisW->height() + (maxRows-1) * spacingVertical + adjustMargin);
+
             // when the include is packed into a scroll area, set the minimumsize too
             if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
                 Q_UNUSED(scrollWidget);
                 QWidget *contents = (QWidget*) includeWidget->parent();
-                contents->setMinimumSize(maxColumns * thisW->width(), maxRows * thisW->height());
+                contents->setMinimumSize(maxColumns * thisW->width() + (maxColumns-1) * spacingHorizontal + adjustMargin,
+                                      maxRows * thisW->height() + (maxRows-1) * spacingVertical + adjustMargin);
             }
         }
 
@@ -2196,6 +2252,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             }
             cartesianplotWidget->setPV(pvs, i);
         }
+
+        cartesianplotWidget->updateLegendsPV();
 
         // handle trigger channel if any
         triggerChannel = cartesianplotWidget->getTriggerPV();
@@ -2632,7 +2690,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
     }
 
     // make a context menu for object having a monitor
-    if(className.contains("ca") && !className.contains("caRel") && !className.contains("caTable") && !className.contains("caShellCommand") && nbMonitors > 0) {
+    //if(className.contains("ca") && !className.contains("caRel") && !className.contains("caTable") && !className.contains("caShellCommand") && nbMonitors > 0) {
+    if((className.contains("ca") && !className.contains("caTable") && !className.contains("caShellCommand") && nbMonitors > 0) || className.contains("caRel")) {
 
         w1->setContextMenuPolicy(Qt::CustomContextMenu);
         connect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
@@ -2652,6 +2711,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         connect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
         w1->setProperty("Connect", false);
     }
+
 }
 
 /**
@@ -3187,6 +3247,53 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                     return false;
                 }
             }
+
+            // special function used for animation purposes through cacalc
+        } else if(calcQString.startsWith("%QRect")) {
+            if(caCalc *calc = qobject_cast<caCalc *>(w)) {
+                //qDebug() << "qrect for cacalc detected";
+                for(int i=0; i<4; i++) valueArray[i] = -1;  //say default value will not do anything
+                for(int i=0; i<nbMonitors;i++) {
+                    knobData *ptr = mutexKnobDataP->GetMutexKnobDataPtr(MonitorList.at(i+1).toInt());
+                    if(ptr != (knobData*) 0) {
+                        //qDebug() << "calculate from index" << i << ptr->index << ptr->pv << ptr->edata.connected << ptr->edata.rvalue << IndexList.at(i+1).toInt();
+                        // when connected
+                        int j = IndexList.at(i+1).toInt(); // input a,b,c,d
+                        if(ptr->edata.connected) {
+                            switch (ptr->edata.fieldtype){
+                            case caINT:
+                            case caLONG:{
+                                valueArray[j] = ptr->edata.ivalue;
+                                break;
+                            }
+                            default:{
+                                valueArray[j] = ptr->edata.rvalue;
+                            }
+                            }
+                        } else {
+                            valueArray[j] = -1;
+                        }
+                    }
+                }
+                bool somethingToSend = false;
+                for(int i=0; i<4; i++) {
+                    if(valueArray[i] != -1) {
+                        somethingToSend = true;
+                        break;
+                    }
+                }
+                if(somethingToSend) {
+                    valid = false;
+                    QRect rect(valueArray[0], valueArray[1], valueArray[2], valueArray[3]);
+                    calc->setValue(rect);
+                    result = 1;
+                    return true;
+                }
+            }
+            valid = false;
+            result = 0;
+            return true;
+
 #ifdef PYTHON
             // python function
         } else if(calcQString.startsWith("%P/")) {
@@ -3886,6 +3993,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         QColor fg = lineeditWidget->property("FColor").value<QColor>();
 
         if(data.edata.connected) {
+            lineeditWidget->setDatatype(data.edata.fieldtype);
             // enum string
             if(data.edata.fieldtype == caENUM || data.edata.fieldtype == caSTRING || data.edata.fieldtype == caCHAR) {
                 QStringList list;
@@ -5166,6 +5274,13 @@ void CaQtDM_Lib::Callback_RelatedDisplayClicked(int indx)
         } else {
             // in case we do not remove the parent let the window manager position the new window
             geometry = "";
+            // however it is possible that the user wanted a fixed position
+            if((w->getPosition().x() != -1) || w->getPosition().y() != -1) {
+                if(w->getPosition().x() < 0) xpos = 0; else xpos= w->getPosition().x();
+                if(w->getPosition().y() < 0) ypos = 0; else ypos = w->getPosition().y();
+                geometry = "+%1+%2";
+                geometry = geometry.arg(xpos).arg(ypos);
+            }
         }
     }
 
@@ -5963,7 +6078,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         info.append("<br>Value: ");
                         switch (kPtr->edata.fieldtype) {
                         case caCHAR:
-                            sprintf(asc,"%ld (0x%lx)", kPtr->edata.ivalue, kPtr->edata.ivalue);
+                            sprintf(asc,"%ld (0x%x)", kPtr->edata.ivalue, kPtr->edata.ivalue);
                             info.append(asc);
                             break;
                         case caSTRING:
@@ -5998,7 +6113,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         }
                         case caINT:
                         case caLONG:
-                            sprintf(asc,"%ld (0x%lx) %s", kPtr->edata.ivalue, kPtr->edata.ivalue, kPtr->edata.units);
+                            sprintf(asc,"%ld (0x%x) %s", kPtr->edata.ivalue, kPtr->edata.ivalue, kPtr->edata.units);
                             info.append(asc);
                             break;
                         case caFLOAT:
@@ -6208,6 +6323,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                                 dataIndex = MonitorList.at(1).toInt();
                                 knobData *kPtr =  mutexKnobDataP->GetMutexKnobDataPtr(dataIndex);
                                 if(kPtr != (knobData *) 0) command.replace("&P", kPtr->pv);
+                                command.replace(".X", "");  // this is only to get rid of our pseudo extensions .X or .Y for the archive cartesian plot
+                                command.replace(".Y", "");  // this is only to get rid of our pseudo extensions .X or .Y for the archive cartesian plot
                             }
                             shellCommand(command);
                         }
@@ -6227,6 +6344,31 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 void CaQtDM_Lib::ShowContextMenu(const QPoint& position) // this is a slot
 {
     Q_UNUSED(position);
+    QWidget *w = qobject_cast<QWidget *>(sender());
+    //qDebug() << "showcontextmenu" << qobject_cast<QWidget *>(sender());
+
+    // very special case, where caRelatedDisplay is on top and recovers other ca objects, so that context has to be found
+    if (caRelatedDisplay *w1 = qobject_cast<caRelatedDisplay *>(w)) {
+        QList<QWidget*> wList;
+        QPoint globalPos = qobject_cast< QWidget* >( sender() )->mapToGlobal( position );
+        QWidget *widgetAt = qApp->widgetAt(globalPos);
+        while (widgetAt != (QWidget *) 0) {
+            QString className = widgetAt->metaObject()->className();
+            if((className.contains("ca")) && (widgetAt != w1) && (!className.contains("caInclude")) && (!className.contains("caRel"))) {
+                DisplayContextMenu(widgetAt);
+                break;
+            }
+            wList.append(widgetAt);
+            widgetAt->setAttribute(Qt::WA_TransparentForMouseEvents);
+            widgetAt = qApp->widgetAt(globalPos);
+        }
+        foreach(QWidget* widget, wList) {
+            widget->setAttribute(Qt::WA_TransparentForMouseEvents, false);
+        }
+        return;
+    }
+
+    // normal case
     DisplayContextMenu(qobject_cast<QWidget *>(sender()));
 }
 
@@ -7180,6 +7322,13 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             }
             stripplotWidget->setTicksResizeFactor(factX, factY);
         } else {
+            caCartesianPlot * cartesianplotWidget = (caCartesianPlot *) widget;
+            fontSize = fontResize(factX, factY, list, 7);
+            f.setPointSizeF(fontSize);
+            if(cartesianplotWidget->getLegendEnabled()) {
+                cartesianplotWidget->setLegendAttribute(cartesianplotWidget->getScaleColor(), f, caCartesianPlot::FONT);
+                cartesianplotWidget->updateLayout();
+            }
             plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MajorTick, factY * (double) list.at(8).toInt());
             plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MediumTick, factY * (double) list.at(9).toInt());
             plot->axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MinorTick, factY * (double) list.at(10).toInt());
@@ -7354,7 +7503,11 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                         stripplotWidget->setLegendAttribute(stripplotWidget->getScaleColor(), QFont("arial", 9), caStripPlot::FONT);
                     }
                 } else {
+                    caCartesianPlot * cartesianplotWidget = (caCartesianPlot *) widget;
                     integerList.insert(7, 9);
+                    if( cartesianplotWidget->getLegendEnabled()) {
+                         cartesianplotWidget->setLegendAttribute(cartesianplotWidget->getScaleColor(), QFont("arial", 9), caCartesianPlot::FONT);
+                    }
                 }
                 integerList.insert(8, plot->axisScaleDraw(QwtPlot::xBottom)->tickLength(QwtScaleDiv::MajorTick));
                 integerList.insert(9, plot->axisScaleDraw(QwtPlot::xBottom)->tickLength(QwtScaleDiv::MediumTick));

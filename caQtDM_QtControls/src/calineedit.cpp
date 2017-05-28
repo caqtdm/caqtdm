@@ -31,6 +31,8 @@
 #include <QtDebug>
 #include <QMouseEvent>
 
+#include "knobDefines.h"
+
 caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(this)
 {
     // to start with, clear the stylesheet, so that playing around
@@ -96,6 +98,7 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     unitsLast = "";
     setTextLine(keepText);
     setValueType(false);
+    //thisDatatype = caDOUBLE;
 
     setFontScaleModeL(WidthAndHeight);
     newFocusPolicy(Qt::NoFocus);
@@ -388,6 +391,11 @@ bool caLineEdit::event(QEvent *e)
     return QLineEdit::event(e);
 }
 
+void caLineEdit::setDatatype(int datatype)
+{
+    thisDatatype = datatype;
+}
+
 void caLineEdit::setFormat(int prec)
 {
     int precision = prec;
@@ -414,16 +422,20 @@ void caLineEdit::setFormat(int prec)
         break;
     case truncated:
     case enumeric:
-        strcpy(thisFormat, "%d");
+        if(thisDatatype == caDOUBLE) strcpy(thisFormat, "%lld");
+        else strcpy(thisFormat, "%d");
         break;
     case utruncated:
-        strcpy(thisFormat, "%u");
+        if(thisDatatype == caDOUBLE) strcpy(thisFormat, "%llu");
+        else strcpy(thisFormat, "%u");
         break;
     case hexadecimal:
-        strcpy(thisFormat, "0x%x");
+        if(thisDatatype == caDOUBLE) strcpy(thisFormat, "0x%llx");
+        else strcpy(thisFormat, "0x%x");
         break;
     case octal:
-        strcpy(thisFormat, "O%o");
+        if(thisDatatype == caDOUBLE) strcpy(thisFormat, "O%llo");
+        else strcpy(thisFormat, "O%o");
         break;
     case sexagesimal:
     case sexagesimal_hms:
@@ -444,13 +456,17 @@ void caLineEdit::setValue(double value, const QString& units)
         sprintf(asc, thisFormat, value);
       }
     } else if(thisFormatType == hexadecimal || thisFormatType == octal)  {
-        sprintf(asc, thisFormat, (int) value);
+        if(thisDatatype == caDOUBLE) sprintf(asc, thisFormat, (long long) value);
+        else  sprintf(asc, thisFormat, (int) value);
     } else if(thisFormatType == truncated) {
-        sprintf(asc, thisFormat, (int) value);
+        if(thisDatatype == caDOUBLE) sprintf(asc, thisFormat, (long long) value);
+        else  sprintf(asc, thisFormat, (int) value);
     } else if(thisFormatType == enumeric) {
-        sprintf(asc, thisFormat, (int) value);
+        if(thisDatatype == caDOUBLE) sprintf(asc, thisFormat, (long long) value);
+        else  sprintf(asc, thisFormat, (int) value);
     } else if(thisFormatType == utruncated) {
-        sprintf(asc, thisFormat, (uint) value);
+        if(thisDatatype == caDOUBLE) sprintf(asc, thisFormat, (unsigned long long) value);
+        else  sprintf(asc, thisFormat, (uint) value);
     } else {
         sprintf(asc, thisFormat, value);
     }
@@ -459,7 +475,6 @@ void caLineEdit::setValue(double value, const QString& units)
         strcat(asc, qasc(units));
         unitsLast = units;
     }
-
     valueLast = value;
     setTextLine(asc);
 }

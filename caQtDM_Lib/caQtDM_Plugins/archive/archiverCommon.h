@@ -36,8 +36,8 @@
 #include "mutexKnobData.h"
 #include "MessageWindow.h"
 
-struct indexes {QString key; int indexX; int indexY; int secondsPast; QString pv; int updateSeconds; struct timeb lastUpdateTime; QWidget *w; int nrOfBins; QMutex *mutexP; bool init;};
-
+struct indexes {QString key; int indexX; int indexY; int secondsPast; QString pv; int updateSeconds; struct timeb lastUpdateTime; QWidget *w; int nrOfBins; QMutex *mutexP; bool init; QString backend;};
+#define CHAR_ARRAY_LENGTH 200
 
 class Q_DECL_EXPORT ArchiverCommon : public QObject
 {
@@ -52,7 +52,7 @@ public:
     int pvFreeAllocatedData(knobData *kData);
     int TerminateIO() {return true;}
     //struct indexes {int indexX; int indexY; QString archive; int secondspast; QString pv;};
-    void updateCartesian(int nbVal, indexes indexNew, QVector<double> TimerN, QVector<double> YValsN);
+    void updateCartesian(int nbVal, indexes indexNew, QVector<double> TimerN, QVector<double> YValsN, QString backend);
 
 protected:
 

@@ -23,6 +23,8 @@
  *    helge.brands@psi.ch
  */
 #include <QNetworkAccessManager>
+#include <QApplication>
+#include <QSslConfiguration>
 #include <QDebug>
 #include <QBuffer>
 #include "bsread_dispatchercontrol.h"
@@ -32,32 +34,43 @@
 
 bsread_dispatchercontrol::bsread_dispatchercontrol()
 {
+    loop = new QEventLoop(this);
+    connect(qApp, SIGNAL(aboutToQuit()),this, SLOT(closeEvent()));
+    //Special Channels
+    bsreadChannels.append("bsread:hash");
+    bsreadChannels.append("bsread:pulse_id");
+    bsreadChannels.append("bsread:htype");
+    bsreadChannels.append("bsread:global_timestamp_ns");
+    bsreadChannels.append("bsread:global_timestamp_sec");
 
 }
 bsread_dispatchercontrol::~bsread_dispatchercontrol()
 {
     this->setTerminate();
-    startReconnection.wakeAll();
+    loop->processEvents();
+    loop->quit();
+    //qDebug()<<"Dispatcher stop";
 }
 
 void bsread_dispatchercontrol::process()
 {
+
     QNetworkAccessManager manager;
-    QEventLoop loop;
+    //QEventLoop loop;
     int requestedchannels=0;
     terminate=false;
     QString msg="bsread Dispatcher started: ";
     msg.append(Dispatcher);
 
+
     messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
-    qDebug()<<"From Dispatcher thread: "<<QThread::currentThreadId();
+    //qDebug()<<"bsread Dispatcher: Start ThreadID: "<<QThread::currentThreadId();
     //Update and reconection handling
     while (!terminate){
-        //QThread::sleep(200);
-
+        //QThread::msleep(200);
 
         ProcessLocker.lock();
-        startReconnection.wait(&ProcessLocker,600);
+        startReconnection.wait(&ProcessLocker,400);
 
 
         QString StreamDispatcher=Dispatcher;
@@ -71,15 +84,48 @@ void bsread_dispatchercontrol::process()
         QUrl url(StreamDispatcher);
         requestChannel = QNetworkRequest(url);
         requestDelete  = QNetworkRequest(url);
+#ifndef QT_NO_SSL
+    if(url.toString().toUpper().contains("HTTPS")) {
+        QSslConfiguration configChannel = requestChannel.sslConfiguration();
+        configChannel.setPeerVerifyMode(QSslSocket::VerifyNone);
+        requestChannel.setSslConfiguration(configChannel);
+
+        QSslConfiguration configDelete = requestDelete.sslConfiguration();
+        configDelete.setPeerVerifyMode(QSslSocket::VerifyNone);
+        requestDelete.setSslConfiguration(configDelete);
+    }
+
+#endif
+
+
+    if (!ChannelsAddPipeline.isEmpty()){
+        ChannelVerification(&manager);
+    }
 
         // qDebug()<<"Check Pipeline";
-        while(!ChannelsAddPipeline.isEmpty()){
-            channelstruct candidate=get_AddChannel();
-            qDebug()<<"ADDChannel Pipeline :"<< candidate.channel<<candidate.index;
-            //QMutexLocker lock(&ChannelLocker);
-            Channels.insert(candidate.channel,candidate.index);
-
+        while(!ChannelsApprovePipeline.isEmpty()){
+            Channels+=ChannelsApprovePipeline;
+            ChannelsApprovePipeline.clear();
         }
+
+
+        if (tobeRemoved.count()>0){
+          requestedchannels=0;
+          //qDebug()<<"tobeRemoved Pipeline :" << tobeRemoved.count() << Channels.count() <<tobeRemoved.at(0).trimmed()<< Channels.first();
+          for (int x=0;x<=tobeRemoved.count()-1;x++){
+                QString chan=tobeRemoved.at(x).trimmed();
+                //qDebug()<<"search :"<< chan;
+                QMultiMap<QString, int>::iterator i = Channels.find(chan);
+                 while (i != Channels.end() && i.key() == chan) {
+                     qDebug()<<"found :"<< chan << i.value();
+                     rem_Channel(chan,i.value());
+                     ++i;
+                 }
+           }
+          tobeRemoved.clear();
+        }
+
+
         while(!ChannelsRemPipeline.isEmpty()){
             channelstruct candidate=get_RemChannel();
             //qDebug()<<"REMChannel Pipeline :"<< candidate.channel<<candidate.index;
@@ -88,9 +134,10 @@ void bsread_dispatchercontrol::process()
                 Channels.remove(candidate.channel,candidate.index);
             }
         }
+
        //  qDebug()<<"Check Connection Pipeline";
         while(!ConnectionDeletePipeline.isEmpty()){
-            qDebug()<<"Delete Connection Pipeline";
+            //qDebug()<<"Delete Connection Pipeline";
             QByteArray data_delete="";
             QString data="";
             data_delete.append("\"");
@@ -102,28 +149,34 @@ void bsread_dispatchercontrol::process()
             requestDelete.setRawHeader("Content-Type", "application/json");
             requestDelete.setRawHeader("Content-Length", postDataSize);
             replydelete =manager.sendCustomRequest(requestDelete,"DELETE",&buff_delete_data);
+            //connect(replydelete, SIGNAL(finished()),this, SLOT(finishReplyDelete()));
             connect(replydelete, SIGNAL(finished()),this, SLOT(finishReplyDelete()));
             //qDebug()<<"Remove Connection :"<< data << postDataSize;
+
         }
 
 
 
 
 
-        if(Channels.count()!=requestedchannels){
-            qDebug()<<"Checking Channels";
+        if((Channels.count()!=requestedchannels)){
+            //qDebug()<<"Checking Channels: "<< Channels.count();
             QString data="{\"channels\":[ ";
             QMutexLocker lock(&ChannelLocker);
             QSet<QString> keys=QSet<QString>::fromList(Channels.keys());
             foreach( QString key,keys){
-               if (!key.startsWith("bsread:")){ //removes all header channels
-                data.append("{\"name\":\"");
-                data.append(key);
-                data.append("\",\"modulo\":1,\"offset\":0},");
-               }
+                if (!key.startsWith("bsread:")){ //removes all header channels
+                        data.append("{\"name\":\"");
+                        data.append(key);
+                        //data.append("\",\"modulo\":1,\"offset\":0},");
+                        data.append("\"},");
+                }
             }
             data.remove(data.length()-1,1);
-            data.append("],\"sendIncompleteMessages\":true,\"compression\":\"none\"}");
+            data.append("],\"sendIncompleteMessages\":true,\"compression\":\"none\",");
+            data.append("\"mapping\":{\"incomplete\":\"fill-null\"},");
+            data.append("\"channelValidation\":{\"inconsistency\":\"keep-as-is\"}}");
+
 
             if (!data.contains("channels\":[]")){
                 QByteArray transferdata;
@@ -134,24 +187,21 @@ void bsread_dispatchercontrol::process()
 
                 requestChannel.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
                 replyConnect = manager.post(requestChannel,transferdata);
-                qDebug() <<transferdata;
+                //qDebug() <<transferdata;
                 connect(replyConnect, SIGNAL(readyRead()),this, SLOT(finishReplyConnect()));
+
                 requestedchannels=Channels.count();
             }
             //qDebug() <<"Rec  finished: "<<requestedchannels;
         }
-
         ProcessLocker.unlock();
- //       qDebug()<<"Prozess Exents";
-        loop.processEvents();
-
+        loop->processEvents();
     }
+    //qDebug()<<"bsread Dispatcher: finished ThreadID (" << QThread::currentThreadId()<< ")";
     msg="bsread Dispatcher finished";
 
     messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
     emit finished();
-
-
 
 }
 /*
@@ -322,13 +372,21 @@ void bsread_dispatchercontrol::finishReplyConnect()
 
     QByteArray httpdata;
     streams.clear();
-    qDebug()<<"From finishReplyConnect thread: "<<QThread::currentThreadId();
+    //qDebug()<<"From finishReplyConnect thread: ("<<QThread::currentThreadId()<<")";
 
     httpdata=reply_local->readAll();
     reply_local->deleteLater();
     JSONValue *MainMessageJ = JSON::Parse(httpdata);
-    qDebug() << "DATA:" <<httpdata;
+    //qDebug() << "DATA:" <<httpdata;
+    QString msg="bsread: ";
+    msg.append(httpdata);
 
+    if (msg.contains("exception")){
+        messagewindowP->postMsgEvent(QtCriticalMsg,(char*) msg.toLatin1().constData());
+    }else{
+
+        messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
+    }
     if (MainMessageJ!=NULL){
         if(!MainMessageJ->IsObject()) {
             delete(MainMessageJ);
@@ -361,35 +419,78 @@ void bsread_dispatchercontrol::finishReplyConnect()
 
 
                 bsreadconnections.last()->moveToThread(bsreadThreads.last());
-                qDebug() << "Create bsread_Decode:" <<bsreadconnections.last();
+                //qDebug() << "Create bsread_Decode:" <<bsreadconnections.last();
                 connect(bsreadThreads.last(), SIGNAL(started()), bsreadconnections.last(), SLOT(process()));
                 connect(bsreadconnections.last(), SIGNAL(finished()), bsreadThreads.last(), SLOT(quit()));
-                connect(bsreadThreads.last(), SIGNAL(finished()), bsreadThreads.last(), SLOT(deleteLater()));
-                connect(bsreadconnections.last(), SIGNAL(finished()), bsreadconnections.last(), SLOT(deleteLater()));
-
+                //connect(bsreadThreads.last(), SIGNAL(finished()), bsreadThreads.last(), SLOT(deleteLater()));
+                //connect(bsreadconnections.last(), SIGNAL(finished()), bsreadconnections.last(), SLOT(deleteLater()));
 
                 bsreadThreads.last()->start();
 
 
 
                 while (bsreadconnections.count()>1){
+                    //qDebug() << "Delete bsread_Decode:" <<bsreadconnections.first();
                     QString connection=QString(bsreadconnections.first()->getConnectionPoint());
                     deleteStream(&connection);
                     bsreadconnections.first()->setTerminate();
+                    bsreadThreads.first()->quit();
+                    bsreadThreads.first()->wait();
+                    delete(bsreadThreads.first());
+                    delete(bsreadconnections.first());
 
                     bsreadconnections.removeFirst();
+
+
+
 
                     bsreadThreads.removeFirst();
                 }
 
-                qDebug() << "bsreadPlugin:" << stream.toLatin1().constData();
+                //qDebug() << "bsreadPlugin:" << stream.toLatin1().constData();
             }
+
+            if (jsonobj.find(L"exception") != jsonobj.end() && jsonobj[L"exception"]->IsString()) {
+                qDebug()<< "Check exception:";
+                tobeRemoved.clear();
+                QString ExceptionError=QString::fromWCharArray(jsonobj[L"exception"]->AsString().c_str());
+                if (ExceptionError.startsWith("java.lang.IllegalArgumentException")){
+                    if (jsonobj.find(L"message") != jsonobj.end() && jsonobj[L"message"]->IsString()) {
+                        QString ErrorString=QString::fromWCharArray(jsonobj[L"message"]->AsString().c_str());
+                        QStringList ErrorChannels = ErrorString.split(",", QString::SkipEmptyParts);
+                        if (ErrorChannels.count()>0){
+
+                            qDebug()<< "ErrorChannels.count():" << ErrorChannels.count();
+
+                            if (ErrorChannels.at(0).contains("recorded:")){
+                                tobeRemoved.append(ErrorChannels.at(0).split(": ", QString::SkipEmptyParts).at(1).split(" - ",QString::SkipEmptyParts).at(0));
+                                if (ErrorChannels.count()>1){
+                                    for (int x=1;x<ErrorChannels.count()-1;x++){
+                                        tobeRemoved.append(ErrorChannels.at(x).split(" - ",QString::SkipEmptyParts).at(0));
+                                    }
+                                }
+
+
+
+                            }
+
+                            qDebug()<< "tobeRemoved:" <<tobeRemoved;
+
+                        }
+
+
+
+                    }
+
+                }
+            }//if jsonobj
+            //qDebug()<< tobeRemoved;
 
         }
     }
 
-
-  qDebug()<<"END: finishReplyConnect";
+    //qDebug()<<"finishReplyConnect: finished ThreadID (" << QThread::currentThreadId()<< ")";
+    //qDebug()<<"END: finishReplyConnect";
 }
 
 void bsread_dispatchercontrol::finishReplyDelete()
@@ -398,6 +499,147 @@ void bsread_dispatchercontrol::finishReplyDelete()
     QNetworkReply* reply_local = qobject_cast<QNetworkReply*>(obj);
     QMutexLocker lock(&ChannelLocker);
     QByteArray httpdata=reply_local->readAll();
-    qDebug() << "DeleteReply:" <<httpdata;
-    qDebug()<<"From finishReplyDelete thread: "<<QThread::currentThreadId();
+    //qDebug() << "DeleteReply:" <<httpdata;
+    //qDebug()<<"From finishReplyDelete thread: ("<<QThread::currentThreadId()<<")";
+}
+
+void bsread_dispatchercontrol::closeEvent(){
+   //qDebug() << "bsread_dispatchercontrol:closeEvent ";
+   this->setTerminate();
+    while (bsreadconnections.count()!=0){
+       //qDebug() << "closeEvent Delete bsread_Decode:" <<bsreadconnections.first();
+        bsreadconnections.first()->setTerminate();
+       bsreadThreads.first()->quit();
+       bsreadThreads.first()->wait();
+       delete(bsreadThreads.first());
+       delete(bsreadconnections.first());
+       bsreadconnections.removeFirst();
+       bsreadThreads.removeFirst();
+   }
+}
+
+void bsread_dispatchercontrol::ChannelVerification(QNetworkAccessManager* manager){
+
+    QMultiMap<QString,int> CheckChannels;
+    QString ChannelQueryVerification=Dispatcher;
+    if (!ChannelQueryVerification.endsWith("/")){
+        ChannelQueryVerification.append("/");
+    }
+    if (ChannelQueryVerification.endsWith("/")){
+        ChannelQueryVerification.append("channels/state");
+    }
+
+    QUrl url(ChannelQueryVerification);
+    requestVerification = QNetworkRequest(url);
+#ifndef QT_NO_SSL
+    if(url.toString().toUpper().contains("HTTPS")) {
+        QSslConfiguration configChannel = requestVerification.sslConfiguration();
+        configChannel.setPeerVerifyMode(QSslSocket::VerifyNone);
+        requestVerification.setSslConfiguration(configChannel);
+    }
+#endif
+
+    QString data="{\"channels\":[ ";
+    while(!ChannelsAddPipeline.isEmpty()){
+        channelstruct candidate=get_AddChannel();
+        ChannelsToBeApprovePipeline.insert(candidate.channel,candidate.index);
+    }
+
+    QSet<QString> keys=QSet<QString>::fromList(ChannelsToBeApprovePipeline.keys());
+    foreach( QString key,keys){
+        if (!key.startsWith("bsread:")){ //removes all header channels
+            data.append("\"");
+            data.append(key);
+            data.append("\",");
+        }
+    }
+    data.remove(data.length()-1,1);
+    data.append("]}");
+    if (!data.contains("channels\":[]")){
+        QByteArray transferdata;
+        transferdata.append(data);
+        requestVerification.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
+        replyVerification = manager->post(requestVerification,transferdata);
+        //qDebug()<<"ChannelVerification() :"<<url.toString() <<" : "<<transferdata;
+        connect(replyVerification, SIGNAL(readyRead()),this, SLOT(finishVerification()));
+    }
+    //qDebug()<<"ChannelVerification() :"<< data;
+}
+void bsread_dispatchercontrol::finishVerification()
+{
+
+    JSONArray jsonobj;
+    QObject* obj = sender();
+    QNetworkReply* reply_local = qobject_cast<QNetworkReply*>(obj);
+
+    QByteArray httpdata;
+
+    httpdata=reply_local->readAll();
+    reply_local->deleteLater();
+    JSONValue *MainMessageJ = JSON::Parse(httpdata);
+
+    QString msg="bsread: ";
+    msg.append(httpdata);
+    if (MainMessageJ!=NULL){
+        if(!MainMessageJ->IsArray()) {
+            qDebug()<<"finishVerification() : MainMessageJ=NULL";
+            delete(MainMessageJ);
+        } else {
+            jsonobj=MainMessageJ->AsArray();
+            //qDebug()<<"finishVerification() : Step array :"<< jsonobj.size();
+
+            for (unsigned int i = 0; i < jsonobj.size(); i++)
+            {
+                JSONObject jsonobj2=jsonobj[i]->AsObject();
+                if (jsonobj2.find(L"recording") != jsonobj2.end() && jsonobj2[L"recording"]->IsBool())
+                {
+                    if (jsonobj2[L"recording"]->AsBool()){
+                        //qDebug()<<"finishVerification() : Recording ok";
+                        QString name="";
+                        if (jsonobj2.find(L"channel") != jsonobj2.end() && jsonobj2[L"channel"]->IsObject())
+                        {
+                            JSONObject jsonobj3=jsonobj2[L"channel"]->AsObject();
+
+
+                            if (jsonobj3.find(L"name") != jsonobj3.end() && jsonobj3[L"name"]->IsString()) {
+                                name=QString::fromWCharArray(jsonobj3[L"name"]->AsString().c_str());
+                            }
+
+                        }
+
+                        QList<int> values = ChannelsToBeApprovePipeline.values(name);
+                        for (int i = 0; i < values.size(); ++i){
+                            channelstruct candidate;
+                            candidate.channel=name;
+                            candidate.index=values.at(i);
+                            ChannelsApprovePipeline.insert(candidate.channel,candidate.index);
+                            ChannelsToBeApprovePipeline.remove(name);
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+    // for special bsread channels
+    for (int j = 0; j < bsreadChannels.size(); ++j){
+        QList<int> values = ChannelsToBeApprovePipeline.values(bsreadChannels.at(j));
+        for (int i = 0; i < values.size(); ++i){
+            channelstruct candidate;
+            candidate.channel=bsreadChannels.at(j);
+            candidate.index=values.at(i);
+            ChannelsApprovePipeline.insert(candidate.channel,candidate.index);
+            ChannelsToBeApprovePipeline.remove(bsreadChannels.at(j));
+        }
+    }
+
+    qDebug()<<"finishVerification() :"<< ChannelsApprovePipeline.count();// httpdata;
+
+    if (msg.contains("exception")){
+        messagewindowP->postMsgEvent(QtCriticalMsg,(char*) msg.toLatin1().constData());
+        // Request all channels we have, and see what will come
+        ChannelsApprovePipeline+=ChannelsToBeApprovePipeline;
+        ChannelsToBeApprovePipeline.clear();
+    }
 }

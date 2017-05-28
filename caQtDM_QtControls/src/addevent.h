@@ -23,20 +23,22 @@
  *    anton.mezger@psi.ch
  */
 
-
+#include <QRect>
     Q_PROPERTY(eventsignal eventSignal READ getEventSignal WRITE setEventSignal)
     Q_ENUMS(eventsignal)
 
 public:
-    enum eventsignal {Never = 0, onFirstChange, onAnyChange};
+    enum eventsignal {Never = 0, onFirstChange, onAnyChange, TriggerZeroToOne, TriggerOneToZero};
     eventsignal getEventSignal() const {return thisEventSignal;}
     void setEventSignal(eventsignal signl) {thisEventSignal = signl;}
 
 signals:
     void emitSignal(int);
     void emitSignal(double);
+    void emitSignal(QRect);
 
 private:
     eventsignal thisEventSignal;
     bool eventFired;
+
 

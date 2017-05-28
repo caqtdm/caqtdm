@@ -64,7 +64,6 @@ private:
     int ratio;
 
 public:
-
     SpectrogramData() {
     }
 
@@ -233,7 +232,6 @@ class QTCON_EXPORT caWaterfallPlot: public QWidget
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
 public:
-
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum units {Monitor=0,  Millisecond, Second, Minute};
@@ -322,9 +320,12 @@ public:
     void updatePlot();
     void defineTimerUpdate(units unit, double period);
 
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
 private:
-
     enum {nbRows = 200};
     enum {nbCols = 500};
 

@@ -449,6 +449,11 @@ void caLineDraw::setText(const QString &txt)
     update();
 }
 
+void caLineDraw::setDatatype(int datatype)
+{
+    thisDatatype = datatype;
+}
+
 void caLineDraw::setFormat(int prec)
 {
     int precision = prec;
@@ -475,16 +480,20 @@ void caLineDraw::setFormat(int prec)
         break;
     case truncated:
     case enumeric:
-        strcpy(m_Format, "%d");
+        if(thisDatatype == caDOUBLE) strcpy(m_Format, "%lld");
+        else strcpy(m_Format, "%d");
         break;
     case utruncated:
-        strcpy(m_Format, "%u");
+        if(thisDatatype == caDOUBLE) strcpy(m_Format, "%llu");
+        else strcpy(m_Format, "%u");
         break;
     case hexadecimal:
-        strcpy(m_Format, "0x%x");
+        if(thisDatatype == caDOUBLE) strcpy(m_Format, "0x%llx");
+        else strcpy(m_Format, "0x%x");
         break;
     case octal:
-        strcpy(m_Format, "O%o");
+        if(thisDatatype == caDOUBLE) strcpy(m_Format, "O%llo");
+        else strcpy(m_Format, "O%o");
         break;
     case sexagesimal:
     case sexagesimal_hms:
@@ -503,13 +512,17 @@ void caLineDraw::setValue(double value, const QString& units)
             sprintf(asc, m_Format, value);
         }
     } else if(m_FormatType == hexadecimal || m_FormatType == octal)  {
-        sprintf(asc, m_Format, (int) value);
+        if(thisDatatype == caDOUBLE) sprintf(asc, m_Format, (long long) value);
+        else  sprintf(asc, m_Format, (int) value);
     } else if(m_FormatType == truncated) {
-        sprintf(asc, m_Format, (int) value);
+        if(thisDatatype == caDOUBLE) sprintf(asc, m_Format, (long long) value);
+        else sprintf(asc, m_Format, (int) value);
     } else if(m_FormatType == enumeric) {
-        sprintf(asc, m_Format, (int) value);
+        if(thisDatatype == caDOUBLE) sprintf(asc, m_Format, (long long) value);
+        else sprintf(asc, m_Format, (int) value);
     } else if(m_FormatType == utruncated) {
-        sprintf(asc, m_Format, (uint) value);
+        if(thisDatatype == caDOUBLE) sprintf(asc, m_Format, (unsigned long long) value);
+        else sprintf(asc, m_Format, (uint) value);
     } else {
         sprintf(asc, m_Format, value);
     }
@@ -520,7 +533,6 @@ void caLineDraw::setValue(double value, const QString& units)
     setText(asc);
 }
 
-
 // caWidgetInterface implementation
 void caLineDraw::caDataUpdate(const QString& units, const QString& String, const knobData& data)
 {
@@ -528,6 +540,7 @@ void caLineDraw::caDataUpdate(const QString& units, const QString& String, const
     QColor fg = property("FColor").value<QColor>();
 
     if(data.edata.connected) {
+        setDatatype(data.edata.fieldtype);
         // enum string
         if(data.edata.fieldtype == caENUM || data.edata.fieldtype == caSTRING || data.edata.fieldtype == caCHAR) {
             QStringList list;

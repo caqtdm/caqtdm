@@ -38,6 +38,7 @@ class QTCON_EXPORT caRelatedDisplay : public caRowColMenu
     Q_PROPERTY(Stacking stackingMode READ getStacking WRITE setStacking)
     Q_PROPERTY(QStringList removeParentList READ getRemoveList WRITE setRemoveList STORED false)
     Q_PROPERTY(QString removeParent READ getReplaceModes WRITE setReplaceModes DESIGNABLE inactiveButVisible())
+    Q_PROPERTY(QPoint displayPosition READ getPosition WRITE setPosition)
 
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
@@ -45,7 +46,6 @@ class QTCON_EXPORT caRelatedDisplay : public caRowColMenu
 #include "caElevation.h"
 
 public:
-
 #include "caPropHandle.h"
 
     void noStyle(QString style) {Q_UNUSED(style);}
@@ -56,10 +56,17 @@ public:
     void setReplaceModes(QString const &newL) {replacemodes = newL.split(";");}
     QStringList getRemoveList() const {return replacemodes;}
     void setRemoveList(QStringList list) {replacemodes = list; updatePropertyEditorItem(this, "removeParent");}
+    QPoint getPosition() {return thisPosition;}
+    void setPosition(QPoint pos);
+
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
 private:
-
     QStringList  replacemodes;
+    QPoint thisPosition;
 
 };
 

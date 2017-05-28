@@ -74,7 +74,6 @@ class QTCON_EXPORT caLineDraw : public QWidget, public FontScalingWidget, public
     Q_ENUMS(Direction)
 
 public:
-
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum FormatType { decimal, exponential, engr_notation, compact, truncated, utruncated,
@@ -159,11 +158,17 @@ public:
     QString text() const { return m_Text; }
     void setFormat(int prec);
     void setValue(double value, const QString& units);
+    void setDatatype(int datatype);
 
     void setDirection(const Direction &direction);
     Direction getDirection() const {return m_Direction;}
 
     bool rotateText(float degrees);
+
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
 protected:
     virtual bool event(QEvent *);
@@ -201,5 +206,6 @@ private:
     int m_FrameLineWidth, m_FrameLineWidthOld;
     QColor m_FrameColorTop, m_FrameColorBottom;
     QBrush brush;
+    int thisDatatype;
 };
 #endif

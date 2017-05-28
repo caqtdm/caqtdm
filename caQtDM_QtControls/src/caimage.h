@@ -51,7 +51,6 @@ class QTCON_EXPORT caImage : public QWidget
 #include "caVisibDefs.h"
 
 public:
-
     void noStyle(QString style) {Q_UNUSED(style);}
 
     caImage( QWidget *parent = 0 );
@@ -75,20 +74,17 @@ public:
     QString getMessages();
     bool anyMessages();
 
-
-
 virtual ~caImage();
 
-
-private slots:
-
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
 protected:
-
     virtual void timerEvent(QTimerEvent *e);
 
 private:
-
     void init(const QString& filename);
 
     messageQueue *messagequeue;

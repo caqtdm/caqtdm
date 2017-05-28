@@ -35,10 +35,14 @@
 #ifndef QWT_THERMOMARKER_H
 #define QWT_THERMOMARKER_H
 
+#include <QTimer>
+#include <QTime>
 #include <qtcontrols_global.h>
 #include "qwt_global.h"
 #include "qwt_abstract_scale.h"
 #include "qwt_interval.h"
+
+const int RedrawInterval = 100; // ms
 
 class QwtScaleDraw;
 class QwtColorMap;
@@ -97,11 +101,19 @@ class QTCON_EXPORT QwtThermoMarker: public QwtAbstractScale
     Q_PROPERTY( double value READ value WRITE setValue )
     Q_PROPERTY(DisplayType type READ getType WRITE setType)
 
+    Q_PROPERTY(bool decayOption READ getDecayOption WRITE setDecayOption)
+    Q_PROPERTY(double decayTime READ getDecayTime WRITE setDecayTime)
+
 public:
 
     enum DisplayType {Pipe, Marker, PipeFromCenter};
     DisplayType getType() const { return thisType; }
     void setType(DisplayType displaytype) {thisType = displaytype; layoutThermo(true);}
+
+    bool getDecayOption() const {return thisDecayOption;}
+    void setDecayOption(bool option) {thisDecayOption = option;}
+    double getDecayTime() const {return thisDecayTime;}
+    void setDecayTime(double decayTime) {thisDecayTime = decayTime;}
 
     enum ScalePosition
     {
@@ -217,6 +229,9 @@ public:
 public Q_SLOTS:
     virtual void setValue( double val );
 
+private Q_SLOTS:
+     void redrawTimerExpired();
+
 protected:
     virtual void drawLiquid( QPainter *, const QRect & ) const;
     virtual void scaleChange();
@@ -237,6 +252,12 @@ private:
     class PrivateData;
     PrivateData *d_data;
     DisplayType thisType;
+    QTimer *redrawTimer;
+    QTime peakLevelChanged;
+    double prvValue;
+    bool thisDecayOption;
+    double thisDecayTime;
+
 };
 
 #endif

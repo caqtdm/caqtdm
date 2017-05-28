@@ -71,7 +71,34 @@ void caCalc::setValue(double value)
     } else if(thisEventSignal == onAnyChange) {
         emit emitSignal((int) value);
         emit emitSignal(value);
+    } else if(thisEventSignal == TriggerZeroToOne) {
+        if((qRound(thisValue) == 0) && (qRound(value) == 1)) {
+            emit emitSignal((int) value);
+            emit emitSignal(value);
+        }
+    } else if(thisEventSignal == TriggerOneToZero) {
+        if((qRound(thisValue) == 1) && (qRound(value) == 0)) {
+            emit emitSignal((int) value);
+            emit emitSignal(value);
+        }
     }
+    thisValue =value;
+}
+
+void caCalc::setValue(QRect value)
+{
+    setTextLine("QRect=ok");
+
+    // emit signal when requested
+    if(thisEventSignal == onFirstChange) {
+        if(!eventFired) {
+            emit emitSignal(value);
+        }
+        eventFired = true;
+    } else if(thisEventSignal == onAnyChange) {
+        emit emitSignal(value);
+    }
+    thisValue =0;
 }
 
 void caCalc::setTextLine(const QString &txt)

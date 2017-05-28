@@ -57,7 +57,6 @@ public slots:
         deleteLater();
     }
 
-
     void getFromArchive(QWidget *w, indexes indexNew,  QString index_name, MessageWindow * messageWindow) {
 
 
@@ -77,17 +76,26 @@ public slots:
         ftime(&now);
         double endSeconds = (double) now.time + (double) now.millitm / (double)1000;
         double startSeconds = endSeconds - indexNew.secondsPast;
+#ifdef CSV
         QString response ="'response':{'format':'csv'}";
-        QString channels = "'channels': [ '" + key + "' ]";
+#else
+        QString response ="'response':{'format':'json'}";
+#endif
+        QString channels;
+        if(indexNew.backend.size() > 0) {
+           channels = "'channels': [ {'name':'" + key + "', 'backend' : '" + indexNew.backend + "' }]";
+        } else {
+           channels = "'channels': [ {'name':'" + key + "' }]";
+        }
+
         QString range = "'range': { 'startSeconds' : '" + QString::number(startSeconds, 'g', 10) + "', 'endSeconds' : '" + QString::number(endSeconds, 'g', 10) + "'}";
+        fields = "'fields':['channel','globalSeconds','value']";
 
         if(indexNew.nrOfBins != -1) {
             isBinned = true;
-            fields = "'fields':['channel','iocSeconds','value']";
             agg = tr(", 'aggregation': {'aggregationType':'value', 'aggregations':['min','mean','max'], 'nrOfBins' : %1}").arg(indexNew.nrOfBins);
         } else {
             isBinned = false;
-            fields = "'fields':['channel','iocSeconds','value']}";
             agg = "";
         }
         QString total = "{" + response + "," + range + "," + channels + "," + fields + agg + "}";
@@ -105,7 +113,7 @@ public slots:
             }
         } else {
             if(messageWindow != (MessageWindow *) 0) {
-                QString mess("ArchiveSF plugin -- lastError= ");
+                QString mess("ArchiveSF plugin -- lastError: ");
                 mess.append(fromArchive->lastError());
 #if QT_VERSION > 0x050000
                 mess=QString(mess.toHtmlEscaped());
@@ -119,13 +127,13 @@ public slots:
 
         //qDebug() << "number of values received" << nbVal;
 
-        emit resultReady(indexNew, nbVal, TimerN, YValsN);
+        emit resultReady(indexNew, nbVal, TimerN, YValsN, fromArchive->getBackend());
 
         mutex->unlock();
     }
 
 signals:
-    void resultReady(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN);
+    void resultReady(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend);
 
 public:
 
@@ -161,7 +169,7 @@ public:
     int TerminateIO();
 
 public slots:
-    void handleResults(indexes, int, QVector<double>, QVector<double>);
+    void handleResults(indexes, int, QVector<double>, QVector<double>, QString);
 signals:
     void operate(QWidget*, const indexes, const QString, MessageWindow *);
 

@@ -55,7 +55,6 @@ class QTCON_EXPORT caLabel : public ESimpleLabel
     Q_OBJECT
 
 public:
-
     void noStyle(QString style) {Q_UNUSED(style);}
 
     caLabel( QWidget *parent = 0 );
@@ -83,8 +82,12 @@ public:
                                           setBackground(thisBackColor);
                                           setForeground(thisForeColor);
                                           oldColorMode = thisColorMode;}
-private:
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
+private:
     QColor thisForeColor, thisForeColorOld;
     QColor thisBackColor, thisBackColorOld;
     QColor thisBorderColor, thisBorderColorOld;

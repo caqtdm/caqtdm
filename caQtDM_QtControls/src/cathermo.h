@@ -71,7 +71,6 @@ class QTCON_EXPORT caThermo : public QwtThermoMarker
     Q_PROPERTY(bool scaleValueEnabled READ isScaleValueEnabled WRITE setScaleValueEnabled)
 
 public:
-
     enum FormatType { decimal, exponential, engr_notation, compact, truncated};
 
     void noStyle(QString style) {Q_UNUSED(style);}
@@ -105,7 +104,6 @@ public:
     void setColorMode(colMode colormode) {thisColorMode = colormode;
                                           setBackground(thisBackColor);
                                           setForeground(thisForeColor);
-                                          oldColorMode = thisColorMode;
                                          }
 
     enum SourceMode {Channel = 0, User};
@@ -122,7 +120,7 @@ public:
 
     void setAlarmColors(short status);
     void setUserAlarmColors(double val);
-    void setColors(QColor bg, QColor fg, QColor barColor);
+    void setColors(QColor bg, QColor fg, QColor barColor, colMode mode);
     void setNormalColors();
 
     caThermo(QWidget *parent);
@@ -133,8 +131,12 @@ public:
     void setScaleValueEnabled(bool b);
     bool isScaleValueEnabled(){ return thisScaleValueEnabled; }
 
-protected:
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
+protected:
     virtual bool event(QEvent *);
     virtual void drawLiquid ( QPainter *, const QRect & ) const;
 
@@ -142,7 +144,6 @@ private:
     QString thisPV;
     bool    m_externalEnabled;
 
-    QString thisStyle, oldStyle;
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
     QColor thisTextColor, oldTextColor;

@@ -56,8 +56,7 @@ class QTCON_EXPORT caByte : public QWidget
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
 public:
-
-     void noStyle(QString style) {Q_UNUSED(style);}
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     enum colMode {Static=0, Alarm};
     enum Direction {Up, Down, Left, Right};
@@ -94,8 +93,12 @@ public:
 
      void drawByte(long lvalue, QColor trueColor, QColor falseColor);
 
-protected:
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
+protected:
     void arrangeCells();
     void resizeEvent(QResizeEvent *e);
 

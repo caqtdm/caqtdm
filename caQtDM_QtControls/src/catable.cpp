@@ -50,7 +50,7 @@ caTable::caTable(QWidget *parent) : QTableWidget(parent)
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     setEditTriggers(QTableWidget::NoEditTriggers);
     verticalHeader()->setDefaultSectionSize(20);
-    horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+    horizontalHeader()->setResizeMode(QHeaderView::Interactive);
 
     defaultForeColor = palette().foreground().color();
 
@@ -82,12 +82,17 @@ void caTable::createActions() {
 
 void caTable::setColumnSizes(QString const &newSizes)
 {
-    thisColumnSizes = newSizes.split(";");
-    for(int i=0; i< thisColumnSizes.count(); i++) {
-        int colsize=thisColumnSizes.at(i).toInt();
-        if(i < columnCount())  {
-            setColumnWidth(i,colsize);
+    if(newSizes.size() > 0) {
+        horizontalHeader()->setResizeMode(QHeaderView::Fixed);
+        thisColumnSizes = newSizes.split(";");
+        for(int i=0; i< thisColumnSizes.count(); i++) {
+            int colsize=thisColumnSizes.at(i).toInt();
+            if(i < columnCount())  {
+                setColumnWidth(i,colsize);
+            }
         }
+    } else {
+        horizontalHeader()->setResizeMode(QHeaderView::Interactive);
     }
 }
 

@@ -36,8 +36,12 @@ class  QTCON_EXPORT wmSignalPropagator : public  ESimpleLabel
     Q_OBJECT
 
 public:
-
     wmSignalPropagator( QWidget *parent = 0 );
+
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
 public slots:
     void closewindow();

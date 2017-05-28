@@ -80,21 +80,36 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
             ++j;
         }
 
-        //qDebug() << "tmpThread new" << tmpThread;
-
         if((tmpThread != (QThread *) 0) && tmpThread->isRunning()) {
-            //qDebug() << "workerthread is running" << tmpThread->isRunning();
+            //qDebug() << "workerthread is running" << tmpThread << tmpThread->isRunning();
 
         } else {
 
             // Get Index name if specified for this widget
             indexNew.nrOfBins = -1;
+            indexNew.backend = "";
             if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) indexNew.w)) {
                 QVariant var = w->property("nrOfBins");
                 if(!var.isNull()) {
                     indexNew.nrOfBins = var.toInt();
                 } else if(indexNew.init){
                     QString mess("ArchiveSF plugin -- no nrOfBins defined as dynamic property in widget "  + w->objectName() + ", defaulting to maximum number of points");
+                    if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
+                }
+
+                var = w->property("backend");
+                if(!var.isNull()) {
+                    QString backend = var.toString().trimmed().toLower();
+                    if(QString::compare(backend, "sf-archiverappliance") == 0) {
+                        indexNew.backend = var.toString();
+                    } else if(QString::compare(backend, "sf-databuffer") == 0) {
+                       indexNew.backend = var.toString();
+                    } else {
+                        QString mess("ArchiveSF plugin -- backend defined as dynamic property in widget but not spelled correctly (use sf-archiverappliance or sf-databuffer) in widget "  + w->objectName() + ", defaulting now to sf-archiverappliance");
+                        if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtFatalMsg, (char*) qasc(mess));
+                    }
+                } else if(indexNew.init){
+                    QString mess("ArchiveSF plugin -- no backend defined as dynamic property in widget "  + w->objectName() + ", can be sf-archiverappliance or sf-databuffer)");
                     if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
                 }
 
@@ -124,6 +139,7 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
 
             WorkerSF *worker = new WorkerSF;
             QThread *tmpThread = new QThread();
+            //qDebug() << "tmpThread new" << tmpThread;
             listOfThreads.insert(i.key(), tmpThread);
 
             worker->moveToThread(tmpThread);
@@ -131,8 +147,8 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
             connect(tmpThread, SIGNAL(finished()), tmpThread, SLOT(deleteLater()) );
             connect(this, SIGNAL(operate( QWidget *, indexes, QString, MessageWindow *)), worker,
                           SLOT(getFromArchive(QWidget *, indexes,  QString, MessageWindow *)));
-            connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>)), this,
-                           SLOT(handleResults(indexes, int, QVector<double>, QVector<double>)));
+            connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>, QString)), this,
+                           SLOT(handleResults(indexes, int, QVector<double>, QVector<double>, QString)));
             tmpThread->start();
 
             emit operate((QWidget *) messagewindowP, indexNew, index_name, messagewindowP);
@@ -145,14 +161,14 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
     }
 }
 
-void ArchiveSF_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN)
+void ArchiveSF_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend)
 {
     //qDebug() << "in sf handle results" << nbVal << TimerN.count() << indexNew.indexX << indexNew.indexY;
     if(nbVal > 0 && nbVal < TimerN.count()) {
       TimerN.resize(nbVal);
       YValsN.resize(nbVal);
     }
-    if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN);
+    if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN, backend);
 
     QList<QString> removeKeys;
     removeKeys.clear();

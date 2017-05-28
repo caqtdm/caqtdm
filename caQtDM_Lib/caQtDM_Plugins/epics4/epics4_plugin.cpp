@@ -1497,6 +1497,16 @@ bool PVAInterface::setValue(double rdata, int32_t idata, char *sdata, int forceT
                return true;
            }
        }
+       int ind = atoi(sdata);
+       if(ind>=0 && ind<enumCount) {
+          PVIntPtr pvInt = putPVStructure->getSubField<PVInt>(request);
+          size_t index = pvInt->getFieldOffset();
+          putBitSet->set(index);
+          pvInt->put(ind);
+          pvaChannelPut->put(putPVStructure,putBitSet);
+          return true;
+       }
+       putFinished = true;
        return false;
     }
 

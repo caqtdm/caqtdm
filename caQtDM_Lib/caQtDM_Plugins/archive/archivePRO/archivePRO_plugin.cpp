@@ -88,8 +88,8 @@ void ArchivePRO_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfI
             connect(tmpThread, SIGNAL(finished()), tmpThread, SLOT(deleteLater()) );
             connect(this, SIGNAL(operate( QWidget *, indexes)), worker,
                           SLOT(getFromArchive(QWidget *, indexes)));
-            connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>)), this,
-                            SLOT(handleResults(indexes, int, QVector<double>, QVector<double>)));
+            connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>, QString)), this,
+                            SLOT(handleResults(indexes, int, QVector<double>, QVector<double>, QString)));
             tmpThread->start();
 
             //qDebug() << "PRO emit operate";
@@ -99,14 +99,14 @@ void ArchivePRO_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfI
     }
 }
 
-void ArchivePRO_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN)
+void ArchivePRO_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend)
 {
     //qDebug() << "in PRO handle results" << nbVal << TimerN.count();
     if(nbVal > 0 && nbVal < TimerN.count()) {
       TimerN.resize(nbVal);
       YValsN.resize(nbVal);
     }
-    if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN);
+    if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN, backend);
 
     QList<QString> removeKeys;
     removeKeys.clear();

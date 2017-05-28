@@ -77,7 +77,6 @@ class QTCON_EXPORT caDoubleTabWidget : public QWidget
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
 public:
-
     void noStyle(QString style) {Q_UNUSED(style);}
 
     caDoubleTabWidget(QWidget *parent);
@@ -104,6 +103,11 @@ public:
     void deleteArrayIndex(int pageIndex);
 
     void setFont(int dir);
+
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
 public slots:
     void setCurrentIndex(int index);

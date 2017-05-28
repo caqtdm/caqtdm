@@ -1,3 +1,18 @@
+record(mbbi, "cachoice_test:CHOICE") {
+   field(ZRST, "Undefined")
+   field(ONST, "Option 1")
+   field(TWST, "Option 2")
+   field(THST, "Option 3")
+   field(FRST, "Option 4")
+   field(FVST, "Option 5")
+}
+
+record(aao, "ACM:TEST:DOUBLE_AAO"){
+        field(FTVL, "DOUBLE")
+        field(NELM, "100")
+        field(PREC, "2")
+}
+
 record(mbbo, "88:MultipleBitMBBO") {
   field(DTYP, "Soft Channel")
   field(FLNK, "88:MultipleBitMBBI")
@@ -1017,6 +1032,12 @@ record(mbbiDirect, "MBBIDIECT" )
  field(DTYP, "Soft Channel")
 }
 
+############## these records are used for the simulation in Geiss
+
+record(ao, "SI"){
+	field(DESC, "Boundary minimum")
+	field(PREC, "3")
+}
 
 record(ao, "SX")
 {
@@ -1030,7 +1051,6 @@ record(ao, "SX")
   field(OUT, "SZ PP")
 }
 
-
 record(ao, "SY")
 {
   field(DTYP, "Soft Channel")
@@ -1038,7 +1058,6 @@ record(ao, "SY")
   field(FLNK, "SZ")
   field(OUT, "SYC PP")
 }
-
 
 record(ao, "SX")
 {
@@ -1051,13 +1070,13 @@ record(ao, "SX")
 record(calc, "SXC")
 {
   field(INPA, "SX MS")
-  field(CALC, "0.07*(A-25)")
+  field(CALC, "0.07*(A-500)/20")
 }
 
 record(calc, "SYC")
 {
   field(INPA, "SY MS")
-  field(CALC, "0.07*(A-25)")
+  field(CALC, "0.07*(A-1250)/50")
 }
 
 record(calc, "SZ")
@@ -1066,6 +1085,8 @@ record(calc, "SZ")
 	field(INPB, "SYC MS")
 	field(CALC,"(0.25*A*A*A*A-0.5*A*A) -0.12*A + (0.25*B*B*B*B-0.5*B*B) +1.0 -0.05*B")
 }
+
+###########################################################################################
 
 #record(waveform, "ACM:PICTURE"){
 #        field(DESC, "16bit waveform")

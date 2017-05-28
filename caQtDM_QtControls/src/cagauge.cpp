@@ -59,34 +59,22 @@ caLinearGauge::caLinearGauge(QWidget *parent, Qt::Orientation o) : caAbstractGau
 
 void caLinearGauge::configure()
 {
-    int shortSide, longSide;
-    if (m_scaleEnabled)
-    {
-        longSide = 80;
-        shortSide = 30;
-    }
-    else
-    {
-        longSide = 60;
-        shortSide = 20;
-    }
+    int longSide = 10;
+    int shortSide = 10;
 
-
-    if (m_orientation == Qt::Horizontal)
-    {
+    if (m_orientation == Qt::Horizontal) {
         if (m_scaleEnabled)
-            scalePos = 20;
+            scalePos = 16;
         else
             scalePos = 0;
-        labelsPos = 12;
-        totalSize = 30;
+        labelsPos = 8;
+        totalSize = 26;
         barSize = totalSize-scalePos;
         scaleSize = scalePos-labelsPos;
         labelsSize = labelsPos;
-        setMinimumSize(longSide,shortSide);
-    }
-    else
-    {
+
+    } else {
+
         if (m_scaleEnabled)
             scalePos = 10;
         else
@@ -96,8 +84,8 @@ void caLinearGauge::configure()
         barSize = scalePos;
         scaleSize = labelsPos-scalePos;
         labelsSize = totalSize-labelsPos;
-        setMinimumSize(shortSide,longSide);
     }
+    setMinimumSize(shortSide,longSide);
     caAbstractGauge::configure();
 }
 
@@ -107,8 +95,12 @@ void caLinearGauge::paintEvent(QPaintEvent *)
     int size, w, h;
     QFontMetrics fm(painter.font());
 
-    h = fm.height()+2;
-    w = fm.width(labels[longestLabelIndex])+2;
+    if (m_scaleEnabled) {
+        h = fm.height()+2;
+        w = fm.width(labels[longestLabelIndex])+2;
+    } else {
+        h=w=10;
+    }
 
     if (m_orientation == Qt::Horizontal) {
         size = qMin((int)(width()*totalSize/100.0), height());
@@ -120,11 +112,12 @@ void caLinearGauge::paintEvent(QPaintEvent *)
 
     if (m_orientation == Qt::Horizontal) {
         painter.setViewport((int)((width()-size*100.0/totalSize)*.5),(int)((height()-size)*.5), (int)(size*100.0/totalSize), size);
-        painter.setWindow((int)(-w*.5), 0, 100+w, totalSize+2); /* border */
+        painter.setWindow((int)(-w*.5), 0, 100+w, totalSize+2); // border
     } else {
         painter.setViewport((int)((width()-size)*.5),(int)((height()-size*100.0/totalSize)*.5), size, (int)(size*100.0/totalSize));
-        painter.setWindow(-2, (int)(-h*.5), totalSize+2, 100+h); /* border */
+        painter.setWindow(-2, (int)(-h*.5), totalSize+2, 100+h); // border
     }
+
     painter.setViewport(0,0, width(), height()); // A.Mezger I do not like above behaviour when resizing
 
     drawColorBar(&painter);
@@ -309,8 +302,10 @@ void caLinearGauge::drawMarker(QPainter *p, bool drawValue)
     {
         if (drawValue)
         {
+            int barSizeR = barSize *3 /4;
             QPointF	vertice(100*(m_value-m_minValue)/(m_maxValue-m_minValue), scalePos);
-            triangolo << vertice << (vertice + QPointF(4,8)) << (vertice + QPointF(-4,8));
+            if (!m_scaleEnabled) triangolo << vertice << (vertice + QPointF(4, barSizeR)) << (vertice + QPointF(-4, barSizeR));
+            else triangolo << vertice << (vertice + QPointF(4,8)) << (vertice + QPointF(-4,8));
         }
         else
         {
@@ -323,8 +318,10 @@ void caLinearGauge::drawMarker(QPainter *p, bool drawValue)
     {
         if (drawValue)
         {
+            int barSizeR = barSize *3 /4;
             QPointF	vertice(scalePos, 100*(1-(m_value-m_minValue)/(m_maxValue-m_minValue)));
-            triangolo << vertice << (vertice + QPointF(-8,-4)) << (vertice + QPointF(-8,4));
+            if (!m_scaleEnabled) triangolo << vertice << (vertice + QPointF(-barSizeR,-4)) << (vertice + QPointF(-barSizeR, 4));
+            else triangolo << vertice << (vertice + QPointF(-8,-4)) << (vertice + QPointF(-8,4));
         }
         else
         {
@@ -368,6 +365,19 @@ void caLinearGauge::drawLabels(QPainter *p)
             else
                 check = false;
         }
+        // check if we have space vertically
+        check = true;
+        while (check && f.pointSize() > 2)
+        {
+            if ((p->fontMetrics().height() > labelsSize))
+            {
+                f.setPointSize(f.pointSize()-1);
+                p->setFont(f);
+            }
+            else
+                check = false;
+        }
+        f.setPointSize(f.pointSize()+1);
 
         CorrectFontIfAndroid(f);
         p->setFont(f);
@@ -392,6 +402,7 @@ void caLinearGauge::drawLabels(QPainter *p)
             else
                 check = false;
         }
+         f.setPointSize(f.pointSize()+1);
 
         for (int i = 0; i < m_numMajorTicks; i++)
         {
@@ -679,7 +690,7 @@ void caCircularGauge::drawValue(QPainter *p)
     QRect textRect(x,y+2,w,h);
     p->setBrush(QColor(255,255,255,100));
     p->drawRect(textRect);
-    p->drawText(x,y+1,w,h, Qt::AlignCenter|Qt::TextDontClip, s);
+    p->drawText(x,y+2,w,h, Qt::AlignCenter|Qt::TextDontClip, s);
 
     f.setPointSize(8);
     p->setFont(f);

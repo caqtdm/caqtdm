@@ -74,6 +74,14 @@ void bsread_wfhandling::wfconvert()
             delete converter;
             break;
         }
+        case bs_string:
+        case bs_bool:{
+          printf("bool and string not yet handled as waveform");
+          break;
+        }
+
+
+
      }
 
 }

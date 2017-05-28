@@ -47,11 +47,15 @@ class QTCON_EXPORT caTextEntry : public caLineEdit
 #include "caElevation.h"
 
 public:
-
     caTextEntry( QWidget *parent = 0 );
     bool getAccessW() const {return _AccessW;}
     void setAccessW(bool access);
     void updateText(const QString &text);
+
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
 private slots:
     void dataInput();

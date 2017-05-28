@@ -103,6 +103,10 @@ signals:
     void updateTime(QTime);
 
 public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
+
     void runClock(bool run) {
         if(thisTimeType == InternalTime) {
             if(run) {

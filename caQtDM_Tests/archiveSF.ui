@@ -173,7 +173,7 @@
      <string>3600</string>
     </property>
     <property name="secondsUpdate" stdset="0">
-     <string>10</string>
+     <string>5</string>
     </property>
    </widget>
    <widget class="caCartesianPlot" name="cacartesianplot_2">
@@ -260,6 +260,93 @@
      <string>https://data-api.psi.ch/sf/query</string>
     </property>
    </widget>
+   <widget class="caCartesianPlot" name="cacartesianplot_3">
+    <property name="geometry">
+     <rect>
+      <x>531</x>
+      <y>372</y>
+      <width>501</width>
+      <height>345</height>
+     </rect>
+    </property>
+    <property name="Title" stdset="0">
+     <string notr="true">archiveSF://SINSB01-RLOD100-PUP10:SIG-AMPLT-AVG</string>
+    </property>
+    <property name="TitleX">
+     <string notr="true">(past hours)</string>
+    </property>
+    <property name="TitleY">
+     <string notr="true"/>
+    </property>
+    <property name="channels_1" stdset="0">
+     <string>archiveSF://SINSB01-RLOD100-PUP10:SIG-AMPLT-AVG.X;archiveSF://SINSB01-RLOD100-PUP10:SIG-AMPLT-AVG.Y</string>
+    </property>
+    <property name="Style_1">
+     <enum>caCartesianPlot::ThinLines</enum>
+    </property>
+    <property name="symbol_1">
+     <enum>caCartesianPlot::NoSymbol</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>255</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="channels_2" stdset="0">
+     <string/>
+    </property>
+    <property name="Style_2">
+     <enum>caCartesianPlot::ThinLines</enum>
+    </property>
+    <property name="channels_3" stdset="0">
+     <string/>
+    </property>
+    <property name="color_3">
+     <color>
+      <red>170</red>
+      <green>85</green>
+      <blue>127</blue>
+     </color>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+    <property name="background">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="scaleColor">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="YAxisType" stdset="0">
+     <enum>caCartesianPlot::linear</enum>
+    </property>
+    <property name="secondsPast" stdset="0">
+     <string>7200</string>
+    </property>
+    <property name="secondsUpdate" stdset="0">
+     <string>5</string>
+    </property>
+    <property name="archiverIndex" stdset="0">
+     <string>https://data-api.psi.ch/sf/query</string>
+    </property>
+    <property name="nrOfBins" stdset="0">
+     <string>5000</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -267,7 +354,7 @@
      <x>0</x>
      <y>0</y>
      <width>1053</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>

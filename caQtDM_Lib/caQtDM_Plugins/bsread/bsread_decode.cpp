@@ -38,25 +38,24 @@
 #include "bsread_channeldata.h"
 #include "bsread_wfhandling.h"
 
+enum Alarms {NO_ALARM=0, MINOR_ALARM, MAJOR_ALARM, INVALID_ALARM, NOTCONNECTED=99};
+
+
 bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint)
 {
    StreamConnectionPoint=ConnectionPoint;
    StreamConnectionType="push_pull";
    context=Context;
-   UpdaterPool=new QThreadPool(this);
-   UpdaterPool->setExpiryTimeout(-1);
-   BlockPool=new QThreadPool(this);
-   BlockPool->setExpiryTimeout(-1);
+   UpdaterPool=NULL;
+   BlockPool=NULL;
 }
 bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint,QString ConnectionType)
 {
    StreamConnectionPoint=ConnectionPoint;
    StreamConnectionType=ConnectionType;
    context=Context;
-   UpdaterPool=new QThreadPool(this);
-   UpdaterPool->setExpiryTimeout(-1);
-   BlockPool=new QThreadPool(this);
-   BlockPool->setExpiryTimeout(-1);
+   UpdaterPool=NULL;
+   BlockPool=NULL;
 }
 
 
@@ -68,8 +67,8 @@ bsread_Decode::~bsread_Decode()
     QMutexLocker locker(&mutex);
     setTerminate();
     bsread_Delay();
-    UpdaterPool->deleteLater();
-    BlockPool->deleteLater();
+    //delete(UpdaterPool);
+    //delete(BlockPool);
 }
 
 
@@ -127,11 +126,13 @@ void bsread_Decode::process()
     terminate=false;
 
 
-    qDebug() << "bsreadPlugin: ConnectionPoint :"<< StreamConnectionPoint << StreamConnectionType ;
+    //qDebug() << "bsreadDecode: ConnectionPoint :"<< StreamConnectionPoint << StreamConnectionType ;
+    //qDebug() << "bsreadDecode: start ThreadID" << QThread::currentThreadId();
+
     bsread_createConnection(rc);
     if (rc != 0) {
         printf ("error in zmq_connect: %s(%s)\n", zmq_strerror (errno),StreamConnectionPoint.toLatin1().constData());
-        qDebug() << "bsreadPlugin: ConnectionPoint faild";
+        //qDebug() << "bsreadPlugin: ConnectionPoint faild";
         running_decode=false;
     }else{
 
@@ -230,6 +231,7 @@ void bsread_Decode::process()
     zmq_msg_close(&msg);
     zmq_close(zmqsocket);
     emit finished();
+    //qDebug() << "bsreadDecode: finished ThreadID" << QThread::currentThreadId();
     qDebug() << "bsread ZMQ Receiver terminate";
 
 }
@@ -280,8 +282,8 @@ bool bsread_Decode::setMainHeader(char *value,size_t size)
                 if (jsonobj2.find(L"ns") != jsonobj2.end() && jsonobj2[L"ns"]->IsNumber()) {
                     global_timestamp_ns=jsonobj2[L"ns"]->AsNumber();
                 }
-                if (jsonobj2.find(L"ms") != jsonobj2.end() && jsonobj2[L"ms"]->IsNumber()) {
-                    global_timestamp_ms=jsonobj2[L"ms"]->AsNumber();
+                if (jsonobj2.find(L"sec") != jsonobj2.end() && jsonobj2[L"sec"]->IsNumber()) {
+                    global_timestamp_sec=jsonobj2[L"sec"]->AsNumber();
                 }
                 if (jsonobj2.find(L"ns_offset") != jsonobj2.end() && jsonobj2[L"ns_offset"]->IsNumber()) {
                     global_timestamp_ns_offset=jsonobj2[L"ns_offset"]->AsNumber();
@@ -312,7 +314,7 @@ void bsread_Decode::setHeader(char *value,size_t size){
     ChannelSearch.clear();
     //Header Channel
     bsread_InitHeaderChannels();
-    qDebug() << "Integer :" << ChannelHeader.toStdString().c_str();
+    //qDebug() << "Integer :" << ChannelHeader.toStdString().c_str();
     try{
         HeaderMessageJ = JSON::Parse(ChannelHeader.toStdString().c_str());
     }
@@ -372,7 +374,7 @@ void bsread_Decode::setHeader(char *value,size_t size){
                     if (jsonobj3.find(L"name") != jsonobj3.end() && jsonobj3[L"name"]->IsString()) {
                         chdata->name=QString::fromWCharArray(jsonobj3[L"name"]->AsString().c_str());
                         ChannelSearch.insert(chdata->name, chdata);
-                        printf("Ch-Name :%s\n",chdata->name.toLatin1().constData());
+                        //printf("Ch-Name :%s\n",chdata->name.toLatin1().constData());
                     }
                     if (jsonobj3.find(L"offset") != jsonobj3.end() && jsonobj3[L"offset"]->IsNumber()) {
                         chdata->offset=jsonobj3[L"offset"]->AsNumber();
@@ -409,8 +411,8 @@ void bsread_Decode::setHeader(char *value,size_t size){
                 if (jsonobj.find(L"global_timestamp") != jsonobj.end() && jsonobj[L"global_timestamp"]->IsObject())
                 {
                     JSONObject jsonobj2=jsonobj[L"global_timestamp"]->AsObject();
-                    if (jsonobj2.find(L"epoch") != jsonobj2.end() && jsonobj2[L"epoch"]->IsNumber()) {
-                        global_timestamp_epoch=jsonobj2[L"epoch"]->AsNumber();
+                    if (jsonobj2.find(L"sec") != jsonobj2.end() && jsonobj2[L"sec"]->IsNumber()) {
+                        global_timestamp_sec=jsonobj2[L"sec"]->AsNumber();
                     }
                     if (jsonobj2.find(L"ns") != jsonobj2.end() && jsonobj2[L"ns"]->IsNumber()) {
                         global_timestamp_ns=jsonobj2[L"ns"]->AsNumber();
@@ -552,27 +554,34 @@ void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message,size_t
         int datasize=Data->shape.at(0);
         //qDebug()<< "Datasize:" << datasize << "ZMQ Size:" << size <<" "<<Data->name ;
         if (datasize==1){
-            bsdata_assign_single(Data, message,&datatypesize);
-
+            if (size>0){
+              bsdata_assign_single(Data, message,&datatypesize);
+              Data->valid=true;
+            }else{
+              Data->valid=false;
+            }
         }else{
             if (datasize>1){
 
                 bsdata_assign_single(Data, message,&datatypesize);
-                if(Data->bsdata.wf_data_size!=(datasize*datatypesize)){
+                if(Data->bsdata.wf_data_size!=(ulong)(datasize*datatypesize)){
                     if (Data->bsdata.wf_data!=NULL){
                         free(Data->bsdata.wf_data);
                     }
                     Data->bsdata.wf_data=malloc(datasize*datatypesize);
 
                 }
-                if (size<(datasize*datatypesize)){
+                if (size<((ulong)(datasize*datatypesize))){
                     memcpy(Data->bsdata.wf_data,message,size);
-                    Data->bsdata.wf_data_size=(size/datatypesize);
+                    Data->bsdata.wf_data_size=(ulong)(size/datatypesize);
                 }else{
                     memcpy(Data->bsdata.wf_data,message,datasize*datatypesize);
                     Data->bsdata.wf_data_size=datasize;
                 }
+                Data->valid=true;
                 //qDebug() << "Data->bsdata.wf_data_size :" << Data->bsdata.wf_data_size << "  " <<size <<"  " <<datasize <<"  " << datatypesize;
+            }else{
+                Data->valid=false;
             }
         }
         break;
@@ -600,6 +609,8 @@ void bsread_Decode::bsread_SetChannelTimeStamp(void * timestamp)
 {
     if ((timestamp)&&(Channels.size()>channelcounter)){
         Channels.at(channelcounter)->timestamp=*(double*) timestamp;
+
+
         channelcounter++;
     }
 }
@@ -625,13 +636,13 @@ void bsread_Decode::bsread_InitHeaderChannels()
     chdata->type=bs_string;
     chdata->name="bsread:htype";
     ChannelSearch.insert(chdata->name, chdata);
-
+/*
     chdata=new bsread_channeldata();
     Channels.append(chdata);
     chdata->type=bs_float64;
     chdata->name="bsread:global_timestamp_epoch";
     ChannelSearch.insert(chdata->name, chdata);
-
+*/
     chdata=new bsread_channeldata();
     Channels.append(chdata);
     chdata->type=bs_float64;
@@ -641,15 +652,16 @@ void bsread_Decode::bsread_InitHeaderChannels()
     chdata=new bsread_channeldata();
     Channels.append(chdata);
     chdata->type=bs_float64;
-    chdata->name="bsread:global_timestamp_ms";
+    chdata->name="bsread:global_timestamp_sec";
     ChannelSearch.insert(chdata->name, chdata);
 
-
+/*
     chdata=new bsread_channeldata();
     Channels.append(chdata);
     chdata->type=bs_float64;
     chdata->name="bsread:global_timestamp_ns_offset";
     ChannelSearch.insert(chdata->name, chdata);
+*/
 }
 
 void bsread_Decode::bsread_TransferHeaderData()
@@ -661,14 +673,14 @@ void bsread_Decode::bsread_TransferHeaderData()
         channelcounter++;
         Channels.at(channelcounter)->bsdata.bs_string=main_htype;
         channelcounter++;
-        Channels.at(channelcounter)->bsdata.bs_float64=global_timestamp_epoch;
-        channelcounter++;
+        //Channels.at(channelcounter)->bsdata.bs_float64=global_timestamp_epoch;
+        //channelcounter++;
         Channels.at(channelcounter)->bsdata.bs_float64=global_timestamp_ns;
         channelcounter++;
-        Channels.at(channelcounter)->bsdata.bs_float64=global_timestamp_ms;
+        Channels.at(channelcounter)->bsdata.bs_float64=global_timestamp_sec;
         channelcounter++;
-        Channels.at(channelcounter)->bsdata.bs_float64=global_timestamp_ns_offset;
-        channelcounter++;
+        //Channels.at(channelcounter)->bsdata.bs_float64=global_timestamp_ns_offset;
+        //channelcounter++;
 
     }
 }
@@ -676,13 +688,8 @@ void bsread_Decode::bsread_TransferHeaderData()
 
 void bsread_Decode::WaveformManagment(knobData* kData,bsread_channeldata * bsreadPV){
     bsread_wfhandling *transfer=new bsread_wfhandling(kData,bsreadPV,BlockPool);
-    //transfer->setAutoDelete(true);
-    //UpdaterPool->start(transfer);
-   //QMutexLocker lock(&WfDataHandlerLocker);
-   //WfDataHandlerQueue.append(transfer);
     transfer->process();
-
-
+    delete(transfer);
 }
 
 
@@ -714,6 +721,11 @@ void bsread_Decode::bsread_EndofData()
                 // bs_string,bs_float64,bs_float32,bs_int64,bs_int32,bs_uint64,bs_uint32,bs_int16,bs_uint16,bs_int8,bs_uint8
 
                 if (bsreadPV){
+                    if (!bsreadPV->valid){
+                        kData->edata.severity=INVALID_ALARM;
+                    }else{
+                        kData->edata.severity=0;
+                    }
                     switch (bsreadPV->type){
                     case bs_float64:{
                         kData->edata.fieldtype = caDOUBLE;

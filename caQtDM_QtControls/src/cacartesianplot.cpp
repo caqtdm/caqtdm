@@ -86,6 +86,9 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
            "You can pan by dragging with the middle mouse button.\n"
            "Choose reset zoom in the context menu for original scale.\n ";
 
+
+    lgd = new QwtLegend;
+
     thisToBeTriggered = false;
     thisTriggerNow = true;
     thisCountNumber = 0;
@@ -146,7 +149,9 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
 
     // curves
     for(int i=0; i < curveCount; i++) {
+        thisPV[i]=QStringList();
         curve[i].setLegendAttribute(QwtPlotCurve::LegendShowLine, true);
+        curve[i].setItemAttribute(QwtPlotItem::Legend, false);
         curve[i].setStyle(QwtPlotCurve::Lines);
         curve[i].attach(this);
         curve[i].setOrientation(Qt::Vertical);
@@ -175,6 +180,7 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     setColor_5(Qt::green);
     setColor_6(Qt::magenta);
 
+    thisLegendshow = false;
     setXaxisEnabled(true);
     setYaxisEnabled(true);
     setXscaling(Auto);
@@ -200,6 +206,27 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
 #endif
 
     installEventFilter(this);
+}
+
+void caCartesianPlot::updateLegendsPV() {
+    if(thisLegendshow) {
+        insertLegend(lgd, QwtPlot::BottomLegend);
+        // set color on legend texts
+        setLegendAttribute(thisScaleColor, QFont("arial",9), COLOR);
+
+        for(int index=0; index < curveCount; index++) {
+            curve[index].setItemAttribute(QwtPlotItem::Legend, false);
+            curve[index].setTitle("");
+            if(thisPV[index].size() > 0) {
+                QStringList PVL = thisPV[index];
+                if(PVL.count() == 2) {
+                    QString PVS = PVL.at(0) + " / " + PVL.at(1);
+                    curve[index].setItemAttribute(QwtPlotItem::Legend, true);
+                    curve[index].setTitle(PVS);
+                }
+            }
+        }   
+    }
 }
 
 void caCartesianPlot::resetZoom() {
@@ -544,22 +571,22 @@ void caCartesianPlot::setSamplesData(int index, double *x, double *y, int size, 
 
     // use auxiliary arrays, in order not to overwrite the original data
     if((thisXtype == log10) || (thisYtype == log10)) {
-        XAUX.resize(size);
-        YAUX.resize(size);
-        memcpy(XAUX.data(), x, size*sizeof(double));
-        memcpy(YAUX.data(), y, size*sizeof(double));
+        XAUX[index].resize(size);
+        YAUX[index].resize(size);
+        memcpy(XAUX[index].data(), x, size*sizeof(double));
+        memcpy(YAUX[index].data(), y, size*sizeof(double));
 
         if(thisXtype == log10) {
             for(int i=0; i< size; i++) {
-                if(x[i] <= lowX)  XAUX[i] = lowX;
+                if(x[i] <= lowX)  XAUX[index][i] = lowX;
             }
         }
         if(thisYtype == log10) {
             for(int i=0; i< size; i++) {
-                if(y[i] < lowY) YAUX[i] = lowY;
+                if(y[i] < lowY) YAUX[index][i] = lowY;
             }
         }
-        curve[index].setRawSamples(XAUX.data(), YAUX.data(), size);
+        curve[index].setRawSamples(XAUX[index].data(), YAUX[index].data(), size);
     }
     else {
         curve[index].setRawSamples(x, y, size);
@@ -1023,6 +1050,106 @@ bool caCartesianPlot::eventFilter(QObject *obj, QEvent *event)
         }
     }
     return QObject::eventFilter(obj, event);
+}
+
+void caCartesianPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
+{
+    int i;
+
+    //printf("fontsize=%.1f %s\n", f.pointSizeF(), qasc(this->objectName()));
+    //when legend text gets to small, hide it (will give then space for plot)
+
+
+#if QWT_VERSION < 0x060100
+    for(i=0; i < curveCount; i++) {
+
+        if(f.pointSizeF() <= 4.0) {
+            curve[i].setItemAttribute(QwtPlotItem::Legend, false);
+            continue;
+        } else {
+            curve[i].setItemAttribute(QwtPlotItem::Legend, true);
+        }
+
+        switch (SW) {
+        case TEXT:
+            // done now through curve title
+            break;
+
+        case FONT:
+            if(getLegendEnabled()) {
+                if(legend() != (QwtLegend*) 0) {
+                    QList<QWidget *> list =  legend()->legendItems();
+                    for (QList<QWidget*>::iterator it = list.begin(); it != list.end(); ++it ) {
+                        QWidget *w = *it;
+                        w->setFont(f);
+                    }
+                }
+            }
+            break;
+
+        case COLOR:
+            if(legend() != (QwtLegend*) 0) {
+                QList<QWidget *> list =  legend()->legendItems();
+                for (QList<QWidget*>::iterator it = list.begin(); it != list.end(); ++it ) {
+                    QWidget *w = *it;
+                    QPalette palette = w->palette();
+                    palette.setColor( QPalette::WindowText, c); // for ticks
+                    palette.setColor( QPalette::Text, c);       // for ticks' labels
+                    w->setPalette (palette);
+                    w->setFont(f);
+                }
+            }
+            break;
+        }
+
+    }
+#else
+
+    i=0;
+    foreach (QwtPlotItem *plt_item, itemList()) {
+        if (plt_item->rtti() == QwtPlotItem::Rtti_PlotCurve) {
+
+            QwtPlotCurve *curve = static_cast<QwtPlotCurve *>(plt_item);
+
+            if(f.pointSizeF() <= 4.0) {
+                curve->setItemAttribute(QwtPlotItem::Legend, false);
+                continue;
+            } else if(!curve->title().isEmpty()) {
+                curve->setItemAttribute(QwtPlotItem::Legend, true);
+            }
+
+            QwtLegend *lgd = qobject_cast<QwtLegend *>(legend());
+            if (lgd != (QwtLegend *) 0){
+                QList<QWidget *> legendWidgets = lgd->legendWidgets(itemToInfo(plt_item));
+                if (legendWidgets.size() == 1) {
+                    QwtLegendLabel *b = qobject_cast<QwtLegendLabel *>(legendWidgets[0]);
+                    switch (SW) {
+
+                    case TEXT:
+                        // done now through curve title
+                        break;
+
+                    case FONT:
+                        b->setFont(f);
+                        b->update();
+                        break;
+
+                    case COLOR:
+                        QPalette palette = b->palette();
+                        palette.setColor(QPalette::WindowText, c); // for ticks
+                        palette.setColor(QPalette::Text, c);       // for ticks' labels
+                        b->setPalette(palette);
+                        b->update();
+                        break;
+
+                    }
+                }
+            }
+        }
+    }
+    updateLegend();
+#endif
+
 }
 
 #include "moc_cacartesianplot.cpp"

@@ -27,7 +27,7 @@
 		<string>./fonts/lucida-sans-typewriter.ttf</string>
 	</array>
 	<key>CFBundleShortVersionString</key>
-	<string>4.1.4</string>
+	<string>4.1.6</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.education</string>
 	<key>NOTE</key>

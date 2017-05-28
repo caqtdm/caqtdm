@@ -116,7 +116,8 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
     //qDebug() << "ArchivePlugin:pvAddMonitor" << kData->pv << kData->index << kData->dispName;
 
     if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) kData->dispW)) {
-        char asc[50];
+
+        char asc[CHAR_ARRAY_LENGTH];
         indexes index;
 
         sprintf(asc, "%d_%s_%p",kData->specData[0], kData->pv, kData->dispW);
@@ -176,39 +177,37 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
     return true;
 }
 
-void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double> TimerN, QVector<double> YValsN)
+void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double> TimerN, QVector<double> YValsN, QString backend)
 {
     if(nbVal > 0) {
         knobData* kData = mutexknobdataP->GetMutexKnobDataPtr(indexNew.indexX);
         //qDebug() << indexNew.indexX;
         if((kData != (knobData *) 0) && (kData->index != -1)) {
-            mutexknobdataP->DataLock(kData);
             kData->edata.fieldtype = caDOUBLE;
             kData->edata.connected = true;
             kData->edata.accessR = kData->edata.accessW = true;
             kData->edata.monitorCount++;
+            strcpy(kData->edata.fec, qasc(backend));
 
             if((nbVal * sizeof(double)) > (size_t) kData->edata.dataSize) {
                 if(kData->edata.dataB != (void*) 0) free(kData->edata.dataB);
                 kData->edata.dataB = (void*) malloc(nbVal * sizeof(double));
                 kData->edata.dataSize = nbVal * sizeof(double);
-
-                memcpy(kData->edata.dataB, &TimerN[0],  nbVal * sizeof(double));
             }
+            memcpy(kData->edata.dataB, &TimerN[0],  nbVal * sizeof(double));
             kData->edata.valueCount = nbVal;
 
             mutexknobdataP->SetMutexKnobData(kData->index, *kData);
-            mutexknobdataP->DataUnlock(kData);
         }
 
         kData = mutexknobdataP->GetMutexKnobDataPtr(indexNew.indexY);
         //qDebug() << indexNew.indexY;
         if((kData != (knobData *) 0) && (kData->index != -1)) {
-            mutexknobdataP->DataLock(kData);
             kData->edata.fieldtype = caDOUBLE;
             kData->edata.connected = true;
             kData->edata.accessR = kData->edata.accessW = true;
             kData->edata.monitorCount++;
+            strcpy(kData->edata.fec, qasc(backend));
 
             if((nbVal * sizeof(double)) > (size_t) kData->edata.dataSize) {
                 if(kData->edata.dataB != (void*) 0) free(kData->edata.dataB);
@@ -220,7 +219,6 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double
             kData->edata.valueCount = nbVal;
 
             mutexknobdataP->SetMutexKnobDataReceived(kData);
-            mutexknobdataP->DataUnlock(kData);
         }
     }
 }
@@ -234,7 +232,7 @@ int ArchiverCommon::pvClearMonitor(knobData *kData) {
 
     if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) kData->dispW)) {
         Q_UNUSED(w);
-        char asc[50];
+        char asc[CHAR_ARRAY_LENGTH];
         sprintf(asc, "%d_%s_%p",kData->specData[0], kData->pv, kData->dispW);
         QString key = QString(asc);
         key = key.replace(".X", "");

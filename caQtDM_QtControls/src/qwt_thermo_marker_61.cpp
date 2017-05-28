@@ -105,7 +105,9 @@ public:
         colorMap( NULL ),
         minValue( 0.0 ),
         maxValue( 100.0 ),
-        value( 0.0 )
+        value( 0.0 ),
+        prvValue (0.0),
+        decayingValue (0.0)
     {
         rangeFlags = QwtInterval::IncludeBorders;
     }
@@ -136,15 +138,14 @@ public:
     double minValue;
     double maxValue;
 
-    double value;
+    double value, prvValue, decayingValue;
 };
 
 /*!
   Constructor
   \param parent Parent widget
 */
-QwtThermoMarker::QwtThermoMarker( QWidget *parent ):
-    QwtAbstractScale( parent )
+QwtThermoMarker::QwtThermoMarker( QWidget *parent ): QwtAbstractScale( parent )
 {
     d_data = new PrivateData;
 
@@ -157,6 +158,13 @@ QwtThermoMarker::QwtThermoMarker( QWidget *parent ):
     setAttribute( Qt::WA_WState_OwnSizePolicy, false );
     layoutThermo( true );
     thisType = Pipe;
+
+    redrawTimer = new QTimer(this);
+    connect(redrawTimer, SIGNAL(timeout()), this, SLOT(redrawTimerExpired()));
+    redrawTimer->start(RedrawInterval);
+
+    setDecayOption(false);
+    setDecayTime(1.0);
 }
 
 //! Destructor
@@ -241,11 +249,20 @@ double QwtThermoMarker::minValue() const
 */
 void QwtThermoMarker::setValue( double value )
 {
-    if ( d_data->value != value )
-    {
+    if (d_data->value != value) {
         d_data->value = value;
+
+        if(d_data->orientation == Qt::Vertical && thisType == Pipe && getDecayOption()) {
+            //printf("%f %f\n ", prvValue, d_data->decayingValue);
+            if(prvValue > d_data->decayingValue) {
+                d_data->prvValue = prvValue;
+                peakLevelChanged.start();
+                if(!redrawTimer->isActive() && value < prvValue) redrawTimer->start(RedrawInterval);
+            }
+        }
         update();
     }
+    prvValue = value;
 }
 
 //! Return the value.
@@ -623,13 +640,33 @@ void QwtThermoMarker::scaleChange()
     layoutThermo( true );
 }
 
+void QwtThermoMarker::redrawTimerExpired()
+{
+    if(d_data->orientation == Qt::Vertical && thisType == Pipe && getDecayOption()) {
+        qreal decayTime = getDecayTime();  // 1-2 seconds
+        // Decay the peak signal
+        const int elapsedMs = peakLevelChanged.elapsed();
+        const qreal decayAmount = qAbs(d_data->maxValue - d_data->minValue) * elapsedMs / 9000.0 / decayTime;   // 1s for 1/10 of bar
+        //printf("value=%f elapsedMs=%d decayAmount=%lf prvValue=%lf\n", d_data->value, elapsedMs, decayAmount, d_data->prvValue);
+        if (decayAmount < d_data->prvValue) {
+            d_data->decayingValue = d_data->prvValue - decayAmount;
+        } else {
+            d_data->decayingValue = 0.0;
+        }
+        if(d_data->decayingValue <= d_data->value){
+            d_data->decayingValue = 0.0;
+            redrawTimer->stop();
+        }
+        update();
+    }
+}
+
 /*!
    Redraw the liquid in thermometer pipe.
    \param painter Painter
    \param pipeRect Bounding rectangle of the pipe without borders
 */
-void QwtThermoMarker::drawLiquid(
-    QPainter *painter, const QRect &pipeRect ) const
+void QwtThermoMarker::drawLiquid(QPainter *painter, const QRect &pipeRect ) const
 {
     painter->save();
     painter->setClipRect( pipeRect, Qt::IntersectClip );
@@ -639,8 +676,24 @@ void QwtThermoMarker::drawLiquid(
 
     QRect liquidRect = fillRect( pipeRect );
 
-    if ( d_data->colorMap != NULL )
-    {
+    // decaying value
+    QRect decayingRect = pipeRect;
+    int from = qRound( scaleMap.transform( d_data->decayingValue) );
+    int to = qRound( scaleMap.transform( d_data->origin ) );
+
+    if ( to < from ) qSwap( from, to );
+
+    if(d_data->orientation == Qt::Vertical && thisType == Pipe && getDecayOption()) {
+        decayingRect.setBottom( from + 1);
+        decayingRect.setTop( from - 1);
+        //printf("drawliquid value=%lf d_data->decayingPrvValue=%lf y=%d\n", d_data->value, d_data->decayingValue, from);
+        QBrush brush = palette().brush( QPalette::ButtonText );
+        QColor color = brush.color();
+        color = color.lighter();
+        painter->fillRect(decayingRect, color);
+    }
+
+    if ( d_data->colorMap != NULL ) {
         const QwtInterval interval = scaleDiv().interval().normalized();
 
         // Because the positions of the ticks are rounded
@@ -648,47 +701,35 @@ void QwtThermoMarker::drawLiquid(
 
         QVector<double> values = qwtTickList( scaleDraw()->scaleDiv() );
 
-        if ( scaleMap.isInverting() )
+        if ( scaleMap.isInverting() ) {
             qSort( values.begin(), values.end(), qGreater<double>() );
-        else
+        } else {
             qSort( values.begin(), values.end(), qLess<double>() );
+        }
 
         int from = 0;
-        if ( !values.isEmpty() )
-        {
+        if ( !values.isEmpty() ) {
             from = qRound( scaleMap.transform( values[0] ) );
-            qwtDrawLine( painter, from,
-                d_data->colorMap->color( interval, values[0] ),
-                pipeRect, liquidRect, d_data->orientation );
+            qwtDrawLine( painter, from, d_data->colorMap->color( interval, values[0] ), pipeRect, liquidRect, d_data->orientation );
         }
 
-        for ( int i = 1; i < values.size(); i++ )
-        {
+        for ( int i = 1; i < values.size(); i++ ) {
             const int to = qRound( scaleMap.transform( values[i] ) );
 
-            for ( int pos = from + 1; pos < to; pos++ )
-            {
+            for ( int pos = from + 1; pos < to; pos++ ) {
                 const double v = scaleMap.invTransform( pos );
-
-                qwtDrawLine( painter, pos,
-                    d_data->colorMap->color( interval, v ),
-                    pipeRect, liquidRect, d_data->orientation );
+                qwtDrawLine( painter, pos, d_data->colorMap->color( interval, v ), pipeRect, liquidRect, d_data->orientation );
             }
 
-            qwtDrawLine( painter, to,
-                d_data->colorMap->color( interval, values[i] ),
-                pipeRect, liquidRect, d_data->orientation );
-
+            qwtDrawLine( painter, to, d_data->colorMap->color( interval, values[i] ), pipeRect, liquidRect, d_data->orientation );
             from = to;
         }
-    }
-    else
-    {
-        if ( !liquidRect.isEmpty() && d_data->alarmEnabled )
-        {
+
+    } else {
+
+        if ( !liquidRect.isEmpty() && d_data->alarmEnabled ) {
             const QRect r = alarmRect( liquidRect );
-            if ( !r.isEmpty() )
-            {
+            if ( !r.isEmpty() ) {
                 painter->fillRect( r, palette().brush( QPalette::Highlight ) );
                 liquidRect = QRegion( liquidRect ).subtracted( r ).boundingRect();
             }
@@ -983,16 +1024,11 @@ QSize QwtThermoMarker::minimumSizeHint() const
 QRect QwtThermoMarker::fillRect( const QRect &pipeRect ) const
 {
     double origin;
-    if ( d_data->originMode == OriginMinimum )
-    {
+    if ( d_data->originMode == OriginMinimum ) {
         origin = qMin( lowerBound(), upperBound() );
-    }
-    else if ( d_data->originMode == OriginMaximum )
-    {
+    } else if ( d_data->originMode == OriginMaximum ) {
         origin = qMax( lowerBound(), upperBound() );
-    }
-    else // OriginCustom
-    {
+    } else { // OriginCustom
         origin = d_data->origin;
     }
 
@@ -1004,8 +1040,7 @@ QRect QwtThermoMarker::fillRect( const QRect &pipeRect ) const
     if ( to < from ) qSwap( from, to );
 
     QRect fillRect = pipeRect;
-    if ( d_data->orientation == Qt::Horizontal )
-    {
+    if ( d_data->orientation == Qt::Horizontal ) {
         if(thisType == Marker) {
             if(lowerBound() < upperBound()) qSwap( from, to );
             fillRect.setLeft( from + 2 );
@@ -1017,12 +1052,12 @@ QRect QwtThermoMarker::fillRect( const QRect &pipeRect ) const
             fillRect.setLeft(cval);
             fillRect.setRight(to);
         } else {
-           fillRect.setLeft( from );
-           fillRect.setRight( to );
+            fillRect.setLeft( from );
+            fillRect.setRight( to );
         }
-    }
-    else // Qt::Vertical
-    {
+
+    } else { // Qt::Vertical
+
         if(thisType == Marker) {
             if(lowerBound() > upperBound()) qSwap( from, to );
             fillRect.setBottom( from + 2);
@@ -1034,8 +1069,8 @@ QRect QwtThermoMarker::fillRect( const QRect &pipeRect ) const
             fillRect.setTop(from);
             fillRect.setBottom(cval);
         } else {
-           fillRect.setTop( from );
-           fillRect.setBottom( to );
+            fillRect.setTop( from );
+            fillRect.setBottom( to );
         }
     }
 

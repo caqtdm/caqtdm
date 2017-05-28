@@ -36,7 +36,6 @@
 
 class QTCON_EXPORT caScriptButton : public QWidget
 {
-
     Q_OBJECT
 
     Q_ENUMS(defaultDisplay)
@@ -57,7 +56,6 @@ class QTCON_EXPORT caScriptButton : public QWidget
 #include "caElevation.h"
 
 public:
-
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum defaultDisplay {Invisible, Visible};
@@ -95,9 +93,12 @@ public:
     void *getProcess() const {return thisProcess;}
     void setProcess(void *t) {thisProcess = t;}
 
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
 
 private slots:
-
     void buttonToggled();
     void scriptButtonClicked();
 
@@ -105,11 +106,9 @@ protected:
        void changeEvent(QEvent *e);
 
 signals:
-
    void scriptButtonSignal();
 
 private:
-
     bool eventFilter(QObject *obj, QEvent *event);
 
     QString thisLabel;

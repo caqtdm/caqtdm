@@ -34,7 +34,6 @@ class ImagePushButton : public EPushButton
 {
 
 public:
-
     ImagePushButton(const QString& text, const QString& image, QWidget *parent = 0);
     ~ImagePushButton(){}
 
@@ -43,7 +42,6 @@ public:
     void setInVisible(QColor bg, QColor fg, QColor bc);
 
 protected:
-
   void paintEvent( QPaintEvent* event);
   void resizeEvent(QResizeEvent *e);
 

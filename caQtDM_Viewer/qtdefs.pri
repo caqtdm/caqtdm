@@ -1,4 +1,19 @@
-CAQTDM_VERSION = V4.1.5
+CAQTDM_VERSION = V4.1.6
+
+exists(../.git) {
+  CAQTDM_GIT_VERSION = $$system(git rev-parse --abbrev-ref HEAD)
+  CAQTDM_GIT_COMMAND = $$sprintf("git rev-parse --short=8 origin/%1", $$CAQTDM_GIT_VERSION)
+  CAQTDM_GIT_HASH = $$system($$CAQTDM_GIT_COMMAND)
+
+  contains(CAQTDM_GIT_VERSION, "Development") {
+     CAQTDM_VERSION = $$sprintf("%1_%2_%3", $$CAQTDM_VERSION, $$CAQTDM_GIT_VERSION, $$CAQTDM_GIT_HASH)
+  }
+  #message("$$CAQTDM_GIT_VERSION")
+  #message("$$CAQTDM_GIT_COMMAND")
+  #message("$$CAQTDM_GIT_HASH")
+}
+
+#message($$CAQTDM_VERSION)
 
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
@@ -83,11 +98,23 @@ exists($(EPICS4LOCATION)/pvAccessCPP/include/pv/pvAccess.h) {
 
 # undefine this for bsread (zeromq) plugin support
 # the main work for this plugin was done by Helge Brands
-exists($(ZMQINC)/zmq.h) {
-!MOBILE {
-   message( "Configuring controlsystem plugin for bsread" )
-   CONFIG += bsread
+contains(QT_VER_MAJ, 4) {
+    contains(QT_VER_MIN, 6) {
+       message( "version 4.6 of Qt" )
+       CONFIG += OLDQT
+    }
 }
+
+# undefine this for bsread (zeromq) plugin support
+# the main work for this plugin was done by Helge Brands
+# will not be build for older version of Qt
+!OLDQT {
+  exists($(ZMQINC)/zmq.h) {
+    !MOBILE {
+       message( "Configuring controlsystem plugin for bsread" )
+       CONFIG += bsread
+    }
+  }
 }
 
 #message("$$PWD")
@@ -99,8 +126,8 @@ archive: {
 # html retrieval, can always be build
    CONFIG += archiveSF
 # next ones are only buildable at psi
-   QMAKESPEC = $$(QMAKESPEC)
-   X64 = $$find(QMAKESPEC, 64)
+
+   X64 = $$find($$(QMAKESPEC), 64)
    isEmpty(X64) {
        exists(../../Libs/libNewLogRPC.a) {
           message( "Configuring archive plugin build for logging (32)" )
@@ -159,6 +186,33 @@ DEFINES += TARGET_DESCRIPTION=\"\\\"$${TARGET_DESCRIPTION}\\\"\"
 DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
+
+# 4.1.5 of 8.4.2017
+# possibility to add a frame around a caInclude
+# in case of epics 3.15 added DBE_PROPERTY
+# modified caQtDM.pri for macos
+# modified caLineEdit and caLineDraw for displaying long long instead of long when double to integer representation
+
+# 4.1.5 of 5.4.2017
+# caled circle will stay a circle when resizing with another aspect ration; border color can be customized
+# add vumeter simulation to caThermo
+
+# 4.1.5 of 23.3.17
+# calineargauge made correct size when no scale (in order to make all sizes the same)
+# for caRelatedDisplay one can now set the position for the called window
+# for caThermo a problem solved in case of alarm colors (not always refreshed with right color) and transparency added for background
+# for caThermo offset of 4 pixels modified in case of noscale
+
+# 4.1.5 of 15.3.17
+# added horizontal and vertical spacing properties to caInclude
+# added possibility to modify position and size of a control object by the function %QRect in caCalc using 1 to 4 channels
+# loading of files through internet now also over https
+# again compatible with Qt4.6
+# cachoice bug when using bit offset corrected
+# legend added to cacartesianplot
+# calineargauge and cacirculargauge modifier in indor to be smaller and changed font algorithme.
+# added possibility to have another http address for archiveSF
+# added test to indicate that waveforms are not supported by the archive plugins.
 
 # 4.1.5
 # archive plugins added

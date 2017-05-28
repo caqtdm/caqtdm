@@ -117,4 +117,8 @@
 # define LMAXVALUE       "maxValue: Maximum value used for alarmhandling in case of limitsMode=User"
 # define LMINVALUE       "minValue: Minimum value used for alarmhandling in case of limitsMode=User"
 
+// caThermo
+#define DECAYOPTION      "this option simulates a vumeter, but only for type=Pipe and direction=Up"
+#define DECAYTIME        "time for a decay in seconds of the vumeter marker for a change of 1/10 of scale"
+
 #endif

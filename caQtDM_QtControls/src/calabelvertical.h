@@ -58,7 +58,6 @@ class QTCON_EXPORT caLabelVertical : public QWidget, public FontScalingWidget
 #include "caVisibDefs.h"
 
 public:
-
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum ScaleMode { None, Height, WidthAndHeight};
@@ -104,6 +103,11 @@ public:
     void setColorMode(colMode colormode) {thisColorMode = colormode;
                                           setBackground(thisBackColor);
                                           setForeground(thisForeColor);}
+public slots:
+    void animation(QRect p) {
+#include "animationcode.h"
+    }
+
 protected:
     virtual bool event(QEvent *);
     virtual QSize sizeHint() const;
