@@ -479,8 +479,30 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 #if QT_VERSION > 0x050000
     connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this, SLOT(onApplicationStateChange(Qt::ApplicationState)));
 #endif
-}
 
+    // we want to be able to exit caQtDM after some amount of time (defined by an environment variable), while many displays are normally started at PSI on a central computer
+    // and never terminated by the used (comes mainly from NX where a session can be closed without closing the applications)
+    QString timeoutHours = (QString)  qgetenv("CAQTDM_TIMEOUT_HOURS");
+    caQtDM_TimeOutEnabled = false;
+    if(timeoutHours.length() > 0) {
+        bool ok;
+        QString displayTimeOut="Info: timeout of caQtDM defined in hours: ";
+        displayTimeOut.append( (QString)  qgetenv("CAQTDM_TIMEOUT_HOURS"));
+
+        qApp->installEventFilter(this);  // move in windows should reset our timeout counter
+        caQtDM_TimeOut = caQtDM_TimeLeft = timeoutHours.trimmed().toDouble(&ok);
+        if(ok) {
+            caQtDM_TimeOutEnabled = true;
+            displayTimeOut.append(" will be enabled");
+        } else {
+            displayTimeOut.append(" can not be enabled");
+        }
+        messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(displayTimeOut));
+    } else {
+        QString displayTimeOut="environment variable CAQTDM_TIMEOUT_HOURS could be set for quitting caQtDM automatically after some time";
+        messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(displayTimeOut));
+    }
+}
 
 void FileOpenWindow::parseConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files)
 {
@@ -601,6 +623,7 @@ void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
     file.close();
 }
 
+// runs one per second
 void FileOpenWindow::timerEvent(QTimerEvent *event)
 {
 #define MAXLEN 255
@@ -613,6 +636,17 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
     int countDisplayed = 0;
     static int printIt = 0;
     static int timeout = 0;
+
+    // when timeout, quit
+    if(caQtDM_TimeOutEnabled) {
+        caQtDM_TimeLeft -= 1.0/3600.0;
+        if(caQtDM_TimeLeft <= 0) {
+            QList<CaQtDM_Lib *> all = this->findChildren<CaQtDM_Lib *>();
+            foreach(QWidget* widget, all) widget->close();
+            if (sharedMemory.isAttached()) sharedMemory.detach();
+            qApp->exit(0);
+        }
+    }
 
     if(mustOpenFile) {
         mustOpenFile = false;
@@ -637,6 +671,13 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
         char msg[255];
         msg[0] = '\0';
         fillPVtable(countPV, countNotConnected, countDisplayed);
+
+        if(caQtDM_TimeOutEnabled) {
+            char asc1[30];
+            sprintf(asc1, ", T/O=%.2lfh ", caQtDM_TimeLeft);
+            strcat(asc, asc1);
+        }
+
         highCount = mutexKnobData->getHighestCountPV(highPV);
         if(highCount != 0.0) {
             snprintf(msg, MAXLEN - 1, "%s - PV=%d (%d NC), %d Monitors/s, %d Displays/s, highest=%s with %.1f Monitors/s ", asc, countPV, countNotConnected,
@@ -1417,4 +1458,11 @@ void FileOpenWindow::closeEvent(QCloseEvent* ce)
     fromIOS = false;
     Callback_ActionExit();
     ce->ignore();
+}
+
+bool FileOpenWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    Q_UNUSED(obj);
+    if (event->type() == QEvent::MouseMove) caQtDM_TimeLeft = caQtDM_TimeOut;
+    return false;
 }

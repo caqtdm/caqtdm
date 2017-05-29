@@ -123,6 +123,7 @@ public slots:
 protected:
      virtual void timerEvent(QTimerEvent *e);
      Qt::GestureType fingerSwipeGestureType;
+     bool eventFilter(QObject *obj, QEvent *event);
 
 signals:
    void messageAvailable(QString message);
@@ -163,6 +164,9 @@ private:
      struct Row {QPoint position; QString file; QString macro; QString resize;};
 
      QList<Row> reloadList;
+
+     double caQtDM_TimeLeft, caQtDM_TimeOut;
+     bool caQtDM_TimeOutEnabled;
 
  };
 
