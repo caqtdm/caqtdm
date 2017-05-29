@@ -29,6 +29,8 @@ bool HTTPCONFIGURATOR = false;
   #define NOMINMAX
   #include <windows.h>
   #define snprintf _snprintf
+  #include <Psapi.h>
+  #pragma comment (lib, "Psapi.lib")
 #endif
 #include "searchfile.h"
 
@@ -663,7 +665,15 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 #ifdef linux
     struct rusage usage;
     getrusage(RUSAGE_SELF, &usage);
-    sprintf(asc, "memory: %ld kB", usage.ru_maxrss);
+    sprintf(asc, "memory: %ld kB,", usage.ru_maxrss);
+#endif
+#ifdef _WIN32
+    PROCESS_MEMORY_COUNTERS_EX procmem;
+    if (GetProcessMemoryInfo(GetCurrentProcess(),(PPROCESS_MEMORY_COUNTERS)&procmem,sizeof(procmem))) {
+      sprintf(asc, "memory: %ld kB,", (procmem.PrivateUsage / (1024)));
+    } else {
+      sprintf(asc, "memory: no RAM,");
+    }
 #endif
 
     // any non connected pv's to display ?
@@ -674,7 +684,11 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 
         if(caQtDM_TimeOutEnabled) {
             char asc1[30];
-            sprintf(asc1, ", T/O=%.2lfh ", caQtDM_TimeLeft);
+            if (caQtDM_TimeLeft<0.02){
+                sprintf(asc1, "T/O=%.0fsec ", caQtDM_TimeLeft*60*60);
+            }else{
+                sprintf(asc1, "T/O=%.2lfh ", caQtDM_TimeLeft);
+            }
             strcat(asc, asc1);
         }
 
