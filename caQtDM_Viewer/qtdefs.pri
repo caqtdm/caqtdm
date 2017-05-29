@@ -1,16 +1,20 @@
 CAQTDM_VERSION = V4.1.6
 
-exists(../.git) {
-  CAQTDM_GIT_VERSION = $$system(git rev-parse --abbrev-ref HEAD)
-  CAQTDM_GIT_COMMAND = $$sprintf("git rev-parse --short=8 origin/%1", $$CAQTDM_GIT_VERSION)
-  CAQTDM_GIT_HASH = $$system($$CAQTDM_GIT_COMMAND)
 
-  contains(CAQTDM_GIT_VERSION, "Development") {
-     CAQTDM_VERSION = $$sprintf("%1_%2_%3", $$CAQTDM_VERSION, $$CAQTDM_GIT_VERSION, $$CAQTDM_GIT_HASH)
+
+exists(../.git) {
+ $$system(git --version):{
+	  CAQTDM_GIT_VERSION = $$system(git rev-parse --abbrev-ref HEAD)
+	  CAQTDM_GIT_COMMAND = $$sprintf("git rev-parse --short=8 origin/%1", $$CAQTDM_GIT_VERSION)
+	  CAQTDM_GIT_HASH = $$system($$CAQTDM_GIT_COMMAND)
+
+	  contains(CAQTDM_GIT_VERSION, "Development") {
+	     CAQTDM_VERSION = $$sprintf("%1_%2_%3", $$CAQTDM_VERSION, $$CAQTDM_GIT_VERSION, $$CAQTDM_GIT_HASH)
+	  }
+	  #message("$$CAQTDM_GIT_VERSION")
+	  #message("$$CAQTDM_GIT_COMMAND")
+	  #message("$$CAQTDM_GIT_HASH")
   }
-  #message("$$CAQTDM_GIT_VERSION")
-  #message("$$CAQTDM_GIT_COMMAND")
-  #message("$$CAQTDM_GIT_HASH")
 }
 
 #message($$CAQTDM_VERSION)
