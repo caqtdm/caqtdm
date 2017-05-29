@@ -493,11 +493,13 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 
         qApp->installEventFilter(this);  // move in windows should reset our timeout counter
         caQtDM_TimeOut = caQtDM_TimeLeft = timeoutHours.trimmed().toDouble(&ok);
-        if(ok) {
+        if(ok && (caQtDM_TimeOut>0.021)) {
             caQtDM_TimeOutEnabled = true;
             displayTimeOut.append(" will be enabled");
         } else {
             displayTimeOut.append(" can not be enabled");
+            if (ok && (caQtDM_TimeOut<=0.021))  displayTimeOut.append(",because the Switch is not mean't for jokes!!!");
+
         }
         messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(displayTimeOut));
     } else {
