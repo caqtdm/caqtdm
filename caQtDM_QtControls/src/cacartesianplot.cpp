@@ -520,6 +520,10 @@ void caCartesianPlot::setSamplesData(int index, double *x, double *y, int size, 
 {
     double lowX = BIGGEST;
     double lowY = BIGGEST;
+    double lowX1 = BIGGEST;
+    double lowY1 = BIGGEST;
+    bool nanXpresent=false;
+    bool nanYpresent=false;
 
     // in case of autoscaling and you have infinite values, things will go wrong
     if(thisXscaling == Auto) {
@@ -533,6 +537,8 @@ void caCartesianPlot::setSamplesData(int index, double *x, double *y, int size, 
                 break;
             }
             if((x[i] < lowX) && (x[i] > 0.0)) lowX = x[i];
+            if(x[i] < lowX1) lowX1 = x[i];
+            if(qIsNaN(x[i])) nanXpresent= true;
         }
 
         if(lowX == BIGGEST) {
@@ -551,7 +557,10 @@ void caCartesianPlot::setSamplesData(int index, double *x, double *y, int size, 
                 fflush(stdout);
                 break;
             }
+            // for logarithmic scale
             if((y[i] < lowY) && (y[i] > 0.0)) lowY = y[i];
+            if(y[i] < lowY1) lowY1 = y[i];
+            if(qIsNaN(y[i])) nanYpresent= true;
         }
 
         if(lowY == BIGGEST) {
@@ -579,16 +588,20 @@ void caCartesianPlot::setSamplesData(int index, double *x, double *y, int size, 
         if(thisXtype == log10) {
             for(int i=0; i< size; i++) {
                 if(x[i] <= lowX)  XAUX[index][i] = lowX;
+                if(qIsNaN(x[i]))  XAUX[index][i] = lowX;
             }
         }
         if(thisYtype == log10) {
             for(int i=0; i< size; i++) {
-                if(y[i] < lowY) YAUX[index][i] = lowY;
+                if(y[i] < lowY)   YAUX[index][i] = lowY;
+                 if(qIsNaN(y[i])) YAUX[index][i] = lowY;
             }
         }
         curve[index].setRawSamples(XAUX[index].data(), YAUX[index].data(), size);
     }
     else {
+        if(nanYpresent) for(int i=0; i< size; i++) if(qIsNaN(y[i])) y[i] = lowY1;
+        if(nanXpresent) for(int i=0; i< size; i++) if(qIsNaN(x[i])) x[i] = lowX1;
         curve[index].setRawSamples(x, y, size);
     }
 }

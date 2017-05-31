@@ -193,7 +193,7 @@ void MutexKnobData::RemoveSoftPV(QString pv, QWidget *w, int indx)
 /**
  * update the data for the caCalc softpv
  */
-void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w)
+void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w, int dataIndex, int dataCount)
 {
     char asc[MAXPVLEN+20];
 
@@ -203,13 +203,33 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w)
     QMap<QString, int>::const_iterator name = softPV_WidgetList.find(asc);
     if(name != softPV_WidgetList.end()) {
         knobData *ptr = GetMutexKnobDataPtr(name.value());
-        //qDebug() << "update index" << ptr->index << "for name" << ptr->pv << "with value=" << value;
-        ptr->edata.rvalue = value;
         ptr->edata.fieldtype = caDOUBLE;
         ptr->edata.precision = 3;
-        ptr->edata.connected = true;
+
         ptr->edata.upper_disp_limit=0.0;
         ptr->edata.lower_disp_limit=0.0;
+
+        // single value
+        if(dataCount <= 1) {
+            //qDebug() << "updatesoftpv single" << ptr->index << "for name" << ptr->pv << "with value=" << value << "dataIndex=" << dataIndex << "dataCount=" << dataCount ;
+            ptr->edata.rvalue = value;
+            ptr->edata.connected = true;
+
+        // waveform
+        } else if(dataIndex < dataCount) {
+            // initialize data to nan and update the correct index
+            if((int) (dataCount * sizeof(double)) != ptr->edata.dataSize) {
+                if(ptr->edata.dataB != (void*) 0) free(ptr->edata.dataB);
+                ptr->edata.dataB = (void*) malloc(dataCount * sizeof(double));
+                double *data = (double *) ptr->edata.dataB;
+                for(int i=0; i<dataCount; i++) data[i] = qQNaN();
+            }
+            ptr->edata.dataSize = dataCount * (int) sizeof(double);
+            ptr->edata.valueCount = dataCount;
+            //qDebug() << "updatesoftpv wave" << dataIndex << value << dataCount;
+            double *data = (double *) ptr->edata.dataB;
+            data[dataIndex] = value;
+        }
     }
 
     // and update everywhere where this soft channel is also used on this main window
@@ -221,7 +241,25 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w)
             int indx = i.value();
             if(KnobData[indx].index != -1 && KnobData[indx].pv == pv && ((QWidget*) list.at(2).toLong(0,16) ==  w)) {
                 //qDebug() <<  "     update index=" << i.value() << i.key() <<  w << "with" << value;
-                KnobData[indx].edata.rvalue = value;
+
+                // simple double
+                if(dataCount <= 1) {
+                    KnobData[indx].edata.rvalue = value;
+
+                // waveform
+                } else {
+                    // initialize data to nan and update the correct index
+                    if((int) (dataCount * sizeof(double)) !=  KnobData[indx].edata.dataSize) {
+                        if( KnobData[indx].edata.dataB != (void*) 0) free( KnobData[indx].edata.dataB);
+                        KnobData[indx].edata.dataB = (void*) malloc(dataCount * sizeof(double));
+                        double *data = (double *) KnobData[indx].edata.dataB;
+                        for(int i=0; i<dataCount; i++) data[i] = qQNaN();
+                    }
+                    KnobData[indx].edata.dataSize = dataCount * sizeof(double);
+                    double *data = (double *) KnobData[indx].edata.dataB;
+                    data[dataIndex] = value;
+                    KnobData[indx].edata.valueCount = dataCount;
+                }
                 KnobData[indx].edata.fieldtype = caDOUBLE;
                 KnobData[indx].edata.precision = 3;
                 KnobData[indx].edata.connected = true;
@@ -386,8 +424,6 @@ extern "C" MutexKnobData* C_DataUnlock(MutexKnobData* p, knobData *kData) {
     p->DataUnlock(kData);
     return p;
 }
-
-
 
 /**
  * update array with the received data
@@ -555,18 +591,27 @@ void MutexKnobData::timerEvent(QTimerEvent *)
             if(getSoftPV(kPtr->pv, &indx, (QWidget*) kPtr->thisW)) {
                 // get value from (updated) QMap variable list
                 knobData *ptr = (knobData*) &KnobData[indx];
-                kPtr->edata.rvalue = ptr->edata.rvalue;
                 kPtr->edata.fieldtype = caDOUBLE;
-                kPtr->edata.connected = true;
+                //kPtr->edata.connected = true;
                 kPtr->edata.accessW = true;
                 kPtr->edata.accessR = true;
+
+                // when waveform put first value into the normal value
+                if(ptr->edata.valueCount > 0) {
+                     double *data = (double *) ptr->edata.dataB;
+                     kPtr->edata.rvalue = data[0];
+                } else {
+                   kPtr->edata.rvalue = ptr->edata.rvalue;
+                   kPtr->edata.connected = true;
+                }
+
                 //increase monitor count when value has changed
                 if(kPtr->edata.oldsoftvalue != ptr->edata.rvalue) {
                     //qDebug() << kPtr->pv << kPtr->dispName << "will be updated with value=" << ptr->edata.rvalue << "from" << ptr->pv << "index=" << ptr->index << "oldvalue=" << kPtr->edata.oldsoftvalue;
                     kPtr->edata.monitorCount++;
                 }
 
-                // when any monitors for calculation increase monitorcount
+                // when any monitors for calculation increase monitorcount (sorry, we are not testing if any change of values)
                 QWidget *w1 =  (QWidget*) kPtr->dispW;
                 QVariant var = w1->property("MonitorList");
                 QVariantList list = var.toList();
@@ -576,7 +621,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                         QWidget *w2 = (QWidget*) kPtr->dispW;
                         if(!w2->property("hidden").value<bool>()) {
                            kPtr->edata.monitorCount++;
-                           //qDebug() << "increase associated" << kPtr->pv << w2->objectName() <<  w2->property("hidden").value<bool>() << number1++;
+                           //qDebug() << "increase associated" << kPtr->pv << w2->objectName();
                         }
                     }
                 }

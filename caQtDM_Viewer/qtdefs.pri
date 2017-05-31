@@ -191,6 +191,11 @@ DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
+# 4.1.6
+# added check for when git not present
+# added an environment variable CAQTD_TIMEOUT_HOURS to be used to quit caQtDM automatically, mouse event will reset the timeout.
+# it is now possible to use caCalc as a vector (waveform) by specifying associated pv's. the soft variable can then be used to display a waveform
+
 # 4.1.5 of 8.4.2017
 # possibility to add a frame around a caInclude
 # in case of epics 3.15 added DBE_PROPERTY

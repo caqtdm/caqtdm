@@ -970,12 +970,40 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             }
             reaffectText(map, &pv);
             calcWidget->setVariable(pv);
+            calcWidget->setDataCount(0);
             addMonitor(myWidget, &kData, qasc(pv), w1, specData, map, &pv);
+
+            // when cacalc is a waveform composed from individual channels
+            if(calcWidget->getVariableType() == caCalc::vector) {
+                // test for waveform
+                int num;
+                kData.soft = false;
+                QString text;
+                QList<QVariant> monitorList;
+                QList<QVariant> indexList;
+                QList<QString> pvList = calcWidget->getPVList();
+
+                // add all channels
+                nbMonitors = pvList.count();
+                calcWidget->setDataCount(nbMonitors);
+                for(int i=0; i<pvList.count(); i++) {
+                    specData[0] = i;
+                    text = treatMacro(map, pvList[i], &doNothing);
+                    num = addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
+                    monitorList.append(num);
+                    indexList.append(i);
+                }
+                monitorList.insert(0, nbMonitors);
+                indexList.insert(0, nbMonitors);
+                calcWidget->setProperty("MonitorList", monitorList);
+                calcWidget->setProperty("IndexList", indexList);
+                calcWidget->setValue(calcWidget->getVariable());
+            }
 
             //qDebug() <<  "firstpass" << firstPass <<  "treatPrimary:" << treatPrimary << pv << calcWidget << SoftPVusesItsself(calcWidget, map);
 
             // softchannels calculating with themselves are done first
-            if(SoftPVusesItsself(calcWidget, map) && treatPrimary) {
+            else if(SoftPVusesItsself(calcWidget, map) && treatPrimary) {
                 doit=true;
                 //qDebug() << "softchannels calculating with themselves have to be done first: doit";
 
@@ -992,13 +1020,14 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
             // other channels if any
             kData.soft = false;
-            nbMonitors = InitVisibility(w1, &kData, map, specData, qasc(calcWidget->getVariable()));
+            // if cacalc is a simple double then calculate its value with the up to 4 channels
+            if(calcWidget->getVariableType() == caCalc::scalar) nbMonitors = InitVisibility(w1, &kData, map, specData, qasc(calcWidget->getVariable()));
 
             // when no monitors then inititalize value
             if(nbMonitors == 0) {
                 //qDebug() << "update " << qasc(calcWidget->getVariable()) << "initial value" << calcWidget->getInitialValue();
                 calcWidget->setValue(calcWidget->getInitialValue());
-                mutexKnobDataP->UpdateSoftPV(qasc(calcWidget->getVariable()), calcWidget->getInitialValue(), myWidget);
+                mutexKnobDataP->UpdateSoftPV(calcWidget->getVariable(), calcWidget->getInitialValue(), myWidget, 0, 1);
             }
 
             w1->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -3641,12 +3670,17 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         }
         //qDebug() << "we have a caCalc" << calcWidget->getVariable() << "  " <<  data.pv;
 
-        CalcVisibility(w, result, valid);  // visibility not used, but calculation yes
-        if(valid) {
-            if (!QString::compare(calcWidget->getVariable(), data.pv, Qt::CaseInsensitive)){
-                calcWidget->setValue(result);
-                mutexKnobDataP->UpdateSoftPV(data.pv, result, myWidget);
-                //qDebug() << "we have a caCalc" << calcWidget->getVariable() << "  " <<  data.pv;
+        if(calcWidget->getDataCount() > 0) {
+            if(!data.edata.connected) result = qQNaN();
+            mutexKnobDataP->UpdateSoftPV(calcWidget->getVariable(), result, myWidget, data.specData[0], calcWidget->getDataCount());
+        } else {
+            CalcVisibility(w, result, valid);  // visibility not used, but calculation yes
+            if(valid) {
+                if (!QString::compare(calcWidget->getVariable(), data.pv, Qt::CaseInsensitive)){
+                    calcWidget->setValue(result);
+                    mutexKnobDataP->UpdateSoftPV(data.pv, result, myWidget, 0, 1);
+                    //qDebug() << "we have a caCalc" << calcWidget->getVariable() << "  " <<  data.pv;
+                }
             }
         }
 
@@ -4624,7 +4658,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 if(data.edata.ivalue < list.count()) wavetableWidget->setDataType(list.at(data.edata.ivalue));
             }
 
-        } else {
+        } else if(data.specData[0] == 0){
             QStringList list;
             for(int i=0; i<qMax(1,wavetableWidget->getNumberOfRows()); i++) {
                 for(int j=0; j<wavetableWidget->getNumberOfColumns(); j++) list.append("NC");

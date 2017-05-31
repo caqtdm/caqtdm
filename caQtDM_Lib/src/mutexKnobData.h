@@ -74,7 +74,7 @@ public:
 
     void InsertSoftPV(QString pv, int num, QWidget* w);
     void RemoveSoftPV(QString pv, QWidget *w, int indx);
-    void UpdateSoftPV(QString pv, double value, QWidget *w);
+    void UpdateSoftPV(QString pv, double value, QWidget *w, int dataIndex, int dataCount);
     bool getSoftPV(QString pv, int *indx, QWidget *w);
     void BuildSoftPVList(QWidget *w);
 

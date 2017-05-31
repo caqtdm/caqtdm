@@ -38,7 +38,10 @@ caCalc::caCalc( QWidget *parent ) :  ESimpleLabel(parent)
     thisChannelD="";
     thisVariable="";
     thisValue = 0.0;
+    thisPV=QStringList();
     keepText="";
+
+    setVariableType(scalar);
 
     setFontScaleMode(WidthAndHeight);
     setForeAndBackground(Qt::black, Qt::lightGray);
@@ -85,6 +88,11 @@ void caCalc::setValue(double value)
     thisValue =value;
 }
 
+void caCalc::setValue(QString value)
+{
+    setTextLine(value);
+}
+
 void caCalc::setValue(QRect value)
 {
     setTextLine("QRect=ok");
@@ -118,4 +126,35 @@ void caCalc::setForeAndBackground(QColor fg, QColor bg)
             arg(fg.red()).arg(fg.green()).arg(fg.blue());
 
     setStyleSheet(thisStyle);
+}
+
+void caCalc::setVariableType(varType vartype) {
+    thisVarType = vartype;
+    if(vartype == vector) {
+        setPropertyVisible(calcabcd, false);
+        setPropertyVisible(channela, false);
+        setPropertyVisible(channelb, false);
+        setPropertyVisible(channelc, false);
+        setPropertyVisible(channeld, false);
+        setPropertyVisible(initialvalue, false);
+        setPropertyVisible(pvlist, true);
+    } else {
+        setPropertyVisible(calcabcd, true);
+        setPropertyVisible(channela, true);
+        setPropertyVisible(channelb, true);
+        setPropertyVisible(channelc, true);
+        setPropertyVisible(channeld, true);
+        setPropertyVisible(initialvalue, true);
+        setPropertyVisible(pvlist, false);
+    }
+}
+
+bool caCalc::isPropertyVisible(Properties property)
+{
+    return designerVisible[property];
+}
+
+void caCalc::setPropertyVisible(Properties property, bool visible)
+{
+    designerVisible[property] = visible;
 }
