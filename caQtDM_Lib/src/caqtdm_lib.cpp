@@ -6583,6 +6583,45 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
         labelverticalWidget->setProperty("IndexList", indexList);
     }
 
+    // when no monitors we have a static visibility calculation, except for cacalc
+    QString className = widget->metaObject()->className();
+    if((nbMon == 0) && !className.contains("caCalc")) {
+        double valueArray[MAX_CALC_INPUTS];
+        char post[256], calcString[256], asc[100];
+        short errnum;
+
+        strcpy(calcString, qasc(text));
+
+        for(int i=0; i < MAX_CALC_INPUTS; i++) valueArray[i] = 0.0;
+        long status = postfix(calcString, post, &errnum);
+        if(status) {
+            sprintf(asc, "Invalid Calc %s for %s (calc not performed)", calcString, qasc(widget->objectName()));
+            setCalcToNothing(widget);
+            postMessage(QtDebugMsg, asc);
+        } else {
+            // Perform the calculation
+            double result;
+            long status = calcPerform(valueArray, &result, post);
+            if(!status) {
+                bool visible = (result?true:false);
+                //set visibility
+                if(!visible) {
+                    if(caPolyLine *polylineWidget = qobject_cast<caPolyLine *>(widget)) polylineWidget->setHide(true);
+                    else if(caGraphics *graphicsWidget = qobject_cast<caGraphics *>(widget)) graphicsWidget->setHide(true);
+                    else widget->hide();
+                } else {
+                    if(caPolyLine *polylineWidget = qobject_cast<caPolyLine *>(widget)) polylineWidget->setHide(false);
+                    else if(caGraphics *graphicsWidget = qobject_cast<caGraphics *>(widget)) graphicsWidget->setHide(false);
+                    else widget->show();
+                }
+            } else {
+                sprintf(asc, "invalid calc %s for %s (calc not performed)", calcString, qasc(widget->objectName()));
+                setCalcToNothing(widget);
+                postMessage(QtDebugMsg, asc);
+            }
+        }
+    }
+
     return nbMon;
 }
 
