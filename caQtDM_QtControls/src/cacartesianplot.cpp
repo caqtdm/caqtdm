@@ -989,7 +989,7 @@ void caCartesianPlot::setXaxisType(axisType s)
         // gives an axe for milliseconds since epoch
         QwtDateScaleEngine *scaleEngine = new QwtDateScaleEngine(Qt::LocalTime); // in number of milliseconds from epoch
         setAxisScaleEngine(QwtPlot::xBottom, scaleEngine);
-        auto * scaleDraw = new QwtDateScaleDraw();
+        QwtDateScaleDraw * scaleDraw = new QwtDateScaleDraw();
         scaleDraw->setDateFormat(QwtDate::Second, "hh:mm:ss\ndd-MMM-yy");
         scaleDraw->setDateFormat(QwtDate::Minute, "hh:mm:ss\ndd-MMM-yy");
         scaleDraw->setDateFormat(QwtDate::Hour, "hh:mm:ss\ndd-MMM-yy");
