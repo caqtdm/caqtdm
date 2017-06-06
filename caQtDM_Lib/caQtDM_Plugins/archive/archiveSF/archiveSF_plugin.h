@@ -62,6 +62,8 @@ public slots:
 
         Q_UNUSED(w);
 
+        bool timeAxis = false;
+
         QMutex *mutex = indexNew.mutexP;
         mutex->lock();
 
@@ -104,7 +106,11 @@ public slots:
 
         sfRetrieval *fromArchive = new sfRetrieval();
 
-        if(fromArchive->requestUrl(url, json_str, indexNew.secondsPast, isBinned)) {
+        if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) indexNew.w)) {
+            if(w->getXaxisType() == caCartesianPlot::time) timeAxis = true;
+        }
+
+        if(fromArchive->requestUrl(url, json_str, indexNew.secondsPast, isBinned, timeAxis)) {
             if((nbVal = fromArchive->getCount()) > 0) {
                 //qDebug() << nbVal << total;
                 TimerN.resize(fromArchive->getCount());

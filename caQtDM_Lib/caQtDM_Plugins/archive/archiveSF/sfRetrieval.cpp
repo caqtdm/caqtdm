@@ -63,7 +63,7 @@ void sfRetrieval::timeoutL()
     eventLoop->quit();
 }
 
-bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int secondsPast, bool binned)
+bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int secondsPast, bool binned, bool timeAxis)
 {
     finished = false;
     totalCount = 0;
@@ -72,6 +72,7 @@ bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int seconds
     //printf("caQtDM -- request from %s with %s\n", qasc(url.toString()), qasc(out));
     downloadUrl = url;
     isBinned = binned;
+    timAxis = timeAxis;
     errorString = "";
 
     QNetworkRequest *request = new QNetworkRequest(url);
@@ -299,7 +300,8 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
 
                                 // fill in our data
                                 if(timeFound && valueFound && (seconds - archiveTime) < secndsPast) {
-                                    X[count] = -(seconds - archiveTime) / 3600.0;
+                                    if(!timAxis) X[count] = -(seconds - archiveTime) / 3600.0;
+                                    else X[count] = archiveTime * 1000;
                                     Y[count] = mean;
                                     count++;
                                 }
@@ -345,7 +347,8 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
 
                                 // fill in our data
                                 if(timeFound && valueFound && (seconds - archiveTime) < secndsPast) {
-                                    X[count] = -(seconds - archiveTime) / 3600.0;
+                                    if(!timAxis) X[count] = -(seconds - archiveTime) / 3600.0;
+                                    else X[count] = archiveTime *1000;
                                     Y[count] = mean;
                                     count++;
                                 }

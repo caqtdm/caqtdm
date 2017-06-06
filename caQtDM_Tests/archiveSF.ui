@@ -44,8 +44,8 @@
     <property name="color_1">
      <color>
       <red>255</red>
-      <green>255</green>
-      <blue>255</blue>
+      <green>0</green>
+      <blue>0</blue>
      </color>
     </property>
     <property name="channels_2" stdset="0">
@@ -66,9 +66,9 @@
     </property>
     <property name="foreground">
      <color>
-      <red>0</red>
-      <green>0</green>
-      <blue>0</blue>
+      <red>230</red>
+      <green>230</green>
+      <blue>230</blue>
      </color>
     </property>
     <property name="background">
@@ -80,9 +80,9 @@
     </property>
     <property name="scaleColor">
      <color>
-      <red>255</red>
-      <green>255</green>
-      <blue>255</blue>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
      </color>
     </property>
     <property name="YAxisType" stdset="0">
@@ -124,9 +124,9 @@
     </property>
     <property name="color_1">
      <color>
-      <red>255</red>
-      <green>255</green>
-      <blue>255</blue>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
      </color>
     </property>
     <property name="channels_2" stdset="0">
@@ -147,9 +147,9 @@
     </property>
     <property name="foreground">
      <color>
-      <red>0</red>
-      <green>0</green>
-      <blue>0</blue>
+      <red>230</red>
+      <green>230</green>
+      <blue>230</blue>
      </color>
     </property>
     <property name="background">
@@ -161,9 +161,9 @@
     </property>
     <property name="scaleColor">
      <color>
-      <red>255</red>
-      <green>255</green>
-      <blue>255</blue>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
      </color>
     </property>
     <property name="YAxisType" stdset="0">
@@ -228,9 +228,9 @@
     </property>
     <property name="foreground">
      <color>
-      <red>0</red>
-      <green>0</green>
-      <blue>0</blue>
+      <red>230</red>
+      <green>230</green>
+      <blue>230</blue>
      </color>
     </property>
     <property name="background">
@@ -242,9 +242,9 @@
     </property>
     <property name="scaleColor">
      <color>
-      <red>255</red>
-      <green>255</green>
-      <blue>255</blue>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
      </color>
     </property>
     <property name="YAxisType" stdset="0">
@@ -271,9 +271,6 @@
     </property>
     <property name="Title" stdset="0">
      <string notr="true">archiveSF://SINSB01-RLOD100-PUP10:SIG-AMPLT-AVG</string>
-    </property>
-    <property name="TitleX">
-     <string notr="true">(past hours)</string>
     </property>
     <property name="TitleY">
      <string notr="true"/>
@@ -312,9 +309,9 @@
     </property>
     <property name="foreground">
      <color>
-      <red>0</red>
-      <green>0</green>
-      <blue>0</blue>
+      <red>230</red>
+      <green>230</green>
+      <blue>230</blue>
      </color>
     </property>
     <property name="background">
@@ -326,10 +323,16 @@
     </property>
     <property name="scaleColor">
      <color>
-      <red>255</red>
-      <green>255</green>
-      <blue>255</blue>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
      </color>
+    </property>
+    <property name="LegendEnabled">
+     <bool>true</bool>
+    </property>
+    <property name="XaxisType">
+     <enum>caCartesianPlot::time</enum>
     </property>
     <property name="YAxisType" stdset="0">
      <enum>caCartesianPlot::linear</enum>
@@ -354,7 +357,7 @@
      <x>0</x>
      <y>0</y>
      <width>1053</width>
-     <height>24</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

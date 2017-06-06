@@ -982,11 +982,20 @@ void caCartesianPlot::setScaleY(double minY, double maxY)
     replot();
 }
 
-
 void caCartesianPlot::setXaxisType(axisType s)
 {
     thisXtype = s;
-    if(s == log10) {
+    if(s == time) {
+        // gives an axe for milliseconds since epoch
+        QwtDateScaleEngine *scaleEngine = new QwtDateScaleEngine(Qt::LocalTime); // in number of milliseconds from epoch
+        setAxisScaleEngine(QwtPlot::xBottom, scaleEngine);
+        auto * scaleDraw = new QwtDateScaleDraw();
+        scaleDraw->setDateFormat(QwtDate::Second, "hh:mm:ss\ndd-MMM-yy");
+        scaleDraw->setDateFormat(QwtDate::Minute, "hh:mm:ss\ndd-MMM-yy");
+        scaleDraw->setDateFormat(QwtDate::Hour, "hh:mm:ss\ndd-MMM-yy");
+        scaleDraw->setDateFormat(QwtDate::Day, QString("yyyy-MM-dd-hh-mm-ss"));
+        setAxisScaleDraw(QwtPlot::xBottom, scaleDraw);
+    } else if(s == log10) {
 #if QWT_VERSION < 0x060100
         setAxisScaleEngine(QwtPlot::xBottom, new QwtLog10ScaleEngine);
 #else
@@ -1007,7 +1016,10 @@ void caCartesianPlot::setXaxisType(axisType s)
 void caCartesianPlot::setYaxisType(axisType s)
 {
     thisYtype = s;
-    if(s == log10) {
+    if(s == time) {  // not supported
+        thisYtype = linear;
+        setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine);
+    } else if(s == log10) {
 #if QWT_VERSION < 0x060100
         setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
 #else
