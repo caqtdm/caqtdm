@@ -38,6 +38,7 @@
 #include "archiverCommon.h"
 #include "sfRetrieval.h"
 
+
 class Q_DECL_EXPORT WorkerSF : public QObject
 {
     Q_OBJECT
@@ -46,6 +47,7 @@ public:
     WorkerSF() {
         qRegisterMetaType<indexes>("indexes");
         qRegisterMetaType<QVector<double> >("QVector<double>");
+        fromArchive =  (sfRetrieval *)0;
     }
 
 private:
@@ -54,11 +56,17 @@ private:
 public slots:
 
     void workerFinish() {
+        //qDebug() << "workerfinish";
         deleteLater();
     }
 
-    void getFromArchive(QWidget *w, indexes indexNew,  QString index_name, MessageWindow * messageWindow) {
+    void workerCancel() {
+        if(fromArchive != (sfRetrieval *)0) {
+            fromArchive->cancelDownload();
+        }
+    }
 
+    void getFromArchive(QWidget *w, indexes indexNew,  QString index_name, MessageWindow * messageWindow) {
 
         Q_UNUSED(w);
 
@@ -104,7 +112,7 @@ public slots:
         total = total.replace("'", "\"");
         QByteArray json_str = total.toUtf8();
 
-        sfRetrieval *fromArchive = new sfRetrieval();
+        fromArchive = new sfRetrieval();
 
         if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) indexNew.w)) {
             if(w->getXaxisType() == caCartesianPlot::time) timeAxis = true;
@@ -131,7 +139,7 @@ public slots:
         }
         fromArchive->deleteLater();
 
-        //qDebug() << "number of values received" << nbVal;
+        //qDebug() << "number of values received" << nbVal << fromArchive;
 
         emit resultReady(indexNew, nbVal, TimerN, YValsN, fromArchive->getBackend());
 
@@ -142,6 +150,29 @@ signals:
     void resultReady(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend);
 
 public:
+
+private:
+    sfRetrieval *fromArchive;
+
+};
+
+class Q_DECL_EXPORT myThread : public QThread
+{
+    Q_OBJECT
+
+public:
+    myThread(WorkerSF *worker) {
+        pworker = worker;
+    }
+    ~myThread() {
+        //qDebug() << "thread destroyed";
+    }
+    WorkerSF *workersf() {
+        return pworker;
+    }
+
+private:
+    WorkerSF *pworker;
 
 };
 
@@ -181,13 +212,15 @@ signals:
 
 private slots:
     void Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes);
+    void Callback_AbortOutstandingRequests();
 
 private:
     QMutex mutex;
     MutexKnobData *mutexknobdataP;
     MessageWindow *messagewindowP;
     ArchiverCommon *archiverCommon;
-    QMap<QString, QThread*> listOfThreads;
+    QMap<QString, myThread*> listOfThreads;
+    bool suspend;
 };
 
 #endif

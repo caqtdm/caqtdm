@@ -53,6 +53,7 @@ public:
     int getCount();
     void getData(QVector<double> &x, QVector<double> &y);
     const QString getBackend();
+    void cancelDownload();
 
 signals:
     void networkError(const QString);
@@ -68,6 +69,7 @@ private:
 
     bool getDoubleFromString(QString input, double &value);
     QNetworkAccessManager *manager;
+    QNetworkReply *reply;
     QTableWidget *thisTable;
     QString thisFile;
     int finished;
@@ -79,6 +81,7 @@ private:
     QEventLoop *eventLoop;
     bool isBinned, timAxis;
     QString Backend;
+    bool aborted;
 };
 
 #endif

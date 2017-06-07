@@ -23,7 +23,7 @@
  *    anton.mezger@psi.ch
  */
 #include <QDebug>
-#include <QThread>
+
 #include "archiveSF_plugin.h"
 #include "archiverCommon.h"
 
@@ -38,6 +38,7 @@ QString ArchiveSF_Plugin::pluginName()
 // constructor
 ArchiveSF_Plugin::ArchiveSF_Plugin()
 {
+    suspend = false;
     qRegisterMetaType<indexes>("indexes");
     qRegisterMetaType<QVector<double> >("QVector<double>");
 
@@ -45,6 +46,7 @@ ArchiveSF_Plugin::ArchiveSF_Plugin()
     archiverCommon = new ArchiverCommon();
 
     connect(archiverCommon, SIGNAL(Signal_UpdateInterface(QMap<QString, indexes>)), this,SLOT(Callback_UpdateInterface(QMap<QString, indexes>)));
+    connect(archiverCommon, SIGNAL(Signal_AbortOutstandingRequests()), this,SLOT(Callback_AbortOutstandingRequests()));
 }
 
 // init communication
@@ -55,12 +57,30 @@ int ArchiveSF_Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindow 
     return archiverCommon->initCommunicationLayer(data, messageWindow, options);
 }
 
+void ArchiveSF_Plugin::Callback_AbortOutstandingRequests()
+{
+    QMutexLocker locker(&mutex);
+    suspend = true;
+    myThread *tmpThread = (myThread *) 0;
+    QMap<QString, myThread *>::const_iterator i = listOfThreads.constBegin();
+    while (i != listOfThreads.constEnd()) {
+        tmpThread = (myThread *) i.value();
+        WorkerSF * worker = tmpThread->workersf();
+        worker->workerCancel();  //should kill also the network request and give 0 data back
+        ++i;
+    }
+
+    //qDebug() << "";
+    suspend = false;
+}
+
 // this routine will be called now every 10 seconds to update the cartesianplot
 // however when many data it may take much longer, then  suppress any new request
 void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes)
 {
     QMutexLocker locker(&mutex);
 
+    if(suspend) return;
     // Index name (url)
     QString index_name =  "https://data-api.psi.ch/sf/query";
 
@@ -70,18 +90,18 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
 
     while (i != listOfIndexes.constEnd()) {
 
-        QThread *tmpThread = (QThread *) 0;
+        myThread *tmpThread = (myThread *) 0;
         indexes indexNew = i.value();
         //qDebug() <<" -------------" << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << indexNew.w;
 
-        QMap<QString, QThread *>::iterator j = listOfThreads.find(indexNew.key);
+        QMap<QString, myThread *>::iterator j = listOfThreads.find(indexNew.key);
         while (j !=listOfThreads.end() && j.key() == indexNew.key) {
-            tmpThread = (QThread *) j.value();
+            tmpThread = (myThread *) j.value();
             ++j;
         }
 
-        if((tmpThread != (QThread *) 0) && tmpThread->isRunning()) {
-            //qDebug() << "workerthread is running" << tmpThread << tmpThread->isRunning();
+        if((tmpThread != (myThread *) 0) && tmpThread->isRunning()) {
+            //qDebug() << "thread is running" << tmpThread << tmpThread->isRunning();
 
         } else {
 
@@ -138,11 +158,12 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
             }
 
             WorkerSF *worker = new WorkerSF;
-            QThread *tmpThread = new QThread();
+            myThread *tmpThread = new myThread(worker);
             //qDebug() << "tmpThread new" << tmpThread;
-            listOfThreads.insert(i.key(), tmpThread);
+            listOfThreads.insert(i.key(), tmpThread);;
 
             worker->moveToThread(tmpThread);
+
             connect(tmpThread, SIGNAL(finished()), worker, SLOT(workerFinish()));
             connect(tmpThread, SIGNAL(finished()), tmpThread, SLOT(deleteLater()) );
             connect(this, SIGNAL(operate( QWidget *, indexes, QString, MessageWindow *)), worker,
@@ -153,7 +174,6 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
 
             emit operate((QWidget *) messagewindowP, indexNew, index_name, messagewindowP);
 
-
             disconnect(worker);
         }
 
@@ -163,19 +183,22 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
 
 void ArchiveSF_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend)
 {
+    QMutexLocker locker(&mutex);
+
     //qDebug() << "in sf handle results" << nbVal << TimerN.count() << indexNew.indexX << indexNew.indexY;
     if(nbVal > 0 && nbVal < TimerN.count()) {
       TimerN.resize(nbVal);
       YValsN.resize(nbVal);
     }
+    //qDebug() << "handle cartesian";
     if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN, backend);
-
+    //qDebug() << "handle cartesian fisnished";
     QList<QString> removeKeys;
     removeKeys.clear();
 
-    QMap<QString, QThread *>::iterator j = listOfThreads.find(indexNew.key);
+    QMap<QString, myThread *>::iterator j = listOfThreads.find(indexNew.key);
     while (j !=listOfThreads.end() && j.key() == indexNew.key) {
-        QThread *tmpThread = (QThread*) j.value();
+        myThread *tmpThread = (myThread*) j.value();
         tmpThread->quit();
         removeKeys.append(indexNew.key);
         //qDebug() << tmpThread << "sf quit";

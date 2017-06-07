@@ -67,7 +67,7 @@ void ArchiverCommon::updateInterface()
         }
         ++i;
     }
-   // qDebug() << "number of indexes to execute" << listOfIndexesToBeExecuted.count();
+    //qDebug() << "number of indexes to execute" << listOfIndexesToBeExecuted.count();
 
 
     // call user routine for updating data
@@ -179,9 +179,11 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
 void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double> TimerN, QVector<double> YValsN, QString backend)
 {
+    //qDebug() << "in updateCartesian" << mutexknobdataP;
+    //qDebug() << indexNew.indexX << indexNew.pv << indexNew.w;
     if(nbVal > 0) {
         knobData* kData = mutexknobdataP->GetMutexKnobDataPtr(indexNew.indexX);
-        //qDebug() << indexNew.indexX;
+        //qDebug() << kData << kData->pv;
         if((kData != (knobData *) 0) && (kData->index != -1)) {
             kData->edata.fieldtype = caDOUBLE;
             kData->edata.connected = true;
@@ -199,6 +201,7 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double
 
             mutexknobdataP->SetMutexKnobData(kData->index, *kData);
         }
+        //qDebug() << "done",
 
         kData = mutexknobdataP->GetMutexKnobDataPtr(indexNew.indexY);
         //qDebug() << indexNew.indexY;
@@ -243,7 +246,6 @@ int ArchiverCommon::pvClearMonitor(knobData *kData) {
 
         QMap<QString, indexes>::iterator i = listOfIndexes.find(key);
         while (i !=listOfIndexes.end() && i.key() == key) {
-            //listOfIndexes.remove(key);
             removeKeys.append(key);
             ++i;
         }
@@ -252,6 +254,8 @@ int ArchiverCommon::pvClearMonitor(knobData *kData) {
             listOfIndexes.remove(removeKeys.at(i));
         }
     }
+
+    emit Signal_AbortOutstandingRequests();
 
     pvFreeAllocatedData(kData);
     kData->index = -1;

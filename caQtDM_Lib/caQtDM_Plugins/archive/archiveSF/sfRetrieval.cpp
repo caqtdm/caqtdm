@@ -65,6 +65,7 @@ void sfRetrieval::timeoutL()
 
 bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int secondsPast, bool binned, bool timeAxis)
 {
+    aborted = false;
     finished = false;
     totalCount = 0;
     secndsPast = secondsPast;
@@ -88,7 +89,9 @@ bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int seconds
     request->setRawHeader("Content-Type", "application/json");
     request->setRawHeader("Timeout", "86400");
 
-    manager->post(*request, json);
+    reply = manager->post(*request, json);
+
+    //qDebug() << "requesturl reply" << reply;
 
     connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(finishReply(QNetworkReply*)));
 
@@ -104,6 +107,22 @@ bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int seconds
     else return false;
 }
 
+void sfRetrieval::cancelDownload()
+{
+    totalCount = 0;
+    aborted = true;
+    //qDebug() << "!!!!!!!!!!!!!!!!! abort" << reply;
+
+    if( reply != NULL && reply->isOpen() ) {
+        //qDebug() << "stop";
+        reply->abort();
+        reply->deleteLater();
+        reply = NULL;
+    }
+
+    eventLoop->quit();
+}
+
 int sfRetrieval::downloadFinished()
 {
     eventLoop->quit();
@@ -112,6 +131,8 @@ int sfRetrieval::downloadFinished()
 
 void sfRetrieval::finishReply(QNetworkReply *reply)
 {
+    if(aborted) return;
+    //qDebug() << "finishreply" << reply;
     int count = 0;
     struct timeb now;
     int valueIndex = 2;
@@ -363,7 +384,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
     }
 
     totalCount = count;
-    //qDebug() << "totalcount =" << count;
+    //qDebug() << "finishreply totalcount =" << count << reply;
 
 #endif
 
