@@ -32,6 +32,70 @@
 #include "cacartesianplot.h"
 #include <QtCore>
 
+class PlotScaleDateEngine: public QwtDateScaleEngine
+{
+public:
+
+    PlotScaleDateEngine(const int &nb, Qt::TimeSpec time): QwtDateScaleEngine(time)
+    {
+        nbTicks = nb;
+    }
+
+    virtual QwtScaleDiv divideScale( double x1, double x2, int , int , double) const
+    {
+        QList<double> Ticks[QwtScaleDiv::NTickTypes];
+        const QwtInterval interval = QwtInterval( x1, x2 ).normalized();
+
+        if (interval.width() <= 0 ) return QwtScaleDiv();
+
+        QwtScaleDiv scaleDiv;
+
+        for (int i=0; i<nbTicks+1; i++) {
+            Ticks[QwtScaleDiv::MajorTick] << x1 + ((x2-x1)*i / nbTicks);
+        }
+
+        scaleDiv = QwtScaleDiv(interval, Ticks);
+        if ( x1 > x2 ) scaleDiv.invert();
+
+        return scaleDiv;
+    }
+
+private:
+    int nbTicks;
+};
+
+class PlotScaleEngine: public QwtLinearScaleEngine
+{
+public:
+
+    PlotScaleEngine(const int &nb): QwtLinearScaleEngine()
+    {
+        nbTicks = nb;
+    }
+
+    virtual QwtScaleDiv divideScale( double x1, double x2, int , int , double) const
+    {
+        QList<double> Ticks[QwtScaleDiv::NTickTypes];
+        const QwtInterval interval = QwtInterval( x1, x2 ).normalized();
+
+        if (interval.width() <= 0 ) return QwtScaleDiv();
+
+        QwtScaleDiv scaleDiv;
+
+        for (int i=0; i<nbTicks+1; i++) {
+            Ticks[QwtScaleDiv::MajorTick] << x1 + ((x2-x1)*i / nbTicks);
+        }
+
+        scaleDiv = QwtScaleDiv(interval, Ticks);
+        if ( x1 > x2 ) scaleDiv.invert();
+
+        return scaleDiv;
+    }
+
+private:
+    int nbTicks;
+};
+
 class MyZoomer: public QwtPlotZoomer
 {
 public:
@@ -93,6 +157,7 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     thisTriggerNow = true;
     thisCountNumber = 0;
     thisXaxisSyncGroup = 0;
+    thisXticks = 5;
 
     plotGrid = new QwtPlotGrid();
     plotGrid->attach(this);
@@ -187,8 +252,8 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     setYscaling(Auto);
     setXaxisLimits("0;1");
     setYaxisLimits("0;1");
-    setAxisFont(QwtPlot::xBottom, QFont("Arial", 9));
-    setAxisFont(QwtPlot::yLeft, QFont("Arial", 9));
+    setAxisFont(QwtPlot::xBottom, QFont("Arial", 8));
+    setAxisFont(QwtPlot::yLeft, QFont("Arial", 8));
 
     // this allows to have a transparent widget
 #if QWT_VERSION < 0x060100
@@ -212,7 +277,7 @@ void caCartesianPlot::updateLegendsPV() {
     if(thisLegendshow) {
         insertLegend(lgd, QwtPlot::BottomLegend);
         // set color on legend texts
-        setLegendAttribute(thisScaleColor, QFont("arial",9), COLOR);
+        setLegendAttribute(thisScaleColor, QFont("arial",7), COLOR);
 
         for(int index=0; index < curveCount; index++) {
             curve[index].setItemAttribute(QwtPlotItem::Legend, false);
@@ -611,7 +676,7 @@ void caCartesianPlot::setTitlePlot(QString const &titel)
     thisTitle=titel;
     if(titel.size() != 0) {
         QwtText title(titel);
-        title.setFont(QFont("Arial", 10));
+        title.setFont(QFont("Arial", 9));
         setTitle(title);
         replot();
     }
@@ -622,7 +687,7 @@ void caCartesianPlot::setTitleX(QString const &titel)
     thisTitleX=titel;
     if(titel.size() != 0) {
         QwtText xAxis(titel);
-        xAxis.setFont(QFont("Arial", 10));
+        xAxis.setFont(QFont("Arial", 9));
         setAxisTitle(xBottom, xAxis);
     }
     replot();
@@ -633,7 +698,7 @@ void caCartesianPlot::setTitleY(QString const &titel)
     thisTitleY=titel;
     if(titel.size() != 0) {
         QwtText xAxis(titel);
-        xAxis.setFont(QFont("Arial", 10));
+        xAxis.setFont(QFont("Arial", 9));
         setAxisTitle(yLeft, xAxis);
     }
     replot();
@@ -987,22 +1052,34 @@ void caCartesianPlot::setXaxisType(axisType s)
     thisXtype = s;
     if(s == time) {
         // gives an axe for milliseconds since epoch
-        QwtDateScaleEngine *scaleEngine = new QwtDateScaleEngine(Qt::LocalTime); // in number of milliseconds from epoch
+        PlotScaleDateEngine *scaleEngine = new PlotScaleDateEngine(thisXticks, Qt::LocalTime); // in number of milliseconds from epoch
         setAxisScaleEngine(QwtPlot::xBottom, scaleEngine);
+
         QwtDateScaleDraw * scaleDraw = new QwtDateScaleDraw();
-        scaleDraw->setDateFormat(QwtDate::Second, "hh:mm:ss\ndd-MMM-yy");
-        scaleDraw->setDateFormat(QwtDate::Minute, "hh:mm:ss\ndd-MMM-yy");
-        scaleDraw->setDateFormat(QwtDate::Hour, "hh:mm:ss\ndd-MMM-yy");
-        scaleDraw->setDateFormat(QwtDate::Day, QString("yyyy-MM-dd-hh-mm-ss"));
+        scaleDraw->setDateFormat(QwtDate::Millisecond, QString("hh:mm:ss\ndd-MM-yy"));
+        scaleDraw->setDateFormat(QwtDate::Second, QString("hh:mm:ss\ndd-MM-yy"));
+        scaleDraw->setDateFormat(QwtDate::Minute, QString("hh:mm:ss\ndd-MM-yy"));
+        scaleDraw->setDateFormat(QwtDate::Hour, QString("hh:mm:ss\ndd-MM-yy"));
+        scaleDraw->setDateFormat(QwtDate::Day, QString("hh:mm:ss\ndd-MM-yy"));
+        scaleDraw->setDateFormat(QwtDate::Week, QString("hh:mm:ss\ndd-MM-yy"));
+        scaleDraw->setDateFormat(QwtDate::Month, QString("hh:mm:ss\ndd-MM-yy"));
+        scaleDraw->setDateFormat(QwtDate::Year, QString("hh:mm:ss\ndd-MM-yy"));
         setAxisScaleDraw(QwtPlot::xBottom, scaleDraw);
+        double INTERVAL = 3600 * 1000;
+        setAxisScale(QwtPlot::xBottom, 0.0, INTERVAL, INTERVAL/thisXticks);
+
     } else if(s == log10) {
 #if QWT_VERSION < 0x060100
         setAxisScaleEngine(QwtPlot::xBottom, new QwtLog10ScaleEngine);
 #else
         setAxisScaleEngine(QwtPlot::xBottom, new QwtLogScaleEngine);
 #endif
+        setAxisScaleDraw(QwtPlot::xBottom, new QwtScaleDraw());
     } else {
-        setAxisScaleEngine(QwtPlot::xBottom, new QwtLinearScaleEngine);
+        setAxisScaleEngine(QwtPlot::xBottom, new PlotScaleEngine(thisXticks));
+        setAxisScaleDraw(QwtPlot::xBottom, new QwtScaleDraw());
+        double INTERVAL = 1000.0;
+        setAxisScale(QwtPlot::xBottom, 0.0, INTERVAL, INTERVAL/thisXticks);
     }
 
     setXaxisLimits(getXaxisLimits());

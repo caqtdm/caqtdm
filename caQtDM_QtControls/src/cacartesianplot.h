@@ -147,6 +147,7 @@ class QTCON_EXPORT caCartesianPlot : public QwtPlot
     Q_PROPERTY(bool LegendEnabled READ getLegendEnabled WRITE setLegendEnabled)
 
     Q_PROPERTY(axisType XaxisType READ getXaxisType WRITE setXaxisType)
+    Q_PROPERTY(int numberOfXticks READ getXticks WRITE setXticks)
     Q_PROPERTY(axisType YAxisType READ getYaxisType WRITE setYaxisType)
 
     Q_PROPERTY(int XaxisSyncGroup READ getXaxisSyncGroup WRITE setXaxisSyncGroup)
@@ -358,6 +359,9 @@ public:
     axisType getYaxisType() const {return thisYtype;}
     void setYaxisType(axisType s);
 
+    void setXticks( int nb ) {if(nb < 1) thisXticks = 1; else thisXticks = nb; setXaxisType(thisXtype);}
+    int getXticks() {return thisXticks;}
+
     void setXaxisSyncGroup( int group ) {thisXaxisSyncGroup = group;}
     int getXaxisSyncGroup() {return thisXaxisSyncGroup;}
 
@@ -463,6 +467,8 @@ private:
     int thisXaxisSyncGroup;
 
     QwtLegend *lgd;
+
+    int thisXticks;
 
 };
 

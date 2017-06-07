@@ -7564,9 +7564,9 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                     }
                 } else {
                     caCartesianPlot * cartesianplotWidget = (caCartesianPlot *) widget;
-                    integerList.insert(7, 9);
+                    integerList.insert(7, 8);
                     if( cartesianplotWidget->getLegendEnabled()) {
-                         cartesianplotWidget->setLegendAttribute(cartesianplotWidget->getScaleColor(), QFont("arial", 9), caCartesianPlot::FONT);
+                         cartesianplotWidget->setLegendAttribute(cartesianplotWidget->getScaleColor(), QFont("arial", 7), caCartesianPlot::FONT);
                     }
                 }
                 integerList.insert(8, plot->axisScaleDraw(QwtPlot::xBottom)->tickLength(QwtScaleDiv::MajorTick));

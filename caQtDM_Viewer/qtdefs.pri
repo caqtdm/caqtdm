@@ -193,6 +193,9 @@ DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
 # 4.1.6
+# x scale of cartseain plot can now also be used with a time scale (milliseconds from epoch)
+# for visibilitycalc, when no channels specified, static calculation will be done at startup
+# cacalc can now also be a vector (waveform) where the items can come from channels
 # added check for when git not present
 # added an environment variable CAQTD_TIMEOUT_HOURS to be used to quit caQtDM automatically, mouse event will reset the timeout.
 # it is now possible to use caCalc as a vector (waveform) by specifying associated pv's. the soft variable can then be used to display a waveform
