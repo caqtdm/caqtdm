@@ -1106,3 +1106,65 @@ record(calc, "SZ")
 #        field(INPA, "MTEST-CAQTDM-CAMERA:HEIGHT CP")
 #}
 
+record(ao, "ACM:BPM1") {
+}
+record(ao, "ACM:BPM2") {
+}
+record(ao, "ACM:BPM3") {
+}
+record(ao, "ACM:BPM4") {
+}
+record(ao, "ACM:BPM5") {
+}
+
+record(ai,"ACM:BPM1:X") {
+    field(SCAN,"Passive")
+    field(PINI,"YES")
+    field(INP,"10")
+}
+record(ai,"ACM:BPM1:Y") {
+    field(SCAN,"Passive")
+    field(PINI,"YES")
+    field(INP,"10")
+}
+record(ai,"ACM:BPM2:X") {
+    field(SCAN,"Passive")
+    field(PINI,"YES")
+    field(INP,"50")
+}
+record(ai,"ACM:BPM2:Y") {
+    field(SCAN,"Passive")
+    field(PINI,"YES")
+    field(INP,"10")
+}
+record(ai,"ACM:BPM3:X") {
+    field(SCAN,"Passive")
+    field(PINI,"YES")
+    field(INP,"110")
+}
+record(ai,"ACM:BPM3:Y") {
+    field(SCAN,"Passive")
+    field(PINI,"YES")
+    field(INP,"20")
+}
+record(ai,"ACM:BPM4:X") {
+    field(SCAN,"Passive")
+    field(PINI,"YES")
+    field(INP,"200")
+}
+record(ai,"ACM:BPM4:Y") {
+    field(SCAN,"Passive")
+    field(PINI,"YES")
+    field(INP,"10")
+}
+record(ai,"ACM:BPM5:X") {
+    field(SCAN,"Passive")
+    field(PINI,"YES")
+    field(INP,"350")
+}
+record(ai,"ACM:BPM5:Y") {
+    field(SCAN,"Passive")
+    field(PINI,"YES")
+    field(INP,"10")
+}
+
