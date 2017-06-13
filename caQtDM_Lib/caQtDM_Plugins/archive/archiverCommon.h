@@ -59,10 +59,11 @@ protected:
 
 signals:
     void Signal_UpdateInterface(QMap<QString, indexes> listOfIndexes);
-    void Signal_AbortOutstandingRequests();
+    void Signal_AbortOutstandingRequests(QString key);
 
 private slots:
     void updateInterface();
+    void stopUpdateInterface();
 
 private:
     typedef struct  {char Dev[40];} device;

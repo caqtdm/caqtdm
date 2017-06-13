@@ -23,6 +23,7 @@
  *    anton.mezger@psi.ch
  */
 #include <QDebug>
+#include <QApplication>
 
 #include "archiveSF_plugin.h"
 #include "archiverCommon.h"
@@ -46,7 +47,18 @@ ArchiveSF_Plugin::ArchiveSF_Plugin()
     archiverCommon = new ArchiverCommon();
 
     connect(archiverCommon, SIGNAL(Signal_UpdateInterface(QMap<QString, indexes>)), this,SLOT(Callback_UpdateInterface(QMap<QString, indexes>)));
-    connect(archiverCommon, SIGNAL(Signal_AbortOutstandingRequests()), this,SLOT(Callback_AbortOutstandingRequests()));
+    connect(archiverCommon, SIGNAL(Signal_AbortOutstandingRequests(QString)), this,SLOT(Callback_AbortOutstandingRequests(QString)));
+    connect(this, SIGNAL(Signal_StopUpdateInterface()), archiverCommon,SLOT(stopUpdateInterface()));
+    connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closeEvent()));
+}
+
+ArchiveSF_Plugin:: ~ArchiveSF_Plugin() {
+    qDebug() << "ArchiveSF_Plugin::~ArchiveSF_Plugin()";
+}
+
+void ArchiveSF_Plugin::closeEvent(){
+   qDebug() << "ArchiveSF_Plugin::closeEvent ";
+   emit Signal_StopUpdateInterface();
 }
 
 // init communication
@@ -57,30 +69,33 @@ int ArchiveSF_Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindow 
     return archiverCommon->initCommunicationLayer(data, messageWindow, options);
 }
 
-void ArchiveSF_Plugin::Callback_AbortOutstandingRequests()
+void ArchiveSF_Plugin::Callback_AbortOutstandingRequests(QString key)
 {
-    QMutexLocker locker(&mutex);
     suspend = true;
+    //qDebug()  << "Callback_AbortOutstandingRequests for key" << key;
+
     myThread *tmpThread = (myThread *) 0;
-    QMap<QString, myThread *>::const_iterator i = listOfThreads.constBegin();
-    while (i != listOfThreads.constEnd()) {
-        tmpThread = (myThread *) i.value();
-        WorkerSF * worker = tmpThread->workersf();
-        worker->workerCancel();  //should kill also the network request and give 0 data back
-        ++i;
+    QMap<QString, myThread *>::iterator j = listOfThreads.find(key);
+    while (j !=listOfThreads.end() && j.key() == key) {
+        tmpThread = (myThread *) j.value();
+        if(tmpThread != (myThread *) 0) {
+            sfRetrieval *retrieval = tmpThread->getArchive();
+            if(retrieval != (sfRetrieval *) 0) retrieval->cancelDownload();
+            tmpThread->quit();
+        }
+        ++j;
     }
 
-    //qDebug() << "";
-    suspend = false;
+   QApplication::processEvents();
+   suspend = false;
 }
 
 // this routine will be called now every 10 seconds to update the cartesianplot
 // however when many data it may take much longer, then  suppress any new request
 void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes)
 {
-    QMutexLocker locker(&mutex);
-
     if(suspend) return;
+
     // Index name (url)
     QString index_name =  "https://data-api.psi.ch/sf/query";
 
@@ -179,13 +194,13 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
 
         ++i;
     }
+    //qDebug() << "====================== ArchiveSF_Plugin::Callback_UpdateInterface finished";
 }
 
 void ArchiveSF_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend)
 {
-    QMutexLocker locker(&mutex);
-
-    //qDebug() << "in sf handle results" << nbVal << TimerN.count() << indexNew.indexX << indexNew.indexY;
+    //QThread *thread = QThread::currentThread();
+    //qDebug() << "in sf handle results" << nbVal << TimerN.count() << indexNew.indexX << indexNew.indexY << thread;
     if(nbVal > 0 && nbVal < TimerN.count()) {
       TimerN.resize(nbVal);
       YValsN.resize(nbVal);
@@ -208,6 +223,8 @@ void ArchiveSF_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double
     for(int i=0; i< removeKeys.count(); i++) {
         listOfThreads.remove(removeKeys.at(i));
     }
+
+    //qDebug() << "in sf handle results finished";
 }
 
 // define data to be called

@@ -47,13 +47,18 @@ class sfRetrieval:public QObject
 
 public:
     sfRetrieval();
-    ~sfRetrieval() {X.clear(); Y.clear();}
+    ~sfRetrieval() {
+        X.clear();
+        Y.clear();
+        //qDebug() << "sfRetrieval::~sfRetrieval()";
+    }
     bool requestUrl(const QUrl url, const QByteArray &json, int secondsPast, bool binned, bool timeAxis);
     const QString lastError();
     int getCount();
     void getData(QVector<double> &x, QVector<double> &y);
     const QString getBackend();
     void cancelDownload();
+    void close();
 
 signals:
     void networkError(const QString);

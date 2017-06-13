@@ -37,6 +37,7 @@
 #include <sys/timeb.h>
 #include "sfRetrieval.h"
 #include <QDebug>
+#include <QThread>
 #include <iostream>
 #include <sstream>
 
@@ -65,6 +66,7 @@ void sfRetrieval::timeoutL()
 
 bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int secondsPast, bool binned, bool timeAxis)
 {
+    //qDebug() << "sfRetrieval::requestUrl";
     aborted = false;
     finished = false;
     totalCount = 0;
@@ -107,20 +109,26 @@ bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int seconds
     else return false;
 }
 
+void sfRetrieval::close()
+{
+    deleteLater();
+}
+
 void sfRetrieval::cancelDownload()
 {
     totalCount = 0;
     aborted = true;
-    //qDebug() << "!!!!!!!!!!!!!!!!! abort" << reply;
 
-    if( reply != NULL && reply->isOpen() ) {
-        //qDebug() << "stop";
+    disconnect(manager);
+    if( reply != NULL ) {
+        //qDebug() << "!!!!!!!!!!!!!!!!! abort networkreply" << reply;
         reply->abort();
         reply->deleteLater();
         reply = NULL;
     }
 
-    eventLoop->quit();
+    downloadFinished();
+    deleteLater();
 }
 
 int sfRetrieval::downloadFinished()
@@ -153,6 +161,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
 
     if(reply->error()) {
         errorString = tr("%1: %2").arg(parseError(reply->error())).arg(downloadUrl.toString());
+        qDebug() << "reply error" << errorString;
         emit requestFinished();
         reply->deleteLater();
         return;

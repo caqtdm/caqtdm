@@ -45,9 +45,14 @@ class Q_DECL_EXPORT WorkerSF : public QObject
 
 public:
     WorkerSF() {
+        //qDebug() << "WorkerSF::WorkerSF()";
         qRegisterMetaType<indexes>("indexes");
         qRegisterMetaType<QVector<double> >("QVector<double>");
         fromArchive =  (sfRetrieval *)0;
+    }
+
+    ~WorkerSF() {
+        //qDebug() << "WorkerSF::~WorkerSF()";
     }
 
 private:
@@ -56,14 +61,11 @@ private:
 public slots:
 
     void workerFinish() {
-        //qDebug() << "workerfinish";
         deleteLater();
     }
 
-    void workerCancel() {
-        if(fromArchive != (sfRetrieval *)0) {
-            fromArchive->cancelDownload();
-        }
+    sfRetrieval* getArchive() {
+        return fromArchive;
     }
 
     void getFromArchive(QWidget *w, indexes indexNew,  QString index_name, MessageWindow * messageWindow) {
@@ -114,6 +116,8 @@ public slots:
 
         fromArchive = new sfRetrieval();
 
+        //qDebug() << "fromArchive pointer=" << fromArchive;
+
         if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) indexNew.w)) {
             if(w->getXaxisType() == caCartesianPlot::time) timeAxis = true;
         }
@@ -137,11 +141,12 @@ public slots:
                 messageWindow->postMsgEvent(QtFatalMsg, (char*) qasc(mess));
             }
         }
-        fromArchive->deleteLater();
 
         //qDebug() << "number of values received" << nbVal << fromArchive;
 
         emit resultReady(indexNew, nbVal, TimerN, YValsN, fromArchive->getBackend());
+
+        fromArchive->close();
 
         mutex->unlock();
     }
@@ -163,17 +168,25 @@ class Q_DECL_EXPORT myThread : public QThread
 public:
     myThread(WorkerSF *worker) {
         pworker = worker;
+        //qDebug() << "myThread::myThread()";
     }
     ~myThread() {
-        //qDebug() << "thread destroyed";
+        //qDebug() << "myThread::~myThread()";
     }
     WorkerSF *workersf() {
         return pworker;
     }
 
+    sfRetrieval *getArchive() {
+        if(pworker != (WorkerSF *) 0) {
+            return pworker->getArchive();
+        } else {
+            return (sfRetrieval *) 0;
+        }
+    }
+
 private:
     WorkerSF *pworker;
-
 };
 
 class Q_DECL_EXPORT ArchiveSF_Plugin : public QObject, ControlsInterface
@@ -188,7 +201,7 @@ class Q_DECL_EXPORT ArchiveSF_Plugin : public QObject, ControlsInterface
 public:
     QString pluginName();
     ArchiveSF_Plugin();
-    ~ArchiveSF_Plugin(){}
+    ~ArchiveSF_Plugin();
 
     int initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow, QMap<QString, QString> options);
     int pvAddMonitor(int index, knobData *kData, int rate, int skip);
@@ -207,12 +220,15 @@ public:
 
 public slots:
     void handleResults(indexes, int, QVector<double>, QVector<double>, QString);
+
 signals:
     void operate(QWidget*, const indexes, const QString, MessageWindow *);
+    void Signal_StopUpdateInterface();
 
 private slots:
     void Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes);
-    void Callback_AbortOutstandingRequests();
+    void Callback_AbortOutstandingRequests(QString key);
+    void closeEvent();
 
 private:
     QMutex mutex;
