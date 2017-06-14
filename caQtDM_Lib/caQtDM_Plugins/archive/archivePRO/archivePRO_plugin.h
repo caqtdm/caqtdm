@@ -152,10 +152,12 @@ public slots:
 
 signals:
     void operate(QWidget*, const indexes);
+    void Signal_StopUpdateInterface();
 
 private slots:
     void updateValues();
     void Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes);
+    void closeEvent();
 
 private:
     QMutex mutex;

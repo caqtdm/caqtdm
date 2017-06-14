@@ -219,8 +219,11 @@ private slots:
 
 public slots:
     void handleResults(indexes, int, QVector<double>, QVector<double>, QString backend);
+    void closeEvent();
+
 signals:
     void operate(QWidget*, const indexes, const stdString);
+    void Signal_StopUpdateInterface();
 
 private:
     QMutex mutex;

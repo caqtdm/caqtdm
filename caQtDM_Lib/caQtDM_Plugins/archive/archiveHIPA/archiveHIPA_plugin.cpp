@@ -23,6 +23,7 @@
  *    anton.mezger@psi.ch
  */
 #include <QDebug>
+#include <QApplication>
 #include <QThread>
 #include "archiveHIPA_plugin.h"
 #include "archiverCommon.h"
@@ -45,6 +46,13 @@ ArchiveHIPA_Plugin::ArchiveHIPA_Plugin()
     archiverCommon = new ArchiverCommon();
 
     connect(archiverCommon, SIGNAL(Signal_UpdateInterface(QMap<QString, indexes>)), this,SLOT(Callback_UpdateInterface(QMap<QString, indexes>)));
+    connect(this, SIGNAL(Signal_StopUpdateInterface()), archiverCommon,SLOT(stopUpdateInterface()));
+    connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closeEvent()));
+}
+
+void ArchiveHIPA_Plugin::closeEvent(){
+   qDebug() << "ArchiveHIPA_Plugin::closeEvent ";
+   emit Signal_StopUpdateInterface();
 }
 
 // init communication
@@ -59,8 +67,6 @@ int ArchiveHIPA_Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindo
 // however when many data it may take much longer, then  suppress any new request
 void ArchiveHIPA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes)
 {
-    QMutexLocker locker(&mutex);
-
     //qDebug() << "-------------------- ArchiveHIPA_Plugin::Callback_UpdateInterface";
 
     QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
