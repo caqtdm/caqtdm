@@ -77,13 +77,7 @@ void ImagePushButton::paintEvent( QPaintEvent* event) {
     QRect r = this->geometry();
     x=r.x(); y=r.y(); w=r.width(); h=r.height();
 
-    if(invisible) {
-        thisbg.setAlpha(0);
-        thisfg.setAlpha(0);
-        p.setBackground(thisbg);
-        p.setPen(thisfg);
-        p.drawRect(QRect(0, 0, w, h));
-    }  else {
+    if(!invisible) {
         if(iconPresent && iconOK) {
             int hpix = qRound(h * 0.9);
             QPixmap pixnew1 = pixmap.scaledToHeight(hpix, Qt::SmoothTransformation);
