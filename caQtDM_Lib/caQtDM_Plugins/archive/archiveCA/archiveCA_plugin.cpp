@@ -23,6 +23,7 @@
  *    anton.mezger@psi.ch
  */
 #include <QDebug>
+#include <QApplication>
 #include <QThread>
 #include "archiveCA_plugin.h"
 #include "archiverCommon.h"
@@ -46,6 +47,13 @@ ArchiveCA_Plugin::ArchiveCA_Plugin()
     archiverCommon = new ArchiverCommon();
 
     connect(archiverCommon, SIGNAL(Signal_UpdateInterface(QMap<QString, indexes>)), this,SLOT(Callback_UpdateInterface(QMap<QString, indexes>)));
+    connect(this, SIGNAL(Signal_StopUpdateInterface()), archiverCommon,SLOT(stopUpdateInterface()));
+    connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closeEvent()));
+}
+
+void ArchiveCA_Plugin::closeEvent(){
+   qDebug() << "ArchiveCA_Plugin::closeEvent ";
+   emit Signal_StopUpdateInterface();
 }
 
 // init communication
@@ -61,8 +69,6 @@ int ArchiveCA_Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindow 
 void ArchiveCA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes)
 {
     int nbVal;
-
-    QMutexLocker locker(&mutex);
 
     precision = 5;
 

@@ -131,7 +131,6 @@ private:
     QString thisImage;
     int borderSize;
     EPushButton::ScaleMode thisScaleMode;
-    int alpha;
 };
 
 #endif

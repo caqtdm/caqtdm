@@ -72,8 +72,6 @@ caRowColMenu::caRowColMenu(QWidget *parent) : QWidget(parent)
 
     setStacking(Row);
 
-    alpha = 255;
-
     installEventFilter(this);
 }
 
@@ -143,9 +141,7 @@ void caRowColMenu::populateCells()
             if(thisStacking == Hidden) {
                 temp->setInVisible(thisBackColor, thisForeColor, thisBorderColor);
                 borderSize = 0;
-                alpha = 0;
             } else {
-                alpha = 255;
                 borderSize = 3;
             }
 
@@ -339,16 +335,28 @@ void caRowColMenu::updateColors()
             ImagePushButton *temp = cellsI[0];
 
             //set colors and style filled
+
+            int alphafg = 0;
+            int alphabg = 0;
+            int alphaborder = 0;
+            int alphabghover = 0;
+            if(thisStacking != Hidden)  {
+                alphafg = thisForeColor.alpha();
+                alphabg = thisBackColor.alpha();
+                alphaborder = thisBorderColor.alpha();
+                alphabghover = thisBackColorHover.alpha();
+            }
+
             QString style = "QPushButton{ background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border-color: rgba(%9, %10, %11, %12);";
-            style = style.arg(thisBackColor.red()).arg(thisBackColor.green()).arg(thisBackColor.blue()).arg(thisBackColor.alpha()).
-                    arg(thisForeColor.red()).arg(thisForeColor.green()).arg(thisForeColor.blue()).arg(thisForeColor.alpha()).
-                    arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
+            style = style.arg(thisBackColor.red()).arg(thisBackColor.green()).arg(thisBackColor.blue()).arg(alphabg).
+                    arg(thisForeColor.red()).arg(thisForeColor.green()).arg(thisForeColor.blue()).arg(alphafg).
+                    arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(alphaborder);
             QString border ="border-radius: 3px; padding: 1px; border-style: outset; border-width: %1px;}";
             border = border.arg(borderSize);
             style.append(border);
             QString hover = "QPushButton:hover {background-color: rgba(%1, %2, %3, %4);}  QPushButton:pressed {background-color: rgba(%5, %6, %7, %8)};";
-            hover = hover.arg(thisBackColorHover.red()).arg(thisBackColorHover.green()).arg(thisBackColorHover.blue()).arg(thisBackColorHover.alpha()).
-                    arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
+            hover = hover.arg(thisBackColorHover.red()).arg(thisBackColorHover.green()).arg(thisBackColorHover.blue()).arg(alphabghover).
+                    arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(alphaborder);
             style.append(hover);
             if(temp->styleSheet() != style) {
                 temp->setStyleSheet(style);

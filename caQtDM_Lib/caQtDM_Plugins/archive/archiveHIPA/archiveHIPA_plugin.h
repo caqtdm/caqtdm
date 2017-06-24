@@ -150,9 +150,11 @@ public:
 
 public slots:
     void handleResults(indexes, int, QVector<double>, QVector<double>, QString);
+    void closeEvent();
 
 signals:
     void operate(QWidget*, const indexes);
+    void Signal_StopUpdateInterface();
 
 private slots:
     void updateValues();

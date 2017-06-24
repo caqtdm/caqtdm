@@ -24,6 +24,7 @@
  */
 #include <QDebug>
 #include <QThread>
+#include <QApplication>
 #include "archivePRO_plugin.h"
 #include "archiverCommon.h"
 
@@ -45,6 +46,13 @@ ArchivePRO_Plugin::ArchivePRO_Plugin()
     archiverCommon = new ArchiverCommon();
 
     connect(archiverCommon, SIGNAL(Signal_UpdateInterface(QMap<QString, indexes>)), this,SLOT(Callback_UpdateInterface(QMap<QString, indexes>)));
+    connect(this, SIGNAL(Signal_StopUpdateInterface()), archiverCommon,SLOT(stopUpdateInterface()));
+    connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closeEvent()));
+}
+
+void ArchivePRO_Plugin::closeEvent(){
+   qDebug() << "ArchivePRO_Plugin::closeEvent ";
+   emit Signal_StopUpdateInterface();
 }
 
 // init communication
@@ -58,8 +66,6 @@ int ArchivePRO_Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindow
 // however when many data it may take much longer, then  suppress any new request
 void ArchivePRO_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes)
 {
-    QMutexLocker locker(&mutex);
-
     //qDebug() << "-------------------- ArchivePRO_Plugin::Callback_UpdateInterface";
 
     QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
