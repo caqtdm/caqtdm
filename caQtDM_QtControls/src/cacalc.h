@@ -63,7 +63,7 @@ public:
     enum Properties { calcabcd = 0, channela, channelb, channelc, channeld, initialvalue, pvlist};
 
     QString getPV() const {return thisPV.join(";");}
-    void setPV(QString const &newPV)  {thisPV = newPV.split(";");}
+    void setPV(QString const &newPV)  {thisPV = newPV.simplified().split(";");}
     QStringList getPVList() const {return thisPV;}
     void setPVList(QStringList list) {thisPV = list; updatePropertyEditorItem(this, "channels");}
 
