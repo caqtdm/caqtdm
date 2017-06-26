@@ -248,7 +248,7 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w, int dataI
 
                 // waveform
                 } else {
-                    // initialize data to nan and update the correct index
+                    // allocate and initialize data to nan
                     if((int) (dataCount * sizeof(double)) !=  KnobData[indx].edata.dataSize) {
                         if( KnobData[indx].edata.dataB != (void*) 0) free( KnobData[indx].edata.dataB);
                         KnobData[indx].edata.dataB = (void*) malloc(dataCount * sizeof(double));
@@ -256,8 +256,6 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w, int dataI
                         for(int i=0; i<dataCount; i++) data[i] = qQNaN();
                     }
                     KnobData[indx].edata.dataSize = dataCount * sizeof(double);
-                    double *data = (double *) KnobData[indx].edata.dataB;
-                    data[dataIndex] = value;
                     KnobData[indx].edata.valueCount = dataCount;
                 }
                 KnobData[indx].edata.fieldtype = caDOUBLE;
@@ -592,7 +590,6 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 // get value from (updated) QMap variable list
                 knobData *ptr = (knobData*) &KnobData[indx];
                 kPtr->edata.fieldtype = caDOUBLE;
-                //kPtr->edata.connected = true;
                 kPtr->edata.accessW = true;
                 kPtr->edata.accessR = true;
 
@@ -600,16 +597,13 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 if(ptr->edata.valueCount > 0) {
                      double *data = (double *) ptr->edata.dataB;
                      kPtr->edata.rvalue = data[0];
+                     kPtr->edata.monitorCount++;
+                     memcpy(kPtr->edata.dataB,  data, kPtr->edata.valueCount * sizeof(double));
                 } else {
                    kPtr->edata.rvalue = ptr->edata.rvalue;
-                   kPtr->edata.connected = true;
+                   if(kPtr->edata.oldsoftvalue != ptr->edata.rvalue) kPtr->edata.monitorCount++;
                 }
-
-                //increase monitor count when value has changed
-                if(kPtr->edata.oldsoftvalue != ptr->edata.rvalue) {
-                    //qDebug() << kPtr->pv << kPtr->dispName << "will be updated with value=" << ptr->edata.rvalue << "from" << ptr->pv << "index=" << ptr->index << "oldvalue=" << kPtr->edata.oldsoftvalue;
-                    kPtr->edata.monitorCount++;
-                }
+                kPtr->edata.connected = true;
 
                 // when any monitors for calculation increase monitorcount (sorry, we are not testing if any change of values)
                 QWidget *w1 =  (QWidget*) kPtr->dispW;
@@ -621,7 +615,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                         QWidget *w2 = (QWidget*) kPtr->dispW;
                         if(!w2->property("hidden").value<bool>()) {
                            kPtr->edata.monitorCount++;
-                           //qDebug() << "increase associated" << kPtr->pv << w2->objectName();
+                           //qDebug() << "increase associated" << kPtr->pv << kPtr->index << w2->objectName();
                         }
                     }
                 }
@@ -788,5 +782,6 @@ extern "C" MutexKnobData* C_UpdateTextLine(MutexKnobData* p, char *message, char
     p->UpdateTextLine(message, name);
     return p;
 }
+
 
 
