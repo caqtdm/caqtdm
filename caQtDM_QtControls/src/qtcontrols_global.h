@@ -27,6 +27,8 @@
 #define QTCONGLOBAL_H
 
 #include "qtdefinitions.h"
+#include <QDebug>
+#include <QScrollArea>
 
 #define NOMINMAX
 

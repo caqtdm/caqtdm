@@ -43,8 +43,8 @@ class  QTCON_EXPORT caInclude : public QWidget
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString macro READ getMacro WRITE setMacro  DESIGNABLE inactiveButVisible())
     Q_PROPERTY(QStringList macroList READ getMacroList WRITE setMacroList STORED false)
+    Q_PROPERTY(QString macro READ getMacro WRITE setMacro  DESIGNABLE inactiveButVisible())
 
     Q_PROPERTY(QString filename READ getFileName WRITE setFileName)
     Q_PROPERTY(Stacking stacking READ getStacking WRITE setStacking)
@@ -52,6 +52,12 @@ class  QTCON_EXPORT caInclude : public QWidget
     Q_PROPERTY(int maximumLines READ getMaxLines WRITE setMaxLines DESIGNABLE isPropertyVisible(maximumLines))
     Q_PROPERTY(int maximumColumns READ getMaxColumns WRITE setMaxColumns DESIGNABLE isPropertyVisible(maximumColumns))
     Q_ENUMS(Stacking)
+
+    Q_PROPERTY(QStringList xPositionsOrChannelsList READ getXpositionsList WRITE setXpositionsList STORED false)
+    Q_PROPERTY(QString xPositionsOrChannels READ getXpositions WRITE setXpositions DESIGNABLE inactiveButVisible())
+    Q_PROPERTY(QStringList yPositionsOrChannelsList READ getYpositionsList WRITE setYpositionsList STORED false)
+    Q_PROPERTY(QString yPositionsOrChannels READ getYpositions WRITE setYpositions DESIGNABLE inactiveButVisible())
+
     Q_PROPERTY(bool adjustSizeToContents READ getAdjustSize WRITE setAdjustSize)
     Q_PROPERTY(int verticalSpacing READ getSpacingVertical WRITE setSpacingVertical)
     Q_PROPERTY(int horizontalSpacing READ getSpacingHorizontal WRITE setSpacingHorizontal)
@@ -76,9 +82,25 @@ public:
     enum myShapes {NoFrame=0, Box, Panel};
 
     enum Properties { maximumLines = 0, numberofItems, maximumColumns};
-    enum Stacking {Row=0, Column, RowColumn, ColumnRow};
+    enum Stacking {Row=0, Column, RowColumn, ColumnRow, Positions};
     Stacking getStacking() const { return thisStacking; }
     void setStacking(Stacking stacking);
+
+    QString getXpositions() const {return thisXpositionsList.join(";");}
+    void setXpositions(QString const &newPosition) {thisXpositionsList = newPosition.split(";");}
+    QStringList getXpositionsList() const {return thisXpositionsList;}
+    void setXpositionsList(QStringList list);
+    void updateXpositionsList(int pos, int value);
+    bool getXposition(int indx, int &posX, int width, QString &pos);
+    int getXmaximum();
+
+    QString getYpositions() const {return thisYpositionsList.join(";");}
+    void setYpositions(QString const &newPosition) {thisYpositionsList = newPosition.split(";");}
+    QStringList getYpositionsList() const {return thisYpositionsList;}
+    void setYpositionsList(QStringList list);
+    void updateYpositionsList(int pos, int value);
+    bool getYposition(int indx, int &posY, int height, QString &pos);
+    int getYmaximum();
 
     bool getAdjustSize() { return thisAdjust; }
     void setAdjustSize(bool adjust) { thisAdjust = adjust; setFileName(newFileName);}
@@ -124,13 +146,15 @@ public:
     bool isPropertyVisible(Properties property);
     void setPropertyVisible(Properties property, bool visible);
 
+    int getMargin();
+
 public slots:
     void animation(QRect p) {
 #include "animationcode.h"
     }
 
 protected:
-      void paintEvent( QPaintEvent* );
+      void paintEvent( QPaintEvent *);
 
 private:
 
@@ -160,6 +184,10 @@ private:
     int thisFrameLineWidth;
     bool thisFrameUpdate;
     QPalette thisPalette;
+    QStringList thisXpositionsList;
+    QStringList thisYpositionsList;
+    QRect thisRect;
+    int maximumX, maximumY;
 
 #ifdef PRC
     ParsePepFile *pepfile;

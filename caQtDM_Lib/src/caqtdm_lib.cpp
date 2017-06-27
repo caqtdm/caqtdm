@@ -1855,6 +1855,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
     } else if(caInclude* includeWidget = qobject_cast<caInclude *>(w1)) {
 
         //qDebug() << "create caInclude" << w1;
+        int maximumX=1;
+        int maximumY=1;
+        int posX=0;
+        int posY = 0;
         int maxRows = 0;
         int row = 0;
         int maxColumns=0;
@@ -1967,6 +1971,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         macros = treatMacro(map, macros, &doNothing);
         QStringList macroList = macros.split(";", QString::SkipEmptyParts);
 
+        int adjustMargin = includeWidget->getMargin();
+
         // loop on this include with different macro
         for(int j=0; j<qMax(macroList.count(), includeWidget->getItemCount()); j++) {
             QString macroS;
@@ -2076,6 +2082,37 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                         column++;
                         if(column > maxColumns) maxColumns = column;
                         maxRows = row + 1;
+                    } else {
+                        thisW->setParent(frame);
+
+                        QString pos;
+                        if(!includeWidget->getXposition(j, posX, thisW->width(), pos)) {
+                            //qDebug() << posX << " x position could be a channel";
+                            specData[0] = 1;   // x position
+                            specData[1] = j;   // actual position in array;
+                            specData[2] = adjustMargin;
+                            memcpy(&specData[3], &thisW, sizeof(QWidget*));
+                            int num = addMonitor(myWidget, &kData, pos, w1, specData, map, &pv);
+                            integerList.append(num);
+                            nbMonitors++;
+                        }
+
+                        if(!includeWidget->getYposition(j, posY, thisW->height(), pos)) {
+                            //qDebug() << posY << " x position could be a channel";
+                            specData[0] = 2;   // x position
+                            specData[1] = j;   // actual position in array;
+                            specData[2] = adjustMargin;
+                            memcpy(&specData[3], &thisW, sizeof(QWidget*));
+                            int num = addMonitor(myWidget, &kData, pos, w1, specData, map, &pv);
+                            integerList.append(num);
+                            nbMonitors++;
+                        }
+
+                        thisW->move(posX+adjustMargin/2, posY + adjustMargin/2);
+                        int maxX = posX + thisW->width();
+                        int maxY = posY + thisW->height();
+                        if(maxX > maximumX) maximumX = maxX;
+                        if(maxY > maximumY) maximumY = maxY;
                     }
 
                     frame->setLayout(gridLayout);
@@ -2122,21 +2159,25 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         } // end for
 
-        int adjustMargin = 0;
-        if(includeWidget->getFrameShape() == caInclude::Box) adjustMargin = 4*includeWidget->getFrameLineWidth();
-        else if(includeWidget->getFrameShape() == caInclude::NoFrame) adjustMargin = 0;
-        else adjustMargin = 2*includeWidget->getFrameLineWidth();
-
-        if((thisW != (QWidget *) 0 ) && (!prcFile) && includeWidget->getAdjustSize()) {
+        // resize the include widget
+        if((thisW != (QWidget *) 0 ) && (!prcFile) && includeWidget->getAdjustSize() && includeWidget->getStacking() != caInclude::Positions) {
             includeWidget->resize(maxColumns * thisW->width() + (maxColumns-1) * spacingHorizontal + adjustMargin,
                                   maxRows * thisW->height() + (maxRows-1) * spacingVertical + adjustMargin);
+        } else if((thisW != (QWidget *) 0 ) && (!prcFile) && includeWidget->getAdjustSize() && includeWidget->getStacking() == caInclude::Positions) {
+            includeWidget->resize(maximumX + adjustMargin, maximumY + adjustMargin);
+        }
 
-            // when the include is packed into a scroll area, set the minimumsize too
+        // when the include is packed into a scroll area, set the minimumsize too
+        if((thisW != (QWidget *) 0 ) && (!prcFile) && includeWidget->getAdjustSize()) {
             if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
                 Q_UNUSED(scrollWidget);
                 QWidget *contents = (QWidget*) includeWidget->parent();
-                contents->setMinimumSize(maxColumns * thisW->width() + (maxColumns-1) * spacingHorizontal + adjustMargin,
-                                      maxRows * thisW->height() + (maxRows-1) * spacingVertical + adjustMargin);
+                if(includeWidget->getStacking() != caInclude::Positions) {
+                   contents->setMinimumSize(maxColumns * thisW->width() + (maxColumns-1) * spacingHorizontal + adjustMargin,
+                                            maxRows * thisW->height() + (maxRows-1) * spacingVertical + adjustMargin);
+                } else {
+                    contents->setMinimumSize(maximumX + adjustMargin, maximumY + adjustMargin);
+                }
             }
         }
 
@@ -3738,9 +3779,47 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         // caInclude ==================================================================================================================
     } else if(caInclude *includeWidget = qobject_cast<caInclude *>(w)) {
-        //qDebug() << "we have an included frame";
+        //qDebug() << "we have an include";
 
-        setObjectVisibility(includeWidget, data.edata.rvalue);
+        // visibility
+        if(data.specData[0] == 0) {
+            setObjectVisibility(includeWidget, data.edata.rvalue);
+
+        // absolute positioning
+        } else {
+            QWidget *dispW;
+            int posx, posy;
+            int posX=0;
+            int posY=0;
+            QString pos;
+            //qDebug() << "we got a position at " << data.specData[1] << data.edata.rvalue << data.pv;
+            int adjustMargin = data.specData[2];
+            if(data.specData[0] == 1) {
+                includeWidget->updateXpositionsList(data.specData[1], (int) data.edata.rvalue);
+            } else {
+                includeWidget->updateYpositionsList(data.specData[1], (int) data.edata.rvalue);
+            }
+            if(includeWidget->getXposition(data.specData[1], posx, 0, pos)) {posX = posx;}
+            if(includeWidget->getYposition(data.specData[1], posy, 0, pos)) {posY = posy;}
+            memcpy(&dispW, &data.specData[3], sizeof(QWidget*));
+
+            // move to correct position
+            dispW->move(posX+adjustMargin/2, posY + adjustMargin/2);
+
+            // recalcute eventually the size
+            if(includeWidget->getAdjustSize()) {
+                int maximumX = includeWidget->getXmaximum() + dispW->width();
+                int maximumY = includeWidget->getYmaximum() + dispW->height();
+
+                // when the include is packed into a scroll area, set the minimumsize too
+                includeWidget->resize(maximumX + adjustMargin, maximumY + adjustMargin);
+                if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
+                    Q_UNUSED(scrollWidget);
+                    QWidget *contents = (QWidget*) includeWidget->parent();
+                    contents->setMinimumSize(maximumX + adjustMargin, maximumY + adjustMargin);
+                }
+            }
+        }
 
         // caFrame ==================================================================================================================
     } else if(caFrame *frameWidget = qobject_cast<caFrame *>(w)) {
@@ -4798,7 +4877,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         // something else (user defined monitors with non ca imageWidgets ?) ==============================================
     } else {
-        //qDebug() << "unrecognized widget" << w->metaObject()->className();
+        qDebug() << "unrecognized widget" << w->metaObject()->className();
     }
 }
 

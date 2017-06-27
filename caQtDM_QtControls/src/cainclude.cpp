@@ -27,6 +27,7 @@
 #include <QPainter>
 #include <QApplication>
 #include <QFrame>
+#include <QScrollArea>
 #include <math.h>
 #include "cainclude.h"
 #include "searchfile.h"
@@ -42,7 +43,8 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
     thisMaxLines = 1;
     thisMaxColumns = 1;
     thisStacking = Row;
-    thisAdjust = prvAdjust= true;
+    // I have to change the previous default of this parameter
+    thisAdjust = prvAdjust= false;
     thisSpacingVertical = thisSpacingHorizontal=0;
     thisFrameColor = Qt::gray;
     setVisibility(StaticV);
@@ -100,9 +102,12 @@ void caInclude::setPropertyVisible(Properties property, bool visible)
 void caInclude::removeIncludedWidgets()
 {
     if(thisLoadedWidgets.count() > 0) {
+
+        // remove from gridlayout and / or qframe
         foreach(QWidget *l, thisLoadedWidgets) {
             gridLayout->removeWidget(l);
             l->hide();
+            l->setParent(NULL);
             l->deleteLater();
         }
         thisLoadedWidgets.clear();
@@ -111,6 +116,7 @@ void caInclude::removeIncludedWidgets()
 }
 
 void caInclude::setStacking(Stacking stacking) {
+
     thisStacking = stacking;
     setFileName(newFileName);
     prvStacking = thisStacking;
@@ -145,6 +151,8 @@ void caInclude::setFileName(QString const &filename)
         int maxRows = 0;
         int maxColumns=0;
         int adjustMargin = 0;
+
+        maximumX = maximumY = 0;
 
         //printf("cainclude -- setfilename %s for %s\n", qasc(filename), qasc(this->objectName()));
 
@@ -198,14 +206,23 @@ void caInclude::setFileName(QString const &filename)
             gridLayout->setHorizontalSpacing(thisSpacingHorizontal);
 
             if(thisLoadedWidgets.count() > 0) {
-                //printf("modify stacking with %d items\n", thisLoadedWidgets.count());
                 int j = 0;
+
+                if(thisFrameShape == Box) adjustMargin = 4*thisFrameLineWidth;
+                else if(thisFrameShape == NoFrame) adjustMargin = 0;
+                else adjustMargin = 2*thisFrameLineWidth;
+
+                // remove from gridlayout and / or qframe
                 foreach(QWidget *l, thisLoadedWidgets) {
                     l->hide();
                     gridLayout->removeWidget(l);
+                    l->setParent(NULL);
                 }
 
                 foreach(QWidget *l, thisLoadedWidgets) {
+                    bool ok = false;
+                    int posX = 0;
+                    int posY = 0;
                     // find the row, column to add this widget
                     if(thisStacking == Row) {
                         gridLayout->addWidget(l, j, 0);
@@ -235,18 +252,39 @@ void caInclude::setFileName(QString const &filename)
                         column++;
                         if(column > maxColumns) maxColumns = column;
                         maxRows = row + 1;
+                    } else {
+                        l->setParent(frame);
+                        if(j<thisXpositionsList.count()) {
+                            posX = thisXpositionsList.at(j).toInt(&ok);
+                            if(!ok) posX += l->width();
+                        }
+                        if(j<thisYpositionsList.count()) {
+                            posY = thisYpositionsList.at(j).toInt(&ok);
+                            if(!ok) posY = 0;
+                        }
+
+                        l->move(posX+adjustMargin/2, posY + adjustMargin/2);
+                        int maxX = posX + l->width();
+                        int maxY = posY + l->height();
+                        if(maxX > maximumX) maximumX = maxX;
+                        if(maxY > maximumY) maximumY = maxY;
                     }
 
                     j++;
                     l->show();
                 }
-                //printf("resize 1 for row=%d column=%d\n", maxRows, maxColumns);
-                if(thisFrameShape == Box) adjustMargin = 4*thisFrameLineWidth;
-                else if(thisFrameShape == NoFrame) adjustMargin = 0;
-                else adjustMargin = 2*thisFrameLineWidth;
-                if(thisAdjust) resize(maxColumns * effectiveSize.width() + (maxColumns-1) * thisSpacingHorizontal + adjustMargin,
+
+                if(thisAdjust && (thisStacking != Positions)) resize(maxColumns * effectiveSize.width() + (maxColumns-1) * thisSpacingHorizontal + adjustMargin,
                                       maxRows * effectiveSize.height() + (maxRows-1) * thisSpacingVertical + adjustMargin);
+                else if(thisAdjust && (thisStacking == Positions)) resize(maximumX + adjustMargin, maximumY + adjustMargin);
                 prvAdjust = thisAdjust;
+
+                if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(parent()->parent())) {
+                    Q_UNUSED(scrollWidget);
+                    QWidget *contents = (QWidget*) parent();
+                    contents->setMinimumSize(maximumX + adjustMargin, maximumY + adjustMargin);
+                }
+
             }
         }
 
@@ -290,8 +328,13 @@ void caInclude::setFileName(QString const &filename)
         // file was found, remove previous widget if any
         removeIncludedWidgets();
 
+        adjustMargin = getMargin();
+
         // load file
         for(int j=0; j<thisItemCount; j++) {
+            bool ok = false;
+            int posX = 0;
+            int posY = 0;
             QWidget * loadedWidget = (QWidget *) 0;
             if(!fileName.contains(".prc")) {
                 // load new file
@@ -349,18 +392,39 @@ void caInclude::setFileName(QString const &filename)
                 column++;
                 if(column > maxColumns) maxColumns = column;
                 maxRows = row + 1;
+            } else {
+                loadedWidget->setParent(frame);
+
+                if(j<thisXpositionsList.count()) {
+                    posX = thisXpositionsList.at(j).toInt(&ok);
+                    if(!ok) posX += loadedWidget->width();
+                }
+                if(j<thisYpositionsList.count()) {
+                    posY = thisYpositionsList.at(j).toInt(&ok);
+                    if(!ok) posY = 0;
+                }
+
+                loadedWidget->move(posX+adjustMargin/2, posY+adjustMargin/2);
+                int maxX = posX + loadedWidget->width();
+                int maxY = posY + loadedWidget->height();
+                if(maxX > maximumX) maximumX = maxX;
+                if(maxY > maximumY) maximumY = maxY;
             }
 
             // show it
             loadedWidget->show();
         }
 
-        //printf("resize 2 for row=%d column=%d\n", maxRows, maxColumns);
-        if(thisFrameShape == Box) adjustMargin = 4*thisFrameLineWidth;
-        else if(thisFrameShape == NoFrame) adjustMargin = 0;
-        else adjustMargin = 2*thisFrameLineWidth;
-        if(thisAdjust) resize(maxColumns * effectiveSize.width() + (maxColumns-1) * thisSpacingHorizontal + adjustMargin,
+        if(thisAdjust  && (thisStacking != Positions)) resize(maxColumns * effectiveSize.width() + (maxColumns-1) * thisSpacingHorizontal + adjustMargin,
                               maxRows * effectiveSize.height() + (maxRows-1) * thisSpacingVertical + adjustMargin);
+        else if(thisAdjust && (thisStacking == Positions)) resize(maximumX + adjustMargin, maximumY + adjustMargin);
+
+        if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(parent()->parent())) {
+            Q_UNUSED(scrollWidget);
+            QWidget *contents = (QWidget*) parent();
+            contents->setMinimumSize(maximumX + adjustMargin, maximumY + adjustMargin);
+        }
+
         prvFileName = newFileName;
         prvStacking = thisStacking;
         prvItemCount = thisItemCount;
@@ -378,7 +442,7 @@ void caInclude::setLineSize(int size )
     update();
 }
 
-void caInclude::paintEvent( QPaintEvent *event )
+void caInclude::paintEvent( QPaintEvent *event)
 {
     Q_UNUSED(event);
     if(thisLineSize > 0) {
@@ -388,7 +452,101 @@ void caInclude::paintEvent( QPaintEvent *event )
     }
 }
 
+void caInclude::setXpositionsList(QStringList list)
+{
+    thisXpositionsList = list;
+    updatePropertyEditorItem(this, "xPositionsOrChannels");
+    thisFrameUpdate = true;
+    setFileName(newFileName);
+}
 
+void caInclude::setYpositionsList(QStringList list)
+{
+    thisYpositionsList = list;
+    updatePropertyEditorItem(this, "yPositionsOrChannels");
+    thisFrameUpdate = true;
+    setFileName(newFileName);
+}
+
+void caInclude::updateXpositionsList(int pos, int value)
+{
+    if(pos < thisXpositionsList.count()) {
+        thisXpositionsList[pos] = QString::number(value);
+    }
+}
+
+void caInclude::updateYpositionsList(int pos, int value)
+{
+    if(pos < thisYpositionsList.count()) {
+        thisYpositionsList[pos] = QString::number(value);
+    }
+}
+
+bool caInclude::getXposition(int indx, int &posX, int width, QString &pos) {
+    if(indx < thisXpositionsList.count()) {
+        bool ok;
+        pos =  thisXpositionsList[indx];
+        posX = pos.toInt(&ok);
+        if(!ok) {
+            posX = posX + width;
+            return false;
+        } else {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool caInclude::getYposition(int indx, int &posY, int height, QString &pos) {
+    Q_UNUSED(height);
+    if(indx < thisYpositionsList.count()) {
+        bool ok;
+        pos =  thisYpositionsList[indx];
+        posY = pos.toInt(&ok);
+        if(!ok) {
+            posY = 0;
+            return false;
+        } else {
+            return true;
+        }
+    }
+    return false;
+}
+
+int caInclude::getXmaximum()
+{
+    int maximum = 0;
+    QString pos;
+    int posX;
+
+    for(int i=0; i <  thisXpositionsList.count(); i++) {
+        getXposition(i, posX, 0, pos);
+        int maxX = posX + getMargin();
+        if(maxX > maximum) maximum = maxX;
+    }
+    return maximum;
+}
+
+int caInclude::getYmaximum() {
+    int maximum = 0;
+    QString pos;
+    int posY;
+
+    for(int i=0; i <  thisYpositionsList.count(); i++) {
+        getYposition(i, posY, 0, pos);
+        int maxY = posY + getMargin();
+        if(maxY > maximum) maximum = maxY;
+    }
+    return maximum;
+}
+
+int caInclude::getMargin() {
+    int adjustMargin = 0;
+    if(getFrameShape() == caInclude::Box) adjustMargin = 4*getFrameLineWidth();
+    else if(getFrameShape() == caInclude::NoFrame) adjustMargin = 0;
+    else adjustMargin = 2*getFrameLineWidth();
+    return adjustMargin;
+}
 
 
 

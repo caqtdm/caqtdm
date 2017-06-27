@@ -24,6 +24,7 @@
  */
 
 #include "wmsignalpropagator.h"
+#include "cainclude.h"
 
 
 wmSignalPropagator::wmSignalPropagator( QWidget *parent ) : ESimpleLabel(parent)
@@ -31,6 +32,7 @@ wmSignalPropagator::wmSignalPropagator( QWidget *parent ) : ESimpleLabel(parent)
     setForeAndBackground(Qt::black, Qt::lightGray);
     setFontScaleMode(WidthAndHeight);
     setText("wmSignals");
+    Parent = parent;
 }
 
 void wmSignalPropagator::closewindow() {emit wmCloseWindow();}
@@ -38,8 +40,48 @@ void wmSignalPropagator::shownormal() {emit wmShowNormal();}
 void wmSignalPropagator::showmaximized() {emit wmShowMaximized();}
 void wmSignalPropagator::showminimized() {emit wmShowMinimized();}
 void wmSignalPropagator::showfullscreen() {emit wmShowFullScreen();}
+void wmSignalPropagator::propagateToParent(QRect p) {
 
+    // move parent to the p.x and p.y
+    QWidget *w = Parent;
+    caInclude *includeWidget = (caInclude *) 0;
+    while(w != (QWidget*) 0) {
+        if(w != (QWidget*) 0) {
+            if(caInclude* widget = qobject_cast<caInclude *>(w)) {
+                includeWidget = widget;
+                if((widget->x() != p.x()) || (widget->y() != p.y())) {
+                    widget->move(p.x(), p.y());
+                    //printf("propagate:: move parent include to %d %d\n", p.x(), p.y());
+                    break;
+                } else {
 
+                }
+            }
+        }
+        w = (QWidget*) w->parent();
+    }
+
+    // adjust the scroll area, but only when something was moved
+    if(includeWidget != (caInclude *) 0) {
+        if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
+            int maxX=300;
+            int maxY=200;
+            QList<QWidget *> allW = scrollWidget->findChildren<QWidget *>();
+            foreach(QWidget* widget, allW) {
+                if(widget->x() + widget->width() > maxX) maxX = widget->x() + widget->width();
+                if(widget->y() + widget->height() > maxY) maxY = widget->y() + widget->height();
+            }
+            QWidget *contents = (QWidget*) includeWidget->parent();
+            if(contents != (QWidget *) 0) {
+               QSize sizew = contents->minimumSize();
+               if(maxX > sizew.width() || maxY > sizew.height()) {
+                   //printf("propagate:: resize print area\n");
+                   contents->setMinimumSize(maxX, maxY);
+               }
+            }
+        }
+    }
+}
 
 void wmSignalPropagator::setForeAndBackground(QColor fg, QColor bg)
 {

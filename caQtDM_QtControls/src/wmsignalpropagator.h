@@ -27,6 +27,7 @@
 #define WMSIGNALPROPAGATOR_H
 
 #include <QWidget>
+#include <QScrollArea>
 #include "esimplelabel.h"
 #include <qtcontrols_global.h>
 
@@ -49,6 +50,7 @@ public slots:
     void showmaximized();
     void showminimized();
     void showfullscreen();
+    void propagateToParent(QRect p);
 
 signals:
     void wmCloseWindow();
@@ -59,6 +61,7 @@ signals:
 
 private:
     void setForeAndBackground(QColor fg, QColor bg);
+    QWidget *Parent;
 };
 
 #endif 
