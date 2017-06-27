@@ -257,6 +257,7 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w, int dataI
                     }
                     KnobData[indx].edata.dataSize = dataCount * sizeof(double);
                     KnobData[indx].edata.valueCount = dataCount;
+                    KnobData[indx].edata.rvalue = value;
                 }
                 KnobData[indx].edata.fieldtype = caDOUBLE;
                 KnobData[indx].edata.precision = 3;
@@ -603,6 +604,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                    kPtr->edata.rvalue = ptr->edata.rvalue;
                    if(kPtr->edata.oldsoftvalue != ptr->edata.rvalue) kPtr->edata.monitorCount++;
                 }
+
                 kPtr->edata.connected = true;
 
                 // when any monitors for calculation increase monitorcount (sorry, we are not testing if any change of values)
