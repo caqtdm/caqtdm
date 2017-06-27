@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>975</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QScrollArea" name="scrollArea">
+    <property name="geometry">
+     <rect>
+      <x>367</x>
+      <y>53</y>
+      <width>475</width>
+      <height>127</height>
+     </rect>
+    </property>
+    <property name="horizontalScrollBarPolicy">
+     <enum>Qt::ScrollBarAlwaysOn</enum>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="scrollAreaWidgetContents">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>456</width>
+       <height>140</height>
+      </rect>
+     </property>
+     <widget class="caInclude" name="cainclude">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>440</width>
+        <height>140</height>
+       </rect>
+      </property>
+      <property name="macro">
+       <string>PV=$(PV1);PV=$(PV2);PV=$(PV3);PV=$(PV4);PV=$(PV5)</string>
+      </property>
+      <property name="filename" stdset="0">
+       <string notr="true">bpmsingle.ui</string>
+      </property>
+      <property name="stacking">
+       <enum>caInclude::Positions</enum>
+      </property>
+      <property name="numberOfItems" stdset="0">
+       <number>5</number>
+      </property>
+      <property name="xPositionsOrChannels" stdset="0">
+       <string>$(PV1):X;100;200;300;400</string>
+      </property>
+      <property name="yPositionsOrChannels" stdset="0">
+       <string>$(PV1):Y;10;20;30;40</string>
+      </property>
+      <property name="adjustSizeToContents" stdset="0">
+       <bool>true</bool>
+      </property>
+      <property name="frameShape">
+       <enum>caInclude::Box</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <property name="frameLineWidth">
+       <number>5</number>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>380</x>
+      <y>31</y>
+      <width>543</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>cainclude with absolute positioning using PV1 to PV5</string>
+    </property>
+   </widget>
+   <widget class="caInclude" name="cainclude_6">
+    <property name="geometry">
+     <rect>
+      <x>6</x>
+      <y>307</y>
+      <width>89</width>
+      <height>217</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>PV1=$(PV1)</string>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">bpminclude_child1.ui</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>4</x>
+      <y>276</y>
+      <width>433</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>cainclude with signal positioning in its parent using PV1</string>
+    </property>
+   </widget>
+   <widget class="QScrollArea" name="scrollArea_2">
+    <property name="geometry">
+     <rect>
+      <x>446</x>
+      <y>298</y>
+      <width>437</width>
+      <height>228</height>
+     </rect>
+    </property>
+    <property name="verticalScrollBarPolicy">
+     <enum>Qt::ScrollBarAlwaysOn</enum>
+    </property>
+    <property name="horizontalScrollBarPolicy">
+     <enum>Qt::ScrollBarAlwaysOn</enum>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="scrollAreaWidgetContents_2">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>418</width>
+       <height>360</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>94</width>
+       <height>360</height>
+      </size>
+     </property>
+     <widget class="caInclude" name="cainclude_7">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>3</y>
+        <width>89</width>
+        <height>217</height>
+       </rect>
+      </property>
+      <property name="macro">
+       <string>PV1=$(PV2)</string>
+      </property>
+      <property name="filename" stdset="0">
+       <string notr="true">bpminclude_child2.ui</string>
+      </property>
+      <property name="stacking">
+       <enum>caInclude::Positions</enum>
+      </property>
+     </widget>
+     <widget class="caCalc" name="cacalc_37">
+      <property name="geometry">
+       <rect>
+        <x>216</x>
+        <y>151</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="variable">
+       <string notr="true">calcVariationX</string>
+      </property>
+      <property name="calc">
+       <string notr="true">150+100*SIN(A*3.1416/180)</string>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">angleVariation</string>
+      </property>
+      <property name="channelB">
+       <string notr="true"/>
+      </property>
+      <property name="channelC">
+       <string notr="true"/>
+      </property>
+      <property name="channelD">
+       <string notr="true"/>
+      </property>
+     </widget>
+     <widget class="caCalc" name="cacalc_41">
+      <property name="geometry">
+       <rect>
+        <x>216</x>
+        <y>175</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="variable">
+       <string notr="true">calcVariationY</string>
+      </property>
+      <property name="calc">
+       <string notr="true">150+100*COS(A*3.1416/180)</string>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">angleVariation</string>
+      </property>
+      <property name="channelB">
+       <string notr="true"/>
+      </property>
+      <property name="channelC">
+       <string notr="true"/>
+      </property>
+      <property name="channelD">
+       <string notr="true"/>
+      </property>
+     </widget>
+     <widget class="caCalc" name="cacalc_39">
+      <property name="geometry">
+       <rect>
+        <x>326</x>
+        <y>177</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="variable">
+       <string notr="true">calcVariationHeight</string>
+      </property>
+      <property name="calc">
+       <string notr="true">100+100*COS(A*3.1416/180)</string>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">angleVariation</string>
+      </property>
+      <property name="channelB">
+       <string notr="true"/>
+      </property>
+      <property name="channelC">
+       <string notr="true"/>
+      </property>
+      <property name="channelD">
+       <string notr="true"/>
+      </property>
+     </widget>
+     <widget class="caCalc" name="cacalc_38">
+      <property name="geometry">
+       <rect>
+        <x>326</x>
+        <y>129</y>
+        <width>81</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="variable">
+       <string notr="true">QRectDrive</string>
+      </property>
+      <property name="calc">
+       <string notr="true">%QRect</string>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">calcVariationX</string>
+      </property>
+      <property name="channelB">
+       <string notr="true">calcVariationY</string>
+      </property>
+      <property name="channelC">
+       <string notr="true">calcVariationWidth</string>
+      </property>
+      <property name="channelD">
+       <string notr="true">calcVariationHeight</string>
+      </property>
+      <property name="eventSignal">
+       <enum>caCalc::onAnyChange</enum>
+      </property>
+     </widget>
+     <widget class="caCalc" name="cacalc_42">
+      <property name="geometry">
+       <rect>
+        <x>327</x>
+        <y>152</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="variable">
+       <string notr="true">calcVariationWidth</string>
+      </property>
+      <property name="calc">
+       <string notr="true">100+100*SIN(A*3.1416/180)</string>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">angleVariation</string>
+      </property>
+      <property name="channelB">
+       <string notr="true"/>
+      </property>
+      <property name="channelC">
+       <string notr="true"/>
+      </property>
+      <property name="channelD">
+       <string notr="true"/>
+      </property>
+     </widget>
+     <widget class="caGraphics" name="cagraphics_23">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>18</y>
+        <width>100</width>
+        <height>100</height>
+       </rect>
+      </property>
+      <property name="foreground">
+       <color>
+        <red>255</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </property>
+      <property name="fillstyle" stdset="0">
+       <enum>caGraphics::Filled</enum>
+      </property>
+      <property name="lineSize">
+       <number>6</number>
+      </property>
+     </widget>
+     <widget class="caCalc" name="cacalc_43">
+      <property name="geometry">
+       <rect>
+        <x>216</x>
+        <y>127</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="variable">
+       <string notr="true">angleVariation</string>
+      </property>
+      <property name="calc">
+       <string notr="true">A&gt;=360?A=0:A+5</string>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">angleVariation</string>
+      </property>
+      <property name="channelB">
+       <string notr="true"/>
+      </property>
+      <property name="channelC">
+       <string notr="true"/>
+      </property>
+      <property name="eventSignal">
+       <enum>caCalc::onAnyChange</enum>
+      </property>
+     </widget>
+     <widget class="wmSignalPropagator" name="wmsignalpropagator">
+      <property name="geometry">
+       <rect>
+        <x>192</x>
+        <y>71</y>
+        <width>70</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>447</x>
+      <y>258</y>
+      <width>532</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>cainclude with signal positioning in its parent with scrolling using PV2</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>7</x>
+      <y>533</y>
+      <width>543</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>common to the includes is the file bpmsingle.ui</string>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_40">
+    <property name="geometry">
+     <rect>
+      <x>21</x>
+      <y>181</y>
+      <width>21</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">bpmy$(PV1)</string>
+    </property>
+    <property name="calc">
+     <string notr="true">A</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">$(PV1):Y</string>
+    </property>
+    <property name="channelB">
+     <string notr="true"/>
+    </property>
+    <property name="channelC">
+     <string notr="true"/>
+    </property>
+    <property name="channelD">
+     <string notr="true"/>
+    </property>
+    <property name="initialValue">
+     <double>75.000000000000000</double>
+    </property>
+    <property name="precision">
+     <number>0</number>
+    </property>
+    <property name="eventSignal">
+     <enum>caCalc::onAnyChange</enum>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_36">
+    <property name="geometry">
+     <rect>
+      <x>21</x>
+      <y>121</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">QRectDrive$(PV1)</string>
+    </property>
+    <property name="calc">
+     <string notr="true">%QRect</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bpmx$(PV1)</string>
+    </property>
+    <property name="channelB">
+     <string notr="true">bpmy$(PV1)</string>
+    </property>
+    <property name="channelC">
+     <string notr="true"/>
+    </property>
+    <property name="channelD">
+     <string notr="true"/>
+    </property>
+    <property name="eventSignal">
+     <enum>caCalc::onAnyChange</enum>
+    </property>
+   </widget>
+   <widget class="caInclude" name="cainclude_2">
+    <property name="geometry">
+     <rect>
+      <x>23</x>
+      <y>31</y>
+      <width>20</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>PV=$(PV1)</string>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">bpmsingle.ui</string>
+    </property>
+    <property name="adjustSizeToContents" stdset="0">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_35">
+    <property name="geometry">
+     <rect>
+      <x>21</x>
+      <y>151</y>
+      <width>21</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">bpmx$(PV1)</string>
+    </property>
+    <property name="calc">
+     <string notr="true">A</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">$(PV1):X</string>
+    </property>
+    <property name="channelB">
+     <string notr="true"/>
+    </property>
+    <property name="channelC">
+     <string notr="true"/>
+    </property>
+    <property name="channelD">
+     <string notr="true"/>
+    </property>
+    <property name="initialValue">
+     <double>50.000000000000000</double>
+    </property>
+    <property name="precision">
+     <number>0</number>
+    </property>
+    <property name="eventSignal">
+     <enum>caCalc::onAnyChange</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>4</y>
+      <width>433</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>direct positioning with PV1</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>975</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caGraphics</class>
+   <extends>QWidget</extends>
+   <header>caGraphics</header>
+  </customwidget>
+  <customwidget>
+   <class>caInclude</class>
+   <extends>QWidget</extends>
+   <header>caInclude</header>
+  </customwidget>
+  <customwidget>
+   <class>caCalc</class>
+   <extends>QLabel</extends>
+   <header>caCalc</header>
+  </customwidget>
+  <customwidget>
+   <class>wmSignalPropagator</class>
+   <extends>QLabel</extends>
+   <header>wmSignalPropagator</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>cacalc_36</sender>
+   <signal>emitSignal(QRect)</signal>
+   <receiver>cainclude_2</receiver>
+   <slot>animation(QRect)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>30</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>32</x>
+     <y>121</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_38</sender>
+   <signal>emitSignal(QRect)</signal>
+   <receiver>cagraphics_23</receiver>
+   <slot>animation(QRect)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>806</x>
+     <y>474</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>748</x>
+     <y>355</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
