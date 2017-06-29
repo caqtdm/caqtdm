@@ -193,9 +193,12 @@ DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
 # 4.1.6
-# x scale of cartseain plot can now also be used with a time scale (milliseconds from epoch)
+# added propagation of signal QRECT to parent, this allows to move a cainclude
+# absolute positionig of items added to cainclude; abolute positions can also be channels that can move the positions.
+# due to some changes to internal stylesheet, the carelateddisplay could not be hidden, this has been corrected
+# x scale of cartesian plot can now also be used with a time scale (milliseconds from epoch)
 # for visibilitycalc, when no channels specified, static calculation will be done at startup
-# cacalc can now also be a vector (waveform) where the items can come from channels
+# archive retrieval revisited, while crashing and http requests had to be canceled at exit.
 # added check for when git not present
 # added an environment variable CAQTD_TIMEOUT_HOURS to be used to quit caQtDM automatically, mouse event will reset the timeout.
 # it is now possible to use caCalc as a vector (waveform) by specifying associated pv's. the soft variable can then be used to display a waveform
