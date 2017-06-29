@@ -368,9 +368,9 @@ QWidget *caIncludeInterface::createWidget(QWidget* parent)
 
 caIncludeInterface::caIncludeInterface(QObject* parent) : CustomWidgetInterface_Graphics(parent)
 {
-    strng name[12], type[12] = {"","","","","","","","","","","", ""};
-    longtext text[12] = {INCLUDEMACRO, INCLUDEFILE, VISIBILITY, VISIBILITYCALC, TEXTPVA, TEXTPVB, TEXTPVC, TEXTPVD, INCLUDESTACKING,
-                       INCLUDEMAXLINES, INCLUDENBITEMS, STRINGFROMLIST};
+    strng name[14], type[14] = {"","","","","","","","","","","", "","", ""};
+    longtext text[14] = {INCLUDEMACRO, INCLUDEFILE, VISIBILITY, VISIBILITYCALC, TEXTPVA, TEXTPVB, TEXTPVC, TEXTPVD, INCLUDESTACKING,
+                       INCLUDEMAXLINES, INCLUDENBITEMS, INCLUDEMACROLIST, "", ""};
 
     strcpy(name[0], "macro");
     strcpy(type[0], "multiline");
@@ -391,8 +391,12 @@ caIncludeInterface::caIncludeInterface(QObject* parent) : CustomWidgetInterface_
     strcpy(name[9], "maximumLines");
     strcpy(name[10], "numberOfItems");
     strcpy(name[11], "macroList");
+    strcpy(name[12], "xPositionsOrChannels");
+    strcpy(type[12], "multiline");
+    strcpy(name[13], "yPositionsOrChannels");
+    strcpy(type[13], "multiline");
 
-    d_domXml = XmlFunc("caInclude", "cainclude", 0, 0, 100, 100, name, type, text, 12);
+    d_domXml = XmlFunc("caInclude", "cainclude", 0, 0, 100, 100, name, type, text, 14);
     d_name = "caInclude";
     d_include = "caInclude";
     QPixmap qpixmap = QPixmap(":pixmaps/include.png");

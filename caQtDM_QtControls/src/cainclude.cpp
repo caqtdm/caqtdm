@@ -256,7 +256,7 @@ void caInclude::setFileName(QString const &filename)
                         l->setParent(frame);
                         if(j<thisXpositionsList.count()) {
                             posX = thisXpositionsList.at(j).toInt(&ok);
-                            if(!ok) posX += l->width();
+                            if(!ok) posX = 0;
                         }
                         if(j<thisYpositionsList.count()) {
                             posY = thisYpositionsList.at(j).toInt(&ok);
@@ -397,7 +397,7 @@ void caInclude::setFileName(QString const &filename)
 
                 if(j<thisXpositionsList.count()) {
                     posX = thisXpositionsList.at(j).toInt(&ok);
-                    if(!ok) posX += loadedWidget->width();
+                    if(!ok) posX = 0;
                 }
                 if(j<thisYpositionsList.count()) {
                     posY = thisYpositionsList.at(j).toInt(&ok);
@@ -452,10 +452,115 @@ void caInclude::paintEvent( QPaintEvent *event)
     }
 }
 
+void caInclude::setMacro(QString const &newMacro) {
+    QString Macro = newMacro.simplified();
+    Macro.replace(" ", "");
+    QStringList splitted = Macro.split(";");
+    setMacroAndPositionsFromMacroStringList(splitted);
+/*
+    for(int i=0; i< thisMacro.count(); i++) {
+        printf("%s\n", qasc(thisMacro[i]));
+    }
+    */
+}
+
+void caInclude::setMacroAndPositionsFromMacroStringList(QStringList macroList) {
+
+    // compose the real lists (macro and x,y lists) by decoding the macro list containing macros and or positions
+    thisMacro.clear();
+    QStringList XpositionsList;
+    QStringList YpositionsList;
+
+    for(int i=0; i<macroList.count(); i++) {
+        QString Macro = macroList[i].simplified();
+        Macro.replace(" ", "");
+
+        // detect comma
+        int posComma = Macro.indexOf(",");
+        int posBracket = Macro.indexOf("[");
+
+        //printf("posComma=%d posBracket=%d\n", posComma, posBracket);
+
+        // when comma, we have a macro and a position
+        if(posComma > -1 && posBracket > -1) {
+            //printf("case comma and bracket\n");
+            if(posBracket < posComma) {
+                //printf("case comma after bracket ==> only position\n");
+                thisMacro.append("");
+                QString position = Macro;
+                position.remove("]");
+                position.remove("[");
+                QStringList positions = position.split(",");
+                if(positions.count() > 1) {
+                    XpositionsList.append(positions[0]);
+                    YpositionsList.append(positions[1]);
+                    //printf("x=%s y=%s\n", qasc(positions[0]), qasc(positions[1]));
+                } else {
+                    XpositionsList.append("undef");
+                    YpositionsList.append("undef");
+                }
+            } else {
+                //printf("case comma before bracket == macro and position\n");
+                thisMacro.append(Macro.mid(0, posComma));
+                QString position = Macro.mid(posComma + 1, -1);
+                position.remove("]");
+                position.remove("[");
+                QStringList positions = position.split(",");
+                if(positions.count() > 1) {
+                    XpositionsList.append(positions[0]);
+                    YpositionsList.append(positions[1]);
+                    //printf("x=%s y=%s\n", qasc(positions[0]), qasc(positions[1]));
+                } else {
+                    XpositionsList.append("undef");
+                    YpositionsList.append("undef");
+                }
+            }
+
+        // we have a comma, but no bracket => wrong syntax
+        } else if(posComma > -1 && posBracket == -1)  {
+            //printf("case comma , but no bracket ==> wrong syntax\n");
+            thisMacro.append(Macro);
+            XpositionsList.append("undef");
+            YpositionsList.append("undef");
+
+        // we have no comma, no position
+        } else {
+            //printf("case no comma, no position\n");
+            thisMacro.append(Macro);
+            XpositionsList.append("undef");
+            YpositionsList.append("undef");
+        }
+        //printf("%s\n", qasc(thisMacro[i]));
+    }
+    setXpositionsList(XpositionsList);
+    setYpositionsList(YpositionsList);
+}
+
+QStringList caInclude::getMacroList() const {
+    QStringList newList;
+    for(int i=0; i<thisMacro.count(); i++) {
+        if(!thisXpositionsList[i].contains("undef") && !thisYpositionsList[i].contains("undef")) {
+            if(thisMacro[i].length() > 0) {
+               newList.append(thisMacro[i] + ", [" + thisXpositionsList[i] + "," + thisYpositionsList[i] + "]");
+            } else {
+               newList.append("[" + thisXpositionsList[i] + "," + thisYpositionsList[i] + "]");
+            }
+        } else {
+            newList.append(thisMacro[i]);
+        }
+    }
+    return newList;
+}
+
+void caInclude::setMacroList(QStringList list) {
+    thisMacro = list;
+    setMacroAndPositionsFromMacroStringList(thisMacro);
+    updatePropertyEditorItem(this, "macro");
+}
+
 void caInclude::setXpositionsList(QStringList list)
 {
     thisXpositionsList = list;
-    updatePropertyEditorItem(this, "xPositionsOrChannels");
     thisFrameUpdate = true;
     setFileName(newFileName);
 }
@@ -463,7 +568,6 @@ void caInclude::setXpositionsList(QStringList list)
 void caInclude::setYpositionsList(QStringList list)
 {
     thisYpositionsList = list;
-    updatePropertyEditorItem(this, "yPositionsOrChannels");
     thisFrameUpdate = true;
     setFileName(newFileName);
 }
@@ -486,6 +590,10 @@ bool caInclude::getXposition(int indx, int &posX, int width, QString &pos) {
     if(indx < thisXpositionsList.count()) {
         bool ok;
         pos =  thisXpositionsList[indx];
+        if(pos.contains("undef")) {
+            posX = 0;
+            return true;
+        }
         posX = pos.toInt(&ok);
         if(!ok) {
             posX = posX + width;
@@ -502,6 +610,10 @@ bool caInclude::getYposition(int indx, int &posY, int height, QString &pos) {
     if(indx < thisYpositionsList.count()) {
         bool ok;
         pos =  thisYpositionsList[indx];
+        if(pos.contains("undef")) {
+            posY = 0;
+            return true;
+        }
         posY = pos.toInt(&ok);
         if(!ok) {
             posY = 0;

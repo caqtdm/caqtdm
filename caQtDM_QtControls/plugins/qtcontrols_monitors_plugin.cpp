@@ -140,7 +140,9 @@ caLedInterface::caLedInterface(QObject *parent): CustomWidgetInterface_Monitors(
     strcpy(type[0], "multiline");
     strcpy(name[1], "colorMode");
     strcpy(name[2], "trueValue");
+    strcpy(type[2], "multiline");
     strcpy(name[3], "falseValue");
+    strcpy(type[3], "multiline");
     d_domXml = XmlFunc("caLed", "caled", 0, 0, 30, 30, name, type, text, 4);
     d_toolTip = "[LED for true or false bitstate or for severity states]";
     d_name = "caLed";

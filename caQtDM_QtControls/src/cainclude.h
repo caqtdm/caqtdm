@@ -44,7 +44,9 @@ class  QTCON_EXPORT caInclude : public QWidget
     Q_OBJECT
 
     Q_PROPERTY(QStringList macroList READ getMacroList WRITE setMacroList STORED false)
-    Q_PROPERTY(QString macro READ getMacro WRITE setMacro  DESIGNABLE inactiveButVisible())
+    Q_PROPERTY(QString macro READ getMacroC WRITE setMacro  DESIGNABLE inactiveButVisible())
+    Q_PROPERTY(QString xPositionsOrChannels READ getXpositions WRITE setXpositions DESIGNABLE inactiveButVisible() STORED false)
+    Q_PROPERTY(QString yPositionsOrChannels READ getYpositions WRITE setYpositions DESIGNABLE inactiveButVisible() STORED false)
 
     Q_PROPERTY(QString filename READ getFileName WRITE setFileName)
     Q_PROPERTY(Stacking stacking READ getStacking WRITE setStacking)
@@ -52,11 +54,6 @@ class  QTCON_EXPORT caInclude : public QWidget
     Q_PROPERTY(int maximumLines READ getMaxLines WRITE setMaxLines DESIGNABLE isPropertyVisible(maximumLines))
     Q_PROPERTY(int maximumColumns READ getMaxColumns WRITE setMaxColumns DESIGNABLE isPropertyVisible(maximumColumns))
     Q_ENUMS(Stacking)
-
-    Q_PROPERTY(QStringList xPositionsOrChannelsList READ getXpositionsList WRITE setXpositionsList STORED false)
-    Q_PROPERTY(QString xPositionsOrChannels READ getXpositions WRITE setXpositions DESIGNABLE inactiveButVisible())
-    Q_PROPERTY(QStringList yPositionsOrChannelsList READ getYpositionsList WRITE setYpositionsList STORED false)
-    Q_PROPERTY(QString yPositionsOrChannels READ getYpositions WRITE setYpositions DESIGNABLE inactiveButVisible())
 
     Q_PROPERTY(bool adjustSizeToContents READ getAdjustSize WRITE setAdjustSize)
     Q_PROPERTY(int verticalSpacing READ getSpacingVertical WRITE setSpacingVertical)
@@ -87,19 +84,19 @@ public:
     void setStacking(Stacking stacking);
 
     QString getXpositions() const {return thisXpositionsList.join(";");}
-    void setXpositions(QString const &newPosition) {thisXpositionsList = newPosition.split(";");}
-    QStringList getXpositionsList() const {return thisXpositionsList;}
-    void setXpositionsList(QStringList list);
-    void updateXpositionsList(int pos, int value);
-    bool getXposition(int indx, int &posX, int width, QString &pos);
-    int getXmaximum();
-
     QString getYpositions() const {return thisYpositionsList.join(";");}
-    void setYpositions(QString const &newPosition) {thisYpositionsList = newPosition.split(";");}
-    QStringList getYpositionsList() const {return thisYpositionsList;}
+    void setXpositions(QString const &newPosition) {Q_UNUSED(newPosition);}
+    void setYpositions(QString const &newPosition) {Q_UNUSED(newPosition);}
+
+    void setXpositionsList(QStringList list);
     void setYpositionsList(QStringList list);
+
+    void updateXpositionsList(int pos, int value);
     void updateYpositionsList(int pos, int value);
+
+    bool getXposition(int indx, int &posX, int width, QString &pos);
     bool getYposition(int indx, int &posY, int height, QString &pos);
+    int getXmaximum();
     int getYmaximum();
 
     bool getAdjustSize() { return thisAdjust; }
@@ -134,10 +131,12 @@ public:
     QString getFileName() const {return newFileName;}
     void setFileName(QString const &filename);
 
+    QString getMacroC() const {return getMacroList().join(";");}
     QString getMacro() const {return thisMacro.join(";");}
-    void setMacro(QString const &newMacro) {thisMacro = newMacro.split(";");}
-    QStringList getMacroList() const {return thisMacro;}
-    void setMacroList(QStringList list) {thisMacro = list; updatePropertyEditorItem(this, "macro");}
+    void setMacro(QString const &newMacro);
+    void setMacroAndPositionsFromMacroStringList(QStringList macroList);
+    QStringList getMacroList() const;
+    void setMacroList(QStringList list);
 
     void setLineSize( int size );
 

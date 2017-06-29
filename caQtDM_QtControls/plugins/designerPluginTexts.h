@@ -29,7 +29,7 @@
 # define CHANNEL        "channel: Name of PV (processvariable) used for this object,\na PV can be prefixed with a plugin name (ex: epics3://)"
 # define CHANNELLIST    "channels: List of PV-Names (processvariables) used for this object,\na PV can be prefixed with a plugin name (ex: epics3://)"
 # define CHANNELLISTC   "channels: List of up to 2 PV-Names (processvariables) used for this object,\nfirst or second PV can be blanc (see manual)\na PV can be prefixed with a plugin name (ex: epics3://)"
-# define STRINGFROMLIST "String representation of above list as used in caQtDM, seperated with ;"
+# define STRINGFROMLIST "String representation of list as used in caQtDM, seperated with ;"
 
 // visibility
 # define COLORMODE      "colorMode: Static: Show the object in its here defined colors.\nAlarm: Show the object in alarm colors based on the severity of the associated process variable."
@@ -78,7 +78,8 @@
 # define INCLUDESTACKING "stacking: The included files can be displayed in a row or in a column as well as in rows with multiple columns\ndepending on the number of files included and the maximum number of rows specified."
 # define INCLUDEMAXLINES "maximumLines; The number of rows that will be displayed in case of stacking=rowcolumn.\nWhen more rows that would fit, a new column will be created"
 # define INCLUDENBITEMS "numberOfItems: Number of instances of the included file"
-# define INCLUDEMACRO   "macro: Macro substitution for the include file can de defined through this property\nFor specifying for each instance of the specified file separate\nthe macro with ; (ex: A=QUAD; A=QUAD1; A=QUAD2)"
+# define INCLUDEMACRO   "macro: Macro substitution for the include file is defined through this property\nFor specifying for each instance of the specified file separate\nthe macro with ; (ex: A=QUAD; A=QUAD1; A=QUAD2)"
+# define INCLUDEMACROLIST "macrolist: Macros and positions (integers or channels) can be defined seperated with ; (syntax: macro definition optionnally followed by ,[x,y] or only position [x,y]"
 
 // gauge
 # define ORIENTATION    "orientation: Gauge can be of horizontal or vertical orientation"

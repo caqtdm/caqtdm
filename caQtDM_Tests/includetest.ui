@@ -48,7 +48,7 @@
        </rect>
       </property>
       <property name="macro">
-       <string>PV=$(PV1);PV=$(PV2);PV=$(PV3);PV=$(PV4);PV=$(PV5)</string>
+       <string>PV=$(PV1), [$(PV1):X,10];PV=$(PV2), [100,10];PV=$(PV3), [200,20];[300,30];PV=$(PV5), [400,40];PV=$(PV6)</string>
       </property>
       <property name="filename" stdset="0">
        <string notr="true">bpmsingle.ui</string>
@@ -57,13 +57,7 @@
        <enum>caInclude::Positions</enum>
       </property>
       <property name="numberOfItems" stdset="0">
-       <number>5</number>
-      </property>
-      <property name="xPositionsOrChannels" stdset="0">
-       <string>$(PV1):X;100;200;300;400</string>
-      </property>
-      <property name="yPositionsOrChannels" stdset="0">
-       <string>$(PV1):Y;10;20;30;40</string>
+       <number>6</number>
       </property>
       <property name="adjustSizeToContents" stdset="0">
        <bool>true</bool>
@@ -378,6 +372,15 @@
        </rect>
       </property>
      </widget>
+     <zorder>wmsignalpropagator</zorder>
+     <zorder>cacalc_41</zorder>
+     <zorder>cacalc_43</zorder>
+     <zorder>cacalc_39</zorder>
+     <zorder>cacalc_38</zorder>
+     <zorder>cacalc_37</zorder>
+     <zorder>cacalc_42</zorder>
+     <zorder>cainclude_7</zorder>
+     <zorder>cagraphics_23</zorder>
     </widget>
    </widget>
    <widget class="QLabel" name="label_3">
