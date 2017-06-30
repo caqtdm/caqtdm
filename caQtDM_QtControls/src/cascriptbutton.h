@@ -97,6 +97,7 @@ public slots:
     void animation(QRect p) {
 #include "animationcode.h"
     }
+    void scriptButtonClick() {printf("scriptbuttonclick\n"); emit scriptButtonSignal();}
 
 private slots:
     void buttonToggled();

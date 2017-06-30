@@ -44,7 +44,8 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
     thisMaxColumns = 1;
     thisStacking = Row;
     // I have to change the previous default of this parameter
-    thisAdjust = prvAdjust= false;
+    prvAdjust= false;
+    thisAdjust = true;
     thisSpacingVertical = thisSpacingHorizontal=0;
     thisFrameColor = Qt::gray;
     setVisibility(StaticV);

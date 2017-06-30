@@ -59,6 +59,9 @@ public slots:
 #include "animationcode.h"
     }
 
+    void shellCommandClick() {printf("mimedisplayclick\n"); emit caRowColMenu::clicked(0);}
+
+
 private:
     bool eventFilter(QObject *obj, QEvent *event);
 

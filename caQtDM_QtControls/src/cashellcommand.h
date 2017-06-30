@@ -43,6 +43,8 @@ public slots:
 #include "animationcode.h"
     }
 
+    void shellCommandClick() {printf("shellcommandclick\n"); emit caRowColMenu::clicked(0);}
+
 };
 
 #endif
