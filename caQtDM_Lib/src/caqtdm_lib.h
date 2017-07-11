@@ -296,7 +296,8 @@ private:
     Qt::GestureType fingerSwipeGestureType;
 #endif
 
-    long getValueFromString(char *textValue, FormatType fType, char **end);
+    long getLongValueFromString(char *textValue, FormatType fType, char **end);
+    double getDoubleValueFromString(char *textValue, FormatType fType, char **end);
 
     QWidget *myWidget;
     QList<QWidget*> includeWidgetList;

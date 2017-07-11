@@ -6893,9 +6893,9 @@ void CaQtDM_Lib::TreatOrdinaryValue(QString pvo, double value, int32_t idata,  Q
 }
 
 /**
-  * this routine will get a value from a string with hex and octal representation
+  * these routines will get a value from a string with hex and octal representation
   */
-long CaQtDM_Lib::getValueFromString(char *textValue, FormatType fType, char **end)
+long CaQtDM_Lib::getLongValueFromString(char *textValue, FormatType fType, char **end)
 {
     if(fType == octal) {
         return strtoul(textValue, end, 8);
@@ -6906,6 +6906,21 @@ long CaQtDM_Lib::getValueFromString(char *textValue, FormatType fType, char **en
             return strtoul(textValue, end, 16);
         } else {
             return strtol(textValue, end, 10);
+        }
+    }
+}
+
+double CaQtDM_Lib::getDoubleValueFromString(char *textValue, FormatType fType, char **end)
+{
+    if(fType == octal) {
+        return (double) strtoul(textValue, end, 8);
+    } else if(fType == hexadecimal) {
+        return (double) strtoul(textValue, end, 16);
+    } else {
+        if((strlen(textValue) > (size_t) 2) && (textValue[0] == '0') && (textValue[1] == 'x' || textValue[1] == 'X')) {
+            return (double) strtoul(textValue, end, 16);
+        } else {
+            return strtod(textValue, end);
         }
     }
 }
@@ -6988,7 +7003,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType
         if(!match) {
             //qDebug() << "assume it is a number";
             // Assume it is a number
-            longValue = getValueFromString(textValue, fTypeNew, &end);
+            longValue = getLongValueFromString(textValue, fTypeNew, &end);
 
             // number must be between the enum possibilities
             if(kPtr->edata.fieldtype == caENUM) {
@@ -7047,14 +7062,9 @@ void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType
         match = false;
         //qDebug() << "assume it is a double";
         strcpy(textValue, qasc(text));
-        value = (double) getValueFromString(textValue, fTypeNew, &end);
-        if(*end == '\0' && end != textValue) {        // decoded as long
+        value = getDoubleValueFromString(textValue, fTypeNew, &end);
+        if(*end == '\0' && end != textValue) {        // decoded
             match = true;
-        } else {
-            value = strtod(textValue, &end);  // decoded as double
-            if(*end == '\0' && end != textValue) {
-                match = true;
-            }
         }
         if(match) {
             //qDebug() << "decoded as double, and set as double" << value;
@@ -7125,9 +7135,8 @@ void CaQtDM_Lib::TreatRequestedWave(QString pvo, QString text, caWaveTable::Form
     case caLONG:
     case caCHAR:
         strcpy(textValue, qasc(text));
-        longValue = getValueFromString(textValue, fTypeNew, &end);
+        longValue = getLongValueFromString(textValue, fTypeNew, &end);
 
-        
         if(kPtr->edata.fieldtype == caLONG) {
             int32_t* P = (int32_t*) kPtr->edata.dataB;
             P[index] = (int32_t) longValue;
@@ -7181,14 +7190,9 @@ void CaQtDM_Lib::TreatRequestedWave(QString pvo, QString text, caWaveTable::Form
         match = false;
         // Treat as a double
         strcpy(textValue, qasc(text));
-        value = (double) getValueFromString(textValue, fTypeNew, &end);
-        if(*end == '\0' && end != textValue) {        // decoded as long
+        value = getDoubleValueFromString(textValue, fTypeNew, &end);
+        if(*end == '\0' && end != textValue) {        // decoded
             match = true;
-        } else {
-            value = strtod(textValue, &end);
-            if(*end == '\0' && end != textValue) {   // decoded as double
-                match = true;
-            }
         }
         if(match) {
             if(kPtr->edata.fieldtype == caFLOAT) {
