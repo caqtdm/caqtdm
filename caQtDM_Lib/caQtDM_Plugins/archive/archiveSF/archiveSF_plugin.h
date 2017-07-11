@@ -133,6 +133,8 @@ public slots:
             if(messageWindow != (MessageWindow *) 0) {
                 QString mess("ArchiveSF plugin -- lastError: ");
                 mess.append(fromArchive->lastError());
+                mess.append(" for pv: ");
+                mess.append(key);
 #if QT_VERSION > 0x050000
                 mess=QString(mess.toHtmlEscaped());
 #else
