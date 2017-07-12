@@ -4485,7 +4485,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             }
 
             // not connected
-        } else if(strcasestr(data.pluginName, "archive") == (char*) 0) {
+        } else if(strstr(data.pluginName, "archive") == (char*) 0) {
             cartesianplotWidget->setCountNumber(0);
             cartesianplotWidget->setWhiteColors();
             cartesianplotWidget->setProperty("Connect", false);
