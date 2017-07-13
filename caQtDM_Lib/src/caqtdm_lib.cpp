@@ -297,6 +297,10 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     loopTimer = 0;
     prcFile = false;
 
+    // for cainclude, we need when updating internal positions to know about the resize factors
+    this->setProperty("RESIZEX", 1.0);
+    this->setProperty("RESIZEY", 1.0);
+
     // is a default plugin specified (normally nothing means epics3)
     QString option = options["defaultPlugin"];
     if(!option.isEmpty()) {
@@ -565,6 +569,18 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     PrintWindowAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+P", 0, QApplication::UnicodeUTF8));
     connect(PrintWindowAction, SIGNAL(triggered()), this, SLOT(Callback_printWindow()));
     this->addAction(PrintWindowAction);
+}
+
+/**
+ * resize scrollbars of scrollwidget containing a caInclude
+ */
+void CaQtDM_Lib::ResizeScrollBars(caInclude * includeWidget, int sizeX, int sizeY)
+{
+    if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
+        Q_UNUSED(scrollWidget);
+        QWidget *contents = (QWidget*) includeWidget->parent();
+        contents->setMinimumSize(sizeX, sizeY);
+    }
 }
 
 /**
@@ -2052,6 +2068,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     // seems to be ok
                 } else {
                     includeWidgetList.append(thisW);
+                    includeWidget->appendChildToList(thisW);
 
                     // add includeWidget to the gui
                     if(includeWidget->getStacking() == caInclude::Row) {
@@ -2108,9 +2125,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                             nbMonitors++;
                         }
 
-                        thisW->move(posX+adjustMargin/2, posY + adjustMargin/2);
-                        int maxX = posX + thisW->width();
-                        int maxY = posY + thisW->height();
+                        int xpos = qRound((double) posX * includeWidget->getXcorrection());
+                        int ypos = qRound((double) posY * includeWidget->getYcorrection());
+                        thisW->move(xpos + adjustMargin/2, ypos + adjustMargin/2);
+                        int maxX = xpos + thisW->width();
+                        int maxY = ypos + thisW->height();
                         if(maxX > maximumX) maximumX = maxX;
                         if(maxY > maximumY) maximumY = maxY;
                     }
@@ -2169,15 +2188,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         // when the include is packed into a scroll area, set the minimumsize too
         if((thisW != (QWidget *) 0 ) && (!prcFile) && includeWidget->getAdjustSize()) {
-            if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
-                Q_UNUSED(scrollWidget);
-                QWidget *contents = (QWidget*) includeWidget->parent();
-                if(includeWidget->getStacking() != caInclude::Positions) {
-                   contents->setMinimumSize(maxColumns * thisW->width() + (maxColumns-1) * spacingHorizontal + adjustMargin,
-                                            maxRows * thisW->height() + (maxRows-1) * spacingVertical + adjustMargin);
-                } else {
-                    contents->setMinimumSize(maximumX + adjustMargin, maximumY + adjustMargin);
-                }
+            if(includeWidget->getStacking() != caInclude::Positions) {
+                ResizeScrollBars(includeWidget, maxColumns * thisW->width() + (maxColumns-1) * spacingHorizontal + adjustMargin,
+                                 maxRows * thisW->height() + (maxRows-1) * spacingVertical + adjustMargin);
+            } else {
+                ResizeScrollBars(includeWidget, maximumX + adjustMargin, maximumY + adjustMargin);
             }
         }
 
@@ -2221,7 +2236,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         macroS = treatMacro(map, macroS, &doNothing);
         savedMacro[level] = treatMacro(map, savedMacro[level], &doNothing);
 
-        //QList<QWidget *> childs = frameWidget->findChildren<QWidget *>();
         level++;
 
         // get actual filename from previous level
@@ -2229,10 +2243,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         scanWidgets(frameWidget->findChildren<QWidget *>(), macroS);
 
-        //foreach(QWidget *child, childs) {
-        //    HandleWidget(child, macroS, true, false);
-        //    HandleWidget(child, macroS, false, false);
-        //}
         level--;
 
         macroS= savedMacro[level];
@@ -3791,7 +3801,15 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             int posx, posy;
             int posX=0;
             int posY=0;
+            double factX = 1.0;
+            double factY = 1.0;
             QString pos;
+
+            QVariant resizeX = this->property("RESIZEX");
+            QVariant resizeY = this->property("RESIZEY");
+            if (resizeX.isValid()) factX = this->property("RESIZEX").value<double>();
+            if (resizeY.isValid()) factY = this->property("RESIZEY").value<double>();
+
             //qDebug() << "we got a position at " << data.specData[1] << data.edata.rvalue << data.pv;
             int adjustMargin = data.specData[2];
             if(data.specData[0] == 1) {
@@ -3804,20 +3822,18 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             memcpy(&dispW, &data.specData[3], sizeof(QWidget*));
 
             // move to correct position
-            dispW->move(posX+adjustMargin/2, posY + adjustMargin/2);
+            int xpos = qRound((double) posX * includeWidget->getXcorrection() * factX);
+            int ypos = qRound((double) posY * includeWidget->getYcorrection() * factY);
+            dispW->move(xpos + adjustMargin/2*factX, ypos + adjustMargin/2*factY);
 
-            // recalcute eventually the size
+            // recalculate eventually the size
             if(includeWidget->getAdjustSize()) {
                 int maximumX = includeWidget->getXmaximum() + dispW->width();
                 int maximumY = includeWidget->getYmaximum() + dispW->height();
+                includeWidget->resize((maximumX + adjustMargin) * factX, (maximumY + adjustMargin) * factY);
 
-                // when the include is packed into a scroll area, set the minimumsize too
-                includeWidget->resize(maximumX + adjustMargin, maximumY + adjustMargin);
-                if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
-                    Q_UNUSED(scrollWidget);
-                    QWidget *contents = (QWidget*) includeWidget->parent();
-                    contents->setMinimumSize(maximumX + adjustMargin, maximumY + adjustMargin);
-                }
+                // when the include is packed into a scroll area, set the scrollbars too
+                ResizeScrollBars(includeWidget, factX * (maximumX + adjustMargin), factY * (maximumY + adjustMargin));
             }
         }
 
@@ -7497,13 +7513,44 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
 
     else if(!className.compare("caInclude")) {
         caInclude *includeWidget = (caInclude *) widget;
-        // when the include is packed into a scroll area, set the minimumsize too
-        if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(includeWidget->parent()->parent()->parent())) {
-            Q_UNUSED(scrollWidget);
-            QWidget *contents = (QWidget*) includeWidget->parent();
-            contents->setMinimumSize(factX * list.at(2).toInt(), factY * list.at(3).toInt());
-        }
+        int adjustMargin = includeWidget->getMargin();
+        int maximumX = 10;
+        int maximumY = 10;
+	
+        // in case of absolute positioning, reposition the elements
+        if(includeWidget->getStacking() == caInclude::Positions) {
+            QList<QWidget*> list =  includeWidget->getChildsList();
+            for(int j=0; j<list.count(); j++) {
+                QString pos;
+                QWidget * widget = list[j];
+                int posx, posy;
+                int posX=0;
+                int posY=0;
+                if(includeWidget->getXposition(j, posx, 0, pos)) {posX = posx;}
+                if(includeWidget->getYposition(j, posy, 0, pos)) {posY = posy;}
+                // move to correct position
+                int xpos = qRound((double) posX * includeWidget->getXcorrection() * factX);
+                int ypos = qRound((double) posY * includeWidget->getYcorrection() * factY);
 
+                widget->move(xpos + adjustMargin/2*factX, ypos + adjustMargin/2*factY);
+
+                maximumX = includeWidget->getXmaximum() + widget->width();
+                maximumY = includeWidget->getYmaximum() + widget->height();
+            }
+
+            if(includeWidget->getAdjustSize()) {
+                includeWidget->resize((maximumX + adjustMargin) * factX, (maximumY + adjustMargin) * factY);
+               // when the include is packed into a scroll area, set the minimumsize too
+                ResizeScrollBars(includeWidget, factX * (maximumX + adjustMargin), factY * (maximumY + adjustMargin));
+            }
+
+        } else {
+
+            // when the include is packed into a scroll area, set the minimumsize too
+            ResizeScrollBars(includeWidget, factX * (list.at(2).toInt() + adjustMargin), factY * (list.at(3).toInt() + adjustMargin));
+
+
+        }
     }
 
     // Tabbar adjustment
@@ -7681,6 +7728,10 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 
     factX = (double) event->size().width() / (double) origWidth;
     factY = (double) event->size().height() / (double) origHeight;
+
+    // for cainclude, we need when updating internal positions to know about the resize factors
+    this->setProperty("RESIZEX", factX);
+    this->setProperty("RESIZEY", factY);
 
     QString classNam;
 

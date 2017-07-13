@@ -41,6 +41,12 @@ caTextEntry::caTextEntry(QWidget *parent) : caLineEdit(parent)
     setElevation(on_top);
 }
 
+void caTextEntry::setValue(double v)
+{
+    setText(QString::number(v));
+    emit TextEntryChanged(QString::number(v));
+}
+
 // routine not used any more
 void caTextEntry::dataInput()
 {

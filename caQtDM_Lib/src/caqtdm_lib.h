@@ -299,6 +299,8 @@ private:
     long getLongValueFromString(char *textValue, FormatType fType, char **end);
     double getDoubleValueFromString(char *textValue, FormatType fType, char **end);
 
+    void ResizeScrollBars(caInclude * includeWidget, int sizeX, int sizeY);
+
     QWidget *myWidget;
     QList<QWidget*> includeWidgetList;
     QList<QWidget*> topIncludesWidgetList;

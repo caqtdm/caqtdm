@@ -56,6 +56,7 @@ public slots:
     void animation(QRect p) {
 #include "animationcode.h"
     }
+    void setValue(double v);
 
 private slots:
     void dataInput();

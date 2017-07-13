@@ -67,7 +67,11 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
     effectiveSize = QSize(100,100);
     frame->setLayout(gridLayout);
 
+    thisXfactor = thisYfactor = 1.0;
+
     setPropertyVisible(maximumLines, false);
+    setPropertyVisible(xCorrectionFactor, false);
+    setPropertyVisible(yCorrectionFactor, false);
 
     // when called from designer, we would like to see the included widgets
     loadIncludes = false;
@@ -83,6 +87,8 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
             }
         }
     }
+
+    clearChildsList();
 }
 
 caInclude::~ caInclude()
@@ -130,6 +136,14 @@ void caInclude::setStacking(Stacking stacking) {
     } else {
         setPropertyVisible(maximumLines, false);
         setPropertyVisible(maximumColumns, false);
+    }
+
+    if(thisStacking == Positions) {
+        setPropertyVisible(xCorrectionFactor, true);
+        setPropertyVisible(yCorrectionFactor, true);
+    } else {
+        setPropertyVisible(xCorrectionFactor, false);
+        setPropertyVisible(yCorrectionFactor, false);
     }
 }
 
@@ -264,9 +278,11 @@ void caInclude::setFileName(QString const &filename)
                             if(!ok) posY = 0;
                         }
 
-                        l->move(posX+adjustMargin/2, posY + adjustMargin/2);
-                        int maxX = posX + l->width();
-                        int maxY = posY + l->height();
+                        int xpos = qRound((double) posX * thisXfactor);
+                        int ypos = qRound((double) posY * thisYfactor);
+                        l->move(xpos + adjustMargin/2, ypos + adjustMargin/2);
+                        int maxX = xpos + l->width();
+                        int maxY = ypos + l->height();
                         if(maxX > maximumX) maximumX = maxX;
                         if(maxY > maximumY) maximumY = maxY;
                     }
@@ -405,9 +421,11 @@ void caInclude::setFileName(QString const &filename)
                     if(!ok) posY = 0;
                 }
 
-                loadedWidget->move(posX+adjustMargin/2, posY+adjustMargin/2);
-                int maxX = posX + loadedWidget->width();
-                int maxY = posY + loadedWidget->height();
+                int xpos = qRound((double) posX * thisXfactor);
+                int ypos = qRound((double) posY * thisYfactor);
+                loadedWidget->move(xpos + adjustMargin/2, ypos + adjustMargin/2);
+                int maxX = xpos + loadedWidget->width();
+                int maxY = ypos + loadedWidget->height();
                 if(maxX > maximumX) maximumX = maxX;
                 if(maxY > maximumY) maximumY = maxY;
             }
@@ -634,6 +652,7 @@ int caInclude::getXmaximum()
 
     for(int i=0; i <  thisXpositionsList.count(); i++) {
         getXposition(i, posX, 0, pos);
+        posX = qRound((double) posX * getXcorrection());
         int maxX = posX + getMargin();
         if(maxX > maximum) maximum = maxX;
     }
@@ -647,6 +666,7 @@ int caInclude::getYmaximum() {
 
     for(int i=0; i <  thisYpositionsList.count(); i++) {
         getYposition(i, posY, 0, pos);
+        posY = qRound((double) posY * getYcorrection());
         int maxY = posY + getMargin();
         if(maxY > maximum) maximum = maxY;
     }

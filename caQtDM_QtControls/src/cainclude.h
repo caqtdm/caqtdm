@@ -48,6 +48,9 @@ class  QTCON_EXPORT caInclude : public QWidget
     Q_PROPERTY(QString xPositionsOrChannels READ getXpositions WRITE setXpositions DESIGNABLE inactiveButVisible() STORED false)
     Q_PROPERTY(QString yPositionsOrChannels READ getYpositions WRITE setYpositions DESIGNABLE inactiveButVisible() STORED false)
 
+    Q_PROPERTY(double xCorrectionFactor READ getXcorrection WRITE setXcorrection  DESIGNABLE isPropertyVisible(xCorrectionFactor))
+    Q_PROPERTY(double yCorrectionFactor READ getYcorrection WRITE setYcorrection  DESIGNABLE isPropertyVisible(yCorrectionFactor))
+
     Q_PROPERTY(QString filename READ getFileName WRITE setFileName)
     Q_PROPERTY(Stacking stacking READ getStacking WRITE setStacking)
     Q_PROPERTY(int numberOfItems READ getItemCount WRITE setItemCount)
@@ -78,7 +81,7 @@ public:
 
     enum myShapes {NoFrame=0, Box, Panel};
 
-    enum Properties { maximumLines = 0, numberofItems, maximumColumns};
+    enum Properties { maximumLines = 0, numberofItems, maximumColumns, xCorrectionFactor, yCorrectionFactor};
     enum Stacking {Row=0, Column, RowColumn, ColumnRow, Positions};
     Stacking getStacking() const { return thisStacking; }
     void setStacking(Stacking stacking);
@@ -87,6 +90,11 @@ public:
     QString getYpositions() const {return thisYpositionsList.join(";");}
     void setXpositions(QString const &newPosition) {Q_UNUSED(newPosition);}
     void setYpositions(QString const &newPosition) {Q_UNUSED(newPosition);}
+
+    double getXcorrection() {return thisXfactor;}
+    double getYcorrection() {return thisYfactor;}
+    void setXcorrection(double xFactor) {thisXfactor = xFactor; thisFrameUpdate = true; setFileName(newFileName);}
+    void setYcorrection(double yFactor) {thisYfactor = yFactor; thisFrameUpdate = true; setFileName(newFileName);}
 
     void setXpositionsList(QStringList list);
     void setYpositionsList(QStringList list);
@@ -147,6 +155,11 @@ public:
 
     int getMargin();
 
+    // keep childs
+    void appendChildToList(QWidget *child) {thisChildsList.append(child);}
+    void clearChildsList() {thisChildsList.clear();}
+    QList<QWidget*> getChildsList() {return thisChildsList;}
+
 public slots:
     void animation(QRect p) {
 #include "animationcode.h"
@@ -187,6 +200,9 @@ private:
     QStringList thisYpositionsList;
     QRect thisRect;
     int maximumX, maximumY;
+    double thisXfactor;
+    double thisYfactor;
+    QList<QWidget*> thisChildsList;
 
 #ifdef PRC
     ParsePepFile *pepfile;
