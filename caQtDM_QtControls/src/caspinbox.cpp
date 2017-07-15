@@ -40,9 +40,10 @@ caSpinbox::caSpinbox(QWidget *parent) : SNumeric(parent)
      thisMaximum = 100000.0;
      thisMinimum = -100000.0;
      setDigitsFontScaleEnabled(true);
-     setForeground(Qt::black);
 
      renewStyleSheet = true;
+     thisColorMode = Static;
+     setForeground(Qt::black);
      setBackground(QColor(230,230,230));
 
      setElevation(on_top);
