@@ -57,8 +57,15 @@ void caMimeDisplay::Callback_Clicked(int indx)
                 }
                 // call file as specified
             }
-            //printf("call file %s as specified\n;", qasc(Urls.at(indx)));
-            bool success = QDesktopServices::openUrl (QUrl(Urls.at(indx)));
+            printf("call file %s as specified\n;", qasc(Urls.at(indx)));
+            bool success;
+            if(!Urls.at(indx).contains("%")) {
+                printf("case without percent\n");
+                success = QDesktopServices::openUrl (QUrl(Urls.at(indx)));
+            } else {
+                printf("case with percent\n");
+                success = QDesktopServices::openUrl (QUrl::fromUserInput(QUrl::fromPercentEncoding(Urls.at(indx).toUtf8())));
+            }
             if(!success) QMessageBox::critical(0, tr("caQtDM"), tr("could not start mime application with file '%1'").arg(Urls.at(indx)));
             return;
 
