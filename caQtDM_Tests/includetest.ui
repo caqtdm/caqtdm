@@ -34,7 +34,7 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>456</width>
+       <width>473</width>
        <height>140</height>
       </rect>
      </property>
@@ -131,6 +131,9 @@
     <property name="horizontalScrollBarPolicy">
      <enum>Qt::ScrollBarAlwaysOn</enum>
     </property>
+    <property name="sizeAdjustPolicy">
+     <enum>QAbstractScrollArea::AdjustIgnored</enum>
+    </property>
     <property name="widgetResizable">
      <bool>true</bool>
     </property>
@@ -139,7 +142,7 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>418</width>
+       <width>435</width>
        <height>360</height>
       </rect>
      </property>
@@ -154,8 +157,8 @@
        <rect>
         <x>5</x>
         <y>3</y>
-        <width>89</width>
-        <height>217</height>
+        <width>94</width>
+        <height>360</height>
        </rect>
       </property>
       <property name="macro">
@@ -166,6 +169,9 @@
       </property>
       <property name="stacking">
        <enum>caInclude::Positions</enum>
+      </property>
+      <property name="adjustSizeToContents" stdset="0">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="caCalc" name="cacalc_37">
@@ -425,7 +431,7 @@
      <string notr="true">A</string>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">$(PV1):Y</string>
+     <string notr="true">$(PV3):Y</string>
     </property>
     <property name="channelB">
      <string notr="true"/>
@@ -487,7 +493,7 @@
      </rect>
     </property>
     <property name="macro">
-     <string>PV=$(PV1)</string>
+     <string>PV=$(PV3)</string>
     </property>
     <property name="filename" stdset="0">
      <string notr="true">bpmsingle.ui</string>
@@ -512,7 +518,7 @@
      <string notr="true">A</string>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">$(PV1):X</string>
+     <string notr="true">$(PV3):X</string>
     </property>
     <property name="channelB">
      <string notr="true"/>
@@ -543,7 +549,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>direct positioning with PV1</string>
+     <string>direct signal positioning with PV3</string>
     </property>
    </widget>
   </widget>
@@ -553,7 +559,7 @@
      <x>0</x>
      <y>0</y>
      <width>975</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
@@ -607,7 +613,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>806</x>
-     <y>474</y>
+     <y>469</y>
     </hint>
     <hint type="destinationlabel">
      <x>748</x>
