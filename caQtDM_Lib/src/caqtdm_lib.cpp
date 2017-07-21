@@ -6680,7 +6680,7 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
 
     // when no monitors we have a static visibility calculation, except for cacalc
     QString className = widget->metaObject()->className();
-    if((nbMon == 0) && !className.contains("caCalc")) {
+    if((nbMon == 0) && !className.contains("caCalc") && text.length() > 0) {
         double valueArray[MAX_CALC_INPUTS];
         char post[256], calcString[256], asc[100];
         short errnum;
