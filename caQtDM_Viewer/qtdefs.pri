@@ -193,8 +193,14 @@ DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
 # 4.1.6
+# the colors of the caspinbox could be wrong due to a ack of proper initialisation, this has been corrected.
+# very big doubles were not set correctly, this has ben corrected.
+# static visibility (while no channels) can be used now.
+# handle double encoded url's in camimedisplay.
+# added hide/show slot in all ca widgets (permits to hide and show a widget when propagating a signal from cacalc)
+# when using waveforms from the archive, flashing of the cacartesianplot is suppressed when no data.
 # added propagation of signal QRECT to parent, this allows to move a cainclude
-# absolute positionig of items added to cainclude; abolute positions can also be channels that can move the positions.
+# absolute positioning of items added to cainclude; abolute positions can also be channels that can move the positions.
 # due to some changes to internal stylesheet, the carelateddisplay could not be hidden, this has been corrected
 # x scale of cartesian plot can now also be used with a time scale (milliseconds from epoch)
 # for visibilitycalc, when no channels specified, static calculation will be done at startup
