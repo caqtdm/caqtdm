@@ -116,6 +116,10 @@ public slots:
 #include "animationcode.h"
     }
 
+    void hideObject(bool hideit) {
+#include "hideobjectcode.h"
+    }
+
 signals:
     void clicked(int bit);
 

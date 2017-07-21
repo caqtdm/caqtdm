@@ -92,6 +92,10 @@ public slots:
 #include "animationcode.h"
     }
 
+    void hideObject(bool hideit) {
+#include "hideobjectcode.h"
+    }
+
 private:
     QString thisPV;
     int thisBitNr;

@@ -59,6 +59,10 @@ public slots:
 #include "animationcode.h"
     }
 
+    void hideObject(bool hideit) {
+#include "hideobjectcode.h"
+    }
+
     void shellCommandClick() {printf("mimedisplayclick\n"); emit caRowColMenu::clicked(0);}
 
 

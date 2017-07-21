@@ -126,6 +126,10 @@ public slots:
 #include "animationcode.h"
     }
 
+    void hideObject(bool hideit) {
+#include "hideobjectcode.h"
+    }
+
 public slots:
     void setIndex(double value);
     void setIndex(int value);

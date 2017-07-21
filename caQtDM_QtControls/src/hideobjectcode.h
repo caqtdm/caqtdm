@@ -1,0 +1,1 @@
+if(hideit && !isHidden()) hide(); else if(!hideit && isHidden()) show();

@@ -126,6 +126,10 @@ public slots:
 #include "animationcode.h"
     }
 
+    void hideObject(bool hideit) {
+#include "hideobjectcode.h"
+    }
+
 private slots:
     void copy();
     void dataInput(int, int);

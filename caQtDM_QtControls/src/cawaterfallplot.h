@@ -325,6 +325,10 @@ public slots:
 #include "animationcode.h"
     }
 
+    void hideObject(bool hideit) {
+#include "hideobjectcode.h"
+    }
+
 private:
     enum {nbRows = 200};
     enum {nbCols = 500};

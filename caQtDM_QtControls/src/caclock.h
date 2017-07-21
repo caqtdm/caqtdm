@@ -107,6 +107,10 @@ public slots:
 #include "animationcode.h"
     }
 
+    void hideObject(bool hideit) {
+#include "hideobjectcode.h"
+    }
+
     void runClock(bool run) {
         if(thisTimeType == InternalTime) {
             if(run) {

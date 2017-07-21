@@ -87,6 +87,10 @@ public slots:
 #include "animationcode.h"
     }
 
+    void hideObject(bool hideit) {
+#include "hideobjectcode.h"
+    }
+
 private:
     QColor thisForeColor, thisForeColorOld;
     QColor thisBackColor, thisBackColorOld;

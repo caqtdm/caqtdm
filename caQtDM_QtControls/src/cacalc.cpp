@@ -69,20 +69,24 @@ void caCalc::setValue(double value)
         if(!eventFired) {
             emit emitSignal((int) value);
             emit emitSignal(value);
+            emit emitSignal((bool) value);
         }
         eventFired = true;
     } else if(thisEventSignal == onAnyChange) {
         emit emitSignal((int) value);
         emit emitSignal(value);
+        emit emitSignal((bool) value);
     } else if(thisEventSignal == TriggerZeroToOne) {
         if((qRound(thisValue) == 0) && (qRound(value) == 1)) {
             emit emitSignal((int) value);
             emit emitSignal(value);
+            emit emitSignal((bool) value);
         }
     } else if(thisEventSignal == TriggerOneToZero) {
         if((qRound(thisValue) == 1) && (qRound(value) == 0)) {
             emit emitSignal((int) value);
             emit emitSignal(value);
+            emit emitSignal((bool) value);
         }
     }
     thisValue =value;

@@ -132,6 +132,10 @@ public slots:
 #include "animationcode.h"
     }
 
+    void hideObject(bool hideit) {
+#include "hideobjectcode.h"
+    }
+
 public slots:
     void slotTiltAngle(int);
     void slotTiltAngle(double);

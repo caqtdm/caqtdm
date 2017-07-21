@@ -85,6 +85,10 @@ public slots:
 #include "animationcode.h"
     }
 
+    void hideObject(bool hideit) {
+#include "hideobjectcode.h"
+    }
+
 protected:
 	void paintEvent(QPaintEvent *);
 	void drawColorBar(QPainter *);
@@ -135,7 +139,11 @@ public slots:
     void animation(QRect p) {
 #include "animationcode.h"
     }
-	
+
+    void hideObject(bool hideit) {
+#include "hideobjectcode.h"
+    }
+
 private:
 	double m_startAngle, m_stopAngle, m_arcLength;
 	int m_innerRadius, m_outerRadius, m_labelRadius;

@@ -114,6 +114,10 @@ public slots:
 #include "animationcode.h"
     }
 
+    void hideObject(bool hideit) {
+#include "hideobjectcode.h"
+    }
+
 public slots:
     void setValue(double value);
     void setValue(QRect value);

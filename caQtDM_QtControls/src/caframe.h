@@ -102,6 +102,10 @@ public slots:
 #include "animationcode.h"
     }
 
+    void hideObject(bool hideit) {
+#include "hideobjectcode.h"
+    }
+
 private:
    QString thisChannelA, thisChannelB, thisChannelC, thisChannelD;
    Visibility thisVisibility;

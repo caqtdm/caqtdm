@@ -147,6 +147,10 @@ public slots:
 #include "animationcode.h"
     }
 
+    void hideObject(bool hideit) {
+#include "hideobjectcode.h"
+    }
+
 protected:
     virtual void drawScaleContents(QPainter *painter, const QPointF &center, double radius) const;
     void resizeEvent(QResizeEvent *e);

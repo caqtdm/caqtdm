@@ -56,6 +56,11 @@ public slots:
     void animation(QRect p) {
 #include "animationcode.h"
     }
+
+    void hideObject(bool hideit) {
+#include "hideobjectcode.h"
+    }
+
     void setValue(double v);
 
 private slots:
