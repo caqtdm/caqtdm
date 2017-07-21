@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1090</width>
-    <height>750</height>
+    <height>756</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -120,7 +120,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: rgb(0,0,120);}</string>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>4</number>
     </property>
     <property name="usesScrollButtons">
      <bool>true</bool>
@@ -148,7 +148,7 @@ border-radius: 2px;
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>6</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -1550,9 +1550,6 @@ p, li { white-space: pre-wrap; }
         <property name="filename" stdset="0">
          <string notr="true">earth.gif</string>
         </property>
-        <property name="imageCalc">
-         <string notr="true"/>
-        </property>
        </widget>
        <widget class="caImage" name="caimage_7">
         <property name="geometry">
@@ -1565,9 +1562,6 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="filename" stdset="0">
          <string notr="true">animated.gif</string>
-        </property>
-        <property name="imageCalc">
-         <string notr="true"/>
         </property>
         <property name="frame">
          <number>0</number>
@@ -1604,10 +1598,10 @@ p, li { white-space: pre-wrap; }
        <widget class="caInclude" name="caInclude_7">
         <property name="geometry">
          <rect>
-          <x>20</x>
-          <y>230</y>
-          <width>522</width>
-          <height>210</height>
+          <x>3</x>
+          <y>233</y>
+          <width>538</width>
+          <height>226</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -1620,7 +1614,7 @@ p, li { white-space: pre-wrap; }
          <bool>true</bool>
         </property>
         <property name="macro">
-         <string notr="true">A=QUAD1;A=QUAD2;A=QUAD</string>
+         <string notr="true">A=QUAD1;A=QUAD2;A=$(QUAD)</string>
         </property>
         <property name="filename" stdset="0">
          <string notr="true">object_quad.adl</string>
@@ -1642,6 +1636,15 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="horizontalSpacing" stdset="0">
          <number>10</number>
+        </property>
+        <property name="frameShape">
+         <enum>caInclude::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+        <property name="frameLineWidth">
+         <number>4</number>
         </property>
        </widget>
        <widget class="caInclude" name="caInclude_8">
@@ -1667,6 +1670,12 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="verticalSpacing" stdset="0">
          <number>10</number>
+        </property>
+        <property name="frameShape">
+         <enum>caInclude::Panel</enum>
+        </property>
+        <property name="frameLineWidth">
+         <number>2</number>
         </property>
         <property name="visibility">
          <enum>caInclude::StaticV</enum>
@@ -1733,6 +1742,9 @@ p, li { white-space: pre-wrap; }
          </property>
          <property name="filename" stdset="0">
           <string notr="true">$(FILE).ui</string>
+         </property>
+         <property name="adjustSizeToContents" stdset="0">
+          <bool>true</bool>
          </property>
          <property name="frameShape">
           <enum>caInclude::Box</enum>
@@ -1843,6 +1855,89 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="text">
          <string>include testB with includeTest/testB.ui</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_43">
+       <attribute name="title">
+        <string>caIncludePositioning</string>
+       </attribute>
+       <widget class="QScrollArea" name="scrollArea_4">
+        <property name="geometry">
+         <rect>
+          <x>225</x>
+          <y>178</y>
+          <width>483</width>
+          <height>174</height>
+         </rect>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOn</enum>
+        </property>
+        <property name="widgetResizable">
+         <bool>true</bool>
+        </property>
+        <widget class="QWidget" name="scrollAreaWidgetContents_4">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>479</width>
+           <height>155</height>
+          </rect>
+         </property>
+         <widget class="caInclude" name="cainclude_4">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>440</width>
+            <height>140</height>
+           </rect>
+          </property>
+          <property name="macro">
+           <string>PV=$(PV1), [$(PV1):X,10];PV=$(PV2), [100,10];PV=$(PV3), [200,20];[300,30];PV=$(PV5), [400,40];PV=$(PV6)</string>
+          </property>
+          <property name="filename" stdset="0">
+           <string notr="true">bpmsingle.ui</string>
+          </property>
+          <property name="stacking">
+           <enum>caInclude::Positions</enum>
+          </property>
+          <property name="numberOfItems" stdset="0">
+           <number>6</number>
+          </property>
+          <property name="adjustSizeToContents" stdset="0">
+           <bool>true</bool>
+          </property>
+          <property name="frameShape">
+           <enum>caInclude::Box</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <property name="frameLineWidth">
+           <number>5</number>
+          </property>
+         </widget>
+        </widget>
+       </widget>
+       <widget class="caLabel" name="calabel_65">
+        <property name="geometry">
+         <rect>
+          <x>67</x>
+          <y>40</y>
+          <width>906</width>
+          <height>118</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>this will only work properly when caQtDM is started as follows (macros are used) :
+
+caQtDM -macro PV1=ACM:BPM1,PV2=ACM:BPM2,PV3=ACM:BPM3,PV4=ACM:BPM4,PV5=ACM:BPM5 tests.ui</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </widget>
@@ -2239,8 +2334,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>100</width>
-           <height>30</height>
+           <width>431</width>
+           <height>187</height>
           </rect>
          </property>
          <attribute name="label">
@@ -2316,9 +2411,6 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="filename" stdset="0">
            <string notr="true">earth.gif</string>
-          </property>
-          <property name="imageCalc">
-           <string notr="true"/>
           </property>
          </widget>
          <widget class="caPolyLine" name="capolyline_4">
@@ -2480,7 +2572,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>7</number>
+       <number>8</number>
       </property>
       <property name="usesScrollButtons">
        <bool>true</bool>
@@ -5916,6 +6008,9 @@ p, li { white-space: pre-wrap; }
         <property name="limitsMode">
          <enum>caThermo::Channel</enum>
         </property>
+        <property name="scaleValueEnabled">
+         <bool>true</bool>
+        </property>
         <property name="actOnBeam" stdset="0">
          <bool>true</bool>
         </property>
@@ -5973,6 +6068,9 @@ p, li { white-space: pre-wrap; }
         <property name="limitsMode">
          <enum>caThermo::Channel</enum>
         </property>
+        <property name="scaleValueEnabled">
+         <bool>true</bool>
+        </property>
        </widget>
        <widget class="caThermo" name="caThermo_2">
         <property name="geometry">
@@ -6015,9 +6113,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="foreground">
          <color>
-          <red>20</red>
-          <green>19</green>
-          <blue>18</blue>
+          <red>255</red>
+          <green>170</green>
+          <blue>0</blue>
          </color>
         </property>
         <property name="background">
@@ -6090,6 +6188,9 @@ p, li { white-space: pre-wrap; }
         <property name="limitsMode">
          <enum>caThermo::Channel</enum>
         </property>
+        <property name="scaleValueEnabled">
+         <bool>true</bool>
+        </property>
        </widget>
        <widget class="caThermo" name="caThermo_8">
         <property name="geometry">
@@ -6146,6 +6247,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="limitsMode">
          <enum>caThermo::Channel</enum>
+        </property>
+        <property name="scaleValueEnabled">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="caThermo" name="caThermo_9">
@@ -6211,6 +6315,9 @@ p, li { white-space: pre-wrap; }
         <property name="limitsMode">
          <enum>caThermo::Channel</enum>
         </property>
+        <property name="scaleValueEnabled">
+         <bool>true</bool>
+        </property>
        </widget>
        <widget class="caThermo" name="caThermo_10">
         <property name="geometry">
@@ -6267,6 +6374,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="limitsMode">
          <enum>caThermo::Channel</enum>
+        </property>
+        <property name="scaleValueEnabled">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="caNumeric" name="caNumeric_7">
@@ -6362,6 +6472,9 @@ p, li { white-space: pre-wrap; }
         <property name="limitsMode">
          <enum>caThermo::Channel</enum>
         </property>
+        <property name="scaleValueEnabled">
+         <bool>true</bool>
+        </property>
        </widget>
        <widget class="caThermo" name="caThermo_12">
         <property name="geometry">
@@ -6418,6 +6531,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="limitsMode">
          <enum>caThermo::Channel</enum>
+        </property>
+        <property name="scaleValueEnabled">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="caThermo" name="caThermo_13">
@@ -6476,6 +6592,9 @@ p, li { white-space: pre-wrap; }
         <property name="limitsMode">
          <enum>caThermo::Channel</enum>
         </property>
+        <property name="scaleValueEnabled">
+         <bool>true</bool>
+        </property>
        </widget>
        <widget class="caThermo" name="caThermo_14">
         <property name="geometry">
@@ -6533,6 +6652,9 @@ p, li { white-space: pre-wrap; }
         <property name="limitsMode">
          <enum>caThermo::Channel</enum>
         </property>
+        <property name="scaleValueEnabled">
+         <bool>true</bool>
+        </property>
        </widget>
        <widget class="caThermo" name="caThermo_15">
         <property name="geometry">
@@ -6586,6 +6708,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="limitsMode">
          <enum>caThermo::Channel</enum>
+        </property>
+        <property name="scaleValueEnabled">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="caThermo" name="caThermo_16">
@@ -6643,6 +6768,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="limitsMode">
          <enum>caThermo::Channel</enum>
+        </property>
+        <property name="scaleValueEnabled">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="caThermo" name="caThermo_17">
@@ -6705,8 +6833,8 @@ p, li { white-space: pre-wrap; }
        <widget class="caThermo" name="caThermo_18">
         <property name="geometry">
          <rect>
-          <x>857</x>
-          <y>465</y>
+          <x>683</x>
+          <y>51</y>
           <width>10</width>
           <height>82</height>
          </rect>
@@ -6834,6 +6962,126 @@ p, li { white-space: pre-wrap; }
          <string>default colors</string>
         </property>
        </widget>
+       <widget class="caThermo" name="caThermo_19">
+        <property name="geometry">
+         <rect>
+          <x>848</x>
+          <y>405</y>
+          <width>25</width>
+          <height>162</height>
+         </rect>
+        </property>
+        <property name="lowerBound">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="upperBound">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="scalePosition">
+         <enum>QwtThermoMarker::NoScale</enum>
+        </property>
+        <property name="maxValue">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="decayOption">
+         <bool>true</bool>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="direction">
+         <enum>caThermo::Up</enum>
+        </property>
+        <property name="look">
+         <enum>caThermo::noDeco</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>20</red>
+          <green>19</green>
+          <blue>18</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>224</red>
+          <green>223</green>
+          <blue>222</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caThermo::Default</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caThermo::Channel</enum>
+        </property>
+        <property name="scaleValueEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="caThermo" name="caThermo_20">
+        <property name="geometry">
+         <rect>
+          <x>886</x>
+          <y>441</y>
+          <width>132</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="lowerBound">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="upperBound">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="scalePosition">
+         <enum>QwtThermoMarker::NoScale</enum>
+        </property>
+        <property name="maxValue">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="decayOption">
+         <bool>true</bool>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="direction">
+         <enum>caThermo::Right</enum>
+        </property>
+        <property name="look">
+         <enum>caThermo::noDeco</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>20</red>
+          <green>19</green>
+          <blue>18</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>224</red>
+          <green>223</green>
+          <blue>222</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caThermo::Default</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caThermo::Channel</enum>
+        </property>
+        <property name="scaleValueEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_15">
        <attribute name="title">
@@ -6893,16 +7141,16 @@ p, li { white-space: pre-wrap; }
          <string notr="true">ACM:TEST:DOUBLE_WAVE;ACM:TEST:DOUBLE_WAVE</string>
         </property>
         <property name="Style_1">
-         <enum>caCartesianPlot::FillUnder</enum>
+         <enum>caCartesianPlot::ThinLines</enum>
         </property>
         <property name="symbol_1">
          <enum>caCartesianPlot::NoSymbol</enum>
         </property>
         <property name="color_1">
          <color>
-          <red>170</red>
-          <green>255</green>
-          <blue>255</blue>
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
          </color>
         </property>
         <property name="channels_2" stdset="0">
@@ -6949,6 +7197,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="YaxisLimits">
          <string>0.01;10</string>
+        </property>
+        <property name="LegendEnabled">
+         <bool>true</bool>
         </property>
         <property name="XaxisType">
          <enum>caCartesianPlot::linear</enum>
@@ -11743,7 +11994,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="reloadOnChange">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="defineInexistentMacro" stdset="0">
          <bool>false</bool>
@@ -11768,6 +12019,9 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="reloadOnChange">
+         <bool>true</bool>
+        </property>
+        <property name="defineInexistentMacro" stdset="0">
          <bool>true</bool>
         </property>
         <property name="displayMode" stdset="0">
@@ -11950,7 +12204,7 @@ p, li { white-space: pre-wrap; }
          <string notr="true">sh -c</string>
         </property>
         <property name="args">
-         <string notr="true">&quot;cd /home/mezger;ls&quot;</string>
+         <string notr="true">&quot;ls&quot;</string>
         </property>
        </widget>
        <widget class="caShellCommand" name="caShellCommand_53">
@@ -13001,7 +13255,7 @@ p, li { white-space: pre-wrap; }
     </widget>
     <widget class="QWidget" name="tab_33">
      <attribute name="title">
-      <string>Signals_1</string>
+      <string>signals_1</string>
      </attribute>
      <widget class="caClock" name="caclock_3">
       <property name="geometry">
@@ -13433,7 +13687,7 @@ p, li { white-space: pre-wrap; }
     </widget>
     <widget class="QWidget" name="tab_41">
      <attribute name="title">
-      <string>Signals_2</string>
+      <string>signals_2</string>
      </attribute>
      <widget class="caCalc" name="cacalc_35">
       <property name="geometry">
@@ -13627,6 +13881,242 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="channelD">
        <string notr="true"/>
+      </property>
+     </widget>
+     <widget class="QScrollArea" name="scrollArea_5">
+      <property name="geometry">
+       <rect>
+        <x>590</x>
+        <y>207</y>
+        <width>437</width>
+        <height>228</height>
+       </rect>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents_5">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>418</width>
+         <height>360</height>
+        </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>94</width>
+         <height>360</height>
+        </size>
+       </property>
+       <widget class="caCalc" name="cacalc_45">
+        <property name="geometry">
+         <rect>
+          <x>3</x>
+          <y>3</y>
+          <width>81</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">QRectDrive1</string>
+        </property>
+        <property name="calc">
+         <string notr="true">%QRect</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">calcVariationX</string>
+        </property>
+        <property name="channelB">
+         <string notr="true">calcVariationY</string>
+        </property>
+        <property name="channelC">
+         <string notr="true">calcVariationWidth</string>
+        </property>
+        <property name="channelD">
+         <string notr="true">calcVariationHeight</string>
+        </property>
+        <property name="eventSignal">
+         <enum>caCalc::onAnyChange</enum>
+        </property>
+       </widget>
+       <widget class="caGraphics" name="cagraphics_24">
+        <property name="geometry">
+         <rect>
+          <x>270</x>
+          <y>18</y>
+          <width>100</width>
+          <height>100</height>
+         </rect>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>255</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="fillstyle" stdset="0">
+         <enum>caGraphics::Filled</enum>
+        </property>
+        <property name="lineSize">
+         <number>6</number>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_42">
+     <attribute name="title">
+      <string>signals_3</string>
+     </attribute>
+     <widget class="caClock" name="caclock_6">
+      <property name="geometry">
+       <rect>
+        <x>511</x>
+        <y>229</y>
+        <width>125</width>
+        <height>125</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="caRelatedDisplay" name="carelateddisplay_4">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>235</y>
+        <width>170</width>
+        <height>70</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="caShellCommand" name="cashellcommand">
+      <property name="geometry">
+       <rect>
+        <x>312</x>
+        <y>400</y>
+        <width>170</width>
+        <height>70</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="caMimeDisplay" name="camimedisplay_3">
+      <property name="geometry">
+       <rect>
+        <x>194</x>
+        <y>400</y>
+        <width>100</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="caCalc" name="cacalc_41">
+      <property name="geometry">
+       <rect>
+        <x>386</x>
+        <y>102</y>
+        <width>70</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>hideit</string>
+      </property>
+      <property name="variable">
+       <string notr="true">hideit</string>
+      </property>
+      <property name="calc">
+       <string notr="true">A</string>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">hideit</string>
+      </property>
+      <property name="initialValue">
+       <double>1.000000000000000</double>
+      </property>
+      <property name="precision">
+       <number>0</number>
+      </property>
+      <property name="eventSignal">
+       <enum>caCalc::onAnyChange</enum>
+      </property>
+     </widget>
+     <widget class="caNumeric" name="canumeric_17">
+      <property name="geometry">
+       <rect>
+        <x>255</x>
+        <y>94</y>
+        <width>48</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="integerDigits" stdset="0">
+       <number>1</number>
+      </property>
+      <property name="decimalDigits" stdset="0">
+       <number>0</number>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">hideit</string>
+      </property>
+      <property name="precisionMode">
+       <enum>caNumeric::User</enum>
+      </property>
+      <property name="fixedFormat">
+       <bool>true</bool>
+      </property>
+      <property name="limitsMode">
+       <enum>caNumeric::User</enum>
+      </property>
+      <property name="maxValue">
+       <double>1.000000000000000</double>
+      </property>
+      <property name="minValue">
+       <double>0.000000000000000</double>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_44">
+     <attribute name="title">
+      <string>menubar</string>
+     </attribute>
+     <widget class="caShellCommand" name="cashellcommand_4">
+      <property name="geometry">
+       <rect>
+        <x>283</x>
+        <y>292</y>
+        <width>171</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="label">
+       <string notr="true">listing</string>
+      </property>
+      <property name="labels">
+       <string notr="true">1</string>
+      </property>
+      <property name="files">
+       <string notr="true">sh -c</string>
+      </property>
+      <property name="args">
+       <string notr="true">&quot;ls&quot;</string>
+      </property>
+     </widget>
+     <widget class="wmSignalPropagator" name="wmsignalpropagator_3">
+      <property name="geometry">
+       <rect>
+        <x>282</x>
+        <y>215</y>
+        <width>70</width>
+        <height>20</height>
+       </rect>
       </property>
      </widget>
     </widget>
@@ -14186,8 +14676,26 @@ p, li { white-space: pre-wrap; }
      <height>26</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>file</string>
+    </property>
+    <addaction name="actionExit"/>
+    <addaction name="actionShell"/>
+   </widget>
+   <addaction name="menuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionExit">
+   <property name="text">
+    <string>exit</string>
+   </property>
+  </action>
+  <action name="actionShell">
+   <property name="text">
+    <string>execute shell</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -14555,8 +15063,8 @@ p, li { white-space: pre-wrap; }
    <slot>slotTiltAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>475</x>
-     <y>654</y>
+     <x>479</x>
+     <y>662</y>
     </hint>
     <hint type="destinationlabel">
      <x>463</x>
@@ -14572,7 +15080,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>482</x>
-     <y>654</y>
+     <y>662</y>
     </hint>
     <hint type="destinationlabel">
      <x>597</x>
@@ -14588,7 +15096,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>482</x>
-     <y>654</y>
+     <y>662</y>
     </hint>
     <hint type="destinationlabel">
      <x>810</x>
@@ -14619,8 +15127,8 @@ p, li { white-space: pre-wrap; }
    <slot>slotStartAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>811</x>
-     <y>395</y>
+     <x>815</x>
+     <y>403</y>
     </hint>
     <hint type="destinationlabel">
      <x>950</x>
@@ -14635,8 +15143,8 @@ p, li { white-space: pre-wrap; }
    <slot>slotSpanAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>962</x>
-     <y>395</y>
+     <x>964</x>
+     <y>403</y>
     </hint>
     <hint type="destinationlabel">
      <x>958</x>
@@ -14785,6 +15293,118 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>480</x>
      <y>335</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_41</sender>
+   <signal>emitSignal(bool)</signal>
+   <receiver>carelateddisplay_4</receiver>
+   <slot>hideObject(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>464</x>
+     <y>202</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>450</x>
+     <y>353</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_41</sender>
+   <signal>emitSignal(bool)</signal>
+   <receiver>caclock_6</receiver>
+   <slot>hideObject(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>468</x>
+     <y>205</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>586</x>
+     <y>338</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_41</sender>
+   <signal>emitSignal(bool)</signal>
+   <receiver>camimedisplay_3</receiver>
+   <slot>hideObject(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>419</x>
+     <y>211</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>254</x>
+     <y>495</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_41</sender>
+   <signal>emitSignal(bool)</signal>
+   <receiver>cashellcommand</receiver>
+   <slot>hideObject(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>461</x>
+     <y>199</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>453</x>
+     <y>496</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionExit</sender>
+   <signal>triggered()</signal>
+   <receiver>wmsignalpropagator_3</receiver>
+   <slot>closewindow()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>345</x>
+     <y>316</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionShell</sender>
+   <signal>triggered()</signal>
+   <receiver>cashellcommand_4</receiver>
+   <slot>shellCommandClick()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>376</x>
+     <y>404</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_45</sender>
+   <signal>emitSignal(QRect)</signal>
+   <receiver>cagraphics_24</receiver>
+   <slot>animation(QRect)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>949</x>
+     <y>435</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>941</x>
+     <y>400</y>
     </hint>
    </hints>
   </connection>
