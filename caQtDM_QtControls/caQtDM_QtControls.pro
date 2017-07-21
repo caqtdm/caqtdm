@@ -241,6 +241,7 @@ HEADERS	+= \
     src/camimedisplay.h \
     src/caWidgetInterface.h \
     src/addevent.h \
-    src/animationcode.h
+    src/animationcode.h \
+    src/hideobjectcode.h
 
 OTHER_FILES += README
