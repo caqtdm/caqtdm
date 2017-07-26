@@ -120,7 +120,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: rgb(0,0,120);}</string>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>4</number>
     </property>
     <property name="usesScrollButtons">
      <bool>true</bool>
@@ -148,7 +148,7 @@ border-radius: 2px;
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>6</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -2334,8 +2334,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>100</width>
-           <height>30</height>
+           <width>431</width>
+           <height>187</height>
           </rect>
          </property>
          <attribute name="label">
@@ -13689,200 +13689,6 @@ p, li { white-space: pre-wrap; }
      <attribute name="title">
       <string>signals_2</string>
      </attribute>
-     <widget class="caCalc" name="cacalc_35">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>450</y>
-        <width>81</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="variable">
-       <string notr="true">calcVariationX</string>
-      </property>
-      <property name="calc">
-       <string notr="true">150+100*SIN(A*3.1416/180)</string>
-      </property>
-      <property name="channel" stdset="0">
-       <string notr="true">angleVariation</string>
-      </property>
-      <property name="channelB">
-       <string notr="true"/>
-      </property>
-      <property name="channelC">
-       <string notr="true"/>
-      </property>
-      <property name="channelD">
-       <string notr="true"/>
-      </property>
-     </widget>
-     <widget class="caCalc" name="cacalc_36">
-      <property name="geometry">
-       <rect>
-        <x>360</x>
-        <y>410</y>
-        <width>81</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="variable">
-       <string notr="true">QRectDrive</string>
-      </property>
-      <property name="calc">
-       <string notr="true">%QRect</string>
-      </property>
-      <property name="channel" stdset="0">
-       <string notr="true">calcVariationX</string>
-      </property>
-      <property name="channelB">
-       <string notr="true">calcVariationY</string>
-      </property>
-      <property name="channelC">
-       <string notr="true">calcVariationWidth</string>
-      </property>
-      <property name="channelD">
-       <string notr="true">calcVariationHeight</string>
-      </property>
-      <property name="eventSignal">
-       <enum>caCalc::onAnyChange</enum>
-      </property>
-     </widget>
-     <widget class="caCalc" name="cacalc_37">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>490</y>
-        <width>81</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="variable">
-       <string notr="true">angleVariation</string>
-      </property>
-      <property name="calc">
-       <string notr="true">A&gt;=360?A=0:A+5</string>
-      </property>
-      <property name="channel" stdset="0">
-       <string notr="true">angleVariation</string>
-      </property>
-      <property name="channelB">
-       <string notr="true"/>
-      </property>
-      <property name="channelC">
-       <string notr="true"/>
-      </property>
-      <property name="eventSignal">
-       <enum>caCalc::onAnyChange</enum>
-      </property>
-     </widget>
-     <widget class="caCalc" name="cacalc_38">
-      <property name="geometry">
-       <rect>
-        <x>410</x>
-        <y>450</y>
-        <width>81</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="variable">
-       <string notr="true">calcVariationWidth</string>
-      </property>
-      <property name="calc">
-       <string notr="true">100+100*SIN(A*3.1416/180)</string>
-      </property>
-      <property name="channel" stdset="0">
-       <string notr="true">angleVariation</string>
-      </property>
-      <property name="channelB">
-       <string notr="true"/>
-      </property>
-      <property name="channelC">
-       <string notr="true"/>
-      </property>
-      <property name="channelD">
-       <string notr="true"/>
-      </property>
-     </widget>
-     <widget class="caGraphics" name="cagraphics_23">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>170</y>
-        <width>100</width>
-        <height>100</height>
-       </rect>
-      </property>
-      <property name="foreground">
-       <color>
-        <red>255</red>
-        <green>0</green>
-        <blue>0</blue>
-       </color>
-      </property>
-      <property name="fillstyle" stdset="0">
-       <enum>caGraphics::Filled</enum>
-      </property>
-      <property name="lineSize">
-       <number>6</number>
-      </property>
-     </widget>
-     <widget class="caCalc" name="cacalc_39">
-      <property name="geometry">
-       <rect>
-        <x>410</x>
-        <y>490</y>
-        <width>81</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="variable">
-       <string notr="true">calcVariationHeight</string>
-      </property>
-      <property name="calc">
-       <string notr="true">100+100*COS(A*3.1416/180)</string>
-      </property>
-      <property name="channel" stdset="0">
-       <string notr="true">angleVariation</string>
-      </property>
-      <property name="channelB">
-       <string notr="true"/>
-      </property>
-      <property name="channelC">
-       <string notr="true"/>
-      </property>
-      <property name="channelD">
-       <string notr="true"/>
-      </property>
-     </widget>
-     <widget class="caCalc" name="cacalc_40">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>490</y>
-        <width>81</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="variable">
-       <string notr="true">calcVariationY</string>
-      </property>
-      <property name="calc">
-       <string notr="true">150+100*COS(A*3.1416/180)</string>
-      </property>
-      <property name="channel" stdset="0">
-       <string notr="true">angleVariation</string>
-      </property>
-      <property name="channelB">
-       <string notr="true"/>
-      </property>
-      <property name="channelC">
-       <string notr="true"/>
-      </property>
-      <property name="channelD">
-       <string notr="true"/>
-      </property>
-     </widget>
      <widget class="QScrollArea" name="scrollArea_5">
       <property name="geometry">
        <rect>
@@ -13972,10 +13778,577 @@ p, li { white-space: pre-wrap; }
        </widget>
       </widget>
      </widget>
+     <widget class="caLabel" name="calabel_66">
+      <property name="geometry">
+       <rect>
+        <x>185</x>
+        <y>341</y>
+        <width>41</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>x/y</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="foreground">
+       <color>
+        <red>255</red>
+        <green>255</green>
+        <blue>255</blue>
+       </color>
+      </property>
+     </widget>
+     <widget class="caCalc" name="cacalc_46">
+      <property name="geometry">
+       <rect>
+        <x>275</x>
+        <y>466</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="variable">
+       <string notr="true">calcVariationHeight1</string>
+      </property>
+      <property name="calc">
+       <string notr="true">100+100*COS(A*3.1416/180)</string>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">angleVariation</string>
+      </property>
+      <property name="channelB">
+       <string notr="true">yfactor</string>
+      </property>
+      <property name="channelC">
+       <string notr="true"/>
+      </property>
+      <property name="channelD">
+       <string notr="true"/>
+      </property>
+     </widget>
+     <widget class="caCalc" name="cacalc_35">
+      <property name="geometry">
+       <rect>
+        <x>395</x>
+        <y>374</y>
+        <width>70</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="variable">
+       <string notr="true">xfactor</string>
+      </property>
+      <property name="initialValue">
+       <double>1.000000000000000</double>
+      </property>
+      <property name="eventSignal">
+       <enum>caCalc::onAnyChange</enum>
+      </property>
+     </widget>
+     <widget class="caLabel" name="calabel_67">
+      <property name="geometry">
+       <rect>
+        <x>195</x>
+        <y>264</y>
+        <width>131</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>drive animation</string>
+      </property>
+      <property name="foreground">
+       <color>
+        <red>255</red>
+        <green>255</green>
+        <blue>255</blue>
+       </color>
+      </property>
+     </widget>
+     <widget class="caCalc" name="cacalc_36">
+      <property name="geometry">
+       <rect>
+        <x>495</x>
+        <y>374</y>
+        <width>70</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="variable">
+       <string notr="true">yfactor</string>
+      </property>
+      <property name="initialValue">
+       <double>1.000000000000000</double>
+      </property>
+     </widget>
+     <widget class="wmSignalPropagator" name="wmsignalpropagator_4">
+      <property name="geometry">
+       <rect>
+        <x>435</x>
+        <y>414</y>
+        <width>70</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="caLabel" name="calabel_68">
+      <property name="geometry">
+       <rect>
+        <x>55</x>
+        <y>344</y>
+        <width>51</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>angle</string>
+      </property>
+      <property name="foreground">
+       <color>
+        <red>255</red>
+        <green>255</green>
+        <blue>255</blue>
+       </color>
+      </property>
+     </widget>
+     <widget class="caCalc" name="cacalc_39">
+      <property name="geometry">
+       <rect>
+        <x>275</x>
+        <y>396</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="variable">
+       <string notr="true">calcVariationHeight</string>
+      </property>
+      <property name="calc">
+       <string notr="true">B*(100+100*COS(A*3.1416/180))</string>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">angleVariation</string>
+      </property>
+      <property name="channelB">
+       <string notr="true">yfactor</string>
+      </property>
+      <property name="channelC">
+       <string notr="true"/>
+      </property>
+      <property name="channelD">
+       <string notr="true"/>
+      </property>
+     </widget>
+     <widget class="caCalc" name="cacalc_47">
+      <property name="geometry">
+       <rect>
+        <x>35</x>
+        <y>454</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="variable">
+       <string notr="true">angleVariation1</string>
+      </property>
+      <property name="calc">
+       <string notr="true"/>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true"/>
+      </property>
+      <property name="channelB">
+       <string notr="true"/>
+      </property>
+      <property name="channelC">
+       <string notr="true"/>
+      </property>
+      <property name="initialValue">
+       <double>60.000000000000000</double>
+      </property>
+      <property name="eventSignal">
+       <enum>caCalc::onAnyChange</enum>
+      </property>
+     </widget>
+     <widget class="caCalc" name="cacalc_40">
+      <property name="geometry">
+       <rect>
+        <x>165</x>
+        <y>440</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="variable">
+       <string notr="true">calcVariationX1</string>
+      </property>
+      <property name="calc">
+       <string notr="true">150+100*SIN(A*3.1416/180)</string>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">angleVariation</string>
+      </property>
+      <property name="channelB">
+       <string notr="true">xfactor</string>
+      </property>
+      <property name="channelC">
+       <string notr="true"/>
+      </property>
+      <property name="channelD">
+       <string notr="true"/>
+      </property>
+     </widget>
+     <widget class="caLabel" name="calabel_69">
+      <property name="geometry">
+       <rect>
+        <x>295</x>
+        <y>344</y>
+        <width>41</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>w/h</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="foreground">
+       <color>
+        <red>255</red>
+        <green>255</green>
+        <blue>255</blue>
+       </color>
+      </property>
+     </widget>
+     <widget class="caCalc" name="cacalc_48">
+      <property name="geometry">
+       <rect>
+        <x>165</x>
+        <y>464</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="variable">
+       <string notr="true">calcVariationY1</string>
+      </property>
+      <property name="calc">
+       <string notr="true">150+100*COS(A*3.1416/180)</string>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">angleVariation</string>
+      </property>
+      <property name="channelB">
+       <string notr="true">yfactor</string>
+      </property>
+      <property name="channelC">
+       <string notr="true"/>
+      </property>
+      <property name="channelD">
+       <string notr="true"/>
+      </property>
+     </widget>
+     <widget class="caCalc" name="cacalc_43">
+      <property name="geometry">
+       <rect>
+        <x>165</x>
+        <y>394</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="variable">
+       <string notr="true">calcVariationY</string>
+      </property>
+      <property name="calc">
+       <string notr="true">B*(150+100*COS(A*3.1416/180))</string>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">angleVariation</string>
+      </property>
+      <property name="channelB">
+       <string notr="true">yfactor</string>
+      </property>
+      <property name="channelC">
+       <string notr="true"/>
+      </property>
+      <property name="channelD">
+       <string notr="true"/>
+      </property>
+     </widget>
+     <widget class="caLabel" name="calabel_70">
+      <property name="geometry">
+       <rect>
+        <x>495</x>
+        <y>344</y>
+        <width>61</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>y factor</string>
+      </property>
+      <property name="foreground">
+       <color>
+        <red>255</red>
+        <green>255</green>
+        <blue>255</blue>
+       </color>
+      </property>
+     </widget>
+     <widget class="caCalc" name="cacalc_44">
+      <property name="geometry">
+       <rect>
+        <x>276</x>
+        <y>441</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="variable">
+       <string notr="true">calcVariationWidth1</string>
+      </property>
+      <property name="calc">
+       <string notr="true">100+100*SIN(A*3.1416/180)</string>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">angleVariation</string>
+      </property>
+      <property name="channelB">
+       <string notr="true">xfactor</string>
+      </property>
+      <property name="channelC">
+       <string notr="true"/>
+      </property>
+      <property name="channelD">
+       <string notr="true"/>
+      </property>
+     </widget>
+     <widget class="caCalc" name="cacalc_38">
+      <property name="geometry">
+       <rect>
+        <x>225</x>
+        <y>304</y>
+        <width>81</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="variable">
+       <string notr="true">QRectDrive</string>
+      </property>
+      <property name="calc">
+       <string notr="true">%QRect</string>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">calcVariationX</string>
+      </property>
+      <property name="channelB">
+       <string notr="true">calcVariationY</string>
+      </property>
+      <property name="channelC">
+       <string notr="true">calcVariationWidth</string>
+      </property>
+      <property name="channelD">
+       <string notr="true">calcVariationHeight</string>
+      </property>
+      <property name="eventSignal">
+       <enum>caCalc::onAnyChange</enum>
+      </property>
+     </widget>
+     <widget class="caCalc" name="cacalc_49">
+      <property name="geometry">
+       <rect>
+        <x>276</x>
+        <y>371</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="variable">
+       <string notr="true">calcVariationWidth</string>
+      </property>
+      <property name="calc">
+       <string notr="true">B*(100+100*SIN(A*3.1416/180))</string>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">angleVariation</string>
+      </property>
+      <property name="channelB">
+       <string notr="true">xfactor</string>
+      </property>
+      <property name="channelC">
+       <string notr="true"/>
+      </property>
+      <property name="channelD">
+       <string notr="true"/>
+      </property>
+     </widget>
+     <widget class="caGraphics" name="cagraphics_23">
+      <property name="geometry">
+       <rect>
+        <x>32</x>
+        <y>50</y>
+        <width>100</width>
+        <height>100</height>
+       </rect>
+      </property>
+      <property name="foreground">
+       <color>
+        <red>255</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </property>
+      <property name="fillstyle" stdset="0">
+       <enum>caGraphics::Filled</enum>
+      </property>
+      <property name="lineSize">
+       <number>6</number>
+      </property>
+     </widget>
+     <widget class="caLabel" name="calabel_71">
+      <property name="geometry">
+       <rect>
+        <x>395</x>
+        <y>344</y>
+        <width>61</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>x factor</string>
+      </property>
+      <property name="foreground">
+       <color>
+        <red>255</red>
+        <green>255</green>
+        <blue>255</blue>
+       </color>
+      </property>
+     </widget>
+     <widget class="caCalc" name="cacalc_37">
+      <property name="geometry">
+       <rect>
+        <x>165</x>
+        <y>370</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="variable">
+       <string notr="true">calcVariationX</string>
+      </property>
+      <property name="calc">
+       <string notr="true">B*(150+100*SIN(A*3.1416/180))</string>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">angleVariation</string>
+      </property>
+      <property name="channelB">
+       <string notr="true">xfactor</string>
+      </property>
+      <property name="channelC">
+       <string notr="true"/>
+      </property>
+      <property name="channelD">
+       <string notr="true"/>
+      </property>
+     </widget>
+     <widget class="caCalc" name="cacalc_50">
+      <property name="geometry">
+       <rect>
+        <x>35</x>
+        <y>384</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="variable">
+       <string notr="true">angleVariation</string>
+      </property>
+      <property name="calc">
+       <string notr="true">A&gt;=360?A=0:A+5</string>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">angleVariation</string>
+      </property>
+      <property name="channelB">
+       <string notr="true"/>
+      </property>
+      <property name="channelC">
+       <string notr="true"/>
+      </property>
+      <property name="eventSignal">
+       <enum>caCalc::onAnyChange</enum>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_45">
+     <attribute name="title">
+      <string>signals_3</string>
+     </attribute>
+     <widget class="caInclude" name="cainclude_6">
+      <property name="geometry">
+       <rect>
+        <x>421</x>
+        <y>211</y>
+        <width>94</width>
+        <height>360</height>
+       </rect>
+      </property>
+      <property name="macro">
+       <string>PV1=ACM:BPM1</string>
+      </property>
+      <property name="filename" stdset="0">
+       <string notr="true">bpminclude_child1.ui</string>
+      </property>
+     </widget>
+     <widget class="caLabel" name="calabel_72">
+      <property name="geometry">
+       <rect>
+        <x>106</x>
+        <y>15</y>
+        <width>906</width>
+        <height>118</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>positioning is done externally through the variables ACM:BPM1:X and ACM:BPM1:Y; if you want adjustment when resizing
+then see signals_2</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+      <property name="foreground">
+       <color>
+        <red>255</red>
+        <green>255</green>
+        <blue>0</blue>
+       </color>
+      </property>
+      <property name="background">
+       <color alpha="0">
+        <red>255</red>
+        <green>255</green>
+        <blue>0</blue>
+       </color>
+      </property>
+      <property name="borderColor">
+       <color>
+        <red>255</red>
+        <green>255</green>
+        <blue>0</blue>
+       </color>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_42">
      <attribute name="title">
-      <string>signals_3</string>
+      <string>signals_4</string>
      </attribute>
      <widget class="caClock" name="caclock_6">
       <property name="geometry">
@@ -15012,12 +15385,12 @@ p, li { white-space: pre-wrap; }
    <slot>toggle()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>335</x>
-     <y>241</y>
+     <x>337</x>
+     <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>789</x>
-     <y>315</y>
+     <x>791</x>
+     <y>349</y>
     </hint>
    </hints>
   </connection>
@@ -15192,8 +15565,8 @@ p, li { white-space: pre-wrap; }
      <y>604</y>
     </hint>
     <hint type="destinationlabel">
-     <x>351</x>
-     <y>588</y>
+     <x>355</x>
+     <y>622</y>
     </hint>
    </hints>
   </connection>
@@ -15204,12 +15577,12 @@ p, li { white-space: pre-wrap; }
    <slot>setMacroname(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>192</x>
-     <y>372</y>
+     <x>196</x>
+     <y>406</y>
     </hint>
     <hint type="destinationlabel">
-     <x>482</x>
-     <y>588</y>
+     <x>486</x>
+     <y>622</y>
     </hint>
    </hints>
   </connection>
@@ -15220,12 +15593,12 @@ p, li { white-space: pre-wrap; }
    <slot>setMacrovalue(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>179</x>
-     <y>415</y>
+     <x>183</x>
+     <y>449</y>
     </hint>
     <hint type="destinationlabel">
-     <x>459</x>
-     <y>588</y>
+     <x>463</x>
+     <y>622</y>
     </hint>
    </hints>
   </connection>
@@ -15236,12 +15609,12 @@ p, li { white-space: pre-wrap; }
    <slot>closewindow()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>705</x>
-     <y>260</y>
+     <x>709</x>
+     <y>294</y>
     </hint>
     <hint type="destinationlabel">
-     <x>707</x>
-     <y>355</y>
+     <x>711</x>
+     <y>389</y>
     </hint>
    </hints>
   </connection>
@@ -15306,22 +15679,6 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>624</x>
      <y>669</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cacalc_36</sender>
-   <signal>emitSignal(QRect)</signal>
-   <receiver>cagraphics_23</receiver>
-   <slot>animation(QRect)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>445</x>
-     <y>505</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>480</x>
-     <y>335</y>
     </hint>
    </hints>
   </connection>
@@ -15450,6 +15807,54 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>910</x>
      <y>329</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_38</sender>
+   <signal>emitSignal(QRect)</signal>
+   <receiver>cagraphics_23</receiver>
+   <slot>animation(QRect)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>285</x>
+     <y>400</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>145</x>
+     <y>217</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>wmsignalpropagator_4</sender>
+   <signal>wmFactorX(double)</signal>
+   <receiver>cacalc_35</receiver>
+   <slot>setValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>486</x>
+     <y>512</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>455</x>
+     <y>482</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>wmsignalpropagator_4</sender>
+   <signal>wmFactorY(double)</signal>
+   <receiver>cacalc_36</receiver>
+   <slot>setValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>516</x>
+     <y>515</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>554</x>
+     <y>476</y>
     </hint>
    </hints>
   </connection>

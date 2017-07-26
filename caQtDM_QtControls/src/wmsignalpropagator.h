@@ -38,6 +38,7 @@ class  QTCON_EXPORT wmSignalPropagator : public  ESimpleLabel
 
 public:
     wmSignalPropagator( QWidget *parent = 0 );
+    void setResizeFactors(const double factX, const double factY);
 
 public slots:
     void animation(QRect p) {
@@ -58,6 +59,8 @@ signals:
     void wmShowMaximized();
     void wmShowMinimized();
     void wmShowFullScreen();
+    void wmFactorX(double);
+    void wmFactorY(double);
 
 private:
     void setForeAndBackground(QColor fg, QColor bg);

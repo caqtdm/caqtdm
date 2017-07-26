@@ -35,6 +35,11 @@ wmSignalPropagator::wmSignalPropagator( QWidget *parent ) : ESimpleLabel(parent)
     Parent = parent;
 }
 
+void wmSignalPropagator::setResizeFactors(const double factX, const double factY) {
+    emit wmFactorX(factX);
+    emit wmFactorY(factY);
+}
+
 void wmSignalPropagator::closewindow() {emit wmCloseWindow();}
 void wmSignalPropagator::shownormal() {emit wmShowNormal();}
 void wmSignalPropagator::showmaximized() {emit wmShowMaximized();}

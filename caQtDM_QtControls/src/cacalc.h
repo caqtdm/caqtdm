@@ -108,6 +108,7 @@ public:
     bool isPropertyVisible(Properties property);
     void setPropertyVisible(Properties property, bool visible);
 
+    double getValue() { return thisValue;}
 
 public slots:
     void animation(QRect p) {

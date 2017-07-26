@@ -7783,11 +7783,17 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
     foreach(QWidget* widget, all) {
         QString className(widget->metaObject()->className());
 
+        // give wmsignalpropagator the resize factors
+        if(!className.compare("wmSignalPropagator")) {
+            wmSignalPropagator *signalWidget = (wmSignalPropagator *) widget;
+            signalWidget->setResizeFactors(factX, factY);
+        }
+
         if(     !className.contains("QMainWindow")  &&
                 !className.contains("QRubberBand")  &&
                 !className.contains("Qwt")    &&
                 !className.contains("QWidget")    &&
-                (className.contains("ca") || className.contains("Q") || className.contains("Line"))
+                (className.contains("ca") || className.contains("Q") || className.contains("Line") || !className.compare("wmSignalPropagator"))
                 ) {
             QWidget *w = (QWidget*) widget->parent();
             // if this widget is managed by a layout, do not do anything
@@ -7810,6 +7816,17 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 QVariantList list = var.toList();
 
                 if(list.size() >= 4) {
+
+                    // special case, the position and size of the widget is signal driven, in this case
+                    // we need the actual variables.
+                    if(widget->property("SIGNALDRIVEN").value<bool>()) {
+                        //qDebug() << widget << "is signaldriven";
+                        list[0].setValue(widget->x()/factX);
+                        list[1].setValue(widget->y()/factY);
+                        list[2].setValue(widget->width()/factX);
+                        list[3].setValue(widget->height()/factY);
+                    }
+
                     double x = (double) list.at(0).toInt() * factX;
                     double y = (double) list.at(1).toInt() * factY;
                     double width = (double) list.at(2).toInt() * factX;
