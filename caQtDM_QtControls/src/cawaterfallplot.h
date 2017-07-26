@@ -249,10 +249,10 @@ public:
     void setYaxisEnabled(bool thisYshow);
 
     double getIntensityMax() const {return thisIntensityMax;}
-    void setIntensityMax(double const &newY) {thisIntensityMax = newY; firstDemoPlot=true; updatePlot();}
+    void setIntensityMax(double const &newY) {thisIntensityMax = newY; firstDemoPlot=true; setColormap(thisColormap); updatePlot();}
 
     double getIntensityMin() const {return thisIntensityMin;}
-    void setIntensityMin(double const &newY) {thisIntensityMin = newY;  firstDemoPlot=true; updatePlot();}
+    void setIntensityMin(double const &newY) {thisIntensityMin = newY;  firstDemoPlot=true; setColormap(thisColormap); updatePlot();}
 
     void setIntensityScalingMax(intensityScaling s) {thisIntensityScalingMax = s;}
     intensityScaling getIntensityScalingMax() const {return thisIntensityScalingMax; }

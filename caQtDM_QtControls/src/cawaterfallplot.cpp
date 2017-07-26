@@ -137,17 +137,6 @@ void caWaterfallPlot::setCols(int const &cols)
 
 void caWaterfallPlot::updatePlot()
 {
-    // A color bar on the right axis
-/*
-    QwtScaleWidget *rightAxis = plot->axisWidget(QwtPlot::yRight);
-    rightAxis->setTitle("Intensity");
-    rightAxis->setColorBarEnabled(true);
-    rightAxis->setColorMap(QwtInterval(thisIntensityMin, thisIntensityMax), new ColorMap_Wavelength());
-    plot->setAxisScale(QwtPlot::yRight, thisIntensityMin, thisIntensityMax);
-    plot->enableAxis(QwtPlot::yRight);
-    thisColormap = spectrum_wavelength;
-*/
-
     // disable labels of left axis
     plot->axisScaleDraw(QwtPlot::yLeft)->enableComponent(QwtAbstractScaleDraw::Labels, false);
     plot->setAxisFont(QwtPlot::xBottom, QFont("Arial", 10));
@@ -218,7 +207,7 @@ void caWaterfallPlot::myReplot()
 template <typename pureData> void caWaterfallPlot::AverageArray(pureData *vec, int size, int arraySize, double *avg, int ratio)
 {
     int AverageCounter = 0;
-    for (int i=0; i<size-ratio; i+=ratio) {
+    for (int i=0; i<size-ratio+1; i+=ratio) {
         double mean = 0;
         for(int j=0; j<ratio; j++) {
             if((i+j) >= arraySize) {
