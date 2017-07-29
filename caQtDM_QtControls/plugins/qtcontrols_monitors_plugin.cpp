@@ -515,8 +515,8 @@ QWidget *caCalcInterface::createWidget(QWidget* parent)
 
 caCalcInterface::caCalcInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
-    strng name[6], type[6]  = {"","","","","",""};
-    longtext text[6] = {"","","","","",""};
+    strng name[7], type[7]  = {"","","","","","", ""};
+    longtext text[7] = {"","","","","","", "when vector, you can not use any cacalc as input channels"};
 
     strcpy(name[0], "channel");
     strcpy(type[0], "multiline");
@@ -530,8 +530,9 @@ caCalcInterface::caCalcInterface(QObject* parent) : CustomWidgetInterface_Monito
     strcpy(type[4], "multiline");
     strcpy(name[5], "variable");
     strcpy(type[5], "multiline");
+    strcpy(name[6], "variableType");
 
-    d_domXml = XmlFunc("caCalc", "cacalc", 0, 0, 70, 20, name, type, text, 6);
+    d_domXml = XmlFunc("caCalc", "cacalc", 0, 0, 70, 20, name, type, text, 7);
     d_toolTip = "[define internal process variable]";
     d_name = "caCalc";
     d_include = "caCalc";
@@ -547,7 +548,7 @@ QWidget *caWaterfallPlotInterface::createWidget(QWidget* parent)
 caWaterfallPlotInterface::caWaterfallPlotInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
     strng name[5], type[5] = {"","","","",""};
-    longtext text[5] = {"","","","",""};
+    longtext text[5] = {"","number (or channel) will average the received waveform in order to reduce the data","","",""};
 
     strcpy(name[0], "channel");
     strcpy(type[0], "multiline");
