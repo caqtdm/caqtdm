@@ -132,12 +132,14 @@ void ArchiveCA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
 void ArchiveCA_Plugin::handleResults(indexes indexNew, int nbVal, QVector<float> TimerN, QVector<float> YValsN, QString backend)
 {
     //qDebug() << "in CA handle results" << nbVal << TimerN.count();
-    if(nbVal > 0 && nbVal < TimerN.count()) {
-      TimerN.resize(nbVal);
-      YValsN.resize(nbVal);
-    }
 
-    if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN, backend);
+    if(nbVal > 0) {
+        TimerN.resize(nbVal);
+        YValsN.resize(nbVal);
+        archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN, backend);
+        TimerN.resize(0);
+        YValsN.resize(0);
+    }
 
     QList<QString> removeKeys;
     removeKeys.clear();

@@ -108,11 +108,14 @@ void ArchivePRO_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfI
 void ArchivePRO_Plugin::handleResults(indexes indexNew, int nbVal, QVector<float> TimerN, QVector<float> YValsN, QString backend)
 {
     //qDebug() << "in PRO handle results" << nbVal << TimerN.count();
-    if(nbVal > 0 && nbVal < TimerN.count()) {
-      TimerN.resize(nbVal);
-      YValsN.resize(nbVal);
+
+    if(nbVal > 0) {
+        TimerN.resize(nbVal);
+        YValsN.resize(nbVal);
+        archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN, backend);
+        TimerN.resize(0);
+        YValsN.resize(0);
     }
-    if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN, backend);
 
     QList<QString> removeKeys;
     removeKeys.clear();

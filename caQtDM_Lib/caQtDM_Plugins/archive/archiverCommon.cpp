@@ -150,8 +150,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
             index.updateSeconds = var.toInt();
 
             // override the user specification if too many data are going to be requested
-            if(index.secondsPast > 14400) index.updateSeconds = 120;
-            else if(index.secondsPast > 7200) index.updateSeconds = 60;
+            if(index.secondsPast > 7200) index.updateSeconds = 60;
             else if(index.secondsPast > 3600) index.updateSeconds = 30;
 
         } else{
@@ -172,6 +171,11 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
         index.indexX = index.indexY = 0;
         if(kData->specData[2] == caCartesianPlot::CH_X) index.indexX = kData->index;        // x
         else if(kData->specData[2] == caCartesianPlot::CH_Y) index.indexY = kData->index;   // y
+
+        if(caCartesianPlot* ww = qobject_cast<caCartesianPlot *>((QWidget*) index.w)) {
+            if(ww->getXaxisType() == caCartesianPlot::time) index.timeAxis = true;
+            else index.timeAxis = false;
+        }
 
         if(!listOfIndexes.contains(key)) {
             listOfIndexes.insert(key, index);

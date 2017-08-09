@@ -201,12 +201,15 @@ void ArchiveSF_Plugin::handleResults(indexes indexNew, int nbVal, QVector<float>
 {
     //QThread *thread = QThread::currentThread();
     //qDebug() << "in sf handle results" << nbVal << TimerN.count() << indexNew.indexX << indexNew.indexY << thread;
-    if(nbVal > 0 && nbVal < TimerN.count()) {
-      TimerN.resize(nbVal);
-      YValsN.resize(nbVal);
-    }
+
+    TimerN.resize(nbVal);
+    YValsN.resize(nbVal);
+
     //qDebug() << "handle cartesian";
     if(nbVal > 0) archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN, backend);
+    TimerN.resize(0);
+    YValsN.resize(0);
+
     //qDebug() << "handle cartesian fisnished";
     QList<QString> removeKeys;
     removeKeys.clear();

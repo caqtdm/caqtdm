@@ -117,13 +117,9 @@ public slots:
 
         fromArchive = new sfRetrieval();
 
-        //qDebug() << "fromArchive pointer=" << fromArchive;
+        //qDebug() << "fromArchive pointer=" << fromArchive << indexNew.timeAxis;
 
-        if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) indexNew.w)) {
-            if(w->getXaxisType() == caCartesianPlot::time) timeAxis = true;
-        }
-
-        if(fromArchive->requestUrl(url, json_str, indexNew.secondsPast, isBinned, timeAxis, key)) {
+        if(fromArchive->requestUrl(url, json_str, indexNew.secondsPast, isBinned, indexNew.timeAxis, key)) {
             if((nbVal = fromArchive->getCount()) > 0) {
                 //qDebug() << nbVal << total;
                 TimerN.resize(fromArchive->getCount());
@@ -148,8 +144,6 @@ public slots:
         //qDebug() << QTime::currentTime().toString() << "number of values received" << nbVal << fromArchive << "for" << key;
 
         emit resultReady(indexNew, nbVal, TimerN, YValsN, fromArchive->getBackend());
-
-        fromArchive->close();
 
         mutex->unlock();
     }
