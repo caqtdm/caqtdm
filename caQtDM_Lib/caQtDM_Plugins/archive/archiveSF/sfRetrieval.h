@@ -50,12 +50,12 @@ public:
     ~sfRetrieval() {
         X.clear();
         Y.clear();
-        //qDebug() << "sfRetrieval::~sfRetrieval()";
+        //qDebug() << this << "destructor" << PV;
     }
-    bool requestUrl(const QUrl url, const QByteArray &json, int secondsPast, bool binned, bool timeAxis);
+    bool requestUrl(const QUrl url, const QByteArray &json, int secondsPast, bool binned, bool timeAxis, QString key);
     const QString lastError();
     int getCount();
-    void getData(QVector<double> &x, QVector<double> &y);
+    void getData(QVector<float> &x, QVector<float> &y);
     const QString getBackend();
     void cancelDownload();
     void close();
@@ -80,13 +80,14 @@ private:
     int finished;
     QUrl downloadUrl;
     QString errorString;
-    QVector<double> X,Y;
+    QVector<float> X,Y;
     int totalCount;
     int secndsPast;
     QEventLoop *eventLoop;
     bool isBinned, timAxis;
     QString Backend;
     bool aborted;
+    QString PV;
 };
 
 #endif

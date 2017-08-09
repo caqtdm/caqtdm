@@ -36,7 +36,7 @@
 #include "mutexKnobData.h"
 #include "MessageWindow.h"
 
-struct indexes {QString key; int indexX; int indexY; int secondsPast; QString pv; int updateSeconds; struct timeb lastUpdateTime; QWidget *w; int nrOfBins; QMutex *mutexP; bool init; QString backend;};
+struct indexes {QString key; int indexX; int indexY; int secondsPast; QString pv; float updateSeconds; struct timeb lastUpdateTime; QWidget *w; int nrOfBins; QMutex *mutexP; bool init; QString backend; int updateSecondsOrig;};
 #define CHAR_ARRAY_LENGTH 200
 
 class Q_DECL_EXPORT ArchiverCommon : public QObject
@@ -50,9 +50,11 @@ public:
     int pvAddMonitor(int index, knobData *kData, int rate, int skip);
     int pvClearMonitor(knobData *kData);
     int pvFreeAllocatedData(knobData *kData);
+    int pvClearEvent(void * ptr);
+    int pvAddEvent(void * ptr);
     int TerminateIO() {return true;}
-    //struct indexes {int indexX; int indexY; QString archive; int secondspast; QString pv;};
-    void updateCartesian(int nbVal, indexes indexNew, QVector<double> TimerN, QVector<double> YValsN, QString backend);
+    void updateCartesian(int nbVal, indexes indexNew, QVector<float> TimerN, QVector<float> YValsN, QString backend);
+    void updateSecondsPast(indexes indexNew, bool original);
     QTimer *timer;
 
 protected:

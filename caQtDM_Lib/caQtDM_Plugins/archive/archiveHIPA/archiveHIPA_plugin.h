@@ -45,11 +45,11 @@ class Q_DECL_EXPORT WorkerHIPA : public QObject
 public:
     WorkerHIPA() {
         qRegisterMetaType<indexes>("indexes");
-        qRegisterMetaType<QVector<double> >("QVector<double>");
+        qRegisterMetaType<QVector<float> >("QVector<float>");
     }
 
 private:
-    QVector<double>  TimerN, YValsN;
+    QVector<float>  TimerN, YValsN;
 
 public slots:
 
@@ -113,7 +113,7 @@ public slots:
     }
 
 signals:
-    void resultReady(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend);
+    void resultReady(indexes indexNew, int nbVal, QVector<float> TimerN, QVector<float> YValsN, QString backend);
 
 public:
 
@@ -149,7 +149,7 @@ public:
     int TerminateIO();
 
 public slots:
-    void handleResults(indexes, int, QVector<double>, QVector<double>, QString);
+    void handleResults(indexes, int, QVector<float>, QVector<float>, QString);
     void closeEvent();
 
 signals:

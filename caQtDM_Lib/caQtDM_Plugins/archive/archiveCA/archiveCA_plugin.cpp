@@ -41,7 +41,7 @@ ArchiveCA_Plugin::ArchiveCA_Plugin()
 {
     qRegisterMetaType<indexes>("indexes");
     qRegisterMetaType<stdString>("stdString");
-    qRegisterMetaType<QVector<double> >("QVector<double>");
+    qRegisterMetaType<QVector<float> >("QVector<float>");
 
     qDebug() << "ArchiveCA_Plugin: Create (epics channel archiver retrieval)";
     archiverCommon = new ArchiverCommon();
@@ -118,8 +118,8 @@ void ArchiveCA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
             connect(tmpThread, SIGNAL(finished()), tmpThread, SLOT(deleteLater()) );
             connect(this, SIGNAL(operate( QWidget *, indexes, const stdString)), worker,
                     SLOT(getFromArchive(QWidget *, indexes, stdString)));
-            connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>, QString)), this,
-                    SLOT(handleResults(indexes, int, QVector<double>, QVector<double>, QString)));
+            connect(worker, SIGNAL(resultReady(indexes, int, QVector<float>, QVector<float>, QString)), this,
+                    SLOT(handleResults(indexes, int, QVector<float>, QVector<float>, QString)));
             tmpThread->start();
 
             //qDebug() << "CA emit operate";
@@ -129,7 +129,7 @@ void ArchiveCA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
     }
 }
 
-void ArchiveCA_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend)
+void ArchiveCA_Plugin::handleResults(indexes indexNew, int nbVal, QVector<float> TimerN, QVector<float> YValsN, QString backend)
 {
     //qDebug() << "in CA handle results" << nbVal << TimerN.count();
     if(nbVal > 0 && nbVal < TimerN.count()) {

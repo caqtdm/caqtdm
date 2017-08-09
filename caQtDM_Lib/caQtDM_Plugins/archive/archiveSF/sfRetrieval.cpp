@@ -38,6 +38,7 @@
 #include "sfRetrieval.h"
 #include <QDebug>
 #include <QThread>
+#include <QTime>
 #include <iostream>
 #include <sstream>
 
@@ -54,19 +55,20 @@ sfRetrieval::sfRetrieval()
     manager = new QNetworkAccessManager(this);
     eventLoop = new QEventLoop(this);
     errorString = "";
-
+    //qDebug() << QTime::currentTime().toString() << this << "constructor";
     connect(this, SIGNAL(requestFinished()), this, SLOT(downloadFinished()) );
 }
 
 void sfRetrieval::timeoutL()
 {
     errorString = "http request timeout";
-    eventLoop->quit();
+    //qDebug() << QTime::currentTime().toString() << this << PV << "timeout" << errorString;
+    cancelDownload();
 }
 
-bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int secondsPast, bool binned, bool timeAxis)
+bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int secondsPast, bool binned, bool timeAxis, QString key)
 {
-    //qDebug() << "sfRetrieval::requestUrl";
+    //qDebug() << "sfRetrieval::requestUrl" << json;
     aborted = false;
     finished = false;
     totalCount = 0;
@@ -77,6 +79,7 @@ bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int seconds
     isBinned = binned;
     timAxis = timeAxis;
     errorString = "";
+    PV = key;
 
     QNetworkRequest *request = new QNetworkRequest(url);
 
@@ -99,9 +102,10 @@ bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int seconds
 
     finished = false;
     QTimer *timeoutHelper = new QTimer(this);
-    timeoutHelper->setInterval(10000);
+    timeoutHelper->setInterval(60000);
     timeoutHelper->start();
     connect(timeoutHelper, SIGNAL(timeout()), this, SLOT(timeoutL()));
+    //qDebug() << QTime::currentTime().toString() << this << PV << "go on eventloop->exec";
     eventLoop->exec();
 
     //downloadfinished will continue
@@ -121,7 +125,7 @@ void sfRetrieval::cancelDownload()
 
     disconnect(manager);
     if( reply != NULL ) {
-        //qDebug() << "!!!!!!!!!!!!!!!!! abort networkreply" << reply;
+        //qDebug() << QTime::currentTime().toString() << this << PV << "!!!!!!!!!!!!!!!!! abort networkreply for";
         reply->abort();
         reply->deleteLater();
         reply = NULL;
@@ -133,6 +137,7 @@ void sfRetrieval::cancelDownload()
 
 int sfRetrieval::downloadFinished()
 {
+    //qDebug() << QTime::currentTime().toString() << this << PV << "download finished";
     eventLoop->quit();
     return finished;
 }
@@ -140,7 +145,7 @@ int sfRetrieval::downloadFinished()
 void sfRetrieval::finishReply(QNetworkReply *reply)
 {
     if(aborted) return;
-    //qDebug() << "finishreply" << reply;
+    //qDebug() << QTime::currentTime().toString() << this << PV << "reply received";
     int count = 0;
     struct timeb now;
     int valueIndex = 2;
@@ -154,6 +159,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
     QVariant status =  reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
     if(status.toInt() != 200) {
         errorString = tr("unexpected http status code %1 [%2] from %3").arg(status.toInt()).arg(reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString()).arg(downloadUrl.toString());
+        //qDebug() << QTime::currentTime().toString() << this << PV << "finishreply" << errorString;
         emit requestFinished();
         reply->deleteLater();
         return;
@@ -161,7 +167,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
 
     if(reply->error()) {
         errorString = tr("%1: %2").arg(parseError(reply->error())).arg(downloadUrl.toString());
-        qDebug() << "reply error" << errorString;
+        //qDebug() << QTime::currentTime().toString() << this << PV << "finishreply" << errorString;
         emit requestFinished();
         reply->deleteLater();
         return;
@@ -198,11 +204,11 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
             return;
         } else {
             //qDebug() << "i=" << i <<  "linecount" << line.count() << line[1];
-            double archiveTime = line[1].toDouble(&ok1);
+            float archiveTime = line[1].toFloat(&ok1);
             if(ok1) {
                 if((seconds - archiveTime) < secndsPast) {
                     X[count] = -(seconds - archiveTime) / 3600.0;
-                    Y[count] = line[valueIndex].toDouble(&ok2);
+                    Y[count] = line[valueIndex].toFloat(&ok2);
                     if(ok2) count++;
                     else {
                         errorString = tr("could not decode value %1 at position %2").arg(line[valueIndex].arg(valueIndex));
@@ -231,13 +237,14 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
 
     // Did it go wrong?
     if (value == NULL) {
-        errorString = tr("could not parse json string %1").arg(out);
+        errorString = tr("could not parse json string left=%1 right=%2").arg(out.left(20)).arg(out.right(20));
+        //qDebug() << QTime::currentTime().toString() << this << PV << "finishreply" << errorString;
         emit requestFinished();
         return;
     } else {
 
         if(!value->IsArray()) {
-            qDebug() << "the json root element is not an array, something has changed";
+            qDebug() << QTime::currentTime().toString() << "finishreply the json root element is not an array, something has changed";
         }
 
         if(value->IsArray()) {
@@ -283,6 +290,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
                         // scan the data part (big array)
                         if(array.size() < 1) {
                             errorString = tr("no data from %1 : %2").arg(downloadUrl.toString()).arg(Backend);
+                            //qDebug() << QTime::currentTime().toString() << this << PV << "finishreply" << errorString;
                             emit requestFinished();
                             delete value;
                             delete value1;
@@ -350,16 +358,16 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
                                 // simple value
                                 JSONObject root1 = array[i]->AsObject();
                                 if (root1.find(L"value") != root1.end() && root1[L"value"]->IsNumber()) {
-                                    // qDebug() << "value found";
+                                    //qDebug() << "value found";
                                     stat = swscanf(root1[L"value"]->Stringify().c_str(), L"%lf", &mean);
                                     valueFound = true;
                                 } else
 
                                     // an array
                                     if (root1.find(L"value") != root1.end() && root1[L"value"]->IsArray()) {
-                                        JSONArray array = root1[L"value"]->AsArray();
                                         //qDebug() << "\nvalue part found as array, not yet supported" << array.size();
                                         errorString = tr("waveforms not supported");
+                                        //qDebug()<< QTime::currentTime().toString()  << this << PV << "finishreply" << errorString;
                                         emit requestFinished();
                                         return;
                                     }
@@ -369,6 +377,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
                                     //qDebug()<< "globalSeconds part found";
                                     if(getDoubleFromString(QString::fromWCharArray(root1[L"globalSeconds"]->AsString().c_str()), archiveTime)){
                                         timeFound = true;
+                                        //qDebug() << "time found" << archiveTime;
                                     } else {
                                         qDebug() << tr("could not decode globalSeconds ????");
                                         break;
@@ -393,7 +402,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
     }
 
     totalCount = count;
-    //qDebug() << "finishreply totalcount =" << count << reply;
+    //qDebug() << QTime::currentTime().toString() << this << PV << "finishreply totalcount =" << count << reply;
 
 #endif
 
@@ -421,7 +430,7 @@ const QString sfRetrieval::getBackend()
     return Backend;
 }
 
-void sfRetrieval::getData(QVector<double> &x, QVector<double> &y)
+void sfRetrieval::getData(QVector<float> &x, QVector<float> &y)
 {
     x = X;
     y = Y;

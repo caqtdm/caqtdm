@@ -40,7 +40,7 @@ QString ArchiveHIPA_Plugin::pluginName()
 ArchiveHIPA_Plugin::ArchiveHIPA_Plugin()
 {
     qRegisterMetaType<indexes>("indexes");
-    qRegisterMetaType<QVector<double> >("QVector<double>");
+    qRegisterMetaType<QVector<float> >("QVector<float>");
 
     qDebug() << "ArchiveHIPA_Plugin: Create (logging retrieval)";
     archiverCommon = new ArchiverCommon();
@@ -95,8 +95,8 @@ void ArchiveHIPA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOf
             connect(tmpThread, SIGNAL(finished()), tmpThread, SLOT(deleteLater()) );
             connect(this, SIGNAL(operate( QWidget *, indexes)), worker,
                           SLOT(getFromArchive(QWidget *, indexes)));
-            connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>, QString)), this,
-                            SLOT(handleResults(indexes, int, QVector<double>, QVector<double>, QString)));
+            connect(worker, SIGNAL(resultReady(indexes, int, QVector<float>, QVector<float>, QString)), this,
+                            SLOT(handleResults(indexes, int, QVector<float>, QVector<float>, QString)));
             tmpThread->start();
 
             //qDebug() << "HIPA emit operate";
@@ -109,7 +109,7 @@ void ArchiveHIPA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOf
    // qDebug() << "-------------------- ArchiveHIPA_Plugin::Callback_UpdateInterface finish";
 }
 
-void ArchiveHIPA_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN,  QString backend)
+void ArchiveHIPA_Plugin::handleResults(indexes indexNew, int nbVal, QVector<float> TimerN, QVector<float> YValsN,  QString backend)
 {
     //qDebug() << "in HIPA handle results" << nbVal << TimerN.count();
     if(nbVal > 0 && nbVal < TimerN.count()) {

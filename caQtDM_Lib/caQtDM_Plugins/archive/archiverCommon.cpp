@@ -27,6 +27,9 @@
 #include <QApplication>
 #include "archiverCommon.h"
 
+#define SECONDSSLEEP 3600       // 1 hour
+#define SECONDSTIMEOUT 60.5     // 1 minute
+
 // constructor
 ArchiverCommon::ArchiverCommon()
 {
@@ -48,8 +51,6 @@ void ArchiverCommon::updateInterface()
     QMap<QString, indexes> listOfIndexesToBeExecuted;
     listOfIndexesToBeExecuted.clear();
 
-    //qDebug() << "ArchiverCommon::updateInterface";
-
     QMutexLocker locker(&mutex);
 
     // after first start, set timer to wanted period
@@ -69,6 +70,7 @@ void ArchiverCommon::updateInterface()
         diff = ((double) now.time + (double) now.millitm / (double)1000) -
                ((double) indexNew.lastUpdateTime.time + (double) indexNew.lastUpdateTime.millitm / (double)1000);
         // is it time to update ?
+        //qDebug() << i.key() << diff << indexNew.updateSeconds;
         if(diff >= indexNew.updateSeconds) {
             ftime(&indexNew.lastUpdateTime);
             listOfIndexes.insert(i.key(), indexNew);
@@ -142,14 +144,23 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
             index.secondsPast = 3600;
         }
 
+
         var = w->property("secondsUpdate");
         if(!var.isNull()) {
             index.updateSeconds = var.toInt();
+
+            // override the user specification if too many data are going to be requested
+            if(index.secondsPast > 14400) index.updateSeconds = 120;
+            else if(index.secondsPast > 7200) index.updateSeconds = 60;
+            else if(index.secondsPast > 3600) index.updateSeconds = 30;
+
         } else{
-            QString mess("Archive plugin -- no secondsUpdate defined as dynamic property in widget " + QString(kData->dispName) + ", default to 10 seconds update");
+            QString mess("Archive plugin -- no secondsUpdate defined as dynamic property in widget " + QString(kData->dispName) + ", default to 60 seconds update");
             if(messagewindowP != (MessageWindow *) 0 && !QString(kData->pv).contains(".Y")) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
-            index.updateSeconds = 10;
+            index.updateSeconds = SECONDSTIMEOUT;
         }
+        if(index.updateSeconds < 10) index.updateSeconds = 10;
+        index.updateSecondsOrig = index.updateSeconds;
 
         index.init = true;
         index.key = key;
@@ -171,7 +182,12 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
                 if(kData->specData[2] == caCartesianPlot::CH_X) indexNew.indexX = kData->index;
                 else if(kData->specData[2] == caCartesianPlot::CH_Y) indexNew.indexY = kData->index;
                 //qDebug() << "indexes x and y" << indexNew.indexX << indexNew.indexY;
+
+                if (kData->edata.info != (void *) 0) free(kData->edata.info);
+                kData->edata.info = (char *) malloc(sizeof (asc));
+                memcpy(kData->edata.info, qasc(key), sizeof(asc));
                 indexNew.lastUpdateTime.time = 0;
+                //ftime(&indexNew.lastUpdateTime);
                 listOfIndexes.insert(key, indexNew);
                 break;
             }
@@ -185,7 +201,30 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
     return true;
 }
 
-void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double> TimerN, QVector<double> YValsN, QString backend)
+void ArchiverCommon::updateSecondsPast(indexes indexNew, bool original)
+{
+    QMutexLocker locker(&mutex);
+    QString key = indexNew.key;
+    QMap<QString, indexes>::iterator i = listOfIndexes.find(key);
+    while (i !=listOfIndexes.end() && i.key() == key) {
+        indexes indexNew = i.value();
+        if(original) {
+            if(indexNew.updateSeconds != indexNew.updateSecondsOrig) {
+                //qDebug() << "resume original timing " << indexNew.updateSecondsOrig << " for" << indexNew.pv;
+                indexNew.updateSeconds = indexNew.updateSecondsOrig;
+                listOfIndexes.insert(key, indexNew);
+            }
+        } else if(indexNew.updateSeconds < SECONDSTIMEOUT) {
+            //qDebug() << "set new timing " <<  SECONDSTIMEOUT << " for" << indexNew.pv;
+            indexNew.updateSeconds = SECONDSTIMEOUT;
+            ftime(&indexNew.lastUpdateTime);
+            listOfIndexes.insert(key, indexNew);
+        }
+        break;
+    }
+}
+
+void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<float> TimerN, QVector<float> YValsN, QString backend)
 {
     QMutexLocker locker(&mutex);
     //qDebug() << "ArchiverCommon::updateCartesian";
@@ -193,18 +232,18 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double
         knobData kData = mutexknobdataP->GetMutexKnobData(indexNew.indexX);
         if(kData.index == -1) return;
         mutexknobdataP->DataLock(&kData);
-        kData.edata.fieldtype = caDOUBLE;
+        kData.edata.fieldtype = caFLOAT;
         kData.edata.connected = true;
         kData.edata.accessR = kData.edata.accessW = true;
         kData.edata.monitorCount++;
         strcpy(kData.edata.fec, qasc(backend));
 
-        if((nbVal * sizeof(double)) > (size_t) kData.edata.dataSize) {
+        if((nbVal * sizeof(float)) > (size_t) kData.edata.dataSize) {
             if(kData.edata.dataB != (void*) 0) free(kData.edata.dataB);
-            kData.edata.dataB = (void*) malloc(nbVal * sizeof(double));
-            kData.edata.dataSize = nbVal * sizeof(double);
+            kData.edata.dataB = (void*) malloc(nbVal * sizeof(float));
+            kData.edata.dataSize = nbVal * sizeof(float);
         }
-        memcpy(kData.edata.dataB, &TimerN[0],  nbVal * sizeof(double));
+        memcpy(kData.edata.dataB, &TimerN[0],  nbVal * sizeof(float));
         kData.edata.valueCount = nbVal;
         mutexknobdataP->SetMutexKnobDataReceived(&kData);
         mutexknobdataP->DataUnlock(&kData);
@@ -212,18 +251,18 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double
         kData = mutexknobdataP->GetMutexKnobData(indexNew.indexY);
         if(kData.index == -1) return;
         mutexknobdataP->DataLock(&kData);
-        kData.edata.fieldtype = caDOUBLE;
+        kData.edata.fieldtype = caFLOAT;
         kData.edata.connected = true;
         kData.edata.accessR = kData.edata.accessW = true;
         kData.edata.monitorCount++;
         strcpy(kData.edata.fec, qasc(backend));
 
-        if((nbVal * sizeof(double)) > (size_t) kData.edata.dataSize) {
+        if((nbVal * sizeof(float)) > (size_t) kData.edata.dataSize) {
             if(kData.edata.dataB != (void*) 0) free(kData.edata.dataB);
-            kData.edata.dataB = (void*) malloc(nbVal * sizeof(double));
-            kData.edata.dataSize = nbVal * sizeof(double);
+            kData.edata.dataB = (void*) malloc(nbVal * sizeof(float));
+            kData.edata.dataSize = nbVal * sizeof(float);
         }
-        memcpy(kData.edata.dataB, &YValsN[0],  nbVal * sizeof(double));
+        memcpy(kData.edata.dataB, &YValsN[0],  nbVal * sizeof(float));
 
         kData.edata.valueCount = nbVal;
         mutexknobdataP->SetMutexKnobDataReceived(&kData);
@@ -286,6 +325,55 @@ int ArchiverCommon::pvFreeAllocatedData(knobData *kData)
     if(kData->edata.dataB != (void*) 0) {
         free(kData->edata.dataB);
         kData->edata.dataB = (void*) 0;
+    }
+    return true;
+}
+
+int ArchiverCommon::pvClearEvent(void * ptr)
+{
+    char asc[CHAR_ARRAY_LENGTH];
+    //qDebug() << "clear event" << ptr;
+
+    QMutexLocker locker(&mutex);
+
+    memcpy(asc, ptr, sizeof(asc));
+    QString key = QString(asc);
+
+    QMap<QString, indexes>::iterator i = listOfIndexes.find(key);
+    while (i !=listOfIndexes.end() && i.key() == key) {
+        indexes indexNew = i.value();
+        if(indexNew.updateSeconds != SECONDSSLEEP) {
+            //qDebug() << "update" << indexNew.pv << "to " << SECONDSSLEEP << "seconds";
+            indexNew.updateSeconds = SECONDSSLEEP;
+            ftime(&indexNew.lastUpdateTime);
+            listOfIndexes.insert(key, indexNew);
+        }
+        break;
+    }
+
+    return true;
+}
+
+int ArchiverCommon::pvAddEvent(void * ptr)
+{
+    char asc[CHAR_ARRAY_LENGTH];
+    //qDebug() << "add event" << ptr;
+    QMutexLocker locker(&mutex);
+
+    memcpy(asc, ptr, sizeof(asc));
+    QString key = QString(asc);
+
+    QMap<QString, indexes>::iterator i = listOfIndexes.find(key);
+    while (i !=listOfIndexes.end() && i.key() == key) {
+        indexes indexNew = i.value();
+        if(indexNew.updateSeconds != indexNew.updateSecondsOrig) {
+            if(indexNew.updateSeconds != SECONDSTIMEOUT) {
+              //qDebug() << "update" << indexNew.pv << "to" << indexNew.updateSecondsOrig << "seconds";
+              indexNew.updateSeconds = indexNew.updateSecondsOrig;
+              listOfIndexes.insert(key, indexNew);
+            }
+        }
+        break;
     }
     return true;
 }

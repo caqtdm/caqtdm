@@ -47,7 +47,7 @@ public:
     WorkerSF() {
         //qDebug() << "WorkerSF::WorkerSF()";
         qRegisterMetaType<indexes>("indexes");
-        qRegisterMetaType<QVector<double> >("QVector<double>");
+        qRegisterMetaType<QVector<float> >("QVector<float>");
         fromArchive =  (sfRetrieval *)0;
     }
 
@@ -56,7 +56,7 @@ public:
     }
 
 private:
-    QVector<double>  TimerN, YValsN;
+    QVector<float>  TimerN, YValsN;
 
 public slots:
 
@@ -107,8 +107,9 @@ public slots:
             isBinned = true;
             agg = tr(", 'aggregation': {'aggregationType':'value', 'aggregations':['min','mean','max'], 'nrOfBins' : %1}").arg(indexNew.nrOfBins);
         } else {
-            isBinned = false;
-            agg = "";
+            isBinned = true;
+            agg = ", 'aggregation': {'aggregationType':'value', 'aggregations':['min','mean','max'], 'durationPerBin' : 'PT1S'}";
+            //agg = "";
         }
         QString total = "{" + response + "," + range + "," + channels + "," + fields + agg + "}";
         total = total.replace("'", "\"");
@@ -122,7 +123,7 @@ public slots:
             if(w->getXaxisType() == caCartesianPlot::time) timeAxis = true;
         }
 
-        if(fromArchive->requestUrl(url, json_str, indexNew.secondsPast, isBinned, timeAxis)) {
+        if(fromArchive->requestUrl(url, json_str, indexNew.secondsPast, isBinned, timeAxis, key)) {
             if((nbVal = fromArchive->getCount()) > 0) {
                 //qDebug() << nbVal << total;
                 TimerN.resize(fromArchive->getCount());
@@ -144,7 +145,7 @@ public slots:
             }
         }
 
-        //qDebug() << "number of values received" << nbVal << fromArchive;
+        //qDebug() << QTime::currentTime().toString() << "number of values received" << nbVal << fromArchive << "for" << key;
 
         emit resultReady(indexNew, nbVal, TimerN, YValsN, fromArchive->getBackend());
 
@@ -154,7 +155,7 @@ public slots:
     }
 
 signals:
-    void resultReady(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend);
+    void resultReady(indexes indexNew, int nbVal, QVector<float> TimerN, QVector<float> YValsN, QString backend);
 
 public:
 
@@ -221,7 +222,7 @@ public:
     int TerminateIO();
 
 public slots:
-    void handleResults(indexes, int, QVector<double>, QVector<double>, QString);
+    void handleResults(indexes, int, QVector<float>, QVector<float>, QString);
 
 signals:
     void operate(QWidget*, const indexes, const QString, MessageWindow *);

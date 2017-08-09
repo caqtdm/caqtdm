@@ -50,6 +50,7 @@ MessageWindow::MessageWindow(QWidget* parent) : QDockWidget(parent)
     setFeatures(QDockWidget::NoDockWidgetFeatures);
     setWindowTitle(tr(WINDOW_TITLE));
     msgTextEdit.setReadOnly(true);
+    msgTextEdit.document()->setMaximumBlockCount(400);
     setWidget(&msgTextEdit);
     MessageWindow::MsgHandler = this;
     setMinimumSize(600, 150);
