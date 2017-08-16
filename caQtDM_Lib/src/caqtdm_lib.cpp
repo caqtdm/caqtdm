@@ -935,7 +935,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
     QString pv;
 
     QString className(w1->metaObject()->className());
-    if(!className.contains("ca") && !className.contains("QTextBrowser") && !className.contains("replaceMacro") && !className.contains("QE")) return;
+    if(!className.contains("ca") && !className.contains("QTextBrowser") && !className.contains("replaceMacro") &&
+            !className.contains("QE") && !className.contains("QTabWidget")) return;
 
     int nbMonitors = 0;
 
@@ -948,7 +949,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
     //qDebug() << w1->metaObject()->className() << w1->objectName();
 
-    if(className.contains("ca") || className.contains("QTextBrowser") || className.contains("replaceMacro")) {
+    if(className.contains("ca") || className.contains("QTextBrowser") || className.contains("replaceMacro") || className.contains("QTabWidget")) {
         PRINT(printf("\n%*c %s macro=<%s>", 15 * level, '+', qasc(w1->objectName()), qasc(macro)));
         map = createMap(macro);
     }
@@ -1062,9 +1063,17 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         nbMonitors = 1; // assume at least one monitor;
     }
 
+    // not a ca widget, but offer the possibility to change the tab text by using macros
+    //==================================================================================================================
+    if(QTabWidget* tabWidget = qobject_cast<QTabWidget *>(w1)) {
+        for(int i=0; i< tabWidget->count(); i++) {
+            QString text =  tabWidget->tabText(i);
+            if(reaffectText(map, &text)) tabWidget->setTabText(i, text);
+        }
+
     // not a ca widget, but offer the possibility to load files into the text browser by using macros
     //==================================================================================================================
-    if(QTextBrowser* browserWidget = qobject_cast<QTextBrowser *>(w1)) {
+    } else if(QTextBrowser* browserWidget = qobject_cast<QTextBrowser *>(w1)) {
 
         //qDebug() << "create QTextBrowser";
 
