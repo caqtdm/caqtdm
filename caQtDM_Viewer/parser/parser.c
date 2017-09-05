@@ -1534,9 +1534,9 @@ void *parseRelatedDisplay(DisplayInfo *displayInfo, FrameOffset * offset)
                 getToken(displayInfo,token);
                 getToken(displayInfo,token);
                 if(!strcmp(token,"a row of buttons")) {
-                    strcpy(visual, "Row");
-                } else if(!strcmp(token,"a column of buttons")) {
                     strcpy(visual, "Column");
+                } else if(!strcmp(token,"a column of buttons")) {
+                    strcpy(visual, "Row");
                 } else if(!strcmp(token, "invisible")) {
                     strcpy(visual, "Hidden");
                 }
