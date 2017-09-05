@@ -192,6 +192,8 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     Specials specials;
     OptionList = options;
 
+    caQtDM_TimeOutEnabled = false;
+
     qDebug() <<  "caQtDM -- desktop size:" << qApp->desktop()->size();
 
     // Set Window Title without the whole path
@@ -485,7 +487,6 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     // we want to be able to exit caQtDM after some amount of time (defined by an environment variable), while many displays are normally started at PSI on a central computer
     // and never terminated by the used (comes mainly from NX where a session can be closed without closing the applications)
     QString timeoutHours = (QString)  qgetenv("CAQTDM_TIMEOUT_HOURS");
-    caQtDM_TimeOutEnabled = false;
     if(timeoutHours.length() > 0) {
         bool ok;
         QString displayTimeOut="Info: timeout of caQtDM defined in hours: ";
