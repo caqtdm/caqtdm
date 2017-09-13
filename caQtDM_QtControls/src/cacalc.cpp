@@ -123,11 +123,25 @@ void caCalc::setTextLine(const QString &txt)
     keepText = txt;
 }
 
+void caCalc::setBackground(QColor c)
+{
+    m_BackColor = c;
+    setForeAndBackground(m_ForeColor, m_BackColor);
+}
+
+void caCalc::setForeground(QColor c)
+{
+    m_ForeColor = c;
+    setForeAndBackground(m_ForeColor, m_BackColor);
+}
+
 void caCalc::setForeAndBackground(QColor fg, QColor bg)
 {
-    QString thisStyle = "background-color: rgb(%1, %2, %3); color: rgb(%4, %5, %6);";
-    thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).
-            arg(fg.red()).arg(fg.green()).arg(fg.blue());
+    m_ForeColor = fg;
+    m_BackColor = bg;
+    QString thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
+    thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
+            arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
 
     setStyleSheet(thisStyle);
 }

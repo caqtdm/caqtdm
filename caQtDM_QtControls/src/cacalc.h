@@ -39,6 +39,10 @@ class  QTCON_EXPORT caCalc : public  ESimpleLabel
     Q_PROPERTY(QString variable READ getVariable WRITE setVariable)
 
     Q_PROPERTY(varType variableType READ getVariableType WRITE setVariableType)
+
+    Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
+    Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
+
     Q_PROPERTY(QStringList channelList READ getPVList WRITE setPVList DESIGNABLE isPropertyVisible(pvlist) STORED false )
     Q_PROPERTY(QString channels READ getPV WRITE setPV DESIGNABLE inactiveButVisible())
 
@@ -110,6 +114,12 @@ public:
 
     double getValue() { return thisValue;}
 
+    QColor getForeground() const {return m_ForeColor;}
+    void setForeground(QColor c);
+
+    QColor getBackground() const {return m_BackColor;}
+    void setBackground(QColor c);
+
 public slots:
     void animation(QRect p) {
 #include "animationcode.h"
@@ -133,6 +143,8 @@ private:
     QStringList	thisPV;
     bool designerVisible[10];
     varType thisVarType;
+    QColor m_ForeColor;
+    QColor m_BackColor;
 };
 
 #endif // CACALC_H
