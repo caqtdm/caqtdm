@@ -84,6 +84,7 @@ bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int seconds
     QNetworkRequest *request = new QNetworkRequest(url);
 
     //for https we need some configuration (with no verify socket)
+#ifndef CAQTDM_SSL_IGNORE
 #ifndef QT_NO_SSL
     if(url.toString().toUpper().contains("HTTPS")) {
         QSslConfiguration config = request->sslConfiguration();
@@ -91,6 +92,8 @@ bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int seconds
         request->setSslConfiguration(config);
     }
 #endif
+#endif
+
     request->setRawHeader("Content-Type", "application/json");
     request->setRawHeader("Timeout", "86400");
 

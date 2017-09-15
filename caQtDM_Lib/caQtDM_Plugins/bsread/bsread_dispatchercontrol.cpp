@@ -84,6 +84,7 @@ void bsread_dispatchercontrol::process()
         QUrl url(StreamDispatcher);
         requestChannel = QNetworkRequest(url);
         requestDelete  = QNetworkRequest(url);
+#ifndef CAQTDM_SSL_IGNORE
 #ifndef QT_NO_SSL
     if(url.toString().toUpper().contains("HTTPS")) {
         QSslConfiguration configChannel = requestChannel.sslConfiguration();
@@ -96,7 +97,7 @@ void bsread_dispatchercontrol::process()
     }
 
 #endif
-
+#endif
 
     if (!ChannelsAddPipeline.isEmpty()){
         ChannelVerification(&manager);
@@ -531,12 +532,14 @@ void bsread_dispatchercontrol::ChannelVerification(QNetworkAccessManager* manage
 
     QUrl url(ChannelQueryVerification);
     requestVerification = QNetworkRequest(url);
+#ifndef CAQTDM_SSL_IGNORE
 #ifndef QT_NO_SSL
     if(url.toString().toUpper().contains("HTTPS")) {
         QSslConfiguration configChannel = requestVerification.sslConfiguration();
         configChannel.setPeerVerifyMode(QSslSocket::VerifyNone);
         requestVerification.setSslConfiguration(configChannel);
     }
+#endif
 #endif
 
     QString data="{\"channels\":[ ";
