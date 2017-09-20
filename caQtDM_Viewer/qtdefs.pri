@@ -192,6 +192,16 @@ DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
+# 4.1.6 of 7.9.2017
+# last index in array was not taken into account and scale was not updated for the wareerfallplot
+# optimization of archive plugins
+# added the possibility to update QtabWidget tab texts with a macro
+# changed padding for bigger fonts in carowcolmenu
+# added the possibility to modify colors of cacalc
+# resize storming of carowcolmenu solved
+# cascriptbutton got a property to hide the checkbox
+# QTextBrowser can now also display afile speicied with an url in the searchpath (see texts.ui)
+
 # 4.1.6 of 26.7.2017
 # a hide/show slot has been added to the ca widgets
 # the wmsignalpropagator got signals to propagate the resizing factor of a window. this can be used in order to correct animations with absolute pixel positions.

@@ -120,7 +120,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: rgb(0,0,120);}</string>
     </property>
     <property name="currentIndex">
-     <number>8</number>
+     <number>6</number>
     </property>
     <property name="usesScrollButtons">
      <bool>true</bool>
@@ -14484,6 +14484,29 @@ then see signals_2</string>
        <enum>caCalc::onAnyChange</enum>
       </property>
      </widget>
+     <widget class="wmSignalPropagator" name="wmsignalpropagator_5">
+      <property name="geometry">
+       <rect>
+        <x>628</x>
+        <y>159</y>
+        <width>70</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_3">
+      <property name="geometry">
+       <rect>
+        <x>612</x>
+        <y>98</y>
+        <width>159</width>
+        <height>29</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>maximize window</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_44">
      <attribute name="title">
@@ -15087,6 +15110,54 @@ then see signals_2</string>
     </property>
     <property name="files">
      <string notr="true">http://epics.web.psi.ch/software/caqtdm/qtDir/Help/MEDM.html</string>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_51">
+    <property name="geometry">
+     <rect>
+      <x>539</x>
+      <y>5</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="margin">
+     <number>1</number>
+    </property>
+    <property name="variable">
+     <string notr="true">tab</string>
+    </property>
+    <property name="calc">
+     <string notr="true">A=0?$(index):0</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">tab</string>
+    </property>
+    <property name="precision">
+     <number>0</number>
+    </property>
+    <property name="eventSignal">
+     <enum>caCalc::onFirstChange</enum>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_73">
+    <property name="geometry">
+     <rect>
+      <x>246</x>
+      <y>1</y>
+      <width>270</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>set tab currentindex by an external macro (index):</string>
+    </property>
+    <property name="foreground">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>127</blue>
+     </color>
     </property>
    </widget>
   </widget>
@@ -15844,6 +15915,54 @@ then see signals_2</string>
     <hint type="destinationlabel">
      <x>145</x>
      <y>217</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_3</sender>
+   <signal>clicked()</signal>
+   <receiver>wmsignalpropagator_5</receiver>
+   <slot>showmaximized()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>703</x>
+     <y>201</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>703</x>
+     <y>257</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>wmsignalpropagator_5</sender>
+   <signal>wmShowMaximized()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>showMaximized()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>679</x>
+     <y>263</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>687</x>
+     <y>29</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_51</sender>
+   <signal>emitSignal(int)</signal>
+   <receiver>tabWidget_2</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>571</x>
+     <y>38</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>573</x>
+     <y>63</y>
     </hint>
    </hints>
   </connection>
