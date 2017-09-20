@@ -61,8 +61,8 @@ void ImagePushButton::setInVisible(QColor bg, QColor fg, QColor bc) {
 }
 
 void ImagePushButton::resizeEvent(QResizeEvent *e) {
-    QSize size = e->size();
-    setGeometry(0, 0, size.width(), size.height());
+    //QSize size = e->size();
+    //setGeometry(0, 0, size.width(), size.height());
     EPushButton::resizeEvent(e);
 }
 
