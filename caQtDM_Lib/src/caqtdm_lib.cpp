@@ -1090,6 +1090,42 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 #else
             watcher->addPath(fileName);
 #endif
+        // we could also look at the searchpath, perhaps there is an url we want to get
+        } else {
+
+            QList<QString> list = browserWidget->searchPaths();
+            //when the file name has a url form then get the file from a website
+            if(list.count() > 0 && list.at(0).contains("http")) {
+                QUrl url = QUrl::fromUserInput(list.at(0));
+                 if (!url.isValid()) {
+                      qDebug() << QString("Invalid URL: %1").arg(url.toString());
+                 // try to load from that url
+                 } else {
+                     fileFunctions filefunction;
+                     QList<QString> elements = url.path().split("/");
+                     fileName = elements.last();
+                     QString Url = url.toString();
+                     Url.remove(fileName);
+                     // first try to remove the file from the temporary cache directoy
+                     Specials specials;
+                     QString path = specials.getStdPath();
+                     path.append("/");
+                     QDir dir(path);
+                     dir.remove(fileName);
+
+                     // try to download the file
+                     filefunction.checkFileAndDownload(fileName, Url);
+                     if(messageWindowP != (MessageWindow *) 0) {
+                         if(filefunction.lastInfo().length() > 0) messageWindowP->postMsgEvent(QtWarningMsg, (char*) qasc(filefunction.lastInfo()));
+                         if(filefunction.lastError().length() > 0)  messageWindowP->postMsgEvent(QtCriticalMsg, (char*) qasc(filefunction.lastError()));
+                     }
+                     searchFile *s = new searchFile(fileName);
+                     QString fileNameFound = s->findFile();
+                     if(!fileNameFound.isNull()) {
+                         browserWidget->setSource(fileNameFound);
+                     }
+                 }
+            }
         }
         browserWidget->setProperty("Taken", true);
 
@@ -2767,7 +2803,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
     // make a context menu for object having a monitor
     //if(className.contains("ca") && !className.contains("caRel") && !className.contains("caTable") && !className.contains("caShellCommand") && nbMonitors > 0) {
-    if((className.contains("ca") && !className.contains("caTable") && !className.contains("caShellCommand") && nbMonitors > 0) || className.contains("caRel")) {
+    if((className.contains("ca") && !className.contains("caTable") && !className.contains("caShellCommand") && nbMonitors > 0) || className.contains("caRel") ||
+            className.contains("caScript")) {
 
         w1->setContextMenuPolicy(Qt::CustomContextMenu);
         connect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
@@ -5483,7 +5520,7 @@ void CaQtDM_Lib::Callback_ScriptButton()
         processWindow *t = new processWindow(this, displayWindow, w);
         connect(t, SIGNAL(processClose()), this, SLOT(processTerminated()));
         t->start(command);
-        w->setToolTip("process running, to kill use right mouse button !");
+        w->setToolTip("process running, to kill use right mouse button");
         w->setAccessW(false);
         w->setProcess(t);
     }
@@ -5503,7 +5540,10 @@ void CaQtDM_Lib::processTerminated()
         w->setEnabled(true);
     }
 
-    if(t != (processWindow *) 0) t->deleteLater();
+    if(t != (processWindow *) 0) {
+        w1->setProcess((void*) 0);
+        t->deleteLater();
+    }
 #endif
 }
 
@@ -5916,7 +5956,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
     } else if(caScriptButton* scriptbuttonWidget =  qobject_cast< caScriptButton *>(w)) {
         // add action : kill associated process if running
-        if(!scriptbuttonWidget->getAccessW()) myMenu.addAction(KILLPROCESS);
+        myMenu.addAction(KILLPROCESS);
 
     } else if(caMimeDisplay* mimeWidget = qobject_cast<caMimeDisplay *>(w)) {
         urlStrings = mimeWidget->getFilesList();
@@ -6033,7 +6073,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             if(caScriptButton* scriptbuttonWidget =  qobject_cast< caScriptButton *>(w)) {
 #ifndef MOBILE
                 processWindow *t= (processWindow *) scriptbuttonWidget->getProcess();
-                t->tryTerminate();
+                if(t != (processWindow *) 0) t->tryTerminate();
 #else
                 Q_UNUSED(scriptbuttonWidget);
 #endif
@@ -7802,7 +7842,8 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 !className.contains("QRubberBand")  &&
                 !className.contains("Qwt")    &&
                 !className.contains("QWidget")    &&
-                (className.contains("ca") || className.contains("Q") || className.contains("Line") || !className.compare("wmSignalPropagator"))
+                (className.contains("ca") || className.contains("Q") || className.contains("Line") || !className.compare("wmSignalPropagator") ||
+                 className.compare("replacemacro"))
                 ) {
             QWidget *w = (QWidget*) widget->parent();
             // if this widget is managed by a layout, do not do anything

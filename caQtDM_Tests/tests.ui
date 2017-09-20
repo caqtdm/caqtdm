@@ -120,7 +120,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: rgb(0,0,120);}</string>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>8</number>
     </property>
     <property name="usesScrollButtons">
      <bool>true</bool>
@@ -2572,7 +2572,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>8</number>
+       <number>13</number>
       </property>
       <property name="usesScrollButtons">
        <bool>true</bool>
@@ -9911,7 +9911,7 @@ def PythonCalc(a, b, c, d):
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
@@ -14541,6 +14541,27 @@ then see signals_2</string>
        </url>
       </property>
      </widget>
+     <widget class="QTextBrowser" name="textBrowser_2">
+      <property name="geometry">
+       <rect>
+        <x>485</x>
+        <y>49</y>
+        <width>567</width>
+        <height>552</height>
+       </rect>
+      </property>
+      <property name="overwriteMode">
+       <bool>false</bool>
+      </property>
+      <property name="searchPaths">
+       <stringlist>
+        <string>http://epics.web.psi.ch/software/caqtdm/caqtdm.html</string>
+       </stringlist>
+      </property>
+      <property name="openExternalLinks">
+       <bool>true</bool>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_36">
      <attribute name="title">
@@ -15823,38 +15844,6 @@ then see signals_2</string>
     <hint type="destinationlabel">
      <x>145</x>
      <y>217</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>wmsignalpropagator_4</sender>
-   <signal>wmFactorX(double)</signal>
-   <receiver>cacalc_35</receiver>
-   <slot>setValue(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>486</x>
-     <y>512</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>455</x>
-     <y>482</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>wmsignalpropagator_4</sender>
-   <signal>wmFactorY(double)</signal>
-   <receiver>cacalc_36</receiver>
-   <slot>setValue(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>516</x>
-     <y>515</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>554</x>
-     <y>476</y>
     </hint>
    </hints>
   </connection>
