@@ -58,6 +58,8 @@ caScriptButton::caScriptButton(QWidget *parent) : QWidget(parent)
     setAccessW(true);
 
     setElevation(on_top);
+
+    setCheckboxDisplay(true);
 }
 
 void caScriptButton::buttonToggled()

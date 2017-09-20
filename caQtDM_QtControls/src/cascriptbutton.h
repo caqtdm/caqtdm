@@ -47,6 +47,8 @@ class QTCON_EXPORT caScriptButton : public QWidget
 
     Q_PROPERTY(defaultDisplay scriptDisplay READ getScriptDisplay WRITE setScriptDisplay)
 
+    Q_PROPERTY(bool checkBoxVisible READ getCheckboxDisplay WRITE setCheckboxDisplay)
+
     Q_PROPERTY(QString scriptCommand READ getScriptCommand WRITE setScriptCommand)
     Q_PROPERTY(QString scriptParameter READ getScriptParam WRITE setScriptParam)
 
@@ -86,6 +88,9 @@ public:
 
     void setScriptDisplay(defaultDisplay m);
     defaultDisplay getScriptDisplay() {return  thisDefaultDisplay;}
+
+    void setCheckboxDisplay(bool m) {thisCheckboxDisplay = m; displayScript->setHidden(!m);}
+    bool getCheckboxDisplay() {return  thisCheckboxDisplay;}
 
     bool getAccessW() const {return _AccessW;}
     void setAccessW(bool access) {_AccessW = access;}
@@ -135,6 +140,7 @@ private:
 
      bool _AccessW;
      void *thisProcess;
+     bool thisCheckboxDisplay;
 };
 
 #endif
