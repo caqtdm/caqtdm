@@ -230,7 +230,7 @@ void caRowColMenu::setForeground(QColor c)
 
 void caRowColMenu::resizeEvent(QResizeEvent *e)
 {
-    Q_UNUSED(e);
+    if( (qAbs(e->size().width() - e->oldSize().width()) > 1) || (qAbs(e->size().height() - e->oldSize().height()) > 1))
     populateCells();
 }
 

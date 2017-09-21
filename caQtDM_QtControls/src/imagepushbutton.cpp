@@ -61,15 +61,13 @@ void ImagePushButton::setInVisible(QColor bg, QColor fg, QColor bc) {
 }
 
 void ImagePushButton::resizeEvent(QResizeEvent *e) {
-    //QSize size = e->size();
-    //setGeometry(0, 0, size.width(), size.height());
     EPushButton::resizeEvent(e);
 }
 
 void ImagePushButton::paintEvent( QPaintEvent* event) {
-
     int x, y, w, h;
     EPushButton::paintEvent(event);
+
     QPainter p(this);
 
     p.setRenderHint( QPainter::Antialiasing );
