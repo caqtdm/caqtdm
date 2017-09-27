@@ -191,11 +191,13 @@ void caRowColMenu::setImage(QString const &image) {
 void caRowColMenu::setStacking(Stacking stacking)
 {
     thisStacking = stacking;
-
+/*
     // force resize for repainting
     QResizeEvent *re = new QResizeEvent(size(), size());
     resizeEvent(re);
     delete re;
+*/
+     populateCells();
 }
 
 void  caRowColMenu::setLabels(QString const &newL)
@@ -230,8 +232,8 @@ void caRowColMenu::setForeground(QColor c)
 
 void caRowColMenu::resizeEvent(QResizeEvent *e)
 {
-    if( (qAbs(e->size().width() - e->oldSize().width()) > 1) || (qAbs(e->size().height() - e->oldSize().height()) > 1))
-    populateCells();
+    Q_UNUSED(e);
+    //populateCells();
 }
 
 void caRowColMenu::setFontScaleModeL(EPushButton::ScaleMode m)
