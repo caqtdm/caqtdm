@@ -213,8 +213,17 @@ void limitsCartesianplotDialog::applyClicked()
     QString xLimits, yLimits;
     QString xmin, xmax,  ymin, ymax;
     QStringList list;
-    int indx = xComboBox->currentIndex();
-    int indy = yComboBox->currentIndex();
+
+    int indx = XaxisType->currentIndex();
+    if(indx == 0) CartesianPlot->setXaxisType(caCartesianPlot::linear);
+    else if(indx == 1) CartesianPlot->setXaxisType(caCartesianPlot::log10);
+
+    int indy = YaxisType->currentIndex();
+    if(indy == 0) CartesianPlot->setYaxisType(caCartesianPlot::linear);
+    else if(indy == 1) CartesianPlot->setYaxisType(caCartesianPlot::log10);
+
+    indx = xComboBox->currentIndex();
+    indy = yComboBox->currentIndex();
 
     xmin = xminLineEdit->text().trimmed();
     (void) xmin.toDouble(&ok1);
@@ -245,16 +254,17 @@ void limitsCartesianplotDialog::applyClicked()
     // set x scale
     if(indx == 0) { // auto
         CartesianPlot->setXscaling(caCartesianPlot::Auto);
+        qDebug() << "set xlimits to auto";
     } else if(indx == 1) { // channel
         CartesianPlot->setXscaling(caCartesianPlot::Channel);
-
+        qDebug() << "set xlimits to channel";
         QString pvs = CartesianPlot->getPV(0);
         QStringList vars = pvs.split(";");
         if((vars.size()== 2) || (vars.at(0).trimmed().length() > 0)) {
             knobData *kPtr = monData->getMutexKnobDataPV(CartesianPlot, vars.at(0).trimmed());
              if(kPtr != (knobData*) 0) {
                 if(kPtr->edata.lower_disp_limit != kPtr->edata.upper_disp_limit) {
-                    //qDebug() << "set to channel limits" << kPtr->edata.lower_disp_limit << kPtr->edata.upper_disp_limit;
+                    qDebug() << "set to channel limits" << kPtr->edata.lower_disp_limit << kPtr->edata.upper_disp_limit;
                     CartesianPlot->setScaleX(kPtr->edata.lower_disp_limit, kPtr->edata.upper_disp_limit);
                 } else {
                     //qDebug() << "set to auto";
@@ -265,7 +275,7 @@ void limitsCartesianplotDialog::applyClicked()
 
     } else if(indx == 2) { // user
         CartesianPlot->setXscaling(caCartesianPlot::User);
-        //qDebug() << "set xlimits to" << xLimits;
+        qDebug() << "set xlimits to" << xLimits;
         CartesianPlot->setXaxisLimits(xLimits);
     }
 
@@ -291,20 +301,13 @@ void limitsCartesianplotDialog::applyClicked()
         }
     } else if(indy == 2) { // user
         CartesianPlot->setYscaling(caCartesianPlot::User);
-        //qDebug() << "set ylimits to" << yLimits;
+        qDebug() << "set ylimits to" << yLimits;
         CartesianPlot->setYaxisLimits(yLimits);
     }
 
     CartesianPlot->setXaxisEnabled(xCheckBox->isChecked());
     CartesianPlot->setYaxisEnabled(yCheckBox->isChecked());
-
-    indx = XaxisType->currentIndex();
-    if(indx == 0) CartesianPlot->setXaxisType(caCartesianPlot::linear);
-    else if(indx == 1) CartesianPlot->setXaxisType(caCartesianPlot::log10);
-
-    indx = YaxisType->currentIndex();
-    if(indx == 0) CartesianPlot->setYaxisType(caCartesianPlot::linear);
-    else if(indx == 1) CartesianPlot->setYaxisType(caCartesianPlot::log10);
+    CartesianPlot->updateLegendsPV();
 }
 
 void limitsCartesianplotDialog::exec()

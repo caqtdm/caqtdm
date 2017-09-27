@@ -290,7 +290,7 @@ void caCartesianPlot::updateLegendsPV() {
                     curve[index].setTitle(PVS);
                 }
             }
-        }   
+        }
     }
 }
 
