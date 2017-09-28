@@ -2854,17 +2854,75 @@ void CaQtDM_Lib::updateTextBrowser()
 QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, bool *doNothing)
 {
     QString newText = text;
+    char asc[2048];
     *doNothing = false;
-
     // a macro exists and when pv contains a right syntax then replace pv
     if(!map.isEmpty()) {
         if(text.contains("$(") && text.contains(")")) {
+            // normal macroexchange
             QMapIterator<QString, QString> i(map);
             while (i.hasNext()) {
                 i.next();
                 QString toReplace = "$(" + i.key() + ")";
                 //qDebug() << "replace in" << newText << toReplace << "with" << i.value();
                 newText.replace(toReplace, i.value());
+            }
+            i.toFront();
+            if(newText.contains("$(")){
+                //qDebug() << "Spezial";
+                while (i.hasNext()) {
+                    i.next();
+                    QString tofind = "$(" + i.key();
+
+
+                    int position=newText.indexOf(tofind);
+                    //qDebug() << "position" <<position;
+                    if ((position>=0)&&(position<newText.length())){
+                        int json_start=position+tofind.length();
+                        int json_end  =newText.indexOf(QString("})"),json_start);
+
+                        //qDebug() << "newText.mid(): " << newText.mid(json_start,json_end-json_start+1);
+                        QString macro_regex="BlaBla";
+                        QString macro_value="BlaBla";
+
+                        JSONObject jsonobj;
+                        JSONValue *MacroDataJ = JSON::Parse(newText.mid(json_start,json_end-json_start+1).toStdString().c_str());
+                        if (MacroDataJ!=NULL){
+                            if(!MacroDataJ->IsObject()) {
+                                delete(MacroDataJ);
+                            } else {
+                                jsonobj=MacroDataJ->AsObject();
+                                if (jsonobj.find(L"regex") != jsonobj.end() && jsonobj[L"regex"]->IsString()) {
+                                    macro_regex=QString::fromWCharArray(jsonobj[L"regex"]->AsString().c_str());
+                                }
+
+                                if (jsonobj.find(L"value") != jsonobj.end() && jsonobj[L"value"]->IsString()) {
+                                    macro_value=QString::fromWCharArray(jsonobj[L"value"]->AsString().c_str());
+                                }
+                                delete(MacroDataJ);
+                            }
+                        }else{
+                            sprintf(asc, "JSON Error in (%s)", qasc(newText.mid(json_start,json_end-json_start+1)));
+                            postMessage(QtWarningMsg, asc);
+
+                        }
+                        QRegExp rx_json;
+                        rx_json.setPattern(macro_regex);
+                        if (rx_json.isValid()){
+                            QString ReplaceWith=i.value();
+                            ReplaceWith.replace(rx_json,macro_value);
+
+                            QString toReplace = "$(" + i.key() + newText.mid(json_start,json_end-json_start+1) + ")";
+                            //qDebug() << "replace in" << newText << toReplace << "with" << ReplaceWith << "outof " << macro_value;
+                            sprintf(asc, "Replace (%s) with (%s) Regex:(%s)", qasc(i.value()),qasc(macro_value),qasc(macro_regex));
+                            postMessage(QtDebugMsg, asc);
+
+                            newText.replace(toReplace, ReplaceWith);
+                        }
+
+                    }
+                }
+
             }
         }
     } else {
