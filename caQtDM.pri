@@ -656,7 +656,8 @@ caQtDM_Viewer {
 caQtDM_xdl2ui{
         CONFIG += console
         DEFINES += BUILDVERSION=\\\"$${CAQTDM_VERSION}\\\"
-        DEFINES += BUILDARCH=\\\"$$(QMAKESPEC)\\\"
+        C_QMAKESPEC = $$QMAKESPEC
+        DEFINES += BUILDARCH=\\\"$$replace(C_QMAKESPEC, \\\\, /)\\\"
 	unix:!macx {
                 message("adl2ui configuration unix!macx")
 		OBJECTS_DIR = obj
