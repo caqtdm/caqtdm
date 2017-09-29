@@ -389,8 +389,9 @@ caQtDM_Lib {
 }
 #==========================================================================================================
 caQtDM_Viewer {
+        C_QMAKESPEC = $$QMAKESPEC
         DEFINES += BUILDVERSION=\\\"$${CAQTDM_VERSION}\\\"
-        DEFINES += BUILDARCH=\\\"$$(QMAKESPEC)\\\"
+        DEFINES += BUILDARCH=\\\"$$replace(C_QMAKESPEC, \\\\, /)\\\"
         CONFIG += Define_Build_objDirs
         unix: {
                 message("caQtDM_viewer configuration : unix")
