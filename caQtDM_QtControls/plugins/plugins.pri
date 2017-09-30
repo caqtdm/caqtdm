@@ -39,22 +39,45 @@ win32 {
 	     LIBS += $$(QTCONTROLS_LIBS)/release/libqtcontrols.a
      }
      win32-msvc* {
-	     CONFIG(DebugBuild, DebugBuild|ReleaseBuild) { 
-                     INCLUDEPATH += $(QWTINCLUDE)
-		     LIBS += $$(QWTHOME)/lib/qwtd.lib
-		     LIBS += $(CAQTDM_COLLECT)/debug/qtcontrols.lib
-		     DESTDIR = $(CAQTDM_COLLECT)/debug/designer
-		     
+	     CONFIG += Define_Build_OutputDir
+	     INCLUDEPATH += $(QWTINCLUDE)
+	     DebugBuild { 
+                    LIBS += $$(QWTHOME)/lib/qwtd.lib
+		    LIBS += $(CAQTDM_COLLECT)/debug/qtcontrols.lib
 	     }
 
-	     CONFIG( ReleaseBuild, DebugBuild|ReleaseBuild) {
-	             INCLUDEPATH += $(QWTINCLUDE)
-		     LIBS += $$(QWTHOME)/lib/qwt.lib
+	     ReleaseBuild {
+	             LIBS += $$(QWTHOME)/lib/qwt.lib
 		     LIBS += $(CAQTDM_COLLECT)/qtcontrols.lib
-		     DESTDIR = $(CAQTDM_COLLECT)/designer
-		    
 	     }
      }  
+}
+
+Define_Build_OutputDir {
+   
+   win32 {
+        DebugBuild {
+            
+		caqtdm_dll.files = release/*.dll
+		caqtdm_dll.path = $$(CAQTDM_COLLECT)/designer/debug
+		caqtdm_lib.files = release/*.lib
+		caqtdm_lib.path = $$(CAQTDM_COLLECT)/designer/debug
+		caqtdm_exe.files = release/*.exe
+		caqtdm_exe.path = $$(CAQTDM_COLLECT)/designer/debug
+		INSTALLS += caqtdm_dll caqtdm_lib caqtdm_exe
+
+        }
+        ReleaseBuild {
+        	message("Plugin Release Installation")
+            	caqtdm_dll.files = release/*.dll
+            	caqtdm_dll.path = $$(CAQTDM_COLLECT)/designer
+		caqtdm_lib.files = release/*.lib
+		caqtdm_lib.path = $$(CAQTDM_COLLECT)/designer
+		caqtdm_exe.files = release/*.exe
+		caqtdm_exe.path = $$(CAQTDM_COLLECT)/designer
+		INSTALLS += caqtdm_dll caqtdm_lib caqtdm_exe
+        }
+    }
 }
 
 unix:!ios {

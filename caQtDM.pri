@@ -797,12 +797,27 @@ Define_Build_qtcontrols {
 }
 
 Define_Build_OutputDir {
-    win32 {
+   
+   win32 {
         DebugBuild {
-            DESTDIR = $$(CAQTDM_COLLECT)/debug
+            #DESTDIR = $$(CAQTDM_COLLECT)/debug
+		caqtdm_dll.files = release/*.dll
+		caqtdm_dll.path = $$(CAQTDM_COLLECT)/debug
+		caqtdm_lib.files = release/*.lib
+		caqtdm_lib.path = $$(CAQTDM_COLLECT)/debug
+		caqtdm_exe.files = release/*.exe
+		caqtdm_exe.path = $$(CAQTDM_COLLECT)/debug
+		INSTALLS += caqtdm_dll caqtdm_lib caqtdm_exe
+
         }
         ReleaseBuild {
-            DESTDIR = $$(CAQTDM_COLLECT)
+            	caqtdm_dll.files = release/*.dll
+            	caqtdm_dll.path = $$(CAQTDM_COLLECT)
+		caqtdm_lib.files = release/*.lib
+		caqtdm_lib.path = $$(CAQTDM_COLLECT)
+		caqtdm_exe.files = release/*.exe
+		caqtdm_exe.path = $$(CAQTDM_COLLECT)
+		INSTALLS += caqtdm_dll caqtdm_lib caqtdm_exe
         }
     }
 }
@@ -821,10 +836,10 @@ Define_ControlsysTargetDir{
                 message("adl2ui configuration win32")
                 win32-msvc* {
 		    DebugBuild {
-			DESTDIR = $$(CAQTDM_COLLECT)/debug/controlsystems
+			#DESTDIR = $$(CAQTDM_COLLECT)/debug/controlsystems
 		     }
 		    ReleaseBuild {
-			DESTDIR = $$(CAQTDM_COLLECT)/controlsystems
+			#DESTDIR = $$(CAQTDM_COLLECT)/controlsystems
 		    }
                 }
                 win32-g++ {
