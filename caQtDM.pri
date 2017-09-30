@@ -837,9 +837,24 @@ Define_ControlsysTargetDir{
                 win32-msvc* {
 		    DebugBuild {
 			#DESTDIR = $$(CAQTDM_COLLECT)/debug/controlsystems
-		     }
+                        caqtdm_dll.files = release/*.dll
+                        caqtdm_dll.path = $$(CAQTDM_COLLECT)/debug/controlsystems
+                        caqtdm_lib.files = release/*.lib
+                        caqtdm_lib.path = $$(CAQTDM_COLLECT)/debug/controlsystems
+                        caqtdm_exe.files = release/*.exe
+                        caqtdm_exe.path = $$(CAQTDM_COLLECT)/debug/controlsystems
+                        INSTALLS += caqtdm_dll caqtdm_lib caqtdm_exe
+
+                     }
 		    ReleaseBuild {
 			#DESTDIR = $$(CAQTDM_COLLECT)/controlsystems
+                        caqtdm_dll.files = release/*.dll
+                        caqtdm_dll.path = $$(CAQTDM_COLLECT)/controlsystems
+                        caqtdm_lib.files = release/*.lib
+                        caqtdm_lib.path = $$(CAQTDM_COLLECT)/controlsystems
+                        caqtdm_exe.files = release/*.exe
+                        caqtdm_exe.path = $$(CAQTDM_COLLECT)/controlsystems
+                        INSTALLS += caqtdm_dll caqtdm_lib caqtdm_exe
 		    }
                 }
                 win32-g++ {
