@@ -765,14 +765,14 @@ Define_Build_epics_controls {
         EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
         LIBS += $${EPICS_LIBS}/ca.lib
         LIBS += $${EPICS_LIBS}/COM.lib
-        LIBS += $$(CAQTDM_COLLECT)/debug/qtcontrols.lib
+        #LIBS += $$(CAQTDM_COLLECT)/debug/qtcontrols.lib
      }
     ReleaseBuild {
         INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
         EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
         LIBS += $${EPICS_LIBS}/ca.lib
         LIBS += $${EPICS_LIBS}/COM.lib
-        LIBS += $$(CAQTDM_COLLECT)/qtcontrols.lib
+        #LIBS += $$(CAQTDM_COLLECT)/qtcontrols.lib
     }
 }
 
