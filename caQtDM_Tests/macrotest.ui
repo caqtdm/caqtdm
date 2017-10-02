@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>911</width>
-    <height>481</height>
+    <height>478</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,7 @@
       <height>393</height>
      </rect>
     </property>
-    <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0">
+    <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0,0">
      <item row="2" column="0">
       <widget class="caLabel" name="calabel_11">
        <property name="text">
@@ -49,6 +49,21 @@
       <widget class="caLabel" name="calabel_15">
        <property name="text">
         <string>xyz$$876_A1245______</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="1">
+      <widget class="QLabel" name="label_2">
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>A45</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
@@ -111,10 +126,40 @@
        </property>
       </widget>
      </item>
+     <item row="11" column="1">
+      <widget class="QLabel" name="label_4">
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>A345</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="1">
+      <widget class="QLabel" name="label_3">
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>A1245</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
      <item row="7" column="0">
       <widget class="caLabel" name="calabel_19">
        <property name="text">
-        <string>$(TEST{&quot;regex&quot;:&quot;(\S*)&quot;,&quot;value&quot;:&quot;HUI2HUIHUI&quot;}) $(TEST{Bla}) $(TEST1)$(TEST)</string>
+        <string>$(TEST{&quot;regex&quot;:&quot;\\S+&quot;,&quot;value&quot;:&quot;HUI2HUIHUI&quot;}) $(TEST{Bla}) $(TEST1)$(TEST)</string>
        </property>
       </widget>
      </item>
@@ -140,6 +185,13 @@
        </property>
       </widget>
      </item>
+     <item row="11" column="0">
+      <widget class="caLabel" name="calabel_22">
+       <property name="text">
+        <string>$(TEST{&quot;regex&quot;:&quot;([1,2]+)([3])&quot;,&quot;value&quot;:&quot;A\\2&quot;})</string>
+       </property>
+      </widget>
+     </item>
      <item row="6" column="1">
       <widget class="caLabel" name="calabel_18">
        <property name="text">
@@ -150,7 +202,7 @@
      <item row="7" column="1">
       <widget class="caLabel" name="calabel_20">
        <property name="text">
-        <string>12345 12345 abcd12345</string>
+        <string>HUI2HUIHUI 12345 abcd12345</string>
        </property>
       </widget>
      </item>
@@ -161,55 +213,17 @@
        </property>
       </widget>
      </item>
-     <item row="11" column="0">
-      <widget class="caLabel" name="calabel_22">
+     <item row="12" column="0">
+      <widget class="caLabel" name="calabel_23">
        <property name="text">
-        <string>$(TEST{&quot;regex&quot;:&quot;([1,2]+)([3])&quot;,&quot;value&quot;:&quot;A\\2&quot;})</string>
+        <string>$(TEST{&quot;regex&quot;:&quot;\\S+&quot;,&quot;value&quot;:&quot;$(TEST1)&quot;}) $(TEST{Bla}) $(TEST1)$(TEST)</string>
        </property>
       </widget>
      </item>
-     <item row="9" column="1">
-      <widget class="QLabel" name="label_2">
-       <property name="font">
-        <font>
-         <pointsize>15</pointsize>
-        </font>
-       </property>
+     <item row="12" column="1">
+      <widget class="caLabel" name="calabel_24">
        <property name="text">
-        <string>A45</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="10" column="1">
-      <widget class="QLabel" name="label_3">
-       <property name="font">
-        <font>
-         <pointsize>15</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>A1245</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="11" column="1">
-      <widget class="QLabel" name="label_4">
-       <property name="font">
-        <font>
-         <pointsize>15</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>A345</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        <string>abcd 12345 abcd12345</string>
        </property>
       </widget>
      </item>

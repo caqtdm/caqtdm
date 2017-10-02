@@ -2873,53 +2873,62 @@ QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, 
                 while (i.hasNext()) {
                     i.next();
                     QString tofind = "$(" + i.key();
-
-
                     int position=newText.indexOf(tofind);
-                    //qDebug() << "position" <<position;
-                    if ((position>=0)&&(position<newText.length())){
-                        int json_start=position+tofind.length();
-                        int json_end  =newText.indexOf(QString("})"),json_start);
+                    while (position!=(-1)){
+                        //qDebug() << "position" <<position;
+                        if ((position>=0)&&(position<newText.length())){
+                            int json_start=position+tofind.length();
+                            int json_end  =newText.indexOf(QString("})"),json_start);
 
-                        //qDebug() << "newText.mid(): " << newText.mid(json_start,json_end-json_start+1);
-                        QString macro_regex="BlaBla";
-                        QString macro_value="BlaBla";
+                            //qDebug() << "newText.mid(): " << newText.mid(json_start,json_end-json_start+1);
+                            QString macro_regex="";
+                            QString macro_value="Parsing Error";
+                            boolean macro_value_found=false;
 
-                        JSONObject jsonobj;
-                        JSONValue *MacroDataJ = JSON::Parse(newText.mid(json_start,json_end-json_start+1).toStdString().c_str());
-                        if (MacroDataJ!=NULL){
-                            if(!MacroDataJ->IsObject()) {
-                                delete(MacroDataJ);
-                            } else {
-                                jsonobj=MacroDataJ->AsObject();
-                                if (jsonobj.find(L"regex") != jsonobj.end() && jsonobj[L"regex"]->IsString()) {
-                                    macro_regex=QString::fromWCharArray(jsonobj[L"regex"]->AsString().c_str());
+                            JSONObject jsonobj;
+                            JSONValue *MacroDataJ = JSON::Parse(newText.mid(json_start,json_end-json_start+1).toStdString().c_str());
+                            if (MacroDataJ!=NULL){
+                                if(!MacroDataJ->IsObject()) {
+                                    delete(MacroDataJ);
+                                } else {
+                                    jsonobj=MacroDataJ->AsObject();
+                                    if (jsonobj.find(L"regex") != jsonobj.end() && jsonobj[L"regex"]->IsString()) {
+                                        macro_regex=QString::fromWCharArray(jsonobj[L"regex"]->AsString().c_str());
+                                    }
+
+                                    if (jsonobj.find(L"value") != jsonobj.end() && jsonobj[L"value"]->IsString()) {
+                                        macro_value=QString::fromWCharArray(jsonobj[L"value"]->AsString().c_str());
+                                        macro_value_found=true;
+                                    }
+                                    delete(MacroDataJ);
                                 }
+                            }else{
+                                sprintf(asc, "JSON Error in (%s)", qasc(newText.mid(json_start,json_end-json_start+1)));
+                                postMessage(QtWarningMsg, asc);
 
-                                if (jsonobj.find(L"value") != jsonobj.end() && jsonobj[L"value"]->IsString()) {
-                                    macro_value=QString::fromWCharArray(jsonobj[L"value"]->AsString().c_str());
-                                }
-                                delete(MacroDataJ);
                             }
-                        }else{
-                            sprintf(asc, "JSON Error in (%s)", qasc(newText.mid(json_start,json_end-json_start+1)));
-                            postMessage(QtWarningMsg, asc);
 
-                        }
-                        QRegExp rx_json;
-                        rx_json.setPattern(macro_regex);
-                        if (rx_json.isValid()){
-                            QString ReplaceWith=i.value();
-                            ReplaceWith.replace(rx_json,macro_value);
-
+                            QRegExp rx_json;
                             QString toReplace = "$(" + i.key() + newText.mid(json_start,json_end-json_start+1) + ")";
-                            //qDebug() << "replace in" << newText << toReplace << "with" << ReplaceWith << "outof " << macro_value;
-                            sprintf(asc, "Replace (%s) with (%s) Regex:(%s)", qasc(i.value()),qasc(macro_value),qasc(macro_regex));
-                            postMessage(QtDebugMsg, asc);
+                            rx_json.setPattern(macro_regex);
+                            if (rx_json.isValid()){
+                                QString ReplaceWith=i.value();
+                                    if (macro_value_found){
+                                    ReplaceWith.replace(rx_json,macro_value);
 
-                            newText.replace(toReplace, ReplaceWith);
+                                    //qDebug() << "replace in" << newText << toReplace << "with" << ReplaceWith << "outof " << macro_value;
+                                    sprintf(asc, "Replace (%s) (%s) with (%s) Regex:(%s)", qasc(i.key()), qasc(i.value()),qasc(macro_value),qasc(macro_regex));
+                                    postMessage(QtDebugMsg, asc);
+                                    newText.replace(toReplace, ReplaceWith);
+                                }else{
+                                    sprintf(asc, "No Replacement found do simple(%s) (%s) macro resolution", qasc(i.key()), qasc(i.value()));
+                                    postMessage(QtWarningMsg, asc);
+                                    newText.replace(toReplace, i.value());
+                                }
+                            }
+
                         }
-
+                        position=newText.indexOf(tofind,position+1);
                     }
                 }
 
