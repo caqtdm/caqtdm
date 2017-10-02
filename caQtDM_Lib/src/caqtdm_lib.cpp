@@ -2883,7 +2883,7 @@ QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, 
                             //qDebug() << "newText.mid(): " << newText.mid(json_start,json_end-json_start+1);
                             QString macro_regex="";
                             QString macro_value="Parsing Error";
-                            boolean macro_value_found=false;
+                            bool macro_value_found=false;
 
                             JSONObject jsonobj;
                             JSONValue *MacroDataJ = JSON::Parse(newText.mid(json_start,json_end-json_start+1).toStdString().c_str());
