@@ -32,6 +32,9 @@ class QTCON_EXPORT caMenu : public QComboBox
 {
     Q_ENUMS(colMode)
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
+
+    Q_PROPERTY(QString channelMask READ getMaskPV WRITE setMaskPV)
+
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
@@ -52,6 +55,9 @@ public:
     QString getPV() const;
     void setPV(QString const &newPV);
 
+    QString getMaskPV() const;
+    void setMaskPV(QString const &newPV);
+
     QColor getForeground() const {return thisForeColor;}
     void setForeground(QColor c);
 
@@ -66,7 +72,9 @@ public:
 
     QString getLabel() const;
 
-     void populateCells(QStringList list);
+    void populateCells(QStringList list);
+    void setMaskValue(const int &mask);
+    void setIndex(int const &indx);
 
     caMenu(QWidget *parent);
 
@@ -90,7 +98,7 @@ protected:
      virtual bool event(QEvent *);
 
 private:
-    QString thisPV;
+    QString thisPV, thisMaskPV;
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
     QColor defBackColor, defForeColor, defSelectColor;
@@ -100,9 +108,11 @@ private:
     colMode  thisColorMode, oldColorMode;
     QPalette defaultPalette;
     QString thisStyle, oldStyle;
-
+    QStringList nonMaskedStrings, maskedStrings;
+    int thisMaskValue;
     bool isShown;
     bool eventFilter(QObject *obj, QEvent *event);
+    int lastIndex;
 };
 
 #endif

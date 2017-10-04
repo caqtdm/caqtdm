@@ -1240,10 +1240,21 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         QString text = menuWidget->getPV();
         if(text.size() > 0) {
             text =  treatMacro(map, text, &doNothing);
+            specData[0] = 0;
             int num = addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
             integerList.append(num);
             connect(menuWidget, SIGNAL(activated(QString)), this, SLOT(Callback_MenuClicked(QString)));
             menuWidget->setPV(pv);
+            nbMonitors++;
+        }
+
+        text = menuWidget->getMaskPV();
+        if(text.size() > 0) {
+            text =  treatMacro(map, text, &doNothing);
+            specData[0] = 1;
+            int num = addMonitor(myWidget, &kData, text, w1, specData, map, &pv);
+            integerList.append(num);
+            menuWidget->setMaskPV(pv);
             nbMonitors++;
         }
 
@@ -3958,21 +3969,35 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         // caMenu ==================================================================================================================
     } else if (caMenu *menuWidget = qobject_cast<caMenu *>(w)) {
-        //qDebug() << "we have a menu";
+        //qDebug() << "we have a menu" << data.pv << data.edata.connected << data.specData[0];
 
         if(data.edata.connected) {
-            QStringList stringlist = String.split((QChar)27);
             // set enum strings
-            if(data.edata.fieldtype == caENUM) {
+            if((data.edata.fieldtype == caENUM) && (data.specData[0] == 0)) {
+                QStringList stringlist = String.split((QChar)27);
                 menuWidget->populateCells(stringlist);
                 if(menuWidget->getLabelDisplay()) menuWidget->setCurrentIndex(0);
-                else menuWidget->setCurrentIndex((int) data.edata.ivalue);
+                else {
+                    menuWidget->setIndex((int) data.edata.ivalue);
+                }
 
                 if (menuWidget->getColorMode() == caMenu::Alarm) {
                     menuWidget->setAlarmColors(data.edata.severity);
                     // case of static mode
                 } else {
                     SetColorsBack(menuWidget);
+                }
+            // when mask specified, use it
+            } else if(data.specData[0] == 1) {
+                switch (data.edata.fieldtype){
+                    case caINT:
+                    case caLONG:{
+                        menuWidget->setMaskValue(data.edata.ivalue);
+                        break;
+                    }
+                    default:{
+                        menuWidget->setMaskValue(data.edata.rvalue);
+                    }
                 }
             }
         } else {
@@ -5413,7 +5438,6 @@ void CaQtDM_Lib::Callback_MenuClicked(const QString& text)
     if(menu->getPV().length() > 0) {
         //qDebug() << "menu_clicked" << text << menu->getPV();
         QStringsToChars(menu->getPV().trimmed(), text,  menu->objectName().toLower());
-        //ControlsInterface * plugininterface = (ControlsInterface *) menu->property("Interface").value<void *>();
         ControlsInterface *plugininterface = getPluginInterface((QWidget*) menu);
         if(plugininterface != (ControlsInterface *) 0) {
             knobData *kPtr;

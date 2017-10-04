@@ -601,6 +601,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                         if(calcWidget->getCalc().trimmed().size() == 0)
                             if(calcWidget->getValue() != ptr->edata.rvalue) {
                                 ptr->edata.rvalue = calcWidget->getValue();
+                                ptr->edata.ivalue = (int) calcWidget->getValue();
                             }
                     }
                 }
@@ -613,6 +614,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                      memcpy(kPtr->edata.dataB,  data, kPtr->edata.valueCount * sizeof(double));
                 } else {
                    kPtr->edata.rvalue = ptr->edata.rvalue;
+                   kPtr->edata.ivalue = (int) ptr->edata.rvalue;
                    if(kPtr->edata.oldsoftvalue != ptr->edata.rvalue) kPtr->edata.monitorCount++;
                 }
 

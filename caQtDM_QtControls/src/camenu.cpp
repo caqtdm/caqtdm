@@ -40,6 +40,13 @@ caMenu::caMenu(QWidget *parent) : QComboBox(parent)
     defaultPalette = palette();
     setLabelDisplay(false);
 
+    thisPV = "";
+    thisMaskPV = "";
+    thisMaskValue = 0xFFFF;  // bit 0=do not display enum field; bit 1=display enum field
+    nonMaskedStrings.clear();
+    maskedStrings.clear();
+    lastIndex = 0;
+
     thisBackColor = QColor(230,230,230);
     thisForeColor = Qt::black;
     oldBackColor = QColor(230,230,230);
@@ -65,6 +72,16 @@ void caMenu::setPV(QString const &newPV)
     if(thisLabelDisplay) {
         setLabelDisplay(true);
     }
+}
+
+void caMenu::setMaskPV(QString const &newPV)
+{
+    thisMaskPV = newPV;
+}
+
+QString caMenu::getMaskPV() const
+{
+    return thisMaskPV;
 }
 
 void caMenu::setBackground(QColor c)
@@ -158,8 +175,8 @@ void caMenu::setLabelDisplay(bool c)
     thisLabelDisplay= c;
     clear();
     if(thisLabelDisplay) {
-            addItem(getLabel());
-            setCurrentIndex(0);
+        addItem(getLabel());
+        setCurrentIndex(0);
     }
 }
 
@@ -168,10 +185,22 @@ void caMenu::setAccessW(int access)
      thisAccessW = access;
 }
 
+void caMenu::setMaskValue(const int &mask)
+{
+    if((nonMaskedStrings.size() > 0) && (mask != thisMaskValue)) {
+        thisMaskValue = mask;
+        populateCells(nonMaskedStrings);
+
+    }
+    thisMaskValue = mask;
+    setIndex(lastIndex);
+}
+
 void caMenu::populateCells(QStringList stringlist)
 {
-
+    nonMaskedStrings = stringlist;
     // remove first event filter for the actual items
+
     QList<QWidget*> widgets = this->findChildren<QWidget*>();
     foreach (QWidget* widget, widgets) widget->removeEventFilter(this);
 
@@ -179,11 +208,40 @@ void caMenu::populateCells(QStringList stringlist)
     if(getLabelDisplay()) {
         addItem(getLabel());
     }
-    addItems(stringlist);
 
-    // add now the event filter for the new items
-    widgets = this->findChildren<QWidget*>();
-    foreach (QWidget* widget, widgets) widget->installEventFilter(this);
+    maskedStrings.clear();
+    for (int i=0; i<stringlist.size(); ++i) {
+        if(((thisMaskValue >> i) & 1) == 1) maskedStrings.append(stringlist.at(i));
+    }
+
+    if(maskedStrings.size() > 0) {
+        addItems(maskedStrings);
+        // add now the event filter for the new items
+        widgets = this->findChildren<QWidget*>();
+        foreach (QWidget* widget, widgets) {
+            widget->installEventFilter(this);
+        }
+    }
+}
+
+void caMenu::setIndex(int const &indx)
+{
+    if(nonMaskedStrings.size() == 0) return;
+    bool found = false;
+    lastIndex = indx;
+    QString currentString = nonMaskedStrings.at(indx);
+    for (int i=0; i<maskedStrings.size(); i++) {
+        if(currentString == maskedStrings.at(i)) {
+            setCurrentIndex(i);
+            found = true;
+            break;
+        }
+    }
+    if(!found) setCurrentIndex(-1);
+
+    if(getLabelDisplay()) {
+        setCurrentIndex(0);
+    }
 }
 
 bool caMenu::eventFilter(QObject *obj, QEvent *event)
