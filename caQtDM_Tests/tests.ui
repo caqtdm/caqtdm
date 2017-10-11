@@ -120,7 +120,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: rgb(0,0,120);}</string>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <property name="usesScrollButtons">
      <bool>true</bool>
@@ -2886,8 +2886,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>100</width>
-           <height>30</height>
+           <width>431</width>
+           <height>187</height>
           </rect>
          </property>
          <attribute name="label">
@@ -10463,7 +10463,7 @@ def PythonCalc(a, b, c, d):
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
@@ -10535,7 +10535,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="styleSheet" stdset="0">
-         <string notr="true"/>
+         <string notr="true">QFrame { background: rgb(255, 85, 0, 255); color: rgb(0, 170, 0, 255);}</string>
         </property>
        </widget>
        <widget class="caNumeric" name="caNumeric_0">
@@ -11938,14 +11938,14 @@ p, li { white-space: pre-wrap; }
        <widget class="QLabel" name="label_7">
         <property name="geometry">
          <rect>
-          <x>255</x>
+          <x>171</x>
           <y>125</y>
-          <width>61</width>
-          <height>17</height>
+          <width>145</width>
+          <height>20</height>
          </rect>
         </property>
         <property name="text">
-         <string>menu :</string>
+         <string>unmasked menu :</string>
         </property>
        </widget>
        <widget class="caMenu" name="caMenu_1">
@@ -12133,6 +12133,104 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="styleSheet" stdset="0">
          <string notr="true"/>
+        </property>
+       </widget>
+       <widget class="caMenu" name="caMenu_10">
+        <property name="geometry">
+         <rect>
+          <x>342</x>
+          <y>407</y>
+          <width>90</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="maxVisibleItems">
+         <number>5</number>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:MBBO</string>
+        </property>
+        <property name="channelMask" stdset="0">
+         <string>myMask</string>
+        </property>
+        <property name="colorMode">
+         <enum>caMenu::Static</enum>
+        </property>
+        <property name="labelDisplay">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_17">
+        <property name="geometry">
+         <rect>
+          <x>96</x>
+          <y>407</y>
+          <width>207</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>masked menu through pv:</string>
+        </property>
+       </widget>
+       <widget class="caMenu" name="camenu_3">
+        <property name="geometry">
+         <rect>
+          <x>342</x>
+          <y>450</y>
+          <width>105</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="maxVisibleItems">
+         <number>16</number>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:MBBO</string>
+        </property>
+        <property name="channelMask" stdset="0">
+         <string>myMask</string>
+        </property>
+        <property name="styleSheet" stdset="0">
+         <string notr="true"/>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_53">
+        <property name="geometry">
+         <rect>
+          <x>204</x>
+          <y>445</y>
+          <width>70</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">myMask</string>
+        </property>
+        <property name="initialValue">
+         <double>65535.000000000000000</double>
+        </property>
+       </widget>
+       <widget class="caByteController" name="cabytecontroller_6">
+        <property name="geometry">
+         <rect>
+          <x>155</x>
+          <y>487</y>
+          <width>453</width>
+          <height>19</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">myMask</string>
+        </property>
+        <property name="direction">
+         <enum>caByteController::Right</enum>
+        </property>
+        <property name="endBit">
+         <number>15</number>
+        </property>
+        <property name="colorMode">
+         <enum>caByteController::Alarm</enum>
         </property>
        </widget>
       </widget>
@@ -16243,22 +16341,6 @@ then see signals_2</string>
     <hint type="destinationlabel">
      <x>463</x>
      <y>622</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton</sender>
-   <signal>clicked()</signal>
-   <receiver>wmsignalpropagator</receiver>
-   <slot>closewindow()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>709</x>
-     <y>294</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>711</x>
-     <y>389</y>
     </hint>
    </hints>
   </connection>
