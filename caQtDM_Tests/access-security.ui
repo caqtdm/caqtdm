@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="caLineEdit" name="calineedit">
+    <property name="geometry">
+     <rect>
+      <x>274</x>
+      <y>245</y>
+      <width>100</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">MYTEST:1</string>
+    </property>
+   </widget>
+   <widget class="caNumeric" name="canumeric">
+    <property name="geometry">
+     <rect>
+      <x>236</x>
+      <y>368</y>
+      <width>100</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">MYTEST:1</string>
+    </property>
+   </widget>
+   <widget class="caSpinbox" name="caspinbox">
+    <property name="geometry">
+     <rect>
+      <x>525</x>
+      <y>302</y>
+      <width>80</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">MYTEST:1</string>
+    </property>
+   </widget>
+   <widget class="caTextEntry" name="catextentry">
+    <property name="geometry">
+     <rect>
+      <x>522</x>
+      <y>212</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">MYTEST:1</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caNumeric</class>
+   <extends>QFrame</extends>
+   <header>caNumeric</header>
+  </customwidget>
+  <customwidget>
+   <class>caTextEntry</class>
+   <extends>caLineEdit</extends>
+   <header>caTextEntry</header>
+  </customwidget>
+  <customwidget>
+   <class>caSpinbox</class>
+   <extends>QFrame</extends>
+   <header>caSpinbox</header>
+  </customwidget>
+  <customwidget>
+   <class>caLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>caLineEdit</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
