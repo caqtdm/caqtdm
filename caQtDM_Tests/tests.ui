@@ -120,7 +120,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: rgb(0,0,120);}</string>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <property name="usesScrollButtons">
      <bool>true</bool>
@@ -3124,7 +3124,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>12</number>
+       <number>7</number>
       </property>
       <property name="usesScrollButtons">
        <bool>true</bool>
@@ -6627,7 +6627,7 @@ p, li { white-space: pre-wrap; }
        <widget class="caThermo" name="caThermo_2">
         <property name="geometry">
          <rect>
-          <x>939</x>
+          <x>899</x>
           <y>40</y>
           <width>65</width>
           <height>330</height>
@@ -7328,7 +7328,7 @@ p, li { white-space: pre-wrap; }
        <widget class="caThermo" name="caThermo_17">
         <property name="geometry">
          <rect>
-          <x>849</x>
+          <x>824</x>
           <y>40</y>
           <width>65</width>
           <height>330</height>
@@ -7491,8 +7491,8 @@ p, li { white-space: pre-wrap; }
        <widget class="caLabel" name="calabel_63">
         <property name="geometry">
          <rect>
-          <x>941</x>
-          <y>383</y>
+          <x>919</x>
+          <y>378</y>
           <width>74</width>
           <height>17</height>
          </rect>
@@ -7504,8 +7504,8 @@ p, li { white-space: pre-wrap; }
        <widget class="caLabel" name="calabel_64">
         <property name="geometry">
          <rect>
-          <x>846</x>
-          <y>386</y>
+          <x>819</x>
+          <y>377</y>
           <width>74</width>
           <height>17</height>
          </rect>
@@ -7632,6 +7632,69 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="scaleValueEnabled">
          <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="caThermo" name="caThermo_21">
+        <property name="geometry">
+         <rect>
+          <x>972</x>
+          <y>40</y>
+          <width>65</width>
+          <height>330</height>
+         </rect>
+        </property>
+        <property name="lowerBound">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="upperBound">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="scalePosition">
+         <enum>QwtThermoMarker::LeftScale</enum>
+        </property>
+        <property name="maxValue">
+         <double>900.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="type">
+         <enum>QwtThermoMarker::Marker</enum>
+        </property>
+        <property name="decayOption">
+         <bool>true</bool>
+        </property>
+        <property name="decayTime">
+         <double>0.500000000000000</double>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:TEST:AO</string>
+        </property>
+        <property name="direction">
+         <enum>caThermo::Up</enum>
+        </property>
+        <property name="look">
+         <enum>caThermo::Outline</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>255</red>
+          <green>170</green>
+          <blue>0</blue>
+         </color>
+        </property>
+        <property name="background">
+         <color>
+          <red>224</red>
+          <green>223</green>
+          <blue>222</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caThermo::Static</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caThermo::Channel</enum>
         </property>
        </widget>
       </widget>
@@ -10463,7 +10526,7 @@ def PythonCalc(a, b, c, d):
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
@@ -12675,13 +12738,13 @@ p, li { white-space: pre-wrap; }
          <bool>true</bool>
         </property>
         <property name="displayMode" stdset="0">
-         <enum>replaceMacro::Value</enum>
+         <enum>replaceMacro::List</enum>
         </property>
         <property name="macroKey">
-         <string notr="true">NAME</string>
+         <string notr="true">NAME1</string>
         </property>
-        <property name="macroValue">
-         <string notr="true"/>
+        <property name="macroValues">
+         <string>;test1;test2</string>
         </property>
        </widget>
        <widget class="caNumeric" name="canumeric_14">
