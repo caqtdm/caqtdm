@@ -192,6 +192,11 @@ DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
+# 4.1.6 of 18.10.2017
+# camenu maske integriert, allows to make entries invisible
+# cathermo marker has now variable size
+# cursor shape did not change when on a cawidget and when access security changed
+
 # 4.1.6 of 7.9.2017
 # last index in array was not taken into account and scale was not updated for the wareerfallplot
 # optimization of archive plugins
@@ -207,7 +212,7 @@ DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 # the wmsignalpropagator got signals to propagate the resizing factor of a window. this can be used in order to correct animations with absolute pixel positions.
 # when propagating through a signal a value to cacalc, this value is displayed. However was not propgated for further use. This has been corrected
 # the colors of the caspinbox could be wrong due to a ack of proper initialisation, this has been corrected.
-# very big doubles were not set correctly, this has ben corrected.
+# very big doubles were not set correctly, this has been corrected.
 # static visibility (while no channels) can be used now.
 # handle double encoded url's in camimedisplay.
 # added hide/show slot in all ca widgets (permits to hide and show a widget when propagating a signal from cacalc)
