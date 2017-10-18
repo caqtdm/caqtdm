@@ -176,8 +176,9 @@ static void access_rights_handler(struct access_rights_handler_args args)
     C_GetMutexKnobData(mutexKnobdataPtr, info->index, &kData);
     kData.edata.accessW = ca_write_access(args.chid);
     kData.edata.accessR = ca_read_access(args.chid);
+    kData.edata.monitorCount = info->event;
     C_SetMutexKnobDataReceived(mutexKnobdataPtr, &kData);
-
+    //printf("access rights callback %d %d %d\n",  kData.edata.accessW, kData.edata.accessR, kData.edata.monitorCount);
     return;
 }
 
