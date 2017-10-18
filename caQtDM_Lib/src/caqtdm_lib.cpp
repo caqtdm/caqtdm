@@ -177,6 +177,14 @@
     strng[2] = obj->getChannelC(); \
     strng[3] = obj->getChannelD();
 
+// force an ernter event in order to change the cursor when access changes
+// done here, while I did not want to reproduce this code in each widget
+#define updateAccessCursor(obj)   \
+   if(obj->hasFocus()) {          \
+      QEvent* evt = new QEvent(QEvent::Enter); \
+      QCoreApplication::postEvent(obj,evt);   \
+   }
+
 // ui "file" including the requested pep file (.prc), i.e. file with a layout description used at PSI
 #define uiIntern "<?xml version=\"1.0\" encoding=\"UTF-8\"?> " \
     "<ui version=\"4.0\"> " \
@@ -4004,6 +4012,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             SetColorsNotConnected(menuWidget);
         }
         menuWidget->setAccessW(data.edata.accessW);
+        updateAccessCursor(menuWidget);
 
         // caChoice ==================================================================================================================
     } else if (caChoice *choiceWidget = qobject_cast<caChoice *>(w)) {
@@ -4031,6 +4040,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             SetColorsNotConnected(choiceWidget);
         }
         choiceWidget->setAccessW(data.edata.accessW);
+        updateAccessCursor(choiceWidget);
 
         // caThermo ==================================================================================================================
     } else if (caThermo *thermoWidget = qobject_cast<caThermo *>(w)) {
@@ -4107,6 +4117,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             connect(w, SIGNAL(valueChanged(double)), this, SLOT(Callback_SliderValueChanged(double)));
 
             sliderWidget->setAccessW((bool) data.edata.accessW);
+            updateAccessCursor(sliderWidget);
 
             // set colors when connected
             // case of alarm mode
@@ -4307,6 +4318,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 // access control for textentry
                 if (caTextEntry *textentryWidget = qobject_cast<caTextEntry *>(w)) {
                     textentryWidget->setAccessW((bool) data.edata.accessW);
+                    updateAccessCursor(textentryWidget);
                 }
 
                 // double
@@ -4359,6 +4371,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 // access control for textentry
                 if (caTextEntry *textentryWidget = qobject_cast<caTextEntry *>(w)) {
                     textentryWidget->setAccessW((bool)data.edata.accessW);
+                    updateAccessCursor(textentryWidget);
                 }
             }
 
@@ -4508,6 +4521,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             applynumericWidget->setConnectedColors(true);
             applynumericWidget->silentSetValue(data.edata.rvalue);
             applynumericWidget->setAccessW((bool) data.edata.accessW);
+            updateAccessCursor(applynumericWidget);
         } else {
             applynumericWidget->setConnectedColors(false);
         }
@@ -4521,6 +4535,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             numericWidget->setConnectedColors(true);
             numericWidget->silentSetValue(data.edata.rvalue);
             numericWidget->setAccessW((bool) data.edata.accessW);
+            updateAccessCursor(numericWidget);
         } else {
             numericWidget->setConnectedColors(false);
         }
@@ -4534,6 +4549,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             spinboxWidget->setConnectedColors(true);
             spinboxWidget->silentSetValue(data.edata.rvalue);
             spinboxWidget->setAccessW((bool) data.edata.accessW);
+            updateAccessCursor(spinboxWidget);
         } else {
             spinboxWidget->setConnectedColors(false);
         }
@@ -4554,6 +4570,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             getStatesToggleAndLed(togglebuttonWidget, data, String, state);
             togglebuttonWidget->setState(state);
             togglebuttonWidget->setAccessW((bool) data.edata.accessW);
+            updateAccessCursor(togglebuttonWidget);
         } else {
             SetColorsNotConnected(togglebuttonWidget);
         }
@@ -5028,6 +5045,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             SetColorsNotConnected(messagebuttonWidget);
         }
         messagebuttonWidget->setAccessW((bool) data.edata.accessW);
+        updateAccessCursor(messagebuttonWidget);
 
         // something else (user defined monitors with non ca imageWidgets ?) ==============================================
     } else {
@@ -5613,6 +5631,7 @@ void CaQtDM_Lib::Callback_ScriptButton()
         t->start(command);
         w->setToolTip("process running, to kill use right mouse button");
         w->setAccessW(false);
+        updateAccessCursor(w);
         w->setProcess(t);
     }
 #endif
@@ -5628,6 +5647,7 @@ void CaQtDM_Lib::processTerminated()
     if(w1 != (QWidget*) 0) {
         w1->setToolTip("process terminated !");
         w1->setAccessW(true);
+        updateAccessCursor(w);
         w->setEnabled(true);
     }
 
