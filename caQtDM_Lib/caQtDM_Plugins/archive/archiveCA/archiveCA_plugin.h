@@ -63,11 +63,11 @@ public:
     WorkerCA() {
         qRegisterMetaType<indexes>("indexes");
         qRegisterMetaType<stdString>("stdString");
-        qRegisterMetaType<QVector<float> >("QVector<float>");
+        qRegisterMetaType<QVector<double> >("QVector<double>");
     }
 
 private:
-    QVector<float>  TimerN, YValsN;
+    QVector<double>  TimerN, YValsN;
 
     void format_time(const epicsTime &time, stdString &text,  time_t &timeStamp)
     {
@@ -162,7 +162,7 @@ public slots:
                     QString value(val.c_str());
                     if((timeStamp - endSeconds) >= -indexNew.secondsPast) {
                         TimerN[nbVal] = (timeStamp - endSeconds) / 3600.0;
-                        YValsN[nbVal] = value.toFloat();
+                        YValsN[nbVal] = value.toDouble();
                         nbVal++;
                     }
                 }
@@ -177,7 +177,7 @@ public slots:
     }
 
 signals:
-    void resultReady(indexes indexNew, int nbVal, QVector<float> TimerN, QVector<float> YValsN, QString backend);
+    void resultReady(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend);
 
 public:
 
@@ -218,7 +218,7 @@ private slots:
     void Callback_UpdateInterface( QMap<QString, indexes> listOfIndexes);
 
 public slots:
-    void handleResults(indexes, int, QVector<float>, QVector<float>, QString backend);
+    void handleResults(indexes, int, QVector<double>, QVector<double>, QString backend);
     void closeEvent();
 
 signals:

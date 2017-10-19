@@ -228,7 +228,7 @@ void ArchiverCommon::updateSecondsPast(indexes indexNew, bool original)
     }
 }
 
-void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<float> TimerN, QVector<float> YValsN, QString backend)
+void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double> TimerN, QVector<double> YValsN, QString backend)
 {
     QMutexLocker locker(&mutex);
     //qDebug() << "ArchiverCommon::updateCartesian";
@@ -236,18 +236,18 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<float>
         knobData kData = mutexknobdataP->GetMutexKnobData(indexNew.indexX);
         if(kData.index == -1) return;
         mutexknobdataP->DataLock(&kData);
-        kData.edata.fieldtype = caFLOAT;
+        kData.edata.fieldtype = caDOUBLE;
         kData.edata.connected = true;
         kData.edata.accessR = kData.edata.accessW = true;
         kData.edata.monitorCount++;
         strcpy(kData.edata.fec, qasc(backend));
 
-        if((nbVal * sizeof(float)) > (size_t) kData.edata.dataSize) {
+        if((nbVal * sizeof(double)) > (size_t) kData.edata.dataSize) {
             if(kData.edata.dataB != (void*) 0) free(kData.edata.dataB);
-            kData.edata.dataB = (void*) malloc(nbVal * sizeof(float));
-            kData.edata.dataSize = nbVal * sizeof(float);
+            kData.edata.dataB = (void*) malloc(nbVal * sizeof(double));
+            kData.edata.dataSize = nbVal * sizeof(double);
         }
-        memcpy(kData.edata.dataB, &TimerN[0],  nbVal * sizeof(float));
+        memcpy(kData.edata.dataB, &TimerN[0],  nbVal * sizeof(double));
         kData.edata.valueCount = nbVal;
         mutexknobdataP->SetMutexKnobDataReceived(&kData);
         mutexknobdataP->DataUnlock(&kData);
@@ -255,18 +255,18 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<float>
         kData = mutexknobdataP->GetMutexKnobData(indexNew.indexY);
         if(kData.index == -1) return;
         mutexknobdataP->DataLock(&kData);
-        kData.edata.fieldtype = caFLOAT;
+        kData.edata.fieldtype = caDOUBLE;
         kData.edata.connected = true;
         kData.edata.accessR = kData.edata.accessW = true;
         kData.edata.monitorCount++;
         strcpy(kData.edata.fec, qasc(backend));
 
-        if((nbVal * sizeof(float)) > (size_t) kData.edata.dataSize) {
+        if((nbVal * sizeof(double)) > (size_t) kData.edata.dataSize) {
             if(kData.edata.dataB != (void*) 0) free(kData.edata.dataB);
-            kData.edata.dataB = (void*) malloc(nbVal * sizeof(float));
-            kData.edata.dataSize = nbVal * sizeof(float);
+            kData.edata.dataB = (void*) malloc(nbVal * sizeof(double));
+            kData.edata.dataSize = nbVal * sizeof(double);
         }
-        memcpy(kData.edata.dataB, &YValsN[0],  nbVal * sizeof(float));
+        memcpy(kData.edata.dataB, &YValsN[0],  nbVal * sizeof(double));
 
         kData.edata.valueCount = nbVal;
         mutexknobdataP->SetMutexKnobDataReceived(&kData);

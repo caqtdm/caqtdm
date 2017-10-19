@@ -47,7 +47,7 @@ public:
     WorkerSF() {
         //qDebug() << "WorkerSF::WorkerSF()";
         qRegisterMetaType<indexes>("indexes");
-        qRegisterMetaType<QVector<float> >("QVector<float>");
+        qRegisterMetaType<QVector<double> >("QVector<double>");
         fromArchive =  (sfRetrieval *)0;
     }
 
@@ -56,7 +56,7 @@ public:
     }
 
 private:
-    QVector<float>  TimerN, YValsN;
+    QVector<double>  TimerN, YValsN;
 
 public slots:
 
@@ -71,8 +71,6 @@ public slots:
     void getFromArchive(QWidget *w, indexes indexNew,  QString index_name, MessageWindow * messageWindow) {
 
         Q_UNUSED(w);
-
-        bool timeAxis = false;
 
         QMutex *mutex = indexNew.mutexP;
         mutex->lock();
@@ -149,7 +147,7 @@ public slots:
     }
 
 signals:
-    void resultReady(indexes indexNew, int nbVal, QVector<float> TimerN, QVector<float> YValsN, QString backend);
+    void resultReady(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend);
 
 public:
 
@@ -216,7 +214,7 @@ public:
     int TerminateIO();
 
 public slots:
-    void handleResults(indexes, int, QVector<float>, QVector<float>, QString);
+    void handleResults(indexes, int, QVector<double>, QVector<double>, QString);
 
 signals:
     void operate(QWidget*, const indexes, const QString, MessageWindow *);

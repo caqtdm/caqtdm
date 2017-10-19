@@ -207,11 +207,11 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
             return;
         } else {
             //qDebug() << "i=" << i <<  "linecount" << line.count() << line[1];
-            float archiveTime = line[1].toFloat(&ok1);
+            double archiveTime = line[1].toDouble(&ok1);
             if(ok1) {
                 if((seconds - archiveTime) < secndsPast) {
                     X[count] = -(seconds - archiveTime) / 3600.0;
-                    Y[count] = line[valueIndex].toFloat(&ok2);
+                    Y[count] = line[valueIndex].toDouble(&ok2);
                     if(ok2) count++;
                     else {
                         errorString = tr("could not decode value %1 at position %2").arg(line[valueIndex].arg(valueIndex));
@@ -344,6 +344,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
                                     if(!timAxis) X[count] = -(seconds - archiveTime) / 3600.0;
                                     else X[count] = archiveTime * 1000;
                                     Y[count] = mean;
+                                    //qDebug() << "binned" << X[count] << Y[count];
                                     count++;
                                 }
 
@@ -392,6 +393,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
                                     if(!timAxis) X[count] = -(seconds - archiveTime) / 3600.0;
                                     else X[count] = archiveTime *1000;
                                     Y[count] = mean;
+                                    //qDebug() << "not binned" << X[count] << Y[count];
                                     count++;
                                 }
                             }
@@ -433,7 +435,7 @@ const QString sfRetrieval::getBackend()
     return Backend;
 }
 
-void sfRetrieval::getData(QVector<float> &x, QVector<float> &y)
+void sfRetrieval::getData(QVector<double> &x, QVector<double> &y)
 {
     x = X;
     y = Y;

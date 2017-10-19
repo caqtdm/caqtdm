@@ -55,7 +55,7 @@ public:
     bool requestUrl(const QUrl url, const QByteArray &json, int secondsPast, bool binned, bool timeAxis, QString key);
     const QString lastError();
     int getCount();
-    void getData(QVector<float> &x, QVector<float> &y);
+    void getData(QVector<double> &x, QVector<double> &y);
     const QString getBackend();
     void cancelDownload();
     void close();
@@ -80,7 +80,7 @@ private:
     int finished;
     QUrl downloadUrl;
     QString errorString;
-    QVector<float> X,Y;
+    QVector<double> X,Y;
     int totalCount;
     int secndsPast;
     QEventLoop *eventLoop;

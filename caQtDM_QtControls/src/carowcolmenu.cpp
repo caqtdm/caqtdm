@@ -191,12 +191,12 @@ void caRowColMenu::setImage(QString const &image) {
 void caRowColMenu::setStacking(Stacking stacking)
 {
     thisStacking = stacking;
-/*
+
     // force resize for repainting
-    QResizeEvent *re = new QResizeEvent(size(), size());
-    resizeEvent(re);
-    delete re;
-*/
+    //QResizeEvent *re = new QResizeEvent(size(), size());
+    //resizeEvent(re);
+    //delete re;
+
      populateCells();
 }
 
@@ -209,11 +209,13 @@ void  caRowColMenu::setLabels(QString const &newL)
 void caRowColMenu::setArgs(QString const &newL)
 {
     args = newL.split(";");
+    populateCells();
 }
 
 void caRowColMenu::setFiles(QString const &newL)
 {
     files = newL.split(";");
+    populateCells();
 }
 
 void caRowColMenu::setBackground(QColor c)

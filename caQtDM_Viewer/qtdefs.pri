@@ -196,6 +196,7 @@ DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 # camenu maske integriert, allows to make entries invisible
 # cathermo marker has now variable size
 # cursor shape did not change when on a cawidget and when access security changed
+# regex expressions now possible when using a macro (ask helge brands)
 
 # 4.1.6 of 7.9.2017
 # last index in array was not taken into account and scale was not updated for the wareerfallplot

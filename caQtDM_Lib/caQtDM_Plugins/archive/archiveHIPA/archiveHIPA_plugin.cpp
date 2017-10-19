@@ -109,7 +109,7 @@ void ArchiveHIPA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOf
    // qDebug() << "-------------------- ArchiveHIPA_Plugin::Callback_UpdateInterface finish";
 }
 
-void ArchiveHIPA_Plugin::handleResults(indexes indexNew, int nbVal, QVector<float> TimerN, QVector<float> YValsN,  QString backend)
+void ArchiveHIPA_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN,  QString backend)
 {
     //qDebug() << "in HIPA handle results" << nbVal << TimerN.count();
 

@@ -41,7 +41,7 @@ ArchiveSF_Plugin::ArchiveSF_Plugin()
 {
     suspend = false;
     qRegisterMetaType<indexes>("indexes");
-    qRegisterMetaType<QVector<float> >("QVector<float>");
+    qRegisterMetaType<QVector<double> >("QVector<double>");
 
     qDebug() << "ArchiveSF_Plugin: Create (http-retrieval)";
     archiverCommon = new ArchiverCommon();
@@ -183,8 +183,8 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
             connect(tmpThread, SIGNAL(finished()), tmpThread, SLOT(deleteLater()) );
             connect(this, SIGNAL(operate( QWidget *, indexes, QString, MessageWindow *)), worker,
                           SLOT(getFromArchive(QWidget *, indexes,  QString, MessageWindow *)));
-            connect(worker, SIGNAL(resultReady(indexes, int, QVector<float>, QVector<float>, QString)), this,
-                           SLOT(handleResults(indexes, int, QVector<float>, QVector<float>, QString)));
+            connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>, QString)), this,
+                           SLOT(handleResults(indexes, int, QVector<double>, QVector<double>, QString)));
             tmpThread->start();
 
             emit operate((QWidget *) messagewindowP, indexNew, index_name, messagewindowP);
@@ -197,7 +197,7 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
     //qDebug() << "====================== ArchiveSF_Plugin::Callback_UpdateInterface finished";
 }
 
-void ArchiveSF_Plugin::handleResults(indexes indexNew, int nbVal, QVector<float> TimerN, QVector<float> YValsN, QString backend)
+void ArchiveSF_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend)
 {
     //QThread *thread = QThread::currentThread();
     //qDebug() << "in sf handle results" << nbVal << TimerN.count() << indexNew.indexX << indexNew.indexY << thread;
