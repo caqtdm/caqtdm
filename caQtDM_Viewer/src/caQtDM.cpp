@@ -209,7 +209,7 @@ int main(int argc, char *argv[])
                    "  [-print] will print file and exit\n"
                    "  [-noResize] will prevent resizing\n"
                    "  [-cs defaultcontrolsystempluginname]\n"
-                   "  [-option \"xxx=aaa,yyy=bbb, ...\"] options for cs plugins\n"
+                   "  [-option \"xxx=aaa,yyy=bbb, ...\"] options for cs plugins, -option \"updatetype=direct\" will set the updatetype to Direct\n"
                    "  [-url url] will look for files on the specified url and download them to a local directory\n"
                    "  [-emptycache] will empty the local cache used for downloading"
                    "  [file]\n"
@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
             createMap(options, QString(argv[in]));
         } else if (strncmp (argv[in], "-" , 1) == 0) {
             /* unknown application argument */
-            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -stylefile -dg -x -print -httpconfig -noResize\n",in,argv[in]);
+            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -stylefile -dg -x -print -httpconfig -noResize -option\n",in,argv[in]);
         } else {
             printf("caQtDM -- file = <%s>\n", argv[in]);
             fileName = QString(argv[in]);

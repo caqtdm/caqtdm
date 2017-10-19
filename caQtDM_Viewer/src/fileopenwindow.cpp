@@ -259,6 +259,16 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 
     setWindowTitle(title);
 
+    // is updatetype specified on the command line as option, then set action direct and remove it
+    QMap<QString, QString>::const_iterator i = OptionList.find("updatetype");
+    while (i != OptionList.end() && i.key() == "updatetype") {
+        QString value = i.value();
+        if(value.toLower() == "direct")  emit Callback_ActionDirect();
+        else if(value.toLower() == "timed")  emit Callback_ActionTimed();
+        ++i;
+    }
+    OptionList.remove("updatetype");
+
 #ifdef MOBILE
     specials.setNewStyleSheet(messageWindow, qApp->desktop()->size(), 16, 10);
 #endif
