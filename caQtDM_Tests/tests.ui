@@ -120,7 +120,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: rgb(0,0,120);}</string>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>7</number>
     </property>
     <property name="usesScrollButtons">
      <bool>true</bool>
@@ -2886,8 +2886,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>431</width>
-           <height>187</height>
+           <width>100</width>
+           <height>30</height>
           </rect>
          </property>
          <attribute name="label">
@@ -10526,7 +10526,7 @@ def PythonCalc(a, b, c, d):
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
@@ -15221,6 +15221,300 @@ then see signals_2</string>
       </property>
      </widget>
     </widget>
+    <widget class="QWidget" name="tab_47">
+     <attribute name="title">
+      <string>signals_5</string>
+     </attribute>
+     <widget class="caChoice" name="caChoice_10">
+      <property name="geometry">
+       <rect>
+        <x>150</x>
+        <y>229</y>
+        <width>166</width>
+        <height>166</height>
+       </rect>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">ACM:TEST:MBBO </string>
+      </property>
+      <property name="background">
+       <color>
+        <red>170</red>
+        <green>255</green>
+        <blue>255</blue>
+       </color>
+      </property>
+      <property name="bordercolor">
+       <color>
+        <red>255</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </property>
+      <property name="alignment">
+       <enum>caChoice::center</enum>
+      </property>
+      <property name="colorMode">
+       <enum>caChoice::Static</enum>
+      </property>
+      <property name="fontScaleMode" stdset="0">
+       <enum>EPushButton::WidthAndHeight</enum>
+      </property>
+     </widget>
+     <widget class="caLabel" name="calabel_74">
+      <property name="geometry">
+       <rect>
+        <x>76</x>
+        <y>57</y>
+        <width>906</width>
+        <height>118</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>these controllers have the possibility to emit also a signal with an integer which could be used to change a tab currentindex
+other possibilities exists whenever the appropriate signal can be emitted</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+      <property name="foreground">
+       <color>
+        <red>255</red>
+        <green>255</green>
+        <blue>0</blue>
+       </color>
+      </property>
+      <property name="background">
+       <color alpha="0">
+        <red>255</red>
+        <green>255</green>
+        <blue>0</blue>
+       </color>
+      </property>
+      <property name="borderColor">
+       <color>
+        <red>255</red>
+        <green>255</green>
+        <blue>0</blue>
+       </color>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_18">
+      <property name="geometry">
+       <rect>
+        <x>548</x>
+        <y>181</y>
+        <width>109</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="palette">
+       <palette>
+        <active>
+         <colorrole role="WindowText">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>255</red>
+            <green>255</green>
+            <blue>255</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </active>
+        <inactive>
+         <colorrole role="WindowText">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>255</red>
+            <green>255</green>
+            <blue>255</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </inactive>
+        <disabled>
+         <colorrole role="WindowText">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>146</red>
+            <green>145</green>
+            <blue>144</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </disabled>
+       </palette>
+      </property>
+      <property name="text">
+       <string>camessage:</string>
+      </property>
+     </widget>
+     <widget class="caMessageButton" name="camessagebutton_9">
+      <property name="geometry">
+       <rect>
+        <x>557</x>
+        <y>215</y>
+        <width>100</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="fontScaleMode">
+       <enum>EPushButton::WidthAndHeight</enum>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">ACM:TEST:AO</string>
+      </property>
+      <property name="label">
+       <string notr="true">ACM:TEST:AO</string>
+      </property>
+      <property name="background">
+       <color>
+        <red>200</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </property>
+      <property name="disableChannel" stdset="0">
+       <string>ACM:TEST:AO</string>
+      </property>
+      <property name="pressMessage">
+       <string notr="true">5</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_19">
+      <property name="geometry">
+       <rect>
+        <x>164</x>
+        <y>176</y>
+        <width>129</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="palette">
+       <palette>
+        <active>
+         <colorrole role="WindowText">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>255</red>
+            <green>255</green>
+            <blue>255</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </active>
+        <inactive>
+         <colorrole role="WindowText">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>255</red>
+            <green>255</green>
+            <blue>255</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </inactive>
+        <disabled>
+         <colorrole role="WindowText">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>146</red>
+            <green>145</green>
+            <blue>144</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </disabled>
+       </palette>
+      </property>
+      <property name="text">
+       <string>cachoice :</string>
+      </property>
+     </widget>
+     <widget class="caMenu" name="caMenu_11">
+      <property name="geometry">
+       <rect>
+        <x>559</x>
+        <y>355</y>
+        <width>90</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">ACM:TEST:MBBO</string>
+      </property>
+      <property name="colorMode">
+       <enum>caMenu::Static</enum>
+      </property>
+      <property name="foreground">
+       <color>
+        <red>255</red>
+        <green>255</green>
+        <blue>0</blue>
+       </color>
+      </property>
+      <property name="background">
+       <color>
+        <red>255</red>
+        <green>85</green>
+        <blue>0</blue>
+       </color>
+      </property>
+      <property name="labelDisplay">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_20">
+      <property name="geometry">
+       <rect>
+        <x>550</x>
+        <y>308</y>
+        <width>109</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="palette">
+       <palette>
+        <active>
+         <colorrole role="WindowText">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>255</red>
+            <green>255</green>
+            <blue>255</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </active>
+        <inactive>
+         <colorrole role="WindowText">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>255</red>
+            <green>255</green>
+            <blue>255</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </inactive>
+        <disabled>
+         <colorrole role="WindowText">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>146</red>
+            <green>145</green>
+            <blue>144</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </disabled>
+       </palette>
+      </property>
+      <property name="text">
+       <string>camenu:</string>
+      </property>
+     </widget>
+    </widget>
     <widget class="QWidget" name="tab_44">
      <attribute name="title">
       <string>menubar</string>
@@ -16270,7 +16564,7 @@ then see signals_2</string>
    <slot>slotTiltAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>479</x>
+     <x>482</x>
      <y>662</y>
     </hint>
     <hint type="destinationlabel">
@@ -16334,7 +16628,7 @@ then see signals_2</string>
    <slot>slotStartAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>815</x>
+     <x>838</x>
      <y>403</y>
     </hint>
     <hint type="destinationlabel">
@@ -16370,7 +16664,7 @@ then see signals_2</string>
      <y>604</y>
     </hint>
     <hint type="destinationlabel">
-     <x>355</x>
+     <x>367</x>
      <y>622</y>
     </hint>
    </hints>
@@ -16382,11 +16676,11 @@ then see signals_2</string>
    <slot>setMacroname(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>196</x>
+     <x>208</x>
      <y>406</y>
     </hint>
     <hint type="destinationlabel">
-     <x>486</x>
+     <x>498</x>
      <y>622</y>
     </hint>
    </hints>
@@ -16398,11 +16692,11 @@ then see signals_2</string>
    <slot>setMacrovalue(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>183</x>
+     <x>195</x>
      <y>449</y>
     </hint>
     <hint type="destinationlabel">
-     <x>463</x>
+     <x>475</x>
      <y>622</y>
     </hint>
    </hints>
@@ -16648,18 +16942,66 @@ then see signals_2</string>
    </hints>
   </connection>
   <connection>
+   <sender>camessagebutton_9</sender>
+   <signal>pressClicked(int)</signal>
+   <receiver>tabWidget_2</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>599</x>
+     <y>309</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>659</x>
+     <y>82</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>caChoice_10</sender>
+   <signal>clicked(int)</signal>
+   <receiver>tabWidget_2</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>287</x>
+     <y>404</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>464</x>
+     <y>106</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>caMenu_11</sender>
+   <signal>activated(int)</signal>
+   <receiver>tabWidget_2</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>586</x>
+     <y>469</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>622</x>
+     <y>85</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
    <sender>cacalc_51</sender>
    <signal>emitSignal(int)</signal>
    <receiver>tabWidget_2</receiver>
    <slot>setCurrentIndex(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>571</x>
-     <y>38</y>
+     <x>555</x>
+     <y>42</y>
     </hint>
     <hint type="destinationlabel">
-     <x>573</x>
-     <y>63</y>
+     <x>558</x>
+     <y>69</y>
     </hint>
    </hints>
   </connection>

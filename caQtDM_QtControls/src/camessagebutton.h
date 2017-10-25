@@ -116,6 +116,8 @@ public slots:
 
 signals:
     void messageButtonSignal(int type);
+    void releaseClicked(int val);
+    void pressClicked(int val);
 
 private:
 

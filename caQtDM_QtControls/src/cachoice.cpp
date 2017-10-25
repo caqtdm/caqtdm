@@ -58,6 +58,7 @@ caChoice::caChoice(QWidget *parent) : QWidget(parent)
     }
     texts << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";
     signalMapper = new QSignalMapper(this);
+    signalMapperInt = new QSignalMapper(this);
 
     //setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     grid = new QGridLayout(this);
@@ -111,7 +112,9 @@ void caChoice::arrangeCells(QStringList list, int indx)
 
     // signalmapper will map signals from all buttons to one signal
     delete signalMapper;
+    delete signalMapperInt;
     signalMapper = new QSignalMapper(this);
+    signalMapperInt = new QSignalMapper(this);
 
     // create all buttons
     int count = 0;
@@ -176,13 +179,16 @@ void caChoice::arrangeCells(QStringList list, int indx)
         temp->show();
 
         signalMapper->setMapping(temp, list.at(i + thisStartBit));
+        signalMapperInt->setMapping(temp, i + thisStartBit);
         connect(temp, SIGNAL(clicked()), signalMapper, SLOT(map()));
+        connect(temp, SIGNAL(clicked()), signalMapperInt, SLOT(map()));
     }
 
     // when buttons available connect them
     if(count > 0) {
        lastValue = indx;
        connect(signalMapper, SIGNAL(mapped(QString)),this, SIGNAL(clicked(QString)));
+       connect(signalMapperInt, SIGNAL(mapped(int)),this, SIGNAL(clicked(int)));
 
        // when no buttons, make at least one
     } else {

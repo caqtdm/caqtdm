@@ -183,17 +183,7 @@ public:
         }
 #endif
         if (printDialog->exec() == QDialog::Accepted) {
-
-            QPainter painter(printer);
-            double xscale = printer->pageRect().width()/double(this->width());
-            double yscale = printer->pageRect().height()/double(this->height());
-            double scale = qMin(xscale, yscale);
-            painter.translate(printer->paperRect().x() + printer->pageRect().width()/2,
-                              printer->paperRect().y() + printer->pageRect().height()/2);
-            painter.scale(scale, scale);
-            painter.translate(-width()/2, -height()/2);
-            QPixmap pm = QPixmap::grabWidget(this);
-            painter.drawPixmap(0, 0, pm);
+            print2Painter(printer);
         }
 #endif
     }
@@ -211,17 +201,7 @@ public:
 #endif
         printer->setResolution(300);
         printer->setOutputFileName(filename);
-
-        QPainter painter(printer);
-        double xscale = printer->pageRect().width()/double(this->width());
-        double yscale = printer->pageRect().height()/double(this->height());
-        double scale = qMin(xscale, yscale);
-        painter.translate(printer->paperRect().x() + printer->pageRect().width()/2,
-                          printer->paperRect().y() + printer->pageRect().height()/2);
-        painter.scale(scale, scale);
-        painter.translate(-width()/2, -height()/2);
-        QPixmap pm = QPixmap::grabWidget(this);
-        painter.drawPixmap(0, 0, pm);
+        print2Painter(printer);
 #else
         Q_UNUSED(filename);
 #endif
@@ -250,6 +230,42 @@ private:
 #if !defined(useElapsedTimer)
     double rTime();
 #endif
+
+#ifndef MOBILE
+    void print2Painter(QPrinter *printer)
+    {
+        QPainter painter(printer);
+        QFont qfont = painter.font();
+        qfont.setPointSizeF(12);
+        painter.setFont(qfont);
+        QFontMetrics fm(qfont);
+        QFont thisFont = this->font();
+        thisFont.setPointSizeF(12);
+        QFontMetrics ft(thisFont);
+
+        painter.save();
+        double xscale = printer->pageRect().width()/double(this->width());
+        double yscale = printer->pageRect().height()/double(this->height() + ft.lineSpacing());
+        double scale = qMin(xscale, yscale);
+        painter.translate(printer->paperRect().x() + printer->pageRect().width()/2,
+                          printer->paperRect().y() + printer->pageRect().height()/2);
+        painter.scale(scale, scale);
+        painter.translate(-width()/2, -height()/2 + ft.lineSpacing());
+
+        QPixmap pm = QPixmap::grabWidget(this);
+        painter.drawPixmap(0, 0, pm);
+
+        painter.restore();
+
+        QString text = QDate::currentDate().toString("yyyy-MM-dd");
+        text += " " + QTime::currentTime().toString("hh:mm:ss");
+        text += ", " + this->thisFileShort;
+
+        painter.drawText(0, 0, text);
+        painter.drawText(0, fm.height() + fm.descent(), this->thisFileFull);
+    }
+#endif
+
     void scanChildren(QList<QWidget*> children, QWidget *tab, int i);
     QWidget* getTabParent(QWidget *w1);
     QString treatMacro(QMap<QString, QString> map, const QString& pv, bool *doNothing);

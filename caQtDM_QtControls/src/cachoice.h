@@ -129,6 +129,7 @@ protected:
 
 signals:
     void clicked(QString text);
+    void clicked(int indx);
 
 private:
     QGridLayout  *grid;
@@ -138,6 +139,7 @@ private:
     bool         thisAccessW;
     bool eventFilter(QObject *obj, QEvent *event);
     QSignalMapper *signalMapper;
+    QSignalMapper *signalMapperInt;
     QStringList   texts, labels, savedList;
     QList<EPushButton*> cells;
     int         thisStartBit;
