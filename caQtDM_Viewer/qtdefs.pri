@@ -192,6 +192,13 @@ DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
+# 4.1.6 of 2.11.2017
+# added to print date, time and filename
+# added signals to cachoice, camessage so that setting of the index of a tabwidget will be possible
+# changed all floats in archive plugins to doubles in order to get a better resolution of the time axis
+# access security had a small bug when over a gateway
+# command line option updatetype=direct added to set caQtDM in direct update mode
+
 # 4.1.6 of 18.10.2017
 # camenu maske integriert, allows to make entries invisible
 # cathermo marker has now variable size
