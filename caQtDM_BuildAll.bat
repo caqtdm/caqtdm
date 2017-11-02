@@ -50,5 +50,5 @@ set PATH=%PATH%;%QTHOME%\bin
 set PATH=%PATH%;%GITPATH%
 qmake all.pro
 where /q jom.exe 
-IF %ERRORLEVEL% NEQ 0 (nmake all) ELSE (jom all)
+IF %ERRORLEVEL% NEQ 0 (nmake all) ELSE (jom release)
 GOTO:eof

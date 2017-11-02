@@ -72,7 +72,7 @@ REM ============================================================================
   set QWTHOME=X:/qt/qwt-6.1.3_5_8_64bit
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
-  set GITPATH=C:\Users\brands\AppData\Local\Atlassian\SourceTree\git_local\bin\
+  set GITPATH=C:\Users\brands\AppData\Local\Atlassian\SourceTree\git_local\bin\;C:\Program Files (x86)\Git\bin
     
   set EPICS_BASE=X:/epics/Package/base
   set EPICS_HOST_ARCH=windows-x64
