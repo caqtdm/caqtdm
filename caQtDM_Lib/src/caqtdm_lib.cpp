@@ -7300,6 +7300,8 @@ void CaQtDM_Lib::TreatRequestedWave(QString pvo, QString text, caWaveTable::Form
     knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv);
     if(kPtr == (knobData *) 0)return;
 
+    if(index >= kPtr->edata.valueCount) return;
+
     QMutex *datamutex;
     datamutex = (QMutex*) kPtr->mutex;
     datamutex->lock();
