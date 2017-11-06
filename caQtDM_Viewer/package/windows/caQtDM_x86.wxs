@@ -135,7 +135,6 @@
                                 <File Id="QTIFF.DLL" Name="qtiff.dll" Source="$(env.QTHOME)\plugins\imageformats\qtiff.dll" />
                                 <File Id="QWBMP.DLL" Name="qwbmp.dll" Source="$(env.QTHOME)\plugins\imageformats\qwbmp.dll" />
                                 <File Id="QWEBP.DLL" Name="qwebp.dll" Source="$(env.QTHOME)\plugins\imageformats\qwebp.dll" />
-                                <File Id="QDDS.DLL" Name="qdds.dll" Source="$(env.QTHOME)\plugins\imageformats\qdds.dll" />
                                 <File Id="QGIF.DLL" Name="qgif.dll" Source="$(env.QTHOME)\plugins\imageformats\qgif.dll" />
                                 <File Id="QICNS.DLL" Name="qicns.dll" Source="$(env.QTHOME)\plugins\imageformats\qicns.dll" />
                                 <File Id="QICO.DLL" Name="qico.dll" Source="$(env.QTHOME)\plugins\imageformats\qico.dll" />

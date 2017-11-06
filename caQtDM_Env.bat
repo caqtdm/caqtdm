@@ -137,6 +137,11 @@ REM ============================================================================
   set ZMQINC=%ZMQ%/include
   set ZMQLIB=%ZMQ%/lib/%EPICS_HOST_ARCH%
 
+  set SSL=X:\qt\openssl-1.0.2j_32bit
+  set SSLINC=%SSL%\inc32
+  set SSLLIB=%SSL%\out32dll
+
+
 GOTO PRINTOUT
 
 REM =============================================================================================
