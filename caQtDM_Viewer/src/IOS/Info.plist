@@ -38,7 +38,7 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>Paul Scherrer Institut</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>caQtDM don't need to access any photos</string>
+	<string>caQtDM don&apos;t need to access any photos</string>
 	<key>NSSupportsSuddenTermination</key>
 	<false/>
 	<key>UIAppFonts</key>
@@ -52,7 +52,7 @@
 	<key>UIInterfaceOrientation</key>
 	<string>UIInterfaceOrientationLandscapeLeft</string>
 	<key>UILaunchImageFile~iphone</key>
-        <string>LaunchImage-iOS7-568h@2.png</string>
+	<string>LaunchImage-iOS7-568h@2.png</string>
 	<key>UIRequiresFullScreen</key>
 	<true/>
 	<key>UISupportedInterfaceOrientations</key>
@@ -60,82 +60,81 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-        <key>UILaunchImages</key>
-        <array>
-            <dict>
-                <key>UILaunchImageMinimumOSVersion</key>
-                <string>7.0</string>
-                <key>UILaunchImageName</key>
-                <string>LaunchImage-iOS7</string>
-                <key>UILaunchImageOrientation</key>
-                <string>Portrait</string>
-                <key>UILaunchImageSize</key>
-                <string>{320, 568}</string>
-            </dict>
-            <dict>
-                <key>UILaunchImageMinimumOSVersion</key>
-                <string>7.0</string>
-                <key>UILaunchImageName</key>
-                <string>LaunchImage-iOS7-568p</string>
-                <key>UILaunchImageOrientation</key>
-                <string>Landscape</string>
-                <key>UILaunchImageSize</key>
-                <string>{568, 320}</string>
-            </dict>
-            <dict>
-                <key>UILaunchImageMinimumOSVersion</key>
-                <string>7.0</string>
-                <key>UILaunchImageName</key>
-                <string>LaunchImage-iOS7</string>
-                <key>UILaunchImageOrientation</key>
-                <string>Portrait</string>
-                <key>UILaunchImageSize</key>
-                <string>{320, 480}</string>
-            </dict>
-        </array>
-        <key>UILaunchImages~ipad</key>
-        <array>
-            <dict>
-                <key>UILaunchImageMinimumOSVersion</key>
-                <string>7.0</string>
-                <key>UILaunchImageName</key>
-                <string>LaunchImage-iOS7-Landscape</string>
-                <key>UILaunchImageOrientation</key>
-                <string>Landscape</string>
-                <key>UILaunchImageSize</key>
-                <string>{768, 1024}</string>
-            </dict>
-            <dict>
-                <key>UILaunchImageMinimumOSVersion</key>
-                <string>7.0</string>
-                <key>UILaunchImageName</key>
-                <string>LaunchImage-iOS7-Portrait</string>
-                <key>UILaunchImageOrientation</key>
-                <string>Portrait</string>
-                <key>UILaunchImageSize</key>
-                <string>{768, 1024}</string>
-            </dict>
-            <dict>
-                <key>UILaunchImageMinimumOSVersion</key>
-                <string>7.0</string>
-                <key>UILaunchImageName</key>
-                <string>LaunchImage-iOS7</string>
-                <key>UILaunchImageOrientation</key>
-                <string>Portrait</string>
-                <key>UILaunchImageSize</key>
-                <string>{320, 568}</string>
-            </dict>
-            <dict>
-                <key>UILaunchImageMinimumOSVersion</key>
-                <string>7.0</string>
-                <key>UILaunchImageName</key>
-                <string>LaunchImage-iOS7</string>
-                <key>UILaunchImageOrientation</key>
-                <string>Portrait</string>
-                <key>UILaunchImageSize</key>
-                <string>{320, 480}</string>
-            </dict>
-        </array>
-
+	<key>UILaunchImages</key>
+	<array>
+		<dict>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-iOS7</string>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 568}</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-iOS7-568p</string>
+			<key>UILaunchImageOrientation</key>
+			<string>Landscape</string>
+			<key>UILaunchImageSize</key>
+			<string>{568, 320}</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-iOS7</string>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 480}</string>
+		</dict>
+	</array>
+	<key>UILaunchImages~ipad</key>
+	<array>
+		<dict>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-iOS7-Landscape</string>
+			<key>UILaunchImageOrientation</key>
+			<string>Landscape</string>
+			<key>UILaunchImageSize</key>
+			<string>{768, 1024}</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-iOS7-Portrait</string>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageSize</key>
+			<string>{768, 1024}</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-iOS7</string>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 568}</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-iOS7</string>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 480}</string>
+		</dict>
+	</array>
 </dict>
 </plist>
