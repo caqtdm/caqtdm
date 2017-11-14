@@ -33,8 +33,6 @@
 #include <qwt_scale_widget.h>
 #include <qwt_plot_marker.h>
 #include <qwt_scale_engine.h>
-#include <qwt_date_scale_engine.h>
-#include <qwt_date_scale_draw.h>
 #include <qwt_legend.h>
 #include <QMouseEvent>
 #include <QVarLengthArray>
@@ -51,6 +49,8 @@
 
 #if QWT_VERSION >= 0x060100
   #include <qwt_legend_label.h>
+  #include <qwt_date_scale_engine.h>
+  #include <qwt_date_scale_draw.h>
 #else
   #include <qwt_legend_item.h>
 #endif

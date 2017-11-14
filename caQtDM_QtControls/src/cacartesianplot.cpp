@@ -32,6 +32,7 @@
 #include "cacartesianplot.h"
 #include <QtCore>
 
+#if QWT_VERSION >= 0x060100
 class PlotScaleDateEngine: public QwtDateScaleEngine
 {
 public:
@@ -63,6 +64,7 @@ public:
 private:
     int nbTicks;
 };
+#endif
 
 class PlotScaleEngine: public QwtLinearScaleEngine
 {
@@ -1051,6 +1053,8 @@ void caCartesianPlot::setXaxisType(axisType s)
 {
     thisXtype = s;
     if(s == time) {
+// in qwt6.0 no date/time scale possible
+#if QWT_VERSION >= 0x060100
         // gives an axe for milliseconds since epoch
         PlotScaleDateEngine *scaleEngine = new PlotScaleDateEngine(thisXticks, Qt::LocalTime); // in number of milliseconds from epoch
         setAxisScaleEngine(QwtPlot::xBottom, scaleEngine);
@@ -1067,7 +1071,13 @@ void caCartesianPlot::setXaxisType(axisType s)
         setAxisScaleDraw(QwtPlot::xBottom, scaleDraw);
         double INTERVAL = 3600 * 1000;
         setAxisScale(QwtPlot::xBottom, 0.0, INTERVAL, INTERVAL/thisXticks);
-
+// fall back to normal scale
+#else
+        setAxisScaleEngine(QwtPlot::xBottom, new PlotScaleEngine(thisXticks));
+        setAxisScaleDraw(QwtPlot::xBottom, new QwtScaleDraw());
+        double INTERVAL = 1000.0;
+        setAxisScale(QwtPlot::xBottom, 0.0, INTERVAL, INTERVAL/thisXticks);
+#endif
     } else if(s == log10) {
 #if QWT_VERSION < 0x060100
         setAxisScaleEngine(QwtPlot::xBottom, new QwtLog10ScaleEngine);
