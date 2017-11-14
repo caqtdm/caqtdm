@@ -29,6 +29,7 @@
 #include "qtdefinitions.h"
 #include <QDebug>
 #include <QScrollArea>
+#include <QVariant>
 
 #define NOMINMAX
 
