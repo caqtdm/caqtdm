@@ -22,6 +22,7 @@
  *  Contact details:
  *    anton.mezger@psi.ch
  */
+
 #if defined(_MSC_VER)
 #define NOMINMAX
 #include <windows.h>
@@ -106,13 +107,13 @@ void caWaveTable::RedefineRowColumns(int xsav, int ysav, int z, int &x, int &y)
 
 void caWaveTable::setNumberOfRows(int nbRows)
 {
-    if(nbRows <=1) rowSaved = rowcount = 1;
+    if(nbRows <=0) rowSaved = rowcount = 0;
     else rowSaved = rowcount = nbRows;
     setupItems(rowcount, colcount);
 }
 
 void caWaveTable::setNumberOfColumns(int nbCols) {
-    if(nbCols <=1) colSaved = colcount = 1;
+    if(nbCols <=0) colSaved = colcount = 0;
     else colSaved = colcount = nbCols;
     setupItems(rowcount, colcount);
 }
