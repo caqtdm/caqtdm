@@ -120,7 +120,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: rgb(0,0,120);}</string>
     </property>
     <property name="currentIndex">
-     <number>7</number>
+     <number>11</number>
     </property>
     <property name="usesScrollButtons">
      <bool>true</bool>
@@ -16060,6 +16060,124 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
       </widget>
      </widget>
     </widget>
+    <widget class="QWidget" name="tab_48">
+     <attribute name="title">
+      <string>hidden info</string>
+     </attribute>
+     <widget class="caNumeric" name="canumeric_19">
+      <property name="geometry">
+       <rect>
+        <x>584</x>
+        <y>264</y>
+        <width>186</width>
+        <height>106</height>
+       </rect>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">ACM:TEST:AO</string>
+      </property>
+      <property name="foreground">
+       <color>
+        <red>255</red>
+        <green>255</green>
+        <blue>0</blue>
+       </color>
+      </property>
+      <property name="background">
+       <color>
+        <red>0</red>
+        <green>85</green>
+        <blue>255</blue>
+       </color>
+      </property>
+     </widget>
+     <widget class="caGraphics" name="cagraphics_25">
+      <property name="geometry">
+       <rect>
+        <x>339</x>
+        <y>133</y>
+        <width>181</width>
+        <height>99</height>
+       </rect>
+      </property>
+      <property name="foreground">
+       <color alpha="100">
+        <red>170</red>
+        <green>255</green>
+        <blue>255</blue>
+       </color>
+      </property>
+      <property name="fillstyle" stdset="0">
+       <enum>caGraphics::Filled</enum>
+      </property>
+      <property name="lineColor">
+       <color alpha="10">
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </property>
+     </widget>
+     <widget class="caRelatedDisplay" name="caRelatedDisplay_6">
+      <property name="geometry">
+       <rect>
+        <x>646</x>
+        <y>276</y>
+        <width>120</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="label">
+       <string notr="true">untitled</string>
+      </property>
+      <property name="foreground">
+       <color>
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </property>
+      <property name="background">
+       <color>
+        <red>183</red>
+        <green>157</green>
+        <blue>92</blue>
+       </color>
+      </property>
+      <property name="labels">
+       <string notr="true">atest</string>
+      </property>
+      <property name="files">
+       <string notr="true">untitled</string>
+      </property>
+      <property name="args">
+       <string/>
+      </property>
+      <property name="stackingMode" stdset="0">
+       <enum>caRowColMenu::Menu</enum>
+      </property>
+     </widget>
+     <widget class="caTextEntry" name="catextentry_19">
+      <property name="geometry">
+       <rect>
+        <x>362</x>
+        <y>182</y>
+        <width>100</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">ACM:TEST:AO</string>
+      </property>
+      <property name="elevation">
+       <enum>caTextEntry::as_is</enum>
+      </property>
+     </widget>
+     <zorder>canumeric_19</zorder>
+     <zorder>caRelatedDisplay_6</zorder>
+     <zorder>catextentry_19</zorder>
+     <zorder>cagraphics_25</zorder>
+    </widget>
    </widget>
    <widget class="caLineEdit" name="timeLineEdit">
     <property name="geometry">
@@ -16484,12 +16602,12 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>toggle()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>337</x>
-     <y>275</y>
+     <x>335</x>
+     <y>241</y>
     </hint>
     <hint type="destinationlabel">
-     <x>791</x>
-     <y>349</y>
+     <x>789</x>
+     <y>315</y>
     </hint>
    </hints>
   </connection>
@@ -16564,8 +16682,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotTiltAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>482</x>
-     <y>662</y>
+     <x>480</x>
+     <y>628</y>
     </hint>
     <hint type="destinationlabel">
      <x>463</x>
@@ -16580,8 +16698,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotSpanAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>482</x>
-     <y>662</y>
+     <x>480</x>
+     <y>628</y>
     </hint>
     <hint type="destinationlabel">
      <x>597</x>
@@ -16596,8 +16714,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotTiltAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>482</x>
-     <y>662</y>
+     <x>480</x>
+     <y>628</y>
     </hint>
     <hint type="destinationlabel">
      <x>810</x>
@@ -16628,8 +16746,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotStartAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>838</x>
-     <y>403</y>
+     <x>836</x>
+     <y>369</y>
     </hint>
     <hint type="destinationlabel">
      <x>950</x>
@@ -16644,8 +16762,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotSpanAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>964</x>
-     <y>403</y>
+     <x>962</x>
+     <y>369</y>
     </hint>
     <hint type="destinationlabel">
      <x>958</x>
@@ -16664,8 +16782,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
      <y>604</y>
     </hint>
     <hint type="destinationlabel">
-     <x>367</x>
-     <y>622</y>
+     <x>369</x>
+     <y>588</y>
     </hint>
    </hints>
   </connection>
@@ -16676,12 +16794,12 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setMacroname(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>208</x>
-     <y>406</y>
+     <x>210</x>
+     <y>372</y>
     </hint>
     <hint type="destinationlabel">
-     <x>498</x>
-     <y>622</y>
+     <x>500</x>
+     <y>588</y>
     </hint>
    </hints>
   </connection>
@@ -16692,12 +16810,12 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setMacrovalue(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>195</x>
-     <y>449</y>
+     <x>197</x>
+     <y>415</y>
     </hint>
     <hint type="destinationlabel">
-     <x>475</x>
-     <y>622</y>
+     <x>477</x>
+     <y>588</y>
     </hint>
    </hints>
   </connection>
