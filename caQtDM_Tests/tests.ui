@@ -16173,9 +16173,76 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
        <enum>caTextEntry::as_is</enum>
       </property>
      </widget>
+     <widget class="caCalc" name="cacalc_54">
+      <property name="geometry">
+       <rect>
+        <x>411</x>
+        <y>495</y>
+        <width>70</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>hideunhide</string>
+      </property>
+      <property name="variable">
+       <string notr="true">hideunhide</string>
+      </property>
+      <property name="calc">
+       <string notr="true"/>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true"/>
+      </property>
+      <property name="initialValue">
+       <double>0.000000000000000</double>
+      </property>
+      <property name="precision">
+       <number>0</number>
+      </property>
+      <property name="eventSignal">
+       <enum>caCalc::onAnyChange</enum>
+      </property>
+     </widget>
+     <widget class="caNumeric" name="canumeric_20">
+      <property name="geometry">
+       <rect>
+        <x>338</x>
+        <y>481</y>
+        <width>48</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="integerDigits" stdset="0">
+       <number>1</number>
+      </property>
+      <property name="decimalDigits" stdset="0">
+       <number>0</number>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">hideunhide</string>
+      </property>
+      <property name="precisionMode">
+       <enum>caNumeric::User</enum>
+      </property>
+      <property name="fixedFormat">
+       <bool>true</bool>
+      </property>
+      <property name="limitsMode">
+       <enum>caNumeric::User</enum>
+      </property>
+      <property name="maxValue">
+       <double>1.000000000000000</double>
+      </property>
+      <property name="minValue">
+       <double>0.000000000000000</double>
+      </property>
+     </widget>
      <zorder>canumeric_19</zorder>
      <zorder>caRelatedDisplay_6</zorder>
      <zorder>catextentry_19</zorder>
+     <zorder>cacalc_54</zorder>
+     <zorder>canumeric_20</zorder>
      <zorder>cagraphics_25</zorder>
     </widget>
    </widget>
@@ -16602,12 +16669,12 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>toggle()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>335</x>
-     <y>241</y>
+     <x>337</x>
+     <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>789</x>
-     <y>315</y>
+     <x>791</x>
+     <y>349</y>
     </hint>
    </hints>
   </connection>
@@ -16682,8 +16749,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotTiltAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>480</x>
-     <y>628</y>
+     <x>482</x>
+     <y>662</y>
     </hint>
     <hint type="destinationlabel">
      <x>463</x>
@@ -16698,8 +16765,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotSpanAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>480</x>
-     <y>628</y>
+     <x>482</x>
+     <y>662</y>
     </hint>
     <hint type="destinationlabel">
      <x>597</x>
@@ -16714,8 +16781,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotTiltAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>480</x>
-     <y>628</y>
+     <x>482</x>
+     <y>662</y>
     </hint>
     <hint type="destinationlabel">
      <x>810</x>
@@ -16746,8 +16813,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotStartAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>836</x>
-     <y>369</y>
+     <x>838</x>
+     <y>403</y>
     </hint>
     <hint type="destinationlabel">
      <x>950</x>
@@ -16762,8 +16829,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotSpanAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>962</x>
-     <y>369</y>
+     <x>964</x>
+     <y>403</y>
     </hint>
     <hint type="destinationlabel">
      <x>958</x>
@@ -16782,8 +16849,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
      <y>604</y>
     </hint>
     <hint type="destinationlabel">
-     <x>369</x>
-     <y>588</y>
+     <x>373</x>
+     <y>622</y>
     </hint>
    </hints>
   </connection>
@@ -16794,12 +16861,12 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setMacroname(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>210</x>
-     <y>372</y>
+     <x>212</x>
+     <y>406</y>
     </hint>
     <hint type="destinationlabel">
-     <x>500</x>
-     <y>588</y>
+     <x>504</x>
+     <y>622</y>
     </hint>
    </hints>
   </connection>
@@ -16810,12 +16877,12 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setMacrovalue(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>197</x>
-     <y>415</y>
+     <x>201</x>
+     <y>449</y>
     </hint>
     <hint type="destinationlabel">
-     <x>477</x>
-     <y>588</y>
+     <x>481</x>
+     <y>622</y>
     </hint>
    </hints>
   </connection>
@@ -17120,6 +17187,22 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
     <hint type="destinationlabel">
      <x>558</x>
      <y>69</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_54</sender>
+   <signal>emitSignal(bool)</signal>
+   <receiver>cagraphics_25</receiver>
+   <slot>hideObject(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>487</x>
+     <y>592</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>502</x>
+     <y>310</y>
     </hint>
    </hints>
   </connection>
