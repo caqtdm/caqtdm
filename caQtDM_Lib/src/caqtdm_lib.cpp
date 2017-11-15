@@ -6644,8 +6644,41 @@ void CaQtDM_Lib::ShowContextMenu(const QPoint& position) // this is a slot
         return;
     }
 
-    // normal case
-    DisplayContextMenu(qobject_cast<QWidget *>(sender()));
+    // when this widget has no monitors, it could be that an eventual underlying widget has monitors
+    // get the monitor list back for this widget
+    QVariant monitorList = w->property("MonitorList");
+    QVariantList MonitorList = monitorList.toList();
+    int nbMonitors = 0;
+    bool found = false;
+
+    if(MonitorList.size() > 0) nbMonitors = MonitorList.at(0).toInt();
+
+    // no monitors, then find a first underlying ca widget with monitors
+    if(nbMonitors == 0) {
+        QList<QWidget*> wList;
+        QPoint globalPos = qobject_cast< QWidget* >( sender() )->mapToGlobal( position );
+        QWidget *widgetAt = qApp->widgetAt(globalPos);
+        while (widgetAt != (QWidget *) 0) {
+            monitorList=widgetAt->property("MonitorList");
+            MonitorList = monitorList.toList();
+            if(MonitorList.size() > 0) nbMonitors = MonitorList.at(0).toInt();
+            QString className = widgetAt->metaObject()->className();
+            if((nbMonitors > 0) && (className.contains("ca")) && (widgetAt != w) && (!className.contains("caInclude")) && (!className.contains("caRel"))) {
+                DisplayContextMenu(widgetAt);
+                found = true;
+                break;
+            }
+            wList.append(widgetAt);
+            widgetAt->setAttribute(Qt::WA_TransparentForMouseEvents);
+            widgetAt = qApp->widgetAt(globalPos);
+        }
+        foreach(QWidget* widget, wList) {
+            widget->setAttribute(Qt::WA_TransparentForMouseEvents, false);
+        }
+    }
+       // normal case
+    if(!found) DisplayContextMenu(qobject_cast<QWidget *>(sender()));
+
 }
 
 /**
