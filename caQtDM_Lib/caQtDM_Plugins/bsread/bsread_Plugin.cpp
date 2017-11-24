@@ -145,6 +145,7 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
     }else{
         QString msg="Using Manual BSREAD Connection";
         if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
+        QString ZMQ_CONNECTION_TYPE=(QString)  qgetenv("BSREAD_ZMQ_CONNECTION_TYPE");
         QString ZMQ_ADDR_LIST = (QString)  qgetenv("BSREAD_ZMQ_ADDR_LIST");
 
         if (!ZMQ_ADDR_LIST.isEmpty()){
@@ -154,8 +155,10 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
             QStringList BSREAD_ZMQ_ADDRS = ZMQ_ADDR_LIST.split(" ");
     #endif
             for (i=0;i<BSREAD_ZMQ_ADDRS.count();i++){
-
-                bsreadconnections.append(new bsread_Decode(zmqcontex,BSREAD_ZMQ_ADDRS.at(i)));
+                if (!ZMQ_CONNECTION_TYPE.isEmpty())
+                    bsreadconnections.append(new bsread_Decode(zmqcontex,BSREAD_ZMQ_ADDRS.at(i),ZMQ_CONNECTION_TYPE));
+                else
+                    bsreadconnections.append(new bsread_Decode(zmqcontex,BSREAD_ZMQ_ADDRS.at(i)));
                 bsreadThreads.append(new QThread(this));
                 bsreadconnections.last()->setKnobData(mutexknobdataP);
                 bsreadconnections.last()->moveToThread(bsreadThreads.last());
@@ -189,7 +192,7 @@ int bsreadPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
     int i;
     QMutexLocker locker(&mutex);
     Dispatcher->add_Channel(kData->pv,kData->index);
-    //qDebug() << "bsreadPlugin:pvAddMonitor" << kData->pv << kData->index << kData;
+    qDebug() << "bsreadPlugin:pvAddMonitor" << kData->pv << kData->index << kData;
     i=0;
 
     while ((i<bsreadconnections.size())){
