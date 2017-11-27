@@ -439,6 +439,14 @@ private slots:
         print();
     }
 
+    void Callback_ResizeUp() {
+        this->resize(this->size()*1.1);
+    }
+
+    void Callback_ResizeDown() {
+        this->resize(this->size()*0.9);
+    }
+
     void updateResize();
 };
 

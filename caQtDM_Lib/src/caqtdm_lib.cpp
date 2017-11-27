@@ -577,6 +577,17 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     PrintWindowAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+P", 0, QApplication::UnicodeUTF8));
     connect(PrintWindowAction, SIGNAL(triggered()), this, SLOT(Callback_printWindow()));
     this->addAction(PrintWindowAction);
+
+    // add a resize action
+    QAction *ResizeUpAction = new QAction(this);
+    ResizeUpAction->setShortcut(QKeySequence::ZoomIn);
+    connect(ResizeUpAction, SIGNAL(triggered()), this, SLOT(Callback_ResizeUp()));
+    this->addAction(ResizeUpAction);
+    // add a resize action
+    QAction *ResizeDownAction = new QAction(this);
+    ResizeDownAction->setShortcut(QKeySequence::ZoomOut);
+    connect(ResizeDownAction, SIGNAL(triggered()), this, SLOT(Callback_ResizeDown()));
+    this->addAction(ResizeDownAction);
 }
 
 /**
@@ -1064,7 +1075,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         return;
     }
-
+/*
+    if(caScripting* ws = dynamic_cast<caScripting *>(w1)) {
+        ws->setParent(myWidget);
+        ws->evaluate();
+    }
+*/
     // any caWidget with caWidgetInterface - actually caInoutDemo (new monitor displaying values/string)
     if(caWidgetInterface* wif = dynamic_cast<caWidgetInterface *>(w1)) {
         wif->caActivate(this, map, &kData, specData, myWidget);
