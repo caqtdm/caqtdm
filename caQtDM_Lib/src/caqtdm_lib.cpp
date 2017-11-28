@@ -2896,23 +2896,32 @@ QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, 
         if(text.contains("$(") && text.contains(")")) {
             // normal macroexchange
             QMapIterator<QString, QString> i(map);
-            while (i.hasNext()) {
-                i.next();
-                QString toReplace = "$(" + i.key() + ")";
-                //qDebug() << "replace in" << newText << toReplace << "with" << i.value();
-                newText.replace(toReplace, i.value());
+            bool recursive_continue=true;
+            while (recursive_continue) {
+                //recursive_continue=false;
+                QString newText_Backup=newText;
+                while (i.hasNext()) {
+                    i.next();
+                    QString toReplace = "$(" + i.key() + ")";
+                    //qDebug() << "replace in" << newText << toReplace << "with" << i.value();
+                    newText.replace(toReplace, i.value());
+                }
+                if (newText_Backup.compare(newText)==0){
+                    //qDebug() << "finish Loop simple Macro Replace";
+                    recursive_continue=false;
+                }
             }
             i.toFront();
             if(newText.contains("$(")){
                 //qDebug() << "Spezial";
                 while (i.hasNext()) {
                     i.next();
-                    QString tofind = "$(" + i.key();
+                    QString tofind = "$(" + i.key()+"{";
                     int position=newText.indexOf(tofind);
                     while (position!=(-1)){
                         //qDebug() << "position" <<position;
                         if ((position>=0)&&(position<newText.length())){
-                            int json_start=position+tofind.length();
+                            int json_start=(position-1)+tofind.length();
                             int json_end  =newText.indexOf(QString("})"),json_start);
 
                             //qDebug() << "newText.mid(): " << newText.mid(json_start,json_end-json_start+1);
@@ -2966,6 +2975,25 @@ QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, 
                         position=newText.indexOf(tofind,position+1);
                     }
                 }
+
+            }
+            // unresolved macros
+            if(newText.contains("$(")){
+                QString unresMacroText="unknown Macros:";
+                QString tofind = "$(";
+                int position=newText.indexOf(tofind);
+                while (position!=(-1)){
+                    int wrongmacro_start=(position-1)+tofind.length();
+                    int wrongmacro_end  =newText.indexOf(QString(")"),wrongmacro_start);
+                    if ((position>=0)&&(position<newText.length())){
+                     unresMacroText.append(newText.mid(wrongmacro_start,wrongmacro_end-wrongmacro_start+1));
+                     unresMacroText.append(",");
+                    }
+
+                    position=newText.indexOf(tofind,position+1);
+                }
+                sprintf(asc, "%s", qasc(unresMacroText));
+                postMessage(QtWarningMsg, asc);
 
             }
         }
