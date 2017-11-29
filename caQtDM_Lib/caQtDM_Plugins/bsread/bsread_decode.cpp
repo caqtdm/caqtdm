@@ -37,7 +37,8 @@
 #include "JSONValue.h"
 #include "bsread_channeldata.h"
 #include "bsread_wfhandling.h"
-
+#include "compression/lz4.h"
+#include "compression/bitshuffle.h"
 enum Alarms {NO_ALARM=0, MINOR_ALARM, MAJOR_ALARM, INVALID_ALARM, NOTCONNECTED=99};
 
 
@@ -313,7 +314,7 @@ void bsread_Decode::setHeader(char *value,size_t size){
     ChannelSearch.clear();
     //Header Channel
     bsread_InitHeaderChannels();
-    //qDebug() << "Integer :" << ChannelHeader.toStdString().c_str();
+    qDebug() << "Integer :" << RawData;
     try{
         HeaderMessageJ = JSON::Parse(ChannelHeader.toStdString().c_str());
     }
@@ -385,6 +386,17 @@ void bsread_Decode::setHeader(char *value,size_t size){
                     if (jsonobj3.find(L"encoding") != jsonobj3.end() && jsonobj3[L"encoding"]->IsString()) {
                         if (QString::fromWCharArray(jsonobj3[L"encoding"]->AsString().c_str())=="big"){
                             chdata->endianess=bs_big;
+                        }
+                    }
+                    if (jsonobj3.find(L"compression") != jsonobj3.end() && jsonobj3[L"compression"]->IsString()) {
+                        if (QString::fromWCharArray(jsonobj3[L"encoding"]->AsString().c_str())=="none"){
+                            chdata->compression=none;
+                        }
+                        if (QString::fromWCharArray(jsonobj3[L"encoding"]->AsString().c_str())=="lz4"){
+                            chdata->compression=lz4;
+                        }
+                        if (QString::fromWCharArray(jsonobj3[L"encoding"]->AsString().c_str())=="bitshuffle_lz4"){
+                            chdata->compression=bitshuffle_lz4;
                         }
                     }
                     if (jsonobj3.find(L"shape") != jsonobj3.end() && jsonobj3[L"shape"]->IsArray()) {
@@ -646,7 +658,29 @@ void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message,size_t
 void bsread_Decode::bsread_SetChannelData(void *message,size_t size)
 {
     if ((message)&&(Channels.size()>channelcounter)){
-      bsread_SetData(Channels.at(channelcounter),message,size);
+     switch (Channels.at(channelcounter)->compression){
+     case bitshuffle_lz4:{
+         qDebug()<<"bitshuffle_lz4";
+         void *message_uncompressed=malloc(size*5);
+         size_t uncompressed_size;
+         uncompressed_size=bshuf_decompress_lz4(message,message_uncompressed,size,size*5,0);
+         bsread_SetData(Channels.at(channelcounter),message_uncompressed,uncompressed_size);
+         free(message_uncompressed);
+         break;
+        }
+     case lz4:{
+         qDebug()<<"lz4";
+            void *message_uncompressed=malloc(size*3);
+            size_t uncompressed_size;
+            uncompressed_size=LZ4_decompress_safe((char*)message,(char*)message_uncompressed,size,size*3);
+            bsread_SetData(Channels.at(channelcounter),message_uncompressed,uncompressed_size);
+            free(message_uncompressed);
+            break;
+        }
+     case none:
+        bsread_SetData(Channels.at(channelcounter),message,size);
+         break;
+     }
     }
 }
 

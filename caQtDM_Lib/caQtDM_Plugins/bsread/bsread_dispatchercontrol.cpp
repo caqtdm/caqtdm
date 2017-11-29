@@ -176,7 +176,15 @@ void bsread_dispatchercontrol::process()
                 }
             }
             data.remove(data.length()-1,1);
-            data.append("],\"sendIncompleteMessages\":true,\"compression\":\"none\",");
+            //data.append("],\"sendIncompleteMessages\":true,\"compression\":\"any\",");
+            data.append("],\"sendIncompleteMessages\":true,\"compression\":\"");
+            QString compression = (QString)  qgetenv("BSREAD_COMPRESSION");
+            if (compression.isEmpty()){
+               compression="none";
+            }
+            data.append(compression);
+            data.append("\",");
+
             data.append("\"mapping\":{\"incomplete\":\"fill-null\"},");
             data.append("\"channelValidation\":{\"inconsistency\":\"keep-as-is\"}}");
 

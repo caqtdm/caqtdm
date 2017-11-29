@@ -20,13 +20,22 @@ HEADERS         = bsread_Plugin.h ../controlsinterface.h \
     bsread_wfhandling.h \
     bsread_wfconverter.h \
     bsread_wfblockconverter.h \
-    bsread_wfconverterthread.h
+    bsread_wfconverterthread.h \
+    compression/lz4.h \
+    compression/iochain.h \
+    compression/bitshuffle_internals.h \
+    compression/bitshuffle_core.h \
+    compression/bitshuffle.h 
 SOURCES         = bsread_Plugin.cpp md5.cc \
     bsread_decode.cpp \
     bsread_channeldata.cpp \
     bsread_dispatchercontrol.cpp \
     bsread_wfhandling.cpp \
-    bsread_wfconverterthread.cpp
+    bsread_wfconverterthread.cpp \
+    compression/bitshuffle.c \
+    compression/bitshuffle_core.c \
+    compression/iochain.c \
+    compression/lz4.c
 TARGET          = bsread_Plugin
 
 

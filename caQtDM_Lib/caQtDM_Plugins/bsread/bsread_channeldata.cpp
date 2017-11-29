@@ -34,6 +34,7 @@ bsread_channeldata::bsread_channeldata(QObject *parent) : QObject(parent)
     endianess=bs_little;
     bsdata.wf_data=NULL;
     bsdata.wf_data_size=0;
+    compression=none;
     precision=4;
     units="";
     valid=false;
