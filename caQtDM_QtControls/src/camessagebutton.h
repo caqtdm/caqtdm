@@ -114,6 +114,13 @@ public slots:
 #include "hideobjectcode.h"
     }
 
+    void sendMssage(int i) {
+        emit animateClick();
+        if(_AccessW) buttonhandle(i);
+    }
+
+
+
 signals:
     void messageButtonSignal(int type);
     void releaseClicked(int val);
