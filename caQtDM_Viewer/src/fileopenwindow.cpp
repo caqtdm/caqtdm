@@ -1319,6 +1319,7 @@ void FileOpenWindow::fillPVtable(int &countPV, int &countNotConnected, int &coun
             }
         }
         pvTable->resizeColumnsToContents();
+        pvTable->horizontalHeader()->setStretchLastSection(true);
     }
 }
 
