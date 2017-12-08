@@ -76,7 +76,7 @@ public slots:
         loggingServer = loggingServer.toUpper();
         if(loggingServer.isEmpty() || !loggingServer.contains("HIPA")) setenv("LOGGINGSERVER", "hipa-lgexp.psi.ch", 1);
 
-        //qDebug() << "get from archive at " << "hipa-lgexp.psi.ch";
+        qDebug() << "get from archive at " << "hipa-lgexp.psi.ch";
         int startHours = indexNew.secondsPast / 3600;
         int day =  startHours/24 + 1;
         int arraySize =  3600/5 * 24 * (day+1);
@@ -109,6 +109,7 @@ public slots:
         //qDebug() << ">>>> hipa nbval=" << nbVal << TimerN.count() << k;
 
         emit resultReady(indexNew, nbVal, TimerN, YValsN, "");
+
         mutex->unlock();
     }
 

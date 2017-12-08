@@ -95,8 +95,8 @@ void ArchiveHIPA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOf
             connect(tmpThread, SIGNAL(finished()), tmpThread, SLOT(deleteLater()) );
             connect(this, SIGNAL(operate( QWidget *, indexes)), worker,
                           SLOT(getFromArchive(QWidget *, indexes)));
-            connect(worker, SIGNAL(resultReady(indexes, int, QVector<float>, QVector<float>, QString)), this,
-                            SLOT(handleResults(indexes, int, QVector<float>, QVector<float>, QString)));
+            connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>, QString)), this,
+                            SLOT(handleResults(indexes, int, QVector<double>, QVector<double>, QString)));
             tmpThread->start();
 
             //qDebug() << "HIPA emit operate";
