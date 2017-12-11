@@ -389,13 +389,13 @@ void bsread_Decode::setHeader(char *value,size_t size){
                         }
                     }
                     if (jsonobj3.find(L"compression") != jsonobj3.end() && jsonobj3[L"compression"]->IsString()) {
-                        if (QString::fromWCharArray(jsonobj3[L"encoding"]->AsString().c_str())=="none"){
+                        if (QString::fromWCharArray(jsonobj3[L"compression"]->AsString().c_str())=="none"){
                             chdata->compression=none;
                         }
-                        if (QString::fromWCharArray(jsonobj3[L"encoding"]->AsString().c_str())=="lz4"){
+                        if (QString::fromWCharArray(jsonobj3[L"compression"]->AsString().c_str())=="lz4"){
                             chdata->compression=lz4;
                         }
-                        if (QString::fromWCharArray(jsonobj3[L"encoding"]->AsString().c_str())=="bitshuffle_lz4"){
+                        if (QString::fromWCharArray(jsonobj3[L"compression"]->AsString().c_str())=="bitshuffle_lz4"){
                             chdata->compression=bitshuffle_lz4;
                         }
                     }
@@ -657,27 +657,50 @@ void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message,size_t
 
 void bsread_Decode::bsread_SetChannelData(void *message,size_t size)
 {
+
     if ((message)&&(Channels.size()>channelcounter)){
+//        bsread_SetData(Channels.at(channelcounter),message,size);
+//}
      switch (Channels.at(channelcounter)->compression){
      case bitshuffle_lz4:{
          qDebug()<<"bitshuffle_lz4";
-         void *message_uncompressed=malloc(size*5);
-         size_t uncompressed_size;
-         uncompressed_size=bshuf_decompress_lz4(message,message_uncompressed,size,size*5,0);
+         quint32 data_size=(size-sizeof(quint64))-sizeof(quint32);
+         void *message_data=(void*)(((char*)message)+sizeof(quint64)+sizeof(quint32));
+
+         quint64 big_uncompressed_size=*((quint64*) ((char*)message));
+         quint64 uncompressed_size=qFromBigEndian(big_uncompressed_size);
+         quint32 big_block_size=((quint32*)((char*)message))[2];
+         quint32 block_size=qFromBigEndian(big_block_size);
+
+         qDebug()<<"Size: "<<uncompressed_size<<"Block: " <<block_size;
+
+         void *message_uncompressed=malloc(uncompressed_size);
+         //Channels.at(channelcounter)->type
+         try{
+         int size_return=bshuf_decompress_lz4(message_data,message_uncompressed,data_size,2,0);
+
+         qDebug()<<"used data: "<<size_return;
          bsread_SetData(Channels.at(channelcounter),message_uncompressed,uncompressed_size);
+         }catch(...){}
          free(message_uncompressed);
          break;
         }
      case lz4:{
          qDebug()<<"lz4";
-            void *message_uncompressed=malloc(size*3);
-            size_t uncompressed_size;
-            uncompressed_size=LZ4_decompress_safe((char*)message,(char*)message_uncompressed,size,size*3);
+            qint32 uncompressed_size;
+
+            uncompressed_size=*(qint32*)message;
+            qDebug()<<"lz4"<< uncompressed_size <<"message size"<< size;
+            void *message_uncompressed=malloc(uncompressed_size);
+
+            uncompressed_size=LZ4_decompress_safe((char*)message+4,(char*)message_uncompressed,size,uncompressed_size);
+
             bsread_SetData(Channels.at(channelcounter),message_uncompressed,uncompressed_size);
             free(message_uncompressed);
             break;
         }
      case none:
+         qDebug()<<"none";
         bsread_SetData(Channels.at(channelcounter),message,size);
          break;
      }
