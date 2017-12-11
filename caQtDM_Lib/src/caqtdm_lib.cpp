@@ -5039,7 +5039,9 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 // here we have to be carefull, while a waveform will give you an index to
                 // a list ("STRING", "CHAR", "UCHAR", "SHORT", "USHORT", "LONG", "ULONG", "FLOAT", "DOUBLE", "ENUM")
                 // however it could be something else
-                if(data.edata.ivalue < list.count()) wavetableWidget->setDataType(list.at(data.edata.ivalue));
+                if (data.edata.connected && (data.edata.ivalue>=0)){
+                 if(data.edata.ivalue < list.count()) wavetableWidget->setDataType(list.at(data.edata.ivalue));
+                }
             }
 
         } else if(data.specData[0] == 0){
