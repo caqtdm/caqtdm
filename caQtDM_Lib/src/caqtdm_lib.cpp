@@ -1075,6 +1075,9 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             connect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
             w1->setProperty("Connect", false);
 
+
+            connect(w1, SIGNAL(changeValue(double)), this, SLOT(Callback_CaCalc(double)));
+
             calcWidget->setProperty("Taken", true);
         }
 
@@ -5438,6 +5441,27 @@ void CaQtDM_Lib::getStatesToggleAndLed(QWidget *widget, const knobData &data, co
             // string value
         } else {
             if(falseString.compare(str) == 0) state = Qt::Unchecked;
+        }
+    }
+}
+
+void CaQtDM_Lib::Callback_CaCalc(double value)
+{
+    int indx;
+    caCalc *caCalcWidget = qobject_cast<caCalc *>(sender());
+    //qDebug() << "-------------------- Callback_CaCalc from sender" << value << caCalcWidget << caCalcWidget->getVariable();
+
+    knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(caCalcWidget, caCalcWidget->getVariable());
+    if(kPtr != (knobData *) 0) {
+        // when softpv treat it and get out
+        if(mutexKnobDataP->getSoftPV(caCalcWidget->getVariable(), &indx, (QWidget*) kPtr->thisW)) {
+            if(kPtr->soft) {
+                //qDebug() << "write softpv at" << kPtr->index << kPtr->pv << "with value" << value;
+                kPtr = mutexKnobDataP->GetMutexKnobDataPtr(indx);  // use pointer
+                kPtr->edata.rvalue = value;
+                kPtr->edata.ivalue = (int) value;
+                kPtr->edata.monitorCount++;
+            }
         }
     }
 }

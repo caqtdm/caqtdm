@@ -382,6 +382,7 @@ private:
     QString defaultPlugin;
 
 private slots:
+    void Callback_CaCalc(double value) ;
     void Callback_UndefinedMacrowindowExit();
     void Callback_EApplyNumeric(double value);
     void Callback_ENumeric(double value);

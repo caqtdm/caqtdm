@@ -594,7 +594,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 kPtr->edata.accessW = true;
                 kPtr->edata.accessR = true;
 
-                // possibly we updated this caCalc by signal
+                /*possibly we updated this caCalc by signal, code moved to main thread using a slot
                 if(ptr->edata.valueCount == 0) {
                     QWidget *w2 = (QWidget *)kPtr->dispW;
                     if(caCalc *calcWidget = qobject_cast<caCalc *>(w2)) {
@@ -604,7 +604,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                                 ptr->edata.ivalue = (int) calcWidget->getValue();
                             }
                     }
-                }
+                }*/
 
                 bool update = false;
                 // when waveform put first value into the normal value

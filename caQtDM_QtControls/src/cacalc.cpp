@@ -90,6 +90,10 @@ void caCalc::setValue(double value)
         }
     }
     thisValue =value;
+    //printf("%s emit change value %f\n", qasc(objectName()), value);
+    // only in case of a change where no calculation takes places, will we update
+    // the data container with the actual value
+    if(thisCalc.trimmed().size() == 0) emit changeValue(value);
 }
 
 void caCalc::setValue(QString value)
