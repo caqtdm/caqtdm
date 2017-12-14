@@ -59,6 +59,7 @@
 
 #include <epicsMutex.h>
 static epicsMutexId lockEpics = (epicsMutexId) 0;
+static int optimizeConnections = false;
 
 // global variables defined in epics3_plugin for access through c routines
 extern MutexKnobData* mutexKnobdataPtr;
@@ -146,6 +147,7 @@ void PrepareDeviceIO(void)
 {
     //printf("preparedeviceio\n");
     int status;
+    char *optimize = NULL;
 
     if(lockEpics == (epicsMutexId) 0) InitializeContextMutex();
 
@@ -159,6 +161,20 @@ void PrepareDeviceIO(void)
             exit(1);
         }
         ca_add_exception_event(Exceptionhandler, 0);
+
+        optimize = (char*) getenv("CAQTDM_OPTIMIZE_EPICS3CONNECTIONS");
+        if (optimize != NULL) {
+            if(strcmp(optimize, "true") == 0) {
+                optimizeConnections = true;
+                C_postMsgEvent(messageWindowPtr, 1, vaPrintf("caQtDM will close epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS=true\n"));
+                printf("caQtDM -- Close epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS=true\n");
+            }
+        }
+        if(!optimizeConnections) {
+            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("caQtDM will suspend epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS not set to true\n"));
+            printf("caQtDM -- Suspend epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS not set to true\n");
+        }
+
     } else {
         //printf("context exists\n");
         status = ca_attach_context(ca_current_context());
@@ -599,19 +615,34 @@ void clearEvent(void * ptr)
     int status;
     connectInfo *info = (connectInfo *) ptr;
     if(info == (connectInfo *) 0) return;
-
     if(!info->connected) return;  // must be connected
-    if(info->event < 2) return;  // a first normal addevent must be done
-    if(info->evAdded) {
 
-      PrepareDeviceIO();
+    if(optimizeConnections) {
 
-      PRINT(printf("clearEvent -- %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded));
-      info->evAdded = false;
-      status = ca_clear_event(info->evID);
-      if (status != ECA_NORMAL) {
-          PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
-      }
+        knobData kData;
+        C_GetMutexKnobData(mutexKnobdataPtr, info->index, &kData);
+        if(kData.index == -1) return;
+
+        C_DataLock(mutexKnobdataPtr, &kData);
+        PRINT(printf("destroyConnection -- %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded));
+        EpicsDisconnect(&kData);
+        C_SetMutexKnobData(mutexKnobdataPtr, kData.index, kData);
+        C_DataUnlock(mutexKnobdataPtr, &kData);
+
+    } else {
+
+        if(info->event < 2) return;  // a first normal addevent must be done
+        if(info->evAdded) {
+
+            PrepareDeviceIO();
+
+            PRINT(printf("clearEvent -- %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded));
+            info->evAdded = false;
+            status = ca_clear_event(info->evID);
+            if (status != ECA_NORMAL) {
+                PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+            }
+        }
     }
 }
 
@@ -623,30 +654,47 @@ void addEvent(void * ptr)
     connectInfo *info = (connectInfo *) ptr;
     if(info == (connectInfo *) 0) return;
 
-    if(!info->connected) return; // must be connected
-    if(info->event < 2) return;  // a first normal addevent must be done
-    if(!info->evAdded) {
+    if(optimizeConnections) {
 
+        if(info->connected) return; // already connected ?
         knobData kData;
-        int status;
-
-        PrepareDeviceIO();
 
         C_GetMutexKnobData(mutexKnobdataPtr, info->index, &kData);
         if(kData.index == -1) return;
 
         C_DataLock(mutexKnobdataPtr, &kData);
-        PRINT(printf("addEvent -- %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded));
-        status = ca_add_array_event(dbf_type_to_DBR_STS(ca_field_type(info->ch)), 0,
-                                        info->ch, dataCallback, info, 0.0,0.0,0.0, &info->evID);
-        info->evAdded = true;
-
-        if (status != ECA_NORMAL) {
-            PRINT(printf("ca_add_array_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
-        }
+        PRINT(printf("recreateConnection -- %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded));
+        EpicsReconnect(&kData);
         C_SetMutexKnobData(mutexKnobdataPtr, kData.index, kData);
-
         C_DataUnlock(mutexKnobdataPtr, &kData);
+
+    } else {
+
+        if(!info->connected) return; // must be connected
+        if(info->event < 2) return;  // a first normal addevent must be done
+        if(!info->evAdded) {
+
+            knobData kData;
+            int status;
+
+            PrepareDeviceIO();
+
+            C_GetMutexKnobData(mutexKnobdataPtr, info->index, &kData);
+            if(kData.index == -1) return;
+
+            C_DataLock(mutexKnobdataPtr, &kData);
+            PRINT(printf("addEvent -- %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded));
+            status = ca_add_array_event(dbf_type_to_DBR_STS(ca_field_type(info->ch)), 0,
+                                        info->ch, dataCallback, info, 0.0,0.0,0.0, &info->evID);
+            info->evAdded = true;
+
+            if (status != ECA_NORMAL) {
+                PRINT(printf("ca_add_array_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+            }
+            C_SetMutexKnobData(mutexKnobdataPtr, kData.index, kData);
+
+            C_DataUnlock(mutexKnobdataPtr, &kData);
+        }
     }
 }
 
@@ -754,7 +802,7 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
                                CA_PRIORITY_DEFAULT,
                                &info->ch);
     if(status != ECA_NORMAL) {
-        printf("ca_create_channel:\n"" %s for %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], kData->pv);
+        printf("ca_create_channel: %s for device -%s-\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], kData->pv);
     }
 
     status = ca_pend_io(CA_TIMEOUT);
