@@ -693,7 +693,18 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
     if (mutexKnobData != (MutexKnobData *) 0) {
         char msg[255];
         msg[0] = '\0';
-        fillPVtable(countPV, countNotConnected, countDisplayed);
+
+        for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
+            knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
+            if(kPtr->index != -1) {
+                if(!kPtr->edata.connected) {
+                    countNotConnected++;
+                } else {
+                    if(kPtr->edata.displayCount > 0) countDisplayed++;
+                }
+                countPV++;
+            }
+        }
 
         if(caQtDM_TimeOutEnabled) {
             char asc1[30];
