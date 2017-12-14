@@ -165,17 +165,17 @@ void PrepareDeviceIO(void)
         ca_add_exception_event(Exceptionhandler, 0);
 
         optimize = (char*) getenv("CAQTDM_OPTIMIZE_EPICS3CONNECTIONS");
-        s = optimize; while (*s) {*s = toupper((unsigned char) *s); s++;}
         if (optimize != NULL) {
+            s = optimize; while (*s) {*s = toupper((unsigned char) *s); s++;}
             if(strcmp(optimize, "TRUE") == 0) {
                 optimizeConnections = true;
                 C_postMsgEvent(messageWindowPtr, 1, vaPrintf("caQtDM will close epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS is set to TRUE\n"));
-                printf("caQtDM -- Close epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS=true\n");
+                printf("caQtDM -- Close epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS is TRUE\n");
             }
         }
         if(!optimizeConnections) {
             C_postMsgEvent(messageWindowPtr, 1, vaPrintf("caQtDM will suspend epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS not set to TRUE\n"));
-            printf("caQtDM -- Suspend epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS not set to true\n");
+            printf("caQtDM -- Suspend epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS not set to TRUE\n");
         }
 
     } else {
