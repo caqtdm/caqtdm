@@ -77,6 +77,8 @@ caThermo::caThermo(QWidget *parent) : QwtThermoMarker(parent), m_externalEnabled
     // these default could be changed by a stylesheet
     defaultForeColor = QColor(Qt::darkRed);
     defaultBackColor = QColor(Qt::lightGray);
+    defaultForeColorOld = defaultBackColor;
+    defaultBackColorOld = defaultForeColor;
 
     setAutoFillBackground( true );
     setBackground(QColor(224,224,224));
@@ -114,7 +116,8 @@ void caThermo::setPV(QString const &newPV)
 void caThermo::setColors(QColor bg, QColor fg, QColor textColor, colMode mode)
 {
 
-    if((bg != oldBackColor) || (fg != oldForeColor)  || (textColor != oldTextColor) || (mode != oldColorMode)) {
+    if((bg != oldBackColor) || (fg != oldForeColor)  || (textColor != oldTextColor) || (mode != oldColorMode)
+            || (defaultBackColorOld != defaultBackColor) || (defaultForeColorOld != defaultForeColor)) {
 
         QPalette thisPalette = palette();
 
@@ -122,14 +125,15 @@ void caThermo::setColors(QColor bg, QColor fg, QColor textColor, colMode mode)
             if(!defaultBackColor.isValid() || !defaultForeColor.isValid()) return;
             QColor bgs = defaultBackColor.darker(125);
             bgs.setAlpha(bg.alpha());
-            //printf("default palette %d %d %d\n", fg.red(), fg.green(), fg.blue());
+            //printf("default palette fg %d %d %d %s\n", defaultForeColor.red(), defaultForeColor.green(), defaultForeColor.blue(), qasc(objectName()));
+            //printf("default palette bg %d %d %d %s\n", defaultBackColor.red(), defaultBackColor.green(), defaultBackColor.blue(), qasc(objectName()));
             thisPalette.setColor(QPalette::ButtonText, defaultForeColor);
             thisPalette.setColor(QPalette::Text, textColor);
             thisPalette.setColor(QPalette::WindowText, textColor);
             thisPalette.setColor(QPalette::Window, bg);
             thisPalette.setColor(QPalette::Base, bgs);
-
             setPalette(thisPalette);
+
         } else if(thisColorMode == Static) {
             QColor bgs = bg.darker(125);
             bgs.setAlpha(bg.alpha());
@@ -172,6 +176,8 @@ void caThermo::setColors(QColor bg, QColor fg, QColor textColor, colMode mode)
     oldForeColor = fg;
     oldTextColor = textColor;
     oldColorMode = mode;
+    defaultBackColorOld = defaultBackColor;
+    defaultForeColorOld = defaultForeColor;
 }
 
 void caThermo::setBackground(QColor c)
@@ -373,7 +379,6 @@ bool caThermo::event(QEvent *e)
     } else if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
 
         const caThermo* that = this;
-        int pipeWidth;
 
         switch (thisScale) {
 

@@ -151,6 +151,7 @@ private:
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
     QColor thisTextColor, oldTextColor;
+    QColor defaultBackColorOld, defaultForeColorOld;
 
     colMode thisColorMode;
     colMode oldColorMode;
