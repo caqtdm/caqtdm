@@ -175,6 +175,7 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     setScaleColor(Qt::black);
     setGrid(true);
     setGridColor(Qt::gray);
+    whiteColors = false;
 
     setAutoFillBackground(true);
 
@@ -1129,9 +1130,13 @@ void caCartesianPlot::setYaxisType(axisType s)
 void caCartesianPlot::setWhiteColors()
 {
     QColor c = QColor(Qt::white);
+/* optimized, do not set white to curve to prevent load and flashing
+   and still see some old curve if was present
     for(int i=0; i<curveCount; i++) {
         setColor(c, i);
-    }
+    } */
+    if(whiteColors) return;
+    whiteColors = true;
     setBackgroundColor(c);
     setForegroundColor(c);
     setScalesColor(c);
@@ -1140,9 +1145,11 @@ void caCartesianPlot::setWhiteColors()
 
 void caCartesianPlot::setAllProperties()
 {
+    whiteColors = false;
     for(int i=0; i<curveCount; i++) {
         setColor(thisLineColor[i], i);
     }
+
     setBackgroundColor(thisBackColor);
     setForegroundColor(thisForeColor);
     setScalesColor(thisScaleColor);
