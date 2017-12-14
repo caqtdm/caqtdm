@@ -1,21 +1,11 @@
 #!/bin/sh
-
-export QTCONTROLS_LIBS=/afs/psi.ch/user/m/mezger/workarea/ACS/mezger/caQtDM_Project/caQtDM_Binaries
-export QTHOME=/afs/psi.ch/intranet/Controls/Software/Trolltech/SL6-x86_64/Qt-4.8.2
+export QTCONTROLS_LIBS=`pwd`//caQtDM_Binaries
 export QTBASE=${QTCONTROLS_LIBS}
-export QWTHOME=/afs/psi.ch/intranet/Controls/Software/Trolltech/SL6-x86_64/qwt-6.1.1
-export QWTINCLUDE=$QWTHOME/src
-export QWTLIB=$QWTHOME/lib
-
 export PATH=.:$QTBASE:$PATH
-
-export LD_LIBRARY_PATH=.:$QWTLIB:$QTBASE:$LD_LIBRARY_PATH
-
+export LD_LIBRARY_PATH=.:$QTBASE:$LD_LIBRARY_PATH
 export QT_PLUGIN_PATH=$QTBASE
-export CAQTDM_DISPLAY_PATH=`pwd`/caQtDM_Tests
-
-
-ldd $QTBASE/caQtDM
-
+export CAQTDM_DISPLAY_PATH="`pwd`/caQtDM_Tests ../caQtDM_Tests/hipaFiles ../caQtDM_Tests/sfFiles"
+echo $CAQTDM_DISPLAY_PATH
 export EPICS_CA_MAX_ARRAY_BYTES=40000000
+export CAQTDM_OPTIMIZE_EPICS3CONNECTIONS=true
 $QTBASE/caQtDM -style plastique $*&
