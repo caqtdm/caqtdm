@@ -6682,7 +6682,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             print();
 
         } else if(selectedItem->text().contains(UNDEFINEDMACROS)) {
-            UndefinedMacrosWindow();
+            if(unknownMacrosList.count() > 0) UndefinedMacrosWindow();
 
         } else if(selectedItem->text().contains(RELOADWINDOW)) {
             emit Signal_ReloadWindowL();
