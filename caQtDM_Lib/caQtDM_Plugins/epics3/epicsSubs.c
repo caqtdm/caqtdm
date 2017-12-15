@@ -658,9 +658,9 @@ void addEvent(void * ptr)
     if(info == (connectInfo *) 0) return;
 
     if(optimizeConnections) {
-
-        if(info->connected) return; // already connected ?
         knobData kData;
+        if(info->connected) return; // already connected ?
+
 
         C_GetMutexKnobData(mutexKnobdataPtr, info->index, &kData);
         if(kData.index == -1) return;
