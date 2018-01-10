@@ -3063,7 +3063,8 @@ void CaQtDM_Lib::UndefinedMacrosWindow()
     macroTable->horizontalHeader()->setStretchLastSection(true);
 
     QMap<QString, QString>::const_iterator i = unknownMacrosList.constBegin();
-    macroTable->setRowCount(unknownMacrosList.count());
+    if(unknownMacrosList.count() > 0) macroTable->setRowCount(unknownMacrosList.count());
+    else macroTable->setRowCount(1);
     while (i != unknownMacrosList.constEnd()) {
         QStringList list = i.key().split("###", QString::SkipEmptyParts);
         //qDebug() << i.key() << "macro variable" << list.at(0) << "in widget" << list.at(1) << "in file" << list.at(2) << "is undefined";
@@ -6684,7 +6685,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             print();
 
         } else if(selectedItem->text().contains(UNDEFINEDMACROS)) {
-            if(unknownMacrosList.count() > 0) UndefinedMacrosWindow();
+            UndefinedMacrosWindow();
 
         } else if(selectedItem->text().contains(RELOADWINDOW)) {
             emit Signal_ReloadWindowL();
