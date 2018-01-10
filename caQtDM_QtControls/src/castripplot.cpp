@@ -794,7 +794,9 @@ void caStripPlot::TimeOut()
     }
 
     // in case of autoscale adjust the vertical scale
-    if(thisYaxisScaling == autoScale) setAxisScale(QwtPlot::yLeft, AutoscaleMinY, AutoscaleMaxY);
+    if(thisYaxisScaling == autoScale) {
+        if(!qIsInf(AutoscaleMinY) && !qIsInf(AutoscaleMaxY)) setAxisScale(QwtPlot::yLeft, AutoscaleMinY, AutoscaleMaxY);
+    }
 
     if((ResizeFactorX != oldResizeFactorX) || ResizeFactorY != oldResizeFactorY) {
         axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MajorTick, ResizeFactorX * 8.0);
