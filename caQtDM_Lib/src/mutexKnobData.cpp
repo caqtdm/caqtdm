@@ -624,7 +624,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
 
                 kPtr->edata.connected = true;
 
-                // when no update then when any monitors for calculation increase monitorcount when underlying pv change or when its calculates on itsself
+                // when no update then when any monitors for calculation increase monitorcount when underlying pv changes or when its calculates on itsself
                 // (even when hidden, it should still do it)
                 QWidget *w1 =  (QWidget*) kPtr->dispW;
                 if((!update) && (ptr->edata.valueCount) == 0) {
@@ -633,16 +633,18 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                     if((list.size() > 0)) {    // && (!w1->property("hidden").value<bool>())) {
                         int nbMonitors = list.at(0).toInt();
                         if(nbMonitors > 0) {
+                            // I had to comment this out, while wrong
                             //qDebug() << "number of monitors for this object=" << nbMonitors;
-                            for(int i=0; i< nbMonitors; i++) {
-                                knobData *ptr = (knobData*) &KnobData[list.at(i+1).toInt()];
+                            //for(int i=0; i< nbMonitors; i++) {
+                                //knobData *ptr = (knobData*) &KnobData[list.at(i+1).toInt()];
                                 //qDebug() << ptr->pv << ptr->dispName << ptr->edata.rvalue << ptr->edata.monitorCount << ptr->edata.monitorCountPrev;
-                                if((ptr->edata.monitorCount != ptr->edata.monitorCountPrev) || (kPtr->index == ptr->index)) {
+                                //if(ptr->edata.monitorCount != ptr->edata.displayCount) {
+                                //if ((kPtr->index == ptr->index)) {
                                     //qDebug() << "increase" << kPtr->pv << kPtr->index << w1->objectName() << kPtr->edata.rvalue;
                                     update = true;
-                                    break;
-                                }
-                            }
+                                    //break;
+                                //}
+                            //}
                         }
                     }
                 }
