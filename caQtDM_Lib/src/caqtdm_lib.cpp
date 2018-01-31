@@ -3741,7 +3741,8 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                     if(ptr->edata.connected) {
                         switch (ptr->edata.fieldtype){
                             case caINT:
-                            case caLONG:{
+                            case caLONG:
+                            case caENUM: {
                                 valueArray[j] = ptr->edata.ivalue;
                                 break;
                             }
@@ -3978,7 +3979,8 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         double result;
         switch (data.edata.fieldtype){
             case caINT:
-            case caLONG:{
+            case caLONG:
+            case caENUM: {
                 result = data.edata.ivalue;
                 break;
             }
