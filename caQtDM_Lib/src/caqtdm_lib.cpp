@@ -78,12 +78,13 @@
 
 // context texts
 #define GETINFO         "Get Info"
-#define SETGREY         "Set Greyscale"
-#define SETWAVELEN      "Set Spectrum Wavelength"
-#define SETHOT          "Set Spectrum Hot"
-#define SETHEAT         "Set Spectrum Heat"
-#define SETJET          "Set Spectrum Jet"
-#define SETCUSTOM       "Set Spectrum Custom"
+#define SETASIS         "Set Mono/Color as defined"
+#define SETGREY         "Set Color to Mono"
+#define SETWAVELEN      "Set Mono to Spectrum Wavelength"
+#define SETHOT          "Set Mono to Spectrum Hot"
+#define SETHEAT         "Set Mono to Spectrum Heat"
+#define SETJET          "Set Mono to Spectrum Jet"
+#define SETCUSTOM       "Set Mono to Spectrum Custom"
 #define KILLPROCESS 	"Kill Process"
 #define UNDEFINEDMACROS "Undefined macros"
 #define PRINTWINDOW 	"Print"
@@ -227,6 +228,7 @@
 
 #define addColorTableActions \
     myMenu.addAction(GETINFO); \
+    myMenu.addAction(SETASIS); \
     myMenu.addAction(SETGREY); \
     myMenu.addAction(SETWAVELEN); \
     myMenu.addAction(SETHOT); \
@@ -1319,8 +1321,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             if(i==0) text = cameraWidget->getPV_Data();
             if(i==1) text = cameraWidget->getPV_Width();
             if(i==2) text = cameraWidget->getPV_Height();
-            if(i==3) text = cameraWidget->getPV_Code();
-            if(i==4) text = cameraWidget->getPV_BPP();
+            if(i==3) text = cameraWidget->getPV_ColormodeChannel();
+            if(i==4) text = cameraWidget->getPV_PackingmodeChannel();
 
             // for spectrum pseudo levels
             if(i==5) {
@@ -1375,8 +1377,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                 if(i==0) cameraWidget->setPV_Data(pv);
                 if(i==1) cameraWidget->setPV_Width(pv);
                 if(i==2) cameraWidget->setPV_Height(pv);
-                if(i==3) cameraWidget->setPV_Code(pv);
-                if(i==4) cameraWidget->setPV_BPP(pv);
+                if(i==3) cameraWidget->setPV_ColormodeChannel(pv);
+                if(i==4) cameraWidget->setPV_PackingmodeChannel(pv);
                 if(i==5) cameraWidget->setMinLevel(pv);
                 if(i==6) cameraWidget->setMaxLevel(pv);
                 if(i==7) cameraWidget->setROIChannelsRead(pvs1);
@@ -1385,10 +1387,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                 if(i<=6) tooltip.append(pv);
                 else if(i==7) tooltip.append(pvs1);
                 else if(i==8) tooltip.append(pvs2);
-            } else if (i==3) {  // code missing (assume 1 for Helge)
-                cameraWidget->setCode(1);
-            } else if (i==4) {  // bpp missing (assume 3 for Helge)
-                cameraWidget->setBPP(3);
             }
         }
 
@@ -3735,7 +3733,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
             for(int i=0; i< nbMonitors;i++) {
                 knobData *ptr = mutexKnobDataP->GetMutexKnobDataPtr(MonitorList.at(i+1).toInt());
                 if(ptr != (knobData*) 0) {
-                    //qDebug() << "calculate from index" << i << ptr->index << ptr->pv << ptr->edata.connected << ptr->edata.rvalue << IndexList.at(i+1).toInt();
+                    //qDebug() << "calculate from index" << i << ptr->index << ptr->pv << ptr->edata.connected << ptr->edata.rvalue << ptr->edata.ivalue << IndexList.at(i+1).toInt();
                     // when connected
                     int j = IndexList.at(i+1).toInt(); // input a,b,c,d
                     if(ptr->edata.connected) {
@@ -3988,7 +3986,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 result = data.edata.rvalue;
             }
         }
-        //qDebug() << "we have a caCalc" << calcWidget->getVariable() << "  " <<  data.pv;
+        //qDebug() << "we have a caCalc" << calcWidget->getVariable() << "  " <<  data.pv << "fieldtype" << data.edata.fieldtype;
 
         if(calcWidget->getDataCount() > 0) {
             if(!data.edata.connected) result = qQNaN();
@@ -5079,10 +5077,20 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 cameraWidget->setWidth((int) data.edata.rvalue);
             } else if(data.specData[0] == 2) { // height channel
                 cameraWidget->setHeight((int) data.edata.rvalue);
-            } else if(data.specData[0] == 3) { // code channel if present
-                cameraWidget->setCode((int) data.edata.rvalue);
-            } else if(data.specData[0] == 4) { // bpp channel if present
-                cameraWidget->setBPP((int) data.edata.rvalue);
+            } else if(data.specData[0] == 3) { // mode overwrite channel if present
+                if(cameraWidget->testDecodemodeStr(String)) cameraWidget->setDecodemodeStr(String);
+                else  {
+                    char asc[256];
+                    sprintf(asc, "camera mode %s from pv %s not recognized", qasc(String), qasc(cameraWidget->getPV_ColormodeChannel()));
+                    postMessage(QtDebugMsg, asc);
+                }
+            } else if(data.specData[0] == 4) { // packing mode overwrite channel if present
+                if(cameraWidget->testPackingmodeStr(String)) cameraWidget->setPackingmodeStr(String);
+                else  {
+                    char asc[256];
+                    sprintf(asc, "camera packing mode %s from pv %s not recognized", qasc(String), qasc(cameraWidget->getPV_PackingmodeChannel()));
+                    postMessage(QtDebugMsg, asc);
+                }
             } else if(data.specData[0] == 5) { // minimum level channel if present
                 cameraWidget->updateMin((int) data.edata.rvalue);
             } else if(data.specData[0] == 6) { // maximum level channel if present
@@ -5099,7 +5107,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 QMutex *datamutex;
                 datamutex = (QMutex*) data.mutex;
                 datamutex->lock();
-                cameraWidget->showImage(data.edata.dataSize, (char*) data.edata.dataB);
+                cameraWidget->showImage(data.edata.dataSize, (char*) data.edata.dataB, data.edata.fieldtype);
                 datamutex->unlock();
             } else if(data.specData[0] == 15) {
                 if(data.edata.valueCount > 0 && data.edata.dataB != (void*) 0) {
@@ -6367,32 +6375,37 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             }
 
         } else  if(selectedItem->text().contains(SETWAVELEN)) {
-            if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::spectrum_wavelength);
+            if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::mono_to_wavelength);
             else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) scan2dWidget->setColormap(caScan2D::spectrum_wavelength);
             else if(caWaterfallPlot * waterfallplotWidget = qobject_cast< caWaterfallPlot *>(w)) waterfallplotWidget->setColormap(caWaterfallPlot::spectrum_wavelength);
 
         } else  if(selectedItem->text().contains(SETHOT)) {
-            if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::spectrum_hot);
+            if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::mono_to_hot);
             else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) scan2dWidget->setColormap(caScan2D::spectrum_hot);
             else if(caWaterfallPlot * waterfallplotWidget = qobject_cast< caWaterfallPlot *>(w)) waterfallplotWidget->setColormap(caWaterfallPlot::spectrum_hot);
 
         } else  if(selectedItem->text().contains(SETHEAT)) {
-            if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::spectrum_heat);
+            if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::mono_to_heat);
             else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) scan2dWidget->setColormap(caScan2D::spectrum_heat);
             else if(caWaterfallPlot * waterfallplotWidget = qobject_cast< caWaterfallPlot *>(w)) waterfallplotWidget->setColormap(caWaterfallPlot::spectrum_heat);
 
         } else  if(selectedItem->text().contains(SETJET)) {
-            if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::spectrum_jet);
+            if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::mono_to_jet);
             else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) scan2dWidget->setColormap(caScan2D::spectrum_jet);
             else if(caWaterfallPlot * waterfallplotWidget = qobject_cast< caWaterfallPlot *>(w)) waterfallplotWidget->setColormap(caWaterfallPlot::spectrum_jet);
 
         } else  if(selectedItem->text().contains(SETCUSTOM)) {
-            if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::spectrum_custom);
+            if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::mono_to_custom);
             else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) scan2dWidget->setColormap(caScan2D::spectrum_custom);
             else if(caWaterfallPlot * waterfallplotWidget = qobject_cast< caWaterfallPlot *>(w)) waterfallplotWidget->setColormap(caWaterfallPlot::spectrum_custom);
 
         } else  if(selectedItem->text().contains(SETGREY)) {
-            if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::grey);
+            if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::color_to_mono);
+            else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) scan2dWidget->setColormap(caScan2D::grey);
+            else if(caWaterfallPlot * waterfallplotWidget = qobject_cast< caWaterfallPlot *>(w)) waterfallplotWidget->setColormap(caWaterfallPlot::grey);
+
+        } else  if(selectedItem->text().contains(SETASIS)) {
+            if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) cameraWidget->setColormap(caCamera::as_is);
             else if(caScan2D * scan2dWidget = qobject_cast< caScan2D *>(w)) scan2dWidget->setColormap(caScan2D::grey);
             else if(caWaterfallPlot * waterfallplotWidget = qobject_cast< caWaterfallPlot *>(w)) waterfallplotWidget->setColormap(caWaterfallPlot::grey);
 
