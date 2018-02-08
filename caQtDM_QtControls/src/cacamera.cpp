@@ -173,7 +173,8 @@ void caCamera::setDecodemodeNum(int mode) {
 
 void caCamera::setDecodemodeNum(double mode) {
     printf("colormodeset with %d\n", (int) mode);
-    thisColormode = (colormode) mode;
+    int intermed = (int)mode;
+    thisColormode = (colormode) intermed; // direct not allowed on Windows (C2440)
 }
 
 void caCamera::setPackingmodeNum(int mode) {
@@ -183,7 +184,9 @@ void caCamera::setPackingmodeNum(int mode) {
 
 void caCamera::setPackingmodeNum(double mode) {
     printf("packingmodeset with %d\n", (int) mode);
-    thisPackingmode = (packingmode) mode;
+    int intermed = (int)mode;
+    thisPackingmode = (packingmode) intermed;// direct not allowed on Windows (C2440)
+
 }
 
 bool caCamera::isPropertyVisible(Properties property)
