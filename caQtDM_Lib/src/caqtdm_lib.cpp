@@ -663,11 +663,17 @@ void CaQtDM_Lib::scanChildren(QList<QWidget*> children, QWidget *tab, int indexT
 
     // go through our ca objects on this page (except for caStripplot and cawaterfallplot, needing history data)
     foreach(QWidget* w1, children) {
+        bool treatit = false;
         QString className = w1->metaObject()->className();
         if(className.contains("ca") &&
                 !className.contains("caStripPlot") &&
-                !className.contains("caWaterfallPlot")) {
-
+                !className.contains("caWaterfallPlot")) treatit = true;
+/* this would enable again all the monitors used by a hidden cacalc with signals and would then inrease the load drastically again
+        if(caCalc* calcWidget = qobject_cast<caCalc *>(w1)) {
+           if(calcWidget->getEventSignal() != caCalc::Never) treatit = true;
+        }
+*/
+        if(treatit) {
             // nearest parent tab
             QWidget* tabstack = (QWidget*) w1->property("parentTab").value<QWidget*>();
 

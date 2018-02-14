@@ -115,8 +115,7 @@ void caCamera::setColormodeStrings()
 {
    colorModeString <<  "Mono" << "RGB1" << "RGB2" << "RGB3" << "BayerRG_8" << "BayerGB_8" << "BayerGR_8" << "BayerBG_8" <<
                     "BayerRG_12" << "BayerGB_12" << "BayerGR_12" << "BayerBG_12" <<
-                    "YUY444" << "YUV422" << "YUV421";
-
+                    "YUV444" << "YUV422" << "YUV421";
 }
 
 void caCamera::setPackingModeStrings()
@@ -1387,11 +1386,11 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         CameraDataConvert = &caCamera::CameraDataConvert;
         break;
 
-    case YUY444:
+    case YUV444:
     case YUV421:
     default:
         savedData = data;
-        printf("not yet supported colormode = %s\n", qasc(colorModeString.at(thisColormode)));
+        //printf("not yet supported colormode = %s\n", qasc(colorModeString.at(thisColormode)));
         QPainter painter(image);
         QBrush brush(QColor(200,200,200,255), Qt::SolidPattern);
         painter.setRenderHint(QPainter::Antialiasing);
@@ -1403,6 +1402,8 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         painter.drawText(5, 10 + 2 * lineHeight, "only supported now:");
         painter.drawText(5, 10 + 3 * lineHeight, "mono");
         painter.drawText(5, 10 + 4 * lineHeight, "rgb1, rgb1, rgb3");
+        painter.drawText(5, 10 + 5 * lineHeight, "bayer8, bayer12 unpacked and packed");
+        painter.drawText(5, 10 + 6 * lineHeight, "yuv formats not tested or not implemented");
         return image;
     }
 
