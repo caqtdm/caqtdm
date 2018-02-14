@@ -77,9 +77,9 @@ class QTCON_EXPORT caCamera : public QWidget
     Q_PROPERTY(QString maxLevel READ getMaxLevel WRITE setMaxLevel)
 
     Q_PROPERTY(colormode colorMode READ getColormode WRITE setColormode)
-    Q_PROPERTY(QString colorModeOverwiteChannnel READ getPV_ColormodeChannel WRITE setPV_ColormodeChannel)
+    Q_PROPERTY(QString colorModeOverwriteChannel READ getPV_ColormodeChannel WRITE setPV_ColormodeChannel)
     Q_PROPERTY(packingmode packMode READ getPackmode WRITE setPackmode)
-    Q_PROPERTY(QString packingModeOverwiteChannnel READ getPV_PackingmodeChannel WRITE setPV_PackingmodeChannel)
+    Q_PROPERTY(QString packingModeOverwriteChannel READ getPV_PackingmodeChannel WRITE setPV_PackingmodeChannel)
 
     Q_PROPERTY(colormap ColorMap READ getColormap WRITE setColormap)
     Q_PROPERTY(QString customColorMap READ getCustomMap WRITE setCustomMap  DESIGNABLE isPropertyVisible(customcolormap))
