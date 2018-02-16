@@ -307,6 +307,8 @@ private:
 
     void yuv422(uchar *yuv422, uint *rgb, int sx, int sy);
 
+    void YCbCr422(uchar *YCbCr, uint *rgb, int sx, int sy);
+
     bool eventFilter(QObject *obj, QEvent *event);
     void Coordinates(int posX, int posY, double &newX, double &newY, double &maxX, double &maxY);
     void deleteWidgets();
