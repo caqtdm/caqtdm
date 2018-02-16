@@ -113,9 +113,9 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
 
 void caCamera::setColormodeStrings()
 {
-   colorModeString <<  "Mono" << "RGB1" << "RGB2" << "RGB3" << "BayerRG_8" << "BayerGB_8" << "BayerGR_8" << "BayerBG_8" <<
-                    "BayerRG_12" << "BayerGB_12" << "BayerGR_12" << "BayerBG_12" <<
-                    "YUV444" << "YUV422" << "YUV421";
+    colorModeString <<  "Mono" << "RGB1" << "RGB2" << "RGB3" << "BayerRG_8" << "BayerGB_8" << "BayerGR_8" << "BayerBG_8" <<
+                        "BayerRG_12" << "BayerGB_12" << "BayerGR_12" << "BayerBG_12" <<
+                        "YUV444" << "YUV422" << "YUV421";
 }
 
 void caCamera::setPackingModeStrings()
@@ -424,9 +424,9 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
 
         if(validIntensity) {
             if(Zvalue >=0) {
-              QString strng = "(%1,%2,%3)";
-              strng = strng.arg(int(Xnew)).arg(int(Ynew)).arg(Zvalue);
-              updateIntensity(strng);
+                QString strng = "(%1,%2,%3)";
+                strng = strng.arg(int(Xnew)).arg(int(Ynew)).arg(Zvalue);
+                updateIntensity(strng);
             } else {
                 QString strng = "(%1,%2)";
                 strng = strng.arg(int(Xnew)).arg(int(Ynew));
@@ -960,43 +960,42 @@ template <typename pureData> void caCamera::calcImage (pureData *ptr,  colormode
 
     if((i + offset2 + offset3) > datasize) return;
 
-        // normal rgb display
-        float redcoeff = correction * thisRedCoefficient;
-        float greencoeff = correction * thisGreenCoefficient;
-        float bluecoeff = correction * thisBlueCoefficient;
+    // normal rgb display
+    float redcoeff = correction * thisRedCoefficient;
+    float greencoeff = correction * thisGreenCoefficient;
+    float bluecoeff = correction * thisBlueCoefficient;
 
-
-        if(thisColormap == as_is || thisColormap > color_to_mono) {
-            for (int y = ystart; y < yend; ++y) {
-                for (int x = 0; x < resultSize.width(); ++x) {
-                    uint intensity = qMax(qMax(ptr[i], ptr[i+offset1]), ptr[i+offset2]);
-                    LineData[x] =  qRgb((int) (ptr[i] * redcoeff), (int) (ptr[i+offset1] * greencoeff), (int) (ptr[i+offset2] * bluecoeff));
-                    i += increment;
-                    Max[(intensity > Max[1])] = intensity;
-                    Min[(intensity < Min[1])] = intensity;
-                    if ((i + offset2 + offset3) >= datasize) break;
-                }
-                i += offset3;
-                if((i + offset2 + offset3) >= datasize) break;
-                MinMaxImageLock(LineData, y, resultSize, MinMax);
-            }
-            // convert to mono
-        } else {
-            for (int y = ystart; y < yend; ++y) {
-                for (int x = 0; x < resultSize.width(); ++x) {
-                    uint intensity = qMax(qMax(ptr[i], ptr[i+offset1]), ptr[i+offset2] );
-                    int average =(int) 2.2 * (0.2989 * ptr[i] * correction + 0.5870 * ptr[i+offset1] * correction + 0.1140 * ptr[i+offset2] * correction);
-                    LineData[x] =  qRgb(average, average, average);
-                    i += increment;
-                    Max[(intensity > Max[1])] = intensity;
-                    Min[(intensity < Min[1])] = intensity;
-                    if((i + offset2 + offset3) >= datasize) break;
-                }
-                i += offset3;
+    if(thisColormap == as_is || thisColormap > color_to_mono) {
+        for (int y = ystart; y < yend; ++y) {
+            for (int x = 0; x < resultSize.width(); ++x) {
+                uint intensity = qMax(qMax(ptr[i], ptr[i+offset1]), ptr[i+offset2]);
+                LineData[x] =  qRgb((int) (ptr[i] * redcoeff), (int) (ptr[i+offset1] * greencoeff), (int) (ptr[i+offset2] * bluecoeff));
+                i += increment;
+                Max[(intensity > Max[1])] = intensity;
+                Min[(intensity < Min[1])] = intensity;
                 if ((i + offset2 + offset3) >= datasize) break;
-                MinMaxImageLock(LineData, y, resultSize, MinMax);
             }
+            i += offset3;
+            if((i + offset2 + offset3) >= datasize) break;
+            MinMaxImageLock(LineData, y, resultSize, MinMax);
         }
+        // convert to mono
+    } else {
+        for (int y = ystart; y < yend; ++y) {
+            for (int x = 0; x < resultSize.width(); ++x) {
+                uint intensity = qMax(qMax(ptr[i], ptr[i+offset1]), ptr[i+offset2] );
+                int average =(int) 2.2 * (0.2989 * ptr[i] * correction + 0.5870 * ptr[i+offset1] * correction + 0.1140 * ptr[i+offset2] * correction);
+                LineData[x] =  qRgb(average, average, average);
+                i += increment;
+                Max[(intensity > Max[1])] = intensity;
+                Min[(intensity < Min[1])] = intensity;
+                if((i + offset2 + offset3) >= datasize) break;
+            }
+            i += offset3;
+            if ((i + offset2 + offset3) >= datasize) break;
+            MinMaxImageLock(LineData, y, resultSize, MinMax);
+        }
+    }
 }
 
 void caCamera::CameraDataConvert(int sector, int sectorcount, SyncMinMax* MinMax, QSize resultSize, int datasize)
@@ -1308,7 +1307,6 @@ void caCamera::buf_unpack_12bitpacked_msb(void* target, void* source, size_t cou
         b2 = ((char*) source) [x1 + 2];
         ((unsigned short*) target) [x2] = (b1 & 0xf) + (b0 << 4);   // valid for Mono12Packet on IOC
         ((unsigned short*) target) [x2 + 1] = ((b1 & 0xf0) >> 4) + (b2 << 4);
-
     }
 }
 
@@ -1322,7 +1320,6 @@ void caCamera::buf_unpack_12bitpacked_lsb(void* target, void* source, size_t cou
         b2 = ((char*) source) [x1 + 2];
         ((unsigned short*) target) [x2] = ((b1 & 0xf)<<8) + (b0);   // valid for our actual basler camera
         ((unsigned short*) target) [x2 + 1] = ((b1 & 0xf0) >> 4) + (b2 << 4);
-
     }
 }
 
@@ -1416,7 +1413,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         else if((thisColormode == BayerBG_8) || (thisColormode == BayerBG_12)) tile = BAYER_COLORFILTER_BGGR;
         // how many bits per element and packing
         if((thisColormode == BayerRG_8) || (thisColormode == BayerGB_8) || (thisColormode == BayerGR_8) || (thisColormode == BayerBG_8)) {
-                bitsPerElement = 8;
+            bitsPerElement = 8;
         } else if((thisColormode == BayerRG_12) || (thisColormode == BayerGB_12) || (thisColormode == BayerGR_12) || (thisColormode == BayerBG_12)) {
             bitsPerElement = 12;
         }
@@ -1518,8 +1515,8 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
     }
 
     if(bayerMode) {
-       thisColormode = auxMode;
-       m_datatype = auxDatatype;
+        thisColormode = auxMode;
+        m_datatype = auxDatatype;
     }
 
     return image;
