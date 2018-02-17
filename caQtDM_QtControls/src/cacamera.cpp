@@ -1213,8 +1213,6 @@ void caCamera::YCbCr422(uchar *YCbCr, uint *rgb, int sx, int sy)  // 4 bytes for
 {
     for (long i = 0; i < (sx) * sy / 2; ++i) {
         int Y1, Cr, Y2, Cb;
-        int r,g,b;
-
 
         // Extract YCbCr components
         Cb = YCbCr[1];
@@ -1222,7 +1220,7 @@ void caCamera::YCbCr422(uchar *YCbCr, uint *rgb, int sx, int sy)  // 4 bytes for
         Cr = YCbCr[3];
         Y2 = YCbCr[2];
 
-        YCbCr += 4;//4;
+        YCbCr += 4;
 
         rgb[0]=GET_R_FROM_YCbCr(Y1,Cb,Cr);
         rgb[1]=GET_G_FROM_YCbCr(Y1,Cb,Cr);
@@ -1253,13 +1251,9 @@ void caCamera::YCbCr422(uchar *YCbCr, uint *rgb, int sx, int sy)  // 4 bytes for
     }
 }
 
-
 #define GET_R_FROM_YUV(y,u,v) y + 1.370705 * (v-128);
 #define GET_G_FROM_YUV(y,u,v) y - 0.698001 * (v-128) - 0.337633 * (u -128);
 #define GET_B_FROM_YUV(y,u,v) y + 1.732446 * (u-128);
-
-
-
 
 void caCamera::yuv422(uchar *yuv, uint *rgb, int sx, int sy)  // 4 bytes for 2 pixels
 {
@@ -1293,7 +1287,6 @@ void caCamera::yuv422(uchar *yuv, uint *rgb, int sx, int sy)  // 4 bytes for 2 p
         rgb[1] = GET_G_FROM_YUV(y3,u2,v2);
         rgb[2] = GET_B_FROM_YUV(y3,u2,v2);
         rgb += 3;
-
     }
 }
 
@@ -1329,6 +1322,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
     uint Max[2], Min[2];
     int tile = BAYER_COLORFILTER_BGGR;; // bayer tile
     bool bayerMode = false;
+    bool yuvMode = false;
 
     m_datatype = datatype;
 
@@ -1439,26 +1433,24 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         break;
 
     case YUV422:
-        //yuv422((uchar *) data, rgb, sx, sy);
+        yuvMode = true;
         YCbCr422((uchar *) data, rgb, sx, sy);
+        thisColormode = RGB1;
+        m_datatype = caLONG;
         savedData= (char *) rgb;
         savedSizeNew = 3*sx*sy*sizeof(uint);
-        m_datatype = caLONG;
-
         CameraDataConvert = &caCamera::CameraDataConvert;
         break;
 
     case YUV444:
-
+        yuvMode = true;
         YCbCr422((uchar *) data, rgb, sx, sy);
+        thisColormode = RGB1;
         m_datatype = caLONG;
-
-       savedData= (char *) rgb;
+        savedData= (char *) rgb;
         savedSizeNew = 3*sx*sy*sizeof(uint);
         CameraDataConvert = &caCamera::CameraDataConvert;
         break;
-
-
 
     case YUV421:
     default:
@@ -1514,7 +1506,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         if(maxvalue > 0xFFFFFFFE) maxvalue = 0xFFFFFFFE;
     }
 
-    if(bayerMode) {
+    if(bayerMode || yuvMode) {
         thisColormode = auxMode;
         m_datatype = auxDatatype;
     }

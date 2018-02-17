@@ -306,7 +306,6 @@ private:
     int zValueImage(pureData *ptr, colormode mode, double xnew, double ynew, double xmax, double ymax, int datasize, bool &validIntensity);
 
     void yuv422(uchar *yuv422, uint *rgb, int sx, int sy);
-
     void YCbCr422(uchar *YCbCr, uint *rgb, int sx, int sy);
 
     bool eventFilter(QObject *obj, QEvent *event);
