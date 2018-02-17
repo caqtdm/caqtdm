@@ -66,6 +66,8 @@ static int optimizeConnections = false;
 extern MutexKnobData* mutexKnobdataPtr;
 extern MessageWindow *messageWindowPtr;
 
+static int firstTime = true;
+
 typedef struct _connectInfo {
     int connected;
     int index;
@@ -169,15 +171,19 @@ void PrepareDeviceIO(void)
             s = optimize; while (*s) {*s = toupper((unsigned char) *s); s++;}
             if(strcmp(optimize, "TRUE") == 0) {
                 optimizeConnections = true;
-                C_postMsgEvent(messageWindowPtr, 1, vaPrintf("caQtDM will close epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS is set to TRUE\n"));
-                printf("caQtDM -- Close epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS is TRUE\n");
+                if(firstTime) {
+                    C_postMsgEvent(messageWindowPtr, 1, vaPrintf("caQtDM will close epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS is set to TRUE\n"));
+                    printf("caQtDM -- Close epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS is TRUE\n");
+                }
             }
         }
         if(!optimizeConnections) {
-            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("caQtDM will suspend epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS not set to TRUE\n"));
-            printf("caQtDM -- Suspend epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS not set to TRUE\n");
+            if(firstTime) {
+                C_postMsgEvent(messageWindowPtr, 1, vaPrintf("caQtDM will suspend epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS not set to TRUE\n"));
+                printf("caQtDM -- Suspend epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS not set to TRUE\n");
+            }
         }
-
+        firstTime = false;
     } else {
         //printf("context exists\n");
         status = ca_attach_context(ca_current_context());
