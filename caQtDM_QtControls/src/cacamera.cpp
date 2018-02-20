@@ -1204,16 +1204,12 @@ template <typename pureData> void caCamera::FilterBayer(pureData *bayer, uint *r
 #define GET_G_FROM_YCbCr(y,cb,cr) 298.082*y/256 - 100.291 * cb / 256 - 208.120 * cr / 256 + 135.576 ;
 #define GET_B_FROM_YCbCr(y,cb,cr) 298.082*y/256 + 561.412 * cb / 256                      - 276.836 ;
 
-//#define GET_R_FROM_YCbCr(y,cb,cr) (y + 1.40200 * (cr - 0x80));
-//#define GET_G_FROM_YCbCr(y,cb,cr) (y - 0.34414 * (cb - 0x80) - 0.71414 * (cr - 0x80));
-//#define GET_B_FROM_YCbCr(y,cb,cr) (y + 1.77200 * (cb - 0x80));
-
-
 void caCamera::YCbCr422(uchar *YCbCr, uint *rgb, int sx, int sy)  // 4 bytes for 2 pixels
 {
     for (long i = 0; i < (sx) * sy / 2; ++i) {
         int Y1, Cr, Y2, Cb;
-
+        long r,g,b,r1;
+        long min=0,max=255;
         // Extract YCbCr components
         Cb = YCbCr[1];
         Y1 = YCbCr[0];
@@ -1222,27 +1218,27 @@ void caCamera::YCbCr422(uchar *YCbCr, uint *rgb, int sx, int sy)  // 4 bytes for
 
         YCbCr += 4;
 
-        rgb[0]=GET_R_FROM_YCbCr(Y1,Cb,Cr);
-        rgb[1]=GET_G_FROM_YCbCr(Y1,Cb,Cr);
-        rgb[2]=GET_B_FROM_YCbCr(Y1,Cb,Cr);
+        r=GET_R_FROM_YCbCr(Y1,Cb,Cr);
+        g=GET_G_FROM_YCbCr(Y1,Cb,Cr);
+        b=GET_B_FROM_YCbCr(Y1,Cb,Cr);
 
-        //rgb[0] = qMax(0, qMin(255,r ));
-        //rgb[1] = qMax(0, qMin(255,g ));
-        //rgb[2] = qMax(0, qMin(255,b ));
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+
 //        if (i<9){
 //            printf("(%i)Y1: %x Y2: %x Cr: %x Cb: %x\n",i,Y1,Y2,Cr,Cb);
 //            printf("\t R: %x G: %x B: %x ",rgb[0],rgb[1],rgb[2]);
-
 //        }
 
         rgb += 3;
-        rgb[0]=GET_R_FROM_YCbCr(Y2,Cb,Cr);
-        rgb[1]=GET_G_FROM_YCbCr(Y2,Cb,Cr);
-        rgb[2]=GET_B_FROM_YCbCr(Y2,Cb,Cr);
+        r=GET_R_FROM_YCbCr(Y2,Cb,Cr);
+        g=GET_G_FROM_YCbCr(Y2,Cb,Cr);
+        b=GET_B_FROM_YCbCr(Y2,Cb,Cr);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
 
-        //rgb[0] = qMax(0, qMin(255,r ));
-        //rgb[1] = qMax(0, qMin(255,g ));
-        //rgb[2] = qMax(0, qMin(255,b ));
         rgb += 3;
 //        if (i<9){
 //            printf("R2: %x G2: %x B2: %x \n",rgb[0],rgb[1],rgb[2]);
