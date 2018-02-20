@@ -146,7 +146,7 @@ bool caCamera::testDecodemodeStr(QString mode) {
 
 void caCamera::setPackingmodeStr(QString mode) {
     if(mode.length() == 0) return;
-    printf("colormodeset with %s\n", qasc(mode));
+    printf("Packingmodeset with %s\n", qasc(mode));
     for(int i = 0; i< packingModeString.count(); i++) {
         if(mode == packingModeString.at(i)) {
             thisPackingmode = (packingmode) i;
@@ -156,7 +156,7 @@ void caCamera::setPackingmodeStr(QString mode) {
 
 bool caCamera::testPackingmodeStr(QString mode) {
     if(mode.length() == 0) return false;
-    printf("colormodeset with %s\n", qasc(mode));
+    printf("Packingmodeset with %s\n", qasc(mode));
     for(int i = 0; i< packingModeString.count(); i++) {
         if(mode == packingModeString.at(i)) {
             return true;
