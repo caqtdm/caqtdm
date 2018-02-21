@@ -25,6 +25,8 @@ INCLUDEPATH    += ./Storage
 INCLUDEPATH    += ./xerces-c-3.1.4/src
 INCLUDEPATH    += $(EPICSINCLUDE)
 INCLUDEPATH    += $(EPICSINCLUDE)/os/Linux
+#for epics 3.15 and gcc we need this
+INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
 
 INCLUDEPATH    += $(QWTINCLUDE)
 HEADERS         = ../../controlsinterface.h archiveCA_plugin.h ../archiverCommon.h
