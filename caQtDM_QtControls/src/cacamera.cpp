@@ -955,7 +955,7 @@ template <typename pureData> void caCamera::calcImage (pureData *ptr,  colormode
         offset2 = 2 * offset1;
         offset3 = savedWidth * 2;
         increment = 1;
-    } if(mode >=  YUV422){
+    } else if(mode >=  YUV422){
         increment = 3;
     } else {
         increment = 3;
