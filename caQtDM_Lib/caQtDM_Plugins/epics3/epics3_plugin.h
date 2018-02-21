@@ -28,6 +28,7 @@
 #include <QObject>
 #include "controlsinterface.h"
 #include "epicsExternals.h"
+#include <epicsVersion.h>
 
 class Q_DECL_EXPORT Epics3Plugin : public QObject, ControlsInterface
 {
