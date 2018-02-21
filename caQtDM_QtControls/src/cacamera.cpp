@@ -129,6 +129,7 @@ void caCamera::setDecodemodeStr(QString mode) {
     for(int i = 0; i< colorModeString.count(); i++) {
         if(mode == colorModeString.at(i)) {
             thisColormode = (colormode) i;
+            m_init = true;
         }
     }
 }
@@ -167,12 +168,14 @@ bool caCamera::testPackingmodeStr(QString mode) {
 
 void caCamera::setDecodemodeNum(int mode) {
     printf("colormodeset with %d\n", mode);
+    m_init = true;
     thisColormode = (colormode) mode;
 }
 
 void caCamera::setDecodemodeNum(double mode) {
     printf("colormodeset with %d\n", (int) mode);
     int intermed = (int)mode;
+    m_init = true;
     thisColormode = (colormode) intermed; // direct not allowed on Windows (C2440)
 }
 
@@ -952,9 +955,9 @@ template <typename pureData> void caCamera::calcImage (pureData *ptr,  colormode
         offset2 = 2 * offset1;
         offset3 = savedWidth * 2;
         increment = 1;
-    } if(mode ==  YUV422){
+    } if(mode >=  YUV422){
         increment = 3;
-    }else {
+    } else {
         increment = 3;
     }
 
@@ -964,6 +967,8 @@ template <typename pureData> void caCamera::calcImage (pureData *ptr,  colormode
     float redcoeff = correction * thisRedCoefficient;
     float greencoeff = correction * thisGreenCoefficient;
     float bluecoeff = correction * thisBlueCoefficient;
+
+    //printf("width=%d height=%d datasize=%d\n", resultSize.width(), yend, datasize);
 
     if(thisColormap == as_is || thisColormap > color_to_mono) {
         for (int y = ystart; y < yend; ++y) {
@@ -1076,7 +1081,7 @@ void caCamera::CameraDataConvert(int sector, int sectorcount, SyncMinMax* MinMax
         int increment = 1;
         if(thisColormode == RGB1) increment = 3;
         if(thisColormode == RGB2) increment = 3;
-        if(thisColormode == YUV422) increment = 3;
+        if(thisColormode >= YUV422) increment = 3;
 
         InitLoopdata(ystart, yend, i, LineData, increment, sector, sectorcount, resultSize, Max, Min);
         switch (m_datatype) {
@@ -1352,6 +1357,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
 
         if(rgb != (uint*) 0) free(rgb);
         rgb = (uint *) malloc(3*m_width*m_height*sizeof(uint));
+        //printf("rgb size now define to %d uints => %d chars, received %d chars\n", 3*m_width*m_height, 3*m_width*m_height*sizeof(uint), datasize);
 
         // force resize
         QResizeEvent *re = new QResizeEvent(size(), size());
