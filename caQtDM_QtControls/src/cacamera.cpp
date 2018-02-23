@@ -115,12 +115,12 @@ void caCamera::setColormodeStrings()
 {
     colorModeString <<  "Mono" << "RGB1" << "RGB2" << "RGB3" << "BayerRG_8" << "BayerGB_8" << "BayerGR_8" << "BayerBG_8" <<
                         "BayerRG_12" << "BayerGB_12" << "BayerGR_12" << "BayerBG_12" <<
-                        "YUV444" << "YUV422" << "YUV421";
+                        "YUV444" << "YUV422"<< "YUV411" << "YUV421";
 }
 
 void caCamera::setPackingModeStrings()
 {
-    packingModeString <<  "packNo" << "MSB12Bit" <<  "LSB12Bit";
+    packingModeString <<  "packNo" << "MSB12Bit" <<  "LSB12Bit" << "Reversed";
 }
 
 void caCamera::setDecodemodeStr(QString mode) {
@@ -955,8 +955,6 @@ template <typename pureData> void caCamera::calcImage (pureData *ptr,  colormode
         offset2 = 2 * offset1;
         offset3 = savedWidth * 2;
         increment = 1;
-    } else if(mode >=  YUV422){
-        increment = 3;
     } else {
         increment = 3;
     }
@@ -1081,7 +1079,13 @@ void caCamera::CameraDataConvert(int sector, int sectorcount, SyncMinMax* MinMax
         int increment = 1;
         if(thisColormode == RGB1) increment = 3;
         if(thisColormode == RGB2) increment = 3;
-        if(thisColormode >= YUV422) increment = 3;
+        if(thisColormode == YUV411) increment = 1;
+        if(thisColormode == YUV422) increment = 1;
+        if(thisColormode == YUV444) increment = 1;
+
+
+
+
 
         InitLoopdata(ystart, yend, i, LineData, increment, sector, sectorcount, resultSize, Max, Min);
         switch (m_datatype) {
@@ -1209,19 +1213,20 @@ template <typename pureData> void caCamera::FilterBayer(pureData *bayer, uint *r
 #define GET_G_FROM_YCbCr(y,cb,cr) 298.082*y/256 - 100.291 * cb / 256 - 208.120 * cr / 256 + 135.576 ;
 #define GET_B_FROM_YCbCr(y,cb,cr) 298.082*y/256 + 561.412 * cb / 256                      - 276.836 ;
 
-void caCamera::YCbCr422(uchar *YCbCr, uint *rgb, int sx, int sy)  // 4 bytes for 2 pixels
+void caCamera::PROC_YUYV422(uchar *YUV, uint *rgb, int sx, int sy)  // 4 bytes for 2 pixels
 {
+  if ((sx==0)||(sy==0)) return;
     for (long i = 0; i < (sx) * sy / 2; ++i) {
         int Y1, Cr, Y2, Cb;
-        long r,g,b,r1;
-        long min=0,max=255;
+        long r,g,b;
+        long min=0;
         // Extract YCbCr components
-        Cb = YCbCr[1];
-        Y1 = YCbCr[0];
-        Cr = YCbCr[3];
-        Y2 = YCbCr[2];
+        Y1 = YUV[0];
+        Cb = YUV[1];
+        Y2 = YUV[2];
+        Cr = YUV[3];
 
-        YCbCr += 4;
+        YUV += 4;
 
         r=GET_R_FROM_YCbCr(Y1,Cb,Cr);
         g=GET_G_FROM_YCbCr(Y1,Cb,Cr);
@@ -1256,21 +1261,22 @@ void caCamera::YCbCr422(uchar *YCbCr, uint *rgb, int sx, int sy)  // 4 bytes for
 #define GET_G_FROM_YUV(y,u,v) y - 0.698001 * (v-128) - 0.337633 * (u -128);
 #define GET_B_FROM_YUV(y,u,v) y + 1.732446 * (u-128);
 
-void caCamera::yuv422(uchar *yuv, uint *rgb, int sx, int sy)  // 4 bytes for 2 pixels
+void caCamera::PROC_UYVY422(uchar *YUV, uint *rgb, int sx, int sy)  // 4 bytes for 4 pixels
 {
+  if ((sx==0)||(sy==0)) return;
     for (int i = 0; i < sx * sy / 4; ++i) {
         int y0, u0, y1, v0, y2, u2, y3, v2;
 
         // Extract yuv components
-        u0 = yuv[0];
-        y0 = yuv[1];
-        v0 = yuv[2];
-        y1 = yuv[3];
-        u2 = yuv[4];
-        y2 = yuv[5];
-        v2 = yuv[6];
-        y3 = yuv[7];
-        yuv += 8;
+        u0 = YUV[0];
+        y0 = YUV[1];
+        v0 = YUV[2];
+        y1 = YUV[3];
+        u2 = YUV[4];
+        y2 = YUV[5];
+        v2 = YUV[6];
+        y3 = YUV[7];
+        YUV += 8;
 
         rgb[0] = GET_R_FROM_YUV(y0,u0,v0);
         rgb[1] = GET_G_FROM_YUV(y0,u0,v0);
@@ -1288,6 +1294,169 @@ void caCamera::yuv422(uchar *yuv, uint *rgb, int sx, int sy)  // 4 bytes for 2 p
         rgb[1] = GET_G_FROM_YUV(y3,u2,v2);
         rgb[2] = GET_B_FROM_YUV(y3,u2,v2);
         rgb += 3;
+    }
+}
+
+void caCamera::PROC_YYUYYV411(uchar *YUV, uint *rgb, int sx, int sy, int datasize)  // 6 bytes for 4 pixels
+{
+  if ((sx==0)||(sy==0)) return;
+    for (long i = 0; i < (sx) * sy / 4; ++i) {
+        int Y1, U, Y2, V, Y3, Y4;
+        long max_data=(long)YUV + datasize;
+        long r,g,b;
+        long min=0;
+        // Extract YCbCr components
+        Y1 = YUV[0];
+        Y2 = YUV[1];
+        U  = YUV[2];
+        Y3 = YUV[3];
+        Y4 = YUV[4];
+        V  = YUV[5];
+
+        YUV += 6;
+
+        r=GET_R_FROM_YCbCr(Y1,U,V);
+        g=GET_G_FROM_YCbCr(Y1,U,V);
+        b=GET_B_FROM_YCbCr(Y1,U,V);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+        rgb += 3;
+
+        r=GET_R_FROM_YCbCr(Y2,U,V);
+        g=GET_G_FROM_YCbCr(Y2,U,V);
+        b=GET_B_FROM_YCbCr(Y2,U,V);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+        rgb += 3;
+
+        r=GET_R_FROM_YCbCr(Y3,U,V);
+        g=GET_G_FROM_YCbCr(Y3,U,V);
+        b=GET_B_FROM_YCbCr(Y3,U,V);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+        rgb += 3;
+
+        r=GET_R_FROM_YCbCr(Y4,U,V);
+        g=GET_G_FROM_YCbCr(Y4,U,V);
+        b=GET_B_FROM_YCbCr(Y4,U,V);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+        rgb += 3;
+
+        if (max_data<(long)YUV) break;
+    }
+}
+
+void caCamera::PROC_UYYVYY411(uchar *YUV, uint *rgb, int sx, int sy, int datasize)  // 6 bytes for 4 pixels
+{
+  if ((sx==0)||(sy==0)) return;
+    for (long i = 0; i < (sx) * sy / 4; ++i) {
+        int Y1, U, Y2, V, Y3, Y4;
+        long r,g,b;
+        long max_data=(long)YUV + datasize;
+        long min=0;
+        // Extract YCbCr components
+        U  = YUV[0];
+        Y1 = YUV[1];
+        Y2 = YUV[2];
+        V  = YUV[3];
+        Y3 = YUV[4];
+        Y4 = YUV[5];
+        YUV += 6;
+
+        r=GET_R_FROM_YCbCr(Y1,U,V);
+        g=GET_G_FROM_YCbCr(Y1,U,V);
+        b=GET_B_FROM_YCbCr(Y1,U,V);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+        rgb += 3;
+
+        r=GET_R_FROM_YCbCr(Y2,U,V);
+        g=GET_G_FROM_YCbCr(Y2,U,V);
+        b=GET_B_FROM_YCbCr(Y2,U,V);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+        rgb += 3;
+
+        r=GET_R_FROM_YCbCr(Y3,U,V);
+        g=GET_G_FROM_YCbCr(Y3,U,V);
+        b=GET_B_FROM_YCbCr(Y3,U,V);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+        rgb += 3;
+
+        r=GET_R_FROM_YCbCr(Y4,U,V);
+        g=GET_G_FROM_YCbCr(Y4,U,V);
+        b=GET_B_FROM_YCbCr(Y4,U,V);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+        rgb += 3;
+        if (max_data<(long)YUV) break;
+
+    }
+}
+
+void caCamera::PROC_YUV444(uchar *YUV, uint *rgb, int sx, int sy, int datasize)  // 3 bytes for 1 pixels
+{
+    long max_data=(long)YUV + datasize;
+    if ((sx==0)||(sy==0)||(YUV==NULL)||(rgb==NULL)) return;
+    for (long i = 0; i < (sx) * sy/2 ; ++i) {
+        int Y, U, V;
+        long r,g,b;
+        long min=0;
+        Y  = YUV[0];
+        U  = YUV[1];
+        V  = YUV[2];
+
+        YUV += 3;
+
+        r=GET_R_FROM_YCbCr(Y,U,V);
+        g=GET_G_FROM_YCbCr(Y,U,V);
+        b=GET_B_FROM_YCbCr(Y,U,V);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+        rgb += 3;
+
+        if (max_data<=(long)YUV) return;
+
+    }
+}
+
+void caCamera::PROC_UVY444(uchar *YUV, uint *rgb, int sx, int sy, int datasize)  // 3 bytes for 1 pixels
+{
+//printf("datatype=PROC_UVY444 colormode=%d %s (%x)(%x) %i %i\n", thisColormode, qasc(colorModeString.at(thisColormode)),(long)YUV,(long)rgb,sx, sy);
+    long max_data=(long)YUV + datasize;
+
+    if ((sx==0)||(sy==0)) return;
+    for (long i = 0; i < (sx) * sy/2 ; ++i) {
+        int Y, U, V;
+        long r,g,b;
+        long min=0;
+        U =  YUV[0];
+        Y  = YUV[1];
+        V  = YUV[2];
+
+        YUV += 3;
+
+        r=GET_R_FROM_YCbCr(Y,U,V);
+        g=GET_G_FROM_YCbCr(Y,U,V);
+        b=GET_B_FROM_YCbCr(Y,U,V);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+        rgb += 3;
+
+        if (max_data<=(long)YUV) return;
+
     }
 }
 
@@ -1357,7 +1526,8 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
 
         if(rgb != (uint*) 0) free(rgb);
         rgb = (uint *) malloc(3*m_width*m_height*sizeof(uint));
-        //printf("rgb size now define to %d uints => %d chars, received %d chars\n", 3*m_width*m_height, 3*m_width*m_height*sizeof(uint), datasize);
+        printf("rgb(%x) size now define to %d uints => %d chars, received %d chars\n",rgb,3*m_width*m_height, 3*m_width*m_height*sizeof(uint), datasize);
+        fflush(stdout);
 
         // force resize
         QResizeEvent *re = new QResizeEvent(size(), size());
@@ -1433,10 +1603,27 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         savedSizeNew = 3*sx*sy*sizeof(uint);
         CameraDataConvert = &caCamera::CameraDataConvert;
         break;
+    case YUV411:
+        yuvMode = true;
+        if (thisPackingmode==Reversed){
+            PROC_UYYVYY411((uchar *) data, rgb, sx, sy,datasize);
+        }else{
+            PROC_YYUYYV411((uchar *) data, rgb, sx, sy,datasize);
+        }
+        thisColormode = RGB1;
+        m_datatype = caLONG;
+        savedData= (char *) rgb;
+        savedSizeNew = 3*sx*sy*sizeof(uint);
+        CameraDataConvert = &caCamera::CameraDataConvert;
+        break;
 
     case YUV422:
         yuvMode = true;
-        YCbCr422((uchar *) data, rgb, sx, sy);
+        if (thisPackingmode==Reversed){
+            PROC_UYVY422((uchar *) data, rgb, sx, sy);
+        }else{
+            PROC_YUYV422((uchar *) data, rgb, sx, sy);
+        }
         thisColormode = RGB1;
         m_datatype = caLONG;
         savedData= (char *) rgb;
@@ -1446,7 +1633,12 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
 
     case YUV444:
         yuvMode = true;
-        YCbCr422((uchar *) data, rgb, sx, sy);
+
+        if (thisPackingmode==Reversed){
+            PROC_UVY444((uchar *) data, rgb, sx, sy,datasize);
+        }else{
+            PROC_YUV444((uchar *) data, rgb, sx, sy,datasize);
+        }
         thisColormode = RGB1;
         m_datatype = caLONG;
         savedData= (char *) rgb;
@@ -1474,7 +1666,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         return image;
     }
 
-#ifndef QT_NO_CONCURRENT
+#ifdef QT_NO_CONCURRENT
 
     //mark_event = __itt_event_create( "User Mark", 9 );
     //__itt_event_start( mark_event );
@@ -1522,8 +1714,8 @@ void caCamera::showImage(int datasize, char *data, short datatype)
     //timer.start();
     image = showImageCalc(datasize, data, datatype);
     //printf("Image timer 1 : %d (%x) milliseconds \n", (int) timer.elapsed(),image);
+    //fflush(stdout);
 
-    fflush(stdout);
     if(image != (QImage *) 0) updateImage(*image, readvaluesPresent, readvalues, scaleFactor, X, Y);
 
     if(getAutomateChecked()) {

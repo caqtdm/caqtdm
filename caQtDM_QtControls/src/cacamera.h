@@ -122,9 +122,9 @@ public:
 
     enum colormap {as_is = 0, color_to_mono, mono_to_wavelength, mono_to_hot, mono_to_heat, mono_to_jet, mono_to_custom};
 
-    enum colormode {Mono, RGB1, RGB2, RGB3, BayerRG_8, BayerGB_8, BayerGR_8, BayerBG_8, BayerRG_12, BayerGB_12, BayerGR_12, BayerBG_12, YUV444, YUV422, YUV421};
+    enum colormode {Mono, RGB1, RGB2, RGB3, BayerRG_8, BayerGB_8, BayerGR_8, BayerBG_8, BayerRG_12, BayerGB_12, BayerGR_12, BayerBG_12, YUV444, YUV422, YUV411, YUV421};
 
-    enum packingmode {packNo, MSB12Bit, LSB12Bit};
+    enum packingmode {packNo, MSB12Bit, LSB12Bit, Reversed};
 
     enum Properties { customcolormap = 0, discretecolormap};
 
@@ -305,8 +305,13 @@ private:
     template <typename pureData>
     int zValueImage(pureData *ptr, colormode mode, double xnew, double ynew, double xmax, double ymax, int datasize, bool &validIntensity);
 
-    void yuv422(uchar *yuv422, uint *rgb, int sx, int sy);
-    void YCbCr422(uchar *YCbCr, uint *rgb, int sx, int sy);
+    void PROC_UYVY422(uchar *YUV, uint *rgb, int sx, int sy);
+    void PROC_YUYV422(uchar *YUV, uint *rgb, int sx, int sy);
+    void PROC_YYUYYV411(uchar *YUV, uint *rgb, int sx, int sy, int datasize);
+    void PROC_UYYVYY411(uchar *YUV, uint *rgb, int sx, int sy, int datasize);
+    void PROC_YUV444(uchar *YUV, uint *rgb, int sx, int sy, int datasize);
+    void PROC_UVY444(uchar *YUV, uint *rgb, int sx, int sy, int datasize);
+
 
     bool eventFilter(QObject *obj, QEvent *event);
     void Coordinates(int posX, int posY, double &newX, double &newY, double &maxX, double &maxY);
