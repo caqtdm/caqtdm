@@ -122,7 +122,7 @@ public:
 
     enum colormap {as_is = 0, color_to_mono, mono_to_wavelength, mono_to_hot, mono_to_heat, mono_to_jet, mono_to_custom};
 
-    enum colormode {Mono, RGB1_CA, RGB2_CA, RGB3_CA, BayerRG_8, BayerGB_8, BayerGR_8, BayerBG_8, BayerRG_12, BayerGB_12, BayerGR_12, BayerBG_12, RGB_8 ,BGR_8 ,RGBA_8 ,BRGA_8 ,RGB_12, YUV444, YUV422, YUV411, YUV421};
+    enum colormode {Mono, RGB1_CA, RGB2_CA, RGB3_CA, BayerRG_8, BayerGB_8, BayerGR_8, BayerBG_8, BayerRG_12, BayerGB_12, BayerGR_12, BayerBG_12, RGB_8 ,BGR_8 ,RGBA_8 ,BGRA_8 ,RGB_12, YUV444, YUV422, YUV411, YUV421};
 
     enum packingmode {packNo, MSB12Bit, LSB12Bit, Reversed};
 
@@ -284,6 +284,15 @@ private:
 #define BAYER_COLORFILTER_MAX        BAYER_COLORFILTER_BGGR
 #define BAYER_COLORFILTER_NUM       (BAYER_COLORFILTER_MAX - BAYER_COLORFILTER_MIN + 1)
 
+
+    typedef enum {
+        COLOR_RGB,
+        COLOR_GBR,
+        COLOR_GRB,
+        COLOR_BGR,
+        COLOR_BRG
+    } rgb_interpretation;
+
     template <typename pureData>
     void fillData(pureData *array, int size, int curvIndex, int curvType, int curvXY);
     QVarLengthArray<double> X;
@@ -311,6 +320,9 @@ private:
     void PROC_UYYVYY411(uchar *YUV, uint *rgb, int sx, int sy, int datasize);
     void PROC_YUV444(uchar *YUV, uint *rgb, int sx, int sy, int datasize);
     void PROC_UVY444(uchar *YUV, uint *rgb, int sx, int sy, int datasize);
+
+    void PROC_RGB8(uchar *RGB,rgb_interpretation rgb_type, uint *rgb, int sx, int sy, int datasize);
+    void PROC_RGBA8(uchar *RGBA,rgb_interpretation rgb_type, uint *rgb, int sx, int sy, int datasize);
 
 
     bool eventFilter(QObject *obj, QEvent *event);

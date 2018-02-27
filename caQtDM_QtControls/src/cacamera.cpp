@@ -115,7 +115,7 @@ void caCamera::setColormodeStrings()
 {
     colorModeString <<  "Mono" << "RGB1_CA" << "RGB2_CA" << "RGB3_CA" << "BayerRG_8" << "BayerGB_8" << "BayerGR_8" << "BayerBG_8" <<
                         "BayerRG_12" << "BayerGB_12" << "BayerGR_12" << "BayerBG_12" <<
-                        "RGB_8" << "BGR_8" << "RGBA_8" << "BRGA_8" << "RGB_12" <<
+                        "RGB_8" << "BGR_8" << "RGBA_8" << "BGRA_8" << "RGB_12" <<
                         "YUV444" << "YUV422"<< "YUV411" << "YUV421";
 }
 
@@ -1444,6 +1444,72 @@ void caCamera::PROC_UVY444(uchar *YUV, uint *rgb, int sx, int sy, int datasize) 
     }
 }
 
+void caCamera::PROC_RGB8(uchar *RGB,rgb_interpretation rgb_type, uint *rgb, int sx, int sy, int datasize)  // 3 bytes for 1 pixels
+{
+    int rgb_matrix[5][3]={{0,1,2},  //COLOR_RGB
+                          {2,1,0},  //COLOR_GBR
+                          {1,0,2},  //COLOR_GRB
+                          {2,1,0},  //COLOR_BGR
+                          {1,2,0}   //COLOR_BRG
+    };
+    long max_data=(long)RGB + datasize;
+
+    if ((sx==0)||(sy==0)) return;
+    for (long i = 0; i < (sx) * sy ; ++i) {
+        int R, G, B;
+
+        R =  RGB[rgb_matrix[rgb_type][0]];
+        G  = RGB[rgb_matrix[rgb_type][1]];
+        B  = RGB[rgb_matrix[rgb_type][2]];
+
+        RGB += 3;
+
+        rgb[0]=R;
+        rgb[1]=G;
+        rgb[2]=B;
+        rgb += 3;
+
+        if (max_data<=(long)RGB) return;
+
+    }
+}
+
+void caCamera::PROC_RGBA8(uchar *RGBA,rgb_interpretation rgb_type, uint *rgb, int sx, int sy, int datasize)
+{
+    int rgb_matrix[5][4]={{0,1,2,3},  //COLOR_RGB
+                          {2,1,0,3},  //COLOR_GBR
+                          {1,0,2,3},  //COLOR_GRB
+                          {2,1,0,3},  //COLOR_BGR
+                          {1,2,0,3}   //COLOR_BRG
+    };
+
+    long max_data=(long)RGBA + datasize;
+
+    if ((sx==0)||(sy==0)) return;
+    for (long i = 0; i < (sx) * sy ; ++i) {
+        int R, G, B, A;
+
+        R =  RGBA[rgb_matrix[rgb_type][0]];
+        G  = RGBA[rgb_matrix[rgb_type][1]];
+        B  = RGBA[rgb_matrix[rgb_type][2]];
+        A  = RGBA[rgb_matrix[rgb_type][3]];
+
+        RGBA += 4;
+
+        rgb[0]=R;
+        rgb[1]=G;
+        rgb[2]=B;
+        rgb += 3;
+
+        if (max_data<=(long)RGBA) return;
+
+    }
+}
+
+
+
+
+
 void caCamera::buf_unpack_12bitpacked_msb(void* target, void* source, size_t count)
 {
     size_t x1, x2;
@@ -1587,6 +1653,56 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         savedSizeNew = 3*sx*sy*sizeof(uint);
         CameraDataConvert = &caCamera::CameraDataConvert;
         break;
+    case RGB_8:
+        bayerMode = true;
+
+        PROC_RGB8((uchar *) data,COLOR_RGB ,rgb, sx, sy,datasize);
+
+        thisColormode = RGB1_CA;
+        m_datatype = caLONG;
+        savedData= (char *) rgb;
+        savedSizeNew = 3*sx*sy*sizeof(uint);
+        CameraDataConvert = &caCamera::CameraDataConvert;
+        break;
+
+    case BGR_8:
+        bayerMode = true;
+
+        PROC_RGB8((uchar *) data,COLOR_BGR ,rgb, sx, sy,datasize);
+
+        thisColormode = RGB1_CA;
+        m_datatype = caLONG;
+        savedData= (char *) rgb;
+        savedSizeNew = 3*sx*sy*sizeof(uint);
+        CameraDataConvert = &caCamera::CameraDataConvert;
+        break;
+
+    case RGBA_8:
+        bayerMode = true;
+
+        PROC_RGBA8((uchar *) data,COLOR_RGB ,rgb, sx, sy,datasize);
+
+        thisColormode = RGB1_CA;
+        m_datatype = caLONG;
+        savedData= (char *) rgb;
+        savedSizeNew = 3*sx*sy*sizeof(uint);
+        CameraDataConvert = &caCamera::CameraDataConvert;
+        break;
+
+    case BGRA_8:
+        bayerMode = true;
+
+        PROC_RGBA8((uchar *) data,COLOR_BGR ,rgb, sx, sy,datasize);
+
+        thisColormode = RGB1_CA;
+        m_datatype = caLONG;
+        savedData= (char *) rgb;
+        savedSizeNew = 3*sx*sy*sizeof(uint);
+        CameraDataConvert = &caCamera::CameraDataConvert;
+        break;
+
+    case RGB_12:break;
+
 
     case YUV411:
         yuvMode = true;
