@@ -936,11 +936,11 @@ template <typename pureData> void caCamera::calcImage (pureData *ptr,  colormode
     int offset3 = 0;
     int  dataAdvance;
 
-    if(mode == RGB3) {          // blop red, blob green, blob blue
+    if(mode == RGB3_CA) {          // blop red, blob green, blob blue
         offset1 = savedHeight * savedWidth;
         offset2 = 2 * offset1;
         dataAdvance = 1;
-    } else if(mode == RGB2) {   // row red, row green row blue
+    } else if(mode == RGB2_CA) {   // row red, row green row blue
         offset1 = savedWidth;
         offset2 = 2 * offset1;
         offset3 = savedWidth * 2;
@@ -1068,8 +1068,8 @@ void caCamera::CameraDataConvert(int sector, int sectorcount, SyncMinMax* MinMax
         if(maxvalue != 0) correction = 255.0 / (float) maxvalue;
 
         int increment = 1;
-        if(thisColormode == RGB1) increment = 3; // 3 elements RGB
-        if(thisColormode == RGB2) increment = 3; // 3 Lines RGB
+        if(thisColormode == RGB1_CA) increment = 3; // 3 elements RGB
+        if(thisColormode == RGB2_CA) increment = 3; // 3 Lines RGB
         LineData.resize(resultSize.width());
         InitLoopdata(ystart, yend, i, increment, sector, sectorcount, resultSize, Max, Min);
         switch (m_datatype) {
@@ -1541,9 +1541,9 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
 
     switch (thisColormode) {
     case Mono:
-    case RGB1:
-    case RGB2:
-    case RGB3:
+    case RGB1_CA:
+    case RGB2_CA:
+    case RGB3_CA:
         savedData = data;
         CameraDataConvert = &caCamera::CameraDataConvert;
         break;
@@ -1567,7 +1567,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         } else if((thisColormode == BayerRG_12) || (thisColormode == BayerGB_12) || (thisColormode == BayerGR_12) || (thisColormode == BayerBG_12)) {
             bitsPerElement = 12;
         }
-        thisColormode = RGB1;
+        thisColormode = RGB1_CA;
         m_datatype = caLONG;
 
         //printf("bitsperlement=%d datasize=%d sx=%d sy=%d\n",bitsPerElement,  datasize, sx, sy);
@@ -1595,7 +1595,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         }else{
             PROC_YYUYYV411((uchar *) data, rgb, sx, sy,datasize);
         }
-        thisColormode = RGB1;
+        thisColormode = RGB1_CA;
         m_datatype = caLONG;
         savedData= (char *) rgb;
         savedSizeNew = 3*sx*sy*sizeof(uint);
@@ -1609,7 +1609,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         }else{
             PROC_YUYV422((uchar *) data, rgb, sx, sy);
         }
-        thisColormode = RGB1;
+        thisColormode = RGB1_CA;
         m_datatype = caLONG;
         savedData= (char *) rgb;
         savedSizeNew = 3*sx*sy*sizeof(uint);
@@ -1624,7 +1624,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         }else{
             PROC_YUV444((uchar *) data, rgb, sx, sy,datasize);
         }
-        thisColormode = RGB1;
+        thisColormode = RGB1_CA;
         m_datatype = caLONG;
         savedData= (char *) rgb;
         savedSizeNew = 3*sx*sy*sizeof(uint);
@@ -1645,9 +1645,9 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         painter.drawText(5, 10 + lineHeight, "specified format not supported:"+colorModeString.at(thisColormode));
         painter.drawText(5, 10 + 2 * lineHeight, "only supported now:");
         painter.drawText(5, 10 + 3 * lineHeight, "mono");
-        painter.drawText(5, 10 + 4 * lineHeight, "rgb1, rgb1, rgb3");
+        painter.drawText(5, 10 + 4 * lineHeight, "rgb1_ca, rgb1_ca, rgb3_ca");
         painter.drawText(5, 10 + 5 * lineHeight, "bayer8, bayer12 unpacked and packed");
-        painter.drawText(5, 10 + 6 * lineHeight, "yuv formats not tested or not implemented");
+        painter.drawText(5, 10 + 6 * lineHeight, "yuv formats except yuv421");
         return image;
     }
 
