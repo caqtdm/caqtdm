@@ -324,9 +324,7 @@ private:
     void MinMaxLock(SyncMinMax* MinMax, uint Max[2], uint Min[2]);
     void MinMaxImageLock(QVector<uint> LineData, int y, QSize resultSize, SyncMinMax* MinMax);
     void MinMaxImageLockBlock(uint *LineData, int ystart, int yend, QSize resultSize, SyncMinMax* MinMax);
-    void InitLoopdata(int &ystart, int &yend, long &i, QVector<uint> &LineData, int increment, int sector, int sectorcount,
-                      QSize resultSize, uint Max[2], uint Min[2]);
-    void InitLoopdataNew(int &ystart, int &yend, long &i, int increment, int sector, int sectorcount,
+    void InitLoopdata(int &ystart, int &yend, long &i, int increment, int sector, int sectorcount,
                          QSize resultSize, uint Max[2], uint Min[2]);
 
     bool buttonPressed;

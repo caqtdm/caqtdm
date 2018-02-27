@@ -878,25 +878,14 @@ void caCamera::MinMaxImageLockBlock(uint *LineData, int ystart, int yend, QSize 
     MinMax->imageLock->unlock();
 }
 
-void caCamera::InitLoopdata(int &ystart, int &yend, long &i, QVector<uint> &LineData, int increment, int sector, int sectorcount, QSize resultSize, uint Max[2], uint Min[2])
-{
-    LineData.resize(resultSize.width());
-
-    Max[1] = 0;
-    Min[1] = 65535;
-
-    ystart = sector * resultSize.height() / sectorcount;
-    yend = ((sector + 1) * resultSize.height()) / sectorcount;
-    i = resultSize.width() * ystart * increment;
-}
-
-void caCamera::InitLoopdataNew(int &ystart, int &yend, long &i, int increment, int sector, int sectorcount, QSize resultSize, uint Max[2], uint Min[2])
+void caCamera::InitLoopdata(int &ystart, int &yend, long &i, int increment, int sector, int sectorcount, QSize resultSize, uint Max[2], uint Min[2])
 {
     Max[1] = 0;
     Min[1] = 65535;
 
     ystart = sector * resultSize.height() / sectorcount;
     yend = ((sector + 1) * resultSize.height()) / sectorcount;
+    // start of block to treat
     i = resultSize.width() * ystart * increment;
 }
 
@@ -944,19 +933,19 @@ template <typename pureData> void caCamera::calcImage (pureData *ptr,  colormode
     int offset1 = 1;            // pixel
     int offset2 = 2;
     int offset3 = 0;
-    int  increment;
+    int  dataAdvance;
 
-    if(mode == RGB3) {          // interleaved
+    if(mode == RGB3) {          // blop red, blob green, blob blue
         offset1 = savedHeight * savedWidth;
         offset2 = 2 * offset1;
-        increment = 1;
-    } else if(mode == RGB2) {   // row
+        dataAdvance = 1;
+    } else if(mode == RGB2) {   // row red, row green row blue
         offset1 = savedWidth;
         offset2 = 2 * offset1;
         offset3 = savedWidth * 2;
-        increment = 1;
-    } else {
-        increment = 3;
+        dataAdvance = 1;
+    } else {                   // elements red, green, blue
+        dataAdvance = 3;
     }
 
     if((i + offset2 + offset3) > datasize) return;
@@ -973,7 +962,7 @@ template <typename pureData> void caCamera::calcImage (pureData *ptr,  colormode
             for (int x = 0; x < resultSize.width(); ++x) {
                 uint intensity = qMax(qMax(ptr[i], ptr[i+offset1]), ptr[i+offset2]);
                 LineData[x] =  qRgb((int) (ptr[i] * redcoeff), (int) (ptr[i+offset1] * greencoeff), (int) (ptr[i+offset2] * bluecoeff));
-                i += increment;
+                i += dataAdvance;
                 Max[(intensity > Max[1])] = intensity;
                 Min[(intensity < Min[1])] = intensity;
                 if ((i + offset2 + offset3) >= datasize) break;
@@ -989,7 +978,7 @@ template <typename pureData> void caCamera::calcImage (pureData *ptr,  colormode
                 uint intensity = qMax(qMax(ptr[i], ptr[i+offset1]), ptr[i+offset2] );
                 int average =(int) 2.2 * (0.2989 * ptr[i] * correction + 0.5870 * ptr[i+offset1] * correction + 0.1140 * ptr[i+offset2] * correction);
                 LineData[x] =  qRgb(average, average, average);
-                i += increment;
+                i += dataAdvance;
                 Max[(intensity > Max[1])] = intensity;
                 Min[(intensity < Min[1])] = intensity;
                 if((i + offset2 + offset3) >= datasize) break;
@@ -1017,7 +1006,8 @@ void caCamera::CameraDataConvert(int sector, int sectorcount, SyncMinMax* MinMax
     if(thisColormode == Mono) {
 
         uint *LineData;
-        InitLoopdataNew(ystart, yend, i, 1, sector, sectorcount, resultSize, Max, Min);
+        int elementAdvance = 1;
+        InitLoopdata(ystart, yend, i, elementAdvance, sector, sectorcount, resultSize, Max, Min);
         LineData = (uint *) malloc(resultSize.width() * sizeof(uint) * (yend-ystart));
 
         // instead of testing in the big loop, subtract a line when sizes do not fit
@@ -1077,17 +1067,10 @@ void caCamera::CameraDataConvert(int sector, int sectorcount, SyncMinMax* MinMax
         if(maxvalue != 0) correction = 255.0 / (float) maxvalue;
 
         int increment = 1;
-        if(thisColormode == RGB1) increment = 3;
-        if(thisColormode == RGB2) increment = 3;
-        if(thisColormode == YUV411) increment = 1;
-        if(thisColormode == YUV422) increment = 1;
-        if(thisColormode == YUV444) increment = 1;
-
-
-
-
-
-        InitLoopdata(ystart, yend, i, LineData, increment, sector, sectorcount, resultSize, Max, Min);
+        if(thisColormode == RGB1) increment = 3; // 3 elements RGB
+        if(thisColormode == RGB2) increment = 3; // 3 Lines RGB
+        LineData.resize(resultSize.width());
+        InitLoopdata(ystart, yend, i, increment, sector, sectorcount, resultSize, Max, Min);
         switch (m_datatype) {
         case caCHAR:
             calcImage ((uchar*) savedData, thisColormode, LineData, i, ystart, yend, correction, datasize, resultSize, MinMax, Max, Min);
@@ -1603,6 +1586,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         savedSizeNew = 3*sx*sy*sizeof(uint);
         CameraDataConvert = &caCamera::CameraDataConvert;
         break;
+
     case YUV411:
         yuvMode = true;
         if (thisPackingmode==Reversed){
@@ -1666,7 +1650,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         return image;
     }
 
-#ifdef QT_NO_CONCURRENT
+#ifndef QT_NO_CONCURRENT
 
     //mark_event = __itt_event_create( "User Mark", 9 );
     //__itt_event_start( mark_event );
