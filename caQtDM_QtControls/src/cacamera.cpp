@@ -113,8 +113,9 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
 
 void caCamera::setColormodeStrings()
 {
-    colorModeString <<  "Mono" << "RGB1" << "RGB2" << "RGB3" << "BayerRG_8" << "BayerGB_8" << "BayerGR_8" << "BayerBG_8" <<
+    colorModeString <<  "Mono" << "RGB1_CA" << "RGB2_CA" << "RGB3_CA" << "BayerRG_8" << "BayerGB_8" << "BayerGR_8" << "BayerBG_8" <<
                         "BayerRG_12" << "BayerGB_12" << "BayerGR_12" << "BayerBG_12" <<
+                        "RGB_8" << "BGR_8" << "RGBA_8" << "BRGA_8" << "RGB_12" <<
                         "YUV444" << "YUV422"<< "YUV411" << "YUV421";
 }
 
@@ -1391,7 +1392,7 @@ void caCamera::PROC_YUV444(uchar *YUV, uint *rgb, int sx, int sy, int datasize) 
 {
     long max_data=(long)YUV + datasize;
     if ((sx==0)||(sy==0)||(YUV==NULL)||(rgb==NULL)) return;
-    for (long i = 0; i < (sx) * sy/2 ; ++i) {
+    for (long i = 0; i < (sx) * sy ; ++i) {
         int Y, U, V;
         long r,g,b;
         long min=0;
@@ -1420,7 +1421,7 @@ void caCamera::PROC_UVY444(uchar *YUV, uint *rgb, int sx, int sy, int datasize) 
     long max_data=(long)YUV + datasize;
 
     if ((sx==0)||(sy==0)) return;
-    for (long i = 0; i < (sx) * sy/2 ; ++i) {
+    for (long i = 0; i < (sx) * sy ; ++i) {
         int Y, U, V;
         long r,g,b;
         long min=0;
