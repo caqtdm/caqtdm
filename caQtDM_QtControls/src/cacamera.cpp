@@ -1013,16 +1013,21 @@ void caCamera::CameraDataConvert(int sector, int sectorcount, SyncMinMax* MinMax
 
         // instead of testing in the big loop, subtract a line when sizes do not fit
         bool notOK = true;
+        bool writeIt = true;
         while (notOK) {
             long SizeToTreat = (yend-ystart) * resultSize.width() * elementSize;
             if(SizeToTreat > datasize) {
-                yend -= 1;
+                yend -= 10;
                 if(yend < ystart) {
                     printf("something really wrong between datasize and image width and height\n");
                     free (LineData);
                     return;
                 }
-                printf("datasize=%d ystart=%d yend=%d width=%d\n", datasize, ystart, yend, resultSize.width());
+                if(writeIt) {
+                    printf("something wrong between datasize=%d and image width=%d and height=%d, trying to match\n", datasize, resultSize.width(), resultSize.height());
+                    writeIt = false;
+                    fflush(stdout);
+                }
             } else {
                 notOK = false;
             }
@@ -1575,13 +1580,20 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         ftime(&timeRef);
 
         if(rgb != (uint*) 0) free(rgb);
-        rgb = (uint *) malloc(3*m_width*m_height*sizeof(uint));
-        printf("rgb(%x) size now define to %d uints => %d chars, received %d chars\n",rgb,3*m_width*m_height, 3*m_width*m_height*sizeof(uint), datasize);
+        ulong rgbsize = 3*m_width*m_height*sizeof(uint);
+        rgb = (uint *) malloc(rgbsize);
+
+        printf("rgb(%x) size now define to %d uints => %d chars, received %d chars\n",rgb, 3*m_width*m_height, rgbsize, datasize);
         fflush(stdout);
 
         // force resize
         QResizeEvent *re = new QResizeEvent(size(), size());
         resizeEvent(re);
+    }
+
+    if(rgb == (uint *) 0) {
+        printf("cacamera -- could not allocate rgb buffer\n");
+        return (QImage *) 0;
     }
 
     Max[1] =  0;

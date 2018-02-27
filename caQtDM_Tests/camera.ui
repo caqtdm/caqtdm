@@ -136,13 +136,13 @@ border-radius: 2px;
       </rect>
      </property>
      <property name="channelData" stdset="0">
-      <string notr="true">MTEST-CAQTDM-CAMERA:FPICTURE{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
+      <string notr="true">MTEST-CAQTDM-CAMERA:FPICTURE</string>
      </property>
      <property name="channelWidth" stdset="0">
-      <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+      <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH</string>
      </property>
      <property name="channelHeight" stdset="0">
-      <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+      <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT</string>
      </property>
      <property name="simpleZoomedView" stdset="0">
       <bool>false</bool>
@@ -529,17 +529,17 @@ def PythonCalc(a, b, c, d):
     </item>
     <item>
      <property name="text">
-      <string>RGB1</string>
+      <string>RGB1_CA</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>RGB2</string>
+      <string>RGB2_CA</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>RGB3</string>
+      <string>RGB3_CA</string>
      </property>
     </item>
     <item>
@@ -584,12 +584,42 @@ def PythonCalc(a, b, c, d):
     </item>
     <item>
      <property name="text">
+      <string>RGB_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BGR_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RGBA_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BRGA_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RGB12</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
       <string>YUV444</string>
      </property>
     </item>
     <item>
      <property name="text">
       <string>YUV422</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>YUV411</string>
      </property>
     </item>
     <item>
@@ -688,6 +718,37 @@ def PythonCalc(a, b, c, d):
       <string>LSB12Bit</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>Reversed</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="caLineEdit" name="calineedit">
+    <property name="geometry">
+     <rect>
+      <x>744</x>
+      <y>343</y>
+      <width>100</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_2">
+    <property name="geometry">
+     <rect>
+      <x>744</x>
+      <y>381</y>
+      <width>100</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT</string>
+    </property>
    </widget>
   </widget>
  </widget>
