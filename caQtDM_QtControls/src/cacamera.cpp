@@ -1281,8 +1281,15 @@ template <typename pureData> void caCamera::FilterBayer(pureData *bayer, uint *r
 #define GET_G_FROM_YCbCr(y,cb,cr) 298.082*y/256 - 100.291 * cb / 256 - 208.120 * cr / 256 + 135.576 ;
 #define GET_B_FROM_YCbCr(y,cb,cr) 298.082*y/256 + 561.412 * cb / 256                      - 276.836 ;
 
-void caCamera::PROC_YUYV422(uchar *YUV, uint *rgb, int sx, int sy)  // 4 bytes for 2 pixels
+#define GET_R_FROM_YUV(y,u,v) y + 1.370705 * (v-128);
+#define GET_G_FROM_YUV(y,u,v) y - 0.698001 * (v-128) - 0.337633 * (u -128);
+#define GET_B_FROM_YUV(y,u,v) y + 1.732446 * (u-128);
+
+
+
+void caCamera::PROC_YUYV422(uchar *YUV, uint *rgb, int sx, int sy, int datasize)  // 4 bytes for 2 pixels
 {
+    long max_data=(long)YUV + datasize;
     if ((sx==0)||(sy==0)) return;
     for (long i = 0; i < (sx) * sy / 2; ++i) {
         int Y1, Cr, Y2, Cb;
@@ -1296,9 +1303,9 @@ void caCamera::PROC_YUYV422(uchar *YUV, uint *rgb, int sx, int sy)  // 4 bytes f
 
         YUV += 4;
 
-        r=GET_R_FROM_YCbCr(Y1,Cb,Cr);
-        g=GET_G_FROM_YCbCr(Y1,Cb,Cr);
-        b=GET_B_FROM_YCbCr(Y1,Cb,Cr);
+        r=GET_R_FROM_YUV(Y1,Cb,Cr);
+        g=GET_G_FROM_YUV(Y1,Cb,Cr);
+        b=GET_B_FROM_YUV(Y1,Cb,Cr);
 
         rgb[0]=qMax(min,r);
         rgb[1]=qMax(min,g);
@@ -1310,9 +1317,9 @@ void caCamera::PROC_YUYV422(uchar *YUV, uint *rgb, int sx, int sy)  // 4 bytes f
         //        }
 
         rgb += 3;
-        r=GET_R_FROM_YCbCr(Y2,Cb,Cr);
-        g=GET_G_FROM_YCbCr(Y2,Cb,Cr);
-        b=GET_B_FROM_YCbCr(Y2,Cb,Cr);
+        r=GET_R_FROM_YUV(Y2,Cb,Cr);
+        g=GET_G_FROM_YUV(Y2,Cb,Cr);
+        b=GET_B_FROM_YUV(Y2,Cb,Cr);
         rgb[0]=qMax(min,r);
         rgb[1]=qMax(min,g);
         rgb[2]=qMax(min,b);
@@ -1321,16 +1328,14 @@ void caCamera::PROC_YUYV422(uchar *YUV, uint *rgb, int sx, int sy)  // 4 bytes f
         //        if (i<9){
         //            printf("R2: %x G2: %x B2: %x \n",rgb[0],rgb[1],rgb[2]);
         //        }
-
+        if (max_data<(long)YUV) break;
     }
 }
 
-#define GET_R_FROM_YUV(y,u,v) y + 1.370705 * (v-128);
-#define GET_G_FROM_YUV(y,u,v) y - 0.698001 * (v-128) - 0.337633 * (u -128);
-#define GET_B_FROM_YUV(y,u,v) y + 1.732446 * (u-128);
 
-void caCamera::PROC_UYVY422(uchar *YUV, uint *rgb, int sx, int sy)  // 4 bytes for 4 pixels
+void caCamera::PROC_UYVY422(uchar *YUV, uint *rgb, int sx, int sy, int datasize)  // 4 bytes for 4 pixels
 {
+    long max_data=(long)YUV + datasize;
     if ((sx==0)||(sy==0)) return;
     for (int i = 0; i < sx * sy / 4; ++i) {
         int y0, u0, y1, v0, y2, u2, y3, v2;
@@ -1362,15 +1367,17 @@ void caCamera::PROC_UYVY422(uchar *YUV, uint *rgb, int sx, int sy)  // 4 bytes f
         rgb[1] = GET_G_FROM_YUV(y3,u2,v2);
         rgb[2] = GET_B_FROM_YUV(y3,u2,v2);
         rgb += 3;
+        if (max_data<(long)YUV) break;
     }
 }
 
 void caCamera::PROC_YYUYYV411(uchar *YUV, uint *rgb, int sx, int sy, int datasize)  // 6 bytes for 4 pixels
 {
+    long max_data=(long)YUV + datasize;
     if ((sx==0)||(sy==0)) return;
     for (long i = 0; i < (sx) * sy / 4; ++i) {
         int Y1, U, Y2, V, Y3, Y4;
-        long max_data=(long)YUV + datasize;
+
         long r,g,b;
         long min=0;
         // Extract YCbCr components
@@ -1383,33 +1390,33 @@ void caCamera::PROC_YYUYYV411(uchar *YUV, uint *rgb, int sx, int sy, int datasiz
 
         YUV += 6;
 
-        r=GET_R_FROM_YCbCr(Y1,U,V);
-        g=GET_G_FROM_YCbCr(Y1,U,V);
-        b=GET_B_FROM_YCbCr(Y1,U,V);
+        r=GET_R_FROM_YUV(Y1,U,V);
+        g=GET_G_FROM_YUV(Y1,U,V);
+        b=GET_B_FROM_YUV(Y1,U,V);
         rgb[0]=qMax(min,r);
         rgb[1]=qMax(min,g);
         rgb[2]=qMax(min,b);
         rgb += 3;
 
-        r=GET_R_FROM_YCbCr(Y2,U,V);
-        g=GET_G_FROM_YCbCr(Y2,U,V);
-        b=GET_B_FROM_YCbCr(Y2,U,V);
+        r=GET_R_FROM_YUV(Y2,U,V);
+        g=GET_G_FROM_YUV(Y2,U,V);
+        b=GET_B_FROM_YUV(Y2,U,V);
         rgb[0]=qMax(min,r);
         rgb[1]=qMax(min,g);
         rgb[2]=qMax(min,b);
         rgb += 3;
 
-        r=GET_R_FROM_YCbCr(Y3,U,V);
-        g=GET_G_FROM_YCbCr(Y3,U,V);
-        b=GET_B_FROM_YCbCr(Y3,U,V);
+        r=GET_R_FROM_YUV(Y3,U,V);
+        g=GET_G_FROM_YUV(Y3,U,V);
+        b=GET_B_FROM_YUV(Y3,U,V);
         rgb[0]=qMax(min,r);
         rgb[1]=qMax(min,g);
         rgb[2]=qMax(min,b);
         rgb += 3;
 
-        r=GET_R_FROM_YCbCr(Y4,U,V);
-        g=GET_G_FROM_YCbCr(Y4,U,V);
-        b=GET_B_FROM_YCbCr(Y4,U,V);
+        r=GET_R_FROM_YUV(Y4,U,V);
+        g=GET_G_FROM_YUV(Y4,U,V);
+        b=GET_B_FROM_YUV(Y4,U,V);
         rgb[0]=qMax(min,r);
         rgb[1]=qMax(min,g);
         rgb[2]=qMax(min,b);
@@ -1421,11 +1428,12 @@ void caCamera::PROC_YYUYYV411(uchar *YUV, uint *rgb, int sx, int sy, int datasiz
 
 void caCamera::PROC_UYYVYY411(uchar *YUV, uint *rgb, int sx, int sy, int datasize)  // 6 bytes for 4 pixels
 {
+    long max_data=(long)YUV + datasize;
     if ((sx==0)||(sy==0)) return;
     for (long i = 0; i < (sx) * sy / 4; ++i) {
         int Y1, U, Y2, V, Y3, Y4;
         long r,g,b;
-        long max_data=(long)YUV + datasize;
+
         long min=0;
         // Extract YCbCr components
         U  = YUV[0];
@@ -1436,33 +1444,33 @@ void caCamera::PROC_UYYVYY411(uchar *YUV, uint *rgb, int sx, int sy, int datasiz
         Y4 = YUV[5];
         YUV += 6;
 
-        r=GET_R_FROM_YCbCr(Y1,U,V);
-        g=GET_G_FROM_YCbCr(Y1,U,V);
-        b=GET_B_FROM_YCbCr(Y1,U,V);
+        r=GET_R_FROM_YUV(Y1,U,V);
+        g=GET_G_FROM_YUV(Y1,U,V);
+        b=GET_B_FROM_YUV(Y1,U,V);
         rgb[0]=qMax(min,r);
         rgb[1]=qMax(min,g);
         rgb[2]=qMax(min,b);
         rgb += 3;
 
-        r=GET_R_FROM_YCbCr(Y2,U,V);
-        g=GET_G_FROM_YCbCr(Y2,U,V);
-        b=GET_B_FROM_YCbCr(Y2,U,V);
+        r=GET_R_FROM_YUV(Y2,U,V);
+        g=GET_G_FROM_YUV(Y2,U,V);
+        b=GET_B_FROM_YUV(Y2,U,V);
         rgb[0]=qMax(min,r);
         rgb[1]=qMax(min,g);
         rgb[2]=qMax(min,b);
         rgb += 3;
 
-        r=GET_R_FROM_YCbCr(Y3,U,V);
-        g=GET_G_FROM_YCbCr(Y3,U,V);
-        b=GET_B_FROM_YCbCr(Y3,U,V);
+        r=GET_R_FROM_YUV(Y3,U,V);
+        g=GET_G_FROM_YUV(Y3,U,V);
+        b=GET_B_FROM_YUV(Y3,U,V);
         rgb[0]=qMax(min,r);
         rgb[1]=qMax(min,g);
         rgb[2]=qMax(min,b);
         rgb += 3;
 
-        r=GET_R_FROM_YCbCr(Y4,U,V);
-        g=GET_G_FROM_YCbCr(Y4,U,V);
-        b=GET_B_FROM_YCbCr(Y4,U,V);
+        r=GET_R_FROM_YUV(Y4,U,V);
+        g=GET_G_FROM_YUV(Y4,U,V);
+        b=GET_B_FROM_YUV(Y4,U,V);
         rgb[0]=qMax(min,r);
         rgb[1]=qMax(min,g);
         rgb[2]=qMax(min,b);
@@ -1486,9 +1494,9 @@ void caCamera::PROC_YUV444(uchar *YUV, uint *rgb, int sx, int sy, int datasize) 
 
         YUV += 3;
 
-        r=GET_R_FROM_YCbCr(Y,U,V);
-        g=GET_G_FROM_YCbCr(Y,U,V);
-        b=GET_B_FROM_YCbCr(Y,U,V);
+        r=GET_R_FROM_YUV(Y,U,V);
+        g=GET_G_FROM_YUV(Y,U,V);
+        b=GET_B_FROM_YUV(Y,U,V);
         rgb[0]=qMax(min,r);
         rgb[1]=qMax(min,g);
         rgb[2]=qMax(min,b);
@@ -1515,9 +1523,9 @@ void caCamera::PROC_UVY444(uchar *YUV, uint *rgb, int sx, int sy, int datasize) 
 
         YUV += 3;
 
-        r=GET_R_FROM_YCbCr(Y,U,V);
-        g=GET_G_FROM_YCbCr(Y,U,V);
-        b=GET_B_FROM_YCbCr(Y,U,V);
+        r=GET_R_FROM_YUV(Y,U,V);
+        g=GET_G_FROM_YUV(Y,U,V);
+        b=GET_B_FROM_YUV(Y,U,V);
         rgb[0]=qMax(min,r);
         rgb[1]=qMax(min,g);
         rgb[2]=qMax(min,b);
@@ -1777,9 +1785,9 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         } else if(thisColormode == YUV422) {
 
             if (thisPackingmode==Reversed){
-                PROC_UYVY422((uchar *) data, rgb, sx, sy);
+                PROC_UYVY422((uchar *) data, rgb, sx, sy,datasize);
             } else{
-                PROC_YUYV422((uchar *) data, rgb, sx, sy);
+                PROC_YUYV422((uchar *) data, rgb, sx, sy,datasize);
             }
 
         } else if(thisColormode == YUV444) {

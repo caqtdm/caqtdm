@@ -322,8 +322,8 @@ private:
     template <typename pureData>
     int zValueImage(pureData *ptr, colormode mode, double xnew, double ynew, double xmax, double ymax, int datasize, bool &validIntensity);
 
-    void PROC_UYVY422(uchar *YUV, uint *rgb, int sx, int sy);
-    void PROC_YUYV422(uchar *YUV, uint *rgb, int sx, int sy);
+    void PROC_UYVY422(uchar *YUV, uint *rgb, int sx, int sy, int datasize);
+    void PROC_YUYV422(uchar *YUV, uint *rgb, int sx, int sy, int datasize);
     void PROC_YYUYYV411(uchar *YUV, uint *rgb, int sx, int sy, int datasize);
     void PROC_UYYVYY411(uchar *YUV, uint *rgb, int sx, int sy, int datasize);
     void PROC_YUV444(uchar *YUV, uint *rgb, int sx, int sy, int datasize);
