@@ -306,8 +306,8 @@ private:
     QVarLengthArray<double> X;
     QVarLengthArray<double> Y;
 
-    void buf_unpack_12bitpacked_lsb(void* target, void* source, size_t count);
-    void buf_unpack_12bitpacked_msb(void* target, void* source, size_t count);
+    void buf_unpack_12bitpacked_lsb(void* target, void* source, size_t destcount, size_t targetcount);
+    void buf_unpack_12bitpacked_msb(void* target, void* source, size_t destcount, size_t targetcount);
 
     template <typename pureData>
     void calcImage (pureData *ptr,  colormode mode, QVector<uint> &LineData, long &i, int &ystart, int &yend, float correction,

@@ -1599,29 +1599,31 @@ void caCamera::PROC_RGBA8(uchar *RGBA,rgb_interpretation rgb_type, uint *rgb, in
 
 
 
-void caCamera::buf_unpack_12bitpacked_msb(void* target, void* source, size_t count)
+void caCamera::buf_unpack_12bitpacked_msb(void* target, void* source, size_t destcount, size_t targetcount)
 {
     size_t x1, x2;
     unsigned char b0, b1, b2;
-    for (x1 = 0, x2 = 0; x2 < (count / 2); x1 = x1 + 3, x2 = x2 + 2) {
+    for (x1 = 0, x2 = 0; x2 < (destcount / 2); x1 = x1 + 3, x2 = x2 + 2) {
         b0 = ((char*) source) [x1];
         b1 = ((char*) source) [x1 + 1];
         b2 = ((char*) source) [x1 + 2];
         ((unsigned short*) target) [x2] = (b1 & 0xf) + (b0 << 4);   // valid for Mono12Packet on IOC
         ((unsigned short*) target) [x2 + 1] = ((b1 & 0xf0) >> 4) + (b2 << 4);
+        if (targetcount<x1+3) return;
     }
 }
 
-void caCamera::buf_unpack_12bitpacked_lsb(void* target, void* source, size_t count)
+void caCamera::buf_unpack_12bitpacked_lsb(void* target, void* source, size_t destcount, size_t targetcount)
 {
     size_t x1, x2;
     unsigned char b0, b1, b2;
-    for (x1 = 0, x2 = 0; x2 < (count / 2); x1 = x1 + 3, x2 = x2 + 2) {
+    for (x1 = 0, x2 = 0; x2 < (destcount / 2); x1 = x1 + 3, x2 = x2 + 2) {
         b0 = ((char*) source) [x1];
         b1 = ((char*) source) [x1 + 1];
         b2 = ((char*) source) [x1 + 2];
         ((unsigned short*) target) [x2] = ((b1 & 0xf)<<8) + (b0);   // valid for our actual basler camera
         ((unsigned short*) target) [x2 + 1] = ((b1 & 0xf0) >> 4) + (b2 << 4);
+        if (targetcount<x1+3) return;
     }
 }
 
@@ -1739,14 +1741,16 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         } else if((bitsPerElement == 12) && (thisPackingmode == packNo)) {
             FilterBayer((ushort *) data, rgb, sx, sy, tile);
         } else if((bitsPerElement == 12) && (thisPackingmode > packNo)) {
-            ushort *unpacked = (ushort *) malloc(16/12*sizeof(ushort) * datasize + 1);
-            if(thisPackingmode == LSB12Bit) buf_unpack_12bitpacked_lsb(unpacked, (uchar*) data, datasize);
-            else buf_unpack_12bitpacked_msb(unpacked, (uchar*) data, datasize);
+            ushort *unpacked = (ushort *) malloc(2*sizeof(ushort) * datasize + 1);
+            if(thisPackingmode == LSB12Bit) buf_unpack_12bitpacked_lsb(unpacked, (uchar*) data, sx*sy*2,datasize);
+            else buf_unpack_12bitpacked_msb(unpacked, (uchar*) data, sx*sy*2,datasize);
             FilterBayer((ushort *) unpacked, rgb, sx, sy, tile);
             free(unpacked);
         }
+
         savedData= (char *) rgb;
         savedSizeNew = 3*sx*sy*sizeof(uint);
+
         CameraDataConvert = &caCamera::CameraDataConvert;
         break;
 
