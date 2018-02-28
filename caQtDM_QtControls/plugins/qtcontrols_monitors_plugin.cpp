@@ -472,7 +472,7 @@ QWidget *caCameraInterface::createWidget(QWidget* parent)
 caCameraInterface::caCameraInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
     strng name[16], type[16] = {"","","","","","","","","","","","","","","",""};
-    longtext text[16] = {"","","","","","","","",CHANNELLIST,CHANNELLIST,STRINGFROMLIST,STRINGFROMLIST, "","", "",""};
+    longtext text[16] = {"","","","","","","","",CHANNELLIST,CHANNELLIST,STRINGFROMLIST,STRINGFROMLIST, "Channel for displaying average (X) waveform","Channel for displaying average (Y) waveform", "",""};
 
     strcpy(name[0], "channelData");
     strcpy(type[0], "multiline");
