@@ -1279,13 +1279,13 @@ template <typename pureData> void caCamera::FilterBayer(pureData *bayer, uint *r
 
 //https://en.wikipedia.org/wiki/Chroma_subsampling
 //https://en.wikipedia.org/wiki/YCbCr
-#define GET_R_FROM_YCbCr(y,cb,cr) 298.082*y/256 +                      408.583 * cr / 256 - 222.291 ;
-#define GET_G_FROM_YCbCr(y,cb,cr) 298.082*y/256 - 100.291 * cb / 256 - 208.120 * cr / 256 + 135.576 ;
-#define GET_B_FROM_YCbCr(y,cb,cr) 298.082*y/256 + 561.412 * cb / 256                      - 276.836 ;
+#define GET_R_FROM_YUV(y,cb,cr) 298.082*y/256 +                      408.583 * cr / 256 - 222.291 ;
+#define GET_G_FROM_YUV(y,cb,cr) 298.082*y/256 - 100.291 * cb / 256 - 208.120 * cr / 256 + 135.576 ;
+#define GET_B_FROM_YUV(y,cb,cr) 298.082*y/256 + 561.412 * cb / 256                      - 276.836 ;
 
-#define GET_R_FROM_YUV(y,u,v) y + 1.370705 * (v-128);
-#define GET_G_FROM_YUV(y,u,v) y - 0.698001 * (v-128) - 0.337633 * (u -128);
-#define GET_B_FROM_YUV(y,u,v) y + 1.732446 * (u-128);
+//#define GET_R_FROM_YUV(y,u,v) y + 1.370705 * (v-128);
+//#define GET_G_FROM_YUV(y,u,v) y - 0.698001 * (v-128) - 0.337633 * (u -128);
+//#define GET_B_FROM_YUV(y,u,v) y + 1.732446 * (u-128);
 
 void caCamera::PROC_YUYV422(uchar *YUV, uint *rgb, int sx, int sy, int datasize)  // 4 bytes for 2 pixels
 {
