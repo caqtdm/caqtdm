@@ -37,6 +37,7 @@
 #include <QSlider>
 #include <QToolButton>
 #include <QScrollBar>
+#include <QComboBox>
 #include <qtcontrols_global.h>
 #include <imagewidget.h>
 #include <calabel.h>
