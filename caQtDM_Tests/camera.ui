@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>911</width>
-    <height>663</height>
+    <width>1144</width>
+    <height>658</height>
    </rect>
   </property>
   <property name="styleSheet">
@@ -158,6 +158,15 @@ border-radius: 2px;
      </property>
      <property name="maxLevel">
       <string notr="true">4500</string>
+     </property>
+     <property name="colorMode" stdset="0">
+      <enum>caCamera::RGB1_CA</enum>
+     </property>
+     <property name="packMode" stdset="0">
+      <enum>caCamera::MSB12Bit</enum>
+     </property>
+     <property name="showComboBoxes">
+      <bool>true</bool>
      </property>
      <property name="ColorMap" stdset="0">
       <enum>caCamera::as_is</enum>
@@ -516,9 +525,9 @@ def PythonCalc(a, b, c, d):
    <widget class="QComboBox" name="comboBox">
     <property name="geometry">
      <rect>
-      <x>695</x>
-      <y>118</y>
-      <width>179</width>
+      <x>697</x>
+      <y>17</y>
+      <width>102</width>
       <height>23</height>
      </rect>
     </property>
@@ -631,8 +640,8 @@ def PythonCalc(a, b, c, d):
    <widget class="QDoubleSpinBox" name="doubleSpinBox">
     <property name="geometry">
      <rect>
-      <x>738</x>
-      <y>182</y>
+      <x>940</x>
+      <y>96</y>
       <width>95</width>
       <height>28</height>
      </rect>
@@ -653,8 +662,8 @@ def PythonCalc(a, b, c, d):
    <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
     <property name="geometry">
      <rect>
-      <x>741</x>
-      <y>227</y>
+      <x>940</x>
+      <y>132</y>
       <width>95</width>
       <height>28</height>
      </rect>
@@ -675,8 +684,8 @@ def PythonCalc(a, b, c, d):
    <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
     <property name="geometry">
      <rect>
-      <x>741</x>
-      <y>269</y>
+      <x>940</x>
+      <y>169</y>
       <width>95</width>
       <height>28</height>
      </rect>
@@ -697,9 +706,9 @@ def PythonCalc(a, b, c, d):
    <widget class="QComboBox" name="comboBox_2">
     <property name="geometry">
      <rect>
-      <x>696</x>
-      <y>153</y>
-      <width>179</width>
+      <x>698</x>
+      <y>52</y>
+      <width>104</width>
       <height>23</height>
      </rect>
     </property>
@@ -727,8 +736,8 @@ def PythonCalc(a, b, c, d):
    <widget class="caLineEdit" name="calineedit">
     <property name="geometry">
      <rect>
-      <x>744</x>
-      <y>343</y>
+      <x>1028</x>
+      <y>12</y>
       <width>100</width>
       <height>20</height>
      </rect>
@@ -740,14 +749,259 @@ def PythonCalc(a, b, c, d):
    <widget class="caLineEdit" name="calineedit_2">
     <property name="geometry">
      <rect>
-      <x>744</x>
-      <y>381</y>
+      <x>1029</x>
+      <y>42</y>
       <width>100</width>
       <height>20</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
      <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT</string>
+    </property>
+   </widget>
+   <widget class="caCamera" name="cacamera_2">
+    <property name="geometry">
+     <rect>
+      <x>718</x>
+      <y>412</y>
+      <width>294</width>
+      <height>229</height>
+     </rect>
+    </property>
+    <property name="channelData" stdset="0">
+     <string notr="true">MTEST-CAQTDM-CAMERA:FPICTURE</string>
+    </property>
+    <property name="channelWidth" stdset="0">
+     <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH</string>
+    </property>
+    <property name="channelHeight" stdset="0">
+     <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT</string>
+    </property>
+    <property name="simpleZoomedView" stdset="0">
+     <bool>true</bool>
+    </property>
+    <property name="Zoom" stdset="0">
+     <enum>caCamera::Yes</enum>
+    </property>
+    <property name="automaticLevels" stdset="0">
+     <bool>true</bool>
+    </property>
+    <property name="minLevel">
+     <string notr="true">800</string>
+    </property>
+    <property name="maxLevel">
+     <string notr="true">4500</string>
+    </property>
+    <property name="colorMode" stdset="0">
+     <enum>caCamera::YUV422</enum>
+    </property>
+    <property name="packMode" stdset="0">
+     <enum>caCamera::MSB12Bit</enum>
+    </property>
+    <property name="ColorMap" stdset="0">
+     <enum>caCamera::as_is</enum>
+    </property>
+    <property name="ROI_readChannels" stdset="0">
+     <string>FIGX;FIGY;FIGW;FIGH</string>
+    </property>
+    <property name="ROI_readmarkerType" stdset="0">
+     <enum>caCamera::box_crosshairs</enum>
+    </property>
+    <property name="ROI_readType" stdset="0">
+     <enum>caCamera::xycenter_width_height</enum>
+    </property>
+    <property name="ROI_writeChannels" stdset="0">
+     <string notr="true">FIGX;FIGY;FIGW;FIGH;</string>
+    </property>
+    <property name="ROI_writemarkerType" stdset="0">
+     <enum>caCamera::box</enum>
+    </property>
+    <property name="ROI_writeType" stdset="0">
+     <enum>caCamera::xycenter_width_height</enum>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBox_3">
+    <property name="geometry">
+     <rect>
+      <x>1024</x>
+      <y>414</y>
+      <width>110</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Mono</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RGB1_CA</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RGB2_CA</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RGB3_CA</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerRG_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerGB_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerGR_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerBG_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerRG_12</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerGB_12</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerGR_12</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerBG_12</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RGB_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BGR_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RGBA_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BRGA_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RGB12</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>YUV444</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>YUV422</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>YUV411</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>YUV421</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="comboBox_4">
+    <property name="geometry">
+     <rect>
+      <x>1026</x>
+      <y>441</y>
+      <width>106</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>packNo</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>MSB12Bit</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>LSB12Bit</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Reversed</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="caLabel" name="calabel">
+    <property name="geometry">
+     <rect>
+      <x>702</x>
+      <y>95</y>
+      <width>217</width>
+      <height>43</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;rgb correction coefficients&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_2">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>13</y>
+      <width>90</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>w:</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_3">
+    <property name="geometry">
+     <rect>
+      <x>931</x>
+      <y>38</y>
+      <width>90</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>H:</string>
     </property>
    </widget>
   </widget>
@@ -794,8 +1048,8 @@ def PythonCalc(a, b, c, d):
    <slot>red_coeff(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>633</x>
-     <y>195</y>
+     <x>940</x>
+     <y>109</y>
     </hint>
     <hint type="destinationlabel">
      <x>360</x>
@@ -810,8 +1064,8 @@ def PythonCalc(a, b, c, d):
    <slot>green_coeff(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>609</x>
-     <y>245</y>
+     <x>940</x>
+     <y>150</y>
     </hint>
     <hint type="destinationlabel">
      <x>291</x>
@@ -826,8 +1080,8 @@ def PythonCalc(a, b, c, d):
    <slot>blue_coeff(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>650</x>
-     <y>284</y>
+     <x>940</x>
+     <y>184</y>
     </hint>
     <hint type="destinationlabel">
      <x>373</x>
@@ -842,8 +1096,8 @@ def PythonCalc(a, b, c, d):
    <slot>setPackingmodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>728</x>
-     <y>165</y>
+     <x>730</x>
+     <y>64</y>
     </hint>
     <hint type="destinationlabel">
      <x>578</x>
@@ -858,12 +1112,44 @@ def PythonCalc(a, b, c, d):
    <slot>setDecodemodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>741</x>
-     <y>134</y>
+     <x>743</x>
+     <y>33</y>
     </hint>
     <hint type="destinationlabel">
      <x>592</x>
      <y>133</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox_3</sender>
+   <signal>activated(QString)</signal>
+   <receiver>cacamera_2</receiver>
+   <slot>setDecodemodeStr(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1050</x>
+     <y>430</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>970</x>
+     <y>429</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox_4</sender>
+   <signal>activated(QString)</signal>
+   <receiver>cacamera_2</receiver>
+   <slot>setPackingmodeStr(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1087</x>
+     <y>455</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>895</x>
+     <y>448</y>
     </hint>
    </hints>
   </connection>

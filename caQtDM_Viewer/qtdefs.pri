@@ -1,6 +1,4 @@
-CAQTDM_VERSION = V4.1.9
-
-
+CAQTDM_VERSION = V4.2.0
 
 exists(../.git) {
   GIT_VERSION = $$system(git --version)
@@ -191,6 +189,30 @@ DEFINES += TARGET_DESCRIPTION=\"\\\"$${TARGET_DESCRIPTION}\\\"\"
 DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
+
+# 4.2.0
+# major changes in camera widget to support all possible epics data modes and camera modes
+# rich text now also considered for fontscaling
+# epics version number will now be printed in the message window
+# added include definition for epics 3.15 and higher
+# prevent too many messages when epics exceptions
+
+# 4.1.8
+# bsread support for 2D waveforms
+# added ctrl+ and ctrl - to increase or decrease window size
+# added a slot for executing the message button
+# unresolved macros window implemented
+# the problem of increasing open files solved
+# added possibility to disconnect all channels in hidden tabs
+# problem with autoscale and infinite values solved
+# month number in date corrected
+# soft variables were not always updating. eliminated test for update; soft variables will not be updated in hidden tab
+
+# 4.1.7
+# problem with cawavetable corrected
+# when Qt4.6 using qwt6.0 no support for date time axis, fallback to linear axis
+# problem introduced for cacalc, corrected in new release
+# added possibility to get info for objects when overlay widget has no monitors
 
 # 4.1.6 of 2.11.2017
 # added to print date, time and filename

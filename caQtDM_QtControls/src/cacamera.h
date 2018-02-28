@@ -81,6 +81,8 @@ class QTCON_EXPORT caCamera : public QWidget
     Q_PROPERTY(packingmode packMode READ getPackmode WRITE setPackmode)
     Q_PROPERTY(QString packingModeOverwriteChannel READ getPV_PackingmodeChannel WRITE setPV_PackingmodeChannel)
 
+    Q_PROPERTY(bool showComboBoxes READ getShowComboBoxes WRITE setShowComboBoxes)
+
     Q_PROPERTY(colormap ColorMap READ getColormap WRITE setColormap)
     Q_PROPERTY(QString customColorMap READ getCustomMap WRITE setCustomMap  DESIGNABLE isPropertyVisible(customcolormap))
     Q_PROPERTY(bool discreteCustomColorMap READ getDiscreteCustomMap WRITE setDiscreteCustomMap DESIGNABLE isPropertyVisible(discretecolormap))
@@ -138,10 +140,13 @@ public:
     void showImage(int datasize, char *data, short datatype);
 
     colormode getColormode() const {return thisColormode;}
-    void setColormode(colormode const &mode) {thisColormode = mode;}
+    void setColormode(colormode const &mode) {thisColormode = mode; if(colormodeCombo != (QComboBox*) 0) colormodeCombo->setCurrentIndex(mode);}
 
-    void setPackmode(packingmode mode) {thisPackingmode = mode;}
+    void setPackmode(packingmode mode) {thisPackingmode = mode; if(packingmodeCombo != (QComboBox*) 0) packingmodeCombo->setCurrentIndex(mode);}
     packingmode getPackmode() {return thisPackingmode;}
+
+    void setShowComboBoxes(bool show) {thisShowBoxes = show;  if(thisShowBoxes) colormodesWidget->show(); else colormodesWidget->hide();}
+    bool getShowComboBoxes() const {return thisShowBoxes;}
 
     void setData(double *vector, int size, int curvIndex, int curvType, int curvXY);
     void setData(float *vector, int size, int curvIndex, int curvType, int curvXY);
@@ -253,11 +258,11 @@ public slots:
     void setPackingmodeStr(QString mode);
     void setPackingmodeNum(int mode);
     void setPackingmodeNum(double mode);
-
+/*
     void red_coeff(double coeff) { thisRedCoefficient = coeff;}
     void green_coeff(double coeff) { thisGreenCoefficient = coeff;}
     void blue_coeff(double coeff) { thisBlueCoefficient = coeff;}
-
+*/
 signals:
    void WriteDetectedValuesSignal(QWidget*);
 
@@ -267,6 +272,8 @@ private slots:
     void zoomNow();
     void updateChannels();
     void scrollAreaMoved(int);
+    void colormodeComboSlot(int);
+    void packingmodeComboSlot(int);
 
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -371,6 +378,7 @@ private:
     uint minvalue, maxvalue;
 
     QHBoxLayout  *valuesLayout;
+    QHBoxLayout  *colormodeLayout;
     QGridLayout  *mainLayout;
     QGridLayout  *zoomSliderLayout;
 
@@ -384,12 +392,19 @@ private:
     caLabel *intensityText;
     caLabel *checkAutoText;
     caLabel *nbUpdatesText;
+
+    caLabel *labelColormodeText;
+    caLabel *labelPackingmodeText;
+    QComboBox *colormodeCombo;
+    QComboBox *packingmodeCombo;
+
     bool readvaluesPresent[4];
     double  readvalues[4];
     int writevalues[4];
 
     QScrollArea *scrollArea;
     QWidget *valuesWidget;
+    QWidget *colormodesWidget;
     QWidget *zoomWidget;
     QSlider *zoomSlider;
     QLabel *zoomValue;
@@ -405,6 +420,7 @@ private:
     bool thisInitialAutomatic;
     bool thisDiscreteMap;
     bool designerVisible[10];
+    bool thisShowBoxes;
 
     QTimer *writeTimer;
     QPointF P1, P2, P1_old, P2_old, P3;
