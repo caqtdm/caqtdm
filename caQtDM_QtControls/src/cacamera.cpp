@@ -58,7 +58,7 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     rgb = (uint*) 0;
 
     thisSimpleView = false;
-    thisShowBoxes = true;
+    thisShowBoxes = false;
     thisFitToSize = No;
     savedSize = 0;
     savedWidth = 0;
@@ -81,12 +81,13 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     mainLayout->setMargin(0);
     mainLayout->setSpacing(0);
     setLayout(mainLayout);
+
+    setColormodeStrings();
+    setPackingModeStrings();
     setup();
 
     setColormode(Mono);
     setPackmode(packNo);
-    setColormodeStrings();
-    setPackingModeStrings();
 
     setColormap(as_is);
     setCustomMap("");
@@ -1275,6 +1276,7 @@ template <typename pureData> void caCamera::FilterBayer(pureData *bayer, uint *r
 
     return;
 }
+
 //https://en.wikipedia.org/wiki/Chroma_subsampling
 //https://en.wikipedia.org/wiki/YCbCr
 #define GET_R_FROM_YCbCr(y,cb,cr) 298.082*y/256 +                      408.583 * cr / 256 - 222.291 ;
@@ -1284,8 +1286,6 @@ template <typename pureData> void caCamera::FilterBayer(pureData *bayer, uint *r
 #define GET_R_FROM_YUV(y,u,v) y + 1.370705 * (v-128);
 #define GET_G_FROM_YUV(y,u,v) y - 0.698001 * (v-128) - 0.337633 * (u -128);
 #define GET_B_FROM_YUV(y,u,v) y + 1.732446 * (u-128);
-
-
 
 void caCamera::PROC_YUYV422(uchar *YUV, uint *rgb, int sx, int sy, int datasize)  // 4 bytes for 2 pixels
 {
@@ -1331,7 +1331,6 @@ void caCamera::PROC_YUYV422(uchar *YUV, uint *rgb, int sx, int sy, int datasize)
         if (max_data<(long)YUV) break;
     }
 }
-
 
 void caCamera::PROC_UYVY422(uchar *YUV, uint *rgb, int sx, int sy, int datasize)  // 4 bytes for 4 pixels
 {
