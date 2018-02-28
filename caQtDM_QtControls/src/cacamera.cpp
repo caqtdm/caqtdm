@@ -1665,46 +1665,17 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         savedSizeNew = 3*sx*sy*sizeof(uint);
         CameraDataConvert = &caCamera::CameraDataConvert;
         break;
+
     case RGB_8:
-        bayerMode = true;
-
-        PROC_RGB8((uchar *) data,COLOR_RGB ,rgb, sx, sy,datasize);
-
-        thisColormode = RGB1_CA;
-        m_datatype = caLONG;
-        savedData= (char *) rgb;
-        savedSizeNew = 3*sx*sy*sizeof(uint);
-        CameraDataConvert = &caCamera::CameraDataConvert;
-        break;
-
     case BGR_8:
-        bayerMode = true;
-
-        PROC_RGB8((uchar *) data,COLOR_BGR ,rgb, sx, sy,datasize);
-
-        thisColormode = RGB1_CA;
-        m_datatype = caLONG;
-        savedData= (char *) rgb;
-        savedSizeNew = 3*sx*sy*sizeof(uint);
-        CameraDataConvert = &caCamera::CameraDataConvert;
-        break;
-
     case RGBA_8:
-        bayerMode = true;
-
-        PROC_RGBA8((uchar *) data,COLOR_RGB ,rgb, sx, sy,datasize);
-
-        thisColormode = RGB1_CA;
-        m_datatype = caLONG;
-        savedData= (char *) rgb;
-        savedSizeNew = 3*sx*sy*sizeof(uint);
-        CameraDataConvert = &caCamera::CameraDataConvert;
-        break;
-
     case BGRA_8:
         bayerMode = true;
 
-        PROC_RGBA8((uchar *) data,COLOR_BGR ,rgb, sx, sy,datasize);
+        if(thisColormode == RGB_8) PROC_RGB8((uchar *) data,COLOR_RGB ,rgb, sx, sy,datasize);
+        else if(thisColormode == BGR_8) PROC_RGB8((uchar *) data,COLOR_BGR ,rgb, sx, sy,datasize);
+        else if(thisColormode == RGBA_8) PROC_RGBA8((uchar *) data,COLOR_RGB ,rgb, sx, sy,datasize);
+        else if(thisColormode == BGRA_8) PROC_RGBA8((uchar *) data,COLOR_BGR ,rgb, sx, sy,datasize);
 
         thisColormode = RGB1_CA;
         m_datatype = caLONG;
@@ -1713,45 +1684,39 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         CameraDataConvert = &caCamera::CameraDataConvert;
         break;
 
-    case RGB_12:break;
-
-
-    case YUV411:
-        yuvMode = true;
-        if (thisPackingmode==Reversed){
-            PROC_UYYVYY411((uchar *) data, rgb, sx, sy,datasize);
-        }else{
-            PROC_YYUYYV411((uchar *) data, rgb, sx, sy,datasize);
-        }
-        thisColormode = RGB1_CA;
-        m_datatype = caLONG;
-        savedData= (char *) rgb;
-        savedSizeNew = 3*sx*sy*sizeof(uint);
-        CameraDataConvert = &caCamera::CameraDataConvert;
+    case RGB_12:
         break;
 
+    case YUV411: 
     case YUV422:
-        yuvMode = true;
-        if (thisPackingmode==Reversed){
-            PROC_UYVY422((uchar *) data, rgb, sx, sy);
-        }else{
-            PROC_YUYV422((uchar *) data, rgb, sx, sy);
-        }
-        thisColormode = RGB1_CA;
-        m_datatype = caLONG;
-        savedData= (char *) rgb;
-        savedSizeNew = 3*sx*sy*sizeof(uint);
-        CameraDataConvert = &caCamera::CameraDataConvert;
-        break;
-
     case YUV444:
         yuvMode = true;
 
-        if (thisPackingmode==Reversed){
-            PROC_UVY444((uchar *) data, rgb, sx, sy,datasize);
-        }else{
-            PROC_YUV444((uchar *) data, rgb, sx, sy,datasize);
+        if(thisColormode == YUV411) {
+
+            if (thisPackingmode==Reversed){
+                PROC_UYYVYY411((uchar *) data, rgb, sx, sy,datasize);
+            } else{
+                PROC_YYUYYV411((uchar *) data, rgb, sx, sy,datasize);
+            }
+
+        } else if(thisColormode == YUV422) {
+
+            if (thisPackingmode==Reversed){
+                PROC_UYVY422((uchar *) data, rgb, sx, sy);
+            } else{
+                PROC_YUYV422((uchar *) data, rgb, sx, sy);
+            }
+
+        } else if(thisColormode == YUV444) {
+
+            if (thisPackingmode==Reversed){
+                PROC_UVY444((uchar *) data, rgb, sx, sy,datasize);
+            } else{
+                PROC_YUV444((uchar *) data, rgb, sx, sy,datasize);
+            }
         }
+
         thisColormode = RGB1_CA;
         m_datatype = caLONG;
         savedData= (char *) rgb;
