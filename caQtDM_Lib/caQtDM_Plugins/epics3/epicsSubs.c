@@ -1243,6 +1243,7 @@ int EpicsGetDescription(char *pv, char *description)
     int status;
     pv_desc pvDesc = {'\0'};
     dbr_string_t value;
+    strcpy(description, "");
 
     PrepareDeviceIO();
 
@@ -1271,7 +1272,7 @@ int EpicsGetDescription(char *pv, char *description)
     }
 
     status = ca_pend_io(CA_TIMEOUT/2);
-    strcpy(description, value);
+    if (status == ECA_NORMAL) strcpy(description, value); else strcpy(description, "-timeout-");
 
     ca_clear_channel(ch);
 
