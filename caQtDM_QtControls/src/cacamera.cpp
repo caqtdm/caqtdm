@@ -21,6 +21,14 @@
  *    Anton Mezger
  *  Contact details:
  *    anton.mezger@psi.ch
+ *
+ * camera color modes tested with the following hardware:
+ * Basler acA4600-10uc
+ * Basler acA1300-30gc
+ * Prosilica GC1660C
+ *
+ *
+ *
  */
 #define QWT_DLL
 #include <stdint.h>
@@ -115,7 +123,7 @@ void caCamera::setColormodeStrings()
 {
     colorModeString <<  "Mono" << "RGB1_CA" << "RGB2_CA" << "RGB3_CA" << "BayerRG_8" << "BayerGB_8" << "BayerGR_8" << "BayerBG_8" <<
                         "BayerRG_12" << "BayerGB_12" << "BayerGR_12" << "BayerBG_12" <<
-                        "RGB_8" << "BGR_8" << "RGBA_8" << "BGRA_8" << "RGB_12" <<
+                        "RGB_8" << "BGR_8" << "RGBA_8" << "BGRA_8" <<
                         "YUV444" << "YUV422"<< "YUV411" << "YUV421";
 }
 
@@ -1513,8 +1521,6 @@ void caCamera::PROC_RGBA8(uchar *RGBA,rgb_interpretation rgb_type, uint *rgb, in
 
 
 
-
-
 void caCamera::buf_unpack_12bitpacked_msb(void* target, void* source, size_t count)
 {
     size_t x1, x2;
@@ -1684,12 +1690,9 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         CameraDataConvert = &caCamera::CameraDataConvert;
         break;
 
-    case RGB_12:
-        break;
-
-    case YUV411: 
-    case YUV422:
-    case YUV444:
+        case YUV411:
+        case YUV422:
+        case YUV444:
         yuvMode = true;
 
         if(thisColormode == YUV411) {
@@ -1740,7 +1743,10 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         painter.drawText(5, 10 + 3 * lineHeight, "mono");
         painter.drawText(5, 10 + 4 * lineHeight, "rgb1_ca, rgb1_ca, rgb3_ca");
         painter.drawText(5, 10 + 5 * lineHeight, "bayer8, bayer12 unpacked and packed");
-        painter.drawText(5, 10 + 6 * lineHeight, "yuv formats except yuv421");
+        painter.drawText(5, 10 + 6 * lineHeight, "yuv formats and reversed except yuv421");
+        painter.drawText(5, 10 + 7 * lineHeight, "HW Ref.:  Basler acA4600-10uc/acA1300-30gc  ");
+        painter.drawText(5, 10 + 8 * lineHeight, "HW Ref.:  Prosilica GC1660C  ");
+
         return image;
     }
 
