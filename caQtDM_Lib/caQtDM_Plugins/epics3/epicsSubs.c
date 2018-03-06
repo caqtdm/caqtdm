@@ -1228,9 +1228,12 @@ int EpicsGetTimeStamp(char *pv, char *timestamp)
     }
 
     status = ca_pend_io(CA_TIMEOUT/2);
-
-    epicsTimeToStrftime(tsString, 32, "%b %d, %Y %H:%M:%S.%09f", &ctrlS.stamp);
-    sprintf(timestamp, "TimeStamp: %s\n", tsString);
+    if (status == ECA_NORMAL) {
+        epicsTimeToStrftime(tsString, 32, "%b %d, %Y %H:%M:%S.%09f", &ctrlS.stamp);
+        sprintf(timestamp, "TimeStamp: %s\n", tsString);
+    } else {
+        strcpy(timestamp, "-timestamp timeout-");
+    }
 
     ca_clear_channel(ch);
 
@@ -1272,7 +1275,7 @@ int EpicsGetDescription(char *pv, char *description)
     }
 
     status = ca_pend_io(CA_TIMEOUT/2);
-    if (status == ECA_NORMAL) strcpy(description, value); else strcpy(description, "-timeout-");
+    if (status == ECA_NORMAL) strcpy(description, value); else strcpy(description, "- description timeout-");
 
     ca_clear_channel(ch);
 
