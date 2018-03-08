@@ -575,11 +575,13 @@ caQtDM_Viewer {
                          setting.value = $$(CERTIFICATNUMBER)
                          QMAKE_MAC_XCODE_SETTINGS += setting
 
-                         payload_dir.target = $$OUT_PWD/Release-iphoneos/Payload
-                         payload_dir.commands = @test -d $$OUT_PWD/Release-iphoneos/Payload || mkdir -p $$OUT_PWD/Release-iphoneos/Payload
-                         payload_dir.depends = $$OUT_PWD/Release-iphoneos
+                         QMAKE_ASSET_CATALOGS += $$PWD/caQtDM_Viewer/src/IOS/Assets.xcassets
 
-                         QMAKE_EXTRA_TARGETS +=payload_dir
+                         #payload_dir.target = $$OUT_PWD/Release-iphoneos/Payload
+                         #payload_dir.commands = @test -d $$OUT_PWD/Release-iphoneos/Payload || mkdir -p $$OUT_PWD/Release-iphoneos/Payload
+                         #payload_dir.depends = $$OUT_PWD/Release-iphoneos
+
+                         #QMAKE_EXTRA_TARGETS +=payload_dir
 
 
                     }

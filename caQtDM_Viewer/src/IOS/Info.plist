@@ -10,14 +10,25 @@
 	<string>Created by Qt/QMake</string>
 	<key>CFBundleIconFiles</key>
 	<array>
-		<string>Default-568h@2x.png</string>
+
                 <string>caQtDM-83.5@2x.png</string>
 		<string>caQtDM-72.png</string>
 		<string>caQtDM-60@2x.png</string>
 		<string>caQtDM-76.png</string>
 		<string>caQtDM-76@2x.png</string>
 		<string>caQtDM-57.png</string>
-	</array>
+                <string>caQtDM-60@3x.png</string>
+                <string>caQtDM-60@2x.png</string>
+                <string>caQtDM-60.png</string>
+                <string>caQtDM-40@3x.png</string>
+                <string>caQtDM-40@2x.png</string>
+                <string>caQtDM-40.png</string>
+                <string>caQtDM-29@3x.png</string>
+                <string>caQtDM-29@2x.png</string>
+                <string>caQtDM-29.png</string>
+                <string>caQtDM-20.png</string>
+
+        </array>
 	<key>CFBundleIconName</key>
 	<string>caQtDM-1024.png</string>
 	<key>CFBundleIcons</key>
@@ -37,7 +48,7 @@
 	<key>CFBundleSignature</key>
 	<string>APPL</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.2</string>
+        <string>1.0.3</string>
 	<key>LSApplicationCategoryType</key>
 	<string></string>
 	<key>NOTE</key>
