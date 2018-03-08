@@ -4024,7 +4024,7 @@ DlColormap *parseColormap(DisplayInfo *displayInfo, FILE *filePtr)
                     counter++;
                 }
             } else if(!strcmp(token,"colors")) {
-                parseDlColor(displayInfo,filePtr, dl_color);
+                parseDlColor(displayInfo,filePtr, dlColormap->dl_color);
             }
             break;
         case T_EQUAL:

@@ -1,4 +1,4 @@
-VERSION=4.1.5
+VERSION=4.1.7
 VERSION_TAG=V${VERSION}
 GIT_CHECKOUT=$VERSION_TAG
 
@@ -37,7 +37,7 @@ git checkout $GIT_CHECKOUT
 export PATH=/usr/lib64/qt4/bin/:$PATH
 export PYTHONVERSION=2.7
 
-cd $REPOSITORY_NAME
+#cd $REPOSITORY_NAME
 echo y | ./caQtDM_BuildAll
 
 # Clean and create package build base

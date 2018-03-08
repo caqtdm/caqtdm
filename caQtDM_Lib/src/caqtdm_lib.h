@@ -268,14 +268,14 @@ private:
 
     void scanChildren(QList<QWidget*> children, QWidget *tab, int i);
     QWidget* getTabParent(QWidget *w1);
-    QString treatMacro(QMap<QString, QString> map, const QString& pv, bool *doNothing);
+    QString treatMacro(QMap<QString, QString> map, const QString& pv, bool *doNothing, QString widgetName = "");
     void scanWidgets(QList<QWidget*> list, QString macro);
     void HandleWidget(QWidget *w, QString macro, bool firstPass, bool treatPrimaries);
     void closeEvent(QCloseEvent* ce);
     bool CalcVisibility(QWidget *w, double &result, bool &valid);
     short ComputeAlarm(QWidget *w);
     int setObjectVisibility(QWidget *w, double value);
-    bool reaffectText(QMap<QString, QString> map, QString *text);
+    bool reaffectText(QMap<QString, QString> map, QString *text, QWidget *w);
     int InitVisibility(QWidget* widget, knobData *kData, QMap<QString, QString> map,  int *specData, QString info);
     void postMessage(QtMsgType type, char *msg);
     int Execute(char *command);
@@ -303,6 +303,7 @@ private:
     void StripPlotsVerticalAlign();
     qreal fontResize(double factX, double factY, QVariantList list, int usedIndex);
     ControlsInterface *getPluginInterface(QWidget *w);
+    void UndefinedMacrosWindow();
 
 #ifdef MOBILE
     bool eventFilter(QObject *obj, QEvent *event);
@@ -322,6 +323,10 @@ private:
     QList<QWidget*> topIncludesWidgetList;
     QList<QTabWidget *> allTabs;
     QList<QStackedWidget *> allStacks;
+
+    QMap<QString, QString> unknownMacrosList;
+    QTableWidget* macroTable;
+    QDialog *macroWindow;
 
     int level;
     QString cainclude_path;
@@ -377,6 +382,8 @@ private:
     QString defaultPlugin;
 
 private slots:
+    void Callback_CaCalc(double value) ;
+    void Callback_UndefinedMacrowindowExit();
     void Callback_EApplyNumeric(double value);
     void Callback_ENumeric(double value);
     void Callback_Spinbox(double value);
@@ -437,6 +444,14 @@ private slots:
 
     void Callback_printWindow() {
         print();
+    }
+
+    void Callback_ResizeUp() {
+        this->resize(this->size()*1.1);
+    }
+
+    void Callback_ResizeDown() {
+        this->resize(this->size()*0.9);
     }
 
     void updateResize();

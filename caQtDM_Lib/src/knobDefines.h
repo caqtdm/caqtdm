@@ -49,7 +49,7 @@
 typedef char pv_string[MAXPVLEN];  // temporary definition, I should allocate what we need
 typedef char pv_desc[MAXPVDESC];
 
-enum caType {caSTRING	= 0, caINT = 1, caFLOAT = 2, caENUM = 3, caCHAR = 4, caLONG = 5, caDOUBLE = 6};
+enum caType {caSTRING = 0, caINT = 1, caFLOAT = 2, caENUM = 3, caCHAR = 4, caLONG = 5, caDOUBLE = 6};
 
 // not really used, now just inserted as property in the widgets, not used elsewhere
 enum objectType {caCalc_Widget = 0,

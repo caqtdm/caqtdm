@@ -167,10 +167,12 @@ void bsread_dispatchercontrol::process()
             QSet<QString> keys=QSet<QString>::fromList(Channels.keys());
             foreach( QString key,keys){
                 if (!key.startsWith("bsread:")){ //removes all header channels
+                    if (!key.contains(".BSREADSHAPE")){//removes shape waveform channels
                         data.append("{\"name\":\"");
                         data.append(key);
                         //data.append("\",\"modulo\":1,\"offset\":0},");
                         data.append("\"},");
+                    }
                 }
             }
             data.remove(data.length()-1,1);
@@ -545,15 +547,23 @@ void bsread_dispatchercontrol::ChannelVerification(QNetworkAccessManager* manage
     QString data="{\"channels\":[ ";
     while(!ChannelsAddPipeline.isEmpty()){
         channelstruct candidate=get_AddChannel();
-        ChannelsToBeApprovePipeline.insert(candidate.channel,candidate.index);
+
+        // for special waveform shape channels
+        if (candidate.channel.contains(".BSREADSHAPE")){
+            ChannelsApprovePipeline.insert(candidate.channel,candidate.index);
+        }else{
+            ChannelsToBeApprovePipeline.insert(candidate.channel,candidate.index);
+        }
     }
 
     QSet<QString> keys=QSet<QString>::fromList(ChannelsToBeApprovePipeline.keys());
     foreach( QString key,keys){
         if (!key.startsWith("bsread:")){ //removes all header channels
-            data.append("\"");
-            data.append(key);
-            data.append("\",");
+            if (!key.contains(".BSREADSHAPE")){//removes shape waveform channels
+                data.append("\"");
+                data.append(key);
+                data.append("\",");
+            }
         }
     }
     data.remove(data.length()-1,1);
@@ -636,6 +646,9 @@ void bsread_dispatchercontrol::finishVerification()
             ChannelsToBeApprovePipeline.remove(bsreadChannels.at(j));
         }
     }
+
+
+
 
     qDebug()<<"finishVerification() :"<< ChannelsApprovePipeline.count();// httpdata;
 

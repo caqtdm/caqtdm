@@ -473,6 +473,7 @@ private:
     QwtLegend *lgd;
 
     int thisXticks;
+    bool whiteColors;
 
 };
 

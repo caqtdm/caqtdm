@@ -25,6 +25,8 @@
 
 #include "fontscalingwidget.h"
 #include <QEvent>
+#include <QTextDocument>
+#include <QTextCursor>
 #include <QtDebug>
 
 #define qslisttoc(x) 			do {}while(0)
@@ -70,13 +72,24 @@ void FontScalingWidget::setScaleMode(int mode)
 
 double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSize &size)
 {
+    QTextDocument *textDoc = (QTextDocument *) 0;
     QFontMetrics fmint = d_widget->fontMetrics();
     QFontMetricsF fm(fmint);
     QFont f = d_widget->font();
     QString longestLine;
     double txtWidth;
     double txtHeight;
+    bool richText = false;
     int linecnt = text.count("\n") + 1;
+
+    // do we have richtext
+    if(Qt::mightBeRichText(text)) {
+        richText = true;
+        textDoc = new QTextDocument();
+        QTextCursor* textCursor = new QTextCursor(textDoc);
+        textDoc->setDocumentMargin(0);
+        textCursor->insertHtml(text);
+    }
 
     if(linecnt > 1) {
         QStringList lines = text.split("\n");
@@ -124,16 +137,25 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
         }
 
         // check if width does not go outside
-        QFontMetricsF tmpFm(f);
-        txtWidth = tmpFm.width(longestLine);
+        if(!richText) {
+            QFontMetricsF tmpFm(f);
+            txtWidth = tmpFm.width(longestLine);
+        } else {
+            textDoc->setDefaultFont(f);
+            txtWidth = textDoc->idealWidth();
+        }
         while((txtWidth > borderW2) && f.pointSizeF() > MIN_FONT_SIZE) {
             if(f.pointSizeF() <= 0.0) f.setPointSizeF(1.0);
             f.setPointSizeF(f.pointSizeF() - 0.5);
             //printf(" \e[1;36m -- next DECREASING font size \"%s\" :text \"%s\" width %.1f height %.1f - point size %.2f - w: %.2f\e[0m\n",
             //         qasc(d_widget->objectName()), qasc(text),  txtWidth, txtHeight, f.pointSizeF(), borderW2);
-            QFontMetricsF tmpFm(f);
-            txtWidth = tmpFm.width(longestLine);
-            //txtHeight = linecnt * tmpFm.lineSpacing();
+            if(!richText) {
+                QFontMetricsF tmpFm(f);
+                txtWidth = tmpFm.width(longestLine);
+            } else {
+                textDoc->setDefaultFont(f);
+                txtWidth = textDoc->idealWidth();
+            }
         }
 
     /* scale according to height only */

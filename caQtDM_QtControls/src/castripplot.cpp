@@ -794,7 +794,9 @@ void caStripPlot::TimeOut()
     }
 
     // in case of autoscale adjust the vertical scale
-    if(thisYaxisScaling == autoScale) setAxisScale(QwtPlot::yLeft, AutoscaleMinY, AutoscaleMaxY);
+    if(thisYaxisScaling == autoScale) {
+        if(!qIsInf(AutoscaleMinY) && !qIsInf(AutoscaleMaxY)) setAxisScale(QwtPlot::yLeft, AutoscaleMinY, AutoscaleMaxY);
+    }
 
     if((ResizeFactorX != oldResizeFactorX) || ResizeFactorY != oldResizeFactorY) {
         axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MajorTick, ResizeFactorX * 8.0);
@@ -998,6 +1000,8 @@ void caStripPlot::setTitlePlot(QString const &titel)
         title.setFont(QFont("Arial", 10));
         setTitle(title);
         replot();
+    } else {
+        setTitle("");
     }
 }
 
@@ -1008,6 +1012,8 @@ void caStripPlot::setTitleX(QString const &titel)
         QwtText xAxis(titel);
         xAxis.setFont(QFont("Arial", 10));
         setAxisTitle(xBottom, xAxis);
+    } else {
+        setAxisTitle(xBottom, "");
     }
     replot();
 }
@@ -1019,6 +1025,8 @@ void caStripPlot::setTitleY(QString const &titel)
         QwtText xAxis(titel);
         xAxis.setFont(QFont("Arial", 10));
         setAxisTitle(yLeft, xAxis);
+    } else {
+        setAxisTitle(yLeft, "");
     }
     replot();
 }

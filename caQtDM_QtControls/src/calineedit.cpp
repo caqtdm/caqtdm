@@ -59,9 +59,6 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     oldStyle = "";
     thisStyle = "";
 
-    setColorMode(Default);
-    setAlarmHandling(onForeground);
-
     thisFormatC[0] = '\0';
 
     setUnitsEnabled(false);
@@ -79,6 +76,9 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
 
     thisFrameLineWidth = 0;
     oldFrameLineWidth = 0;
+
+    setColorMode(Default);
+    setAlarmHandling(onForeground);
 
     Alarm = 0;
 

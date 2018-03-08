@@ -490,8 +490,8 @@ void ENumeric::resizeEvent(QResizeEvent *e)
     if (temp) {
         QPixmap pix1(temp->size() * 0.9);
         pix1.fill(palette().color(QPalette::Background));
-        QPainter p(&pix1);
-        p.setRenderHint(QPainter::Antialiasing);
+        QPainter *p = new QPainter(&pix1);
+        p->setRenderHint(QPainter::Antialiasing);
         hmargin = (int) (pix1.width() * MARGIN);
         vmargin = (int) (pix1.height() * MARGIN);
         if (hmargin < MIN_MARGIN)
@@ -503,15 +503,15 @@ void ENumeric::resizeEvent(QResizeEvent *e)
         poly.setPoint(0, (int) (w * .5), vmargin);
         poly.setPoint(1, w - hmargin, h - vmargin);
         poly.setPoint(2, hmargin, h - vmargin);
-        QPen	pen;
+        QPen pen;
         pen.setColor(palette().color(QPalette::Foreground));
-        p.setPen(pen);
+        p->setPen(pen);
         QLinearGradient linearGradient(0, 0, w, h);
         linearGradient.setColorAt(0.0, palette().color(QPalette::Light));
         linearGradient.setColorAt(1.0, palette().color(QPalette::Dark));
-        p.setBrush(linearGradient);
-        p.drawConvexPolygon(poly);
-        p.end();
+        p->setBrush(linearGradient);
+        p->drawConvexPolygon(poly);
+        p->end();
 
         // down pixmap
         QPixmap pix2 = pix1.transformed(QMatrix().rotate(-180));

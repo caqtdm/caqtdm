@@ -133,6 +133,9 @@ public slots:
     void setValue(double value);
     void setValue(QRect value);
 
+signals:
+    void changeValue(double value);
+
 private:
     QString thisChannelA, thisChannelB, thisChannelC, thisChannelD, thisVariable;
     QString thisCalc;

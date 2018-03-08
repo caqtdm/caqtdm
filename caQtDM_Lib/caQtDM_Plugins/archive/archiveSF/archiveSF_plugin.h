@@ -144,6 +144,7 @@ public slots:
         emit resultReady(indexNew, nbVal, TimerN, YValsN, fromArchive->getBackend());
 
         mutex->unlock();
+        fromArchive->deleteLater();
     }
 
 signals:

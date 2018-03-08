@@ -525,7 +525,14 @@ caQtDM_Viewer {
                     QMAKE_BUNDLE_DATA += StartScreen APP_XML_FILES APP_ICON APP1_ICON APP-FONTS
                     QMAKE_CFLAGS += -gdwarf-2
                     QMAKE_CXXFLAGS += -gdwarf-2
-                    QMAKE_BUNDLE_NAME = ch.psi.caqtdm
+                    QMAKE_TARGET_BUNDLE_PREFIX=ch.psi
+
+
+
+                    QMAKE_BUNDLE_NAME = ch.psi.caQtDM
+                    bundle_identifier.name = PRODUCT_BUNDLE_IDENTIFIER
+                    bundle_identifier.value = ch.psi.caQtDM
+                    QMAKE_MAC_XCODE_SETTINGS += bundle_identifier
                     target.name=IPHONEOS_DEPLOYMENT_TARGET
                     target.value = 10.0
                     QMAKE_MAC_XCODE_SETTINGS += target
@@ -550,9 +557,21 @@ caQtDM_Viewer {
                          LIBS += $$(EPICSLIB)/static/libCom.a
                          LIBS += $$(QWTHOME)/lib/libqwt.a
 
-                         setting.name = DEVELOPMENT_TEAM
-                         setting.value = $$(CERTIFICATNUMBER)
-                         QMAKE_MAC_XCODE_SETTINGS += setting
+                         ###############################################################################
+                         # Code Signing needed for iOS App Store
+                         ###############################################################################
+
+                         #provisioning_profile_spec.name=PROVISIONING_PROFILE_SPECIFIER
+                         #provisioning_profile_spec.value = caQtDM Distribution
+                         #QMAKE_MAC_XCODE_SETTINGS += provisioning_profile_spec
+
+                         #signing_identity.name = CODE_SIGN_IDENTITY
+                         #signing_identity.value = $$(CODE_SIGN_IDENTITY)
+                         #QMAKE_MAC_XCODE_SETTINGS += signing_identity
+
+                         #setting.name = DEVELOPMENT_TEAM
+                         #setting.value = $$(CERTIFICATNUMBER)
+                         #QMAKE_MAC_XCODE_SETTINGS += setting
                     }
                     epics4: {
                                     LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/epics4/libepics4_plugin.a

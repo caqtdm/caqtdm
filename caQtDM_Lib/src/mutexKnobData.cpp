@@ -583,75 +583,68 @@ void MutexKnobData::timerEvent(QTimerEvent *)
         }
 
         // update all graphical items for this soft pv when a value changes
+
         if(kPtr->index != -1 && kPtr->soft && (diff >= (2.0/(double)repRate))) {
+
             int indx;
+
             //qDebug() << "I am a soft channel" << "pv=" << kPtr->pv << "index" << kPtr->index << "object" << kPtr->dispName << "value" << kPtr->edata.rvalue ;
             // get for this soft pv the index of the corresponding caCalc into the knobData array where the data were updated
             if(getSoftPV(kPtr->pv, &indx, (QWidget*) kPtr->thisW)) {
-                // get value from (updated) QMap variable list
-                knobData *ptr = (knobData*) &KnobData[indx];
-                kPtr->edata.fieldtype = caDOUBLE;
-                kPtr->edata.accessW = true;
-                kPtr->edata.accessR = true;
 
-                // possibly we updated this caCalc by signal
-                if(ptr->edata.valueCount == 0) {
-                    QWidget *w2 = (QWidget *)kPtr->dispW;
-                    if(caCalc *calcWidget = qobject_cast<caCalc *>(w2)) {
-                        if(calcWidget->getCalc().trimmed().size() == 0)
-                            if(calcWidget->getValue() != ptr->edata.rvalue) {
-                                ptr->edata.rvalue = calcWidget->getValue();
-                                ptr->edata.ivalue = (int) calcWidget->getValue();
-                            }
-                    }
-                }
-
+                // we do not update when softpv is hidden
                 bool update = false;
-                // when waveform put first value into the normal value
-                if(ptr->edata.valueCount > 0) {
-                     double *data = (double *) ptr->edata.dataB;
-                     kPtr->edata.rvalue = data[0];
-                     kPtr->edata.monitorCount++;
-                     memcpy(kPtr->edata.dataB,  data, kPtr->edata.valueCount * sizeof(double));
-                } else {
-                   kPtr->edata.rvalue = ptr->edata.rvalue;
-                   kPtr->edata.ivalue = (int) ptr->edata.rvalue;
-                   if(kPtr->edata.oldsoftvalue != ptr->edata.rvalue) {
-                       update = true;
-                       //qDebug() << "update" << kPtr->pv << kPtr->dispName << "old value" << kPtr->edata.oldsoftvalue << "new value" << ptr->edata.rvalue;
-                   }
+                bool treatit = false;
+                QWidget *w1 =  (QWidget*) kPtr->dispW;
+                QString className = w1->metaObject()->className();
+                if(className.contains("caStripPlot") || className.contains("caWaterfallPlot")) treatit = true;
+                else if(w1->property("hidden").value<bool>()) treatit = false;
+                else treatit = true;
+                if(caCalc* calcWidget = qobject_cast<caCalc *>(w1)) {
+                   if(calcWidget->getEventSignal() != caCalc::Never) treatit = true;
                 }
 
-                kPtr->edata.connected = true;
+                if(treatit) {
+                    // get value from (updated) QMap variable list
+                    knobData *ptr = (knobData*) &KnobData[indx];
+                    kPtr->edata.fieldtype = caDOUBLE;
+                    kPtr->edata.accessW = true;
+                    kPtr->edata.accessR = true;
 
-                // when no update then when any monitors for calculation increase monitorcount when underlying pv change or when its calculates on itsself
-                // (even when hidden, it should still do it)
-                QWidget *w1 =  (QWidget*) kPtr->dispW;
-                if((!update) && (ptr->edata.valueCount) == 0) {
-                    QVariant var = w1->property("MonitorList");
-                    QVariantList list = var.toList();
-                    if((list.size() > 0)) {    // && (!w1->property("hidden").value<bool>())) {
-                        int nbMonitors = list.at(0).toInt();
-                        if(nbMonitors > 0) {
-                            //qDebug() << "number of monitors for this object=" << nbMonitors;
-                            for(int i=0; i< nbMonitors; i++) {
-                                knobData *ptr = (knobData*) &KnobData[list.at(i+1).toInt()];
-                                //qDebug() << ptr->pv << ptr->dispName << ptr->edata.rvalue << ptr->edata.monitorCount << ptr->edata.monitorCountPrev;
-                                if((ptr->edata.monitorCount != ptr->edata.monitorCountPrev) || (kPtr->index == ptr->index)) {
-                                    //qDebug() << "increase" << kPtr->pv << kPtr->index << w1->objectName() << kPtr->edata.rvalue;
-                                    update = true;
-                                    break;
-                                }
-                            }
+                    // when waveform put first value into the normal value
+                    if(ptr->edata.valueCount > 0) {
+                        double *data = (double *) ptr->edata.dataB;
+                        kPtr->edata.rvalue = data[0];
+                        kPtr->edata.monitorCount++;
+                        memcpy(kPtr->edata.dataB,  data, kPtr->edata.valueCount * sizeof(double));
+                    } else {
+                        kPtr->edata.rvalue = ptr->edata.rvalue;
+                        kPtr->edata.ivalue = (int) ptr->edata.rvalue;
+                        if(kPtr->edata.oldsoftvalue != ptr->edata.rvalue) {
+                            update = true;
+                            //qDebug() << "update" << kPtr->pv << kPtr->dispName << "old value" << kPtr->edata.oldsoftvalue << "new value" << ptr->edata.rvalue;
                         }
                     }
-                }
 
-                if(update) kPtr->edata.monitorCount++;
-                kPtr->edata.oldsoftvalue = ptr->edata.rvalue;
-                QWidget *ww = (QWidget *)kPtr->dispW;
-                if (caTextEntry *widget = qobject_cast<caTextEntry *>(ww)) {
-                    widget->setAccessW((bool) kPtr->edata.accessW);
+                    kPtr->edata.connected = true;
+
+                    // when no update then when any monitors for calculation increase monitorcount when underlying pv changes or when its calculates on itsself
+                    QWidget *w1 =  (QWidget*) kPtr->dispW;
+                    if((!update) && (ptr->edata.valueCount) == 0) {
+                        QVariant var = w1->property("MonitorList");
+                        QVariantList list = var.toList();
+                        if((list.size() > 0)) {
+                            int nbMonitors = list.at(0).toInt();
+                            if(nbMonitors > 0)  update = true;
+                        }
+                    }
+
+                    if(update) kPtr->edata.monitorCount++;
+                    kPtr->edata.oldsoftvalue = ptr->edata.rvalue;
+                    QWidget *ww = (QWidget *)kPtr->dispW;
+                    if (caTextEntry *widget = qobject_cast<caTextEntry *>(ww)) {
+                        widget->setAccessW((bool) kPtr->edata.accessW);
+                    }
                 }
             }
         }

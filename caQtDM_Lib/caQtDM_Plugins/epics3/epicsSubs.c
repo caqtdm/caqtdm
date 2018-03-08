@@ -37,6 +37,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdint.h>
+#include <ctype.h>
 #define epicsAlarmGLOBAL
 #include <cadef.h>
 #include "caQtDM_Lib_global.h"
@@ -59,10 +60,13 @@
 
 #include <epicsMutex.h>
 static epicsMutexId lockEpics = (epicsMutexId) 0;
+static int optimizeConnections = false;
 
 // global variables defined in epics3_plugin for access through c routines
 extern MutexKnobData* mutexKnobdataPtr;
 extern MessageWindow *messageWindowPtr;
+
+static int firstTime = true;
 
 typedef struct _connectInfo {
     int connected;
@@ -146,6 +150,8 @@ void PrepareDeviceIO(void)
 {
     //printf("preparedeviceio\n");
     int status;
+    char *optimize = NULL;
+    char *s;
 
     if(lockEpics == (epicsMutexId) 0) InitializeContextMutex();
 
@@ -159,6 +165,25 @@ void PrepareDeviceIO(void)
             exit(1);
         }
         ca_add_exception_event(Exceptionhandler, 0);
+
+        optimize = (char*) getenv("CAQTDM_OPTIMIZE_EPICS3CONNECTIONS");
+        if (optimize != NULL) {
+            s = optimize; while (*s) {*s = toupper((unsigned char) *s); s++;}
+            if(strcmp(optimize, "TRUE") == 0) {
+                optimizeConnections = true;
+                if(firstTime) {
+                    C_postMsgEvent(messageWindowPtr, 1, vaPrintf("caQtDM will close epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS is set to TRUE\n"));
+                    printf("caQtDM -- Close epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS is TRUE\n");
+                }
+            }
+        }
+        if(!optimizeConnections) {
+            if(firstTime) {
+                C_postMsgEvent(messageWindowPtr, 1, vaPrintf("caQtDM will suspend epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS not set to TRUE\n"));
+                printf("caQtDM -- Suspend epics connections for data in invisible tabs while CAQTDM_OPTIMIZE_EPICS3CONNECTIONS not set to TRUE\n");
+            }
+        }
+        firstTime = false;
     } else {
         //printf("context exists\n");
         status = ca_attach_context(ca_current_context());
@@ -598,20 +623,37 @@ void clearEvent(void * ptr)
 {
     int status;
     connectInfo *info = (connectInfo *) ptr;
-    if(info == (connectInfo *) 0) return;
 
-    if(!info->connected) return;  // must be connected
-    if(info->event < 2) return;  // a first normal addevent must be done
-    if(info->evAdded) {
+    if(optimizeConnections) {
 
-      PrepareDeviceIO();
+        knobData kData;
+        C_GetMutexKnobData(mutexKnobdataPtr, info->index, &kData);
+        if(kData.index == -1) return;
 
-      PRINT(printf("clearEvent -- %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded));
-      info->evAdded = false;
-      status = ca_clear_event(info->evID);
-      if (status != ECA_NORMAL) {
-          PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
-      }
+        PrepareDeviceIO();
+
+        PRINT(printf("destroyConnection -- %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded));
+        EpicsDisconnect(&kData);
+        C_DataLock(mutexKnobdataPtr, &kData);
+        kData.edata.connected = false;
+        kData.edata.unconnectCount = 0;
+        C_SetMutexKnobData(mutexKnobdataPtr, kData.index, kData);
+        C_DataUnlock(mutexKnobdataPtr, &kData);
+
+    } else {
+        if(!info->connected) return;  // must be connected
+        if(info->event < 2) return;  // a first normal addevent must be done
+        if(info->evAdded) {
+
+            PrepareDeviceIO();
+
+            PRINT(printf("clearEvent -- %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded));
+            info->evAdded = false;
+            status = ca_clear_event(info->evID);
+            if (status != ECA_NORMAL) {
+                PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+            }
+        }
     }
 }
 
@@ -623,30 +665,46 @@ void addEvent(void * ptr)
     connectInfo *info = (connectInfo *) ptr;
     if(info == (connectInfo *) 0) return;
 
-    if(!info->connected) return; // must be connected
-    if(info->event < 2) return;  // a first normal addevent must be done
-    if(!info->evAdded) {
-
+    if(optimizeConnections) {
         knobData kData;
-        int status;
+        if(info->connected) return; // already connected ?
+        if(info->ch != (chid) 0) return; // already requested
 
         PrepareDeviceIO();
 
         C_GetMutexKnobData(mutexKnobdataPtr, info->index, &kData);
         if(kData.index == -1) return;
 
-        C_DataLock(mutexKnobdataPtr, &kData);
-        PRINT(printf("addEvent -- %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded));
-        status = ca_add_array_event(dbf_type_to_DBR_STS(ca_field_type(info->ch)), 0,
+        PRINT(printf("recreateConnection -- %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded));
+        EpicsReconnect(&kData);
+
+    } else {
+
+        if(!info->connected) return; // must be connected
+        if(info->event < 2) return;  // a first normal addevent must be done
+        if(!info->evAdded) {
+
+            knobData kData;
+            int status;
+
+            PrepareDeviceIO();
+
+            C_GetMutexKnobData(mutexKnobdataPtr, info->index, &kData);
+            if(kData.index == -1) return;
+
+            C_DataLock(mutexKnobdataPtr, &kData);
+            PRINT(printf("addEvent -- %s %d %d %d %d\n", info->pv, info->evID, info->index, info->connected, info->evAdded));
+            status = ca_add_array_event(dbf_type_to_DBR_STS(ca_field_type(info->ch)), 0,
                                         info->ch, dataCallback, info, 0.0,0.0,0.0, &info->evID);
-        info->evAdded = true;
+            info->evAdded = true;
 
-        if (status != ECA_NORMAL) {
-            PRINT(printf("ca_add_array_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+            if (status != ECA_NORMAL) {
+                PRINT(printf("ca_add_array_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+            }
+            C_SetMutexKnobData(mutexKnobdataPtr, kData.index, kData);
+
+            C_DataUnlock(mutexKnobdataPtr, &kData);
         }
-        C_SetMutexKnobData(mutexKnobdataPtr, kData.index, kData);
-
-        C_DataUnlock(mutexKnobdataPtr, &kData);
     }
 }
 
@@ -679,6 +737,7 @@ void connectCallback(struct connection_handler_args args)
         info->connected = false;
         info->event = 0;
         info->evAdded = false;
+        info->evID = 0;
         break;
     case cs_conn:
         PRINT(printf("%s has just connected with channel id=%d count=%d native type=%s\n", ca_name(args.chid), (int) args.chid, ca_element_count(args.chid), dbf_type_to_text(ca_field_type(args.chid))));
@@ -754,7 +813,7 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
                                CA_PRIORITY_DEFAULT,
                                &info->ch);
     if(status != ECA_NORMAL) {
-        printf("ca_create_channel:\n"" %s for %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], kData->pv);
+        printf("ca_create_channel: %s for device -%s-\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], kData->pv);
     }
 
     status = ca_pend_io(CA_TIMEOUT);
@@ -790,7 +849,12 @@ void EpicsReconnect(knobData *kData)
         if(status != ECA_NORMAL) {
             printf("ca_create_channel:\n"" %s for %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], kData->pv);
         }
+        status = ca_pend_io(CA_TIMEOUT);
+        if (status != ECA_NORMAL) {
+            printf("ca_pend_io:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]);
+        }
     }
+
 }
 
 void EpicsDisconnect(knobData *kData)
@@ -798,30 +862,35 @@ void EpicsDisconnect(knobData *kData)
     int status;
     connectInfo *info;
 
-    PrepareDeviceIO();
-
     if (kData->index == -1) return;
+
+    PrepareDeviceIO();
 
     info = (connectInfo *) kData->edata.info;
     if (info != (connectInfo *) 0) {
         if(info->ch != (chid) 0) {
-            if(info->evAdded) {
+            if(info->evAdded && (info->evID != (evid) 0)) {
                 info->evAdded = false;
                 status = ca_clear_event(info->evID);
                 if (status != ECA_NORMAL) {
                     printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]);
                 }
+                info->evAdded = 0;
+                info->evID = 0;
             }
 
             status = ca_clear_channel(info->ch);
             info->connected = false;
             info->event = 0;
             info->ch = 0;
+
             if(status != ECA_NORMAL) {
                 printf("ca_clear_channel: %s %s index=%d\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], info->pv, kData->index);
             }
-            kData->edata.connected = false;
-            kData->edata.unconnectCount = 0;
+            status = ca_pend_io(CA_TIMEOUT);
+            if (status != ECA_NORMAL) {
+                printf("ca_pend_io:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]);
+            }
         }
     }
 }
@@ -1159,9 +1228,12 @@ int EpicsGetTimeStamp(char *pv, char *timestamp)
     }
 
     status = ca_pend_io(CA_TIMEOUT/2);
-
-    epicsTimeToStrftime(tsString, 32, "%b %d, %Y %H:%M:%S.%09f", &ctrlS.stamp);
-    sprintf(timestamp, "TimeStamp: %s\n", tsString);
+    if (status == ECA_NORMAL) {
+        epicsTimeToStrftime(tsString, 32, "%b %d, %Y %H:%M:%S.%09f", &ctrlS.stamp);
+        sprintf(timestamp, "TimeStamp: %s\n", tsString);
+    } else {
+        strcpy(timestamp, "-timestamp timeout-");
+    }
 
     ca_clear_channel(ch);
 
@@ -1174,6 +1246,7 @@ int EpicsGetDescription(char *pv, char *description)
     int status;
     pv_desc pvDesc = {'\0'};
     dbr_string_t value;
+    strcpy(description, "");
 
     PrepareDeviceIO();
 
@@ -1202,7 +1275,7 @@ int EpicsGetDescription(char *pv, char *description)
     }
 
     status = ca_pend_io(CA_TIMEOUT/2);
-    strcpy(description, value);
+    if (status == ECA_NORMAL) strcpy(description, value); else strcpy(description, "- description timeout-");
 
     ca_clear_channel(ch);
 

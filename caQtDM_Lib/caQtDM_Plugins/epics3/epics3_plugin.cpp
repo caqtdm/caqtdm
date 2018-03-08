@@ -44,9 +44,11 @@ Epics3Plugin::Epics3Plugin()
 int Epics3Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow, QMap<QString, QString> options)
 {
     qDebug() << "Epics3Plugin: InitCommunicationLayer with options" << options;
-
+    QString msg=QString("Epics3Plugin: epics version: %1").arg(EPICS_VERSION_STRING);
     mutexknobdataP = data;
     messagewindowP = messageWindow;
+    if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
+    mutexknobdataP = data;
     mutexKnobdataPtr = data;
     messageWindowPtr = messageWindow;
 
