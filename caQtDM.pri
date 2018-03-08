@@ -502,12 +502,6 @@ caQtDM_Viewer {
                     ICON = $$PWD/caQtDM_Viewer/src/caQtDM.icns
 
                     APP_ICON.files = $$files($$PWD/caQtDM_Viewer/src/caQtDM*.png)
-                    #APP_ICON.files = $$PWD/caQtDM_Viewer/src/caQtDM.png
-                    #APP_ICON.files += $$PWD/caQtDM_Viewer/src/caQtDM-57.png
-                    #APP_ICON.files += $$PWD/caQtDM_Viewer/src/caQtDM-60@2x.png
-                    #APP_ICON.files += $$PWD/caQtDM_Viewer/src/caQtDM-72.png
-                    #APP_ICON.files += $$PWD/caQtDM_Viewer/src/caQtDM-76.png
-                    #APP_ICON.files += $$PWD/caQtDM_Viewer/src/caQtDM-76@2x.png
 
                     APP1_ICON.files = $$PWD/caQtDM_Viewer/src/caQtDM.icns
                     APP_XML_FILES.files = $$PWD/caQtDM_Viewer/caQtDM_IOS_Config.xml
@@ -534,7 +528,7 @@ caQtDM_Viewer {
                     bundle_identifier.value = ch.psi.caQtDM
                     QMAKE_MAC_XCODE_SETTINGS += bundle_identifier
                     target.name=IPHONEOS_DEPLOYMENT_TARGET
-                    target.value = 10.0
+                    target.value = 10.3
                     QMAKE_MAC_XCODE_SETTINGS += target
 
                     iphonesimulator {
@@ -561,17 +555,33 @@ caQtDM_Viewer {
                          # Code Signing needed for iOS App Store
                          ###############################################################################
 
-                         #provisioning_profile_spec.name=PROVISIONING_PROFILE_SPECIFIER
-                         #provisioning_profile_spec.value = caQtDM Distribution
-                         #QMAKE_MAC_XCODE_SETTINGS += provisioning_profile_spec
+                         bitcode.name = ENABLE_BITCODE
+                         bitcode.value = YES
+                         QMAKE_MAC_XCODE_SETTINGS += bitcode
 
-                         #signing_identity.name = CODE_SIGN_IDENTITY
-                         #signing_identity.value = $$(CODE_SIGN_IDENTITY)
-                         #QMAKE_MAC_XCODE_SETTINGS += signing_identity
+                         bitcode_generator.name = BITCODE_GENERATION_MODE
+                         bitcode_generator.value = bitcode
+                         QMAKE_MAC_XCODE_SETTINGS += bitcode_generator
 
-                         #setting.name = DEVELOPMENT_TEAM
-                         #setting.value = $$(CERTIFICATNUMBER)
-                         #QMAKE_MAC_XCODE_SETTINGS += setting
+                         provisioning_profile_spec.name=PROVISIONING_PROFILE_SPECIFIER
+                         provisioning_profile_spec.value = caQtDM Distribution
+                         QMAKE_MAC_XCODE_SETTINGS += provisioning_profile_spec
+
+                         signing_identity.name = CODE_SIGN_IDENTITY
+                         signing_identity.value = $$(CODE_SIGN_IDENTITY)
+                         QMAKE_MAC_XCODE_SETTINGS += signing_identity
+
+                         setting.name = DEVELOPMENT_TEAM
+                         setting.value = $$(CERTIFICATNUMBER)
+                         QMAKE_MAC_XCODE_SETTINGS += setting
+
+                         payload_dir.target = $$OUT_PWD/Release-iphoneos/Payload
+                         payload_dir.commands = @test -d $$OUT_PWD/Release-iphoneos/Payload || mkdir -p $$OUT_PWD/Release-iphoneos/Payload
+                         payload_dir.depends = $$OUT_PWD/Release-iphoneos
+
+                         QMAKE_EXTRA_TARGETS +=payload_dir
+
+
                     }
                     epics4: {
                                     LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/epics4/libepics4_plugin.a
