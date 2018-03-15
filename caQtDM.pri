@@ -498,25 +498,25 @@ caQtDM_Viewer {
 
 
 
-                    QMAKE_INFO_PLIST = $$PWD/caQtDM_Viewer/src/IOS/Info.plist
-                    ICON = $$PWD/caQtDM_Viewer/src/caQtDM.icns
+                     ICON = $$PWD/caQtDM_Viewer/src/caQtDM.icns
 
                     APP_ICON.files = $$files($$PWD/caQtDM_Viewer/src/caQtDM*.png)
 
                     APP1_ICON.files = $$PWD/caQtDM_Viewer/src/caQtDM.icns
                     APP_XML_FILES.files = $$PWD/caQtDM_Viewer/caQtDM_IOS_Config.xml
 
-                    StartScreen.files = $$files($$PWD/caQtDM_Viewer/src/IOS/LaunchImage*.png)
+                    #StartScreen.files = $$files($$PWD/caQtDM_Viewer/src/IOS/LaunchImage*.png)
                     #StartScreen.files += $$PWD/caQtDM_Viewer/src/StartScreen-Landscape.png
                     #StartScreen.files += $$PWD/caQtDM_Viewer/src/StartScreen-568h@2x.png
 
 
                     APP-FONTS.files = $$PWD/caQtDM_Viewer/lucida-sans-typewriter.ttf
                     APP-FONTS.path = fonts
-                    assets_catalogs.files = $$files($$PWD/*.xcassets)
-                    QMAKE_BUNDLE_DATA += assets_catalogs
+                    #assets_catalogs.files = $$files($$PWD/caQtDM_Viewer/src/IOS/*.xcassets)
+                    #QMAKE_BUNDLE_DATA += assets_catalogs
 
-                    QMAKE_BUNDLE_DATA += StartScreen APP_XML_FILES APP_ICON APP1_ICON APP-FONTS
+
+                    QMAKE_BUNDLE_DATA += APP_XML_FILES APP-FONTS #APP_ICON APP1_ICON
                     QMAKE_CFLAGS += -gdwarf-2
                     QMAKE_CXXFLAGS += -gdwarf-2
                     QMAKE_TARGET_BUNDLE_PREFIX=ch.psi
@@ -528,8 +528,20 @@ caQtDM_Viewer {
                     bundle_identifier.value = ch.psi.caQtDM
                     QMAKE_MAC_XCODE_SETTINGS += bundle_identifier
                     target.name=IPHONEOS_DEPLOYMENT_TARGET
-                    target.value = 10.3
+                    target.value = 10.0
                     QMAKE_MAC_XCODE_SETTINGS += target
+
+
+
+                    assetIcon.name = ASSETCATALOG_COMPILER_APPICON_NAME
+                    assetIcon.value = AppIcon
+                    launchImage.name = ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME
+                    launchImage.value = LaunchImage
+                    QMAKE_MAC_XCODE_SETTINGS += assetIcon launchImage
+
+                    QMAKE_INFO_PLIST += $$PWD/caQtDM_Viewer/src/IOS/Info.plist
+                    QMAKE_ASSET_CATALOGS += $$PWD/caQtDM_Viewer/src/IOS/Assets.xcassets
+
 
                     iphonesimulator {
                          message("caQtDM_viewer configuration : iphonesimulator")
@@ -552,30 +564,31 @@ caQtDM_Viewer {
                          LIBS += $$(QWTHOME)/lib/libqwt.a
 
                          ###############################################################################
-                         # Code Signing needed for iOS App Store
+                         # Code Signing settings needed only for iOS App Store
                          ###############################################################################
 
-                         bitcode.name = ENABLE_BITCODE
-                         bitcode.value = YES
-                         QMAKE_MAC_XCODE_SETTINGS += bitcode
+                         #bitcode.name = ENABLE_BITCODE
+                         #bitcode.value = YES
+                         #QMAKE_MAC_XCODE_SETTINGS += bitcode
 
-                         bitcode_generator.name = BITCODE_GENERATION_MODE
-                         bitcode_generator.value = bitcode
-                         QMAKE_MAC_XCODE_SETTINGS += bitcode_generator
+                         #bitcode_generator.name = BITCODE_GENERATION_MODE
+                         #bitcode_generator.value = bitcode
+                         #QMAKE_MAC_XCODE_SETTINGS += bitcode_generator
 
-                         provisioning_profile_spec.name=PROVISIONING_PROFILE_SPECIFIER
-                         provisioning_profile_spec.value = caQtDM Distribution
-                         QMAKE_MAC_XCODE_SETTINGS += provisioning_profile_spec
+                         #provisioning_profile_spec.name=PROVISIONING_PROFILE_SPECIFIER
+                         #provisioning_profile_spec.value = caQtDM Distribution
+                         #provisioning_profile_spec.value = caQtDM Development
+                         #QMAKE_MAC_XCODE_SETTINGS += provisioning_profile_spec
 
-                         signing_identity.name = CODE_SIGN_IDENTITY
-                         signing_identity.value = $$(CODE_SIGN_IDENTITY)
-                         QMAKE_MAC_XCODE_SETTINGS += signing_identity
+                         #signing_identity.name = CODE_SIGN_IDENTITY
+                         #signing_identity.value = $$(CODE_SIGN_IDENTITY)
+                         #QMAKE_MAC_XCODE_SETTINGS += signing_identity
 
-                         setting.name = DEVELOPMENT_TEAM
-                         setting.value = $$(CERTIFICATNUMBER)
-                         QMAKE_MAC_XCODE_SETTINGS += setting
+                         #setting.name = DEVELOPMENT_TEAM
+                         #setting.value = $$(CERTIFICATNUMBER)
+                         #QMAKE_MAC_XCODE_SETTINGS += setting
 
-                         QMAKE_ASSET_CATALOGS += $$PWD/caQtDM_Viewer/src/IOS/Assets.xcassets
+
 
                          #payload_dir.target = $$OUT_PWD/Release-iphoneos/Payload
                          #payload_dir.commands = @test -d $$OUT_PWD/Release-iphoneos/Payload || mkdir -p $$OUT_PWD/Release-iphoneos/Payload
