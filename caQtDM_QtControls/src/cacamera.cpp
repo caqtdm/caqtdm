@@ -998,6 +998,7 @@ void caCamera::calcImageMono (pureData *ptr,  uint *LineData, long &i, int &ysta
                 Min[(ptr[i] < Min[1])] = ptr[i];
 
                 int indx1 = (ptr[i] - minvalue) * correction;
+                if(indx1 < 0) indx1 = 0;
                 if(indx1 >= ColormapSize) indx1=ColormapSize -1;
 
                 LineData[k] =  ColorMap[indx1];
