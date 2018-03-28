@@ -317,7 +317,7 @@ private:
     void calcImageMono (pureData *ptr,  uint *LineData, long &i, int &ystart, int &yend, float correction, int datasize, QSize resultSize,
                         uint Max[2], uint Min[2]);
 
-    template <typename pureData> void FilterBayer(pureData *bayer, uint *rgb, int sx, int sy, int tile);
+    template <typename pureData> void FilterBayer(pureData *bayer, uint *rgb, int sx, int sy, int tile,int datasize);
 
     template <typename pureData>
     int zValueImage(pureData *ptr, colormode mode, double xnew, double ynew, double xmax, double ymax, int datasize, bool &validIntensity);

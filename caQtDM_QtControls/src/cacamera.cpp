@@ -1195,10 +1195,13 @@ void caCamera::CameraDataConvert(int sector, int sectorcount, SyncMinMax* MinMax
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  */
-template <typename pureData> void caCamera::FilterBayer(pureData *bayer, uint *rgb, int sx, int sy, int tile)
+
+template <typename pureData> void caCamera::FilterBayer(pureData *bayer, uint *rgb, int sx, int sy, int tile,int datasize)
 {
     const int bayerStep = sx;
     const int rgbStep = 3 * sx;
+    uchar *rgbStart=(uchar *)rgb;
+    uchar *bayerStart=(uchar *)bayer;
 
     int width = sx;
     int height = sy;
@@ -1226,53 +1229,55 @@ template <typename pureData> void caCamera::FilterBayer(pureData *bayer, uint *r
     rgb += 1;
     height -= 1;
     width -= 1;
-
     for (; height--; bayer += bayerStep, rgb += rgbStep) {
         pureData *bayerEnd = bayer + width;
-
-        if (start_with_green) {
-            rgb[-blue] = bayer[1];
-            rgb[0] = bayer[bayerStep + 1];
-            rgb[blue] = bayer[bayerStep];
-            bayer++;
-            rgb += 3;
-        }
-
-        if (blue > 0) {
-            for (; bayer <= bayerEnd - 2; bayer += 2, rgb += 6) {
-                rgb[-1] = bayer[0];
-                rgb[0] = bayer[1];
-                rgb[1] = bayer[bayerStep + 1];
-
-                rgb[2] = bayer[2];
-                rgb[3] = bayer[bayerStep + 2];
-                rgb[4] = bayer[bayerStep + 1];
+        if (((uchar *)(rgb+rgbStep)<((uchar *)rgbStart+3*m_width*m_height*sizeof(uint)))&&((uchar *)(bayer+bayerStep)<((uchar *)bayerStart+datasize))){
+            if (start_with_green) {
+                rgb[-blue] = bayer[1];
+                rgb[0] = bayer[bayerStep + 1];
+                rgb[blue] = bayer[bayerStep];
+                bayer++;
+                rgb += 3;
             }
-        } else {
-            for (; bayer <= bayerEnd - 2; bayer += 2, rgb += 6) {
-                rgb[1] = bayer[0];
-                rgb[0] = bayer[1];
-                rgb[-1] = bayer[bayerStep + 1];
 
-                rgb[4] = bayer[2];
-                rgb[3] = bayer[bayerStep + 2];
-                rgb[2] = bayer[bayerStep + 1];
+            if (blue > 0) {
+                for (; bayer <= bayerEnd - 2; bayer += 2, rgb += 6) {
+                    rgb[-1] = bayer[0];
+                    rgb[0] = bayer[1];
+                    rgb[1] = bayer[bayerStep + 1];
+
+                    rgb[2] = bayer[2];
+                    rgb[3] = bayer[bayerStep + 2];
+                    rgb[4] = bayer[bayerStep + 1];
+                }
+            } else {
+                for (; bayer <= bayerEnd - 2; bayer += 2, rgb += 6) {
+
+                    rgb[1] = bayer[0];
+                    rgb[0] = bayer[1];
+                    rgb[-1] = bayer[bayerStep + 1];
+
+                    rgb[4] = bayer[2];
+                    rgb[3] = bayer[bayerStep + 2];
+                    rgb[2] = bayer[bayerStep + 1];
+
+                }
             }
+
+            if (bayer < bayerEnd) {
+                rgb[-blue] = bayer[0];
+                rgb[0] = bayer[1];
+                rgb[blue] = bayer[bayerStep + 1];
+                bayer++;
+                rgb += 3;
+            }
+
+            bayer -= width;
+            rgb -= width * 3;
+
+            blue = -blue;
+            start_with_green = !start_with_green;
         }
-
-        if (bayer < bayerEnd) {
-            rgb[-blue] = bayer[0];
-            rgb[0] = bayer[1];
-            rgb[blue] = bayer[bayerStep + 1];
-            bayer++;
-            rgb += 3;
-        }
-
-        bayer -= width;
-        rgb -= width * 3;
-
-        blue = -blue;
-        start_with_green = !start_with_green;
     }
 
     return;
@@ -1697,8 +1702,8 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
     colormode auxMode = thisColormode;
     short auxDatatype = m_datatype;
 
-    int sx = resultSize.width();
-    int sy = resultSize.height();
+    int sx = m_width; // resultSize.width();
+    int sy = m_height;// resultSize.height();
 
     void (caCamera::*CameraDataConvert) (int sector, int sectorcount, SyncMinMax* MinMax, QSize resultSize, int datasize) = NULL;
 
@@ -1735,17 +1740,18 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         thisColormode = RGB1_CA;
         m_datatype = caLONG;
 
-        //printf("bitsperlement=%d datasize=%d sx=%d sy=%d\n",bitsPerElement,  datasize, sx, sy);
-
+        printf("bitsperlement=%d datasize=%d sx=%d sy=%d\n",bitsPerElement,  datasize, sx, sy);
+        fflush(stdout);
         if(bitsPerElement == 8) {
-            FilterBayer((uchar *) data, rgb, sx, sy, tile);
+            FilterBayer((uchar *) data, rgb, sx, sy, tile,datasize);
         } else if((bitsPerElement == 12) && (thisPackingmode == packNo)) {
-            FilterBayer((ushort *) data, rgb, sx, sy, tile);
+            FilterBayer((ushort *) data, rgb, sx, sy, tile,datasize);
         } else if((bitsPerElement == 12) && (thisPackingmode > packNo)) {
-            ushort *unpacked = (ushort *) malloc(2*sizeof(ushort) * datasize + 1);
+            int unpacked_datasize=2*sizeof(ushort) * datasize + 1;
+            ushort *unpacked = (ushort *) malloc(unpacked_datasize);
             if(thisPackingmode == LSB12Bit) buf_unpack_12bitpacked_lsb(unpacked, (uchar*) data, sx*sy*2,datasize);
             else buf_unpack_12bitpacked_msb(unpacked, (uchar*) data, sx*sy*2,datasize);
-            FilterBayer((ushort *) unpacked, rgb, sx, sy, tile);
+            FilterBayer((ushort *) unpacked, rgb, sx, sy, tile, unpacked_datasize);
             free(unpacked);
         }
 
