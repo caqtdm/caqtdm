@@ -7123,7 +7123,7 @@ void CaQtDM_Lib::ComputeNumericMaxMinPrec(QWidget* widget, const knobData& data)
             precMode = spinboxWidget->getPrecisionMode();
             limitsMode = spinboxWidget->getLimitsMode();
             fixedFormat = spinboxWidget->getFixedFormat();
-            caMode = caNumeric::Channel;
+            caMode = caSpinbox::Channel;
         }
 
         if(limitsMode == caMode) {
@@ -7151,14 +7151,14 @@ void CaQtDM_Lib::ComputeNumericMaxMinPrec(QWidget* widget, const knobData& data)
         }
 
         if (caApplyNumeric *applynumericWidget = qobject_cast<caApplyNumeric *>(widget)) {
-            applynumericWidget->setMaxValue(maxValue);
-            applynumericWidget->setMinValue(minValue);
+            if(maxValue != applynumericWidget->getMaxValue()) applynumericWidget->setMaxValue(maxValue);
+            if(minValue != applynumericWidget->getMinValue()) applynumericWidget->setMinValue(minValue);
         } else if (caNumeric *numericWidget = qobject_cast<caNumeric *>(widget)) {
-            numericWidget->setMaxValue(maxValue);
-            numericWidget->setMinValue(minValue);
+            if(maxValue != numericWidget->getMaxValue()) numericWidget->setMaxValue(maxValue);
+            if(minValue != numericWidget->getMinValue()) numericWidget->setMinValue(minValue);
         } else if (caSpinbox *spinboxWidget = qobject_cast<caSpinbox *>(widget)) {
-            spinboxWidget->setMaxValue(maxValue);
-            spinboxWidget->setMinValue(minValue);
+            if(maxValue != spinboxWidget->getMaxValue()) spinboxWidget->setMaxValue(maxValue);
+            if(minValue != spinboxWidget->getMinValue()) spinboxWidget->setMinValue(minValue);
         }
 
         if(!fixedFormat) {
