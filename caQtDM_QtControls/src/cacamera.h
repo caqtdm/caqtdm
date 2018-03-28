@@ -146,7 +146,7 @@ public:
     void setPackmode(packingmode mode) {thisPackingmode = mode; if(packingmodeCombo != (QComboBox*) 0) packingmodeCombo->setCurrentIndex(mode);}
     packingmode getPackmode() {return thisPackingmode;}
 
-    void setShowComboBoxes(bool show) {thisShowBoxes = show;  if(thisShowBoxes) colormodesWidget->show(); else colormodesWidget->hide();}
+    void setShowComboBoxes(bool show) {if(colormodesWidget == (QWidget *) 0)return; thisShowBoxes = show;  if(thisShowBoxes) colormodesWidget->show(); else colormodesWidget->hide();}
     bool getShowComboBoxes() const {return thisShowBoxes;}
 
     void setData(double *vector, int size, int curvIndex, int curvType, int curvXY);
