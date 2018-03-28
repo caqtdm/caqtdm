@@ -1740,8 +1740,8 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         thisColormode = RGB1_CA;
         m_datatype = caLONG;
 
-        printf("bitsperlement=%d datasize=%d sx=%d sy=%d\n",bitsPerElement,  datasize, sx, sy);
-        fflush(stdout);
+        //printf("bitsperlement=%d datasize=%d sx=%d sy=%d\n",bitsPerElement,  datasize, sx, sy);
+        //fflush(stdout);
         if(bitsPerElement == 8) {
             FilterBayer((uchar *) data, rgb, sx, sy, tile,datasize);
         } else if((bitsPerElement == 12) && (thisPackingmode == packNo)) {
