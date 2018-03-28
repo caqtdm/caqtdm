@@ -120,7 +120,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: rgb(0,0,120);}</string>
     </property>
     <property name="currentIndex">
-     <number>11</number>
+     <number>1</number>
     </property>
     <property name="usesScrollButtons">
      <bool>true</bool>
@@ -2886,8 +2886,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>100</width>
-           <height>30</height>
+           <width>431</width>
+           <height>187</height>
           </rect>
          </property>
          <attribute name="label">
@@ -3124,7 +3124,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>7</number>
+       <number>13</number>
       </property>
       <property name="usesScrollButtons">
        <bool>true</bool>
@@ -8699,12 +8699,6 @@ p, li { white-space: pre-wrap; }
         <property name="channelHeight" stdset="0">
          <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
-        <property name="channelCode" stdset="0">
-         <string notr="true">code</string>
-        </property>
-        <property name="channelBPP" stdset="0">
-         <string notr="true">bpp</string>
-        </property>
         <property name="simpleZoomedView" stdset="0">
          <bool>false</bool>
         </property>
@@ -8720,8 +8714,11 @@ p, li { white-space: pre-wrap; }
         <property name="maxLevel">
          <string notr="true">4500</string>
         </property>
+        <property name="showComboBoxes">
+         <bool>true</bool>
+        </property>
         <property name="ColorMap" stdset="0">
-         <enum>caCamera::grey</enum>
+         <enum>caCamera::mono_to_wavelength</enum>
         </property>
         <property name="ROI_readChannels" stdset="0">
          <string>FIGX;FIGY;FIGW;FIGH</string>
@@ -8745,10 +8742,10 @@ p, li { white-space: pre-wrap; }
        <widget class="QTextEdit" name="textEdit_23">
         <property name="geometry">
          <rect>
-          <x>5</x>
+          <x>12</x>
           <y>10</y>
-          <width>376</width>
-          <height>186</height>
+          <width>369</width>
+          <height>160</height>
          </rect>
         </property>
         <property name="styleSheet">
@@ -8786,12 +8783,6 @@ p, li { white-space: pre-wrap; }
         <property name="channelHeight" stdset="0">
          <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
-        <property name="channelCode" stdset="0">
-         <string notr="true">code</string>
-        </property>
-        <property name="channelBPP" stdset="0">
-         <string notr="true">bpp</string>
-        </property>
         <property name="simpleZoomedView" stdset="0">
          <bool>true</bool>
         </property>
@@ -8808,7 +8799,7 @@ p, li { white-space: pre-wrap; }
          <string notr="true">4500</string>
         </property>
         <property name="ColorMap" stdset="0">
-         <enum>caCamera::spectrum_hot</enum>
+         <enum>caCamera::as_is</enum>
         </property>
         <property name="ROI_writeType" stdset="0">
          <enum>caCamera::none</enum>
@@ -8832,12 +8823,6 @@ p, li { white-space: pre-wrap; }
         <property name="channelHeight" stdset="0">
          <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
-        <property name="channelCode" stdset="0">
-         <string notr="true">code</string>
-        </property>
-        <property name="channelBPP" stdset="0">
-         <string notr="true">bpp</string>
-        </property>
         <property name="simpleZoomedView" stdset="0">
          <bool>true</bool>
         </property>
@@ -8854,7 +8839,7 @@ p, li { white-space: pre-wrap; }
          <string notr="true">4500</string>
         </property>
         <property name="ColorMap" stdset="0">
-         <enum>caCamera::spectrum_custom</enum>
+         <enum>caCamera::as_is</enum>
         </property>
         <property name="customColorMap" stdset="0">
          <string notr="true">2;15;9;17;11;16;10;14;8;13;7;18;12;3</string>
@@ -9283,6 +9268,151 @@ def PythonCalc(a, b, c, d):
         <property name="endBit">
          <number>1</number>
         </property>
+       </widget>
+       <widget class="QComboBox" name="comboBox_2">
+        <property name="geometry">
+         <rect>
+          <x>120</x>
+          <y>174</y>
+          <width>104</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <item>
+         <property name="text">
+          <string>packNo</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>MSB12Bit</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>LSB12Bit</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Reversed</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QComboBox" name="comboBox">
+        <property name="geometry">
+         <rect>
+          <x>12</x>
+          <y>174</y>
+          <width>102</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <item>
+         <property name="text">
+          <string>Mono</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>RGB1_CA</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>RGB2_CA</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>RGB3_CA</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>BayerRG_8</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>BayerGB_8</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>BayerGR_8</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>BayerBG_8</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>BayerRG_12</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>BayerGB_12</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>BayerGR_12</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>BayerBG_12</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>RGB_8</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>BGR_8</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>RGBA_8</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>BRGA_8</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>RGB12</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>YUV444</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>YUV422</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>YUV411</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>YUV421</string>
+         </property>
+        </item>
        </widget>
       </widget>
       <widget class="QWidget" name="caScan2D">
@@ -10526,7 +10656,7 @@ def PythonCalc(a, b, c, d):
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
@@ -10540,7 +10670,7 @@ def PythonCalc(a, b, c, d):
          <rect>
           <x>20</x>
           <y>15</y>
-          <width>531</width>
+          <width>489</width>
           <height>276</height>
          </rect>
         </property>
@@ -10562,8 +10692,8 @@ p, li { white-space: pre-wrap; }
        <widget class="caApplyNumeric" name="endValueSet">
         <property name="geometry">
          <rect>
-          <x>251</x>
-          <y>311</y>
+          <x>51</x>
+          <y>440</y>
           <width>181</width>
           <height>66</height>
          </rect>
@@ -10604,8 +10734,8 @@ p, li { white-space: pre-wrap; }
        <widget class="caNumeric" name="caNumeric_0">
         <property name="geometry">
          <rect>
-          <x>600</x>
-          <y>150</y>
+          <x>527</x>
+          <y>155</y>
           <width>100</width>
           <height>70</height>
          </rect>
@@ -10651,9 +10781,9 @@ p, li { white-space: pre-wrap; }
        <widget class="QLabel" name="label_2">
         <property name="geometry">
          <rect>
-          <x>705</x>
-          <y>175</y>
-          <width>316</width>
+          <x>632</x>
+          <y>180</y>
+          <width>375</width>
           <height>17</height>
          </rect>
         </property>
@@ -10664,8 +10794,8 @@ p, li { white-space: pre-wrap; }
        <widget class="caNumeric" name="caNumeric_1">
         <property name="geometry">
          <rect>
-          <x>605</x>
-          <y>235</y>
+          <x>525</x>
+          <y>242</y>
           <width>100</width>
           <height>70</height>
          </rect>
@@ -10711,9 +10841,9 @@ p, li { white-space: pre-wrap; }
        <widget class="QLabel" name="label_3">
         <property name="geometry">
          <rect>
-          <x>710</x>
-          <y>260</y>
-          <width>326</width>
+          <x>630</x>
+          <y>267</y>
+          <width>389</width>
           <height>17</height>
          </rect>
         </property>
@@ -10724,9 +10854,9 @@ p, li { white-space: pre-wrap; }
        <widget class="QLabel" name="label_4">
         <property name="geometry">
          <rect>
-          <x>590</x>
-          <y>345</y>
-          <width>411</width>
+          <x>512</x>
+          <y>344</y>
+          <width>465</width>
           <height>17</height>
          </rect>
         </property>
@@ -10737,8 +10867,8 @@ p, li { white-space: pre-wrap; }
        <widget class="caNumeric" name="caNumeric_2">
         <property name="geometry">
          <rect>
-          <x>450</x>
-          <y>315</y>
+          <x>372</x>
+          <y>314</y>
           <width>100</width>
           <height>70</height>
          </rect>
@@ -10777,8 +10907,8 @@ p, li { white-space: pre-wrap; }
        <widget class="caNumeric" name="caNumeric_3">
         <property name="geometry">
          <rect>
-          <x>450</x>
-          <y>400</y>
+          <x>373</x>
+          <y>397</y>
           <width>141</width>
           <height>70</height>
          </rect>
@@ -10817,14 +10947,14 @@ p, li { white-space: pre-wrap; }
        <widget class="QLabel" name="label_5">
         <property name="geometry">
          <rect>
-          <x>610</x>
-          <y>425</y>
-          <width>401</width>
+          <x>533</x>
+          <y>422</y>
+          <width>464</width>
           <height>17</height>
          </rect>
         </property>
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;no fixed format, precision mode=user, prec=2, max=1000)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;no fixed format, precision mode=user, prec=2, max=1000&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
        <widget class="caSpinbox" name="caspinbox">
@@ -10853,9 +10983,9 @@ p, li { white-space: pre-wrap; }
        <widget class="caNumeric" name="caNumeric_4">
         <property name="geometry">
          <rect>
-          <x>630</x>
+          <x>581</x>
           <y>456</y>
-          <width>118</width>
+          <width>167</width>
           <height>66</height>
          </rect>
         </property>
@@ -10863,7 +10993,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="integerDigits" stdset="0">
-         <number>5</number>
+         <number>6</number>
         </property>
         <property name="decimalDigits" stdset="0">
          <number>2</number>
@@ -10872,7 +11002,7 @@ p, li { white-space: pre-wrap; }
          <bool>true</bool>
         </property>
         <property name="channel" stdset="0">
-         <string>ACM:TEST:AO</string>
+         <string notr="true">ACM:TEST:AO:AMP</string>
         </property>
         <property name="colorMode">
          <enum>caNumeric::Default</enum>
@@ -16849,7 +16979,7 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
      <y>604</y>
     </hint>
     <hint type="destinationlabel">
-     <x>373</x>
+     <x>377</x>
      <y>622</y>
     </hint>
    </hints>
@@ -16877,11 +17007,11 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setMacrovalue(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>201</x>
+     <x>205</x>
      <y>449</y>
     </hint>
     <hint type="destinationlabel">
-     <x>481</x>
+     <x>485</x>
      <y>622</y>
     </hint>
    </hints>
@@ -17203,6 +17333,102 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
     <hint type="destinationlabel">
      <x>502</x>
      <y>310</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox_2</sender>
+   <signal>activated(QString)</signal>
+   <receiver>cacamera</receiver>
+   <slot>setPackingmodeStr(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>199</x>
+     <y>315</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>501</x>
+     <y>311</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox_2</sender>
+   <signal>activated(QString)</signal>
+   <receiver>cacamera_2</receiver>
+   <slot>setPackingmodeStr(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>227</x>
+     <y>316</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>285</x>
+     <y>358</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox_2</sender>
+   <signal>activated(QString)</signal>
+   <receiver>cacamera_3</receiver>
+   <slot>setPackingmodeStr(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>207</x>
+     <y>315</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>176</x>
+     <y>358</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox</sender>
+   <signal>activated(QString)</signal>
+   <receiver>cacamera_3</receiver>
+   <slot>setDecodemodeStr(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>78</x>
+     <y>321</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>75</x>
+     <y>355</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox</sender>
+   <signal>activated(QString)</signal>
+   <receiver>cacamera_2</receiver>
+   <slot>setDecodemodeStr(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>53</x>
+     <y>318</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>260</x>
+     <y>366</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox</sender>
+   <signal>activated(QString)</signal>
+   <receiver>cacamera</receiver>
+   <slot>setDecodemodeStr(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>36</x>
+     <y>316</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>615</x>
+     <y>323</y>
     </hint>
    </hints>
   </connection>
