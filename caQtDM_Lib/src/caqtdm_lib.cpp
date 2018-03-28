@@ -6885,7 +6885,7 @@ bool CaQtDM_Lib::SoftPVusesItsself(QWidget* widget, QMap<QString, QString> map)
             int pos = trimmedPV.indexOf("{");  // jason string
             if(pos != -1) JSONString = trimmedPV.mid(pos);
             if(pos != -1) trimmedPV = trimmedPV.mid(0, pos);
-            strng[i] = treatMacro(map, trimmedPV, &doNothing);
+            strng[i] = treatMacro(map, trimmedPV, &doNothing, widget->objectName());
             if(i==4) {
                 char asc[256];
                 QString pv = calcWidget->getVariable();
@@ -7009,12 +7009,12 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
 
     // replace macros for imagecalc
     if (caImage *imageWidget = qobject_cast<caImage *>(widget)) {
-        text =  treatMacro(map, imageWidget->getImageCalc(), &doNothing);
+        text =  treatMacro(map, imageWidget->getImageCalc(), &doNothing, widget->objectName());
         imageWidget->setImageCalc(text);
     }
 
     /* replace also some macro values in the visibility calc string */
-    text =  treatMacro(map, visibilityCalc, &doNothing);
+    text =  treatMacro(map, visibilityCalc, &doNothing, widget->objectName());
 
     monitorList.insert(0, nbMon);
     indexList.insert(0, nbMon);
