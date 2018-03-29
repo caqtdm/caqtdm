@@ -35,8 +35,8 @@ caNumeric::caNumeric(QWidget *parent) : ENumeric(parent)
      setAccessW(true);
      setPrecisionMode(Channel);
      setLimitsMode(Channel);
-     thisMaximum = 100000.0;
-     thisMinimum = -100000.0;
+     setMaxValue(100000.0);
+     setMinValue(-100000.0);
      thisFixedFormat = false;
      thisColorMode = Static;
      setDigitsFontScaleEnabled(true);
