@@ -41,6 +41,7 @@ void wmSignalPropagator::setResizeFactors(const double factX, const double factY
 }
 
 void wmSignalPropagator::closewindow() {emit wmCloseWindow();}
+void wmSignalPropagator::reloadwindow() {emit wmReloadWindow();}
 void wmSignalPropagator::shownormal() {emit wmShowNormal();}
 void wmSignalPropagator::showmaximized() {emit wmShowMaximized();}
 void wmSignalPropagator::showminimized() {emit wmShowMinimized();}

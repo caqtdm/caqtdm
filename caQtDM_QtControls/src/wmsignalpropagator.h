@@ -47,6 +47,7 @@ public slots:
 
 public slots:
     void closewindow();
+    void reloadwindow();
     void shownormal();
     void showmaximized();
     void showminimized();
@@ -55,6 +56,7 @@ public slots:
 
 signals:
     void wmCloseWindow();
+    void wmReloadWindow();
     void wmShowNormal();
     void wmShowMaximized();
     void wmShowMinimized();

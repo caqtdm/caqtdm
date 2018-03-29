@@ -378,6 +378,7 @@ private:
 
     QMap<int, caStripPlot*> stripList;          // list of stripplots with key group
     QList<int> stripGroupList;                  // group numbers found
+    QHash<QString, QString> softvars;                // use a hash list to test if same variable names
 
     QString defaultPlugin;
 

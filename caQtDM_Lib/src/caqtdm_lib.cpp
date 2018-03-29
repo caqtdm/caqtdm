@@ -442,6 +442,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         connect(widget, SIGNAL(wmShowMaximized()), this, SLOT(showMaxWindow()));
         connect(widget, SIGNAL(wmShowMinimized()), this, SLOT(showMinWindow()));
         connect(widget, SIGNAL(wmShowFullScreen()), this, SLOT(showFullWindow()));
+        connect(widget, SIGNAL(wmReloadWindow()), this, SLOT(Callback_ReloadWindowL()));
     }
 
     // connect close launchfile action to parent
@@ -484,6 +485,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     cartesianList.clear();
     stripGroupList.clear();
     stripList.clear();
+    softvars.clear();
 
     nbIncludes = 0;
     splashCounter = 1;
@@ -1021,6 +1023,23 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             calcWidget->setVariable(pv);
             calcWidget->setDataCount(0);
             addMonitor(myWidget, &kData, qasc(pv), w1, specData, map, &pv);
+
+            // test for multiple occurrences
+            if(treatPrimary) {
+                bool found = false;
+                QString fileFound = "";
+                QHash<QString, QString>::const_iterator i = softvars.find(pv);
+                while (i != softvars.end() && i.key() == pv) {
+                    fileFound = i.value();
+                    found = true;
+                    break;
+                }
+                if(!found) {
+                    softvars.insert(pv, savedFile[level]);
+                } else {
+                    postMessage(QtCriticalMsg, (char*) qasc(tr("cacalc softvariable %1 in file %2 already defined in file %3").arg(pv).arg(savedFile[level]).arg(fileFound)));
+                }
+            }
 
             // when cacalc is a waveform composed from individual channels
             if(calcWidget->getVariableType() == caCalc::vector) {
