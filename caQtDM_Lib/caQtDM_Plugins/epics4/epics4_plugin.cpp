@@ -544,7 +544,11 @@ void PVAChannel::channelStateChange(
 void PVAChannel::connect(const string & channelName,const string & providerName)
 {
     if(Epics4Plugin::getDebug()) cout << "PVAChannel::connect\n";
+#if  EPICS_VERSION > 6
+    ChannelProviderRegistry::shared_pointer reg(ChannelProviderRegistry::clients());
+#else
     ChannelProviderRegistry::shared_pointer reg = getChannelProviderRegistry();
+#endif
     ChannelProvider::shared_pointer provider = reg->getProvider(providerName);
     if(!provider) {
         requester->message(channelName + " provider " + providerName + " not registered",errorMessage);

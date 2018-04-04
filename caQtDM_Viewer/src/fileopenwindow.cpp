@@ -59,7 +59,14 @@ bool HTTPCONFIGURATOR = false;
 #include <sys/time.h>
 #endif
 
-#ifdef Q_WS_X11
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+   #define QT_X11 Q_WS_X11
+#else
+   #define QT_X11 Q_OS_UNIX
+#endif
+
+#ifdef QT_X11
+        #warning "fileopenwindow.cpp -- included x11"
         #include <QX11Info>
         #include <X11/Xutil.h>
         #include <X11/Xlib.h>
@@ -68,7 +75,7 @@ bool HTTPCONFIGURATOR = false;
         #define MESSAGE_SOURCE_OLD            0
         #define MESSAGE_SOURCE_APPLICATION    1
         #define MESSAGE_SOURCE_PAGER          2
-#endif //Q_WS_X11
+#endif //Qt_X11
 
 #if defined(_MSC_VER)
 int setenv(const char *name, const char *value, int overwrite)
@@ -280,17 +287,19 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     messageWindow->show();
 
 #ifndef MOBILE
-#ifdef Q_WS_X11
+#ifdef QT_X11
     QString uniqueKey = QString("caQtDM shared memory:") + DisplayString(QX11Info::display());
     sharedMemory.setKey (uniqueKey);
+    qDebug() << "caQtDM -- shared memory key" << uniqueKey;
 #else
     QString uniqueKey = QString("caQtDM shared memory");
+    qDebug() << "caQtDM -- shared memory key" << uniqueKey;
     sharedMemory.setKey ("caQtDM shared memory");
 #endif
     if (sharedMemory.attach()) {
         _isRunning = true;
         if(attach) {
-#ifdef Q_WS_X11
+#ifdef QT_X11
             qDebug() << "caQtDM -- another instance of caQtDM detected ==> attach to it (" << DisplayString(QX11Info::display()) <<")" ;
 #else
             qDebug() << "caQtDM -- another instance of caQtDM detected ==> attach to it";
@@ -981,7 +990,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
                 w->setFocus();
 // all these past commands will only give you a notification in the taskbar
 // in case of x windows, we will pop the window really up
-#ifdef Q_WS_X11
+#ifdef QT_X11
                 static Atom  NET_ACTIVE_WINDOW = 0;
                 XClientMessageEvent xev;
                 if (NET_ACTIVE_WINDOW == 0) {
@@ -998,7 +1007,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
                 xev.data.l[0]    = MESSAGE_SOURCE_PAGER;
                 xev.data.l[1] = xev.data.l[2] = xev.data.l[3] = xev.data.l[4] = 0;
                 XSendEvent(QX11Info::display(), QX11Info::appRootWindow(), False, SubstructureNotifyMask | SubstructureRedirectMask, (XEvent*)&xev);
-#endif //Q_WS_X11
+#endif //Qt_X11
 
                 return;
             }

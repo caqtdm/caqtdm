@@ -123,7 +123,7 @@ epics3_plugin {
 #for epics 3.15 and gcc we need this
                 INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
 
- 		LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
+                LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
  		LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
  		CONFIG += release
 	}
@@ -170,12 +170,39 @@ epics3_plugin {
                 }
 	}
 }
+
 #==========================================================================================================
 epics4_plugin {
         CONFIG += Define_ControlsysTargetDir Define_Build_objDirs
 
         unix:!macx:!ios:!android {
-                message("epics4_plugin configuration unix:!macx:!ios:!android")
+
+        epics7 {
+                message("epics4_plugin (with epics version 7) configuration unix:!macx:!ios:!android")
+
+                INCLUDEPATH   += $(EPICSINCLUDE)
+                INCLUDEPATH   += $(EPICSINCLUDE)/pv
+                INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
+#for epics 3.15 and gcc we need this
+                INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
+
+                !EPICS4_STATICBUILD {
+                   message( "epics4_plugin build with shared object libraries of epics4" )
+                   LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom -lpvAccess -lpvData -lpvaClient -lnt
+                   LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
+                }
+                EPICS4_STATICBUILD  {
+                   message( "epics4_plugin build with static libraries of epics4" )
+                   LIBS += $(EPICSLIB)/libpvAccess.a
+                   LIBS += $(EPICSLIB)/libpvData.a
+                   LIBS += $(EPICSLIB)/libpvaClient.a
+                   LIBS += $(EPICSLIB)/libnt.a
+                   LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
+                }
+                CONFIG += release
+          }
+          else {
+                message("epics4_plugin (with epics version 3) configuration unix:!macx:!ios:!android")
                 
                 INCLUDEPATH   += $(EPICS4LOCATION)/pvDataCPP/include
                 INCLUDEPATH   += $(EPICS4LOCATION)/pvAccessCPP/include
@@ -208,6 +235,7 @@ epics4_plugin {
                    LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
                 }
  		CONFIG += release
+            }
 	}
 	
         macx {

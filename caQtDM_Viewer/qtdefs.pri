@@ -83,24 +83,33 @@ DEFINES += XDR_LE
 CONFIG += XDR_HACK
 }
 
-# undefine this for epics4 plugin support (only preliminary version as example)
-# one can specify channel access with ca:// and pv access with pvs:// (both use the epics4 plugin)
+# undefine CONFIG epics7 for epics4 plugin support with epics version 7 (only preliminary version as example)
+# one can specify channel access with ca:// and pv access with pva:// (both use the epics4 plugin)
 # the main work for this plugin was done by Marty Kraimer
 
-exists($(EPICS4LOCATION)/pvAccessCPP/include/pv/pvAccess.h) {
-!MOBILE {
-   message( "Configuring build for epics4" )
+#CONFIG += epics7
+epics7 {
+   message( "Configuring build for epics4 plugin with epics7" )
    CONFIG += epics4
 }
+
+# undefine CONFIG epics4 for epics4 plugin support with epics version 4 (only preliminary version as example)
+# one can specify channel access with ca:// and pv access with pva:// (both use the epics4 plugin)
+# the main work for this plugin was done by Marty Kraimer
+!epics7 {
+   exists($(EPICS4LOCATION)/pvAccessCPP/include/pv/pvAccess.h) {
+   !MOBILE {
+      message( "Configuring build for epics4 plugin with epics4" )
+      CONFIG += epics4
+   }
    CONFIG += EPICS4_STATICBUILD
+   }
 }
 
 # undefine this to make the ca provider from pvAccess (epics4) the default provider
 # otherwise the ca provider from epics3 base is the default provider
 #DEFINES += PVAISDEFAULTPROVIDER
 
-# undefine this for bsread (zeromq) plugin support
-# the main work for this plugin was done by Helge Brands
 contains(QT_VER_MAJ, 4) {
     contains(QT_VER_MIN, 6) {
        message( "version 4.6 of Qt" )
