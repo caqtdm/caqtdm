@@ -23,6 +23,11 @@
   if [ -z "$CAQTDM_COLLECT" ];       then export  CAQTDM_COLLECT=`pwd`/caQtDM_Binaries;
   fi
   export  QTBASE=${QTCONTROLS_LIBS};
+  
+  if [ -z "$CAQTDM_CA_ARCHIVELIBS" ];       then export  CAQTDM_CA_ARCHIVELIBS=`pwd`/caQtDM_Binaries;
+  fi
+  if [ -z "$CAQTDM_LOGGING_ARCHIVELIBS" ];       then export  CAQTDM_LOGGING_ARCHIVELIBS=`pwd`/caQtDM_Binaries;
+  fi
 
   if [ -z "$QTDM_LIBINSTALL" ];  then  export  QTDM_LIBINSTALL=$EPICSEXTENSIONS/lib/$EPICS_HOST_ARCH;
   fi
@@ -78,6 +83,11 @@ echo EPICSLIB             now defined as ${EPICSLIB}             for locating ep
 echo QTBASE               now defined as ${QTBASE}               for building the package locally, pointing to caQtDM_Binaries
 echo QTDM_RPATH           now defined as ${QTDM_RPATH}           for runtime search path 
 echo
+echo libraries for channel access archive and logging archive:
+echo
+echo CAQTDM_LOGGING_ARCHIVELIBS      now defined as ${CAQTDM_LOGGING_ARCHIVELIBS}   for logging archive rpc library
+echo CAQTDM_CA_ARCHIVELIBS           now defined as ${CAQTDM_CA_ARCHIVELIBS}   for channel access archive library
+echo
 echo for python:
 echo
 echo PYTHONVERSION        now defined as ${PYTHONVERSION}        for locating python
@@ -88,7 +98,6 @@ echo for zmq:
 echo
 echo ZMQINC               now defined as ${ZMQINC}               for locating zmq include files
 echo ZMQLIB               now defined as ${ZMQLIB}               for locating zmq libraries
-
 echo
 echo for install:
 echo

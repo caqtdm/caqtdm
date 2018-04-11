@@ -129,7 +129,16 @@ contains(QT_VER_MAJ, 4) {
   }
 }
 
-#message("$$PWD")
+defineTest(existFiles) {
+    files = $$ARGS
+
+    for(file, files) {
+        !exists($$file) {
+            return(false)
+        }
+    }
+    return(true)
+}
 
 # undefine this for archive retrieval plugin support (these plugins are only valid at psi)
 # take a look at the archiveSF in order to do something similar
@@ -139,26 +148,40 @@ archive: {
    CONFIG += archiveSF
 # next ones are only buildable at psi
 
-   X64 = $$find($$(QMAKESPEC), 64)
-   isEmpty(X64) {
-       exists(../../Libs/libNewLogRPC.a) {
+QMAKESPEC = $$(QMAKESPEC)
+X64 = $$find(QMAKESPEC, 64)
+
+isEmpty(X64) {
+       exists($(CAQTDM_LOGGING_ARCHIVELIBS)/libNewLogRPC.a) {
           message( "Configuring archive plugin build for logging (32)" )
           CONFIG += archiveHIPA
           CONFIG += archivePRO
+       } else {
+          warning("library libNewLogRPC.a not found, archive plugin will not be build for logging (32)" )
        }
-       exists(../caQtDM_Lib/caQtDM_Plugins/archive/archiveCA/Storage/libStorage_32.a) {
-          message( "Configuring archive plugin for CA (32)" )
-          CONFIG += archiveCA
+
+       allFiles = $(CAQTDM_CA_ARCHIVELIBS)/Storage/libStorage_32.a $(CAQTDM_CA_ARCHIVELIBS)/Tools/libTools_32.a $(CAQTDM_CA_ARCHIVELIBS)/xerces-c-3.1.4/libxerces-c_32.a
+       existFiles($$join(allFiles, " ")) {
+         message( "Configuring archive plugin build for CA (32)" )
+         CONFIG += archiveCA
+       } else {
+          warning("some library (libStorage_32.a or libTools_32.a or ibxerces-c_32.a) for ca_archiver not found, ca_archive plugin will not be build" )
        }
     } else {
-       exists(../../Libs/libNewLogRPC_64.a) {
-           message( "Configuring archive plugin for logging (64)" )
+       exists($(CAQTDM_LOGGING_ARCHIVELIBS)/libNewLogRPC_64.a) {
+          message( "Configuring archive plugin for logging (64)" )
           CONFIG += archiveHIPA
           CONFIG += archivePRO
+       } else {
+          warning("library libNewLogRPC_64.a not found, archive plugin will not be build for logging (64)" )
        }
-       exists(../caQtDM_Lib/caQtDM_Plugins/archive/archiveCA/Storage/libStorage_64.a) {
-          message( "Configuring archive pluging for CA (64)" )
+
+       allFiles = $(CAQTDM_CA_ARCHIVELIBS)/Storage/libStorage_64.a $(CAQTDM_CA_ARCHIVELIBS)/Tools/libTools_64.a $(CAQTDM_CA_ARCHIVELIBS)/xerces-c-3.1.4/libxerces-c_64.a
+       existFiles($$join(allFiles, " ")) {
+          message( "Configuring archive plugin for CA (64)" )
           CONFIG += archiveCA
+       } else {
+          warning("some library (libStorage_64.a or libTools_64.a or ibxerces-c_64.a) for ca_archiver not found, ca_archive plugin will not be build" )
        }
     }
 }

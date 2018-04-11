@@ -20,9 +20,9 @@ INCLUDEPATH    += ../
 INCLUDEPATH    += ../../
 INCLUDEPATH    += ../../../src
 INCLUDEPATH    += ../../../../caQtDM_QtControls/src/
-INCLUDEPATH    += ./Tools
-INCLUDEPATH    += ./Storage
-INCLUDEPATH    += ./xerces-c-3.1.4/src
+INCLUDEPATH    += $(CAQTDM_CA_ARCHIVELIBS)/Tools
+INCLUDEPATH    += $(CAQTDM_CA_ARCHIVELIBS)/Storage
+INCLUDEPATH    += $(CAQTDM_CA_ARCHIVELIBS)/xerces-c-3.1.4/src
 INCLUDEPATH    += $(EPICSINCLUDE)
 INCLUDEPATH    += $(EPICSINCLUDE)/os/Linux
 #for epics 3.15 and gcc we need this
@@ -40,13 +40,13 @@ X64 = $$find(QMAKESPEC, 64)
 
 isEmpty(X64) {
     message( "Building for 32 bit")
-    LIBS += ./Storage/libStorage_32.a
-    LIBS += ./Tools/libTools_32.a
-    LIBS += ./xerces-c-3.1.4/libxerces-c_32.a
+    LIBS += $(CAQTDM_CA_ARCHIVELIBS)/Storage/libStorage_32.a
+    LIBS += $(CAQTDM_CA_ARCHIVELIBS)/Tools/libTools_32.a
+    LIBS += $(CAQTDM_CA_ARCHIVELIBS)/xerces-c-3.1.4/libxerces-c_32.a
 } else {
     message( "Building for 64 bit")
-    LIBS += ./Storage/libStorage_64.a
-    LIBS += ./Tools/libTools_64.a
-    LIBS += ./xerces-c-3.1.4/libxerces-c_64.a
+    LIBS += $(CAQTDM_CA_ARCHIVELIBS)/Storage/libStorage_64.a
+    LIBS += $(CAQTDM_CA_ARCHIVELIBS)/Tools/libTools_64.a
+    LIBS += $(CAQTDM_CA_ARCHIVELIBS)/xerces-c-3.1.4/libxerces-c_64.a
     LIBS +=  -L/lib64/ -lcurl
 }
