@@ -3160,7 +3160,6 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     QString pluginFlavor="";
     ControlsInterface *plugininterface = (ControlsInterface *) 0;
 
-
     ftime(&now);
     w->setProperty("Connect", false);
     int rate = DEFAULTRATE;  // default will be 5Hz
@@ -3169,11 +3168,12 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
 
     //qDebug() << "add monitor for " << pv << "soft=" << kData->soft;
 
-    QString trimmedPV = pv.trimmed();
+    // replace macros
+    QString trimmedPV = treatMacro(map, pv.trimmed(), &doNothing, w->objectName());
 
     // is there a json string ?
     int pos = trimmedPV.indexOf("{");
-    if(pos != -1) {
+    if((pos != -1) && trimmedPV.contains("monitor")) {
         int status;
         char asc[255];
         QString JSONString = trimmedPV.mid(pos);
@@ -3187,17 +3187,15 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
         postMessage(QtDebugMsg, asc);
     }
 
-    // replace macro with ist value
-    QString newPV = treatMacro(map, trimmedPV, &doNothing, w->objectName());
-    *pvRep = newPV;
+    *pvRep = trimmedPV;
 
     // find out what kind of interface has to be used for this pv, default is epics3 or whatever is specified on the command line with -cs
 
     // specified with the channel
-    pos = newPV.indexOf("://");
+    pos = trimmedPV.indexOf("://");
     if(pos != -1) {
-        pluginName = newPV.mid(0, pos);
-        trimmedPV = newPV.mid(pos+3);
+        pluginName = trimmedPV.mid(0, pos);
+        trimmedPV = trimmedPV.mid(pos+3);
 
         // take care of some specialties epics4 (one can specify epics4://, pva:// or ca://
         if(pluginName.contains("epics4")) pluginFlavor = "pva";  // default when epics4 is specified
@@ -3225,7 +3223,6 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
            pluginName = defaultPlugin;
            if(pluginName.contains("epics4")) pluginFlavor = "pva";  // default when epics4 is specified
         }
-        trimmedPV = newPV;
         if(kData->soft) pluginName = "intern";
         if(mutexKnobDataP->getSoftPV(trimmedPV, &indx, thisW)) pluginName = "intern";
     }
