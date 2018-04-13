@@ -341,7 +341,6 @@ void bsread_Decode::setHeader(char *value,size_t size){
                     if (jsonobj3.find(L"type") != jsonobj3.end() && jsonobj3[L"type"]->IsString()) {
 
                         QString value=QString::fromWCharArray(jsonobj3[L"type"]->AsString().c_str());
-
                         if (value=="float64"){
                             chdata->type=bs_float64;
                         }else if(value=="float32"){
@@ -366,6 +365,8 @@ void bsread_Decode::setHeader(char *value,size_t size){
                             chdata->type=bs_bool;
                         }else if(value=="string"){
                             chdata->type=bs_string;
+                        }else{
+                            chdata->type=bs_none;
                         }
 
 
@@ -383,9 +384,49 @@ void bsread_Decode::setHeader(char *value,size_t size){
                     }
 
                     if (jsonobj3.find(L"encoding") != jsonobj3.end() && jsonobj3[L"encoding"]->IsString()) {
-                        if (QString::fromWCharArray(jsonobj3[L"encoding"]->AsString().c_str())=="big"){
+                        QString encoding=QString::fromWCharArray(jsonobj3[L"encoding"]->AsString().c_str());
+
+                        if (encoding=="big"){
                             chdata->endianess=bs_big;
+                        }else if(encoding!="little"){
+                           chdata->endianess=bs_other;
                         }
+                        QStringList enc_values=encoding.split(",");
+                        bsread_channeldata *encoding_chdata;
+                        if (enc_values.count()>0){
+                            QString EncodingChannel=chdata->name;
+                            encoding_chdata=new bsread_channeldata();
+                            Channels.append(encoding_chdata);
+                            EncodingChannel.append(".ENC_GROUP");
+                            encoding_chdata->type=bs_string;
+                            encoding_chdata->name=EncodingChannel;
+                            encoding_chdata->bsdata.bs_string=enc_values.at(0);
+                            encoding_chdata->valid=true;
+                            ChannelSearch.insert(EncodingChannel, encoding_chdata);
+                        }
+                        if (enc_values.count()>1){
+                            QString EncodingChannel=chdata->name;
+                            encoding_chdata=new bsread_channeldata();
+                            Channels.append(encoding_chdata);
+                            EncodingChannel.append(".ENC_TYPE");
+                            encoding_chdata->type=bs_string;
+                            encoding_chdata->name=EncodingChannel;
+                            encoding_chdata->bsdata.bs_string=enc_values.at(1);
+                            encoding_chdata->valid=true;
+                            ChannelSearch.insert(EncodingChannel, encoding_chdata);
+                        }
+                        if (enc_values.count()>2){
+                            QString EncodingChannel=chdata->name;
+                            encoding_chdata=new bsread_channeldata();
+                            Channels.append(encoding_chdata);
+                            EncodingChannel.append(".ENC_SUBTYPE");
+                            encoding_chdata->type=bs_string;
+                            encoding_chdata->name=EncodingChannel;
+                            encoding_chdata->bsdata.bs_string=enc_values.at(2);
+                            encoding_chdata->valid=true;
+                            ChannelSearch.insert(EncodingChannel, encoding_chdata);
+                        }
+
                     }
                     if (jsonobj3.find(L"shape") != jsonobj3.end() && jsonobj3[L"shape"]->IsArray()) {
                         chdata->shape.clear();
@@ -608,6 +649,11 @@ void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message,size_t
             }
         }else{
             if (datasize>1){
+                // handle Image Color data as 16 bit
+                if (Data->endianess==bs_other){
+                  Data->type=bs_uint16;
+
+                }
 
                 bsdata_assign_single(Data, message,&datatypesize);
                 if(Data->bsdata.wf_data_size!=(ulong)(datasize*datatypesize)){

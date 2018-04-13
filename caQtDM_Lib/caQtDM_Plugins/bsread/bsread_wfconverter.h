@@ -74,13 +74,13 @@ public:
         QElapsedTimer timer;
         timer.start();
 
-
+        if (bsreadPVP->valid){
         if ((ulong)kDataP->edata.valueCount!=bsreadPVP->bsdata.wf_data_size){
             QMutex *datamutex;
             datamutex = (QMutex*) kDataP->mutex;
             datamutex->lock();
             if (kDataP->edata.dataB==NULL){
-                qDebug() << "Realloc";
+                qDebug() << "Realloc"<< bsreadPVP->name << bsreadPVP->bsdata.wf_data_size<< sizeof(T_CAQTDM);
                 free(kDataP->edata.dataB);
             }
 
@@ -138,7 +138,7 @@ public:
 
           }
       }
-
+    }
 };
 
 

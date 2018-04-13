@@ -30,11 +30,11 @@
 #include <QAtomicInt>
 
 enum bsread_types{
-    bs_string,bs_float64,bs_float32,bs_int64,bs_int32,bs_uint64,bs_uint32,bs_int16,bs_uint16,bs_int8,bs_uint8,bs_bool
+    bs_string,bs_float64,bs_float32,bs_int64,bs_int32,bs_uint64,bs_uint32,bs_int16,bs_uint16,bs_int8,bs_uint8,bs_bool,bs_none
 };
 
 enum bsread_endian{
-    bs_little,bs_big
+    bs_little,bs_big,bs_other
 };
 typedef struct _bs_data{
    QString bs_string;

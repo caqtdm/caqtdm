@@ -70,6 +70,9 @@ void bsread_wfhandling::wfconvert()
         }
         case bs_uint8:{
             bsread_wfConverter<quint8,int> *converter=new bsread_wfConverter<quint8,int>(kDataP,bsreadPVP,BlockPoolP);
+            if (bsreadPVP->endianess==bs_other){
+                converter->usememcpy();
+            }
             converter->wfconvert();
             delete converter;
             break;
