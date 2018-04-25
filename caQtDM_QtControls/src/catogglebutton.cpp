@@ -96,14 +96,13 @@ void caToggleButton::setColors(QColor bg, QColor fg)
             thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
             thisStyle = thisStyle.arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
                     arg(defForeColor.red()).arg(defForeColor.green()).arg(defForeColor.blue()).arg(defForeColor.alpha());
-
         } else {
             thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
             thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
                     arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
-            oldBackColor = bg;
-            oldForeColor = fg;
         }
+        oldBackColor = bg;
+        oldForeColor = fg;
     }
 
     if(thisStyle != oldStyle || thisColorMode != oldColorMode) {
