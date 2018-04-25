@@ -7167,14 +7167,14 @@ void CaQtDM_Lib::ComputeNumericMaxMinPrec(QWidget* widget, const knobData& data)
         }
 
         if (caApplyNumeric *applynumericWidget = qobject_cast<caApplyNumeric *>(widget)) {
-            if(maxValue != applynumericWidget->getMaxValue()) applynumericWidget->setMaxValue(maxValue);
-            if(minValue != applynumericWidget->getMinValue()) applynumericWidget->setMinValue(minValue);
+            applynumericWidget->setMaxValue(maxValue);
+            applynumericWidget->setMinValue(minValue);
         } else if (caNumeric *numericWidget = qobject_cast<caNumeric *>(widget)) {
-            if(maxValue != numericWidget->getMaxValue()) numericWidget->setMaxValue(maxValue);
-            if(minValue != numericWidget->getMinValue()) numericWidget->setMinValue(minValue);
+            numericWidget->setMaxValue(maxValue);
+            numericWidget->setMinValue(minValue);
         } else if (caSpinbox *spinboxWidget = qobject_cast<caSpinbox *>(widget)) {
-            if(maxValue != spinboxWidget->getMaxValue()) spinboxWidget->setMaxValue(maxValue);
-            if(minValue != spinboxWidget->getMinValue()) spinboxWidget->setMinValue(minValue);
+            spinboxWidget->setMaxValue(maxValue);
+            spinboxWidget->setMinValue(minValue);
         }
 
         if(!fixedFormat) {
