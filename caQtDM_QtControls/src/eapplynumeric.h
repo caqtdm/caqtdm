@@ -206,6 +206,7 @@ public slots:
     void clearModified(){ button->clearModified(); }
 	virtual void setFont(const QFont &);
 	void disable() { setDisabled(true); }
+    void UpdateDisplayedValue(double v) {data->setValue(v);}
 	
   private slots:
 	void numericValueChanged(double);
