@@ -125,6 +125,7 @@ void MutexKnobData::InsertSoftPV(QString pv, int num, QWidget *w)
 void  MutexKnobData::BuildSoftPVList(QWidget *w)
 {
     char asc[MAXPVLEN+20];
+    softlist softstruct;
     QMutexLocker locker(&mutex);
     softPV_List.clear();
     // go through all our monitors
@@ -134,7 +135,10 @@ void  MutexKnobData::BuildSoftPVList(QWidget *w)
             // when the main widget corresponds keep it
             if(w == w1) {
                 sprintf(asc, "%s_%d_%p", KnobData[i].pv, KnobData[i].index, w);
-                softPV_List.insert(asc, KnobData[i].index);
+                softstruct.pv = QString(KnobData[i].pv);
+                softstruct.index = KnobData[i].index;
+                softstruct.w = w;
+                softPV_List.insert(asc, softstruct);
                 //qDebug() << "insert softpv_list" << asc << KnobData[i].dispName ;
             }
         }
@@ -144,7 +148,10 @@ void  MutexKnobData::BuildSoftPVList(QWidget *w)
             if(getSoftPV(KnobData[i].pv, &index, (QWidget *) KnobData[i].thisW)) {
                 mutex.unlock();
                 sprintf(asc, "%s_%d_%p", KnobData[i].pv, KnobData[i].index, w);
-                softPV_List.insert(asc, KnobData[i].index);
+                softstruct.pv = QString(KnobData[i].pv);
+                softstruct.index = KnobData[i].index;
+                softstruct.w = w;
+                softPV_List.insert(asc, softstruct);
                 InsertSoftPV(KnobData[i].pv, KnobData[i].index, (QWidget *) KnobData[i].thisW);
                 //qDebug() << "insert untill now unknown pv" << asc << KnobData[i].index;
                 mutex.lock();
@@ -233,14 +240,15 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w, int dataI
     }
 
     // and update everywhere where this soft channel is also used on this main window
-    QMapIterator<QString, int> i(softPV_List);
+    QMapIterator<QString, softlist> i(softPV_List);
+    softlist softstruct;
     while (i.hasNext()) {
         i.next();
-        QStringList list = i.key().split("_");
-        if(pv == list.at(0)) {
-            int indx = i.value();
-            if(KnobData[indx].index != -1 && KnobData[indx].pv == pv && ((QWidget*) list.at(2).toLong(0,16) ==  w)) {
-                //qDebug() <<  "     update index=" << i.value() << i.key() <<  w << "with" << value;
+        softstruct = i.value();
+        if(pv == softstruct.pv) {
+            int indx = softstruct.index;
+            if(KnobData[indx].index != -1 && KnobData[indx].pv == pv && softstruct.w == w) {
+                //qDebug() <<  "     update index=" << softstruct.index << i.key() <<  w << "with" << value;
 
                 // simple double
                 if(dataCount <= 1) {
