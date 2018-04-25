@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1144</width>
-    <height>658</height>
+    <width>1072</width>
+    <height>655</height>
    </rect>
   </property>
   <property name="styleSheet">
@@ -178,16 +178,16 @@ border-radius: 2px;
       <enum>caCamera::box_crosshairs</enum>
      </property>
      <property name="ROI_readType" stdset="0">
-      <enum>caCamera::xycenter_width_height</enum>
+      <enum>caCamera::xy_only</enum>
      </property>
      <property name="ROI_writeChannels" stdset="0">
       <string notr="true">FIGX;FIGY;FIGW;FIGH;</string>
      </property>
      <property name="ROI_writemarkerType" stdset="0">
-      <enum>caCamera::box</enum>
+      <enum>caCamera::box_crosshairs</enum>
      </property>
      <property name="ROI_writeType" stdset="0">
-      <enum>caCamera::xycenter_width_height</enum>
+      <enum>caCamera::xy_only</enum>
      </property>
     </widget>
     <widget class="caCalc" name="cacalc_10">
@@ -525,7 +525,7 @@ def PythonCalc(a, b, c, d):
    <widget class="QComboBox" name="comboBox">
     <property name="geometry">
      <rect>
-      <x>697</x>
+      <x>690</x>
       <y>17</y>
       <width>102</width>
       <height>23</height>
@@ -637,76 +637,10 @@ def PythonCalc(a, b, c, d):
      </property>
     </item>
    </widget>
-   <widget class="QDoubleSpinBox" name="doubleSpinBox">
-    <property name="geometry">
-     <rect>
-      <x>940</x>
-      <y>96</y>
-      <width>95</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <double>0.000000000000000</double>
-    </property>
-    <property name="maximum">
-     <double>2.000000000000000</double>
-    </property>
-    <property name="singleStep">
-     <double>0.010000000000000</double>
-    </property>
-    <property name="value">
-     <double>1.000000000000000</double>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
-    <property name="geometry">
-     <rect>
-      <x>940</x>
-      <y>132</y>
-      <width>95</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <double>0.000000000000000</double>
-    </property>
-    <property name="maximum">
-     <double>2.000000000000000</double>
-    </property>
-    <property name="singleStep">
-     <double>0.010000000000000</double>
-    </property>
-    <property name="value">
-     <double>1.000000000000000</double>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
-    <property name="geometry">
-     <rect>
-      <x>940</x>
-      <y>169</y>
-      <width>95</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <double>0.000000000000000</double>
-    </property>
-    <property name="maximum">
-     <double>2.000000000000000</double>
-    </property>
-    <property name="singleStep">
-     <double>0.010000000000000</double>
-    </property>
-    <property name="value">
-     <double>1.000000000000000</double>
-    </property>
-   </widget>
    <widget class="QComboBox" name="comboBox_2">
     <property name="geometry">
      <rect>
-      <x>698</x>
+      <x>690</x>
       <y>52</y>
       <width>104</width>
       <height>23</height>
@@ -736,8 +670,8 @@ def PythonCalc(a, b, c, d):
    <widget class="caLineEdit" name="calineedit">
     <property name="geometry">
      <rect>
-      <x>1028</x>
-      <y>12</y>
+      <x>875</x>
+      <y>21</y>
       <width>100</width>
       <height>20</height>
      </rect>
@@ -749,8 +683,8 @@ def PythonCalc(a, b, c, d):
    <widget class="caLineEdit" name="calineedit_2">
     <property name="geometry">
      <rect>
-      <x>1029</x>
-      <y>42</y>
+      <x>876</x>
+      <y>51</y>
       <width>100</width>
       <height>20</height>
      </rect>
@@ -762,8 +696,8 @@ def PythonCalc(a, b, c, d):
    <widget class="caCamera" name="cacamera_2">
     <property name="geometry">
      <rect>
-      <x>718</x>
-      <y>412</y>
+      <x>690</x>
+      <y>400</y>
       <width>294</width>
       <height>229</height>
      </rect>
@@ -823,8 +757,8 @@ def PythonCalc(a, b, c, d):
    <widget class="QComboBox" name="comboBox_3">
     <property name="geometry">
      <rect>
-      <x>1024</x>
-      <y>414</y>
+      <x>690</x>
+      <y>343</y>
       <width>110</width>
       <height>23</height>
      </rect>
@@ -938,8 +872,8 @@ def PythonCalc(a, b, c, d):
    <widget class="QComboBox" name="comboBox_4">
     <property name="geometry">
      <rect>
-      <x>1026</x>
-      <y>441</y>
+      <x>690</x>
+      <y>370</y>
       <width>106</width>
       <height>23</height>
      </rect>
@@ -965,38 +899,25 @@ def PythonCalc(a, b, c, d):
      </property>
     </item>
    </widget>
-   <widget class="caLabel" name="calabel">
-    <property name="geometry">
-     <rect>
-      <x>702</x>
-      <y>95</y>
-      <width>217</width>
-      <height>43</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;rgb correction coefficients&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-   </widget>
    <widget class="caLabel" name="calabel_2">
     <property name="geometry">
      <rect>
-      <x>930</x>
-      <y>13</y>
-      <width>90</width>
+      <x>827</x>
+      <y>22</y>
+      <width>40</width>
       <height>28</height>
      </rect>
     </property>
     <property name="text">
-     <string>w:</string>
+     <string>W:</string>
     </property>
    </widget>
    <widget class="caLabel" name="calabel_3">
     <property name="geometry">
      <rect>
-      <x>931</x>
-      <y>38</y>
-      <width>90</width>
+      <x>827</x>
+      <y>47</y>
+      <width>40</width>
       <height>28</height>
      </rect>
     </property>
@@ -1004,9 +925,148 @@ def PythonCalc(a, b, c, d):
      <string>H:</string>
     </property>
    </widget>
+   <widget class="caApplyNumeric" name="caapplynumeric">
+    <property name="geometry">
+     <rect>
+      <x>816</x>
+      <y>138</y>
+      <width>175</width>
+      <height>62</height>
+     </rect>
+    </property>
+    <property name="integerDigits" stdset="0">
+     <number>6</number>
+    </property>
+    <property name="decimalDigits" stdset="0">
+     <number>0</number>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">roi:x</string>
+    </property>
+    <property name="precisionMode">
+     <enum>caApplyNumeric::User</enum>
+    </property>
+    <property name="fixedFormat">
+     <bool>true</bool>
+    </property>
+    <property name="limitsMode">
+     <enum>caApplyNumeric::User</enum>
+    </property>
+    <property name="minValue">
+     <double>0.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="caApplyNumeric" name="caapplynumeric_2">
+    <property name="geometry">
+     <rect>
+      <x>817</x>
+      <y>220</y>
+      <width>175</width>
+      <height>62</height>
+     </rect>
+    </property>
+    <property name="integerDigits" stdset="0">
+     <number>6</number>
+    </property>
+    <property name="decimalDigits" stdset="0">
+     <number>0</number>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">roi:y</string>
+    </property>
+    <property name="precisionMode">
+     <enum>caApplyNumeric::User</enum>
+    </property>
+    <property name="fixedFormat">
+     <bool>true</bool>
+    </property>
+    <property name="limitsMode">
+     <enum>caApplyNumeric::User</enum>
+    </property>
+    <property name="minValue">
+     <double>0.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_34">
+    <property name="geometry">
+     <rect>
+      <x>696</x>
+      <y>156</y>
+      <width>97</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>set x value:</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <property name="background">
+     <color alpha="0">
+      <red>160</red>
+      <green>160</green>
+      <blue>164</blue>
+     </color>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_35">
+    <property name="geometry">
+     <rect>
+      <x>698</x>
+      <y>240</y>
+      <width>97</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>set y value:</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <property name="background">
+     <color alpha="0">
+      <red>160</red>
+      <green>160</green>
+      <blue>164</blue>
+     </color>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_25">
+    <property name="geometry">
+     <rect>
+      <x>867</x>
+      <y>314</y>
+      <width>100</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">roi:x</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_26">
+    <property name="geometry">
+     <rect>
+      <x>867</x>
+      <y>345</y>
+      <width>100</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">roi:y</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>caApplyNumeric</class>
+   <extends>QWidget</extends>
+   <header>caApplyNumeric</header>
+  </customwidget>
   <customwidget>
    <class>caChoice</class>
    <extends>QWidget</extends>
@@ -1042,54 +1102,6 @@ def PythonCalc(a, b, c, d):
  <resources/>
  <connections>
   <connection>
-   <sender>doubleSpinBox</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>cacamera</receiver>
-   <slot>red_coeff(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>940</x>
-     <y>109</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>360</x>
-     <y>183</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>doubleSpinBox_2</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>cacamera</receiver>
-   <slot>green_coeff(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>940</x>
-     <y>150</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>291</x>
-     <y>236</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>doubleSpinBox_3</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>cacamera</receiver>
-   <slot>blue_coeff(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>940</x>
-     <y>184</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>373</x>
-     <y>277</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>comboBox_2</sender>
    <signal>activated(QString)</signal>
    <receiver>cacamera</receiver>
@@ -1122,34 +1134,66 @@ def PythonCalc(a, b, c, d):
    </hints>
   </connection>
   <connection>
-   <sender>comboBox_3</sender>
+   <sender>cacalc_9</sender>
+   <signal>changeValue(double)</signal>
+   <receiver>caapplynumeric</receiver>
+   <slot>UpdateDisplayedValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>131</x>
+     <y>557</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>855</x>
+     <y>169</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox</sender>
    <signal>activated(QString)</signal>
    <receiver>cacamera_2</receiver>
    <slot>setDecodemodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1050</x>
-     <y>430</y>
+     <x>765</x>
+     <y>31</y>
     </hint>
     <hint type="destinationlabel">
-     <x>970</x>
-     <y>429</y>
+     <x>966</x>
+     <y>414</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>comboBox_4</sender>
+   <sender>comboBox_2</sender>
    <signal>activated(QString)</signal>
    <receiver>cacamera_2</receiver>
    <slot>setPackingmodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1087</x>
-     <y>455</y>
+     <x>765</x>
+     <y>66</y>
     </hint>
     <hint type="destinationlabel">
-     <x>895</x>
-     <y>448</y>
+     <x>823</x>
+     <y>430</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_10</sender>
+   <signal>changeValue(double)</signal>
+   <receiver>caapplynumeric_2</receiver>
+   <slot>UpdateDisplayedValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>102</x>
+     <y>579</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>857</x>
+     <y>251</y>
     </hint>
    </hints>
   </connection>
