@@ -1093,20 +1093,24 @@ record(calc, "SZ")
 ###########################################################################################
 
 record(waveform, "ACM:PICTURE"){
-        field(DESC, "16bit waveform")
+	field(DTYP, "fileread")
+	field(INP, "@bayerpicture.dat")
+        field(DESC, "16bit image waveform")
         field(FTVL, "SHORT")
         field(NELM, "16000000")
-        field(SCAN,".1 second")
+        field(SCAN,"1 second")
 }
 
 record(ao, "ACM:PICTURE:WIDTH"){
         field(DESC, "width")
-        field(SCAN,".1 second")     
+        field(SCAN,"1 second")   
+	field(VAL, "1410")  
 }
 
-record(calc, "ACM:PICTURE:HEIGHT"){
+record(ao, "ACM:PICTURE:HEIGHT"){
         field(DESC, "height")
-        field(SCAN,".1 second")
+        field(SCAN,"1 second")
+	field(VAL, "930")
 }
 
 record(ao, "ACM:BPM1") {

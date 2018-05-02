@@ -1,0 +1,6 @@
+export IOC=$HOSTNAME-sioc
+# -s is to get epics prompt (interactive ?!?)
+iocsh st.cmd
+
+
+
