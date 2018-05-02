@@ -99,6 +99,10 @@ record(ao, "ACM:MOTOR") {
 record(ao,"ACM:TEST:AO:AMP") {
     field(DESC,"analog output noise amplitude")
     field(SCAN,"Passive")
+        field(DRVH,"10000000.0")
+    field(DRVL,"-10000000.0")
+    field(HOPR,"90000000.0")
+    field(LOPR,"0.0")
 }
 
 record(calc, "ACM:TEST:AO:NOISE"){
@@ -1088,23 +1092,22 @@ record(calc, "SZ")
 
 ###########################################################################################
 
-#record(waveform, "ACM:PICTURE"){
-#        field(DESC, "16bit waveform")
-#        field(FTVL, "SHORT")
-#        field(NELM, "16000000")
-#        field(INP, "MTEST-CAQTDM-CAMERA:FPICTURE CP")
-#}
+record(waveform, "ACM:PICTURE"){
+        field(DESC, "16bit waveform")
+        field(FTVL, "SHORT")
+        field(NELM, "16000000")
+        field(SCAN,".1 second")
+}
 
-#record(calc, "ACM:PICTURE:WIDTH"){
-#        field(CALC, "A")
-#        field(DESC, "width")
-#        field(INPA, "MTEST-CAQTDM-CAMERA:WIDTH CP")
-#}
-#record(calc, "ACM:PICTURE:HEIGHT"){
-#        field(CALC, "A")
-#        field(DESC, "height")
-#        field(INPA, "MTEST-CAQTDM-CAMERA:HEIGHT CP")
-#}
+record(ao, "ACM:PICTURE:WIDTH"){
+        field(DESC, "width")
+        field(SCAN,".1 second")     
+}
+
+record(calc, "ACM:PICTURE:HEIGHT"){
+        field(DESC, "height")
+        field(SCAN,".1 second")
+}
 
 record(ao, "ACM:BPM1") {
 }
@@ -1167,4 +1170,5 @@ record(ai,"ACM:BPM5:Y") {
     field(PINI,"YES")
     field(INP,"10")
 }
+
 
