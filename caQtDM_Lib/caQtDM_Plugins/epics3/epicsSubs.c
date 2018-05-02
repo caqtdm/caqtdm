@@ -119,6 +119,16 @@ char* myLimitedString (char * strng) {
     strcpy(kData.edata.fec, myLimitedString((char*) ca_host_name(args.chid))); \
     kData.edata.monitorCount = info->event; }
 
+#define EpicsPut_ErrorMessage_ClearChannel_Return  \
+    C_postMsgEvent(messageWindowPtr, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status))); \
+    ca_clear_channel(ch); \
+    return status;
+
+#define EpicsGet_ErrorMessage_ClearChannel_Return  \
+    C_postMsgEvent(messageWindowPtr, 1, vaPrintf("get pv (%s) %s\n", pv, ca_message (status))); \
+    ca_clear_channel(ch); \
+    return status;
+
 /**
  * general print routine with timestamp
  */
@@ -975,6 +985,7 @@ int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *obje
 
     if (ca_state(ch) != cs_conn) {
         C_postMsgEvent(messageWindowPtr, 1, vaPrintf("pv (%s) is not connected\n", pv));
+        ca_clear_channel(ch);
         return status;
     }
 
@@ -989,8 +1000,7 @@ int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *obje
         PRINT(printf("Epicsput string for <%s> with data=%s\n", pv, sdata));
         status = ca_put(DBR_STRING, ch, sdata);
         if (status != ECA_NORMAL) {
-            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
-            return status;
+            EpicsPut_ErrorMessage_ClearChannel_Return;
         }
         break;
 
@@ -998,8 +1008,7 @@ int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *obje
         PRINT(printf("Epicsput int for <%s> with data=%d\n", pv, (int) idata));
         status = ca_put(DBR_INT, ch, &idata);
         if (status != ECA_NORMAL) {
-            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
-            return status;
+             EpicsPut_ErrorMessage_ClearChannel_Return;
         }
         break;
 
@@ -1007,8 +1016,7 @@ int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *obje
         PRINT(printf("Epicsput long for <%s> with data=%d\n", pv, (int) idata));
         status = ca_put(DBR_LONG, ch, &idata);
         if (status != ECA_NORMAL) {
-            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
-            return status;
+             EpicsPut_ErrorMessage_ClearChannel_Return;
         }
         break;
 
@@ -1017,8 +1025,7 @@ int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *obje
         PRINT(printf("put double/float for <%s> with data=%f chid=%p\n", pv, rdata, ch));
         status = ca_put(DBR_DOUBLE, ch, &rdata);
         if (status != ECA_NORMAL) {
-            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("put pv (%s) %s)\n", pv, ca_message (status)));
-            return status;
+             EpicsPut_ErrorMessage_ClearChannel_Return;
         }
         break;
 
@@ -1026,8 +1033,7 @@ int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *obje
         PRINT(printf("put char array for <%s> with <%s>\n", pv, sdata));
         status = ca_array_put(DBR_CHAR, strlen(sdata)+1, ch, sdata);
         if (status != ECA_NORMAL) {
-            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
-            return status;
+             EpicsPut_ErrorMessage_ClearChannel_Return;
         }
         break;
 
@@ -1038,8 +1044,7 @@ int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *obje
 
     status = ca_pend_io(CA_TIMEOUT);
     if (status != ECA_NORMAL) {
-        C_postMsgEvent(messageWindowPtr, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
-        return status;
+         EpicsPut_ErrorMessage_ClearChannel_Return;
     }
 
     // something was written, so check status
@@ -1055,8 +1060,7 @@ int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *obje
         status = ca_get(DBR_CTRL_DOUBLE, ch, &ctrlR);
         status = ca_pend_io(CA_TIMEOUT);
         if (status != ECA_NORMAL) {
-            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("get pv (%s) %s\n", pv, ca_message (status)));
-            return status;
+             EpicsGet_ErrorMessage_ClearChannel_Return;
         }
         status = ctrlR.status;
         break;
@@ -1069,8 +1073,7 @@ int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *obje
         status = ca_get(DBR_STRING, ch, &ctrlS);
         status = ca_pend_io(CA_TIMEOUT);
         if (status != ECA_NORMAL) {
-            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("get pv (%s) %s\n", pv, ca_message (status)));
-            return status;
+             EpicsGet_ErrorMessage_ClearChannel_Return;
         }
         status = ctrlS.status;
         break;
@@ -1081,6 +1084,9 @@ int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *obje
         default:
             C_postMsgEvent(messageWindowPtr, 1, vaPrintf("unhandled epics type (%d) in epicssetvalue\n", chType));
     }
+
+    status = ca_clear_channel(ch);
+
 
     return ECA_NORMAL;
 
@@ -1121,36 +1127,31 @@ int EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t
     case DBF_DOUBLE:
         status = ca_array_put (DBR_DOUBLE, (unsigned long) nelm, ch, ddata);
         if (status != ECA_NORMAL) {
-            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
-            return status;
+            EpicsPut_ErrorMessage_ClearChannel_Return;
         }
         break;
     case DBF_FLOAT:
         status = ca_array_put (DBR_FLOAT, (unsigned long) nelm, ch, fdata);
         if (status != ECA_NORMAL) {
-            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
-            return status;
+            EpicsPut_ErrorMessage_ClearChannel_Return;
         }
         break;
     case DBF_INT:
         status = ca_array_put (DBR_INT, (unsigned long) nelm, ch, data16);
         if (status != ECA_NORMAL) {
-            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
-            return status;
+            EpicsPut_ErrorMessage_ClearChannel_Return;
         }
         break;
     case DBF_LONG:
         status = ca_array_put (DBR_LONG, (unsigned long) nelm, ch, data32);
         if (status != ECA_NORMAL) {
-            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
-            return status;
+            EpicsPut_ErrorMessage_ClearChannel_Return;
         }
         break;
     case DBF_CHAR:
         status = ca_array_put (DBR_CHAR, (unsigned long) nelm, ch, sdata);
         if (status != ECA_NORMAL) {
-            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
-            return status;
+            EpicsPut_ErrorMessage_ClearChannel_Return;
         }
         break;
 
@@ -1163,6 +1164,8 @@ int EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t
         C_postMsgEvent(messageWindowPtr, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status)));
         return status;
     }
+
+    status = ca_clear_channel(ch);
 
     return ECA_NORMAL;
 }
