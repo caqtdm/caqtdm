@@ -595,6 +595,12 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     this->addAction(ResizeDownAction);
 
     char asc[100];
+    QString path = thisFileFull;
+    int pos = path.lastIndexOf("/");
+    if((pos > 0) && ((path.length() - pos -1) > 0)) path.chop(path.length() - pos -1);
+    sprintf(asc, "special macro CAQTDM_INTERNAL_UIPATH set to %s\n", qasc(path));
+    postMessage(QtWarningMsg, asc);
+
     strcpy(asc,"unresolved macros present, press context in display to obtain a list");
     if(unknownMacrosList.count() > 0) postMessage(QtCriticalMsg, asc);
 }
@@ -986,6 +992,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
     if(className.contains("ca") || className.contains("QTextBrowser") || className.contains("replaceMacro") || className.contains("QTabWidget")) {
         PRINT(printf("\n%*c %s macro=<%s>", 15 * level, '+', qasc(w1->objectName()), qasc(macro)));
         map = createMap(macro);
+        // insert special macro into map
+        QString path = thisFileFull;
+        int pos = path.lastIndexOf("/");
+        if((pos > 0) && ((path.length() - pos -1) > 0)) path.chop(path.length() - pos -1);
+        map.insert("CAQTDM_INTERNAL_UIPATH", path);
     }
 
     QColor bg = w1->property("background").value<QColor>();
@@ -6256,6 +6267,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         else strcpy(colMode, "Static");
 
     } else if(caScriptButton* scriptbuttonWidget =  qobject_cast< caScriptButton *>(w)) {
+        Q_UNUSED(scriptbuttonWidget);
         // add action : kill associated process if running
         myMenu.addAction(KILLPROCESS);
 
