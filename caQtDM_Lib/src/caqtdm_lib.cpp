@@ -997,6 +997,32 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         int pos = path.lastIndexOf("/");
         if((pos > 0) && ((path.length() - pos -1) > 0)) path.chop(path.length() - pos -1);
         map.insert("CAQTDM_INTERNAL_UIPATH", path);
+        map.insert("CAQTDM_INTERNAL_STARTTIME", QTime::currentTime().toString());
+        map.insert("CAQTDM_INTERNAL_STARTDATE", QDate::currentDate().toString("dd.MM.yyyy"));
+
+        map.insert("CAQTDM_INTERNAL_VERSION", TARGET_VERSION_STR);
+
+        QString message = QString("%1");
+        message = message.arg(QT_VERSION_STR);
+        map.insert("CAQTDM_INTERNAL_QTVERSION", message);
+
+        path =qApp->applicationFilePath();
+        pos = path.lastIndexOf("/");
+        if((pos > 0) && ((path.length() - pos -1) > 0)) path.chop(path.length() - pos -1);
+        map.insert("CAQTDM_INTERNAL_EXEPATH", path);
+
+        map.insert("CAQTDM_INTERNAL_PID",QString::number(qApp->applicationPid()));
+        map.insert("CAQTDM_INTERNAL_HOSTNAME", QSysInfo::machineHostName());
+
+        map.insert("CAQTDM_INTERNAL_SCREENCOUNT",QString::number( qApp->desktop()->screenCount()));
+        map.insert("CAQTDM_INTERNAL_DPI",QString::number(qApp->primaryScreen()->physicalDotsPerInch()));
+        map.insert("CAQTDM_INTERNAL_REFRESHRATE",QString::number(qApp->primaryScreen()->refreshRate()));
+        map.insert("CAQTDM_INTERNAL_DESKTOP_WIDTH",QString::number(qApp->desktop()->size().width()));
+        map.insert("CAQTDM_INTERNAL_DESKTOP_HEIGHT",QString::number(qApp->desktop()->size().height()));
+
+        map.insert("CAQTDM_INTERNAL_CA_ADDRLIST",qgetenv("EPICS_CA_ADDR_LIST"));
+        map.insert("CAQTDM_INTERNAL_BS_ADDRLIST",qgetenv("BSREAD_ZMQ_ADDR_LIST"));
+        map.insert("CAQTDM_INTERNAL_BS_DISPATCHER",qgetenv("BSREAD_DISPATCHER"));
     }
 
     QColor bg = w1->property("background").value<QColor>();
