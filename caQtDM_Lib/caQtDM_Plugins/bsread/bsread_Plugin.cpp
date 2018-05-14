@@ -321,8 +321,19 @@ void bsreadPlugin::closeEvent(){
    //qDebug() << "bsreadPlugin:closeEvent ";
    emit closeSignal();
    Dispatcher->setTerminate();
-   DispatcherThread->quit();
+   DispatcherThread->terminate();
    DispatcherThread->wait();
+   if (bsreadThreads.count()>0){
+      bsreadconnections.last()->setTerminate();
+      bsreadThreads.last()->quit();
+      bsreadThreads.last()->wait(300);
+      if (bsreadThreads.last()->isRunning()){
+        bsreadThreads.last()->terminate();
+        bsreadThreads.last()->wait(3000);
+      }
+   }
+
+
 }
 
 

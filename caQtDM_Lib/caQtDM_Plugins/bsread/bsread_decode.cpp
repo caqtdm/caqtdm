@@ -215,7 +215,7 @@ void bsread_Decode::process()
                     bsread_Delay();
                     notReceivedCounter++;
                     if (notReceivedCounter>200){
-                        qDebug() << "bsread ZMQ Data Timeout";
+                        //qDebug() << "bsread ZMQ Data Timeout";
                         //bsread_DataTimeOut();
                         notReceivedCounter=0;
                     }
