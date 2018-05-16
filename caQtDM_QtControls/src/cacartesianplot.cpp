@@ -160,6 +160,7 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     thisCountNumber = 0;
     thisXaxisSyncGroup = 0;
     thisXticks = 5;
+    symbolSizeFactor = 1.0;
 
     plotGrid = new QwtPlotGrid();
     plotGrid->attach(this);
@@ -842,7 +843,7 @@ void caCartesianPlot::setColor(QColor c, int indx)
         } else if(thisStyle[indx] == Dots) {
             curve[indx].setPen(QPen(c, 0));
         } else {
-            int size=qMax(2, (int) qRound(this->geometry().height()/70.0));
+            int size=qMax(2, (int) qRound(this->geometry().height() * symbolSizeFactor / 70.0));
             curve[indx].setPen(QPen(c, size));
         }
     } else {
@@ -904,7 +905,7 @@ void caCartesianPlot::setSymbol(curvSymbol s, int indx)
     QwtSymbol::Style ms = myMarker(s);
     brush.setColor(thisLineColor[indx]);
     brush.setStyle(Qt::SolidPattern);
-    size=qMax(2, (int) qRound(this->geometry().height()/50.0));
+    size=qMax(2, (int) qRound(this->geometry().height() * symbolSizeFactor / 50.0 ));
     curve[indx].setSymbol(new QwtSymbol(ms, brush, QPen(thisLineColor[indx]), QSize(size, size)));
     replot();
 }

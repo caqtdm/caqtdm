@@ -121,6 +121,8 @@ class QTCON_EXPORT caCartesianPlot : public QwtPlot
     Q_PROPERTY(curvSymbol symbol_6 READ getSymbol_6 WRITE setSymbol_6)
     Q_PROPERTY(QColor color_6 READ getColor_6 WRITE setColor_6)
 
+    Q_PROPERTY(double symbolResizeFactor READ getSymbolsizeFactor WRITE setSymbolsizeFactor)
+
     Q_PROPERTY(plMode plotMode READ getPlotMode WRITE setPlotMode)
 
     Q_PROPERTY(QString countNumOrChannel READ getCountPV WRITE setCountPV)
@@ -158,7 +160,10 @@ class QTCON_EXPORT caCartesianPlot : public QwtPlot
 public:
 #include "caPropHandle.h"
 
-     void noStyle(QString style) {Q_UNUSED(style);}
+    double getSymbolsizeFactor() {return symbolSizeFactor;}
+    void setSymbolsizeFactor(double value) {symbolSizeFactor=value;}
+
+    void noStyle(QString style) {Q_UNUSED(style);}
 
     bool getXaxisEnabled() const { return thisXshow; }
     void setXaxisEnabled(bool thisXshow);
@@ -474,6 +479,8 @@ private:
 
     int thisXticks;
     bool whiteColors;
+
+    double symbolSizeFactor;
 
 };
 
