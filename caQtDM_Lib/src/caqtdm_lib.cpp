@@ -37,6 +37,7 @@
 #include <QObject>
 #include <QToolBar>
 #include <QUuid>
+#include <QHostInfo>
 
 // interfacing widgets, handling their own data acquisition ... (thanks zai)
 #include "caWidgetInterface.h"
@@ -1012,11 +1013,13 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         map.insert("CAQTDM_INTERNAL_EXEPATH", path);
 
         map.insert("CAQTDM_INTERNAL_PID",QString::number(qApp->applicationPid()));
-        map.insert("CAQTDM_INTERNAL_HOSTNAME", QSysInfo::machineHostName());
+        map.insert("CAQTDM_INTERNAL_HOSTNAME", QHostInfo::localHostName());
 
         map.insert("CAQTDM_INTERNAL_SCREENCOUNT",QString::number( qApp->desktop()->screenCount()));
-        map.insert("CAQTDM_INTERNAL_DPI",QString::number(qApp->primaryScreen()->physicalDotsPerInch()));
+        map.insert("CAQTDM_INTERNAL_DPI",QString::number( qApp->desktop()->physicalDpiX())); //qApp->primaryScreen()->physicalDotsPerInch()));
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
         map.insert("CAQTDM_INTERNAL_REFRESHRATE",QString::number(qApp->primaryScreen()->refreshRate()));
+#endif
         map.insert("CAQTDM_INTERNAL_DESKTOP_WIDTH",QString::number(qApp->desktop()->size().width()));
         map.insert("CAQTDM_INTERNAL_DESKTOP_HEIGHT",QString::number(qApp->desktop()->size().height()));
 
@@ -2414,6 +2417,27 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         cartesianplotWidget->setBackground(cartesianplotWidget->getBackground());
         cartesianplotWidget->setScaleColor(cartesianplotWidget->getScaleColor());
         cartesianplotWidget->setGridColor(cartesianplotWidget->getGridColor());
+
+        // reaffect special dynamic strings to be used for the archive plots (secondsPast, secondsUpdate, nrOfBins)
+        // should have been done with a new method, however stay compatible with existing caQtDM
+        QVariant dynVars;
+        for(int varLoop=0; varLoop < 3; varLoop++) {
+            bool ok = false;
+            if(varLoop == 0) dynVars = w1->property("secondsUpdate");
+            if(varLoop == 1) dynVars = w1->property("secondsPast");
+            if(varLoop == 2) dynVars = w1->property("nrOfBins");
+            if(!dynVars.isNull()) {
+                dynVars.toInt(&ok);
+                if(!ok && dynVars.canConvert<QString>())  {
+                    title =  dynVars.toString();
+                    if((reaffectText(map, &title, w1)) && (varLoop == 0)) cartesianplotWidget->setProperty("secondsUpdate", title);
+                    title =  dynVars.toString();
+                    if((reaffectText(map, &title, w1)) && (varLoop == 1)) cartesianplotWidget->setProperty("secondsPast", title);
+                    title =  dynVars.toString();
+                    if((reaffectText(map, &title, w1)) && (varLoop == 2)) cartesianplotWidget->setProperty("nrOfBins", title);
+                }
+            }
+        }
 
         // go through all possible curves and add monitor
         for(int i=0; i< caCartesianPlot::curveCount; i++) {
