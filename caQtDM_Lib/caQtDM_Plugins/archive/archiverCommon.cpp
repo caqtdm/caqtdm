@@ -137,7 +137,9 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
         QVariant var = w->property("secondsPast");
         if(!var.isNull()) {
-            index.secondsPast = var.toInt();
+            bool ok;
+            index.secondsPast = var.toInt(&ok);
+            if(!ok) index.secondsPast = 3600;
         } else {
             QString mess("Archive plugin -- no secondsPast defined as dynamic property in widget " + QString(kData->dispName) + ", default to 1 hour back");
             if(messagewindowP != (MessageWindow *) 0 && !QString(kData->pv).contains(".Y")) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
@@ -146,8 +148,11 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
 
         var = w->property("secondsUpdate");
+        qDebug() << var;
         if(!var.isNull()) {
-            index.updateSeconds = var.toInt();
+            bool ok;
+            index.updateSeconds = var.toInt(&ok);
+            if(!ok) index.updateSeconds = SECONDSTIMEOUT;
 
             // override the user specification if too many data are going to be requested
             if(index.secondsPast > 7200) index.updateSeconds = 60;

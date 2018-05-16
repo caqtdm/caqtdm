@@ -126,7 +126,9 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
             if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) indexNew.w)) {
                 QVariant var = w->property("nrOfBins");
                 if(!var.isNull()) {
-                    indexNew.nrOfBins = var.toInt();
+                    bool ok;
+                    indexNew.nrOfBins = var.toInt(&ok);
+                    if(!ok) indexNew.nrOfBins = -1;
                 } else if(indexNew.init){
                     QString mess("ArchiveSF plugin -- no nrOfBins defined as dynamic property in widget "  + w->objectName() + ", defaulting to maximum number of points");
                     if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
