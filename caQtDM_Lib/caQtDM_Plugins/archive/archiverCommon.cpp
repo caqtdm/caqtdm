@@ -148,7 +148,6 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
 
         var = w->property("secondsUpdate");
-        qDebug() << var;
         if(!var.isNull()) {
             bool ok;
             index.updateSeconds = var.toInt(&ok);
