@@ -470,6 +470,10 @@ void caLineEdit::setValue(double value, const QString& units)
     } else {
         sprintf(asc, thisFormat, value);
     }
+    if(qIsNaN(value)){
+      sprintf(asc, "nan");
+    }
+
     if(thisUnitMode) {
         strcat(asc, " ");
         strcat(asc, qasc(units));
