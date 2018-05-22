@@ -30,7 +30,7 @@
 #include <QStyle>
 #include <QtDebug>
 #include <QMouseEvent>
-
+#include <qnumeric.h>
 #include "knobDefines.h"
 
 caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(this)
