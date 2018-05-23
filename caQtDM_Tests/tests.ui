@@ -120,7 +120,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: rgb(0,0,120);}</string>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <property name="usesScrollButtons">
      <bool>true</bool>
@@ -2886,8 +2886,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>431</width>
-           <height>187</height>
+           <width>100</width>
+           <height>30</height>
           </rect>
          </property>
          <attribute name="label">
@@ -4025,8 +4025,6 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </widget>
-       <zorder>horizontalLayoutWidget</zorder>
-       <zorder>caframe_3</zorder>
       </widget>
      </widget>
     </widget>
@@ -11585,7 +11583,7 @@ def PythonCalc(a, b, c, d):
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>5</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
@@ -17742,12 +17740,12 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>toggle()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>337</x>
-     <y>257</y>
+     <x>335</x>
+     <y>241</y>
     </hint>
     <hint type="destinationlabel">
-     <x>791</x>
-     <y>331</y>
+     <x>789</x>
+     <y>315</y>
     </hint>
    </hints>
   </connection>
@@ -17822,8 +17820,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotTiltAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>480</x>
-     <y>628</y>
+     <x>482</x>
+     <y>662</y>
     </hint>
     <hint type="destinationlabel">
      <x>463</x>
@@ -17838,8 +17836,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotSpanAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>480</x>
-     <y>628</y>
+     <x>482</x>
+     <y>662</y>
     </hint>
     <hint type="destinationlabel">
      <x>597</x>
@@ -17854,8 +17852,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotTiltAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>480</x>
-     <y>628</y>
+     <x>482</x>
+     <y>662</y>
     </hint>
     <hint type="destinationlabel">
      <x>810</x>
@@ -17886,8 +17884,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotStartAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>836</x>
-     <y>369</y>
+     <x>838</x>
+     <y>403</y>
     </hint>
     <hint type="destinationlabel">
      <x>950</x>
@@ -17902,8 +17900,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotSpanAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>962</x>
-     <y>369</y>
+     <x>964</x>
+     <y>403</y>
     </hint>
     <hint type="destinationlabel">
      <x>958</x>
@@ -17922,8 +17920,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
      <y>604</y>
     </hint>
     <hint type="destinationlabel">
-     <x>379</x>
-     <y>588</y>
+     <x>383</x>
+     <y>622</y>
     </hint>
    </hints>
   </connection>
@@ -17934,12 +17932,12 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setMacroname(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>210</x>
-     <y>372</y>
+     <x>212</x>
+     <y>406</y>
     </hint>
     <hint type="destinationlabel">
-     <x>502</x>
-     <y>588</y>
+     <x>504</x>
+     <y>622</y>
     </hint>
    </hints>
   </connection>
@@ -17950,12 +17948,12 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setMacrovalue(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>207</x>
-     <y>415</y>
+     <x>211</x>
+     <y>449</y>
     </hint>
     <hint type="destinationlabel">
-     <x>487</x>
-     <y>588</y>
+     <x>491</x>
+     <y>622</y>
     </hint>
    </hints>
   </connection>
@@ -18286,8 +18284,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setPackingmodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>203</x>
-     <y>306</y>
+     <x>205</x>
+     <y>290</y>
     </hint>
     <hint type="destinationlabel">
      <x>501</x>
@@ -18302,8 +18300,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setPackingmodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>231</x>
-     <y>306</y>
+     <x>233</x>
+     <y>290</y>
     </hint>
     <hint type="destinationlabel">
      <x>285</x>
@@ -18318,8 +18316,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setPackingmodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>211</x>
-     <y>306</y>
+     <x>213</x>
+     <y>290</y>
     </hint>
     <hint type="destinationlabel">
      <x>176</x>
@@ -18334,8 +18332,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setDecodemodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>82</x>
-     <y>306</y>
+     <x>84</x>
+     <y>290</y>
     </hint>
     <hint type="destinationlabel">
      <x>75</x>
@@ -18350,8 +18348,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setDecodemodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>57</x>
-     <y>306</y>
+     <x>59</x>
+     <y>290</y>
     </hint>
     <hint type="destinationlabel">
      <x>260</x>
@@ -18366,8 +18364,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setDecodemodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>40</x>
-     <y>306</y>
+     <x>42</x>
+     <y>290</y>
     </hint>
     <hint type="destinationlabel">
      <x>615</x>
@@ -18388,6 +18386,22 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
     <hint type="destinationlabel">
      <x>275</x>
      <y>651</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>wmsignalpropagator</receiver>
+   <slot>closewindow()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>709</x>
+     <y>285</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>699</x>
+     <y>380</y>
     </hint>
    </hints>
   </connection>

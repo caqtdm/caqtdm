@@ -26,6 +26,8 @@
 #ifndef QTDEFINITIONS_H
 #define QTDEFINITIONS_H
 
+#define MAX_STRING_LENGTH 4096
+
 #ifdef MOBILE_ANDROID
 #include <QScreen>
 #endif

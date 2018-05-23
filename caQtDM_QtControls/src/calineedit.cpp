@@ -446,32 +446,33 @@ void caLineEdit::setFormat(int prec)
 
 void caLineEdit::setValue(double value, const QString& units)
 {
-    char asc[1024];
+    char asc[MAX_STRING_LENGTH];
     isValue = true;
 
     if(thisFormatType == compact) {
       if ((value < 1.e4 && value > 1.e-4) || (value > -1.e4 && value < -1.e-4) || value == 0.0) {
-        sprintf(asc, thisFormatC, value);
+        snprintf(asc, MAX_STRING_LENGTH, thisFormatC, value);
       } else {
-        sprintf(asc, thisFormat, value);
+        snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
       }
     } else if(thisFormatType == hexadecimal || thisFormatType == octal)  {
-        if(thisDatatype == caDOUBLE) sprintf(asc, thisFormat, (long long) value);
-        else  sprintf(asc, thisFormat, (int) value);
+        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, thisFormat, (long long) value);
+        else  snprintf(asc, MAX_STRING_LENGTH, thisFormat, (int) value);
     } else if(thisFormatType == truncated) {
-        if(thisDatatype == caDOUBLE) sprintf(asc, thisFormat, (long long) value);
-        else  sprintf(asc, thisFormat, (int) value);
+        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, thisFormat, (long long) value);
+        else  snprintf(asc,MAX_STRING_LENGTH,  thisFormat, (int) value);
     } else if(thisFormatType == enumeric) {
-        if(thisDatatype == caDOUBLE) sprintf(asc, thisFormat, (long long) value);
-        else  sprintf(asc, thisFormat, (int) value);
+        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, thisFormat, (long long) value);
+        else  snprintf(asc, MAX_STRING_LENGTH, thisFormat, (int) value);
     } else if(thisFormatType == utruncated) {
-        if(thisDatatype == caDOUBLE) sprintf(asc, thisFormat, (unsigned long long) value);
-        else  sprintf(asc, thisFormat, (uint) value);
+        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, thisFormat, (unsigned long long) value);
+        else  snprintf(asc,MAX_STRING_LENGTH,  thisFormat, (uint) value);
     } else {
-        sprintf(asc, thisFormat, value);
+        snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
     }
+
     if(qIsNaN(value)){
-      sprintf(asc, "nan");
+      snprintf(asc, MAX_STRING_LENGTH,  "nan");
     }
 
     if(thisUnitMode) {

@@ -53,14 +53,14 @@ caCalc::caCalc( QWidget *parent ) :  ESimpleLabel(parent)
 
 void caCalc::setValue(double value)
 {
-    char asc[1024], format[20];
+    char asc[MAX_STRING_LENGTH], format[20];
     int precision;
     if((precision = getPrecision()) >= 0) {
        sprintf(format, "%s.%dlf", "%", precision);
     } else {
        sprintf(format, "%s.%dle", "%", -precision);
     }
-    sprintf(asc, format, value);
+    snprintf(asc, MAX_STRING_LENGTH, format, value);
 
     setTextLine(QString(asc));
 

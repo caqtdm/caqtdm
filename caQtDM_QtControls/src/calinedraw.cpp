@@ -27,6 +27,7 @@
 #include "alarmdefs.h"
 
 #include <QPainter>
+#include <qnumeric.h>
 #include <QDebug>
 
 caLineDraw::caLineDraw(QWidget *parent) : QWidget(parent), FontScalingWidget(this), caWidgetInterface()
@@ -504,28 +505,33 @@ void caLineDraw::setFormat(int prec)
 
 void caLineDraw::setValue(double value, const QString& units)
 {
-    char asc[1024];
+    char asc[MAX_STRING_LENGTH];
     if(m_FormatType == compact) {
         if ((value < 1.e4 && value > 1.e-4) || (value > -1.e4 && value < -1.e-4) || value == 0.0) {
-            sprintf(asc, m_FormatC, value);
+            snprintf(asc, MAX_STRING_LENGTH, m_FormatC, value);
         } else {
-            sprintf(asc, m_Format, value);
+            snprintf(asc, MAX_STRING_LENGTH, m_Format, value);
         }
     } else if(m_FormatType == hexadecimal || m_FormatType == octal)  {
-        if(thisDatatype == caDOUBLE) sprintf(asc, m_Format, (long long) value);
-        else  sprintf(asc, m_Format, (int) value);
+        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, m_Format, (long long) value);
+        else  snprintf(asc, MAX_STRING_LENGTH, m_Format, (int) value);
     } else if(m_FormatType == truncated) {
-        if(thisDatatype == caDOUBLE) sprintf(asc, m_Format, (long long) value);
-        else sprintf(asc, m_Format, (int) value);
+        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, m_Format, (long long) value);
+        else snprintf(asc, MAX_STRING_LENGTH, m_Format, (int) value);
     } else if(m_FormatType == enumeric) {
-        if(thisDatatype == caDOUBLE) sprintf(asc, m_Format, (long long) value);
-        else sprintf(asc, m_Format, (int) value);
+        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, m_Format, (long long) value);
+        else snprintf(asc, MAX_STRING_LENGTH, m_Format, (int) value);
     } else if(m_FormatType == utruncated) {
-        if(thisDatatype == caDOUBLE) sprintf(asc, m_Format, (unsigned long long) value);
-        else sprintf(asc, m_Format, (uint) value);
+        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, m_Format, (unsigned long long) value);
+        else snprintf(asc, MAX_STRING_LENGTH, m_Format, (uint) value);
     } else {
-        sprintf(asc, m_Format, value);
+        snprintf(asc,MAX_STRING_LENGTH,  m_Format, value);
     }
+
+    if(qIsNaN(value)){
+      snprintf(asc, MAX_STRING_LENGTH,  "nan");
+    }
+
     if(m_UnitMode) {
         strcat(asc, " ");
         strcat(asc, qasc(units));

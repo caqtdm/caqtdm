@@ -461,9 +461,9 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         if(!interfaces.isEmpty()) {
             QMapIterator<QString, ControlsInterface *> i(interfaces);
             while (i.hasNext()) {
-                char asc[256];
+                char asc[MAX_STRING_LENGTH];
                 i.next();
-                sprintf(asc, "Info: plugin %s loaded", qasc(i.key()));
+                snprintf(asc, MAX_STRING_LENGTH, "Info: plugin %s loaded", qasc(i.key()));
                 messageWindow->postMsgEvent(QtWarningMsg, asc);
             }
         }
@@ -608,7 +608,7 @@ void FileOpenWindow::saveConfigFile(const QString &filename, QList<QString> &url
 
 void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
 {
-    char asc[2048];
+    char asc[MAX_STRING_LENGTH];
     Specials specials;
     QString stdpathdoc =  specials.getStdPath();
 
@@ -635,14 +635,14 @@ void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
             setenv(qasc(fields.at(0)), qasc(envString), 1);
             //messageWindow->postMsgEvent(QtDebugMsg, (char*) qasc(envString));
         } else if(line.size() > 0) {
-            sprintf(asc, "environment variable could not be set from %s", qasc(line));
+            snprintf(asc, MAX_STRING_LENGTH, "environment variable could not be set from %s", qasc(line));
             messageWindow->postMsgEvent(QtDebugMsg, asc);
         }
     }
     //Replacement for standard writable directory
     setenv("CAQTDM_DISPLAY_PATH", qasc(stdpathdoc), 1);
 
-    sprintf(asc, "epics configuration file loaded: %s", qasc(fileName));
+    snprintf(asc, MAX_STRING_LENGTH, "epics configuration file loaded: %s", qasc(fileName));
     messageWindow->postMsgEvent(QtDebugMsg, asc);
     file.close();
 }
@@ -650,9 +650,8 @@ void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
 // runs one per second
 void FileOpenWindow::timerEvent(QTimerEvent *event)
 {
-#define MAXLEN 255
     Q_UNUSED(event);
-    char asc[MAXLEN];
+    char asc[MAX_STRING_LENGTH];
     int countPV=0;
     int countNotConnected=0;
     float highCount = 0.0;
@@ -687,20 +686,20 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 #ifdef linux
     struct rusage usage;
     getrusage(RUSAGE_SELF, &usage);
-    sprintf(asc, "memory: %ld kB,", usage.ru_maxrss);
+    snprintf(asc, MAX_STRING_LENGTH, "memory: %ld kB,", usage.ru_maxrss);
 #endif
 #ifdef _WIN32
     PROCESS_MEMORY_COUNTERS_EX procmem;
     if (GetProcessMemoryInfo(GetCurrentProcess(),(PPROCESS_MEMORY_COUNTERS)&procmem,sizeof(procmem))) {
-      sprintf(asc, "memory: %ld kB,", (procmem.PrivateUsage / (1024)));
+      snprintf(asc, MAX_STRING_LENGTH,"memory: %ld kB,", (procmem.PrivateUsage / (1024)));
     } else {
-      sprintf(asc, "memory: no RAM,");
+      snprintf(asc, MAX_STRING_LENGTH, "memory: no RAM,");
     }
 #endif
 
     // any non connected pv's to display ?
     if (mutexKnobData != (MutexKnobData *) 0) {
-        char msg[255];
+        char msg[MAX_STRING_LENGTH];
         msg[0] = '\0';
 
         for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
@@ -716,7 +715,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
         }
 
         if(caQtDM_TimeOutEnabled) {
-            char asc1[30];
+            char asc1[50];
             if (caQtDM_TimeLeft<0.02){
                 sprintf(asc1, "T/O=%.0fsec ", caQtDM_TimeLeft*60*60);
             }else{
@@ -727,7 +726,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 
         highCount = mutexKnobData->getHighestCountPV(highPV);
         if(highCount != 0.0) {
-            snprintf(msg, MAXLEN - 1, "%s - PV=%d (%d NC), %d Monitors/s, %d Displays/s, highest=%s with %.1f Monitors/s ", asc, countPV, countNotConnected,
+            snprintf(msg, MAX_STRING_LENGTH, "%s - PV=%d (%d NC), %d Monitors/s, %d Displays/s, highest=%s with %.1f Monitors/s ", asc, countPV, countNotConnected,
                       mutexKnobData->getMonitorsPerSecond(), mutexKnobData->getDisplaysPerSecond(), qasc(highPV), highCount);
         } else {
             strcpy(msg, asc);

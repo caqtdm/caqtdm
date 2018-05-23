@@ -595,11 +595,11 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     connect(ResizeDownAction, SIGNAL(triggered()), this, SLOT(Callback_ResizeDown()));
     this->addAction(ResizeDownAction);
 
-    char asc[100];
+    char asc[MAX_STRING_LENGTH];
     QString path = thisFileFull;
     int pos = path.lastIndexOf("/");
     if((pos > 0) && ((path.length() - pos -1) > 0)) path.chop(path.length() - pos -1);
-    sprintf(asc, "special macro CAQTDM_INTERNAL_UIPATH set to %s\n", qasc(path));
+    snprintf(asc, MAX_STRING_LENGTH, "special macro CAQTDM_INTERNAL_UIPATH set to %s\n", qasc(path));
     postMessage(QtWarningMsg, asc);
 
     strcpy(asc,"unresolved macros present, press context in display to obtain a list");
@@ -2981,7 +2981,7 @@ void CaQtDM_Lib::updateTextBrowser()
 QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, bool *doNothing, QString widgetName)
 {
     QString newText = text;
-    char asc[2048];
+    char asc[MAX_STRING_LENGTH];
     *doNothing = false;
     // a macro exists and when pv contains a right syntax then replace pv
     if(!map.isEmpty()) {
@@ -3041,7 +3041,7 @@ QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, 
                                     delete(MacroDataJ);
                                 }
                             }else{
-                                sprintf(asc, "JSON Error in (%s)", qasc(newText.mid(json_start,json_end-json_start+1)));
+                                snprintf(asc, MAX_STRING_LENGTH, "JSON Error in (%s)", qasc(newText.mid(json_start,json_end-json_start+1)));
                                 postMessage(QtWarningMsg, asc);
 
                             }
@@ -3055,11 +3055,11 @@ QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, 
                                     ReplaceWith.replace(rx_json,macro_value);
 
                                     //qDebug() << "replace in" << newText << toReplace << "with" << ReplaceWith << "outof " << macro_value;
-                                    sprintf(asc, "Replace (%s) (%s) with (%s) Regex:(%s)", qasc(i.key()), qasc(i.value()),qasc(macro_value),qasc(macro_regex));
+                                    snprintf(asc, MAX_STRING_LENGTH, "Replace (%s) (%s) with (%s) Regex:(%s)", qasc(i.key()), qasc(i.value()),qasc(macro_value),qasc(macro_regex));
                                     postMessage(QtDebugMsg, asc);
                                     newText.replace(toReplace, ReplaceWith);
                                 }else{
-                                    sprintf(asc, "No Replacement found do simple(%s) (%s) macro resolution", qasc(i.key()), qasc(i.value()));
+                                    snprintf(asc, MAX_STRING_LENGTH, "No Replacement found do simple(%s) (%s) macro resolution", qasc(i.key()), qasc(i.value()));
                                     //qDebug() << "No Replacement found do simple(%s) (%s) macro resolution" <<  qasc(i.key()) <<  qasc(i.value()) << text;
                                     postMessage(QtWarningMsg, asc);
                                     newText.replace(toReplace, i.value());
@@ -3236,14 +3236,14 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     int pos = trimmedPV.indexOf("{");
     if((pos != -1) && trimmedPV.contains("monitor")) {
         int status;
-        char asc[255];
+        char asc[MAX_STRING_LENGTH];
         QString JSONString = trimmedPV.mid(pos);
         trimmedPV = trimmedPV.mid(0, pos);
         status = parseForDisplayRate(JSONString, rate);
         if(!status) {
-            sprintf(asc, "JSON parsing error on %s ,should be like {\"monitor\":{\"maxdisplayrate\":10}}", (char*) qasc(pv.trimmed()));
+            snprintf(asc, MAX_STRING_LENGTH, "JSON parsing error on %s ,should be like {\"monitor\":{\"maxdisplayrate\":10}}", (char*) qasc(pv.trimmed()));
         } else {
-            sprintf(asc, "pv %s display rate set to maximum %dHz", qasc(trimmedPV), rate);
+            snprintf(asc, MAX_STRING_LENGTH, "pv %s display rate set to maximum %dHz", qasc(trimmedPV), rate);
         }
         postMessage(QtDebugMsg, asc);
     }
@@ -3302,8 +3302,8 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
         // and set it to the widget and the pointer to the data
         kData->pluginInterface = (void *) plugininterface;
         if(kData->pluginInterface == (void *) 0) {
-            char asc[255];
-            sprintf(asc, "could not find a control plugin for %s with name %s\n", (char*) qasc(trimmedPV), (char*) qasc(pluginName.trimmed()));
+            char asc[MAX_STRING_LENGTH];
+            snprintf(asc, MAX_STRING_LENGTH, "could not find a control plugin for %s with name %s\n", (char*) qasc(trimmedPV), (char*) qasc(pluginName.trimmed()));
             postMessage(QtCriticalMsg, asc);
         } else {
             //qDebug() << "control interface for" << trimmedPV << "plugin:" << pluginName;
@@ -3317,8 +3317,8 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     }
 
     if(doNothing) {
-        char asc[255];
-        sprintf(asc, "Info: malformed pv '%s' (due to macro?)", (char*) qasc(trimmedPV));
+        char asc[MAX_STRING_LENGTH];
+        snprintf(asc, MAX_STRING_LENGTH, "Info: malformed pv '%s' (due to macro?)", (char*) qasc(trimmedPV));
         postMessage(QtWarningMsg, asc);
     }
 
@@ -3515,7 +3515,7 @@ bool CaQtDM_Lib::Python_Error(QWidget *w, QString message)
 #ifdef PYTHON
 
     PyObject *errObj = NULL, *errData = NULL, *errTraceback = NULL, *pystring = NULL;
-    char errorType[1024], errorInfo[1024], asc[3000];
+    char errorType[1024], errorInfo[1024], asc[MAX_STRING_LENGTH];
 
     // get latest python exception info
     PyErr_Fetch(&errObj, &errData, &errTraceback);
@@ -3536,7 +3536,7 @@ bool CaQtDM_Lib::Python_Error(QWidget *w, QString message)
     }
     Py_XDECREF(pystring);
 
-    sprintf(asc, "%s %s : %s %s", qPrintable(message), qasc(w->objectName()), errorType, errorInfo);
+    snprintf(asc, MAX_STRING_LENGTH, "%s %s : %s %s", qPrintable(message), qasc(w->objectName()), errorType, errorInfo);
 
     Py_XDECREF(errObj);
     Py_XDECREF(errData);
@@ -3643,8 +3643,8 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                         }
 
                     } else  {
-                        char asc[100];
-                        sprintf(asc, "Invalid channel data type %s", qasc(w->objectName()));
+                        char asc[MAX_STRING_LENGTH];
+                        snprintf(asc, MAX_STRING_LENGTH, "Invalid channel data type %s", qasc(w->objectName()));
                         postMessage(QtDebugMsg, asc);
                         valid = false;
                         return true;
@@ -3801,8 +3801,8 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
             return visible;
 #else
         } else if(calcQString.startsWith("%P/")) {
-            char asc[100];
-            sprintf(asc, "python is not enabled in this caqtdm version(calc will be disabled) %s", qasc(w->objectName()));
+            char asc[MAX_STRING_LENGTH];
+            snprintf(asc, MAX_STRING_LENGTH, "python is not enabled in this caqtdm version(calc will be disabled) %s", qasc(w->objectName()));
             postMessage(QtWarningMsg, asc);
             setCalcToNothing(w);
             valid = false;
@@ -3850,8 +3850,8 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
             // calculate
             status = postfix(calcString, post, &errnum);
             if(status) {
-                char asc[100];
-                sprintf(asc, "Invalid Calc %s for %s (calc will be disabled)", calcString, qasc(w->objectName()));
+                char asc[MAX_STRING_LENGTH];
+                snprintf(asc, MAX_STRING_LENGTH, "Invalid Calc %s for %s (calc will be disabled)", calcString, qasc(w->objectName()));
                 setCalcToNothing(w);
                 postMessage(QtDebugMsg, asc);
                 //printf("%s\n", asc);
@@ -3866,8 +3866,8 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                 valid = true;
                 return visible;
             } else {
-                char asc[100];
-                sprintf(asc, "invalid calc %s for %s (calc will be disabled)", calcString, qasc(w->objectName()));
+                char asc[MAX_STRING_LENGTH];
+                snprintf(asc, MAX_STRING_LENGTH, "invalid calc %s for %s (calc will be disabled)", calcString, qasc(w->objectName()));
                 setCalcToNothing(w);
                 postMessage(QtDebugMsg, asc);
                 valid = false;
@@ -5163,15 +5163,15 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             } else if(data.specData[0] == 3) { // mode overwrite channel if present
                 if(cameraWidget->testDecodemodeStr(String)) cameraWidget->setDecodemodeStr(String);
                 else  {
-                    char asc[256];
-                    sprintf(asc, "camera mode %s from pv %s not recognized", qasc(String), qasc(cameraWidget->getPV_ColormodeChannel()));
+                    char asc[MAX_STRING_LENGTH];
+                    snprintf(asc, MAX_STRING_LENGTH, "camera mode %s from pv %s not recognized", qasc(String), qasc(cameraWidget->getPV_ColormodeChannel()));
                     postMessage(QtDebugMsg, asc);
                 }
             } else if(data.specData[0] == 4) { // packing mode overwrite channel if present
                 if(cameraWidget->testPackingmodeStr(String)) cameraWidget->setPackingmodeStr(String);
                 else  {
-                    char asc[256];
-                    sprintf(asc, "camera packing mode %s from pv %s not recognized", qasc(String), qasc(cameraWidget->getPV_PackingmodeChannel()));
+                    char asc[MAX_STRING_LENGTH];
+                    snprintf(asc,MAX_STRING_LENGTH, "camera packing mode %s from pv %s not recognized", qasc(String), qasc(cameraWidget->getPV_PackingmodeChannel()));
                     postMessage(QtDebugMsg, asc);
                 }
             } else if(data.specData[0] == 5) { // minimum level channel if present
@@ -6563,7 +6563,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 knobData *kPtr =  mutexKnobDataP->GetMutexKnobDataPtr(dataIndex);
 
                 if((kPtr != (knobData *) 0)) {
-                    char asc[2048] = {'\0'};
+                    char asc[MAX_STRING_LENGTH] = {'\0'};
                     char timestamp[50] = {'\0'};
                     char description[40] = {'\0'};
                     info.append("<br>");
@@ -6606,13 +6606,13 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         info.append("<br>Type: ");
                         info.append(caTypeStr[kPtr->edata.fieldtype]);
 
-                        sprintf(asc,"<br>Count: %d", kPtr->edata.valueCount);
+                        snprintf(asc, MAX_STRING_LENGTH, "<br>Count: %d", kPtr->edata.valueCount);
                         info.append(asc);
 
                         info.append("<br>Value: ");
                         switch (kPtr->edata.fieldtype) {
                         case caCHAR:
-                            sprintf(asc,"%ld (0x%x)", kPtr->edata.ivalue, kPtr->edata.ivalue);
+                            snprintf(asc, MAX_STRING_LENGTH, "%ld (0x%x)", kPtr->edata.ivalue, kPtr->edata.ivalue);
                             info.append(asc);
                             break;
                         case caSTRING:
@@ -6622,16 +6622,16 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                                 QString States((char*) kPtr->edata.dataB);
                                 QStringList list = States.split((QChar)27);
                                 for(int j=0; j<list.count(); j++) {
-                                    sprintf(asc, "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%d %s", j, qasc(list.at(j)));
+                                    snprintf(asc, MAX_STRING_LENGTH, "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%d %s", j, qasc(list.at(j)));
                                     info.append(asc);
                                 }
                             }
                             break;
 
                         case caENUM:{
-                            sprintf(asc,"%ld %s", kPtr->edata.ivalue, kPtr->edata.units);
+                            snprintf(asc, MAX_STRING_LENGTH, "%ld %s", kPtr->edata.ivalue, kPtr->edata.units);
                             info.append(asc);
-                            sprintf(asc,"<br>nbStates: %d", kPtr->edata.enumCount);
+                            snprintf(asc, MAX_STRING_LENGTH, "<br>nbStates: %d", kPtr->edata.enumCount);
                             info.append(asc);
                             info.append("<br>States: ");
                             if(kPtr->edata.enumCount > 0) {
@@ -6639,7 +6639,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                                 //QStringList list = States.split(";");
                                 QStringList list = States.split((QChar)27);
                                 for(int j=0; j<list.count(); j++) {
-                                    sprintf(asc, "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%d %s", j, qasc(list.at(j)));
+                                    snprintf(asc, MAX_STRING_LENGTH, "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%d %s", j, qasc(list.at(j)));
                                     info.append(asc);
                                 }
                             }
@@ -6647,17 +6647,17 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         }
                         case caINT:
                         case caLONG:
-                            sprintf(asc,"%ld (0x%x) %s", kPtr->edata.ivalue, kPtr->edata.ivalue, kPtr->edata.units);
+                            snprintf(asc, MAX_STRING_LENGTH, "%ld (0x%x) %s", kPtr->edata.ivalue, kPtr->edata.ivalue, kPtr->edata.units);
                             info.append(asc);
                             break;
                         case caFLOAT:
                         case caDOUBLE:
-                            sprintf(asc,"%lf %s", kPtr->edata.rvalue, kPtr->edata.units);
+                            snprintf(asc, MAX_STRING_LENGTH, "%lf %s", kPtr->edata.rvalue, kPtr->edata.units);
                             info.append(asc);
                             break;
 
                         default:
-                            sprintf(asc,"unhandled epics type");
+                            snprintf(asc, MAX_STRING_LENGTH, "unhandled epics type");
                             info.append(asc);
                         }
 
@@ -6693,57 +6693,57 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
                         // precision
                         if(!precMode) {
-                            sprintf(asc,"<br>Precision (channel) :%d ", kPtr->edata.precision);
+                            snprintf(asc, MAX_STRING_LENGTH, "<br>Precision (channel) :%d ", kPtr->edata.precision);
                             Precision = kPtr->edata.precision;
                         } else {
-                            sprintf(asc,"<br>Precision (user) :%d ", Precision);
+                            snprintf(asc, MAX_STRING_LENGTH, "<br>Precision (user) :%d ", Precision);
                         }
 
                         info.append(asc);
                         if(ClassName.contains("Gauge")) {
-                            sprintf(asc, "not used for scale") ;
+                            snprintf(asc, MAX_STRING_LENGTH, "not used for scale") ;
                             info.append(asc);
                         }
 
                         // limits
                         if(limitsMode) {
-                            sprintf(asc,"<br>User alarm: MIN:%g  MAX:%g ", limitsMin, limitsMax);
+                            snprintf(asc, MAX_STRING_LENGTH, "<br>User alarm: MIN:%g  MAX:%g ", limitsMin, limitsMax);
                             info.append(asc);
                         }
                         if(highLimit){
-                            sprintf(asc,"<br>User alarm MAX:%g ", limitsMax);
+                            snprintf(asc, MAX_STRING_LENGTH, "<br>User alarm MAX:%g ", limitsMax);
                             info.append(asc);
                         }
                         if(lowLimit) {
-                            sprintf(asc,"<br>User alarm MIN:%g ", limitsMin);
+                            snprintf(asc, MAX_STRING_LENGTH, "<br>User alarm MIN:%g ", limitsMin);
                             info.append(asc);
                         }
                         if(limitsDefault) {
-                            sprintf(asc,"<br>Default limits: MIN:%g  MAX:%g ",limitsMin, limitsMax);
+                            snprintf(asc, MAX_STRING_LENGTH, "<br>Default limits: MIN:%g  MAX:%g ",limitsMin, limitsMax);
                             info.append(asc);
                         }
-                        sprintf(asc,"<br>LOPR:%g  HOPR:%g ", kPtr->edata.lower_disp_limit, kPtr->edata.upper_disp_limit);
+                        snprintf(asc, MAX_STRING_LENGTH, "<br>LOPR:%g  HOPR:%g ", kPtr->edata.lower_disp_limit, kPtr->edata.upper_disp_limit);
                         info.append(asc);
-                        sprintf(asc,"<br>LOLO:%g  HIHI:%g ", kPtr->edata.lower_alarm_limit, kPtr->edata.upper_alarm_limit);
+                        snprintf(asc, MAX_STRING_LENGTH, "<br>LOLO:%g  HIHI:%g ", kPtr->edata.lower_alarm_limit, kPtr->edata.upper_alarm_limit);
                         info.append(asc);
-                        sprintf(asc,"<br>LOW :%g  HIGH:%g ", kPtr->edata.lower_warning_limit, kPtr->edata.upper_warning_limit);
+                        snprintf(asc, MAX_STRING_LENGTH, "<br>LOW :%g  HIGH:%g ", kPtr->edata.lower_warning_limit, kPtr->edata.upper_warning_limit);
                         info.append(asc);
-                        sprintf(asc,"<br>DRVL:%g  DRVH:%g ",kPtr->edata.lower_ctrl_limit, kPtr->edata.upper_ctrl_limit);
+                        snprintf(asc, MAX_STRING_LENGTH, "<br>DRVL:%g  DRVH:%g ",kPtr->edata.lower_ctrl_limit, kPtr->edata.upper_ctrl_limit);
                         info.append(asc);
                         info.append("<br>");
 
                         //colormode
                         if(strlen(colMode) > 0) {
-                            sprintf(asc, "Colormode: %s", colMode);
+                            snprintf(asc,  MAX_STRING_LENGTH, "Colormode: %s", colMode);
                             info.append(asc);
                             info.append("<br>");
                         }
 
                         // access
-                        if(kPtr->edata.accessR==1 && kPtr->edata.accessW==1) sprintf(asc, "Access: ReadWrite");
-                        else if(kPtr->edata.accessR==1 && kPtr->edata.accessW==0) sprintf(asc, "Access: ReadOnly");
-                        else if(kPtr->edata.accessR==0 && kPtr->edata.accessW==1) sprintf(asc, "Access: WriteOnly"); // not possible
-                        else sprintf(asc, "Access: NoAccess");
+                        if(kPtr->edata.accessR==1 && kPtr->edata.accessW==1) snprintf(asc, MAX_STRING_LENGTH, "Access: ReadWrite");
+                        else if(kPtr->edata.accessR==1 && kPtr->edata.accessW==0) snprintf(asc, MAX_STRING_LENGTH, "Access: ReadOnly");
+                        else if(kPtr->edata.accessR==0 && kPtr->edata.accessW==1) snprintf(asc, MAX_STRING_LENGTH, "Access: WriteOnly"); // not possible
+                        else snprintf(asc, MAX_STRING_LENGTH, "Access: NoAccess");
                         info.append(asc);
                         info.append("<br>");
                     }
@@ -6965,15 +6965,15 @@ bool CaQtDM_Lib::SoftPVusesItsself(QWidget* widget, QMap<QString, QString> map)
             if(pos != -1) trimmedPV = trimmedPV.mid(0, pos);
             strng[i] = treatMacro(map, trimmedPV, &doNothing, widget->objectName());
             if(i==4) {
-                char asc[256];
+                char asc[ MAX_STRING_LENGTH];
                 QString pv = calcWidget->getVariable();
                 calcWidget->setVariable(strng[i]);  // update variable name when macro used
                 if(pos != -1) {
                     int status = parseForDisplayRate(JSONString, rate);
                     if(!status) {
-                        sprintf(asc, "JSON parsing error on %s ,should be like {\"monitor\":{\"maxdisplayrate\":10}}", (char*) qasc(pv.trimmed()));
+                        snprintf(asc, MAX_STRING_LENGTH, "JSON parsing error on %s ,should be like {\"monitor\":{\"maxdisplayrate\":10}}", (char*) qasc(pv.trimmed()));
                     } else {
-                        sprintf(asc, "pv %s display rate set to maximum %dHz", qasc(trimmedPV), rate);
+                        snprintf(asc, MAX_STRING_LENGTH, "pv %s display rate set to maximum %dHz", qasc(trimmedPV), rate);
                     }
                     postMessage(QtDebugMsg, asc);
                 }
@@ -7136,7 +7136,7 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
     QString className = widget->metaObject()->className();
     if((nbMon == 0) && !className.contains("caCalc") && text.length() > 0) {
         double valueArray[MAX_CALC_INPUTS];
-        char post[256], calcString[256], asc[100];
+        char post[256], calcString[256], asc[MAX_STRING_LENGTH];
         short errnum;
 
         strcpy(calcString, qasc(text));
@@ -7144,7 +7144,7 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
         for(int i=0; i < MAX_CALC_INPUTS; i++) valueArray[i] = 0.0;
         long status = postfix(calcString, post, &errnum);
         if(status) {
-            sprintf(asc, "Invalid Calc %s for %s (calc not performed)", calcString, qasc(widget->objectName()));
+            snprintf(asc, MAX_STRING_LENGTH, "Invalid Calc %s for %s (calc not performed)", calcString, qasc(widget->objectName()));
             setCalcToNothing(widget);
             postMessage(QtDebugMsg, asc);
         } else {
@@ -7164,7 +7164,7 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
                     else widget->show();
                 }
             } else {
-                sprintf(asc, "invalid calc %s for %s (calc not performed)", calcString, qasc(widget->objectName()));
+                snprintf(asc, MAX_STRING_LENGTH, "invalid calc %s for %s (calc not performed)", calcString, qasc(widget->objectName()));
                 setCalcToNothing(widget);
                 postMessage(QtDebugMsg, asc);
             }
@@ -7485,8 +7485,8 @@ void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType
                         }
                     }
                 } else {
-                    char asc[100];
-                    sprintf(asc, "Invalid value: pv=%s value= \"%s\"\n", kPtr->pv, textValue);
+                    char asc[MAX_STRING_LENGTH];
+                    snprintf(asc, MAX_STRING_LENGTH, "Invalid value: pv=%s value= \"%s\"\n", kPtr->pv, textValue);
                     postMessage(QtDebugMsg, asc);
                     if(caTextEntry* widget = qobject_cast<caTextEntry *>((QWidget*) auxPtr->dispW)) {
                         Q_UNUSED(widget);
@@ -7552,8 +7552,8 @@ void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType
             }
 
         } else {
-            char asc[100];
-            sprintf(asc, "Invalid value: pv=%s value= \"%s\"\n", kPtr->pv, textValue);
+            char asc[MAX_STRING_LENGTH];
+            snprintf(asc, MAX_STRING_LENGTH, "Invalid value: pv=%s value= \"%s\"\n", kPtr->pv, textValue);
             postMessage(QtDebugMsg, asc);
             if(caTextEntry* widget = qobject_cast<caTextEntry *>((QWidget*) auxPtr->dispW)) {
                 Q_UNUSED(widget);
@@ -7568,7 +7568,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType
   */
 void CaQtDM_Lib::TreatRequestedWave(QString pvo, QString text, caWaveTable::FormatType fType, int index, QWidget *w)
 {
-    char    errmess[255], sdata[40], asc[100];
+    char    errmess[255], sdata[40], asc[MAX_STRING_LENGTH];
     int32_t data32[1];
     int16_t data16[1];
     float   fdata[1];
@@ -7653,7 +7653,7 @@ void CaQtDM_Lib::TreatRequestedWave(QString pvo, QString text, caWaveTable::Form
         break;
 
     case caSTRING:
-        sprintf(asc, "writing of strings for treatRequestedWave is not yet supported\n");
+        snprintf(asc, MAX_STRING_LENGTH, "writing of strings for treatRequestedWave is not yet supported\n");
         postMessage(QtDebugMsg, asc);
         break;
 
@@ -7687,14 +7687,14 @@ void CaQtDM_Lib::TreatRequestedWave(QString pvo, QString text, caWaveTable::Form
                 }
             }
         } else {
-            char asc[100];
-            sprintf(asc, "Invalid value: pv=%s value= \"%s\"\n", kPtr->pv, textValue);
+            char asc[MAX_STRING_LENGTH];
+            snprintf(asc, MAX_STRING_LENGTH, "Invalid value: pv=%s value= \"%s\"\n", kPtr->pv, textValue);
             postMessage(QtDebugMsg, asc);
         }
         break;
 
     default:
-        sprintf(asc, "unhandled epics type (%d) in treatRequestedWave\n", kPtr->edata.fieldtype);
+        snprintf(asc, MAX_STRING_LENGTH, "unhandled epics type (%d) in treatRequestedWave\n", kPtr->edata.fieldtype);
         postMessage(QtDebugMsg, asc);
     }
 
