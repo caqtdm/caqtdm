@@ -31,6 +31,8 @@ REM ============================================================================
  
   set QTHOME=X:/qt/4.8.5
   set QWTHOME=X:/qt/qwt-6.1.3
+  set QWTVERSION=6.1
+
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
   set GITPATH=C:\Users\brands\AppData\Local\Atlassian\SourceTree\git_local\bin\;C:\Program Files (x86)\Git\bin
@@ -72,6 +74,8 @@ REM ============================================================================
   set QWTHOME=X:/qt/qwt-6.1.3_5_8_64bit
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
+  set QWTVERSION=6.1
+
   set GITPATH=C:\Users\brands\AppData\Local\Atlassian\SourceTree\git_local\bin\;C:\Program Files (x86)\Git\bin
     
   set EPICS_BASE=X:/epics/Package/base
@@ -115,6 +119,8 @@ REM ============================================================================
   set QWTHOME=X:/qt/qwt-6.1.3_32bit
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
+  set QWTVERSION=6.1
+
   set PATH=%PATH%;C:\Program Files (x86)\Git\bin
   set GITPATH=C:\Users\brands\AppData\Local\Atlassian\SourceTree\git_local\bin\
   

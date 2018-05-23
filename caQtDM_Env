@@ -8,6 +8,8 @@
   fi
   if [ -z "$QWTLIB" ];                then export   QWTLIB=${QWTHOME}/lib;
   fi
+  if [ -z "$QWTVERSION" ];            then export   QWTVERSION=6.1;
+  fi
   if [ -z "$EPICS_BASE" ];            then export   EPICS_BASE=/usr/local/epics/base;
   fi
   if [ -z "$EPICSINCLUDE" ];          then export   EPICSINCLUDE=${EPICS_BASE}/include;

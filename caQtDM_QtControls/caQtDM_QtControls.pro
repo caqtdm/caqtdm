@@ -49,7 +49,7 @@ PRE_TARGETDEPS += \
      moc/moc_cameter.cpp \
      moc/moc_caclock.cpp
 
-contains(QT_VER_MAJ, 5) {
+contains(QWT_VER_MIN, 1) {
   PRE_TARGETDEPS += moc/moc_qwt_thermo_marker_61.cpp
 }
 
@@ -145,25 +145,14 @@ HEADERS += src/networkaccess.h src/fileFunctions.h \
 SOURCES += src/networkaccess.cpp src/fileFunctions.cpp
 
 
-contains(QT_VER_MAJ, 4) {
-    contains(QT_VER_MIN, 6) {
-       warning("Qt $$[QT_VERSION] was detected (use qwt6.0.1), so compile qwt_thermo_marker")
-       HEADERS	+= src/qwt_thermo_marker.h
-       SOURCES	+= src/qwt_thermo_marker.cpp
-    }
-    contains(QT_VER_MIN, 8) {
-       warning("Qt $$[QT_VERSION] was detected (use qwt6.1.1), so compile qwt_thermo_marker_61")
-       HEADERS	+= src/qwt_thermo_marker_61.h
-       SOURCES	+= src/qwt_thermo_marker_61.cpp
-    }
+contains(QWT_VER_MIN, 0) {
+   HEADERS	+= src/qwt_thermo_marker.h
+   SOURCES	+= src/qwt_thermo_marker.cpp
 }
-
-contains(QT_VER_MAJ, 5) {
-    warning("Qt $$[QT_VERSION] was detected (use qwt6.1.1 or higher), so compile qwt_thermo_marker_61")
-    HEADERS	+= src/qwt_thermo_marker_61.h
-    SOURCES	+= src/qwt_thermo_marker_61.cpp
+contains(QWT_VER_MIN, 1) {
+   HEADERS	+= src/qwt_thermo_marker_61.h
+   SOURCES	+= src/qwt_thermo_marker_61.cpp
 }
-
 
 HEADERS	+= \
     src/caframe.h \

@@ -24,6 +24,15 @@ QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
 QT_VER_PAT = $$member(QT_VERSION, 2)
 
+
+QWTVERSION = $$(QWTVERSION)
+QWTVERSION = $$split(QWTVERSION, ".")
+QWT_VER_MAJ = $$member(QWTVERSION, 0)
+QWT_VER_MIN = $$member(QWTVERSION, 1)
+
+message ("Qt $$[QT_VERSION] QWT $$(QWTVERSION)")
+
+
 TARGET_COMPANY = "Paul Scherrer Institut"
 TARGET_DESCRIPTION = "Channel Access Qt Display Manager"
 TARGET_COPYRIGHT = "Copyright (C) 2016 Paul Scherrer Institut"
