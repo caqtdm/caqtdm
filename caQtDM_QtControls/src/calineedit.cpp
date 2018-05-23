@@ -22,7 +22,6 @@
  *  Contact details:
  *    anton.mezger@psi.ch
  */
-
 #include "calineedit.h"
 #include "alarmdefs.h"
 #include <QEvent>
@@ -32,6 +31,11 @@
 #include <QMouseEvent>
 #include <qnumeric.h>
 #include "knobDefines.h"
+
+#if defined(_MSC_VER)
+  #define snprintf _snprintf
+#endif
+
 
 caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(this)
 {

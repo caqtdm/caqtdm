@@ -37,6 +37,10 @@
 #include "cathermo.h"
 #include <qnumeric.h>
 //#include <QMetaEnum>
+#if defined(_MSC_VER)
+  #define snprintf _snprintf
+#endif
+
 
 #define MIN_FONT_SIZE 3
 #define MAX_FONT_SIZE 20

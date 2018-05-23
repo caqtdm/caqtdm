@@ -24,6 +24,10 @@
  */
 
 #include "cacalc.h"
+#if defined(_MSC_VER)
+  #define snprintf _snprintf
+#endif
+
 
 
 caCalc::caCalc( QWidget *parent ) :  ESimpleLabel(parent)

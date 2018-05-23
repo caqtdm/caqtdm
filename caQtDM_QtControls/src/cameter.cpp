@@ -27,6 +27,7 @@
 #define NOMINMAX
 #include <windows.h>
 #define QWT_DLL
+#define snprintf _snprintf
 #endif
 
 #include "cameter.h"

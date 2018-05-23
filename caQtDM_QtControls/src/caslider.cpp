@@ -27,6 +27,7 @@
 #define NOMINMAX
 #include <windows.h>
 #define QWT_DLL
+#define snprintf _snprintf
 #endif
 
 #define MIN_FONT_SIZE 3

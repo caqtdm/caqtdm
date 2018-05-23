@@ -29,6 +29,10 @@
 #include <QPainter>
 #include <qnumeric.h>
 #include <QDebug>
+#if defined(_MSC_VER)
+  #define snprintf _snprintf
+#endif
+
 
 caLineDraw::caLineDraw(QWidget *parent) : QWidget(parent), FontScalingWidget(this), caWidgetInterface()
 {
