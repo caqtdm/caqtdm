@@ -107,7 +107,7 @@ void MessageWindow::customEvent(QEvent* event)
 #ifdef __MINGW32__
                 msgTextEdit.append(dynamic_cast<typename MessageEvent::MessageEvent* >(event)->msg);
 #else
-        #ifdef _WIN32
+        #if defined(_WIN32)  || defined(__clang__)
                 msgTextEdit.append(dynamic_cast<::MessageEvent* >(event)->msg);
         #else
                #if GCC_VERSION > 40407
@@ -152,7 +152,7 @@ void MessageWindow::postMsgEvent(QtMsgType type, char* msg)
 #ifdef __MINGW32__
     QCoreApplication::postEvent(this, new typename MessageEvent::MessageEvent(qmsg));
 #else
-#ifdef _WIN32
+#if defined(_WIN32)  || defined(__clang__)
     QCoreApplication::postEvent(this, new ::MessageEvent(qmsg));
 #else
 #if GCC_VERSION > 40407
