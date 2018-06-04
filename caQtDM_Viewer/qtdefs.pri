@@ -231,6 +231,14 @@ DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
+# 4.2.1
+# after write epics channel is cleared now
+# performance enhancement for caCalc
+# added some signals and slots
+# internal macros added
+# added property to caCartesianplot for changing size of symbols by a multiplicator
+# bug fixes
+
 # 4.2.0
 # major changes in camera widget to support all possible epics data modes and camera modes
 # rich text now also considered for fontscaling

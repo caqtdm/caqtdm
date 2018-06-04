@@ -25,6 +25,7 @@
 
 #ifdef _MSC_VER
     #include <windows.h>
+    #define EPICS_CALL_DLL
   #if (_MSC_VER > 1700)
     #include <stdbool.h>
   #endif
@@ -38,6 +39,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <ctype.h>
+#include <shareLib.h>
 #define epicsAlarmGLOBAL
 #include <cadef.h>
 #include "caQtDM_Lib_global.h"
