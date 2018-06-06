@@ -27,14 +27,16 @@
 #define NOMINMAX
 #include <windows.h>
 #define QWT_DLL
-#define snprintf _snprintf
 #endif
 
 #include "cameter.h"
 
 #if defined(_MSC_VER)
-#define fmax max
-#define fmin min
+ #define fmax max
+ #define fmin min
+ #ifndef snprintf
+  #define snprintf _snprintf
+ #endif
 #endif
 
 #include <qnumeric.h>
@@ -114,7 +116,7 @@ caMeter::caMeter(QWidget *parent) : QwtDial(parent)
     setScale( thisMinValue, thisMaxValue);
     setScaleStepSize((thisMinValue - thisMaxValue)/10.0);
 #endif
-		
+
     ScaleDraw->setPenWidth(1);
     setLineWidth(1);
     setFrameShadow(QwtDial::Sunken);

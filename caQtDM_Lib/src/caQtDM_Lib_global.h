@@ -35,7 +35,9 @@
    #else
       #define CAQTDM_LIBSHARED_EXPORT __declspec(dllimport)
    #endif
-   #define snprintf _snprintf
+   # if _MSC_VER < 1900
+    #define snprintf _snprintf
+   #endif
 #else
  #if defined(__MINGW32__)
     #if defined(CAQTDM_LIB_LIBRARY)

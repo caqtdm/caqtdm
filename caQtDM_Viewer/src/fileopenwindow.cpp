@@ -28,7 +28,9 @@ bool HTTPCONFIGURATOR = false;
 #if defined(_MSC_VER)
   #define NOMINMAX
   #include <windows.h>
-  #define snprintf _snprintf
+    #ifndef snprintf
+     #define snprintf _snprintf
+    #endif
   #include <Psapi.h>
   #pragma comment (lib, "Psapi.lib")
 #endif

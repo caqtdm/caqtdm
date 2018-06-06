@@ -27,7 +27,6 @@
 #define NOMINMAX
 #include <windows.h>
 #define QWT_DLL
-#define snprintf _snprintf
 #endif
 
 #define MIN_FONT_SIZE 3
@@ -44,8 +43,11 @@
 #include "alarmdefs.h"
 
 #if defined(_MSC_VER)
-#define fmax max
-#define fmin min
+ #define fmax max
+ #define fmin min
+ #ifndef snprintf
+  #define snprintf _snprintf
+ #endif
 #endif
 
 // I need to overload the scaleengine of qwt in order to get the upper and lower scale ticks drawn

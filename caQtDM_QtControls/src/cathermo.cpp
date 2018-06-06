@@ -38,7 +38,9 @@
 #include <qnumeric.h>
 //#include <QMetaEnum>
 #if defined(_MSC_VER)
-  #define snprintf _snprintf
+    #ifndef snprintf
+     #define snprintf _snprintf
+    #endif
 #endif
 
 

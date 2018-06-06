@@ -28,7 +28,6 @@
 #include <windows.h>
 #include <float.h>
 #define isnan _isnan
-#define snprintf _snprintf
 #define QWT_DLL
 #if (_MSC_VER == 1600)
   #define INFINITY (DBL_MAX+DBL_MAX)
@@ -42,6 +41,14 @@
 #include <qpainter.h>
 #include <QMetaProperty>
 #include "castripplot.h"
+
+
+
+#if defined(_MSC_VER)
+    #ifndef snprintf
+     #define snprintf _snprintf
+    #endif
+#endif
 
 // increase the array size given by the canvas width to be sure that the whole range is covered
 #define MAXIMUMSIZE 5000

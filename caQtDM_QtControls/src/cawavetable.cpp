@@ -27,7 +27,6 @@
 #define NOMINMAX
 #include <windows.h>
 #define QWT_DLL
-#define snprintf _snprintf
 #endif
 
 #include <stdio.h>
@@ -37,6 +36,12 @@
 #include <qnumeric.h>
 #include "cawavetable.h"
 #include "alarmdefs.h"
+
+#if defined(_MSC_VER)
+    #ifndef snprintf
+     #define snprintf _snprintf
+    #endif
+#endif
 
 
 caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
