@@ -28,9 +28,6 @@ bool HTTPCONFIGURATOR = false;
 #if defined(_MSC_VER)
   #define NOMINMAX
   #include <windows.h>
-    #ifndef snprintf
-     #define snprintf _snprintf
-    #endif
   #include <Psapi.h>
   #pragma comment (lib, "Psapi.lib")
 #endif
@@ -90,6 +87,10 @@ int setenv(const char *name, const char *value, int overwrite)
     }
     return _putenv_s(name, value);
 }
+#ifndef snprintf
+ #define snprintf _snprintf
+#endif
+
 #endif
 
 
