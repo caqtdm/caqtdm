@@ -26,6 +26,12 @@
 #ifndef MUTEXKNOBDATA_H
 #define MUTEXKNOBDATA_H
 
+#if defined(_MSC_VER)
+ //to avoid macro redefinition
+ #define _MATH_DEFINES_DEFINED
+ #include <math.h>
+#endif
+
 
 #include "caQtDM_Lib_global.h"
 
