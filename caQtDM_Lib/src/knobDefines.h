@@ -32,7 +32,7 @@
 
 #if defined(_MSC_VER) || !defined(__cplusplus)
 #ifndef Q_MOC_RUN
-#if _MSC_VER !=1800
+#if _MSC_VER <1800
  #define boolean int
  #define true 1==1
  #define false !(true)
