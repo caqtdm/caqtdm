@@ -56,7 +56,7 @@ int limitsDialog::extractPrecisionFromFormat(const QString &fmt)
 
 QString limitsDialog::getFormatFromPrecision(int prec)
 {
-    QString format = "\%.%1f";
+    QString format = "\\%.%1f";
     format = format.arg(prec);
     return format;
 }
