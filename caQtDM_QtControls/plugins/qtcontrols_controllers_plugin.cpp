@@ -24,7 +24,10 @@
  */
 
 #if defined(_MSC_VER)
-#define _CRT_SECURE_NO_WARNINGS
+ #define _CRT_SECURE_NO_WARNINGS
+ //to avoid macro redefinition
+ #define _MATH_DEFINES_DEFINED
+ #include <math.h>
 #endif
 
 #include <QtControls>
@@ -403,7 +406,7 @@ QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface_Controlle
 {
     return d_plugins;
 }
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 #else
 Q_EXPORT_PLUGIN2(QtControls, CustomWidgetCollectionInterface_Controllers)
 #endif

@@ -23,6 +23,13 @@
  *    anton.mezger@psi.ch
  */
 
+#if defined(_MSC_VER)
+ //to avoid macro redefinition
+ #define _MATH_DEFINES_DEFINED
+ #include <math.h>
+#endif
+
+
 #include <QTimer>
 #include <QtGui>
 #include <QApplication>
