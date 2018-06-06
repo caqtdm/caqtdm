@@ -25,7 +25,7 @@ archive_plugin {
 
         win32 {
                 message("archive_plugin configuration win32")
-                win32-msvc* {
+                win32-msvc* || msvc{
                         CONFIG += Define_Build_caQtDM_Lib Define_Build_qtcontrols Define_Symbols
                 }
 
@@ -65,7 +65,7 @@ demo_plugin {
                 message("demo_plugin configuration win32")
                 INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
 
-                win32-msvc* {
+                win32-msvc* || msvc{
                         CONFIG += Define_Build_caQtDM_Lib Define_Symbols
                 }
 
@@ -101,7 +101,7 @@ bsread_Plugin {
                 message(“bsread_plugin configuration win32”)
                 INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
 		INCLUDEPATH += $$(EPICS_BASE)/include
-                win32-msvc* {
+                win32-msvc* || msvc{
                         CONFIG += Define_Build_epics_controls Define_ControlsysTargetDir
                         CONFIG += Define_Build_caQtDM_Lib Define_Symbols Define_ZMQ_Lib
                 }
@@ -156,7 +156,7 @@ epics3_plugin {
                 message("epics3_plugin configuration win32")
                 INCLUDEPATH += $$(EPICS_BASE)/include/os/win32
                 INCLUDEPATH += $$(EPICS_BASE)/include/compiler/msvc
-                win32-msvc* {
+                win32-msvc* || msvc{
                         DEFINES +=_CRT_SECURE_NO_WARNINGS
                         CONFIG += Define_Build_epics_controls 
                         CONFIG += Define_Build_caQtDM_Lib Define_Symbols
@@ -280,7 +280,7 @@ epics4_plugin {
 	win32 {
                 message("epics4_plugin configuration win32")
   		
-                win32-msvc* {
+                win32-msvc* || msvc{
                         CONFIG += Define_Build_epics_controls Define_Build_objDirs
                         CONFIG += Define_Build_caQtDM_Lib Define_Symbols
                 }
@@ -325,13 +325,14 @@ caQtDM_QtControls {
         }
 
 	win32 {
-                message("caQtDM_QtControls sconfiguration : win32")
+                message("caQtDM_QtControls configuration : win32")
+		message($$CONFIG)
                 INCLUDEPATH += $$(QWTINCLUDE)
     		win32-g++ {
       			INCLUDEPATH = $(QWTHOME)/src
       			LIBS += $$(QWTLIB)/libqwt.a
      		}
-     		win32-msvc* {
+     		win32-msvc* || msvc{
         		DEFINES += QTCON_MAKEDLL _CRT_SECURE_NO_WARNINGS
                         CONFIG += Define_Build_qwt Define_Build_objDirs Define_Symbols Define_Build_OutputDir
      		}
@@ -398,7 +399,7 @@ caQtDM_Lib {
                 INCLUDEPATH += $$(EPICS_BASE)/include/compiler/msvc
 
 
-  		win32-msvc* {
+  		win32-msvc* || msvc{
         		DEFINES +=_CRT_SECURE_NO_WARNINGS
         		DEFINES += CAQTDM_LIB_LIBRARY
         		TEMPLATE = lib
@@ -705,7 +706,7 @@ caQtDM_Viewer {
                 RESOURCES += ./src/caQtDM.qrc
                 RC_FILE = ./src/caQtDM.rc
 
-                win32-msvc* {
+                win32-msvc* || msvc{
                         CONFIG += Define_Build_qwt
                         CONFIG += Define_Build_epics_controls
                         CONFIG += Define_Build_caQtDM_Lib Define_Symbols
@@ -744,7 +745,7 @@ caQtDM_xdl2ui{
 
         win32 {
                 message("adl2ui configuration win32")
-                win32-msvc* {
+                win32-msvc* || msvc{
                         CONFIG += Define_Build_OutputDir
                 }
 
@@ -891,7 +892,7 @@ Define_ControlsysTargetDir{
         }
         win32 {
                 message("adl2ui configuration win32")
-                win32-msvc* {
+                win32-msvc* || msvc{
 		    DebugBuild {
 			DESTDIR = $$(CAQTDM_COLLECT)/debug/controlsystems
 		     }
