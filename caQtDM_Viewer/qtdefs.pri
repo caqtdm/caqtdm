@@ -91,6 +91,17 @@ DEFINES += XDR_HACK
 DEFINES += XDR_LE
 CONFIG += XDR_HACK
 }
+# enable XDR_HACK test for Linux/Qt5.10 e.g. Fedora 28
+unix{
+ contains(QT_VER_MAJ, 5) {
+   greaterThan(QT_VER_MIN,10){
+    DEFINES += XDR_HACK
+    DEFINES += XDR_LE
+    CONFIG += XDR_HACK
+   }
+ }
+}
+
 
 # undefine CONFIG epics7 for epics4 plugin support with epics version 7 (only preliminary version as example)
 # one can specify channel access with ca:// and pv access with pva:// (both use the epics4 plugin)
