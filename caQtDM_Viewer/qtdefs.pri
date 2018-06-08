@@ -92,9 +92,9 @@ DEFINES += XDR_LE
 CONFIG += XDR_HACK
 }
 # enable XDR_HACK test for Linux/Qt5.10 e.g. Fedora 28
-unix{
+unix:!macx:{
  contains(QT_VER_MAJ, 5) {
-   greaterThan(QT_VER_MIN,10){
+   greaterThan(QT_VER_MIN,9){
     DEFINES += XDR_HACK
     DEFINES += XDR_LE
     CONFIG += XDR_HACK
