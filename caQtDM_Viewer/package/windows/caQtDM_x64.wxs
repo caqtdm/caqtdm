@@ -2,7 +2,7 @@
 <?include caQtDM_Version.wxi ?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Product Id="*" Name="caQtDM" Language="1033" Version="$(var.CaQtDMVersion)" Manufacturer="Paul Scherrer Institut" UpgradeCode="$(var.CaQtDM_x64_ProductUpgradeCode)">
-        <Package Description="caQTDM Windows Manager with Qt-Designer(5.5.0)" Comments="Displaymanager for EPICS with Qt(5.5.0)" InstallerVersion="405" Compressed="yes" Manufacturer="Paul Scherrer Institut Switzerland" Keywords="EPICS, Display, Network, Control" Platform="x64" InstallScope="perMachine" />
+        <Package Description="caQTDM Windows Manager with Qt-Designer" Comments="Displaymanager for EPICS with Qt" InstallerVersion="405" Compressed="yes" Manufacturer="Paul Scherrer Institut Switzerland" Keywords="EPICS, Display, Network, Control" Platform="x64" InstallScope="perMachine" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
         <Upgrade Id="$(var.CaQtDM_x64_ProductUpgradeCode)">
             <UpgradeVersion OnlyDetect="yes" Minimum="$(var.CaQtDMVersion)" Property="NEWERVERSIONDETECTED" IncludeMinimum="no" />
