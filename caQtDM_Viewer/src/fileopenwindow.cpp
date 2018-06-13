@@ -856,7 +856,16 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
         mainWindow->resize(mainWindow->minimumSizeHint());
     }
     activWindow = 0;
+#ifdef MOBILE_IOS
+    // this is needed for the status bar
+    QRect availscreengeo = QApplication::desktop()->availableGeometry(-1);
+    //QRect screengeo = QApplication::desktop()->geometry();
+    //qDebug() << "IOS screen" << screengeo<< availscreengeo;
+    QSize winsize=mainWindow->size();
+    winsize.setHeight( winsize.rheight() -availscreengeo.top());
+    mainWindow->resize(winsize);
 
+#endif
     //qDebug() << "allocate" << fileS.size()+macroS.size()+100;
     asc = (char*) malloc((fileS.size()+macroS.size()+100) * sizeof(char));
     if(macroS.size() > 0) {

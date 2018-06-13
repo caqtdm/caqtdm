@@ -839,7 +839,7 @@ void bsread_Decode::bsread_EndofData()
                         break;
                     }
                     case bs_float32:{
-                        kData->edata.fieldtype = caDOUBLE;
+                        kData->edata.fieldtype = caFLOAT;
                         if(bsreadPV->bsdata.wf_data_size!=0){
                             WaveformManagment(kData,bsreadPV);
                             MonitorList->append(kData);
