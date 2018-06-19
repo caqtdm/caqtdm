@@ -35,6 +35,7 @@ REM ============================================================================
 
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
+  set QWTLIBNAME=qwt
   set GITPATH=C:\Users\brands\AppData\Local\Atlassian\SourceTree\git_local\bin\;C:\Program Files (x86)\Git\bin
   
   set EPICS_BASE=X:/epics/base-3.14.12.4
