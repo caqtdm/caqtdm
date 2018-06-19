@@ -298,7 +298,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     #endif
 
     qDebug() << "caQtDM -- shared memory key" << uniqueKey;
-    sharedMemory.setKey ("caQtDM shared memory");
+    sharedMemory.setKey (uniqueKey);
 
     if (sharedMemory.attach()) {
         _isRunning = true;
@@ -1149,6 +1149,7 @@ void FileOpenWindow::reload(QWidget *w)
     }
 
     // get rif of old window
+    if(!w->isVisible()) return; // add this, while a close will quit when window is not loaded and visible
     position = w->pos();
     w->close();
     w->disconnect();
