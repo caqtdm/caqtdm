@@ -301,7 +301,7 @@ caQtDM_QtControls {
  		OBJECTS_DIR = obj
 		DESTDIR = $$(CAQTDM_COLLECT)
  		INCLUDEPATH += $$(QWTINCLUDE)
-                LIBS += -L$$(QWTLIB) -Wl,-rpath,$(QWTLIB) -lqwt
+                LIBS += -L$$(QWTLIB) -Wl,-rpath,$(QWTLIB) -l$$(QWTLIBNAME)
   	}
 
         macx {
@@ -310,13 +310,12 @@ caQtDM_QtControls {
     		OBJECTS_DIR = obj
 		DESTDIR = $$(CAQTDM_COLLECT)
     		CONFIG += lib_bundle
-                LIBS += -F$$(QWTLIB) -framework qwt
+                LIBS += -F$$(QWTLIB) -framework $$(QWTLIBNAME)
   	}
 
 	ios | android {
                 message("caQtDM_QtControls configuration : ios or android")
 		OBJECTS_DIR = obj
-                #DESTDIR = $$(CAQTDM_COLLECT)
 		INCLUDEPATH += $$(QWTINCLUDE)
                 CONFIG += staticlib
                 CONFIG += release
@@ -329,7 +328,7 @@ caQtDM_QtControls {
                 INCLUDEPATH += $$(QWTINCLUDE)
     		win32-g++ {
       			INCLUDEPATH = $(QWTHOME)/src
-      			LIBS += $$(QWTLIB)/libqwt.a
+                        LIBS += $$(QWTLIB)/lib$$(QWTLIBNAME).a
      		}
      		win32-msvc* {
         		DEFINES += QTCON_MAKEDLL _CRT_SECURE_NO_WARNINGS
@@ -363,7 +362,7 @@ caQtDM_Lib {
                 INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
 
       		QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
-      		LIBS += -F$(QWTLIB) -framework qwt
+                LIBS += -F$(QWTLIB) -framework $$(QWTLIBNAME)
                 LIBS += -L$(CAQTDM_COLLECT) -lqtcontrols
       		LIBS += ${EPICSLIB}/libCom.dylib
       		DESTDIR = $(CAQTDM_COLLECT)
@@ -407,7 +406,7 @@ caQtDM_Lib {
    		}
    		win32-g++ {
        			EPICS_LIBS=$$(EPICS_BASE)/lib/win32-x86-mingw
-			LIBS += $$(QWTLIB)/libqwt.a
+                        LIBS += $$(QWTLIB)/lib$$(QWTLIBNAME).a
 			LIBS += $$(QTCONTROLS_LIBS)/release//libqtcontrols.a
 			LIBS += $${EPICS_LIBS}/ca.lib
 			LIBS += $${EPICS_LIBS}/COM.lib
@@ -478,7 +477,7 @@ caQtDM_Viewer {
                 comlib.files = $$(EPICSDYLIB2)
 
                 qwtframework.path = Contents/Frameworks
-                qwtframework.files = $$(QWTHOME)/lib/qwt.framework
+                qwtframework.files = $$(QWTHOME)/lib/$$(QWTLIBNAME).framework
                 QMAKE_BUNDLE_DATA += calib comlib qwtframework
                 plugins_epics3.path = Contents/PlugIns/controlsystems
                 plugins_epics3.files += $(CAQTDM_COLLECT)/controlsystems/libepics3_plugin.dylib
@@ -577,7 +576,7 @@ caQtDM_Viewer {
                          LIBS += $$(EPICSLIB)/static/libca.a
                          LIBS += $$(EPICSLIB)/static/libCom.a
 
-                         LIBS += $$(QWTHOME)/lib/libqwt_iphonesimulator.a
+                         LIBS += $$(QWTHOME)/lib/lib$$(QWTLIBNAME)_iphonesimulator.a
 
 
                          # build simulator only for 32 bit
@@ -589,7 +588,7 @@ caQtDM_Viewer {
 
                          LIBS += $$(EPICSLIB)/static/libca.a
                          LIBS += $$(EPICSLIB)/static/libCom.a
-                         LIBS += $$(QWTHOME)/lib/libqwt.a
+                         LIBS += $$(QWTHOME)/lib/lib$$(QWTLIBNAME).a
 
                          ###############################################################################
                          # Code Signing settings needed only for iOS App Store
@@ -653,7 +652,7 @@ caQtDM_Viewer {
                         }
                         LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.a
                         LIBS += $(CAQTDM_COLLECT)/libqtcontrols.a
-                        LIBS += $$(QWTHOME)/lib/libqwt.a
+                        LIBS += $$(QWTHOME)/lib/lib$$(QWTLIBNAME).a
                         LIBS += $$(EPICSLIB)/libca.a
                         LIBS += $$(EPICSLIB)/libCom.a
                         LOCAL_LDLIBS += -llog
@@ -714,7 +713,7 @@ caQtDM_Viewer {
 
                 win32-g++ {
                         EPICS_LIBS=$$(EPICS_BASE)/lib/win32-x86-mingw
-                        LIBS += $$(QWTLIB)/libqwt.a
+                        LIBS += $$(QWTLIB)/lib$$(QWTLIBNAME).a
                         LIBS += $$(QTCONTROLS_LIBS)/release/libqtcontrols.a
                         LIBS += $${EPICS_LIBS}/ca.lib
                         LIBS += $${EPICS_LIBS}/COM.lib
@@ -807,11 +806,11 @@ Define_Symbols{
 Define_Build_qwt {
      DebugBuild {
          message("QWT Debug configuration : win32")
-         LIBS += $$(QWTHOME)/lib/qwtd.lib
+         LIBS += $$(QWTHOME)/lib/$$(QWTLIBNAME)d.lib
      }
     ReleaseBuild {
         message("QWT Release configuration : win32")
-        LIBS += $$(QWTHOME)/lib/qwt.lib
+        LIBS += $$(QWTHOME)/lib/$$(QWTLIBNAME).lib
     }
 }
 Define_Build_objDirs {
