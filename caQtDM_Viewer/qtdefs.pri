@@ -242,6 +242,9 @@ DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
+# 4.2.2
+# shared memory key was not set correctly for -attach; corrected now
+
 # 4.2.1
 # after write epics channel is cleared now
 # performance enhancement for caCalc
