@@ -17,7 +17,7 @@ void bsread_wfhandling::wfconvert()
             break;
         }
         case bs_float32:{
-            bsread_wfConverter<float,double> *converter=new bsread_wfConverter<float,double>(kDataP,bsreadPVP,BlockPoolP);
+            bsread_wfConverter<float,float> *converter=new bsread_wfConverter<float,float>(kDataP,bsreadPVP,BlockPoolP);
             converter->wfconvert();
             delete converter;
             break;
