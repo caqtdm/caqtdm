@@ -288,6 +288,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 
 #ifndef MOBILE
     QString uniqueKey = QString("caQtDM shared memory:") ;
+    bool memoryAttached = false;
     #ifdef CAQTDM_X11
         uniqueKey.append(DisplayString(QX11Info::display()));
     #endif
@@ -300,10 +301,22 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     qDebug() << "caQtDM -- shared memory key" << uniqueKey;
     sharedMemory.setKey (uniqueKey);
 
-    if (sharedMemory.attach()) {
+    // in case that one wants to attach to an instance that is actually creating, wait until we can attach
+    if(attach) {
+        for(int j=0; j<10; j++) {
+            Sleep::msleep(150);
+            if (sharedMemory.attach()) {
+                memoryAttached = true;
+                break;
+            }
+        }
+    }
+
+    // memory attached
+    if (memoryAttached) {
         _isRunning = true;
         if(attach) {
-            qDebug() << "caQtDM -- another instance of caQtDM detected ==> attach to it (" << uniqueKey <<")" ;
+            qDebug() << "caQtDM -- another instance of caQtDM detected with size"  << sharedMemory.size() << "==> attach to it (" << uniqueKey <<")" ;
             QString message(filename);
             message.append(";");
             message.append(macroString);
@@ -311,7 +324,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
             message.append(geometry);
             message.append(";");
             message.append(lastResizing);
-            //qDebug() << "send a message with file, macro and geometry to it and exit "<< message;
+            qDebug() << "send a message with file, macro and geometry to it and exit "<< message;
             sendMessage(message);
             sharedMemory.detach();
             qApp->exit(0);  // does not work here
@@ -319,18 +332,21 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         } else {
             qDebug() << "caQtDM -- another instance of caQtDM detected, but no attach specified ==> standalone";
         }
+    // memory to be created
     } else {
-        QByteArray byteArray("0");
         _isRunning = false;
         // create shared memory with a default value to note that no message is available.
-        if (!sharedMemory.create(4096)) {
-            qDebug("caQtDM -- Unable to create single instance of shared memory.");
+        if (!sharedMemory.create(BlopSize * RingSize + 2 * sizeof(uint))) {
+            qDebug() << "caQtDM -- Unable to create shared memory:" << sharedMemory.errorString();
         } else {
-            qDebug() << "caQtDM -- created shared memory with 4096 bytes";
+            int size =  BlopSize * RingSize + 2 * sizeof(uint);
+            QByteArray byteArray(size, '\0');
+            qDebug() << "caQtDM -- created shared memory with" << BlopSize * RingSize + 2 * sizeof(uint) << "bytes";
             sharedMemory.lock();
             char *to = (char*)sharedMemory.data();
             const char *from = byteArray.data();
             memcpy(to, from, qMin(sharedMemory.size(), byteArray.size()));
+            MSQ_init();
             sharedMemory.unlock();
             // start checking for messages of other instances.
             timer = new QTimer(this);
@@ -1216,28 +1232,23 @@ void FileOpenWindow::Callback_ActionDirect() {
 
 void FileOpenWindow::checkForMessage()
 {
-    // check for message in memory
-    sharedMemory.lock();
-    QByteArray byteArray = QByteArray((char*)sharedMemory.constData(), sharedMemory.size());
-    sharedMemory.unlock();
+     _blop element;
 
-    if (byteArray.left(1) == "0") return;  // no message, quit
-    byteArray.remove(0, 1);                // remove first character
-    QString message = QString::fromUtf8(byteArray.constData()); // get and split message
+    // check and remove message in shared memory
+    sharedMemory.lock();
+    element = MSQ_deQueue();
+    sharedMemory.unlock();
+    if(element.blop[0] == '\0') {
+        //qDebug() << "queue was empty, so do nothing";
+        return;  // no message, quit
+    }
+    QString message = QString::fromUtf8(element.blop); // get and split message
     QStringList vars = message.split(";");
 
     //qDebug() << "received message=" << message;
     //qDebug() << "vars" << vars.count() <<  vars;
 
     if(vars.count() == 4) emit Callback_OpenNewFile(vars.at(0), vars.at(1), vars.at(2), vars.at(3));
-
-    // remove message from shared memory.
-    byteArray = "0";
-    sharedMemory.lock();
-    char *to = (char*)sharedMemory.data();
-    const char *from = byteArray.data();
-    memcpy(to, from, qMin(sharedMemory.size(), byteArray.size()));
-    sharedMemory.unlock();
 }
 
 bool FileOpenWindow::isRunning()
@@ -1247,14 +1258,14 @@ bool FileOpenWindow::isRunning()
 
 bool FileOpenWindow::sendMessage(const QString &message)
 {
+    _blop element;
     if (!_isRunning) return false;
-    QByteArray byteArray("1");
-    byteArray.append(message.toUtf8());
+    QByteArray byteArray(message.toUtf8());
     byteArray.append('\0');
-    sharedMemory.lock();
-    char *to = (char*)sharedMemory.data();
     const char *from = byteArray.data();
-    memcpy(to, from, qMin(sharedMemory.size(), byteArray.size()));
+    memcpy(element.blop, from, byteArray.size());
+    sharedMemory.lock();
+    MSQ_enQueue(element);
     sharedMemory.unlock();
     return true;
 }
