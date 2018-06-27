@@ -1603,12 +1603,37 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         if(lineeditWidget->getPV().size() > 0) {
             lineeditWidget->setCursor(QCursor());
             lineeditWidget->setReadOnly(true);
+            QString pv = lineeditWidget->getPV();
 
             lineeditWidget->setAlignment(lineeditWidget->alignment());
+            specData[0] = 0;
             int num = addMonitor(myWidget, &kData, lineeditWidget->getPV(), w1, specData, map, &pv);
             integerList.append(num);
             lineeditWidget->setPV(pv);
             nbMonitors++;
+
+            // this is in principle crap, but necessary for psi's bsread, in order to get the unit (.EGU), that was normally
+            // transmitted in the epics protocol
+            QVariant var=lineeditWidget->property("Interface");
+            if(!var.isNull()) {
+                QVariantList infoList = var.toList();
+                void *ptr = (void*) infoList.at(0).value<void *>();
+                if(ptr != (void*) 0) {
+                    ControlsInterface * plugininterface = (ControlsInterface *) ptr;
+                    if(plugininterface != (ControlsInterface *) 0) {
+                        if(plugininterface->pluginName().contains("bsread")) {
+                            qDebug() << "bread detected";
+                            pv.append(".EGU");
+                            specData[0] = 1;
+                            if(pv.contains("bsread://")) pv.replace("bsread://", "epics3://");
+                            else pv.prepend("epics3://");
+                            int num = addMonitor(myWidget, &kData, pv, w1, specData, map, &pv);
+                            integerList.append(num);
+                            nbMonitors++;
+                        }
+                    }
+                }
+            }
         }
 
         // default format, format from ui file will be used normally except for channel precision
@@ -4475,7 +4500,12 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         QColor bg = lineeditWidget->property("BColor").value<QColor>();
         QColor fg = lineeditWidget->property("FColor").value<QColor>();
 
-        if(data.edata.connected) {
+        // units crap
+        if(data.edata.connected && (data.specData[0] == 1)) {
+            lineeditWidget->appendUnits(String);
+        }
+
+        if(data.edata.connected && (data.specData[0] == 0)) {
             lineeditWidget->setDatatype(data.edata.fieldtype);
             // enum string
             if(data.edata.fieldtype == caENUM || data.edata.fieldtype == caSTRING || data.edata.fieldtype == caCHAR) {
@@ -4593,7 +4623,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 }
             }
 
-        } else {
+        } else if(data.specData[0] == 0) {
             lineeditWidget->setValueType(false);
             lineeditWidget->setTextLine("");
             lineeditWidget->setAlarmColors(NOTCONNECTED, 0.0, bg, fg);        \

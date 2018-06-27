@@ -136,6 +136,7 @@ public:
 
     void setFormat(int prec);
     void setValue(double value, const QString& units);
+    void appendUnits(const QString& units);
     void setDatatype(int datatype);
 
     void setFormatType(FormatType m) { thisFormatType = m; }
@@ -168,8 +169,6 @@ protected:
       virtual QSize sizeHint() const;
       virtual QSize minimumSizeHint() const;
       QSize calculateTextSpace();
-      // attempt to improve performance
-      //void paintEvent(QPaintEvent *);
 
 private:
     QString thisPV;
@@ -209,6 +208,8 @@ private:
     QColor fgAtInitLast;
     QString unitsLast;
     int thisDatatype;
+    bool specialUnitsAppend;
+    QString specialUnitsString;
 };
 
 #endif
