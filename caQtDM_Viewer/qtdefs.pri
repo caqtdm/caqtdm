@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V4.2.1
+CAQTDM_VERSION = V4.2.3
 
 exists(../.git) {
   GIT_VERSION = $$system(git --version)
@@ -91,6 +91,17 @@ DEFINES += XDR_HACK
 DEFINES += XDR_LE
 CONFIG += XDR_HACK
 }
+# enable XDR_HACK test for Linux/Qt5.10 e.g. Fedora 28
+unix:!macx:{
+ contains(QT_VER_MAJ, 5) {
+   greaterThan(QT_VER_MIN,9){
+    DEFINES += XDR_HACK
+    DEFINES += XDR_LE
+    CONFIG += XDR_HACK
+   }
+ }
+}
+
 
 # undefine CONFIG epics7 for epics4 plugin support with epics version 7 (only preliminary version as example)
 # one can specify channel access with ca:// and pv access with pva:// (both use the epics4 plugin)
@@ -230,6 +241,9 @@ DEFINES += TARGET_DESCRIPTION=\"\\\"$${TARGET_DESCRIPTION}\\\"\"
 DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
+
+# 4.2.2
+# shared memory key was not set correctly for -attach; corrected now
 
 # 4.2.1
 # after write epics channel is cleared now

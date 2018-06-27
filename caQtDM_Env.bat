@@ -35,6 +35,7 @@ REM ============================================================================
 
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
+  set QWTLIBNAME=qwt
   set GITPATH=C:\Users\brands\AppData\Local\Atlassian\SourceTree\git_local\bin\;C:\Program Files (x86)\Git\bin
   
   set EPICS_BASE=X:/epics/base-3.14.12.4
@@ -74,6 +75,7 @@ REM ============================================================================
   set QWTHOME=X:/qt/qwt-6.1.3_5_8_64bit
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
+  set QWTLIBNAME=qwt
   set QWTVERSION=6.1
 
   set GITPATH=C:\Users\brands\AppData\Local\Atlassian\SourceTree\git_local\bin\;C:\Program Files (x86)\Git\bin
@@ -119,6 +121,7 @@ REM ============================================================================
   set QWTHOME=X:/qt/qwt-6.1.3_32bit
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
+  set QWTLIBNAME=qwt
   set QWTVERSION=6.1
 
   set PATH=%PATH%;C:\Program Files (x86)\Git\bin
@@ -163,7 +166,7 @@ REM ============================================================================
   set QWTHOME=X:/qt/qwt-6.1.3_RT
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
-  
+  set QWTLIBNAME=qwt
   
   set EPICS_BASE=X:/epics/Package/base
   set EPICS_HOST_ARCH=win32-x86
@@ -205,6 +208,7 @@ echo QTHOME               now defined as %QTHOME%		for locating Qt
 echo QWTHOME              now defined as %QWTHOME%		for locating qwt
 echo QWTINCLUDE           now defined as %QWTINCLUDE%		for locating the include files of qwt
 echo QWTLIB               now defined as %QWTLIB%		for locating the libraries of qwt
+echo QWTLIBNAME           now defined as %QWTLIBName%		for naming the library of qwt
 echo EPICS_BASE           now defined as %EPICS_BASE%		for locating epics 
 echo EPICSINCLUDE         now defined as %EPICSINCLUDE%		for locating epics include files
 echo EPICSLIB             now defined as %EPICSLIB%		for locating epics libraries

@@ -308,6 +308,7 @@ int main(int argc, char *argv[])
             QFile file(fileNameFound);
             file.open(QFile::ReadOnly);
             macroString = QLatin1String(file.readAll());
+            macroString = macroString.simplified();
             file.close();
         }
     }

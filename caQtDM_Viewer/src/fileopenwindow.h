@@ -61,6 +61,30 @@
     int setenv(const char *name, const char *value, int overwrite);
 #endif
 
+#define RingSize 50
+#define BlopSize 4096
+    struct _blop {
+        char blop[BlopSize];
+    };
+
+// this sleep will not block the GUI and QThread::msleep is protected in Qt4.8 (so do not use that)
+    class Sleep
+    {
+    public:
+        static void msleep(unsigned long msecs)
+        {
+    #ifndef MOBILE_ANDROID
+            QMutex mutex;
+            mutex.lock();
+            QWaitCondition waitCondition;
+            waitCondition.wait(&mutex, msecs);
+            mutex.unlock();
+    #else
+            // not nice, but the above does not work on android now (does not wait)
+            usleep(msecs * 100);
+    #endif
+        }
+    };
 
  class FileOpenWindow : public QMainWindow
  {
@@ -85,6 +109,104 @@
      void setAllEnvironmentVariables(const QString &fileName);
      void parseConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files);
      void saveConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files);
+
+
+     void MSQ_getPtrs(int &front, int &rear) {
+             int *ptr1 = (int*) sharedMemory.data();
+             front = *ptr1;
+             int *ptr2 = ptr1 + 1;
+             rear = *ptr2;
+         }
+
+         void MSQ_setPtrs(int front, int rear) {
+             int *ptr1 = (int*) sharedMemory.data();
+             *ptr1 = front;
+             int *ptr2 = ptr1 + 1;
+             *ptr2 = rear;
+         }
+
+         void MSQ_init() {
+             MSQ_setPtrs(-1, -1);
+         }
+
+         bool MSQ_isFull() {
+             MSQ_getPtrs(front, rear);
+
+             if(front == 0 && rear == RingSize - 1){
+                 return true;
+             }
+             if(front == rear + 1) {
+                 return true;
+             }
+             return false;
+         }
+
+         bool MSQ_isEmpty() {
+             MSQ_getPtrs(front, rear);
+
+             if(front == -1) return true;
+             else return false;
+         }
+
+         void MSQ_enQueue(_blop element) {
+             MSQ_getPtrs(front, rear);
+
+             if(MSQ_isFull()){
+                 qDebug() << "caQtDM -- attach queue is full";
+             } else {
+                 if(front == -1) front = 0;
+                 rear = (rear + 1) % RingSize;
+                 char *ptr = (char*) (((char*) sharedMemory.data()) + (rear * BlopSize) + 2*sizeof(int));
+                 memcpy((char*) ptr, &element.blop[0], BlopSize);
+                 //qDebug() << "Inserted @" << rear;
+                 MSQ_setPtrs(front, rear);
+             }
+             return;
+         }
+
+         _blop MSQ_deQueue() {
+             _blop element;
+
+             MSQ_getPtrs(front, rear);
+             //qDebug() << front << rear;
+
+             if(MSQ_isEmpty()){
+                 return(empty);
+             } else {
+                 char *ptr = (char*) (((char*) sharedMemory.data()) + (front * BlopSize) + 2*sizeof(int));
+                 memcpy(element.blop, (char*) ptr, BlopSize);
+                 if(front == rear) {
+                     front = -1;
+                     rear = -1;
+                 }
+                 else {
+                     front=(front+1) % RingSize;
+                 }
+                 MSQ_setPtrs(front, rear);
+                 return(element);
+             }
+         }
+
+         void MSQ_display()
+         {
+             int i = 0;
+
+             if(MSQ_isEmpty()) {
+                 qDebug() << "Empty Queue";
+             } else {
+
+                 MSQ_getPtrs(front, rear);
+
+                 qDebug() << "Front -> " << front;
+                 for(i=front; i!=rear;i=(i+1) % RingSize ) {
+                     char *ptr = (char*) (((char*) sharedMemory.data()) + (i * BlopSize) + 2 * sizeof(int));
+                     qDebug() << i << ptr;
+                 }
+                 char *ptr = (char*) (((char*) sharedMemory.data()) + (i * BlopSize) + 2 * sizeof(int));
+                 qDebug() << i << ptr;
+                 qDebug() << "Rear -> " << rear;
+             }
+         }
 
  private slots:
      void Callback_ActionTimed();
@@ -167,6 +289,11 @@ private:
 
      double caQtDM_TimeLeft, caQtDM_TimeOut;
      bool caQtDM_TimeOutEnabled;
+
+     QMutex mutex;
+     int front;
+     int rear;
+     _blop empty;
 
  };
 
