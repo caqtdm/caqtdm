@@ -29,6 +29,7 @@
 #include <QGridLayout>
 #include <QFrame>
 #include <QEvent>
+#include <QMimeData>
 
 #include <qtcontrols_global.h>
 #include <caLineEdit>
