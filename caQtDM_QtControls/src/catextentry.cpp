@@ -26,6 +26,7 @@
 #include "catextentry.h"
 #include <QApplication>
 #include <QMouseEvent>
+#include <QMimeData>
 
 caTextEntry::caTextEntry(QWidget *parent) : caLineEdit(parent)
 {
