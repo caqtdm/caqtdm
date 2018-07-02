@@ -549,11 +549,15 @@ void bsread_dispatchercontrol::ChannelVerification(QNetworkAccessManager* manage
         channelstruct candidate=get_AddChannel();
 
         // for special waveform shape channels
+/*
         if (candidate.channel.contains(".BSREADSHAPE")){
             ChannelsApprovePipeline.insert(candidate.channel,candidate.index);
         }else{
             ChannelsToBeApprovePipeline.insert(candidate.channel,candidate.index);
         }
+*/
+        // Channel Check Removed!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        ChannelsApprovePipeline.insert(candidate.channel,candidate.index);
     }
 
     QSet<QString> keys=QSet<QString>::fromList(ChannelsToBeApprovePipeline.keys());
