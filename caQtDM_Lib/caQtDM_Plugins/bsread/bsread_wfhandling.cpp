@@ -12,12 +12,15 @@ void bsread_wfhandling::wfconvert()
     switch (bsreadPVP->type){
         case bs_float64:{
             bsread_wfConverter<double,double> *converter=new bsread_wfConverter<double,double>(kDataP,bsreadPVP,BlockPoolP);
+            converter->setPrecision(QDataStream::DoublePrecision);
             converter->wfconvert();
             delete converter;
             break;
         }
         case bs_float32:{
+            //for (int x=0;x<10;x++)  qDebug() << ((float *)bsreadPVP->bsdata.wf_data)[x];
             bsread_wfConverter<float,float> *converter=new bsread_wfConverter<float,float>(kDataP,bsreadPVP,BlockPoolP);
+            converter->setPrecision(QDataStream::SinglePrecision);
             converter->wfconvert();
             delete converter;
             break;

@@ -31,6 +31,8 @@ private:
     bsread_channeldata * bsreadPVP;
     QThreadPool *BlockPoolP;
     bool usememcpyP;
+    bool set_Precision;
+    QDataStream::FloatingPointPrecision precision;
 public:
     bsread_wfConverter(knobData* kData,bsread_channeldata * bsreadPV,QThreadPool *BlockPool)
     {
@@ -38,9 +40,15 @@ public:
         bsreadPVP=bsreadPV;
         BlockPoolP=BlockPool;
         usememcpyP=false;
+        set_Precision=false;
+        precision=QDataStream::SinglePrecision;
     }
     void usememcpy(){
       usememcpyP=true;
+    }
+    void setPrecision(QDataStream::FloatingPointPrecision prec){
+      set_Precision=true;
+      precision=prec;
     }
 
     void ConProcess(int sectorP,int fullP,T_BSREAD* SourceP,size_t sourcecountP ,T_CAQTDM * targetP){
@@ -96,6 +104,7 @@ public:
             if (kDataP->edata.valueCount<100000){
                 QByteArray data = QByteArray::fromRawData((const char *)bsreadPVP->bsdata.wf_data, bsreadPVP->bsdata.wf_data_size*sizeof(T_BSREAD));
                 QDataStream stream(data);
+                if (set_Precision) stream.setFloatingPointPrecision(precision);
                 ulong counter=0;
 
                 switch(bsreadPVP->endianess){
