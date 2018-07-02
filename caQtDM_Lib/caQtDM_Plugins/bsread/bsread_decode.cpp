@@ -822,7 +822,7 @@ void bsread_Decode::bsread_EndofData()
                     if (!bsreadPV->valid){
                         kData->edata.severity=INVALID_ALARM;
                     }else{
-                        kData->edata.severity=0;
+                        kData->edata.severity=NO_ALARM;
                     }
                     switch (bsreadPV->type){
                     case bs_float64:{
