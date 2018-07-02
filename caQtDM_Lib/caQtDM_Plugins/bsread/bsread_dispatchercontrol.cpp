@@ -652,6 +652,14 @@ void bsread_dispatchercontrol::finishVerification()
 
     qDebug()<<"finishVerification() :"<< ChannelsApprovePipeline.count();// httpdata;
 
+    if (ChannelsToBeApprovePipeline.count()>0){
+     QString msg_not="bsread: Not approved channels ";
+     msg_not.append(QString("%1").arg(ChannelsToBeApprovePipeline.count()));
+     messagewindowP->postMsgEvent(QtCriticalMsg,(char*) msg_not.toLatin1().constData());
+
+    }
+
+
     if (msg.contains("exception")){
         messagewindowP->postMsgEvent(QtCriticalMsg,(char*) msg.toLatin1().constData());
         // Request all channels we have, and see what will come
