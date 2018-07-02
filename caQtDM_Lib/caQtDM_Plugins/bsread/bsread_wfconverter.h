@@ -120,14 +120,17 @@ public:
                      counter++;
                 }
             }else{
-                int threadcounter=QThread::idealThreadCount();
                 size_t elementcount= (bsreadPVP->bsdata.wf_data_size);
+                T_BSREAD* ptr=(T_BSREAD *)(bsreadPVP->bsdata.wf_data);
+                T_CAQTDM* target=(T_CAQTDM*)(kDataP->edata.dataB);
 
-    #ifndef QT_NO_CONCURRENT
+   #ifndef QT_NO_CONCURRENT
+                int threadcounter=QThread::idealThreadCount();
+
                 QFutureSynchronizer<void> Sectors;
                 for (int sector=0;sector<threadcounter;sector++){
-                  T_BSREAD* ptr=(T_BSREAD *)(bsreadPVP->bsdata.wf_data);
-                  T_CAQTDM* target=(T_CAQTDM*)(kDataP->edata.dataB);
+
+
 
                   Sectors.addFuture(QtConcurrent::run(this,&bsread_wfConverter::ConProcess,sector,threadcounter,ptr,elementcount,target));
                 }
