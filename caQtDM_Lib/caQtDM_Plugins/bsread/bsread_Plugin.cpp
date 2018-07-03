@@ -121,7 +121,7 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
     //Q_UNUSED(options);
     //qDebug() << "bsreadPlugin: InitCommunicationLayer" << data;
     qDebug() << "bsreadPlugin: InitCommunicationLayer with options" << options;
-    qDebug()<< options<<options.count();
+
     mutexknobdataP = data;
     messagewindowP = messageWindow;
     // INIT ZMQ Layer

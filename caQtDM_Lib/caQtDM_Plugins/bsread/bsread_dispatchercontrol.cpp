@@ -156,22 +156,33 @@ void bsread_dispatchercontrol::process()
 
         }
 
-        bsmodulo="1";
-        bsoffset="0";
+        QString bsmodulo="1";
+        QString bsoffset="0";
+        QString bsinconsistency="keep-as-is";
+        QString bsmapping="fill-null";
 
         if (!optionsP.empty()){
-
-          QMap<QString, QString>::const_iterator m = optionsP.find("bsmodulo");
+          QMap<QString, QString>::const_iterator m;
+          m = optionsP.find("bsmodulo");
           while (m != optionsP.end() && m.key() == "bsmodulo") {
               bsmodulo=m.value();
               ++m;
           }
-          QMap<QString, QString>::const_iterator o = optionsP.find("bsoffset");
-          while (o != optionsP.end() && o.key() == "bsoffset") {
-              bsoffset=o.value();
-              ++o;
+          m = optionsP.find("bsoffset");
+          while (m != optionsP.end() && m.key() == "bsoffset") {
+              bsoffset=m.value();
+              ++m;
           }
-
+          m = optionsP.find("bsinconsistency");
+          while (m != optionsP.end() && m.key() == "bsinconsistency") {
+              bsinconsistency=m.value();
+              ++m;
+          }
+          m = optionsP.find("bsmapping");
+          while (m != optionsP.end() && m.key() == "bsmapping") {
+              bsmapping=m.value();
+              ++m;
+          }
         }
 
         if((Channels.count()!=requestedchannels)){
@@ -192,8 +203,8 @@ void bsread_dispatchercontrol::process()
             }
             data.remove(data.length()-1,1);
             data.append("],\"sendIncompleteMessages\":true,\"compression\":\"none\",");
-            data.append("\"mapping\":{\"incomplete\":\"fill-null\"},");
-            data.append("\"channelValidation\":{\"inconsistency\":\"keep-as-is\"}}");
+            data.append("\"mapping\":{\"incomplete\":\""+bsmapping+"\"},");
+            data.append("\"channelValidation\":{\"inconsistency\":\""+bsinconsistency+"\"}}");
 
 
             if (!data.contains("channels\":[]")){
