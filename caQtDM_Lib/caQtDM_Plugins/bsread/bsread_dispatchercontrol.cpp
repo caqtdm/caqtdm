@@ -156,9 +156,23 @@ void bsread_dispatchercontrol::process()
 
         }
 
+        bsmodulo="1";
+        bsoffset="0";
 
+        if (!optionsP.empty()){
 
+          QMap<QString, QString>::const_iterator m = optionsP.find("bsmodulo");
+          while (m != optionsP.end() && m.key() == "bsmodulo") {
+              bsmodulo=m.value();
+              ++m;
+          }
+          QMap<QString, QString>::const_iterator o = optionsP.find("bsoffset");
+          while (o != optionsP.end() && o.key() == "bsoffset") {
+              bsoffset=o.value();
+              ++o;
+          }
 
+        }
 
         if((Channels.count()!=requestedchannels)){
             //qDebug()<<"Checking Channels: "<< Channels.count();
@@ -169,9 +183,10 @@ void bsread_dispatchercontrol::process()
                 if (!key.startsWith("bsread:")){ //removes all header channels
                     if (!key.contains(".BSREADSHAPE")){//removes shape waveform channels
                         data.append("{\"name\":\"");
-                        data.append(key);
-                        //data.append("\",\"modulo\":1,\"offset\":0},");
-                        data.append("\"},");
+                        data.append(key+"\"");
+                        data.append(",\"modulo\": "+bsmodulo);
+                        data.append(",\"offset\": "+bsoffset);
+                        data.append("},");
                     }
                 }
             }
@@ -251,6 +266,11 @@ void bsread_dispatchercontrol::deleteStream(QString *value)
 
  }
 */
+void bsread_dispatchercontrol::setOptions(QMap<QString, QString> options){
+   optionsP=options;
+}
+
+
 
 void bsread_dispatchercontrol::setMessagewindow(MessageWindow *value)
 {

@@ -67,6 +67,7 @@ public:
     void setMessagewindow(MessageWindow *value);
     void ChannelVerification(QNetworkAccessManager* manager);
 
+    void setOptions(QMap<QString, QString> options);
 signals:
     //void requestFinished();
     void finished();
@@ -83,6 +84,7 @@ protected:
 
   QString Dispatcher;
   MessageWindow *messagewindowP;
+  QMap<QString, QString> optionsP;
   bool terminate;
   QList<QString> streams;
   QMultiMap<QString,int> Channels;

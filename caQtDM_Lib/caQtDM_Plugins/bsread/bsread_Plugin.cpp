@@ -118,8 +118,10 @@ void bsreadPlugin::updateValues()
 int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow,QMap<QString, QString> options)
 {
     int i;
-    Q_UNUSED(options);
-    qDebug() << "bsreadPlugin: InitCommunicationLayer" << data;
+    //Q_UNUSED(options);
+    //qDebug() << "bsreadPlugin: InitCommunicationLayer" << data;
+    qDebug() << "bsreadPlugin: InitCommunicationLayer with options" << options;
+    qDebug()<< options<<options.count();
     mutexknobdataP = data;
     messagewindowP = messageWindow;
     // INIT ZMQ Layer
@@ -133,6 +135,9 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
 
         Dispatcher->set_Dispatcher(&DispacherConfig);
         Dispatcher->setMessagewindow(messagewindowP);
+
+        Dispatcher->setOptions(options);
+
         Dispatcher->setZmqcontex(zmqcontex);
         Dispatcher->setMutexknobdataP(data);
         Dispatcher->moveToThread(DispatcherThread);
