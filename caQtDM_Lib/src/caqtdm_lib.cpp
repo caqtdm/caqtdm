@@ -1584,7 +1584,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         }
         // default format, format from ui file will be used normally except for channel precision
         textentryWidget->setFormat(1);
+
+        // get focus away
         textentryWidget->clearFocus();
+        myWidget->setFocus();
 
         if(textentryWidget->isElevated()) textentryWidget->raise();
 
@@ -8525,6 +8528,7 @@ knobData* CaQtDM_Lib::GetMutexKnobDataPV(QWidget *widget, QString pv){
 void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
 {
     if((event->button() == Qt::LeftButton) ||  (event->button() == Qt::RightButton)) {
+        myWidget->setFocus();  // this will take the focus away (for caTextEntry mainly, when keepFocus was set)
         return;
     }
     QWidget *w = static_cast<QWidget*>(childAt(event->pos()));

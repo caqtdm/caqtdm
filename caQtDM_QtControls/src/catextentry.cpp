@@ -33,6 +33,7 @@ caTextEntry::caTextEntry(QWidget *parent) : caLineEdit(parent)
   // this dis not really worked on ios, while the events had another order
   //connect(this, SIGNAL(returnPressed()), this, SLOT(dataInput()));
     clearFocus();
+    setKeepFocus(false);
     setAccessW(true);
     installEventFilter(this);
     newFocusPolicy(Qt::StrongFocus);
@@ -111,7 +112,7 @@ bool caTextEntry::eventFilter(QObject *obj, QEvent *event)
     } else if(event->type() == QEvent::Leave) {
         QApplication::restoreOverrideCursor();
         setReadOnly(false);
-        clearFocus();
+        if(!keepFocusOnLeave) clearFocus();
     } else if(event->type() == QEvent::FocusOut) {
         //printf("lost focus, set text to %s\n", qasc(startText));
         forceText(startText);
