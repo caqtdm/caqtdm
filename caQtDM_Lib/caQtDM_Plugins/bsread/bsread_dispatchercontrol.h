@@ -33,6 +33,7 @@
 #include <QNetworkReply>
 #include <QEventLoop>
 #include <QUrl>
+#include "bsread_internalchannel.h"
 #include "bsread_decode.h"
 #include "controlsinterface.h"
 
@@ -49,6 +50,10 @@ class bsread_dispatchercontrol : public QObject
 {
 Q_OBJECT
 
+    int filldispatcherchannels(QString channel);
+    int filldispatcherchannels2(bsread_internalchannel *channel,int index);
+
+    bsread_internalchannel* get_internalChannel(QString value);
 public:
     bsread_dispatchercontrol();
     ~bsread_dispatchercontrol();
@@ -56,7 +61,7 @@ public:
 
     int add_Channel(QString channel,int index);
     int rem_Channel(QString channel,int index);
-
+    int set_Channel(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
 
 
     void setZmqcontex(void *value);
@@ -89,6 +94,11 @@ protected:
   QList<QString> streams;
   QMultiMap<QString,int> Channels;
   QList<QString> bsreadChannels;
+  QList<QString> DispatcherChannels;
+  QMap<QString, int> DispatcherChannelsConnected;
+  QMap<QString, QPointer<bsread_internalchannel>> DispatcherChannels_Connected;
+
+
   QList<channelstruct> ChannelsAddPipeline;
   QMultiMap<QString,int> ChannelsToBeApprovePipeline;
   QMultiMap<QString,int> ChannelsApprovePipeline;

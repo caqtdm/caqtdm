@@ -43,6 +43,24 @@ bsread_dispatchercontrol::bsread_dispatchercontrol()
     bsreadChannels.append("bsread:global_timestamp_ns");
     bsreadChannels.append("bsread:global_timestamp_sec");
 
+    DispatcherChannels.append("bsread:bsmodulo");
+    DispatcherChannels.append("bsread:bsoffset");
+    DispatcherChannels.append("bsread:bsinconsistency");
+    DispatcherChannels.append("bsread:bsmapping");
+
+    bsread_internalchannel *opt;
+
+    opt=new bsread_internalchannel(this,"bsread:bsmodulo","bsmodulo");
+    opt->setData(NULL,bsread_internalchannel::in_string);
+    opt->setString("1");
+
+    DispatcherChannels_Connected.insert(opt->getPv_name(),opt);
+    opt=new bsread_internalchannel(this,"bsread:bsoffset","bsoffset");
+    opt->setData(NULL,bsread_internalchannel::in_string);
+    opt->setString("0");
+
+    DispatcherChannels_Connected.insert(opt->getPv_name(),opt);
+
 }
 bsread_dispatchercontrol::~bsread_dispatchercontrol()
 {
@@ -56,7 +74,8 @@ void bsread_dispatchercontrol::process()
 {
 
     QNetworkAccessManager manager;
-    //QEventLoop loop;
+    bool init_reconnection=false;
+
     int requestedchannels=0;
     terminate=false;
     QString msg="bsread Dispatcher started: ";
@@ -66,12 +85,46 @@ void bsread_dispatchercontrol::process()
     messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
     //qDebug()<<"bsread Dispatcher: Start ThreadID: "<<QThread::currentThreadId();
     //Update and reconection handling
+
+    if (!optionsP.empty()){
+        QMap<QString, QString>::const_iterator m;
+        m = optionsP.find("bsmodulo");
+        while (m != optionsP.end() && m.key() == "bsmodulo") {
+            get_internalChannel("bsread:bsmodulo")->setString(m.value());
+            ++m;
+        }
+        m = optionsP.find("bsoffset");
+        while (m != optionsP.end() && m.key() == "bsoffset") {
+            get_internalChannel("bsread:bsoffset")->setString(m.value());
+            ++m;
+        }
+        m = optionsP.find("bsinconsistency");
+        while (m != optionsP.end() && m.key() == "bsinconsistency") {
+            get_internalChannel("bsread:bsinconsistency")->setString(m.value());
+            ++m;
+        }
+        m = optionsP.find("bsmapping");
+        while (m != optionsP.end() && m.key() == "bsmapping") {
+            get_internalChannel("bsread:bsmapping")->setString(m.value());
+            ++m;
+        }
+    }
+
+
+
     while (!terminate){
         //QThread::msleep(200);
 
         ProcessLocker.lock();
         startReconnection.wait(&ProcessLocker,400);
 
+        init_reconnection=false;
+        QString l_bsmodulo=get_internalChannel("bsread:bsmodulo")->getString();
+        init_reconnection=init_reconnection||get_internalChannel("bsread:bsmodulo")->getProc();
+        QString l_bsoffset=get_internalChannel("bsread:bsoffset")->getString();
+        init_reconnection=init_reconnection||get_internalChannel("bsread:bsoffset")->getProc();
+        QString l_bsinconsistency="keep-as-is";;
+        QString l_bsmapping="fill-null";
 
         QString StreamDispatcher=Dispatcher;
         if (!StreamDispatcher.endsWith("/")){
@@ -86,22 +139,22 @@ void bsread_dispatchercontrol::process()
         requestDelete  = QNetworkRequest(url);
 #ifndef CAQTDM_SSL_IGNORE
 #ifndef QT_NO_SSL
-    if(url.toString().toUpper().contains("HTTPS")) {
-        QSslConfiguration configChannel = requestChannel.sslConfiguration();
-        configChannel.setPeerVerifyMode(QSslSocket::VerifyNone);
-        requestChannel.setSslConfiguration(configChannel);
+        if(url.toString().toUpper().contains("HTTPS")) {
+            QSslConfiguration configChannel = requestChannel.sslConfiguration();
+            configChannel.setPeerVerifyMode(QSslSocket::VerifyNone);
+            requestChannel.setSslConfiguration(configChannel);
 
-        QSslConfiguration configDelete = requestDelete.sslConfiguration();
-        configDelete.setPeerVerifyMode(QSslSocket::VerifyNone);
-        requestDelete.setSslConfiguration(configDelete);
-    }
+            QSslConfiguration configDelete = requestDelete.sslConfiguration();
+            configDelete.setPeerVerifyMode(QSslSocket::VerifyNone);
+            requestDelete.setSslConfiguration(configDelete);
+        }
 
 #endif
 #endif
 
-    if (!ChannelsAddPipeline.isEmpty()){
-        ChannelVerification(&manager);
-    }
+        if (!ChannelsAddPipeline.isEmpty()){
+            ChannelVerification(&manager);
+        }
 
         // qDebug()<<"Check Pipeline";
         while(!ChannelsApprovePipeline.isEmpty()){
@@ -111,19 +164,19 @@ void bsread_dispatchercontrol::process()
 
 
         if (tobeRemoved.count()>0){
-          requestedchannels=0;
-          //qDebug()<<"tobeRemoved Pipeline :" << tobeRemoved.count() << Channels.count() <<tobeRemoved.at(0).trimmed()<< Channels.first();
-          for (int x=0;x<=tobeRemoved.count()-1;x++){
+            requestedchannels=0;
+            //qDebug()<<"tobeRemoved Pipeline :" << tobeRemoved.count() << Channels.count() <<tobeRemoved.at(0).trimmed()<< Channels.first();
+            for (int x=0;x<=tobeRemoved.count()-1;x++){
                 QString chan=tobeRemoved.at(x).trimmed();
                 //qDebug()<<"search :"<< chan;
                 QMultiMap<QString, int>::iterator i = Channels.find(chan);
-                 while (i != Channels.end() && i.key() == chan) {
-                     qDebug()<<"found :"<< chan << i.value();
-                     rem_Channel(chan,i.value());
-                     ++i;
-                 }
-           }
-          tobeRemoved.clear();
+                while (i != Channels.end() && i.key() == chan) {
+                    qDebug()<<"found :"<< chan << i.value();
+                    rem_Channel(chan,i.value());
+                    ++i;
+                }
+            }
+            tobeRemoved.clear();
         }
 
 
@@ -136,9 +189,9 @@ void bsread_dispatchercontrol::process()
             }
         }
 
-       //  qDebug()<<"Check Connection Pipeline";
-        while(!ConnectionDeletePipeline.isEmpty()){
-            //qDebug()<<"Delete Connection Pipeline";
+        //qDebug()<<"Check Connection Pipeline";
+        while((!ConnectionDeletePipeline.isEmpty())){
+            qDebug()<<"Delete Connection Pipeline";
             QByteArray data_delete="";
             QString data="";
             data_delete.append("\"");
@@ -156,37 +209,13 @@ void bsread_dispatchercontrol::process()
 
         }
 
-        QString bsmodulo="1";
-        QString bsoffset="0";
-        QString bsinconsistency="keep-as-is";
-        QString bsmapping="fill-null";
 
-        if (!optionsP.empty()){
-          QMap<QString, QString>::const_iterator m;
-          m = optionsP.find("bsmodulo");
-          while (m != optionsP.end() && m.key() == "bsmodulo") {
-              bsmodulo=m.value();
-              ++m;
-          }
-          m = optionsP.find("bsoffset");
-          while (m != optionsP.end() && m.key() == "bsoffset") {
-              bsoffset=m.value();
-              ++m;
-          }
-          m = optionsP.find("bsinconsistency");
-          while (m != optionsP.end() && m.key() == "bsinconsistency") {
-              bsinconsistency=m.value();
-              ++m;
-          }
-          m = optionsP.find("bsmapping");
-          while (m != optionsP.end() && m.key() == "bsmapping") {
-              bsmapping=m.value();
-              ++m;
-          }
-        }
 
-        if((Channels.count()!=requestedchannels)){
-            //qDebug()<<"Checking Channels: "<< Channels.count();
+
+        if((Channels.count()!=requestedchannels)||init_reconnection){
+            qDebug()<<"Checking Channels: "<< Channels.count() << "init_reconnection" << init_reconnection;
+
+            init_reconnection=false;
             QString data="{\"channels\":[ ";
             QMutexLocker lock(&ChannelLocker);
             QSet<QString> keys=QSet<QString>::fromList(Channels.keys());
@@ -195,16 +224,16 @@ void bsread_dispatchercontrol::process()
                     if (!key.contains(".BSREADSHAPE")){//removes shape waveform channels
                         data.append("{\"name\":\"");
                         data.append(key+"\"");
-                        data.append(",\"modulo\": "+bsmodulo);
-                        data.append(",\"offset\": "+bsoffset);
+                        data.append(",\"modulo\": "+l_bsmodulo);
+                        data.append(",\"offset\": "+l_bsoffset);
                         data.append("},");
                     }
                 }
             }
             data.remove(data.length()-1,1);
             data.append("],\"sendIncompleteMessages\":true,\"compression\":\"none\",");
-            data.append("\"mapping\":{\"incomplete\":\""+bsmapping+"\"},");
-            data.append("\"channelValidation\":{\"inconsistency\":\""+bsinconsistency+"\"}}");
+            data.append("\"mapping\":{\"incomplete\":\""+l_bsmapping+"\"},");
+            data.append("\"channelValidation\":{\"inconsistency\":\""+l_bsinconsistency+"\"}}");
 
 
             if (!data.contains("channels\":[]")){
@@ -233,6 +262,18 @@ void bsread_dispatchercontrol::process()
     emit finished();
 
 }
+
+
+bsread_internalchannel* bsread_dispatchercontrol::get_internalChannel(QString value){
+    bsread_internalchannel *bsreadPV=NULL;
+    QMap<QString, QPointer<bsread_internalchannel>>::iterator i = DispatcherChannels_Connected.find(value);
+    while (i !=DispatcherChannels_Connected.end() && i.key() == value) {
+        bsreadPV = i.value();
+        break;
+    }
+    return bsreadPV;
+}
+
 /*
 void bsread_dispatchercontrol::deleteStream(QString *value)
 {
@@ -305,15 +346,75 @@ int bsread_dispatchercontrol::set_Dispatcher(QString *dispatcher)
     startReconnection.wakeAll();
     return 0;
 }
+
+
+int bsread_dispatchercontrol::filldispatcherchannels2(bsread_internalchannel *channel,int index){
+
+
+         knobData* kData = mutexknobdataP->GetMutexKnobDataPtr(index);
+         if (kData){
+             if (channel->getType()==bsread_internalchannel::in_string){
+                 qDebug() << " FILL Channel:" << channel->getPv_name() << index;
+                 kData->edata.fieldtype=caSTRING;
+                 kData->edata.nelm=10;
+                 kData->edata.dataSize=10;
+                 QString data=channel->getString();
+                 kData->edata.valueCount=data.length()+1;
+                 kData->edata.dataB=malloc(kData->edata.nelm+1);
+
+                 strcpy_s((char*) kData->edata.dataB,(size_t) kData->edata.dataSize,data.toLatin1().data());
+                 ((char*) kData->edata.dataB)[data.length()+1]='\0';
+
+             }
+
+
+
+             kData->edata.severity=0;
+             kData->edata.connected = true;
+             kData->edata.accessR = true;
+             kData->edata.accessW = true;
+             kData->edata.monitorCount++;
+             mutexknobdataP->SetMutexKnobData(kData->index, *kData);
+             mutexknobdataP->SetMutexKnobDataReceived(kData);
+
+         }
+
+
+
+
+    return 0;
+}
 int bsread_dispatchercontrol::add_Channel(QString channel,int index)
 {
     QMutexLocker lock(&ChannelAddPipelineLocker);
-    channelstruct channeldata;
-    channeldata.channel=channel;
-    channeldata.index=index;
-    ChannelsAddPipeline.append(channeldata);
-    //startReconnection.wakeAll();
-    //qDebug()<<"ADDChannel"<< channel << index;
+
+    if (DispatcherChannels.contains(channel)){
+
+        bsread_internalchannel *bsreadPV=NULL;
+        QMap<QString, QPointer<bsread_internalchannel>>::iterator i = DispatcherChannels_Connected.find(channel);
+        while (i !=DispatcherChannels_Connected.end() && i.key() == channel) {
+            bsreadPV = i.value();
+            break;
+        }
+       if (bsreadPV){
+         qDebug() << " Ping: bsreadPV";
+         bsreadPV->addIndex(index);
+         filldispatcherchannels2(bsreadPV,index);
+       }
+
+
+
+       //DispatcherChannelsConnected.insert(channel,index);
+
+
+    }else{
+        channelstruct channeldata;
+        channeldata.channel=channel;
+        channeldata.index=index;
+        ChannelsAddPipeline.append(channeldata);
+        //startReconnection.wakeAll();
+        //qDebug()<<"ADDChannel"<< channel << index;
+    }
     return 0;
 }
 
@@ -382,15 +483,114 @@ void bsread_dispatchercontrol::setZmqcontex(void *value)
 int bsread_dispatchercontrol::rem_Channel(QString channel,int index)
 {
     QMutexLocker lock(&ChannelRemPipelineLocker);
-    channelstruct channeldata;
-    channeldata.channel=channel;
-    channeldata.index=index;
-    ChannelsRemPipeline.append(channeldata);
-    //qDebug()<<"REMChannel"<< channel << index;
+    bsread_internalchannel *bsreadPV=NULL;
+    QMap<QString, QPointer<bsread_internalchannel>>::iterator i = DispatcherChannels_Connected.find(channel);
+    while (i !=DispatcherChannels_Connected.end() && i.key() == channel) {
+        bsreadPV = i.value();
+        break;
+    }
+
+    if (bsreadPV){
+        bsreadPV->deleteIndex(index);
+
+    }else{
+        channelstruct channeldata;
+        channeldata.channel=channel;
+        channeldata.index=index;
+        ChannelsRemPipeline.append(channeldata);
+    }
+        //qDebug()<<"REMChannel"<< channel << index;
     return 0;
 
 }
 
+int bsread_dispatchercontrol::set_Channel(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType)
+{
+    //bsreadThreads.last()
+    Q_UNUSED(forceType);
+    Q_UNUSED(errmess);
+    Q_UNUSED(object);
+    Q_UNUSED(idata);
+    Q_UNUSED(rdata);
+
+    QString PV_String=QString(pv);
+
+    qDebug() << "bsread_dispatchercontrol::set_Channel" << PV_String;
+
+    bsread_internalchannel *bsreadPV=get_internalChannel(PV_String);
+
+    if (bsreadPV){
+      // update variable
+      switch (bsreadPV->getType()){
+      case bsread_internalchannel::in_string:{
+        QString data=QString(sdata);
+        bsreadPV->setString(data);
+        break;
+      }
+      }
+
+     //update all index connections
+     qDebug() << "Count:" << bsreadPV->getIndexCount();
+
+     for (int d=0;d<bsreadPV->getIndexCount();d++){
+       qDebug() << "Index:" << d<< bsreadPV->getIndex(d);
+       knobData* kData = mutexknobdataP->GetMutexKnobDataPtr(bsreadPV->getIndex(d));
+       if (kData){
+           qDebug() << "Ping:" << d;
+           switch (bsreadPV->getType()){
+               case bsread_internalchannel::in_string:{
+                 strcpy_s((char *)kData->edata.dataB,kData->edata.dataSize,sdata);
+                 break;
+               }
+           }
+           kData->edata.connected = true;
+           kData->edata.monitorCount++;
+
+           mutexknobdataP->SetMutexKnobData(kData->index, *kData);
+           mutexknobdataP->SetMutexKnobDataReceived(kData);
+           //qDebug() << "Ping:" << d;
+
+
+
+     }
+
+    }
+     //qDebug() << "FINAL:" <<  check_bsmodulo<< bsmodulo;;
+     return true;
+   }
+
+
+
+
+ /*
+    if (PV_String.compare("bsread:bsmodulo")==0){
+        QMap<QString,int>::iterator i = DispatcherChannelsConnected.find(PV_String);
+        while (i !=DispatcherChannelsConnected.end() && i.key() == PV_String) {
+            index = i.value();
+            break;//?????
+        }
+        if (i !=DispatcherChannelsConnected.end()){
+            knobData* kData = mutexknobdataP->GetMutexKnobDataPtr(index);
+
+            bsmodulo=QString(sdata);
+            qDebug() << "bsread:bsmodulo" << sdata;
+            //kData->edata.severity=0;
+            kData->edata.connected = true;
+            kData->edata.monitorCount++;
+
+            mutexknobdataP->SetMutexKnobData(kData->index, *kData);
+            mutexknobdataP->SetMutexKnobDataReceived(kData);
+            return true;
+        }
+     }
+
+
+        //DispatcherChannelsConnected
+
+    return 0;
+     */
+
+}
 
 
 

@@ -243,10 +243,9 @@ int bsreadPlugin::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata,
     Q_UNUSED(forceType);
     Q_UNUSED(errmess);
     Q_UNUSED(object);
-
     QMutexLocker locker(&mutex);
     qDebug() << "bsreadPlugin:pvSetValue" << pv << rdata << idata << sdata;
-    return false;
+    return Dispatcher->set_Channel(pv,rdata,idata,sdata,object,errmess,forceType);
 }
 
 // caQtDM_Lib will call this routine for setting waveforms data (see for more detail the epics3 plugin)
