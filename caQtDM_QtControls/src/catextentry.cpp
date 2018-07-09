@@ -26,6 +26,7 @@
 #include "catextentry.h"
 #include <QApplication>
 #include <QMouseEvent>
+#include <QMimeData>
 
 caTextEntry::caTextEntry(QWidget *parent) : caLineEdit(parent)
 {
@@ -39,6 +40,8 @@ caTextEntry::caTextEntry(QWidget *parent) : caLineEdit(parent)
     setFromTextEntry();
 
     setElevation(on_top);
+
+    setAcceptDrops(true);
 }
 
 void caTextEntry::setValue(double v)
@@ -116,4 +119,32 @@ bool caTextEntry::eventFilter(QObject *obj, QEvent *event)
         //printf("focus in\n");
     }
     return QObject::eventFilter(obj, event);
+}
+
+void caTextEntry::dragEnterEvent(QDragEnterEvent *event)
+{
+    setBackgroundRole(QPalette::Highlight);
+    event->acceptProposedAction();
+}
+
+void caTextEntry::dragMoveEvent(QDragMoveEvent *event)
+{
+    event->acceptProposedAction();
+}
+
+void caTextEntry::dropEvent(QDropEvent *event)
+{
+    const QMimeData *mimeData = event->mimeData();
+    setBackgroundRole(QPalette::Dark);
+    if (mimeData->hasText()) {
+        event->acceptProposedAction();
+        emit TextEntryChanged(event->mimeData()->text());
+    } else {
+
+    }
+}
+
+void caTextEntry::dragLeaveEvent(QDragLeaveEvent *event)
+{
+    event->accept();
 }

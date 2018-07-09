@@ -29,6 +29,7 @@
 #include <QGridLayout>
 #include <QFrame>
 #include <QEvent>
+#include <QMimeData>
 
 #include <qtcontrols_global.h>
 #include <caLineEdit>
@@ -62,6 +63,12 @@ public slots:
     }
 
     void setValue(double v);
+
+protected:
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dragMoveEvent(QDragMoveEvent *event);
+    void dragLeaveEvent(QDragLeaveEvent *event);
+    void dropEvent(QDropEvent *event);
 
 private slots:
     void dataInput();
