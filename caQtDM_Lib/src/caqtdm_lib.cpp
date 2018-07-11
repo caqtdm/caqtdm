@@ -781,7 +781,7 @@ void CaQtDM_Lib::EnableDisableIO()
 }
 
 //extern uint qGlobalPostedEventsCount(); // from qapplication.cpp
-#include "private/qobject_p.h"
+//#include "private/qobject_p.h"
 /**
  * timer event
  */
