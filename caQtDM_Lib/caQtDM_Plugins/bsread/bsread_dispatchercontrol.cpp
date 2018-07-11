@@ -266,7 +266,7 @@ void bsread_dispatchercontrol::process()
 
 bsread_internalchannel* bsread_dispatchercontrol::get_internalChannel(QString value){
     bsread_internalchannel *bsreadPV=NULL;
-    QMap<QString, QPointer<bsread_internalchannel>>::iterator i = DispatcherChannels_Connected.find(value);
+    QMap<QString, QPointer<bsread_internalchannel> >::iterator i = DispatcherChannels_Connected.find(value);
     while (i !=DispatcherChannels_Connected.end() && i.key() == value) {
         bsreadPV = i.value();
         break;
@@ -362,7 +362,7 @@ int bsread_dispatchercontrol::filldispatcherchannels2(bsread_internalchannel *ch
                  kData->edata.valueCount=data.length()+1;
                  kData->edata.dataB=malloc(kData->edata.nelm+1);
 
-                 strcpy_s((char*) kData->edata.dataB,(size_t) kData->edata.dataSize,data.toLatin1().data());
+                 strncpy((char*) kData->edata.dataB, data.toLatin1().data(), (size_t) kData->edata.dataSize);
                  ((char*) kData->edata.dataB)[data.length()+1]='\0';
 
              }
@@ -391,7 +391,7 @@ int bsread_dispatchercontrol::add_Channel(QString channel,int index)
     if (DispatcherChannels.contains(channel)){
 
         bsread_internalchannel *bsreadPV=NULL;
-        QMap<QString, QPointer<bsread_internalchannel>>::iterator i = DispatcherChannels_Connected.find(channel);
+        QMap<QString, QPointer<bsread_internalchannel> >::iterator i = DispatcherChannels_Connected.find(channel);
         while (i !=DispatcherChannels_Connected.end() && i.key() == channel) {
             bsreadPV = i.value();
             break;
@@ -484,7 +484,7 @@ int bsread_dispatchercontrol::rem_Channel(QString channel,int index)
 {
     QMutexLocker lock(&ChannelRemPipelineLocker);
     bsread_internalchannel *bsreadPV=NULL;
-    QMap<QString, QPointer<bsread_internalchannel>>::iterator i = DispatcherChannels_Connected.find(channel);
+    QMap<QString, QPointer<bsread_internalchannel> >::iterator i = DispatcherChannels_Connected.find(channel);
     while (i !=DispatcherChannels_Connected.end() && i.key() == channel) {
         bsreadPV = i.value();
         break;
@@ -539,7 +539,7 @@ int bsread_dispatchercontrol::set_Channel(char *pv, double rdata, int32_t idata,
            qDebug() << "Ping:" << d;
            switch (bsreadPV->getType()){
                case bsread_internalchannel::in_string:{
-                 strcpy_s((char *)kData->edata.dataB,kData->edata.dataSize,sdata);
+                 strncpy((char *)kData->edata.dataB, sdata, kData->edata.dataSize);
                  break;
                }
            }

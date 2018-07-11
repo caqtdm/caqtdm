@@ -96,7 +96,7 @@ protected:
   QList<QString> bsreadChannels;
   QList<QString> DispatcherChannels;
   QMap<QString, int> DispatcherChannelsConnected;
-  QMap<QString, QPointer<bsread_internalchannel>> DispatcherChannels_Connected;
+  QMap<QString, QPointer<bsread_internalchannel> > DispatcherChannels_Connected;
 
 
   QList<channelstruct> ChannelsAddPipeline;

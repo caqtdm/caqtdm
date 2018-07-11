@@ -29,7 +29,7 @@
 #include <QList>
 #include <QAtomicInt>
 #include "knobData.h"
-
+#include <QMutex>
 
 
 class bsread_internalchannel : public QObject
