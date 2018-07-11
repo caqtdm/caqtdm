@@ -61,6 +61,16 @@ bsread_dispatchercontrol::bsread_dispatchercontrol()
     opt->setString("0");
 
     DispatcherChannels_Connected.insert(opt->getPv_name(),opt);
+    opt=new bsread_internalchannel(this,"bsread:bsinconsistency","bsinconsistency");
+    opt->setData(NULL,bsread_internalchannel::in_string);
+    opt->setString("keep-as-is");
+
+    DispatcherChannels_Connected.insert(opt->getPv_name(),opt);
+    opt=new bsread_internalchannel(this,"bsread:bsmapping","bsmapping");
+    opt->setData(NULL,bsread_internalchannel::in_string);
+    opt->setString("fill-null");
+
+    DispatcherChannels_Connected.insert(opt->getPv_name(),opt);
 
 }
 bsread_dispatchercontrol::~bsread_dispatchercontrol()
@@ -148,8 +158,10 @@ void bsread_dispatchercontrol::process()
         init_reconnection=init_reconnection||get_internalChannel("bsread:bsmodulo")->getProc();
         QString l_bsoffset=get_internalChannel("bsread:bsoffset")->getString();
         init_reconnection=init_reconnection||get_internalChannel("bsread:bsoffset")->getProc();
-        QString l_bsinconsistency="keep-as-is";;
-        QString l_bsmapping="fill-null";
+        QString l_bsinconsistency=get_internalChannel("bsread:bsinconsistency")->getString();
+        init_reconnection=init_reconnection||get_internalChannel("bsread:bsinconsistency")->getProc();
+        QString l_bsmapping=get_internalChannel("bsread:bsmapping")->getString();
+        init_reconnection=init_reconnection||get_internalChannel("bsread:bsmapping")->getProc();
 
         QString StreamDispatcher=Dispatcher;
         if (!StreamDispatcher.endsWith("/")){
