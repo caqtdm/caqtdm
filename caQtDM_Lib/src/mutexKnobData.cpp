@@ -750,11 +750,10 @@ extern "C" MutexKnobData* C_SetMutexKnobDataConnected(MutexKnobData* p, int inde
 
 void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, char *dataString, knobData knb)
 {
-
-
     QString StringUnits = QString::fromLatin1(units);
     if(StringUnits.size() > 0) {
-        // special characters handling
+        // special characters handling (should be done in constructor to save time; however
+        // then we will have somme application using caQtFM_Lib that will crash
 #ifdef linux
         static const QChar egrad = 0x00b0;              // º coming from epics
         QString Egrad(egrad);
@@ -773,12 +772,16 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
         static const QChar mu =  0x00b5;
         QString Mu(mu);
         static const QChar uA[2] = { 0x00b5, 0x0041};
+        static const QChar uJ[2] = { 0x00b5, 0x004A};
         QString uAs(uA, 2);
+        QString uJs(uJ, 2);
 #else
         static const QChar mu[2] = { 0x00ce, 0x00bc};
         QString Mu(mu, 2);
         static const QChar uA[3] = { 0x00ce, 0x00bc, 0x0041}; // muA code for replacing ?A coming from epics
+        static const QChar uJ[3] = { 0x00ce, 0x00bc, 0x004A}; // muA code for replacing ?A coming from epics
         QString uAs(uA, 3);
+        QString uJs(uJ, 3);
 #endif
 
         // replace special characters
@@ -789,6 +792,7 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
         StringUnits.replace("?A", uAs);
         StringUnits.replace("muA", uAs);
         StringUnits.replace("uA", uAs);
+        StringUnits.replace("uJ", uJs);
 
         // neither grad
         static const QChar spec =  0x00c2;
