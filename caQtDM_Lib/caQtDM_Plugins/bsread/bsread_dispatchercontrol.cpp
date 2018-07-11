@@ -89,26 +89,50 @@ void bsread_dispatchercontrol::process()
 
     if (!optionsP.empty()){
         QMap<QString, QString>::const_iterator m;
+        bsread_internalchannel* ich;
         m = optionsP.find("bsmodulo");
         while (m != optionsP.end() && m.key() == "bsmodulo") {
-            get_internalChannel("bsread:bsmodulo")->setString(m.value());
             ++m;
+        }
+        if (m!= optionsP.end()){
+            ich=get_internalChannel("bsread:bsmodulo");
+            if (ich){
+             ich->setString(m.value());
+            }
         }
         m = optionsP.find("bsoffset");
         while (m != optionsP.end() && m.key() == "bsoffset") {
-            get_internalChannel("bsread:bsoffset")->setString(m.value());
             ++m;
         }
+        if (m!= optionsP.end()){
+            ich=get_internalChannel("bsread:bsoffset");
+            if (ich){
+             ich->setString(m.value());
+            }
+        }
+
         m = optionsP.find("bsinconsistency");
         while (m != optionsP.end() && m.key() == "bsinconsistency") {
-            get_internalChannel("bsread:bsinconsistency")->setString(m.value());
             ++m;
         }
+        if (m!= optionsP.end()){
+            ich=get_internalChannel("bsread:bsinconsistency");
+            if (ich){
+             ich->setString(m.value());
+            }
+        }
+
         m = optionsP.find("bsmapping");
         while (m != optionsP.end() && m.key() == "bsmapping") {
-            get_internalChannel("bsread:bsmapping")->setString(m.value());
             ++m;
         }
+        if (m!= optionsP.end()){
+            ich=get_internalChannel("bsread:bsmapping");
+            if (ich){
+             ich->setString(m.value());
+            }
+        }
+
     }
 
 
