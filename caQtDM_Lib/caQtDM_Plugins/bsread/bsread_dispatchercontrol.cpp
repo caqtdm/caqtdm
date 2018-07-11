@@ -102,47 +102,37 @@ void bsread_dispatchercontrol::process()
         bsread_internalchannel* ich;
         m = optionsP.find("bsmodulo");
         while (m != optionsP.end() && m.key() == "bsmodulo") {
-            ++m;
-        }
-        if (m!= optionsP.end()){
             ich=get_internalChannel("bsread:bsmodulo");
             if (ich){
              ich->setString(m.value());
             }
+            ++m;
         }
         m = optionsP.find("bsoffset");
         while (m != optionsP.end() && m.key() == "bsoffset") {
-            ++m;
-        }
-        if (m!= optionsP.end()){
             ich=get_internalChannel("bsread:bsoffset");
             if (ich){
              ich->setString(m.value());
             }
-        }
-
-        m = optionsP.find("bsinconsistency");
-        while (m != optionsP.end() && m.key() == "bsinconsistency") {
             ++m;
         }
-        if (m!= optionsP.end()){
+        m = optionsP.find("bsinconsistency");
+        while (m != optionsP.end() && m.key() == "bsinconsistency") {
             ich=get_internalChannel("bsread:bsinconsistency");
             if (ich){
              ich->setString(m.value());
             }
+            ++m;
         }
 
         m = optionsP.find("bsmapping");
         while (m != optionsP.end() && m.key() == "bsmapping") {
-            ++m;
-        }
-        if (m!= optionsP.end()){
             ich=get_internalChannel("bsread:bsmapping");
             if (ich){
              ich->setString(m.value());
             }
+            ++m;
         }
-
     }
 
 
