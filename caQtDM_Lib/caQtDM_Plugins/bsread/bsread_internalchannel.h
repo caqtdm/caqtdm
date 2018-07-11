@@ -54,7 +54,13 @@ public:
     internal_types getType() const;
 
     QString getString();
-    void setString(QString value);
+    bool setString(QString value);
+
+    void addEnumString(QString value);
+    int getEnumCount();
+    QString getEnumStrings();
+    QString setEnumIndex(int value);
+    int getEnumIndex();
 
     bool getProc();
 

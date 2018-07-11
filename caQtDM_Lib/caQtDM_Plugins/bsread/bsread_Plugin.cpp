@@ -47,6 +47,7 @@ bsreadPlugin::bsreadPlugin()
     //qDebug() << "bsreadPlugin: Create";
     DispatcherThread=new QThread(this);
     Dispatcher=new bsread_dispatchercontrol();
+    mutexknobdataP = NULL;
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closeEvent()));
 
 }
@@ -196,8 +197,9 @@ int bsreadPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
 
     int i;
     QMutexLocker locker(&mutex);
-    Dispatcher->add_Channel(kData->pv,kData->index);
     //qDebug() << "bsreadPlugin:pvAddMonitor" << kData->pv << kData->index << kData;
+    Dispatcher->add_Channel(kData->pv,kData->index);
+
     i=0;
 
     while ((i<bsreadconnections.size())){
@@ -244,7 +246,7 @@ int bsreadPlugin::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata,
     Q_UNUSED(errmess);
     Q_UNUSED(object);
     QMutexLocker locker(&mutex);
-    qDebug() << "bsreadPlugin:pvSetValue" << pv << rdata << idata << sdata;
+    //qDebug() << "bsreadPlugin:pvSetValue" << pv << rdata << idata << sdata;
     return Dispatcher->set_Channel(pv,rdata,idata,sdata,object,errmess,forceType);
 }
 

@@ -48,11 +48,11 @@ echo ============ make all =================
 set PATH=%PATH%;%JOM%
 set PATH=%PATH%;%QTHOME%\bin
 set PATH=%PATH%;%GITPATH%
-set /a timerstart=((1%time:~0,2%-100)*60*60)+((1%time:~3,2%-100)*60)+(1%time:~6,2%-100)
+set /a timerstart=(((1%time:~0,2%-100)*60*60)+((1%time:~3,2%-100)*60)+(1%time:~6,2%-100)^)
 qmake all.pro
 where /q jom.exe 
 IF %ERRORLEVEL% NEQ 0 (nmake all) ELSE (jom release)
-set /a timerstop=((1%time:~0,2%-100)*60*60)+((1%time:~3,2%-100)*60)+(1%time:~6,2%-100)
+set /a timerstop=(((1%time:~0,2%-100)*60*60)+((1%time:~3,2%-100)*60)+(1%time:~6,2%-100)^)
 set /a timeseks=(%timerstop%-%timerstart%)
 set /a timemins=(%timerstop%-%timerstart%)/60
 echo caQtDM compile time seconds: %timeseks% -- minutes: %timemins%

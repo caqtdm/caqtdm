@@ -97,13 +97,71 @@ int bsread_internalchannel::getIndexCount() const
 QString bsread_internalchannel::getString()
 {
     QMutexLocker locker(&mutex);
-    //proc=true;
     return internal_string;
 }
 
-void bsread_internalchannel::setString(QString value)
+bool bsread_internalchannel::setString(QString value)
 {
     QMutexLocker locker(&mutex);
     proc=true;
+    if (this->getType()==bsread_internalchannel::in_enum){
+     int i = internal_enum_strings.indexOf(value);
+     if (i != -1){
+      internal_enum_index=i;
+     }else{
+      return false;
+     }
+    }
     internal_string=value;
+    return true;
+}
+
+void bsread_internalchannel::addEnumString(QString value)
+{
+    internal_enum_strings.append(value);
+}
+
+int bsread_internalchannel::getEnumCount()
+{
+    return internal_enum_strings.count();
+}
+
+QString bsread_internalchannel::getEnumStrings()
+{
+    QString return_value;
+    for(int x=0;x<internal_enum_strings.count();x++){
+      return_value.append(internal_enum_strings.at(x));
+      if (x<internal_enum_strings.count()-1) return_value.append((QChar)27);
+    }
+
+    return return_value;
+}
+
+QString bsread_internalchannel::setEnumIndex(int value)
+{
+    if (value>(internal_enum_strings.count()-1)){
+        internal_enum_index=internal_enum_strings.count()-1;
+        internal_string=internal_enum_strings.at(internal_enum_index);
+    }else{
+        if (value>0){
+            internal_string=internal_enum_strings.at(value);
+            internal_enum_index=value;
+        }else{
+            internal_string=internal_enum_strings.at(0);
+            internal_enum_index=0;
+        }
+    }
+    return internal_string;
+}
+
+int bsread_internalchannel::getEnumIndex()
+{
+    if (internal_enum_index>(internal_enum_strings.count()-1)){
+        internal_enum_index=internal_enum_strings.count()-1;
+    }else{
+        if (internal_enum_index<0){
+          internal_enum_index=0;
+        }
+    }
+ return internal_enum_index;
 }

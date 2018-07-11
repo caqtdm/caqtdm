@@ -54,23 +54,32 @@ bsread_dispatchercontrol::bsread_dispatchercontrol()
     opt=new bsread_internalchannel(this,"bsread:bsmodulo","bsmodulo");
     opt->setData(NULL,bsread_internalchannel::in_string);
     opt->setString("1");
-
     DispatcherChannels_Connected.insert(opt->getPv_name(),opt);
+
     opt=new bsread_internalchannel(this,"bsread:bsoffset","bsoffset");
     opt->setData(NULL,bsread_internalchannel::in_string);
     opt->setString("0");
-
     DispatcherChannels_Connected.insert(opt->getPv_name(),opt);
+
+
     opt=new bsread_internalchannel(this,"bsread:bsinconsistency","bsinconsistency");
-    opt->setData(NULL,bsread_internalchannel::in_string);
+    opt->setData(NULL,bsread_internalchannel::in_enum);
+    opt->addEnumString("drop");
+    opt->addEnumString("keep-as-is");
+    opt->addEnumString("adjust-individual");
+    opt->addEnumString("adjust-global");
     opt->setString("keep-as-is");
-
     DispatcherChannels_Connected.insert(opt->getPv_name(),opt);
+
     opt=new bsread_internalchannel(this,"bsread:bsmapping","bsmapping");
-    opt->setData(NULL,bsread_internalchannel::in_string);
+    opt->setData(NULL,bsread_internalchannel::in_enum);
+    opt->addEnumString("provide-as-is");
+    opt->addEnumString("drop");
+    opt->addEnumString("fill-null");
     opt->setString("fill-null");
-
     DispatcherChannels_Connected.insert(opt->getPv_name(),opt);
+
+
 
 }
 bsread_dispatchercontrol::~bsread_dispatchercontrol()
@@ -198,7 +207,7 @@ void bsread_dispatchercontrol::process()
                 //qDebug()<<"search :"<< chan;
                 QMultiMap<QString, int>::iterator i = Channels.find(chan);
                 while (i != Channels.end() && i.key() == chan) {
-                    qDebug()<<"found :"<< chan << i.value();
+                    //qDebug()<<"found :"<< chan << i.value();
                     rem_Channel(chan,i.value());
                     ++i;
                 }
@@ -218,7 +227,7 @@ void bsread_dispatchercontrol::process()
 
         //qDebug()<<"Check Connection Pipeline";
         while((!ConnectionDeletePipeline.isEmpty())){
-            qDebug()<<"Delete Connection Pipeline";
+            //qDebug()<<"Delete Connection Pipeline";
             QByteArray data_delete="";
             QString data="";
             data_delete.append("\"");
@@ -381,7 +390,7 @@ int bsread_dispatchercontrol::filldispatcherchannels2(bsread_internalchannel *ch
          knobData* kData = mutexknobdataP->GetMutexKnobDataPtr(index);
          if (kData){
              if (channel->getType()==bsread_internalchannel::in_string){
-                 qDebug() << " FILL Channel:" << channel->getPv_name() << index;
+                 //qDebug() << " FILL Channel:" << channel->getPv_name() << index;
                  kData->edata.fieldtype=caSTRING;
                  kData->edata.nelm=10;
                  kData->edata.dataSize=10;
@@ -390,6 +399,25 @@ int bsread_dispatchercontrol::filldispatcherchannels2(bsread_internalchannel *ch
                  kData->edata.dataB=malloc(kData->edata.nelm+1);
 
                  strncpy((char*) kData->edata.dataB, data.toLatin1().data(), (size_t) kData->edata.dataSize);
+                 ((char*) kData->edata.dataB)[data.length()+1]='\0';
+
+             }
+             if (channel->getType()==bsread_internalchannel::in_enum){
+                 QString data=channel->getEnumStrings();
+                 //qDebug() << " FILL Channel:" << channel->getPv_name() << index <<data.length()<<data.toLatin1().data() ;
+
+                 kData->edata.fieldtype=caENUM;
+                 kData->edata.nelm=(int)strlen(data.toLatin1().data());
+                 kData->edata.dataSize=(int)strlen(data.toLatin1().data());
+                 kData->edata.enumCount=channel->getEnumCount();
+                 kData->edata.valueCount=1;
+                 kData->edata.ivalue=channel->getEnumIndex();
+
+                 //qDebug() << " ENUM:" << kData->edata.valueCount << kData->edata.ivalue;
+
+                 kData->edata.dataB=malloc(kData->edata.nelm+2);
+
+                 strncpy((char*) kData->edata.dataB,data.toLatin1().data(),(size_t) kData->edata.dataSize);
                  ((char*) kData->edata.dataB)[data.length()+1]='\0';
 
              }
@@ -406,9 +434,9 @@ int bsread_dispatchercontrol::filldispatcherchannels2(bsread_internalchannel *ch
 
          }
 
-
-
     }
+
+
     return 0;
 }
 int bsread_dispatchercontrol::add_Channel(QString channel,int index)
@@ -424,7 +452,7 @@ int bsread_dispatchercontrol::add_Channel(QString channel,int index)
             break;
         }
        if (bsreadPV){
-         qDebug() << " Ping: bsreadPV";
+         //qDebug() << " Ping: bsreadPV" <<index ;
          bsreadPV->addIndex(index);
          filldispatcherchannels2(bsreadPV,index);
        }
@@ -499,6 +527,7 @@ channelstruct bsread_dispatchercontrol::get_RemChannel(){
 void bsread_dispatchercontrol::setMutexknobdataP(MutexKnobData *value)
 {
     mutexknobdataP = value;
+    //qDebug()<<"setMutexknobdataP"<<mutexknobdataP;
 }
 
 void bsread_dispatchercontrol::setZmqcontex(void *value)
@@ -537,12 +566,12 @@ int bsread_dispatchercontrol::set_Channel(char *pv, double rdata, int32_t idata,
     Q_UNUSED(forceType);
     Q_UNUSED(errmess);
     Q_UNUSED(object);
-    Q_UNUSED(idata);
+
     Q_UNUSED(rdata);
 
     QString PV_String=QString(pv);
 
-    qDebug() << "bsread_dispatchercontrol::set_Channel" << PV_String;
+    //qDebug() << "bsread_dispatchercontrol::set_Channel" << PV_String;
 
     bsread_internalchannel *bsreadPV=get_internalChannel(PV_String);
 
@@ -554,69 +583,46 @@ int bsread_dispatchercontrol::set_Channel(char *pv, double rdata, int32_t idata,
         bsreadPV->setString(data);
         break;
       }
+      case bsread_internalchannel::in_enum:{
+        QString data=QString(sdata);
+        bsreadPV->setString(data);
+        break;
+      }
+
       }
 
      //update all index connections
-     qDebug() << "Count:" << bsreadPV->getIndexCount();
+     //qDebug() << "Count:" << bsreadPV->getIndexCount();
 
      for (int d=0;d<bsreadPV->getIndexCount();d++){
-       qDebug() << "Index:" << d<< bsreadPV->getIndex(d);
+       //qDebug() << "Index:" << d<< bsreadPV->getIndex(d);
        knobData* kData = mutexknobdataP->GetMutexKnobDataPtr(bsreadPV->getIndex(d));
        if (kData){
-           qDebug() << "Ping:" << d;
+           //qDebug() << "Ping:" << d;
            switch (bsreadPV->getType()){
                case bsread_internalchannel::in_string:{
                  strncpy((char *)kData->edata.dataB, sdata, kData->edata.dataSize);
                  break;
                }
+               case bsread_internalchannel::in_enum:{
+                 kData->edata.ivalue=bsreadPV->getEnumIndex();
+                 break;
+               }
+
            }
            kData->edata.connected = true;
            kData->edata.monitorCount++;
 
            mutexknobdataP->SetMutexKnobData(kData->index, *kData);
            mutexknobdataP->SetMutexKnobDataReceived(kData);
-           //qDebug() << "Ping:" << d;
-
-
 
      }
 
     }
-     //qDebug() << "FINAL:" <<  check_bsmodulo<< bsmodulo;;
      return true;
    }
 
-
-
-
- /*
-    if (PV_String.compare("bsread:bsmodulo")==0){
-        QMap<QString,int>::iterator i = DispatcherChannelsConnected.find(PV_String);
-        while (i !=DispatcherChannelsConnected.end() && i.key() == PV_String) {
-            index = i.value();
-            break;//?????
-        }
-        if (i !=DispatcherChannelsConnected.end()){
-            knobData* kData = mutexknobdataP->GetMutexKnobDataPtr(index);
-
-            bsmodulo=QString(sdata);
-            qDebug() << "bsread:bsmodulo" << sdata;
-            //kData->edata.severity=0;
-            kData->edata.connected = true;
-            kData->edata.monitorCount++;
-
-            mutexknobdataP->SetMutexKnobData(kData->index, *kData);
-            mutexknobdataP->SetMutexKnobDataReceived(kData);
-            return true;
-        }
-     }
-
-
-        //DispatcherChannelsConnected
-
-    return 0;
-     */
-
+    return false;
 }
 
 
@@ -735,7 +741,7 @@ void bsread_dispatchercontrol::finishReplyConnect()
 
                             }
 
-                            qDebug()<< "tobeRemoved:" <<tobeRemoved;
+                            //qDebug()<< "tobeRemoved:" <<tobeRemoved;
 
                         }
 
