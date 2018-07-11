@@ -36,6 +36,7 @@ bsread_dispatchercontrol::bsread_dispatchercontrol()
 {
     loop = new QEventLoop(this);
     connect(qApp, SIGNAL(aboutToQuit()),this, SLOT(closeEvent()));
+    mutexknobdataP = NULL;
     //Special Channels
     bsreadChannels.append("bsread:hash");
     bsreadChannels.append("bsread:pulse_id");
@@ -350,7 +351,7 @@ int bsread_dispatchercontrol::set_Dispatcher(QString *dispatcher)
 
 int bsread_dispatchercontrol::filldispatcherchannels2(bsread_internalchannel *channel,int index){
 
-
+    if (mutexknobdataP){
          knobData* kData = mutexknobdataP->GetMutexKnobDataPtr(index);
          if (kData){
              if (channel->getType()==bsread_internalchannel::in_string){
@@ -381,7 +382,7 @@ int bsread_dispatchercontrol::filldispatcherchannels2(bsread_internalchannel *ch
 
 
 
-
+    }
     return 0;
 }
 int bsread_dispatchercontrol::add_Channel(QString channel,int index)
