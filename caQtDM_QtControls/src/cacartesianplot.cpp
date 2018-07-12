@@ -580,8 +580,8 @@ void caCartesianPlot::displayData(int curvIndex, int curvType)
     }
 }
 
-#define SMALLEST -1.e50
-#define BIGGEST 1.e50
+#define SMALLEST -1.e20
+#define BIGGEST 1.e20
 
 // this routine will prevent that we have problems with negative values when logarithmic scale
 // and will keep the values in order to switch between log and linear scale
