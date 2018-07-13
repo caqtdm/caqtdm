@@ -178,6 +178,7 @@ void bsread_dispatchercontrol::process()
         while(!ChannelsApprovePipeline.isEmpty()){
             Channels+=ChannelsApprovePipeline;
             ChannelsApprovePipeline.clear();
+            init_reconnection=true;
         }
 
 
@@ -204,6 +205,7 @@ void bsread_dispatchercontrol::process()
             if ((Channels.contains(candidate.channel))){
                 //QMutexLocker lock(&ChannelLocker);
                 Channels.remove(candidate.channel,candidate.index);
+                init_reconnection=true;
             }
         }
 
@@ -230,7 +232,7 @@ void bsread_dispatchercontrol::process()
 
 
 
-        if((Channels.count()!=requestedchannels)||init_reconnection){
+        if(init_reconnection){
             //qDebug()<<"Checking Channels: "<< Channels.count() << "init_reconnection" << init_reconnection;
 
             init_reconnection=false;
