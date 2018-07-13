@@ -103,16 +103,20 @@ QString bsread_internalchannel::getString()
 bool bsread_internalchannel::setString(QString value)
 {
     QMutexLocker locker(&mutex);
-    proc=true;
+
     if (this->getType()==bsread_internalchannel::in_enum){
      int i = internal_enum_strings.indexOf(value);
      if (i != -1){
-      internal_enum_index=i;
+      if (internal_enum_index!=i) proc=true;
+         internal_enum_index=i;
+
      }else{
       return false;
      }
     }
+    if (internal_string.compare(value)!=0) proc=true;
     internal_string=value;
+
     return true;
 }
 
@@ -139,6 +143,8 @@ QString bsread_internalchannel::getEnumStrings()
 
 QString bsread_internalchannel::setEnumIndex(int value)
 {
+    QString Old_internal_string=internal_string;
+
     if (value>(internal_enum_strings.count()-1)){
         internal_enum_index=internal_enum_strings.count()-1;
         internal_string=internal_enum_strings.at(internal_enum_index);
@@ -151,6 +157,7 @@ QString bsread_internalchannel::setEnumIndex(int value)
             internal_enum_index=0;
         }
     }
+    if (internal_string.compare(Old_internal_string)!=0) proc=true;
     return internal_string;
 }
 
