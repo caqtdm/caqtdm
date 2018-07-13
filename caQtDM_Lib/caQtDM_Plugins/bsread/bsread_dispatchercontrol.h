@@ -73,6 +73,7 @@ public:
     void ChannelVerification(QNetworkAccessManager* manager);
 
     void setOptions(QMap<QString, QString> options);
+    void processOption(QMap<QString, QString> options,QString option);
 signals:
     //void requestFinished();
     void finished();

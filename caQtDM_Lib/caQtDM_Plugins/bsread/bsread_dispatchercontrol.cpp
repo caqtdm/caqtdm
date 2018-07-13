@@ -48,6 +48,7 @@ bsread_dispatchercontrol::bsread_dispatchercontrol()
     DispatcherChannels.append("bsread:bsoffset");
     DispatcherChannels.append("bsread:bsinconsistency");
     DispatcherChannels.append("bsread:bsmapping");
+    DispatcherChannels.append("bsread:bsstrategy");
 
     bsread_internalchannel *opt;
 
@@ -79,6 +80,12 @@ bsread_dispatchercontrol::bsread_dispatchercontrol()
     opt->setString("fill-null");
     DispatcherChannels_Connected.insert(opt->getPv_name(),opt);
 
+    opt=new bsread_internalchannel(this,"bsread:bsstrategy","bsstrategy");
+    opt->setData(NULL,bsread_internalchannel::in_enum);
+    opt->addEnumString("complete-all");
+    opt->addEnumString("complete-latest");
+    opt->setString("complete-all");
+    DispatcherChannels_Connected.insert(opt->getPv_name(),opt);
 
 
 }
@@ -107,41 +114,13 @@ void bsread_dispatchercontrol::process()
     //Update and reconection handling
 
     if (!optionsP.empty()){
-        QMap<QString, QString>::const_iterator m;
-        bsread_internalchannel* ich;
-        m = optionsP.find("bsmodulo");
-        while (m != optionsP.end() && m.key() == "bsmodulo") {
-            ich=get_internalChannel("bsread:bsmodulo");
-            if (ich){
-             ich->setString(m.value());
-            }
-            ++m;
-        }
-        m = optionsP.find("bsoffset");
-        while (m != optionsP.end() && m.key() == "bsoffset") {
-            ich=get_internalChannel("bsread:bsoffset");
-            if (ich){
-             ich->setString(m.value());
-            }
-            ++m;
-        }
-        m = optionsP.find("bsinconsistency");
-        while (m != optionsP.end() && m.key() == "bsinconsistency") {
-            ich=get_internalChannel("bsread:bsinconsistency");
-            if (ich){
-             ich->setString(m.value());
-            }
-            ++m;
-        }
 
-        m = optionsP.find("bsmapping");
-        while (m != optionsP.end() && m.key() == "bsmapping") {
-            ich=get_internalChannel("bsread:bsmapping");
-            if (ich){
-             ich->setString(m.value());
-            }
-            ++m;
-        }
+        processOption(optionsP,"bsmodulo");
+        processOption(optionsP,"bsoffset");
+        processOption(optionsP,"bsinconsistency");
+        processOption(optionsP,"bsmapping");
+        processOption(optionsP,"bsstrategy");
+
     }
 
 
@@ -161,6 +140,9 @@ void bsread_dispatchercontrol::process()
         init_reconnection=init_reconnection||get_internalChannel("bsread:bsinconsistency")->getProc();
         QString l_bsmapping=get_internalChannel("bsread:bsmapping")->getString();
         init_reconnection=init_reconnection||get_internalChannel("bsread:bsmapping")->getProc();
+        QString l_bsstrategy=get_internalChannel("bsread:bsstrategy")->getString();
+        init_reconnection=init_reconnection||get_internalChannel("bsread:bsstrategy")->getProc();
+
 
         QString StreamDispatcher=Dispatcher;
         if (!StreamDispatcher.endsWith("/")){
@@ -249,7 +231,7 @@ void bsread_dispatchercontrol::process()
 
 
         if((Channels.count()!=requestedchannels)||init_reconnection){
-            qDebug()<<"Checking Channels: "<< Channels.count() << "init_reconnection" << init_reconnection;
+            //qDebug()<<"Checking Channels: "<< Channels.count() << "init_reconnection" << init_reconnection;
 
             init_reconnection=false;
             QString data="{\"channels\":[ ";
@@ -257,7 +239,7 @@ void bsread_dispatchercontrol::process()
             QSet<QString> keys=QSet<QString>::fromList(Channels.keys());
             foreach( QString key,keys){
                 if (!key.startsWith("bsread:")){ //removes all header channels
-                    if (!key.contains(".BSREADSHAPE")){//removes shape waveform channels
+                    if (!key.contains(".BSREADSHAPE")&&!key.contains(".ENC_GROUP")&&!key.contains(".ENC_TYPE")&&!key.contains(".ENC_SUBTYPE")){//removes shape waveform channels
                         data.append("{\"name\":\"");
                         data.append(key+"\"");
                         data.append(",\"modulo\": "+l_bsmodulo);
@@ -270,7 +252,7 @@ void bsread_dispatchercontrol::process()
             data.append("],\"sendIncompleteMessages\":true,\"compression\":\"none\",");
             data.append("\"mapping\":{\"incomplete\":\""+l_bsmapping+"\"},");
             data.append("\"channelValidation\":{\"inconsistency\":\""+l_bsinconsistency+"\"}}");
-
+            data.append("\"sendBehavior\":{\"strategy\":\""+l_bsstrategy+"\"}}");
 
             if (!data.contains("channels\":[]")){
                 QByteArray transferdata;
@@ -355,7 +337,21 @@ void bsread_dispatchercontrol::deleteStream(QString *value)
  }
 */
 void bsread_dispatchercontrol::setOptions(QMap<QString, QString> options){
-   optionsP=options;
+    optionsP=options;
+}
+
+void bsread_dispatchercontrol::processOption(QMap<QString, QString> options, QString option)
+{
+    bsread_internalchannel* ich;
+    QMap<QString, QString>::const_iterator m = options.find(option);
+    while (m != options.end() && m.key() == option) {
+        ich=get_internalChannel("bsread:"+option);
+        if (ich){
+         ich->setString(m.value());
+        }
+        ++m;
+    }
+
 }
 
 
@@ -423,7 +419,7 @@ int bsread_dispatchercontrol::filldispatcherchannels2(bsread_internalchannel *ch
              }
 
 
-
+             strcpy(kData->edata.fec,"localhost");
              kData->edata.severity=0;
              kData->edata.connected = true;
              kData->edata.accessR = true;
@@ -566,7 +562,7 @@ int bsread_dispatchercontrol::set_Channel(char *pv, double rdata, int32_t idata,
     Q_UNUSED(forceType);
     Q_UNUSED(errmess);
     Q_UNUSED(object);
-
+    Q_UNUSED(idata);
     Q_UNUSED(rdata);
 
     QString PV_String=QString(pv);
