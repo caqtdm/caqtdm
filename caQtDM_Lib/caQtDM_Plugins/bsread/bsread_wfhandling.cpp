@@ -50,13 +50,13 @@ void bsread_wfhandling::wfconvert()
             break;
         }
         case bs_int16:{
-            bsread_wfConverter<qint16,int> *converter=new bsread_wfConverter<qint16,int>(kDataP,bsreadPVP,BlockPoolP);
+            bsread_wfConverter<qint16,short> *converter=new bsread_wfConverter<qint16,short>(kDataP,bsreadPVP,BlockPoolP);
             converter->wfconvert();
             delete converter;
             break;
         }
         case bs_int8:{
-            bsread_wfConverter<qint8,int> *converter=new bsread_wfConverter<qint8,int>(kDataP,bsreadPVP,BlockPoolP);
+            bsread_wfConverter<qint8,short> *converter=new bsread_wfConverter<qint8,short>(kDataP,bsreadPVP,BlockPoolP);
             converter->wfconvert();
             delete converter;
             break;
