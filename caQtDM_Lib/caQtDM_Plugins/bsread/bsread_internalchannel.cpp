@@ -71,13 +71,10 @@ void bsread_internalchannel::addIndex(int setindex)
 
 void bsread_internalchannel::deleteIndex(int i)
 {
-    int d=0;
+    QMutexLocker locker(&mutex);
     if (index.count()>0){
-        while ((d<index.count())||(index.at(d)!=i) ){
-            d++;
-        }
-        if (index.at(d)==i){
-          index.removeAt(d);
+        if (index.indexOf(i)!=-1){
+          index.removeAt(index.indexOf(i));
         }
     }
 }
