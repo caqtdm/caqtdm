@@ -57,9 +57,14 @@ public:
 
         QByteArray data = QByteArray::fromRawData((const char *)SourceP,(int) sourcecountP*sizeof(T_BSREAD));
         QDataStream stream(data);
+        if (set_Precision) stream.setFloatingPointPrecision(precision);
+
         stream.skipRawData((int)(sectorP*(sourcecountP*sizeof(T_BSREAD)/fullP)));
         switch(bsreadPVP->endianess){
-           case bs_big : stream.setByteOrder(QDataStream::BigEndian);
+           case bs_big : {
+            stream.setByteOrder(QDataStream::BigEndian);
+            break;
+        }
            default     : stream.setByteOrder(QDataStream::LittleEndian);
         }
         size_t counter=sectorP*sourcecountP/fullP;
@@ -106,9 +111,11 @@ public:
                 QDataStream stream(data);
                 if (set_Precision) stream.setFloatingPointPrecision(precision);
                 ulong counter=0;
-
                 switch(bsreadPVP->endianess){
-                   case bs_big : stream.setByteOrder(QDataStream::BigEndian);
+                   case bs_big : {
+                    stream.setByteOrder(QDataStream::BigEndian);
+                    break;
+                }
                    default     : stream.setByteOrder(QDataStream::LittleEndian);
                 }
 
