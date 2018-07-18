@@ -283,7 +283,7 @@ private:
     void TreatRequestedWave(QString pv, QString text, caWaveTable::FormatType fType, int index, QWidget *w);
     void TreatOrdinaryValue(QString pv, double value, int32_t idata, QString svalue, QWidget *w);
     bool getSoftChannel(QString pv, knobData &data);
-    int parseForDisplayRate(QString input, int &rate);
+    int parseForDisplayRate(QString &input, int &rate);
     void getStatesToggleAndLed(QWidget *widget, const knobData &data, const QString &String, Qt::CheckState &state);
 
     void resizeSpecials(QString className, QWidget *widget, QVariantList list, double factX, double factY);

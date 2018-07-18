@@ -3264,13 +3264,14 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     QString trimmedPV = treatMacro(map, pv.trimmed(), &doNothing, w->objectName());
 
     // is there a json string ?
-    int pos = trimmedPV.indexOf("{");
-    if((pos != -1) && trimmedPV.contains("monitor")) {
+    int pos = trimmedPV.indexOf(".{");
+    if((pos != -1) && trimmedPV.contains("caqtdm_monitor")) {
         int status;
         char asc[MAX_STRING_LENGTH];
-        QString JSONString = trimmedPV.mid(pos);
+        QString JSONString = trimmedPV.mid(pos+1);
         trimmedPV = trimmedPV.mid(0, pos);
         status = parseForDisplayRate(JSONString, rate);
+        trimmedPV = trimmedPV + "." + JSONString;
         if(!status) {
             snprintf(asc, MAX_STRING_LENGTH, "JSON parsing error on %s ,should be like {\"monitor\":{\"maxdisplayrate\":10}}", (char*) qasc(pv.trimmed()));
         } else {
@@ -6996,9 +6997,9 @@ bool CaQtDM_Lib::SoftPVusesItsself(QWidget* widget, QMap<QString, QString> map)
         strng[4] = calcWidget->getVariable();
         for(int i=0; i<5; i++) {
             QString trimmedPV = strng[i].trimmed();
-            int pos = trimmedPV.indexOf("{");  // jason string
-            if(pos != -1) JSONString = trimmedPV.mid(pos);
-            if(pos != -1) trimmedPV = trimmedPV.mid(0, pos);
+            int pos = trimmedPV.indexOf(".{");  // jason string
+            if(pos != -1) JSONString = trimmedPV.mid(pos+1);
+            if(pos != -1) trimmedPV = trimmedPV.mid(0, pos+1);
             strng[i] = treatMacro(map, trimmedPV, &doNothing, widget->objectName());
             if(i==4) {
                 char asc[ MAX_STRING_LENGTH];
@@ -7737,9 +7738,10 @@ void CaQtDM_Lib::TreatRequestedWave(QString pvo, QString text, caWaveTable::Form
     datamutex->unlock();
 }
 
-int CaQtDM_Lib::parseForDisplayRate(QString inputc, int &rate)
+int CaQtDM_Lib::parseForDisplayRate(QString &inputc, int &rate)
 {
     // Parse data
+    bool success = false;
     char input[MAXPVLEN];
     int cpylen = qMin(inputc.length(), MAXPVLEN-1);
     strncpy(input, (char*) qasc(inputc), (size_t) cpylen);
@@ -7750,23 +7752,21 @@ int CaQtDM_Lib::parseForDisplayRate(QString inputc, int &rate)
     // Did it go wrong?
     if (value == NULL) {
         //printf("failed to parse <%s>\n", input);
-        return false;
     } else {
         // Retrieve the main object
         JSONObject root;
         if(!value->IsObject()) {
             //printf("The root element is not an object");
             delete(value);
-            return false;
         } else {
 
             root = value->AsObject();
             // check for monitor
-            if (root.find(L"monitor") != root.end() && root[L"monitor"]->IsObject()) {
+            if (root.find(L"caqtdm_monitor") != root.end() && root[L"caqtdm_monitor"]->IsObject()) {
 
                 //printf("monitor detected\n");
                 // Retrieve nested object
-                JSONValue *value1 = JSON::Parse(root[L"monitor"]->Stringify().c_str());
+                JSONValue *value1 = JSON::Parse(root[L"caqtdm_monitor"]->Stringify().c_str());
                 // Did it go wrong?
                 if ((value1 != NULL) && value1->IsObject()) {
                     JSONObject root;
@@ -7779,20 +7779,31 @@ int CaQtDM_Lib::parseForDisplayRate(QString inputc, int &rate)
                         //printf("%d decode value=%d\n", status, rate);
                         delete(value1);
                         delete(value);
-                        return true;
+                        success = true;
                     } else {
                         delete(value1);
                         delete(value);
-                        return false;
                     }
                 } else {
                     delete(value);
-                    return false;
                 }
             }
+
         }
     }
-    return false;
+
+    // we have to take this json string out of the global json string given for epics 3.15 and higher
+    // get rid of first { and last }
+    // in the call we append the resulting string to the pv
+    if((inputc.at(0) == '{') && (inputc.at(inputc.length()-1) == '}')) {
+        QStringList items = inputc.split(",", QString::SkipEmptyParts);
+        int pos = items.indexOf(QRegExp("*caqtdm_monitor*", Qt::CaseInsensitive, QRegExp::Wildcard), 0);
+        if(pos != -1) items.removeAt(pos);  // pos==-1 should never happen
+        inputc = "{" + items.join(",") + "}";
+    }
+
+
+    return success;
 }
 
 void CaQtDM_Lib::allowResizing(bool allowresize)
@@ -8531,7 +8542,13 @@ knobData* CaQtDM_Lib::GetMutexKnobDataPV(QWidget *widget, QString pv){
 void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
 {
     if((event->button() == Qt::LeftButton) ||  (event->button() == Qt::RightButton)) {
-        myWidget->setFocus();  // this will take the focus away (for caTextEntry mainly, when keepFocus was set)
+        QWidget *w = static_cast<QWidget*>(childAt(event->pos()));
+        // this will take the focus away (for caTextEntry mainly, when keepFocus was set)
+        // however we have to be carefull with caNumeric keyboard handling
+        QLabel *w1 = qobject_cast<QLabel *>(w);
+        if(w1 == (QObject*) 0) {
+            myWidget->setFocus();
+        }
         return;
     }
     QWidget *w = static_cast<QWidget*>(childAt(event->pos()));
