@@ -150,6 +150,54 @@
      <string notr="true">ACM:TEST:AO.{&quot;dbnd&quot;:{&quot;d&quot;:1.5}}</string>
     </property>
    </widget>
+   <widget class="caTextEntry" name="catextentry_5">
+    <property name="geometry">
+     <rect>
+      <x>63</x>
+      <y>269</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:AO.{&quot;f&quot;:{&quot;lo&quot;:0,&quot;hi&quot;:10}, &quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+    </property>
+    <property name="keepFocus">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="caTextEntry" name="catextentry_6">
+    <property name="geometry">
+     <rect>
+      <x>62</x>
+      <y>310</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:AO.{&quot;ts&quot;:{}, &quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+    </property>
+    <property name="keepFocus">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="caTextEntry" name="catextentry_7">
+    <property name="geometry">
+     <rect>
+      <x>62</x>
+      <y>348</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:AO.{test:channel.{&quot;arr&quot;:{&quot;s&quot;:2,&quot;i&quot;:2,&quot;e&quot;:8}} 4 2 4 6 8}, &quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+    </property>
+    <property name="keepFocus">
+     <bool>true</bool>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
