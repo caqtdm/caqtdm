@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="caTextEntry" name="catextentry">
+    <property name="geometry">
+     <rect>
+      <x>342</x>
+      <y>138</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:AO.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+    </property>
+   </widget>
+   <widget class="caTextEntry" name="catextentry_2">
+    <property name="geometry">
+     <rect>
+      <x>343</x>
+      <y>200</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:AO</string>
+    </property>
+    <property name="keepFocus">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="caThermo" name="cathermo">
+    <property name="geometry">
+     <rect>
+      <x>582</x>
+      <y>138</y>
+      <width>69</width>
+      <height>263</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:AO</string>
+    </property>
+    <property name="limitsMode">
+     <enum>caThermo::User</enum>
+    </property>
+   </widget>
+   <widget class="caNumeric" name="canumeric">
+    <property name="geometry">
+     <rect>
+      <x>222</x>
+      <y>405</y>
+      <width>100</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:AO</string>
+    </property>
+   </widget>
+   <widget class="caTextEntry" name="catextentry_3">
+    <property name="geometry">
+     <rect>
+      <x>341</x>
+      <y>31</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:AO.{&quot;dbnd&quot;:{&quot;d&quot;:1.5}, &quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel">
+    <property name="geometry">
+     <rect>
+      <x>47</x>
+      <y>17</y>
+      <width>271</width>
+      <height>49</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>epics dbnd + caqtdm_monitor</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_2">
+    <property name="geometry">
+     <rect>
+      <x>129</x>
+      <y>123</y>
+      <width>197</width>
+      <height>49</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>only caqtdm_monitor</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_3">
+    <property name="geometry">
+     <rect>
+      <x>261</x>
+      <y>188</y>
+      <width>68</width>
+      <height>49</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>no json</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_4">
+    <property name="geometry">
+     <rect>
+      <x>209</x>
+      <y>73</y>
+      <width>108</width>
+      <height>49</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>epics dbnd</string>
+    </property>
+   </widget>
+   <widget class="caTextEntry" name="catextentry_4">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>87</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:AO.{&quot;dbnd&quot;:{&quot;d&quot;:1.5}}</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caNumeric</class>
+   <extends>QFrame</extends>
+   <header>caNumeric</header>
+  </customwidget>
+  <customwidget>
+   <class>caTextEntry</class>
+   <extends>caLineEdit</extends>
+   <header>caTextEntry</header>
+  </customwidget>
+  <customwidget>
+   <class>caLabel</class>
+   <extends>QLabel</extends>
+   <header>caLabel</header>
+  </customwidget>
+  <customwidget>
+   <class>caLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>caLineEdit</header>
+  </customwidget>
+  <customwidget>
+   <class>caThermo</class>
+   <extends>QWidget</extends>
+   <header>caThermo</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
