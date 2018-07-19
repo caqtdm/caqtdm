@@ -242,6 +242,15 @@ DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
+# 4.2.3 of 11.7.2018
+# focus can be kept now in caTextEntry even on pointer leave by specifying a property
+# instead of exchanging through shared memory directly for -attach, a queue has been integrated for attaching
+# for caLineEdit in case of bsread, the unit will be acquired automatically through epics (PSI special)
+# remove extra white spaces and special characters (lf, cr) form macrodefs
+# added for caTextEntry  a drop possibility when dragging into it.
+# new bsread options
+# in the unit, the u in uJ will be converted to a real mu
+
 # 4.2.2
 # shared memory key was not set correctly for -attach; corrected now
 

@@ -12,12 +12,15 @@ void bsread_wfhandling::wfconvert()
     switch (bsreadPVP->type){
         case bs_float64:{
             bsread_wfConverter<double,double> *converter=new bsread_wfConverter<double,double>(kDataP,bsreadPVP,BlockPoolP);
+            converter->setPrecision(QDataStream::DoublePrecision);
             converter->wfconvert();
             delete converter;
             break;
         }
         case bs_float32:{
+            //for (int x=0;x<10;x++)  qDebug() << ((float *)bsreadPVP->bsdata.wf_data)[x];
             bsread_wfConverter<float,float> *converter=new bsread_wfConverter<float,float>(kDataP,bsreadPVP,BlockPoolP);
+            converter->setPrecision(QDataStream::SinglePrecision);
             converter->wfconvert();
             delete converter;
             break;
@@ -47,13 +50,13 @@ void bsread_wfhandling::wfconvert()
             break;
         }
         case bs_int16:{
-            bsread_wfConverter<qint16,int> *converter=new bsread_wfConverter<qint16,int>(kDataP,bsreadPVP,BlockPoolP);
+            bsread_wfConverter<qint16,short> *converter=new bsread_wfConverter<qint16,short>(kDataP,bsreadPVP,BlockPoolP);
             converter->wfconvert();
             delete converter;
             break;
         }
         case bs_int8:{
-            bsread_wfConverter<qint8,int> *converter=new bsread_wfConverter<qint8,int>(kDataP,bsreadPVP,BlockPoolP);
+            bsread_wfConverter<qint8,short> *converter=new bsread_wfConverter<qint8,short>(kDataP,bsreadPVP,BlockPoolP);
             converter->wfconvert();
             delete converter;
             break;

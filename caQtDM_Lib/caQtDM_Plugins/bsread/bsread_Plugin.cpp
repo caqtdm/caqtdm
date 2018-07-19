@@ -47,6 +47,7 @@ bsreadPlugin::bsreadPlugin()
     //qDebug() << "bsreadPlugin: Create";
     DispatcherThread=new QThread(this);
     Dispatcher=new bsread_dispatchercontrol();
+    mutexknobdataP = NULL;
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closeEvent()));
 
 }
@@ -118,8 +119,10 @@ void bsreadPlugin::updateValues()
 int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow,QMap<QString, QString> options)
 {
     int i;
-    Q_UNUSED(options);
-    qDebug() << "bsreadPlugin: InitCommunicationLayer" << data;
+    //Q_UNUSED(options);
+    //qDebug() << "bsreadPlugin: InitCommunicationLayer" << data;
+    qDebug() << "bsreadPlugin: InitCommunicationLayer with options" << options;
+
     mutexknobdataP = data;
     messagewindowP = messageWindow;
     // INIT ZMQ Layer
@@ -133,6 +136,9 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
 
         Dispatcher->set_Dispatcher(&DispacherConfig);
         Dispatcher->setMessagewindow(messagewindowP);
+
+        Dispatcher->setOptions(options);
+
         Dispatcher->setZmqcontex(zmqcontex);
         Dispatcher->setMutexknobdataP(data);
         Dispatcher->moveToThread(DispatcherThread);
@@ -191,8 +197,9 @@ int bsreadPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
 
     int i;
     QMutexLocker locker(&mutex);
+    //qDebug() << "bsreadPlugin:pvAddMonitor" << kData->pv << kData->index << kData;
     Dispatcher->add_Channel(kData->pv,kData->index);
-    qDebug() << "bsreadPlugin:pvAddMonitor" << kData->pv << kData->index << kData;
+
     i=0;
 
     while ((i<bsreadconnections.size())){
@@ -238,10 +245,9 @@ int bsreadPlugin::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata,
     Q_UNUSED(forceType);
     Q_UNUSED(errmess);
     Q_UNUSED(object);
-
     QMutexLocker locker(&mutex);
-    qDebug() << "bsreadPlugin:pvSetValue" << pv << rdata << idata << sdata;
-    return false;
+    //qDebug() << "bsreadPlugin:pvSetValue" << pv << rdata << idata << sdata;
+    return Dispatcher->set_Channel(pv,rdata,idata,sdata,object,errmess,forceType);
 }
 
 // caQtDM_Lib will call this routine for setting waveforms data (see for more detail the epics3 plugin)

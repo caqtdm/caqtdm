@@ -606,6 +606,7 @@ void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message,size_t
         if (datasize==1){
             if (size>0){
               bsdata_assign_single(Data, message,&datatypesize);
+              channelcounter++;
               Data->valid=true;
             }else{
               Data->valid=false;
@@ -821,7 +822,7 @@ void bsread_Decode::bsread_EndofData()
                     if (!bsreadPV->valid){
                         kData->edata.severity=INVALID_ALARM;
                     }else{
-                        kData->edata.severity=0;
+                        kData->edata.severity=NO_ALARM;
                     }
                     switch (bsreadPV->type){
                     case bs_float64:{
