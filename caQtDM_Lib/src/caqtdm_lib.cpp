@@ -3279,6 +3279,9 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
         }
         postMessage(QtDebugMsg, asc);
     }
+    if (trimmedPV.contains(".{}")){
+       trimmedPV.truncate(trimmedPV.indexOf(".{}"));
+    }
 
     *pvRep = trimmedPV;
 
