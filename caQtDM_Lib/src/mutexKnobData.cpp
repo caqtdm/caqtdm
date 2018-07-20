@@ -353,7 +353,8 @@ int MutexKnobData::GetMutexKnobDataSize()
 void MutexKnobData::SetMutexKnobData(int index, knobData data)
 {
     QMutexLocker locker(&mutex);
-    memcpy(&KnobData[index], &data, sizeof(knobData));
+    if (KnobData&&(index<KnobDataArraySize))
+        memcpy(&KnobData[index], &data, sizeof(knobData));
 }
 
 extern "C" MutexKnobData* C_SetMutexKnobData(MutexKnobData* p, int index, knobData data)
