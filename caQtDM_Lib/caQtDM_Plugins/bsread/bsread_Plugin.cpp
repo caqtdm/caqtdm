@@ -198,7 +198,15 @@ int bsreadPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
     int i;
     QMutexLocker locker(&mutex);
     //qDebug() << "bsreadPlugin:pvAddMonitor" << kData->pv << kData->index << kData;
-    Dispatcher->add_Channel(kData->pv,kData->index);
+
+    //remove EPICS addjustment parameter
+    QString datapv=kData->pv;
+    int pos = datapv.indexOf(".{");
+    if(pos != -1) {
+     datapv.truncate(pos);
+    }
+
+    Dispatcher->add_Channel(datapv,kData->index);
 
     i=0;
 

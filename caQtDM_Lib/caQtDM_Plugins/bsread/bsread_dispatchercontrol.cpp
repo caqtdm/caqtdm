@@ -261,7 +261,7 @@ void bsread_dispatchercontrol::process()
                 transferdata.append(data);
 
 
-                //qDebug() <<"Send Test Data"<< StreamDispatcher << data;
+                //qDebug() <<"Send Test Data"<< StreamDispatcher << transferdata;
 
                 requestChannel.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
                 replyConnect = manager.post(requestChannel,transferdata);
