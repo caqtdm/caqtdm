@@ -227,6 +227,7 @@ void bsread_Decode::process()
 
         }
     }
+    bsread_DataTimeOut();
     zmq_msg_close(&msg);
     zmq_close(zmqsocket);
     emit finished();

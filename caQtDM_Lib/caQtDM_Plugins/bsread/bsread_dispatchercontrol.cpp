@@ -269,6 +269,9 @@ void bsread_dispatchercontrol::process()
                 connect(replyConnect, SIGNAL(readyRead()),this, SLOT(finishReplyConnect()));
 
                 requestedchannels=Channels.count();
+            }else{
+               // delete all streams because no receive data is requested
+               cleanStreamConnections(0);
             }
             //qDebug() <<"Rec  finished: "<<requestedchannels;
         }
@@ -691,26 +694,7 @@ void bsread_dispatchercontrol::finishReplyConnect()
                 //connect(bsreadconnections.last(), SIGNAL(finished()), bsreadconnections.last(), SLOT(deleteLater()));
 
                 bsreadThreads.last()->start();
-
-
-
-                while (bsreadconnections.count()>1){
-                    //qDebug() << "Delete bsread_Decode:" <<bsreadconnections.first();
-                    QString connection=QString(bsreadconnections.first()->getConnectionPoint());
-                    deleteStream(&connection);
-                    bsreadconnections.first()->setTerminate();
-                    bsreadThreads.first()->quit();
-                    bsreadThreads.first()->wait();
-                    delete(bsreadThreads.first());
-                    delete(bsreadconnections.first());
-
-                    bsreadconnections.removeFirst();
-
-
-
-
-                    bsreadThreads.removeFirst();
-                }
+                cleanStreamConnections(1);
 
                 //qDebug() << "bsreadPlugin:" << stream.toLatin1().constData();
             }
@@ -756,6 +740,23 @@ void bsread_dispatchercontrol::finishReplyConnect()
 
     //qDebug()<<"finishReplyConnect: finished ThreadID (" << QThread::currentThreadId()<< ")";
     //qDebug()<<"END: finishReplyConnect";
+}
+void bsread_dispatchercontrol::cleanStreamConnections(int check){
+
+    while (bsreadconnections.count()>check){
+        //qDebug() << "Delete bsread_Decode:" <<bsreadconnections.first();
+        QString connection=QString(bsreadconnections.first()->getConnectionPoint());
+        deleteStream(&connection);
+        bsreadconnections.first()->setTerminate();
+        bsreadThreads.first()->quit();
+        bsreadThreads.first()->wait();
+        delete(bsreadThreads.first());
+        delete(bsreadconnections.first());
+
+        bsreadconnections.removeFirst();
+        bsreadThreads.removeFirst();
+    }
+
 }
 
 void bsread_dispatchercontrol::finishReplyDelete()

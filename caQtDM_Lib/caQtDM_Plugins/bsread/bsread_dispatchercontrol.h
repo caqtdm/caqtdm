@@ -54,6 +54,7 @@ Q_OBJECT
     int filldispatcherchannels2(bsread_internalchannel *channel,int index);
 
     bsread_internalchannel* get_internalChannel(QString value);
+    void cleanStreamConnections(int check);
 public:
     bsread_dispatchercontrol();
     ~bsread_dispatchercontrol();
