@@ -745,9 +745,12 @@ void bsread_dispatchercontrol::cleanStreamConnections(int check){
 
     while (bsreadconnections.count()>check){
         //qDebug() << "Delete bsread_Decode:" <<bsreadconnections.first();
-        QString connection=QString(bsreadconnections.first()->getConnectionPoint());
-        deleteStream(&connection);
         bsreadconnections.first()->setTerminate();
+        qDebug() << "Delete bsread_Decode";
+        QString connection=QString(bsreadconnections.first()->getConnectionPoint());
+
+        deleteStream(&connection);
+
         bsreadThreads.first()->quit();
         bsreadThreads.first()->wait();
         delete(bsreadThreads.first());

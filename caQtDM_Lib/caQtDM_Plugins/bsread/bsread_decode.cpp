@@ -135,7 +135,6 @@ void bsread_Decode::process()
         //qDebug() << "bsreadPlugin: ConnectionPoint faild";
         running_decode=false;
     }else{
-
         running_decode=true;
         channelcounter=0;
 
@@ -226,10 +225,14 @@ void bsread_Decode::process()
             }
 
         }
+
+        bsread_DataTimeOut();
+        zmq_msg_close(&msg);
+        zmq_close(zmqsocket);
+
+
     }
-    bsread_DataTimeOut();
-    zmq_msg_close(&msg);
-    zmq_close(zmqsocket);
+
     emit finished();
     //qDebug() << "bsreadDecode: finished ThreadID" << QThread::currentThreadId();
     qDebug() << "bsread ZMQ Receiver terminate";
@@ -1030,17 +1033,25 @@ void bsread_Decode::bsread_EndofData()
 void bsread_Decode::setTerminate()
 {
     terminate = true;
+
 }
 
 void bsread_Decode::bsread_DataTimeOut(){
     QMutexLocker locker(&mutex);
     hash="Data Time Out";
     channelcounter=0;
-    foreach(int index, listOfIndexes) {
-        knobData* kData = bsread_KnobDataP->GetMutexKnobDataPtr(index);
-        kData->edata.connected = false;
-        bsread_KnobDataP->SetMutexKnobData(kData->index, *kData);
-        bsread_KnobDataP->SetMutexKnobDataReceived(kData);
+    if (bsread_KnobDataP){
+        foreach(int index, listOfIndexes) {
+            knobData* kData = bsread_KnobDataP->GetMutexKnobDataPtr(index);
+            //qDebug() << "Index :" << kData->pv << kData->index;
+            if (kData->index>=0){
+                bsread_KnobDataP->DataLock(kData);
+                kData->edata.connected = false;
+                bsread_KnobDataP->SetMutexKnobData(kData->index, *kData);
+                bsread_KnobDataP->SetMutexKnobDataReceived(kData);
+                bsread_KnobDataP->DataUnlock(kData);
+            }
+        }
     }
 }
 void bsread_Decode::bsread_Delay(){
@@ -1075,6 +1086,7 @@ bool bsread_Decode::bsread_DataMonitorUnConnect(knobData *kData){
     kData->edata.valueCount=0;
     datamutex->unlock();
 
+    //qDebug() << "Index :" << kData->pv << kData->index;
     listOfIndexes.removeAll(kData->index);
     listOfRequestedChannels.removeAll(kData->pv);
     hash="";
