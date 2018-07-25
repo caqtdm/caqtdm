@@ -46,6 +46,7 @@ void wmSignalPropagator::shownormal() {emit wmShowNormal();}
 void wmSignalPropagator::showmaximized() {emit wmShowMaximized();}
 void wmSignalPropagator::showminimized() {emit wmShowMinimized();}
 void wmSignalPropagator::showfullscreen() {emit wmShowFullScreen();}
+void wmSignalPropagator::printwindow() {emit wmPrintWindow();}
 void wmSignalPropagator::propagateToParent(QRect p) {
 
     // move parent to the p.x and p.y

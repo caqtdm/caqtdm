@@ -53,6 +53,7 @@ public slots:
     void showminimized();
     void showfullscreen();
     void propagateToParent(QRect p);
+    void printwindow();
 
 signals:
     void wmCloseWindow();
@@ -63,6 +64,7 @@ signals:
     void wmShowFullScreen();
     void wmFactorX(double);
     void wmFactorY(double);
+    void wmPrintWindow();
 
 private:
     void setForeAndBackground(QColor fg, QColor bg);

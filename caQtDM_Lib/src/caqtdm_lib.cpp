@@ -444,6 +444,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         connect(widget, SIGNAL(wmShowMinimized()), this, SLOT(showMinWindow()));
         connect(widget, SIGNAL(wmShowFullScreen()), this, SLOT(showFullWindow()));
         connect(widget, SIGNAL(wmReloadWindow()), this, SLOT(Callback_ReloadWindowL()));
+        connect(widget, SIGNAL(wmPrintWindow()), this, SLOT(Callback_printWindow()));
     }
 
     // connect close launchfile action to parent
