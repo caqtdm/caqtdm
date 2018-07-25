@@ -4777,9 +4777,18 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         if(data.edata.connected) {
             ComputeNumericMaxMinPrec(applynumericWidget, data);
             applynumericWidget->setConnectedColors(true);
-            applynumericWidget->silentSetValue(data.edata.rvalue);
-            applynumericWidget->setAccessW((bool) data.edata.accessW);
-            updateAccessCursor(applynumericWidget);
+
+            if(data.edata.fieldtype == caSTRING ||  data.edata.fieldtype ==  caCHAR) {
+                char asc[MAX_STRING_LENGTH];
+                snprintf(asc, MAX_STRING_LENGTH, "caApplyNumeric %s does not treat other then numerical values", qasc(w->objectName()));
+                postMessage(QtCriticalMsg, asc);
+                applynumericWidget->setEnabled(false);
+            } else {
+                applynumericWidget->silentSetValue(data.edata.rvalue);
+                applynumericWidget->setAccessW((bool) data.edata.accessW);
+                updateAccessCursor(applynumericWidget);
+            }
+
         } else {
             applynumericWidget->setConnectedColors(false);
         }
@@ -4791,9 +4800,18 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         if(data.edata.connected) {
             ComputeNumericMaxMinPrec(numericWidget, data);
             numericWidget->setConnectedColors(true);
-            numericWidget->silentSetValue(data.edata.rvalue);
-            numericWidget->setAccessW((bool) data.edata.accessW);
-            updateAccessCursor(numericWidget);
+
+            if(data.edata.fieldtype == caSTRING ||  data.edata.fieldtype ==  caCHAR) {
+                char asc[MAX_STRING_LENGTH];
+                snprintf(asc, MAX_STRING_LENGTH, "caNumeric %s does not treat other then numerical values", qasc(w->objectName()));
+                postMessage(QtCriticalMsg, asc);
+                numericWidget->setEnabled(false);
+            } else {
+                numericWidget->silentSetValue(data.edata.rvalue);
+                numericWidget->setAccessW((bool) data.edata.accessW);
+                updateAccessCursor(numericWidget);
+            }
+
         } else {
             numericWidget->setConnectedColors(false);
         }
@@ -4805,9 +4823,18 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         if(data.edata.connected) {
             ComputeNumericMaxMinPrec(spinboxWidget, data);
             spinboxWidget->setConnectedColors(true);
-            spinboxWidget->silentSetValue(data.edata.rvalue);
-            spinboxWidget->setAccessW((bool) data.edata.accessW);
-            updateAccessCursor(spinboxWidget);
+
+            if(data.edata.fieldtype == caSTRING || data.edata.fieldtype ==  caCHAR) {
+                char asc[MAX_STRING_LENGTH];
+                snprintf(asc, MAX_STRING_LENGTH, "caSpinbox %s does not treat other then numerical values", qasc(w->objectName()));
+                postMessage(QtCriticalMsg, asc);
+                spinboxWidget->setEnabled(false);
+            } else {
+                spinboxWidget->silentSetValue(data.edata.rvalue);
+                spinboxWidget->setAccessW((bool) data.edata.accessW);
+                updateAccessCursor(spinboxWidget);
+            }
+
         } else {
             spinboxWidget->setConnectedColors(false);
         }
