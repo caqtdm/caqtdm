@@ -7030,7 +7030,7 @@ bool CaQtDM_Lib::SoftPVusesItsself(QWidget* widget, QMap<QString, QString> map)
             QString trimmedPV = strng[i].trimmed();
             int pos = trimmedPV.indexOf(".{");  // jason string
             if(pos != -1) JSONString = trimmedPV.mid(pos+1);
-            if(pos != -1) trimmedPV = trimmedPV.mid(0, pos+1);
+            if(pos != -1) trimmedPV = trimmedPV.mid(0, pos);
             strng[i] = treatMacro(map, trimmedPV, &doNothing, widget->objectName());
             if(i==4) {
                 char asc[ MAX_STRING_LENGTH];
