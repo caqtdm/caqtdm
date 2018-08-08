@@ -8816,7 +8816,7 @@ p, li { white-space: pre-wrap; }
          <string notr="true">[counts]</string>
         </property>
         <property name="channels" stdset="0">
-         <string notr="true">ACM:COUNT:1{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}};ACM:TEST:AO</string>
+         <string notr="true">ACM:COUNT:1.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:20}};ACM:TEST:AO</string>
         </property>
         <property name="units">
          <enum>caStripPlot::Second</enum>
@@ -9618,13 +9618,13 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channelData" stdset="0">
-         <string notr="true">MTEST-CAQTDM-CAMERA:FPICTURE{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:FPICTURE.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
         </property>
         <property name="channelWidth" stdset="0">
-         <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
         <property name="channelHeight" stdset="0">
-         <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
         <property name="simpleZoomedView" stdset="0">
          <bool>false</bool>
@@ -9702,13 +9702,13 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channelData" stdset="0">
-         <string notr="true">MTEST-CAQTDM-CAMERA:FPICTURE{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:FPICTURE.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
         </property>
         <property name="channelWidth" stdset="0">
-         <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
         <property name="channelHeight" stdset="0">
-         <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
         <property name="simpleZoomedView" stdset="0">
          <bool>true</bool>
@@ -9742,13 +9742,13 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channelData" stdset="0">
-         <string notr="true">MTEST-CAQTDM-CAMERA:FPICTURE{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:FPICTURE.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
         </property>
         <property name="channelWidth" stdset="0">
-         <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
         <property name="channelHeight" stdset="0">
-         <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
         <property name="simpleZoomedView" stdset="0">
          <bool>true</bool>
@@ -10383,13 +10383,13 @@ def PythonCalc(a, b, c, d):
          <enum>caScan2D::Yes</enum>
         </property>
         <property name="channelYCPT" stdset="0">
-         <string notr="true">TEST:scan2.CPT{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+         <string notr="true">TEST:scan2.CPT.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
         </property>
         <property name="channelXNEWDATA" stdset="0">
-         <string notr="true">TEST:scan1.DATA{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+         <string notr="true">TEST:scan1.DATA.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
         </property>
         <property name="channelYNEWDATA" stdset="0">
-         <string notr="true">TEST:scan2.DATA{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+         <string notr="true">TEST:scan2.DATA.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
         </property>
         <property name="channelSAVEDATA_PATH" stdset="0">
          <string notr="true">$(SAVEDATAPATH)</string>
@@ -10444,13 +10444,13 @@ def PythonCalc(a, b, c, d):
          <enum>caScan2D::Yes</enum>
         </property>
         <property name="channelYCPT" stdset="0">
-         <string notr="true">TEST:scan2.CPT{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+         <string notr="true">TEST:scan2.CPT.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
         </property>
         <property name="channelXNEWDATA" stdset="0">
-         <string notr="true">TEST:scan1.DATA{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+         <string notr="true">TEST:scan1.DATA.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
         </property>
         <property name="channelYNEWDATA" stdset="0">
-         <string notr="true">TEST:scan2.DATA{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+         <string notr="true">TEST:scan2.DATA.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
         </property>
         <property name="channelSAVEDATA_PATH" stdset="0">
          <string notr="true">$(SAVEDATAPATH)</string>
@@ -10889,7 +10889,7 @@ def PythonCalc(a, b, c, d):
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
         <property name="variable">
-         <string notr="true">mycalc{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">mycalc.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
         <property name="calc">
          <string notr="true">A+0.5</string>
@@ -11054,7 +11054,7 @@ def PythonCalc(a, b, c, d):
          </rect>
         </property>
         <property name="variable">
-         <string notr="true">myPython1{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+         <string notr="true">myPython1.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
         </property>
         <property name="calc">
          <string notr="true">%P/def PythonCalc(a, b, c, d):
@@ -11079,7 +11079,7 @@ def PythonCalc(a, b, c, d):
          </rect>
         </property>
         <property name="variable">
-         <string notr="true">myPython2{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+         <string notr="true">myPython2.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
         </property>
         <property name="calc">
          <string notr="true">%P/
@@ -16862,7 +16862,7 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
          <string notr="true">[counts]</string>
         </property>
         <property name="channels" stdset="0">
-         <string notr="true">ACM:COUNT:1{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}};ACM:TEST:AO;mySoft1</string>
+         <string notr="true">ACM:COUNT:1.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:20}};ACM:TEST:AO;mySoft1</string>
         </property>
         <property name="units">
          <enum>caStripPlot::Minute</enum>
