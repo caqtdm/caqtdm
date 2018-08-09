@@ -12,8 +12,10 @@ contains(QT_VER_MAJ, 4) {
 contains(QT_VER_MAJ, 5) {
    QT     += core gui svg uitools  printsupport network opengl
 # x11 extras must be included for qt5.1 and higher
-   greaterThan(QT_VER_MIN,0){
-      QT += x11extras
+linux{
+      greaterThan(QT_VER_MIN,0){
+         QT += x11extras
+     }
    }
    CONFIG += qt warn_on thread widgets
    DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
