@@ -628,6 +628,22 @@ void CaQtDM_Lib::Callback_TabChanged(int current)
     // Enable & Disable IO when in invisible page of a TabWidget
     EnableDisableIO();
     FlushAllInterfaces();
+
+    // due to some problem with the legend of cartesianplot in tab widgets, we should update its layout
+    QTabWidget *tabwidget = qobject_cast<QTabWidget *>(sender());
+    if(tabwidget == (QTabWidget*) 0) return;
+
+    QList<caCartesianPlot*> children = tabwidget->findChildren< caCartesianPlot*>();
+    foreach(caCartesianPlot* w1, children) {
+        if(w1->getLegendEnabled()) {
+            qreal fontsize = w1->property("legendfontsize").value<qreal>();
+            QFont f = QFont("Arial");
+            f.setPointSizeF(fontsize);
+            w1->setLegendAttribute(w1->getScaleColor(), f, caCartesianPlot::FONT);
+            w1->updateLayout();
+        }
+    }
+
 }
 
 /**
@@ -8228,7 +8244,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                     }
                 } else {
                     caCartesianPlot * cartesianplotWidget = (caCartesianPlot *) widget;
-                    integerList.insert(7, 8);
+                    integerList.insert(7, 7);
                     if( cartesianplotWidget->getLegendEnabled()) {
                          cartesianplotWidget->setLegendAttribute(cartesianplotWidget->getScaleColor(), QFont("arial", 7), caCartesianPlot::FONT);
                     }
