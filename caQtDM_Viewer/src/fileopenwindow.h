@@ -67,6 +67,9 @@
         char blop[BlopSize];
     };
 
+#ifdef linux
+#  include <unistd.h>
+#endif
 // this sleep will not block the GUI and QThread::msleep is protected in Qt4.8 (so do not use that)
     class Sleep
     {

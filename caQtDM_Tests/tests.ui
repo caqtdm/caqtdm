@@ -120,7 +120,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: rgb(0,0,120);}</string>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>3</number>
     </property>
     <property name="usesScrollButtons">
      <bool>true</bool>
@@ -8816,7 +8816,7 @@ p, li { white-space: pre-wrap; }
          <string notr="true">[counts]</string>
         </property>
         <property name="channels" stdset="0">
-         <string notr="true">ACM:COUNT:1{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}};ACM:TEST:AO</string>
+         <string notr="true">ACM:COUNT:1.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:20}};ACM:TEST:AO</string>
         </property>
         <property name="units">
          <enum>caStripPlot::Second</enum>
@@ -9618,13 +9618,13 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channelData" stdset="0">
-         <string notr="true">MTEST-CAQTDM-CAMERA:FPICTURE{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:FPICTURE.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
         </property>
         <property name="channelWidth" stdset="0">
-         <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
         <property name="channelHeight" stdset="0">
-         <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
         <property name="simpleZoomedView" stdset="0">
          <bool>false</bool>
@@ -9702,13 +9702,13 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channelData" stdset="0">
-         <string notr="true">MTEST-CAQTDM-CAMERA:FPICTURE{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:FPICTURE.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
         </property>
         <property name="channelWidth" stdset="0">
-         <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
         <property name="channelHeight" stdset="0">
-         <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
         <property name="simpleZoomedView" stdset="0">
          <bool>true</bool>
@@ -9742,13 +9742,13 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="channelData" stdset="0">
-         <string notr="true">MTEST-CAQTDM-CAMERA:FPICTURE{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:FPICTURE.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
         </property>
         <property name="channelWidth" stdset="0">
-         <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
         <property name="channelHeight" stdset="0">
-         <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
         <property name="simpleZoomedView" stdset="0">
          <bool>true</bool>
@@ -10383,13 +10383,13 @@ def PythonCalc(a, b, c, d):
          <enum>caScan2D::Yes</enum>
         </property>
         <property name="channelYCPT" stdset="0">
-         <string notr="true">TEST:scan2.CPT{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+         <string notr="true">TEST:scan2.CPT.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
         </property>
         <property name="channelXNEWDATA" stdset="0">
-         <string notr="true">TEST:scan1.DATA{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+         <string notr="true">TEST:scan1.DATA.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
         </property>
         <property name="channelYNEWDATA" stdset="0">
-         <string notr="true">TEST:scan2.DATA{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+         <string notr="true">TEST:scan2.DATA.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
         </property>
         <property name="channelSAVEDATA_PATH" stdset="0">
          <string notr="true">$(SAVEDATAPATH)</string>
@@ -10444,13 +10444,13 @@ def PythonCalc(a, b, c, d):
          <enum>caScan2D::Yes</enum>
         </property>
         <property name="channelYCPT" stdset="0">
-         <string notr="true">TEST:scan2.CPT{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+         <string notr="true">TEST:scan2.CPT.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
         </property>
         <property name="channelXNEWDATA" stdset="0">
-         <string notr="true">TEST:scan1.DATA{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+         <string notr="true">TEST:scan1.DATA.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
         </property>
         <property name="channelYNEWDATA" stdset="0">
-         <string notr="true">TEST:scan2.DATA{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+         <string notr="true">TEST:scan2.DATA.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
         </property>
         <property name="channelSAVEDATA_PATH" stdset="0">
          <string notr="true">$(SAVEDATAPATH)</string>
@@ -10889,7 +10889,7 @@ def PythonCalc(a, b, c, d):
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
         <property name="variable">
-         <string notr="true">mycalc{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+         <string notr="true">mycalc.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
         </property>
         <property name="calc">
          <string notr="true">A+0.5</string>
@@ -11054,7 +11054,7 @@ def PythonCalc(a, b, c, d):
          </rect>
         </property>
         <property name="variable">
-         <string notr="true">myPython1{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+         <string notr="true">myPython1.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
         </property>
         <property name="calc">
          <string notr="true">%P/def PythonCalc(a, b, c, d):
@@ -11079,7 +11079,7 @@ def PythonCalc(a, b, c, d):
          </rect>
         </property>
         <property name="variable">
-         <string notr="true">myPython2{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
+         <string notr="true">myPython2.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:10}}</string>
         </property>
         <property name="calc">
          <string notr="true">%P/
@@ -15446,6 +15446,19 @@ p, li { white-space: pre-wrap; }
        <string>Reload</string>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButton_5">
+      <property name="geometry">
+       <rect>
+        <x>103</x>
+        <y>510</y>
+        <width>84</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Print</string>
+      </property>
+     </widget>
      <zorder>caclock_3</zorder>
      <zorder>caclock_4</zorder>
      <zorder>cagraphics_16</zorder>
@@ -15468,6 +15481,7 @@ p, li { white-space: pre-wrap; }
      <zorder>cacalc_34</zorder>
      <zorder>canumeric_16</zorder>
      <zorder>pushButton_4</zorder>
+     <zorder>pushButton_5</zorder>
     </widget>
     <widget class="QWidget" name="tab_41">
      <attribute name="title">
@@ -16848,7 +16862,7 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
          <string notr="true">[counts]</string>
         </property>
         <property name="channels" stdset="0">
-         <string notr="true">ACM:COUNT:1{&quot;monitor&quot;:{&quot;maxdisplayrate&quot;:20}};ACM:TEST:AO;mySoft1</string>
+         <string notr="true">ACM:COUNT:1.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:20}};ACM:TEST:AO;mySoft1</string>
         </property>
         <property name="units">
          <enum>caStripPlot::Minute</enum>
@@ -17439,6 +17453,7 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
     </property>
     <addaction name="actionExit"/>
     <addaction name="actionShell"/>
+    <addaction name="actionPrint"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -17451,6 +17466,11 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
   <action name="actionShell">
    <property name="text">
     <string>execute shell</string>
+   </property>
+  </action>
+  <action name="actionPrint">
+   <property name="text">
+    <string>print</string>
    </property>
   </action>
  </widget>
@@ -17740,12 +17760,12 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>toggle()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>335</x>
-     <y>241</y>
+     <x>337</x>
+     <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>789</x>
-     <y>315</y>
+     <x>791</x>
+     <y>349</y>
     </hint>
    </hints>
   </connection>
@@ -18284,8 +18304,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setPackingmodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>205</x>
-     <y>290</y>
+     <x>209</x>
+     <y>324</y>
     </hint>
     <hint type="destinationlabel">
      <x>501</x>
@@ -18300,8 +18320,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setPackingmodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>233</x>
-     <y>290</y>
+     <x>237</x>
+     <y>324</y>
     </hint>
     <hint type="destinationlabel">
      <x>285</x>
@@ -18316,8 +18336,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setPackingmodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>213</x>
-     <y>290</y>
+     <x>217</x>
+     <y>324</y>
     </hint>
     <hint type="destinationlabel">
      <x>176</x>
@@ -18332,8 +18352,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setDecodemodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>84</x>
-     <y>290</y>
+     <x>88</x>
+     <y>324</y>
     </hint>
     <hint type="destinationlabel">
      <x>75</x>
@@ -18348,8 +18368,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setDecodemodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>59</x>
-     <y>290</y>
+     <x>63</x>
+     <y>324</y>
     </hint>
     <hint type="destinationlabel">
      <x>260</x>
@@ -18364,8 +18384,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setDecodemodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>42</x>
-     <y>290</y>
+     <x>46</x>
+     <y>324</y>
     </hint>
     <hint type="destinationlabel">
      <x>615</x>
@@ -18390,18 +18410,34 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    </hints>
   </connection>
   <connection>
-   <sender>pushButton</sender>
+   <sender>pushButton_5</sender>
    <signal>clicked()</signal>
-   <receiver>wmsignalpropagator</receiver>
-   <slot>closewindow()</slot>
+   <receiver>wmsignalpropagator_2</receiver>
+   <slot>printwindow()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>709</x>
-     <y>285</y>
+     <x>176</x>
+     <y>616</y>
     </hint>
     <hint type="destinationlabel">
-     <x>699</x>
-     <y>380</y>
+     <x>267</x>
+     <y>661</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionPrint</sender>
+   <signal>triggered()</signal>
+   <receiver>wmsignalpropagator_2</receiver>
+   <slot>printwindow()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>266</x>
+     <y>654</y>
     </hint>
    </hints>
   </connection>

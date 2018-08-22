@@ -226,7 +226,7 @@ void caMenu::populateCells(QStringList stringlist)
 
 void caMenu::setIndex(int const &indx)
 {
-    if(nonMaskedStrings.size() <= 0 || indx > nonMaskedStrings.size()) {setCurrentIndex(-1); return;}
+    if(nonMaskedStrings.size() <= 0 || indx >= nonMaskedStrings.size()) {setCurrentIndex(-1); return;}
     bool found = false;
     lastIndex = indx;
     QString currentString = nonMaskedStrings.at(indx);

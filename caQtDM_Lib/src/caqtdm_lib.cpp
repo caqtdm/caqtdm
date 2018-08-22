@@ -444,6 +444,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         connect(widget, SIGNAL(wmShowMinimized()), this, SLOT(showMinWindow()));
         connect(widget, SIGNAL(wmShowFullScreen()), this, SLOT(showFullWindow()));
         connect(widget, SIGNAL(wmReloadWindow()), this, SLOT(Callback_ReloadWindowL()));
+        connect(widget, SIGNAL(wmPrintWindow()), this, SLOT(Callback_printWindow()));
     }
 
     // connect close launchfile action to parent
@@ -627,6 +628,22 @@ void CaQtDM_Lib::Callback_TabChanged(int current)
     // Enable & Disable IO when in invisible page of a TabWidget
     EnableDisableIO();
     FlushAllInterfaces();
+
+    // due to some problem with the legend of cartesianplot in tab widgets, we should update its layout
+    QTabWidget *tabwidget = qobject_cast<QTabWidget *>(sender());
+    if(tabwidget == (QTabWidget*) 0) return;
+
+    QList<caCartesianPlot*> children = tabwidget->findChildren< caCartesianPlot*>();
+    foreach(caCartesianPlot* w1, children) {
+        if(w1->getLegendEnabled()) {
+            qreal fontsize = w1->property("legendfontsize").value<qreal>();
+            QFont f = QFont("Arial");
+            f.setPointSizeF(fontsize);
+            w1->setLegendAttribute(w1->getScaleColor(), f, caCartesianPlot::FONT);
+            w1->updateLayout();
+        }
+    }
+
 }
 
 /**
@@ -3279,6 +3296,9 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
         }
         postMessage(QtDebugMsg, asc);
     }
+    if (trimmedPV.contains(".{}")){
+       trimmedPV.truncate(trimmedPV.indexOf(".{}"));
+    }
 
     *pvRep = trimmedPV;
 
@@ -4774,9 +4794,18 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         if(data.edata.connected) {
             ComputeNumericMaxMinPrec(applynumericWidget, data);
             applynumericWidget->setConnectedColors(true);
-            applynumericWidget->silentSetValue(data.edata.rvalue);
-            applynumericWidget->setAccessW((bool) data.edata.accessW);
-            updateAccessCursor(applynumericWidget);
+
+            if(data.edata.fieldtype == caSTRING ||  data.edata.fieldtype ==  caCHAR) {
+                char asc[MAX_STRING_LENGTH];
+                snprintf(asc, MAX_STRING_LENGTH, "caApplyNumeric %s does not treat other then numerical values", qasc(w->objectName()));
+                postMessage(QtCriticalMsg, asc);
+                applynumericWidget->setEnabled(false);
+            } else {
+                applynumericWidget->silentSetValue(data.edata.rvalue);
+                applynumericWidget->setAccessW((bool) data.edata.accessW);
+                updateAccessCursor(applynumericWidget);
+            }
+
         } else {
             applynumericWidget->setConnectedColors(false);
         }
@@ -4788,9 +4817,18 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         if(data.edata.connected) {
             ComputeNumericMaxMinPrec(numericWidget, data);
             numericWidget->setConnectedColors(true);
-            numericWidget->silentSetValue(data.edata.rvalue);
-            numericWidget->setAccessW((bool) data.edata.accessW);
-            updateAccessCursor(numericWidget);
+
+            if(data.edata.fieldtype == caSTRING ||  data.edata.fieldtype ==  caCHAR) {
+                char asc[MAX_STRING_LENGTH];
+                snprintf(asc, MAX_STRING_LENGTH, "caNumeric %s does not treat other then numerical values", qasc(w->objectName()));
+                postMessage(QtCriticalMsg, asc);
+                numericWidget->setEnabled(false);
+            } else {
+                numericWidget->silentSetValue(data.edata.rvalue);
+                numericWidget->setAccessW((bool) data.edata.accessW);
+                updateAccessCursor(numericWidget);
+            }
+
         } else {
             numericWidget->setConnectedColors(false);
         }
@@ -4802,9 +4840,18 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         if(data.edata.connected) {
             ComputeNumericMaxMinPrec(spinboxWidget, data);
             spinboxWidget->setConnectedColors(true);
-            spinboxWidget->silentSetValue(data.edata.rvalue);
-            spinboxWidget->setAccessW((bool) data.edata.accessW);
-            updateAccessCursor(spinboxWidget);
+
+            if(data.edata.fieldtype == caSTRING || data.edata.fieldtype ==  caCHAR) {
+                char asc[MAX_STRING_LENGTH];
+                snprintf(asc, MAX_STRING_LENGTH, "caSpinbox %s does not treat other then numerical values", qasc(w->objectName()));
+                postMessage(QtCriticalMsg, asc);
+                spinboxWidget->setEnabled(false);
+            } else {
+                spinboxWidget->silentSetValue(data.edata.rvalue);
+                spinboxWidget->setAccessW((bool) data.edata.accessW);
+                updateAccessCursor(spinboxWidget);
+            }
+
         } else {
             spinboxWidget->setConnectedColors(false);
         }
@@ -6553,7 +6600,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         } else  if(selectedItem->text().contains(GETINFO)) {
             QString info;
             info.append(InfoPrefix);
-            info.append("-----------------------------------------------------------------<br>");
+            info.append("---------------------------------------------------------------------------------------<br>");
 
             info.append("Object: ");
             info.append(ObjectName);
@@ -6593,6 +6640,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 #endif
                 info.append("<br>");
             }
+
+            info.append("<br>! configuration values are only fetched at panel start<br>");
 
             for(int i=0; i< nbMonitors; i++) {
 
@@ -6999,7 +7048,7 @@ bool CaQtDM_Lib::SoftPVusesItsself(QWidget* widget, QMap<QString, QString> map)
             QString trimmedPV = strng[i].trimmed();
             int pos = trimmedPV.indexOf(".{");  // jason string
             if(pos != -1) JSONString = trimmedPV.mid(pos+1);
-            if(pos != -1) trimmedPV = trimmedPV.mid(0, pos+1);
+            if(pos != -1) trimmedPV = trimmedPV.mid(0, pos);
             strng[i] = treatMacro(map, trimmedPV, &doNothing, widget->objectName());
             if(i==4) {
                 char asc[ MAX_STRING_LENGTH];
@@ -8197,7 +8246,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                     }
                 } else {
                     caCartesianPlot * cartesianplotWidget = (caCartesianPlot *) widget;
-                    integerList.insert(7, 8);
+                    integerList.insert(7, 7);
                     if( cartesianplotWidget->getLegendEnabled()) {
                          cartesianplotWidget->setLegendAttribute(cartesianplotWidget->getScaleColor(), QFont("arial", 7), caCartesianPlot::FONT);
                     }

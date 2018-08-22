@@ -846,7 +846,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 
     //printf("fontsize=%.1f %s\n", f.pointSizeF(), qasc(this->objectName()));
     //when legend text gets to small, hide it (will give then space for plot)
-
+    setProperty("legendfontsize", f.pointSizeF());
 
 #if QWT_VERSION < 0x060100
     for(i=0; i < NumberOfCurves; i++) {
@@ -903,7 +903,11 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
                 curve->setItemAttribute(QwtPlotItem::Legend, false);
                 continue;
             } else {
-                if(!curve->title().text().contains("?fill?")) curve->setItemAttribute(QwtPlotItem::Legend, true);
+                if(!curve->title().text().contains("?fill?")) {
+                    curve->setItemAttribute(QwtPlotItem::Legend, false);
+                    updateLegend();
+                    curve->setItemAttribute(QwtPlotItem::Legend, true);
+                }
             }
 
 			QwtLegend *lgd = qobject_cast<QwtLegend *>(legend());
