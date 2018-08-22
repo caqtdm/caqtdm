@@ -6600,7 +6600,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         } else  if(selectedItem->text().contains(GETINFO)) {
             QString info;
             info.append(InfoPrefix);
-            info.append("-----------------------------------------------------------------<br>");
+            info.append("---------------------------------------------------------------------------------------<br>");
 
             info.append("Object: ");
             info.append(ObjectName);
@@ -6640,6 +6640,8 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 #endif
                 info.append("<br>");
             }
+
+            info.append("<br>! configuration values are only fetched at panel start<br>");
 
             for(int i=0; i< nbMonitors; i++) {
 
