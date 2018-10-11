@@ -1,4 +1,4 @@
-t/*
+/*
  *  This file is part of the caQtDM Framework, developed at the Paul Scherrer Institut,
  *  Villigen, Switzerland
  *
