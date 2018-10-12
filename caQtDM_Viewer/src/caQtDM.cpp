@@ -222,7 +222,7 @@ int main(int argc, char *argv[])
                    "  [&]\n"
                    "\n"
                    "  -x -displayFont -display are ignored !\n\n"
-                   "  on linux plattforms, ui data can be piped to caQtDM, but then -httpconfig & -attach will not work\n\n");
+                   "  on linux platforms, ui data can be piped to caQtDM, but then -httpconfig & -attach will not work\n\n");
                  exit(1);
         } else if((!strcmp(argv[in],"-displayGeometry")) || (!strcmp(argv[in],"-dg"))) {
             // [-dg [xpos[xypos]][+xoffset[+yoffset]]
@@ -284,7 +284,7 @@ int main(int argc, char *argv[])
     }
 #endif
 
-    // must be always true for mobile plattforms
+    // must be always true for mobile platforms
 #ifdef MOBILE
      HTTPCONFIGURATOR = true;
 #endif
@@ -314,7 +314,7 @@ int main(int argc, char *argv[])
             QFile file(fileNameFound);
             file.open(QFile::ReadOnly);
             macroString = QLatin1String(file.readAll());
-            macroString = macroString.simplified();
+            macroString = macroString.trimmed();
             file.close();
         }
     }
