@@ -293,25 +293,25 @@ public:
 
     virtual std::string getRequesterName()
     {
-        PVAInterfacePtr interface(pvaInterface.lock());
-        if(!interface) return string("pvaInterface is null");
-         return interface->getRequesterName();
+        PVAInterfacePtr _interface(pvaInterface.lock());
+        if(!_interface) return string("pvaInterface is null");
+         return _interface->getRequesterName();
     }
 
     virtual void message(std::string const & message, epics::pvData::MessageType messageType)
     {
-        PVAInterfacePtr interface(pvaInterface.lock());
-        if(!interface) return;
-        interface->message(message,messageType);
+        PVAInterfacePtr _interface(pvaInterface.lock());
+        if(!_interface) return;
+        _interface->message(message,messageType);
     }
 
     virtual void getDone(
         const Status& status,
         FieldConstPtr const & field) 
     {
-        PVAInterfacePtr interface(pvaInterface.lock());
-        if(!interface) return;
-        interface->getDone(status,field);  
+        PVAInterfacePtr _interface(pvaInterface.lock());
+        if(!_interface) return;
+        _interface->getDone(status,field);
     }
 };
 
@@ -329,16 +329,16 @@ public:
 
     virtual std::string getRequesterName()
     {
-        PVAInterfacePtr interface(pvaInterface.lock());
-        if(!interface) return string("pvaInterface is null");
-         return interface->getRequesterName();
+        PVAInterfacePtr _interface(pvaInterface.lock());
+        if(!_interface) return string("pvaInterface is null");
+         return _interface->getRequesterName();
     }
 
     virtual void message(std::string const & message, epics::pvData::MessageType messageType)
     {
-        PVAInterfacePtr interface(pvaInterface.lock());
-        if(!interface) return;
-        interface->message(message,messageType);
+        PVAInterfacePtr _interface(pvaInterface.lock());
+        if(!_interface) return;
+        _interface->message(message,messageType);
     }
 
     virtual void channelGetConnect(
@@ -346,9 +346,9 @@ public:
         ChannelGet::shared_pointer const & channelGet,
         Structure::const_shared_pointer const & structure)
     {
-        PVAInterfacePtr interface(pvaInterface.lock());
-        if(!interface) return;
-        interface->channelGetConnect(status,channelGet,structure);  
+        PVAInterfacePtr _interface(pvaInterface.lock());
+        if(!_interface) return;
+        _interface->channelGetConnect(status,channelGet,structure);
     }
 
     virtual void getDone(
@@ -357,9 +357,9 @@ public:
         PVStructurePtr const & pvStructure,
         BitSet::shared_pointer const & bitSet)
     {
-        PVAInterfacePtr interface(pvaInterface.lock());
-        if(!interface) return;
-        interface->getDone(status,channelGet,pvStructure,bitSet);
+        PVAInterfacePtr _interface(pvaInterface.lock());
+        if(!_interface) return;
+        _interface->getDone(status,channelGet,pvStructure,bitSet);
     }
 };
 
@@ -377,16 +377,16 @@ public:
 
     virtual std::string getRequesterName()
     {
-        PVAInterfacePtr interface(pvaInterface.lock());
-        if(!interface) return string("pvaInterface is null");
-         return interface->getRequesterName();
+        PVAInterfacePtr _interface(pvaInterface.lock());
+        if(!_interface) return string("pvaInterface is null");
+         return _interface->getRequesterName();
     }
 
     virtual void message(std::string const & message, epics::pvData::MessageType messageType)
     {
-        PVAInterfacePtr interface(pvaInterface.lock());
-        if(!interface) return;
-        interface->message(message,messageType);
+        PVAInterfacePtr _interface(pvaInterface.lock());
+        if(!_interface) return;
+        _interface->message(message,messageType);
     }
 
     virtual void channelPutConnect(
@@ -394,9 +394,9 @@ public:
         ChannelPut::shared_pointer const & channelPut,
         Structure::const_shared_pointer const & structure)
     {
-        PVAInterfacePtr interface(pvaInterface.lock());
-        if(!interface) return;
-        interface->channelPutConnect(status,channelPut,structure);  
+        PVAInterfacePtr _interface(pvaInterface.lock());
+        if(!_interface) return;
+        _interface->channelPutConnect(status,channelPut,structure);
     }
 
     virtual void getDone(
@@ -405,18 +405,18 @@ public:
         PVStructurePtr const & pvStructure,
         BitSet::shared_pointer const & bitSet)
     {
-        PVAInterfacePtr interface(pvaInterface.lock());
-        if(!interface) return;
-        interface->getDone(status,channelPut,pvStructure,bitSet);
+        PVAInterfacePtr _interface(pvaInterface.lock());
+        if(!_interface) return;
+        _interface->getDone(status,channelPut,pvStructure,bitSet);
     }
 
     virtual void putDone(
         const Status& status,
         ChannelPut::shared_pointer const & channelPut)
     {
-        PVAInterfacePtr interface(pvaInterface.lock());
-        if(!interface) return;
-        interface->putDone(status,channelPut);
+        PVAInterfacePtr _interface(pvaInterface.lock());
+        if(!_interface) return;
+        _interface->putDone(status,channelPut);
     }
 };
 
@@ -434,16 +434,16 @@ public:
 
     virtual std::string getRequesterName()
     {
-        PVAInterfacePtr interface(pvaInterface.lock());
-        if(!interface) return string("pvaInterface is null");
-         return interface->getRequesterName();
+        PVAInterfacePtr _interface(pvaInterface.lock());
+        if(!_interface) return string("pvaInterface is null");
+         return _interface->getRequesterName();
     }
 
     virtual void message(std::string const & message, epics::pvData::MessageType messageType)
     {
-        PVAInterfacePtr interface(pvaInterface.lock());
-        if(!interface) return;
-        interface->message(message,messageType);
+        PVAInterfacePtr _interface(pvaInterface.lock());
+        if(!_interface) return;
+        _interface->message(message,messageType);
     }
 
     virtual void monitorConnect(
@@ -451,23 +451,23 @@ public:
         Monitor::shared_pointer const & monitor,
         Structure::const_shared_pointer const & structure)
     {
-        PVAInterfacePtr interface(pvaInterface.lock());
-        if(!interface) return;
-        interface->monitorConnect(status,monitor,structure);  
+        PVAInterfacePtr _interface(pvaInterface.lock());
+        if(!_interface) return;
+        _interface->monitorConnect(status,monitor,structure);
     }
 
     virtual void unlisten(MonitorPtr const & monitor)
     {
-        PVAInterfacePtr interface(pvaInterface.lock());
-        if(!interface) return;
-        interface->unlisten(monitor);  
+        PVAInterfacePtr _interface(pvaInterface.lock());
+        if(!_interface) return;
+        _interface->unlisten(monitor);
     }
 
     virtual void monitorEvent(MonitorPtr const & monitor)
     {
-        PVAInterfacePtr interface(pvaInterface.lock());
-        if(!interface) return;
-        interface->monitorEvent(monitor);  
+        PVAInterfacePtr _interface(pvaInterface.lock());
+        if(!_interface) return;
+        _interface->monitorEvent(monitor);
     }
 };
 
@@ -536,8 +536,8 @@ void PVAChannel::channelStateChange(
          << endl;
     }
     for(size_t ind = 0; ind<num; ++ind) {
-        PVAInterfacePtr interface = pvaInterfaceList[ind].lock();
-        if(interface) interface->channelStateChange(value);
+        PVAInterfacePtr _interface = pvaInterfaceList[ind].lock();
+        if(_interface) _interface->channelStateChange(value);
     }
 }
 
@@ -588,8 +588,8 @@ bool PVAChannel::removeInterface(const PVAInterfacePtr & pvaInterface)
         << endl;
     }
     for(size_t ind = 0; ind<num; ++ind) {
-        PVAInterfacePtr interface = pvaInterfaceList[ind].lock();
-        if(interface==pvaInterface) {
+        PVAInterfacePtr _interface = pvaInterfaceList[ind].lock();
+        if(_interface==pvaInterface) {
             pvaInterfaceList.erase(pvaInterfaceList.begin() + ind);
             break;
         }
