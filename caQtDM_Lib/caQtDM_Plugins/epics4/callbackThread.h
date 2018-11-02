@@ -29,7 +29,7 @@
 #include <queue>
 #include <epicsThread.h>
 #include <pv/event.h>
-
+#include <pv/lock.h>
 
 namespace epics { namespace pvData {
 
