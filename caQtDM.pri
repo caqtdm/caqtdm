@@ -277,20 +277,15 @@ epics4_plugin {
                 }
         }
 
-	win32 {
+	win32-msvc* || msvc {
                 message("epics4_plugin configuration win32")
-  		
-                win32-msvc* || msvc{
-                        CONFIG += Define_Build_epics_controls Define_Build_objDirs
-                        CONFIG += Define_Build_caQtDM_Lib Define_Symbols
-                }
-
-                win32-g++ {
-                        EPICS_LIBS=$$(EPICS_BASE)/lib/win32-x86-mingw
-                        LIBS += $${EPICS_LIBS}/ca.lib
-                        LIBS += $${EPICS_LIBS}/COM.lib
-                        LIBS += ../caQtDM_Lib/release/libcaQtDM_Lib.a
-                }
+		 epics7 {
+                    message("epics4_plugin (with epics version 7) configuration win32")
+                    CONFIG +=Define_Build_caQtDM_Lib Define_Build_qtcontrols
+                    CONFIG +=Define_Build_epicsPV_controls Define_Build_epics_controls
+		  }
+ 		
+ 
 	}
 }
 
@@ -845,6 +840,30 @@ Define_Build_epics_controls {
         LIBS += $${EPICS_LIBS}/ca.lib
         LIBS += $${EPICS_LIBS}/COM.lib
         LIBS += $$(CAQTDM_COLLECT)/qtcontrols.lib
+    }
+}
+Define_Build_epicsPV_controls {
+
+	INCLUDEPATH += $(EPICSINCLUDE)
+	INCLUDEPATH += $(EPICSINCLUDE)/pv
+	INCLUDEPATH += $(EPICSINCLUDE)/os/WIN32
+	INCLUDEPATH += $(EPICSINCLUDE)/compiler/msvc
+     DebugBuild {
+        CONFIG += console
+        EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
+        LIBS += $${EPICS_LIBS}/pvAccess.lib
+        LIBS += $${EPICS_LIBS}/pvData.lib
+        LIBS += $${EPICS_LIBS}/pvaClient.lib
+
+     }
+    ReleaseBuild {
+        EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
+        LIBS += $${EPICS_LIBS}/nt.lib
+        LIBS += $${EPICS_LIBS}/pvAccess.lib
+        LIBS += $${EPICS_LIBS}/pvAccessCA.lib
+        LIBS += $${EPICS_LIBS}/pvData.lib
+        LIBS += $${EPICS_LIBS}/pvaClient.lib
+
     }
 }
 

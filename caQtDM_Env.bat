@@ -10,8 +10,8 @@ IF "%1"=="4" GOTO SELECT4
 echo =============================================================================================
 echo Select Build Environment
 echo 1) QT 4.8.5 QWT6.1.3  32 Bit VS2010  
-echo 2) QT 5.8.0 QWT6.1.3  64 Bit VS2013  
-echo 3) QT 5.8.0 QWT6.1.3  32 Bit VS2013
+echo 2) QT 5.11.2 QWT6.1.3 64 Bit VS2017  
+echo 3) QT 5.11.2 QWT6.1.3 32 Bit VS2017
 set /P SELCTION=Select: 
 echo =============================================================================================
  
@@ -67,40 +67,42 @@ REM SELECT2
 REM =============================================================================================
 
 :SELECT2 
- 
-  call "C:\Program files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
- 
-  set QTHOME=X:/qt/5.8.0_64bit_SSL/qtbase
+  call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvars64.bat"
+  d:
   
-  set QWTHOME=X:/qt/qwt-6.1.3_5_8_64bit
+  set QTHOME=D:/qt/build/Qt-5.11.2_VS15_64bit
+  
+  set QWTHOME=D:/qt/qwt-6.1.3_5.11.2_VS15_64bit
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
-  set QWTLIBNAME=qwt
   set QWTVERSION=6.1
+  set QWTLIBNAME=qwt
 
   set GITPATH=C:\Users\brands\AppData\Local\Atlassian\SourceTree\git_local\bin\;C:\Program Files (x86)\Git\bin
     
-  set EPICS_BASE=X:/epics/Package/base
+  set EPICS_BASE=D:\epics\base7
   set EPICS_HOST_ARCH=windows-x64
 
   set EPICSINCLUDE=%EPICS_BASE%/include
-  set QTCONTROLS_LIBS=X:/Qt/caqtdm_project/caQtDM_QtControls_64Bit
-  set CAQTDM_COLLECT=X:/Qt/caqtdm_project/caQtDM_Binaries_64Bit
-  set JOM=X:\qt\jom
+  set EPICS4LOCATION=D:\epics\base7
+  
+  set QTCONTROLS_LIBS=D:/user/brands/caqtdm/caQtDM_QtControls_64Bit
+  set CAQTDM_COLLECT=D:/user/brands/caqtdm/caQtDM_Binaries_64Bit
+  set JOM=D:\qt\jom
  
   set QTBASE=%QTCONTROLS_LIBS%
   
-  set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
-  set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
+  set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.10\bin
+  set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc
   set TIMESTAPER="http://timestamp.verisign.com/scripts/timstamp.dll"
   set CAQTDM_SIGNER="Paul Scherrer Institut"
 
   
-  set ZMQ=X:/Qt/ZMQ
-  set ZMQINC=%ZMQ%/include
-  set ZMQLIB=%ZMQ%/lib/%EPICS_HOST_ARCH%
+  set ZMQ=D:\qt\zeromq-4.2.3
+  set ZMQINC=%ZMQ%\include
+  set ZMQLIB=%ZMQ%\bin\x64\Release\v141\dynamic
   
-  set SSL=X:\qt\openssl-1.0.2j_64bit
+  set SSL=D:\qt\openssl-1.0.2n_VS15_64bit
   set SSLINC=%SSL%\inc32
   set SSLLIB=%SSL%\out32dll
   
@@ -114,15 +116,15 @@ REM ============================================================================
 
 :SELECT3 
  
-  call "C:\Program files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
+  call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvars32.bat"
  
-  set QTHOME=X:/qt/5.8.0_32bit_SSL/qtbase
+  set QTHOME=D:/qt/Qt-5.11.2_VS15_32bit
   
-  set QWTHOME=X:/qt/qwt-6.1.3_32bit
+  set QWTHOME=D:/qt/qwt-6.1.3_5.11.2_VS15_64bit
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
-  set QWTLIBNAME=qwt
   set QWTVERSION=6.1
+  set QWTLIBNAME=qwt
 
   set PATH=%PATH%;C:\Program Files (x86)\Git\bin
   set GITPATH=C:\Users\brands\AppData\Local\Atlassian\SourceTree\git_local\bin\
@@ -166,7 +168,7 @@ REM ============================================================================
   set QWTHOME=X:/qt/qwt-6.1.3_RT
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
-  set QWTLIBNAME=qwt
+  
   
   set EPICS_BASE=X:/epics/Package/base
   set EPICS_HOST_ARCH=win32-x86
@@ -208,7 +210,6 @@ echo QTHOME               now defined as %QTHOME%		for locating Qt
 echo QWTHOME              now defined as %QWTHOME%		for locating qwt
 echo QWTINCLUDE           now defined as %QWTINCLUDE%		for locating the include files of qwt
 echo QWTLIB               now defined as %QWTLIB%		for locating the libraries of qwt
-echo QWTLIBNAME           now defined as %QWTLIBName%		for naming the library of qwt
 echo EPICS_BASE           now defined as %EPICS_BASE%		for locating epics 
 echo EPICSINCLUDE         now defined as %EPICSINCLUDE%		for locating epics include files
 echo EPICSLIB             now defined as %EPICSLIB%		for locating epics libraries
