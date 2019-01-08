@@ -1255,6 +1255,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         //qDebug() << "create caImage";
         w1->setProperty("ObjectType", caImage_Widget);
 
+        if(imageWidget->getFileName().size() > 0) {
+            QString text = imageWidget->getFileName();
+            if(reaffectText(map, &text, w1))  imageWidget->setFileName(text);
+        }
+
         // any error messages for this object?
         while(imageWidget->anyMessages()) {
             //qDebug() << imageWidget->getMessages();
