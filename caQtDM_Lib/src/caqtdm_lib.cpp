@@ -4605,6 +4605,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             } else {
                 int colorMode = lineeditWidget->getColorMode();
                 int precMode = lineeditWidget->getPrecisionMode();
+                int limitsMode = lineeditWidget->getLimitsMode();
                 lineeditWidget->setValueType(true);
 
                 if(colorMode == caLineEdit::Static || colorMode == caLineEdit::Default) { // done at initialisation
@@ -4631,6 +4632,14 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                         default:{
                             lineeditWidget->setAlarmColors(data.edata.severity, data.edata.rvalue, bg, fg);
                         }
+                    }
+                }
+
+                if(limitsMode == caLineEdit::Channel) {
+                    // when limits are the same, do nothing
+                    if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
+                        lineeditWidget->setMaxValue(data.edata.upper_disp_limit);
+                        lineeditWidget->setMinValue(data.edata.lower_disp_limit);
                     }
                 }
 
@@ -7636,6 +7645,13 @@ void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType
                 ww->setValue(value);
             } else {
                 if(plugininterface != (ControlsInterface *) 0) {
+
+                    // test for caTextEntry if outside bounds
+                    if(caTextEntry* textentryWidget = qobject_cast<caTextEntry *>(w)) {
+                        if(value > textentryWidget->getMaxValue()) return;
+                        if(value < textentryWidget->getMinValue()) return;
+                    }
+
                     if(!plugininterface->pvSetValue(kPtr,  value, 0, textValue, (char*) qasc(w->objectName().toLower()), errmess, 1)) {
                        plugininterface->pvSetValue((char*) kPtr->pv, value, 0, textValue, (char*) qasc(w->objectName().toLower()), errmess, 1);
                     }
