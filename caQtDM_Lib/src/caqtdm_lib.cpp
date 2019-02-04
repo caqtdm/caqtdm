@@ -3708,7 +3708,9 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                     }
                 }
                 QRegExp check_A(captured_Calc);
-                check_A.setMinimal(true);
+                check_A.setMinimal(false);
+                //check_A.indexIn(dataString);
+                //qDebug() << "captured_Calc" <<captured_Calc << dataString << check_A.capturedTexts() << check_A.isValid() << check_A.exactMatch(dataString);
                 if (check_A.exactMatch(dataString)){
                     result=1;
                     valid = true;
