@@ -61,3 +61,9 @@ The building can be started with the batchfile 	: caQtDM_BuildAll.bat
 The packaging is made with the batch file 	: caQtDM_Build_Package.bat
 This will generate a MSI installation file in the folder of caQtDM_Binaries.
 To clean the Folder you should use caQtDM_CleanAll.bat.
+
+
+# Environment Variables
+Following environment variables can be used to configure caqtdm:
+- __CAQTDM_DISPLAY_PATH__ - paths to look for ui and stylesheet files
+- __CAQTDM_ARCHIVERSF_URL__ - point the archiver plugin to a different archiver backend |
