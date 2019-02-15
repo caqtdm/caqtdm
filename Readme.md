@@ -49,10 +49,10 @@ In case of problems, please contact Anton Mezger at PSI.
 ## Windows
 To compile and run caQtDM on Windows following requirements have to be met:
 
-1. Qt 4.8.2
-2. Qwt 6.0.1
-3. EPICS 3.12.2
-4. MS Visual Studio 2010
+1. Qt 4.8.2 - Qt 5.12.0
+2. Qwt 6.0.1 - Qwt 6.1.3
+3. EPICS 3.14.12
+4. MS Visual Studio 2013 and MS Visual Studio 2017 
 5. Wix 3.0.5419.0
 
 With caQtDM_Env.bat you can configure your system. All setting which are needed will be taken from here.
@@ -65,5 +65,24 @@ To clean the Folder you should use caQtDM_CleanAll.bat.
 
 # Environment Variables
 Following environment variables can be used to configure caqtdm:
+
+- __QT_PLUGIN_PATH__ - to find the plugins of qt and others
+
+- __EPICS_CA_ADDR_LIST__ - see EPICS Documentation 
+- __EPICS_CA_MAX_ARRAY_BYTES__ - see EPICS Documentation
+
+- __CAQTDM_LAUNCHFILE__ - Enviroment file for Mobile devices
+
+- __CAQTDM_TIMEOUT_HOURS__ to exit caQtDM after some amount of time
 - __CAQTDM_DISPLAY_PATH__ - paths to look for ui and stylesheet files
+- __CAQTDM_URL_DISPLAY_PATH__ - paths to look for ui and stylesheet files to download via http
+- __CAQTDM_MIME_PATH__ - path to MIME file
+
+- __CAQTDM_EXEC_LIST__ - execution list for context menu
+- __MEDM_EXEC_LIST__ - for backwards......
+
+- __BSREAD_DISPATCHER__ - point the bsread plugin to the dispatcher 
+- __BSREAD_ZMQ_CONNECTION_TYPE__ - control the connection type of the bsread plugin 
+- __BSREAD_ZMQ_ADDR_LIST__ - point the bsread plugin static sources 
+
 - __CAQTDM_ARCHIVERSF_URL__ - point the archiver plugin to a different archiver backend |
