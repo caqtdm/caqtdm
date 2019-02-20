@@ -3573,21 +3573,36 @@ bool CaQtDM_Lib::Python_Error(QWidget *w, QString message)
 
     PyObject *errObj = NULL, *errData = NULL, *errTraceback = NULL, *pystring = NULL;
     char errorType[1024], errorInfo[1024], asc[MAX_STRING_LENGTH];
+    char *errorStr = 0;
 
     // get latest python exception info
     PyErr_Fetch(&errObj, &errData, &errTraceback);
 
-    pystring = NULL;
-    if (errObj != NULL && (pystring = PyObject_Str(errObj)) != NULL && (PyString_Check(pystring))) {
-       strcpy(errorType, PyString_AsString(pystring));
+    pystring = PyObject_Str(errObj);
+#if PY_MAJOR_VERSION >= 3
+    bool pystringcheck = PyUnicode_Check(pystring);
+    errorStr = PyUnicode_AsUTF8 (pystring);
+#else
+    bool pystringcheck = PyString_Check(pystring);
+    errorStr = PyString_AsString(pystring);
+#endif
+    if ((errObj != NULL) && (pystring != NULL) && (pystringcheck)) {
+       strcpy(errorType, errorStr);
     } else {
        strcpy(errorType, "<unknown exception type>");
     }
     Py_XDECREF(pystring);
 
-    pystring = NULL;
-    if (errData != NULL && (pystring = PyObject_Str(errData)) != NULL && (PyString_Check(pystring))) {
-       strcpy(errorInfo, PyString_AsString(pystring));
+    pystring = PyObject_Str(errData);
+#if PY_MAJOR_VERSION >= 3
+    pystringcheck = PyUnicode_Check(pystring);
+    errorStr = PyUnicode_AsUTF8 (pystring);
+#else
+    pystringcheck = PyString_Check(pystring);
+    errorStr = PyString_AsString(pystring);
+#endif
+    if ((errData != NULL) && (pystring != NULL) && (pystringcheck)) {
+       strcpy(errorInfo, errorStr);
     } else {
        strcpy(errorInfo, "<unknown exception data>");
     }
