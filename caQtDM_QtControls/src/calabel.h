@@ -74,7 +74,7 @@ public:
     void setColors(QColor bg, QColor fg);
 
     void setBorderWidth(int width) {thisBorderWidth = width; setColors(thisBackColor, thisForeColor);}
-    bool getBorderWidth() const {return thisBorderWidth;}
+    int getBorderWidth() const {return thisBorderWidth;}
 
     void setAlarmColors(short status);
 

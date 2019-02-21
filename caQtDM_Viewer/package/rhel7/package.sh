@@ -2,7 +2,7 @@ export ZMQLIB=/lib64
 export ZMQINC=//usr/include
 #export ZMQINC=/afs/psi.ch/user/e/ebner/package/zmq/zeromq-4.2.3/include
 
-VERSION=4.2.0
+VERSION=4.2.4
 VERSION_TAG=V${VERSION}
 GIT_CHECKOUT=$VERSION_TAG
 

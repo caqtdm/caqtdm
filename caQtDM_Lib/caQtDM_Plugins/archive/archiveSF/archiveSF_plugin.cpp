@@ -142,8 +142,9 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
                     } else if(QString::compare(backend, "sf-databuffer") == 0) {
                        indexNew.backend = var.toString();
                     } else {
-                        QString mess("ArchiveSF plugin -- backend defined as dynamic property in widget but not spelled correctly (use sf-archiverappliance or sf-databuffer) in widget "  + w->objectName() + ", defaulting now to sf-archiverappliance");
-                        if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtFatalMsg, (char*) qasc(mess));
+                        QString mess("ArchiveSF plugin -- backend defined as dynamic property in widget but not known (use sf-archiverappliance or sf-databuffer) in widget "  + w->objectName());
+                        indexNew.backend = var.toString();
+                        if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
                     }
                 } else if(indexNew.init){
                     QString mess("ArchiveSF plugin -- no backend defined as dynamic property in widget "  + w->objectName() + ", can be sf-archiverappliance or sf-databuffer)");

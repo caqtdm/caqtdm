@@ -91,7 +91,7 @@ public:
     void setBorderColor(QColor c);
 
     void setBorderWidth(int width) {thisBorderWidth = width;  update();}
-    bool getBorderWidth() const {return thisBorderWidth;}
+    int getBorderWidth() const {return thisBorderWidth;}
 
     enum colMode {Static, Alarm};
     colMode getColorMode() const { return thisColorMode; }
