@@ -70,7 +70,7 @@ caLineDraw::caLineDraw(QWidget *parent) : QWidget(parent), FontScalingWidget(thi
     m_Precision = 0;
     m_FormatType = decimal;
 
-    m_Maximum = 1.0;
+    m_Maximum = 0.0;
     m_Minimum = 0.0;
 
     m_Format[0] = '\0';

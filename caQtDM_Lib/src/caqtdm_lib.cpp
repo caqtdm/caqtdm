@@ -7665,8 +7665,11 @@ void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType
 
                     // test for caTextEntry if outside bounds
                     if(caTextEntry* textentryWidget = qobject_cast<caTextEntry *>(w)) {
+                      if (textentryWidget->getMinValue()!=textentryWidget->getMaxValue()){
                         if(value > textentryWidget->getMaxValue()) return;
                         if(value < textentryWidget->getMinValue()) return;
+                      }
+
                     }
 
                     if(!plugininterface->pvSetValue(kPtr,  value, 0, textValue, (char*) qasc(w->objectName().toLower()), errmess, 1)) {

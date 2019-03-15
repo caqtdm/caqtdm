@@ -98,7 +98,7 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     setFormatType(decimal);
     setFormat(0);
     setMinValue(0.0);
-    setMaxValue(1.0);
+    setMaxValue(0.0);
     setFrame(false);
 
     keepText = " ";
