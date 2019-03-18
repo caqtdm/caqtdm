@@ -53,6 +53,8 @@
 #define CA_PRIORITY 50          /* CA priority */
 #define CA_TIMEOUT   2          /* CA timeout 2.0 seconds */
 
+//#define PRINT(a) a
+
 #include "knobDefines.h"
 
 #include "knobData.h"
@@ -833,7 +835,7 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
         printf("ca_pend_io:\n"" %s for %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], kData->pv);
     }
 
-    //printf("channel created for button=%d <%s> info=%p, chid=%d\n", index, kData->pv, info, info->ch);
+    PRINT(printf("channel created for button=%d <%s> info=%p, chid=%d\n", index, kData->pv, info, info->ch));
 
     return index;
 }
@@ -959,37 +961,12 @@ void DestroyContext()
     ca_context_destroy();
 }
 
-int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType)
+int EpicsSetValue_Connected(chid ch,char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType)
 {
-    chid     ch;
     chtype   chType;
     int status;
     struct dbr_ctrl_double ctrlR;
     struct dbr_sts_string ctrlS;
-
-    UNUSED(errmess);
-    UNUSED(object);
-
-    if(strlen(pv) < 1)  {
-            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("pv with length=0 (not translated for macro?)\n"));
-            return !ECA_NORMAL;
-    }
-
-    PrepareDeviceIO();
-
-    // set epics value
-    PRINT(printf(" we have to set a value to an epics device <%s> %f %ld <%s>\n", pv, rdata, idata, sdata));
-    status = ca_create_channel(pv, NULL, 0, CA_PRIORITY, &ch);
-    if (ch == (chid) 0) {
-        return !ECA_NORMAL;
-    }
-    status = ca_pend_io(CA_TIMEOUT);
-
-    if (ca_state(ch) != cs_conn) {
-        C_postMsgEvent(messageWindowPtr, 1, vaPrintf("pv (%s) is not connected\n", pv));
-        ca_clear_channel(ch);
-        return status;
-    }
 
     chType = ca_field_type(ch);
 
@@ -1087,6 +1064,40 @@ int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *obje
             C_postMsgEvent(messageWindowPtr, 1, vaPrintf("unhandled epics type (%d) in epicssetvalue\n", chType));
     }
 
+    return ECA_NORMAL;
+
+}
+int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType)
+{
+    chid     ch;
+    int status;
+
+    UNUSED(errmess);
+    UNUSED(object);
+
+    if(strlen(pv) < 1)  {
+            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("pv with length=0 (not translated for macro?)\n"));
+            return !ECA_NORMAL;
+    }
+
+    PrepareDeviceIO();
+
+    // set epics value
+    PRINT(printf(" we have to set a value to an epics device <%s> %f %ld <%s>\n", pv, rdata, idata, sdata));
+    status = ca_create_channel(pv, NULL, 0, CA_PRIORITY, &ch);
+    if (ch == (chid) 0) {
+        return !ECA_NORMAL;
+    }
+    status = ca_pend_io(CA_TIMEOUT);
+
+    if (ca_state(ch) != cs_conn) {
+        C_postMsgEvent(messageWindowPtr, 1, vaPrintf("pv (%s) is not connected\n", pv));
+        ca_clear_channel(ch);
+        return status;
+    }
+
+    EpicsSetValue_Connected(ch, pv, rdata, idata, sdata, object, errmess, forceType);
+
     status = ca_clear_channel(ch);
 
 
@@ -1094,27 +1105,13 @@ int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *obje
 
 }
 
-int EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess)
+int EpicsSetWave_Connected(chid ch,char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess)
 {
-    chid     ch;
     chtype   chType;
-    int status;
+    int status= ECA_NORMAL;
 
     UNUSED(errmess);
     UNUSED(object);
-
-    PrepareDeviceIO();
-
-    if(strlen(pv) < 1)  {
-            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("pv with length=0 (not translated for macro?)\n"));
-            return !ECA_NORMAL;
-    }
-
-    status = ca_create_channel(pv, NULL, 0, CA_PRIORITY, &ch);
-    if (ch == (chid) 0) {
-        return !ECA_NORMAL;
-    }
-    status = ca_pend_io(CA_TIMEOUT);
 
     if (ca_state(ch) != cs_conn) {
         C_postMsgEvent(messageWindowPtr, 1, vaPrintf("pv (%s) is not connected\n", pv));
@@ -1167,6 +1164,36 @@ int EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t
         return status;
     }
 
+    return ECA_NORMAL;
+}
+
+
+
+
+
+
+
+int EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess)
+{
+    chid     ch;
+
+    int status;
+
+    PrepareDeviceIO();
+
+    if(strlen(pv) < 1)  {
+            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("pv with length=0 (not translated for macro?)\n"));
+            return !ECA_NORMAL;
+    }
+
+    status = ca_create_channel(pv, NULL, 0, CA_PRIORITY, &ch);
+    if (ch == (chid) 0) {
+        return !ECA_NORMAL;
+    }
+    status = ca_pend_io(CA_TIMEOUT);
+
+    EpicsSetWave_Connected(ch,pv, fdata, ddata, data16, data32,sdata,nelm,object,errmess);
+
     status = ca_clear_channel(ch);
 
     return ECA_NORMAL;
@@ -1199,27 +1226,12 @@ void ExitHandler(int sig)
 {
     printf("Exiting with signal=%d\n", sig);
 }
-
-int EpicsGetTimeStamp(char *pv, char *timestamp)
+int EpicsGetTimeStamp_Connected(chid ch,char *pv, char *timestamp)
 {
-    chid     ch;
-    int status;
+    int status= ECA_NORMAL;
     struct dbr_time_string ctrlS;
     char tsString[32];
     timestamp[0] = '\0';
-
-    PrepareDeviceIO();
-
-    if(strlen(pv) < 1)  {
-        C_postMsgEvent(messageWindowPtr, 1, vaPrintf("pv with length=0 (not translated for macro?)\n"));
-        return !ECA_NORMAL;
-    }
-
-    // get epics timestamp
-    status = ca_create_channel(pv, NULL, 0, CA_PRIORITY, &ch);
-    if (ch == (chid) 0) return !ECA_NORMAL;
-
-    status = ca_pend_io(CA_TIMEOUT/2);
 
     if (ca_state(ch) != cs_conn) {
         C_postMsgEvent(messageWindowPtr, 1, vaPrintf("pv (%s) is not connected\n", pv));
@@ -1239,6 +1251,29 @@ int EpicsGetTimeStamp(char *pv, char *timestamp)
     } else {
         strcpy(timestamp, "-timestamp timeout-");
     }
+    return status;
+}
+
+
+int EpicsGetTimeStamp(char *pv, char *timestamp)
+{
+    chid     ch;
+    int status;
+
+    PrepareDeviceIO();
+
+    if(strlen(pv) < 1)  {
+        C_postMsgEvent(messageWindowPtr, 1, vaPrintf("pv with length=0 (not translated for macro?)\n"));
+        return !ECA_NORMAL;
+    }
+
+    // get epics timestamp
+    status = ca_create_channel(pv, NULL, 0, CA_PRIORITY, &ch);
+    if (ch == (chid) 0) return !ECA_NORMAL;
+
+    status = ca_pend_io(CA_TIMEOUT/2);
+
+    EpicsGetTimeStamp_Connected(ch, pv, timestamp);
 
     ca_clear_channel(ch);
 
