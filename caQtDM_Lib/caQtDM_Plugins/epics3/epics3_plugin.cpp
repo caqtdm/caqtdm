@@ -23,7 +23,19 @@
  *    anton.mezger@psi.ch
  */
 #include <QDebug>
+#include <cadef.h>
 #include "epics3_plugin.h"
+
+typedef struct _connectInfo {
+    int connected;
+    int index;
+    int event;
+    pv_string pv;    // channel name
+    chid ch;         // read channel
+    evid evID;       // epics event id
+    int  evAdded;    // epics event added yes/no
+} connectInfo;
+
 
 // global variables defined here for access through c routines in epicsSubs.c
 extern "C" {
@@ -51,18 +63,26 @@ int Epics3Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
     mutexknobdataP = data;
     mutexKnobdataPtr = data;
     messageWindowPtr = messageWindow;
-
+    Channelcache.clear();
     PrepareDeviceIO();
     return true;
 }
 
 int Epics3Plugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
     //qDebug() << "Epics3Plugin:pvAddMonitor" << kData->pv;
+    if (!Channelcache.contains(kData->pv,index)){
+        //qDebug() << "Epics3Plugin:first" << kData->pv << kData;
+        Channelcache.insert(kData->pv,index);
+    }else{
+        qDebug() << "Epics3Plugin:dublicated" << kData->pv << Channelcache.value(kData->pv) ;
+    }
+
     return CreateAndConnect(index, kData, rate, skip);
 }
 
 int Epics3Plugin::pvClearMonitor(knobData *kData) {
     //qDebug() << "Epics3Plugin:pvClearMonitor" << kData->pv;
+    Channelcache.remove(kData->pv,kData->index);
     ClearMonitor(kData);
     return true;
 }
@@ -85,16 +105,77 @@ int Epics3Plugin::pvFreeAllocatedData(knobData *kData)
 int Epics3Plugin::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType) {
 
     //qDebug() << "Epics3Plugin:pvSetValue";
+    if (Channelcache.contains(pv)){
+        //qDebug() << "CacheEntry Found" << pv;
+        QMultiMap<QString, int>::iterator i = Channelcache.find(pv);
+        while (i != Channelcache.end() && i.key() == pv) {
+
+            knobData kData=mutexKnobdataPtr->GetMutexKnobData(i.value());
+
+            //qDebug() << "CacheEntry Found" << kData.pv;
+            if (kData.edata.connected){
+                if (kData.edata.info){
+                    chid ch=((connectInfo *)kData.edata.info)->ch;
+                    if (ch){
+                        //qDebug() << "Epics3Plugin:use cached Ch" << pv <<":"<< kData.pv <<":"<< kData.edata.connected ;
+                        return EpicsSetValue_Connected(ch, pv, rdata, idata, sdata, object, errmess, forceType);
+                    }
+                }
+            }
+            i++;
+        }
+    }
     return EpicsSetValue(pv, rdata, idata, sdata, object, errmess, forceType);
 }
 
 int Epics3Plugin::pvSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess) {
     //qDebug() << "Epics3Plugin:pvSetWave";
+
+    if (Channelcache.contains(pv)){
+        //qDebug() << "CacheEntry Found" << pv;
+        QMultiMap<QString, int>::iterator i = Channelcache.find(pv);
+        while (i != Channelcache.end() && i.key() == pv) {
+
+            knobData kData=mutexKnobdataPtr->GetMutexKnobData(i.value());
+
+            //qDebug() << "CacheEntry Found" << kData.pv;
+            if (kData.edata.connected){
+                if (kData.edata.info){
+                    chid ch=((connectInfo *)kData.edata.info)->ch;
+                    if (ch){
+                        //qDebug() << "Epics3Plugin:use cached Ch" << pv <<":"<< kData.pv <<":"<< kData.edata.connected ;
+                        return EpicsSetWave_Connected(ch, pv, fdata, ddata, data16, data32, sdata, nelm, object, errmess);
+                    }
+                }
+            }
+            i++;
+        }
+    }
     return EpicsSetWave(pv, fdata, ddata, data16, data32, sdata, nelm, object, errmess);
 }
 
 int Epics3Plugin::pvGetTimeStamp(char *pv, char *timestamp) {
     //qDebug() << "Epics3Plugin:pvgetTimeStamp";
+    if (Channelcache.contains(pv)){
+        //qDebug() << "CacheEntry Found" << pv;
+        QMultiMap<QString, int>::iterator i = Channelcache.find(pv);
+        while (i != Channelcache.end() && i.key() == pv) {
+
+            knobData kData=mutexKnobdataPtr->GetMutexKnobData(i.value());
+
+            //qDebug() << "CacheEntry Found" << kData.pv;
+            if (kData.edata.connected){
+                if (kData.edata.info){
+                    chid ch=((connectInfo *)kData.edata.info)->ch;
+                    if (ch){
+                        //qDebug() << "Epics3Plugin:use cached Ch" << pv <<":"<< kData.pv <<":"<< kData.edata.connected ;
+                        return EpicsGetTimeStamp_Connected(ch, pv, timestamp);
+                    }
+                }
+            }
+            i++;
+        }
+    }
     return EpicsGetTimeStamp(pv, timestamp);
 }
 
