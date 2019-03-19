@@ -1854,6 +1854,9 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         connect(scriptbuttonWidget, SIGNAL(scriptButtonSignal()), this, SLOT(Callback_ScriptButton()));
 
+        text= scriptbuttonWidget->getScriptCommand();
+        if(reaffectText(map, &text, w1))  scriptbuttonWidget->setScriptCommand(text);
+
         text= scriptbuttonWidget->getScriptParam();
         if(reaffectText(map, &text, w1))  scriptbuttonWidget->setScriptParam(text);
         scriptbuttonWidget->setToolTip("process never started !");
