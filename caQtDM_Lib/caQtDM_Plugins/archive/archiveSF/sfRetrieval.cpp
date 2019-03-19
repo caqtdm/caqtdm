@@ -142,8 +142,11 @@ int sfRetrieval::downloadFinished()
 {
     //qDebug() << QTime::currentTime().toString() << this << PV << "download finished";
     //eventLoop->processEvents();
-    //eventLoop->quit();
+#if QT_VERSION > QT_VERSION_CHECK(4, 8, 0)
+    eventLoop->quit();
+#else
     eventLoop->exit();
+#endif
     return finished;
 }
 
@@ -414,7 +417,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
     }
 
     totalCount = count;
-    qDebug() << QTime::currentTime().toString() << this << PV << "finishreply totalcount =" << count << reply;
+    //qDebug() << QTime::currentTime().toString() << this << PV << "finishreply totalcount =" << count << reply;
 
 #endif
 
