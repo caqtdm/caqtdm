@@ -1624,7 +1624,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         //==================================================================================================================
     } else if(caLineEdit* lineeditWidget = qobject_cast<caLineEdit *>(w1)) {
-
+        QString text;
         //qDebug() << "create caLineEdit";
         w1->setProperty("ObjectType", caLineEdit_Widget);
 
@@ -1667,6 +1667,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         // default format, format from ui file will be used normally except for channel precision
         lineeditWidget->setFormat(1);
 
+        text= lineeditWidget->toolTip();
+        if(reaffectText(map, &text, w1))  lineeditWidget->setToolTip(text);
+        text= lineeditWidget->statusTip();
+        if(reaffectText(map, &text, w1))  lineeditWidget->setStatusTip(text);
+
+
         // insert dataindex list
         integerList.insert(0, nbMonitors);
         lineeditWidget->setProperty("MonitorList", integerList);
@@ -1675,7 +1681,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         //==================================================================================================================
     } else if(caMultiLineString* multilinestringWidget = qobject_cast<caMultiLineString *>(w1)) {
-
+        QString text;
         //qDebug() << "create caMultilineString";
         w1->setProperty("ObjectType", caMultiLineString_Widget);
 
@@ -1689,6 +1695,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             multilinestringWidget->setPV(pv);
             nbMonitors++;
         }
+        text= multilinestringWidget->toolTip();
+        if(reaffectText(map, &text, w1))  multilinestringWidget->setToolTip(text);
+        text= multilinestringWidget->statusTip();
+        if(reaffectText(map, &text, w1))  multilinestringWidget->setStatusTip(text);
 
         // insert dataindex list
         integerList.insert(0, nbMonitors);
@@ -1699,8 +1709,15 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         //==================================================================================================================
     } else if(caGraphics* graphicsWidget = qobject_cast<caGraphics *>(w1)) {
 
+        QString text;
         //qDebug() << "create caGraphics";
         w1->setProperty("ObjectType", caGraphics_Widget);
+
+        text= graphicsWidget->toolTip();
+        if(reaffectText(map, &text, w1))  graphicsWidget->setToolTip(text);
+        text= graphicsWidget->statusTip();
+        if(reaffectText(map, &text, w1))  graphicsWidget->setStatusTip(text);
+
 
         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
         graphicsWidget->setProperty("Taken", true);
@@ -1708,8 +1725,14 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         //==================================================================================================================
     } else if(caPolyLine* polylineWidget = qobject_cast<caPolyLine *>(w1)) {
 
+        QString text;
         //qDebug() << "create caPolyLine";
         w1->setProperty("ObjectType", caPolyLine_Widget);
+
+        text= polylineWidget->toolTip();
+        if(reaffectText(map, &text, w1))  polylineWidget->setToolTip(text);
+        text= polylineWidget->statusTip();
+        if(reaffectText(map, &text, w1))  polylineWidget->setStatusTip(text);
 
         nbMonitors = InitVisibility(w1, &kData, map, specData, "");
         polylineWidget->setProperty("Taken", true);
@@ -1812,6 +1835,13 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         text = messagebuttonWidget->getReleaseMessage();
         if(reaffectText(map, &text, w1))  messagebuttonWidget->setReleaseMessage(text);
 
+        text= messagebuttonWidget->toolTip();
+        if(reaffectText(map, &text, w1))  messagebuttonWidget->setToolTip(text);
+
+        text= messagebuttonWidget->statusTip();
+        if(reaffectText(map, &text, w1))  messagebuttonWidget->setStatusTip(text);
+
+
         if(messagebuttonWidget->isElevated()) messagebuttonWidget->raise();
 
         // insert dataindex list
@@ -1854,9 +1884,14 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         connect(scriptbuttonWidget, SIGNAL(scriptButtonSignal()), this, SLOT(Callback_ScriptButton()));
 
+        text= scriptbuttonWidget->getScriptCommand();
+        if(reaffectText(map, &text, w1))  scriptbuttonWidget->setScriptCommand(text);
+
         text= scriptbuttonWidget->getScriptParam();
         if(reaffectText(map, &text, w1))  scriptbuttonWidget->setScriptParam(text);
         scriptbuttonWidget->setToolTip("process never started !");
+        text= scriptbuttonWidget->statusTip();
+        if(reaffectText(map, &text, w1))  scriptbuttonWidget->setStatusTip(text);
 
         if(scriptbuttonWidget->isElevated()) scriptbuttonWidget->raise();
 
@@ -1865,6 +1900,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         //==================================================================================================================
     } else if(caLed* ledWidget = qobject_cast<caLed *>(w1)) {
 
+        QString text;
         //qDebug() << "create caLed";
         w1->setProperty("ObjectType", caLed_Widget);
 
@@ -1874,6 +1910,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             ledWidget->setPV(pv);
             nbMonitors++;
         }
+
+        text= ledWidget->toolTip();
+        if(reaffectText(map, &text, w1))  ledWidget->setToolTip(text);
+        text= ledWidget->statusTip();
+        if(reaffectText(map, &text, w1))  ledWidget->setStatusTip(text);
 
         // insert dataindex list
         integerList.insert(0, nbMonitors);

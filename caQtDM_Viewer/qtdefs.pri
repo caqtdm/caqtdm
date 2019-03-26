@@ -242,6 +242,18 @@ DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
+# 4.2.4
+# add macroreplacment for tooltip and statustip on: caLineEdit, caMultilineString, caGraphics, caPolyline, caMessageButton and caLed
+# fix TLS problem in sf archiver for old Qt Versions
+# buffer overflow in sf_archiver plugin corrected
+# extend macro replacement for cascript button
+# reusing connected channels in epics3 plugin for seting data
+# borderWidth designer problem with numbers >1, fixed
+# changes for python3
+# fix for backend check. Backend property will generate a message that the backend name is not known. but it will use it.
+# too strict check on RegEx match for visibility
+# caTextEntry value could be set beyond channel hopr or lopr limits. this has been corrected
+
 # 4.2.3 of 11.7.2018
 # focus can be kept now in caTextEntry even on pointer leave by specifying a property
 # instead of exchanging through shared memory directly for -attach, a queue has been integrated for attaching

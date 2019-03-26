@@ -88,9 +88,14 @@ bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int seconds
 #ifndef QT_NO_SSL
     if(url.toString().toUpper().contains("HTTPS")) {
         QSslConfiguration config = request->sslConfiguration();
+#if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
+        config.setProtocol(QSsl::TlsV1);
+#endif
         config.setPeerVerifyMode(QSslSocket::VerifyNone);
         request->setSslConfiguration(config);
     }
+
+
 #endif
 #endif
 
@@ -141,7 +146,12 @@ void sfRetrieval::cancelDownload()
 int sfRetrieval::downloadFinished()
 {
     //qDebug() << QTime::currentTime().toString() << this << PV << "download finished";
+    //eventLoop->processEvents();
+#if QT_VERSION > QT_VERSION_CHECK(4, 8, 0)
     eventLoop->quit();
+#else
+    eventLoop->exit();
+#endif
     return finished;
 }
 
@@ -269,18 +279,23 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
 
                         // get channel name
                         if (root0.find(L"name") != root0.end() && root0[L"name"]->IsString()) {
-                            char channel[80];
-                            stat = swscanf(root0[L"name"]->Stringify().c_str(), L"%s", channel);
-                            //qDebug()<< "channel name found" << root0[L"name"]->AsString().c_str(); << backend
+                            std::wstring data=root0[L"name"]->Stringify();
+                            char *channel = new char[data.size()+1];
+                            sprintf(channel,"%ls", data.c_str());
+                            //qDebug()<< "channel name found" << root0[L"name"]->AsString().c_str() << channel;
+                            delete channel;
                         }
 
                         // get backend name
                         if (root0.find(L"backend") != root0.end() && root0[L"backend"]->IsString()) {
-                            char backend[80];
-                            stat = swscanf(root0[L"backend"]->Stringify().c_str(), L"%s", backend);
+                            //char backend[800];
+                            std::wstring data=root0[L"backend"]->Stringify();
+                            char *backend = new char[data.size()+1];
+                            sprintf(backend,"%ls", data.c_str());
                             Backend = QString(backend);
                             Backend = Backend.replace("\"", "");
                             //qDebug()<< "backend name found" << root0[L"backend"]->AsString().c_str() << backend;
+                            delete backend;
                         }
                         delete value2;
                     }
