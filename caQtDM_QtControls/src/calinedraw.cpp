@@ -521,7 +521,7 @@ void caLineDraw::setValue(double value, const QString& units)
         } else {
             snprintf(asc, MAX_STRING_LENGTH, m_Format, value);
         }
-    } else if(m_FormatType == hexadecimal || m_FormatType == octal || thisFormatType == user_defined_format)  {
+    } else if(m_FormatType == hexadecimal || m_FormatType == octal || m_FormatType == user_defined_format)  {
         if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, m_Format, (long long) value);
         else  snprintf(asc, MAX_STRING_LENGTH, m_Format, (int) value);
     } else if(m_FormatType == truncated) {
