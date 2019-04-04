@@ -406,6 +406,10 @@ void caLineEdit::setFormat(int prec)
     case sexagesimal_hms:
     case sexagesimal_dms:
         break;
+    case user_defined_format:{
+            strncpy(thisFormat,thisFormatUserString.toLatin1().data(),20);
+            break;
+        }
     }
 }
 
@@ -420,7 +424,7 @@ void caLineEdit::setValue(double value, const QString& units)
       } else {
         snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
       }
-    } else if(thisFormatType == hexadecimal || thisFormatType == octal)  {
+    } else if(thisFormatType == hexadecimal || thisFormatType == octal || thisFormatType == user_defined_format)  {
         if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, thisFormat, (long long) value);
         else  snprintf(asc, MAX_STRING_LENGTH, thisFormat, (int) value);
     } else if(thisFormatType == truncated) {

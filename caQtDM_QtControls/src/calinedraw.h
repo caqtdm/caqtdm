@@ -61,7 +61,7 @@ class QTCON_EXPORT caLineDraw : public QWidget, public FontScalingWidget, public
     Q_PROPERTY(ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleModeL)
     Q_PROPERTY(bool unitsEnabled READ getUnitsEnabled WRITE setUnitsEnabled)
     Q_PROPERTY(FormatType formatType READ getFormatType WRITE setFormatType)
-
+    Q_PROPERTY(QString formatString READ getFormatString WRITE setFormatString)
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
@@ -77,7 +77,7 @@ public:
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum FormatType { decimal, exponential, engr_notation, compact, truncated, utruncated,
-                      hexadecimal, octal, string, sexagesimal, sexagesimal_hms, sexagesimal_dms, enumeric}; // enumeric = enum as number
+                      hexadecimal, octal, string, sexagesimal, sexagesimal_hms, sexagesimal_dms, enumeric,user_defined_format}; // enumeric = enum as number
     enum ScaleMode { None, Height, WidthAndHeight};
     enum Alignment { Center, Left, Right};
     enum alertHandling { onForeground = 0, onBackground };
@@ -165,6 +165,9 @@ public:
 
     bool rotateText(float degrees);
 
+    void setFormatString(const QString m) { thisFormatUserString = m; }
+    QString getFormatString() {return thisFormatUserString;}
+
 public slots:
     void animation(QRect p) {
 #include "animationcode.h"
@@ -211,5 +214,6 @@ private:
     QColor m_FrameColorTop, m_FrameColorBottom;
     QBrush brush;
     int thisDatatype;
+    QString thisFormatUserString;
 };
 #endif
