@@ -4051,7 +4051,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>5</number>
       </property>
       <property name="usesScrollButtons">
        <bool>true</bool>
@@ -7274,6 +7274,172 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="frameLineWidth" stdset="0">
          <number>2</number>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_25">
+        <property name="geometry">
+         <rect>
+          <x>895</x>
+          <y>364</y>
+          <width>100</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:TEST:EGU:3</string>
+        </property>
+        <property name="background">
+         <color alpha="50">
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+        <property name="unitsEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_26">
+        <property name="geometry">
+         <rect>
+          <x>895</x>
+          <y>336</y>
+          <width>100</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:TEST:EGU:2</string>
+        </property>
+        <property name="alignment">
+         <enum>caLineDraw::Center</enum>
+        </property>
+        <property name="background">
+         <color alpha="50">
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+        <property name="unitsEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_27">
+        <property name="geometry">
+         <rect>
+          <x>895</x>
+          <y>309</y>
+          <width>100</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:TEST:EGU:1</string>
+        </property>
+        <property name="alignment">
+         <enum>caLineDraw::Center</enum>
+        </property>
+        <property name="background">
+         <color alpha="50">
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+        <property name="unitsEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_28">
+        <property name="geometry">
+         <rect>
+          <x>895</x>
+          <y>392</y>
+          <width>100</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:TEST:EGU:4</string>
+        </property>
+        <property name="background">
+         <color alpha="50">
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+        <property name="unitsEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="caLineDraw" name="caLineDraw_29">
+        <property name="geometry">
+         <rect>
+          <x>895</x>
+          <y>420</y>
+          <width>100</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string>ACM:TEST:EGU:5</string>
+        </property>
+        <property name="background">
+         <color alpha="50">
+          <red>255</red>
+          <green>255</green>
+          <blue>127</blue>
+         </color>
+        </property>
+        <property name="colorMode">
+         <enum>caLineDraw::Static</enum>
+        </property>
+        <property name="framePresent" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="frameLineWidth" stdset="0">
+         <number>2</number>
+        </property>
+        <property name="unitsEnabled">
+         <bool>true</bool>
         </property>
        </widget>
       </widget>

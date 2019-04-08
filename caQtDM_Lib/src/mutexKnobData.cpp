@@ -780,7 +780,7 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
         static const QChar mu[2] = { 0x00ce, 0x00bc};
         QString Mu(mu, 2);
         static const QChar uA[3] = { 0x00ce, 0x00bc, 0x0041}; // muA code for replacing ?A coming from epics
-        static const QChar uJ[3] = { 0x00ce, 0x00bc, 0x004A}; // muA code for replacing ?A coming from epics
+        static const QChar uJ[3] = { 0x00ce, 0x00bc, 0x004A}; // muA code for replacing ?J coming from epics
         QString uAs(uA, 3);
         QString uJs(uJ, 3);
 #endif
@@ -790,12 +790,13 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
         StringUnits.replace(Emu, Mu);
 
         // seems people did not know how to code mu in EGU
-        StringUnits.replace("?A", uAs);
         StringUnits.replace("muA", uAs);
         StringUnits.replace("uA", uAs);
+        StringUnits.replace("?A", uAs);
+        StringUnits.replace("muJ", uJs);
         StringUnits.replace("?J", uJs);
         StringUnits.replace("uJ", uJs);
-        StringUnits.replace("muJ", uJs);
+
 
         // neither grad
         static const QChar spec =  0x00c2;
