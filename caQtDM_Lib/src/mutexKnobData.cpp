@@ -755,7 +755,7 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
     if(StringUnits.size() > 0) {
         // special characters handling (should be done in constructor to save time; however
         // then we will have somme application using caQtFM_Lib that will crash
-#ifdef linux
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
         static const QChar egrad = 0x00b0;              // º coming from epics
         QString Egrad(egrad);
         static const QChar grad = 0x00b0;   // will be replaced by this utf-8 code
@@ -769,7 +769,7 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
 
         static const QChar emu =  0x00b5;               // mu coming from epics
         QString Emu(emu);
-#ifdef linux
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
         static const QChar mu =  0x00b5;
         QString Mu(mu);
         static const QChar uA[2] = { 0x00b5, 0x0041};
@@ -793,7 +793,9 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
         StringUnits.replace("?A", uAs);
         StringUnits.replace("muA", uAs);
         StringUnits.replace("uA", uAs);
+        StringUnits.replace("?J", uJs);
         StringUnits.replace("uJ", uJs);
+        StringUnits.replace("muJ", uJs);
 
         // neither grad
         static const QChar spec =  0x00c2;
