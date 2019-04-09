@@ -749,6 +749,16 @@ extern "C" MutexKnobData* C_SetMutexKnobDataConnected(MutexKnobData* p, int inde
  * update display data
  */
 
+QString getBufferAsHexStr(char* buf, int buffsize) {
+    QString result;
+    for(int i = 0; i < buffsize; ++i)
+        result += "0x" + QString("%1:").arg(buf[i], 2, 16, QChar('0')).toUpper();
+    result.chop(1);
+    return result;
+}
+
+
+
 void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, char *dataString, knobData knb)
 {
     QString StringUnits = QString::fromLatin1(units);
@@ -763,7 +773,10 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
 #else
         static const QChar egrad = 0x00b0;              // º coming from epics
         QString Egrad(egrad);
-        static const QChar grad[2] = { 0x00c2, 0x00b0};   // will be replaced by this utf-8 code
+        //static const QChar grad[2] = { 0x00c2, 0x00b0};   // will be replaced by this utf-8 code
+        //this version ^^^^^^ is right but gets always a ? in the widget.
+        static const QChar grad[2] = { 0x00c2, 0x00ba};   // will be replaced by this utf-8 code
+
         QString Grad(grad, 2);
 #endif
 
@@ -788,6 +801,8 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
         // replace special characters
         StringUnits.replace(Egrad, Grad);
         StringUnits.replace(Emu, Mu);
+        //printf("Units(string): %s(%s)\n",StringUnits.toUtf8().data(),units);
+        //printf("Units(hex): %s\n",getBufferAsHexStr(units,strlen(units)).toLatin1().data());
 
         // seems people did not know how to code mu in EGU
         StringUnits.replace("muA", uAs);
@@ -796,7 +811,6 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
         StringUnits.replace("muJ", uJs);
         StringUnits.replace("?J", uJs);
         StringUnits.replace("uJ", uJs);
-
 
         // neither grad
         static const QChar spec =  0x00c2;
