@@ -773,11 +773,7 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
 #else
         static const QChar egrad = 0x00b0;              // º coming from epics
         QString Egrad(egrad);
-        //static const QChar grad[2] = { 0x00c2, 0x00b0};   // will be replaced by this utf-8 code
-        //this version ^^^^^^ is right but gets always a ? in the widget.
-        static const QChar grad[2] = { 0x00c2, 0x00ba};   // will be replaced by this utf-8 code
-
-        QString Grad(grad, 2);
+        QString Grad=QString::fromLatin1("º");
 #endif
 
         static const QChar emu =  0x00b5;               // mu coming from epics
