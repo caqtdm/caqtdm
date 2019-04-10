@@ -82,6 +82,7 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
     bool richText = false;
     int linecnt = text.count("\n") + 1;
 
+    int watchdog=0; //watchdog needed because of endless processing, reason could be the used TTF
     // do we have richtext
     if(Qt::mightBeRichText(text)) {
         richText = true;
@@ -117,22 +118,25 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
             //qasc(widget()->objectName()), qasc(text), txtHeight, borderH1,borderH2, f.pointSizeF(), borderH1 );
 
         } else {
-            while((txtHeight > borderH1) && f.pointSizeF() > MIN_FONT_SIZE) {
+            watchdog=0;
+            while(((txtHeight > borderH1) && f.pointSizeF() > MIN_FONT_SIZE)&&(watchdog<1000)) {
                 if(f.pointSizeF() <= 0.0) f.setPointSizeF(1.0);
                 f.setPointSizeF(f.pointSizeF() - 0.5);
                 //printf(" \e[1;36m -- DECREASING font size for object \"%s\" :text \"%s\"  height %.1f - point size %.2f - h: %.2f\e[0m\n",
                 //         qasc(d_widget->objectName()), qasc(text),  txtHeight, f.pointSizeF(), borderH1);
                 QFontMetricsF tmpFm(f);
                 txtHeight = linecnt * tmpFm.lineSpacing();
+                watchdog++;
             }
-
-            while(txtHeight < borderH2) {
+            watchdog=0;
+            while((txtHeight < borderH2)&&(watchdog<1000)) {
                 if(f.pointSizeF() <= 0.0) f.setPointSizeF(0.5);
                 f.setPointSizeF(f.pointSizeF() + 0.5);
                 //printf(" \e[1;35m ++ INCREASING font size for object\"%s\" :text \"%s\" height %.1f - point size %.2f - h: %.2f\e[0m\n",
                 //         qasc(d_widget->objectName()), qasc(text), txtHeight, f.pointSizeF(), borderH2);
                 QFontMetricsF tmpFm(f);
                 txtHeight = linecnt * tmpFm.lineSpacing();
+                watchdog++;
             }
         }
 
@@ -144,7 +148,8 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
             textDoc->setDefaultFont(f);
             txtWidth = textDoc->idealWidth();
         }
-        while((txtWidth > borderW2) && f.pointSizeF() > MIN_FONT_SIZE) {
+        watchdog=0;
+        while(((txtWidth > borderW2) && f.pointSizeF() > MIN_FONT_SIZE)&&(watchdog<1000) ){
             if(f.pointSizeF() <= 0.0) f.setPointSizeF(1.0);
             f.setPointSizeF(f.pointSizeF() - 0.5);
             //printf(" \e[1;36m -- next DECREASING font size \"%s\" :text \"%s\" width %.1f height %.1f - point size %.2f - w: %.2f\e[0m\n",
@@ -156,6 +161,7 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
                 textDoc->setDefaultFont(f);
                 txtWidth = textDoc->idealWidth();
             }
+            watchdog++;
         }
 
     /* scale according to height only */
@@ -168,22 +174,25 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
             //   txtHeight, borderH1,borderH2, f.pointSizeF(), borderH1 );
 
         } else {
-            while((txtHeight > borderH1) && f.pointSizeF() > MIN_FONT_SIZE) {
+            watchdog=0;
+            while(((txtHeight > borderH1) && f.pointSizeF() > MIN_FONT_SIZE)&&(watchdog<1000) ) {
                 if(f.pointSizeF() <= 0.0) f.setPointSizeF(1.0);
                 f.setPointSizeF(f.pointSizeF() - 0.5);
                 //printf(" \e[1;36m -- DECREASING font size \"%s\" :text \"%s\"  height %.1f - point size %.2f - h: %.2f\e[0m\n",
                 //         qasc(widget()->objectName()), qasc(text),  txtHeight, f.pointSizeF(), borderH1);
                 QFontMetricsF tmpFm(f);
                 txtHeight = linecnt * tmpFm.lineSpacing();
+                watchdog++;
             }
-
-            while(txtHeight < borderH2) {
+            watchdog=0;
+            while((txtHeight < borderH2)&&(watchdog<1000) ) {
                 if(f.pointSizeF() <= 0.0) f.setPointSizeF(0.5);
                 f.setPointSizeF(f.pointSizeF() + 0.5);
                 //printf(" \e[1;35m ++ INCREASING font size \"%s\" :text \"%s\" height %.1f - point size %.2f - h: %.2f\e[0m\n",
                 //         qasc(widget()->objectName()), qasc(text), txtHeight, f.pointSizeF(), borderH2);
                 QFontMetricsF tmpFm(f);
                 txtHeight = linecnt * tmpFm.lineSpacing();
+                watchdog++;
             }
         }
 
