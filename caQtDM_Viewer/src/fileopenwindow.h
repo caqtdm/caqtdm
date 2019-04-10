@@ -115,6 +115,7 @@
 
 
      void MSQ_getPtrs(int &front, int &rear) {
+             if (!sharedMemory.isAttached()) return;
              int *ptr1 = (int*) sharedMemory.data();
              front = *ptr1;
              int *ptr2 = ptr1 + 1;
@@ -122,6 +123,7 @@
          }
 
          void MSQ_setPtrs(int front, int rear) {
+             if (!sharedMemory.isAttached()) return;
              int *ptr1 = (int*) sharedMemory.data();
              *ptr1 = front;
              int *ptr2 = ptr1 + 1;
