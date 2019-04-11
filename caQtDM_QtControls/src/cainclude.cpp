@@ -487,69 +487,40 @@ void caInclude::setMacroAndPositionsFromMacroStringList(QStringList macroList) {
 
     // compose the real lists (macro and x,y lists) by decoding the macro list containing macros and or positions
     thisMacro.clear();
+
     QStringList XpositionsList;
     QStringList YpositionsList;
 
     for(int i=0; i<macroList.count(); i++) {
+
         QString Macro = macroList[i].simplified();
         Macro.replace(" ", "");
+        //printf(" MacroOrg: %s\n",qasc(Macro));
+        QRegExp rx("(?:,+|^)\\[([^,]*[^\\]]*)\\]");
+        if (rx.indexIn(Macro) != -1){
+         QStringList capTxt = rx.capturedTexts();
+         //printf(" capTxt(%d): %s\n",capTxt.count(),qasc(capTxt[1]));
+         //handle only the first one
+         QStringList MacroPartPos = capTxt[1].split(",");
 
-        // detect comma
-        int posComma = Macro.indexOf(",");
-        int posBracket = Macro.indexOf("[");
+         if(MacroPartPos.count() > 1) {
+             XpositionsList.append(MacroPartPos[0]);
+             YpositionsList.append(MacroPartPos[1]);
+             rx=QRegExp("(,+|^)\\[[^,]*[^\\]]*\\],?");
+             Macro.remove(rx);
+             //printf("Remove Macro: %s\n",qasc(Macro));
+         }else {
+             XpositionsList.append("undef");
+             YpositionsList.append("undef");
+         }
 
-        //printf("posComma=%d posBracket=%d\n", posComma, posBracket);
-
-        // when comma, we have a macro and a position
-        if(posComma > -1 && posBracket > -1) {
-            //printf("case comma and bracket\n");
-            if(posBracket < posComma) {
-                //printf("case comma after bracket ==> only position\n");
-                thisMacro.append("");
-                QString position = Macro;
-                position.remove("]");
-                position.remove("[");
-                QStringList positions = position.split(",");
-                if(positions.count() > 1) {
-                    XpositionsList.append(positions[0]);
-                    YpositionsList.append(positions[1]);
-                    //printf("x=%s y=%s\n", qasc(positions[0]), qasc(positions[1]));
-                } else {
-                    XpositionsList.append("undef");
-                    YpositionsList.append("undef");
-                }
-            } else {
-                //printf("case comma before bracket == macro and position\n");
-                thisMacro.append(Macro.mid(0, posComma));
-                QString position = Macro.mid(posComma + 1, -1);
-                position.remove("]");
-                position.remove("[");
-                QStringList positions = position.split(",");
-                if(positions.count() > 1) {
-                    XpositionsList.append(positions[0]);
-                    YpositionsList.append(positions[1]);
-                    //printf("x=%s y=%s\n", qasc(positions[0]), qasc(positions[1]));
-                } else {
-                    XpositionsList.append("undef");
-                    YpositionsList.append("undef");
-                }
-            }
-
-        // we have a comma, but no bracket => wrong syntax
-        } else if(posComma > -1 && posBracket == -1)  {
-            //printf("case comma , but no bracket ==> wrong syntax\n");
-            thisMacro.append(Macro);
-            XpositionsList.append("undef");
-            YpositionsList.append("undef");
-
-        // we have no comma, no position
-        } else {
-            //printf("case no comma, no position\n");
-            thisMacro.append(Macro);
+        }else {
             XpositionsList.append("undef");
             YpositionsList.append("undef");
         }
-        //printf("%s\n", qasc(thisMacro[i]));
+        //printf(" Macro: %s\n",qasc(Macro));
+        thisMacro.append(Macro);
+        //fflush(stdout);
     }
     setXpositionsList(XpositionsList);
     setYpositionsList(YpositionsList);

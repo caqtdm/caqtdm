@@ -66,7 +66,7 @@ class QTCON_EXPORT caLineEdit : public QLineEdit, public FontScalingWidget
     Q_PROPERTY(bool unitsEnabled READ getUnitsEnabled WRITE setUnitsEnabled)
 
     Q_PROPERTY(FormatType formatType READ getFormatType WRITE setFormatType)
-
+    Q_PROPERTY(QString formatString READ getFormatString WRITE setFormatString)
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
@@ -124,7 +124,7 @@ public:
     void setPrecision(int prec) {thisPrecision = prec;}
 
     enum FormatType { decimal, exponential, engr_notation, compact, truncated, utruncated,
-                      hexadecimal, octal, string, sexagesimal, sexagesimal_hms, sexagesimal_dms, enumeric}; // enumeric = enum as number
+                      hexadecimal, octal, string, sexagesimal, sexagesimal_hms, sexagesimal_dms, enumeric,user_defined_format}; // enumeric = enum as number
 
     enum ScaleMode { None, Height, WidthAndHeight};
     void setTextLine(const QString&);
@@ -151,6 +151,8 @@ public:
 
     void setValueType(bool isvalue);
     void setFromTextEntry();
+    void setFormatString(const QString m) { thisFormatUserString = m; }
+    QString getFormatString() {return thisFormatUserString;}
 
 public slots:
     void animation(QRect p) {
@@ -210,6 +212,7 @@ private:
     int thisDatatype;
     bool specialUnitsAppend;
     QString specialUnitsString;
+    QString thisFormatUserString;
 };
 
 #endif

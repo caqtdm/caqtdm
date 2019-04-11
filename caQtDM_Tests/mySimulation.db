@@ -95,7 +95,6 @@ record(ao, "ACM:MOTOR") {
     field(SCAN,"Passive")
 }
 
-
 record(ao,"ACM:TEST:AO:AMP") {
     field(DESC,"analog output noise amplitude")
     field(SCAN,"Passive")
@@ -1176,3 +1175,28 @@ record(ai,"ACM:BPM5:Y") {
 }
 
 
+record(ao,"ACM:TEST:EGU:1") {
+    field(DESC,"EGU Test Record Joule")
+    field(EGU,"uJ")
+    field(VAL,"42")
+}
+record(ao,"ACM:TEST:EGU:2") {
+    field(DESC,"EGU Test Record Joule")
+    field(EGU,"muJ")
+    field(VAL,"42")
+}
+record(ao,"ACM:TEST:EGU:3") {
+    field(DESC,"EGU Test Record Ampere")
+    field(EGU,"uA")
+    field(VAL,"42")
+}
+record(ao,"ACM:TEST:EGU:4") {
+    field(DESC,"EGU Test Record Ampere")
+    field(EGU,"muA")
+    field(VAL,"42")
+}
+record(ao,"ACM:TEST:EGU:5") {
+    field(DESC,"EGU Test Record Celsius")
+    field(EGU,"°C")
+    field(VAL,"42")
+}
