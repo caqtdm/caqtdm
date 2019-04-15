@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>911</width>
+    <height>478</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="caFrame" name="caframe">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>8</y>
+      <width>892</width>
+      <height>59</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Box</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Sunken</enum>
+    </property>
+    <property name="lineWidth">
+     <number>1</number>
+    </property>
+    <property name="background">
+     <color>
+      <red>148</red>
+      <green>148</green>
+      <blue>148</blue>
+     </color>
+    </property>
+    <widget class="QLabel" name="label_5">
+     <property name="geometry">
+      <rect>
+       <x>6</x>
+       <y>6</y>
+       <width>879</width>
+       <height>47</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>23</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>macro position test for cainclude (do not modifiy with designer!)</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </widget>
+   <widget class="caInclude" name="cainclude">
+    <property name="geometry">
+     <rect>
+      <x>16</x>
+      <y>120</y>
+      <width>125</width>
+      <height>43</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>TEST=TEST,TEST1=TEST1,[20,20];TEST=TEST,[30,50],TEST1=TEST1;[60,80],TEST=TEST,TEST1=TEST1;[MOVE_VALUE_X,MOVE_VALUE_Y],TEST=TESTM1,TEST1=TESTM1;TEST=TESTM2,[MOVE_VALUE_Y,MOVE_VALUE_X],TEST1=TESTM2;</string>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">macrotest2_include.ui</string>
+    </property>
+    <property name="stacking">
+     <enum>caInclude::Positions</enum>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc">
+    <property name="geometry">
+     <rect>
+      <x>777</x>
+      <y>436</y>
+      <width>116</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">MOVE_VALUE</string>
+    </property>
+    <property name="calc">
+     <string notr="true">A&lt;1.4?A+0.01:0</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">MOVE_VALUE</string>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_2">
+    <property name="geometry">
+     <rect>
+      <x>776</x>
+      <y>340</y>
+      <width>116</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">MOVE_VALUE_X</string>
+    </property>
+    <property name="calc">
+     <string notr="true">SIN(A)*200</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">MOVE_VALUE</string>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_3">
+    <property name="geometry">
+     <rect>
+      <x>778</x>
+      <y>379</y>
+      <width>116</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">MOVE_VALUE_Y</string>
+    </property>
+    <property name="calc">
+     <string notr="true">COS(A)*200</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">MOVE_VALUE</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caFrame</class>
+   <extends>QFrame</extends>
+   <header>caFrame</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>caInclude</class>
+   <extends>QWidget</extends>
+   <header>caInclude</header>
+  </customwidget>
+  <customwidget>
+   <class>caCalc</class>
+   <extends>QLabel</extends>
+   <header>caCalc</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

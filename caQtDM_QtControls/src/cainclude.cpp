@@ -507,7 +507,18 @@ void caInclude::setMacroAndPositionsFromMacroStringList(QStringList macroList) {
              XpositionsList.append(MacroPartPos[0]);
              YpositionsList.append(MacroPartPos[1]);
              rx=QRegExp("(,+|^)\\[[^,]*[^\\]]*\\],?");
-             Macro.remove(rx);
+             int index_rx=rx.indexIn(Macro);
+             int length_rx=rx.matchedLength();
+             if (index_rx==0){
+                Macro.remove(rx);
+             }else{
+                 if (Macro.length()>(index_rx+length_rx)){
+                    Macro.replace(rx,",");
+                 }else{
+                    Macro.remove(rx);
+                 }
+             }
+
              //printf("Remove Macro: %s\n",qasc(Macro));
          }else {
              XpositionsList.append("undef");
