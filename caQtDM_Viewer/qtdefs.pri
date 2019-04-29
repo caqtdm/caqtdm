@@ -133,7 +133,7 @@ epics7 {
 contains(QT_VER_MAJ, 4) {
     contains(QT_VER_MIN, 6) {
        message( "version 4.6 of Qt" )
-       CONFIG += OLDQT
+       #CONFIG += OLDQT
     }
 }
 
