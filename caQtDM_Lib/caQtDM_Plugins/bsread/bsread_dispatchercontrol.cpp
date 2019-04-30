@@ -160,10 +160,16 @@ void bsread_dispatchercontrol::process()
         if(url.toString().toUpper().contains("HTTPS")) {
             QSslConfiguration configChannel = requestChannel.sslConfiguration();
             configChannel.setPeerVerifyMode(QSslSocket::VerifyNone);
+            #if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
+                configChannel.setProtocol(QSsl::TlsV1);
+            #endif
             requestChannel.setSslConfiguration(configChannel);
 
             QSslConfiguration configDelete = requestDelete.sslConfiguration();
             configDelete.setPeerVerifyMode(QSslSocket::VerifyNone);
+            #if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
+                configDelete.setProtocol(QSsl::TlsV1);
+            #endif
             requestDelete.setSslConfiguration(configDelete);
         }
 
@@ -811,6 +817,9 @@ void bsread_dispatchercontrol::ChannelVerification(QNetworkAccessManager* manage
     if(url.toString().toUpper().contains("HTTPS")) {
         QSslConfiguration configChannel = requestVerification.sslConfiguration();
         configChannel.setPeerVerifyMode(QSslSocket::VerifyNone);
+        #if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
+            configChannel.setProtocol(QSsl::TlsV1);
+        #endif
         requestVerification.setSslConfiguration(configChannel);
     }
 #endif
