@@ -53,7 +53,7 @@ ArchiveSF_Plugin::ArchiveSF_Plugin()
 }
 
 ArchiveSF_Plugin:: ~ArchiveSF_Plugin() {
-    qDebug() << "ArchiveSF_Plugin::~ArchiveSF_Plugin()";
+    //qDebug() << "ArchiveSF_Plugin::~ArchiveSF_Plugin()";
 }
 
 void ArchiveSF_Plugin::closeEvent(){
