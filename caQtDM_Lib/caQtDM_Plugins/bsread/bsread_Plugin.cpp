@@ -48,6 +48,9 @@ bsreadPlugin::bsreadPlugin()
     DispatcherThread=new QThread(this);
     Dispatcher=new bsread_dispatchercontrol();
     mutexknobdataP = NULL;
+    zmqcontex = NULL;
+    // INIT ZMQ Layer
+    zmqcontex = zmq_ctx_new();
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closeEvent()));
 
 }
@@ -57,6 +60,8 @@ bsreadPlugin:: ~bsreadPlugin()
     //qDebug() << "WaitPre:" <<DispatcherThread->isFinished();
     //qDebug() << "bsreadPlugin: ThreadID" << QThread::currentThreadId();
     Dispatcher->setTerminate();
+    DispatcherThread->terminate();
+    DispatcherThread->wait();
     //Dispatcher->deleteLater();
 
     //qDebug() << "bsreadPlugin: DispatcherThread Inter:"<<DispatcherThread->isInterruptionRequested();
@@ -65,13 +70,14 @@ bsreadPlugin:: ~bsreadPlugin()
 
     delete(DispatcherThread);
     delete(Dispatcher);
+    if (zmqcontex) zmq_ctx_destroy(zmqcontex);
 /*
     while (!DispatcherThread.isFinished()){
       qDebug() << "Wait:" <<DispatcherThread.isFinished();
        QThread::sleep(5);
     }
 */
-    qDebug() << "bsreadPlugin: Destroy";
+    //qDebug() << "bsreadPlugin: Destroy";
 }
 
 // in this demo we update our interface here; normally you should update in from your controlsystem
@@ -125,8 +131,7 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
 
     mutexknobdataP = data;
     messagewindowP = messageWindow;
-    // INIT ZMQ Layer
-    zmqcontex = zmq_init (1);
+
 
     initValue = 0.0;
     QString DispacherConfig = (QString)  qgetenv("BSREAD_DISPATCHER");
