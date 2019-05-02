@@ -230,13 +230,15 @@ void bsread_dispatchercontrol::process()
             requestDelete.setRawHeader("Content-Length", postDataSize);
             #if QT_VERSION < QT_VERSION_CHECK(4, 8, 0)
 			  //delete without data !!!
-			  //replydelete =manager.deleteResource(requestDelete,"DELETE");
+              //replydelete =manager.deleteResource(requestDelete,"DELETE");
+              //connect(replydelete, SIGNAL(finished()),this, SLOT(finishReplyDelete()));
 			#else
 			  replydelete =manager.sendCustomRequest(requestDelete,"DELETE",&buff_delete_data);
+              connect(replydelete, SIGNAL(finished()),this, SLOT(finishReplyDelete()));
             #endif
 
             //connect(replydelete, SIGNAL(finished()),this, SLOT(finishReplyDelete()));
-            connect(replydelete, SIGNAL(finished()),this, SLOT(finishReplyDelete()));
+
             //qDebug()<<"Remove Connection :"<< data << postDataSize;
 
         }
