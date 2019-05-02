@@ -60,8 +60,8 @@ bsreadPlugin:: ~bsreadPlugin()
     //qDebug() << "WaitPre:" <<DispatcherThread->isFinished();
     //qDebug() << "bsreadPlugin: ThreadID" << QThread::currentThreadId();
     Dispatcher->setTerminate();
-    DispatcherThread->terminate();
-    DispatcherThread->wait();
+    //DispatcherThread->terminate();
+    //DispatcherThread->wait();
     //Dispatcher->deleteLater();
 
     //qDebug() << "bsreadPlugin: DispatcherThread Inter:"<<DispatcherThread->isInterruptionRequested();
