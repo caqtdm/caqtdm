@@ -248,6 +248,10 @@ void bsread_dispatchercontrol::process()
 
         if(init_reconnection){
             //qDebug()<<"Checking Channels: "<< Channels.count() << "init_reconnection" << init_reconnection;
+            msg="Dispatcher Request (";
+            msg.append(QString::number(Channels.count()));
+            msg.append(")");
+            messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
 
             init_reconnection=false;
             QString data="{\"channels\":[ ";
@@ -709,6 +713,9 @@ void bsread_dispatchercontrol::finishReplyConnect()
 
                 bsreadThreads.last()->start();
                 cleanStreamConnections(1);
+                // Remove internal data processing flags
+                QMap<QString, QPointer<bsread_internalchannel> >::iterator i;
+                for (i = DispatcherChannels_Connected.begin(); i != DispatcherChannels_Connected.end(); ++i) i.value()->resetProc();
 
                 //qDebug() << "bsreadPlugin:" << stream.toLatin1().constData();
             }

@@ -70,8 +70,13 @@ bsreadPlugin:: ~bsreadPlugin()
 
     delete(DispatcherThread);
     delete(Dispatcher);
-    if (zmqcontex) zmq_ctx_destroy(zmqcontex);
-/*
+
+    #if ZMQ_VERSION<ZMQ_MAKE_VERSION(4,2,0)
+        if (zmqcontex) zmq_ctx_destroy(zmqcontex);
+    #else
+        if (zmqcontex) zmq_ctx_term(zmqcontex);
+    #endif
+    /*
     while (!DispatcherThread.isFinished()){
       qDebug() << "Wait:" <<DispatcherThread.isFinished();
        QThread::sleep(5);

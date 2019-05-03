@@ -63,7 +63,7 @@ public:
     int getEnumIndex();
 
     bool getProc();
-
+    void resetProc();
 private:
     QMutex mutex;
     bool proc;

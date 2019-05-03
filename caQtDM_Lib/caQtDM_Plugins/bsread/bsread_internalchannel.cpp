@@ -46,7 +46,10 @@ bool bsread_internalchannel::getProc()
     proc=false;
     return returnvalue;
 }
-
+void bsread_internalchannel::resetProc()
+{
+    proc=false;
+}
 
 bsread_internalchannel::bsread_internalchannel(QObject *parent,QString channelname,QString option) : QObject(parent)
 {
