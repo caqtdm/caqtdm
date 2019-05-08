@@ -251,10 +251,6 @@ void bsread_dispatchercontrol::process()
 
         if(init_reconnection){
             //qDebug()<<"Checking Channels: "<< Channels.count() << "init_reconnection" << init_reconnection;
-            msg="Dispatcher Request (";
-            msg.append(QString::number(Channels.count()));
-            msg.append(")");
-            messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
 
             init_reconnection=false;
             QString data="{\"channels\":[ ";
@@ -280,6 +276,11 @@ void bsread_dispatchercontrol::process()
             if (!data.contains("channels\":[]")){
                 QByteArray transferdata;
                 transferdata.append(data);
+
+                msg="Dispatcher Request (";
+                msg.append(QString::number(Channels.count()));
+                msg.append(")");
+                messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
 
 
                 qDebug() <<"Send Test Data"<< StreamDispatcher << transferdata;
