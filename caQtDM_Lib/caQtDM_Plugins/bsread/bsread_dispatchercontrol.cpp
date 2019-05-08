@@ -92,9 +92,12 @@ bsread_dispatchercontrol::bsread_dispatchercontrol()
 bsread_dispatchercontrol::~bsread_dispatchercontrol()
 {
     this->setTerminate();
-    loop->processEvents();
     loop->quit();
+    delete(loop);
     //qDebug()<<"Dispatcher stop";
+    //printf("bsread Dispatcher destructor\n");
+   //fflush(stdout);
+
 }
 
 void bsread_dispatchercontrol::process()
@@ -180,7 +183,7 @@ void bsread_dispatchercontrol::process()
             ChannelVerification(&manager);
         }
 
-        // qDebug()<<"Check Pipeline";
+        //qDebug()<<"Check Pipeline";
         while(!ChannelsApprovePipeline.isEmpty()){
             Channels+=ChannelsApprovePipeline;
             ChannelsApprovePipeline.clear();
@@ -279,7 +282,7 @@ void bsread_dispatchercontrol::process()
                 transferdata.append(data);
 
 
-                //qDebug() <<"Send Test Data"<< StreamDispatcher << transferdata;
+                qDebug() <<"Send Test Data"<< StreamDispatcher << transferdata;
 
                 requestChannel.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
                 replyConnect = manager.post(requestChannel,transferdata);
@@ -295,12 +298,15 @@ void bsread_dispatchercontrol::process()
         }
         ProcessLocker.unlock();
         loop->processEvents();
+
     }
     //qDebug()<<"bsread Dispatcher: finished ThreadID (" << QThread::currentThreadId()<< ")";
-    msg="bsread Dispatcher finished";
+    //msg="bsread Dispatcher finished";
 
-    messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
+    //messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
     emit finished();
+    //printf("bsread Dispatcher finished\n");
+    //fflush(stdout);
 
 }
 
@@ -387,6 +393,7 @@ void bsread_dispatchercontrol::setMessagewindow(MessageWindow *value)
 
 void bsread_dispatchercontrol::setTerminate()
 {
+
     terminate = true;
     startReconnection.wakeAll();
 }
