@@ -140,14 +140,14 @@ contains(QT_VER_MAJ, 4) {
 # undefine this for bsread (zeromq) plugin support
 # the main work for this plugin was done by Helge Brands
 # will not be build for older version of Qt
-!OLDQT {
+#!OLDQT {
   exists($(ZMQINC)/zmq.h) {
     !MOBILE {
        message( "Configuring controlsystem plugin for bsread" )
        CONFIG += bsread
     }
   }
-}
+#}
 
 defineTest(existFiles) {
     files = $$ARGS
@@ -243,6 +243,7 @@ DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
 # 4.2.4
+# fixed a exception in bsread at closing
 # added a userdefined format to caLinEdit,caTextEntry and caTextEntry
 # add macroreplacment for tooltip and statustip on: caLineEdit, caMultilineString, caGraphics, caPolyline, caMessageButton and caLed
 # fix TLS problem in sf archiver for old Qt Versions

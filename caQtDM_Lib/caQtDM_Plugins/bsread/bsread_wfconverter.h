@@ -8,7 +8,11 @@
 #include <QBuffer>
 #include <QByteArray>
 #include <QDataStream>
-#include <QElapsedTimer>
+
+#if QT_VERSION > QT_VERSION_CHECK(4, 8, 0)
+ #include <QElapsedTimer>
+#endif
+
 #include <qdatastream.h>
 
 #include "knobData.h"
@@ -84,8 +88,8 @@ public:
     {
 
 
-        QElapsedTimer timer;
-        timer.start();
+        //QElapsedTimer timer;
+        //timer.start();
 
         if (bsreadPVP->valid){
         if ((ulong)kDataP->edata.valueCount!=bsreadPVP->bsdata.wf_data_size){
