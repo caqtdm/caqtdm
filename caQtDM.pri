@@ -757,15 +757,17 @@ caQtDM_xdl2ui{
 Define_ZMQ_Lib{
 	
 	
-	INCLUDEPATH += $$(ZMQINC)
+
         unix:!macx {
                  LIBS += -L$$(ZMQLIB) -Wl,-rpath,$$(ZMQLIB) -lzmq
                  #LIBS += $$(ZMQLIB)/libzmq.a
 	}
         macx {
+                INCLUDEPATH += $$(ZMQINC)
                 LIBS += $$(ZMQLIB)/libzmq.5.dylib
         }
         win32 {
+            INCLUDEPATH += $$(ZMQINC)
 	    DebugBuild {
                 LIBS += $$(ZMQLIB)/libzmq.lib
 	     }
