@@ -752,8 +752,12 @@ caQtDM_xdl2ui{
 #==========================================================================================================
 Define_ZMQ_Lib{
 	
-	
-	INCLUDEPATH += $$(ZMQINC)
+        ZEROMQ_INCLUDECHECK=$$(QTHOME)/include
+        !equals(ZEROMQ_INCLUDECHECK,$$(ZMQINC)){
+            message("No collision with Qt detected, include ZMQ include")
+            INCLUDEPATH += $$(ZMQINC)
+        }
+
         unix:!macx {
                  LIBS += -L$$(ZMQLIB) -Wl,-rpath,$$(ZMQLIB) -lzmq
                  #LIBS += $$(ZMQLIB)/libzmq.a
