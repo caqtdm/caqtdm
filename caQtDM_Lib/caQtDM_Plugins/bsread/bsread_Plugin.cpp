@@ -44,34 +44,22 @@ QString bsreadPlugin::pluginName()
 // constructor
 bsreadPlugin::bsreadPlugin()
 {
-    //qDebug() << "bsreadPlugin: Create";
+    qDebug() << "bsreadPlugin: Create";
+    DispatcherThread=NULL;
+    Dispatcher=NULL;
     DispatcherThread=new QThread(this);
     Dispatcher=new bsread_dispatchercontrol();
     mutexknobdataP = NULL;
+    zmqcontex = NULL;
+    // INIT ZMQ Layer
+    zmqcontex = zmq_ctx_new();
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closeEvent()));
 
 }
 bsreadPlugin:: ~bsreadPlugin()
 {
-    //qDebug() << "bsreadPlugin: Start Destroy";
-    //qDebug() << "WaitPre:" <<DispatcherThread->isFinished();
-    //qDebug() << "bsreadPlugin: ThreadID" << QThread::currentThreadId();
-    Dispatcher->setTerminate();
-    //Dispatcher->deleteLater();
 
-    //qDebug() << "bsreadPlugin: DispatcherThread Inter:"<<DispatcherThread->isInterruptionRequested();
-    //qDebug() << "bsreadPlugin: DispatcherThread Runni:"<<DispatcherThread->isRunning();
-    //qDebug() << "bsreadPlugin: DispatcherThread FINI :"<<DispatcherThread->isFinished();
 
-    delete(DispatcherThread);
-    delete(Dispatcher);
-/*
-    while (!DispatcherThread.isFinished()){
-      qDebug() << "Wait:" <<DispatcherThread.isFinished();
-       QThread::sleep(5);
-    }
-*/
-    qDebug() << "bsreadPlugin: Destroy";
 }
 
 // in this demo we update our interface here; normally you should update in from your controlsystem
@@ -125,27 +113,26 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
 
     mutexknobdataP = data;
     messagewindowP = messageWindow;
-    // INIT ZMQ Layer
-    zmqcontex = zmq_init (1);
+
 
     initValue = 0.0;
     QString DispacherConfig = (QString)  qgetenv("BSREAD_DISPATCHER");
     if (DispacherConfig.length()>0){
+        if (Dispatcher){
+            Dispatcher->set_Dispatcher(&DispacherConfig);
+            Dispatcher->setMessagewindow(messagewindowP);
 
+            Dispatcher->setOptions(options);
 
-
-        Dispatcher->set_Dispatcher(&DispacherConfig);
-        Dispatcher->setMessagewindow(messagewindowP);
-
-        Dispatcher->setOptions(options);
-
-        Dispatcher->setZmqcontex(zmqcontex);
-        Dispatcher->setMutexknobdataP(data);
-        Dispatcher->moveToThread(DispatcherThread);
-        connect(DispatcherThread, SIGNAL(started()), Dispatcher, SLOT(process()));
-        connect(Dispatcher, SIGNAL(finished()), DispatcherThread, SLOT(quit()));
-        DispatcherThread->start();
-
+            Dispatcher->setZmqcontex(zmqcontex);
+            Dispatcher->setMutexknobdataP(data);
+            if (DispatcherThread){
+                Dispatcher->moveToThread(DispatcherThread);
+                connect(DispatcherThread, SIGNAL(started()), Dispatcher, SLOT(process()));
+                connect(Dispatcher, SIGNAL(finished()), DispatcherThread, SLOT(quit()));
+                DispatcherThread->start();
+            }
+        }
         //qDebug() << "Start Status:" <<DispatcherThread->isFinished();
 
     }else{
@@ -205,9 +192,9 @@ int bsreadPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
     if(pos != -1) {
      datapv.truncate(pos);
     }
-
-    Dispatcher->add_Channel(datapv,kData->index);
-
+    if (Dispatcher){
+        Dispatcher->add_Channel(datapv,kData->index);
+    }
     i=0;
 
     while ((i<bsreadconnections.size())){
@@ -332,20 +319,39 @@ int bsreadPlugin::TerminateIO() {
 }
 
 void bsreadPlugin::closeEvent(){
-   //qDebug() << "bsreadPlugin:closeEvent ";
-   emit closeSignal();
-   Dispatcher->setTerminate();
-   DispatcherThread->terminate();
-   DispatcherThread->wait();
-   if (bsreadThreads.count()>0){
-      bsreadconnections.last()->setTerminate();
-      bsreadThreads.last()->quit();
-      bsreadThreads.last()->wait(300);
-      if (bsreadThreads.last()->isRunning()){
-        bsreadThreads.last()->terminate();
-        bsreadThreads.last()->wait(3000);
-      }
-   }
+    //qDebug() << "bsreadPlugin:closeEvent ";
+    emit closeSignal();
+    if (Dispatcher){
+        //qDebug() << "start Dispatcher->setTerminate(); ";
+        Dispatcher->setTerminate();
+        //qDebug() << "END Dispatcher->setTerminate(); ";
+    }
+    if (DispatcherThread){
+        //qDebug() << "start DispatcherThread ";
+        DispatcherThread->exit();
+        DispatcherThread->wait();
+        //qDebug() << "end DispatcherThread ";
+    }
+    if (bsreadThreads.count()>0){
+        bsreadconnections.last()->setTerminate();
+        bsreadThreads.last()->exit();
+        bsreadThreads.last()->wait(300);
+        if (bsreadThreads.last()->isRunning()){
+            bsreadThreads.last()->exit();
+            bsreadThreads.last()->wait(3000);
+        }
+    }
+    if (DispatcherThread){
+        delete(DispatcherThread);
+    }
+    if (Dispatcher){
+        delete(Dispatcher);
+    }
+#if ZMQ_VERSION<ZMQ_MAKE_VERSION(4,2,0)
+    if (zmqcontex) zmq_ctx_destroy(zmqcontex);
+#else
+    if (zmqcontex) zmq_ctx_term(zmqcontex);
+#endif
 
 
 }

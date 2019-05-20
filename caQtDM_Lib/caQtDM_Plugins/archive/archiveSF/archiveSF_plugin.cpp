@@ -57,7 +57,7 @@ ArchiveSF_Plugin:: ~ArchiveSF_Plugin() {
 }
 
 void ArchiveSF_Plugin::closeEvent(){
-   qDebug() << "ArchiveSF_Plugin::closeEvent ";
+   //qDebug() << "ArchiveSF_Plugin::closeEvent ";
    emit Signal_StopUpdateInterface();
 }
 

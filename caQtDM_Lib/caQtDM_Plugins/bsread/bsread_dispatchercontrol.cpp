@@ -92,9 +92,12 @@ bsread_dispatchercontrol::bsread_dispatchercontrol()
 bsread_dispatchercontrol::~bsread_dispatchercontrol()
 {
     this->setTerminate();
-    loop->processEvents();
     loop->quit();
+    delete(loop);
     //qDebug()<<"Dispatcher stop";
+    //printf("bsread Dispatcher destructor\n");
+   //fflush(stdout);
+
 }
 
 void bsread_dispatchercontrol::process()
@@ -160,10 +163,16 @@ void bsread_dispatchercontrol::process()
         if(url.toString().toUpper().contains("HTTPS")) {
             QSslConfiguration configChannel = requestChannel.sslConfiguration();
             configChannel.setPeerVerifyMode(QSslSocket::VerifyNone);
+            #if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
+                configChannel.setProtocol(QSsl::TlsV1);
+            #endif
             requestChannel.setSslConfiguration(configChannel);
 
             QSslConfiguration configDelete = requestDelete.sslConfiguration();
             configDelete.setPeerVerifyMode(QSslSocket::VerifyNone);
+            #if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
+                configDelete.setProtocol(QSsl::TlsV1);
+            #endif
             requestDelete.setSslConfiguration(configDelete);
         }
 
@@ -174,7 +183,7 @@ void bsread_dispatchercontrol::process()
             ChannelVerification(&manager);
         }
 
-        // qDebug()<<"Check Pipeline";
+        //qDebug()<<"Check Pipeline";
         while(!ChannelsApprovePipeline.isEmpty()){
             Channels+=ChannelsApprovePipeline;
             ChannelsApprovePipeline.clear();
@@ -222,9 +231,17 @@ void bsread_dispatchercontrol::process()
 
             requestDelete.setRawHeader("Content-Type", "application/json");
             requestDelete.setRawHeader("Content-Length", postDataSize);
-            replydelete =manager.sendCustomRequest(requestDelete,"DELETE",&buff_delete_data);
+            #if QT_VERSION < QT_VERSION_CHECK(4, 8, 0)
+			  //delete without data !!!
+              replydelete =manager.deleteResource(requestDelete);
+              connect(replydelete, SIGNAL(finished()),this, SLOT(finishReplyDelete()));
+			#else
+			  replydelete =manager.sendCustomRequest(requestDelete,"DELETE",&buff_delete_data);
+              connect(replydelete, SIGNAL(finished()),this, SLOT(finishReplyDelete()));
+            #endif
+
             //connect(replydelete, SIGNAL(finished()),this, SLOT(finishReplyDelete()));
-            connect(replydelete, SIGNAL(finished()),this, SLOT(finishReplyDelete()));
+
             //qDebug()<<"Remove Connection :"<< data << postDataSize;
 
         }
@@ -260,8 +277,13 @@ void bsread_dispatchercontrol::process()
                 QByteArray transferdata;
                 transferdata.append(data);
 
+                msg="Dispatcher Request (";
+                msg.append(QString::number(Channels.count()));
+                msg.append(")");
+                messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
 
-                //qDebug() <<"Send Test Data"<< StreamDispatcher << transferdata;
+
+                qDebug() <<"Send Test Data"<< StreamDispatcher << transferdata;
 
                 requestChannel.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
                 replyConnect = manager.post(requestChannel,transferdata);
@@ -277,12 +299,15 @@ void bsread_dispatchercontrol::process()
         }
         ProcessLocker.unlock();
         loop->processEvents();
+
     }
     //qDebug()<<"bsread Dispatcher: finished ThreadID (" << QThread::currentThreadId()<< ")";
-    msg="bsread Dispatcher finished";
+    //msg="bsread Dispatcher finished";
 
-    messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
+    //messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
     emit finished();
+    //printf("bsread Dispatcher finished\n");
+    //fflush(stdout);
 
 }
 
@@ -369,6 +394,7 @@ void bsread_dispatchercontrol::setMessagewindow(MessageWindow *value)
 
 void bsread_dispatchercontrol::setTerminate()
 {
+
     terminate = true;
     startReconnection.wakeAll();
 }
@@ -695,6 +721,9 @@ void bsread_dispatchercontrol::finishReplyConnect()
 
                 bsreadThreads.last()->start();
                 cleanStreamConnections(1);
+                // Remove internal data processing flags
+                QMap<QString, QPointer<bsread_internalchannel> >::iterator i;
+                for (i = DispatcherChannels_Connected.begin(); i != DispatcherChannels_Connected.end(); ++i) i.value()->resetProc();
 
                 //qDebug() << "bsreadPlugin:" << stream.toLatin1().constData();
             }
@@ -805,6 +834,9 @@ void bsread_dispatchercontrol::ChannelVerification(QNetworkAccessManager* manage
     if(url.toString().toUpper().contains("HTTPS")) {
         QSslConfiguration configChannel = requestVerification.sslConfiguration();
         configChannel.setPeerVerifyMode(QSslSocket::VerifyNone);
+        #if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
+            configChannel.setProtocol(QSsl::TlsV1);
+        #endif
         requestVerification.setSslConfiguration(configChannel);
     }
 #endif
