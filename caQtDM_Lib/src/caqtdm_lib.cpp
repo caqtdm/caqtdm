@@ -4694,11 +4694,9 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 }
 
                 if(limitsMode == caLineEdit::Channel) {
-                    // when limits are the same, do nothing
-                    if(data.edata.upper_disp_limit != data.edata.lower_disp_limit) {
+                    //set the limits when they are equal the correction will disable them
                         lineeditWidget->setMaxValue(data.edata.upper_disp_limit);
                         lineeditWidget->setMinValue(data.edata.lower_disp_limit);
-                    }
                 }
 
                 if((precMode != caLineEdit::User) && (data.edata.initialize)) {
