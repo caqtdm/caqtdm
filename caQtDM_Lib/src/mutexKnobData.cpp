@@ -103,6 +103,16 @@ void MutexKnobData::UpdateMechanism(UpdateType Type)
 {
     myUpdateType = Type;
 }
+/**
+ * softpv naming
+ */
+QString MutexKnobData::SoftPV_Name(QString pv, QWidget *w)
+{
+    //printf("%s\n",asc.toUtf8().constData());
+    //printf("%s_%p\n", qasc(pv),  w);
+    //fflush(stdout);
+    return QString("%1_%2").arg(pv).arg((quintptr)w,QT_POINTER_SIZE * 2, 16, QChar('0'));
+}
 
 /**
  * insert the softpv into the list of softpv's with the corresponding widget
@@ -110,9 +120,10 @@ void MutexKnobData::UpdateMechanism(UpdateType Type)
 void MutexKnobData::InsertSoftPV(QString pv, int num, QWidget *w)
 {
     int indx;
-    char asc[MAXPVLEN+20];
+    //char asc[MAXPVLEN+20];
+    //sprintf(asc, "%s_%p", qasc(pv),  w);
     QMutexLocker locker(&mutex);
-    sprintf(asc, "%s_%p", qasc(pv),  w);
+    QString asc=SoftPV_Name(pv, w);
     if(!getSoftPV(pv, &indx, (QWidget*) w)) {
         softPV_WidgetList.insert(asc, num);
         //qDebug() << "insert softpv_widgetList" << asc;
@@ -175,16 +186,18 @@ void  MutexKnobData::BuildSoftPVList(QWidget *w)
  */
 void MutexKnobData::RemoveSoftPV(QString pv, QWidget *w, int indx)
 {
-    char asc[MAXPVLEN+20];
+    //char asc[MAXPVLEN+20];
     QMutexLocker locker(&mutex);
     // remove from the softpv list
-    sprintf(asc, "%s_%p", qasc(pv),  w);
+    //sprintf(asc, "%s_%p", qasc(pv),  w);
+    QString asc=SoftPV_Name(pv, w);
     softPV_WidgetList.remove(asc);
 
     // and remove from the global list
+    char asc1[MAXPVLEN+20];
     QWidget *w1 = (QWidget*) KnobData[indx].thisW;
-    sprintf(asc, "%s_%d_%p",  KnobData[indx].pv, KnobData[indx].index,  w1);
-    softPV_List.remove(asc);
+    sprintf(asc1, "%s_%d_%p",  KnobData[indx].pv, KnobData[indx].index,  w1);
+    softPV_List.remove(asc1);
 
 /*
      QMapIterator<QString, int> i(softPV_List);
@@ -202,11 +215,10 @@ void MutexKnobData::RemoveSoftPV(QString pv, QWidget *w, int indx)
  */
 void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w, int dataIndex, int dataCount)
 {
-    char asc[MAXPVLEN+20];
-
     // update the right data
-
-    sprintf(asc, "%s_%p", qasc(pv),  w);
+    //char asc[MAXPVLEN+20];
+    //sprintf(asc, "%s_%p", qasc(pv),  w);
+    QString asc=SoftPV_Name(pv, w);
     QMap<QString, int>::const_iterator name = softPV_WidgetList.find(asc);
     if(name != softPV_WidgetList.end()) {
         knobData *ptr = GetMutexKnobDataPtr(name.value());
@@ -284,8 +296,9 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w, int dataI
  */
 bool MutexKnobData::getSoftPV(QString pv, int *indx, QWidget *w)
 {
-    char asc[MAXPVLEN+20];
-    sprintf(asc, "%s_%p", qasc(pv),  w);
+    //char asc[MAXPVLEN+20];
+    //sprintf(asc, "%s_%p", qasc(pv),  w);
+    QString asc=SoftPV_Name(pv, w);
     QMap<QString, int>::const_iterator name = softPV_WidgetList.find(asc);
     if(name != softPV_WidgetList.end()) {
         *indx = name.value();
