@@ -90,7 +90,7 @@ public:
     void initHighestCountPV();
 
     void UpdateMechanism(UpdateType Type);
-
+    QString SoftPV_Name(QString pv, QWidget *w);
     void BlockProcessing(bool block) { blockProcess= block;}
 
 signals:

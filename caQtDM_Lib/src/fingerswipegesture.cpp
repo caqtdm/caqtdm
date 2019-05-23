@@ -53,7 +53,7 @@ QGesture *FingerSwipeGestureRecognizer::create(QObject *target)
     return new FingerSwipeGesture();
 }
 
-QGestureRecognizer::Result FingerSwipeGestureRecognizer::recognize(QGesture *state, QObject *, QEvent *event)
+QGestureRecognizer::Result FingerSwipeGestureRecognizer::recognize(QGesture *state, QObject *obj, QEvent *event)
 {
     FingerSwipeGesture *q = static_cast<FingerSwipeGesture *>(state);
     const QTouchEvent *ev = static_cast<const QTouchEvent *>(event); // only use ev after checking event->type()
@@ -64,6 +64,10 @@ QGestureRecognizer::Result FingerSwipeGestureRecognizer::recognize(QGesture *sta
         if (ev->touchPoints().size() >= 1) {
             QTouchEvent::TouchPoint p1 = ev->touchPoints().first();
             q->m_startPos = p1.startScenePos();
+#ifdef MDITEST
+            QWidget *w= (QWidget*) obj;
+            q->m_wPos = w->mapToGlobal(QPoint(0,0));
+#endif
         }
         break;
     }
@@ -88,8 +92,12 @@ QGestureRecognizer::Result FingerSwipeGestureRecognizer::recognize(QGesture *sta
                 q->m_triggered = true;
                 result = QGestureRecognizer::TriggerGesture;
             }
-            break;
+#ifdef MDITEST
+            QWidget *w= (QWidget*) obj;
+            w->parentWidget()->move(q->m_currentPos.toPoint() - q->m_startPos.toPoint() + q->m_wPos.toPoint() - 2 * w->pos());
+#endif
         }
+        break;
     }
     default:
         break;
