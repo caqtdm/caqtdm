@@ -51,6 +51,7 @@ private:
     QPointF m_startPos;
     QPointF m_lastPos;
     QPointF m_currentPos;
+    QPointF m_wPos;
     bool m_triggered;
     bool m_cancelled;
     friend class FingerSwipeGestureRecognizer;

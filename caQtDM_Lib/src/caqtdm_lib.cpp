@@ -501,7 +501,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         }
     }
 
-    if(nbIncludes > 0) {
+    if(nbIncludes > 0 && !thisFileFull.contains("popup")) {
         splash = new SplashScreen(parent);
         splash->setMaximum(nbIncludes);
         splash->show();
@@ -559,7 +559,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     // due to crash in connection with the splash screen, changed
     // these instructions to the botton of this class
-    if(nbIncludes > 0) {
+    if(nbIncludes > 0 && !thisFileFull.contains("popup")) {
         Sleep::msleep(200);
         // this seems to causes the crash and is not really needed here?
         //splash->finish(this);
@@ -2442,7 +2442,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         }
 
         // increment splashcounter when include is in list
-        if(nbIncludes > 0) {
+        if(nbIncludes > 0 && !thisFileFull.contains("popup")) {
             for (int i = topIncludesWidgetList.count()-1; i >= 0; --i) {
                 if(w1 ==  topIncludesWidgetList.at(i)) {
                     splash->setProgress(splashCounter++);
@@ -3020,6 +3020,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
     if(className.contains("ca")) {
         QWidget *tabWidget = getTabParent(w1);
         w1->setProperty("parentTab",QVariant::fromValue(tabWidget) );
+        w1->setAttribute(Qt::WA_Hover, true);
     }
 
     // make a context menu for object having a monitor
@@ -3034,6 +3035,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 #ifdef MOBILE
         w1->grabGesture(Qt::TapAndHoldGesture);
         w1->installEventFilter(this);
+#else
+        if(nbMonitors> 0 && !thisFileFull.contains("popup")) w1->installEventFilter(this);
 #endif
     }
 
@@ -8206,6 +8209,53 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
     }
 }
 
+#ifndef MOBILE
+// a popup can be displayed when hovering over a widget by taking from the property whatisthisw a popup ui file and a macro definition.
+// this will only work when the widget has at least one monitor and the file contains the character sequence popup
+bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::HoverEnter) {
+        QWidget *w= (QWidget*) obj;
+        QString whatisthis = w->whatsThis().trimmed();
+        QStringList popupFields = whatisthis.split(";", QString::SkipEmptyParts);
+        if(popupFields.size() > 1) {
+            popupFields[1].replace("\"","");  // in case of macro surrounded by double quotes
+            if(popupFields[0].contains("popup")) emit Signal_OpenNewWFile(popupFields[0], popupFields[1], "", "true");
+        } else if(popupFields.size() > 0) {
+            if(popupFields[0].contains("popup")) emit Signal_OpenNewWFile(popupFields[0], "", "", "true");
+        }
+    } else if(event->type() == QEvent::HoverLeave) {
+        foreach (QWidget *widget, QApplication::topLevelWidgets()) {
+            if (CaQtDM_Lib *w = qobject_cast<CaQtDM_Lib *>(widget)) {
+                QVariant fileName = w->property("fileString");
+                QString qs = fileName.toString();
+                if(qs.contains("popup.ui")) {
+                    w->closeWindow();
+                }
+            }
+        }
+    } else if(event->type() == QEvent::HoverMove) {
+        foreach (QWidget *widget, QApplication::topLevelWidgets()) {
+            if (CaQtDM_Lib *w = qobject_cast<CaQtDM_Lib *>(widget)) {
+                QVariant fileName = w->property("fileString");
+                QString qs = fileName.toString();
+                if(qs.contains("popup.ui")) {
+                    Qt::WindowFlags flags = Qt::ToolTip;
+                    flags |= Qt::FramelessWindowHint;
+                    w->setWindowFlags(flags);
+                    QPoint pos = QCursor::pos();
+                       pos.setX(pos.x()+5);
+                       pos.setY(pos.y()+5);
+                       w->move(pos);
+                       w->show();
+                }
+            }
+        }
+    }
+    return QWidget::eventFilter(obj, event);
+}
+
+#endif
 // treat gesture events (we use tapandhold and fingerswipe, custom gesture)
 #ifdef MOBILE
 bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)

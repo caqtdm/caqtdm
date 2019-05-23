@@ -311,6 +311,8 @@ private:
     void tapAndHoldTriggered(QObject *obj, QTapAndHoldGesture* tapAndHold);
     void fingerswipeTriggered(FingerSwipeGesture *gesture);
     Qt::GestureType fingerSwipeGestureType;
+#else
+    bool eventFilter(QObject *obj, QEvent *event);
 #endif
 
     long getLongValueFromString(char *textValue, FormatType fType, char **end);

@@ -383,6 +383,8 @@ caQtDM_Lib {
 		ios {
       			INCLUDEPATH += $(EPICSINCLUDE)/os/iOS
                         INCLUDEPATH   += $(EPICSINCLUDE)/compiler/clang
+# this instruction is actually needed for me while the build does not work for multiple architectures
+                        QMAKE_CXXFLAGS_RELEASE -= -O2
 		}
 
 		android {
@@ -523,9 +525,7 @@ caQtDM_Viewer {
                     LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/demo/libdemo_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/epics3/libepics3_plugin.a
 
-
-
-                     ICON = $$PWD/caQtDM_Viewer/src/caQtDM.icns
+                    ICON = $$PWD/caQtDM_Viewer/src/caQtDM.icns
 
                     APP_ICON.files = $$files($$PWD/caQtDM_Viewer/src/caQtDM*.png)
 
@@ -536,19 +536,15 @@ caQtDM_Viewer {
                     #StartScreen.files += $$PWD/caQtDM_Viewer/src/StartScreen-Landscape.png
                     #StartScreen.files += $$PWD/caQtDM_Viewer/src/StartScreen-568h@2x.png
 
-
                     APP-FONTS.files = $$PWD/caQtDM_Viewer/lucida-sans-typewriter.ttf
                     APP-FONTS.path = fonts
                     #assets_catalogs.files = $$files($$PWD/caQtDM_Viewer/src/IOS/*.xcassets)
                     #QMAKE_BUNDLE_DATA += assets_catalogs
 
-
                     QMAKE_BUNDLE_DATA += APP_XML_FILES APP-FONTS #APP_ICON APP1_ICON
                     QMAKE_CFLAGS += -gdwarf-2
                     QMAKE_CXXFLAGS += -gdwarf-2
                     QMAKE_TARGET_BUNDLE_PREFIX=ch.psi
-
-
 
                     QMAKE_BUNDLE_NAME = ch.psi.caQtDM
                     bundle_identifier.name = PRODUCT_BUNDLE_IDENTIFIER
@@ -556,10 +552,8 @@ caQtDM_Viewer {
                     QMAKE_MAC_XCODE_SETTINGS += bundle_identifier
                     target.name=IPHONEOS_DEPLOYMENT_TARGET
                     target.value = 10.0
+
                     QMAKE_MAC_XCODE_SETTINGS += target
-
-
-
                     assetIcon.name = ASSETCATALOG_COMPILER_APPICON_NAME
                     assetIcon.value = AppIcon
                     launchImage.name = ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME
@@ -569,16 +563,14 @@ caQtDM_Viewer {
                     QMAKE_INFO_PLIST += $$PWD/caQtDM_Viewer/src/IOS/Info.plist
                     QMAKE_ASSET_CATALOGS += $$PWD/caQtDM_Viewer/src/IOS/Assets.xcassets
 
-
+#actually, I have a problem with ios, it seems that iphonesimulator is defined too and wants than the library of simlator
+# I comment it out now
                     iphonesimulator {
                          message("caQtDM_viewer configuration : iphonesimulator")
                          # when .dylib and .a in same directory, macos takes .dylib, so separate the libraries
                          LIBS += $$(EPICSLIB)/static/libca.a
                          LIBS += $$(EPICSLIB)/static/libCom.a
-
                          LIBS += $$(QWTHOME)/lib/lib$$(QWTLIBNAME)_iphonesimulator.a
-
-
                          # build simulator only for 32 bit
                          INCLUDEPATH += $$(QWTHOME)/src
                     }
@@ -615,15 +607,11 @@ caQtDM_Viewer {
                          #setting.value = $$(CERTIFICATNUMBER)
                          #QMAKE_MAC_XCODE_SETTINGS += setting
 
-
-
                          #payload_dir.target = $$OUT_PWD/Release-iphoneos/Payload
                          #payload_dir.commands = @test -d $$OUT_PWD/Release-iphoneos/Payload || mkdir -p $$OUT_PWD/Release-iphoneos/Payload
                          #payload_dir.depends = $$OUT_PWD/Release-iphoneos
 
                          #QMAKE_EXTRA_TARGETS +=payload_dir
-
-
                     }
                     epics4: {
                                     LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/epics4/libepics4_plugin.a
@@ -908,3 +896,7 @@ Define_ControlsysTargetDir{
         }
 }
 		
+
+SOURCES +=
+
+HEADERS +=
