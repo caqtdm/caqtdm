@@ -454,7 +454,7 @@ void caLineEdit::setValue(double value, const QString& units)
             datastring=datastring+units;
 
             unitsLast = units;
-            setTextLine(datastring);
+            setTextLine( qasc(datastring));
 
         } else {
             strcat(asc, qasc(specialUnitsString));
