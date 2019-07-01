@@ -25,6 +25,8 @@
 
 #include "camenu.h"
 #include "alarmdefs.h"
+#include <QPainter>
+#include <QTimer>
 #include <QLineEdit>
 #include <QMouseEvent>
 #include<QApplication>
@@ -34,6 +36,8 @@ caMenu::caMenu(QWidget *parent) : QComboBox(parent)
     // to start with, clear the stylesheet, so that playing around
     // is not possible.
     setStyleSheet("");
+
+    setAttribute(Qt::WA_StyleSheet);
 
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     isShown = false;
@@ -46,19 +50,28 @@ caMenu::caMenu(QWidget *parent) : QComboBox(parent)
     nonMaskedStrings.clear();
     maskedStrings.clear();
     lastIndex = 0;
+    alarmstatus= -1;
 
+    defBackColor = QColor(255, 248, 220, 255);
+    defForeColor = Qt::black;
+
+
+    oldStyle="DEADBEEF";
+    thisStyle="";
     thisBackColor = QColor(230,230,230);
     thisForeColor = Qt::black;
     oldBackColor = QColor(230,230,230);
     oldForeColor = Qt::black;
     thisColorMode=Default;
-    oldColorMode =Default;
+    oldColorMode =Alarm;
     setColorMode(Default);
+    updateAlarmStatus_once_Later=false;
 
     setAccessW(true);
     installEventFilter(this);
 
     setElevation(on_top);
+
 }
 
 QString caMenu::getPV() const
@@ -101,30 +114,34 @@ void caMenu::setColors(QColor bg, QColor fg)
     if(!defBackColor.isValid() || !defForeColor.isValid()) return;
     if((bg != oldBackColor) || (fg != oldForeColor) || (thisColorMode != oldColorMode)) {
         if(thisColorMode == Default) {
-            thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
+            thisStyle = "caMenu {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);padding: 1px 18px 1px 3px;min-width: 6em;}";
             thisStyle = thisStyle.arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
                     arg(defForeColor.red()).arg(defForeColor.green()).arg(defForeColor.blue()).arg(defForeColor.alpha());
 
         } else {
-            thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
+            thisStyle = "caMenu {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);padding: 1px 18px 1px 3px;min-width: 6em;}";
             thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
                     arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
             oldBackColor = bg;
             oldForeColor = fg;
+
         }
     }
 
     if(thisStyle != oldStyle || thisColorMode != oldColorMode) {
+        //printf("caMenu style update %i %i (%i)\n",(thisStyle != oldStyle),(thisColorMode != oldColorMode), alarmstatus);
         setStyleSheet(thisStyle);
         oldStyle = thisStyle;
-        update();
     }
+
     oldColorMode = thisColorMode;
+
 }
 
 void caMenu::setAlarmColors(short status)
 {
     QColor bg, fg;
+    alarmstatus= status;
     fg = thisForeColor;
     switch (status) {
 
@@ -148,6 +165,21 @@ void caMenu::setAlarmColors(short status)
         break;
     }
     setColors(bg, fg);
+    // it looks that depending on the generation time of the Combobox widget and the application of the
+    // stylesheet, the stylesheet is not active correctly. The timer trigger the colors once a second later.
+    // This is only a workaround!
+    if (!updateAlarmStatus_once_Later){
+        QTimer *timer = new QTimer(this);
+          timer->setSingleShot(true);
+
+          connect(timer, &QTimer::timeout, [=]() {
+            /*Code here*/
+            setColors(bg, fg);
+            timer->deleteLater();
+          } );
+        timer->start(1000);
+        updateAlarmStatus_once_Later=true;
+    }
 }
 
 void caMenu::setNormalColors()
@@ -307,5 +339,13 @@ bool caMenu::event(QEvent *e)
         }
     }
     return QComboBox::event(e);
+}
+
+void caMenu::paintEvent(QPaintEvent *)
+{
+    QStyleOption opt;
+    opt.init(this);
+    QPainter painter(this);
+    style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
 }
 

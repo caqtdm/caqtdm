@@ -96,7 +96,7 @@ public slots:
 
 protected:
      virtual bool event(QEvent *);
-
+     void paintEvent(QPaintEvent *);
 private:
     QString thisPV, thisMaskPV;
     QColor thisForeColor, oldForeColor;
@@ -105,12 +105,14 @@ private:
     QPalette thisPalette;
     bool thisLabelDisplay;
     int thisAccessW;
+    short alarmstatus;
     colMode  thisColorMode, oldColorMode;
     QPalette defaultPalette;
     QString thisStyle, oldStyle;
     QStringList nonMaskedStrings, maskedStrings;
     int thisMaskValue;
     bool isShown;
+    bool updateAlarmStatus_once_Later;
     bool eventFilter(QObject *obj, QEvent *event);
     int lastIndex;
 };

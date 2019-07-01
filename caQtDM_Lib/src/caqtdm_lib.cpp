@@ -4325,12 +4325,6 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     menuWidget->setIndex((int) data.edata.ivalue);
                 }
 
-                if (menuWidget->getColorMode() == caMenu::Alarm) {
-                    menuWidget->setAlarmColors(data.edata.severity);
-                    // case of static mode
-                } else {
-                    SetColorsBack(menuWidget);
-                }
             // when mask specified, use it
             } else if(data.specData[0] == 1) {
                 switch (data.edata.fieldtype){
@@ -4344,6 +4338,14 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     }
                 }
             }
+            if (menuWidget->getColorMode() == caMenu::Alarm) {
+                menuWidget->setAlarmColors(data.edata.severity);
+                //printf("caMenu severity %i\n",data.edata.severity);
+                //fflush(stdout);
+            } else {
+                SetColorsBack(menuWidget);
+            }
+
         } else {
             SetColorsNotConnected(menuWidget);
         }
