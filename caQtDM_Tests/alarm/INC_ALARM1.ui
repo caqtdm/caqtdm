@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>115</width>
+    <height>82</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="caMenu" name="camenu">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>8</y>
+      <width>99</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:AO.LLSV</string>
+    </property>
+    <property name="colorMode">
+     <enum>caMenu::Alarm</enum>
+    </property>
+    <property name="background">
+     <color>
+      <red>164</red>
+      <green>164</green>
+      <blue>164</blue>
+     </color>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>42</y>
+      <width>100</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:AO.LLSV</string>
+    </property>
+    <property name="colorMode">
+     <enum>caLineEdit::Alarm_Static</enum>
+    </property>
+    <property name="alarmHandling">
+     <enum>caLineEdit::onBackground</enum>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caMenu</class>
+   <extends>QComboBox</extends>
+   <header>caMenu</header>
+  </customwidget>
+  <customwidget>
+   <class>caLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>caLineEdit</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
