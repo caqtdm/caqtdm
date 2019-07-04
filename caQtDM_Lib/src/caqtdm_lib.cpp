@@ -4195,10 +4195,26 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         } else {
             CalcVisibility(w, result, valid);  // visibility not used, but calculation yes
             if(valid) {
-                if (!QString::compare(calcWidget->getVariable(), data.pv, Qt::CaseInsensitive)){
+                if (!QString::compare(calcWidget->getVariable(), data.pv, Qt::CaseSensitive)){
                     calcWidget->setValue(result);
                     mutexKnobDataP->UpdateSoftPV(data.pv, result, myWidget, 0, 1);
                     //qDebug() << "we have a caCalc" << calcWidget->getVariable() << "  " <<  data.pv;
+
+                    // be sure to update softchannels in the soft waves
+                    QList<caCalc *> all = myWidget->findChildren<caCalc *>();
+                    foreach(caCalc* w, all) {
+                        // when cacalc is a waveform composed from individual channels
+                        if(w->getVariableType() == caCalc::vector) {
+                            // get items of this waveform
+                            QList<QString> pvList = w->getPVList();
+                            for (int j = 0; j < pvList.size(); j++) {
+                                if (!QString::compare(calcWidget->getVariable(), pvList[j], Qt::CaseSensitive)) {
+                                    mutexKnobDataP->UpdateSoftPV(w->getVariable(), result, myWidget, j, pvList.count());
+                                }
+                            }
+                        }
+                    }
+
                 }
             }
         }
