@@ -169,22 +169,24 @@ void caMenu::setAlarmColors(short status)
     // stylesheet, the stylesheet is not active correctly. The timer trigger the colors once a second later.
     // This is only a workaround!
     if (!updateAlarmStatus_once_Later){
-        QTimer *timer = new QTimer(this);
-          timer->setSingleShot(true);
-
-          connect(timer, &QTimer::timeout, [=]() {
-            /*Code here*/
-            setColors(bg, fg);
-            timer->deleteLater();
-          } );
-        timer->start(1000);
+        updateAlarmStatus_bg=bg;
+        updateAlarmStatus_fg=fg;
+        QTimer::singleShot(1000, this, SLOT(alarmrewrite()));
         updateAlarmStatus_once_Later=true;
     }
 }
 
+
+
 void caMenu::setNormalColors()
 {
     setColors(thisBackColor, thisForeColor);
+}
+
+void caMenu::alarmrewrite()
+{
+    setColors(updateAlarmStatus_bg, updateAlarmStatus_fg);
+
 }
 
 QString caMenu::getLabel() const

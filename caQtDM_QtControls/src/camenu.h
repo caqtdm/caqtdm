@@ -84,8 +84,8 @@ public:
     void setColors(QColor bg, QColor fg);
     void setAlarmColors(short status);
     void setNormalColors();
-
 public slots:
+    void alarmrewrite();
     void animation(QRect p) {
 #include "animationcode.h"
     }
@@ -113,6 +113,8 @@ private:
     int thisMaskValue;
     bool isShown;
     bool updateAlarmStatus_once_Later;
+    QColor updateAlarmStatus_bg;
+    QColor updateAlarmStatus_fg;
     bool eventFilter(QObject *obj, QEvent *event);
     int lastIndex;
 };
