@@ -286,13 +286,6 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     gridLayout->addWidget(messageWindow, 0, 0, 1, 1);
     messageWindow->show();
 
-#ifdef MDITEST
-    mdiArea = new QMdiArea;
-    mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    mdiArea->showMaximized();
-#endif
-
 #ifndef MOBILE
     QString uniqueKey = QString("caQtDM shared memory:") ;
     bool memoryAttached = false;
@@ -836,14 +829,6 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
     QMainWindow *mainWindow = newWindow;
     lastWindow = mainWindow;
 
-#ifdef MDITEST
-    mdiArea->showMaximized();
-    QMdiSubWindow *subWindow = mdiArea->addSubWindow(mainWindow);
-    subWindow->setOption(QMdiSubWindow::RubberBandResize, true);
-    mdiArea->raise();
-    mainWindow->showNormal();
-#endif
-
     // center the window if requested (only for windows)
 #if defined(WIN32) && !defined(__GNUC__)
      if(centerwindow)  {
@@ -868,11 +853,7 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
     if(printexit) {
         mainWindow->showMinimized();
     } else {
-#ifdef MDITEST
-        mainWindow->showNormal();
-#else
         mainWindow->show();
-#endif
     }
 
     mainWindow->raise();
@@ -1136,9 +1117,6 @@ void FileOpenWindow::Callback_ActionExit()
     // normal close
     } else {
         if(debugWindow) {selected = QMessageBox::No;
-#ifdef MDITEST
-        mdiArea->hide();
-#endif
     } else selected = QMessageBox::Yes;
     }
 

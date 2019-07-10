@@ -8228,19 +8228,24 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
 }
 
 #ifndef MOBILE
-// a popup can be displayed when hovering over a widget by taking from the property whatisthisw a popup ui file and a macro definition.
+// a popup can be displayed when hovering over a widget by taking from the dynamic property caqtdmPopupUI a popup ui file and a macro definition.
 // this will only work when the widget has at least one monitor and the file contains the character sequence popup
 bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::HoverEnter) {
         QWidget *w= (QWidget*) obj;
-        QString whatisthis = w->whatsThis().trimmed();
-        QStringList popupFields = whatisthis.split(";", QString::SkipEmptyParts);
-        if(popupFields.size() > 1) {
-            popupFields[1].replace("\"","");  // in case of macro surrounded by double quotes
-            if(popupFields[0].contains("popup")) emit Signal_OpenNewWFile(popupFields[0], popupFields[1], "", "true");
-        } else if(popupFields.size() > 0) {
-            if(popupFields[0].contains("popup")) emit Signal_OpenNewWFile(popupFields[0], "", "", "true");
+        QVariant dynVars = w->property("caqtdmPopupUI");
+        if(!dynVars.isNull()) {
+            if(dynVars.canConvert<QString>())  {
+                QString popupUI = dynVars.toString().trimmed();
+                QStringList popupFields = popupUI.split(";", QString::SkipEmptyParts);
+                if(popupFields.size() > 1) {
+                    popupFields[1].replace("\"","");  // in case of macro surrounded by double quotes
+                    if(popupFields[0].contains("popup")) emit Signal_OpenNewWFile(popupFields[0], popupFields[1], "", "true");
+                } else if(popupFields.size() > 0) {
+                    if(popupFields[0].contains("popup")) emit Signal_OpenNewWFile(popupFields[0], "", "", "true");
+                }
+            }
         }
     } else if(event->type() == QEvent::HoverLeave) {
         foreach (QWidget *widget, QApplication::topLevelWidgets()) {

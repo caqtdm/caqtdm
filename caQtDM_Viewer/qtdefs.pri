@@ -80,8 +80,6 @@ ios | android {
 }
 ios {
   DEFINES += MOBILE_IOS
-# test mdi behaviour instead of overlapping windows
-#  DEFINES += MDITEST
 }
 android {
   DEFINES += MOBILE_ANDROID

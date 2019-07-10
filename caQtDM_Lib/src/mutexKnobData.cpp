@@ -230,7 +230,7 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w, int dataI
 
         // single value
         if(dataCount <= 1) {
-            //qDebug() << "updatesoftpv single" << ptr->index << "for name" << ptr->pv << "with value=" << value << "dataIndex=" << dataIndex << "dataCount=" << dataCount ;
+            //qDebug() << "updateSoftPV --  single" << ptr->index << "for name" << ptr->pv << "with value=" << value << "dataIndex=" << dataIndex << "dataCount=" << dataCount ;
             ptr->edata.rvalue = value;
             ptr->edata.connected = true;
 
@@ -245,7 +245,7 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w, int dataI
             }
             ptr->edata.dataSize = dataCount * (int) sizeof(double);
             ptr->edata.valueCount = dataCount;
-            //qDebug() << "updatesoftpv wave" << dataIndex << value << dataCount;
+            //qDebug() << "updateSoftPV -- pv" << pv << "wave dataindex" << dataIndex << "with value " << value << dataCount;
             double *data = (double *) ptr->edata.dataB;
             data[dataIndex] = value;
         }
