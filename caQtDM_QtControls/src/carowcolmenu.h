@@ -111,7 +111,7 @@ signals:
     void triggered(int indx);
 
 private:
-    enum {MAXITEMS = 16};
+    enum {MAXITEMS = 48};
     QList<EPushButton*> cellsP;
     QList<ImagePushButton*> cellsI;
     QGridLayout  *grid;
