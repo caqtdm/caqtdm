@@ -59,7 +59,7 @@ caRowColMenu::caRowColMenu(QWidget *parent) : QWidget(parent)
     cellsP.clear();
     cellsI.clear();
     signalMapper = new QSignalMapper(this);
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < MAXITEMS; i++) {
         EPushButton* temp =  new EPushButton(QString::number(i), this);
         temp->setFontScaleMode(thisScaleMode);
         temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
