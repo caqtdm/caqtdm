@@ -2279,7 +2279,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     // open and load ui file
                     file->setFileName(fileName);
                     file->open(QFile::ReadOnly);
-                    thisW = loader.load(file, this);
+                    if (level<CAQTDM_MAX_INCLUDE_LEVEL-1)
+                        thisW = loader.load(file, this);
                     file->close();
                     delete file;
 
@@ -4195,10 +4196,26 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         } else {
             CalcVisibility(w, result, valid);  // visibility not used, but calculation yes
             if(valid) {
-                if (!QString::compare(calcWidget->getVariable(), data.pv, Qt::CaseInsensitive)){
+                if (!QString::compare(calcWidget->getVariable(), data.pv, Qt::CaseSensitive)){
                     calcWidget->setValue(result);
                     mutexKnobDataP->UpdateSoftPV(data.pv, result, myWidget, 0, 1);
                     //qDebug() << "we have a caCalc" << calcWidget->getVariable() << "  " <<  data.pv;
+
+                    // be sure to update softchannels in the soft waves
+                    QList<caCalc *> all = myWidget->findChildren<caCalc *>();
+                    foreach(caCalc* w, all) {
+                        // when cacalc is a waveform composed from individual channels
+                        if(w->getVariableType() == caCalc::vector) {
+                            // get items of this waveform
+                            QList<QString> pvList = w->getPVList();
+                            for (int j = 0; j < pvList.size(); j++) {
+                                if (!QString::compare(calcWidget->getVariable(), pvList[j], Qt::CaseSensitive)) {
+                                    mutexKnobDataP->UpdateSoftPV(w->getVariable(), result, myWidget, j, pvList.count());
+                                }
+                            }
+                        }
+                    }
+
                 }
             }
         }
@@ -4325,12 +4342,6 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     menuWidget->setIndex((int) data.edata.ivalue);
                 }
 
-                if (menuWidget->getColorMode() == caMenu::Alarm) {
-                    menuWidget->setAlarmColors(data.edata.severity);
-                    // case of static mode
-                } else {
-                    SetColorsBack(menuWidget);
-                }
             // when mask specified, use it
             } else if(data.specData[0] == 1) {
                 switch (data.edata.fieldtype){
@@ -4344,6 +4355,14 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     }
                 }
             }
+            if (menuWidget->getColorMode() == caMenu::Alarm) {
+                menuWidget->setAlarmColors(data.edata.severity);
+                //printf("caMenu severity %i\n",data.edata.severity);
+                //fflush(stdout);
+            } else {
+                SetColorsBack(menuWidget);
+            }
+
         } else {
             SetColorsNotConnected(menuWidget);
         }
@@ -8210,19 +8229,24 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
 }
 
 #ifndef MOBILE
-// a popup can be displayed when hovering over a widget by taking from the property whatisthisw a popup ui file and a macro definition.
+// a popup can be displayed when hovering over a widget by taking from the dynamic property caqtdmPopupUI a popup ui file and a macro definition.
 // this will only work when the widget has at least one monitor and the file contains the character sequence popup
 bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::HoverEnter) {
         QWidget *w= (QWidget*) obj;
-        QString whatisthis = w->whatsThis().trimmed();
-        QStringList popupFields = whatisthis.split(";", QString::SkipEmptyParts);
-        if(popupFields.size() > 1) {
-            popupFields[1].replace("\"","");  // in case of macro surrounded by double quotes
-            if(popupFields[0].contains("popup")) emit Signal_OpenNewWFile(popupFields[0], popupFields[1], "", "true");
-        } else if(popupFields.size() > 0) {
-            if(popupFields[0].contains("popup")) emit Signal_OpenNewWFile(popupFields[0], "", "", "true");
+        QVariant dynVars = w->property("caqtdmPopupUI");
+        if(!dynVars.isNull()) {
+            if(dynVars.canConvert<QString>())  {
+                QString popupUI = dynVars.toString().trimmed();
+                QStringList popupFields = popupUI.split(";", QString::SkipEmptyParts);
+                if(popupFields.size() > 1) {
+                    popupFields[1].replace("\"","");  // in case of macro surrounded by double quotes
+                    if(popupFields[0].contains("popup")) emit Signal_OpenNewWFile(popupFields[0], popupFields[1], "", "true");
+                } else if(popupFields.size() > 0) {
+                    if(popupFields[0].contains("popup")) emit Signal_OpenNewWFile(popupFields[0], "", "", "true");
+                }
+            }
         }
     } else if(event->type() == QEvent::HoverLeave) {
         foreach (QWidget *widget, QApplication::topLevelWidgets()) {

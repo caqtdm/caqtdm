@@ -96,6 +96,11 @@
 #else
 #endif
 
+// 50 levels of includes should do it
+#define CAQTDM_MAX_INCLUDE_LEVEL 50
+
+
+
 namespace Ui {
 class CaQtDM_Lib;
 }
@@ -333,8 +338,8 @@ private:
     int level;
     QString cainclude_path;
     // 50 levels of includes should do it
-    QString savedMacro[50];
-    QString savedFile[50];
+    QString savedMacro[CAQTDM_MAX_INCLUDE_LEVEL];
+    QString savedFile[CAQTDM_MAX_INCLUDE_LEVEL];
 
 #ifndef MOBILE
     myQProcess *proc;

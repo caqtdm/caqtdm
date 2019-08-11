@@ -41,11 +41,6 @@
 #include <QScrollBar>
 #include <QFile>
 
-#ifdef MDITEST
-#include <QMdiArea>
-#include <QMdiSubWindow>
-#endif
-
 #ifdef MOBILE
 #include <QGuiApplication>
 #endif
@@ -305,9 +300,6 @@ private:
      int front;
      int rear;
      _blop empty;
-
-     QMdiArea *mdiArea;
-
  };
 
  #endif

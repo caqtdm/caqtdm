@@ -84,8 +84,8 @@ public:
     void setColors(QColor bg, QColor fg);
     void setAlarmColors(short status);
     void setNormalColors();
-
 public slots:
+    void alarmrewrite();
     void animation(QRect p) {
 #include "animationcode.h"
     }
@@ -96,7 +96,7 @@ public slots:
 
 protected:
      virtual bool event(QEvent *);
-
+     void paintEvent(QPaintEvent *);
 private:
     QString thisPV, thisMaskPV;
     QColor thisForeColor, oldForeColor;
@@ -105,12 +105,16 @@ private:
     QPalette thisPalette;
     bool thisLabelDisplay;
     int thisAccessW;
+    short alarmstatus;
     colMode  thisColorMode, oldColorMode;
     QPalette defaultPalette;
     QString thisStyle, oldStyle;
     QStringList nonMaskedStrings, maskedStrings;
     int thisMaskValue;
     bool isShown;
+    bool updateAlarmStatus_once_Later;
+    QColor updateAlarmStatus_bg;
+    QColor updateAlarmStatus_fg;
     bool eventFilter(QObject *obj, QEvent *event);
     int lastIndex;
 };
