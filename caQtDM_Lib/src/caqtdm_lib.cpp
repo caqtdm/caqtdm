@@ -2279,7 +2279,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     // open and load ui file
                     file->setFileName(fileName);
                     file->open(QFile::ReadOnly);
-                    thisW = loader.load(file, this);
+                    if (level<CAQTDM_MAX_INCLUDE_LEVEL-1)
+                        thisW = loader.load(file, this);
                     file->close();
                     delete file;
 

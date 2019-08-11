@@ -148,7 +148,7 @@ border-radius: 2px;
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -208,7 +208,7 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caLabel: &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;fontscalemode (none, width, width and height)&lt;/li&gt;
@@ -564,7 +564,7 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caGraphics: &lt;/span&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;different graphic entities:  rectangle, circle, arc, triangle, line, arrow&lt;/li&gt;
 &lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;can be rotated&lt;/li&gt;
@@ -1324,7 +1324,7 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caPolyline: &lt;/span&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;dedicated editor&lt;/li&gt;
 &lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;polyline and polygone (outlined or filled)&lt;/li&gt;&lt;/ul&gt;
@@ -1526,7 +1526,7 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caImage: &lt;/span&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;animated gif, when no frame specification through calc then goes through frames.&lt;/li&gt;
 &lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;animated gif, frame specification through channel.&lt;/li&gt;
@@ -2163,7 +2163,7 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caInclude: &lt;/span&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;include of ui files with macro expansion&lt;/li&gt;&lt;/ul&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;visibility depending on channels and calculation (like medm)&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -2173,7 +2173,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>3</x>
-          <y>233</y>
+          <y>165</y>
           <width>538</width>
           <height>226</height>
          </rect>
@@ -2265,7 +2265,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>180</x>
-          <y>200</y>
+          <y>132</y>
           <width>211</width>
           <height>21</height>
          </rect>
@@ -2350,6 +2350,71 @@ p, li { white-space: pre-wrap; }
         <property name="text">
          <string>include ui file (filename given by macro of frame 
 (can only be loaded at runtime)</string>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_107">
+        <property name="geometry">
+         <rect>
+          <x>213</x>
+          <y>398</y>
+          <width>211</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>include ui file (recursive_bad)</string>
+        </property>
+       </widget>
+       <widget class="caInclude" name="caInclude_10">
+        <property name="geometry">
+         <rect>
+          <x>109</x>
+          <y>420</y>
+          <width>341</width>
+          <height>155</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="macro">
+         <string notr="true"/>
+        </property>
+        <property name="filename" stdset="0">
+         <string notr="true">recursive_bad.ui</string>
+        </property>
+        <property name="stacking">
+         <enum>caInclude::RowColumn</enum>
+        </property>
+        <property name="numberOfItems" stdset="0">
+         <number>3</number>
+        </property>
+        <property name="maximumLines" stdset="0">
+         <number>2</number>
+        </property>
+        <property name="adjustSizeToContents" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="verticalSpacing" stdset="0">
+         <number>10</number>
+        </property>
+        <property name="horizontalSpacing" stdset="0">
+         <number>10</number>
+        </property>
+        <property name="frameShape">
+         <enum>caInclude::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+        <property name="frameLineWidth">
+         <number>4</number>
         </property>
        </widget>
       </widget>
@@ -2536,7 +2601,7 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caFrame: &lt;/span&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;can contain any widgets&lt;/li&gt;&lt;/ul&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;visibility depending on channels and calculation (like medm)&lt;/li&gt;
@@ -2908,8 +2973,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>100</width>
-           <height>30</height>
+           <width>431</width>
+           <height>197</height>
           </rect>
          </property>
          <attribute name="label">
@@ -3144,7 +3209,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_75">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3172,7 +3237,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_76">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3200,7 +3265,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_85">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3228,7 +3293,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_77">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3256,7 +3321,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_78">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3284,7 +3349,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_79">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3312,7 +3377,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_80">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3340,7 +3405,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_81">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3368,7 +3433,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_86">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3396,7 +3461,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_87">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3424,7 +3489,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_88">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3452,7 +3517,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_90">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3480,7 +3545,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_89">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3508,7 +3573,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_82">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3536,7 +3601,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_83">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3564,7 +3629,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_84">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3596,7 +3661,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_91">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3624,7 +3689,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_92">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3652,7 +3717,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_93">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3680,7 +3745,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_94">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3708,7 +3773,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_95">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3736,7 +3801,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_96">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3764,7 +3829,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_97">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3792,7 +3857,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_98">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3820,7 +3885,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_99">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3848,7 +3913,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_100">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3876,7 +3941,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_101">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3904,7 +3969,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_102">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3932,7 +3997,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_103">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3960,7 +4025,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_104">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3988,7 +4053,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_105">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4016,7 +4081,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_106">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4073,7 +4138,7 @@ p, li { white-space: pre-wrap; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>5</number>
+       <number>15</number>
       </property>
       <property name="usesScrollButtons">
        <bool>true</bool>
@@ -4099,7 +4164,7 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caLed: &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;led is used for bits display with two states or for alarm display with the usual alarm colors&lt;/li&gt;
@@ -4489,7 +4554,7 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caLinearGauge: &lt;/span&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;alarm colors given by values here (not convenient)&lt;/li&gt;
 &lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;limits can be given through hopr, lopr&lt;/li&gt;
@@ -4978,7 +5043,7 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caCircularGauge: &lt;/span&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;alarm colors given by values here (not convenient)&lt;/li&gt;
 &lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;limits can be given through hopr, lopr&lt;/li&gt;
@@ -5423,7 +5488,7 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caByte: &lt;/span&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;foreground, background, direction&lt;/li&gt;&lt;/ul&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;startBit, endBit&lt;/li&gt;
@@ -5547,7 +5612,7 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caLineEdit: &lt;/span&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;values display with or without unit&lt;/li&gt;
 &lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;alignment left, right, center justified&lt;/li&gt;
@@ -6535,7 +6600,7 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caLineDraw: &lt;/span&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;values display with or without unit&lt;/li&gt;
 &lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;alignment left, right, center justified&lt;/li&gt;
@@ -7719,7 +7784,7 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caMultiLineString: &lt;/span&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;display of char waveforms, enums and strings&lt;/li&gt;
 &lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;new line will be produced when carriage return (ascii code 13) is detected&lt;/li&gt;
@@ -7878,7 +7943,7 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caThermo: &lt;/span&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;bar monitor up, down, left, right&lt;/li&gt;
 &lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;with or without scale&lt;/li&gt;
@@ -9100,7 +9165,7 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caCartesianPlot: &lt;/span&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;foreground, background, scale and grid colors&lt;/li&gt;&lt;/ul&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;up to 6 curves with styles / colors / symbols / filled&lt;/li&gt;
@@ -9436,7 +9501,7 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caStripPlot: &lt;/span&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;foreground, background, scale and grid colors&lt;/li&gt;&lt;/ul&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;up to 5 curves with styles / colors / filled&lt;/li&gt;
@@ -9558,7 +9623,7 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caTable: &lt;/span&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; string with channelnames&lt;/li&gt;&lt;/ul&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;colormode, precisionmode, limitsmode&lt;/li&gt;
@@ -10049,7 +10114,7 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caBitNames: &lt;/span&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; 2 channels (one for enum string, one for value)&lt;/li&gt;&lt;/ul&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;startBit, endBit&lt;/li&gt;
@@ -10137,7 +10202,7 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caCamera: &lt;/span&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;channels for data, width, height, code and bpp&lt;/li&gt;&lt;/ul&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;zoom yes/no&lt;/li&gt;
@@ -10317,7 +10382,7 @@ QWidget {background: white;} </string>
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;Array of 4 values written by mouse action&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;1. xy_only : (0)=x, (1)=y&lt;/span&gt;&lt;/p&gt;
@@ -11254,8 +11319,8 @@ def PythonCalc(a, b, c, d):
        <widget class="caLabel" name="calabel_10">
         <property name="geometry">
          <rect>
-          <x>110</x>
-          <y>400</y>
+          <x>166</x>
+          <y>387</y>
           <width>171</width>
           <height>28</height>
          </rect>
@@ -11589,8 +11654,8 @@ def PythonCalc(a, b, c, d):
        <widget class="caCalc" name="cacalc_29">
         <property name="geometry">
          <rect>
-          <x>270</x>
-          <y>452</y>
+          <x>378</x>
+          <y>403</y>
           <width>71</width>
           <height>21</height>
          </rect>
@@ -11629,6 +11694,341 @@ def PythonCalc(a, b, c, d):
         <property name="channel" stdset="0">
          <string notr="true">ACM:COUNT:1</string>
         </property>
+       </widget>
+       <widget class="QFrame" name="frame_2">
+        <property name="geometry">
+         <rect>
+          <x>19</x>
+          <y>439</y>
+          <width>473</width>
+          <height>136</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <widget class="caCalc" name="cacalc_56">
+         <property name="geometry">
+          <rect>
+           <x>12</x>
+           <y>10</y>
+           <width>70</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="variable">
+          <string notr="true">calcarray1</string>
+         </property>
+         <property name="calc">
+          <string notr="true">A*0.02</string>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">ACM:COUNT:1</string>
+         </property>
+        </widget>
+        <widget class="caCalc" name="cacalc_57">
+         <property name="geometry">
+          <rect>
+           <x>12</x>
+           <y>30</y>
+           <width>70</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="variable">
+          <string notr="true">calcarray2</string>
+         </property>
+         <property name="calc">
+          <string notr="true">A*0.03</string>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">ACM:COUNT:1</string>
+         </property>
+        </widget>
+        <widget class="caCalc" name="cacalc_58">
+         <property name="geometry">
+          <rect>
+           <x>12</x>
+           <y>50</y>
+           <width>70</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="variable">
+          <string notr="true">calcarray3</string>
+         </property>
+         <property name="calc">
+          <string notr="true">A*0.04</string>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">ACM:COUNT:1</string>
+         </property>
+        </widget>
+        <widget class="caCalc" name="cacalc_59">
+         <property name="geometry">
+          <rect>
+           <x>12</x>
+           <y>70</y>
+           <width>70</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="variable">
+          <string notr="true">calcarray4</string>
+         </property>
+         <property name="calc">
+          <string notr="true">A*0.05</string>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">ACM:COUNT:1</string>
+         </property>
+        </widget>
+        <widget class="caCalc" name="cacalc_60">
+         <property name="geometry">
+          <rect>
+           <x>12</x>
+           <y>90</y>
+           <width>70</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="variable">
+          <string notr="true">calcarray5</string>
+         </property>
+         <property name="calc">
+          <string notr="true">A*0.06</string>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">ACM:COUNT:1</string>
+         </property>
+        </widget>
+        <widget class="caCalc" name="cacalc_61">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>10</y>
+           <width>70</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="variable">
+          <string notr="true">calcarray6</string>
+         </property>
+         <property name="calc">
+          <string notr="true">A*0.10</string>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">ACM:COUNT:1</string>
+         </property>
+        </widget>
+        <widget class="caCalc" name="cacalc_62">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>30</y>
+           <width>70</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="variable">
+          <string notr="true">calcarray7</string>
+         </property>
+         <property name="calc">
+          <string notr="true">A*0.11</string>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">ACM:COUNT:1</string>
+         </property>
+        </widget>
+        <widget class="caCalc" name="cacalc_63">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>50</y>
+           <width>70</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="variable">
+          <string notr="true">calcarray8</string>
+         </property>
+         <property name="calc">
+          <string notr="true">A*0.12</string>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">ACM:COUNT:1</string>
+         </property>
+        </widget>
+        <widget class="caCalc" name="cacalc_64">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>70</y>
+           <width>70</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="variable">
+          <string notr="true">calcarray9</string>
+         </property>
+         <property name="calc">
+          <string notr="true">A*0.13</string>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">ACM:COUNT:1</string>
+         </property>
+        </widget>
+        <widget class="caCalc" name="cacalc_65">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>90</y>
+           <width>70</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="variable">
+          <string notr="true">calcarray0</string>
+         </property>
+         <property name="calc">
+          <string notr="true">A*0.14</string>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">ACM:COUNT:1</string>
+         </property>
+        </widget>
+        <widget class="caCalc" name="cacalc_66">
+         <property name="geometry">
+          <rect>
+           <x>192</x>
+           <y>14</y>
+           <width>68</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="variable">
+          <string notr="true">vec_Calc1</string>
+         </property>
+         <property name="variableType">
+          <enum>caCalc::vector</enum>
+         </property>
+         <property name="channels" stdset="0">
+          <string>calcarray1;calcarray2;calcarray3;calcarray4;calcarray5;calcarray6;calcarray7;calcarray8;calcarray9;calcarray0;;</string>
+         </property>
+        </widget>
+        <widget class="caWaveTable" name="cawavetable_9">
+         <property name="geometry">
+          <rect>
+           <x>277</x>
+           <y>8</y>
+           <width>174</width>
+           <height>113</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">vec_Calc1</string>
+         </property>
+         <property name="numberOfRows">
+          <number>10</number>
+         </property>
+         <property name="numberOfColumns">
+          <number>1</number>
+         </property>
+         <row/>
+         <row/>
+         <row/>
+         <row/>
+         <row/>
+         <row/>
+         <row/>
+         <row/>
+         <row/>
+         <row/>
+         <column/>
+         <item row="0" column="0">
+          <property name="font">
+           <font/>
+          </property>
+          <property name="textAlignment">
+           <set>AlignLeft|AlignLeading</set>
+          </property>
+         </item>
+         <item row="1" column="0">
+          <property name="font">
+           <font/>
+          </property>
+          <property name="textAlignment">
+           <set>AlignLeft|AlignLeading</set>
+          </property>
+         </item>
+         <item row="2" column="0">
+          <property name="font">
+           <font/>
+          </property>
+          <property name="textAlignment">
+           <set>AlignLeft|AlignLeading</set>
+          </property>
+         </item>
+         <item row="3" column="0">
+          <property name="font">
+           <font/>
+          </property>
+          <property name="textAlignment">
+           <set>AlignLeft|AlignLeading</set>
+          </property>
+         </item>
+         <item row="4" column="0">
+          <property name="font">
+           <font/>
+          </property>
+          <property name="textAlignment">
+           <set>AlignLeft|AlignLeading</set>
+          </property>
+         </item>
+         <item row="5" column="0">
+          <property name="font">
+           <font/>
+          </property>
+          <property name="textAlignment">
+           <set>AlignLeft|AlignLeading</set>
+          </property>
+         </item>
+         <item row="6" column="0">
+          <property name="font">
+           <font/>
+          </property>
+          <property name="textAlignment">
+           <set>AlignLeft|AlignLeading</set>
+          </property>
+         </item>
+         <item row="7" column="0">
+          <property name="font">
+           <font/>
+          </property>
+          <property name="textAlignment">
+           <set>AlignLeft|AlignLeading</set>
+          </property>
+         </item>
+         <item row="8" column="0">
+          <property name="font">
+           <font/>
+          </property>
+          <property name="textAlignment">
+           <set>AlignLeft|AlignLeading</set>
+          </property>
+         </item>
+         <item row="9" column="0">
+          <property name="font">
+           <font/>
+          </property>
+          <property name="textAlignment">
+           <set>AlignLeft|AlignLeading</set>
+          </property>
+         </item>
+        </widget>
        </widget>
       </widget>
       <widget class="QWidget" name="tab_30">
@@ -12059,7 +12459,7 @@ def PythonCalc(a, b, c, d):
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;caNumeric &amp;amp; caApplyNumeric: &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Sans Serif'; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;font can adapt to widget size&lt;/li&gt;
@@ -13706,7 +14106,7 @@ p, li { white-space: pre-wrap; }
          <string notr="true">ACM:TEST:MBBO</string>
         </property>
         <property name="styleSheet" stdset="0">
-         <string notr="true">caMenu {background-color: rgba(255, 248, 220, 255); color: rgba(0, 0, 0, 255);padding: 1px 18px 1px 3px;min-width: 6em;}</string>
+         <string notr="true"/>
         </property>
        </widget>
        <widget class="caMenu" name="caMenu_10">
@@ -13766,7 +14166,7 @@ p, li { white-space: pre-wrap; }
          <string>myMask</string>
         </property>
         <property name="styleSheet" stdset="0">
-         <string notr="true">caMenu {background-color: rgba(255, 248, 220, 255); color: rgba(0, 0, 0, 255);padding: 1px 18px 1px 3px;min-width: 6em;}</string>
+         <string notr="true"/>
         </property>
        </widget>
        <widget class="caCalc" name="cacalc_53">
@@ -17898,7 +18298,7 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
      <x>0</x>
      <y>0</y>
      <width>1090</width>
-     <height>22</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
