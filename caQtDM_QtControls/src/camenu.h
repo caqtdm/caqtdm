@@ -96,7 +96,6 @@ public slots:
 
 protected:
      virtual bool event(QEvent *);
-     void paintEvent(QPaintEvent *);
 private:
     QString thisPV, thisMaskPV;
     QColor thisForeColor, oldForeColor;

@@ -343,11 +343,4 @@ bool caMenu::event(QEvent *e)
     return QComboBox::event(e);
 }
 
-void caMenu::paintEvent(QPaintEvent *)
-{
-    QStyleOption opt;
-    opt.init(this);
-    QPainter painter(this);
-    style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
-}
 
