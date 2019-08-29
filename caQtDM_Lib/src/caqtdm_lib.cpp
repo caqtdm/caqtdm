@@ -351,9 +351,17 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         if(filename.lastIndexOf(".ui") != -1) {
 
             file->open(QFile::ReadOnly);
+            //symtomatic AFS check
+            if (!file->isOpen()){
+                postMessage(QtDebugMsg, (char*) qasc(tr("can't open file %1 ").arg(filename)));
+            }else{
+                if (file->size()==0){
+                    postMessage(QtDebugMsg, (char*) qasc(tr("file %1 has size zero ").arg(filename)));
+                }else{
 
-            myWidget = loader.load(file, this);
-
+                    myWidget = loader.load(file, this);
+                }
+            }
             if (!myWidget) {
                 QMessageBox::warning(this, tr("caQtDM"), tr("Error loading %1. Use designer to find errors").arg(filename));
                 file->close();
@@ -2279,9 +2287,19 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     // open and load ui file
                     file->setFileName(fileName);
                     file->open(QFile::ReadOnly);
-                    if (level<CAQTDM_MAX_INCLUDE_LEVEL-1)
-                        thisW = loader.load(file, this);
-                    file->close();
+                    //symtomatic AFS check
+                    if (!file->isOpen()){
+                        postMessage(QtDebugMsg, (char*) qasc(tr("can't open file %1 ").arg(fileName)));
+                    }else{
+                        if (file->size()==0){
+                            postMessage(QtDebugMsg, (char*) qasc(tr("file %1 has size zero ").arg(fileName)));
+                        }else{
+                            if (level<CAQTDM_MAX_INCLUDE_LEVEL-1)
+                                thisW = loader.load(file, this);
+                        }
+                        file->close();
+                    }
+
                     delete file;
 
 #if !defined(useElapsedTimer)
