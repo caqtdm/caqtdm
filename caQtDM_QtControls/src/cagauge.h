@@ -30,9 +30,9 @@
 
 class QTCON_EXPORT caAbstractGauge : public EAbstractGauge
 {
-
- Q_PROPERTY(QString channel READ getPV WRITE setPV)
  Q_OBJECT
+ Q_PROPERTY(QString channel READ getPV WRITE setPV)
+
 
 public:
 

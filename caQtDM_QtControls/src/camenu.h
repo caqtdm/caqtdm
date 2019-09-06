@@ -30,6 +30,8 @@
 
 class QTCON_EXPORT caMenu : public QComboBox
 {
+    Q_OBJECT
+
     Q_ENUMS(colMode)
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
 
@@ -43,7 +45,7 @@ class QTCON_EXPORT caMenu : public QComboBox
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
-    Q_OBJECT
+
 
 #include "caElevation.h"
 
