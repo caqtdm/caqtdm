@@ -38,6 +38,7 @@
 #include <QToolBar>
 #include <QUuid>
 #include <QHostInfo>
+#include <QMutableListIterator>
 
 // interfacing widgets, handling their own data acquisition ... (thanks zai)
 #include "caWidgetInterface.h"
@@ -358,8 +359,15 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
                 if (file->size()==0){
                     postMessage(QtDebugMsg, (char*) qasc(tr("file %1 has size zero ").arg(filename)));
                 }else{
+                    QBuffer *buffer = new QBuffer();
+                    buffer->open(QIODevice::ReadWrite);
+                    buffer->write(file->readAll());
 
-                    myWidget = loader.load(file, this);
+                    buffer->seek(0);
+
+                    myWidget = loader.load(buffer, this);
+                    delete buffer;
+                    //qDebug() << "load= " << filename;
                 }
             }
             if (!myWidget) {
@@ -973,6 +981,13 @@ QMap<QString, QString> CaQtDM_Lib::createMap(const QString& macro)
 
 void CaQtDM_Lib::scanWidgets(QList<QWidget*> list, QString macro)
 {
+    QMutableListIterator<QWidget*> i(list);
+    while (i.hasNext()) {
+        QString className(i.next()->metaObject()->className());
+        if (className.contains("EPushButton")) i.remove();
+    }
+
+
     // get first all primary softs (inorder that pv working on their own value will always be treated first
     //qDebug() << " ------------ first pass treat softs being involved in itsself (incrementing)";
     foreach(QWidget *w1, list) {
@@ -981,12 +996,12 @@ void CaQtDM_Lib::scanWidgets(QList<QWidget*> list, QString macro)
     //qDebug() << " ------------ first pass other softs";
     // other softpvs
     foreach(QWidget *w1, list) {
-        HandleWidget(w1, macro, true, false);
+            HandleWidget(w1, macro, true, false);
     }
     // other pvs
     //qDebug() << " ------------ no first pass other stuff";
     foreach(QWidget *w1, list) {
-        HandleWidget(w1, macro, false, false);
+            HandleWidget(w1, macro, false, false);
     }
 }
 
@@ -2294,8 +2309,27 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                         if (file->size()==0){
                             postMessage(QtDebugMsg, (char*) qasc(tr("file %1 has size zero ").arg(fileName)));
                         }else{
-                            if (level<CAQTDM_MAX_INCLUDE_LEVEL-1)
-                                thisW = loader.load(file, this);
+                            if (level<CAQTDM_MAX_INCLUDE_LEVEL-1){
+                                QBuffer *buffer = new QBuffer();
+                                buffer->open(QIODevice::ReadWrite);
+                                //QByteArray data=file->readAll();
+                                buffer->write(file->readAll());
+
+                                //QCryptographicHash md5Gen(QCryptographicHash::Md5);
+                                //md5Gen.addData(data);
+
+                                buffer->seek(0);
+
+                                thisW = loader.load(buffer, this);
+
+                                //qDebug() << "iload= " << fileName << buffer->size() << md5Gen.result().toHex();
+                                //qDebug() << thisW->findChildren<QWidget *>();
+                                //foreach(QWidget *w1, thisW->findChildren<QWidget *>()) {
+                                //  qDebug() << w1->metaObject()->className();
+                                //}
+
+                                delete buffer;
+                            }
                         }
                         file->close();
                     }
