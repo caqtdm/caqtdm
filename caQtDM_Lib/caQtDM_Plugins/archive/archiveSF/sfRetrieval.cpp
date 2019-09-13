@@ -283,7 +283,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
                             char *channel = new char[data.size()+1];
                             sprintf(channel,"%ls", data.c_str());
                             //qDebug()<< "channel name found" << root0[L"name"]->AsString().c_str() << channel;
-                            delete channel;
+                            delete[] channel;
                         }
 
                         // get backend name
@@ -295,7 +295,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
                             Backend = QString(backend);
                             Backend = Backend.replace("\"", "");
                             //qDebug()<< "backend name found" << root0[L"backend"]->AsString().c_str() << backend;
-                            delete backend;
+                            delete[] backend;
                         }
                         delete value2;
                     }

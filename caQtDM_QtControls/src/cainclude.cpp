@@ -353,14 +353,23 @@ void caInclude::setFileName(QString const &filename)
             int posX = 0;
             int posY = 0;
             QWidget * loadedWidget = (QWidget *) 0;
+            QWidget * tmp = (QWidget *) 0;
             if(!fileName.contains(".prc")) {
                 // load new file
                 QFile *file = new QFile;
                 file->setFileName(fileNameFound);
                 file->open(QFile::ReadOnly);
-
-                printf("effective load of file %s for widget %s\n", qasc(fileNameFound), qasc(this->objectName()));
-                QWidget *tmp = loader.load(file, thisParent);
+                //symtomatic AFS check
+                if (!file->isOpen()){
+                    printf("can't open file %s\n",qasc(fileName));
+                }else{
+                    if (file->size()==0){
+                        printf("file %s has size zero \n",qasc(fileName));
+                    }else{
+                        printf("effective load of file %s for widget %s\n", qasc(fileNameFound), qasc(this->objectName()));
+                        tmp = loader.load(file, thisParent);
+                    }
+                }
 
                 file->close();
                 delete file;

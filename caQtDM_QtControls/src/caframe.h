@@ -31,6 +31,7 @@
 
 class QTCON_EXPORT caFrame : public QFrame
 {
+    Q_OBJECT
     Q_PROPERTY(QString macro READ getMacro WRITE setMacro)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
     Q_PROPERTY(BackgroundMode backgroundMode READ getBackgroundMode WRITE setBackgroundMode)
@@ -50,7 +51,7 @@ class QTCON_EXPORT caFrame : public QFrame
     Q_ENUMS(VisibilityMode)
     Q_ENUMS(BackgroundMode)
 
-    Q_OBJECT
+
 
 public:
     void noStyle(QString style) {Q_UNUSED(style);}

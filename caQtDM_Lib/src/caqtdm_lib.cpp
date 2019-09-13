@@ -38,6 +38,7 @@
 #include <QToolBar>
 #include <QUuid>
 #include <QHostInfo>
+#include <QMutableListIterator>
 
 // interfacing widgets, handling their own data acquisition ... (thanks zai)
 #include "caWidgetInterface.h"
@@ -99,6 +100,10 @@
 #define INPUTDIALOG 	"Input Dialog"
 #define FILEDIALOG      "File Dialog"
 #define CHANGELIMITS 	"Change Limits/Precision"
+
+
+#define POPUPDEFENITION "popup.ui"
+
 
 // used for calculating visibility for several types of widgets
 #define ComputeVisibility(x, obj)  {  \
@@ -351,9 +356,24 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         if(filename.lastIndexOf(".ui") != -1) {
 
             file->open(QFile::ReadOnly);
+            //symtomatic AFS check
+            if (!file->isOpen()){
+                postMessage(QtDebugMsg, (char*) qasc(tr("can't open file %1 ").arg(filename)));
+            }else{
+                if (file->size()==0){
+                    postMessage(QtDebugMsg, (char*) qasc(tr("file %1 has size zero ").arg(filename)));
+                }else{
+                    QBuffer *buffer = new QBuffer();
+                    buffer->open(QIODevice::ReadWrite);
+                    buffer->write(file->readAll());
 
-            myWidget = loader.load(file, this);
+                    buffer->seek(0);
 
+                    myWidget = loader.load(buffer, this);
+                    delete buffer;
+                    //qDebug() << "load= " << filename;
+                }
+            }
             if (!myWidget) {
                 QMessageBox::warning(this, tr("caQtDM"), tr("Error loading %1. Use designer to find errors").arg(filename));
                 file->close();
@@ -501,7 +521,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         }
     }
 
-    if(nbIncludes > 0 && !thisFileFull.contains("popup")) {
+    if(nbIncludes > 0 && !thisFileFull.contains(POPUPDEFENITION)) {
         splash = new SplashScreen(parent);
         splash->setMaximum(nbIncludes);
         splash->show();
@@ -559,7 +579,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     // due to crash in connection with the splash screen, changed
     // these instructions to the botton of this class
-    if(nbIncludes > 0 && !thisFileFull.contains("popup")) {
+    if(nbIncludes > 0 && !thisFileFull.contains(POPUPDEFENITION)) {
         Sleep::msleep(200);
         // this seems to causes the crash and is not really needed here?
         //splash->finish(this);
@@ -965,6 +985,13 @@ QMap<QString, QString> CaQtDM_Lib::createMap(const QString& macro)
 
 void CaQtDM_Lib::scanWidgets(QList<QWidget*> list, QString macro)
 {
+    QMutableListIterator<QWidget*> i(list);
+    while (i.hasNext()) {
+        QString className(i.next()->metaObject()->className());
+        if (className.contains("EPushButton")) i.remove();
+    }
+
+
     // get first all primary softs (inorder that pv working on their own value will always be treated first
     //qDebug() << " ------------ first pass treat softs being involved in itsself (incrementing)";
     foreach(QWidget *w1, list) {
@@ -973,12 +1000,12 @@ void CaQtDM_Lib::scanWidgets(QList<QWidget*> list, QString macro)
     //qDebug() << " ------------ first pass other softs";
     // other softpvs
     foreach(QWidget *w1, list) {
-        HandleWidget(w1, macro, true, false);
+            HandleWidget(w1, macro, true, false);
     }
     // other pvs
     //qDebug() << " ------------ no first pass other stuff";
     foreach(QWidget *w1, list) {
-        HandleWidget(w1, macro, false, false);
+            HandleWidget(w1, macro, false, false);
     }
 }
 
@@ -2279,9 +2306,38 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     // open and load ui file
                     file->setFileName(fileName);
                     file->open(QFile::ReadOnly);
-                    if (level<CAQTDM_MAX_INCLUDE_LEVEL-1)
-                        thisW = loader.load(file, this);
-                    file->close();
+                    //symtomatic AFS check
+                    if (!file->isOpen()){
+                        postMessage(QtDebugMsg, (char*) qasc(tr("can't open file %1 ").arg(fileName)));
+                    }else{
+                        if (file->size()==0){
+                            postMessage(QtDebugMsg, (char*) qasc(tr("file %1 has size zero ").arg(fileName)));
+                        }else{
+                            if (level<CAQTDM_MAX_INCLUDE_LEVEL-1){
+                                QBuffer *buffer = new QBuffer();
+                                buffer->open(QIODevice::ReadWrite);
+                                //QByteArray data=file->readAll();
+                                buffer->write(file->readAll());
+
+                                //QCryptographicHash md5Gen(QCryptographicHash::Md5);
+                                //md5Gen.addData(data);
+
+                                buffer->seek(0);
+
+                                thisW = loader.load(buffer, this);
+
+                                //qDebug() << "iload= " << fileName << buffer->size() << md5Gen.result().toHex();
+                                //qDebug() << thisW->findChildren<QWidget *>();
+                                //foreach(QWidget *w1, thisW->findChildren<QWidget *>()) {
+                                //  qDebug() << w1->metaObject()->className();
+                                //}
+
+                                delete buffer;
+                            }
+                        }
+                        file->close();
+                    }
+
                     delete file;
 
 #if !defined(useElapsedTimer)
@@ -2443,7 +2499,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         }
 
         // increment splashcounter when include is in list
-        if(nbIncludes > 0 && !thisFileFull.contains("popup")) {
+        if(nbIncludes > 0 && !thisFileFull.contains(POPUPDEFENITION)) {
             for (int i = topIncludesWidgetList.count()-1; i >= 0; --i) {
                 if(w1 ==  topIncludesWidgetList.at(i)) {
                     splash->setProgress(splashCounter++);
@@ -3037,7 +3093,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         w1->grabGesture(Qt::TapAndHoldGesture);
         w1->installEventFilter(this);
 #else
-        if(nbMonitors> 0 && !thisFileFull.contains("popup")) w1->installEventFilter(this);
+        if(nbMonitors> 0 && !thisFileFull.contains(POPUPDEFENITION)) w1->installEventFilter(this);
 #endif
     }
 
@@ -8242,9 +8298,9 @@ bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
                 QStringList popupFields = popupUI.split(";", QString::SkipEmptyParts);
                 if(popupFields.size() > 1) {
                     popupFields[1].replace("\"","");  // in case of macro surrounded by double quotes
-                    if(popupFields[0].contains("popup")) emit Signal_OpenNewWFile(popupFields[0], popupFields[1], "", "true");
+                    if(popupFields[0].contains(POPUPDEFENITION)) emit Signal_OpenNewWFile(popupFields[0], popupFields[1], "", "true");
                 } else if(popupFields.size() > 0) {
-                    if(popupFields[0].contains("popup")) emit Signal_OpenNewWFile(popupFields[0], "", "", "true");
+                    if(popupFields[0].contains(POPUPDEFENITION)) emit Signal_OpenNewWFile(popupFields[0], "", "", "true");
                 }
             }
         }
@@ -8253,7 +8309,7 @@ bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
             if (CaQtDM_Lib *w = qobject_cast<CaQtDM_Lib *>(widget)) {
                 QVariant fileName = w->property("fileString");
                 QString qs = fileName.toString();
-                if(qs.contains("popup.ui")) {
+                if(qs.contains(POPUPDEFENITION)) {
                     w->closeWindow();
                 }
             }
@@ -8263,7 +8319,7 @@ bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
             if (CaQtDM_Lib *w = qobject_cast<CaQtDM_Lib *>(widget)) {
                 QVariant fileName = w->property("fileString");
                 QString qs = fileName.toString();
-                if(qs.contains("popup.ui")) {
+                if(qs.contains(POPUPDEFENITION)) {
                     Qt::WindowFlags flags = Qt::ToolTip;
                     flags |= Qt::FramelessWindowHint;
                     w->setWindowFlags(flags);

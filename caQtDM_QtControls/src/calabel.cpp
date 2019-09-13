@@ -38,13 +38,13 @@ caLabel::caLabel(QWidget *parent) : ESimpleLabel(parent)
     thisForeColor = Qt::black;
     thisBackColorOld = QColor(255,255,255,0);
     thisForeColorOld = Qt::black;
-    setBorderWidth (0);
+
     thisBorderWidthOld = 0;
     thisColorMode=Static;
     oldColorMode =Static;
 
     renewStyleSheet = true;
-
+    setBorderWidth (0);
     setColorMode(Static);
     thisVisibility = StaticV;
 }
