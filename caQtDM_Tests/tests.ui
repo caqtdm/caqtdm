@@ -11937,6 +11937,9 @@ def PythonCalc(a, b, c, d):
          <property name="numberOfColumns">
           <number>1</number>
          </property>
+         <property name="precision">
+          <number>3</number>
+         </property>
          <row/>
          <row/>
          <row/>
