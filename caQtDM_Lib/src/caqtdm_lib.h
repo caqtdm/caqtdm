@@ -330,6 +330,7 @@ private:
     QList<QWidget*> topIncludesWidgetList;
     QList<QTabWidget *> allTabs;
     QList<QStackedWidget *> allStacks;
+    QList<caCalc *> allCalcs_Vectors;
 
     QMap<QString, QString> unknownMacrosList;
     QTableWidget* macroTable;

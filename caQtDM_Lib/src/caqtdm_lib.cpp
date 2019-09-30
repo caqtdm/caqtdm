@@ -292,6 +292,7 @@ CaQtDM_Lib::~CaQtDM_Lib()
     includeWidgetList.clear();
     topIncludesWidgetList.clear();
     includeFilesList.clear();
+    allCalcs_Vectors.clear();
     allTabs.clear();
     allStacks.clear();
 }
@@ -503,6 +504,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     topIncludesWidgetList.clear();
     allTabs.clear();
     allStacks.clear();
+    allCalcs_Vectors.clear();
     cartesianGroupList.clear();
     cartesianList.clear();
     stripGroupList.clear();
@@ -546,6 +548,17 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     foreach(QStackedWidget* widget, allStacks) {
         connect(widget, SIGNAL(currentChanged(int)), this, SLOT(Callback_TabChanged(int)));
     }
+    // setup changeevent for QStackedWidgets
+    allCalcs_Vectors.clear();
+    QList<caCalc *> allCalcs = myWidget->findChildren<caCalc *>();
+    foreach(caCalc* w, allCalcs) {
+        // when cacalc is a waveform composed from individual channels
+        if(w->getVariableType() == caCalc::vector) {
+            allCalcs_Vectors.append(w);
+        }
+    }
+
+
 
     // scan cartesianplots and find groups != 0; compose a list with the groups, and a map with the group key
     QList<caCartesianPlot *> allCarts = myWidget->findChildren<caCartesianPlot *>();
@@ -4258,10 +4271,11 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     //qDebug() << "we have a caCalc" << calcWidget->getVariable() << "  " <<  data.pv;
 
                     // be sure to update softchannels in the soft waves
-                    QList<caCalc *> all = myWidget->findChildren<caCalc *>();
-                    foreach(caCalc* w, all) {
-                        // when cacalc is a waveform composed from individual channels
-                        if(w->getVariableType() == caCalc::vector) {
+
+                    //QList<caCalc *> all = myWidget->findChildren<caCalc *>();
+                    if (allCalcs_Vectors.count()>0){
+                        foreach(caCalc* w, allCalcs_Vectors) {
+                            // when cacalc is a waveform composed from individual channels
                             // get items of this waveform
                             QList<QString> pvList = w->getPVList();
                             for (int j = 0; j < pvList.size(); j++) {
@@ -4271,7 +4285,6 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                             }
                         }
                     }
-
                 }
             }
         }
