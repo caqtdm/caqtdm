@@ -140,7 +140,7 @@ void sfRetrieval::cancelDownload()
     }
 
     downloadFinished();
-    deleteLater();
+    //deleteLater();
 }
 
 int sfRetrieval::downloadFinished()

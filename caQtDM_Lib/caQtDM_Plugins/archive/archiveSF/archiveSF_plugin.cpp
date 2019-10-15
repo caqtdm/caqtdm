@@ -80,8 +80,13 @@ void ArchiveSF_Plugin::Callback_AbortOutstandingRequests(QString key)
         tmpThread = (myThread *) j.value();
         if(tmpThread != (myThread *) 0) {
             sfRetrieval *retrieval = tmpThread->getArchive();
-            if(retrieval != (sfRetrieval *) 0) retrieval->cancelDownload();
             tmpThread->quit();
+            if(retrieval != (sfRetrieval *) 0){
+                //qDebug()  << "retrieval->cancelDownload()"<< retrieval;
+                retrieval->cancelDownload();
+                retrieval->deleteLater();
+            }
+
         }
         ++j;
     }
