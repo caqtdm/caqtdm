@@ -283,6 +283,7 @@ epics4_plugin {
                     message("epics4_plugin (with epics version 7) configuration win32")
                     CONFIG +=Define_Build_caQtDM_Lib Define_Build_qtcontrols
                     CONFIG +=Define_Build_epicsPV_controls Define_Build_epics_controls
+                    CONFIG +=Define_Symbols
 		  }
  		
  
