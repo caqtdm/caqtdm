@@ -27,18 +27,18 @@
 using namespace std;
 
 
-#include "callbackThread.h"
+#include "epics4_callbackThread.h"
 
 namespace epics { namespace pvData {
 
-CallbackThread::~CallbackThread()
+epics4_CallbackThread::~epics4_CallbackThread()
 {
 cout << "CallbackThread::~CallbackThread()\n";
-    stop();
+
 cout << "CallbackThread::~CallbackThread() returning\n";
 }
 
-void CallbackThread::run()
+void epics4_CallbackThread::run()
 {
     CallbackRequesterPtr callbackRequester;
     while(true) 

@@ -34,23 +34,23 @@
 namespace epics { namespace pvData {
 
 
-class CallbackThread;
-typedef std::tr1::shared_ptr<CallbackThread> CallbackThreadPtr;
+class epics4_CallbackThread;
+typedef std::tr1::shared_ptr<epics4_CallbackThread> CallbackThreadPtr;
 
-class CallbackRequester;
-typedef std::tr1::shared_ptr<CallbackRequester> CallbackRequesterPtr;
+class epics4_CallbackRequester;
+typedef std::tr1::shared_ptr<epics4_CallbackRequester> CallbackRequesterPtr;
 
-class epicsShareClass CallbackRequester
+class epicsShareClass epics4_CallbackRequester
 {
 public:
-    virtual ~CallbackRequester(){}
+    virtual ~epics4_CallbackRequester(){}
     virtual void callback() = 0;
 };
 
-class CallbackThread;
-typedef std::tr1::shared_ptr<CallbackThread> CallbackThreadPtr;
+class epics4_CallbackThread;
+typedef std::tr1::shared_ptr<epics4_CallbackThread> CallbackThreadPtr;
 
-class epicsShareClass  CallbackThread :
+class epicsShareClass  epics4_CallbackThread :
     public epicsThreadRunable
 {
     std::queue<CallbackRequesterPtr> monitorQueue;
@@ -59,8 +59,8 @@ class epicsShareClass  CallbackThread :
     epics::pvData::Event runStop;
     epics::pvData::Event runReturn;
 public:
-    POINTER_DEFINITIONS(CallbackThread);
-    ~CallbackThread();
+    POINTER_DEFINITIONS(epics4_CallbackThread);
+    ~epics4_CallbackThread();
     virtual void run();
     void startThread()
     {
@@ -78,7 +78,7 @@ public:
     }
     static CallbackThreadPtr create()
     {
-         CallbackThreadPtr t(new CallbackThread());
+         CallbackThreadPtr t(new epics4_CallbackThread());
          t->startThread();
          return t;
     } 
@@ -88,7 +88,7 @@ public:
         runReturn.wait();
     }
 private:
-    CallbackThread()
+    epics4_CallbackThread()
     {}
 };
 

@@ -149,7 +149,7 @@ typedef std::tr1::shared_ptr<PVAMonitorRequester> PVAMonitorRequesterPtr;
 typedef std::tr1::weak_ptr<PVAMonitorRequester> PVAMonitorRequesterWPtr;
 
 class epicsShareClass PVAInterface :
-    public CallbackRequester,
+    public epics4_CallbackRequester,
     public std::tr1::enable_shared_from_this<PVAInterface>
 {
 private:
@@ -1727,7 +1727,7 @@ int Epics4Plugin::initCommunicationLayer(MutexKnobData *mutexKnobDataP, MessageW
     mutexKnobData = mutexKnobDataP;
     ClientFactory::start();
     CAClientFactory::start();
-    callbackThread = CallbackThread::create();
+    epics4_callbackThread = epics4_CallbackThread::create();
     requester = Epics4RequesterPtr(new Epics4Requester(messageWindow));
     if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::initCommunicationLayer return true\n";
     return true;
@@ -1770,13 +1770,13 @@ int Epics4Plugin::pvAddMonitor(int index, knobData *kData, int rate, int skip)
         }
     }
     if(!foundit) {
-        pvaChannel = PVAChannelPtr(new PVAChannel(fullname,requester,callbackThread));
+        pvaChannel = PVAChannelPtr(new PVAChannel(fullname,requester,epics4_callbackThread));
         pvaChannel->connect(channelName,providerName);
         pvaChannelMap.insert(std::pair<string,PVAChannelWPtr>(fullname,pvaChannel));
         if(Epics4Plugin::getDebug())cout << "created new and called connect\n";
     }
     PVAInterfacePtr pvaInterface(
-         new PVAInterface(pvaChannel, mutexKnobData,index,requester,callbackThread));
+         new PVAInterface(pvaChannel, mutexKnobData,index,requester,epics4_callbackThread));
     pvaInterfaceGlue = new PVAInterfaceGlue(pvaInterface);
     kData->edata.info = pvaInterfaceGlue;
     C_SetMutexKnobData(mutexKnobData, index, *kData);
@@ -1924,7 +1924,10 @@ Epics4Plugin::setDebug(true);
     ClientFactory::stop();
     if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::TerminateIO calling CAClientFactory::stop();\n";
     CAClientFactory::stop();
+    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::TerminateIO calling epics4_callbackThread->stop();\n";
+    epics4_callbackThread->stop();
     if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::TerminateIO returning true;\n";
+
     return true;
 }
 
