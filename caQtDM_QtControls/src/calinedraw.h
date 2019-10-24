@@ -168,6 +168,9 @@ public:
     void setFormatString(const QString m) { thisFormatUserString = m; }
     QString getFormatString() {return thisFormatUserString;}
 
+signals:
+    void textChanged(QString);
+
 public slots:
     void animation(QRect p) {
 #include "animationcode.h"

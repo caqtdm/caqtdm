@@ -548,6 +548,7 @@ void caLineDraw::setValue(double value, const QString& units)
         strcat(asc, qasc(units));
     }
     setText(asc);
+    emit textChanged(QString(asc));
 }
 
 // caWidgetInterface implementation
