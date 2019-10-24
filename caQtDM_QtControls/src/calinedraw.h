@@ -202,7 +202,7 @@ private:
     SourceMode m_LimitsMode;
     FormatType m_FormatType;
     QString m_Text;
-    char m_Format[20];
+    char m_Format[MAX_STRING_LENGTH];
     char m_FormatC[20];
     short m_AlarmState;
     QColor m_bgAtInitLast;
