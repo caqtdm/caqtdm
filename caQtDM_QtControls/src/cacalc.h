@@ -148,6 +148,8 @@ private:
     varType thisVarType;
     QColor m_ForeColor;
     QColor m_BackColor;
+    bool checkSignal_value_bool;
+    int  checkSignal_value_int;
 };
 
 #endif // CACALC_H
