@@ -53,6 +53,9 @@ caCalc::caCalc( QWidget *parent ) :  ESimpleLabel(parent)
 
     thisEventSignal = Never;
     eventFired = false;
+    checkSignal_value_bool=false;
+    checkSignal_value_int=0;
+
 }
 
 void caCalc::setValue(double value)
@@ -77,9 +80,16 @@ void caCalc::setValue(double value)
         }
         eventFired = true;
     } else if(thisEventSignal == onAnyChange) {
-        emit emitSignal((int) value);
         emit emitSignal(value);
-        emit emitSignal((bool) value);
+        if ((!eventFired)||(checkSignal_value_int!=(int) value)){
+            checkSignal_value_int = (int) value;
+            emit emitSignal((int) value);
+        }
+        if ((!eventFired)||(checkSignal_value_bool!=(bool) value)){
+            checkSignal_value_bool = (bool) value;
+            emit emitSignal((bool) value);
+        }
+        eventFired = true;
     } else if(thisEventSignal == TriggerZeroToOne) {
         if((qRound(thisValue) == 0) && (qRound(value) == 1)) {
             emit emitSignal((int) value);
