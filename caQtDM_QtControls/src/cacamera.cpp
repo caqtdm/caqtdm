@@ -54,6 +54,11 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     m_widthDefined = false;
     m_heightDefined = false;
     m_datatype = -1;
+    m_MinLevel = -1;
+    m_MaxLevel = -1;
+    m_zoom_value = 52; //value see widget init
+    m_verticalScroll = -1;
+    m_horizontalScroll = -1;
 
     rgb = (uint*) 0;
 
@@ -651,7 +656,9 @@ void caCamera::setup()
         // connect buttons and slider
         connect(zoomInIcon, SIGNAL(clicked()), this, SLOT(zoomIn()));
         connect(zoomOutIcon, SIGNAL(clicked()), this, SLOT(zoomOut()));
-        connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomNow()));
+        //connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomNow()));
+        connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(setZoomSlider(int)));
+
 
         // add everything to main layout
         mainLayout->addWidget(valuesWidget, 0, 0);
@@ -678,29 +685,86 @@ void caCamera::scrollAreaMoved(int)
     if(image != (QImage *) 0)  imageW->update();
 }
 
+
+void caCamera::setAutoLevel(bool enable){
+
+    if (thisInitialAutomatic!=enable){
+        thisInitialAutomatic=enable;
+        if(autoW != (QCheckBox *) nullptr) {
+            if(enable) {autoW->setCheckState(Qt::Checked);}
+            else {autoW->setCheckState(Qt::Unchecked);}
+        }
+    }
+}
+
+
+
+void caCamera::setZoomSlider(int zoom){
+   if (zoom!=m_zoom_value){
+    m_zoom_value=zoom;
+    printf("setZoomSlider(int zoom)");
+    fflush(stdout);
+    if(zoomSlider != (QSlider *) nullptr) {
+        if (zoomSlider->value()!=m_zoom_value) {
+            zoomSlider->setValue(zoom);}
+    }
+    zoomNow();
+   }
+}
+
+void caCamera::setverticalScrollBar(int pos){
+
+    if (m_verticalScroll!=pos){
+        m_verticalScroll = pos;
+        if(scrollArea != (QScrollArea *) nullptr){
+            scrollArea->verticalScrollBar()->setValue(pos);
+        }
+    }
+}
+
+void caCamera::sethorizontalScrollBar(int pos){
+    if (m_horizontalScroll!=pos){
+        m_horizontalScroll = pos;
+        if(scrollArea != (QScrollArea *) nullptr){
+            scrollArea->horizontalScrollBar()->setValue(pos);
+        }
+    }
+}
+
 void caCamera::zoomNow()
 {
-    double scale = qPow(2.0, ((double) zoomSlider->value() - 52.0) / 13.0);
+    if(zoomSlider != (QSlider *) nullptr) {
+     m_zoom_value=zoomSlider->value();
+    }
+
+
+    double scale = qPow(2.0, ((double) m_zoom_value - 52.0) / 13.0);
     if(scale > 32) scale = 32;
-    zoomValue->setText(QString::number(scale, 'f', 3));
+    if(zoomValue != (QLabel *) nullptr) {
+        zoomValue->setText(QString::number(scale, 'f', 3));
+    }
     scaleFactor = scale;
     setFitToSize(No);
 
     // keep centered on last pick
     int posX =  P3.x() * scaleFactor;
     int posY =  P3.y() * scaleFactor;
-    scrollArea->horizontalScrollBar()->setValue(posX - scrollArea->horizontalScrollBar()->pageStep()/2);
-    scrollArea->verticalScrollBar()->setValue(posY - scrollArea->verticalScrollBar()->pageStep()/2);
+    if(scrollArea != (QScrollArea *) nullptr){
+        scrollArea->horizontalScrollBar()->setValue(posX - scrollArea->horizontalScrollBar()->pageStep()/2);
+        scrollArea->verticalScrollBar()->setValue(posY - scrollArea->verticalScrollBar()->pageStep()/2);
+    }
 }
 
 void caCamera::zoomIn(int level)
 {
-    zoomSlider->setValue(zoomSlider->value() + level);
+    m_zoom_value=zoomSlider->value() + level;
+    zoomSlider->setValue(m_zoom_value);
 }
 
 void caCamera::zoomOut(int level)
 {
-    zoomSlider->setValue(zoomSlider->value() - level);
+    m_zoom_value=zoomSlider->value() - level;
+    zoomSlider->setValue(m_zoom_value);
 }
 
 void caCamera::setFitToSize(zoom const &z)

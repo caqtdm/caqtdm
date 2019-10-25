@@ -219,10 +219,10 @@ public:
 
     QString getMinLevel() const {return thisMinLevel;}
     bool isAlphaMinLevel();
-    void setMinLevel(QString const &level);
+
     QString getMaxLevel() const {return thisMaxLevel;}
     bool isAlphaMaxLevel();
-    void setMaxLevel(QString const &level);
+
 
     bool isPropertyVisible(Properties property);
     void setPropertyVisible(Properties property, bool visible);
@@ -251,6 +251,14 @@ public slots:
     void hideObject(bool hideit) {
 #include "hideobjectcode.h"
     }
+
+    void setMinLevel(QString const &level);
+    void setMaxLevel(QString const &level);
+    void setAutoLevel(bool enable);
+
+    void setZoomSlider(int zoom);
+    void sethorizontalScrollBar(int pos);
+    void setverticalScrollBar(int pos);
 
     void setDecodemodeStr(QString mode);
     void setDecodemodeNum(int mode);
@@ -355,6 +363,10 @@ private:
     ROI_markertype thisROIreadmarkertype, thisROIwritemarkertype;
     QStringList thisPV_ROI_Read, thisPV_ROI_Write;
     QString thisMinLevel, thisMaxLevel;
+    int m_MinLevel,m_MaxLevel;
+    int m_zoom_value;
+    int m_verticalScroll,m_horizontalScroll;
+
     colormap thisColormap;
     zoom thisFitToSize;
     QImage *image;
