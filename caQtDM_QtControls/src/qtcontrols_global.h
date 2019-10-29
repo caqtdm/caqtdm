@@ -48,29 +48,13 @@
   #define isnan(x) std::isnan(x)
 #endif
 
-// nullptr problem and "fix" warnings
-// see http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2431.pdf
-#if defined(_MSC_VER)
-    #if (_MSC_VER >1800)
-     #define nullptr 0
-    #endif
-#else
-    #if __cplusplus <= 199711L
-    const // this is a const object...
-    class {
-    public:
-        template<class T> // convertible to any type
-        operator T*() const // of null non-member
-        { return 0; } // pointer...
-        template<class C, class T> // or any type of null
-        operator T C::*() const // member pointer...
-        { return 0; }
-    private:
-        void operator&() const; // whose address can't be taken
-    } nullptr = {};
-
-    #endif
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+#ifndef Q_NULLPTR
+    #define Q_NULLPTR 0
 #endif
+#endif
+
+
 
 
 #endif //QTCONGLOBAL_H

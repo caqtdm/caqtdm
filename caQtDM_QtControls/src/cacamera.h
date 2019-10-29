@@ -141,12 +141,12 @@ public:
     void showImage(int datasize, char *data, short datatype);
 
     colormode getColormode() const {return thisColormode;}
-    void setColormode(colormode const &mode) {thisColormode = mode; if(colormodeCombo != (QComboBox*) 0) colormodeCombo->setCurrentIndex(mode);}
+    void setColormode(colormode const &mode) {thisColormode = mode; if(colormodeCombo != (QComboBox*)Q_NULLPTR) colormodeCombo->setCurrentIndex(mode);}
 
-    void setPackmode(packingmode mode) {thisPackingmode = mode; if(packingmodeCombo != (QComboBox*) 0) packingmodeCombo->setCurrentIndex(mode);}
+    void setPackmode(packingmode mode) {thisPackingmode = mode; if(packingmodeCombo != (QComboBox*)Q_NULLPTR) packingmodeCombo->setCurrentIndex(mode);}
     packingmode getPackmode() {return thisPackingmode;}
 
-    void setShowComboBoxes(bool show) {if(colormodesWidget == (QWidget *) 0)return; thisShowBoxes = show;  if(thisShowBoxes) colormodesWidget->show(); else colormodesWidget->hide();}
+    void setShowComboBoxes(bool show) {if(colormodesWidget == (QWidget *)Q_NULLPTR)return; thisShowBoxes = show;  if(thisShowBoxes) colormodesWidget->show(); else colormodesWidget->hide();}
     bool getShowComboBoxes() const {return thisShowBoxes;}
 
     void setData(double *vector, int size, int curvIndex, int curvType, int curvXY);
