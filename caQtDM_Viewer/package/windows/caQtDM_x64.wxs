@@ -56,7 +56,6 @@
                                 <File Id="LIBEGL.DLL" Name="libEGL.dll" Source="$(env.QTHOME)\bin\libEGL.dll" />
                                 <File Id="LIBGLESV2.DLL" Name="libGLESv2.dll" Source="$(env.QTHOME)\bin\libGLESv2.dll" />
                                 <File Id="QT5BLUETOOTH.DLL" Name="Qt5Bluetooth.dll" Source="$(env.QTHOME)\bin\Qt5Bluetooth.dll" />
-                                
                                 <File Id="QT5CONCURRENT.DLL" Name="Qt5Concurrent.dll" Source="$(env.QTHOME)\bin\Qt5Concurrent.dll" />
                                 <File Id="QT5CORE.DLL" Name="Qt5Core.dll" Source="$(env.QTHOME)\bin\Qt5Core.dll" />
                                 <File Id="QT5DESIGNER.DLL" Name="Qt5Designer.dll" Source="$(env.QTHOME)\bin\Qt5Designer.dll" />
@@ -64,7 +63,6 @@
                                 <File Id="QT5GUI.DLL" Name="Qt5Gui.dll" Source="$(env.QTHOME)\bin\Qt5Gui.dll" />
                                 <File Id="QT5HELP.DLL" Name="Qt5Help.dll" Source="$(env.QTHOME)\bin\Qt5Help.dll" />
                                 <File Id="QT5MULTIMEDIA.DLL" Name="Qt5Multimedia.dll" Source="$(env.QTHOME)\bin\Qt5Multimedia.dll" />
-                                
                                 <File Id="QT5MULTIMEDIAWIDGETS.DLL" Name="Qt5MultimediaWidgets.dll" Source="$(env.QTHOME)\bin\Qt5MultimediaWidgets.dll" />
                                 <File Id="QT5NETWORK.DLL" Name="Qt5Network.dll" Source="$(env.QTHOME)\bin\Qt5Network.dll" />
                                 <File Id="QT5NFC.DLL" Name="Qt5Nfc.dll" Source="$(env.QTHOME)\bin\Qt5Nfc.dll" />
@@ -78,6 +76,11 @@
                                 <File Id="CAREPEATER.EXE" Name="caRepeater.exe" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\caRepeater.exe" />
                                 <File Id="CA.DLL" Name="ca.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\ca.dll" />
                                 <File Id="COM.DLL" Name="Com.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\Com.dll" />
+                                <File Id="PVACCESS.DLL" Name="pvAccess.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\pvAccess.dll" />
+                                <File Id="PVACCESSCA.DLL" Name="pvAccessCA.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\pvAccessCA.dll" />
+                                <File Id="PVACLIENT.DLL" Name="pvaClient.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\pvaClient.dll" />
+                                <File Id="PVDATA.DLL" Name="pvData.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\pvData.dll" />
+                                <File Id="NT.DLL" Name="nt.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\nt.dll" />
                             </Component>
                             <Component Id="ZMQ" Guid="6F1967A1-84CA-4BE4-85DC-8D1B75338BB7" Win64="yes">
                                 <File Id="LIBZMQ.DLL" Name="libzmq.dll" Source="$(env.ZMQLIB)\libzmq.dll" />
@@ -108,6 +111,7 @@
                             <Component Id="controlsystems" Guid="02E16D39-2C06-43FB-9DBF-22DA6A416313" Win64="yes">
                                 <File Id="DEMO_PLUGIN.DLL" Name="demo_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\demo_plugin.dll" />
                                 <File Id="EPICS3_PLUGIN.DLL" Name="epics3_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics3_plugin.dll" />
+                                <File Id="EPICS4_PLUGIN.DLL" Name="epics4_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics4_plugin.dll" />
                                 <File Id="BSREAD_PLUGIN.DLL" Name="bsread_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\bsread_plugin.dll" />
                                 <File Id="ARCHIVESF_PLUGIN.DLL" Name="archiveSF_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\archiveSF_plugin.dll" />
                             </Component>
@@ -160,7 +164,7 @@
                         </Component>
                     </Directory>
                 </Directory>
-                <Merge Id="VCRedist" Language="0" SourceFile="C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC120_CRT_x64.msm" DiskId="1" />
+                <Merge Id="VCRedist" Language="0" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Redist\MSVC\14.23.27820\MergeModules\Microsoft_VC142_CRT_x64.msm" DiskId="1" />
             </Directory>
             <Directory Id="ProgramMenuFolder">
                 <Directory Id="ProgramMenuDir" Name="caQtDM">
