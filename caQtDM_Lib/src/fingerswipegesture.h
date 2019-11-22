@@ -27,9 +27,16 @@
 ****************************************************************************/
 #ifndef QFINGERSWIPEGESTURE_H
 #define QFINGERSWIPEGESTURE_H
+#include <QMainWindow>
+#include <QPixmap>
+#include <QBoxLayout>
+#include <QLabel>
 #include <QGesture>
 #include <QGestureRecognizer>
 #include <QPointF>
+#include <QPushButton>
+#include <QRectF>
+#include <QPainter>
 class FingerSwipeGestureRecognizer : public QGestureRecognizer
 {
 public:
@@ -41,19 +48,24 @@ public:
 class FingerSwipeGesture : public QGesture
 {
 public:
-    FingerSwipeGesture(QObject *parent = 0);
+    FingerSwipeGesture(QObject *parent = nullptr);
     virtual ~FingerSwipeGesture();
     bool isLeftToRight() const;
     bool isRightToLeft() const;
     bool isBottomToTop() const;
     bool isTopToBottom() const;
+
 private:
     QPointF m_startPos;
+    QPointF m_actPos;
     QPointF m_lastPos;
     QPointF m_currentPos;
-    QPointF m_wPos;
+    QWidget *m_central;
+    QPixmap m_snapshot;
     bool m_triggered;
     bool m_cancelled;
+    bool m_touchupdate;
+    bool m_begin;
     friend class FingerSwipeGestureRecognizer;
 };
 #endif

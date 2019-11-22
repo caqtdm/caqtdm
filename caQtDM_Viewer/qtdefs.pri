@@ -80,9 +80,15 @@ ios | android {
 }
 ios {
   DEFINES += MOBILE_IOS
+  QTPLUGIN += qjpeg qgif
+  QMAKE_CXXFLAGS_WARN_ON = -w
 }
 android {
   DEFINES += MOBILE_ANDROID
+  QMAKE_CXXFLAGS_WARN_ON = -w
+}
+macx {
+  QMAKE_CXXFLAGS_WARN_ON = -w
 }
 
 # for some architectures this has to be defined for scan2D

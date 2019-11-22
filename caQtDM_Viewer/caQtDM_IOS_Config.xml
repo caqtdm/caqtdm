@@ -2,12 +2,12 @@
 <configuration>
     <url value="http://epics.web.psi.ch/software/caqtdm/qtDir"/>
     <url value="http://epics.web.psi.ch/software/caqtdm/qtDir"/>
-    <url value=""/>
+    <url value="http://192.168.0.30/qtdir"/>"/>
     <url value=""/>
     <url value=""/>
     <config value="Proscan_MA85.config"/>
     <config value="HIPA_MA85.config"/>
-    <config value=""/>
+    <config value="caqtdmtest.config"/>
     <config value=""/>
     <config value=""/>
 </configuration>

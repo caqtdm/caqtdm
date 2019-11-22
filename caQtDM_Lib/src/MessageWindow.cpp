@@ -30,7 +30,11 @@
 #include <QMutexLocker>
 #include <stdio.h>
 #include <time.h>
+#ifndef MOBILE_ANDROID
 #include <sys/timeb.h>
+#else
+#include <androidtimeb.h>
+#endif
 #include "qtdefinitions.h"
 
 #define GCC_VERSION (__GNUC__ * 10000 \

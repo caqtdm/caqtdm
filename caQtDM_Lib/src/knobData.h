@@ -26,7 +26,12 @@
 #ifndef KNOBDATA_H
 #define KNOBDATA_H
 
-#include <sys/timeb.h>
+#ifndef MOBILE_ANDROID
+  #include <sys/timeb.h>
+#else
+  #include "androidtimeb.h"
+#endif
+
 #include "dbrString.h"
 #include "knobDefines.h"
 

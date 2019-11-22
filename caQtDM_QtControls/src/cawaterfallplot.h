@@ -42,7 +42,13 @@
 #include <qwt_matrix_raster_data.h>
 #include <qwt_point_3d.h>
 #include <qwt_plot_spectrocurve.h>
+
+#ifndef MOBILE_ANDROID
 #include <sys/timeb.h>
+#else
+#include <androidtimeb.h>
+#endif
+
 #include <stdint.h>
 //#include <sys/timeb.h>
 

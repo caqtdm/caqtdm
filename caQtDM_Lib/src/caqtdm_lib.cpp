@@ -33,7 +33,13 @@
 #include <stdlib.h>
 #include <iostream>
 #include <sstream>
-#include <sys/timeb.h>
+
+#ifndef MOBILE_ANDROID
+  #include <sys/timeb.h>
+#else
+  #include <androidtimeb.h>
+#endif
+
 #include <QObject>
 #include <QToolBar>
 #include <QUuid>
@@ -8622,6 +8628,13 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                         ledWidget->setLedWidth(qRound(width));
                     }
 
+                    // this is something new (Qt5.13), probably a bug for android and a very dirty fix
+#ifdef MOBILE_ANDROID
+                    if (!className.compare("caMenu")) {
+                        widget->setMinimumWidth(10);
+                        rectnew.setWidth(width/2.5);
+                    }
+#endif
                     widget->setGeometry(rectnew);
                     resizeSpecials(className, widget, list, factX, factY);
                     widget->updateGeometry();

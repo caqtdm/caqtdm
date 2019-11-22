@@ -42,6 +42,10 @@ SUBDIRS = caQtDM_QtControls caQtDM_Lib caQtDM_Viewer
 SUBDIRS += qtcontrols_controllers qtcontrols_graphics qtcontrols_monitors qtcontrols_utilities
 SUBDIRS += caQtDM_Plugins
 
+android {
+  SUBDIRS += caQtDM_AndroidFunctions
+}
+
 qtcontrols_controllers.file = caQtDM_QtControls/plugins/qtcontrols_controllers.pro 
 qtcontrols_controllers.depends = caQtDM_QtControls caQtDM_Lib
 
@@ -75,6 +79,10 @@ unix {
 
 caQtDM_Viewer.depends = caQtDM_QtControls caQtDM_Lib qtcontrols_controllers qtcontrols_graphics qtcontrols_utilities qtcontrols_monitors caQtDM_Plugins
 caQtDM_Lib.depends = caQtDM_QtControls
+
+android {
+  caQtDM_Lib.depends += caQtDM_AndroidFunctions
+}
 
 archiveCA.depends = caQtDM_QtControls caQtDM_Lib
 archivePRO.depends = caQtDM_QtControls caQtDM_Lib

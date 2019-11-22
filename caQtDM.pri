@@ -17,7 +17,7 @@ archive_plugin {
 
         ios | android {
                 message("archive_plugin configuration : ios or android")
-                 message( $$OUT_PWD )
+                message( $$OUT_PWD )
                 CONFIG += staticlib
                 LIBS += $$OUT_PWD/../../../caQtDM_Lib/libcaQtDM_Lib.a
                 LIBS += $$OUT_PWD/../../../caQtDM_QtControls/libqtcontrols.a
@@ -56,9 +56,12 @@ demo_plugin {
 
         ios | android {
                 message("demo_plugin configuration : ios or android")
-                 message( $$OUT_PWD )
+                message( $$OUT_PWD )
                 CONFIG += staticlib
                 LIBS += $$OUT_PWD/../../libcaQtDM_Lib.a
+                android {
+                    INCLUDEPATH += $$OUT_PWD/../caQtDM_AndroidFunctions/src
+                }
         }
 
         win32 {
@@ -140,7 +143,6 @@ epics3_plugin {
 
         ios | android {
                 message("epics3_plugin configuration : ios or android")
-                message( $$OUT_PWD )
                 CONFIG += staticlib
                 LIBS += $$OUT_PWD/../../libcaQtDM_Lib.a
                 ios {
@@ -149,6 +151,7 @@ epics3_plugin {
                 }
                 android {
                         INCLUDEPATH += $(EPICSINCLUDE)/os/android
+                        INCLUDEPATH += $$OUT_PWD/../caQtDM_AndroidFunctions/src
                 }
         }
 
@@ -321,6 +324,9 @@ caQtDM_QtControls {
                 CONFIG += release
                 CONFIG -= debug
                 CONFIG -= debug_and_release
+                android {
+                   DESTDIR = $(CAQTDM_COLLECT)
+                }
         }
 
 	win32 {
@@ -372,13 +378,12 @@ caQtDM_Lib {
    	}
 
 	ios | android {
-                message("caQtDM_Lib configuration : !os or android")
+                message("caQtDM_Lib configuration : ios or android")
                 message( $$OUT_PWD )
                 CONFIG += staticlib console
                 CONFIG += release
                 SOURCES +=     fingerswipegesture.cpp
       		HEADERS +=     fingerswipegesture.h
-                #DESTDIR = $(CAQTDM_COLLECT)
                 INCLUDEPATH += ./caQtDM_Plugins
 		ios {
       			INCLUDEPATH += $(EPICSINCLUDE)/os/iOS
@@ -389,6 +394,7 @@ caQtDM_Lib {
 
 		android {
       			INCLUDEPATH += $(EPICSINCLUDE)/os/android
+                        DESTDIR = $(CAQTDM_COLLECT)
                 }
 	}
 
@@ -441,7 +447,6 @@ caQtDM_Viewer {
 
 #for epics 3.15 and gcc we need this
                 INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
-
                 DESTDIR = $(CAQTDM_COLLECT)
                 QMAKE_INFO_PLIST = ./src/Mac/Info.plist
                 APP-FONTS.files = lucida-sans-typewriter.ttf
@@ -487,6 +492,7 @@ caQtDM_Viewer {
                 plugins_demo.path = Contents/PlugIns/controlsystems
                 plugins_demo.files += $(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.dylib
                 QMAKE_BUNDLE_DATA += plugins_demo
+
                 epics4: {
                                     plugins_epics4.path = Contents/PlugIns/controlsystems
                                     plugins_epics4.files += $(CAQTDM_COLLECT)/controlsystems/libepics4_plugin.dylib
@@ -570,13 +576,12 @@ caQtDM_Viewer {
                          # when .dylib and .a in same directory, macos takes .dylib, so separate the libraries
                          LIBS += $$(EPICSLIB)/static/libca.a
                          LIBS += $$(EPICSLIB)/static/libCom.a
-                         LIBS += $$(QWTHOME)/lib/lib$$(QWTLIBNAME)_iphonesimulator.a
+                         #LIBS += $$(QWTHOME)/lib/lib$$(QWTLIBNAME)_iphonesimulator.a
                          # build simulator only for 32 bit
                          INCLUDEPATH += $$(QWTHOME)/src
                     }
                     iphoneos {
                         message("caQtDM_viewer configuration : iphoneos")
-                        message("$$QMAKESPEC")
 
                          LIBS += $$(EPICSLIB)/static/libca.a
                          LIBS += $$(EPICSLIB)/static/libCom.a
@@ -632,6 +637,7 @@ caQtDM_Viewer {
                         LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_utilities_plugin.a
                         LIBS += $(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.a
                         LIBS += $(CAQTDM_COLLECT)/controlsystems/libepics3_plugin.a
+                        LIBS += $(CAQTDM_COLLECT)/libAndroidFunctions.a
                 epics4: {
                                 LIBS += $(CAQTDM_COLLECT)/controlsystems/libepics4_plugin.a
                                 }
@@ -878,7 +884,9 @@ Define_ControlsysTargetDir{
         }
 
         ios | android {
-                #DESTDIR = $(CAQTDM_COLLECT)/controlsystems
+             android {
+                DESTDIR = $(CAQTDM_COLLECT)/controlsystems
+             }
         }
         win32 {
                 message("adl2ui configuration win32")
