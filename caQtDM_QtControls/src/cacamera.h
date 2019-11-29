@@ -43,7 +43,7 @@
 #include <imagewidget.h>
 #include <calabel.h>
 #include "knobDefines.h"
-#include <QtControls>
+
 
 #include <qwt_color_map.h>
 #include <qwt_scale_widget.h>
@@ -55,6 +55,7 @@
 #ifndef MOBILE_ANDROID
 #include <sys/timeb.h>
 #else
+#include <QtControls>
 #include <androidtimeb.h>
 #endif
 
