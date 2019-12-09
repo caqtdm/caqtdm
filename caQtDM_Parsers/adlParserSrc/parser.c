@@ -38,6 +38,7 @@ int generateFlatFile;
 int generateDeviceOnMenus;
 int expandText;
 int legendsForStripplot;
+int veryFirst = True;
 
 char filePrefix[128] = "";
 static  string40 formatTable[] = { "decimal", "exponential", "engr_notation", "compact", "truncated",
@@ -2404,9 +2405,9 @@ void *parseValuator(DisplayInfo *displayInfo, FrameOffset * offset)
     if(!strcmp(look,"noLabel") || !strcmp(look,"noDeco")) {
         Qt_handleString("scalePosition", "enum", "NoScale");
     } else if(!strcmp(direction, "Up") || !strcmp(direction, "Down")) {
-        Qt_handleString("scalePosition", "enum", "LeftScale");
+        Qt_handleString("scalePosition", "enum", "TrailingScale");
     } else if(!strcmp(direction, "Right") || !strcmp(direction, "Left")) {
-        Qt_handleString("scalePosition", "enum", "BottomScale");
+        Qt_handleString("scalePosition", "enum", "LeadingScale");
     }
 
     if(!strcmp(look,"noLabel") || !strcmp(look,"noDeco") || !strcmp(look,"Outline")) {
@@ -3715,13 +3716,17 @@ void *getNextElement(DisplayInfo *pDI, char *token, FrameOffset *offset) {
     return 0;
 }
 
+void initScanning()
+{
+    veryFirst = True;
+}
+
 TOKEN parseAndAppendDisplayList(DisplayInfo *displayInfo, FrameOffset *offset, char *firstToken, TOKEN firstTokenType)
 {
     TOKEN tokenType;
     char token[MAX_TOKEN_LENGTH];
     int nestingLevel = 0;
     int first = 1;
-    static int veryFirst = True;
     int bclr = 0;
 
     if(veryFirst) {
