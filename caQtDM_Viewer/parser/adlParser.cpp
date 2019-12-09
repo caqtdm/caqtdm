@@ -23,14 +23,13 @@
  *    anton.mezger@psi.ch
  */
 
+#include <cstdlib>
+#include <iostream>
+#include "adlParserMain.h"
 
-#include <qfile.h>
-#include "XmlWriter.h"
-
-using namespace std;
-
-class myParser {
-
-public:
-  XmlWriter *xw;
-};
+int main(int argc, char *argv[])
+{
+    myParser *adlParser = new myParser;
+    adlParser->myMain(argc, argv);
+    return 0;
+}

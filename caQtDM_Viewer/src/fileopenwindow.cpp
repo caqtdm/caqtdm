@@ -968,19 +968,35 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     int found1 = inputFile.lastIndexOf(".ui");
     int found2 = inputFile.lastIndexOf(".adl");
     int found3 = inputFile.lastIndexOf(".prc");
-    QString openFile = inputFile;
+    int found4 = inputFile.lastIndexOf(".edl");
+    QString FileName;
+
+    // normal ui file
     if (found1 != -1) {
-        openFile = inputFile.mid(0, found1);
+        FileName = inputFile;
     }
-    if(found2 != -1) {
-        openFile = inputFile.mid(0, found2);
+    // if we have a adl file, default is taking a corresponding ui file
+    else if(found2 != -1 || found4 != -1) {
+#ifndef ADL_EDL_FILES
+        QString openFile = inputFile.mid(0, found2);
+        FileName = openFile.append(".ui");
+#else
+        FileName = inputFile;
+#endif
+    }
+    // normal ui file
+    else if (found3 != -1) {
+        FileName = inputFile;
+    // missing or wrong extension
+    } else {
+        QString openFile;
+        int found = inputFile.lastIndexOf(".");
+        if(found > -1) openFile = inputFile.mid(0, found);
+        else openFile = inputFile;
+        FileName = openFile.append(".ui");
     }
 
-    QString FileName;
-    if(found3 == -1)
-        FileName = openFile.append(".ui");
-    else
-        FileName = inputFile;
+    //qDebug() << "try to open file" << FileName;
 
     // go through the children of this main window and find out if new or already present
     QList<QWidget *> all = this->findChildren<QWidget *>();

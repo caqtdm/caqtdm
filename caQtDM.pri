@@ -439,6 +439,8 @@ caQtDM_Viewer {
                         CONFIG += x11
                         LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
                         LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
+                        LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -ladlParser
+                        LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -ledlParser
                         LIBS += -L$(CAQTDM_COLLECT) -L$(CAQTDM_COLLECT)/designer
                 }
         }

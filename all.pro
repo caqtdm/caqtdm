@@ -61,20 +61,12 @@ qtcontrols_utilities.depends = caQtDM_QtControls caQtDM_Lib
 caQtDM_Plugins.file = caQtDM_Lib/caQtDM_Plugins/csplugins.pro 
 caQtDM_Plugins.depends = caQtDM_Lib
 
-!ios {
-!android {
-   SUBDIRS += parser
+!MOBILE {
+   SUBDIRS +=  caQtDM_Parsers parser parserEDM
    parser.file = caQtDM_Viewer/parser/parser.pro
-}
-}
-
-unix {
-!ios {
-!android {
-   SUBDIRS +=  parserEDM
+   parser.depends = caQtDM_Parsers
    parserEDM.file = caQtDM_Viewer/parserEDM/parserEDM.pro
-}
-}
+   parserEDM.depends = caQtDM_Parsers
 }
 
 caQtDM_Viewer.depends = caQtDM_QtControls caQtDM_Lib qtcontrols_controllers qtcontrols_graphics qtcontrols_utilities qtcontrols_monitors caQtDM_Plugins
@@ -82,6 +74,10 @@ caQtDM_Lib.depends = caQtDM_QtControls
 
 android {
   caQtDM_Lib.depends += caQtDM_AndroidFunctions
+}
+
+ADL_EDL_FILES {
+caQtDM_Lib.depends += caQtDM_Parsers
 }
 
 archiveCA.depends = caQtDM_QtControls caQtDM_Lib

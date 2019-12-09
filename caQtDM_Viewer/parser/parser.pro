@@ -9,18 +9,16 @@ contains(QT_VER_MAJ, 5) {
 
 TEMPLATE = app
 INCLUDEPATH += .
+INCLUDEPATH += ../../caQtDM_Parsers/adlParserSrc
 MOC_DIR = moc
 
 # Input
-HEADERS += XmlWriter.h parser.h \
-    myParser.h \
-    QtProperties.h \
-    dmsearchfile.h
-SOURCES += myParser.cpp XmlWriter.cpp parser.c \
-    QtProperties.c \
-    dmsearchfile.cpp
+HEADERS += adlParser.h
+SOURCES += adlParser.cpp
 
 TARGET = adl2ui
+
+LIBS += $(CAQTDM_COLLECT)/libadlParser.a
 
 OTHER_FILES += \
     stylesheet.qss

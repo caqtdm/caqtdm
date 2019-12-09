@@ -35,6 +35,8 @@ INCLUDEPATH += .
 INCLUDEPATH += ./src
 INCLUDEPATH += ./caQtDM_Plugins
 INCLUDEPATH += ../caQtDM_QtControls/src
+INCLUDEPATH += ../caQtDM_Parsers/adlParserSrc
+INCLUDEPATH += ../caQtDM_Parsers/edlParserSrc
 INCLUDEPATH += $(QWTINCLUDE)
 INCLUDEPATH += $(EPICSINCLUDE)
 
