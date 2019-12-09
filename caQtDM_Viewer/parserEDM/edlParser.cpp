@@ -23,21 +23,13 @@
  *    anton.mezger@psi.ch
  */
 
-#ifndef DMSEARCHFILE_H
-#define DMSEARCHFILE_H
+#include <cstdlib>
+#include <iostream>
+#include "edlParserMain.h"
 
-#include <QString>
-#include <QFileDialog>
-
-class dmsearchFile
+int main(int argc, char *argv[])
 {
-public:
-    dmsearchFile(QString FileName);
-    QString findFile();
-    QString displayPath();
-
-private:
-    QString _FileName;
-};
-
-#endif // DMSEARCHFILE_H
+    myParserEDM *edlParser = new myParserEDM;
+    edlParser->myMainEDM(argc, argv);
+    return 0;
+}
