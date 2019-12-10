@@ -17,3 +17,7 @@ SUBDIRS = demo epics3 archive
       SUBDIRS += bsread
      }
 }
+
+equals(QT_MAJOR_VERSION, 5):greaterThan(QT_MINOR_VERSION, 8) {
+  SUBDIRS += modbus
+}
