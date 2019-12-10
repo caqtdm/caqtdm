@@ -111,8 +111,8 @@ unix:!macx:{
 # enable ADL_EDL automatic on the fly conversion, if not enabled, when an adl file is encountered,
 # an ui file is assumed
 !MOBILE: {
-#    CONFIG += ADL_EDL_FILES
-#    DEFINES += ADL_EDL_FILES
+    CONFIG += ADL_EDL_FILES
+    DEFINES += ADL_EDL_FILES
 }
 
 
