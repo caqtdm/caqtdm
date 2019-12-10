@@ -962,8 +962,8 @@ void FileOpenWindow::nextWindow()
  */
 void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QString& macroString, const QString& geometry, const QString& resizeString)
 {
-    //qDebug() << "*************************************************************************";
-    //qDebug() << "callback open new file" << inputFile << "with macro string" << macroString;
+    qDebug() << "*************************************************************************";
+    qDebug() << "callback open new file" << inputFile << "with macro string" << macroString;
 
     int found1 = inputFile.lastIndexOf(".ui");
     int found2 = inputFile.lastIndexOf(".adl");
@@ -980,6 +980,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
 #ifndef ADL_EDL_FILES
         QString openFile = inputFile.mid(0, found2);
         FileName = openFile.append(".ui");
+        messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(tr("file %1 is not parsed (caQtDM built without ADL_EDL_FILES)").arg(inputFile)));
 #else
         FileName = inputFile;
 #endif
