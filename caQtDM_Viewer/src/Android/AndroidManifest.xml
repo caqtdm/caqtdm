@@ -16,7 +16,7 @@
         <activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density"
                   android:name="org.qtproject.qt5.android.bindings.QtActivity"
                   android:label="-- %%INSERT_APP_NAME%% --"
-                  android:screenOrientation="unspecified"
+                  android:screenOrientation="landscape"
                   android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
