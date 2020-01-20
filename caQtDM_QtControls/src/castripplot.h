@@ -26,7 +26,12 @@
 #ifndef caStripPlot_H
 #define caStripPlot_H
 
-#include <sys/timeb.h>
+#ifndef MOBILE_ANDROID
+  #include <sys/timeb.h>
+#else
+  #include "androidtimeb.h"
+#endif
+
 #include <QTime>
 #include <QTimer>
 #include <QThread>

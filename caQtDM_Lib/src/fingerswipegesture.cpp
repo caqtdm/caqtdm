@@ -35,6 +35,8 @@
 #include <QDesktopWidget>
 #include <QApplication>
 
+#include <QtControls>
+
 FingerSwipeGestureRecognizer::FingerSwipeGestureRecognizer()
 {
 }
@@ -58,31 +60,86 @@ QGestureRecognizer::Result FingerSwipeGestureRecognizer::recognize(QGesture *sta
     FingerSwipeGesture *q = static_cast<FingerSwipeGesture *>(state);
     const QTouchEvent *ev = static_cast<const QTouchEvent *>(event); // only use ev after checking event->type()
     QGestureRecognizer::Result result = QGestureRecognizer::Ignore;
+
+    QMainWindow *w1 = (QMainWindow *) obj;
+    if(w1 == (QWidget*) nullptr) return result;
+
     switch (event->type()) {
     case QEvent::TouchBegin: {
+        //qDebug() << "TouchBegin" << obj;
         result = QGestureRecognizer::MayBeGesture;
         if (ev->touchPoints().size() >= 1) {
             QTouchEvent::TouchPoint p1 = ev->touchPoints().first();
             q->m_startPos = p1.startScenePos();
-#ifdef MDITEST
-            QWidget *w= (QWidget*) obj;
-            q->m_wPos = w->mapToGlobal(QPoint(0,0));
-#endif
+            q->m_actPos = p1.startScenePos();
+            q->m_touchupdate = false;
+
+                QWidget *w2 = w1->childAt ((int)q->m_startPos.x(), (int)q->m_startPos.y());
+                if(w2 != (QWidget*) nullptr) {
+                   if(caNumeric* numericWidget = qobject_cast<caNumeric *>(w2)) {
+                       return QGestureRecognizer::Ignore;
+                   } else if(caApplyNumeric* numericWidget = qobject_cast<caApplyNumeric *>(w2)) {
+                       q->m_cancelled = true;
+                       return QGestureRecognizer::Ignore;
+                   } else if(caSlider* sliderWidget = qobject_cast<caSlider *>(w2)) {
+                       q->m_cancelled = true;
+                       return QGestureRecognizer::Ignore;
+                   } else if(caMenu* sliderWidget = qobject_cast<caMenu *>(w2)) {
+                       q->m_cancelled = true;
+                       return QGestureRecognizer::Ignore;
+                   } else if(caChoice* sliderWidget = qobject_cast<caChoice *>(w2)) {
+                       q->m_cancelled = true;
+                       return QGestureRecognizer::Ignore;
+                   } else if(caRelatedDisplay* sliderWidget = qobject_cast<caRelatedDisplay *>(w2)) {
+                       q->m_cancelled = true;
+                       return QGestureRecognizer::Ignore;
+                   } else if(caTextEntry* sliderWidget = qobject_cast<caTextEntry *>(w2)) {
+                       q->m_cancelled = true;
+                       return QGestureRecognizer::Ignore;
+                   } else if(caMessageButton* sliderWidget = qobject_cast<caMessageButton *>(w2)) {
+                       q->m_cancelled = true;
+                       return QGestureRecognizer::Ignore;
+                   } else if(caToggleButton* sliderWidget = qobject_cast<caToggleButton *>(w2)) {
+                       q->m_cancelled = true;
+                       return QGestureRecognizer::Ignore;
+                   } else if(caSpinbox* sliderWidget = qobject_cast<caSpinbox *>(w2)) {
+                       q->m_cancelled = true;
+                       return QGestureRecognizer::Ignore;
+                   } else if(caByteController* sliderWidget = qobject_cast<caByteController *>(w2)) {
+                       q->m_cancelled = true;
+                       return QGestureRecognizer::Ignore;
+                   }
+                }
+                q->m_begin = true;
+                q->m_cancelled = false;
         }
         break;
     }
     case QEvent::TouchEnd: {
+        //qDebug() << "TouchEnd" <<q->m_startPos.toPoint().x() << q->m_startPos.toPoint().y();
+        QMainWindow *w1 = (QMainWindow *) obj;
         if (q->m_cancelled) {
+            //qDebug() << "TouchEnd ignore";
             result = QGestureRecognizer::Ignore;
+            return result;
         } else if (q->m_triggered) {
+            //qDebug() << "TouchEnd finish";
             result = QGestureRecognizer::FinishGesture;
         } else {
+            //qDebug() << "TouchEnd cancel";
             result = QGestureRecognizer::CancelGesture;
+        }
+        if (q->m_touchupdate)   {
+           //qDebug() << "move";
+           w1->move(q->m_startPos.toPoint().x(), q->m_startPos.toPoint().y());
+           w1->show();
+           if(!q->m_begin) w1->setCentralWidget(q->m_central);
         }
         break;
     }
     case QEvent::TouchUpdate: {
         if (!q->m_cancelled && ev->touchPoints().size() >= 1) {
+            //qDebug() << "touchupdate true";
             QTouchEvent::TouchPoint p1 = ev->touchPoints().first();
             q->m_currentPos = p1.screenPos();
             // update the hot-spot to be in the middle between start and current point
@@ -92,10 +149,39 @@ QGestureRecognizer::Result FingerSwipeGestureRecognizer::recognize(QGesture *sta
                 q->m_triggered = true;
                 result = QGestureRecognizer::TriggerGesture;
             }
-#ifdef MDITEST
-            QWidget *w= (QWidget*) obj;
-            w->parentWidget()->move(q->m_currentPos.toPoint() - q->m_startPos.toPoint() + q->m_wPos.toPoint() - 2 * w->pos());
-#endif
+            // here we move the window, but first replace the centralwidget in order to have faster interaction
+            if((qAbs(q->m_currentPos.x() - q->m_actPos.x()) > 10) || (qAbs(q->m_currentPos.y() - q->m_actPos.y()) > 10)) {
+                QMainWindow *w1 = (QMainWindow *) obj;
+                if(q->m_begin) {
+
+                    // get snaphot
+                    //q->m_snapshot = QPixmap::grabWidget(w1->centralWidget());
+                    q->m_snapshot = w1->centralWidget()->grab();
+                    // save actual centralwidget
+                    q->m_central = w1->centralWidget();
+                    q->m_central->setParent(nullptr);  //now it is saved
+
+                    // prepare new central widget with a label
+                    QWidget *centralwidget = new QWidget(w1);
+                    //centralwidget->setFixedSize((sSize));
+                    QLabel *label = new QLabel(centralwidget);
+                    //label->setStyleSheet(QStringLiteral("QLabel { border: 1px solid red;}"));
+                    label->setScaledContents(false);
+                    label->setPixmap(q->m_snapshot);
+                    // replace centralwidget
+                    w1->setCentralWidget(centralwidget);
+                    w1->showNormal();
+                    q->m_begin = false;
+                }
+                if(qAbs(q->m_currentPos.x() - q->m_actPos.x()) > 10) {
+                    w1->move(q->m_currentPos.toPoint().x()- q->m_startPos.toPoint().x(), 10);
+                } else {
+                    w1->move(10, q->m_currentPos.toPoint().y()- q->m_startPos.toPoint().y());
+                }
+                // save last position
+                q->m_actPos = q->m_currentPos;
+                q->m_touchupdate = true;
+            }
         }
         break;
     }

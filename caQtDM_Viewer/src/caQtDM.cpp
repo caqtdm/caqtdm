@@ -122,7 +122,8 @@ int main(int argc, char *argv[])
     QApplication::setApplicationName("caQtDM");
 
 #ifdef MOBILE_ANDROID
-    app.setStyle(QStyleFactory::create("fusion"));
+    //qDebug() << QStyleFactory::keys();
+    app.setStyle(QStyleFactory::create("Fusion"));
 #endif
 
     // we do not want numbers with a group separators

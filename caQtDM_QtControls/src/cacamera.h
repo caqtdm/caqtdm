@@ -38,10 +38,12 @@
 #include <QToolButton>
 #include <QScrollBar>
 #include <QComboBox>
+#include <QGridLayout>
 #include <qtcontrols_global.h>
 #include <imagewidget.h>
 #include <calabel.h>
 #include "knobDefines.h"
+
 
 #include <qwt_color_map.h>
 #include <qwt_scale_widget.h>
@@ -49,7 +51,14 @@
 #include <qwt_scale_div.h>
 #endif
 #include <time.h>
+
+#ifndef MOBILE_ANDROID
 #include <sys/timeb.h>
+#else
+#include <QtControls>
+#include <androidtimeb.h>
+#endif
+
 #include <stdint.h>
 
 #include "colormaps.h"

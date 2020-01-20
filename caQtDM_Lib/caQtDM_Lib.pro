@@ -8,16 +8,21 @@ include(../caQtDM.pri)
 QT += core gui network
 
 contains(QT_VER_MAJ, 4) {
-   CONFIG   += qt thread uitools plugin  qtestlib
+   CONFIG += qt thread uitools plugin  qtestlib
 }
 
 contains(QT_VER_MAJ, 5) {
-    QT     += widgets printsupport uitools opengl
+    QT += widgets  uitools opengl
+    !ios:!android {
+       message("caQtDM_Lib -- printsupport added")
+       QT += printsupport
+    }
+
     CONFIG += qt plugin thread
     DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 }
 
-CONFIG   += warn_on
+CONFIG += warn_on
 
 TARGET = caQtDM_Lib
 
@@ -32,6 +37,12 @@ INCLUDEPATH += ./caQtDM_Plugins
 INCLUDEPATH += ../caQtDM_QtControls/src
 INCLUDEPATH += $(QWTINCLUDE)
 INCLUDEPATH += $(EPICSINCLUDE)
+
+android {
+   INCLUDEPATH += $(ANDROIDFUNCTIONSINCLUDE)
+   QMAKE_CXXFLAGS += "-g"
+   QMAKE_CFLAGS_RELEASE += "-g"
+}
 
 RC_FILE = ./src/caQtDM_Lib.rc
 

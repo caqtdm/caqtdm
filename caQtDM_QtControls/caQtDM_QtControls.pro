@@ -34,6 +34,11 @@ TEMPLATE = lib
 MOC_DIR = moc
 INCLUDEPATH += src
 INCLUDEPATH += ../caQtDM_Lib/src
+
+android {
+   INCLUDEPATH += $(ANDROIDFUNCTIONSINCLUDE)
+}
+
 RESOURCES = qtcontrols.qrc
 RC_FILE = ./src/qtcontrols.rc
 
@@ -143,7 +148,6 @@ HEADERS += src/networkaccess.h src/fileFunctions.h \
     src/wmsignalpropagator.h \
     src/replacemacro.h
 SOURCES += src/networkaccess.cpp src/fileFunctions.cpp
-
 
 contains(QWT_VER_MIN, 0) {
    HEADERS	+= src/qwt_thermo_marker.h

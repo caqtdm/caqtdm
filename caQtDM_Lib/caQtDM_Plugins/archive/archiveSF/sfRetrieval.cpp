@@ -34,7 +34,13 @@
 #include <QEventLoop>
 #include <QTimer>
 #include <time.h>
+
+#ifndef MOBILE_ANDROID
 #include <sys/timeb.h>
+#else
+#include <androidtimeb.h>
+#endif
+
 #include "sfRetrieval.h"
 #include <QDebug>
 #include <QThread>
