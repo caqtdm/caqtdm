@@ -36,7 +36,7 @@ QString dmsearchFile::findFile()
 {
     if(_FileName.isNull()) return NULL;
 
-    QString path = (QString)  getenv("CAQTDM_DISPLAY_PATH");
+    QString path = (QString)  qgetenv("CAQTDM_DISPLAY_PATH");
 #ifdef _MSC_VER
     QStringList paths = path.split(";");
 #else
@@ -74,5 +74,5 @@ QString dmsearchFile::findFile()
 
 QString dmsearchFile::displayPath()
 {
-    return (QString)  getenv("CAQTDM_DISPLAY_PATH");
+    return (QString)  qgetenv("CAQTDM_DISPLAY_PATH");
 }

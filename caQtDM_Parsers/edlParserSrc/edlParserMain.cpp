@@ -33,13 +33,10 @@
 #include "dmsearchfile.h"
 #include <QDebug>
 #include <QFileInfo>
-#include "myParserEDM.h"
+#include "edlParserMain.h"
 #include "parserClass.h"
 
 #define MAX_ASCII               80      /* max size of many asci strings */
-
-//extern "C" void Qt_writeZorder();
-
 
 extern "C" char filePrefix[128];
 
@@ -52,7 +49,6 @@ extern "C" {
 myParserEDM::myParserEDM () {
     zindex = 0;
 }
-
 
 void myParserEDM::openFile(char *outFile)
 {
@@ -332,12 +328,67 @@ void myParserEDM::Qt_extractString(char *str, char *retStr, int *status) {
     *status = true;
 }
 
+// ZHW
+void myParserEDM::edl2ui(QString inputFile, QString macro)
+{
+    Q_UNUSED(macro);
+
+    // input and out files
+    if(inputFile.size() < 1) {
+        qDebug() << "edl2ui -- sorry: no input file";
+//        exit(-1);
+        return;
+    }
+
+    QString openFile1, openFile2;
+    QString outputFile;
+
+    int found = inputFile.lastIndexOf(".edl");
+    if (found != -1) {
+        openFile1 = inputFile.mid(0, found);
+    } else {
+        openFile1 = inputFile;
+    }
+
+    openFile2 = openFile1;
+
+    outputFile = openFile1.append(".ui");
+    inputFile = openFile2.append(".edl");
+
+    // when file exists open it
+    QFileInfo fi(inputFile);
+    if(!fi.exists()) {
+        qDebug() << "edl2ui -- sorry, file" << inputFile << "does not exist";
+//        exit(-1);
+        return;
+    }
+
+    // get path for composite file parsing
+    //qDebug() << fi.absolutePath();
+    //strcpy(filePrefix, fi.absolutePath().toLatin1().data());
+
+    // init edlParser
+    Init(this);
+
+    //get rid of path, we want to generate where we are
+    outputFile = outputFile.section('/',-1);
+    openFile(outputFile.toLatin1().data());
+
+    // open input file
+    //FILE *filePtr = fopen(inputFile.toLatin1().data(), "r");
+    parserClass *parser = new parserClass(inputFile.toLatin1().data());
+    parser->loadFile(this);
+
+    // close output file
+    closeFile();
+
+    return;
+}
+
 /*
  *
  */
-class myParserEDM;
-
-int main(int argc, char *argv[])
+int myParserEDM::myMainEDM(int argc, char *argv[])
 {
     int	in, numargs;
     char inFile[80] = "";

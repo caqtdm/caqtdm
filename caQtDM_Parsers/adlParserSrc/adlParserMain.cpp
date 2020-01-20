@@ -26,8 +26,7 @@
 #include <cstdlib>
 #include "parser.h"
 #include <iostream>
-#include <qfile.h>
-#include "XmlWriter.h"
+#include <adlParserMain.h>
 #include <QFileDialog>
 #include "dmsearchfile.h"
 #include <QDebug>
@@ -45,6 +44,7 @@ extern "C" int generateFlatFile;
 extern "C" int generateDeviceOnMenus;
 extern "C" int expandText;
 extern "C" int legendsForStripplot;
+extern "C" void initScanning();
 
 typedef char string40[40];
 typedef struct _zOrder {
@@ -57,33 +57,6 @@ extern "C" zOrder zorder[1000];
 extern "C" int zindex;
 extern "C" char filePrefix[128];
 
-class myParser {
-
-public:
-
-    myParser ();
-    void openFile(char *outFile);
-    void closeFile();
-    void writeProperty(const QString& name, const QString& type, const QString& value );
-    void writeOpenProperty(const QString& name);
-    void writeTaggedString(const QString& type, const QString& value );
-    void writeCloseProperty();
-    void writeStyleSheet(int r, int g, int b);
-
-    void writeOpenTag(const QString& type, const QString& cls = "", const QString& name = "");
-    void writeCloseTag(const QString& type);
-    XmlWriter *xw;
-    myParser *adlParser;
-    QFile *file;
-    QString StyleSheet;
-    void test();
-    void Init(myParser* adlParser);
-    void writeMessage(char *mess);
-
-private:
-
-};
-
 // pointer used by external C
 extern "C" {
 	myParser* myParserPtr;
@@ -91,7 +64,6 @@ extern "C" {
 // constructor
 myParser::myParser () {
 }
-
 
 void myParser::openFile(char *outFile)
 {
@@ -108,6 +80,8 @@ void myParser::openFile(char *outFile)
         printf("adl2ui -- if you do not want any styles, redefine CAQTDM_DISPLAY_PATH\n");
         file.close();
     }
+
+    //printf("write to file %s\n", outFile);
 
     file = new QFile(outFile);
     if (!file->open(QIODevice::WriteOnly | QIODevice::Text)) exit(0);
@@ -153,9 +127,11 @@ void myParser::closeFile()
     }
     // sort according to the static elements
     qStableSort(myvector.begin(), myvector.end(), compareFunc);
+    int index = 0;
     for (it=myvector.begin(); it!=myvector.end(); ++it) {
         //qDebug() << "sorted" << it->indx << it->vis << it->z;
         xw->writeTaggedString("zorder", it->z);
+        index++;
     }
 
     xw->writeCloseTag( "widget");
@@ -262,9 +238,100 @@ extern "C" myParser* C_writeStyleSheet(myParser* p, int r, int g, int b)
 /*
  *
  */
-class myParser;
+bool myParser::adl2ui(QString inputFile)
+{
+    char token[MAX_TOKEN_LENGTH];
+    TOKEN tokenType;
 
-int main(int argc, char *argv[])
+    if(inputFile.size() < 1) {
+        qDebug() << "adl2ui -- sorry: no input file";
+        return false;
+    }
+
+    QString openFile1, openFile2;
+    QString outputFile;
+
+    int found = inputFile.lastIndexOf(".adl");
+    if (found != -1) {
+        openFile1 = inputFile.mid(0, found);
+    } else {
+        openFile1 = inputFile;
+    }
+
+    openFile2 = openFile1;
+
+    outputFile = openFile1.append(".ui");
+    inputFile = openFile2.append(".adl");
+
+    // when file exists open it
+    QFileInfo fi(inputFile);
+    if(!fi.exists()) {
+        qDebug() << "adl2ui -- sorry, file" << inputFile << "does not exist";
+        return false;
+    }
+
+    // get path for composite file parsing
+    //qDebug() << fi.absolutePath();
+    strcpy(filePrefix, fi.absolutePath().toLatin1().data());
+    zindex = 0; // ZW
+    // init adlParser
+    Init(this);
+
+    //get rid of path, we want to generate where we are
+    outputFile = outputFile.section('/',-1);
+    openFile(outputFile.toLatin1().data());
+
+    // open input file
+    FILE *filePtr = fopen(inputFile.toLatin1().data(), "r");
+    FrameOffset offset;
+
+    DisplayInfo *cdi = (DisplayInfo *) malloc(sizeof (DisplayInfo));
+    offset.frameX = 0;
+    offset.frameY = 0;
+    cdi->filePtr = filePtr;
+
+    // start parsing
+    initScanning();
+    tokenType = getToken(cdi, token);
+    if (tokenType == T_WORD && !strcmp(token, "file")) {
+        parseFile(cdi);
+    } else {
+        qDebug() << "dmDisplayListParse: Invalid .adl file (First block is not file block) file: " <<  inputFile;
+        closeFile();
+        return false;
+    }
+    // continue parsing
+    tokenType = getToken(cdi, token);
+    if (tokenType == T_WORD && !strcmp(token, "display")) {
+        parseDisplay(cdi);
+    } else {
+        closeFile();
+        qDebug() << "dmDisplayListParse: Invalid .adl file (Second block is not display block) " << inputFile;
+        return false;
+    }
+
+    // Read the colormap if there.  Will also create cdi->dlColormap.
+    tokenType = getToken(cdi, token);
+    if (tokenType == T_WORD && (!strcmp(token, "color map") || !strcmp(token, "<<color map>>"))) {
+        cdi->dlColormap = parseColormap(cdi, cdi->filePtr);
+        if (cdi->dlColormap) {
+            tokenType = getToken(cdi, token);
+        } else {
+            printf("Invalid .adl file (Cannot parse colormap file: %s\n", inputFile.toLatin1().data());
+            closeFile();
+            return false;
+        }
+    }
+    // Proceed with parsing
+    while (parseAndAppendDisplayList(cdi, &offset, token, tokenType) != T_EOF) {
+        tokenType = getToken(cdi, token);
+    }
+
+    closeFile();
+    return true;
+}
+
+int myParser::myMain(int argc, char *argv[])
 {
     int	in, numargs;
     char inFile[80] = "";

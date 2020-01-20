@@ -108,6 +108,13 @@ unix:!macx:{
  }
 }
 
+# enable ADL_EDL automatic on the fly conversion, if not enabled, when an adl file is encountered,
+# an ui file is assumed
+!MOBILE: {
+    CONFIG += ADL_EDL_FILES
+    DEFINES += ADL_EDL_FILES
+}
+
 
 # undefine CONFIG epics7 for epics4 plugin support with epics version 7 (only preliminary version as example)
 # one can specify channel access with ca:// and pv access with pva:// (both use the epics4 plugin)

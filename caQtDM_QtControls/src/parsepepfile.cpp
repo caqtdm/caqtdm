@@ -33,6 +33,7 @@ ParsePepFile::ParsePepFile(QString filename, bool willprint)
     QString footer;
 
     QFile *file = new QFile;
+    buffer = new QBuffer();
     int nbRows, nbCols;
     QColor bgColor;
 
@@ -55,8 +56,6 @@ ParsePepFile::ParsePepFile(QString filename, bool willprint)
         firstCols[j] = 0;
         maxCols[j] = 0;
     }
-
-    buffer = new QBuffer();
 
     // parese file
     file->setFileName(filename);
@@ -1377,7 +1376,6 @@ QWidget* ParsePepFile::load(QWidget *parent)
     buffer->seek(0);
     widget=loader.load(buffer, parent);
     buffer->close();
-    delete buffer;
     return widget;
 }
 

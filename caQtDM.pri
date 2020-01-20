@@ -310,6 +310,10 @@ caQtDM_QtControls {
 		DESTDIR = $$(CAQTDM_COLLECT)
     		CONFIG += lib_bundle
                 LIBS += -F$$(QWTLIB) -framework $$(QWTLIBNAME)
+                        ADL_EDL_FILES {
+                           LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -ladlParser
+                           LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -ledlParser
+                        }
   	}
 
 	ios | android {
@@ -436,6 +440,10 @@ caQtDM_Viewer {
                         CONFIG += x11
                         LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
                         LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
+                        ADL_EDL_FILES {
+                           LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -ladlParser
+                           LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -ledlParser
+                        }
                         LIBS += -L$(CAQTDM_COLLECT) -L$(CAQTDM_COLLECT)/designer
                 }
         }
@@ -458,6 +466,10 @@ caQtDM_Viewer {
                 plugins.files += $(CAQTDM_COLLECT)/designer/libqtcontrols_utilities_plugin.dylib
                 caqtdmlibs.path = Contents/Frameworks/
                 caqtdmlibs.files = $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib $(CAQTDM_COLLECT)/libqtcontrols.dylib
+                ADL_EDL_FILES {
+                           caqtdmlibs.files += $(CAQTDM_COLLECT)/libadlParser.dylib
+                           caqtdmlibs.files += $(CAQTDM_COLLECT)/libedlParser.dylib
+                }
                 QMAKE_BUNDLE_DATA += plugins caqtdmlibs
                 calib.path = Contents/Frameworks
 #                calib.files = $$(EPICS_BASE)/lib/darwin-x86/libca.3.14.12.dylib

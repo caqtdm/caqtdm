@@ -129,6 +129,8 @@ public:
     knobData* GetMutexKnobDataPtr(int index);
     knobData* GetMutexKnobDataPV(QWidget *widget, QString pv);
     void TreatRequestedValue(QString pv, QString text, FormatType fType, QWidget *w);
+    // ZHW requested for external integration - allow an external application/object to get the top level ui widget of caQtDM_Lib window
+    QWidget* getMyWidget(){ return myWidget; }
     // interface finish (perhaps we need more)
 
 #ifdef MOBILE

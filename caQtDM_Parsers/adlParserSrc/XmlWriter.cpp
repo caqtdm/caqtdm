@@ -43,7 +43,6 @@ XmlWriter::XmlWriter( QIODevice *device, QTextCodec *codec )
 
 XmlWriter::~XmlWriter()
 {
-    qDebug() << "xml destructor";
     if ( autoNewLine && !atBeginningOfLine )
 	out << endl;
 }
@@ -109,7 +108,8 @@ void XmlWriter::writeOpenTag( const QString& name, const AttrMap& attrs, const A
     writePendingIndent();
     out << opening( name, attrs, attrs1 );
     indentStr += QString().fill( ' ', indentSize );
-    if ( autoNewLine ) newLine();
+    if ( autoNewLine )
+	newLine();
 }
 
 void XmlWriter::writeCloseTag( const QString& name )
@@ -117,7 +117,8 @@ void XmlWriter::writeCloseTag( const QString& name )
     indentStr = indentStr.mid( indentSize );
     writePendingIndent();
     out << opening( "/" + name );
-    if ( autoNewLine ) newLine();
+    if ( autoNewLine )
+	newLine();
 }
 
 void XmlWriter::writeAtomTag( const QString& name, const AttrMap& attrs )
@@ -126,7 +127,8 @@ void XmlWriter::writeAtomTag( const QString& name, const AttrMap& attrs )
     QString atom = opening( name, attrs );
     atom.insert( atom.length() - 1, "/" );
     out << atom;
-    if ( autoNewLine ) newLine();
+    if ( autoNewLine )
+	newLine();
 }
 
 void XmlWriter::writeTaggedString( const QString& name, const QString& string,
@@ -136,6 +138,7 @@ void XmlWriter::writeTaggedString( const QString& name, const QString& string,
     out << opening( name, attrs );
     writeString( string );
     out << opening( "/" + name );
-    if ( autoNewLine ) newLine();
+    if ( autoNewLine )
+	newLine();
 }
 

@@ -34,6 +34,8 @@ TEMPLATE = lib
 MOC_DIR = moc
 INCLUDEPATH += src
 INCLUDEPATH += ../caQtDM_Lib/src
+INCLUDEPATH += ../caQtDM_Parsers/adlParserSrc
+INCLUDEPATH += ../caQtDM_Parsers/edlParserSrc
 
 android {
    INCLUDEPATH += $(ANDROIDFUNCTIONSINCLUDE)
@@ -129,6 +131,10 @@ SOURCES	+= \
     src/calinedraw.cpp \
     src/wmsignalpropagator.cpp \
     src/replacemacro.cpp
+
+ADL_EDL_FILES {
+    SOURCES	+= src/parseotherfile.cpp
+}
 
 XDR_HACK {
     SOURCES += src/xdr_hack.c
@@ -236,5 +242,9 @@ HEADERS	+= \
     src/addevent.h \
     src/animationcode.h \
     src/hideobjectcode.h
+
+ADL_EDL_FILES {
+    HEADERS	+= src/parseotherfile.h
+}
 
 OTHER_FILES += README

@@ -78,6 +78,8 @@ public:
     void test();
     void Init(myParserEDM* edlParser);
     void writeMessage(char *mess);
+    // ZHW
+    void edl2ui(QString inputFile, QString macro = QString());
 
     XmlWriter *xw;
     myParserEDM *edlParser;
@@ -85,6 +87,7 @@ public:
     QString StyleSheet;
     zOrder zorder[10000];
     int zindex;
+    int myMainEDM(int argc, char *argv[]);
 };
 
 #endif

@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include "utility.h"
 #include "tag_pkg.h"
-#include "myParserEDM.h"
+#include "edlParserMain.h"
 #include <vector>
 
 #define AWC_MAXTMPLPARAMS 30

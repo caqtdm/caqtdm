@@ -16,6 +16,10 @@ rm -f ./Makefile
 rm -f ./caQtDM_Viewer/Makefile
 rm -f ./caQtDM_Viewer/parser/Makefile
 rm -f ./caQtDM_Viewer/parserEDM/Makefile
+rm -f ./caQtDM_Parsers/Makefile
+rm -f ./caQtDM_Parsers/adlParser/Makefile
+rm -f ./caQtDM_Parsers/edlParser/Makefile
+rm -f ./caQtDM_AndroidFunctions/Makefile
 rm -f ./caQtDM_Lib/Makefile
 rm -f ./caQtDM_Lib/caQtDM_Plugins/Makefile.csplugins
 rm -f ./caQtDM_Lib/caQtDM_Plugins/demo/Makefile.csplugins
@@ -49,6 +53,20 @@ rm -f ./caQtDM_QtControls/moc/*
 rm -f ./caQtDM_QtControls/obj/*
 rm -f ./caQtDM_Lib/obj/*
 rm -f ./caQtDM_Lib/moc/*
+
+rm -f ./caQtDM_Parsers/Makefile
+rm -f ./caQtDM_Parsers/adlParserSharedLib/Makefile
+rm -f ./caQtDM_Parsers/adlParserStaticLib/Makefile
+rm -f ./caQtDM_Parsers/edlParserSharedLib/Makefile
+rm -f ./caQtDM_Parsers/edlParserStaticLib/Makefile
+rm -f ./caQtDM_Parsers/adlParserSharedLib/obj/*
+rm -f ./caQtDM_Parsers/adlParserStaticLib/obj/*
+rm -f ./caQtDM_Parsers/edlParserSharedLib/obj/*
+rm -f ./caQtDM_Parsers/edlParserStaticLib/obj/*
+rm -f ./caQtDM_Parsers/adlParserSharedLib/moc/*
+rm -f ./caQtDM_Parsers/adlParserStaticLib/moc/*
+rm -f ./caQtDM_Parsers/edlParserSharedLib/moc/*
+rm -f ./caQtDM_Parsers/edlParserStaticLib/moc/*
 
 rm -f ./caQtDM_Lib/caQtDM_Plugins/demo/obj/*
 rm -f ./caQtDM_Lib/caQtDM_Plugins/demo/moc/*
