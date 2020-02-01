@@ -62,7 +62,7 @@ void modbusPlugin::updateInterface()
     // go through our devices
     foreach(int index, listOfIndexes) {
         knobData* kData = mutexknobdataP->GetMutexKnobDataPtr(index);
-        if((kData != (knobData *) 0) && (kData->index != -1)) {
+        if((kData != (knobData *) Q_NULLPTR) && (kData->index != -1)) {
             QString key = kData->pv;
 
             // find this pv in our internal double values list (assume for now we are only treating doubles)
@@ -95,16 +95,12 @@ void modbusPlugin::updateValues()
 // initialize our communicationlayer with everything you need
 int modbusPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow,QMap<QString, QString> options)
 {
-    int i;
-    //Q_UNUSED(options);
-    //qDebug() << "modbusPlugin: InitCommunicationLayer" << data;
     qDebug() << "modbusPlugin: InitCommunicationLayer with options" << options;
 
     mutexknobdataP = data;
     messagewindowP = messageWindow;
 
 
-    initValue = 0.0;
 
 
 

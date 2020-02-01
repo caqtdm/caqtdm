@@ -13,8 +13,10 @@ CONFIG         += plugin
 INCLUDEPATH    += .
 INCLUDEPATH    += ../
 INCLUDEPATH    += ../../src
+
 HEADERS         = modbus_Plugin.h ../controlsinterface.h 
-SOURCES         = modbus_Plugin.cpp 
+
+SOURCES         = modbus_Plugin.cpp
 
 TARGET          = modbus_Plugin
 
