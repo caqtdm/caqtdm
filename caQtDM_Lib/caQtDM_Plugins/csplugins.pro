@@ -7,7 +7,7 @@ include (../../caQtDM_Viewer/qtdefs.pri)
 
 
 TEMPLATE = subdirs
-SUBDIRS = demo epics3 archive
+SUBDIRS = demo epics3 archive environment
 
 !MOBILE {
     epics4: {
