@@ -22,13 +22,15 @@
  *  Contact details:
  *    helge.brands@psi.ch
  */
+#include <QtCore>
 #include <QDebug>
+#include <QString>
 #include <QApplication>
-#include "environment_Plugin.h"
+#include "Environment_Plugin.h"
 
 // as defined in knobDefines.h
 //caType {caSTRING	= 0, caINT = 1, caFLOAT = 2, caENUM = 3, caCHAR = 4, caLONG = 5, caDOUBLE = 6};
-
+#define qasc(x) x.toLatin1().constData()
 
 // gives the plugin name back
 QString environmentPlugin::pluginName()
@@ -55,7 +57,7 @@ environmentPlugin:: ~environmentPlugin()
 // take a look how monitors are treated in the epics3 plugin
 void environmentPlugin::updateInterface()
 {
-    double newValue;
+    QString newValue;
 
     QMutexLocker locker(&mutex);
 
@@ -67,19 +69,28 @@ void environmentPlugin::updateInterface()
 
             // find this pv in our internal double values list (assume for now we are only treating doubles)
             // and increment its value
-            QMap<QString, double>::iterator i = listOfDoubles.find(key);
-            while (i !=listOfDoubles.end() && i.key() == key) {
+            QMap<QString, QString>::iterator i = listOfStrings.find(key);
+            while (i !=listOfStrings.end() && i.key() == key) {
                 newValue = i.value();
                 break;
             }
             // update some data
-            kData->edata.rvalue = newValue;
-            kData->edata.fieldtype = caDOUBLE;
+
+
+
+
+
+
+/*
+
+            kData->edata.rvalue = 0;
+            kData->edata.fieldtype = caCHAR;
             kData->edata.connected = true;
             kData->edata.accessR = kData->edata.accessW = true;
             kData->edata.monitorCount++;
             mutexknobdataP->SetMutexKnobData(kData->index, *kData);
             mutexknobdataP->SetMutexKnobDataReceived(kData);
+            */
         }
     }
 }
@@ -88,8 +99,8 @@ void environmentPlugin::updateInterface()
 void environmentPlugin::updateValues()
 {
     QMutexLocker locker(&mutex);
-    QMap<QString, double>::iterator i;
-    for (i = listOfDoubles.begin(); i != listOfDoubles.end(); ++i) i.value()++;
+    QMap<QString, QString>::iterator i;
+    //for (i = listOfStrings.begin(); i != listOfStrings.end(); ++i) i.value()++;
 }
 
 // initialize our communicationlayer with everything you need
@@ -115,8 +126,9 @@ int environmentPlugin::pvAddMonitor(int index, knobData *kData, int rate, int sk
     Q_UNUSED(skip);
 
     int i;
+    size_t dataSize;
     QMutexLocker locker(&mutex);
-    //qDebug() << "environmentPlugin:pvAddMonitor" << kData->pv << kData->index << kData;
+    qDebug() << "environmentPlugin:pvAddMonitor" << kData->pv << kData->index << kData;
 
     //remove EPICS addjustment parameter
     QString datapv=kData->pv;
@@ -124,6 +136,31 @@ int environmentPlugin::pvAddMonitor(int index, knobData *kData, int rate, int sk
     if(pos != -1) {
      datapv.truncate(pos);
     }
+    listOfIndexes.append(kData->index);
+    listOfRequestedChannels.append(datapv);
+    QString value = (QString)  qgetenv(qasc(datapv));
+    if (!value.isEmpty()){
+        dataSize= value.length();
+        //qDebug() <<"PV:" << datapv << value;
+        if(dataSize != kData->edata.dataSize) {
+           if(kData->edata.dataB != (void*) 0) free(kData->edata.dataB);
+            kData->edata.dataB = (void*) malloc((size_t) dataSize*sizeof(char)+5);
+            kData->edata.dataSize = dataSize;
+        }
+
+
+
+        strcpy((char*)kData->edata.dataB, (char*)qasc(value));
+
+        kData->edata.fieldtype = caSTRING;
+        kData->edata.connected = true;
+        kData->edata.accessR = kData->edata.accessW = true;
+        kData->edata.monitorCount++;
+        mutexknobdataP->SetMutexKnobData(kData->index, *kData);
+        mutexknobdataP->SetMutexKnobDataReceived(kData);
+
+    }
+
 
 
 
@@ -135,6 +172,14 @@ int environmentPlugin::pvClearMonitor(knobData *kData) {
     int i=0;
 
     QMutexLocker locker(&mutex);
+    QString datapv=kData->pv;
+    int pos = datapv.indexOf(".{");
+    if(pos != -1) {
+     datapv.truncate(pos);
+    }
+
+    listOfIndexes.removeAll(kData->index);
+    listOfRequestedChannels.removeAll(datapv);
 
     return true;
 }
@@ -192,7 +237,7 @@ int environmentPlugin::pvGetTimeStamp(char *pv, char *timestamp) {
 int environmentPlugin::pvGetDescription(char *pv, char *description) {
     Q_UNUSED(pv);
     qDebug() << "environmentPlugin:pvGetDescription";
-    strcpy(description, "no Description available BSREAD data transfer");
+    strcpy(description, "no Description available Environment data transfer");
     return true;
 }
 

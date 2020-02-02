@@ -77,7 +77,9 @@ private:
     MutexKnobData *mutexknobdataP;
     MessageWindow *messagewindowP;
     QList<int> listOfIndexes;
-    QMap<QString, double> listOfDoubles;
+    QList<QString> listOfRequestedChannels;
+
+    QMap<QString, QString> listOfStrings;
     QTimer *timer, *timerValues;
   };
 
