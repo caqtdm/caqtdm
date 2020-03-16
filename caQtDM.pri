@@ -756,6 +756,26 @@ caQtDM_xdl2ui{
                 }
         }
 }
+caQtDM_xdl2ui_Lib{
+        unix:!macx {
+            LIBS += $(CAQTDM_COLLECT)/libadlParser.a
+        }
+
+        macx {
+            LIBS += $(CAQTDM_COLLECT)/libadlParser.a
+        }
+
+        win32 {
+                win32-msvc* || msvc{
+                        LIBS += $(CAQTDM_COLLECT)/adlParser.lib
+                }
+
+                win32-g++ {
+                        LIBS += $(CAQTDM_COLLECT)/libadlParser.a
+                }
+        }
+
+}
 #==========================================================================================================
 Define_ZMQ_Lib{
 	

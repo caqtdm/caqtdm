@@ -67,11 +67,13 @@ ParseOtherFile::ParseOtherFile(QString fileName, bool &ok, QString &errorString)
                     myParser converter;
                     converter.adl2ui(fileName);
                 }
+#ifndef _MSC_VER
                 else if ( isEdmFile ){
                     // edm conversion
                     myParserEDM converter;
                     converter.edl2ui(fileName);
                 }
+#endif
                 ok = true;
             }
             delete newFile;

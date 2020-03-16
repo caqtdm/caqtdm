@@ -1,5 +1,5 @@
 include(../qtdefs.pri)
-CONFIG += caQtDM_xdl2ui
+CONFIG += caQtDM_xdl2ui caQtDM_xdl2ui_Lib
 include(../../caQtDM.pri)
 
 contains(QT_VER_MAJ, 5) {
@@ -18,7 +18,7 @@ SOURCES += adlParser.cpp
 
 TARGET = adl2ui
 
-LIBS += $(CAQTDM_COLLECT)/libadlParser.a
+
 
 OTHER_FILES += \
     stylesheet.qss

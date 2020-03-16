@@ -7,5 +7,7 @@ include (../caQtDM_Viewer/qtdefs.pri)
 
 TEMPLATE = subdirs
 
-SUBDIRS = adlParserStaticLib adlParserSharedLib edlParserStaticLib edlParserSharedLib
-
+SUBDIRS = adlParserStaticLib adlParserSharedLib
+unix:{
+    SUBDIRS += edlParserStaticLib edlParserSharedLib
+}

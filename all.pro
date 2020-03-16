@@ -62,7 +62,10 @@ caQtDM_Plugins.file = caQtDM_Lib/caQtDM_Plugins/csplugins.pro
 caQtDM_Plugins.depends = caQtDM_Lib
 
 !MOBILE {
-   SUBDIRS +=  caQtDM_Parsers parser parserEDM
+   SUBDIRS +=  caQtDM_Parsers parser
+   unix:{
+        SUBDIRS += parserEDM
+   }
    parser.file = caQtDM_Viewer/parser/parser.pro
    parser.depends = caQtDM_Parsers
    parserEDM.file = caQtDM_Viewer/parserEDM/parserEDM.pro
