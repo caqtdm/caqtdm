@@ -12,11 +12,11 @@
 
     <supports-screens android:largeScreens="true" android:normalScreens="true" android:anyDensity="true" android:smallScreens="true"/>
 
-    <application android:hardwareAccelerated="true" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:label="-- %%INSERT_APP_NAME%% --">
+    <application android:hardwareAccelerated="true" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:label="caQtDM" android:icon="@drawable/icon">
         <activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density"
                   android:name="org.qtproject.qt5.android.bindings.QtActivity"
                   android:label="-- %%INSERT_APP_NAME%% --"
-                  android:screenOrientation="unspecified"
+                  android:screenOrientation="landscape"
                   android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -52,6 +52,8 @@
             <!--  Messages maps -->
 
             <!-- Splash screen -->
+            <meta-data android:name="android.app.splash_screen_drawable" android:resource="@drawable/screen"/>
+            
             <!-- Orientation-specific (portrait/landscape) data is checked first. If not available for current orientation,
                  then android.app.splash_screen_drawable. For best results, use together with splash_screen_sticky and
                  use hideSplashScreen() with a fade-out animation from Qt Android Extras to hide the splash screen when you
@@ -71,7 +73,7 @@
             <!-- Background running -->
 
             <!-- auto screen scale factor -->
-            <meta-data android:name="android.app.auto_screen_scale_factor" android:value="false"/>
+            <meta-data android:name="android.app.auto_screen_scale_factor" android:value="true"/>
             <!-- auto screen scale factor -->
 
             <!-- extract android style -->
@@ -88,5 +90,7 @@
     <!-- For adding service(s) please check: https://wiki.qt.io/AndroidServices -->
 
     </application>
-
+    
+    <uses-permission android:name="android.permission.PERSISTENT_ACTIVITY"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 </manifest>

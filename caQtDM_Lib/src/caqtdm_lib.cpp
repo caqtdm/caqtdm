@@ -6297,20 +6297,39 @@ void CaQtDM_Lib::Callback_ShellCommandClicked(int indx)
 
 void CaQtDM_Lib::shellCommand(QString command) {
 #ifndef MOBILE
+    QVariant macroString = this->property("macroString");
     command.replace("&T", thisFileShort);
     command.replace("&A", thisFileFull);
+    command.replace("&S", macroString.toString());
+
+    // Code to return the list of all the process variable given with &D
+
+    if(command.contains("&D")) {
+        QStringList pv_list;
+        for (int i=0; i < mutexKnobDataP->GetMutexKnobDataSize(); i++) {
+            knobData kData = mutexKnobDataP->GetMutexKnobData(i);
+            if((kData.index != -1) && (myWidget == (QWidget*) kData.thisW)) {
+                QString pv = kData.pv;
+                pv_list.append(pv);
+            }
+        }
+        pv_list.removeDuplicates();
+        pv_list.sort();
+        command.replace("&D", pv_list.join(" "));
+    }
 #ifdef linux
     int windid = this->winId();
     command.replace("&X", QString::number(windid));
 #endif
     command = command.trimmed();
     postMessage(QtDebugMsg, (char*) qasc(command.trimmed()));
-#ifndef linux
+#if !defined(linux) && !defined(__APPLE__)
     if(command.endsWith("&")) command.remove(command.size()-1, 1);
     //qDebug() << "execute:" << command;
     proc = new myQProcess( this);
     proc->start(command.trimmed(), QIODevice::ReadWrite);
 #else
+    //qDebug() << "shellcommand" << command;
     // I had too many problems with QProcess start, use standard execl
     if(!command.endsWith("&")) command.append("&");
     int status = Execute((char*) qasc(command));
@@ -6735,7 +6754,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     // add to context menu, the actions requested by the environment variable caQtDM_EXEC_LIST
     if(validExecListItems) {
         for(int i=0; i<execListItems.count(); i++) {
-             execListItems[i] = execListItems[i].replace(separator+"//", "://");
+            execListItems[i] = execListItems[i].replace(separator+"//", "://");
             QStringList item = execListItems[i].split(";");
             if(item.count() > 1) {
                 if(!item[1].contains("&P") && onMain) myMenu.addAction(item[0]);
@@ -7615,7 +7634,8 @@ void CaQtDM_Lib::postMessage(QtMsgType type, char *msg)
 /**
   * execute an application on linux
   */
-#ifdef linux
+#ifndef MOBILE
+#if defined(linux) || defined(__APPLE__)
 int CaQtDM_Lib::Execute(char *command)
 {
     int status;
@@ -7636,6 +7656,7 @@ int CaQtDM_Lib::Execute(char *command)
 
     return status;
 }
+#endif
 #endif
 
 void CaQtDM_Lib::TreatOrdinaryValue(QString pvo, double value, int32_t idata,  QString svalue, QWidget *w)
