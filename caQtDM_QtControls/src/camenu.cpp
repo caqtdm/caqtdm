@@ -29,7 +29,7 @@
 #include <QTimer>
 #include <QLineEdit>
 #include <QMouseEvent>
-#include<QApplication>
+#include <QApplication>
 
 caMenu::caMenu(QWidget *parent) : QComboBox(parent)
 {
@@ -52,9 +52,10 @@ caMenu::caMenu(QWidget *parent) : QComboBox(parent)
     lastIndex = 0;
     alarmstatus= -1;
 
+    /* certainly not, while disturbs color handling
     defBackColor = QColor(255, 248, 220, 255);
     defForeColor = Qt::black;
-
+    */
 
     oldStyle="DEADBEEF";
     thisStyle="";
@@ -114,12 +115,11 @@ void caMenu::setColors(QColor bg, QColor fg)
     if(!defBackColor.isValid() || !defForeColor.isValid()) return;
     if((bg != oldBackColor) || (fg != oldForeColor) || (thisColorMode != oldColorMode)) {
         if(thisColorMode == Default) {
-            thisStyle = "caMenu {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);padding: 1px 18px 1px 3px;min-width: 6em;}";
+            thisStyle = "caMenu {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);}";
             thisStyle = thisStyle.arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
                     arg(defForeColor.red()).arg(defForeColor.green()).arg(defForeColor.blue()).arg(defForeColor.alpha());
-
         } else {
-            thisStyle = "caMenu {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);padding: 1px 18px 1px 3px;min-width: 6em;}";
+            thisStyle = "caMenu {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);}";
             thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
                     arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
             oldBackColor = bg;
@@ -129,13 +129,12 @@ void caMenu::setColors(QColor bg, QColor fg)
     }
 
     if(thisStyle != oldStyle || thisColorMode != oldColorMode) {
-        //printf("caMenu style update %i %i (%i)\n",(thisStyle != oldStyle),(thisColorMode != oldColorMode), alarmstatus);
+        //printf("caMenu style update %i %i (%i) %s\n",(thisStyle != oldStyle),(thisColorMode != oldColorMode), alarmstatus, qasc(this->objectName()));
         setStyleSheet(thisStyle);
         oldStyle = thisStyle;
     }
 
     oldColorMode = thisColorMode;
-
 }
 
 void caMenu::setAlarmColors(short status)
