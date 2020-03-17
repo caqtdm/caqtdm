@@ -72,7 +72,6 @@ caMenu::caMenu(QWidget *parent) : QComboBox(parent)
     installEventFilter(this);
 
     setElevation(on_top);
-
 }
 
 QString caMenu::getPV() const
