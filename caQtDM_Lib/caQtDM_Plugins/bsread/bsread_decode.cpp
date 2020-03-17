@@ -438,17 +438,19 @@ void bsread_Decode::setHeader(char *value,size_t size){
                         for (unsigned int j = 0; j < jsonobj4.size(); j++){
                             int value=(int)jsonobj4[j]->AsNumber();
                             chdata->shape.append(value);
-                            QString ShapeChannel=chdata->name;
-                            bsread_channeldata *shape_chdata=new bsread_channeldata();
-                            Channels.append(shape_chdata);
-                            ShapeChannel.append(".BSREADSHAPE");
-                            ShapeChannel.append(QString::number(j));
-                            shape_chdata->type=bs_float32;
-                            shape_chdata->name=ShapeChannel;
-                            shape_chdata->bsdata.bs_float32=value;
-                            shape_chdata->valid=true;
-                            ChannelSearch.insert(ShapeChannel, shape_chdata);
-                            qDebug()<< "shape["<<j<<"]:" << value << ShapeChannel;
+                            if ((jsonobj4.size()>1)&&(value>1)){
+                                QString ShapeChannel=chdata->name;
+                                bsread_channeldata *shape_chdata=new bsread_channeldata();
+                                Channels.append(shape_chdata);
+                                ShapeChannel.append(".BSREADSHAPE");
+                                ShapeChannel.append(QString::number(j));
+                                shape_chdata->type=bs_float32;
+                                shape_chdata->name=ShapeChannel;
+                                shape_chdata->bsdata.bs_float32=value;
+                                shape_chdata->valid=true;
+                                ChannelSearch.insert(ShapeChannel, shape_chdata);
+                                qDebug()<< "shape["<<j<<"]:" << value << ShapeChannel;
+                            }
                         }
 
                     }
