@@ -354,7 +354,15 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     // define a layout
     QGridLayout *layout = new QGridLayout;
-
+#ifdef ADL_EDL_FILES
+    const bool isMedmFile = filename.endsWith (".adl");
+    const bool isEdmFile = filename.endsWith (".edl");
+    if(!QFileInfo::exists(filename)){
+        // if file is not existing try ui ending
+        if (isMedmFile) filename=filename.replace(".adl",".ui");
+        if (isEdmFile) filename=filename.replace(".edl",".ui");
+    }
+#endif
     // define the file to use
     QFile *file = new QFile;
     file->setFileName(filename);
@@ -363,10 +371,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     QFileInfo fi(filename);
 
     if(!fromAS) {
-#ifdef ADL_EDL_FILES
-        const bool isMedmFile = filename.endsWith (".adl");
-        const bool isEdmFile = filename.endsWith (".edl");
-#endif
+
         if(filename.lastIndexOf(".ui") != -1) {
 
             file->open(QFile::ReadOnly);
@@ -2267,6 +2272,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 #ifdef ADL_EDL_FILES
         const bool isMedmFile = fileName.endsWith (".adl");
         const bool isEdmFile = fileName.endsWith (".edl");
+        if(!QFileInfo::exists(fileName)){
+            // if file is not existing try ui ending
+            if (isMedmFile)fileName=fileName.replace(".adl",".ui");
+            if (isEdmFile) fileName=fileName.replace(".edl",".ui");
+        }
         ParseOtherFile *otherFile = (ParseOtherFile *) 0;
         bool convertOK = false;
 #endif

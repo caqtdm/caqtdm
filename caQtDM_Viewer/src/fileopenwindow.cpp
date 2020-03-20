@@ -999,7 +999,19 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         else openFile = inputFile;
         FileName = openFile.append(".ui");
     }
+#ifdef ADL_EDL_FILES
+    qDebug() << "Check if file exists!!!!" << FileName << QFileInfo::exists(FileName) ;
+    if(!QFileInfo::exists(FileName)){
+        qDebug() << "Problem with files exchange ending";
+        // if file is not existing try ui ending
+        if (found2 != -1) FileName=FileName.replace(".adl",".ui");
+        if (found4 != -1) FileName=FileName.replace(".edl",".ui");
+        found1 = inputFile.lastIndexOf(".ui");
+        found2 =-1;
+        found4 =-1;
+    }
 
+#endif
     //qDebug() << "try to open file" << FileName;
 
     // go through the children of this main window and find out if new or already present
