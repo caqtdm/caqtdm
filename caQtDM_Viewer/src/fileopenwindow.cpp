@@ -965,8 +965,8 @@ void FileOpenWindow::nextWindow()
  */
 void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QString& macroString, const QString& geometry, const QString& resizeString)
 {
-    qDebug() << "*************************************************************************";
-    qDebug() << "callback open new file" << inputFile << "with macro string" << macroString;
+    //qDebug() << "*************************************************************************";
+    //qDebug() << "callback open new file" << inputFile << "with macro string" << macroString;
 
     int found1 = inputFile.lastIndexOf(".ui");
     int found2 = inputFile.lastIndexOf(".adl");
@@ -1000,9 +1000,10 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         FileName = openFile.append(".ui");
     }
 #ifdef ADL_EDL_FILES
-    qDebug() << "Check if file exists!!!!" << FileName << QFileInfo::exists(FileName) ;
-    if(!QFileInfo::exists(FileName)){
-        qDebug() << "Problem with files exchange ending";
+    //qDebug() << "Check if file exists!!!!" << FileName << QFileInfo::exists(FileName) ;
+     QFileInfo adledlcheck(FileName);
+    if(!adledlcheck.exists()){
+        //qDebug() << "Problem with files exchange ending";
         // if file is not existing try ui ending
         if (found2 != -1) FileName=FileName.replace(".adl",".ui");
         if (found4 != -1) FileName=FileName.replace(".edl",".ui");

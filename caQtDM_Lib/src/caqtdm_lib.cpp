@@ -357,7 +357,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 #ifdef ADL_EDL_FILES
     const bool isMedmFile = filename.endsWith (".adl");
     const bool isEdmFile = filename.endsWith (".edl");
-    if(!QFileInfo::exists(filename)){
+    QFileInfo adledlcheck(filename);
+    if(!adledlcheck.exists()){
         // if file is not existing try ui ending
         if (isMedmFile) filename=filename.replace(".adl",".ui");
         if (isEdmFile) filename=filename.replace(".edl",".ui");
@@ -2272,7 +2273,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 #ifdef ADL_EDL_FILES
         const bool isMedmFile = fileName.endsWith (".adl");
         const bool isEdmFile = fileName.endsWith (".edl");
-        if(!QFileInfo::exists(fileName)){
+        QFileInfo adledlcheck(fileName);
+        if(!adledlcheck.exists()){
             // if file is not existing try ui ending
             if (isMedmFile)fileName=fileName.replace(".adl",".ui");
             if (isEdmFile) fileName=fileName.replace(".edl",".ui");
