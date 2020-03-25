@@ -1088,10 +1088,15 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         PRINT(printf("\n%*c %s macro=<%s>", 15 * level, '+', qasc(w1->objectName()), qasc(macro)));
         map = createMap(macro);
         // insert special macro into map
+        map.insert("CAQTDM_INTERNAL_UIFULLFILE", thisFileFull);
         QString path = thisFileFull;
         int pos = path.lastIndexOf("/");
         if((pos > 0) && ((path.length() - pos -1) > 0)) path.chop(path.length() - pos -1);
         map.insert("CAQTDM_INTERNAL_UIPATH", path);
+
+        QString filename = thisFileFull.right(thisFileFull.length()-path.length()).trimmed();
+        map.insert("CAQTDM_INTERNAL_UIFILENAME", filename);
+
         map.insert("CAQTDM_INTERNAL_STARTTIME", QTime::currentTime().toString());
         map.insert("CAQTDM_INTERNAL_STARTDATE", QDate::currentDate().toString("dd.MM.yyyy"));
 

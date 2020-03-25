@@ -148,7 +148,7 @@ border-radius: 2px;
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>5</number>
+       <number>11</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -2522,7 +2522,7 @@ p, li { white-space: pre-wrap; }
            <x>0</x>
            <y>0</y>
            <width>479</width>
-           <height>154</height>
+           <height>153</height>
           </rect>
          </property>
          <widget class="caInclude" name="cainclude_4">
@@ -3206,10 +3206,38 @@ p, li { white-space: pre-wrap; }
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_4">
               <item>
-               <widget class="caLabel" name="calabel_75">
+               <widget class="caLabel" name="calabel_109">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>CAQTDM_INTERNAL_UIFULLFILE =</string>
+                </property>
+                <property name="textFormat">
+                 <enum>Qt::PlainText</enum>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+                <property name="fontScaleMode">
+                 <enum>ESimpleLabel::Height</enum>
+                </property>
+                <property name="background">
+                 <color alpha="0">
+                  <red>160</red>
+                  <green>160</green>
+                  <blue>164</blue>
+                 </color>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="caLabel" name="calabel_108">
+                <property name="font">
+                 <font>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3234,10 +3262,38 @@ p, li { white-space: pre-wrap; }
                </widget>
               </item>
               <item>
+               <widget class="caLabel" name="calabel_75">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>CAQTDM_INTERNAL_UIFILENAME =</string>
+                </property>
+                <property name="textFormat">
+                 <enum>Qt::PlainText</enum>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+                <property name="fontScaleMode">
+                 <enum>ESimpleLabel::Height</enum>
+                </property>
+                <property name="background">
+                 <color alpha="0">
+                  <red>160</red>
+                  <green>160</green>
+                  <blue>164</blue>
+                 </color>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="caLabel" name="calabel_76">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3265,7 +3321,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_85">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3293,7 +3349,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_77">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3321,7 +3377,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_78">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3349,7 +3405,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_79">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3377,7 +3433,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_80">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3405,7 +3461,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_81">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3433,7 +3489,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_86">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3461,7 +3517,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_87">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3489,7 +3545,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_88">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3517,7 +3573,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_90">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3545,7 +3601,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_89">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3573,7 +3629,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_82">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3601,7 +3657,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_83">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3629,7 +3685,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_84">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3658,10 +3714,38 @@ p, li { white-space: pre-wrap; }
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_5">
               <item>
-               <widget class="caLabel" name="calabel_91">
+               <widget class="caLabel" name="calabel_110">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>$(CAQTDM_INTERNAL_UIFULLFILE)</string>
+                </property>
+                <property name="textFormat">
+                 <enum>Qt::PlainText</enum>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+                <property name="fontScaleMode">
+                 <enum>ESimpleLabel::Height</enum>
+                </property>
+                <property name="background">
+                 <color alpha="0">
+                  <red>160</red>
+                  <green>160</green>
+                  <blue>164</blue>
+                 </color>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="caLabel" name="calabel_111">
+                <property name="font">
+                 <font>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3686,10 +3770,38 @@ p, li { white-space: pre-wrap; }
                </widget>
               </item>
               <item>
+               <widget class="caLabel" name="calabel_91">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>$(CAQTDM_INTERNAL_UIFILENAME)</string>
+                </property>
+                <property name="textFormat">
+                 <enum>Qt::PlainText</enum>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+                <property name="fontScaleMode">
+                 <enum>ESimpleLabel::Height</enum>
+                </property>
+                <property name="background">
+                 <color alpha="0">
+                  <red>160</red>
+                  <green>160</green>
+                  <blue>164</blue>
+                 </color>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="caLabel" name="calabel_92">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3717,7 +3829,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_93">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3745,7 +3857,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_94">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3773,7 +3885,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_95">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3801,7 +3913,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_96">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3829,7 +3941,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_97">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3857,7 +3969,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_98">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3885,7 +3997,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_99">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3913,7 +4025,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_100">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3941,7 +4053,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_101">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3969,7 +4081,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_102">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3997,7 +4109,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_103">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4025,7 +4137,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_104">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4053,7 +4165,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_105">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4081,7 +4193,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_106">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -12512,7 +12624,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="styleSheet" stdset="0">
-         <string notr="true">QFrame { background: rgb(255, 85, 0, 255); color: rgb(0, 170, 0, 255);}</string>
+         <string notr="true">QFrame { background: rgba(255, 85, 0, 255); color: rgba(0, 170, 0, 255);}</string>
         </property>
        </widget>
        <widget class="caNumeric" name="caNumeric_0">
@@ -16367,7 +16479,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>417</width>
+         <width>416</width>
          <height>360</height>
         </rect>
        </property>
@@ -18301,7 +18413,7 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
      <x>0</x>
      <y>0</y>
      <width>1090</width>
-     <height>18</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
