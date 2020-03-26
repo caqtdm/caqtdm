@@ -923,7 +923,11 @@ void FileOpenWindow::Callback_OpenButton()
 
     if(path.size() == 0 && lastFilePath.size()==0) path.append(".");
     else path = lastFilePath;
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open ui or prc file"), path, tr("ui/prc Files (*.ui *.prc)"));
+#ifdef ADL_EDL_FILES
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Display file"), path, tr("ui/prc Files (*.ui *.prc);;MEDM Files (*.adl);;EDM Files (*.edl);;ALL Files (*.*)"));
+#else
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Display file"), path, tr("ui/prc Files (*.ui *.prc);;ALL Files (*.*)"));
+#endif
     //std::cout << "Got filename: " << fileName.toStdString() << std::endl;
 
     if(!fileName.isNull()) {
