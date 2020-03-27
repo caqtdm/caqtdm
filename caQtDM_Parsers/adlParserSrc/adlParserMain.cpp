@@ -63,6 +63,7 @@ extern "C" {
 }
 // constructor
 myParser::myParser () {
+    tmp_directory="";
 }
 
 void myParser::openFile(char *outFile)
@@ -278,7 +279,13 @@ bool myParser::adl2ui(QString inputFile)
     Init(this);
 
     //get rid of path, we want to generate where we are
-    outputFile = outputFile.section('/',-1);
+    if (!tmp_directory.isEmpty()){
+        QFileInfo fileInfo(outputFile);
+        outputFile=fileInfo.fileName();
+        outputFile=tmp_directory+'/'+outputFile;
+    }else{
+      outputFile = outputFile.section('/',-1);
+    }
     openFile(outputFile.toLatin1().data());
 
     // open input file
@@ -478,5 +485,15 @@ int myParser::myMain(int argc, char *argv[])
     adlParser->closeFile();
 
     return 0;
+}
+
+QString myParser::getTmp_directory() const
+{
+    return tmp_directory;
+}
+
+void myParser::setTmp_directory(const QString &value)
+{
+    tmp_directory = value;
 }
 

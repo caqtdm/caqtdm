@@ -53,7 +53,10 @@ public:
     bool adl2ui(QString inputFile);
     int myMain(int argc, char *argv[]);
 
-private:
+    QString getTmp_directory() const;
+    void setTmp_directory(const QString &value);
 
+private:
+    QString tmp_directory;
 };
 #endif
