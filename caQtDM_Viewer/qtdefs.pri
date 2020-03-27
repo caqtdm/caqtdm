@@ -255,6 +255,34 @@ DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
+# 4.2.5
+# POPUP status Windows
+# dynamic Property caqtdmPopupUI for POPUP Windows (The filename muist contain the word popup)
+# fix for to long strings in channel names
+# fix for some character problems
+# fix for alarm status for caMenu
+# fix for softPV Waveform Processing
+# cleanup in the sf-archiver
+# fix in caMenu, paintEvent removed
+# more file status check before accessing (avoid AFS problems)
+# fix the seg fault for the classname problem EPushButton
+# softPV vector/scalar performance problem fixed
+# start of EPICS 4 to EPICS 7 implementation
+# fix for string length problems
+# calinedraw emit textChanged
+# optimized caCalc signal emitance
+# caCamera add solts for zoom and position
+# caQtDM can be compiled with VS2019
+# Updates for Android and IOS
+# fixes some problems with MOC and QWT
+# build in ADL and EDL Parser
+# shellcommand for Mac
+# landscape version for Android
+# fileopening with dynaic conversion causes problems using TEMP directory
+
+
+
+
 # 4.2.4
 # fixed a exception in bsread at closing
 # added a userdefined format to caLinEdit,caTextEntry and caTextEntry
