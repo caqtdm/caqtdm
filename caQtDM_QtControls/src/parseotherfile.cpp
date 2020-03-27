@@ -50,9 +50,12 @@ ParseOtherFile::ParseOtherFile(QString fileName, bool &ok, QString &errorString)
         } else {
             // file to convert to locally
             //printf("caQtDM -- parseotherfile %s file to convert exists\n", qasc(fileName));
-            outFileName = aFile->fileName().section('/',-1);
+            QFileInfo fileInfo(aFile->fileName());
+
+            outFileName=QDir::tempPath()+QDir::separator()+fileInfo.fileName();
             outFileName.chop (3);
             outFileName.append ("ui");
+            outFileName=QDir::fromNativeSeparators(outFileName);
 
             QFile* newFile = new QFile(outFileName);
             if(newFile->exists() ) {
@@ -65,6 +68,7 @@ ParseOtherFile::ParseOtherFile(QString fileName, bool &ok, QString &errorString)
                 if( isMedmFile ){
                     // medm conversion
                     myParser converter;
+                    converter.setTmp_directory(QDir::tempPath());
                     converter.adl2ui(fileName);
                 }
 #ifndef _MSC_VER

@@ -972,51 +972,70 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     //qDebug() << "*************************************************************************";
     //qDebug() << "callback open new file" << inputFile << "with macro string" << macroString;
 
-    int found1 = inputFile.lastIndexOf(".ui");
-    int found2 = inputFile.lastIndexOf(".adl");
-    int found3 = inputFile.lastIndexOf(".prc");
-    int found4 = inputFile.lastIndexOf(".edl");
-    QString FileName;
-
-    // normal ui file
-    if (found1 != -1) {
-        FileName = inputFile;
-    }
-    // if we have a adl file, default is taking a corresponding ui file
-    else if(found2 != -1 || found4 != -1) {
-#ifndef ADL_EDL_FILES
-        QString openFile = inputFile.mid(0, found2);
-        FileName = openFile.append(".ui");
-        messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(tr("file %1 is not parsed (caQtDM built without ADL_EDL_FILES)").arg(inputFile)));
-#else
-        FileName = inputFile;
-#endif
-    }
-    // normal ui file
-    else if (found3 != -1) {
-        FileName = inputFile;
-    // missing or wrong extension
-    } else {
-        QString openFile;
-        int found = inputFile.lastIndexOf(".");
-        if(found > -1) openFile = inputFile.mid(0, found);
-        else openFile = inputFile;
-        FileName = openFile.append(".ui");
-    }
 #ifdef ADL_EDL_FILES
-    //qDebug() << "Check if file exists!!!!" << FileName << QFileInfo::exists(FileName) ;
-     QFileInfo adledlcheck(FileName);
-    if(!adledlcheck.exists()){
-        //qDebug() << "Problem with files exchange ending";
-        // if file is not existing try ui ending
-        if (found2 != -1) FileName=FileName.replace(".adl",".ui");
-        if (found4 != -1) FileName=FileName.replace(".edl",".ui");
-        found1 = inputFile.lastIndexOf(".ui");
-        found2 =-1;
-        found4 =-1;
-    }
-
+    const int extensions=4;
+    const QString valid_extensions[extensions] = {".ui", ".prc", ".adl", ".edl"};
+#else
+    const int extensions=2;
+    const QString valid_extensions[extensions] = {".ui", ".prc"};
 #endif
+    QString FileName;
+    int ext_found=-1;
+    FileName=inputFile;
+
+
+    int counter=0;
+    bool check_extension = false;
+    while (counter<extensions){
+        check_extension = check_extension || inputFile.endsWith(valid_extensions[counter]);
+        if (check_extension) break;
+        counter++;
+    }
+    ext_found=counter;
+    counter=0;
+    if (!check_extension) {
+        while (counter<extensions){
+            FileName=inputFile;
+            FileName=FileName.append(valid_extensions[counter]);
+            searchFile *filecheck = new searchFile(FileName);
+            FileName=filecheck->findFile();
+            delete filecheck;
+            if (!FileName.isNull()) break;
+            counter++;
+        }
+#ifndef ADL_EDL_FILES
+        if (counter==extensions)
+            messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(tr("file %1 is not parsed (caQtDM built without ADL_EDL_FILES)").arg(inputFile)));
+#endif
+    }else{
+        //check if file is there else check other extensions
+        searchFile *filecheck = new searchFile(FileName);
+        FileName=filecheck->findFile();
+        delete filecheck;
+        if (FileName.isNull()){
+            //remove the extension
+            FileName=inputFile;
+            counter=0;
+            while (counter<extensions){
+                if (counter!=ext_found){
+                    FileName=inputFile;
+                    FileName=FileName.remove(valid_extensions[ext_found]);
+                    FileName=FileName.append(valid_extensions[counter]);
+                    searchFile *filecheck = new searchFile(FileName);
+                    FileName=filecheck->findFile();
+                    //qDebug() << "check " << FileName << valid_extensions[counter] ;
+                    delete filecheck;
+                    if (!FileName.isNull()) break;
+                }
+                counter++;
+            }
+            //if this I give up nothing is found
+            if (counter==extensions) FileName=inputFile;
+
+
+        }
+
+    }
     //qDebug() << "try to open file" << FileName;
 
     // go through the children of this main window and find out if new or already present
@@ -1092,7 +1111,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "file open error", message, ":/caQtDM-logos.png", QMessageBox::Close, this, Qt::Dialog, true);
         m->show();
     } else {
-        //qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString;
+        qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString;
         QPoint position(0,0);
         QMainWindow *mainWindow = loadMainWindow(position, fileNameFound, macroString, resizeString, printandexit, false, (geometry == ""));//if geometry is empty center window (for windows)
         if(geometry != "") {
