@@ -91,7 +91,7 @@ void caNumeric::setColors(QColor bg, QColor fg)
 
     if((bg != oldBackColor) || (fg != oldForeColor)  || renewStyleSheet || styleSheet().isEmpty()) {
         renewStyleSheet = false;
-        QString style = "background: rgb(%1, %2, %3, %4); color: rgb(%5, %6, %7, %8);";
+        QString style = "background: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
         style = style.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
                 arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
         setStyleSheet(style);
