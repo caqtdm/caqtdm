@@ -178,7 +178,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
 
     QVariant status =  reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
 
-    if(status.toInt() == 307) {
+    if(status.toInt() == 301||status.toInt() == 302||status.toInt() == 303||status.toInt() == 307||status.toInt() == 308) {
         errorString = tr("Temporary Redirect status code %1 [%2] from %3").arg(status.toInt()).arg(reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString()).arg(downloadUrl.toString());
         //qDebug() << QTime::currentTime().toString() << this << PV << "finishreply" << errorString;
         QByteArray header = reply->rawHeader("location");
