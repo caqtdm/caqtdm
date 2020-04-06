@@ -116,10 +116,18 @@ int main(int argc, char *argv[])
 #endif
 
     //MyApplication app(argc, argv);
+#if defined(_MSC_VER)
+#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
+    // to avoid an error output: "Qt WebEngine seems to be initialized from a plugin"
+    QGuiApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+#endif
+#endif
 
     QApplication app(argc, argv);
     QApplication::setOrganizationName("Paul Scherrer Institut");
     QApplication::setApplicationName("caQtDM");
+
+
 
 #ifdef MOBILE_ANDROID
     //qDebug() << QStyleFactory::keys();
