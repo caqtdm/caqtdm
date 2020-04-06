@@ -58,6 +58,7 @@
 sfRetrieval::sfRetrieval()
 {
     finished = false;
+    intern_is_Redirected = false;
     manager = new QNetworkAccessManager(this);
     eventLoop = new QEventLoop(this);
     errorString = "";
@@ -176,6 +177,22 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
     }
 
     QVariant status =  reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+
+    if(status.toInt() == 307) {
+        errorString = tr("Temporary Redirect status code %1 [%2] from %3").arg(status.toInt()).arg(reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString()).arg(downloadUrl.toString());
+        //qDebug() << QTime::currentTime().toString() << this << PV << "finishreply" << errorString;
+        QByteArray header = reply->rawHeader("location");
+        qDebug() << "location" << header;
+        finished = true;
+        intern_is_Redirected=true;
+        Redirected_Url=header;
+
+        emit requestFinished();
+        reply->deleteLater();
+
+        return;
+    }
+
     if(status.toInt() != 200) {
         errorString = tr("unexpected http status code %1 [%2] from %3").arg(status.toInt()).arg(reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString()).arg(downloadUrl.toString());
         //qDebug() << QTime::currentTime().toString() << this << PV << "finishreply" << errorString;
@@ -444,6 +461,16 @@ bool sfRetrieval::getDoubleFromString(QString input, double &value) {
     } else {
         return false;
     }
+}
+
+bool sfRetrieval::is_Redirected() const
+{
+    return intern_is_Redirected;
+}
+
+QString sfRetrieval::getRedirected_Url() const
+{
+    return Redirected_Url;
 }
 
 int sfRetrieval::getCount()

@@ -60,6 +60,9 @@ public:
     void cancelDownload();
     void close();
 
+    QString getRedirected_Url() const;
+    bool is_Redirected() const;
+
 signals:
     void networkError(const QString);
     void requestFinished();
@@ -88,6 +91,8 @@ private:
     QString Backend;
     bool aborted;
     QString PV;
+    bool intern_is_Redirected;
+    QString Redirected_Url;
 };
 
 #endif

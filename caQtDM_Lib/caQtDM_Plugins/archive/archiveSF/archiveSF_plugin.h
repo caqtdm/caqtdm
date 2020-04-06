@@ -116,14 +116,27 @@ public slots:
         fromArchive = new sfRetrieval();
 
         //qDebug() << "fromArchive pointer=" << fromArchive << indexNew.timeAxis;
+        bool readdata_ok=fromArchive->requestUrl(url, json_str, indexNew.secondsPast, isBinned, indexNew.timeAxis, key);
 
-        if(fromArchive->requestUrl(url, json_str, indexNew.secondsPast, isBinned, indexNew.timeAxis, key)) {
+        if (fromArchive->is_Redirected()){
+          url=QUrl(fromArchive->getRedirected_Url());
+          // Messages disabled because too many output
+          //QString mess("ArchiveSF plugin -- redirect: ");
+          //mess.append(url.toString());
+          //messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(mess));
+          fromArchive->deleteLater();
+          fromArchive = new sfRetrieval();
+          readdata_ok=fromArchive->requestUrl(url, json_str, indexNew.secondsPast, isBinned, indexNew.timeAxis, key);
+        }
+
+        if(readdata_ok) {
             if((nbVal = fromArchive->getCount()) > 0) {
                 //qDebug() << nbVal << total;
                 TimerN.resize(fromArchive->getCount());
                 YValsN.resize(fromArchive->getCount());
                 fromArchive->getData(TimerN, YValsN);
             }
+
         } else {
             if(messageWindow != (MessageWindow *) 0) {
                 QString mess("ArchiveSF plugin -- lastError: ");
