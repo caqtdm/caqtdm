@@ -1125,6 +1125,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         map.insert("CAQTDM_INTERNAL_CA_ADDRLIST",qgetenv("EPICS_CA_ADDR_LIST"));
         map.insert("CAQTDM_INTERNAL_BS_ADDRLIST",qgetenv("BSREAD_ZMQ_ADDR_LIST"));
         map.insert("CAQTDM_INTERNAL_BS_DISPATCHER",qgetenv("BSREAD_DISPATCHER"));
+        map.insert("CAQTDM_INTERNAL_ARCHIVESF_URL",qgetenv("CAQTDM_ARCHIVERSF_URL"));
     }
 
     QColor bg = w1->property("background").value<QColor>();

@@ -3237,7 +3237,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_108">
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3293,7 +3293,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_76">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3349,7 +3349,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_77">
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3405,7 +3405,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_79">
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3461,7 +3461,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_81">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3489,7 +3489,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_86">
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3517,7 +3517,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_87">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3573,7 +3573,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_90">
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3601,7 +3601,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_89">
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3629,7 +3629,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_82">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3685,11 +3685,39 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_84">
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
                  <string>CAQTDM_INTERNAL_BS_DISPATCHER =</string>
+                </property>
+                <property name="textFormat">
+                 <enum>Qt::PlainText</enum>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+                <property name="fontScaleMode">
+                 <enum>ESimpleLabel::Height</enum>
+                </property>
+                <property name="background">
+                 <color alpha="0">
+                  <red>160</red>
+                  <green>160</green>
+                  <blue>164</blue>
+                 </color>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="caLabel" name="calabel_112">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>CAQTDM_INTERNAL_ARCHIVESF_URL =</string>
                 </property>
                 <property name="textFormat">
                  <enum>Qt::PlainText</enum>
@@ -3745,7 +3773,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_111">
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3801,7 +3829,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_92">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3857,7 +3885,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_94">
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3913,7 +3941,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_96">
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3969,7 +3997,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_98">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3997,7 +4025,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_99">
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4025,7 +4053,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_100">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4081,7 +4109,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_102">
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4109,7 +4137,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_103">
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4137,7 +4165,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_104">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4193,11 +4221,39 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_106">
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
                  <string>$(CAQTDM_INTERNAL_BS_DISPATCHER)</string>
+                </property>
+                <property name="textFormat">
+                 <enum>Qt::PlainText</enum>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+                <property name="fontScaleMode">
+                 <enum>ESimpleLabel::Height</enum>
+                </property>
+                <property name="background">
+                 <color alpha="0">
+                  <red>160</red>
+                  <green>160</green>
+                  <blue>164</blue>
+                 </color>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="caLabel" name="calabel_113">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>$(CAQTDM_INTERNAL_ARCHIVESF_URL)</string>
                 </property>
                 <property name="textFormat">
                  <enum>Qt::PlainText</enum>
