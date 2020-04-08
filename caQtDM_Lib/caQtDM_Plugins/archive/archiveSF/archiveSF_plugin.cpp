@@ -158,8 +158,9 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
 
                 // first look if an environment variable is set for the url
                 QString url = (QString)  qgetenv("CAQTDM_ARCHIVERSF_URL");
-                if(url.size() == 0) {
+                if(url.size() == 0 ||(!w->property("archiverIndex").toString().isEmpty())) {
                     var = w->property("archiverIndex");
+                    //qDebug() << "Check URL: " <<var;
                     if(!var.isNull()) {
                         QString indexName = var.toString();
                         index_name = qasc(indexName);

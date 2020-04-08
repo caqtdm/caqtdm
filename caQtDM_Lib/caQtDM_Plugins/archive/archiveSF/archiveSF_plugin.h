@@ -120,10 +120,16 @@ public slots:
 
         if (fromArchive->is_Redirected()){
           url=QUrl(fromArchive->getRedirected_Url());
-          // Messages disabled because too many output
-          //QString mess("ArchiveSF plugin -- redirect: ");
-          //mess.append(url.toString());
-          //messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(mess));
+          // Messages in case of a redirect and set the widget to the correct location
+          // with a reload of the panel this information get lost.
+          // the url storage location is the dynamic property of the widget
+          QString mess("ArchiveSF plugin -- redirect: ");
+          mess.append(key);
+          mess.append(" to ");
+          mess.append(url.toString());
+          messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(mess));
+          indexNew.w->setProperty("archiverIndex",QVariant(url.toString()));
+          //qDebug()<< "archiv PV"<<indexNew.pv;
           fromArchive->deleteLater();
           fromArchive = new sfRetrieval();
           readdata_ok=fromArchive->requestUrl(url, json_str, indexNew.secondsPast, isBinned, indexNew.timeAxis, key);
