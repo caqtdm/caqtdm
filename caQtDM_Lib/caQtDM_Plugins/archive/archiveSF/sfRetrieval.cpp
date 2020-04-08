@@ -360,7 +360,8 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
                                     // look for mean
                                     if (root2.find(L"mean") != root2.end() && root2[L"mean"]->IsNumber()) {
                                         //qDebug() << "mean part found";
-                                        stat = swscanf(root2[L"mean"]->Stringify().c_str(), L"%lf", &mean);
+                                        //stat = swscanf(root2[L"mean"]->Stringify().c_str(), L"%lf", &mean);
+                                        mean=root2[L"mean"]->AsNumber();
                                         valueFound = true;
                                     }
                                     delete value2;
@@ -401,7 +402,8 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
                                 JSONObject root1 = array[i]->AsObject();
                                 if (root1.find(L"value") != root1.end() && root1[L"value"]->IsNumber()) {
                                     //qDebug() << "value found";
-                                    stat = swscanf(root1[L"value"]->Stringify().c_str(), L"%lf", &mean);
+                                    //stat = swscanf(root1[L"value"]->Stringify().c_str(), L"%lf", &mean);
+                                    mean=root1[L"value"]->AsNumber();
                                     valueFound = true;
                                 } else
 
