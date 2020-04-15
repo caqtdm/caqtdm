@@ -747,7 +747,6 @@ caQtDM_xdl2ui{
         win32 {
                 message("adl2ui configuration win32")
                 win32-msvc* || msvc{
-                        CONFIG += Define_Build_OutputDir
                 }
 
                 win32-g++ {
