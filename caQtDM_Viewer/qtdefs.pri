@@ -257,7 +257,7 @@ DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
 # 4.2.5
 # POPUP status Windows
-# dynamic Property caqtdmPopupUI for POPUP Windows (The filename muist contain the word popup)
+# dynamic Property caqtdmPopupUI for POPUP Windows (The filename must contain the word popup)
 # fix for to long strings in channel names
 # fix for some character problems
 # fix for alarm status for caMenu
@@ -271,15 +271,16 @@ DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 # fix for string length problems
 # calinedraw emit textChanged
 # optimized caCalc signal emitance
-# caCamera add solts for zoom and position
+# caCamera add slots for zoom and position
 # caQtDM can be compiled with VS2019
 # Updates for Android and IOS
 # fixes some problems with MOC and QWT
 # build in ADL and EDL Parser
 # shellcommand for Mac
 # landscape version for Android
-# fileopening with dynaic conversion causes problems using TEMP directory
-
+# fileopening with dynamic conversion causes problems using TEMP directory
+# added for archivSF the redirection feature to access multiple data sources
+# fix a floating point problem on RHL7 in the archiveSF
 
 
 
