@@ -36,6 +36,12 @@
 #include <QTimer>
 #include "controlsinterface.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+#ifndef Q_NULLPTR
+    #define Q_NULLPTR 0
+#endif
+#endif
+
 class Q_DECL_EXPORT environmentPlugin : public QObject, ControlsInterface
 {
     Q_OBJECT
