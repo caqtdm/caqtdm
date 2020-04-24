@@ -8408,6 +8408,60 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
 #ifndef MOBILE
 // a popup can be displayed when hovering over a widget by taking from the dynamic property caqtdmPopupUI a popup ui file and a macro definition.
 // this will only work when the widget has at least one monitor and the file contains the character sequence popup
+void CaQtDM_Lib::send_delayed_popup_signal(){
+    qDebug()<< "delayed popup timer signal";
+    QVariant dynVars;
+    bool marker_delay_popup=false;
+    QWidget *w= (QWidget*) 0;
+
+    QList<QWidget *> list=this->findChildren<QWidget *>();
+    QMutableListIterator<QWidget*> i(list);
+    while (i.hasNext()&&!marker_delay_popup) {
+        w=i.next();
+        QString className(w->metaObject()->className());
+        if (className.contains("ca")){
+            dynVars = w->property("delayed_popup_timer");
+            if(dynVars.isValid()) {
+                if(dynVars.canConvert<bool>()){
+                    marker_delay_popup =dynVars.toBool();
+                }
+            }
+        }
+    }
+    if (marker_delay_popup){
+        QString Filename="";
+        QString Args="";
+        QString geometry="";
+
+        dynVars = w->property("delayed_popup_filename");
+        qDebug() << dynVars;
+        if(dynVars.canConvert<QString>()){
+            Filename =dynVars.toString();
+        }
+        dynVars = w->property("delayed_popup_args");
+        if(dynVars.canConvert<QString>()){
+            Args =dynVars.toString();
+        }
+        dynVars = w->property("delayed_popup_geometry");
+        if(dynVars.canConvert<QString>()){
+            geometry =dynVars.toString();
+        }
+
+        // qDebug() << Filename << Args <<w;
+        if(!Filename.isEmpty())  {
+            qDebug()<< "delayed_popup_timer";
+            emit Signal_OpenNewWFile(Filename, Args, geometry, "true ToolTip FramelessWindowHint");
+            w->setProperty("delayed_popup_timer",false);
+            w->setProperty("delayed_popup_filename","");
+            w->setProperty("delayed_popup_args","");
+            w->setProperty("delayed_popup_geometry","");
+
+        }
+    }
+}
+
+
+
 bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::HoverEnter) {
@@ -8415,27 +8469,75 @@ bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
         QVariant dynVars = w->property("caqtdmPopupUI");
         if(!dynVars.isNull()) {
             if(dynVars.canConvert<QString>())  {
+                QString Filename="";
+                QString Args="";
+                QString geometry="";
                 QString popupUI = dynVars.toString().trimmed();
                 QStringList popupFields = popupUI.split(";", QString::SkipEmptyParts);
-                if(popupFields.size() > 1) {
-                    popupFields[1].replace("\"","");  // in case of macro surrounded by double quotes
-                    if(popupFields[0].contains(POPUPDEFENITION)) emit Signal_OpenNewWFile(popupFields[0], popupFields[1], "", "true");
-                } else if(popupFields.size() > 0) {
-                    if(popupFields[0].contains(POPUPDEFENITION)) emit Signal_OpenNewWFile(popupFields[0], "", "", "true");
+
+                if(popupFields.size() > 0) {
+                    if(popupFields[0].contains(POPUPDEFENITION)){
+                        Filename=popupFields[0];
+                        if(popupFields.size() > 1) {
+                            popupFields[1].replace("\"","");// in case of macro surrounded by double quotes
+                            Args=popupFields[1];
+                        }
+                    }
+                }
+                QPoint pos = QCursor::pos();
+                geometry=QString("+%1+%2\0").arg(pos.x()+5).arg(pos.y()+5);
+                qDebug() << geometry;
+                QVariant delayVars = w->property("caqtdmPopupUI_Delay");
+                if(!delayVars.isNull()) {
+                    if(delayVars.canConvert<int>())  {
+                        int timeout = delayVars.toInt();
+                        if(popupFields.size() > 0) {
+                            w->setProperty("delayed_popup_timer",true);
+                            w->setProperty("delayed_popup_filename",Filename);
+                            w->setProperty("delayed_popup_args",Args);
+                            w->setProperty("delayed_popup_geometry",geometry);
+                            qDebug() << Filename << Args <<w;
+                            QTimer::singleShot(timeout, this, SLOT(send_delayed_popup_signal()));
+
+                        }
+                    }
+                }else{
+                    if (!Filename.isEmpty()) Signal_OpenNewWFile(Filename, Args, geometry, "true ToolTip FramelessWindowHint");
                 }
             }
         }
     } else if(event->type() == QEvent::HoverLeave) {
+        QWidget *wo= (QWidget*) obj;
+        QVariant dynVars = wo->property("caqtdmPopupUI");
+        if(!dynVars.isNull()) {
+            dynVars = wo->property("delayed_popup_timer");
+            if(dynVars.isValid()) {
+                wo->setProperty("delayed_popup_timer",false);
+                wo->setProperty("delayed_popup_filename","");
+                wo->setProperty("delayed_popup_args","");
+            }
+        }
         foreach (QWidget *widget, QApplication::topLevelWidgets()) {
             if (CaQtDM_Lib *w = qobject_cast<CaQtDM_Lib *>(widget)) {
                 QVariant fileName = w->property("fileString");
                 QString qs = fileName.toString();
+
                 if(qs.contains(POPUPDEFENITION)) {
                     w->closeWindow();
                 }
             }
         }
     } else if(event->type() == QEvent::HoverMove) {
+        //Update for delay visibility Enter and move are a little bit away
+        QWidget *wu= (QWidget*) obj;
+        QVariant dynVars = wu->property("caqtdmPopupUI");
+        if(!dynVars.isNull()) {
+            QPoint pos = QCursor::pos();
+            QString geometry="";
+            geometry=QString("+%1+%2\0").arg(pos.x()+5).arg(pos.y()+5);
+            wu->setProperty("delayed_popup_geometry",geometry);
+        }
+
         foreach (QWidget *widget, QApplication::topLevelWidgets()) {
             if (CaQtDM_Lib *w = qobject_cast<CaQtDM_Lib *>(widget)) {
                 QVariant fileName = w->property("fileString");

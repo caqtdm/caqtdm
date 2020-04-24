@@ -466,6 +466,8 @@ private slots:
     }
 
     void updateResize();
+
+    void send_delayed_popup_signal();
 };
 
 #endif // CaQtDM_Lib_H

@@ -825,6 +825,30 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
         } else {
             newWindow->allowResizing(true);
         }
+        if(resizeS.contains("Window")||
+           resizeS.contains("ToolTip")||
+           resizeS.contains("SplashScreen")) {
+            Qt::WindowFlags flags;
+            if(resizeS.contains("Window")){
+              flags = Qt::Window;
+            }
+            if(resizeS.contains("ToolTip")){
+              flags = Qt::ToolTip;
+            }
+            if(resizeS.contains("SplashScreen")){
+              flags = Qt::SplashScreen;
+            }
+            if(resizeS.contains("FramelessWindowHint")){
+              flags |= Qt::FramelessWindowHint;
+            }
+            if(resizeS.contains("WindowStaysOnTopHint")){
+              flags |= Qt::WindowStaysOnTopHint;
+            }
+            newWindow->setWindowFlags(flags);
+        }
+
+
+
     }
 
 #ifdef MOBILE

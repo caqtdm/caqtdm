@@ -148,7 +148,7 @@ border-radius: 2px;
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>11</number>
+       <number>12</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -4279,6 +4279,159 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
         </layout>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_50">
+       <attribute name="title">
+        <string>Popup</string>
+       </attribute>
+       <widget class="caNumeric" name="canumeric_21">
+        <property name="geometry">
+         <rect>
+          <x>210</x>
+          <y>100</y>
+          <width>100</width>
+          <height>50</height>
+         </rect>
+        </property>
+        <property name="integerDigits" stdset="0">
+         <number>4</number>
+        </property>
+        <property name="decimalDigits" stdset="0">
+         <number>0</number>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">changeStart</string>
+        </property>
+        <property name="precisionMode">
+         <enum>caNumeric::User</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caNumeric::User</enum>
+        </property>
+        <property name="maxValue">
+         <double>360.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="caqtdmPopupUI" stdset="0">
+         <string>popup.ui; DEVICE=ACM:COUNT:1</string>
+        </property>
+       </widget>
+       <widget class="caNumeric" name="canumeric_22">
+        <property name="geometry">
+         <rect>
+          <x>210</x>
+          <y>200</y>
+          <width>100</width>
+          <height>50</height>
+         </rect>
+        </property>
+        <property name="integerDigits" stdset="0">
+         <number>4</number>
+        </property>
+        <property name="decimalDigits" stdset="0">
+         <number>0</number>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">changeStart</string>
+        </property>
+        <property name="precisionMode">
+         <enum>caNumeric::User</enum>
+        </property>
+        <property name="limitsMode">
+         <enum>caNumeric::User</enum>
+        </property>
+        <property name="maxValue">
+         <double>360.000000000000000</double>
+        </property>
+        <property name="minValue">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="caqtdmPopupUI" stdset="0">
+         <string>popup.ui; DEVICE=ACM:COUNT:1</string>
+        </property>
+        <property name="caqtdmPopupUI_Delay" stdset="0">
+         <string>500</string>
+        </property>
+       </widget>
+       <widget class="caLineEdit" name="calineedit_34">
+        <property name="geometry">
+         <rect>
+          <x>220</x>
+          <y>300</y>
+          <width>100</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:COUNT:1</string>
+        </property>
+        <property name="caqtdmPopupUI" stdset="0">
+         <string>popup.ui; DEVICE=ACM:COUNT:1</string>
+        </property>
+        <property name="caqtdmPopupUI_Delay" stdset="0">
+         <string>2000</string>
+        </property>
+       </widget>
+       <widget class="caRelatedDisplay" name="carelateddisplay_7">
+        <property name="geometry">
+         <rect>
+          <x>460</x>
+          <y>80</y>
+          <width>261</width>
+          <height>70</height>
+         </rect>
+        </property>
+        <property name="labels">
+         <string>collison test</string>
+        </property>
+        <property name="files">
+         <string>popup.ui</string>
+        </property>
+        <property name="args">
+         <string>DEVICE=ACM:COUNT:1</string>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_114">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>110</y>
+          <width>151</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Popup with no delay</string>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_115">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>210</y>
+          <width>161</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Popup 500 ms delay</string>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_116">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>300</y>
+          <width>161</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Popup 2000 ms delay</string>
+        </property>
        </widget>
       </widget>
      </widget>
@@ -12608,7 +12761,7 @@ def PythonCalc(a, b, c, d):
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>7</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
@@ -14277,7 +14430,7 @@ p, li { white-space: pre-wrap; }
          <string notr="true">ACM:TEST:MBBO</string>
         </property>
         <property name="styleSheet" stdset="0">
-         <string notr="true"/>
+         <string notr="true">caMenu {background-color: rgba(255, 255, 255, 255); color: rgba(0, 0, 0, 255);}</string>
         </property>
        </widget>
        <widget class="caMenu" name="caMenu_10">
@@ -14337,7 +14490,7 @@ p, li { white-space: pre-wrap; }
          <string>myMask</string>
         </property>
         <property name="styleSheet" stdset="0">
-         <string notr="true"/>
+         <string notr="true">caMenu {background-color: rgba(255, 255, 255, 255); color: rgba(0, 0, 0, 255);}</string>
         </property>
        </widget>
        <widget class="caCalc" name="cacalc_53">
@@ -16044,6 +16197,35 @@ p, li { white-space: pre-wrap; }
         <property name="YAxisType" stdset="0">
          <enum>caCartesianPlot::linear</enum>
         </property>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_11">
+        <property name="geometry">
+         <rect>
+          <x>190</x>
+          <y>220</y>
+          <width>162</width>
+          <height>67</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="title">
+         <string>epics4://ACM:COUNT:1</string>
+        </property>
+        <widget class="caTextEntry" name="catextentry_20">
+         <property name="geometry">
+          <rect>
+           <x>12</x>
+           <y>29</y>
+           <width>100</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="channel" stdset="0">
+          <string notr="true">epics4://ACM:COUNT:1</string>
+         </property>
+        </widget>
        </widget>
       </widget>
      </widget>
