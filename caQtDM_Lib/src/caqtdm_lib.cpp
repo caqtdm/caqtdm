@@ -2628,7 +2628,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                 macroS = savedMacro[level-1];
                 savedMacro[level] = macroS;
             } else {
-                macroS = savedMacro[level];
+                //macroS = savedMacro[level];
+                macroS=macro;
             }
         } else {
             //printf("\n    %*c macro=%s <%s>", 15 * level, ' ', qasc(macroS), qasc(w1->objectName()));
