@@ -846,7 +846,9 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
             }
             newWindow->setWindowFlags(flags);
         }
-
+        if(resizeS.contains("PopUpWindow")){
+            newWindow->setProperty("open_as_popupwindow",true);
+        }
 
 
     }

@@ -8410,7 +8410,7 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
 // a popup can be displayed when hovering over a widget by taking from the dynamic property caqtdmPopupUI a popup ui file and a macro definition.
 // this will only work when the widget has at least one monitor and the file contains the character sequence popup
 void CaQtDM_Lib::send_delayed_popup_signal(){
-    qDebug()<< "delayed popup timer signal";
+    //qDebug()<< "delayed popup timer signal";
     QVariant dynVars;
     bool marker_delay_popup=false;
     QWidget *w= (QWidget*) 0;
@@ -8450,8 +8450,8 @@ void CaQtDM_Lib::send_delayed_popup_signal(){
 
         // qDebug() << Filename << Args <<w;
         if(!Filename.isEmpty())  {
-            qDebug()<< "delayed_popup_timer";
-            emit Signal_OpenNewWFile(Filename, Args, geometry, "true ToolTip FramelessWindowHint");
+            //qDebug()<< "delayed_popup_timer";
+            emit Signal_OpenNewWFile(Filename, Args, geometry, "true ToolTip FramelessWindowHint PopUpWindow");
             w->setProperty("delayed_popup_timer",false);
             w->setProperty("delayed_popup_filename","");
             w->setProperty("delayed_popup_args","");
@@ -8497,13 +8497,13 @@ bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
                             w->setProperty("delayed_popup_filename",Filename);
                             w->setProperty("delayed_popup_args",Args);
                             w->setProperty("delayed_popup_geometry",geometry);
-                            qDebug() << Filename << Args <<w;
+                            //qDebug() << Filename << Args <<w;
                             QTimer::singleShot(timeout, this, SLOT(send_delayed_popup_signal()));
 
                         }
                     }
                 }else{
-                    if (!Filename.isEmpty()) Signal_OpenNewWFile(Filename, Args, geometry, "true ToolTip FramelessWindowHint");
+                    if (!Filename.isEmpty()) Signal_OpenNewWFile(Filename, Args, geometry, "true ToolTip FramelessWindowHint PopUpWindow");
                 }
             }
         }
@@ -8520,11 +8520,13 @@ bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
         }
         foreach (QWidget *widget, QApplication::topLevelWidgets()) {
             if (CaQtDM_Lib *w = qobject_cast<CaQtDM_Lib *>(widget)) {
-                QVariant fileName = w->property("fileString");
-                QString qs = fileName.toString();
-
-                if(qs.contains(POPUPDEFENITION)) {
-                    w->closeWindow();
+                QVariant is_a_popup = w->property("open_as_popupwindow");
+                if (!is_a_popup.isNull()){
+                    QVariant fileName = w->property("fileString");
+                    QString qs = fileName.toString();
+                    if(qs.contains(POPUPDEFENITION)) {
+                        w->closeWindow();
+                    }
                 }
             }
         }
@@ -8541,17 +8543,20 @@ bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
 
         foreach (QWidget *widget, QApplication::topLevelWidgets()) {
             if (CaQtDM_Lib *w = qobject_cast<CaQtDM_Lib *>(widget)) {
-                QVariant fileName = w->property("fileString");
-                QString qs = fileName.toString();
-                if(qs.contains(POPUPDEFENITION)) {
-                    Qt::WindowFlags flags = Qt::ToolTip;
-                    flags |= Qt::FramelessWindowHint;
-                    w->setWindowFlags(flags);
-                    QPoint pos = QCursor::pos();
-                       pos.setX(pos.x()+5);
-                       pos.setY(pos.y()+5);
-                       w->move(pos);
-                       w->show();
+                QVariant is_a_popup = w->property("open_as_popupwindow");
+                if (!is_a_popup.isNull()){
+                    QVariant fileName = w->property("fileString");
+                    QString qs = fileName.toString();
+                    if(qs.contains(POPUPDEFENITION)) {
+                        Qt::WindowFlags flags = Qt::ToolTip;
+                        flags |= Qt::FramelessWindowHint;
+                        w->setWindowFlags(flags);
+                        QPoint pos = QCursor::pos();
+                        pos.setX(pos.x()+5);
+                        pos.setY(pos.y()+5);
+                        w->move(pos);
+                        w->show();
+                    }
                 }
             }
         }
