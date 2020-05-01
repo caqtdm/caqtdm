@@ -1225,18 +1225,18 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                 //qDebug() << "softchannels that just define themselves: dont";
                 return;
             }
-
-            // other channels if any
-            kData.soft = false;
-            // if cacalc is a simple double then calculate its value with the up to 4 channels
-            if(calcWidget->getVariableType() == caCalc::scalar) nbMonitors = InitVisibility(w1, &kData, map, specData, qasc(calcWidget->getVariable()));
-
             // when no monitors then inititalize value
             if(nbMonitors == 0) {
                 //qDebug() << "update " << qasc(calcWidget->getVariable()) << "initial value" << calcWidget->getInitialValue();
                 calcWidget->setValue(calcWidget->getInitialValue());
                 mutexKnobDataP->UpdateSoftPV(calcWidget->getVariable(), calcWidget->getInitialValue(), myWidget, 0, 1);
             }
+
+            // other channels if any
+            kData.soft = false;
+            // if cacalc is a simple double then calculate its value with the up to 4 channels
+            if(calcWidget->getVariableType() == caCalc::scalar) nbMonitors = InitVisibility(w1, &kData, map, specData, qasc(calcWidget->getVariable()));
+
 
             w1->setContextMenuPolicy(Qt::CustomContextMenu);
             connect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
