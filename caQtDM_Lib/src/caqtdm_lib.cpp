@@ -7412,9 +7412,9 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
     for(int i=0; i<4; i++) {
         if((num = addMonitor(myWidget, kData, strng[i], widget, specData, map, &pv)) >= 0) {
             if (caCalc *calcWidget = qobject_cast<caCalc *>(widget)) {
-                replaceVisibilityChannels(calcWidget);
+               replaceVisibilityChannels(calcWidget)
             } else if (caImage *imageWidget = qobject_cast<caImage *>(widget)) {
-                replaceVisibilityChannels(imageWidget);
+                replaceVisibilityChannels(imageWidget)
             } else if (caGraphics *graphicsWidget = qobject_cast<caGraphics *>(widget)) {
                 replaceVisibilityChannels(graphicsWidget)
             } else if (caPolyLine *polylineWidget = qobject_cast<caPolyLine *>(widget)) {
