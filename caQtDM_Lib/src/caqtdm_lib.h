@@ -214,6 +214,8 @@ public:
 #endif
     }
 
+
+
 protected:
     virtual void timerEvent(QTimerEvent *e);
     void resizeEvent ( QResizeEvent * event );
@@ -291,6 +293,7 @@ private:
     void TreatOrdinaryValue(QString pv, double value, int32_t idata, QString svalue, QWidget *w);
     bool getSoftChannel(QString pv, knobData &data);
     int parseForDisplayRate(QString &input, int &rate);
+    bool parseForQRectConst(QString &input,double* valueArray);
     void getStatesToggleAndLed(QWidget *widget, const knobData &data, const QString &String, Qt::CheckState &state);
 
     void resizeSpecials(QString className, QWidget *widget, QVariantList list, double factX, double factY);
@@ -425,6 +428,7 @@ private slots:
     void showMaxWindow();
     void showMinWindow();
     void showFullWindow();
+    void resizeFullWindow(QRect& q);
 
     void updateTextBrowser();
     void handleFileChanged(const QString&);

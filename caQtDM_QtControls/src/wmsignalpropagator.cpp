@@ -22,7 +22,7 @@
  *  Contact details:
  *    anton.mezger@psi.ch
  */
-
+#include <QMainWindow>
 #include "wmsignalpropagator.h"
 #include "cainclude.h"
 
@@ -47,9 +47,14 @@ void wmSignalPropagator::showmaximized() {emit wmShowMaximized();}
 void wmSignalPropagator::showminimized() {emit wmShowMinimized();}
 void wmSignalPropagator::showfullscreen() {emit wmShowFullScreen();}
 void wmSignalPropagator::printwindow() {emit wmPrintWindow();}
+void wmSignalPropagator::resizeMainWindow(QRect p){emit wmResizeMainWindow(p);}
+
 void wmSignalPropagator::propagateToParent(QRect p) {
 
     // move parent to the p.x and p.y
+    qDebug() << "propagateToParent";
+    printf("propagateToParent\n");
+    fflush(stdout);
     QWidget *w = Parent;
     caInclude *includeWidget = (caInclude *) 0;
     while(w != (QWidget*) 0) {

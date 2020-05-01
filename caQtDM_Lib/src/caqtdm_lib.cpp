@@ -500,6 +500,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
         connect(widget, SIGNAL(wmShowFullScreen()), this, SLOT(showFullWindow()));
         connect(widget, SIGNAL(wmReloadWindow()), this, SLOT(Callback_ReloadWindowL()));
         connect(widget, SIGNAL(wmPrintWindow()), this, SLOT(Callback_printWindow()));
+        connect(widget, SIGNAL(wmResizeMainWindow(QRect&)), this, SLOT(resizeFullWindow(QRect&)));
     }
 
     // connect close launchfile action to parent
@@ -1163,6 +1164,19 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             calcWidget->setVariable(pv);
             calcWidget->setDataCount(0);
             addMonitor(myWidget, &kData, qasc(pv), w1, specData, map, &pv);
+            // Special treatment for QRect
+            if (calcWidget->getCalc().startsWith("%QRect")){
+                double qrectvalues[12];
+                QString qrectscan=calcWidget->getCalc();
+                qrectscan=qrectscan.right(qrectscan.length()-6);
+                if (!qrectscan.isEmpty()){
+                    //qDebug() << "Check QRectString: "<< qrectscan;
+                    if (parseForQRectConst(qrectscan,qrectvalues)){
+                        for (int i=0;i<4;i++)
+                            calcWidget->setQRectParam(i,qrectvalues[i]);
+                    }
+                }
+            }
 
             // test for multiple occurrences
             if(treatPrimary) {
@@ -3828,6 +3842,7 @@ bool CaQtDM_Lib::Python_Error(QWidget *w, QString message)
 
 /**
   * routine used by the above routine for calculating the visibilty of our objects
+  * and generates animation parameter
   */
 bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
 {
@@ -3966,6 +3981,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                         }
                     }
                 }
+
                 bool somethingToSend = false;
                 for(int i=0; i<4; i++) {
                     if(valueArray[i] != -1) {
@@ -3973,7 +3989,13 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                         break;
                     }
                 }
+               QString scancalc = calc->getCalc();
+                parseForQRectConst(scancalc,valueArray);
+
                 if(somethingToSend) {
+                    if (calc->getTextLine()!="%QRect"){
+                      calc->setTextLine("%QRect");
+                    }
                     valid = false;
                     QRect rect(valueArray[0], valueArray[1], valueArray[2], valueArray[3]);
                     calc->setValue(rect);
@@ -6386,7 +6408,16 @@ void CaQtDM_Lib::showFullWindow()
 {
     this->showFullScreen();
 }
-
+void CaQtDM_Lib::resizeFullWindow(QRect& q)
+{
+    QMainWindow *main = this->findChild<QMainWindow *>();
+    main->centralWidget()->setProperty("mainlayoutPresent",true);
+    main->centralWidget()->setProperty("allowResize",false);
+    if ((q.width()>0)&&(q.height()>0)){
+        this->resize(q.width(),q.height());
+        this->setFixedSize(q.width(),q.height());
+    }
+}
 /**
   * when closing the window, we will clear all associated monitors and free data
   */
@@ -8067,6 +8098,48 @@ void CaQtDM_Lib::TreatRequestedWave(QString pvo, QString text, caWaveTable::Form
     datamutex->unlock();
 }
 
+
+bool CaQtDM_Lib::parseForQRectConst(QString &inputc, double *valueArray)
+{
+    // Parse data
+    bool success = false;
+    char input[MAXPVLEN];
+    int cpylen = qMin(inputc.length(), MAXPVLEN-1);
+    strncpy(input, (char*) qasc(inputc), (size_t) cpylen);
+    input[cpylen] = '\0';
+
+    JSONValue *value = JSON::Parse(input);
+    if (value == NULL) {
+        //printf("failed to parse <%s>\n", input);
+    } else {
+        // Retrieve the main object
+        JSONObject root;
+        if(!value->IsObject()) {
+            delete(value);
+        } else {
+
+            root = value->AsObject();
+            if (root.find(L"valueconst") != root.end() && root[L"valueconst"]->IsArray()) {
+                JSONArray jsonobj=root[L"valueconst"]->AsArray();
+                for (unsigned int j = 0; j < jsonobj.size(); j++){
+                    if (jsonobj[j]->IsNumber())
+                       valueArray[j]=(int)jsonobj[j]->AsNumber();
+                }
+                success =true;
+                // Did it go wrong?
+                } else {
+                    delete(value);
+                }
+            }
+
+        }
+
+
+
+    return success;
+}
+
+
 int CaQtDM_Lib::parseForDisplayRate(QString &inputc, int &rate)
 {
     // Parse data
@@ -8636,8 +8709,17 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
     }
 
 
+    QVariant allowResizeVars = main->centralWidget()->property("allowResize");
+    if(!allowResizeVars.isNull()) {
+        if(allowResizeVars.canConvert<bool>())  {
+             if(!allowResizeVars.toBool()) return;
+        }
+    }
+
+
     //qDebug() << "allowResize=" << allowResize;
     // when noresizing then fix the size, however for prc files, we will later shrink the display to a minimumsize, so do not fix then
+
     if(!allowResize) {
         if(!prcFile) main->setFixedSize(myWidget->size());
         return;
@@ -8728,6 +8810,12 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 
     bool mainlayoutPresent = false;
 
+    QVariant mainlayoutVars = main->centralWidget()->property("mainlayoutPresent");
+    if(!mainlayoutVars.isNull()) {
+        if(mainlayoutVars.canConvert<bool>())  {
+            mainlayoutPresent = mainlayoutVars.toBool();
+        }
+    }
     if(main == (QObject*) 0) {
         QDialog *dialog = this->findChild<QDialog *>();
         if(dialog == (QObject*) 0) return;  // if not a mainwindow or dialog get out

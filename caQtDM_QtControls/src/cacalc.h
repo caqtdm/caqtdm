@@ -32,6 +32,8 @@
 #include <qtcontrols_global.h>
 #include "caPropHandleDefs.h"
 
+#define MAX_QRECT_PARAMS 4
+
 class  QTCON_EXPORT caCalc : public  ESimpleLabel
 {
     Q_OBJECT
@@ -100,6 +102,7 @@ public:
     caCalc( QWidget *parent = 0 );
 
     void setTextLine(const QString &txt);
+    QString getTextLine(){return keepText;}
     void setForeAndBackground(QColor fg, QColor bg);
 
     int getPrecision() const {return thisPrecision;}
@@ -120,6 +123,8 @@ public:
     QColor getBackground() const {return m_BackColor;}
     void setBackground(QColor c);
 
+    void setQRectParam(int x,double param);
+
 public slots:
     void animation(QRect p) {
 #include "animationcode.h"
@@ -132,6 +137,7 @@ public slots:
 public slots:
     void setValue(double value);
     void setValue(QRect value);
+    void setValue(int value);
 
 signals:
     void changeValue(double value);
@@ -150,6 +156,11 @@ private:
     QColor m_BackColor;
     bool checkSignal_value_bool;
     int  checkSignal_value_int;
+    QRect checkSignal_value_QRect;
+    int value_QRect_const[MAX_QRECT_PARAMS];
+    bool value_QRect_is_const[MAX_QRECT_PARAMS];
+    bool is_a_pure_constant;
+
 };
 
 #endif // CACALC_H
