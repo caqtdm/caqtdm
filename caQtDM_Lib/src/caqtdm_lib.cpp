@@ -8711,13 +8711,15 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
     // it seems that when mainwindow was fixed by user, then the window stays empty ?
     if(main != (QObject*) 0) {
         main->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    }
 
 
-    QVariant allowResizeVars = main->centralWidget()->property("allowResize");
-    if(!allowResizeVars.isNull()) {
-        if(allowResizeVars.canConvert<bool>())  {
-             if(!allowResizeVars.toBool()) return;
+        if (main->centralWidget()){
+            QVariant allowResizeVars = main->centralWidget()->property("allowResize");
+            if(!allowResizeVars.isNull()) {
+                if(allowResizeVars.canConvert<bool>())  {
+                    if(!allowResizeVars.toBool()) return;
+                }
+            }
         }
     }
 
@@ -8814,11 +8816,12 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
     QString classNam;
 
     bool mainlayoutPresent = false;
-
-    QVariant mainlayoutVars = main->centralWidget()->property("mainlayoutPresent");
-    if(!mainlayoutVars.isNull()) {
-        if(mainlayoutVars.canConvert<bool>())  {
-            mainlayoutPresent = mainlayoutVars.toBool();
+    if ((main)&&(main->centralWidget())){
+        QVariant mainlayoutVars = main->centralWidget()->property("mainlayoutPresent");
+        if(!mainlayoutVars.isNull()) {
+            if(mainlayoutVars.canConvert<bool>())  {
+                mainlayoutPresent = mainlayoutVars.toBool();
+            }
         }
     }
     if(main == (QObject*) 0) {
