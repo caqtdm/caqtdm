@@ -6829,7 +6829,12 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         } else  if(selectedItem->text().contains(RAISEWINDOW)) {
             QMainWindow *mainWindow = (QMainWindow *) this->parentWidget();
             mainWindow->showNormal();
-            if(messageWindowP != (MessageWindow *) 0) messageWindowP->raise();
+
+            if(messageWindowP != (MessageWindow *) 0) {
+                messageWindowP->setWindowState( (windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+                messageWindowP->raise();
+                messageWindowP->activateWindow();
+            }
 
         } else  if(selectedItem->text().contains(TOGGLESIZE)) {
             if(caCamera * cameraWidget = qobject_cast< caCamera *>(w)) {
