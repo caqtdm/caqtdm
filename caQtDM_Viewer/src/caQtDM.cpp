@@ -47,6 +47,24 @@
 #else
 #include <QtGui/QApplication>
 #endif
+
+#ifdef linux
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+   #define CAQTDM_X11 Q_WS_X11
+#else
+   #ifndef MOBILE_ANDROID
+      #define CAQTDM_X11 Q_OS_UNIX
+   #endif
+#endif
+#endif
+
+#ifdef CAQTDM_X11
+        #include <QX11Info>
+        #include <X11/Xutil.h>
+        #include <X11/Xlib.h>
+        #include <X11/Xatom.h>
+#endif //CAQTDM_X11
+
 /*
 class MyApplication: public QApplication
 {
@@ -348,7 +366,17 @@ int main(int argc, char *argv[])
     FileOpenWindow window (0, fileName, macroString, attach, minimize, geometry, printscreen, resizing, options);
     window.setWindowIcon (QIcon(":/caQtDM.ico"));
     window.show();
+#ifdef CAQTDM_X11
+    QString X_Server_Check=ServerVendor(QX11Info::display());
+    if (X_Server_Check.contains("Colin Harrison")){ //Xming Server on Windows, yes this is a quickfix!
+       window.move(10,30);// 0,0 is outside the visible areas on the taget
+    }else{
+       window.move(0,0);
+    }
+#else
     window.move(0,0);
+#endif
+
 
     if (signal(SIGINT, unixSignalHandler) == SIG_ERR) {
         qFatal("ERR - %s(%d): An error occurred while setting a signal handler.\n", __FILE__,__LINE__);
