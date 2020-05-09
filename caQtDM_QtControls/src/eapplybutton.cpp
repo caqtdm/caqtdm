@@ -30,6 +30,7 @@ EApplyButton::EApplyButton(QWidget *parent) : EPushButton(parent)
 {
 	this->setFocusPolicy(Qt::StrongFocus);
 	this->setText("APPLY");
+    this->setAutoFillBackground(true);
     d_modified = false;
     //setMinimumWidth(MIN_BUTTON_SIZE);
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -38,6 +39,14 @@ EApplyButton::EApplyButton(QWidget *parent) : EPushButton(parent)
 	defaultTextColor = palette().color(QPalette::ButtonText);
     LeftClickWithModifiersEater *leftClickWithModifiersEater = new LeftClickWithModifiersEater(this);
     installEventFilter(leftClickWithModifiersEater);
+/*
+    QColor bg = palette().color(QPalette::Button);
+    QColor fg = palette().color(QPalette::Text);
+    QString style = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
+    style = style.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
+            arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
+    setStyleSheet(style);
+*/
 }
 
 void EApplyButton::valueModified(double)

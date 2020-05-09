@@ -27,6 +27,7 @@
 #include <QResizeEvent>
 #include <QPainter>
 #include <QPen>
+#include "alarmdefs.h"
 
 caNumeric::caNumeric(QWidget *parent) : ENumeric(parent)
 {
@@ -75,25 +76,27 @@ void caNumeric::setForeground(QColor c)
     setColors(thisBackColor, thisForeColor);
 }
 
-void caNumeric::setColors(QColor bg, QColor fg)
+void caNumeric::setColors(QColor bg, QColor fg, bool init)
 {
     if(thisColorMode == Default) {
         if(!styleSheet().isEmpty()) {
             setStyleSheet("");
             renewStyleSheet = true;
+        }
+        if(!init) {
             // force resize for repainting
             QResizeEvent *re = new QResizeEvent(size(), size());
             resizeEvent(re);
             delete re;
+            return;
         }
-        return;
     }
 
     if((bg != oldBackColor) || (fg != oldForeColor)  || renewStyleSheet || styleSheet().isEmpty()) {
         renewStyleSheet = false;
         QString style = "background: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
         style = style.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
-                arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
+                          arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
         setStyleSheet(style);
         oldForeColor = fg;
         oldBackColor = bg;
@@ -107,12 +110,36 @@ void caNumeric::setColors(QColor bg, QColor fg)
 void caNumeric::setConnectedColors(bool connected)
 {
     if(!connected) {
-       setColors(QColor(Qt::white), QColor(Qt::white));
+       setColors(QColor(Qt::white), QColor(Qt::white), true);
     } else {
        setColors(thisBackColor, thisForeColor);
     }
 }
 
+void caNumeric::setAlarmColors(short status)
+{
+    QColor c;
+
+    switch (status) {
+    case NO_ALARM:
+        c=AL_GREEN;
+        break;
+    case MINOR_ALARM:
+        c=AL_YELLOW;
+        break;
+    case MAJOR_ALARM:
+        c=AL_RED;
+        break;
+    case INVALID_ALARM:
+    case NOTCONNECTED:
+        c=AL_WHITE;
+        break;
+    default:
+        c=AL_DEFAULT;
+        break;
+    }
+    setBackground(c);
+}
 
 void caNumeric::paintEvent(QPaintEvent *event) {
     QPen	pen;

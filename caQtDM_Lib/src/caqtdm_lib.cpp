@@ -5064,7 +5064,13 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         if(data.edata.connected) {
             ComputeNumericMaxMinPrec(applynumericWidget, data);
-            applynumericWidget->setConnectedColors(true);
+
+            int colorMode = applynumericWidget->getColorMode();
+            if(colorMode == caApplyNumeric::Static || colorMode == caApplyNumeric::Default) {
+                applynumericWidget->setConnectedColors(true);
+            } else {
+                applynumericWidget->setAlarmColors(data.edata.severity);
+            }
 
             if(data.edata.fieldtype == caSTRING ||  data.edata.fieldtype ==  caCHAR) {
                 char asc[MAX_STRING_LENGTH];
@@ -5089,6 +5095,13 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             ComputeNumericMaxMinPrec(numericWidget, data);
             numericWidget->setConnectedColors(true);
 
+            int colorMode = numericWidget->getColorMode();
+            if(colorMode == caNumeric::Static || colorMode == caNumeric::Default) {
+                numericWidget->setConnectedColors(true);
+            } else {
+                numericWidget->setAlarmColors(data.edata.severity);
+            }
+
             if(data.edata.fieldtype == caSTRING ||  data.edata.fieldtype ==  caCHAR) {
                 char asc[MAX_STRING_LENGTH];
                 snprintf(asc, MAX_STRING_LENGTH, "caNumeric %s does not treat other then numerical values", qasc(w->objectName()));
@@ -5110,7 +5123,12 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         if(data.edata.connected) {
             ComputeNumericMaxMinPrec(spinboxWidget, data);
-            spinboxWidget->setConnectedColors(true);
+            int colorMode = spinboxWidget->getColorMode();
+            if(colorMode == caSpinbox::Static || colorMode == caSpinbox::Default) {
+                spinboxWidget->setConnectedColors(true);
+            } else {
+                spinboxWidget->setAlarmColors(data.edata.severity);
+            }
 
             if(data.edata.fieldtype == caSTRING || data.edata.fieldtype ==  caCHAR) {
                 char asc[MAX_STRING_LENGTH];
