@@ -115,7 +115,7 @@ void caApplyNumeric::setColors(QColor bg, QColor fg, bool init)
     if((bg != oldBackColor) || (fg != oldForeColor)  || renewStyleSheet || styleSheet().isEmpty()) {
         setStyleSheet("");
         renewStyleSheet = false;
-        QString style = QStringLiteral("QFrame {color: rgba(%1, %2, %3, %4); background: rgba(%5, %6, %7, %8);}");
+        QString style = "QFrame {color: rgba(%1, %2, %3, %4); background: rgba(%5, %6, %7, %8);}";
         //QString style = QStringLiteral("color: rgba(%1, %2, %3, %4); background: rgba(%5, %6, %7, %8);");
         style = style.arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha()).
                           arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha());
