@@ -125,13 +125,37 @@ char* myLimitedString (char * strng) {
 
 #define EpicsPut_ErrorMessage_ClearChannel_Return  \
     C_postMsgEvent(messageWindowPtr, 1, vaPrintf("put pv (%s) %s\n", pv, ca_message (status))); \
+    connectInfo *info = (connectInfo *) ca_puser(ch);\
+    info->connected=false;\
+    C_SetMutexKnobDataConnected(mutexKnobdataPtr, info->index, info->connected);\
+    info->evAdded = false;\
+    status = ca_clear_event(info->evID);\
+    if (status != ECA_NORMAL) {\
+        PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));\
+    }\
+    info->evID = 0;\
+    info->event = 0;\
     ca_clear_channel(ch); \
-    return status;
+    return status
 
 #define EpicsGet_ErrorMessage_ClearChannel_Return  \
     C_postMsgEvent(messageWindowPtr, 1, vaPrintf("get pv (%s) %s\n", pv, ca_message (status))); \
-    ca_clear_channel(ch); \
-    return status;
+    info->connected=false;\
+    info->ch=0;\
+    info->evAdded = false;\
+    status = ca_clear_event(info->evID);\
+    if (status != ECA_NORMAL) {\
+        PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));\
+    }\
+    info->evID = 0;\
+    info->event = 0;\
+    ca_clear_channel(ch);\
+    C_SetMutexKnobDataConnected(mutexKnobdataPtr, info->index, info->connected);\
+    knobData kData;\
+    C_GetMutexKnobData(mutexKnobdataPtr, info->index, &kData);\
+    EpicsReconnect(&kData);\
+    return status
+
 
 /**
  * general print routine with timestamp
@@ -731,7 +755,7 @@ void connectCallback(struct connection_handler_args args)
     int status;
 
     connectInfo *info = (connectInfo *) ca_puser(args.chid);
-
+    if (!info) return;
     PRINT(printf("connectcallback %p pv=<%s> %d chid=%d\n", info, info->pv, info->evAdded, args.chid));
 
     switch (ca_state(args.chid)) {
@@ -885,9 +909,11 @@ void EpicsDisconnect(knobData *kData)
         if(info->ch != (chid) 0) {
             if(info->evAdded && (info->evID != (evid) 0)) {
                 info->evAdded = false;
-                status = ca_clear_event(info->evID);
-                if (status != ECA_NORMAL) {
-                    printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]);
+                if (ca_state(info->ch) == cs_conn) {
+                    status = ca_clear_event(info->evID);
+                    if (status != ECA_NORMAL) {
+                        printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]);
+                    }
                 }
                 info->evAdded = 0;
                 info->evID = 0;
@@ -930,24 +956,28 @@ void ClearMonitor(knobData *kData)
 
     info = (connectInfo *) kData->edata.info;
     if (info != (connectInfo *) 0) {
-        if(info->ch != (chid) 0) {
-            if(info->evAdded) {
-                info->evAdded = false;
-                PRINT(printf("ca_clear_event: %s index=%d\n", info->pv, aux));
-                status = ca_clear_event(info->evID);
-                if (status != ECA_NORMAL) {
-                    PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+        if (info->connected){
+            if(info->ch != (chid) 0) {
+                if(info->evAdded) {
+                    info->evAdded = false;
+                    PRINT(printf("ca_clear_event: %s index=%d\n", info->pv, aux));
+                    if (ca_state(info->ch) == cs_conn) {
+                        status = ca_clear_event(info->evID);
+                        if (status != ECA_NORMAL) {
+                            PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+                        }
+                    }
                 }
+                status = ca_clear_channel(info->ch);
+                PRINT(printf("ca_clear_channel: %s chid=%d, index=%d\n", info->pv, info->ch, aux));
+                info->connected = false;
+                info->event = 0;
+                info->ch = 0;
+                if(status != ECA_NORMAL) {
+                    printf("ca_clear_channel: %s %s index=%d\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], info->pv, aux);
+                }
+                info->pv[0] = '\0';
             }
-            status = ca_clear_channel(info->ch);
-            PRINT(printf("ca_clear_channel: %s chid=%d, index=%d\n", info->pv, info->ch, aux));
-            info->connected = false;
-            info->event = 0;
-            info->ch = 0;
-            if(status != ECA_NORMAL) {
-                printf("ca_clear_channel: %s %s index=%d\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], info->pv, aux);
-            }
-            info->pv[0] = '\0';
         }
     }
 
@@ -967,7 +997,11 @@ int EpicsSetValue_Connected(chid ch,char *pv, double rdata, int32_t idata, char 
     int status;
     struct dbr_ctrl_double ctrlR;
     struct dbr_sts_string ctrlS;
+    connectInfo *info = (connectInfo *) ca_puser(ch);
+    if (!info){
 
+        return ECA_DISCONN;
+    }
     chType = ca_field_type(ch);
 
     if(forceType == 1) chType = DBF_DOUBLE;
