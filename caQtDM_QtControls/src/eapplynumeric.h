@@ -53,6 +53,7 @@ Q_PROPERTY(Qt::Orientation buttonPos READ buttonPosition WRITE setButtonPosition
 Q_PROPERTY(QString buttonText READ buttonText WRITE setButtonText)
 Q_PROPERTY(QFont numericFont READ numericFont WRITE setNumericFont)
 Q_PROPERTY(bool applyButtonActive READ applyButtonActive WRITE setApplyButtonActive)
+Q_PROPERTY(bool buttonVisible READ buttonVisible WRITE setButtonVisible)
 /* scalable fonts */
 Q_PROPERTY(bool digitsFontScaleEnabled READ digitsFontScaleEnabled WRITE setDigitsFontScaleEnabled DESIGNABLE true)
 
@@ -68,6 +69,8 @@ public:
 	 * @see setApplyButtonActive
 	 */
 	bool applyButtonActive() { return d_applyButtonActive; }
+
+    bool buttonVisible() { return d_buttonVisible;}
 	
 	bool digitsFontScaleEnabled();
 	
@@ -83,6 +86,7 @@ private:
 	bool d_applyButtonActive;
 	bool d_applyOnValueChanged;
 	bool d_fontScaleEnabled;
+    bool d_buttonVisible;
 
 public:
 	/** 
@@ -184,6 +188,10 @@ public:
 	 * <p><em>Note</em>: introduced in qtcontrols version <em>4.x</em>.</p>
 	 */
 	void setApplyButtonActive(bool en) { d_applyButtonActive = en; }
+    void setButtonVisible(bool en) {
+                                      d_buttonVisible = en;
+                                      button->setVisible(en);
+                                   }
 	
         QFont numericFont() const { return data->font(); }
         void setNumericFont(const QFont f) { data->setFont(f); }

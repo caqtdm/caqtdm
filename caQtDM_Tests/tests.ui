@@ -3077,8 +3077,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>100</width>
-           <height>30</height>
+           <width>431</width>
+           <height>191</height>
           </rect>
          </property>
          <attribute name="label">
@@ -3313,7 +3313,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_109">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>13</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3341,7 +3341,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_108">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3369,7 +3369,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_75">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>13</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3397,7 +3397,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_76">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3425,7 +3425,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_85">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>13</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3453,7 +3453,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_77">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3481,7 +3481,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_78">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>13</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3509,7 +3509,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_79">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3537,7 +3537,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_80">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>13</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3565,7 +3565,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_81">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3593,7 +3593,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_86">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>13</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3621,7 +3621,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_87">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3649,7 +3649,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_88">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>13</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3677,7 +3677,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_90">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3705,7 +3705,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_89">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>13</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3733,7 +3733,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_82">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3761,7 +3761,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_83">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>13</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3789,7 +3789,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_84">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3817,7 +3817,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_112">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>13</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3849,7 +3849,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_110">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>13</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3877,7 +3877,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_111">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3905,7 +3905,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_91">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>13</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3933,7 +3933,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_92">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3961,7 +3961,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_93">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>13</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3989,7 +3989,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_94">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4017,7 +4017,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_95">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>13</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4045,7 +4045,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_96">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4073,7 +4073,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_97">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>13</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4101,7 +4101,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_98">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4129,7 +4129,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_99">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>13</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4157,7 +4157,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_100">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4185,7 +4185,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_101">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>13</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4213,7 +4213,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_102">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4241,7 +4241,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_103">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>13</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4269,7 +4269,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_104">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4297,7 +4297,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_105">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>13</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4325,7 +4325,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_106">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4353,7 +4353,7 @@ p, li { white-space: pre-wrap; }
                <widget class="caLabel" name="calabel_113">
                 <property name="font">
                  <font>
-                  <pointsize>24</pointsize>
+                  <pointsize>13</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -12865,7 +12865,7 @@ def PythonCalc(a, b, c, d):
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_16">
        <attribute name="title">
@@ -13756,7 +13756,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="styleSheet" stdset="0">
-         <string notr="true">color: rgba(253, 128, 8, 255); background: rgba(32, 255, 255, 255);</string>
+         <string notr="true">QFrame {color: rgba(253, 128, 8, 255); background: rgba(32, 255, 255, 255);}</string>
         </property>
        </widget>
        <widget class="caApplyNumeric" name="endValueSet_3">
@@ -13765,7 +13765,7 @@ p, li { white-space: pre-wrap; }
           <x>310</x>
           <y>460</y>
           <width>111</width>
-          <height>81</height>
+          <height>61</height>
          </rect>
         </property>
         <property name="integerDigits" stdset="0">
@@ -13776,6 +13776,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="buttonPos" stdset="0">
          <enum>Qt::Vertical</enum>
+        </property>
+        <property name="buttonVisible">
+         <bool>false</bool>
         </property>
         <property name="digitsFontScaleEnabled">
          <bool>true</bool>
@@ -13790,7 +13793,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="styleSheet" stdset="0">
-         <string notr="true">color: rgba(0, 0, 0, 255); background: rgba(230, 230, 230, 255);</string>
+         <string notr="true">QFrame {color: rgba(0, 0, 0, 255); background: rgba(230, 230, 230, 255);}</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_30">
@@ -13823,6 +13826,23 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="alignment">
          <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButton_6">
+        <property name="geometry">
+         <rect>
+          <x>310</x>
+          <y>520</y>
+          <width>111</width>
+          <height>26</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: white;
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(9, 41, 4, 255), stop:0.085 rgba(2, 79, 0, 255), stop:0.19 rgba(50, 147, 22, 255), stop:0.275 rgba(236, 191, 49, 255), stop:0.39 rgba(243, 61, 34, 255), stop:0.555 rgba(135, 81, 60, 255), stop:0.667 rgba(121, 75, 255, 255), stop:0.825 rgba(164, 255, 244, 255), stop:0.885 rgba(104, 222, 71, 255), stop:1 rgba(93, 128, 0, 255));</string>
+        </property>
+        <property name="text">
+         <string>ApplyBySignal</string>
         </property>
        </widget>
       </widget>
@@ -14924,7 +14944,7 @@ p, li { white-space: pre-wrap; }
          <string notr="true">ACM:TEST:MBBO</string>
         </property>
         <property name="styleSheet" stdset="0">
-         <string notr="true"/>
+         <string notr="true">caMenu {background-color: rgba(255, 255, 255, 255); color: rgba(0, 0, 0, 255);}</string>
         </property>
        </widget>
        <widget class="caMenu" name="caMenu_10">
@@ -14984,7 +15004,7 @@ p, li { white-space: pre-wrap; }
          <string>myMask</string>
         </property>
         <property name="styleSheet" stdset="0">
-         <string notr="true"/>
+         <string notr="true">caMenu {background-color: rgba(255, 255, 255, 255); color: rgba(0, 0, 0, 255);}</string>
         </property>
        </widget>
        <widget class="caCalc" name="cacalc_53">
@@ -19421,8 +19441,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
      <y>348</y>
     </hint>
     <hint type="destinationlabel">
-     <x>437</x>
-     <y>338</y>
+     <x>422</x>
+     <y>345</y>
     </hint>
    </hints>
   </connection>
@@ -19469,8 +19489,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
      <y>490</y>
     </hint>
     <hint type="destinationlabel">
-     <x>437</x>
-     <y>468</y>
+     <x>422</x>
+     <y>475</y>
     </hint>
    </hints>
   </connection>
@@ -19481,12 +19501,12 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>toggle()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>337</x>
-     <y>259</y>
+     <x>322</x>
+     <y>267</y>
     </hint>
     <hint type="destinationlabel">
-     <x>791</x>
-     <y>333</y>
+     <x>776</x>
+     <y>341</y>
     </hint>
    </hints>
   </connection>
@@ -19561,12 +19581,12 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotTiltAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>482</x>
-     <y>646</y>
+     <x>467</x>
+     <y>654</y>
     </hint>
     <hint type="destinationlabel">
-     <x>463</x>
-     <y>400</y>
+     <x>465</x>
+     <y>398</y>
     </hint>
    </hints>
   </connection>
@@ -19577,8 +19597,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotSpanAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>482</x>
-     <y>646</y>
+     <x>467</x>
+     <y>654</y>
     </hint>
     <hint type="destinationlabel">
      <x>597</x>
@@ -19593,8 +19613,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotTiltAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>482</x>
-     <y>646</y>
+     <x>467</x>
+     <y>654</y>
     </hint>
     <hint type="destinationlabel">
      <x>810</x>
@@ -19609,12 +19629,12 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotTiltAngle(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>822</x>
-     <y>431</y>
+     <x>824</x>
+     <y>429</y>
     </hint>
     <hint type="destinationlabel">
-     <x>253</x>
-     <y>549</y>
+     <x>255</x>
+     <y>547</y>
     </hint>
    </hints>
   </connection>
@@ -19625,8 +19645,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotStartAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>838</x>
-     <y>387</y>
+     <x>823</x>
+     <y>395</y>
     </hint>
     <hint type="destinationlabel">
      <x>950</x>
@@ -19641,12 +19661,12 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>slotSpanAngle(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>964</x>
-     <y>387</y>
+     <x>949</x>
+     <y>395</y>
     </hint>
     <hint type="destinationlabel">
-     <x>958</x>
-     <y>309</y>
+     <x>960</x>
+     <y>307</y>
     </hint>
    </hints>
   </connection>
@@ -19657,8 +19677,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setIndex(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>223</x>
-     <y>604</y>
+     <x>220</x>
+     <y>630</y>
     </hint>
     <hint type="destinationlabel">
      <x>387</x>
@@ -19673,12 +19693,12 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setMacroname(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>212</x>
-     <y>390</y>
+     <x>197</x>
+     <y>398</y>
     </hint>
     <hint type="destinationlabel">
-     <x>504</x>
-     <y>606</y>
+     <x>489</x>
+     <y>614</y>
     </hint>
    </hints>
   </connection>
@@ -19689,12 +19709,12 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setMacrovalue(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>214</x>
-     <y>433</y>
+     <x>199</x>
+     <y>441</y>
     </hint>
     <hint type="destinationlabel">
-     <x>495</x>
-     <y>606</y>
+     <x>489</x>
+     <y>614</y>
     </hint>
    </hints>
   </connection>
@@ -19705,12 +19725,12 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>closewindow()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>181</x>
-     <y>655</y>
+     <x>183</x>
+     <y>609</y>
     </hint>
     <hint type="destinationlabel">
-     <x>260</x>
-     <y>651</y>
+     <x>262</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -19721,8 +19741,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setValue(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>438</x>
-     <y>635</y>
+     <x>432</x>
+     <y>642</y>
     </hint>
     <hint type="destinationlabel">
      <x>497</x>
@@ -19737,8 +19757,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>hide()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>541</x>
-     <y>648</y>
+     <x>531</x>
+     <y>655</y>
     </hint>
     <hint type="destinationlabel">
      <x>597</x>
@@ -19769,8 +19789,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>hideObject(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>466</x>
-     <y>198</y>
+     <x>457</x>
+     <y>205</y>
     </hint>
     <hint type="destinationlabel">
      <x>450</x>
@@ -19785,8 +19805,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>hideObject(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>470</x>
-     <y>198</y>
+     <x>457</x>
+     <y>205</y>
     </hint>
     <hint type="destinationlabel">
      <x>586</x>
@@ -19817,8 +19837,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>hideObject(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>463</x>
-     <y>198</y>
+     <x>457</x>
+     <y>205</y>
     </hint>
     <hint type="destinationlabel">
      <x>453</x>
@@ -19865,8 +19885,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>animation(QRect)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>692</x>
-     <y>308</y>
+     <x>677</x>
+     <y>315</y>
     </hint>
     <hint type="destinationlabel">
      <x>941</x>
@@ -19901,8 +19921,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
      <y>400</y>
     </hint>
     <hint type="destinationlabel">
-     <x>145</x>
-     <y>217</y>
+     <x>133</x>
+     <y>233</y>
     </hint>
    </hints>
   </connection>
@@ -19917,8 +19937,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
      <y>201</y>
     </hint>
     <hint type="destinationlabel">
-     <x>705</x>
-     <y>255</y>
+     <x>699</x>
+     <y>262</y>
     </hint>
    </hints>
   </connection>
@@ -20009,8 +20029,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>hideObject(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>489</x>
-     <y>591</y>
+     <x>482</x>
+     <y>598</y>
     </hint>
     <hint type="destinationlabel">
      <x>504</x>
@@ -20025,8 +20045,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setPackingmodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>213</x>
-     <y>308</y>
+     <x>219</x>
+     <y>316</y>
     </hint>
     <hint type="destinationlabel">
      <x>501</x>
@@ -20041,8 +20061,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setPackingmodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>241</x>
-     <y>308</y>
+     <x>228</x>
+     <y>316</y>
     </hint>
     <hint type="destinationlabel">
      <x>285</x>
@@ -20057,8 +20077,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setPackingmodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>221</x>
-     <y>308</y>
+     <x>227</x>
+     <y>316</y>
     </hint>
     <hint type="destinationlabel">
      <x>176</x>
@@ -20073,8 +20093,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setDecodemodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>92</x>
-     <y>308</y>
+     <x>98</x>
+     <y>316</y>
     </hint>
     <hint type="destinationlabel">
      <x>75</x>
@@ -20089,8 +20109,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setDecodemodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>67</x>
-     <y>308</y>
+     <x>73</x>
+     <y>316</y>
     </hint>
     <hint type="destinationlabel">
      <x>260</x>
@@ -20105,8 +20125,8 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>setDecodemodeStr(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>50</x>
-     <y>308</y>
+     <x>56</x>
+     <y>316</y>
     </hint>
     <hint type="destinationlabel">
      <x>615</x>
@@ -20121,12 +20141,12 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>reloadwindow()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>177</x>
-     <y>686</y>
+     <x>212</x>
+     <y>609</y>
     </hint>
     <hint type="destinationlabel">
-     <x>275</x>
-     <y>651</y>
+     <x>277</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -20137,12 +20157,12 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
    <slot>printwindow()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>178</x>
-     <y>614</y>
+     <x>115</x>
+     <y>609</y>
     </hint>
     <hint type="destinationlabel">
-     <x>269</x>
-     <y>653</y>
+     <x>271</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -20157,8 +20177,24 @@ other possibilities exists whenever the appropriate signal can be emitted</strin
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>268</x>
-     <y>653</y>
+     <x>270</x>
+     <y>633</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_6</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>endValueSet_3</receiver>
+   <slot>applyValue()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>391</x>
+     <y>696</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>394</x>
+     <y>623</y>
     </hint>
    </hints>
   </connection>
