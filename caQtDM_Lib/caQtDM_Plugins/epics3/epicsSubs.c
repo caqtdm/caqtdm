@@ -312,7 +312,6 @@ static void dataCallback(struct event_handler_args args)
                          stsF->value, info->index, ca_host_name(args.chid),
                          stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
 
-
             // concatenate strings separated with ';'
             dataSize = dbr_size_n(args.type, args.count) + (args.count+1) * sizeof(char);
             if(dataSize != kData.edata.dataSize) {
@@ -340,6 +339,7 @@ static void dataCallback(struct event_handler_args args)
         case DBF_ENUM:
         {
             struct dbr_sts_enum *stsF = (struct dbr_sts_enum *) args.dbr;
+
             PRINT(printf("dataCallback enum  %s %d <%d> %d <%s> status=%d count=%d size=%d\n", ca_name(args.chid), (int) args.chid,
                          stsF->value, info->index, ca_host_name(args.chid),
                          stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
@@ -357,7 +357,6 @@ static void dataCallback(struct event_handler_args args)
             PRINT(printf("dataCallback int values %s %d %d %d <%s> status=%d count=%d size=%d\n", ca_name(args.chid), (int) args.chid,
                          stsF->value, info->index, ca_host_name(args.chid),
                          stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
-
 
             AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
 
@@ -382,9 +381,7 @@ static void dataCallback(struct event_handler_args args)
                          stsF->value, info->index, ca_host_name(args.chid),
                          stsF->status, (int) args.count, dbr_size_n(args.type, args.count)));
 
-
             AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
-
 
             if(args.count > 1) {
                 if((int) (args.count * sizeof(int32_t)) != kData.edata.dataSize) {
@@ -978,6 +975,17 @@ void ClearMonitor(knobData *kData)
                 }
                 info->pv[0] = '\0';
             }
+        } else {
+            PRINT(printf("ClearMonitor -- %s is not connected index=%d %d\n", info->pv, info->index, info->evID));
+            info->connected=false;
+            C_SetMutexKnobDataConnected(mutexKnobdataPtr, info->index, info->connected);
+            info->evAdded = false;
+            info->evID = 0;
+            info->event = 0;
+            ca_clear_channel(info->ch);
+            info->ch = 0;
+            PRINT(printf("ClearMonitor -- %s should now have been taken out \n", info->pv));
+            info->pv[0] = '\0';
         }
     }
 
