@@ -180,6 +180,7 @@ environment_Plugin {
 
         unix:!macx:!ios:!android {
                 message(“environment_plugin configuration unix:!macx:!ios:!android”)
+                INCLUDEPATH   += $(EPICSINCLUDE)
                 INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
                 LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
                 CONFIG += release
@@ -187,6 +188,7 @@ environment_Plugin {
 
         macx {
                 message(“environment_plugin configuration macx”)
+                INCLUDEPATH   += $(EPICSINCLUDE)
                 INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
                 LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
                 plugins.path = Contents/PlugIns/controlsystems
