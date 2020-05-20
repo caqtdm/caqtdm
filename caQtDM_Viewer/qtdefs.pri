@@ -256,12 +256,14 @@ DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
 # 4.2.5
-# POPUP status Windows
-# dynamic Property caqtdmPopupUI for POPUP Windows (The filename must contain the word popup)
+# POPUP status windows with possible delays
+# dynamic Property caqtdmPopupUI and caqtdmPopupUI_Delay for POPUP windows (The filename must contain the word popup.ui)
+# wmsignalpropergator can resize a panel
 # fix for to long strings in channel names
 # fix for some character problems
 # fix for alarm status for caMenu
 # fix for softPV Waveform Processing
+# fix for softPV initialisation, wrong initial value, ui loader depending
 # cleanup in the sf-archiver
 # fix in caMenu, paintEvent removed
 # more file status check before accessing (avoid AFS problems)
