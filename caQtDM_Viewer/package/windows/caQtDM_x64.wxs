@@ -35,7 +35,7 @@
                 <Directory Id="INSTALLDIR" Name="caQTDM">
                     <Directory Name="bin" Id="BIN">
                         <Directory Name="windows-x64" Id="WINDOWS_X64">
-                            <Component Id="Qt_5.8.0" Guid="FC03E65E-7757-4CAE-8BB5-F3FEAF29E12B" Win64="yes">
+                            <Component Id="Qt_5.13.1" Guid="FC03E65E-7757-4CAE-8BB5-F3FEAF29E12B" Win64="yes">
                                 <File Id="DESIGNER.EXE" Name="designer.exe" Source="$(env.QTHOME)\bin\designer.exe" />
                                 <File Id="ASSISTANT.EXE" Name="assistant.exe" Source="$(env.QTHOME)\bin\assistant.exe" />
                                 <File Id="QT5QUICKPARTICLES.DLL" Name="Qt5QuickParticles.dll" Source="$(env.QTHOME)\bin\Qt5QuickParticles.dll" />
@@ -45,6 +45,7 @@
                                 <File Id="QT5SCRIPTTOOLS.DLL" Name="Qt5ScriptTools.dll" Source="$(env.QTHOME)\bin\Qt5ScriptTools.dll" />
                                 <File Id="QT5SENSORS.DLL" Name="Qt5Sensors.dll" Source="$(env.QTHOME)\bin\Qt5Sensors.dll" />
                                 <File Id="QT5SERIALPORT.DLL" Name="Qt5SerialPort.dll" Source="$(env.QTHOME)\bin\Qt5SerialPort.dll" />
+                                <File Id="QT5SERIALBUS.DLL" Name="Qt5SerialBus.dll" Source="$(env.QTHOME)\bin\Qt5SerialBus.dll" />
                                 <File Id="QT5SQL.DLL" Name="Qt5Sql.dll" Source="$(env.QTHOME)\bin\Qt5Sql.dll" />
                                 <File Id="QT5SVG.DLL" Name="Qt5Svg.dll" Source="$(env.QTHOME)\bin\Qt5Svg.dll" />
                                 <File Id="QT5TEST.DLL" Name="Qt5Test.dll" Source="$(env.QTHOME)\bin\Qt5Test.dll" />
@@ -113,6 +114,7 @@
                                 <File Id="EPICS3_PLUGIN.DLL" Name="epics3_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics3_plugin.dll" />
                                 <File Id="EPICS4_PLUGIN.DLL" Name="epics4_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics4_plugin.dll" />
                                 <File Id="BSREAD_PLUGIN.DLL" Name="bsread_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\bsread_plugin.dll" />
+                                <File Id="MODBUS_PLUGIN.DLL" Name="modbus_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\modbus_plugin.dll" />
                                 <File Id="ARCHIVESF_PLUGIN.DLL" Name="archiveSF_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\archiveSF_plugin.dll" />
                             </Component>
                         </Directory>
@@ -164,7 +166,7 @@
                         </Component>
                     </Directory>
                 </Directory>
-                <Merge Id="VCRedist" Language="0" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Redist\MSVC\14.23.27820\MergeModules\Microsoft_VC142_CRT_x64.msm" DiskId="1" />
+                <Merge Id="VCRedist" Language="0" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Redist\MSVC\14.25.28508\MergeModules\Microsoft_VC142_CRT_x64.msm" DiskId="1" />
             </Directory>
             <Directory Id="ProgramMenuFolder">
                 <Directory Id="ProgramMenuDir" Name="caQtDM">
@@ -184,7 +186,7 @@
             </Component>
         </Directory>
         <Feature Id="DefaultFeature" Title="Main Feature" Level="1" ConfigurableDirectory="INSTALLDIR">
-            <ComponentRef Id="Qt_5.8.0" />
+            <ComponentRef Id="Qt_5.13.1" />
             <ComponentRef Id="Epics_3.14.12.4" />
             <ComponentRef Id="qwt_6.1.3" />
             <ComponentRef Id="CaQtDM" />
