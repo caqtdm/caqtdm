@@ -190,9 +190,14 @@ environment_Plugin {
                 message(“environment_plugin configuration macx”)
                 INCLUDEPATH   += $(EPICSINCLUDE)
                 INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
-                LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
+                LIBS += -L$(CAQTDM_COLLECT) -lqtcontrols
+		LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
+		LIBS += $$(EPICSLIB)/libCom.dylib
                 plugins.path = Contents/PlugIns/controlsystems
                 plugins.files += $(CAQTDM_COLLECT)/controlsystems/libenvironment_plugin.dylib
+                plugins.path = Contents/PlugIns/controlsystems
+                plugins.files += $(CAQTDM_COLLECT)/controlsystems/libmodbus_plugin.dylib
+
                 CONFIG += release
 
         }
