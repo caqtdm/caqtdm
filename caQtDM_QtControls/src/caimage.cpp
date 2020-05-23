@@ -26,12 +26,15 @@
 #include "caimage.h"
 #include "searchfile.h"
 #include "fileFunctions.h"
+#include <QPainter>
+#include <QElapsedTimer>
 
 caImage::caImage(QWidget* parent) : QWidget(parent)
 {
     messagequeue = new messageQueue();
-    _container = new QLabel(this);
+    _container = new QLabel();
     _layout = new QVBoxLayout(this);
+    thisAngle = 0;
     thisFrame = prevFrame = 0;
     setVisibility(StaticV);
     timerId = 0;
@@ -81,11 +84,17 @@ void caImage::init(const QString& filename) {
     _animation = new QMovie(fileNameFound, 0, this);
     _animation->setCacheMode(QMovie::CacheAll);
     _animation->jumpToFrame(0);
+    connect(_animation, SIGNAL(frameChanged(int)), this, SLOT(OnFrameChanged(int)));
     delete s;
     if( _animation.isNull()) return;
     // display the movie
     _container->setScaledContents(true);
     _container->setMovie(_animation);
+
+    pixmap = _animation->currentPixmap();
+    pix    = _animation->currentPixmap();
+
+    if(thisAngle != 0) OnFrameChanged(0);
 
     _layout->setSpacing(0);
     _layout->setMargin(0);
@@ -157,4 +166,45 @@ void caImage::setFrame(int frame)
     if( _animation.isNull()) return;
     (void)_animation->jumpToFrame(frame);
     prevFrame= thisFrame;
+}
+
+void caImage::setAngle( int angle)
+{
+    if (angle >= 0 && angle <= 360) {
+        thisAngle = angle;
+        OnFrameChanged(thisFrame);
+    }
+}
+
+void caImage::slotTiltAngle(int angle)
+{
+    setAngle(angle);
+}
+
+void caImage::slotTiltAngle(double angle)
+{
+    setAngle(qRound(angle));
+}
+
+void caImage::OnFrameChanged(int frame)
+{
+    pixmap = pixmap.scaled(width(), height());
+    pixmap = _animation->currentPixmap();
+    if(thisAngle == 0) {
+        _container->setPixmap (pixmap);
+        return;
+    }
+
+    QMatrix rm;
+    pix.scaled(width(), height());
+    pix.fill(QColor::fromRgb(0, 0, 0, 0)); //pixmap transparent.
+    QPainter* p = new QPainter(&pix);
+    QSize size = pixmap.size();
+    p->translate(size.height()/2,size.height()/2);
+    p->rotate(thisAngle);
+    p->translate(-size.height()/2,-size.height()/2);
+    p->drawPixmap(0, 0, pixmap);
+    p->end();
+    delete p;
+    _container->setPixmap(pix);
 }

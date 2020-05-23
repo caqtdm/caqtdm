@@ -1159,6 +1159,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                 pv =  QUuid::createUuid().toString();
                 pv = pv.replace("{", "");  // otherwise a json string, that would be taken out
                 pv = pv.replace("}", "");
+            // no plugin can be set, while it is a softvariable; however it will write to the real variable of the same name when changing
+            } else if(pv.contains("://")) {
+                int pos = pv.indexOf("://");
+                if(pos != -1) pv = pv.mid(pos+3);
             }
             reaffectText(map, &pv, w1);
             calcWidget->setVariable(pv);

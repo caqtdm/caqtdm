@@ -120,7 +120,7 @@ border-radius: 2px;
      <string notr="true">QTabWidget::tab &gt; QWidget &gt;QWidget {background: rgb(0,0,120);}</string>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <property name="usesScrollButtons">
      <bool>true</bool>
@@ -148,7 +148,7 @@ border-radius: 2px;
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -1795,6 +1795,28 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="delayMilliseconds" stdset="0">
          <number>1000</number>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true"/>
+        </property>
+       </widget>
+       <widget class="caImage" name="caImage_40">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>320</y>
+          <width>40</width>
+          <height>40</height>
+         </rect>
+        </property>
+        <property name="filename" stdset="0">
+         <string>turbo.gif</string>
+        </property>
+        <property name="imageCalc">
+         <string notr="true"/>
+        </property>
+        <property name="tiltAngle" stdset="0">
+         <number>45</number>
         </property>
         <property name="channel" stdset="0">
          <string notr="true"/>
