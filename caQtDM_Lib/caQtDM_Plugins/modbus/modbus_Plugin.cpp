@@ -130,7 +130,7 @@ int modbusPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
     int pos;
 
     QMutexLocker locker(&mutex);
-    qDebug() << "modbusPlugin:pvAddMonitor" << kData->pv << kData->index << kData;
+    //qDebug() << "modbusPlugin:pvAddMonitor" << kData->pv << kData->index << kData;
 
 
 
@@ -140,7 +140,7 @@ int modbusPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
     QString replace=modbus_translation_map.value(target,"");
     if (!replace.isEmpty()){
         target=modbus_translation_map.value(target);
-        qDebug() << "Channel translation:" << kData->pv << target;
+        //qDebug() << "Channel translation:" << kData->pv << target;
     }
 
 
@@ -156,7 +156,7 @@ int modbusPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
         break;
     }
     if (!connector){
-        qDebug() << "create new decode" << target;
+        //qDebug() << "create new decode" << target;
        connector = new modbus_decode();
        qDebug() << "Target" << target << QUrl::fromUserInput(target);
        connector->setModbustarget(QUrl::fromUserInput(target));
@@ -181,7 +181,7 @@ int modbusPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
        msg.append(target);
        if(messagewindowP != Q_NULLPTR) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
     }else{
-      qDebug() << "reuse decode" << target;
+      //qDebug() << "reuse decode" << target;
     }
 
 

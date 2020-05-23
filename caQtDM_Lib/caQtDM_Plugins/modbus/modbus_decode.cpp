@@ -349,7 +349,7 @@ void modbus_decode::device_reply_data()
                             if  (unit.valueCount()>1){
                                 if ((kData->edata.fieldtype==caFLOAT)&&(unit.valueCount()*sizeof(quint16)==sizeof(float))){
                                     qint32 combined = (unit.value(1) << 16) | unit.value(0);
-                                    qDebug() << "ReadFloat:" << unit.value(0) << unit.value(1);
+                                    //qDebug() << "ReadFloat:" << unit.value(0) << unit.value(1);
                                     float* num =(float*) &combined;
                                     kData->edata.rvalue=(double)*num;
                                     kData->edata.monitorCount++;
@@ -541,7 +541,7 @@ int modbus_decode::pvAddMonitor(int index, knobData *kData)
     QString replace=modbus_translation_map.value(target,"");
     if (!replace.isEmpty()){
         target=modbus_translation_map.value(target);
-        qDebug() << "Channel translation:" << kData->pv << target;
+        //qDebug() << "Channel translation:" << kData->pv << target;
     }
 
 
@@ -565,11 +565,11 @@ int modbus_decode::pvAddMonitor(int index, knobData *kData)
         QJsonObject chan_obj = chan_doc.object();
         QJsonValue value;
 
-        foreach(const QString& key, chan_obj.keys()) {
-            QJsonValue value = chan_obj.value(key);
-            qDebug() << "Key = " << key << ", Value = " << value.toString();
-        }
-        qDebug() << "***********************************************************************";
+//        foreach(const QString& key, chan_obj.keys()) {
+//            QJsonValue value = chan_obj.value(key);
+//            qDebug() << "Key = " << key << ", Value = " << value.toString();
+//        }
+        //qDebug() << "***********************************************************************";
 
 
         //DiscreteInputs,D
@@ -652,13 +652,13 @@ int modbus_decode::pvAddMonitor(int index, knobData *kData)
         }
 
 
-        qDebug()<< "QModbusDataUnit : " << int(modbus_type)<< modbus_addr << modbus_count ;
+        //qDebug()<< "QModbusDataUnit : " << int(modbus_type)<< modbus_addr << modbus_count ;
         QModbusDataUnit* readUnit =new QModbusDataUnit(modbus_type,modbus_addr,modbus_count);
         if (!readUnit->isValid()||(modbus_addr<0)){
-            qDebug()<< "Invalid QModbusDataUnit : " << kData->pv << modbus_addr << modbus_count ;
+            //qDebug()<< "Invalid QModbusDataUnit : " << kData->pv << modbus_addr << modbus_count ;
             free(readUnit);
         }else{
-            qDebug()<< "readData.insert : "<<kData->index<<readUnit->valueCount()<<removeEPICSExtensions(chan_desc);
+            //qDebug()<< "readData.insert : "<<kData->index<<readUnit->valueCount()<<removeEPICSExtensions(chan_desc);
             chdata=new modbus_channeldata(kData->index,readUnit);
             chdata->setCycleTime(modbus_cycle);
             chdata->setStation(modbus_station);
@@ -750,7 +750,7 @@ int modbus_decode::pvAddMonitor(int index, knobData *kData)
         QString ioc_string=modbustargetP.host()+":"+QString::number(modbustargetP.port());
         qstrncpy(kData->edata.fec,ioc_string.toLatin1().constData(),39);
         mutexknobdataP->SetMutexKnobData(kData->index, *kData);
-        qDebug()<< "kdata params set ";
+        //qDebug()<< "kdata params set ";
     }
     return MODBUS_OK;
 }
@@ -818,7 +818,7 @@ int modbus_decode::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata
             rawdata[1]=(quint16)(((combined) & 0xFFFF0000)>>16);
             rawdata[0]=(quint16)((combined) & 0xFFFF);
             data->setValues(rawdata);
-            qDebug() << "Float:" << rdata << "/"<< rawdata[0] << rawdata[1] << rawdata;
+            //qDebug() << "Float:" << rdata << "/"<< rawdata[0] << rawdata[1] << rawdata;
 
 
             break;
@@ -829,7 +829,7 @@ int modbus_decode::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata
 
             if (chdata && (chdata->getValid_calc()))  {
                 knobData *kData=mutexknobdataP->GetMutexKnobDataPtr(chdata->getIndex());
-                qDebug()<< "rdata: "<< rdata;
+                //qDebug()<< "rdata: "<< rdata;
                 kData->edata.rvalue=rdata;
                 do_the_calculation(removeHost(target),data,kData,modbus_WRITE);
             }
@@ -863,13 +863,13 @@ int modbus_decode::pvGetTimeStamp(char *pv, char *timestamp)
 
     QString strippedpv=removeEPICSExtensions(removeHost(target));
 
-    qDebug() << "pvGetTimeStamp:"<< strippedpv;
+    //qDebug() << "pvGetTimeStamp:"<< strippedpv;
 
     QMap<QString,modbus_channeldata*>::iterator i = readData.find(strippedpv);
     while (i !=readData.end() && i.key() == strippedpv) {
         knobData *kData=mutexknobdataP->GetMutexKnobDataPtr(i.value()->getIndex());
         modbus_channeldata* chdata=(modbus_channeldata*)kData->edata.info;
-        qDebug() << "chdata" << chdata;
+        //qDebug() << "chdata" << chdata;
         if (chdata){
             chdata->process_timestamp(timestamp);
             qDebug() << pv << timestamp;
