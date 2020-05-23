@@ -133,6 +133,16 @@ void modbus_channeldata::setInvalid_calc()
     valid_calc=false;
 }
 
+short modbus_channeldata::getPrecision() const
+{
+    return Precision;
+}
+
+void modbus_channeldata::setPrecision(short value)
+{
+    Precision = value;
+}
+
 QModbusDataUnit *modbus_channeldata::getReadUnit() const
 {
     return readUnit;

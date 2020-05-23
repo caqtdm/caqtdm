@@ -75,11 +75,15 @@ public:
 
     void setInvalid_calc();
 
+    short getPrecision() const;
+    void setPrecision(short value);
+
 private:
     QMutex mutex;
     bool will_be_written;
     int CycleTime;
     int Station;
+    short Precision;
     QModbusDataUnit* readUnit;
     QList<int> index;
     QDateTime generation_time;

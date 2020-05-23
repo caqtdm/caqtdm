@@ -117,6 +117,7 @@ QModbusDataUnit *modbus_decode::generateDataUnit(QString pv)
 caType modbus_decode::generatecaDataType(QString pv)
 {
     QString chan_desc=removeHost(pv);
+    QString epics_pv=getEPICSExtensions(chan_desc);
     QJsonDocument chan_doc = QJsonDocument::fromJson(chan_desc.toUtf8());
     QJsonObject chan_obj = chan_doc.object();
 
@@ -125,6 +126,20 @@ caType modbus_decode::generatecaDataType(QString pv)
         value = chan_obj.value(QString("wcalc"));
         if (value.isString()) return caDOUBLE;
     }
+    value = chan_obj.value(QString("dtyp"));
+    if (value.isString()){
+        if (value.toString().compare("float",Qt::CaseInsensitive)==0){
+            return caFLOAT;
+        }
+    }
+
+    if (epics_pv.compare("FTVL")==0){
+         return caINT;
+    }
+    if ((epics_pv.compare("NORD")==0)||(epics_pv.compare("NELM")==0)){
+        return caINT;
+    }
+
 
     return caINT;
 }
@@ -168,7 +183,9 @@ void modbus_decode::process()
                     pair = writeData.first();
                     writeData.removeFirst();
                     if (writeData.isEmpty()) break;
+
                     pair_next = writeData.first();
+                    if (pair.first==pair_next.first) delete(pair.second);
                   } while (pair.first==pair_next.first);
                 }
             }
@@ -182,9 +199,12 @@ void modbus_decode::process()
                 int modbus_station=1;
                 modbus_channeldata* reply_channel = readData.value(pair.first,Q_NULLPTR);
                 if (reply_channel) modbus_station=reply_channel->getStation();
-                if (auto *reply = device->sendWriteRequest(*chdata,modbus_station)){
+                QModbusDataUnit cpy_chdata=*chdata;
+                delete chdata;
+                if (auto *reply = device->sendWriteRequest(cpy_chdata,modbus_station)){
                     if (!reply->isFinished()){
                         reply->setProperty("kData.channel",pair.first);
+                        reply->setProperty("QModbusDataUnitDelete",true);
                         connect(reply, SIGNAL(finished()), this, SLOT(device_reply_data()));
 
                     }
@@ -277,6 +297,7 @@ void modbus_decode::trigger_modbusrequest()
                                         if (!reply->isFinished()){
 
                                             reply->setProperty("kData.channel",Channel);
+                                            reply->setProperty("QModbusDataUnitDelete",false);
                                             connect(reply, SIGNAL(finished()), this, SLOT(device_reply_data()));
                                         }
                                         else
@@ -328,29 +349,27 @@ void modbus_decode::device_reply_data()
                             if  (unit.valueCount()>1){
                                 if ((kData->edata.fieldtype==caFLOAT)&&(unit.valueCount()*sizeof(quint16)==sizeof(float))){
                                     qint32 combined = (unit.value(1) << 16) | unit.value(0);
+                                    qDebug() << "ReadFloat:" << unit.value(0) << unit.value(1);
                                     float* num =(float*) &combined;
                                     kData->edata.rvalue=(double)*num;
                                     kData->edata.monitorCount++;
-                                }
+                                }else
+                                    if (kData->edata.fieldtype==caINT){
+                                        int oldsize=kData->edata.dataSize;
+                                        kData->edata.dataSize=(unit.valueCount()*sizeof(int16_t));
+                                        if (kData->edata.dataB){
 
+                                            kData->edata.dataB=realloc(kData->edata.dataB,kData->edata.dataSize);
 
-
-
-                                int oldsize=kData->edata.dataSize;
-                                kData->edata.dataSize=(unit.valueCount()*sizeof(int16_t));
-                                if (kData->edata.dataB){
-
-                                    kData->edata.dataB=realloc(kData->edata.dataB,kData->edata.dataSize);
-
-                                }else{
-                                    kData->edata.dataB=malloc(kData->edata.dataSize);
-                                }
-                                for (uint i = 0; i < unit.valueCount(); i++) {
-                                    ((int16_t*) kData->edata.dataB)[i]=unit.value(i);
-                                }
-
-                                // Achtung sollte noch optimiert werden!!!!
-                                kData->edata.monitorCount++;
+                                        }else{
+                                            kData->edata.dataB=malloc(kData->edata.dataSize);
+                                        }
+                                        for (uint i = 0; i < unit.valueCount(); i++) {
+                                            ((int16_t*) kData->edata.dataB)[i]=unit.value(i);
+                                        }
+                                        // Achtung sollte noch optimiert werden!!!!
+                                        kData->edata.monitorCount++;
+                                    }
                             }else{
                                 kData->edata.fieldtype=caINT;
                                 if (kData->edata.ivalue!=unit.value(0)){
@@ -375,12 +394,19 @@ void modbus_decode::device_reply_data()
                             mutexknobdataP->SetMutexKnobData(kData->index, *kData);
                             mutexknobdataP->SetMutexKnobDataReceived(kData);
                         }}
+                        //reply->setProperty("QModbusDataUnitDelete",true);
+//                        QVariant vardelete = reply->property("QModbusDataUnitDelete");
+//                        if (!vardelete.isNull())
+//                            if (vardelete.canConvert<bool>())
+//                                if (vardelete.toBool())
+
+
                 }else{
                     qDebug()<< "NoIndex";
                 }
         } else{
             //qDebug()<< "Error: ";
-            QVariant varindex = reply->property("kData.index");
+            QVariant varindex = reply->property("kData.channel");
 
             if (!varindex.isNull())
                 if (varindex.canConvert<QString>()){
@@ -531,6 +557,7 @@ int modbus_decode::pvAddMonitor(int index, knobData *kData)
         int modbus_count;
         int modbus_cycle;
         int modbus_station;
+        short modbus_prec=0;
         QString modbus_rcalc;
         QString modbus_wcalc;
 
@@ -549,7 +576,7 @@ int modbus_decode::pvAddMonitor(int index, knobData *kData)
         //Coils,C
         //InputRegisters,I
         //HoldingRegisters,H
-        kData->edata.fieldtype=caINT;
+
         value = chan_obj.value(QString("type"));
         if (value.isString()){
             QString teststr=value.toString();
@@ -578,10 +605,10 @@ int modbus_decode::pvAddMonitor(int index, knobData *kData)
         value = chan_obj.value(QString("dtyp"));
         if (value.isString()){
             if (value.toString().compare("float",Qt::CaseInsensitive)==0){
-                kData->edata.fieldtype=caFLOAT;
+
                 modbus_count=2;
             }else if (value.toString().compare("char",Qt::CaseInsensitive)==0){
-                kData->edata.fieldtype=caCHAR; // not tested
+                //kData->edata.fieldtype=caCHAR; // not tested
             }
         }
 
@@ -610,20 +637,18 @@ int modbus_decode::pvAddMonitor(int index, knobData *kData)
 
         value = chan_obj.value(QString("rcalc"));
         if (value.isString()){
-            kData->edata.fieldtype=caDOUBLE;
+
             modbus_rcalc=value.toString();
         }
         value = chan_obj.value(QString("wcalc"));
         if (value.isString()){
-            kData->edata.fieldtype=caDOUBLE;
+
             modbus_wcalc=value.toString();
         }
 
         value = chan_obj.value(QString("prec"));
         if (value.isDouble()){
-            kData->edata.precision=short(value.toDouble());
-        }else{
-            kData->edata.precision=0;
+            modbus_prec=short(value.toDouble());
         }
 
 
@@ -639,6 +664,7 @@ int modbus_decode::pvAddMonitor(int index, knobData *kData)
             chdata->setStation(modbus_station);
             chdata->setRcalc(modbus_rcalc);
             chdata->setWcalc(modbus_wcalc);
+            chdata->setPrecision(modbus_prec);
             readData.insert(removeEPICSExtensions(chan_desc),chdata);
 
             QTimer* selected_timer=running_Timer.value(modbus_cycle,Q_NULLPTR);
@@ -689,22 +715,28 @@ int modbus_decode::pvAddMonitor(int index, knobData *kData)
                 break;
             }
             }
+            kData->edata.fieldtype=generatecaDataType(target);
             kData->edata.status=0;
             kData->edata.info=chdata;
             kData->edata.valueCount=chdata->getModbus_count();
+            kData->edata.precision=chdata->getPrecision();
+            if (kData->edata.fieldtype==caFLOAT){
+               kData->edata.valueCount=1;
+            }else
             if (chdata->getModbus_count()>1){
                 kData->edata.dataSize=chdata->getModbus_count()*sizeof(qint16);
                 kData->edata.dataB=malloc(chdata->getModbus_count()*sizeof(qint16));
             }else{
                 kData->edata.dataB=Q_NULLPTR;
             }
+
         }else{
            if (epics_pv.compare("FTVL")==0){
-                kData->edata.fieldtype=caINT;
+                kData->edata.fieldtype=generatecaDataType(target);
                 kData->edata.ivalue=4;//menuFtypeUSHORT,"USHORT"
            }
            if ((epics_pv.compare("NORD")==0)||(epics_pv.compare("NELM")==0)){
-                kData->edata.fieldtype=caINT;
+                kData->edata.fieldtype=generatecaDataType(target);
                 QMap<QString,modbus_channeldata*>::iterator i = readData.find(chan_desc);
                 while (i !=readData.end() && i.key() == chan_desc) {
                     kData->edata.ivalue=chdata->getModbus_count();
@@ -775,6 +807,20 @@ int modbus_decode::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata
     switch (generatecaDataType(target)){
         case caINT:{
             data->setValue(0,quint16(idata));
+            break;
+        }
+        case caFLOAT:{
+
+            float floatdata=(float)rdata;
+            quint32* num=(quint32*) &floatdata;
+            quint32 combined = *num;
+            QVector<quint16> rawdata(sizeof(float)/sizeof(quint16));
+            rawdata[1]=(quint16)(((combined) & 0xFFFF0000)>>16);
+            rawdata[0]=(quint16)((combined) & 0xFFFF);
+            data->setValues(rawdata);
+            qDebug() << "Float:" << rdata << "/"<< rawdata[0] << rawdata[1] << rawdata;
+
+
             break;
         }
         case caDOUBLE:{
