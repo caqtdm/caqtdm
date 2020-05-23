@@ -29,7 +29,7 @@ modbus_channeldata::modbus_channeldata()
     readUnit=new QModbusDataUnit();
     this->index.clear();
     generation_time= QDateTime::currentDateTime();
-    will_be_written=false;
+
     valid_calc=true;
 }
 
@@ -39,7 +39,7 @@ modbus_channeldata::modbus_channeldata( int index, QModbusDataUnit *readUnit)
     this->index.append(index);
     this->readUnit=readUnit;
     generation_time= QDateTime::currentDateTime();
-    will_be_written=false;
+
     valid_calc=true;
 }
 
@@ -63,24 +63,6 @@ void modbus_channeldata::process_timestamp(char *timestamp)
     QString time=process_time.toString("hh:mm:ss.zzz");
     time="TimeStamp: "+time;
     qstrncpy(timestamp,time.toLatin1().data(),50);// see defenition of timestamp char(50)
-}
-
-bool modbus_channeldata::getWill_be_written()
-{
-    QMutexLocker locker(&mutex);
-    return will_be_written;
-}
-
-void modbus_channeldata::setWill_be_written()
-{
-    QMutexLocker locker(&mutex);
-    will_be_written = true;
-}
-
-void modbus_channeldata::resetWill_be_written()
-{
-    QMutexLocker locker(&mutex);
-    will_be_written=false;
 }
 
 int modbus_channeldata::getCycleTime() const

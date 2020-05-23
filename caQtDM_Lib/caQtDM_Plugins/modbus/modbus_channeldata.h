@@ -55,10 +55,6 @@ public:
     void trigger_process();
     void process_timestamp(char* timestamp);
 
-    bool getWill_be_written();
-    void setWill_be_written();
-    void resetWill_be_written();
-
     int getCycleTime() const;
     void setCycleTime(int value);
 
@@ -79,8 +75,7 @@ public:
     void setPrecision(short value);
 
 private:
-    QMutex mutex;
-    bool will_be_written;
+
     int CycleTime;
     int Station;
     short Precision;

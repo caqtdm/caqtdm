@@ -283,7 +283,7 @@ void modbus_decode::trigger_modbusrequest()
 
                 QMap<QString,modbus_channeldata*>::iterator i = readData.find(Channel);
                 while (i !=readData.end() && i.key() == Channel) {
-                    if(!i.value()->getWill_be_written()){
+
                         readUnit=i.value()->getReadUnit();
                         if (timer_cycle==i.value()->getCycleTime())
                             if (readUnit){
@@ -310,7 +310,7 @@ void modbus_decode::trigger_modbusrequest()
 
                                 } else printf(".");fflush(stdout);
                             }
-                    }
+
                     ++i;
                 }
 
@@ -341,10 +341,6 @@ void modbus_decode::device_reply_data()
 
                             knobData *kData=mutexknobdataP->GetMutexKnobDataPtr(index);
                             modbus_channeldata* chdata=(modbus_channeldata*)kData->edata.info;
-                            if (chdata){
-                                chdata->trigger_process();
-                                if (chdata->getWill_be_written()) chdata->resetWill_be_written();
-                            }
 
                             if  (unit.valueCount()>1){
                                 if ((kData->edata.fieldtype==caFLOAT)&&(unit.valueCount()*sizeof(quint16)==sizeof(float))){
