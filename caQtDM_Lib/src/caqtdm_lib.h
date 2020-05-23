@@ -322,6 +322,7 @@ private:
     void fingerswipeTriggered(FingerSwipeGesture *gesture);
     Qt::GestureType fingerSwipeGestureType;
 #else
+    void send_delayed_popup_signal();
     bool eventFilter(QObject *obj, QEvent *event);
 #endif
 
@@ -471,7 +472,7 @@ private slots:
 
     void updateResize();
 
-    void send_delayed_popup_signal();
+
 };
 
 #endif // CaQtDM_Lib_H
