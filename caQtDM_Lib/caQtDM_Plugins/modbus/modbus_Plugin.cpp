@@ -114,6 +114,18 @@ int modbusPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
     return true;
 }
 
+QString modbusPlugin::removeEPICSExtensions(QString pv)
+{
+   QString chan_desc=pv;
+   chan_desc=chan_desc.remove(".FTVL",Qt::CaseInsensitive);
+   chan_desc=chan_desc.remove(".EGU",Qt::CaseInsensitive);
+   chan_desc=chan_desc.remove(".NELM",Qt::CaseInsensitive);
+   chan_desc=chan_desc.remove(".NORD",Qt::CaseInsensitive);
+
+   return chan_desc;
+}
+
+
 // caQtDM_Lib will call this routine for defining a monitor
 //modbus://129.129.130.73:502{type:"coils",addr:0,count:1,datatype:"float",rcalc:"A*10",wcalc:"A/10",egu:"Bla",cycle:10}
 //r,wcalc : read/write calc to register
@@ -136,12 +148,12 @@ int modbusPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
 
 
     QString target=kData->pv;
-
-    QString replace=modbus_translation_map.value(target,"");
+    QString replace=modbus_translation_map.value(removeEPICSExtensions(target),"");
     if (!replace.isEmpty()){
-        target=modbus_translation_map.value(target);
-        //qDebug() << "Channel translation:" << kData->pv << target;
+        target=target.replace(removeEPICSExtensions(target),modbus_translation_map.value(removeEPICSExtensions(target)));
     }
+
+
 
 
     pos=target.indexOf("{");
@@ -158,7 +170,7 @@ int modbusPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
     if (!connector){
         //qDebug() << "create new decode" << target;
        connector = new modbus_decode();
-       qDebug() << "Target" << target << QUrl::fromUserInput(target);
+       //qDebug() << "Target" << target << QUrl::fromUserInput(target);
        connector->setModbustarget(QUrl::fromUserInput(target));
 
 

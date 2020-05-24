@@ -38,6 +38,8 @@
 #define MODBUS_ERROR -1
 #define MODBUS_OK 0
 
+#define MODBUS_MAX_SEGMENT_SIZE 123
+
 enum modbus_calc_direction {modbus_INVALID = 0, modbus_READ = 1, modbus_WRITE = 2};
 
 class modbus_decode : public QObject

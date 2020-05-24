@@ -36,7 +36,7 @@ class modbus_channeldata : public QObject
 public:
     modbus_channeldata();
     modbus_channeldata(int index,QModbusDataUnit* readUnit);
-
+    modbus_channeldata(int index, QList<QModbusDataUnit> readUnits);
 
     QModbusDataUnit::RegisterType getModbus_type() const;
     void setModbus_type(const QModbusDataUnit::RegisterType &value);
@@ -44,7 +44,10 @@ public:
     void setModbus_addr(int value);
     int getModbus_count() const;
     void setModbus_count(int value);
-    QModbusDataUnit *getReadUnit() const;
+    QModbusDataUnit getReadUnit() ;
+    QModbusDataUnit getReadUnit(int n) ;
+    int getReadUnit_count();
+
     void addIndex(int pvindex);
     void delIndex(int pvindex);
 
@@ -79,7 +82,8 @@ private:
     int CycleTime;
     int Station;
     short Precision;
-    QModbusDataUnit* readUnit;
+
+    QList<QModbusDataUnit> readUnits;
     QList<int> index;
     QDateTime generation_time;
     QDateTime request_time;

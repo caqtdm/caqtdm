@@ -52,6 +52,8 @@ public:
 
 
     int initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow,QMap<QString, QString> options);
+
+    QString removeEPICSExtensions(QString pv);
     int pvAddMonitor(int index, knobData *kData, int rate, int skip);
     int pvClearMonitor(knobData *kData);
     int pvFreeAllocatedData(knobData *kData);

@@ -26,7 +26,7 @@
 
 modbus_channeldata::modbus_channeldata()
 {
-    readUnit=new QModbusDataUnit();
+
     this->index.clear();
     generation_time= QDateTime::currentDateTime();
 
@@ -37,7 +37,17 @@ modbus_channeldata::modbus_channeldata( int index, QModbusDataUnit *readUnit)
 {
     this->index.clear();
     this->index.append(index);
-    this->readUnit=readUnit;
+    this->readUnits.append(*readUnit);
+    generation_time= QDateTime::currentDateTime();
+
+    valid_calc=true;
+}
+
+modbus_channeldata::modbus_channeldata( int index, QList<QModbusDataUnit> readUnits)
+{
+    this->index.clear();
+    this->index.append(index);
+    this->readUnits=readUnits;
     generation_time= QDateTime::currentDateTime();
 
     valid_calc=true;
@@ -125,9 +135,19 @@ void modbus_channeldata::setPrecision(short value)
     Precision = value;
 }
 
-QModbusDataUnit *modbus_channeldata::getReadUnit() const
+QModbusDataUnit modbus_channeldata::getReadUnit()
 {
-    return readUnit;
+    return readUnits.first();
+}
+
+QModbusDataUnit modbus_channeldata::getReadUnit(int n)
+{
+    return readUnits.at(n);
+}
+
+int modbus_channeldata::getReadUnit_count()
+{
+    return readUnits.count();
 }
 
 void modbus_channeldata::addIndex(int pvindex)
@@ -146,30 +166,33 @@ void modbus_channeldata::delIndex(int pvindex)
 
 int modbus_channeldata::getModbus_count() const
 {
-    return readUnit->valueCount();
+    int datasize=0;
+    foreach (QModbusDataUnit i,readUnits) datasize=datasize+i.valueCount();
+
+    return datasize;
 }
 
 void modbus_channeldata::setModbus_count(int value)
 {
-    readUnit->setValueCount(value);
+    readUnits.first().setValueCount(value);
 }
 
 int modbus_channeldata::getModbus_addr() const
 {
-    return readUnit->startAddress();
+    return readUnits.first().startAddress();
 }
 
 void modbus_channeldata::setModbus_addr(int value)
 {
-    readUnit->setStartAddress(value);
+    readUnits.first().setStartAddress(value);
 }
 
 QModbusDataUnit::RegisterType modbus_channeldata::getModbus_type() const
 {
-    return readUnit->registerType();
+    return readUnits.first().registerType();
 }
 
 void modbus_channeldata::setModbus_type(const QModbusDataUnit::RegisterType &value)
 {
-    readUnit->setRegisterType(value);
+    readUnits.first().setRegisterType(value);
 }

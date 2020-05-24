@@ -171,12 +171,13 @@ void modbus_decode::process()
         QThread::msleep(100);
         loop->processEvents();
         QModbusDataUnit* chdata=Q_NULLPTR;
-        QPair<QString, QModbusDataUnit*> pair;
-        QPair<QString, QModbusDataUnit*> pair_next;
+        QString channel;
         {
             QMutexLocker locker(&writeData_mutex);
             if (writeData.size()){
                 {
+                  QPair<QString, QModbusDataUnit*> pair;
+                  QPair<QString, QModbusDataUnit*> pair_next;
                   //with this loop we remove some mutiple write access
                   //specially form caSlider
                   do{
@@ -187,23 +188,25 @@ void modbus_decode::process()
                     pair_next = writeData.first();
                     if (pair.first==pair_next.first) delete(pair.second);
                   } while (pair.first==pair_next.first);
+                  channel=pair.first;
+                  chdata=pair.second;
                 }
             }
         }
-        chdata=pair.second;
+
         if (chdata){
             //qDebug()<<"write Data"<< chdata->value(0);
             //qDebug() << readUnit->startAddress() << int(readUnit->registerType() );
             if (chdata->isValid()){
                 //qDebug()<< "QModbusDataUnit: "<< readData;
                 int modbus_station=1;
-                modbus_channeldata* reply_channel = readData.value(pair.first,Q_NULLPTR);
+                modbus_channeldata* reply_channel = readData.value(channel,Q_NULLPTR);
                 if (reply_channel) modbus_station=reply_channel->getStation();
                 QModbusDataUnit cpy_chdata=*chdata;
                 delete chdata;
                 if (auto *reply = device->sendWriteRequest(cpy_chdata,modbus_station)){
                     if (!reply->isFinished()){
-                        reply->setProperty("kData.channel",pair.first);
+                        reply->setProperty("kData.channel",channel);
                         reply->setProperty("QModbusDataUnitDelete",true);
                         connect(reply, SIGNAL(finished()), this, SLOT(device_reply_data()));
 
@@ -240,7 +243,7 @@ void modbus_decode::devicestate_changed(QModbusDevice::State state)
         QMutexLocker locker(&mutex);
         qDebug()<< "QModbusDevice::UnconnectedState";
         QList<modbus_channeldata*> usedkeys=readData.values();
-        qDebug()<< usedkeys;
+        //qDebug()<< usedkeys;
         foreach (modbus_channeldata* index,usedkeys){
 
             knobData *kData=mutexknobdataP->GetMutexKnobDataPtr(index->getIndex());
@@ -269,7 +272,7 @@ void modbus_decode::trigger_modbusrequest()
            timer_cycle=varcycle.toInt();
 
 
-    QModbusDataUnit* readUnit;
+    QModbusDataUnit readUnit;
     if (device_state == QModbusDevice::ConnectedState){
         bool request_data=true;
         {
@@ -283,33 +286,37 @@ void modbus_decode::trigger_modbusrequest()
 
                 QMap<QString,modbus_channeldata*>::iterator i = readData.find(Channel);
                 while (i !=readData.end() && i.key() == Channel) {
+                    for (int x=0;x<i.value()->getReadUnit_count();x++){
+                        readUnit=i.value()->getReadUnit(x);
 
-                        readUnit=i.value()->getReadUnit();
                         if (timer_cycle==i.value()->getCycleTime())
-                            if (readUnit){
-                                //qDebug() << readUnit->startAddress() << int(readUnit->registerType() );
-                                if (readUnit->isValid()){
-                                    //qDebug()<< "QModbusDataUnit: "<< readUnit->registerType() << readUnit->startAddress() << readUnit->valueCount() << Channel;
-                                    if (auto *reply = device->sendReadRequest(*readUnit,i.value()->getStation())) {
 
+                            //qDebug() << readUnit->startAddress() << int(readUnit->registerType() );
+                            if (readUnit.isValid()){
+                                //qDebug()<< "QModbusDataUnit: "<< readUnit->registerType() << readUnit->startAddress() << readUnit->valueCount() << Channel;
+                                if (auto *reply = device->sendReadRequest(readUnit,i.value()->getStation())) {
+                                    if (!reply->isFinished()){
 
-
-                                        if (!reply->isFinished()){
-
-                                            reply->setProperty("kData.channel",Channel);
-                                            reply->setProperty("QModbusDataUnitDelete",false);
-                                            connect(reply, SIGNAL(finished()), this, SLOT(device_reply_data()));
-                                        }
-                                        else
-                                            delete reply; // broadcast replies return immediately
-                                    } else{
-                                        qDebug()<< "Read error: " << device->errorString();
-                                        qDebug()<< readUnit->registerType() << readUnit->startAddress() << readUnit->valueCount();
-
+                                        reply->setProperty("kData.channel",Channel);
+                                        reply->setProperty("QModbusDataUnitDelete",false);
+                                        connect(reply, SIGNAL(finished()), this, SLOT(device_reply_data()));
                                     }
+                                    else
+                                        delete reply; // broadcast replies return immediately
+                                } else{
+                                    qDebug()<< "Read error: " << device->errorString();
+                                    qDebug()<< readUnit.registerType() << readUnit.startAddress() << readUnit.valueCount();
 
-                                } else printf(".");fflush(stdout);
-                            }
+                                }
+
+                            } else {printf(".");fflush(stdout);}
+
+
+                    }
+
+
+
+
 
                     ++i;
                 }
@@ -351,17 +358,19 @@ void modbus_decode::device_reply_data()
                                     kData->edata.monitorCount++;
                                 }else
                                     if (kData->edata.fieldtype==caINT){
-                                        int oldsize=kData->edata.dataSize;
-                                        kData->edata.dataSize=(unit.valueCount()*sizeof(int16_t));
-                                        if (kData->edata.dataB){
-
-                                            kData->edata.dataB=realloc(kData->edata.dataB,kData->edata.dataSize);
-
-                                        }else{
-                                            kData->edata.dataB=malloc(kData->edata.dataSize);
+                                        if ((chdata->getModbus_count()*sizeof(qint16)+1024)!=kData->edata.dataSize){
+                                            kData->edata.dataSize=(chdata->getModbus_count()*sizeof(qint16))+10;
+                                            if (kData->edata.dataB){
+                                                kData->edata.dataB=realloc(kData->edata.dataB,kData->edata.dataSize);
+                                            }else{
+                                                kData->edata.dataB=malloc(kData->edata.dataSize);
+                                            }
                                         }
+                                        int datashift=unit.startAddress()-reply_channel->getModbus_addr();
+
+
                                         for (uint i = 0; i < unit.valueCount(); i++) {
-                                            ((int16_t*) kData->edata.dataB)[i]=unit.value(i);
+                                            ((qint16*) kData->edata.dataB)[i+datashift]=unit.value(i);
                                         }
                                         // Achtung sollte noch optimiert werden!!!!
                                         kData->edata.monitorCount++;
@@ -445,7 +454,7 @@ int modbus_decode::do_the_calculation(QString modbus_connection,QModbusDataUnit 
         valueArray[0]=unit->value(0);
         if (!chdata->getRcalc().isEmpty()){
             status = postfix(chdata->getRcalc().toLatin1().data(), post, &errnum);
-        }
+        }else chdata->setInvalid_calc();
         break;
     }
     case modbus_WRITE:{
@@ -453,12 +462,12 @@ int modbus_decode::do_the_calculation(QString modbus_connection,QModbusDataUnit 
         valueArray[0]=kData->edata.rvalue;
         if (!chdata->getWcalc().isEmpty()){
             status = postfix(chdata->getWcalc().toLatin1().data(), post, &errnum);
-        }
+        }else chdata->setInvalid_calc();
         break;
     }
     default: return MODBUS_ERROR;
     }
-
+    if (!chdata->getValid_calc()) return MODBUS_ERROR;
 
     if (status){
         chdata->setInvalid_calc();
@@ -534,17 +543,16 @@ int modbus_decode::pvAddMonitor(int index, knobData *kData)
             //Adresse,count
     QString target=kData->pv;
 
-    QString replace=modbus_translation_map.value(target,"");
+    QString replace=modbus_translation_map.value(removeEPICSExtensions(target),"");
     if (!replace.isEmpty()){
-        target=modbus_translation_map.value(target);
-        //qDebug() << "Channel translation:" << kData->pv << target;
+        target=target.replace(removeEPICSExtensions(target),modbus_translation_map.value(removeEPICSExtensions(target)));
     }
+
 
 
     QString chan_desc=removeHost(target);
 
     QString epics_pv=getEPICSExtensions(chan_desc);
-
 
     modbus_channeldata* chdata=readData.value(removeEPICSExtensions(chan_desc),Q_NULLPTR);
     if (chdata==Q_NULLPTR){
@@ -647,37 +655,43 @@ int modbus_decode::pvAddMonitor(int index, knobData *kData)
             modbus_prec=short(value.toDouble());
         }
 
-
         //qDebug()<< "QModbusDataUnit : " << int(modbus_type)<< modbus_addr << modbus_count ;
-        QModbusDataUnit* readUnit =new QModbusDataUnit(modbus_type,modbus_addr,modbus_count);
-        if (!readUnit->isValid()||(modbus_addr<0)){
-            //qDebug()<< "Invalid QModbusDataUnit : " << kData->pv << modbus_addr << modbus_count ;
-            free(readUnit);
+        QList<QModbusDataUnit> readUnit;
+        if (modbus_count<MODBUS_MAX_SEGMENT_SIZE){
+            readUnit.append(QModbusDataUnit(modbus_type,modbus_addr,modbus_count));
         }else{
-            //qDebug()<< "readData.insert : "<<kData->index<<readUnit->valueCount()<<removeEPICSExtensions(chan_desc);
-            chdata=new modbus_channeldata(kData->index,readUnit);
-            chdata->setCycleTime(modbus_cycle);
-            chdata->setStation(modbus_station);
-            chdata->setRcalc(modbus_rcalc);
-            chdata->setWcalc(modbus_wcalc);
-            chdata->setPrecision(modbus_prec);
-            readData.insert(removeEPICSExtensions(chan_desc),chdata);
-
-            QTimer* selected_timer=running_Timer.value(modbus_cycle,Q_NULLPTR);
-            if (!selected_timer){
-                selected_timer=new QTimer(this);
-                selected_timer->setInterval(modbus_cycle);
-                selected_timer->setProperty("modbus_cycle",modbus_cycle);
-                connect(selected_timer, SIGNAL(timeout()), this, SLOT(trigger_modbusrequest()));
-                selected_timer->start();
-                running_Timer.insert(modbus_cycle,selected_timer);
-                QString msg=QString("modbus timer started cycle time %1 ms").arg(modbus_cycle);
-                if(messagewindowP != Q_NULLPTR) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
-
+            int segmentcount=modbus_count/MODBUS_MAX_SEGMENT_SIZE;
+            int segmentlast=modbus_count%MODBUS_MAX_SEGMENT_SIZE;
+            for (int x=0;x<segmentcount;x++){
+                readUnit.append(QModbusDataUnit(modbus_type,modbus_addr+(x*MODBUS_MAX_SEGMENT_SIZE),MODBUS_MAX_SEGMENT_SIZE));
             }
+            readUnit.append(QModbusDataUnit(modbus_type,modbus_addr+(segmentcount*MODBUS_MAX_SEGMENT_SIZE),segmentlast));
+        }
 
+        //qDebug()<< "readData.insert : "<<kData->index<<readUnit->valueCount()<<removeEPICSExtensions(chan_desc);
+        chdata=new modbus_channeldata(kData->index,readUnit);
+        chdata->setCycleTime(modbus_cycle);
+        chdata->setStation(modbus_station);
+        chdata->setRcalc(modbus_rcalc);
+        chdata->setWcalc(modbus_wcalc);
+        chdata->setPrecision(modbus_prec);
+        readData.insert(removeEPICSExtensions(chan_desc),chdata);
+
+        QTimer* selected_timer=running_Timer.value(modbus_cycle,Q_NULLPTR);
+        if (!selected_timer){
+            selected_timer=new QTimer(this);
+            selected_timer->setInterval(modbus_cycle);
+            selected_timer->setProperty("modbus_cycle",modbus_cycle);
+            connect(selected_timer, SIGNAL(timeout()), this, SLOT(trigger_modbusrequest()));
+            selected_timer->start();
+            running_Timer.insert(modbus_cycle,selected_timer);
+            QString msg=QString("modbus timer started cycle time %1 ms").arg(modbus_cycle);
+            if(messagewindowP != Q_NULLPTR) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
 
         }
+
+
+
     }else{
        chdata->addIndex(kData->index);
     }
@@ -720,8 +734,8 @@ int modbus_decode::pvAddMonitor(int index, knobData *kData)
                kData->edata.valueCount=1;
             }else
             if (chdata->getModbus_count()>1){
-                kData->edata.dataSize=chdata->getModbus_count()*sizeof(qint16);
-                kData->edata.dataB=malloc(chdata->getModbus_count()*sizeof(qint16));
+                kData->edata.dataSize=chdata->getModbus_count()*sizeof(qint16)+1024;
+                kData->edata.dataB=malloc(kData->edata.dataSize);
             }else{
                 kData->edata.dataB=Q_NULLPTR;
             }
@@ -784,6 +798,7 @@ bool modbus_decode::pvClearMonitor(knobData *kData)
 
 void modbus_decode::setTerminate()
 {
+    messagewindowP=Q_NULLPTR;
     modbus_terminate = true;
 
 }
@@ -800,7 +815,8 @@ int modbus_decode::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata
 
 
     QModbusDataUnit* data=generateDataUnit(target);
-    switch (generatecaDataType(target)){
+    if (data){
+        switch (generatecaDataType(target)){
         case caINT:{
             data->setValue(0,quint16(idata));
             break;
@@ -834,14 +850,15 @@ int modbus_decode::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata
         }
         default:data->setValue(0,quint16(idata));
 
-    }
+        }
 
 
-    {
-        pair.first=removeHost(target);
-        pair.second=data;
-        QMutexLocker locker(&writeData_mutex);
-        writeData.append(pair);
+        {
+            pair.first=removeHost(target);
+            pair.second=data;
+            QMutexLocker locker(&writeData_mutex);
+            writeData.append(pair);
+        }
     }
     return MODBUS_OK;
 
@@ -868,7 +885,7 @@ int modbus_decode::pvGetTimeStamp(char *pv, char *timestamp)
         //qDebug() << "chdata" << chdata;
         if (chdata){
             chdata->process_timestamp(timestamp);
-            qDebug() << pv << timestamp;
+
             return MODBUS_OK;
 
         }
