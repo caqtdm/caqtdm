@@ -167,13 +167,16 @@
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;H&quot;,&quot;addr&quot;:0,&quot;count&quot;:120}</string>
+     <string notr="true">modbus://testchannel6</string>
     </property>
     <property name="numberOfRows">
      <number>13</number>
     </property>
     <property name="numberOfColumns">
      <number>10</number>
+    </property>
+    <property name="precision">
+     <number>2</number>
     </property>
     <row/>
     <row/>
@@ -1319,7 +1322,7 @@
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;C&quot;,&quot;addr&quot;:0,&quot;count&quot;:1}</string>
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;D&quot;,&quot;addr&quot;:0,&quot;count&quot;:1}</string>
     </property>
    </widget>
    <widget class="caLed" name="caled_3">

@@ -123,7 +123,7 @@ caType modbus_decode::generatecaDataType(QString pv)
 
     QJsonValue value = chan_obj.value(QString("rcalc"));
     if (value.isString()){
-        value = chan_obj.value(QString("wcalc"));
+        value = chan_obj.value(QString("rcalc"));
         if (value.isString()) return caDOUBLE;
     }
     value = chan_obj.value(QString("dtyp"));
@@ -356,7 +356,7 @@ void modbus_decode::device_reply_data()
                                     float* num =(float*) &combined;
                                     kData->edata.rvalue=(double)*num;
                                     kData->edata.monitorCount++;
-                                }else
+                                }else{
                                     if (kData->edata.fieldtype==caINT){
                                         if ((chdata->getModbus_count()*sizeof(qint16)+1024)!=kData->edata.dataSize){
                                             kData->edata.dataSize=(chdata->getModbus_count()*sizeof(qint16))+10;
@@ -367,14 +367,30 @@ void modbus_decode::device_reply_data()
                                             }
                                         }
                                         int datashift=unit.startAddress()-reply_channel->getModbus_addr();
-
-
                                         for (uint i = 0; i < unit.valueCount(); i++) {
                                             ((qint16*) kData->edata.dataB)[i+datashift]=unit.value(i);
                                         }
                                         // Achtung sollte noch optimiert werden!!!!
                                         kData->edata.monitorCount++;
                                     }
+                                    if (kData->edata.fieldtype==caDOUBLE){
+                                        if ((chdata->getModbus_count()*sizeof(double)+1024)!=kData->edata.dataSize){
+                                            kData->edata.dataSize=(chdata->getModbus_count()*sizeof(double))+1024;
+                                            if (kData->edata.dataB){
+                                                kData->edata.dataB=realloc(kData->edata.dataB,kData->edata.dataSize);
+                                            }else{
+                                                kData->edata.dataB=malloc(kData->edata.dataSize);
+                                            }
+                                        }
+                                        QModbusDataUnit convert = unit;
+                                        do_the_calculation(varindex.toString(),&convert,kData,modbus_READ);
+                                        // Achtung sollte noch optimiert werden!!!!
+                                        kData->edata.monitorCount++;
+                                    }
+
+
+
+                                }
                             }else{
                                 kData->edata.fieldtype=caINT;
                                 if (kData->edata.ivalue!=unit.value(0)){
@@ -477,28 +493,60 @@ int modbus_decode::do_the_calculation(QString modbus_connection,QModbusDataUnit 
         if(messagewindowP != Q_NULLPTR) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
         return MODBUS_ERROR;
     }
-    status = calcPerform(valueArray, &result, post);
-    if(!status) {
-        switch(direction){
+
+    switch(direction){
         case modbus_READ:{
-            kData->edata.fieldtype=caDOUBLE;
-            kData->edata.rvalue=result;
+            if (chdata->getModbus_count()>1){
+                int datashift=unit->startAddress()-chdata->getModbus_addr();
+                for (uint i = 0; i < unit->valueCount(); i++) {
+                    valueArray[0]=(qint16)unit->value(i);
+                    status = calcPerform(valueArray, &result, post);
+                    if(status) break;
+                    ((double*) kData->edata.dataB)[i+datashift]=result;
+                }
+                if (status){
+                    chdata->setInvalid_calc();
+                    QString msg="modbus: Invalid READ array calc found in: ";
+                    msg.append(kData->pv);
+                    msg.append("/"+modbus_connection);
+                    if(messagewindowP != Q_NULLPTR) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
+                    return MODBUS_ERROR;
+                }
+            }else{
+                status = calcPerform(valueArray, &result, post);
+                if(!status) {
+                    kData->edata.fieldtype=caDOUBLE;
+                    kData->edata.rvalue=result;
+                } else{
+                    chdata->setInvalid_calc();
+                    QString msg="modbus: Invalid READ calc found in: ";
+                    msg.append(kData->pv);
+                    msg.append("/"+modbus_connection);
+                    if(messagewindowP != Q_NULLPTR) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
+                    return MODBUS_ERROR;
+                }
+            }
+
+
             break;
         }
         case modbus_WRITE:{
-            unit->setValue(0,(quint16)qRound(result));
+            status = calcPerform(valueArray, &result, post);
+            if(!status) {
+                unit->setValue(0,(quint16)qRound(result));
+            } else{
+                chdata->setInvalid_calc();
+                QString msg="modbus: Invalid WRITE calc found in: ";
+                msg.append(kData->pv);
+                msg.append("/"+modbus_connection);
+                if(messagewindowP != Q_NULLPTR) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
+                return MODBUS_ERROR;
+            }
             break;
         }
         default: return MODBUS_ERROR;
-        }
-    } else{
-        chdata->setInvalid_calc();
-        QString msg="modbus: Invalid calc found in: ";
-        msg.append(kData->pv);
-        msg.append("/"+modbus_connection);
-        if(messagewindowP != Q_NULLPTR) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
-        return MODBUS_ERROR;
     }
+
     return MODBUS_OK;
 }
 
