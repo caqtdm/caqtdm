@@ -228,6 +228,10 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Utilities);
     Q_IMPORT_PLUGIN(DemoPlugin);
     Q_IMPORT_PLUGIN(Epics3Plugin);
+    Q_IMPORT_PLUGIN(environmentPlugin);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
+    Q_IMPORT_PLUGIN(modbusPlugin);
+#endif
 //*************************************
 #ifdef EPICS4
     Q_IMPORT_PLUGIN(Epics4Plugin);

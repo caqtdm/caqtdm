@@ -199,8 +199,23 @@ environment_Plugin {
                 plugins.files += $(CAQTDM_COLLECT)/controlsystems/libmodbus_plugin.dylib
 
                 CONFIG += release
-
+         }
+        ios | android {
+                message("epics3_plugin configuration : ios or android")
+                CONFIG += staticlib
+                INCLUDEPATH   += $(EPICSINCLUDE)
+                LIBS += $$OUT_PWD/../../libcaQtDM_Lib.a
+                ios {
+                        INCLUDEPATH += $(EPICSINCLUDE)/os/iOS
+                        INCLUDEPATH   += $(EPICSINCLUDE)/compiler/clang
+                }
+                android {
+                        INCLUDEPATH += $(EPICSINCLUDE)/os/android
+                        INCLUDEPATH += $$OUT_PWD/../caQtDM_AndroidFunctions/src
+                }
         }
+
+
 
         win32 {
                 message(“environment_plugin configuration win32”)
@@ -480,7 +495,7 @@ caQtDM_Viewer {
                 !ios:!android {
                         message("caQtDM_viewer configuration : !ios!android (all unixes + mac)")
                         DESTDIR = $(CAQTDM_COLLECT)
-                        CONFIG += x11
+                 !macx: {CONFIG += x11}
                         LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
                         LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
                         ADL_EDL_FILES {
@@ -582,6 +597,9 @@ caQtDM_Viewer {
                     LIBS += $$OUT_PWD/../caQtDM_QtControls/plugins/libqtcontrols_utilities_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/demo/libdemo_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/epics3/libepics3_plugin.a
+                    LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/archive/archiveSF/libarchiveSF_plugin.a
+                    LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/modbus/libmodbus_plugin.a
+                    LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/environment/libenvironment_plugin.a
 
                     ICON = $$PWD/caQtDM_Viewer/src/caQtDM.icns
 
@@ -609,7 +627,7 @@ caQtDM_Viewer {
                     bundle_identifier.value = ch.psi.caQtDM
                     QMAKE_MAC_XCODE_SETTINGS += bundle_identifier
                     target.name=IPHONEOS_DEPLOYMENT_TARGET
-                    target.value = 10.0
+                    target.value = 12.0
 
                     QMAKE_MAC_XCODE_SETTINGS += target
                     assetIcon.name = ASSETCATALOG_COMPILER_APPICON_NAME
@@ -628,6 +646,7 @@ caQtDM_Viewer {
                          # when .dylib and .a in same directory, macos takes .dylib, so separate the libraries
                          LIBS += $$(EPICSLIB)/static/libca.a
                          LIBS += $$(EPICSLIB)/static/libCom.a
+                         LIBS += $$(QWTHOME)/lib/lib$$(QWTLIBNAME).a
                          #LIBS += $$(QWTHOME)/lib/lib$$(QWTLIBNAME)_iphonesimulator.a
                          # build simulator only for 32 bit
                          INCLUDEPATH += $$(QWTHOME)/src
