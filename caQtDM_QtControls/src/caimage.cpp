@@ -27,7 +27,7 @@
 #include "searchfile.h"
 #include "fileFunctions.h"
 #include <QPainter>
-#include <QElapsedTimer>
+//#include <QElapsedTimer>
 
 caImage::caImage(QWidget* parent) : QWidget(parent)
 {
