@@ -71,6 +71,7 @@ private slots:
 
 private:
     QMutex mutex;
+    bool enable_gps_readout;
     MutexKnobData *mutexknobdataP;
     MessageWindow *messagewindowP;
     QMap<QString, double> listOfDoubles;

@@ -19,11 +19,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-        <string>4.2.5</string>
+	<string>4.2.5</string>
 	<key>CFBundleSignature</key>
 	<string>APPL</string>
 	<key>CFBundleVersion</key>
-        <string>1.0.0</string>
+	<string>1.0.0</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
 	<key>NOTE</key>
@@ -31,7 +31,7 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>Paul Scherrer Institut</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>caQtDM don't need to access any photos</string>
+	<string>caQtDM don&apos;t need to access any photos</string>
 	<key>NSSupportsSuddenTermination</key>
 	<false/>
 	<key>UIAppFonts</key>
@@ -41,6 +41,8 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
+		<string>location</string>
+		<string>processing</string>
 	</array>
 	<key>UIInterfaceOrientation</key>
 	<string>UIInterfaceOrientationLandscapeLeft</string>
@@ -50,6 +52,15 @@
 	<array>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>needs only access for GPS channels</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>needs only access for GPS channels</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>location-services</string>
+		<string>gps</string>
 	</array>
 </dict>
 </plist>

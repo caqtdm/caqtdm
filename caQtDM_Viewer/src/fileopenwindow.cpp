@@ -231,6 +231,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     Q_IMPORT_PLUGIN(environmentPlugin);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
     Q_IMPORT_PLUGIN(modbusPlugin);
+    Q_IMPORT_PLUGIN(gpsPlugin);
 #endif
 //*************************************
 #ifdef EPICS4

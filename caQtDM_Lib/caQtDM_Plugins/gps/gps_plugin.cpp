@@ -40,6 +40,7 @@ QString gpsPlugin::pluginName()
 gpsPlugin::gpsPlugin()
 {
     qDebug() << "gpsPlugin: Create";
+    enable_gps_readout=false;
 }
 
 // in this gps we update our interface here; normally you should update in from your controlsystem
@@ -78,24 +79,51 @@ void gpsPlugin::updateInterface()
 
 void gpsPlugin::positionUpdated(const QGeoPositionInfo &info)
 {
-     qDebug() << "Position updated:" << info;
+     //qDebug() << "Position updated:" << info;
      QMutexLocker locker(&mutex);
-
+     if (!enable_gps_readout) return;
      if (info.isValid()){
          foreach(int index, listOfIndexes) {
              knobData* kData = mutexknobdataP->GetMutexKnobDataPtr(index);
              if((kData != (knobData *) 0) && (kData->index != -1)) {
                  QString key = kData->pv;
-                 if (key.compare("altitude",Qt::CaseInsensitive)){
-                    kData->edata.rvalue= info.coordinate().altitude(); }else
-                 if (key.compare("latitude",Qt::CaseInsensitive)){
-                     kData->edata.rvalue= info.coordinate().latitude();}else
-                 if (key.compare("latitude",Qt::CaseInsensitive)){
-                         kData->edata.rvalue= info.coordinate().longitude();}else
-                 if (key.compare("distanceTo",Qt::CaseInsensitive)){
-                         const QGeoCoordinate d=distancedata;
-                         kData->edata.rvalue= info.coordinate().distanceTo(d);}
+                 if (key.compare("altitude",Qt::CaseInsensitive)==0){
+                     kData->edata.monitorCount++;
+                     kData->edata.rvalue= info.coordinate().altitude(); }
+                 if (key.compare("latitude",Qt::CaseInsensitive)==0){
+                     kData->edata.monitorCount++;
+                     kData->edata.rvalue= info.coordinate().latitude();}
+                 if (key.compare("longitude",Qt::CaseInsensitive)==0){
+                     kData->edata.monitorCount++;
+                     kData->edata.rvalue= info.coordinate().longitude();}
+                 if (key.compare("distanceTo",Qt::CaseInsensitive)==0){
+                     kData->edata.monitorCount++;
+                     const QGeoCoordinate d=distancedata;
+                     kData->edata.rvalue= info.coordinate().distanceTo(d);}
+                 if (key.compare("GroundSpeed",Qt::CaseInsensitive)==0)
+                     if (info.hasAttribute(QGeoPositionInfo::GroundSpeed))
+                     {
+                         kData->edata.monitorCount++;
+                         kData->edata.rvalue= info.attribute(QGeoPositionInfo::GroundSpeed);
+                     }
+                 if (key.compare("Direction",Qt::CaseInsensitive)==0)
+                     if (info.hasAttribute(QGeoPositionInfo::Direction))
+                     {
+                         kData->edata.monitorCount++;
+                         kData->edata.rvalue=  info.attribute(QGeoPositionInfo::Direction);
+                     }
+                 if (key.compare("HorizontalAccuracy",Qt::CaseInsensitive)==0)
+                     if (info.hasAttribute(QGeoPositionInfo::HorizontalAccuracy))
+                     {
+                         kData->edata.monitorCount++;
+                         kData->edata.rvalue= info.attribute(QGeoPositionInfo::HorizontalAccuracy);
+                     }
 
+
+
+
+                 mutexknobdataP->SetMutexKnobData(kData->index, *kData);
+                 mutexknobdataP->SetMutexKnobDataReceived(kData);
 
 
              }
@@ -109,9 +137,8 @@ void gpsPlugin::positionUpdated(const QGeoPositionInfo &info)
 void gpsPlugin::updateValues()
 {
     QMutexLocker locker(&mutex);
+    if (!enable_gps_readout) return;
 
-    QMap<QString, double>::iterator i;
-    for (i = listOfDoubles.begin(); i != listOfDoubles.end(); ++i) i.value()++;
 
 }
 
@@ -135,7 +162,7 @@ int gpsPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messag
       if (pos_data_source) {
           connect(pos_data_source, SIGNAL(positionUpdated(QGeoPositionInfo)),
                   this, SLOT(positionUpdated(QGeoPositionInfo)));
-          pos_data_source->startUpdates();
+
       }
     pos_data_source->setUpdateInterval(500);
     pos_data_source->setPreferredPositioningMethods(QGeoPositionInfoSource::AllPositioningMethods);
@@ -154,25 +181,37 @@ int gpsPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
     bool validkey=false;
     bool writeable=false;
 
-    if (key.compare("altitude",Qt::CaseInsensitive)){
+    if (key.compare("altitude",Qt::CaseInsensitive)==0){
        validkey=true; }else
-    if (key.compare("latitude",Qt::CaseInsensitive)){
+    if (key.compare("latitude",Qt::CaseInsensitive)==0){
         validkey=true;}else
-    if (key.compare("latitude",Qt::CaseInsensitive)){
+    if (key.compare("longitude",Qt::CaseInsensitive)==0){
        validkey=true;}else
-    if (key.compare("distanceTo",Qt::CaseInsensitive)){
+    if (key.compare("distanceTo",Qt::CaseInsensitive)==0){
        validkey=true;}else
-    if (key.compare("setAltitude",Qt::CaseInsensitive)){
+    if (key.compare("setAltitude",Qt::CaseInsensitive)==0){
        validkey=true;
        writeable=true;}else
-    if (key.compare("setLatitude",Qt::CaseInsensitive)){
+    if (key.compare("setLatitude",Qt::CaseInsensitive)==0){
        validkey=true;
        writeable=true;}else
-    if (key.compare("setLongitude",Qt::CaseInsensitive)){
+    if (key.compare("setLongitude",Qt::CaseInsensitive)==0){
        validkey=true;
-       writeable=true;}
-    if (!validkey) return false;
+       writeable=true;}else
+    if (key.compare("GroundSpeed",Qt::CaseInsensitive)==0){
+        qstrncpy(kData->edata.units,QString("m/s").toLatin1().data(),39);
+        validkey=true;}else
+    if (key.compare("Direction",Qt::CaseInsensitive)==0){
+        validkey=true;}
+    if (key.compare("HorizontalAccuracy",Qt::CaseInsensitive)==0){
+        qstrncpy(kData->edata.units,QString("m").toLatin1().data(),39);
+        validkey=true;}
 
+    if (!validkey) return false;
+    if(!enable_gps_readout){
+        pos_data_source->startUpdates();
+        enable_gps_readout=true;
+    }
     // append device index to our internal list
     listOfIndexes.append(kData->index);
     // initial values into the doubles list
