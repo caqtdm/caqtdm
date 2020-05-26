@@ -13,6 +13,10 @@ contains(QT_VER_MAJ, 5) {
         # the reason is the modbus impementation in Qt
         SUBDIRS += modbus
     }
+#MOBILE {
+    SUBDIRS += gps
+#}
+
 }
 !MOBILE {
     epics4: {
