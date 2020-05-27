@@ -327,6 +327,11 @@ int gpsPlugin::pvAddEvent(void * ptr) {
 int gpsPlugin::pvReconnect(knobData *kData) {
     Q_UNUSED(kData);
     qDebug() << "gpsPlugin:pvReconnect";
+    if(!enable_gps_readout){
+        pos_data_source->startUpdates();
+        enable_gps_readout=true;
+    }
+
     return true;
 }
 
@@ -347,7 +352,7 @@ int gpsPlugin::FlushIO() {
 // otherwise probably no meaning; in this gps, we stop the simulation, however it will not be reactivated
 // any more (you may do that through pvReconnect)
 int gpsPlugin::TerminateIO() {
-    //qDebug() << "gpsPlugin:TerminateIO";
+    qDebug() << "gpsPlugin:TerminateIO";
 
     if(enable_gps_readout){
         pos_data_source->stopUpdates();

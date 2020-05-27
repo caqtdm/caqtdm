@@ -298,6 +298,13 @@ int modbusPlugin::pvAddEvent(void * ptr) {
 int modbusPlugin::pvReconnect(knobData *kData) {
      Q_UNUSED(kData);
     qDebug() << "modbusPlugin:pvReconnect";
+    QMutexLocker locker(&mutex);
+    QList<QPointer<modbus_decode>> connectors=modbusconnections.values();
+    foreach(QPointer<modbus_decode> connector, connectors) {
+       emit connector->pvReconnect(kData);
+    }
+
+
     return true;
 }
 
@@ -326,17 +333,18 @@ int modbusPlugin::FlushIO() {
 
 // termination
 int modbusPlugin::TerminateIO() {
-    //qDebug() << "modbusPlugin:TerminateIO";
-    //timerValues->stop();
-    //timer->stop();
-    return true;
+    qDebug() << "modbusPlugin:TerminateIO";
+    QMutexLocker locker(&mutex);
+    QList<QPointer<modbus_decode>> connectors=modbusconnections.values();
+    foreach(QPointer<modbus_decode> connector, connectors) {
+       emit connector->TerminateIO();
+    }
+     return true;
 }
 
 void modbusPlugin::closeEvent(){
     //qDebug() << "modbusPlugin:closeEvent ";
     QMutexLocker locker(&mutex);
-
-
     QList<QPointer<modbus_decode>> connectors=modbusconnections.values();
     foreach(QPointer<modbus_decode> connector, connectors) {
        connector->setTerminate();

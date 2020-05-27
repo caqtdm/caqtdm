@@ -147,6 +147,7 @@ caType modbus_decode::generatecaDataType(QString pv)
 void modbus_decode::process()
 {
     modbus_terminate=false;
+    modbus_disabled=false;
     device = new QModbusTcpClient(this);
     const QUrl url = modbustargetP;
     //qDebug()<<"URL:"<< url;
@@ -162,6 +163,9 @@ void modbus_decode::process()
         });
 
     connect(device,  SIGNAL(stateChanged(QModbusDevice::State)), this,SLOT(devicestate_changed(QModbusDevice::State)));
+
+    connect(this,  SIGNAL(TerminateIO()), this,SLOT(handle_TerminateIO()),Qt::QueuedConnection);
+    connect(this,  SIGNAL(pvReconnect()), this,SLOT(handle_pvReconnect()),Qt::QueuedConnection);
 
     if (!device->connectDevice()){
        qDebug()<< "Connection Error: " << device->errorString();
@@ -253,8 +257,7 @@ void modbus_decode::devicestate_changed(QModbusDevice::State state)
             mutexknobdataP->SetMutexKnobData(kData->index, *kData);
             mutexknobdataP->SetMutexKnobDataReceived(kData);
         }
-
-        device->connectDevice();
+        if (!modbus_disabled)  device->connectDevice();
     }else if (state == QModbusDevice::ConnectedState){
         qDebug()<< "QModbusDevice::ConnectedStat";
     }
@@ -842,7 +845,22 @@ bool modbus_decode::pvClearMonitor(knobData *kData)
     }
     readData.remove(pv);
     return true;
- }
+}
+
+void modbus_decode::handle_pvReconnect(knobData *kData)
+{
+    qDebug() << "modbus_decode:TerminateIO";
+    modbus_disabled=false;
+    if (!kData->edata.connected)
+        device->connectDevice();
+}
+
+void modbus_decode::handle_TerminateIO()
+{
+    qDebug() << "modbus_decode:TerminateIO";
+    modbus_disabled=true;
+    device->disconnectDevice();
+}
 
 void modbus_decode::setTerminate()
 {

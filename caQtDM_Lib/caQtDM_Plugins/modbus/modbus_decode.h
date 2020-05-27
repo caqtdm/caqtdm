@@ -70,6 +70,8 @@ public:
     int pvAddMonitor(int index, knobData *kData);
     int pvDisconnect(knobData *kData);
     bool pvClearMonitor(knobData *kData);
+
+
     void setTerminate();
     int pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
     int pvGetTimeStamp(char *pv, char *timestamp);
@@ -82,8 +84,12 @@ public slots:
     void devicestate_changed(QModbusDevice::State state);
     void trigger_modbusrequest();
     void device_reply_data();
+    void handle_TerminateIO();
+    void handle_pvReconnect(knobData *kData);
 signals:
     void finished();
+    void TerminateIO();
+    void pvReconnect(knobData *kData);
 
 private:
     QMutex mutex;
@@ -104,6 +110,7 @@ private:
 
     int modbustimeout;
     int modbusretries;
+    bool modbus_disabled;
     bool modbus_terminate;
 };
 enum Alarms {NO_ALARM=0, MINOR_ALARM, MAJOR_ALARM, INVALID_ALARM, NOTCONNECTED=99};
