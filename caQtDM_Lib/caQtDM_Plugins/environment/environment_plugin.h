@@ -86,7 +86,7 @@ private:
     QList<QString> listOfRequestedChannels;
 
     QMap<QString, QString> listOfStrings;
-    QTimer *timer, *timerValues;
+
   };
 
 #endif

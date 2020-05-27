@@ -327,8 +327,8 @@ int modbusPlugin::FlushIO() {
 // termination
 int modbusPlugin::TerminateIO() {
     //qDebug() << "modbusPlugin:TerminateIO";
-    timerValues->stop();
-    timer->stop();
+    //timerValues->stop();
+    //timer->stop();
     return true;
 }
 

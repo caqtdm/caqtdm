@@ -276,8 +276,8 @@ int environmentPlugin::FlushIO() {
 // termination
 int environmentPlugin::TerminateIO() {
     //qDebug() << "environmentPlugin:TerminateIO";
-    timerValues->stop();
-    timer->stop();
+    //timerValues->stop();
+    //timer->stop();
     return true;
 }
 

@@ -79,7 +79,7 @@ private:
     MessageWindow *messagewindowP;
     QMap<QString, QString> optionsP;
     double initValue;
-    QTimer *timer, *timerValues;
+    //QTimer *timer, *timerValues;
 
     QMap<QString,QPointer<modbus_decode>> modbusconnections;
     QList<QThread*> modbusThreads;

@@ -79,7 +79,7 @@ void gpsPlugin::updateInterface()
 
 void gpsPlugin::positionUpdated(const QGeoPositionInfo &info)
 {
-     //qDebug() << "Position updated:" << info;
+     // qDebug() << "Position updated:" << info;
      QMutexLocker locker(&mutex);
      if (!enable_gps_readout) return;
      if (info.isValid()){
@@ -348,8 +348,13 @@ int gpsPlugin::FlushIO() {
 // any more (you may do that through pvReconnect)
 int gpsPlugin::TerminateIO() {
     //qDebug() << "gpsPlugin:TerminateIO";
-    timerValues->stop();
-    timer->stop();
+
+    if(enable_gps_readout){
+        pos_data_source->stopUpdates();
+    }
+
+    //timerValues->stop();
+    //timer->stop();
     return true;
 }
 
