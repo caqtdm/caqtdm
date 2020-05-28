@@ -7,18 +7,23 @@ include (../../caQtDM_Viewer/qtdefs.pri)
 
 
 TEMPLATE = subdirs
-SUBDIRS = demo epics3 archive environment
-contains(QT_VER_MAJ, 5) {
-    greaterThan(QT_VER_MIN, 8){
+SUBDIRS = demo epics3 archive
+
+modbus {
+  SUBDIRS += environment
+  contains(QT_VER_MAJ, 5) {
+    greaterThan(QT_VER_MIN, 8) {
         # the reason is the modbus impementation in Qt
         SUBDIRS += modbus
     }
+  }
 }
+
 !MOBILE {
     epics4: {
      SUBDIRS += epics4
     }
     bsread: {
       SUBDIRS += bsread
-     }
+    }
 }
