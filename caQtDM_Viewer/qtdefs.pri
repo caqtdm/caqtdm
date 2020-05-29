@@ -126,6 +126,12 @@ epics7 {
    CONFIG += epics4
 }
 
+CONFIG += modbus
+modbus {
+   message( "Configuring build for modbus plugin" )
+   CONFIG += modbus
+}
+
 # undefine CONFIG epics4 for epics4 plugin support with epics version 4 (only preliminary version as example)
 # one can specify channel access with ca:// and pv access with pva:// (both use the epics4 plugin)
 # the main work for this plugin was done by Marty Kraimer

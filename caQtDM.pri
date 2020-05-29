@@ -193,10 +193,13 @@ environment_Plugin {
                 LIBS += -L$(CAQTDM_COLLECT) -lqtcontrols
 		LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
 		LIBS += $$(EPICSLIB)/libCom.dylib
-                plugins.path = Contents/PlugIns/controlsystems
-                plugins.files += $(CAQTDM_COLLECT)/controlsystems/libenvironment_plugin.dylib
-                plugins.path = Contents/PlugIns/controlsystems
-                plugins.files += $(CAQTDM_COLLECT)/controlsystems/libmodbus_plugin.dylib
+
+                modbus {
+                    plugins.path = Contents/PlugIns/controlsystems
+                    plugins.files += $(CAQTDM_COLLECT)/controlsystems/libenvironment_plugin.dylib
+                    plugins.path = Contents/PlugIns/controlsystems
+                    plugins.files += $(CAQTDM_COLLECT)/controlsystems/libmodbus_plugin.dylib
+                }
 
                 CONFIG += release
          }
@@ -214,8 +217,6 @@ environment_Plugin {
                         INCLUDEPATH += $$OUT_PWD/../caQtDM_AndroidFunctions/src
                 }
         }
-
-
 
         win32 {
                 message(“environment_plugin configuration win32”)
@@ -578,6 +579,12 @@ caQtDM_Viewer {
                                     plugins_archiveSF.files += $(CAQTDM_COLLECT)/controlsystems/libarchiveSF_plugin.dylib
                                     QMAKE_BUNDLE_DATA += plugins_archiveSF
                                 }
+                modbus: {
+                                    plugins_modbus.path = Contents/PlugIns/controlsystems
+                                    plugins_modbus.files += $(CAQTDM_COLLECT)/controlsystems/libmodbus_plugin.dylib
+                                    plugins_modbus.files += $(CAQTDM_COLLECT)/controlsystems/libenvironment_plugin.dylib
+                                    QMAKE_BUNDLE_DATA += plugins_modbus
+                                }
         }
 
         ios {
@@ -598,9 +605,12 @@ caQtDM_Viewer {
                     LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/demo/libdemo_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/epics3/libepics3_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/archive/archiveSF/libarchiveSF_plugin.a
-                    LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/modbus/libmodbus_plugin.a
+
+                    modbus {
+                        LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/modbus/libmodbus_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/gps/libgps_plugin.a
-                    LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/environment/libenvironment_plugin.a
+                        LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/environment/libenvironment_plugin.a
+                    }
 
                     ICON = $$PWD/caQtDM_Viewer/src/caQtDM.icns
 
