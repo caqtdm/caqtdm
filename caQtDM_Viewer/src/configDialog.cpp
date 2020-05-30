@@ -324,7 +324,7 @@ void configDialog::clearUiClicked()
 
     path.append("/");
     QDir dir(path);
-    dir.setNameFilters(QStringList() << "*.ui" << "*.prc" << "*.gif" << "*.jpg" << "*.png" << "*.config");
+    dir.setNameFilters(QStringList() << "*.ui" << "*.prc" << "*.gif" << "*.jpg" << "*.png" << "*.config"<< "*.ini");
     dir.setFilter(QDir::Files);
     foreach(QString dirFile, dir.entryList()) dir.remove(dirFile);
 
@@ -377,7 +377,7 @@ int configDialog::NumberOfFiles()
 
     path.append("/");
     QDir dir(path);
-    dir.setNameFilters(QStringList() << "*.ui" << "*.prc" << "*.gif" << "*.jpg" << "*.png" << "*.config");
+    dir.setNameFilters(QStringList() << "*.ui" << "*.prc" << "*.gif" << "*.jpg" << "*.png" << "*.config"<< "*.ini");
     dir.setFilter(QDir::Files);
     foreach(QString dirFile, dir.entryList()) count++;
     return count;
