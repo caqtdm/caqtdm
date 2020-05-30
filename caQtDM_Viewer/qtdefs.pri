@@ -129,7 +129,11 @@ epics7 {
 CONFIG += modbus
 modbus {
    message( "Configuring build for modbus plugin" )
-   CONFIG += modbus
+}
+
+CONFIG += gps
+modbus {
+   message( "Configuring build for gps plugin" )
 }
 
 # undefine CONFIG epics4 for epics4 plugin support with epics version 4 (only preliminary version as example)

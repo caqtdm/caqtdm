@@ -10,7 +10,16 @@ contains(QT_VER_MAJ, 4) {
    CONFIG += qt warn_on thread uitools
 }
 contains(QT_VER_MAJ, 5) {
-   QT     += core gui svg uitools network opengl serialbus positioning
+   QT     += core gui svg uitools network opengl
+   modbus{
+      QT += serialbus
+      DEFINES += CAQTDM_MODBUS
+   }
+   gps{
+      QT += positioning
+      DEFINES += CAQTDM_GPS
+   }
+
    !ios:!android {
        QT     += printsupport
     }

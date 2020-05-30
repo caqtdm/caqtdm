@@ -230,8 +230,12 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     Q_IMPORT_PLUGIN(Epics3Plugin);
     Q_IMPORT_PLUGIN(environmentPlugin);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
-    Q_IMPORT_PLUGIN(modbusPlugin);
-    Q_IMPORT_PLUGIN(gpsPlugin);
+    #ifdef CAQTDM_MODBUS
+        Q_IMPORT_PLUGIN(modbusPlugin);
+    #endif
+    #ifdef CAQTDM_GPS
+        Q_IMPORT_PLUGIN(gpsPlugin);
+    #endif
 #endif
 //*************************************
 #ifdef EPICS4

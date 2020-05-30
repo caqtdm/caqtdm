@@ -605,11 +605,13 @@ caQtDM_Viewer {
                     LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/demo/libdemo_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/epics3/libepics3_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/archive/archiveSF/libarchiveSF_plugin.a
+                    LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/environment/libenvironment_plugin.a
 
                     modbus {
                         LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/modbus/libmodbus_plugin.a
-                    LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/gps/libgps_plugin.a
-                        LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/environment/libenvironment_plugin.a
+                    }
+                    gps {
+                        LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/gps/libgps_plugin.a
                     }
 
                     ICON = $$PWD/caQtDM_Viewer/src/caQtDM.icns
