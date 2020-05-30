@@ -69,19 +69,25 @@ int modbusPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
 
     QStringList modbus_database_files;
 
-    QString url = (QString)  qgetenv("CAQTDM_URL_DISPLAY");
+    QString url = (QString)  qgetenv("CAQTDM_URL_DISPLAY_PATH");
+    qDebug() <<"url " << url;
     QString database_file = (QString)  qgetenv("CAQTDM_MODBUS_DATABASE");
+
     modbus_database_files.append(database_file.split(","));
 
-    modbus_database_files.append(optionsP.value("MODBUS_DATABASE",""));
+    if (!optionsP.value("MODBUS_DATABASE","").isEmpty())
+        modbus_database_files.append(optionsP.value("MODBUS_DATABASE",""));
     fileFunctions filefunction;
     //qDebug() <<"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
     foreach (QString modbus_database_file,modbus_database_files) {
-        if (!url.isEmpty())
-            filefunction.checkFileAndDownload(modbus_database_file, url);
 
+        if (!url.isEmpty()){
+            //qDebug() << "TestDownlaod:" <<modbus_database_file;
+            filefunction.checkFileAndDownload(modbus_database_file, url);
+        }
         searchFile *s = new searchFile(modbus_database_file);
         QString fileNameFound = s->findFile();
+        //qDebug() << "fileNameFound:" <<fileNameFound;
         delete s;
         if (!fileNameFound.isEmpty()){
             QFile file(fileNameFound);
