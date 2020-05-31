@@ -165,7 +165,9 @@ void modbus_decode::process()
     connect(device,  SIGNAL(stateChanged(QModbusDevice::State)), this,SLOT(devicestate_changed(QModbusDevice::State)));
 
     connect(this,  SIGNAL(TerminateIO()), this,SLOT(handle_TerminateIO()),Qt::QueuedConnection);
-    connect(this,  SIGNAL(pvReconnect()), this,SLOT(handle_pvReconnect()),Qt::QueuedConnection);
+    connect(this,  SIGNAL(pvReconnect(knobData *)), this,SLOT(handle_pvReconnect(knobData *)),Qt::QueuedConnection);
+    connect(this,  SIGNAL(create_Timer(int)), this,SLOT(handle_createTimer(int)),Qt::QueuedConnection);
+
 
     if (!device->connectDevice()){
        qDebug()<< "Connection Error: " << device->errorString();
@@ -197,35 +199,35 @@ void modbus_decode::process()
                 }
             }
         }
+        if (device_state == QModbusDevice::ConnectedState){
+            if (chdata){
+                //qDebug()<<"write Data"<< chdata->value(0);
+                //qDebug() << readUnit->startAddress() << int(readUnit->registerType() );
+                if (chdata->isValid()){
+                    //qDebug()<< "QModbusDataUnit: "<< readData;
+                    int modbus_station=1;
+                    modbus_channeldata* reply_channel = readData.value(channel,Q_NULLPTR);
+                    if (reply_channel) modbus_station=reply_channel->getStation();
+                    QModbusDataUnit cpy_chdata=*chdata;
+                    delete chdata;
+                    if (auto *reply = device->sendWriteRequest(cpy_chdata,modbus_station)){
+                        if (!reply->isFinished()){
+                            reply->setProperty("kData.channel",channel);
+                            reply->setProperty("QModbusDataUnitDelete",true);
+                            connect(reply, SIGNAL(finished()), this, SLOT(device_reply_data()));
 
-        if (chdata){
-            //qDebug()<<"write Data"<< chdata->value(0);
-            //qDebug() << readUnit->startAddress() << int(readUnit->registerType() );
-            if (chdata->isValid()){
-                //qDebug()<< "QModbusDataUnit: "<< readData;
-                int modbus_station=1;
-                modbus_channeldata* reply_channel = readData.value(channel,Q_NULLPTR);
-                if (reply_channel) modbus_station=reply_channel->getStation();
-                QModbusDataUnit cpy_chdata=*chdata;
-                delete chdata;
-                if (auto *reply = device->sendWriteRequest(cpy_chdata,modbus_station)){
-                    if (!reply->isFinished()){
-                        reply->setProperty("kData.channel",channel);
-                        reply->setProperty("QModbusDataUnitDelete",true);
-                        connect(reply, SIGNAL(finished()), this, SLOT(device_reply_data()));
-
+                        }
+                        else
+                            //delete reply; // broadcast replies return immediately
+                            reply->deleteLater();
+                    } else{
+                        qDebug()<< "Write error: " << device->errorString();
                     }
-                    else
-                        //delete reply; // broadcast replies return immediately
-                        reply->deleteLater();
-                } else{
-                    qDebug()<< "Write error: " << device->errorString();
+
                 }
 
             }
-
         }
-
 
 
     }
@@ -249,13 +251,16 @@ void modbus_decode::devicestate_changed(QModbusDevice::State state)
         QList<modbus_channeldata*> usedkeys=readData.values();
         //qDebug()<< usedkeys;
         foreach (modbus_channeldata* index,usedkeys){
-
-            knobData *kData=mutexknobdataP->GetMutexKnobDataPtr(index->getIndex());
-            kData->edata.monitorCount=0;
-            kData->edata.displayCount=0;
-            mutexknobdataP->SetMutexKnobDataConnected(index->getIndex(),0);
-            mutexknobdataP->SetMutexKnobData(kData->index, *kData);
-            mutexknobdataP->SetMutexKnobDataReceived(kData);
+            if (index && (index->getIndexCount()>0)){
+                knobData *kData=mutexknobdataP->GetMutexKnobDataPtr(index->getIndex());
+                kData->edata.monitorCount++;
+                //kData->edata.displayCount=0;
+                kData->edata.connected=false;
+                kData->edata.severity=INVALID_ALARM;
+                //mutexknobdataP->SetMutexKnobDataConnected(index->getIndex(),0);
+                mutexknobdataP->SetMutexKnobData(kData->index, *kData);
+                mutexknobdataP->SetMutexKnobDataReceived(kData);
+            }
         }
         if (!modbus_disabled)  device->connectDevice();
     }else if (state == QModbusDevice::ConnectedState){
@@ -728,18 +733,19 @@ int modbus_decode::pvAddMonitor(int index, knobData *kData)
         chdata->setPrecision(modbus_prec);
         readData.insert(removeEPICSExtensions(chan_desc),chdata);
 
-        QTimer* selected_timer=running_Timer.value(modbus_cycle,Q_NULLPTR);
-        if (!selected_timer){
-            selected_timer=new QTimer(this);
-            selected_timer->setInterval(modbus_cycle);
-            selected_timer->setProperty("modbus_cycle",modbus_cycle);
-            connect(selected_timer, SIGNAL(timeout()), this, SLOT(trigger_modbusrequest()));
-            selected_timer->start();
-            running_Timer.insert(modbus_cycle,selected_timer);
-            QString msg=QString("modbus timer started cycle time %1 ms").arg(modbus_cycle);
-            if(messagewindowP != Q_NULLPTR) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
+        emit create_Timer(modbus_cycle);
+//        QTimer* selected_timer=running_Timer.value(modbus_cycle,Q_NULLPTR);
+//        if (!selected_timer){
+//            selected_timer=new QTimer(this);
+//            selected_timer->setInterval(modbus_cycle);
+//            selected_timer->setProperty("modbus_cycle",modbus_cycle);
+//            connect(selected_timer, SIGNAL(timeout()), this, SLOT(trigger_modbusrequest()));
+//            selected_timer->start();
+//            running_Timer.insert(modbus_cycle,selected_timer);
+//            QString msg=QString("modbus timer started cycle time %1 ms").arg(modbus_cycle);
+//            if(messagewindowP != Q_NULLPTR) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
 
-        }
+//        }
 
 
 
@@ -822,10 +828,10 @@ int modbus_decode::pvDisconnect(knobData *kData)
     QString pv=removeHost(kData->pv);
     QMap<QString,modbus_channeldata*>::iterator i = readData.find(pv);
     while (i !=readData.end() && i.key() == pv) {
-        if (i.value()) free( i.value());
+        if (i.value()) i.value()->delIndex(kData->index);
         ++i;
     }
-    return readData.remove(pv);
+    return MODBUS_OK;
 }
 
 bool modbus_decode::pvClearMonitor(knobData *kData)
@@ -840,19 +846,60 @@ bool modbus_decode::pvClearMonitor(knobData *kData)
     QString pv=removeHost(target);
     QMap<QString,modbus_channeldata*>::iterator i = readData.find(pv);
     while (i !=readData.end() && i.key() == pv) {
-        readData_disabledMonitor.insert(pv,i.value());
+        i.value()->setClearMonitor(kData->index);
         ++i;
     }
-    readData.remove(pv);
+    kData->edata.connected=false;
+    kData->edata.monitorCount++;
+    mutexknobdataP->SetMutexKnobData(kData->index, *kData);
+    mutexknobdataP->SetMutexKnobDataReceived(kData);
     return true;
 }
 
 void modbus_decode::handle_pvReconnect(knobData *kData)
 {
-    qDebug() << "modbus_decode:TerminateIO";
-    modbus_disabled=false;
-    if (!kData->edata.connected)
+    qDebug() << "modbus_decode:pvReconnect";
+    QMutexLocker locker(&mutex);
+    if (modbus_disabled){
         device->connectDevice();
+        modbus_disabled=false;
+    }
+
+    QString target=kData->pv;
+    QString replace=modbus_translation_map.value(target,"");
+    if (!replace.isEmpty()){
+        target=modbus_translation_map.value(target);
+    }
+
+    QString pv=removeHost(target);
+    QMap<QString,modbus_channeldata*>::iterator i = readData.find(pv);
+    while (i !=readData.end() && i.key() == pv) {
+        i.value()->pvReconnect(kData->index);
+        ++i;
+    }
+    kData->edata.connected=true;
+    kData->edata.monitorCount++;
+    mutexknobdataP->SetMutexKnobData(kData->index, *kData);
+    mutexknobdataP->SetMutexKnobDataReceived(kData);
+
+
+}
+
+void modbus_decode::handle_createTimer(int modbus_cycle)
+{
+    QTimer* selected_timer=running_Timer.value(modbus_cycle,Q_NULLPTR);
+    if (!selected_timer){
+        selected_timer=new QTimer(this);
+        selected_timer->setInterval(modbus_cycle);
+        selected_timer->setProperty("modbus_cycle",modbus_cycle);
+        connect(selected_timer, SIGNAL(timeout()), this, SLOT(trigger_modbusrequest()));
+        selected_timer->start();
+        running_Timer.insert(modbus_cycle,selected_timer);
+        QString msg=QString("modbus timer started cycle time %1 ms").arg(modbus_cycle);
+        if(messagewindowP != Q_NULLPTR) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
+
+    }
+
 }
 
 void modbus_decode::handle_TerminateIO()
@@ -946,14 +993,16 @@ int modbus_decode::pvGetTimeStamp(char *pv, char *timestamp)
 
     QMap<QString,modbus_channeldata*>::iterator i = readData.find(strippedpv);
     while (i !=readData.end() && i.key() == strippedpv) {
-        knobData *kData=mutexknobdataP->GetMutexKnobDataPtr(i.value()->getIndex());
-        modbus_channeldata* chdata=(modbus_channeldata*)kData->edata.info;
-        //qDebug() << "chdata" << chdata;
-        if (chdata){
-            chdata->process_timestamp(timestamp);
+        if (i.value()->getIndexCount()>0){
+            knobData *kData=mutexknobdataP->GetMutexKnobDataPtr(i.value()->getIndex());
+            modbus_channeldata* chdata=(modbus_channeldata*)kData->edata.info;
+            //qDebug() << "chdata" << chdata;
+            if (chdata){
+                chdata->process_timestamp(timestamp);
 
-            return MODBUS_OK;
+                return MODBUS_OK;
 
+            }
         }
         i++;
     }

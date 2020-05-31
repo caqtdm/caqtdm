@@ -51,6 +51,7 @@ public:
     void addIndex(int pvindex);
     void delIndex(int pvindex);
 
+    int getIndexCount() const;
     int getIndex() const;
     QList<int> getIndexes(){return index;}
 
@@ -76,6 +77,9 @@ public:
 
     short getPrecision() const;
     void setPrecision(short value);
+
+    void setClearMonitor(int index);
+    void pvReconnect(int index);
 
 private:
 

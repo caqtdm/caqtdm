@@ -135,6 +135,16 @@ void modbus_channeldata::setPrecision(short value)
     Precision = value;
 }
 
+void modbus_channeldata::setClearMonitor(int index)
+{
+    addIndex(index);
+}
+
+void modbus_channeldata::pvReconnect(int index)
+{
+    delIndex(index);
+}
+
 QModbusDataUnit modbus_channeldata::getReadUnit()
 {
     return readUnits.first();
@@ -162,6 +172,11 @@ void modbus_channeldata::delIndex(int pvindex)
         index.takeAt(pos);
         pos=index.indexOf(pvindex);
     }
+}
+
+int modbus_channeldata::getIndexCount() const
+{
+    return index.count();
 }
 
 int modbus_channeldata::getModbus_count() const

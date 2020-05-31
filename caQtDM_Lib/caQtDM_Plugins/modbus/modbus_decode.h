@@ -86,10 +86,13 @@ public slots:
     void device_reply_data();
     void handle_TerminateIO();
     void handle_pvReconnect(knobData *kData);
+    void handle_createTimer(int modbus_cycle);
+
 signals:
     void finished();
     void TerminateIO();
     void pvReconnect(knobData *kData);
+    void create_Timer(int modbus_cycle);
 
 private:
     QMutex mutex;
