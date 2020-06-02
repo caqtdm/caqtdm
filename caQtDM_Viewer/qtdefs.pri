@@ -35,7 +35,7 @@ message ("Qt $$[QT_VERSION] QWT $$(QWTVERSION)")
 
 TARGET_COMPANY = "Paul Scherrer Institut"
 TARGET_DESCRIPTION = "Channel Access Qt Display Manager"
-TARGET_COPYRIGHT = "Copyright (C) 2016 Paul Scherrer Institut"
+TARGET_COPYRIGHT = "Copyright (C) 2020 Paul Scherrer Institut"
 TARGET_INTERNALNAME = "caqtdm"
 
 # enable opengl in stripplot and cartesianplot (edo not use, experimental only, for Qt5 and qwt6.1)
@@ -126,14 +126,27 @@ epics7 {
    CONFIG += epics4
 }
 
-CONFIG += modbus
-modbus {
-   message( "Configuring build for modbus plugin" )
+
+_CAQTDM_MODBUS = $$(CAQTDM_MODBUS)
+isEmpty(_CAQTDM_MODBUS) {
+message("Modbus Plugin will not be build")
+}
+else {
+    CONFIG += modbus
+    modbus {
+       message( "Configuring build for modbus plugin" )
+    }
 }
 
-CONFIG += gps
-modbus {
-   message( "Configuring build for gps plugin" )
+_CAQTDM_GPS = $$(CAQTDM_GPS)
+isEmpty(_CAQTDM_GPS) {
+message("GPS Plugin will not be build")
+}
+else {
+    CONFIG += gps
+    gps {
+       message( "Configuring build for GPS plugin" )
+    }
 }
 
 # undefine CONFIG epics4 for epics4 plugin support with epics version 4 (only preliminary version as example)
