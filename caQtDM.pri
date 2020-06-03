@@ -585,6 +585,13 @@ caQtDM_Viewer {
                                     plugins_modbus.files += $(CAQTDM_COLLECT)/controlsystems/libenvironment_plugin.dylib
                                     QMAKE_BUNDLE_DATA += plugins_modbus
                                 }
+
+                gps: {
+                                    plugins_gps.path = Contents/PlugIns/controlsystems
+                                    plugins_gps.files += $(CAQTDM_COLLECT)/controlsystems/libgps_plugin.dylib
+                                    plugins_gps.files += $(CAQTDM_COLLECT)/controlsystems/libgps_plugin.dylib
+                                    QMAKE_BUNDLE_DATA += plugins_gps
+                                }
         }
 
         ios {

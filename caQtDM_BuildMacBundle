@@ -54,6 +54,14 @@ echo ++++++++++ libmodbus_plugin lib ++++++++
 install_name_tool -change libcaQtDM_Lib.dylib @rpath/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libmodbus_plugin.dylib
 install_name_tool -change libqtcontrols.dylib @rpath/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libmodbus_plugin.dylib
 
+echo ++++++++++ libenvironment_plugin lib ++++++++
+install_name_tool -change libcaQtDM_Lib.dylib @rpath/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libenvironment_plugin.dylib
+install_name_tool -change libqtcontrols.dylib @rpath/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libenvironment_plugin.dylib
+
+echo ++++++++++ libgps_plugin lib ++++++++
+install_name_tool -change libcaQtDM_Lib.dylib @rpath/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libgps_plugin.dylib
+install_name_tool -change libqtcontrols.dylib @rpath/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libgps_plugin.dylib
+
 echo ++++++++++ libcaQtDM_Lib.dylib controls lib ++++++++
 install_name_tool -change qwt.framework/Versions/6/qwt @rpath/qwt.framework/Versions/6/qwt ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
 install_name_tool -change libqtcontrols.dylib @rpath/libqtcontrols.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/libcaQtDM_Lib.dylib
