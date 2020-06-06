@@ -328,6 +328,7 @@ int gpsPlugin::pvReconnect(knobData *kData) {
     Q_UNUSED(kData);
     qDebug() << "gpsPlugin:pvReconnect";
     if(!enable_gps_readout){
+        qDebug() << "gpsPlugin:startUpdates";
         pos_data_source->startUpdates();
         enable_gps_readout=true;
     }
@@ -355,7 +356,9 @@ int gpsPlugin::TerminateIO() {
     qDebug() << "gpsPlugin:TerminateIO";
 
     if(enable_gps_readout){
+        qDebug() << "gpsPlugin:stopUpdates";
         pos_data_source->stopUpdates();
+        enable_gps_readout=false;
     }
 
     //timerValues->stop();
