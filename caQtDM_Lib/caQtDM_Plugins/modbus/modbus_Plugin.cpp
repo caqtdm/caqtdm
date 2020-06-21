@@ -174,7 +174,7 @@ int modbusPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
         break;
     }
     if (!connector){
-        //qDebug() << "create new decode" << target;
+        qDebug() << "create new decode" << target;
        connector = new modbus_decode();
        //qDebug() << "Target" << target << QUrl::fromUserInput(target);
        connector->setModbustarget(QUrl::fromUserInput(target));

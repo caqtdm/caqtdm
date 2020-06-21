@@ -11,12 +11,12 @@ SUBDIRS = demo epics3 archive environment
   contains(QT_VER_MAJ, 5) {
     greaterThan(QT_VER_MIN, 8){
         # the reason is the modbus impementation in Qt
-	modbus{
+        modbus{
           SUBDIRS += modbus
         }
-	gps{
-	  SUBDIRS += gps
-	}
+        gps{
+          SUBDIRS += gps
+        }
     }
 
 }
