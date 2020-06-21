@@ -132,9 +132,17 @@ isEmpty(_CAQTDM_MODBUS) {
 message("Modbus Plugin will not be build")
 }
 else {
-    CONFIG += modbus
-    modbus {
-       message( "Configuring build for modbus plugin" )
+    contains(QT_VER_MAJ, 5) {
+        unix:!macx:!ios:!android  {
+            packagesExist(serialbus){
+                CONFIG += modbus
+            }
+        }else{
+            CONFIG += modbus
+        }
+        modbus {
+           message( "Configuring build for modbus plugin" )
+        }
     }
 }
 
@@ -143,10 +151,19 @@ isEmpty(_CAQTDM_GPS) {
 message("GPS Plugin will not be build")
 }
 else {
-    CONFIG += gps
-    gps {
-       message( "Configuring build for GPS plugin" )
+    contains(QT_VER_MAJ, 5) {
+        unix:!macx:!ios:!android {
+            packagesExist(positioning){
+                CONFIG += gps
+            }
+        }else{
+            CONFIG += gps
+        }
+        gps {
+           message( "Configuring build for GPS plugin" )
+        }
     }
+
 }
 
 # undefine CONFIG epics4 for epics4 plugin support with epics version 4 (only preliminary version as example)

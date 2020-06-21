@@ -194,11 +194,19 @@ environment_Plugin {
 		LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
 		LIBS += $$(EPICSLIB)/libCom.dylib
 
-                modbus {
+
+                !modbus:!gps:{
                     plugins.path = Contents/PlugIns/controlsystems
                     plugins.files += $(CAQTDM_COLLECT)/controlsystems/libenvironment_plugin.dylib
+                }
+
+                modbus: {
                     plugins.path = Contents/PlugIns/controlsystems
                     plugins.files += $(CAQTDM_COLLECT)/controlsystems/libmodbus_plugin.dylib
+                }
+                gps: {
+                    plugins.path = Contents/PlugIns/controlsystems
+                    plugins.files += $(CAQTDM_COLLECT)/controlsystems/libgps_plugin.dylib
                 }
 
                 CONFIG += release
@@ -560,6 +568,9 @@ caQtDM_Viewer {
                 plugins_demo.path = Contents/PlugIns/controlsystems
                 plugins_demo.files += $(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.dylib
                 QMAKE_BUNDLE_DATA += plugins_demo
+                plugins_environment.path = Contents/PlugIns/controlsystems
+                plugins_environment.files += $(CAQTDM_COLLECT)/controlsystems/libenvironment_plugin.dylib
+                QMAKE_BUNDLE_DATA += plugins_environment
 
                 epics4: {
                                     plugins_epics4.path = Contents/PlugIns/controlsystems
@@ -582,13 +593,11 @@ caQtDM_Viewer {
                 modbus: {
                                     plugins_modbus.path = Contents/PlugIns/controlsystems
                                     plugins_modbus.files += $(CAQTDM_COLLECT)/controlsystems/libmodbus_plugin.dylib
-                                    plugins_modbus.files += $(CAQTDM_COLLECT)/controlsystems/libenvironment_plugin.dylib
                                     QMAKE_BUNDLE_DATA += plugins_modbus
                                 }
 
                 gps: {
                                     plugins_gps.path = Contents/PlugIns/controlsystems
-                                    plugins_gps.files += $(CAQTDM_COLLECT)/controlsystems/libgps_plugin.dylib
                                     plugins_gps.files += $(CAQTDM_COLLECT)/controlsystems/libgps_plugin.dylib
                                     QMAKE_BUNDLE_DATA += plugins_gps
                                 }
