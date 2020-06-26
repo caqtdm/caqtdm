@@ -156,7 +156,11 @@ QGestureRecognizer::Result FingerSwipeGestureRecognizer::recognize(QGesture *sta
 
                     // get snaphot
                     //q->m_snapshot = QPixmap::grabWidget(w1->centralWidget());
-                    q->m_snapshot = w1->centralWidget()->grab();
+                    #ifdef MOBILE_ANDROID
+                        q->m_snapshot = w1->centralWidget()->grab();
+                    #else
+                        q->m_snapshot = w1->centralWidget()->grab(QGuiApplication::primaryScreen()->availableGeometry());
+                    #endif
                     // save actual centralwidget
                     q->m_central = w1->centralWidget();
                     q->m_central->setParent(nullptr);  //now it is saved
