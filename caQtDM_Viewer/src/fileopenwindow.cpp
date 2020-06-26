@@ -304,7 +304,19 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     QString uniqueKey = QString("caQtDM shared memory:") ;
     bool memoryAttached = false;
     #ifdef CAQTDM_X11
+        #if QT_VERSION > QT_VERSION_CHECK(5,0,0)
+        if (qApp->platformName()== QLatin1String("xcb")){
+        #endif
+
         uniqueKey.append(DisplayString(QX11Info::display()));
+        #if QT_VERSION > QT_VERSION_CHECK(5,0,0)
+
+        }else{
+            QString uids = QString::number(getuid());
+            uniqueKey.append(":"+ uids);
+        }
+        #endif
+
     #endif
 
     #ifdef linux
