@@ -46,7 +46,7 @@ GOTO:eof
 :compile
 echo ============ make all =================
 set PATH=%PATH%;%JOM%
-set PATH=%PATH%;%QTHOME%\bin
+set PATH=%QTHOME%\bin;%PATH%
 set PATH=%PATH%;%GITPATH%
 set /a timerstart=(((1%time:~0,2%-100)*60*60)+((1%time:~3,2%-100)*60)+(1%time:~6,2%-100)^)
 qmake all.pro

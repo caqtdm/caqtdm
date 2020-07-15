@@ -35,7 +35,7 @@
                 <Directory Id="INSTALLDIR" Name="caQTDM">
                     <Directory Name="bin" Id="BIN">
                         <Directory Name="windows-x64" Id="WINDOWS_X64">
-                            <Component Id="Qt_5.13.1" Guid="FC03E65E-7757-4CAE-8BB5-F3FEAF29E12B" Win64="yes">
+                            <Component Id="Qt_5.15.0" Guid="FC03E65E-7757-4CAE-8BB5-F3FEAF29E12B" Win64="yes">
                                 <File Id="DESIGNER.EXE" Name="designer.exe" Source="$(env.QTHOME)\bin\designer.exe" />
                                 <File Id="ASSISTANT.EXE" Name="assistant.exe" Source="$(env.QTHOME)\bin\assistant.exe" />
                                 <File Id="QT5QUICKPARTICLES.DLL" Name="Qt5QuickParticles.dll" Source="$(env.QTHOME)\bin\Qt5QuickParticles.dll" />
@@ -73,7 +73,7 @@
                                 <File Id="QT5QML.DLL" Name="Qt5Qml.dll" Source="$(env.QTHOME)\bin\Qt5Qml.dll" />
                                 <File Id="QT5QUICK.DLL" Name="Qt5Quick.dll" Source="$(env.QTHOME)\bin\Qt5Quick.dll" />
                             </Component>
-                            <Component Id="Epics_3.14.12.4" Guid="B7D7E8AE-F448-43F8-A68A-A35895605B8C" Win64="yes">
+                            <Component Id="Epics_7.0.4.1" Guid="B7D7E8AE-F448-43F8-A68A-A35895605B8C" Win64="yes">
                                 <File Id="CAREPEATER.EXE" Name="caRepeater.exe" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\caRepeater.exe" />
                                 <File Id="CA.DLL" Name="ca.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\ca.dll" />
                                 <File Id="COM.DLL" Name="Com.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\Com.dll" />
@@ -86,7 +86,7 @@
                             <Component Id="ZMQ" Guid="6F1967A1-84CA-4BE4-85DC-8D1B75338BB7" Win64="yes">
                                 <File Id="LIBZMQ.DLL" Name="libzmq.dll" Source="$(env.ZMQLIB)\libzmq.dll" />
                             </Component>
-                            <Component Id="qwt_6.1.3" Guid="80321EF0-DC70-4D0A-8E0C-269502A0EACB" Win64="yes">
+                            <Component Id="qwt_6.1.5" Guid="80321EF0-DC70-4D0A-8E0C-269502A0EACB" Win64="yes">
                                 <File Id="QWT.DLL" Name="qwt.dll" Source="$(env.QWTHOME)\lib\qwt.dll" />
                             </Component>
                             <Component Id="CaQtDM" Guid="ECDE0227-4100-43B8-B817-88D6BCD7FF49" Win64="yes">
@@ -112,7 +112,7 @@
                             <Component Id="controlsystems" Guid="02E16D39-2C06-43FB-9DBF-22DA6A416313" Win64="yes">
                                 <File Id="DEMO_PLUGIN.DLL" Name="demo_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\demo_plugin.dll" />
                                 <File Id="EPICS3_PLUGIN.DLL" Name="epics3_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics3_plugin.dll" />
-                                <File Id="EPICS4_PLUGIN.DLL" Name="epics4_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics4_plugin.dll" />
+                                <!---File Id="EPICS4_PLUGIN.DLL" Name="epics4_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics4_plugin.dll" -->
                                 <File Id="BSREAD_PLUGIN.DLL" Name="bsread_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\bsread_plugin.dll" />
                                 <File Id="MODBUS_PLUGIN.DLL" Name="modbus_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\modbus_plugin.dll" />
                                 <File Id="ARCHIVESF_PLUGIN.DLL" Name="archiveSF_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\archiveSF_plugin.dll" />
@@ -186,9 +186,9 @@
             </Component>
         </Directory>
         <Feature Id="DefaultFeature" Title="Main Feature" Level="1" ConfigurableDirectory="INSTALLDIR">
-            <ComponentRef Id="Qt_5.13.1" />
-            <ComponentRef Id="Epics_3.14.12.4" />
-            <ComponentRef Id="qwt_6.1.3" />
+            <ComponentRef Id="Qt_5.15.0" />
+            <ComponentRef Id="Epics_7.0.4.1" />
+            <ComponentRef Id="qwt_6.1.5" />
             <ComponentRef Id="CaQtDM" />
             <ComponentRef Id="designer" />
             <ComponentRef Id="Stylesheet" />

@@ -35,7 +35,7 @@
                 <Directory Id="INSTALLDIR" Name="caQTDM">
                     <Directory Name="bin" Id="BIN">
                         <Directory Name="win32-x86" Id="WINDOWS_X32">
-                            <Component Id="Qt_5.8.0" Guid="AB6F6013-EF64-4FAB-8F10-BE78192BE413">
+                            <Component Id="Qt_5.15.0" Guid="AB6F6013-EF64-4FAB-8F10-BE78192BE413">
                                 <File Id="DESIGNER.EXE" Name="designer.exe" Source="$(env.QTHOME)\bin\designer.exe" />
                                 <File Id="ASSISTANT.EXE" Name="assistant.exe" Source="$(env.QTHOME)\bin\assistant.exe" />
                                 <File Id="QT5QUICKPARTICLES.DLL" Name="Qt5QuickParticles.dll" Source="$(env.QTHOME)\bin\Qt5QuickParticles.dll" />
@@ -74,7 +74,7 @@
                                 <File Id="QT5QML.DLL" Name="Qt5Qml.dll" Source="$(env.QTHOME)\bin\Qt5Qml.dll" />
                                 <File Id="QT5QUICK.DLL" Name="Qt5Quick.dll" Source="$(env.QTHOME)\bin\Qt5Quick.dll" />
                             </Component>
-                            <Component Id="Epics_3.14.12.4" Guid="153692ED-7DF5-41DD-B9EA-1180C4B8D89A">
+                            <Component Id="Epics_7.0.4.1" Guid="153692ED-7DF5-41DD-B9EA-1180C4B8D89A">
                                 <File Id="CAREPEATER.EXE" Name="caRepeater.exe" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\caRepeater.exe" />
                                 <File Id="CA.DLL" Name="ca.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\ca.dll" />
                                 <File Id="COM.DLL" Name="Com.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\Com.dll" />
@@ -160,7 +160,7 @@
                         </Component>
                     </Directory>
                 </Directory>
-                <Merge Id="VCRedist" Language="0" SourceFile="C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC120_CRT_x86.msm" DiskId="1" />
+                <Merge Id="VCRedist" Language="0" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Redist\MSVC\14.25.28508\MergeModules\Microsoft_VC142_CRT_x86.msm" DiskId="1" />
             </Directory>
             <Directory Id="ProgramMenuFolder">
                 <Directory Id="ProgramMenuDir" Name="caQtDM">
@@ -182,9 +182,9 @@
             </Component>
         </Directory>
         <Feature Id="DefaultFeature" Title="Main Feature" Level="1" ConfigurableDirectory="INSTALLDIR">
-            <ComponentRef Id="Qt_5.8.0" />
-            <ComponentRef Id="Epics_3.14.12.4" />
-            <ComponentRef Id="qwt_6.1.3" />
+            <ComponentRef Id="Qt_5.15.0" />
+            <ComponentRef Id="Epics_7.0.4.1" />
+            <ComponentRef Id="qwt_6.1.5" />
             <ComponentRef Id="CaQtDM" />
             <ComponentRef Id="designer" />
             <ComponentRef Id="Stylesheet" />

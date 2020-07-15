@@ -67,46 +67,44 @@ REM SELECT2
 REM =============================================================================================
 
 :SELECT2 
-  call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvars64.bat"
-  d:
-  
-  set QTHOME=D:/qt/build/Qt-5.11.2_VS15_64bit
-  
-  set QWTHOME=D:/qt/qwt-6.1.3_5.11.2_VS15_64bit
-  set QWTINCLUDE=%QWTHOME%/src
-  set QWTLIB=%QWTHOME%/lib
-  set QWTVERSION=6.1
-  set QWTLIBNAME=qwt
 
-  set GITPATH=C:\Users\brands\AppData\Local\Atlassian\SourceTree\git_local\bin\;C:\Program Files (x86)\Git\bin
+  call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+  d:	
+ 
+  set QTHOME=D:/qt/build/Qt-5.15.0_VS19_64bit
+  
+  set QWTHOME=D:/qt/build/qwt-Qt_5_15_0-Release
+  set QWTINCLUDE=D:/qt/qwt-6.1.5/src
+  set QWTLIB=%QWTHOME%/lib
+  set QWTLIBNAME=qwt
+  set QWTVERSION=6.1
+
+  set GITPATH=C:\Users\brands\AppData\Local\Atlassian\SourceTree\git_local\bin\
     
-  set EPICS_BASE=D:\epics\base7
+  set EPICS_BASE=D:\epics\base
   set EPICS_HOST_ARCH=windows-x64
 
   set EPICSINCLUDE=%EPICS_BASE%/include
-  set EPICS4LOCATION=D:\epics\base7
-  
-  set QTCONTROLS_LIBS=D:/user/brands/caqtdm/caQtDM_QtControls_64Bit
-  set CAQTDM_COLLECT=D:/user/brands/caqtdm/caQtDM_Binaries_64Bit
-  set JOM=D:\qt\jom
+  set QTCONTROLS_LIBS=D:\qt\caqtdm_project\caQtDM_Binaries_64Bit
+  set CAQTDM_COLLECT=D:\qt\caqtdm_project\caQtDM_Binaries_64Bit
+  set JOM=X:\qt\jom
  
   set QTBASE=%QTCONTROLS_LIBS%
   
-  set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.10\bin
+  set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.11\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc
   set TIMESTAPER="http://timestamp.verisign.com/scripts/timstamp.dll"
   set CAQTDM_SIGNER="Paul Scherrer Institut"
 
   
   set ZMQ=D:\qt\zeromq-4.2.3
-  set ZMQINC=%ZMQ%\include
-  set ZMQLIB=%ZMQ%\bin\x64\Release\v141\dynamic
+  set ZMQINC=%ZMQ%/include
+  set ZMQLIB=%ZMQ%/lib/%EPICS_HOST_ARCH%
   
-  set SSL=D:\qt\openssl-1.0.2n_VS15_64bit
+  set SSL=D:\qt\openssl-1.0.2n_VS16_64bit
   set SSLINC=%SSL%\inc32
   set SSLLIB=%SSL%\out32dll
-  
-  
+ 
   
 GOTO PRINTOUT
 
