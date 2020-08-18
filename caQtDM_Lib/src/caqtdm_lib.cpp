@@ -2578,9 +2578,23 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                 }
 
             } else {
-                postMessage(QtDebugMsg, (char*) qasc(tr("sorry, could not load include file %1").arg(fileName)));
-                qDebug() << "sorry, file" << fileName << " does not exist";
-                break;
+                #ifdef ADL_EDL_FILES
+                    if (isMedmFile){
+                        fileName=fileName.replace(".ui",".adl");
+                        postMessage(QtDebugMsg, (char*) qasc(tr("error ADL file conversion")));
+                    }
+                    if (isEdmFile){
+                        fileName=fileName.replace(".ui",".edl");
+                        postMessage(QtDebugMsg, (char*) qasc(tr("error EDL file conversion")));
+                    }
+                    postMessage(QtDebugMsg, (char*) qasc(tr("sorry, could not load include file %1").arg(fileName)));
+                    qDebug() << "sorry, file" << fileName << " does not exist";
+                    break;
+                #else
+                    postMessage(QtDebugMsg, (char*) qasc(tr("sorry, could not load include file %1").arg(fileName)));
+                    qDebug() << "sorry, file" << fileName << " does not exist";
+                    break;
+                #endif
             }
 
             macroS = savedMacro[level];
