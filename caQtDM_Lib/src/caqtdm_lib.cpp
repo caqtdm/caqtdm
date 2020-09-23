@@ -6138,6 +6138,47 @@ void CaQtDM_Lib::Callback_RelatedDisplayClicked(int indx)
     QStringList args = w->getArgs().split(";");
     QStringList removeParents = w->getReplaceModes().split(";");
 
+
+    // special case where macros are coming from a macro definition file
+    // when specified with %(read filename) in the argument list
+
+    QRegExp re("^\\s*\\%\\s*\\(\\s*read\\s+(.+)\\)$");
+
+    for (int j = 0; j < args.count(); ++j) {
+        QStringList macro_list = args[j].split(",");
+        QStringList macro_list_expanded;
+        for (int k = 0; k < macro_list.count(); ++k) {
+            int match = re.indexIn(macro_list[k]);
+            if (match >= 0) {
+                QString macroFile = re.cap(1);
+                if(macroFile.length() > 0) {
+                    searchFile *s = new searchFile(macroFile);
+                    QString fileNameFound = s->findFile();
+                    char asc[MAX_STRING_LENGTH];
+                    if(fileNameFound.isNull()) {
+                        snprintf(asc, MAX_STRING_LENGTH, "macro definition file %s could not be loaded for related display", qasc(macroFile));
+                        postMessage(QtCriticalMsg, asc);
+                    }
+                    else {
+                        snprintf(asc, MAX_STRING_LENGTH, "macro definition file %s loaded for related display", qasc(macroFile));
+                        postMessage(QtWarningMsg, asc);
+                        QFile file(fileNameFound);
+                        file.open(QFile::ReadOnly);
+                        QString macroString = QLatin1String(file.readAll());
+                        macroString = macroString.simplified().trimmed();
+                        file.close();
+                        QStringList macro_list_from_file = macroString.split(",");
+                        macro_list_expanded = macro_list_expanded + macro_list_from_file;
+                    }
+                }
+            }
+            else {
+                macro_list_expanded.append(macro_list[k]);
+            }
+        }
+        args[j] = macro_list_expanded.join(",");
+    }
+
     //qDebug() << "files:" << files;
     //qDebug() << "args" <<  w->getArgs() << args;
 
