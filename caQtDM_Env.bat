@@ -10,8 +10,8 @@ IF "%1"=="4" GOTO SELECT4
 echo =============================================================================================
 echo Select Build Environment
 echo 1) QT 4.8.5 QWT6.1.3  32 Bit VS2010  
-echo 2) QT 5.11.2 QWT6.1.3 64 Bit VS2017  
-echo 3) QT 5.11.2 QWT6.1.3 32 Bit VS2017
+echo 2) QT 5.15.0 QWT6.1.5 64 Bit VS2019  
+echo 3) QT 5.15.0 QWT6.1.5 32 Bit VS2019
 set /P SELCTION=Select: 
 echo =============================================================================================
  
@@ -81,13 +81,13 @@ REM ============================================================================
 
   set GITPATH=C:\Users\brands\AppData\Local\Atlassian\SourceTree\git_local\bin\
     
-  set EPICS_BASE=D:\epics\base
+  set EPICS_BASE=D:\epics\Package\base
   set EPICS_HOST_ARCH=windows-x64
 
   set EPICSINCLUDE=%EPICS_BASE%/include
   set QTCONTROLS_LIBS=D:\qt\caqtdm_project\caQtDM_Binaries_64Bit
   set CAQTDM_COLLECT=D:\qt\caqtdm_project\caQtDM_Binaries_64Bit
-  set JOM=X:\qt\jom
+  set JOM=D:\qt\jom
  
   set QTBASE=%QTCONTROLS_LIBS%
   
@@ -114,11 +114,12 @@ REM ============================================================================
 
 :SELECT3 
  
-  call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvars32.bat"
+  call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x86
+  d:
  
-  set QTHOME=D:/qt/Qt-5.11.2_VS15_32bit
+  set QTHOME=D:/qt/Qt-5.15.0_VS15_32bit
   
-  set QWTHOME=D:/qt/qwt-6.1.3_5.11.2_VS15_64bit
+  set QWTHOME=D:/qt/qwt-6.1.5_5.15.0_VS19_32bit
   set QWTINCLUDE=%QWTHOME%/src
   set QWTLIB=%QWTHOME%/lib
   set QWTVERSION=6.1
@@ -137,8 +138,8 @@ REM ============================================================================
  
   set QTBASE=%QTCONTROLS_LIBS%
   
-  set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
-  set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
+  set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.11\bin
+  set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc
   set TIMESTAPER="http://timestamp.verisign.com/scripts/timstamp.dll"
   set CAQTDM_SIGNER="Paul Scherrer Institut"
 
@@ -150,42 +151,6 @@ REM ============================================================================
   set SSLINC=%SSL%\inc32
   set SSLLIB=%SSL%\out32dll
 
-
-GOTO PRINTOUT
-
-REM =============================================================================================
-REM SELECT4
-REM =============================================================================================
-
-:SELECT4 
- 
-  call "C:\Program files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
- 
-  set QTHOME=X:/qt/5.7.0_RT/qtbase
-  
-  set QWTHOME=X:/qt/qwt-6.1.3_RT
-  set QWTINCLUDE=%QWTHOME%/src
-  set QWTLIB=%QWTHOME%/lib
-  
-  
-  set EPICS_BASE=X:/epics/Package/base
-  set EPICS_HOST_ARCH=win32-x86
-
-  set EPICSINCLUDE=%EPICS_BASE%/include
-  set QTCONTROLS_LIBS=X:/Qt/caqtdm_project/caQtDM_QtControls_RT
-  set CAQTDM_COLLECT=X:/Qt/caqtdm_project/caQtDM_Binaries_RT
-  set JOM=X:\qt\jom
- 
-  set QTBASE=%QTCONTROLS_LIBS%
-  
-  set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
-  rem set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2013
-  set TIMESTAPER="http://timestamp.verisign.com/scripts/timstamp.dll"
-  set CAQTDM_SIGNER="Paul Scherrer Institut"
-
-  set ZMQ=X:/Qt/ZMQ
-  set ZMQINC=%ZMQ%/include
-  set ZMQLIB=%ZMQ%/lib/%EPICS_HOST_ARCH%
 
 GOTO PRINTOUT
 
