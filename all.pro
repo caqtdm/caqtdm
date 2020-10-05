@@ -1,3 +1,8 @@
+
+# put in file 5.13.1/ios/mkspecs/features/toolchain.prf  after line 184 darwin {
+# cxx_flags += -arch $$QMAKE_APPLE_DEVICE_ARCHS otherwise nothing works for ios 14
+# even parsing of the .pro files fails
+
 _QTHOME=$$(QTHOME)
 _QWTHOME=$$(QWTHOME)
 _EPICSBASE=$$(EPICS_BASE)
@@ -89,5 +94,15 @@ archivePRO.depends = caQtDM_QtControls caQtDM_Lib
 archiveSF.depends = caQtDM_QtControls caQtDM_Lib
 archiveHIPA.depends = caQtDM_QtControls caQtDM_Lib
 
+iosArchitectures=armv7
+iosTarget=5.0
 
+# Set "Architectures"
+QMAKE_IOS_DEVICE_ARCHS = $$iosArchitectures
+
+# Set "Target"
+QMAKE_IOS_DEPLOYMENT_TARGET = $$iosTarget
+
+# Set "Devices" (1=iPhone, 2=iPad, 1,2=Universal)
+QMAKE_IOS_TARGETED_DEVICE_FAMILY = 2
 
