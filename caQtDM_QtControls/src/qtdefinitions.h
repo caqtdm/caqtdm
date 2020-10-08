@@ -36,7 +36,7 @@
 
 #ifdef MOBILE_ANDROID
 #define CorrectFontIfAndroid(x) \
-    x.setPointSize(x.pointSize() * (float) qApp->primaryScreen()->logicalDotsPerInch() / (float) qApp->primaryScreen()->physicalDotsPerInch());
+    x.setPointSize(x.pointSize() * 2.0 * (float) qApp->primaryScreen()->logicalDotsPerInch() / (float) qApp->primaryScreen()->physicalDotsPerInch());
 #else
 #define CorrectFontIfAndroid(x)
 #endif
