@@ -105,6 +105,10 @@ REM ============================================================================
   set SSLINC=%SSL%\inc32
   set SSLLIB=%SSL%\out32dll
  
+  set CAQTDM_GPS=1
+  set CAQTDM_MODBUS=1
+
+  
   
 GOTO PRINTOUT
 
@@ -117,10 +121,10 @@ REM ============================================================================
   call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x86
   d:
  
-  set QTHOME=D:/qt/Qt-5.15.0_VS15_32bit
+  set QTHOME=D:/qt/build/Qt-5.15.0_VS19_32bit
   
-  set QWTHOME=D:/qt/qwt-6.1.5_5.15.0_VS19_32bit
-  set QWTINCLUDE=%QWTHOME%/src
+  set QWTHOME=D:/qt/build/qwt-Qt_5_15_0-Release_32bit
+  set QWTINCLUDE=%QWTHOME%/include
   set QWTLIB=%QWTHOME%/lib
   set QWTVERSION=6.1
   set QWTLIBNAME=qwt
@@ -128,12 +132,12 @@ REM ============================================================================
   set PATH=%PATH%;C:\Program Files (x86)\Git\bin
   set GITPATH=C:\Users\brands\AppData\Local\Atlassian\SourceTree\git_local\bin\
   
-  set EPICS_BASE=X:/epics/Package/base
+  set EPICS_BASE=D:\epics\Package\base
   set EPICS_HOST_ARCH=win32-x86
 
   set EPICSINCLUDE=%EPICS_BASE%/include
-  set QTCONTROLS_LIBS=X:/Qt/caqtdm_project/caQtDM_QtControls_32Bit
-  set CAQTDM_COLLECT=X:/Qt/caqtdm_project/caQtDM_Binaries_32Bit
+  set QTCONTROLS_LIBS=D:/qt/caqtdm_project/caQtDM_QtControls_32Bit
+  set CAQTDM_COLLECT=D:/qt/caqtdm_project/caQtDM_Binaries_32Bit
   set JOM=X:\qt\jom
  
   set QTBASE=%QTCONTROLS_LIBS%
@@ -150,6 +154,10 @@ REM ============================================================================
   set SSL=X:\qt\openssl-1.0.2j_32bit
   set SSLINC=%SSL%\inc32
   set SSLLIB=%SSL%\out32dll
+
+  set CAQTDM_GPS=1
+  set CAQTDM_MODBUS=1
+
 
 
 GOTO PRINTOUT
