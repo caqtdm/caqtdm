@@ -56,7 +56,6 @@
                                 <File Id="LIBEGL.DLL" Name="libEGL.dll" Source="$(env.QTHOME)\bin\libEGL.dll" />
                                 <File Id="LIBGLESV2.DLL" Name="libGLESv2.dll" Source="$(env.QTHOME)\bin\libGLESv2.dll" />
                                 <File Id="QT5BLUETOOTH.DLL" Name="Qt5Bluetooth.dll" Source="$(env.QTHOME)\bin\Qt5Bluetooth.dll" />
-                                <File Id="QT5CLUCENE.DLL" Name="Qt5CLucene.dll" Source="$(env.QTHOME)\bin\Qt5CLucene.dll" />
                                 <File Id="QT5CONCURRENT.DLL" Name="Qt5Concurrent.dll" Source="$(env.QTHOME)\bin\Qt5Concurrent.dll" />
                                 <File Id="QT5CORE.DLL" Name="Qt5Core.dll" Source="$(env.QTHOME)\bin\Qt5Core.dll" />
                                 <File Id="QT5DESIGNER.DLL" Name="Qt5Designer.dll" Source="$(env.QTHOME)\bin\Qt5Designer.dll" />
@@ -64,7 +63,6 @@
                                 <File Id="QT5GUI.DLL" Name="Qt5Gui.dll" Source="$(env.QTHOME)\bin\Qt5Gui.dll" />
                                 <File Id="QT5HELP.DLL" Name="Qt5Help.dll" Source="$(env.QTHOME)\bin\Qt5Help.dll" />
                                 <File Id="QT5MULTIMEDIA.DLL" Name="Qt5Multimedia.dll" Source="$(env.QTHOME)\bin\Qt5Multimedia.dll" />
-                                <File Id="QT5MULTIMEDIAQUICK_P.DLL" Name="Qt5MultimediaQuick_p.dll" Source="$(env.QTHOME)\bin\Qt5MultimediaQuick_p.dll" />
                                 <File Id="QT5MULTIMEDIAWIDGETS.DLL" Name="Qt5MultimediaWidgets.dll" Source="$(env.QTHOME)\bin\Qt5MultimediaWidgets.dll" />
                                 <File Id="QT5NETWORK.DLL" Name="Qt5Network.dll" Source="$(env.QTHOME)\bin\Qt5Network.dll" />
                                 <File Id="QT5NFC.DLL" Name="Qt5Nfc.dll" Source="$(env.QTHOME)\bin\Qt5Nfc.dll" />
@@ -82,7 +80,7 @@
                             <Component Id="ZMQ" Guid="DE3ABF16-AE16-461F-B0C2-8264F1E40CF8">
                                 <File Id="LIBZMQ.DLL" Name="libzmq.dll" Source="$(env.ZMQ)\bin\$(env.EPICS_HOST_ARCH)\libzmq.dll" />
                             </Component>
-                            <Component Id="qwt_6.1.3" Guid="BE452C38-1E9E-4678-90BC-D03E1F347987">
+                            <Component Id="qwt_6.1.5" Guid="BE452C38-1E9E-4678-90BC-D03E1F347987">
                                 <File Id="QWT.DLL" Name="qwt.dll" Source="$(env.QWTHOME)\lib\qwt.dll" />
                             </Component>
                             <Component Id="CaQtDM" Guid="BF8DC119-A14E-401D-B136-B486FEF41683">
@@ -160,7 +158,7 @@
                         </Component>
                     </Directory>
                 </Directory>
-                <Merge Id="VCRedist" Language="0" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Redist\MSVC\14.25.28508\MergeModules\Microsoft_VC142_CRT_x86.msm" DiskId="1" />
+                <Merge Id="VCRedist" Language="0" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Redist\MSVC\14.27.29016\MergeModules\Microsoft_VC142_CRT_x86.msm" DiskId="1" />
             </Directory>
             <Directory Id="ProgramMenuFolder">
                 <Directory Id="ProgramMenuDir" Name="caQtDM">
