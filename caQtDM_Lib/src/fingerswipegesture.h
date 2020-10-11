@@ -54,11 +54,14 @@ public:
     bool isRightToLeft() const;
     bool isBottomToTop() const;
     bool isTopToBottom() const;
+    bool isVertical() const;
+    bool isHorizontal() const;
 
 private:
     QPointF m_startPos;
     QPointF m_actPos;
     QPointF m_lastPos;
+    QPointF m_decisionPos;
     QPointF m_currentPos;
     QWidget *m_central;
     QPixmap m_snapshot;
@@ -66,6 +69,7 @@ private:
     bool m_cancelled;
     bool m_touchupdate;
     bool m_begin;
+    bool m_decision;
     friend class FingerSwipeGestureRecognizer;
 };
 #endif

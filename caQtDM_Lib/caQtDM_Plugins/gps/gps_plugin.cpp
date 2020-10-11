@@ -244,6 +244,7 @@ int gpsPlugin::pvClearMonitor(knobData *kData) {
 
 int gpsPlugin::pvFreeAllocatedData(knobData *kData)
 {
+    QMutexLocker locker(&mutex);
     //qDebug() << "gpsPlugin:pvFreeAllocatedData";
     if (kData->edata.info != (void *) 0) {
         free(kData->edata.info);
