@@ -1043,7 +1043,16 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     if (!check_extension) {
         while (counter<extensions){
             FileName=inputFile;
+            // remove any extension
+            FileName=FileName.split(".",QString::SkipEmptyParts).at(0);
+
             FileName=FileName.append(valid_extensions[counter]);
+            //qDebug() << "check " << FileName << valid_extensions[counter] ;
+            // this will check for file existence and when an url is defined, download the file from a http server
+            fileFunctions filefunction;
+            // dont show error because we try!
+            filefunction.checkFileAndDownload(FileName);
+
             searchFile *filecheck = new searchFile(FileName);
             FileName=filecheck->findFile();
             delete filecheck;
@@ -1068,6 +1077,12 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
                     FileName=inputFile;
                     FileName=FileName.remove(valid_extensions[ext_found]);
                     FileName=FileName.append(valid_extensions[counter]);
+                    //qDebug() << "check " << FileName << valid_extensions[counter] ;
+                    // this will check for file existence and when an url is defined, download the file from a http server
+                    fileFunctions filefunction;
+                    // dont show error because we try!
+                    filefunction.checkFileAndDownload(FileName);
+
                     searchFile *filecheck = new searchFile(FileName);
                     FileName=filecheck->findFile();
                     //qDebug() << "check " << FileName << valid_extensions[counter] ;
