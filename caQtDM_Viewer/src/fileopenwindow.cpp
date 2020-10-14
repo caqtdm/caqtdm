@@ -926,6 +926,7 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
     activWindow = 0;
 #ifdef MOBILE_IOS
     // this is needed for the status bar
+    mainWindow->setAttribute(Qt::WA_ContentsMarginsRespectsSafeArea,false);
     QRect availscreengeo = QApplication::desktop()->availableGeometry(-1);
     //QRect screengeo = QApplication::desktop()->geometry();
     //qDebug() << "IOS screen" << screengeo<< availscreengeo;
