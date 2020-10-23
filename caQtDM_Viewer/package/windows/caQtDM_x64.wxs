@@ -94,6 +94,7 @@
                                 <File Id="QTCONTROLS.DLL" Name="qtcontrols.dll" Source="$(env.CAQTDM_COLLECT)\qtcontrols.dll" />
                                 <File Id="CAQTDM_LIB.DLL" Name="caQtDM_Lib.dll" Source="$(env.CAQTDM_COLLECT)\caQtDM_Lib.dll" />
                                 <File Id="ADL2UI.EXE" Name="adl2ui.exe" Source="$(env.CAQTDM_COLLECT)\adl2ui.exe" />
+                                <File Id="ADLPARSER.DLL" Name="adlParser.dll" Source="$(env.CAQTDM_COLLECT)\adlParser.dll" />
                             </Component>
                             <Component Guid="37AC3E87-ABC3-4543-8489-3FBD6F3DDC41" Id="qt_conf" Win64="yes">
                                 <IniFile Id="qt_conf_file1" Action="createLine" Key="Prefix" Name="qt.conf" Section="Paths" Value="../.." Directory="INSTALLDIR_BIN" />
@@ -115,7 +116,8 @@
                                 <!---File Id="EPICS4_PLUGIN.DLL" Name="epics4_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics4_plugin.dll" -->
                                 <File Id="BSREAD_PLUGIN.DLL" Name="bsread_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\bsread_plugin.dll" />
                                 <File Id="MODBUS_PLUGIN.DLL" Name="modbus_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\modbus_plugin.dll" />
-                                <File Id="ARCHIVESF_PLUGIN.DLL" Name="archiveSF_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\archiveSF_plugin.dll" />
+                                <File Id="ENVIRONMENT_PLUGIN.DLL" Name="environment_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\environment_plugin.dll" />
+                                <!---File Id="GPS_PLUGIN.DLL" Name="gps_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\gps_plugin.dll" -->
                             </Component>
                         </Directory>
                         <Directory Id="DESIGNER" Name="designer">

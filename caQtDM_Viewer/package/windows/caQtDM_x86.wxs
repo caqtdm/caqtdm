@@ -45,6 +45,7 @@
                                 <File Id="QT5SCRIPTTOOLS.DLL" Name="Qt5ScriptTools.dll" Source="$(env.QTHOME)\bin\Qt5ScriptTools.dll" />
                                 <File Id="QT5SENSORS.DLL" Name="Qt5Sensors.dll" Source="$(env.QTHOME)\bin\Qt5Sensors.dll" />
                                 <File Id="QT5SERIALPORT.DLL" Name="Qt5SerialPort.dll" Source="$(env.QTHOME)\bin\Qt5SerialPort.dll" />
+                                <File Id="QT5SERIALBUS.DLL" Name="Qt5SerialBus.dll" Source="$(env.QTHOME)\bin\Qt5SerialBus.dll" />
                                 <File Id="QT5SQL.DLL" Name="Qt5Sql.dll" Source="$(env.QTHOME)\bin\Qt5Sql.dll" />
                                 <File Id="QT5SVG.DLL" Name="Qt5Svg.dll" Source="$(env.QTHOME)\bin\Qt5Svg.dll" />
                                 <File Id="QT5TEST.DLL" Name="Qt5Test.dll" Source="$(env.QTHOME)\bin\Qt5Test.dll" />
@@ -88,6 +89,7 @@
                                 <File Id="QTCONTROLS.DLL" Name="qtcontrols.dll" Source="$(env.CAQTDM_COLLECT)\qtcontrols.dll" />
                                 <File Id="CAQTDM_LIB.DLL" Name="caQtDM_Lib.dll" Source="$(env.CAQTDM_COLLECT)\caQtDM_Lib.dll" />
                                 <File Id="ADL2UI.EXE" Name="adl2ui.exe" Source="$(env.CAQTDM_COLLECT)\adl2ui.exe" />
+                                <File Id="ADLPARSER.DLL" Name="adlParser.dll" Source="$(env.CAQTDM_COLLECT)\adlParser.dll" />
                             </Component>
 			    <Component Id="openssl" Guid="D1EEC8C0-7B65-4ECA-B6AF-DC6389C2E365">
 			        <File Id="LIBEAY32.DLL" Name="libeay32.dll" Source="$(env.SSLLIB)\libeay32.dll" />
@@ -108,6 +110,9 @@
                                 <File Id="EPICS3_PLUGIN.DLL" Name="epics3_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics3_plugin.dll" />
                                 <File Id="BSREAD_PLUGIN.DLL" Name="bsread_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\bsread_plugin.dll" />
                                 <File Id="ARCHIVESF_PLUGIN.DLL" Name="archiveSF_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\archiveSF_plugin.dll" />
+				<File Id="MODBUS_PLUGIN.DLL" Name="modbus_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\modbus_plugin.dll" />
+				<File Id="ENVIRONMENT_PLUGIN.DLL" Name="environment_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\environment_plugin.dll" />
+				<!---File Id="GPS_PLUGIN.DLL" Name="gps_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\gps_plugin.dll" -->
                             </Component>
                         </Directory>
                         <Directory Id="DESIGNER" Name="designer">
