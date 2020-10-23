@@ -1,3 +1,6 @@
+TARGET_PRODUCT = "ADL converter library for Display Manager"
+TARGET_FILENAME = "adlParser.dll"
+
 include(../../caQtDM_Viewer/qtdefs.pri)
 CONFIG += caQtDM_xdl2ui
 include(../../caQtDM.pri)
@@ -15,6 +18,8 @@ INCLUDEPATH += ../adlParserSrc
 
 MOC_DIR = moc
 VPATH += ../adlParserSrc
+
+RC_FILE = ../../caQtDM_Viewer/src/caQtDM.rc
 
 HEADERS += XmlWriter.h \
     adlParserMain.h \

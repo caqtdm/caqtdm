@@ -1,3 +1,6 @@
+TARGET_PRODUCT = "ADL converter for Display Manager"
+TARGET_FILENAME = "adl2ui.exe"
+
 include(../qtdefs.pri)
 CONFIG += caQtDM_xdl2ui caQtDM_xdl2ui_Lib
 include(../../caQtDM.pri)
@@ -11,6 +14,7 @@ TEMPLATE = app
 INCLUDEPATH += .
 INCLUDEPATH += ../../caQtDM_Parsers/adlParserSrc
 MOC_DIR = moc
+RC_FILE = ../../caQtDM_Viewer/src/caQtDM.rc
 
 # Input
 HEADERS += adlParser.h
