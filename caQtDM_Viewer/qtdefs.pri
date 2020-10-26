@@ -295,7 +295,7 @@ DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
-# 4.2.5
+# 4.3.0
 # POPUP status windows with possible delays
 # dynamic Property caqtdmPopupUI and caqtdmPopupUI_Delay for POPUP windows (The filename must contain the word popup.ui)
 # wmsignalpropergator can resize a panel

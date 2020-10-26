@@ -247,12 +247,12 @@ void modbus_decode::devicestate_changed(QModbusDevice::State state)
 {
     device_state=state;
     if (state==QModbusClient::ConnectingState){
-        qDebug()<<"QModbusClient::ConnectingState";
+        //qDebug()<<"QModbusClient::ConnectingState";
     }else if (state==QModbusClient::ConnectedState){
-        qDebug()<<"QModbusClient::ConnectedState";
+        //qDebug()<<"QModbusClient::ConnectedState";
     }else if (state == QModbusDevice::UnconnectedState){
         QMutexLocker locker(&mutex);
-        qDebug()<< "QModbusDevice::UnconnectedState";
+        //qDebug()<< "QModbusDevice::UnconnectedState";
         QList<modbus_channeldata*> usedkeys=readData.values();
         //qDebug()<< usedkeys;
         foreach (modbus_channeldata* index,usedkeys){
@@ -269,7 +269,7 @@ void modbus_decode::devicestate_changed(QModbusDevice::State state)
         }
         if (!modbus_disabled)  device->connectDevice();
     }else if (state == QModbusDevice::ConnectedState){
-        qDebug()<< "QModbusDevice::ConnectedStat";
+        //qDebug()<< "QModbusDevice::ConnectedStat";
     }
 
 }
@@ -284,7 +284,7 @@ void modbus_decode::trigger_modbusrequest()
         if (varcycle.canConvert<int>())
            timer_cycle=varcycle.toInt();
 
-    //qDebug() << "ModbusCycle: "<< timer_cycle;
+    //qDebug() << "ModbusCycle: "<< timer_cycle << device_state;
     QModbusDataUnit readUnit;
     if (device_state == QModbusDevice::ConnectedState){
         bool request_data=true;
@@ -299,7 +299,7 @@ void modbus_decode::trigger_modbusrequest()
 
                 QMap<QString,modbus_channeldata*>::iterator i = readData.find(Channel);
                 while (i !=readData.end() && i.key() == Channel) {
-                    //qDebug() << "ModbusCount: "<<i.value()->getIndexCount();
+                   //qDebug() << "ModbusCount: "<<i.value()->getIndexCount();
                     if (i.value()->getIndexCount()>0)
                     for (int x=0;x<i.value()->getReadUnit_count();x++){
                         readUnit=i.value()->getReadUnit(x);
@@ -876,14 +876,14 @@ void modbus_decode::handle_pvReconnect(knobData *kData)
     mutexknobdataP->SetMutexKnobData(kData->index, *kData);
     mutexknobdataP->SetMutexKnobDataReceived(kData);
 
-
 }
 
 void modbus_decode::handle_createTimer(int modbus_cycle)
 {
-    qDebug() << "handle_createTimer" << modbus_cycle;
+
     QTimer* selected_timer=running_Timer.value(modbus_cycle,Q_NULLPTR);
     if (!selected_timer){
+        //qDebug() << "handle_createTimer" << modbus_cycle;
         selected_timer=new QTimer(this);
         selected_timer->setInterval(modbus_cycle);
         selected_timer->setProperty("modbus_cycle",modbus_cycle);

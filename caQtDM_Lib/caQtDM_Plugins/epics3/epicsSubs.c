@@ -982,7 +982,9 @@ void ClearMonitor(knobData *kData)
             info->evAdded = false;
             info->evID = 0;
             info->event = 0;
-            ca_clear_channel(info->ch);
+            if(info->ch != (chid) 0) {
+                ca_clear_channel(info->ch);
+            }
             info->ch = 0;
             PRINT(printf("ClearMonitor -- %s should now have been taken out \n", info->pv));
             info->pv[0] = '\0';

@@ -137,12 +137,12 @@ void modbus_channeldata::setPrecision(short value)
 
 void modbus_channeldata::setClearMonitor(int index)
 {
-    addIndex(index);
+    delIndex(index);
 }
 
 void modbus_channeldata::pvReconnect(int index)
 {
-    delIndex(index);
+    addIndex(index);
 }
 
 QModbusDataUnit modbus_channeldata::getReadUnit()
