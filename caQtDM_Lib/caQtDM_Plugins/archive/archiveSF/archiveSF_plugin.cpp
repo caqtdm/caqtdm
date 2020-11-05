@@ -41,7 +41,7 @@ ArchiveSF_Plugin::ArchiveSF_Plugin()
 {
     suspend = false;
     qRegisterMetaType<indexes>("indexes");
-    qRegisterMetaType<QVector<float> >("QVector<float>");
+    qRegisterMetaType<QVector<double> >("QVector<double>");
 
     qDebug() << "ArchiveSF_Plugin: Create (http-retrieval)";
     archiverCommon = new ArchiverCommon();
@@ -53,11 +53,11 @@ ArchiveSF_Plugin::ArchiveSF_Plugin()
 }
 
 ArchiveSF_Plugin:: ~ArchiveSF_Plugin() {
-    qDebug() << "ArchiveSF_Plugin::~ArchiveSF_Plugin()";
+    //qDebug() << "ArchiveSF_Plugin::~ArchiveSF_Plugin()";
 }
 
 void ArchiveSF_Plugin::closeEvent(){
-   qDebug() << "ArchiveSF_Plugin::closeEvent ";
+   //qDebug() << "ArchiveSF_Plugin::closeEvent ";
    emit Signal_StopUpdateInterface();
 }
 
@@ -80,8 +80,13 @@ void ArchiveSF_Plugin::Callback_AbortOutstandingRequests(QString key)
         tmpThread = (myThread *) j.value();
         if(tmpThread != (myThread *) 0) {
             sfRetrieval *retrieval = tmpThread->getArchive();
-            if(retrieval != (sfRetrieval *) 0) retrieval->cancelDownload();
             tmpThread->quit();
+            if(retrieval != (sfRetrieval *) 0){
+                //qDebug()  << "retrieval->cancelDownload()"<< retrieval;
+                retrieval->cancelDownload();
+                retrieval->deleteLater();
+            }
+
         }
         ++j;
     }
@@ -126,7 +131,9 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
             if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) indexNew.w)) {
                 QVariant var = w->property("nrOfBins");
                 if(!var.isNull()) {
-                    indexNew.nrOfBins = var.toInt();
+                    bool ok;
+                    indexNew.nrOfBins = var.toInt(&ok);
+                    if(!ok) indexNew.nrOfBins = -1;
                 } else if(indexNew.init){
                     QString mess("ArchiveSF plugin -- no nrOfBins defined as dynamic property in widget "  + w->objectName() + ", defaulting to maximum number of points");
                     if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
@@ -140,18 +147,20 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
                     } else if(QString::compare(backend, "sf-databuffer") == 0) {
                        indexNew.backend = var.toString();
                     } else {
-                        QString mess("ArchiveSF plugin -- backend defined as dynamic property in widget but not spelled correctly (use sf-archiverappliance or sf-databuffer) in widget "  + w->objectName() + ", defaulting now to sf-archiverappliance");
-                        if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtFatalMsg, (char*) qasc(mess));
+                        QString mess("ArchiveSF plugin -- backend defined as dynamic property in widget but not known (use sf-archiverappliance or sf-databuffer) in widget "  + w->objectName());
+                        indexNew.backend = var.toString();
+                        if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
                     }
                 } else if(indexNew.init){
-                    QString mess("ArchiveSF plugin -- no backend defined as dynamic property in widget "  + w->objectName() + ", can be sf-archiverappliance or sf-databuffer)");
+                    QString mess("ArchiveSF plugin -- no backend defined as dynamic property in widget "  + w->objectName() + ", it is defined by the server e.g.(sf-archiverappliance,sf-databuffer)");
                     if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
                 }
 
                 // first look if an environment variable is set for the url
                 QString url = (QString)  qgetenv("CAQTDM_ARCHIVERSF_URL");
-                if(url.size() == 0) {
+                if(url.size() == 0 ||(!w->property("archiverIndex").toString().isEmpty())) {
                     var = w->property("archiverIndex");
+                    //qDebug() << "Check URL: " <<var;
                     if(!var.isNull()) {
                         QString indexName = var.toString();
                         index_name = qasc(indexName);
@@ -183,8 +192,8 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
             connect(tmpThread, SIGNAL(finished()), tmpThread, SLOT(deleteLater()) );
             connect(this, SIGNAL(operate( QWidget *, indexes, QString, MessageWindow *)), worker,
                           SLOT(getFromArchive(QWidget *, indexes,  QString, MessageWindow *)));
-            connect(worker, SIGNAL(resultReady(indexes, int, QVector<float>, QVector<float>, QString)), this,
-                           SLOT(handleResults(indexes, int, QVector<float>, QVector<float>, QString)));
+            connect(worker, SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>, QString)), this,
+                           SLOT(handleResults(indexes, int, QVector<double>, QVector<double>, QString)));
             tmpThread->start();
 
             emit operate((QWidget *) messagewindowP, indexNew, index_name, messagewindowP);
@@ -197,7 +206,7 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
     //qDebug() << "====================== ArchiveSF_Plugin::Callback_UpdateInterface finished";
 }
 
-void ArchiveSF_Plugin::handleResults(indexes indexNew, int nbVal, QVector<float> TimerN, QVector<float> YValsN, QString backend)
+void ArchiveSF_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend)
 {
     //QThread *thread = QThread::currentThread();
     //qDebug() << "in sf handle results" << nbVal << TimerN.count() << indexNew.indexX << indexNew.indexY << thread;

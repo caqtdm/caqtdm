@@ -30,6 +30,7 @@
 # define CHANNELLIST    "channels: List of PV-Names (processvariables) used for this object,\na PV can be prefixed with a plugin name (ex: epics3://)"
 # define CHANNELLISTC   "channels: List of up to 2 PV-Names (processvariables) used for this object,\nfirst or second PV can be blanc (see manual)\na PV can be prefixed with a plugin name (ex: epics3://)"
 # define STRINGFROMLIST "String representation of list as used in caQtDM, seperated with ;"
+# define CHANNELMASK    "channelMask: Name of pv used in order to mask the items in the puldownmenu,\n16 bits can be used where a bit not set hides the item and set shows it"
 
 // visibility
 # define COLORMODE      "colorMode: Static: Show the object in its here defined colors.\nAlarm: Show the object in alarm colors based on the severity of the associated process variable."

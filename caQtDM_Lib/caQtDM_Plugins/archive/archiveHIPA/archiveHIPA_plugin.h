@@ -45,11 +45,11 @@ class Q_DECL_EXPORT WorkerHIPA : public QObject
 public:
     WorkerHIPA() {
         qRegisterMetaType<indexes>("indexes");
-        qRegisterMetaType<QVector<float> >("QVector<float>");
+        qRegisterMetaType<QVector<double> >("QVector<double>");
     }
 
 private:
-    QVector<float>  TimerN, YValsN;
+    QVector<double>  TimerN, YValsN;
 
 public slots:
 
@@ -76,7 +76,7 @@ public slots:
         loggingServer = loggingServer.toUpper();
         if(loggingServer.isEmpty() || !loggingServer.contains("HIPA")) setenv("LOGGINGSERVER", "hipa-lgexp.psi.ch", 1);
 
-        //qDebug() << "get from archive at " << "hipa-lgexp.psi.ch";
+        qDebug() << "get from archive at " << "hipa-lgexp.psi.ch";
         int startHours = indexNew.secondsPast / 3600;
         int day =  startHours/24 + 1;
         int arraySize =  3600/5 * 24 * (day+1);
@@ -109,11 +109,12 @@ public slots:
         //qDebug() << ">>>> hipa nbval=" << nbVal << TimerN.count() << k;
 
         emit resultReady(indexNew, nbVal, TimerN, YValsN, "");
+
         mutex->unlock();
     }
 
 signals:
-    void resultReady(indexes indexNew, int nbVal, QVector<float> TimerN, QVector<float> YValsN, QString backend);
+    void resultReady(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend);
 
 public:
 
@@ -149,7 +150,7 @@ public:
     int TerminateIO();
 
 public slots:
-    void handleResults(indexes, int, QVector<float>, QVector<float>, QString);
+    void handleResults(indexes, int, QVector<double>, QVector<double>, QString);
     void closeEvent();
 
 signals:

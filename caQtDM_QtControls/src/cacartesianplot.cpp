@@ -32,6 +32,7 @@
 #include "cacartesianplot.h"
 #include <QtCore>
 
+#if QWT_VERSION >= 0x060100
 class PlotScaleDateEngine: public QwtDateScaleEngine
 {
 public:
@@ -63,6 +64,7 @@ public:
 private:
     int nbTicks;
 };
+#endif
 
 class PlotScaleEngine: public QwtLinearScaleEngine
 {
@@ -158,6 +160,7 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     thisCountNumber = 0;
     thisXaxisSyncGroup = 0;
     thisXticks = 5;
+    symbolSizeFactor = 1.0;
 
     plotGrid = new QwtPlotGrid();
     plotGrid->attach(this);
@@ -173,6 +176,7 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     setScaleColor(Qt::black);
     setGrid(true);
     setGridColor(Qt::gray);
+    whiteColors = false;
 
     setAutoFillBackground(true);
 
@@ -839,7 +843,7 @@ void caCartesianPlot::setColor(QColor c, int indx)
         } else if(thisStyle[indx] == Dots) {
             curve[indx].setPen(QPen(c, 0));
         } else {
-            int size=qMax(2, (int) qRound(this->geometry().height()/70.0));
+            int size=qMax(2, (int) qRound(this->geometry().height() * symbolSizeFactor / 70.0));
             curve[indx].setPen(QPen(c, size));
         }
     } else {
@@ -901,7 +905,7 @@ void caCartesianPlot::setSymbol(curvSymbol s, int indx)
     QwtSymbol::Style ms = myMarker(s);
     brush.setColor(thisLineColor[indx]);
     brush.setStyle(Qt::SolidPattern);
-    size=qMax(2, (int) qRound(this->geometry().height()/50.0));
+    size=qMax(2, (int) qRound(this->geometry().height() * symbolSizeFactor / 50.0 ));
     curve[indx].setSymbol(new QwtSymbol(ms, brush, QPen(thisLineColor[indx]), QSize(size, size)));
     replot();
 }
@@ -1051,6 +1055,8 @@ void caCartesianPlot::setXaxisType(axisType s)
 {
     thisXtype = s;
     if(s == time) {
+// in qwt6.0 no date/time scale possible
+#if QWT_VERSION >= 0x060100
         // gives an axe for milliseconds since epoch
         PlotScaleDateEngine *scaleEngine = new PlotScaleDateEngine(thisXticks, Qt::LocalTime); // in number of milliseconds from epoch
         setAxisScaleEngine(QwtPlot::xBottom, scaleEngine);
@@ -1067,7 +1073,13 @@ void caCartesianPlot::setXaxisType(axisType s)
         setAxisScaleDraw(QwtPlot::xBottom, scaleDraw);
         double INTERVAL = 3600 * 1000;
         setAxisScale(QwtPlot::xBottom, 0.0, INTERVAL, INTERVAL/thisXticks);
-
+// fall back to normal scale
+#else
+        setAxisScaleEngine(QwtPlot::xBottom, new PlotScaleEngine(thisXticks));
+        setAxisScaleDraw(QwtPlot::xBottom, new QwtScaleDraw());
+        double INTERVAL = 1000.0;
+        setAxisScale(QwtPlot::xBottom, 0.0, INTERVAL, INTERVAL/thisXticks);
+#endif
     } else if(s == log10) {
 #if QWT_VERSION < 0x060100
         setAxisScaleEngine(QwtPlot::xBottom, new QwtLog10ScaleEngine);
@@ -1119,9 +1131,13 @@ void caCartesianPlot::setYaxisType(axisType s)
 void caCartesianPlot::setWhiteColors()
 {
     QColor c = QColor(Qt::white);
+/* optimized, do not set white to curve to prevent load and flashing
+   and still see some old curve if was present
     for(int i=0; i<curveCount; i++) {
         setColor(c, i);
-    }
+    } */
+    if(whiteColors) return;
+    whiteColors = true;
     setBackgroundColor(c);
     setForegroundColor(c);
     setScalesColor(c);
@@ -1130,9 +1146,11 @@ void caCartesianPlot::setWhiteColors()
 
 void caCartesianPlot::setAllProperties()
 {
+    whiteColors = false;
     for(int i=0; i<curveCount; i++) {
         setColor(thisLineColor[i], i);
     }
+
     setBackgroundColor(thisBackColor);
     setForegroundColor(thisForeColor);
     setScalesColor(thisScaleColor);
@@ -1160,7 +1178,7 @@ void caCartesianPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 
     //printf("fontsize=%.1f %s\n", f.pointSizeF(), qasc(this->objectName()));
     //when legend text gets to small, hide it (will give then space for plot)
-
+    setProperty("legendfontsize", f.pointSizeF());
 
 #if QWT_VERSION < 0x060100
     for(i=0; i < curveCount; i++) {
@@ -1217,6 +1235,8 @@ void caCartesianPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
                 curve->setItemAttribute(QwtPlotItem::Legend, false);
                 continue;
             } else if(!curve->title().isEmpty()) {
+                curve->setItemAttribute(QwtPlotItem::Legend, false);
+                updateLegend();
                 curve->setItemAttribute(QwtPlotItem::Legend, true);
             }
 

@@ -43,6 +43,7 @@ class QTCON_EXPORT caImage : public QWidget
     Q_PROPERTY(QString imageCalc READ getImageCalc WRITE setImageCalc)
     Q_PROPERTY(int frame READ getFrame WRITE setFrame)
     Q_PROPERTY(int delayMilliseconds READ getDelay WRITE setDelay)
+    Q_PROPERTY(int tiltAngle READ getAngle WRITE setAngle)
 
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
@@ -67,6 +68,9 @@ public:
     QString getImageCalc() const {return thisImageCalc;}
     void setImageCalc(QString const &calc) {thisImageCalc = calc;}
 
+    void setAngle( int angle );
+    int getAngle() {return thisAngle;}
+
     int getFrameCount();
     void startMovie();
     void setInvalid(QColor c);
@@ -84,6 +88,11 @@ public slots:
     void hideObject(bool hideit) {
 #include "hideobjectcode.h"
     }
+    void slotTiltAngle(int);
+    void slotTiltAngle(double);
+
+private slots:
+        void OnFrameChanged(int frame);
 
 protected:
     virtual void timerEvent(QTimerEvent *e);
@@ -96,11 +105,13 @@ private:
     QPointer<QMovie> _animation;
     QVBoxLayout* _layout;
     QString thisFileName;
+    QPixmap pixmap, pix;
     int thisFrame, thisDelay;
     int prevFrame;
     QString thisImageCalc;
     int timerId;
     QColor oldColor;
+    int thisAngle;
 };
 
 #endif

@@ -96,6 +96,11 @@
 #else
 #endif
 
+// 50 levels of includes should do it
+#define CAQTDM_MAX_INCLUDE_LEVEL 50
+
+
+
 namespace Ui {
 class CaQtDM_Lib;
 }
@@ -124,6 +129,8 @@ public:
     knobData* GetMutexKnobDataPtr(int index);
     knobData* GetMutexKnobDataPV(QWidget *widget, QString pv);
     void TreatRequestedValue(QString pv, QString text, FormatType fType, QWidget *w);
+    // ZHW requested for external integration - allow an external application/object to get the top level ui widget of caQtDM_Lib window
+    QWidget* getMyWidget(){ return myWidget; }
     // interface finish (perhaps we need more)
 
 #ifdef MOBILE
@@ -183,17 +190,7 @@ public:
         }
 #endif
         if (printDialog->exec() == QDialog::Accepted) {
-
-            QPainter painter(printer);
-            double xscale = printer->pageRect().width()/double(this->width());
-            double yscale = printer->pageRect().height()/double(this->height());
-            double scale = qMin(xscale, yscale);
-            painter.translate(printer->paperRect().x() + printer->pageRect().width()/2,
-                              printer->paperRect().y() + printer->pageRect().height()/2);
-            painter.scale(scale, scale);
-            painter.translate(-width()/2, -height()/2);
-            QPixmap pm = QPixmap::grabWidget(this);
-            painter.drawPixmap(0, 0, pm);
+            print2Painter(printer);
         }
 #endif
     }
@@ -211,21 +208,13 @@ public:
 #endif
         printer->setResolution(300);
         printer->setOutputFileName(filename);
-
-        QPainter painter(printer);
-        double xscale = printer->pageRect().width()/double(this->width());
-        double yscale = printer->pageRect().height()/double(this->height());
-        double scale = qMin(xscale, yscale);
-        painter.translate(printer->paperRect().x() + printer->pageRect().width()/2,
-                          printer->paperRect().y() + printer->pageRect().height()/2);
-        painter.scale(scale, scale);
-        painter.translate(-width()/2, -height()/2);
-        QPixmap pm = QPixmap::grabWidget(this);
-        painter.drawPixmap(0, 0, pm);
+        print2Painter(printer);
 #else
         Q_UNUSED(filename);
 #endif
     }
+
+
 
 protected:
     virtual void timerEvent(QTimerEvent *e);
@@ -250,16 +239,52 @@ private:
 #if !defined(useElapsedTimer)
     double rTime();
 #endif
+
+#ifndef MOBILE
+    void print2Painter(QPrinter *printer)
+    {
+        QPainter painter(printer);
+        QFont qfont = painter.font();
+        qfont.setPointSizeF(12);
+        painter.setFont(qfont);
+        QFontMetrics fm(qfont);
+        QFont thisFont = this->font();
+        thisFont.setPointSizeF(12);
+        QFontMetrics ft(thisFont);
+
+        painter.save();
+        double xscale = printer->pageRect().width()/double(this->width());
+        double yscale = printer->pageRect().height()/double(this->height() + ft.lineSpacing());
+        double scale = qMin(xscale, yscale);
+        painter.translate(printer->paperRect().x() + printer->pageRect().width()/2,
+                          printer->paperRect().y() + printer->pageRect().height()/2);
+        painter.scale(scale, scale);
+        painter.translate(-width()/2, -height()/2 + ft.lineSpacing());
+
+        QPixmap pm = QPixmap::grabWidget(this);
+        painter.drawPixmap(0, 0, pm);
+
+        painter.restore();
+
+        QString text = QDate::currentDate().toString("yyyy-MM-dd");
+        text += " " + QTime::currentTime().toString("hh:mm:ss");
+        text += ", " + this->thisFileShort;
+
+        painter.drawText(0, 0, text);
+        painter.drawText(0, fm.height() + fm.descent(), this->thisFileFull);
+    }
+#endif
+
     void scanChildren(QList<QWidget*> children, QWidget *tab, int i);
     QWidget* getTabParent(QWidget *w1);
-    QString treatMacro(QMap<QString, QString> map, const QString& pv, bool *doNothing);
+    QString treatMacro(QMap<QString, QString> map, const QString& pv, bool *doNothing, QString widgetName = "");
     void scanWidgets(QList<QWidget*> list, QString macro);
     void HandleWidget(QWidget *w, QString macro, bool firstPass, bool treatPrimaries);
     void closeEvent(QCloseEvent* ce);
     bool CalcVisibility(QWidget *w, double &result, bool &valid);
     short ComputeAlarm(QWidget *w);
     int setObjectVisibility(QWidget *w, double value);
-    bool reaffectText(QMap<QString, QString> map, QString *text);
+    bool reaffectText(QMap<QString, QString> map, QString *text, QWidget *w);
     int InitVisibility(QWidget* widget, knobData *kData, QMap<QString, QString> map,  int *specData, QString info);
     void postMessage(QtMsgType type, char *msg);
     int Execute(char *command);
@@ -267,7 +292,8 @@ private:
     void TreatRequestedWave(QString pv, QString text, caWaveTable::FormatType fType, int index, QWidget *w);
     void TreatOrdinaryValue(QString pv, double value, int32_t idata, QString svalue, QWidget *w);
     bool getSoftChannel(QString pv, knobData &data);
-    int parseForDisplayRate(QString input, int &rate);
+    int parseForDisplayRate(QString &input, int &rate);
+    bool parseForQRectConst(QString &input,double* valueArray);
     void getStatesToggleAndLed(QWidget *widget, const knobData &data, const QString &String, Qt::CheckState &state);
 
     void resizeSpecials(QString className, QWidget *widget, QVariantList list, double factX, double factY);
@@ -287,6 +313,7 @@ private:
     void StripPlotsVerticalAlign();
     qreal fontResize(double factX, double factY, QVariantList list, int usedIndex);
     ControlsInterface *getPluginInterface(QWidget *w);
+    void UndefinedMacrosWindow();
 
 #ifdef MOBILE
     bool eventFilter(QObject *obj, QEvent *event);
@@ -294,6 +321,9 @@ private:
     void tapAndHoldTriggered(QObject *obj, QTapAndHoldGesture* tapAndHold);
     void fingerswipeTriggered(FingerSwipeGesture *gesture);
     Qt::GestureType fingerSwipeGestureType;
+#else
+
+    bool eventFilter(QObject *obj, QEvent *event);
 #endif
 
     long getLongValueFromString(char *textValue, FormatType fType, char **end);
@@ -306,12 +336,17 @@ private:
     QList<QWidget*> topIncludesWidgetList;
     QList<QTabWidget *> allTabs;
     QList<QStackedWidget *> allStacks;
+    QList<caCalc *> allCalcs_Vectors;
+
+    QMap<QString, QString> unknownMacrosList;
+    QTableWidget* macroTable;
+    QDialog *macroWindow;
 
     int level;
     QString cainclude_path;
     // 50 levels of includes should do it
-    QString savedMacro[50];
-    QString savedFile[50];
+    QString savedMacro[CAQTDM_MAX_INCLUDE_LEVEL];
+    QString savedFile[CAQTDM_MAX_INCLUDE_LEVEL];
 
 #ifndef MOBILE
     myQProcess *proc;
@@ -357,10 +392,13 @@ private:
 
     QMap<int, caStripPlot*> stripList;          // list of stripplots with key group
     QList<int> stripGroupList;                  // group numbers found
+    QHash<QString, QString> softvars;                // use a hash list to test if same variable names
 
     QString defaultPlugin;
 
 private slots:
+    void Callback_CaCalc(double value) ;
+    void Callback_UndefinedMacrowindowExit();
     void Callback_EApplyNumeric(double value);
     void Callback_ENumeric(double value);
     void Callback_Spinbox(double value);
@@ -391,6 +429,7 @@ private slots:
     void showMaxWindow();
     void showMinWindow();
     void showFullWindow();
+    void resizeFullWindow(QRect& q);
 
     void updateTextBrowser();
     void handleFileChanged(const QString&);
@@ -423,7 +462,19 @@ private slots:
         print();
     }
 
+    void Callback_ResizeUp() {
+        this->resize(this->size()*1.1);
+    }
+
+    void Callback_ResizeDown() {
+        this->resize(this->size()*0.9);
+    }
+
     void updateResize();
+#ifndef MOBILE
+    void send_delayed_popup_signal();
+#endif
+
 };
 
 #endif // CaQtDM_Lib_H

@@ -103,6 +103,16 @@ void MutexKnobData::UpdateMechanism(UpdateType Type)
 {
     myUpdateType = Type;
 }
+/**
+ * softpv naming
+ */
+QString MutexKnobData::SoftPV_Name(QString pv, QWidget *w)
+{
+    //printf("%s\n",asc.toUtf8().constData());
+    //printf("%s_%p\n", qasc(pv),  w);
+    //fflush(stdout);
+    return QString("%1_%2").arg(pv).arg((quintptr)w,QT_POINTER_SIZE * 2, 16, QChar('0'));
+}
 
 /**
  * insert the softpv into the list of softpv's with the corresponding widget
@@ -110,9 +120,10 @@ void MutexKnobData::UpdateMechanism(UpdateType Type)
 void MutexKnobData::InsertSoftPV(QString pv, int num, QWidget *w)
 {
     int indx;
-    char asc[MAXPVLEN+20];
+    //char asc[MAXPVLEN+20];
+    //sprintf(asc, "%s_%p", qasc(pv),  w);
     QMutexLocker locker(&mutex);
-    sprintf(asc, "%s_%p", qasc(pv),  w);
+    QString asc=SoftPV_Name(pv, w);
     if(!getSoftPV(pv, &indx, (QWidget*) w)) {
         softPV_WidgetList.insert(asc, num);
         //qDebug() << "insert softpv_widgetList" << asc;
@@ -125,6 +136,7 @@ void MutexKnobData::InsertSoftPV(QString pv, int num, QWidget *w)
 void  MutexKnobData::BuildSoftPVList(QWidget *w)
 {
     char asc[MAXPVLEN+20];
+    softlist softstruct;
     QMutexLocker locker(&mutex);
     softPV_List.clear();
     // go through all our monitors
@@ -134,7 +146,10 @@ void  MutexKnobData::BuildSoftPVList(QWidget *w)
             // when the main widget corresponds keep it
             if(w == w1) {
                 sprintf(asc, "%s_%d_%p", KnobData[i].pv, KnobData[i].index, w);
-                softPV_List.insert(asc, KnobData[i].index);
+                softstruct.pv = QString(KnobData[i].pv);
+                softstruct.index = KnobData[i].index;
+                softstruct.w = w;
+                softPV_List.insert(asc, softstruct);
                 //qDebug() << "insert softpv_list" << asc << KnobData[i].dispName ;
             }
         }
@@ -144,7 +159,10 @@ void  MutexKnobData::BuildSoftPVList(QWidget *w)
             if(getSoftPV(KnobData[i].pv, &index, (QWidget *) KnobData[i].thisW)) {
                 mutex.unlock();
                 sprintf(asc, "%s_%d_%p", KnobData[i].pv, KnobData[i].index, w);
-                softPV_List.insert(asc, KnobData[i].index);
+                softstruct.pv = QString(KnobData[i].pv);
+                softstruct.index = KnobData[i].index;
+                softstruct.w = w;
+                softPV_List.insert(asc, softstruct);
                 InsertSoftPV(KnobData[i].pv, KnobData[i].index, (QWidget *) KnobData[i].thisW);
                 //qDebug() << "insert untill now unknown pv" << asc << KnobData[i].index;
                 mutex.lock();
@@ -168,16 +186,18 @@ void  MutexKnobData::BuildSoftPVList(QWidget *w)
  */
 void MutexKnobData::RemoveSoftPV(QString pv, QWidget *w, int indx)
 {
-    char asc[MAXPVLEN+20];
+    //char asc[MAXPVLEN+20];
     QMutexLocker locker(&mutex);
     // remove from the softpv list
-    sprintf(asc, "%s_%p", qasc(pv),  w);
+    //sprintf(asc, "%s_%p", qasc(pv),  w);
+    QString asc=SoftPV_Name(pv, w);
     softPV_WidgetList.remove(asc);
 
     // and remove from the global list
+    char asc1[MAXPVLEN+20];
     QWidget *w1 = (QWidget*) KnobData[indx].thisW;
-    sprintf(asc, "%s_%d_%p",  KnobData[indx].pv, KnobData[indx].index,  w1);
-    softPV_List.remove(asc);
+    sprintf(asc1, "%s_%d_%p",  KnobData[indx].pv, KnobData[indx].index,  w1);
+    softPV_List.remove(asc1);
 
 /*
      QMapIterator<QString, int> i(softPV_List);
@@ -195,11 +215,10 @@ void MutexKnobData::RemoveSoftPV(QString pv, QWidget *w, int indx)
  */
 void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w, int dataIndex, int dataCount)
 {
-    char asc[MAXPVLEN+20];
-
     // update the right data
-
-    sprintf(asc, "%s_%p", qasc(pv),  w);
+    //char asc[MAXPVLEN+20];
+    //sprintf(asc, "%s_%p", qasc(pv),  w);
+    QString asc=SoftPV_Name(pv, w);
     QMap<QString, int>::const_iterator name = softPV_WidgetList.find(asc);
     if(name != softPV_WidgetList.end()) {
         knobData *ptr = GetMutexKnobDataPtr(name.value());
@@ -211,7 +230,7 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w, int dataI
 
         // single value
         if(dataCount <= 1) {
-            //qDebug() << "updatesoftpv single" << ptr->index << "for name" << ptr->pv << "with value=" << value << "dataIndex=" << dataIndex << "dataCount=" << dataCount ;
+            //qDebug() << "updateSoftPV --  single" << ptr->index << "for name" << ptr->pv << "with value=" << value << "dataIndex=" << dataIndex << "dataCount=" << dataCount ;
             ptr->edata.rvalue = value;
             ptr->edata.connected = true;
 
@@ -226,21 +245,22 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w, int dataI
             }
             ptr->edata.dataSize = dataCount * (int) sizeof(double);
             ptr->edata.valueCount = dataCount;
-            //qDebug() << "updatesoftpv wave" << dataIndex << value << dataCount;
+            //qDebug() << "updateSoftPV -- pv" << pv << "wave dataindex" << dataIndex << "with value " << value << dataCount;
             double *data = (double *) ptr->edata.dataB;
             data[dataIndex] = value;
         }
     }
 
     // and update everywhere where this soft channel is also used on this main window
-    QMapIterator<QString, int> i(softPV_List);
+    QMapIterator<QString, softlist> i(softPV_List);
+    softlist softstruct;
     while (i.hasNext()) {
         i.next();
-        QStringList list = i.key().split("_");
-        if(pv == list.at(0)) {
-            int indx = i.value();
-            if(KnobData[indx].index != -1 && KnobData[indx].pv == pv && ((QWidget*) list.at(2).toLong(0,16) ==  w)) {
-                //qDebug() <<  "     update index=" << i.value() << i.key() <<  w << "with" << value;
+        softstruct = i.value();
+        if(pv == softstruct.pv) {
+            int indx = softstruct.index;
+            if(KnobData[indx].index != -1 && KnobData[indx].pv == pv && softstruct.w == w) {
+                //qDebug() <<  "     update index=" << softstruct.index << i.key() <<  w << "with" << value;
 
                 // simple double
                 if(dataCount <= 1) {
@@ -276,8 +296,9 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w, int dataI
  */
 bool MutexKnobData::getSoftPV(QString pv, int *indx, QWidget *w)
 {
-    char asc[MAXPVLEN+20];
-    sprintf(asc, "%s_%p", qasc(pv),  w);
+    //char asc[MAXPVLEN+20];
+    //sprintf(asc, "%s_%p", qasc(pv),  w);
+    QString asc=SoftPV_Name(pv, w);
     QMap<QString, int>::const_iterator name = softPV_WidgetList.find(asc);
     if(name != softPV_WidgetList.end()) {
         *indx = name.value();
@@ -345,7 +366,8 @@ int MutexKnobData::GetMutexKnobDataSize()
 void MutexKnobData::SetMutexKnobData(int index, knobData data)
 {
     QMutexLocker locker(&mutex);
-    memcpy(&KnobData[index], &data, sizeof(knobData));
+    if (KnobData&&(index<KnobDataArraySize))
+        memcpy(&KnobData[index], &data, sizeof(knobData));
 }
 
 extern "C" MutexKnobData* C_SetMutexKnobData(MutexKnobData* p, int index, knobData data)
@@ -583,60 +605,68 @@ void MutexKnobData::timerEvent(QTimerEvent *)
         }
 
         // update all graphical items for this soft pv when a value changes
+
         if(kPtr->index != -1 && kPtr->soft && (diff >= (2.0/(double)repRate))) {
+
             int indx;
-            //qDebug() << "I am a soft channel" << kPtr->pv << kPtr->dispName << kPtr->edata.rvalue << kPtr->index;
+
+            //qDebug() << "I am a soft channel" << "pv=" << kPtr->pv << "index" << kPtr->index << "object" << kPtr->dispName << "value" << kPtr->edata.rvalue ;
             // get for this soft pv the index of the corresponding caCalc into the knobData array where the data were updated
             if(getSoftPV(kPtr->pv, &indx, (QWidget*) kPtr->thisW)) {
-                // get value from (updated) QMap variable list
-                knobData *ptr = (knobData*) &KnobData[indx];
-                kPtr->edata.fieldtype = caDOUBLE;
-                kPtr->edata.accessW = true;
-                kPtr->edata.accessR = true;
 
-                // possibly we updated this caCalc by signal
-                if(ptr->edata.valueCount == 0) {
-                    QWidget *w2 = (QWidget *)kPtr->dispW;
-                    if(caCalc *calcWidget = qobject_cast<caCalc *>(w2)) {
-                        if(calcWidget->getCalc().trimmed().size() == 0)
-                            if(calcWidget->getValue() != ptr->edata.rvalue) {
-                                ptr->edata.rvalue = calcWidget->getValue();
-                            }
-                    }
-                }
-
-                // when waveform put first value into the normal value
-                if(ptr->edata.valueCount > 0) {
-                     double *data = (double *) ptr->edata.dataB;
-                     kPtr->edata.rvalue = data[0];
-                     kPtr->edata.monitorCount++;
-                     memcpy(kPtr->edata.dataB,  data, kPtr->edata.valueCount * sizeof(double));
-                } else {
-                   kPtr->edata.rvalue = ptr->edata.rvalue;
-                   if(kPtr->edata.oldsoftvalue != ptr->edata.rvalue) kPtr->edata.monitorCount++;
-                }
-
-                kPtr->edata.connected = true;
-
-                // when any monitors for calculation increase monitorcount (sorry, we are not testing if any change of values)
+                // we do not update when softpv is hidden
+                bool update = false;
+                bool treatit = false;
                 QWidget *w1 =  (QWidget*) kPtr->dispW;
-                QVariant var = w1->property("MonitorList");
-                QVariantList list = var.toList();
-                if(list.size() > 0) {
-                    int nbMonitors = list.at(0).toInt();
-                    if(nbMonitors > 0) {
-                        QWidget *w2 = (QWidget*) kPtr->dispW;
-                        if(!w2->property("hidden").value<bool>()) {
-                           kPtr->edata.monitorCount++;
-                           //qDebug() << "increase associated" << kPtr->pv << kPtr->index << w2->objectName();
+                QString className = w1->metaObject()->className();
+                if(className.contains("caStripPlot") || className.contains("caWaterfallPlot")) treatit = true;
+                else if(w1->property("hidden").value<bool>()) treatit = false;
+                else treatit = true;
+                if(caCalc* calcWidget = qobject_cast<caCalc *>(w1)) {
+                   if(calcWidget->getEventSignal() != caCalc::Never) treatit = true;
+                }
+
+                if(treatit) {
+                    // get value from (updated) QMap variable list
+                    knobData *ptr = (knobData*) &KnobData[indx];
+                    kPtr->edata.fieldtype = caDOUBLE;
+                    kPtr->edata.accessW = true;
+                    kPtr->edata.accessR = true;
+
+                    // when waveform put first value into the normal value
+                    if(ptr->edata.valueCount > 0) {
+                        double *data = (double *) ptr->edata.dataB;
+                        kPtr->edata.rvalue = data[0];
+                        kPtr->edata.monitorCount++;
+                        memcpy(kPtr->edata.dataB,  data, kPtr->edata.valueCount * sizeof(double));
+                    } else {
+                        kPtr->edata.rvalue = ptr->edata.rvalue;
+                        kPtr->edata.ivalue = (int) ptr->edata.rvalue;
+                        if(kPtr->edata.oldsoftvalue != ptr->edata.rvalue) {
+                            update = true;
+                            //qDebug() << "update" << kPtr->pv << kPtr->dispName << "old value" << kPtr->edata.oldsoftvalue << "new value" << ptr->edata.rvalue;
                         }
                     }
-                }
 
-                kPtr->edata.oldsoftvalue = ptr->edata.rvalue;
-                QWidget *ww = (QWidget *)kPtr->dispW;
-                if (caTextEntry *widget = qobject_cast<caTextEntry *>(ww)) {
-                    widget->setAccessW((bool) kPtr->edata.accessW);
+                    kPtr->edata.connected = true;
+
+                    // when no update then when any monitors for calculation increase monitorcount when underlying pv changes or when its calculates on itsself
+                    QWidget *w1 =  (QWidget*) kPtr->dispW;
+                    if((!update) && (ptr->edata.valueCount) == 0) {
+                        QVariant var = w1->property("MonitorList");
+                        QVariantList list = var.toList();
+                        if((list.size() > 0)) {
+                            int nbMonitors = list.at(0).toInt();
+                            if(nbMonitors > 0)  update = true;
+                        }
+                    }
+
+                    if(update) kPtr->edata.monitorCount++;
+                    kPtr->edata.oldsoftvalue = ptr->edata.rvalue;
+                    QWidget *ww = (QWidget *)kPtr->dispW;
+                    if (caTextEntry *widget = qobject_cast<caTextEntry *>(ww)) {
+                        widget->setAccessW((bool) kPtr->edata.accessW);
+                    }
                 }
             }
         }
@@ -732,14 +762,23 @@ extern "C" MutexKnobData* C_SetMutexKnobDataConnected(MutexKnobData* p, int inde
  * update display data
  */
 
+QString getBufferAsHexStr(char* buf, int buffsize) {
+    QString result;
+    for(int i = 0; i < buffsize; ++i)
+        result += "0x" + QString("%1:").arg(buf[i], 2, 16, QChar('0')).toUpper();
+    result.chop(1);
+    return result;
+}
+
+
+
 void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, char *dataString, knobData knb)
 {
-
-
     QString StringUnits = QString::fromLatin1(units);
     if(StringUnits.size() > 0) {
-        // special characters handling
-#ifdef linux
+        // special characters handling (should be done in constructor to save time; however
+        // then we will have somme application using caQtFM_Lib that will crash
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
         static const QChar egrad = 0x00b0;              // º coming from epics
         QString Egrad(egrad);
         static const QChar grad = 0x00b0;   // will be replaced by this utf-8 code
@@ -747,32 +786,44 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
 #else
         static const QChar egrad = 0x00b0;              // º coming from epics
         QString Egrad(egrad);
-        static const QChar grad[2] = { 0x00c2, 0x00b0};   // will be replaced by this utf-8 code
+        //QString Grad=QString::fromLatin1("º");
+        //QString Grad=QString::fromUtf8("\xc2\xb0");
+        static const QChar grad[2] = { 0x00c2, 0x00ba};   // will be replaced by this utf-8 code
         QString Grad(grad, 2);
+
 #endif
 
         static const QChar emu =  0x00b5;               // mu coming from epics
         QString Emu(emu);
-#ifdef linux
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
         static const QChar mu =  0x00b5;
         QString Mu(mu);
         static const QChar uA[2] = { 0x00b5, 0x0041};
+        static const QChar uJ[2] = { 0x00b5, 0x004A};
         QString uAs(uA, 2);
+        QString uJs(uJ, 2);
 #else
         static const QChar mu[2] = { 0x00ce, 0x00bc};
         QString Mu(mu, 2);
         static const QChar uA[3] = { 0x00ce, 0x00bc, 0x0041}; // muA code for replacing ?A coming from epics
+        static const QChar uJ[3] = { 0x00ce, 0x00bc, 0x004A}; // muA code for replacing ?J coming from epics
         QString uAs(uA, 3);
+        QString uJs(uJ, 3);
 #endif
 
         // replace special characters
         StringUnits.replace(Egrad, Grad);
         StringUnits.replace(Emu, Mu);
+        //printf("Units(string): %s(%s)\n",StringUnits.toUtf8().data(),units);
+        //printf("Units(hex): %s\n",getBufferAsHexStr(units,strlen(units)).toLatin1().data());
 
         // seems people did not know how to code mu in EGU
-        StringUnits.replace("?A", uAs);
         StringUnits.replace("muA", uAs);
         StringUnits.replace("uA", uAs);
+        StringUnits.replace("?A", uAs);
+        StringUnits.replace("muJ", uJs);
+        StringUnits.replace("?J", uJs);
+        StringUnits.replace("uJ", uJs);
 
         // neither grad
         static const QChar spec =  0x00c2;

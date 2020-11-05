@@ -55,6 +55,9 @@ void caMessageButton::buttonhandle(int type)
     emit messageButtonSignal(type);
     if(type == 0) setChecked(true);
     else setChecked(false);
+
+    emit pressClicked(getPressMessage().toInt());
+    emit releaseClicked(getReleaseMessage().toInt());
 }
 
 void caMessageButton::setLabel(QString const &label)

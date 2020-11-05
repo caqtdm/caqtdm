@@ -31,10 +31,12 @@
 #define PRINT(x)
 
 #if defined(_MSC_VER) || !defined(__cplusplus)
-#if _MSC_VER !=1800
+#ifndef Q_MOC_RUN
+#if _MSC_VER <1800
  #define boolean int
  #define true 1==1
  #define false !(true)
+#endif
 #endif
 #endif
 
@@ -49,7 +51,7 @@
 typedef char pv_string[MAXPVLEN];  // temporary definition, I should allocate what we need
 typedef char pv_desc[MAXPVDESC];
 
-enum caType {caSTRING	= 0, caINT = 1, caFLOAT = 2, caENUM = 3, caCHAR = 4, caLONG = 5, caDOUBLE = 6};
+enum caType {caSTRING = 0, caINT = 1, caFLOAT = 2, caENUM = 3, caCHAR = 4, caLONG = 5, caDOUBLE = 6};
 
 // not really used, now just inserted as property in the widgets, not used elsewhere
 enum objectType {caCalc_Widget = 0,

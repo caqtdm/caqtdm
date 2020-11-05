@@ -27,7 +27,7 @@ SOURCES         = archiveHIPA_plugin.cpp ../archiverCommon.cpp \
     hipaRetrieval.c
 TARGET          = archiveHIPA_plugin
 
-INCLUDEPATH    += ../../../../../Include
+INCLUDEPATH    += $(CAQTDM_LOGGING_ARCHIVELIBS)
 
 
 QMAKESPEC = $$(QMAKESPEC)
@@ -35,10 +35,10 @@ X64 = $$find(QMAKESPEC, 64)
 
 isEmpty(X64) {
   message( "Building for 32 bit")
-  LIBS += /afs/psi.ch/user/m/mezger/workarea/ACS/mezger/Libs/libNewLogRPC.a
+  LIBS += $(CAQTDM_LOGGING_ARCHIVELIBS)/libNewLogRPC.a
 } else {
   message( "Building for 64 bit")
-  LIBS += /afs/psi.ch/user/m/mezger/workarea/ACS/mezger/Libs/libNewLogRPC_64.a
+  LIBS +=  $(CAQTDM_LOGGING_ARCHIVELIBS)/libNewLogRPC_64.a
 }
 
 

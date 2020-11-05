@@ -39,6 +39,7 @@ EApplyNumeric::EApplyNumeric(QWidget *parent, int i, int d, Qt::Orientation pos)
 	decDig = d;
 	d_applyButtonActive = true;
     d_fontScaleEnabled = true;
+    d_buttonVisible = true;
 	init();
 }
 
@@ -80,8 +81,10 @@ void EApplyNumeric::init()
 
 	if (!data)
 		data = new ENumeric(this, intDig, decDig);
-	if (!button)
+    if (!button) {
         button = new EApplyButton(this);
+        button->setVisible(d_buttonVisible);
+    }
 	box->addWidget(data, 3);
     box->addWidget(button, 1);
 

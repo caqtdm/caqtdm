@@ -27,7 +27,14 @@
 #include "alarmdefs.h"
 
 #include <QPainter>
+#include <qnumeric.h>
 #include <QDebug>
+#if defined(_MSC_VER)
+    #ifndef snprintf
+     #define snprintf _snprintf
+    #endif
+#endif
+
 
 caLineDraw::caLineDraw(QWidget *parent) : QWidget(parent), FontScalingWidget(this), caWidgetInterface()
 {
@@ -65,7 +72,7 @@ caLineDraw::caLineDraw(QWidget *parent) : QWidget(parent), FontScalingWidget(thi
     m_Precision = 0;
     m_FormatType = decimal;
 
-    m_Maximum = 1.0;
+    m_Maximum = 0.0;
     m_Minimum = 0.0;
 
     m_Format[0] = '\0';
@@ -499,38 +506,49 @@ void caLineDraw::setFormat(int prec)
     case sexagesimal_hms:
     case sexagesimal_dms:
         break;
+    case user_defined_format:{
+            strncpy(m_Format,thisFormatUserString.toLatin1().data(),MAX_STRING_LENGTH);
+            break;
+     }
+
     }
 }
 
 void caLineDraw::setValue(double value, const QString& units)
 {
-    char asc[1024];
+    char asc[MAX_STRING_LENGTH];
     if(m_FormatType == compact) {
         if ((value < 1.e4 && value > 1.e-4) || (value > -1.e4 && value < -1.e-4) || value == 0.0) {
-            sprintf(asc, m_FormatC, value);
+            snprintf(asc, MAX_STRING_LENGTH, m_FormatC, value);
         } else {
-            sprintf(asc, m_Format, value);
+            snprintf(asc, MAX_STRING_LENGTH, m_Format, value);
         }
-    } else if(m_FormatType == hexadecimal || m_FormatType == octal)  {
-        if(thisDatatype == caDOUBLE) sprintf(asc, m_Format, (long long) value);
-        else  sprintf(asc, m_Format, (int) value);
+    } else if(m_FormatType == hexadecimal || m_FormatType == octal || m_FormatType == user_defined_format)  {
+        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, m_Format, (long long) value);
+        else  snprintf(asc, MAX_STRING_LENGTH, m_Format, (int) value);
     } else if(m_FormatType == truncated) {
-        if(thisDatatype == caDOUBLE) sprintf(asc, m_Format, (long long) value);
-        else sprintf(asc, m_Format, (int) value);
+        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, m_Format, (long long) value);
+        else snprintf(asc, MAX_STRING_LENGTH, m_Format, (int) value);
     } else if(m_FormatType == enumeric) {
-        if(thisDatatype == caDOUBLE) sprintf(asc, m_Format, (long long) value);
-        else sprintf(asc, m_Format, (int) value);
+        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, m_Format, (long long) value);
+        else snprintf(asc, MAX_STRING_LENGTH, m_Format, (int) value);
     } else if(m_FormatType == utruncated) {
-        if(thisDatatype == caDOUBLE) sprintf(asc, m_Format, (unsigned long long) value);
-        else sprintf(asc, m_Format, (uint) value);
+        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, m_Format, (unsigned long long) value);
+        else snprintf(asc, MAX_STRING_LENGTH, m_Format, (uint) value);
     } else {
-        sprintf(asc, m_Format, value);
+        snprintf(asc,MAX_STRING_LENGTH,  m_Format, value);
     }
+
+    if(qIsNaN(value)){
+      snprintf(asc, MAX_STRING_LENGTH,  "nan");
+    }
+
     if(m_UnitMode) {
         strcat(asc, " ");
         strcat(asc, qasc(units));
     }
     setText(asc);
+    emit textChanged(QString(asc));
 }
 
 // caWidgetInterface implementation

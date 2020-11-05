@@ -121,7 +121,6 @@ public:
     QwtThermoMarker::ScalePosition scalePosition;
     QwtThermoMarker::ScalePos scalePos;
 
-
     int spacing;
     int borderWidth;
     int pipeWidth;
@@ -158,6 +157,8 @@ QwtThermoMarker::QwtThermoMarker( QWidget *parent ): QwtAbstractScale( parent )
     setAttribute( Qt::WA_WState_OwnSizePolicy, false );
     layoutThermo( true );
     thisType = Pipe;
+    thisMarkerSize = 2;
+    thisMarkerLineOption = false;
 
     redrawTimer = new QTimer(this);
     connect(redrawTimer, SIGNAL(timeout()), this, SLOT(redrawTimerExpired()));
@@ -668,13 +669,15 @@ void QwtThermoMarker::redrawTimerExpired()
 */
 void QwtThermoMarker::drawLiquid(QPainter *painter, const QRect &pipeRect ) const
 {
+    QRect markerRect;
     painter->save();
     painter->setClipRect( pipeRect, Qt::IntersectClip );
     painter->setPen( Qt::NoPen );
 
     const QwtScaleMap scaleMap = scaleDraw()->scaleMap();
 
-    QRect liquidRect = fillRect( pipeRect );
+    QRect liquidRect = fillRect( pipeRect, thisMarkerSize);
+    if(thisMarkerLineOption) markerRect = fillRect (pipeRect, 1);
 
     // decaying value
     QRect decayingRect = pipeRect;
@@ -736,6 +739,13 @@ void QwtThermoMarker::drawLiquid(QPainter *painter, const QRect &pipeRect ) cons
         }
 
         painter->fillRect( liquidRect, palette().brush( QPalette::ButtonText ) );
+
+        if(thisType == Marker && thisMarkerLineOption) {
+            QBrush brush = palette().brush( QPalette::ButtonText );
+            QColor color = brush.color();
+            color = color.darker();
+            painter->fillRect(markerRect, color);
+        }
     }
 
     painter->restore();
@@ -1021,7 +1031,7 @@ QSize QwtThermoMarker::minimumSizeHint() const
 
   \sa pipeRect(), alarmRect()
  */
-QRect QwtThermoMarker::fillRect( const QRect &pipeRect ) const
+QRect QwtThermoMarker::fillRect( const QRect &pipeRect, int markerSize) const
 {
     double origin;
     if ( d_data->originMode == OriginMinimum ) {
@@ -1043,8 +1053,8 @@ QRect QwtThermoMarker::fillRect( const QRect &pipeRect ) const
     if ( d_data->orientation == Qt::Horizontal ) {
         if(thisType == Marker) {
             if(lowerBound() < upperBound()) qSwap( from, to );
-            fillRect.setLeft( from + 2 );
-            fillRect.setRight(from - 2 );
+            fillRect.setLeft( from + markerSize );
+            fillRect.setRight(from - markerSize );
         } else if(thisType == PipeFromCenter) {
             const float center = lowerBound() + (upperBound()-lowerBound())/2;
             const int cval = qRound(scaleMap.transform(center));
@@ -1060,8 +1070,8 @@ QRect QwtThermoMarker::fillRect( const QRect &pipeRect ) const
 
         if(thisType == Marker) {
             if(lowerBound() > upperBound()) qSwap( from, to );
-            fillRect.setBottom( from + 2);
-            fillRect.setTop( from - 2);
+            fillRect.setBottom( from + markerSize);
+            fillRect.setTop( from - markerSize);
         } else if(thisType == PipeFromCenter) {
             const float center = lowerBound() + (upperBound()-lowerBound())/2;
             const int cval = qRound(scaleMap.transform(center));

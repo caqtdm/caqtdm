@@ -2,7 +2,7 @@ TARGET_PRODUCT = "Widgets for Display Manager"
 TARGET_FILENAME = "qtcontrols.dll"
 
 include(../caQtDM_Viewer/qtdefs.pri)
-CONFIG += caQtDM_QtControls
+CONFIG += caQtDM_QtControls caQtDM_xdl2ui_Lib
 include(../caQtDM.pri)
 
 DEFINES += QT_NO_DEBUG_OUTPUT
@@ -34,6 +34,13 @@ TEMPLATE = lib
 MOC_DIR = moc
 INCLUDEPATH += src
 INCLUDEPATH += ../caQtDM_Lib/src
+INCLUDEPATH += ../caQtDM_Parsers/adlParserSrc
+INCLUDEPATH += ../caQtDM_Parsers/edlParserSrc
+
+android {
+   INCLUDEPATH += $(ANDROIDFUNCTIONSINCLUDE)
+}
+
 RESOURCES = qtcontrols.qrc
 RC_FILE = ./src/qtcontrols.rc
 
@@ -49,7 +56,7 @@ PRE_TARGETDEPS += \
      moc/moc_cameter.cpp \
      moc/moc_caclock.cpp
 
-contains(QT_VER_MAJ, 5) {
+contains(QWT_VER_MIN, 1) {
   PRE_TARGETDEPS += moc/moc_qwt_thermo_marker_61.cpp
 }
 
@@ -125,6 +132,10 @@ SOURCES	+= \
     src/wmsignalpropagator.cpp \
     src/replacemacro.cpp
 
+ADL_EDL_FILES {
+    SOURCES	+= src/parseotherfile.cpp
+}
+
 XDR_HACK {
     SOURCES += src/xdr_hack.c
     HEADERS += src/xdr_hack.h
@@ -144,26 +155,14 @@ HEADERS += src/networkaccess.h src/fileFunctions.h \
     src/replacemacro.h
 SOURCES += src/networkaccess.cpp src/fileFunctions.cpp
 
-
-contains(QT_VER_MAJ, 4) {
-    contains(QT_VER_MIN, 6) {
-       warning("Qt $$[QT_VERSION] was detected (use qwt6.0.1), so compile qwt_thermo_marker")
-       HEADERS	+= src/qwt_thermo_marker.h
-       SOURCES	+= src/qwt_thermo_marker.cpp
-    }
-    contains(QT_VER_MIN, 8) {
-       warning("Qt $$[QT_VERSION] was detected (use qwt6.1.1), so compile qwt_thermo_marker_61")
-       HEADERS	+= src/qwt_thermo_marker_61.h
-       SOURCES	+= src/qwt_thermo_marker_61.cpp
-    }
+contains(QWT_VER_MIN, 0) {
+   HEADERS	+= src/qwt_thermo_marker.h
+   SOURCES	+= src/qwt_thermo_marker.cpp
 }
-
-contains(QT_VER_MAJ, 5) {
-    warning("Qt $$[QT_VERSION] was detected (use qwt6.1.1 or higher), so compile qwt_thermo_marker_61")
-    HEADERS	+= src/qwt_thermo_marker_61.h
-    SOURCES	+= src/qwt_thermo_marker_61.cpp
+contains(QWT_VER_MIN, 1) {
+   HEADERS	+= src/qwt_thermo_marker_61.h
+   SOURCES	+= src/qwt_thermo_marker_61.cpp
 }
-
 
 HEADERS	+= \
     src/caframe.h \
@@ -243,5 +242,9 @@ HEADERS	+= \
     src/addevent.h \
     src/animationcode.h \
     src/hideobjectcode.h
+
+ADL_EDL_FILES {
+    HEADERS	+= src/parseotherfile.h
+}
 
 OTHER_FILES += README

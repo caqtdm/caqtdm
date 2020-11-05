@@ -47,7 +47,7 @@ public:
     WorkerSF() {
         //qDebug() << "WorkerSF::WorkerSF()";
         qRegisterMetaType<indexes>("indexes");
-        qRegisterMetaType<QVector<float> >("QVector<float>");
+        qRegisterMetaType<QVector<double> >("QVector<double>");
         fromArchive =  (sfRetrieval *)0;
     }
 
@@ -56,7 +56,7 @@ public:
     }
 
 private:
-    QVector<float>  TimerN, YValsN;
+    QVector<double>  TimerN, YValsN;
 
 public slots:
 
@@ -71,8 +71,6 @@ public slots:
     void getFromArchive(QWidget *w, indexes indexNew,  QString index_name, MessageWindow * messageWindow) {
 
         Q_UNUSED(w);
-
-        bool timeAxis = false;
 
         QMutex *mutex = indexNew.mutexP;
         mutex->lock();
@@ -118,14 +116,33 @@ public slots:
         fromArchive = new sfRetrieval();
 
         //qDebug() << "fromArchive pointer=" << fromArchive << indexNew.timeAxis;
+        bool readdata_ok=fromArchive->requestUrl(url, json_str, indexNew.secondsPast, isBinned, indexNew.timeAxis, key);
 
-        if(fromArchive->requestUrl(url, json_str, indexNew.secondsPast, isBinned, indexNew.timeAxis, key)) {
+        if (fromArchive->is_Redirected()){
+          url=QUrl(fromArchive->getRedirected_Url());
+          // Messages in case of a redirect and set the widget to the correct location
+          // with a reload of the panel this information get lost.
+          // the url storage location is the dynamic property of the widget
+          QString mess("ArchiveSF plugin -- redirect: ");
+          mess.append(key);
+          mess.append(" to ");
+          mess.append(url.toString());
+          messageWindow->postMsgEvent(QtDebugMsg, (char*) qasc(mess));
+          indexNew.w->setProperty("archiverIndex",QVariant(url.toString()));
+          //qDebug()<< "archiv PV"<<indexNew.pv;
+          fromArchive->deleteLater();
+          fromArchive = new sfRetrieval();
+          readdata_ok=fromArchive->requestUrl(url, json_str, indexNew.secondsPast, isBinned, indexNew.timeAxis, key);
+        }
+
+        if(readdata_ok) {
             if((nbVal = fromArchive->getCount()) > 0) {
                 //qDebug() << nbVal << total;
                 TimerN.resize(fromArchive->getCount());
                 YValsN.resize(fromArchive->getCount());
                 fromArchive->getData(TimerN, YValsN);
             }
+
         } else {
             if(messageWindow != (MessageWindow *) 0) {
                 QString mess("ArchiveSF plugin -- lastError: ");
@@ -146,10 +163,11 @@ public slots:
         emit resultReady(indexNew, nbVal, TimerN, YValsN, fromArchive->getBackend());
 
         mutex->unlock();
+        fromArchive->deleteLater();
     }
 
 signals:
-    void resultReady(indexes indexNew, int nbVal, QVector<float> TimerN, QVector<float> YValsN, QString backend);
+    void resultReady(indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend);
 
 public:
 
@@ -216,7 +234,7 @@ public:
     int TerminateIO();
 
 public slots:
-    void handleResults(indexes, int, QVector<float>, QVector<float>, QString);
+    void handleResults(indexes, int, QVector<double>, QVector<double>, QString);
 
 signals:
     void operate(QWidget*, const indexes, const QString, MessageWindow *);

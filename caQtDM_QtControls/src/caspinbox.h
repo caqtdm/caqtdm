@@ -58,7 +58,7 @@ Q_OBJECT
 public:
     void noStyle(QString style) {Q_UNUSED(style);}
 
-    enum colMode {Static=0, Default};
+    enum colMode {Static=0, Default, Alarm};
 
      caSpinbox(QWidget *parent);
     ~caSpinbox(){}
@@ -73,6 +73,7 @@ public:
 
     void setColorMode(colMode colormode) {thisColorMode = colormode;
                                           setBackground(thisBackColor);
+                                          renewStyleSheet = true;
                                           setForeground(thisForeColor);
                                           oldColorMode = thisColorMode;
                                            }
@@ -99,8 +100,9 @@ public:
     QColor getBackground() const {return thisBackColor;}
     void setBackground(QColor c);
 
-    void setColors(QColor bg, QColor fg);
+    void setColors(QColor bg, QColor fg, bool init = false);
     void setConnectedColors(bool connected);
+    void setAlarmColors(short status);
 
 public slots:
     void animation(QRect p) {

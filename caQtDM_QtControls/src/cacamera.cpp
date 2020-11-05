@@ -21,6 +21,14 @@
  *    Anton Mezger
  *  Contact details:
  *    anton.mezger@psi.ch
+ *
+ * camera color modes tested with the following hardware:
+ * Basler acA4600-10uc
+ * Basler acA1300-30gc
+ * Prosilica GC1660C
+ *
+ *
+ *
  */
 #define QWT_DLL
 #include <stdint.h>
@@ -33,18 +41,29 @@
 #endif
 #include "cacamera.h"
 
+// Clamp out of range values
+#define CLAMP(t) (((t)>255)?255:(((t)<0)?0:(t)))
+
 //#include "ittnotify.h"
+
+char caTypeStr[7][20] = {"caSTRING", "caINT", "caFLOAT", "caENUM", "caCHAR", "caLONG", "caDOUBLE"};
 
 caCamera::caCamera(QWidget *parent) : QWidget(parent)
 {
     m_init = true;
-
-    m_codeDefined = false;
-    m_bppDefined = false;
     m_widthDefined = false;
     m_heightDefined = false;
+    m_datatype = -1;
+    m_MinLevel = -1;
+    m_MaxLevel = -1;
+    m_zoom_value = 52; //value see widget init
+    m_verticalScroll = -1;
+    m_horizontalScroll = -1;
+
+    rgb = (uint*)Q_NULLPTR;
 
     thisSimpleView = false;
+    thisShowBoxes = false;
     thisFitToSize = No;
     savedSize = 0;
     savedWidth = 0;
@@ -53,24 +72,29 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
 
     thisPV_Xaverage = "";
     thisPV_Yaverage = "";
+    thisPV_Mode = "";
+    thisPV_Packing = "";
 
-    savedData = (char*) 0;
-
-    imageMessage = new QImage(size(), QImage::Format_RGB32);
-
+    savedData = (char*)Q_NULLPTR;
     initWidgets();
 
     Xpos = Ypos = 0;
 
-    scrollArea = (QScrollArea *) 0;
+    scrollArea = (QScrollArea *)Q_NULLPTR;
 
     mainLayout = new QGridLayout(this);
     mainLayout->setMargin(0);
     mainLayout->setSpacing(0);
     setLayout(mainLayout);
+
+    setColormodeStrings();
+    setPackingModeStrings();
     setup();
 
-    setColormap(spectrum_wavelength);
+    setColormode(Mono);
+    setPackmode(packNo);
+
+    setColormap(as_is);
     setCustomMap("");
     setDiscreteCustomMap(false);
 
@@ -90,12 +114,110 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
 
     UpdatesPerSecond = 0;
 
+    thisRedCoefficient = 1.0;
+    thisGreenCoefficient = 1.0;
+    thisBlueCoefficient = 1.0;
+
     startTimer(1000);
 
     // __itt_thread_set_name("My worker thread");
 
     writeTimer = new QTimer(this);
     connect(writeTimer, SIGNAL(timeout()), this, SLOT(updateChannels()));
+}
+
+void caCamera::setColormodeStrings()
+{
+    colorModeString <<  "Mono" << "RGB1_CA" << "RGB2_CA" << "RGB3_CA" << "BayerRG_8" << "BayerGB_8" << "BayerGR_8" << "BayerBG_8" <<
+                        "BayerRG_12" << "BayerGB_12" << "BayerGR_12" << "BayerBG_12" <<
+                        "RGB_8" << "BGR_8" << "RGBA_8" << "BGRA_8" <<
+                        "YUV444" << "YUV422"<< "YUV411" << "YUV421";
+}
+
+void caCamera::setPackingModeStrings()
+{
+    packingModeString <<  "packNo" << "MSB12Bit" <<  "LSB12Bit" << "Reversed";
+}
+
+void caCamera::setDecodemodeStr(QString mode)
+{
+    if(mode.length() == 0) return;
+    //printf("colormodeset with %s\n", qasc(mode));
+    for(int i = 0; i< colorModeString.count(); i++) {
+        if(mode == colorModeString.at(i)) {
+            thisColormode = (colormode) i;
+            if(colormodeCombo != (QComboBox*)Q_NULLPTR) colormodeCombo->setCurrentIndex(thisColormode);
+            m_init = true;
+        }
+    }
+}
+
+bool caCamera::testDecodemodeStr(QString mode)
+{
+    if(mode.length() == 0) return false;
+    //printf("colormodeset with %s\n", qasc(mode));
+    for(int i = 0; i< colorModeString.count(); i++) {
+        if(mode == colorModeString.at(i)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void caCamera::setPackingmodeStr(QString mode)
+{
+    if(mode.length() == 0) return;
+    //printf("Packingmodeset with %s\n", qasc(mode));
+    for(int i = 0; i< packingModeString.count(); i++) {
+        if(mode == packingModeString.at(i)) {
+            thisPackingmode = (packingmode) i;
+            if(packingmodeCombo != (QComboBox*)Q_NULLPTR) packingmodeCombo->setCurrentIndex(thisPackingmode);
+        }
+    }
+}
+
+bool caCamera::testPackingmodeStr(QString mode)
+{
+    if(mode.length() == 0) return false;
+    //printf("Packingmodeset with %s\n", qasc(mode));
+    for(int i = 0; i< packingModeString.count(); i++) {
+        if(mode == packingModeString.at(i)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void caCamera::setDecodemodeNum(int mode)
+{
+    //printf("colormodeset with %d\n", mode);
+    m_init = true;
+    thisColormode = (colormode) mode;
+    if(colormodeCombo != (QComboBox*)Q_NULLPTR) colormodeCombo->setCurrentIndex(thisColormode);
+}
+
+void caCamera::setDecodemodeNum(double mode)
+{
+    //printf("colormodeset with %d\n", (int) mode);
+    int intermed = (int)mode;
+    m_init = true;
+    thisColormode = (colormode) intermed; // direct not allowed on Windows (C2440)
+    if(colormodeCombo != (QComboBox*)Q_NULLPTR) colormodeCombo->setCurrentIndex(thisColormode);
+}
+
+void caCamera::setPackingmodeNum(int mode)
+{
+    //printf("packingmodeset with %d\n", mode);
+    thisPackingmode = (packingmode) mode;
+    if(packingmodeCombo != (QComboBox*)Q_NULLPTR) packingmodeCombo->setCurrentIndex(thisPackingmode);
+}
+
+void caCamera::setPackingmodeNum(double mode)
+{
+    //printf("packingmodeset with %d\n", (int) mode);
+    int intermed = (int)mode;
+    thisPackingmode = (packingmode) intermed;// direct not allowed on Windows (C2440)
+    if(packingmodeCombo != (QComboBox*)Q_NULLPTR) packingmodeCombo->setCurrentIndex(thisPackingmode);
 }
 
 bool caCamera::isPropertyVisible(Properties property)
@@ -110,56 +232,71 @@ void caCamera::setPropertyVisible(Properties property, bool visible)
 
 void caCamera::deleteWidgets()
 {
-    if(image != (QImage *) 0)                    delete image;
+    if(image != (QImage *)Q_NULLPTR)                    delete image;
 
-    if(valuesLayout != (QHBoxLayout *) 0)        delete valuesLayout;
-    if(labelMaxText != (caLabel *) 0)            delete labelMaxText;
-    if(labelMinText != (caLabel *) 0)            delete labelMinText;
-    if(labelMin != (caLineEdit *) 0)             delete labelMin;
-    if(labelMax != (caLineEdit *) 0)             delete labelMax;
-    if(checkAutoText != (caLabel *) 0)           delete checkAutoText;
-    if(autoW != (QCheckBox *) 0)                 delete autoW;
-    if(intensity != (caLabel *) 0)               delete intensity;
-    if(intensityText != (caLabel *) 0)           delete intensityText;
-    if(nbUpdatesText != (caLabel *) 0)           delete nbUpdatesText;
+    if(valuesLayout != (QHBoxLayout *)Q_NULLPTR)        delete valuesLayout;
+    if(colormodeLayout != (QHBoxLayout *)Q_NULLPTR)     delete colormodeLayout;
+    if(labelMaxText != (caLabel *)Q_NULLPTR)            delete labelMaxText;
+    if(labelMinText != (caLabel *)Q_NULLPTR)            delete labelMinText;
+    if(labelMin != (caLineEdit *)Q_NULLPTR)             delete labelMin;
+    if(labelMax != (caLineEdit *)Q_NULLPTR)             delete labelMax;
+    if(labelColormodeText != (caLabel *)Q_NULLPTR)      delete labelColormodeText;
+    if(labelPackingmodeText != (caLabel *)Q_NULLPTR)   delete labelPackingmodeText;
 
-    if(zoomSliderLayout != ( QGridLayout *) 0)   delete zoomSliderLayout;
-    if(zoomSlider != (QSlider *) 0)              delete zoomSlider;
-    if(zoomValue != (caLabel *) 0)               delete zoomValue;
-    if(zoomInIcon != (QToolButton *) 0)          delete zoomInIcon;
-    if(zoomOutIcon != (QToolButton *) 0)         delete zoomOutIcon;
+    if(colormodeCombo != (QComboBox *)Q_NULLPTR)        delete colormodeCombo;
+    if(packingmodeCombo != (QComboBox *)Q_NULLPTR)      delete packingmodeCombo;
 
-    if(imageW != (ImageWidget *) 0)              delete imageW;
-    if(valuesWidget != (QWidget *) 0)            delete valuesWidget;
-    if(scrollArea != (QScrollArea *) 0)          delete scrollArea;
-    if(colormapWidget != (QwtScaleWidget *) 0)   delete colormapWidget;
-    if(zoomWidget != (QWidget *) 0)              delete zoomWidget;
+    if(checkAutoText != (caLabel *)Q_NULLPTR)           delete checkAutoText;
+    if(autoW != (QCheckBox *)Q_NULLPTR)                 delete autoW;
+    if(intensity != (caLabel *)Q_NULLPTR)               delete intensity;
+    if(intensityText != (caLabel *)Q_NULLPTR)           delete intensityText;
+    if(nbUpdatesText != (caLabel *)Q_NULLPTR)           delete nbUpdatesText;
+
+    if(zoomSliderLayout != ( QGridLayout *)Q_NULLPTR)   delete zoomSliderLayout;
+    if(zoomSlider != (QSlider *)Q_NULLPTR)              delete zoomSlider;
+    if(zoomValue != (caLabel *)Q_NULLPTR)               delete zoomValue;
+    if(zoomInIcon != (QToolButton *)Q_NULLPTR)          delete zoomInIcon;
+    if(zoomOutIcon != (QToolButton *)Q_NULLPTR)         delete zoomOutIcon;
+
+    if(imageW != (ImageWidget *)Q_NULLPTR)              delete imageW;
+    if(valuesWidget != (QWidget *)Q_NULLPTR)            delete valuesWidget;
+    if(colormodesWidget != (QWidget *)Q_NULLPTR)        delete colormodesWidget;
+    if(scrollArea != (QScrollArea *)Q_NULLPTR)          delete scrollArea;
+    if(colormapWidget != (QwtScaleWidget *)Q_NULLPTR)   delete colormapWidget;
+    if(zoomWidget != (QWidget *)Q_NULLPTR)              delete zoomWidget;
 }
 
 void caCamera::initWidgets()
 {
-    image = (QImage *) 0;
-    labelMin = (caLineEdit *) 0;
-    labelMax = (caLineEdit *) 0;
-    intensity = (caLabel *) 0;
-    imageW = (ImageWidget *) 0;
-    autoW = (QCheckBox *) 0;
-    labelMaxText = (caLabel *) 0;
-    labelMinText = (caLabel *) 0;
-    intensityText = (caLabel *) 0;
-    checkAutoText = (caLabel *) 0;
-    nbUpdatesText = (caLabel *) 0;
-    scrollArea = (QScrollArea *) 0;
-    valuesWidget = (QWidget *) 0;
-    zoomWidget = (QWidget *) 0;
-    zoomSlider = (QSlider *) 0;
-    zoomValue = (caLabel *) 0;
-    zoomInIcon = (QToolButton *) 0;
-    zoomOutIcon = (QToolButton *) 0;
+    image = (QImage *)Q_NULLPTR;
+    labelMin = (caLineEdit *)Q_NULLPTR;
+    labelMax = (caLineEdit *)Q_NULLPTR;
+    intensity = (caLabel *)Q_NULLPTR;
+    imageW = (ImageWidget *)Q_NULLPTR;
+    autoW = (QCheckBox *)Q_NULLPTR;
+    labelMaxText = (caLabel *)Q_NULLPTR;
+    labelMinText = (caLabel *)Q_NULLPTR;
+    labelColormodeText = (caLabel *)Q_NULLPTR;
+    labelPackingmodeText = (caLabel *)Q_NULLPTR;
+    colormodeCombo = (QComboBox *)Q_NULLPTR;
+    packingmodeCombo = (QComboBox *)Q_NULLPTR;
 
-    valuesLayout = (QHBoxLayout *) 0;
-    zoomSliderLayout = ( QGridLayout *) 0;
-    colormapWidget = (QwtScaleWidget *) 0;
+    intensityText = (caLabel *)Q_NULLPTR;
+    checkAutoText = (caLabel *)Q_NULLPTR;
+    nbUpdatesText = (caLabel *)Q_NULLPTR;
+    scrollArea = (QScrollArea *)Q_NULLPTR;
+    valuesWidget = (QWidget *)Q_NULLPTR;
+    colormodesWidget = (QWidget *)Q_NULLPTR;
+    zoomWidget = (QWidget *)Q_NULLPTR;
+    zoomSlider = (QSlider *)Q_NULLPTR;
+    zoomValue = (caLabel *)Q_NULLPTR;
+    zoomInIcon = (QToolButton *)Q_NULLPTR;
+    zoomOutIcon = (QToolButton *)Q_NULLPTR;
+
+    valuesLayout = (QHBoxLayout *)Q_NULLPTR;
+    colormodeLayout = (QHBoxLayout *)Q_NULLPTR;
+    zoomSliderLayout = ( QGridLayout *)Q_NULLPTR;
+    colormapWidget = (QwtScaleWidget *)Q_NULLPTR;
 }
 
 caCamera::~caCamera()
@@ -170,9 +307,10 @@ caCamera::~caCamera()
 
 void caCamera::timerEvent(QTimerEvent *)
 {
-    QString text= "%1 U/s";
-    text = text.arg(UpdatesPerSecond);
-    if(nbUpdatesText != (caLabel*) 0) nbUpdatesText->setText(text);
+    QString text= "%1 U/s (%2,%3)";
+    if(m_datatype >=0) text = text.arg(UpdatesPerSecond).arg(colorModeString.at(thisColormode)).arg(caTypeStr[m_datatype]);
+    else  text = text.arg(UpdatesPerSecond).arg(colorModeString.at(thisColormode)).arg("");
+    if(nbUpdatesText != (caLabel*)Q_NULLPTR) nbUpdatesText->setText(text);
     UpdatesPerSecond = 0;
 }
 
@@ -208,6 +346,24 @@ void caCamera::updateChannels()
         P2_old = P2;
         emit WriteDetectedValuesSignal(this);
     }
+}
+
+template <typename pureData> int caCamera::zValueImage(pureData *ptr, colormode mode, double xnew, double ynew,
+                                                       double xmax, double ymax, int datasize, bool &validIntensity)
+{
+    int Zvalue = 0;
+    validIntensity = true;
+    if(mode == Mono) {
+        int index = ((int) ynew * savedWidth + (int) xnew);
+        if((xnew >=0) && (ynew >=0) && (xnew < xmax) && (ynew < ymax) && (index < datasize)) {
+            Zvalue = ptr[index];
+        } else {
+            validIntensity = false;
+        }
+    } else {
+        Zvalue = -1;
+    }
+    return Zvalue;
 }
 
 bool caCamera::eventFilter(QObject *obj, QEvent *event)
@@ -285,109 +441,59 @@ bool caCamera::eventFilter(QObject *obj, QEvent *event)
 
     if(buttonPressed) imageW->updateSelectionBox(selectionPoints, selectionInProgress);
 
-    if(buttonPressed && (savedData != (char*) 0)) {
+    if(buttonPressed && (savedData != (char*)Q_NULLPTR)) {
         double Xnew, Ynew, Xmax, Ymax;
-        validIntensity = true;
+        bool validIntensity = true;
+        int Zvalue = 0;
 
         Coordinates(Xpos, Ypos, Xnew, Ynew, Xmax, Ymax);
 
         // find intensity
-        switch (m_code) {
-
-        // monochrome image
-        case 1:{
-
-            switch (m_bpp) {
-
-            case 1:  {  // monochrome 1 bpp  (Damir camera)
-                uchar *ptr = (uchar*)  savedData;
-                int index = ((int) Ynew * savedWidth + (int) Xnew);
-                if((Xnew >=0) && (Ynew >=0)  && (Xnew < Xmax) && (Ynew < Ymax) && (index < savedSize)) {
-                    Zvalue=ptr[index];
-
-                } else {
-                    validIntensity = false;
-                }
-            }
-                break;
-
-            case 2: {   // monochrome 2 bpp  (Damir camera)
-                uchar *ptr = (uchar*)  savedData;
-                int index = ((int) Ynew * savedWidth * 2 + 2 * (int) Xnew);
-                if((Xnew >=0) && (Ynew >=0)  &&  (Xnew < Xmax) && (Ynew < Ymax) && (index < savedSize)) {
-                    if(thisColormap == grey) Zvalue=ptr[index];
-                    else Zvalue=ptr[index] * 256 + ptr[index+1];
-
-                } else {
-                    validIntensity = false;
-                }
-            }
-                break;
-
-            case 3: {   // monochrome 2 bpp, but used only 12 bits  (Helge cameras)
-                QSize resultSize;
-                resultSize.setWidth(savedWidth);
-                resultSize.setHeight(savedHeight);
-                ushort *ptr = (ushort*) savedData;
-                int index = ((int) Ynew * savedWidth + (int) Xnew);
-                if((Xnew >=0) && (Ynew >=0) &&  (Xnew < Xmax) && (Ynew < Ymax) && ((index+resultSize.width())*2 < savedSize))
-                    Zvalue = ptr[index];
-                else
-                    validIntensity = false;
-            }
-                break;
-
-            default:
-                break;
-            } // end switch bpp
-
+        switch (m_datatype) {
+        case caCHAR:
+            Zvalue = zValueImage((uchar*) savedData, thisColormode, Xnew, Ynew, Xmax, Ymax, savedSizeNew, validIntensity);
             break;
-        }
-            // color rgb image
-        case 3:
-
-            // start bpp switch
-            switch (m_bpp) {
-
-            case 3: // 3 bpp, each byte with r,g,b
-            {
-                QSize resultSize;
-                resultSize.setWidth(savedWidth);
-                resultSize.setHeight(savedHeight);
-                uchar *ptr = (uchar*) savedData;
-                int index = ((int) Ynew * savedWidth*3 + 3 * (int) Xnew);
-                if((Xnew >=0) && (Ynew >=0) &&  (Xnew < Xmax) && (Ynew < Ymax) && ((index+2) < savedSize)) {
-                    if(thisColormap != grey)
-                        Zvalue =(int) (2.2 * ( 0.2989 * ptr[index] +  0.5870 * ptr[index+1] + 0.1140 * ptr[index+2]));
-                    else
-                        Zvalue = (int) (0.2989 * ptr[index] +  0.5870 * ptr[index+1] + 0.1140 * ptr[index+2]);
-                } else {
-                    validIntensity = false;
-                }
-            }
-
-                break;
-
-            default:
-                break;
-
-            } // end switch bpp
-
-            break; // end code case 3
-
+        case caINT:
+            Zvalue = zValueImage((ushort*) savedData, thisColormode, Xnew, Ynew, Xmax, Ymax, savedSizeNew/2, validIntensity);
+            break;
+        case caLONG:
+            Zvalue = zValueImage((uint*) savedData, thisColormode, Xnew, Ynew, Xmax, Ymax, savedSizeNew/4, validIntensity);
+            break;
+        case caFLOAT:
+            Zvalue = zValueImage((float*) savedData, thisColormode, Xnew, Ynew, Xmax, Ymax, savedSizeNew/4, validIntensity);
+            break;
+        case caDOUBLE:
+            Zvalue = zValueImage((double*) savedData, thisColormode, Xnew, Ynew, Xmax, Ymax, savedSizeNew/8, validIntensity);
+            break;
         default:
             break;
-        } // end switch code
+        }
 
-        QString strng = "%1, %2, %3";
         if(validIntensity) {
-            strng = strng.arg(int(Xnew)).arg(int(Ynew)).arg(Zvalue);
-            updateIntensity(strng);
+            if(Zvalue >=0) {
+                QString strng = "(%1,%2,%3)";
+                strng = strng.arg(int(Xnew)).arg(int(Ynew)).arg(Zvalue);
+                updateIntensity(strng);
+            } else {
+                QString strng = "(%1,%2)";
+                strng = strng.arg(int(Xnew)).arg(int(Ynew));
+                updateIntensity(strng);
+            }
         } else {
             updateIntensity("invalid");
         }
     }
+
     return false;
+}
+
+void caCamera::colormodeComboSlot(int num)
+{
+    setDecodemodeNum(num);
+}
+
+void caCamera::packingmodeComboSlot(int num) {
+    setPackingmodeNum(num);
 }
 
 void caCamera::setup()
@@ -398,7 +504,6 @@ void caCamera::setup()
     // image inside a scrollarea
     // zoom utilities
 
-    // labels
     if(!thisSimpleView) {
         labelMaxText = new caLabel(this);
         labelMaxText->setText(" Max: ");
@@ -408,21 +513,32 @@ void caCamera::setup()
         checkAutoText->setText(" Auto: ");
         intensityText = new caLabel(this);
         intensityText->setText(" x/y/z: ");
+        labelColormodeText = new caLabel(this);
+        labelColormodeText->setText("Colormode: ");
+        labelPackingmodeText = new caLabel(this);
+        labelPackingmodeText->setText("Packingmode: ");
+        colormodeCombo = new QComboBox(this);
+        packingmodeCombo = new QComboBox(this);
+
+        for(int i=0; i<colorModeString.count(); i++) colormodeCombo->addItem(colorModeString.at(i));
+        for(int i=0; i<packingModeString.count(); i++) packingmodeCombo->addItem(packingModeString.at(i));
+        connect(colormodeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(colormodeComboSlot(int)));
+        connect(packingmodeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(packingmodeComboSlot(int)));
 
         nbUpdatesText = new caLabel(this);
 
-        // texts
         labelMax = new caLineEdit(this);
         labelMin = new caLineEdit(this);
-
         labelMax->newFocusPolicy(Qt::ClickFocus);
         labelMin->newFocusPolicy(Qt::ClickFocus);
 
         intensity = new caLabel(this);
-
         intensity->setAlignment(Qt::AlignVCenter | Qt::AlignLeft );
         labelMaxText->setScaleMode(caLabel::None);
         labelMinText->setScaleMode(caLabel::None);
+        labelColormodeText->setScaleMode(caLabel::None);
+        labelPackingmodeText->setScaleMode(caLabel::None);
+
         checkAutoText->setScaleMode(caLabel::None);
         intensity->setScaleMode(caLabel::None);
         intensityText->setScaleMode(caLabel::None);
@@ -431,12 +547,20 @@ void caCamera::setup()
         font.setPointSize(10);
         labelMaxText->setFont(font);
         labelMinText->setFont(font);
+        labelColormodeText->setFont(font);
+        labelPackingmodeText->setFont(font);
+        colormodeCombo->setFont(font);
+        packingmodeCombo->setFont(font);
+
         checkAutoText->setFont(font);
         intensity->setFont(font);
         intensityText->setFont(font);
         nbUpdatesText->setFont(font);
         labelMaxText->setBackground(QColor(0,0,0,0));
         labelMinText->setBackground(QColor(0,0,0,0));
+        labelColormodeText->setBackground(QColor(0,0,0,0));
+        labelPackingmodeText->setBackground(QColor(0,0,0,0));
+
         checkAutoText->setBackground(QColor(0,0,0,0));
         intensity->setBackground(QColor(0,0,0,0));
         intensityText->setBackground(QColor(0,0,0,0));
@@ -465,6 +589,18 @@ void caCamera::setup()
         valuesWidget->setLayout(valuesLayout);
         valuesWidget->show();
 
+        colormodeLayout = new QHBoxLayout();
+        colormodeLayout->setMargin(0);
+        colormodeLayout->setSpacing(2);
+        colormodeLayout->addWidget(labelColormodeText, Qt::AlignLeft);
+        colormodeLayout->addWidget(colormodeCombo, Qt::AlignLeft);
+        colormodeLayout->addWidget(labelPackingmodeText, Qt::AlignLeft);
+        colormodeLayout->addWidget(packingmodeCombo, Qt::AlignLeft);
+        colormodeLayout->addStretch(2);
+
+        colormodesWidget = new QWidget;
+        colormodesWidget->setLayout(colormodeLayout);
+
         // image inside a scrollarea
         imageW   = new ImageWidget();
         scrollArea = new QScrollArea;
@@ -474,7 +610,6 @@ void caCamera::setup()
 
         connect (scrollArea->verticalScrollBar(), SIGNAL(valueChanged (int)), this, SLOT(scrollAreaMoved(int)));
         connect (scrollArea->horizontalScrollBar(), SIGNAL(valueChanged (int)), this, SLOT(scrollAreaMoved(int)));
-
 
         // add some zoom utilities to our widget
         int iconsize = style()->pixelMetric(QStyle::PM_ToolBarIconSize);
@@ -500,6 +635,7 @@ void caCamera::setup()
         colormapWidget = new QwtScaleWidget();
         colormapWidget->setColorBarEnabled(true);
         colormapWidget->setHidden(true);
+
 #if QWT_VERSION >= 0x060100
         QwtScaleDiv *div = new QwtScaleDiv(0.0, 1.0);
         colormapWidget->setScaleDiv(*div);
@@ -520,12 +656,17 @@ void caCamera::setup()
         // connect buttons and slider
         connect(zoomInIcon, SIGNAL(clicked()), this, SLOT(zoomIn()));
         connect(zoomOutIcon, SIGNAL(clicked()), this, SLOT(zoomOut()));
-        connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomNow()));
+        //connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomNow()));
+        connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(setZoomSlider(int)));
+
 
         // add everything to main layout
         mainLayout->addWidget(valuesWidget, 0, 0);
         mainLayout->addWidget(scrollArea, 1, 0);
         mainLayout->addWidget(zoomWidget, 1, 2);
+        mainLayout->addWidget(colormodesWidget, 2, 0);
+        if(thisShowBoxes) colormodesWidget->show();
+        else colormodesWidget->hide();
 
         for(int i=0; i<4; i++) readvaluesPresent[i] = false;
 
@@ -541,32 +682,89 @@ void caCamera::setup()
 
 void caCamera::scrollAreaMoved(int)
 {
-    if(image != (QImage *) 0)  imageW->update();
+    if(image != (QImage *)Q_NULLPTR)  imageW->update();
+}
+
+
+void caCamera::setAutoLevel(bool enable){
+
+    if (thisInitialAutomatic!=enable){
+        thisInitialAutomatic=enable;
+        if(autoW != (QCheckBox *) Q_NULLPTR ) {
+            if(enable) {autoW->setCheckState(Qt::Checked);}
+            else {autoW->setCheckState(Qt::Unchecked);}
+        }
+    }
+}
+
+
+
+void caCamera::setZoomSlider(int zoom){
+   if (zoom!=m_zoom_value){
+    m_zoom_value=zoom;
+    printf("setZoomSlider(int zoom)");
+    fflush(stdout);
+    if(zoomSlider != (QSlider *) Q_NULLPTR ) {
+        if (zoomSlider->value()!=m_zoom_value) {
+            zoomSlider->setValue(zoom);}
+    }
+    zoomNow();
+   }
+}
+
+void caCamera::setverticalScrollBar(int pos){
+
+    if (m_verticalScroll!=pos){
+        m_verticalScroll = pos;
+        if(scrollArea != (QScrollArea *) Q_NULLPTR ){
+            scrollArea->verticalScrollBar()->setValue(pos);
+        }
+    }
+}
+
+void caCamera::sethorizontalScrollBar(int pos){
+    if (m_horizontalScroll!=pos){
+        m_horizontalScroll = pos;
+        if(scrollArea != (QScrollArea *) Q_NULLPTR ){
+            scrollArea->horizontalScrollBar()->setValue(pos);
+        }
+    }
 }
 
 void caCamera::zoomNow()
 {
-    double scale = qPow(2.0, ((double) zoomSlider->value() - 52.0) / 13.0);
+    if(zoomSlider != (QSlider *) Q_NULLPTR ) {
+     m_zoom_value=zoomSlider->value();
+    }
+
+
+    double scale = qPow(2.0, ((double) m_zoom_value - 52.0) / 13.0);
     if(scale > 32) scale = 32;
-    zoomValue->setText(QString::number(scale, 'f', 3));
+    if(zoomValue != (QLabel *) Q_NULLPTR ) {
+        zoomValue->setText(QString::number(scale, 'f', 3));
+    }
     scaleFactor = scale;
     setFitToSize(No);
 
     // keep centered on last pick
     int posX =  P3.x() * scaleFactor;
     int posY =  P3.y() * scaleFactor;
-    scrollArea->horizontalScrollBar()->setValue(posX - scrollArea->horizontalScrollBar()->pageStep()/2);
-    scrollArea->verticalScrollBar()->setValue(posY - scrollArea->verticalScrollBar()->pageStep()/2);
+    if(scrollArea != (QScrollArea *) Q_NULLPTR ){
+        scrollArea->horizontalScrollBar()->setValue(posX - scrollArea->horizontalScrollBar()->pageStep()/2);
+        scrollArea->verticalScrollBar()->setValue(posY - scrollArea->verticalScrollBar()->pageStep()/2);
+    }
 }
 
 void caCamera::zoomIn(int level)
 {
-    zoomSlider->setValue(zoomSlider->value() + level);
+    m_zoom_value=zoomSlider->value() + level;
+    zoomSlider->setValue(m_zoom_value);
 }
 
 void caCamera::zoomOut(int level)
 {
-    zoomSlider->setValue(zoomSlider->value() - level);
+    m_zoom_value=zoomSlider->value() - level;
+    zoomSlider->setValue(m_zoom_value);
 }
 
 void caCamera::setFitToSize(zoom const &z)
@@ -592,14 +790,14 @@ void caCamera::setFitToSize(zoom const &z)
 bool caCamera::getInitialAutomatic()
 {
     if(thisSimpleView) return thisInitialAutomatic;
-    if(autoW == (QCheckBox *) 0) return false;
+    if(autoW == (QCheckBox *) Q_NULLPTR) return false;
     return autoW->isChecked();
 }
 
 void caCamera::setInitialAutomatic(bool automatic)
 {
     if(thisSimpleView) thisInitialAutomatic = automatic;
-    if(autoW == (QCheckBox *) 0) return;
+    if(autoW == (QCheckBox *) Q_NULLPTR) return;
     autoW->setChecked(automatic);
 }
 
@@ -648,22 +846,22 @@ void caCamera::setColormap(colormap const &map)
 
     switch (map) {
 
-    case grey:
+    case color_to_mono:
         colormaps.getColormap(colorMaps::grey, false, thisCustomMap, ColormapSize, ColorMap, colormapWidget);
         break;
-    case spectrum_wavelength:
+    case mono_to_wavelength:
         colormaps.getColormap(colorMaps::spectrum_wavelength, false, thisCustomMap, ColormapSize, ColorMap, colormapWidget);
         break;
-    case spectrum_hot:
+    case mono_to_hot:
         colormaps.getColormap(colorMaps::spectrum_hot, false, thisCustomMap, ColormapSize, ColorMap, colormapWidget);
         break;
-    case spectrum_heat:
+    case mono_to_heat:
         colormaps.getColormap(colorMaps::spectrum_heat, false, thisCustomMap, ColormapSize, ColorMap, colormapWidget);
         break;
-    case spectrum_jet:
+    case mono_to_jet:
         colormaps.getColormap(colorMaps::spectrum_jet, false, thisCustomMap, ColormapSize, ColorMap, colormapWidget);
         break;
-    case spectrum_custom:
+    case mono_to_custom:
         setPropertyVisible(customcolormap, true);
         setPropertyVisible(discretecolormap, true);
         // user has the possibility to input its own colormap with discrete QtColors from 2 t0 18
@@ -679,26 +877,15 @@ void caCamera::setColormap(colormap const &map)
         break;
     }
     // force resize
-    if(zoomWidget != (QWidget*) 0) zoomWidget->adjustSize();
+    if(zoomWidget != (QWidget*) Q_NULLPTR) zoomWidget->adjustSize();
     QResizeEvent *re = new QResizeEvent(size(), size());
     resizeEvent(re);
 }
 
-void caCamera::setCode(int code)
-{
-    m_code = code;
-    m_codeDefined = true;
-}
-void caCamera::setBPP(int bpp)
-{
-    m_bpp = bpp;
-    m_bppDefined = true;
-}
 void caCamera::setWidth(int width)
 {
     m_width = width;
     m_widthDefined = true;
-
 }
 void caCamera::setHeight(int height)
 {
@@ -706,19 +893,15 @@ void caCamera::setHeight(int height)
     m_heightDefined = true;
 }
 
-
 void caCamera::resizeEvent(QResizeEvent *e)
 {
-    if(imageMessage != (QImage *)0) delete imageMessage;
-    imageMessage =  new QImage(size(), QImage::Format_RGB32);
-
     if(thisSimpleView) return;
 
     if(m_widthDefined && m_heightDefined) {
         if(!thisFitToSize) {
             imageW->setMinimumSize((int) (m_width * scaleFactor), (int) (m_height * scaleFactor));
 
-        } else if((zoomWidget != (QWidget*) 0) && (valuesWidget != (QWidget*) 0)) {
+        } else if((zoomWidget != (QWidget*) Q_NULLPTR) && (valuesWidget != (QWidget*) Q_NULLPTR)) {
             double Xcorr = (double) (e->size().width() - zoomWidget->width()-4) / (double) savedWidth;
             double Ycorr = (double) (e->size().height()- valuesWidget->height()-4) / (double) savedHeight;
             double scale = qMin(Xcorr, Ycorr); // aspect ratio
@@ -737,7 +920,7 @@ void caCamera::resizeEvent(QResizeEvent *e)
             P3 = QPointF(Xnew, Ynew);
         }
     }
-    if(image != (QImage *) 0)  imageW->rescaleSelectionBox(scaleFactor);
+    if(image != (QImage *) Q_NULLPTR)  imageW->rescaleSelectionBox(scaleFactor);
 }
 
 void caCamera::updateImage(const QImage &image, bool valuesPresent[], double values[], double scaleFactor,
@@ -758,25 +941,25 @@ bool caCamera::getAutomateChecked()
     if(thisSimpleView) {
         return thisInitialAutomatic;
     }
-    if(autoW == (QCheckBox *) 0) return false;
+    if(autoW == (QCheckBox *) Q_NULLPTR) return false;
     return autoW->isChecked();
 }
 
 void caCamera::updateMax(int max)
 {
-    if(labelMax == (caLineEdit*) 0) return;
+    if(labelMax == (caLineEdit*) Q_NULLPTR) return;
     labelMax->setText(QString::number(max));
 }
 
 void caCamera::updateMin(int min)
 {
-    if(labelMin == (caLineEdit*) 0) return;
+    if(labelMin == (caLineEdit*) Q_NULLPTR) return;
     labelMin->setText(QString::number(min));
 }
 
 void caCamera::updateIntensity(QString strng)
 {
-    if(intensity == (caLabel*) 0) return;
+    if(intensity == (caLabel*) Q_NULLPTR) return;
     intensity->setText(strng);
 }
 
@@ -784,14 +967,14 @@ int caCamera::getMin()
 {
     bool ok;
     if(thisSimpleView) return  thisMinLevel.toInt(&ok);
-    if(labelMin == (caLineEdit*) 0) return 0;
+    if(labelMin == (caLineEdit*) Q_NULLPTR) return 0;
     return labelMin->text().toInt();
 }
 int caCamera::getMax()
 {
     bool ok;
     if(thisSimpleView) return  thisMaxLevel.toInt(&ok);
-    if(labelMax == (caLineEdit*) 0) return 65535;
+    if(labelMax == (caLineEdit*) Q_NULLPTR) return 65535;
     return labelMax->text().toInt();
 }
 
@@ -813,7 +996,7 @@ void caCamera::MinMaxLock(SyncMinMax* MinMax, uint Max[2], uint Min[2])
 void caCamera::MinMaxImageLock(QVector<uint> LineData, int y, QSize resultSize, SyncMinMax* MinMax)
 {
     MinMax->imageLock->lock();
-    if(image != (QImage *) 0) {
+    if(image != (QImage *) Q_NULLPTR) {
         if (image->height()>y){
             uint *scanLine = reinterpret_cast<uint *>(image->scanLine(y));
             if (scanLine){
@@ -821,13 +1004,13 @@ void caCamera::MinMaxImageLock(QVector<uint> LineData, int y, QSize resultSize, 
             }
         }
     }
-	MinMax->imageLock->unlock();
+    MinMax->imageLock->unlock();
 }
 
 void caCamera::MinMaxImageLockBlock(uint *LineData, int ystart, int yend, QSize resultSize, SyncMinMax* MinMax)
 {
     MinMax->imageLock->lock();
-    if(image != (QImage *) 0) {
+    if(image != (QImage *) Q_NULLPTR) {
         for(int i=ystart; i<yend; ++i) {
             if (i<image->height()){
                 uint *scanLine = reinterpret_cast<uint *>(image->scanLine(i));
@@ -840,281 +1023,697 @@ void caCamera::MinMaxImageLockBlock(uint *LineData, int ystart, int yend, QSize 
     MinMax->imageLock->unlock();
 }
 
-void caCamera::InitLoopdata(int &ystart, int &yend, long &i, QVector<uint> &LineData, int increment, int sector, int sectorcount, QSize resultSize, uint Max[2], uint Min[2])
-{
-    LineData.resize(resultSize.width());
-
-    Max[1] = 0;
-    Min[1] = 65535;
-
-    ystart = sector * resultSize.height() / sectorcount;
-    yend = ((sector + 1) * resultSize.height()) / sectorcount; //     sector * resultSize.height() / sectorcount + resultSize.height() / sectorcount;
-    i = resultSize.width() * ystart * increment;
-}
-
-void caCamera::InitLoopdataNew(int &ystart, int &yend, long &i, int increment, int sector, int sectorcount, QSize resultSize, uint Max[2], uint Min[2])
+void caCamera::InitLoopdata(int &ystart, int &yend, long &i, int increment, int sector, int sectorcount, QSize resultSize, uint Max[2], uint Min[2])
 {
     Max[1] = 0;
     Min[1] = 65535;
 
     ystart = sector * resultSize.height() / sectorcount;
-    yend = ((sector + 1) * resultSize.height()) / sectorcount; //     sector * resultSize.height() / sectorcount + resultSize.height() / sectorcount;
+    yend = ((sector + 1) * resultSize.height()) / sectorcount;
+    // start of block to treat
     i = resultSize.width() * ystart * increment;
 }
 
-// monochrome 1 bpp  (Damir camera)
-void caCamera::CameraDataConvert_8bit(int sector, int sectorcount, SyncMinMax* MinMax, QSize resultSize, int datasize)
+// I leave the code now as it was, while here we use uint and in calcimage QVector<uint>. I can merge later on.
+template <typename pureData>
+void caCamera::calcImageMono (pureData *ptr,  uint *LineData, long &i, int &ystart, int &yend, float correction, int datasize, QSize resultSize,
+                              uint Max[2], uint Min[2])
 {
-    uint indx, indx1;
-    uint Max[2], Min[2];
-    int ystart, yend;
-    long i;
-    QVector<uint> LineData;
-
-    uchar *ptr = (uchar*) savedData;
-
-    InitLoopdata(ystart, yend, i, LineData, 1, sector, sectorcount, resultSize, Max, Min);
-
-    if(i >= datasize) return;
-
-    if(thisColormap != grey) {
-
-        for (int y = ystart; y < yend; ++y) {
-            for (int x = 0; x < resultSize.width(); ++x) {
-                indx = ptr[i]; i+=m_bpp;
-                indx1 = (indx - minvalue) * (ColormapSize-1) / (maxvalue - minvalue);
-                if(indx1 >= ColormapSize) indx1=ColormapSize -1;
-
-                //LineData.replace(x, ColorMap[indx1]);
-                LineData[x] =  ColorMap[indx1];
-                Max[(indx > Max[1])] = indx;
-                Min[(indx < Min[1])] = indx;
-
-                if(i >= datasize) break;
-            }
-            if(i >= datasize) break;
-
-            MinMaxImageLock(LineData, y, resultSize, MinMax);
-        }
-
-    } else {
-        for (int y = ystart; y < yend; ++y) {
-            for (int x = 0; x < resultSize.width(); ++x) {
-                indx = ptr[i]; i+=m_bpp;
-                Max[(indx > Max[1])] = indx;
-                Min[(indx < Min[1])] = indx;
-
-                indx1=indx * 255 /(maxvalue - minvalue);
-                if(indx1 > 255) indx1 = 255;
-
-                //LineData.replace(x,qRgb(indx1,indx1,indx1));
-                LineData[x] =  qRgb(indx1,indx1,indx1);
-                if(i >= datasize) break;
-            }
-            if(i >= datasize) break;
-
-            MinMaxImageLock(LineData, y, resultSize, MinMax);
-        }
-    }
-
-    MinMaxLock(MinMax, Max, Min);
-}
-
-// monochrome 2 bpp, but used only 12 bits  (Helge cameras)
-void caCamera::CameraDataConvert_16bit(int sector, int sectorcount, SyncMinMax* MinMax, QSize resultSize, int datasize)
-{
-    uint indx1;
-    uint Max[2], Min[2];
-    int ystart, yend;
-    long i;
-    uint *LineData;
-
-    ushort *ptr = (ushort*) savedData;
-
-    InitLoopdataNew(ystart, yend, i, 1, sector, sectorcount, resultSize, Max, Min);
-
-    if(i*sizeof(ushort) >= datasize) return;
-
-    // allocate the whole block
-    LineData = (uint *) malloc(resultSize.width() * sizeof(uint) * (yend-ystart));
-
-    // instead of testing in the big loop, subtract a line when sizes do not fit
-    bool notOK = true;
-    while (notOK) {
-        long SizeToTreat = (yend-ystart)*resultSize.width()*2;
-        if(SizeToTreat > datasize) {
-            yend -= 1;
-            if(yend < ystart) {
-                printf("something really wrong between datasize and image width and height\n");
-                free (LineData);
-                return;
-            }
-            printf("datasize=%d ystart=%d yend=%d width=%d\n", datasize, ystart, yend, resultSize.width());
-        } else {
-            notOK = false;
-        }
-    }
-
-    if(thisColormap != grey) {
-        float correctColor1 =  (float)(ColormapSize-1) / (float) (maxvalue - minvalue);
-        if(i*sizeof(ushort) < datasize){
+    if(i > datasize) return;
+    if(thisColormap == as_is || thisColormap == color_to_mono) {
+        if(i < datasize) {
             for(int k=0; k<(yend-ystart)*resultSize.width(); ++k) {
                 Max[(ptr[i] > Max[1])] = ptr[i];
                 Min[(ptr[i] < Min[1])] = ptr[i];
 
-                indx1 = (ptr[i] - minvalue) * correctColor1;
-                if(indx1 >= ColormapSize) indx1=ColormapSize -1;
-
-                LineData[k] =  ColorMap[indx1];
-                ++i;
-                if(i*sizeof(ushort) >= datasize) break;
-            }
-        }
-    } else {
-        float correctColor2 =  (float) 255 / (float) (maxvalue - minvalue);
-        if(i*sizeof(ushort) < datasize){
-            for(int k=0; k<(yend-ystart)*resultSize.width(); ++k) {
-                Max[(ptr[i] > Max[1])] = ptr[i];
-                Min[(ptr[i] < Min[1])] = ptr[i];
-
-                indx1 = ptr[i] * correctColor2;
+                int indx1 = ptr[i] * correction;
                 if(indx1 > 255) indx1 = 255;
 
                 LineData[k] =  qRgb(indx1,indx1,indx1);
                 ++i;
-                if(i*sizeof(ushort) >= datasize) break;
+                if(i >= datasize) break;
             }
         }
-    }
+        // use colormap
+    } else {
+        if(i < datasize) {
+            for(int k=0; k<(yend-ystart)*resultSize.width(); ++k) {
+                Max[(ptr[i] > Max[1])] = ptr[i];
+                Min[(ptr[i] < Min[1])] = ptr[i];
 
-    MinMaxImageLockBlock(LineData, ystart, yend, resultSize, MinMax);
-    MinMaxLock(MinMax, Max, Min);
-    free(LineData);
-}
-
-// monochrome 2 bpp, but used only first byte  (Damir cameras)
-void caCamera::CameraDataConvert_16bitD(int sector, int sectorcount, SyncMinMax* MinMax, QSize resultSize, int datasize)
-{
-    uint indx, indx1;
-    uint Max[2], Min[2];
-    int ystart, yend;
-    long i;
-    QVector<uint> LineData;
-
-    uchar *ptr = (uchar*) savedData;
-
-    InitLoopdata(ystart, yend, i, LineData, m_bpp, sector, sectorcount, resultSize, Max, Min);
-
-    if(i >= datasize) return;
-
-    if(thisColormap != grey) {
-
-        for (int y = ystart; y < yend; ++y) {
-            for (int x = 0; x < resultSize.width(); ++x) {
-
-                indx = ptr[i]*256 + ptr[i+1]; i+=m_bpp;
-                indx1 = (indx - minvalue) * (ColormapSize-1) / (maxvalue - minvalue);
+                int indx1 = (ptr[i] - minvalue) * correction;
+                if(indx1 < 0) indx1 = 0;
                 if(indx1 >= ColormapSize) indx1=ColormapSize -1;
 
-                //LineData.replace(x, ColorMap[indx1]);
-                LineData[x] =  ColorMap[indx1];
-                Max[(indx > Max[1])] = indx;
-                Min[(indx < Min[1])] = indx;
+                LineData[k] =  ColorMap[indx1];
+                ++i;
                 if(i >= datasize) break;
             }
-            if(i >= datasize) break;
+        }
+    }
+}
 
+template <typename pureData> void caCamera::calcImage (pureData *ptr,  colormode mode,  QVector<uint> &LineData, long &i, int &ystart, int &yend,
+                                                       float correction, int datasize, QSize resultSize, SyncMinMax *MinMax, uint Max[2], uint Min[2])
+{
+    int offset1 = 1;            // pixel
+    int offset2 = 2;
+    int offset3 = 0;
+    int  dataAdvance;
+
+    if(mode == RGB3_CA) {          // blop red, blob green, blob blue
+        offset1 = savedHeight * savedWidth;
+        offset2 = 2 * offset1;
+        dataAdvance = 1;
+    } else if(mode == RGB2_CA) {   // row red, row green row blue
+        offset1 = savedWidth;
+        offset2 = 2 * offset1;
+        offset3 = savedWidth * 2;
+        dataAdvance = 1;
+    } else {                   // elements red, green, blue
+        dataAdvance = 3;
+    }
+
+    if((i + offset2 + offset3) > datasize) return;
+
+    // normal rgb display
+    float redcoeff = correction * thisRedCoefficient;
+    float greencoeff = correction * thisGreenCoefficient;
+    float bluecoeff = correction * thisBlueCoefficient;
+
+    //printf("width=%d height=%d datasize=%d\n", resultSize.width(), yend, datasize);
+
+    if(thisColormap == as_is || thisColormap > color_to_mono) {
+        for (int y = ystart; y < yend; ++y) {
+            for (int x = 0; x < resultSize.width(); ++x) {
+                uint intensity = qMax(qMax(ptr[i], ptr[i+offset1]), ptr[i+offset2]);
+                LineData[x] =  qRgb((int) (ptr[i] * redcoeff), (int) (ptr[i+offset1] * greencoeff), (int) (ptr[i+offset2] * bluecoeff));
+                i += dataAdvance;
+                Max[(intensity > Max[1])] = intensity;
+                Min[(intensity < Min[1])] = intensity;
+                if ((i + offset2 + offset3) >= datasize) break;
+            }
+            i += offset3;
+            if((i + offset2 + offset3) >= datasize) break;
             MinMaxImageLock(LineData, y, resultSize, MinMax);
         }
-
+        // convert to mono
     } else {
         for (int y = ystart; y < yend; ++y) {
             for (int x = 0; x < resultSize.width(); ++x) {
-                indx = ptr[i]; i+=m_bpp;
-                Max[(indx > Max[1])] = indx;
-                Min[(indx < Min[1])] = indx;
-
-                //LineData.replace(x,qRgb(indx,indx,indx));
-                LineData[x] = qRgb(indx,indx,indx);
-                if(i >= datasize) break;
+                uint intensity = qMax(qMax(ptr[i], ptr[i+offset1]), ptr[i+offset2] );
+                int average =(int) 2.2 * (0.2989 * ptr[i] * correction + 0.5870 * ptr[i+offset1] * correction + 0.1140 * ptr[i+offset2] * correction);
+                LineData[x] =  qRgb(average, average, average);
+                i += dataAdvance;
+                Max[(intensity > Max[1])] = intensity;
+                Min[(intensity < Min[1])] = intensity;
+                if((i + offset2 + offset3) >= datasize) break;
             }
-            if(i >= datasize) break;
-
+            i += offset3;
+            if ((i + offset2 + offset3) >= datasize) break;
             MinMaxImageLock(LineData, y, resultSize, MinMax);
         }
     }
-
-    MinMaxLock(MinMax, Max, Min);
 }
 
-// color rgb image, one byte per color
-void caCamera::CameraDataConvert_24bit(int sector, int sectorcount, SyncMinMax* MinMax, QSize resultSize, int datasize)
+void caCamera::CameraDataConvert(int sector, int sectorcount, SyncMinMax* MinMax, QSize resultSize, int datasize)
 {
     uint Max[2], Min[2];
     int ystart, yend;
     long i;
-    QVector<uint> LineData;
 
-    uchar *ptr = (uchar*) savedData;
+    int elementSize = 1;
+    float correction = 1.0;
 
-    InitLoopdata(ystart, yend, i, LineData, 3, sector, sectorcount, resultSize, Max, Min);
+    if(m_datatype == caINT) elementSize = 2;
+    else if(m_datatype == caLONG || m_datatype == caFLOAT) elementSize = 4;
+    else if(m_datatype == caDOUBLE) elementSize = 8;
 
-    if(i >= datasize) return;
+    if(thisColormode == Mono) {
 
-    if(thisColormap != grey) {
-        uint intensity;
+        uint *LineData;
+        int elementAdvance = 1;
+        InitLoopdata(ystart, yend, i, elementAdvance, sector, sectorcount, resultSize, Max, Min);
+        LineData = (uint *) malloc(resultSize.width() * sizeof(uint) * (yend-ystart));
 
-        for (int y = ystart; y < yend; ++y) {
-            for (int x = 0; x < resultSize.width(); ++x) {
-                intensity = (int) (2.2 * (0.2989 * ptr[i] +  0.5870 * ptr[i+1] + 0.1140 * ptr[i+2]));
-                //LineData.replace(x, qRgb(ptr[i], ptr[i+1], ptr[i+2]));
-                LineData[x] =  qRgb(ptr[i], ptr[i+1], ptr[i+2]);
-                i+=3;
-                Max[(intensity > Max[1])] = intensity;
-                Min[(intensity < Min[1])] = intensity;
-                if ((i + 2) >= datasize) break;
+        // instead of testing in the big loop, subtract 10 lines when sizes do not fit
+        bool notOK = true;
+        bool writeIt = true;
+        while (notOK) {
+            long SizeToTreat = (yend-ystart) * resultSize.width() * elementSize;
+            if(SizeToTreat > datasize) {
+                yend -= 10;
+                if(yend < ystart) {
+                    printf("caCamera -- something really wrong between datasize and image width and height\n");
+                    free (LineData);
+                    return;
+                }
+                if(writeIt) {
+                    printf("caCamera -- something wrong between datasize=%d and image width=%d and height=%d, trying to match\n", datasize, resultSize.width(), resultSize.height());
+                    writeIt = false;
+                    fflush(stdout);
+                }
+            } else {
+                notOK = false;
             }
-            if((i + 2) >= datasize) break;
-
-            MinMaxImageLock(LineData, y, resultSize, MinMax);
         }
-    } else {
-        uint average;
 
-        for (int y = ystart; y < yend; ++y) {
-            for (int x = 0; x < resultSize.width(); ++x) {
-                average =(int) (0.2989 * ptr[i] + 0.5870 * ptr[i+1] +  + 0.1140 * ptr[i+2]);
-                //LineData.replace(x, qRgb(average, average, average));
-                LineData[x] =  qRgb(average, average, average);
-                i+=3;
-                Max[(average > Max[1])] = average;
-                Min[(average < Min[1])] = average;
-                if((i + 2) >= datasize) break;
+        if(thisColormap == as_is || thisColormap == color_to_mono) {
+            correction =  (float) 255 / (float) (maxvalue - minvalue);
+        } else {
+            correction =  (float)(ColormapSize-1) / (float) (maxvalue - minvalue);
+        }
+
+        switch (m_datatype) {
+        case caCHAR:
+            if((ulong) i*sizeof(uchar) >= (uint) datasize) return;
+            calcImageMono ((uchar*) savedData, LineData, i, ystart, yend, correction, datasize, resultSize, Max, Min);
+            break;
+        case caINT:
+            if((ulong) i*sizeof(ushort) >= (uint) datasize) return;
+            calcImageMono ((ushort*) savedData, LineData, i, ystart, yend, correction, datasize/elementSize, resultSize, Max, Min);
+            break;
+        case caLONG:
+            if((ulong) i*sizeof(uint) >= (uint) datasize) return;
+            calcImageMono ((uint*) savedData, LineData, i, ystart, yend, correction, datasize/elementSize, resultSize, Max, Min);
+            break;
+        case caFLOAT:
+            if((ulong) i*sizeof(float) >= (uint) datasize) return;
+            calcImageMono ((float*) savedData,  LineData, i, ystart, yend, correction, datasize/elementSize, resultSize, Max, Min);
+            break;
+        case caDOUBLE:
+            if((ulong) i*sizeof(double) >= (uint) datasize) return;
+            calcImageMono ((double*) savedData, LineData, i, ystart, yend, correction, datasize/elementSize, resultSize, Max, Min);
+            break;
+        default:
+            printf("caCamera -- data format not supported\n");
+        }
+
+        MinMaxImageLockBlock(LineData, ystart, yend, resultSize, MinMax);
+        MinMaxLock(MinMax, Max, Min);
+        free(LineData);
+    } else  {
+        QVector<uint> LineData;
+
+        if(maxvalue != 0) correction = 255.0 / (float) maxvalue;
+
+        int increment = 1;
+        if(thisColormode == RGB1_CA) increment = 3; // 3 elements RGB
+        if(thisColormode == RGB2_CA) increment = 3; // 3 Lines RGB
+        LineData.resize(resultSize.width());
+        InitLoopdata(ystart, yend, i, increment, sector, sectorcount, resultSize, Max, Min);
+        switch (m_datatype) {
+        case caCHAR:
+            calcImage ((uchar*) savedData, thisColormode, LineData, i, ystart, yend, correction, datasize, resultSize, MinMax, Max, Min);
+            break;
+        case caINT:
+            calcImage ((ushort*) savedData, thisColormode, LineData, i, ystart, yend, correction, datasize/elementSize, resultSize, MinMax, Max, Min);
+            break;
+        case caLONG:
+            calcImage ((uint*) savedData, thisColormode, LineData, i, ystart, yend, correction, datasize/elementSize, resultSize, MinMax, Max, Min);
+            break;
+        case caFLOAT:
+            calcImage ((float*) savedData, thisColormode, LineData, i, ystart, yend, correction, datasize/elementSize, resultSize, MinMax, Max, Min);
+            break;
+        case caDOUBLE:
+            calcImage ((double*) savedData, thisColormode, LineData, i, ystart, yend, correction, datasize/elementSize, resultSize, MinMax, Max, Min);
+            break;
+        default:
+            printf("caCamera -- data format not supported\n");
+        }
+
+        MinMaxLock(MinMax, Max, Min);
+    }
+}
+
+/*
+ * 1394-Based Digital Camera Control Library
+ *
+ * Bayer pattern decoding functions
+ *
+ * Written by Damien Douxchamps and Frederic Devernay
+ * The original VNG and AHD Bayer decoding are from Dave Coffin's DCR
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ */
+
+template <typename pureData> void caCamera::FilterBayer(pureData *bayer, uint *rgb, int sx, int sy, int tile,int datasize)
+{
+    const int bayerStep = sx;
+    const int rgbStep = 3 * sx;
+    uchar *rgbStart=(uchar *)rgb;
+    uchar *bayerStart=(uchar *)bayer;
+
+    int width = sx;
+    int height = sy;
+    int blue = tile == BAYER_COLORFILTER_BGGR || tile == BAYER_COLORFILTER_GBRG ? -1 : 1;
+    int start_with_green = tile == BAYER_COLORFILTER_GBRG|| tile == BAYER_COLORFILTER_GRBG;
+    int i, iinc, imax;
+
+    if ((tile > BAYER_COLORFILTER_MAX) || (tile < BAYER_COLORFILTER_MIN)) {
+        printf("caCamera -- bayer, invalid filter\n");
+        return;
+    }
+
+    /* add black border */
+    imax = sx * sy * 3;
+    for (i = sx * (sy - 1) * 3; i < imax; i++) {
+        rgb[i] = 0;
+    }
+    iinc = (sx - 1) * 3;
+    for (i = (sx - 1) * 3; i < imax; i += iinc) {
+        rgb[i++] = 0;
+        rgb[i++] = 0;
+        rgb[i++] = 0;
+    }
+
+    rgb += 1;
+    height -= 1;
+    width -= 1;
+    for (; height--; bayer += bayerStep, rgb += rgbStep) {
+        pureData *bayerEnd = bayer + width;
+        if (((uchar *)(rgb+rgbStep)<((uchar *)rgbStart+3*m_width*m_height*sizeof(uint)))&&((uchar *)(bayer+bayerStep)<((uchar *)bayerStart+datasize))){
+            if (start_with_green) {
+                rgb[-blue] = bayer[1];
+                rgb[0] = bayer[bayerStep + 1];
+                rgb[blue] = bayer[bayerStep];
+                bayer++;
+                rgb += 3;
             }
-            if ((i + 2) >= datasize) break;
 
-            MinMaxImageLock(LineData, y, resultSize, MinMax);
+            if (blue > 0) {
+                for (; bayer <= bayerEnd - 2; bayer += 2, rgb += 6) {
+                    rgb[-1] = bayer[0];
+                    rgb[0] = bayer[1];
+                    rgb[1] = bayer[bayerStep + 1];
+
+                    rgb[2] = bayer[2];
+                    rgb[3] = bayer[bayerStep + 2];
+                    rgb[4] = bayer[bayerStep + 1];
+                }
+            } else {
+                for (; bayer <= bayerEnd - 2; bayer += 2, rgb += 6) {
+
+                    rgb[1] = bayer[0];
+                    rgb[0] = bayer[1];
+                    rgb[-1] = bayer[bayerStep + 1];
+
+                    rgb[4] = bayer[2];
+                    rgb[3] = bayer[bayerStep + 2];
+                    rgb[2] = bayer[bayerStep + 1];
+
+                }
+            }
+
+            if (bayer < bayerEnd) {
+                rgb[-blue] = bayer[0];
+                rgb[0] = bayer[1];
+                rgb[blue] = bayer[bayerStep + 1];
+                bayer++;
+                rgb += 3;
+            }
+
+            bayer -= width;
+            rgb -= width * 3;
+
+            blue = -blue;
+            start_with_green = !start_with_green;
         }
     }
 
-    MinMaxLock(MinMax, Max, Min);
+    return;
+}
+
+//https://en.wikipedia.org/wiki/Chroma_subsampling
+//https://en.wikipedia.org/wiki/YCbCr
+#define GET_R_FROM_YUV(y,cb,cr) 298.082*y/256 +                      408.583 * cr / 256 - 222.291 ;
+#define GET_G_FROM_YUV(y,cb,cr) 298.082*y/256 - 100.291 * cb / 256 - 208.120 * cr / 256 + 135.576 ;
+#define GET_B_FROM_YUV(y,cb,cr) 298.082*y/256 + 561.412 * cb / 256                      - 276.836 ;
+
+//#define GET_R_FROM_YUV(y,u,v) y + 1.370705 * (v-128);
+//#define GET_G_FROM_YUV(y,u,v) y - 0.698001 * (v-128) - 0.337633 * (u -128);
+//#define GET_B_FROM_YUV(y,u,v) y + 1.732446 * (u-128);
+
+void caCamera::PROC_YUYV422(uchar *YUV, uint *rgb, int sx, int sy, int datasize)  // 4 bytes for 2 pixels
+{
+    long max_data=(long)YUV + datasize;
+    if ((sx==0)||(sy==0)) return;
+    for (long i = 0; i < (sx) * sy / 2; ++i) {
+        int Y1, Cr, Y2, Cb;
+        long r,g,b;
+        long min=0;
+        // Extract YCbCr components
+        Y1 = YUV[0];
+        Cb = YUV[1];
+        Y2 = YUV[2];
+        Cr = YUV[3];
+
+        YUV += 4;
+
+        r=GET_R_FROM_YUV(Y1,Cb,Cr);
+        g=GET_G_FROM_YUV(Y1,Cb,Cr);
+        b=GET_B_FROM_YUV(Y1,Cb,Cr);
+
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+
+        //        if (i<9){
+        //            printf("(%i)Y1: %x Y2: %x Cr: %x Cb: %x\n",i,Y1,Y2,Cr,Cb);
+        //            printf("\t R: %x G: %x B: %x ",rgb[0],rgb[1],rgb[2]);
+        //        }
+
+        rgb += 3;
+        r=GET_R_FROM_YUV(Y2,Cb,Cr);
+        g=GET_G_FROM_YUV(Y2,Cb,Cr);
+        b=GET_B_FROM_YUV(Y2,Cb,Cr);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+
+        rgb += 3;
+        //        if (i<9){
+        //            printf("R2: %x G2: %x B2: %x \n",rgb[0],rgb[1],rgb[2]);
+        //        }
+        if (max_data<(long)YUV) break;
+    }
+}
+
+void caCamera::PROC_UYVY422(uchar *YUV, uint *rgb, int sx, int sy, int datasize)  // 4 bytes for 4 pixels
+{
+    long max_data=(long)YUV + datasize;
+    if ((sx==0)||(sy==0)) return;
+    for (int i = 0; i < sx * sy / 4; ++i) {
+        int y0, u0, y1, v0, y2, u2, y3, v2;
+
+        // Extract yuv components
+        u0 = YUV[0];
+        y0 = YUV[1];
+        v0 = YUV[2];
+        y1 = YUV[3];
+        u2 = YUV[4];
+        y2 = YUV[5];
+        v2 = YUV[6];
+        y3 = YUV[7];
+        YUV += 8;
+
+        rgb[0] = GET_R_FROM_YUV(y0,u0,v0);
+        rgb[1] = GET_G_FROM_YUV(y0,u0,v0);
+        rgb[2] = GET_B_FROM_YUV(y0,u0,v0);
+        rgb += 3;
+        rgb[0] = GET_R_FROM_YUV(y1,u0,v0);
+        rgb[1] = GET_G_FROM_YUV(y1,u0,v0);
+        rgb[2] = GET_B_FROM_YUV(y1,u0,v0);
+        rgb += 3;
+        rgb[0] = GET_R_FROM_YUV(y2,u2,v2);
+        rgb[1] = GET_G_FROM_YUV(y2,u2,v2);
+        rgb[2] = GET_B_FROM_YUV(y2,u2,v2);
+        rgb += 3;
+        rgb[0] = GET_R_FROM_YUV(y3,u2,v2);
+        rgb[1] = GET_G_FROM_YUV(y3,u2,v2);
+        rgb[2] = GET_B_FROM_YUV(y3,u2,v2);
+        rgb += 3;
+        if (max_data<(long)YUV) break;
+    }
+}
+
+void caCamera::PROC_YYUYYV411(uchar *YUV, uint *rgb, int sx, int sy, int datasize)  // 6 bytes for 4 pixels
+{
+    long max_data=(long)YUV + datasize;
+    if ((sx==0)||(sy==0)) return;
+    for (long i = 0; i < (sx) * sy / 4; ++i) {
+        int Y1, U, Y2, V, Y3, Y4;
+
+        long r,g,b;
+        long min=0;
+        // Extract YCbCr components
+        Y1 = YUV[0];
+        Y2 = YUV[1];
+        U  = YUV[2];
+        Y3 = YUV[3];
+        Y4 = YUV[4];
+        V  = YUV[5];
+
+        YUV += 6;
+
+        r=GET_R_FROM_YUV(Y1,U,V);
+        g=GET_G_FROM_YUV(Y1,U,V);
+        b=GET_B_FROM_YUV(Y1,U,V);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+        rgb += 3;
+
+        r=GET_R_FROM_YUV(Y2,U,V);
+        g=GET_G_FROM_YUV(Y2,U,V);
+        b=GET_B_FROM_YUV(Y2,U,V);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+        rgb += 3;
+
+        r=GET_R_FROM_YUV(Y3,U,V);
+        g=GET_G_FROM_YUV(Y3,U,V);
+        b=GET_B_FROM_YUV(Y3,U,V);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+        rgb += 3;
+
+        r=GET_R_FROM_YUV(Y4,U,V);
+        g=GET_G_FROM_YUV(Y4,U,V);
+        b=GET_B_FROM_YUV(Y4,U,V);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+        rgb += 3;
+
+        if (max_data<(long)YUV) break;
+    }
+}
+
+void caCamera::PROC_UYYVYY411(uchar *YUV, uint *rgb, int sx, int sy, int datasize)  // 6 bytes for 4 pixels
+{
+    long max_data=(long)YUV + datasize;
+    if ((sx==0)||(sy==0)) return;
+    for (long i = 0; i < (sx) * sy / 4; ++i) {
+        int Y1, U, Y2, V, Y3, Y4;
+        long r,g,b;
+
+        long min=0;
+        // Extract YCbCr components
+        U  = YUV[0];
+        Y1 = YUV[1];
+        Y2 = YUV[2];
+        V  = YUV[3];
+        Y3 = YUV[4];
+        Y4 = YUV[5];
+        YUV += 6;
+
+        r=GET_R_FROM_YUV(Y1,U,V);
+        g=GET_G_FROM_YUV(Y1,U,V);
+        b=GET_B_FROM_YUV(Y1,U,V);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+        rgb += 3;
+
+        r=GET_R_FROM_YUV(Y2,U,V);
+        g=GET_G_FROM_YUV(Y2,U,V);
+        b=GET_B_FROM_YUV(Y2,U,V);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+        rgb += 3;
+
+        r=GET_R_FROM_YUV(Y3,U,V);
+        g=GET_G_FROM_YUV(Y3,U,V);
+        b=GET_B_FROM_YUV(Y3,U,V);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+        rgb += 3;
+
+        r=GET_R_FROM_YUV(Y4,U,V);
+        g=GET_G_FROM_YUV(Y4,U,V);
+        b=GET_B_FROM_YUV(Y4,U,V);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+        rgb += 3;
+        if (max_data<(long)YUV) break;
+
+    }
+}
+
+void caCamera::PROC_YUV444(uchar *YUV, uint *rgb, int sx, int sy, int datasize)  // 3 bytes for 1 pixels
+{
+    long max_data=(long)YUV + datasize;
+    if ((sx==0)||(sy==0)||(YUV==NULL)||(rgb==NULL)) return;
+    for (long i = 0; i < (sx) * sy ; ++i) {
+        int Y, U, V;
+        long r,g,b;
+        long min=0;
+        Y  = YUV[0];
+        U  = YUV[1];
+        V  = YUV[2];
+
+        YUV += 3;
+
+        r=GET_R_FROM_YUV(Y,U,V);
+        g=GET_G_FROM_YUV(Y,U,V);
+        b=GET_B_FROM_YUV(Y,U,V);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+        rgb += 3;
+
+        if (max_data<=(long)YUV) return;
+
+    }
+}
+
+void caCamera::PROC_UVY444(uchar *YUV, uint *rgb, int sx, int sy, int datasize)  // 3 bytes for 1 pixels
+{
+    //printf("datatype=PROC_UVY444 colormode=%d %s (%x)(%x) %i %i\n", thisColormode, qasc(colorModeString.at(thisColormode)),(long)YUV,(long)rgb,sx, sy);
+    long max_data=(long)YUV + datasize;
+
+    if ((sx==0)||(sy==0)) return;
+    for (long i = 0; i < (sx) * sy ; ++i) {
+        int Y, U, V;
+        long r,g,b;
+        long min=0;
+        U =  YUV[0];
+        Y  = YUV[1];
+        V  = YUV[2];
+
+        YUV += 3;
+
+        r=GET_R_FROM_YUV(Y,U,V);
+        g=GET_G_FROM_YUV(Y,U,V);
+        b=GET_B_FROM_YUV(Y,U,V);
+        rgb[0]=qMax(min,r);
+        rgb[1]=qMax(min,g);
+        rgb[2]=qMax(min,b);
+        rgb += 3;
+
+        if (max_data<=(long)YUV) return;
+
+    }
+}
+
+void caCamera::PROC_RGB8(uchar *RGB,rgb_interpretation rgb_type, uint *rgb, int sx, int sy, int datasize)  // 3 bytes for 1 pixels
+{
+    int rgb_matrix[5][3]={{0,1,2},  //COLOR_RGB
+                          {2,1,0},  //COLOR_GBR
+                          {1,0,2},  //COLOR_GRB
+                          {2,1,0},  //COLOR_BGR
+                          {1,2,0}   //COLOR_BRG
+                         };
+    long max_data=(long)RGB + datasize;
+
+    if ((sx==0)||(sy==0)) return;
+    for (long i = 0; i < (sx) * sy ; ++i) {
+        int R, G, B;
+
+        R =  RGB[rgb_matrix[rgb_type][0]];
+        G  = RGB[rgb_matrix[rgb_type][1]];
+        B  = RGB[rgb_matrix[rgb_type][2]];
+
+        RGB += 3;
+
+        rgb[0]=R;
+        rgb[1]=G;
+        rgb[2]=B;
+        rgb += 3;
+
+        if (max_data<=(long)RGB) return;
+
+    }
+}
+
+void caCamera::PROC_RGBA8(uchar *RGBA,rgb_interpretation rgb_type, uint *rgb, int sx, int sy, int datasize)
+{
+    int rgb_matrix[5][4]={{0,1,2,3},  //COLOR_RGB
+                          {2,1,0,3},  //COLOR_GBR
+                          {1,0,2,3},  //COLOR_GRB
+                          {2,1,0,3},  //COLOR_BGR
+                          {1,2,0,3}   //COLOR_BRG
+                         };
+
+    long max_data=(long)RGBA + datasize;
+
+    if ((sx==0)||(sy==0)) return;
+    for (long i = 0; i < (sx) * sy ; ++i) {
+        int R, G, B, A;
+
+        R =  RGBA[rgb_matrix[rgb_type][0]];
+        G  = RGBA[rgb_matrix[rgb_type][1]];
+        B  = RGBA[rgb_matrix[rgb_type][2]];
+        A  = RGBA[rgb_matrix[rgb_type][3]];
+
+        RGBA += 4;
+
+        rgb[0]=R;
+        rgb[1]=G;
+        rgb[2]=B;
+        rgb += 3;
+
+        if (max_data<=(long)RGBA) return;
+
+    }
 }
 
 
-QImage *caCamera::showImageCalc(int datasize, char *data)
+
+void caCamera::buf_unpack_12bitpacked_msb(void* target, void* source, size_t destcount, size_t targetcount)
+{
+    size_t x1, x2;
+    unsigned char b0, b1, b2;
+    for (x1 = 0, x2 = 0; x2 < (destcount / 2); x1 = x1 + 3, x2 = x2 + 2) {
+        b0 = ((char*) source) [x1];
+        b1 = ((char*) source) [x1 + 1];
+        b2 = ((char*) source) [x1 + 2];
+        ((unsigned short*) target) [x2] = (b1 & 0xf) + (b0 << 4);   // valid for Mono12Packet on IOC
+        ((unsigned short*) target) [x2 + 1] = ((b1 & 0xf0) >> 4) + (b2 << 4);
+        if (targetcount<x1+3) return;
+    }
+}
+
+void caCamera::buf_unpack_12bitpacked_lsb(void* target, void* source, size_t destcount, size_t targetcount)
+{
+    size_t x1, x2;
+    unsigned char b0, b1, b2;
+    for (x1 = 0, x2 = 0; x2 < (destcount / 2); x1 = x1 + 3, x2 = x2 + 2) {
+        b0 = ((char*) source) [x1];
+        b1 = ((char*) source) [x1 + 1];
+        b2 = ((char*) source) [x1 + 2];
+        ((unsigned short*) target) [x2] = ((b1 & 0xf)<<8) + (b0);   // valid for our actual basler camera
+        ((unsigned short*) target) [x2 + 1] = ((b1 & 0xf0) >> 4) + (b2 << 4);
+        if (targetcount<x1+3) return;
+    }
+}
+
+QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
 {
     QSize resultSize;
     uint Max[2], Min[2];
+    int tile = BAYER_COLORFILTER_BGGR;; // bayer tile
+    bool bayerMode = false;
+    bool yuvMode = false;
+
+    m_datatype = datatype;
 
     //__itt_event mark_event;
-    if(!m_bppDefined) return (QImage *) 0;
-    if(!m_widthDefined) return (QImage *) 0;
-    if(!m_heightDefined) return (QImage *) 0;
-    if(!m_codeDefined) return (QImage *) 0;
-    if(!(m_width>0)||!(m_height>0)) {
+
+    if(!m_heightDefined) return (QImage *) Q_NULLPTR;
+    if(!(m_width > 0) || !(m_height > 0)) {
         savedWidth = m_width;
         savedHeight = m_height;
-        return (QImage *) 0;
+        return (QImage *) Q_NULLPTR;
     }
 
     resultSize.setWidth(m_width);
@@ -1122,11 +1721,11 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
 
     // first time get image
     if(m_init || datasize != savedSize || m_width != savedWidth || m_height != savedHeight) {
-        savedSize = datasize;
+        savedSizeNew = savedSize = datasize;
         savedWidth = m_width;
         savedHeight = m_height;
 
-        if(image != (QImage *) 0) {
+        if(image != (QImage *)Q_NULLPTR) {
             delete image;
         }
         image = new QImage(resultSize, QImage::Format_RGB32);
@@ -1136,17 +1735,27 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
         maxvalue = 0xFFFFFFFF;
         ftime(&timeRef);
 
+        if(rgb != (uint*)Q_NULLPTR) free(rgb);
+        ulong rgbsize = 3*m_width*m_height*sizeof(uint);
+        rgb = (uint *) malloc(rgbsize);
+
+        //printf("rgb(%x) size now define to %d uints => %d chars, received %d chars\n",rgb, 3*m_width*m_height, rgbsize, datasize);
+        //fflush(stdout);
+
         // force resize
         QResizeEvent *re = new QResizeEvent(size(), size());
         resizeEvent(re);
     }
 
-    savedData = data;
+    if(rgb == (uint *)Q_NULLPTR) {
+        printf("caCamera -- could not allocate rgb buffer\n");
+        return (QImage *) Q_NULLPTR;
+    }
 
-    Max[1] = 0;
+    Max[1] =  0;
     Min[1] = 65535;
 
-    if(data == (void*) 0) return (QImage *) 0;
+    if(data == (void*)Q_NULLPTR) return (QImage *) Q_NULLPTR;
 
     SyncMinMax MinMax;
     MinMax.Max[1] = 0;
@@ -1154,55 +1763,166 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
     MinMax.MinMaxLock=new QMutex();
     MinMax.imageLock=new QMutex();
 
+    colormode auxMode = thisColormode;
+    short auxDatatype = m_datatype;
+
+    int sx = m_width; // resultSize.width();
+    int sy = m_height;// resultSize.height();
+
     void (caCamera::*CameraDataConvert) (int sector, int sectorcount, SyncMinMax* MinMax, QSize resultSize, int datasize) = NULL;
 
-    if((m_code == 1) && (m_bpp == 1)) {         // monochrome 1 bpp  (Damir camera)
-        //printf("CameraDataConvert_8bit\n");
-        CameraDataConvert = &caCamera::CameraDataConvert_8bit;
-    } else if((m_code == 1) && (m_bpp == 2)) {  // monochrome 2 bpp, but use only first byte of words (Damir camera)
-        CameraDataConvert = &caCamera::CameraDataConvert_16bitD;
-        //printf("CameraDataConvert_16bitD\n");
-    } else if((m_code == 1) && (m_bpp == 3)) {  // monochrome 2 bpp, but used only 12 bits  (Helge cameras)
-        CameraDataConvert = &caCamera::CameraDataConvert_16bit;
-        //printf("CameraDataConvert_16bit\n");
-    } else if((m_code == 3) && (m_bpp == 3)) {  //color rgb image, 3 bpp, each byte with r,g,b
-        CameraDataConvert = &caCamera::CameraDataConvert_24bit;
-        //printf("CameraDataConvert_24bit\n");
-    } else {
-        QPainter painter(imageMessage);
+    //printf("datatype=%d %s colormode=%d %s\n", datatype, caTypeStr[datatype], thisColormode, qasc(colorModeString.at(thisColormode)));
+
+    switch (thisColormode) {
+    case Mono:
+    case RGB1_CA:
+    case RGB2_CA:
+    case RGB3_CA:
+        savedData = data;
+        CameraDataConvert = &caCamera::CameraDataConvert;
+        break;
+    case BayerRG_8:
+    case BayerGB_8:
+    case BayerGR_8:
+    case BayerBG_8:
+    case BayerRG_12:
+    case BayerGB_12:
+    case BayerGR_12:
+    case BayerBG_12:
+        bayerMode = true;
+        // which tile to use
+        if     ((thisColormode == BayerRG_8) || (thisColormode == BayerRG_12)) tile = BAYER_COLORFILTER_RGGB;
+        else if((thisColormode == BayerGB_8) || (thisColormode == BayerGB_12)) tile = BAYER_COLORFILTER_GBRG;
+        else if((thisColormode == BayerGR_8) || (thisColormode == BayerGR_12)) tile = BAYER_COLORFILTER_GRBG;
+        else if((thisColormode == BayerBG_8) || (thisColormode == BayerBG_12)) tile = BAYER_COLORFILTER_BGGR;
+        // how many bits per element and packing
+        if((thisColormode == BayerRG_8) || (thisColormode == BayerGB_8) || (thisColormode == BayerGR_8) || (thisColormode == BayerBG_8)) {
+            bitsPerElement = 8;
+        } else if((thisColormode == BayerRG_12) || (thisColormode == BayerGB_12) || (thisColormode == BayerGR_12) || (thisColormode == BayerBG_12)) {
+            bitsPerElement = 12;
+        }
+        thisColormode = RGB1_CA;
+        m_datatype = caLONG;
+
+        //printf("bitsperlement=%d datasize=%d sx=%d sy=%d\n",bitsPerElement,  datasize, sx, sy);
+        //fflush(stdout);
+        if(bitsPerElement == 8) {
+            FilterBayer((uchar *) data, rgb, sx, sy, tile,datasize);
+        } else if((bitsPerElement == 12) && (thisPackingmode == packNo)) {
+            FilterBayer((ushort *) data, rgb, sx, sy, tile,datasize);
+        } else if((bitsPerElement == 12) && (thisPackingmode > packNo)) {
+            int unpacked_datasize=2*sizeof(ushort) * datasize + 1;
+            ushort *unpacked = (ushort *) malloc(unpacked_datasize);
+            if(thisPackingmode == LSB12Bit) buf_unpack_12bitpacked_lsb(unpacked, (uchar*) data, sx*sy*2,datasize);
+            else buf_unpack_12bitpacked_msb(unpacked, (uchar*) data, sx*sy*2,datasize);
+            FilterBayer((ushort *) unpacked, rgb, sx, sy, tile, unpacked_datasize);
+            free(unpacked);
+        }
+
+        savedData= (char *) rgb;
+        savedSizeNew = 3*sx*sy*sizeof(uint);
+
+        CameraDataConvert = &caCamera::CameraDataConvert;
+        break;
+
+    case RGB_8:
+    case BGR_8:
+    case RGBA_8:
+    case BGRA_8:
+        bayerMode = true;
+
+        if(thisColormode == RGB_8) PROC_RGB8((uchar *) data, COLOR_RGB ,rgb, sx, sy,datasize);
+        else if(thisColormode == BGR_8) PROC_RGB8((uchar *) data, COLOR_BGR ,rgb, sx, sy,datasize);
+        else if(thisColormode == RGBA_8) PROC_RGBA8((uchar *) data, COLOR_RGB ,rgb, sx, sy,datasize);
+        else if(thisColormode == BGRA_8) PROC_RGBA8((uchar *) data, COLOR_BGR ,rgb, sx, sy,datasize);
+
+        thisColormode = RGB1_CA;
+        m_datatype = caLONG;
+        savedData= (char *) rgb;
+        savedSizeNew = 3*sx*sy*sizeof(uint);
+        CameraDataConvert = &caCamera::CameraDataConvert;
+        break;
+
+    case YUV411:
+    case YUV422:
+    case YUV444:
+        yuvMode = true;
+
+        if(thisColormode == YUV411) {
+
+            if (thisPackingmode==Reversed){
+                PROC_UYYVYY411((uchar *) data, rgb, sx, sy,datasize);
+            } else{
+                PROC_YYUYYV411((uchar *) data, rgb, sx, sy,datasize);
+            }
+
+        } else if(thisColormode == YUV422) {
+
+            if (thisPackingmode==Reversed){
+                PROC_UYVY422((uchar *) data, rgb, sx, sy,datasize);
+            } else{
+                PROC_YUYV422((uchar *) data, rgb, sx, sy,datasize);
+            }
+
+        } else if(thisColormode == YUV444) {
+
+            if (thisPackingmode==Reversed){
+                PROC_UVY444((uchar *) data, rgb, sx, sy,datasize);
+            } else{
+                PROC_YUV444((uchar *) data, rgb, sx, sy,datasize);
+            }
+        }
+
+        thisColormode = RGB1_CA;
+        m_datatype = caLONG;
+        savedData= (char *) rgb;
+        savedSizeNew = 3*sx*sy*sizeof(uint);
+        CameraDataConvert = &caCamera::CameraDataConvert;
+        break;
+
+    case YUV421:
+    default:
+        savedData = data;
+        //printf("not yet supported colormode = %s\n", qasc(colorModeString.at(thisColormode)));
+        QPainter painter(image);
         QBrush brush(QColor(200,200,200,255), Qt::SolidPattern);
         painter.setRenderHint(QPainter::Antialiasing);
         painter.setPen(Qt::black);
         painter.fillRect(rect(), brush);
         painter.setFont(QFont("Arial", width() / 30));
         int lineHeight = 1.2 * painter.fontMetrics().height();
-        painter.drawText(5, 10 + lineHeight, "specified camera data conversion not supported");
+        painter.drawText(5, 10 + lineHeight, "specified format not supported:"+colorModeString.at(thisColormode));
         painter.drawText(5, 10 + 2 * lineHeight, "only supported now:");
-        painter.drawText(5, 10 + 3 * lineHeight, "code=1 bpp=1: monocrome 1bpp");
-        painter.drawText(5, 10 + 4 * lineHeight, "code=1 bpp=2: monocrome 2bpp");
-        painter.drawText(5, 10 + 5 * lineHeight, "code=1 bpp=3: monocrome 2bpp (used only 12bits)");
-        painter.drawText(5, 10 + 6 * lineHeight, "code=3 bpp=3: color rgb 3bpp (r,g,b)");
-        return imageMessage ;
+        painter.drawText(5, 10 + 3 * lineHeight, "mono");
+        painter.drawText(5, 10 + 4 * lineHeight, "rgb1_ca, rgb1_ca, rgb3_ca");
+        painter.drawText(5, 10 + 5 * lineHeight, "bayer8, bayer12 unpacked and packed");
+        painter.drawText(5, 10 + 6 * lineHeight, "yuv formats and reversed except yuv421");
+        painter.drawText(5, 10 + 7 * lineHeight, "HW Ref.:  Basler acA4600-10uc/acA1300-30gc  ");
+        painter.drawText(5, 10 + 8 * lineHeight, "HW Ref.:  Prosilica GC1660C  ");
+
+        return image;
     }
 
 #ifndef QT_NO_CONCURRENT
 
     //mark_event = __itt_event_create( "User Mark", 9 );
-   //__itt_event_start( mark_event );
+    //__itt_event_start( mark_event );
 
     int threadcounter=QThread::idealThreadCount()*2/3;  // seems to be a magic number
     if(threadcounter < 1) threadcounter = 1;
 
     QFutureSynchronizer<void> Sectors;
     for (int x=0;x<threadcounter;x++){
-        Sectors.addFuture(QtConcurrent::run(this, CameraDataConvert, x, threadcounter, &MinMax, resultSize, datasize));
+        Sectors.addFuture(QtConcurrent::run(this, CameraDataConvert, x, threadcounter, &MinMax, resultSize, savedSizeNew));
     }
     Sectors.waitForFinished();
     //__itt_event_end( mark_event );
 
 #else
-    (this->*CameraDataConvert)(0, 1, &MinMax, resultSize, datasize);
+
+    (this->*CameraDataConvert)(0, 1, &MinMax, resultSize, savedSizeNew);
 #endif
+
     delete MinMax.MinMaxLock;
     delete MinMax.imageLock;
     Max[1]=MinMax.Max[1];
@@ -1217,18 +1937,23 @@ QImage *caCamera::showImageCalc(int datasize, char *data)
         if(maxvalue > 0xFFFFFFFE) maxvalue = 0xFFFFFFFE;
     }
 
+    if(bayerMode || yuvMode) {
+        thisColormode = auxMode;
+        m_datatype = auxDatatype;
+    }
+
     return image;
 }
 
-void caCamera::showImage(int datasize, char *data)
+void caCamera::showImage(int datasize, char *data, short datatype)
 {
     //QElapsedTimer timer;
     //timer.start();
-    image = showImageCalc(datasize, data);
+    image = showImageCalc(datasize, data, datatype);
     //printf("Image timer 1 : %d (%x) milliseconds \n", (int) timer.elapsed(),image);
-
     //fflush(stdout);
-    if(image != (QImage *) 0) updateImage(*image, readvaluesPresent, readvalues, scaleFactor, X, Y);
+
+    if(image != (QImage *)Q_NULLPTR) updateImage(*image, readvaluesPresent, readvalues, scaleFactor, X, Y);
 
     if(getAutomateChecked()) {
         updateMax(maxvalue);
@@ -1245,6 +1970,7 @@ void caCamera::showImage(int datasize, char *data)
         }
         if(maxvalue == minvalue) maxvalue = minvalue + 1000;
     }
+
     UpdatesPerSecond++;
 }
 
@@ -1278,16 +2004,16 @@ void caCamera::fillData(pureData *array, int size, int curvIndex, int curvType, 
 {
     Q_UNUSED(curvIndex);
     Q_UNUSED(curvType);
-        // keep data points
-        if(curvXY == CH_X) {                       // X
-            X.resize(size);
-            double *data = X.data();
-            for(int i=0; i<  size; i++) data[i] = array[i];
-        } else {                                   // Y
-            Y.resize(size);
-            double *data = Y.data();
-            for(int i=0; i<  size; i++) data[i] = array[i];
-        }
+    // keep data points
+    if(curvXY == CH_X) {                       // X
+        X.resize(size);
+        double *data = X.data();
+        for(int i=0; i<  size; i++) data[i] = array[i];
+    } else {                                   // Y
+        Y.resize(size);
+        double *data = Y.data();
+        for(int i=0; i<  size; i++) data[i] = array[i];
+    }
 }
 
 void caCamera::setAccessW(bool access)

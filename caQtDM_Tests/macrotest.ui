@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>911</width>
+    <height>478</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="gridLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>23</x>
+      <y>74</y>
+      <width>857</width>
+      <height>393</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0,0">
+     <item row="2" column="0">
+      <widget class="caLabel" name="calabel_11">
+       <property name="text">
+        <string>$(TEST)$(TEST1)$(TEST)$(TEST1)$(TEST)$(TEST1)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="0">
+      <widget class="caLabel" name="calabel_7">
+       <property name="text">
+        <string>$(TEST{&quot;regex&quot;:&quot;([1,2]+)([3])&quot;,&quot;value&quot;:&quot;A&quot;})</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="caLabel" name="calabel_12">
+       <property name="text">
+        <string>$(TEST{Bla})$(TEST1)$(TEST)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="caLabel" name="calabel_15">
+       <property name="text">
+        <string>xyz$$876_A1245______</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="1">
+      <widget class="QLabel" name="label_2">
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>A45</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="0">
+      <widget class="caLabel" name="calabel_21">
+       <property name="text">
+        <string>$(TEST{&quot;regex&quot;:&quot;([1,2]+)([3])&quot;,&quot;value&quot;:&quot;A\\1&quot;})</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="caLabel" name="calabel_9">
+       <property name="text">
+        <string>xyz$$876_$(TEST{&quot;regex&quot;:&quot;([1,2]+)([3])&quot;,&quot;value&quot;:&quot;A\\1&quot;})______</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="caLabel" name="calabel_10">
+       <property name="text">
+        <string>$(TEST)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="caLabel" name="calabel_8">
+       <property name="text">
+        <string>______$(TEST{&quot;regex&quot;:&quot;[1-2]+&quot;,&quot;value&quot;:&quot;HUI1HUIHUI&quot;})</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="caLabel" name="calabel_13">
+       <property name="text">
+        <string>12345</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="caLabel" name="calabel_14">
+       <property name="text">
+        <string>12345abcd12345abcd12345abcd</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="0">
+      <widget class="caLabel" name="calabel">
+       <property name="text">
+        <string>$(TEST2)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="caLabel" name="calabel_2">
+       <property name="text">
+        <string>$(TEST)$(TEST)$(TEST)$(TEST)$(TEST)$(TEST)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="1">
+      <widget class="QLabel" name="label_4">
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>A345</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="1">
+      <widget class="QLabel" name="label_3">
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>A1245</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="caLabel" name="calabel_19">
+       <property name="text">
+        <string>$(TEST{&quot;regex&quot;:&quot;\\S+&quot;,&quot;value&quot;:&quot;HUI2HUIHUI&quot;}) $(TEST{Bla}) $(TEST1)$(TEST)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QLabel" name="label">
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>not resolved Macro !!!!!!</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="caLabel" name="calabel_16">
+       <property name="text">
+        <string>______HUI2HUIHUI345</string>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="0">
+      <widget class="caLabel" name="calabel_22">
+       <property name="text">
+        <string>$(TEST{&quot;regex&quot;:&quot;([1,2]+)([3])&quot;,&quot;value&quot;:&quot;A\\2&quot;})</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="caLabel" name="calabel_18">
+       <property name="text">
+        <string>12345abcd12345</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="caLabel" name="calabel_20">
+       <property name="text">
+        <string>HUI2HUIHUI 12345 abcd12345</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="caLabel" name="calabel_17">
+       <property name="text">
+        <string>123451234512345123451234512345</string>
+       </property>
+      </widget>
+     </item>
+     <item row="12" column="0">
+      <widget class="caLabel" name="calabel_23">
+       <property name="text">
+        <string>$(TEST{&quot;regex&quot;:&quot;\\S+&quot;,&quot;value&quot;:&quot;$(TEST1)&quot;}) $(TEST{Bla}) $(TEST1)$(TEST)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="12" column="1">
+      <widget class="caLabel" name="calabel_24">
+       <property name="text">
+        <string>abcd 12345 abcd12345</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="caFrame" name="caframe">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>8</y>
+      <width>892</width>
+      <height>59</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Box</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Sunken</enum>
+    </property>
+    <property name="lineWidth">
+     <number>1</number>
+    </property>
+    <property name="background">
+     <color>
+      <red>148</red>
+      <green>148</green>
+      <blue>148</blue>
+     </color>
+    </property>
+    <widget class="QLabel" name="label_5">
+     <property name="geometry">
+      <rect>
+       <x>6</x>
+       <y>6</y>
+       <width>879</width>
+       <height>47</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>23</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>complex macro test</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caFrame</class>
+   <extends>QFrame</extends>
+   <header>caFrame</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>caLabel</class>
+   <extends>QLabel</extends>
+   <header>caLabel</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

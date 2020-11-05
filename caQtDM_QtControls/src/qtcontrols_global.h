@@ -29,6 +29,7 @@
 #include "qtdefinitions.h"
 #include <QDebug>
 #include <QScrollArea>
+#include <QVariant>
 
 #define NOMINMAX
 
@@ -46,5 +47,14 @@
   #include <cmath>
   #define isnan(x) std::isnan(x)
 #endif
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+#ifndef Q_NULLPTR
+    #define Q_NULLPTR 0
+#endif
+#endif
+
+
+
 
 #endif //QTCONGLOBAL_H

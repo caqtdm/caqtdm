@@ -42,6 +42,7 @@ class QTCON_EXPORT ParsePepFile
 
 public:
     ParsePepFile(QString filename, bool willPrint = false);
+    ~ParsePepFile() {delete buffer;}
     QWidget *load(QWidget *parent);
 
 protected:

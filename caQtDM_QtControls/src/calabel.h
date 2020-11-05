@@ -31,6 +31,7 @@
 
 class QTCON_EXPORT caLabel : public ESimpleLabel
 {
+    Q_OBJECT
 
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
@@ -52,7 +53,7 @@ class QTCON_EXPORT caLabel : public ESimpleLabel
 #include "caVisibProps.h"
 #include "caVisibDefs.h"
 
-    Q_OBJECT
+
 
 public:
     void noStyle(QString style) {Q_UNUSED(style);}
@@ -74,7 +75,7 @@ public:
     void setColors(QColor bg, QColor fg);
 
     void setBorderWidth(int width) {thisBorderWidth = width; setColors(thisBackColor, thisForeColor);}
-    bool getBorderWidth() const {return thisBorderWidth;}
+    int getBorderWidth() const {return thisBorderWidth;}
 
     void setAlarmColors(short status);
 

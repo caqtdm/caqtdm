@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>495</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="caLabel" name="calabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>60</y>
+      <width>90</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Standard</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_2">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>200</y>
+      <width>121</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Extended 1</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_3">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>390</y>
+      <width>111</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Extended 2</string>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>10</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="calc">
+     <string notr="true">%QRect{&quot;valueconst&quot;: [0,0,800,125]}</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true"/>
+    </property>
+    <property name="channelB">
+     <string notr="true"/>
+    </property>
+    <property name="channelC">
+     <string notr="true"/>
+    </property>
+    <property name="channelD">
+     <string notr="true"/>
+    </property>
+    <property name="eventSignal">
+     <enum>caCalc::onAnyChange</enum>
+    </property>
+   </widget>
+   <widget class="wmSignalPropagator" name="wmsignalpropagator">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>90</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="caMessageButton" name="camessagebutton">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>10</y>
+      <width>131</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Standard</string>
+    </property>
+   </widget>
+   <widget class="caMessageButton" name="camessagebutton_2">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>40</y>
+      <width>131</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Extended 1</string>
+    </property>
+   </widget>
+   <widget class="caMessageButton" name="camessagebutton_3">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>70</y>
+      <width>131</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Extended 2</string>
+    </property>
+   </widget>
+   <widget class="caPolyLine" name="capolyline">
+    <property name="geometry">
+     <rect>
+      <x>380</x>
+      <y>400</y>
+      <width>150</width>
+      <height>150</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_2">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>30</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="calc">
+     <string notr="true">%QRect{&quot;valueconst&quot;: [0,0,800,300]}</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true"/>
+    </property>
+    <property name="channelB">
+     <string notr="true"/>
+    </property>
+    <property name="channelC">
+     <string notr="true"/>
+    </property>
+    <property name="channelD">
+     <string notr="true"/>
+    </property>
+    <property name="eventSignal">
+     <enum>caCalc::onAnyChange</enum>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>10</y>
+      <width>411</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>dynamic parameter</string>
+    </property>
+    <widget class="caNumeric" name="canumeric">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>10</y>
+       <width>100</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="decimalDigits" stdset="0">
+      <number>0</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">testh</string>
+     </property>
+     <property name="precisionMode">
+      <enum>caNumeric::User</enum>
+     </property>
+     <property name="limitsMode">
+      <enum>caNumeric::User</enum>
+     </property>
+     <property name="maxValue">
+      <double>1250.000000000000000</double>
+     </property>
+     <property name="minValue">
+      <double>125.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_3">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>48</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">testw</string>
+     </property>
+     <property name="calc">
+      <string notr="true"/>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+     <property name="channelB">
+      <string notr="true"/>
+     </property>
+     <property name="channelC">
+      <string notr="true"/>
+     </property>
+     <property name="initialValue">
+      <double>800.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_4">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>78</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">testh</string>
+     </property>
+     <property name="initialValue">
+      <double>125.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_5">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>62</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">testnull</string>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_6">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>20</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="calc">
+      <string notr="true">%QRect{&quot;valueconst&quot;: [0,0,800,125]}</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+     <property name="channelB">
+      <string notr="true"/>
+     </property>
+     <property name="channelC">
+      <string notr="true">testw</string>
+     </property>
+     <property name="channelD">
+      <string notr="true">testh</string>
+     </property>
+     <property name="eventSignal">
+      <enum>caCalc::onAnyChange</enum>
+     </property>
+    </widget>
+    <widget class="caNumeric" name="canumeric_2">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>60</y>
+       <width>100</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="decimalDigits" stdset="0">
+      <number>0</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">testw</string>
+     </property>
+     <property name="precisionMode">
+      <enum>caNumeric::User</enum>
+     </property>
+     <property name="limitsMode">
+      <enum>caNumeric::User</enum>
+     </property>
+     <property name="maxValue">
+      <double>1000.000000000000000</double>
+     </property>
+     <property name="minValue">
+      <double>800.000000000000000</double>
+     </property>
+    </widget>
+   </widget>
+   <widget class="caCalc" name="cacalc_7">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>50</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="calc">
+     <string notr="true">%QRect{&quot;valueconst&quot;: [0,0,800,500]}</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true"/>
+    </property>
+    <property name="channelB">
+     <string notr="true"/>
+    </property>
+    <property name="channelC">
+     <string notr="true"/>
+    </property>
+    <property name="channelD">
+     <string notr="true"/>
+    </property>
+    <property name="eventSignal">
+     <enum>caCalc::onAnyChange</enum>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caNumeric</class>
+   <extends>QFrame</extends>
+   <header>caNumeric</header>
+  </customwidget>
+  <customwidget>
+   <class>caMessageButton</class>
+   <extends>QPushButton</extends>
+   <header>caMessageButton</header>
+  </customwidget>
+  <customwidget>
+   <class>caLabel</class>
+   <extends>QLabel</extends>
+   <header>caLabel</header>
+  </customwidget>
+  <customwidget>
+   <class>caPolyLine</class>
+   <extends>QWidget</extends>
+   <header>caPolyLine</header>
+  </customwidget>
+  <customwidget>
+   <class>caCalc</class>
+   <extends>QLabel</extends>
+   <header>caCalc</header>
+  </customwidget>
+  <customwidget>
+   <class>wmSignalPropagator</class>
+   <extends>QLabel</extends>
+   <header>wmSignalPropagator</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>camessagebutton</sender>
+   <signal>releaseClicked(int)</signal>
+   <receiver>cacalc</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>231</x>
+     <y>23</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>285</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>camessagebutton_2</sender>
+   <signal>releaseClicked(int)</signal>
+   <receiver>cacalc_2</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>233</x>
+     <y>59</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>284</x>
+     <y>40</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc</sender>
+   <signal>emitSignal(QRect)</signal>
+   <receiver>wmsignalpropagator</receiver>
+   <slot>resizeMainWindow(QRect)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>326</x>
+     <y>26</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>292</x>
+     <y>103</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_2</sender>
+   <signal>emitSignal(QRect)</signal>
+   <receiver>wmsignalpropagator</receiver>
+   <slot>resizeMainWindow(QRect)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>330</x>
+     <y>35</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>306</x>
+     <y>99</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>camessagebutton_3</sender>
+   <signal>releaseClicked(int)</signal>
+   <receiver>cacalc_7</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>232</x>
+     <y>83</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>304</x>
+     <y>62</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_7</sender>
+   <signal>emitSignal(QRect)</signal>
+   <receiver>wmsignalpropagator</receiver>
+   <slot>resizeMainWindow(QRect)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>291</x>
+     <y>62</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>294</x>
+     <y>105</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_6</sender>
+   <signal>emitSignal(QRect)</signal>
+   <receiver>wmsignalpropagator</receiver>
+   <slot>resizeMainWindow(QRect)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>452</x>
+     <y>41</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>336</x>
+     <y>102</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

@@ -35,7 +35,14 @@
 #include "qwt_scale_map.h"
 #include "qwt_scale_draw.h"
 #include "cathermo.h"
+#include <qnumeric.h>
 //#include <QMetaEnum>
+#if defined(_MSC_VER)
+    #ifndef snprintf
+     #define snprintf _snprintf
+    #endif
+#endif
+
 
 #define MIN_FONT_SIZE 3
 #define MAX_FONT_SIZE 20
@@ -77,6 +84,8 @@ caThermo::caThermo(QWidget *parent) : QwtThermoMarker(parent), m_externalEnabled
     // these default could be changed by a stylesheet
     defaultForeColor = QColor(Qt::darkRed);
     defaultBackColor = QColor(Qt::lightGray);
+    defaultForeColorOld = defaultBackColor;
+    defaultBackColorOld = defaultForeColor;
 
     setAutoFillBackground( true );
     setBackground(QColor(224,224,224));
@@ -114,7 +123,8 @@ void caThermo::setPV(QString const &newPV)
 void caThermo::setColors(QColor bg, QColor fg, QColor textColor, colMode mode)
 {
 
-    if((bg != oldBackColor) || (fg != oldForeColor)  || (textColor != oldTextColor) || (mode != oldColorMode)) {
+    if((bg != oldBackColor) || (fg != oldForeColor)  || (textColor != oldTextColor) || (mode != oldColorMode)
+            || (defaultBackColorOld != defaultBackColor) || (defaultForeColorOld != defaultForeColor)) {
 
         QPalette thisPalette = palette();
 
@@ -122,14 +132,15 @@ void caThermo::setColors(QColor bg, QColor fg, QColor textColor, colMode mode)
             if(!defaultBackColor.isValid() || !defaultForeColor.isValid()) return;
             QColor bgs = defaultBackColor.darker(125);
             bgs.setAlpha(bg.alpha());
-            //printf("default palette %d %d %d\n", fg.red(), fg.green(), fg.blue());
+            //printf("default palette fg %d %d %d %s\n", defaultForeColor.red(), defaultForeColor.green(), defaultForeColor.blue(), qasc(objectName()));
+            //printf("default palette bg %d %d %d %s\n", defaultBackColor.red(), defaultBackColor.green(), defaultBackColor.blue(), qasc(objectName()));
             thisPalette.setColor(QPalette::ButtonText, defaultForeColor);
             thisPalette.setColor(QPalette::Text, textColor);
             thisPalette.setColor(QPalette::WindowText, textColor);
             thisPalette.setColor(QPalette::Window, bg);
             thisPalette.setColor(QPalette::Base, bgs);
-
             setPalette(thisPalette);
+
         } else if(thisColorMode == Static) {
             QColor bgs = bg.darker(125);
             bgs.setAlpha(bg.alpha());
@@ -172,6 +183,8 @@ void caThermo::setColors(QColor bg, QColor fg, QColor textColor, colMode mode)
     oldForeColor = fg;
     oldTextColor = textColor;
     oldColorMode = mode;
+    defaultBackColorOld = defaultBackColor;
+    defaultForeColorOld = defaultForeColor;
 }
 
 void caThermo::setBackground(QColor c)
@@ -373,7 +386,6 @@ bool caThermo::event(QEvent *e)
     } else if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
 
         const caThermo* that = this;
-        int pipeWidth;
 
         switch (thisScale) {
 
@@ -544,20 +556,25 @@ void caThermo::setFormat(int prec)
 // Creates the QString that will be displayed for the value label
 QString caThermo::setScaleLabel(double value) const
 {
-    char asc[1024];
+    char asc[MAX_STRING_LENGTH];
     QString label;
 
     if(thisFormatType == compact) {
         if ((value < 1.e4 && value > 1.e-4) || (value > -1.e4 && value < -1.e-4) || value == 0.0) {
-            sprintf(asc, thisFormatC, value);
+            snprintf(asc, MAX_STRING_LENGTH, thisFormatC, value);
         } else {
-            sprintf(asc, thisFormat, value);
+            snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
         }
     } else if(thisFormatType == truncated) {
-        sprintf(asc, thisFormat, (int) value);
+        snprintf(asc, MAX_STRING_LENGTH, thisFormat, (int) value);
     } else {
-        sprintf(asc, thisFormat, value);
+        snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
     }
+
+    if(qIsNaN(value)){
+      snprintf(asc, MAX_STRING_LENGTH,  "nan");
+    }
+
     label = QString::fromAscii(asc);
 
     return label;

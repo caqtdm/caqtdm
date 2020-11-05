@@ -100,6 +100,8 @@ class QTCON_EXPORT QwtThermoMarker: public QwtAbstractScale
     Q_PROPERTY( int pipeWidth READ pipeWidth WRITE setPipeWidth )
     Q_PROPERTY( double value READ value WRITE setValue )
     Q_PROPERTY(DisplayType type READ getType WRITE setType)
+    Q_PROPERTY(int markerSize READ getMarkerSize WRITE setMarkerSize)
+    Q_PROPERTY( bool markerLineEnabled READ getMarkerLineOption WRITE setMarkerLineOption)
 
     Q_PROPERTY(bool decayOption READ getDecayOption WRITE setDecayOption)
     Q_PROPERTY(double decayTime READ getDecayTime WRITE setDecayTime)
@@ -109,6 +111,12 @@ public:
     enum DisplayType {Pipe, Marker, PipeFromCenter};
     DisplayType getType() const { return thisType; }
     void setType(DisplayType displaytype) {thisType = displaytype; layoutThermo(true);}
+
+    void setMarkerSize(int markerSize) {thisMarkerSize = markerSize;}
+    int getMarkerSize() const {return thisMarkerSize;}
+
+    bool getMarkerLineOption() const {return thisMarkerLineOption;}
+    void setMarkerLineOption(bool option) {thisMarkerLineOption = option;}
 
     bool getDecayOption() const {return thisDecayOption;}
     void setDecayOption(bool option) {thisDecayOption = option;}
@@ -243,7 +251,7 @@ protected:
     QwtScaleDraw *scaleDraw();
 
     QRect pipeRect() const;
-    QRect fillRect( const QRect & ) const;
+    QRect fillRect( const QRect & , int markerSize) const;
     QRect alarmRect( const QRect & ) const;
 
 private:
@@ -257,7 +265,8 @@ private:
     double prvValue;
     bool thisDecayOption;
     double thisDecayTime;
-
+    int thisMarkerSize;
+    bool thisMarkerLineOption;
 };
 
 #endif

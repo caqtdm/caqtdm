@@ -1,0 +1,1201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1072</width>
+    <height>655</height>
+   </rect>
+  </property>
+  <property name="styleSheet">
+   <string>
+
+QWidget#centralWidget {background: rgb(200, 200, 200);}
+
+caTable {
+        
+       background: cornsilk;
+       alternate-background-color: wheat;
+}
+
+caLineEdit {
+     border-radius: 1px;
+     background: lightyellow;
+     color: black;
+ }
+
+caTextEntry {
+    color: rgb(127, 0, 63);
+    background-color: cornsilk;
+    selection-color: #0a214c;
+    selection-background-color: wheat;
+    border: 1px groove black;
+    border-radius: 1px;
+    padding: 1px;
+}
+
+caTextEntry:focus {
+    padding: 0px;
+    border: 2px groove darkred;
+    border-radius: 1px;
+}
+
+ 
+QPushButton {
+      border-color: #00b;
+      border-radius: 2px;
+      padding: 3px;
+      border-width: 1px;
+
+	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
+						   stop:0   rgba(224, 239, 255, 255),
+						   stop:0.5 rgba(199, 215, 230, 255),
+						   stop:1   rgba(184, 214, 236, 255));
+}
+QPushButton:hover {
+	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
+						stop:0   rgba(201, 226, 255, 255),
+						stop:0.5 rgba(177, 204, 230, 255),
+						stop:1   rgba(163, 205, 236, 255));
+}
+QPushButton:pressed {
+	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
+						stop:0   rgba(174, 219, 255, 255),
+						stop:0.5 rgba(165, 199, 230, 255),
+						stop:1   rgba(134, 188, 236, 255));
+}
+
+QPushButton:disabled {
+	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
+						stop:0   rgba(174, 219, 255, 255),
+						stop:0.5 rgba(165, 199, 230, 255),
+						stop:1   rgba(134, 188, 236, 255));
+}
+
+caChoice {
+      background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                  stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
+                                  stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);
+}
+
+  
+
+caSlider::groove:horizontal {
+border: 1px solid #bbb;
+background: lightgrey;
+height: 20px;
+border-radius: 4px;
+}
+
+caSlider::handle:horizontal {
+background: red;
+border: 1px solid #777;
+width: 13px;
+margin-top: -2px;
+margin-bottom: -2px;
+border-radius: 2px;
+}
+
+
+
+</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="caFrame" name="caFrame_35">
+    <property name="geometry">
+     <rect>
+      <x>1428</x>
+      <y>785</y>
+      <width>122</width>
+      <height>62</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="caFrame" name="caframe">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>13</y>
+      <width>676</width>
+      <height>619</height>
+     </rect>
+    </property>
+    <property name="backgroundMode">
+     <enum>caFrame::Filled</enum>
+    </property>
+    <widget class="caCamera" name="cacamera">
+     <property name="geometry">
+      <rect>
+       <x>24</x>
+       <y>14</y>
+       <width>652</width>
+       <height>490</height>
+      </rect>
+     </property>
+     <property name="channelData" stdset="0">
+      <string notr="true">MTEST-CAQTDM-CAMERA:FPICTURE</string>
+     </property>
+     <property name="channelWidth" stdset="0">
+      <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH</string>
+     </property>
+     <property name="channelHeight" stdset="0">
+      <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT</string>
+     </property>
+     <property name="simpleZoomedView" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="Zoom" stdset="0">
+      <enum>caCamera::Yes</enum>
+     </property>
+     <property name="automaticLevels" stdset="0">
+      <bool>true</bool>
+     </property>
+     <property name="minLevel">
+      <string notr="true">800</string>
+     </property>
+     <property name="maxLevel">
+      <string notr="true">4500</string>
+     </property>
+     <property name="colorMode" stdset="0">
+      <enum>caCamera::RGB1_CA</enum>
+     </property>
+     <property name="packMode" stdset="0">
+      <enum>caCamera::MSB12Bit</enum>
+     </property>
+     <property name="showComboBoxes">
+      <bool>true</bool>
+     </property>
+     <property name="ColorMap" stdset="0">
+      <enum>caCamera::as_is</enum>
+     </property>
+     <property name="ROI_readChannels" stdset="0">
+      <string>FIGX;FIGY;FIGW;FIGH</string>
+     </property>
+     <property name="ROI_readmarkerType" stdset="0">
+      <enum>caCamera::box_crosshairs</enum>
+     </property>
+     <property name="ROI_readType" stdset="0">
+      <enum>caCamera::xy_only</enum>
+     </property>
+     <property name="ROI_writeChannels" stdset="0">
+      <string notr="true">FIGX;FIGY;FIGW;FIGH;</string>
+     </property>
+     <property name="ROI_writemarkerType" stdset="0">
+      <enum>caCamera::box_crosshairs</enum>
+     </property>
+     <property name="ROI_writeType" stdset="0">
+      <enum>caCamera::xy_only</enum>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_10">
+     <property name="geometry">
+      <rect>
+       <x>87</x>
+       <y>555</y>
+       <width>41</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">FIGY</string>
+     </property>
+    </widget>
+    <widget class="caLineEdit" name="calineedit_24">
+     <property name="geometry">
+      <rect>
+       <x>297</x>
+       <y>585</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ACM:MOTOR</string>
+     </property>
+    </widget>
+    <widget class="caLabel" name="calabel_28">
+     <property name="geometry">
+      <rect>
+       <x>47</x>
+       <y>533</y>
+       <width>31</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>(0)</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="background">
+      <color alpha="0">
+       <red>160</red>
+       <green>160</green>
+       <blue>164</blue>
+      </color>
+     </property>
+    </widget>
+    <widget class="caChoice" name="cachoice_14">
+     <property name="geometry">
+      <rect>
+       <x>456</x>
+       <y>539</y>
+       <width>62</width>
+       <height>68</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">MTEST-CAQTDM-CAMERA:CAMERA</string>
+     </property>
+     <property name="background">
+      <color>
+       <red>176</red>
+       <green>176</green>
+       <blue>176</blue>
+      </color>
+     </property>
+     <property name="alignment">
+      <enum>caChoice::center</enum>
+     </property>
+     <property name="colorMode">
+      <enum>caChoice::Static</enum>
+     </property>
+     <property name="stackingMode" stdset="0">
+      <enum>caChoice::Row</enum>
+     </property>
+     <property name="endBit">
+      <number>1</number>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_11">
+     <property name="geometry">
+      <rect>
+       <x>167</x>
+       <y>535</y>
+       <width>41</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">FIGW</string>
+     </property>
+    </widget>
+    <widget class="caLabel" name="calabel_33">
+     <property name="geometry">
+      <rect>
+       <x>57</x>
+       <y>585</y>
+       <width>61</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>distance</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="background">
+      <color alpha="0">
+       <red>160</red>
+       <green>160</green>
+       <blue>164</blue>
+      </color>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_9">
+     <property name="geometry">
+      <rect>
+       <x>87</x>
+       <y>535</y>
+       <width>41</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">FIGX</string>
+     </property>
+    </widget>
+    <widget class="caLabel" name="calabel_31">
+     <property name="geometry">
+      <rect>
+       <x>134</x>
+       <y>555</y>
+       <width>31</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>(3)</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="background">
+      <color alpha="0">
+       <red>160</red>
+       <green>160</green>
+       <blue>164</blue>
+      </color>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_16">
+     <property name="geometry">
+      <rect>
+       <x>127</x>
+       <y>586</y>
+       <width>91</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">myPython3</string>
+     </property>
+     <property name="calc">
+      <string notr="true">%P/
+#!/usr/bin/python
+def PythonCalc(a, b, c, d):
+	import decimal, math, sys
+	e = pow(int(c-a),2)
+	f =  pow(int(d-b),2)
+	try:
+		return  pow(e+f, 0.5)
+	except:
+		return float('NaN')
+/
+</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">FIGX</string>
+     </property>
+     <property name="channelB">
+      <string notr="true">FIGY</string>
+     </property>
+     <property name="channelC">
+      <string notr="true">FIGW</string>
+     </property>
+     <property name="channelD">
+      <string notr="true">FIGH</string>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_13">
+     <property name="geometry">
+      <rect>
+       <x>237</x>
+       <y>555</y>
+       <width>41</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">FIGXW</string>
+     </property>
+     <property name="calc">
+      <string notr="true">2*A</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">FIGX</string>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_14">
+     <property name="geometry">
+      <rect>
+       <x>237</x>
+       <y>575</y>
+       <width>41</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">FIGYW</string>
+     </property>
+     <property name="calc">
+      <string notr="true">2*A</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">FIGY</string>
+     </property>
+    </widget>
+    <widget class="caLabel" name="calabel_32">
+     <property name="geometry">
+      <rect>
+       <x>237</x>
+       <y>535</y>
+       <width>161</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>ex. of  world coordinates</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="background">
+      <color alpha="0">
+       <red>160</red>
+       <green>160</green>
+       <blue>164</blue>
+      </color>
+     </property>
+    </widget>
+    <widget class="caLabel" name="calabel_29">
+     <property name="geometry">
+      <rect>
+       <x>47</x>
+       <y>555</y>
+       <width>31</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>(1)</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="background">
+      <color alpha="0">
+       <red>160</red>
+       <green>160</green>
+       <blue>164</blue>
+      </color>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_12">
+     <property name="geometry">
+      <rect>
+       <x>167</x>
+       <y>555</y>
+       <width>41</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">FIGH</string>
+     </property>
+    </widget>
+    <widget class="caLabel" name="calabel_30">
+     <property name="geometry">
+      <rect>
+       <x>134</x>
+       <y>534</y>
+       <width>31</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>(2)</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="background">
+      <color alpha="0">
+       <red>160</red>
+       <green>160</green>
+       <blue>164</blue>
+      </color>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_15">
+     <property name="geometry">
+      <rect>
+       <x>297</x>
+       <y>555</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">ACM:MOTOR</string>
+     </property>
+     <property name="calc">
+      <string notr="true">A</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">myPython3</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QComboBox" name="comboBox">
+    <property name="geometry">
+     <rect>
+      <x>690</x>
+      <y>17</y>
+      <width>102</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Mono</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RGB1_CA</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RGB2_CA</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RGB3_CA</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerRG_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerGB_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerGR_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerBG_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerRG_12</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerGB_12</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerGR_12</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerBG_12</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RGB_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BGR_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RGBA_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BRGA_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RGB12</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>YUV444</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>YUV422</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>YUV411</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>YUV421</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="comboBox_2">
+    <property name="geometry">
+     <rect>
+      <x>690</x>
+      <y>52</y>
+      <width>104</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>packNo</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>MSB12Bit</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>LSB12Bit</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Reversed</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="caLineEdit" name="calineedit">
+    <property name="geometry">
+     <rect>
+      <x>875</x>
+      <y>21</y>
+      <width>100</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_2">
+    <property name="geometry">
+     <rect>
+      <x>876</x>
+      <y>51</y>
+      <width>100</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT</string>
+    </property>
+   </widget>
+   <widget class="caCamera" name="cacamera_2">
+    <property name="geometry">
+     <rect>
+      <x>690</x>
+      <y>400</y>
+      <width>294</width>
+      <height>229</height>
+     </rect>
+    </property>
+    <property name="channelData" stdset="0">
+     <string notr="true">MTEST-CAQTDM-CAMERA:FPICTURE</string>
+    </property>
+    <property name="channelWidth" stdset="0">
+     <string notr="true">MTEST-CAQTDM-CAMERA:WIDTH</string>
+    </property>
+    <property name="channelHeight" stdset="0">
+     <string notr="true">MTEST-CAQTDM-CAMERA:HEIGHT</string>
+    </property>
+    <property name="simpleZoomedView" stdset="0">
+     <bool>true</bool>
+    </property>
+    <property name="Zoom" stdset="0">
+     <enum>caCamera::Yes</enum>
+    </property>
+    <property name="automaticLevels" stdset="0">
+     <bool>true</bool>
+    </property>
+    <property name="minLevel">
+     <string notr="true">800</string>
+    </property>
+    <property name="maxLevel">
+     <string notr="true">4500</string>
+    </property>
+    <property name="colorMode" stdset="0">
+     <enum>caCamera::YUV422</enum>
+    </property>
+    <property name="packMode" stdset="0">
+     <enum>caCamera::MSB12Bit</enum>
+    </property>
+    <property name="ColorMap" stdset="0">
+     <enum>caCamera::as_is</enum>
+    </property>
+    <property name="ROI_readChannels" stdset="0">
+     <string>FIGX;FIGY;FIGW;FIGH</string>
+    </property>
+    <property name="ROI_readmarkerType" stdset="0">
+     <enum>caCamera::box_crosshairs</enum>
+    </property>
+    <property name="ROI_readType" stdset="0">
+     <enum>caCamera::xycenter_width_height</enum>
+    </property>
+    <property name="ROI_writeChannels" stdset="0">
+     <string notr="true">FIGX;FIGY;FIGW;FIGH;</string>
+    </property>
+    <property name="ROI_writemarkerType" stdset="0">
+     <enum>caCamera::box</enum>
+    </property>
+    <property name="ROI_writeType" stdset="0">
+     <enum>caCamera::xycenter_width_height</enum>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBox_3">
+    <property name="geometry">
+     <rect>
+      <x>690</x>
+      <y>343</y>
+      <width>110</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Mono</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RGB1_CA</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RGB2_CA</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RGB3_CA</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerRG_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerGB_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerGR_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerBG_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerRG_12</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerGB_12</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerGR_12</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BayerBG_12</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RGB_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BGR_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RGBA_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>BRGA_8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RGB12</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>YUV444</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>YUV422</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>YUV411</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>YUV421</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="comboBox_4">
+    <property name="geometry">
+     <rect>
+      <x>690</x>
+      <y>370</y>
+      <width>106</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>packNo</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>MSB12Bit</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>LSB12Bit</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Reversed</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="caLabel" name="calabel_2">
+    <property name="geometry">
+     <rect>
+      <x>827</x>
+      <y>22</y>
+      <width>40</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>W:</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_3">
+    <property name="geometry">
+     <rect>
+      <x>827</x>
+      <y>47</y>
+      <width>40</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>H:</string>
+    </property>
+   </widget>
+   <widget class="caApplyNumeric" name="caapplynumeric">
+    <property name="geometry">
+     <rect>
+      <x>816</x>
+      <y>138</y>
+      <width>175</width>
+      <height>62</height>
+     </rect>
+    </property>
+    <property name="integerDigits" stdset="0">
+     <number>6</number>
+    </property>
+    <property name="decimalDigits" stdset="0">
+     <number>0</number>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">roi:x</string>
+    </property>
+    <property name="precisionMode">
+     <enum>caApplyNumeric::User</enum>
+    </property>
+    <property name="fixedFormat">
+     <bool>true</bool>
+    </property>
+    <property name="limitsMode">
+     <enum>caApplyNumeric::User</enum>
+    </property>
+    <property name="minValue">
+     <double>0.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="caApplyNumeric" name="caapplynumeric_2">
+    <property name="geometry">
+     <rect>
+      <x>817</x>
+      <y>220</y>
+      <width>175</width>
+      <height>62</height>
+     </rect>
+    </property>
+    <property name="integerDigits" stdset="0">
+     <number>6</number>
+    </property>
+    <property name="decimalDigits" stdset="0">
+     <number>0</number>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">roi:y</string>
+    </property>
+    <property name="precisionMode">
+     <enum>caApplyNumeric::User</enum>
+    </property>
+    <property name="fixedFormat">
+     <bool>true</bool>
+    </property>
+    <property name="limitsMode">
+     <enum>caApplyNumeric::User</enum>
+    </property>
+    <property name="minValue">
+     <double>0.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_34">
+    <property name="geometry">
+     <rect>
+      <x>696</x>
+      <y>156</y>
+      <width>97</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>set x value:</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <property name="background">
+     <color alpha="0">
+      <red>160</red>
+      <green>160</green>
+      <blue>164</blue>
+     </color>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_35">
+    <property name="geometry">
+     <rect>
+      <x>698</x>
+      <y>240</y>
+      <width>97</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>set y value:</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <property name="background">
+     <color alpha="0">
+      <red>160</red>
+      <green>160</green>
+      <blue>164</blue>
+     </color>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_25">
+    <property name="geometry">
+     <rect>
+      <x>867</x>
+      <y>314</y>
+      <width>100</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">roi:x</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_26">
+    <property name="geometry">
+     <rect>
+      <x>867</x>
+      <y>345</y>
+      <width>100</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">roi:y</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caApplyNumeric</class>
+   <extends>QWidget</extends>
+   <header>caApplyNumeric</header>
+  </customwidget>
+  <customwidget>
+   <class>caChoice</class>
+   <extends>QWidget</extends>
+   <header>caChoice</header>
+  </customwidget>
+  <customwidget>
+   <class>caFrame</class>
+   <extends>QFrame</extends>
+   <header>caFrame</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>caLabel</class>
+   <extends>QLabel</extends>
+   <header>caLabel</header>
+  </customwidget>
+  <customwidget>
+   <class>caLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>caLineEdit</header>
+  </customwidget>
+  <customwidget>
+   <class>caCamera</class>
+   <extends>QWidget</extends>
+   <header>caCamera</header>
+  </customwidget>
+  <customwidget>
+   <class>caCalc</class>
+   <extends>QLabel</extends>
+   <header>caCalc</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>comboBox_2</sender>
+   <signal>activated(QString)</signal>
+   <receiver>cacamera</receiver>
+   <slot>setPackingmodeStr(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>730</x>
+     <y>64</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>578</x>
+     <y>164</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox</sender>
+   <signal>activated(QString)</signal>
+   <receiver>cacamera</receiver>
+   <slot>setDecodemodeStr(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>743</x>
+     <y>33</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>592</x>
+     <y>133</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_9</sender>
+   <signal>changeValue(double)</signal>
+   <receiver>caapplynumeric</receiver>
+   <slot>UpdateDisplayedValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>131</x>
+     <y>557</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>855</x>
+     <y>169</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox</sender>
+   <signal>activated(QString)</signal>
+   <receiver>cacamera_2</receiver>
+   <slot>setDecodemodeStr(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>765</x>
+     <y>31</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>966</x>
+     <y>414</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox_2</sender>
+   <signal>activated(QString)</signal>
+   <receiver>cacamera_2</receiver>
+   <slot>setPackingmodeStr(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>765</x>
+     <y>66</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>823</x>
+     <y>430</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_10</sender>
+   <signal>changeValue(double)</signal>
+   <receiver>caapplynumeric_2</receiver>
+   <slot>UpdateDisplayedValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>102</x>
+     <y>579</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>857</x>
+     <y>251</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

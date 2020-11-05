@@ -32,9 +32,14 @@
 #include "cameter.h"
 
 #if defined(_MSC_VER)
-#define fmax max
-#define fmin min
+ #define fmax max
+ #define fmin min
+ #ifndef snprintf
+  #define snprintf _snprintf
+ #endif
 #endif
+
+#include <qnumeric.h>
 
 #if QWT_VERSION < 0x060100
 
@@ -111,7 +116,7 @@ caMeter::caMeter(QWidget *parent) : QwtDial(parent)
     setScale( thisMinValue, thisMaxValue);
     setScaleStepSize((thisMinValue - thisMaxValue)/10.0);
 #endif
-		
+
     ScaleDraw->setPenWidth(1);
     setLineWidth(1);
     setFrameShadow(QwtDial::Sunken);
@@ -226,20 +231,25 @@ void caMeter::setFormat(int prec)
 
 QString caMeter::setLabel(double value, const QString& units)
 {
-    char asc[1024];
+    char asc[MAX_STRING_LENGTH];
     QString label;
 
     if(thisFormatType == compact) {
       if ((value < 1.e4 && value > 1.e-4) || (value > -1.e4 && value < -1.e-4) || value == 0.0) {
-        sprintf(asc, thisFormatC, value);
+        snprintf(asc, MAX_STRING_LENGTH, thisFormatC, value);
       } else {
-        sprintf(asc, thisFormat, value);
+        snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
       }
     } else if(thisFormatType == truncated) {
-        sprintf(asc, thisFormat, (int) value);
+        snprintf(asc, MAX_STRING_LENGTH, thisFormat, (int) value);
     } else {
-        sprintf(asc, thisFormat, value);
+        snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
     }
+
+    if(qIsNaN(value)){
+      snprintf(asc, MAX_STRING_LENGTH,  "nan");
+    }
+
     if(thisUnitMode) {
         strcat(asc, " ");
         strcat(asc, qasc(units));
@@ -253,22 +263,27 @@ QString caMeter::setLabel(double value, const QString& units)
 // something that has to be thought over
 QString caMeter::setScaleLabel(double value)
 {
-    char asc[1024];
+    char asc[MAX_STRING_LENGTH];
     QString label;
 
     if(!thisScaleEnabled) return "";
 
     if(thisFormatType == compact) {
       if ((value < 1.e4 && value > 1.e-4) || (value > -1.e4 && value < -1.e-4) || value == 0.0) {
-        sprintf(asc, thisFormatC, value);
+        snprintf(asc, MAX_STRING_LENGTH,thisFormatC, value);
       } else {
-        sprintf(asc, thisFormat, value);
+        snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
       }
     } else if(thisFormatType == truncated) {
-        sprintf(asc, thisFormat, (int) value);
+        snprintf(asc, MAX_STRING_LENGTH, thisFormat, (int) value);
     } else {
-        sprintf(asc, thisFormat, value);
+        snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
     }
+
+    if(qIsNaN(value)){
+      snprintf(asc, MAX_STRING_LENGTH,  "nan");
+    }
+
     label = QString::fromAscii(asc);
 
     return label;

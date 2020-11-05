@@ -28,6 +28,7 @@
 
 #include "caQtDM_Lib_global.h"
 #include <stdint.h>
+#include <cadef.h>
 #include "knobDefines.h"
 #include "knobData.h"
 
@@ -37,9 +38,11 @@
 extern "C" {
 #endif /* __cplusplus */
 
-
+int EpicsSetValue_Connected(chid ch,char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
 int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
+int EpicsSetWave_Connected(chid ch,char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess);
 int EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess);
+int EpicsGetTimeStamp_Connected(chid ch,char *pv, char *timestamp);
 int EpicsGetTimeStamp(char *pv, char *timestamp);
 int EpicsGetDescription(char *pv, char *description);
 void clearEvent(void * ptr);

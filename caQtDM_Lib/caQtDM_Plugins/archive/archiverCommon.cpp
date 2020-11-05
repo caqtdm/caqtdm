@@ -137,7 +137,9 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
         QVariant var = w->property("secondsPast");
         if(!var.isNull()) {
-            index.secondsPast = var.toInt();
+            bool ok;
+            index.secondsPast = var.toInt(&ok);
+            if(!ok) index.secondsPast = 3600;
         } else {
             QString mess("Archive plugin -- no secondsPast defined as dynamic property in widget " + QString(kData->dispName) + ", default to 1 hour back");
             if(messagewindowP != (MessageWindow *) 0 && !QString(kData->pv).contains(".Y")) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
@@ -147,7 +149,9 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
         var = w->property("secondsUpdate");
         if(!var.isNull()) {
-            index.updateSeconds = var.toInt();
+            bool ok;
+            index.updateSeconds = var.toInt(&ok);
+            if(!ok) index.updateSeconds = SECONDSTIMEOUT;
 
             // override the user specification if too many data are going to be requested
             if(index.secondsPast > 7200) index.updateSeconds = 60;
@@ -228,7 +232,7 @@ void ArchiverCommon::updateSecondsPast(indexes indexNew, bool original)
     }
 }
 
-void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<float> TimerN, QVector<float> YValsN, QString backend)
+void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double> TimerN, QVector<double> YValsN, QString backend)
 {
     QMutexLocker locker(&mutex);
     //qDebug() << "ArchiverCommon::updateCartesian";
@@ -236,18 +240,18 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<float>
         knobData kData = mutexknobdataP->GetMutexKnobData(indexNew.indexX);
         if(kData.index == -1) return;
         mutexknobdataP->DataLock(&kData);
-        kData.edata.fieldtype = caFLOAT;
+        kData.edata.fieldtype = caDOUBLE;
         kData.edata.connected = true;
         kData.edata.accessR = kData.edata.accessW = true;
         kData.edata.monitorCount++;
         strcpy(kData.edata.fec, qasc(backend));
 
-        if((nbVal * sizeof(float)) > (size_t) kData.edata.dataSize) {
+        if((nbVal * sizeof(double)) > (size_t) kData.edata.dataSize) {
             if(kData.edata.dataB != (void*) 0) free(kData.edata.dataB);
-            kData.edata.dataB = (void*) malloc(nbVal * sizeof(float));
-            kData.edata.dataSize = nbVal * sizeof(float);
+            kData.edata.dataB = (void*) malloc(nbVal * sizeof(double));
+            kData.edata.dataSize = nbVal * sizeof(double);
         }
-        memcpy(kData.edata.dataB, &TimerN[0],  nbVal * sizeof(float));
+        memcpy(kData.edata.dataB, &TimerN[0],  nbVal * sizeof(double));
         kData.edata.valueCount = nbVal;
         mutexknobdataP->SetMutexKnobDataReceived(&kData);
         mutexknobdataP->DataUnlock(&kData);
@@ -255,18 +259,18 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<float>
         kData = mutexknobdataP->GetMutexKnobData(indexNew.indexY);
         if(kData.index == -1) return;
         mutexknobdataP->DataLock(&kData);
-        kData.edata.fieldtype = caFLOAT;
+        kData.edata.fieldtype = caDOUBLE;
         kData.edata.connected = true;
         kData.edata.accessR = kData.edata.accessW = true;
         kData.edata.monitorCount++;
         strcpy(kData.edata.fec, qasc(backend));
 
-        if((nbVal * sizeof(float)) > (size_t) kData.edata.dataSize) {
+        if((nbVal * sizeof(double)) > (size_t) kData.edata.dataSize) {
             if(kData.edata.dataB != (void*) 0) free(kData.edata.dataB);
-            kData.edata.dataB = (void*) malloc(nbVal * sizeof(float));
-            kData.edata.dataSize = nbVal * sizeof(float);
+            kData.edata.dataB = (void*) malloc(nbVal * sizeof(double));
+            kData.edata.dataSize = nbVal * sizeof(double);
         }
-        memcpy(kData.edata.dataB, &YValsN[0],  nbVal * sizeof(float));
+        memcpy(kData.edata.dataB, &YValsN[0],  nbVal * sizeof(double));
 
         kData.edata.valueCount = nbVal;
         mutexknobdataP->SetMutexKnobDataReceived(&kData);

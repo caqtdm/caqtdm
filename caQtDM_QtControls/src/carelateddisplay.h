@@ -67,6 +67,30 @@ public slots:
     void hideObject(bool hideit) {
 #include "hideobjectcode.h"
     }
+    void trigger0() {
+        emit triggered(0);
+    }
+    void trigger1() {
+        emit triggered(1);
+    }
+    void trigger2() {
+        emit triggered(2);
+    }
+    void trigger3() {
+        emit triggered(3);
+    }
+    void trigger4() {
+        emit triggered(4);
+    }
+    void trigger5() {
+        emit triggered(5);
+    }
+    void trigger6() {
+        emit triggered(6);
+    }
+    void trigger7() {
+        emit triggered(7);
+    }
 
 private:
     QStringList  replacemodes;

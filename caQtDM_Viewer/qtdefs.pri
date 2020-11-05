@@ -1,6 +1,4 @@
-CAQTDM_VERSION = V4.1.6
-
-
+CAQTDM_VERSION = V4.3.1
 
 exists(../.git) {
   GIT_VERSION = $$system(git --version)
@@ -26,9 +24,18 @@ QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
 QT_VER_PAT = $$member(QT_VERSION, 2)
 
+
+QWTVERSION = $$(QWTVERSION)
+QWTVERSION = $$split(QWTVERSION, ".")
+QWT_VER_MAJ = $$member(QWTVERSION, 0)
+QWT_VER_MIN = $$member(QWTVERSION, 1)
+
+message ("Qt $$[QT_VERSION] QWT $$(QWTVERSION)")
+
+
 TARGET_COMPANY = "Paul Scherrer Institut"
 TARGET_DESCRIPTION = "Channel Access Qt Display Manager"
-TARGET_COPYRIGHT = "Copyright (C) 2016 Paul Scherrer Institut"
+TARGET_COPYRIGHT = "Copyright (C) 2020 Paul Scherrer Institut"
 TARGET_INTERNALNAME = "caqtdm"
 
 # enable opengl in stripplot and cartesianplot (edo not use, experimental only, for Qt5 and qwt6.1)
@@ -73,9 +80,15 @@ ios | android {
 }
 ios {
   DEFINES += MOBILE_IOS
+  QTPLUGIN += qjpeg qgif
+  QMAKE_CXXFLAGS_WARN_ON = -w
 }
 android {
   DEFINES += MOBILE_ANDROID
+  QMAKE_CXXFLAGS_WARN_ON = -w
+}
+macx {
+  QMAKE_CXXFLAGS_WARN_ON = -w
 }
 
 # for some architectures this has to be defined for scan2D
@@ -84,25 +97,92 @@ DEFINES += XDR_HACK
 DEFINES += XDR_LE
 CONFIG += XDR_HACK
 }
+# enable XDR_HACK test for Linux/Qt5.10 e.g. Fedora 28
+unix:!macx:{
+ contains(QT_VER_MAJ, 5) {
+   greaterThan(QT_VER_MIN,9){
+    DEFINES += XDR_HACK
+    DEFINES += XDR_LE
+    CONFIG += XDR_HACK
+   }
+ }
+}
 
-# undefine this for epics4 plugin support (only preliminary version as example)
-# one can specify channel access with ca:// and pv access with pvs:// (both use the epics4 plugin)
+# enable ADL_EDL automatic on the fly conversion, if not enabled, when an adl file is encountered,
+# an ui file is assumed
+!MOBILE: {
+    CONFIG += ADL_EDL_FILES
+    DEFINES += ADL_EDL_FILES
+}
+
+
+# undefine CONFIG epics7 for epics4 plugin support with epics version 7 (only preliminary version as example)
+# one can specify channel access with ca:// and pv access with pva:// (both use the epics4 plugin)
 # the main work for this plugin was done by Marty Kraimer
 
-exists($(EPICS4LOCATION)/pvAccessCPP/include/pv/pvAccess.h) {
-!MOBILE {
-   message( "Configuring build for epics4" )
+#CONFIG += epics7
+epics7 {
+   message( "Configuring build for epics4 plugin with epics7" )
    CONFIG += epics4
 }
+
+
+_CAQTDM_MODBUS = $$(CAQTDM_MODBUS)
+isEmpty(_CAQTDM_MODBUS) {
+message("Modbus Plugin will not be build")
+}
+else {
+    contains(QT_VER_MAJ, 5) {
+        unix:!macx:!ios:!android  {
+            packagesExist(serialbus){
+                CONFIG += modbus
+            }
+        }else{
+            CONFIG += modbus
+        }
+        modbus {
+           message( "Configuring build for modbus plugin" )
+        }
+    }
+}
+
+_CAQTDM_GPS = $$(CAQTDM_GPS)
+isEmpty(_CAQTDM_GPS) {
+message("GPS Plugin will not be build")
+}
+else {
+    contains(QT_VER_MAJ, 5) {
+        unix:!macx:!ios:!android {
+            packagesExist(positioning){
+                CONFIG += gps
+            }
+        }else{
+            CONFIG += gps
+        }
+        gps {
+           message( "Configuring build for GPS plugin" )
+        }
+    }
+
+}
+
+# undefine CONFIG epics4 for epics4 plugin support with epics version 4 (only preliminary version as example)
+# one can specify channel access with ca:// and pv access with pva:// (both use the epics4 plugin)
+# the main work for this plugin was done by Marty Kraimer
+!epics7 {
+   exists($(EPICS4LOCATION)/pvAccessCPP/include/pv/pvAccess.h) {
+   !MOBILE {
+      message( "Configuring build for epics4 plugin with epics4" )
+      CONFIG += epics4
+   }
    CONFIG += EPICS4_STATICBUILD
+   }
 }
 
 # undefine this to make the ca provider from pvAccess (epics4) the default provider
 # otherwise the ca provider from epics3 base is the default provider
 #DEFINES += PVAISDEFAULTPROVIDER
 
-# undefine this for bsread (zeromq) plugin support
-# the main work for this plugin was done by Helge Brands
 contains(QT_VER_MAJ, 4) {
     contains(QT_VER_MIN, 6) {
        message( "version 4.6 of Qt" )
@@ -113,16 +193,25 @@ contains(QT_VER_MAJ, 4) {
 # undefine this for bsread (zeromq) plugin support
 # the main work for this plugin was done by Helge Brands
 # will not be build for older version of Qt
-!OLDQT {
+#!OLDQT {
   exists($(ZMQINC)/zmq.h) {
     !MOBILE {
        message( "Configuring controlsystem plugin for bsread" )
        CONFIG += bsread
     }
   }
-}
+#}
 
-#message("$$PWD")
+defineTest(existFiles) {
+    files = $$ARGS
+
+    for(file, files) {
+        !exists($$file) {
+            return(false)
+        }
+    }
+    return(true)
+}
 
 # undefine this for archive retrieval plugin support (these plugins are only valid at psi)
 # take a look at the archiveSF in order to do something similar
@@ -132,26 +221,40 @@ archive: {
    CONFIG += archiveSF
 # next ones are only buildable at psi
 
-   X64 = $$find($$(QMAKESPEC), 64)
-   isEmpty(X64) {
-       exists(../../Libs/libNewLogRPC.a) {
+QMAKESPEC = $$(QMAKESPEC)
+X64 = $$find(QMAKESPEC, 64)
+
+isEmpty(X64) {
+       exists($(CAQTDM_LOGGING_ARCHIVELIBS)/libNewLogRPC.a) {
           message( "Configuring archive plugin build for logging (32)" )
           CONFIG += archiveHIPA
           CONFIG += archivePRO
+       } else {
+          warning("library libNewLogRPC.a not found, archive plugin will not be build for logging (32)" )
        }
-       exists(../caQtDM_Lib/caQtDM_Plugins/archive/archiveCA/Storage/libStorage_32.a) {
-          message( "Configuring archive plugin for CA (32)" )
-          CONFIG += archiveCA
+
+       allFiles = $(CAQTDM_CA_ARCHIVELIBS)/Storage/libStorage_32.a $(CAQTDM_CA_ARCHIVELIBS)/Tools/libTools_32.a $(CAQTDM_CA_ARCHIVELIBS)/xerces-c-3.1.4/libxerces-c_32.a
+       existFiles($$join(allFiles, " ")) {
+         message( "Configuring archive plugin build for CA (32)" )
+         CONFIG += archiveCA
+       } else {
+          warning("some library (libStorage_32.a or libTools_32.a or ibxerces-c_32.a) for ca_archiver not found, ca_archive plugin will not be build" )
        }
     } else {
-       exists(../../Libs/libNewLogRPC_64.a) {
-           message( "Configuring archive plugin for logging (64)" )
+       exists($(CAQTDM_LOGGING_ARCHIVELIBS)/libNewLogRPC_64.a) {
+          message( "Configuring archive plugin for logging (64)" )
           CONFIG += archiveHIPA
           CONFIG += archivePRO
+       } else {
+          warning("library libNewLogRPC_64.a not found, archive plugin will not be build for logging (64)" )
        }
-       exists(../caQtDM_Lib/caQtDM_Plugins/archive/archiveCA/Storage/libStorage_64.a) {
-          message( "Configuring archive pluging for CA (64)" )
+
+       allFiles = $(CAQTDM_CA_ARCHIVELIBS)/Storage/libStorage_64.a $(CAQTDM_CA_ARCHIVELIBS)/Tools/libTools_64.a $(CAQTDM_CA_ARCHIVELIBS)/xerces-c-3.1.4/libxerces-c_64.a
+       existFiles($$join(allFiles, " ")) {
+          message( "Configuring archive plugin for CA (64)" )
           CONFIG += archiveCA
+       } else {
+          warning("some library (libStorage_64.a or libTools_64.a or ibxerces-c_64.a) for ca_archiver not found, ca_archive plugin will not be build" )
        }
     }
 }
@@ -192,6 +295,108 @@ DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 
+# 4.3.0
+# POPUP status windows with possible delays
+# dynamic Property caqtdmPopupUI and caqtdmPopupUI_Delay for POPUP windows (The filename must contain the word popup.ui)
+# wmsignalpropergator can resize a panel
+# fix for to long strings in channel names
+# fix for some character problems
+# fix for alarm status for caMenu
+# fix for softPV Waveform Processing
+# fix for softPV initialisation, wrong initial value, ui loader depending
+# cleanup in the sf-archiver
+# fix in caMenu, paintEvent removed
+# more file status check before accessing (avoid AFS problems)
+# fix the seg fault for the classname problem EPushButton
+# softPV vector/scalar performance problem fixed
+# start of EPICS 4 to EPICS 7 implementation
+# fix for string length problems
+# calinedraw emit textChanged
+# optimized caCalc signal emitance
+# caCamera add slots for zoom and position
+# caQtDM can be compiled with VS2019
+# Updates for Android and IOS
+# fixes some problems with MOC and QWT
+# build in ADL and EDL Parser
+# shellcommand for Mac
+# landscape version for Android
+# fileopening with dynamic conversion causes problems using TEMP directory
+# added for archivSF the redirection feature to access multiple data sources
+# fix a floating point problem on RHL7 in the archiveSF
+
+
+
+# 4.2.4
+# fixed a exception in bsread at closing
+# added a userdefined format to caLinEdit,caTextEntry and caTextEntry
+# add macroreplacment for tooltip and statustip on: caLineEdit, caMultilineString, caGraphics, caPolyline, caMessageButton and caLed
+# fix TLS problem in sf archiver for old Qt Versions
+# buffer overflow in sf_archiver plugin corrected
+# extend macro replacement for cascript button
+# reusing connected channels in epics3 plugin for seting data
+# borderWidth designer problem with numbers >1, fixed
+# changes for python3
+# fix for backend check. Backend property will generate a message that the backend name is not known. but it will use it.
+# too strict check on RegEx match for visibility
+# caTextEntry value could be set beyond channel hopr or lopr limits. this has been corrected
+
+# 4.2.3 of 11.7.2018
+# focus can be kept now in caTextEntry even on pointer leave by specifying a property
+# instead of exchanging through shared memory directly for -attach, a queue has been integrated for attaching
+# for caLineEdit in case of bsread, the unit will be acquired automatically through epics (PSI special)
+# remove extra white spaces and special characters (lf, cr) form macrodefs
+# added for caTextEntry  a drop possibility when dragging into it.
+# new bsread options
+# in the unit, the u in uJ will be converted to a real mu
+
+# 4.2.2
+# shared memory key was not set correctly for -attach; corrected now
+
+# 4.2.1
+# after write epics channel is cleared now
+# performance enhancement for caCalc
+# added some signals and slots
+# internal macros added
+# added property to caCartesianplot for changing size of symbols by a multiplicator
+# bug fixes
+
+# 4.2.0
+# major changes in camera widget to support all possible epics data modes and camera modes
+# rich text now also considered for fontscaling
+# epics version number will now be printed in the message window
+# added include definition for epics 3.15 and higher
+# prevent too many messages when epics exceptions
+
+# 4.1.8
+# bsread support for 2D waveforms
+# added ctrl+ and ctrl - to increase or decrease window size
+# added a slot for executing the message button
+# unresolved macros window implemented
+# the problem of increasing open files solved
+# added possibility to disconnect all channels in hidden tabs
+# problem with autoscale and infinite values solved
+# month number in date corrected
+# soft variables were not always updating. eliminated test for update; soft variables will not be updated in hidden tab
+
+# 4.1.7
+# problem with cawavetable corrected
+# when Qt4.6 using qwt6.0 no support for date time axis, fallback to linear axis
+# problem introduced for cacalc, corrected in new release
+# added possibility to get info for objects when overlay widget has no monitors
+
+# 4.1.6 of 2.11.2017
+# added to print date, time and filename
+# added signals to cachoice, camessage so that setting of the index of a tabwidget will be possible
+# changed all floats in archive plugins to doubles in order to get a better resolution of the time axis
+# access security had a small bug when over a gateway
+# command line option updatetype=direct added to set caQtDM in direct update mode
+
+# 4.1.6 of 18.10.2017
+# camenu maske integriert, allows to make entries invisible
+# cathermo marker has now variable size
+# cursor shape did not change when on a cawidget and when access security changed
+# regex expressions now possible when using a macro (ask helge brands)
+
 # 4.1.6 of 7.9.2017
 # last index in array was not taken into account and scale was not updated for the wareerfallplot
 # optimization of archive plugins
@@ -207,7 +412,7 @@ DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 # the wmsignalpropagator got signals to propagate the resizing factor of a window. this can be used in order to correct animations with absolute pixel positions.
 # when propagating through a signal a value to cacalc, this value is displayed. However was not propgated for further use. This has been corrected
 # the colors of the caspinbox could be wrong due to a ack of proper initialisation, this has been corrected.
-# very big doubles were not set correctly, this has ben corrected.
+# very big doubles were not set correctly, this has been corrected.
 # static visibility (while no channels) can be used now.
 # handle double encoded url's in camimedisplay.
 # added hide/show slot in all ca widgets (permits to hide and show a widget when propagating a signal from cacalc)

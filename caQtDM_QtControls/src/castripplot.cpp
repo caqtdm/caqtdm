@@ -28,7 +28,6 @@
 #include <windows.h>
 #include <float.h>
 #define isnan _isnan
-#define snprintf _snprintf
 #define QWT_DLL
 #if (_MSC_VER == 1600)
   #define INFINITY (DBL_MAX+DBL_MAX)
@@ -42,6 +41,14 @@
 #include <qpainter.h>
 #include <QMetaProperty>
 #include "castripplot.h"
+
+
+
+#if defined(_MSC_VER)
+    #ifndef snprintf
+     #define snprintf _snprintf
+    #endif
+#endif
 
 // increase the array size given by the canvas width to be sure that the whole range is covered
 #define MAXIMUMSIZE 5000
@@ -794,7 +801,9 @@ void caStripPlot::TimeOut()
     }
 
     // in case of autoscale adjust the vertical scale
-    if(thisYaxisScaling == autoScale) setAxisScale(QwtPlot::yLeft, AutoscaleMinY, AutoscaleMaxY);
+    if(thisYaxisScaling == autoScale) {
+        if(!qIsInf(AutoscaleMinY) && !qIsInf(AutoscaleMaxY)) setAxisScale(QwtPlot::yLeft, AutoscaleMinY, AutoscaleMaxY);
+    }
 
     if((ResizeFactorX != oldResizeFactorX) || ResizeFactorY != oldResizeFactorY) {
         axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MajorTick, ResizeFactorX * 8.0);
@@ -837,7 +846,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 
     //printf("fontsize=%.1f %s\n", f.pointSizeF(), qasc(this->objectName()));
     //when legend text gets to small, hide it (will give then space for plot)
-
+    setProperty("legendfontsize", f.pointSizeF());
 
 #if QWT_VERSION < 0x060100
     for(i=0; i < NumberOfCurves; i++) {
@@ -894,7 +903,11 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
                 curve->setItemAttribute(QwtPlotItem::Legend, false);
                 continue;
             } else {
-                if(!curve->title().text().contains("?fill?")) curve->setItemAttribute(QwtPlotItem::Legend, true);
+                if(!curve->title().text().contains("?fill?")) {
+                    curve->setItemAttribute(QwtPlotItem::Legend, false);
+                    updateLegend();
+                    curve->setItemAttribute(QwtPlotItem::Legend, true);
+                }
             }
 
 			QwtLegend *lgd = qobject_cast<QwtLegend *>(legend());
@@ -998,6 +1011,8 @@ void caStripPlot::setTitlePlot(QString const &titel)
         title.setFont(QFont("Arial", 10));
         setTitle(title);
         replot();
+    } else {
+        setTitle("");
     }
 }
 
@@ -1008,6 +1023,8 @@ void caStripPlot::setTitleX(QString const &titel)
         QwtText xAxis(titel);
         xAxis.setFont(QFont("Arial", 10));
         setAxisTitle(xBottom, xAxis);
+    } else {
+        setAxisTitle(xBottom, "");
     }
     replot();
 }
@@ -1019,6 +1036,8 @@ void caStripPlot::setTitleY(QString const &titel)
         QwtText xAxis(titel);
         xAxis.setFont(QFont("Arial", 10));
         setAxisTitle(yLeft, xAxis);
+    } else {
+        setAxisTitle(yLeft, "");
     }
     replot();
 }

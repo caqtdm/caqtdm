@@ -22,6 +22,7 @@
  *  Contact details:
  *    anton.mezger@psi.ch
  */
+
 #if defined(_MSC_VER)
 #define NOMINMAX
 #include <windows.h>
@@ -32,8 +33,16 @@
 #include <QHeaderView>
 #include <QApplication>
 #include <QClipboard>
+#include <qnumeric.h>
 #include "cawavetable.h"
 #include "alarmdefs.h"
+
+#if defined(_MSC_VER)
+    #ifndef snprintf
+     #define snprintf _snprintf
+    #endif
+#endif
+
 
 caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
 {
@@ -341,24 +350,28 @@ void caWaveTable::setFormat(DataType dataType)
 
 QString caWaveTable::setValue(double value, DataType dataType)
 {
-    char asc[40];
+    char asc[MAX_STRING_LENGTH];
 
     if(dataType == doubles) {
         if(thisFormatType == compact) {
             if ((value < 1.e4 && value > 1.e-4) || (value > -1.e4 && value < -1.e-4) || value == 0.0) {
-                sprintf(asc, thisFormatC, value);
+                snprintf(asc, MAX_STRING_LENGTH, thisFormatC, value);
             } else {
-                sprintf(asc, thisFormat, value);
+                snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
             }
         } else {
-            sprintf(asc, thisFormat, value);
+            snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
         }
     } else if(dataType == longs) {
-        if(thisUnsigned) sprintf(asc, thisFormat, (uint) value);
-        else sprintf(asc, thisFormat, (int) value);
+        if(thisUnsigned) snprintf(asc, MAX_STRING_LENGTH, thisFormat, (uint) value);
+        else snprintf(asc, MAX_STRING_LENGTH, thisFormat, (int) value);
     } else if(dataType == characters) {
-        if(thisUnsigned) sprintf(asc, thisFormat, (uchar) value);
-        else sprintf(asc, thisFormat, (char) value);
+        if(thisUnsigned) snprintf(asc, MAX_STRING_LENGTH, thisFormat, (uchar) value);
+        else snprintf(asc, MAX_STRING_LENGTH, thisFormat, (char) value);
+    }
+
+    if(qIsNaN(value)){
+      snprintf(asc, MAX_STRING_LENGTH,  "nan");
     }
 
     return QString(asc);

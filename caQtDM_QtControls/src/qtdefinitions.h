@@ -26,6 +26,8 @@
 #ifndef QTDEFINITIONS_H
 #define QTDEFINITIONS_H
 
+#define MAX_STRING_LENGTH 4096
+
 #ifdef MOBILE_ANDROID
 #include <QScreen>
 #endif
@@ -34,7 +36,7 @@
 
 #ifdef MOBILE_ANDROID
 #define CorrectFontIfAndroid(x) \
-    x.setPointSize(x.pointSize() * (float) qApp->primaryScreen()->logicalDotsPerInch() / (float) qApp->primaryScreen()->physicalDotsPerInch());
+    x.setPointSize(x.pointSize() * 2.0 * (float) qApp->primaryScreen()->logicalDotsPerInch() / (float) qApp->primaryScreen()->physicalDotsPerInch());
 #else
 #define CorrectFontIfAndroid(x)
 #endif

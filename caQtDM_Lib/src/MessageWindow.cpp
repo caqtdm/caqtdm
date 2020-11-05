@@ -30,7 +30,11 @@
 #include <QMutexLocker>
 #include <stdio.h>
 #include <time.h>
+#ifndef MOBILE_ANDROID
 #include <sys/timeb.h>
+#else
+#include <androidtimeb.h>
+#endif
 #include "qtdefinitions.h"
 
 #define GCC_VERSION (__GNUC__ * 10000 \
@@ -72,7 +76,7 @@ QString MessageWindow::QtMsgToQString(QtMsgType type, const char *msg)
     time_val = timeA.time;
     timess = localtime(&time_val);
     if(timess != NULL) {
-        sprintf(prTime, "%02d-%02d-%04d %02d:%02d:%02d ", timess->tm_mday, timess->tm_mon, timess->tm_year+1900,  timess->tm_hour, timess->tm_min, timess->tm_sec);
+        sprintf(prTime, "%02d-%02d-%04d %02d:%02d:%02d ", timess->tm_mday, timess->tm_mon+1, timess->tm_year+1900,  timess->tm_hour, timess->tm_min, timess->tm_sec);
         switch (type) {
                 case QtDebugMsg:
                         return QString(prTime) + QString(msg);
@@ -107,7 +111,7 @@ void MessageWindow::customEvent(QEvent* event)
 #ifdef __MINGW32__
                 msgTextEdit.append(dynamic_cast<typename MessageEvent::MessageEvent* >(event)->msg);
 #else
-        #ifdef _WIN32
+        #if defined(_WIN32)  || defined(__clang__)
                 msgTextEdit.append(dynamic_cast<::MessageEvent* >(event)->msg);
         #else
                #if GCC_VERSION > 40407
@@ -152,7 +156,7 @@ void MessageWindow::postMsgEvent(QtMsgType type, char* msg)
 #ifdef __MINGW32__
     QCoreApplication::postEvent(this, new typename MessageEvent::MessageEvent(qmsg));
 #else
-#ifdef _WIN32
+#if defined(_WIN32)  || defined(__clang__)
     QCoreApplication::postEvent(this, new ::MessageEvent(qmsg));
 #else
 #if GCC_VERSION > 40407

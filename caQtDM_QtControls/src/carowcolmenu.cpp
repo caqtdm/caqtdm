@@ -59,7 +59,7 @@ caRowColMenu::caRowColMenu(QWidget *parent) : QWidget(parent)
     cellsP.clear();
     cellsI.clear();
     signalMapper = new QSignalMapper(this);
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < MAXITEMS; i++) {
         EPushButton* temp =  new EPushButton(QString::number(i), this);
         temp->setFontScaleMode(thisScaleMode);
         temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -191,12 +191,12 @@ void caRowColMenu::setImage(QString const &image) {
 void caRowColMenu::setStacking(Stacking stacking)
 {
     thisStacking = stacking;
-/*
+
     // force resize for repainting
-    QResizeEvent *re = new QResizeEvent(size(), size());
-    resizeEvent(re);
-    delete re;
-*/
+    //QResizeEvent *re = new QResizeEvent(size(), size());
+    //resizeEvent(re);
+    //delete re;
+
      populateCells();
 }
 
@@ -209,11 +209,13 @@ void  caRowColMenu::setLabels(QString const &newL)
 void caRowColMenu::setArgs(QString const &newL)
 {
     args = newL.split(";");
+    populateCells();
 }
 
 void caRowColMenu::setFiles(QString const &newL)
 {
     files = newL.split(";");
+    populateCells();
 }
 
 void caRowColMenu::setBackground(QColor c)

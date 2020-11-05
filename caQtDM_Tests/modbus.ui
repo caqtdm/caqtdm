@@ -1,0 +1,1671 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="caLineEdit" name="calineedit">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>30</y>
+      <width>111</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;HoldingRegisters&quot;,&quot;addr&quot;:10,&quot;count&quot;:1}</string>
+    </property>
+    <property name="colorMode">
+     <enum>caLineEdit::Alarm_Default</enum>
+    </property>
+    <property name="alarmHandling">
+     <enum>caLineEdit::onBackground</enum>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_2">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>90</y>
+      <width>111</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;HoldingRegisters&quot;,&quot;addr&quot;:1,&quot;count&quot;:1}</string>
+    </property>
+    <property name="colorMode">
+     <enum>caLineEdit::Alarm_Default</enum>
+    </property>
+    <property name="alarmHandling">
+     <enum>caLineEdit::onBackground</enum>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_3">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>120</y>
+      <width>111</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;HoldingRegisters&quot;,&quot;addr&quot;:3,&quot;count&quot;:1}</string>
+    </property>
+    <property name="colorMode">
+     <enum>caLineEdit::Alarm_Default</enum>
+    </property>
+    <property name="alarmHandling">
+     <enum>caLineEdit::onBackground</enum>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_4">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>150</y>
+      <width>111</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;HoldingRegisters&quot;,&quot;addr&quot;:6,&quot;count&quot;:1}</string>
+    </property>
+    <property name="colorMode">
+     <enum>caLineEdit::Alarm_Default</enum>
+    </property>
+    <property name="alarmHandling">
+     <enum>caLineEdit::onBackground</enum>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_5">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>180</y>
+      <width>111</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;H&quot;,&quot;addr&quot;:0,&quot;count&quot;:10}</string>
+    </property>
+    <property name="colorMode">
+     <enum>caLineEdit::Alarm_Default</enum>
+    </property>
+    <property name="alarmHandling">
+     <enum>caLineEdit::onBackground</enum>
+    </property>
+    <property name="formatType">
+     <enum>caLineEdit::string</enum>
+    </property>
+   </widget>
+   <widget class="caTextEntry" name="catextentry">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>30</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://testchannel4</string>
+    </property>
+   </widget>
+   <widget class="caSlider" name="caslider">
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>30</y>
+      <width>20</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="lowerBound">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="upperBound">
+     <double>5555.000000000000000</double>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;HoldingRegisters&quot;,&quot;addr&quot;:10,&quot;count&quot;:1,&quot;stat&quot;:2}</string>
+    </property>
+   </widget>
+   <widget class="caNumeric" name="canumeric">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>0</y>
+      <width>100</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;HoldingRegisters&quot;,&quot;addr&quot;:10,&quot;count&quot;:1}</string>
+    </property>
+   </widget>
+   <widget class="caWaveTable" name="cawavetable">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>280</y>
+      <width>661</width>
+      <height>261</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://testchannel6</string>
+    </property>
+    <property name="numberOfRows">
+     <number>13</number>
+    </property>
+    <property name="numberOfColumns">
+     <number>10</number>
+    </property>
+    <property name="precision">
+     <number>2</number>
+    </property>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <column/>
+    <column/>
+    <column/>
+    <column/>
+    <column/>
+    <column/>
+    <column/>
+    <column/>
+    <column/>
+    <column/>
+    <item row="0" column="0">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="1">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="2">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="3">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="4">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="5">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="6">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="7">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="8">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="9">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="1" column="0">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="1" column="1">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="1" column="2">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="1" column="3">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="1" column="4">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="1" column="5">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="1" column="6">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="1" column="7">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="1" column="8">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="1" column="9">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="2" column="0">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="2" column="1">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="2" column="2">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="2" column="3">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="2" column="4">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="2" column="5">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="2" column="6">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="2" column="7">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="2" column="8">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="2" column="9">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="3" column="0">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="3" column="1">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="3" column="2">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="3" column="3">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="3" column="4">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="3" column="5">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="3" column="6">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="3" column="7">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="3" column="8">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="3" column="9">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="4" column="0">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="4" column="1">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="4" column="2">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="4" column="3">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="4" column="4">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="4" column="5">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="4" column="6">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="4" column="7">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="4" column="8">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="4" column="9">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="5" column="0">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="5" column="1">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="5" column="2">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="5" column="3">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="5" column="4">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="5" column="5">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="5" column="6">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="5" column="7">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="5" column="8">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="5" column="9">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="6" column="0">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="6" column="1">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="6" column="2">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="6" column="3">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="6" column="4">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="6" column="5">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="6" column="6">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="6" column="7">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="6" column="8">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="6" column="9">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="7" column="0">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="7" column="1">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="7" column="2">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="7" column="3">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="7" column="4">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="7" column="5">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="7" column="6">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="7" column="7">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="7" column="8">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="7" column="9">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="8" column="0">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="8" column="1">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="8" column="2">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="8" column="3">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="8" column="4">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="8" column="5">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="8" column="6">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="8" column="7">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="8" column="8">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="8" column="9">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="9" column="0">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="9" column="1">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="9" column="2">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="9" column="3">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="9" column="4">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="9" column="5">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="9" column="6">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="9" column="7">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="9" column="8">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="9" column="9">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="10" column="0">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="10" column="1">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="10" column="2">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="10" column="3">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="10" column="4">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="10" column="5">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="10" column="6">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="10" column="7">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="10" column="8">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="10" column="9">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="11" column="0">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="11" column="1">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="11" column="2">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="11" column="3">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="11" column="4">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="11" column="5">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="11" column="6">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="11" column="7">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="11" column="8">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="11" column="9">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="12" column="0">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="12" column="1">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="12" column="2">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="12" column="3">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="12" column="4">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="12" column="5">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="12" column="6">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="12" column="7">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="12" column="8">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="12" column="9">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+   </widget>
+   <widget class="caSlider" name="caslider_2">
+    <property name="geometry">
+     <rect>
+      <x>620</x>
+      <y>30</y>
+      <width>20</width>
+      <height>150</height>
+     </rect>
+    </property>
+    <property name="lowerBound">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="upperBound">
+     <double>5555.000000000000000</double>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;HoldingRegisters&quot;,&quot;addr&quot;:10,&quot;count&quot;:1,&quot;cycle&quot;:20}</string>
+    </property>
+   </widget>
+   <widget class="caSlider" name="caslider_3">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>30</y>
+      <width>21</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="lowerBound">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="upperBound">
+     <double>5555.000000000000000</double>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;HoldingRegisters&quot;,&quot;addr&quot;:10,&quot;count&quot;:1,&quot;stat&quot;:3}</string>
+    </property>
+   </widget>
+   <widget class="caSlider" name="caslider_4">
+    <property name="geometry">
+     <rect>
+      <x>520</x>
+      <y>30</y>
+      <width>20</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="lowerBound">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="upperBound">
+     <double>5555.000000000000000</double>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;HoldingRegisters&quot;,&quot;addr&quot;:10,&quot;count&quot;:1,&quot;stat&quot;:4}</string>
+    </property>
+   </widget>
+   <widget class="caLed" name="caled">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>210</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;C&quot;,&quot;addr&quot;:1,&quot;count&quot;:1}</string>
+    </property>
+   </widget>
+   <widget class="caLed" name="caled_2">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>210</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;D&quot;,&quot;addr&quot;:0,&quot;count&quot;:1}</string>
+    </property>
+   </widget>
+   <widget class="caLed" name="caled_3">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>240</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;C&quot;,&quot;addr&quot;:17,&quot;count&quot;:1}</string>
+    </property>
+   </widget>
+   <widget class="caToggleButton" name="catogglebutton">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>210</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Hallo</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;C&quot;,&quot;addr&quot;:2,&quot;count&quot;:1}</string>
+    </property>
+    <property name="colorMode">
+     <enum>caToggleButton::Alarm</enum>
+    </property>
+   </widget>
+   <widget class="caSlider" name="caslider_5">
+    <property name="geometry">
+     <rect>
+      <x>520</x>
+      <y>150</y>
+      <width>20</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="lowerBound">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="upperBound">
+     <double>5555.000000000000000</double>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://testchannel3</string>
+    </property>
+   </widget>
+   <widget class="caSlider" name="caslider_6">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>150</y>
+      <width>21</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="lowerBound">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="upperBound">
+     <double>5555.000000000000000</double>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://testchannel2</string>
+    </property>
+   </widget>
+   <widget class="caSlider" name="caslider_7">
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>150</y>
+      <width>20</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="lowerBound">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="upperBound">
+     <double>5555.000000000000000</double>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://testchannel1</string>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc">
+    <property name="geometry">
+     <rect>
+      <x>390</x>
+      <y>220</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">epics3://ACM:TEST:AO</string>
+    </property>
+    <property name="calc">
+     <string notr="true">A+B+1</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">trigger1</string>
+    </property>
+    <property name="channelB">
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;HoldingRegisters&quot;,&quot;addr&quot;:10,&quot;count&quot;:1}</string>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_2">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>220</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">trigger1</string>
+    </property>
+    <property name="calc">
+     <string notr="true">(A+B+1)&lt;65535?(A+B+1):0</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">trigger1</string>
+    </property>
+    <property name="channelB">
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;HoldingRegisters&quot;,&quot;addr&quot;:10,&quot;count&quot;:1}</string>
+    </property>
+    <property name="eventSignal">
+     <enum>caCalc::onAnyChange</enum>
+    </property>
+   </widget>
+   <widget class="caNumeric" name="canumeric_2">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>70</y>
+      <width>100</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://testchannel5</string>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_3">
+    <property name="geometry">
+     <rect>
+      <x>390</x>
+      <y>180</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;HoldingRegisters&quot;,&quot;addr&quot;:3,&quot;count&quot;:1}</string>
+    </property>
+    <property name="calc">
+     <string notr="true">A+B+1</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">trigger1</string>
+    </property>
+    <property name="channelB">
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;HoldingRegisters&quot;,&quot;addr&quot;:10,&quot;count&quot;:1}</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_6">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>60</y>
+      <width>111</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://testchannel4</string>
+    </property>
+    <property name="colorMode">
+     <enum>caLineEdit::Alarm_Default</enum>
+    </property>
+    <property name="alarmHandling">
+     <enum>caLineEdit::onBackground</enum>
+    </property>
+    <property name="precision">
+     <number>1</number>
+    </property>
+    <property name="precisionMode">
+     <enum>caLineEdit::User</enum>
+    </property>
+    <property name="unitsEnabled">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_7">
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>200</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://testchannel5</string>
+    </property>
+    <property name="colorMode">
+     <enum>caLineEdit::Alarm_Default</enum>
+    </property>
+    <property name="alarmHandling">
+     <enum>caLineEdit::onBackground</enum>
+    </property>
+    <property name="precision">
+     <number>1</number>
+    </property>
+    <property name="precisionMode">
+     <enum>caLineEdit::Channel</enum>
+    </property>
+    <property name="unitsEnabled">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="caTextEntry" name="catextentry_2">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>120</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;HoldingRegisters&quot;,&quot;addr&quot;:3,&quot;count&quot;:1}</string>
+    </property>
+   </widget>
+   <widget class="caTextEntry" name="catextentry_3">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>150</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">modbus://129.129.130.73:502{&quot;type&quot;:&quot;HoldingRegisters&quot;,&quot;addr&quot;:6,&quot;count&quot;:1}</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caNumeric</class>
+   <extends>QFrame</extends>
+   <header>caNumeric</header>
+  </customwidget>
+  <customwidget>
+   <class>caSlider</class>
+   <extends>QWidget</extends>
+   <header>caSlider</header>
+  </customwidget>
+  <customwidget>
+   <class>caTextEntry</class>
+   <extends>caLineEdit</extends>
+   <header>caTextEntry</header>
+  </customwidget>
+  <customwidget>
+   <class>caToggleButton</class>
+   <extends>QCheckBox</extends>
+   <header>caToggleButton</header>
+  </customwidget>
+  <customwidget>
+   <class>caLed</class>
+   <extends>QWidget</extends>
+   <header>caLed</header>
+  </customwidget>
+  <customwidget>
+   <class>caLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>caLineEdit</header>
+  </customwidget>
+  <customwidget>
+   <class>caWaveTable</class>
+   <extends>QTableWidget</extends>
+   <header>caWaveTable</header>
+  </customwidget>
+  <customwidget>
+   <class>caCalc</class>
+   <extends>QLabel</extends>
+   <header>caCalc</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>cacalc_2</sender>
+   <signal>emitSignal(double)</signal>
+   <receiver>catextentry_2</receiver>
+   <slot>setValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>319</x>
+     <y>250</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>285</x>
+     <y>155</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_2</sender>
+   <signal>emitSignal(double)</signal>
+   <receiver>catextentry_3</receiver>
+   <slot>setValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>343</x>
+     <y>245</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>276</x>
+     <y>181</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

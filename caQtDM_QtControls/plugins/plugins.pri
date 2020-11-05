@@ -22,7 +22,7 @@ TEMPLATE = lib
 
 ios | android {
   CONFIG += static
-  LIBS += $$(QWTHOME)/lib/qwt.a
+  LIBS += $$(QWTHOME)/lib/$$(QWTLIBNAME).a
   LIBS += ../$(CAQTDM_COLLECT)/libqtcontrols.a
   INCLUDEPATH += $(QWTINCLUDE)
   INCLUDEPATH += $$(QWTHOME)/src
@@ -35,19 +35,22 @@ win32 {
      INCLUDEPATH += $$(QWTHOME)/src
      
      win32-g++ {
-	     LIBS += $$(QWTLIB)/lib/libqwt.a
+             LIBS += $$(QWTLIB)/lib/lib$$(QWTLIBNAME).a
 	     LIBS += $$(QTCONTROLS_LIBS)/release/libqtcontrols.a
      }
-     win32-msvc* {
+     win32-msvc* || msvc{
 	     CONFIG += Define_Build_OutputDir
 	     INCLUDEPATH += $(QWTINCLUDE)
-	     DebugBuild { 
-                    LIBS += $$(QWTHOME)/lib/qwtd.lib
+	     CONFIG(DebugBuild, DebugBuild|ReleaseBuild) { 
+                     INCLUDEPATH += $(QWTINCLUDE)
+                     LIBS += $$(QWTHOME)/lib/$$(QWTLIBNAME)d.lib
 		    LIBS += $(CAQTDM_COLLECT)/debug/qtcontrols.lib
 	     }
 
 	     ReleaseBuild {
-	             LIBS += $$(QWTHOME)/lib/qwt.lib
+	     CONFIG( ReleaseBuild, DebugBuild|ReleaseBuild) {
+	             INCLUDEPATH += $(QWTINCLUDE)
+                     LIBS += $$(QWTHOME)/lib/$$(QWTLIBNAME).lib
 		     LIBS += $(CAQTDM_COLLECT)/qtcontrols.lib
 	     }
      }  
@@ -89,7 +92,7 @@ unix:!ios {
    }
 
    unix:!macx {
-      LIBS += -L$(QWTLIB) -Wl,-rpath,$(QWTLIB) -lqwt
+      LIBS += -L$(QWTLIB) -Wl,-rpath,$(QWTLIB) -l$$(QWTLIBNAME)
       LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
    }
 
@@ -97,7 +100,7 @@ unix:!ios {
       INCLUDEPATH += $(QWTINCLUDE)
       QMAKE_LFLAGS_PLUGIN -= -dynamiclib
       QMAKE_LFLAGS_PLUGIN += -bundle
-      LIBS += -F$(QWTLIB) -framework qwt
+      LIBS += -F$(QWTLIB) -framework $$(QWTLIBNAME)
       LIBS += -L $(CAQTDM_COLLECT) -lqtcontrols
       QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
    }

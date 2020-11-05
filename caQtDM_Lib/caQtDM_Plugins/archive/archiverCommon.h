@@ -53,7 +53,7 @@ public:
     int pvClearEvent(void * ptr);
     int pvAddEvent(void * ptr);
     int TerminateIO() {return true;}
-    void updateCartesian(int nbVal, indexes indexNew, QVector<float> TimerN, QVector<float> YValsN, QString backend);
+    void updateCartesian(int nbVal, indexes indexNew, QVector<double> TimerN, QVector<double> YValsN, QString backend);
     void updateSecondsPast(indexes indexNew, bool original);
     QTimer *timer;
 

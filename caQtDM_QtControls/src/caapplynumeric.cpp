@@ -26,6 +26,7 @@
 #include "caapplynumeric.h"
 #include <QApplication>
 #include <QResizeEvent>
+#include "alarmdefs.h"
 
 caApplyNumeric::caApplyNumeric(QWidget *parent) : EApplyNumeric(parent)
 {
@@ -36,6 +37,7 @@ caApplyNumeric::caApplyNumeric(QWidget *parent) : EApplyNumeric(parent)
     setAccessW(true);
     setPrecisionMode(Channel);
     setLimitsMode(Channel);
+    thisColorMode = Static;
     thisMaximum = 100000.0;
     thisMinimum = -100000.0;
     setDigitsFontScaleEnabled(true);
@@ -94,42 +96,72 @@ void caApplyNumeric::setForeground(QColor c)
     setColors(thisBackColor, thisForeColor);
 }
 
-void caApplyNumeric::setColors(QColor bg, QColor fg)
+void caApplyNumeric::setColors(QColor bg, QColor fg, bool init)
 {
     if(thisColorMode == Default) {
         if(!styleSheet().isEmpty()) {
             setStyleSheet("");
             renewStyleSheet = true;
+        }
+        if(!init) {
             // force resize for repainting
             QResizeEvent *re = new QResizeEvent(size(), size());
             resizeEvent(re);
             delete re;
+            return;
         }
-        return;
     }
 
-    if((oldBackColor != bg) || (oldForeColor != fg)   || renewStyleSheet || styleSheet().isEmpty()) {
+    if((bg != oldBackColor) || (fg != oldForeColor)  || renewStyleSheet || styleSheet().isEmpty()) {
+        setStyleSheet("");
         renewStyleSheet = false;
-        QString style = "QFrame { background: rgb(%1, %2, %3, %4); color: rgb(%5, %6, %7, %8);}";
-        style = style.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
-                      arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
-
+        QString style = "QFrame {color: rgba(%1, %2, %3, %4); background: rgba(%5, %6, %7, %8);}";
+        //QString style = QStringLiteral("color: rgba(%1, %2, %3, %4); background: rgba(%5, %6, %7, %8);");
+        style = style.arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha()).
+                          arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha());
         setStyleSheet(style);
+        //printf("%s\n", qasc(style));
+        //fflush(stdout);
         oldForeColor = fg;
         oldBackColor = bg;
+
         // force resize for repainting
         QResizeEvent *re = new QResizeEvent(size(), size());
         resizeEvent(re);
         delete re;
-     }
+    }
 }
 
 void caApplyNumeric::setConnectedColors(bool connected)
 {
     if(!connected) {
-       setColors(QColor(Qt::white), QColor(Qt::white));
+       setColors(QColor(Qt::white), QColor(Qt::white), true);
     } else {
        setColors(thisBackColor, thisForeColor);
     }
 }
 
+void caApplyNumeric::setAlarmColors(short status)
+{
+    QColor c;
+
+    switch (status) {
+    case NO_ALARM:
+        c=AL_GREEN;
+        break;
+    case MINOR_ALARM:
+        c=AL_YELLOW;
+        break;
+    case MAJOR_ALARM:
+        c=AL_RED;
+        break;
+    case INVALID_ALARM:
+    case NOTCONNECTED:
+        c=AL_WHITE;
+        break;
+    default:
+        c=AL_DEFAULT;
+        break;
+    }
+    setBackground(c);
+}

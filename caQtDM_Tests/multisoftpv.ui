@@ -1,0 +1,736 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1016</width>
+    <height>774</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QFrame" name="frame_2">
+    <property name="geometry">
+     <rect>
+      <x>48</x>
+      <y>32</y>
+      <width>473</width>
+      <height>136</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="caCalc" name="cacalc_56">
+     <property name="geometry">
+      <rect>
+       <x>12</x>
+       <y>10</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">calcarray1</string>
+     </property>
+     <property name="calc">
+      <string notr="true">A*0.02</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ACM:COUNT:1</string>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_57">
+     <property name="geometry">
+      <rect>
+       <x>12</x>
+       <y>30</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">calcarray2</string>
+     </property>
+     <property name="calc">
+      <string notr="true">A*0.03</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ACM:COUNT:1</string>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_58">
+     <property name="geometry">
+      <rect>
+       <x>12</x>
+       <y>50</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">calcarray3</string>
+     </property>
+     <property name="calc">
+      <string notr="true">A*0.04</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ACM:COUNT:1</string>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_59">
+     <property name="geometry">
+      <rect>
+       <x>12</x>
+       <y>70</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">calcarray4</string>
+     </property>
+     <property name="calc">
+      <string notr="true">A*0.05</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ACM:COUNT:1</string>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_60">
+     <property name="geometry">
+      <rect>
+       <x>12</x>
+       <y>90</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">calcarray5</string>
+     </property>
+     <property name="calc">
+      <string notr="true">A*0.06</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ACM:COUNT:1</string>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_61">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>10</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">calcarray6</string>
+     </property>
+     <property name="calc">
+      <string notr="true">A*0.10</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ACM:COUNT:1</string>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_62">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>30</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">calcarray7</string>
+     </property>
+     <property name="calc">
+      <string notr="true">A*0.11</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ACM:COUNT:1</string>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_63">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>50</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">calcarray8</string>
+     </property>
+     <property name="calc">
+      <string notr="true">A*0.12</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ACM:COUNT:1</string>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_64">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>70</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">calcarray9</string>
+     </property>
+     <property name="calc">
+      <string notr="true">A*0.13</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ACM:COUNT:1</string>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_65">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>90</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">calcarray0</string>
+     </property>
+     <property name="calc">
+      <string notr="true">A*0.14</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ACM:COUNT:1</string>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_66">
+     <property name="geometry">
+      <rect>
+       <x>192</x>
+       <y>14</y>
+       <width>68</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">vec_Calc1</string>
+     </property>
+     <property name="variableType">
+      <enum>caCalc::vector</enum>
+     </property>
+     <property name="channels" stdset="0">
+      <string>calcarray1;calcarray2;ACM:COUNT:1;calcarray3;calcarray4;calcarray5;calcarray6;ACM:TEST:AO;calcarray7;calcarray8;calcarray9;calcarray0</string>
+     </property>
+    </widget>
+    <widget class="caWaveTable" name="cawavetable_9">
+     <property name="geometry">
+      <rect>
+       <x>277</x>
+       <y>8</y>
+       <width>174</width>
+       <height>113</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">vec_Calc1</string>
+     </property>
+     <property name="numberOfRows">
+      <number>10</number>
+     </property>
+     <property name="numberOfColumns">
+      <number>1</number>
+     </property>
+     <row/>
+     <row/>
+     <row/>
+     <row/>
+     <row/>
+     <row/>
+     <row/>
+     <row/>
+     <row/>
+     <row/>
+     <column/>
+     <item row="0" column="0">
+      <property name="font">
+       <font/>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeft|AlignLeading</set>
+      </property>
+     </item>
+     <item row="1" column="0">
+      <property name="font">
+       <font/>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeft|AlignLeading</set>
+      </property>
+     </item>
+     <item row="2" column="0">
+      <property name="font">
+       <font/>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeft|AlignLeading</set>
+      </property>
+     </item>
+     <item row="3" column="0">
+      <property name="font">
+       <font/>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeft|AlignLeading</set>
+      </property>
+     </item>
+     <item row="4" column="0">
+      <property name="font">
+       <font/>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeft|AlignLeading</set>
+      </property>
+     </item>
+     <item row="5" column="0">
+      <property name="font">
+       <font/>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeft|AlignLeading</set>
+      </property>
+     </item>
+     <item row="6" column="0">
+      <property name="font">
+       <font/>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeft|AlignLeading</set>
+      </property>
+     </item>
+     <item row="7" column="0">
+      <property name="font">
+       <font/>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeft|AlignLeading</set>
+      </property>
+     </item>
+     <item row="8" column="0">
+      <property name="font">
+       <font/>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeft|AlignLeading</set>
+      </property>
+     </item>
+     <item row="9" column="0">
+      <property name="font">
+       <font/>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeft|AlignLeading</set>
+      </property>
+     </item>
+    </widget>
+    <widget class="caNumeric" name="canumeric_5">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>50</y>
+       <width>100</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ACM:TEST:AO</string>
+     </property>
+     <property name="precisionMode">
+      <enum>caNumeric::User</enum>
+     </property>
+     <property name="fixedFormat">
+      <bool>true</bool>
+     </property>
+     <property name="maxValue">
+      <double>100.000000000000000</double>
+     </property>
+     <property name="minValue">
+      <double>-100.000000000000000</double>
+     </property>
+    </widget>
+   </widget>
+   <widget class="caCartesianPlot" name="cacartesianplot">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>10</y>
+      <width>417</width>
+      <height>238</height>
+     </rect>
+    </property>
+    <property name="channels_1" stdset="0">
+     <string>;vec_Calc1</string>
+    </property>
+    <property name="symbol_1">
+     <enum>caCartesianPlot::Rect</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>255</red>
+      <green>48</green>
+      <blue>62</blue>
+     </color>
+    </property>
+   </widget>
+   <widget class="caCartesianPlot" name="cacartesianplot_2">
+    <property name="geometry">
+     <rect>
+      <x>46</x>
+      <y>490</y>
+      <width>367</width>
+      <height>180</height>
+     </rect>
+    </property>
+    <property name="channels_1" stdset="0">
+     <string>;mywave</string>
+    </property>
+    <property name="symbol_1">
+     <enum>caCartesianPlot::Ellipse</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>255</red>
+      <green>85</green>
+      <blue>255</blue>
+     </color>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_2">
+    <property name="geometry">
+     <rect>
+      <x>498</x>
+      <y>338</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">mywave1</string>
+    </property>
+    <property name="variableType">
+     <enum>caCalc::vector</enum>
+    </property>
+    <property name="channels" stdset="0">
+     <string>roi:x;roi:y;roi:w;roi:h</string>
+    </property>
+    <property name="initialValue">
+     <double>10.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>343</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">mywave</string>
+    </property>
+    <property name="variableType">
+     <enum>caCalc::vector</enum>
+    </property>
+    <property name="channels" stdset="0">
+     <string>roi:x;roi:y;roi:w;roi:h</string>
+    </property>
+    <property name="initialValue">
+     <double>10.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="caWaveTable" name="cawavetable_2">
+    <property name="geometry">
+     <rect>
+      <x>498</x>
+      <y>395</y>
+      <width>414</width>
+      <height>75</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">mywave1</string>
+    </property>
+    <property name="numberOfColumns">
+     <number>4</number>
+    </property>
+    <row/>
+    <column/>
+    <column/>
+    <column/>
+    <column/>
+    <item row="0" column="0">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="1">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="2">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="3">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+   </widget>
+   <widget class="caCartesianPlot" name="cacartesianplot_3">
+    <property name="geometry">
+     <rect>
+      <x>494</x>
+      <y>485</y>
+      <width>367</width>
+      <height>180</height>
+     </rect>
+    </property>
+    <property name="channels_1" stdset="0">
+     <string>;mywave1</string>
+    </property>
+    <property name="symbol_1">
+     <enum>caCartesianPlot::Ellipse</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>255</red>
+      <green>85</green>
+      <blue>255</blue>
+     </color>
+    </property>
+   </widget>
+   <widget class="caWaveTable" name="cawavetable">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>400</y>
+      <width>414</width>
+      <height>75</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">mywave</string>
+    </property>
+    <property name="numberOfColumns">
+     <number>4</number>
+    </property>
+    <row/>
+    <column/>
+    <column/>
+    <column/>
+    <column/>
+    <item row="0" column="0">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="1">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="2">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="3">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+   </widget>
+   <widget class="caNumeric" name="canumeric">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>280</y>
+      <width>100</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">roi:x</string>
+    </property>
+    <property name="precisionMode">
+     <enum>caNumeric::User</enum>
+    </property>
+    <property name="fixedFormat">
+     <bool>true</bool>
+    </property>
+    <property name="maxValue">
+     <double>100.000000000000000</double>
+    </property>
+    <property name="minValue">
+     <double>-100.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="caNumeric" name="canumeric_2">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>280</y>
+      <width>100</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">roi:y</string>
+    </property>
+    <property name="precisionMode">
+     <enum>caNumeric::User</enum>
+    </property>
+    <property name="fixedFormat">
+     <bool>true</bool>
+    </property>
+    <property name="maxValue">
+     <double>100.000000000000000</double>
+    </property>
+    <property name="minValue">
+     <double>-100.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="caNumeric" name="canumeric_3">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>280</y>
+      <width>100</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">roi:w</string>
+    </property>
+    <property name="precisionMode">
+     <enum>caNumeric::User</enum>
+    </property>
+    <property name="fixedFormat">
+     <bool>true</bool>
+    </property>
+    <property name="limitsMode">
+     <enum>caNumeric::User</enum>
+    </property>
+    <property name="maxValue">
+     <double>100.000000000000000</double>
+    </property>
+    <property name="minValue">
+     <double>-100.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="caNumeric" name="canumeric_4">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>280</y>
+      <width>100</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">roi:h</string>
+    </property>
+    <property name="precisionMode">
+     <enum>caNumeric::User</enum>
+    </property>
+    <property name="fixedFormat">
+     <bool>true</bool>
+    </property>
+    <property name="maxValue">
+     <double>100.000000000000000</double>
+    </property>
+    <property name="minValue">
+     <double>-100.000000000000000</double>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1016</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caNumeric</class>
+   <extends>QFrame</extends>
+   <header>caNumeric</header>
+  </customwidget>
+  <customwidget>
+   <class>caCartesianPlot</class>
+   <extends>QFrame</extends>
+   <header>caCartesianPlot</header>
+  </customwidget>
+  <customwidget>
+   <class>caWaveTable</class>
+   <extends>QTableWidget</extends>
+   <header>caWaveTable</header>
+  </customwidget>
+  <customwidget>
+   <class>caCalc</class>
+   <extends>QLabel</extends>
+   <header>caCalc</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

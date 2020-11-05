@@ -36,7 +36,7 @@
 #include <pv/event.h>
 #include <pv/lock.h>
 #include <pv/pvData.h>
-#include <pv/pvCopy.h>
+//#include <pv/pvCopy.h>
 #include <pv/pvTimeStamp.h>
 #include <pv/timeStamp.h>
 #include <pv/pvAlarm.h>
@@ -53,7 +53,7 @@
 
 #include <QObject>
 #include "controlsinterface.h"
-#include "callbackThread.h"
+#include "epics4_callbackThread.h"
 #include "epics4Requester.h"
 
 
@@ -127,7 +127,7 @@ public:
     static bool debug;
     std::map<std::string,epics::caqtdm::epics4::PVAChannelWPtr> pvaChannelMap;
     epics::caqtdm::epics4::Epics4RequesterPtr requester;
-    epics::pvData::CallbackThreadPtr callbackThread;
+    epics::pvData::CallbackThreadPtr epics4_callbackThread;
     MutexKnobData * mutexKnobData;
 };
 

@@ -28,7 +28,6 @@ bool HTTPCONFIGURATOR = false;
 #if defined(_MSC_VER)
   #define NOMINMAX
   #include <windows.h>
-  #define snprintf _snprintf
   #include <Psapi.h>
   #pragma comment (lib, "Psapi.lib")
 #endif
@@ -57,9 +56,18 @@ bool HTTPCONFIGURATOR = false;
 #ifdef linux
 #include <sys/resource.h>
 #include <sys/time.h>
+#include <unistd.h>
+
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+   #define CAQTDM_X11 Q_WS_X11
+#else
+   #ifndef MOBILE_ANDROID
+      #define CAQTDM_X11 Q_OS_UNIX
+   #endif
+#endif
 #endif
 
-#ifdef Q_WS_X11
+#ifdef CAQTDM_X11
         #include <QX11Info>
         #include <X11/Xutil.h>
         #include <X11/Xlib.h>
@@ -68,7 +76,7 @@ bool HTTPCONFIGURATOR = false;
         #define MESSAGE_SOURCE_OLD            0
         #define MESSAGE_SOURCE_APPLICATION    1
         #define MESSAGE_SOURCE_PAGER          2
-#endif //Q_WS_X11
+#endif //CAQTDM_X11
 
 #if defined(_MSC_VER)
 int setenv(const char *name, const char *value, int overwrite)
@@ -81,6 +89,10 @@ int setenv(const char *name, const char *value, int overwrite)
     }
     return _putenv_s(name, value);
 }
+#ifndef snprintf
+ #define snprintf _snprintf
+#endif
+
 #endif
 
 
@@ -216,6 +228,15 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     Q_IMPORT_PLUGIN(CustomWidgetCollectionInterface_Utilities);
     Q_IMPORT_PLUGIN(DemoPlugin);
     Q_IMPORT_PLUGIN(Epics3Plugin);
+    Q_IMPORT_PLUGIN(environmentPlugin);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
+    #ifdef CAQTDM_MODBUS
+        Q_IMPORT_PLUGIN(modbusPlugin);
+    #endif
+    #ifdef CAQTDM_GPS
+        Q_IMPORT_PLUGIN(gpsPlugin);
+    #endif
+#endif
 //*************************************
 #ifdef EPICS4
     Q_IMPORT_PLUGIN(Epics4Plugin);
@@ -259,6 +280,16 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 
     setWindowTitle(title);
 
+    // is updatetype specified on the command line as option, then set action direct and remove it
+    QMap<QString, QString>::const_iterator i = OptionList.find("updatetype");
+    while (i != OptionList.end() && i.key() == "updatetype") {
+        QString value = i.value();
+        if(value.toLower() == "direct")  emit Callback_ActionDirect();
+        else if(value.toLower() == "timed")  emit Callback_ActionTimed();
+        ++i;
+    }
+    OptionList.remove("updatetype");
+
 #ifdef MOBILE
     specials.setNewStyleSheet(messageWindow, qApp->desktop()->size(), 16, 10);
 #endif
@@ -270,21 +301,48 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     messageWindow->show();
 
 #ifndef MOBILE
-#ifdef Q_WS_X11
-    QString uniqueKey = QString("caQtDM shared memory:") + DisplayString(QX11Info::display());
+    QString uniqueKey = QString("caQtDM shared memory:") ;
+    bool memoryAttached = false;
+    #ifdef CAQTDM_X11
+        #if QT_VERSION > QT_VERSION_CHECK(5,0,0)
+        if (qApp->platformName()== QLatin1String("xcb")){
+        #endif
+
+        uniqueKey.append(DisplayString(QX11Info::display()));
+        #if QT_VERSION > QT_VERSION_CHECK(5,0,0)
+
+        }else{
+            QString uids = QString::number(getuid());
+            uniqueKey.append(":"+ uids);
+        }
+        #endif
+
+    #endif
+
+    #ifdef linux
+        QString uids = QString::number(getuid());
+        uniqueKey.append(":"+ uids);
+    #endif
+
+    qDebug() << "caQtDM -- shared memory key" << uniqueKey;
     sharedMemory.setKey (uniqueKey);
-#else
-    QString uniqueKey = QString("caQtDM shared memory");
-    sharedMemory.setKey ("caQtDM shared memory");
-#endif
-    if (sharedMemory.attach()) {
+
+    // in case that one wants to attach to an instance that is actually creating, wait until we can attach
+    if(attach) {
+        for(int j=0; j<10; j++) {
+            Sleep::msleep(150);
+            if (sharedMemory.attach()) {
+                memoryAttached = true;
+                break;
+            }
+        }
+    }
+
+    // memory attached
+    if (memoryAttached) {
         _isRunning = true;
         if(attach) {
-#ifdef Q_WS_X11
-            qDebug() << "caQtDM -- another instance of caQtDM detected ==> attach to it (" << DisplayString(QX11Info::display()) <<")" ;
-#else
-            qDebug() << "caQtDM -- another instance of caQtDM detected ==> attach to it";
-#endif
+            qDebug() << "caQtDM -- another instance of caQtDM detected with size"  << sharedMemory.size() << "==> attach to it (" << uniqueKey <<")" ;
             QString message(filename);
             message.append(";");
             message.append(macroString);
@@ -292,7 +350,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
             message.append(geometry);
             message.append(";");
             message.append(lastResizing);
-            //qDebug() << "send a message with file, macro and geometry to it and exit "<< message;
+            qDebug() << "send a message with file, macro and geometry to it and exit "<< message;
             sendMessage(message);
             sharedMemory.detach();
             qApp->exit(0);  // does not work here
@@ -300,18 +358,21 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         } else {
             qDebug() << "caQtDM -- another instance of caQtDM detected, but no attach specified ==> standalone";
         }
+    // memory to be created
     } else {
-        QByteArray byteArray("0");
         _isRunning = false;
         // create shared memory with a default value to note that no message is available.
-        if (!sharedMemory.create(4096)) {
-            qDebug("caQtDM -- Unable to create single instance of shared memory.");
+        if (!sharedMemory.create(BlopSize * RingSize + 2 * sizeof(uint))) {
+            qDebug() << "caQtDM -- Unable to create shared memory:" << sharedMemory.errorString();
         } else {
-            qDebug() << "caQtDM -- created shared memory with 4096 bytes";
+            int size =  BlopSize * RingSize + 2 * sizeof(uint);
+            QByteArray byteArray(size, '\0');
+            qDebug() << "caQtDM -- created shared memory with" << BlopSize * RingSize + 2 * sizeof(uint) << "bytes";
             sharedMemory.lock();
             char *to = (char*)sharedMemory.data();
             const char *from = byteArray.data();
             memcpy(to, from, qMin(sharedMemory.size(), byteArray.size()));
+            MSQ_init();
             sharedMemory.unlock();
             // start checking for messages of other instances.
             timer = new QTimer(this);
@@ -442,16 +503,16 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         if(!interfaces.isEmpty()) {
             QMapIterator<QString, ControlsInterface *> i(interfaces);
             while (i.hasNext()) {
-                char asc[256];
+                char asc[MAX_STRING_LENGTH];
                 i.next();
-                sprintf(asc, "Info: plugin %s loaded", qasc(i.key()));
+                snprintf(asc, MAX_STRING_LENGTH, "Info: plugin %s loaded", qasc(i.key()));
                 messageWindow->postMsgEvent(QtWarningMsg, asc);
             }
         }
     }
 
     // in case of http support, we add the temporary directory name to the CAQTDM_DISPLAY_PATH if not already set
-    // only in case of non mobile plattforms
+    // only in case of non mobile platforms
 #ifndef MOBILE
     QString displayPath = (QString)  qgetenv("CAQTDM_DISPLAY_PATH");
     if(!displayPath.contains(specials.getStdPath())) {
@@ -589,7 +650,7 @@ void FileOpenWindow::saveConfigFile(const QString &filename, QList<QString> &url
 
 void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
 {
-    char asc[2048];
+    char asc[MAX_STRING_LENGTH];
     Specials specials;
     QString stdpathdoc =  specials.getStdPath();
 
@@ -616,14 +677,14 @@ void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
             setenv(qasc(fields.at(0)), qasc(envString), 1);
             //messageWindow->postMsgEvent(QtDebugMsg, (char*) qasc(envString));
         } else if(line.size() > 0) {
-            sprintf(asc, "environment variable could not be set from %s", qasc(line));
+            snprintf(asc, MAX_STRING_LENGTH, "environment variable could not be set from %s", qasc(line));
             messageWindow->postMsgEvent(QtDebugMsg, asc);
         }
     }
     //Replacement for standard writable directory
     setenv("CAQTDM_DISPLAY_PATH", qasc(stdpathdoc), 1);
 
-    sprintf(asc, "epics configuration file loaded: %s", qasc(fileName));
+    snprintf(asc, MAX_STRING_LENGTH, "epics configuration file loaded: %s", qasc(fileName));
     messageWindow->postMsgEvent(QtDebugMsg, asc);
     file.close();
 }
@@ -631,9 +692,8 @@ void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
 // runs one per second
 void FileOpenWindow::timerEvent(QTimerEvent *event)
 {
-#define MAXLEN 255
     Q_UNUSED(event);
-    char asc[MAXLEN];
+    char asc[MAX_STRING_LENGTH];
     int countPV=0;
     int countNotConnected=0;
     float highCount = 0.0;
@@ -668,25 +728,36 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 #ifdef linux
     struct rusage usage;
     getrusage(RUSAGE_SELF, &usage);
-    sprintf(asc, "memory: %ld kB,", usage.ru_maxrss);
+    snprintf(asc, MAX_STRING_LENGTH, "memory: %ld kB,", usage.ru_maxrss);
 #endif
 #ifdef _WIN32
     PROCESS_MEMORY_COUNTERS_EX procmem;
     if (GetProcessMemoryInfo(GetCurrentProcess(),(PPROCESS_MEMORY_COUNTERS)&procmem,sizeof(procmem))) {
-      sprintf(asc, "memory: %ld kB,", (procmem.PrivateUsage / (1024)));
+      snprintf(asc, MAX_STRING_LENGTH,"memory: %ld kB,", (procmem.PrivateUsage / (1024)));
     } else {
-      sprintf(asc, "memory: no RAM,");
+      snprintf(asc, MAX_STRING_LENGTH, "memory: no RAM,");
     }
 #endif
 
     // any non connected pv's to display ?
     if (mutexKnobData != (MutexKnobData *) 0) {
-        char msg[255];
+        char msg[MAX_STRING_LENGTH];
         msg[0] = '\0';
-        fillPVtable(countPV, countNotConnected, countDisplayed);
+
+        for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
+            knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
+            if(kPtr->index != -1) {
+                if(!kPtr->edata.connected) {
+                    countNotConnected++;
+                } else {
+                    if(kPtr->edata.displayCount > 0) countDisplayed++;
+                }
+                countPV++;
+            }
+        }
 
         if(caQtDM_TimeOutEnabled) {
-            char asc1[30];
+            char asc1[50];
             if (caQtDM_TimeLeft<0.02){
                 sprintf(asc1, "T/O=%.0fsec ", caQtDM_TimeLeft*60*60);
             }else{
@@ -697,7 +768,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 
         highCount = mutexKnobData->getHighestCountPV(highPV);
         if(highCount != 0.0) {
-            snprintf(msg, MAXLEN - 1, "%s - PV=%d (%d NC), %d Monitors/s, %d Displays/s, highest=%s with %.1f Monitors/s ", asc, countPV, countNotConnected,
+            snprintf(msg, MAX_STRING_LENGTH, "%s - PV=%d (%d NC), %d Monitors/s, %d Displays/s, highest=%s with %.1f Monitors/s ", asc, countPV, countNotConnected,
                       mutexKnobData->getMonitorsPerSecond(), mutexKnobData->getDisplaysPerSecond(), qasc(highPV), highCount);
         } else {
             strcpy(msg, asc);
@@ -775,6 +846,32 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
         } else {
             newWindow->allowResizing(true);
         }
+        if(resizeS.contains("Window")||
+           resizeS.contains("ToolTip")||
+           resizeS.contains("SplashScreen")) {
+            Qt::WindowFlags flags;
+            if(resizeS.contains("Window")){
+              flags = Qt::Window;
+            }
+            if(resizeS.contains("ToolTip")){
+              flags = Qt::ToolTip;
+            }
+            if(resizeS.contains("SplashScreen")){
+              flags = Qt::SplashScreen;
+            }
+            if(resizeS.contains("FramelessWindowHint")){
+              flags |= Qt::FramelessWindowHint;
+            }
+            if(resizeS.contains("WindowStaysOnTopHint")){
+              flags |= Qt::WindowStaysOnTopHint;
+            }
+            newWindow->setWindowFlags(flags);
+        }
+        if(resizeS.contains("PopUpWindow")){
+            newWindow->setProperty("open_as_popupwindow",true);
+        }
+
+
     }
 
 #ifdef MOBILE
@@ -812,7 +909,7 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
     }
 
     mainWindow->raise();
-    mainWindow->setMinimumSize(0, 0);
+    mainWindow->setMinimumSize(mainWindow->size()/4);
     mainWindow->setMaximumSize(16777215, 16777215);
     mainWindow->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     mainWindow->setWindowFlags( mainWindow->windowFlags() );
@@ -827,7 +924,17 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
         mainWindow->resize(mainWindow->minimumSizeHint());
     }
     activWindow = 0;
+#ifdef MOBILE_IOS
+    // this is needed for the status bar
+    mainWindow->setAttribute(Qt::WA_ContentsMarginsRespectsSafeArea,false);
+    QRect availscreengeo = QApplication::desktop()->availableGeometry(-1);
+    //QRect screengeo = QApplication::desktop()->geometry();
+    //qDebug() << "IOS screen" << screengeo<< availscreengeo;
+    QSize winsize=mainWindow->size();
+    winsize.setHeight( winsize.rheight() -availscreengeo.top());
+    mainWindow->resize(winsize);
 
+#endif
     //qDebug() << "allocate" << fileS.size()+macroS.size()+100;
     asc = (char*) malloc((fileS.size()+macroS.size()+100) * sizeof(char));
     if(macroS.size() > 0) {
@@ -864,7 +971,11 @@ void FileOpenWindow::Callback_OpenButton()
 
     if(path.size() == 0 && lastFilePath.size()==0) path.append(".");
     else path = lastFilePath;
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open ui or prc file"), path, tr("ui/prc Files (*.ui *.prc)"));
+#ifdef ADL_EDL_FILES
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Display file"), path, tr("ui/prc Files (*.ui *.prc);;MEDM Files (*.adl);;EDM Files (*.edl);;ALL Files (*.*)"));
+#else
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Display file"), path, tr("ui/prc Files (*.ui *.prc);;ALL Files (*.*)"));
+#endif
     //std::cout << "Got filename: " << fileName.toStdString() << std::endl;
 
     if(!fileName.isNull()) {
@@ -909,22 +1020,86 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     //qDebug() << "*************************************************************************";
     //qDebug() << "callback open new file" << inputFile << "with macro string" << macroString;
 
-    int found1 = inputFile.lastIndexOf(".ui");
-    int found2 = inputFile.lastIndexOf(".adl");
-    int found3 = inputFile.lastIndexOf(".prc");
-    QString openFile = inputFile;
-    if (found1 != -1) {
-        openFile = inputFile.mid(0, found1);
-    }
-    if(found2 != -1) {
-        openFile = inputFile.mid(0, found2);
-    }
-
+#ifdef ADL_EDL_FILES
+    const int extensions=4;
+    const QString valid_extensions[extensions] = {".ui", ".prc", ".adl", ".edl"};
+#else
+    const int extensions=2;
+    const QString valid_extensions[extensions] = {".ui", ".prc"};
+#endif
     QString FileName;
-    if(found3 == -1)
-        FileName = openFile.append(".ui");
-    else
-        FileName = inputFile;
+    int ext_found=-1;
+    FileName=inputFile;
+
+
+    int counter=0;
+    bool check_extension = false;
+    while (counter<extensions){
+        check_extension = check_extension || inputFile.endsWith(valid_extensions[counter]);
+        if (check_extension) break;
+        counter++;
+    }
+    ext_found=counter;
+    counter=0;
+    if (!check_extension) {
+        while (counter<extensions){
+            FileName=inputFile;
+            // remove any extension
+            FileName=FileName.split(".",QString::SkipEmptyParts).at(0);
+
+            FileName=FileName.append(valid_extensions[counter]);
+            //qDebug() << "check " << FileName << valid_extensions[counter] ;
+            // this will check for file existence and when an url is defined, download the file from a http server
+            fileFunctions filefunction;
+            // dont show error because we try!
+            filefunction.checkFileAndDownload(FileName);
+
+            searchFile *filecheck = new searchFile(FileName);
+            FileName=filecheck->findFile();
+            delete filecheck;
+            if (!FileName.isNull()) break;
+            counter++;
+        }
+#ifndef ADL_EDL_FILES
+        if (counter==extensions)
+            messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(tr("file %1 is not parsed (caQtDM built without ADL_EDL_FILES)").arg(inputFile)));
+#endif
+    }else{
+        //check if file is there else check other extensions
+        searchFile *filecheck = new searchFile(FileName);
+        FileName=filecheck->findFile();
+        delete filecheck;
+        if (FileName.isNull()){
+            //remove the extension
+            FileName=inputFile;
+            counter=0;
+            while (counter<extensions){
+                if (counter!=ext_found){
+                    FileName=inputFile;
+                    FileName=FileName.remove(valid_extensions[ext_found]);
+                    FileName=FileName.append(valid_extensions[counter]);
+                    //qDebug() << "check " << FileName << valid_extensions[counter] ;
+                    // this will check for file existence and when an url is defined, download the file from a http server
+                    fileFunctions filefunction;
+                    // dont show error because we try!
+                    filefunction.checkFileAndDownload(FileName);
+
+                    searchFile *filecheck = new searchFile(FileName);
+                    FileName=filecheck->findFile();
+                    //qDebug() << "check " << FileName << valid_extensions[counter] ;
+                    delete filecheck;
+                    if (!FileName.isNull()) break;
+                }
+                counter++;
+            }
+            //if this I give up nothing is found
+            if (counter==extensions) FileName=inputFile;
+
+
+        }
+
+    }
+    //qDebug() << "try to open file" << FileName;
 
     // go through the children of this main window and find out if new or already present
     QList<QWidget *> all = this->findChildren<QWidget *>();
@@ -960,7 +1135,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
                 w->setFocus();
 // all these past commands will only give you a notification in the taskbar
 // in case of x windows, we will pop the window really up
-#ifdef Q_WS_X11
+#ifdef CAQTDM_X11
                 static Atom  NET_ACTIVE_WINDOW = 0;
                 XClientMessageEvent xev;
                 if (NET_ACTIVE_WINDOW == 0) {
@@ -977,7 +1152,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
                 xev.data.l[0]    = MESSAGE_SOURCE_PAGER;
                 xev.data.l[1] = xev.data.l[2] = xev.data.l[3] = xev.data.l[4] = 0;
                 XSendEvent(QX11Info::display(), QX11Info::appRootWindow(), False, SubstructureNotifyMask | SubstructureRedirectMask, (XEvent*)&xev);
-#endif //Q_WS_X11
+#endif //CAQTDM_X11
 
                 return;
             }
@@ -999,7 +1174,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "file open error", message, ":/caQtDM-logos.png", QMessageBox::Close, this, Qt::Dialog, true);
         m->show();
     } else {
-        //qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString;
+        qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString;
         QPoint position(0,0);
         QMainWindow *mainWindow = loadMainWindow(position, fileNameFound, macroString, resizeString, printandexit, false, (geometry == ""));//if geometry is empty center window (for windows)
         if(geometry != "") {
@@ -1014,7 +1189,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
  */
 void FileOpenWindow::Callback_ActionAbout()
 {
-    QString message = QString("Qt-based Epics Display Manager Version %1 using Qt %2 and %3 with data from %4 developed at Paul Scherrer Institut, by Anton Mezger\nPlattform support is supported by H.Brands\n");
+    QString message = QString("Qt-based Epics Display Manager Version %1 using Qt %2 and %3 with data from %4 developed at Paul Scherrer Institut, by Anton Mezger\nPlatform support is supported by H.Brands\n");
     message = message.arg(BUILDVERSION, QT_VERSION_STR, BUILDARCH, SUPPORT);
     QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Information, "About", message, ":/caQtDM-logospsi.png", QMessageBox::Close, this, Qt::Dialog, true);
     m->show();
@@ -1062,8 +1237,8 @@ void FileOpenWindow::Callback_ActionExit()
         selected = m->exec();
     // normal close
     } else {
-        if(debugWindow) selected = QMessageBox::No;
-        else selected = QMessageBox::Yes;
+        if(debugWindow) {selected = QMessageBox::No;
+    } else selected = QMessageBox::Yes;
     }
 
     if(selected == QMessageBox::Yes) {
@@ -1111,6 +1286,7 @@ void FileOpenWindow::reload(QWidget *w)
     }
 
     // get rif of old window
+    if(!w->isVisible()) return; // add this, while a close will quit when window is not loaded and visible
     position = w->pos();
     w->close();
     w->disconnect();
@@ -1177,28 +1353,23 @@ void FileOpenWindow::Callback_ActionDirect() {
 
 void FileOpenWindow::checkForMessage()
 {
-    // check for message in memory
-    sharedMemory.lock();
-    QByteArray byteArray = QByteArray((char*)sharedMemory.constData(), sharedMemory.size());
-    sharedMemory.unlock();
+     _blop element;
 
-    if (byteArray.left(1) == "0") return;  // no message, quit
-    byteArray.remove(0, 1);                // remove first character
-    QString message = QString::fromUtf8(byteArray.constData()); // get and split message
+    // check and remove message in shared memory
+    sharedMemory.lock();
+    element = MSQ_deQueue();
+    sharedMemory.unlock();
+    if(element.blop[0] == '\0') {
+        //qDebug() << "queue was empty, so do nothing";
+        return;  // no message, quit
+    }
+    QString message = QString::fromUtf8(element.blop); // get and split message
     QStringList vars = message.split(";");
 
     //qDebug() << "received message=" << message;
     //qDebug() << "vars" << vars.count() <<  vars;
 
     if(vars.count() == 4) emit Callback_OpenNewFile(vars.at(0), vars.at(1), vars.at(2), vars.at(3));
-
-    // remove message from shared memory.
-    byteArray = "0";
-    sharedMemory.lock();
-    char *to = (char*)sharedMemory.data();
-    const char *from = byteArray.data();
-    memcpy(to, from, qMin(sharedMemory.size(), byteArray.size()));
-    sharedMemory.unlock();
 }
 
 bool FileOpenWindow::isRunning()
@@ -1208,14 +1379,14 @@ bool FileOpenWindow::isRunning()
 
 bool FileOpenWindow::sendMessage(const QString &message)
 {
+    _blop element;
     if (!_isRunning) return false;
-    QByteArray byteArray("1");
-    byteArray.append(message.toUtf8());
+    QByteArray byteArray(message.toUtf8());
     byteArray.append('\0');
-    sharedMemory.lock();
-    char *to = (char*)sharedMemory.data();
     const char *from = byteArray.data();
-    memcpy(to, from, qMin(sharedMemory.size(), byteArray.size()));
+    memcpy(element.blop, from, byteArray.size());
+    sharedMemory.lock();
+    MSQ_enQueue(element);
     sharedMemory.unlock();
     return true;
 }
@@ -1309,6 +1480,7 @@ void FileOpenWindow::fillPVtable(int &countPV, int &countNotConnected, int &coun
             }
         }
         pvTable->resizeColumnsToContents();
+        pvTable->horizontalHeader()->setStretchLastSection(true);
     }
 }
 

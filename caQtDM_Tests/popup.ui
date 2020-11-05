@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>191</width>
+    <height>75</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <widget class="caLineEdit" name="calineedit">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">$(DEVICE)</string>
+    </property>
+    <property name="colorMode">
+     <enum>caLineEdit::Default</enum>
+    </property>
+    <property name="framePresent" stdset="0">
+     <bool>true</bool>
+    </property>
+    <property name="frameLineWidth" stdset="0">
+     <number>1</number>
+    </property>
+    <property name="fontScaleMode" stdset="0">
+     <enum>caLineEdit::WidthAndHeight</enum>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_2">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>10</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:COUNT:1</string>
+    </property>
+    <property name="colorMode">
+     <enum>caLineEdit::Default</enum>
+    </property>
+    <property name="framePresent" stdset="0">
+     <bool>true</bool>
+    </property>
+    <property name="frameLineWidth" stdset="0">
+     <number>1</number>
+    </property>
+    <property name="fontScaleMode" stdset="0">
+     <enum>caLineEdit::WidthAndHeight</enum>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_3">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:COUNT:1</string>
+    </property>
+    <property name="colorMode">
+     <enum>caLineEdit::Default</enum>
+    </property>
+    <property name="framePresent" stdset="0">
+     <bool>true</bool>
+    </property>
+    <property name="frameLineWidth" stdset="0">
+     <number>1</number>
+    </property>
+    <property name="fontScaleMode" stdset="0">
+     <enum>caLineEdit::WidthAndHeight</enum>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_4">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>30</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:COUNT:1</string>
+    </property>
+    <property name="colorMode">
+     <enum>caLineEdit::Default</enum>
+    </property>
+    <property name="framePresent" stdset="0">
+     <bool>true</bool>
+    </property>
+    <property name="frameLineWidth" stdset="0">
+     <number>1</number>
+    </property>
+    <property name="fontScaleMode" stdset="0">
+     <enum>caLineEdit::WidthAndHeight</enum>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_5">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:COUNT:1</string>
+    </property>
+    <property name="colorMode">
+     <enum>caLineEdit::Default</enum>
+    </property>
+    <property name="framePresent" stdset="0">
+     <bool>true</bool>
+    </property>
+    <property name="frameLineWidth" stdset="0">
+     <number>1</number>
+    </property>
+    <property name="fontScaleMode" stdset="0">
+     <enum>caLineEdit::WidthAndHeight</enum>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_6">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>50</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:COUNT:1</string>
+    </property>
+    <property name="colorMode">
+     <enum>caLineEdit::Default</enum>
+    </property>
+    <property name="framePresent" stdset="0">
+     <bool>true</bool>
+    </property>
+    <property name="frameLineWidth" stdset="0">
+     <number>1</number>
+    </property>
+    <property name="fontScaleMode" stdset="0">
+     <enum>caLineEdit::WidthAndHeight</enum>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>caLineEdit</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

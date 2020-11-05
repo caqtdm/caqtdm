@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget#centralwidget {background: rgb(58, 94, 171);}
+
+ QTabWidget::pane { /* The tab widget frame */
+     border: 2px solid black;
+ }
+
+ /* Style the tab using the tab sub-control. Note that
+     it reads QTabBar _not_ QTabWidget */
+ QTabBar::tab {
+     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                 stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
+                                 stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);
+     border: 2px solid #C4C4C3;
+     border-bottom-color: #C2C7CB; /* same as the pane color */
+     border-top-left-radius: 4px;
+     border-top-right-radius: 4px;
+     min-width: 8ex;
+     padding: 5px;
+ }
+
+ QTabBar::tab:selected, QTabBar::tab:hover {
+     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                 stop: 0 #fafafa, stop: 0.4 #f4f4f4,
+                                 stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);
+ }
+
+ QTabBar::tab:selected {
+     border-color: #9B9B9B;
+     border-bottom-color: #C2C7CB; /* same as pane color */
+ }
+
+ 
+caTable {
+       font: 10pt;
+       background: cornsilk;
+       alternate-background-color: wheat;
+}
+
+caLineEdit {
+     border-radius: 1px;
+     background: lightyellow;
+     color: black;
+ }
+
+caTextEntry {
+    color: rgb(127, 0, 63);
+    background-color: cornsilk;
+    selection-color: #0a214c;
+    selection-background-color: wheat;
+    border: 1px groove black;
+    border-radius: 1px;
+    padding: 1px;
+}
+
+caTextEntry:focus {
+    padding: 0px;
+    border: 2px groove darkred;
+    border-radius: 1px;
+}
+
+caSlider::groove:horizontal {
+border: 1px solid #bbb;
+background: lightgrey;
+height: 20px;
+border-radius: 4px;
+}
+
+caSlider::handle:horizontal {
+background: red;
+border: 1px solid #777;
+width: 13px;
+margin-top: -2px;
+margin-bottom: -2px;
+border-radius: 2px;
+}
+</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="caTextEntry" name="catextentry">
+    <property name="geometry">
+     <rect>
+      <x>342</x>
+      <y>138</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:AO.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+    </property>
+   </widget>
+   <widget class="caTextEntry" name="catextentry_2">
+    <property name="geometry">
+     <rect>
+      <x>343</x>
+      <y>200</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:AO</string>
+    </property>
+    <property name="keepFocus">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="caThermo" name="cathermo">
+    <property name="geometry">
+     <rect>
+      <x>582</x>
+      <y>138</y>
+      <width>69</width>
+      <height>263</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:AO</string>
+    </property>
+    <property name="limitsMode">
+     <enum>caThermo::User</enum>
+    </property>
+   </widget>
+   <widget class="caNumeric" name="canumeric">
+    <property name="geometry">
+     <rect>
+      <x>222</x>
+      <y>405</y>
+      <width>100</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:AO</string>
+    </property>
+   </widget>
+   <widget class="caTextEntry" name="catextentry_3">
+    <property name="geometry">
+     <rect>
+      <x>341</x>
+      <y>31</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:AO.{&quot;dbnd&quot;:{&quot;d&quot;:1.5}, &quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel">
+    <property name="geometry">
+     <rect>
+      <x>47</x>
+      <y>17</y>
+      <width>271</width>
+      <height>49</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>epics dbnd + caqtdm_monitor</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_2">
+    <property name="geometry">
+     <rect>
+      <x>129</x>
+      <y>123</y>
+      <width>197</width>
+      <height>49</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>only caqtdm_monitor</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_3">
+    <property name="geometry">
+     <rect>
+      <x>261</x>
+      <y>188</y>
+      <width>68</width>
+      <height>49</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>no json</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_4">
+    <property name="geometry">
+     <rect>
+      <x>209</x>
+      <y>73</y>
+      <width>108</width>
+      <height>49</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>epics dbnd</string>
+    </property>
+   </widget>
+   <widget class="caTextEntry" name="catextentry_4">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>87</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:AO.{&quot;dbnd&quot;:{&quot;d&quot;:1.5}}</string>
+    </property>
+   </widget>
+   <widget class="caTextEntry" name="catextentry_5">
+    <property name="geometry">
+     <rect>
+      <x>63</x>
+      <y>269</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:AO.{&quot;f&quot;:{&quot;lo&quot;:0,&quot;hi&quot;:10}, &quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+    </property>
+    <property name="keepFocus">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="caTextEntry" name="catextentry_6">
+    <property name="geometry">
+     <rect>
+      <x>62</x>
+      <y>310</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:AO.{&quot;ts&quot;:{}, &quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+    </property>
+    <property name="keepFocus">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="caTextEntry" name="catextentry_7">
+    <property name="geometry">
+     <rect>
+      <x>62</x>
+      <y>348</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:AO.{test:channel.{&quot;arr&quot;:{&quot;s&quot;:2,&quot;i&quot;:2,&quot;e&quot;:8}} 4 2 4 6 8}, &quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+    </property>
+    <property name="keepFocus">
+     <bool>true</bool>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caNumeric</class>
+   <extends>QFrame</extends>
+   <header>caNumeric</header>
+  </customwidget>
+  <customwidget>
+   <class>caTextEntry</class>
+   <extends>caLineEdit</extends>
+   <header>caTextEntry</header>
+  </customwidget>
+  <customwidget>
+   <class>caLabel</class>
+   <extends>QLabel</extends>
+   <header>caLabel</header>
+  </customwidget>
+  <customwidget>
+   <class>caLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>caLineEdit</header>
+  </customwidget>
+  <customwidget>
+   <class>caThermo</class>
+   <extends>QWidget</extends>
+   <header>caThermo</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

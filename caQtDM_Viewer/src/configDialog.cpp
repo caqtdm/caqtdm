@@ -79,7 +79,13 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
     QPixmap bg(":/caQtDM-BGL-2048.png");
 
+#ifdef MOBILE_IOS
+    // the picture is behind the status bar
+    bg = bg.scaled(desktopSize);
+#else
     bg = bg.scaled(desktopSize-QSize(0,10));
+#endif
+
     QPalette palette;
     palette.setBrush(QPalette::Background, bg);
     setPalette(palette);
@@ -318,7 +324,7 @@ void configDialog::clearUiClicked()
 
     path.append("/");
     QDir dir(path);
-    dir.setNameFilters(QStringList() << "*.ui" << "*.prc" << "*.gif" << "*.jpg" << "*.png" << "*.config");
+    dir.setNameFilters(QStringList() << "*.ui" << "*.prc" << "*.gif" << "*.jpg" << "*.png" << "*.config"<< "*.ini");
     dir.setFilter(QDir::Files);
     foreach(QString dirFile, dir.entryList()) dir.remove(dirFile);
 
@@ -371,7 +377,7 @@ int configDialog::NumberOfFiles()
 
     path.append("/");
     QDir dir(path);
-    dir.setNameFilters(QStringList() << "*.ui" << "*.prc" << "*.gif" << "*.jpg" << "*.png" << "*.config");
+    dir.setNameFilters(QStringList() << "*.ui" << "*.prc" << "*.gif" << "*.jpg" << "*.png" << "*.config"<< "*.ini");
     dir.setFilter(QDir::Files);
     foreach(QString dirFile, dir.entryList()) count++;
     return count;

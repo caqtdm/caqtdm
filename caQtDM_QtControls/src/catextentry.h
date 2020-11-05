@@ -29,6 +29,7 @@
 #include <QGridLayout>
 #include <QFrame>
 #include <QEvent>
+#include <QMimeData>
 
 #include <qtcontrols_global.h>
 #include <caLineEdit>
@@ -43,6 +44,7 @@ class QTCON_EXPORT caTextEntry : public caLineEdit
     Q_PROPERTY(QColor frameColor READ getFrameColor WRITE setFrameColor  DESIGNABLE false)
     Q_PROPERTY(int frameLineWidth READ getLineWidth WRITE setLinewidth  DESIGNABLE false)
     Q_PROPERTY(alertHandling alarmHandling READ getAlarmHandling WRITE setAlarmHandling DESIGNABLE false )
+    Q_PROPERTY(bool keepFocus READ getKeepFocus WRITE setKeepFocus)
 
 #include "caElevation.h"
 
@@ -51,6 +53,9 @@ public:
     bool getAccessW() const {return _AccessW;}
     void setAccessW(bool access);
     void updateText(const QString &text);
+
+    bool getKeepFocus() const { return keepFocusOnLeave; }
+    void setKeepFocus(bool focusBehavior) {keepFocusOnLeave=focusBehavior;}
 
 public slots:
     void animation(QRect p) {
@@ -63,6 +68,12 @@ public slots:
 
     void setValue(double v);
 
+protected:
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dragMoveEvent(QDragMoveEvent *event);
+    void dragLeaveEvent(QDragLeaveEvent *event);
+    void dropEvent(QDropEvent *event);
+
 private slots:
     void dataInput();
 
@@ -72,6 +83,7 @@ signals:
 private:
     bool eventFilter(QObject *obj, QEvent *event);
 
+    bool  keepFocusOnLeave;
     bool _AccessW;
     QString startText;
 };

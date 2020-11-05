@@ -32,6 +32,8 @@
 
 class QTCON_EXPORT caMultiLineString : public QPlainTextEdit, public FontScalingWidget
 {
+    Q_OBJECT
+
     // things to get rid off
     Q_ENUMS(Shape Shadow WrapMode)
     Q_PROPERTY(Shape frameShape READ getFrameShape  DESIGNABLE false)
@@ -77,7 +79,6 @@ class QTCON_EXPORT caMultiLineString : public QPlainTextEdit, public FontScaling
 
     Q_ENUMS(ScaleMode)
 
-    Q_OBJECT
 
 public:
     void noStyle(QString style) {Q_UNUSED(style);}

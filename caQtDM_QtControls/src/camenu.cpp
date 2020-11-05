@@ -25,9 +25,11 @@
 
 #include "camenu.h"
 #include "alarmdefs.h"
+#include <QPainter>
+#include <QTimer>
 #include <QLineEdit>
 #include <QMouseEvent>
-#include<QApplication>
+#include <QApplication>
 
 caMenu::caMenu(QWidget *parent) : QComboBox(parent)
 {
@@ -35,18 +37,36 @@ caMenu::caMenu(QWidget *parent) : QComboBox(parent)
     // is not possible.
     setStyleSheet("");
 
+    setAttribute(Qt::WA_StyleSheet);
+
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     isShown = false;
     defaultPalette = palette();
     setLabelDisplay(false);
 
+    thisPV = "";
+    thisMaskPV = "";
+    thisMaskValue = 0xFFFF;  // bit 0=do not display enum field; bit 1=display enum field
+    nonMaskedStrings.clear();
+    maskedStrings.clear();
+    lastIndex = 0;
+    alarmstatus= -1;
+
+    /* certainly not, while disturbs color handling
+    defBackColor = QColor(255, 248, 220, 255);
+    defForeColor = Qt::black;
+    */
+
+    oldStyle="DEADBEEF";
+    thisStyle="";
     thisBackColor = QColor(230,230,230);
     thisForeColor = Qt::black;
     oldBackColor = QColor(230,230,230);
     oldForeColor = Qt::black;
     thisColorMode=Default;
-    oldColorMode =Default;
+    oldColorMode =Alarm;
     setColorMode(Default);
+    updateAlarmStatus_once_Later=false;
 
     setAccessW(true);
     installEventFilter(this);
@@ -67,6 +87,16 @@ void caMenu::setPV(QString const &newPV)
     }
 }
 
+void caMenu::setMaskPV(QString const &newPV)
+{
+    thisMaskPV = newPV;
+}
+
+QString caMenu::getMaskPV() const
+{
+    return thisMaskPV;
+}
+
 void caMenu::setBackground(QColor c)
 {
     thisBackColor = c;
@@ -84,30 +114,32 @@ void caMenu::setColors(QColor bg, QColor fg)
     if(!defBackColor.isValid() || !defForeColor.isValid()) return;
     if((bg != oldBackColor) || (fg != oldForeColor) || (thisColorMode != oldColorMode)) {
         if(thisColorMode == Default) {
-            thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
+            thisStyle = "caMenu {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);}";
             thisStyle = thisStyle.arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
                     arg(defForeColor.red()).arg(defForeColor.green()).arg(defForeColor.blue()).arg(defForeColor.alpha());
-
         } else {
-            thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);";
+            thisStyle = "caMenu {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);}";
             thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
                     arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha());
             oldBackColor = bg;
             oldForeColor = fg;
+
         }
     }
 
     if(thisStyle != oldStyle || thisColorMode != oldColorMode) {
+        //printf("caMenu style update %i %i (%i) %s\n",(thisStyle != oldStyle),(thisColorMode != oldColorMode), alarmstatus, qasc(this->objectName()));
         setStyleSheet(thisStyle);
         oldStyle = thisStyle;
-        update();
     }
+
     oldColorMode = thisColorMode;
 }
 
 void caMenu::setAlarmColors(short status)
 {
     QColor bg, fg;
+    alarmstatus= status;
     fg = thisForeColor;
     switch (status) {
 
@@ -131,11 +163,28 @@ void caMenu::setAlarmColors(short status)
         break;
     }
     setColors(bg, fg);
+    // it looks that depending on the generation time of the Combobox widget and the application of the
+    // stylesheet, the stylesheet is not active correctly. The timer trigger the colors once a second later.
+    // This is only a workaround!
+    if (!updateAlarmStatus_once_Later){
+        updateAlarmStatus_bg=bg;
+        updateAlarmStatus_fg=fg;
+        QTimer::singleShot(1000, this, SLOT(alarmrewrite()));
+        updateAlarmStatus_once_Later=true;
+    }
 }
+
+
 
 void caMenu::setNormalColors()
 {
     setColors(thisBackColor, thisForeColor);
+}
+
+void caMenu::alarmrewrite()
+{
+    setColors(updateAlarmStatus_bg, updateAlarmStatus_fg);
+
 }
 
 QString caMenu::getLabel() const
@@ -158,8 +207,8 @@ void caMenu::setLabelDisplay(bool c)
     thisLabelDisplay= c;
     clear();
     if(thisLabelDisplay) {
-            addItem(getLabel());
-            setCurrentIndex(0);
+        addItem(getLabel());
+        setCurrentIndex(0);
     }
 }
 
@@ -168,10 +217,22 @@ void caMenu::setAccessW(int access)
      thisAccessW = access;
 }
 
+void caMenu::setMaskValue(const int &mask)
+{
+    if((nonMaskedStrings.size() > 0) && (mask != thisMaskValue)) {
+        thisMaskValue = mask;
+        populateCells(nonMaskedStrings);
+
+    }
+    thisMaskValue = mask;
+    setIndex(lastIndex);
+}
+
 void caMenu::populateCells(QStringList stringlist)
 {
-
+    nonMaskedStrings = stringlist;
     // remove first event filter for the actual items
+
     QList<QWidget*> widgets = this->findChildren<QWidget*>();
     foreach (QWidget* widget, widgets) widget->removeEventFilter(this);
 
@@ -179,11 +240,40 @@ void caMenu::populateCells(QStringList stringlist)
     if(getLabelDisplay()) {
         addItem(getLabel());
     }
-    addItems(stringlist);
 
-    // add now the event filter for the new items
-    widgets = this->findChildren<QWidget*>();
-    foreach (QWidget* widget, widgets) widget->installEventFilter(this);
+    maskedStrings.clear();
+    for (int i=0; i<stringlist.size(); ++i) {
+        if(((thisMaskValue >> i) & 1) == 1) maskedStrings.append(stringlist.at(i));
+    }
+
+    if(maskedStrings.size() > 0) {
+        addItems(maskedStrings);
+        // add now the event filter for the new items
+        widgets = this->findChildren<QWidget*>();
+        foreach (QWidget* widget, widgets) {
+            widget->installEventFilter(this);
+        }
+    }
+}
+
+void caMenu::setIndex(int const &indx)
+{
+    if(nonMaskedStrings.size() <= 0 || indx >= nonMaskedStrings.size()) {setCurrentIndex(-1); return;}
+    bool found = false;
+    lastIndex = indx;
+    QString currentString = nonMaskedStrings.at(indx);
+    for (int i=0; i<maskedStrings.size(); i++) {
+        if(currentString == maskedStrings.at(i)) {
+            setCurrentIndex(i);
+            found = true;
+            break;
+        }
+    }
+    if(!found) setCurrentIndex(-1);
+
+    if(getLabelDisplay()) {
+        setCurrentIndex(0);
+    }
 }
 
 bool caMenu::eventFilter(QObject *obj, QEvent *event)
@@ -250,4 +340,5 @@ bool caMenu::event(QEvent *e)
     }
     return QComboBox::event(e);
 }
+
 

@@ -55,10 +55,13 @@ public:
     bool requestUrl(const QUrl url, const QByteArray &json, int secondsPast, bool binned, bool timeAxis, QString key);
     const QString lastError();
     int getCount();
-    void getData(QVector<float> &x, QVector<float> &y);
+    void getData(QVector<double> &x, QVector<double> &y);
     const QString getBackend();
     void cancelDownload();
     void close();
+
+    QString getRedirected_Url() const;
+    bool is_Redirected() const;
 
 signals:
     void networkError(const QString);
@@ -80,7 +83,7 @@ private:
     int finished;
     QUrl downloadUrl;
     QString errorString;
-    QVector<float> X,Y;
+    QVector<double> X,Y;
     int totalCount;
     int secndsPast;
     QEventLoop *eventLoop;
@@ -88,6 +91,8 @@ private:
     QString Backend;
     bool aborted;
     QString PV;
+    bool intern_is_Redirected;
+    QString Redirected_Url;
 };
 
 #endif

@@ -30,8 +30,13 @@
 
 class QTCON_EXPORT caMenu : public QComboBox
 {
+    Q_OBJECT
+
     Q_ENUMS(colMode)
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
+
+    Q_PROPERTY(QString channelMask READ getMaskPV WRITE setMaskPV)
+
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
@@ -40,7 +45,7 @@ class QTCON_EXPORT caMenu : public QComboBox
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
-    Q_OBJECT
+
 
 #include "caElevation.h"
 
@@ -51,6 +56,9 @@ public:
 
     QString getPV() const;
     void setPV(QString const &newPV);
+
+    QString getMaskPV() const;
+    void setMaskPV(QString const &newPV);
 
     QColor getForeground() const {return thisForeColor;}
     void setForeground(QColor c);
@@ -66,7 +74,9 @@ public:
 
     QString getLabel() const;
 
-     void populateCells(QStringList list);
+    void populateCells(QStringList list);
+    void setMaskValue(const int &mask);
+    void setIndex(int const &indx);
 
     caMenu(QWidget *parent);
 
@@ -76,8 +86,8 @@ public:
     void setColors(QColor bg, QColor fg);
     void setAlarmColors(short status);
     void setNormalColors();
-
 public slots:
+    void alarmrewrite();
     void animation(QRect p) {
 #include "animationcode.h"
     }
@@ -88,21 +98,26 @@ public slots:
 
 protected:
      virtual bool event(QEvent *);
-
 private:
-    QString thisPV;
+    QString thisPV, thisMaskPV;
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
     QColor defBackColor, defForeColor, defSelectColor;
     QPalette thisPalette;
     bool thisLabelDisplay;
     int thisAccessW;
+    short alarmstatus;
     colMode  thisColorMode, oldColorMode;
     QPalette defaultPalette;
     QString thisStyle, oldStyle;
-
+    QStringList nonMaskedStrings, maskedStrings;
+    int thisMaskValue;
     bool isShown;
+    bool updateAlarmStatus_once_Later;
+    QColor updateAlarmStatus_bg;
+    QColor updateAlarmStatus_fg;
     bool eventFilter(QObject *obj, QEvent *event);
+    int lastIndex;
 };
 
 #endif

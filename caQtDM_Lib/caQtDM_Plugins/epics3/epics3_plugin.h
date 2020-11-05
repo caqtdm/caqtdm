@@ -26,8 +26,10 @@
 #define EPICS3PLUGIN_H
 
 #include <QObject>
+#include <QMultiMap>
 #include "controlsinterface.h"
 #include "epicsExternals.h"
+#include <epicsVersion.h>
 
 class Q_DECL_EXPORT Epics3Plugin : public QObject, ControlsInterface
 {
@@ -60,6 +62,7 @@ public:
   private:
     MutexKnobData *mutexknobdataP;
     MessageWindow *messagewindowP;
+    QMultiMap<QString,int> Channelcache;
 };
 
 #endif

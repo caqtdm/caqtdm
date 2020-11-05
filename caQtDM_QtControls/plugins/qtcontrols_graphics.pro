@@ -5,3 +5,7 @@ HEADERS	+= qtcontrols_graphics_plugin.h designerPluginTexts.h
 RESOURCES += qtcontrolsplugin.qrc
 TARGET = qtcontrols_graphics_plugin
 
+android {
+   INCLUDEPATH += $(ANDROIDFUNCTIONSINCLUDE)
+}
+

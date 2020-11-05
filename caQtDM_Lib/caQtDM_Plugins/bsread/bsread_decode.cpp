@@ -135,7 +135,6 @@ void bsread_Decode::process()
         //qDebug() << "bsreadPlugin: ConnectionPoint faild";
         running_decode=false;
     }else{
-
         running_decode=true;
         channelcounter=0;
 
@@ -166,7 +165,6 @@ void bsread_Decode::process()
                             }
                             msg_size=zmq_msg_size(&msg);
                             bsread_SetChannelData(zmq_msg_data(&msg),msg_size);
-
                             //qDebug() <<msg_size;
                             zmq_getsockopt (zmqsocket, ZMQ_RCVMORE, &more, &more_size);
 
@@ -227,9 +225,14 @@ void bsread_Decode::process()
             }
 
         }
+
+        bsread_DataTimeOut();
+        zmq_msg_close(&msg);
+        zmq_close(zmqsocket);
+
+
     }
-    zmq_msg_close(&msg);
-    zmq_close(zmqsocket);
+
     emit finished();
     //qDebug() << "bsreadDecode: finished ThreadID" << QThread::currentThreadId();
     qDebug() << "bsread ZMQ Receiver terminate";
@@ -342,7 +345,6 @@ void bsread_Decode::setHeader(char *value,size_t size){
                     if (jsonobj3.find(L"type") != jsonobj3.end() && jsonobj3[L"type"]->IsString()) {
 
                         QString value=QString::fromWCharArray(jsonobj3[L"type"]->AsString().c_str());
-
                         if (value=="float64"){
                             chdata->type=bs_float64;
                         }else if(value=="float32"){
@@ -367,6 +369,8 @@ void bsread_Decode::setHeader(char *value,size_t size){
                             chdata->type=bs_bool;
                         }else if(value=="string"){
                             chdata->type=bs_string;
+                        }else{
+                            chdata->type=bs_none;
                         }
 
 
@@ -384,9 +388,49 @@ void bsread_Decode::setHeader(char *value,size_t size){
                     }
 
                     if (jsonobj3.find(L"encoding") != jsonobj3.end() && jsonobj3[L"encoding"]->IsString()) {
-                        if (QString::fromWCharArray(jsonobj3[L"encoding"]->AsString().c_str())=="big"){
+                        QString encoding=QString::fromWCharArray(jsonobj3[L"encoding"]->AsString().c_str());
+
+                        if (encoding=="big"){
                             chdata->endianess=bs_big;
+                        }else if(encoding!="little"){
+                           chdata->endianess=bs_other;
                         }
+                        QStringList enc_values=encoding.split(",");
+                        bsread_channeldata *encoding_chdata;
+                        if (enc_values.count()>0){
+                            QString EncodingChannel=chdata->name;
+                            encoding_chdata=new bsread_channeldata();
+                            Channels.append(encoding_chdata);
+                            EncodingChannel.append(".ENC_GROUP");
+                            encoding_chdata->type=bs_string;
+                            encoding_chdata->name=EncodingChannel;
+                            encoding_chdata->bsdata.bs_string=enc_values.at(0);
+                            encoding_chdata->valid=true;
+                            ChannelSearch.insert(EncodingChannel, encoding_chdata);
+                        }
+                        if (enc_values.count()>1){
+                            QString EncodingChannel=chdata->name;
+                            encoding_chdata=new bsread_channeldata();
+                            Channels.append(encoding_chdata);
+                            EncodingChannel.append(".ENC_TYPE");
+                            encoding_chdata->type=bs_string;
+                            encoding_chdata->name=EncodingChannel;
+                            encoding_chdata->bsdata.bs_string=enc_values.at(1);
+                            encoding_chdata->valid=true;
+                            ChannelSearch.insert(EncodingChannel, encoding_chdata);
+                        }
+                        if (enc_values.count()>2){
+                            QString EncodingChannel=chdata->name;
+                            encoding_chdata=new bsread_channeldata();
+                            Channels.append(encoding_chdata);
+                            EncodingChannel.append(".ENC_SUBTYPE");
+                            encoding_chdata->type=bs_string;
+                            encoding_chdata->name=EncodingChannel;
+                            encoding_chdata->bsdata.bs_string=enc_values.at(2);
+                            encoding_chdata->valid=true;
+                            ChannelSearch.insert(EncodingChannel, encoding_chdata);
+                        }
+
                     }
                     if (jsonobj3.find(L"shape") != jsonobj3.end() && jsonobj3[L"shape"]->IsArray()) {
                         chdata->shape.clear();
@@ -394,7 +438,19 @@ void bsread_Decode::setHeader(char *value,size_t size){
                         for (unsigned int j = 0; j < jsonobj4.size(); j++){
                             int value=(int)jsonobj4[j]->AsNumber();
                             chdata->shape.append(value);
-                            //qDebug()<< "shape:" << value;
+                            if ((jsonobj4.size()>1)&&(value>1)){
+                                QString ShapeChannel=chdata->name;
+                                bsread_channeldata *shape_chdata=new bsread_channeldata();
+                                Channels.append(shape_chdata);
+                                ShapeChannel.append(".BSREADSHAPE");
+                                ShapeChannel.append(QString::number(j));
+                                shape_chdata->type=bs_float32;
+                                shape_chdata->name=ShapeChannel;
+                                shape_chdata->bsdata.bs_float32=value;
+                                shape_chdata->valid=true;
+                                ChannelSearch.insert(ShapeChannel, shape_chdata);
+                                qDebug()<< "shape["<<j<<"]:" << value << ShapeChannel;
+                            }
                         }
 
                     }
@@ -556,6 +612,7 @@ void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message,size_t
         if (datasize==1){
             if (size>0){
               bsdata_assign_single(Data, message,&datatypesize);
+              channelcounter++;
               Data->valid=true;
             }else{
               Data->valid=false;
@@ -579,6 +636,8 @@ void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message,size_t
                     Data->bsdata.wf_data_size=datasize;
                 }
                 Data->valid=true;
+
+                channelcounter++;
                 //qDebug() << "Data->bsdata.wf_data_size :" << Data->bsdata.wf_data_size << "  " <<size <<"  " <<datasize <<"  " << datatypesize;
             }else{
                 Data->valid=false;
@@ -587,6 +646,45 @@ void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message,size_t
         break;
     }
     case 2:{
+        int datasize=Data->shape.at(0)*Data->shape.at(1);
+        if (datasize==1){
+            if (size>0){
+              bsdata_assign_single(Data, message,&datatypesize);
+              Data->valid=true;
+            }else{
+              Data->valid=false;
+            }
+        }else{
+            if (datasize>1){
+                // handle Image Color data as 16 bit
+                if (Data->endianess==bs_other){
+                  Data->type=bs_uint16;
+
+                }
+
+                bsdata_assign_single(Data, message,&datatypesize);
+                if(Data->bsdata.wf_data_size!=(ulong)(datasize*datatypesize)){
+                    if (Data->bsdata.wf_data!=NULL){
+                        free(Data->bsdata.wf_data);
+                    }
+                    Data->bsdata.wf_data=malloc(datasize*datatypesize);
+
+                }
+                if (size<((ulong)(datasize*datatypesize))){
+                    memcpy(Data->bsdata.wf_data,message,size);
+                    Data->bsdata.wf_data_size=(ulong)(size/datatypesize);
+                }else{
+                    memcpy(Data->bsdata.wf_data,message,datasize*datatypesize);
+                    Data->bsdata.wf_data_size=datasize;
+                }
+                Data->valid=true;
+                channelcounter++;
+                channelcounter++;
+                //qDebug() << "Data->bsdata.wf_data_size :" << Data->bsdata.wf_data_size << "  " <<size <<"  " <<datasize <<"  " << datatypesize;
+            }else{
+                Data->valid=false;
+            }
+        }
 
         break;
     }
@@ -623,18 +721,21 @@ void bsread_Decode::bsread_InitHeaderChannels()
     Channels.append(chdata);
     chdata->type=bs_string;
     chdata->name="bsread:hash";
+    chdata->valid=true;
     ChannelSearch.insert(chdata->name, chdata);
 
     chdata=new bsread_channeldata();
     Channels.append(chdata);
     chdata->type=bs_float64;
     chdata->name="bsread:pulse_id";
+    chdata->valid=true;
     ChannelSearch.insert(chdata->name, chdata);
 
     chdata=new bsread_channeldata();
     Channels.append(chdata);
     chdata->type=bs_string;
     chdata->name="bsread:htype";
+    chdata->valid=true;
     ChannelSearch.insert(chdata->name, chdata);
 /*
     chdata=new bsread_channeldata();
@@ -647,12 +748,14 @@ void bsread_Decode::bsread_InitHeaderChannels()
     Channels.append(chdata);
     chdata->type=bs_float64;
     chdata->name="bsread:global_timestamp_ns";
+    chdata->valid=true;
     ChannelSearch.insert(chdata->name, chdata);
 
     chdata=new bsread_channeldata();
     Channels.append(chdata);
     chdata->type=bs_float64;
     chdata->name="bsread:global_timestamp_sec";
+    chdata->valid=true;
     ChannelSearch.insert(chdata->name, chdata);
 
 /*
@@ -707,6 +810,7 @@ void bsread_Decode::bsread_EndofData()
             knobData* kData = bsread_KnobDataP->GetMutexKnobDataPtr(index);
             if((kData != (knobData *) 0) && (kData->index != -1)) {
                 QString key = kData->pv;
+                //qDebug() << kData->pv;
                 QString ioc_string=StreamConnectionPoint.leftJustified(39, ' ');
                 strcpy(kData->edata.fec,ioc_string.toLatin1().constData());
                 // find this pv in our internal values list
@@ -724,7 +828,7 @@ void bsread_Decode::bsread_EndofData()
                     if (!bsreadPV->valid){
                         kData->edata.severity=INVALID_ALARM;
                     }else{
-                        kData->edata.severity=0;
+                        kData->edata.severity=NO_ALARM;
                     }
                     switch (bsreadPV->type){
                     case bs_float64:{
@@ -742,7 +846,7 @@ void bsread_Decode::bsread_EndofData()
                         break;
                     }
                     case bs_float32:{
-                        kData->edata.fieldtype = caDOUBLE;
+                        kData->edata.fieldtype = caFLOAT;
                         if(bsreadPV->bsdata.wf_data_size!=0){
                             WaveformManagment(kData,bsreadPV);
                             MonitorList->append(kData);
@@ -931,17 +1035,25 @@ void bsread_Decode::bsread_EndofData()
 void bsread_Decode::setTerminate()
 {
     terminate = true;
+
 }
 
 void bsread_Decode::bsread_DataTimeOut(){
     QMutexLocker locker(&mutex);
     hash="Data Time Out";
     channelcounter=0;
-    foreach(int index, listOfIndexes) {
-        knobData* kData = bsread_KnobDataP->GetMutexKnobDataPtr(index);
-        kData->edata.connected = false;
-        bsread_KnobDataP->SetMutexKnobData(kData->index, *kData);
-        bsread_KnobDataP->SetMutexKnobDataReceived(kData);
+    if (bsread_KnobDataP){
+        foreach(int index, listOfIndexes) {
+            knobData* kData = bsread_KnobDataP->GetMutexKnobDataPtr(index);
+            //qDebug() << "Index :" << kData->pv << kData->index;
+            if (kData->index>=0){
+                bsread_KnobDataP->DataLock(kData);
+                kData->edata.connected = false;
+                bsread_KnobDataP->SetMutexKnobData(kData->index, *kData);
+                bsread_KnobDataP->SetMutexKnobDataReceived(kData);
+                bsread_KnobDataP->DataUnlock(kData);
+            }
+        }
     }
 }
 void bsread_Decode::bsread_Delay(){
@@ -976,6 +1088,7 @@ bool bsread_Decode::bsread_DataMonitorUnConnect(knobData *kData){
     kData->edata.valueCount=0;
     datamutex->unlock();
 
+    //qDebug() << "Index :" << kData->pv << kData->index;
     listOfIndexes.removeAll(kData->index);
     listOfRequestedChannels.removeAll(kData->pv);
     hash="";

@@ -26,6 +26,12 @@
 #ifndef MUTEXKNOBDATA_H
 #define MUTEXKNOBDATA_H
 
+#if defined(_MSC_VER)
+ //to avoid macro redefinition
+ #define _MATH_DEFINES_DEFINED
+ #include <math.h>
+#endif
+
 
 #include "caQtDM_Lib_global.h"
 
@@ -84,7 +90,7 @@ public:
     void initHighestCountPV();
 
     void UpdateMechanism(UpdateType Type);
-
+    QString SoftPV_Name(QString pv, QWidget *w);
     void BlockProcessing(bool block) { blockProcess= block;}
 
 signals:
@@ -94,12 +100,18 @@ signals:
 
 private:
 
+    typedef struct _softlist {
+        QString pv;                       /* device process variable name */
+        int  index;
+       QWidget *w;
+    } softlist;
+
     QMutex mutex;
     knobData *KnobData;
     int KnobDataArraySize;
     int timerId, prvRepetitionRate;
     QMap<QString, int> softPV_WidgetList;
-    QMap<QString, int> softPV_List;
+    QMap<QString, softlist> softPV_List;
 
     int nbMonitorsPerSecond, nbMonitors;
     int highestCount, highestIndex, highestIndexPV;

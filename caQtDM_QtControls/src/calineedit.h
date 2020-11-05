@@ -66,7 +66,7 @@ class QTCON_EXPORT caLineEdit : public QLineEdit, public FontScalingWidget
     Q_PROPERTY(bool unitsEnabled READ getUnitsEnabled WRITE setUnitsEnabled)
 
     Q_PROPERTY(FormatType formatType READ getFormatType WRITE setFormatType)
-
+    Q_PROPERTY(QString formatString READ getFormatString WRITE setFormatString)
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
@@ -124,7 +124,7 @@ public:
     void setPrecision(int prec) {thisPrecision = prec;}
 
     enum FormatType { decimal, exponential, engr_notation, compact, truncated, utruncated,
-                      hexadecimal, octal, string, sexagesimal, sexagesimal_hms, sexagesimal_dms, enumeric}; // enumeric = enum as number
+                      hexadecimal, octal, string, sexagesimal, sexagesimal_hms, sexagesimal_dms, enumeric,user_defined_format}; // enumeric = enum as number
 
     enum ScaleMode { None, Height, WidthAndHeight};
     void setTextLine(const QString&);
@@ -136,6 +136,7 @@ public:
 
     void setFormat(int prec);
     void setValue(double value, const QString& units);
+    void appendUnits(const QString& units);
     void setDatatype(int datatype);
 
     void setFormatType(FormatType m) { thisFormatType = m; }
@@ -150,6 +151,8 @@ public:
 
     void setValueType(bool isvalue);
     void setFromTextEntry();
+    void setFormatString(const QString m) { thisFormatUserString = m; }
+    QString getFormatString() {return thisFormatUserString;}
 
 public slots:
     void animation(QRect p) {
@@ -168,8 +171,6 @@ protected:
       virtual QSize sizeHint() const;
       virtual QSize minimumSizeHint() const;
       QSize calculateTextSpace();
-      // attempt to improve performance
-      //void paintEvent(QPaintEvent *);
 
 private:
     QString thisPV;
@@ -187,7 +188,7 @@ private:
 
     bool thisUnitMode;
     QString keepText;
-    char thisFormat[20];
+    char thisFormat[MAX_STRING_LENGTH];
     char thisFormatC[20];
     bool d_rescaleFontOnTextChanged;
     double thisMaximum, thisMinimum;
@@ -209,6 +210,9 @@ private:
     QColor fgAtInitLast;
     QString unitsLast;
     int thisDatatype;
+    bool specialUnitsAppend;
+    QString specialUnitsString;
+    QString thisFormatUserString;
 };
 
 #endif

@@ -95,10 +95,13 @@ record(ao, "ACM:MOTOR") {
     field(SCAN,"Passive")
 }
 
-
 record(ao,"ACM:TEST:AO:AMP") {
     field(DESC,"analog output noise amplitude")
     field(SCAN,"Passive")
+        field(DRVH,"10000000.0")
+    field(DRVL,"-10000000.0")
+    field(HOPR,"90000000.0")
+    field(LOPR,"0.0")
 }
 
 record(calc, "ACM:TEST:AO:NOISE"){
@@ -1088,23 +1091,26 @@ record(calc, "SZ")
 
 ###########################################################################################
 
-#record(waveform, "ACM:PICTURE"){
-#        field(DESC, "16bit waveform")
-#        field(FTVL, "SHORT")
-#        field(NELM, "16000000")
-#        field(INP, "MTEST-CAQTDM-CAMERA:FPICTURE CP")
-#}
+record(waveform, "ACM:PICTURE"){
+	field(DTYP, "fileread")
+	field(INP, "@bayerpicture.dat")
+        field(DESC, "16bit image waveform")
+        field(FTVL, "SHORT")
+        field(NELM, "16000000")
+        field(SCAN,"1 second")
+}
 
-#record(calc, "ACM:PICTURE:WIDTH"){
-#        field(CALC, "A")
-#        field(DESC, "width")
-#        field(INPA, "MTEST-CAQTDM-CAMERA:WIDTH CP")
-#}
-#record(calc, "ACM:PICTURE:HEIGHT"){
-#        field(CALC, "A")
-#        field(DESC, "height")
-#        field(INPA, "MTEST-CAQTDM-CAMERA:HEIGHT CP")
-#}
+record(ao, "ACM:PICTURE:WIDTH"){
+        field(DESC, "width")
+        field(SCAN,"1 second")   
+	field(VAL, "1410")  
+}
+
+record(ao, "ACM:PICTURE:HEIGHT"){
+        field(DESC, "height")
+        field(SCAN,"1 second")
+	field(VAL, "930")
+}
 
 record(ao, "ACM:BPM1") {
 }
@@ -1168,3 +1174,29 @@ record(ai,"ACM:BPM5:Y") {
     field(INP,"10")
 }
 
+
+record(ao,"ACM:TEST:EGU:1") {
+    field(DESC,"EGU Test Record Joule")
+    field(EGU,"uJ")
+    field(VAL,"42")
+}
+record(ao,"ACM:TEST:EGU:2") {
+    field(DESC,"EGU Test Record Joule")
+    field(EGU,"muJ")
+    field(VAL,"42")
+}
+record(ao,"ACM:TEST:EGU:3") {
+    field(DESC,"EGU Test Record Ampere")
+    field(EGU,"uA")
+    field(VAL,"42")
+}
+record(ao,"ACM:TEST:EGU:4") {
+    field(DESC,"EGU Test Record Ampere")
+    field(EGU,"muA")
+    field(VAL,"42")
+}
+record(ao,"ACM:TEST:EGU:5") {
+    field(DESC,"EGU Test Record Celsius")
+    field(EGU,"°C")
+    field(VAL,"42")
+}

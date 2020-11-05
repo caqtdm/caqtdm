@@ -24,7 +24,10 @@
  */
 
 #if defined(_MSC_VER)
-#define _CRT_SECURE_NO_WARNINGS
+ #define _CRT_SECURE_NO_WARNINGS
+ //to avoid macro redefinition
+ #define _MATH_DEFINES_DEFINED
+ #include <math.h>
 #endif
 
 #include <QtControls>

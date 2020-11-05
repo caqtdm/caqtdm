@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>843</width>
+    <height>605</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QScrollArea" name="scrollArea">
+    <property name="geometry">
+     <rect>
+      <x>2</x>
+      <y>5</y>
+      <width>418</width>
+      <height>562</height>
+     </rect>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="scrollAreaWidgetContents">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>414</width>
+       <height>558</height>
+      </rect>
+     </property>
+     <widget class="caInclude" name="cainclude">
+      <property name="geometry">
+       <rect>
+        <x>8</x>
+        <y>4</y>
+        <width>395</width>
+        <height>538</height>
+       </rect>
+      </property>
+      <property name="filename" stdset="0">
+       <string notr="true">INC_ALARM1.ui</string>
+      </property>
+      <property name="stacking">
+       <enum>caInclude::RowColumn</enum>
+      </property>
+      <property name="numberOfItems" stdset="0">
+       <number>30</number>
+      </property>
+      <property name="maximumLines" stdset="0">
+       <number>10</number>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QScrollArea" name="scrollArea_2">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>4</y>
+      <width>418</width>
+      <height>562</height>
+     </rect>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="scrollAreaWidgetContents_2">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>414</width>
+       <height>558</height>
+      </rect>
+     </property>
+     <widget class="caInclude" name="cainclude_2">
+      <property name="geometry">
+       <rect>
+        <x>8</x>
+        <y>4</y>
+        <width>395</width>
+        <height>538</height>
+       </rect>
+      </property>
+      <property name="filename" stdset="0">
+       <string notr="true">INC_ALARM2.ui</string>
+      </property>
+      <property name="stacking">
+       <enum>caInclude::RowColumn</enum>
+      </property>
+      <property name="numberOfItems" stdset="0">
+       <number>30</number>
+      </property>
+      <property name="maximumLines" stdset="0">
+       <number>10</number>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>843</width>
+     <height>18</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caInclude</class>
+   <extends>QWidget</extends>
+   <header>caInclude</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

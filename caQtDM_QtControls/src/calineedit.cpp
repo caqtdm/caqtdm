@@ -22,7 +22,6 @@
  *  Contact details:
  *    anton.mezger@psi.ch
  */
-
 #include "calineedit.h"
 #include "alarmdefs.h"
 #include <QEvent>
@@ -30,8 +29,15 @@
 #include <QStyle>
 #include <QtDebug>
 #include <QMouseEvent>
-
+#include <qnumeric.h>
 #include "knobDefines.h"
+
+#if defined(_MSC_VER)
+    #ifndef snprintf
+     #define snprintf _snprintf
+    #endif
+#endif
+
 
 caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(this)
 {
@@ -54,13 +60,13 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
        setFont(font);
     }
 
+    specialUnitsAppend = false;
+    specialUnitsString = "";
+
     isShown = false;
 
     oldStyle = "";
     thisStyle = "";
-
-    setColorMode(Default);
-    setAlarmHandling(onForeground);
 
     thisFormatC[0] = '\0';
 
@@ -80,6 +86,9 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     thisFrameLineWidth = 0;
     oldFrameLineWidth = 0;
 
+    setColorMode(Default);
+    setAlarmHandling(onForeground);
+
     Alarm = 0;
 
     // default colors will be defined in my event handler by taking them from the palette defined by stylesheet definitions
@@ -91,7 +100,7 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     setFormatType(decimal);
     setFormat(0);
     setMinValue(0.0);
-    setMaxValue(1.0);
+    setMaxValue(0.0);
     setFrame(false);
 
     keepText = " ";
@@ -312,48 +321,6 @@ void caLineEdit::setLinewidth(int width)
     setColors(thisBackColor, thisForeColor, thisFrameColor, thisFrameLineWidth);
 }
 
-// attempt to improve performance
-/*
-void caLineEdit::paintEvent(QPaintEvent *)
-{
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    QColor m_BackColor = defBackColor;
-    QColor m_ForeColor = defForeColor;
-
-    QBrush brush = QBrush(m_BackColor);
-    painter.setPen(m_ForeColor);
-    painter.setBackground(brush);
-    painter.setBackgroundMode(Qt::OpaqueMode);
-    painter.fillRect(0,0, width(), height(), brush);
-
-    int m_FrameLineWidth = 0;
-    Qt::Alignment m_Alignment = QLineEdit::alignment();
-    QRect newRect(rect().top() + m_FrameLineWidth + 1, rect().left() + m_FrameLineWidth+1, rect().width() - 2 * m_FrameLineWidth - 2, rect().height() - 2 * m_FrameLineWidth - 2);
-    switch (m_Alignment) {
-    case Qt::AlignLeft:
-        painter.drawText(newRect, Qt::AlignLeft | Qt::AlignVCenter, keepText);
-        break;
-    case Qt::AlignRight:
-        painter.drawText(newRect, Qt::AlignRight | Qt::AlignVCenter, keepText);
-        break;
-    case Qt::AlignCenter:
-    default:
-        painter.drawText(newRect, Qt::AlignCenter | Qt::AlignVCenter, keepText);
-        break;
-    }
-
-    //if(m_FramePresent) {
-    //    painter.setPen(QPen(m_FrameColorBottom, m_FrameLineWidth));
-    //    painter.drawLine(QPoint(0, height() - m_FrameLineWidth/2), QPoint(width(), height() - m_FrameLineWidth/2));
-    //    painter.drawLine(QPoint(width() -  m_FrameLineWidth/2, m_FrameLineWidth/2), QPoint(width() -  m_FrameLineWidth/2, height() - m_FrameLineWidth/2));
-    //    painter.setPen(QPen(m_FrameColorTop, m_FrameLineWidth));
-    //    painter.drawLine(QPoint(0, m_FrameLineWidth/2), QPoint(width(), m_FrameLineWidth/2));
-    //    painter.drawLine(QPoint(m_FrameLineWidth/2, m_FrameLineWidth/2), QPoint(m_FrameLineWidth/2, height() - m_FrameLineWidth/2));
-    //}
-}
-*/
 bool caLineEdit::event(QEvent *e)
 {
     if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
@@ -441,42 +408,70 @@ void caLineEdit::setFormat(int prec)
     case sexagesimal_hms:
     case sexagesimal_dms:
         break;
+    case user_defined_format:{
+            strncpy(thisFormat,thisFormatUserString.toLatin1().data(),MAX_STRING_LENGTH);
+            break;
+        }
     }
 }
 
 void caLineEdit::setValue(double value, const QString& units)
 {
-    char asc[1024];
+    char asc[MAX_STRING_LENGTH];
     isValue = true;
 
     if(thisFormatType == compact) {
       if ((value < 1.e4 && value > 1.e-4) || (value > -1.e4 && value < -1.e-4) || value == 0.0) {
-        sprintf(asc, thisFormatC, value);
+        snprintf(asc, MAX_STRING_LENGTH, thisFormatC, value);
       } else {
-        sprintf(asc, thisFormat, value);
+        snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
       }
-    } else if(thisFormatType == hexadecimal || thisFormatType == octal)  {
-        if(thisDatatype == caDOUBLE) sprintf(asc, thisFormat, (long long) value);
-        else  sprintf(asc, thisFormat, (int) value);
+    } else if(thisFormatType == hexadecimal || thisFormatType == octal || thisFormatType == user_defined_format)  {
+        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, thisFormat, (long long) value);
+        else  snprintf(asc, MAX_STRING_LENGTH, thisFormat, (int) value);
     } else if(thisFormatType == truncated) {
-        if(thisDatatype == caDOUBLE) sprintf(asc, thisFormat, (long long) value);
-        else  sprintf(asc, thisFormat, (int) value);
+        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, thisFormat, (long long) value);
+        else  snprintf(asc,MAX_STRING_LENGTH,  thisFormat, (int) value);
     } else if(thisFormatType == enumeric) {
-        if(thisDatatype == caDOUBLE) sprintf(asc, thisFormat, (long long) value);
-        else  sprintf(asc, thisFormat, (int) value);
+        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, thisFormat, (long long) value);
+        else  snprintf(asc, MAX_STRING_LENGTH, thisFormat, (int) value);
     } else if(thisFormatType == utruncated) {
-        if(thisDatatype == caDOUBLE) sprintf(asc, thisFormat, (unsigned long long) value);
-        else  sprintf(asc, thisFormat, (uint) value);
+        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, thisFormat, (unsigned long long) value);
+        else  snprintf(asc,MAX_STRING_LENGTH,  thisFormat, (uint) value);
     } else {
-        sprintf(asc, thisFormat, value);
+        snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
     }
+
+    if(qIsNaN(value)){
+      snprintf(asc, MAX_STRING_LENGTH,  "nan");
+    }
+
     if(thisUnitMode) {
         strcat(asc, " ");
-        strcat(asc, qasc(units));
-        unitsLast = units;
+        if(!specialUnitsAppend) {
+
+            QString datastring=asc;
+            datastring=datastring+units;
+
+            unitsLast = units;
+            setTextLine( qasc(datastring));
+
+        } else {
+            strcat(asc, qasc(specialUnitsString));
+            unitsLast = specialUnitsString;
+            setTextLine(asc);
+        }
+    }else{
+        valueLast = value;
+        setTextLine(asc);
     }
-    valueLast = value;
-    setTextLine(asc);
+}
+
+void caLineEdit::appendUnits(const QString& units)
+{
+    specialUnitsAppend = true;
+    specialUnitsString = units;
+    setValue(valueLast, units);
 }
 
 void caLineEdit::setAlarmColors(short status, double value, QColor bgAtInit, QColor fgAtInit)
@@ -657,3 +652,4 @@ void caLineEdit::setUnitsEnabled(bool check)
 {
     thisUnitMode = check;
 }
+

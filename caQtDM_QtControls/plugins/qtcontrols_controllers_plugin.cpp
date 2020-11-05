@@ -24,7 +24,10 @@
  */
 
 #if defined(_MSC_VER)
-#define _CRT_SECURE_NO_WARNINGS
+ #define _CRT_SECURE_NO_WARNINGS
+ //to avoid macro redefinition
+ #define _MATH_DEFINES_DEFINED
+ #include <math.h>
 #endif
 
 #include <QtControls>
@@ -205,12 +208,14 @@ QWidget *caMenuInterface::createWidget(QWidget *parent)
 
 caMenuInterface::caMenuInterface(QObject *parent): CustomWidgetInterface_Controllers(parent)
 {
-    strng name[1], type[1] = {""};
-    longtext text[1] = {""};
+    strng name[2], type[2] = {""};
+    longtext text[2] = {CHANNEL, CHANNELMASK};
 
     strcpy(name[0], "channel");
     strcpy(type[0], "multiline");
-    d_domXml = XmlFunc("caMenu", "camenu", 0, 0, 100, 30, name, type, text, 1);
+    strcpy(name[1], "channelMask");
+    strcpy(type[1], "multiline");
+    d_domXml = XmlFunc("caMenu", "camenu", 0, 0, 100, 30, name, type, text, 2);
     d_name = "caMenu";
     d_include = "caMenu";
     QPixmap qpixmap =  QPixmap(":pixmaps/menu.png");
@@ -401,7 +406,7 @@ QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface_Controlle
 {
     return d_plugins;
 }
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 #else
 Q_EXPORT_PLUGIN2(QtControls, CustomWidgetCollectionInterface_Controllers)
 #endif

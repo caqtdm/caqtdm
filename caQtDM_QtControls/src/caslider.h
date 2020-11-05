@@ -26,6 +26,12 @@
 #ifndef CASLIDER_H
 #define CASLIDER_H
 
+#if defined(_MSC_VER)
+ #define QWT_DLL
+#endif
+
+
+
 #include <qtcontrols_global.h>
 #include <qwt_slider.h>
 #include <qwt_scale_draw.h>

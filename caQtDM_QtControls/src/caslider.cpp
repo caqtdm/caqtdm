@@ -38,12 +38,16 @@
 #include <QMouseEvent>
 #include <QApplication>
 #include <QPainter>
+#include <qnumeric.h>
 #include "qwt_scale_draw.h"
 #include "alarmdefs.h"
 
 #if defined(_MSC_VER)
-#define fmax max
-#define fmin min
+ #define fmax max
+ #define fmin min
+ #ifndef snprintf
+  #define snprintf _snprintf
+ #endif
 #endif
 
 // I need to overload the scaleengine of qwt in order to get the upper and lower scale ticks drawn
@@ -885,20 +889,25 @@ void caSlider::setFormat(int prec)
 // Creates the QString that will be displayed for the value label
 QString caSlider::setScaleLabel(double value) const
 {
-    char asc[1024];
+    char asc[MAX_STRING_LENGTH];
     QString label;
 
     if(thisFormatType == compact) {
         if ((value < 1.e4 && value > 1.e-4) || (value > -1.e4 && value < -1.e-4) || value == 0.0) {
-            sprintf(asc, thisFormatC, value);
+            snprintf(asc, MAX_STRING_LENGTH, thisFormatC, value);
         } else {
-            sprintf(asc, thisFormat, value);
+            snprintf(asc, MAX_STRING_LENGTH,  thisFormat, value);
         }
     } else if(thisFormatType == truncated) {
-        sprintf(asc, thisFormat, (int) value);
+        snprintf(asc, MAX_STRING_LENGTH, thisFormat, (int) value);
     } else {
-        sprintf(asc, thisFormat, value);
+        snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
     }
+
+    if(qIsNaN(value)){
+      snprintf(asc, MAX_STRING_LENGTH,  "nan");
+    }
+
     label = QString::fromAscii(asc);
 
     return label;

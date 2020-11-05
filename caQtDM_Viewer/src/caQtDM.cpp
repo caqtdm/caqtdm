@@ -47,6 +47,24 @@
 #else
 #include <QtGui/QApplication>
 #endif
+
+#ifdef linux
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+   #define CAQTDM_X11 Q_WS_X11
+#else
+   #ifndef MOBILE_ANDROID
+      #define CAQTDM_X11 Q_OS_UNIX
+   #endif
+#endif
+#endif
+
+#ifdef CAQTDM_X11
+        #include <QX11Info>
+        #include <X11/Xutil.h>
+        #include <X11/Xlib.h>
+        #include <X11/Xatom.h>
+#endif //CAQTDM_X11
+
 /*
 class MyApplication: public QApplication
 {
@@ -116,13 +134,22 @@ int main(int argc, char *argv[])
 #endif
 
     //MyApplication app(argc, argv);
+#if defined(_MSC_VER)
+#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
+    // to avoid an error output: "Qt WebEngine seems to be initialized from a plugin"
+    QGuiApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+#endif
+#endif
 
     QApplication app(argc, argv);
     QApplication::setOrganizationName("Paul Scherrer Institut");
     QApplication::setApplicationName("caQtDM");
 
+
+
 #ifdef MOBILE_ANDROID
-    app.setStyle(QStyleFactory::create("fusion"));
+    //qDebug() << QStyleFactory::keys();
+    app.setStyle(QStyleFactory::create("Fusion"));
 #endif
 
     // we do not want numbers with a group separators
@@ -209,14 +236,20 @@ int main(int argc, char *argv[])
                    "  [-print] will print file and exit\n"
                    "  [-noResize] will prevent resizing\n"
                    "  [-cs defaultcontrolsystempluginname]\n"
-                   "  [-option \"xxx=aaa,yyy=bbb, ...\"] options for cs plugins\n"
+                   "  [-option \"xxx=aaa,yyy=bbb, ...\"] options for cs plugins,\n"
+                   "  \t e.g. -option \"updatetype=direct\" will set the updatetype to Direct\n"
+                   "  \t options for bsread:\n "
+                   "  \t\t bsmodulo,bsoffset,\n"
+                   "  \t\t bsinconsistency(drop|keep-as-is|adjust-individual|adjust-global),\n"
+                   "  \t\t bsmapping(provide-as-is|drop|fill-null)\n"
+                   "  \t\t bsstrategy(complete-all|complete-latest)\n"
                    "  [-url url] will look for files on the specified url and download them to a local directory\n"
                    "  [-emptycache] will empty the local cache used for downloading"
                    "  [file]\n"
                    "  [&]\n"
                    "\n"
                    "  -x -displayFont -display are ignored !\n\n"
-                   "  on linux plattforms, ui data can be piped to caQtDM, but then -httpconfig & -attach will not work\n\n");
+                   "  on linux platforms, ui data can be piped to caQtDM, but then -httpconfig & -attach will not work\n\n");
                  exit(1);
         } else if((!strcmp(argv[in],"-displayGeometry")) || (!strcmp(argv[in],"-dg"))) {
             // [-dg [xpos[xypos]][+xoffset[+yoffset]]
@@ -249,7 +282,7 @@ int main(int argc, char *argv[])
             createMap(options, QString(argv[in]));
         } else if (strncmp (argv[in], "-" , 1) == 0) {
             /* unknown application argument */
-            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -stylefile -dg -x -print -httpconfig -noResize\n",in,argv[in]);
+            printf("caQtDM -- Argument %d = [%s] is unknown!, possible -attach -macro -noMsg -stylefile -dg -x -print -httpconfig -noResize -option\n",in,argv[in]);
         } else {
             printf("caQtDM -- file = <%s>\n", argv[in]);
             fileName = QString(argv[in]);
@@ -278,7 +311,7 @@ int main(int argc, char *argv[])
     }
 #endif
 
-    // must be always true for mobile plattforms
+    // must be always true for mobile platforms
 #ifdef MOBILE
      HTTPCONFIGURATOR = true;
 #endif
@@ -308,6 +341,7 @@ int main(int argc, char *argv[])
             QFile file(fileNameFound);
             file.open(QFile::ReadOnly);
             macroString = QLatin1String(file.readAll());
+            macroString = macroString.simplified().trimmed();
             file.close();
         }
     }
@@ -332,7 +366,26 @@ int main(int argc, char *argv[])
     FileOpenWindow window (0, fileName, macroString, attach, minimize, geometry, printscreen, resizing, options);
     window.setWindowIcon (QIcon(":/caQtDM.ico"));
     window.show();
+#ifdef CAQTDM_X11
+    #if QT_VERSION > QT_VERSION_CHECK(5,0,0)
+        if (qApp->platformName()== QLatin1String("xcb")){
+    #endif
+
+    QString X_Server_Check=ServerVendor(QX11Info::display());
+    if (X_Server_Check.contains("Colin Harrison")){ //Xming Server on Windows, yes this is a quickfix!
+       window.move(10,30);// 0,0 is outside the visible areas on the taget
+    }else{
+       window.move(0,0);
+    }
+    #if QT_VERSION > QT_VERSION_CHECK(5,0,0)
+        }else{
+            window.move(0,0);
+        }
+    #endif
+#else
     window.move(0,0);
+#endif
+
 
     if (signal(SIGINT, unixSignalHandler) == SIG_ERR) {
         qFatal("ERR - %s(%d): An error occurred while setting a signal handler.\n", __FILE__,__LINE__);

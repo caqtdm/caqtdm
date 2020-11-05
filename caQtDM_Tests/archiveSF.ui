@@ -89,10 +89,10 @@
      <enum>caCartesianPlot::linear</enum>
     </property>
     <property name="secondsPast" stdset="0">
-     <string>7200</string>
+     <string>$(secondsPast)</string>
     </property>
     <property name="secondsUpdate" stdset="0">
-     <string>5</string>
+     <string>$(secondsUpdate)</string>
     </property>
    </widget>
    <widget class="caCartesianPlot" name="cacartesianplot_4">
@@ -357,7 +357,7 @@
      <x>0</x>
      <y>0</y>
      <width>1053</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>
