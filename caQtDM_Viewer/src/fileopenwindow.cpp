@@ -876,6 +876,7 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
 
 #ifdef MOBILE
     newWindow->grabSwipeGesture(fingerSwipeGestureType);
+    newWindow->setAttribute(Qt::WA_ContentsMarginsRespectsSafeArea,false);
 #endif
 
     QMainWindow *mainWindow = newWindow;
