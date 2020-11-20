@@ -1565,6 +1565,13 @@ void *parseRelatedDisplay(DisplayInfo *displayInfo, FrameOffset * offset)
     }
     if(strlen(names) > 0) {
         names[strlen(names) -1] = '\0';
+        char * pch= strstr(names,".adl");
+        if (strstr(names,".adl")){
+            while(pch != NULL){
+                strncpy(pch,".ui ",4);
+                pch = strstr(pch,".adl");
+            }
+        }
         Qt_handleString("files", "string", names);
     }
     if(strlen(argus) > 0) {
@@ -2665,7 +2672,12 @@ static void compositeFileParse(DisplayInfo *displayInfo, char *filename, DlObjec
         newoffset->frameWidth = compositeFileWidth;
 
         writeRectangleDimensions(object, newoffset, "caInclude", False);
-
+        if (strstr(filename,".adl")){
+            char * pch;
+            pch = strstr(filename,".adl");
+            if (pch != NULL)
+              strncpy (pch,".ui\0",4);
+        }
         Qt_handleString("filename", "string", filename);
         Qt_handleString("macro", "string", macroString);
 
