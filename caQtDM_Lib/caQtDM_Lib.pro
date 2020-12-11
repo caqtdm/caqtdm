@@ -1,9 +1,10 @@
+CAQTDM_TOP = ..
 TARGET_PRODUCT = "Library for Display Manager"
 TARGET_FILENAME = "caQtDM_Lib.dll"
 
-include (../caQtDM_Viewer/qtdefs.pri)
+include ($$CAQTDM_TOP/caQtDM_Viewer/qtdefs.pri)
 CONFIG += caQtDM_Lib
-include(../caQtDM.pri)
+include($$CAQTDM_TOP/caQtDM.pri)
 
 QT += core gui network
 

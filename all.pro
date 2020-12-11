@@ -2,7 +2,7 @@
 # put in file 5.13.1/ios/mkspecs/features/toolchain.prf  after line 184 darwin {
 # cxx_flags += -arch $$QMAKE_APPLE_DEVICE_ARCHS otherwise nothing works for ios 14
 # even parsing of the .pro files fails
-
+CAQTDM_TOP=.
 _QTHOME=$$(QTHOME)
 _QWTHOME=$$(QWTHOME)
 _EPICSBASE=$$(EPICS_BASE)

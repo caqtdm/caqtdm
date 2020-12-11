@@ -7,7 +7,6 @@ include(./caQtDM_BuildingFactory/caQtDM_Viewer.pri)
 include(./caQtDM_BuildingFactory/caQtDM_Library.pri)
 include(./caQtDM_BuildingFactory/caQtDM_QtControls.pri)
 include(./caQtDM_BuildingFactory/caQtDM_Parser.pri)
-
 #==========================================================================================================
 #
 #   caQtDM Data Sources
@@ -21,6 +20,13 @@ include(./caQtDM_BuildingFactory/caQtDM_Plugin_EPICS3.pri)
 include(./caQtDM_BuildingFactory/caQtDM_Plugin_EPICS4.pri)
 include(./caQtDM_BuildingFactory/caQtDM_Plugin_GPS.pri)
 include(./caQtDM_BuildingFactory/caQtDM_Plugin_MODBUS.pri)
+#==========================================================================================================
+#
+#   internal Libraries
+#
+#==========================================================================================================
+
+include(./caQtDM_BuildingFactory/caQtDM_internal_Libraries.pri)
 
 #==========================================================================================================
 #

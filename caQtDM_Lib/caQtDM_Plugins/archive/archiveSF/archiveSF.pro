@@ -1,4 +1,5 @@
-include (../../../../caQtDM_Viewer/qtdefs.pri)
+CAQTDM_TOP=../../../..
+include ($$CAQTDM_TOP/caQtDM_Viewer/qtdefs.pri)
 
 QT += core gui network
 
@@ -11,7 +12,7 @@ contains(QT_VER_MAJ, 5) {
 
 CONFIG += archive_plugin
 
-include (../../../../caQtDM.pri)
+include ($$CAQTDM_TOP/caQtDM.pri)
 
 MOC_DIR = ./moc
 VPATH += ./src

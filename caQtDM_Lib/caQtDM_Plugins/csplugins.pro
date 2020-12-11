@@ -1,3 +1,4 @@
+CAQTDM_TOP=../..
 #version check qt
 contains(QT_VERSION, ^4\\.[0-5]\\..*) {
 message("Cannot build package with Qt version $${QT_VERSION}.")

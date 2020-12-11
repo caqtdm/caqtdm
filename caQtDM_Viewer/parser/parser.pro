@@ -1,3 +1,4 @@
+CAQTDM_TOP=../..
 TARGET_PRODUCT = "ADL converter for Display Manager"
 TARGET_FILENAME = "adl2ui.exe"
 

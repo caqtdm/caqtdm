@@ -1,3 +1,4 @@
+CAQTDM_TOP=..
 TARGET_PRODUCT = "Widgets for Display Manager"
 TARGET_FILENAME = "qtcontrols.dll"
 
@@ -33,6 +34,7 @@ TARGET = qtcontrols
 TEMPLATE = lib
 MOC_DIR = moc
 INCLUDEPATH += src
+INCLUDEPATH += $$PWD/moc
 INCLUDEPATH += ../caQtDM_Lib/src
 INCLUDEPATH += ../caQtDM_Parsers/adlParserSrc
 INCLUDEPATH += ../caQtDM_Parsers/edlParserSrc

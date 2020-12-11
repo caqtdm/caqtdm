@@ -1,3 +1,4 @@
+CAQTDM_TOP = ..
 TARGET_PRODUCT = "Display Manager"
 TARGET_FILENAME = "caqtdm.exe"
 
