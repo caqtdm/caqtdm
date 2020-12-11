@@ -1,5 +1,5 @@
 CAQTDM_TOP=../../..
-include ($$CAQTDM_TOP/caQtDM_Viewer/qtdefs.pri)
+include($$CAQTDM_TOP/caQtDM_BuildControl_Version/caQtDM_BuildControl_Version.pri)
 QT += core gui network
 contains(QT_VER_MAJ, 5) {
     QT     += widgets concurrent

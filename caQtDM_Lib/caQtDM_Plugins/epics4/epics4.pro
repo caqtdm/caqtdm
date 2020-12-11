@@ -1,5 +1,5 @@
 CAQTDM_TOP=../../..
-include ($$CAQTDM_TOP/caQtDM_Viewer/qtdefs.pri)
+include($$CAQTDM_TOP/caQtDM_BuildControl_Version/caQtDM_BuildControl_Version.pri)
 QT += core gui
 contains(QT_VER_MAJ, 5) {
     QT     += widgets
@@ -25,7 +25,7 @@ TARGET          = epics4_plugin
 SOURCES += epics4_callbackThread.cpp epics4Requester.cpp
 HEADERS += epics4_callbackThread.h epics4Requester.h
 
-warning("epics4 was specified in qtdefs.pri, so build plugin with epics4 which will support all normative data types")
+warning("epics4 was specified in include caQtDM_BuildControl_Version.pri, so build plugin with epics4 which will support all normative data types")
 
 
 DEFINES += QT_NO_WARNING_OUTPUT QT_NO_DEBUG_OUTPUT

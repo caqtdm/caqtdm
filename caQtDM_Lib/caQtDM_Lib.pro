@@ -2,7 +2,7 @@ CAQTDM_TOP = ..
 TARGET_PRODUCT = "Library for Display Manager"
 TARGET_FILENAME = "caQtDM_Lib.dll"
 
-include ($$CAQTDM_TOP/caQtDM_Viewer/qtdefs.pri)
+include($$CAQTDM_TOP/caQtDM_BuildControl_Version/caQtDM_BuildControl_Version.pri)
 CONFIG += caQtDM_Lib
 include($$CAQTDM_TOP/caQtDM.pri)
 

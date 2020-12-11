@@ -1,4 +1,5 @@
-include(../../caQtDM_Viewer/qtdefs.pri)
+CAQTDM_TOP = ../..
+include($$CAQTDM_TOP/caQtDM_BuildControl_Version/caQtDM_BuildControl_Version.pri)
 
 contains(QT_VER_MAJ, 4) {
       CONFIG += plugin qt thread warn_on

@@ -1,6 +1,8 @@
-include(../../caQtDM_Viewer/qtdefs.pri)
+CAQTDM_TOP = ../..
+include($$CAQTDM_TOP/caQtDM_BuildControl_Version/caQtDM_BuildControl_Version.pri)
 CONFIG += caQtDM_xdl2ui
-include(../../caQtDM.pri)
+include($$CAQTDM_TOP/caQtDM.pri)
+
 
 contains(QT_VER_MAJ, 5) {
   QT       += widgets
