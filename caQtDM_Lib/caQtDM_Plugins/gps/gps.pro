@@ -1,5 +1,5 @@
 CAQTDM_TOP=../../..
-include($$CAQTDM_TOP/caQtDM_BuildControl_Version/caQtDM_BuildControl_Version.pri)
+include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
 contains(QT_VER_MAJ, 5) {
     QT     +=  core gui widgets positioning
 }

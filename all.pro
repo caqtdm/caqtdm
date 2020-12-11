@@ -8,7 +8,7 @@ _QWTHOME=$$(QWTHOME)
 _EPICSBASE=$$(EPICS_BASE)
 _EPICSHOSTARCH=$$(EPICS_HOST_ARCH)
 
-include (caQtDM_Viewer/qtdefs.pri)
+include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
 
 isEmpty(_QTHOME){
  message("QTHOME must be defined in order to locate QT")

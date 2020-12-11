@@ -2,9 +2,9 @@ CAQTDM_TOP=../..
 TARGET_PRODUCT = "ADL converter for Display Manager"
 TARGET_FILENAME = "adl2ui.exe"
 
-include(../qtdefs.pri)
+include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
 CONFIG += caQtDM_xdl2ui caQtDM_xdl2ui_Lib
-include(../../caQtDM.pri)
+include($$CAQTDM_TOP/caQtDM.pri)
 
 contains(QT_VER_MAJ, 5) {
   QT       += widgets
@@ -15,7 +15,7 @@ TEMPLATE = app
 INCLUDEPATH += .
 INCLUDEPATH += ../../caQtDM_Parsers/adlParserSrc
 MOC_DIR = moc
-RC_FILE = ../../caQtDM_Viewer/src/caQtDM.rc
+RC_FILE = $$CAQTDM_TOP/caQtDM_Viewer/src/caQtDM.rc
 
 # Input
 HEADERS += adlParser.h

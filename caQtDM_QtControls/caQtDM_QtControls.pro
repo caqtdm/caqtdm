@@ -2,7 +2,7 @@ CAQTDM_TOP=..
 TARGET_PRODUCT = "Widgets for Display Manager"
 TARGET_FILENAME = "qtcontrols.dll"
 
-include($$CAQTDM_TOP/caQtDM_BuildControl_Version/caQtDM_BuildControl_Version.pri)
+include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
 CONFIG += caQtDM_QtControls caQtDM_xdl2ui_Lib
 include($$CAQTDM_TOP/caQtDM.pri)
 

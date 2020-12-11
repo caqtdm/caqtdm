@@ -1,5 +1,7 @@
 CAQTDM_TOP = ../..
-include($$CAQTDM_TOP/caQtDM_BuildControl_Version/caQtDM_BuildControl_Version.pri)
+include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
+CONFIG += Define_Build_caQtDM_QtControls
+include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_internal_Libraries.pri)
 
 contains(QT_VER_MAJ, 4) {
       CONFIG += plugin qt thread warn_on
@@ -45,14 +47,14 @@ win32 {
 	     CONFIG(DebugBuild, DebugBuild|ReleaseBuild) { 
                      INCLUDEPATH += $(QWTINCLUDE)
                      LIBS += $$(QWTHOME)/lib/$$(QWTLIBNAME)d.lib
-		    LIBS += $(CAQTDM_COLLECT)/debug/qtcontrols.lib
+                    #LIBS += $(CAQTDM_COLLECT)/debug/qtcontrols.lib
 	     }
 
 	     ReleaseBuild {
 	     CONFIG( ReleaseBuild, DebugBuild|ReleaseBuild) {
 	             INCLUDEPATH += $(QWTINCLUDE)
                      LIBS += $$(QWTHOME)/lib/$$(QWTLIBNAME).lib
-		     LIBS += $(CAQTDM_COLLECT)/qtcontrols.lib
+                     #LIBS += $(CAQTDM_COLLECT)/qtcontrols.lib
 	     }
      }  
 }
@@ -110,3 +112,4 @@ unix:!ios {
 INCLUDEPATH += ../../caQtDM_Lib/src
 INCLUDEPATH += ../src
 INCLUDEPATH += .
+}

@@ -1,4 +1,5 @@
 Define_Build_caQtDM_QtControls {
+	INCLUDEPATH += $$CAQTDM_TOP/caQtDM_QtControls/src
 
 	unix:!macx:!ios:!android {
 		LIBS += -L$(CAQTDM_COLLECT) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols

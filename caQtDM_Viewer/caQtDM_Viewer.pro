@@ -2,7 +2,7 @@ CAQTDM_TOP = ..
 TARGET_PRODUCT = "Display Manager"
 TARGET_FILENAME = "caqtdm.exe"
 
-include($$CAQTDM_TOP/caQtDM_BuildControl_Version/caQtDM_BuildControl_Version.pri)
+include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
 CONFIG += caQtDM_Viewer
 include($$CAQTDM_TOP/caQtDM.pri)
 

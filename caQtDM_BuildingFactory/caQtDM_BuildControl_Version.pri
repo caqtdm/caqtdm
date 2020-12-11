@@ -1,7 +1,7 @@
 
 CAQTDM_VERSION = V4.3.1
 
-CAQTDM_TOP=..
+
 exists($$CAQTDM_TOP/.git) {
   GIT_VERSION = $$system(git --version)
   contains(GIT_VERSION, "git") :{
