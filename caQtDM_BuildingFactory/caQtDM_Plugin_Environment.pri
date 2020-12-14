@@ -1,7 +1,7 @@
 #==========================================================================================================
 environment_Plugin {
         message(“environment_plugin configuration”)
-        CONFIG += Define_ControlsysTargetDir Define_Build_objDirs
+        CONFIG += Define_Build_objDirs
 
         unix:!macx:!ios:!android {
                 message(“environment_plugin configuration unix:!macx:!ios:!android”)
@@ -56,7 +56,7 @@ environment_Plugin {
                 INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
                 INCLUDEPATH += $$(EPICS_BASE)/include
                 win32-msvc* || msvc{
-                        CONFIG += Define_Build_epics_controls Define_ControlsysTargetDir
+                        CONFIG += Define_Build_epics_controls
                         CONFIG += Define_Build_caQtDM_Lib Define_Symbols
                 }
 

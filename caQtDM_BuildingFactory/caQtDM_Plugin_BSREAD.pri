@@ -2,7 +2,6 @@
 bsread_Plugin {
         message(“bsread_plugin configuration”)
         CONFIG += Define_Build_caQtDM_Lib
-        #CONFIG += Define_ControlsysTargetDir
         CONFIG += Define_Build_caQtDM_QtControls Define_Build_objDirs Define_ZMQ_Lib
 
         unix:!macx:!ios:!android {

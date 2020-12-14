@@ -1,7 +1,7 @@
 
 #==========================================================================================================
 epics4_plugin {
-        CONFIG += Define_ControlsysTargetDir Define_Build_objDirs
+        CONFIG += Define_Build_objDirs
 	    CONFIG +=Define_Build_caQtDM_Lib Define_Build_qtcontrols
 	    CONFIG +=Define_Build_epicsPV_controls Define_Build_epics_controls
 	    CONFIG +=Define_Symbols

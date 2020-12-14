@@ -7,6 +7,8 @@ contains(QT_VER_MAJ, 5) {
 CONFIG += warn_on
 CONFIG += release
 CONFIG += epics4_plugin
+CONFIG += caQtDM_Installation
+INSTALLTIONSUBDIR = controlsystems
 include ($$CAQTDM_TOP/caQtDM.pri)
 
 MOC_DIR = ./moc

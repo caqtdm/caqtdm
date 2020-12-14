@@ -1,6 +1,6 @@
 #==========================================================================================================
 gps_plugin {
-        CONFIG += Define_ControlsysTargetDir Define_Build_objDirs
+        CONFIG += Define_Build_objDirs
 
         unix:!macx:!ios:!android {
                 message("gps_plugin configuration unix:!macx:!ios:!android")

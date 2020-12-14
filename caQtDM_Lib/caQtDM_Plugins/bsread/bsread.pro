@@ -7,7 +7,8 @@ contains(QT_VER_MAJ, 5) {
 
 CONFIG += warn_on
 CONFIG += bsread_Plugin
-
+CONFIG += caQtDM_Installation
+INSTALLTIONSUBDIR = controlsystems
 include ($$CAQTDM_TOP/caQtDM.pri)
 TEMPLATE        = lib
 CONFIG         += plugin

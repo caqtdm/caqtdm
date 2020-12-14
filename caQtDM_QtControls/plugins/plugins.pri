@@ -1,6 +1,8 @@
 CAQTDM_TOP = ../..
 include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
 CONFIG += Define_Build_caQtDM_QtControls
+CONFIG += caQtDM_Installation
+INSTALLTIONSUBDIR = designer
 include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_internal_Libraries.pri)
 
 contains(QT_VER_MAJ, 4) {

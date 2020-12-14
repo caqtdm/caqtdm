@@ -1,8 +1,8 @@
 #==========================================================================================================
 modbus_Plugin {
         message(“modbus_Plugin configuration”)
-        CONFIG += Define_ControlsysTargetDir Define_Build_caQtDM_QtControls Define_Build_objDirs
-        CONFIG += Define_Build_epics_controls Define_ControlsysTargetDir
+        CONFIG += Define_Build_caQtDM_QtControls Define_Build_objDirs
+        CONFIG += Define_Build_epics_controls
         CONFIG += Define_Build_caQtDM_Lib Define_Symbols
 
         unix:!macx:!ios:!android {

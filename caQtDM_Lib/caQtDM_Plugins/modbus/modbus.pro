@@ -8,6 +8,8 @@ contains(QT_VER_MAJ, 5) {
 
 CONFIG += warn_on
 CONFIG += modbus_Plugin
+CONFIG += caQtDM_Installation
+INSTALLTIONSUBDIR = controlsystems
 
 include ($$CAQTDM_TOP/caQtDM.pri)
 

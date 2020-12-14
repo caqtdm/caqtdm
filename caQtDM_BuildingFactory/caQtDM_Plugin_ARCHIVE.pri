@@ -1,6 +1,6 @@
 #==========================================================================================================
 archive_plugin {
-        CONFIG += Define_ControlsysTargetDir Define_Build_objDirs Define_Build_caQtDM_Lib Define_Build_caQtDM_QtControls
+        CONFIG += Define_Build_objDirs Define_Build_caQtDM_Lib Define_Build_caQtDM_QtControls
 
         unix:!macx:!ios:!android {
                 message("archive_plugin configuration unix:!macx:!ios:!android")

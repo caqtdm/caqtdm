@@ -11,7 +11,8 @@ contains(QT_VER_MAJ, 5) {
 }
 
 CONFIG += archive_plugin
-
+CONFIG += caQtDM_Installation
+INSTALLTIONSUBDIR = controlsystems
 include ($$CAQTDM_TOP/caQtDM.pri)
 
 MOC_DIR = ./moc

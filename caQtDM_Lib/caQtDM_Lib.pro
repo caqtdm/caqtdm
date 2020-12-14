@@ -4,6 +4,7 @@ TARGET_FILENAME = "caQtDM_Lib.dll"
 
 include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
 CONFIG += caQtDM_Lib
+CONFIG += caQtDM_Installation
 include($$CAQTDM_TOP/caQtDM.pri)
 
 QT += core gui network
