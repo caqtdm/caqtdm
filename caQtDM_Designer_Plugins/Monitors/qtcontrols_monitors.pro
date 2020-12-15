@@ -1,9 +1,9 @@
 CAQTDM_PLUGINNAME = monitors
-include(./plugins.pri)
+include(../Common/plugins.pri)
 
 SOURCES	+= qtcontrols_monitors_plugin.cpp
 HEADERS	+= qtcontrols_monitors_plugin.h designerPluginTexts.h
-RESOURCES += qtcontrolsplugin.qrc
+RESOURCES += ../Common/qtcontrolsplugin.qrc
 TARGET = qtcontrols_monitors_plugin
 
 android {

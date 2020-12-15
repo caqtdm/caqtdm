@@ -1,9 +1,9 @@
 CAQTDM_PLUGINNAME = utilities
-include(./plugins.pri)
+include(../Common/plugins.pri)
 
 SOURCES	+= qtcontrols_utilities_plugin.cpp
 HEADERS	+= qtcontrols_utilities_plugin.h  designerPluginTexts.h
-RESOURCES += qtcontrolsplugin.qrc
+RESOURCES += ../Common/qtcontrolsplugin.qrc
 TARGET = qtcontrols_utilities_plugin
 
 android {

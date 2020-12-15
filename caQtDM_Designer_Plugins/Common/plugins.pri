@@ -109,7 +109,7 @@ unix:!ios {
       QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
    }
 }
-
+INCLUDEPATH += ../Common
 INCLUDEPATH += ../../caQtDM_Lib/src
 INCLUDEPATH += ../src
 INCLUDEPATH += .
