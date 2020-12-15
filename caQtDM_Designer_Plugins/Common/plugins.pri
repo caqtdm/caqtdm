@@ -24,6 +24,7 @@ contains(QT_VER_MAJ, 5) {
 }
 
 TEMPLATE = lib
+MOC_DIR = moc
 
 ios | android {
   CONFIG += static
@@ -31,7 +32,6 @@ ios | android {
   LIBS += ../$(CAQTDM_COLLECT)/libqtcontrols.a
   INCLUDEPATH += $(QWTINCLUDE)
   INCLUDEPATH += $$(QWTHOME)/src
-  MOC_DIR = moc
   OBJECTS_DIR = obj
 }
 
@@ -92,7 +92,6 @@ unix:!ios {
    DESTDIR = $(CAQTDM_COLLECT)/designer
    unix {
      INCLUDEPATH += $(QWTINCLUDE)
-     MOC_DIR = moc
      OBJECTS_DIR = obj
    }
 

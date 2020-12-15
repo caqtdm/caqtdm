@@ -1,3 +1,4 @@
+CAQTDM_PLUGINNAME = utilities
 include(./plugins.pri)
 
 SOURCES	+= qtcontrols_utilities_plugin.cpp

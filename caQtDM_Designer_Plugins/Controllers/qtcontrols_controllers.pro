@@ -1,3 +1,4 @@
+CAQTDM_PLUGINNAME = controllers
 include(./plugins.pri)
 
 SOURCES	+= qtcontrols_controllers_plugin.cpp
