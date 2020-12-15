@@ -42,3 +42,25 @@ Define_Build_caQtDM_Lib {
     }
 
 }
+
+caQtDM_xdl2ui_Lib{
+        unix:!macx {
+            LIBS += $(CAQTDM_COLLECT)/libadlParser.a
+        }
+
+        macx {
+            LIBS += $(CAQTDM_COLLECT)/libadlParser.a
+        }
+
+        win32 {
+                win32-msvc* || msvc{
+                        #LIBS += $(CAQTDM_COLLECT)/adlParser.lib
+                        LIBS += $$CAQTDM_TOP/caQtDM_Parsers/adlParserStaticLib/release/adlParser.lib
+                }
+
+                win32-g++ {
+                        LIBS += $(CAQTDM_COLLECT)/libadlParser.a
+                }
+        }
+
+}
