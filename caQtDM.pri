@@ -3,23 +3,23 @@
 #   Main caQtDM Components
 #
 #==========================================================================================================
-include(./caQtDM_BuildingFactory/caQtDM_Viewer.pri)
-include(./caQtDM_BuildingFactory/caQtDM_Library.pri)
-include(./caQtDM_BuildingFactory/caQtDM_QtControls.pri)
-include(./caQtDM_BuildingFactory/caQtDM_Parser.pri)
+caQtDM_Viewer {include(./caQtDM_BuildingFactory/caQtDM_Viewer.pri)}
+caQtDM_Lib {include(./caQtDM_BuildingFactory/caQtDM_Library.pri)}
+caQtDM_QtControls {include(./caQtDM_BuildingFactory/caQtDM_QtControls.pri)}
+caQtDM_xdl2ui {include(./caQtDM_BuildingFactory/caQtDM_Parser.pri)}
 #==========================================================================================================
 #
 #   caQtDM Data Sources
 #
 #==========================================================================================================
-include(./caQtDM_BuildingFactory/caQtDM_Plugin_ARCHIVE.pri)
-include(./caQtDM_BuildingFactory/caQtDM_Plugin_BSREAD.pri)
-include(./caQtDM_BuildingFactory/caQtDM_Plugin_DEMO.pri)
-include(./caQtDM_BuildingFactory/caQtDM_Plugin_Environment.pri)
-include(./caQtDM_BuildingFactory/caQtDM_Plugin_EPICS3.pri)
-include(./caQtDM_BuildingFactory/caQtDM_Plugin_EPICS4.pri)
-include(./caQtDM_BuildingFactory/caQtDM_Plugin_GPS.pri)
-include(./caQtDM_BuildingFactory/caQtDM_Plugin_MODBUS.pri)
+archive_plugin {include(./caQtDM_BuildingFactory/caQtDM_Plugin_ARCHIVE.pri)}
+bsread_Plugin {include(./caQtDM_BuildingFactory/caQtDM_Plugin_BSREAD.pri)}
+demo_plugin {include(./caQtDM_BuildingFactory/caQtDM_Plugin_DEMO.pri)}
+environment_Plugin {include(./caQtDM_BuildingFactory/caQtDM_Plugin_Environment.pri)}
+epics3_plugin {include(./caQtDM_BuildingFactory/caQtDM_Plugin_EPICS3.pri)}
+epics4_plugin {include(./caQtDM_BuildingFactory/caQtDM_Plugin_EPICS4.pri)}
+gps_plugin {include(./caQtDM_BuildingFactory/caQtDM_Plugin_GPS.pri)}
+modbus_Plugin {include(./caQtDM_BuildingFactory/caQtDM_Plugin_MODBUS.pri)}
 #==========================================================================================================
 #
 #   internal Libraries
