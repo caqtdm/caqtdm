@@ -7,6 +7,7 @@ contains(QT_VER_MAJ, 5) {
 CONFIG += warn_on
 CONFIG += release
 CONFIG += demo_plugin
+CONFIG += caQtDM_Installation
 include ($$CAQTDM_TOP/caQtDM.pri)
 
 MOC_DIR = ./moc
