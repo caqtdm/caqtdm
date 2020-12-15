@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>plugins/pixmaps/econtexthelp.png</file>
+        <file>pixmaps/econtexthelp.png</file>
         <file>pixmaps/go-up.png</file>
         <file>pixmaps/go-down.png</file>
         <file>pixmaps/list-add.png</file>
