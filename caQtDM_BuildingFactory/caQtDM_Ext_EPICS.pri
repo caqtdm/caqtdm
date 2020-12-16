@@ -1,20 +1,44 @@
 
 Define_Build_epics_controls {
-     DebugBuild {
-        CONFIG += console
-        EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
-        LIBS += $${EPICS_LIBS}/ca.lib
-        LIBS += $${EPICS_LIBS}/COM.lib
-        #LIBS += $$(CAQTDM_COLLECT)/debug/qtcontrols.lib
-     }
-    ReleaseBuild {
-        INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
-        EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
-        LIBS += $${EPICS_LIBS}/ca.lib
-        LIBS += $${EPICS_LIBS}/COM.lib
-        #LIBS += $$(CAQTDM_COLLECT)/qtcontrols.lib
-    }
+    INCLUDEPATH  += $$(EPICS_BASE)/include
+
+        unix:!macx:!ios:!android {
+            INCLUDEPATH += $$(EPICS_BASE)/include/os/Linux
+            INCLUDEPATH += $$(EPICS_BASE)/include/compiler/gcc
+            LIBS += -L$$(EPICSLIB) -Wl,-rpath,$$(EPICSLIB) -lCom
+            LIBS += -L$$(EPICSLIB) -Wl,-rpath,$$(EPICSLIB) -lca
+        }
+
+        macx {
+
+        }
+
+        ios | android {
+
+
+
 }
+
+        win32 {
+
+             DebugBuild {
+                CONFIG += console
+                EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
+                LIBS += $${EPICS_LIBS}/ca.lib
+                LIBS += $${EPICS_LIBS}/COM.lib
+                #LIBS += $$(CAQTDM_COLLECT)/debug/qtcontrols.lib
+             }
+            ReleaseBuild {
+                INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
+                EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
+                LIBS += $${EPICS_LIBS}/ca.lib
+                LIBS += $${EPICS_LIBS}/COM.lib
+                #LIBS += $$(CAQTDM_COLLECT)/qtcontrols.lib
+            }
+       }
+
+}
+
 Define_Build_epicsPV_controls {
 
 	INCLUDEPATH += $$(EPICSINCLUDE)
@@ -41,8 +65,6 @@ Define_Build_epicsPV_controls {
                         LIBS += ../caQtDM_Lib/release/libcaQtDM_Lib.a
                 }
         }
-
-
 
 
 

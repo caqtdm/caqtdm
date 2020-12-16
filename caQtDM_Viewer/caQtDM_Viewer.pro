@@ -40,15 +40,7 @@ TEMPLATE = app
 
 DEFINES += SUPPORT=\\\"EPICS\\\"
 
-MOC_DIR = ./moc
-VPATH += ./src
 INCLUDEPATH += ./src
-UI_DIR += ./src
-
-INCLUDEPATH += $(QWTINCLUDE)
-INCLUDEPATH += ../caQtDM_QtControls/src
-INCLUDEPATH += ../caQtDM_Lib/src
-INCLUDEPATH += ../caQtDM_Lib/caQtDM_Plugins
 
 android {
    INCLUDEPATH += $(ANDROIDFUNCTIONSINCLUDE)
@@ -58,19 +50,19 @@ RESOURCES += ./src/caQtDM.qrc
 RC_FILE = ./src/caQtDM.rc
 
 SOURCES +=\
-    caQtDM.cpp \
-    fileopenwindow.cpp \
-    messagebox.cpp \
-    configDialog.cpp \
-    pipereader.cpp
+    src/caQtDM.cpp \
+    src/fileopenwindow.cpp \
+    src/messagebox.cpp \
+    src/configDialog.cpp \
+    src/pipereader.cpp
 
 HEADERS  +=  \
-    messagebox.h \
-    fileopenwindow.h \
-    configDialog.h \
-    pipereader.h
+    src/messagebox.h \
+    src/fileopenwindow.h \
+    src/configDialog.h \
+    src/pipereader.h
 
-FORMS += main.ui
+FORMS += src/main.ui
 
 # when epics4 not build, then do not import statically in fileopenwindow.cpp
 epics4 {

@@ -2,11 +2,12 @@
 #==========================================================================================================
 caQtDM_QtControls {
         CONFIG += Define_Build_qwt
+        CONFIG += caQtDM_xdl2ui_Lib
 
         unix:!macx:!ios:!android {
                 message("caQtDM_QtControls configuration : unix:!macx:!ios:!android")
  		OBJECTS_DIR = obj
-		DESTDIR = $$(CAQTDM_COLLECT)
+
   	}
 
         macx {

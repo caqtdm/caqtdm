@@ -18,7 +18,7 @@ CONFIG         += plugin
 INCLUDEPATH    += .
 INCLUDEPATH    += ../
 INCLUDEPATH    += ../../src
-INCLUDEPATH    += $(EPICSINCLUDE)
+
 
 HEADERS         = epics3_plugin.h ../controlsinterface.h
 SOURCES         = epics3_plugin.cpp epicsSubs.c

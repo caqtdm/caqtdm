@@ -5,13 +5,13 @@ Define_Build_Python {
 	!android {
 	   unix:!macx {
 	      DEFINES += PYTHON
-	      INCLUDEPATH += $(PYTHONINCLUDE)
-	      LIBS += -L$(PYTHONLIB) -Wl,-rpath,$(PYTHONLIB) -lpython$(PYTHONVERSION)
+              INCLUDEPATH += $$(PYTHONINCLUDE)
+              LIBS += -L$$(PYTHONLIB) -Wl,-rpath,$$(PYTHONLIB) -lpython$$(PYTHONVERSION)
 	    }
 	    unix:macx {
 	       DEFINES += PYTHON
-	       INCLUDEPATH += /System/Library/Frameworks/Python.framework/Versions/$(PYTHONVERSION)/include/python$(PYTHONVERSION)/
-	       LIBS += -L/System/Library/Frameworks/Python.framework/Versions/$(PYTHONVERSION)/lib/ -lpython$(PYTHONVERSION)
+               INCLUDEPATH += /System/Library/Frameworks/Python.framework/Versions/$$(PYTHONVERSION)/include/python$$(PYTHONVERSION)/
+               LIBS += -L/System/Library/Frameworks/Python.framework/Versions/$$(PYTHONVERSION)/lib/ -lpython$$(PYTHONVERSION)
 	    }
         }
         }

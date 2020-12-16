@@ -6,10 +6,7 @@ bsread_Plugin {
 
         unix:!macx:!ios:!android {
                 message(“bsread_plugin configuration unix:!macx:!ios:!android”)
- 		INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
- 		LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
- 		CONFIG += release
-	}
+        }
 
         macx {
                 message(“bsread_plugin configuration macx”)

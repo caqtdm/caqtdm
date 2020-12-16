@@ -2,6 +2,8 @@
 environment_Plugin {
         message(“environment_plugin configuration”)
         CONFIG += Define_Build_objDirs
+        CONFIG += Define_Build_caQtDM_Lib
+        CONFIG += Define_Build_epics_controls
 
         unix:!macx:!ios:!android {
                 message(“environment_plugin configuration unix:!macx:!ios:!android”)

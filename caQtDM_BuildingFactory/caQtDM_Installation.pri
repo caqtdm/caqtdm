@@ -9,7 +9,14 @@ isEmpty(INSTALLTIONSUBDIR){
 
 
         unix:!macx:!ios:!android {
-                DESTDIR = $(CAQTDM_COLLECT)/controlsystems
+                        caqtdm_so.files = *.so
+                        caqtdm_so.path = $$_CAQTDM_COLLECT
+                        caqtdm_a.files = *.a
+                        caqtdm_a.path = $$_CAQTDM_COLLECT
+                        caqtdm_execute.files = caQtDM adl2ui edl2ui
+                        caqtdm_execute.path = $$_CAQTDM_COLLECT
+                        INSTALLS += caqtdm_so caqtdm_a caqtdm_execute
+
 	}
         macx:!ios {
                 DESTDIR = $(CAQTDM_COLLECT)/controlsystems

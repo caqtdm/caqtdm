@@ -2,12 +2,10 @@
 #==========================================================================================================
 demo_plugin {
         CONFIG += Define_Build_objDirs
-        
+        CONFIG += Define_Build_caQtDM_Lib Define_Symbols
+
         unix:!macx:!ios:!android {
                 message("demo_plugin configuration unix:!macx:!ios:!android")
- 		INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
- 		LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
- 		CONFIG += release
 	}
 
         macx {
@@ -32,7 +30,7 @@ demo_plugin {
                 INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
 
                 win32-msvc* || msvc{
-                        CONFIG += Define_Build_caQtDM_Lib Define_Symbols
+
                 }
 
                 win32-g++ {

@@ -2,17 +2,13 @@
 #==========================================================================================================
 epics3_plugin {
         CONFIG += Define_Build_objDirs
+        CONFIG += Define_Build_caQtDM_Lib
+        CONFIG += Define_Build_caQtDM_QtControls
+        CONFIG += Define_Build_epics_controls
 
         unix:!macx:!ios:!android  {
                 message("epics3_plugin configuration unix:!macx:!ios:!android ")
- 		INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
-#for epics 3.15 and gcc we need this
-                INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
-
-                LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
- 		LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
- 		CONFIG += release
-	}
+        }
 
         macx {
                 message("epics3_plugin configuration macx")

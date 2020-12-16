@@ -1,6 +1,11 @@
-include(../qtdefs.pri)
-CONFIG += caQtDM_xdl2ui
-include(../../caQtDM.pri)
+CAQTDM_TOP=../..
+TARGET_PRODUCT = "EDL converter for Display Manager"
+
+
+include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
+CONFIG += caQtDM_xdl2ui caQtDM_xdl2ui_Lib
+CONFIG += caQtDM_Installation
+include($$CAQTDM_TOP/caQtDM.pri)
 
 contains(QT_VER_MAJ, 5) {
   QT       += widgets
@@ -20,8 +25,6 @@ SOURCES += \
 
 TARGET = edl2ui
 
-#LIBS += -L$(CAQTDM_COLLECT) -Wl,-rpath,$(QTDM_RPATH) -ledlParser
-LIBS += $(CAQTDM_COLLECT)/libedlParser.a
 OTHER_FILES += \
     stylesheet.qss
 

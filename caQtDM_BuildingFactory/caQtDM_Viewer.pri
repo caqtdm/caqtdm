@@ -5,7 +5,11 @@ caQtDM_Viewer {
         DEFINES += BUILDVERSION=\\\"$${CAQTDM_VERSION}\\\"
         DEFINES += BUILDARCH=\\\"$$replace(C_QMAKESPEC, \\\\, /)\\\"
         CONFIG += Define_Build_objDirs
-        CONFIG += Define_Build_caQtDM_Lib Define_Build_caQtDM_QtControls
+        CONFIG += Define_Build_caQtDM_Lib
+        CONFIG += Define_Build_caQtDM_QtControls
+        CONFIG += caQtDM_xdl2ui_Lib
+        CONFIG += Define_Build_qwt
+        CONFIG += caQtDM_Plugin_Interface
 
         unix: {
                 message("caQtDM_viewer configuration : unix")
@@ -14,15 +18,8 @@ caQtDM_Viewer {
 
                 !ios:!android {
                         message("caQtDM_viewer configuration : !ios!android (all unixes + mac)")
-                        DESTDIR = $(CAQTDM_COLLECT)
-                 !macx: {CONFIG += x11}
-                        LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
-                        LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
-                        ADL_EDL_FILES {
-                           LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -ladlParser
-                           LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -ledlParser
-                        }
-                        LIBS += -L$(CAQTDM_COLLECT) -L$(CAQTDM_COLLECT)/designer
+
+                 !macx:{CONFIG += x11}
                 }
         }
         macx:!ios {

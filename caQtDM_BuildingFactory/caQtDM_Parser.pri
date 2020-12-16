@@ -6,7 +6,7 @@ caQtDM_xdl2ui{
 	unix:!macx {
                 message("adl2ui configuration unix!macx")
 		OBJECTS_DIR = obj
-		DESTDIR = $(CAQTDM_COLLECT)
+
 	}
 
         macx {

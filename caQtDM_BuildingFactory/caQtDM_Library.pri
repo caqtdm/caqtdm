@@ -1,19 +1,16 @@
 
 #==========================================================================================================
 caQtDM_Lib {
+        CONFIG += Define_Build_qwt Define_Build_objDirs Define_Build_Python
+        CONFIG += Define_Build_epics_controls Define_Symbols Define_Build_OutputDir Define_Build_caQtDM_QtControls
+        CONFIG += caQtDM_Plugin_Interface
+
         unix:!macx:!ios:!android  {
                 message("caQtDM_Lib configuration : unix:!macx:!ios:!android")
-                LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lCom
-      		LIBS += -L$(CAQTDM_COLLECT) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
-      		INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
-#for epics 3.15 and gcc we need this
-                INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
 
-      		OBJECTS_DIR = ./obj
-      		DESTDIR = $(CAQTDM_COLLECT)
                 QMAKE_CXXFLAGS += "-g"
                 QMAKE_CFLAGS_RELEASE += "-g"
-                CONFIG += Define_Build_Python
+
    	}
 
         macx {
@@ -65,8 +62,6 @@ caQtDM_Lib {
         		DEFINES +=_CRT_SECURE_NO_WARNINGS
         		DEFINES += CAQTDM_LIB_LIBRARY
         		TEMPLATE = lib
-                        CONFIG += Define_Build_qwt Define_Build_objDirs
-                        CONFIG += Define_Build_epics_controls Define_Symbols Define_Build_OutputDir Define_Build_caQtDM_QtControls
    		}
    		win32-g++ {
        			EPICS_LIBS=$$(EPICS_BASE)/lib/win32-x86-mingw

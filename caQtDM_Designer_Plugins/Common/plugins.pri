@@ -1,9 +1,13 @@
 CAQTDM_TOP = ../..
 include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
 CONFIG += Define_Build_caQtDM_QtControls
+CONFIG += Define_Build_caQtDM_Lib
+CONFIG += Define_Build_qwt
 CONFIG += caQtDM_Installation
 INSTALLTIONSUBDIR = designer
 include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_internal_Libraries.pri)
+include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_Ext_QWT.pri)
+include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_Installation.pri)
 
 contains(QT_VER_MAJ, 4) {
       CONFIG += plugin qt thread warn_on
@@ -24,7 +28,12 @@ contains(QT_VER_MAJ, 5) {
 }
 
 TEMPLATE = lib
-MOC_DIR = moc
+INCLUDEPATH += ../Common
+INCLUDEPATH += ../src
+INCLUDEPATH += .
+
+
+
 
 ios | android {
   CONFIG += static
@@ -61,44 +70,9 @@ win32 {
      }  
 }
 
-Define_Build_OutputDir {
-   
-   win32 {
-        DebugBuild {
-            
-		caqtdm_dll.files = release/*.dll
-		caqtdm_dll.path = $$(CAQTDM_COLLECT)/designer/debug
-		caqtdm_lib.files = release/*.lib
-		caqtdm_lib.path = $$(CAQTDM_COLLECT)/designer/debug
-		caqtdm_exe.files = release/*.exe
-		caqtdm_exe.path = $$(CAQTDM_COLLECT)/designer/debug
-		INSTALLS += caqtdm_dll caqtdm_lib caqtdm_exe
 
-        }
-        ReleaseBuild {
-        	message("Plugin Release Installation")
-            	caqtdm_dll.files = release/*.dll
-            	caqtdm_dll.path = $$(CAQTDM_COLLECT)/designer
-		caqtdm_lib.files = release/*.lib
-		caqtdm_lib.path = $$(CAQTDM_COLLECT)/designer
-		caqtdm_exe.files = release/*.exe
-		caqtdm_exe.path = $$(CAQTDM_COLLECT)/designer
-		INSTALLS += caqtdm_dll caqtdm_lib caqtdm_exe
-        }
-    }
-}
 
 unix:!ios {
-   DESTDIR = $(CAQTDM_COLLECT)/designer
-   unix {
-     INCLUDEPATH += $(QWTINCLUDE)
-     OBJECTS_DIR = obj
-   }
-
-   unix:!macx {
-      LIBS += -L$(QWTLIB) -Wl,-rpath,$(QWTLIB) -l$$(QWTLIBNAME)
-      LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
-   }
 
    macx: {
       INCLUDEPATH += $(QWTINCLUDE)
@@ -109,8 +83,5 @@ unix:!ios {
       QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
    }
 }
-INCLUDEPATH += ../Common
-INCLUDEPATH += ../../caQtDM_Lib/src
-INCLUDEPATH += ../src
-INCLUDEPATH += .
+
 }
