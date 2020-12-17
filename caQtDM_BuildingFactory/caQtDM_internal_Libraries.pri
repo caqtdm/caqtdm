@@ -19,7 +19,7 @@ Define_Build_caQtDM_QtControls {
 		     }
 		    ReleaseBuild {
 			
-			LIBS += $$CAQTDM_TOP/caQtDM_QtControls/release/qtcontrols.lib
+                        LIBS += $$OUT_PWD/$$CAQTDM_TOP/caQtDM_QtControls/release/qtcontrols.lib
 			
 		    }
 
@@ -32,7 +32,7 @@ Define_Build_caQtDM_QtControls {
 }
 
 Define_Build_caQtDM_Lib {
-    INCLUDEPATH += $$CAQTDM_TOP/caQtDM_Lib/src
+    CONFIG += Define_Build_caQtDM_Lib_include
     unix:!macx {
         LIBS += -L$$CAQTDM_TOP/caQtDM_Lib -Wl,-rpath,$$CAQTDM_TOP/caQtDM_Lib -lcaQtDM_Lib
     }
@@ -53,11 +53,14 @@ Define_Build_caQtDM_Lib {
          }
         ReleaseBuild {
 
-            LIBS += $$CAQTDM_TOP/caQtDM_Lib/release/caQtDM_Lib.lib
+            LIBS +=$$OUT_PWD/$$CAQTDM_TOP/caQtDM_Lib/release/caQtDM_Lib.lib
         }
     }
-
 }
+Define_Build_caQtDM_Lib_include {
+    INCLUDEPATH += $$CAQTDM_TOP/caQtDM_Lib/src
+}
+
 
 caQtDM_Plugin_Interface{
     INCLUDEPATH += $$CAQTDM_TOP/caQtDM_Lib/caQtDM_Plugins
@@ -90,7 +93,7 @@ caQtDM_xdl2ui_Lib{
         win32 {
                 win32-msvc* || msvc{
                         #LIBS += $(CAQTDM_COLLECT)/adlParser.lib
-                        LIBS += $$CAQTDM_TOP/caQtDM_Parsers/adlParserStaticLib/release/adlParser.lib
+                        LIBS += $$OUT_PWD/$$CAQTDM_TOP/caQtDM_Parsers/adlParserStaticLib/release/adlParser.lib
                 }
 
                 win32-g++ {

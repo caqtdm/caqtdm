@@ -1,7 +1,7 @@
 CAQTDM_TOP = ../..
 include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
 CONFIG += Define_Build_caQtDM_QtControls
-CONFIG += Define_Build_caQtDM_Lib
+CONFIG += Define_Build_caQtDM_Lib_include
 CONFIG += Define_Build_qwt
 CONFIG += Define_Build_objDirs
 CONFIG += Define_Symbols
