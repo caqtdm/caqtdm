@@ -32,7 +32,7 @@ Define_Build_epics_controls {
                 EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
                 LIBS += $$(EPICSLIB)/ca.lib
                 LIBS += $$(EPICSLIB)/COM.lib
-                #LIBS += $$(CAQTDM_COLLECT)/debug/qtcontrols.lib
+
              }
             ReleaseBuild {
                 INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
@@ -40,7 +40,7 @@ Define_Build_epics_controls {
 
                 LIBS += $$(EPICSLIB)/ca.lib
                 LIBS += $$(EPICSLIB)/COM.lib
-                #LIBS += $$(CAQTDM_COLLECT)/qtcontrols.lib
+
             }
        }
 

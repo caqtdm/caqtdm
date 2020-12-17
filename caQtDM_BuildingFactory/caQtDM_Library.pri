@@ -43,10 +43,6 @@ caQtDM_Lib {
 
 	win32 {
                 message("caQtDM_Lib configuration : win32")
-   		INCLUDEPATH += $$(EPICS_BASE)/include
-   		INCLUDEPATH += $$(EPICS_BASE)/include/os/win32
-                INCLUDEPATH += $$(EPICS_BASE)/include/compiler/msvc
-
 
   		win32-msvc* || msvc{
         		DEFINES +=_CRT_SECURE_NO_WARNINGS
