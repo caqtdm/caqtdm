@@ -19,7 +19,14 @@ isEmpty(INSTALLTIONSUBDIR){
 
 	}
         macx:!ios {
-                DESTDIR = $(CAQTDM_COLLECT)/controlsystems
+                        caqtdm_dylib.files = *.dylib
+                        caqtdm_dylib.path = $$_CAQTDM_COLLECT
+                        caqtdm_a.files = *.a
+                        caqtdm_a.path = $$_CAQTDM_COLLECT
+                        caqtdm_execute.files = caQtDM adl2ui edl2ui
+                        caqtdm_execute.path = $$_CAQTDM_COLLECT
+                        INSTALLS += caqtdm_dylib caqtdm_a caqtdm_execute
+
         }
 
         ios | android {

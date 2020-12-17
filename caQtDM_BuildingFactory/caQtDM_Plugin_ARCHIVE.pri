@@ -4,14 +4,11 @@ archive_plugin {
 
         unix:!macx:!ios:!android {
                 message("archive_plugin configuration unix:!macx:!ios:!android")
-                LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
                 CONFIG += release
         }
 
         macx {
                 message("archive_plugin configuration macx")
-                LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
-                LIBS += $(CAQTDM_COLLECT)/libqtcontrols.dylib
                 CONFIG += release
         }
 

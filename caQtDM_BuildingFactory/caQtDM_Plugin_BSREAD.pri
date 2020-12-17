@@ -1,7 +1,7 @@
 #==========================================================================================================
 bsread_Plugin {
         message(“bsread_plugin configuration”)
-        CONFIG += Define_Build_caQtDM_Lib
+        CONFIG += Define_Build_caQtDM_Lib Define_Build_epics_controls Define_Symbols
         CONFIG += Define_Build_caQtDM_QtControls Define_Build_objDirs Define_ZMQ_Lib
 
         unix:!macx:!ios:!android {
@@ -10,11 +10,6 @@ bsread_Plugin {
 
         macx {
                 message(“bsread_plugin configuration macx”)
-                INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
-        	LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
-        	plugins.path = Contents/PlugIns/controlsystems
-                plugins.files += $(CAQTDM_COLLECT)/controlsystems/libbsread_plugin.dylib
-        	CONFIG += release
 
         }
 
@@ -23,11 +18,6 @@ bsread_Plugin {
                 INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
 		INCLUDEPATH += $$(EPICS_BASE)/include
                 win32-msvc* || msvc{
-
-                        CONFIG += Define_Build_epics_controls
-
-                        CONFIG += Define_Symbols
-
                 }
 
                 win32-g++ {

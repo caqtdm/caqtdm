@@ -6,18 +6,14 @@ epics3_plugin {
         CONFIG += Define_Build_caQtDM_QtControls
         CONFIG += Define_Build_epics_controls
 
+
         unix:!macx:!ios:!android  {
                 message("epics3_plugin configuration unix:!macx:!ios:!android ")
         }
 
         macx {
                 message("epics3_plugin configuration macx")
- 		INCLUDEPATH   += $(EPICSINCLUDE)/os/Darwin
-                INCLUDEPATH   += $(EPICSINCLUDE)/compiler/clang
- 		LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
- 		LIBS += $$(EPICSLIB)/libca.dylib
- 		LIBS += $$(EPICSLIB)/libCom.dylib
-                CONFIG += release
+
         }
 
         ios | android {

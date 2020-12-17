@@ -10,6 +10,12 @@ Define_Build_epics_controls {
         }
 
         macx {
+                INCLUDEPATH += $(EPICSINCLUDE)/os/Darwin
+                INCLUDEPATH   += $(EPICSINCLUDE)/compiler/clang
+#for epics 3.15 and gcc we need this
+                INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
+                LIBS += $$(EPICSLIB)/libca.dylib
+                LIBS += $$(EPICSLIB)/libCom.dylib
 
         }
 
@@ -17,22 +23,23 @@ Define_Build_epics_controls {
 
 
 
-}
+        }
 
         win32 {
 
              DebugBuild {
                 CONFIG += console
                 EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
-                LIBS += $${EPICS_LIBS}/ca.lib
-                LIBS += $${EPICS_LIBS}/COM.lib
+                LIBS += $$(EPICSLIB)/ca.lib
+                LIBS += $$(EPICSLIB)/COM.lib
                 #LIBS += $$(CAQTDM_COLLECT)/debug/qtcontrols.lib
              }
             ReleaseBuild {
                 INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
-                EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
-                LIBS += $${EPICS_LIBS}/ca.lib
-                LIBS += $${EPICS_LIBS}/COM.lib
+                INCLUDEPATH += $$(EPICS_BASE)/include/compiler/msvc
+
+                LIBS += $$(EPICSLIB)/ca.lib
+                LIBS += $$(EPICSLIB)/COM.lib
                 #LIBS += $$(CAQTDM_COLLECT)/qtcontrols.lib
             }
        }
@@ -53,7 +60,7 @@ Define_Build_epicsPV_controls {
 
     }
        win32 {
-                message(“EPICS 7 Windows”)
+
 		INCLUDEPATH += $$(EPICSINCLUDE)/os/WIN32
 		INCLUDEPATH += $$(EPICSINCLUDE)/compiler/msvc
 

@@ -43,7 +43,7 @@ include(./caQtDM_BuildingFactory/caQtDM_Ext_ZMQ.pri)
 #   Compiler/Linker Specials
 #
 #==========================================================================================================
-
+include(./caQtDM_BuildingFactory/caQtDM_Compiler_Linker.pri)
 #==========================================================================================================
 #
 #   Installation

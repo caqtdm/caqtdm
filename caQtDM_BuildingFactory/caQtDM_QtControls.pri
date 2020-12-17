@@ -14,13 +14,12 @@ caQtDM_QtControls {
                 message("caQtDM_QtControls configuration : macx")
 
     		OBJECTS_DIR = obj
-		DESTDIR = $$(CAQTDM_COLLECT)
-    		CONFIG += lib_bundle
 
-                ADL_EDL_FILES {
-                   LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -ladlParser
-                   LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -ledlParser
-                }
+
+                #ADL_EDL_FILES {
+                #   LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -ladlParser
+                #   LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -ledlParser
+                #}
   	}
 
 	ios | android {

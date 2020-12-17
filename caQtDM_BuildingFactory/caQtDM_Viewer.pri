@@ -26,8 +26,7 @@ caQtDM_Viewer {
                 message("caQtDM_viewer configuration : macx (only mac)")
 
 #for epics 3.15 and gcc we need this
-                INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
-                DESTDIR = $(CAQTDM_COLLECT)
+                #DESTDIR = $(CAQTDM_COLLECT)
                 QMAKE_INFO_PLIST = ./src/Mac/Info.plist
                 APP-FONTS.files = lucida-sans-typewriter.ttf
                 APP-FONTS.path = Contents/Resources/fonts
@@ -35,15 +34,15 @@ caQtDM_Viewer {
                 CONFIG += app_bundle
                 ICON = ./src/caQtDM.icns
                 plugins.path = Contents/PlugIns/designer
-                plugins.files = $(CAQTDM_COLLECT)/designer/libqtcontrols_controllers_plugin.dylib
-                plugins.files += $(CAQTDM_COLLECT)/designer/libqtcontrols_graphics_plugin.dylib
-                plugins.files += $(CAQTDM_COLLECT)/designer/libqtcontrols_monitors_plugin.dylib
-                plugins.files += $(CAQTDM_COLLECT)/designer/libqtcontrols_utilities_plugin.dylib
+                plugins.files = $$CAQTDM_TOP/caQtDM_Designer_Plugins/Controllers/libqtcontrols_controllers_plugin.dylib
+                plugins.files += $$CAQTDM_TOP/caQtDM_Designer_Plugins/Graphics/libqtcontrols_graphics_plugin.dylib
+                plugins.files += $$CAQTDM_TOP/caQtDM_Designer_Plugins/Monitors/libqtcontrols_monitors_plugin.dylib
+                plugins.files += $$CAQTDM_TOP/caQtDM_Designer_Plugins/Utilities/libqtcontrols_utilities_plugin.dylib
                 caqtdmlibs.path = Contents/Frameworks/
-                caqtdmlibs.files = $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib $(CAQTDM_COLLECT)/libqtcontrols.dylib
+                caqtdmlibs.files = $$CAQTDM_TOP/caQtDM_Lib/libcaQtDM_Lib.dylib $$CAQTDM_TOP/caQtDM_QtControls/libqtcontrols.dylib
                 ADL_EDL_FILES {
-                           caqtdmlibs.files += $(CAQTDM_COLLECT)/libadlParser.dylib
-                           caqtdmlibs.files += $(CAQTDM_COLLECT)/libedlParser.dylib
+                           caqtdmlibs.files += $$CAQTDM_TOP/caQtDM_Parsers/adlParserSharedLib/libadlParser.dylib
+                           caqtdmlibs.files += $$CAQTDM_TOP/caQtDM_Parsers/edlParserSharedLib/libedlParser.dylib
                 }
                 QMAKE_BUNDLE_DATA += plugins caqtdmlibs
                 calib.path = Contents/Frameworks
@@ -71,23 +70,23 @@ caQtDM_Viewer {
                 qwtframework.files = $$(QWTHOME)/lib/$$(QWTLIBNAME).framework
                 QMAKE_BUNDLE_DATA += calib comlib qwtframework
                 plugins_epics3.path = Contents/PlugIns/controlsystems
-                plugins_epics3.files += $(CAQTDM_COLLECT)/controlsystems/libepics3_plugin.dylib
+                plugins_epics3.files += $$CAQTDM_TOP/caQtDM_Lib/caQtDM_Plugins/epics3/libepics3_plugin.dylib
                 QMAKE_BUNDLE_DATA += plugins_epics3
                 plugins_demo.path = Contents/PlugIns/controlsystems
-                plugins_demo.files += $(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.dylib
+                plugins_demo.files += $$CAQTDM_TOP/caQtDM_Lib/caQtDM_Plugins/demo/libdemo_plugin.dylib
                 QMAKE_BUNDLE_DATA += plugins_demo
                 plugins_environment.path = Contents/PlugIns/controlsystems
-                plugins_environment.files += $(CAQTDM_COLLECT)/controlsystems/libenvironment_plugin.dylib
+                plugins_environment.files += $$CAQTDM_TOP/caQtDM_Lib/caQtDM_Plugins/environment/libenvironment_plugin.dylib
                 QMAKE_BUNDLE_DATA += plugins_environment
 
                 epics4: {
                                     plugins_epics4.path = Contents/PlugIns/controlsystems
-                                    plugins_epics4.files += $(CAQTDM_COLLECT)/controlsystems/libepics4_plugin.dylib
+                                    plugins_epics4.files += $$CAQTDM_TOP/caQtDM_Lib/caQtDM_Plugins/epics4/libepics4_plugin.dylib
                                     QMAKE_BUNDLE_DATA += plugins_epics4
                                 }
                 bsread:{
                                     plugins_bsread.path = Contents/PlugIns/controlsystems
-                                    plugins_bsread.files += $(CAQTDM_COLLECT)/controlsystems/libbsread_plugin.dylib
+                                    plugins_bsread.files += $$CAQTDM_TOP/caQtDM_Lib/caQtDM_Plugins/bsread/libbsread_plugin.dylib
                                     QMAKE_BUNDLE_DATA += plugins_bsread
                                     zmqlibrary.path = Contents/Frameworks
                                     zmqlibrary.files += $$(ZMQLIB)/libzmq.5.dylib
@@ -95,18 +94,18 @@ caQtDM_Viewer {
                                 }
                 archiveSF:{
                                     plugins_archiveSF.path = Contents/PlugIns/controlsystems
-                                    plugins_archiveSF.files += $(CAQTDM_COLLECT)/controlsystems/libarchiveSF_plugin.dylib
+                                    plugins_archiveSF.files += $$CAQTDM_TOP/caQtDM_Lib/caQtDM_Plugins/archive/archiveSF/libarchiveSF_plugin.dylib
                                     QMAKE_BUNDLE_DATA += plugins_archiveSF
                                 }
                 modbus: {
                                     plugins_modbus.path = Contents/PlugIns/controlsystems
-                                    plugins_modbus.files += $(CAQTDM_COLLECT)/controlsystems/libmodbus_plugin.dylib
+                                    plugins_modbus.files += $$CAQTDM_TOP/caQtDM_Lib/caQtDM_Plugins/modbus/libmodbus_plugin.dylib
                                     QMAKE_BUNDLE_DATA += plugins_modbus
                                 }
 
                 gps: {
                                     plugins_gps.path = Contents/PlugIns/controlsystems
-                                    plugins_gps.files += $(CAQTDM_COLLECT)/controlsystems/libgps_plugin.dylib
+                                    plugins_gps.files += $$CAQTDM_TOP/caQtDM_Lib/caQtDM_Plugins/gps/libgps_plugin.dylib
                                     QMAKE_BUNDLE_DATA += plugins_gps
                                 }
         }

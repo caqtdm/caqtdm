@@ -10,9 +10,6 @@ demo_plugin {
 
         macx {
                 message("demo_plugin configuration macx")
-                INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
-        	LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
-        	CONFIG += release
         }
 
         ios | android {
