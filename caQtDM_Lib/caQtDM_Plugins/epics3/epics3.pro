@@ -8,6 +8,7 @@ CONFIG += warn_on
 CONFIG += epics3_plugin
 CONFIG += caQtDM_Installation
 INSTALLTIONSUBDIR = controlsystems
+CAQTDM_INSTALL_LIB = epics3_plugin
 include($$CAQTDM_TOP/caQtDM.pri)
 
 MOC_DIR = ./moc

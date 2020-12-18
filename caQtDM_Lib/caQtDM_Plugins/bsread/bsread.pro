@@ -9,6 +9,7 @@ CONFIG += warn_on
 CONFIG += bsread_Plugin
 CONFIG += caQtDM_Installation
 INSTALLTIONSUBDIR = controlsystems
+CAQTDM_INSTALL_LIB = bsread_Plugin
 include ($$CAQTDM_TOP/caQtDM.pri)
 TEMPLATE        = lib
 CONFIG         += plugin

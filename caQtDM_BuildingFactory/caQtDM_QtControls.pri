@@ -3,17 +3,18 @@
 caQtDM_QtControls {
         CONFIG += Define_Build_qwt
         CONFIG += caQtDM_xdl2ui_Lib
-
+        CONFIG += Define_Build_objDirs
+        CONFIG += Define_Build_OutputDir
         unix:!macx:!ios:!android {
                 message("caQtDM_QtControls configuration : unix:!macx:!ios:!android")
- 		OBJECTS_DIR = obj
+
 
   	}
 
         macx {
                 message("caQtDM_QtControls configuration : macx")
 
-    		OBJECTS_DIR = obj
+
 
 
                 #ADL_EDL_FILES {
@@ -42,7 +43,7 @@ caQtDM_QtControls {
 
      		win32-msvc* || msvc{
                         DEFINES += QTCON_MAKEDLL _CRT_SECURE_NO_WARNINGS
-                        CONFIG += Define_Build_objDirs Define_Symbols Define_Build_OutputDir
+
      		}
 	}
 }

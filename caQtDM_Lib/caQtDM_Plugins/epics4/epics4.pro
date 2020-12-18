@@ -9,6 +9,7 @@ CONFIG += release
 CONFIG += epics4_plugin
 CONFIG += caQtDM_Installation
 INSTALLTIONSUBDIR = controlsystems
+CAQTDM_INSTALL_LIB = epics4_plugin
 include ($$CAQTDM_TOP/caQtDM.pri)
 
 MOC_DIR = ./moc

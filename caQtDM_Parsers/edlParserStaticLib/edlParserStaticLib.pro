@@ -1,7 +1,9 @@
 CAQTDM_TOP = ../..
 include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
 CONFIG += caQtDM_xdl2ui
+CONFIG += Define_Build_objDirs
 CONFIG += caQtDM_Installation
+CAQTDM_INSTALL_LIB = edlParser
 include($$CAQTDM_TOP/caQtDM.pri)
 
 
@@ -17,10 +19,10 @@ CONFIG	+= static
 INCLUDEPATH += .
 INCLUDEPATH += ../edlParserSrc
 
-MOC_DIR = moc
+
 VPATH += ../edlParserSrc
 
-QMAKE_CXXFLAGS += "-g -Wno-write-strings"
+
 
 HEADERS += XmlWriter.h \
     edlParserMain.h \

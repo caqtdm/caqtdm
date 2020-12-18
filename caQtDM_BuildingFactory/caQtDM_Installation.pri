@@ -6,12 +6,17 @@ isEmpty(INSTALLTIONSUBDIR){
     _CAQTDM_COLLECT = $$(CAQTDM_COLLECT)/$$INSTALLTIONSUBDIR
 }
 
+        #CAQTDM_INSTALL_LIB
 
-
+        #CAQTDM_INSTALL_EXE
         unix:!macx:!ios:!android {
-                        caqtdm_so.files = *.so
+                        for(a, CAQTDM_INSTALL_LIB):{
+                            caqtdm_so.files += lib$${a}.so
+                        }
                         caqtdm_so.path = $$_CAQTDM_COLLECT
-                        caqtdm_a.files = *.a
+                        for(a, CAQTDM_INSTALL_LIB):{
+                            caqtdm_a.files += lib$${a}.a
+                        }
                         caqtdm_a.path = $$_CAQTDM_COLLECT
                         caqtdm_execute.files = caQtDM adl2ui edl2ui
                         caqtdm_execute.path = $$_CAQTDM_COLLECT
@@ -50,11 +55,19 @@ isEmpty(INSTALLTIONSUBDIR){
                      }
 		    ReleaseBuild {
 			#DESTDIR = $$(CAQTDM_COLLECT)/controlsystems
-                        caqtdm_dll.files = release/*.dll
+                        for(a, CAQTDM_INSTALL_LIB):{
+                            caqtdm_dll.files = release/$${a}.dll
+                        }
                         caqtdm_dll.path = $$_CAQTDM_COLLECT
-                        caqtdm_lib.files = release/*.lib
+                        for(a, CAQTDM_INSTALL_LIB):{
+                            caqtdm_dll.files = release/$${a}.lib
+                        }
                         caqtdm_lib.path = $$_CAQTDM_COLLECT
                         caqtdm_exe.files = release/*.exe
+                        for(a, CAQTDM_INSTALL_LIB):{
+                            caqtdm_exe.files = release/$${a}.exe
+                        }
+
                         caqtdm_exe.path = $$_CAQTDM_COLLECT
                         INSTALLS += caqtdm_dll caqtdm_lib caqtdm_exe
 		    }

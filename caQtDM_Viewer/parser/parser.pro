@@ -3,7 +3,7 @@ TARGET_PRODUCT = "ADL converter for Display Manager"
 TARGET_FILENAME = "adl2ui.exe"
 
 include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
-CONFIG += caQtDM_xdl2ui caQtDM_xdl2ui_Lib
+CONFIG += caQtDM_xdl2ui caQtDM_xdl2ui_Lib Define_Build_objDirs
 CONFIG += caQtDM_Installation
 include($$CAQTDM_TOP/caQtDM.pri)
 

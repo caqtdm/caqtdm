@@ -1,4 +1,5 @@
 CAQTDM_PLUGINNAME = monitors
+CAQTDM_INSTALL_LIB = qtcontrols_monitors_plugin
 include(../Common/plugins.pri)
 
 SOURCES	+= qtcontrols_monitors_plugin.cpp

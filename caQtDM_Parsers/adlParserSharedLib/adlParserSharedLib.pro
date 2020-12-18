@@ -4,7 +4,9 @@ TARGET_FILENAME = "adlParser.dll"
 
 include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
 CONFIG += caQtDM_xdl2ui
+CONFIG += Define_Build_objDirs
 CONFIG += caQtDM_Installation
+CAQTDM_INSTALL_LIB = adlParser
 include($$CAQTDM_TOP/caQtDM.pri)
 
 contains(QT_VER_MAJ, 5) {
@@ -18,7 +20,6 @@ CONFIG	+= shared plugin
 INCLUDEPATH += .
 INCLUDEPATH += ../adlParserSrc
 
-MOC_DIR = moc
 VPATH += ../adlParserSrc
 
 RC_FILE = $$CAQTDM_TOP/caQtDM_Viewer/src/caQtDM.rc

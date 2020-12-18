@@ -10,6 +10,7 @@ CONFIG += release
 CONFIG += archive_plugin
 CONFIG += caQtDM_Installation
 INSTALLTIONSUBDIR = controlsystems
+CAQTDM_INSTALL_LIB = archiveHIPA_plugin
 include ($$CAQTDM_TOP/caQtDM.pri)
 
 MOC_DIR = ./moc

@@ -8,6 +8,7 @@ CONFIG += release
 CONFIG += gps_plugin
 CONFIG += caQtDM_Installation
 INSTALLTIONSUBDIR = controlsystems
+CAQTDM_INSTALL_LIB = gps_plugin
 include ($$CAQTDM_TOP/caQtDM.pri)
 
 MOC_DIR = ./moc

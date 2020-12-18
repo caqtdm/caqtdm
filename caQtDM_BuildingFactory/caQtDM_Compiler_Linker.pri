@@ -23,11 +23,16 @@ Define_Symbols{
 
 Define_Build_objDirs {
         MOC_DIR = moc
+        QMAKE_DISTCLEAN += moc
         unix:!macx!ios:!android {
+                QMAKE_DEL_FILE = rm -rf
                 OBJECTS_DIR = obj
+                QMAKE_DISTCLEAN += obj
         }
         macx {
+                QMAKE_DEL_FILE = rm -rf
                 OBJECTS_DIR = obj
+                QMAKE_DISTCLEAN += obj
         }
         ios{
 
@@ -42,7 +47,9 @@ Define_Build_objDirs {
                 OBJECTS_DIR = debug/obj
              }
             ReleaseBuild {
+                QMAKE_DEL_FILE = $$QMAKE_DEL_DIR
                 OBJECTS_DIR = release/obj
+                QMAKE_DISTCLEAN += release/obj
             }
         }
 }

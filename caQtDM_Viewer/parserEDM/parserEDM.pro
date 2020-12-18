@@ -4,6 +4,7 @@ TARGET_PRODUCT = "EDL converter for Display Manager"
 
 include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
 CONFIG += caQtDM_xdl2ui caQtDM_xdl2ui_Lib
+CONFIG += Define_Build_objDirs
 CONFIG += caQtDM_Installation
 include($$CAQTDM_TOP/caQtDM.pri)
 

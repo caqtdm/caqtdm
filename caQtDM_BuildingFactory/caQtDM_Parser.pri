@@ -1,13 +1,12 @@
 caQtDM_xdl2ui{
         CONFIG += console
-        CONFIG += Define_Symbols
         DEFINES += BUILDVERSION=\\\"$${CAQTDM_VERSION}\\\"
         C_QMAKESPEC = $$QMAKESPEC
         DEFINES += BUILDARCH=\\\"$$replace(C_QMAKESPEC, \\\\, /)\\\"
-        OBJECTS_DIR = obj
 
         unix:!macx {
                 message("adl2ui configuration unix!macx")
+                QMAKE_CXXFLAGS += "-g -Wno-write-strings"
 	}
 
         macx {

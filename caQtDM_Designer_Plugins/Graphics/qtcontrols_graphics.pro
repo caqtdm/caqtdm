@@ -1,4 +1,5 @@
 CAQTDM_PLUGINNAME = graphics
+CAQTDM_INSTALL_LIB = qtcontrols_graphics_plugin
 include(../Common/plugins.pri)
 
 SOURCES	+= qtcontrols_graphics_plugin.cpp

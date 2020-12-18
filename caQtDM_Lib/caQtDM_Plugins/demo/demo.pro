@@ -8,6 +8,8 @@ CONFIG += warn_on
 CONFIG += release
 CONFIG += demo_plugin
 CONFIG += caQtDM_Installation
+INSTALLTIONSUBDIR = controlsystems
+CAQTDM_INSTALL_LIB = demo_plugin
 include ($$CAQTDM_TOP/caQtDM.pri)
 
 MOC_DIR = ./moc
