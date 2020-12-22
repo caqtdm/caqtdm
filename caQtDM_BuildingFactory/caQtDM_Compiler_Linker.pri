@@ -53,4 +53,24 @@ Define_Build_objDirs {
             }
         }
 }
+Define_library_settings{
+        unix:!macx!ios:!android {
+        }
+        macx {
+            QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
+        }
+        ios{
 
+        }
+        android{
+
+        }
+
+        win32 {
+            DebugBuild {
+             }
+            ReleaseBuild {
+            }
+        }
+
+}

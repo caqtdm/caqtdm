@@ -6,6 +6,7 @@ Define_Build_caQtDM_QtControls {
 	}
         macx {
                 LIBS += $$CAQTDM_TOP/caQtDM_QtControls/libqtcontrols.dylib
+                QMAKE_RPATHDIR += $$CAQTDM_TOP/caQtDM_QtControls
         }
 
         ios | android {
@@ -38,6 +39,7 @@ Define_Build_caQtDM_Lib {
     }
     macx {
             LIBS += $$CAQTDM_TOP/caQtDM_Lib/libcaQtDM_Lib.dylib
+            QMAKE_RPATHDIR += $$CAQTDM_TOP/caQtDM_Lib
     }
 
     ios | android {
@@ -87,6 +89,8 @@ caQtDM_xdl2ui_Lib{
             ADL_EDL_FILES {
                 LIBS += $$CAQTDM_TOP/caQtDM_Parsers/adlParserSharedLib/libadlParser.dylib
                 LIBS += $$CAQTDM_TOP/caQtDM_Parsers/edlParserSharedLib/libedlParser.dylib
+                QMAKE_RPATHDIR += $$CAQTDM_TOP/caQtDM_Parsers/adlParserSharedLib/
+                QMAKE_RPATHDIR += $$CAQTDM_TOP/caQtDM_Parsers/edlParserSharedLib/
             }
         }
 

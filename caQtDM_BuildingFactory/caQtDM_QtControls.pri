@@ -5,6 +5,7 @@ caQtDM_QtControls {
         CONFIG += caQtDM_xdl2ui_Lib
         CONFIG += Define_Build_objDirs
         CONFIG += Define_Build_OutputDir
+        CONFIG += Define_library_settings
         unix:!macx:!ios:!android {
                 message("caQtDM_QtControls configuration : unix:!macx:!ios:!android")
 
@@ -13,9 +14,6 @@ caQtDM_QtControls {
 
         macx {
                 message("caQtDM_QtControls configuration : macx")
-
-
-
 
                 #ADL_EDL_FILES {
                 #   LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -ladlParser

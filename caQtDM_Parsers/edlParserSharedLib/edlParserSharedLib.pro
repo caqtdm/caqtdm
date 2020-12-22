@@ -3,6 +3,7 @@ include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
 CONFIG += caQtDM_xdl2ui
 CONFIG += caQtDM_Installation
 CAQTDM_INSTALL_LIB = edlParser
+CONFIG += Define_library_settings
 include($$CAQTDM_TOP/caQtDM.pri)
 
 contains(QT_VER_MAJ, 5) {

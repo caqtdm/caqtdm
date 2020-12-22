@@ -1,7 +1,7 @@
 #==========================================================================================================
 gps_plugin {
         CONFIG += Define_Build_objDirs
-
+        CONFIG += Define_library_settings
         unix:!macx:!ios:!android {
                 message("gps_plugin configuration unix:!macx:!ios:!android")
                 INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux

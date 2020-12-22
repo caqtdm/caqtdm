@@ -6,6 +6,7 @@ include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
 CONFIG += caQtDM_xdl2ui
 CONFIG += Define_Build_objDirs
 CONFIG += caQtDM_Installation
+CONFIG += Define_library_settings
 CAQTDM_INSTALL_LIB = adlParser
 include($$CAQTDM_TOP/caQtDM.pri)
 

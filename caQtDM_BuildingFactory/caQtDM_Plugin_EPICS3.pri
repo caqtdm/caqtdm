@@ -5,7 +5,7 @@ epics3_plugin {
         CONFIG += Define_Build_caQtDM_Lib
         CONFIG += Define_Build_caQtDM_QtControls
         CONFIG += Define_Build_epics_controls
-
+        CONFIG += Define_library_settings
 
         unix:!macx:!ios:!android  {
                 message("epics3_plugin configuration unix:!macx:!ios:!android ")

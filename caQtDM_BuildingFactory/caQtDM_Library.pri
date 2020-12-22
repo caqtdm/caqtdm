@@ -4,7 +4,7 @@ caQtDM_Lib {
         CONFIG += Define_Build_qwt Define_Build_objDirs Define_Build_Python
         CONFIG += Define_Build_epics_controls Define_Symbols Define_Build_OutputDir Define_Build_caQtDM_QtControls
         CONFIG += caQtDM_Plugin_Interface
-
+        CONFIG += Define_library_settings
         unix:!macx:!ios:!android  {
                 message("caQtDM_Lib configuration : unix:!macx:!ios:!android")
 

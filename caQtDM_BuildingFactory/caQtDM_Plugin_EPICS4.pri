@@ -6,6 +6,7 @@ epics4_plugin {
         CONFIG +=Define_Build_epicsPV_controls Define_Build_epics_controls
         CONFIG +=Define_Symbols
         CONFIG += Define_Build_objDirs
+        CONFIG += Define_library_settings
 
         unix:!macx:!ios:!android {
 

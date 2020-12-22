@@ -3,6 +3,7 @@
 demo_plugin {
         CONFIG += Define_Build_objDirs
         CONFIG += Define_Build_caQtDM_Lib Define_Symbols
+        CONFIG += Define_library_settings
 
         unix:!macx:!ios:!android {
                 message("demo_plugin configuration unix:!macx:!ios:!android")
