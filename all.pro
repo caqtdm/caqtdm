@@ -73,11 +73,18 @@ caQtDM_Plugins.depends = caQtDM_Lib
 }
 
 caQtDM_Viewer.depends = caQtDM_QtControls caQtDM_Lib caQtDM_Designer_Plugins
+#beccause of building a bundle
+macx:{
+    caQtDM_Viewer.depends += caQtDM_Plugins
+}
+
+
+
 caQtDM_Lib.depends = caQtDM_QtControls caQtDM_Parsers
 
 caQtDM_QtControls.depends += caQtDM_Parsers
 
-android {
+android:!macx {
   caQtDM_Lib.depends += caQtDM_AndroidFunctions
 }
 

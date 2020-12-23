@@ -15,7 +15,7 @@ caQtDM_Lib {
 
         macx {
                 message("caQtDM_Lib configuration : macx")
-
+                QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
 
 
    	}

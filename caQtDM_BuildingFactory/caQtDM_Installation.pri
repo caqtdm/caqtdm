@@ -24,17 +24,9 @@ isEmpty(INSTALLTIONSUBDIR){
 
 	}
         macx:!ios {
-                        for(a, CAQTDM_INSTALL_LIB):{
-                            caqtdm_dylib.files += lib$${a}.dylib
-                        }
-                        caqtdm_dylib.path = $$_CAQTDM_COLLECT
-                        for(a, CAQTDM_INSTALL_LIB):{
-                            caqtdm_a.files += lib$${a}.a
-                        }
-                        caqtdm_a.path = $$_CAQTDM_COLLECT
-                        caqtdm_execute.files = caQtDM adl2ui edl2ui
+                        caqtdm_execute.files = caQtDM.app
                         caqtdm_execute.path = $$_CAQTDM_COLLECT
-                        INSTALLS += caqtdm_dylib caqtdm_a caqtdm_execute
+                        INSTALLS += caqtdm_execute
 
         }
 

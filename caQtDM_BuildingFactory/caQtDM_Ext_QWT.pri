@@ -30,3 +30,10 @@ Define_Build_qwt {
 	    }
 	}
 }
+Define_install_qwt{
+    macx {
+        qwtframework.path = Contents/Frameworks
+        qwtframework.files = $$(QWTHOME)/lib/$$(QWTLIBNAME).framework
+        QMAKE_BUNDLE_DATA += qwtframework
+    }
+}

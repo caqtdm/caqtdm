@@ -6,7 +6,8 @@ Define_Build_caQtDM_QtControls {
 	}
         macx {
                 LIBS += $$CAQTDM_TOP/caQtDM_QtControls/libqtcontrols.dylib
-                QMAKE_RPATHDIR += $$CAQTDM_TOP/caQtDM_QtControls
+                #QMAKE_RPATHDIR += $$CAQTDM_TOP/caQtDM_QtControls
+                QMAKE_RPATHDIR += @executable_path/../Frameworks
         }
 
         ios | android {

@@ -14,7 +14,8 @@ caQtDM_QtControls {
 
         macx {
                 message("caQtDM_QtControls configuration : macx")
-
+                #QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
+                QMAKE_SONAME_PREFIX = @loader_path/../Frameworks
                 #ADL_EDL_FILES {
                 #   LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -ladlParser
                 #   LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -ledlParser

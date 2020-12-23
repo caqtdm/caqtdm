@@ -76,3 +76,26 @@ Define_Build_epicsPV_controls {
 
 
 }
+Define_install_epics{
+    macx {
+        EPICS = $$(EPICSINCLUDE)
+        EPICSPATH1=$$(EPICS_BASE)/lib/darwin-x86/libca.
+        EPICSPATH2=$$(EPICS_BASE)/lib/darwin-x86/libCom.
+        EPICSVERSION = $$split(EPICS, "/")
+        $$take_last(EPICSVERSION)
+        EPICSVERSION = $$split(EPICSVERSION, "-")
+        EPICSVERSION=$$last(EPICSVERSION)
+
+        EPICSDYLIB1 = $$join(EPICSVERSION,"", $$EPICSPATH1, ."dylib")
+        EPICSDYLIB2 = $$join(EPICSVERSION,"", $$EPICSPATH2, ."dylib")
+        message($$EPICSDYLIB1)
+        message($$EPICSDYLIB2)
+        calib.files  = $$(EPICSDYLIB1)
+        comlib.files = $$(EPICSDYLIB2)
+
+        calib.path = Contents/Frameworks
+        comlib.path = Contents/Frameworks
+
+        QMAKE_BUNDLE_DATA += calib comlib
+    }
+}

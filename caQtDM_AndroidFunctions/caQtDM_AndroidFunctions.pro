@@ -1,8 +1,9 @@
+CAQTDM_TOP = ..
 TARGET_PRODUCT = "android functions"
 
-include(../caQtDM_Viewer/qtdefs.pri)
+include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
 CONFIG += caQtDM_AndroidFunctions
-include(../caQtDM.pri)
+include($$CAQTDM_TOP/caQtDM.pri)
 
 OBJECTS_DIR = obj
 

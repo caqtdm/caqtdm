@@ -24,6 +24,7 @@ caQtDM_Viewer {
         }
         macx:!ios {
                 message("caQtDM_viewer configuration : macx (only mac)")
+                QMAKE_SONAME_PREFIX = @loader_path/../Frameworks
 
 #for epics 3.15 and gcc we need this
                 #DESTDIR = $(CAQTDM_COLLECT)
@@ -45,30 +46,6 @@ caQtDM_Viewer {
                            caqtdmlibs.files += $$CAQTDM_TOP/caQtDM_Parsers/edlParserSharedLib/libedlParser.dylib
                 }
                 QMAKE_BUNDLE_DATA += plugins caqtdmlibs
-                calib.path = Contents/Frameworks
-#                calib.files = $$(EPICS_BASE)/lib/darwin-x86/libca.3.14.12.dylib
-                comlib.path = Contents/Frameworks
-#                comlib.files = $$(EPICS_BASE)/lib/darwin-x86/libCom.3.14.12.dylib
-
-#compute dylib library from epicsinclude
-                EPICS = $$(EPICSINCLUDE)
-                EPICSPATH1=$$(EPICS_BASE)/lib/darwin-x86/libca.
-                EPICSPATH2=$$(EPICS_BASE)/lib/darwin-x86/libCom.
-                EPICSVERSION = $$split(EPICS, "/")
-                $$take_last(EPICSVERSION)
-                EPICSVERSION = $$split(EPICSVERSION, "-")
-                EPICSVERSION=$$last(EPICSVERSION)
-
-                EPICSDYLIB1 = $$join(EPICSVERSION,"", $$EPICSPATH1, ."dylib")
-                EPICSDYLIB2 = $$join(EPICSVERSION,"", $$EPICSPATH2, ."dylib")
-                message($$EPICSDYLIB1)
-                message($$EPICSDYLIB2)
-                calib.files  = $$(EPICSDYLIB1)
-                comlib.files = $$(EPICSDYLIB2)
-
-                qwtframework.path = Contents/Frameworks
-                qwtframework.files = $$(QWTHOME)/lib/$$(QWTLIBNAME).framework
-                QMAKE_BUNDLE_DATA += calib comlib qwtframework
                 plugins_epics3.path = Contents/PlugIns/controlsystems
                 plugins_epics3.files += $$CAQTDM_TOP/caQtDM_Lib/caQtDM_Plugins/epics3/libepics3_plugin.dylib
                 QMAKE_BUNDLE_DATA += plugins_epics3
