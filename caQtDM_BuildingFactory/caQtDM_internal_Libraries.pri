@@ -90,8 +90,11 @@ caQtDM_xdl2ui_Lib{
             ADL_EDL_FILES {
                 LIBS += $$CAQTDM_TOP/caQtDM_Parsers/adlParserSharedLib/libadlParser.dylib
                 LIBS += $$CAQTDM_TOP/caQtDM_Parsers/edlParserSharedLib/libedlParser.dylib
-                QMAKE_RPATHDIR += $$CAQTDM_TOP/caQtDM_Parsers/adlParserSharedLib/
-                QMAKE_RPATHDIR += $$CAQTDM_TOP/caQtDM_Parsers/edlParserSharedLib/
+
+                #QMAKE_LFLAGS_PLUGIN += -install_name @executable_path/../Frameworks/libedlParser.dylib
+                #QMAKE_LFLAGS_PLUGIN += -install_name @executable_path/../Frameworks/libadlParser.dylib
+
+
             }
         }
 
