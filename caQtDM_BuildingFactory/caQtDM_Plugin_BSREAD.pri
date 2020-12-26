@@ -10,7 +10,7 @@ bsread_Plugin {
 
         macx {
                 message(“bsread_plugin configuration macx”)
-
+                CAQTDM_POSTWORKFILE = lib$${CAQTDM_INSTALL_LIB}.dylib
         }
 
         win32 {

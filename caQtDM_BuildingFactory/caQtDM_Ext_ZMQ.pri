@@ -11,9 +11,15 @@ Define_ZMQ_Lib{
         unix:!macx {
                  LIBS += -L$$(ZMQLIB) -Wl,-rpath,$$(ZMQLIB) -lzmq
                  #LIBS += $$(ZMQLIB)/libzmq.a
+
+
 	}
         macx {
                 LIBS += $$(ZMQLIB)/libzmq.5.dylib
+                QMAKE_POST_LINK += \
+                   install_name_tool -change $$(ZMQLIB)/libzmq.5.dylib @rpath/libzmq.5.dylib $$CAQTDM_POSTWORKFILE $$RETURN
+
+
         }
         win32 {
 	    DebugBuild {

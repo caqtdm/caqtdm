@@ -16,6 +16,10 @@ Define_Build_epics_controls {
                 INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
                 LIBS += $$(EPICSLIB)/libca.dylib
                 LIBS += $$(EPICSLIB)/libCom.dylib
+                QMAKE_POST_LINK += \
+                   install_name_tool -change $$(EPICSLIB)/libca.dylib @rpath/libca.dylib $$CAQTDM_POSTWORKFILE $$RETURN \
+                   install_name_tool -change $$(EPICSLIB)/libCom.dylib @rpath/libCom.dylib $$CAQTDM_POSTWORKFILE $$RETURN
+
 
         }
 

@@ -13,7 +13,7 @@ epics3_plugin {
 
         macx {
                 message("epics3_plugin configuration macx")
-
+                CAQTDM_POSTWORKFILE = lib$${CAQTDM_INSTALL_LIB}.dylib
         }
 
         ios | android {

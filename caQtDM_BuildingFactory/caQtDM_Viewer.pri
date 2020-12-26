@@ -9,6 +9,7 @@ caQtDM_Viewer {
         CONFIG += Define_Build_caQtDM_QtControls
         CONFIG += caQtDM_xdl2ui_Lib
         CONFIG += Define_Build_qwt
+        CONFIG += Define_install_qwt
         CONFIG += caQtDM_Plugin_Interface
 
         unix: {
@@ -24,7 +25,7 @@ caQtDM_Viewer {
         }
         macx:!ios {
                 message("caQtDM_viewer configuration : macx (only mac)")
-                QMAKE_SONAME_PREFIX = @loader_path/../Frameworks
+                CAQTDM_POSTWORKFILE=caQtDM.app/Contents/MacOS/caQtDM
 
 #for epics 3.15 and gcc we need this
                 #DESTDIR = $(CAQTDM_COLLECT)
@@ -85,6 +86,8 @@ caQtDM_Viewer {
                                     plugins_gps.files += $$CAQTDM_TOP/caQtDM_Lib/caQtDM_Plugins/gps/libgps_plugin.dylib
                                     QMAKE_BUNDLE_DATA += plugins_gps
                                 }
+
+
         }
 
         ios {

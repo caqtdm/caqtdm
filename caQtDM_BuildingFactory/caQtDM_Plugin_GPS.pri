@@ -2,6 +2,8 @@
 gps_plugin {
         CONFIG += Define_Build_objDirs
         CONFIG += Define_library_settings
+        CONFIG += Define_Build_caQtDM_Lib
+        CONFIG += Define_Symbols
         unix:!macx:!ios:!android {
                 message("gps_plugin configuration unix:!macx:!ios:!android")
                 INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
@@ -11,9 +13,8 @@ gps_plugin {
 
         macx {
                 message("gps_plugin configuration macx")
-                INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
-                LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
                 CONFIG += release
+                CAQTDM_POSTWORKFILE = lib$${CAQTDM_INSTALL_LIB}.dylib
         }
 
         ios | android {
@@ -31,7 +32,7 @@ gps_plugin {
                 INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
 
                 win32-msvc* || msvc{
-                        CONFIG += Define_Build_caQtDM_Lib Define_Symbols
+
                 }
 
                 win32-g++ {

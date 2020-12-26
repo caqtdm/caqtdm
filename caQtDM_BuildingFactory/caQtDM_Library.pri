@@ -15,7 +15,13 @@ caQtDM_Lib {
 
         macx {
                 message("caQtDM_Lib configuration : macx")
-                QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
+                CAQTDM_POSTWORKFILE=libcaQtDM_Lib.dylib
+                #QMAKE_POST_LINK += \
+                #   install_name_tool -change libadlParser.dylib @executable_path/../Frameworks/libadlParser.dylib libcaQtDM_Lib.dylib $$RETURN \
+                #   install_name_tool -change libedlParser.dylib @executable_path/../Frameworks/libedlParser.dylib libcaQtDM_Lib.dylib $$RETURN \
+                #   install_name_tool -change libqtcontrols.dylib @executable_path/../Frameworks/libqtcontrols.dylib libcaQtDM_Lib.dylib $$RETURN \
+                #   install_name_tool -change qwt.framework/Versions/6/qwt @executable_path/../Frameworks/qwt.framework/Versions/6/qwt libcaQtDM_Lib.dylib
+
 
 
    	}

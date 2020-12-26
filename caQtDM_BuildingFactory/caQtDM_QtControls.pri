@@ -14,17 +14,8 @@ caQtDM_QtControls {
 
         macx {
                 message("caQtDM_QtControls configuration : macx")
-                #QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
-                #QMAKE_SONAME_PREFIX = @loader_path/../Frameworks/libadlParser.dylib
-                #QMAKE_LFLAGS_PLUGIN += -Wl,-install_name,@executable_path/../Frameworks/$${TARGET}.$${QMAKE_EXTENSION_SHLIB}
-                modify_adl.depends = $$TARGET
-                modify_adl.commands = $$shell_quote(install_name_tool -change libadlParser.dylib @executable_path/../Frameworks/libadlParser.dylib libqtcontrols.dylib $$escape_expand(\n\t))
-                modify_edl.depends = $$TARGET
-                modify_edl.commands = $$shell_quote(install_name_tool -change libedlParser.dylib @executable_path/../Frameworks/libedlParser.dylib libqtcontrols.dylib $$escape_expand(\n\t))
-                RETURN=$$escape_expand(\\n\\t)
-                QMAKE_POST_LINK += \
-                   install_name_tool -change libadlParser.dylib @executable_path/../Frameworks/libadlParser.dylib libqtcontrols.dylib $$RETURN \
-                   install_name_tool -change libedlParser.dylib @executable_path/../Frameworks/libedlParser.dylib libqtcontrols.dylib
+                CAQTDM_POSTWORKFILE=libqtcontrols.dylib
+
   	}
 
 	ios | android {

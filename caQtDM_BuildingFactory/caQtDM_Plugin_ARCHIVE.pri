@@ -10,6 +10,7 @@ archive_plugin {
         macx {
                 message("archive_plugin configuration macx")
                 CONFIG += release
+                CAQTDM_POSTWORKFILE = lib$${CAQTDM_INSTALL_LIB}.dylib
         }
 
         ios | android {

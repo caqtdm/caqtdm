@@ -40,6 +40,7 @@ TARGET_DESCRIPTION = "Channel Access Qt Display Manager"
 TARGET_COPYRIGHT = "Copyright (C) 2020 Paul Scherrer Institut"
 TARGET_INTERNALNAME = "caqtdm"
 
+RETURN=$$escape_expand(\\n\\t)
 # enable opengl in stripplot and cartesianplot (edo not use, experimental only, for Qt5 and qwt6.1)
 
 contains(QT_VER_MAJ, 5) {

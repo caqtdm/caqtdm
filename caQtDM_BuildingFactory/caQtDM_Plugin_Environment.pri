@@ -16,6 +16,7 @@ environment_Plugin {
 
         macx {
                 message(“environment_plugin configuration macx”)
+                CAQTDM_POSTWORKFILE = lib$${CAQTDM_INSTALL_LIB}.dylib
           }
         ios | android {
                 message("epics3_plugin configuration : ios or android")

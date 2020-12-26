@@ -11,6 +11,7 @@ demo_plugin {
 
         macx {
                 message("demo_plugin configuration macx")
+                CAQTDM_POSTWORKFILE = lib$${CAQTDM_INSTALL_LIB}.dylib
         }
 
         ios | android {

@@ -7,6 +7,13 @@ CONFIG += Define_Build_objDirs
 CONFIG += Define_Symbols
 CONFIG += caQtDM_Installation
 INSTALLTIONSUBDIR = designer
+
+macx: {
+      QMAKE_LFLAGS_PLUGIN -= -dynamiclib
+      QMAKE_LFLAGS_PLUGIN += -bundle
+      CAQTDM_POSTWORKFILE = libqtcontrols_$${CAQTDM_PLUGINNAME}_plugin.dylib
+}
+
 include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_internal_Libraries.pri)
 include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_Compiler_Linker.pri)
 include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_Ext_QWT.pri)
@@ -64,14 +71,5 @@ win32 {
 }
 
 
-
-unix:!ios {
-
-   macx: {
-      QMAKE_LFLAGS_PLUGIN -= -dynamiclib
-      QMAKE_LFLAGS_PLUGIN += -bundle
-
-   }
-}
 
 

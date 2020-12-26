@@ -6,8 +6,9 @@ Define_Build_caQtDM_QtControls {
 	}
         macx {
                 LIBS += $$CAQTDM_TOP/caQtDM_QtControls/libqtcontrols.dylib
+                QMAKE_POST_LINK += install_name_tool -change libqtcontrols.dylib @rpath/libqtcontrols.dylib $$CAQTDM_POSTWORKFILE $$RETURN
                 #QMAKE_RPATHDIR += $$CAQTDM_TOP/caQtDM_QtControls
-                QMAKE_RPATHDIR += @executable_path/../Frameworks
+                #QMAKE_RPATHDIR += @executable_path/../Frameworks
         }
 
         ios | android {
@@ -40,7 +41,9 @@ Define_Build_caQtDM_Lib {
     }
     macx {
             LIBS += $$CAQTDM_TOP/caQtDM_Lib/libcaQtDM_Lib.dylib
-            QMAKE_RPATHDIR += $$CAQTDM_TOP/caQtDM_Lib
+            QMAKE_POST_LINK += install_name_tool -change libcaQtDM_Lib.dylib @rpath/libcaQtDM_Lib.dylib $$CAQTDM_POSTWORKFILE $$RETURN
+
+
     }
 
     ios | android {
@@ -90,7 +93,8 @@ caQtDM_xdl2ui_Lib{
             ADL_EDL_FILES {
                 LIBS += $$CAQTDM_TOP/caQtDM_Parsers/adlParserSharedLib/libadlParser.dylib
                 LIBS += $$CAQTDM_TOP/caQtDM_Parsers/edlParserSharedLib/libedlParser.dylib
-
+                QMAKE_POST_LINK += install_name_tool -change libadlParser.dylib @rpath/libadlParser.dylib $$CAQTDM_POSTWORKFILE $$RETURN
+                QMAKE_POST_LINK += install_name_tool -change libedlParser.dylib @rpath/libedlParser.dylib $$CAQTDM_POSTWORKFILE $$RETURN
                 #QMAKE_LFLAGS_PLUGIN += -install_name @executable_path/../Frameworks/libedlParser.dylib
                 #QMAKE_LFLAGS_PLUGIN += -install_name @executable_path/../Frameworks/libadlParser.dylib
 

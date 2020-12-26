@@ -7,6 +7,7 @@ Define_Build_qwt {
 
         macx {
 		LIBS += -F$$(QWTLIB) -framework $$(QWTLIBNAME)
+                QMAKE_POST_LINK += install_name_tool -change qwt.framework/Versions/6/qwt @rpath/qwt.framework/Versions/6/qwt $$CAQTDM_POSTWORKFILE $$RETURN
   	}
 
 	ios | android {

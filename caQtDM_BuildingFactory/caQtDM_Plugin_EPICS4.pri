@@ -96,6 +96,7 @@ epics4_plugin {
         	LIBS += $$(EPICSLIB)/libca.dylib
         	LIBS += $$(EPICSLIB)/libCom.dylib
                 CONFIG += release
+                CAQTDM_POSTWORKFILE = lib$${CAQTDM_INSTALL_LIB}.dylib
         }
 
         ios | android {
