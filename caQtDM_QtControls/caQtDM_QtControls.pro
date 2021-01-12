@@ -5,6 +5,7 @@ TARGET_FILENAME = "qtcontrols.dll"
 include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
 CONFIG += caQtDM_QtControls
 CONFIG += caQtDM_Installation
+CAQTDM_INSTALL_LIB = qtcontrols
 include($$CAQTDM_TOP/caQtDM.pri)
 
 DEFINES += QT_NO_DEBUG_OUTPUT
