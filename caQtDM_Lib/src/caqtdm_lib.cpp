@@ -3807,8 +3807,11 @@ bool CaQtDM_Lib::Python_Error(QWidget *w, QString message)
 
     PyObject *errObj = NULL, *errData = NULL, *errTraceback = NULL, *pystring = NULL;
     char errorType[1024], errorInfo[1024], asc[MAX_STRING_LENGTH];
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 7
     const char *errorStr = 0;
-
+#else
+    char *errorStr = 0;
+#endif
     // get latest python exception info
     PyErr_Fetch(&errObj, &errData, &errTraceback);
 
