@@ -35,4 +35,5 @@ echo ============ make all =================
 qmake all.pro
 #scan-build --use-analyzer Xcode make -j8
 make -j8
+make install
 

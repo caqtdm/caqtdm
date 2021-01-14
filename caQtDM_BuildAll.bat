@@ -51,7 +51,13 @@ set PATH=%PATH%;%GITPATH%
 set /a timerstart=(((1%time:~0,2%-100)*60*60)+((1%time:~3,2%-100)*60)+(1%time:~6,2%-100)^)
 qmake all.pro
 where /q jom.exe 
-IF %ERRORLEVEL% NEQ 0 (nmake release) ELSE (jom release)
+IF %ERRORLEVEL% NEQ 0 (
+	nmake release
+	nmake install
+) ELSE (
+	jom release
+	nmake install
+)
 set /a timerstop=(((1%time:~0,2%-100)*60*60)+((1%time:~3,2%-100)*60)+(1%time:~6,2%-100)^)
 set /a timeseks=(%timerstop%-%timerstart%)
 set /a timemins=(%timerstop%-%timerstart%)/60
