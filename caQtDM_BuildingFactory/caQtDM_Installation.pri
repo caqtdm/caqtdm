@@ -55,15 +55,15 @@ isEmpty(INSTALLTIONSUBDIR){
                             caqtdm_dll.files = release/$${a}.dll
                         }
                         caqtdm_dll.path = $$_CAQTDM_COLLECT
+
                         for(a, CAQTDM_INSTALL_LIB):{
-                            caqtdm_dll.files = release/$${a}.lib
+                            caqtdm_lib.files = release/$${a}.lib
                         }
                         caqtdm_lib.path = $$_CAQTDM_COLLECT
-                        caqtdm_exe.files = release/*.exe
+
                         for(a, CAQTDM_INSTALL_LIB):{
                             caqtdm_exe.files = release/$${a}.exe
                         }
-
                         caqtdm_exe.path = $$_CAQTDM_COLLECT
                         INSTALLS += caqtdm_dll caqtdm_lib caqtdm_exe
 		    }

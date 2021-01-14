@@ -33,7 +33,7 @@ Define_Build_epics_controls {
 
              DebugBuild {
                 CONFIG += console
-                EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
+
                 LIBS += $$(EPICSLIB)/ca.lib
                 LIBS += $$(EPICSLIB)/COM.lib
 
@@ -56,11 +56,11 @@ Define_Build_epicsPV_controls {
 	INCLUDEPATH += $$(EPICSINCLUDE)/pv
     ReleaseBuild {
         EPICS_LIBS=$$(EPICS_BASE)/lib/$$(EPICS_HOST_ARCH)
-        LIBS += $${EPICS_LIBS}/nt.lib
-        LIBS += $${EPICS_LIBS}/pvAccess.lib
-        LIBS += $${EPICS_LIBS}/pvAccessCA.lib
-        LIBS += $${EPICS_LIBS}/pvData.lib
-        LIBS += $${EPICS_LIBS}/pvaClient.lib
+        LIBS += $$(EPICSLIB)/nt.lib
+        LIBS += $$(EPICSLIB)/pvAccess.lib
+        LIBS += $$(EPICSLIB)/pvAccessCA.lib
+        LIBS += $$(EPICSLIB)/pvData.lib
+        LIBS += $$(EPICSLIB)/pvaClient.lib
 
     }
        win32 {
