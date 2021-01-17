@@ -69,7 +69,9 @@ caQtDM_Plugins.depends = caQtDM_Lib
    parserEDM.depends = caQtDM_Parsers
    ADL_EDL_FILES {
       caQtDM_Lib.depends += caQtDM_Parsers
-   }
+      caQtDM_QtControls.depends += caQtDM_Parsers
+    }
+
 }
 
 caQtDM_Viewer.depends = caQtDM_QtControls caQtDM_Lib caQtDM_Designer_Plugins
@@ -80,9 +82,9 @@ macx:{
 
 
 
-caQtDM_Lib.depends = caQtDM_QtControls caQtDM_Parsers
+caQtDM_Lib.depends += caQtDM_QtControls
 
-caQtDM_QtControls.depends += caQtDM_Parsers
+
 
 android:!macx {
   caQtDM_Lib.depends += caQtDM_AndroidFunctions
@@ -93,15 +95,15 @@ archivePRO.depends = caQtDM_QtControls caQtDM_Lib
 archiveSF.depends = caQtDM_QtControls caQtDM_Lib
 archiveHIPA.depends = caQtDM_QtControls caQtDM_Lib
 
-iosArchitectures=armv7
-iosTarget=5.0
+#iosArchitectures=armv7
+#iosTarget=5.0
 
 # Set "Architectures"
-QMAKE_IOS_DEVICE_ARCHS = $$iosArchitectures
+#QMAKE_IOS_DEVICE_ARCHS = $$iosArchitectures
 
 # Set "Target"
-QMAKE_IOS_DEPLOYMENT_TARGET = $$iosTarget
+#QMAKE_IOS_DEPLOYMENT_TARGET = $$iosTarget
 
 # Set "Devices" (1=iPhone, 2=iPad, 1,2=Universal)
-QMAKE_IOS_TARGETED_DEVICE_FAMILY = 2
+#QMAKE_IOS_TARGETED_DEVICE_FAMILY = 2
 

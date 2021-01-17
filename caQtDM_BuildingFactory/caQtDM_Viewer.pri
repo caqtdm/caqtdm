@@ -101,10 +101,10 @@ caQtDM_Viewer {
                     LIBS += $$OUT_PWD/../caQtDM_Lib/libcaQtDM_Lib.a
                     LIBS += $$OUT_PWD/../caQtDM_QtControls/libqtcontrols.a
 
-                    LIBS += $$OUT_PWD/../caQtDM_QtControls/plugins/libqtcontrols_controllers_plugin.a
-                    LIBS += $$OUT_PWD/../caQtDM_QtControls/plugins/libqtcontrols_monitors_plugin.a
-                    LIBS += $$OUT_PWD/../caQtDM_QtControls/plugins/libqtcontrols_graphics_plugin.a
-                    LIBS += $$OUT_PWD/../caQtDM_QtControls/plugins/libqtcontrols_utilities_plugin.a
+                    LIBS += $$OUT_PWD/../caQtDM_Designer_Plugins/Controllers/libqtcontrols_controllers_plugin.a
+                    LIBS += $$OUT_PWD/../caQtDM_Designer_Plugins/Monitors/libqtcontrols_monitors_plugin.a
+                    LIBS += $$OUT_PWD/../caQtDM_Designer_Plugins/Graphics/libqtcontrols_graphics_plugin.a
+                    LIBS += $$OUT_PWD/../caQtDM_Designer_Plugins/Utilities/libqtcontrols_utilities_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/demo/libdemo_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/epics3/libepics3_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/archive/archiveSF/libarchiveSF_plugin.a
@@ -117,18 +117,18 @@ caQtDM_Viewer {
                         LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/gps/libgps_plugin.a
                     }
 
-                    ICON = $$PWD/caQtDM_Viewer/src/caQtDM.icns
+                    ICON = $$CAQTDM_TOP/caQtDM_Viewer/src/caQtDM.icns
 
-                    APP_ICON.files = $$files($$PWD/caQtDM_Viewer/src/caQtDM*.png)
+                    APP_ICON.files = $$files($$CAQTDM_TOP/caQtDM_Viewer/src/caQtDM*.png)
 
-                    APP1_ICON.files = $$PWD/caQtDM_Viewer/src/caQtDM.icns
-                    APP_XML_FILES.files = $$PWD/caQtDM_Viewer/caQtDM_IOS_Config.xml
+                    APP1_ICON.files = $$CAQTDM_TOP/caQtDM_Viewer/src/caQtDM.icns
+                    APP_XML_FILES.files = $$CAQTDM_TOP/caQtDM_Viewer/caQtDM_IOS_Config.xml
 
                     #StartScreen.files = $$files($$PWD/caQtDM_Viewer/src/IOS/LaunchImage*.png)
                     #StartScreen.files += $$PWD/caQtDM_Viewer/src/StartScreen-Landscape.png
                     #StartScreen.files += $$PWD/caQtDM_Viewer/src/StartScreen-568h@2x.png
 
-                    APP-FONTS.files = $$PWD/caQtDM_Viewer/lucida-sans-typewriter.ttf
+                    APP-FONTS.files = $$CAQTDM_TOP/caQtDM_Viewer/lucida-sans-typewriter.ttf
                     APP-FONTS.path = fonts
                     #assets_catalogs.files = $$files($$PWD/caQtDM_Viewer/src/IOS/*.xcassets)
                     #QMAKE_BUNDLE_DATA += assets_catalogs
@@ -143,7 +143,7 @@ caQtDM_Viewer {
                     bundle_identifier.value = ch.psi.caQtDM
                     QMAKE_MAC_XCODE_SETTINGS += bundle_identifier
                     target.name=IPHONEOS_DEPLOYMENT_TARGET
-                    target.value = 12.0
+                    target.value = 14.0
 
                     QMAKE_MAC_XCODE_SETTINGS += target
                     assetIcon.name = ASSETCATALOG_COMPILER_APPICON_NAME
@@ -152,8 +152,8 @@ caQtDM_Viewer {
                     launchImage.value = LaunchImage
                     QMAKE_MAC_XCODE_SETTINGS += assetIcon launchImage
 
-                    QMAKE_INFO_PLIST += $$PWD/caQtDM_Viewer/src/IOS/Info.plist
-                    QMAKE_ASSET_CATALOGS += $$PWD/caQtDM_Viewer/src/IOS/Assets.xcassets
+                    QMAKE_INFO_PLIST += $$CAQTDM_TOP/caQtDM_Viewer/src/IOS/Info.plist
+                    QMAKE_ASSET_CATALOGS += $$CAQTDM_TOP/caQtDM_Viewer/src/IOS/Assets.xcassets
 
 #actually, I have a problem with ios, it seems that iphonesimulator is defined too and wants than the library of simlator
 # I comment it out now
@@ -170,8 +170,8 @@ caQtDM_Viewer {
                     iphoneos {
                         message("caQtDM_viewer configuration : iphoneos")
 
-                         LIBS += $$(EPICSLIB)/static/libca.a
-                         LIBS += $$(EPICSLIB)/static/libCom.a
+                         LIBS += $$(EPICSLIB)/libca.a
+                         LIBS += $$(EPICSLIB)/libCom.a
                          LIBS += $$(QWTHOME)/lib/lib$$(QWTLIBNAME).a
 
                          ###############################################################################

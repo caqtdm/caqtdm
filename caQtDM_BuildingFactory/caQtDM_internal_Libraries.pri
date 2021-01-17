@@ -12,7 +12,7 @@ Define_Build_caQtDM_QtControls {
         }
 
         ios | android {
-        	LIBS += $$OUT_PWD/../../../caQtDM_QtControls/libqtcontrols.a
+                #LIBS += $$OUT_PWD/../../../caQtDM_QtControls/libqtcontrols.a
         }
 
         win32 {
