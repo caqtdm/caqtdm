@@ -124,6 +124,12 @@ caQtDM_Viewer {
                     APP1_ICON.files = $$CAQTDM_TOP/caQtDM_Viewer/src/caQtDM.icns
                     APP_XML_FILES.files = $$CAQTDM_TOP/caQtDM_Viewer/caQtDM_IOS_Config.xml
 
+                    DEFAULTPNG.files = $$CAQTDM_TOP/caQtDM_Viewer/src/IOS/Default-568h@2x.png
+                    DEFAULTPNG.path = $$OUT_PWD/../caQtDM_Viewer/caQtDM.xcodeproj/
+                    LAUNCHSCREEN.files = $$CAQTDM_TOP/caQtDM_Viewer/src/IOS/LaunchScreen.storyboard
+                    LAUNCHSCREEN.path = $$OUT_PWD/../caQtDM_Viewer/caQtDM.xcodeproj/
+                    #COPIES += DEFAULTPNG LAUNCHSCREEN
+
                     #StartScreen.files = $$files($$PWD/caQtDM_Viewer/src/IOS/LaunchImage*.png)
                     #StartScreen.files += $$PWD/caQtDM_Viewer/src/StartScreen-Landscape.png
                     #StartScreen.files += $$PWD/caQtDM_Viewer/src/StartScreen-568h@2x.png
@@ -134,6 +140,7 @@ caQtDM_Viewer {
                     #QMAKE_BUNDLE_DATA += assets_catalogs
 
                     QMAKE_BUNDLE_DATA += APP_XML_FILES APP-FONTS #APP_ICON APP1_ICON
+
                     QMAKE_CFLAGS += -gdwarf-2
                     QMAKE_CXXFLAGS += -gdwarf-2
                     QMAKE_TARGET_BUNDLE_PREFIX=ch.psi
@@ -154,6 +161,8 @@ caQtDM_Viewer {
 
                     QMAKE_INFO_PLIST += $$CAQTDM_TOP/caQtDM_Viewer/src/IOS/Info.plist
                     QMAKE_ASSET_CATALOGS += $$CAQTDM_TOP/caQtDM_Viewer/src/IOS/Assets.xcassets
+
+
 
 #actually, I have a problem with ios, it seems that iphonesimulator is defined too and wants than the library of simlator
 # I comment it out now
