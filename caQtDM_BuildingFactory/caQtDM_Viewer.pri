@@ -124,11 +124,15 @@ caQtDM_Viewer {
                     APP1_ICON.files = $$CAQTDM_TOP/caQtDM_Viewer/src/caQtDM.icns
                     APP_XML_FILES.files = $$CAQTDM_TOP/caQtDM_Viewer/caQtDM_IOS_Config.xml
 
-                    DEFAULTPNG.files = $$CAQTDM_TOP/caQtDM_Viewer/src/IOS/Default-568h@2x.png
-                    DEFAULTPNG.path = $$OUT_PWD/../caQtDM_Viewer/caQtDM.xcodeproj/
-                    LAUNCHSCREEN.files = $$CAQTDM_TOP/caQtDM_Viewer/src/IOS/LaunchScreen.storyboard
-                    LAUNCHSCREEN.path = $$OUT_PWD/../caQtDM_Viewer/caQtDM.xcodeproj/
-                    #COPIES += DEFAULTPNG LAUNCHSCREEN
+                    DEFAULTPNG.input = $$CAQTDM_TOP/caQtDM_Viewer/src/IOS/Default-568h@2x.png
+                    DEFAULTPNG.output = $$OUT_PWD/../caQtDM_Viewer/caQtDM.xcodeproj/Default-568h@2x.png
+                    DEFAULTPNG.CONFIG = verbatim
+                    QMAKE_SUBSTITUTES += DEFAULTPNG
+
+                    LAUNCHSCREEN.input = $$CAQTDM_TOP/caQtDM_Viewer/src/IOS/LaunchScreen.storyboard
+                    LAUNCHSCREEN.output = $$OUT_PWD/../caQtDM_Viewer/caQtDM.xcodeproj/LaunchScreen.storyboard
+                    LAUNCHSCREEN.CONFIG = verbatim
+                    QMAKE_SUBSTITUTES += LAUNCHSCREEN
 
                     #StartScreen.files = $$files($$PWD/caQtDM_Viewer/src/IOS/LaunchImage*.png)
                     #StartScreen.files += $$PWD/caQtDM_Viewer/src/StartScreen-Landscape.png
