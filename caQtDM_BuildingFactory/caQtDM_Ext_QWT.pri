@@ -22,11 +22,11 @@ Define_Build_qwt {
      		win32-msvc* || msvc{
 		     DebugBuild {
 			 message("QWT Debug configuration : win32")
-			 LIBS += $$(QWTHOME)/lib/$$(QWTLIBNAME)d.lib
+                         LIBS += $$(QWTLIB)/$$(QWTLIBNAME)d.lib
 		     }
 		    ReleaseBuild {
 			message("QWT Release configuration : win32")
-			LIBS += $$(QWTHOME)/lib/$$(QWTLIBNAME).lib
+                        LIBS += $$(QWTLIB)/$$(QWTLIBNAME).lib
 		    }
 	    }
 	}
