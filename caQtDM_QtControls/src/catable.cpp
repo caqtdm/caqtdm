@@ -30,6 +30,12 @@
 #include "catable.h"
 #include "alarmdefs.h"
 
+#if defined(_MSC_VER)
+    #ifndef snprintf
+     #define snprintf _snprintf
+    #endif
+#endif
+
 caTable::caTable(QWidget *parent) : QTableWidget(parent)
 
 {
@@ -219,7 +225,8 @@ void caTable::setValue(int row, int col, short status, double value, QString con
             Alarm = NO_ALARM;
         }
     }
-    sprintf(text, thisFormat[row], value);
+    //sprintf(text, thisFormat[row], value);
+    snprintf(text, 40, thisFormat[row], value);
     displayText(row, col, Alarm, text);
     displayText(row, col+1, Alarm, unit);
 }
