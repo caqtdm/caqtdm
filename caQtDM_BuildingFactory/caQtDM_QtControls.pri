@@ -6,6 +6,7 @@ caQtDM_QtControls {
         CONFIG += Define_Build_objDirs
         CONFIG += Define_Build_OutputDir
         CONFIG += Define_library_settings
+        CONFIG += Define_Symbols
         unix:!macx:!ios:!android {
                 message("caQtDM_QtControls configuration : unix:!macx:!ios:!android")
 
