@@ -707,10 +707,10 @@ void bsread_Decode::bsread_SetChannelTimeStamp(void * timestamp)
 {
     if ((timestamp)&&(Channels.size()>channelcounter)){
         Channels.at(channelcounter)->timestamp=*(double*) timestamp;
-
-
-        channelcounter++;
     }
+    // After the timestamp the next channel is coming, even when the timestamp is NULL
+    channelcounter++;
+
 }
 
 void bsread_Decode::bsread_InitHeaderChannels()
