@@ -25,6 +25,7 @@
 
 #include "catextlog.h"
 #include "alarmdefs.h"
+#include <iostream> 
 #include <QEvent>
 #include <QStyleOptionFrame>
 #include <QStyle>
@@ -37,6 +38,8 @@
 
 caTextLog::caTextLog(QWidget *parent) : QPlainTextEdit(parent), FontScalingWidget(this)
 {
+    std::cerr << "Called caTextLog constructor" << std::endl;
+    std::cerr << "Called caTextLog constructor" << std::endl;
     // to start with, clear the stylesheet, so that playing around
     // is not possible.
     setStyleSheet("");
@@ -72,7 +75,7 @@ caTextLog::caTextLog(QWidget *parent) : QPlainTextEdit(parent), FontScalingWidge
     oldFrameColor = Qt::black;
 
     Alarm = 0;
-
+    
     // default colors will be defined in my event handler by taking them from the palette defined by stylesheet definitions
     //defBackColor = QColor(255, 248, 220, 255);
     //defForeColor = Qt::black;
