@@ -5040,7 +5040,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         // textlog ====================================================================================================
     } else if (caTextLog *textlogWidget = qobject_cast<caTextLog *>(w)) {
 
-        //qDebug() << "we have a multilinedit" << textlogWidget << data.edata.rvalue <<  data.edata.ivalue;
+        qDebug() << "we have a textlog : " << textlogWidget << data.edata.rvalue <<  data.edata.ivalue;
 
         QColor bg = textlogWidget->property("BColor").value<QColor>();
         QColor fg = textlogWidget->property("FColor").value<QColor>();
@@ -5053,7 +5053,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             if(data.edata.fieldtype == caENUM || data.edata.fieldtype == caSTRING || data.edata.fieldtype == caCHAR) {
 
                 int colorMode = textlogWidget->getColorMode();
-                if(colorMode == caMultiLineString::Static || colorMode == caTextLog::Default) { // done at initialisation
+                if(colorMode == caTextLog::Static || colorMode == caTextLog::Default) { // done at initialisation
                     if(!textlogWidget->property("Connect").value<bool>()) {                    // but was disconnected before
                         textlogWidget->setAlarmColors(data.edata.severity, (double) data.edata.ivalue, bg, fg);
                         textlogWidget->setProperty("Connect", true);
@@ -5062,7 +5062,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     textlogWidget->setAlarmColors(data.edata.severity, (double) data.edata.ivalue, bg, fg);
                 }
 
-                //qDebug() << textlogWidget << String << list << data.pv << (int) data.edata.ivalue << data.edata.valueCount;
+                // qDebug() << textlogWidget << String << list << data.pv << (int) data.edata.ivalue << data.edata.valueCount;
 
                 // an enum
                 if(data.edata.fieldtype == caENUM) {

@@ -275,16 +275,17 @@ QWidget *caTextLogInterface::createWidget(QWidget* parent)
 caTextLogInterface::caTextLogInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
 {
     strng name[6], type[6]={"","","","","",""};
-    longtext text[5] = {CHANNEL, LFOREGROUND, LBACKGROUND, LCOLORMODE, FONTSCALEMODE};
+    longtext text[6] = {CHANNEL, LFOREGROUND, LBACKGROUND, LCOLORMODE, ALARMHANDLING, FONTSCALEMODE};
 
     strcpy(name[0], "channel");
     strcpy(type[0], "multiline");
     strcpy(name[1], "foreground");
     strcpy(name[2], "background");
     strcpy(name[3], "colorMode");
-    strcpy(name[4], "fontScaleMode");
+    strcpy(name[4], "alarmHandling");
+    strcpy(name[5], "fontScaleMode");
 
-    d_domXml = XmlFunc("caTextLog", "catextlog", 0, 0, 100, 20, name, type, text, 5);
+    d_domXml = XmlFunc("caTextLog", "catextlog", 0, 0, 100, 20, name, type, text, 6);
     d_toolTip = "[Timestamped Text Logger]";
     d_name = "caTextLog";
     d_include = "caTextLog";
@@ -683,6 +684,7 @@ CustomWidgetCollectionInterface_Monitors::CustomWidgetCollectionInterface_Monito
     d_plugins.append(new caMeterInterface(this));
     d_plugins.append(new caLineEditInterface(this));
     d_plugins.append(new caMultiLineStringInterface(this));
+    d_plugins.append(new caTextLogInterface(this));
     d_plugins.append(new caThermoInterface(this));
     d_plugins.append(new caCartesianPlotInterface(this));
     d_plugins.append(new caStripPlotInterface(this));
