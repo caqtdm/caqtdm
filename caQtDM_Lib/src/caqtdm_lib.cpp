@@ -1803,6 +1803,32 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         multilinestringWidget->setProperty("MonitorList", integerList);
 
         multilinestringWidget->setProperty("Taken", true);
+        //==================================================================================================================
+    } else if(caTextLog* texlogWidget = qobject_cast<caTextLog *>(w1)) {
+        QString text;
+        //qDebug() << "create caMultilineString";
+        w1->setProperty("ObjectType", caTextLog_Widget);
+
+        if(texlogWidget->getPV().size() > 0) {
+            texlogWidget->setCursor(QCursor());
+            texlogWidget->setReadOnly(true);
+
+            //multilinestringWidget->setAlignment(lineeditWidget->alignment());
+            int num = addMonitor(myWidget, &kData, texlogWidget->getPV(), w1, specData, map, &pv);
+            integerList.append(num);
+            texlogWidget->setPV(pv);
+            nbMonitors++;
+        }
+        text= texlogWidget->toolTip();
+        if(reaffectText(map, &text, w1))  texlogWidget->setToolTip(text);
+        text= texlogWidget->statusTip();
+        if(reaffectText(map, &text, w1))  texlogWidget->setStatusTip(text);
+
+        // insert dataindex list
+        integerList.insert(0, nbMonitors);
+        texlogWidget->setProperty("MonitorList", integerList);
+
+        texlogWidget->setProperty("Taken", true);
 
         //==================================================================================================================
     } else if(caGraphics* graphicsWidget = qobject_cast<caGraphics *>(w1)) {

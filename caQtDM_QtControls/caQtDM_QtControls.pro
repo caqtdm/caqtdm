@@ -127,6 +127,7 @@ SOURCES	+= \
     src/cabytecontroller.cpp \
     src/calabelvertical.cpp \
     src/camultilinestring.cpp \
+    src/catextlog.cpp \
     src/camimedisplay.cpp \
     src/calinedraw.cpp \
     src/wmsignalpropagator.cpp \
@@ -235,6 +236,7 @@ HEADERS	+= \
     src/qtdefinitions.h \
     src/pathdefinitions.h \
     src/camultilinestring.h \
+    src/catextlog.h \
     src/formattype.h \
     src/calabelvertical.h \
     src/camimedisplay.h \

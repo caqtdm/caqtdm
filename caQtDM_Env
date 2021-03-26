@@ -39,7 +39,7 @@
   if [ -z "$QTDM_BININSTALL" ];   then  export  QTDM_BININSTALL=$EPICSEXTENSIONS/bin/$EPICS_HOST_ARCH;
   fi
   
-  if [ -z "$PYTHONVERSION" ];   then  export  PYTHONVERSION=2.6;
+  if [ -z "$PYTHONVERSION" ];   then  export  PYTHONVERSION=2.7;
   fi
   if [ -z "$PYTHONINCLUDE" ];   then  export  PYTHONINCLUDE=/usr/include/python$PYTHONVERSION;
   fi
