@@ -25,7 +25,9 @@
 
 #include "catextlog.h"
 #include "alarmdefs.h"
-#include <iostream> 
+#include <iostream>
+#include <sstream>
+#include <sys/time.h>
 #include <QEvent>
 #include <QStyleOptionFrame>
 #include <QStyle>
@@ -91,10 +93,12 @@ caTextLog::caTextLog(QWidget *parent) : QPlainTextEdit(parent), FontScalingWidge
 
     setFontScaleModeL(WidthAndHeight);
     setFocusPolicy(Qt::NoFocus);
-    setLinewidth(0);
-    setFrame(false);
+    setLinewidth(2);
+    setFrame(true);
 
-    d_rescaleFontOnTextChanged = true;
+
+    setFontScaleFactor(0.2);
+    d_rescaleFontOnTextChanged = false;
 
     installEventFilter(this);
 
@@ -198,7 +202,7 @@ void caTextLog::setLinewidth(int width)
 bool caTextLog::event(QEvent *e)
 {
     if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
-        FontScalingWidget::rescaleFont(text(), calculateTextSpace());
+        this->rescaleFont();
         // we try to get the default color for the background set through the external stylesheets
 
         if(!isShown) {
@@ -260,17 +264,19 @@ void caTextLog::setAlarmColors(short status, double value, QColor bgAtInit, QCol
     fgAtInitLast = fgAtInit;
 }
 
-void caTextLog::setTextLine(const QString &txt)
-{
-    if(txt == "") {  // accelerate things
-        return;
-    }
-    QPlainTextEdit::setPlainText(keepText + "\n" +txt);
-    if(keepText.size() != txt.size()) {
-       FontScalingWidget::rescaleFont(text(), d_savedTextSpace);
-    }
+void caTextLog::setTextLine(const QString &txt){
 
-    keepText = keepText + "\n" + txt;
+    QPlainTextEdit::setPlainText(keepText + "\n" +txt);
+    // FontScalingWidget::rescaleFont(text(), d_savedTextSpace);
+
+    // Timestamp from local time
+    const time_t cTime = time(NULL);
+    struct tm *timeinfo = localtime(&cTime);
+    char ss[40];
+    sprintf(ss, "\n[%02d:%02d:%02d] ", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
+
+    keepText = keepText + ss + txt;
+    QPlainTextEdit::setPlainText(keepText);
 }
 
 
@@ -287,11 +293,11 @@ QSize caTextLog::calculateTextSpace()
 }
 
 // will now be used only for catextentry (performance)
-void caTextLog::rescaleFont(const QString& newText)
-{
-    if(d_rescaleFontOnTextChanged) {
-        FontScalingWidget::rescaleFont(newText, d_savedTextSpace);
-    }
+void caTextLog::rescaleFont(){
+    // Constant 40 character width rescaling
+    QFont f = QPlainTextEdit::font();
+    f.setPointSizeF(QPlainTextEdit::width()/40);
+    QPlainTextEdit::setFont(f);
 }
 
 QSize caTextLog::sizeHint() const
