@@ -38,12 +38,10 @@
 #include <QApplication>
 #include <QClipboard>
 
-caTextLog::caTextLog(QWidget *parent) : QPlainTextEdit(parent), FontScalingWidget(this)
-{
+caTextLog::caTextLog(QWidget *parent) : QPlainTextEdit(parent) {
     std::cerr << "Called caTextLog constructor" << std::endl;
-    std::cerr << "Called caTextLog constructor" << std::endl;
-    // to start with, clear the stylesheet, so that playing around
-    // is not possible.
+
+    // to start with, clear the stylesheet, so that playing around is not possible.
     setStyleSheet("");
 
     // we want this font, while nice and monospace
@@ -91,14 +89,9 @@ caTextLog::caTextLog(QWidget *parent) : QPlainTextEdit(parent), FontScalingWidge
     keepText = "";
     setTextLine(keepText);
 
-    setFontScaleModeL(WidthAndHeight);
     setFocusPolicy(Qt::NoFocus);
     setLinewidth(2);
     setFrame(true);
-
-
-    setFontScaleFactor(0.2);
-    d_rescaleFontOnTextChanged = false;
 
     installEventFilter(this);
 
@@ -265,23 +258,21 @@ void caTextLog::setAlarmColors(short status, double value, QColor bgAtInit, QCol
 }
 
 void caTextLog::setTextLine(const QString &txt){
-
-    QPlainTextEdit::setPlainText(keepText + "\n" +txt);
-    // FontScalingWidget::rescaleFont(text(), d_savedTextSpace);
-
     // Timestamp from local time
     const time_t cTime = time(NULL);
     struct tm *timeinfo = localtime(&cTime);
     char ss[40];
     sprintf(ss, "\n[%02d:%02d:%02d] ", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
 
+
     keepText = keepText + ss + txt;
     QPlainTextEdit::setPlainText(keepText);
+    verticalScrollBar()->setSliderPosition(verticalScrollBar()->maximum());
+
 }
 
 
-QSize caTextLog::calculateTextSpace()
-{
+QSize caTextLog::calculateTextSpace(){
     int innerWidth = size().width();
     int innerHeight = size().height();
 
@@ -300,11 +291,10 @@ void caTextLog::rescaleFont(){
     QPlainTextEdit::setFont(f);
 }
 
-QSize caTextLog::sizeHint() const
-{
-    if(!fontScaleEnabled()) return QPlainTextEdit::sizeHint();
+QSize caTextLog::sizeHint() const {    
     QFont f = font();
-    f.setPointSize(10);
+    int fs = std::max(QPlainTextEdit::width()/40, 10);
+    f.setPointSize(fs);
     QFontMetrics fm(f);
     int w = fm.width(text());
     int h = fm.height();
@@ -313,19 +303,11 @@ QSize caTextLog::sizeHint() const
     return size;
 }
 
-QSize caTextLog::minimumSizeHint() const
-{
-    QSize size;
-    if(!fontScaleEnabled())
-        size = QPlainTextEdit::minimumSizeHint();
-    else
-        size = sizeHint();
-    //printf("ESimpleLabel \e[0;33mminimumSizeHint\e[0m \"%s\" returning size w %d h %d\n", objectName(), size.width(), size.height());
-    return size;
+QSize caTextLog::minimumSizeHint() const {
+    return QPlainTextEdit::minimumSizeHint();
 }
 
-void caTextLog::copy()
-{
+void caTextLog::copy(){
     QString s = textCursor().selectedText();
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(s);

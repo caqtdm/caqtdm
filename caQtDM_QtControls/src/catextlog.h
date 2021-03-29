@@ -28,10 +28,8 @@
 
 #include <QPlainTextEdit>
 #include <qtcontrols_global.h>
-#include <fontscalingwidget.h>
 
-class QTCON_EXPORT caTextLog : public QPlainTextEdit, public FontScalingWidget
-{
+class QTCON_EXPORT caTextLog : public QPlainTextEdit {
     Q_OBJECT
 
     // things to get rid off
@@ -70,15 +68,8 @@ class QTCON_EXPORT caTextLog : public QPlainTextEdit, public FontScalingWidget
     Q_PROPERTY(alertHandling alarmHandling READ getAlarmHandling WRITE setAlarmHandling)
     Q_ENUMS(alertHandling)
 
-    Q_PROPERTY(bool fontScaleEnabled READ fontScaleEnabled DESIGNABLE false)
-    Q_PROPERTY(ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleModeL)
-    Q_PROPERTY(double fontScaleFactor READ fontScaleFactor WRITE setFontScaleFactor DESIGNABLE false)
-
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
-
-    Q_ENUMS(ScaleMode)
-
 
 public:
     void noStyle(QString style) {Q_UNUSED(style);}
@@ -121,13 +112,9 @@ public:
     alertHandling getAlarmHandling() const { return thisAlarmHandling;}
     void setAlarmHandling(alertHandling alarmHandling) {thisAlarmHandling = alarmHandling;}
 
-    enum ScaleMode { None, Height, WidthAndHeight};
     void setTextLine(const QString&);
 
     QString text() const { return QPlainTextEdit::toPlainText(); }
-
-    void setFontScaleModeL(ScaleMode m) { FontScalingWidget::setScaleMode((int) m);}
-    ScaleMode fontScaleMode() { return (ScaleMode) FontScalingWidget::scaleMode(); }
 
     void setForeAndBackground(QColor foreground, QColor background, QColor frame);
     void forceForeAndBackground(QColor foreground, QColor background, QColor frame);
@@ -145,8 +132,6 @@ public slots:
     }
 
 private slots:
-    void rescaleFont(const QString& newText);
-
     void copy();
 
 protected:
@@ -166,7 +151,7 @@ private:
     colMode thisColorMode;
     colMode oldColorMode;
 
-    bool d_rescaleFontOnTextChanged;
+    QSize d_savedTextSpace;
     QString thisStyle, oldStyle;
 
     bool isShown;
