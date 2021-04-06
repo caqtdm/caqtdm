@@ -2296,14 +2296,20 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         //qDebug() << "use file" << fileName << openFile;
         ParsePepFile *parseFile = (ParsePepFile *) 0;
 #ifdef ADL_EDL_FILES
-        const bool isMedmFile = fileName.endsWith (".adl");
-        const bool isEdmFile = fileName.endsWith (".edl");
+        bool isMedmFile = fileName.endsWith (".adl");
+        bool isEdmFile = fileName.endsWith (".edl");
         searchFile *other_s = new searchFile(fileName);
         QString adledlcheck = other_s->findFile();
         if(adledlcheck.isNull()){
             // if file is not existing try ui ending
-            if (isMedmFile)fileName=fileName.replace(".adl",".ui");
-            if (isEdmFile) fileName=fileName.replace(".edl",".ui");
+            if (isMedmFile){
+                fileName=fileName.replace(".adl",".ui");
+                isMedmFile = false;
+            }
+            if (isEdmFile){
+                fileName=fileName.replace(".edl",".ui");
+                isEdmFile = false;
+            }
         }
         delete other_s;
         ParseOtherFile *otherFile = (ParseOtherFile *) 0;
@@ -2322,6 +2328,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         } else {
             //qDebug() << "ui file";
             fileName = openFile.append(".ui");
+
         }
         //qDebug() << "use2 file" << fileName << openFile;
         // this will check for file existence and when an url is defined, download the file from a http server
