@@ -135,7 +135,9 @@ char* myLimitedString (char * strng) {
     }\
     info->evID = 0;\
     info->event = 0;\
-    ca_clear_channel(ch); \
+    if (info->connected){\
+        ca_clear_channel(ch);\
+    }\
     return status
 
 #define EpicsGet_ErrorMessage_ClearChannel_Return  \
@@ -149,7 +151,9 @@ char* myLimitedString (char * strng) {
     }\
     info->evID = 0;\
     info->event = 0;\
-    ca_clear_channel(ch);\
+    if (info->connected){\
+        ca_clear_channel(ch);\
+    }\
     C_SetMutexKnobDataConnected(mutexKnobdataPtr, info->index, info->connected);\
     knobData kData;\
     C_GetMutexKnobData(mutexKnobdataPtr, info->index, &kData);\
