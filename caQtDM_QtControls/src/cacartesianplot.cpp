@@ -77,6 +77,7 @@ public:
 
     virtual QwtScaleDiv divideScale( double x1, double x2, int , int , double) const
     {
+        /*
         QList<double> Ticks[QwtScaleDiv::NTickTypes];
         const QwtInterval interval = QwtInterval( x1, x2 ).normalized();
 
@@ -89,6 +90,22 @@ public:
         }
 
         scaleDiv = QwtScaleDiv(interval, Ticks);
+        if ( x1 > x2 ) scaleDiv.invert();
+
+        return scaleDiv;
+        */
+
+        double stepSize = (x2-x1) / nbTicks;
+        int maxMinorSteps = 10;
+
+        QwtInterval interval = QwtInterval(x1, x2 ).normalized();
+        if ( interval.width() <= 0 ) return QwtScaleDiv();
+
+        QwtScaleDiv scaleDiv;
+        QList<double> Ticks[QwtScaleDiv::NTickTypes];
+        buildTicks(interval, stepSize, maxMinorSteps, Ticks);
+        scaleDiv = QwtScaleDiv( interval, Ticks );
+
         if ( x1 > x2 ) scaleDiv.invert();
 
         return scaleDiv;
