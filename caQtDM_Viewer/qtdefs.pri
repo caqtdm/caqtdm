@@ -120,12 +120,11 @@ unix:!macx:{
 # one can specify channel access with ca:// and pv access with pva:// (both use the epics4 plugin)
 # the main work for this plugin was done by Marty Kraimer
 
-#CONFIG += epics7
+CONFIG += epics7
 epics7 {
    message( "Configuring build for epics4 plugin with epics7" )
    CONFIG += epics4
 }
-
 
 _CAQTDM_MODBUS = $$(CAQTDM_MODBUS)
 isEmpty(_CAQTDM_MODBUS) {
