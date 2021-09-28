@@ -34,8 +34,6 @@ namespace epics { namespace pvData {
 epics4_CallbackThread::~epics4_CallbackThread()
 {
 cout << "CallbackThread::~CallbackThread()\n";
-
-cout << "CallbackThread::~CallbackThread() returning\n";
 }
 
 void epics4_CallbackThread::run()
@@ -44,6 +42,7 @@ void epics4_CallbackThread::run()
     while(true) 
     {
         epicsThreadSleep(.2);
+
         if(runStop.tryWait()) {
             runReturn.signal();
             return;

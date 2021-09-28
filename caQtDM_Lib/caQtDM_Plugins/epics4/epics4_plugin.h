@@ -50,28 +50,23 @@
 #include <pv/nt.h>
 #include <pv/convert.h>
 
-
 #include <QObject>
 #include "controlsinterface.h"
 #include "epics4_callbackThread.h"
 #include "epics4Requester.h"
 
 
-
 namespace epics { namespace caqtdm { namespace epics4 {
 
-
-
 class PVAChannel;
+
 typedef std::tr1::shared_ptr<PVAChannel> PVAChannelPtr;
 typedef std::tr1::weak_ptr<PVAChannel> PVAChannelWPtr;
-
+typedef std::tr1::shared_ptr<epics::pvAccess::ChannelProvider> PVAChannelProviderPtr;
 
 }}}
 
-
-class Q_DECL_EXPORT Epics4Plugin : public QObject, ControlsInterface, 
-     public std::tr1::enable_shared_from_this<Epics4Plugin>
+class Q_DECL_EXPORT Epics4Plugin : public QObject, ControlsInterface, public std::tr1::enable_shared_from_this<Epics4Plugin>
 {
     Q_OBJECT
     Q_INTERFACES(ControlsInterface)
@@ -122,13 +117,13 @@ public:
     static void setDebug(bool value) {debug = value;}
     static bool getDebug() {return debug;}
 
-
   private:
     static bool debug;
     std::map<std::string,epics::caqtdm::epics4::PVAChannelWPtr> pvaChannelMap;
     epics::caqtdm::epics4::Epics4RequesterPtr requester;
     epics::pvData::CallbackThreadPtr epics4_callbackThread;
     MutexKnobData * mutexKnobData;
+    epics::caqtdm::epics4::PVAChannelProviderPtr providerN;
 };
 
 #endif
