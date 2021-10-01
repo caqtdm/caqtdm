@@ -184,6 +184,7 @@ private:
     knobData kData;
     shared_vector<const string> choices;
     TimeStamp timeStamp;
+    string description;
     Mutex mutex;
     PVAGetFieldRequesterPtr pvaGetFieldRequester;
     PVAChannelGetRequesterPtr pvaChannelGetRequester;
@@ -268,6 +269,7 @@ public:
             int16_t *data16, int32_t *data32,
             char *sdata, int nelm);
     bool getTimeStamp(char *timestamp);
+    bool getDescription(char *timestamp);
 };
 
 class epicsShareClass PVAGetFieldRequester : public GetFieldRequester
@@ -1012,30 +1014,26 @@ void PVAInterface::gotDisplayControl(PVStructurePtr const & pvStructure)
             controlHigh = control.getHigh();
         }
     }
-    pvField = pvStructure->getSubField<PVStructure>(string("display"));
-    if(pvField) {
-        epics::pvData::Display display;
-        PVDisplay pvDisplay;
-        if(pvDisplay.attach(pvField)) {
-            pvDisplay.get(display);
-            displayLow = display.getLow();
-            displayHigh = display.getHigh();
-            units = display.getUnits();
-            string format = display.getFormat();
-            string::size_type ind = format.find("%.");
-            if(ind!=std::string::npos) {
-                string rest(format.substr(ind +2));
-                ind = rest.find('f');
-                if(ind!=std::string::npos) {
-                    rest = rest.substr(0,ind);
-                    if(rest.length()!=std::string::npos) {
-                        //precision = std::stoi(rest);
-                        precision = std::atoi(rest.c_str());
-                    }
-                }
-            }
-        }
+
+    PVStructurePtr pvDisplay(pvStructure->getSubField<PVStructure>("display"));
+    if(pvDisplay) {
+        // limitlow
+        PVDoublePtr pvDouble = pvDisplay->getSubField<PVDouble>("limitLow");
+        if(pvDouble) displayLow = pvDouble->get();
+        // limithigh
+        pvDouble = pvDisplay->getSubField<PVDouble>("limitHigh");
+        if(pvDouble)  displayHigh = pvDouble->get();
+        // precision
+        PVIntPtr pvInt  = pvDisplay->getSubField<PVInt>("precision");
+        if(pvInt) precision =  pvInt->get();
+        // units
+        PVStringPtr pvString = pvDisplay->getSubField<PVString>("units");
+        if(pvString) units = pvString->get();
+        // description
+        pvString = pvDisplay->getSubField<PVString>("description");
+        if(pvString)  description = pvString->get();
     }
+
     kData = mutexKnobData->GetMutexKnobData(index);
     if(kData.index == -1) return;
     mutexKnobData->DataLock(&kData);
@@ -1046,6 +1044,7 @@ void PVAInterface::gotDisplayControl(PVStructurePtr const & pvStructure)
     kData.edata.lower_ctrl_limit = controlLow;
     kData.edata.precision = precision;
 
+    strcpy(kData.edata.fec, pvaChannel->getChannel()->getRemoteAddress().c_str());
     AccessRights accessr = pvaChannel->getChannel()->getAccessRights(pvField);
     kData.edata.accessR = 1;
     kData.edata.accessW = 1;
@@ -1704,9 +1703,15 @@ bool PVAInterface::getTimeStamp(char *buf)
     timeStamp.toTime_t(tt);
     struct tm ctm;
     memcpy(&ctm,localtime(&tt),sizeof(struct tm));
-    strftime(buf,40,"%G.%m.%d %H.%M.%S%n",&ctm);
+    strftime(buf,32,"%b %d, %Y %H:%M:%S%n",&ctm);
     int len = strlen(buf);
     sprintf(buf + len,".%09d tag %d\n",timeStamp.getNanoseconds(),timeStamp.getUserTag());
+    return true;
+}
+
+bool PVAInterface::getDescription(char *buf)
+{
+    strcpy(buf, description.c_str());
     return true;
 }
 }}}
@@ -1796,6 +1801,7 @@ int Epics4Plugin::pvAddMonitor(int index, knobData *kData, int rate, int skip)
         pvaChannel = PVAChannelPtr(new PVAChannel(fullname, mapname, requester,epics4_callbackThread, providerN));
         pvaChannel->connect(channelName,providerName);
         pvaChannelMap.insert(std::pair<string,PVAChannelWPtr>(mapname,pvaChannel));
+        pvMap.insert(std::pair<string,int>(mapname, kData->index));
         if(Epics4Plugin::getDebug())cout << "created new and called connect\n";
     }
     PVAInterfacePtr pvaInterface(new PVAInterface(pvaChannel, mutexKnobData,index,requester,epics4_callbackThread));
@@ -1834,8 +1840,10 @@ int Epics4Plugin::pvFreeAllocatedData(knobData *kData)
     bool isLast = pvaChannel->removeInterface(pvaInterface);
     if(isLast) {
         string mapName = pvaChannel->getMapName();
-        std::map<string,PVAChannelWPtr>::iterator it = pvaChannelMap.find(mapName);
-        pvaChannelMap.erase(it);
+        std::map<string,PVAChannelWPtr>::iterator it1 = pvaChannelMap.find(mapName);
+        pvaChannelMap.erase(it1);
+        std::map<string,int>::iterator it2 = pvMap.find(mapName);
+        pvMap.erase(it2);
         pvaChannel->destroy();
     }
     pvaInterface->destroy();
@@ -1878,8 +1886,25 @@ bool Epics4Plugin::pvSetWave(knobData *kData,
     return pvaInterface->setArrayValue(fdata,ddata,data16,data32,sdata,nelm);
 }
 
-bool Epics4Plugin::pvGetTimeStamp(knobData *kData, char *timestamp) {
+int Epics4Plugin::pvGetTimeStamp(char *pv, char *timestamp)
+{
     if(Epics4Plugin::getDebug()) cout  << "Epics4Plugin:pvGetTimeStamp\n";
+    map<std::string, int>::iterator it = pvMap.begin();
+    while (it != pvMap.end()) {
+        string mapname = it->first;
+        if (mapname.find(pv) != string::npos) {
+            //cout << "found" << endl;
+            knobData kData = mutexKnobData->GetMutexKnobData(it->second);
+            pvGetTimeStampN(&kData, timestamp);
+            break;
+        }
+        it++;
+    }
+    return true;
+}
+
+bool Epics4Plugin::pvGetTimeStampN(knobData *kData, char *timestamp) {
+    //if(Epics4Plugin::getDebug()) cout  << "Epics4Plugin:pvGetTimeStamp\n";
     if (kData->edata.info == (void *) 0) throw std::runtime_error("Epics4Plugin::pvSetWave kData->edata.info  is null");
     PVAInterfaceGlue *pvaInterfaceGlue  = static_cast<PVAInterfaceGlue *>(kData->edata.info);
     PVAInterfacePtr pvaInterface = pvaInterfaceGlue->getPVAInterface();
@@ -1888,11 +1913,31 @@ bool Epics4Plugin::pvGetTimeStamp(knobData *kData, char *timestamp) {
     return true;
 }
 
-bool Epics4Plugin::pvGetDescription(knobData *kData, char *description) {
-    Q_UNUSED(kData);
-    Q_UNUSED(description);
-    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin:pvGetDescription\n";
-    return false;
+int Epics4Plugin::pvGetDescription(char *pv, char *description)
+{
+    if(Epics4Plugin::getDebug()) cout  << "Epics4Plugin:pvGetDescription\n";
+    map<std::string, int>::iterator it = pvMap.begin();
+    while (it != pvMap.end()) {
+        string mapname = it->first;
+        if (mapname.find(pv) != string::npos) {
+            //cout << "found" << endl;
+            knobData kData = mutexKnobData->GetMutexKnobData(it->second);
+            pvGetDescriptionN(&kData, description);
+            break;
+        }
+        it++;
+    }
+    return true;
+}
+
+bool Epics4Plugin::pvGetDescriptionN(knobData *kData, char *description) {
+    //if(Epics4Plugin::getDebug()) cout  << "Epics4Plugin:pvGetTimeStamp\n";
+    if (kData->edata.info == (void *) 0) throw std::runtime_error("Epics4Plugin::pvSetWave kData->edata.info  is null");
+    PVAInterfaceGlue *pvaInterfaceGlue  = static_cast<PVAInterfaceGlue *>(kData->edata.info);
+    PVAInterfacePtr pvaInterface = pvaInterfaceGlue->getPVAInterface();
+    if(!pvaInterface) throw std::runtime_error("Epics4Plugin::pvSetWave pvaInterface is null");
+    pvaInterface->getDescription(description);
+    return true;
 }
 
 int Epics4Plugin::pvClearEvent(void * ptr) {

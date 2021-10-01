@@ -94,20 +94,13 @@ public:
         Q_UNUSED(nelm); Q_UNUSED(object); Q_UNUSED(errmess);
         return false;
     }
-    int pvGetTimeStamp(char *pv, char *timestamp)
-    {
-        Q_UNUSED(pv); Q_UNUSED(timestamp);
-        return false;
-    }
-    int pvGetDescription(char *pv, char *description)
-    {
-        Q_UNUSED(pv); Q_UNUSED(description);
-        return false;
-    }
+
+    int pvGetTimeStamp(char *pv, char *timestamp);
+    int pvGetDescription(char *pv, char *description);
     bool pvSetValue(knobData *kData, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
     bool pvSetWave(knobData *kData, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess);
-    bool pvGetTimeStamp(knobData *kData, char *timestamp);
-    bool pvGetDescription(knobData *kData, char *description);
+    bool pvGetTimeStampN(knobData *kData, char *timestamp);
+    bool pvGetDescriptionN(knobData *kData, char *description);
     int pvClearEvent(void * ptr);
     int pvAddEvent(void * ptr);
     int pvReconnect(knobData *kData);
@@ -120,6 +113,7 @@ public:
   private:
     static bool debug;
     std::map<std::string,epics::caqtdm::epics4::PVAChannelWPtr> pvaChannelMap;
+    std::map<std::string, int > pvMap;
     epics::caqtdm::epics4::Epics4RequesterPtr requester;
     epics::pvData::CallbackThreadPtr epics4_callbackThread;
     MutexKnobData * mutexKnobData;
