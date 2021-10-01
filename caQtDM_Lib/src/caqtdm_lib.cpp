@@ -3547,6 +3547,12 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     }
     if (trimmedPV.contains(".{}")){
        trimmedPV.truncate(trimmedPV.indexOf(".{}"));
+    } else if (trimmedPV.contains(".{")) {
+        int pos = trimmedPV.indexOf(".{");
+        QString JSONString = trimmedPV.mid(pos+1);
+        if(!checkJsonString(JSONString)) {
+            trimmedPV.truncate(trimmedPV.indexOf(".{"));
+        }
     }
 
     *pvRep = trimmedPV;
@@ -8260,7 +8266,6 @@ int CaQtDM_Lib::parseForDisplayRate(QString &inputc, int &rate)
             root = value->AsObject();
             // check for monitor
             if (root.find(L"caqtdm_monitor") != root.end() && root[L"caqtdm_monitor"]->IsObject()) {
-
                 //printf("monitor detected\n");
                 // Retrieve nested object
                 JSONValue *value1 = JSON::Parse(root[L"caqtdm_monitor"]->Stringify().c_str());
@@ -8285,7 +8290,6 @@ int CaQtDM_Lib::parseForDisplayRate(QString &inputc, int &rate)
                     delete(value);
                 }
             }
-
         }
     }
 
@@ -8296,10 +8300,41 @@ int CaQtDM_Lib::parseForDisplayRate(QString &inputc, int &rate)
         QStringList items = inputc.split(",", QString::SkipEmptyParts);
         int pos = items.indexOf(QRegExp("*caqtdm_monitor*", Qt::CaseInsensitive, QRegExp::Wildcard), 0);
         if(pos != -1) items.removeAt(pos);  // pos==-1 should never happen
-        inputc = "{" + items.join(",") + "}";
+        //inputc = "{" + items.join(",") + "}";
+        inputc =  items.join(",");
+        if(inputc.size() > 0) inputc.append(("}"));
+        else inputc = "{}";
     }
+    return success;
+}
 
-
+bool CaQtDM_Lib::checkJsonString(QString inputc)
+{
+    // test if we have a valid json string
+    bool success = false;
+    char input[MAXPVLEN];
+    int cpylen = qMin(inputc.length(), MAXPVLEN-1);
+    strncpy(input, (char*) qasc(inputc), (size_t) cpylen);
+    input[cpylen] = '\0';
+    JSONValue *value = JSON::Parse(input);
+    // Did it go wrong?, when yes then get rid of it
+    if (value == NULL) {
+        success = false;
+        printf("failed to parse <%s>\n", input);
+    } else {
+        // however is seems the parsing does not take into account if the last bracket is missing
+        int nbOpening = 0;
+        for(int counter = 0; counter < inputc.size();  counter++){
+                QString element = inputc.at(counter);
+                if(element.contains("{")) nbOpening++;
+                else if(element.contains("}")) nbOpening--;
+        }
+        if(nbOpening == 0) {
+            success = true;
+        } else {
+            success = false;
+        }
+    }
     return success;
 }
 
