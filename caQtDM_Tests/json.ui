@@ -266,7 +266,7 @@ border-radius: 2px;
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">ACM:TEST:AO.{test:channel.{{&quot;arr&quot;:{&quot;s&quot;:2,&quot;i&quot;:2,&quot;e&quot;:8}} 4 2 4 6 8}, &quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+     <string notr="true">ACM:TEST:DOUBLE_WAVE.{&quot;arr&quot;:{&quot;s&quot;:2,&quot;i&quot;:2,&quot;e&quot;:8}}</string>
     </property>
     <property name="keepFocus">
      <bool>true</bool>
@@ -297,6 +297,113 @@ border-radius: 2px;
     <property name="channel" stdset="0">
      <string notr="true">ACM:TEST:AO.{&quot;dbnd&quot;:{&quot;abs&quot;:1.5}</string>
     </property>
+   </widget>
+   <widget class="caWaveTable" name="cawavetable">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>480</y>
+      <width>411</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ACM:TEST:DOUBLE_WAVE.{&quot;arr&quot;:{&quot;s&quot;:2,&quot;i&quot;:2,&quot;e&quot;:8}}</string>
+    </property>
+    <property name="numberOfColumns">
+     <number>10</number>
+    </property>
+    <row/>
+    <column/>
+    <column/>
+    <column/>
+    <column/>
+    <column/>
+    <column/>
+    <column/>
+    <column/>
+    <column/>
+    <column/>
+    <item row="0" column="0">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="1">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="2">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="3">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="4">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="5">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="6">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="7">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="8">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
+    <item row="0" column="9">
+     <property name="font">
+      <font/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeft|AlignLeading</set>
+     </property>
+    </item>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -336,6 +443,11 @@ border-radius: 2px;
    <class>caThermo</class>
    <extends>QWidget</extends>
    <header>caThermo</header>
+  </customwidget>
+  <customwidget>
+   <class>caWaveTable</class>
+   <extends>QTableWidget</extends>
+   <header>caWaveTable</header>
   </customwidget>
  </customwidgets>
  <resources/>
