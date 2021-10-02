@@ -53,6 +53,7 @@
 // therefore we need this include and also link with the epics libraries
 // should probably be changed at some point.
 #include <postfix.h>
+#include <epicsVersion.h>
 
 #ifdef MOBILE_ANDROID
 #  include <unistd.h>
@@ -3545,15 +3546,28 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
         }
         postMessage(QtDebugMsg, asc);
     }
+
     if (trimmedPV.contains(".{}")){
        trimmedPV.truncate(trimmedPV.indexOf(".{}"));
     } else if (trimmedPV.contains(".{")) {
+        bool status;
+        char asc[MAX_STRING_LENGTH];
         int pos = trimmedPV.indexOf(".{");
         QString JSONString = trimmedPV.mid(pos+1);
-        if(!checkJsonString(JSONString)) {
-            trimmedPV.truncate(trimmedPV.indexOf(".{"));
+        trimmedPV = trimmedPV.mid(0, pos);
+        status = checkJsonString(JSONString);
+        if(!status) {
+            snprintf(asc, MAX_STRING_LENGTH, "JSON parsing error on %s ,should be a better jsong string", (char*) qasc(pv.trimmed()));
         }
+        trimmedPV = trimmedPV + "." + JSONString;
     }
+
+#if defined(EPICS_VERSION_INT) && (EPICS_VERSION_INT >= VERSION_INT(3,15,0,0) || EPICS_VERSION_INT >= VERSION_INT(7,0,0,0))
+        // do nothing
+#else
+        //qDebug() << "for old epics truncate" << trimmedPV;
+        if (trimmedPV.contains(".{")) trimmedPV.truncate(trimmedPV.indexOf(".{"));
+#endif
 
     *pvRep = trimmedPV;
 
@@ -8255,6 +8269,8 @@ int CaQtDM_Lib::parseForDisplayRate(QString &inputc, int &rate)
     // Did it go wrong?
     if (value == NULL) {
         //printf("failed to parse <%s>\n", input);
+        inputc = "{}";
+        return success;
     } else {
         // Retrieve the main object
         JSONObject root;
@@ -8305,36 +8321,47 @@ int CaQtDM_Lib::parseForDisplayRate(QString &inputc, int &rate)
         if(inputc.size() > 0) inputc.append(("}"));
         else inputc = "{}";
     }
+
+    //qDebug() << "final1" << inputc;
+
     return success;
 }
 
-bool CaQtDM_Lib::checkJsonString(QString inputc)
+bool CaQtDM_Lib::checkJsonString(QString &inputc)
 {
     // test if we have a valid json string
+
     bool success = false;
     char input[MAXPVLEN];
     int cpylen = qMin(inputc.length(), MAXPVLEN-1);
     strncpy(input, (char*) qasc(inputc), (size_t) cpylen);
     input[cpylen] = '\0';
     JSONValue *value = JSON::Parse(input);
+
     // Did it go wrong?, when yes then get rid of it
     if (value == NULL) {
         success = false;
-        printf("failed to parse <%s>\n", input);
+        inputc ="{}";
+        //printf("checkJsonString -- failed to parse <%s>\n", input);
     } else {
         // however is seems the parsing does not take into account if the last bracket is missing
-        int nbOpening = 0;
+        int nbBrackets = 0;
         for(int counter = 0; counter < inputc.size();  counter++){
                 QString element = inputc.at(counter);
-                if(element.contains("{")) nbOpening++;
-                else if(element.contains("}")) nbOpening--;
+                if(element.contains("{")) nbBrackets++;
+                else if(element.contains("}")) nbBrackets--;
         }
-        if(nbOpening == 0) {
+        //qDebug() << "number of brackets" << nbBrackets;
+        if(nbBrackets == 0) {
             success = true;
         } else {
             success = false;
+            inputc = "{}";
         }
     }
+
+    //qDebug() << "final2" << inputc;
+
     return success;
 }
 
