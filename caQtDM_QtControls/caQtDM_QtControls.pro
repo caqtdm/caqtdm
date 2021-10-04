@@ -25,7 +25,14 @@ contains(QT_VER_MAJ, 5) {
           QT += designer
       }
 }
-
+contains(QT_VER_MAJ, 6) {
+      QT += widgets concurrent uitools opengl core
+      CONFIG  += qwt plugin
+      ios | android {
+            QT += uiplugin
+      }
+      QT += designer
+}
 CONFIG += warn_on
 CONFIG += console
 
