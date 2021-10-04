@@ -24,9 +24,13 @@
     agreement, the Example Code may be used, distributed and modified
     without limitation.
 */
+#include <QtGlobal>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    #include <qtextcodec.h>
+#else
+    #include <QtCore5Compat/QTextCodec>
+#endif
 
-
-#include <qtextcodec.h>
 
 #include "XmlWriter.h"
 
@@ -37,14 +41,19 @@ XmlWriter::XmlWriter( QIODevice *device, QTextCodec *codec )
 {
     Q_UNUSED(codec);
     out.setDevice( device );
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     out.setCodec("UTF-8");
+#else
+    out.setEncoding(QStringConverter::Utf8);
+#endif
+
     out << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 }
 
 XmlWriter::~XmlWriter()
 {
     if ( autoNewLine && !atBeginningOfLine )
-	out << endl;
+    out << Qt::endl;
 }
 
 QString XmlWriter::protect( const QString& string )
@@ -87,7 +96,7 @@ void XmlWriter::writePendingIndent()
 
 void XmlWriter::newLine()
 {
-    out << endl;
+    out << Qt::endl;
     atBeginningOfLine = true;
 }
 

@@ -127,7 +127,11 @@ void myParser::closeFile()
         myvector.append(zorder[i]);
     }
     // sort according to the static elements
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     qStableSort(myvector.begin(), myvector.end(), compareFunc);
+#else
+    std::stable_sort(myvector.begin(), myvector.end(), compareFunc);
+#endif
     int index = 0;
     for (it=myvector.begin(); it!=myvector.end(); ++it) {
         //qDebug() << "sorted" << it->indx << it->vis << it->z;
