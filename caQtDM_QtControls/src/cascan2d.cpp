@@ -58,8 +58,14 @@ caScan2D::caScan2D(QWidget *parent) : QWidget(parent)
     scrollArea = (QScrollArea *) 0;
 
     mainLayout = new QGridLayout(this);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     mainLayout->setMargin(0);
     mainLayout->setSpacing(0);
+#else
+    mainLayout->setVerticalSpacing(0);
+    mainLayout->setHorizontalSpacing(0);
+    mainLayout->setContentsMargins(0,0,0,0);
+#endif
     setLayout(mainLayout);
     setup();
 
@@ -360,8 +366,13 @@ void caScan2D::setup()
 
         // add everything to layout
         valuesLayout = new QHBoxLayout();
-        valuesLayout->setMargin(0);
         valuesLayout->setSpacing(2);
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        valuesLayout->setMargin(0);
+#else
+        valuesLayout->setContentsMargins(0,0,0,0);
+#endif
         valuesLayout->addWidget(labelMinText, Qt::AlignLeft);
         valuesLayout->addWidget(labelMin, Qt::AlignLeft);
         valuesLayout->addWidget(labelMaxText, Qt::AlignLeft);
