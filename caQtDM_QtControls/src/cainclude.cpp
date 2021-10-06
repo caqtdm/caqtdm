@@ -32,6 +32,11 @@
 #include "cainclude.h"
 #include "searchfile.h"
 #include "fileFunctions.h"
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    #include <QRegExp>
+#else
+    #include <QRegularExpression>
+#endif
 
 caInclude::caInclude(QWidget *parent) : QWidget(parent)
 {
@@ -53,8 +58,14 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
     thisPalette = palette();
 
     boxLayout = new QHBoxLayout();
-    boxLayout->setMargin(0);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        boxLayout->setMargin(0);
+#else
+        boxLayout->setContentsMargins(0,0,0,0);
+#endif
     boxLayout->setSpacing(0);
+
+
     frame = new QFrame();
     thisFrameShape = NoFrame;
     thisFrameShadow = QFrame::Plain;
@@ -62,7 +73,11 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
     boxLayout->addWidget(frame);
 
     gridLayout = new QGridLayout();
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     gridLayout->setMargin(0);
+#else
+    gridLayout->setContentsMargins(0,0,0,0);
+#endif
     gridLayout->setSpacing(0);
     effectiveSize = QSize(100,100);
     frame->setLayout(gridLayout);
@@ -187,7 +202,12 @@ void caInclude::setFileName(QString const &filename)
             thisFrameUpdate = false;
 
             setLayout(boxLayout);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             gridLayout->setMargin(0);
+#else
+            gridLayout->setContentsMargins(0,0,0,0);
+#endif
+
             switch(thisFrameShape) {
                 case NoFrame:
                       frame->setFrameShape(QFrame::NoFrame);
@@ -325,7 +345,11 @@ void caInclude::setFileName(QString const &filename)
             fileName = newFileName;
             thisAdjust = false;
         } else {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             openFile = newFileName.split(".", QString::SkipEmptyParts);
+#else
+            openFile = newFileName.split(".", Qt::SkipEmptyParts);
+#endif
             fileName = openFile[0].append(".ui");
         }
 
@@ -505,9 +529,20 @@ void caInclude::setMacroAndPositionsFromMacroStringList(QStringList macroList) {
         QString Macro = macroList[i].simplified();
         Macro.replace(" ", "");
         //printf(" MacroOrg: %s\n",qasc(Macro));
-        QRegExp rx("(?:,+|^)\\[([^,]*[^\\]]*)\\]");
+        QString pattern = QString("(?:,+|^)\\[([^,]*[^\\]]*)\\]");
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        QRegExp rx(pattern);
         if (rx.indexIn(Macro) != -1){
          QStringList capTxt = rx.capturedTexts();
+
+#else
+        QRegularExpression rx(pattern);
+        QRegularExpressionMatch match = rx.match(Macro);
+        if (match.hasMatch()){
+           QStringList capTxt = match.capturedTexts();
+#endif
+
          //printf(" capTxt(%d): %s\n",capTxt.count(),qasc(capTxt[1]));
          //handle only the first one
          QStringList MacroPartPos = capTxt[1].split(",");
