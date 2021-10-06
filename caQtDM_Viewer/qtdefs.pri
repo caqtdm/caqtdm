@@ -293,6 +293,18 @@ DEFINES += TARGET_DESCRIPTION=\"\\\"$${TARGET_DESCRIPTION}\\\"\"
 DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
+# 4.3.1
+# fileopenwindow: options changes
+# fix for converted adl files
+# fix for higher python versions
+# fix cacartesianplot for minor ticks disappeared when changing number of ticks
+# searchpaths handling for non ADL files
+# catable fix for big numbers
+# bsread fix null number counting messages
+# epics3plugin fix for disconnected channels
+# epics4plugin is now working with the epics 7 API and PVA can be used
+# filter feature for epics 7 is now available
+
 
 # 4.3.0
 # POPUP status windows with possible delays
