@@ -71,13 +71,13 @@ REM ============================================================================
   call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
   d:	
  
-  set QTHOME=D:/qt/build/Qt-5.15.0_VS19_64bit
+  set QTHOME=D:/qt/build/Qt-6.2.0_VS19_64bit
   
-  set QWTHOME=D:/qt/build/qwt-Qt_5_15_0-Release
-  set QWTINCLUDE=D:/qt/qwt-6.1.5/src
+  set QWTHOME=D:/qt/qwt-6.2.0
+  set QWTINCLUDE=D:/qt/qwt-6.2.0/src
   set QWTLIB=%QWTHOME%/lib
   set QWTLIBNAME=qwt
-  set QWTVERSION=6.1
+  set QWTVERSION=6.2
 
   set GITPATH=C:\Users\brands\AppData\Local\Atlassian\SourceTree\git_local\bin\
     
