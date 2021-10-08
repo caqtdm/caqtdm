@@ -24,6 +24,7 @@
  */
 #include <QDebug>
 #include <QString>
+#include <QApplication>
 #include <db_access.h>
 #include <cadef.h>
 
@@ -1728,6 +1729,7 @@ QString Epics4Plugin::pluginName()
 Epics4Plugin::Epics4Plugin()
 {
     if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::Epics4Plugin\n";
+    connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closeEvent()));
 }
 
 Epics4Plugin::~Epics4Plugin()
@@ -1983,6 +1985,9 @@ int Epics4Plugin::FlushIO() {
     return true;
 }
 
+void Epics4Plugin::closeEvent(){
+   TerminateIO();
+}
 
 int Epics4Plugin::TerminateIO() {
     Epics4Plugin::setDebug(true);
