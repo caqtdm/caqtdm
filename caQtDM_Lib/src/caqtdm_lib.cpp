@@ -2992,6 +2992,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         w1->setProperty("ObjectType", caStripPlot_Widget);
 
         QString text, title;
+        QStringList extra_legend,legend;
 
         // addmonitor normally will add a tooltip to show the pv; however here we have more than one pv
         QString tooltip;
@@ -3004,9 +3005,34 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         int NumberOfCurves = min(vars.count(), caStripPlot::MAXCURVES);
 
-        // go through the defined curves and add monitor
+// look for a description replacement for the Legend of stripplot
 
-        if(NumberOfCurves > 0) stripplotWidget->defineCurves(vars, stripplotWidget->getUnits(), stripplotWidget->getPeriod(),  stripplotWidget->width(),  NumberOfCurves);
+        QVariant legenddata = w1->property("Legend");
+        if (legenddata.isValid()) {
+            if (legenddata.type()==QVariant::StringList)
+                extra_legend = legenddata.value<QStringList>();
+
+            if (legenddata.type()==QVariant::String)
+                extra_legend = legenddata.value<QString>().split(";",QString::KeepEmptyParts);
+        }
+        //qDebug() << "extra_legend" << extra_legend << extra_legend.count();
+        if (extra_legend.count()>0){
+            for(int i=0; i< NumberOfCurves; i++) {
+                //qDebug() << "legend for" << legend;
+                if (i<extra_legend.count()){
+                    QString element=extra_legend.at(i);
+                    if (!element.isNull() && !element.isEmpty()){
+                        legend.append(element);
+                    } else legend.append(vars.at(i));
+                }else legend.append(vars.at(i));
+
+            }
+        }else legend=vars;
+
+// go through the defined curves and add monitor
+
+        //qDebug() << "legend" << legend;
+        if(NumberOfCurves > 0) stripplotWidget->defineCurves(legend, stripplotWidget->getUnits(), stripplotWidget->getPeriod(),  stripplotWidget->width(),  NumberOfCurves);
         for(int i=0; i< NumberOfCurves; i++) {
             pv = vars.at(i).trimmed();
             if(pv.size() > 0) {

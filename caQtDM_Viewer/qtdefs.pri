@@ -304,6 +304,7 @@ DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 # epics3plugin fix for disconnected channels
 # epics4plugin is now working with the epics 7 API and PVA can be used
 # filter feature for epics 7 is now available
+# caStripPlot: feature dynamic property "Legend" for rename the channel to a user defined
 
 
 # 4.3.0
