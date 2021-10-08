@@ -1345,7 +1345,7 @@ int EpicsGetDescription(char *pv, char *description)
     }
     // if there is a filter we remove it first
 
-    strcpy_s(pvDesc,sizeof(pvDesc),pv);
+    strcpy(pvDesc,pv);
     pch = strstr (pvDesc,".{");
 
     if (pch) *pch='\0';
