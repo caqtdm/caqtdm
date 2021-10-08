@@ -8338,17 +8338,11 @@ int CaQtDM_Lib::parseForDisplayRate(QString &inputc, int &rate)
     // we have to take this json string out of the global json string given for epics 3.15 and higher
     // get rid of first { and last }
     // in the call we append the resulting string to the pv
-    if((inputc.at(0) == '{') && (inputc.at(inputc.length()-1) == '}')) {
-        QStringList items = inputc.split(",", QString::SkipEmptyParts);
-        int pos = items.indexOf(QRegExp("*caqtdm_monitor*", Qt::CaseInsensitive, QRegExp::Wildcard), 0);
-        if(pos != -1) items.removeAt(pos);  // pos==-1 should never happen
-        //inputc = "{" + items.join(",") + "}";
-        inputc =  items.join(",");
-        if(inputc.size() > 0) inputc.append(("}"));
-        else inputc = "{}";
-    }
 
-    //qDebug() << "final1" << inputc;
+
+    inputc.remove(QRegExp(",?\\s*.caqtdm_monitor.:\\{([^}]+)\\}\\s*,?", Qt::CaseInsensitive));
+
+    qDebug() << "final1" << inputc;
 
     return success;
 }
