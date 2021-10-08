@@ -8342,7 +8342,7 @@ int CaQtDM_Lib::parseForDisplayRate(QString &inputc, int &rate)
 
     inputc.remove(QRegExp(",?\\s*.caqtdm_monitor.:\\{([^}]+)\\}\\s*,?", Qt::CaseInsensitive));
 
-    qDebug() << "final1" << inputc;
+    //qDebug() << "final1" << inputc;
 
     return success;
 }
