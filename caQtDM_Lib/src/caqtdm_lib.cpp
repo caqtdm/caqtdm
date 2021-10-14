@@ -3586,10 +3586,12 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
             snprintf(asc, MAX_STRING_LENGTH, "JSON parsing error on %s ,should be a better jsong string", (char*) qasc(pv.trimmed()));
         }
         trimmedPV = trimmedPV + "." + JSONString;
+        if (trimmedPV.contains(".{}")) trimmedPV.truncate(trimmedPV.indexOf(".{}"));
     }
 
 #if defined(EPICS_VERSION_INT) && (EPICS_VERSION_INT >= VERSION_INT(3,15,0,0) || EPICS_VERSION_INT >= VERSION_INT(7,0,0,0))
         // do nothing
+        //qDebug() << "for new epics use" << trimmedPV;
 #else
         //qDebug() << "for old epics truncate" << trimmedPV;
         if (trimmedPV.contains(".{")) trimmedPV.truncate(trimmedPV.indexOf(".{"));
@@ -8339,7 +8341,7 @@ int CaQtDM_Lib::parseForDisplayRate(QString &inputc, int &rate)
     // get rid of first { and last }
     // in the call we append the resulting string to the pv
 
-
+    //qDebug() << "before1" << inputc;
     inputc.remove(QRegExp(",?\\s*.caqtdm_monitor.:\\{([^}]+)\\}\\s*,?", Qt::CaseInsensitive));
 
     //qDebug() << "final1" << inputc;
