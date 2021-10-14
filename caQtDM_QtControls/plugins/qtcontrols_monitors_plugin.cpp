@@ -107,10 +107,21 @@ CustomWidgetInterface_Monitors::CustomWidgetInterface_Monitors(QObject *parent):
 {
 }
 
-void CustomWidgetInterface_Monitors::initialize(QDesignerFormEditorInterface *)
+void CustomWidgetInterface_Monitors::initialize(QDesignerFormEditorInterface *formEditor)
 {
     if (d_isInitialized) return;
     d_isInitialized = true;
+
+#ifndef MOBILE
+        // for edition of channel/pv
+        QExtensionManager *manager = formEditor->extensionManager();
+        Q_ASSERT(manager != 0);
+        manager->registerExtensions(new PVTaskMenuFactory(manager),
+                                    Q_TYPEID(QDesignerTaskMenuExtension));
+#else
+    Q_UNUSED(formEditor);
+#endif
+
 }
 
 caBitnamesInterface::caBitnamesInterface(QObject *parent): CustomWidgetInterface_Monitors(parent)

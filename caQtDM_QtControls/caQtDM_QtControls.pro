@@ -130,7 +130,11 @@ SOURCES	+= \
     src/camimedisplay.cpp \
     src/calinedraw.cpp \
     src/wmsignalpropagator.cpp \
-    src/replacemacro.cpp
+    src/replacemacro.cpp \
+    src/JSON.cpp \
+    src/JSONValue.cpp \
+    src/pvdialog.cpp \
+    src/pvtaskmenu.cpp
 
 ADL_EDL_FILES {
     SOURCES	+= src/parseotherfile.cpp
@@ -152,7 +156,11 @@ QT += network
 HEADERS += src/networkaccess.h src/fileFunctions.h \
     src/calinedraw.h \
     src/wmsignalpropagator.h \
-    src/replacemacro.h
+    src/replacemacro.h \
+    src/JSON.h \
+    src/JSONValue.h \
+    src/pvtaskmenu.h \
+    src/pvdialog.h
 SOURCES += src/networkaccess.cpp src/fileFunctions.cpp
 
 contains(QWT_VER_MIN, 0) {

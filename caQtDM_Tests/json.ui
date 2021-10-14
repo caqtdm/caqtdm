@@ -95,14 +95,14 @@ border-radius: 2px;
    <widget class="caTextEntry" name="catextentry">
     <property name="geometry">
      <rect>
-      <x>342</x>
+      <x>340</x>
       <y>138</y>
       <width>100</width>
       <height>22</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">ACM:TEST:AO.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+     <string>ACM:TEST:AO.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:2}}</string>
     </property>
     <property name="colorMode">
      <enum>caLineEdit::Alarm_Static</enum>
@@ -111,7 +111,7 @@ border-radius: 2px;
    <widget class="caTextEntry" name="catextentry_2">
     <property name="geometry">
      <rect>
-      <x>343</x>
+      <x>340</x>
       <y>200</y>
       <width>100</width>
       <height>22</height>
@@ -165,14 +165,14 @@ border-radius: 2px;
    <widget class="caTextEntry" name="catextentry_3">
     <property name="geometry">
      <rect>
-      <x>341</x>
+      <x>340</x>
       <y>31</y>
       <width>100</width>
       <height>22</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">ACM:TEST:AO.{&quot;dbnd&quot;:{&quot;abs&quot;:1.5}, &quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+     <string>ACM:TEST:AO.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1},&quot;dbnd&quot;:{&quot;abs&quot;:2}}</string>
     </property>
    </widget>
    <widget class="caLabel" name="calabel">
@@ -237,7 +237,7 @@ border-radius: 2px;
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">ACM:TEST:AO.{&quot;dbnd&quot;:{&quot;abs&quot;:1.5}}</string>
+     <string>ACM:TEST:AO.{&quot;dbnd&quot;:{&quot;abs&quot;:1.4}}</string>
     </property>
    </widget>
    <widget class="caTextEntry" name="catextentry_6">
@@ -250,7 +250,7 @@ border-radius: 2px;
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">ACM:TEST:AO.{&quot;ts&quot;:{}, &quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
+     <string>ACM:TEST:AO.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:1}}</string>
     </property>
     <property name="keepFocus">
      <bool>true</bool>
@@ -259,14 +259,14 @@ border-radius: 2px;
    <widget class="caTextEntry" name="catextentry_7">
     <property name="geometry">
      <rect>
-      <x>62</x>
-      <y>348</y>
+      <x>600</x>
+      <y>50</y>
       <width>100</width>
       <height>22</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">ACM:TEST:DOUBLE_WAVE.{&quot;arr&quot;:{&quot;s&quot;:2,&quot;i&quot;:2,&quot;e&quot;:8}}</string>
+     <string>ACM:TEST:AO.{&quot;ts&quot;:{}}</string>
     </property>
     <property name="keepFocus">
      <bool>true</bool>
@@ -275,27 +275,27 @@ border-radius: 2px;
    <widget class="caLabel" name="calabel_5">
     <property name="geometry">
      <rect>
-      <x>479</x>
-      <y>64</y>
-      <width>108</width>
+      <x>230</x>
+      <y>340</y>
+      <width>91</width>
       <height>51</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;epics dbnd &lt;/p&gt;&lt;p&gt;wrong syntax&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>epics sync</string>
     </property>
    </widget>
    <widget class="caTextEntry" name="catextentry_8">
     <property name="geometry">
      <rect>
-      <x>610</x>
-      <y>80</y>
+      <x>340</x>
+      <y>350</y>
       <width>100</width>
       <height>22</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">ACM:TEST:AO.{&quot;dbnd&quot;:{&quot;abs&quot;:1.5}</string>
+     <string notr="true">ACM:COUNT:1.{&quot;sync&quot;:{&quot;while&quot;:&quot;blue&quot;}}</string>
     </property>
    </widget>
    <widget class="caWaveTable" name="cawavetable">
@@ -308,7 +308,7 @@ border-radius: 2px;
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">ACM:TEST:DOUBLE_WAVE.{&quot;arr&quot;:{&quot;s&quot;:2,&quot;i&quot;:2,&quot;e&quot;:8}}</string>
+     <string>ACM:TEST:DOUBLE_WAVE.{&quot;arr&quot;:{&quot;e&quot;:10,&quot;i&quot;:2,&quot;s&quot;:1}}</string>
     </property>
     <property name="numberOfColumns">
      <number>10</number>
@@ -404,6 +404,71 @@ border-radius: 2px;
       <set>AlignLeft|AlignLeading</set>
      </property>
     </item>
+   </widget>
+   <widget class="caTextEntry" name="catextentry_9">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>310</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string>ACM:COUNT:1.{&quot;dbnd&quot;:{&quot;abs&quot;:1.5}}</string>
+    </property>
+   </widget>
+   <widget class="caTextEntry" name="catextentry_10">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>260</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string>ACM:COUNT:1.{&quot;dec&quot;:{&quot;n&quot;:2}}</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_6">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>260</y>
+      <width>171</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>epics decimation</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_7">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>290</y>
+      <width>108</width>
+      <height>49</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>epics dbnd</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_8">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>40</y>
+      <width>81</width>
+      <height>49</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>epics ts</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
