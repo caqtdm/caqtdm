@@ -67,10 +67,11 @@ private:
     QWidget *thisWidget;
     QCheckBox *dbndCheckBox, *arrayCheckBox, *syncCheckBox, *rateCheckBox, *tsCheckBox, *decCheckBox;
     QLabel    *pvLabel, *dbndLabel, *arrayLabel, *syncLabel, *rateLabel, *decLabel;
-    QLabel    *arrayLabel_s, *arrayLabel_i, *arrayLabel_e, *tsLabel;
+    QLabel    *arrayLabel_s, *arrayLabel_i, *arrayLabel_e, *tsLabel, *prefixLabel;
+    QLabel    *remarkLabel;
     QSpinBox *arrayIntValue_s, *arrayIntValue_i, *arrayIntValue_e;
     QLineEdit *pvLine, *syncLine, *msgLine;
-    QComboBox *dbndComboBox, *syncComboBox;
+    QComboBox *dbndComboBox, *syncComboBox, *prefixComboBox;
     QDoubleSpinBox *dbndDoubleValue;
     QSpinBox *rateIntValue, *decIntValue;
 

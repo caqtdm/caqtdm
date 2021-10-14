@@ -70,6 +70,11 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
     int syncIndex = -1;
     QString syncValue("");
 
+    int pos;
+    QString prefix("");
+    QStringList plugins;
+    plugins <<""<<"epics3"<<"epics4"<<"archivsf"<<"bsread"<<"modbus"<<"gps";
+
     if(caLed *w = qobject_cast<caLed *>(tic)) PV = w->getPV();
     else if (caLinearGauge *w = qobject_cast<caLinearGauge*>(tic)) PV = w->getPV();
     else if (caCircularGauge *w = qobject_cast<caCircularGauge*>(tic)) PV = w->getPV();
@@ -100,10 +105,17 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
 
     trimmedPV = PV;
 
+    pos = PV.indexOf("://");
+    if(pos != -1) {
+        prefix = PV.mid(0, pos);
+        PV = PV.mid(pos+3);
+        trimmedPV = PV;
+    }
+
     //std::cerr << "\nPV string " << qasc(PV) << "\n";
 
     // separate pv and filters, then parse filters
-    int pos = PV.indexOf(".{");
+    pos = PV.indexOf(".{");
     if(pos != -1) {
         QString JSONString = PV.mid(pos+1);
         trimmedPV = PV.mid(0, pos);
@@ -293,6 +305,19 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
     mainLayout->addWidget(pvLine, 0, 1, 1, 7);
     pvLine->setText(trimmedPV);
 
+    // prefix
+    prefixLabel = new QLabel("Plugin prefix:");
+    remarkLabel = new QLabel("nul: epics3");
+    prefixComboBox = new QComboBox;
+    for(int i=0; i< plugins.size(); i++) prefixComboBox->addItem(plugins.at(i));
+    mainLayout->addWidget(prefixLabel, 1, 0);;
+    mainLayout->addWidget(prefixComboBox, 1, 3);
+    mainLayout->addWidget(remarkLabel, 1, 4);
+    if(prefix.size() > 0) {
+        int indx = 0;
+        if((indx = plugins.indexOf(prefix)) != -1) prefixComboBox->setCurrentIndex(indx);
+    }
+
     // deadband filter
     dbndLabel = new QLabel("Deadband Filter:");
     dbndCheckBox = new QCheckBox;
@@ -300,10 +325,10 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
     dbndComboBox->addItem("abs");
     dbndComboBox->addItem("rel");
     dbndDoubleValue = new QDoubleSpinBox;
-    mainLayout->addWidget(dbndLabel, 1, 0);
-    mainLayout->addWidget(dbndCheckBox, 1, 1);
-    mainLayout->addWidget(dbndComboBox, 1, 3);
-    mainLayout->addWidget(dbndDoubleValue, 1, 5);
+    mainLayout->addWidget(dbndLabel, 2, 0);
+    mainLayout->addWidget(dbndCheckBox, 2, 1);
+    mainLayout->addWidget(dbndComboBox, 2, 3);
+    mainLayout->addWidget(dbndDoubleValue, 2, 5);
     if(deadbandPresent) {
         dbndCheckBox->setChecked(true);
         if(dbndType.contains("abs")) dbndComboBox->setCurrentIndex(0);
@@ -329,14 +354,14 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
     arrayIntValue_s->setValue(0);
     arrayIntValue_i->setValue(1);
     arrayIntValue_e->setValue(-1);
-    mainLayout->addWidget(arrayLabel, 2, 0);
-    mainLayout->addWidget(arrayCheckBox, 2, 1);
-    mainLayout->addWidget(arrayLabel_s, 2, 2);
-    mainLayout->addWidget(arrayLabel_i, 2, 4);
-    mainLayout->addWidget(arrayLabel_e, 2, 6);
-    mainLayout->addWidget(arrayIntValue_s, 2, 3);
-    mainLayout->addWidget(arrayIntValue_i, 2, 5);
-    mainLayout->addWidget(arrayIntValue_e, 2, 7);
+    mainLayout->addWidget(arrayLabel, 3, 0);
+    mainLayout->addWidget(arrayCheckBox, 3, 1);
+    mainLayout->addWidget(arrayLabel_s, 3, 2);
+    mainLayout->addWidget(arrayLabel_i, 3, 4);
+    mainLayout->addWidget(arrayLabel_e, 3, 6);
+    mainLayout->addWidget(arrayIntValue_s, 3, 3);
+    mainLayout->addWidget(arrayIntValue_i, 3, 5);
+    mainLayout->addWidget(arrayIntValue_e, 3, 7);
     if(arrayPresent) {
        arrayCheckBox->setChecked(true);
        if(sValueOK) arrayIntValue_s->setValue(sValueDecoded);
@@ -355,10 +380,10 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
     syncComboBox->addItem("after");
     syncComboBox->addItem("unless");
     syncLine = new QLineEdit;
-    mainLayout->addWidget(syncLabel, 3, 0);
-    mainLayout->addWidget(syncCheckBox, 3, 1);
-    mainLayout->addWidget(syncComboBox, 3, 3);
-    mainLayout->addWidget(syncLine, 3, 5, 1, 3);
+    mainLayout->addWidget(syncLabel, 4, 0);
+    mainLayout->addWidget(syncCheckBox, 4, 1);
+    mainLayout->addWidget(syncComboBox, 4, 3);
+    mainLayout->addWidget(syncLine, 4, 5, 1, 3);
     if(syncPresent) {
         syncCheckBox->setChecked(true);
         if(syncIndex > -1) syncComboBox->setCurrentIndex(syncIndex);
@@ -370,9 +395,9 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
     decCheckBox = new QCheckBox;
     decIntValue = new QSpinBox;
     decIntValue->setMinimum(0);
-    mainLayout->addWidget(decLabel, 4, 0);
-    mainLayout->addWidget(decCheckBox, 4, 1);
-    mainLayout->addWidget(decIntValue, 4, 3);
+    mainLayout->addWidget(decLabel, 5, 0);
+    mainLayout->addWidget(decCheckBox, 5, 1);
+    mainLayout->addWidget(decIntValue, 5, 3);
     if(decPresent) {
         decCheckBox->setChecked(true);
         if(decValueOK) decIntValue->setValue(decValueDecoded);
@@ -381,8 +406,8 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
     // ts filter
     tsLabel = new QLabel("ts Filter:");
     tsCheckBox = new QCheckBox;
-    mainLayout->addWidget(tsLabel, 5, 0);
-    mainLayout->addWidget(tsCheckBox, 5, 1);
+    mainLayout->addWidget(tsLabel, 6, 0);
+    mainLayout->addWidget(tsCheckBox, 6, 1);
     if(tsPresent) {
         tsCheckBox->setChecked(true);
     }
@@ -391,9 +416,9 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
     rateLabel = new QLabel("MaxdisplayRate:");
     rateCheckBox = new QCheckBox;
     rateIntValue = new QSpinBox;
-    mainLayout->addWidget(rateLabel, 6, 0);
-    mainLayout->addWidget(rateCheckBox, 6, 1);
-    mainLayout->addWidget(rateIntValue, 6, 3);
+    mainLayout->addWidget(rateLabel, 7, 0);
+    mainLayout->addWidget(rateCheckBox, 7, 1);
+    mainLayout->addWidget(rateIntValue, 7, 3);
     rateIntValue->setMinimum(1);
     if(displayratePresent) {
        rateCheckBox->setChecked(true);
@@ -403,11 +428,11 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
     // error message
     msgLine = new QLineEdit;
     msgLine->setDisabled(true);
-    mainLayout->addWidget(msgLine, 7,0,1,8);
+    mainLayout->addWidget(msgLine, 8,0,1,8);
     msgLine->setText(errorMessage);
 
     // buttonbox
-    mainLayout->addWidget(buttonBox, 8, 0, 1, 8);
+    mainLayout->addWidget(buttonBox, 9, 0, 1, 8);
 
     setLayout(mainLayout);
     setWindowTitle(tr("Edit PV"));
@@ -441,6 +466,7 @@ void PVDialog::saveState()
 
         QString channel("");
         QString pv = pvLine->text();
+        QString prefix = prefixComboBox->currentText();
         JSONObject root, root1, root2, root3;
         bool B_dbnd = dbndCheckBox->isChecked();
         bool B_rate = rateCheckBox->isChecked();
@@ -488,7 +514,12 @@ void PVDialog::saveState()
         }
 
         if(pv.size() > 0) {
-            channel = pv;
+            if(prefix.size() > 0) {
+                channel = prefix + "://" + pv;
+            } else {
+               channel = pv;
+            }
+
             if(B_dbnd || B_rate || B_array || B_sync || B_ts || B_dec) {
                 JSONValue *value = new JSONValue(root);
                 QString strng = QString::fromWCharArray(value->Stringify().c_str());
