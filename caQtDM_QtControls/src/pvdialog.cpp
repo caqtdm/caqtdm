@@ -317,6 +317,7 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
         int indx = 0;
         if((indx = plugins.indexOf(prefix)) != -1) prefixComboBox->setCurrentIndex(indx);
     }
+    prefixLabel->setToolTip(prefixToolTip);
 
     // deadband filter
     dbndLabel = new QLabel("Deadband Filter:");
@@ -335,6 +336,7 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
         if(dbndType.contains("rel")) dbndComboBox->setCurrentIndex(1);
         if(dbndValueOK) dbndDoubleValue->setValue(dbndValueDecoded);
     }
+    dbndLabel->setToolTip(dbndToolTip);
 
     // array filter
     arrayLabel = new QLabel("Array Filter:");
@@ -368,6 +370,7 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
        if(iValueOK) arrayIntValue_i->setValue(iValueDecoded);
        if(eValueOK) arrayIntValue_e->setValue(eValueDecoded);
     }
+    arrayLabel->setToolTip(arrayToolTip);
 
     // sync filter
     syncLabel = new QLabel("Sync Filter:");
@@ -389,6 +392,7 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
         if(syncIndex > -1) syncComboBox->setCurrentIndex(syncIndex);
         syncLine->setText(syncValue);
     }
+    syncLabel->setToolTip(syncToolTip);
 
     // decimation filter
     decLabel = new QLabel("Decimation:");
@@ -402,6 +406,7 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
         decCheckBox->setChecked(true);
         if(decValueOK) decIntValue->setValue(decValueDecoded);
     }
+    decLabel->setToolTip(decToolTip);
 
     // ts filter
     tsLabel = new QLabel("ts Filter:");
@@ -411,6 +416,7 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
     if(tsPresent) {
         tsCheckBox->setChecked(true);
     }
+    tsLabel->setToolTip(tsToolTip);
 
     // displayrate
     rateLabel = new QLabel("MaxdisplayRate:");
@@ -424,6 +430,7 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
        rateCheckBox->setChecked(true);
        if(rateValueOK) rateIntValue->setValue(rateValueDecoded);
     }
+    rateLabel->setToolTip(rateToolTip);
 
     // error message
     msgLine = new QLineEdit;
@@ -439,7 +446,7 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
     setStyleSheet(stylesheet);
     int dialogWidth  = tic->width()+40;
     int dialogHeight = tic->height()+80;
-    if(dialogWidth < 450) dialogWidth = 450;
+    if(dialogWidth < 500) dialogWidth = 500;
     if(dialogHeight < 350) dialogHeight = 350;
     setFixedWidth(dialogWidth);
     setFixedHeight(dialogHeight);

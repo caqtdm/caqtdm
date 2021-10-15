@@ -42,6 +42,14 @@
 
 #define MAXPVLEN 120
 
+#define prefixToolTip "This prefix defines the plugin that will be used for acquiring data, when nothing is specified the channel access epics3 plugin is used."
+#define decToolTip "This epics filter is used to reduce the number or rate of monitor updates from a channel by an integer factor n."
+#define tsToolTip "This epics filter is used to set the timestamp of the value fetched through the channel to the time the value was fetched."
+#define syncToolTip "This epics filter is used to dynamically enable or disable monitors according to a condition and a state variable declared by the IOC."
+#define dbndToolTip "This epics filter implements a channel-specific monitor deadband."
+#define arrayToolTip "This epics filter is used to retrieve parts of an array (subarrays and strided subarrays)."
+#define rateToolTip "This caQtDM filter is used to limit the maximum display rate of a channel/pv (in Hz)"
+
 QT_BEGIN_NAMESPACE
 class QDialogButtonBox;
 QT_END_NAMESPACE
