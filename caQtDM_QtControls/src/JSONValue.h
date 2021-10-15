@@ -25,7 +25,7 @@
 #ifndef _JSONVALUE_H_
 #define _JSONVALUE_H_
 
-#include "caQtDM_Lib_global.h"
+#include "qtcontrols_global.h"
 #include <vector>
 #include <string>
 
@@ -35,7 +35,7 @@ class JSON;
 
 enum JSONType { JSONType_Null, JSONType_String, JSONType_Bool, JSONType_Number, JSONType_Array, JSONType_Object };
 
-class CAQTDM_LIBSHARED_EXPORT JSONValue
+class QTCON_EXPORT JSONValue
 {
 	friend class JSON;
 	

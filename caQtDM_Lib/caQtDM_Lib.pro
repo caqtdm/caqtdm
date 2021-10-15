@@ -87,9 +87,6 @@ HEADERS += caqtdm_lib.h\
     HEADERS += myQProcess.h  processWindow.h
 }
 
-HEADERS += JSONValue.h JSON.h
-SOURCES += JSONValue.cpp JSON.cpp
-
 #if we want some info from the australian lightsource, define it above
 australian: {
   DEFINES +=_AUSTRALIAN
