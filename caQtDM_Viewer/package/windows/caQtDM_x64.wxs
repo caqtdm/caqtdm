@@ -168,7 +168,7 @@
                         </Component>
                     </Directory>
                 </Directory>
-                <Merge Id="VCRedist" Language="0" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Redist\MSVC\14.28.29325\MergeModules\Microsoft_VC142_CRT_x64.msm" DiskId="1" />
+                <Merge Id="VCRedist" Language="0" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Redist\MSVC\14.29.30133\MergeModules\Microsoft_VC142_CRT_x64.msm" DiskId="1" />
             </Directory>
             <Directory Id="ProgramMenuFolder">
                 <Directory Id="ProgramMenuDir" Name="caQtDM">
