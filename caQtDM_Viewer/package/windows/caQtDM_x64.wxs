@@ -113,7 +113,7 @@
                             <Component Id="controlsystems" Guid="02E16D39-2C06-43FB-9DBF-22DA6A416313" Win64="yes">
                                 <File Id="DEMO_PLUGIN.DLL" Name="demo_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\demo_plugin.dll" />
                                 <File Id="EPICS3_PLUGIN.DLL" Name="epics3_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics3_plugin.dll" />
-                                <!---File Id="EPICS4_PLUGIN.DLL" Name="epics4_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics4_plugin.dll" -->
+                                <File Id="EPICS4_PLUGIN.DLL" Name="epics4_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics4_plugin.dll" />
                                 <File Id="BSREAD_PLUGIN.DLL" Name="bsread_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\bsread_plugin.dll" />
                                 <File Id="MODBUS_PLUGIN.DLL" Name="modbus_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\modbus_plugin.dll" />
                                 <File Id="ENVIRONMENT_PLUGIN.DLL" Name="environment_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\environment_plugin.dll" />
@@ -168,7 +168,7 @@
                         </Component>
                     </Directory>
                 </Directory>
-                <Merge Id="VCRedist" Language="0" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Redist\MSVC\14.28.29325\MergeModules\Microsoft_VC142_CRT_x64.msm" DiskId="1" />
+                <Merge Id="VCRedist" Language="0" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Redist\MSVC\14.29.30133\MergeModules\Microsoft_VC142_CRT_x64.msm" DiskId="1" />
             </Directory>
             <Directory Id="ProgramMenuFolder">
                 <Directory Id="ProgramMenuDir" Name="caQtDM">

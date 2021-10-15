@@ -1333,6 +1333,7 @@ int EpicsGetDescription(char *pv, char *description)
     chid     ch;
     int status;
     pv_desc pvDesc = {'\0'};
+    char * pch;
     dbr_string_t value;
     strcpy(description, "");
 
@@ -1342,8 +1343,14 @@ int EpicsGetDescription(char *pv, char *description)
         C_postMsgEvent(messageWindowPtr, 1, vaPrintf("pv with length=0 (not translated for macro?)\n"));
         return !ECA_NORMAL;
     }
+    // if there is a filter we remove it first
 
-    sprintf(pvDesc, "%s.DESC", pv);
+    strcpy(pvDesc,pv);
+    pch = strstr (pvDesc,".{");
+
+    if (pch) *pch='\0';
+
+    sprintf(pvDesc, "%s.DESC", pvDesc);
 
     // get description
     status = ca_create_channel(pvDesc, NULL, 0, CA_PRIORITY, &ch);

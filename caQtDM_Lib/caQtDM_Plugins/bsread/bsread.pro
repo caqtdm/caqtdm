@@ -16,6 +16,7 @@ CONFIG         += plugin
 INCLUDEPATH    += .
 INCLUDEPATH    += ../
 INCLUDEPATH    += ../../src
+INCLUDEPATH    += ../../../caQtDM_QtControls/src
 HEADERS         = bsread_Plugin.h ../controlsinterface.h \
     bsread_decode.h \
     bsread_channeldata.h \

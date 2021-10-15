@@ -53,6 +53,7 @@
 // therefore we need this include and also link with the epics libraries
 // should probably be changed at some point.
 #include <postfix.h>
+#include <epicsVersion.h>
 
 #ifdef MOBILE_ANDROID
 #  include <unistd.h>
@@ -2991,6 +2992,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         w1->setProperty("ObjectType", caStripPlot_Widget);
 
         QString text, title;
+        QStringList extra_legend,legend;
 
         // addmonitor normally will add a tooltip to show the pv; however here we have more than one pv
         QString tooltip;
@@ -3003,9 +3005,34 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         int NumberOfCurves = min(vars.count(), caStripPlot::MAXCURVES);
 
-        // go through the defined curves and add monitor
+// look for a description replacement for the Legend of stripplot
 
-        if(NumberOfCurves > 0) stripplotWidget->defineCurves(vars, stripplotWidget->getUnits(), stripplotWidget->getPeriod(),  stripplotWidget->width(),  NumberOfCurves);
+        QVariant legenddata = w1->property("Legend");
+        if (legenddata.isValid()) {
+            if (legenddata.type()==QVariant::StringList)
+                extra_legend = legenddata.value<QStringList>();
+
+            if (legenddata.type()==QVariant::String)
+                extra_legend = legenddata.value<QString>().split(";",QString::KeepEmptyParts);
+        }
+        //qDebug() << "extra_legend" << extra_legend << extra_legend.count();
+        if (extra_legend.count()>0){
+            for(int i=0; i< NumberOfCurves; i++) {
+                //qDebug() << "legend for" << legend;
+                if (i<extra_legend.count()){
+                    QString element=extra_legend.at(i);
+                    if (!element.isNull() && !element.isEmpty()){
+                        legend.append(element);
+                    } else legend.append(vars.at(i));
+                }else legend.append(vars.at(i));
+
+            }
+        }else legend=vars;
+
+// go through the defined curves and add monitor
+
+        //qDebug() << "legend" << legend;
+        if(NumberOfCurves > 0) stripplotWidget->defineCurves(legend, stripplotWidget->getUnits(), stripplotWidget->getPeriod(),  stripplotWidget->width(),  NumberOfCurves);
         for(int i=0; i< NumberOfCurves; i++) {
             pv = vars.at(i).trimmed();
             if(pv.size() > 0) {
@@ -3545,9 +3572,30 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
         }
         postMessage(QtDebugMsg, asc);
     }
+
     if (trimmedPV.contains(".{}")){
        trimmedPV.truncate(trimmedPV.indexOf(".{}"));
+    } else if (trimmedPV.contains(".{")) {
+        bool status;
+        char asc[MAX_STRING_LENGTH];
+        int pos = trimmedPV.indexOf(".{");
+        QString JSONString = trimmedPV.mid(pos+1);
+        trimmedPV = trimmedPV.mid(0, pos);
+        status = checkJsonString(JSONString);
+        if(!status) {
+            snprintf(asc, MAX_STRING_LENGTH, "JSON parsing error on %s ,should be a better jsong string", (char*) qasc(pv.trimmed()));
+        }
+        trimmedPV = trimmedPV + "." + JSONString;
+        if (trimmedPV.contains(".{}")) trimmedPV.truncate(trimmedPV.indexOf(".{}"));
     }
+
+#if defined(EPICS_VERSION_INT) && (EPICS_VERSION_INT >= VERSION_INT(3,15,0,0) || EPICS_VERSION_INT >= VERSION_INT(7,0,0,0))
+        // do nothing
+        //qDebug() << "for new epics use" << trimmedPV;
+#else
+        //qDebug() << "for old epics truncate" << trimmedPV;
+        if (trimmedPV.contains(".{")) trimmedPV.truncate(trimmedPV.indexOf(".{"));
+#endif
 
     *pvRep = trimmedPV;
 
@@ -8249,6 +8297,8 @@ int CaQtDM_Lib::parseForDisplayRate(QString &inputc, int &rate)
     // Did it go wrong?
     if (value == NULL) {
         //printf("failed to parse <%s>\n", input);
+        inputc = "{}";
+        return success;
     } else {
         // Retrieve the main object
         JSONObject root;
@@ -8260,7 +8310,6 @@ int CaQtDM_Lib::parseForDisplayRate(QString &inputc, int &rate)
             root = value->AsObject();
             // check for monitor
             if (root.find(L"caqtdm_monitor") != root.end() && root[L"caqtdm_monitor"]->IsObject()) {
-
                 //printf("monitor detected\n");
                 // Retrieve nested object
                 JSONValue *value1 = JSON::Parse(root[L"caqtdm_monitor"]->Stringify().c_str());
@@ -8285,20 +8334,55 @@ int CaQtDM_Lib::parseForDisplayRate(QString &inputc, int &rate)
                     delete(value);
                 }
             }
-
         }
     }
 
     // we have to take this json string out of the global json string given for epics 3.15 and higher
     // get rid of first { and last }
     // in the call we append the resulting string to the pv
-    if((inputc.at(0) == '{') && (inputc.at(inputc.length()-1) == '}')) {
-        QStringList items = inputc.split(",", QString::SkipEmptyParts);
-        int pos = items.indexOf(QRegExp("*caqtdm_monitor*", Qt::CaseInsensitive, QRegExp::Wildcard), 0);
-        if(pos != -1) items.removeAt(pos);  // pos==-1 should never happen
-        inputc = "{" + items.join(",") + "}";
+
+    //qDebug() << "before1" << inputc;
+    inputc.remove(QRegExp(",?\\s*.caqtdm_monitor.:\\{([^}]+)\\}\\s*,?", Qt::CaseInsensitive));
+
+    //qDebug() << "final1" << inputc;
+
+    return success;
+}
+
+bool CaQtDM_Lib::checkJsonString(QString &inputc)
+{
+    // test if we have a valid json string
+
+    bool success = false;
+    char input[MAXPVLEN];
+    int cpylen = qMin(inputc.length(), MAXPVLEN-1);
+    strncpy(input, (char*) qasc(inputc), (size_t) cpylen);
+    input[cpylen] = '\0';
+    JSONValue *value = JSON::Parse(input);
+
+    // Did it go wrong?, when yes then get rid of it
+    if (value == NULL) {
+        success = false;
+        inputc ="{}";
+        //printf("checkJsonString -- failed to parse <%s>\n", input);
+    } else {
+        // however is seems the parsing does not take into account if the last bracket is missing
+        int nbBrackets = 0;
+        for(int counter = 0; counter < inputc.size();  counter++){
+                QString element = inputc.at(counter);
+                if(element.contains("{")) nbBrackets++;
+                else if(element.contains("}")) nbBrackets--;
+        }
+        //qDebug() << "number of brackets" << nbBrackets;
+        if(nbBrackets == 0) {
+            success = true;
+        } else {
+            success = false;
+            inputc = "{}";
+        }
     }
 
+    //qDebug() << "final2" << inputc;
 
     return success;
 }

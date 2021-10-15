@@ -293,6 +293,7 @@ private:
     void TreatOrdinaryValue(QString pv, double value, int32_t idata, QString svalue, QWidget *w);
     bool getSoftChannel(QString pv, knobData &data);
     int parseForDisplayRate(QString &input, int &rate);
+    bool checkJsonString(QString &inputc);
     bool parseForQRectConst(QString &input,double* valueArray);
     void getStatesToggleAndLed(QWidget *widget, const knobData &data, const QString &String, Qt::CheckState &state);
 

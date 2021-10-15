@@ -102,13 +102,23 @@ CustomWidgetInterface_Controllers::CustomWidgetInterface_Controllers(QObject *pa
 {
 }
 
-void CustomWidgetInterface_Controllers::initialize(QDesignerFormEditorInterface *)
+void CustomWidgetInterface_Controllers::initialize(QDesignerFormEditorInterface *formEditor)
 {
     if (d_isInitialized)
         return;
 
     // set this property in order to find out later if we use our controls through the designer or otherwise
     qApp->setProperty("APP_SOURCE", QVariant(QString("DESIGNER")));
+
+#ifndef MOBILE
+        // for edition of channel/pv
+        QExtensionManager *manager = formEditor->extensionManager();
+        Q_ASSERT(manager != 0);
+        manager->registerExtensions(new PVTaskMenuFactory(manager),
+                                    Q_TYPEID(QDesignerTaskMenuExtension));
+#else
+    Q_UNUSED(formEditor);
+#endif
 
     d_isInitialized = true;
 }

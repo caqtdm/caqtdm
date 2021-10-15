@@ -44,6 +44,7 @@ record(mbbi, "88:MultipleBitMBBI") {
 }
 
 
+
 record(ao,"ACM:TEST:AO") {
     field(DESC,"analog output record")
     field(SCAN,"Passive")
@@ -61,7 +62,7 @@ record(ao,"ACM:TEST:AO") {
     field(DOL,"0.000000000000000e+00")
     field(OMSL,"supervisory")
     field(OIF,"Full")
-    field(PREC,"2")
+    field(PREC,"5")
     field(LINR,"NO CONVERSION")
     field(EGUF,"0.0000000e+00")
     field(EGUL,"0.0000000e+00")
@@ -80,14 +81,6 @@ record(ao,"ACM:TEST:AO") {
     field(LLSV,"NO_ALARM")
     field(HSV,"MINOR")
     field(LSV,"NO_ALARM")
-    field(HYST,"0.000000000000000e+00")
-    field(ADEL,"0.000000000000000e+00")
-    field(MDEL,"0.000000000000000e+00")
-    field(SIOL,"0.000000000000000e+00")
-    field(SIML,"0.000000000000000e+00")
-    field(SIMS,"NO_ALARM")
-    field(IVOA,"Continue normally")
-    field(IVOV,"0.000000000000000e+00")
 }
 
 record(ao, "ACM:MOTOR") {
@@ -149,6 +142,36 @@ record(bo,"ACM:TEST:BO") {
     field(IVOA,"Continue normally")
     field(IVOV,"0")
 }
+
+record(bo,"blue") {
+    field(DESC,"binary output record")
+    field(SCAN,"1 second")
+    field(PINI,"NO")
+    field(PHAS,"0")
+    field(EVNT,"0")
+    field(DTYP,"Soft Channel")
+    field(DISV,"1")
+    field(SDIS,"0.000000000000000e+00")
+    field(DISS,"NO_ALARM")
+    field(PRIO,"LOW")
+    field(FLNK,"0.000000")
+    field(OMSL,"supervisory")
+    field(DOL,"0.000000000000000e+00")
+    field(OUT,"0.000000000000000e+00")
+    field(HIGH,"0.000000")
+    field(ZNAM,"false")
+    field(ONAM,"true")
+    field(ZSV,"NO_ALARM")
+    field(OSV,"NO_ALARM")
+    field(COSV,"NO_ALARM")
+    field(SIOL,"0.000000000000000e+00")
+    field(SIML,"0.000000000000000e+00")
+    field(SIMS,"NO_ALARM")
+    field(IVOA,"Continue normally")
+    field(IVOV,"0")
+}
+
+
 record(ai,"ACM:TEST:AI") {
     field(DESC,"analog input record")
     field(SCAN,"Passive")
@@ -356,12 +379,32 @@ record(waveform,"BUSY") {
 
 }
 
+record(ao,"float03") {
+    field(DESC,"analog output")
+    field(SCAN,"Passive")
+    field(PREC,"3")
+    field(EGU,"V")
+    field(DRVH,"1000.0")
+    field(DRVL,"-1000.0")
+    field(HOPR,"900.0")
+    field(LOPR,"0.0")
+    field(HIHI,"900.0")
+    field(LOLO,"0.0")
+    field(HIGH,"450.0")
+    field(LOW,"0.0")
+    field(HHSV,"MAJOR")
+    field(LLSV,"NO_ALARM")
+    field(HSV,"MINOR")
+    field(LSV,"NO_ALARM")
+}
+
+
 record(calc,"ACM:COUNT:1") {
         field(DESC, "counter")
         field(EGU, "value")
         field(CALC, "A+1")
         field(INPA, "ACM:COUNT:1")
-        field(PREC, "2")
+        field(PREC, "5")
         field(SCAN, "1 second")
 }
 
@@ -433,10 +476,6 @@ record(calc, "QUAD:IST:3"){
 	field(EGU,  "kG")
 	field(PREC, "3")
 }
-
-
-
-
 
 record(ao, "QUAD1:SOL:1"){
 	field(DESC, "Sollwert")
@@ -1091,14 +1130,14 @@ record(calc, "SZ")
 
 ###########################################################################################
 
-record(waveform, "ACM:PICTURE"){
-	field(DTYP, "fileread")
-	field(INP, "@bayerpicture.dat")
-        field(DESC, "16bit image waveform")
-        field(FTVL, "SHORT")
-        field(NELM, "16000000")
-        field(SCAN,"1 second")
-}
+#record(waveform, "ACM:PICTURE"){
+#	field(DTYP, "fileread")
+#	field(INP, "@bayerpicture.dat")
+#        field(DESC, "16bit image waveform")
+#        field(FTVL, "SHORT")
+#        field(NELM, "16000000")
+#        field(SCAN,"1 second")
+#}
 
 record(ao, "ACM:PICTURE:WIDTH"){
         field(DESC, "width")
