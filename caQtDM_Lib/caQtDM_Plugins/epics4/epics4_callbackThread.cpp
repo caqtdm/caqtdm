@@ -24,6 +24,7 @@
  */
 
 #include <iostream>
+#include <QDebug>
 using namespace std;
 
 
@@ -33,7 +34,7 @@ namespace epics { namespace pvData {
 
 epics4_CallbackThread::~epics4_CallbackThread()
 {
-cout << "CallbackThread::~CallbackThread()\n";
+qDebug() << "CallbackThread::~CallbackThread()\n";
 }
 
 void epics4_CallbackThread::run()

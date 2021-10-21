@@ -25,7 +25,7 @@
 #ifndef CALLBACKTHREAD_H
 #define CALLBACKTHREAD_H
 
-
+#include <iostream>
 #include <queue>
 #include <epicsThread.h>
 #include <pv/event.h>
