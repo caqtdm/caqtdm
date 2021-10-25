@@ -80,6 +80,7 @@ caQtDM_xdl2ui_Lib{
             ADL_EDL_FILES {
                 LIBS += -L$$CAQTDM_TOP/caQtDM_Parsers/adlParserSharedLib -Wl,-rpath,$$CAQTDM_TOP/caQtDM_Parser/adlParserSharedLib -ladlParser
                 LIBS += -L$$CAQTDM_TOP/caQtDM_Parsers/edlParserSharedLib -Wl,-rpath,$$CAQTDM_TOP/caQtDM_Parser/edlParserSharedLib -ledlParser
+                QMAKE_LFLAGS += '-Wl,-rpath,\'\$$ORIGIN\''
             }
             #LIBS += $$CAQTDM_TOP/caQtDM_Parsers/adlParserStaticLib/libadlParser.a
             #ADL_EDL_FILES {
