@@ -24,8 +24,11 @@
  */
 
 #include "dec_int_from_format.h"
-#include <QRegExp>
-#include <QStringList>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    #include <QRegExp>
+#else
+    #include <QRegularExpression>
+#endif#include <QStringList>
 #include <stdio.h>
 
 #define qstoc(x) ""
@@ -52,8 +55,19 @@ bool DecIntFromFormat::decode()
 		return true;
 	}
         /* add ' in [0-9] to recognize "%'d" */
-        QRegExp intRe("%[0-9]*\\.*[0-9']*d\\b");
-	pos = intRe.indexIn(d_format);
+
+        QString pattern = QString("%[0-9]*\\.*[0-9']*d\\b");
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        QRegExp intRe(pattern);
+        pos = intRe.indexIn(d_format);
+#else
+        QRegularExpression intRe(pattern);
+        QRegularExpressionMatch match = intRe.match(d_format);
+        pos=match.capturedStart();
+
+#endif
+
+
 	if(pos >= 0) /* integer */
 	{
 		d_decDefaults = false;
