@@ -191,6 +191,7 @@ int main(int argc, char *argv[])
     bool attach = false;
     bool minimize= false;
     bool printscreen = false;
+    bool savetoimage = false;
     bool resizing = true;
 
     for (numargs = argc, in = 1; in < numargs; in++) {
@@ -234,6 +235,7 @@ int main(int argc, char *argv[])
                    "  [-dg [<width>x<height>][+<xoffset>-<yoffset>]\n"
                    "  [-httpconfig] will display a network configuration screen at startup\n"
                    "  [-print] will print file and exit\n"
+                   "  [-savetoimage] will save image file and exit\n"
                    "  [-noResize] will prevent resizing\n"
                    "  [-cs defaultcontrolsystempluginname]\n"
                    "  [-option \"xxx=aaa,yyy=bbb, ...\"] options for cs plugins,\n"
@@ -259,6 +261,10 @@ int main(int argc, char *argv[])
              printscreen = true;
              minimize = true;
              resizing = false;
+        } else if(!strcmp(argv[in], "-savetoimage")) {
+            savetoimage = true;
+            minimize = true;
+            resizing = false;
         } else if(!strcmp(argv[in], "-noResize")) {
             resizing = false;
         } else if(!strcmp(argv[in], "-httpconfig")) {
@@ -365,6 +371,7 @@ int main(int argc, char *argv[])
 
     FileOpenWindow window (0, fileName, macroString, attach, minimize, geometry, printscreen, resizing, options);
     window.setWindowIcon (QIcon(":/caQtDM.ico"));
+    if (savetoimage) window.setProperty("savetoimage", true);
     window.show();
 #ifdef CAQTDM_X11
     #if QT_VERSION > QT_VERSION_CHECK(5,0,0)

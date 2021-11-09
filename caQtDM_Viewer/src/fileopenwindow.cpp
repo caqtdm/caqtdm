@@ -775,7 +775,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
         }
         statusBar()->showMessage(msg);
     }
-
+    QString filename_save=qgetenv("CAQTDM_SCREENSHOT_NAME");
     // we wanted a print, do it when acquired, then exit
     if(printandexit) {
         if(countPV > 0 && countNotConnected == 0) {
@@ -800,6 +800,41 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
             exit(1);
         }
     }
+    QVariant var = this->property("savetoimage");
+    if(!var.isNull()) {
+        bool savetoimage = var.toBool();
+        if (savetoimage){
+            QString name="caQtDM";
+            if (!filename_save.isEmpty()){
+                name=filename_save;
+            }
+            name=name.append(".png");
+            if(countPV > 0 && countNotConnected == 0) {
+                if(this->findChildren<CaQtDM_Lib *>().count() == 1) {
+                    CaQtDM_Lib * widget = this->findChild<CaQtDM_Lib *>();
+                    if(countDisplayed > 0 && countDisplayed == countPV) {
+                        printIt++;
+                        if(printIt > 2) {
+
+                            widget->save_graphics(name);
+                            qDebug() << "caQtDM -- file has been printed to "<< name;
+                            qApp->exit(1);
+                            exit(1);
+                        }
+                    }
+                }
+            }
+            if(timeout++ > 4) {    // seems we did not get everything
+                CaQtDM_Lib * widget = this->findChild<CaQtDM_Lib *>();
+                widget->save_graphics(name);
+                qDebug() << "caQtDM -- file has been printed to " << name << ", probably with errors";
+                qApp->exit(1);
+                exit(1);
+            }
+
+        }
+    }
+
 
     // reload windows that were closed to be reloaded (had to be deferrred, due to memory problems)
     if(!reloadList.isEmpty()) {
