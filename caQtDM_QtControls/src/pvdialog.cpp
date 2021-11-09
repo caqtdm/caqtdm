@@ -40,7 +40,6 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
 {
     QString stylesheet("QDialog {background: rgb(154,192,205);} \
                        QLineEdit {color: black; background: rgb(255, 255, 127)};");
-
     QString PV("");
     QString trimmedPV("");
     QString dbndType("");
@@ -298,9 +297,34 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
 
     QGridLayout *mainLayout = new QGridLayout;
 
+    autocompletionCheckBox = new QCheckBox;
+    autocompletionCheckBox->setChecked(true);
+
     // channel
     pvLabel = new QLabel("PV:");
-    pvLine = new QLineEdit;
+    pvLine = new TextEdit;
+    pvLine->setAcceptRichText(false);
+    pvLine->setLineWrapMode(QTextEdit::NoWrap);
+
+    // error message
+    msgLine = new QLineEdit;
+    msgLine->setDisabled(true);
+
+    QFontMetrics metrics(pvLine->font());
+    int lineHeight = metrics.lineSpacing();
+    pvLine->setFixedHeight(1.5*lineHeight);
+    pvLine->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    pvLine->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    completer = new NetworkCompleter(this);
+    completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setWrapAround(false);
+    completer->setCompletionColumn(0);
+    completer->setErrorWidget(msgLine);
+    completer->setCompletionWidget(autocompletionCheckBox);
+    pvLine->setCompleter(completer);
+
     mainLayout->addWidget(pvLabel, 0, 0);
     mainLayout->addWidget(pvLine, 0, 1, 1, 7);
     pvLine->setText(trimmedPV);
@@ -432,14 +456,17 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
     }
     rateLabel->setToolTip(rateToolTip);
 
+    // autocompletion checkbox
+    autoLabel = new QLabel("pv autocompletion:");
+    mainLayout->addWidget(autoLabel, 9, 0);
+    mainLayout->addWidget(autocompletionCheckBox, 9, 1);
+
     // error message
-    msgLine = new QLineEdit;
-    msgLine->setDisabled(true);
     mainLayout->addWidget(msgLine, 8,0,1,8);
     msgLine->setText(errorMessage);
 
     // buttonbox
-    mainLayout->addWidget(buttonBox, 9, 0, 1, 8);
+    mainLayout->addWidget(buttonBox, 9, 2, 2, 6);
 
     setLayout(mainLayout);
     setWindowTitle(tr("Edit PV"));
@@ -472,7 +499,7 @@ void PVDialog::saveState()
             = QDesignerFormWindowInterface::findFormWindow(entry)) {
 
         QString channel("");
-        QString pv = pvLine->text();
+        QString pv = pvLine->toPlainText();
         QString prefix = prefixComboBox->currentText();
         JSONObject root, root1, root2, root3;
         bool B_dbnd = dbndCheckBox->isChecked();
@@ -541,14 +568,12 @@ void PVDialog::saveState()
         }
 
         if (caCamera *w = qobject_cast<caCamera*>(entry)) {
+            Q_UNUSED(w);
             formWindow->cursor()->setProperty("channelData", channel);
         } else {
             formWindow->cursor()->setProperty("channel", channel);
         }
     }
-
-
-
 
     accept();
 }

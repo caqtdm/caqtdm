@@ -26,19 +26,24 @@
 #ifndef PVDIALOG_H
 #define PVDIALOG_H
 
+
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QFontMetrics>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDoubleSpinBox>
 #include <QSpinBox>
+#include <QCompleter>
 #include <qtcontrols_global.h>
 #include <QtControls>
 #include "JSON.h"
 #include "JSONValue.h"
+#include "textedit.h"
+#include "networkmodel.h"
 
 #define MAXPVLEN 120
 
@@ -50,16 +55,13 @@
 #define arrayToolTip "This epics filter is used to retrieve parts of an array (subarrays and strided subarrays)."
 #define rateToolTip "This caQtDM filter is used to limit the maximum display rate of a channel/pv (in Hz)"
 
-QT_BEGIN_NAMESPACE
-class QDialogButtonBox;
-QT_END_NAMESPACE
 
-//! [0]
 class QTCON_EXPORT PVDialog : public QDialog
 {
     Q_OBJECT
 
 public:
+
     explicit PVDialog(QWidget *plugin = 0, QWidget *parent = 0);
 
     QSize sizeHint() const;
@@ -74,11 +76,13 @@ private:
 
     QWidget *thisWidget;
     QCheckBox *dbndCheckBox, *arrayCheckBox, *syncCheckBox, *rateCheckBox, *tsCheckBox, *decCheckBox;
-    QLabel    *pvLabel, *dbndLabel, *arrayLabel, *syncLabel, *rateLabel, *decLabel;
+    QCheckBox *autocompletionCheckBox;
+    QLabel    *pvLabel, *dbndLabel, *arrayLabel, *syncLabel, *rateLabel, *decLabel, *autoLabel;
     QLabel    *arrayLabel_s, *arrayLabel_i, *arrayLabel_e, *tsLabel, *prefixLabel;
     QLabel    *remarkLabel;
     QSpinBox *arrayIntValue_s, *arrayIntValue_i, *arrayIntValue_e;
-    QLineEdit *pvLine, *syncLine, *msgLine;
+    QLineEdit *syncLine, *msgLine;
+    TextEdit *pvLine;
     QComboBox *dbndComboBox, *syncComboBox, *prefixComboBox;
     QDoubleSpinBox *dbndDoubleValue;
     QSpinBox *rateIntValue, *decIntValue;
@@ -87,7 +91,8 @@ private:
 
     QWidget *entry;
 
+    NetworkCompleter *completer;
+
 };
-//! [0]
 
 #endif
