@@ -190,7 +190,7 @@ private:
         //std::cerr << "create request\n";
         QString FindRecord_Srv = (QString)  qgetenv("CAQTDM_FINDRECORD_SRV");
         if (FindRecord_Srv.isEmpty()){
-            FindRecord_Srv="http://iocinfo.psi.ch:9090/api/v2/records?";// for PSI
+            FindRecord_Srv="http://iocinfo.psi.ch/api/v2/records?";// for PSI
         }
         QString FindRecord_facility = (QString)  qgetenv("CAQTDM_FINDRECORD_FACILITY");
         if (FindRecord_facility.isEmpty()){
