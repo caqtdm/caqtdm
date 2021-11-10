@@ -194,10 +194,7 @@ private:
         }
         QString FindRecord_facility = (QString)  qgetenv("CAQTDM_FINDRECORD_FACILITY");
         if (FindRecord_facility.isEmpty()){
-            FindRecord_facility=qgetenv("SYSDB_ENV");// for PSI
-            if (FindRecord_facility.isEmpty()){
                 FindRecord_facility=".*";// for all
-             }
         }
         QString FindRecord_Limit = (QString)  qgetenv("CAQTDM_FINDRECORD_LIMIT");
         if (FindRecord_Limit.isEmpty()){
