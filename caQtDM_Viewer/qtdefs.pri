@@ -305,6 +305,8 @@ DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 # epics4plugin is now working with the epics 7 API and PVA can be used
 # filter feature for epics 7 is now available
 # caStripPlot: feature dynamic property "Legend" for rename the channel to a user defined
+# PV-Editor for Designer with network based auto completion
+# new commandline option [-savetoimage] to save screenshots as PNG files
 
 
 # 4.3.0
