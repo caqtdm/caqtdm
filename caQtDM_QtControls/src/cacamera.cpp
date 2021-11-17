@@ -128,7 +128,7 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
 
 void caCamera::setColormodeStrings()
 {
-    colorModeString <<  "Mono" << "RGB1_CA" << "RGB2_CA" << "RGB3_CA" << "BayerRG_8" << "BayerGB_8" << "BayerGR_8" << "BayerBG_8" <<
+    colorModeString <<  "Mono"<< "Mono12p" << "Mono10p" << "Mono10Packed"<< "Mono8" << "RGB1_CA" << "RGB2_CA" << "RGB3_CA" << "BayerRG_8" << "BayerGB_8" << "BayerGR_8" << "BayerBG_8" <<
                         "BayerRG_12" << "BayerGB_12" << "BayerGR_12" << "BayerBG_12" <<
                         "RGB_8" << "BGR_8" << "RGBA_8" << "BGRA_8" <<
                         "YUV444" << "YUV422"<< "YUV411" << "YUV421";
@@ -1145,6 +1145,8 @@ void caCamera::CameraDataConvert(int sector, int sectorcount, SyncMinMax* MinMax
     int elementSize = 1;
     float correction = 1.0;
 
+    if (savedData==nullptr) return;
+
     if(m_datatype == caINT) elementSize = 2;
     else if(m_datatype == caLONG || m_datatype == caFLOAT) elementSize = 4;
     else if(m_datatype == caDOUBLE) elementSize = 8;
@@ -1697,6 +1699,51 @@ void caCamera::buf_unpack_12bitpacked_lsb(void* target, void* source, size_t des
     }
 }
 
+void caCamera::buf_unpack_10bitpacked(void* target, void* source, size_t destcount, size_t targetcount)
+{
+    size_t x1, x2;
+    unsigned char b0, b1, b2;
+    for (x1 = 0, x2 = 0; x2 < (destcount / 2); x1 = x1 + 3, x2 = x2 + 2) {
+        b0 = ((char*) source) [x1];
+        b1 = ((char*) source) [x1 + 1];
+        b2 = ((char*) source) [x1 + 2];
+        ((unsigned short*) target) [x2] = ((b1 & 0x30) >> 4 ) + (b0 << 2);
+        ((unsigned short*) target) [x2 + 1] = ((b1 & 0x03) ) + (b2  << 2);
+        if (targetcount<x1+3) return;
+    }
+}
+
+void caCamera::buf_unpack_10bitp(void* target, void* source, size_t destcount, size_t targetcount)
+{
+    size_t x1, x2;
+    unsigned char b0, b1, b2, b3, b4;
+    for (x1 = 0, x2 = 0; x2 < (destcount / 2); x1 = x1 + 5, x2 = x2 + 4) {
+        b0 = ((char*) source) [x1];
+        b1 = ((char*) source) [x1 + 1];
+        b2 = ((char*) source) [x1 + 2];
+        b3 = ((char*) source) [x1 + 3];
+        b4 = ((char*) source) [x1 + 4];
+
+        //((unsigned short*) target) [x2] = ((b1 & 0xC0)>>6) + (b0<<2);   // valid for our actual basler camera
+        //((unsigned short*) target) [x2 + 1] = ((b1 & 0x3F)<<4) + ((b2 & 0xF0) >> 4);
+        //((unsigned short*) target) [x2 + 2] = ((b2 & 0x0F)<<6) + ((b3 & 0xFC) >> 2);
+        //((unsigned short*) target) [x2 + 3] = ((b1 & 0x03)<<8) + (b4);
+
+        ((unsigned short*) target) [x2] = ((b1 & 0x03)) + (b0);   // valid for our actual basler camera
+        ((unsigned short*) target) [x2 + 1] = ((b1 & 0xFC)>>2) + ((b2 & 0x0F) << 6);
+        ((unsigned short*) target) [x2 + 2] = ((b2 & 0xF0)>>4) + ((b3 & 0x1F) << 4);
+        ((unsigned short*) target) [x2 + 3] = ((b3 & 0xC0)>>6) + (b4<<2);
+
+
+        if (targetcount<x1+5) return;
+    }
+}
+
+
+
+
+
+
 QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
 {
     QSize resultSize;
@@ -1704,6 +1751,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
     int tile = BAYER_COLORFILTER_BGGR;; // bayer tile
     bool bayerMode = false;
     bool yuvMode = false;
+    bool monoMode = false;
 
     m_datatype = datatype;
 
@@ -1772,9 +1820,57 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
     void (caCamera::*CameraDataConvert) (int sector, int sectorcount, SyncMinMax* MinMax, QSize resultSize, int datasize) = NULL;
 
     //printf("datatype=%d %s colormode=%d %s\n", datatype, caTypeStr[datatype], thisColormode, qasc(colorModeString.at(thisColormode)));
-
+    printf("thisColormode %i\n",thisColormode);
+    fflush(stdout);
     switch (thisColormode) {
     case Mono:
+        savedData = data;
+        CameraDataConvert = &caCamera::CameraDataConvert;
+        break;
+
+    case Mono12p:{
+        bitsPerElement = 16;
+        monoMode=true;
+        thisColormode = Mono;
+        m_datatype = caINT;
+        if(thisPackingmode == LSB12Bit) buf_unpack_12bitpacked_lsb(rgb, (uchar*) data, sx*sy*2,datasize);
+        if(thisPackingmode == MSB12Bit) buf_unpack_12bitpacked_msb(rgb, (uchar*) data, sx*sy*2,datasize);
+        if(thisPackingmode == packNo)   memcpy(rgb,data,datasize);
+        savedData= (char *) rgb;
+        savedSizeNew = 2*sx*sy*sizeof(uint);
+        CameraDataConvert = &caCamera::CameraDataConvert;
+        break;
+        }
+    case Mono10p:
+        bitsPerElement = 10;
+        monoMode=true;
+        thisColormode = Mono;
+        m_datatype = caINT;
+        buf_unpack_10bitp(rgb, (uchar*) data, sx*sy*2,datasize);
+        savedData= (char *) rgb;
+        savedSizeNew = 2*sx*sy*sizeof(uint);
+        CameraDataConvert = &caCamera::CameraDataConvert;
+        break;
+    case Mono10Packed:
+        bitsPerElement = 10;
+        monoMode=true;
+        thisColormode = Mono;
+        m_datatype = caINT;
+        buf_unpack_10bitpacked(rgb, (uchar*) data, sx*sy*2,datasize);
+        savedData= (char *) rgb;
+        savedSizeNew = 2*sx*sy*sizeof(uint);
+        CameraDataConvert = &caCamera::CameraDataConvert;
+        break;
+
+    case Mono8:
+        bitsPerElement = 8;
+        monoMode=true;
+        thisColormode = Mono;
+        savedData=data;
+        m_datatype = caCHAR;
+        CameraDataConvert = &caCamera::CameraDataConvert;
+        break;
+
     case RGB1_CA:
     case RGB2_CA:
     case RGB3_CA:
@@ -1937,7 +2033,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         if(maxvalue > 0xFFFFFFFE) maxvalue = 0xFFFFFFFE;
     }
 
-    if(bayerMode || yuvMode) {
+    if(bayerMode || yuvMode || monoMode) {
         thisColormode = auxMode;
         m_datatype = auxDatatype;
     }

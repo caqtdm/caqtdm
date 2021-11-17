@@ -134,7 +134,7 @@ public:
 
     enum colormap {as_is = 0, color_to_mono, mono_to_wavelength, mono_to_hot, mono_to_heat, mono_to_jet, mono_to_custom};
 
-    enum colormode {Mono, RGB1_CA, RGB2_CA, RGB3_CA, BayerRG_8, BayerGB_8, BayerGR_8, BayerBG_8, BayerRG_12, BayerGB_12, BayerGR_12, BayerBG_12, RGB_8 ,BGR_8 ,RGBA_8 ,BGRA_8 , YUV444, YUV422, YUV411, YUV421};
+    enum colormode {Mono,Mono12p,Mono10p,Mono10Packed,Mono8, RGB1_CA, RGB2_CA, RGB3_CA, BayerRG_8, BayerGB_8, BayerGR_8, BayerBG_8, BayerRG_12, BayerGB_12, BayerGR_12, BayerBG_12, RGB_8 ,BGR_8 ,RGBA_8 ,BGRA_8 , YUV444, YUV422, YUV411, YUV421};
 
     enum packingmode {packNo, MSB12Bit, LSB12Bit, Reversed};
 
@@ -325,6 +325,8 @@ private:
 
     void buf_unpack_12bitpacked_lsb(void* target, void* source, size_t destcount, size_t targetcount);
     void buf_unpack_12bitpacked_msb(void* target, void* source, size_t destcount, size_t targetcount);
+    void buf_unpack_10bitpacked(void* target, void* source, size_t destcount, size_t targetcount);
+    void buf_unpack_10bitp(void* target, void* source, size_t destcount, size_t targetcount);
 
     template <typename pureData>
     void calcImage (pureData *ptr,  colormode mode, QVector<uint> &LineData, long &i, int &ystart, int &yend, float correction,
