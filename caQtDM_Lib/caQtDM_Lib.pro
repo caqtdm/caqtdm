@@ -22,6 +22,8 @@ contains(QT_VER_MAJ, 5) {
     DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 }
 
+FORMS += ../caQtDM_Viewer/src/main.ui
+
 CONFIG += warn_on
 
 TARGET = caQtDM_Lib

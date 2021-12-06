@@ -9450,3 +9450,192 @@ ControlsInterface * CaQtDM_Lib::getPluginInterface(QWidget *w)
     }
 }
 
+#include "loadPlugins.h"
+#include "ui_main.h"
+
+extern "C"  {
+
+    QMainWindow *myWidget;
+
+    void myMessageOutput(QtMsgType type, const char *msg)
+    {
+        switch (type) {
+        case QtDebugMsg:
+            fprintf(stderr, "Debug: %s\n", msg);
+            break;
+        case QtWarningMsg:
+            //fprintf(stderr, "Warning: %s\n", msg);
+            break;
+        case QtCriticalMsg:
+            fprintf(stderr, "Critical: %s\n", msg);
+            break;
+        case QtFatalMsg:
+            fprintf(stderr, "Fatal: %s\n", msg);
+            abort();
+        }
+    }
+
+    int caQtDM_Create (char* filename) {
+        int argc = 0;
+        char *argv[1];
+        Ui::MainWindow ui;
+
+        // set for epics longer waveforms
+        QString maxBytes = (QString)  qgetenv("EPICS_CA_MAX_ARRAY_BYTES");
+        if(maxBytes.size() == 0) setenv("EPICS_CA_MAX_ARRAY_BYTES", "150000000", 1);
+
+        QMap<QString, ControlsInterface*> interfaces;
+        QMap<QString, QString> OptionList;
+
+        QString macroS;
+        QApplication app(argc, argv);
+        QApplication::setOrganizationName("Paul Scherrer Institut");
+        QApplication::setApplicationName("caQtDM");
+
+
+        QString FileName(filename);
+        searchFile *filecheck = new searchFile(FileName);
+        FileName=filecheck->findFile();
+        delete filecheck;
+        if (FileName.isNull()) {
+            qDebug() << "file" << FileName << "could not be loaded -> exit";
+            exit(-1);
+        } else {
+            qDebug() << "file" << FileName << "will be loaded";
+        }
+
+        QMainWindow *widget = new QMainWindow;
+        ui.setupUi(widget);
+        widget->show();
+
+        MessageWindow *messageWindow = new MessageWindow(widget);
+        MutexKnobData *mutexKnobData = new MutexKnobData();
+
+        messageWindow->setAllowedAreas(Qt::TopDockWidgetArea);
+        QGridLayout *gridLayoutCentral = new QGridLayout(ui.centralwidget);
+        QGridLayout *gridLayout = new QGridLayout();
+        gridLayoutCentral->addLayout(gridLayout, 0, 0, 1, 1);
+        gridLayout->addWidget(messageWindow, 0, 0, 1, 1);
+        messageWindow->show();
+
+        // load the control plugins (must be done after setting the environment)
+        loadPlugins loadplugins;
+        if (!loadplugins.loadAll(interfaces, mutexKnobData, messageWindow, OptionList )) {
+            //QMessageBox::critical(this, "Error", "Could not load any plugin");
+            QMessageBox(QMessageBox::Information, "Error", "Could not load any plugin", QMessageBox::Yes|QMessageBox::No).exec();
+        } else {
+            if(!interfaces.isEmpty()) {
+                QMapIterator<QString, ControlsInterface *> i(interfaces);
+                while (i.hasNext()) {
+                    char asc[MAX_STRING_LENGTH];
+                    i.next();
+                    snprintf(asc, MAX_STRING_LENGTH, "Info: plugin %s loaded", qasc(i.key()));
+                    messageWindow->postMsgEvent(QtWarningMsg, asc);
+                }
+            }
+        }
+
+        qInstallMsgHandler(myMessageOutput);
+        QMainWindow *pWindow =  new CaQtDM_Lib(0, FileName, macroS, mutexKnobData, interfaces);
+        pWindow->show();
+
+        myWidget = pWindow;
+        return app.exec();
+    }
+
+    int getDataValue(char *object, char *pv, int pvMaxLength, double *value)
+    {
+        bool ok = false;
+        QList<QWidget *> all = myWidget->findChildren<QWidget *>();
+        foreach(QWidget* widget, all) {
+            if(widget->objectName().contains(object)) {
+                if (caSlider *w = qobject_cast<caSlider *>(widget)) {
+                    *value = w->getSliderValue();
+                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    ok = true;
+                } else if (caNumeric *w = qobject_cast<caNumeric *>(widget)) {
+                    *value = w->value();
+                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    ok = true;
+                } else if (caTextEntry *w = qobject_cast<caTextEntry *>(widget)) {
+                    *value = w->text().toDouble();
+                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    ok = true;
+                } else if (caSpinbox *w = qobject_cast<caSpinbox *>(widget)) {
+                    *value = w->value();
+                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    ok = true;
+                } else if (caLineEdit *w = qobject_cast<caLineEdit *>(widget)) {
+                    *value = w->text().toDouble();
+                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    ok = true;
+                } else if (caMeter *w = qobject_cast<caMeter *>(widget)) {
+                    *value = w->value();
+                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    ok = true;
+                } else if (caThermo *w = qobject_cast<caThermo*>(widget)) {
+                    *value = w->value();
+                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    ok = true;
+                }
+            }
+        }
+        return ok;
+    }
+
+    int getDataString(char *object, char *pv, int pvMaxLength, char *value, int valueMaxLength)
+    {
+        bool ok = false;
+        QList<QWidget *> all = myWidget->findChildren<QWidget*>();
+        foreach(QWidget* widget, all) {
+
+            if(widget->objectName().contains(object)) {
+
+                if (caMenu *w = qobject_cast<caMenu*>(widget)) {
+                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    strncpy(value,  qasc(w->currentText()), qMin(valueMaxLength, w->currentText().size()));
+                    ok = true;
+                }
+            }
+        }
+        return ok;
+    }
+
+    int setDataValue(char *object, double value, char *unit)
+    {
+        bool ok = false;
+        QString Unit(unit);
+        QList<QWidget *> all = myWidget->findChildren<QWidget *>();
+        foreach(QWidget* widget, all) {
+            if(widget->objectName().contains(object)) {
+
+                if (caSlider *w = qobject_cast<caSlider *>(widget)) {
+                    w->setValue(value);
+                    ok = true;
+                } else if (caTextEntry *w = qobject_cast<caTextEntry *>(widget)) {
+                    w->setValue(value);
+                    ok = true;
+                } else if (caNumeric *w = qobject_cast<caNumeric *>(widget)) {
+                    w->setValue(value);
+                    ok = true;
+                } else if (caSpinbox *w = qobject_cast<caSpinbox *>(widget)) {
+                    w->setValue(value);
+                    ok = true;
+                } else if (caLineEdit *w = qobject_cast<caLineEdit *>(widget)) {
+                    w->setValue(value, Unit);
+                    ok = true;
+                } else if (caMeter *w = qobject_cast<caMeter *>(widget)) {
+                    w->setValueUnits(value, Unit);
+                    ok = true;
+                } else if (caThermo *w = qobject_cast<caThermo*>(widget)) {
+                    w->setValue(value);
+                    ok = true;
+                } else if (caByte *w = qobject_cast<caByte*>(widget)) {
+                    w->setValue((long) value);
+                    ok = true;
+                }
+            }
+        }
+        return ok;
+    }
+}
