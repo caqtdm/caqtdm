@@ -41,6 +41,10 @@
 #endif
 #include "cacamera.h"
 
+#include <QtZlib/zconf.h>
+#include <QtZlib/zlib.h>
+
+
 // Clamp out of range values
 #define CLAMP(t) (((t)>255)?255:(((t)<0)?0:(t)))
 
@@ -89,6 +93,7 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
 
     setColormodeStrings();
     setPackingModeStrings();
+    setCompressionModeStrings();
     setup();
 
     setColormode(Mono);
@@ -118,6 +123,7 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     thisGreenCoefficient = 1.0;
     thisBlueCoefficient = 1.0;
 
+    thisCompressionmode=non;
     startTimer(1000);
 
     // __itt_thread_set_name("My worker thread");
@@ -137,6 +143,11 @@ void caCamera::setColormodeStrings()
 void caCamera::setPackingModeStrings()
 {
     packingModeString <<  "packNo" << "MSB12Bit" <<  "LSB12Bit" << "Reversed";
+}
+
+void caCamera::setCompressionModeStrings()
+{
+    compressionModeString <<  "non" << "Zlib" << "JPG";
 }
 
 void caCamera::setDecodemodeStr(QString mode)
@@ -188,6 +199,30 @@ bool caCamera::testPackingmodeStr(QString mode)
     return false;
 }
 
+void caCamera::setCompressionmodeStr(QString mode)
+{
+    if(mode.length() == 0) return;
+    //printf("Packingmodeset with %s\n", qasc(mode));
+    for(int i = 0; i< compressionModeString.count(); i++) {
+        if(mode == compressionModeString.at(i)) {
+            thisCompressionmode = (compressionmode) i;
+            if(compressionmodeCombo != (QComboBox*)Q_NULLPTR) compressionmodeCombo->setCurrentIndex(thisCompressionmode);
+        }
+    }
+}
+
+bool caCamera::testCompressionmodeStr(QString mode)
+{
+    if(mode.length() == 0) return false;
+    //printf("Packingmodeset with %s\n", qasc(mode));
+    for(int i = 0; i< compressionModeString.count(); i++) {
+        if(mode == compressionModeString.at(i)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void caCamera::setDecodemodeNum(int mode)
 {
     //printf("colormodeset with %d\n", mode);
@@ -220,6 +255,23 @@ void caCamera::setPackingmodeNum(double mode)
     if(packingmodeCombo != (QComboBox*)Q_NULLPTR) packingmodeCombo->setCurrentIndex(thisPackingmode);
 }
 
+void caCamera::setCompressionmodeNum(int mode)
+{
+    //printf("compressionmodeset with %d\n", mode);
+    thisCompressionmode = (compressionmode) mode;
+    if(compressionmodeCombo != (QComboBox*)Q_NULLPTR) compressionmodeCombo->setCurrentIndex(thisCompressionmode);
+}
+
+void caCamera::setCompressionmodeNum(double mode)
+{
+    //printf("compressionmodeset with %d\n", (int) mode);
+    int intermed = (int)mode;
+    thisCompressionmode = (compressionmode) intermed;
+    if(compressionmodeCombo != (QComboBox*)Q_NULLPTR) compressionmodeCombo->setCurrentIndex(thisCompressionmode);
+}
+
+
+
 bool caCamera::isPropertyVisible(Properties property)
 {
     return designerVisible[property];
@@ -241,10 +293,14 @@ void caCamera::deleteWidgets()
     if(labelMin != (caLineEdit *)Q_NULLPTR)             delete labelMin;
     if(labelMax != (caLineEdit *)Q_NULLPTR)             delete labelMax;
     if(labelColormodeText != (caLabel *)Q_NULLPTR)      delete labelColormodeText;
-    if(labelPackingmodeText != (caLabel *)Q_NULLPTR)   delete labelPackingmodeText;
+    if(labelPackingmodeText != (caLabel *)Q_NULLPTR)    delete labelPackingmodeText;
+    if(labelCompressionmodeText != (caLabel *)Q_NULLPTR)    delete labelCompressionmodeText;
+
 
     if(colormodeCombo != (QComboBox *)Q_NULLPTR)        delete colormodeCombo;
     if(packingmodeCombo != (QComboBox *)Q_NULLPTR)      delete packingmodeCombo;
+    if(compressionmodeCombo != (QComboBox *)Q_NULLPTR)  delete compressionmodeCombo;
+
 
     if(checkAutoText != (caLabel *)Q_NULLPTR)           delete checkAutoText;
     if(autoW != (QCheckBox *)Q_NULLPTR)                 delete autoW;
@@ -278,8 +334,10 @@ void caCamera::initWidgets()
     labelMinText = (caLabel *)Q_NULLPTR;
     labelColormodeText = (caLabel *)Q_NULLPTR;
     labelPackingmodeText = (caLabel *)Q_NULLPTR;
+    labelCompressionmodeText = (caLabel *)Q_NULLPTR;
     colormodeCombo = (QComboBox *)Q_NULLPTR;
     packingmodeCombo = (QComboBox *)Q_NULLPTR;
+    compressionmodeCombo = (QComboBox *)Q_NULLPTR;
 
     intensityText = (caLabel *)Q_NULLPTR;
     checkAutoText = (caLabel *)Q_NULLPTR;
@@ -496,6 +554,11 @@ void caCamera::packingmodeComboSlot(int num) {
     setPackingmodeNum(num);
 }
 
+void caCamera::compressionmodeComboSlot(int num) {
+    setCompressionmodeNum(num);
+}
+
+
 void caCamera::setup()
 {
     deleteWidgets();
@@ -514,16 +577,26 @@ void caCamera::setup()
         intensityText = new caLabel(this);
         intensityText->setText(" x/y/z: ");
         labelColormodeText = new caLabel(this);
-        labelColormodeText->setText("Colormode: ");
+        labelColormodeText->setText("Color: ");
         labelPackingmodeText = new caLabel(this);
-        labelPackingmodeText->setText("Packingmode: ");
+        labelPackingmodeText->setText("Packing: ");
+        labelCompressionmodeText = new caLabel(this);
+        labelCompressionmodeText->setText("Compression: ");
+
         colormodeCombo = new QComboBox(this);
         packingmodeCombo = new QComboBox(this);
+        compressionmodeCombo = new QComboBox(this);
+
 
         for(int i=0; i<colorModeString.count(); i++) colormodeCombo->addItem(colorModeString.at(i));
         for(int i=0; i<packingModeString.count(); i++) packingmodeCombo->addItem(packingModeString.at(i));
+        for(int i=0; i<compressionModeString.count(); i++) compressionmodeCombo->addItem(compressionModeString.at(i));
+
         connect(colormodeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(colormodeComboSlot(int)));
         connect(packingmodeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(packingmodeComboSlot(int)));
+        connect(compressionmodeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(compressionmodeComboSlot(int)));
+
+        compressionmodeCombo->setCurrentIndex(thisCompressionmode);
 
         nbUpdatesText = new caLabel(this);
 
@@ -538,6 +611,7 @@ void caCamera::setup()
         labelMinText->setScaleMode(caLabel::None);
         labelColormodeText->setScaleMode(caLabel::None);
         labelPackingmodeText->setScaleMode(caLabel::None);
+        labelCompressionmodeText->setScaleMode(caLabel::None);
 
         checkAutoText->setScaleMode(caLabel::None);
         intensity->setScaleMode(caLabel::None);
@@ -549,8 +623,10 @@ void caCamera::setup()
         labelMinText->setFont(font);
         labelColormodeText->setFont(font);
         labelPackingmodeText->setFont(font);
+        labelCompressionmodeText->setFont(font);
         colormodeCombo->setFont(font);
         packingmodeCombo->setFont(font);
+        compressionmodeCombo->setFont(font);
 
         checkAutoText->setFont(font);
         intensity->setFont(font);
@@ -560,6 +636,8 @@ void caCamera::setup()
         labelMinText->setBackground(QColor(0,0,0,0));
         labelColormodeText->setBackground(QColor(0,0,0,0));
         labelPackingmodeText->setBackground(QColor(0,0,0,0));
+        labelCompressionmodeText->setBackground(QColor(0,0,0,0));
+
 
         checkAutoText->setBackground(QColor(0,0,0,0));
         intensity->setBackground(QColor(0,0,0,0));
@@ -596,6 +674,9 @@ void caCamera::setup()
         colormodeLayout->addWidget(colormodeCombo, Qt::AlignLeft);
         colormodeLayout->addWidget(labelPackingmodeText, Qt::AlignLeft);
         colormodeLayout->addWidget(packingmodeCombo, Qt::AlignLeft);
+        colormodeLayout->addWidget(labelCompressionmodeText, Qt::AlignLeft);
+        colormodeLayout->addWidget(compressionmodeCombo, Qt::AlignLeft);
+
         colormodeLayout->addStretch(2);
 
         colormodesWidget = new QWidget;
@@ -1034,6 +1115,21 @@ void caCamera::InitLoopdata(int &ystart, int &yend, long &i, int increment, int 
     i = resultSize.width() * ystart * increment;
 }
 
+void caCamera::reallocate_central_image()
+{
+
+    imageMutex.lock();
+    if(image != (QImage *)Q_NULLPTR){
+        if ((image->width()!=m_width)||(image->height()!=m_height)){
+            delete image;
+            image = (QImage *)Q_NULLPTR;
+        }
+    }
+    if (image == (QImage *)Q_NULLPTR)
+        image = new QImage(m_width,m_height,QImage::Format_RGB32);
+    imageMutex.unlock();
+}
+
 // I leave the code now as it was, while here we use uint and in calcimage QVector<uint>. I can merge later on.
 template <typename pureData>
 void caCamera::calcImageMono (pureData *ptr,  uint *LineData, long &i, int &ystart, int &yend, float correction, int datasize, QSize resultSize,
@@ -1188,23 +1284,38 @@ void caCamera::CameraDataConvert(int sector, int sectorcount, SyncMinMax* MinMax
 
         switch (m_datatype) {
         case caCHAR:
-            if((ulong) i*sizeof(uchar) >= (uint) datasize) return;
+            if((ulong) i*sizeof(uchar) >= (uint) datasize){
+                free(LineData);
+                return;
+            }
             calcImageMono ((uchar*) savedData, LineData, i, ystart, yend, correction, datasize, resultSize, Max, Min);
             break;
         case caINT:
-            if((ulong) i*sizeof(ushort) >= (uint) datasize) return;
+            if((ulong) i*sizeof(ushort) >= (uint) datasize) {
+                free(LineData);
+                return;
+            }
             calcImageMono ((ushort*) savedData, LineData, i, ystart, yend, correction, datasize/elementSize, resultSize, Max, Min);
             break;
         case caLONG:
-            if((ulong) i*sizeof(uint) >= (uint) datasize) return;
+            if((ulong) i*sizeof(uint) >= (uint) datasize) {
+                free(LineData);
+                return;
+            }
             calcImageMono ((uint*) savedData, LineData, i, ystart, yend, correction, datasize/elementSize, resultSize, Max, Min);
             break;
         case caFLOAT:
-            if((ulong) i*sizeof(float) >= (uint) datasize) return;
+            if((ulong) i*sizeof(float) >= (uint) datasize) {
+                free(LineData);
+                return;
+            }
             calcImageMono ((float*) savedData,  LineData, i, ystart, yend, correction, datasize/elementSize, resultSize, Max, Min);
             break;
         case caDOUBLE:
-            if((ulong) i*sizeof(double) >= (uint) datasize) return;
+            if((ulong) i*sizeof(double) >= (uint) datasize) {
+                free(LineData);
+                return;
+            }
             calcImageMono ((double*) savedData, LineData, i, ystart, yend, correction, datasize/elementSize, resultSize, Max, Min);
             break;
         default:
@@ -1748,7 +1859,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
 {
     QSize resultSize;
     uint Max[2], Min[2];
-    int tile = BAYER_COLORFILTER_BGGR;; // bayer tile
+    int tile = BAYER_COLORFILTER_BGGR;// bayer tile
     bool bayerMode = false;
     bool yuvMode = false;
     bool monoMode = false;
@@ -1767,16 +1878,88 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
     resultSize.setWidth(m_width);
     resultSize.setHeight(m_height);
 
+    switch (thisCompressionmode){
+    case non:{
+        decompressedData.resize(0);
+        break;
+    }
+    case Zlib:{
+        uchar* data2=(uchar*)data;
+        ulong expectedSize = uint((data2[0] << 24) | (data2[1] << 16) |
+                                      (data2[2] <<  8) | (data2[3]      ))+16384;
+        data2=data2+4;
+        decompressedData.resize(expectedSize);
+        z_uLongf newsize=expectedSize;
+        int error=uncompress((z_Bytef *)decompressedData.constData(),&newsize,(z_Bytef *)data2,datasize-4);
+
+        //decompressedData=qUncompress((uchar*)data, datasize);
+        //datasize=decompressedData->size();
+
+        data=(char*)decompressedData.constData();
+        savedData = data;
+        //printf("datasize=%d:%d (%i)\n",datasize,decompressedData.size(),error);
+        datasize=(int)newsize;//decompressedData.size();
+
+        break;
+    }
+    case JPG:{
+
+        //printf("not yet supported colormode = %s\n", qasc(colorModeString.at(thisColormode)));
+
+        //image = new QImage(resultSize, QImage::Format_Grayscale8);
+        QByteArray qdata=QByteArray((const char*)data,datasize);
+        QBuffer databuffer(&qdata);
+        QImageReader qimg;
+        qimg.setDecideFormatFromContent(true);
+        qimg.setDevice(&databuffer);
+        if (qimg.canRead()){
+            QImage* jimage= new QImage(qimg.read());
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            decompressedData.resize(jimage->byteCount());
+            memcpy((void*)decompressedData.constData(),(void*)jimage->constBits(),jimage->byteCount());
+            datasize=jimage->byteCount();
+            printf("datasize=%d:%d:%d (%i)\n",datasize,decompressedData.size(),jimage->byteCount(),jimage->format());
+#else
+            decompressedData.resize(jimage->sizeInBytes());
+            memcpy((void*)decompressedData.constData(),(void*)jimage->constBits(),jimage->sizeInBytes());
+            datasize=jimage->sizeInBytes();
+#endif
+            delete jimage;
+            data=(char*)decompressedData.constData();
+            savedData = data;
+            savedSizeNew = savedSize = datasize;
+            thisColormode = Mono8;
+            m_datatype = caCHAR;
+            //decompressedData=QByteArray((const char *)image->constBits(),image->byteCount());
+            //switch(image->format()){
+           // case QImage::Format_Grayscale8:{
+           //     thisColormode = Mono8;
+           // }
+           // }
+
+
+        }else{
+            reallocate_central_image();
+            image->fill(Qt::red);
+            return image;
+
+        }
+        //image->loadFromData(QByteArray((const char*)data,datasize),"JPG");
+    }
+    }
+
+
+
     // first time get image
-    if(m_init || datasize != savedSize || m_width != savedWidth || m_height != savedHeight) {
+    //if(m_init || datasize != savedSize || m_width != savedWidth || m_height != savedHeight) {
+    if(m_init || m_width != savedWidth || m_height != savedHeight) {
         savedSizeNew = savedSize = datasize;
         savedWidth = m_width;
         savedHeight = m_height;
 
-        if(image != (QImage *)Q_NULLPTR) {
-            delete image;
-        }
-        image = new QImage(resultSize, QImage::Format_RGB32);
+        reallocate_central_image();
+
+        printf("datasize=%d\n",datasize);
 
         m_init = false;
         minvalue = 0;
@@ -1795,15 +1978,18 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         resizeEvent(re);
     }
 
-    if(rgb == (uint *)Q_NULLPTR) {
-        printf("caCamera -- could not allocate rgb buffer\n");
-        return (QImage *) Q_NULLPTR;
-    }
 
     Max[1] =  0;
     Min[1] = 65535;
 
     if(data == (void*)Q_NULLPTR) return (QImage *) Q_NULLPTR;
+    if(datasize == 0) return (QImage *) Q_NULLPTR;
+    if(rgb == (uint *)Q_NULLPTR) {
+        printf("caCamera -- could not allocate rgb buffer\n");
+        return (QImage *) Q_NULLPTR;
+    }
+
+
 
     SyncMinMax MinMax;
     MinMax.Max[1] = 0;
@@ -1820,8 +2006,9 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
     void (caCamera::*CameraDataConvert) (int sector, int sectorcount, SyncMinMax* MinMax, QSize resultSize, int datasize) = NULL;
 
     //printf("datatype=%d %s colormode=%d %s\n", datatype, caTypeStr[datatype], thisColormode, qasc(colorModeString.at(thisColormode)));
-    printf("thisColormode %i\n",thisColormode);
+   // printf("thisColormode %i\n",thisColormode);
     fflush(stdout);
+
     switch (thisColormode) {
     case Mono:
         savedData = data;
@@ -1867,6 +2054,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         monoMode=true;
         thisColormode = Mono;
         savedData=data;
+
         m_datatype = caCHAR;
         CameraDataConvert = &caCamera::CameraDataConvert;
         break;
@@ -1996,6 +2184,9 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         painter.drawText(5, 10 + 7 * lineHeight, "HW Ref.:  Basler acA4600-10uc/acA1300-30gc  ");
         painter.drawText(5, 10 + 8 * lineHeight, "HW Ref.:  Prosilica GC1660C  ");
 
+        delete MinMax.MinMaxLock;
+        delete MinMax.imageLock;
+
         return image;
     }
 
@@ -2037,7 +2228,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         thisColormode = auxMode;
         m_datatype = auxDatatype;
     }
-
+   // delete decompressedData;
     return image;
 }
 
@@ -2045,11 +2236,11 @@ void caCamera::showImage(int datasize, char *data, short datatype)
 {
     //QElapsedTimer timer;
     //timer.start();
-    image = showImageCalc(datasize, data, datatype);
+    QImage *localimage = showImageCalc(datasize, data, datatype);
     //printf("Image timer 1 : %d (%x) milliseconds \n", (int) timer.elapsed(),image);
     //fflush(stdout);
 
-    if(image != (QImage *)Q_NULLPTR) updateImage(*image, readvaluesPresent, readvalues, scaleFactor, X, Y);
+    if(localimage != (QImage *)Q_NULLPTR) updateImage(*localimage, readvaluesPresent, readvalues, scaleFactor, X, Y);
 
     if(getAutomateChecked()) {
         updateMax(maxvalue);
