@@ -1,9 +1,8 @@
 import ctypes
 import threading
 import time
-import faulthandler; 
 import os
-faulthandler.enable()
+
 from ctypes import *
 
 def thread1(name):
@@ -20,6 +19,15 @@ def thread2(name):
 		pv= ctypes.create_string_buffer(100)
 		dll9.getDataValue(b"cameter", pv, ctypes.sizeof(pv), byref(value))
 		print(pv.value, value);
+		dll9.getDataValue(b"catogglebutton", pv, ctypes.sizeof(pv), byref(value))
+		print(pv.value, value);
+		if value.value == 1.0: dll9.setDataValue(b"catogglebutton", c_double(0), b" ")
+		dll9.getDataValue(b"pushbutton", pv, ctypes.sizeof(pv), byref(value))
+		print(pv.value, value);
+		if value.value == 1.0: dll9.setDataValue(b"pushbutton", c_double(0), b" ")
+		dll9.getDataValue(b"checkbox", pv, ctypes.sizeof(pv), byref(value))
+		print(pv.value, value);
+		if value.value == 1.0: dll9.setDataValue(b"checkbox", c_double(0), b" ")
 
 def thread3(name):
 	print("Thread starting", name)

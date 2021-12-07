@@ -9549,6 +9549,7 @@ extern "C"  {
         QList<QWidget *> all = myWidget->findChildren<QWidget *>();
         foreach(QWidget* widget, all) {
             if(widget->objectName().contains(object)) {
+                if(pvMaxLength > 0) strcpy(pv, " " );
                 if (caSlider *w = qobject_cast<caSlider *>(widget)) {
                     *value = w->getSliderValue();
                     strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
@@ -9576,6 +9577,16 @@ extern "C"  {
                 } else if (caThermo *w = qobject_cast<caThermo*>(widget)) {
                     *value = w->value();
                     strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    ok = true;
+                } else if (caToggleButton *w = qobject_cast<caToggleButton*>(widget)) {
+                    *value = w->isChecked();
+                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    ok = true;
+                } else if (QCheckBox *w = qobject_cast<QCheckBox*>(widget)) {
+                    *value = w->isChecked();
+                    ok = true;
+                } else if (QPushButton *w = qobject_cast<QPushButton*>(widget)) {
+                    *value = w->isChecked();
                     ok = true;
                 }
             }
@@ -9632,6 +9643,18 @@ extern "C"  {
                     ok = true;
                 } else if (caByte *w = qobject_cast<caByte*>(widget)) {
                     w->setValue((long) value);
+                    ok = true;
+                } else if (caToggleButton *w = qobject_cast<caToggleButton*>(widget)) {
+                    if((bool) value) w->setChecked(true);
+                    else w->setChecked(value);
+                    ok = true;
+                } else if (QPushButton *w = qobject_cast<QPushButton*>(widget)) {
+                    if((bool) value) w->setChecked(true);
+                    else w->setChecked(value);
+                    ok = true;
+                } else if (QCheckBox *w = qobject_cast<QCheckBox*>(widget)) {
+                    if((bool) value) w->setChecked(true);
+                    else w->setChecked(value);
                     ok = true;
                 }
             }
