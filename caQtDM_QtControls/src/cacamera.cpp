@@ -46,11 +46,18 @@
 #if defined(_MSC_VER)|| defined TARGET_OS_MAC
 #include <QtZlib/zconf.h>
 #include <QtZlib/zlib.h>
+#define ZLIB_BYTE z_Bytef
+#define ZLIB_ULONG z_uLongf
+
+
 #endif
 
 #if defined(linux)
 #include <zconf.h>
 #include <zlib.h>
+#define ZLIB_BYTE Bytef
+#define ZLIB_ULONG uLongf
+
 #endif
 
 
@@ -1900,8 +1907,8 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
                                       (data2[2] <<  8) | (data2[3]      ))+16384;
         data2=data2+4;
         decompressedData.resize(expectedSize);
-        z_uLongf newsize=expectedSize;
-        int error=uncompress((z_Bytef *)decompressedData.constData(),&newsize,(z_Bytef *)data2,datasize-4);
+        ZLIB_ULONG newsize=expectedSize;
+        int error=uncompress((ZLIB_BYTE *)decompressedData.constData(),&newsize,(ZLIB_BYTE *)data2,datasize-4);
 
         //decompressedData=qUncompress((uchar*)data, datasize);
         //datasize=decompressedData->size();
