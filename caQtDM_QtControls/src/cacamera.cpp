@@ -41,8 +41,19 @@
 #endif
 #include "cacamera.h"
 
+
+
+#if defined(_MSC_VER)|| defined TARGET_OS_MAC
 #include <QtZlib/zconf.h>
 #include <QtZlib/zlib.h>
+#endif
+
+#if defined(linux)
+#include <zconf.h>
+#include <zlib.h>
+#endif
+
+
 
 
 // Clamp out of range values
@@ -1906,7 +1917,6 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
 
         //printf("not yet supported colormode = %s\n", qasc(colorModeString.at(thisColormode)));
 
-        //image = new QImage(resultSize, QImage::Format_Grayscale8);
         QByteArray qdata=QByteArray((const char*)data,datasize);
         QBuffer databuffer(&qdata);
         QImageReader qimg;
@@ -1918,7 +1928,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
             decompressedData.resize(jimage->byteCount());
             memcpy((void*)decompressedData.constData(),(void*)jimage->constBits(),jimage->byteCount());
             datasize=jimage->byteCount();
-            printf("datasize=%d:%d:%d (%i)\n",datasize,decompressedData.size(),jimage->byteCount(),jimage->format());
+            //printf("datasize=%d:%d:%d (%i)\n",datasize,decompressedData.size(),jimage->byteCount(),jimage->format());
 #else
             decompressedData.resize(jimage->sizeInBytes());
             memcpy((void*)decompressedData.constData(),(void*)jimage->constBits(),jimage->sizeInBytes());
@@ -1930,12 +1940,6 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
             savedSizeNew = savedSize = datasize;
             thisColormode = Mono8;
             m_datatype = caCHAR;
-            //decompressedData=QByteArray((const char *)image->constBits(),image->byteCount());
-            //switch(image->format()){
-           // case QImage::Format_Grayscale8:{
-           //     thisColormode = Mono8;
-           // }
-           // }
 
 
         }else{
@@ -1951,8 +1955,8 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
 
 
     // first time get image
-    //if(m_init || datasize != savedSize || m_width != savedWidth || m_height != savedHeight) {
-    if(m_init || m_width != savedWidth || m_height != savedHeight) {
+    if(m_init || datasize != savedSize || m_width != savedWidth || m_height != savedHeight) {
+    //if(m_init || m_width != savedWidth || m_height != savedHeight) {
         savedSizeNew = savedSize = datasize;
         savedWidth = m_width;
         savedHeight = m_height;
