@@ -9482,7 +9482,7 @@ extern "C"  {
 
         // set for epics longer waveforms
         QString maxBytes = (QString)  qgetenv("EPICS_CA_MAX_ARRAY_BYTES");
-        if(maxBytes.size() == 0) setenv("EPICS_CA_MAX_ARRAY_BYTES", "150000000", 1);
+        if(maxBytes.size() == 0) qputenv("EPICS_CA_MAX_ARRAY_BYTES", QByteArray("150000000"));
 
         QMap<QString, ControlsInterface*> interfaces;
         QMap<QString, QString> OptionList;
