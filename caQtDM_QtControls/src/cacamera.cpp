@@ -41,27 +41,18 @@
 #endif
 #include "cacamera.h"
 
-
-
-#if defined(_MSC_VER)|| defined TARGET_OS_MAC
-#include <QtZlib/zconf.h>
-#include <QtZlib/zlib.h>
-#define ZLIB_BYTE z_Bytef
-#define ZLIB_ULONG z_uLongf
-
-
-#endif
-
-#if defined(linux)
-#include <zconf.h>
-#include <zlib.h>
 #define ZLIB_BYTE Bytef
 #define ZLIB_ULONG uLongf
 
+#if defined(_MSC_VER)
+#include <QtZlib/zconf.h>
+#include <QtZlib/zlib.h>
 #endif
 
-
-
+#if defined(linux)|| defined TARGET_OS_MAC
+#include <zconf.h>
+#include <zlib.h>
+#endif
 
 // Clamp out of range values
 #define CLAMP(t) (((t)>255)?255:(((t)<0)?0:(t)))
