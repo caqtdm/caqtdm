@@ -156,7 +156,11 @@ void caCamera::setPackingModeStrings()
 
 void caCamera::setCompressionModeStrings()
 {
+#if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
+    compressionModeString <<  "non" << "Zlib";
+#else
     compressionModeString <<  "non" << "Zlib" << "JPG";
+#endif
 }
 
 void caCamera::setDecodemodeStr(QString mode)
@@ -1912,9 +1916,10 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         break;
     }
     case JPG:{
-
-        //printf("not yet supported colormode = %s\n", qasc(colorModeString.at(thisColormode)));
-
+#if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
+        printf("not yet supported colormode = %s\n", qasc(colorModeString.at(thisColormode)));
+        return (QImage *) Q_NULLPTR;
+#else
         QByteArray qdata=QByteArray((const char*)data,datasize);
         QBuffer databuffer(&qdata);
         QImageReader qimg;
@@ -1938,7 +1943,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
             savedSizeNew = savedSize = datasize;
             thisColormode = Mono8;
             m_datatype = caCHAR;
-
+#endif
 
         }else{
             reallocate_central_image();
