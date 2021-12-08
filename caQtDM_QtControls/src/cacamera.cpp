@@ -1943,7 +1943,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
             savedSizeNew = savedSize = datasize;
             thisColormode = Mono8;
             m_datatype = caCHAR;
-#endif
+
 
         }else{
             reallocate_central_image();
@@ -1951,7 +1951,8 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
             return image;
 
         }
-        //image->loadFromData(QByteArray((const char*)data,datasize),"JPG");
+#endif
+
     }
     }
 
