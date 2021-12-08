@@ -1250,7 +1250,7 @@ void caCamera::CameraDataConvert(int sector, int sectorcount, SyncMinMax* MinMax
     int elementSize = 1;
     float correction = 1.0;
 
-    if (savedData==nullptr) return;
+    if (savedData==Q_NULLPTR) return;
 
     if(m_datatype == caINT) elementSize = 2;
     else if(m_datatype == caLONG || m_datatype == caFLOAT) elementSize = 4;
