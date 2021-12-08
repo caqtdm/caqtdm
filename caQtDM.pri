@@ -419,6 +419,7 @@ caQtDM_QtControls {
     		OBJECTS_DIR = obj
 		DESTDIR = $$(CAQTDM_COLLECT)
     		CONFIG += lib_bundle
+                LIBS += -lz
                 LIBS += -F$$(QWTLIB) -framework $$(QWTLIBNAME)
                         ADL_EDL_FILES {
                            LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -ladlParser
