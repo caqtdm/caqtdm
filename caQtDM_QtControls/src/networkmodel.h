@@ -35,6 +35,10 @@
 #include <QCheckBox>
 #include <qtcontrols_global.h>
 
+#if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
+#include <algorithm>
+#endif
+
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #include "JSON.h"
 #include "JSONValue.h"

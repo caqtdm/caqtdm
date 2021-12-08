@@ -1917,7 +1917,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
     }
     case JPG:{
 #if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
-        printf("not yet supported colormode = %s\n", qasc(colorModeString.at(thisColormode)));
+        printf("not yet supported colormode = JPG\n");
         return (QImage *) Q_NULLPTR;
 #else
         QByteArray qdata=QByteArray((const char*)data,datasize);
