@@ -1,4 +1,4 @@
-CAQTDM_VERSION = V4.3.1
+CAQTDM_VERSION = V4.4.0
 
 exists(../.git) {
   GIT_VERSION = $$system(git --version)
@@ -35,7 +35,7 @@ message ("Qt $$[QT_VERSION] QWT $$(QWTVERSION)")
 
 TARGET_COMPANY = "Paul Scherrer Institut"
 TARGET_DESCRIPTION = "Channel Access Qt Display Manager"
-TARGET_COPYRIGHT = "Copyright (C) 2020 Paul Scherrer Institut"
+TARGET_COPYRIGHT = "Copyright (C) 2021 Paul Scherrer Institut"
 TARGET_INTERNALNAME = "caqtdm"
 
 # enable opengl in stripplot and cartesianplot (edo not use, experimental only, for Qt5 and qwt6.1)
