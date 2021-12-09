@@ -224,7 +224,7 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
 
     // get channel limits if needed later
     knobData *kPtr = monData->getMutexKnobDataPV(w, thisPV);
-    if(kPtr != (knobData*) 0) {
+    if(kPtr != (knobData*) Q_NULLPTR) {
         channelLowerLimit = kPtr->edata.lower_disp_limit;
         channelUpperLimit = kPtr->edata.upper_disp_limit;
         channelPrecision = kPtr->edata.precision;
@@ -554,7 +554,7 @@ void limitsDialog::applyClicked()
         sliderWidget->blockSignals(false);
         // set eventual missed value
         knobData *kPtr = monData->getMutexKnobDataPV(sliderWidget, thisPV);
-        if(kPtr != (knobData*) 0) sliderWidget->setSliderValue(kPtr->edata.rvalue);
+        if(kPtr != (knobData*) Q_NULLPTR) sliderWidget->setSliderValue(kPtr->edata.rvalue);
 
     } else if(caMeter* meterWidget = qobject_cast<caMeter *>(thisWidget)) {
         if(limitsMode == Channel) {
@@ -669,7 +669,7 @@ void limitsDialog::applyClicked()
 
         knobData *kPtr = monData->getMutexKnobDataPV(thisWidget, thisPV);
         CaQtDM_Lib *compute = (CaQtDM_Lib *) thisWidget;
-        if(kPtr != (knobData*) 0) {
+        if(kPtr != (knobData*) Q_NULLPTR) {
             kPtr->edata.initialize = true;
             compute->ComputeNumericMaxMinPrec(thisWidget, *kPtr);
             kPtr->edata.initialize = false;
@@ -690,7 +690,7 @@ void limitsDialog::applyClicked()
         }
         knobData *kPtr = monData->getMutexKnobDataPV(abstractgaugeWidget, thisPV);
         CaQtDM_Lib *compute = (CaQtDM_Lib *) abstractgaugeWidget;
-        if(kPtr != (knobData*) 0) {
+        if(kPtr != (knobData*) Q_NULLPTR) {
             kPtr->edata.initialize = true;
             compute->UpdateGauge(abstractgaugeWidget, *kPtr);
             kPtr->edata.initialize = false;

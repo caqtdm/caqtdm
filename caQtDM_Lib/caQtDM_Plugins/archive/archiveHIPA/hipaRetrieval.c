@@ -50,9 +50,9 @@ int GetLogShift(int startSeconds, char *dev, int *nbVal, float *Timer, float *Yv
 
     useStopValid = False;
     int jahr = 0;
-    float *Valdev = (float *) 0;
-    int *Timef = (int *) 0;
-    short *Valerr = (short *) 0;
+    float *Valdev = (float *) Q_NULLPTR;
+    int *Timef = (int *) Q_NULLPTR;
+    short *Valerr = (short *) Q_NULLPTR;
 
     GetActualTime(&yearn, &monthn, &dayn, &hourn, &minn, &secn);
     cvdate_c(yearn, monthn, dayn, &yearday, &week, &weekday);

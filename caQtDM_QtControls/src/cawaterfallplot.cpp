@@ -180,9 +180,9 @@ void caWaterfallPlot::setCountNumber(int number) {
 void caWaterfallPlot::InitData(int numCols)
 {
     disableDemo = true;
-    if(reducedArray != (double *) 0) {
+    if(reducedArray != (double *) Q_NULLPTR) {
         free(reducedArray);
-        reducedArray = (double *) 0;
+        reducedArray = (double *) Q_NULLPTR;
     }
 
     countRows = 0;
@@ -224,9 +224,9 @@ template <typename pureData> void caWaterfallPlot::CompressAndkeepArray(pureData
 {
     datamutex->lock();
     int ratio = m_data->getRatio(NumberOfColumns, ActualNumberOfColumns);
-    if(reducedArray != (double *) 0) {
+    if(reducedArray != (double *) Q_NULLPTR) {
         free(reducedArray);
-        reducedArray = (double *) 0;
+        reducedArray = (double *) Q_NULLPTR;
     }
     reducedArray = (double*) malloc(ActualNumberOfColumns * sizeof(double));
     memset(reducedArray, 0, ActualNumberOfColumns *sizeof(double));
@@ -378,7 +378,7 @@ void caWaterfallPlot::TimeOut()
             if(drift < 0 && position <= 0)  drift = 1;
             position += drift;
         } else {
-            if(reducedArray != (double*) 0) {
+            if(reducedArray != (double*) Q_NULLPTR) {
                 datamutex->lock();
                 m_data->setData(reducedArray, countRows, ActualNumberOfColumns, getRows(),  ActualNumberOfColumns);
                 if(firstTimerPlot) {

@@ -132,7 +132,7 @@ void caWaveTable::setupItems(int nbRows, int nbCols)
     for(int i=0; i<rowCount(); i++) {
         for(int j=0; j<columnCount(); j++) {
             QTableWidgetItem *Item = item(i,j);
-            if(Item != (QTableWidgetItem *) 0) {
+            if(Item != (QTableWidgetItem *) Q_NULLPTR) {
                 delete Item;
             }
         }
@@ -202,7 +202,7 @@ void caWaveTable::dataInput(int row, int col)
         clearSelection();
 
         // set the value back (dataInput is now blocked again
-        if(item(row,col) != (QTableWidgetItem*) 0) {
+        if(item(row,col) != (QTableWidgetItem*) Q_NULLPTR) {
             item(row,col)->setText(keepText[index]);
         }
 
@@ -213,8 +213,8 @@ void caWaveTable::dataInput(int row, int col)
 
 void caWaveTable::cellClicked(int row, int col)
 {
-    Q_UNUSED(row);
-    Q_UNUSED(col);
+    Q_UNUSED(row)
+    Q_UNUSED(col)
     disableEdit(item(row, col));
     QTimer::singleShot(2000, this, SLOT(clearSelection()));
 }

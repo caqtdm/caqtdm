@@ -495,16 +495,16 @@ void caStripPlot::defineCurves(QStringList titres, units unit, double period, in
         curvStyle s = Lines;
         QColor c;
 
-        if(curve[i] != (QwtPlotCurve*) 0) {
+        if(curve[i] != (QwtPlotCurve*) Q_NULLPTR) {
             s = getStyle(i);
             c = getColor(i);
             delete curve[i];
         }
 
-        if(errorcurve[i] != (QwtPlotIntervalCurveNaN*) 0) {
+        if(errorcurve[i] != (QwtPlotIntervalCurveNaN*) Q_NULLPTR) {
             delete errorcurve[i];
         }
-        if(fillcurve[i] != (QwtPlotCurve*) 0) {
+        if(fillcurve[i] != (QwtPlotCurve*) Q_NULLPTR) {
             delete fillcurve[i];
         }
 
@@ -865,7 +865,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 
         case FONT:
             if(getLegendEnabled()) {
-                if(legend() != (QwtLegend*) 0) {
+                if(legend() != (QwtLegend*) Q_NULLPTR) {
                     QList<QWidget *> list =  legend()->legendItems();
                     for (QList<QWidget*>::iterator it = list.begin(); it != list.end(); ++it ) {
                         QWidget *w = *it;
@@ -876,7 +876,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
             break;
 
         case COLOR:
-            if(legend() != (QwtLegend*) 0) {
+            if(legend() != (QwtLegend*) Q_NULLPTR) {
                 QList<QWidget *> list =  legend()->legendItems();
                 for (QList<QWidget*>::iterator it = list.begin(); it != list.end(); ++it ) {
                     QWidget *w = *it;
@@ -911,7 +911,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
             }
 
 			QwtLegend *lgd = qobject_cast<QwtLegend *>(legend());
-			if (lgd != (QwtLegend *) 0){
+            if (lgd != (QwtLegend *) Q_NULLPTR){
 				QList<QWidget *> legendWidgets = lgd->legendWidgets(itemToInfo(plt_item));
 				if (legendWidgets.size() == 1) {
 					QwtLegendLabel *b = qobject_cast<QwtLegendLabel *>(legendWidgets[0]);
@@ -1114,17 +1114,17 @@ void caStripPlot::setColor(QColor c, int number)
     if(number < 0 || number > (MAXCURVES-1)) return;
     thisLineColor[number] = c;
 
-    if(curve[number] != (QwtPlotCurve *) 0) {
+    if(curve[number] != (QwtPlotCurve *) Q_NULLPTR) {
         curve[number]->setPen(QPen(c, 0));
     }
 
-    if(fillcurve[number] != (QwtPlotCurveNaN *) 0) {
+    if(fillcurve[number] != (QwtPlotCurveNaN *) Q_NULLPTR) {
         fillcurve[number]->setPen(c);
         fillcurve[number]->setBrush(QBrush(c, Qt::SolidPattern));
         fillcurve[number]->setRenderHint( QwtPlotItem::RenderAntialiased, true );
     }
 
-    if(errorcurve[number] != (QwtPlotIntervalCurveNaN *) 0) {
+    if(errorcurve[number] != (QwtPlotIntervalCurveNaN *) Q_NULLPTR) {
         if(thisStyle[number] == FillUnder) {
             errorcurve[number]->setPen(QPen(thisScaleColor,0));
             errorcurve[number]->setBrush(QBrush(thisScaleColor, Qt::SolidPattern));
@@ -1157,7 +1157,7 @@ void caStripPlot::ReplaceTrailingZerosByBlancs(char *asc)
         }
     }
     if (dot) {
-        for (i = strlen(asc) - 1; i >= 0; i--) {
+        for (i = (int)strlen(asc) - 1; i >= 0; i--) {
             if (asc[i] != '0') {
                 if(asc[i] == '.') asc[i]=' ';
                 break;

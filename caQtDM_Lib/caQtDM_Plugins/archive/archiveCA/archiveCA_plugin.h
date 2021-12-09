@@ -131,7 +131,7 @@ public slots:
         AutoIndex index;
         char error[1000];
         if(!index.open(index_name.c_str(), error, true)) {
-            if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtCriticalMsg, error);
+            if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtCriticalMsg, error);
             emit resultReady(indexNew, 0, TimerN, YValsN , "");
         }
 

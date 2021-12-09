@@ -264,7 +264,6 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
 #else
 
     totalCount = 0;
-    int stat;
     Backend = "";
 
     JSONValue *value = JSON::Parse(qasc(out));
@@ -272,7 +271,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
     //printf("\n\nout: %s\n\n", qasc(out));
 
     // Did it go wrong?
-    if (value == NULL) {
+    if (value == Q_NULLPTR) {
         errorString = tr("could not parse json string left=%1 right=%2").arg(out.left(20)).arg(out.right(20));
         //qDebug() << QTime::currentTime().toString() << this << PV << "finishreply" << errorString;
         emit requestFinished();

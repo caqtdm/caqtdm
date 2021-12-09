@@ -72,7 +72,7 @@ void FontScalingWidget::setScaleMode(int mode)
 
 double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSize &size)
 {
-    QTextDocument *textDoc = (QTextDocument *) 0;
+    QTextDocument *textDoc = (QTextDocument *) Q_NULLPTR;
     QFontMetrics fmint = d_widget->fontMetrics();
     QFontMetricsF fm(fmint);
     QFont f = d_widget->font();

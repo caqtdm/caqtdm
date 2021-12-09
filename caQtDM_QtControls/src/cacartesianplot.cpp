@@ -1214,7 +1214,7 @@ void caCartesianPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
 
         case FONT:
             if(getLegendEnabled()) {
-                if(legend() != (QwtLegend*) 0) {
+                if(legend() != (QwtLegend*) Q_NULLPTR) {
                     QList<QWidget *> list =  legend()->legendItems();
                     for (QList<QWidget*>::iterator it = list.begin(); it != list.end(); ++it ) {
                         QWidget *w = *it;
@@ -1225,7 +1225,7 @@ void caCartesianPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
             break;
 
         case COLOR:
-            if(legend() != (QwtLegend*) 0) {
+            if(legend() != (QwtLegend*) Q_NULLPTR) {
                 QList<QWidget *> list =  legend()->legendItems();
                 for (QList<QWidget*>::iterator it = list.begin(); it != list.end(); ++it ) {
                     QWidget *w = *it;
@@ -1258,7 +1258,7 @@ void caCartesianPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
             }
 
             QwtLegend *lgd = qobject_cast<QwtLegend *>(legend());
-            if (lgd != (QwtLegend *) 0){
+            if (lgd != (QwtLegend *) Q_NULLPTR){
                 QList<QWidget *> legendWidgets = lgd->legendWidgets(itemToInfo(plt_item));
                 if (legendWidgets.size() == 1) {
                     QwtLegendLabel *b = qobject_cast<QwtLegendLabel *>(legendWidgets[0]);

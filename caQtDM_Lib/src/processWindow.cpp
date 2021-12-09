@@ -27,12 +27,12 @@
 
 processWindow::processWindow(QWidget *parent, bool display, QWidget *caller): QMainWindow(parent)
 {
-    outputWindow = (QTextEdit *) 0;
-    debugWindow = (QTextEdit *) 0;
-    splitter = (QSplitter *) 0;
+    outputWindow = (QTextEdit *) Q_NULLPTR;
+    debugWindow = (QTextEdit *) Q_NULLPTR;
+    splitter = (QSplitter *) Q_NULLPTR;
     displayWindow = display;
     thisCaller = caller;
-    thisPID = 0;
+    thisPID = Q_NULLPTR;
 
     termProcess = new QProcess;
     if(!display) return;
@@ -63,9 +63,9 @@ processWindow::processWindow(QWidget *parent, bool display, QWidget *caller): QM
 
 processWindow::~processWindow()
 {
-    if(outputWindow != (QTextEdit *) 0) outputWindow->deleteLater();
-    if(debugWindow != (QTextEdit *) 0) debugWindow->deleteLater();
-    if(splitter != (QSplitter *) 0) splitter->deleteLater();
+    if(outputWindow != (QTextEdit *) Q_NULLPTR) outputWindow->deleteLater();
+    if(debugWindow != (QTextEdit *) Q_NULLPTR) debugWindow->deleteLater();
+    if(splitter != (QSplitter *) Q_NULLPTR) splitter->deleteLater();
     termProcess->deleteLater();
 }
 
@@ -131,7 +131,7 @@ void processWindow::start(QString command)
 
 void processWindow::updateError()
 {
-    if(outputWindow == (QTextEdit *) 0) return;
+    if(outputWindow == (QTextEdit *) Q_NULLPTR) return;
     QByteArray data = termProcess->readAllStandardError();
     QString text = outputWindow->toPlainText() + QString(data);
     outputWindow->setText(text);
@@ -143,7 +143,7 @@ void processWindow::updateError()
 
 void processWindow::updateText()
 {
-   if(outputWindow == (QTextEdit *) 0) return;
+   if(outputWindow == (QTextEdit *) Q_NULLPTR) return;
     QByteArray data = termProcess->readAllStandardOutput();
     QString text = outputWindow->toPlainText() + QString(data);
     outputWindow->setText(text);
@@ -155,7 +155,7 @@ void processWindow::updateText()
 
 void processWindow::processFinished()
 {
-    if(outputWindow == (QTextEdit *) 0) {
+    if(outputWindow == (QTextEdit *) Q_NULLPTR) {
         tryTerminate();
         return;
     }
@@ -177,25 +177,25 @@ void processWindow::processError(QProcess::ProcessError err)
     switch(err)
     {
     case QProcess::FailedToStart:
-        QMessageBox::information(0,"FailedToStart","FailedToStart");
+        QMessageBox::information(Q_NULLPTR,"FailedToStart","FailedToStart");
         break;
     case QProcess::Crashed:
-        QMessageBox::information(0,"Crashed","Crashed");
+        QMessageBox::information(Q_NULLPTR,"Crashed","Crashed");
         break;
     case QProcess::Timedout:
-        QMessageBox::information(0,"FailedToStart","FailedToStart");
+        QMessageBox::information(Q_NULLPTR,"FailedToStart","FailedToStart");
         break;
     case QProcess::WriteError:
-        QMessageBox::information(0,"Timedout","Timedout");
+        QMessageBox::information(Q_NULLPTR,"Timedout","Timedout");
         break;
     case QProcess::ReadError:
-        QMessageBox::information(0,"ReadError","ReadError");
+        QMessageBox::information(Q_NULLPTR,"ReadError","ReadError");
         break;
     case QProcess::UnknownError:
-        QMessageBox::information(0,"UnknownError","UnknownError");
+        QMessageBox::information(Q_NULLPTR,"UnknownError","UnknownError");
         break;
     default:
-        QMessageBox::information(0,"default","default");
+        QMessageBox::information(Q_NULLPTR,"default","default");
         break;
     }
 }

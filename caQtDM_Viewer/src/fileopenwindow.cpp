@@ -84,7 +84,7 @@ int setenv(const char *name, const char *value, int overwrite)
     int errcode = 0;
     if(!overwrite) {
         size_t envsize = 0;
-        errcode = getenv_s(&envsize, NULL, 0, name);
+        errcode = getenv_s(&envsize, Q_NULLPTR, 0, name);
         if(errcode || envsize) return errcode;
     }
     return _putenv_s(name, value);
@@ -113,13 +113,13 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
              qDebug() << "application state changed to inactive";
 
              pendio = false;
-             if (mutexKnobData != (MutexKnobData *) 0) {
+             if (mutexKnobData != (MutexKnobData *) Q_NULLPTR) {
                  for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
                      knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
                      if(kPtr->index != -1)  {
                        //qDebug() << "should disconnect" << kPtr->pv;
                        ControlsInterface * plugininterface = (ControlsInterface *) kPtr->pluginInterface;
-                       if(plugininterface != (ControlsInterface *) 0) plugininterface->pvDisconnect(kPtr);
+                       if(plugininterface != (ControlsInterface *) Q_NULLPTR) plugininterface->pvDisconnect(kPtr);
                        mutexKnobData->SetMutexKnobData(i, *kPtr);
                        pendio = true;
                      }
@@ -131,12 +131,12 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
          case Qt::ApplicationActive:
              qDebug() << "application state changed to active";
              pendio = false;
-              if (mutexKnobData != (MutexKnobData *) 0) {
+              if (mutexKnobData != (MutexKnobData *) Q_NULLPTR) {
                   for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
                       knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
                       if(kPtr->index != -1) {
                         ControlsInterface * plugininterface = (ControlsInterface *) kPtr->pluginInterface;
-                        if(plugininterface != (ControlsInterface *) 0) plugininterface->pvReconnect(kPtr);
+                        if(plugininterface != (ControlsInterface *) Q_NULLPTR) plugininterface->pvReconnect(kPtr);
                         pendio = true;
                       }
                   }

@@ -3290,7 +3290,7 @@ void *parseText(DisplayInfo *displayInfo, FrameOffset * offset)
              && (tokenType != T_EOF) );
 
     if(strlen(textix) > 0  && expandText) {
-        newWidth = .6 * object.height * strlen(textix);
+        newWidth =(unsigned int)( .6 * object.height * strlen(textix));
         if(newWidth > object.width) object.width = newWidth;
     }
 

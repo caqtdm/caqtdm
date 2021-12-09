@@ -152,12 +152,12 @@ private slots:
             for(int i=0; i<itemList.count(); i++)  {
                 QStandardItem * item1 = itemList.at(i);
 #if QT_VERSION < QT_VERSION_CHECK(5, 12, 0)
-                if(item1 != (QStandardItem *) 0) {
+                if(item1 != (QStandardItem *) Q_NULLPTR) {
                     QVariant data = item1->data(0);
                     if(data.isValid()) data.clear();
                 }
 #else
-                if(item1 != (QStandardItem *) 0) item1->clearData();
+                if(item1 != (QStandardItem *) Q_NULLPTR) item1->clearData();
 #endif
             }
             itemList.clear();
@@ -177,7 +177,7 @@ private slots:
         }
         reply->deleteLater();
         emit finished();
-        m_reply = (QNetworkReply *) 0;
+        m_reply = (QNetworkReply *) Q_NULLPTR;
     }
 
 signals:
@@ -232,7 +232,7 @@ public:
         m_model->setCompletionWidget(w);
     }
 
-    NetworkCompleter(QObject *parent=(QObject *) 0): QCompleter(parent) {
+    NetworkCompleter(QObject *parent=(QObject *) Q_NULLPTR): QCompleter(parent) {
         m_model = new NetworkModel();
         setModel(m_model);
         setCompletionMode(QCompleter::UnfilteredPopupCompletion);

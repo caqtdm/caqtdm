@@ -155,7 +155,7 @@ void limitsStripplotDialog::applyClicked()
         if(pv.size() > 0) {
 
             knobData *ptr = monData->GetMutexKnobDataPtr(list.at(i+1).toInt());
-            if(ptr == (knobData *) 0) break;
+            if(ptr == (knobData *) Q_NULLPTR) break;
 
             int indx = minComboBox[i]->currentIndex();
             QString text = minLineEdit[i]->text();

@@ -73,7 +73,7 @@ void bsreadPlugin::updateInterface()
     // go through our devices
     foreach(int index, listOfIndexes) {
         knobData* kData = mutexknobdataP->GetMutexKnobDataPtr(index);
-        if((kData != (knobData *) 0) && (kData->index != -1)) {
+        if((kData != (knobData *) Q_NULLPTR) && (kData->index != -1)) {
             QString key = kData->pv;
 
             // find this pv in our internal double values list (assume for now we are only treating doubles)
@@ -137,7 +137,7 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
 
     }else{
         QString msg="Using Manual BSREAD Connection";
-        if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
+        if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
         QString ZMQ_CONNECTION_TYPE=(QString)  qgetenv("BSREAD_ZMQ_CONNECTION_TYPE");
         QString ZMQ_ADDR_LIST = (QString)  qgetenv("BSREAD_ZMQ_ADDR_LIST");
 
@@ -163,11 +163,11 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
                 msg="Connection started: ";
                 disconnect(bsreadconnections.last());
                 msg.append(BSREAD_ZMQ_ADDRS.at(i));
-                if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
+                if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
             }
         }else{
             QString msg="no BSREAD Connection";
-            if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
+            if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
 
         }
     }
@@ -223,13 +223,13 @@ int bsreadPlugin::pvClearMonitor(knobData *kData) {
 int bsreadPlugin::pvFreeAllocatedData(knobData *kData)
 {
     //qDebug() << "DemoPlugin:pvFreeAllocatedData";
-    if (kData->edata.info != (void *) 0) {
+    if (kData->edata.info != (void *) Q_NULLPTR) {
         free(kData->edata.info);
-        kData->edata.info = (void*) 0;
+        kData->edata.info = (void*) Q_NULLPTR;
     }
-    if(kData->edata.dataB != (void*) 0) {
+    if(kData->edata.dataB != (void*) Q_NULLPTR) {
         free(kData->edata.dataB);
-        kData->edata.dataB = (void*) 0;
+        kData->edata.dataB = (void*) Q_NULLPTR;
     }
 
     return true;

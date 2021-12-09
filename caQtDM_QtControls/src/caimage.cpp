@@ -188,6 +188,7 @@ void caImage::slotTiltAngle(double angle)
 
 void caImage::OnFrameChanged(int frame)
 {
+    Q_UNUSED(frame)
     if( _animation.isNull()) return;
     pixmap = pixmap.scaled(width(), height());
     pixmap = _animation->currentPixmap();

@@ -808,7 +808,7 @@ void bsread_Decode::bsread_EndofData()
     if (listOfIndexes.size()>0){
         foreach(int index, listOfIndexes) {
             knobData* kData = bsread_KnobDataP->GetMutexKnobDataPtr(index);
-            if((kData != (knobData *) 0) && (kData->index != -1)) {
+            if((kData != (knobData *) Q_NULLPTR) && (kData->index != -1)) {
                 QString key = kData->pv;
                 //qDebug() << kData->pv;
                 QString ioc_string=StreamConnectionPoint.leftJustified(39, ' ');
@@ -1016,7 +1016,7 @@ void bsread_Decode::bsread_EndofData()
 //        foreach(int index, listOfIndexes) {
           for (int i=0;i<MonitorList->count();i++){
             knobData* kData = MonitorList->at(i);
-            if((kData != (knobData *) 0) && (kData->index != -1)) {
+            if((kData != (knobData *) Q_NULLPTR) && (kData->index != -1)) {
                 kData->edata.monitorCount++;
                 bsread_KnobDataP->SetMutexKnobData(kData->index, *kData);
                 bsread_KnobDataP->SetMutexKnobDataReceived(kData);
