@@ -32,7 +32,7 @@ processWindow::processWindow(QWidget *parent, bool display, QWidget *caller): QM
     splitter = (QSplitter *) Q_NULLPTR;
     displayWindow = display;
     thisCaller = caller;
-    thisPID = Q_NULLPTR;
+    thisPID =(Q_PID) Q_NULLPTR;
 
     termProcess = new QProcess;
     if(!display) return;
