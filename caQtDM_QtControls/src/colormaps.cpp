@@ -26,6 +26,7 @@
 #define QWT_DLL
 #endif
 
+#include <qtcontrols_global.h>
 #include "colormaps.h"
 
 colorMaps::colorMaps()
