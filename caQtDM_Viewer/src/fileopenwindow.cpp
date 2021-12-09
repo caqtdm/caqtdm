@@ -161,7 +161,7 @@ void FileOpenWindow::FlushAllInterfaces()
         while (i.hasNext()) {
             i.next();
             ControlsInterface *plugininterface = i.value();
-            if(plugininterface != (ControlsInterface *) 0) plugininterface->FlushIO();
+            if(plugininterface != (ControlsInterface *) Q_NULLPTR) plugininterface->FlushIO();
         }
     }
 }
@@ -174,7 +174,7 @@ void FileOpenWindow::TerminateAllInterfaces()
         while (i.hasNext()) {
             i.next();
             ControlsInterface *plugininterface = i.value();
-            if(plugininterface != (ControlsInterface *) 0) plugininterface->TerminateIO();
+            if(plugininterface != (ControlsInterface *) Q_NULLPTR) plugininterface->TerminateIO();
         }
     }
 }
@@ -189,7 +189,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     // definitions for last opened file
     debugWindow = true;
     fromIOS = false;
-    lastWindow = (QMainWindow*) 0;
+    lastWindow = (QMainWindow*) Q_NULLPTR;
     lastMacro ="";
     lastFile = "";
     if(resizing) lastResizing="true";
@@ -399,8 +399,8 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     // start a timer
     startTimer(1000);
 
-    pvWindow = (QMainWindow*) 0;
-    pvTable = (QTableWidget*) 0;
+    pvWindow = (QMainWindow*) Q_NULLPTR;
+    pvTable = (QTableWidget*) Q_NULLPTR;
 
 //************************************************************************************************************************************************
     if(HTTPCONFIGURATOR) {
@@ -472,7 +472,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     setenv("CAQTDM_DISPLAY_PATH", qasc(specials.getStdPath()), 1);
     int success = filefunction.checkFileAndDownload(file, url);
     if(!success) {
-        QMessageBox::critical(0, tr("caQtDM"), tr("could not download file %1 from %2").arg(file).arg(url));
+        QMessageBox::critical(Q_NULLPTR, tr("caQtDM"), tr("could not download file %1 from %2").arg(file).arg(url));
         exit(0);
     }
 
@@ -576,7 +576,7 @@ void FileOpenWindow::parseConfigFile(const QString &filename, QList<QString> &ur
 
     /* can not open file */
     if (!file->open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::critical(0, tr("caQtDM"), tr("could not open configuration file: %1").arg(filename));
+        QMessageBox::critical(Q_NULLPTR, tr("caQtDM"), tr("could not open configuration file: %1").arg(filename));
         exit(0);
     }
 
@@ -620,7 +620,7 @@ void FileOpenWindow::saveConfigFile(const QString &filename, QList<QString> &url
 
     /* can not open file */
     if (!file->open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QMessageBox::critical(0, tr("caQtDM"), tr("could not open configuration file: %1").arg(filename));
+        QMessageBox::critical(Q_NULLPTR, tr("caQtDM"), tr("could not open configuration file: %1").arg(filename));
         exit(0);
     }
 
@@ -659,7 +659,7 @@ void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
     EnvFile.append(fileName);
     QFile file(EnvFile);
     if(!file.open(QIODevice::ReadOnly)) {
-        QMessageBox::information(0, "open file error setAllEnviromentVariables", file.errorString());
+        QMessageBox::information(Q_NULLPTR, "open file error setAllEnviromentVariables", file.errorString());
         return;
     }
 
@@ -740,7 +740,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 #endif
 
     // any non connected pv's to display ?
-    if (mutexKnobData != (MutexKnobData *) 0) {
+    if (mutexKnobData != (MutexKnobData *) Q_NULLPTR) {
         char msg[MAX_STRING_LENGTH];
         msg[0] = '\0';
 
@@ -870,7 +870,7 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
 {
     char *asc;
     bool willprint = printexit;
-    CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, interfaces, messageWindow, willprint, 0, OptionList);
+    CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, interfaces, messageWindow, willprint, Q_NULLPTR, OptionList);
 
     // prc files are not allowed to be resized, or when resizing is prohibited by the command line
     if (fileS.contains("prc")) {
@@ -1436,7 +1436,7 @@ void FileOpenWindow::Callback_ActionUnconnected()
     int countNotConnected=0;
     int countDisplayed = 0;
 
-    if(pvWindow != (QMainWindow*) 0) {
+    if(pvWindow != (QMainWindow*) Q_NULLPTR) {
         pvWindow->show();
         return;
     }
@@ -1480,7 +1480,7 @@ void FileOpenWindow::Callback_PVwindowExit()
 void FileOpenWindow::fillPVtable(int &countPV, int &countNotConnected, int &countDisplayed)
 {
     int count = 0;
-    if(pvTable != (QTableWidget*) 0) {
+    if(pvTable != (QTableWidget*) Q_NULLPTR) {
         pvTable->clear();
         pvTable->setColumnCount(4);
         pvTable->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -1500,7 +1500,7 @@ void FileOpenWindow::fillPVtable(int &countPV, int &countNotConnected, int &coun
         }
     }
 
-    if(pvTable != (QTableWidget*) 0) {
+    if(pvTable != (QTableWidget*) Q_NULLPTR) {
         pvTable->setRowCount(countNotConnected);
         count = 0;
         for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {

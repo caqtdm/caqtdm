@@ -1000,7 +1000,7 @@ void caCamera::resizeEvent(QResizeEvent *e)
             double Ycorr = (double) (e->size().height()- valuesWidget->height()-4) / (double) savedHeight;
             double scale = qMin(Xcorr, Ycorr); // aspect ratio
             // disconnect signal to prevent firing now
-            disconnect(zoomSlider, SIGNAL(valueChanged (int)), 0, 0);
+            disconnect(zoomSlider, SIGNAL(valueChanged (int)), Q_NULLPTR, Q_NULLPTR);
             zoomSlider->setValue((int)(13.0*log(scale)/log(2.0)+52.0));
             zoomValue->setText(QString::number(scale, 'f', 3));
             connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomNow()));
