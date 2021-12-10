@@ -1,4 +1,5 @@
 #include "hipaRetrieval.h"
+#include "caQtDM_Lib_global.h"
 
 static void GetActualTime(short *year, short *month, short *day, short *hour,
                           short *min, short *sec)
