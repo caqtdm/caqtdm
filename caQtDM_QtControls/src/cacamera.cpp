@@ -1967,7 +1967,7 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
 
         reallocate_central_image();
 
-        printf("datasize=%d\n",datasize);
+        //printf("datasize=%d\n",datasize);
 
         m_init = false;
         minvalue = 0;
