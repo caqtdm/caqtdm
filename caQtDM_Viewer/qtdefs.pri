@@ -294,7 +294,7 @@ DEFINES += TARGET_DESCRIPTION=\"\\\"$${TARGET_DESCRIPTION}\\\"\"
 DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
-# 4.3.1
+# 4.4.0
 # fileopenwindow: options changes
 # fix for converted adl files
 # fix for higher python versions
@@ -308,6 +308,10 @@ DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 # caStripPlot: feature dynamic property "Legend" for rename the channel to a user defined
 # PV-Editor for Designer with network based auto completion
 # new commandline option [-savetoimage] to save screenshots as PNG files
+# added C entry points for python
+# new decoding functions for camera images (Mono8,Mono10p,Mono10packed,Mono12p,Mono12packed)
+# future use of compression for camera images (zLib+jpg)
+
 
 
 # 4.3.0
