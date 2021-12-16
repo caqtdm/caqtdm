@@ -120,7 +120,11 @@ unix:!macx:{
 # one can specify channel access with ca:// and pv access with pva:// (both use the epics4 plugin)
 # the main work for this plugin was done by Marty Kraimer
 exists($(EPICSINCLUDE)/pv/pvAccess.h) {
-CONFIG += epics7
+    #a special thing for PSI build
+    eval($$(EPICS_HOST_ARCH)=RHEL7-x86_64){
+        CONFIG += CAQTDM_PSI_SPECIAL_EPICS7_C11
+    }
+    CONFIG += epics7
     epics7 {
        message( "Configuring build for epics4 plugin with epics7" )
        CONFIG += epics4

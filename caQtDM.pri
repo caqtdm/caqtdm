@@ -313,6 +313,17 @@ epics4_plugin {
                    LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
                 }
                 CONFIG += release
+                CAQTDM_PSI_SPECIAL_EPICS7_C11 {
+                    contains(QT_VER_MAJ, 5) {
+                        CONFIG += c++11
+                    }
+                    contains(QT_VER_MAJ, 4) {
+                        QMAKE_CXXFLAGS += -std=c++11
+                    }
+                }
+
+
+
           }
           else {
                 message("epics4_plugin (with epics version 3) configuration unix:!macx:!ios:!android")
