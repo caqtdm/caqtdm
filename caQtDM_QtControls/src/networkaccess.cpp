@@ -65,9 +65,9 @@ bool NetworkAccess::requestUrl(const QUrl url, const QString &file)
 #ifndef CAQTDM_SSL_IGNORE
 #ifndef QT_NO_SSL
     if(url.toString().toUpper().contains("HTTPS")) {
-        QSslConfiguration config = request->sslConfiguration();
+        QSslConfiguration config = request.sslConfiguration();
         config.setPeerVerifyMode(QSslSocket::VerifyNone);
-        request->setSslConfiguration(config);
+        request.setSslConfiguration(config);
     }
 #endif
 #endif
