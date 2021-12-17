@@ -163,6 +163,7 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     RestartPlot2 = false;
     ResizeFactorX = ResizeFactorY = 1.0;
     oldResizeFactorX = oldResizeFactorY = 1.0;
+    thisYaxisType = linear;
 
 #ifdef QWT_USE_OPENGL
     printf("caStripplot uses opengl ?\n");

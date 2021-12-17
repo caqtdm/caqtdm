@@ -59,7 +59,7 @@ bool NetworkAccess::requestUrl(const QUrl url, const QString &file)
     //printf("caQtDM -- download %s\n", qasc(url.toString()));
     downloadUrl = url;
 
-    QNetworkRequest *request = new QNetworkRequest(url);
+    QNetworkRequest request = QNetworkRequest(url);
 
     //for https we need some configuration (with no verify socket)
 #ifndef CAQTDM_SSL_IGNORE
@@ -74,7 +74,7 @@ bool NetworkAccess::requestUrl(const QUrl url, const QString &file)
     //request->setRawHeader("Content-Type", "application/json");
     //request->setRawHeader("Timeout", "86400");
 
-    manager->get(*request);
+    manager->get(request);
 
     connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(finishReply(QNetworkReply*)));
 

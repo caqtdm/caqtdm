@@ -49,6 +49,8 @@ MutexKnobData::MutexKnobData()
         KnobData[i].index  = -1;
         KnobData[i].thisW = (void*) Q_NULLPTR;
         KnobData[i].mutex = (void*) Q_NULLPTR;
+        KnobData[i].edata.dataB = (void*) Q_NULLPTR;
+        KnobData[i].edata.dataPtr = (void*) Q_NULLPTR;
     }
 
     nbMonitorsPerSecond = 0;

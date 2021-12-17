@@ -512,7 +512,7 @@ void ENumeric::resizeEvent(QResizeEvent *e)
         p->setBrush(linearGradient);
         p->drawConvexPolygon(poly);
         p->end();
-
+        delete p;
         // down pixmap
         QPixmap pix2 = pix1.transformed(QMatrix().rotate(-180));
 

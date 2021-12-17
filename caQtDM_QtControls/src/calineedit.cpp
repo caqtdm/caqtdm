@@ -91,6 +91,7 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
 
     Alarm = 0;
 
+    thisDatatype = caDOUBLE;
     // default colors will be defined in my event handler by taking them from the palette defined by stylesheet definitions
     defSelectColor = Qt::red; // this does not appear in the palette
 
