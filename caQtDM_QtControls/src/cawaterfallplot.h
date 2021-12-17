@@ -254,6 +254,8 @@ public:
     enum Properties { customcolormap = 0, discretecolormap};
 
     caWaterfallPlot(QWidget * = NULL);
+    ~caWaterfallPlot();
+
     void GausCurv(double middle);
 
     bool getXaxisEnabled() const { return thisXshow; }

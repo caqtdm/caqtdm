@@ -115,6 +115,14 @@ caWaterfallPlot::caWaterfallPlot(QWidget *parent): QWidget(parent)
     connect(Timer, SIGNAL(timeout()), this, SLOT(TimeOut()));
 }
 
+caWaterfallPlot::~caWaterfallPlot()
+{
+    if(reducedArray != (double *) Q_NULLPTR) {
+        free(reducedArray);
+        reducedArray = (double *) Q_NULLPTR;
+    }
+}
+
 bool caWaterfallPlot::isPropertyVisible(Properties property)
 {
     return designerVisible[property];

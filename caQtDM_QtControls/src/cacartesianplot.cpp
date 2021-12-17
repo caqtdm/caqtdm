@@ -294,6 +294,11 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     installEventFilter(this);
 }
 
+caCartesianPlot::~caCartesianPlot()
+{
+   delete lgd;
+}
+
 void caCartesianPlot::updateLegendsPV() {
     if(thisLegendshow) {
         insertLegend(lgd, QwtPlot::BottomLegend);
