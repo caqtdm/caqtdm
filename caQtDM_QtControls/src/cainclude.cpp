@@ -93,6 +93,8 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
 
 caInclude::~ caInclude()
 {
+    delete boxLayout;
+    frame->deleteLater();
     delete gridLayout;
 }
 
