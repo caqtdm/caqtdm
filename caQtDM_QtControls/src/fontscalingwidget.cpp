@@ -90,6 +90,7 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
         QTextCursor* textCursor = new QTextCursor(textDoc);
         textDoc->setDocumentMargin(0);
         textCursor->insertHtml(text);
+        delete textCursor;
     }
 
     if(linecnt > 1) {
@@ -196,6 +197,9 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
             }
         }
 
+    }
+    if(richText) {
+        delete textDoc;
     }
     return f.pointSizeF();
 }
