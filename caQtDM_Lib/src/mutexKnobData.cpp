@@ -41,7 +41,7 @@ MutexKnobData::MutexKnobData()
 {
     KnobDataArraySize=500;
     KnobData = (knobData*) malloc(KnobDataArraySize * sizeof(knobData));
-    if (KnobData==NULL) {
+    if (KnobData==Q_NULLPTR) {
         printf("caQtDM -- could not allocate memory -> exit\n");
         exit(1);
     }
@@ -86,7 +86,7 @@ void MutexKnobData::ReAllocate(int oldsize, int newsize, void **ptr)
     void *tmp;
     //printf("reallocate for %d size\n", newsize);
     tmp = (void *) malloc((size_t) newsize);
-    if (tmp==NULL) {
+    if (tmp==Q_NULLPTR) {
         printf("caQtDM -- could not allocate any more memory -> exit\n");
         exit (1);
     }

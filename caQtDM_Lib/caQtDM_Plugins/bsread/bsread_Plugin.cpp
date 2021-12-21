@@ -45,12 +45,12 @@ QString bsreadPlugin::pluginName()
 bsreadPlugin::bsreadPlugin()
 {
     qDebug() << "bsreadPlugin: Create";
-    DispatcherThread=NULL;
-    Dispatcher=NULL;
+    DispatcherThread=Q_NULLPTR;
+    Dispatcher=Q_NULLPTR;
     DispatcherThread=new QThread(this);
     Dispatcher=new bsread_dispatchercontrol();
-    mutexknobdataP = NULL;
-    zmqcontex = NULL;
+    mutexknobdataP = Q_NULLPTR;
+    zmqcontex = Q_NULLPTR;
     // INIT ZMQ Layer
     zmqcontex = zmq_ctx_new();
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closeEvent()));

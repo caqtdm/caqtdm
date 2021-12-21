@@ -96,7 +96,7 @@ public:
             QMutex *datamutex;
             datamutex = (QMutex*) kDataP->mutex;
             datamutex->lock();
-            if (kDataP->edata.dataB==NULL){
+            if (kDataP->edata.dataB==Q_NULLPTR){
                 qDebug() << "Realloc"<< bsreadPVP->name << bsreadPVP->bsdata.wf_data_size<< sizeof(T_CAQTDM);
                 free(kDataP->edata.dataB);
             }

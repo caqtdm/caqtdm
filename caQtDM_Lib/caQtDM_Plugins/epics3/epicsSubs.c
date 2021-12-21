@@ -192,7 +192,7 @@ void PrepareDeviceIO(void)
 {
     //printf("preparedeviceio\n");
     int status;
-    char *optimize = NULL;
+    char *optimize = Q_NULLPTR;
     char *s;
 
     if(lockEpics == (epicsMutexId) 0) InitializeContextMutex();
@@ -209,7 +209,7 @@ void PrepareDeviceIO(void)
         ca_add_exception_event(Exceptionhandler, 0);
 
         optimize = (char*) getenv("CAQTDM_OPTIMIZE_EPICS3CONNECTIONS");
-        if (optimize != NULL) {
+        if (optimize != Q_NULLPTR) {
             s = optimize; while (*s) {*s = toupper((unsigned char) *s); s++;}
             if(strcmp(optimize, "TRUE") == 0) {
                 optimizeConnections = true;
@@ -786,7 +786,7 @@ void connectCallback(struct connection_handler_args args)
             info->event++;
 
 #if EPICS_REVISION < 15
-            status = ca_array_get_callback(dbf_type_to_DBR_CTRL(ca_field_type(args.chid)), 1, args.chid, displayCallback, NULL);
+            status = ca_array_get_callback(dbf_type_to_DBR_CTRL(ca_field_type(args.chid)), 1, args.chid, displayCallback, Q_NULLPTR);
 #else
             status = ca_add_masked_array_event(dbf_type_to_DBR_CTRL(ca_field_type(args.chid)), 0, //ca_element_count(args.chid),
                                          args.chid, displayCallback, info, 0.0,0.0,0.0, &info->evID, DBE_PROPERTY);
@@ -1132,7 +1132,7 @@ int EpicsSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *obje
 
     // set epics value
     PRINT(printf(" we have to set a value to an epics device <%s> %f %ld <%s>\n", pv, rdata, idata, sdata));
-    status = ca_create_channel(pv, NULL, 0, CA_PRIORITY, &ch);
+    status = ca_create_channel(pv, Q_NULLPTR, 0, CA_PRIORITY, &ch);
     if (ch == (chid) 0) {
         return !ECA_NORMAL;
     }
@@ -1234,7 +1234,7 @@ int EpicsSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t
             return !ECA_NORMAL;
     }
 
-    status = ca_create_channel(pv, NULL, 0, CA_PRIORITY, &ch);
+    status = ca_create_channel(pv, Q_NULLPTR, 0, CA_PRIORITY, &ch);
     if (ch == (chid) 0) {
         return !ECA_NORMAL;
     }
@@ -1316,7 +1316,7 @@ int EpicsGetTimeStamp(char *pv, char *timestamp)
     }
 
     // get epics timestamp
-    status = ca_create_channel(pv, NULL, 0, CA_PRIORITY, &ch);
+    status = ca_create_channel(pv, Q_NULLPTR, 0, CA_PRIORITY, &ch);
     if (ch == (chid) 0) return !ECA_NORMAL;
 
     status = ca_pend_io(CA_TIMEOUT/2);
@@ -1353,7 +1353,7 @@ int EpicsGetDescription(char *pv, char *description)
     sprintf(pvDesc, "%s.DESC", pvDesc);
 
     // get description
-    status = ca_create_channel(pvDesc, NULL, 0, CA_PRIORITY, &ch);
+    status = ca_create_channel(pvDesc, Q_NULLPTR, 0, CA_PRIORITY, &ch);
     if (ch == (chid) 0) return !ECA_NORMAL;
 
     status = ca_pend_io(CA_TIMEOUT/2);

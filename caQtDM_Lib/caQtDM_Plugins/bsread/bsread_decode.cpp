@@ -46,16 +46,16 @@ bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint)
    StreamConnectionPoint=ConnectionPoint;
    StreamConnectionType="push_pull";
    context=Context;
-   UpdaterPool=NULL;
-   BlockPool=NULL;
+   UpdaterPool=Q_NULLPTR;
+   BlockPool=Q_NULLPTR;
 }
 bsread_Decode::bsread_Decode(void * Context,QString ConnectionPoint,QString ConnectionType)
 {
    StreamConnectionPoint=ConnectionPoint;
    StreamConnectionType=ConnectionType;
    context=Context;
-   UpdaterPool=NULL;
-   BlockPool=NULL;
+   UpdaterPool=Q_NULLPTR;
+   BlockPool=Q_NULLPTR;
 }
 
 
@@ -259,7 +259,7 @@ bool bsread_Decode::setMainHeader(char *value,size_t size)
     MainHeader = RawData.left((int)size);
     channelcounter=0;
     JSONValue *MainMessageJ = JSON::Parse(MainHeader.toStdString().c_str());
-    if (MainMessageJ!=NULL){
+    if (MainMessageJ!=Q_NULLPTR){
         if(!MainMessageJ->IsObject()) {
             delete(MainMessageJ);
         } else {
@@ -323,10 +323,10 @@ void bsread_Decode::setHeader(char *value,size_t size){
     }
     catch (...) {
         qDebug() << "bsreadPlugin: Header Error :"<< value;
-        HeaderMessageJ=NULL;
+        HeaderMessageJ=Q_NULLPTR;
     }
 
-    if (HeaderMessageJ!=NULL){
+    if (HeaderMessageJ!=Q_NULLPTR){
         if(!HeaderMessageJ->IsObject()) {
             delete(HeaderMessageJ);
         } else {
@@ -622,7 +622,7 @@ void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message,size_t
 
                 bsdata_assign_single(Data, message,&datatypesize);
                 if(Data->bsdata.wf_data_size!=(ulong)(datasize*datatypesize)){
-                    if (Data->bsdata.wf_data!=NULL){
+                    if (Data->bsdata.wf_data!=Q_NULLPTR){
                         free(Data->bsdata.wf_data);
                     }
                     Data->bsdata.wf_data=malloc(datasize*datatypesize);
@@ -664,7 +664,7 @@ void bsread_Decode::bsread_SetData(bsread_channeldata* Data,void *message,size_t
 
                 bsdata_assign_single(Data, message,&datatypesize);
                 if(Data->bsdata.wf_data_size!=(ulong)(datasize*datatypesize)){
-                    if (Data->bsdata.wf_data!=NULL){
+                    if (Data->bsdata.wf_data!=Q_NULLPTR){
                         free(Data->bsdata.wf_data);
                     }
                     Data->bsdata.wf_data=malloc(datasize*datatypesize);
@@ -815,7 +815,7 @@ void bsread_Decode::bsread_EndofData()
                 strcpy(kData->edata.fec,ioc_string.toLatin1().constData());
                 // find this pv in our internal values list
                 // and update its value
-                bsreadPV=NULL;
+                bsreadPV=Q_NULLPTR;
                 QMap<QString,bsread_channeldata*>::iterator i = ChannelSearch.find(key);
                 while (i !=ChannelSearch.end() && i.key() == key) {
                     bsreadPV = i.value();
@@ -1083,7 +1083,7 @@ bool bsread_Decode::bsread_DataMonitorUnConnect(knobData *kData){
     QMutex *datamutex;
     datamutex = (QMutex*) kData->mutex;
     datamutex->lock();
-    kData->edata.dataB=NULL;
+    kData->edata.dataB=Q_NULLPTR;
     kData->edata.dataSize=0;
     kData->edata.valueCount=0;
     datamutex->unlock();

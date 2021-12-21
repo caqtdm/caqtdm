@@ -139,11 +139,11 @@ void sfRetrieval::cancelDownload()
     aborted = true;
 
     disconnect(manager);
-    if( reply != NULL ) {
+    if( reply != Q_NULLPTR ) {
         //qDebug() << QTime::currentTime().toString() << this << PV << "!!!!!!!!!!!!!!!!! abort networkreply for";
         reply->abort();
         reply->deleteLater();
-        reply = NULL;
+        reply = Q_NULLPTR;
     }
 
     downloadFinished();

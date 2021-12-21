@@ -123,15 +123,15 @@ void SNumeric::clearContainers()
         labels.clear();
         foreach(QWidget *child, this->findChildren<QWidget *>(QRegExp("layoutmember*"))) delete child;
         delete box;
-        box = NULL;
+        box = Q_NULLPTR;
     }
     if (bup) {
         delete bup;
-        bup = NULL;
+        bup = Q_NULLPTR;
     }
     if (bdown) {
         delete bdown;
-        bdown = NULL;
+        bdown = Q_NULLPTR;
     }
 }
 
@@ -508,7 +508,7 @@ void SNumeric::resizeEvent(QResizeEvent *e)
         }
     }
 
-    if (text != NULL)  {
+    if (text != Q_NULLPTR)  {
         text->setGeometry(QRect(box->cellRect(1, 0).topLeft(), box->cellRect(1, box->columnCount() - 1).bottomRight()));
     }
 

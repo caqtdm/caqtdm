@@ -3349,7 +3349,7 @@ QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, 
 
                             JSONObject jsonobj;
                             JSONValue *MacroDataJ = JSON::Parse(newText.mid(json_start,json_end-json_start+1).toStdString().c_str());
-                            if (MacroDataJ!=NULL){
+                            if (MacroDataJ!=Q_NULLPTR){
                                 if(!MacroDataJ->IsObject()) {
                                     delete(MacroDataJ);
                                 } else {
@@ -7938,7 +7938,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType
     char errmess[255];
     double value;
     long longValue;
-    char *end = NULL, textValue[255];
+    char *end = Q_NULLPTR, textValue[255];
     bool match;
     int indx;
     ControlsInterface * plugininterface = (ControlsInterface *) Q_NULLPTR;
@@ -7990,7 +7990,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType
         if(kPtr->edata.dataB != (void*)0 && kPtr->edata.enumCount > 0) {
             QString strng((char*) kPtr->edata.dataB);
             //QStringList list = strng.split(";", QString::SkipEmptyParts);
-            QStringList list = strng.split((QChar)27, QString::SkipEmptyParts);
+            QStringList list = strng.split((QChar)27, SKIP_EMPTY_PARTS);
             for (int i=0; i<list.size(); i++) {
                 if(!text.compare(list.at(i).trimmed())) {
                     //qDebug() << "set enum text" << textValue;
@@ -8119,7 +8119,7 @@ void CaQtDM_Lib::TreatRequestedWave(QString pvo, QString text, caWaveTable::Form
     float   fdata[1];
     double  value, ddata[1];
     long    longValue;
-    char    *end = NULL, textValue[255];
+    char    *end = Q_NULLPTR, textValue[255];
     bool    match;
 
     QString pv = pvo.trimmed();
@@ -8257,7 +8257,7 @@ bool CaQtDM_Lib::parseForQRectConst(QString &inputc, double *valueArray)
     input[cpylen] = '\0';
 
     JSONValue *value = JSON::Parse(input);
-    if (value == NULL) {
+    if (value == Q_NULLPTR) {
         //printf("failed to parse <%s>\n", input);
     } else {
         // Retrieve the main object
@@ -8300,7 +8300,7 @@ int CaQtDM_Lib::parseForDisplayRate(QString &inputc, int &rate)
     JSONValue *value = JSON::Parse(input);
 
     // Did it go wrong?
-    if (value == NULL) {
+    if (value == Q_NULLPTR) {
         //printf("failed to parse <%s>\n", input);
         inputc = "{}";
         return success;
@@ -8319,7 +8319,7 @@ int CaQtDM_Lib::parseForDisplayRate(QString &inputc, int &rate)
                 // Retrieve nested object
                 JSONValue *value1 = JSON::Parse(root[L"caqtdm_monitor"]->Stringify().c_str());
                 // Did it go wrong?
-                if ((value1 != NULL) && value1->IsObject()) {
+                if ((value1 != Q_NULLPTR) && value1->IsObject()) {
                     JSONObject root;
                     root = value1->AsObject();
                     if (root.find(L"maxdisplayrate") != root.end() && root[L"maxdisplayrate"]->IsNumber()) {
@@ -8366,7 +8366,7 @@ bool CaQtDM_Lib::checkJsonString(QString &inputc)
     JSONValue *value = JSON::Parse(input);
 
     // Did it go wrong?, when yes then get rid of it
-    if (value == NULL) {
+    if (value == Q_NULLPTR) {
         success = false;
         inputc ="{}";
         //printf("checkJsonString -- failed to parse <%s>\n", input);
