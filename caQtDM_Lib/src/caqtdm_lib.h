@@ -214,8 +214,27 @@ public:
 #endif
     }
 
-
-
+    void save_graphics(QString filename)
+    {
+#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
+        QPixmap pm = this->grab();
+#else
+        QPixmap pm = QPixmap::grabWidget(this);
+#endif
+        QString text = QDate::currentDate().toString("yyyy-MM-dd");
+        text += " " + QTime::currentTime().toString("hh:mm:ss");
+        text += ", " + this->thisFileShort;
+        QPainter painter( &pm );
+        QFont qfont = painter.font();
+        qfont.setPointSizeF(8);
+        painter.setFont(qfont);
+        painter.drawText(QPoint(0, 10), text );
+        if (pm.save(filename,"PNG",-1)){
+            printf("caQtDM image file saved\n");
+        }else{
+            printf("caQtDM image file save failed\n");
+        }
+    }
 protected:
     virtual void timerEvent(QTimerEvent *e);
     void resizeEvent ( QResizeEvent * event );

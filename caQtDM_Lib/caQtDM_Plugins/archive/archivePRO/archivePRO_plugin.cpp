@@ -71,7 +71,7 @@ void ArchivePRO_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfI
     QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
 
     while (i != listOfIndexes.constEnd()) {
-        QThread *tmpThread = (QThread *) 0;
+        QThread *tmpThread = (QThread *) Q_NULLPTR;
         indexes indexNew = i.value();
         //qDebug() << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << indexNew.w << endl;
 
@@ -83,7 +83,7 @@ void ArchivePRO_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfI
 
         //qDebug() << "tmpThread" << tmpThread;
 
-        if((tmpThread != (QThread *) 0) && tmpThread->isRunning()) {
+        if((tmpThread != (QThread *) Q_NULLPTR) && tmpThread->isRunning()) {
             //qDebug() << "workerthread is running" << tmpThread->isRunning();
         } else {
             WorkerPRO *worker = new WorkerPRO;

@@ -46,7 +46,7 @@ caTable::caTable(QWidget *parent) : QTableWidget(parent)
     setMaxValue(1.0);
     for(int i=0; i< MaxRows; i++) {
         setFormat(i, 1);
-        for(int j=0; j< MaxCols; j++) tableItem[i][j] = (QTableWidgetItem*) 0;
+        for(int j=0; j< MaxCols; j++) tableItem[i][j] = (QTableWidgetItem*) Q_NULLPTR;
     }
 
     thisItemFont = this->font();
@@ -76,7 +76,7 @@ void caTable::cellclicked(int row, int col)
 void caTable::celldoubleclicked(int row, int col)
 {
      if(col==1) emit TableDoubleClickedSignal(this->item(row, 0)->text());
-     if(tableItem[row][col] != (QTableWidgetItem*) 0)  this->item(row,col)->setSelected(false);
+     if(tableItem[row][col] != (QTableWidgetItem*) Q_NULLPTR)  this->item(row,col)->setSelected(false);
 }
 
 void caTable::createActions() {
@@ -165,7 +165,7 @@ void caTable::displayText(int row, int col, short status, QString const &text)
 
     if(row >= rowCount() || col >= columnCount()) return;
 
-    if(tableItem[row][col] != (QTableWidgetItem*) 0) {
+    if(tableItem[row][col] != (QTableWidgetItem*) Q_NULLPTR) {
         tableItem[row][col]->setText(text);
     } else {
         tableItem[row][col] = new QTableWidgetItem(text);

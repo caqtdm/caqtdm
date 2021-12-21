@@ -167,6 +167,7 @@ void caCalc::setValue(QRect value)
 
 void caCalc::setValue(int value)
 {
+    Q_UNUSED(value)
     QRect empty;
     setValue(empty);
 }

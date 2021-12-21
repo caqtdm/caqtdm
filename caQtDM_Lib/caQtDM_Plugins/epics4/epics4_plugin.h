@@ -118,6 +118,12 @@ public:
     epics::pvData::CallbackThreadPtr epics4_callbackThread;
     MutexKnobData * mutexKnobData;
     epics::caqtdm::epics4::PVAChannelProviderPtr providerN;
+signals:
+    void closeSignal();
+
+private slots:
+    void closeEvent();
+
 };
 
 #endif

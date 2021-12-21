@@ -84,7 +84,7 @@ int setenv(const char *name, const char *value, int overwrite)
     int errcode = 0;
     if(!overwrite) {
         size_t envsize = 0;
-        errcode = getenv_s(&envsize, NULL, 0, name);
+        errcode = getenv_s(&envsize, Q_NULLPTR, 0, name);
         if(errcode || envsize) return errcode;
     }
     return _putenv_s(name, value);
@@ -113,13 +113,13 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
              qDebug() << "application state changed to inactive";
 
              pendio = false;
-             if (mutexKnobData != (MutexKnobData *) 0) {
+             if (mutexKnobData != (MutexKnobData *) Q_NULLPTR) {
                  for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
                      knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
                      if(kPtr->index != -1)  {
                        //qDebug() << "should disconnect" << kPtr->pv;
                        ControlsInterface * plugininterface = (ControlsInterface *) kPtr->pluginInterface;
-                       if(plugininterface != (ControlsInterface *) 0) plugininterface->pvDisconnect(kPtr);
+                       if(plugininterface != (ControlsInterface *) Q_NULLPTR) plugininterface->pvDisconnect(kPtr);
                        mutexKnobData->SetMutexKnobData(i, *kPtr);
                        pendio = true;
                      }
@@ -131,12 +131,12 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
          case Qt::ApplicationActive:
              qDebug() << "application state changed to active";
              pendio = false;
-              if (mutexKnobData != (MutexKnobData *) 0) {
+              if (mutexKnobData != (MutexKnobData *) Q_NULLPTR) {
                   for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
                       knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
                       if(kPtr->index != -1) {
                         ControlsInterface * plugininterface = (ControlsInterface *) kPtr->pluginInterface;
-                        if(plugininterface != (ControlsInterface *) 0) plugininterface->pvReconnect(kPtr);
+                        if(plugininterface != (ControlsInterface *) Q_NULLPTR) plugininterface->pvReconnect(kPtr);
                         pendio = true;
                       }
                   }
@@ -161,7 +161,7 @@ void FileOpenWindow::FlushAllInterfaces()
         while (i.hasNext()) {
             i.next();
             ControlsInterface *plugininterface = i.value();
-            if(plugininterface != (ControlsInterface *) 0) plugininterface->FlushIO();
+            if(plugininterface != (ControlsInterface *) Q_NULLPTR) plugininterface->FlushIO();
         }
     }
 }
@@ -174,7 +174,7 @@ void FileOpenWindow::TerminateAllInterfaces()
         while (i.hasNext()) {
             i.next();
             ControlsInterface *plugininterface = i.value();
-            if(plugininterface != (ControlsInterface *) 0) plugininterface->TerminateIO();
+            if(plugininterface != (ControlsInterface *) Q_NULLPTR) plugininterface->TerminateIO();
         }
     }
 }
@@ -189,7 +189,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     // definitions for last opened file
     debugWindow = true;
     fromIOS = false;
-    lastWindow = (QMainWindow*) 0;
+    lastWindow = (QMainWindow*) Q_NULLPTR;
     lastMacro ="";
     lastFile = "";
     if(resizing) lastResizing="true";
@@ -399,8 +399,8 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     // start a timer
     startTimer(1000);
 
-    pvWindow = (QMainWindow*) 0;
-    pvTable = (QTableWidget*) 0;
+    pvWindow = (QMainWindow*) Q_NULLPTR;
+    pvTable = (QTableWidget*) Q_NULLPTR;
 
 //************************************************************************************************************************************************
     if(HTTPCONFIGURATOR) {
@@ -472,7 +472,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     setenv("CAQTDM_DISPLAY_PATH", qasc(specials.getStdPath()), 1);
     int success = filefunction.checkFileAndDownload(file, url);
     if(!success) {
-        QMessageBox::critical(0, tr("caQtDM"), tr("could not download file %1 from %2").arg(file).arg(url));
+        QMessageBox::critical(Q_NULLPTR, tr("caQtDM"), tr("could not download file %1 from %2").arg(file).arg(url));
         exit(0);
     }
 
@@ -576,7 +576,7 @@ void FileOpenWindow::parseConfigFile(const QString &filename, QList<QString> &ur
 
     /* can not open file */
     if (!file->open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::critical(0, tr("caQtDM"), tr("could not open configuration file: %1").arg(filename));
+        QMessageBox::critical(Q_NULLPTR, tr("caQtDM"), tr("could not open configuration file: %1").arg(filename));
         exit(0);
     }
 
@@ -620,7 +620,7 @@ void FileOpenWindow::saveConfigFile(const QString &filename, QList<QString> &url
 
     /* can not open file */
     if (!file->open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QMessageBox::critical(0, tr("caQtDM"), tr("could not open configuration file: %1").arg(filename));
+        QMessageBox::critical(Q_NULLPTR, tr("caQtDM"), tr("could not open configuration file: %1").arg(filename));
         exit(0);
     }
 
@@ -659,7 +659,7 @@ void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
     EnvFile.append(fileName);
     QFile file(EnvFile);
     if(!file.open(QIODevice::ReadOnly)) {
-        QMessageBox::information(0, "open file error setAllEnviromentVariables", file.errorString());
+        QMessageBox::information(Q_NULLPTR, "open file error setAllEnviromentVariables", file.errorString());
         return;
     }
 
@@ -740,7 +740,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 #endif
 
     // any non connected pv's to display ?
-    if (mutexKnobData != (MutexKnobData *) 0) {
+    if (mutexKnobData != (MutexKnobData *) Q_NULLPTR) {
         char msg[MAX_STRING_LENGTH];
         msg[0] = '\0';
 
@@ -775,7 +775,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
         }
         statusBar()->showMessage(msg);
     }
-
+    QString filename_save=qgetenv("CAQTDM_SCREENSHOT_NAME");
     // we wanted a print, do it when acquired, then exit
     if(printandexit) {
         if(countPV > 0 && countNotConnected == 0) {
@@ -800,6 +800,41 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
             exit(1);
         }
     }
+    QVariant var = this->property("savetoimage");
+    if(!var.isNull()) {
+        bool savetoimage = var.toBool();
+        if (savetoimage){
+            QString name="caQtDM";
+            if (!filename_save.isEmpty()){
+                name=filename_save;
+            }
+            name=name.append(".png");
+            if(countPV > 0 && countNotConnected == 0) {
+                if(this->findChildren<CaQtDM_Lib *>().count() == 1) {
+                    CaQtDM_Lib * widget = this->findChild<CaQtDM_Lib *>();
+                    if(countDisplayed > 0 && countDisplayed == countPV) {
+                        printIt++;
+                        if(printIt > 2) {
+
+                            widget->save_graphics(name);
+                            qDebug() << "caQtDM -- file has been printed to "<< name;
+                            qApp->exit(1);
+                            exit(1);
+                        }
+                    }
+                }
+            }
+            if(timeout++ > 4) {    // seems we did not get everything
+                CaQtDM_Lib * widget = this->findChild<CaQtDM_Lib *>();
+                widget->save_graphics(name);
+                qDebug() << "caQtDM -- file has been printed to " << name << ", probably with errors";
+                qApp->exit(1);
+                exit(1);
+            }
+
+        }
+    }
+
 
     // reload windows that were closed to be reloaded (had to be deferrred, due to memory problems)
     if(!reloadList.isEmpty()) {
@@ -835,7 +870,7 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
 {
     char *asc;
     bool willprint = printexit;
-    CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, interfaces, messageWindow, willprint, 0, OptionList);
+    CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, interfaces, messageWindow, willprint, Q_NULLPTR, OptionList);
 
     // prc files are not allowed to be resized, or when resizing is prohibited by the command line
     if (fileS.contains("prc")) {
@@ -1401,7 +1436,7 @@ void FileOpenWindow::Callback_ActionUnconnected()
     int countNotConnected=0;
     int countDisplayed = 0;
 
-    if(pvWindow != (QMainWindow*) 0) {
+    if(pvWindow != (QMainWindow*) Q_NULLPTR) {
         pvWindow->show();
         return;
     }
@@ -1445,7 +1480,7 @@ void FileOpenWindow::Callback_PVwindowExit()
 void FileOpenWindow::fillPVtable(int &countPV, int &countNotConnected, int &countDisplayed)
 {
     int count = 0;
-    if(pvTable != (QTableWidget*) 0) {
+    if(pvTable != (QTableWidget*) Q_NULLPTR) {
         pvTable->clear();
         pvTable->setColumnCount(4);
         pvTable->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -1465,7 +1500,7 @@ void FileOpenWindow::fillPVtable(int &countPV, int &countNotConnected, int &coun
         }
     }
 
-    if(pvTable != (QTableWidget*) 0) {
+    if(pvTable != (QTableWidget*) Q_NULLPTR) {
         pvTable->setRowCount(countNotConnected);
         count = 0;
         for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {

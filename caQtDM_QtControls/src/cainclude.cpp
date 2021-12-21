@@ -108,6 +108,8 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
 
 caInclude::~ caInclude()
 {
+    delete boxLayout;
+    frame->deleteLater();
     delete gridLayout;
 }
 
@@ -376,8 +378,8 @@ void caInclude::setFileName(QString const &filename)
             bool ok = false;
             int posX = 0;
             int posY = 0;
-            QWidget * loadedWidget = (QWidget *) 0;
-            QWidget * tmp = (QWidget *) 0;
+            QWidget * loadedWidget = (QWidget *) Q_NULLPTR;
+            QWidget * tmp = (QWidget *) Q_NULLPTR;
             if(!fileName.contains(".prc")) {
                 // load new file
                 QFile *file = new QFile;
@@ -397,7 +399,7 @@ void caInclude::setFileName(QString const &filename)
 
                 file->close();
                 delete file;
-                if(tmp == (QWidget*) 0) return;
+                if(tmp == (QWidget*) Q_NULLPTR) return;
                 thisLoadedWidgets.append(tmp);
                 loadedWidget = tmp;
                 effectiveSize= tmp->size();
@@ -406,7 +408,7 @@ void caInclude::setFileName(QString const &filename)
                 ParsePepFile *parsefile = new ParsePepFile(fileNameFound);
                 printf("effective load of file %s for widget %s\n", qasc(fileNameFound), qasc(this->objectName()));
                 QWidget *tmp= parsefile->load(thisParent);
-                if(tmp == (QWidget*) 0) return;
+                if(tmp == (QWidget*) Q_NULLPTR) return;
                 thisLoadedWidgets.append(tmp);
                 loadedWidget = tmp;
                 effectiveSize= tmp->size();

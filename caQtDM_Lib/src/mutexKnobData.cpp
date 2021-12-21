@@ -47,8 +47,10 @@ MutexKnobData::MutexKnobData()
     }
     for(int i=0; i < KnobDataArraySize; i++){
         KnobData[i].index  = -1;
-        KnobData[i].thisW = (void*) 0;
-        KnobData[i].mutex = (void*) 0;
+        KnobData[i].thisW = (void*) Q_NULLPTR;
+        KnobData[i].mutex = (void*) Q_NULLPTR;
+        KnobData[i].edata.dataB = (void*) Q_NULLPTR;
+        KnobData[i].edata.dataPtr = (void*) Q_NULLPTR;
     }
 
     nbMonitorsPerSecond = 0;
@@ -238,7 +240,7 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w, int dataI
         } else if(dataIndex < dataCount) {
             // initialize data to nan and update the correct index
             if((int) (dataCount * sizeof(double)) != ptr->edata.dataSize) {
-                if(ptr->edata.dataB != (void*) 0) free(ptr->edata.dataB);
+                if(ptr->edata.dataB != (void*) Q_NULLPTR) free(ptr->edata.dataB);
                 ptr->edata.dataB = (void*) malloc(dataCount * sizeof(double));
                 double *data = (double *) ptr->edata.dataB;
                 for(int i=0; i<dataCount; i++) data[i] = qQNaN();
@@ -270,7 +272,7 @@ void MutexKnobData::UpdateSoftPV(QString pv, double value, QWidget *w, int dataI
                 } else {
                     // allocate and initialize data to nan
                     if((int) (dataCount * sizeof(double)) !=  KnobData[indx].edata.dataSize) {
-                        if( KnobData[indx].edata.dataB != (void*) 0) free( KnobData[indx].edata.dataB);
+                        if( KnobData[indx].edata.dataB != (void*) Q_NULLPTR) free( KnobData[indx].edata.dataB);
                         KnobData[indx].edata.dataB = (void*) malloc(dataCount * sizeof(double));
                         double *data = (double *) KnobData[indx].edata.dataB;
                         for(int i=0; i<dataCount; i++) data[i] = qQNaN();
@@ -408,7 +410,7 @@ knobData* MutexKnobData::getMutexKnobDataPV(QWidget *widget, QString pv)
         }
     loop++;
     }
-    return (knobData*) 0;
+    return (knobData*) Q_NULLPTR;
 }
 
 //*********************************************************************************************************************
@@ -504,7 +506,7 @@ void MutexKnobData::SetMutexKnobDataReceived(knobData *kData) {
         strcpy(fec, kData->edata.fec);
         int caFieldType= kData->edata.fieldtype;
 
-        if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kData->edata.dataB != (void*) 0) {
+        if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kData->edata.dataB != (void*) Q_NULLPTR) {
             if(kData->edata.dataSize < STRING_EXCHANGE_SIZE) {
                 memcpy(dataString, (char*) kData->edata.dataB, (size_t) kData->edata.dataSize);
                 dataString[kData->edata.dataSize] = '\0';
@@ -687,7 +689,7 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 strcpy(fec, kPtr->edata.fec);
                 int caFieldType= kPtr->edata.fieldtype;
 
-                if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kPtr->edata.dataB != (void*) 0) {
+                if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kPtr->edata.dataB != (void*) Q_NULLPTR) {
                     if(kPtr->edata.dataSize < STRING_EXCHANGE_SIZE) {
                         memcpy(dataString, (char*) kPtr->edata.dataB, (size_t) kPtr->edata.dataSize);
                         dataString[kPtr->edata.dataSize] = '\0';
@@ -743,7 +745,7 @@ void MutexKnobData::SetMutexKnobDataConnected(int index, int connected)
 
 #ifdef epics4
     connectInfoShort *tmp = (connectInfoShort *) KnobData[index].edata.info;
-    if (tmp != (connectInfoShort *) 0) tmp->connected = connected;
+    if (tmp != (connectInfoShort *) Q_NULLPTR) tmp->connected = connected;
 #endif
 
     if(!connected) {

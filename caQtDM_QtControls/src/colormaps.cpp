@@ -26,6 +26,7 @@
 #define QWT_DLL
 #endif
 
+#include <qtcontrols_global.h>
 #include "colormaps.h"
 
 colorMaps::colorMaps()
@@ -34,7 +35,7 @@ colorMaps::colorMaps()
 
 void colorMaps::showColorMap(QwtScaleWidget *colormapWidget, bool hide, QwtLinearColorMap *colormap)
 {
-    if(colormapWidget != ( QwtScaleWidget *) 0) {
+    if(colormapWidget != ( QwtScaleWidget *) Q_NULLPTR) {
         colormapWidget->setHidden(hide);
         colormapWidget->setColorMap(QwtInterval(0,1), colormap);
     }

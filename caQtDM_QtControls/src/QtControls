@@ -51,6 +51,7 @@
     #include <cadoubletabwidgetextension.h>
     #include <cadoubletabwidgetextensionfactory.h>
     #include <capolylinetaskmenu.h>
+    #include <pvtaskmenu.h>
 #endif
 
 #endif

@@ -262,7 +262,7 @@ void limitsCartesianplotDialog::applyClicked()
         QStringList vars = pvs.split(";");
         if((vars.size()== 2) || (vars.at(0).trimmed().length() > 0)) {
             knobData *kPtr = monData->getMutexKnobDataPV(CartesianPlot, vars.at(0).trimmed());
-             if(kPtr != (knobData*) 0) {
+             if(kPtr != (knobData*) Q_NULLPTR) {
                 if(kPtr->edata.lower_disp_limit != kPtr->edata.upper_disp_limit) {
                     qDebug() << "set to channel limits" << kPtr->edata.lower_disp_limit << kPtr->edata.upper_disp_limit;
                     CartesianPlot->setScaleX(kPtr->edata.lower_disp_limit, kPtr->edata.upper_disp_limit);
@@ -289,7 +289,7 @@ void limitsCartesianplotDialog::applyClicked()
         QStringList vars = pvs.split(";");
         if((vars.size()== 2) || (vars.at(1).trimmed().length() > 0)) {
             knobData *kPtr = monData->getMutexKnobDataPV(CartesianPlot, vars.at(1).trimmed());
-             if(kPtr != (knobData*) 0) {
+             if(kPtr != (knobData*) Q_NULLPTR) {
                 if(kPtr->edata.lower_disp_limit != kPtr->edata.upper_disp_limit) {
                     //qDebug() << "set to channel limits" << kPtr->edata.lower_disp_limit << kPtr->edata.upper_disp_limit;
                     CartesianPlot->setScaleY(kPtr->edata.lower_disp_limit, kPtr->edata.upper_disp_limit);

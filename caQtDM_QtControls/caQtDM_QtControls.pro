@@ -8,11 +8,11 @@ include(../caQtDM.pri)
 DEFINES += QT_NO_DEBUG_OUTPUT
 
 contains(QT_VER_MAJ, 4) {
-      CONFIG += qwt plugin thread uitools
+      CONFIG += qwt plugin thread uitools network
       CONFIG += designer
 }
 contains(QT_VER_MAJ, 5) {
-      QT += widgets concurrent uitools opengl
+      QT += widgets concurrent uitools opengl network
       CONFIG  += qwt plugin
       DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
       ios | android {
@@ -137,7 +137,12 @@ SOURCES	+= \
     src/camimedisplay.cpp \
     src/calinedraw.cpp \
     src/wmsignalpropagator.cpp \
-    src/replacemacro.cpp
+    src/replacemacro.cpp \
+    src/JSON.cpp \
+    src/JSONValue.cpp \
+    src/pvdialog.cpp \
+    src/pvtaskmenu.cpp \
+    src/textedit.cpp
 
 ADL_EDL_FILES {
     SOURCES	+= src/parseotherfile.cpp
@@ -159,7 +164,13 @@ QT += network
 HEADERS += src/networkaccess.h src/fileFunctions.h \
     src/calinedraw.h \
     src/wmsignalpropagator.h \
-    src/replacemacro.h
+    src/replacemacro.h \
+    src/JSON.h \
+    src/JSONValue.h \
+    src/pvtaskmenu.h \
+    src/pvdialog.h \
+    src/networkmodel.h \
+    src/textedit.h
 SOURCES += src/networkaccess.cpp src/fileFunctions.cpp
 
 contains(QWT_VER_MIN, 0) {

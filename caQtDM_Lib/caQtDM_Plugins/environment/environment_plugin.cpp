@@ -121,12 +121,11 @@ int environmentPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow
 
 // caQtDM_Lib will call this routine for defining a monitor
 int environmentPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip) {
-    Q_UNUSED(index);
-    Q_UNUSED(rate);
-    Q_UNUSED(skip);
+    Q_UNUSED(index)
+    Q_UNUSED(rate)
+    Q_UNUSED(skip)
 
-    int i;
-    size_t dataSize;
+    int dataSize;
     QMutexLocker locker(&mutex);
     qDebug() << "environmentPlugin:pvAddMonitor" << kData->pv << kData->index << kData;
 
@@ -143,7 +142,7 @@ int environmentPlugin::pvAddMonitor(int index, knobData *kData, int rate, int sk
         dataSize= value.length();
         //qDebug() <<"PV:" << datapv << value;
         if(dataSize != kData->edata.dataSize) {
-           if(kData->edata.dataB != (void*) 0) free(kData->edata.dataB);
+           if(kData->edata.dataB != (void*) Q_NULLPTR) free(kData->edata.dataB);
             kData->edata.dataB = (void*) malloc((size_t) dataSize*sizeof(char)+5);
             kData->edata.dataSize = dataSize;
         }
@@ -169,7 +168,6 @@ int environmentPlugin::pvAddMonitor(int index, knobData *kData, int rate, int sk
 
 // caQtDM_Lib will call this routine for getting rid of a monitor
 int environmentPlugin::pvClearMonitor(knobData *kData) {
-    int i=0;
 
     QMutexLocker locker(&mutex);
     QString datapv=kData->pv;
@@ -186,13 +184,13 @@ int environmentPlugin::pvClearMonitor(knobData *kData) {
 int environmentPlugin::pvFreeAllocatedData(knobData *kData)
 {
     //qDebug() << "DemoPlugin:pvFreeAllocatedData";
-    if (kData->edata.info != (void *) 0) {
+    if (kData->edata.info != (void *) Q_NULLPTR) {
         free(kData->edata.info);
-        kData->edata.info = (void*) 0;
+        kData->edata.info = (void*) Q_NULLPTR;
     }
-    if(kData->edata.dataB != (void*) 0) {
+    if(kData->edata.dataB != (void*) Q_NULLPTR) {
         free(kData->edata.dataB);
-        kData->edata.dataB = (void*) 0;
+        kData->edata.dataB = (void*) Q_NULLPTR;
     }
 
     return true;
@@ -200,9 +198,13 @@ int environmentPlugin::pvFreeAllocatedData(knobData *kData)
 
 // caQtDM_Lib will call this routine for setting data (see for more detail the epics3 plugin)
 int environmentPlugin::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType) {
-    Q_UNUSED(forceType);
-    Q_UNUSED(errmess);
-    Q_UNUSED(object);
+    Q_UNUSED(idata)
+    Q_UNUSED(sdata)
+    Q_UNUSED(rdata)
+    Q_UNUSED(pv)
+    Q_UNUSED(forceType)
+    Q_UNUSED(errmess)
+    Q_UNUSED(object)
     QMutexLocker locker(&mutex);
     //qDebug() << "environmentPlugin:pvSetValue" << pv << rdata << idata << sdata;
     return 0;

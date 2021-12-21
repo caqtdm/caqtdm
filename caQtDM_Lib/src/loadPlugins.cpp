@@ -81,7 +81,7 @@ bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKn
         if( pluginsDir.entryList(QDir::Files).length() > 0) {
             QString currentPath = pluginsDir.absolutePath();
             snprintf(asc, MAX_STRING_LENGTH, "Controlsystem plugins: attempt to load from %s", qasc(currentPath));
-            if(messageWindow != (MessageWindow *) 0) messageWindow->postMsgEvent(QtWarningMsg, asc);
+            if(messageWindow != (MessageWindow *) Q_NULLPTR) messageWindow->postMsgEvent(QtWarningMsg, asc);
 
             foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
                 //qDebug() << "load " << pluginsDir.absoluteFilePath(fileName);
@@ -96,7 +96,7 @@ bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKn
                     }
                 } else {
                     snprintf(asc, MAX_STRING_LENGTH, "%s", qasc(pluginLoader.errorString()));
-                    if(messageWindow != (MessageWindow *) 0) messageWindow->postMsgEvent(QtWarningMsg, asc);
+                    if(messageWindow != (MessageWindow *) Q_NULLPTR) messageWindow->postMsgEvent(QtWarningMsg, asc);
                 }
             }
             break;

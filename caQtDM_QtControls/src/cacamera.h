@@ -134,9 +134,11 @@ public:
 
     enum colormap {as_is = 0, color_to_mono, mono_to_wavelength, mono_to_hot, mono_to_heat, mono_to_jet, mono_to_custom};
 
-    enum colormode {Mono, RGB1_CA, RGB2_CA, RGB3_CA, BayerRG_8, BayerGB_8, BayerGR_8, BayerBG_8, BayerRG_12, BayerGB_12, BayerGR_12, BayerBG_12, RGB_8 ,BGR_8 ,RGBA_8 ,BGRA_8 , YUV444, YUV422, YUV411, YUV421};
+    enum colormode {Mono,Mono12p,Mono10p,Mono10Packed,Mono8, RGB1_CA, RGB2_CA, RGB3_CA, BayerRG_8, BayerGB_8, BayerGR_8, BayerBG_8, BayerRG_12, BayerGB_12, BayerGR_12, BayerBG_12, RGB_8 ,BGR_8 ,RGBA_8 ,BGRA_8 , YUV444, YUV422, YUV411, YUV421};
 
     enum packingmode {packNo, MSB12Bit, LSB12Bit, Reversed};
+
+    enum compressionmode {non, Zlib, JPG };
 
     enum Properties { customcolormap = 0, discretecolormap};
 
@@ -154,6 +156,9 @@ public:
 
     void setPackmode(packingmode mode) {thisPackingmode = mode; if(packingmodeCombo != (QComboBox*)Q_NULLPTR) packingmodeCombo->setCurrentIndex(mode);}
     packingmode getPackmode() {return thisPackingmode;}
+
+    void setCompressionmode(compressionmode mode) {thisCompressionmode = mode; if(compressionmodeCombo != (QComboBox*)Q_NULLPTR) compressionmodeCombo->setCurrentIndex(mode);}
+    compressionmode getCompressionmode() {return thisCompressionmode;}
 
     void setShowComboBoxes(bool show) {if(colormodesWidget == (QWidget *)Q_NULLPTR)return; thisShowBoxes = show;  if(thisShowBoxes) colormodesWidget->show(); else colormodesWidget->hide();}
     bool getShowComboBoxes() const {return thisShowBoxes;}
@@ -251,6 +256,7 @@ public:
 
     bool testDecodemodeStr(QString mode);
     bool testPackingmodeStr(QString mode);
+    bool testCompressionmodeStr(QString mode);
 
 public slots:
     void animation(QRect p) {
@@ -276,6 +282,12 @@ public slots:
     void setPackingmodeStr(QString mode);
     void setPackingmodeNum(int mode);
     void setPackingmodeNum(double mode);
+
+    void setCompressionmodeStr(QString mode);
+    void setCompressionmodeNum(int mode);
+    void setCompressionmodeNum(double mode);
+
+
 /*
     void red_coeff(double coeff) { thisRedCoefficient = coeff;}
     void green_coeff(double coeff) { thisGreenCoefficient = coeff;}
@@ -292,6 +304,7 @@ private slots:
     void scrollAreaMoved(int);
     void colormodeComboSlot(int);
     void packingmodeComboSlot(int);
+    void compressionmodeComboSlot(int);
 
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -325,6 +338,8 @@ private:
 
     void buf_unpack_12bitpacked_lsb(void* target, void* source, size_t destcount, size_t targetcount);
     void buf_unpack_12bitpacked_msb(void* target, void* source, size_t destcount, size_t targetcount);
+    void buf_unpack_10bitpacked(void* target, void* source, size_t destcount, size_t targetcount);
+    void buf_unpack_10bitp(void* target, void* source, size_t destcount, size_t targetcount);
 
     template <typename pureData>
     void calcImage (pureData *ptr,  colormode mode, QVector<uint> &LineData, long &i, int &ystart, int &yend, float correction,
@@ -355,6 +370,7 @@ private:
     void initWidgets();
     void setColormodeStrings();
     void setPackingModeStrings();
+    void setCompressionModeStrings();
 
     void CameraDataConvert(int sector, int sectorcount, SyncMinMax *MinMax, QSize resultSize, int datasize);
     void MinMaxLock(SyncMinMax* MinMax, uint Max[2], uint Min[2]);
@@ -363,6 +379,7 @@ private:
     void InitLoopdata(int &ystart, int &yend, long &i, int increment, int sector, int sectorcount,
                          QSize resultSize, uint Max[2], uint Min[2]);
 
+    void reallocate_central_image();
     bool buttonPressed;
     QString  thisPV_Mode, thisPV_Packing;
     QString thisPV_Data, thisPV_Width, thisPV_Height;
@@ -379,6 +396,8 @@ private:
     colormap thisColormap;
     zoom thisFitToSize;
     QImage *image;
+    QMutex imageMutex;
+    QByteArray decompressedData;
 
     int Xpos, Ypos;
     bool m_init;
@@ -417,8 +436,10 @@ private:
 
     caLabel *labelColormodeText;
     caLabel *labelPackingmodeText;
+    caLabel *labelCompressionmodeText;
     QComboBox *colormodeCombo;
     QComboBox *packingmodeCombo;
+    QComboBox *compressionmodeCombo;
 
     bool readvaluesPresent[4];
     double  readvalues[4];
@@ -451,8 +472,10 @@ private:
     QStringList thisList;
     QStringList colorModeString;
     QStringList packingModeString;
+    QStringList compressionModeString;
 
     packingmode thisPackingmode;
+    compressionmode thisCompressionmode;
     float thisRedCoefficient;
     float thisGreenCoefficient;
     float thisBlueCoefficient;

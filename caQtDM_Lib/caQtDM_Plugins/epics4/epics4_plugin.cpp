@@ -24,6 +24,7 @@
  */
 #include <QDebug>
 #include <QString>
+#include <QApplication>
 #include <db_access.h>
 #include <cadef.h>
 
@@ -1118,7 +1119,7 @@ void PVAInterface::gotEnum(PVStructurePtr const & pvStructure)
         return;
     }
     if(dataSize > kData.edata.dataSize) {
-        if(kData.edata.dataSize>0 && (kData.edata.dataB != (void*) 0)) free(kData.edata.dataB);
+        if(kData.edata.dataSize>0 && (kData.edata.dataB != (void*) Q_NULLPTR)) free(kData.edata.dataB);
         kData.edata.dataB = (void*) malloc((size_t) dataSize);
         kData.edata.dataSize = dataSize;
     }
@@ -1257,7 +1258,7 @@ void PVAInterface::getScalarData(PVStructurePtr const & pvStructure)
         int length = len + 1;
         if(length>kData.edata.dataSize)
         {
-            if(kData.edata.dataSize!=0 && (kData.edata.dataB != (void*) 0)) free(kData.edata.dataB);
+            if(kData.edata.dataSize!=0 && (kData.edata.dataB != (void*) Q_NULLPTR)) free(kData.edata.dataB);
             kData.edata.dataB = (void*) malloc((size_t) length);
         }
         memcpy(kData.edata.dataB,data,len);
@@ -1300,7 +1301,7 @@ void PVAInterface::fillData(pureData const &array, size_t length, knobData* kPtr
     if(length>0) {
         int size = sizeof(array[0]);
         if((length * size) > (size_t) kPtr->edata.dataSize) {
-            if(kPtr->edata.dataB != (void*) 0) free(kPtr->edata.dataB);
+            if(kPtr->edata.dataB != (void*) Q_NULLPTR) free(kPtr->edata.dataB);
             kPtr->edata.dataB = (void*) malloc(length * size);
             kPtr->edata.dataSize = length * size;
         }
@@ -1340,7 +1341,7 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
         }
         numBytes += length + 1;
         if(numBytes>kData.edata.dataSize) {
-            if(kData.edata.dataB != (void*) 0) free(kData.edata.dataB);
+            if(kData.edata.dataB != (void*) Q_NULLPTR) free(kData.edata.dataB);
             kData.edata.dataB = (void*) malloc(numBytes);
             kData.edata.dataSize = numBytes;
         }
@@ -1728,6 +1729,7 @@ QString Epics4Plugin::pluginName()
 Epics4Plugin::Epics4Plugin()
 {
     if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::Epics4Plugin\n";
+    connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closeEvent()));
 }
 
 Epics4Plugin::~Epics4Plugin()
@@ -1815,7 +1817,7 @@ int Epics4Plugin::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
 int Epics4Plugin::pvClearMonitor(knobData *kData) {
     if(Epics4Plugin::getDebug()) cout << "Epics4Plugin:pvClearMonitor\n";
-    if (kData->edata.info == (void *) 0)
+    if (kData->edata.info == (void *) Q_NULLPTR)
         throw std::runtime_error(
                 "Epics4Plugin::pvClearMonitor kData->edata.info  is null");
     PVAInterfaceGlue *pvaInterfaceGlue  = static_cast<PVAInterfaceGlue *>(kData->edata.info);
@@ -1829,7 +1831,7 @@ int Epics4Plugin::pvClearMonitor(knobData *kData) {
 int Epics4Plugin::pvFreeAllocatedData(knobData *kData)
 {
     if(Epics4Plugin::getDebug()) cout << "Epics4Plugin:pvFreeAllocatedData\n";
-    if (kData->edata.info == (void *) 0)
+    if (kData->edata.info == (void *) Q_NULLPTR)
         throw std::runtime_error(
                 "Epics4Plugin::pvFreeAllocatedData kData->edata.info  is null");
     PVAInterfaceGlue *pvaInterfaceGlue  = static_cast<PVAInterfaceGlue *>(kData->edata.info);
@@ -1847,11 +1849,11 @@ int Epics4Plugin::pvFreeAllocatedData(knobData *kData)
         pvaChannel->destroy();
     }
     pvaInterface->destroy();
-    kData->edata.info = NULL;
+    kData->edata.info = Q_NULLPTR;
     delete pvaInterfaceGlue;
-    if(kData->edata.dataB != (void*) 0) {
-        if(kData->edata.dataB != (void*) 0) free(kData->edata.dataB);
-        kData->edata.dataB = (void*) 0;
+    if(kData->edata.dataB != (void*) Q_NULLPTR) {
+        if(kData->edata.dataB != (void*) Q_NULLPTR) free(kData->edata.dataB);
+        kData->edata.dataB = (void*) Q_NULLPTR;
     }
     return true;
 }
@@ -1864,7 +1866,7 @@ bool Epics4Plugin::pvSetValue(knobData *kData,
     Q_UNUSED(errmess);
     Q_UNUSED(forceType);
     if(Epics4Plugin::getDebug()) cout << "Epics4Plugin:pvSetValue\n";
-    if (kData->edata.info == (void *) 0) throw std::runtime_error("Epics4Plugin::pvSetValue kData->edata.info  is null");
+    if (kData->edata.info == (void *) Q_NULLPTR) throw std::runtime_error("Epics4Plugin::pvSetValue kData->edata.info  is null");
     PVAInterfaceGlue *pvaInterfaceGlue  = static_cast<PVAInterfaceGlue *>(kData->edata.info);
     PVAInterfacePtr pvaInterface = pvaInterfaceGlue->getPVAInterface();
     if(!pvaInterface) throw std::runtime_error("Epics4Plugin::pvSetValue pvaInterface is null");
@@ -1879,7 +1881,7 @@ bool Epics4Plugin::pvSetWave(knobData *kData,
     Q_UNUSED(object);
     Q_UNUSED(errmess);
     if(Epics4Plugin::getDebug()) cout << "Epics4Plugin:pvSetWave\n";
-    if (kData->edata.info == (void *) 0) throw std::runtime_error("Epics4Plugin::pvSetWave kData->edata.info  is null");
+    if (kData->edata.info == (void *) Q_NULLPTR) throw std::runtime_error("Epics4Plugin::pvSetWave kData->edata.info  is null");
     PVAInterfaceGlue *pvaInterfaceGlue  = static_cast<PVAInterfaceGlue *>(kData->edata.info);
     PVAInterfacePtr pvaInterface = pvaInterfaceGlue->getPVAInterface();
     if(!pvaInterface) throw std::runtime_error("Epics4Plugin::pvSetWave pvaInterface is null");
@@ -1905,7 +1907,7 @@ int Epics4Plugin::pvGetTimeStamp(char *pv, char *timestamp)
 
 bool Epics4Plugin::pvGetTimeStampN(knobData *kData, char *timestamp) {
     //if(Epics4Plugin::getDebug()) cout  << "Epics4Plugin:pvGetTimeStamp\n";
-    if (kData->edata.info == (void *) 0) throw std::runtime_error("Epics4Plugin::pvSetWave kData->edata.info  is null");
+    if (kData->edata.info == (void *) Q_NULLPTR) throw std::runtime_error("Epics4Plugin::pvSetWave kData->edata.info  is null");
     PVAInterfaceGlue *pvaInterfaceGlue  = static_cast<PVAInterfaceGlue *>(kData->edata.info);
     PVAInterfacePtr pvaInterface = pvaInterfaceGlue->getPVAInterface();
     if(!pvaInterface) throw std::runtime_error("Epics4Plugin::pvSetWave pvaInterface is null");
@@ -1932,7 +1934,7 @@ int Epics4Plugin::pvGetDescription(char *pv, char *description)
 
 bool Epics4Plugin::pvGetDescriptionN(knobData *kData, char *description) {
     //if(Epics4Plugin::getDebug()) cout  << "Epics4Plugin:pvGetTimeStamp\n";
-    if (kData->edata.info == (void *) 0) throw std::runtime_error("Epics4Plugin::pvSetWave kData->edata.info  is null");
+    if (kData->edata.info == (void *) Q_NULLPTR) throw std::runtime_error("Epics4Plugin::pvSetWave kData->edata.info  is null");
     PVAInterfaceGlue *pvaInterfaceGlue  = static_cast<PVAInterfaceGlue *>(kData->edata.info);
     PVAInterfacePtr pvaInterface = pvaInterfaceGlue->getPVAInterface();
     if(!pvaInterface) throw std::runtime_error("Epics4Plugin::pvSetWave pvaInterface is null");
@@ -1961,7 +1963,7 @@ int Epics4Plugin::pvAddEvent(void * ptr) {
 
 int Epics4Plugin::pvReconnect(knobData *kData) {
     if(Epics4Plugin::getDebug()) cout  << "Epics4Plugin:pvReconnect\n";
-    if (kData->edata.info == (void *) 0) throw std::runtime_error("Epics4Plugin::pvReconnect kData->edata.info  is null");
+    if (kData->edata.info == (void *) Q_NULLPTR) throw std::runtime_error("Epics4Plugin::pvReconnect kData->edata.info  is null");
     PVAInterfaceGlue *pvaInterfaceGlue  = static_cast<PVAInterfaceGlue *>(kData->edata.info);
     PVAInterfacePtr pvaInterface = pvaInterfaceGlue->getPVAInterface();
     if(!pvaInterface) throw std::runtime_error("Epics4Plugin::pvReconnect pvaInterface is null");
@@ -1970,7 +1972,7 @@ int Epics4Plugin::pvReconnect(knobData *kData) {
 
 int Epics4Plugin::pvDisconnect(knobData *kData) {
     if(Epics4Plugin::getDebug()) cout << "Epics4Plugin:pvDisconnect\n";
-    if (kData->edata.info == (void *) 0) throw std::runtime_error("Epics4Plugin::pvDisconnect kData->edata.info  is null");
+    if (kData->edata.info == (void *) Q_NULLPTR) throw std::runtime_error("Epics4Plugin::pvDisconnect kData->edata.info  is null");
     PVAInterfaceGlue *pvaInterfaceGlue  = static_cast<PVAInterfaceGlue *>(kData->edata.info);
     PVAInterfacePtr pvaInterface = pvaInterfaceGlue->getPVAInterface();
     if(!pvaInterface) throw std::runtime_error("Epics4Plugin::pvDisconnect pvaInterface is null");
@@ -1983,6 +1985,9 @@ int Epics4Plugin::FlushIO() {
     return true;
 }
 
+void Epics4Plugin::closeEvent(){
+   TerminateIO();
+}
 
 int Epics4Plugin::TerminateIO() {
     Epics4Plugin::setDebug(true);

@@ -23,37 +23,49 @@
  *    anton.mezger@psi.ch
  */
 
-#ifndef MYQPROCESS_H
-#define MYQPROCESS_H
+#ifndef PVTASKMENU_H
+#define PVTASKMENU_H
 
-#include "caQtDM_Lib_global.h"
-#include <QObject>
-#include <QProcess>
-#include <QIODevice>
+#include <QtDesigner/QDesignerTaskMenuExtension>
+#include <QtDesigner/QExtensionFactory>
+#include <qtcontrols_global.h>
+#include <QAction>
 
-class CAQTDM_LIBSHARED_EXPORT myQProcess : public QObject
+QT_BEGIN_NAMESPACE
+class QAction;
+class QExtensionManager;
+QT_END_NAMESPACE
+class caLineEdit;
+
+class QTCON_EXPORT PVTaskMenu : public QObject, public QDesignerTaskMenuExtension
 {
     Q_OBJECT
+    Q_INTERFACES(QDesignerTaskMenuExtension)
+
 public:
+    PVTaskMenu(QWidget *tic, QObject *parent);
 
-    explicit myQProcess(QObject *parent = Q_NULLPTR);
-    ~myQProcess() {
-     if (process != (QProcess *) Q_NULLPTR)
-        if (started && process->state() != QProcess::NotRunning)
-            process->kill();
-    }
+    QAction *preferredEditAction() const;
+    QList<QAction *> taskActions() const;
 
-public Q_SLOTS:
-    void start(QString program, QIODevice::OpenMode mode = QIODevice::ReadWrite);
+private slots:
+    void editState();
 
 private:
-    QProcess * process;
-    bool started;
-    QString prog;
-
-private Q_SLOTS:
-    void error(QProcess::ProcessError error);
-    void finished(int exitCode, QProcess::ExitStatus status);
+    QAction *editStateAction;
+    QWidget *pvWidget;
 };
+
+class QTCON_EXPORT PVTaskMenuFactory : public QExtensionFactory
+{
+    Q_OBJECT
+
+public:
+    PVTaskMenuFactory(QExtensionManager *parent = 0);
+
+protected:
+    QObject *createExtension(QObject *object, const QString &iid, QObject *parent) const;
+};
+
 
 #endif

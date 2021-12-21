@@ -49,10 +49,10 @@ In case of problems, please contact Anton Mezger at PSI.
 ## Windows
 To compile and run caQtDM on Windows following requirements have to be met:
 
-1. Qt 4.8.2 - Qt 5.12.0
+1. Qt 4.8.2 - Qt 5.15.2
 2. Qwt 6.0.1 - Qwt 6.1.3
 3. EPICS 3.14.12
-4. MS Visual Studio 2013 and MS Visual Studio 2017 
+4. MS Visual Studio 2013 and MS Visual Studio 2019 
 5. Wix 3.0.5419.0
 
 With caQtDM_Env.bat you can configure your system. All setting which are needed will be taken from here.
@@ -85,4 +85,11 @@ Following environment variables can be used to configure caqtdm:
 - __BSREAD_ZMQ_CONNECTION_TYPE__ - control the connection type of the bsread plugin 
 - __BSREAD_ZMQ_ADDR_LIST__ - point the bsread plugin static sources 
 
-- __CAQTDM_ARCHIVERSF_URL__ - point the archiver plugin to a different archiver backend |
+- __CAQTDM_ARCHIVERSF_URL__ - point the archiver plugin to a different archiver backend 
+
+- __CAQTDM_FINDRECORD_SRV__ - for autocompletion, the request URL
+- __CAQTDM_FINDRECORD_FACILITY__ - search limitation for a facility  
+- __CAQTDM_FINDRECORD_LIMIT__ - search limit max number of entries
+
+- __CAQTDM_FINDRECORD_DIRECT__ - override all other find record settings (direct json http download)
+|

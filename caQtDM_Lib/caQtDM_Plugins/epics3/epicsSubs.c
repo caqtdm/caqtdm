@@ -289,7 +289,7 @@ static void dataCallback(struct event_handler_args args)
 
             dataSize = dbr_size_n(args.type, args.count) + sizeof(char);
             if(dataSize != kData.edata.dataSize) {
-               if(kData.edata.dataB != (void*) 0) free(kData.edata.dataB);
+               if(kData.edata.dataB != (void*) Q_NULLPTR) free(kData.edata.dataB);
                 kData.edata.dataB = (void*) malloc((size_t) dataSize);
                 kData.edata.dataSize = dataSize;
             }
@@ -319,7 +319,7 @@ static void dataCallback(struct event_handler_args args)
             // concatenate strings separated with ';'
             dataSize = dbr_size_n(args.type, args.count) + (args.count+1) * sizeof(char);
             if(dataSize != kData.edata.dataSize) {
-                if(kData.edata.dataB != (void*) 0) free(kData.edata.dataB);
+                if(kData.edata.dataB != (void*) Q_NULLPTR) free(kData.edata.dataB);
                 kData.edata.dataB = (void*) malloc((size_t) dataSize);
                 kData.edata.dataSize = dataSize;
             }
@@ -366,7 +366,7 @@ static void dataCallback(struct event_handler_args args)
 
             if(args.count > 1) {
                 if((int) (args.count * sizeof(int16_t)) != kData.edata.dataSize) {
-                    if(kData.edata.dataB != (void*) 0) free(kData.edata.dataB);
+                    if(kData.edata.dataB != (void*) Q_NULLPTR) free(kData.edata.dataB);
                     kData.edata.dataB = (void*) malloc(args.count * sizeof(int16_t));
                     kData.edata.dataSize = args.count * (int) sizeof(int16_t);
                 }
@@ -389,7 +389,7 @@ static void dataCallback(struct event_handler_args args)
 
             if(args.count > 1) {
                 if((int) (args.count * sizeof(int32_t)) != kData.edata.dataSize) {
-                    if(kData.edata.dataB != (void*) 0) free(kData.edata.dataB);
+                    if(kData.edata.dataB != (void*) Q_NULLPTR) free(kData.edata.dataB);
                     kData.edata.dataB = (void*) malloc(args.count * sizeof(int32_t));
                     kData.edata.dataSize = args.count * (int) sizeof(int32_t);
                 }
@@ -412,7 +412,7 @@ static void dataCallback(struct event_handler_args args)
 
             if(args.count > 1) {
                 if((int) (args.count * sizeof(float)) != kData.edata.dataSize) {
-                    if(kData.edata.dataB != (void*) 0) free(kData.edata.dataB);
+                    if(kData.edata.dataB != (void*) Q_NULLPTR) free(kData.edata.dataB);
                     kData.edata.dataB = (void*) malloc(args.count * sizeof(float));
                     kData.edata.dataSize = args.count * (int) sizeof(float);
                 }
@@ -434,7 +434,7 @@ static void dataCallback(struct event_handler_args args)
 
             if(args.count > 1) {
                 if((int) (args.count * sizeof(double)) != kData.edata.dataSize) {
-                    if(kData.edata.dataB != (void*) 0) free(kData.edata.dataB);
+                    if(kData.edata.dataB != (void*) Q_NULLPTR) free(kData.edata.dataB);
                     kData.edata.dataB = (void*) malloc(args.count * sizeof(double));
                     memcpy(kData.edata.dataB, &stsF->value, args.count * sizeof(double));
                     kData.edata.dataSize = args.count * (int) sizeof(double);
@@ -528,7 +528,7 @@ static void displayCallback(struct event_handler_args args) {
                 // concatenate strings separated with ';'
                 dataSize = dbr_size_n(args.type, args.count) + stsF->no_str * sizeof(char);
                 if(dataSize != kData.edata.dataSize) {
-                    if(kData.edata.dataB != (void*) 0) free(kData.edata.dataB);
+                    if(kData.edata.dataB != (void*) Q_NULLPTR) free(kData.edata.dataB);
                     kData.edata.dataB = (void*) malloc((size_t) dataSize);
                     kData.edata.dataSize = dataSize;
                 }
@@ -548,7 +548,7 @@ static void displayCallback(struct event_handler_args args) {
                 // concatenate strings separated with ';'
                 dataSize = 40;
                 if(dataSize != kData.edata.dataSize) {
-                    if(kData.edata.dataB != (void*) 0) free(kData.edata.dataB);
+                    if(kData.edata.dataB != (void*) Q_NULLPTR) free(kData.edata.dataB);
                     kData.edata.dataB = (void*) malloc((size_t) dataSize);
                     kData.edata.dataSize = dataSize;
                 }
@@ -1333,6 +1333,7 @@ int EpicsGetDescription(char *pv, char *description)
     chid     ch;
     int status;
     pv_desc pvDesc = {'\0'};
+    char * pch;
     dbr_string_t value;
     strcpy(description, "");
 
@@ -1342,8 +1343,14 @@ int EpicsGetDescription(char *pv, char *description)
         C_postMsgEvent(messageWindowPtr, 1, vaPrintf("pv with length=0 (not translated for macro?)\n"));
         return !ECA_NORMAL;
     }
+    // if there is a filter we remove it first
 
-    sprintf(pvDesc, "%s.DESC", pv);
+    strcpy(pvDesc,pv);
+    pch = strstr (pvDesc,".{");
+
+    if (pch) *pch='\0';
+
+    sprintf(pvDesc, "%s.DESC", pvDesc);
 
     // get description
     status = ca_create_channel(pvDesc, NULL, 0, CA_PRIORITY, &ch);

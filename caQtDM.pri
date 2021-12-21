@@ -253,6 +253,7 @@ environment_Plugin {
                 }
 
                 CONFIG += release
+
          }
         ios | android {
                 message("epics3_plugin configuration : ios or android")
@@ -313,42 +314,16 @@ epics4_plugin {
                    LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
                 }
                 CONFIG += release
+                CAQTDM_PSI_SPECIAL_EPICS7_C11 {
+                    contains(QT_VER_MAJ, 5) {
+                        CONFIG += c++11
+                    }
+                    contains(QT_VER_MAJ, 4) {
+                        QMAKE_CXXFLAGS += -std=c++11
+                    }
+                }
           }
-          else {
-                message("epics4_plugin (with epics version 3) configuration unix:!macx:!ios:!android")
-                
-                INCLUDEPATH   += $(EPICS4LOCATION)/pvDataCPP/include
-                INCLUDEPATH   += $(EPICS4LOCATION)/pvAccessCPP/include
-                INCLUDEPATH   += $(EPICS4LOCATION)/pvaClientCPP/include
-                INCLUDEPATH   += $(EPICS4LOCATION)/normativeTypesCPP/include
-                INCLUDEPATH   += $(EPICSINCLUDE)
-                INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
-#for epics 3.15 and gcc we need this
-                INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
-                
-                EPICS4LOC1 = $(EPICS4LOCATION)/pvAccessCPP/lib/$(EPICS_HOST_ARCH)
-                EPICS4LOC2 = $(EPICS4LOCATION)/pvDataCPP/lib/$(EPICS_HOST_ARCH)
-                EPICS4LOC3 = $(EPICS4LOCATION)/pvaClientCPP/lib/$(EPICS_HOST_ARCH)
-                EPICS4LOC4 = $(EPICS4LOCATION)/normativeTypesCPP/lib/$(EPICS_HOST_ARCH)
 
-                !EPICS4_STATICBUILD {
-                   message( "epics4_plugin build with shared object libraries of epics4" )
-                   LIBS += -L$${EPICS4LOC1} -Wl,-rpath,$${EPICS4LOC1} -lpvAccess
-                   LIBS += -L$${EPICS4LOC2} -Wl,-rpath,$${EPICS4LOC2} -lpvData
-                   LIBS += -L$${EPICS4LOC3} -Wl,-rpath,$${EPICS4LOC3} -lpvaClient
-                   LIBS += -L$${EPICS4LOC4} -Wl,-rpath,$${EPICS4LOC4} -lnt
-                   LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
-                }
-                EPICS4_STATICBUILD  {
-                   message( "epics4_plugin build with static libraries of epics4" )
-                   LIBS += $${EPICS4LOC1}/libpvAccess.a
-                   LIBS += $${EPICS4LOC2}/libpvData.a
-                   LIBS += $${EPICS4LOC3}/libpvaClient.a
-                   LIBS += $${EPICS4LOC4}/libnt.a
-                   LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom
-                }
- 		CONFIG += release
-            }
 	}
 	
         macx {
@@ -419,6 +394,7 @@ caQtDM_QtControls {
     		OBJECTS_DIR = obj
 		DESTDIR = $$(CAQTDM_COLLECT)
     		CONFIG += lib_bundle
+                LIBS += -lz
                 LIBS += -F$$(QWTLIB) -framework $$(QWTLIBNAME)
                         ADL_EDL_FILES {
                            LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -ladlParser

@@ -371,6 +371,7 @@ public:
     int getXaxisSyncGroup() {return thisXaxisSyncGroup;}
 
     caCartesianPlot(QWidget *parent);
+    ~caCartesianPlot();
 
     QwtSymbol::Style myMarker(curvSymbol m);
     QwtPlotCurve::CurveStyle myStyle(curvStyle s);

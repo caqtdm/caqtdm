@@ -54,6 +54,15 @@
  #endif
 #endif
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+#ifndef Q_NULLPTR
+#if __cplusplus >= 201103L
+    #define Q_NULLPTR nullptr
+#else
+    #define Q_NULLPTR 0
+#endif
+#endif
+#endif
 // in order to correctly define for c and c++ (no mismatched tags)
 #ifdef __cplusplus
 typedef class MessageWindow MessageWindow;

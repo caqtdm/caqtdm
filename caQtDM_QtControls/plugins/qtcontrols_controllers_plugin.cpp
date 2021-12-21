@@ -75,7 +75,7 @@ static QString XmlFunc(const char *clss, const char *name, int x, int y, int w, 
             strng3 = strng3.arg(propertyname[i]).arg(propertytext[i]);
             strng1.append(strng3);
 #endif
-            if(strstr(propertytype[i], "multiline") != (char*) 0) {
+            if(strstr(propertytype[i], "multiline") != (char*) Q_NULLPTR) {
                 strng2 = " <stringpropertyspecification name=\"%1\" notr=\"true\" type=\"%2\"/>";
                 strng2 = strng2.arg(propertyname[i]).arg(propertytype[i]);
             }
@@ -102,13 +102,23 @@ CustomWidgetInterface_Controllers::CustomWidgetInterface_Controllers(QObject *pa
 {
 }
 
-void CustomWidgetInterface_Controllers::initialize(QDesignerFormEditorInterface *)
+void CustomWidgetInterface_Controllers::initialize(QDesignerFormEditorInterface *formEditor)
 {
     if (d_isInitialized)
         return;
 
     // set this property in order to find out later if we use our controls through the designer or otherwise
     qApp->setProperty("APP_SOURCE", QVariant(QString("DESIGNER")));
+
+#ifndef MOBILE
+        // for edition of channel/pv
+        QExtensionManager *manager = formEditor->extensionManager();
+        Q_ASSERT(manager != 0);
+        manager->registerExtensions(new PVTaskMenuFactory(manager),
+                                    Q_TYPEID(QDesignerTaskMenuExtension));
+#else
+    Q_UNUSED(formEditor);
+#endif
 
     d_isInitialized = true;
 }

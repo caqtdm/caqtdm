@@ -597,6 +597,7 @@ void modbus_decode::setModbusretries(int value)
 
 int modbus_decode::pvAddMonitor(int index, knobData *kData)
 {
+    Q_UNUSED(index)
     QMutexLocker locker(&mutex);
     // Example
     // modbus://129.129.130.73:502{type:"coils",addr:0,count:1,datatype:"float",rcalc:"A*10",wcalc:"A/10",egu:"Bla",cycle:10}
@@ -913,6 +914,10 @@ void modbus_decode::setTerminate()
 
 int modbus_decode::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType)
 {
+    Q_UNUSED(sdata)
+    Q_UNUSED(object)
+    Q_UNUSED(errmess)
+    Q_UNUSED(forceType)
     QPair<QString, QModbusDataUnit*> pair;
 
     QString target=pv;
