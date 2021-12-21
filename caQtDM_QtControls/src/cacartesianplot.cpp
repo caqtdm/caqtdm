@@ -956,7 +956,7 @@ void caCartesianPlot::setYscaling(axisScaling s)
 void caCartesianPlot::setXaxisLimits(QString const &newX)
 {
     bool ok1,ok2;
-    QStringList list = newX.split(";", QString::SkipEmptyParts);
+    QStringList list = newX.split(";", SKIP_EMPTY_PARTS);
 
     if(list.count() == 2) {
         double minX = list.at(0).toDouble(&ok1);
@@ -974,7 +974,7 @@ void caCartesianPlot::setXaxisLimits(QString const &newX)
 void caCartesianPlot::setYaxisLimits(QString const &newY)
 {
     bool ok1,ok2;
-    QStringList list = newY.split(";", QString::SkipEmptyParts);
+    QStringList list = newY.split(";", SKIP_EMPTY_PARTS);
 
     if(list.count() == 2) {
         double minY = list.at(0).toDouble(&ok1);

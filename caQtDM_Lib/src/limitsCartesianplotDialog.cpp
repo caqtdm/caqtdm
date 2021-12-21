@@ -233,7 +233,7 @@ void limitsCartesianplotDialog::applyClicked()
         xLimits = xmin; xLimits.append(";"); xLimits.append(xmax);
     } else {
         xLimits = CartesianPlot->getXaxisLimits();
-        list = xLimits.split(";", QString::SkipEmptyParts);
+        list = xLimits.split(";", SKIP_EMPTY_PARTS);
         xminLineEdit->setText(list.at(0));
         xmaxLineEdit->setText(list.at(1));
     }
@@ -246,7 +246,7 @@ void limitsCartesianplotDialog::applyClicked()
         yLimits = ymin; yLimits.append(";"); yLimits.append(ymax);
     } else {
         yLimits = CartesianPlot->getYaxisLimits();
-        list = yLimits.split(";", QString::SkipEmptyParts);
+        list = yLimits.split(";", SKIP_EMPTY_PARTS);
         yminLineEdit->setText(list.at(0));
         ymaxLineEdit->setText(list.at(1));
     }

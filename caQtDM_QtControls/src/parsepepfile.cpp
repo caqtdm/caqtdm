@@ -148,7 +148,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QColor &bgColor, QFile *f
         }
 
         // break the line down in their elements
-        QStringList elements= line.split(separator,  QString::SkipEmptyParts);
+        QStringList elements= line.split(separator,  SKIP_EMPTY_PARTS);
 /*
         printf("%d %s\n", elements.count(), qasc(line));
         for (int i=0; i< elements.count(); i++) {
@@ -551,7 +551,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
     rgba[0] = 0; rgba[1] = 0; rgba[2] = 0; rgba[3] = 255;
 
-    QStringList pvElements= grid.widgetChannel.split(":",  QString::SkipEmptyParts);
+    QStringList pvElements= grid.widgetChannel.split(":", SKIP_EMPTY_PARTS);
     if(pvElements.count() > 0) partialpv = pvElements.at(0);
 
     if(grid.widgetType.contains("menubutton")) {
@@ -933,7 +933,7 @@ void ParsePepFile::writeWheelswitch(QString format, QString pv, QByteArray *arra
     bool ok;
     int totalDigits = 8, decimalDigits = 3;
     int integerDigits = totalDigits - decimalDigits -2;
-    QStringList elements= format.split(".",  QString::SkipEmptyParts);
+    QStringList elements= format.split(".",  SKIP_EMPTY_PARTS);
     if(elements.count() == 2) {
        totalDigits = elements[0].toInt(&ok);
        if(!ok) totalDigits = 8;
@@ -1090,7 +1090,7 @@ void ParsePepFile::writeLineEdit(QString format, QString pv, QString minwidth, Q
             newFormat.replace("g", "");
             newFormat.replace("e", "");
             newFormat.replace("f", "");
-            QStringList elements= newFormat.split(".",  QString::SkipEmptyParts);
+            QStringList elements= newFormat.split(".", SKIP_EMPTY_PARTS);
             if(elements.count() == 2) {
                 decimalDigits = elements[1].toInt(&ok);
                 if(ok) {
@@ -1105,7 +1105,7 @@ void ParsePepFile::writeLineEdit(QString format, QString pv, QString minwidth, Q
         } else if(newFormat.contains("o")) {
             writeSimpleProperty("formatType", "enum", "caLineEdit::octal", array);
         } else {
-            QStringList elements= newFormat.split(".",  QString::SkipEmptyParts);
+            QStringList elements= newFormat.split(".",  SKIP_EMPTY_PARTS);
             if(elements.count() == 2) {
                 decimalDigits = elements[1].toInt(&ok);
                 if(ok) {

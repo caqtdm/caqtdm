@@ -46,7 +46,7 @@ void EFlag::setDisplayMask(QString slist)
     unsigned int tmp;
     bool ok;
     QList <unsigned int> uilist;
-    QStringList stringlist = slist.split(",", QString::SkipEmptyParts);
+    QStringList stringlist = slist.split(",", SKIP_EMPTY_PARTS);
     foreach(QString s, stringlist)
     {
         tmp = s.toUInt(&ok);
@@ -289,7 +289,7 @@ QString EFlag::trueStrings()
 
 void EFlag::setFalseStrings(QString s)
 {
-    m_falseStrings = s.split(";",QString::SkipEmptyParts);
+    m_falseStrings = s.split(";",SKIP_EMPTY_PARTS);
     configureCells();
 }
 
@@ -301,7 +301,7 @@ QString EFlag::falseStrings()
 void EFlag::setTrueColors(QString c)
 {
     m_trueColors.clear();
-    QStringList l = c.split(";",QString::SkipEmptyParts);
+    QStringList l = c.split(";",SKIP_EMPTY_PARTS);
     foreach(QString s, l)
         m_trueColors << QVariant(QColor(s.toUInt()));
     configureCells();
@@ -318,7 +318,7 @@ QString EFlag::trueColors()
 void EFlag::setFalseColors(QString c)
 {
     m_falseColors.clear();
-    QStringList l = c.split(";",QString::SkipEmptyParts);
+    QStringList l = c.split(";",SKIP_EMPTY_PARTS);
     foreach(QString s, l)
         m_falseColors << QVariant(QColor(s.toUInt()));
     configureCells();

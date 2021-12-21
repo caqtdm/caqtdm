@@ -1081,7 +1081,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         while (counter<extensions){
             FileName=inputFile;
             // remove any extension
-            FileName=FileName.split(".",QString::SkipEmptyParts).at(0);
+            FileName=FileName.split(".",SKIP_EMPTY_PARTS).at(0);
 
             FileName=FileName.append(valid_extensions[counter]);
             //qDebug() << "check " << FileName << valid_extensions[counter] ;

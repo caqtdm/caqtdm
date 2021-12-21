@@ -218,7 +218,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
 
 
 #ifdef CSV
-    QStringList result = out.split("\n", QString::SkipEmptyParts);
+    QStringList result = out.split("\n", SKIP_EMPTY_PARTS);
     //printf("number of values received = %d\n",  result.count());
 
     if(result.count() < 2) {
@@ -233,7 +233,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
 
     bool ok1, ok2;
     for(int i=1; i< result.count(); ++i) {
-        QStringList line = result[i].split(";", QString::SkipEmptyParts);
+        QStringList line = result[i].split(";", SKIP_EMPTY_PARTS);
         if(line.count() != expected) {
             errorString = tr("dataline has not the expected number of items %1: [%2]").arg(QString::number(line.count())).arg(expected);
             emit requestFinished();

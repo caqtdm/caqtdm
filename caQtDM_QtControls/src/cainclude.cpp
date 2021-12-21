@@ -347,11 +347,7 @@ void caInclude::setFileName(QString const &filename)
             fileName = newFileName;
             thisAdjust = false;
         } else {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-            openFile = newFileName.split(".", QString::SkipEmptyParts);
-#else
-            openFile = newFileName.split(".", Qt::SkipEmptyParts);
-#endif
+            openFile = newFileName.split(".", SKIP_EMPTY_PARTS);
             fileName = openFile[0].append(".ui");
         }
 

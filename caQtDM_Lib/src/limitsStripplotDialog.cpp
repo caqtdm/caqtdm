@@ -40,7 +40,7 @@ limitsStripplotDialog::limitsStripplotDialog(caStripPlot *w, MutexKnobData *data
     setWindowModality (Qt::WindowModal);
 
     QString text = StripPlot->getPVS();
-    vars = text.split(";", QString::SkipEmptyParts);
+    vars = text.split(";", SKIP_EMPTY_PARTS);
 
 #if defined(MOBILE_IOS)
     Specials special;

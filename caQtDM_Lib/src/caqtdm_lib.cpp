@@ -1015,7 +1015,7 @@ QMap<QString, QString> CaQtDM_Lib::createMap(const QString& macro)
     QMap<QString, QString> map;
     // macro of type A=MMAC3,B=STR,C=RMJ:POSA:2 to be used for replacements of pv in child widgets
     if(macro != NULL) {
-        QStringList vars = macro.split(",", QString::SkipEmptyParts);
+        QStringList vars = macro.split(",", SKIP_EMPTY_PARTS);
         for(int i=0; i< vars.count(); i++) {
             int pos = vars.at(i).indexOf("=");
             if(pos != -1) {
@@ -2369,7 +2369,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         QString macros = includeWidget->getMacro();
         //in case the macro $(B) has to be replaced by another macro  (ex: "B=NAME=ARIMA-CV-02ME;NAME=ARIMA-CV-03ME")
         macros = treatMacro(map, macros, &doNothing, w1->objectName());
-        QStringList macroList = macros.split(";", QString::SkipEmptyParts);
+        QStringList macroList = macros.split(";", SKIP_EMPTY_PARTS);
 
         int adjustMargin = includeWidget->getMargin();
 
@@ -3001,7 +3001,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         text = stripplotWidget->getPVS();
         reaffectText(map, &text, w1);
         stripplotWidget->setPVS(text);
-        QStringList vars = text.split(";", QString::SkipEmptyParts);
+        QStringList vars = text.split(";", SKIP_EMPTY_PARTS);
 
         int NumberOfCurves = min(vars.count(), caStripPlot::MAXCURVES);
 
@@ -3073,7 +3073,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         //qDebug() << "create caTable" << tableWidget->getPVS();
         w1->setProperty("ObjectType", caTable_Widget);
 
-        QStringList vars = tableWidget->getPVS().split(";", QString::SkipEmptyParts);
+        QStringList vars = tableWidget->getPVS().split(";", SKIP_EMPTY_PARTS);
         tableWidget->setColumnCount(3);
         tableWidget->setRowCount(vars.count());
 
@@ -3474,7 +3474,7 @@ void CaQtDM_Lib::UndefinedMacrosWindow()
     if(unknownMacrosList.count() > 0) macroTable->setRowCount(unknownMacrosList.count());
     else macroTable->setRowCount(1);
     while (i != unknownMacrosList.constEnd()) {
-        QStringList list = i.key().split("###", QString::SkipEmptyParts);
+        QStringList list = i.key().split("###", SKIP_EMPTY_PARTS);
         //qDebug() << i.key() << "macro variable" << list.at(0) << "in widget" << list.at(1) << "in file" << list.at(2) << "is undefined";
         macroTable->setItem(count, 0, new QTableWidgetItem(list.at(0)));
         macroTable->setItem(count, 1, new QTableWidgetItem(list.at(1)));
@@ -6666,9 +6666,9 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
     if(!execList.isNull() && execList.size() > 0) {
 #ifdef _MSC_VER
-        execListItems= execList.split(";", QString::SkipEmptyParts);
+        execListItems= execList.split(";", SKIP_EMPTY_PARTS);
 #else
-        execListItems= execList.split(":", QString::SkipEmptyParts);
+        execListItems= execList.split(":", SKIP_EMPTY_PARTS);
 #endif
         for(int i=0; i<execListItems.count(); i++) {
             validExecListItems = true;
@@ -6681,9 +6681,9 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
         if(!execList.isNull() && execList.size() > 0) {
 #ifdef _MSC_VER
-            execListItems= execList.split(";", QString::SkipEmptyParts);
+            execListItems= execList.split(";", SKIP_EMPTY_PARTS);
 #else
-            execListItems= execList.split(":", QString::SkipEmptyParts);
+            execListItems= execList.split(":", SKIP_EMPTY_PARTS);
 #endif
             for(int i=0; i<execListItems.count(); i++) {
                 validExecListItems = true;
@@ -8731,7 +8731,7 @@ bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
                 QString Args="";
                 QString geometry="";
                 QString popupUI = dynVars.toString().trimmed();
-                QStringList popupFields = popupUI.split(";", QString::SkipEmptyParts);
+                QStringList popupFields = popupUI.split(";", SKIP_EMPTY_PARTS);
 
                 if(popupFields.size() > 0) {
                     if(popupFields[0].contains(POPUPDEFENITION)){

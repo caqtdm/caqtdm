@@ -58,5 +58,11 @@
 #endif
 #endif
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            #define SKIP_EMPTY_PARTS QString::SkipEmptyParts
+#else
+            #define SKIP_EMPTY_PARTS Qt::SkipEmptyParts
+#endif
+
 
 #endif //QTCONGLOBAL_H
