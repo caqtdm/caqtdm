@@ -35,7 +35,11 @@ EFlag::EFlag(QWidget *parent) : QWidget(parent)
 
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     grid = new QGridLayout(this);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     grid->setMargin(0);
+#else
+    grid->setContentsMargins(0,0,0,0);
+#endif
     grid->setSpacing(0);
     arrangeCells();
     mask.clear();

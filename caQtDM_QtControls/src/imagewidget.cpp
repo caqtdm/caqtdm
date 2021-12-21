@@ -116,8 +116,12 @@ void ImageWidget::paintEvent(QPaintEvent * event)
     painter.scale(scaleFactorL, scaleFactorL);
 
     // exposed rectangle
-    QRect exposedRect = painter.matrix().inverted().mapRect(event->rect()).adjusted(-1, -1, 1, 1);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QRect exposedRect = painter.matrix().inverted().mapRect(event->rect()).adjusted(-1, -1, 1, 1);
+#else
+    QRect exposedRect = painter.worldTransform().inverted().mapRect(event->rect()).adjusted(-1, -1, 1, 1);
+#endif
     // and draw
 
     painter.drawImage(exposedRect, imageNew, exposedRect);
