@@ -185,7 +185,11 @@ void EFlag::setValue(QVariant v, bool ref)
         int i = 0;
         for(i = 0; i < mask.size(); i++ )
         {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             qSort(mask[i].begin(), mask[i].end() );
+#else
+            std::sort(mask[i].begin(), mask[i].end() );
+#endif
             for(int j = 0; j < mask[i].size(); j++)
             {
                 data << temp.value(mask[i][j]);
@@ -217,7 +221,11 @@ void EFlag::setValue(QVariant v, bool ref)
              */
 
             /* Let's sort each submask */
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             qSort(mask[i].begin(), mask[i].end() );
+#else
+            std::sort(mask[i].begin(), mask[i].end() );
+#endif
 
             value = 0;
             int j;

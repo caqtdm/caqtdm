@@ -65,8 +65,12 @@ caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     verticalHeader()->setDefaultSectionSize(20);
     verticalHeader()->setSortIndicatorShown(false);
-    horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+           horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+#else
+           horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+#endif
     setColumnSize(80);
     setAttribute(Qt::WA_Hover);
 
@@ -82,7 +86,11 @@ caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
     createActions();
     addAction(copyAct);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     defaultForeColor = palette().foreground().color();
+#else
+    defaultForeColor = this->palette().brush(QPalette::Text).color();
+#endif
 
     blockIndex = -1;
 

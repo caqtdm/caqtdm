@@ -115,7 +115,12 @@ void ENumeric::setDigitsFontScaleEnabled(bool en)
     if(int1Label) {
         int1Label->setFontScaleMode(ESimpleLabel::None);
         d_fontScaleEnabled = en;
-        foreach(QLabel *l, findChildren<QLabel *>(QRegExp("layoutmember*"))) {
+        QString pattern="layoutmember*";
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        foreach(QLabel *l, findChildren<QLabel *>(QRegExp(pattern))) {
+#else
+        foreach(QLabel *l, findChildren<QLabel *>(QRegularExpression(pattern))) {
+#endif
             l->setFont(int1Label->font());
         }
     } else {
@@ -129,7 +134,12 @@ void ENumeric::clearContainers()
 {
     if (box) {
         labels.clear();
-        foreach(QWidget *child, this->findChildren<QWidget *>(QRegExp("layoutmember*"))) delete child;
+        QString pattern="layoutmember*";
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        foreach(QWidget *child, this->findChildren<QWidget *>(QRegExp(pattern))) delete child;
+#else
+        foreach(QWidget *child, this->findChildren<QWidget *>(QRegularExpression(pattern))) delete child;
+#endif
         delete box;
         box = NULL;
     }
@@ -489,7 +499,11 @@ void ENumeric::resizeEvent(QResizeEvent *e)
     temp =  qobject_cast<QPushButton *>(list.front());
     if (temp) {
         QPixmap pix1(temp->size() * 0.9);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         pix1.fill(palette().color(QPalette::Background));
+#else
+        pix1.fill(palette().color(QPalette::Base));
+#endif
         QPainter *p = new QPainter(&pix1);
         p->setRenderHint(QPainter::Antialiasing);
         hmargin = (int) (pix1.width() * MARGIN);
@@ -504,7 +518,11 @@ void ENumeric::resizeEvent(QResizeEvent *e)
         poly.setPoint(1, w - hmargin, h - vmargin);
         poly.setPoint(2, hmargin, h - vmargin);
         QPen pen;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         pen.setColor(palette().color(QPalette::Foreground));
+#else
+        pen.setColor(palette().color(QPalette::Text));
+#endif
         p->setPen(pen);
         QLinearGradient linearGradient(0, 0, w, h);
         linearGradient.setColorAt(0.0, palette().color(QPalette::Light));
@@ -514,8 +532,11 @@ void ENumeric::resizeEvent(QResizeEvent *e)
         p->end();
         delete p;
         // down pixmap
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         QPixmap pix2 = pix1.transformed(QMatrix().rotate(-180));
-
+#else
+        QPixmap pix2 = pix1.transformed(QTransform().rotate(-180));
+#endif
         // pixmap up with red border
         QPixmap pix1Red = pix1;
         QPainter paint1R(&pix1Red);

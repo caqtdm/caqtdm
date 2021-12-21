@@ -311,8 +311,13 @@ bool caLineDraw::rotateText(float degrees)
 void caLineDraw::paintEvent(QPaintEvent *)
 {
     QFontMetrics fm(font());
-    int h = fm.height();
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     int w = fm.width(m_Text);
+    int h = fm.height();
+#else
+    int w = fm.boundingRect(m_Text).width();
+    int h = fm.boundingRect(m_Text).height();
+#endif
     QPainter painter(this);
     //painter.setRenderHint(QPainter::Antialiasing);
     painter.setPen(m_ForeColor);
