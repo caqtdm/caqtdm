@@ -129,9 +129,11 @@ char* myLimitedString (char * strng) {
     info->connected=false;\
     C_SetMutexKnobDataConnected(mutexKnobdataPtr, info->index, info->connected);\
     info->evAdded = false;\
-    status = ca_clear_event(info->evID);\
-    if (status != ECA_NORMAL) {\
-        PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));\
+    if (ca_state(info->ch) == cs_conn) {\
+        status = ca_clear_event(info->evID);\
+        if (status != ECA_NORMAL) {\
+            PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));\
+        }\
     }\
     info->evID = 0;\
     info->event = 0;\
@@ -142,18 +144,20 @@ char* myLimitedString (char * strng) {
 
 #define EpicsGet_ErrorMessage_ClearChannel_Return  \
     C_postMsgEvent(messageWindowPtr, 1, vaPrintf("get pv (%s) %s\n", pv, ca_message (status))); \
+    if (ca_state(info->ch) == cs_conn) {\
+        status = ca_clear_event(info->evID);\
+        if (status != ECA_NORMAL) {\
+            PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));\
+        }\
+    }\
+    if(info->ch != (chid) 0) {\
+        ca_clear_channel(ch);\
+    }\
     info->connected=false;\
     info->ch=0;\
     info->evAdded = false;\
-    status = ca_clear_event(info->evID);\
-    if (status != ECA_NORMAL) {\
-        PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));\
-    }\
     info->evID = 0;\
     info->event = 0;\
-    if (info->connected){\
-        ca_clear_channel(ch);\
-    }\
     C_SetMutexKnobDataConnected(mutexKnobdataPtr, info->index, info->connected);\
     knobData kData;\
     C_GetMutexKnobData(mutexKnobdataPtr, info->index, &kData);\
@@ -768,9 +772,11 @@ void connectCallback(struct connection_handler_args args)
     case cs_prev_conn:
         PRINT(printf("%s with channel %d has just disconnected, evid=%d\n", ca_name(args.chid), args.chid, info->evID));
         if(info->evAdded) {
-            status = ca_clear_event(info->evID);
-            if (status != ECA_NORMAL) {
-               PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+            if (info->connected){
+                //status = ca_clear_event(info->evID);
+                if (status != ECA_NORMAL) {
+                   PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+               }
             }
         }
         info->connected = false;
@@ -1087,7 +1093,28 @@ int EpicsSetValue_Connected(chid ch,char *pv, double rdata, int32_t idata, char 
         status = ca_get(DBR_CTRL_DOUBLE, ch, &ctrlR);
         status = ca_pend_io(CA_TIMEOUT);
         if (status != ECA_NORMAL) {
-             EpicsGet_ErrorMessage_ClearChannel_Return;
+             //EpicsGet_ErrorMessage_ClearChannel_Return;
+            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("get pv (%s) %s\n", pv, ca_message (status)));
+            if (ca_state(info->ch) == cs_conn) {
+                status = ca_clear_event(info->evID);
+                if (status != ECA_NORMAL) {
+                    PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+                }
+            }
+            if(info->ch != (chid) 0) {
+                ca_clear_channel(ch);
+            }
+            info->connected=false;
+            info->ch=0;
+            info->evAdded = false;
+            info->evID = 0;
+            info->event = 0;
+            C_SetMutexKnobDataConnected(mutexKnobdataPtr, info->index, info->connected);
+            knobData kData;
+            C_GetMutexKnobData(mutexKnobdataPtr, info->index, &kData);\
+            EpicsReconnect(&kData);
+            return status;
+
         }
         status = ctrlR.status;
         break;
@@ -1100,7 +1127,29 @@ int EpicsSetValue_Connected(chid ch,char *pv, double rdata, int32_t idata, char 
         status = ca_get(DBR_STRING, ch, &ctrlS);
         status = ca_pend_io(CA_TIMEOUT);
         if (status != ECA_NORMAL) {
-             EpicsGet_ErrorMessage_ClearChannel_Return;
+             //EpicsGet_ErrorMessage_ClearChannel_Return;
+            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("get pv (%s) %s\n", pv, ca_message (status)));
+            if (ca_state(info->ch) == cs_conn) {
+                status = ca_clear_event(info->evID);
+                if (status != ECA_NORMAL) {
+                    PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+                }
+            }
+            if(info->ch != (chid) 0) {
+                ca_clear_channel(ch);
+            }
+            info->connected=false;
+            info->ch=0;
+            info->evAdded = false;
+            info->evID = 0;
+            info->event = 0;
+            C_SetMutexKnobDataConnected(mutexKnobdataPtr, info->index, info->connected);
+            knobData kData;
+            C_GetMutexKnobData(mutexKnobdataPtr, info->index, &kData);\
+            EpicsReconnect(&kData);
+            return status;
+
+
         }
         status = ctrlS.status;
         break;
