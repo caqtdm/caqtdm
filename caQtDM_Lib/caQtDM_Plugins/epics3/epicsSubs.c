@@ -154,7 +154,6 @@ char* myLimitedString (char * strng) {
         ca_clear_channel(ch);\
     }\
     info->connected=false;\
-    info->ch=0;\
     info->evAdded = false;\
     info->evID = 0;\
     info->event = 0;\
@@ -979,7 +978,7 @@ void ClearMonitor(knobData *kData)
                 PRINT(printf("ca_clear_channel: %s chid=%d, index=%d\n", info->pv, info->ch, aux));
                 info->connected = false;
                 info->event = 0;
-                info->ch = 0;
+                //info->ch = 0;
                 if(status != ECA_NORMAL) {
                     printf("ca_clear_channel: %s %s index=%d\n", ca_message_text[CA_EXTRACT_MSG_NO(status)], info->pv, aux);
                 }
