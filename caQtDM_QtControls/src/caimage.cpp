@@ -97,7 +97,12 @@ void caImage::init(const QString& filename) {
     if(thisAngle != 0) OnFrameChanged(0);
 
     _layout->setSpacing(0);
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     _layout->setMargin(0);
+#else
+     _layout->setContentsMargins(0,0,0,0);
+#endif
     _layout->addWidget(_container);
     setLayout(_layout);
 

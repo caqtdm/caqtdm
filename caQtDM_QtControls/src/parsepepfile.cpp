@@ -84,14 +84,22 @@ ParsePepFile::ParsePepFile(QString filename, bool willprint)
 
     // copy first header to our byte array
     QByteArray *array= new QByteArray();
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     array->append(header);
-
+#else
+   array->append(header.toLatin1());
+#endif
     // fill array with the scanned data
     DisplayFile(nbRows, nbCols, array);
 
     // and finish with the footer
     footer = QString("</layout></item></layout></widget></widget></ui>");
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     array->append(footer);
+#else
+   array->append(footer.toLatin1());
+#endif
 
     // fill buffer with the byte array data
     buffer->open(QIODevice::ReadWrite);
@@ -1274,19 +1282,32 @@ void ParsePepFile::writeLabel(QString text, QString minwidth, QString minheight,
 void ParsePepFile::writeOpenProperty(QString property, QByteArray *array)
 {
     QString aux = QString("<property name=\"%1\">\n").arg( property);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     array->append(aux);
+#else
+   array->append(aux.toLatin1());
+#endif
+
 }
 
 void ParsePepFile::writeCloseProperty(QByteArray *array)
 {
     QString aux = QString("</property>\n");
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     array->append(aux);
+#else
+   array->append(aux.toLatin1());
+#endif
 }
 
 void ParsePepFile::writeTaggedString(QString tag, QString value, QByteArray *array)
 {
     QString aux = QString("<%1>%2</%3>\n").arg(tag).arg(value).arg(tag);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     array->append(aux);
+#else
+   array->append(aux.toLatin1());
+#endif
 }
 
 void ParsePepFile::setColor(QString property, int r, int g, int b, int alpha, QByteArray *array)
@@ -1329,20 +1350,32 @@ void ParsePepFile::writeItemRowCol(int &row, int &column,  int span, QByteArray 
 {
     QString Qrow, Qcolumn, Qspan;
     QString aux = QString("<item row=\"%1\" column=\"%2\" colspan=\"%3\">\n").arg(Qrow.setNum(row)).arg(Qcolumn.setNum(column)).arg(Qspan.setNum(span));
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     array->append(aux);
+#else
+   array->append(aux.toLatin1());
+#endif
     column++;
 }
 
 void ParsePepFile::writeOpenTag(QString tag,  QByteArray *array)
 {
     QString aux = QString("<%1>\n").arg(tag);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     array->append(aux);
+#else
+   array->append(aux.toLatin1());
+#endif
 }
 
 void ParsePepFile::writeCloseTag(QString tag,  QByteArray *array)
 {
     QString aux = QString("</%1>\n").arg(tag);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     array->append(aux);
+#else
+   array->append(aux.toLatin1());
+#endif
 }
 
 void ParsePepFile::writeSimpleProperty(QString prop, QString tag, QString value, QByteArray *array)
