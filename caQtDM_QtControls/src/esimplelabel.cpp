@@ -81,8 +81,14 @@ QSize ESimpleLabel::sizeHint() const
  QFont f = font();
  f.setPointSize(4);
  QFontMetrics fm(f);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
  int w = fm.width(text());
  int h = fm.height();
+#else
+ int w = fm.boundingRect(text()).width();
+ int h = fm.boundingRect(text()).height();
+#endif
+
  /* add some pixels... */
  w += 2 * frameWidth() + 2 * midLineWidth();
  h += 2 * frameWidth() + 2 * midLineWidth();

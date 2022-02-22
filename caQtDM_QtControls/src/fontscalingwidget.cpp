@@ -149,7 +149,12 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
         // check if width does not go outside
         if(!richText) {
             QFontMetricsF tmpFm(f);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             txtWidth = tmpFm.width(longestLine);
+#else
+            txtWidth = tmpFm.boundingRect(longestLine).width();
+#endif
+
         } else {
             textDoc->setDefaultFont(f);
             txtWidth = textDoc->idealWidth();
