@@ -202,7 +202,13 @@ void caImage::OnFrameChanged(int frame)
         return;
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QMatrix rm;
+#else
+    QTransform rm;
+#endif
+
+
     pix.scaled(width(), height());
     pix.fill(QColor::fromRgb(0, 0, 0, 0)); //pixmap transparent.
     QPainter* p = new QPainter(&pix);
