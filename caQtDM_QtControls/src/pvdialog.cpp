@@ -120,7 +120,7 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
         trimmedPV = PV.mid(0, pos);
         //std::cerr << "jsonstring=" << qasc(JSONString) << "\n";
 
-        JSONValue *main_object = JSON::Parse(JSONString.toAscii());
+        JSONValue *main_object = JSON::Parse(JSONString.toLatin1());
         if (main_object == NULL) {
             //print_out(L"failed to parse");
             errorMessage = "could not parse entered expression";
@@ -199,7 +199,7 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
                     if(QKey.contains("sync")) {  // camonitor 'ACM:COUNT:1.{"sync":{"while":"blue"}}’
                         //std::cerr <<  "Key: " << qasc(QKey) << " Value. " << qasc(QValue) << "\n";
                         syncPresent = true;
-                        JSONValue *main_object = JSON::Parse(QValue.toAscii());
+                        JSONValue *main_object = JSON::Parse(QValue.toLatin1());
                         if (main_object == NULL) {
                             //print_out(L"failed to parse");
                             errorMessage = "could not parse entered sync expression";
@@ -245,7 +245,7 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
                     // get array data
                     if(QKey.contains("arr")) {
                         arrayPresent = true;
-                        JSONValue *main_object = JSON::Parse(QValue.toAscii());
+                        JSONValue *main_object = JSON::Parse(QValue.toLatin1());
                         if (main_object == NULL) {
                             //print_out(L"failed to parse");
                             errorMessage = "could not parse entered array expression";
