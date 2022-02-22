@@ -95,7 +95,12 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
 
     if(linecnt > 1) {
         QStringList lines = text.split("\n");
-        qSort(lines.begin(), lines.end(), FontScalingWidget::longerThan);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            qSort(lines.begin(), lines.end(), FontScalingWidget::longerThan);
+#else
+            std::sort(lines.begin(), lines.end(), FontScalingWidget::longerThan);
+#endif
+
         qslisttoc(lines);
         longestLine = lines.first();
         txtHeight = fm.lineSpacing() * linecnt;
@@ -216,7 +221,11 @@ double FontScalingWidget::calculateVertFontPointSizeF(const QString& text, const
 
     if(linecnt > 1) {
         QStringList lines = text.split("\n");
-        qSort(lines.begin(), lines.end(), FontScalingWidget::longerThan);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            qSort(lines.begin(), lines.end(), FontScalingWidget::longerThan);
+#else
+            std::sort(lines.begin(), lines.end(), FontScalingWidget::longerThan );
+#endif
         qslisttoc(lines);
         longestLine = lines.first();
         txtHeight = fm.lineSpacing() * linecnt;
