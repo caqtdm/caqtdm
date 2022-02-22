@@ -50,12 +50,19 @@ class QTCON_EXPORT replaceMacro : public QWidget
 
     Q_PROPERTY(QString macroKey READ getMacroKey WRITE setMacroKey)
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     Q_PROPERTY(QStringList macroValuesList READ getMacroValuesList WRITE setMacroValuesList DESIGNABLE isPropertyVisible(macroValuesList)  STORED false)
     Q_PROPERTY(QString macroValues READ getMacroValues WRITE setMacroValues  DESIGNABLE inactiveButVisible())
-
     Q_PROPERTY(QString enumChannel READ getPV WRITE setPV DESIGNABLE isPropertyVisible(channel))
-
     Q_PROPERTY(QString macroValue READ getMacroValue WRITE setMacroValue DESIGNABLE isPropertyVisible(macroValue))
+#else
+    Q_PROPERTY(QStringList macroValuesList READ getMacroValuesList WRITE setMacroValuesList DESIGNABLE true  STORED false)
+    Q_PROPERTY(QString macroValues READ getMacroValues WRITE setMacroValues  DESIGNABLE false)
+    Q_PROPERTY(QString enumChannel READ getPV WRITE setPV DESIGNABLE true)
+    Q_PROPERTY(QString macroValue READ getMacroValue WRITE setMacroValue DESIGNABLE true)
+
+#endif
+
     Q_ENUMS(Form)
     Q_ENUMS(colMode)
 

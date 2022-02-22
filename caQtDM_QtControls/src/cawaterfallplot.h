@@ -234,8 +234,13 @@ class QTCON_EXPORT caWaterfallPlot: public QWidget
     Q_PROPERTY(intensityScaling IntensityScalingMin READ getIntensityScalingMin WRITE setIntensityScalingMin)
 
     Q_PROPERTY(colormap ColorMap READ getColormap WRITE setColormap)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     Q_PROPERTY(QString customColorMap READ getCustomMap WRITE setCustomMap  DESIGNABLE isPropertyVisible(customcolormap))
     Q_PROPERTY(bool discreteCustomColorMap READ getDiscreteCustomMap WRITE setDiscreteCustomMap DESIGNABLE isPropertyVisible(discretecolormap))
+#else
+    Q_PROPERTY(QString customColorMap READ getCustomMap WRITE setCustomMap  DESIGNABLE true)
+    Q_PROPERTY(bool discreteCustomColorMap READ getDiscreteCustomMap WRITE setDiscreteCustomMap DESIGNABLE true)
+#endif
 
     Q_PROPERTY(bool grid READ getGrid WRITE setGrid)
     Q_PROPERTY(bool XaxisEnabled READ getXaxisEnabled WRITE setXaxisEnabled)

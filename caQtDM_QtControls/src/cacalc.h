@@ -44,16 +44,30 @@ class  QTCON_EXPORT caCalc : public  ESimpleLabel
 
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
-
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     Q_PROPERTY(QStringList channelList READ getPVList WRITE setPVList DESIGNABLE isPropertyVisible(pvlist) STORED false )
-    Q_PROPERTY(QString channels READ getPV WRITE setPV DESIGNABLE inactiveButVisible())
+#else
+    Q_PROPERTY(QStringList channelList READ getPVList WRITE setPVList DESIGNABLE true STORED false )
+#endif
 
+
+    Q_PROPERTY(QString channels READ getPV WRITE setPV DESIGNABLE false)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     Q_PROPERTY(QString calc READ getCalc WRITE setCalc  DESIGNABLE isPropertyVisible(calcabcd))
     Q_PROPERTY(QString channel READ getChannelA WRITE setChannelA  DESIGNABLE isPropertyVisible(channela))
     Q_PROPERTY(QString channelB READ getChannelB WRITE setChannelB DESIGNABLE isPropertyVisible(channelb))
     Q_PROPERTY(QString channelC READ getChannelC WRITE setChannelC DESIGNABLE isPropertyVisible(channelc))
     Q_PROPERTY(QString channelD READ getChannelD WRITE setChannelD DESIGNABLE isPropertyVisible(channeld))
     Q_PROPERTY(double initialValue READ getInitialValue WRITE setInitialValue DESIGNABLE isPropertyVisible(initialvalue))
+#else
+    Q_PROPERTY(QString calc READ getCalc WRITE setCalc  DESIGNABLE true)
+    Q_PROPERTY(QString channel READ getChannelA WRITE setChannelA  DESIGNABLE true)
+    Q_PROPERTY(QString channelB READ getChannelB WRITE setChannelB DESIGNABLE true)
+    Q_PROPERTY(QString channelC READ getChannelC WRITE setChannelC DESIGNABLE true)
+    Q_PROPERTY(QString channelD READ getChannelD WRITE setChannelD DESIGNABLE true)
+    Q_PROPERTY(double initialValue READ getInitialValue WRITE setInitialValue DESIGNABLE true)
+
+#endif
     Q_PROPERTY(int precision READ getPrecision WRITE setPrecision)
 
     // this will prevent user interference

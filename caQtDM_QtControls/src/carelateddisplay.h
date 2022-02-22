@@ -37,7 +37,7 @@ class QTCON_EXPORT caRelatedDisplay : public caRowColMenu
 
     Q_PROPERTY(Stacking stackingMode READ getStacking WRITE setStacking)
     Q_PROPERTY(QStringList removeParentList READ getRemoveList WRITE setRemoveList STORED false)
-    Q_PROPERTY(QString removeParent READ getReplaceModes WRITE setReplaceModes DESIGNABLE inactiveButVisible())
+    Q_PROPERTY(QString removeParent READ getReplaceModes WRITE setReplaceModes DESIGNABLE false)
     Q_PROPERTY(QPoint displayPosition READ getPosition WRITE setPosition)
 
     // this will prevent user interference

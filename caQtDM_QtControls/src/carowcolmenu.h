@@ -45,13 +45,13 @@ class QTCON_EXPORT caRowColMenu : public QWidget
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
 
     Q_PROPERTY(QStringList labelsList READ getLabelsList WRITE setLabelsList STORED false)
-    Q_PROPERTY(QString labels READ getLabels WRITE setLabels DESIGNABLE inactiveButVisible())
+    Q_PROPERTY(QString labels READ getLabels WRITE setLabels DESIGNABLE false)
 
     Q_PROPERTY(QStringList filesList READ getFilesList WRITE setFilesList STORED false)
-    Q_PROPERTY(QString files READ getFiles WRITE setFiles DESIGNABLE inactiveButVisible())
+    Q_PROPERTY(QString files READ getFiles WRITE setFiles DESIGNABLE false)
 
     Q_PROPERTY(QStringList argsList READ getArgsList WRITE setArgsList STORED false)
-    Q_PROPERTY(QString args READ getArgs WRITE setArgs DESIGNABLE inactiveButVisible())
+    Q_PROPERTY(QString args READ getArgs WRITE setArgs DESIGNABLE false)
 
     Q_PROPERTY(EPushButton::ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleModeL)
 

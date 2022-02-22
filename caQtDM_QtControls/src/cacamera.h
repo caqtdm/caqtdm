@@ -94,16 +94,21 @@ class QTCON_EXPORT caCamera : public QWidget
     Q_PROPERTY(bool showComboBoxes READ getShowComboBoxes WRITE setShowComboBoxes)
 
     Q_PROPERTY(colormap ColorMap READ getColormap WRITE setColormap)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     Q_PROPERTY(QString customColorMap READ getCustomMap WRITE setCustomMap  DESIGNABLE isPropertyVisible(customcolormap))
     Q_PROPERTY(bool discreteCustomColorMap READ getDiscreteCustomMap WRITE setDiscreteCustomMap DESIGNABLE isPropertyVisible(discretecolormap))
+#else
+    Q_PROPERTY(QString customColorMap READ getCustomMap WRITE setCustomMap  DESIGNABLE true)
+    Q_PROPERTY(bool discreteCustomColorMap READ getDiscreteCustomMap WRITE setDiscreteCustomMap DESIGNABLE true)
+#endif
 
     Q_PROPERTY(QStringList ROI_readChannelsList READ getROIChannelsReadList WRITE setROIChannelsReadList STORED false)
-    Q_PROPERTY(QString ROI_readChannels READ getROIChannelsRead WRITE setROIChannelsRead DESIGNABLE inactiveButVisible())
+    Q_PROPERTY(QString ROI_readChannels READ getROIChannelsRead WRITE setROIChannelsRead DESIGNABLE false)
     Q_PROPERTY(ROI_markertype ROI_readmarkerType READ getROIreadmarkerType WRITE setROIreadmarkerType)
     Q_PROPERTY(ROI_type ROI_readType READ getROIreadType WRITE setROIreadType)
 
     Q_PROPERTY(QStringList ROI_writeChannelsList READ getROIChannelsWriteList WRITE setROIChannelsWriteList STORED false)
-    Q_PROPERTY(QString ROI_writeChannels READ getROIChannelsWrite WRITE setROIChannelsWrite DESIGNABLE inactiveButVisible())
+    Q_PROPERTY(QString ROI_writeChannels READ getROIChannelsWrite WRITE setROIChannelsWrite DESIGNABLE false)
     Q_PROPERTY(ROI_markertype ROI_writemarkerType READ getROIwritemarkerType WRITE setROIwritemarkerType)
     Q_PROPERTY(ROI_type ROI_writeType READ getROIwriteType WRITE setROIwriteType)
 
