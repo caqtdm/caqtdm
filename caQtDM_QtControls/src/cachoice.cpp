@@ -62,7 +62,7 @@ caChoice::caChoice(QWidget *parent) : QWidget(parent)
 
     //setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     grid = new QGridLayout(this);
-    grid->setMargin(0);
+    SETMARGIN_QT456(grid,0);
     grid->setSpacing(2);
 
     thisStacking = Row;

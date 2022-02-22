@@ -96,7 +96,7 @@ caCamera::caCamera(QWidget *parent) : QWidget(parent)
     scrollArea = (QScrollArea *)Q_NULLPTR;
 
     mainLayout = new QGridLayout(this);
-    mainLayout->setMargin(0);
+    SETMARGIN_QT456(mainLayout,0);
     mainLayout->setSpacing(0);
     setLayout(mainLayout);
 
@@ -663,7 +663,7 @@ void caCamera::setup()
 
         // add everything to layout
         valuesLayout = new QHBoxLayout();
-        valuesLayout->setMargin(0);
+        SETMARGIN_QT456(valuesLayout,0);
         valuesLayout->setSpacing(2);
         valuesLayout->addWidget(labelMinText, Qt::AlignLeft);
         valuesLayout->addWidget(labelMin, Qt::AlignLeft);
@@ -681,7 +681,7 @@ void caCamera::setup()
         valuesWidget->show();
 
         colormodeLayout = new QHBoxLayout();
-        colormodeLayout->setMargin(0);
+        SETMARGIN_QT456(colormodeLayout,0);
         colormodeLayout->setSpacing(2);
         colormodeLayout->addWidget(labelColormodeText, Qt::AlignLeft);
         colormodeLayout->addWidget(colormodeCombo, Qt::AlignLeft);

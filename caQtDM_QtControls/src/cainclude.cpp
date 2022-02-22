@@ -58,11 +58,7 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
     thisPalette = palette();
 
     boxLayout = new QHBoxLayout();
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        boxLayout->setMargin(0);
-#else
-        boxLayout->setContentsMargins(0,0,0,0);
-#endif
+    SETMARGIN_QT456(boxLayout,0);
     boxLayout->setSpacing(0);
 
 
@@ -73,11 +69,7 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
     boxLayout->addWidget(frame);
 
     gridLayout = new QGridLayout();
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    gridLayout->setMargin(0);
-#else
-    gridLayout->setContentsMargins(0,0,0,0);
-#endif
+    SETMARGIN_QT456(gridLayout,0);
     gridLayout->setSpacing(0);
     effectiveSize = QSize(100,100);
     frame->setLayout(gridLayout);
@@ -204,11 +196,7 @@ void caInclude::setFileName(QString const &filename)
             thisFrameUpdate = false;
 
             setLayout(boxLayout);
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-            gridLayout->setMargin(0);
-#else
-            gridLayout->setContentsMargins(0,0,0,0);
-#endif
+            SETMARGIN_QT456(gridLayout,0);
 
             switch(thisFrameShape) {
                 case NoFrame:

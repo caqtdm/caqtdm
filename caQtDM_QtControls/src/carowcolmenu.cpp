@@ -44,11 +44,7 @@ caRowColMenu::caRowColMenu(QWidget *parent) : QWidget(parent)
 
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     grid = new QGridLayout(this);
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        grid->setMargin(0);
-#else
-        grid->setContentsMargins(0,0,0,0);
-#endif
+    SETMARGIN_QT456(grid,0);
     grid->setSpacing(2);
     thisForeColor = Qt::black;
 
