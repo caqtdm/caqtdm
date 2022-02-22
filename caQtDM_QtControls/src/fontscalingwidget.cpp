@@ -149,12 +149,7 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
         // check if width does not go outside
         if(!richText) {
             QFontMetricsF tmpFm(f);
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-            txtWidth = tmpFm.width(longestLine);
-#else
-            txtWidth = tmpFm.boundingRect(longestLine).width();
-#endif
-
+            txtWidth = QMETRIC_QT456_FONT_WIDTH(tmpFm,longestLine);
         } else {
             textDoc->setDefaultFont(f);
             txtWidth = textDoc->idealWidth();
@@ -167,7 +162,7 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
             //         qasc(d_widget->objectName()), qasc(text),  txtWidth, txtHeight, f.pointSizeF(), borderW2);
             if(!richText) {
                 QFontMetricsF tmpFm(f);
-                txtWidth = tmpFm.width(longestLine);
+                txtWidth = QMETRIC_QT456_FONT_WIDTH(tmpFm,longestLine);
             } else {
                 textDoc->setDefaultFont(f);
                 txtWidth = textDoc->idealWidth();
@@ -273,14 +268,14 @@ double FontScalingWidget::calculateVertFontPointSizeF(const QString& text, const
 
         // check if width does not go outside
         QFontMetricsF tmpFm(f);
-        txtWidth = tmpFm.width(longestLine);
+        txtWidth = QMETRIC_QT456_FONT_WIDTH(tmpFm,longestLine);
         while((txtWidth > borderH2) && f.pointSizeF() > MIN_FONT_SIZE) {
             if(f.pointSizeF() <= 0.0) f.setPointSizeF(1.0);
             f.setPointSizeF(f.pointSizeF() - 0.5);
             //printf(" \e[1;36m -- next DECREASING font size \"%s\" :text \"%s\" width %.1f height %.1f - point size %.2f - w: %.2f\e[0m\n",
             //         qasc(d_widget->objectName()), qasc(text),  txtWidth, txtHeight, f.pointSizeF(), borderW2);
             QFontMetricsF tmpFm(f);
-            txtWidth = tmpFm.width(longestLine);
+            txtWidth = QMETRIC_QT456_FONT_WIDTH(tmpFm,longestLine);
             //txtHeight = linecnt * tmpFm.lineSpacing();
         }
 

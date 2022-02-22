@@ -98,7 +98,7 @@ QSize ENumeric::sizeHint() const
         QFont f = font();
         f.setPointSize(4); /* provide a size hint calculated on a minimum font of 4 points */
         QFontMetrics fm(f);
-        int width = digits * fm.width("X") + fm.width("X"); /* in case there's the +/- sign */
+        int width = digits * QMETRIC_QT456_FONT_WIDTH(fm,"X") + QMETRIC_QT456_FONT_WIDTH(fm,"X"); /* in case there's the +/- sign */
         return QSize(width, fm.height());
     }
     return QWidget::sizeHint();
@@ -160,7 +160,7 @@ void ENumeric::init()
 
     box = new QGridLayout(this);
     box->setSpacing(0);
-    box->setMargin(1);
+    SETMARGIN_QT456(box,1);
     box->setRowStretch(0,1);
     box->setRowStretch(1,1);
     box->setRowStretch(2,1);

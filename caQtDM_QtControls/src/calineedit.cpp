@@ -631,13 +631,8 @@ QSize caLineEdit::sizeHint() const
     QFont f = font();
     f.setPointSize(10);
     QFontMetrics fm(f);
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    int w = fm.width(text());
-    int h = fm.height();
-#else
-    int w = fm.boundingRect(text()).width();
-    int h = fm.boundingRect(text()).height();
-#endif
+    int w = QMETRIC_QT456_FONT_WIDTH(fm,text());
+    int h = QMETRIC_QT456_FONT_HEIGHT(fm,text());
     QSize size(w, h);
     //printf("ESimpleLabel \e[1;33msizeHint\e[0m \"%s\" returning size w %d h %d\n", objectName(), size.width(), size.height());
     return size;

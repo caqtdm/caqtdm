@@ -60,8 +60,18 @@
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             #define SKIP_EMPTY_PARTS QString::SkipEmptyParts
+            #define QMETRIC_QT456_FONT_WIDTH(metric,text) metric.width(text)
+            #define QMETRIC_QT456_FONT_HEIGHT(metric,text) metric.height()
+            #define SETMARGIN_QT456(obj,value) obj->setMargin(value)
+            #define SETSPACING_QT456(obj,value) obj->setSpacing(value)
 #else
             #define SKIP_EMPTY_PARTS Qt::SkipEmptyParts
+            #define QMETRIC_QT456_FONT_WIDTH(metric,text) metric.boundingRect(text).width()
+            #define QMETRIC_QT456_FONT_HEIGHT(metric,text) metric.boundingRect(text).height()
+            #define SETMARGIN_QT456(obj,value) obj->setContentsMargins(value,value,value,value)
+            #define SETSPACING_QT456(obj,value) obj->setVerticalSpacing(value);\
+                                                obj->setHorizontalSpacing(value)
+            //#define QPalette::Background QPalette::Window
 #endif
 
 

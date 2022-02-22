@@ -97,7 +97,9 @@ void caLinearGauge::paintEvent(QPaintEvent *)
 
     if (m_scaleEnabled) {
         h = fm.height()+2;
-        w = fm.width(labels[longestLabelIndex])+2;
+        //w = fm.width(labels[longestLabelIndex])+2;
+        w = QMETRIC_QT456_FONT_WIDTH(fm,labels[longestLabelIndex]) + 2;
+
     } else {
         h=w=10;
     }
@@ -349,7 +351,8 @@ void caLinearGauge::drawLabels(QPainter *p)
     QFont f = p->font();
     QFontMetrics fm(f);
     h = fm.height();
-    w = fm.width(labels[longestLabelIndex]);
+    //w = fm.width(labels[longestLabelIndex]);
+    w = QMETRIC_QT456_FONT_WIDTH(fm,labels[longestLabelIndex]);
 
     if (m_orientation == Qt::Horizontal)
     {
@@ -357,7 +360,7 @@ void caLinearGauge::drawLabels(QPainter *p)
         h = labelsSize;
         while (check && f.pointSize() > 2)
         {
-            if ((p->fontMetrics().width(labels[longestLabelIndex]) > (p->window().width()/m_numMajorTicks)))
+           if ((QMETRIC_QT456_FONT_WIDTH(p->fontMetrics(),labels[longestLabelIndex]) > (p->window().width()/m_numMajorTicks)))
             {
                 f.setPointSize(f.pointSize()-1);
                 p->setFont(f);
@@ -394,7 +397,7 @@ void caLinearGauge::drawLabels(QPainter *p)
         w = labelsSize;
         while (check && f.pointSize() > 2)
         {
-            if (((p->fontMetrics().height()>(p->window().height()/m_numMajorTicks))||p->fontMetrics().width(labels[longestLabelIndex])>labelsSize))
+            if (((p->fontMetrics().height()>(p->window().height()/m_numMajorTicks))||QMETRIC_QT456_FONT_WIDTH(p->fontMetrics(),labels[longestLabelIndex]) >labelsSize))
             {
                 f.setPointSize(f.pointSize()-1);
                 p->setFont(f);
@@ -673,7 +676,7 @@ void caCircularGauge::drawValue(QPainter *p)
     bool check = true;
     while (check)
     {
-        if ((p->fontMetrics().width(s) > (w-2)))
+        if ((QMETRIC_QT456_FONT_WIDTH(p->fontMetrics(),s) > (w-2)))
         {
             qreal fontSize = f.pointSizeF()-.5;
             if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
@@ -697,7 +700,7 @@ void caCircularGauge::drawValue(QPainter *p)
     check = true;
     while (check)
     {
-        if ((p->fontMetrics().width(m_label) > (38)))
+        if ((QMETRIC_QT456_FONT_WIDTH(p->fontMetrics(),m_label) > (38)))
         {
             f.setPointSizeF(f.pointSizeF()-.5);
             p->setFont(f);

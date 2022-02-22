@@ -498,11 +498,7 @@ void caThermo::paintValue(QPainter *painter, QRect valueRect) const
         painter->drawText( valueRect, Qt::AlignCenter, label );
     } else {
         QFontMetrics fm(font());
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        int w = fm.width(label);
-#else
-        int w = fm.boundingRect(label).width();
-#endif
+        int w = QMETRIC_QT456_FONT_WIDTH(fm,label);
         int h = fm.height();
         switch (this->scalePosition()) {
         case LeftScale:

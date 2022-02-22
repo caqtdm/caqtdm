@@ -1222,7 +1222,7 @@ void ParsePepFile::writeLabel(QString text, QString minwidth, QString minheight,
 
     QFont font( "Lucida Sans Typewriter", pointsize.toInt());
     QFontMetrics metrics(font);
-    int width = metrics.width(text);
+    int width = QMETRIC_QT456_FONT_WIDTH(metrics,text);
     if( (minwidth.size() == 0) && (minheight.size() > 0) ) {
         writeOpenProperty("minimumSize", array);
         writeOpenTag("size", array);

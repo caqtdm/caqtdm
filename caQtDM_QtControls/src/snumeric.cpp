@@ -90,11 +90,7 @@ QSize SNumeric::sizeHint() const
         QFont f = font();
         f.setPointSize(4); /* provide a size hint calculated on a minimum font of 4 points */
         QFontMetrics fm(f);
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        int width = digits * fm.width("X") + fm.width("X"); /* in case there's the +/- sign */
-#else
-        int width = digits * fm.boundingRect("X").width() + fm.boundingRect("X").width(); /* in case there's the +/- sign */
-#endif
+        int width = digits * QMETRIC_QT456_FONT_WIDTH(fm,"X") + QMETRIC_QT456_FONT_WIDTH(fm,"X"); /* in case there's the +/- sign */
         return QSize(width, fm.height());
     }
     return QWidget::sizeHint();
@@ -155,14 +151,9 @@ void SNumeric::init()
     setFocusPolicy(Qt::StrongFocus);
 
     box = new QGridLayout(this);
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    box->setSpacing(0);
-    box->setMargin(1);
-#else
-    box->setVerticalSpacing(0);
-    box->setHorizontalSpacing(0);
-    box->setContentsMargins(1,1,1,1);
-#endif
+    SETMARGIN_QT456(box,1);
+    SETSPACING_QT456(box,0);
+
     box->setRowStretch(0,1);
     //box->setRowStretch(1,1);
     //box->setRowStretch(2,1);
