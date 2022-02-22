@@ -656,7 +656,12 @@ void caCircularGauge::drawValue(QPainter *p)
     QString s;
     if (isEnabled())
     {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         EngString engString(QString().sprintf(m_valueFormat.toLatin1(), d_naturalValue), m_valueFormat, d_naturalValue);
+#else
+        EngString engString(QString().asprintf(m_valueFormat.toLatin1(), d_naturalValue), m_valueFormat, d_naturalValue);
+#endif
+
         s = engString;
     }
     else
