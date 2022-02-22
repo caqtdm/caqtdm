@@ -28,6 +28,7 @@
 
 #include <qtcontrols_global.h>
 #include "colormaps.h"
+#include <qwt_interval.h>
 
 colorMaps::colorMaps()
 {

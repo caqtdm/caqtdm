@@ -517,8 +517,12 @@ void caSlider::wheelEvent(QWheelEvent *e)
         e->ignore();
         return;
     }
-
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     int delta = e->delta();
+#else
+    int delta = e->pixelDelta().manhattanLength();
+#endif
+
 
     if(thisDirection == Right || thisDirection == Up) {
         if ( delta > 0 ) direction = 1;
@@ -908,7 +912,7 @@ QString caSlider::setScaleLabel(double value) const
       snprintf(asc, MAX_STRING_LENGTH,  "nan");
     }
 
-    label = QString::fromAscii(asc);
+    label = QString::fromLatin1(asc);
 
     return label;
 }

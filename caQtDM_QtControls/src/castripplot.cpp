@@ -474,7 +474,12 @@ QString caStripPlot::legendText(int i)
         snprintf(max, MAXLEN - 1, "%.1f", thisYaxisLimitsMax[i]);
         ReplaceTrailingZerosByBlancs(min);
         ReplaceTrailingZerosByBlancs(max);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         MinMax.sprintf("[%s,%s]", min, max);
+#else
+        MinMax=QString("[%1,%2]").arg(min).arg(max);
+#endif
+
         MinMax = MinMax.simplified(); MinMax.replace( " ", "" );
         titre.append(" ");
         titre.append(MinMax);
@@ -1085,7 +1090,7 @@ void caStripPlot::setBackground(QColor c)
 {
     thisBackColor = c;
     QPalette canvasPalette(c);
-    canvasPalette.setColor(QPalette::Foreground, QColor(133, 190, 232));
+    canvasPalette.setColor(QPalette::WindowText, QColor(133, 190, 232));
     canvas()->setPalette(canvasPalette);
     replot();
 }

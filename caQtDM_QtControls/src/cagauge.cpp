@@ -211,7 +211,12 @@ void caLinearGauge::drawColorBar(QPainter *p)
         v1 = (m_value-m_minValue)/(m_maxValue-m_minValue);
 
         p->setPen(Qt::black);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         p->setBrush(palette().background());
+#else
+        p->setBrush(palette().window());
+#endif
+
         if (m_fillMode == FROM_MIN)
         {
             max = v1;
@@ -527,7 +532,11 @@ void caCircularGauge::drawColorBar(QPainter *p)
         p->setBrush(v_c[0]);
         p->drawPie(-m_outerRadius,-m_outerRadius,m_outerRadius*2,m_outerRadius*2, (int)(m_startAngle*16), (int)-(m_arcLength*16));
     }
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     p->setBrush(palette().background());
+#else
+    p->setBrush(palette().window());
+#endif
     p->drawEllipse(-m_innerRadius,-m_innerRadius,m_innerRadius*2,m_innerRadius*2);
 }
 

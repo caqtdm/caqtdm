@@ -222,9 +222,15 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     panner->setAxisEnabled(QwtPlot::yRight, false);
     panner->setAxisEnabled(QwtPlot::yLeft, true);
     panner->setAxisEnabled(QwtPlot::xBottom, true);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     panner->setMouseButton(Qt::MidButton);
+#else
+    panner->setMouseButton(Qt::MiddleButton);
+#endif
 
-    const QColor c(Qt::red);
+
+
+        const QColor c(Qt::red);
    zoomer->setRubberBandPen(c);
    zoomer->setTrackerPen(c);
    zoomer->setMousePattern(QwtEventPattern::MouseSelect2,Qt:: NoButton);
@@ -819,7 +825,12 @@ void caCartesianPlot::setGridsColor(QColor c)
 void caCartesianPlot::setBackgroundColor(QColor c)
 {
     QPalette canvasPalette(c);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     canvasPalette.setColor(QPalette::Foreground, QColor(133, 190, 232));
+#else
+    canvasPalette.setColor(QPalette::WindowText, QColor(133, 190, 232));
+
+#endif
     canvas()->setPalette(canvasPalette);
     replot();
 }
