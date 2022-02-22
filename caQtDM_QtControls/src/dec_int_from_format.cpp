@@ -28,7 +28,8 @@
     #include <QRegExp>
 #else
     #include <QRegularExpression>
-#endif#include <QStringList>
+#endif
+#include <QStringList>
 #include <stdio.h>
 
 #define qstoc(x) ""
