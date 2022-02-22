@@ -40,7 +40,7 @@ class NetworkAccess:public QObject
 public:
     NetworkAccess();
     ~NetworkAccess(){}
-    bool requestUrl(const QUrl url, const QString &file = QString::null);
+    bool requestUrl(const QUrl url, const QString &file = Q_NULLPTR);
     const QString lastError();
 
 signals:
