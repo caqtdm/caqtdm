@@ -502,7 +502,7 @@ void ENumeric::resizeEvent(QResizeEvent *e)
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         pix1.fill(palette().color(QPalette::Background));
 #else
-        pix1.fill(palette().color(QPalette::Base));
+        pix1.fill(palette().color(QPalette::Window));
 #endif
         QPainter *p = new QPainter(&pix1);
         p->setRenderHint(QPainter::Antialiasing);

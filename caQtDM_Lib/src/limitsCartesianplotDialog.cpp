@@ -49,13 +49,13 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
     Specials special;
     special.setNewStyleSheet(this, qApp->desktop()->size(), 16, 10);
     QPalette palette;
-    palette.setBrush(QPalette::Background, QColor(255,255,224,255));
+    palette.setBrush(QPalette::Window, QColor(255,255,224,255));
     setPalette(palette);
     setAutoFillBackground(true);
     setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(thisWidth,thisHeight), qApp->desktop()->availableGeometry()));
 #elif defined(MOBILE_ANDROID)
     QPalette palette;
-    palette.setBrush(QPalette::Background, QColor(255,255,224,255));
+    palette.setBrush(QPalette::Window, QColor(255,255,224,255));
     setPalette(palette);
     setAutoFillBackground(true);
     showMax = true;

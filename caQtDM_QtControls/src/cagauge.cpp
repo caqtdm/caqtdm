@@ -133,7 +133,7 @@ void caLinearGauge::paintEvent(QPaintEvent *)
 
     if (!isEnabled())
     {
-        QColor c = palette().color(QPalette::Background);
+        QColor c = palette().color(QPalette::Window);
         c.setAlpha(200);
         painter.fillRect(painter.window(), c);
     }
@@ -492,7 +492,7 @@ void caCircularGauge::paintEvent(QPaintEvent *)
 
     if (!isEnabled())
     {
-        QColor c = palette().color(QPalette::Background);
+        QColor c = palette().color(QPalette::Window);
         c.setAlpha(200);
         painter.fillRect(painter.window(), c);
     }

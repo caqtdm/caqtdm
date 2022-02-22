@@ -467,7 +467,7 @@ void SNumeric::resizeEvent(QResizeEvent *e)
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         pix.fill(palette().color(QPalette::Background));
 #else
-        pix.fill(palette().color(QPalette::Base));
+        pix.fill(palette().color(QPalette::Window));
 #endif
         QPainter p(&pix);
         p.setRenderHint(QPainter::Antialiasing);

@@ -87,7 +87,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 #endif
 
     QPalette palette;
-    palette.setBrush(QPalette::Background, bg);
+    palette.setBrush(QPalette::Window, bg);
     setPalette(palette);
 
     ClearConfigButtonClicked = false;
