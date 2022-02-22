@@ -548,9 +548,19 @@ void caInclude::setMacroAndPositionsFromMacroStringList(QStringList macroList) {
          if(MacroPartPos.count() > 1) {
              XpositionsList.append(MacroPartPos[0]);
              YpositionsList.append(MacroPartPos[1]);
-             rx=QRegExp("(,+|^)\\[[^,]*[^\\]]*\\],?");
+             QString pattern2 = QString("(,+|^)\\[[^,]*[^\\]]*\\],?");
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+             rx=QRegExp(pattern2);
              int index_rx=rx.indexIn(Macro);
              int length_rx=rx.matchedLength();
+#else
+             rx=QRegularExpression(pattern2);
+             QRegularExpressionMatch match = rx.match(Macro);
+             qsizetype index_rx=match.capturedStart();
+             qsizetype length_rx=match.capturedLength();
+
+#endif
+
              if (index_rx==0){
                 Macro.remove(rx);
              }else{
