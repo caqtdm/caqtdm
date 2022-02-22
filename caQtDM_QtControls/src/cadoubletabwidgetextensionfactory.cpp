@@ -40,7 +40,7 @@ QObject *caDoubleTabWidgetExtensionFactory::createExtension(QObject *object,
     if (widget && (iid == Q_TYPEID(QDesignerContainerExtension))) {
         return new caDoubleTabWidgetExtension(widget, parent);
     } else {
-        return 0;
+        return Q_NULLPTR;
     }
 }
 
