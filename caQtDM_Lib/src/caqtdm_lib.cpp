@@ -411,7 +411,11 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
             QString uiString = QString(uiIntern);
             uiString= uiString.arg(filename);
             QByteArray *array= new QByteArray();
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             array->append(uiString);
+#else
+            array->append(uiString.toLocal8Bit());
+#endif
 
             QBuffer *buffer = new QBuffer();
             buffer->open(QIODevice::ReadWrite);
@@ -601,7 +605,11 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     if(allCarts.count() > 0) {
         foreach(caCartesianPlot* widget, allCarts) {
             if( widget->getXaxisSyncGroup() != 0) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
                 cartesianList.insertMulti(widget->getXaxisSyncGroup(), widget);
+#else
+                cartesianList.insert(widget->getXaxisSyncGroup(), widget);
+#endif
                 if(!cartesianGroupList.contains(widget->getXaxisSyncGroup())) cartesianGroupList.append(widget->getXaxisSyncGroup());
             }
         }
@@ -612,7 +620,11 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     if(allStrips.count() > 0) {
         foreach(caStripPlot* widget, allStrips) {
             if( widget->getXaxisSyncGroup() != 0) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
                 stripList.insertMulti(widget->getXaxisSyncGroup(), widget);
+#else
+                stripList.insert(widget->getXaxisSyncGroup(), widget);
+#endif
                 if(!stripGroupList.contains(widget->getXaxisSyncGroup())) stripGroupList.append(widget->getXaxisSyncGroup());
             }
         }
@@ -638,19 +650,31 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     // add a reload action
     QAction *ReloadWindowAction = new QAction(this);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     ReloadWindowAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+R", 0, QApplication::UnicodeUTF8));
+#else
+    ReloadWindowAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+R", Q_NULLPTR));
+#endif
     connect(ReloadWindowAction, SIGNAL(triggered()), this, SLOT(Callback_ReloadWindowL()));
     this->addAction(ReloadWindowAction);
 
     // add also a global reload action
     QAction *ReloadAllWindowsAction = new QAction(this);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     ReloadAllWindowsAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+Alt+R", 0, QApplication::UnicodeUTF8));
+#else
+    ReloadAllWindowsAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+Alt+R", Q_NULLPTR));
+#endif
     connect(ReloadAllWindowsAction, SIGNAL(triggered()), this, SLOT(Callback_reloadAllWindows()));
     this->addAction(ReloadAllWindowsAction);
 
     // add a print action
     QAction *PrintWindowAction = new QAction(this);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     PrintWindowAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+P", 0, QApplication::UnicodeUTF8));
+#else
+    PrintWindowAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+P", Q_NULLPTR));
+#endif
     connect(PrintWindowAction, SIGNAL(triggered()), this, SLOT(Callback_printWindow()));
     this->addAction(PrintWindowAction);
 
@@ -922,7 +946,7 @@ QString CaQtDM_Lib::actualizeMacroString(QMap<QString, QString> map, QString arg
                     //qDebug() << widget;
                     QString key =  widget->getKey();
                     QString value = widget->getNewValue();
-                    if(key == i.key() && value > 0) {
+                    if(key == i.key() && value != Q_NULLPTR) {
                         replace = true;
                         //qDebug() << key << value << replace;
                         break;
@@ -1014,7 +1038,7 @@ QMap<QString, QString> CaQtDM_Lib::createMap(const QString& macro)
     //qDebug() << "treat macro" << macro;
     QMap<QString, QString> map;
     // macro of type A=MMAC3,B=STR,C=RMJ:POSA:2 to be used for replacements of pv in child widgets
-    if(macro != NULL) {
+    if(macro != Q_NULLPTR) {
         QStringList vars = macro.split(",", SKIP_EMPTY_PARTS);
         for(int i=0; i< vars.count(); i++) {
             int pos = vars.at(i).indexOf("=");
@@ -1116,13 +1140,27 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         map.insert("CAQTDM_INTERNAL_PID",QString::number(qApp->applicationPid()));
         map.insert("CAQTDM_INTERNAL_HOSTNAME", QHostInfo::localHostName());
 
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+
         map.insert("CAQTDM_INTERNAL_SCREENCOUNT",QString::number( qApp->desktop()->screenCount()));
-        map.insert("CAQTDM_INTERNAL_DPI",QString::number( qApp->desktop()->physicalDpiX())); //qApp->primaryScreen()->physicalDotsPerInch()));
+        map.insert("CAQTDM_INTERNAL_DPI",QString::number( qApp->desktop()->physicalDpiX()));
+#else
+        map.insert("CAQTDM_INTERNAL_SCREENCOUNT",QString::number( qApp->screens().count()));
+        map.insert("CAQTDM_INTERNAL_DPI",QString::number(qApp->primaryScreen()->physicalDotsPerInch()));
+
+#endif
 #if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
         map.insert("CAQTDM_INTERNAL_REFRESHRATE",QString::number(qApp->primaryScreen()->refreshRate()));
 #endif
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         map.insert("CAQTDM_INTERNAL_DESKTOP_WIDTH",QString::number(qApp->desktop()->size().width()));
         map.insert("CAQTDM_INTERNAL_DESKTOP_HEIGHT",QString::number(qApp->desktop()->size().height()));
+#else
+        map.insert("CAQTDM_INTERNAL_DESKTOP_WIDTH",QString::number(qApp->primaryScreen()->size().width()));
+        map.insert("CAQTDM_INTERNAL_DESKTOP_HEIGHT",QString::number(qApp->primaryScreen()->size().height()));
+#endif
+
 
         map.insert("CAQTDM_INTERNAL_CA_ADDRLIST",qgetenv("EPICS_CA_ADDR_LIST"));
         map.insert("CAQTDM_INTERNAL_BS_ADDRLIST",qgetenv("BSREAD_ZMQ_ADDR_LIST"));
@@ -2227,12 +2265,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         int spacingVertical = includeWidget->getSpacingVertical();
         w1->setProperty("ObjectType", caInclude_Widget);
 
-        QWidget *thisW = (QWidget *) 0;
+        QWidget *thisW = (QWidget *) Q_NULLPTR;
         QUiLoader loader;
         bool prcFile = false;
 
         QHBoxLayout *boxLayout = new QHBoxLayout;
-        boxLayout->setMargin(0);
+        SETMARGIN_QT456(boxLayout,0);
         boxLayout->setSpacing(0);
         QFrame *frame = new QFrame();
         QColor thisFrameColor= includeWidget->getFrameColor();
@@ -2255,7 +2293,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         // define a layout for adding the includes
         QGridLayout *gridLayout = new QGridLayout;
         gridLayout->setContentsMargins(0,0,0,0);
-        gridLayout->setMargin(0);
+        SETMARGIN_QT456(gridLayout,0);
         gridLayout->setVerticalSpacing(spacingVertical);
         gridLayout->setHorizontalSpacing(spacingHorizontal);
 
@@ -2267,7 +2305,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             case caInclude::Box:
                   frame->setFrameShape(QFrame::Box);
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-                  gridLayout->setMargin(includeWidget->getFrameLineWidth());
+                  SETMARGIN_QT456(gridLayout,includeWidget->getFrameLineWidth());
 #endif
                   break;
             case caInclude::Panel:
@@ -3013,7 +3051,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                 extra_legend = legenddata.value<QStringList>();
 
             if (legenddata.type()==QVariant::String)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
                 extra_legend = legenddata.value<QString>().split(";",QString::KeepEmptyParts);
+#else
+                extra_legend = legenddata.value<QString>().split(";",Qt::KeepEmptyParts);
+#endif
+
         }
         //qDebug() << "extra_legend" << extra_legend << extra_legend.count();
         if (extra_legend.count()>0){
@@ -3370,9 +3413,14 @@ QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, 
 
                             }
 
-                            QRegExp rx_json;
+
                             QString toReplace = "$(" + i.key() + newText.mid(json_start,json_end-json_start+1) + ")";
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+                            QRegExp rx_json;
                             rx_json.setPattern(macro_regex);
+#else
+                            QRegularExpression rx_json(macro_regex);
+#endif
                             if (rx_json.isValid()){
                                 QString ReplaceWith=i.value();
                                     if (macro_value_found){
@@ -3770,13 +3818,21 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     if(plugininterface != (ControlsInterface *) Q_NULLPTR) plugininterface->pvAddMonitor(num, kData, rate, false);
 
     // add for this widget the io info
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QVariant v = qVariantFromValue(kData->edata.info);
+#else
+    QVariant v = QVariant::fromValue(kData->edata.info);
+#endif
     QVariant var1=w->property("InfoList");
     QVariantList infoList1 = var1.toList();
     infoList1.append(v);
     w->setProperty("InfoList", infoList1);
 
+ #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QVariant plugin = qVariantFromValue(kData->pluginInterface);
+#else
+    QVariant plugin = QVariant::fromValue(kData->pluginInterface);
+#endif
     QVariant var2=w->property("Interface");
     QVariantList infoList2 = var2.toList();
     infoList2.append(plugin);
@@ -3987,7 +4043,15 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
         setlocale(LC_NUMERIC, "C");
 
         // Regexp will used when is marked with %/regexp/
-        QRegExp checkregexp("%\\/(\\S+)\\/");
+     QString pattern="%\\/(\\S+)\\/";
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        QRegExp checkregexp(pattern);
+#else
+        QRegularExpression checkregexp(pattern);
+        QRegularExpressionMatch match = checkregexp(calcString);
+        int pos=match.capturedStart();
+        //match.captured();
+#endif
         checkregexp.setMinimal(true);
         if (checkregexp.indexIn(calcString) != -1){
             knobData *ptr = mutexKnobDataP->GetMutexKnobDataPtr(MonitorList.at(1).toInt());

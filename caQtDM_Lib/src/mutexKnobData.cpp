@@ -786,18 +786,25 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
         static const QChar grad = 0x00b0;   // will be replaced by this utf-8 code
         QString Grad(grad);
 #else
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         static const QChar egrad = 0x00b0;              // º coming from epics
         QString Egrad(egrad);
         //QString Grad=QString::fromLatin1("º");
         //QString Grad=QString::fromUtf8("\xc2\xb0");
         static const QChar grad[2] = { 0x00c2, 0x00ba};   // will be replaced by this utf-8 code
         QString Grad(grad, 2);
-
+#else
+        static const QChar egrad = QChar(0x00b0);              // º coming from epics
+        QString Egrad(egrad);
+        static const QChar grad[2] = { QChar(0x00c2), QChar(0x00ba)};   // will be replaced by this utf-8 code
+        QString Grad(grad, 2);
+#endif
 #endif
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
         static const QChar emu =  0x00b5;               // mu coming from epics
         QString Emu(emu);
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+
         static const QChar mu =  0x00b5;
         QString Mu(mu);
         static const QChar uA[2] = { 0x00b5, 0x0041};
@@ -805,13 +812,29 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
         QString uAs(uA, 2);
         QString uJs(uJ, 2);
 #else
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        static const QChar emu =  0x00b5;               // mu coming from epics
+        QString Emu(emu);
+
         static const QChar mu[2] = { 0x00ce, 0x00bc};
         QString Mu(mu, 2);
         static const QChar uA[3] = { 0x00ce, 0x00bc, 0x0041}; // muA code for replacing ?A coming from epics
         static const QChar uJ[3] = { 0x00ce, 0x00bc, 0x004A}; // muA code for replacing ?J coming from epics
+#else
+        static const QChar emu =   QChar(0x00b5);               // mu coming from epics
+        QString Emu(emu);
+
+        static const QChar mu[2] = { QChar(0x00ce), QChar(0x00bc)};
+        QString Mu(mu, 2);
+        static const QChar uA[3] = { QChar(0x00ce), QChar(0x00bc), QChar(0x0041)}; // muA code for replacing ?A coming from epics
+        static const QChar uJ[3] = { QChar(0x00ce), QChar(0x00bc), QChar(0x004A)}; // muA code for replacing ?J coming from epics
+
+#endif
+
+#endif
+
         QString uAs(uA, 3);
         QString uJs(uJ, 3);
-#endif
 
         // replace special characters
         StringUnits.replace(Egrad, Grad);
@@ -828,7 +851,13 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
         StringUnits.replace("uJ", uJs);
 
         // neither grad
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         static const QChar spec =  0x00c2;
+#else
+        static const QChar spec =  QChar(0x00c2);
+#endif
+
+
         QString special(spec);
         if(StringUnits.contains("°C")) StringUnits.replace(special, "");
     }

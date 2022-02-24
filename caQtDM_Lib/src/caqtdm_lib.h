@@ -177,7 +177,11 @@ public:
         printer->setOutputFileName(0);
         printer->setPrintProgram("lpr");
 #endif
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         printer->setOrientation(QPrinter::Landscape);
+#else
+        printer->setPageOrientation( QPageLayout::Landscape);
+#endif
         printer->setResolution(300);
         printer->setOutputFormat(QPrinter::NativeFormat);
         QPrintDialog *printDialog = new QPrintDialog(printer, this);
@@ -199,7 +203,11 @@ public:
     {
 #ifndef MOBILE
         QPrinter *printer = new QPrinter;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         printer->setOrientation(QPrinter::Portrait);
+#else
+        printer->setPageOrientation( QPageLayout::Portrait);
+#endif
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
         printer->setOutputFormat(QPrinter::PostScriptFormat);
 #else
@@ -272,15 +280,30 @@ private:
         QFontMetrics ft(thisFont);
 
         painter.save();
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         double xscale = printer->pageRect().width()/double(this->width());
         double yscale = printer->pageRect().height()/double(this->height() + ft.lineSpacing());
         double scale = qMin(xscale, yscale);
         painter.translate(printer->paperRect().x() + printer->pageRect().width()/2,
                           printer->paperRect().y() + printer->pageRect().height()/2);
+#else
+        QRectF pageSize=printer->pageLayout().fullRect();
+        double xscale = pageSize.width()/double(this->width());
+        double yscale = pageSize.height()/double(this->height() + ft.lineSpacing());
+        double scale = qMin(xscale, yscale);
+        painter.translate(pageSize.x() + pageSize.width()/2,
+                          pageSize.y() + pageSize.height()/2);
+
+#endif
         painter.scale(scale, scale);
         painter.translate(-width()/2, -height()/2 + ft.lineSpacing());
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         QPixmap pm = QPixmap::grabWidget(this);
+#else
+        QPixmap pm = this->grab();
+#endif
+
         painter.drawPixmap(0, 0, pm);
 
         painter.restore();

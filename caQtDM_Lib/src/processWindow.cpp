@@ -169,7 +169,12 @@ void processWindow::processFinished()
 
 void processWindow::processStarted()
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     thisPID = termProcess->pid();
+#else
+    thisPID = termProcess->processId();
+#endif
+
 }
 
 void processWindow::processError(QProcess::ProcessError err)

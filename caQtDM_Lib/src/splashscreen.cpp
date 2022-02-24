@@ -31,15 +31,23 @@
 #include <QLabel>
 #include <QWidget>
 #include "splashscreen.h"
-#include <QStyleOptionProgressBarV2>
 #include <QDebug>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#include <QStyleOptionProgressBarV2>
 #include <QDesktopWidget>
+#else
+#include <QStyleOptionProgressBar>
+#endif
 #include <QApplication>
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 SplashScreen::SplashScreen(QWidget *parent) : QSplashScreen(parent), m_progress(0)
+#else
+SplashScreen::SplashScreen(QWidget *parent) : QSplashScreen(pixmap), m_progress(0)
+#endif
 
 {
-    Qt::WindowFlags flags = 0;
+    Qt::WindowFlags flags = (Qt::WindowFlags)0;
     flags |= Qt::WindowStaysOnTopHint | Qt::SplashScreen ;
     setWindowFlags(flags);
 

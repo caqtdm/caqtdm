@@ -42,7 +42,13 @@ void myQProcess::start(QString program, QIODevice::OpenMode mode)
 {
     started = true;
     prog = program;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     process->start(program, mode);
+#else
+     QStringList arguments=QStringList();
+    process->start(program,arguments, mode);
+#endif
+
     //qDebug() << process->readAllStandardOutput();
 }
 
@@ -52,26 +58,26 @@ void myQProcess::error(QProcess::ProcessError err)
     {
     case QProcess::FailedToStart:
         started = false;
-        QMessageBox::information(0,"FailedToStart","FailedToStart <" + prog + ">");
+        QMessageBox::information(Q_NULLPTR,"FailedToStart","FailedToStart <" + prog + ">");
         break;
     case QProcess::Crashed:
         started = false;
-        QMessageBox::information(0,"Crashed","Crashed <" + prog + ">");
+        QMessageBox::information(Q_NULLPTR,"Crashed","Crashed <" + prog + ">");
         break;
     case QProcess::Timedout:
-        QMessageBox::information(0,"FailedToStart","FailedToStart <" + prog + ">");
+        QMessageBox::information(Q_NULLPTR,"FailedToStart","FailedToStart <" + prog + ">");
         break;
     case QProcess::WriteError:
-        QMessageBox::information(0,"Timedout","Timedout <" + prog + ">");
+        QMessageBox::information(Q_NULLPTR,"Timedout","Timedout <" + prog + ">");
         break;
     case QProcess::ReadError:
-        QMessageBox::information(0,"ReadError","ReadError <" + prog + ">");
+        QMessageBox::information(Q_NULLPTR,"ReadError","ReadError <" + prog + ">");
         break;
     case QProcess::UnknownError:
-        QMessageBox::information(0,"UnknownError","UnknownError <" + prog + ">");
+        QMessageBox::information(Q_NULLPTR,"UnknownError","UnknownError <" + prog + ">");
         break;
     default:
-        QMessageBox::information(0,"default","default <" + prog + ">");
+        QMessageBox::information(Q_NULLPTR,"default","default <" + prog + ">");
         break;
     }
     process->deleteLater();
@@ -81,9 +87,9 @@ void myQProcess::finished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     started = false;
     if(exitStatus == QProcess::CrashExit) {
-        QMessageBox::information(0,"Crashed","Crashed <" + prog + ">");
+        QMessageBox::information(Q_NULLPTR,"Crashed","Crashed <" + prog + ">");
     } else if(exitCode != 0) {
-        QMessageBox::information(0,"Some failure","failure on <" + prog + ">");
+        QMessageBox::information(Q_NULLPTR,"Some failure","failure on <" + prog + ">");
     }
     process->deleteLater();
 }
