@@ -29,6 +29,7 @@
 #include <QEvent>
 #include <QMouseEvent>
 #include <QTimer>
+#include <QTime>
 #include <QApplication>
 
 #include <math.h>

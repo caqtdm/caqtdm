@@ -2208,7 +2208,13 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
 
     QFutureSynchronizer<void> Sectors;
     for (int x=0;x<threadcounter;x++){
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         Sectors.addFuture(QtConcurrent::run(this, CameraDataConvert, x, threadcounter, &MinMax, resultSize, savedSizeNew));
+#else
+        Sectors.addFuture(QtConcurrent::run(CameraDataConvert,this,x, threadcounter, &MinMax, resultSize, savedSizeNew));
+#endif
+
+
     }
     Sectors.waitForFinished();
     //__itt_event_end( mark_event );
