@@ -315,6 +315,10 @@ epics4_plugin {
                 }
                 CONFIG += release
                 CAQTDM_PSI_SPECIAL_EPICS7_C11 {
+                    contains(QT_VER_MAJ, 6) {
+                        CONFIG += c++11
+                    }
+
                     contains(QT_VER_MAJ, 5) {
                         CONFIG += c++11
                     }
@@ -372,6 +376,9 @@ epics4_plugin {
                     CONFIG +=Define_Build_caQtDM_Lib Define_Build_qtcontrols
                     CONFIG +=Define_Build_epicsPV_controls Define_Build_epics_controls
                     CONFIG +=Define_Symbols
+                    QMAKE_CXXFLAGS     -= -Zc:externConstexpr
+                    QMAKE_CXXFLAGS     -= -permissive-
+                    QMAKE_CXXFLAGS     +=-Zc:referenceBinding
 		  }
  		
  
