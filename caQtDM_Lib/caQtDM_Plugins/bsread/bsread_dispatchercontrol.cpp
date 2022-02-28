@@ -255,7 +255,11 @@ void bsread_dispatchercontrol::process()
             init_reconnection=false;
             QString data="{\"channels\":[ ";
             QMutexLocker lock(&ChannelLocker);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             QSet<QString> keys=QSet<QString>::fromList(Channels.keys());
+#else
+            QSet<QString> keys(Channels.keys().begin(),Channels.keys().end());
+#endif
             foreach( QString key,keys){
                 if (!key.startsWith("bsread:")){ //removes all header channels
                     if (!key.contains(".BSREADSHAPE")&&!key.contains(".ENC_GROUP")&&!key.contains(".ENC_TYPE")&&!key.contains(".ENC_SUBTYPE")){//removes shape waveform channels
@@ -275,8 +279,11 @@ void bsread_dispatchercontrol::process()
 
             if (!data.contains("channels\":[]")){
                 QByteArray transferdata;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
                 transferdata.append(data);
-
+#else
+                transferdata.append(data.toLatin1());
+#endif
                 msg="Dispatcher Request (";
                 msg.append(QString::number(Channels.count()));
                 msg.append(")");
@@ -703,8 +710,11 @@ void bsread_dispatchercontrol::finishReplyConnect()
                 bsreadconnections.last()->setKnobData(mutexknobdataP);
 
 
-                QSet<QString> keys=QSet<QString>::fromList(Channels.keys());
-
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            QSet<QString> keys=QSet<QString>::fromList(Channels.keys());
+#else
+            QSet<QString> keys(Channels.keys().begin(),Channels.keys().end());
+#endif
                 foreach( QString key,keys)
                     foreach(int value,Channels.values(key)){
                         //qDebug()<< "Register:("<< key << value << ")";
@@ -858,7 +868,11 @@ void bsread_dispatchercontrol::ChannelVerification(QNetworkAccessManager* manage
         ChannelsApprovePipeline.insert(candidate.channel,candidate.index);
     }
 
-    QSet<QString> keys=QSet<QString>::fromList(ChannelsToBeApprovePipeline.keys());
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            QSet<QString> keys=QSet<QString>::fromList(ChannelsToBeApprovePipeline.keys());
+#else
+            QSet<QString> keys(ChannelsToBeApprovePipeline.keys().begin(),ChannelsToBeApprovePipeline.keys().end());
+#endif
     foreach( QString key,keys){
         if (!key.startsWith("bsread:")){ //removes all header channels
             if (!key.contains(".BSREADSHAPE")){//removes shape waveform channels
@@ -872,7 +886,11 @@ void bsread_dispatchercontrol::ChannelVerification(QNetworkAccessManager* manage
     data.append("]}");
     if (!data.contains("channels\":[]")){
         QByteArray transferdata;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         transferdata.append(data);
+#else
+        transferdata.append(data.toLatin1());
+#endif
         requestVerification.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
         replyVerification = manager->post(requestVerification,transferdata);
         //qDebug()<<"ChannelVerification() :"<<url.toString() <<" : "<<transferdata;

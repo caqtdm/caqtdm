@@ -4044,21 +4044,30 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
 
         // Regexp will used when is marked with %/regexp/
      QString pattern="%\\/(\\S+)\\/";
+     QString captured_Calc="";
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         QRegExp checkregexp(pattern);
-#else
-        QRegularExpression checkregexp(pattern);
-        QRegularExpressionMatch match = checkregexp(calcString);
-        int pos=match.capturedStart();
-        //match.captured();
-#endif
         checkregexp.setMinimal(true);
-        if (checkregexp.indexIn(calcString) != -1){
+        int pos=checkregexp.indexIn(calcString);
+        if (pos != -1){
+            captured_Calc = checkregexp.cap(1);
+        }
+#else
+        // Achtung setminimal der alten Implementierung ist noch nicht getested!!!!
+        QRegularExpression checkregexp(pattern);
+        QRegularExpressionMatch match = checkregexp.match(calcString,0, QRegularExpression::PartialPreferFirstMatch);
+        qsizetype pos=match.capturedStart();
+        if (match.hasMatch()){
+            captured_Calc = match.captured();
+        }
+#endif
+
+        if (pos != -1){
             knobData *ptr = mutexKnobDataP->GetMutexKnobDataPtr(MonitorList.at(1).toInt());
             if(ptr != (knobData *) Q_NULLPTR) {
                 char dataString[STRING_EXCHANGE_SIZE];
                 int caFieldType= ptr->edata.fieldtype;
-                QString captured_Calc = checkregexp.cap(1);
+
                 if((caFieldType == caSTRING || caFieldType == caENUM || caFieldType == caCHAR) && ptr->edata.dataB != (void*) Q_NULLPTR) {
                     if(ptr->edata.dataSize < STRING_EXCHANGE_SIZE) {
                         memcpy(dataString, (char*) ptr->edata.dataB, (size_t) ptr->edata.dataSize);
@@ -4087,11 +4096,16 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                         return true;
                     }
                 }
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
                 QRegExp check_A(captured_Calc);
                 check_A.setMinimal(false);
                 //check_A.indexIn(dataString);
                 //qDebug() << "captured_Calc" <<captured_Calc << dataString << check_A.capturedTexts() << check_A.isValid() << check_A.exactMatch(dataString);
                 if (check_A.exactMatch(dataString)){
+#else
+                QRegularExpression check_A(captured_Calc);
+                if (check_A.match(dataString,0, QRegularExpression::PartialPreferFirstMatch).hasMatch()){
+#endif
                     result=1;
                     valid = true;
                     return true;
@@ -4828,7 +4842,11 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
         if(data.edata.connected) {
             if(clockWidget->getTimeType() == caClock::ReceiveTime) {
                 clockWidget->setAlarmColors(data.edata.severity);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
                 QDateTime dattim = QDateTime::fromTime_t((uint) (data.edata.actTime.time + data.edata.actTime.millitm/1000.0));
+#else
+                QDateTime dattim = QDateTime::fromSecsSinceEpoch((data.edata.actTime.time + (time_t)(data.edata.actTime.millitm/1000.0)));
+#endif
                 clockWidget->updateClock(dattim.time());
             }
             // set no connection color
@@ -6286,15 +6304,25 @@ void CaQtDM_Lib::Callback_RelatedDisplayClicked(int indx)
     // special case where macros are coming from a macro definition file
     // when specified with %(read filename) in the argument list
 
-    QRegExp re("^\\s*\\%\\s*\\(\\s*read\\s+(.+)\\)$");
-
+    QString pattern="^\\s*\\%\\s*\\(\\s*read\\s+(.+)\\)$";
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QRegExp re(pattern);
+#else
+    QRegularExpression re(pattern);
+#endif
     for (int j = 0; j < args.count(); ++j) {
         QStringList macro_list = args[j].split(",");
         QStringList macro_list_expanded;
         for (int k = 0; k < macro_list.count(); ++k) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             int match = re.indexIn(macro_list[k]);
             if (match >= 0) {
                 QString macroFile = re.cap(1);
+#else
+            QRegularExpressionMatch match = re.match(macro_list[k]);
+            if (match.hasMatch()) {
+                QString macroFile = match.captured();
+#endif
                 if(macroFile.length() > 0) {
                     searchFile *s = new searchFile(macroFile);
                     QString fileNameFound = s->findFile();
@@ -7356,7 +7384,11 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         // add a file dialog to simplify user path+file input
         } else if(selectedItem->text().contains(FILEDIALOG)) {
             QFileDialog dialog(this);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             dialog.setFileMode(QFileDialog::DirectoryOnly);
+#else
+            dialog.setOption(QFileDialog::ShowDirsOnly, true);
+#endif
             if (dialog.exec()) {
                 QStringList fileNames = dialog.selectedFiles();
                 if(!fileNames[0].isEmpty()) {
@@ -8411,8 +8443,12 @@ int CaQtDM_Lib::parseForDisplayRate(QString &inputc, int &rate)
     // in the call we append the resulting string to the pv
 
     //qDebug() << "before1" << inputc;
+    QString pattern=",?\\s*.caqtdm_monitor.:\\{([^}]+)\\}\\s*,?";
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     inputc.remove(QRegExp(",?\\s*.caqtdm_monitor.:\\{([^}]+)\\}\\s*,?", Qt::CaseInsensitive));
-
+#else
+    inputc.remove(QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption));
+#endif
     //qDebug() << "final1" << inputc;
 
     return success;
@@ -9473,7 +9509,8 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
     // build a pixmap from pv text
     QFont f = font();
     QFontMetrics metrics(f);
-    int width = metrics.width(mimeData->text() + 20);
+    int width = QMETRIC_QT456_FONT_WIDTH(metrics,mimeData->text())+20;
+    //int width = metrics.width(mimeData->text() + 20);
     int height = (int) ((float) metrics.height() * 1.5);
 
     QPixmap pixmap(width, height);
@@ -9520,7 +9557,7 @@ ControlsInterface * CaQtDM_Lib::getPluginInterface(QWidget *w)
 extern "C"  {
 
     QMainWindow *myWidget;
-
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     void myMessageOutput(QtMsgType type, const char *msg)
     {
         switch (type) {
@@ -9538,7 +9575,31 @@ extern "C"  {
             abort();
         }
     }
-
+#else
+    void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+    {
+        QByteArray localMsg = msg.toLocal8Bit();
+        const char *file = context.file ? context.file : "";
+        const char *function = context.function ? context.function : "";
+        switch (type) {
+        case QtDebugMsg:
+            fprintf(stderr, "Debug: %s (%s:%u, %s)\n", localMsg.constData(), file, context.line, function);
+            break;
+        case QtInfoMsg:
+            fprintf(stderr, "Info: %s (%s:%u, %s)\n", localMsg.constData(), file, context.line, function);
+            break;
+        case QtWarningMsg:
+            fprintf(stderr, "Warning: %s (%s:%u, %s)\n", localMsg.constData(), file, context.line, function);
+            break;
+        case QtCriticalMsg:
+            fprintf(stderr, "Critical: %s (%s:%u, %s)\n", localMsg.constData(), file, context.line, function);
+            break;
+        case QtFatalMsg:
+            fprintf(stderr, "Fatal: %s (%s:%u, %s)\n", localMsg.constData(), file, context.line, function);
+            break;
+        }
+    }
+#endif
     int caQtDM_Create (char* filename) {
         int argc = 0;
         char *argv[1];
@@ -9598,9 +9659,12 @@ extern "C"  {
                 }
             }
         }
-
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         qInstallMsgHandler(myMessageOutput);
-        QMainWindow *pWindow =  new CaQtDM_Lib(0, FileName, macroS, mutexKnobData, interfaces);
+#else
+         qInstallMessageHandler(myMessageOutput);
+#endif
+        QMainWindow *pWindow =  new CaQtDM_Lib(Q_NULLPTR, FileName, macroS, mutexKnobData, interfaces);
         pWindow->show();
 
         myWidget = pWindow;

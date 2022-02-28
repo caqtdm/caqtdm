@@ -141,9 +141,14 @@ public:
                 QFutureSynchronizer<void> Sectors;
                 for (int sector=0;sector<threadcounter;sector++){
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+                    Sectors.addFuture(QtConcurrent::run(this,&bsread_wfConverter::ConProcess,sector,threadcounter,ptr,elementcount,target));
+#else
+                    Sectors.addFuture(QtConcurrent::run(&bsread_wfConverter::ConProcess,this,sector,threadcounter,ptr,elementcount,target));
+#endif
 
 
-                  Sectors.addFuture(QtConcurrent::run(this,&bsread_wfConverter::ConProcess,sector,threadcounter,ptr,elementcount,target));
+
                 }
                 Sectors.waitForFinished();
                 //printf("Image timer : %d milliseconds \n",timer.elapsed());
