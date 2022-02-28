@@ -3,6 +3,11 @@ QT += core gui
 contains(QT_VER_MAJ, 5) {
     QT     += widgets
 }
+contains(QT_VER_MAJ, 6) {
+    QT     += widgets
+    CONFIG += c++17
+}
+
 CONFIG += warn_on
 CONFIG += release
 CONFIG += epics4_plugin

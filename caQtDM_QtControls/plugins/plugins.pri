@@ -17,7 +17,10 @@ contains(QT_VER_MAJ, 5) {
           QT += designer
       }
 }
-
+contains(QT_VER_MAJ, 6) {
+      CONFIG += plugin qt thread warn_on
+      QT += widgets uitools opengl
+}
 TEMPLATE = lib
 
 ios | android {

@@ -8,6 +8,9 @@ contains(QT_VER_MAJ, 4) {
 contains(QT_VER_MAJ, 5) {
       QT += uitools
 }
+contains(QT_VER_MAJ, 6) {
+      QT += uitools
+}
 
 CONFIG += archive_plugin
 
